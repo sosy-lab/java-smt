@@ -618,9 +618,10 @@ public class ModelTest extends SolverBasedTest0 {
         amgr.makeArray("array", IntegerType, IntegerType);
     ArrayFormula<IntegerFormula, IntegerFormula> updated =
         amgr.store(array, imgr.makeNumber(1), imgr.makeNumber(1));
+    IntegerFormula selected = amgr.select(updated, imgr.makeNumber(1));
 
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
-      prover.push(imgr.equal(amgr.select(updated, imgr.makeNumber(1)), imgr.makeNumber(1)));
+      prover.push(imgr.equal(selected, imgr.makeNumber(1)));
 
       assertThat(prover).isSatisfiable();
 
@@ -628,7 +629,7 @@ public class ModelTest extends SolverBasedTest0 {
         for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
           // Check that we can iterate through with no crashes.
         }
-        assertThat(m.evaluate(amgr.select(updated, imgr.makeNumber(1)))).isEqualTo(BigInteger.ONE);
+        assertThat(m.evaluate(selected)).isEqualTo(BigInteger.ONE);
       }
     }
   }
