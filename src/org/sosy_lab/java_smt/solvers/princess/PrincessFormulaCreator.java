@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.solvers.princess;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier.EXISTS;
 import static org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier.FORALL;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessEnvironment.toSeq;
 import static scala.collection.JavaConverters.asJava;
 
 import ap.basetypes.IdealInt;
@@ -46,7 +47,6 @@ import ap.types.Sort$;
 import ap.types.Sort.MultipleValueBool$;
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +66,6 @@ import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.Prince
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessIFunctionDeclaration;
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessMultiplyDeclaration;
 import scala.Enumeration;
-import scala.collection.JavaConverters;
 
 class PrincessFormulaCreator
     extends FormulaCreator<IExpression, Sort, PrincessEnvironment, PrincessFunctionDeclaration> {
@@ -187,13 +186,7 @@ class PrincessFormulaCreator
 
   @Override
   public Sort getArrayType(Sort pIndexType, Sort pElementType) {
-    // no special cases here, princess does only support int arrays with int indexes
-    // TODO: check sorts
-    scala.collection.immutable.Seq<Sort> indexSeq =
-        JavaConverters.asScalaIteratorConverter(Arrays.asList(pIndexType).iterator())
-            .asScala()
-            .toSeq();
-    ExtArray extArray = new ExtArray(indexSeq, pElementType);
+    ExtArray extArray = new ExtArray(toSeq(ImmutableList.of(pIndexType)), pElementType);
     return extArray.objSort();
   }
 

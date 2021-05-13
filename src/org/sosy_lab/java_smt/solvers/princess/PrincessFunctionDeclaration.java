@@ -9,7 +9,7 @@
 package org.sosy_lab.java_smt.solvers.princess;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static scala.collection.JavaConverters.collectionAsScalaIterableConverter;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessEnvironment.toSeq;
 
 import ap.basetypes.IdealInt;
 import ap.parser.IExpression;
@@ -64,7 +64,7 @@ abstract class PrincessFunctionDeclaration {
         }
         argsList.add(termArg);
       }
-      final Seq<ITerm> argsBuf = collectionAsScalaIterableConverter(argsList).asScala().toSeq();
+      final Seq<ITerm> argsBuf = toSeq(argsList);
       IFunApp returnFormula = new IFunApp(app, argsBuf);
       Sort returnType = SortedIFunction$.MODULE$.iResultSort(app, returnFormula.args());
 
@@ -115,7 +115,7 @@ abstract class PrincessFunctionDeclaration {
 
     @Override
     public IExpression makeApp(PrincessEnvironment env, List<IExpression> args) {
-      return example.update(collectionAsScalaIterableConverter(args).asScala().toSeq());
+      return example.update(toSeq(args));
     }
 
     @Override
