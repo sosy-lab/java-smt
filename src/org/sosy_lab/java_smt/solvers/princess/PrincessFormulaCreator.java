@@ -39,7 +39,6 @@ import ap.parser.IVariable;
 import ap.terfor.conjunctions.Quantifier;
 import ap.terfor.preds.Predicate;
 import ap.theories.ExtArray;
-import ap.theories.ExtArray.ArraySort;
 import ap.theories.bitvectors.ModuloArithmetic;
 import ap.theories.nia.GroebnerMultiplication$;
 import ap.types.Sort;
@@ -147,7 +146,7 @@ class PrincessFormulaCreator
         return FormulaType.BooleanType;
       } else if (sort == PrincessEnvironment.INTEGER_SORT) {
         return FormulaType.IntegerType;
-      } else if (sort instanceof ExtArray.ArraySort || sort instanceof ArraySort) {
+      } else if (sort instanceof ExtArray.ArraySort) {
         return new ArrayFormulaType<>(FormulaType.IntegerType, FormulaType.IntegerType);
       } else if (sort instanceof MultipleValueBool$) {
         return FormulaType.BooleanType;
