@@ -444,11 +444,7 @@ class PrincessEnvironment {
     } else {
       IFunction funcDecl =
           api.createFunction(
-              name,
-              collectionAsScalaIterableConverter(args).asScala().toSeq(),
-              returnType,
-              false,
-              SimpleAPI.FunctionalityMode$.MODULE$.Full());
+              name, toSeq(args), returnType, false, SimpleAPI.FunctionalityMode$.MODULE$.Full());
       addFunction(funcDecl);
       functionsCache.put(name, funcDecl);
       return funcDecl;
@@ -457,12 +453,14 @@ class PrincessEnvironment {
 
   public ITerm makeSelect(ITerm array, ITerm index) {
     List<ITerm> args = ImmutableList.of(array, index);
-    return api.select(collectionAsScalaIterableConverter(args).asScala().toSeq());
+    ExtArray.ArraySort arraySort = (ExtArray.ArraySort) Sort$.MODULE$.sortOf(array);
+    return new IFunApp(arraySort.theory().select(), toSeq(args));
   }
 
   public ITerm makeStore(ITerm array, ITerm index, ITerm value) {
     List<ITerm> args = ImmutableList.of(array, index, value);
-    return api.store(collectionAsScalaIterableConverter(args).asScala().toSeq());
+    ExtArray.ArraySort arraySort = (ExtArray.ArraySort) Sort$.MODULE$.sortOf(array);
+    return new IFunApp(arraySort.theory().store(), toSeq(args));
   }
 
   public boolean hasArrayType(IExpression exp) {
@@ -494,5 +492,9 @@ class PrincessEnvironment {
     for (PrincessAbstractProver<?, ?> prover : registeredProvers) {
       prover.addSymbol(funcDecl);
     }
+  }
+
+  static <T> Seq<T> toSeq(List<T> list) {
+    return collectionAsScalaIterableConverter(list).asScala().toSeq();
   }
 }
