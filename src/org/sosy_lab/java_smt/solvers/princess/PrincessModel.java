@@ -88,8 +88,7 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
    * <p>The returned mapping contains the mapping of the complete array value ("store(const(0), 5,
    * 123)") to the identifier ("arr").
    */
-  private Map<IFunApp, List<ITerm>>
-      getArrays(
+  private Map<IFunApp, List<ITerm>> getArrays(
       scala.collection.Map<IExpression, IExpression> interpretation) {
     Map<IFunApp, List<ITerm>> arrays = new HashMap<>();
     for (Map.Entry<IExpression, IExpression> entry : asJava(interpretation).entrySet()) {
@@ -110,8 +109,8 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
     return arrays;
   }
 
-  private @Nullable List<ValueAssignment>
-      getAssignment(IExpression key, IExpression value, Map<IFunApp, List<ITerm>> pArrays) {
+  private @Nullable List<ValueAssignment> getAssignment(
+      IExpression key, IExpression value, Map<IFunApp, List<ITerm>> pArrays) {
     IExpression fValue = value;
     IExpression fKey;
     String name;
@@ -160,7 +159,6 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
                   name,
                   creator.convertValue(fValue),
                   argumentInterpretations));
-
         }
         return arrayAssignments;
 
@@ -190,7 +188,6 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
                   name,
                   creator.convertValue(fValue),
                   argumentInterpretations));
-
         }
         return arrayAssignments;
       } else {
@@ -212,11 +209,11 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
 
     return List.of(
         new ValueAssignment(
-        creator.encapsulateWithTypeOf(fKey),
-        creator.encapsulateWithTypeOf(fValue),
-        creator.encapsulateBoolean(fAssignment),
-        name,
-        creator.convertValue(fValue),
+            creator.encapsulateWithTypeOf(fKey),
+            creator.encapsulateWithTypeOf(fValue),
+            creator.encapsulateBoolean(fAssignment),
+            name,
+            creator.convertValue(fValue),
             argumentInterpretations));
   }
 
