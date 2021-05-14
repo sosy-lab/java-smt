@@ -630,6 +630,18 @@ public class ModelTest extends SolverBasedTest0 {
           // Check that we can iterate through with no crashes.
         }
         assertThat(m.evaluate(selected)).isEqualTo(BigInteger.ONE);
+
+        // check that model evaluation applies formula simplification or constant propagation.
+        ArrayFormula<IntegerFormula, IntegerFormula> stored = array;
+        for (int i = 0; i < 10; i++) {
+          stored = amgr.store(stored, imgr.makeNumber(i), imgr.makeNumber(i));
+          // zero is the inner element of array
+          assertThat(m.evaluate(amgr.select(stored, imgr.makeNumber(0))))
+              .isEqualTo(BigInteger.ZERO);
+          // i is the outer element of array
+          assertThat(m.evaluate(amgr.select(stored, imgr.makeNumber(i))))
+              .isEqualTo(BigInteger.valueOf(i));
+        }
       }
     }
   }
