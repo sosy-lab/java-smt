@@ -13,6 +13,7 @@ import static scala.collection.JavaConverters.asJava;
 import static scala.collection.JavaConverters.collectionAsScalaIterableConverter;
 
 import ap.SimpleAPI;
+import ap.parser.BooleanCompactifier;
 import ap.parser.Environment.EnvironmentException;
 import ap.parser.IAtom;
 import ap.parser.IConstant;
@@ -23,6 +24,7 @@ import ap.parser.IFunction;
 import ap.parser.IIntFormula;
 import ap.parser.ITerm;
 import ap.parser.Parser2InputAbsy.TranslationException;
+import ap.parser.PartialEvaluator;
 import ap.parser.SMTLineariser;
 import ap.parser.SMTParser2InputAbsy.SMTFunctionType;
 import ap.parser.SMTParser2InputAbsy.SMTType;
@@ -496,5 +498,13 @@ class PrincessEnvironment {
 
   static <T> Seq<T> toSeq(List<T> list) {
     return collectionAsScalaIterableConverter(list).asScala().toSeq();
+  }
+
+  IExpression simplify(IExpression f) {
+    // TODO this method is not tested, check it!
+    if (f instanceof IFormula) {
+      f = BooleanCompactifier.apply((IFormula) f);
+    }
+    return PartialEvaluator.apply(f);
   }
 }

@@ -230,6 +230,15 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
 
   @Override
   protected IExpression evalImpl(IExpression formula) {
+    IExpression evaluation = evaluate(formula);
+    if (evaluation == null) {
+      // fallback: try to simplify the query and evaluate again.
+      evaluation = evaluate(creator.getEnv().simplify(formula));
+    }
+    return evaluation;
+  }
+
+  private IExpression evaluate(IExpression formula) {
     if (formula instanceof ITerm) {
       Option<ITerm> out = model.evalToTerm((ITerm) formula);
       return out.isEmpty() ? null : out.get();
