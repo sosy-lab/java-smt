@@ -400,6 +400,8 @@ class PrincessFormulaCreator
         return FunctionDeclarationKind.SELECT;
       } else if (ExtArray.Store$.MODULE$.unapply(fun).isDefined()) {
         return FunctionDeclarationKind.STORE;
+      } else if (fun == ModuloArithmetic.mod_cast()) {
+        return FunctionDeclarationKind.OTHER;
       } else {
         return FunctionDeclarationKind.UF;
       }
