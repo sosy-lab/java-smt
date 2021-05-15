@@ -402,6 +402,8 @@ class PrincessFormulaCreator
         return FunctionDeclarationKind.STORE;
       } else if (fun == ModuloArithmetic.mod_cast()) {
         return FunctionDeclarationKind.OTHER;
+      } else if (fun == ModuloArithmetic.int_cast()) {
+        return FunctionDeclarationKind.OTHER;
       } else {
         return FunctionDeclarationKind.UF;
       }
