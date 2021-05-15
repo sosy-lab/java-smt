@@ -610,6 +610,105 @@ public class ModelTest extends SolverBasedTest0 {
     }
   }
 
+  /**
+   * Princess had problems returning a model if some (more than 1) result is not bound to a
+   * variable.
+   */
+  @Test
+  public void testResultNotInVariable() throws SolverException, InterruptedException {
+    // Boolector only supports Bitvectors (bv arrays and ufs)
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
+    ArrayFormula<IntegerFormula, IntegerFormula> array1 =
+        amgr.makeArray("array", IntegerType, IntegerType);
+    // ArrayFormula<IntegerFormula, IntegerFormula> array2 = amgr.makeArray("array", IntegerType,
+    // IntegerType);
+
+    IntegerFormula selected = amgr.select(array1, imgr.makeNumber(1));
+    BooleanFormula selectEq0 = imgr.equal(selected, imgr.makeNumber(0));
+    // Note that store is not an assignment! This is just so that the implication fails and arr[1] =
+    // 0
+    BooleanFormula selectStore =
+        imgr.equal(
+            amgr.select(
+                amgr.store(array1, imgr.makeNumber(1), imgr.makeNumber(7)),
+                imgr.makeNumber(
+                    1)),
+            imgr.makeNumber(0));
+
+    BooleanFormula assert1 = bmgr.implication(bmgr.not(selectEq0), selectStore);
+    // BooleanFormula assert2 = bmgr.implication(bmgr.not(selectEq0), formula2);
+
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(assert1);
+
+      assertThat(prover).isSatisfiable();
+
+      try (Model m = prover.getModel()) {
+        for (@SuppressWarnings("unused")
+        ValueAssignment assignment : m) {
+          // Check that we can iterate through with no crashes.
+        }
+        assertThat(m.evaluate(selected)).isEqualTo(BigInteger.ZERO);
+        assertThat(m.evaluate(selected)).isNotEqualTo(BigInteger.valueOf(0));
+      }
+    }
+  }
+
+  /**
+   * Princess had problems returning a model if some (more than 1) result is not bound to a
+   * variable.
+   */
+  @Test
+  public void testResultNotInVariable2() throws SolverException, InterruptedException {
+    // Boolector only supports Bitvectors (bv arrays and ufs)
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
+    ArrayFormula<IntegerFormula, IntegerFormula> array1 =
+        amgr.makeArray("array", IntegerType, IntegerType);
+    // ArrayFormula<IntegerFormula, IntegerFormula> array2 = amgr.makeArray("array", IntegerType,
+    // IntegerType);
+
+    IntegerFormula selected = amgr.select(array1, imgr.makeNumber(1));
+    BooleanFormula selectEq0 = imgr.equal(selected, imgr.makeNumber(0));
+    IntegerFormula selectStore = amgr.select(
+        amgr.store(array1, imgr.makeNumber(1), imgr.makeNumber(7)),
+        imgr.makeNumber(1));
+    // Note that store is not an assignment! This is just used to make the implication fail and arr[1] =
+    // 0
+    BooleanFormula selectStoreEq0 =
+        imgr.equal(
+            selectStore,
+            imgr.makeNumber(0));
+
+    IntegerFormula arithEq7 =
+        imgr.subtract(
+            imgr.multiply(imgr.add(imgr.makeNumber(1), imgr.makeNumber(2)), imgr.makeNumber(3)),
+            imgr.makeNumber(2));
+    BooleanFormula selectStoreEq7 = imgr.equal(selectStore, arithEq7);
+
+    // arr[1] = 0 -> (arr[1] = 7)[1] = 0
+    // if the left is true, the right has to be, but its false => left false => overall TRUE
+    BooleanFormula assert1 = bmgr.implication(selectEq0, selectStoreEq0);
+    // arr[1] != 0 -> (arr[1] = 7)[1] = 7
+    // left has to be true because of assert1 -> right has to be true as well
+    BooleanFormula assert2 = bmgr.implication(bmgr.not(selectEq0), selectStoreEq7);
+
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(bmgr.and(assert1, assert2));
+
+      assertThat(prover).isSatisfiable();
+
+      try (Model m = prover.getModel()) {
+        for (@SuppressWarnings("unused")
+        ValueAssignment assignment : m) {
+          // Check that we can iterate through with no crashes.
+        }
+        assertThat(m.evaluate(selectStore)).isEqualTo(BigInteger.valueOf(7));
+        assertThat(m.evaluate(arithEq7)).isEqualTo(BigInteger.valueOf(7));
+        assertThat(m.evaluate(selected)).isNotEqualTo(BigInteger.valueOf(0));
+      }
+    }
+  }
+
   @Test
   public void testGetIntArrays() throws SolverException, InterruptedException {
     requireArrays();
@@ -626,7 +725,8 @@ public class ModelTest extends SolverBasedTest0 {
       assertThat(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {
-        for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
+        for (@SuppressWarnings("unused")
+        ValueAssignment assignment : m) {
           // Check that we can iterate through with no crashes.
         }
         assertThat(m.evaluate(selected)).isEqualTo(BigInteger.ONE);
