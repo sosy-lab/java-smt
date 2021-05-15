@@ -100,84 +100,46 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
 
   private ImmutableList<ValueAssignment> getAssignments(
       IExpression key, IExpression value, Multimap<IFunApp, ITerm> pArrays) {
-    IExpression fValue = value;
-    IExpression fKey;
+
+    // first check array-access, for explanation see #getArrays.
+    // those cases can return multiple assignments per model entry.
+    if (key instanceof IConstant) {
+      if (creator.getEnv().hasArrayType(key)) {
+        return ImmutableList.of();
+      }
+    } else if (key instanceof IFunApp) {
+      IFunApp cKey = (IFunApp) key;
+      if (ExtArray.Select$.MODULE$.unapply(cKey.fun()).isDefined()) {
+        return getAssignmentsFromArraySelect(value, cKey, pArrays);
+      } else if (ExtArray.Store$.MODULE$.unapply(cKey.fun()).isDefined()) {
+        return getAssignmentsFromArrayStore((IFunApp) value, cKey, pArrays);
+      }
+    }
+
+    // then handle assignments for non-array cases.
+    // we expect exactly one assignment per model entry.
+
     String name;
     IFormula fAssignment;
     Collection<Object> argumentInterpretations = ImmutableList.of();
 
     if (key instanceof IAtom) {
-      fKey = key;
       name = key.toString();
-      fAssignment = new IBinFormula(IBinJunctor.Eqv(), (IAtom) key, (IFormula) fValue);
+      fAssignment = new IBinFormula(IBinJunctor.Eqv(), (IAtom) key, (IFormula) value);
 
     } else if (key instanceof IConstant) {
-      if (creator.getEnv().hasArrayType(key)) {
-        // array-access, for explanation see #getArrays
-        return ImmutableList.of();
-      } else {
-        fKey = key;
-        name = key.toString();
-        fAssignment = ((IConstant) key).$eq$eq$eq((ITerm) fValue);
-      }
+      name = key.toString();
+      fAssignment = ((IConstant) key).$eq$eq$eq((ITerm) value);
 
     } else if (key instanceof IFunApp) {
+      // normal variable or UF
       IFunApp cKey = (IFunApp) key;
-
-      if (ExtArray.Select$.MODULE$.unapply(cKey.fun()).isDefined()) {
-        // array-access, for explanation see #getArrayAddresses
-        ITerm arrayId = cKey.args().apply(Integer.valueOf(0));
-        ITerm arrayIndex = cKey.args().apply(Integer.valueOf(1));
-        ImmutableList.Builder<ValueAssignment> arrayAssignments = ImmutableList.builder();
-        for (ITerm arrayF : pArrays.get((IFunApp) arrayId)) {
-          fKey = creator.getEnv().makeSelect(arrayF, arrayIndex);
-          name = arrayF.toString();
-          argumentInterpretations = ImmutableList.of(creator.convertValue(arrayIndex));
-          fAssignment = ((ITerm) fKey).$eq$eq$eq((ITerm) fValue);
-          arrayAssignments.add(
-              new ValueAssignment(
-                  creator.encapsulateWithTypeOf(fKey),
-                  creator.encapsulateWithTypeOf(fValue),
-                  creator.encapsulateBoolean(fAssignment),
-                  name,
-                  creator.convertValue(fValue),
-                  argumentInterpretations));
-        }
-        return arrayAssignments.build();
-
-      } else if (ExtArray.Store$.MODULE$.unapply(cKey.fun()).isDefined()) {
-        // array-access, for explanation see #getArrayAddresses
-        // IdealInt sourceArray = cKey.args().apply(0);
-        ITerm arrayIndex2 = cKey.args().apply(Integer.valueOf(1));
-        ITerm arrayContent = cKey.args().apply(Integer.valueOf(2));
-        ImmutableList.Builder<ValueAssignment> arrayAssignments = ImmutableList.builder();
-        for (ITerm arrayF2 : pArrays.get((IFunApp) value)) {
-          fKey = creator.getEnv().makeSelect(arrayF2, arrayIndex2);
-          fValue = arrayContent;
-          name = arrayF2.toString();
-          argumentInterpretations = ImmutableList.of(creator.convertValue(arrayIndex2));
-          fAssignment = ((ITerm) fKey).$eq$eq$eq((ITerm) fValue);
-          arrayAssignments.add(
-              new ValueAssignment(
-                  creator.encapsulateWithTypeOf(fKey),
-                  creator.encapsulateWithTypeOf(fValue),
-                  creator.encapsulateBoolean(fAssignment),
-                  name,
-                  creator.convertValue(fValue),
-                  argumentInterpretations));
-        }
-        return arrayAssignments.build();
-      } else {
-        // normal variable or UF
-        argumentInterpretations = new ArrayList<>();
-        for (ITerm arg : asJava(cKey.args())) {
-          argumentInterpretations.add(creator.convertValue(arg));
-        }
-        fKey = cKey;
-        name = cKey.fun().name();
+      argumentInterpretations = new ArrayList<>();
+      for (ITerm arg : asJava(cKey.args())) {
+        argumentInterpretations.add(creator.convertValue(arg));
       }
-
-      fAssignment = ((ITerm) fKey).$eq$eq$eq((ITerm) fValue);
+      name = cKey.fun().name();
+      fAssignment = ((ITerm) key).$eq$eq$eq((ITerm) value);
 
     } else {
       throw new AssertionError(
@@ -186,12 +148,52 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
 
     return ImmutableList.of(
         new ValueAssignment(
-            creator.encapsulateWithTypeOf(fKey),
-            creator.encapsulateWithTypeOf(fValue),
+            creator.encapsulateWithTypeOf(key),
+            creator.encapsulateWithTypeOf(value),
             creator.encapsulateBoolean(fAssignment),
             name,
-            creator.convertValue(fValue),
+            creator.convertValue(value),
             argumentInterpretations));
+  }
+
+  /** array-access, for explanation see #getArrayAddresses. */
+  private ImmutableList<ValueAssignment> getAssignmentsFromArraySelect(
+      IExpression fValue, IFunApp cKey, Multimap<IFunApp, ITerm> pArrays) {
+    IFunApp arrayId = (IFunApp) cKey.args().apply(Integer.valueOf(0));
+    ITerm arrayIndex = cKey.args().apply(Integer.valueOf(1));
+    ImmutableList.Builder<ValueAssignment> arrayAssignments = ImmutableList.builder();
+    for (ITerm arrayF : pArrays.get(arrayId)) {
+      ITerm select = creator.getEnv().makeSelect(arrayF, arrayIndex);
+      arrayAssignments.add(
+          new ValueAssignment(
+              creator.encapsulateWithTypeOf(select),
+              creator.encapsulateWithTypeOf(fValue),
+              creator.encapsulateBoolean(select.$eq$eq$eq((ITerm) fValue)),
+              arrayF.toString(),
+              creator.convertValue(fValue),
+              ImmutableList.of(creator.convertValue(arrayIndex))));
+    }
+    return arrayAssignments.build();
+  }
+
+  /** array-access, for explanation see #getArrayAddresses. */
+  private ImmutableList<ValueAssignment> getAssignmentsFromArrayStore(
+      IFunApp value, IFunApp cKey, Multimap<IFunApp, ITerm> pArrays) {
+    ITerm arrayIndex = cKey.args().apply(Integer.valueOf(1));
+    ITerm arrayContent = cKey.args().apply(Integer.valueOf(2));
+    ImmutableList.Builder<ValueAssignment> arrayAssignments = ImmutableList.builder();
+    for (ITerm arrayF : pArrays.get(value)) {
+      ITerm select = creator.getEnv().makeSelect(arrayF, arrayIndex);
+      arrayAssignments.add(
+          new ValueAssignment(
+              creator.encapsulateWithTypeOf(select),
+              creator.encapsulateWithTypeOf(arrayContent),
+              creator.encapsulateBoolean(select.$eq$eq$eq(arrayContent)),
+              arrayF.toString(),
+              creator.convertValue(arrayContent),
+              ImmutableList.of(creator.convertValue(arrayIndex))));
+    }
+    return arrayAssignments.build();
   }
 
   @Override
