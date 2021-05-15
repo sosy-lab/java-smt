@@ -21,14 +21,13 @@ import ap.parser.IFunApp;
 import ap.parser.ITerm;
 import ap.theories.ExtArray;
 import ap.types.Sort;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Multimap;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import scala.Option;
@@ -48,19 +47,12 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
     scala.collection.Map<IExpression, IExpression> interpretation = model.interpretation();
 
     // first get the addresses of arrays
-    Map<IFunApp, List<ITerm>> arrays = getArrays(interpretation);
+    Multimap<IFunApp, ITerm> arrays = getArrays(interpretation);
 
     // then iterate over the model and generate the assignments
     ImmutableSet.Builder<ValueAssignment> assignments = ImmutableSet.builder();
     for (Map.Entry<IExpression, IExpression> entry : asJava(interpretation).entrySet()) {
-      List<ValueAssignment> assignmentList =
-          getAssignment(entry.getKey(), entry.getValue(), arrays);
-      if (assignmentList != null) {
-        for (int i = 0; i < assignmentList.size(); i++) {
-          ValueAssignment assignment = assignmentList.get(i);
-          assignments.add(assignment);
-        }
-      }
+      assignments.addAll(getAssignments(entry.getKey(), entry.getValue(), arrays));
     }
     return assignments.build().asList();
   }
@@ -88,9 +80,9 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
    * <p>The returned mapping contains the mapping of the complete array value ("store(const(0), 5,
    * 123)") to the identifier ("arr").
    */
-  private Map<IFunApp, List<ITerm>> getArrays(
+  private Multimap<IFunApp, ITerm> getArrays(
       scala.collection.Map<IExpression, IExpression> interpretation) {
-    Map<IFunApp, List<ITerm>> arrays = new HashMap<>();
+    Multimap<IFunApp, ITerm> arrays = ArrayListMultimap.create();
     for (Map.Entry<IExpression, IExpression> entry : asJava(interpretation).entrySet()) {
       if (entry.getKey() instanceof IConstant) {
         ITerm maybeArray = (IConstant) entry.getKey();
@@ -99,18 +91,15 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
             && value instanceof IFunApp
             && ExtArray.Store$.MODULE$.unapply(((IFunApp) value).fun()).isDefined()) {
           // It is value -> variables, hence if 2+ vars have the same value we need a list
-          List<ITerm> variables = arrays.getOrDefault(value, new ArrayList<>());
-          variables.add(maybeArray);
-          arrays.remove(value);
-          arrays.put((IFunApp) value, variables);
+          arrays.put((IFunApp) value, maybeArray);
         }
       }
     }
     return arrays;
   }
 
-  private @Nullable List<ValueAssignment> getAssignment(
-      IExpression key, IExpression value, Map<IFunApp, List<ITerm>> pArrays) {
+  private ImmutableList<ValueAssignment> getAssignments(
+      IExpression key, IExpression value, Multimap<IFunApp, ITerm> pArrays) {
     IExpression fValue = value;
     IExpression fKey;
     String name;
@@ -125,7 +114,7 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
     } else if (key instanceof IConstant) {
       if (creator.getEnv().hasArrayType(key)) {
         // array-access, for explanation see #getArrays
-        return null;
+        return ImmutableList.of();
       } else {
         fKey = key;
         name = key.toString();
@@ -139,14 +128,8 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
         // array-access, for explanation see #getArrayAddresses
         ITerm arrayId = cKey.args().apply(Integer.valueOf(0));
         ITerm arrayIndex = cKey.args().apply(Integer.valueOf(1));
-        List<ITerm> arrayFList = pArrays.get(arrayId);
-        if (arrayFList == null) {
-          // intermediate array store, like a tmp-variable, happens for repeated
-          // store-operations
-          return null;
-        }
-        List<ValueAssignment> arrayAssignments = new ArrayList<>();
-        for (ITerm arrayF : arrayFList) {
+        ImmutableList.Builder<ValueAssignment> arrayAssignments = ImmutableList.builder();
+        for (ITerm arrayF : pArrays.get((IFunApp) arrayId)) {
           fKey = creator.getEnv().makeSelect(arrayF, arrayIndex);
           name = arrayF.toString();
           argumentInterpretations = ImmutableList.of(creator.convertValue(arrayIndex));
@@ -160,21 +143,15 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
                   creator.convertValue(fValue),
                   argumentInterpretations));
         }
-        return arrayAssignments;
+        return arrayAssignments.build();
 
       } else if (ExtArray.Store$.MODULE$.unapply(cKey.fun()).isDefined()) {
         // array-access, for explanation see #getArrayAddresses
         // IdealInt sourceArray = cKey.args().apply(0);
         ITerm arrayIndex2 = cKey.args().apply(Integer.valueOf(1));
         ITerm arrayContent = cKey.args().apply(Integer.valueOf(2));
-        List<ITerm> arrayF2List = pArrays.get(value);
-        if (arrayF2List == null) {
-          // intermediate array store, like a tmp-variable, happens for repeated
-          // store-operations
-          return null;
-        }
-        List<ValueAssignment> arrayAssignments = new ArrayList<>();
-        for (ITerm arrayF2 : arrayF2List) {
+        ImmutableList.Builder<ValueAssignment> arrayAssignments = ImmutableList.builder();
+        for (ITerm arrayF2 : pArrays.get((IFunApp) value)) {
           fKey = creator.getEnv().makeSelect(arrayF2, arrayIndex2);
           fValue = arrayContent;
           name = arrayF2.toString();
@@ -189,7 +166,7 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
                   creator.convertValue(fValue),
                   argumentInterpretations));
         }
-        return arrayAssignments;
+        return arrayAssignments.build();
       } else {
         // normal variable or UF
         argumentInterpretations = new ArrayList<>();
@@ -207,7 +184,7 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
           String.format("unknown type of key: %s -> %s (%s)", key, value, key.getClass()));
     }
 
-    return List.of(
+    return ImmutableList.of(
         new ValueAssignment(
             creator.encapsulateWithTypeOf(fKey),
             creator.encapsulateWithTypeOf(fValue),
