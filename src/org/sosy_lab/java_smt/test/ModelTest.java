@@ -620,8 +620,6 @@ public class ModelTest extends SolverBasedTest0 {
     assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     ArrayFormula<IntegerFormula, IntegerFormula> array1 =
         amgr.makeArray("array", IntegerType, IntegerType);
-    // ArrayFormula<IntegerFormula, IntegerFormula> array2 = amgr.makeArray("array", IntegerType,
-    // IntegerType);
 
     IntegerFormula selected = amgr.select(array1, imgr.makeNumber(1));
     BooleanFormula selectEq0 = imgr.equal(selected, imgr.makeNumber(0));
@@ -636,7 +634,6 @@ public class ModelTest extends SolverBasedTest0 {
             imgr.makeNumber(0));
 
     BooleanFormula assert1 = bmgr.implication(bmgr.not(selectEq0), selectStore);
-    // BooleanFormula assert2 = bmgr.implication(bmgr.not(selectEq0), formula2);
 
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(assert1);
@@ -664,8 +661,6 @@ public class ModelTest extends SolverBasedTest0 {
     assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     ArrayFormula<IntegerFormula, IntegerFormula> array1 =
         amgr.makeArray("array", IntegerType, IntegerType);
-    // ArrayFormula<IntegerFormula, IntegerFormula> array2 = amgr.makeArray("array", IntegerType,
-    // IntegerType);
 
     IntegerFormula selected = amgr.select(array1, imgr.makeNumber(1));
     BooleanFormula selectEq0 = imgr.equal(selected, imgr.makeNumber(0));
@@ -705,6 +700,66 @@ public class ModelTest extends SolverBasedTest0 {
         assertThat(m.evaluate(selectStore)).isEqualTo(BigInteger.valueOf(7));
         assertThat(m.evaluate(arithEq7)).isEqualTo(BigInteger.valueOf(7));
         assertThat(m.evaluate(selected)).isNotEqualTo(BigInteger.valueOf(0));
+      }
+    }
+  }
+
+  /**
+   * Princess had problems returning a model if some (more than 1) result is not bound to a
+   * variable.
+   */
+  @Test
+  public void testResultNotInVariable3() throws SolverException, InterruptedException {
+    // Boolector only supports Bitvectors (bv arrays and ufs)
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
+    ArrayFormula<IntegerFormula, IntegerFormula> array1 =
+        amgr.makeArray("array1", IntegerType, IntegerType);
+
+    ArrayFormula<IntegerFormula, IntegerFormula> array2 =
+        amgr.makeArray("array2", IntegerType, IntegerType);
+
+    IntegerFormula selected1 = amgr.select(array1, imgr.makeNumber(1));
+    BooleanFormula selectEq0 = imgr.equal(selected1, imgr.makeNumber(0));
+    BooleanFormula selectGT0 = imgr.greaterThan(selected1, imgr.makeNumber(0));
+    BooleanFormula selectGTEmin1 = imgr.greaterOrEquals(selected1, imgr.makeNumber(-1));
+
+    IntegerFormula selected2 = amgr.select(array2, imgr.makeNumber(1));
+    BooleanFormula arr2LT0 = imgr.lessOrEquals(selected2, imgr.makeNumber(0));
+    BooleanFormula select2GTEmin1 = imgr.greaterOrEquals(selected2, imgr.makeNumber(-1));
+
+    // arr1[1] > 0 -> arr1[1] = 0
+    // obviously false => arr[1] <= 0
+    BooleanFormula assert1 = bmgr.implication(selectGT0, selectEq0);
+    // arr1[1] > 0 -> arr2[1] <= 1
+    // left holds because of the first assertion => arr2[1] <= 0
+    BooleanFormula assert2 = bmgr.implication(bmgr.not(selectGT0), arr2LT0);
+    // if now arr2[1] >= -1 -> arr1[1] >= -1
+    // holds
+    BooleanFormula assert3 = bmgr.implication(select2GTEmin1, selectGTEmin1);
+    BooleanFormula assert4 = imgr.greaterThan(selected2, imgr.makeNumber(-2));
+    // basicly just says that: -1 <= arr[1] <= 0 & -1 <= arr2[1] <= 0 up to this point
+    // make the 2 array[1] values unequal
+    BooleanFormula assert5 = bmgr.not(imgr.equal(selected1, selected2));
+
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(bmgr.and(assert1, assert2, assert3, assert4, assert5));
+
+      assertThat(prover).isSatisfiable();
+
+      try (Model m = prover.getModel()) {
+        for (@SuppressWarnings("unused")
+        ValueAssignment assignment : m) {
+          // Check that we can iterate through with no crashes.
+        }
+        System.out.println(m.evaluate(selected1));
+        System.out.println(m.evaluate(selected2));
+        if (m.evaluate(selected1).equals(BigInteger.valueOf(-1))) {
+          assertThat(m.evaluate(selected1)).isEqualTo(BigInteger.valueOf(-1));
+          assertThat(m.evaluate(selected2)).isEqualTo(BigInteger.valueOf(0));
+        } else {
+          assertThat(m.evaluate(selected1)).isEqualTo(BigInteger.valueOf(0));
+          assertThat(m.evaluate(selected2)).isEqualTo(BigInteger.valueOf(-1));
+        }
       }
     }
   }
