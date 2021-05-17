@@ -680,7 +680,7 @@ public class ModelTest extends SolverBasedTest0 {
         amgr.select(amgr.store(array1, imgr.makeNumber(1), imgr.makeNumber(7)), imgr.makeNumber(1));
     BooleanFormula selectStoreEq1 = imgr.equal(select1Store7in1, imgr.makeNumber(1));
 
-    IntegerFormula select1Store7in1store7in2 =
+    IntegerFormula select1Store7in1store3in1 =
         amgr.select(
             amgr.store(
                 amgr.store(array1, imgr.makeNumber(1), imgr.makeNumber(3)),
@@ -697,7 +697,7 @@ public class ModelTest extends SolverBasedTest0 {
     BooleanFormula assert1 = bmgr.implication(selectStoreEq1, selectEq0);
     // (arr[1] = 7)[1] != 1 -> ((arr[1] = 3)[1] = 7)[1] = 7 is true
     BooleanFormula assert2 =
-        bmgr.implication(bmgr.not(selectStoreEq1), imgr.equal(select1Store7in1store7in2, arithIs7));
+        bmgr.implication(bmgr.not(selectStoreEq1), imgr.equal(select1Store7in1store3in1, arithIs7));
 
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       // make the right part of the impl in assert1 fail such that the left is negated
@@ -713,7 +713,7 @@ public class ModelTest extends SolverBasedTest0 {
           // Check that we can iterate through with no crashes.
         }
         assertThat(m.evaluate(select1Store7in1)).isEqualTo(BigInteger.valueOf(7));
-        assertThat(m.evaluate(select1Store7in1store7in2)).isEqualTo(BigInteger.valueOf(7));
+        assertThat(m.evaluate(select1Store7in1store3in1)).isEqualTo(BigInteger.valueOf(7));
         assertThat(m.evaluate(selected)).isNotEqualTo(BigInteger.valueOf(0));
         assertThat(m.evaluate(arithIs7)).isEqualTo(BigInteger.valueOf(7));
       }
