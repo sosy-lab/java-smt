@@ -653,8 +653,7 @@ public class ModelTest extends SolverBasedTest0 {
       assertThat(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {
-        for (@SuppressWarnings("unused")
-        ValueAssignment assignment : m) {
+        for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
           // Check that we can iterate through with no crashes.
         }
         assertThat(m.evaluate(select1Store7in1)).isEqualTo(BigInteger.valueOf(7));
@@ -708,8 +707,7 @@ public class ModelTest extends SolverBasedTest0 {
       assertThat(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {
-        for (@SuppressWarnings("unused")
-        ValueAssignment assignment : m) {
+        for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
           // Check that we can iterate through with no crashes.
         }
         assertThat(m.evaluate(select1Store7in1)).isEqualTo(BigInteger.valueOf(7));
@@ -736,8 +734,7 @@ public class ModelTest extends SolverBasedTest0 {
       assertThat(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {
-        for (@SuppressWarnings("unused")
-        ValueAssignment assignment : m) {
+        for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
           // Check that we can iterate through with no crashes.
         }
         assertThat(m.evaluate(selected)).isEqualTo(BigInteger.ONE);
@@ -1133,8 +1130,7 @@ public class ModelTest extends SolverBasedTest0 {
     BooleanFormula selectStore =
         imgr.equal(
             amgr.select(
-                amgr.store(array1, imgr.makeNumber(1), imgr.makeNumber(7)),
-                imgr.makeNumber(1)),
+                amgr.store(array1, imgr.makeNumber(1), imgr.makeNumber(7)), imgr.makeNumber(1)),
             imgr.makeNumber(0));
 
     BooleanFormula assert1 = bmgr.implication(bmgr.not(selectEq0), selectStore);
@@ -1145,8 +1141,7 @@ public class ModelTest extends SolverBasedTest0 {
       assertThat(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {
-        for (@SuppressWarnings("unused")
-        ValueAssignment assignment : m) {
+        for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
           // Check that we can iterate through with no crashes.
         }
         assertThat(m.evaluate(selected)).isEqualTo(BigInteger.ZERO);
@@ -1190,8 +1185,7 @@ public class ModelTest extends SolverBasedTest0 {
       assertThat(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {
-        for (@SuppressWarnings("unused")
-        ValueAssignment assignment : m) {
+        for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
           // Check that we can iterate through with no crashes.
         }
         assertThat(m.evaluate(selectStore)).isEqualTo(BigInteger.valueOf(7));
@@ -1241,8 +1235,7 @@ public class ModelTest extends SolverBasedTest0 {
       assertThat(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {
-        for (@SuppressWarnings("unused")
-        ValueAssignment assignment : m) {
+        for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
           // Check that we can iterate through with no crashes.
         }
         if (m.evaluate(selected1).equals(BigInteger.valueOf(-1))) {
