@@ -616,6 +616,7 @@ public class ModelTest extends SolverBasedTest0 {
    */
   @Test
   public void testResultNotInVariable() throws SolverException, InterruptedException {
+    requireArrays();
     // Boolector only supports Bitvectors (bv arrays and ufs)
     assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     ArrayFormula<IntegerFormula, IntegerFormula> array1 =
@@ -646,7 +647,6 @@ public class ModelTest extends SolverBasedTest0 {
           // Check that we can iterate through with no crashes.
         }
         assertThat(m.evaluate(selected)).isEqualTo(BigInteger.ZERO);
-        assertThat(m.evaluate(selected)).isNotEqualTo(BigInteger.valueOf(0));
       }
     }
   }
@@ -657,6 +657,7 @@ public class ModelTest extends SolverBasedTest0 {
    */
   @Test
   public void testResultNotInVariable2() throws SolverException, InterruptedException {
+    requireArrays();
     // Boolector only supports Bitvectors (bv arrays and ufs)
     assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     ArrayFormula<IntegerFormula, IntegerFormula> array1 =
@@ -710,6 +711,7 @@ public class ModelTest extends SolverBasedTest0 {
    */
   @Test
   public void testResultNotInVariable3() throws SolverException, InterruptedException {
+    requireArrays();
     // Boolector only supports Bitvectors (bv arrays and ufs)
     assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     ArrayFormula<IntegerFormula, IntegerFormula> array1 =
@@ -751,8 +753,6 @@ public class ModelTest extends SolverBasedTest0 {
         ValueAssignment assignment : m) {
           // Check that we can iterate through with no crashes.
         }
-        System.out.println(m.evaluate(selected1));
-        System.out.println(m.evaluate(selected2));
         if (m.evaluate(selected1).equals(BigInteger.valueOf(-1))) {
           assertThat(m.evaluate(selected1)).isEqualTo(BigInteger.valueOf(-1));
           assertThat(m.evaluate(selected2)).isEqualTo(BigInteger.valueOf(0));
