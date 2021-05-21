@@ -10,10 +10,6 @@ dist: bionic # Ubuntu 18.04
 language: java
 jdk:
   - openjdk11 # Java 11 is sufficient, larger tests are executed in Gitlab-CI
-addons:
-  apt:
-    packages:
-      - jq
 env:
   global:
     - GH_REF: github.com/sosy-lab/java-smt.git
@@ -31,7 +27,7 @@ matrix:
         - ant build-project-ecj
     - env: NAME='Unit Tests'
       script:
-        - ant unit-tests-coverage
+        - ant unit-tests
     - env: NAME='Create Javadoc'
       script:
         - ant javadoc collect-options
@@ -44,12 +40,6 @@ matrix:
     - env: NAME='Check source-code format'
       script:
         - ant format-source && git diff --exit-code
-deploy:
-  - skip_cleanup: true
-    provider: script
-    script: build/deploy-coverage.sh
-    on:
-      condition: $NAME = "Unit Tests"
 notifications:
   email:
   - java-smt-dev@googlegroups.com
