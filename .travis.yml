@@ -47,11 +47,6 @@ matrix:
 deploy:
   - skip_cleanup: true
     provider: script
-    script: build/deploy-gh-pages.sh
-    on:
-      condition: $NAME = "Create Javadoc"
-  - skip_cleanup: true
-    provider: script
     script: build/deploy-coverage.sh
     on:
       condition: $NAME = "Unit Tests"
