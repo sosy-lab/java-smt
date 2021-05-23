@@ -9,7 +9,9 @@
 package org.sosy_lab.java_smt.basicimpl;
 
 import com.google.common.base.Preconditions;
-import java.util.ArrayList;
+import com.google.common.collect.ImmutableList;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.List;
 import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -41,22 +43,43 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
   }
 
   @Override
-  public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
+  public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> importantPredicates)
       throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
     checkGenerateAllSat();
 
     push();
+    try {
+      // try model-based computation of ALLSAT
+      iterateOverAllModels(callback, importantPredicates);
+    } catch (SolverException e) {
+      // fallback to direct SAT/UNSAT-based computation of ALLSAT
+      iterateOverAllPredicateCombinations(callback, importantPredicates, new ArrayDeque<>());
+      // TODO should we completely switch to the second method?
+    }
+
+    pop();
+    return callback.getResult();
+  }
+
+  /**
+   * This method computes all satisfiable assignments for the given predicates by iterating over all
+   * models. The SMT solver can choose the ordering of variables and shortcut model generation.
+   */
+  private <R> void iterateOverAllModels(
+      AllSatCallback<R> callback, List<BooleanFormula> importantPredicates)
+      throws SolverException, InterruptedException {
     while (!isUnsat()) {
       shutdownNotifier.shutdownIfNecessary();
 
-      List<BooleanFormula> valuesOfModel = new ArrayList<>(important.size());
+      ImmutableList.Builder<BooleanFormula> valuesOfModel = ImmutableList.builder();
       try (Model model = getModelWithoutChecks()) {
-        for (BooleanFormula formula : important) {
+        for (BooleanFormula formula : importantPredicates) {
           Boolean value = model.evaluate(formula);
           if (value == null) {
             // This is a legal return value for evaluation.
             // The value doesn't matter. We ignore this assignment.
+            // This step aim for shortcutting the ALLSAT-loop.
           } else if (value) {
             valuesOfModel.add(formula);
           } else {
@@ -65,16 +88,62 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
         }
       }
 
-      callback.apply(valuesOfModel);
+      final ImmutableList<BooleanFormula> values = valuesOfModel.build();
+      callback.apply(values);
       shutdownNotifier.shutdownIfNecessary();
 
-      BooleanFormula negatedModel = bmgr.not(bmgr.and(valuesOfModel));
+      BooleanFormula negatedModel = bmgr.not(bmgr.and(values));
       addConstraint(negatedModel);
       shutdownNotifier.shutdownIfNecessary();
     }
+  }
 
-    pop();
-    return callback.getResult();
+  /**
+   * This method computes all satisfiable assignments for the given predicates by (recursively)
+   * traversing the decision tree over the given variables. The ordering of variables is fixed and
+   * we can only ignore unsatisfiable subtrees.
+   *
+   * <p>In contrast to {@link #iterateOverAllModels} we do not use model generation here, which is a
+   * benefit for some solvers or theory combinations.
+   *
+   * @param predicates remaining predicates in the decision tree.
+   * @param valuesOfModel already chosen predicate values, ordered as appearing in the tree.
+   */
+  private <R> void iterateOverAllPredicateCombinations(
+      AllSatCallback<R> callback,
+      List<BooleanFormula> predicates,
+      Deque<BooleanFormula> valuesOfModel)
+      throws SolverException, InterruptedException {
+
+    shutdownNotifier.shutdownIfNecessary();
+
+    if (isUnsat()) {
+      return;
+
+    } else if (predicates.isEmpty()) {
+      // we aim at providing the same order of predicates as given as parameter, thus reverse.
+      callback.apply(ImmutableList.copyOf(valuesOfModel).reverse());
+
+    } else {
+
+      // positive predicate
+      final BooleanFormula predicate = predicates.get(0);
+      valuesOfModel.push(predicate);
+      push(predicate);
+      iterateOverAllPredicateCombinations(
+          callback, predicates.subList(1, predicates.size()), valuesOfModel);
+      pop();
+      valuesOfModel.pop();
+
+      // negated predicate
+      final BooleanFormula notPredicate = bmgr.not(predicates.get(0));
+      valuesOfModel.push(notPredicate);
+      push(notPredicate);
+      iterateOverAllPredicateCombinations(
+          callback, predicates.subList(1, predicates.size()), valuesOfModel);
+      pop();
+      valuesOfModel.pop();
+    }
   }
 
   /**
