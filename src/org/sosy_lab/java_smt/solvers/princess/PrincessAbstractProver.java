@@ -13,6 +13,8 @@ import static scala.collection.JavaConverters.asJava;
 import static scala.collection.JavaConverters.asScala;
 
 import ap.SimpleAPI;
+import ap.SimpleAPI.PartialModel;
+import ap.SimpleAPI.SimpleAPIException;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.IFunction;
@@ -131,8 +133,23 @@ abstract class PrincessAbstractProver<E, AF> extends AbstractProverWithAllSat<E>
   }
 
   @Override
-  protected PrincessModel getModelWithoutChecks() {
-    return new PrincessModel(api.partialModel(), creator);
+  protected PrincessModel getModelWithoutChecks() throws SolverException {
+    final PartialModel partialModel;
+    try {
+      partialModel = partialModel();
+    } catch (SimpleAPIException ex) {
+      throw new SolverException(ex.getMessage(), ex);
+    }
+    return new PrincessModel(partialModel, creator);
+  }
+
+  /**
+   * This method only exists to allow catching the exception from Scala in Java.
+   *
+   * @throws SimpleAPIException if model can not be constructed.
+   */
+  private PartialModel partialModel() throws SimpleAPIException {
+    return api.partialModel();
   }
 
   @Override

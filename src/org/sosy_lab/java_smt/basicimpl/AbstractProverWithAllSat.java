@@ -77,6 +77,10 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
     return callback.getResult();
   }
 
-  /** model computation without checks for further options. */
-  protected abstract Model getModelWithoutChecks();
+  /**
+   * model computation without checks for further options.
+   *
+   * @throws SolverException if model can not be constructed.
+   */
+  protected abstract Model getModelWithoutChecks() throws SolverException;
 }
