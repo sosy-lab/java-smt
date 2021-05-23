@@ -160,6 +160,9 @@ public class SolverAllSatTest extends SolverBasedTest0 {
     env.push(bmgr.equivalence(v1, cond1));
     env.push(bmgr.equivalence(v2, cond2));
 
+    // ((i=1) XOR (i=2)) & b1 <=> (i=1) & b2 <=> (i=2)
+    // query ALLSAT for predicates [b1, b2] --> {[b1,-b2], [-b1,b2]}
+
     TestAllSatCallback callback = new TestAllSatCallback();
 
     assertThat(env.allSat(callback, ImmutableList.of(v1, v2))).isEqualTo(EXPECTED_RESULT);
