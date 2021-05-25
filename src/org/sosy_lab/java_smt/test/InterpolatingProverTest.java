@@ -971,13 +971,11 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
 
       BooleanFormula f1Internal5 =
           bvmgr.equal(
-              b,
-              bvmgr.subtract(bvmgr.add(p, bvmgr.multiply(bv2, bv4)), bvmgr.multiply(bv1, bv4)));
+              b, bvmgr.subtract(bvmgr.add(p, bvmgr.multiply(bv2, bv4)), bvmgr.multiply(bv1, bv4)));
 
       BooleanFormula f1Internal6 =
           bvmgr.equal(
-              t2,
-              bvmgr.subtract(bvmgr.add(p, bvmgr.multiply(bv2, bv4)), bvmgr.multiply(bv1, bv4)));
+              t2, bvmgr.subtract(bvmgr.add(p, bvmgr.multiply(bv2, bv4)), bvmgr.multiply(bv1, bv4)));
 
       BooleanFormula f1Internal7 = bvmgr.equal(p2, p);
 
