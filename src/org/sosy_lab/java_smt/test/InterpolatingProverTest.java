@@ -938,6 +938,7 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
   }
 
   /* This is a testcase that failed with Princess and seq interpolants. */
+  @SuppressWarnings("unused")
   @Test
   public <T> void bigSeqInterpolationTest() throws InterruptedException, SolverException {
     requireBitvectors();
@@ -1000,7 +1001,6 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
       boolean check = prover.isUnsat();
       assertWithMessage("formulas must be contradicting").that(check).isTrue();
       List<BooleanFormula> interpolants = prover.getSeqInterpolants0(ImmutableList.of(id1, id2));
-      System.out.println(interpolants);
     }
   }
 
