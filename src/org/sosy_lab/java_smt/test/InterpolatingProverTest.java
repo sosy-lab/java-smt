@@ -938,68 +938,68 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
   }
 
   /* This is a testcase that failed with Princess and seq interpolants. */
-  @SuppressWarnings("unused")
   @Test
   public <T> void bigSeqInterpolationTest() throws InterruptedException, SolverException {
     requireBitvectors();
     requireInterpolation();
+
+    int bvWidth = 32;
+    BitvectorFormula bv0 = bvmgr.makeBitvector(bvWidth, 0);
+    BitvectorFormula bv1 = bvmgr.makeBitvector(bvWidth, 1);
+    BitvectorFormula bv2 = bvmgr.makeBitvector(bvWidth, 2);
+    BitvectorFormula bv4 = bvmgr.makeBitvector(bvWidth, 4);
+    BitvectorFormula bv8 = bvmgr.makeBitvector(bvWidth, 8);
+
+    BitvectorFormula t2 = bvmgr.makeVariable(bvWidth, "tmp3");
+    BitvectorFormula p = bvmgr.makeVariable(bvWidth, "ADDRESS_OF_main::pathbuf");
+    BitvectorFormula p2 = bvmgr.makeVariable(bvWidth, "glob2::pathbuf2");
+    BitvectorFormula p3 = bvmgr.makeVariable(bvWidth, "glob2::p3");
+    BitvectorFormula p4 = bvmgr.makeVariable(bvWidth, "glob2::pathlim2");
+    BitvectorFormula b = bvmgr.makeVariable(bvWidth, "main::bound2");
+    BitvectorFormula c = bvmgr.makeVariable(bvWidth, "VERIFIER_assert::cond2");
+
+    BooleanFormula f1Internal1 =
+        bmgr.and(
+            bvmgr.lessThan(bv0, p, true),
+            bvmgr.equal(bvmgr.modulo(p, bv4, false), bvmgr.modulo(bv0, bv4, false)),
+            bvmgr.lessThan(bv0, bvmgr.add(p, bv8), true));
+
+    BooleanFormula f1Internal2 =
+        bvmgr.equal(bvmgr.modulo(p, bv4, false), bvmgr.modulo(bv0, bv4, false));
+
+    BooleanFormula f1Internal3 = bvmgr.lessThan(bv0, bvmgr.add(p, bv8), true);
+
+    BooleanFormula f1Internal5 =
+        bvmgr.equal(
+            b, bvmgr.subtract(bvmgr.add(p, bvmgr.multiply(bv2, bv4)), bvmgr.multiply(bv1, bv4)));
+
+    BooleanFormula f1Internal6 =
+        bvmgr.equal(
+            t2, bvmgr.subtract(bvmgr.add(p, bvmgr.multiply(bv2, bv4)), bvmgr.multiply(bv1, bv4)));
+
+    BooleanFormula f1Internal7 = bvmgr.equal(p2, p);
+
+    BooleanFormula f1 =
+        bmgr.and(
+            f1Internal1,
+            f1Internal2,
+            f1Internal3,
+            f1Internal5,
+            f1Internal6,
+            f1Internal7,
+            bvmgr.equal(p3, p2));
+
+    BooleanFormula f2 =
+        bmgr.and(
+            bvmgr.lessOrEquals(p3, p4, true),
+            bvmgr.equal(c, bmgr.ifThenElse(bvmgr.lessOrEquals(p3, t2, true), bv1, bv0)),
+            bvmgr.equal(c, bv0));
+
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
-      int bvWidth = 32;
-      BitvectorFormula bv0 = bvmgr.makeBitvector(bvWidth, 0);
-      BitvectorFormula bv1 = bvmgr.makeBitvector(bvWidth, 1);
-      BitvectorFormula bv2 = bvmgr.makeBitvector(bvWidth, 2);
-      BitvectorFormula bv4 = bvmgr.makeBitvector(bvWidth, 4);
-      BitvectorFormula bv8 = bvmgr.makeBitvector(bvWidth, 8);
-
-      BitvectorFormula t2 = bvmgr.makeVariable(bvWidth, "tmp3");
-      BitvectorFormula p = bvmgr.makeVariable(bvWidth, "ADDRESS_OF_main::pathbuf");
-      BitvectorFormula p2 = bvmgr.makeVariable(bvWidth, "glob2::pathbuf2");
-      BitvectorFormula p3 = bvmgr.makeVariable(bvWidth, "glob2::p3");
-      BitvectorFormula p4 = bvmgr.makeVariable(bvWidth, "glob2::pathlim2");
-      BitvectorFormula b = bvmgr.makeVariable(bvWidth, "main::bound2");
-      BitvectorFormula c = bvmgr.makeVariable(bvWidth, "VERIFIER_assert::cond2");
-
-      BooleanFormula f1Internal1 =
-          bmgr.and(
-              bvmgr.lessThan(bv0, p, true),
-              bvmgr.equal(bvmgr.modulo(p, bv4, false), bvmgr.modulo(bv0, bv4, false)),
-              bvmgr.lessThan(bv0, bvmgr.add(p, bv8), true));
-
-      BooleanFormula f1Internal2 =
-          bvmgr.equal(bvmgr.modulo(p, bv4, false), bvmgr.modulo(bv0, bv4, false));
-
-      BooleanFormula f1Internal3 = bvmgr.lessThan(bv0, bvmgr.add(p, bv8), true);
-
-      BooleanFormula f1Internal5 =
-          bvmgr.equal(
-              b, bvmgr.subtract(bvmgr.add(p, bvmgr.multiply(bv2, bv4)), bvmgr.multiply(bv1, bv4)));
-
-      BooleanFormula f1Internal6 =
-          bvmgr.equal(
-              t2, bvmgr.subtract(bvmgr.add(p, bvmgr.multiply(bv2, bv4)), bvmgr.multiply(bv1, bv4)));
-
-      BooleanFormula f1Internal7 = bvmgr.equal(p2, p);
-
-      BooleanFormula f1 =
-          bmgr.and(
-              f1Internal1,
-              f1Internal2,
-              f1Internal3,
-              f1Internal5,
-              f1Internal6,
-              f1Internal7,
-              bvmgr.equal(p3, p2));
-
-      BooleanFormula f2 =
-          bmgr.and(
-              bvmgr.lessOrEquals(p3, p4, true),
-              bvmgr.equal(c, bmgr.ifThenElse(bvmgr.lessOrEquals(p3, t2, true), bv1, bv0)),
-              bvmgr.equal(c, bv0));
-
       T id1 = prover.push(f2);
       T id2 = prover.push(f1);
-      boolean check = prover.isUnsat();
-      assertWithMessage("formulas must be contradicting").that(check).isTrue();
+      assertThat(prover).isUnsatisfiable();
+      @SuppressWarnings("unused")
       List<BooleanFormula> interpolants = prover.getSeqInterpolants0(ImmutableList.of(id1, id2));
     }
   }
