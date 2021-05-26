@@ -84,6 +84,13 @@ class PrincessEnvironment {
               + " it gets abbreviated if there are more identical terms.")
   private int minAtomsForAbbreviation = 100;
 
+  @Option(
+      secure = true,
+      description =
+          "Enable additional assertion checks within Princess. "
+              + "The main usage is debugging. This option can cause a performance overhead.")
+  private boolean enableAssertions = false;
+
   public static final Sort BOOL_SORT = Sort$.MODULE$.Bool();
   public static final Sort INTEGER_SORT = Sort.Integer$.MODULE$;
 
@@ -187,14 +194,11 @@ class PrincessEnvironment {
       scalaDumpBasename = logPath.getFileName().toString();
     }
 
-    // We enable assertions because typically we use the "assertionless" JAR where they have no
-    // effect anyway, but if we use the JAR with assertions we want them to be enabled.
-    // The constructor parameter to SimpleAPI affects only part of the assertions.
-    Debug.enableAllAssertions(true);
+    Debug.enableAllAssertions(enableAssertions);
 
     final SimpleAPI newApi =
         SimpleAPI.apply(
-            true, // enableAssert, see above
+            enableAssertions, // enableAssert, see above
             false, // no sanitiseNames, because variable names may contain chars like "@" and ":".
             smtDumpBasename != null, // dumpSMT
             smtDumpBasename, // smtDumpBasename
