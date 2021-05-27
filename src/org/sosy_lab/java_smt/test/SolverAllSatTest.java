@@ -195,6 +195,25 @@ public class SolverAllSatTest extends SolverBasedTest0 {
     requireBitvectors();
     requireQuantifiers();
 
+    assume()
+        .withMessage("solver does only partially support quantifiers")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BOOLECTOR);
+
+    if ("opt".equals(proverEnv)) {
+      assume()
+          .withMessage("solver reports a partial model when using optimization")
+          .that(solverToUse())
+          .isNotEqualTo(Solvers.Z3);
+    }
+
+    if ("itp".equals(proverEnv)) {
+      assume()
+          .withMessage("solver reports a inconclusive sat-check when using interpolation")
+          .that(solverToUse())
+          .isNotEqualTo(Solvers.PRINCESS);
+    }
+
     // (y = 1)
     // & (PRED1 <-> (y = 1))
     // & (PRED3 <-> ALL x_0. (3 * x_0 != y))
