@@ -71,6 +71,10 @@ public class FormulaClassifier {
       }
     }
 
+    if (path == null) {
+      help();
+    }
+
     Configuration config = Configuration.defaultConfiguration();
     LogManager logger = BasicLogManager.create(config);
     ShutdownNotifier notifier = ShutdownNotifier.createDummy();
