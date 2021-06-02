@@ -9,6 +9,8 @@
 package org.sosy_lab.java_smt.example;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -87,7 +89,8 @@ public class FormulaClassifier {
       List<String> definitions = new ArrayList<>();
       for (String line : Files.readAllLines(path)) {
         // we assume a line-based content
-        if (line.startsWith(";;") || line.startsWith("(push ") || line.startsWith("(pop ")) {
+        if (Iterables.any(
+            ImmutableList.of(";", "(push ", "(pop ", "(reset", "(set-logic"), line::startsWith)) {
           continue;
         } else if (line.startsWith("(assert ")) {
           BooleanFormula bf =
