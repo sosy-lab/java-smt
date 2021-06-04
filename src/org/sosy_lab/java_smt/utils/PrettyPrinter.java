@@ -131,7 +131,7 @@ public class PrettyPrinter {
     private void newline() {
       if (enableSplitting) {
         if (out.length() != 0) {
-          out.append("\n");
+          out.append(System.lineSeparator());
         }
         out.append(Strings.repeat("  ", depth)); // two spaces indent is sufficient
       } else {
@@ -190,7 +190,8 @@ public class PrettyPrinter {
     private final boolean onlyBooleanOperations;
 
     // start of dot-file, rest will be appended on visitation
-    private final StringBuilder out = new StringBuilder("digraph SMT {\n  rankdir=LR\n");
+    private final StringBuilder out =
+        new StringBuilder(String.format("digraph SMT {%n  rankdir=LR%n"));
 
     // lets print leave-nodes lazily, having them on same rank looks nicer in the plot.
     private final List<String> leaves = new ArrayList<>();
@@ -204,9 +205,9 @@ public class PrettyPrinter {
 
       // lets put non-expanded leaf-nodes onto the right side
       if (!leaves.isEmpty()) {
-        out.append("  { rank=same;\n");
+        out.append("  { rank=same;").append(System.lineSeparator());
         leaves.forEach(out::append);
-        out.append("  }\n");
+        out.append("  }").append(System.lineSeparator());
       }
 
       // end of dot-file
