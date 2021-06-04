@@ -268,11 +268,6 @@ public abstract class SolverBasedTest0 {
         .isNotEqualTo(Solvers.BOOLECTOR);
   }
 
-  @Deprecated
-  protected final void requireFalse(String failureMessage) {
-    assume().withMessage(failureMessage).fail();
-  }
-
   /**
    * Use this for checking assertions about BooleanFormulas with Truth: <code>
    * assertThatFormula(formula).is...()</code>.
