@@ -191,7 +191,8 @@ public class PrettyPrinter {
 
     // start of dot-file, rest will be appended on visitation
     private final StringBuilder out =
-        new StringBuilder(String.format("digraph SMT {%n  rankdir=LR%n"));
+        new StringBuilder(
+            "digraph SMT {" + System.lineSeparator() + "  rankdir=LR" + System.lineSeparator());
 
     // lets print leave-nodes lazily, having them on same rank looks nicer in the plot.
     private final List<String> leaves = new ArrayList<>();
