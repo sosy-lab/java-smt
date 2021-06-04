@@ -9,6 +9,8 @@
 package org.sosy_lab.java_smt.example;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -71,28 +73,38 @@ public class FormulaClassifier {
       }
     }
 
+    if (path == null) {
+      help();
+    }
+
     Configuration config = Configuration.defaultConfiguration();
     LogManager logger = BasicLogManager.create(config);
     ShutdownNotifier notifier = ShutdownNotifier.createDummy();
     // we need a solver that supports all theories, at least for parsing.
     try (SolverContext context =
         SolverContextFactory.createSolverContext(config, logger, notifier, solver)) {
-      FormulaClassifier fc = new FormulaClassifier(context);
       List<BooleanFormula> formulas = new ArrayList<>();
+
+      // read all formulas from the file
       List<String> definitions = new ArrayList<>();
       for (String line : Files.readAllLines(path)) {
         // we assume a line-based content
-        if (line.startsWith(";;") || line.startsWith("(push ") || line.startsWith("(pop ")) {
+        if (Iterables.any(
+            ImmutableList.of(";", "(push ", "(pop ", "(reset", "(set-logic"), line::startsWith)) {
           continue;
         } else if (line.startsWith("(assert ")) {
-          BooleanFormula bf = fc.parse(Joiner.on("").join(definitions) + line);
-          fc.visit(bf);
+          BooleanFormula bf =
+              context.getFormulaManager().parse(Joiner.on("").join(definitions) + line);
           formulas.add(bf);
         } else {
           // it is a definition
           definitions.add(line);
         }
       }
+
+      // classify the formulas
+      FormulaClassifier fc = new FormulaClassifier(context);
+      formulas.forEach(fc::visit);
       System.out.println(fc + ", checked formulas: " + formulas.size());
 
     } catch (InvalidConfigurationException | UnsatisfiedLinkError e) {
@@ -113,10 +125,6 @@ public class FormulaClassifier {
   public FormulaClassifier(SolverContext pContext) {
     context = pContext;
     mgr = context.getFormulaManager();
-  }
-
-  private BooleanFormula parse(String s) {
-    return mgr.parse(s);
   }
 
   public void visit(BooleanFormula f) {

@@ -24,4 +24,14 @@ public final class SolverUtils {
   public static UfElimination ufElimination(FormulaManager pFormulaManager) {
     return new UfElimination(pFormulaManager);
   }
+
+  /**
+   * Creates a new {@link PrettyPrinter} instance.
+   *
+   * @param pFormulaManager the {@link FormulaManager} to be used
+   * @return a new {@link PrettyPrinter} instance
+   */
+  public static PrettyPrinter prettyPrinter(FormulaManager pFormulaManager) {
+    return new PrettyPrinter(pFormulaManager);
+  }
 }

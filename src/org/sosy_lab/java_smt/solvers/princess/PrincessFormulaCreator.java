@@ -224,8 +224,10 @@ class PrincessFormulaCreator
   }
 
   private String getName(IExpression input) {
-    if (input instanceof IAtom || input instanceof IConstant) {
-      return input.toString();
+    if (input instanceof IAtom) {
+      return ((IAtom) input).pred().name();
+    } else if (input instanceof IConstant) {
+      return ((IConstant) input).c().name();
     } else if (input instanceof IBinFormula) {
       return ((IBinFormula) input).j().toString();
     } else if (input instanceof IFormulaITE || input instanceof ITermITE) {
