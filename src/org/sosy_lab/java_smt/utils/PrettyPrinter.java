@@ -97,8 +97,8 @@ public class PrettyPrinter {
   }
 
   private static String getEdgeLabel(FunctionDeclarationKind kind, int operandId) {
+    // for some functions, the order of operands is not important, so we return an empty String
     switch (kind) {
-        // for some functions, the order of operands is not important
       case AND:
       case OR:
       case NOT:
@@ -117,10 +117,10 @@ public class PrettyPrinter {
     private final boolean onlyBooleanOperations;
     private int depth = 0;
 
-    /** flag to enable or disable splitting formulas in multiple lines */
+    /** flag to enable or disable splitting formulas in multiple lines. */
     private boolean enableSplitting = true;
 
-    public PrettyPrintVisitor(
+    private PrettyPrintVisitor(
         FormulaManager pFmgr, StringBuilder pStr, boolean pOnlyBooleanOperations) {
       fmgr = pFmgr;
       out = pStr;
@@ -195,7 +195,7 @@ public class PrettyPrinter {
     // lets print leave-nodes lazily, having them on same rank looks nicer in the plot.
     private final List<String> leaves = new ArrayList<>();
 
-    public DotVisitor(boolean pOnlyBooleanOperations) {
+    private DotVisitor(boolean pOnlyBooleanOperations) {
       onlyBooleanOperations = pOnlyBooleanOperations;
     }
 

@@ -34,11 +34,18 @@ import org.sosy_lab.java_smt.utils.SolverUtils;
 @SuppressWarnings("unused")
 public class PrettyPrinter {
 
-  /** different kind of output */
+  /** Utility class without a public constructor. */
+  private PrettyPrinter() {}
+
+  /** We provide different types of output for the user. */
   private enum Type {
+    /** dot-output with only boolean nodes. */
     DOT,
+    /** dot-output with all operations/functions split into separate nodes. */
     DETAILED_DOT,
+    /** text-output with only boolean formulas on separate lines. */
     TEXT,
+    /** text-output with all operations/functions split to single lines. */
     DETAILED_TEXT
   }
 
