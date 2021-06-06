@@ -9,7 +9,7 @@
 dist: focal
 language: java
 jdk:
-  - openjdk12 # Java 11 is sufficient, larger tests are executed in Gitlab-CI
+  - openjdk11 # Java 11 is sufficient, larger tests are executed in Gitlab-CI
 env:
   global:
     - GH_REF: github.com/sosy-lab/java-smt.git
