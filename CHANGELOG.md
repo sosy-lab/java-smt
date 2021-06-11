@@ -10,6 +10,14 @@ SPDX-License-Identifier: Apache-2.0
 
 # JavaSMT ChangeLog
 
+## JavaSMT 3.8.0
+
+This release contains smaller bugfixes, some cleanup, and updated libraries.
+
+### Updated solvers:
+ - MathSAT5 5.6.6
+ - Z3 4.8.10
+
 ## JavaSMT 3.7.0
 
 This release contains the first official support for native SMT solvers on Windows.

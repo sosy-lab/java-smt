@@ -12,9 +12,9 @@ variables:
   PROJECT_PATH: "sosy-lab/software/java-smt"
   GH_REF: "github.com/sosy-lab/java-smt"
   # Version of https://gitlab.com/sosy-lab/software/refaster/ to use
-  REFASTER_REPO_REVISION: bc1fb643e97a552f1187a643be80a3f35a6ca115
+  REFASTER_REPO_REVISION: 4e90f97b885afbcff609c6a41f4f6feea393fccb
   # Needs to be synchronized with Error Prone version in lib/ivy.xml
-  REFASTER_VERSION: 2.6.0
+  REFASTER_VERSION: 2.7.1
 
 build:jdk-14:
   variables:
