@@ -45,7 +45,7 @@ class PrincessQuantifiedFormulaManager
     if (vars.isEmpty()) {
 
       // Body already contains bound variables.
-      return new ISortedQuantified(pq, PrincessEnvironment.BOOL_SORT, (IFormula) body);
+      return new ISortedQuantified(pq, PrincessEnvironment.INTEGER_SORT, (IFormula) body);
     } else {
       // TODO: add support for boolean quantification!
       return IExpression.quanConsts(pq, asScala(toConstantTerm(vars)), (IFormula) body);
