@@ -303,6 +303,81 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     }
   }
 
+  @Test
+  public void bvVisitFunctionArgs() {
+    requireBitvectors();
+    BitvectorFormula x = bvmgr.makeVariable(5, "x");
+    BitvectorFormula y = bvmgr.makeVariable(5, "y");
+
+    for (Formula f :
+        ImmutableList.of(
+            bvmgr.lessOrEquals(x, y, true),
+            bvmgr.lessOrEquals(x, y, false),
+            bvmgr.lessThan(x, y, true),
+            bvmgr.lessThan(x, y, false),
+            bvmgr.greaterOrEquals(x, y, true),
+            bvmgr.greaterOrEquals(x, y, false),
+            bvmgr.greaterThan(x, y, true),
+            bvmgr.greaterThan(x, y, false),
+            bvmgr.add(x, y),
+            bvmgr.subtract(x, y),
+            bvmgr.multiply(x, y),
+            bvmgr.divide(x, y, true),
+            bvmgr.divide(x, y, false),
+            bvmgr.modulo(x, y, true),
+            bvmgr.modulo(x, y, false),
+            bvmgr.and(x, y),
+            bvmgr.or(x, y),
+            bvmgr.xor(x, y),
+            bvmgr.equal(x, y),
+            bvmgr.not(x),
+            bvmgr.negate(y))) {
+      mgr.visitRecursively(
+          f,
+          new DefaultFormulaVisitor<TraversalProcess>() {
+
+            @Override
+            protected TraversalProcess visitDefault(Formula pF) {
+              return TraversalProcess.CONTINUE;
+            }
+
+            @Override
+            public TraversalProcess visitFunction(
+                Formula pF, List<Formula> pArgs, FunctionDeclaration<?> pDeclaration) {
+              switch (pDeclaration.getKind()) {
+                case NOT:
+                  assertThat(pArgs).hasSize(1);
+                  break;
+                case BV_NOT:
+                case BV_NEG:
+                  // Yices is special in some cases
+                  if (Solvers.YICES2 != solverToUse()) {
+                    assertThat(pArgs).hasSize(1);
+                  }
+                  break;
+                case BV_ADD:
+                  assertThat(pArgs).contains(x);
+                  assertThat(pArgs).hasSize(2);
+                  break;
+                case BV_MUL:
+                  assertThat(pArgs).contains(y);
+                  assertThat(pArgs).hasSize(2);
+                  if (Solvers.YICES2 != solverToUse()) {
+                    assertThat(pArgs).contains(x);
+                  }
+                  break;
+                default:
+                  if (Solvers.YICES2 != solverToUse()) {
+                    assertThat(pArgs).hasSize(2);
+                    assertThat(pArgs).containsExactly(x, y);
+                  }
+              }
+              return visitDefault(pF);
+            }
+          });
+    }
+  }
+
   private void checkKind(Formula f, FunctionDeclarationKind expected) {
     FunctionDeclarationVisitorNoOther visitor = new FunctionDeclarationVisitorNoOther();
     mgr.visit(f, visitor);
