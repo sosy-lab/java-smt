@@ -61,6 +61,8 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
+import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessBitvectorToBitvectorDeclaration;
+import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessBitvectorToBooleanDeclaration;
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessByExampleDeclaration;
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessEquationDeclaration;
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessIFunctionDeclaration;
@@ -356,16 +358,23 @@ class PrincessFormulaCreator
         ImmutableList.Builder<Formula> args = ImmutableList.builder();
         ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
         int arity = input.length();
-        for (int i = 0; i < arity; i++) {
-          IExpression arg = input.apply(i);
-          FormulaType<?> argumentType = getFormulaType(arg);
-          args.add(encapsulate(argumentType, arg));
-          argTypes.add(argumentType);
-        }
+        int arityStart = 0;
 
         PrincessFunctionDeclaration solverDeclaration;
-
-        if (input instanceof IFunApp) {
+        if (isBitvectorOperationWithAdditionalArgument(kind)) {
+          // the first argument is the bitsize, and it is not relevant for the user.
+          // we do not want type/sort information as arguments.
+          arityStart = 1;
+          if (input instanceof IAtom) {
+            solverDeclaration = new PrincessBitvectorToBooleanDeclaration(((IAtom) input).pred());
+          } else if (input instanceof IFunApp) {
+            solverDeclaration =
+                new PrincessBitvectorToBitvectorDeclaration(((IFunApp) input).fun());
+          } else {
+            throw new AssertionError(
+                String.format("unexpected bitvector operation '%s' for formula '%s'", kind, input));
+          }
+        } else if (input instanceof IFunApp) {
           if (kind == FunctionDeclarationKind.UF) {
             solverDeclaration = new PrincessIFunctionDeclaration(((IFunApp) input).fun());
           } else if (kind == FunctionDeclarationKind.MUL) {
@@ -377,12 +386,48 @@ class PrincessFormulaCreator
           solverDeclaration = new PrincessByExampleDeclaration(input);
         }
 
+        for (int i = arityStart; i < arity; i++) {
+          IExpression arg = input.apply(i);
+          FormulaType<?> argumentType = getFormulaType(arg);
+          args.add(encapsulate(argumentType, arg));
+          argTypes.add(argumentType);
+        }
+
         return visitor.visitFunction(
             f,
             args.build(),
             FunctionDeclarationImpl.of(
                 getName(input), kind, argTypes.build(), getFormulaType(f), solverDeclaration));
       }
+    }
+  }
+
+  private boolean isBitvectorOperationWithAdditionalArgument(FunctionDeclarationKind kind) {
+    switch (kind) {
+      case BV_NOT:
+      case BV_NEG:
+      case BV_OR:
+      case BV_AND:
+      case BV_XOR:
+      case BV_SUB:
+      case BV_ADD:
+      case BV_SDIV:
+      case BV_UDIV:
+      case BV_SREM:
+      case BV_UREM:
+      case BV_MUL:
+      case BV_ULT:
+      case BV_SLT:
+      case BV_ULE:
+      case BV_SLE:
+      case BV_UGT:
+      case BV_SGT:
+      case BV_UGE:
+      case BV_SGE:
+      case BV_EQ:
+        return true;
+      default:
+        return false;
     }
   }
 
