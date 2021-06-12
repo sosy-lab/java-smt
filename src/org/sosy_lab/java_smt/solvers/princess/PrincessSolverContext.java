@@ -14,6 +14,7 @@ import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.io.PathCounterTemplate;
+import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
@@ -37,13 +38,14 @@ public final class PrincessSolverContext extends AbstractSolverContext {
 
   public static SolverContext create(
       Configuration config,
+      LogManager pLogger,
       ShutdownNotifier pShutdownNotifier,
       @Nullable PathCounterTemplate pLogfileTemplate,
       int pRandomSeed,
       NonLinearArithmetic pNonLinearArithmetic)
       throws InvalidConfigurationException {
     PrincessEnvironment env =
-        new PrincessEnvironment(config, pLogfileTemplate, pShutdownNotifier, pRandomSeed);
+        new PrincessEnvironment(config, pLogger, pLogfileTemplate, pShutdownNotifier, pRandomSeed);
     PrincessFormulaCreator creator = new PrincessFormulaCreator(env);
 
     // Create managers

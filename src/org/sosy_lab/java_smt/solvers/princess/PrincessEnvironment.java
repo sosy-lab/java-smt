@@ -64,6 +64,7 @@ import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.PathCounterTemplate;
+import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import scala.Tuple2;
 import scala.Tuple3;
@@ -113,6 +114,7 @@ class PrincessEnvironment {
   private final Map<String, IFunction> functionsCache = new HashMap<>();
 
   private final int randomSeed;
+  private final LogManager logger;
   private final @Nullable PathCounterTemplate basicLogfile;
   private final ShutdownNotifier shutdownNotifier;
 
@@ -127,12 +129,14 @@ class PrincessEnvironment {
 
   PrincessEnvironment(
       Configuration config,
+      LogManager pLogger,
       @Nullable final PathCounterTemplate pBasicLogfile,
       ShutdownNotifier pShutdownNotifier,
       final int pRandomSeed)
       throws InvalidConfigurationException {
     config.inject(this);
 
+    logger = pLogger;
     basicLogfile = pBasicLogfile;
     shutdownNotifier = pShutdownNotifier;
     randomSeed = pRandomSeed;
@@ -307,6 +311,19 @@ class PrincessEnvironment {
 
       @Override
       public void appendTo(Appendable out) throws IOException {
+        try {
+          appendTo0(out);
+        } catch (scala.MatchError e) {
+          // exception might be thrown in case of interrupt, then we ignore it
+          if (shutdownNotifier.shouldShutdown()) {
+            logger.logDebugException(e);
+          } else {
+            throw e;
+          }
+        }
+      }
+
+      private void appendTo0(Appendable out) throws IOException {
         // allVars needs to be mutable, but declaredFunctions should have deterministic order
         Set<IExpression> allVars =
             ImmutableSet.copyOf(creator.extractVariablesAndUFs(lettedFormula, true).values());
