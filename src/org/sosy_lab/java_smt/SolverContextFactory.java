@@ -232,7 +232,7 @@ public class SolverContextFactory {
 
       case PRINCESS:
         return PrincessSolverContext.create(
-            config, logger, shutdownNotifier, logfile, (int) randomSeed, nonLinearArithmetic);
+            config, shutdownNotifier, logfile, (int) randomSeed, nonLinearArithmetic);
 
       case YICES2:
         return Yices2SolverContext.create(nonLinearArithmetic, shutdownNotifier);
