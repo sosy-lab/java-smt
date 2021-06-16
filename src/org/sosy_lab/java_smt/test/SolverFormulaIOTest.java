@@ -25,6 +25,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
@@ -190,6 +191,22 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
 
     // check that int variable is declared correctly + necessary assert that has to be there
     assertThat(formDump).contains("(declare-fun a () Int)");
+    checkThatAssertIsInLastLine(formDump);
+    checkThatDumpIsParseable(formDump);
+  }
+
+  @Test
+  public void bvDumpTest() {
+    requireBitvectors();
+    TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
+    BitvectorFormula f1 = bvmgr.makeVariable(8, "a");
+    BitvectorFormula val = bvmgr.makeBitvector(8, 1);
+    BooleanFormula formula = bvmgr.equal(f1, val);
+
+    String formDump = mgr.dumpFormula(formula).toString();
+
+    // check that int variable is declared correctly + necessary assert that has to be there
+    assertThat(formDump).contains("(declare-fun a () (_ BitVec 8))");
     checkThatAssertIsInLastLine(formDump);
     checkThatDumpIsParseable(formDump);
   }

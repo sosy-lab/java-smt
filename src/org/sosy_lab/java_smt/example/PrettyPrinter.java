@@ -28,6 +28,7 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.utils.PrettyPrinter.PrinterOption;
 import org.sosy_lab.java_smt.utils.SolverUtils;
 
 /** This program parses user-given formulas and prints them in a pretty format. */
@@ -122,14 +123,14 @@ public class PrettyPrinter {
       BooleanFormula formula, org.sosy_lab.java_smt.utils.PrettyPrinter pp, Type type) {
     switch (type) {
       case DETAILED_TEXT:
-        return pp.formulaToString(formula, false);
+        return pp.formulaToString(formula);
       case DOT:
-        return pp.formulaToDot(formula, true);
+        return pp.formulaToDot(formula, PrinterOption.SPLIT_ONLY_BOOLEAN_OPERATIONS);
       case DETAILED_DOT:
-        return pp.formulaToDot(formula, false);
+        return pp.formulaToDot(formula);
       case TEXT:
       default:
-        return pp.formulaToString(formula, true);
+        return pp.formulaToString(formula, PrinterOption.SPLIT_ONLY_BOOLEAN_OPERATIONS);
     }
   }
 

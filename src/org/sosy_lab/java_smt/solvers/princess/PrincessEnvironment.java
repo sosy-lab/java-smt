@@ -30,12 +30,16 @@ import ap.parser.SMTParser2InputAbsy.SMTFunctionType;
 import ap.parser.SMTParser2InputAbsy.SMTType;
 import ap.terfor.ConstantTerm;
 import ap.theories.ExtArray;
+import ap.theories.bitvectors.ModuloArithmetic;
 import ap.types.Sort;
 import ap.types.Sort$;
+import ap.types.Sort.MultipleValueBool$;
 import ap.util.Debug;
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -49,7 +53,6 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -64,6 +67,8 @@ import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.PathCounterTemplate;
+import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import scala.Tuple2;
 import scala.Tuple3;
@@ -370,21 +375,13 @@ class PrincessEnvironment {
             out.append(" (");
             if (var instanceof IFunApp) {
               IFunApp function = (IFunApp) var;
-              Iterator<ITerm> args = asJava(function.args()).iterator();
-              while (args.hasNext()) {
-                args.next();
-                // Princess does only support IntegerFormulas in UIFs we don't need
-                // to check the type here separately
-                if (args.hasNext()) {
-                  out.append("Int ");
-                } else {
-                  out.append("Int");
-                }
-              }
+              List<String> argSorts =
+                  Lists.transform(asJava(function.args()), a -> getFormulaType(a).toSMTLIBString());
+              Joiner.on(" ").appendTo(out, argSorts);
             }
 
             out.append(") ");
-            out.append(getType(var));
+            out.append(getFormulaType(var).toSMTLIBString());
             out.append(")\n");
           }
         }
@@ -402,17 +399,13 @@ class PrincessEnvironment {
             continue;
           }
 
-          out.append("(define-fun ").append(SMTLineariser.quoteIdentifier(name));
-
-          // the type of each abbreviation
-          if (fullFormula instanceof IFormula) {
-            out.append(" () Bool ");
-          } else if (fullFormula instanceof ITerm) {
-            out.append(" () Int ");
-          }
-
-          // the abbreviated formula
-          out.append(SMTLineariser.asString(fullFormula)).append(" )\n");
+          // the type of each abbreviation and the abbreviated formula
+          out.append(
+              String.format(
+                  "(define-fun %s () %s %s)%n",
+                  SMTLineariser.quoteIdentifier(name),
+                  getFormulaType(fullFormula).toSMTLIBString(),
+                  SMTLineariser.asString(fullFormula)));
         }
 
         // now add the final assert
@@ -436,16 +429,49 @@ class PrincessEnvironment {
     throw new IllegalArgumentException("The given parameter is no variable or function");
   }
 
-  private static String getType(IExpression var) {
-    if (var instanceof IFormula) {
-      return "Bool";
-
-      // functions are included here, they cannot be handled separate for princess
-    } else if (var instanceof ITerm) {
-      return "Int";
+  static FormulaType<?> getFormulaType(IExpression pFormula) {
+    if (pFormula instanceof IFormula) {
+      return FormulaType.BooleanType;
+    } else if (pFormula instanceof ITerm) {
+      final Sort sort = Sort$.MODULE$.sortOf((ITerm) pFormula);
+      return getFormulaTypeFromSort(sort);
     }
+    throw new IllegalArgumentException(
+        String.format(
+            "Unknown formula type '%s' for formula '%s'.", pFormula.getClass(), pFormula));
+  }
 
-    throw new IllegalArgumentException("The given parameter is no variable or function");
+  private static FormulaType<?> getFormulaTypeFromSort(final Sort sort) {
+    if (sort == PrincessEnvironment.BOOL_SORT) {
+      return FormulaType.BooleanType;
+    } else if (sort == PrincessEnvironment.INTEGER_SORT) {
+      return FormulaType.IntegerType;
+    } else if (sort instanceof ExtArray.ArraySort) {
+      Seq<Sort> indexSorts = ((ExtArray.ArraySort) sort).theory().indexSorts();
+      Sort elementSort = ((ExtArray.ArraySort) sort).theory().objSort();
+      assert indexSorts.iterator().size() == 1 : "unexpected index type in Array type:" + sort;
+      // assert indexSorts.size() == 1; // TODO Eclipse does not like simpler code.
+      return new ArrayFormulaType<>(
+          getFormulaTypeFromSort(indexSorts.iterator().next()), // get single index-sort
+          getFormulaTypeFromSort(elementSort));
+    } else if (sort instanceof MultipleValueBool$) {
+      return FormulaType.BooleanType;
+    } else {
+      scala.Option<Object> bitWidth = getBitWidth(sort);
+      if (bitWidth.isDefined()) {
+        return FormulaType.getBitvectorTypeWithSize((Integer) bitWidth.get());
+      }
+    }
+    throw new IllegalArgumentException(
+        String.format("Unknown formula type '%s' for sort '%s'.", sort.getClass(), sort));
+  }
+
+  static scala.Option<Object> getBitWidth(final Sort sort) {
+    scala.Option<Object> bitWidth = ModuloArithmetic.UnsignedBVSort$.MODULE$.unapply(sort);
+    if (!bitWidth.isDefined()) {
+      bitWidth = ModuloArithmetic.SignedBVSort$.MODULE$.unapply(sort);
+    }
+    return bitWidth;
   }
 
   public IExpression makeVariable(Sort type, String varname) {

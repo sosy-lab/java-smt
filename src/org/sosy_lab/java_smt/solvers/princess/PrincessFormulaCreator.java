@@ -44,7 +44,6 @@ import ap.theories.bitvectors.ModuloArithmetic;
 import ap.theories.nia.GroebnerMultiplication$;
 import ap.types.Sort;
 import ap.types.Sort$;
-import ap.types.Sort.MultipleValueBool$;
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -68,7 +67,6 @@ import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.Prince
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessIFunctionDeclaration;
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessMultiplyDeclaration;
 import scala.Enumeration;
-import scala.collection.immutable.Seq;
 
 class PrincessFormulaCreator
     extends FormulaCreator<IExpression, Sort, PrincessEnvironment, PrincessFunctionDeclaration> {
@@ -140,48 +138,7 @@ class PrincessFormulaCreator
 
   @Override
   public FormulaType<?> getFormulaType(IExpression pFormula) {
-    if (pFormula instanceof IFormula) {
-      return FormulaType.BooleanType;
-    } else if (pFormula instanceof ITerm) {
-      final Sort sort = Sort$.MODULE$.sortOf((ITerm) pFormula);
-      return getFormulaTypeFromSort(sort);
-    }
-    throw new IllegalArgumentException(
-        String.format(
-            "Unknown formula type '%s' for formula '%s'.", pFormula.getClass(), pFormula));
-  }
-
-  private FormulaType<?> getFormulaTypeFromSort(final Sort sort) {
-    if (sort == PrincessEnvironment.BOOL_SORT) {
-      return FormulaType.BooleanType;
-    } else if (sort == PrincessEnvironment.INTEGER_SORT) {
-      return FormulaType.IntegerType;
-    } else if (sort instanceof ExtArray.ArraySort) {
-      Seq<Sort> indexSorts = ((ExtArray.ArraySort) sort).theory().indexSorts();
-      Sort elementSort = ((ExtArray.ArraySort) sort).theory().objSort();
-      assert indexSorts.iterator().size() == 1 : "unexpected index type in Array type:" + sort;
-      // assert indexSorts.size() == 1; // TODO Eclipse does not like simpler code.
-      return new ArrayFormulaType<>(
-          getFormulaTypeFromSort(indexSorts.iterator().next()), // get single index-sort
-          getFormulaTypeFromSort(elementSort));
-    } else if (sort instanceof MultipleValueBool$) {
-      return FormulaType.BooleanType;
-    } else {
-      scala.Option<Object> bitWidth = getBitWidth(sort);
-      if (bitWidth.isDefined()) {
-        return FormulaType.getBitvectorTypeWithSize((Integer) bitWidth.get());
-      }
-    }
-    throw new IllegalArgumentException(
-        String.format("Unknown formula type '%s' for sort '%s'.", sort.getClass(), sort));
-  }
-
-  static scala.Option<Object> getBitWidth(final Sort sort) {
-    scala.Option<Object> bitWidth = ModuloArithmetic.UnsignedBVSort$.MODULE$.unapply(sort);
-    if (!bitWidth.isDefined()) {
-      bitWidth = ModuloArithmetic.SignedBVSort$.MODULE$.unapply(sort);
-    }
-    return bitWidth;
+    return PrincessEnvironment.getFormulaType(pFormula);
   }
 
   @Override
@@ -210,7 +167,7 @@ class PrincessFormulaCreator
     if (pFormula instanceof BitvectorFormula) {
       ITerm input = (ITerm) extractInfo(pFormula);
       Sort sort = Sort$.MODULE$.sortOf(input);
-      scala.Option<Object> bitWidth = getBitWidth(sort);
+      scala.Option<Object> bitWidth = PrincessEnvironment.getBitWidth(sort);
       checkArgument(
           bitWidth.isDefined(), "BitvectorFormula with actual type %s: %s", sort, pFormula);
       return (FormulaType<T>) FormulaType.getBitvectorTypeWithSize((Integer) bitWidth.get());

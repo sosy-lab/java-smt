@@ -18,6 +18,7 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.utils.PrettyPrinter;
+import org.sosy_lab.java_smt.utils.PrettyPrinter.PrinterOption;
 
 @RunWith(Parameterized.class)
 public class PrettyPrinterTest extends SolverBasedTest0 {
@@ -78,7 +79,10 @@ public class PrettyPrinterTest extends SolverBasedTest0 {
         expected = "(and\n" + "  (= (select arr x) (foo 3))\n" + "  (< x xx)\n" + ")";
     }
     expected = expected.replace("\n", System.lineSeparator());
-    assertThat(pp.formulaToString(mgr.parse(VARS + QUERY_1), true)).isEqualTo(expected);
+    assertThat(
+            pp.formulaToString(
+                mgr.parse(VARS + QUERY_1), PrinterOption.SPLIT_ONLY_BOOLEAN_OPERATIONS))
+        .isEqualTo(expected);
   }
 
   @Test
@@ -151,7 +155,7 @@ public class PrettyPrinterTest extends SolverBasedTest0 {
                 + ")";
     }
     expected = expected.replace("\n", System.lineSeparator());
-    assertThat(pp.formulaToString(mgr.parse(VARS + QUERY_1), false)).isEqualTo(expected);
+    assertThat(pp.formulaToString(mgr.parse(VARS + QUERY_1))).isEqualTo(expected);
   }
 
   @Test
@@ -211,7 +215,9 @@ public class PrettyPrinterTest extends SolverBasedTest0 {
                 + "}";
     }
     expected = expected.replace("\n", System.lineSeparator());
-    assertThat(pp.formulaToDot(mgr.parse(VARS + QUERY_1), true)).isEqualTo(expected);
+    assertThat(
+            pp.formulaToDot(mgr.parse(VARS + QUERY_1), PrinterOption.SPLIT_ONLY_BOOLEAN_OPERATIONS))
+        .isEqualTo(expected);
   }
 
   @Test
@@ -319,6 +325,6 @@ public class PrettyPrinterTest extends SolverBasedTest0 {
                 + "}";
     }
     expected = expected.replace("\n", System.lineSeparator());
-    assertThat(pp.formulaToDot(mgr.parse(VARS + QUERY_1), false)).isEqualTo(expected);
+    assertThat(pp.formulaToDot(mgr.parse(VARS + QUERY_1))).isEqualTo(expected);
   }
 }

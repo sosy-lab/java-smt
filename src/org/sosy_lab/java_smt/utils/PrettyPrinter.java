@@ -9,7 +9,9 @@
 package org.sosy_lab.java_smt.utils;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableSet;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +25,11 @@ import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
 public class PrettyPrinter {
 
+  public enum PrinterOption {
+    /** introduce newlines only for boolean operations, instead of for all operations. */
+    SPLIT_ONLY_BOOLEAN_OPERATIONS
+  }
+
   private final FormulaManager fmgr;
 
   public PrettyPrinter(FormulaManager pFmgr) {
@@ -34,14 +41,14 @@ public class PrettyPrinter {
    *
    * <p>The String representation might contain solver-specific symbols that appear during a
    * visitation of the formula. The returned String is intended to be human-readable and should not
-   * be used for further processing. If a user wants to apply further processing, we refer to {@link
-   * FormulaManager#dumpFormula} that provides machine-readable SMTLIB2.
-   *
-   * @param onlyBooleanOperations whether all operations should be split to multiple lines or not.
+   * be used for further processing. The formatting of this string might change with future
+   * development and thus is not considered as "stable". If a user wants to apply further
+   * processing, we refer to {@link FormulaManager#dumpFormula} that provides machine-readable
+   * SMTLIB2.
    */
-  public String formulaToString(Formula f, boolean onlyBooleanOperations) {
+  public String formulaToString(Formula f, PrinterOption... options) {
     StringBuilder str = new StringBuilder();
-    fmgr.visit(f, new PrettyPrintVisitor(fmgr, str, onlyBooleanOperations));
+    fmgr.visit(f, new PrettyPrintVisitor(fmgr, str, ImmutableSet.copyOf(options)));
     return str.toString();
   }
 
@@ -50,14 +57,13 @@ public class PrettyPrinter {
    *
    * <p>The graph representation might contain solver-specific symbols that appear during a
    * visitation of the formula. The returned String is intended to be a human-readable graph for
-   * Graphviz/Dot and should not be used for further processing. If a user wants to apply further
-   * processing, we refer to {@link FormulaManager#dumpFormula} that provides machine-readable
-   * SMTLIB2.
-   *
-   * @param onlyBooleanOperations whether all operations should be split to multiple lines or not.
+   * Graphviz/Dot and should not be used for further processing. The formatting of this string might
+   * change with future development and thus is not considered as "stable". If a user wants to apply
+   * further processing, we refer to {@link FormulaManager#dumpFormula} that provides
+   * machine-readable SMTLIB2.
    */
-  public String formulaToDot(Formula f, boolean onlyBooleanOperations) {
-    DotVisitor plotter = new DotVisitor(onlyBooleanOperations);
+  public String formulaToDot(Formula f, PrinterOption... options) {
+    DotVisitor plotter = new DotVisitor(ImmutableSet.copyOf(options));
     fmgr.visitRecursively(f, plotter);
     return plotter.toString();
   }
@@ -121,10 +127,10 @@ public class PrettyPrinter {
     private boolean enableSplitting = true;
 
     private PrettyPrintVisitor(
-        FormulaManager pFmgr, StringBuilder pStr, boolean pOnlyBooleanOperations) {
+        FormulaManager pFmgr, StringBuilder pStr, Collection<PrinterOption> pOptions) {
       fmgr = pFmgr;
       out = pStr;
-      onlyBooleanOperations = pOnlyBooleanOperations;
+      onlyBooleanOperations = pOptions.contains(PrinterOption.SPLIT_ONLY_BOOLEAN_OPERATIONS);
     }
 
     /** add a newline and space for indent if required, and a simple whitespace otherwise. */
@@ -197,8 +203,8 @@ public class PrettyPrinter {
     // lets print leave-nodes lazily, having them on same rank looks nicer in the plot.
     private final List<String> leaves = new ArrayList<>();
 
-    private DotVisitor(boolean pOnlyBooleanOperations) {
-      onlyBooleanOperations = pOnlyBooleanOperations;
+    private DotVisitor(Collection<PrinterOption> pOptions) {
+      onlyBooleanOperations = pOptions.contains(PrinterOption.SPLIT_ONLY_BOOLEAN_OPERATIONS);
     }
 
     @Override

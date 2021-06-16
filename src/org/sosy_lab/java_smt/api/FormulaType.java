@@ -65,6 +65,9 @@ public abstract class FormulaType<T extends Formula> {
   @Override
   public abstract String toString();
 
+  /** return the correctly formatted SMTLIB2 type declaration. */
+  public abstract String toSMTLIBString();
+
   @Immutable
   public abstract static class NumeralType<T extends NumeralFormula> extends FormulaType<T> {
 
@@ -86,6 +89,11 @@ public abstract class FormulaType<T extends Formula> {
         public String toString() {
           return "Rational";
         }
+
+        @Override
+        public String toSMTLIBString() {
+          return "Real";
+        }
       };
 
   public static final FormulaType<IntegerFormula> IntegerType =
@@ -100,6 +108,11 @@ public abstract class FormulaType<T extends Formula> {
         public String toString() {
           return "Integer";
         }
+
+        @Override
+        public String toSMTLIBString() {
+          return "Int";
+        }
       };
 
   public static final FormulaType<BooleanFormula> BooleanType =
@@ -113,6 +126,11 @@ public abstract class FormulaType<T extends Formula> {
         @Override
         public String toString() {
           return "Boolean";
+        }
+
+        @Override
+        public String toSMTLIBString() {
+          return "Bool";
         }
       };
 
@@ -157,6 +175,11 @@ public abstract class FormulaType<T extends Formula> {
     @Override
     public int hashCode() {
       return size;
+    }
+
+    @Override
+    public String toSMTLIBString() {
+      return "(_ BitVec " + size + ")";
     }
   }
 
@@ -225,6 +248,11 @@ public abstract class FormulaType<T extends Formula> {
     public String toString() {
       return "FloatingPoint<exp=" + exponentSize + ",mant=" + mantissaSize + ">";
     }
+
+    @Override
+    public String toSMTLIBString() {
+      return "(_ FloatingPoint " + exponentSize + " " + mantissaSize + ")";
+    }
   }
 
   public static final FormulaType<FloatingPointRoundingModeFormula> FloatingPointRoundingModeType =
@@ -241,6 +269,12 @@ public abstract class FormulaType<T extends Formula> {
     @Override
     public String toString() {
       return "FloatingPointRoundingMode";
+    }
+
+    @Override
+    public String toSMTLIBString() {
+      throw new UnsupportedOperationException(
+          "rounding mode is not expected in symbol declarations");
     }
   }
 
@@ -302,6 +336,11 @@ public abstract class FormulaType<T extends Formula> {
       ArrayFormulaType<?, ?> other = (ArrayFormulaType<?, ?>) obj;
 
       return elementType.equals(other.elementType) && indexType.equals(other.indexType);
+    }
+
+    @Override
+    public String toSMTLIBString() {
+      return "(Array " + indexType.toSMTLIBString() + " " + elementType.toSMTLIBString() + ")";
     }
   }
 
