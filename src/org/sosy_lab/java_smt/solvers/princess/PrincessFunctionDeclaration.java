@@ -135,7 +135,7 @@ abstract class PrincessFunctionDeclaration {
     public IExpression makeApp(PrincessEnvironment env, List<IExpression> args) {
       ITerm arg0 = (ITerm) args.get(0);
       Sort sort = Sort$.MODULE$.sortOf(arg0);
-      scala.Option<Object> bitWidth = PrincessFormulaCreator.getBitWidth(sort);
+      scala.Option<Object> bitWidth = PrincessEnvironment.getBitWidth(sort);
       checkArgument(bitWidth.isDefined(), "BitvectorFormula with actual type %s: %s", sort, arg0);
       int bitsize = (Integer) bitWidth.get();
 
@@ -159,7 +159,7 @@ abstract class PrincessFunctionDeclaration {
     public IExpression makeApp(PrincessEnvironment env, List<IExpression> args) {
       ITerm arg0 = (ITerm) args.get(0);
       Sort sort = Sort$.MODULE$.sortOf(arg0);
-      scala.Option<Object> bitWidth = PrincessFormulaCreator.getBitWidth(sort);
+      scala.Option<Object> bitWidth = PrincessEnvironment.getBitWidth(sort);
       checkArgument(bitWidth.isDefined(), "BitvectorFormula with actual type %s: %s", sort, arg0);
       int bitsize = (Integer) bitWidth.get();
 
