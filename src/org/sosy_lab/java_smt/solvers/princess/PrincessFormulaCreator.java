@@ -42,7 +42,6 @@ import ap.theories.bitvectors.ModuloArithmetic;
 import ap.theories.nia.GroebnerMultiplication$;
 import ap.types.Sort;
 import ap.types.Sort$;
-import ap.types.Sort.MultipleValueBool$;
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -135,36 +134,7 @@ class PrincessFormulaCreator
 
   @Override
   public FormulaType<?> getFormulaType(IExpression pFormula) {
-    if (pFormula instanceof IFormula) {
-      return FormulaType.BooleanType;
-    } else if (pFormula instanceof ITerm) {
-      final Sort sort = Sort$.MODULE$.sortOf((ITerm) pFormula);
-      if (sort == PrincessEnvironment.BOOL_SORT) {
-        return FormulaType.BooleanType;
-      } else if (sort == PrincessEnvironment.INTEGER_SORT) {
-        return FormulaType.IntegerType;
-      } else if (sort instanceof SimpleArray.ArraySort) {
-        return new ArrayFormulaType<>(FormulaType.IntegerType, FormulaType.IntegerType);
-      } else if (sort instanceof MultipleValueBool$) {
-        return FormulaType.BooleanType;
-      } else {
-        scala.Option<Object> bitWidth = getBitWidth(sort);
-        if (bitWidth.isDefined()) {
-          return FormulaType.getBitvectorTypeWithSize((Integer) bitWidth.get());
-        }
-      }
-    }
-    throw new IllegalArgumentException(
-        String.format(
-            "Unknown formula type '%s' for formula '%s'.", pFormula.getClass(), pFormula));
-  }
-
-  static scala.Option<Object> getBitWidth(final Sort sort) {
-    scala.Option<Object> bitWidth = ModuloArithmetic.UnsignedBVSort$.MODULE$.unapply(sort);
-    if (!bitWidth.isDefined()) {
-      bitWidth = ModuloArithmetic.SignedBVSort$.MODULE$.unapply(sort);
-    }
-    return bitWidth;
+    return PrincessEnvironment.getFormulaType(pFormula);
   }
 
   @Override
@@ -195,7 +165,7 @@ class PrincessFormulaCreator
     if (pFormula instanceof BitvectorFormula) {
       ITerm input = (ITerm) extractInfo(pFormula);
       Sort sort = Sort$.MODULE$.sortOf(input);
-      scala.Option<Object> bitWidth = getBitWidth(sort);
+      scala.Option<Object> bitWidth = PrincessEnvironment.getBitWidth(sort);
       checkArgument(
           bitWidth.isDefined(), "BitvectorFormula with actual type %s: %s", sort, pFormula);
       return (FormulaType<T>) FormulaType.getBitvectorTypeWithSize((Integer) bitWidth.get());

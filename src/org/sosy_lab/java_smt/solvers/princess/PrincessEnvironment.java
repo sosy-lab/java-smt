@@ -28,8 +28,10 @@ import ap.parser.SMTParser2InputAbsy.SMTFunctionType;
 import ap.parser.SMTParser2InputAbsy.SMTType;
 import ap.terfor.ConstantTerm;
 import ap.theories.SimpleArray;
+import ap.theories.bitvectors.ModuloArithmetic;
 import ap.types.Sort;
 import ap.types.Sort$;
+import ap.types.Sort.MultipleValueBool$;
 import ap.util.Debug;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -62,6 +64,8 @@ import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.PathCounterTemplate;
+import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import scala.Tuple2;
 import scala.Tuple3;
@@ -351,7 +355,7 @@ class PrincessEnvironment {
             }
 
             out.append(") ");
-            out.append(getType(var));
+            out.append(getFormulaType(var).toSMTLIBString());
             out.append(")\n");
           }
         }
@@ -369,17 +373,13 @@ class PrincessEnvironment {
             continue;
           }
 
-          out.append("(define-fun ").append(SMTLineariser.quoteIdentifier(name));
-
-          // the type of each abbreviation
-          if (fullFormula instanceof IFormula) {
-            out.append(" () Bool ");
-          } else if (fullFormula instanceof ITerm) {
-            out.append(" () Int ");
-          }
-
-          // the abbreviated formula
-          out.append(SMTLineariser.asString(fullFormula)).append(" )\n");
+          // the type of each abbreviation and the abbreviated formula
+          out.append(
+              String.format(
+                  "(define-fun %s () %s %s)%n",
+                  SMTLineariser.quoteIdentifier(name),
+                  getFormulaType(fullFormula).toSMTLIBString(),
+                  SMTLineariser.asString(fullFormula)));
         }
 
         // now add the final assert
@@ -403,16 +403,37 @@ class PrincessEnvironment {
     throw new IllegalArgumentException("The given parameter is no variable or function");
   }
 
-  private static String getType(IExpression var) {
-    if (var instanceof IFormula) {
-      return "Bool";
-
-      // functions are included here, they cannot be handled separate for princess
-    } else if (var instanceof ITerm) {
-      return "Int";
+  static FormulaType<?> getFormulaType(IExpression pFormula) {
+    if (pFormula instanceof IFormula) {
+      return FormulaType.BooleanType;
+    } else if (pFormula instanceof ITerm) {
+      final Sort sort = Sort$.MODULE$.sortOf((ITerm) pFormula);
+      if (sort == PrincessEnvironment.BOOL_SORT) {
+        return FormulaType.BooleanType;
+      } else if (sort == PrincessEnvironment.INTEGER_SORT) {
+        return FormulaType.IntegerType;
+      } else if (sort instanceof SimpleArray.ArraySort) {
+        return new ArrayFormulaType<>(FormulaType.IntegerType, FormulaType.IntegerType);
+      } else if (sort instanceof MultipleValueBool$) {
+        return FormulaType.BooleanType;
+      } else {
+        scala.Option<Object> bitWidth = getBitWidth(sort);
+        if (bitWidth.isDefined()) {
+          return FormulaType.getBitvectorTypeWithSize((Integer) bitWidth.get());
+        }
+      }
     }
+    throw new IllegalArgumentException(
+        String
+            .format("Unknown formula type '%s' for formula '%s'.", pFormula.getClass(), pFormula));
+  }
 
-    throw new IllegalArgumentException("The given parameter is no variable or function");
+  static scala.Option<Object> getBitWidth(final Sort sort) {
+    scala.Option<Object> bitWidth = ModuloArithmetic.UnsignedBVSort$.MODULE$.unapply(sort);
+    if (!bitWidth.isDefined()) {
+      bitWidth = ModuloArithmetic.SignedBVSort$.MODULE$.unapply(sort);
+    }
+    return bitWidth;
   }
 
   public IExpression makeVariable(Sort type, String varname) {
