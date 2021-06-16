@@ -33,9 +33,11 @@ import ap.types.Sort;
 import ap.types.Sort$;
 import ap.types.Sort.MultipleValueBool$;
 import ap.util.Debug;
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -49,7 +51,6 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -341,17 +342,9 @@ class PrincessEnvironment {
             out.append(" (");
             if (var instanceof IFunApp) {
               IFunApp function = (IFunApp) var;
-              Iterator<ITerm> args = asJava(function.args()).iterator();
-              while (args.hasNext()) {
-                args.next();
-                // Princess does only support IntegerFormulas in UIFs we don't need
-                // to check the type here separately
-                if (args.hasNext()) {
-                  out.append("Int ");
-                } else {
-                  out.append("Int");
-                }
-              }
+              List<String> argSorts =
+                  Lists.transform(asJava(function.args()), a -> getFormulaType(a).toSMTLIBString());
+              Joiner.on(" ").appendTo(out, argSorts);
             }
 
             out.append(") ");
@@ -424,8 +417,8 @@ class PrincessEnvironment {
       }
     }
     throw new IllegalArgumentException(
-        String
-            .format("Unknown formula type '%s' for formula '%s'.", pFormula.getClass(), pFormula));
+        String.format(
+            "Unknown formula type '%s' for formula '%s'.", pFormula.getClass(), pFormula));
   }
 
   static scala.Option<Object> getBitWidth(final Sort sort) {
