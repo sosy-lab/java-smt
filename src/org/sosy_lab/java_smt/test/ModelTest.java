@@ -1465,14 +1465,14 @@ public class ModelTest extends SolverBasedTest0 {
     }
   }
 
-  static final String SMALL_ARRAY_QUERY =
+  private static final String SMALL_ARRAY_QUERY =
       "(declare-fun A1 () (Array Int Int))"
           + "(declare-fun A2 () (Array Int Int))"
           + "(declare-fun X () Int)"
           + "(declare-fun Y () Int)"
           + "(assert (= A1 (store A2 X Y)))";
 
-  static final String BIG_ARRAY_QUERY =
+  private static final String BIG_ARRAY_QUERY =
       "(declare-fun |V#2@| () Int)"
           + "(declare-fun z3name!115 () Int)"
           + "(declare-fun P42 () Bool)"
@@ -1641,7 +1641,7 @@ public class ModelTest extends SolverBasedTest0 {
           + "       (or (and P43 (not (= M@3 0))) (and (not P43) (= z3name!115 0)))"
           + "       (or (and P42 (= M@3 0)) (and (not P42) (= z3name!115 |V#2@|)))))";
 
-  static final String MEDIUM_ARRAY_QUERY =
+  private static final String MEDIUM_ARRAY_QUERY =
       "(declare-fun |H@1| () (Array Int Int))"
           + "(declare-fun |H@2| () (Array Int Int))"
           + "(declare-fun |H@3| () (Array Int Int))"
@@ -1685,7 +1685,7 @@ public class ModelTest extends SolverBasedTest0 {
           + "       (= I15 (+ 12 I14))"
           + "       ))";
 
-  static final String UGLY_ARRAY_QUERY =
+  private static final String UGLY_ARRAY_QUERY =
       "(declare-fun V () Int)"
           + "(declare-fun W () Int)"
           + "(declare-fun A () Int)"
@@ -1700,14 +1700,14 @@ public class ModelTest extends SolverBasedTest0 {
           + "       (= ARR (store (store (store EMPTY G B) B G) A W))"
           + "       ))";
 
-  static final String UGLY_ARRAY_QUERY_2 =
+  private static final String UGLY_ARRAY_QUERY_2 =
       "(declare-fun A () Int)"
           + "(declare-fun B () Int)"
           + "(declare-fun ARR () (Array Int Int))"
           + "(declare-fun EMPTY () (Array Int Int))"
           + "(assert (and (= A 0) (= B 0) (= ARR (store (store EMPTY A 1) B 2))))";
 
-  static final String SMALL_BV_FLOAT_QUERY =
+  private static final String SMALL_BV_FLOAT_QUERY =
       "(declare-fun |f@2| () (_ FloatingPoint 8 23))"
           + "(declare-fun |p@3| () (_ BitVec 32))"
           + "(declare-fun *float@1 () (Array (_ BitVec 32) (_ FloatingPoint 8 23)))"
@@ -1723,7 +1723,7 @@ public class ModelTest extends SolverBasedTest0 {
           + "     (not (fp.eq ((_ to_fp 11 52) roundNearestTiesToEven |f@2|)"
           + "                 (_ +zero 11 52)))))";
 
-  static final String SMALL_BV_FLOAT_QUERY2 =
+  private static final String SMALL_BV_FLOAT_QUERY2 =
       "(declare-fun a () (_ FloatingPoint 8 23))"
           + "(declare-fun A () (Array (_ BitVec 32) (_ FloatingPoint 8 23)))"
           + "(assert (= a (select A #x00000000)))";
@@ -1758,7 +1758,7 @@ public class ModelTest extends SolverBasedTest0 {
     }
   }
 
-  static final String ARRAY_QUERY_INT =
+  private static final String ARRAY_QUERY_INT =
       "(declare-fun i () Int)"
           + "(declare-fun X () (Array Int Int))"
           + "(declare-fun Y () (Array Int Int))"
@@ -1769,7 +1769,7 @@ public class ModelTest extends SolverBasedTest0 {
           + "  (= Z (store Y 5 2))"
           + "))";
 
-  static final String ARRAY_QUERY_BV =
+  private static final String ARRAY_QUERY_BV =
       "(declare-fun v () (_ BitVec 64))"
           + "(declare-fun A () (Array (_ BitVec 64) (_ BitVec 32)))"
           + "(declare-fun B () (Array (_ BitVec 64) (_ BitVec 32)))"
