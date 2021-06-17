@@ -526,9 +526,9 @@ public class ModelTest extends SolverBasedTest0 {
   @Test
   public void testPartialModelsUF() throws SolverException, InterruptedException {
     assume()
-        .withMessage("As of now, only Z3 and Princess support partial model evaluation")
+        .withMessage("As of now, only Z3 supports partial model evaluation")
         .that(solver)
-        .isIn(ImmutableList.of(Solvers.Z3, Solvers.PRINCESS));
+        .isIn(ImmutableList.of(Solvers.Z3));
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       IntegerFormula x = imgr.makeVariable("x");
       IntegerFormula f = fmgr.declareAndCallUF("f", IntegerType, x);
@@ -759,12 +759,6 @@ public class ModelTest extends SolverBasedTest0 {
     requireParser();
     requireArrays();
     requireBitvectors();
-    assume()
-        .withMessage(
-            "Solver %s does not support array theory with bitvectors as indices or elements",
-            solverToUse())
-        .that(solver)
-        .isNotEqualTo(Solvers.PRINCESS);
 
     ArrayFormula<BitvectorFormula, BitvectorFormula> array =
         amgr.makeArray(
@@ -1794,11 +1788,6 @@ public class ModelTest extends SolverBasedTest0 {
     requireParser();
     requireArrays();
     requireBitvectors();
-    assume()
-        .withMessage("solver does not fully support arrays over bitvectors")
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.PRINCESS);
-
     BooleanFormula formula = context.getFormulaManager().parse(ARRAY_QUERY_BV);
     checkModelIteration(formula, false);
   }
