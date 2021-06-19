@@ -44,7 +44,9 @@ import ap.theories.bitvectors.ModuloArithmetic;
 import ap.theories.nia.GroebnerMultiplication$;
 import ap.types.Sort;
 import ap.types.Sort$;
+import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Table;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -108,6 +110,16 @@ class PrincessFormulaCreator
     theoryFunctionKind.put(GroebnerMultiplication$.MODULE$.mul(), FunctionDeclarationKind.MUL);
   }
 
+  /**
+   * This mapping is a cache from index sort and element sort to the full array sort.
+   *
+   * <p>This mapping guarantees uniqueness of array types in JavaSMT, i.e. without this cache, we
+   * can not compare arrays, because all of them have distinct sorts, and SELECT/STORE operations
+   * are also incomparable and result in trivially satisfiable SMT queries (with no visible hint on
+   * the reason, except distinct sort objects).
+   */
+  private final Table<Sort, Sort, Sort> arraySortCache = HashBasedTable.create();
+
   PrincessFormulaCreator(PrincessEnvironment pEnv) {
     super(pEnv, PrincessEnvironment.BOOL_SORT, PrincessEnvironment.INTEGER_SORT, null);
   }
@@ -158,7 +170,12 @@ class PrincessFormulaCreator
 
   @Override
   public Sort getArrayType(Sort pIndexType, Sort pElementType) {
-    return new ExtArray(toSeq(ImmutableList.of(pIndexType)), pElementType).sort();
+    Sort result = arraySortCache.get(pIndexType, pElementType);
+    if (result == null) {
+      result = new ExtArray(toSeq(ImmutableList.of(pIndexType)), pElementType).sort();
+      arraySortCache.put(pIndexType, pElementType, result);
+    }
+    return result;
   }
 
   @SuppressWarnings("unchecked")
