@@ -146,7 +146,7 @@ SPDX-License-Identifier: Apache-2.0
         <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.5-732-gd208e931" conf="runtime-smtinterpol->master; contrib->sources"/>
 
         <!-- Princess for our Maven release -->
-        <dependency org="io.github.uuverifiers" name="princess_2.13" rev="2021-04-09" conf="runtime-princess-with-javacup->default; contrib->sources"/>
+        <dependency org="io.github.uuverifiers" name="princess_2.13" rev="2021-05-10" conf="runtime-princess-with-javacup->default; contrib->sources"/>
         <!-- Princess for our Ivy release-->
         <dependency org="io.github.uuverifiers" name="princess_2.13" rev="2021-05-10" conf="runtime-princess->default; contrib->sources">
           <!-- Exclude dependency on java-cup and replace it with java-cup-runtime, which is enough.
