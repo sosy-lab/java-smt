@@ -10,6 +10,15 @@ SPDX-License-Identifier: Apache-2.0
 
 # JavaSMT ChangeLog
 
+## JavaSMT 3.9.0
+
+This release contains a larger update of Princess and more JUnit tests.
+The PrettyPrinter is switched from a boolean parameter to a options enum.
+The example projects for Maven are updated with newer solver versions.
+
+### Updated solvers:
+ - Princess 2021-05-10 (improving Array and BV theory, and including a switch to an official Maven repository)
+
 ## JavaSMT 3.8.0
 
 This release contains smaller bugfixes, some cleanup, and updated libraries.
