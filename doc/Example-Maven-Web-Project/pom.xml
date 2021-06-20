@@ -76,7 +76,7 @@ SPDX-License-Identifier: Apache-2.0
     <dependency>
       <groupId>org.sosy-lab</groupId>
       <artifactId>java-smt</artifactId>
-      <version>3.8.0</version>
+      <version>3.9.0</version>
     </dependency>
 
     <!-- MathSAT5 has one dependency (on Linux) -->
