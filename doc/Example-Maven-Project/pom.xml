@@ -16,7 +16,7 @@ SPDX-License-Identifier: Apache-2.0
 
   <groupId>org.sosy_lab.java_smt_example</groupId>
   <artifactId>java-smt-maven-example</artifactId>
-  <version>1.2</version>
+  <version>1.3</version>
   <name>java-smt-maven-example</name>
   <description>Example Maven project to show how to use JavaSMT with native solver libraries.</description>
   <url>https://github.com/sosy-lab/java-smt</url>
@@ -74,7 +74,7 @@ SPDX-License-Identifier: Apache-2.0
     <dependency>
       <groupId>org.sosy-lab</groupId>
       <artifactId>java-smt</artifactId>
-      <version>3.9.0</version>
+      <version>3.9.0-1-g304079c2</version>
     </dependency>
 
     <!-- MathSAT5 has one dependency (on Linux) -->
