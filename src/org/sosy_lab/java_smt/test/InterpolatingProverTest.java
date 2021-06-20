@@ -937,49 +937,6 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
     assertThat(itps).isEmpty();
   }
 
-  /* This is a testcase that failed with Princess and seq interpolants. */
-  /*
-   * (reset) (set-logic AUFLIA) (set-option :produce-interpolants true)
-   *
-   * (declare-fun __-Infinity__ () Int) (declare-fun |__ADDRESS_OF_main::pathbuf@| () (_ BitVec 32))
-   * (declare-fun |glob2::pathbuf@2| () (_ BitVec 32)) (declare-fun |glob2::__retval__@2| () (_
-   * BitVec 32)) (declare-fun |glob2::pathlim@2| () (_ BitVec 32)) (declare-fun |glob2::p@3| () (_
-   * BitVec 32)) (declare-fun |__VERIFIER_assert::cond@2| () (_ BitVec 32)) (declare-fun
-   * __+Infinity__ () Int) (declare-fun tmp@2 () (_ BitVec 32)) (declare-fun |main::bound@2| () (_
-   * BitVec 32)) (declare-fun __NaN__ () Int) (declare-fun tmp@3 () (_ BitVec 32)) (declare-fun
-   * __string__ (Int) (_ BitVec 32)) (declare-fun __isSubnormal__ (Int) Bool) (declare-fun
-   * Integer_%_ (Int Int) Int) (declare-fun sqrt (Int) Int) (declare-fun Integer_*_ (Int Int) Int)
-   * (declare-fun __isNormal__ (Int) Bool) (declare-fun Integer_/_ (Int Int) Int) (assert (and (and
-   * (and (and (and (= tmp@2 (_ bv0 32)) (and (and (bvslt (_ bv0 32) |__ADDRESS_OF_main::pathbuf@|)
-   * (= (bvurem |__ADDRESS_OF_main::pathbuf@| (_ bv4 32)) (bvurem (_ bv0 32) (_ bv4 32)))) (bvslt (_
-   * bv0 32) (bvadd |__ADDRESS_OF_main::pathbuf@| (_ bv8 32))))) (= |main::bound@2| (bvsub (bvadd
-   * |__ADDRESS_OF_main::pathbuf@| (bvmul (_ bv2 32) (_ bv4 32))) (bvmul (_ bv1 32) (_ bv4 32)))))
-   * (= tmp@3 (bvsub (bvadd |__ADDRESS_OF_main::pathbuf@| (bvmul (_ bv2 32) (_ bv4 32))) (bvmul (_
-   * bv1 32) (_ bv4 32))))) (and (= |glob2::pathbuf@2| |__ADDRESS_OF_main::pathbuf@|) (=
-   * |glob2::pathlim@2| |main::bound@2|))) (= |glob2::p@3| |glob2::pathbuf@2|)))
-   *
-   * (assert (and (and (bvsle |glob2::p@3| |glob2::pathlim@2|) (= |__VERIFIER_assert::cond@2| (ite
-   * (bvsle |glob2::p@3| tmp@3) (_ bv1 32) (_ bv0 32)))) (= |__VERIFIER_assert::cond@2| (_ bv0
-   * 32))))
-   *
-   * (check-sat) (get-interpolants)
-   */
-  /*
-   * java.lang.AssertionError: assertion failed at scala.Predef$.assert(Predef.scala:265) at
-   * ap.util.Debug$.assertTrue(Debug.scala:132) at ap.util.Debug$.assertPostFast(Debug.scala:167) at
-   * ap.SimpleAPI.getInterpolants(SimpleAPI.scala:2610) at
-   * org.sosy_lab.java_smt.solvers.princess.PrincessInterpolatingProver.getSeqInterpolants(
-   * PrincessInterpolatingProver.java:122) at
-   * org.sosy_lab.java_smt.basicimpl.reusableStack.ReusableStackInterpolatingProver.
-   * getSeqInterpolants(ReusableStackInterpolatingProver.java:34) at
-   * org.sosy_lab.java_smt.basicimpl.withAssumptionsWrapper.
-   * InterpolatingProverWithAssumptionsWrapper.getSeqInterpolants(
-   * InterpolatingProverWithAssumptionsWrapper.java:61) at
-   * org.sosy_lab.java_smt.api.InterpolatingProverEnvironment.getSeqInterpolants0(
-   * InterpolatingProverEnvironment.java:75) at
-   * org.sosy_lab.java_smt.test.InterpolatingProverTest.bigSeqInterpolationTest(
-   * InterpolatingProverTest.java:1008)
-   */
   @Test
   public <T> void bigSeqInterpolationTest() throws InterruptedException, SolverException {
     requireBitvectors();
