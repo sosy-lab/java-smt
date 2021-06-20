@@ -109,8 +109,8 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * Get all satisfying assignments of the current environment with regards to a subset of terms,
    * and create a region representing all those models.
    *
-   * @param important A set of variables appearing in f. Only these variables will appear in the
-   *     region.
+   * @param important A set of (positive) variables appearing in the asserted queries. Only these
+   *     variables will appear in the region.
    * @return A region representing all satisfying models of the formula.
    */
   <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
@@ -126,7 +126,11 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
     /**
      * Callback for each possible satisfying assignment to given {@code important} predicates. If
      * the predicate is assigned {@code true} in the model, it is returned as-is in the list, and
-     * otherwise it is negated. TODO: this interface does not work properly for negated predicates.
+     * otherwise it is negated.
+     *
+     * <p>There is no guarantee that the list of model values corresponds to the list in {@link
+     * BasicProverEnvironment#allSat}. We can reorder the variables or leave out values with an
+     * freely chosen value.
      */
     void apply(List<BooleanFormula> model);
 

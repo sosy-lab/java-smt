@@ -69,14 +69,6 @@ SPDX-License-Identifier: Apache-2.0
         </developer>
     </developers>
 
-    <repositories>
-      <repository> <!-- additional repository for Princess -->
-        <id>princess-repo</id>
-        <name>Princess Maven Repository</name>
-        <url>http://logicrunch.research.it.uu.se/maven/</url>
-      </repository>
-    </repositories>
-
     <!-- Dependencies are automatically inserted after this line. Do not change! -->
 
 </project>

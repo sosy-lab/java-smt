@@ -44,12 +44,6 @@ class PrincessArrayFormulaManager
   @SuppressWarnings("MethodTypeParameterName")
   protected <TI extends Formula, TE extends Formula> IExpression internalMakeArray(
       String pName, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
-
-    // other types in arrays are not supported in princess
-    // TODO: check
-    assert pIndexType.isIntegerType() && pElementType.isIntegerType()
-        : "Princess supports only Integer types in Arrays";
-
     final ArrayFormulaType<TI, TE> arrayFormulaType =
         FormulaType.getArrayType(pIndexType, pElementType);
     final Sort arrayType = toSolverType(arrayFormulaType);

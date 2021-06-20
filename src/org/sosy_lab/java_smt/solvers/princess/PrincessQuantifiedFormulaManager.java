@@ -14,7 +14,7 @@ import static scala.collection.JavaConverters.asScala;
 import ap.parser.IConstant;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
-import ap.parser.IQuantified;
+import ap.parser.ISortedQuantified;
 import ap.terfor.ConstantTerm;
 import ap.terfor.conjunctions.Quantifier.ALL$;
 import ap.terfor.conjunctions.Quantifier.EX$;
@@ -45,7 +45,7 @@ class PrincessQuantifiedFormulaManager
     if (vars.isEmpty()) {
 
       // Body already contains bound variables.
-      return new IQuantified(pq, (IFormula) body);
+      return new ISortedQuantified(pq, PrincessEnvironment.INTEGER_SORT, (IFormula) body);
     } else {
       // TODO: add support for boolean quantification!
       return IExpression.quanConsts(pq, asScala(toConstantTerm(vars)), (IFormula) body);

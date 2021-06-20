@@ -13,6 +13,7 @@ import static scala.collection.JavaConverters.asJava;
 import static scala.collection.JavaConverters.collectionAsScalaIterableConverter;
 
 import ap.SimpleAPI;
+import ap.parser.BooleanCompactifier;
 import ap.parser.Environment.EnvironmentException;
 import ap.parser.IAtom;
 import ap.parser.IConstant;
@@ -23,11 +24,12 @@ import ap.parser.IFunction;
 import ap.parser.IIntFormula;
 import ap.parser.ITerm;
 import ap.parser.Parser2InputAbsy.TranslationException;
+import ap.parser.PartialEvaluator;
 import ap.parser.SMTLineariser;
 import ap.parser.SMTParser2InputAbsy.SMTFunctionType;
 import ap.parser.SMTParser2InputAbsy.SMTType;
 import ap.terfor.ConstantTerm;
-import ap.theories.SimpleArray;
+import ap.theories.ExtArray;
 import ap.theories.bitvectors.ModuloArithmetic;
 import ap.types.Sort;
 import ap.types.Sort$;
@@ -86,6 +88,13 @@ class PrincessEnvironment {
           "The number of atoms a term has to have before"
               + " it gets abbreviated if there are more identical terms.")
   private int minAtomsForAbbreviation = 100;
+
+  @Option(
+      secure = true,
+      description =
+          "Enable additional assertion checks within Princess. "
+              + "The main usage is debugging. This option can cause a performance overhead.")
+  private boolean enableAssertions = false;
 
   public static final Sort BOOL_SORT = Sort$.MODULE$.Bool();
   public static final Sort INTEGER_SORT = Sort.Integer$.MODULE$;
@@ -190,14 +199,11 @@ class PrincessEnvironment {
       scalaDumpBasename = logPath.getFileName().toString();
     }
 
-    // We enable assertions because typically we use the "assertionless" JAR where they have no
-    // effect anyway, but if we use the JAR with assertions we want them to be enabled.
-    // The constructor parameter to SimpleAPI affects only part of the assertions.
-    Debug.enableAllAssertions(true);
+    Debug.enableAllAssertions(enableAssertions);
 
     final SimpleAPI newApi =
         SimpleAPI.apply(
-            true, // enableAssert, see above
+            enableAssertions, // enableAssert, see above
             false, // no sanitiseNames, because variable names may contain chars like "@" and ":".
             smtDumpBasename != null, // dumpSMT
             smtDumpBasename, // smtDumpBasename
@@ -292,6 +298,17 @@ class PrincessEnvironment {
     return api.extractSMTLIBAssertionsSymbols(new StringReader(s));
   }
 
+  /**
+   * Utility helper method to hide a checked exception as RuntimeException.
+   *
+   * <p>The generic E simulates a RuntimeException at compile time and lets us throw the correct
+   * Exception at run time.
+   */
+  @SuppressWarnings("unchecked")
+  private static <E extends Throwable> void throwCheckedAsUnchecked(Throwable e) throws E {
+    throw (E) e;
+  }
+
   public Appender dumpFormula(IFormula formula, final PrincessFormulaCreator creator) {
     // remove redundant expressions
     // TODO do we want to remove redundancy completely (as checked in the unit
@@ -306,6 +323,22 @@ class PrincessEnvironment {
 
       @Override
       public void appendTo(Appendable out) throws IOException {
+        try {
+          appendTo0(out);
+        } catch (scala.MatchError e) {
+          // exception might be thrown in case of interrupt, then we wrap it in an interrupt.
+          if (shutdownNotifier.shouldShutdown()) {
+            InterruptedException interrupt = new InterruptedException();
+            interrupt.addSuppressed(e);
+            throwCheckedAsUnchecked(interrupt);
+          } else {
+            // simply re-throw exception
+            throw e;
+          }
+        }
+      }
+
+      private void appendTo0(Appendable out) throws IOException {
         // allVars needs to be mutable, but declaredFunctions should have deterministic order
         Set<IExpression> allVars =
             ImmutableSet.copyOf(creator.extractVariablesAndUFs(lettedFormula, true).values());
@@ -401,24 +434,36 @@ class PrincessEnvironment {
       return FormulaType.BooleanType;
     } else if (pFormula instanceof ITerm) {
       final Sort sort = Sort$.MODULE$.sortOf((ITerm) pFormula);
-      if (sort == PrincessEnvironment.BOOL_SORT) {
-        return FormulaType.BooleanType;
-      } else if (sort == PrincessEnvironment.INTEGER_SORT) {
-        return FormulaType.IntegerType;
-      } else if (sort instanceof SimpleArray.ArraySort) {
-        return new ArrayFormulaType<>(FormulaType.IntegerType, FormulaType.IntegerType);
-      } else if (sort instanceof MultipleValueBool$) {
-        return FormulaType.BooleanType;
-      } else {
-        scala.Option<Object> bitWidth = getBitWidth(sort);
-        if (bitWidth.isDefined()) {
-          return FormulaType.getBitvectorTypeWithSize((Integer) bitWidth.get());
-        }
-      }
+      return getFormulaTypeFromSort(sort);
     }
     throw new IllegalArgumentException(
         String.format(
             "Unknown formula type '%s' for formula '%s'.", pFormula.getClass(), pFormula));
+  }
+
+  private static FormulaType<?> getFormulaTypeFromSort(final Sort sort) {
+    if (sort == PrincessEnvironment.BOOL_SORT) {
+      return FormulaType.BooleanType;
+    } else if (sort == PrincessEnvironment.INTEGER_SORT) {
+      return FormulaType.IntegerType;
+    } else if (sort instanceof ExtArray.ArraySort) {
+      Seq<Sort> indexSorts = ((ExtArray.ArraySort) sort).theory().indexSorts();
+      Sort elementSort = ((ExtArray.ArraySort) sort).theory().objSort();
+      assert indexSorts.iterator().size() == 1 : "unexpected index type in Array type:" + sort;
+      // assert indexSorts.size() == 1; // TODO Eclipse does not like simpler code.
+      return new ArrayFormulaType<>(
+          getFormulaTypeFromSort(indexSorts.iterator().next()), // get single index-sort
+          getFormulaTypeFromSort(elementSort));
+    } else if (sort instanceof MultipleValueBool$) {
+      return FormulaType.BooleanType;
+    } else {
+      scala.Option<Object> bitWidth = getBitWidth(sort);
+      if (bitWidth.isDefined()) {
+        return FormulaType.getBitvectorTypeWithSize((Integer) bitWidth.get());
+      }
+    }
+    throw new IllegalArgumentException(
+        String.format("Unknown formula type '%s' for sort '%s'.", sort.getClass(), sort));
   }
 
   static scala.Option<Object> getBitWidth(final Sort sort) {
@@ -458,11 +503,7 @@ class PrincessEnvironment {
     } else {
       IFunction funcDecl =
           api.createFunction(
-              name,
-              collectionAsScalaIterableConverter(args).asScala().toSeq(),
-              returnType,
-              false,
-              SimpleAPI.FunctionalityMode$.MODULE$.Full());
+              name, toSeq(args), returnType, false, SimpleAPI.FunctionalityMode$.MODULE$.Full());
       addFunction(funcDecl);
       functionsCache.put(name, funcDecl);
       return funcDecl;
@@ -471,18 +512,20 @@ class PrincessEnvironment {
 
   public ITerm makeSelect(ITerm array, ITerm index) {
     List<ITerm> args = ImmutableList.of(array, index);
-    return api.select(collectionAsScalaIterableConverter(args).asScala().toSeq());
+    ExtArray.ArraySort arraySort = (ExtArray.ArraySort) Sort$.MODULE$.sortOf(array);
+    return new IFunApp(arraySort.theory().select(), toSeq(args));
   }
 
   public ITerm makeStore(ITerm array, ITerm index, ITerm value) {
     List<ITerm> args = ImmutableList.of(array, index, value);
-    return api.store(collectionAsScalaIterableConverter(args).asScala().toSeq());
+    ExtArray.ArraySort arraySort = (ExtArray.ArraySort) Sort$.MODULE$.sortOf(array);
+    return new IFunApp(arraySort.theory().store(), toSeq(args));
   }
 
   public boolean hasArrayType(IExpression exp) {
     if (exp instanceof ITerm) {
       final ITerm t = (ITerm) exp;
-      return Sort$.MODULE$.sortOf(t) instanceof SimpleArray.ArraySort;
+      return Sort$.MODULE$.sortOf(t) instanceof ExtArray.ArraySort;
     } else {
       return false;
     }
@@ -508,5 +551,17 @@ class PrincessEnvironment {
     for (PrincessAbstractProver<?, ?> prover : registeredProvers) {
       prover.addSymbol(funcDecl);
     }
+  }
+
+  static <T> Seq<T> toSeq(List<T> list) {
+    return collectionAsScalaIterableConverter(list).asScala().toSeq();
+  }
+
+  IExpression simplify(IExpression f) {
+    // TODO this method is not tested, check it!
+    if (f instanceof IFormula) {
+      f = BooleanCompactifier.apply((IFormula) f);
+    }
+    return PartialEvaluator.apply(f);
   }
 }

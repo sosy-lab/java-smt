@@ -311,7 +311,7 @@ public abstract class FormulaType<T extends Formula> {
 
     @Override
     public String toString() {
-      return "Array";
+      return String.format("Array<%s,%s>", indexType, elementType);
     }
 
     @Override

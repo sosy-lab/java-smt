@@ -937,6 +937,115 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
     assertThat(itps).isEmpty();
   }
 
+  /* This is a testcase that failed with Princess and seq interpolants. */
+  /*
+   * (reset) (set-logic AUFLIA) (set-option :produce-interpolants true)
+   *
+   * (declare-fun __-Infinity__ () Int) (declare-fun |__ADDRESS_OF_main::pathbuf@| () (_ BitVec 32))
+   * (declare-fun |glob2::pathbuf@2| () (_ BitVec 32)) (declare-fun |glob2::__retval__@2| () (_
+   * BitVec 32)) (declare-fun |glob2::pathlim@2| () (_ BitVec 32)) (declare-fun |glob2::p@3| () (_
+   * BitVec 32)) (declare-fun |__VERIFIER_assert::cond@2| () (_ BitVec 32)) (declare-fun
+   * __+Infinity__ () Int) (declare-fun tmp@2 () (_ BitVec 32)) (declare-fun |main::bound@2| () (_
+   * BitVec 32)) (declare-fun __NaN__ () Int) (declare-fun tmp@3 () (_ BitVec 32)) (declare-fun
+   * __string__ (Int) (_ BitVec 32)) (declare-fun __isSubnormal__ (Int) Bool) (declare-fun
+   * Integer_%_ (Int Int) Int) (declare-fun sqrt (Int) Int) (declare-fun Integer_*_ (Int Int) Int)
+   * (declare-fun __isNormal__ (Int) Bool) (declare-fun Integer_/_ (Int Int) Int) (assert (and (and
+   * (and (and (and (= tmp@2 (_ bv0 32)) (and (and (bvslt (_ bv0 32) |__ADDRESS_OF_main::pathbuf@|)
+   * (= (bvurem |__ADDRESS_OF_main::pathbuf@| (_ bv4 32)) (bvurem (_ bv0 32) (_ bv4 32)))) (bvslt (_
+   * bv0 32) (bvadd |__ADDRESS_OF_main::pathbuf@| (_ bv8 32))))) (= |main::bound@2| (bvsub (bvadd
+   * |__ADDRESS_OF_main::pathbuf@| (bvmul (_ bv2 32) (_ bv4 32))) (bvmul (_ bv1 32) (_ bv4 32)))))
+   * (= tmp@3 (bvsub (bvadd |__ADDRESS_OF_main::pathbuf@| (bvmul (_ bv2 32) (_ bv4 32))) (bvmul (_
+   * bv1 32) (_ bv4 32))))) (and (= |glob2::pathbuf@2| |__ADDRESS_OF_main::pathbuf@|) (=
+   * |glob2::pathlim@2| |main::bound@2|))) (= |glob2::p@3| |glob2::pathbuf@2|)))
+   *
+   * (assert (and (and (bvsle |glob2::p@3| |glob2::pathlim@2|) (= |__VERIFIER_assert::cond@2| (ite
+   * (bvsle |glob2::p@3| tmp@3) (_ bv1 32) (_ bv0 32)))) (= |__VERIFIER_assert::cond@2| (_ bv0
+   * 32))))
+   *
+   * (check-sat) (get-interpolants)
+   */
+  /*
+   * java.lang.AssertionError: assertion failed at scala.Predef$.assert(Predef.scala:265) at
+   * ap.util.Debug$.assertTrue(Debug.scala:132) at ap.util.Debug$.assertPostFast(Debug.scala:167) at
+   * ap.SimpleAPI.getInterpolants(SimpleAPI.scala:2610) at
+   * org.sosy_lab.java_smt.solvers.princess.PrincessInterpolatingProver.getSeqInterpolants(
+   * PrincessInterpolatingProver.java:122) at
+   * org.sosy_lab.java_smt.basicimpl.reusableStack.ReusableStackInterpolatingProver.
+   * getSeqInterpolants(ReusableStackInterpolatingProver.java:34) at
+   * org.sosy_lab.java_smt.basicimpl.withAssumptionsWrapper.
+   * InterpolatingProverWithAssumptionsWrapper.getSeqInterpolants(
+   * InterpolatingProverWithAssumptionsWrapper.java:61) at
+   * org.sosy_lab.java_smt.api.InterpolatingProverEnvironment.getSeqInterpolants0(
+   * InterpolatingProverEnvironment.java:75) at
+   * org.sosy_lab.java_smt.test.InterpolatingProverTest.bigSeqInterpolationTest(
+   * InterpolatingProverTest.java:1008)
+   */
+  @Test
+  public <T> void bigSeqInterpolationTest() throws InterruptedException, SolverException {
+    requireBitvectors();
+    requireInterpolation();
+
+    int bvWidth = 32;
+    BitvectorFormula bv0 = bvmgr.makeBitvector(bvWidth, 0);
+    BitvectorFormula bv1 = bvmgr.makeBitvector(bvWidth, 1);
+    BitvectorFormula bv2 = bvmgr.makeBitvector(bvWidth, 2);
+    BitvectorFormula bv4 = bvmgr.makeBitvector(bvWidth, 4);
+    BitvectorFormula bv8 = bvmgr.makeBitvector(bvWidth, 8);
+
+    BitvectorFormula t2 = bvmgr.makeVariable(bvWidth, "tmp3");
+    BitvectorFormula p = bvmgr.makeVariable(bvWidth, "ADDRESS_OF_main::pathbuf");
+    BitvectorFormula p2 = bvmgr.makeVariable(bvWidth, "glob2::pathbuf2");
+    BitvectorFormula p3 = bvmgr.makeVariable(bvWidth, "glob2::p3");
+    BitvectorFormula p4 = bvmgr.makeVariable(bvWidth, "glob2::pathlim2");
+    BitvectorFormula b = bvmgr.makeVariable(bvWidth, "main::bound2");
+    BitvectorFormula c = bvmgr.makeVariable(bvWidth, "VERIFIER_assert::cond2");
+
+    BooleanFormula f1Internal1 =
+        bmgr.and(
+            bvmgr.lessThan(bv0, p, true),
+            bvmgr.equal(bvmgr.modulo(p, bv4, false), bvmgr.modulo(bv0, bv4, false)),
+            bvmgr.lessThan(bv0, bvmgr.add(p, bv8), true));
+
+    BooleanFormula f1Internal2 =
+        bvmgr.equal(bvmgr.modulo(p, bv4, false), bvmgr.modulo(bv0, bv4, false));
+
+    BooleanFormula f1Internal3 = bvmgr.lessThan(bv0, bvmgr.add(p, bv8), true);
+
+    BooleanFormula f1Internal5 =
+        bvmgr.equal(
+            b, bvmgr.subtract(bvmgr.add(p, bvmgr.multiply(bv2, bv4)), bvmgr.multiply(bv1, bv4)));
+
+    BooleanFormula f1Internal6 =
+        bvmgr.equal(
+            t2, bvmgr.subtract(bvmgr.add(p, bvmgr.multiply(bv2, bv4)), bvmgr.multiply(bv1, bv4)));
+
+    BooleanFormula f1Internal7 = bvmgr.equal(p2, p);
+
+    BooleanFormula f1 =
+        bmgr.and(
+            f1Internal1,
+            f1Internal2,
+            f1Internal3,
+            f1Internal5,
+            f1Internal6,
+            f1Internal7,
+            bvmgr.equal(p3, p2));
+
+    BooleanFormula f2 =
+        bmgr.and(
+            bvmgr.lessOrEquals(p3, p4, true),
+            bvmgr.equal(c, bmgr.ifThenElse(bvmgr.lessOrEquals(p3, t2, true), bv1, bv0)),
+            bvmgr.equal(c, bv0));
+
+    try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
+      T id1 = prover.push(f2);
+      T id2 = prover.push(f1);
+      assertThat(prover).isUnsatisfiable();
+      @SuppressWarnings("unused")
+      List<BooleanFormula> interpolants = prover.getSeqInterpolants0(ImmutableList.of(id1, id2));
+    }
+  }
+
   private void checkItpSequence(
       InterpolatingProverEnvironment<?> stack,
       List<BooleanFormula> formulas,
