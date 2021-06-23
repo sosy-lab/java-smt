@@ -37,7 +37,7 @@ public final class ShutdownHook implements ShutdownRequestListener, AutoCloseabl
   // so we repeat cancellation until the solver's method returns and terminates.
   // In that case, we should call #close and terminate this hook.
   @Override
-  public void shutdownRequested(@Nullable String reason_unused) {
+  public void shutdownRequested(@Nullable String reasonUnused) {
     while (isActiveHook.get()) { // flag is reset in #cancelHook
       interruptCall.run();
       try {
