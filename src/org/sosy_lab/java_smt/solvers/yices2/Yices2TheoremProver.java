@@ -201,7 +201,7 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
       Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
     Preconditions.checkState(!isClosed());
     checkGenerateUnsatCoresOverAssumptions();
-    boolean sat = isUnsatWithAssumptions(pAssumptions);
+    boolean sat = !isUnsatWithAssumptions(pAssumptions);
     return sat ? Optional.empty() : Optional.of(getUnsatCore0());
   }
 
