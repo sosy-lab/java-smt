@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.basicimpl;
 
 import com.google.common.base.Preconditions;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.ShutdownNotifier.ShutdownRequestListener;
 
@@ -32,9 +33,11 @@ public final class ShutdownHook implements ShutdownRequestListener, AutoCloseabl
 
   final AtomicBoolean isActiveHook = new AtomicBoolean(true);
 
-  // Due to a small delay in some solvers, interrupts have no effect when it is called too soon.
+  // Due to a small delay in some solvers, interrupts have no effect when it is called too soon,
+  // so we repeat cancellation until the solver's method returns and terminates.
+  // In that case, we should call #close and terminate this hook.
   @Override
-  public void shutdownRequested(String reason) {
+  public void shutdownRequested(@Nullable String reason_unused) {
     while (isActiveHook.get()) { // flag is reset in #cancelHook
       interruptCall.run();
       try {
