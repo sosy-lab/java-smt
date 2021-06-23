@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
+import com.google.common.base.Preconditions;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.ShutdownNotifier.ShutdownRequestListener;
@@ -24,8 +25,8 @@ public final class ShutdownHook implements ShutdownRequestListener, AutoCloseabl
   private final Runnable interruptCall;
 
   public ShutdownHook(ShutdownNotifier pShutdownNotifier, Runnable pInterruptCall) {
-    interruptCall = pInterruptCall;
-    shutdownNotifier = pShutdownNotifier;
+    interruptCall = Preconditions.checkNotNull(pInterruptCall);
+    shutdownNotifier = Preconditions.checkNotNull(pShutdownNotifier);
     shutdownNotifier.register(this);
   }
 
