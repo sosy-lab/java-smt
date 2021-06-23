@@ -434,7 +434,15 @@ class PrincessEnvironment {
       return FormulaType.BooleanType;
     } else if (pFormula instanceof ITerm) {
       final Sort sort = Sort$.MODULE$.sortOf((ITerm) pFormula);
-      return getFormulaTypeFromSort(sort);
+      try {
+        return getFormulaTypeFromSort(sort);
+      } catch (IllegalArgumentException e) {
+        // add more info about the formula, then rethrow
+        throw new IllegalArgumentException(
+            String.format(
+                "Unknown formula type '%s' for formula '%s'.", pFormula.getClass(), pFormula),
+            e);
+      }
     }
     throw new IllegalArgumentException(
         String.format(
