@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.solvers.z3;
 
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
@@ -22,8 +23,9 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
       Z3FormulaManager pMgr,
       long z3params,
       Set<ProverOptions> pOptions,
-      @Nullable PathCounterTemplate pLogfile) {
-    super(creator, z3params, pMgr, pOptions, pLogfile);
+      @Nullable PathCounterTemplate pLogfile,
+      ShutdownNotifier pShutdownNotifier) {
+    super(creator, z3params, pMgr, pOptions, pLogfile, pShutdownNotifier);
   }
 
   @Override

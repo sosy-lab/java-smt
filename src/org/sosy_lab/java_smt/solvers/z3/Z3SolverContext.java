@@ -52,6 +52,7 @@ final class Z3SolverContext extends AbstractSolverContext {
   String objectivePrioritizationMode = "box";
 
   private final ShutdownRequestListener interruptListener;
+  private final ShutdownNotifier shutdownNotifier;
   private final @Nullable PathCounterTemplate logfile;
   private final long z3params;
   private final LogManager logger;
@@ -83,7 +84,6 @@ final class Z3SolverContext extends AbstractSolverContext {
       Z3FormulaCreator pFormulaCreator,
       Configuration config,
       long pZ3params,
-      ShutdownRequestListener pInterruptListener,
       ShutdownNotifier pShutdownNotifier,
       LogManager pLogger,
       Z3FormulaManager pManager,
@@ -94,7 +94,8 @@ final class Z3SolverContext extends AbstractSolverContext {
     creator = pFormulaCreator;
     config.inject(this);
     z3params = pZ3params;
-    interruptListener = pInterruptListener;
+    interruptListener = reason -> Native.interrupt(pFormulaCreator.getEnv());
+    shutdownNotifier = pShutdownNotifier;
     pShutdownNotifier.register(interruptListener);
     logger = pLogger;
     manager = pManager;
@@ -150,13 +151,10 @@ final class Z3SolverContext extends AbstractSolverContext {
     Native.globalParamSet("model.compact", "false");
 
     final long context = Native.mkContextRc(cfg);
-    ShutdownNotifier.ShutdownRequestListener interruptListener =
-        reason -> Native.interrupt(context);
     Native.delConfig(cfg);
 
     long boolSort = Native.mkBoolSort(context);
     Native.incRef(context, Native.sortToAst(context, boolSort));
-
     long integerSort = Native.mkIntSort(context);
     Native.incRef(context, Native.sortToAst(context, integerSort));
     long realSort = Native.mkRealSort(context);
@@ -204,14 +202,7 @@ final class Z3SolverContext extends AbstractSolverContext {
             quantifierManager,
             arrayManager);
     return new Z3SolverContext(
-        creator,
-        config,
-        z3params,
-        interruptListener,
-        pShutdownNotifier,
-        logger,
-        manager,
-        solverLogfile);
+        creator, config, z3params, pShutdownNotifier, logger, manager, solverLogfile);
   }
 
   @Override
@@ -230,7 +221,7 @@ final class Z3SolverContext extends AbstractSolverContext {
         Native.mkStringSymbol(z3context, ":unsat_core"),
         options.contains(ProverOptions.GENERATE_UNSAT_CORE)
             || options.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS));
-    return new Z3TheoremProver(creator, manager, z3params, options, logfile);
+    return new Z3TheoremProver(creator, manager, z3params, options, logfile, shutdownNotifier);
   }
 
   @Override
@@ -244,7 +235,8 @@ final class Z3SolverContext extends AbstractSolverContext {
       Set<ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
     Z3OptimizationProver out =
-        new Z3OptimizationProver(creator, logger, z3params, manager, options, logfile);
+        new Z3OptimizationProver(
+            creator, logger, z3params, manager, options, logfile, shutdownNotifier);
     out.setParam(OPT_ENGINE_CONFIG_KEY, this.optimizationEngine);
     out.setParam(OPT_PRIORITY_CONFIG_KEY, this.objectivePrioritizationMode);
     return out;
@@ -271,6 +263,7 @@ final class Z3SolverContext extends AbstractSolverContext {
       closed = true;
       long context = creator.getEnv();
       creator.forceClose();
+      shutdownNotifier.unregister(interruptListener);
       Native.paramsDecRef(context, z3params);
       Native.closeLog();
       Native.delContext(context);
