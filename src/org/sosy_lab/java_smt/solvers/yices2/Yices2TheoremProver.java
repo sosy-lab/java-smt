@@ -133,10 +133,10 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
       int[] allConstraints = getAllConstraints();
       unsat =
           !yices_check_sat_with_assumptions(
-              curEnv, DEFAULT_PARAMS, allConstraints.length, allConstraints);
+              curEnv, DEFAULT_PARAMS, allConstraints.length, allConstraints, shutdownNotifier);
       return unsat;
     } else {
-      unsat = !yices_check_sat(curEnv, DEFAULT_PARAMS);
+      unsat = !yices_check_sat(curEnv, DEFAULT_PARAMS, shutdownNotifier);
       if (unsat && stackSizeToUnsat == Integer.MAX_VALUE) {
         stackSizeToUnsat = constraintStack.size(); // If sat check is UNSAT and stackSizeToUnsat was
         // not already set, set to current
@@ -158,7 +158,7 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
     Preconditions.checkState(!closed);
     // TODO handle BooleanFormulaCollection / check for literals
     return !yices_check_sat_with_assumptions(
-        curEnv, 0, pAssumptions.size(), uncapsulate(pAssumptions));
+        curEnv, DEFAULT_PARAMS, pAssumptions.size(), uncapsulate(pAssumptions), shutdownNotifier);
   }
 
   @Override
@@ -201,9 +201,7 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
       Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
     Preconditions.checkState(!isClosed());
     checkGenerateUnsatCoresOverAssumptions();
-    boolean sat =
-        yices_check_sat_with_assumptions(
-            curEnv, DEFAULT_PARAMS, pAssumptions.size(), uncapsulate(pAssumptions));
+    boolean sat = isUnsatWithAssumptions(pAssumptions);
     return sat ? Optional.empty() : Optional.of(getUnsatCore0());
   }
 

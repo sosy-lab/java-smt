@@ -17,6 +17,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_SUM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_EQ_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_NOT_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_OR_TERM;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_STATUS_SAT;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YVAL_RATIONAL;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_add;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_and;
@@ -41,7 +42,6 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvpower
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvsum_component;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvxor2;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_check_context;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_check_sat;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_context_disable_option;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_def_terms;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_eq;
@@ -462,7 +462,7 @@ public class Yices2NativeApiTest {
     yices_assert_formula(env, eq);
     System.out.println("varx: " + varx);
     System.out.println("query: " + query);
-    if (yices_check_sat(env, 0)) {
+    if (yices_check_context(env, 0) == YICES_STATUS_SAT) {
       Model m = new Yices2Model(yices_get_model(env, 1), null, creator);
       Object val = m.evaluate(creator.encapsulateWithTypeOf(varx));
       System.out.println(val);
@@ -492,7 +492,7 @@ public class Yices2NativeApiTest {
     yices_assert_formula(env, gt2);
     yices_assert_formula(env, lt2);
     yices_assert_formula(env, eq);
-    if (yices_check_sat(env, 0)) {
+    if (yices_check_context(env, 0) == YICES_STATUS_SAT) {
       long model = yices_get_model(env, 1);
       Model m = new Yices2Model(model, null, creator);
       System.out.println(yices_model_to_string(model));
