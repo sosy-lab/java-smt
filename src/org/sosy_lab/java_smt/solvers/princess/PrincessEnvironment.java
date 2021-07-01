@@ -29,6 +29,7 @@ import ap.parser.SMTLineariser;
 import ap.parser.SMTParser2InputAbsy.SMTFunctionType;
 import ap.parser.SMTParser2InputAbsy.SMTType;
 import ap.terfor.ConstantTerm;
+import ap.terfor.preds.Predicate;
 import ap.theories.ExtArray;
 import ap.theories.bitvectors.ModuloArithmetic;
 import ap.types.Sort;
@@ -71,7 +72,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import scala.Tuple2;
-import scala.Tuple3;
+import scala.Tuple4;
 import scala.collection.immutable.Seq;
 
 /**
@@ -247,19 +248,20 @@ class PrincessEnvironment {
 
   public List<? extends IExpression> parseStringToTerms(String s, PrincessFormulaCreator creator) {
 
-    Tuple3<
-            scala.collection.immutable.Seq<IFormula>,
+    Tuple4<
+            Seq<IFormula>,
             scala.collection.immutable.Map<IFunction, SMTFunctionType>,
-            scala.collection.immutable.Map<ConstantTerm, SMTType>>
-        triple;
+            scala.collection.immutable.Map<ConstantTerm, SMTType>,
+            scala.collection.immutable.Map<Predicate, SMTFunctionType>>
+        parserResult;
 
     try {
-      triple = extractFromSTMLIB(s);
+      parserResult = extractFromSTMLIB(s);
     } catch (TranslationException | EnvironmentException nested) {
       throw new IllegalArgumentException(nested);
     }
 
-    List<? extends IExpression> formulas = asJava(triple._1());
+    final List<IFormula> formulas = asJava(parserResult._1());
 
     ImmutableSet.Builder<IExpression> declaredFunctions = ImmutableSet.builder();
     for (IExpression f : formulas) {
@@ -267,7 +269,7 @@ class PrincessEnvironment {
     }
     for (IExpression var : declaredFunctions.build()) {
       if (var instanceof IConstant) {
-        sortedVariablesCache.put(var.toString(), (ITerm) var);
+        sortedVariablesCache.put(((IConstant) var).c().name(), (ITerm) var);
         addSymbol((IConstant) var);
       } else if (var instanceof IAtom) {
         boolVariablesCache.put(((IAtom) var).pred().name(), (IFormula) var);
@@ -290,12 +292,15 @@ class PrincessEnvironment {
    */
   /* EnvironmentException is not unused, but the Java compiler does not like Scala. */
   @SuppressWarnings("unused")
-  private Tuple3<
+  private Tuple4<
           Seq<IFormula>,
           scala.collection.immutable.Map<IFunction, SMTFunctionType>,
-          scala.collection.immutable.Map<ConstantTerm, SMTType>>
+          scala.collection.immutable.Map<ConstantTerm, SMTType>,
+          scala.collection.immutable.Map<Predicate, SMTFunctionType>>
       extractFromSTMLIB(String s) throws EnvironmentException, TranslationException {
-    return api.extractSMTLIBAssertionsSymbols(new StringReader(s));
+    // replace let-terms and function definitions by their full term.
+    final boolean fullyInlineLetsAndFunctions = true;
+    return api.extractSMTLIBAssertionsSymbols(new StringReader(s), fullyInlineLetsAndFunctions);
   }
 
   /**
