@@ -14,7 +14,9 @@ import static com.google.common.truth.TruthJUnit.assume;
 import com.google.common.collect.ImmutableList;
 import com.google.common.truth.Truth;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -655,5 +657,38 @@ public class SolverVisitorTest extends SolverBasedTest0 {
       assertThat(mapping2).hasSize(1);
       assertThat(mapping2).containsEntry("v", v);
     }
+  }
+
+  @Test
+  public void extractionArguments() {
+    requireIntegers();
+
+    // Create the variables and uf
+    IntegerFormula a = imgr.makeVariable("a");
+    IntegerFormula b = imgr.makeVariable("b");
+    IntegerFormula ab = imgr.add(a, b);
+    BooleanFormula uf = fmgr.declareAndCallUF("testFunc", FormulaType.BooleanType, a, b, ab);
+
+    FormulaVisitor<Collection<Formula>> argCollectingVisitor =
+        new DefaultFormulaVisitor<>() {
+
+          final Collection<Formula> usedArgs = new LinkedHashSet<>();
+
+          @Override
+          public Collection<Formula> visitFunction(
+              Formula pF, List<Formula> args, FunctionDeclaration<?> pFunctionDeclaration) {
+            usedArgs.addAll(args);
+            return usedArgs;
+          }
+
+          @Override
+          protected Collection<Formula> visitDefault(Formula pF) {
+            return usedArgs;
+          }
+        };
+
+    Collection<Formula> usedArgs = mgr.visit(uf, argCollectingVisitor);
+
+    assertThat(usedArgs).containsExactly(a, b, ab);
   }
 }
