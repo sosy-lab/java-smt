@@ -87,7 +87,7 @@ final class Z3SolverContext extends AbstractSolverContext {
       ShutdownNotifier pShutdownNotifier,
       LogManager pLogger,
       Z3FormulaManager pManager,
-      PathCounterTemplate pSolverLogFile)
+      @Nullable PathCounterTemplate pSolverLogFile)
       throws InvalidConfigurationException {
     super(pManager);
 

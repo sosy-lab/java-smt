@@ -394,7 +394,7 @@ public class Sudoku {
     @Override
     Integer getValue(BooleanFormula[][][] symbols, Model model, int row, int col) {
       for (int value = 0; value < SIZE; value++) {
-        if (model.evaluate(symbols[row][col][value]).booleanValue()) {
+        if (model.evaluate(symbols[row][col][value])) {
           return value + 1; // off-by-one!
         }
       }

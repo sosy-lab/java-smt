@@ -178,7 +178,7 @@ public class BoolectorNativeApiTest {
       String s1 = mgr.dumpFormula(f1).toString();
       // repeat several times to increase probability for non-deterministic behavior
       for (int i = 0; i < 10; i++) {
-        assertThat(s1).isEqualTo(new StringBuilder().append(mgr.dumpFormula(f2)).toString());
+        assertThat(s1).isEqualTo(mgr.dumpFormula(f2).toString());
       }
     }
   }

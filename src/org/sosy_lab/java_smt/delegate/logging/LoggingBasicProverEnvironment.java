@@ -100,7 +100,7 @@ class LoggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
     Optional<List<BooleanFormula>> result = wrapped.unsatCoreOverAssumptions(assumptions);
-    logger.log(Level.FINE, "unsat-check returned:", !result.isPresent());
+    logger.log(Level.FINE, "unsat-check returned:", result.isEmpty());
     return result;
   }
 

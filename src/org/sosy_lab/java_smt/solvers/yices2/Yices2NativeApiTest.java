@@ -503,10 +503,10 @@ public class Yices2NativeApiTest {
       System.out.println(val2);
       System.out.println("DEFINED TERMS");
       int[] terms = yices_def_terms(model);
-      for (int i = 0; i < terms.length; i++) {
-        System.out.println(yices_term_to_string(terms[i]));
-        System.out.println("Term id is: " + terms[i]);
-        int[] yval = yices_get_value(model, terms[i]);
+      for (int term : terms) {
+        System.out.println(yices_term_to_string(term));
+        System.out.println("Term id is: " + term);
+        int[] yval = yices_get_value(model, term);
         System.out.println("Node id is: " + yval[0]);
         System.out.println("Node tag is: " + yval[1]);
         if (yval[1] == YVAL_RATIONAL) {
@@ -604,7 +604,7 @@ public class Yices2NativeApiTest {
   public void bvExtensionStructureTest() {
     int extendBy = 5;
     int x = yices_named_variable(yices_bv_type(5), "x");
-    List<Integer> terms = new ArrayList<Integer>();
+    List<Integer> terms = new ArrayList<>();
     terms.add(yices_sign_extend(x, extendBy));
     terms.add(yices_sign_extend(x, extendBy));
     terms.add(yices_zero_extend(x, extendBy));

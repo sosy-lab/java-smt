@@ -134,16 +134,15 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
       unsat =
           !yices_check_sat_with_assumptions(
               curEnv, DEFAULT_PARAMS, allConstraints.length, allConstraints, shutdownNotifier);
-      return unsat;
     } else {
       unsat = !yices_check_sat(curEnv, DEFAULT_PARAMS, shutdownNotifier);
       if (unsat && stackSizeToUnsat == Integer.MAX_VALUE) {
-        stackSizeToUnsat = constraintStack.size(); // If sat check is UNSAT and stackSizeToUnsat was
-        // not already set, set to current
-        // constraintStack size.
+        stackSizeToUnsat = constraintStack.size();
+        // If sat check is UNSAT and stackSizeToUnsat waS not already set,
+        // set to current constraintStack size.
       }
-      return unsat;
     }
+    return unsat;
   }
 
   private int[] getAllConstraints() {

@@ -112,7 +112,7 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
           }
         }
         // TODO fold formula to avoid exp. overhead
-        out.append("(assert " + yices_term_to_string(formula) + ")");
+        out.append("(assert ").append(yices_term_to_string(formula)).append(")");
       }
 
       private String getTypeRepr(int type) {

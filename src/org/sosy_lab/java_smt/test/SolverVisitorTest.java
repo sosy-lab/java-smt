@@ -336,7 +336,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
             bvmgr.negate(y))) {
       mgr.visitRecursively(
           f,
-          new DefaultFormulaVisitor<TraversalProcess>() {
+          new DefaultFormulaVisitor<>() {
 
             @Override
             protected TraversalProcess visitDefault(Formula pF) {
