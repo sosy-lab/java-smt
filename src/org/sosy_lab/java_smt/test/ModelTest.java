@@ -354,6 +354,8 @@ public class ModelTest extends SolverBasedTest0 {
     // Boolector only supports bitvector quantifier
     assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
 
+    // create query: "(var == 1) && exists bound : (bound == 0 && var == func(bound))"
+    // then check that the model contains an evaluation "func(0) := 1"
     IntegerFormula var = imgr.makeVariable("var");
     BooleanFormula varIsOne = imgr.equal(var, imgr.makeNumber(1));
     IntegerFormula boundVar = imgr.makeVariable("boundVar");
