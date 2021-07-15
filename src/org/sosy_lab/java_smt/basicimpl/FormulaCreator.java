@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.basicimpl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.ArrayDeque;
@@ -334,6 +335,11 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
   @SuppressWarnings("unchecked")
   public final <T extends Formula> T callFunction(
       FunctionDeclaration<T> declaration, List<? extends Formula> args) {
+    Preconditions.checkArgument(
+        args.size() == declaration.getArgumentTypes().size(),
+        String.format(
+            "function application '%s' requires %d arguments, but received %d arguments",
+            declaration, declaration.getArgumentTypes().size(), args.size()));
     return encapsulate(
         declaration.getType(),
         callFunctionImpl(
