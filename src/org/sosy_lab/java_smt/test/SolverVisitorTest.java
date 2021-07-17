@@ -301,7 +301,6 @@ public class SolverVisitorTest extends SolverBasedTest0 {
   @Test
   public void testBooleanFormulaQuantifierHandling() throws Exception {
     requireQuantifiers();
-    // TODO Maybe rewrite using quantified integer variable to allow testing with Princess
     assume()
         .withMessage("Princess does not support quantifier over boolean variables")
         .that(solverToUse())
@@ -309,6 +308,49 @@ public class SolverVisitorTest extends SolverBasedTest0 {
 
     BooleanFormula x = bmgr.makeVariable("x");
     BooleanFormula constraint = qmgr.forall(ImmutableList.of(x), x);
+    assertThatFormula(constraint).isUnsatisfiable();
+    BooleanFormula newConstraint =
+        bmgr.visit(constraint, new BooleanFormulaTransformationVisitor(mgr) {});
+    assertThatFormula(newConstraint).isUnsatisfiable();
+  }
+
+  // Same as testBooleanFormulaQuantifierHandling but with Ints
+  @Test
+  public void testIntegerFormulaQuantifierHandlingUNSAT() throws Exception {
+    requireQuantifiers();
+    requireIntegers();
+
+    IntegerFormula x = imgr.makeVariable("x");
+    BooleanFormula xEqx = bmgr.not(imgr.equal(imgr.makeNumber(1), x));
+    BooleanFormula constraint = qmgr.forall(ImmutableList.of(x), xEqx);
+    assertThatFormula(constraint).isUnsatisfiable();
+    BooleanFormula newConstraint =
+        bmgr.visit(constraint, new BooleanFormulaTransformationVisitor(mgr) {});
+    assertThatFormula(newConstraint).isUnsatisfiable();
+  }
+
+  @Test
+  public void testIntegerFormulaQuantifierHandlingTrivialSAT() throws Exception {
+    requireQuantifiers();
+    requireIntegers();
+
+    IntegerFormula x = imgr.makeVariable("x");
+    BooleanFormula xEqx = imgr.equal(x, x);
+    BooleanFormula constraint = qmgr.forall(ImmutableList.of(x), xEqx);
+    assertThatFormula(constraint).isSatisfiable();
+    BooleanFormula newConstraint =
+        bmgr.visit(constraint, new BooleanFormulaTransformationVisitor(mgr) {});
+    assertThatFormula(newConstraint).isSatisfiable();
+  }
+
+  @Test
+  public void testIntegerFormulaQuantifierHandlingTrivialUNSAT() throws Exception {
+    requireQuantifiers();
+    requireIntegers();
+
+    IntegerFormula x = imgr.makeVariable("x");
+    BooleanFormula xEqx = bmgr.not(imgr.equal(x, x));
+    BooleanFormula constraint = qmgr.forall(ImmutableList.of(x), xEqx);
     assertThatFormula(constraint).isUnsatisfiable();
     BooleanFormula newConstraint =
         bmgr.visit(constraint, new BooleanFormulaTransformationVisitor(mgr) {});
