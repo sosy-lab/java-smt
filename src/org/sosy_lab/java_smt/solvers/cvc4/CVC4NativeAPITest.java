@@ -29,6 +29,8 @@ import edu.stanford.CVC4.SortType;
 import edu.stanford.CVC4.Type;
 import edu.stanford.CVC4.UnsatCore;
 import edu.stanford.CVC4.vectorExpr;
+import java.io.FileNotFoundException;
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import org.junit.After;
 import org.junit.AssumptionViolatedException;
@@ -601,6 +603,57 @@ public class CVC4NativeAPITest {
 
     Expr resultCheck = exprMgr.mkExpr(Kind.GEQ, y, three);
     assertThat(result.toString()).isEqualTo(resultCheck.toString());
+  }
+
+  @SuppressWarnings("unused")
+  @Test
+  public void checkQuantifierWithUf() throws FileNotFoundException, UnsupportedEncodingException {
+    Expr var = exprMgr.mkVar("var", exprMgr.integerType());
+    // start with a normal, free variable!
+    Expr boundVar = exprMgr.mkVar("boundVar", exprMgr.integerType());
+    Expr varIsOne = exprMgr.mkExpr(Kind.EQUAL, var, exprMgr.mkConst(new Rational(1)));
+    // try not to use 0 as this is the default value for CVC4 models
+    Expr boundVarIsTwo = exprMgr.mkExpr(Kind.EQUAL, boundVar, exprMgr.mkConst(new Rational(2)));
+    Expr boundVarIsOne = exprMgr.mkExpr(Kind.EQUAL, boundVar, exprMgr.mkConst(new Rational(1)));
+
+    String func = "func";
+    Type intType = exprMgr.integerType();
+
+    Type ufType = exprMgr.mkFunctionType(intType, intType);
+    Expr uf = exprMgr.mkVar(func, ufType);
+    Expr funcAtBoundVar = exprMgr.mkExpr(uf, boundVar);
+
+    Expr body =
+        exprMgr.mkExpr(Kind.AND, boundVarIsTwo, exprMgr.mkExpr(Kind.EQUAL, var, funcAtBoundVar));
+
+    // This is the bound variable used for boundVar
+    Expr boundVarBound = exprMgr.mkBoundVar("boundVar", exprMgr.integerType());
+    vectorExpr vec = new vectorExpr();
+    vec.add(boundVarBound);
+    Expr quantifiedVars = exprMgr.mkExpr(Kind.BOUND_VAR_LIST, vec);
+    // Subst all boundVar variables with the bound version
+    Expr bodySubst = body.substitute(boundVar, boundVarBound);
+    Expr quantFormula = exprMgr.mkExpr(Kind.EXISTS, quantifiedVars, bodySubst);
+
+    // var = 1 & boundVar = 1 & exists boundVar . ( boundVar = 2 & f(boundVar) = var )
+    Expr overallFormula = exprMgr.mkExpr(Kind.AND, varIsOne, boundVarIsOne, quantFormula);
+
+    smtEngine.assertFormula(overallFormula);
+
+    Result satCheck = smtEngine.checkSat();
+
+    // SAT
+    assertThat(satCheck.isSat()).isEqualTo(Sat.SAT);
+
+    // check Model
+    // var = 1 & boundVar = 1 & exists boundVar . ( boundVar = 2 & f(2) = 1 )
+    // It seems like CVC4 cant return quantified variables,
+    // therefore we cant get a value for the uf!
+    assertThat(smtEngine.getValue(var).toString()).isEqualTo("1");
+    assertThat(smtEngine.getValue(boundVar).toString()).isEqualTo("1");
+
+    assertThat(smtEngine.getValue(funcAtBoundVar).toString()).isEqualTo("1");
+    assertThat(smtEngine.getValue(boundVarBound).toString()).isEqualTo("boundVar");
   }
 
   /**
