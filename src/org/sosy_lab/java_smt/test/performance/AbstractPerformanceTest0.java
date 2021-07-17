@@ -12,6 +12,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.truth.Truth;
 import java.util.ArrayList;
 import java.util.List;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -27,9 +28,10 @@ import org.sosy_lab.java_smt.test.SolverBasedTest0;
 public abstract class AbstractPerformanceTest0 extends SolverBasedTest0 {
 
   /** Note: This is not the real limit. Please see #getSymbolLimit() for further multipliers. */
-  private static final int[] SYMBOL_LIMITS = {100, 200, 500, 1000, 2000, 5000, 10000, 20000};
+  private static final int[] SYMBOL_LIMITS = {100, 1000, 10000};
+  // private static final int[] SYMBOL_LIMITS = {100, 200, 500, 1000, 2000, 5000, 10000, 20000};
 
-  protected static final int TIMEUT_IN_MS = 5000;
+  protected static final int TIMEUT_IN_MS = 1000;
 
   // for debugging and testing, do not enable this flag in the official junit test.
   private static final boolean ENABLE_SAT_CHECK = false;
@@ -56,6 +58,7 @@ public abstract class AbstractPerformanceTest0 extends SolverBasedTest0 {
     return solver;
   }
 
+  @Ignore // partially redundant
   @Test(timeout = TIMEUT_IN_MS)
   public void pushConjunctionWithoutPopTest() throws InterruptedException, SolverException {
     List<BooleanFormula> lst = createConstraints();
@@ -68,6 +71,7 @@ public abstract class AbstractPerformanceTest0 extends SolverBasedTest0 {
     closeContext();
   }
 
+  @Ignore // partially redundant
   @Test(timeout = TIMEUT_IN_MS)
   public void pushConjunctionWithPopTest() throws InterruptedException, SolverException {
     List<BooleanFormula> lst = createConstraints();
@@ -128,6 +132,7 @@ public abstract class AbstractPerformanceTest0 extends SolverBasedTest0 {
     closeContext();
   }
 
+  @Ignore // just for testing and debugging
   @Test(timeout = TIMEUT_IN_MS * 3)
   public void pushCombinationTest() throws InterruptedException {
     List<BooleanFormula> lst = createConstraints();
@@ -157,6 +162,7 @@ public abstract class AbstractPerformanceTest0 extends SolverBasedTest0 {
 
   // lets use some more test that are not inherited from the super-class.
 
+  @Ignore
   @Test(timeout = TIMEUT_IN_MS)
   public void pushSymbolsWithoutPopTest() throws InterruptedException {
     try (ProverEnvironment pe = context.newProverEnvironment()) {
@@ -167,6 +173,7 @@ public abstract class AbstractPerformanceTest0 extends SolverBasedTest0 {
     closeContext();
   }
 
+  @Ignore // partially redundant
   @Test(timeout = TIMEUT_IN_MS)
   public void pushSymbolsWithPopTest() throws InterruptedException {
     try (ProverEnvironment pe = context.newProverEnvironment()) {
@@ -203,6 +210,7 @@ public abstract class AbstractPerformanceTest0 extends SolverBasedTest0 {
     closeContext();
   }
 
+  @Ignore
   @Test(timeout = TIMEUT_IN_MS)
   public void pushSymbolsSeparatelyWithSeparatePopTest() throws InterruptedException {
     try (ProverEnvironment pe = context.newProverEnvironment()) {
@@ -216,6 +224,7 @@ public abstract class AbstractPerformanceTest0 extends SolverBasedTest0 {
     closeContext();
   }
 
+  @Ignore
   @Test(timeout = TIMEUT_IN_MS)
   public void pushSymbolsOnTopWithoutPopTest() throws InterruptedException {
     try (ProverEnvironment pe = context.newProverEnvironment()) {
@@ -227,6 +236,7 @@ public abstract class AbstractPerformanceTest0 extends SolverBasedTest0 {
     closeContext();
   }
 
+  @Ignore
   @Test(timeout = TIMEUT_IN_MS)
   public void pushSymbolsSeparatelyWithSinglePopTest() throws InterruptedException {
     try (ProverEnvironment pe = context.newProverEnvironment()) {
