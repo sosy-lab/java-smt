@@ -18,7 +18,7 @@ public class PerformanceBitvectorConstraintsTest extends AbstractPerformanceTest
 
   @Before
   public final void checkRequirements() {
-    Preconditions.checkState(1l << BITSIZE > getSymbolLimit());
+    Preconditions.checkState(1L << BITSIZE > getSymbolLimit());
     requireBitvectors();
   }
 

@@ -241,8 +241,7 @@ public abstract class AbstractPerformanceTest0 extends SolverBasedTest0 {
 
   @Test(timeout = TIMEUT_IN_MS)
   public void createSymbolsAndCloseTest() {
-    @SuppressWarnings("unused")
-    List<BooleanFormula> lst = createConstraints();
+    createConstraints();
     closeContext();
   }
 
