@@ -294,11 +294,10 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
         throw new UnsupportedOperationException("Unhandled constant " + f + " with type " + type);
       }
 
-    } else if (f.isVariable()) {
+    } else if (f.isVariable() && !(f.getKind() == Kind.BOUND_VARIABLE)) {
       return visitor.visitFreeVariable(formula, getName(f));
     } else if (f.getKind() == Kind.BOUND_VARIABLE) {
-      // BOUND vars are used for all vars that are used in a quantifier,
-      // even if not all occorences of this var are in the quantifier
+      // BOUND vars are used for all vars that are bound to a quantifier.
       // CVC4 doesn't give you the de-brujin index
       return visitor.visitBoundVariable(formula, 0);
     } else if (f.getKind() == Kind.FORALL) {
@@ -338,7 +337,6 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       // part of the operator itself, thus the arity is one too small and there might be no
       // possibility to access the information from user side. Should we encode such information as
       // additional parameters? We do so for some methods of Princess.
-
       return visitor.visitFunction(
           formula,
           args,
@@ -353,7 +351,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     List<Formula> boundVars = new ArrayList<>(numBound);
     for (int i = 0; i < numBound; i++) {
       Expr expr = f.getChildren().get(i);
-      boundVars.add(encapsulate(getFormulaType(expr), makeBoundCopy(expr)));
+      boundVars.add(encapsulate(getFormulaType(expr), expr));
     }
     return boundVars;
   }
@@ -490,7 +488,10 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   @Override
   public Object convertValue(Expr expForType, Expr value) {
     final Type type = expForType.getType();
-    if (value.getType().isBoolean()) {
+    if (value.getKind() == Kind.BOUND_VARIABLE) {
+      // CVC4 does not allow model values for bound vars
+      return value.toString();
+    } else if (value.getType().isBoolean()) {
       return value.getConstBoolean();
 
     } else if (value.getType().isInteger() && type.isInteger()) {
