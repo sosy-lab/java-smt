@@ -25,14 +25,18 @@ public class PerformanceIntegerComplexConstraintsTest extends AbstractPerformanc
     List<BooleanFormula> lst = new ArrayList<>(getSymbolLimit());
     for (int i = 0; i < getSymbolLimit(); i++) {
       for (int step = 0; step < 5; step++) {
-        lst.add(imgr.equal(imgr.makeVariable("i" + i), imgr.makeVariable("i" + (i + step))));
+        lst.add(createConstraint(i, step));
       }
     }
     return lst;
   }
 
   @Override
-  protected BooleanFormula createConstraint(int pI) {
-    throw new AssertionError("unused");
+  protected BooleanFormula createConstraint(int i) {
+    return createConstraint(i, 1);
+  }
+
+  private BooleanFormula createConstraint(int i, int step) {
+    return imgr.equal(imgr.makeVariable("i" + i), imgr.makeVariable("i" + (i + step)));
   }
 }
