@@ -76,6 +76,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
 
   @Override
   public Expr makeVariable(Type type, String name) {
+    System.out.println("makeVariable name: " + name);
     Expr exp = variablesCache.computeIfAbsent(name, n -> exprManager.mkVar(name, type));
     Preconditions.checkArgument(
         type.equals(exp.getType()),
@@ -273,7 +274,6 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula formula, final Expr f) {
     Preconditions.checkState(!f.isNull());
-
     Type type = f.getType();
 
     if (f.isConst()) {
@@ -297,19 +297,37 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     } else if (f.isVariable() && !(f.getKind() == Kind.BOUND_VARIABLE)) {
       return visitor.visitFreeVariable(formula, getName(f));
     } else if (f.getKind() == Kind.BOUND_VARIABLE) {
-      // BOUND vars are used for all vars that are bound to a quantifier.
+      // BOUND vars are used for all vars that are bound to a quantifier in CVC4.
+      // We resubstitute them back to the original free.
       // CVC4 doesn't give you the de-brujin index
-      return visitor.visitBoundVariable(formula, 0);
+      Expr originalVar = variablesCache.get(formula.toString());
+      Formula origFormula = encapsulate(getFormulaType(originalVar), originalVar);
+      return visitor.visitBoundVariable(origFormula, 0);
     } else if (f.getKind() == Kind.FORALL) {
       // QUANTIFIER FORALL
-      BooleanFormula body = encapsulateBoolean(f.getChildren().get(1));
-      return visitor.visitQuantifier(
-          (BooleanFormula) formula, Quantifier.FORALL, getBoundVars(f.getChildren().get(0)), body);
+      List<Expr> boundVars = getBoundVars(f.getChildren().get(0));
+      Expr body = f.getChildren().get(1);
+      List<Formula> freeVars = new ArrayList<>(boundVars.size());
+      for (Expr bvar : boundVars) {
+        Expr freeVar = variablesCache.get(bvar.toString());
+        body.substitute(bvar, freeVar);
+        freeVars.add(encapsulate(getFormulaType(freeVar), freeVar));
+      }
+      BooleanFormula fBody = encapsulateBoolean(body);
+      return visitor.visitQuantifier((BooleanFormula) formula, Quantifier.FORALL, freeVars, fBody);
     } else if (f.getKind() == Kind.EXISTS) {
       // QUANTIFIER EXISTS
-      BooleanFormula body = encapsulateBoolean(f.getChildren().get(1));
-      return visitor.visitQuantifier(
-          (BooleanFormula) formula, Quantifier.EXISTS, getBoundVars(f.getChildren().get(0)), body);
+      List<Expr> boundVars = getBoundVars(f.getChildren().get(0));
+      Expr body = f.getChildren().get(1);
+      List<Formula> freeVars = new ArrayList<>(boundVars.size());
+      for (Expr bvar : boundVars) {
+        System.out.println("loop bound var: " + bvar);
+        Expr freeVar = variablesCache.get(bvar.toString());
+        body.substitute(bvar, freeVar);
+        freeVars.add(encapsulate(getFormulaType(freeVar), freeVar));
+      }
+      BooleanFormula fBody = encapsulateBoolean(body);
+      return visitor.visitQuantifier((BooleanFormula) formula, Quantifier.EXISTS, freeVars, fBody);
     } else {
       // Expressions like uninterpreted function calls (Kind.APPLY_UF) or operators (e.g. Kind.AND).
       // These are all treated like operators, so we can get the declaration by f.getOperator()!
@@ -345,13 +363,12 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     }
   }
 
-  private List<Formula> getBoundVars(final Expr f) {
-    // i doubt that we will ever have a list that needs long values
+  private List<Expr> getBoundVars(final Expr f) {
+    // I doubt that we will ever have a list that needs long values
     int numBound = (int) f.getChildren().size();
-    List<Formula> boundVars = new ArrayList<>(numBound);
+    List<Expr> boundVars = new ArrayList<>(numBound);
     for (int i = 0; i < numBound; i++) {
-      Expr expr = f.getChildren().get(i);
-      boundVars.add(encapsulate(getFormulaType(expr), expr));
+      boundVars.add(f.getChildren().get(i));
     }
     return boundVars;
   }
