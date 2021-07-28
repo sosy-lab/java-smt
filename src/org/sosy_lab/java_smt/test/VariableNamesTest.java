@@ -376,6 +376,8 @@ public class VariableNamesTest extends SolverBasedTest0 {
     IntegerFormula zero = imgr.makeNumber(0);
     BooleanFormula exists = qmgr.exists(var, imgr.equal(var, zero));
 
+    // TODO: find out if this has to hold!
+    assertThat(var.toString()).isEqualTo(getVarname());
     // check whether it exists with the given name
     assertThat(mgr.extractVariablesAndUFs(exists)).isEmpty();
 
