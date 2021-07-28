@@ -76,7 +76,6 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
 
   @Override
   public Expr makeVariable(Type type, String name) {
-    System.out.println("makeVariable name: " + name);
     Expr exp = variablesCache.computeIfAbsent(name, n -> exprManager.mkVar(name, type));
     Preconditions.checkArgument(
         type.equals(exp.getType()),
@@ -321,7 +320,6 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       Expr body = f.getChildren().get(1);
       List<Formula> freeVars = new ArrayList<>(boundVars.size());
       for (Expr bvar : boundVars) {
-        System.out.println("loop bound var: " + bvar);
         Expr freeVar = variablesCache.get(bvar.toString());
         body.substitute(bvar, freeVar);
         freeVars.add(encapsulate(getFormulaType(freeVar), freeVar));
