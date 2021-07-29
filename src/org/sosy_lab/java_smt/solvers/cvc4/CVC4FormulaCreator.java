@@ -309,7 +309,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       List<Formula> freeVars = new ArrayList<>(boundVars.size());
       for (Expr bvar : boundVars) {
         Expr freeVar = variablesCache.get(bvar.toString());
-        body.substitute(bvar, freeVar);
+        body = body.substitute(bvar, freeVar);
         freeVars.add(encapsulate(getFormulaType(freeVar), freeVar));
       }
       BooleanFormula fBody = encapsulateBoolean(body);
@@ -321,7 +321,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       List<Formula> freeVars = new ArrayList<>(boundVars.size());
       for (Expr bvar : boundVars) {
         Expr freeVar = variablesCache.get(bvar.toString());
-        body.substitute(bvar, freeVar);
+        body = body.substitute(bvar, freeVar);
         freeVars.add(encapsulate(getFormulaType(freeVar), freeVar));
       }
       BooleanFormula fBody = encapsulateBoolean(body);
