@@ -549,8 +549,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
 
     BitvectorFormula z = bvmgr.makeVariable(bvWidth, "z");
     BitvectorFormula y = bvmgr.makeVariable(bvWidth, "y");
-    BooleanFormula f =
-        qmgr.forall(ImmutableList.of(z, y), bvmgr.equal(z, y));
+    BooleanFormula f = qmgr.forall(ImmutableList.of(z, y), bvmgr.equal(z, y));
     assertThatFormula(f).isUnsatisfiable();
   }
 
