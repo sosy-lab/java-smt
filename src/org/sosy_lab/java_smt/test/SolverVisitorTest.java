@@ -384,6 +384,8 @@ public class SolverVisitorTest extends SolverBasedTest0 {
   public void testNestedIntegerFormulaQuantifierHandling() throws Exception {
     requireQuantifiers();
     requireIntegers();
+    // Z3 returns UNKNOWN as its quantifiers can not handle this.
+    assume().that(solverToUse()).isNotEqualTo(Solvers.Z3);
 
     IntegerFormula x = imgr.makeVariable("x");
     BooleanFormula xEq1 = imgr.equal(x, imgr.makeNumber(1));
@@ -400,6 +402,8 @@ public class SolverVisitorTest extends SolverBasedTest0 {
   public void testNestedIntegerFormulaQuantifierRecursiveHandling() throws Exception {
     requireQuantifiers();
     requireIntegers();
+    // Z3 returns UNKNOWN as its quantifiers can not handle this.
+    assume().that(solverToUse()).isNotEqualTo(Solvers.Z3);
 
     IntegerFormula x = imgr.makeVariable("x");
     BooleanFormula xEq1 = imgr.equal(x, imgr.makeNumber(1));
