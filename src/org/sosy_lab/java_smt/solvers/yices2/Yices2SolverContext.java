@@ -64,7 +64,8 @@ public class Yices2SolverContext extends AbstractSolverContext {
     Yices2FormulaCreator creator = new Yices2FormulaCreator();
     Yices2UFManager functionTheory = new Yices2UFManager(creator);
     Yices2BooleanFormulaManager booleanTheory = new Yices2BooleanFormulaManager(creator);
-    Yices2BitvectorFormulaManager bitvectorTheory = new Yices2BitvectorFormulaManager(creator);
+    Yices2BitvectorFormulaManager bitvectorTheory =
+        new Yices2BitvectorFormulaManager(creator, booleanTheory);
     Yices2IntegerFormulaManager integerTheory =
         new Yices2IntegerFormulaManager(creator, pNonLinearArithmetic);
     Yices2RationalFormulaManager rationalTheory =

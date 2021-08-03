@@ -8,16 +8,18 @@
 
 package org.sosy_lab.java_smt.solvers.z3;
 
+import com.google.common.primitives.Longs;
 import com.microsoft.z3.Native;
 import java.math.BigInteger;
+import java.util.List;
 import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
 
 class Z3BitvectorFormulaManager extends AbstractBitvectorFormulaManager<Long, Long, Long, Long> {
 
   private final long z3context;
 
-  Z3BitvectorFormulaManager(Z3FormulaCreator creator) {
-    super(creator);
+  Z3BitvectorFormulaManager(Z3FormulaCreator creator, Z3BooleanFormulaManager pBmgr) {
+    super(creator, pBmgr);
     this.z3context = creator.getEnv();
   }
 
@@ -169,5 +171,10 @@ class Z3BitvectorFormulaManager extends AbstractBitvectorFormulaManager<Long, Lo
   @Override
   public Long greaterOrEquals(Long pNumber1, Long pNumber2, boolean signed) {
     return lessOrEquals(pNumber2, pNumber1, signed);
+  }
+
+  @Override
+  protected Long distinctImpl(List<Long> pBits) {
+    return Native.mkDistinct(z3context, pBits.size(), Longs.toArray(pBits));
   }
 }

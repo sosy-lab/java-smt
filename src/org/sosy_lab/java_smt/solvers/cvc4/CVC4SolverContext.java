@@ -72,7 +72,8 @@ public final class CVC4SolverContext extends AbstractSolverContext {
         new CVC4IntegerFormulaManager(creator, pNonLinearArithmetic);
     CVC4RationalFormulaManager rationalTheory =
         new CVC4RationalFormulaManager(creator, pNonLinearArithmetic);
-    CVC4BitvectorFormulaManager bitvectorTheory = new CVC4BitvectorFormulaManager(creator);
+    CVC4BitvectorFormulaManager bitvectorTheory =
+        new CVC4BitvectorFormulaManager(creator, booleanTheory);
 
     CVC4FloatingPointFormulaManager fpTheory;
     if (Configuration.isBuiltWithSymFPU()) {

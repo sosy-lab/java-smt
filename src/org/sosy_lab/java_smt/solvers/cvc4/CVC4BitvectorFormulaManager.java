@@ -19,7 +19,9 @@ import edu.stanford.CVC4.IntToBitVector;
 import edu.stanford.CVC4.Kind;
 import edu.stanford.CVC4.Rational;
 import edu.stanford.CVC4.Type;
+import edu.stanford.CVC4.vectorExpr;
 import java.math.BigInteger;
+import java.util.List;
 import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
 
 public class CVC4BitvectorFormulaManager
@@ -27,8 +29,9 @@ public class CVC4BitvectorFormulaManager
 
   private final ExprManager exprManager;
 
-  protected CVC4BitvectorFormulaManager(CVC4FormulaCreator pCreator) {
-    super(pCreator);
+  protected CVC4BitvectorFormulaManager(
+      CVC4FormulaCreator pCreator, CVC4BooleanFormulaManager pBmgr) {
+    super(pCreator, pBmgr);
     exprManager = pCreator.getEnv();
   }
 
@@ -210,5 +213,12 @@ public class CVC4BitvectorFormulaManager
     }
 
     return intExpr;
+  }
+
+  @Override
+  protected Expr distinctImpl(List<Expr> pParam) {
+    vectorExpr param = new vectorExpr();
+    pParam.forEach(param::add);
+    return exprManager.mkExpr(Kind.DISTINCT, param);
   }
 }

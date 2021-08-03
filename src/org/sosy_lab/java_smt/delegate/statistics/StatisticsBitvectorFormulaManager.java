@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.delegate.statistics;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
+import java.util.List;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -193,5 +194,11 @@ class StatisticsBitvectorFormulaManager implements BitvectorFormulaManager {
   public BitvectorFormula extend(BitvectorFormula pNumber, int pExtensionBits, boolean pSigned) {
     stats.bvOperations.getAndIncrement();
     return delegate.extend(pNumber, pExtensionBits, pSigned);
+  }
+
+  @Override
+  public BooleanFormula distinct(List<BitvectorFormula> pBits) {
+    stats.bvOperations.getAndIncrement();
+    return delegate.distinct(pBits);
   }
 }

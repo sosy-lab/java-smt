@@ -12,7 +12,10 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -25,9 +28,13 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     implements BitvectorFormulaManager {
 
+  private final AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> bmgr;
+
   protected AbstractBitvectorFormulaManager(
-      FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pCreator) {
+      FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pCreator,
+      AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> pBmgr) {
     super(pCreator);
+    bmgr = pBmgr;
   }
 
   private BitvectorFormula wrap(TFormulaInfo pTerm) {
@@ -342,5 +349,27 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
   public int getLength(BitvectorFormula pNumber) {
     FormulaType<BitvectorFormula> type = getFormulaCreator().getFormulaType(pNumber);
     return ((FormulaType.BitvectorType) type).getSize();
+  }
+
+  @Override
+  public final BooleanFormula distinct(List<BitvectorFormula> pBits) {
+    // optimization
+    if (pBits.size() <= 1) {
+      return bmgr.makeTrue();
+    } else if (pBits.size() > 1L << getLength(pBits.iterator().next())) {
+      return bmgr.makeFalse();
+    } else {
+      return wrapBool(distinctImpl(Lists.transform(pBits, this::extractInfo)));
+    }
+  }
+
+  protected TFormulaInfo distinctImpl(List<TFormulaInfo> pBits) {
+    List<TFormulaInfo> lst = new ArrayList<>();
+    for (int i = 0; i < pBits.size(); i++) {
+      for (int j = 0; j < i; j++) {
+        lst.add(bmgr.not(equal(pBits.get(i), pBits.get(j))));
+      }
+    }
+    return bmgr.andImpl(lst);
   }
 }

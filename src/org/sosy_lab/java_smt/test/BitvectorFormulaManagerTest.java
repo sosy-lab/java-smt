@@ -14,7 +14,9 @@ import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
@@ -391,5 +393,29 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0 {
     arr = amgr.store(arr, index, bv);
 
     assertThat(mgr.getFormulaType(arr)).isEqualTo(FormulaType.getArrayType(bvType4, bvType4));
+  }
+
+  @Test
+  public void bvDistinct() throws SolverException, InterruptedException {
+    for (int bitsize : new int[] {2, 4, 6}) {
+      List<BitvectorFormula> bvs = new ArrayList<>();
+      for (int i = 0; i < 1 << bitsize; i++) {
+        bvs.add(bvmgr.makeVariable(bitsize, "a" + i + "_" + bitsize));
+      }
+      assertThatFormula(bvmgr.distinct(bvs.subList(0, 1 << (bitsize - 1)))).isSatisfiable();
+      assertThatFormula(bvmgr.distinct(bvs)).isSatisfiable();
+      bvs.add(bvmgr.makeVariable(bitsize, "b" + "_" + bitsize));
+      assertThatFormula(bvmgr.distinct(bvs)).isUnsatisfiable();
+    }
+  }
+
+  @Test
+  public void bvVarDistinct() throws SolverException, InterruptedException {
+    BitvectorFormula a = bvmgr.makeVariable(4, "a");
+    BitvectorFormula num3 = bvmgr.makeBitvector(4, 3);
+
+    assertThatFormula(bvmgr.distinct(List.of(a, num3))).isSatisfiable();
+    assertThatFormula(bvmgr.distinct(List.of(a, a))).isUnsatisfiable();
+    assertThatFormula(bvmgr.distinct(List.of(num3, num3))).isUnsatisfiable();
   }
 }

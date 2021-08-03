@@ -23,8 +23,9 @@ class PrincessBitvectorFormulaManager
     extends AbstractBitvectorFormulaManager<
         IExpression, Sort, PrincessEnvironment, PrincessFunctionDeclaration> {
 
-  PrincessBitvectorFormulaManager(PrincessFormulaCreator pCreator) {
-    super(pCreator);
+  PrincessBitvectorFormulaManager(
+      PrincessFormulaCreator pCreator, PrincessBooleanFormulaManager pBmgr) {
+    super(pCreator, pBmgr);
   }
 
   @Override

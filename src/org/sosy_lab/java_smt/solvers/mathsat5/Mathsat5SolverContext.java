@@ -185,7 +185,7 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
     Mathsat5RationalFormulaManager rationalTheory =
         new Mathsat5RationalFormulaManager(creator, pNonLinearArithmetic);
     Mathsat5BitvectorFormulaManager bitvectorTheory =
-        Mathsat5BitvectorFormulaManager.create(creator);
+        new Mathsat5BitvectorFormulaManager(creator, booleanTheory);
     Mathsat5FloatingPointFormulaManager floatingPointTheory =
         new Mathsat5FloatingPointFormulaManager(creator, pFloatingPointRoundingMode);
     Mathsat5ArrayFormulaManager arrayTheory = new Mathsat5ArrayFormulaManager(creator);

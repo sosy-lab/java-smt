@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.delegate.synchronize;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
+import java.util.List;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -221,6 +222,13 @@ class SynchronizedBitvectorFormulaManager implements BitvectorFormulaManager {
   public BitvectorFormula extend(BitvectorFormula pNumber, int pExtensionBits, boolean pSigned) {
     synchronized (sync) {
       return delegate.extend(pNumber, pExtensionBits, pSigned);
+    }
+  }
+
+  @Override
+  public BooleanFormula distinct(List<BitvectorFormula> pBits) {
+    synchronized (sync) {
+      return delegate.distinct(pBits);
     }
   }
 }

@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.api;
 
 import java.math.BigInteger;
+import java.util.List;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
@@ -140,4 +141,7 @@ public interface BitvectorFormulaManager {
    * @param signed Whether the extension should depend on the sign bit.
    */
   BitvectorFormula extend(BitvectorFormula number, int extensionBits, boolean signed);
+
+  /** All given bitvectors are pairwise unequal. */
+  BooleanFormula distinct(List<BitvectorFormula> pBits);
 }

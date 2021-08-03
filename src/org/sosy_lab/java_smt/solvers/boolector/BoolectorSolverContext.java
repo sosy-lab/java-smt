@@ -89,7 +89,7 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
     BoolectorUFManager functionTheory = new BoolectorUFManager(creator);
     BoolectorBooleanFormulaManager booleanTheory = new BoolectorBooleanFormulaManager(creator);
     BoolectorBitvectorFormulaManager bitvectorTheory =
-        new BoolectorBitvectorFormulaManager(creator);
+        new BoolectorBitvectorFormulaManager(creator, booleanTheory);
     BoolectorQuantifiedFormulaManager quantifierTheory =
         new BoolectorQuantifiedFormulaManager(creator);
     BoolectorArrayFormulaManager arrayTheory = new BoolectorArrayFormulaManager(creator);
