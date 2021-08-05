@@ -116,30 +116,47 @@ class PrincessBooleanFormulaManager
     return simplify(new IBinFormula(IBinJunctor.Or(), (IFormula) t1, (IFormula) t2));
   }
 
-  /** simplification to avoid identical subgraphs: (a&b)&(a&c) --> a&(b&c), etc. */
+  /**
+   * simplification based on distibution property of boolean operands, to avoid identical subgraphs
+   * in basic boolean operations:
+   *
+   * <ul>
+   *   <li>(a&b)&(a&c) --> a&(b&c)
+   *   <li>(a|b)&(a|c) --> a|(b&c)
+   *   <li>(a&b)|(a&c) --> a&(b|c)
+   *   <li>(a|b)|(a|c) --> a|(b|c)
+   * </ul>
+   *
+   * <p>Note that we only consider the most frequently used operations here. There are more
+   * combination of boolean operators (implication and equivalence), which are ignored here, to keep
+   * it simple.
+   */
   private IFormula simplify(IFormula f) {
     if (f instanceof IBinFormula) {
       final IBinFormula bin = (IBinFormula) f;
-      if (bin.f1() instanceof IBinFormula
+      Enumeration.Value operator = bin.j();
+      if (isDistributiveBooleanOperator(operator)
+          && bin.f1() instanceof IBinFormula
           && bin.f2() instanceof IBinFormula
           && ((IBinFormula) bin.f1()).j().equals(((IBinFormula) bin.f2()).j())) {
-        Enumeration.Value operator = ((IBinFormula) f).j();
         Enumeration.Value innerOperator = ((IBinFormula) bin.f1()).j();
+        if (isDistributiveBooleanOperator(innerOperator)) {
 
-        IFormula s11 = ((IBinFormula) bin.f1()).f1();
-        IFormula s12 = ((IBinFormula) bin.f1()).f2();
-        IFormula s21 = ((IBinFormula) bin.f2()).f1();
-        IFormula s22 = ((IBinFormula) bin.f2()).f2();
+          IFormula s11 = ((IBinFormula) bin.f1()).f1();
+          IFormula s12 = ((IBinFormula) bin.f1()).f2();
+          IFormula s21 = ((IBinFormula) bin.f2()).f1();
+          IFormula s22 = ((IBinFormula) bin.f2()).f2();
 
-        // only check for object equality, for performance
-        if (s11 == s21) { // (ab)(ac) -> a(bc)
-          return new IBinFormula(innerOperator, s11, new IBinFormula(operator, s12, s22));
-        } else if (s11 == s22) { // (ab)(ca) -> a(bc)
-          return new IBinFormula(innerOperator, s11, new IBinFormula(operator, s12, s21));
-        } else if (s12 == s21) { // (ba)(ac) -> a(bc)
-          return new IBinFormula(innerOperator, s12, new IBinFormula(operator, s11, s22));
-        } else if (s12 == s22) { // (ba)(ca) -> a(bc)
-          return new IBinFormula(innerOperator, s12, new IBinFormula(operator, s11, s21));
+          // only check for object equality, for performance
+          if (s11 == s21) { // (ab)(ac) -> a(bc)
+            return new IBinFormula(innerOperator, s11, new IBinFormula(operator, s12, s22));
+          } else if (s11 == s22) { // (ab)(ca) -> a(bc)
+            return new IBinFormula(innerOperator, s11, new IBinFormula(operator, s12, s21));
+          } else if (s12 == s21) { // (ba)(ac) -> a(bc)
+            return new IBinFormula(innerOperator, s12, new IBinFormula(operator, s11, s22));
+          } else if (s12 == s22) { // (ba)(ca) -> a(bc)
+            return new IBinFormula(innerOperator, s12, new IBinFormula(operator, s11, s21));
+          }
         }
       }
     }
@@ -147,6 +164,10 @@ class PrincessBooleanFormulaManager
     // if we cannot simplify the formula, we create an abbreviation
     // return getFormulaCreator().getEnv().abbrev(f);
     return f;
+  }
+
+  private boolean isDistributiveBooleanOperator(Enumeration.Value operator) {
+    return IBinJunctor.And().equals(operator) || IBinJunctor.Or().equals(operator);
   }
 
   /**

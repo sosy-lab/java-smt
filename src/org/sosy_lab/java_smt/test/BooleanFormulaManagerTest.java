@@ -311,4 +311,14 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0 {
 
     Truth.assertThat(bmgr.or(fals, fals, x, tru, y, fals, x, y)).isEqualTo(tru);
   }
+
+  @Test
+  public void simpleImplicationTest() throws InterruptedException, SolverException {
+    BooleanFormula x = bmgr.makeVariable("x");
+    BooleanFormula y = bmgr.makeVariable("y");
+    BooleanFormula z = bmgr.makeVariable("z");
+
+    BooleanFormula f = bmgr.and(bmgr.equivalence(x, y), bmgr.equivalence(x, z));
+    assertThatFormula(f).implies(bmgr.equivalence(y, z));
+  }
 }
