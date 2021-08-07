@@ -9,15 +9,14 @@
 package org.sosy_lab.java_smt.solvers.cvc4;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Iterables;
 import de.uni_freiburg.informatik.ultimate.logic.PrintTerm;
 import edu.stanford.CVC4.Expr;
 import edu.stanford.CVC4.ExprManager;
 import edu.stanford.CVC4.Type;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
@@ -83,10 +82,7 @@ class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, ExprManager,
           out.append("(declare-fun ").append(PrintTerm.quoteIdentifier(name)).append(" (");
 
           // add function parameters
-          List<Type> childrenTypes = new ArrayList<>();
-          for (int i = 0; i < var.getNumChildren(); i++) {
-            childrenTypes.add(var.getChild(i).getType());
-          }
+          Iterable<Type> childrenTypes = Iterables.transform(var, Expr::getType);
           out.append(Joiner.on(" ").join(childrenTypes));
 
           // and return type

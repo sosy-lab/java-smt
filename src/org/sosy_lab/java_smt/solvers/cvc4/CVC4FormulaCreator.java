@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.primitives.UnsignedInteger;
@@ -325,10 +326,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     } else {
       // Expressions like uninterpreted function calls (Kind.APPLY_UF) or operators (e.g. Kind.AND).
       // These are all treated like operators, so we can get the declaration by f.getOperator()!
-      List<Formula> args = new ArrayList<>();
-      for (Expr arg : f) {
-        args.add(encapsulate(arg));
-      }
+      List<Formula> args = ImmutableList.copyOf(Iterables.transform(f, this::encapsulate));
       List<FormulaType<?>> argsTypes = new ArrayList<>();
       Expr operator = f.getOperator();
       if (operator.getType().isFunction()) {
