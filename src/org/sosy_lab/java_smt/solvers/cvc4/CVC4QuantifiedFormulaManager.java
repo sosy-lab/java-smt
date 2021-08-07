@@ -76,11 +76,8 @@ public class CVC4QuantifiedFormulaManager
       }
       Expr quantifiedVars = exprManager.mkExpr(Kind.BOUND_VAR_LIST, vec);
 
-      if (pQ == Quantifier.FORALL) {
-        return exprManager.mkExpr(Kind.FORALL, quantifiedVars, substBody);
-      } else {
-        return exprManager.mkExpr(Kind.EXISTS, quantifiedVars, substBody);
-      }
+      Kind quant = pQ == Quantifier.EXISTS ? Kind.EXISTS : Kind.FORALL;
+      return exprManager.mkExpr(quant, quantifiedVars, substBody);
     }
   }
 }
