@@ -311,7 +311,8 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       Expr body = f.getChildren().get(1);
       List<Formula> freeVars = new ArrayList<>();
       for (Expr boundVar : f.getChild(0)) { // unpack grand-children of f.
-        Expr freeVar = variablesCache.get(boundVar.toString());
+        String name = getName(boundVar);
+        Expr freeVar = Preconditions.checkNotNull(variablesCache.get(name));
         body = body.substitute(boundVar, freeVar);
         freeVars.add(encapsulate(freeVar));
       }
