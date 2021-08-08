@@ -368,21 +368,28 @@ public class VariableNamesTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testNameExists() {
+  public void testNameInQuantification() {
     requireQuantifiers();
     requireIntegers();
 
     IntegerFormula var = createVariableWith(imgr::makeVariable, getVarname());
     IntegerFormula zero = imgr.makeNumber(0);
-    BooleanFormula exists = qmgr.exists(var, imgr.equal(var, zero));
+    BooleanFormula eq = imgr.equal(var, zero);
+    BooleanFormula exists = qmgr.exists(var, eq);
+    BooleanFormula query = bmgr.and(bmgr.not(eq), exists);
 
-    // TODO: find out if this has to hold!
-    assertThat(var.toString()).isEqualTo(getVarname());
-    // check whether it exists with the given name
+    // (var != 0) & (EX var: (var == 0))
+
+    assertThat(mgr.extractVariablesAndUFs(eq)).hasSize(1);
+    assertThat(mgr.extractVariablesAndUFs(eq)).containsEntry(getVarname(), var);
+
+    assertThat(mgr.extractVariablesAndUFs(query)).hasSize(1);
+    assertThat(mgr.extractVariablesAndUFs(query)).containsEntry(getVarname(), var);
+
     assertThat(mgr.extractVariablesAndUFs(exists)).isEmpty();
 
     mgr.visit(
-        exists,
+        query,
         new DefaultFormulaVisitor<Void>() {
 
           @Override
@@ -391,11 +398,96 @@ public class VariableNamesTest extends SolverBasedTest0 {
               Quantifier pQuantifier,
               List<Formula> pBoundVariables,
               BooleanFormula pBody) {
+            if (solverToUse() != Solvers.PRINCESS) {
+              // TODO Princess does not (yet) return quantified variables.
+              assertThat(pBoundVariables).hasSize(1);
+            }
             for (Formula f : pBoundVariables) {
               Map<String, Formula> map = mgr.extractVariables(f);
               assertThat(map).hasSize(1);
               assertThat(map).containsEntry(getVarname(), f);
             }
+            return null;
+          }
+
+          @Override
+          protected Void visitDefault(Formula pF) {
+            return null;
+          }
+        });
+  }
+
+  @Test
+  public void testNameInNestedQuantification() {
+    requireQuantifiers();
+    requireIntegers();
+
+    IntegerFormula var1 = createVariableWith(imgr::makeVariable, getVarname() + 1);
+    IntegerFormula var2 = createVariableWith(imgr::makeVariable, getVarname() + 2);
+    IntegerFormula var3 = createVariableWith(imgr::makeVariable, getVarname() + 3);
+    IntegerFormula var4 = createVariableWith(imgr::makeVariable, getVarname() + 4);
+    IntegerFormula zero = imgr.makeNumber(0);
+
+    // (v1 == 0) & (EX v2: ((v2 == v1) & (EX v3: ((v3 == v2) & (EX v4: (v4 == v3))))
+
+    BooleanFormula eq01 = imgr.equal(zero, var1);
+    BooleanFormula eq12 = imgr.equal(var1, var2);
+    BooleanFormula eq23 = imgr.equal(var2, var3);
+    BooleanFormula eq34 = imgr.equal(var3, var4);
+    BooleanFormula exists4 = qmgr.exists(var4, eq34);
+    BooleanFormula exists3 = qmgr.exists(var3, bmgr.and(eq23, exists4));
+    BooleanFormula exists2 = qmgr.exists(var2, bmgr.and(eq12, exists3));
+    BooleanFormula query = bmgr.and(eq01, exists2);
+
+    assertThat(mgr.extractVariablesAndUFs(eq01)).hasSize(1);
+    assertThat(mgr.extractVariablesAndUFs(eq01)).containsEntry(getVarname() + 1, var1);
+
+    assertThat(mgr.extractVariablesAndUFs(eq12)).hasSize(2);
+    assertThat(mgr.extractVariablesAndUFs(eq12)).containsEntry(getVarname() + 1, var1);
+    assertThat(mgr.extractVariablesAndUFs(eq12)).containsEntry(getVarname() + 2, var2);
+
+    assertThat(mgr.extractVariablesAndUFs(eq23)).hasSize(2);
+    assertThat(mgr.extractVariablesAndUFs(eq23)).containsEntry(getVarname() + 2, var2);
+    assertThat(mgr.extractVariablesAndUFs(eq23)).containsEntry(getVarname() + 3, var3);
+
+    assertThat(mgr.extractVariablesAndUFs(eq34)).hasSize(2);
+    assertThat(mgr.extractVariablesAndUFs(eq34)).containsEntry(getVarname() + 3, var3);
+    assertThat(mgr.extractVariablesAndUFs(eq34)).containsEntry(getVarname() + 4, var4);
+
+    assertThat(mgr.extractVariablesAndUFs(query)).hasSize(1);
+    assertThat(mgr.extractVariablesAndUFs(query)).containsEntry(getVarname() + 1, var1);
+
+    assertThat(mgr.extractVariablesAndUFs(exists2)).hasSize(1);
+    assertThat(mgr.extractVariablesAndUFs(exists2)).containsEntry(getVarname() + 1, var1);
+
+    assertThat(mgr.extractVariablesAndUFs(exists3)).hasSize(1);
+    assertThat(mgr.extractVariablesAndUFs(exists3)).containsEntry(getVarname() + 2, var2);
+
+    assertThat(mgr.extractVariablesAndUFs(exists4)).hasSize(1);
+    assertThat(mgr.extractVariablesAndUFs(exists4)).containsEntry(getVarname() + 3, var3);
+
+    mgr.visit(
+        query,
+        new DefaultFormulaVisitor<Void>() {
+
+          int depth = 1;
+
+          @Override
+          public Void visitQuantifier(
+              BooleanFormula pF,
+              Quantifier pQuantifier,
+              List<Formula> pBoundVariables,
+              BooleanFormula pBody) {
+            if (solverToUse() != Solvers.PRINCESS) {
+              // TODO Princess does not return quantified variables.
+              assertThat(pBoundVariables).hasSize(1);
+            }
+            for (Formula f : pBoundVariables) {
+              Map<String, Formula> map = mgr.extractVariables(f);
+              assertThat(map).hasSize(1);
+              assertThat(map).containsEntry(getVarname() + depth, f);
+            }
+            depth++;
             return null;
           }
 
