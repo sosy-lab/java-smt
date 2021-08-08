@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.primitives.UnsignedInteger;
@@ -44,6 +45,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
+import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
@@ -81,6 +83,20 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
         "symbol name already in use for different type %s",
         exp.getType());
     return exp;
+  }
+
+  /**
+   * Makes a bound copy of an variable for use in quantifier. Note that all occurrences of the free
+   * var have to be substituted by the bound once it exists.
+   *
+   * @param var Variable you want a bound copy of.
+   * @return Bound Variable
+   */
+  public Expr makeBoundCopy(Expr var) {
+    Type type = var.getType();
+    String name = getName(var);
+    Expr boundCopy = exprManager.mkBoundVar(name, type);
+    return boundCopy;
   }
 
   @Override
@@ -206,6 +222,10 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     throw new IllegalArgumentException("Cannot create formulas of type " + pType + " in CVC4");
   }
 
+  private Formula encapsulate(Expr pTerm) {
+    return encapsulate(getFormulaType(pTerm), pTerm);
+  }
+
   @Override
   public BooleanFormula encapsulateBoolean(Expr pTerm) {
     assert getFormulaType(pTerm).isBooleanType()
@@ -258,7 +278,6 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula formula, final Expr f) {
     Preconditions.checkState(!f.isNull());
-
     Type type = f.getType();
 
     if (f.isConst()) {
@@ -279,18 +298,37 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
         throw new UnsupportedOperationException("Unhandled constant " + f + " with type " + type);
       }
 
+    } else if (f.getKind() == Kind.BOUND_VARIABLE) {
+      // BOUND vars are used for all vars that are bound to a quantifier in CVC4.
+      // We resubstitute them back to the original free.
+      // CVC4 doesn't give you the de-brujin index
+      Expr originalVar = variablesCache.get(formula.toString());
+      return visitor.visitBoundVariable(encapsulate(originalVar), 0);
+
+    } else if (f.getKind() == Kind.FORALL || f.getKind() == Kind.EXISTS) {
+      // QUANTIFIER: replace bound variable with free variable for visitation
+      assert f.getNumChildren() == 2;
+      Expr body = f.getChildren().get(1);
+      List<Formula> freeVars = new ArrayList<>();
+      for (Expr boundVar : f.getChild(0)) { // unpack grand-children of f.
+        String name = getName(boundVar);
+        Expr freeVar = Preconditions.checkNotNull(variablesCache.get(name));
+        body = body.substitute(boundVar, freeVar);
+        freeVars.add(encapsulate(freeVar));
+      }
+      BooleanFormula fBody = encapsulateBoolean(body);
+      Quantifier quant = f.getKind() == Kind.EXISTS ? Quantifier.EXISTS : Quantifier.FORALL;
+      return visitor.visitQuantifier((BooleanFormula) formula, quant, freeVars, fBody);
+
     } else if (f.isVariable()) {
+      assert f.getKind() != Kind.BOUND_VARIABLE;
       return visitor.visitFreeVariable(formula, getName(f));
 
     } else {
       // Expressions like uninterpreted function calls (Kind.APPLY_UF) or operators (e.g. Kind.AND).
       // These are all treated like operators, so we can get the declaration by f.getOperator()!
-      List<Formula> args = new ArrayList<>();
+      List<Formula> args = ImmutableList.copyOf(Iterables.transform(f, this::encapsulate));
       List<FormulaType<?>> argsTypes = new ArrayList<>();
-      for (Expr arg : f) {
-        FormulaType<?> argType = getFormulaType(arg);
-        args.add(encapsulate(argType, arg));
-      }
       Expr operator = f.getOperator();
       if (operator.getType().isFunction()) {
         vectorType argTypes = new FunctionType(operator.getType()).getArgTypes();
@@ -309,7 +347,6 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       // part of the operator itself, thus the arity is one too small and there might be no
       // possibility to access the information from user side. Should we encode such information as
       // additional parameters? We do so for some methods of Princess.
-
       return visitor.visitFunction(
           formula,
           args,
@@ -450,7 +487,10 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   @Override
   public Object convertValue(Expr expForType, Expr value) {
     final Type type = expForType.getType();
-    if (value.getType().isBoolean()) {
+    if (value.getKind() == Kind.BOUND_VARIABLE) {
+      // CVC4 does not allow model values for bound vars
+      return value.toString();
+    } else if (value.getType().isBoolean()) {
       return value.getConstBoolean();
 
     } else if (value.getType().isInteger() && type.isInteger()) {

@@ -444,7 +444,6 @@ public class SolverVisitorTest extends SolverBasedTest0 {
   @Test
   public void testBooleanFormulaQuantifierHandling() throws Exception {
     requireQuantifiers();
-    // TODO Maybe rewrite using quantified integer variable to allow testing with Princess
     assume()
         .withMessage("Princess does not support quantifier over boolean variables")
         .that(solverToUse())
@@ -455,6 +454,107 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     assertThatFormula(constraint).isUnsatisfiable();
     BooleanFormula newConstraint =
         bmgr.visit(constraint, new BooleanFormulaTransformationVisitor(mgr) {});
+    assertThatFormula(newConstraint).isUnsatisfiable();
+  }
+
+  @Test
+  public void testBooleanFormulaQuantifierRecursiveHandling() throws Exception {
+    requireQuantifiers();
+    assume()
+        .withMessage("Princess does not support quantifier over boolean variables")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.PRINCESS);
+
+    BooleanFormula x = bmgr.makeVariable("x");
+    BooleanFormula constraint = qmgr.forall(ImmutableList.of(x), x);
+    assertThatFormula(constraint).isUnsatisfiable();
+    BooleanFormula newConstraint =
+        bmgr.transformRecursively(constraint, new BooleanFormulaTransformationVisitor(mgr) {});
+    assertThatFormula(newConstraint).isUnsatisfiable();
+  }
+
+  // Same as testBooleanFormulaQuantifierHandling but with Ints
+  @Test
+  public void testIntegerFormulaQuantifierHandlingUNSAT() throws Exception {
+    requireQuantifiers();
+    requireIntegers();
+
+    IntegerFormula x = imgr.makeVariable("x");
+    BooleanFormula xEq1 = bmgr.not(imgr.equal(imgr.makeNumber(1), x));
+    BooleanFormula constraint = qmgr.forall(ImmutableList.of(x), xEq1);
+    assertThatFormula(constraint).isUnsatisfiable();
+    BooleanFormula newConstraint =
+        bmgr.visit(constraint, new BooleanFormulaTransformationVisitor(mgr) {});
+    assertThatFormula(newConstraint).isUnsatisfiable();
+  }
+
+  @Test
+  public void testIntegerFormulaQuantifierHandlingTrivialSAT() throws Exception {
+    requireQuantifiers();
+    requireIntegers();
+
+    IntegerFormula x = imgr.makeVariable("x");
+    BooleanFormula xEqx = imgr.equal(x, x);
+    BooleanFormula constraint = qmgr.forall(ImmutableList.of(x), xEqx);
+    assertThatFormula(constraint).isSatisfiable();
+    BooleanFormula newConstraint =
+        bmgr.visit(constraint, new BooleanFormulaTransformationVisitor(mgr) {});
+    assertThatFormula(newConstraint).isSatisfiable();
+  }
+
+  @Test
+  public void testIntegerFormulaQuantifierHandlingTrivialUNSAT() throws Exception {
+    requireQuantifiers();
+    requireIntegers();
+
+    IntegerFormula x = imgr.makeVariable("x");
+    BooleanFormula notxEqx = bmgr.not(imgr.equal(x, x));
+    BooleanFormula constraint = qmgr.forall(ImmutableList.of(x), notxEqx);
+    assertThatFormula(constraint).isUnsatisfiable();
+    BooleanFormula newConstraint =
+        bmgr.visit(constraint, new BooleanFormulaTransformationVisitor(mgr) {});
+    assertThatFormula(newConstraint).isUnsatisfiable();
+  }
+
+  // The idea is to test quantifier (with bound variables),
+  // such that they might fail to reconstruct the bound vars properly.
+  // One of such failures may occur when the inner variables are substituted with outer vars.
+  // exists x . ( forall x . (x = 1))
+  // This is UNSAT as exists x_1 . ( forall x_2 . ( x_2 = 1 )).
+  // If however the bound var x is inproperly substituted this might happen:
+  // exists x_1 . ( forall x_2 . ( x_1 = 1 )) which is SAT
+  @Test
+  public void testNestedIntegerFormulaQuantifierHandling() throws Exception {
+    requireQuantifiers();
+    requireIntegers();
+    // Z3 returns UNKNOWN as its quantifiers can not handle this.
+    assume().that(solverToUse()).isNotEqualTo(Solvers.Z3);
+
+    IntegerFormula x = imgr.makeVariable("x");
+    BooleanFormula xEq1 = imgr.equal(x, imgr.makeNumber(1));
+    BooleanFormula constraint =
+        qmgr.exists(ImmutableList.of(x), qmgr.forall(ImmutableList.of(x), xEq1));
+    assertThatFormula(constraint).isUnsatisfiable();
+    BooleanFormula newConstraint =
+        bmgr.visit(constraint, new BooleanFormulaTransformationVisitor(mgr) {});
+    assertThatFormula(newConstraint).isUnsatisfiable();
+  }
+
+  // Same as testNestedIntegerFormulaQuantifierHandling but with a recursive visitor
+  @Test
+  public void testNestedIntegerFormulaQuantifierRecursiveHandling() throws Exception {
+    requireQuantifiers();
+    requireIntegers();
+    // Z3 returns UNKNOWN as its quantifiers can not handle this.
+    assume().that(solverToUse()).isNotEqualTo(Solvers.Z3);
+
+    IntegerFormula x = imgr.makeVariable("x");
+    BooleanFormula xEq1 = imgr.equal(x, imgr.makeNumber(1));
+    BooleanFormula constraint =
+        qmgr.exists(ImmutableList.of(x), qmgr.forall(ImmutableList.of(x), xEq1));
+    assertThatFormula(constraint).isUnsatisfiable();
+    BooleanFormula newConstraint =
+        bmgr.transformRecursively(constraint, new BooleanFormulaTransformationVisitor(mgr) {});
     assertThatFormula(newConstraint).isUnsatisfiable();
   }
 

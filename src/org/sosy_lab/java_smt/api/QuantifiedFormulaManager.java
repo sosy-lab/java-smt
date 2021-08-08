@@ -64,7 +64,8 @@ public interface QuantifiedFormulaManager {
       Quantifier q, List<? extends Formula> pVariables, BooleanFormula pBody);
 
   /**
-   * Eliminate the quantifiers for a given formula.
+   * Eliminate the quantifiers for a given formula. If this is not possible, it will return the
+   * input formula. Note that CVC4 only supports this for LIA and LRA.
    *
    * @param pF Formula with quantifiers.
    * @return New formula without quantifiers.

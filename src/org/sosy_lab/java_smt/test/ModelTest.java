@@ -348,6 +348,7 @@ public class ModelTest extends SolverBasedTest0 {
     }
   }
 
+  // var = 1 & Exists boundVar . (boundVar = 0 & var = f(boundVar))
   @Test
   public void testQuantifiedUF() throws SolverException, InterruptedException {
     requireQuantifiers();
@@ -369,6 +370,27 @@ public class ModelTest extends SolverBasedTest0 {
     BooleanFormula f = bmgr.and(varIsOne, qmgr.exists(ImmutableList.of(boundVar), body));
     IntegerFormula one = imgr.makeNumber(1);
 
+    ValueAssignment expectedValueAssignment =
+        new ValueAssignment(
+            funcAtZero,
+            one,
+            imgr.equal(funcAtZero, one),
+            func,
+            BigInteger.ONE,
+            ImmutableList.of(BigInteger.ZERO));
+
+    // CVC4 does not give back bound variable values. Not even in UFs.
+    if (solverToUse() == Solvers.CVC4) {
+      expectedValueAssignment =
+          new ValueAssignment(
+              funcAtBoundVar,
+              one,
+              imgr.equal(funcAtBoundVar, one),
+              func,
+              BigInteger.ONE,
+              ImmutableList.of("boundVar"));
+    }
+
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(f);
       assertThat(prover).isSatisfiable();
@@ -377,15 +399,63 @@ public class ModelTest extends SolverBasedTest0 {
         for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
           // Check that we can iterate through with no crashes.
         }
-        assertThat(m)
-            .contains(
-                new ValueAssignment(
-                    funcAtZero,
-                    one,
-                    imgr.equal(funcAtZero, one),
-                    func,
-                    BigInteger.ONE,
-                    ImmutableList.of(BigInteger.ZERO)));
+        assertThat(m).contains(expectedValueAssignment);
+      }
+    }
+  }
+
+  // var = 1 & boundVar = 1 & Exists boundVar . (boundVar = 0 & var = f(boundVar))
+  @Test
+  public void testQuantifiedUF2() throws SolverException, InterruptedException {
+    requireQuantifiers();
+    // Boolector only supports bitvector quantifier
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
+
+    IntegerFormula var = imgr.makeVariable("var");
+    BooleanFormula varIsOne = imgr.equal(var, imgr.makeNumber(1));
+    IntegerFormula boundVar = imgr.makeVariable("boundVar");
+    BooleanFormula boundVarIsZero = imgr.equal(boundVar, imgr.makeNumber(0));
+    BooleanFormula boundVarIsOne = imgr.equal(boundVar, imgr.makeNumber(1));
+
+    String func = "func";
+    IntegerFormula funcAtZero = fmgr.declareAndCallUF(func, IntegerType, imgr.makeNumber(0));
+    IntegerFormula funcAtBoundVar = fmgr.declareAndCallUF(func, IntegerType, boundVar);
+
+    BooleanFormula body = bmgr.and(boundVarIsZero, imgr.equal(var, funcAtBoundVar));
+    BooleanFormula f =
+        bmgr.and(varIsOne, boundVarIsOne, qmgr.exists(ImmutableList.of(boundVar), body));
+    IntegerFormula one = imgr.makeNumber(1);
+
+    ValueAssignment expectedValueAssignment =
+        new ValueAssignment(
+            funcAtZero,
+            one,
+            imgr.equal(funcAtZero, one),
+            func,
+            BigInteger.ONE,
+            ImmutableList.of(BigInteger.ZERO));
+
+    // CVC4 does not give back bound variable values. Not even in UFs.
+    if (solverToUse() == Solvers.CVC4) {
+      expectedValueAssignment =
+          new ValueAssignment(
+              funcAtBoundVar,
+              one,
+              imgr.equal(funcAtBoundVar, one),
+              func,
+              BigInteger.ONE,
+              ImmutableList.of("boundVar"));
+    }
+
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(f);
+      assertThat(prover).isSatisfiable();
+
+      try (Model m = prover.getModel()) {
+        for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
+          // Check that we can iterate through with no crashes.
+        }
+        assertThat(m).contains(expectedValueAssignment);
       }
     }
   }

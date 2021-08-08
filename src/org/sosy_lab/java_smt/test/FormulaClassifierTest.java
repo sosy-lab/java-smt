@@ -111,6 +111,7 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
 
   @Test
   public void test_ABV() {
+    requireParser();
     assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     requireQuantifiers();
     requireBitvectors();
