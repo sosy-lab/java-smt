@@ -10,7 +10,9 @@ package org.sosy_lab.java_smt.basicimpl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -18,6 +20,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -34,6 +37,7 @@ import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
+import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
@@ -303,32 +307,68 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
       final Formula pFormula,
       final boolean extractUF,
       final BiConsumer<String, Formula> pConsumer) {
+    visitRecursively(new VariableAndUFExtractor(extractUF, pConsumer, ImmutableSet.of()), pFormula);
+  }
 
-    visitRecursively(
-        new DefaultFormulaVisitor<>() {
+  private class VariableAndUFExtractor extends DefaultFormulaVisitor<TraversalProcess> {
 
-          @Override
-          protected TraversalProcess visitDefault(Formula f) {
-            return TraversalProcess.CONTINUE;
-          }
+    private final boolean extractUF;
+    private final BiConsumer<String, Formula> consumer;
+    private final Set<Formula> boundVariablesInContext;
 
-          @Override
-          public TraversalProcess visitFunction(
-              Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
+    VariableAndUFExtractor(
+        boolean pExtractUF,
+        BiConsumer<String, Formula> pConsumer,
+        Set<Formula> pBoundVariablesInContext) {
+      extractUF = pExtractUF;
+      consumer = pConsumer;
+      boundVariablesInContext = pBoundVariablesInContext;
+    }
 
-            if (functionDeclaration.getKind() == FunctionDeclarationKind.UF && extractUF) {
-              pConsumer.accept(functionDeclaration.getName(), f);
-            }
-            return TraversalProcess.CONTINUE;
-          }
+    @Override
+    protected TraversalProcess visitDefault(Formula f) {
+      return TraversalProcess.CONTINUE;
+    }
 
-          @Override
-          public TraversalProcess visitFreeVariable(Formula f, String name) {
-            pConsumer.accept(name, f);
-            return TraversalProcess.CONTINUE;
-          }
-        },
-        pFormula);
+    @Override
+    public TraversalProcess visitFunction(
+        Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
+
+      if (!boundVariablesInContext.contains(f) // TODO can UFs be bounded?
+          && functionDeclaration.getKind() == FunctionDeclarationKind.UF
+          && extractUF) {
+        consumer.accept(functionDeclaration.getName(), f);
+      }
+      return TraversalProcess.CONTINUE;
+    }
+
+    @Override
+    public TraversalProcess visitFreeVariable(Formula f, String name) {
+
+      // If we are inside a quantified formula, bound variables appear to be free,
+      // but they are actually bound by the surrounding context.
+      if (!boundVariablesInContext.contains(f)) {
+        consumer.accept(name, f);
+      }
+      return TraversalProcess.CONTINUE;
+    }
+
+    @Override
+    public TraversalProcess visitQuantifier(
+        BooleanFormula f, Quantifier q, List<Formula> boundVariables, BooleanFormula body) {
+
+      // We begin a new nested scope, thus we need a 'really' recursive call and
+      // use another visitor-instance which knows the corresponding bound variables.
+      visitRecursively(
+          new VariableAndUFExtractor(
+              extractUF,
+              consumer,
+              Sets.union(boundVariablesInContext, ImmutableSet.copyOf(boundVariables))),
+          body);
+
+      // Afterwards, we skip the already finished body-formula.
+      return TraversalProcess.SKIP;
+    }
   }
 
   @SuppressWarnings("unchecked")
