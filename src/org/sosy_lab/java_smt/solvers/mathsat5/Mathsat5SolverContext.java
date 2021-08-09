@@ -28,12 +28,10 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.io.MoreFiles;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -41,6 +39,7 @@ import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
+import org.sosy_lab.java_smt.LibraryLoader;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
@@ -145,16 +144,17 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
       @Nullable PathCounterTemplate solverLogFile,
       long randomSeed,
       FloatingPointRoundingMode pFloatingPointRoundingMode,
-      NonLinearArithmetic pNonLinearArithmetic)
+      NonLinearArithmetic pNonLinearArithmetic,
+      LibraryLoader pLoader)
       throws InvalidConfigurationException {
 
     // Init Msat
     Mathsat5Settings settings = new Mathsat5Settings(config, solverLogFile);
 
     if (settings.loadOptimathsat5) {
-      NativeLibraries.loadLibrary("optimathsat5j");
+      pLoader.loadLibrary("optimathsat5j");
     } else {
-      loadLibrary();
+      loadLibrary(pLoader);
     }
 
     long msatConf = msat_create_config();
@@ -204,33 +204,9 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
   }
 
   @VisibleForTesting
-  static void loadLibrary() {
-    loadLibrary(ImmutableList.of("mathsat5j"), ImmutableList.of("mpir", "mathsat", "mathsat5j"));
-  }
-
-  /**
-   * This method loads the given library, depending on the operating system.
-   *
-   * <p>Each list is applied in the given ordering.
-   */
-  private static void loadLibrary(List<String> linuxLibrary, List<String> windowsLibrary) {
-    // we try Linux first, and then Windows.
-    // TODO we could simply switch over the OS-name.
-    // TODO move this method upwards? more solvers could use it.
-    try {
-      for (String libraryName : linuxLibrary) {
-        NativeLibraries.loadLibrary(libraryName);
-      }
-    } catch (UnsatisfiedLinkError e1) {
-      try {
-        for (String libraryName : windowsLibrary) {
-          NativeLibraries.loadLibrary(libraryName);
-        }
-      } catch (UnsatisfiedLinkError e2) {
-        e1.addSuppressed(e2);
-        throw e1;
-      }
-    }
+  static void loadLibrary(LibraryLoader pLoader) {
+    pLoader.loadLibrary(
+        ImmutableList.of("mathsat5j"), ImmutableList.of("mpir", "mathsat", "mathsat5j"));
   }
 
   long createEnvironment(long cfg) {

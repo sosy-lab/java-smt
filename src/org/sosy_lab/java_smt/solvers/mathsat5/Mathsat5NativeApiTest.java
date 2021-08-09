@@ -46,6 +46,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.sosy_lab.java_smt.LibraryLoader;
 import org.sosy_lab.java_smt.api.SolverException;
 
 public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
@@ -57,7 +58,7 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
   @BeforeClass
   public static void loadMathsat() {
     try {
-      Mathsat5SolverContext.loadLibrary();
+      Mathsat5SolverContext.loadLibrary(LibraryLoader.defaultLibraryLoader());
     } catch (UnsatisfiedLinkError e) {
       throw new AssumptionViolatedException("MathSAT5 is not available", e);
     }
