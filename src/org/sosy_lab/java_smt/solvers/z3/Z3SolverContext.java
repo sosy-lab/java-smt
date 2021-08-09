@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.z3;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.enumerations.Z3_ast_print_mode;
 import java.io.IOException;
@@ -17,7 +18,6 @@ import java.nio.file.Path;
 import java.util.Set;
 import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.ShutdownNotifier.ShutdownRequestListener;
 import org.sosy_lab.common.configuration.Configuration;
@@ -28,6 +28,7 @@ import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.IO;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
+import org.sosy_lab.java_smt.LibraryLoader;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
@@ -110,7 +111,8 @@ public final class Z3SolverContext extends AbstractSolverContext {
       @Nullable PathCounterTemplate solverLogfile,
       long randomSeed,
       FloatingPointRoundingMode pFloatingPointRoundingMode,
-      NonLinearArithmetic pNonLinearArithmetic)
+      NonLinearArithmetic pNonLinearArithmetic,
+      LibraryLoader pLoader)
       throws InvalidConfigurationException {
     ExtraOptions extraOptions = new ExtraOptions();
     config.inject(extraOptions);
@@ -118,20 +120,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
     // We need to load z3 in addition to z3java, because Z3's own class only loads the latter
     // but it will fail to find the former if not loaded previously.
     // We load both libraries here to have all the loading in one place.
-    try {
-      // On Linux and MacOS, the plain name of the library works.
-      NativeLibraries.loadLibrary("z3");
-      NativeLibraries.loadLibrary("z3java");
-    } catch (UnsatisfiedLinkError e1) {
-      try {
-        // On Windows, the library name is different, so we try again.
-        NativeLibraries.loadLibrary("libz3");
-        NativeLibraries.loadLibrary("libz3java");
-      } catch (UnsatisfiedLinkError e2) {
-        e1.addSuppressed(e2);
-        throw e1;
-      }
-    }
+    pLoader.loadLibrary(ImmutableList.of("z3", "z3java"), ImmutableList.of("libz3", "libz3java"));
 
     // disable Z3's own loading mechanism, see com.microsoft.z3.Native
     System.setProperty("z3.skipLibraryLoad", "true");

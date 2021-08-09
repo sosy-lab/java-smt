@@ -104,14 +104,30 @@ public class SolverContextFactory {
   private final LogManager logger;
   private final ShutdownNotifier shutdownNotifier;
   private final Configuration config;
+  private final LibraryLoader loader;
 
+  /**
+   * This constructor uses the default JavaSMT loader for accessing native libraries.
+   *
+   * @see #SolverContextFactory(Configuration, LogManager, ShutdownNotifier, LibraryLoader)
+   */
   public SolverContextFactory(
       Configuration pConfig, LogManager pLogger, ShutdownNotifier pShutdownNotifier)
+      throws InvalidConfigurationException {
+    this(pConfig, pLogger, pShutdownNotifier, LibraryLoader.defaultLibraryLoader());
+  }
+
+  public SolverContextFactory(
+      Configuration pConfig,
+      LogManager pLogger,
+      ShutdownNotifier pShutdownNotifier,
+      LibraryLoader pLoader)
       throws InvalidConfigurationException {
     pConfig.inject(this);
     logger = pLogger.withComponentName("JavaSMT");
     shutdownNotifier = checkNotNull(pShutdownNotifier);
     config = pConfig;
+    loader = pLoader;
 
     if (!logAllQueries) {
       logfile = null;
@@ -189,7 +205,8 @@ public class SolverContextFactory {
             shutdownNotifier,
             (int) randomSeed,
             nonLinearArithmetic,
-            floatingPointRoundingMode);
+            floatingPointRoundingMode,
+            loader);
 
       case SMTINTERPOL:
         return SmtInterpolSolverContext.create(
@@ -203,7 +220,8 @@ public class SolverContextFactory {
             logfile,
             randomSeed,
             floatingPointRoundingMode,
-            nonLinearArithmetic);
+            nonLinearArithmetic,
+            loader);
 
       case Z3:
         return Z3SolverContext.create(
@@ -213,17 +231,19 @@ public class SolverContextFactory {
             logfile,
             randomSeed,
             floatingPointRoundingMode,
-            nonLinearArithmetic);
+            nonLinearArithmetic,
+            loader);
 
       case PRINCESS:
         return PrincessSolverContext.create(
             config, shutdownNotifier, logfile, (int) randomSeed, nonLinearArithmetic);
 
       case YICES2:
-        return Yices2SolverContext.create(nonLinearArithmetic, shutdownNotifier);
+        return Yices2SolverContext.create(nonLinearArithmetic, shutdownNotifier, loader);
 
       case BOOLECTOR:
-        return BoolectorSolverContext.create(config, shutdownNotifier, logfile, (int) randomSeed);
+        return BoolectorSolverContext.create(
+            config, shutdownNotifier, logfile, (int) randomSeed, loader);
 
       default:
         throw new AssertionError("no solver selected");
@@ -232,27 +252,46 @@ public class SolverContextFactory {
 
   /**
    * Shortcut for getting a {@link SolverContext}, the solver is selected using the configuration
-   * {@code config}
-   *
-   * <p>See {@link #SolverContextFactory(Configuration, LogManager, ShutdownNotifier)} for
-   * documentation of accepted parameters.
+   * {@code config}.
    */
   public static SolverContext createSolverContext(
       Configuration config, LogManager logger, ShutdownNotifier shutdownNotifier)
       throws InvalidConfigurationException {
-    return new SolverContextFactory(config, logger, shutdownNotifier).generateContext();
+    return new SolverContextFactory(
+            config, logger, shutdownNotifier, LibraryLoader.defaultLibraryLoader())
+        .generateContext();
   }
 
   /**
    * Shortcut for getting a {@link SolverContext}, the solver is selected using an argument.
    *
-   * <p>See {@link #SolverContextFactory(Configuration, LogManager, ShutdownNotifier)} for
-   * documentation of accepted parameters.
+   * <p>See {@link #SolverContextFactory(Configuration, LogManager, ShutdownNotifier,
+   * LibraryLoader)} for documentation of accepted parameters.
    */
   public static SolverContext createSolverContext(
       Configuration config, LogManager logger, ShutdownNotifier shutdownNotifier, Solvers solver)
       throws InvalidConfigurationException {
-    return new SolverContextFactory(config, logger, shutdownNotifier).generateContext(solver);
+    return new SolverContextFactory(
+            config, logger, shutdownNotifier, LibraryLoader.defaultLibraryLoader())
+        .generateContext(solver);
+  }
+
+  /**
+   * This is the most explicit method for getting a {@link SolverContext}, the solver, the logger,
+   * the shutdownNotifier, and the libraryLoader are provided as parameters by the caller.
+   *
+   * <p>See {@link #SolverContextFactory(Configuration, LogManager, ShutdownNotifier,
+   * LibraryLoader)} for documentation of accepted parameters.
+   */
+  public static SolverContext createSolverContext(
+      Configuration config,
+      LogManager logger,
+      ShutdownNotifier shutdownNotifier,
+      Solvers solver,
+      LibraryLoader loader)
+      throws InvalidConfigurationException {
+    return new SolverContextFactory(config, logger, shutdownNotifier, loader)
+        .generateContext(solver);
   }
 
   /**
@@ -266,7 +305,8 @@ public class SolverContextFactory {
     return new SolverContextFactory(
             Configuration.defaultConfiguration(),
             LogManager.createNullLogManager(),
-            ShutdownNotifier.createDummy())
+            ShutdownNotifier.createDummy(),
+            LibraryLoader.defaultLibraryLoader())
         .generateContext(solver);
   }
 }
