@@ -106,7 +106,6 @@ import org.junit.AssumptionViolatedException;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.Model;
 
@@ -118,7 +117,7 @@ public class Yices2NativeApiTest {
   @BeforeClass
   public static void loadYices() {
     try {
-      NativeLibraries.loadLibrary("yices2j");
+      Yices2SolverContext.loadLibrary();
     } catch (UnsatisfiedLinkError e) {
       throw new AssumptionViolatedException("Yices2 is not available", e);
     }
