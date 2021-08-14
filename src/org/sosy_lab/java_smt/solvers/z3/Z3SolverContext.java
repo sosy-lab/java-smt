@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -28,7 +29,6 @@ import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.IO;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.java_smt.LibraryLoader;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
@@ -112,7 +112,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
       long randomSeed,
       FloatingPointRoundingMode pFloatingPointRoundingMode,
       NonLinearArithmetic pNonLinearArithmetic,
-      LibraryLoader pLoader)
+      Consumer<String> pLoader)
       throws InvalidConfigurationException {
     ExtraOptions extraOptions = new ExtraOptions();
     config.inject(extraOptions);
@@ -120,7 +120,8 @@ public final class Z3SolverContext extends AbstractSolverContext {
     // We need to load z3 in addition to z3java, because Z3's own class only loads the latter
     // but it will fail to find the former if not loaded previously.
     // We load both libraries here to have all the loading in one place.
-    pLoader.loadLibrary(ImmutableList.of("z3", "z3java"), ImmutableList.of("libz3", "libz3java"));
+    loadLibrariesWithFallback(
+        pLoader, ImmutableList.of("z3", "z3java"), ImmutableList.of("libz3", "libz3java"));
 
     // disable Z3's own loading mechanism, see com.microsoft.z3.Native
     System.setProperty("z3.skipLibraryLoad", "true");

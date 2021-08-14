@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -39,7 +40,6 @@ import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.java_smt.LibraryLoader;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
@@ -145,14 +145,14 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
       long randomSeed,
       FloatingPointRoundingMode pFloatingPointRoundingMode,
       NonLinearArithmetic pNonLinearArithmetic,
-      LibraryLoader pLoader)
+      Consumer<String> pLoader)
       throws InvalidConfigurationException {
 
     // Init Msat
     Mathsat5Settings settings = new Mathsat5Settings(config, solverLogFile);
 
     if (settings.loadOptimathsat5) {
-      pLoader.loadLibrary("optimathsat5j");
+      pLoader.accept("optimathsat5j");
     } else {
       loadLibrary(pLoader);
     }
@@ -204,9 +204,9 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
   }
 
   @VisibleForTesting
-  static void loadLibrary(LibraryLoader pLoader) {
-    pLoader.loadLibrary(
-        ImmutableList.of("mathsat5j"), ImmutableList.of("mpir", "mathsat", "mathsat5j"));
+  static void loadLibrary(Consumer<String> pLoader) {
+    loadLibrariesWithFallback(
+        pLoader, ImmutableList.of("mathsat5j"), ImmutableList.of("mpir", "mathsat", "mathsat5j"));
   }
 
   long createEnvironment(long cfg) {

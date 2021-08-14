@@ -15,8 +15,8 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_ver
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_init;
 
 import java.util.Set;
+import java.util.function.Consumer;
 import org.sosy_lab.common.ShutdownNotifier;
-import org.sosy_lab.java_smt.LibraryLoader;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -49,9 +49,9 @@ public class Yices2SolverContext extends AbstractSolverContext {
   public static Yices2SolverContext create(
       NonLinearArithmetic pNonLinearArithmetic,
       ShutdownNotifier pShutdownManager,
-      LibraryLoader pLoader) {
+      Consumer<String> pLoader) {
 
-    pLoader.loadLibrary("yices2j");
+    pLoader.accept("yices2j");
 
     synchronized (Yices2SolverContext.class) {
       if (numLoadedInstances == 0) {
