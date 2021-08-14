@@ -151,7 +151,7 @@ public class SolverContextFactory {
     logger = pLogger.withComponentName("JavaSMT");
     shutdownNotifier = checkNotNull(pShutdownNotifier);
     config = pConfig;
-    loader = pLoader;
+    loader = checkNotNull(pLoader);
 
     if (!logAllQueries) {
       logfile = null;
