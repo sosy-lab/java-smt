@@ -17,6 +17,7 @@ import java.nio.file.Path;
 import java.util.Set;
 import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.ShutdownNotifier.ShutdownRequestListener;
 import org.sosy_lab.common.configuration.Configuration;
@@ -36,7 +37,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearAr
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 
 @Options(prefix = "solver.z3")
-final class Z3SolverContext extends AbstractSolverContext {
+public final class Z3SolverContext extends AbstractSolverContext {
 
   /** Optimization settings. */
   @Option(
@@ -119,18 +120,21 @@ final class Z3SolverContext extends AbstractSolverContext {
     // We load both libraries here to have all the loading in one place.
     try {
       // On Linux and MacOS, the plain name of the library works.
-      System.loadLibrary("z3");
-      System.loadLibrary("z3java");
+      NativeLibraries.loadLibrary("z3");
+      NativeLibraries.loadLibrary("z3java");
     } catch (UnsatisfiedLinkError e1) {
       try {
         // On Windows, the library name is different, so we try again.
-        System.loadLibrary("libz3");
-        System.loadLibrary("libz3java");
+        NativeLibraries.loadLibrary("libz3");
+        NativeLibraries.loadLibrary("libz3java");
       } catch (UnsatisfiedLinkError e2) {
         e1.addSuppressed(e2);
         throw e1;
       }
     }
+
+    // disable Z3's own loading mechanism, see com.microsoft.z3.Native
+    System.setProperty("z3.skipLibraryLoad", "true");
 
     if (extraOptions.log != null) {
       Path absolutePath = extraOptions.log.toAbsolutePath();
