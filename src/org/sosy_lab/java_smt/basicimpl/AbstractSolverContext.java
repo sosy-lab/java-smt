@@ -10,7 +10,9 @@ package org.sosy_lab.java_smt.basicimpl;
 
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
@@ -93,5 +95,41 @@ public abstract class AbstractSolverContext implements SolverContext {
     Set<ProverOptions> opts = EnumSet.noneOf(ProverOptions.class);
     Collections.addAll(opts, options);
     return opts;
+  }
+
+  /**
+   * This method loads the given libraries.
+   *
+   * <p>If the first list of libraries can not be loaded, the second list is used as a fallback. The
+   * two lists of libraries can be used to differ between libraries specific to Unix/Linux and
+   * Windows.
+   *
+   * <p>If the first try a aborts after a few steps, we do not cleanup partially loaded libraries,
+   * but directly start the second try.
+   *
+   * <p>Each list is applied in the given ordering.
+   *
+   * @param loader the loading mechanism that will be used for loading each single library.
+   * @param librariesForFirstTry list of library names that will be loaded, if possible.
+   * @param librariesForSecondTry list of library names that will be loaded, after the first attempt
+   *     (using librariesForFirstTry} has failed.
+   * @throws UnsatisfiedLinkError if neither the first nor second try returned a successful loading
+   *     process.
+   */
+  protected static void loadLibrariesWithFallback(
+      Consumer<String> loader,
+      List<String> librariesForFirstTry,
+      List<String> librariesForSecondTry)
+      throws UnsatisfiedLinkError {
+    try {
+      librariesForFirstTry.forEach(loader);
+    } catch (UnsatisfiedLinkError e1) {
+      try {
+        librariesForSecondTry.forEach(loader);
+      } catch (UnsatisfiedLinkError e2) {
+        e1.addSuppressed(e2);
+        throw e1;
+      }
+    }
   }
 }

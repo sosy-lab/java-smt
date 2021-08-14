@@ -14,10 +14,10 @@ import edu.stanford.CVC4.ExprManager;
 import edu.stanford.CVC4.SExpr;
 import edu.stanford.CVC4.SmtEngine;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.java_smt.LibraryLoader;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
@@ -51,9 +51,9 @@ public final class CVC4SolverContext extends AbstractSolverContext {
       int randomSeed,
       NonLinearArithmetic pNonLinearArithmetic,
       FloatingPointRoundingMode pFloatingPointRoundingMode,
-      LibraryLoader pLoader) {
+      Consumer<String> pLoader) {
 
-    pLoader.loadLibrary("cvc4jni");
+    pLoader.accept("cvc4jni");
 
     // ExprManager is the central class for creating expressions/terms/formulae.
     ExprManager exprManager = new ExprManager();

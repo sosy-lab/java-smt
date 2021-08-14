@@ -12,7 +12,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.function.Consumer;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.FileOption;
@@ -104,24 +106,46 @@ public class SolverContextFactory {
   private final LogManager logger;
   private final ShutdownNotifier shutdownNotifier;
   private final Configuration config;
-  private final LibraryLoader loader;
+  private final Consumer<String> loader;
 
   /**
    * This constructor uses the default JavaSMT loader for accessing native libraries.
    *
-   * @see #SolverContextFactory(Configuration, LogManager, ShutdownNotifier, LibraryLoader)
+   * @see #SolverContextFactory(Configuration, LogManager, ShutdownNotifier, Consumer)
    */
   public SolverContextFactory(
       Configuration pConfig, LogManager pLogger, ShutdownNotifier pShutdownNotifier)
       throws InvalidConfigurationException {
-    this(pConfig, pLogger, pShutdownNotifier, LibraryLoader.defaultLibraryLoader());
+    this(pConfig, pLogger, pShutdownNotifier, NativeLibraries::loadLibrary);
   }
 
+  /**
+   * This constructor instantiates a factory for building solver contexts for a configured SMT
+   * solver (via the parameter <code>pConfig</code>). Each created context is independent from other
+   * contexts and uses its own environment for building formulas and querying the solver.
+   *
+   * @param pConfig The configuration to be used when instantiating JavaSMT and the solvers. By
+   *     default, the configuration specifies the solver to use via the option <code>
+   *     solver.solver=...</code>. This option can be overridden when calling the method {@link
+   *     #generateContext(Solvers)}.
+   * @param pLogger The processing of log messages from SMT solvers (or their bindings) is handled
+   *     via this LogManager.
+   * @param pShutdownNotifier This central instance allows to request the termination of all
+   *     operations in the created solver. Please note that the solver can decide on its own to
+   *     accept the shutdown request and terminate its operation afterwards. We do not forcefully
+   *     terminate any solver query eagerly. In general, a solver is of good nature, and maturely
+   *     developed, and terminates accordingly.
+   * @param pLoader The loading mechanism (loading method) in this class can be injected by the user
+   *     and, e.g., can be used to search for the library binaries in more directories. This makes
+   *     the loading process for native solvers like Boolector, CVC4, MathSAT, Z3 more flexible. For
+   *     Java-based libraries (solvers like SMTInterpol or Princess, and also other dependences),
+   *     this class is irrelevant and not accessed.
+   */
   public SolverContextFactory(
       Configuration pConfig,
       LogManager pLogger,
       ShutdownNotifier pShutdownNotifier,
-      LibraryLoader pLoader)
+      Consumer<String> pLoader)
       throws InvalidConfigurationException {
     pConfig.inject(this);
     logger = pLogger.withComponentName("JavaSMT");
@@ -166,7 +190,11 @@ public class SolverContextFactory {
     return generateContext(solver);
   }
 
-  /** Create new context with solver name supplied. */
+  /**
+   * Create new context with solver name supplied.
+   *
+   * @see #generateContext()
+   */
   @SuppressWarnings("resource") // returns unclosed context object
   public SolverContext generateContext(Solvers solverToCreate)
       throws InvalidConfigurationException {
@@ -257,22 +285,20 @@ public class SolverContextFactory {
   public static SolverContext createSolverContext(
       Configuration config, LogManager logger, ShutdownNotifier shutdownNotifier)
       throws InvalidConfigurationException {
-    return new SolverContextFactory(
-            config, logger, shutdownNotifier, LibraryLoader.defaultLibraryLoader())
+    return new SolverContextFactory(config, logger, shutdownNotifier, NativeLibraries::loadLibrary)
         .generateContext();
   }
 
   /**
    * Shortcut for getting a {@link SolverContext}, the solver is selected using an argument.
    *
-   * <p>See {@link #SolverContextFactory(Configuration, LogManager, ShutdownNotifier,
-   * LibraryLoader)} for documentation of accepted parameters.
+   * <p>See {@link #SolverContextFactory(Configuration, LogManager, ShutdownNotifier, Consumer)} for
+   * documentation of accepted parameters.
    */
   public static SolverContext createSolverContext(
       Configuration config, LogManager logger, ShutdownNotifier shutdownNotifier, Solvers solver)
       throws InvalidConfigurationException {
-    return new SolverContextFactory(
-            config, logger, shutdownNotifier, LibraryLoader.defaultLibraryLoader())
+    return new SolverContextFactory(config, logger, shutdownNotifier, NativeLibraries::loadLibrary)
         .generateContext(solver);
   }
 
@@ -280,15 +306,15 @@ public class SolverContextFactory {
    * This is the most explicit method for getting a {@link SolverContext}, the solver, the logger,
    * the shutdownNotifier, and the libraryLoader are provided as parameters by the caller.
    *
-   * <p>See {@link #SolverContextFactory(Configuration, LogManager, ShutdownNotifier,
-   * LibraryLoader)} for documentation of accepted parameters.
+   * <p>See {@link #SolverContextFactory(Configuration, LogManager, ShutdownNotifier, Consumer)} for
+   * documentation of accepted parameters.
    */
   public static SolverContext createSolverContext(
       Configuration config,
       LogManager logger,
       ShutdownNotifier shutdownNotifier,
       Solvers solver,
-      LibraryLoader loader)
+      Consumer<String> loader)
       throws InvalidConfigurationException {
     return new SolverContextFactory(config, logger, shutdownNotifier, loader)
         .generateContext(solver);
@@ -306,7 +332,7 @@ public class SolverContextFactory {
             Configuration.defaultConfiguration(),
             LogManager.createNullLogManager(),
             ShutdownNotifier.createDummy(),
-            LibraryLoader.defaultLibraryLoader())
+            NativeLibraries::loadLibrary)
         .generateContext(solver);
   }
 }

@@ -14,6 +14,7 @@ import com.google.common.base.Splitter.MapSplitter;
 import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
@@ -21,7 +22,6 @@ import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.PathCounterTemplate;
-import org.sosy_lab.java_smt.LibraryLoader;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
@@ -79,10 +79,10 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
       ShutdownNotifier pShutdownNotifier,
       @Nullable PathCounterTemplate solverLogfile,
       long randomSeed,
-      LibraryLoader pLoader)
+      Consumer<String> pLoader)
       throws InvalidConfigurationException {
 
-    pLoader.loadLibrary("boolector");
+    pLoader.accept("boolector");
 
     final long btor = BtorJNI.boolector_new();
     setOptions(config, solverLogfile, randomSeed, btor);
