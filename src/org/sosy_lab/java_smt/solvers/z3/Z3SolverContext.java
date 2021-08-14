@@ -104,6 +104,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
     logfile = pSolverLogFile;
   }
 
+  @SuppressWarnings("ParameterNumber")
   public static synchronized Z3SolverContext create(
       LogManager logger,
       Configuration config,

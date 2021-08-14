@@ -137,6 +137,7 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
         };
   }
 
+  @SuppressWarnings("ParameterNumber")
   public static Mathsat5SolverContext create(
       LogManager logger,
       Configuration config,
