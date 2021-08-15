@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
+import com.google.common.base.Preconditions;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
@@ -121,6 +122,8 @@ public abstract class AbstractSolverContext implements SolverContext {
       List<String> librariesForFirstTry,
       List<String> librariesForSecondTry)
       throws UnsatisfiedLinkError {
+    Preconditions.checkNotNull(librariesForFirstTry);
+    Preconditions.checkNotNull(librariesForSecondTry);
     try {
       librariesForFirstTry.forEach(loader);
     } catch (UnsatisfiedLinkError e1) {
