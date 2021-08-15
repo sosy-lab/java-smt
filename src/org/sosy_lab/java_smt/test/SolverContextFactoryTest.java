@@ -35,10 +35,11 @@ import org.sosy_lab.java_smt.api.SolverContext;
 @RunWith(Parameterized.class)
 public class SolverContextFactoryTest {
 
-  private static String OS = StandardSystemProperty.OS_NAME.value().toLowerCase().replace(" ", "");
-  private static boolean IS_WINDOWS = OS.startsWith("windows");
-  private static boolean IS_MAC = OS.startsWith("macos");
-  private static boolean IS_LINUX = OS.startsWith("linux");
+  private static final String OS =
+      StandardSystemProperty.OS_NAME.value().toLowerCase().replace(" ", "");
+  private static final boolean IS_WINDOWS = OS.startsWith("windows");
+  private static final boolean IS_MAC = OS.startsWith("macos");
+  private static final boolean IS_LINUX = OS.startsWith("linux");
 
   protected Configuration config;
   protected final LogManager logger = LogManager.createTestLogManager();
