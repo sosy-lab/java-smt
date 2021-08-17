@@ -8,13 +8,6 @@
 
 package org.sosy_lab.java_smt.api;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import java.util.Collection;
-import java.util.Set;
-import java.util.stream.Collector;
-import org.sosy_lab.java_smt.api.visitors.BooleanFormulaTransformationVisitor;
-import org.sosy_lab.java_smt.api.visitors.BooleanFormulaVisitor;
-import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
 /** Manager for dealing with string formulas. */
 public interface StringFormulaManager {

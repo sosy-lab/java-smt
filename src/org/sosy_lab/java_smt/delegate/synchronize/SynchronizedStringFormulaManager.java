@@ -10,9 +10,9 @@ package org.sosy_lab.java_smt.delegate.synchronize;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.StringFormulaManager;
-import org.sosy_lab.java_smt.api.SolverContext;
 
 class SynchronizedStringFormulaManager implements StringFormulaManager {
 

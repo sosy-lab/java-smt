@@ -72,7 +72,10 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
   protected final TEnv environment;
 
   protected FormulaCreator(
-      TEnv env, TType boolType, @Nullable TType pIntegerType, @Nullable TType pRationalType,
+      TEnv env,
+      TType boolType,
+      @Nullable TType pIntegerType,
+      @Nullable TType pRationalType,
       @Nullable TType stringType) {
     this.environment = env;
     this.boolType = boolType;

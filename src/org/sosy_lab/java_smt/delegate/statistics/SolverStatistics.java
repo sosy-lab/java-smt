@@ -141,7 +141,9 @@ public class SolverStatistics {
     return fpOperations.get();
   }
 
-  public int getNumberOfStringOperations() { return stringOperations.get(); }
+  public int getNumberOfStringOperations() {
+    return stringOperations.get();
+  }
 
   public int getNumberOfModelEvaluationQueries() {
     return modelEvaluations.get();

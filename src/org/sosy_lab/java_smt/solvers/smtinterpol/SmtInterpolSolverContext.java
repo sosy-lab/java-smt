@@ -59,7 +59,12 @@ public final class SmtInterpolSolverContext extends AbstractSolverContext {
         new SmtInterpolStringFormulaManager(creator, env.getTheory());
     SmtInterpolFormulaManager manager =
         new SmtInterpolFormulaManager(
-            creator, functionTheory, booleanTheory, integerTheory, rationalTheory, arrayTheory,
+            creator,
+            functionTheory,
+            booleanTheory,
+            integerTheory,
+            rationalTheory,
+            arrayTheory,
             stringTheory);
     return new SmtInterpolSolverContext(creator, manager);
   }

@@ -35,6 +35,4 @@ class Z3StringFormulaManager extends AbstractStringFormulaManager<Long, Long, Lo
   protected Long equal(Long pParam1, Long pParam2) {
     return Native.mkEq(z3context, pParam1, pParam2);
   }
-
-
 }

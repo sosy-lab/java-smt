@@ -428,7 +428,9 @@ public class SmtInterpolEnvironment {
     return script.binary(bin);
   }
 
-  public Term string(String value) { return script.string(new QuotedObject(value)); }
+  public Term string(String value) {
+    return script.string(new QuotedObject(value));
+  }
 
   /**
    * Compute a sequence of interpolants. The nesting array describes the start of the subtree for

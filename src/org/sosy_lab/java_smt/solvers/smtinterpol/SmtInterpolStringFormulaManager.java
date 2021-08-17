@@ -40,11 +40,11 @@ class SmtInterpolStringFormulaManager
   @Override
   public Term equal(Term t1, Term t2) {
     assert t1.getTheory().getStringSort() == t1.getSort()
-        && t2.getTheory().getStringSort() == t2.getSort()
+            && t2.getTheory().getStringSort() == t2.getSort()
         : "Cannot make equality of non-string terms:\nTerm 1:\n"
-        + t1.toStringDirect()
-        + "\nTerm 2:\n"
-        + t2.toStringDirect();
+            + t1.toStringDirect()
+            + "\nTerm 2:\n"
+            + t2.toStringDirect();
     return theory.equals(t1, t2);
   }
 }

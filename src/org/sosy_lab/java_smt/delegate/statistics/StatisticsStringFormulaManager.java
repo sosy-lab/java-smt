@@ -10,7 +10,6 @@ package org.sosy_lab.java_smt.delegate.statistics;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.StringFormulaManager;
 

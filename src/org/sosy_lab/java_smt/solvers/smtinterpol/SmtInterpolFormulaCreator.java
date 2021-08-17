@@ -104,8 +104,10 @@ class SmtInterpolFormulaCreator
     return getEnv().getTheory().getSort("Array", pIndexType, pElementType);
   }
 
-  /** convert a boolean or numeral term into an object of type
-   * Boolean, BigInteger, Rational, or String. */
+  /**
+   * convert a boolean or numeral term into an object of type Boolean, BigInteger, Rational, or
+   * String.
+   */
   @Override
   public Object convertValue(Term value) {
     FormulaType<?> type = getFormulaType(value);

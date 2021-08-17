@@ -8,11 +8,8 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkState;
 import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
 
-import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.StringFormulaManager;
 
