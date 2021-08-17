@@ -52,7 +52,9 @@ public class SmtInterpolFormulaManager
         null,
         pArrayFormulaManager,
         null,
-        pStringFormulaManager);
+        // uncomment when Logics.ALL contains Features.S
+        // pStringFormulaManager);
+        null);
   }
 
   BooleanFormula encapsulateBooleanFormula(Term t) {

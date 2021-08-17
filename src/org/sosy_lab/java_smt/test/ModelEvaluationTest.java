@@ -144,4 +144,14 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
         Lists.newArrayList(null, false),
         Lists.newArrayList(null, bmgr.makeBoolean(false)));
   }
+
+  @Test
+  public void testGetStringsEvaluation() throws SolverException, InterruptedException {
+    requireStrings();
+    evaluateInModel(
+        smgr.equal(smgr.makeVariable("x"), smgr.makeString("hello")),
+        smgr.makeVariable("y"),
+        Lists.newArrayList(null, "hello"),
+        Lists.newArrayList(null, smgr.makeString("hello")));
+  }
 }

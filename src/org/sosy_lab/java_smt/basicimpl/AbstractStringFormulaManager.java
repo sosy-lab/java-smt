@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.basicimpl;
 
 import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
 
+import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.StringFormulaManager;
 
@@ -43,11 +44,11 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
   protected abstract TFormulaInfo makeVariableImpl(String pVar);
 
   @Override
-  public StringFormula equal(StringFormula str1, StringFormula str2) {
+  public BooleanFormula equal(StringFormula str1, StringFormula str2) {
     TFormulaInfo param1 = extractInfo(str1);
     TFormulaInfo param2 = extractInfo(str2);
 
-    return wrap(equal(param1, param2));
+    return wrapBool(equal(param1, param2));
   }
 
   protected abstract TFormulaInfo equal(TFormulaInfo pParam1, TFormulaInfo pParam2);

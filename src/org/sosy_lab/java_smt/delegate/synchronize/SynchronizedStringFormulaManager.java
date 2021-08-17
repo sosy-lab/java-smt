@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.delegate.synchronize;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.StringFormulaManager;
@@ -39,7 +40,7 @@ class SynchronizedStringFormulaManager implements StringFormulaManager {
   }
 
   @Override
-  public StringFormula equal(StringFormula str1, StringFormula str2) {
+  public BooleanFormula equal(StringFormula str1, StringFormula str2) {
     synchronized (sync) {
       return delegate.equal(str1, str2);
     }

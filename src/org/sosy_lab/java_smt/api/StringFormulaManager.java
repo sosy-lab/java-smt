@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.api;
 
-
 /** Manager for dealing with string formulas. */
 public interface StringFormulaManager {
 
@@ -31,5 +30,5 @@ public interface StringFormulaManager {
    */
   StringFormula makeVariable(String pVar);
 
-  StringFormula equal(StringFormula str1, StringFormula str2);
+  BooleanFormula equal(StringFormula str1, StringFormula str2);
 }

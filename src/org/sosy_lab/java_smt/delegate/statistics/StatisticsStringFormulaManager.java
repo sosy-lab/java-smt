@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.delegate.statistics;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.StringFormulaManager;
 
@@ -36,7 +37,7 @@ class StatisticsStringFormulaManager implements StringFormulaManager {
   }
 
   @Override
-  public StringFormula equal(StringFormula str1, StringFormula str2) {
+  public BooleanFormula equal(StringFormula str1, StringFormula str2) {
     stats.stringOperations.getAndIncrement();
     return delegate.equal(str1, str2);
   }
