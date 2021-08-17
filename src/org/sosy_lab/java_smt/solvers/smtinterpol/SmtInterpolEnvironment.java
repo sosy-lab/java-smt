@@ -366,6 +366,10 @@ public class SmtInterpolEnvironment {
     return theory.getRealSort();
   }
 
+  public Sort getStringSort() {
+    return theory.getStringSort();
+  }
+
   /** This function returns an n-ary sort with given parameters. */
   Sort sort(String sortname, Sort... params) {
     return script.sort(sortname, params);
@@ -423,6 +427,8 @@ public class SmtInterpolEnvironment {
   public Term binary(String bin) {
     return script.binary(bin);
   }
+
+  public Term string(String value) { return script.string(new QuotedObject(value)); }
 
   /**
    * Compute a sequence of interpolants. The nesting array describes the start of the subtree for

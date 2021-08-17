@@ -71,7 +71,8 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
         pExprManager,
         pExprManager.booleanType(),
         pExprManager.integerType(),
-        pExprManager.realType());
+        pExprManager.realType(),
+        null);
     exprManager = pExprManager;
   }
 

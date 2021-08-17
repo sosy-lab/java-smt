@@ -34,12 +34,14 @@ class SmtInterpolFormulaCreator
   private final Sort booleanSort;
   private final Sort integerSort;
   private final Sort realSort;
+  private final Sort stringSort;
 
   SmtInterpolFormulaCreator(final SmtInterpolEnvironment env) {
-    super(env, env.getBooleanSort(), env.getIntegerSort(), env.getRealSort());
+    super(env, env.getBooleanSort(), env.getIntegerSort(), env.getRealSort(), env.getStringSort());
     booleanSort = env.getBooleanSort();
     integerSort = env.getIntegerSort();
     realSort = env.getRealSort();
+    stringSort = env.getStringSort();
   }
 
   @Override
@@ -54,6 +56,8 @@ class SmtInterpolFormulaCreator
       return FormulaType.RationalType;
     } else if (pSort == booleanSort) {
       return FormulaType.BooleanType;
+    } else if (pSort == stringSort) {
+      return FormulaType.StringType;
     } else if (pSort.isArraySort()) {
       return new FormulaType.ArrayFormulaType<>(
           getFormulaTypeOfSort(pSort.getArguments()[0]),
@@ -100,7 +104,8 @@ class SmtInterpolFormulaCreator
     return getEnv().getTheory().getSort("Array", pIndexType, pElementType);
   }
 
-  /** convert a boolean or numeral term into an object of type Boolean, BigInteger, or Rational. */
+  /** convert a boolean or numeral term into an object of type
+   * Boolean, BigInteger, Rational, or String. */
   @Override
   public Object convertValue(Term value) {
     FormulaType<?> type = getFormulaType(value);
@@ -124,6 +129,9 @@ class SmtInterpolFormulaCreator
       } else {
         return out;
       }
+    } else if (value instanceof ConstantTerm
+        && ((ConstantTerm) value).getValue() instanceof String) {
+      return ((ConstantTerm) value).getValue();
     } else {
       throw new IllegalArgumentException("Unexpected value: " + value);
     }

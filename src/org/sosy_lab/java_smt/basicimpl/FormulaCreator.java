@@ -39,6 +39,7 @@ import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
+import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
@@ -49,6 +50,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractFormula.FloatingPointFormulaImpl;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormula.FloatingPointRoundingModeFormulaImpl;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormula.IntegerFormulaImpl;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormula.RationalFormulaImpl;
+import org.sosy_lab.java_smt.basicimpl.AbstractFormula.StringFormulaImpl;
 
 /**
  * This is a helper class with several methods that are commonly used throughout the basicimpl
@@ -66,14 +68,17 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
   private final TType boolType;
   private final @Nullable TType integerType;
   private final @Nullable TType rationalType;
+  private final @Nullable TType stringType;
   protected final TEnv environment;
 
   protected FormulaCreator(
-      TEnv env, TType boolType, @Nullable TType pIntegerType, @Nullable TType pRationalType) {
+      TEnv env, TType boolType, @Nullable TType pIntegerType, @Nullable TType pRationalType,
+      @Nullable TType stringType) {
     this.environment = env;
     this.boolType = boolType;
     this.integerType = pIntegerType;
     this.rationalType = pRationalType;
+    this.stringType = stringType;
   }
 
   public final TEnv getEnv() {
@@ -104,6 +109,13 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
 
   public abstract TType getArrayType(TType indexType, TType elementType);
 
+  public final TType getStringType() {
+    if (stringType == null) {
+      throw new UnsupportedOperationException("String theory is not supported by this solver.");
+    }
+    return stringType;
+  }
+
   public abstract TFormulaInfo makeVariable(TType type, String varName);
 
   public BooleanFormula encapsulateBoolean(TFormulaInfo pTerm) {
@@ -132,6 +144,11 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
     return new ArrayFormulaImpl<>(pTerm, pIndexType, pElementType);
   }
 
+  public StringFormula encapsulateString(TFormulaInfo pTerm) {
+    assert getFormulaType(pTerm).isStringType();
+    return new StringFormulaImpl<>(pTerm);
+  }
+
   public Formula encapsulateWithTypeOf(TFormulaInfo pTerm) {
     return encapsulate(getFormulaType(pTerm), pTerm);
   }
@@ -148,6 +165,8 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
       return (T) new IntegerFormulaImpl<>(pTerm);
     } else if (pType.isRationalType()) {
       return (T) new RationalFormulaImpl<>(pTerm);
+    } else if (pType.isStringType()) {
+      return (T) new StringFormulaImpl<>(pTerm);
     } else if (pType.isBitvectorType()) {
       return (T) new BitvectorFormulaImpl<>(pTerm);
     } else if (pType.isFloatingPointType()) {
@@ -194,6 +213,8 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
       t = FormulaType.IntegerType;
     } else if (formula instanceof RationalFormula) {
       t = FormulaType.RationalType;
+    } else if (formula instanceof StringFormula) {
+      t = FormulaType.StringType;
     } else if (formula instanceof FloatingPointRoundingModeFormula) {
       t = FormulaType.FloatingPointRoundingModeType;
     } else if (formula instanceof ArrayFormula) {

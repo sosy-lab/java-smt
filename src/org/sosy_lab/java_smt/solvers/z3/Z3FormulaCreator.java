@@ -50,6 +50,7 @@ import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
@@ -60,6 +61,7 @@ import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3FloatingPointFormula;
 import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3IntegerFormula;
 import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3RationalFormula;
+import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3StringFormula;
 
 @Options(prefix = "solver.z3")
 class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
@@ -124,10 +126,11 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       long pBoolType,
       long pIntegerType,
       long pRealType,
+      long pStringType,
       Configuration config,
       ShutdownNotifier pShutdownNotifier)
       throws InvalidConfigurationException {
-    super(pEnv, pBoolType, pIntegerType, pRealType);
+    super(pEnv, pBoolType, pIntegerType, pRealType, pStringType);
     shutdownNotifier = pShutdownNotifier;
     config.inject(this);
   }
@@ -193,12 +196,15 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       case Z3_RE_SORT:
       case Z3_UNKNOWN_SORT:
       case Z3_UNINTERPRETED_SORT:
-        // TODO: support for remaining sorts.
-        throw new IllegalArgumentException(
-            "Unknown formula type "
-                + Native.sortToString(z3context, pSort)
-                + " with sort "
-                + sortKind);
+        if (Native.isStringSort(z3context, pSort))
+          return FormulaType.StringType;
+        else
+          // TODO: support for remaining sorts.
+          throw new IllegalArgumentException(
+              "Unknown formula type "
+                  + Native.sortToString(z3context, pSort)
+                  + " with sort "
+                  + sortKind);
       default:
         throw new UnsupportedOperationException("Unexpected state.");
     }
@@ -257,6 +263,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       return (T) storePhantomReference(new Z3IntegerFormula(getEnv(), pTerm), pTerm);
     } else if (pType.isRationalType()) {
       return (T) storePhantomReference(new Z3RationalFormula(getEnv(), pTerm), pTerm);
+    } else if (pType.isStringType()) {
+      return (T) storePhantomReference(new Z3StringFormula(getEnv(), pTerm), pTerm);
     } else if (pType.isBitvectorType()) {
       return (T) storePhantomReference(new Z3BitvectorFormula(getEnv(), pTerm), pTerm);
     } else if (pType.isFloatingPointType()) {
@@ -294,6 +302,13 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     assert getFormulaType(pTerm).isFloatingPointType();
     cleanupReferences();
     return storePhantomReference(new Z3FloatingPointFormula(getEnv(), pTerm), pTerm);
+  }
+
+  @Override
+  public StringFormula encapsulateString(Long pTerm) {
+    assert getFormulaType(pTerm).isStringType();
+    cleanupReferences();
+    return storePhantomReference(new Z3StringFormula(getEnv(), pTerm), pTerm);
   }
 
   @Override
@@ -642,6 +657,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   public boolean isConstant(long value) {
     return Native.isNumeralAst(environment, value)
         || Native.isAlgebraicNumber(environment, value)
+        || Native.isString(environment, value)
         || isOP(environment, value, Z3_decl_kind.Z3_OP_TRUE.toInt())
         || isOP(environment, value, Z3_decl_kind.Z3_OP_FALSE.toInt());
   }
@@ -673,6 +689,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return new BigInteger(Native.getNumeralString(environment, value));
       } else if (type.isRationalType()) {
         return Rational.ofString(Native.getNumeralString(environment, value));
+      } else if (type.isStringType()) {
+        return Native.getString(environment, value);
       } else if (type.isBitvectorType()) {
         return new BigInteger(Native.getNumeralString(environment, value));
       } else if (type.isFloatingPointType()) {

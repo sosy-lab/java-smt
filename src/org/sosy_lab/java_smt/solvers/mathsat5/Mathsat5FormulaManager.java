@@ -48,6 +48,7 @@ final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Lo
         pFloatingPointManager,
         null,
         pArrayManager,
+        null,
         null);
   }
 

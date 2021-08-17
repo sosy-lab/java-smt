@@ -154,6 +154,8 @@ public final class Z3SolverContext extends AbstractSolverContext {
     Native.incRef(context, Native.sortToAst(context, integerSort));
     long realSort = Native.mkRealSort(context);
     Native.incRef(context, Native.sortToAst(context, realSort));
+    long stringSort = Native.mkStringSort(context);
+    Native.incRef(context, Native.sortToAst(context, stringSort));
 
     // The string representations of Z3s formulas should be in SMTLib2,
     // otherwise serialization wouldn't work.
@@ -165,7 +167,8 @@ public final class Z3SolverContext extends AbstractSolverContext {
         context, z3params, Native.mkStringSymbol(context, ":random-seed"), (int) randomSeed);
 
     Z3FormulaCreator creator =
-        new Z3FormulaCreator(context, boolSort, integerSort, realSort, config, pShutdownNotifier);
+        new Z3FormulaCreator(context, boolSort, integerSort, realSort, stringSort, config,
+            pShutdownNotifier);
 
     // Create managers
     Z3UFManager functionTheory = new Z3UFManager(creator);
@@ -180,6 +183,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
         new Z3FloatingPointFormulaManager(creator, pFloatingPointRoundingMode);
     Z3QuantifiedFormulaManager quantifierManager = new Z3QuantifiedFormulaManager(creator);
     Z3ArrayFormulaManager arrayManager = new Z3ArrayFormulaManager(creator);
+    Z3StringFormulaManager stringTheory = new Z3StringFormulaManager(creator);
 
     // Set the custom error handling
     // which will throw Z3Exception
@@ -196,7 +200,8 @@ public final class Z3SolverContext extends AbstractSolverContext {
             bitvectorTheory,
             floatingPointTheory,
             quantifierManager,
-            arrayManager);
+            arrayManager,
+            stringTheory);
     return new Z3SolverContext(
         creator, config, z3params, pShutdownNotifier, logger, manager, solverLogfile);
   }

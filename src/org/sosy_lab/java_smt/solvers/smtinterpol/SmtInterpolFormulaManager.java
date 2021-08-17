@@ -39,7 +39,8 @@ public class SmtInterpolFormulaManager
       SmtInterpolBooleanFormulaManager pBooleanManager,
       SmtInterpolIntegerFormulaManager pIntegerManager,
       SmtInterpolRationalFormulaManager pRationalManager,
-      SmtInterpolArrayFormulaManager pArrayFormulaManager) {
+      SmtInterpolArrayFormulaManager pArrayFormulaManager,
+      SmtInterpolStringFormulaManager pStringFormulaManager) {
     super(
         pCreator,
         pFunctionManager,
@@ -50,7 +51,8 @@ public class SmtInterpolFormulaManager
         null,
         null,
         pArrayFormulaManager,
-        null);
+        null,
+        pStringFormulaManager);
   }
 
   BooleanFormula encapsulateBooleanFormula(Term t) {
