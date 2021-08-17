@@ -196,14 +196,16 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       case Z3_RE_SORT:
       case Z3_UNKNOWN_SORT:
       case Z3_UNINTERPRETED_SORT:
-        if (Native.isStringSort(z3context, pSort)) return FormulaType.StringType;
-        else
+        if (Native.isStringSort(z3context, pSort)) {
+          return FormulaType.StringType;
+        } else {
           // TODO: support for remaining sorts.
           throw new IllegalArgumentException(
               "Unknown formula type "
                   + Native.sortToString(z3context, pSort)
                   + " with sort "
                   + sortKind);
+        }
       default:
         throw new UnsupportedOperationException("Unexpected state.");
     }
