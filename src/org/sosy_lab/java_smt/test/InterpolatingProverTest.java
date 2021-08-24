@@ -282,7 +282,7 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
     checkItpSequence(ImmutableList.of(A, B, C, D), itps1);
     checkItpSequence(ImmutableList.of(D, C, B, A), itps2);
     checkItpSequence(ImmutableList.of(A, C, B, D), itps3);
-    checkItpSequence(ImmutableList.of(A, A, A, C, B, D, D), itps4);
+    checkItpSequence(ImmutableList.of(A, A, A, B, C, D, D), itps4);
     checkItpSequence(ImmutableList.of(A, A, B, C, D, A, D), itps5);
     checkItpSequence(ImmutableList.of(B, C, D, A, A, A, D), itps6);
   }
@@ -408,7 +408,7 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
     checkItpSequence(ImmutableList.of(A, B, C, D), itps1);
     checkItpSequence(ImmutableList.of(D, C, B, A), itps2);
     checkItpSequence(ImmutableList.of(A, C, B, D), itps3);
-    checkItpSequence(ImmutableList.of(A, A, A, C, B, D, D), itps4);
+    checkItpSequence(ImmutableList.of(A, A, A, B, C, D, D), itps4);
     checkItpSequence(ImmutableList.of(A, A, B, C, D, A, D), itps5);
     checkItpSequence(ImmutableList.of(B, C, D, A, A, A, D), itps6);
   }
