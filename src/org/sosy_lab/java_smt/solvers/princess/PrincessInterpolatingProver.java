@@ -160,7 +160,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
       // otherwise:  leaf-node  -> start new subtree, no children
       while (!subtreeStarts.isEmpty() && start <= subtreeStarts.peek()) {
         subtreeStarts.pop();
-        children.$plus$eq(stack.pop());
+        children.$plus$eq$colon(stack.pop()); // prepend
       }
       subtreeStarts.push(start);
       stack.push(new Tree<>(asScala(partitionedFormulas.get(i)).toSet(), children.toList()));
