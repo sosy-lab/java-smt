@@ -62,8 +62,7 @@ public final class SmtInterpolSolverContext extends AbstractSolverContext {
             booleanTheory,
             integerTheory,
             rationalTheory,
-            arrayTheory,
-            null);
+            arrayTheory);
     return new SmtInterpolSolverContext(creator, manager);
   }
 

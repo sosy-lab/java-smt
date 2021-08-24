@@ -366,10 +366,6 @@ public class SmtInterpolEnvironment {
     return theory.getRealSort();
   }
 
-  public Sort getStringSort() {
-    return theory.getStringSort();
-  }
-
   /** This function returns an n-ary sort with given parameters. */
   Sort sort(String sortname, Sort... params) {
     return script.sort(sortname, params);

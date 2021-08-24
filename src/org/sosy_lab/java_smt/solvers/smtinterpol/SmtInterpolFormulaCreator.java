@@ -36,7 +36,7 @@ class SmtInterpolFormulaCreator
   private final Sort realSort;
 
   SmtInterpolFormulaCreator(final SmtInterpolEnvironment env) {
-    super(env, env.getBooleanSort(), env.getIntegerSort(), env.getRealSort(), env.getStringSort());
+    super(env, env.getBooleanSort(), env.getIntegerSort(), env.getRealSort(), null);
     booleanSort = env.getBooleanSort();
     integerSort = env.getIntegerSort();
     realSort = env.getRealSort();
@@ -100,10 +100,7 @@ class SmtInterpolFormulaCreator
     return getEnv().getTheory().getSort("Array", pIndexType, pElementType);
   }
 
-  /**
-   * convert a boolean or numeral term into an object of type Boolean, BigInteger, Rational, or
-   * String.
-   */
+  /** convert a boolean or numeral term into an object of type Boolean, BigInteger, or Rational. */
   @Override
   public Object convertValue(Term value) {
     FormulaType<?> type = getFormulaType(value);
@@ -127,9 +124,6 @@ class SmtInterpolFormulaCreator
       } else {
         return out;
       }
-    } else if (value instanceof ConstantTerm
-        && ((ConstantTerm) value).getValue() instanceof String) {
-      return ((ConstantTerm) value).getValue();
     } else {
       throw new IllegalArgumentException("Unexpected value: " + value);
     }
