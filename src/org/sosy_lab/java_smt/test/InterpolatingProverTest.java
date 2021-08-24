@@ -697,6 +697,53 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
   }
 
   @Test
+  public <T> void treeInterpolation4() throws SolverException, InterruptedException {
+
+    requireTreeItp();
+
+    InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
+
+    int i = index.getFreshId();
+
+    IntegerFormula a = imgr.makeVariable("a" + i);
+    IntegerFormula b = imgr.makeVariable("b" + i);
+    IntegerFormula c = imgr.makeVariable("c" + i);
+
+    // build formula: a=9 & b+c=a & b=1 & c=2
+    BooleanFormula bEquals1 = imgr.equal(b, imgr.makeNumber(1));
+    BooleanFormula cEquals2 = imgr.equal(c, imgr.makeNumber(2));
+    BooleanFormula bPlusCEqualsA = imgr.equal(imgr.add(b, c), a);
+    BooleanFormula aEquals9 = imgr.equal(a, imgr.makeNumber(9));
+
+    T TbEquals1 = stack.push(bEquals1);
+    T TcEquals2 = stack.push(cEquals2);
+    T TbPlusCEqualsA = stack.push(bPlusCEqualsA);
+    T TaEquals9 = stack.push(aEquals9);
+
+    assertThat(stack).isUnsatisfiable();
+
+    // we build a simple tree:
+    // b=1 c=2
+    // | /
+    // b+c=a
+    // |
+    // a=9
+    List<BooleanFormula> itps =
+        stack.getTreeInterpolants0(
+            ImmutableList.of(TbEquals1, TcEquals2, TbPlusCEqualsA, TaEquals9), // post-order
+            new int[] {0, 1, 0, 0}); // left-most node in current subtree
+
+    assertThat(itps).hasSize(3);
+
+    stack.close();
+
+    assertThatFormula(bEquals1).implies(itps.get(0));
+    assertThatFormula(cEquals2).implies(itps.get(1));
+    assertThatFormula(bmgr.and(itps.get(0), itps.get(1), bPlusCEqualsA)).implies(itps.get(2));
+    assertThatFormula(bmgr.and(itps.get(2), aEquals9)).implies(bmgr.makeBoolean(false));
+  }
+
+  @Test
   public <T> void treeInterpolationForSequence() throws SolverException, InterruptedException {
 
     requireTreeItp();
