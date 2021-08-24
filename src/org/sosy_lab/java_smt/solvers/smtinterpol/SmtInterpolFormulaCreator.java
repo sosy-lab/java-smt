@@ -34,14 +34,12 @@ class SmtInterpolFormulaCreator
   private final Sort booleanSort;
   private final Sort integerSort;
   private final Sort realSort;
-  private final Sort stringSort;
 
   SmtInterpolFormulaCreator(final SmtInterpolEnvironment env) {
     super(env, env.getBooleanSort(), env.getIntegerSort(), env.getRealSort(), env.getStringSort());
     booleanSort = env.getBooleanSort();
     integerSort = env.getIntegerSort();
     realSort = env.getRealSort();
-    stringSort = env.getStringSort();
   }
 
   @Override
@@ -56,8 +54,6 @@ class SmtInterpolFormulaCreator
       return FormulaType.RationalType;
     } else if (pSort == booleanSort) {
       return FormulaType.BooleanType;
-    } else if (pSort == stringSort) {
-      return FormulaType.StringType;
     } else if (pSort.isArraySort()) {
       return new FormulaType.ArrayFormulaType<>(
           getFormulaTypeOfSort(pSort.getArguments()[0]),
