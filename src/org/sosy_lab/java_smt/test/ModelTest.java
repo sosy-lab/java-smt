@@ -106,8 +106,7 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void testGetSmallIntegers() throws SolverException, InterruptedException {
-    // Boolector only supports Bitvectors (bv arrays and ufs)
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
+    requireIntegers();
     testModelGetters(
         imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(10)),
         imgr.makeVariable("x"),
@@ -117,8 +116,7 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void testGetNegativeIntegers() throws SolverException, InterruptedException {
-    // Boolector only supports Bitvectors (bv arrays and ufs)
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
+    requireIntegers();
     testModelGetters(
         imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(-10)),
         imgr.makeVariable("x"),
@@ -128,8 +126,7 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void testGetLargeIntegers() throws SolverException, InterruptedException {
-    // Boolector only supports Bitvectors (bv arrays and ufs)
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
+    requireIntegers();
     BigInteger large = new BigInteger("1000000000000000000000000000000000000000");
     testModelGetters(
         imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(large)),
@@ -140,8 +137,7 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void testGetSmallIntegralRationals() throws SolverException, InterruptedException {
-    // Boolector only supports Bitvectors (bv arrays and ufs)
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
+    requireIntegers();
     requireRationals();
     testModelGetters(
         rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(1)),
@@ -152,8 +148,7 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void testGetLargeIntegralRationals() throws SolverException, InterruptedException {
-    // Boolector only supports Bitvectors (bv arrays and ufs)
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
+    requireIntegers();
     requireRationals();
     BigInteger large = new BigInteger("1000000000000000000000000000000000000000");
     testModelGetters(
@@ -165,8 +160,7 @@ public class ModelTest extends SolverBasedTest0 {
 
   @Test
   public void testGetRationals() throws SolverException, InterruptedException {
-    // Boolector only supports Bitvectors (bv arrays and ufs)
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
+    requireIntegers();
     requireRationals();
     testModelGetters(
         rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(Rational.ofString("1/3"))),
@@ -352,8 +346,7 @@ public class ModelTest extends SolverBasedTest0 {
   @Test
   public void testQuantifiedUF() throws SolverException, InterruptedException {
     requireQuantifiers();
-    // Boolector only supports bitvector quantifier
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
+    requireIntegers();
 
     // create query: "(var == 1) && exists bound : (bound == 0 && var == func(bound))"
     // then check that the model contains an evaluation "func(0) := 1"
@@ -408,8 +401,7 @@ public class ModelTest extends SolverBasedTest0 {
   @Test
   public void testQuantifiedUF2() throws SolverException, InterruptedException {
     requireQuantifiers();
-    // Boolector only supports bitvector quantifier
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
+    requireIntegers();
 
     IntegerFormula var = imgr.makeVariable("var");
     BooleanFormula varIsOne = imgr.equal(var, imgr.makeNumber(1));
@@ -1184,8 +1176,8 @@ public class ModelTest extends SolverBasedTest0 {
   @Test
   public void testGetArrays7() throws SolverException, InterruptedException {
     requireArrays();
-    // Boolector only supports Bitvectors (bv arrays and ufs)
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
+    requireIntegers();
+
     ArrayFormula<IntegerFormula, IntegerFormula> array1 =
         amgr.makeArray("array", IntegerType, IntegerType);
 
@@ -1218,8 +1210,8 @@ public class ModelTest extends SolverBasedTest0 {
   @Test
   public void testGetArrays8() throws SolverException, InterruptedException {
     requireArrays();
-    // Boolector only supports Bitvectors (bv arrays and ufs)
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
+    requireIntegers();
+
     ArrayFormula<IntegerFormula, IntegerFormula> array1 =
         amgr.makeArray("array", IntegerType, IntegerType);
 
@@ -1264,8 +1256,8 @@ public class ModelTest extends SolverBasedTest0 {
   @Test
   public void testGetArrays9() throws SolverException, InterruptedException {
     requireArrays();
-    // Boolector only supports Bitvectors (bv arrays and ufs)
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
+    requireIntegers();
+
     ArrayFormula<IntegerFormula, IntegerFormula> array1 =
         amgr.makeArray("array1", IntegerType, IntegerType);
 
