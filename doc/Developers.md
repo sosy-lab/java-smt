@@ -86,13 +86,28 @@ For example, insert the following content into `~/.m2/settings.xml`:
     <profile>
       <id>gpg</id>
       <properties>
-        <gpg.executable>gpg2</gpg.executable>
+        <gpg.executable>gpg</gpg.executable>
         <!-- optional <gpg.passphrase>PASSPHRASE</gpg.passphrase> -->
       </properties>
     </profile>
   </profiles>
+  <mirrors>
+    <mirror>
+      <id>centralhttps</id>
+      <mirrorOf>central</mirrorOf>
+      <name>Maven central https</name>
+      <url>https://repo1.maven.org/maven2/</url>
+    </mirror>
+  </mirrors>
 </settings>
 ```
+
+If default system settings are not configured for HTTPS,
+we get an 501 error when downloading further maven dependencies.
+Thus, we add a mirror for HTTPS.
+
+You might need to store `maven-ant-tasks-2.1.3.jar` (or newer version) under `~/.ant/lib/`
+to avoid a failure when creating the task `antlib:org.apache.maven.artifact.ant:mvn`.
 
 #### Publishing
 
