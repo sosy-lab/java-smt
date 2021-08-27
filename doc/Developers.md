@@ -121,9 +121,11 @@ This is one of the most critical steps in JavaSMT development.
 We prefer to use the official Z3 binaries,
 please build from source only if necessary (e.g., in case of an important bugfix).
 
-To publish Z3, download the **Ubuntu 16.04**, **Windows**, and **OSX** binary for the
-[latest release](https://github.com/Z3Prover/z3/releases) and unzip them.
-For simpler handling, we copy the files from their `bin` directories together into one directory.
+To publish Z3, download the **Ubuntu 16.04**, **Windows**, and **OSX** binary
+and the sources (for JavaDoc) for the [latest release](https://github.com/Z3Prover/z3/releases) and unzip them.
+In the unpacked sources directory, prepare Java sources via `python scripts/mk_make.py --java`.
+For simpler handling, we then copy the files from the three `bin` directories together into one directory,
+and include the sources (we can keep the internal structure of each directory, just copy them above each other).
 Then execute the following command in the JavaSMT directory,
 where `$Z3_DIR` is the absolute path of the unpacked Z3 directory
 and `$Z3_VERSION` is the version number:
@@ -167,13 +169,16 @@ Finally follow the instructions shown in the message at the end.
 ### Publishing Boolector
 
 We prefer to use our own Boolector binaries and Java bindings.
+Boolector's dependencies, mainly Minisat, requires GCC version 7 and does not yet compile with newer compilers.
+We prefer to directly build diretly on Ubuntu 18.04, where gcc-7 is the default compiler.
+It should also be possible to set environment varables like CC=gcc-7 on newer systems.
 
-To publish Boolector, checkout the [CVC4 repository](https://github.com/kfriedberger/CVC4).
+To publish Boolector, checkout the [Boolector repository](https://github.com/Boolector/boolector).
 Then execute the following command in the JavaSMT directory,
-where `$BTOR_DIR` is the path to the CVC4 directory
+where `$BTOR_DIR` is the path to the Boolector directory
 and `$BTOR_VERSION` is the version number:
 ```
-ant publish-boolector -Dboolector.path=$BTOR_DIR -Dboolector.customRev=$BTOR_VERSION
+CC=gcc-7 ant publish-boolector -Dboolector.path=$BTOR_DIR -Dboolector.customRev=$BTOR_VERSION
 ```
 Example:
 ```
