@@ -10,6 +10,16 @@ SPDX-License-Identifier: Apache-2.0
 
 # JavaSMT ChangeLog
 
+## JavaSMT 3.10.0
+
+This release contains several improvement, some new features, several bugfixes and updated libraries.
+A new method for loading native libraries is available for developers to use their own loading mechanism.
+A new method `distinct` is available for Bitvector formulas.
+The visitation of quantified formulas was improved.
+
+### Updated solvers:
+ - Princess 2021-08-12
+
 ## JavaSMT 3.9.0
 
 This release contains a larger update of Princess and more JUnit tests.
