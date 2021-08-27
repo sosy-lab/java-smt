@@ -48,7 +48,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -224,7 +223,7 @@ class PrincessEnvironment {
   }
 
   private File getAbsoluteParent(Path path) {
-    return Optional.ofNullable(path.getParent()).orElse(Paths.get(".")).toAbsolutePath().toFile();
+    return Optional.ofNullable(path.getParent()).orElse(Path.of(".")).toAbsolutePath().toFile();
   }
 
   int getMinAtomsForAbbreviation() {

@@ -20,7 +20,7 @@ import com.google.common.collect.Iterables;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -1873,7 +1873,7 @@ public class ModelTest extends SolverBasedTest0 {
             .getFormulaManager()
             .parse(
                 Files.readString(
-                    Paths.get("src/org/sosy_lab/java_smt/test/SMT2_UF_and_Array.smt2")));
+                    Path.of("src/org/sosy_lab/java_smt/test/SMT2_UF_and_Array.smt2")));
 
     checkModelIteration(formula, false);
   }

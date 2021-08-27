@@ -14,7 +14,6 @@ import com.google.common.collect.Iterables;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -66,7 +65,7 @@ public class PrettyPrinter {
       } else if (arg.startsWith("-type=")) {
         type = Type.valueOf(arg.substring(6).toUpperCase());
       } else if (path == null) {
-        path = Paths.get(arg);
+        path = Path.of(arg);
       } else {
         help();
       }
