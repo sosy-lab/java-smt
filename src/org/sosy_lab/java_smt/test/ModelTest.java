@@ -1872,8 +1872,7 @@ public class ModelTest extends SolverBasedTest0 {
         context
             .getFormulaManager()
             .parse(
-                Files.readString(
-                    Path.of("src/org/sosy_lab/java_smt/test/SMT2_UF_and_Array.smt2")));
+                Files.readString(Path.of("src/org/sosy_lab/java_smt/test/SMT2_UF_and_Array.smt2")));
 
     checkModelIteration(formula, false);
   }
