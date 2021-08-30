@@ -130,7 +130,11 @@ public class SmtInterpolEnvironment {
       script.setOption(":unsat-core-check-mode", true);
       script.setOption(":model-check-mode", true);
     }
-    script.setLogic(Logics.ALL);
+    // TODO: We would like to use Logics.ALL here and let the solver decide which logics are needed.
+    // But ... SMTInterpol eagerly checks logics for model generation,
+    // so we limit the available theories here to a large set of logics,
+    // including Arrays, UFs, and non-linear arithmetics over Ints and Rationals.
+    script.setLogic(Logics.AUFNIRA);
 
     for (String option : furtherOptions) {
       try {
