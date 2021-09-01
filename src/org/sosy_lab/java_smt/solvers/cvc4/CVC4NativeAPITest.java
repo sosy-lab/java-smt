@@ -418,11 +418,7 @@ public class CVC4NativeAPITest {
     Result result = smtEngine.checkSat(assertion);
     assertThat(result.isSat()).isEqualTo(Sat.UNSAT);
     Exception e =
-        assertThrows(
-            edu.stanford.CVC4.Exception.class,
-            () -> {
-              smtEngine.getValue(assertion);
-            });
+        assertThrows(edu.stanford.CVC4.Exception.class, () -> smtEngine.getValue(assertion));
     assertThat(e.toString()).contains(INVALID_GETVALUE_STRING);
   }
 
@@ -431,12 +427,7 @@ public class CVC4NativeAPITest {
   public void checkInvalidModel() {
     Result result = smtEngine.checkSat(exprMgr.mkConst(false));
     assertThat(result.isSat()).isEqualTo(Sat.UNSAT);
-    Exception e =
-        assertThrows(
-            edu.stanford.CVC4.Exception.class,
-            () -> {
-              smtEngine.getModel();
-            });
+    Exception e = assertThrows(edu.stanford.CVC4.Exception.class, () -> smtEngine.getModel());
     assertThat(e.toString()).contains(INVALID_MODEL_STRING);
   }
 
@@ -448,11 +439,7 @@ public class CVC4NativeAPITest {
     Expr assertion = exprMgr.mkExpr(Kind.AND, bvVar, bvVar);
 
     Exception e =
-        assertThrows(
-            edu.stanford.CVC4.Exception.class,
-            () -> {
-              smtEngine.assertFormula(assertion);
-            });
+        assertThrows(edu.stanford.CVC4.Exception.class, () -> smtEngine.assertFormula(assertion));
     assertThat(e.toString()).contains("expecting a Boolean subexpression");
   }
 
@@ -464,11 +451,7 @@ public class CVC4NativeAPITest {
     Expr assertion = exprMgr.mkExpr(Kind.AND, bvVar, bvVar);
 
     Exception e =
-        assertThrows(
-            edu.stanford.CVC4.Exception.class,
-            () -> {
-              smtEngine.checkSat(assertion);
-            });
+        assertThrows(edu.stanford.CVC4.Exception.class, () -> smtEngine.checkSat(assertion));
     assertThat(e.toString()).contains("expecting a Boolean subexpression");
   }
 
@@ -478,11 +461,7 @@ public class CVC4NativeAPITest {
     Expr assertion = exprMgr.mkExpr(Kind.EQUAL, bvOne, bvOne);
 
     Exception e =
-        assertThrows(
-            edu.stanford.CVC4.Exception.class,
-            () -> {
-              smtEngine.assertFormula(assertion);
-            });
+        assertThrows(edu.stanford.CVC4.Exception.class, () -> smtEngine.assertFormula(assertion));
     assertThat(e.toString()).contains("constant of size 0");
   }
 
@@ -492,11 +471,7 @@ public class CVC4NativeAPITest {
     Expr assertion = exprMgr.mkExpr(Kind.EQUAL, bvOne, bvOne);
 
     Exception e =
-        assertThrows(
-            edu.stanford.CVC4.Exception.class,
-            () -> {
-              smtEngine.checkSat(assertion);
-            });
+        assertThrows(edu.stanford.CVC4.Exception.class, () -> smtEngine.checkSat(assertion));
     assertThat(e.toString()).contains("constant of size 0");
   }
 
@@ -716,11 +691,7 @@ public class CVC4NativeAPITest {
     Expr bodySubst = body.substitute(yBv, xBound);
     Expr assertion = exprMgr.mkExpr(Kind.EXISTS, quantifiedVars, bodySubst);
 
-    assertThrows(
-        RuntimeException.class,
-        () -> {
-          smtEngine.doQuantifierElimination(assertion, true);
-        });
+    assertThrows(RuntimeException.class, () -> smtEngine.doQuantifierElimination(assertion, true));
   }
 
   @Test

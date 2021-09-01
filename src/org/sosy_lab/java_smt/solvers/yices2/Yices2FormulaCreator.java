@@ -653,7 +653,9 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
           throw new IllegalArgumentException(
               String.format(
                   "Unknown function declaration with constructor %d and arguments %s (%s)",
-                  -pDeclaration, pArgs, Lists.transform(pArgs, a -> yices_term_to_string(a))));
+                  -pDeclaration,
+                  pArgs,
+                  Lists.transform(pArgs, Yices2NativeApi::yices_term_to_string)));
       }
     } else { // is UF Application
       if (pArgs.isEmpty()) {
@@ -677,7 +679,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
         "%s with %s expected arguments was called with unexpected arguments: %s",
         kind,
         expectedLength,
-        Collections2.transform(pArgs, a -> yices_term_to_string(a)));
+        Collections2.transform(pArgs, Yices2NativeApi::yices_term_to_string));
   }
 
   @Override
