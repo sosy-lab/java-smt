@@ -238,7 +238,7 @@ public class SolverOverviewTable {
   /** This class builds the table row-by-row. */
   public static class RowBuilder {
 
-    private List<String> lines = new ArrayList<>();
+    private final List<String> lines = new ArrayList<>();
     // Minimum number of lines so that you can be sure a solver was added
     private static final int MIN_NUM_OF_LINES = 4;
     private static final int SOLVER_COLUMN_WIDTH = 11;
