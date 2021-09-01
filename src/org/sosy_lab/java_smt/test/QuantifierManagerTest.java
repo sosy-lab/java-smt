@@ -80,14 +80,8 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
   @SuppressWarnings("checkstyle:membername")
   private BooleanFormula bv_forall_x_a_at_x_eq_0;
 
-  /*
-   * Boolector does not support Integers.
-   */
   @Before
   public void setUpLIA() {
-    if (solverUnderTest == Solvers.BOOLECTOR) {
-      return;
-    }
     requireIntegers();
     requireArrays();
     requireQuantifiers();
