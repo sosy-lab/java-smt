@@ -122,8 +122,8 @@ class PrincessEnvironment {
   private final ShutdownNotifier shutdownNotifier;
 
   /**
-   * The wrapped API is the first created API. It will never be used outside of this class and never
-   * be closed. If a variable is declared, it is declared in the first api, then copied into all
+   * The wrapped API is the first created API. It will never be used outside this class and never be
+   * closed. If a variable is declared, it is declared in the first api, then copied into all
    * registered APIs. Each API has its own stack for formulas.
    */
   private final SimpleAPI api;

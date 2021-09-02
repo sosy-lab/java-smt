@@ -121,7 +121,7 @@ public abstract class SolverBasedTest0 {
 
     fmgr = mgr.getUFManager();
     bmgr = mgr.getBooleanFormulaManager();
-    // Needed for Boolector tests (Doesnt support Integer Formulas)
+    // Needed for Boolector tests (Does not support Integer Formulas)
     try {
       imgr = mgr.getIntegerFormulaManager();
     } catch (UnsupportedOperationException e) {

@@ -194,7 +194,7 @@ public class OptimizationTest extends SolverBasedTest0 {
       int handle = prover.maximize(x);
       assertThat(prover.check()).isEqualTo(OptStatus.OPT);
 
-      // lets check how close we can get to value 1.
+      // let's check how close we can get to value 1.
       for (long i : new long[] {1, 10, 100, 1000, 10000, 100000000L, 1000000000000L}) {
         long largeI = i * 1000000L; // increase precision
         Rational epsilon = Rational.ofLongs(1, largeI);

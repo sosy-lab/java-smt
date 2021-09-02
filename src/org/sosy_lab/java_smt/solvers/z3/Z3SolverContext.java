@@ -118,7 +118,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
     ExtraOptions extraOptions = new ExtraOptions();
     config.inject(extraOptions);
 
-    // We need to load z3 in addition to z3java, because Z3's own class only loads the latter
+    // We need to load z3 in addition to z3java, because Z3's own class only loads the latter,
     // but it will fail to find the former if not loaded previously.
     // We load both libraries here to have all the loading in one place.
     loadLibrariesWithFallback(

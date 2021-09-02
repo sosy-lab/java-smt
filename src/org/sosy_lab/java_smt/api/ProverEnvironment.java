@@ -19,6 +19,6 @@ import org.sosy_lab.common.ShutdownNotifier;
  * <p>All solving methods are expected to throw {@link SolverException} if the solver fails to solve
  * the given query, and {@link InterruptedException} if a thread interrupt was requested or a
  * shutdown request via the {@link ShutdownNotifier}. It is not guaranteed, though, that solvers
- * respond in a timely manner (or at all) to shutdown or interrupt requests.
+ * respond in a timely manner (or at all) to shut down or interrupt requests.
  */
 public interface ProverEnvironment extends BasicProverEnvironment<Void> {}

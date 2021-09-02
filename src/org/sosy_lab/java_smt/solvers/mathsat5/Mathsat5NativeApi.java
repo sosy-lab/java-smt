@@ -137,8 +137,7 @@ class Mathsat5NativeApi {
     boolean shouldTerminate() throws InterruptedException;
   }
 
-  // wrappers for some of the native methods with a different number
-  // of arguments
+  // wrappers for some native methods with a different number of arguments
   public static int msat_all_sat(long e, long[] important, AllSatModelCallback func)
       throws InterruptedException {
 

@@ -72,7 +72,7 @@ public class SolverContextFactoryTest {
   }
 
   /**
-   * Lets allow to disable some checks on certain combinations of operating systems and solvers,
+   * Let's allow to disable some checks on certain combinations of operating systems and solvers,
    * because of missing support.
    *
    * <p>We update this list, whenever a new solver or operating system is added.

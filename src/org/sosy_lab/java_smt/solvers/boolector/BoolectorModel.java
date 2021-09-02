@@ -40,7 +40,7 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
   @Override
   public void close() {
     if (!closed) {
-      // Technically boolector has no model
+      // Technically boolector has no model,
       // but you could release all bindings.
       closed = true;
     }
@@ -51,7 +51,7 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
     Preconditions.checkState(!closed);
     Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
     // We wait till the Boolector devs give us methods to do this properly.
-    // See toList1 for help building this method! (delete toList1 later)
+    // See toList1 for help to build this method! (delete toList1 later)
     ImmutableList.Builder<ValueAssignment> assignments = ImmutableList.builder();
     return assignments.build();
   }

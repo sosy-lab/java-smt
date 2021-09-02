@@ -55,7 +55,7 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String, S
       throws SolverException, InterruptedException {
     Preconditions.checkState(!isClosed());
 
-    // SMTInterpol is not able to handle the trivial cases
+    // SMTInterpol is not able to handle the trivial cases,
     // so we need to check them explicitly
     if (pTermNamesOfA.isEmpty()) {
       return mgr.getBooleanFormulaManager().makeBoolean(true);

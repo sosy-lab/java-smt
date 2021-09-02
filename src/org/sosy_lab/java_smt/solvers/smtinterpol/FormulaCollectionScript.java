@@ -35,8 +35,8 @@ import java.util.Map;
 /**
  * This {@link Script} implementation allows to use the SMTLIB2 parser of SMTInterpol for parsing
  * single formulas. It is meant to be given to a {@link
- * de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.ParseEnvironment} and allows to declare
- * and define terms (by forwarding such calls to a real {@link Script} implementation, but does not
+ * de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.ParseEnvironment} and allows declaring
+ * and define terms (by forwarding such calls to a real {@link Script} implementation), but does not
  * allow any other actions. All formulas that are asserted (regardless of pop and push commands) are
  * collected and can be retrieved afterwards.
  *

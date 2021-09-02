@@ -273,8 +273,8 @@ public class SolverConcurrencyTest {
 
   /**
    * Uses HardBitvectorFormulaGenerator for longer test-cases to assess concurrency problems. Length
-   * is very solver depended, so make sure you choose a appropriate number for the used solver. Make
-   * sure to not call this method with a SolverContext that does not support bitvectors! (No
+   * is very solver depended, so make sure you choose an appropriate number for the used solver.
+   * Make sure to not call this method with a SolverContext that does not support bitvectors! (No
    * requireBitvector() because the exceptionList would collect it and throw an exception failing
    * the test!).
    *
@@ -298,8 +298,8 @@ public class SolverConcurrencyTest {
 
   /**
    * Uses HardIntegerFormulaGenerator for longer test-cases to assess concurrency problems. Length
-   * is very solver depended, so make sure you choose a appropriate number for the used solver. Make
-   * sure to not call this method with a SolverContext that does not support integers! (No
+   * is very solver depended, so make sure you choose an appropriate number for the used solver.
+   * Make sure to not call this method with a SolverContext that does not support integers! (No
    * requireIntegers() because the exceptionList would collect it and throw an exception failing the
    * test!).
    *

@@ -31,7 +31,7 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 /**
- * {@link Subject} subclass for testing assertions about BooleanFormulas with Truth (allows to use
+ * {@link Subject} subclass for testing assertions about BooleanFormulas with Truth (allows using
  * <code>assert_().about(...).that(formula).isUnsatisfiable()</code> etc.).
  *
  * <p>For a test use either {@link SolverBasedTest0#assertThatFormula(BooleanFormula)}, or use

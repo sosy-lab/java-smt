@@ -616,7 +616,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
         });
 
     assertThat(found).containsAtLeast("a", "b");
-    assertThat(found).hasSize(3); // all of the above plus the boolean "and" function
+    assertThat(found).hasSize(3); // all the above plus the boolean "and" function
     assertThat(found).doesNotContain(ab.toString());
   }
 
@@ -739,7 +739,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
 
   @Test
   public void extractionTest2() {
-    // the same than above, but with nullary UF.
+    // the same as above, but with nullary UF.
     IntegerFormula v = fmgr.declareAndCallUF("v", FormulaType.IntegerType);
     BooleanFormula q = fmgr.declareAndCallUF("q", FormulaType.BooleanType, v);
     Map<String, Formula> mapping = mgr.extractVariablesAndUFs(q);

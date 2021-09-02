@@ -88,7 +88,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
 
   /** Mapping of disallowed char to their escaped counterparts. */
   /* Keep this map in sync with {@link #DISALLOWED_CHARACTERS}.
-   * Counterparts can be any unique string. For optimization we could even use plain chars. */
+   * Counterparts can be any unique string. For optimization, we could even use plain chars. */
   @VisibleForTesting
   public static final ImmutableBiMap<Character, String> DISALLOWED_CHARACTER_REPLACEMENT =
       ImmutableBiMap.<Character, String>builder().put('|', "pipe").put('\\', "backslash").build();

@@ -449,8 +449,8 @@ public class SolverStackTest extends SolverBasedTest0 {
     newEnvironmentForTest();
   }
   /**
-   * This test checks that a SMT solver uses "global declarations": regardless of the stack at
-   * declaration time, declarations always live for the full life time of the solver (i.e., they do
+   * This test checks that an SMT solver uses "global declarations": regardless of the stack at
+   * declaration time, declarations always live for the full lifetime of the solver (i.e., they do
    * not get deleted on pop()). This is contrary to the SMTLib standard, but required by us, e.g.
    * for BMC with induction (where we create new formulas while there is something on the stack).
    */

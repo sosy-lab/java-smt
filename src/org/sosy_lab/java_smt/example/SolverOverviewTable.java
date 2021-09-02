@@ -204,7 +204,7 @@ public class SolverOverviewTable {
     private final String solverFeatures;
 
     /**
-     * Saves the information of an solver.
+     * Saves the information of a solver.
      *
      * @param solver Solvers enum object for a solver.
      * @param solverVersion Solver version String.

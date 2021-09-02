@@ -22,7 +22,7 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 /**
- * This class is an utility-class to avoid repeated implementation of a the AllSAT computation.
+ * This class is a utility-class to avoid repeated implementation of the AllSAT computation.
  *
  * <p>If a solver does not support direct AllSAT computation, please inherit from this class.
  */
@@ -100,7 +100,7 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
 
   /**
    * This method computes all satisfiable assignments for the given predicates by (recursively)
-   * traversing the decision tree over the given variables. The ordering of variables is fixed and
+   * traversing the decision tree over the given variables. The ordering of variables is fixed, and
    * we can only ignore unsatisfiable subtrees.
    *
    * <p>In contrast to {@link #iterateOverAllModels} we do not use model generation here, which is a

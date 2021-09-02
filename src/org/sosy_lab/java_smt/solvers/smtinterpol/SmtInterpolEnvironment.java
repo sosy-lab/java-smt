@@ -66,7 +66,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 @Options(prefix = "solver.smtinterpol")
 public class SmtInterpolEnvironment {
 
-  /** SMTInterpol does not allow to use key-functions as identifiers. */
+  /** SMTInterpol does not allow using key-functions as identifiers. */
   private static final ImmutableSet<String> UNSUPPORTED_IDENTIFIERS =
       ImmutableSet.of("true", "false", "select", "store", "or", "and", "xor", "distinct");
 

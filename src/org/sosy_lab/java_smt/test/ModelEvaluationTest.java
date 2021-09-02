@@ -59,7 +59,7 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
       try (Model m = prover.getModel()) {
         assertThat(m.evaluate(formula)).isIn(possibleExpectedValues);
 
-        // lets try to check evaluations. Actually the whole method is based on some default values
+        // let's try to check evaluations. Actually the whole method is based on some default values
         // in the solvers, because we do not use constraints for the evaluated formulas.
         Formula eval = m.eval(formula);
         if (eval != null && solver == Solvers.SMTINTERPOL) {
