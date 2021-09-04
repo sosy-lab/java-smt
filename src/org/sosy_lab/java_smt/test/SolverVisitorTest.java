@@ -503,6 +503,24 @@ public class SolverVisitorTest extends SolverBasedTest0 {
   }
 
   @Test
+  public void testIntegerFormulaQuantifierSymbolsExtraction() throws Exception {
+    requireQuantifiers();
+    requireIntegers();
+
+    IntegerFormula x = imgr.makeVariable("x");
+    IntegerFormula y = imgr.makeVariable("y");
+    BooleanFormula xEqy = imgr.equal(x, y);
+    // (x=y) && EX x: (X=y)
+    BooleanFormula constraint = bmgr.and(xEqy, qmgr.forall(ImmutableList.of(x), xEqy));
+
+    // The variable extraction should visit "x" and "y" only once,
+    // otherwise AbstractFormulaManager#extractVariables might throw an exception,
+    // when building an ImmutableMap.
+    assertThat(mgr.extractVariables(constraint)).containsEntry(x.toString(), x);
+    assertThat(mgr.extractVariables(constraint)).containsEntry(y.toString(), y);
+  }
+
+  @Test
   public void testIntegerFormulaQuantifierHandlingTrivialUNSAT() throws Exception {
     requireQuantifiers();
     requireIntegers();
