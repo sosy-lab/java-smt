@@ -492,17 +492,18 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
         !variableName.isEmpty(), "Identifier for variable should not be empty.");
     Preconditions.checkArgument(
         !BASIC_OPERATORS.contains(variableName),
-        "Identifier '%s' should not be a simple operator. %s",
+        "Identifier '%s' can not be used, because it is a simple operator. %s",
         variableName,
         help);
     Preconditions.checkArgument(
         !SMTLIB2_KEYWORDS.contains(variableName),
-        "Identifier '%s' should not be a keyword of SMT-LIB2. %s",
+        "Identifier '%s' can not be used, because it is a keyword of SMT-LIB2. %s",
         variableName,
         help);
     Preconditions.checkArgument(
         DISALLOWED_CHARACTERS.matchesNoneOf(variableName),
-        "Identifier '%s' should contain an escape character %s of SMT-LIB2. %s",
+        "Identifier '%s' can not be used, "
+            + "because it should not contain an escape character %s of SMT-LIB2. %s",
         variableName,
         DISALLOWED_CHARACTER_REPLACEMENT
             .keySet(), // toString prints UTF8-encoded escape sequence, better than nothing.
