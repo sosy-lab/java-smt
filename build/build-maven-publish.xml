@@ -71,16 +71,18 @@ SPDX-License-Identifier: Apache-2.0
          (push into the staging area, from there manual publication is required afterwards) -->
     <macrodef name="stage-solver-file">
       <attribute name="filename"/>
+      <attribute name="classifier" default="@{filename}"/>
       <attribute name="fileending"/>
       <attribute name="filedirectory" default="lib/java/runtime-${stage.solver}"/>
+      <attribute name="pomFile" default="solvers_maven_conf/maven_${stage.solver}_pom.xml"/>
       <sequential>
         <artifact:mvn>
           <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
           <arg value="-Durl=${ossrh-staging-repository-url}" />
           <arg value="-DrepositoryId=${ossrh-server-id}" />
-          <arg value="-DpomFile=solvers_maven_conf/maven_${stage.solver}_pom.xml" />
+          <arg value="-DpomFile=@{pomFile}" />
           <arg value="-Dfile=@{filedirectory}/@{filename}.@{fileending}" />
-          <arg value="-Dclassifier=@{filename}" />
+          <arg value="-Dclassifier=@{classifier}" />
           <arg value="-Dpackaging=@{fileending}" />
           <arg value="-Dversion=${stage.revision}" />
           <arg value="-DgeneratePom=false" />
@@ -141,5 +143,34 @@ SPDX-License-Identifier: Apache-2.0
         <stage-solver-file filename="libcvc4" fileending="so"/>
         <stage-solver-file filename="libcvc4jni" fileending="so"/>
         <stage-solver-file filename="libcvc4parser" fileending="so"/>
+    </target>
+
+    <!--
+    Yices2 consists of two parts:
+     - we release our JavaSMT-based bindings for Yices2.
+     - we release our Yices2 itself.
+    We do currently not track any dependency within Maven, but rely on the developer to provide them,
+    i.e., by including both packages in a proper JavaSMT deployment.
+    -->
+    <target name="stage-javasmt-yices2" depends="build-dependencies, install-contrib"
+            description="deploy current version of Yices2 to Maven staging repository">
+        <!-- get revision from dependencies -->
+        <ivy:artifactproperty name="[artifact].revision" value="[revision]"/>
+        <property name="stage.solver" value="yices2"/> <!-- <==unused -->
+        <property name="stage.revision" value="${javasmt-yices2.revision}"/>
+        <!-- then publish the files -->
+        <stage-solver-file filename="javasmt-yices2" fileending="jar" classifier="sources"
+            pomFile="solvers_maven_conf/maven_javasmt_yices2_pom.xml"/>
+        <stage-solver-file filename="javasmt-yices2-sources" fileending="jar" classifier="sources"
+            pomFile="solvers_maven_conf/maven_javasmt_yices2_pom.xml" filedirectory="lib/java-contrib"/>
+    </target>
+    <target name="stage-yices2" depends="build-dependencies"
+            description="deploy current version of Yices2 to Maven staging repository">
+        <!-- get revision from dependencies -->
+        <ivy:artifactproperty name="[artifact].revision" value="[revision]"/>
+        <property name="stage.solver" value="yices2"/>
+        <property name="stage.revision" value="${libyices2j.revision}"/>
+        <!-- then publish the file -->
+        <stage-solver-file filename="libyices2j" fileending="so"/>
     </target>
 </project>
