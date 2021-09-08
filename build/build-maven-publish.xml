@@ -49,39 +49,35 @@ SPDX-License-Identifier: Apache-2.0
 
     <!-- before this, update project version (both build.xml and pom.xml) from SNAPSHOT to RELEASE -->
     <target name="stage" depends="dist, gen-pom, jar, sources" description="deploy release version to Maven staging repository">
-
-        <!-- Sign and deploy the main artifact. -->
-        <artifact:mvn>
-            <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
-            <arg value="-Durl=${ossrh-staging-repository-url}" />
-            <arg value="-DrepositoryId=${ossrh-server-id}" />
-            <arg value="-DpomFile=pom.xml" />
-            <arg value="-Dfile=${jar.file}" />
-            <arg value="-Pgpg" />
-        </artifact:mvn>
-
-        <!-- Sign and deploy the sources artifact -->
-        <artifact:mvn>
-            <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
-            <arg value="-Durl=${ossrh-staging-repository-url}" />
-            <arg value="-DrepositoryId=${ossrh-server-id}" />
-            <arg value="-DpomFile=pom.xml" />
-            <arg value="-Dfile=${ivy.module}-${version}-sources.jar" />
-            <arg value="-Dclassifier=sources" />
-            <arg value="-Pgpg" />
-        </artifact:mvn>
-
-        <!-- sign and deploy the javadoc artifact -->
-        <artifact:mvn>
-            <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
-            <arg value="-Durl=${ossrh-staging-repository-url}" />
-            <arg value="-DrepositoryId=${ossrh-server-id}" />
-            <arg value="-DpomFile=pom.xml" />
-            <arg value="-Dfile=${ivy.module}-${version}-javadoc.jar" />
-            <arg value="-Dclassifier=javadoc" />
-            <arg value="-Pgpg" />
-        </artifact:mvn>
+		<fail message="unexpected filename of jar">
+			<condition> <!-- see property in build-jar.xml -->
+                <not><equals arg1="${jar.file}" arg2="${ivy.module}-${version}.jar"/></not>
+            </condition>
+        </fail>
+        <stage-javasmt-file filename="${ivy.module}-${version}" fileending="jar"/>
+        <stage-javasmt-file filename="${ivy.module}-${version}-sources" fileending="jar" classifier="sources"/>
+        <stage-javasmt-file filename="${ivy.module}-${version}-javadoc" fileending="jar" classifier="javadoc"/>
     </target>
+
+    <!-- macro for pushing a JavaSMT file into a Maven repository
+         (push into the staging area, from there manual publication is required afterwards) -->
+    <macrodef name="stage-javasmt-file">
+      <attribute name="filename"/>
+      <attribute name="fileending"/>
+      <attribute name="filedirectory" default="."/>
+      <attribute name="classifier" default=""/>
+      <sequential>
+        <artifact:mvn>
+          <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
+          <arg value="-Durl=${ossrh-staging-repository-url}" />
+          <arg value="-DrepositoryId=${ossrh-server-id}" />
+          <arg value="-DpomFile=pom.xml" />
+          <arg value="-Dfile=@{filedirectory}/@{filename}.@{fileending}" />
+          <arg value="-Dclassifier=@{classifier}" />
+          <arg value="-Pgpg" />
+        </artifact:mvn>
+      </sequential>
+    </macrodef>
 
     <!-- macro for pushing solvers into a Maven repository
          (push into the staging area, from there manual publication is required afterwards) -->
