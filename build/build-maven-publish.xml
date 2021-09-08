@@ -35,19 +35,7 @@ SPDX-License-Identifier: Apache-2.0
         </replace>
     </target>
 
-    <target name="deploy-to-maven-central" depends="dist, gen-pom, jar"
-        description="deploy snapshot version to Maven snapshot repository">
-
-        <artifact:mvn>
-            <arg value="org.apache.maven.plugins:maven-deploy-plugin:2.6:deploy-file" />
-            <arg value="-Durl=${ossrh-snapshots-repository-url}" />
-            <arg value="-DrepositoryId=${ossrh-server-id}" />
-            <arg value="-DpomFile=pom.xml" />
-            <arg value="-Dfile=${jar.file}" />
-        </artifact:mvn>
-    </target>
-
-    <!-- before this, update project version (both build.xml and pom.xml) from SNAPSHOT to RELEASE -->
+    <!-- before this, please check that the project version is set correctly! -->
     <target name="stage" depends="dist, gen-pom, jar, sources" description="deploy release version to Maven staging repository">
 		<fail message="unexpected filename of jar">
 			<condition> <!-- see property in build-jar.xml -->
