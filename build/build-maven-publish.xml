@@ -159,7 +159,7 @@ SPDX-License-Identifier: Apache-2.0
         <property name="stage.solver" value="yices2"/> <!-- <==unused -->
         <property name="stage.revision" value="${javasmt-yices2.revision}"/>
         <!-- then publish the files -->
-        <stage-solver-file filename="javasmt-yices2" fileending="jar" classifier="sources"
+        <stage-solver-file filename="javasmt-yices2" fileending="jar" classifier=""
             pomFile="solvers_maven_conf/maven_javasmt_yices2_pom.xml"/>
         <stage-solver-file filename="javasmt-yices2-sources" fileending="jar" classifier="sources"
             pomFile="solvers_maven_conf/maven_javasmt_yices2_pom.xml" filedirectory="lib/java-contrib"/>
