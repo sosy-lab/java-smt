@@ -3,12 +3,17 @@ This file is part of JavaSMT,
 an API wrapper for a collection of SMT solvers:
 https://github.com/sosy-lab/java-smt
 
-SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+SPDX-FileCopyrightText: 2021 Dirk Beyer <https://www.sosy-lab.org>
 
 SPDX-License-Identifier: Apache-2.0
 -->
 
 # JavaSMT Developers Documentation
+
+This file contains hints and documentation for developers,
+i.e., for developing JavaSMT, adding code, integrating or updating SMT solvers,
+and releasing JavaSMT into a public repository.
+
 
 ## Style Guide
 
@@ -23,270 +28,39 @@ Additionally, refer to the CPAchecker
 [style guide](https://github.com/sosy-lab/cpachecker/blob/trunk/doc/StyleGuide.txt)
 for more information.
 
+
 ## Continuous Integration
 
-We rely on [GitLab-CI][] for continuous integration, which picks up code style violations,
+We rely on [GitLab-CI](https://gitlab.com/sosy-lab/software/java-smt/pipelines)
+for continuous integration, which picks up code style violations,
 compile warnings for both ECJ and javac (for several versions of Java),
 [SpotBugs](https://github.com/spotbugs/spotbugs) errors,...
 
+
 ## Releasing JavaSMT
 
-Currently, releases are pushed to two software repositories:
-[Ivy Repository][] and
-[Maven Central](http://search.maven.org/).
+Currently, releases are pushed to two software repositories,
+and there is seperate documentation for uploading packages into those repositories:
+- [Ivy Repository](http://www.sosy-lab.org/ivy/org.sosy_lab/):
+  see [Developers-How-to-Release-into-Ivy](Developers-How-to-Release-into-Ivy.md)
+- [Maven Central](http://search.maven.org/):
+  see [Developers-How-to-Release-into-Maven.md](Developers-How-to-Release-into-Maven.md).
+
 The release version number is derived from the `git describe` command,
 which output is either a git tag (if the release version corresponds exactly
 to the tagged commit), or a latest git tag together with a distance measured
 in number of commits and a git hash corresponding to the current revision.
 
+
 ### Creating new release numbers
 
-New JavaSMT version is defined by creating a new git tag with a version number.
+A new JavaSMT version is defined by creating a new git tag with a version number.
 Git tags should be signed (`git tag -s` command).
 When creating a new version number, populate the `CHANGELOG.md` file with the
 changes which are exposed by the new release.
 
-[Semantic versioning][] guidelines should be followed when defining a new
+[Semantic versioning](http://semver.org/) guidelines should be followed when defining a new
 version.
-
-### Release to Ivy
-
-If you have write permission to the [Ivy Repository][] you can perform the
-release as follows:
-
- - Symlink the `repository` folder in the JavaSMT to the root of the SVN
-    checkout of the Ivy repository.
- - Run the `publish` ANT task.
- - Manually perform the commit in SVN.
-
-### Release to Maven Central
-
-Release to Maven Central is currently not fully automated due to the bug in the
-ANT script provided by Maven Central documentation.
-For publishing to Maven Central, we use the [Nexus Repository Manager](https://oss.sonatype.org/).
-
-#### Requirements
-
-Please make sure that all necessary libraries are already released on Maven Central,
-before (or at least while) publishing a new version of JavaSMT.
-Maven does not check for existing dependencies automatically.
-
-Please make sure that you have a valid user account and configured your local settings accordingly.
-For example, insert the following content into `~/.m2/settings.xml`:
-```xml
-<settings>
-  <servers>
-    <server>
-      <id>ossrh</id>
-      <username>USER</username>
-      <password>PASSWORD</password>
-    </server>
-  </servers>
-  <profiles>
-    <profile>
-      <id>gpg</id>
-      <properties>
-        <gpg.executable>gpg</gpg.executable>
-        <!-- optional <gpg.passphrase>PASSPHRASE</gpg.passphrase> -->
-      </properties>
-    </profile>
-  </profiles>
-  <mirrors>
-    <mirror>
-      <id>centralhttps</id>
-      <mirrorOf>central</mirrorOf>
-      <name>Maven central https</name>
-      <url>https://repo1.maven.org/maven2/</url>
-    </mirror>
-  </mirrors>
-</settings>
-```
-
-If default system settings are not configured for HTTPS,
-we get an 501 error when downloading further maven dependencies.
-Thus, we add a mirror for HTTPS.
-
-You might need to store `maven-ant-tasks-2.1.3.jar` (or newer version) under `~/.ant/lib/`
-to avoid a failure when creating the task `antlib:org.apache.maven.artifact.ant:mvn`.
-
-#### Publishing
-
-The following steps are required:
-
- - Run the `stage` ANT target.
-   (There is currently no need to change any label from `SNAPSHOT` to `RELEASE` or vice versa,
-   as written somewhere in the documentation, because we only produce `RELEASE` versions.)
- - Login to [Nexus Repository Manager](https://oss.sonatype.org/)
-   and open the [list of staging repositories](https://oss.sonatype.org/#stagingRepositories).
- - Run `close` and `release` tasks on your pushed bundle
-   (see [documentation](http://central.sonatype.org/pages/releasing-the-deployment.html) for details).
- - After some delay (a few hours or days) the release is automatically synced to Maven Central.
-
-Additional instructions are available at the official [OSSRH][] page.
-
-## Releasing Solvers
-
-Before actually releasing a new version of a solver into the public world,
-make sure, it is tested sufficiently.
-This is one of the most critical steps in JavaSMT development.
-
-
-### Publishing Z3
-
-We prefer to use the official Z3 binaries,
-please build from source only if necessary (e.g., in case of an important bugfix).
-
-To publish Z3, download the **Ubuntu 16.04**, **Windows**, and **OSX** binary
-and the sources (for JavaDoc) for the [latest release](https://github.com/Z3Prover/z3/releases) and unzip them.
-In the unpacked sources directory, prepare Java sources via `python scripts/mk_make.py --java`.
-For simpler handling, we then copy the files from the three `bin` directories together into one directory,
-and include the sources (we can keep the internal structure of each directory, just copy them above each other).
-Then execute the following command in the JavaSMT directory,
-where `$Z3_DIR` is the absolute path of the unpacked Z3 directory
-and `$Z3_VERSION` is the version number:
-```
-ant publish-z3 -Dz3.path=$Z3_DIR/bin -Dz3.version=$Z3_VERSION
-```
-Finally follow the instructions shown in the message at the end.
-
-To publish Z3 from source, [download it](https://github.com/Z3Prover/z3) and build
-it with the following command in its directory on a 64bit Ubuntu 16.04 system:
-```
-./configure --staticlib --java --git-describe && cd build && make -j 2
-```
-(Note that additional binaries for other operating systems need to be provided, too.
-This step is currently not fully tested from our side.)
-Then execute the following command in the JavaSMT directory, where `$Z3_DIR` is the absolute path of the Z3 directory:
-```
-ant publish-z3 -Dz3.path=$Z3_DIR/build
-```
-Finally follow the instructions shown in the message at the end.
-
-
-### Publishing CVC4
-
-We prefer to use our own CVC4 binaries and Java bindings.
-
-To publish CVC4, checkout the [CVC4 repository](https://github.com/kfriedberger/CVC4).
-Then execute the following command in the JavaSMT directory,
-where `$CVC4_DIR` is the path to the CVC4 directory
-and `$CVC4_VERSION` is the version number:
-```
-ant publish-cvc4 -Dcvc4.path=$CVC4_DIR -Dcvc4.customRev=$CVC4_VERSION
-```
-Example:
-```
-ant publish-cvc4 -Dcvc4.path=../CVC4 -Dcvc4.customRev=1.8-prerelease-2019-10-05
-```
-Finally follow the instructions shown in the message at the end.
-
-
-### Publishing Boolector
-
-We prefer to use our own Boolector binaries and Java bindings.
-Boolector's dependencies, mainly Minisat, requires GCC version 7 and does not yet compile with newer compilers.
-We prefer to directly build diretly on Ubuntu 18.04, where gcc-7 is the default compiler.
-It should also be possible to set environment varables like CC=gcc-7 on newer systems.
-
-To publish Boolector, checkout the [Boolector repository](https://github.com/Boolector/boolector).
-Then execute the following command in the JavaSMT directory,
-where `$BTOR_DIR` is the path to the Boolector directory
-and `$BTOR_VERSION` is the version number:
-```
-CC=gcc-7 ant publish-boolector -Dboolector.path=$BTOR_DIR -Dboolector.customRev=$BTOR_VERSION
-```
-Example:
-```
-ant publish-boolector -Dboolector.path=../boolector -Dboolector.customRev=3.0.0-2019-11-29
-```
-Finally follow the instructions shown in the message at the end.
-
-
-### Publishing (Opti)-MathSAT5
-
-We publish MathSAT for both Linux and Windows systems at once.
-The build process can fully be done on a Linux system.
-
-For publishing MathSAT5, you need to use a Linux machine with at least GCC 7.5.0 and x86_64-w64-mingw32-gcc 7.3.
-First, [download the (reentrant!) Linux and Windows64 binary release](http://mathsat.fbk.eu/download.html) in the same version, unpack them,
-then provide the necessary dependencies (GMP for Linux and MPIR/JDK for Windows) as described in the compilation scripts.
-(see `lib/native/source/libmathsat5j/`), and then execute the following command in the JavaSMT directory,
-where `$MATHSAT_PATH_LINUX` and `$MATHSAT_PATH_WINDOWS` are the paths to the MathSAT root directory,
-and `$MATHSAT_VERSION` is the version number of MathSAT (all-in-one, runtime: less than 5s):
-```
-  ant publish-mathsat \
-      -Dmathsat.path=$MATHSAT_PATH_LINUX \
-      -Dgmp.path=$GMP_PATH \
-      -Dmathsat-windows.path=$MATHSAT_PATH_WINDOWS \
-      -Dmpir-windows.path=$MPIR_PATH \
-      -Djdk-windows.path=$JDK_11_PATH \
-      -Dmathsat.version=$MATHSAT_VERSION
-```
-Concrete example (`$WD` is a working directory where all dependencies are located):
-```
-  ant publish-mathsat \
-      -Dmathsat.path=$WD/mathsat-5.6.4-linux-x86_64-reentrant \
-      -Dgmp.path=$WD/gmp-6.1.2 \
-      -Dmathsat-windows.path=$WD/mathsat-5.6.4-win64-msvc \
-      -Dmpir-windows.path=$WD/mpir-2.7.2-win \
-      -Djdk-windows.path=$WD/jdk-11 \
-      -Dmathsat.version=5.6.4-debug
-```
-Finally follow the instructions shown in the message at the end.
-
-A similar procedure applies to [OptiMathSAT](http://optimathsat.disi.unitn.it/) solver,
-except that Windows is not yet supported and the publishing command is simpler:
-```
-ant publish-optimathsat -Dmathsat.path=$OPTIMATHSAT_PATH -Dgmp.path=$GMP_PATH -Dmathsat.version=$OPTIMATHSAT_VERSION
-```
-
-### Publishing Princess and SMTInterpol
-
-The scripts for publishing Princess and SMTInterpol are available
-at the root of the [Ivy Repository](https://svn.sosy-lab.org/software/ivy).
-
-
-### Publishing Yices2
-
-Yices2 consists of two components: the solver binary and the Java components in JavaSMT.
-The Java components were splitt from the rest of JavaSMT because of the GPL.
-
-#### Publishing the solver binary for Yices2
-
-Prepare gperf and gmp (required for our own static binary):
-```
-wget http://ftp.gnu.org/pub/gnu/gperf/gperf-3.1.tar.gz && tar -zxvf gperf-3.1.tar.gz && cd gperf-3.1 && ./configure --enable-cxx --with-pic --disable-shared --enable-fat && make
-wget https://gmplib.org/download/gmp/gmp-6.2.0.tar.xz && tar -xvf gmp-6.2.0.tar.xz && cd gmp-6.2.0 && ./configure --enable-cxx --with-pic --disable-shared --enable-fat && make
-```
-
-Download and build Yices2 from source:
-```
-git clone git@github.com:SRI-CSL/yices2.git && cd yices2 && autoconf && ./configure --with-pic-gmp=../gmp-6.2.0/.libs/libgmp.a && make
-```
-
-Get the version of Yices2:
-```
-git describe --tags
-```
-
-Publish the solver binary from within JavaSMT (adjust all paths to your system!):
-```
-ant publish-yices2 -Dyices2.path=../solver/yices2 -Dgmp.path=../solver/gmp-6.2.0 -Dgperf.path=../solver/gperf-3.1 -Dyices2.version=2.6.2-89-g0f77dc4b
-```
-
-Afterwards you need to update the version number in `solvers_ivy_conf/ivy_javasmt_yices2.xml` and publish new Java components for Yices2.
-
-#### Publish the Java components for Yices2
-
-Info: There is a small cyclic dependency: JavaSMT itself depends on the Java components of Yices2.
-
-As long as no API was changed and compilation suceeds, simply execute `ant publish-artifacts-yices2`.
-
-If the API was changed, we need to break the dependency cycle for the publication and revert this later:
-edit `lib/ivy.xml` and replace the dependency towards `javasmt-yices2` with the dependency towards `javasmt-solver-yices2`
-(the line can be copied from `solvers_ivy_conf/ivy_javasmt_yices2.xml`).
-Then run `ant publish-artifact-yices2`.
-We still need to figure out how to avoid the warning about a dirty repository in that case, e.g. by a temporary commit.
 
 
 ## Writing Solver Backends
@@ -304,8 +78,3 @@ to include the new solver.
 The new solver can be added from outside of JavaSMT as well: in that case,
 the user might wish to have their own factory which can create
 a suitable `SolverContext`.
-
-[GitLab-CI]: https://gitlab.com/sosy-lab/software/java-smt/pipelines
-[Ivy Repository]: http://www.sosy-lab.org/ivy/org.sosy_lab/
-[OSSRH]: http://central.sonatype.org/pages/ossrh-guide.html
-[Semantic Versioning]: http://semver.org/
