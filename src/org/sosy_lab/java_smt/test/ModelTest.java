@@ -1863,11 +1863,6 @@ public class ModelTest extends SolverBasedTest0 {
     requireArrays();
     requireBitvectors();
 
-    assume()
-        .withMessage("Solver %s sadly fails on this test.", solverToUse())
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.PRINCESS);
-
     BooleanFormula formula =
         context
             .getFormulaManager()
