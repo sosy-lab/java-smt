@@ -219,8 +219,7 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
   @Override
   public BooleanFormula translateFrom(BooleanFormula other, FormulaManager otherManager) {
     if (otherManager instanceof Z3FormulaManager) {
-      Z3FormulaManager o = (Z3FormulaManager) otherManager;
-      long otherZ3Context = o.getEnvironment();
+      long otherZ3Context = ((Z3FormulaManager) otherManager).getEnvironment();
       if (otherZ3Context == getEnvironment()) {
 
         // Same context.

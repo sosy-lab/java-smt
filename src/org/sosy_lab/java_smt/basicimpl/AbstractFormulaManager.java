@@ -372,11 +372,11 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   }
 
   @Override
-  public BooleanFormula translateFrom(BooleanFormula formula, FormulaManager otherContext) {
-    if (this == otherContext) {
+  public BooleanFormula translateFrom(BooleanFormula formula, FormulaManager otherManager) {
+    if (this == otherManager) {
       return formula; // shortcut
     }
-    return parse(otherContext.dumpFormula(formula).toString());
+    return parse(otherManager.dumpFormula(formula).toString());
   }
 
   @Override
