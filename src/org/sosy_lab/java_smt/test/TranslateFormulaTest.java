@@ -89,10 +89,17 @@ public class TranslateFormulaTest {
     }
   }
 
-  private void requireParser() {
+  private void requireParserTo() {
     assume()
         .withMessage("Solver %s does not support parsing formulae", translateTo)
         .that(translateTo)
+        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2);
+  }
+
+  private void requireParserFrom() {
+    assume()
+        .withMessage("Solver %s does not support parsing formulae", translateFrom)
+        .that(translateFrom)
         .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2);
   }
 
@@ -105,7 +112,7 @@ public class TranslateFormulaTest {
 
   @Test
   public void testDumpingAndParsing() throws SolverException, InterruptedException {
-    requireParser();
+    requireParserTo();
 
     BooleanFormula input = createTestFormula(managerFrom);
     String out = managerFrom.dumpFormula(input).toString();
@@ -116,12 +123,37 @@ public class TranslateFormulaTest {
 
   @Test
   public void testTranslating() throws SolverException, InterruptedException {
-    requireParser();
+    requireParserTo();
 
-    BooleanFormula input = createTestFormula(managerFrom);
-    BooleanFormula parsed = managerTo.translateFrom(input, managerFrom);
+    BooleanFormula inputFrom = createTestFormula(managerFrom);
+    BooleanFormula inputTo = createTestFormula(managerTo);
+    BooleanFormula translatedInput = managerTo.translateFrom(inputFrom, managerFrom);
 
-    assertUsing(to).that(createTestFormula(managerTo)).isEquivalentTo(parsed);
+    assertUsing(to).that(inputTo).isEquivalentTo(translatedInput);
+  }
+
+  @Test
+  public void testTranslatingSelf() throws SolverException, InterruptedException {
+    assume().that(translateTo).isEqualTo(translateFrom);
+    FormulaManager manager = managerFrom;
+
+    BooleanFormula inputFrom = createTestFormula(manager);
+    BooleanFormula inputTo = createTestFormula(manager);
+    BooleanFormula translatedInput = manager.translateFrom(inputFrom, manager);
+
+    assertUsing(to).that(inputTo).isEquivalentTo(translatedInput);
+  }
+
+  @Test
+  public void testTranslatingAndReverse() throws SolverException, InterruptedException {
+    requireParserTo();
+    requireParserFrom();
+
+    BooleanFormula inputFrom = createTestFormula(managerFrom);
+    BooleanFormula translatedInput = managerTo.translateFrom(inputFrom, managerFrom);
+    BooleanFormula translatedReverseInput = managerFrom.translateFrom(translatedInput, managerTo);
+
+    assertUsing(from).that(inputFrom).isEquivalentTo(translatedReverseInput);
   }
 
   private BooleanFormula createTestFormula(FormulaManager mgr) {
