@@ -10,14 +10,13 @@ package org.sosy_lab.java_smt.solvers.mathsat5;
 
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_apply_substitution;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_from_smtlib2;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_copy_from;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_simplify;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_to_smtlib2;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_copy_from;;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Collections2;
 import com.google.common.primitives.Longs;
-import com.microsoft.z3.Native;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
