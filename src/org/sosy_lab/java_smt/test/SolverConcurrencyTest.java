@@ -184,6 +184,81 @@ public class SolverConcurrencyTest {
         });
   }
 
+  /**
+   * Test translation of formulas used on distinct contexts to a new, unrelated context. Every
+   * thread creates a context, generates a formula, those are collected and handed back to the main
+   * thread where they are translated to the main-thread context, anded and asserted.
+   */
+  @Test
+  public void testFormulaTranslationWithConcurrentContexts()
+      throws InvalidConfigurationException, InterruptedException, SolverException {
+    requireIntegers();
+    // CVC4 does not support parsing and therefore no translation.
+    // Princess has a wierd bug
+    // TODO: Look into the Princess problem
+    assume()
+        .withMessage("Solver does not support translation of formulas")
+        .that(solver)
+        .isNoneOf(Solvers.CVC4, Solvers.PRINCESS);
+    /** Helperclass to pack a SolverContext together with a Formula */
+    class ContextAndFormula {
+      private final SolverContext context;
+      private final BooleanFormula formula;
+
+      protected ContextAndFormula(SolverContext context, BooleanFormula formula) {
+        this.context = context;
+        this.formula = formula;
+      }
+
+      public SolverContext getContext() {
+        return context;
+      }
+
+      public BooleanFormula getFormula() {
+        return formula;
+      }
+    }
+    ConcurrentLinkedQueue<ContextAndFormula> contextAndFormulaList = new ConcurrentLinkedQueue<>();
+
+    assertConcurrency(
+        "testFormulaTranslationWithConcurrentContexts",
+        () -> {
+          SolverContext context = initSolver();
+          FormulaManager mgr = context.getFormulaManager();
+          IntegerFormulaManager imgr = mgr.getIntegerFormulaManager();
+          BooleanFormulaManager bmgr = mgr.getBooleanFormulaManager();
+          HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
+          BooleanFormula threadFormula = gen.generate(INTEGER_FORMULA_GEN.getOrDefault(solver, 9));
+          // We need to know the context from which the formula was created
+          contextAndFormulaList.add(new ContextAndFormula(context, threadFormula));
+        });
+
+    assertThat(contextAndFormulaList).hasSize(NUMBER_OF_THREADS);
+    SolverContext context = initSolver();
+    FormulaManager mgr = context.getFormulaManager();
+    BooleanFormulaManager bmgr = mgr.getBooleanFormulaManager();
+    ArrayList<BooleanFormula> translatedFormulas = new ArrayList<>();
+
+    for (ContextAndFormula currentContAndForm : contextAndFormulaList) {
+      SolverContext threadedContext = currentContAndForm.getContext();
+      BooleanFormula threadedFormula = currentContAndForm.getFormula();
+      BooleanFormula translatedFormula =
+          mgr.translateFrom(threadedFormula, threadedContext.getFormulaManager());
+      translatedFormulas.add(translatedFormula);
+      threadedContext.close();
+    }
+    assertThat(translatedFormulas).hasSize(NUMBER_OF_THREADS);
+    BooleanFormula finalFormula = bmgr.and(translatedFormulas);
+    try (BasicProverEnvironment<?> stack = context.newProverEnvironment()) {
+      stack.push(finalFormula);
+
+      assertWithMessage(
+              "Test testFormulaTranslationWithConcurrentContexts() failed isUnsat() in the main thread.")
+          .that(stack.isUnsat())
+          .isTrue();
+    }
+  }
+
   /** Test concurrency with already present and unique context per thread. */
   @SuppressWarnings("resource")
   @Test
