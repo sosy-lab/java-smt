@@ -237,7 +237,7 @@ public class SolverConcurrencyTest {
     SolverContext context = initSolver();
     FormulaManager mgr = context.getFormulaManager();
     BooleanFormulaManager bmgr = mgr.getBooleanFormulaManager();
-    ArrayList<BooleanFormula> translatedFormulas = new ArrayList<>();
+    List<BooleanFormula> translatedFormulas = new ArrayList<>();
 
     for (ContextAndFormula currentContAndForm : contextAndFormulaList) {
       SolverContext threadedContext = currentContAndForm.getContext();
@@ -253,7 +253,8 @@ public class SolverConcurrencyTest {
       stack.push(finalFormula);
 
       assertWithMessage(
-              "Test testFormulaTranslationWithConcurrentContexts() failed isUnsat() in the main thread.")
+              "Test testFormulaTranslationWithConcurrentContexts() failed isUnsat() in the main"
+                  + " thread.")
           .that(stack.isUnsat())
           .isTrue();
     }
