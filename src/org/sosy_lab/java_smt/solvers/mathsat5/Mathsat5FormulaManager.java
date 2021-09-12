@@ -12,10 +12,12 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_appl
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_from_smtlib2;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_simplify;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_to_smtlib2;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_copy_from;;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Collections2;
 import com.google.common.primitives.Longs;
+import com.microsoft.z3.Native;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
@@ -23,6 +25,7 @@ import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 
@@ -120,5 +123,25 @@ final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Lo
     final Map<String, Long> variables = getFormulaCreator().extractVariablesAndUFs(f, true);
     final long[] protectedSymbols = Longs.toArray(variables.values());
     return msat_simplify(getFormulaCreator().getEnv(), f, protectedSymbols);
+  }
+
+  @Override
+  public BooleanFormula translateFrom(BooleanFormula formula, FormulaManager otherContext) {
+    if (otherContext instanceof Mathsat5FormulaManager) {
+      Mathsat5FormulaManager otherManager = (Mathsat5FormulaManager) otherContext;
+      long otherMsatContext = otherManager.getEnvironment();
+      if (otherMsatContext == getEnvironment()) {
+
+        // Same context.
+        return formula;
+      } else {
+
+        // Msat5 to Msat5 translation.
+        long translatedFormula =
+            msat_make_copy_from(getEnvironment(), extractInfo(formula), otherMsatContext);
+        return getFormulaCreator().encapsulateBoolean(translatedFormula);
+      }
+    }
+    return parse(otherContext.dumpFormula(formula).toString());
   }
 }
