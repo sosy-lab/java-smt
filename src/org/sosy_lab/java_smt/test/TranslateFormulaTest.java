@@ -11,6 +11,9 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.test.BooleanFormulaSubject.assertUsing;
 
+import com.google.common.collect.Lists;
+import java.util.Arrays;
+import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,17 +53,9 @@ public class TranslateFormulaTest {
   public Solvers translateTo;
 
   @Parameters(name = "{index}: {0} --> {1}")
-  public static Object[] getSolversProduct() {
-    // Every combination: translateFrom and translateTo.
-    int len = Solvers.values().length;
-    Solvers[][] combinations = new Solvers[len * len][2];
-    for (int i = 0; i < len; i++) {
-      for (int j = 0; j < len; j++) {
-        combinations[i * len + j][0] = Solvers.values()[i];
-        combinations[i * len + j][1] = Solvers.values()[j];
-      }
-    }
-    return combinations;
+  public static List<Object[]> getSolverCombinations() {
+    List<Solvers> solvers = Arrays.asList(Solvers.values());
+    return Lists.transform(Lists.cartesianProduct(solvers, solvers), List::toArray);
   }
 
   @Before
