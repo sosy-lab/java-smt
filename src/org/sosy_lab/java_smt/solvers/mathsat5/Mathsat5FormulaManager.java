@@ -141,6 +141,6 @@ final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Lo
         return getFormulaCreator().encapsulateBoolean(translatedFormula);
       }
     }
-    return parse(otherContext.dumpFormula(formula).toString());
+    return super.translateFrom(formula, otherContext);
   }
 }
