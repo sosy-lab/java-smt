@@ -10,6 +10,15 @@ SPDX-License-Identifier: Apache-2.0
 
 # JavaSMT ChangeLog
 
+## JavaSMT 3.10.1
+
+This patch release brings several bugfixes for JavaSMT, for example,
+in the bindings of Princess or for quantifier handling.
+Additionally, we now provide Yices2 via Maven.
+
+### Updated solvers:
+ - SMTInterpol 2.5-842-gfcd46532
+
 ## JavaSMT 3.10.0
 
 This release contains several improvement, some new features, several bugfixes and updated libraries.
