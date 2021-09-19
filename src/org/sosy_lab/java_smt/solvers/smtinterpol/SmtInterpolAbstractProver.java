@@ -12,6 +12,11 @@ import static com.google.common.base.Preconditions.checkState;
 
 import de.uni_freiburg.informatik.ultimate.logic.Annotation;
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
+import de.uni_freiburg.informatik.ultimate.logic.Model;
+import de.uni_freiburg.informatik.ultimate.logic.ReasonUnknown;
+import de.uni_freiburg.informatik.ultimate.logic.SMTLIBException;
+import de.uni_freiburg.informatik.ultimate.logic.Script;
+import de.uni_freiburg.informatik.ultimate.logic.Script.LBool;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import java.util.ArrayDeque;
@@ -23,8 +28,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.collect.Collections3;
+import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -35,29 +42,35 @@ import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
 
   private boolean closed = false;
-  protected final SmtInterpolEnvironment env;
-  protected final FormulaCreator<Term, Sort, SmtInterpolEnvironment, FunctionSymbol> creator;
+  protected final Script env;
+  protected final FormulaCreator<Term, Sort, Script, FunctionSymbol> creator;
   protected final SmtInterpolFormulaManager mgr;
   protected final Deque<List<AF>> assertedFormulas = new ArrayDeque<>();
   protected final Map<String, Term> annotatedTerms = new HashMap<>(); // Collection of termNames
+  protected final ShutdownNotifier shutdownNotifier;
 
   private static final String PREFIX = "term_"; // for termnames
   private static final UniqueIdGenerator termIdGenerator =
       new UniqueIdGenerator(); // for different termnames
 
-  SmtInterpolAbstractProver(SmtInterpolFormulaManager pMgr, Set<ProverOptions> options) {
+  SmtInterpolAbstractProver(
+      SmtInterpolFormulaManager pMgr,
+      Script pEnv,
+      Set<ProverOptions> options,
+      ShutdownNotifier pShutdownNotifier) {
     super(options);
-    checkState(
-        pMgr.getEnvironment().getStackDepth() == 0,
-        "Not allowed to create a new prover environment while solver stack is still non-empty, "
-            + "parallel stacks are not supported.");
     mgr = pMgr;
-    env = pMgr.createEnvironment();
     creator = pMgr.getFormulaCreator();
+    env = pEnv;
+    shutdownNotifier = pShutdownNotifier;
   }
 
   protected boolean isClosed() {
     return closed;
+  }
+
+  int size() {
+    return assertedFormulas.size();
   }
 
   @Override
@@ -77,14 +90,56 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
   @Override
   public boolean isUnsat() throws InterruptedException {
     checkState(!closed);
-    return !env.checkSat();
+
+    // We actually terminate SmtInterpol during the analysis
+    // by using a shutdown listener. However, SmtInterpol resets the
+    // mStopEngine flag in DPLLEngine before starting to solve,
+    // so we check here, too.
+    shutdownNotifier.shutdownIfNecessary();
+
+    LBool result = env.checkSat();
+    switch (result) {
+      case SAT:
+        return false;
+      case UNSAT:
+        return true;
+      case UNKNOWN:
+        Object reason = env.getInfo(":reason-unknown");
+        if (!(reason instanceof ReasonUnknown)) {
+          throw new SMTLIBException("checkSat returned UNKNOWN with unknown reason " + reason);
+        }
+        switch ((ReasonUnknown) reason) {
+          case MEMOUT:
+            // SMTInterpol catches OOM, but we want to have it thrown.
+            throw new OutOfMemoryError("Out of memory during SMTInterpol operation");
+          case CANCELLED:
+            shutdownNotifier.shutdownIfNecessary(); // expected if we requested termination
+            throw new SMTLIBException("checkSat returned UNKNOWN with unexpected reason " + reason);
+          default:
+            throw new SMTLIBException("checkSat returned UNKNOWN with unexpected reason " + reason);
+        }
+
+      default:
+        throw new SMTLIBException("checkSat returned " + result);
+    }
   }
 
   @Override
   public SmtInterpolModel getModel() {
     checkState(!closed);
     checkGenerateModels();
-    return new SmtInterpolModel(env.getModel(), creator);
+    final Model model;
+    try {
+      model = env.getModel();
+    } catch (SMTLIBException e) {
+      if (e.getMessage().contains("Context is inconsistent")) {
+        throw new IllegalStateException(BasicProverEnvironment.NO_MODEL_HELP, e);
+      } else {
+        // new stacktrace, but only the library calls are missing.
+        throw e;
+      }
+    }
+    return new SmtInterpolModel(model, creator);
   }
 
   protected static String generateTermName() {
@@ -137,7 +192,7 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
     checkState(!closed);
     assertedFormulas.clear();
     annotatedTerms.clear();
-    env.pop(env.getStackDepth());
+    env.pop(assertedFormulas.size());
     closed = true;
   }
 
@@ -158,7 +213,12 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
     for (BooleanFormula impF : important) {
       importantTerms[i++] = mgr.extractInfo(impF);
     }
-    for (Term[] model : env.checkAllSat(importantTerms)) {
+    // We actually terminate SmtInterpol during the analysis
+    // by using a shutdown listener. However, SmtInterpol resets the
+    // mStopEngine flag in DPLLEngine before starting to solve,
+    // so we check here, too.
+    shutdownNotifier.shutdownIfNecessary();
+    for (Term[] model : env.checkAllsat(importantTerms)) {
       callback.apply(Collections3.transformedImmutableListCopy(model, creator::encapsulateBoolean));
     }
     return callback.getResult();

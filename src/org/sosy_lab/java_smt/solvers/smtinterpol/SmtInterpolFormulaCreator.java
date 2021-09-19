@@ -11,10 +11,15 @@ package org.sosy_lab.java_smt.solvers.smtinterpol;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.common.collect.Collections3.transformedImmutableListCopy;
 
+import com.google.common.collect.ImmutableSet;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
 import de.uni_freiburg.informatik.ultimate.logic.ConstantTerm;
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
+import de.uni_freiburg.informatik.ultimate.logic.NoopScript;
 import de.uni_freiburg.informatik.ultimate.logic.Rational;
+import de.uni_freiburg.informatik.ultimate.logic.SMTLIBException;
+import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.logic.Theory;
@@ -28,18 +33,18 @@ import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
 
-class SmtInterpolFormulaCreator
-    extends FormulaCreator<Term, Sort, SmtInterpolEnvironment, FunctionSymbol> {
+class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, FunctionSymbol> {
 
-  private final Sort booleanSort;
-  private final Sort integerSort;
-  private final Sort realSort;
+  /** SMTInterpol does not allow using key-functions as identifiers. */
+  private static final ImmutableSet<String> UNSUPPORTED_IDENTIFIERS =
+      ImmutableSet.of("true", "false", "select", "store", "or", "and", "xor", "distinct");
 
-  SmtInterpolFormulaCreator(final SmtInterpolEnvironment env) {
-    super(env, env.getBooleanSort(), env.getIntegerSort(), env.getRealSort());
-    booleanSort = env.getBooleanSort();
-    integerSort = env.getIntegerSort();
-    realSort = env.getRealSort();
+  SmtInterpolFormulaCreator(final Script env) {
+    super(
+        env,
+        env.getTheory().getBooleanSort(),
+        env.getTheory().getNumericSort(),
+        env.getTheory().getRealSort());
   }
 
   @Override
@@ -48,11 +53,11 @@ class SmtInterpolFormulaCreator
   }
 
   private FormulaType<?> getFormulaTypeOfSort(final Sort pSort) {
-    if (pSort == integerSort) {
+    if (pSort == getIntegerType()) {
       return FormulaType.IntegerType;
-    } else if (pSort == realSort) {
+    } else if (pSort == getRationalType()) {
       return FormulaType.RationalType;
-    } else if (pSort == booleanSort) {
+    } else if (pSort == getBoolType()) {
       return FormulaType.BooleanType;
     } else if (pSort.isArraySort()) {
       return new FormulaType.ArrayFormulaType<>(
@@ -78,9 +83,51 @@ class SmtInterpolFormulaCreator
 
   @Override
   public Term makeVariable(final Sort type, final String varName) {
-    SmtInterpolEnvironment env = getEnv();
-    env.declareFun(varName, new Sort[] {}, type);
-    return env.term(varName);
+    declareFun(varName, new Sort[] {}, type);
+    return environment.term(varName);
+  }
+
+  /**
+   * This function declares a new functionSymbol, that has a given (result-) sort. The params for
+   * the functionSymbol also have sorts. If you want to declare a new variable, i.e. "X", paramSorts
+   * is an empty array.
+   */
+  @CanIgnoreReturnValue
+  private FunctionSymbol declareFun(String fun, Sort[] paramSorts, Sort resultSort) {
+    checkSymbol(fun);
+    FunctionSymbol fsym = environment.getTheory().getFunction(fun, paramSorts);
+
+    if (fsym == null) {
+      environment.declareFun(fun, paramSorts, resultSort);
+      return environment.getTheory().getFunction(fun, paramSorts);
+    } else {
+      if (!fsym.getReturnSort().equals(resultSort)) {
+        throw new IllegalArgumentException(
+            "Function " + fun + " is already declared with different definition");
+      }
+      if (fun.equals("true") || fun.equals("false")) {
+        throw new IllegalArgumentException("Cannot declare a variable named " + fun);
+      }
+      return fsym;
+    }
+  }
+
+  /**
+   * Copied from {@link NoopScript#checkSymbol}.
+   *
+   * <p>Check that the symbol does not contain characters that would make it impossible to use it in
+   * a LoggingScript. These are | and \.
+   *
+   * @param symbol the symbol to check
+   * @throws IllegalArgumentException if symbol contains | or \.
+   */
+  private void checkSymbol(String symbol) throws SMTLIBException {
+    checkArgument(
+        symbol.indexOf('|') == -1 && symbol.indexOf('\\') == -1, "Symbol must not contain | or \\");
+    checkArgument(
+        !UNSUPPORTED_IDENTIFIERS.contains(symbol),
+        "SMTInterpol does not support %s as identifier.",
+        symbol);
   }
 
   @Override
@@ -294,7 +341,7 @@ class SmtInterpolFormulaCreator
   @Override
   public FunctionSymbol declareUFImpl(String pName, Sort returnType, List<Sort> pArgs) {
     Sort[] types = pArgs.toArray(new Sort[0]);
-    return environment.declareFun(pName, types, returnType);
+    return declareFun(pName, types, returnType);
   }
 
   @Override

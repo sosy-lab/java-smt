@@ -13,11 +13,14 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import de.uni_freiburg.informatik.ultimate.logic.Annotation;
+import de.uni_freiburg.informatik.ultimate.logic.SMTLIBException;
+import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
@@ -26,8 +29,12 @@ import org.sosy_lab.java_smt.api.SolverException;
 class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String, String>
     implements InterpolatingProverEnvironment<String> {
 
-  SmtInterpolInterpolatingProver(SmtInterpolFormulaManager pMgr, Set<ProverOptions> options) {
-    super(pMgr, options);
+  SmtInterpolInterpolatingProver(
+      SmtInterpolFormulaManager pMgr,
+      Script pScript,
+      Set<ProverOptions> options,
+      ShutdownNotifier pShutdownNotifier) {
+    super(pMgr, pScript, options, pShutdownNotifier);
   }
 
   @Override
@@ -90,7 +97,22 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String, S
     }
 
     // get interpolants of groups
-    final Term[] itps = env.getTreeInterpolants(formulas, startOfSubTree);
+    final Term[] itps;
+    try {
+      itps = env.getInterpolants(formulas, startOfSubTree);
+    } catch (UnsupportedOperationException e) {
+      if (e.getMessage() != null && e.getMessage().startsWith("Cannot interpolate ")) {
+        // Not a bug, interpolation procedure is incomplete
+        throw new SolverException(e.getMessage(), e);
+      } else {
+        throw e;
+      }
+    } catch (SMTLIBException e) {
+      if ("Timeout exceeded".equals(e.getMessage())) {
+        shutdownNotifier.shutdownIfNecessary();
+      }
+      throw new AssertionError(e);
+    }
 
     final List<BooleanFormula> result = new ArrayList<>();
     for (Term itp : itps) {
