@@ -440,7 +440,7 @@ public class SolverStackTest extends SolverBasedTest0 {
     assume()
         .withMessage("Solver does not support multiple stacks yet")
         .that(solver)
-        .isEqualTo(Solvers.SMTINTERPOL);
+        .isAnyOf(Solvers.SMTINTERPOL, Solvers.BOOLECTOR);
 
     BasicProverEnvironment<?> stack1 = newEnvironmentForTest();
     stack1.push(bmgr.makeTrue());
