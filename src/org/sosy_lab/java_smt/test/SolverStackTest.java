@@ -76,7 +76,7 @@ public class SolverStackTest extends SolverBasedTest0 {
     assume()
         .withMessage("Solver does not support multiple stacks yet")
         .that(solver)
-        .isNoneOf(Solvers.SMTINTERPOL, Solvers.BOOLECTOR);
+        .isNotEqualTo(Solvers.BOOLECTOR);
   }
 
   protected final void requireUfValuesInModel() {
@@ -440,7 +440,7 @@ public class SolverStackTest extends SolverBasedTest0 {
     assume()
         .withMessage("Solver does not support multiple stacks yet")
         .that(solver)
-        .isAnyOf(Solvers.SMTINTERPOL, Solvers.BOOLECTOR);
+        .isEqualTo(Solvers.BOOLECTOR);
 
     BasicProverEnvironment<?> stack1 = newEnvironmentForTest();
     stack1.push(bmgr.makeTrue());
