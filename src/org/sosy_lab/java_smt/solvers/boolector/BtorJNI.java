@@ -472,7 +472,8 @@ class BtorJNI {
    * @param jarg2 array node
    * @return Returns 2Dim Array or Strings. Size [2][x], x beeing the length of the array used.
    *     First String Array will be argument assignment strings. Second String Array will be value
-   *     assignment strings.
+   *     assignment strings. Example: array[0][0] is the index to value array[1][0]. Note: repeated
+   *     calls to this might change the order of the arrays (but uniformly across both).
    */
   protected static native String[][] boolector_array_assignment_helper(long jarg1, long jarg2);
 
