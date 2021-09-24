@@ -411,6 +411,8 @@ class BtorJNI {
 
   protected static native long boolector_rori(long btor, long node, int nbits);
 
+  protected static native long boolector_get_value(long btor, long node);
+
   /**
    * Returns int representation of BOOLECTOR_PARSE_ERROR. Used for checking return value of
    * boolector_help_parse().
