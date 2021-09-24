@@ -3862,6 +3862,22 @@ SWIGEXPORT jobjectArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_B
   return outerJNIArray;
 }
 
+// Call to get a model value for any node (note: this returns a node, not a String! One can use methods of the type boolector_..._assignment to get the string representation)
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1get_1value(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  Btor *arg1 = (Btor *) 0 ;
+  BoolectorNode *arg2 = (BoolectorNode *) 0 ;
+  jlong jresult = 0 ;
+  BoolectorNode *result = 0 ;
+
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  result = (BoolectorNode *) boolector_get_value(arg1,arg2);
+  *(BoolectorNode **)&jresult = result;
+  return jresult;
+}
+
 SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1set_1termination(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg2) {
   Btor *arg1 = (Btor *) 0 ;
 
