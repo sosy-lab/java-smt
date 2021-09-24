@@ -3816,11 +3816,14 @@ SWIGEXPORT jobjectArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_B
 
 //helper method for arrays similiar to the uf one
 SWIGEXPORT jobjectArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1array_1assignment_1helper(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
-  Btor *arg1 = (Btor *) 0 ;
-  BoolectorNode *arg2 = (BoolectorNode *) 0 ;
-  char ***arg3 = (char ***) 0 ;
-  char ***arg4 = (char ***) 0 ;
-  uint32_t *arg5 = (uint32_t *) 0 ;
+  Btor *btor = (Btor *) 0 ;
+  BoolectorNode *node = (BoolectorNode *) 0 ;
+  //char ***arg3 = (char ***) 0 ;
+  //char ***arg4 = (char ***) 0 ;
+  //uint32_t *arg5 = (uint32_t *) 0 ;
+  // Boolector wants these pointers uninitialized
+  char **indices, **values;
+  uint32_t size;
 
   (void)jenv;
   (void)jcls;
@@ -3828,16 +3831,17 @@ SWIGEXPORT jobjectArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_B
   int i = 0;
   int j = 0;
 
-  arg1 = *(Btor **)&jarg1;
-  arg2 = *(BoolectorNode **)&jarg2;
+  btor = *(Btor **)&jarg1;
+  node = *(BoolectorNode **)&jarg2;
 
-  boolector_array_assignment(arg1,arg2,arg3,arg4,arg5);
+  boolector_array_assignment(btor, node, &indices, &values, &size);
 
-  if (arg3 == 0 || arg4 == 0 || arg5 == 0) return ((void*)0) ;
+  // TODO: is the check for indices and values good?
+  if (indices == 0 || values == 0 || size == 0) return ((void*)0) ;
 
-  jsize arrayLength = *arg5;
-  int arrayLengthInt = *arg5;
-  char **workArray = *arg3;
+  jsize arrayLength = size;
+  int arrayLengthInt = size;
+  char **workArray = indices;
 
   jclass classString = (*jenv)->FindClass(jenv, "java/lang/String");
   jclass classArray = (*jenv)->FindClass(jenv, "[Ljava/lang/Object;");
@@ -3851,7 +3855,7 @@ SWIGEXPORT jobjectArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_B
       (*jenv)->SetObjectArrayElement(jenv, innerJNIArray, j, (*jenv)->NewStringUTF(jenv, workArray[j]));
     }
     //switch to second Array
-    workArray = *arg4;
+    workArray = values;
     (*jenv)->SetObjectArrayElement(jenv, outerJNIArray, i, innerJNIArray);
     (*jenv)->DeleteLocalRef(jenv, innerJNIArray);
   }
