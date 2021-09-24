@@ -316,12 +316,14 @@ class BtorJNI {
 
   protected static native void boolector_free_bv_assignment(long jarg1, String jarg2);
 
+  // Use the helper method instead of this one!
   protected static native void boolector_array_assignment(
-      long jarg1, long jarg2, long jarg3, long jarg4, long jarg5);
+      long btor, long array_operand, long indicies, long values, long size);
 
   protected static native void boolector_free_array_assignment(
       long jarg1, long jarg2, long jarg3, long jarg4);
 
+  // Use the helper method instead of this one!
   protected static native void boolector_uf_assignment(
       long jarg1, long jarg2, long jarg3, long jarg4, long jarg5);
 
@@ -350,6 +352,7 @@ class BtorJNI {
 
   protected static native boolean boolector_is_fun_sort(long jarg1, long jarg2);
 
+  // Use the helper method instead of this one!
   protected static native long boolector_parse(
       long jarg1, long jarg2, String jarg3, long jarg4, long jarg5, long jarg6);
 
@@ -369,8 +372,10 @@ class BtorJNI {
 
   protected static native void boolector_dump_btor(long jarg1, long jarg2);
 
+  // Use the helper method instead of this one!
   protected static native void boolector_dump_smt2_node(long jarg1, long jarg2, long jarg3);
 
+  // Use the helper method instead of this one!
   protected static native void boolector_dump_smt2(long jarg1, long jarg2);
 
   protected static native void boolector_dump_aiger_ascii(long jarg1, long jarg2, boolean jarg3);
