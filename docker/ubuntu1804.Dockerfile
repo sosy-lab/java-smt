@@ -15,3 +15,6 @@ RUN groupadd -r developer -g 1000 \
  && chmod 755 /developer
 
 USER developer
+
+# JNI is not found when compiling Boolector in the image, so we need to set JAVA_HOME
+ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64/

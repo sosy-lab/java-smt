@@ -6,5 +6,6 @@ WORKSPACE=$HOME/workspace
 
 docker run -it \
     --mount type=bind,source=${WORKSPACE},target=/workspace \
-    -u $(id -u ${USER}):$(id -g ${USER}) \
+    --workdir /workspace/java-smt \
+    --user $(id -u ${USER}):$(id -g ${USER}) \
     devel:ubuntu1804
