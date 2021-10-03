@@ -14,6 +14,12 @@ SPDX-License-Identifier: Apache-2.0
 
 This release comes with support for multiple prover stacks in SMTInterpol.
 
+### Breaking change:
+Users might have accessed the public class `SmtInterpolEnvironment` for direct interaction with SMTInterpol.
+We replace the class `org.sosy_lab.java_smt.solvers.smtinterpol.SmtInterpolEnvironment`
+with the class `de.uni_freiburg.informatik.ultimate.logic.Script`,
+which provides a similar interface and also allows direct interaction with SMTInterpol.
+
 ### Updated solvers:
  - SMTInterpol 2.5-916-ga5843d8b
  - Boolector 3.2.2
