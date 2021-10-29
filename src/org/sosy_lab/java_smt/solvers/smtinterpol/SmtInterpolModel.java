@@ -13,6 +13,7 @@ import com.google.common.collect.ImmutableSet;
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
 import de.uni_freiburg.informatik.ultimate.logic.Model;
+import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.model.FunctionValue.Index;
@@ -22,13 +23,15 @@ import java.util.List;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
-class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvironment> {
+class SmtInterpolModel extends CachingAbstractModel<Term, Sort, Script> {
 
   private final Model model;
+  private final Script env;
 
-  SmtInterpolModel(Model pModel, FormulaCreator<Term, Sort, SmtInterpolEnvironment, ?> pCreator) {
+  SmtInterpolModel(Model pModel, FormulaCreator<Term, Sort, Script, ?> pCreator) {
     super(pCreator);
     model = pModel;
+    env = pCreator.getEnv();
   }
 
   @Override
@@ -39,7 +42,7 @@ class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvir
     for (FunctionSymbol symbol : model.getDefinedFunctions()) {
       final String name = unescape(symbol.getApplicationString());
       if (symbol.getParameterSorts().length == 0) { // simple variable or array
-        Term variable = creator.getEnv().term(name);
+        Term variable = env.term(name);
         if (symbol.getReturnSort().isArraySort()) {
           assignments.addAll(getArrayAssignment(name, variable, variable, ImmutableList.of()));
         } else {
@@ -83,7 +86,7 @@ class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvir
         List<Object> innerIndices = new ArrayList<>(upperIndices);
         innerIndices.add(evaluateImpl(index));
 
-        Term select = creator.getEnv().term("select", key, index);
+        Term select = env.term("select", key, index);
         if (content.getSort().isArraySort()) {
           assignments.addAll(getArrayAssignment(symbol, select, content, innerIndices));
         } else {
@@ -91,7 +94,7 @@ class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvir
               new ValueAssignment(
                   creator.encapsulateWithTypeOf(select),
                   creator.encapsulateWithTypeOf(model.evaluate(content)),
-                  creator.encapsulateBoolean(creator.getEnv().term("=", select, content)),
+                  creator.encapsulateBoolean(env.term("=", select, content)),
                   symbol,
                   evaluateImpl(content),
                   innerIndices));
@@ -121,8 +124,7 @@ class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvir
         (de.uni_freiburg.informatik.ultimate.smtinterpol.model.Model) model;
 
     for (Index key : mmodel.getFunctionValue(symbol).values().keySet()) {
-      assignments.add(
-          getAssignment(name, (ApplicationTerm) creator.getEnv().term(name, key.toArray())));
+      assignments.add(getAssignment(name, (ApplicationTerm) env.term(name, key.toArray())));
     }
 
     return assignments;
@@ -138,7 +140,7 @@ class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvir
     return new ValueAssignment(
         creator.encapsulateWithTypeOf(term),
         creator.encapsulateWithTypeOf(value),
-        creator.encapsulateBoolean(creator.getEnv().term("=", term, value)),
+        creator.encapsulateBoolean(env.term("=", term, value)),
         key,
         evaluateImpl(term),
         argumentInterpretation);

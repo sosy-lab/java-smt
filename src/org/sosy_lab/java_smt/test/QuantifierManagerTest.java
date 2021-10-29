@@ -80,14 +80,8 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
   @SuppressWarnings("checkstyle:membername")
   private BooleanFormula bv_forall_x_a_at_x_eq_0;
 
-  /*
-   * Boolector does not support Integers.
-   */
   @Before
   public void setUpLIA() {
-    if (solverUnderTest == Solvers.BOOLECTOR) {
-      return;
-    }
     requireIntegers();
     requireArrays();
     requireQuantifiers();
@@ -787,5 +781,154 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
 
     assertThatFormula(qFreeF)
         .isEquivalentTo(bvmgr.equal(bvmgr.extract(xx, 0, 0, false), bvmgr.makeBitvector(1, 1)));
+  }
+
+  @Test
+  public void testExistsRestrictedRange() throws SolverException, InterruptedException {
+    ArrayFormula<IntegerFormula, IntegerFormula> b =
+        amgr.makeArray("b", FormulaType.IntegerType, FormulaType.IntegerType);
+    BooleanFormula bAtXEq1 = imgr.equal(amgr.select(b, x), imgr.makeNumber(1));
+    BooleanFormula bAtXEq0 = imgr.equal(amgr.select(b, x), imgr.makeNumber(0));
+    BooleanFormula exists10to20bx1 = exists(x, imgr.makeNumber(10), imgr.makeNumber(20), bAtXEq1);
+    BooleanFormula forallXbx0 = qmgr.forall(x, bAtXEq0);
+
+    // (exists x in [10..20] . b[x] = 1) AND (forall x . b[x] = 0) is UNSAT
+    assertThatFormula(bmgr.and(exists10to20bx1, forallXbx0)).isUnsatisfiable();
+
+    // (exists x in [10..20] . b[x] = 1) AND (b[10] = 0) is SAT
+    assertThatFormula(
+            bmgr.and(
+                exists10to20bx1,
+                imgr.equal(amgr.select(b, imgr.makeNumber(10)), imgr.makeNumber(0))))
+        .isSatisfiable();
+
+    // (exists x in [10..20] . b[x] = 1) AND (b[1000] = 0) is SAT
+    assertThatFormula(
+            bmgr.and(
+                exists10to20bx1,
+                imgr.equal(amgr.select(b, imgr.makeNumber(1000)), imgr.makeNumber(0))))
+        .isSatisfiable();
+  }
+
+  @Test
+  public void testExistsRestrictedRangeWithoutInconclusiveSolvers()
+      throws SolverException, InterruptedException {
+    assume()
+        .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
+        .that(solverToUse())
+        .isNoneOf(Solvers.CVC4, Solvers.PRINCESS);
+
+    ArrayFormula<IntegerFormula, IntegerFormula> b =
+        amgr.makeArray("b", FormulaType.IntegerType, FormulaType.IntegerType);
+    BooleanFormula bAtXEq1 = imgr.equal(amgr.select(b, x), imgr.makeNumber(1));
+    BooleanFormula bAtXEq0 = imgr.equal(amgr.select(b, x), imgr.makeNumber(0));
+    BooleanFormula exists10to20bx0 = exists(x, imgr.makeNumber(10), imgr.makeNumber(20), bAtXEq0);
+    BooleanFormula exists10to20bx1 = exists(x, imgr.makeNumber(10), imgr.makeNumber(20), bAtXEq1);
+    BooleanFormula forallXbx1 = qmgr.forall(x, bAtXEq1);
+    BooleanFormula forallXbx0 = qmgr.forall(x, bAtXEq0);
+
+    // (exists x in [10..20] . b[x] = 0) AND (forall x . b[x] = 0) is SAT
+    assertThatFormula(bmgr.and(exists10to20bx0, forallXbx0)).isSatisfiable();
+
+    // (exists x in [10..20] . b[x] = 1) AND (forall x . b[x] = 1) is SAT
+    assertThatFormula(bmgr.and(exists10to20bx1, forallXbx1)).isSatisfiable();
+  }
+
+  @Test
+  public void testForallRestrictedRange() throws SolverException, InterruptedException {
+    ArrayFormula<IntegerFormula, IntegerFormula> b =
+        amgr.makeArray("b", FormulaType.IntegerType, FormulaType.IntegerType);
+    BooleanFormula bAtXEq1 = imgr.equal(amgr.select(b, x), imgr.makeNumber(1));
+    BooleanFormula bAtXEq0 = imgr.equal(amgr.select(b, x), imgr.makeNumber(0));
+    BooleanFormula forall10to20bx1 = forall(x, imgr.makeNumber(10), imgr.makeNumber(20), bAtXEq1);
+
+    // (forall x in [10..20] . b[x] = 1) AND (exits x in [15..17] . b[x] = 0) is UNSAT
+    assertThatFormula(
+            bmgr.and(forall10to20bx1, exists(x, imgr.makeNumber(15), imgr.makeNumber(17), bAtXEq0)))
+        .isUnsatisfiable();
+
+    // (forall x in [10..20] . b[x] = 1) AND b[10] = 0 is UNSAT
+    assertThatFormula(
+            bmgr.and(
+                forall10to20bx1,
+                imgr.equal(amgr.select(b, imgr.makeNumber(10)), imgr.makeNumber(0))))
+        .isUnsatisfiable();
+
+    // (forall x in [10..20] . b[x] = 1) AND b[20] = 0 is UNSAT
+    assertThatFormula(
+            bmgr.and(
+                forall10to20bx1,
+                imgr.equal(amgr.select(b, imgr.makeNumber(20)), imgr.makeNumber(0))))
+        .isUnsatisfiable();
+  }
+
+  @Test
+  public void testForallRestrictedRangeWithoutConclusiveSolvers()
+      throws SolverException, InterruptedException {
+    assume()
+        .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
+        .that(solverToUse())
+        .isNoneOf(Solvers.CVC4, Solvers.PRINCESS);
+
+    ArrayFormula<IntegerFormula, IntegerFormula> b =
+        amgr.makeArray("b", FormulaType.IntegerType, FormulaType.IntegerType);
+    BooleanFormula bAtXEq1 = imgr.equal(amgr.select(b, x), imgr.makeNumber(1));
+    BooleanFormula bAtXEq0 = imgr.equal(amgr.select(b, x), imgr.makeNumber(0));
+    BooleanFormula forall10to20bx0 = forall(x, imgr.makeNumber(10), imgr.makeNumber(20), bAtXEq0);
+    BooleanFormula forall10to20bx1 = forall(x, imgr.makeNumber(10), imgr.makeNumber(20), bAtXEq1);
+
+    // (forall x in [10..20] . b[x] = 0) AND (forall x . b[x] = 0) is SAT
+    assertThatFormula(bmgr.and(forall10to20bx0, qmgr.forall(x, bAtXEq0))).isSatisfiable();
+
+    // (forall x in [10..20] . b[x] = 1) AND b[9] = 0 is SAT
+    assertThatFormula(
+            bmgr.and(
+                forall10to20bx1,
+                imgr.equal(amgr.select(b, imgr.makeNumber(9)), imgr.makeNumber(0))))
+        .isSatisfiable();
+
+    // (forall x in [10..20] . b[x] = 1) AND b[21] = 0 is SAT
+    assertThatFormula(
+            bmgr.and(
+                forall10to20bx1,
+                imgr.equal(amgr.select(b, imgr.makeNumber(21)), imgr.makeNumber(0))))
+        .isSatisfiable();
+
+    // (forall x in [10..20] . b[x] = 1) AND (forall x in [0..20] . b[x] = 0) is UNSAT
+    assertThatFormula(
+            bmgr.and(forall10to20bx1, forall(x, imgr.makeNumber(0), imgr.makeNumber(20), bAtXEq0)))
+        .isUnsatisfiable();
+
+    // (forall x in [10..20] . b[x] = 1) AND (forall x in [0..9] . b[x] = 0) is SAT
+    assertThatFormula(
+            bmgr.and(forall10to20bx1, forall(x, imgr.makeNumber(0), imgr.makeNumber(9), bAtXEq0)))
+        .isSatisfiable();
+  }
+
+  private BooleanFormula forall(
+      final IntegerFormula pVariable,
+      final IntegerFormula pLowerBound,
+      final IntegerFormula pUpperBound,
+      final BooleanFormula pBody) {
+    return qmgr.forall(
+        pVariable,
+        bmgr.implication(
+            bmgr.and(
+                imgr.greaterOrEquals(pVariable, pLowerBound),
+                imgr.lessOrEquals(pVariable, pUpperBound)),
+            pBody));
+  }
+
+  private BooleanFormula exists(
+      final IntegerFormula pVariable,
+      final IntegerFormula pLowerBound,
+      final IntegerFormula pUpperBound,
+      final BooleanFormula pBody) {
+    List<BooleanFormula> constraintsAndBody =
+        ImmutableList.of(
+            imgr.greaterOrEquals(pVariable, pLowerBound),
+            imgr.lessOrEquals(pVariable, pUpperBound),
+            pBody);
+    return qmgr.exists(pVariable, bmgr.and(constraintsAndBody));
   }
 }

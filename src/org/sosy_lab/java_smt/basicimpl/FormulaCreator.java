@@ -19,6 +19,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -332,7 +333,9 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
       final Formula pFormula,
       final boolean extractUF,
       final BiConsumer<String, Formula> pConsumer) {
-    visitRecursively(new VariableAndUFExtractor(extractUF, pConsumer, ImmutableSet.of()), pFormula);
+    visitRecursively(
+        new VariableAndUFExtractor(extractUF, pConsumer, ImmutableSet.of(), new LinkedHashSet<>()),
+        pFormula);
   }
 
   private class VariableAndUFExtractor extends DefaultFormulaVisitor<TraversalProcess> {
@@ -341,13 +344,21 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
     private final BiConsumer<String, Formula> consumer;
     private final Set<Formula> boundVariablesInContext;
 
+    /**
+     * let's collect all visited symbols here, to avoid redundant visitation of symbols in nested
+     * quantified formulas.
+     */
+    private final Set<Formula> alreadyVisited;
+
     VariableAndUFExtractor(
         boolean pExtractUF,
         BiConsumer<String, Formula> pConsumer,
-        Set<Formula> pBoundVariablesInContext) {
+        Set<Formula> pBoundVariablesInContext,
+        Set<Formula> pAlreadyVisited) {
       extractUF = pExtractUF;
       consumer = pConsumer;
       boundVariablesInContext = pBoundVariablesInContext;
+      alreadyVisited = pAlreadyVisited;
     }
 
     @Override
@@ -362,7 +373,9 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
       if (!boundVariablesInContext.contains(f) // TODO can UFs be bounded?
           && functionDeclaration.getKind() == FunctionDeclarationKind.UF
           && extractUF) {
-        consumer.accept(functionDeclaration.getName(), f);
+        if (alreadyVisited.add(f)) {
+          consumer.accept(functionDeclaration.getName(), f);
+        }
       }
       return TraversalProcess.CONTINUE;
     }
@@ -373,7 +386,9 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
       // If we are inside a quantified formula, bound variables appear to be free,
       // but they are actually bound by the surrounding context.
       if (!boundVariablesInContext.contains(f)) {
-        consumer.accept(name, f);
+        if (alreadyVisited.add(f)) {
+          consumer.accept(name, f);
+        }
       }
       return TraversalProcess.CONTINUE;
     }
@@ -388,7 +403,8 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
           new VariableAndUFExtractor(
               extractUF,
               consumer,
-              Sets.union(boundVariablesInContext, ImmutableSet.copyOf(boundVariables))),
+              Sets.union(boundVariablesInContext, ImmutableSet.copyOf(boundVariables)),
+              alreadyVisited),
           body);
 
       // Afterwards, we skip the already finished body-formula.
@@ -427,7 +443,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
    * Convert the formula into a Java object as far as possible, i.e., try to match a primitive or
    * simple type like Boolean, BigInteger, or Rational.
    *
-   * <p>If the formula is not a simple constant expression, we simple return <code>null</code>.
+   * <p>If the formula is not a simple constant expression, we simply return <code>null</code>.
    *
    * @param pF the formula to be converted.
    */

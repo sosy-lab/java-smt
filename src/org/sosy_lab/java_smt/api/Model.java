@@ -53,7 +53,7 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
    *
    * @param f Input formula
    * @return Either of: - Number (Rational/Double/BigInteger/Long/Integer) - Boolean
-   * @throws IllegalArgumentException if a formula has unexpected type, e.g Array.
+   * @throws IllegalArgumentException if a formula has unexpected type, e.g. Array.
    */
   @Nullable
   Object evaluate(Formula f);
@@ -131,7 +131,7 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
      *
      * <p>For arrays we use the selection-statement with an index. We do not support Array theory as
      * {@link #value} during a model evaluation, but we provide assignments like <code>
-     * select(arr, 12) := 34</code> (where <code>arr</code> itself is a plain symbol (without an
+     * select(arr, 12) := 34</code> where <code>arr</code> itself is a plain symbol (without an
      * explicit const- or zero-based initialization, as done by some SMT solvers).
      */
     private final Formula keyFormula;

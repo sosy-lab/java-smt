@@ -8,17 +8,22 @@
 
 package org.sosy_lab.java_smt.solvers.smtinterpol;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
+import de.uni_freiburg.informatik.ultimate.logic.Script;
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.common.io.IO;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -29,9 +34,29 @@ class LoggingSmtInterpolInterpolatingProver extends SmtInterpolInterpolatingProv
   private final PrintWriter out;
 
   LoggingSmtInterpolInterpolatingProver(
-      SmtInterpolFormulaManager pMgr, Set<ProverOptions> pOptions, PrintWriter pOut) {
-    super(pMgr, pOptions);
-    out = checkNotNull(pOut);
+      SmtInterpolFormulaManager pMgr,
+      Script pScript,
+      Set<ProverOptions> pOptions,
+      ShutdownNotifier pShutdownNotifier,
+      Map<String, Object> pGlobalOptions,
+      Path pLogfile) {
+    super(pMgr, pScript, pOptions, pShutdownNotifier);
+    try {
+      out = initializeLoggerForInterpolation(pGlobalOptions, pLogfile);
+    } catch (IOException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  private PrintWriter initializeLoggerForInterpolation(
+      Map<String, Object> globalOptions, Path logfile) throws IOException {
+    @SuppressWarnings("IllegalInstantiation")
+    PrintWriter writer = new PrintWriter(IO.openOutputFile(logfile, Charset.defaultCharset()));
+    for (Map.Entry<String, Object> entry : globalOptions.entrySet()) {
+      writer.println(String.format("(set-option %s %s)", entry.getKey(), entry.getValue()));
+    }
+    writer.println("(set-logic " + env.getTheory().getLogic().name() + ")");
+    return writer;
   }
 
   @Override

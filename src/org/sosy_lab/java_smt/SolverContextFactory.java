@@ -121,7 +121,7 @@ public class SolverContextFactory {
 
   /**
    * This constructor instantiates a factory for building solver contexts for a configured SMT
-   * solver (via the parameter <code>pConfig</code>). Each created context is independent from other
+   * solver (via the parameter <code>pConfig</code>). Each created context is independent of other
    * contexts and uses its own environment for building formulas and querying the solver.
    *
    * @param pConfig The configuration to be used when instantiating JavaSMT and the solvers. By

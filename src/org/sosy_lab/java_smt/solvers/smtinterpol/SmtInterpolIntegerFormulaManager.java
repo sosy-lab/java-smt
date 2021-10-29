@@ -26,17 +26,17 @@ class SmtInterpolIntegerFormulaManager
 
   @Override
   protected Term makeNumberImpl(long i) {
-    return getFormulaCreator().getEnv().numeral(BigInteger.valueOf(i));
+    return env.numeral(BigInteger.valueOf(i));
   }
 
   @Override
   protected Term makeNumberImpl(BigInteger pI) {
-    return getFormulaCreator().getEnv().numeral(pI);
+    return env.numeral(pI);
   }
 
   @Override
   protected Term makeNumberImpl(String pI) {
-    return getFormulaCreator().getEnv().numeral(pI);
+    return env.numeral(pI);
   }
 
   @Override
@@ -60,7 +60,7 @@ class SmtInterpolIntegerFormulaManager
     if (consistsOfNumerals(pNumber2)) {
       Sort intSort = pNumber1.getTheory().getNumericSort();
       assert intSort.equals(pNumber1.getSort()) && intSort.equals(pNumber2.getSort());
-      return getFormulaCreator().getEnv().term("div", pNumber1, pNumber2);
+      return env.term("div", pNumber1, pNumber2);
     } else {
       return super.divide(pNumber1, pNumber2);
     }
@@ -71,7 +71,7 @@ class SmtInterpolIntegerFormulaManager
     if (consistsOfNumerals(pNumber2)) {
       Sort intSort = pNumber1.getTheory().getNumericSort();
       assert intSort.equals(pNumber1.getSort()) && intSort.equals(pNumber2.getSort());
-      return getFormulaCreator().getEnv().term("mod", pNumber1, pNumber2);
+      return env.term("mod", pNumber1, pNumber2);
     } else {
       return super.modulo(pNumber1, pNumber2);
     }

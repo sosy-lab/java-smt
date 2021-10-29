@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.solvers.mathsat5;
 
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_apply_substitution;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_from_smtlib2;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_copy_from;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_simplify;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_to_smtlib2;
 
@@ -23,6 +24,7 @@ import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 
@@ -121,5 +123,24 @@ final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Lo
     final Map<String, Long> variables = getFormulaCreator().extractVariablesAndUFs(f, true);
     final long[] protectedSymbols = Longs.toArray(variables.values());
     return msat_simplify(getFormulaCreator().getEnv(), f, protectedSymbols);
+  }
+
+  @Override
+  public BooleanFormula translateFrom(BooleanFormula formula, FormulaManager otherManager) {
+    if (otherManager instanceof Mathsat5FormulaManager) {
+      long otherMsatContext = ((Mathsat5FormulaManager) otherManager).getEnvironment();
+      if (otherMsatContext == getEnvironment()) {
+
+        // Same context.
+        return formula;
+      } else {
+
+        // Msat5 to Msat5 translation.
+        long translatedFormula =
+            msat_make_copy_from(getEnvironment(), extractInfo(formula), otherMsatContext);
+        return getFormulaCreator().encapsulateBoolean(translatedFormula);
+      }
+    }
+    return super.translateFrom(formula, otherManager);
   }
 }

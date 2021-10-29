@@ -89,7 +89,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
 
   /** Mapping of disallowed char to their escaped counterparts. */
   /* Keep this map in sync with {@link #DISALLOWED_CHARACTERS}.
-   * Counterparts can be any unique string. For optimization we could even use plain chars. */
+   * Counterparts can be any unique string. For optimization, we could even use plain chars. */
   @VisibleForTesting
   public static final ImmutableBiMap<Character, String> DISALLOWED_CHARACTER_REPLACEMENT =
       ImmutableBiMap.<Character, String>builder().put('|', "pipe").put('\\', "backslash").build();
@@ -385,11 +385,11 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   }
 
   @Override
-  public BooleanFormula translateFrom(BooleanFormula formula, FormulaManager otherContext) {
-    if (this == otherContext) {
+  public BooleanFormula translateFrom(BooleanFormula formula, FormulaManager otherManager) {
+    if (this == otherManager) {
       return formula; // shortcut
     }
-    return parse(otherContext.dumpFormula(formula).toString());
+    return parse(otherManager.dumpFormula(formula).toString());
   }
 
   @Override
@@ -508,17 +508,18 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
         !variableName.isEmpty(), "Identifier for variable should not be empty.");
     Preconditions.checkArgument(
         !BASIC_OPERATORS.contains(variableName),
-        "Identifier '%s' should not be a simple operator. %s",
+        "Identifier '%s' can not be used, because it is a simple operator. %s",
         variableName,
         help);
     Preconditions.checkArgument(
         !SMTLIB2_KEYWORDS.contains(variableName),
-        "Identifier '%s' should not be a keyword of SMT-LIB2. %s",
+        "Identifier '%s' can not be used, because it is a keyword of SMT-LIB2. %s",
         variableName,
         help);
     Preconditions.checkArgument(
         DISALLOWED_CHARACTERS.matchesNoneOf(variableName),
-        "Identifier '%s' should contain an escape character %s of SMT-LIB2. %s",
+        "Identifier '%s' can not be used, "
+            + "because it should not contain an escape character %s of SMT-LIB2. %s",
         variableName,
         DISALLOWED_CHARACTER_REPLACEMENT
             .keySet(), // toString prints UTF8-encoded escape sequence, better than nothing.

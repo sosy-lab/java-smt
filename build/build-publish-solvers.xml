@@ -68,7 +68,7 @@ SPDX-License-Identifier: Apache-2.0
             e.g., copy the releases (especially the content of their `bin` directories) together into one directory.
             The only overlap between those releases is the JAR file, which should be equal anyway.
         </fail>
-        <echo>Option -Dz3.version=... not specified. Trying to determine z3.version from git repository. This will crash if git repository is not available.</echo>
+        <echo>Option -Dz3.version=... not specified. Trying to determine z3.version from git repository. This will fail if git repository is not available.</echo>
         <exec executable="git" dir="${z3.path}" outputproperty="z3.version" failonerror="true">
             <arg value="describe" />
         </exec>
@@ -167,7 +167,7 @@ SPDX-License-Identifier: Apache-2.0
         </fail>
 
         <!-- get a nive version -->
-        <exec executable="git" dir="${cvc4.path}" outputproperty="cvc4.revision">
+        <exec executable="git" dir="${cvc4.path}" outputproperty="cvc4.revision" failonerror="true">
             <arg value="show"/>
             <arg value="-s"/>
             <arg value="--format=%h"/>
@@ -176,37 +176,37 @@ SPDX-License-Identifier: Apache-2.0
         <echo message="Building CVC4 in version '${cvc4.version}'"/>
 
         <!-- build CVC4 -->
-        <exec executable="rm" dir="${cvc4.path}">
+        <exec executable="rm" dir="${cvc4.path}" failonerror="true">
             <arg value="-rf"/>
             <arg value="symfpu-CVC4"/>
         </exec>
-        <exec executable="./contrib/get-symfpu" dir="${cvc4.path}"/>
-        <exec executable="./configure.sh" dir="${cvc4.path}">
+        <exec executable="./contrib/get-symfpu" dir="${cvc4.path}" failonerror="true"/>
+        <exec executable="./configure.sh" dir="${cvc4.path}" failonerror="true">
             <arg value="--symfpu"/>
             <arg value="--language-bindings=java"/>
         </exec>
-        <exec executable="make" dir="${cvc4.path}/build/">
+        <exec executable="make" dir="${cvc4.path}/build/" failonerror="true">
             <arg value="-j4" />
         </exec>
 
         <!-- remove unneeded symbols -->
-        <exec executable="strip" dir="${cvc4.path}/build/src/bindings/java/">
+        <exec executable="strip" dir="${cvc4.path}/build/src/bindings/java/" failonerror="true">
             <arg value="libcvc4jni.so" />
         </exec>
-        <exec executable="strip" dir="${cvc4.path}/build/src/">
+        <exec executable="strip" dir="${cvc4.path}/build/src/" failonerror="true">
             <arg value="libcvc4.so" />
         </exec>
-        <exec executable="strip" dir="${cvc4.path}/build/src/parser/">
+        <exec executable="strip" dir="${cvc4.path}/build/src/parser/" failonerror="true">
             <arg value="libcvc4parser.so" />
         </exec>
 
         <!-- fix RPATH and library dependencies -->
-        <exec executable="patchelf" dir="${cvc4.path}/build/src/parser/">
+        <exec executable="patchelf" dir="${cvc4.path}/build/src/parser/" failonerror="true">
             <arg value="--set-rpath"/><arg value="$ORIGIN"/>
             <arg value="--replace-needed"/><arg value="libcvc4.so.6"/><arg value="libcvc4.so"/>
             <arg value="libcvc4parser.so"/>
         </exec>
-        <exec executable="patchelf" dir="${cvc4.path}/build/src/bindings/java/">
+        <exec executable="patchelf" dir="${cvc4.path}/build/src/bindings/java/" failonerror="true">
             <arg value="--set-rpath"/><arg value="$ORIGIN"/>
             <arg value="--replace-needed"/><arg value="libcvc4.so.6"/><arg value="libcvc4.so"/>
             <arg value="--replace-needed"/><arg value="libcvc4parser.so.6"/><arg value="libcvc4parser.so"/>
@@ -259,7 +259,7 @@ SPDX-License-Identifier: Apache-2.0
         </fail>
 
         <!-- get a nive version -->
-        <exec executable="git" dir="${boolector.path}" outputproperty="boolector.revision">
+        <exec executable="git" dir="${boolector.path}" outputproperty="boolector.revision" failonerror="true">
             <arg value="show"/>
             <arg value="-s"/>
             <arg value="--format=%h"/>
@@ -268,45 +268,42 @@ SPDX-License-Identifier: Apache-2.0
         <echo message="Building Boolector in version '${boolector.version}'"/>
 
         <!-- add JNI wrapper before compiling Boolector -->
-        <exec executable="cp">
-            <arg value="lib/native/source/libboolector/interface_wrap.c"/>
-            <arg value="lib/native/source/libboolector/include_interface_and_jni.patch"/>
-            <arg value="${boolector.path}/src/"/>
-        </exec>
-        <exec executable="git" dir="${boolector.path}">
+        <copy file="lib/native/source/libboolector/interface_wrap.c"                tofile="${boolector.path}/src/interface_wrap.c"/>
+        <copy file="lib/native/source/libboolector/include_interface_and_jni.patch" tofile="${boolector.path}/src/include_interface_and_jni.patch"/>
+        <exec executable="git" dir="${boolector.path}" failonerror="true">
             <arg value="apply"/>
             <arg value="src/include_interface_and_jni.patch"/>
         </exec>
 
         <!-- build Boolector -->
-        <exec executable="./contrib/setup-picosat.sh"    dir="${boolector.path}"/>
-        <exec executable="./contrib/setup-minisat.sh"    dir="${boolector.path}"/>
-    	<exec executable="./contrib/setup-cms.sh"    	 dir="${boolector.path}"/>
-        <exec executable="./contrib/setup-lingeling.sh"  dir="${boolector.path}"/>
-        <exec executable="./contrib/setup-cadical.sh"    dir="${boolector.path}"/>
-        <exec executable="./contrib/setup-btor2tools.sh" dir="${boolector.path}"/>
-        <exec executable="./configure.sh" dir="${boolector.path}">
+        <exec executable="./contrib/setup-picosat.sh"    dir="${boolector.path}" failonerror="true"/>
+        <exec executable="./contrib/setup-minisat.sh"    dir="${boolector.path}" failonerror="true"/>
+    	<exec executable="./contrib/setup-cms.sh"    	 dir="${boolector.path}" failonerror="true"/>
+        <exec executable="./contrib/setup-lingeling.sh"  dir="${boolector.path}" failonerror="true"/>
+        <exec executable="./contrib/setup-cadical.sh"    dir="${boolector.path}" failonerror="true"/>
+        <exec executable="./contrib/setup-btor2tools.sh" dir="${boolector.path}" failonerror="true"/>
+        <exec executable="./configure.sh" dir="${boolector.path}" failonerror="true">
             <arg value="-fno-strict-aliasing"/>
             <arg value="-fpic"/>
             <arg value="--shared"/>
         </exec>
-        <exec executable="make" dir="${boolector.path}/build/">
+        <exec executable="make" dir="${boolector.path}/build/" failonerror="true">
             <arg value="-j4" />
         </exec>
 
         <!-- remove unneeded symbols -->
-        <exec executable="strip" dir="${boolector.path}/deps/install/lib/">
+        <exec executable="strip" dir="${boolector.path}/deps/install/lib/" failonerror="true">
             <arg value="libpicosat.so" />
         </exec>
-        <exec executable="strip" dir="${boolector.path}/deps/install/lib/">
+        <exec executable="strip" dir="${boolector.path}/deps/install/lib/" failonerror="true">
             <arg value="libminisat.so" />
         </exec>
-        <exec executable="strip" dir="${boolector.path}/build/lib/">
+        <exec executable="strip" dir="${boolector.path}/build/lib/" failonerror="true">
             <arg value="libboolector.so" />
         </exec>
 
         <!-- fix RPATH and library dependencies -->
-        <exec executable="patchelf" dir="${boolector.path}/build/lib/">
+        <exec executable="patchelf" dir="${boolector.path}/build/lib/" failonerror="true">
             <arg value="--set-rpath"/><arg value="$ORIGIN"/>
             <arg value="--replace-needed"/><arg value="libminisat.so.2"/><arg value="libminisat.so"/>
             <arg value="libboolector.so"/>
@@ -446,7 +443,7 @@ SPDX-License-Identifier: Apache-2.0
             <checkPathOption pathOption="yices2.path" defaultPath="/path/to/yices2" targetName="Yices2 source folder"/>
             <checkPathOption pathOption="gmp.path" defaultPath="/path/to/gmp" targetName="GMP source folder"/>
             <checkPathOption pathOption="gperf.path" defaultPath="/path/to/gperf" targetName="GPERF source folder"/>
-           <exec executable="lib/native/source/yices2j/compile.sh">
+           <exec executable="lib/native/source/yices2j/compile.sh" failonerror="true">
                <arg value="${yices2.path}" />
                <arg value="${gmp.path}" />
                <arg value="${gperf.path}" />

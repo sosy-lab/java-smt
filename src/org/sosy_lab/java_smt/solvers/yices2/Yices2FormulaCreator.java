@@ -186,7 +186,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
   @Override
   public <T extends Formula> T encapsulate(FormulaType<T> pType, Integer pTerm) {
     // INTEGER is basic type and also used for function applications like EXTRACT/EXPAND.
-    // RATIONAL can be used to model INTEGERS. Otherwise the type should match exactly.
+    // RATIONAL can be used to model INTEGERS. Otherwise, the type should match exactly.
     assert FormulaType.IntegerType.equals(pType)
             || (FormulaType.RationalType.equals(pType)
                 && FormulaType.IntegerType.equals(getFormulaType(pTerm)))
@@ -503,7 +503,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     for (int i = 0; i < yices_term_num_children(parent); i++) {
       int[] component = yices_bvsum_component(parent, i, bitsize);
       assert component.length == bitsize + 1;
-      // the components consists of coefficient (as bits) and variable (if missing: -1)
+      // the components consist of coefficient (as bits) and variable (if missing: -1)
       int coeff = yices_bvconst_from_array(bitsize, Arrays.copyOfRange(component, 0, bitsize));
       int term = component[component.length - 1];
       if (term == -1) { // No term
@@ -653,7 +653,9 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
           throw new IllegalArgumentException(
               String.format(
                   "Unknown function declaration with constructor %d and arguments %s (%s)",
-                  -pDeclaration, pArgs, Lists.transform(pArgs, a -> yices_term_to_string(a))));
+                  -pDeclaration,
+                  pArgs,
+                  Lists.transform(pArgs, Yices2NativeApi::yices_term_to_string)));
       }
     } else { // is UF Application
       if (pArgs.isEmpty()) {
@@ -677,7 +679,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
         "%s with %s expected arguments was called with unexpected arguments: %s",
         kind,
         expectedLength,
-        Collections2.transform(pArgs, a -> yices_term_to_string(a)));
+        Collections2.transform(pArgs, Yices2NativeApi::yices_term_to_string));
   }
 
   @Override

@@ -192,7 +192,7 @@ public class FormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void bitvectorFormulaEqualsAndHashCode() {
-    // Boolector does not support integers and its easier to make a new test with bvs
+    // Boolector does not support integers and it is easier to make a new test with bvs
     assume().that(solverToUse()).isEqualTo(Solvers.BOOLECTOR);
     FunctionDeclaration<BitvectorFormula> fb =
         fmgr.declareUF(

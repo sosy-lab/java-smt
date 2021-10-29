@@ -18,12 +18,15 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReferenceArray;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,6 +35,7 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -184,6 +188,82 @@ public class SolverConcurrencyTest {
         });
   }
 
+  /**
+   * Test translation of formulas used on distinct contexts to a new, unrelated context. Every
+   * thread creates a context, generates a formula, those are collected and handed back to the main
+   * thread where they are translated to the main-thread context, anded and asserted.
+   */
+  @Test
+  public void testFormulaTranslationWithConcurrentContexts()
+      throws InvalidConfigurationException, InterruptedException, SolverException {
+    requireIntegers();
+    // CVC4 does not support parsing and therefore no translation.
+    // Princess has a wierd bug
+    // TODO: Look into the Princess problem
+    assume()
+        .withMessage("Solver does not support translation of formulas")
+        .that(solver)
+        .isNoneOf(Solvers.CVC4, Solvers.PRINCESS);
+    /** Helperclass to pack a SolverContext together with a Formula */
+    class ContextAndFormula {
+      private final SolverContext context;
+      private final BooleanFormula formula;
+
+      protected ContextAndFormula(SolverContext context, BooleanFormula formula) {
+        this.context = context;
+        this.formula = formula;
+      }
+
+      public SolverContext getContext() {
+        return context;
+      }
+
+      public BooleanFormula getFormula() {
+        return formula;
+      }
+    }
+    ConcurrentLinkedQueue<ContextAndFormula> contextAndFormulaList = new ConcurrentLinkedQueue<>();
+
+    assertConcurrency(
+        "testFormulaTranslationWithConcurrentContexts",
+        () -> {
+          SolverContext context = initSolver();
+          FormulaManager mgr = context.getFormulaManager();
+          IntegerFormulaManager imgr = mgr.getIntegerFormulaManager();
+          BooleanFormulaManager bmgr = mgr.getBooleanFormulaManager();
+          HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
+          BooleanFormula threadFormula = gen.generate(INTEGER_FORMULA_GEN.getOrDefault(solver, 9));
+          // We need to know the context from which the formula was created
+          contextAndFormulaList.add(new ContextAndFormula(context, threadFormula));
+        });
+
+    assertThat(contextAndFormulaList).hasSize(NUMBER_OF_THREADS);
+    SolverContext context = initSolver();
+    FormulaManager mgr = context.getFormulaManager();
+    BooleanFormulaManager bmgr = mgr.getBooleanFormulaManager();
+    List<BooleanFormula> translatedFormulas = new ArrayList<>();
+
+    for (ContextAndFormula currentContAndForm : contextAndFormulaList) {
+      SolverContext threadedContext = currentContAndForm.getContext();
+      BooleanFormula threadedFormula = currentContAndForm.getFormula();
+      BooleanFormula translatedFormula =
+          mgr.translateFrom(threadedFormula, threadedContext.getFormulaManager());
+      translatedFormulas.add(translatedFormula);
+      threadedContext.close();
+    }
+    assertThat(translatedFormulas).hasSize(NUMBER_OF_THREADS);
+    BooleanFormula finalFormula = bmgr.and(translatedFormulas);
+    try (BasicProverEnvironment<?> stack = context.newProverEnvironment()) {
+      stack.push(finalFormula);
+
+      assertWithMessage(
+              "Test testFormulaTranslationWithConcurrentContexts() failed isUnsat() in the main"
+                  + " thread.")
+          .that(stack.isUnsat())
+          .isTrue();
+    }
+  }
+
   /** Test concurrency with already present and unique context per thread. */
   @SuppressWarnings("resource")
   @Test
@@ -273,8 +353,8 @@ public class SolverConcurrencyTest {
 
   /**
    * Uses HardBitvectorFormulaGenerator for longer test-cases to assess concurrency problems. Length
-   * is very solver depended, so make sure you choose a appropriate number for the used solver. Make
-   * sure to not call this method with a SolverContext that does not support bitvectors! (No
+   * is very solver depended, so make sure you choose an appropriate number for the used solver.
+   * Make sure to not call this method with a SolverContext that does not support bitvectors! (No
    * requireBitvector() because the exceptionList would collect it and throw an exception failing
    * the test!).
    *
@@ -298,8 +378,8 @@ public class SolverConcurrencyTest {
 
   /**
    * Uses HardIntegerFormulaGenerator for longer test-cases to assess concurrency problems. Length
-   * is very solver depended, so make sure you choose a appropriate number for the used solver. Make
-   * sure to not call this method with a SolverContext that does not support integers! (No
+   * is very solver depended, so make sure you choose an appropriate number for the used solver.
+   * Make sure to not call this method with a SolverContext that does not support integers! (No
    * requireIntegers() because the exceptionList would collect it and throw an exception failing the
    * test!).
    *
@@ -320,6 +400,105 @@ public class SolverConcurrencyTest {
           .that(pe.isUnsat())
           .isTrue();
     }
+  }
+
+  /**
+   * Test that starts multiple threads that solve several problems such that they tend to not finish
+   * at the same time. Once a problem finishes, the formula is then send to another thread (with the
+   * context) and the sending thread starts solving a new problem (either send to it, or by
+   * generating a new one). The thread that just got the formula + context translates the formula
+   * into its own context once its finished (and send its formula to another context) and starts
+   * solving the formula it got send. This test is supposed to show the feasability of translating
+   * formulas with contexts in (concurrent) use.
+   */
+  @Test
+  public void continuousRunningThreadFormulaTransferTranslateTest() {
+    requireIntegers();
+    // CVC4 does not support parsing and therefore no translation.
+    // Princess has a wierd bug
+    // TODO: Look into the Princess problem
+    assume()
+        .withMessage("Solver does not support translation of formulas")
+        .that(solver)
+        .isNoneOf(Solvers.CVC4, Solvers.PRINCESS);
+    /** Helperclass to pack a SolverContext together with a Formula */
+    class ContextAndFormula {
+      private final SolverContext context;
+      private final BooleanFormula formula;
+
+      protected ContextAndFormula(SolverContext context, BooleanFormula formula) {
+        this.context = context;
+        this.formula = formula;
+      }
+
+      public SolverContext getContext() {
+        return context;
+      }
+
+      public BooleanFormula getFormula() {
+        return formula;
+      }
+    }
+    // This is fine! We might access this more than once at a time,
+    // but that gives only access to the bucket, which is threadsafe.
+    AtomicReferenceArray<BlockingQueue<ContextAndFormula>> bucketQueue =
+        new AtomicReferenceArray<>(NUMBER_OF_THREADS);
+
+    // Init as many buckets as there are threads; each bucket generates an initial formula (such
+    // that
+    // they are differently hard to solve) depending on the uniqueId
+    for (int i = 0; i < NUMBER_OF_THREADS; i++) {
+      BlockingQueue<ContextAndFormula> bucket = new LinkedBlockingQueue<>(NUMBER_OF_THREADS);
+      bucketQueue.set(i, bucket);
+    }
+
+    // Bind unique IDs to each thread with a (threadsafe) unique ID generator
+    final UniqueIdGenerator idGenerator = new UniqueIdGenerator();
+
+    // Take the formula from the bucket of itself, solve it, once solved give the formula to the
+    // bucket of the next thread (have a counter for in which bucket we transfered the formula and
+    // +1 the counter)
+    assertConcurrency(
+        "continuousRunningThreadFormulaTransferTranslateTest",
+        () -> {
+          // Start the threads such that they each get a unqiue id
+          final int id = idGenerator.getFreshId();
+          int nextBucket = (id + 1) % NUMBER_OF_THREADS;
+          final BlockingQueue<ContextAndFormula> ownBucket = bucketQueue.get(id);
+          SolverContext context = initSolver();
+          FormulaManager mgr = context.getFormulaManager();
+          IntegerFormulaManager imgr = mgr.getIntegerFormulaManager();
+          BooleanFormulaManager bmgr = mgr.getBooleanFormulaManager();
+          HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
+          BooleanFormula threadFormula =
+              gen.generate(INTEGER_FORMULA_GEN.getOrDefault(solver, 9) - id);
+          try (BasicProverEnvironment<?> stack = context.newProverEnvironment()) {
+            // Repeat till the bucket counter reaches itself again
+            while (nextBucket != id) {
+              stack.push(threadFormula);
+
+              assertWithMessage(
+                      "Test continuousRunningThreadFormulaTransferTranslateTest() "
+                          + "failed isUnsat() in thread with id: "
+                          + id
+                          + ".")
+                  .that(stack.isUnsat())
+                  .isTrue();
+
+              // Take another formula from its own bucket or wait for one.
+              bucketQueue.get(nextBucket).add(new ContextAndFormula(context, threadFormula));
+
+              // Translate the formula into its own context and start solving
+              ContextAndFormula newFormulaAndContext = ownBucket.take();
+              threadFormula =
+                  mgr.translateFrom(
+                      newFormulaAndContext.getFormula(),
+                      newFormulaAndContext.getContext().getFormulaManager());
+
+              nextBucket = (nextBucket + 1) % NUMBER_OF_THREADS;
+            }
+          }
+        });
   }
 
   // As optimization is not used much at the moment this small test is ok

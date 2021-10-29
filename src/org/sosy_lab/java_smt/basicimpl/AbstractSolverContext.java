@@ -87,7 +87,7 @@ public abstract class AbstractSolverContext implements SolverContext {
    * methods. This class will wrap the prover environments and provide an implementation of the
    * feature.
    *
-   * <p>This method is expected to always return the same value. Otherwise the behavior of this
+   * <p>This method is expected to always return the same value. Otherwise, the behavior of this
    * class is undefined.
    */
   protected abstract boolean supportsAssumptionSolving();
@@ -105,7 +105,7 @@ public abstract class AbstractSolverContext implements SolverContext {
    * two lists of libraries can be used to differ between libraries specific to Unix/Linux and
    * Windows.
    *
-   * <p>If the first try a aborts after a few steps, we do not cleanup partially loaded libraries,
+   * <p>If the first try aborts after a few steps, we do not clean up partially loaded libraries,
    * but directly start the second try.
    *
    * <p>Each list is applied in the given ordering.
@@ -113,7 +113,7 @@ public abstract class AbstractSolverContext implements SolverContext {
    * @param loader the loading mechanism that will be used for loading each single library.
    * @param librariesForFirstTry list of library names that will be loaded, if possible.
    * @param librariesForSecondTry list of library names that will be loaded, after the first attempt
-   *     (using librariesForFirstTry} has failed.
+   *     (using librariesForFirstTry) has failed.
    * @throws UnsatisfiedLinkError if neither the first nor second try returned a successful loading
    *     process.
    */

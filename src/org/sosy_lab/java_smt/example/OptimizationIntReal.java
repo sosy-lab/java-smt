@@ -140,7 +140,7 @@ public class OptimizationIntReal {
     prover.pop();
 
     prover.push();
-    { // maximize x and get a upper bound of x: x < 10
+    { // maximize x and get an upper bound of x: x < 10
       // --> bound is (10 - EPSILON) for rational symbols and 9 for integer symbols.
       int handleX = prover.maximize(x);
       OptStatus status = prover.check();

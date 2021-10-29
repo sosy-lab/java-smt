@@ -11,6 +11,9 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.test.BooleanFormulaSubject.assertUsing;
 
+import com.google.common.collect.Lists;
+import java.util.Arrays;
+import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,17 +53,9 @@ public class TranslateFormulaTest {
   public Solvers translateTo;
 
   @Parameters(name = "{index}: {0} --> {1}")
-  public static Object[] getSolversProduct() {
-    // Every combination: translateFrom and translateTo.
-    int len = Solvers.values().length;
-    Solvers[][] combinations = new Solvers[len * len][2];
-    for (int i = 0; i < len; i++) {
-      for (int j = 0; j < len; j++) {
-        combinations[i * len + j][0] = Solvers.values()[i];
-        combinations[i * len + j][1] = Solvers.values()[j];
-      }
-    }
-    return combinations;
+  public static List<Object[]> getSolverCombinations() {
+    List<Solvers> solvers = Arrays.asList(Solvers.values());
+    return Lists.transform(Lists.cartesianProduct(solvers, solvers), List::toArray);
   }
 
   @Before
@@ -94,10 +89,17 @@ public class TranslateFormulaTest {
     }
   }
 
-  private void requireParser() {
+  private void requireParserTo() {
     assume()
         .withMessage("Solver %s does not support parsing formulae", translateTo)
         .that(translateTo)
+        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2);
+  }
+
+  private void requireParserFrom() {
+    assume()
+        .withMessage("Solver %s does not support parsing formulae", translateFrom)
+        .that(translateFrom)
         .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2);
   }
 
@@ -110,7 +112,7 @@ public class TranslateFormulaTest {
 
   @Test
   public void testDumpingAndParsing() throws SolverException, InterruptedException {
-    requireParser();
+    requireParserTo();
 
     BooleanFormula input = createTestFormula(managerFrom);
     String out = managerFrom.dumpFormula(input).toString();
@@ -121,12 +123,37 @@ public class TranslateFormulaTest {
 
   @Test
   public void testTranslating() throws SolverException, InterruptedException {
-    requireParser();
+    requireParserTo();
 
-    BooleanFormula input = createTestFormula(managerFrom);
-    BooleanFormula parsed = managerTo.translateFrom(input, managerFrom);
+    BooleanFormula inputFrom = createTestFormula(managerFrom);
+    BooleanFormula inputTo = createTestFormula(managerTo);
+    BooleanFormula translatedInput = managerTo.translateFrom(inputFrom, managerFrom);
 
-    assertUsing(to).that(createTestFormula(managerTo)).isEquivalentTo(parsed);
+    assertUsing(to).that(inputTo).isEquivalentTo(translatedInput);
+  }
+
+  @Test
+  public void testTranslatingSelf() throws SolverException, InterruptedException {
+    assume().that(translateTo).isEqualTo(translateFrom);
+    FormulaManager manager = managerFrom;
+
+    BooleanFormula inputFrom = createTestFormula(manager);
+    BooleanFormula inputTo = createTestFormula(manager);
+    BooleanFormula translatedInput = manager.translateFrom(inputFrom, manager);
+
+    assertUsing(to).that(inputTo).isEquivalentTo(translatedInput);
+  }
+
+  @Test
+  public void testTranslatingAndReverse() throws SolverException, InterruptedException {
+    requireParserTo();
+    requireParserFrom();
+
+    BooleanFormula inputFrom = createTestFormula(managerFrom);
+    BooleanFormula translatedInput = managerTo.translateFrom(inputFrom, managerFrom);
+    BooleanFormula translatedReverseInput = managerFrom.translateFrom(translatedInput, managerTo);
+
+    assertUsing(from).that(inputFrom).isEquivalentTo(translatedReverseInput);
   }
 
   private BooleanFormula createTestFormula(FormulaManager mgr) {

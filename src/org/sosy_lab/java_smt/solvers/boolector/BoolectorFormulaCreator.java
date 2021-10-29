@@ -34,7 +34,7 @@ import org.sosy_lab.java_smt.solvers.boolector.BoolectorFormula.BoolectorBoolean
 
 public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
-  // Boolector can give back 'x' for a arbitrary value that we change to this
+  // Boolector can give back 'x' for an arbitrary value that we change to this
   private static final char ARBITRARY_VALUE = '1';
 
   /** Maps a name and a variable or function type to a concrete formula node. */
@@ -164,8 +164,8 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
     return newVar;
   }
 
-  // This method is a massive problem... you CANT get the value formulas(nodes) because they are
-  // only build and used internally in boolector. (See visit1 for help)
+  // This method is a massive problem... you CAN'T get the value formulas(nodes) because they are
+  // only build and used internally in Boolector. (See visit1 for help)
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula formula, Long f) {
     throw new UnsupportedOperationException(

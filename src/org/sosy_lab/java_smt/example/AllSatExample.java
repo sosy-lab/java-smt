@@ -105,7 +105,7 @@ public class AllSatExample {
     return prover.allSat(
         new AllSatCallback<>() {
 
-          List<List<BooleanFormula>> models = new ArrayList<>();
+          private final List<List<BooleanFormula>> models = new ArrayList<>();
 
           @Override
           public void apply(List<BooleanFormula> pModel) {

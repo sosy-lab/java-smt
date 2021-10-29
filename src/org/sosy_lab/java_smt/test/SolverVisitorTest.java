@@ -503,6 +503,24 @@ public class SolverVisitorTest extends SolverBasedTest0 {
   }
 
   @Test
+  public void testIntegerFormulaQuantifierSymbolsExtraction() throws Exception {
+    requireQuantifiers();
+    requireIntegers();
+
+    IntegerFormula x = imgr.makeVariable("x");
+    IntegerFormula y = imgr.makeVariable("y");
+    BooleanFormula xEqy = imgr.equal(x, y);
+    // (x=y) && EX x: (X=y)
+    BooleanFormula constraint = bmgr.and(xEqy, qmgr.forall(ImmutableList.of(x), xEqy));
+
+    // The variable extraction should visit "x" and "y" only once,
+    // otherwise AbstractFormulaManager#extractVariables might throw an exception,
+    // when building an ImmutableMap.
+    assertThat(mgr.extractVariables(constraint)).containsEntry(x.toString(), x);
+    assertThat(mgr.extractVariables(constraint)).containsEntry(y.toString(), y);
+  }
+
+  @Test
   public void testIntegerFormulaQuantifierHandlingTrivialUNSAT() throws Exception {
     requireQuantifiers();
     requireIntegers();
@@ -616,7 +634,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
         });
 
     assertThat(found).containsAtLeast("a", "b");
-    assertThat(found).hasSize(3); // all of the above plus the boolean "and" function
+    assertThat(found).hasSize(3); // all the above plus the boolean "and" function
     assertThat(found).doesNotContain(ab.toString());
   }
 
@@ -739,7 +757,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
 
   @Test
   public void extractionTest2() {
-    // the same than above, but with nullary UF.
+    // the same as above, but with nullary UF.
     IntegerFormula v = fmgr.declareAndCallUF("v", FormulaType.IntegerType);
     BooleanFormula q = fmgr.declareAndCallUF("q", FormulaType.BooleanType, v);
     Map<String, Formula> mapping = mgr.extractVariablesAndUFs(q);

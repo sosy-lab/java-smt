@@ -76,7 +76,7 @@ public interface FloatingPointFormulaManager {
    *
    * @param source the source formula of compatible type
    * @param signed if a {@link BitvectorFormula} is given as source, we additionally use this flag.
-   *     Otherwise we ignore it.
+   *     Otherwise, we ignore it.
    * @param targetType the type of the resulting formula
    * @throws IllegalArgumentException if an incompatible type is used, e.g. a {@link BooleanFormula}
    *     cannot be cast to {@link FloatingPointFormula}.
@@ -93,7 +93,7 @@ public interface FloatingPointFormulaManager {
    *
    * @param source the source formula of compatible type
    * @param signed if a {@link BitvectorFormula} is given as source, we additionally use this flag.
-   *     Otherwise we ignore it.
+   *     Otherwise, we ignore it.
    * @param targetType the type of the resulting formula
    * @param pFloatingPointRoundingMode if rounding is needed, we apply the rounding mode.
    * @throws IllegalArgumentException if an incompatible type is used, e.g. a {@link BooleanFormula}

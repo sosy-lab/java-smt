@@ -87,7 +87,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   }
 
   /**
-   * Makes a bound copy of an variable for use in quantifier. Note that all occurrences of the free
+   * Makes a bound copy of a variable for use in quantifier. Note that all occurrences of the free
    * var have to be substituted by the bound once it exists.
    *
    * @param var Variable you want a bound copy of.

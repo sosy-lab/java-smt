@@ -44,8 +44,9 @@ import org.sosy_lab.common.NativeLibraries;
  * Each variable created is a new one with a new internal id, even if they are named the same.
  * As a result, checking equality on 2 formulas that are build with new variables
  *  that are named the same results in false!
- * Additionally CVC4 only supports quantifier elimination for LIA and LRA.
- * However it might run endlessly in some cases if you try quant elim on array theories!
+ * Additionally, CVC4 only supports quantifier elimination for LIA and LRA.
+ * However, it might run endlessly in some cases if you try quantifier elimination on array
+ * theories!
  */
 public class CVC4NativeAPITest {
 
@@ -418,29 +419,20 @@ public class CVC4NativeAPITest {
     Result result = smtEngine.checkSat(assertion);
     assertThat(result.isSat()).isEqualTo(Sat.UNSAT);
     Exception e =
-        assertThrows(
-            edu.stanford.CVC4.Exception.class,
-            () -> {
-              smtEngine.getValue(assertion);
-            });
+        assertThrows(edu.stanford.CVC4.Exception.class, () -> smtEngine.getValue(assertion));
     assertThat(e.toString()).contains(INVALID_GETVALUE_STRING);
   }
 
-  /** For reasons unknown you can get a model but you can't do anything with it. */
+  /** For reasons unknown you can get a model, but you can't do anything with it. */
   @Test
   public void checkInvalidModel() {
     Result result = smtEngine.checkSat(exprMgr.mkConst(false));
     assertThat(result.isSat()).isEqualTo(Sat.UNSAT);
-    Exception e =
-        assertThrows(
-            edu.stanford.CVC4.Exception.class,
-            () -> {
-              smtEngine.getModel();
-            });
+    Exception e = assertThrows(edu.stanford.CVC4.Exception.class, () -> smtEngine.getModel());
     assertThat(e.toString()).contains(INVALID_MODEL_STRING);
   }
 
-  /** It does not matter if you take a int or array or bv here, all result in the same error. */
+  /** It does not matter if you take an int or array or bv here, all result in the same error. */
   @Test
   public void checkInvalidTypeOperationsAssert() {
     BitVectorType bvType = exprMgr.mkBitVectorType(16);
@@ -448,15 +440,11 @@ public class CVC4NativeAPITest {
     Expr assertion = exprMgr.mkExpr(Kind.AND, bvVar, bvVar);
 
     Exception e =
-        assertThrows(
-            edu.stanford.CVC4.Exception.class,
-            () -> {
-              smtEngine.assertFormula(assertion);
-            });
+        assertThrows(edu.stanford.CVC4.Exception.class, () -> smtEngine.assertFormula(assertion));
     assertThat(e.toString()).contains("expecting a Boolean subexpression");
   }
 
-  /** It does not matter if you take a int or array or bv here, all result in the same error. */
+  /** It does not matter if you take an int or array or bv here, all result in the same error. */
   @Test
   public void checkInvalidTypeOperationsCheckSat() {
     BitVectorType bvType = exprMgr.mkBitVectorType(16);
@@ -464,11 +452,7 @@ public class CVC4NativeAPITest {
     Expr assertion = exprMgr.mkExpr(Kind.AND, bvVar, bvVar);
 
     Exception e =
-        assertThrows(
-            edu.stanford.CVC4.Exception.class,
-            () -> {
-              smtEngine.checkSat(assertion);
-            });
+        assertThrows(edu.stanford.CVC4.Exception.class, () -> smtEngine.checkSat(assertion));
     assertThat(e.toString()).contains("expecting a Boolean subexpression");
   }
 
@@ -478,11 +462,7 @@ public class CVC4NativeAPITest {
     Expr assertion = exprMgr.mkExpr(Kind.EQUAL, bvOne, bvOne);
 
     Exception e =
-        assertThrows(
-            edu.stanford.CVC4.Exception.class,
-            () -> {
-              smtEngine.assertFormula(assertion);
-            });
+        assertThrows(edu.stanford.CVC4.Exception.class, () -> smtEngine.assertFormula(assertion));
     assertThat(e.toString()).contains("constant of size 0");
   }
 
@@ -492,11 +472,7 @@ public class CVC4NativeAPITest {
     Expr assertion = exprMgr.mkExpr(Kind.EQUAL, bvOne, bvOne);
 
     Exception e =
-        assertThrows(
-            edu.stanford.CVC4.Exception.class,
-            () -> {
-              smtEngine.checkSat(assertion);
-            });
+        assertThrows(edu.stanford.CVC4.Exception.class, () -> smtEngine.checkSat(assertion));
     assertThat(e.toString()).contains("constant of size 0");
   }
 
@@ -568,7 +544,7 @@ public class CVC4NativeAPITest {
     Expr selectEq0 = exprMgr.mkExpr(Kind.EQUAL, select123, zero);
     Expr assertion = exprMgr.mkExpr(Kind.AND, notExists, selectEq0);
 
-    // assertFormula has an return value, check?
+    // assertFormula has a return value, check?
     smtEngine.assertFormula(assertion);
     Result satCheck = smtEngine.checkSat();
     // CVC4 fails this test as incomplete
@@ -647,8 +623,8 @@ public class CVC4NativeAPITest {
 
     // check Model
     // var = 1 & boundVar = 1 & exists boundVar . ( boundVar = 2 & f(2) = 1 )
-    // It seems like CVC4 cant return quantified variables,
-    // therefore we cant get a value for the uf!
+    // It seems like CVC4 can't return quantified variables,
+    // therefore we can't get a value for the uf!
     assertThat(smtEngine.getValue(var).toString()).isEqualTo("1");
     assertThat(smtEngine.getValue(boundVar).toString()).isEqualTo("1");
 
@@ -657,8 +633,8 @@ public class CVC4NativeAPITest {
   }
 
   /**
-   * CVC4 does not support Array quantifier elim. This is expected to fail! But it runs endlessly.
-   * So we can check interruption on it.
+   * CVC4 does not support Array quantifier elimination. This is expected to fail! But it runs
+   * endlessly. So we can check interruption on it.
    */
   @Test
   public void checkInterruptBehaviour() {
@@ -716,11 +692,7 @@ public class CVC4NativeAPITest {
     Expr bodySubst = body.substitute(yBv, xBound);
     Expr assertion = exprMgr.mkExpr(Kind.EXISTS, quantifiedVars, bodySubst);
 
-    assertThrows(
-        RuntimeException.class,
-        () -> {
-          smtEngine.doQuantifierElimination(assertion, true);
-        });
+    assertThrows(RuntimeException.class, () -> smtEngine.doQuantifierElimination(assertion, true));
   }
 
   @Test
