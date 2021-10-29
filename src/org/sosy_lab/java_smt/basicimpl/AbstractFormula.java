@@ -12,16 +12,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.errorprone.annotations.Immutable;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.sosy_lab.java_smt.api.ArrayFormula;
-import org.sosy_lab.java_smt.api.BitvectorFormula;
-import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.FloatingPointFormula;
-import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
-import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.*;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
-import org.sosy_lab.java_smt.api.StringFormula;
 
 /**
  * A Formula represented as a TFormulaInfo object.
@@ -138,6 +131,14 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
   static final class StringFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo>
       implements StringFormula {
     StringFormulaImpl(TFormulaInfo pT) {
+      super(pT);
+    }
+  }
+
+  /** Simple RegexFormula implementation. */
+  static final class RegexFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo>
+          implements RegexFormula {
+    RegexFormulaImpl(TFormulaInfo pT) {
       super(pT);
     }
   }

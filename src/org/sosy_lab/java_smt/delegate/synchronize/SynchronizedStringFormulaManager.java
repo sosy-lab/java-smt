@@ -10,10 +10,7 @@ package org.sosy_lab.java_smt.delegate.synchronize;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.SolverContext;
-import org.sosy_lab.java_smt.api.StringFormula;
-import org.sosy_lab.java_smt.api.StringFormulaManager;
+import org.sosy_lab.java_smt.api.*;
 
 class SynchronizedStringFormulaManager implements StringFormulaManager {
 
@@ -43,6 +40,146 @@ class SynchronizedStringFormulaManager implements StringFormulaManager {
   public BooleanFormula equal(StringFormula str1, StringFormula str2) {
     synchronized (sync) {
       return delegate.equal(str1, str2);
+    }
+  }
+
+  @Override
+  public BooleanFormula greaterThan(StringFormula str1, StringFormula str2) {
+    synchronized (sync) {
+      return delegate.greaterThan(str1, str2);
+    }
+  }
+
+  @Override
+  public BooleanFormula greaterOrEquals(StringFormula str1, StringFormula str2) {
+    synchronized (sync) {
+      return delegate.greaterOrEquals(str1, str2);
+    }
+  }
+
+  @Override
+  public BooleanFormula lessThan(StringFormula str1, StringFormula str2) {
+    synchronized (sync) {
+      return delegate.lessThan(str1, str2);
+    }
+  }
+
+  @Override
+  public BooleanFormula lessOrEquals(StringFormula str1, StringFormula str2) {
+    synchronized (sync) {
+      return delegate.lessOrEquals(str1, str2);
+    }
+  }
+
+  @Override
+  public NumeralFormula.IntegerFormula length(StringFormula str) {
+    synchronized (sync) {
+      return delegate.length(str);
+    }
+  }
+
+  @Override
+  public StringFormula concat(StringFormula str1, StringFormula str2) {
+    synchronized (sync) {
+      return delegate.concat(str1, str2);
+    }
+  }
+
+  @Override
+  public BooleanFormula in(StringFormula str, RegexFormula regex) {
+    synchronized (sync) {
+      return delegate.in(str, regex);
+    }
+  }
+
+  @Override
+  public RegexFormula makeRegex(String value) {
+    synchronized (sync) {
+      return delegate.makeRegex(value);
+    }
+  }
+
+  @Override
+  public RegexFormula none() {
+    synchronized (sync) {
+      return delegate.none();
+    }
+  }
+
+  @Override
+  public RegexFormula all() {
+    synchronized (sync) {
+      return delegate.all();
+    }
+  }
+
+  @Override
+  public RegexFormula allChar() {
+    synchronized (sync) {
+      return delegate.allChar();
+    }
+  }
+
+  @Override
+  public RegexFormula concat(RegexFormula regex1, RegexFormula regex2) {
+    synchronized (sync) {
+      return delegate.concat(regex1, regex2);
+    }
+  }
+
+  @Override
+  public RegexFormula union(RegexFormula regex1, RegexFormula regex2) {
+    synchronized (sync) {
+      return delegate.union(regex1, regex2);
+    }
+  }
+
+  @Override
+  public RegexFormula intersection(RegexFormula regex1, RegexFormula regex2) {
+    synchronized (sync) {
+      return delegate.intersection(regex1, regex2);
+    }
+  }
+
+  @Override
+  public RegexFormula closure(RegexFormula regex) {
+    synchronized (sync) {
+      return delegate.closure(regex);
+    }
+  }
+
+  @Override
+  public RegexFormula complement(RegexFormula regex) {
+    synchronized (sync) {
+      return delegate.complement(regex);
+    }
+  }
+
+  @Override
+  public RegexFormula difference(RegexFormula regex1, RegexFormula regex2) {
+    synchronized (sync) {
+      return delegate.difference(regex1, regex2);
+    }
+  }
+
+  @Override
+  public RegexFormula cross(RegexFormula regex) {
+    synchronized (sync) {
+      return delegate.cross(regex);
+    }
+  }
+
+  @Override
+  public RegexFormula optional(RegexFormula regex) {
+    synchronized (sync) {
+      return delegate.optional(regex);
+    }
+  }
+
+  @Override
+  public RegexFormula times(RegexFormula regex, int repetitions) {
+    synchronized (sync) {
+      return delegate.times(regex, repetitions);
     }
   }
 }

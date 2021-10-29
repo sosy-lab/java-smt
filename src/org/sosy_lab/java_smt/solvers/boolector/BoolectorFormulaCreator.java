@@ -41,7 +41,7 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
   private final Table<String, Long, Long> nameFormulaCache = HashBasedTable.create();
 
   BoolectorFormulaCreator(Long btor) {
-    super(btor, BtorJNI.boolector_bool_sort(btor), null, null, null);
+    super(btor, BtorJNI.boolector_bool_sort(btor), null, null, null, null);
   }
 
   @SuppressWarnings("unchecked")

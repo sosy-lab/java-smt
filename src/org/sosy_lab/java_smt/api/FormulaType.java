@@ -66,6 +66,8 @@ public abstract class FormulaType<T extends Formula> {
     return false;
   }
 
+  public boolean isRegexType() { return false; }
+
   @Override
   public abstract String toString();
 
@@ -367,6 +369,25 @@ public abstract class FormulaType<T extends Formula> {
         }
       };
 
+  public static final FormulaType<BooleanFormula> RegexType =
+      new FormulaType<>() {
+
+        @Override
+        public boolean isRegexType() {
+          return true;
+        }
+
+        @Override
+        public String toString() {
+          return "RegLan";
+        }
+
+        @Override
+        public String toSMTLIBString() {
+          return "RegLan";
+        }
+      };
+
   /**
    * Parse a string and return the corresponding type. This method is the counterpart of {@link
    * #toString()}.
@@ -380,6 +401,8 @@ public abstract class FormulaType<T extends Formula> {
       return RationalType;
     } else if (StringType.toString().equals(t)) {
       return StringType;
+    } else if (RegexType.toString().equals(t)) {
+      return RegexType;
     } else if (FloatingPointRoundingModeType.toString().equals(t)) {
       return FloatingPointRoundingModeType;
     } else if (t.startsWith("FloatingPoint<")) {

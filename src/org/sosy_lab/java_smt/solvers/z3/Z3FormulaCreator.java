@@ -61,6 +61,7 @@ import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3FloatingPointFormula;
 import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3IntegerFormula;
 import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3RationalFormula;
+import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3RegexFormula;
 import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3StringFormula;
 
 @Options(prefix = "solver.z3")
@@ -127,10 +128,11 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       long pIntegerType,
       long pRealType,
       long pStringType,
+      long pRegexType,
       Configuration config,
       ShutdownNotifier pShutdownNotifier)
       throws InvalidConfigurationException {
-    super(pEnv, pBoolType, pIntegerType, pRealType, pStringType);
+    super(pEnv, pBoolType, pIntegerType, pRealType, pStringType, pRegexType);
     shutdownNotifier = pShutdownNotifier;
     config.inject(this);
   }
@@ -189,11 +191,12 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
             Native.fpaGetEbits(z3context, pSort), Native.fpaGetSbits(z3context, pSort) - 1);
       case Z3_ROUNDING_MODE_SORT:
         return FormulaType.FloatingPointRoundingModeType;
+      case Z3_RE_SORT:
+        return FormulaType.RegexType;
       case Z3_DATATYPE_SORT:
       case Z3_RELATION_SORT:
       case Z3_FINITE_DOMAIN_SORT:
       case Z3_SEQ_SORT:
-      case Z3_RE_SORT:
       case Z3_UNKNOWN_SORT:
       case Z3_UNINTERPRETED_SORT:
         if (Native.isStringSort(z3context, pSort)) {
@@ -266,6 +269,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       return (T) storePhantomReference(new Z3RationalFormula(getEnv(), pTerm), pTerm);
     } else if (pType.isStringType()) {
       return (T) storePhantomReference(new Z3StringFormula(getEnv(), pTerm), pTerm);
+    } else if (pType.isRegexType()) {
+      return (T) storePhantomReference(new Z3RegexFormula(getEnv(), pTerm), pTerm);
     } else if (pType.isBitvectorType()) {
       return (T) storePhantomReference(new Z3BitvectorFormula(getEnv(), pTerm), pTerm);
     } else if (pType.isFloatingPointType()) {

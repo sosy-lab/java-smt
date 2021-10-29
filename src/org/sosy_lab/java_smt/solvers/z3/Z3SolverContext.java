@@ -156,6 +156,8 @@ public final class Z3SolverContext extends AbstractSolverContext {
     Native.incRef(context, Native.sortToAst(context, realSort));
     long stringSort = Native.mkStringSort(context);
     Native.incRef(context, Native.sortToAst(context, stringSort));
+    long regexSort = Native.mkReSort(context, stringSort);
+    Native.incRef(context, Native.sortToAst(context, regexSort));
 
     // The string representations of Z3s formulas should be in SMTLib2,
     // otherwise serialization wouldn't work.
@@ -168,7 +170,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
 
     Z3FormulaCreator creator =
         new Z3FormulaCreator(
-            context, boolSort, integerSort, realSort, stringSort, config, pShutdownNotifier);
+            context, boolSort, integerSort, realSort, stringSort, regexSort, config, pShutdownNotifier);
 
     // Create managers
     Z3UFManager functionTheory = new Z3UFManager(creator);

@@ -26,21 +26,12 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.sosy_lab.java_smt.api.ArrayFormula;
-import org.sosy_lab.java_smt.api.BitvectorFormula;
-import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.FloatingPointFormula;
-import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
-import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.*;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
-import org.sosy_lab.java_smt.api.FunctionDeclaration;
-import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
-import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
@@ -51,6 +42,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractFormula.FloatingPointFormulaImpl;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormula.FloatingPointRoundingModeFormulaImpl;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormula.IntegerFormulaImpl;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormula.RationalFormulaImpl;
+import org.sosy_lab.java_smt.basicimpl.AbstractFormula.RegexFormulaImpl;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormula.StringFormulaImpl;
 
 /**
@@ -70,6 +62,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
   private final @Nullable TType integerType;
   private final @Nullable TType rationalType;
   private final @Nullable TType stringType;
+  private final @Nullable TType regexType;
   protected final TEnv environment;
 
   protected FormulaCreator(
@@ -77,12 +70,14 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
       TType boolType,
       @Nullable TType pIntegerType,
       @Nullable TType pRationalType,
-      @Nullable TType stringType) {
+      @Nullable TType stringType,
+      @Nullable TType regexType) {
     this.environment = env;
     this.boolType = boolType;
     this.integerType = pIntegerType;
     this.rationalType = pRationalType;
     this.stringType = stringType;
+    this.regexType = regexType;
   }
 
   public final TEnv getEnv() {
@@ -120,6 +115,13 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
     return stringType;
   }
 
+  public final TType getRegexType() {
+    if (regexType == null) {
+      throw new UnsupportedOperationException("String theory is not supported by this solver.");
+    }
+    return regexType;
+  }
+
   public abstract TFormulaInfo makeVariable(TType type, String varName);
 
   public BooleanFormula encapsulateBoolean(TFormulaInfo pTerm) {
@@ -153,6 +155,11 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
     return new StringFormulaImpl<>(pTerm);
   }
 
+  public RegexFormula encapsulateRegex(TFormulaInfo pTerm) {
+    assert getFormulaType(pTerm).isRegexType();
+    return new RegexFormulaImpl<>(pTerm);
+  }
+
   public Formula encapsulateWithTypeOf(TFormulaInfo pTerm) {
     return encapsulate(getFormulaType(pTerm), pTerm);
   }
@@ -171,6 +178,8 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
       return (T) new RationalFormulaImpl<>(pTerm);
     } else if (pType.isStringType()) {
       return (T) new StringFormulaImpl<>(pTerm);
+    } else if (pType.isRegexType()) {
+      return (T) new RegexFormulaImpl<>(pTerm);
     } else if (pType.isBitvectorType()) {
       return (T) new BitvectorFormulaImpl<>(pTerm);
     } else if (pType.isFloatingPointType()) {
@@ -219,6 +228,8 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
       t = FormulaType.RationalType;
     } else if (formula instanceof StringFormula) {
       t = FormulaType.StringType;
+    } else if (formula instanceof RegexFormula) {
+      t = FormulaType.RegexType;
     } else if (formula instanceof FloatingPointRoundingModeFormula) {
       t = FormulaType.FloatingPointRoundingModeType;
     } else if (formula instanceof ArrayFormula) {
