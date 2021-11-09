@@ -33,7 +33,7 @@ to integer ones at _compile_ time) sometimes at the cost of verbosity.
 
 #### References
 
-- D. Baier, D. Beyer, and K. Friedberger
+- D. Baier, D. Beyer, and K. Friedberger.
   [**JavaSMT 3: Interacting with SMT Solvers in Java**](https://link.springer.com/content/pdf/10.1007/978-3-030-81688-9_9.pdf).
   In Proc. CAV, LNCS 12760, pages 1-13, 2021. Springer.
 - E. G. Karpenkov, K. Friedberger, and D. Beyer.
