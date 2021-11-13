@@ -37,10 +37,8 @@ import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
-import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.api.StringFormula;
 
 @RunWith(Parameterized.class)
 @SuppressWarnings("LocalVariableName")
@@ -1171,77 +1169,5 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     } else {
       assertThat(z1).isEqualTo(z2);
     }
-  }
-
-  @Test
-  public void testStringRegex() throws SolverException, InterruptedException {
-    requireStrings();
-
-    RegexFormula regex = smgr.makeRegex(".*");
-    StringFormula str = smgr.makeString("hello");
-    BooleanFormula formula = smgr.in(str, regex);
-
-    assertThatFormula(formula).isSatisfiable();
-  }
-
-  @Test
-  public void testEmptyRegex() throws SolverException, InterruptedException {
-    requireStrings();
-
-    RegexFormula regex = smgr.none();
-    StringFormula str = smgr.makeString("hello");
-    BooleanFormula formula = smgr.in(str, regex);
-
-    assertThatFormula(formula).isUnsatisfiable();
-  }
-
-  @Test
-  public void testStringConcat() throws SolverException, InterruptedException {
-    requireStrings();
-
-    StringFormula str1 = smgr.makeString("hello");
-    StringFormula str2 = smgr.makeString("world");
-    StringFormula concat = smgr.concat(str1, str2);
-    StringFormula complete = smgr.makeString("helloworld");
-
-    assertThatFormula(smgr.equal(concat, complete)).isSatisfiable();
-  }
-
-  @Test
-  public void testStringPrefixSuffixConcat() throws SolverException, InterruptedException {
-    requireStrings();
-
-    // check whether "prefix + suffix == concat"
-    StringFormula prefix = smgr.makeVariable("prefix");
-    StringFormula suffix = smgr.makeVariable("suffix");
-    StringFormula concat = smgr.makeVariable("concat");
-
-    assertThatFormula(
-            bmgr.and(
-                smgr.prefix(prefix, concat),
-                smgr.suffix(suffix, concat),
-                imgr.equal(
-                    smgr.length(concat), imgr.add(smgr.length(prefix), smgr.length(suffix)))))
-        .implies(smgr.equal(concat, smgr.concat(prefix, suffix)));
-  }
-
-  @Test
-  public void testStringPrefixSuffix() throws SolverException, InterruptedException {
-    requireStrings();
-
-    // check whether "prefix == suffix iff equal length"
-    StringFormula prefix = smgr.makeVariable("prefix");
-    StringFormula suffix = smgr.makeVariable("suffix");
-
-    assertThatFormula(bmgr.and(smgr.prefix(prefix, suffix), smgr.suffix(suffix, prefix)))
-        .implies(smgr.equal(prefix, suffix));
-    assertThatFormula(
-            bmgr.and(
-                smgr.prefix(prefix, suffix), imgr.equal(smgr.length(prefix), smgr.length(suffix))))
-        .implies(smgr.equal(prefix, suffix));
-    assertThatFormula(
-            bmgr.and(
-                smgr.suffix(suffix, prefix), imgr.equal(smgr.length(prefix), smgr.length(suffix))))
-        .implies(smgr.equal(prefix, suffix));
   }
 }
