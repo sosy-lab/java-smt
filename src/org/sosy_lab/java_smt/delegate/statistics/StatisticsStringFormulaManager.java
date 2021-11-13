@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.delegate.statistics;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.List;
 import org.sosy_lab.java_smt.api.*;
 
 class StatisticsStringFormulaManager implements StringFormulaManager {
@@ -71,9 +72,9 @@ class StatisticsStringFormulaManager implements StringFormulaManager {
   }
 
   @Override
-  public StringFormula concat(StringFormula str1, StringFormula str2) {
+  public StringFormula concat(List<StringFormula> parts) {
     stats.stringOperations.getAndIncrement();
-    return delegate.concat(str1, str2);
+    return delegate.concat(parts);
   }
 
   @Override
@@ -113,15 +114,15 @@ class StatisticsStringFormulaManager implements StringFormulaManager {
   }
 
   @Override
-  public RegexFormula allChar() {
+  public RegexFormula range(StringFormula start, StringFormula end) {
     stats.stringOperations.getAndIncrement();
-    return delegate.allChar();
+    return delegate.range(start, end);
   }
 
   @Override
-  public RegexFormula concat(RegexFormula regex1, RegexFormula regex2) {
+  public RegexFormula concatRegex(List<RegexFormula> parts) {
     stats.stringOperations.getAndIncrement();
-    return delegate.concat(regex1, regex2);
+    return delegate.concatRegex(parts);
   }
 
   @Override

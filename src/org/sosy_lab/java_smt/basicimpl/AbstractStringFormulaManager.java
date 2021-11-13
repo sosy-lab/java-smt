@@ -10,6 +10,9 @@ package org.sosy_lab.java_smt.basicimpl;
 
 import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
 
+import com.google.common.collect.Lists;
+import java.util.Collections;
+import java.util.List;
 import org.sosy_lab.java_smt.api.*;
 
 @SuppressWarnings("ClassTypeParameterName")
@@ -105,14 +108,11 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
   protected abstract TFormulaInfo length(TFormulaInfo pParam);
 
   @Override
-  public StringFormula concat(StringFormula str1, StringFormula str2) {
-    TFormulaInfo param1 = extractInfo(str1);
-    TFormulaInfo param2 = extractInfo(str2);
-
-    return wrapString(concat(param1, param2));
+  public StringFormula concat(List<StringFormula> parts) {
+    return wrapString(concatImpl(Lists.transform(parts, this::extractInfo)));
   }
 
-  protected abstract TFormulaInfo concat(TFormulaInfo pParam1, TFormulaInfo pParam2);
+  protected abstract TFormulaInfo concatImpl(List<TFormulaInfo> parts);
 
   @Override
   public BooleanFormula prefix(StringFormula prefix, StringFormula str) {
@@ -166,21 +166,18 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
   protected abstract TFormulaInfo allImpl();
 
   @Override
-  public RegexFormula allChar() {
-    return wrapRegex(allCharsImpl());
+  public RegexFormula range(StringFormula start, StringFormula end) {
+    return wrapRegex(range(extractInfo(start), extractInfo(end)));
   }
 
-  protected abstract TFormulaInfo allCharsImpl();
+  protected abstract TFormulaInfo range(TFormulaInfo start, TFormulaInfo end);
 
   @Override
-  public RegexFormula concat(RegexFormula regex1, RegexFormula regex2) {
-    TFormulaInfo param1 = extractInfo(regex1);
-    TFormulaInfo param2 = extractInfo(regex2);
-
-    return wrapRegex(regexConcat(param1, param2));
+  public RegexFormula concatRegex(List<RegexFormula> parts) {
+    return wrapRegex(concatRegexImpl(Lists.transform(parts, this::extractInfo)));
   }
 
-  protected abstract TFormulaInfo regexConcat(TFormulaInfo pParam1, TFormulaInfo pParam2);
+  protected abstract TFormulaInfo concatRegexImpl(List<TFormulaInfo> parts);
 
   @Override
   public RegexFormula union(RegexFormula regex1, RegexFormula regex2) {
@@ -237,10 +234,6 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
 
   @Override
   public RegexFormula times(RegexFormula regex, int repetitions) {
-    RegexFormula formula = makeRegex("");
-    for (int i = 0; i < repetitions; i++) {
-      formula = concat(regex, formula);
-    }
-    return formula;
+    return concatRegex(Collections.nCopies(repetitions, regex));
   }
 }

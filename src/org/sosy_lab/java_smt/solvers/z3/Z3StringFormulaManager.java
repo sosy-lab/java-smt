@@ -8,7 +8,9 @@
 
 package org.sosy_lab.java_smt.solvers.z3;
 
+import com.google.common.primitives.Longs;
 import com.microsoft.z3.Native;
+import java.util.List;
 import org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager;
 
 class Z3StringFormulaManager extends AbstractStringFormulaManager<Long, Long, Long, Long> {
@@ -62,8 +64,11 @@ class Z3StringFormulaManager extends AbstractStringFormulaManager<Long, Long, Lo
   }
 
   @Override
-  protected Long concat(Long pParam1, Long pParam2) {
-    return Native.mkSeqConcat(z3context, 2, new long[] {pParam1, pParam2});
+  protected Long concatImpl(List<Long> parts) {
+    if (parts.isEmpty()) {
+      return Native.mkString(z3context, ""); // empty sequence
+    }
+    return Native.mkSeqConcat(z3context, parts.size(), Longs.toArray(parts));
   }
 
   @Override
@@ -98,13 +103,16 @@ class Z3StringFormulaManager extends AbstractStringFormulaManager<Long, Long, Lo
   }
 
   @Override
-  protected Long allCharsImpl() {
-    return makeRegexImpl(".");
+  protected Long range(Long start, Long end) {
+    return Native.mkReRange(z3context, start, end);
   }
 
   @Override
-  protected Long regexConcat(Long pParam1, Long pParam2) {
-    return Native.mkReConcat(z3context, 2, new long[] {pParam1, pParam2});
+  protected Long concatRegexImpl(List<Long> parts) {
+    if (parts.isEmpty()) {
+      return noneImpl();
+    }
+    return Native.mkReConcat(z3context, parts.size(), Longs.toArray(parts));
   }
 
   @Override

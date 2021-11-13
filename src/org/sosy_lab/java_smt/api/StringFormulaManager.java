@@ -8,6 +8,9 @@
 
 package org.sosy_lab.java_smt.api;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Manager for dealing with string formulas. Functions come from
  * http://smtlib.cs.uiowa.edu/theories-UnicodeStrings.shtml.
@@ -51,7 +54,11 @@ public interface StringFormulaManager {
 
   NumeralFormula.IntegerFormula length(StringFormula str);
 
-  StringFormula concat(StringFormula str1, StringFormula str2);
+  default StringFormula concat(StringFormula... parts) {
+    return concat(Arrays.asList(parts));
+  }
+
+  StringFormula concat(List<StringFormula> parts);
 
   /**
    * @param str formula representing the string to match
@@ -73,14 +80,34 @@ public interface StringFormulaManager {
   /** @return formula denoting the empty set of strings */
   RegexFormula none();
 
-  /** @return formula denoting the set of all strings */
+  /** @return formula denoting the set of all strings, also known as Regex <code>".*"</code>. */
   RegexFormula all();
 
-  /** @return formula denoting the set of all strings of length 1 */
-  RegexFormula allChar();
+  /** @return formula denoting the set of all strings of length 1, also known as DOT operator. */
+  default RegexFormula allChar() {
+    return range(Character.MIN_VALUE, Character.MAX_VALUE);
+  }
+
+  /** @return formula denoting the range regular expression over two sequences of length 1. */
+  RegexFormula range(StringFormula start, StringFormula end);
+
+  /**
+   * @return formula denoting the range regular expression over two chars.
+   * @see #range(StringFormula, StringFormula)
+   */
+  default RegexFormula range(char start, char end) {
+    return range(makeString(String.valueOf(start)), makeString(String.valueOf(end)));
+  }
 
   /** @return formula denoting the concatenation */
-  RegexFormula concat(RegexFormula regex1, RegexFormula regex2);
+  default RegexFormula concat(RegexFormula... parts) {
+    return concatRegex(Arrays.asList(parts));
+  }
+
+  /** @return formula denoting the concatenation */
+  // TODO the naming of this function collides with #concat(List<StringFormula>).
+  //  Maybe we should split String and Regex manager.
+  RegexFormula concatRegex(List<RegexFormula> parts);
 
   /** @return formula denoting the union */
   RegexFormula union(RegexFormula regex1, RegexFormula regex2);
@@ -91,7 +118,7 @@ public interface StringFormulaManager {
   /** @return formula denoting the Kleene closure */
   RegexFormula complement(RegexFormula regex);
 
-  /** @return formula denoting the Kleene closure (0 or more) */
+  /** @return formula denoting the Kleene closure (0 or more), also known as STAR operand. */
   RegexFormula closure(RegexFormula regex);
 
   // derived regex operations
@@ -99,10 +126,10 @@ public interface StringFormulaManager {
   /** @return formula denoting the difference */
   RegexFormula difference(RegexFormula regex1, RegexFormula regex2);
 
-  /** @return formula denoting the Kleene cross (1 or more) */
+  /** @return formula denoting the Kleene cross (1 or more), also known as PLUS operand. */
   RegexFormula cross(RegexFormula regex);
 
-  /** @return formula denoting the optionality */
+  /** @return formula denoting the optionality, also known as QUESTIONMARK operand. */
   RegexFormula optional(RegexFormula regex);
 
   /** @return formula denoting the concatenation n times */

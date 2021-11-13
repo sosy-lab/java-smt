@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.delegate.synchronize;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.List;
 import org.sosy_lab.java_smt.api.*;
 
 class SynchronizedStringFormulaManager implements StringFormulaManager {
@@ -79,9 +80,9 @@ class SynchronizedStringFormulaManager implements StringFormulaManager {
   }
 
   @Override
-  public StringFormula concat(StringFormula str1, StringFormula str2) {
+  public StringFormula concat(List<StringFormula> parts) {
     synchronized (sync) {
-      return delegate.concat(str1, str2);
+      return delegate.concat(parts);
     }
   }
 
@@ -128,16 +129,16 @@ class SynchronizedStringFormulaManager implements StringFormulaManager {
   }
 
   @Override
-  public RegexFormula allChar() {
+  public RegexFormula range(StringFormula start, StringFormula end) {
     synchronized (sync) {
-      return delegate.allChar();
+      return delegate.range(start, end);
     }
   }
 
   @Override
-  public RegexFormula concat(RegexFormula regex1, RegexFormula regex2) {
+  public RegexFormula concatRegex(List<RegexFormula> parts) {
     synchronized (sync) {
-      return delegate.concat(regex1, regex2);
+      return delegate.concatRegex(parts);
     }
   }
 
