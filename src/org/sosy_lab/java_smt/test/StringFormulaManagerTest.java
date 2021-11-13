@@ -36,8 +36,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
     return Solvers.values();
   }
 
-  @Parameter
-  public Solvers solverUnderTest;
+  @Parameter public Solvers solverUnderTest;
 
   @Override
   protected Solvers solverToUse() {
