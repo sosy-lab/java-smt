@@ -123,6 +123,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   private final Timer cleanupTimer = new Timer();
   protected final ShutdownNotifier shutdownNotifier;
 
+  @SuppressWarnings("ParameterNumber")
   Z3FormulaCreator(
       long pEnv,
       long pBoolType,

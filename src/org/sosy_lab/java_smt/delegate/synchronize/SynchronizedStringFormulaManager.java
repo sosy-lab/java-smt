@@ -11,7 +11,12 @@ package org.sosy_lab.java_smt.delegate.synchronize;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.List;
-import org.sosy_lab.java_smt.api.*;
+import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula;
+import org.sosy_lab.java_smt.api.RegexFormula;
+import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.api.StringFormula;
+import org.sosy_lab.java_smt.api.StringFormulaManager;
 
 class SynchronizedStringFormulaManager implements StringFormulaManager {
 

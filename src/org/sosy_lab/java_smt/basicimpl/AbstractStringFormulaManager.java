@@ -13,7 +13,12 @@ import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariab
 import com.google.common.collect.Lists;
 import java.util.Collections;
 import java.util.List;
-import org.sosy_lab.java_smt.api.*;
+import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.NumeralFormula;
+import org.sosy_lab.java_smt.api.RegexFormula;
+import org.sosy_lab.java_smt.api.StringFormula;
+import org.sosy_lab.java_smt.api.StringFormulaManager;
 
 @SuppressWarnings("ClassTypeParameterName")
 public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>

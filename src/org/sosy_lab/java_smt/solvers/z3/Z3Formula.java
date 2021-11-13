@@ -13,9 +13,17 @@ import static com.google.common.base.Preconditions.checkArgument;
 import com.google.errorprone.annotations.Immutable;
 import com.microsoft.z3.Native;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.sosy_lab.java_smt.api.*;
+import org.sosy_lab.java_smt.api.ArrayFormula;
+import org.sosy_lab.java_smt.api.BitvectorFormula;
+import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.FloatingPointFormula;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
+import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
+import org.sosy_lab.java_smt.api.RegexFormula;
+import org.sosy_lab.java_smt.api.StringFormula;
 
 @Immutable
 abstract class Z3Formula implements Formula {
