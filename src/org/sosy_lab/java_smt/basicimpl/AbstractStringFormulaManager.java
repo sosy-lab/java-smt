@@ -115,6 +115,26 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
   protected abstract TFormulaInfo concat(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
   @Override
+  public BooleanFormula prefix(StringFormula prefix, StringFormula str) {
+    TFormulaInfo param1 = extractInfo(prefix);
+    TFormulaInfo param2 = extractInfo(str);
+
+    return wrapBool(prefix(param1, param2));
+  }
+
+  protected abstract TFormulaInfo prefix(TFormulaInfo pParam1, TFormulaInfo pParam2);
+
+  @Override
+  public BooleanFormula suffix(StringFormula suffix, StringFormula str) {
+    TFormulaInfo param1 = extractInfo(suffix);
+    TFormulaInfo param2 = extractInfo(str);
+
+    return wrapBool(suffix(param1, param2));
+  }
+
+  protected abstract TFormulaInfo suffix(TFormulaInfo pParam1, TFormulaInfo pParam2);
+
+  @Override
   public BooleanFormula in(StringFormula str, RegexFormula regex) {
     TFormulaInfo param1 = extractInfo(str);
     TFormulaInfo param2 = extractInfo(regex);

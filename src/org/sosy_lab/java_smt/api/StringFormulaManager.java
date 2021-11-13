@@ -43,6 +43,12 @@ public interface StringFormulaManager {
 
   BooleanFormula lessOrEquals(StringFormula str1, StringFormula str2);
 
+  /** Check whether the given prefix is a real prefix of str. */
+  BooleanFormula prefix(StringFormula prefix, StringFormula str);
+
+  /** Check whether the given suffix is a real suffix of str. */
+  BooleanFormula suffix(StringFormula suffix, StringFormula str);
+
   NumeralFormula.IntegerFormula length(StringFormula str);
 
   StringFormula concat(StringFormula str1, StringFormula str2);

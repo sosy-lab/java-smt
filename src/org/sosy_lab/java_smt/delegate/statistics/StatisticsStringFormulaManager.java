@@ -77,6 +77,18 @@ class StatisticsStringFormulaManager implements StringFormulaManager {
   }
 
   @Override
+  public BooleanFormula prefix(StringFormula str1, StringFormula str2) {
+    stats.stringOperations.getAndIncrement();
+    return delegate.prefix(str1, str2);
+  }
+
+  @Override
+  public BooleanFormula suffix(StringFormula str1, StringFormula str2) {
+    stats.stringOperations.getAndIncrement();
+    return delegate.suffix(str1, str2);
+  }
+
+  @Override
   public BooleanFormula in(StringFormula str, RegexFormula regex) {
     stats.stringOperations.getAndIncrement();
     return delegate.in(str, regex);

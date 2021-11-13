@@ -86,6 +86,20 @@ class SynchronizedStringFormulaManager implements StringFormulaManager {
   }
 
   @Override
+  public BooleanFormula prefix(StringFormula str1, StringFormula str2) {
+    synchronized (sync) {
+      return delegate.prefix(str1, str2);
+    }
+  }
+
+  @Override
+  public BooleanFormula suffix(StringFormula str1, StringFormula str2) {
+    synchronized (sync) {
+      return delegate.suffix(str1, str2);
+    }
+  }
+
+  @Override
   public BooleanFormula in(StringFormula str, RegexFormula regex) {
     synchronized (sync) {
       return delegate.in(str, regex);

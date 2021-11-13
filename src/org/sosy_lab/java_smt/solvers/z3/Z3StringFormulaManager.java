@@ -67,6 +67,16 @@ class Z3StringFormulaManager extends AbstractStringFormulaManager<Long, Long, Lo
   }
 
   @Override
+  protected Long prefix(Long pParam1, Long pParam2) {
+    return Native.mkSeqPrefix(z3context, pParam1, pParam2);
+  }
+
+  @Override
+  protected Long suffix(Long pParam1, Long pParam2) {
+    return Native.mkSeqSuffix(z3context, pParam1, pParam2);
+  }
+
+  @Override
   protected Long in(Long pParam1, Long pParam2) {
     return Native.mkSeqInRe(z3context, pParam1, pParam2);
   }
