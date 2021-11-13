@@ -49,6 +49,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
+import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
@@ -315,6 +316,13 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     assert getFormulaType(pTerm).isStringType();
     cleanupReferences();
     return storePhantomReference(new Z3StringFormula(getEnv(), pTerm), pTerm);
+  }
+
+  @Override
+  public RegexFormula encapsulateRegex(Long pTerm) {
+    assert getFormulaType(pTerm).isRegexType();
+    cleanupReferences();
+    return storePhantomReference(new Z3RegexFormula(getEnv(), pTerm), pTerm);
   }
 
   @Override
