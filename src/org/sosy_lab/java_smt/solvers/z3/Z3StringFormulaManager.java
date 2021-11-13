@@ -79,12 +79,12 @@ class Z3StringFormulaManager extends AbstractStringFormulaManager<Long, Long, Lo
 
   @Override
   protected Long noneImpl() {
-    return Native.mkReEmpty(z3context, formulaCreator.getStringType());
+    return Native.mkReEmpty(z3context, formulaCreator.getRegexType());
   }
 
   @Override
   protected Long allImpl() {
-    return Native.mkReFull(z3context, formulaCreator.getStringType());
+    return Native.mkReFull(z3context, formulaCreator.getRegexType());
   }
 
   @Override
