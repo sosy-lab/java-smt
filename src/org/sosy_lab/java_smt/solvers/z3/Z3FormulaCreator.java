@@ -313,14 +313,22 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   @Override
   public StringFormula encapsulateString(Long pTerm) {
-    assert getFormulaType(pTerm).isStringType();
+    assert getFormulaType(pTerm).isStringType()
+        : String.format(
+            "Term %s has unexpected type %s.",
+            Native.astToString(getEnv(), pTerm),
+            Native.sortToString(getEnv(), Native.getSort(getEnv(), pTerm)));
     cleanupReferences();
     return storePhantomReference(new Z3StringFormula(getEnv(), pTerm), pTerm);
   }
 
   @Override
   public RegexFormula encapsulateRegex(Long pTerm) {
-    assert getFormulaType(pTerm).isRegexType();
+    assert getFormulaType(pTerm).isRegexType()
+        : String.format(
+            "Term %s has unexpected type %s.",
+            Native.astToString(getEnv(), pTerm),
+            Native.sortToString(getEnv(), Native.getSort(getEnv(), pTerm)));
     cleanupReferences();
     return storePhantomReference(new Z3RegexFormula(getEnv(), pTerm), pTerm);
   }
