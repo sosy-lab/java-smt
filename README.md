@@ -43,9 +43,13 @@ JavaSMT can express formulas in the following theories:
  - Integer
  - Rational
  - Bitvector
- - Floating point
+ - Floating Point
  - Array
  - Uninterpreted Function
+ - String and RegEx
+
+The concrete support for a certain theory depends on the underlying SMT solver.
+Only a few SMT solvers provide support for theories like Arrays, Floating Point, String or RegEx.
 
 Currently JavaSMT supports several SMT solvers (see [Getting Started](doc/Getting-started.md)  for installation):
 
