@@ -132,17 +132,23 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
   protected abstract TFormulaInfo makeRegexImpl(String value);
 
   @Override
-  public RegexFormula none() { return wrapRegex(noneImpl()); }
+  public RegexFormula none() {
+    return wrapRegex(noneImpl());
+  }
 
   protected abstract TFormulaInfo noneImpl();
 
   @Override
-  public RegexFormula all() { return wrapRegex(allImpl()); }
+  public RegexFormula all() {
+    return wrapRegex(allImpl());
+  }
 
   protected abstract TFormulaInfo allImpl();
 
   @Override
-  public RegexFormula allChar() { return wrapRegex(allCharsImpl()); }
+  public RegexFormula allChar() {
+    return wrapRegex(allCharsImpl());
+  }
 
   protected abstract TFormulaInfo allCharsImpl();
 
@@ -217,5 +223,4 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
     }
     return formula;
   }
-
 }

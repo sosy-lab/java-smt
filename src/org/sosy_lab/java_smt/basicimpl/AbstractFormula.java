@@ -137,7 +137,7 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
 
   /** Simple RegexFormula implementation. */
   static final class RegexFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo>
-          implements RegexFormula {
+      implements RegexFormula {
     RegexFormulaImpl(TFormulaInfo pT) {
       super(pT);
     }

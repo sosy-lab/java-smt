@@ -170,7 +170,14 @@ public final class Z3SolverContext extends AbstractSolverContext {
 
     Z3FormulaCreator creator =
         new Z3FormulaCreator(
-            context, boolSort, integerSort, realSort, stringSort, regexSort, config, pShutdownNotifier);
+            context,
+            boolSort,
+            integerSort,
+            realSort,
+            stringSort,
+            regexSort,
+            config,
+            pShutdownNotifier);
 
     // Create managers
     Z3UFManager functionTheory = new Z3UFManager(creator);

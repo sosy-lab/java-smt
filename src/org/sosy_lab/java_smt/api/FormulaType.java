@@ -66,7 +66,9 @@ public abstract class FormulaType<T extends Formula> {
     return false;
   }
 
-  public boolean isRegexType() { return false; }
+  public boolean isRegexType() {
+    return false;
+  }
 
   @Override
   public abstract String toString();

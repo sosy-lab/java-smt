@@ -9,9 +9,9 @@
 package org.sosy_lab.java_smt.api;
 
 /**
- * Manager for dealing with string formulas.
- * Functions come from http://smtlib.cs.uiowa.edu/theories-UnicodeStrings.shtml.
- * */
+ * Manager for dealing with string formulas. Functions come from
+ * http://smtlib.cs.uiowa.edu/theories-UnicodeStrings.shtml.
+ */
 public interface StringFormulaManager {
 
   /**
@@ -48,7 +48,6 @@ public interface StringFormulaManager {
   StringFormula concat(StringFormula str1, StringFormula str2);
 
   /**
-   *
    * @param str formula representing the string to match
    * @param regex formula representing the regular expression
    * @return a formula representing the acceptance of the string by the regular expression
@@ -65,65 +64,41 @@ public interface StringFormulaManager {
 
   // basic regex operations
 
-  /**
-   * @return formula denoting the empty set of strings
-   */
+  /** @return formula denoting the empty set of strings */
   RegexFormula none();
 
-  /**
-   * @return formula denoting the set of all strings
-   */
+  /** @return formula denoting the set of all strings */
   RegexFormula all();
 
-  /**
-   * @return formula denoting the set of all strings of length 1
-   */
+  /** @return formula denoting the set of all strings of length 1 */
   RegexFormula allChar();
 
-  /**
-   * @return formula denoting the concatenation
-   */
+  /** @return formula denoting the concatenation */
   RegexFormula concat(RegexFormula regex1, RegexFormula regex2);
 
-  /**
-   * @return formula denoting the union
-   */
+  /** @return formula denoting the union */
   RegexFormula union(RegexFormula regex1, RegexFormula regex2);
 
-  /**
-   * @return formula denoting the intersection
-   */
+  /** @return formula denoting the intersection */
   RegexFormula intersection(RegexFormula regex1, RegexFormula regex2);
 
-  /**
-   * @return formula denoting the Kleene closure
-   */
+  /** @return formula denoting the Kleene closure */
   RegexFormula complement(RegexFormula regex);
 
-  /**
-   * @return formula denoting the Kleene closure (0 or more)
-   */
+  /** @return formula denoting the Kleene closure (0 or more) */
   RegexFormula closure(RegexFormula regex);
 
   // derived regex operations
 
-  /**
-   * @return formula denoting the difference
-   */
+  /** @return formula denoting the difference */
   RegexFormula difference(RegexFormula regex1, RegexFormula regex2);
 
-  /**
-   * @return formula denoting the Kleene cross (1 or more)
-   */
+  /** @return formula denoting the Kleene cross (1 or more) */
   RegexFormula cross(RegexFormula regex);
 
-  /**
-   * @return formula denoting the optionality
-   */
+  /** @return formula denoting the optionality */
   RegexFormula optional(RegexFormula regex);
 
-  /**
-   * @return formula denoting the concatenation n times
-   */
+  /** @return formula denoting the concatenation n times */
   RegexFormula times(RegexFormula regex, int repetitions);
 }
