@@ -71,18 +71,49 @@ class Z3StringFormulaManager extends AbstractStringFormulaManager<Long, Long, Lo
   }
 
   @Override
-  protected Long prefix(Long pParam1, Long pParam2) {
-    return Native.mkSeqPrefix(z3context, pParam1, pParam2);
+  protected Long prefix(Long prefix, Long str) {
+    return Native.mkSeqPrefix(z3context, prefix, str);
   }
 
   @Override
-  protected Long suffix(Long pParam1, Long pParam2) {
-    return Native.mkSeqSuffix(z3context, pParam1, pParam2);
+  protected Long suffix(Long suffix, Long str) {
+    return Native.mkSeqSuffix(z3context, suffix, str);
   }
 
   @Override
-  protected Long in(Long pParam1, Long pParam2) {
-    return Native.mkSeqInRe(z3context, pParam1, pParam2);
+  protected Long in(Long str, Long regex) {
+    return Native.mkSeqInRe(z3context, str, regex);
+  }
+
+  @Override
+  protected Long contains(Long str, Long part) {
+    return Native.mkSeqContains(z3context, str, part);
+  }
+
+  @Override
+  protected Long indexOf(Long str, Long part) {
+    final int offset = 0;
+    return Native.mkSeqIndex(z3context, str, part, offset);
+  }
+
+  @Override
+  protected Long charAt(Long str, Long index) {
+    return Native.mkSeqAt(z3context, str, index);
+  }
+
+  @Override
+  protected Long substring(Long str, Long index, Long length) {
+    return Native.mkSeqExtract(z3context, str, index, length);
+  }
+
+  @Override
+  protected Long replace(Long fullStr, Long target, Long replacement) {
+    return Native.mkSeqReplace(z3context, fullStr, target, replacement);
+  }
+
+  @Override
+  protected Long replaceAll(Long fullStr, Long target, Long replacement) {
+    throw new UnsupportedOperationException();
   }
 
   @Override

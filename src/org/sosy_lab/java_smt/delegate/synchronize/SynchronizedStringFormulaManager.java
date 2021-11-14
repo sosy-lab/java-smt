@@ -13,6 +13,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.StringFormula;
@@ -102,6 +103,50 @@ class SynchronizedStringFormulaManager implements StringFormulaManager {
   public BooleanFormula suffix(StringFormula str1, StringFormula str2) {
     synchronized (sync) {
       return delegate.suffix(str1, str2);
+    }
+  }
+
+  @Override
+  public BooleanFormula contains(StringFormula str, StringFormula part) {
+    synchronized (sync) {
+      return delegate.contains(str, part);
+    }
+  }
+
+  @Override
+  public IntegerFormula indexOf(StringFormula str, StringFormula part) {
+    synchronized (sync) {
+      return delegate.indexOf(str, part);
+    }
+  }
+
+  @Override
+  public StringFormula charAt(StringFormula str, IntegerFormula index) {
+    synchronized (sync) {
+      return delegate.charAt(str, index);
+    }
+  }
+
+  @Override
+  public StringFormula substring(StringFormula str, IntegerFormula index, IntegerFormula length) {
+    synchronized (sync) {
+      return delegate.substring(str, index, length);
+    }
+  }
+
+  @Override
+  public StringFormula replace(
+      StringFormula fullStr, StringFormula target, StringFormula replacement) {
+    synchronized (sync) {
+      return delegate.replace(fullStr, target, replacement);
+    }
+  }
+
+  @Override
+  public StringFormula replaceAll(
+      StringFormula fullStr, StringFormula target, StringFormula replacement) {
+    synchronized (sync) {
+      return delegate.replaceAll(fullStr, target, replacement);
     }
   }
 

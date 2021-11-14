@@ -77,18 +77,48 @@ class CVC4StringFormulaManager extends AbstractStringFormulaManager<Expr, Type, 
   }
 
   @Override
-  protected Expr prefix(Expr pParam1, Expr pParam2) {
-    return exprManager.mkExpr(Kind.STRING_PREFIX, pParam1, pParam2);
+  protected Expr prefix(Expr prefix, Expr str) {
+    return exprManager.mkExpr(Kind.STRING_PREFIX, prefix, str);
   }
 
   @Override
-  protected Expr suffix(Expr pParam1, Expr pParam2) {
-    return exprManager.mkExpr(Kind.STRING_SUFFIX, pParam1, pParam2);
+  protected Expr suffix(Expr suffix, Expr str) {
+    return exprManager.mkExpr(Kind.STRING_SUFFIX, suffix, str);
   }
 
   @Override
-  protected Expr in(Expr pParam1, Expr pParam2) {
-    return exprManager.mkExpr(Kind.STRING_IN_REGEXP, pParam1, pParam2);
+  protected Expr in(Expr str, Expr regex) {
+    return exprManager.mkExpr(Kind.STRING_IN_REGEXP, str, regex);
+  }
+
+  @Override
+  protected Expr contains(Expr str, Expr part) {
+    return exprManager.mkExpr(Kind.STRING_STRCTN, str, part);
+  }
+
+  @Override
+  protected Expr indexOf(Expr str, Expr part) {
+    return exprManager.mkExpr(Kind.STRING_STRIDOF, str, part);
+  }
+
+  @Override
+  protected Expr charAt(Expr str, Expr index) {
+    return exprManager.mkExpr(Kind.STRING_CHARAT, str, index);
+  }
+
+  @Override
+  protected Expr substring(Expr str, Expr index, Expr length) {
+    return exprManager.mkExpr(Kind.STRING_SUBSTR, str, index, length);
+  }
+
+  @Override
+  protected Expr replace(Expr fullStr, Expr target, Expr replacement) {
+    return exprManager.mkExpr(Kind.STRING_STRREPL, fullStr, target, replacement);
+  }
+
+  @Override
+  protected Expr replaceAll(Expr fullStr, Expr target, Expr replacement) {
+    return exprManager.mkExpr(Kind.STRING_STRREPLALL, fullStr, target, replacement);
   }
 
   @Override

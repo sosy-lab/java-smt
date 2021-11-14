@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.api;
 
 import java.util.Arrays;
 import java.util.List;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
 /**
  * Manager for dealing with string formulas. Functions come from
@@ -52,7 +53,34 @@ public interface StringFormulaManager {
   /** Check whether the given suffix is a real suffix of str. */
   BooleanFormula suffix(StringFormula suffix, StringFormula str);
 
-  NumeralFormula.IntegerFormula length(StringFormula str);
+  BooleanFormula contains(StringFormula str, StringFormula part);
+
+  /** Get the first index for a substring in a String, or -1 if the substring is not found. */
+  IntegerFormula indexOf(StringFormula str, StringFormula part);
+
+  /**
+   * Get a substring of length 1 from the given String.
+   *
+   * <p>The result is underspecified, if the index is out of bounds for the given String.
+   */
+  StringFormula charAt(StringFormula str, IntegerFormula index);
+
+  /**
+   * Get a substring from the given String.
+   *
+   * <p>The result is underspecified, if the start index is out of bounds for the given String or if
+   * the requested length is negative. The length of the result is the minimum of the requested
+   * length and the remaining length of the given String.
+   */
+  StringFormula substring(StringFormula str, IntegerFormula index, IntegerFormula length);
+
+  /** Replace the first appearances of target in fullStr with the replacement. */
+  StringFormula replace(StringFormula fullStr, StringFormula target, StringFormula replacement);
+
+  /** Replace all appearances of target in fullStr with the replacement. */
+  StringFormula replaceAll(StringFormula fullStr, StringFormula target, StringFormula replacement);
+
+  IntegerFormula length(StringFormula str);
 
   default StringFormula concat(StringFormula... parts) {
     return concat(Arrays.asList(parts));
@@ -85,7 +113,10 @@ public interface StringFormulaManager {
   /** @return formula denoting the set of all strings, also known as Regex <code>".*"</code>. */
   RegexFormula all();
 
-  /** @return formula denoting the set of all strings of length 1, also known as DOT operator. */
+  /**
+   * @return formula denoting the set of all strings of length 1, also known as DOT operator which
+   *     represents an arbitrary char. .
+   */
   default RegexFormula allChar() {
     return range(Character.MIN_VALUE, Character.MAX_VALUE);
   }

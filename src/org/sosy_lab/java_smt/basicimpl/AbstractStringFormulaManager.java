@@ -17,6 +17,7 @@ import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.StringFormulaManager;
@@ -129,33 +130,73 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
 
   @Override
   public BooleanFormula prefix(StringFormula prefix, StringFormula str) {
-    TFormulaInfo param1 = extractInfo(prefix);
-    TFormulaInfo param2 = extractInfo(str);
-
-    return wrapBool(prefix(param1, param2));
+    return wrapBool(prefix(extractInfo(prefix), extractInfo(str)));
   }
 
-  protected abstract TFormulaInfo prefix(TFormulaInfo pParam1, TFormulaInfo pParam2);
+  protected abstract TFormulaInfo prefix(TFormulaInfo prefix, TFormulaInfo str);
 
   @Override
   public BooleanFormula suffix(StringFormula suffix, StringFormula str) {
-    TFormulaInfo param1 = extractInfo(suffix);
-    TFormulaInfo param2 = extractInfo(str);
-
-    return wrapBool(suffix(param1, param2));
+    return wrapBool(suffix(extractInfo(suffix), extractInfo(str)));
   }
 
-  protected abstract TFormulaInfo suffix(TFormulaInfo pParam1, TFormulaInfo pParam2);
+  protected abstract TFormulaInfo suffix(TFormulaInfo suffix, TFormulaInfo str);
 
   @Override
   public BooleanFormula in(StringFormula str, RegexFormula regex) {
-    TFormulaInfo param1 = extractInfo(str);
-    TFormulaInfo param2 = extractInfo(regex);
-
-    return wrapBool(in(param1, param2));
+    return wrapBool(in(extractInfo(str), extractInfo(regex)));
   }
 
-  protected abstract TFormulaInfo in(TFormulaInfo pParam1, TFormulaInfo pParam2);
+  protected abstract TFormulaInfo in(TFormulaInfo str, TFormulaInfo regex);
+
+  @Override
+  public BooleanFormula contains(StringFormula str, StringFormula part) {
+    return wrapBool(contains(extractInfo(str), extractInfo(part)));
+  }
+
+  protected abstract TFormulaInfo contains(TFormulaInfo str, TFormulaInfo part);
+
+  @Override
+  public IntegerFormula indexOf(StringFormula str, StringFormula part) {
+    return getFormulaCreator()
+        .encapsulate(FormulaType.IntegerType, indexOf(extractInfo(str), extractInfo(part)));
+  }
+
+  protected abstract TFormulaInfo indexOf(TFormulaInfo str, TFormulaInfo part);
+
+  @Override
+  public StringFormula charAt(StringFormula str, IntegerFormula index) {
+    return wrapString(charAt(extractInfo(str), extractInfo(index)));
+  }
+
+  protected abstract TFormulaInfo charAt(TFormulaInfo str, TFormulaInfo index);
+
+  @Override
+  public StringFormula substring(StringFormula str, IntegerFormula index, IntegerFormula length) {
+    return wrapString(substring(extractInfo(str), extractInfo(index), extractInfo(length)));
+  }
+
+  protected abstract TFormulaInfo substring(
+      TFormulaInfo str, TFormulaInfo index, TFormulaInfo length);
+
+  @Override
+  public StringFormula replace(
+      StringFormula fullStr, StringFormula target, StringFormula replacement) {
+    return wrapString(replace(extractInfo(fullStr), extractInfo(target), extractInfo(replacement)));
+  }
+
+  protected abstract TFormulaInfo replace(
+      TFormulaInfo fullStr, TFormulaInfo target, TFormulaInfo replacement);
+
+  @Override
+  public StringFormula replaceAll(
+      StringFormula fullStr, StringFormula target, StringFormula replacement) {
+    return wrapString(
+        replaceAll(extractInfo(fullStr), extractInfo(target), extractInfo(replacement)));
+  }
+
+  protected abstract TFormulaInfo replaceAll(
+      TFormulaInfo fullStr, TFormulaInfo target, TFormulaInfo replacement);
 
   @Override
   public RegexFormula makeRegex(String value) {
