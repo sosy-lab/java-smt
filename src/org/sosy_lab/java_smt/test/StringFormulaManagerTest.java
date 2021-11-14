@@ -62,6 +62,10 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
         .withMessage("Solver %s is incomplete in the theory of strings", solverToUse())
         .that(solverToUse())
         .isNotEqualTo(Solvers.Z3);
+    assume()
+        .withMessage("Solver %s does not support the full unicode range", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC4);
     RegexFormula regex = smgr.closure(smgr.allChar());
     assertThatFormula(smgr.in(hello, regex)).isSatisfiable();
   }

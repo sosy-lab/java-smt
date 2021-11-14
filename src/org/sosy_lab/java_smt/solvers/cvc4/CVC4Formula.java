@@ -19,6 +19,8 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
+import org.sosy_lab.java_smt.api.RegexFormula;
+import org.sosy_lab.java_smt.api.StringFormula;
 
 @Immutable
 public class CVC4Formula implements Formula {
@@ -118,6 +120,20 @@ public class CVC4Formula implements Formula {
   @Immutable
   static final class CVC4BooleanFormula extends CVC4Formula implements BooleanFormula {
     CVC4BooleanFormula(Expr pTerm) {
+      super(pTerm);
+    }
+  }
+
+  @Immutable
+  static final class CVC4StringFormula extends CVC4Formula implements StringFormula {
+    CVC4StringFormula(Expr pTerm) {
+      super(pTerm);
+    }
+  }
+
+  @Immutable
+  static final class CVC4RegexFormula extends CVC4Formula implements RegexFormula {
+    CVC4RegexFormula(Expr pTerm) {
       super(pTerm);
     }
   }

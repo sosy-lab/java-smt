@@ -40,7 +40,8 @@ class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, ExprManager,
       CVC4FloatingPointFormulaManager pFpfmgr,
       CVC4QuantifiedFormulaManager pQfmgr,
       CVC4ArrayFormulaManager pAfmgr,
-      CVC4SLFormulaManager pSLfmgr) {
+      CVC4SLFormulaManager pSLfmgr,
+      CVC4StringFormulaManager pStrmgr) {
     super(
         pFormulaCreator,
         pFfmgr,
@@ -52,7 +53,7 @@ class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, ExprManager,
         pQfmgr,
         pAfmgr,
         pSLfmgr,
-        null);
+        pStrmgr);
     creator = pFormulaCreator;
   }
 

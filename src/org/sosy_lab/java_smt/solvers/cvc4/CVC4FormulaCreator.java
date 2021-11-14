@@ -46,6 +46,8 @@ import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
+import org.sosy_lab.java_smt.api.RegexFormula;
+import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
@@ -56,6 +58,8 @@ import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4FloatingPointFormula;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4IntegerFormula;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4RationalFormula;
+import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4RegexFormula;
+import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4StringFormula;
 
 public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, Expr> {
 
@@ -72,8 +76,8 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
         pExprManager.booleanType(),
         pExprManager.integerType(),
         pExprManager.realType(),
-        null,
-        null);
+        pExprManager.stringType(),
+        pExprManager.regExpType());
     exprManager = pExprManager;
   }
 
@@ -191,8 +195,13 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       FormulaType<?> indexType = getFormulaTypeFromTermType(arrayType.getIndexType());
       FormulaType<?> elementType = getFormulaTypeFromTermType(arrayType.getConstituentType());
       return FormulaType.getArrayType(indexType, elementType);
+    } else if (t.isString()) {
+      return FormulaType.StringType;
+    } else if (t.isRegExp()) {
+      return FormulaType.RegexType;
     } else {
-      throw new AssertionError("Unhandled type " + t.getBaseType());
+      throw new AssertionError(
+          String.format("Unhandled type '%s' with base type '%s'.", t, t.getBaseType()));
     }
   }
 
@@ -220,6 +229,10 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       return (T) new CVC4FloatingPointFormula(pTerm);
     } else if (pType.isFloatingPointRoundingModeType()) {
       return (T) new CVC4FloatingPointRoundingModeFormula(pTerm);
+    } else if (pType.isStringType()) {
+      return (T) new CVC4StringFormula(pTerm);
+    } else if (pType.isRegexType()) {
+      return (T) new CVC4RegexFormula(pTerm);
     }
     throw new IllegalArgumentException("Cannot create formulas of type " + pType + " in CVC4");
   }
@@ -258,6 +271,18 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
         : String.format(
             "%s is no array, but %s (%s)", pTerm, pTerm.getType(), getFormulaType(pTerm));
     return new CVC4ArrayFormula<>(pTerm, pIndexType, pElementType);
+  }
+
+  @Override
+  protected StringFormula encapsulateString(Expr pTerm) {
+    assert getFormulaType(pTerm).isStringType();
+    return new CVC4StringFormula(pTerm);
+  }
+
+  @Override
+  protected RegexFormula encapsulateRegex(Expr pTerm) {
+    assert getFormulaType(pTerm).isRegexType();
+    return new CVC4RegexFormula(pTerm);
   }
 
   private static String getName(Expr e) {

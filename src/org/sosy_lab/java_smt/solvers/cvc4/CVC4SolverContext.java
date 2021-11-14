@@ -89,6 +89,7 @@ public final class CVC4SolverContext extends AbstractSolverContext {
 
     CVC4ArrayFormulaManager arrayTheory = new CVC4ArrayFormulaManager(creator);
     CVC4SLFormulaManager slTheory = new CVC4SLFormulaManager(creator);
+    CVC4StringFormulaManager strTheory = new CVC4StringFormulaManager(creator);
     CVC4FormulaManager manager =
         new CVC4FormulaManager(
             creator,
@@ -100,7 +101,8 @@ public final class CVC4SolverContext extends AbstractSolverContext {
             fpTheory,
             qfTheory,
             arrayTheory,
-            slTheory);
+            slTheory,
+            strTheory);
 
     return new CVC4SolverContext(creator, manager, pShutdownNotifier, randomSeed);
   }
