@@ -70,8 +70,10 @@ public interface StringFormulaManager {
   /**
    * Returns a {@link RegexFormula} representing the given constant.
    *
+   * <p>This method does not parse an existing regex from String, but uses the String directly as a
+   * constant.
+   *
    * @param value the regular expression the returned <code>Formula</code> should represent
-   * @return a Formula representing the given value
    */
   RegexFormula makeRegex(String value);
 

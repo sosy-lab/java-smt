@@ -160,12 +160,12 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
     return new ArrayFormulaImpl<>(pTerm, pIndexType, pElementType);
   }
 
-  public StringFormula encapsulateString(TFormulaInfo pTerm) {
+  protected StringFormula encapsulateString(TFormulaInfo pTerm) {
     assert getFormulaType(pTerm).isStringType();
     return new StringFormulaImpl<>(pTerm);
   }
 
-  public RegexFormula encapsulateRegex(TFormulaInfo pTerm) {
+  protected RegexFormula encapsulateRegex(TFormulaInfo pTerm) {
     assert getFormulaType(pTerm).isRegexType();
     return new RegexFormulaImpl<>(pTerm);
   }

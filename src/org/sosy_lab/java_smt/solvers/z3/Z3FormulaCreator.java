@@ -313,7 +313,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   }
 
   @Override
-  public StringFormula encapsulateString(Long pTerm) {
+  protected StringFormula encapsulateString(Long pTerm) {
     assert getFormulaType(pTerm).isStringType()
         : String.format(
             "Term %s has unexpected type %s.",
@@ -324,7 +324,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   }
 
   @Override
-  public RegexFormula encapsulateRegex(Long pTerm) {
+  protected RegexFormula encapsulateRegex(Long pTerm) {
     assert getFormulaType(pTerm).isRegexType()
         : String.format(
             "Term %s has unexpected type %s.",

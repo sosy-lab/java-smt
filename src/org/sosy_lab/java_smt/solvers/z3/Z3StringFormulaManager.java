@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.z3;
 
+import com.google.common.base.Preconditions;
 import com.google.common.primitives.Longs;
 import com.microsoft.z3.Native;
 import java.util.List;
@@ -65,9 +66,7 @@ class Z3StringFormulaManager extends AbstractStringFormulaManager<Long, Long, Lo
 
   @Override
   protected Long concatImpl(List<Long> parts) {
-    if (parts.isEmpty()) {
-      return Native.mkString(z3context, ""); // empty sequence
-    }
+    Preconditions.checkArgument(!parts.isEmpty());
     return Native.mkSeqConcat(z3context, parts.size(), Longs.toArray(parts));
   }
 

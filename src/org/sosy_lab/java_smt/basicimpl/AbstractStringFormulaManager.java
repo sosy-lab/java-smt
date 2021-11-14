@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.basicimpl;
 
 import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import java.util.Collections;
 import java.util.List;
@@ -114,7 +115,14 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
 
   @Override
   public StringFormula concat(List<StringFormula> parts) {
-    return wrapString(concatImpl(Lists.transform(parts, this::extractInfo)));
+    switch (parts.size()) {
+      case 0:
+        return makeString(""); // empty sequence
+      case 1:
+        return Iterables.getOnlyElement(parts);
+      default:
+        return wrapString(concatImpl(Lists.transform(parts, this::extractInfo)));
+    }
   }
 
   protected abstract TFormulaInfo concatImpl(List<TFormulaInfo> parts);
@@ -179,7 +187,14 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
 
   @Override
   public RegexFormula concatRegex(List<RegexFormula> parts) {
-    return wrapRegex(concatRegexImpl(Lists.transform(parts, this::extractInfo)));
+    switch (parts.size()) {
+      case 0:
+        return none(); // empty sequence
+      case 1:
+        return Iterables.getOnlyElement(parts);
+      default:
+        return wrapRegex(concatRegexImpl(Lists.transform(parts, this::extractInfo)));
+    }
   }
 
   protected abstract TFormulaInfo concatRegexImpl(List<TFormulaInfo> parts);
