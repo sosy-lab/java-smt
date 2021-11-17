@@ -16,6 +16,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Table;
 import com.google.common.primitives.Longs;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -39,6 +41,14 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
 
   /** Maps a name and a variable or function type to a concrete formula node. */
   private final Table<String, Long, Long> nameFormulaCache = HashBasedTable.create();
+
+  /*  Experiment: remember all variables, arrays and ufs in this map by their name.
+   *  Reconstruct a model based on the smt-lib2 and this map.
+   *  If this works, remove the nameFormulaCache and make this the vars cache.
+   */
+  private final HashMap<String, Long> nameFormulaMap = new HashMap<>();
+  private final HashMap<Long, List<Long>> ufArgumentsSortMap = new HashMap<>();
+  // Possibly we need to split this up into vars, ufs, and arrays
 
   BoolectorFormulaCreator(Long btor) {
     super(btor, BtorJNI.boolector_bool_sort(btor), null, null);
@@ -72,12 +82,27 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
   @Override
   public FormulaType<?> getFormulaType(Long pFormula) {
     long sort = BtorJNI.boolector_get_sort(getEnv(), pFormula);
+    if (BtorJNI.boolector_is_fun_sort(getEnv(), sort)) {
+      sort = BtorJNI.boolector_fun_get_codomain_sort(getEnv(), pFormula);
+    }
+    return getFormulaTypeFromSortAndFormula(pFormula, sort);
+  }
+
+  /**
+   * Returns the proper FormulaType for the sort entered.
+   *
+   * @param pFormula Some Boolector node. Either the node of the sort, or its parent. Only has to be
+   *     accurate for arrays.
+   * @param sort The actual sort you want the FormulaType of.
+   * @return FormulaType for the sort.
+   */
+  private FormulaType<?> getFormulaTypeFromSortAndFormula(Long pFormula, Long sort) {
     if (BtorJNI.boolector_is_bitvec_sort(getEnv(), sort)) {
-      if (sort == 1) {
+      int width = BtorJNI.boolector_bitvec_sort_get_width(getEnv(), sort);
+      if (width == 1) {
         return FormulaType.BooleanType;
       } else {
-        return FormulaType.getBitvectorTypeWithSize(
-            BtorJNI.boolector_get_width(getEnv(), pFormula));
+        return FormulaType.getBitvectorTypeWithSize(width);
       }
     } else if (BtorJNI.boolector_is_array_sort(getEnv(), sort)) {
       int indexWidth = BtorJNI.boolector_get_index_width(getEnv(), pFormula);
@@ -161,6 +186,7 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
     }
     long newVar = BtorJNI.boolector_var(getEnv(), type, varName);
     nameFormulaCache.put(varName, type, newVar);
+    nameFormulaMap.put(varName, newVar);
     return newVar;
   }
 
@@ -239,25 +265,40 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
     }
     long uf = BtorJNI.boolector_uf(getEnv(), sort, name);
     nameFormulaCache.put(name, sort, uf);
+    nameFormulaMap.put(name, uf);
+    ufArgumentsSortMap.put(uf, pArgTypes);
     return uf;
   }
 
   @Override
   public Object convertValue(Long key, Long term) {
     String value;
-    if (BtorJNI.boolector_is_array(getEnv(), term)) {
-      value = BtorJNI.boolector_bv_assignment(getEnv(), term);
-    } else if (BtorJNI.boolector_is_const(getEnv(), term)) {
+    if (BtorJNI.boolector_is_const(getEnv(), term)) {
       value = BtorJNI.boolector_get_bits(getEnv(), term);
+      return transformStringToBigInt(value);
+
     } else if (BtorJNI.boolector_is_bitvec_sort(
         getEnv(), BtorJNI.boolector_get_sort(getEnv(), term))) {
       value = BtorJNI.boolector_bv_assignment(getEnv(), term);
-    } else {
-      throw new AssertionError("unknown sort and term");
-      // value = BtorJNI.boolector_bv_assignment(getEnv(), term);
+      return transformStringToBigInt(value);
+
+    } else if (BtorJNI.boolector_is_fun(getEnv(), term)) {
+      value = BtorJNI.boolector_uf_assignment_helper(getEnv(), term)[1][0];
+      return transformStringToBigInt(value);
+
+    } else if (BtorJNI.boolector_is_array(getEnv(), term)) {
+      List<Object> arrayValues = new ArrayList<>();
+      for (String stringArrayEntry : BtorJNI.boolector_array_assignment_helper(getEnv(), term)[1]) {
+        arrayValues.add(transformStringToBigInt(stringArrayEntry));
+      }
+      return arrayValues;
     }
+    throw new AssertionError("unknown sort and term");
+  }
+
+  protected Object transformStringToBigInt(String value) {
     // To get the correct type, we check the width of the term (== 1 means bool).
-    int width = BtorJNI.boolector_get_width(getEnv(), term);
+    int width = value.length();
     if (width == 1) {
       long longValue = parseBigInt(value).longValue();
       if (longValue == 1) {
@@ -352,6 +393,10 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
    */
   protected Table<String, Long, Long> getCache() {
     return nameFormulaCache;
+  }
+
+  protected HashMap<String, Long> getModelMap() {
+    return nameFormulaMap;
   }
 
   @Override
