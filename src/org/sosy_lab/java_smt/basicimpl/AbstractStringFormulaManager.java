@@ -57,59 +57,42 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
 
   @Override
   public BooleanFormula equal(StringFormula str1, StringFormula str2) {
-    TFormulaInfo param1 = extractInfo(str1);
-    TFormulaInfo param2 = extractInfo(str2);
-
-    return wrapBool(equal(param1, param2));
+    return wrapBool(equal(extractInfo(str1), extractInfo(str2)));
   }
 
   protected abstract TFormulaInfo equal(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
   @Override
   public BooleanFormula greaterThan(StringFormula str1, StringFormula str2) {
-    TFormulaInfo param1 = extractInfo(str1);
-    TFormulaInfo param2 = extractInfo(str2);
-
-    return wrapBool(greaterThan(param1, param2));
+    return wrapBool(greaterThan(extractInfo(str1), extractInfo(str2)));
   }
 
   protected abstract TFormulaInfo greaterThan(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
   @Override
   public BooleanFormula greaterOrEquals(StringFormula str1, StringFormula str2) {
-    TFormulaInfo param1 = extractInfo(str1);
-    TFormulaInfo param2 = extractInfo(str2);
-
-    return wrapBool(greaterThan(param1, param2));
+    return wrapBool(greaterOrEquals(extractInfo(str1), extractInfo(str2)));
   }
 
   protected abstract TFormulaInfo greaterOrEquals(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
   @Override
   public BooleanFormula lessThan(StringFormula str1, StringFormula str2) {
-    TFormulaInfo param1 = extractInfo(str1);
-    TFormulaInfo param2 = extractInfo(str2);
-
-    return wrapBool(greaterThan(param1, param2));
+    return wrapBool(lessThan(extractInfo(str1), extractInfo(str2)));
   }
 
   protected abstract TFormulaInfo lessThan(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
   @Override
   public BooleanFormula lessOrEquals(StringFormula str1, StringFormula str2) {
-    TFormulaInfo param1 = extractInfo(str1);
-    TFormulaInfo param2 = extractInfo(str2);
-
-    return wrapBool(greaterThan(param1, param2));
+    return wrapBool(lessOrEquals(extractInfo(str1), extractInfo(str2)));
   }
 
   protected abstract TFormulaInfo lessOrEquals(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
   @Override
   public NumeralFormula.IntegerFormula length(StringFormula str) {
-    TFormulaInfo param = extractInfo(str);
-
-    return getFormulaCreator().encapsulate(FormulaType.IntegerType, length(param));
+    return getFormulaCreator().encapsulate(FormulaType.IntegerType, length(extractInfo(str)));
   }
 
   protected abstract TFormulaInfo length(TFormulaInfo pParam);
@@ -242,38 +225,28 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
 
   @Override
   public RegexFormula union(RegexFormula regex1, RegexFormula regex2) {
-    TFormulaInfo param1 = extractInfo(regex1);
-    TFormulaInfo param2 = extractInfo(regex2);
-
-    return wrapRegex(union(param1, param2));
+    return wrapRegex(union(extractInfo(regex1), extractInfo(regex2)));
   }
 
   protected abstract TFormulaInfo union(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
   @Override
   public RegexFormula intersection(RegexFormula regex1, RegexFormula regex2) {
-    TFormulaInfo param1 = extractInfo(regex1);
-    TFormulaInfo param2 = extractInfo(regex2);
-
-    return wrapRegex(union(param1, param2));
+    return wrapRegex(union(extractInfo(regex1), extractInfo(regex2)));
   }
 
   protected abstract TFormulaInfo intersection(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
   @Override
   public RegexFormula closure(RegexFormula regex) {
-    TFormulaInfo param = extractInfo(regex);
-
-    return wrapRegex(closure(param));
+    return wrapRegex(closure(extractInfo(regex)));
   }
 
   protected abstract TFormulaInfo closure(TFormulaInfo pParam);
 
   @Override
   public RegexFormula complement(RegexFormula regex) {
-    TFormulaInfo param = extractInfo(regex);
-
-    return wrapRegex(complement(param));
+    return wrapRegex(complement(extractInfo(regex)));
   }
 
   protected abstract TFormulaInfo complement(TFormulaInfo pParam);
