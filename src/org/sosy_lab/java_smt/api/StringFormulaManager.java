@@ -10,6 +10,8 @@ package org.sosy_lab.java_smt.api;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
 /**
@@ -105,6 +107,25 @@ public interface StringFormulaManager {
    */
   RegexFormula makeRegex(String value);
 
+  /**
+   * Returns a {@link RegexFormula} representing the regular expression in the {@link Pattern}
+   *
+   * @param value the regular expression pattern the returned <code>Formula</code> should represent
+   */
+  default RegexFormula makeRegex(Pattern value) {
+    return makeRegex(value.pattern());
+  }
+
+  /**
+   * Returns a {@link RegexFormula} representing the regular expression in the {@link Matcher}
+   *
+   * @param value a matcher for the regular expression the returned <code>Formula</code> should
+   *              represent
+   */
+  default RegexFormula makeRegex(Matcher value) {
+    return makeRegex(value.pattern());
+  }
+
   // basic regex operations
 
   /** @return formula denoting the empty set of strings */
@@ -112,14 +133,6 @@ public interface StringFormulaManager {
 
   /** @return formula denoting the set of all strings, also known as Regex <code>".*"</code>. */
   RegexFormula all();
-
-  /**
-   * @return formula denoting the set of all strings of length 1, also known as DOT operator which
-   *     represents an arbitrary char. .
-   */
-  default RegexFormula allChar() {
-    return range(Character.MIN_VALUE, Character.MAX_VALUE);
-  }
 
   /** @return formula denoting the range regular expression over two sequences of length 1. */
   RegexFormula range(StringFormula start, StringFormula end);
