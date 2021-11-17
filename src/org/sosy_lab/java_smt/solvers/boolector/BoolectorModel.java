@@ -9,14 +9,23 @@
 package org.sosy_lab.java_smt.solvers.boolector;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 
 class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
+
+  // TODO: The rest of the keywords any maybe make this a map for O(1) access
+  private static final List<String> SMT_KEYWORDS = Arrays.asList("and", "=", "or");
 
   private final long btor;
   private final BoolectorAbstractProver<?> prover;
@@ -50,49 +59,110 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
   protected ImmutableList<ValueAssignment> toList() {
     Preconditions.checkState(!closed);
     Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
-    // We wait till the Boolector devs give us methods to do this properly.
-    // See toList1 for help to build this method! (delete toList1 later)
-    ImmutableList.Builder<ValueAssignment> assignments = ImmutableList.builder();
-    return assignments.build();
+    HashMap<String, Long> varsCache = ((BoolectorFormulaCreator) creator).getModelMap();
+    ImmutableSet.Builder<Long> variablesBuilder = ImmutableSet.builder();
+
+    for (long term : assertedTerms) {
+
+      // Escape characters are used if the string contains i.e. spaces or ( ).
+      // If one wants to use |, one needs an escape char, either | or \
+
+      // Get String representation for each asserted term
+      // Search each string for variables/ufs/arrays and gather them by using the vars cache
+
+      // Split of () at the beginning and end, get substrings by spaces if no | is present, get
+      // substrings encasing | | without escape chars else then by spacing
+      // (\|.+?\|(?<!\\\|))|
+
+      // It might be that Boolector uses "BTOR_1@varname" as an escape in this method!
+      // The number before the @ is any number, the varname is after the @
+      // TODO: cover this case as well
+      String termString = BtorJNI.boolector_help_dump_node_smt2(btor, term);
+      List<String> escapedList = new ArrayList<>();
+      // Matches all escaped names
+      Pattern pattern = Pattern.compile("(\\|.+?\\|(?<!\\\\\\|))");
+      String input = termString;
+      Matcher matcher = pattern.matcher(input);
+
+      while (matcher.find()) {
+        escapedList.add(matcher.group());
+      }
+      // Now remove all escaped strings from the term string as it allows
+      // special characters/keywords
+      String inputReplaced = input;
+      for (String escaped : escapedList) {
+        inputReplaced = inputReplaced.replace(escaped, "");
+      }
+      inputReplaced = inputReplaced.replace("(", " ");
+      inputReplaced = inputReplaced.replace(")", " ");
+
+      Iterable<String> maybeVars = Splitter.onPattern("\\s+").split(inputReplaced);
+
+      // Strings in maybeVars may not have SMTLIB2 keywords
+      for (String var : maybeVars) {
+        if (!SMT_KEYWORDS.contains(var) && varsCache.containsKey(var)) {
+          variablesBuilder.add(varsCache.get(var));
+        }
+      }
+      // escaped Strings may have SMTLIB2 keywords in them
+      for (String var : escapedList) {
+        String varSubs = var.substring(1, var.length() - 1);
+        if (varsCache.containsKey(varSubs)) {
+          variablesBuilder.add(varsCache.get(varSubs));
+        }
+      }
+      System.out.println(maybeVars);
+      System.out.println(escapedList);
+    }
+
+    ImmutableList<ValueAssignment> assignments = toList1(variablesBuilder.build());
+    return assignments;
   }
 
   @SuppressWarnings("unused")
-  private ImmutableList<ValueAssignment> toList1() {
+  private void getVariables(String termString, Set<String> set) {
+    // Cut off beginning and trailing braces
+    String termStringCutBraces = termString.substring(1, termString.length() - 1);
+    // Now check for | as it might mess up splitting by spaces
+    // But only unescaped | are valid
+    List<String> parts = Splitter.onPattern("(?<!\\\\)\\|").splitToList(termStringCutBraces);
+    // Now we either split the String if a | was found, or not
+    if (parts.size() > 1) {
+      // If this is split into multiple parts, we know that the insides MUST be vars/ufs...
+
+    }
+  }
+
+  @SuppressWarnings("unused")
+  private ImmutableList<ValueAssignment> toList1(Set<Long> variables) {
     Preconditions.checkState(!closed);
     Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
     ImmutableList.Builder<ValueAssignment> assignments = ImmutableList.builder();
-    for (Long formula : assertedTerms) {
-      for (Map.Entry<String, Long> entry :
-          creator.extractVariablesAndUFs(formula, true).entrySet()) {
-        String name = entry.getKey();
-        Long var = entry.getValue();
-        if (BtorJNI.boolector_is_array(btor, var)) {
-          assignments.add(getArrayAssignment(formula));
-        } else if (BtorJNI.boolector_is_uf(btor, var)) {
-          assignments.add(getUFAssignment(formula));
-        } else {
-          assignments.add(getConstAssignment(formula));
+      for (Long entry : variables) {
+        if (BtorJNI.boolector_is_array(btor, entry)) {
+        System.out.println("array assignment for: " + entry);
+          assignments.add(getArrayAssignment(entry));
+        } else if (BtorJNI.boolector_is_const(btor, entry)) {
+        System.out.println("const assignment for: " + entry);
+          assignments.add(getConstAssignment(entry));
+        } else if (BtorJNI.boolector_is_uf(btor, entry)) {
+        System.out.println("uf assignment for: " + entry);
+          assignments.addAll(getUFAssignments(entry));
+      } else {
+        System.out.println("bv assignment? for: " + entry);
+        assignments.add(getConstAssignment(entry));
+        System.out.println(getConstAssignment(entry));
         }
-      }
     }
     return assignments.build();
   }
 
   private ValueAssignment getConstAssignment(long key) {
-    // Boolector does not give back a value "node" (formula), just an assignment string.
-    // We have to wait for the new methods and revisit this method!
     List<Object> argumentInterpretation = new ArrayList<>();
     Object value = creator.convertValue(key, evalImpl(key));
-    argumentInterpretation.add(value);
-    long valueNode;
-    if (value.equals(true)) {
-      valueNode = BtorJNI.boolector_true(btor);
-    } else if (value.equals(false)) {
-      valueNode = BtorJNI.boolector_false(btor);
-    } else {
-      long sort = BtorJNI.boolector_bitvec_sort(btor, BtorJNI.boolector_get_width(btor, key));
-      valueNode = BtorJNI.boolector_int(btor, (long) value, sort);
-    }
+    Long valueNode = BtorJNI.boolector_get_value(btor, key);
+    System.out.println("Uf name: " + bfCreator.getName(key));
+    System.out.println("const: " + bfCreator.getName(key) + " with: " + value);
     return new ValueAssignment(
         creator.encapsulateWithTypeOf(key),
         creator.encapsulateWithTypeOf(valueNode),
@@ -102,30 +172,53 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
         argumentInterpretation);
   }
 
-  private ValueAssignment getUFAssignment(long key) {
-    List<Object> argumentInterpretation = new ArrayList<>();
-    Long value = evalImpl(key); // wrong! use creator.convertValue
-    // TODO
-    return new ValueAssignment(
-        creator.encapsulateWithTypeOf(key),
-        creator.encapsulateWithTypeOf(value),
-        creator.encapsulateBoolean(BtorJNI.boolector_eq(btor, key, value)),
-        bfCreator.getName(key),
-        creator.convertValue(key, value),
-        argumentInterpretation);
+  private ImmutableList<ValueAssignment> getUFAssignments(long key) {
+    ImmutableList.Builder<ValueAssignment> assignments = ImmutableList.builder();
+    // Don't use the creator with convertValue() as while it returns the correct values, the order
+    // of values may differ when calling boolector_uf_assignment_helper again to get the arguments!
+    // Object value = creator.convertValue(key, evalImpl(key));
+    // The "value" from boolector_get_value() is just
+    // a plain copy of the entered node with static results!
+    Long fun = BtorJNI.boolector_get_value(btor, key);
+    String[][] ufAssignments = BtorJNI.boolector_uf_assignment_helper(btor, key);
+    for (int i = 0; i < ufAssignments[0].length; i++) {
+      ImmutableList.Builder<Object> argBuilder = ImmutableList.builder();
+      String arguments = ufAssignments[0][i];
+      Object value = bfCreator.transformStringToBigInt(ufAssignments[1][i]);
+      for (String arg : Splitter.onPattern("\\s+").splitToList(arguments)) {
+        argBuilder.add(bfCreator.transformStringToBigInt(arg));
+      }
+      Long equality = BtorJNI.boolector_eq(btor, key, fun);
+      System.out.println("arguments: " + argBuilder.build());
+      System.out.println("value: " + value);
+      assignments.add(
+          new ValueAssignment(
+              creator.encapsulateWithTypeOf(key),
+              creator.encapsulateWithTypeOf(fun),
+              creator.encapsulateBoolean(equality),
+              bfCreator.getName(key),
+              value,
+              argBuilder.build()));
+    }
+    return assignments.build();
   }
 
   private ValueAssignment getArrayAssignment(long key) {
+    // Don't use the creator with convertValue() as while it returns the correct values, the order
+    // of values may differ when calling boolector_array_assignment_helper again to get the
+    // arguments!
     List<Object> argumentInterpretation = new ArrayList<>();
-    Long value = evalImpl(key); // wrong! use creator.convertValue
-    Long valueNode = null;
-    // TODO
+    for (String stringArrayEntry : BtorJNI.boolector_array_assignment_helper(btor, key)[0]) {
+      argumentInterpretation.add(bfCreator.transformStringToBigInt(stringArrayEntry));
+    }
+    Object value = creator.convertValue(key, evalImpl(key));
+    Long valueNode = BtorJNI.boolector_get_value(btor, key);
     return new ValueAssignment(
         creator.encapsulateWithTypeOf(key),
         creator.encapsulateWithTypeOf(valueNode),
-        creator.encapsulateBoolean(BtorJNI.boolector_eq(btor, key, value)),
+        creator.encapsulateBoolean(BtorJNI.boolector_eq(btor, key, valueNode)),
         bfCreator.getName(key),
-        creator.convertValue(key, value),
+        value,
         argumentInterpretation);
   }
 
