@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.test;
 
-import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.collect.ImmutableList;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -53,20 +52,6 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
   @Test
   public void testRegexAll() throws SolverException, InterruptedException {
     RegexFormula regex = smgr.all();
-    assertThatFormula(smgr.in(hello, regex)).isSatisfiable();
-  }
-
-  @Test
-  public void testRegexAll2() throws SolverException, InterruptedException {
-    assume()
-        .withMessage("Solver %s is incomplete in the theory of strings", solverToUse())
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.Z3);
-    assume()
-        .withMessage("Solver %s does not support the full unicode range", solverToUse())
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.CVC4);
-    RegexFormula regex = smgr.closure(smgr.allChar());
     assertThatFormula(smgr.in(hello, regex)).isSatisfiable();
   }
 
