@@ -215,4 +215,16 @@ class StatisticsStringFormulaManager implements StringFormulaManager {
     stats.stringOperations.getAndIncrement();
     return delegate.times(regex, repetitions);
   }
+
+  @Override
+  public IntegerFormula toIntegerFormula(StringFormula str) {
+    stats.stringOperations.getAndIncrement();
+    return delegate.toIntegerFormula(str);
+  }
+
+  @Override
+  public StringFormula toStringFormula(IntegerFormula number) {
+    stats.stringOperations.getAndIncrement();
+    return delegate.toStringFormula(number);
+  }
 }

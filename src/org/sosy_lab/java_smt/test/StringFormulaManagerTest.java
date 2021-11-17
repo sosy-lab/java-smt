@@ -8,9 +8,9 @@
 
 package org.sosy_lab.java_smt.test;
 
-
 import com.google.common.collect.ImmutableList;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,6 +18,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.StringFormula;
@@ -48,6 +49,30 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
     hello = smgr.makeString("hello");
     a2z = smgr.range('a', 'z');
   }
+
+  // Utility methods
+
+  private void assertEqual(IntegerFormula num1, IntegerFormula num2)
+      throws SolverException, InterruptedException {
+    assertThatFormula(imgr.equal(num1, num2)).isTautological();
+  }
+
+  private void assertDistinct(IntegerFormula num1, IntegerFormula num2)
+      throws SolverException, InterruptedException {
+    assertThatFormula(imgr.distinct(List.of(num1, num2))).isTautological();
+  }
+
+  private void assertEqual(StringFormula str1, StringFormula str2)
+      throws SolverException, InterruptedException {
+    assertThatFormula(smgr.equal(str1, str2)).isTautological();
+  }
+
+  private void assertDistinct(StringFormula str1, StringFormula str2)
+      throws SolverException, InterruptedException {
+    assertThatFormula(smgr.equal(str1, str2)).isUnsatisfiable();
+  }
+
+  // Tests
 
   @Test
   public void testRegexAll() throws SolverException, InterruptedException {
@@ -88,18 +113,17 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
     StringFormula concat = smgr.concat(str1, str2);
     StringFormula complete = smgr.makeString("helloworld");
 
-    assertThatFormula(smgr.equal(concat, complete)).isSatisfiable();
+    assertEqual(concat, complete);
   }
 
   @Test
   public void testStringConcatEmpty() throws SolverException, InterruptedException {
     StringFormula empty = smgr.makeString("");
 
-    assertThatFormula(smgr.equal(empty, smgr.concat(ImmutableList.of()))).isSatisfiable();
-    assertThatFormula(smgr.equal(empty, smgr.concat(empty))).isSatisfiable();
-    assertThatFormula(smgr.equal(empty, smgr.concat(empty, empty))).isSatisfiable();
-    assertThatFormula(smgr.equal(empty, smgr.concat(ImmutableList.of(empty, empty, empty, empty))))
-        .isSatisfiable();
+    assertEqual(empty, smgr.concat(ImmutableList.of()));
+    assertEqual(empty, smgr.concat(empty));
+    assertEqual(empty, smgr.concat(empty, empty));
+    assertEqual(empty, smgr.concat(ImmutableList.of(empty, empty, empty, empty)));
   }
 
   @Test
@@ -134,5 +158,63 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
             bmgr.and(
                 smgr.suffix(suffix, prefix), imgr.equal(smgr.length(prefix), smgr.length(suffix))))
         .implies(smgr.equal(prefix, suffix));
+  }
+
+  @Test
+  public void testStringToIntConversion() throws SolverException, InterruptedException {
+    IntegerFormula ten = imgr.makeNumber(10);
+    StringFormula zeroStr = smgr.makeString("0");
+
+    for (int i = 0; i < 100; i += 7) {
+      StringFormula str = smgr.makeString(Integer.toString(i));
+      IntegerFormula num = imgr.makeNumber(i);
+      IntegerFormula numInc = imgr.makeNumber(i + 1);
+
+      assertEqual(str, smgr.toStringFormula(num));
+      assertDistinct(str, smgr.toStringFormula(numInc));
+      assertDistinct(str, smgr.toStringFormula(imgr.add(num, numInc)));
+
+      assertEqual(num, smgr.toIntegerFormula(str));
+      assertDistinct(numInc, smgr.toIntegerFormula(str));
+      assertEqual(imgr.multiply(num, ten), smgr.toIntegerFormula(smgr.concat(str, zeroStr)));
+      assertDistinct(imgr.multiply(numInc, ten), smgr.toIntegerFormula(smgr.concat(str, zeroStr)));
+
+      assertEqual(num, smgr.toIntegerFormula(smgr.toStringFormula(num)));
+      assertEqual(numInc, smgr.toIntegerFormula(smgr.toStringFormula(numInc)));
+    }
+  }
+
+  @Test
+  public void testStringToIntConversionCornerCases() throws SolverException, InterruptedException {
+    assertEqual(imgr.makeNumber(-1), smgr.toIntegerFormula(smgr.makeString("-1")));
+    assertEqual(imgr.makeNumber(-1), smgr.toIntegerFormula(smgr.makeString("-12")));
+    assertEqual(imgr.makeNumber(-1), smgr.toIntegerFormula(smgr.makeString("-123")));
+    assertEqual(imgr.makeNumber(-1), smgr.toIntegerFormula(smgr.makeString("-1234")));
+
+    assertDistinct(imgr.makeNumber(-12), smgr.toIntegerFormula(smgr.makeString("-1")));
+    assertDistinct(imgr.makeNumber(-12), smgr.toIntegerFormula(smgr.makeString("-12")));
+    assertDistinct(imgr.makeNumber(-12), smgr.toIntegerFormula(smgr.makeString("-123")));
+    assertDistinct(imgr.makeNumber(-12), smgr.toIntegerFormula(smgr.makeString("-1234")));
+
+    assertEqual(imgr.makeNumber(-1), smgr.toIntegerFormula(smgr.makeString("")));
+    assertEqual(imgr.makeNumber(-1), smgr.toIntegerFormula(smgr.makeString("a")));
+    assertEqual(imgr.makeNumber(-1), smgr.toIntegerFormula(smgr.makeString("1a")));
+    assertEqual(imgr.makeNumber(-1), smgr.toIntegerFormula(smgr.makeString("a1")));
+
+    assertDistinct(imgr.makeNumber(-12), smgr.toIntegerFormula(smgr.makeString("")));
+    assertDistinct(imgr.makeNumber(-12), smgr.toIntegerFormula(smgr.makeString("a")));
+    assertDistinct(imgr.makeNumber(-12), smgr.toIntegerFormula(smgr.makeString("1a")));
+    assertDistinct(imgr.makeNumber(-12), smgr.toIntegerFormula(smgr.makeString("a1")));
+  }
+
+  @Test
+  public void testIntToStringConversionCornerCases() throws SolverException, InterruptedException {
+    assertEqual(smgr.makeString("123"), smgr.toStringFormula(imgr.makeNumber(123)));
+    assertEqual(smgr.makeString("1"), smgr.toStringFormula(imgr.makeNumber(1)));
+    assertEqual(smgr.makeString("0"), smgr.toStringFormula(imgr.makeNumber(0)));
+    assertEqual(smgr.makeString(""), smgr.toStringFormula(imgr.makeNumber(-1)));
+    assertEqual(smgr.makeString(""), smgr.toStringFormula(imgr.makeNumber(-123)));
+
+    assertDistinct(smgr.makeString("1"), smgr.toStringFormula(imgr.makeNumber(-1)));
   }
 }

@@ -169,4 +169,14 @@ class CVC4StringFormulaManager extends AbstractStringFormulaManager<Expr, Type, 
   protected Expr complement(Expr pParam) {
     return exprManager.mkExpr(Kind.REGEXP_COMPLEMENT, pParam);
   }
+
+  @Override
+  protected Expr toIntegerFormula(Expr pParam) {
+    return exprManager.mkExpr(Kind.STRING_STOI, pParam);
+  }
+
+  @Override
+  protected Expr toStringFormula(Expr pParam) {
+    return exprManager.mkExpr(Kind.STRING_ITOS, pParam);
+  }
 }

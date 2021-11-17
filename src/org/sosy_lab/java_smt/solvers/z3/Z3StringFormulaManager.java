@@ -164,4 +164,14 @@ class Z3StringFormulaManager extends AbstractStringFormulaManager<Long, Long, Lo
   protected Long complement(Long pParam) {
     return Native.mkReComplement(z3context, pParam);
   }
+
+  @Override
+  protected Long toIntegerFormula(Long pParam) {
+    return Native.mkStrToInt(z3context, pParam);
+  }
+
+  @Override
+  protected Long toStringFormula(Long pParam) {
+    return Native.mkIntToStr(z3context, pParam);
+  }
 }

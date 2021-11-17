@@ -120,7 +120,7 @@ public interface StringFormulaManager {
    * Returns a {@link RegexFormula} representing the regular expression in the {@link Matcher}
    *
    * @param value a matcher for the regular expression the returned <code>Formula</code> should
-   *              represent
+   *     represent
    */
   default RegexFormula makeRegex(Matcher value) {
     return makeRegex(value.pattern());
@@ -180,4 +180,21 @@ public interface StringFormulaManager {
 
   /** @return formula denoting the concatenation n times */
   RegexFormula times(RegexFormula regex, int repetitions);
+
+  /**
+   * Interpret a String formula as an Integer formula.
+   *
+   * <p>The number is interpreted in base 10 and has no leading zeros. The method works as expected
+   * for positive numbers, including zero. It returns the constant value of <code>-1</code> for
+   * negative numbers or invalid number representations, for example if any char is no digit.
+   */
+  IntegerFormula toIntegerFormula(StringFormula str);
+
+  /**
+   * Interpret an Integer formula as a String formula.
+   *
+   * <p>The number is in base 10. The method works as expected for positive numbers, including zero.
+   * It returns the empty string <code>""</code> for negative numbers.
+   */
+  StringFormula toStringFormula(IntegerFormula number);
 }

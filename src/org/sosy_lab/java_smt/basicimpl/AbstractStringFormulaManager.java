@@ -270,4 +270,19 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
   public RegexFormula times(RegexFormula regex, int repetitions) {
     return concatRegex(Collections.nCopies(repetitions, regex));
   }
+
+  @Override
+  public IntegerFormula toIntegerFormula(StringFormula str) {
+    return getFormulaCreator()
+        .encapsulate(FormulaType.IntegerType, toIntegerFormula(extractInfo(str)));
+  }
+
+  protected abstract TFormulaInfo toIntegerFormula(TFormulaInfo pParam);
+
+  @Override
+  public StringFormula toStringFormula(IntegerFormula number) {
+    return wrapString(toStringFormula(extractInfo(number)));
+  }
+
+  protected abstract TFormulaInfo toStringFormula(TFormulaInfo pParam);
 }

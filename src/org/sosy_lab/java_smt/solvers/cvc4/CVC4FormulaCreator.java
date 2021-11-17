@@ -275,7 +275,9 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
 
   @Override
   protected StringFormula encapsulateString(Expr pTerm) {
-    assert getFormulaType(pTerm).isStringType();
+    assert getFormulaType(pTerm).isStringType()
+        : String.format(
+            "%s is no String, but %s (%s)", pTerm, pTerm.getType(), getFormulaType(pTerm));
     return new CVC4StringFormula(pTerm);
   }
 

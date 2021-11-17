@@ -247,4 +247,18 @@ class SynchronizedStringFormulaManager implements StringFormulaManager {
       return delegate.times(regex, repetitions);
     }
   }
+
+  @Override
+  public IntegerFormula toIntegerFormula(StringFormula str) {
+    synchronized (sync) {
+      return delegate.toIntegerFormula(str);
+    }
+  }
+
+  @Override
+  public StringFormula toStringFormula(IntegerFormula number) {
+    synchronized (sync) {
+      return delegate.toStringFormula(number);
+    }
+  }
 }
