@@ -3770,6 +3770,8 @@ SWIGEXPORT jobjectArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_B
   char ***arg3 = (char ***) 0 ;
   char ***arg4 = (char ***) 0 ;
   uint32_t *arg5 = (uint32_t *) 0 ;
+  char **args, **values;
+  uint32_t size;
 
   (void)jenv;
   (void)jcls;
@@ -3780,16 +3782,16 @@ SWIGEXPORT jobjectArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_B
   arg1 = *(Btor **)&jarg1;
   arg2 = *(BoolectorNode **)&jarg2;
 
-  boolector_uf_assignment(arg1,arg2,arg3,arg4,arg5);
+  boolector_uf_assignment(arg1, arg2, &args, &values, &size);
 
-  if (arg3 == 0 || arg4 == 0 || arg5 == 0) {
+  if (args == 0 || values == 0 || size == 0) {
     SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "boolector_uf_assignment_helper returned NULL");
     return 0;
   }
 
-  jsize arrayLength = *arg5;
-  int arrayLengthInt = *arg5;
-  char **workArray = *arg3;
+  jsize arrayLength = size;
+  int arrayLengthInt = size;
+  char **workArray = args;
 
   jclass classString = (*jenv)->FindClass(jenv, "java/lang/String");
   jclass classArray = (*jenv)->FindClass(jenv, "[Ljava/lang/Object;");
@@ -3803,7 +3805,7 @@ SWIGEXPORT jobjectArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_B
       (*jenv)->SetObjectArrayElement(jenv, innerJNIArray, j, (*jenv)->NewStringUTF(jenv, workArray[j]));
     }
     //switch to second Array
-    workArray = *arg4;
+    workArray = values;
     (*jenv)->SetObjectArrayElement(jenv, outerJNIArray, i, innerJNIArray);
     (*jenv)->DeleteLocalRef(jenv, innerJNIArray);
   }
@@ -3818,10 +3820,6 @@ SWIGEXPORT jobjectArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_B
 SWIGEXPORT jobjectArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1array_1assignment_1helper(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
   Btor *btor = (Btor *) 0 ;
   BoolectorNode *node = (BoolectorNode *) 0 ;
-  //char ***arg3 = (char ***) 0 ;
-  //char ***arg4 = (char ***) 0 ;
-  //uint32_t *arg5 = (uint32_t *) 0 ;
-  // Boolector wants these pointers uninitialized
   char **indices, **values;
   uint32_t size;
 
