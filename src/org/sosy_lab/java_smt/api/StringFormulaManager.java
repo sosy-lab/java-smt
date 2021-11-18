@@ -108,7 +108,7 @@ public interface StringFormulaManager {
   RegexFormula makeRegex(String value);
 
   /**
-   * Returns a {@link RegexFormula} representing the regular expression in the {@link Pattern}
+   * Returns a {@link RegexFormula} representing the regular expression in the {@link Pattern}.
    *
    * @param value the regular expression pattern the returned <code>Formula</code> should represent
    */
@@ -117,7 +117,7 @@ public interface StringFormulaManager {
   }
 
   /**
-   * Returns a {@link RegexFormula} representing the regular expression in the {@link Matcher}
+   * Returns a {@link RegexFormula} representing the regular expression in the {@link Matcher}.
    *
    * @param value a matcher for the regular expression the returned <code>Formula</code> should
    *     represent
