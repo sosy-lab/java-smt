@@ -217,4 +217,55 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
 
     assertDistinct(smgr.makeString("1"), smgr.toStringFormula(imgr.makeNumber(-1)));
   }
+
+  @Test
+  public void testStringLength() throws SolverException, InterruptedException {
+    assertEqual(imgr.makeNumber(0), smgr.length(smgr.makeString("")));
+    assertEqual(imgr.makeNumber(1), smgr.length(smgr.makeString("a")));
+    assertEqual(imgr.makeNumber(2), smgr.length(smgr.makeString("aa")));
+    assertEqual(imgr.makeNumber(9), smgr.length(smgr.makeString("aaabbbccc")));
+
+    assertDistinct(imgr.makeNumber(5), smgr.length(smgr.makeString("")));
+    assertDistinct(imgr.makeNumber(5), smgr.length(smgr.makeString("a")));
+    assertDistinct(imgr.makeNumber(5), smgr.length(smgr.makeString("aa")));
+    assertDistinct(imgr.makeNumber(5), smgr.length(smgr.makeString("aaabbbcc")));
+  }
+
+  @Test
+  public void testStringLengthWithVariable() throws SolverException, InterruptedException {
+    StringFormula var = smgr.makeVariable("var");
+
+    assertThatFormula(imgr.equal(imgr.makeNumber(0), smgr.length(var)))
+        .implies(smgr.equal(var, smgr.makeString("")));
+
+    assertThatFormula(
+            bmgr.and(
+                imgr.equal(imgr.makeNumber(5), smgr.length(var)),
+                smgr.prefix(smgr.makeString("aba"), var),
+                smgr.suffix(smgr.makeString("aba"), var)))
+        .implies(smgr.equal(smgr.makeVariable("var"), smgr.makeString("ababa")));
+
+    assertThatFormula(
+            bmgr.and(
+                imgr.equal(imgr.makeNumber(4), smgr.length(var)),
+                smgr.prefix(smgr.makeString("aba"), var),
+                smgr.suffix(smgr.makeString("aba"), var)))
+        .isUnsatisfiable();
+
+    assertThatFormula(
+            bmgr.and(
+                imgr.equal(imgr.makeNumber(4), smgr.length(var)),
+                smgr.prefix(smgr.makeString("ab"), var),
+                smgr.suffix(smgr.makeString("ba"), var),
+                smgr.equal(smgr.makeString("c"), smgr.charAt(var, imgr.makeNumber(3)))))
+        .isUnsatisfiable();
+
+    assertThatFormula(
+            bmgr.and(
+                imgr.equal(imgr.makeNumber(5), smgr.length(var)),
+                smgr.prefix(smgr.makeString("ab"), var),
+                smgr.suffix(smgr.makeString("ba"), var),
+                smgr.equal(smgr.makeString("c"), smgr.charAt(var, imgr.makeNumber(3)))))
+        .implies(smgr.equal(smgr.makeVariable("var"), smgr.makeString("abcba")));
+  }
 }
