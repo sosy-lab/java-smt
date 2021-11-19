@@ -423,7 +423,11 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
    *
    * @param pF the formula to be converted.
    */
-  public abstract Object convertValue(TFormulaInfo pF);
+  public Object convertValue(TFormulaInfo pF) {
+    throw new UnsupportedOperationException(
+        "This SMT solver needs a second term to determine a correct type. "
+            + "Please use the other method 'convertValue(formula, formula)'.");
+  }
 
   /**
    * Convert the formula into a Java object as far as possible, i.e., try to match a primitive or
@@ -432,7 +436,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
    * @param pAdditionalF an additonal formula where the type can be received from.
    * @param pF the formula to be converted.
    */
-  // TODO only Mathsat5 needs the second (first) parameter, other solvers ignore it. Avoid it?
+  // only some solvers require the additional (first) parameter, other solvers ignore it.
   public Object convertValue(
       @SuppressWarnings("unused") TFormulaInfo pAdditionalF, TFormulaInfo pF) {
     return convertValue(pF);

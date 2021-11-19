@@ -243,7 +243,7 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
   }
 
   @Override
-  public Object convertValue(Long key, Long term) {
+  public Object convertValue(Long term) {
     String value;
     if (BtorJNI.boolector_is_array(getEnv(), term)) {
       value = BtorJNI.boolector_bv_assignment(getEnv(), term);
@@ -325,11 +325,6 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
 
   String getName(long pKey) {
     return BtorJNI.boolector_get_symbol(getEnv(), pKey);
-  }
-
-  @Override
-  public Object convertValue(Long pF) {
-    throw new UnsupportedOperationException("Please use the other method.");
   }
 
   @Override

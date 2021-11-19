@@ -733,12 +733,6 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
   }
 
   @Override
-  public Object convertValue(Integer key) {
-    throw new UnsupportedOperationException(
-        "Yices needs a second term to determine a correct type. Please use the other method.");
-  }
-
-  @Override
   public Object convertValue(Integer typeKey, Integer pF) {
     FormulaType<?> type = getFormulaType(typeKey);
     if (type.isBooleanType()) {

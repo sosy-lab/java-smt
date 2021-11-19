@@ -479,12 +479,6 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   }
 
   @Override
-  public Object convertValue(Expr pF) {
-    throw new UnsupportedOperationException(
-        "CVC4 needs a second term to determine a correct type. Please use the other method.");
-  }
-
-  @Override
   public Object convertValue(Expr expForType, Expr value) {
     final Type type = expForType.getType();
     if (value.getKind() == Kind.BOUND_VARIABLE) {
