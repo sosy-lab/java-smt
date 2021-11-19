@@ -18,6 +18,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -267,5 +268,118 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
                 smgr.suffix(smgr.makeString("ba"), var),
                 smgr.equal(smgr.makeString("c"), smgr.charAt(var, imgr.makeNumber(3)))))
         .implies(smgr.equal(smgr.makeVariable("var"), smgr.makeString("abcba")));
+  }
+
+  /*
+   * Test const Strings = String variables + prefix and suffix constraints.
+   */
+  @Test
+  public void testConstStringEqStringVar() throws SolverException, InterruptedException {
+    String string1 = "";
+    String string2 = "a";
+    String string3 = "ab";
+    String string4 = "abcdefghijklmnopqrstuvwxyz";
+    StringFormula string1c = smgr.makeString(string1);
+    StringFormula string2c = smgr.makeString(string2);
+    StringFormula string3c = smgr.makeString(string3);
+    StringFormula string4c = smgr.makeString(string4);
+    StringFormula string1v = smgr.makeVariable("string1v");
+    StringFormula string2v = smgr.makeVariable("string1v");
+    StringFormula string3v = smgr.makeVariable("string1v");
+    StringFormula string4v = smgr.makeVariable("string1v");
+
+    BooleanFormula formula =
+        bmgr.and(
+            smgr.equal(string1c, string1v),
+            smgr.equal(string2c, string2v),
+            smgr.equal(string3c, string3v),
+            smgr.equal(string4c, string4v));
+
+    BooleanFormula string1PrefixFormula =
+        bmgr.and(
+            smgr.prefix(string1c, string1v),
+            bmgr.not(smgr.prefix(string2c, string1v)),
+            bmgr.not(smgr.prefix(string3c, string1v)),
+            bmgr.not(smgr.prefix(string4c, string1v)));
+
+    BooleanFormula string2PrefixFormula =
+        bmgr.and(
+            smgr.prefix(string1c, string2v),
+            smgr.prefix(string2c, string2v),
+            bmgr.not(smgr.prefix(string3c, string2v)),
+            bmgr.not(smgr.prefix(string4c, string2v)));
+
+    BooleanFormula string3PrefixFormula =
+        bmgr.and(
+            smgr.prefix(string3c, string3v),
+            smgr.prefix(string2c, string3v),
+            smgr.prefix(string3c, string3v),
+            bmgr.not(smgr.prefix(string4c, string3v)));
+
+    BooleanFormula string4PrefixFormula =
+        bmgr.and(
+            smgr.prefix(string1c, string4v),
+            smgr.prefix(string2c, string4v),
+            smgr.prefix(string3c, string4v),
+            smgr.prefix(string4c, string4v));
+
+    BooleanFormula string1SuffixFormula =
+        bmgr.and(
+            smgr.suffix(string1c, string1v),
+            bmgr.not(smgr.suffix(string2c, string1v)),
+            bmgr.not(smgr.suffix(string3c, string1v)),
+            bmgr.not(smgr.suffix(string4c, string1v)));
+
+    BooleanFormula string2SuffixFormula =
+        bmgr.and(
+            smgr.suffix(string1c, string2v),
+            smgr.suffix(string2c, string2v),
+            bmgr.not(smgr.suffix(string3c, string2v)),
+            bmgr.not(smgr.suffix(string4c, string2v)));
+
+    BooleanFormula string3SuffixFormula =
+        bmgr.and(
+            smgr.suffix(string3c, string3v),
+            smgr.suffix(string2c, string3v),
+            smgr.suffix(string3c, string3v),
+            bmgr.not(smgr.suffix(string4c, string3v)));
+
+    BooleanFormula string4SuffixFormula =
+        bmgr.and(
+            smgr.suffix(string1c, string4v),
+            smgr.suffix(string2c, string4v),
+            smgr.suffix(string3c, string4v),
+            smgr.suffix(string4c, string4v));
+
+    assertThatFormula(bmgr.and(formula))
+        .implies(
+            bmgr.and(
+                string1PrefixFormula,
+                string2PrefixFormula,
+                string3PrefixFormula,
+                string4PrefixFormula,
+                string1SuffixFormula,
+                string2SuffixFormula,
+                string3SuffixFormula,
+                string4SuffixFormula));
+  }
+
+  /** Test String variables with negative length (UNSAT). */
+  @Test
+  public void testStringVariableLengthNegative() throws SolverException, InterruptedException {
+    StringFormula stringVariable1 = smgr.makeVariable("zeroLength");
+    StringFormula stringVariable2 = smgr.makeVariable("negLength");
+
+    // SAT + UNSAT Formula -> UNSAT
+    assertThatFormula(
+            bmgr.and(
+                imgr.equal(smgr.length(stringVariable1), imgr.makeNumber(0)),
+                imgr.equal(smgr.length(stringVariable2), imgr.makeNumber(-100))))
+        .isUnsatisfiable();
+    // UNSAT below
+    assertThatFormula(imgr.equal(smgr.length(stringVariable2), imgr.makeNumber(-1)))
+        .isUnsatisfiable();
+    assertThatFormula(imgr.equal(smgr.length(stringVariable2), imgr.makeNumber(-100)))
+        .isUnsatisfiable();
   }
 }
