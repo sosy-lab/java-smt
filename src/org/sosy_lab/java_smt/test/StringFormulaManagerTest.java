@@ -382,4 +382,106 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
     assertThatFormula(imgr.equal(smgr.length(stringVariable2), imgr.makeNumber(-100)))
         .isUnsatisfiable();
   }
+
+  /**
+   * Test String formulas with inequalities in the negative range.
+   *
+   * <p>-10000 < stringVariable length < 0 -> UNSAT
+   *
+   * <p>-10000 < stringVariable length < -1 -> UNSAT
+   *
+   * <p>-10000 <= stringVariable length <= -1 -> UNSAT
+   *
+   * <p>-10000 <= stringVariable length <= 0 AND stringVariable != "" -> UNSAT
+   *
+   * <p>-10000 <= stringVariable length <= 0 -> SAT implies stringVariable = ""
+   */
+  @Test
+  public void testStringLengthInequalityNegativeRange()
+      throws SolverException, InterruptedException {
+    StringFormula stringVariable = smgr.makeVariable("stringVariable");
+    IntegerFormula stringVariableLength = smgr.length(stringVariable);
+    IntegerFormula minusTenThousand = imgr.makeNumber(-10000);
+    IntegerFormula minusOne = imgr.makeNumber(-1);
+    IntegerFormula zero = imgr.makeNumber(0);
+
+    // -10000 < stringVariable length < 0 -> UNSAT
+    assertThatFormula(
+            bmgr.and(
+                imgr.lessThan(minusTenThousand, stringVariableLength),
+                imgr.lessThan(stringVariableLength, zero)))
+        .isUnsatisfiable();
+    // -10000 < stringVariable length < -1 -> UNSAT
+    assertThatFormula(
+            bmgr.and(
+                imgr.lessThan(minusTenThousand, stringVariableLength),
+                imgr.lessThan(stringVariableLength, minusOne)))
+        .isUnsatisfiable();
+    // -10000 <= stringVariable length <= -1 -> UNSAT
+    assertThatFormula(
+            bmgr.and(
+                imgr.lessOrEquals(minusTenThousand, stringVariableLength),
+                imgr.lessOrEquals(stringVariableLength, zero)))
+        .isUnsatisfiable();
+    // -10000 <= stringVariable length <= 0 AND stringVariable != "" -> UNSAT
+    assertThatFormula(
+            bmgr.and(
+                imgr.lessOrEquals(minusTenThousand, stringVariableLength),
+                imgr.lessOrEquals(stringVariableLength, zero),
+                bmgr.not(smgr.equal(stringVariable, smgr.makeString("")))))
+        .isUnsatisfiable();
+    // -10000 <= stringVariable length <= 0 -> SAT implies stringVariable = ""
+    assertThatFormula(
+            bmgr.and(
+                imgr.lessOrEquals(minusTenThousand, stringVariableLength),
+                imgr.lessOrEquals(stringVariableLength, zero)))
+        .implies(smgr.equal(stringVariable, smgr.makeString("")));
+  }
+
+  /**
+   * Test String formulas with inequalities in the negative range.
+   *
+   * <p>0 < stringVariable length < 1 -> UNSAT
+   *
+   * <p>0 < stringVariable length < 2 -> SAT
+   *
+   * <p>0 <= stringVariable length < 1 -> SAT implies stringVariable = ""
+   *
+   * <p>1 < stringVariable length < 3 -> SAT implies stringVariable length = 2
+   */
+  @Test
+  public void testStringLengthInequalityPositiveRange()
+      throws SolverException, InterruptedException {
+    StringFormula stringVariable = smgr.makeVariable("stringVariable");
+    IntegerFormula stringVariableLength = smgr.length(stringVariable);
+    IntegerFormula three = imgr.makeNumber(3);
+    IntegerFormula two = imgr.makeNumber(2);
+    IntegerFormula one = imgr.makeNumber(1);
+    IntegerFormula zero = imgr.makeNumber(0);
+
+    // 0 < stringVariable length < 1 -> UNSAT
+    assertThatFormula(
+            bmgr.and(
+                imgr.lessThan(zero, stringVariableLength),
+                imgr.lessThan(stringVariableLength, one)))
+        .isUnsatisfiable();
+    // 0 < stringVariable length < 2 -> SAT
+    assertThatFormula(
+            bmgr.and(
+                imgr.lessThan(zero, stringVariableLength),
+                imgr.lessThan(stringVariableLength, two)))
+        .isUnsatisfiable();
+    // 0 <= stringVariable length < 1 -> SAT implies stringVariable = ""
+    assertThatFormula(
+            bmgr.and(
+                imgr.lessOrEquals(zero, stringVariableLength),
+                imgr.lessThan(stringVariableLength, one)))
+        .implies(smgr.equal(stringVariable, smgr.makeString("")));
+    // 1 < stringVariable length < 3 -> SAT implies stringVariable length = 2
+    assertThatFormula(
+            bmgr.and(
+                imgr.lessThan(one, stringVariableLength),
+                imgr.lessThan(stringVariableLength, three)))
+        .implies(imgr.equal(smgr.length(stringVariable), two));
+  }
 }
