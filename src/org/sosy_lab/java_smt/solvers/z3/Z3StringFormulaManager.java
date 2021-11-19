@@ -41,22 +41,22 @@ class Z3StringFormulaManager extends AbstractStringFormulaManager<Long, Long, Lo
 
   @Override
   protected Long greaterThan(Long pParam1, Long pParam2) {
-    return Native.mkGt(z3context, pParam1, pParam2);
+    return lessThan(pParam2, pParam1);
   }
 
   @Override
   protected Long greaterOrEquals(Long pParam1, Long pParam2) {
-    return Native.mkGe(z3context, pParam1, pParam2);
+    return lessOrEquals(pParam2, pParam1);
   }
 
   @Override
   protected Long lessThan(Long pParam1, Long pParam2) {
-    return Native.mkLt(z3context, pParam1, pParam2);
+    return Native.mkStrLt(z3context, pParam1, pParam2);
   }
 
   @Override
   protected Long lessOrEquals(Long pParam1, Long pParam2) {
-    return Native.mkLe(z3context, pParam1, pParam2);
+    return Native.mkStrLe(z3context, pParam1, pParam2);
   }
 
   @Override
