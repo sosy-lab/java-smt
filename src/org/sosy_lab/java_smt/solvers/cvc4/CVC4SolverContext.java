@@ -64,6 +64,8 @@ public final class CVC4SolverContext extends AbstractSolverContext {
     SmtEngine smtEngine = new SmtEngine(exprManager);
     smtEngine.setOption("output-language", new SExpr("smt2"));
     smtEngine.setOption("random-seed", new SExpr(randomSeed));
+    // Set Strings option to enable all String features (such as lessOrEquals)
+    smtEngine.setOption("strings-exp", new SExpr(true));
     // smtEngine.delete();
 
     // Create managers
