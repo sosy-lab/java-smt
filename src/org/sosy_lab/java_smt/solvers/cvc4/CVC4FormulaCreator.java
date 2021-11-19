@@ -516,22 +516,23 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   @Override
   public Object convertValue(Expr expForType, Expr value) {
     final Type type = expForType.getType();
+    final Type valueType = value.getType();
     if (value.getKind() == Kind.BOUND_VARIABLE) {
       // CVC4 does not allow model values for bound vars
       return value.toString();
-    } else if (value.getType().isBoolean()) {
+    } else if (valueType.isBoolean()) {
       return value.getConstBoolean();
 
-    } else if (value.getType().isInteger() && type.isInteger()) {
+    } else if (valueType.isInteger() && type.isInteger()) {
       return new BigInteger(value.getConstRational().toString());
 
-    } else if (value.getType().isReal() && type.isReal()) {
+    } else if (valueType.isReal() && type.isReal()) {
       Rational rat = value.getConstRational();
       return org.sosy_lab.common.rationals.Rational.of(
           new BigInteger(rat.getNumerator().toString()),
           new BigInteger(rat.getDenominator().toString()));
 
-    } else if (value.getType().isBitVector()) {
+    } else if (valueType.isBitVector()) {
       Integer bv = value.getConstBitVector().getValue();
       if (bv.fitsSignedLong()) {
         return BigInteger.valueOf(bv.getUnsignedLong());
@@ -539,7 +540,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
         return value.toString(); // default
       }
 
-    } else if (value.getType().isFloatingPoint()) {
+    } else if (valueType.isFloatingPoint()) {
       return parseFloatingPoint(value);
 
     } else {
