@@ -561,12 +561,9 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
     StringFormula a = smgr.makeString("a");
     StringFormula b = smgr.makeString("b");
     StringFormula ab = smgr.makeString("ab");
-    StringFormula bc = smgr.makeString("bc");
     StringFormula abc = smgr.makeString("abc");
     StringFormula abd = smgr.makeString("abd");
     StringFormula abe = smgr.makeString("abe");
-    StringFormula bcd = smgr.makeString("bcd");
-    StringFormula cde = smgr.makeString("cde");
     StringFormula abaab = smgr.makeString("abaab");
     StringFormula abbab = smgr.makeString("abbab");
     StringFormula abcab = smgr.makeString("abcab");
