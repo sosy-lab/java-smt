@@ -543,6 +543,9 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     } else if (valueType.isFloatingPoint()) {
       return parseFloatingPoint(value);
 
+    } else if (valueType.isString()) {
+      return value.getConstString().toString();
+
     } else {
       // String serialization for unknown terms.
       return value.toString();
