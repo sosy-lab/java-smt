@@ -29,7 +29,8 @@ class CVC4StringFormulaManager extends AbstractStringFormulaManager<Expr, Type, 
 
   @Override
   protected Expr makeStringImpl(String pValue) {
-    return exprManager.mkConst(new CVC4String(pValue));
+    // The boolean enables escape characters!
+    return exprManager.mkConst(new CVC4String(pValue, true));
   }
 
   @Override
