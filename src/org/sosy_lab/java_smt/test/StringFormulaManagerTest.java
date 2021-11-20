@@ -837,4 +837,333 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
                 smgr.prefix(abc, stringVariable)))
         .implies(smgr.equal(stringVariable, abcb));
   }
+
+  @Test
+  public void testConstStringContains() throws SolverException, InterruptedException {
+    StringFormula empty = smgr.makeString("");
+    StringFormula a = smgr.makeString("a");
+    StringFormula aUppercase = smgr.makeString("A");
+    StringFormula bUppercase = smgr.makeString("B");
+    StringFormula b = smgr.makeString("b");
+    StringFormula bbbbbb = smgr.makeString("bbbbbb");
+    StringFormula bbbbbbb = smgr.makeString("bbbbbbb");
+    StringFormula abbbbbb = smgr.makeString("abbbbbb");
+    StringFormula aaaaaaaB = smgr.makeString("aaaaaaaB");
+    StringFormula abcAndSoOn = smgr.makeString("abcdefghijklmnopqrstuVwxyz");
+    StringFormula curlyOpen2BUnicode = smgr.makeString("\\u{7B}");
+    StringFormula curlyClose2BUnicode = smgr.makeString("\\u{7D}");
+    StringFormula multipleCurlys2BUnicode = smgr.makeString("\\u{7B}\\u{7D}\\u{7B}\\u{7B}");
+    StringFormula curlyClose2BUnicodeEncased = smgr.makeString("blabla\\u{7D}bla");
+
+    assertThatFormula(smgr.contains(empty, empty)).isSatisfiable();
+    assertThatFormula(smgr.contains(empty, a)).isUnsatisfiable();
+    assertThatFormula(smgr.contains(a, empty)).isSatisfiable();
+    assertThatFormula(smgr.contains(a, a)).isSatisfiable();
+    assertThatFormula(smgr.contains(a, aUppercase)).isUnsatisfiable();
+    assertThatFormula(smgr.contains(aUppercase, a)).isUnsatisfiable();
+    assertThatFormula(smgr.contains(a, b)).isUnsatisfiable();
+    assertThatFormula(smgr.contains(b, b)).isSatisfiable();
+    assertThatFormula(smgr.contains(abbbbbb, a)).isSatisfiable();
+    assertThatFormula(smgr.contains(abbbbbb, b)).isSatisfiable();
+    assertThatFormula(smgr.contains(abbbbbb, bbbbbb)).isSatisfiable();
+    assertThatFormula(smgr.contains(abbbbbb, bbbbbbb)).isUnsatisfiable();
+    assertThatFormula(smgr.contains(abbbbbb, aUppercase)).isUnsatisfiable();
+    assertThatFormula(smgr.contains(abbbbbb, aUppercase)).isUnsatisfiable();
+    assertThatFormula(smgr.contains(aaaaaaaB, a)).isSatisfiable();
+    assertThatFormula(smgr.contains(aaaaaaaB, b)).isUnsatisfiable();
+    assertThatFormula(smgr.contains(aaaaaaaB, bUppercase)).isSatisfiable();
+    assertThatFormula(smgr.contains(aaaaaaaB, curlyOpen2BUnicode)).isUnsatisfiable();
+    assertThatFormula(smgr.contains(abcAndSoOn, smgr.makeString("xyz"))).isSatisfiable();
+    assertThatFormula(smgr.contains(abcAndSoOn, smgr.makeString("Vwxyz"))).isSatisfiable();
+    assertThatFormula(smgr.contains(abcAndSoOn, smgr.makeString("Vwxyza"))).isUnsatisfiable();
+    assertThatFormula(smgr.contains(abcAndSoOn, smgr.makeString("t Vwxyz"))).isUnsatisfiable();
+    assertThatFormula(smgr.contains(multipleCurlys2BUnicode, curlyOpen2BUnicode)).isSatisfiable();
+    assertThatFormula(smgr.contains(multipleCurlys2BUnicode, curlyClose2BUnicode)).isSatisfiable();
+    assertThatFormula(smgr.contains(curlyClose2BUnicodeEncased, curlyClose2BUnicode))
+        .isSatisfiable();
+  }
+
+  @Test
+  public void testStringVariableContains() throws SolverException, InterruptedException {
+    StringFormula var1 = smgr.makeVariable("var1");
+    StringFormula var2 = smgr.makeVariable("var2");
+
+    StringFormula empty = smgr.makeString("");
+    StringFormula bUppercase = smgr.makeString("B");
+    StringFormula ab = smgr.makeString("ab");
+    StringFormula bbbbbb = smgr.makeString("bbbbbb");
+    StringFormula abbbbbb = smgr.makeString("abbbbbb");
+    StringFormula curlyOpen2BUnicode = smgr.makeString("\\u{7B}");
+    StringFormula curlyClose2BUnicode = smgr.makeString("\\u{7D}");
+
+    assertThatFormula(
+            bmgr.and(smgr.contains(var1, empty), imgr.equal(imgr.makeNumber(0), smgr.length(var1))))
+        .implies(smgr.equal(var1, empty));
+
+    assertThatFormula(bmgr.and(smgr.contains(var1, var2), smgr.contains(var2, var1)))
+        .implies(smgr.equal(var1, var2));
+
+    // Unicode is treated as 1 char. So \\u{7B} is treated as { and the B inside is not contained!
+    assertThatFormula(
+            bmgr.and(
+                smgr.contains(var1, curlyOpen2BUnicode),
+                smgr.contains(var1, bUppercase),
+                imgr.equal(imgr.makeNumber(1), smgr.length(var1))))
+        .isUnsatisfiable();
+    // Same goes for the curly brackets used as escape sequence
+    assertThatFormula(
+            bmgr.and(
+                smgr.contains(var1, curlyOpen2BUnicode),
+                smgr.contains(var1, curlyClose2BUnicode),
+                imgr.equal(imgr.makeNumber(1), smgr.length(var1))))
+        .isUnsatisfiable();
+
+    assertThatFormula(
+            bmgr.and(
+                smgr.contains(var1, bbbbbb),
+                smgr.contains(var1, ab),
+                imgr.equal(imgr.makeNumber(7), smgr.length(var1))))
+        .implies(smgr.equal(var1, abbbbbb));
+  }
+
+  @Test
+  public void testStringContainsOtherVariable() throws SolverException, InterruptedException {
+    assume()
+        .withMessage("Solver %s runs endlessly on this task", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3);
+
+    StringFormula var1 = smgr.makeVariable("var1");
+    StringFormula var2 = smgr.makeVariable("var2");
+
+    StringFormula abUppercase = smgr.makeString("AB");
+    StringFormula ab = smgr.makeString("ab");
+
+    assertThatFormula(
+            bmgr.and(
+                smgr.contains(var1, ab),
+                smgr.contains(var2, abUppercase),
+                smgr.contains(var1, var2)))
+        .implies(smgr.contains(var1, abUppercase));
+  }
+
+  @Test
+  public void testConstStringIndexOf() throws SolverException, InterruptedException {
+    StringFormula empty = smgr.makeString("");
+    StringFormula a = smgr.makeString("a");
+    StringFormula aUppercase = smgr.makeString("A");
+    StringFormula b = smgr.makeString("b");
+    StringFormula ab = smgr.makeString("ab");
+    StringFormula bbbbbb = smgr.makeString("bbbbbb");
+    StringFormula bbbbbbb = smgr.makeString("bbbbbbb");
+    StringFormula abbbbbb = smgr.makeString("abbbbbb");
+    StringFormula abcAndSoOn = smgr.makeString("abcdefghijklmnopqrstuVwxyz");
+    StringFormula curlyOpen2BUnicode = smgr.makeString("\\u{7B}");
+    StringFormula curlyClose2BUnicode = smgr.makeString("\\u{7D}");
+    StringFormula multipleCurlys2BUnicode = smgr.makeString("\\u{7B}\\u{7D}\\u{7B}\\u{7B}");
+    // Z3 transforms this into {}, but CVC4 does not! CVC4 is on the side of the SMTLIB2 standard as
+    // far as i can see.
+    StringFormula curlys2BUnicodeWOEscape = smgr.makeString("\\u7B\\u7D");
+
+    IntegerFormula zero = imgr.makeNumber(0);
+
+    assertEqual(smgr.indexOf(empty, empty, zero), zero);
+    assertEqual(smgr.indexOf(a, empty, zero), zero);
+    assertEqual(smgr.indexOf(a, a, zero), zero);
+    assertEqual(smgr.indexOf(a, aUppercase, zero), imgr.makeNumber(-1));
+    assertEqual(smgr.indexOf(abbbbbb, a, zero), zero);
+    assertEqual(smgr.indexOf(abbbbbb, b, zero), imgr.makeNumber(1));
+    assertEqual(smgr.indexOf(abbbbbb, ab, zero), zero);
+    assertEqual(smgr.indexOf(abbbbbb, bbbbbb, zero), imgr.makeNumber(1));
+    assertEqual(smgr.indexOf(abbbbbb, bbbbbbb, zero), imgr.makeNumber(-1));
+    assertEqual(smgr.indexOf(abbbbbb, smgr.makeString("c"), zero), imgr.makeNumber(-1));
+    assertEqual(smgr.indexOf(abcAndSoOn, smgr.makeString("z"), zero), imgr.makeNumber(25));
+    assertEqual(smgr.indexOf(abcAndSoOn, smgr.makeString("V"), zero), imgr.makeNumber(21));
+    assertEqual(smgr.indexOf(abcAndSoOn, smgr.makeString("v"), zero), imgr.makeNumber(-1));
+    assertEqual(smgr.indexOf(multipleCurlys2BUnicode, curlyOpen2BUnicode, zero), zero);
+    assertEqual(
+        smgr.indexOf(multipleCurlys2BUnicode, curlyClose2BUnicode, zero), imgr.makeNumber(1));
+
+    // TODO: Z3 and CVC4 handle this differently!
+    // assertEqual(smgr.indexOf(multipleCurlys2BUnicode, curlys2BUnicodeWOEscape, zero), zero);
+
+    assertEqual(
+        smgr.indexOf(multipleCurlys2BUnicode, curlys2BUnicodeWOEscape, imgr.makeNumber(1)),
+        imgr.makeNumber(-1));
+    assertEqual(
+        smgr.indexOf(multipleCurlys2BUnicode, smgr.makeString("B"), zero), imgr.makeNumber(-1));
+  }
+
+  @Test
+  public void testStringVariableIndexOf() throws SolverException, InterruptedException {
+    StringFormula var1 = smgr.makeVariable("var1");
+    StringFormula var2 = smgr.makeVariable("var2");
+    IntegerFormula intVar = imgr.makeVariable("intVar");
+
+    StringFormula empty = smgr.makeString("");
+    StringFormula curlyOpen2BUnicode = smgr.makeString("\\u{7B}");
+
+    IntegerFormula zero = imgr.makeNumber(0);
+
+    // If the index of var2 is not -1, it is contained in var1.
+    assertThatFormula(
+            bmgr.and(
+                bmgr.not(imgr.equal(intVar, imgr.makeNumber(-1))),
+                imgr.equal(intVar, smgr.indexOf(var1, var2, zero))))
+        .implies(smgr.contains(var1, var2));
+
+    // If the index is less than 0 (only -1 possible) it is not contained.
+    assertThatFormula(
+            bmgr.and(
+                imgr.equal(intVar, smgr.indexOf(var1, var2, zero)), imgr.lessThan(intVar, zero)))
+        .implies(bmgr.not(smgr.contains(var1, var2)));
+
+    // If the index of var2 in var is >= 0 and vice versa, both contain each other.
+    assertThatFormula(
+            bmgr.and(
+                imgr.greaterOrEquals(smgr.indexOf(var1, var2, zero), zero),
+                imgr.greaterOrEquals(smgr.indexOf(var2, var1, zero), zero)))
+        .implies(bmgr.and(smgr.contains(var1, var2), smgr.contains(var2, var1)));
+
+    // If the are indices equal and one is >= 0 and the strings are not "", both are contained in
+    // each other and the chars at the position must be the same.
+    assertThatFormula(
+            bmgr.and(
+                imgr.equal(smgr.indexOf(var1, var2, zero), smgr.indexOf(var2, var1, zero)),
+                imgr.greaterOrEquals(smgr.indexOf(var1, var2, zero), zero),
+                bmgr.not(smgr.equal(empty, smgr.charAt(var1, smgr.indexOf(var1, var2, zero))))))
+        .implies(
+            bmgr.and(
+                smgr.contains(var1, var2),
+                smgr.contains(var2, var1),
+                smgr.equal(
+                    smgr.charAt(var1, smgr.indexOf(var2, var1, zero)),
+                    smgr.charAt(var1, smgr.indexOf(var1, var2, zero)))));
+
+    // If a String contains {, but not B, the index of B must be -1. (unicode of { contains B)
+    assertThatFormula(
+            bmgr.and(
+                smgr.contains(var1, curlyOpen2BUnicode),
+                bmgr.not(smgr.contains(var1, smgr.makeString("B")))))
+        .implies(
+            bmgr.and(
+                imgr.greaterOrEquals(smgr.indexOf(var1, curlyOpen2BUnicode, zero), zero),
+                imgr.equal(imgr.makeNumber(-1), smgr.indexOf(var1, smgr.makeString("B"), zero))));
+  }
+
+  @Test
+  public void testStringIndexOfWithSubStrings() throws SolverException, InterruptedException {
+    assume()
+        .withMessage("Solver %s runs endlessly on this task", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3);
+
+    StringFormula var1 = smgr.makeVariable("var1");
+
+    IntegerFormula zero = imgr.makeNumber(0);
+
+    // If the index of the string abba is 0, the index of the string bba is 1, and b is 1, and ba is
+    // 2
+    assertThatFormula(imgr.equal(zero, smgr.indexOf(var1, smgr.makeString("abba"), zero)))
+        .implies(
+            bmgr.and(
+                smgr.contains(var1, smgr.makeString("abba")),
+                imgr.equal(imgr.makeNumber(1), smgr.indexOf(var1, smgr.makeString("bba"), zero)),
+                imgr.equal(imgr.makeNumber(1), smgr.indexOf(var1, smgr.makeString("b"), zero)),
+                imgr.equal(imgr.makeNumber(2), smgr.indexOf(var1, smgr.makeString("ba"), zero))));
+  }
+
+  @Test
+  public void testStringPrefixImpliesPrefixIndexOf() throws SolverException, InterruptedException {
+    assume()
+        .withMessage("Solver %s runs endlessly on this task", solverToUse())
+        .that(solverToUse())
+        .isNoneOf(Solvers.Z3, Solvers.CVC4);
+
+    StringFormula var1 = smgr.makeVariable("var1");
+    StringFormula var2 = smgr.makeVariable("var2");
+
+    IntegerFormula zero = imgr.makeNumber(0);
+
+    // If a prefix (var2) is non empty, the length of the string (var1) has to be larger or equal to
+    // the prefix
+    // and the chars have to be the same for the lenth of the prefix, meaning the indexOf the prefix
+    // must be 0 in the string.
+    assertThatFormula(bmgr.and(imgr.greaterThan(smgr.length(var2), zero), smgr.prefix(var2, var1)))
+        .implies(
+            bmgr.and(
+                smgr.contains(var1, var2),
+                imgr.greaterOrEquals(smgr.length(var1), smgr.length(var2)),
+                imgr.equal(zero, smgr.indexOf(var1, var2, zero))));
+  }
+
+  @SuppressWarnings("unused")
+  @Test
+  public void testSubString() throws SolverException, InterruptedException {
+    StringFormula empty = smgr.makeString("");
+    StringFormula a = smgr.makeString("a");
+    StringFormula aUppercase = smgr.makeString("A");
+    StringFormula bUppercase = smgr.makeString("B");
+    StringFormula b = smgr.makeString("b");
+    StringFormula bbbbbb = smgr.makeString("bbbbbb");
+    StringFormula bbbbbbb = smgr.makeString("bbbbbbb");
+    StringFormula abbbbbb = smgr.makeString("abbbbbb");
+    StringFormula aaaaaaaB = smgr.makeString("aaaaaaaB");
+    StringFormula abcAndSoOn = smgr.makeString("abcdefghijklmnopqrstuVwxyz");
+    StringFormula curlyOpen2BUnicode = smgr.makeString("\\u{7B}");
+    StringFormula curlyClose2BUnicode = smgr.makeString("\\u{7D}");
+    StringFormula multipleCurlys2BUnicode = smgr.makeString("\\u{7B}\\u{7D}\\u{7B}\\u{7B}");
+    StringFormula curlyClose2BUnicodeEncased = smgr.makeString("blabla\\u{7D}bla");
+    StringFormula curlys2BUnicodeWOEscape = smgr.makeString("\\u007B\\u007D");
+
+    IntegerFormula zero = imgr.makeNumber(0);
+    IntegerFormula one = imgr.makeNumber(1);
+    IntegerFormula two = imgr.makeNumber(2);
+
+    assertEqual(smgr.substring(empty, zero, zero), empty);
+    // TODO: more
+  }
+
+  @Test
+  public void testStringSubstringOutOfBounds() throws SolverException, InterruptedException {
+    StringFormula bbbbbb = smgr.makeString("bbbbbb");
+    StringFormula abbbbbb = smgr.makeString("abbbbbb");
+
+    StringFormula multipleCurlys2BUnicode = smgr.makeString("\\u{7B}\\u{7D}\\u{7B}\\u{7B}");
+    StringFormula multipleCurlys2BUnicodeFromIndex1 = smgr.makeString("\\u{7D}\\u{7B}\\u{7B}");
+
+    assertEqual(smgr.substring(abbbbbb, imgr.makeNumber(1), imgr.makeNumber(10000)), bbbbbb);
+    assertEqual(
+        smgr.substring(multipleCurlys2BUnicode, imgr.makeNumber(1), imgr.makeNumber(10000)),
+        multipleCurlys2BUnicodeFromIndex1);
+  }
+
+  @Test
+  public void testStringReplace() {
+    // TODO
+  }
+
+  @Test
+  public void testStringReplaceAll() {
+    // TODO
+  }
+
+  @Test
+  public void testStringConcatWUnicode() throws SolverException, InterruptedException {
+    StringFormula backslash = smgr.makeString("\\");
+    StringFormula u = smgr.makeString("u");
+    StringFormula curlyOpen = smgr.makeString("\\u{7B}");
+    StringFormula sevenB = smgr.makeString("7B");
+    StringFormula curlyClose = smgr.makeString("\\u{7D}");
+    StringFormula concat = smgr.concat(backslash, u, curlyOpen, sevenB, curlyClose);
+    StringFormula complete = smgr.makeString("\\u{7B}");
+
+    // Concatting parts of unicode does not result in the unicode char!
+    assertDistinct(concat, complete);
+  }
+
+  @Test
+  public void testStringSimpleRegex() {
+    // TODO
+  }
 }
