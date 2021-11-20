@@ -91,9 +91,8 @@ class Z3StringFormulaManager extends AbstractStringFormulaManager<Long, Long, Lo
   }
 
   @Override
-  protected Long indexOf(Long str, Long part) {
-    final int offset = 0;
-    return Native.mkSeqIndex(z3context, str, part, offset);
+  protected Long indexOf(Long str, Long part, Long startIndex) {
+    return Native.mkSeqIndex(z3context, str, part, startIndex);
   }
 
   @Override

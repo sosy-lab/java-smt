@@ -101,9 +101,9 @@ class StatisticsStringFormulaManager implements StringFormulaManager {
   }
 
   @Override
-  public IntegerFormula indexOf(StringFormula str, StringFormula part) {
+  public IntegerFormula indexOf(StringFormula str, StringFormula part, IntegerFormula startIndex) {
     stats.stringOperations.getAndIncrement();
-    return delegate.indexOf(str, part);
+    return delegate.indexOf(str, part, startIndex);
   }
 
   @Override

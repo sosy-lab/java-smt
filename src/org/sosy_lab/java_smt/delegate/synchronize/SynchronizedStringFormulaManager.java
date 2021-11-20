@@ -114,9 +114,9 @@ class SynchronizedStringFormulaManager implements StringFormulaManager {
   }
 
   @Override
-  public IntegerFormula indexOf(StringFormula str, StringFormula part) {
+  public IntegerFormula indexOf(StringFormula str, StringFormula part, IntegerFormula startIndex) {
     synchronized (sync) {
-      return delegate.indexOf(str, part);
+      return delegate.indexOf(str, part, startIndex);
     }
   }
 

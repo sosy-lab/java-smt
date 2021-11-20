@@ -57,8 +57,11 @@ public interface StringFormulaManager {
 
   BooleanFormula contains(StringFormula str, StringFormula part);
 
-  /** Get the first index for a substring in a String, or -1 if the substring is not found. */
-  IntegerFormula indexOf(StringFormula str, StringFormula part);
+  /**
+   * Get the first index for a substring in a String, or -1 if the substring is not found.
+   * startIndex (inlcuded) denotes the start of the search for the index.
+   */
+  IntegerFormula indexOf(StringFormula str, StringFormula part, IntegerFormula startIndex);
 
   /**
    * Get a substring of length 1 from the given String.

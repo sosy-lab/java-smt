@@ -98,8 +98,8 @@ class CVC4StringFormulaManager extends AbstractStringFormulaManager<Expr, Type, 
   }
 
   @Override
-  protected Expr indexOf(Expr str, Expr part) {
-    return exprManager.mkExpr(Kind.STRING_STRIDOF, str, part);
+  protected Expr indexOf(Expr str, Expr part, Expr startIndex) {
+    return exprManager.mkExpr(Kind.STRING_STRIDOF, str, part, startIndex);
   }
 
   @Override

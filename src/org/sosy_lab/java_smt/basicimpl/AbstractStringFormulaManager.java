@@ -140,12 +140,15 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
   protected abstract TFormulaInfo contains(TFormulaInfo str, TFormulaInfo part);
 
   @Override
-  public IntegerFormula indexOf(StringFormula str, StringFormula part) {
+  public IntegerFormula indexOf(StringFormula str, StringFormula part, IntegerFormula startIndex) {
     return getFormulaCreator()
-        .encapsulate(FormulaType.IntegerType, indexOf(extractInfo(str), extractInfo(part)));
+        .encapsulate(
+            FormulaType.IntegerType,
+            indexOf(extractInfo(str), extractInfo(part), extractInfo(startIndex)));
   }
 
-  protected abstract TFormulaInfo indexOf(TFormulaInfo str, TFormulaInfo part);
+  protected abstract TFormulaInfo indexOf(
+      TFormulaInfo str, TFormulaInfo part, TFormulaInfo startIndex);
 
   @Override
   public StringFormula charAt(StringFormula str, IntegerFormula index) {
