@@ -1097,41 +1097,99 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
                 imgr.equal(zero, smgr.indexOf(var1, var2, zero))));
   }
 
-  @SuppressWarnings("unused")
   @Test
-  public void testSubString() throws SolverException, InterruptedException {
+  public void testConstStringSubStrings() throws SolverException, InterruptedException {
     StringFormula empty = smgr.makeString("");
     StringFormula a = smgr.makeString("a");
     StringFormula aUppercase = smgr.makeString("A");
     StringFormula bUppercase = smgr.makeString("B");
-    StringFormula b = smgr.makeString("b");
     StringFormula bbbbbb = smgr.makeString("bbbbbb");
-    StringFormula bbbbbbb = smgr.makeString("bbbbbbb");
-    StringFormula abbbbbb = smgr.makeString("abbbbbb");
-    StringFormula aaaaaaaB = smgr.makeString("aaaaaaaB");
-    StringFormula abcAndSoOn = smgr.makeString("abcdefghijklmnopqrstuVwxyz");
     StringFormula curlyOpen2BUnicode = smgr.makeString("\\u{7B}");
     StringFormula curlyClose2BUnicode = smgr.makeString("\\u{7D}");
     StringFormula multipleCurlys2BUnicode = smgr.makeString("\\u{7B}\\u{7D}\\u{7B}\\u{7B}");
-    StringFormula curlyClose2BUnicodeEncased = smgr.makeString("blabla\\u{7D}bla");
-    StringFormula curlys2BUnicodeWOEscape = smgr.makeString("\\u007B\\u007D");
 
     IntegerFormula zero = imgr.makeNumber(0);
     IntegerFormula one = imgr.makeNumber(1);
-    IntegerFormula two = imgr.makeNumber(2);
 
+    // Check empty string
     assertEqual(smgr.substring(empty, zero, zero), empty);
-    // TODO: more
+    // Check length 0 = empty string
+    assertEqual(smgr.substring(a, one, zero), empty);
+    // Check that it correctly recognized uppercase
+    assertDistinct(smgr.substring(a, zero, one), aUppercase);
+    assertDistinct(smgr.substring(aUppercase, zero, one), a);
+    assertDistinct(smgr.substring(bbbbbb, zero, one), bUppercase);
+    // Check smgr length interaction
+    assertEqual(smgr.substring(bbbbbb, zero, smgr.length(bbbbbb)), bbbbbb);
+    // Check unicode substrings
+    assertEqual(smgr.substring(multipleCurlys2BUnicode, zero, one), curlyOpen2BUnicode);
+    assertEqual(smgr.substring(multipleCurlys2BUnicode, one, one), curlyClose2BUnicode);
+  }
+
+  @Test
+  public void testConstStringAllPossibleSubStrings() throws SolverException, InterruptedException {
+    String[] ws = {
+      "",
+      "0",
+      "1",
+      "10",
+      "a",
+      "b",
+      "A",
+      "B",
+      "aa",
+      "Aa",
+      "aA",
+      "AA",
+      "ab",
+      "aB",
+      "Ab",
+      "AB",
+      "ac",
+      "bb",
+      "aaa",
+      "Aaa",
+      "aAa",
+      "aAA",
+      "aab",
+      "aaabbb",
+      "bbbccc",
+      "abcde",
+      "abdde",
+      "abcdf",
+      "abchurrdurr",
+      "abcdefaaaaa",
+    };
+
+    for (String wordString : ws) {
+      StringFormula word = smgr.makeString(wordString);
+
+      for (int j = 0; j < wordString.length(); j++) {
+        for (int k = j; k < wordString.length(); k++) {
+          // Loop through all combinations of substrings
+          // Note: String.substring uses begin index and end index (non-including) while SMT based
+          // substring uses length!
+          // Length = endIndex - beginIndex
+          String wordSubString = wordString.substring(j, k);
+          assertEqual(
+              smgr.substring(word, imgr.makeNumber(j), imgr.makeNumber(k - j)),
+              smgr.makeString(wordSubString));
+        }
+      }
+    }
   }
 
   @Test
   public void testStringSubstringOutOfBounds() throws SolverException, InterruptedException {
     StringFormula bbbbbb = smgr.makeString("bbbbbb");
+    StringFormula b = smgr.makeString("b");
     StringFormula abbbbbb = smgr.makeString("abbbbbb");
 
     StringFormula multipleCurlys2BUnicode = smgr.makeString("\\u{7B}\\u{7D}\\u{7B}\\u{7B}");
     StringFormula multipleCurlys2BUnicodeFromIndex1 = smgr.makeString("\\u{7D}\\u{7B}\\u{7B}");
 
+    assertEqual(smgr.substring(abbbbbb, imgr.makeNumber(0), imgr.makeNumber(10000)), abbbbbb);
+    assertEqual(smgr.substring(abbbbbb, imgr.makeNumber(6), imgr.makeNumber(10000)), b);
     assertEqual(smgr.substring(abbbbbb, imgr.makeNumber(1), imgr.makeNumber(10000)), bbbbbb);
     assertEqual(
         smgr.substring(multipleCurlys2BUnicode, imgr.makeNumber(1), imgr.makeNumber(10000)),
