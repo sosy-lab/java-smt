@@ -1197,6 +1197,42 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
   }
 
   @Test
+  public void testStringVariablesSubstring() throws SolverException, InterruptedException {
+    StringFormula var1 = smgr.makeVariable("var1");
+    StringFormula var2 = smgr.makeVariable("var2");
+    IntegerFormula intVar1 = imgr.makeVariable("intVar1");
+    IntegerFormula intVar2 = imgr.makeVariable("intVar2");
+
+    // If a Prefix of a certain length exists, the substring over that equals the prefix
+    assertThatFormula(smgr.prefix(var2, var1))
+        .implies(smgr.equal(var2, smgr.substring(var1, imgr.makeNumber(0), smgr.length(var2))));
+
+    // Same with suffix
+    assertThatFormula(smgr.suffix(var2, var1))
+        .implies(
+            smgr.equal(
+                var2,
+                smgr.substring(
+                    var1, imgr.subtract(smgr.length(var1), smgr.length(var2)), smgr.length(var2))));
+
+    // If a string has a char at a specified position, a substring beginning with the same index
+    // must have the same char, independent of the length of the substring.
+    // But its not really relevant to check out of bounds cases, hence the exclusion.
+    // So we test substring length 1 (== charAt) and larger
+    assertThatFormula(
+            bmgr.and(
+                imgr.greaterThan(intVar2, imgr.makeNumber(1)),
+                smgr.equal(var2, smgr.charAt(var1, intVar1)),
+                imgr.greaterThan(smgr.length(var1), intVar1)))
+        .implies(
+            smgr.equal(
+                var2, smgr.charAt(smgr.substring(var1, intVar1, intVar2), imgr.makeNumber(0))));
+
+    assertThatFormula(smgr.equal(var2, smgr.charAt(var1, intVar1)))
+        .implies(smgr.equal(var2, smgr.substring(var1, intVar1, imgr.makeNumber(1))));
+  }
+
+  @Test
   public void testStringReplace() {
     // TODO
   }
