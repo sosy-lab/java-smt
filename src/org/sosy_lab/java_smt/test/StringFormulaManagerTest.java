@@ -1233,13 +1233,111 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testStringReplace() {
-    // TODO
+  public void testConstStringReplace() throws SolverException, InterruptedException {
+    String[] ws = {
+      "",
+      "0",
+      "1",
+      "10",
+      "a",
+      "b",
+      "A",
+      "B",
+      "aa",
+      "Aa",
+      "aA",
+      "AA",
+      "ab",
+      "aB",
+      "Ab",
+      "AB",
+      "ac",
+      "bb",
+      "aaa",
+      "Aaa",
+      "aAa",
+      "aAA",
+      "aab",
+      "aaabbb",
+      "bbbccc",
+      "abcde",
+      "abdde",
+      "abcdf",
+      "abchurrdurr",
+      "abcdefaaaaa",
+    };
+
+    for (int i = 0; i < ws.length; i++) {
+      for (int j = 2; j < ws.length; j++) {
+        String word1 = ws[j - 1];
+          String word2 = ws[j];
+          String word3 = ws[i];
+          StringFormula word1F = smgr.makeString(word1);
+          StringFormula word2F = smgr.makeString(word2);
+          StringFormula word3F = smgr.makeString(word3);
+
+        StringFormula result = smgr.makeString(word3.replaceFirst(word2, word1));
+        assertEqual(smgr.replace(word3F, word2F, word1F), result);
+        }
+      }
   }
 
   @Test
-  public void testStringReplaceAll() {
-    // TODO
+  public void testConstStringReplaceAll() throws SolverException, InterruptedException {
+    assume()
+        .withMessage("Solver %s does not support replaceAll()", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3);
+
+    String[] ws = {
+      "",
+      "0",
+      "1",
+      "10",
+      "a",
+      "b",
+      "A",
+      "B",
+      "aa",
+      "Aa",
+      "aA",
+      "AA",
+      "ab",
+      "aB",
+      "Ab",
+      "AB",
+      "ac",
+      "bb",
+      "aaa",
+      "Aaa",
+      "aAa",
+      "aAA",
+      "aab",
+      "aaabbb",
+      "bbbccc",
+      "abcde",
+      "abdde",
+      "abcdf",
+      "abchurrdurr",
+      "abcdefaaaaa",
+    };
+
+    for (int i = 0; i < ws.length; i++) {
+      for (int j = 1; j < ws.length; j++) {
+        for (int k = 0; k < ws.length; k++) {
+          // TODO: this might be a bit overkill
+          String word1 = ws[k];
+          String word2 = ws[j];
+          String word3 = ws[i];
+          StringFormula word1F = smgr.makeString(word1);
+          StringFormula word2F = smgr.makeString(word2);
+          StringFormula word3F = smgr.makeString(word3);
+
+          StringFormula result = smgr.makeString(word3.replaceAll(word2, word1));
+          assertEqual(smgr.replaceAll(word3F, word2F, word1F), result);
+        }
+      }
+    }
   }
 
   @Test
