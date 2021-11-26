@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.sosy_lab.java_smt.api.FormulaType.StringType;
 
 import com.google.common.collect.ImmutableList;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -33,6 +34,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.Tactic;
 import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 
@@ -903,6 +905,85 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     assertThatFormula(
             bmgr.and(forall10to20bx1, forall(x, imgr.makeNumber(0), imgr.makeNumber(9), bAtXEq0)))
         .isSatisfiable();
+  }
+
+  @Test
+  public void testExistsBasicStringTheorie() throws SolverException, InterruptedException {
+    requireStrings();
+    requireIntegers();
+
+    // exists var ("a" < var < "c") & length var == 1  -> var == "b"
+    StringFormula stringA = smgr.makeString("a");
+    StringFormula stringC = smgr.makeString("c");
+    StringFormula var = smgr.makeVariable("var");
+
+    BooleanFormula query =
+        qmgr.exists(
+            var,
+            bmgr.and(
+                imgr.equal(smgr.length(var), imgr.makeNumber(1)),
+                smgr.lessThan(stringA, var),
+                smgr.lessThan(var, stringC)));
+    assertThatFormula(query).isSatisfiable();
+  }
+
+  @Test
+  public void testForallBasicStringTheorie() throws SolverException, InterruptedException {
+    requireStrings();
+    requireIntegers();
+
+    // forall var ("a" < var < "c") & length var == 1
+    StringFormula stringA = smgr.makeString("a");
+    StringFormula stringC = smgr.makeString("c");
+    StringFormula var = smgr.makeVariable("var");
+
+    BooleanFormula query =
+        qmgr.forall(
+            var,
+            bmgr.and(
+                imgr.equal(smgr.length(var), imgr.makeNumber(1)),
+                smgr.lessThan(stringA, var),
+                smgr.lessThan(var, stringC)));
+    assertThatFormula(query).isUnsatisfiable();
+  }
+
+  @Test
+  public void testExistsBasicStringArray() throws SolverException, InterruptedException {
+    requireStrings();
+    requireIntegers();
+
+    // exists var (var = select(store(arr, 2, "bla"), 2)
+    IntegerFormula two = imgr.makeNumber(2);
+    StringFormula string = smgr.makeString("bla");
+    StringFormula var = smgr.makeVariable("var");
+    ArrayFormula<IntegerFormula, StringFormula> arr =
+        amgr.makeArray("arr", FormulaType.IntegerType, StringType);
+    BooleanFormula query =
+        qmgr.exists(var, smgr.equal(var, amgr.select(amgr.store(arr, two, string), two)));
+    assertThatFormula(query).isSatisfiable();
+  }
+
+  @Test
+  public void testForallBasicStringArray() throws SolverException, InterruptedException {
+    requireStrings();
+    requireIntegers();
+
+    // CVC4 returns null or UNKNOWN, however it does not seem to have a problem with
+    // declaring/starting the solving process!
+    assume()
+        .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC4);
+
+    // forall var (var = select(store(arr, 2, "bla"), 2)
+    IntegerFormula two = imgr.makeNumber(2);
+    StringFormula string = smgr.makeString("bla");
+    StringFormula var = smgr.makeVariable("var");
+    ArrayFormula<IntegerFormula, StringFormula> arr =
+        amgr.makeArray("arr", FormulaType.IntegerType, StringType);
+    BooleanFormula query =
+        qmgr.forall(var, smgr.equal(var, amgr.select(amgr.store(arr, two, string), two)));
+    assertThatFormula(query).isUnsatisfiable();
   }
 
   private BooleanFormula forall(
