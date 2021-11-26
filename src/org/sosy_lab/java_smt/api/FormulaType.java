@@ -352,7 +352,7 @@ public abstract class FormulaType<T extends Formula> {
     }
   }
 
-  public static final FormulaType<BooleanFormula> StringType =
+  public static final FormulaType<StringFormula> StringType =
       new FormulaType<>() {
 
         @Override
