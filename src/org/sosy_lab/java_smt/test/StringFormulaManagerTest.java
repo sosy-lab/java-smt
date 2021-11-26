@@ -16,6 +16,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -1282,6 +1283,210 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
       }
   }
 
+  // Neither CVC4 nor Z3 can solve this!
+  @Ignore
+  @Test
+  public void testStringVariableReplacePrefix() throws SolverException, InterruptedException {
+    StringFormula var1 = smgr.makeVariable("var1");
+    StringFormula var2 = smgr.makeVariable("var2");
+    StringFormula var3 = smgr.makeVariable("var3");
+    StringFormula prefix = smgr.makeVariable("prefix");
+
+    // If var1 has a prefix, and you replace said prefix with var3 (saved in var2), the prefix of
+    // var2 is var3
+    assertThatFormula(
+            bmgr.and(
+                smgr.equal(var2, smgr.replace(var1, prefix, var3)),
+                smgr.prefix(prefix, var1),
+                bmgr.not(smgr.equal(prefix, var3)),
+                imgr.greaterThan(smgr.length(prefix), imgr.makeNumber(0)),
+                imgr.greaterThan(smgr.length(var3), imgr.makeNumber(0))))
+        .implies(bmgr.and(bmgr.not(smgr.equal(var1, var2)), smgr.prefix(var3, var2)));
+    assertThatFormula(
+            bmgr.and(
+                smgr.equal(var2, smgr.replace(var1, prefix, var3)),
+                smgr.prefix(prefix, var1),
+                bmgr.not(smgr.equal(prefix, var3))))
+        .implies(bmgr.and(smgr.prefix(var3, var2), bmgr.not(smgr.equal(var1, var2))));
+  }
+
+  @Test
+  public void testStringVariableReplaceSubstring() throws SolverException, InterruptedException {
+    // I couldn't find stronger constraints in the implication that don't run endlessly.....
+    StringFormula original = smgr.makeVariable("original");
+    StringFormula prefix = smgr.makeVariable("prefix");
+    StringFormula replacement = smgr.makeVariable("replacement");
+    StringFormula replaced = smgr.makeVariable("replaced");
+
+    // Set a prefix that does not contain the suffix substring, make sure that the substring that
+    // comes after the prefix is replaced
+    assertThatFormula(
+            bmgr.and(
+                smgr.prefix(prefix, original),
+                imgr.equal(
+                    smgr.length(prefix),
+                    smgr.indexOf(
+                        original,
+                        smgr.substring(original, smgr.length(prefix), smgr.length(original)),
+                        imgr.makeNumber(0))),
+                imgr.greaterThan(smgr.length(original), smgr.length(prefix)),
+                imgr.greaterThan(smgr.length(prefix), imgr.makeNumber(0)),
+                imgr.greaterThan(
+                    smgr.length(
+                        smgr.substring(original, smgr.length(prefix), smgr.length(original))),
+                    imgr.makeNumber(0)),
+                smgr.equal(
+                    replaced,
+                    smgr.replace(
+                        original,
+                        smgr.substring(original, smgr.length(prefix), smgr.length(original)),
+                        replacement))))
+        .implies(
+            smgr.equal(
+                replacement, smgr.substring(replaced, smgr.length(prefix), smgr.length(replaced))));
+
+    // In this version it is still possible that parts of the prefix and suffix together build the
+    // suffix, replacing parts of the prefix additionally to the implication above (or the
+    // replacement is empty)
+    assertThatFormula(
+            bmgr.and(
+                smgr.prefix(prefix, original),
+                bmgr.not(smgr.contains(original, replacement)),
+                bmgr.not(
+                    smgr.contains(
+                        smgr.substring(original, smgr.length(prefix), smgr.length(original)),
+                        prefix)),
+                bmgr.not(
+                    smgr.contains(
+                        prefix,
+                        smgr.substring(original, smgr.length(prefix), smgr.length(original)))),
+                imgr.greaterThan(smgr.length(original), smgr.length(prefix)),
+                imgr.greaterThan(smgr.length(prefix), imgr.makeNumber(0)),
+                smgr.equal(
+                    replaced,
+                    smgr.replace(
+                        original,
+                        smgr.substring(original, smgr.length(prefix), smgr.length(original)),
+                        replacement))))
+        .implies(smgr.contains(replacement, replacement));
+
+    // This version may have the original as a larger version of the prefix; prefix: a, original:
+    // aaa
+    assertThatFormula(
+            bmgr.and(
+                smgr.prefix(prefix, original),
+                bmgr.not(smgr.contains(original, replacement)),
+                bmgr.not(
+                    smgr.contains(
+                        prefix,
+                        smgr.substring(original, smgr.length(prefix), smgr.length(original)))),
+                imgr.greaterThan(smgr.length(original), smgr.length(prefix)),
+                imgr.greaterThan(smgr.length(prefix), imgr.makeNumber(0)),
+                smgr.equal(
+                    replaced,
+                    smgr.replace(
+                        original,
+                        smgr.substring(original, smgr.length(prefix), smgr.length(original)),
+                        replacement))))
+        .implies(smgr.contains(replacement, replacement));
+
+    // This version can contain the substring in the prefix!
+    assertThatFormula(
+            bmgr.and(
+                smgr.prefix(prefix, original),
+                bmgr.not(smgr.contains(original, replacement)),
+                imgr.greaterThan(smgr.length(original), smgr.length(prefix)),
+                imgr.greaterThan(smgr.length(prefix), imgr.makeNumber(0)),
+                smgr.equal(
+                    replaced,
+                    smgr.replace(
+                        original,
+                        smgr.substring(original, smgr.length(prefix), smgr.length(original)),
+                        replacement))))
+        .implies(smgr.contains(replacement, replacement));
+  }
+
+  @Test
+  public void testStringVariableReplaceMiddle() throws SolverException, InterruptedException {
+    // TODO: either rework that this terminates, or remove
+    assume()
+        .withMessage("Solver %s runs endlessly on this task.", solverToUse())
+        .that(solverToUse())
+        .isNoneOf(Solvers.CVC4, Solvers.Z3);
+
+    StringFormula original = smgr.makeVariable("original");
+    StringFormula replacement = smgr.makeVariable("replacement");
+    StringFormula replaced = smgr.makeVariable("replaced");
+    StringFormula beginning = smgr.makeVariable("beginning");
+    StringFormula middle = smgr.makeVariable("middle");
+    StringFormula end = smgr.makeVariable("end");
+
+    // If beginning + middle + end (length of each > 0) get concated (in original), replacing
+    // beginning/middle/end
+    // with replacement (result = replaces; replacement > 0 and != the replaced) results in a
+    // string that is equal to the concat of the 2 remaining start strings and the replaced one
+    // replaced
+    // This is tested with 2 different implications, 1 that only checks wheter or not the
+    // replacement is contained in the string and not in the original and vice verse for the
+    // replaced String
+    BooleanFormula formula =
+        bmgr.and(
+            smgr.equal(original, smgr.concat(beginning, middle, end)),
+            smgr.equal(replaced, smgr.replace(original, middle, replacement)),
+            bmgr.not(smgr.equal(middle, replacement)),
+            bmgr.not(smgr.equal(beginning, replacement)),
+            bmgr.not(smgr.equal(end, replacement)),
+            bmgr.not(smgr.equal(beginning, middle)),
+            imgr.greaterThan(smgr.length(middle), imgr.makeNumber(0)),
+            imgr.greaterThan(smgr.length(replacement), imgr.makeNumber(0)),
+            imgr.greaterThan(smgr.length(beginning), imgr.makeNumber(0)));
+    assertThatFormula(formula)
+        .implies(
+            bmgr.and(
+                bmgr.not(smgr.equal(original, replaced)), smgr.contains(replaced, replacement)));
+
+    // Same as above, but with concat instead of contains
+    assertThatFormula(formula)
+        .implies(
+            bmgr.and(
+                bmgr.not(smgr.equal(original, replaced)),
+                smgr.equal(replaced, smgr.concat(beginning, replacement, end))));
+  }
+
+  @Test
+  public void testStringVariableReplaceFront() throws SolverException, InterruptedException {
+    assume()
+        .withMessage("Solver %s runs endlessly on this task.", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3);
+
+    StringFormula var1 = smgr.makeVariable("var1");
+    StringFormula var2 = smgr.makeVariable("var2");
+    StringFormula var3 = smgr.makeVariable("var3");
+    StringFormula var4 = smgr.makeVariable("var4");
+    StringFormula var5 = smgr.makeVariable("var5");
+
+    // If var1 and 2 get concated (in var4) such that var1 is in front, replacing var1 with var3
+    // (var5) results in a
+    // string that is equal to var3 + var2
+    // First with length constraints, second without
+    assertThatFormula(
+            bmgr.and(
+                smgr.equal(var4, smgr.concat(var1, var2)),
+                smgr.equal(var5, smgr.replace(var4, var1, var3)),
+                bmgr.not(smgr.equal(var1, var3)),
+                imgr.greaterThan(smgr.length(var1), imgr.makeNumber(0)),
+                imgr.greaterThan(smgr.length(var3), imgr.makeNumber(0))))
+        .implies(bmgr.and(bmgr.not(smgr.equal(var4, var5)), smgr.prefix(var3, var5)));
+
+    assertThatFormula(
+            bmgr.and(
+                smgr.equal(var4, smgr.concat(var1, var2)),
+                smgr.equal(var5, smgr.replace(var4, var1, var3)),
+                bmgr.not(smgr.equal(var1, var3))))
+        .implies(bmgr.and(bmgr.not(smgr.equal(var4, var5)), smgr.prefix(var3, var5)));
+  }
+
   @Test
   public void testConstStringReplaceAll() throws SolverException, InterruptedException {
     assume()
@@ -1338,6 +1543,86 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
         }
       }
     }
+  }
+
+  /**
+   * Concat a String that consists of a String that is later replaces with replaceAll. The resulting
+   * String should consist of only concatinated versions of itself.
+   */
+  @Test
+  public void testStringVariableReplaceAllConcatedString()
+      throws SolverException, InterruptedException {
+    assume()
+        .withMessage("Solver %s does not support replaceAll()", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3);
+
+    // 2 concats is the max number CVC4 supports without running endlessly
+    for (int numOfConcats = 0; numOfConcats < 3; numOfConcats++) {
+
+    StringFormula original = smgr.makeVariable("original");
+    StringFormula replacement = smgr.makeVariable("replacement");
+    StringFormula replaced = smgr.makeVariable("replaced");
+    StringFormula segment = smgr.makeVariable("segment");
+
+    StringFormula[] concatSegments = new StringFormula[numOfConcats];
+    StringFormula[] concatReplacements = new StringFormula[numOfConcats];
+
+    for (int i = 0; i < numOfConcats; i++) {
+      concatSegments[i] = segment;
+      concatReplacements[i] = replacement;
+    }
+
+    BooleanFormula formula =
+        bmgr.and(
+            smgr.equal(original, smgr.concat(concatSegments)),
+            smgr.equal(replaced, smgr.replaceAll(original, segment, replacement)),
+            bmgr.not(smgr.equal(segment, replacement)),
+            imgr.greaterThan(smgr.length(segment), imgr.makeNumber(0)),
+            imgr.greaterThan(smgr.length(replacement), imgr.makeNumber(0)));
+    assertThatFormula(formula).implies(smgr.equal(replaced, smgr.concat(concatReplacements)));
+    }
+  }
+
+  @Test
+  public void testStringVariableReplaceAllSubstring() throws SolverException, InterruptedException {
+    assume()
+        .withMessage("Solver %s does not support replaceAll()", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3);
+
+    // I couldn't find stronger constraints in the implication that don't run endlessly.....
+    StringFormula original = smgr.makeVariable("original");
+    StringFormula prefix = smgr.makeVariable("prefix");
+    StringFormula replacement = smgr.makeVariable("replacement");
+    StringFormula replaced = smgr.makeVariable("replaced");
+
+    // Set a prefix that does not contain the suffix substring, make sure that the substring that
+    // comes after the prefix is replaced
+    assertThatFormula(
+            bmgr.and(
+                smgr.prefix(prefix, original),
+                imgr.equal(
+                    smgr.length(prefix),
+                    smgr.indexOf(
+                        original,
+                        smgr.substring(original, smgr.length(prefix), smgr.length(original)),
+                        imgr.makeNumber(0))),
+                imgr.greaterThan(smgr.length(original), smgr.length(prefix)),
+                imgr.greaterThan(smgr.length(prefix), imgr.makeNumber(0)),
+                imgr.greaterThan(
+                    smgr.length(
+                        smgr.substring(original, smgr.length(prefix), smgr.length(original))),
+                    imgr.makeNumber(0)),
+                smgr.equal(
+                    replaced,
+                    smgr.replaceAll(
+                        original,
+                        smgr.substring(original, smgr.length(prefix), smgr.length(original)),
+                        replacement))))
+        .implies(
+            smgr.equal(
+                replacement, smgr.substring(replaced, smgr.length(prefix), smgr.length(replaced))));
   }
 
   @Test
