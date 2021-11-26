@@ -9,7 +9,10 @@
 package org.sosy_lab.java_smt.test;
 
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
+import static org.sosy_lab.java_smt.api.FormulaType.RationalType;
 import static org.sosy_lab.java_smt.api.FormulaType.StringType;
+import static org.sosy_lab.java_smt.api.FormulaType.getBitvectorTypeWithSize;
+import static org.sosy_lab.java_smt.api.FormulaType.getSinglePrecisionFloatingPointType;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -19,10 +22,13 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.ArrayFormula;
+import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.StringFormula;
 
@@ -84,6 +90,71 @@ public class ArrayFormulaManagerTest extends SolverBasedTest0 {
         bmgr.and(
             amgr.equivalence(arr2, amgr.store(arr1, num4, num2)),
             bmgr.not(smgr.equal(num2, amgr.select(arr2, num4))));
+    assertThatFormula(query).isUnsatisfiable();
+  }
+
+  /*
+   *  Test whether or not Bitvector Arrays are possible
+   */
+  @Test
+  public void basicBitvectorTypeTest() throws SolverException, InterruptedException {
+    requireBitvectors();
+
+    // (arr2 = store(arr1, 0100, 0010)) & !(select(arr2, 0100) = 0010)
+    BitvectorFormula num2 = bvmgr.makeBitvector(4, 2);
+    BitvectorFormula num4 = bvmgr.makeBitvector(4, 4);
+    ArrayFormula<BitvectorFormula, BitvectorFormula> arr1 =
+        amgr.makeArray("arr1", getBitvectorTypeWithSize(4), getBitvectorTypeWithSize(4));
+    ArrayFormula<BitvectorFormula, BitvectorFormula> arr2 =
+        amgr.makeArray("arr2", getBitvectorTypeWithSize(4), getBitvectorTypeWithSize(4));
+    BooleanFormula query =
+        bmgr.and(
+            amgr.equivalence(arr2, amgr.store(arr1, num4, num2)),
+            bmgr.not(bvmgr.equal(num2, amgr.select(arr2, num4))));
+    assertThatFormula(query).isUnsatisfiable();
+  }
+
+  /*
+   *  Test whether or not Rational Arrays are possible
+   */
+  @Test
+  public void basicRationalTypeTest() throws SolverException, InterruptedException {
+    requireRationals();
+
+    // (arr2 = store(arr1, 4, 2)) & !(select(arr2, 4) = 2)
+    RationalFormula num2 = rmgr.makeNumber(2);
+    RationalFormula num4 = rmgr.makeNumber(4);
+    ArrayFormula<RationalFormula, RationalFormula> arr1 =
+        amgr.makeArray("arr1", RationalType, RationalType);
+    ArrayFormula<RationalFormula, RationalFormula> arr2 =
+        amgr.makeArray("arr2", RationalType, RationalType);
+    BooleanFormula query =
+        bmgr.and(
+            amgr.equivalence(arr2, amgr.store(arr1, num4, num2)),
+            bmgr.not(rmgr.equal(num2, amgr.select(arr2, num4))));
+    assertThatFormula(query).isUnsatisfiable();
+  }
+
+  /*
+   *  Test whether or not Float Arrays are possible
+   */
+  @Test
+  public void basicFloatTypeTest() throws SolverException, InterruptedException {
+    requireFloats();
+
+    // (arr2 = store(arr1, 4.0, 2.0)) & !(select(arr2, 4.0) = 2.0)
+    FloatingPointFormula num2 = fpmgr.makeNumber(2, getSinglePrecisionFloatingPointType());
+    FloatingPointFormula num4 = fpmgr.makeNumber(4, getSinglePrecisionFloatingPointType());
+    ArrayFormula<FloatingPointFormula, FloatingPointFormula> arr1 =
+        amgr.makeArray(
+            "arr1", getSinglePrecisionFloatingPointType(), getSinglePrecisionFloatingPointType());
+    ArrayFormula<FloatingPointFormula, FloatingPointFormula> arr2 =
+        amgr.makeArray(
+            "arr2", getSinglePrecisionFloatingPointType(), getSinglePrecisionFloatingPointType());
+    BooleanFormula query =
+        bmgr.and(
+            amgr.equivalence(arr2, amgr.store(arr1, num4, num2)),
+            bmgr.not(fpmgr.equalWithFPSemantics(num2, amgr.select(arr2, num4))));
     assertThatFormula(query).isUnsatisfiable();
   }
 }
