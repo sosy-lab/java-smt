@@ -55,7 +55,7 @@ public class ArrayFormulaManagerTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void uniqueType() throws SolverException, InterruptedException {
+  public void testIntIndexIntValue() throws SolverException, InterruptedException {
     requireIntegers();
 
     // (arr2 = store(arr1, 4, 2)) & !(select(arr2, 4) = 2)
@@ -73,10 +73,10 @@ public class ArrayFormulaManagerTest extends SolverBasedTest0 {
   }
 
   /*
-   *  Test whether or not String Arrays are possible
+   *  Test whether or not String Arrays are possible with String indexes
    */
   @Test
-  public void basicStringTypeTest() throws SolverException, InterruptedException {
+  public void testStringIndexStringValue() throws SolverException, InterruptedException {
     requireStrings();
 
     // (arr2 = store(arr1, "four", "two")) & !(select(arr2, "four") = "two")
@@ -94,10 +94,52 @@ public class ArrayFormulaManagerTest extends SolverBasedTest0 {
   }
 
   /*
-   *  Test whether or not Bitvector Arrays are possible
+   *  Test whether or not String Arrays with Int indexes are possible
    */
   @Test
-  public void basicBitvectorTypeTest() throws SolverException, InterruptedException {
+  public void testIntIndexStringValue() throws SolverException, InterruptedException {
+    requireStrings();
+
+    // (arr2 = store(arr1, 4, "two")) & !(select(arr2, 4) = "two")
+    StringFormula stringTwo = smgr.makeString("two");
+    IntegerFormula intFour = imgr.makeNumber(4);
+    ArrayFormula<IntegerFormula, StringFormula> arr1 =
+        amgr.makeArray("arr1", FormulaType.IntegerType, StringType);
+    ArrayFormula<IntegerFormula, StringFormula> arr2 =
+        amgr.makeArray("arr2", FormulaType.IntegerType, StringType);
+    BooleanFormula query =
+        bmgr.and(
+            amgr.equivalence(arr2, amgr.store(arr1, intFour, stringTwo)),
+            bmgr.not(smgr.equal(stringTwo, amgr.select(arr2, intFour))));
+    assertThatFormula(query).isUnsatisfiable();
+  }
+
+  /*
+   *  Test whether or not String Arrays with bitvector indexes are possible
+   */
+  @Test
+  public void testBvIndexStringValue() throws SolverException, InterruptedException {
+    requireStrings();
+
+    // (arr2 = store(arr1, 0100, "two")) & !(select(arr2, 0100) = "two")
+    StringFormula stringTwo = smgr.makeString("two");
+    BitvectorFormula bv4 = bvmgr.makeBitvector(4, 4);
+    ArrayFormula<BitvectorFormula, StringFormula> arr1 =
+        amgr.makeArray("arr1", getBitvectorTypeWithSize(4), StringType);
+    ArrayFormula<BitvectorFormula, StringFormula> arr2 =
+        amgr.makeArray("arr2", getBitvectorTypeWithSize(4), StringType);
+    BooleanFormula query =
+        bmgr.and(
+            amgr.equivalence(arr2, amgr.store(arr1, bv4, stringTwo)),
+            bmgr.not(smgr.equal(stringTwo, amgr.select(arr2, bv4))));
+    assertThatFormula(query).isUnsatisfiable();
+  }
+
+  /*
+   *  Test whether or not Bitvector Arrays are possible with bv index
+   */
+  @Test
+  public void testBvIndexBvValue() throws SolverException, InterruptedException {
     requireBitvectors();
 
     // (arr2 = store(arr1, 0100, 0010)) & !(select(arr2, 0100) = 0010)
@@ -115,10 +157,10 @@ public class ArrayFormulaManagerTest extends SolverBasedTest0 {
   }
 
   /*
-   *  Test whether or not Rational Arrays are possible
+   *  Test whether or not Rational Arrays are possible with Rational index
    */
   @Test
-  public void basicRationalTypeTest() throws SolverException, InterruptedException {
+  public void testRationalIndexRationalValue() throws SolverException, InterruptedException {
     requireRationals();
 
     // (arr2 = store(arr1, 4, 2)) & !(select(arr2, 4) = 2)
@@ -136,10 +178,10 @@ public class ArrayFormulaManagerTest extends SolverBasedTest0 {
   }
 
   /*
-   *  Test whether or not Float Arrays are possible
+   *  Test whether or not Float Arrays are possible with Float index
    */
   @Test
-  public void basicFloatTypeTest() throws SolverException, InterruptedException {
+  public void testFloatIndexFloatValue() throws SolverException, InterruptedException {
     requireFloats();
 
     // (arr2 = store(arr1, 4.0, 2.0)) & !(select(arr2, 4.0) = 2.0)
