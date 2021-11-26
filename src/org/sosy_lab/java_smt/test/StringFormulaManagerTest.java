@@ -1271,16 +1271,16 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
     for (int i = 0; i < ws.length; i++) {
       for (int j = 2; j < ws.length; j++) {
         String word1 = ws[j - 1];
-          String word2 = ws[j];
-          String word3 = ws[i];
-          StringFormula word1F = smgr.makeString(word1);
-          StringFormula word2F = smgr.makeString(word2);
-          StringFormula word3F = smgr.makeString(word3);
+        String word2 = ws[j];
+        String word3 = ws[i];
+        StringFormula word1F = smgr.makeString(word1);
+        StringFormula word2F = smgr.makeString(word2);
+        StringFormula word3F = smgr.makeString(word3);
 
         StringFormula result = smgr.makeString(word3.replaceFirst(word2, word1));
         assertEqual(smgr.replace(word3F, word2F, word1F), result);
-        }
       }
+    }
   }
 
   // Neither CVC4 nor Z3 can solve this!
@@ -1560,27 +1560,27 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
     // 2 concats is the max number CVC4 supports without running endlessly
     for (int numOfConcats = 0; numOfConcats < 3; numOfConcats++) {
 
-    StringFormula original = smgr.makeVariable("original");
-    StringFormula replacement = smgr.makeVariable("replacement");
-    StringFormula replaced = smgr.makeVariable("replaced");
-    StringFormula segment = smgr.makeVariable("segment");
+      StringFormula original = smgr.makeVariable("original");
+      StringFormula replacement = smgr.makeVariable("replacement");
+      StringFormula replaced = smgr.makeVariable("replaced");
+      StringFormula segment = smgr.makeVariable("segment");
 
-    StringFormula[] concatSegments = new StringFormula[numOfConcats];
-    StringFormula[] concatReplacements = new StringFormula[numOfConcats];
+      StringFormula[] concatSegments = new StringFormula[numOfConcats];
+      StringFormula[] concatReplacements = new StringFormula[numOfConcats];
 
-    for (int i = 0; i < numOfConcats; i++) {
-      concatSegments[i] = segment;
-      concatReplacements[i] = replacement;
-    }
+      for (int i = 0; i < numOfConcats; i++) {
+        concatSegments[i] = segment;
+        concatReplacements[i] = replacement;
+      }
 
-    BooleanFormula formula =
-        bmgr.and(
-            smgr.equal(original, smgr.concat(concatSegments)),
-            smgr.equal(replaced, smgr.replaceAll(original, segment, replacement)),
-            bmgr.not(smgr.equal(segment, replacement)),
-            imgr.greaterThan(smgr.length(segment), imgr.makeNumber(0)),
-            imgr.greaterThan(smgr.length(replacement), imgr.makeNumber(0)));
-    assertThatFormula(formula).implies(smgr.equal(replaced, smgr.concat(concatReplacements)));
+      BooleanFormula formula =
+          bmgr.and(
+              smgr.equal(original, smgr.concat(concatSegments)),
+              smgr.equal(replaced, smgr.replaceAll(original, segment, replacement)),
+              bmgr.not(smgr.equal(segment, replacement)),
+              imgr.greaterThan(smgr.length(segment), imgr.makeNumber(0)),
+              imgr.greaterThan(smgr.length(replacement), imgr.makeNumber(0)));
+      assertThatFormula(formula).implies(smgr.equal(replaced, smgr.concat(concatReplacements)));
     }
   }
 
