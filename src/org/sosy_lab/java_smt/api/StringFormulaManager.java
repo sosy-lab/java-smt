@@ -10,8 +10,6 @@ package org.sosy_lab.java_smt.api;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
 /**
@@ -29,7 +27,9 @@ public interface StringFormulaManager {
   StringFormula makeString(String value);
 
   /**
-   * Creates a variable with exactly the given name.
+   * Creates a variable of type String with exactly the given name.
+   *
+   * <p>This variable (symbol) represents a "String" for which the SMT solver needs to find a model.
    *
    * <p>Please make sure that the given name is valid in SMT-LIB2. Take a look at {@link
    * FormulaManager#isValidName} for further information.
@@ -38,6 +38,12 @@ public interface StringFormulaManager {
    * {@link Formula#toString} can return a different String than the given one.
    */
   StringFormula makeVariable(String pVar);
+
+  // TODO: There is currently no way to use variables of type "Regex", i.e., that represent full
+  //       regular expression for which the SMT solver need to find a model.
+  //       The reason for this is that the current SMT solvers do not support this feature.
+  //       However, we can build a RegexFormula from basic parts like Strings (including
+  //       variables of type String) and operations like range, union, or complement.
 
   BooleanFormula equal(StringFormula str1, StringFormula str2);
 
@@ -109,25 +115,6 @@ public interface StringFormulaManager {
    * @param value the regular expression the returned <code>Formula</code> should represent
    */
   RegexFormula makeRegex(String value);
-
-  /**
-   * Returns a {@link RegexFormula} representing the regular expression in the {@link Pattern}.
-   *
-   * @param value the regular expression pattern the returned <code>Formula</code> should represent
-   */
-  default RegexFormula makeRegex(Pattern value) {
-    return makeRegex(value.pattern());
-  }
-
-  /**
-   * Returns a {@link RegexFormula} representing the regular expression in the {@link Matcher}.
-   *
-   * @param value a matcher for the regular expression the returned <code>Formula</code> should
-   *     represent
-   */
-  default RegexFormula makeRegex(Matcher value) {
-    return makeRegex(value.pattern());
-  }
 
   // basic regex operations
 
