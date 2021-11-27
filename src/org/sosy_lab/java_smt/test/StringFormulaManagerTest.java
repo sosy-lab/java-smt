@@ -10,10 +10,8 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.TruthJUnit.assume;
 
-import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Arrays;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -34,39 +32,39 @@ import org.sosy_lab.java_smt.api.StringFormula;
 @RunWith(Parameterized.class)
 public class StringFormulaManagerTest extends SolverBasedTest0 {
 
-  public static final String[] WORDS =
-      new String[] {
-        "",
-        "0",
-        "1",
-        "10",
-        "a",
-        "b",
-        "A",
-        "B",
-        "aa",
-        "Aa",
-        "aA",
-        "AA",
-        "ab",
-        "aB",
-        "Ab",
-        "AB",
-        "ac",
-        "bb",
-        "aaa",
-        "Aaa",
-        "aAa",
-        "aAA",
-        "aab",
-        "aaabbb",
-        "bbbccc",
-        "abcde",
-        "abdde",
-        "abcdf",
-        "abchurrdurr",
-        "abcdefaaaaa",
-      };
+  private static final ImmutableList<String> WORDS =
+      ImmutableList.of(
+          "",
+          "0",
+          "1",
+          "10",
+          "a",
+          "b",
+          "A",
+          "B",
+          "aa",
+          "Aa",
+          "aA",
+          "AA",
+          "ab",
+          "aB",
+          "Ab",
+          "AB",
+          "ac",
+          "bb",
+          "aaa",
+          "Aaa",
+          "aAa",
+          "aAA",
+          "aab",
+          "aaabbb",
+          "bbbccc",
+          "abcde",
+          "abdde",
+          "abcdf",
+          "abchurrdurr",
+          "abcdefaaaaa");
+
   private StringFormula hello;
   private RegexFormula a2z;
 
@@ -537,14 +535,11 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
   @Test
   public void testSimpleConstStringLexicographicOrdering()
       throws SolverException, InterruptedException {
-
-    Arrays.sort(WORDS); // lexicographic ordering
-    List<StringFormula> words =
-        FluentIterable.from(WORDS).transform(w -> smgr.makeString(w)).toList();
+    List<String> words = ImmutableList.sortedCopyOf(WORDS);
 
     for (int i = 1; i < words.size(); i++) {
-      StringFormula word1 = words.get(i - 1);
-      StringFormula word2 = words.get(i);
+      StringFormula word1 = smgr.makeString(words.get(i - 1));
+      StringFormula word2 = smgr.makeString(words.get(i));
 
       assertThatFormula(smgr.lessThan(word1, word1)).isUnsatisfiable();
       assertThatFormula(smgr.lessOrEquals(word1, word1)).isSatisfiable();
@@ -1204,11 +1199,11 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testConstStringReplace() throws SolverException, InterruptedException {
-    for (int i = 0; i < WORDS.length; i++) {
-      for (int j = 2; j < WORDS.length; j++) {
-        String word1 = WORDS[j - 1];
-        String word2 = WORDS[j];
-        String word3 = WORDS[i];
+    for (int i = 0; i < WORDS.size(); i++) {
+      for (int j = 2; j < WORDS.size(); j++) {
+        String word1 = WORDS.get(j - 1);
+        String word2 = WORDS.get(j);
+        String word3 = WORDS.get(i);
         StringFormula word1F = smgr.makeString(word1);
         StringFormula word2F = smgr.makeString(word2);
         StringFormula word3F = smgr.makeString(word3);
@@ -1430,10 +1425,10 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
         .that(solverToUse())
         .isNotEqualTo(Solvers.Z3);
 
-    for (int i = 0; i < WORDS.length; i++) {
-      for (int j = 1; j < WORDS.length; j++) {
-        String word1 = WORDS[i];
-        String word2 = WORDS[j];
+    for (int i = 0; i < WORDS.size(); i++) {
+      for (int j = 1; j < WORDS.size(); j++) {
+        String word1 = WORDS.get(i);
+        String word2 = WORDS.get(j);
         String word3 = "replacement";
         StringFormula word1F = smgr.makeString(word1);
         StringFormula word2F = smgr.makeString(word2);
