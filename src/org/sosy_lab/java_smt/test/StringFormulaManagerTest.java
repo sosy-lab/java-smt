@@ -34,6 +34,39 @@ import org.sosy_lab.java_smt.api.StringFormula;
 @RunWith(Parameterized.class)
 public class StringFormulaManagerTest extends SolverBasedTest0 {
 
+  public static final String[] WORDS =
+      new String[] {
+        "",
+        "0",
+        "1",
+        "10",
+        "a",
+        "b",
+        "A",
+        "B",
+        "aa",
+        "Aa",
+        "aA",
+        "AA",
+        "ab",
+        "aB",
+        "Ab",
+        "AB",
+        "ac",
+        "bb",
+        "aaa",
+        "Aaa",
+        "aAa",
+        "aAA",
+        "aab",
+        "aaabbb",
+        "bbbccc",
+        "abcde",
+        "abdde",
+        "abcdf",
+        "abchurrdurr",
+        "abcdefaaaaa",
+      };
   private StringFormula hello;
   private RegexFormula a2z;
 
@@ -505,40 +538,9 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
   public void testSimpleConstStringLexicographicOrdering()
       throws SolverException, InterruptedException {
 
-    String[] ws = {
-      "",
-      "0",
-      "1",
-      "10",
-      "a",
-      "b",
-      "A",
-      "B",
-      "aa",
-      "Aa",
-      "aA",
-      "AA",
-      "ab",
-      "aB",
-      "Ab",
-      "AB",
-      "ac",
-      "bb",
-      "aaa",
-      "Aaa",
-      "aAa",
-      "aAA",
-      "aab",
-      "aaabbb",
-      "bbbccc",
-      "abcde",
-      "abdde",
-      "abcdf",
-      "abchurrdurr",
-      "abcdefaaaaa",
-    };
-    Arrays.sort(ws); // lexicographic ordering
-    List<StringFormula> words = FluentIterable.from(ws).transform(w -> smgr.makeString(w)).toList();
+    Arrays.sort(WORDS); // lexicographic ordering
+    List<StringFormula> words =
+        FluentIterable.from(WORDS).transform(w -> smgr.makeString(w)).toList();
 
     for (int i = 1; i < words.size(); i++) {
       StringFormula word1 = words.get(i - 1);
@@ -1129,40 +1131,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testConstStringAllPossibleSubStrings() throws SolverException, InterruptedException {
-    String[] ws = {
-      "",
-      "0",
-      "1",
-      "10",
-      "a",
-      "b",
-      "A",
-      "B",
-      "aa",
-      "Aa",
-      "aA",
-      "AA",
-      "ab",
-      "aB",
-      "Ab",
-      "AB",
-      "ac",
-      "bb",
-      "aaa",
-      "Aaa",
-      "aAa",
-      "aAA",
-      "aab",
-      "aaabbb",
-      "bbbccc",
-      "abcde",
-      "abdde",
-      "abcdf",
-      "abchurrdurr",
-      "abcdefaaaaa",
-    };
-
-    for (String wordString : ws) {
+    for (String wordString : WORDS) {
       StringFormula word = smgr.makeString(wordString);
 
       for (int j = 0; j < wordString.length(); j++) {
@@ -1235,44 +1204,11 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testConstStringReplace() throws SolverException, InterruptedException {
-    String[] ws = {
-      "",
-      "0",
-      "1",
-      "10",
-      "a",
-      "b",
-      "A",
-      "B",
-      "aa",
-      "Aa",
-      "aA",
-      "AA",
-      "ab",
-      "aB",
-      "Ab",
-      "AB",
-      "ac",
-      "bb",
-      "aaa",
-      "Aaa",
-      "aAa",
-      "aAA",
-      "aab",
-      "aaabbb",
-      "bbbccc",
-      "abcde",
-      "abdde",
-      "abcdf",
-      "abchurrdurr",
-      "abcdefaaaaa",
-    };
-
-    for (int i = 0; i < ws.length; i++) {
-      for (int j = 2; j < ws.length; j++) {
-        String word1 = ws[j - 1];
-        String word2 = ws[j];
-        String word3 = ws[i];
+    for (int i = 0; i < WORDS.length; i++) {
+      for (int j = 2; j < WORDS.length; j++) {
+        String word1 = WORDS[j - 1];
+        String word2 = WORDS[j];
+        String word3 = WORDS[i];
         StringFormula word1F = smgr.makeString(word1);
         StringFormula word2F = smgr.makeString(word2);
         StringFormula word3F = smgr.makeString(word3);
@@ -1494,53 +1430,17 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
         .that(solverToUse())
         .isNotEqualTo(Solvers.Z3);
 
-    String[] ws = {
-      "",
-      "0",
-      "1",
-      "10",
-      "a",
-      "b",
-      "A",
-      "B",
-      "aa",
-      "Aa",
-      "aA",
-      "AA",
-      "ab",
-      "aB",
-      "Ab",
-      "AB",
-      "ac",
-      "bb",
-      "aaa",
-      "Aaa",
-      "aAa",
-      "aAA",
-      "aab",
-      "aaabbb",
-      "bbbccc",
-      "abcde",
-      "abdde",
-      "abcdf",
-      "abchurrdurr",
-      "abcdefaaaaa",
-    };
+    for (int i = 0; i < WORDS.length; i++) {
+      for (int j = 1; j < WORDS.length; j++) {
+        String word1 = WORDS[i];
+        String word2 = WORDS[j];
+        String word3 = "replacement";
+        StringFormula word1F = smgr.makeString(word1);
+        StringFormula word2F = smgr.makeString(word2);
+        StringFormula word3F = smgr.makeString(word3);
 
-    for (int i = 0; i < ws.length; i++) {
-      for (int j = 1; j < ws.length; j++) {
-        for (int k = 0; k < ws.length; k++) {
-          // TODO: this might be a bit overkill
-          String word1 = ws[k];
-          String word2 = ws[j];
-          String word3 = ws[i];
-          StringFormula word1F = smgr.makeString(word1);
-          StringFormula word2F = smgr.makeString(word2);
-          StringFormula word3F = smgr.makeString(word3);
-
-          StringFormula result = smgr.makeString(word3.replaceAll(word2, word1));
-          assertEqual(smgr.replaceAll(word3F, word2F, word1F), result);
-        }
+        StringFormula result = smgr.makeString(word3.replaceAll(word2, word1));
+        assertEqual(smgr.replaceAll(word3F, word2F, word1F), result);
       }
     }
   }
