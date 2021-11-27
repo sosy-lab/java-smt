@@ -463,6 +463,18 @@ public class ModelTest extends SolverBasedTest0 {
   }
 
   @Test
+  public void testGetString() throws SolverException, InterruptedException {
+    requireStrings();
+    for (String word : new String[] {"", "a", "abc", "1", "123", "-abc", "\"test\"", "\""}) {
+      testModelGetters(
+          smgr.equal(smgr.makeVariable("x"), smgr.makeString(word)),
+          smgr.makeVariable("x"),
+          word,
+          "x");
+    }
+  }
+
+  @Test
   public void testGetModelAssignments() throws SolverException, InterruptedException {
     if (imgr != null) {
       testModelIterator(

@@ -144,7 +144,9 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         msatEnv,
         msat_get_bool_type(msatEnv),
         msat_get_integer_type(msatEnv),
-        msat_get_rational_type(msatEnv));
+        msat_get_rational_type(msatEnv),
+        null,
+        null);
   }
 
   @Override

@@ -121,7 +121,7 @@ class PrincessFormulaCreator
   private final Table<Sort, Sort, Sort> arraySortCache = HashBasedTable.create();
 
   PrincessFormulaCreator(PrincessEnvironment pEnv) {
-    super(pEnv, PrincessEnvironment.BOOL_SORT, PrincessEnvironment.INTEGER_SORT, null);
+    super(pEnv, PrincessEnvironment.BOOL_SORT, PrincessEnvironment.INTEGER_SORT, null, null, null);
   }
 
   @Override

@@ -28,6 +28,7 @@ import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.SLFormulaManager;
+import org.sosy_lab.java_smt.api.StringFormulaManager;
 import org.sosy_lab.java_smt.api.Tactic;
 import org.sosy_lab.java_smt.api.UFManager;
 import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
@@ -88,6 +89,11 @@ class StatisticsFormulaManager implements FormulaManager {
   @Override
   public QuantifiedFormulaManager getQuantifiedFormulaManager() {
     return new StatisticsQuantifiedFormulaManager(delegate.getQuantifiedFormulaManager(), stats);
+  }
+
+  @Override
+  public StringFormulaManager getStringFormulaManager() {
+    return new StatisticsStringFormulaManager(delegate.getStringFormulaManager(), stats);
   }
 
   @Override

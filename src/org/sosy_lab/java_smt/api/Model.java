@@ -91,6 +91,14 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
   BigInteger evaluate(BitvectorFormula f);
 
   /**
+   * Type-safe evaluation for string formulas.
+   *
+   * <p>The formula does not need to be a variable, we also allow complex expression.
+   */
+  @Nullable
+  String evaluate(StringFormula f);
+
+  /**
    * Iterate over all values present in the model. Note that iterating multiple times may be
    * inefficient for some solvers, it is recommended to use {@link
    * BasicProverEnvironment#getModelAssignments()} instead in this case.
