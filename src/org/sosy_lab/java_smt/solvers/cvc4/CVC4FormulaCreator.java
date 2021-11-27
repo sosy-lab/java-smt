@@ -323,6 +323,8 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       } else if (type.isRoundingMode()) {
         // TODO is this correct?
         return visitor.visitConstant(formula, f.getConstRoundingMode());
+      } else if (type.isString()) {
+        return visitor.visitConstant(formula, f.getConstString());
       } else {
         throw new UnsupportedOperationException("Unhandled constant " + f + " with type " + type);
       }
@@ -404,6 +406,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           .put(Kind.LEQ, FunctionDeclarationKind.LTE)
           .put(Kind.GT, FunctionDeclarationKind.GT)
           .put(Kind.GEQ, FunctionDeclarationKind.GTE)
+          // Bitvector theory
           .put(Kind.BITVECTOR_PLUS, FunctionDeclarationKind.BV_ADD)
           .put(Kind.BITVECTOR_SUB, FunctionDeclarationKind.BV_SUB)
           .put(Kind.BITVECTOR_MULT, FunctionDeclarationKind.BV_MUL)
@@ -429,6 +432,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           .put(Kind.BITVECTOR_CONCAT, FunctionDeclarationKind.BV_CONCAT)
           .put(Kind.BITVECTOR_SIGN_EXTEND, FunctionDeclarationKind.BV_SIGN_EXTENSION)
           .put(Kind.BITVECTOR_ZERO_EXTEND, FunctionDeclarationKind.BV_ZERO_EXTENSION)
+          // Floating-point theory
           .put(Kind.TO_INTEGER, FunctionDeclarationKind.FLOOR)
           .put(Kind.FLOATINGPOINT_TO_SBV, FunctionDeclarationKind.FP_CASTTO_SBV)
           .put(Kind.FLOATINGPOINT_TO_UBV, FunctionDeclarationKind.FP_CASTTO_UBV)
@@ -456,6 +460,32 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           .put(Kind.FLOATINGPOINT_GEQ, FunctionDeclarationKind.FP_GE)
           .put(Kind.FLOATINGPOINT_RTI, FunctionDeclarationKind.FP_ROUND_TO_INTEGRAL)
           .put(Kind.FLOATINGPOINT_TO_FP_IEEE_BITVECTOR, FunctionDeclarationKind.FP_AS_IEEEBV)
+          // String and Regex theory
+          .put(Kind.STRING_CONCAT, FunctionDeclarationKind.STR_CONCAT)
+          .put(Kind.STRING_PREFIX, FunctionDeclarationKind.STR_PREFIX)
+          .put(Kind.STRING_SUFFIX, FunctionDeclarationKind.STR_SUFFIX)
+          .put(Kind.STRING_STRCTN, FunctionDeclarationKind.STR_CONTAINS)
+          .put(Kind.STRING_SUBSTR, FunctionDeclarationKind.STR_SUBSTRING)
+          .put(Kind.STRING_STRREPL, FunctionDeclarationKind.STR_REPLACE)
+          .put(Kind.STRING_STRREPLALL, FunctionDeclarationKind.STR_REPLACE_ALL)
+          .put(Kind.STRING_CHARAT, FunctionDeclarationKind.STR_CHAR_AT)
+          .put(Kind.STRING_LENGTH, FunctionDeclarationKind.STR_LENGTH)
+          .put(Kind.STRING_STRIDOF, FunctionDeclarationKind.STR_INDEX_OF)
+          .put(Kind.STRING_TO_REGEXP, FunctionDeclarationKind.STR_TO_RE)
+          .put(Kind.STRING_IN_REGEXP, FunctionDeclarationKind.STR_IN_RE)
+          .put(Kind.STRING_STOI, FunctionDeclarationKind.STR_TO_INT)
+          .put(Kind.STRING_ITOS, FunctionDeclarationKind.INT_TO_STR)
+          .put(Kind.STRING_LT, FunctionDeclarationKind.STR_LT)
+          .put(Kind.STRING_LEQ, FunctionDeclarationKind.STR_LE)
+          .put(Kind.REGEXP_PLUS, FunctionDeclarationKind.RE_PLUS)
+          .put(Kind.REGEXP_STAR, FunctionDeclarationKind.RE_STAR)
+          .put(Kind.REGEXP_OPT, FunctionDeclarationKind.RE_OPTIONAL)
+          .put(Kind.REGEXP_CONCAT, FunctionDeclarationKind.RE_CONCAT)
+          .put(Kind.REGEXP_UNION, FunctionDeclarationKind.RE_UNION)
+          .put(Kind.REGEXP_RANGE, FunctionDeclarationKind.RE_RANGE)
+          .put(Kind.REGEXP_INTER, FunctionDeclarationKind.RE_INTERSECT)
+          .put(Kind.REGEXP_COMPLEMENT, FunctionDeclarationKind.RE_COMPLEMENT)
+          .put(Kind.REGEXP_DIFF, FunctionDeclarationKind.RE_DIFFERENCE)
           .build();
 
   private FunctionDeclarationKind getDeclarationKind(Expr f) {

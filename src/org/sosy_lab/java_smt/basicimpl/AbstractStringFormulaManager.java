@@ -256,7 +256,11 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
 
   @Override
   public RegexFormula difference(RegexFormula regex1, RegexFormula regex2) {
-    return intersection(regex1, complement(regex2));
+    return wrapRegex(difference(extractInfo(regex1), extractInfo(regex2)));
+  }
+
+  protected TFormulaInfo difference(TFormulaInfo pParam1, TFormulaInfo pParam2) {
+    return union(pParam1, complement(pParam2));
   }
 
   @Override

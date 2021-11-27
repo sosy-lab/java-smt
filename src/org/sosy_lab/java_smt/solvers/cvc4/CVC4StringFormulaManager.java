@@ -172,6 +172,11 @@ class CVC4StringFormulaManager extends AbstractStringFormulaManager<Expr, Type, 
   }
 
   @Override
+  protected Expr difference(Expr pParam1, Expr pParam2) {
+    return exprManager.mkExpr(Kind.REGEXP_DIFF, pParam1, pParam2);
+  }
+
+  @Override
   protected Expr toIntegerFormula(Expr pParam) {
     return exprManager.mkExpr(Kind.STRING_STOI, pParam);
   }

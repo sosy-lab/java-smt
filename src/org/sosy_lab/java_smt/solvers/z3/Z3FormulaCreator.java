@@ -389,11 +389,10 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return visitor.visitConstant(formula, convertValue(f));
       case Z3_APP_AST:
         int arity = Native.getAppNumArgs(environment, f);
+        int declKind = Native.getDeclKind(environment, Native.getAppDecl(environment, f));
 
         if (arity == 0) {
-
           // constants
-          int declKind = Native.getDeclKind(environment, Native.getAppDecl(environment, f));
           Object value = Z3_CONSTANTS.get(declKind);
           if (value != null) {
             return visitor.visitConstant(formula, value);
@@ -668,6 +667,54 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.FP_IS_SUBNORMAL;
       case Z3_OP_FPA_IS_NORMAL:
         return FunctionDeclarationKind.FP_IS_NORMAL;
+
+      case Z3_OP_SEQ_CONCAT:
+        return FunctionDeclarationKind.STR_CONCAT;
+      case Z3_OP_SEQ_PREFIX:
+        return FunctionDeclarationKind.STR_PREFIX;
+      case Z3_OP_SEQ_SUFFIX:
+        return FunctionDeclarationKind.STR_SUFFIX;
+      case Z3_OP_SEQ_CONTAINS:
+        return FunctionDeclarationKind.STR_CONTAINS;
+      case Z3_OP_SEQ_EXTRACT:
+        return FunctionDeclarationKind.STR_SUBSTRING;
+      case Z3_OP_SEQ_REPLACE:
+        return FunctionDeclarationKind.STR_REPLACE;
+      case Z3_OP_SEQ_AT:
+        return FunctionDeclarationKind.STR_CHAR_AT;
+      case Z3_OP_SEQ_LENGTH:
+        return FunctionDeclarationKind.STR_LENGTH;
+      case Z3_OP_SEQ_INDEX:
+        return FunctionDeclarationKind.STR_INDEX_OF;
+      case Z3_OP_SEQ_TO_RE:
+        return FunctionDeclarationKind.STR_TO_RE;
+      case Z3_OP_SEQ_IN_RE:
+        return FunctionDeclarationKind.STR_IN_RE;
+      case Z3_OP_STR_TO_INT:
+        return FunctionDeclarationKind.STR_TO_INT;
+      case Z3_OP_INT_TO_STR:
+        return FunctionDeclarationKind.INT_TO_STR;
+      case Z3_OP_STRING_LT:
+        return FunctionDeclarationKind.STR_LT;
+      case Z3_OP_STRING_LE:
+        return FunctionDeclarationKind.STR_LE;
+      case Z3_OP_RE_PLUS:
+        return FunctionDeclarationKind.RE_PLUS;
+      case Z3_OP_RE_STAR:
+        return FunctionDeclarationKind.RE_STAR;
+      case Z3_OP_RE_OPTION:
+        return FunctionDeclarationKind.RE_OPTIONAL;
+      case Z3_OP_RE_CONCAT:
+        return FunctionDeclarationKind.RE_CONCAT;
+      case Z3_OP_RE_UNION:
+        return FunctionDeclarationKind.RE_UNION;
+      case Z3_OP_RE_RANGE:
+        return FunctionDeclarationKind.RE_RANGE;
+      case Z3_OP_RE_INTERSECT:
+        return FunctionDeclarationKind.RE_INTERSECT;
+      case Z3_OP_RE_COMPLEMENT:
+        return FunctionDeclarationKind.RE_COMPLEMENT;
+
       default:
         return FunctionDeclarationKind.OTHER;
     }
