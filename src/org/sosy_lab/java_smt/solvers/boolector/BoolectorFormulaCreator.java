@@ -82,7 +82,10 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
   @Override
   public FormulaType<?> getFormulaType(Long pFormula) {
     long sort = BtorJNI.boolector_get_sort(getEnv(), pFormula);
-    if (BtorJNI.boolector_is_fun_sort(getEnv(), sort)) {
+    // Careful, Boolector interprets nearly everything as a fun!
+    if (!BtorJNI.boolector_is_array_sort(getEnv(), sort)
+        && !BtorJNI.boolector_is_bitvec_sort(getEnv(), sort)
+        && BtorJNI.boolector_is_fun_sort(getEnv(), sort)) {
       sort = BtorJNI.boolector_fun_get_codomain_sort(getEnv(), pFormula);
     }
     return getFormulaTypeFromSortAndFormula(pFormula, sort);
@@ -97,19 +100,19 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
    * @return FormulaType for the sort.
    */
   private FormulaType<?> getFormulaTypeFromSortAndFormula(Long pFormula, Long sort) {
-    if (BtorJNI.boolector_is_bitvec_sort(getEnv(), sort)) {
+    if (BtorJNI.boolector_is_array_sort(getEnv(), sort)) {
+      int indexWidth = BtorJNI.boolector_get_index_width(getEnv(), pFormula);
+      int elementWidth = BtorJNI.boolector_get_width(getEnv(), pFormula);
+      return FormulaType.getArrayType(
+          FormulaType.getBitvectorTypeWithSize(indexWidth),
+          FormulaType.getBitvectorTypeWithSize(elementWidth));
+    } else if (BtorJNI.boolector_is_bitvec_sort(getEnv(), sort)) {
       int width = BtorJNI.boolector_bitvec_sort_get_width(getEnv(), sort);
       if (width == 1) {
         return FormulaType.BooleanType;
       } else {
         return FormulaType.getBitvectorTypeWithSize(width);
       }
-    } else if (BtorJNI.boolector_is_array_sort(getEnv(), sort)) {
-      int indexWidth = BtorJNI.boolector_get_index_width(getEnv(), pFormula);
-      int elementWidth = BtorJNI.boolector_get_width(getEnv(), pFormula);
-      return FormulaType.getArrayType(
-          FormulaType.getBitvectorTypeWithSize(indexWidth),
-          FormulaType.getBitvectorTypeWithSize(elementWidth));
     }
     throw new IllegalArgumentException("Unknown formula type for " + pFormula);
   }
@@ -152,6 +155,7 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
   @SuppressWarnings("MethodTypeParameterName")
   protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> encapsulateArray(
       Long pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
+    System.out.println("assert array");
     assert getFormulaType(pTerm).isArrayType()
         : "Unexpected formula type for array formula: " + getFormulaType(pTerm);
     return new BoolectorArrayFormula<>(pTerm, pIndexType, pElementType, getEnv());
