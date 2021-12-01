@@ -74,10 +74,20 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
       // substrings encasing | | without escape chars else then by spacing
       // (\|.+?\|(?<!\\\|))|
 
-      // It might be that Boolector uses "BTOR_1@varname" as an escape in this method!
-      // The number before the @ is any number, the varname is after the @
+      // It might be that Boolector uses "BTOR_1@varname" or BTOR2 (their own BTOR format) for some
+      // reason as an escape in this method! We set the proper option that it should always return
+      // smt2, but ok.
+      // The number before the @ is either 1 or 2, the varname is after the @
+      // There is no further escape in this case, so a var named "@a" will be returned as
+      // "BTOR_2@@a"
       // TODO: cover this case as well
+      BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_OUTPUT_FORMAT.getValue(), 1);
       String termString = BtorJNI.boolector_help_dump_node_smt2(btor, term);
+
+      System.out.println(
+          "option BTOR_OPT_OUTPUT_FORMAT: "
+              + BtorJNI.boolector_get_opt_lng(btor, BtorOption.BTOR_OPT_OUTPUT_FORMAT.getValue()));
+      System.out.println("dump: " + termString);
       List<String> escapedList = new ArrayList<>();
       // Matches all escaped names
       Pattern pattern = Pattern.compile("(\\|.+?\\|(?<!\\\\\\|))");
