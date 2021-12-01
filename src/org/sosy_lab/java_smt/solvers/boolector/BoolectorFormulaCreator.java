@@ -155,7 +155,6 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
   @SuppressWarnings("MethodTypeParameterName")
   protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> encapsulateArray(
       Long pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
-    System.out.println("assert array");
     assert getFormulaType(pTerm).isArrayType()
         : "Unexpected formula type for array formula: " + getFormulaType(pTerm);
     return new BoolectorArrayFormula<>(pTerm, pIndexType, pElementType, getEnv());
