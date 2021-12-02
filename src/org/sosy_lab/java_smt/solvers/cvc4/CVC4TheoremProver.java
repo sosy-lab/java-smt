@@ -98,7 +98,8 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     smtEngine.setOption("random-seed", new SExpr(randomSeed));
     // Set Strings option to enable all String features (such as lessOrEquals)
     smtEngine.setOption("strings-exp", new SExpr(true));
-    // Enable more complete quantifier solving
+    // Enable more complete quantifier solving (for more information see
+    // CVC4QuantifiedFormulaManager)
     smtEngine.setOption("full-saturate-quant", new SExpr(true));
   }
 

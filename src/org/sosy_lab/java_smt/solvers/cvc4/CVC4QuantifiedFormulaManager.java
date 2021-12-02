@@ -32,8 +32,19 @@ public class CVC4QuantifiedFormulaManager
   }
 
   /*
-   * (non-Javadoc) CVC4 supports this for LIA and LRA only. If it fails, we return the input. If you
-   * try this on array theories, it will most likely run indefinetly.
+   * (non-Javadoc) CVC4s quantifier support is dependent on the options used.
+   * Without any options it tends to run infenitly on many theories or examples.
+   * There are 2 options improving this: full-saturate-quant and sygus-inst.
+   * full-saturate-quant is activated in JavaSMT per default.
+   * You can try combinations of them, or just one if a query is not solveable.
+   * More info on full-saturate-quant: Enables "enumerative instantiation",
+   * see: https://homepage.divms.uiowa.edu/~ajreynol/tacas18.pdf
+   * More info on sygus-inst: Enables syntax-guided instantiation,
+   * see https://homepage.divms.uiowa.edu/~ajreynol/tacas21.pdf
+   * This approach tends to work well when the quantified formula involves
+   * theories (e.g. strings) where more traditional quantifier instantiation
+   * heuristics do not apply.
+   * This applies to CVC4 and CVC5!
    */
   @Override
   protected Expr eliminateQuantifiers(Expr pExtractInfo)
