@@ -42,6 +42,8 @@ import ap.terfor.preds.Predicate;
 import ap.theories.ExtArray;
 import ap.theories.bitvectors.ModuloArithmetic;
 import ap.theories.nia.GroebnerMultiplication$;
+import ap.theories.strings.SeqStringTheory;
+import ap.theories.strings.SeqStringTheoryBuilder;
 import ap.types.Sort;
 import ap.types.Sort$;
 import com.google.common.collect.HashBasedTable;
@@ -108,6 +110,54 @@ class PrincessFormulaCreator
     theoryPredKind.put(ModuloArithmetic.bv_sle(), FunctionDeclarationKind.BV_SLE);
 
     theoryFunctionKind.put(GroebnerMultiplication$.MODULE$.mul(), FunctionDeclarationKind.MUL);
+
+    theoryFunctionKind.put(PrincessEnvironment.stringTheory.str_$plus$plus(),
+        FunctionDeclarationKind.STR_CONCAT);
+    theoryFunctionKind.put(PrincessEnvironment.stringTheory.str_len(),
+        FunctionDeclarationKind.STR_LENGTH);
+    theoryFunctionKind.put(PrincessEnvironment.stringTheory.str_indexof(),
+        FunctionDeclarationKind.STR_INDEX_OF);
+    theoryFunctionKind.put(PrincessEnvironment.stringTheory.str_char(),
+        FunctionDeclarationKind.STR_CHAR_AT);
+    theoryFunctionKind.put(PrincessEnvironment.stringTheory.str_substr(),
+        FunctionDeclarationKind.STR_SUBSTRING);
+    theoryFunctionKind.put(PrincessEnvironment.stringTheory.str_replace(),
+        FunctionDeclarationKind.STR_REPLACE);
+    theoryFunctionKind.put(PrincessEnvironment.stringTheory.str_replaceall(),
+        FunctionDeclarationKind.STR_REPLACE_ALL);
+    theoryFunctionKind.put(PrincessEnvironment.stringTheory.str_to_re(),
+        FunctionDeclarationKind.STR_TO_RE);
+    theoryFunctionKind.put(PrincessEnvironment.stringTheory.str_to_int(),
+        FunctionDeclarationKind.STR_TO_INT);
+    theoryFunctionKind.put(PrincessEnvironment.stringTheory.re_range(),
+        FunctionDeclarationKind.RE_RANGE);
+    theoryFunctionKind.put(PrincessEnvironment.stringTheory.re_$plus$plus(),
+        FunctionDeclarationKind.RE_CONCAT);
+    theoryFunctionKind.put(PrincessEnvironment.stringTheory.re_union(),
+        FunctionDeclarationKind.RE_UNION);
+    theoryFunctionKind.put(PrincessEnvironment.stringTheory.re_inter(),
+        FunctionDeclarationKind.RE_INTERSECT);
+    theoryFunctionKind.put(PrincessEnvironment.stringTheory.re_$times(),
+        FunctionDeclarationKind.RE_STAR);
+    theoryFunctionKind.put(PrincessEnvironment.stringTheory.re_$plus(),
+        FunctionDeclarationKind.RE_PLUS);
+    theoryFunctionKind.put(PrincessEnvironment.stringTheory.re_diff(),
+        FunctionDeclarationKind.RE_DIFFERENCE);
+    theoryFunctionKind.put(PrincessEnvironment.stringTheory.re_opt(),
+        FunctionDeclarationKind.RE_OPTIONAL);
+    theoryFunctionKind.put(PrincessEnvironment.stringTheory.re_comp(),
+        FunctionDeclarationKind.RE_COMPLEMENT);
+    theoryFunctionKind.put(PrincessEnvironment.stringTheory.int_to_str(),
+        FunctionDeclarationKind.INT_TO_STR);
+
+    theoryPredKind.put(PrincessEnvironment.stringTheory.str_prefixof(),
+        FunctionDeclarationKind.STR_PREFIX);
+    theoryPredKind.put(PrincessEnvironment.stringTheory.str_suffixof(),
+        FunctionDeclarationKind.STR_SUFFIX);
+    theoryPredKind.put(PrincessEnvironment.stringTheory.str_contains(),
+        FunctionDeclarationKind.STR_CONTAINS);
+    theoryPredKind.put(PrincessEnvironment.stringTheory.str_in_re(),
+        FunctionDeclarationKind.STR_IN_RE);
   }
 
   /**
@@ -121,7 +171,9 @@ class PrincessFormulaCreator
   private final Table<Sort, Sort, Sort> arraySortCache = HashBasedTable.create();
 
   PrincessFormulaCreator(PrincessEnvironment pEnv) {
-    super(pEnv, PrincessEnvironment.BOOL_SORT, PrincessEnvironment.INTEGER_SORT, null, null, null);
+    super(pEnv, PrincessEnvironment.BOOL_SORT, PrincessEnvironment.INTEGER_SORT,
+        null,
+        PrincessEnvironment.STRING_SORT, PrincessEnvironment.REGEX_SORT);
   }
 
   @Override
@@ -177,6 +229,7 @@ class PrincessFormulaCreator
     }
     return result;
   }
+
 
   @SuppressWarnings("unchecked")
   @Override

@@ -31,6 +31,8 @@ import ap.terfor.ConstantTerm;
 import ap.terfor.preds.Predicate;
 import ap.theories.ExtArray;
 import ap.theories.bitvectors.ModuloArithmetic;
+import ap.theories.strings.SeqStringTheory;
+import ap.theories.strings.SeqStringTheoryBuilder;
 import ap.types.Sort;
 import ap.types.Sort$;
 import ap.types.Sort.MultipleValueBool$;
@@ -100,6 +102,18 @@ class PrincessEnvironment {
 
   public static final Sort BOOL_SORT = Sort$.MODULE$.Bool();
   public static final Sort INTEGER_SORT = Sort.Integer$.MODULE$;
+  public static final Sort NAT_SORT = Sort.Nat$.MODULE$;
+
+  static int STRING_ALPHABET_SIZE = 500;
+  static SeqStringTheory stringTheory;
+  static {
+    SeqStringTheoryBuilder builder = new SeqStringTheoryBuilder();
+    builder.setAlphabetSize(STRING_ALPHABET_SIZE);
+    stringTheory = builder.theory();
+  }
+
+  public static final Sort STRING_SORT = stringTheory.StringSort();
+  public static final Sort REGEX_SORT = stringTheory.RegexSort();
 
   @Option(secure = true, description = "log all queries as Princess-specific Scala code")
   private boolean logAllQueriesAsScala = false;
@@ -512,7 +526,8 @@ class PrincessEnvironment {
         // add more info about the formula, then rethrow
         throw new IllegalArgumentException(
             String.format(
-                "Unknown formula type '%s' for formula '%s'.", pFormula.getClass(), pFormula),
+                "Unknown formula type '%s' of sort '%s' for formula '%s'.",
+                pFormula.getClass(), sort.toString(), pFormula),
             e);
       }
     }
@@ -524,8 +539,12 @@ class PrincessEnvironment {
   private static FormulaType<?> getFormulaTypeFromSort(final Sort sort) {
     if (sort == PrincessEnvironment.BOOL_SORT) {
       return FormulaType.BooleanType;
-    } else if (sort == PrincessEnvironment.INTEGER_SORT) {
+    } else if (sort == PrincessEnvironment.INTEGER_SORT || sort == PrincessEnvironment.NAT_SORT) {
       return FormulaType.IntegerType;
+    } else if (sort == PrincessEnvironment.STRING_SORT) {
+      return FormulaType.StringType;
+    } else if (sort == PrincessEnvironment.REGEX_SORT) {
+      return FormulaType.RegexType;
     } else if (sort instanceof ExtArray.ArraySort) {
       Seq<Sort> indexSorts = ((ExtArray.ArraySort) sort).theory().indexSorts();
       Sort elementSort = ((ExtArray.ArraySort) sort).theory().objSort();

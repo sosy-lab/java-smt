@@ -30,7 +30,7 @@ abstract class AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> 
     return formulaCreator;
   }
 
-  final TFormulaInfo extractInfo(Formula pBits) {
+  protected final TFormulaInfo extractInfo(Formula pBits) {
     return getFormulaCreator().extractInfo(pBits);
   }
 
