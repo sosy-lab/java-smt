@@ -31,6 +31,8 @@ import ap.terfor.ConstantTerm;
 import ap.terfor.preds.Predicate;
 import ap.theories.ExtArray;
 import ap.theories.bitvectors.ModuloArithmetic;
+import ap.theories.rationals.Fractions;
+import ap.theories.rationals.Rationals$;
 import ap.theories.strings.SeqStringTheory;
 import ap.theories.strings.SeqStringTheoryBuilder;
 import ap.types.Sort;
@@ -111,6 +113,9 @@ class PrincessEnvironment {
     builder.setAlphabetSize(STRING_ALPHABET_SIZE);
     stringTheory = builder.theory();
   }
+
+  static Fractions rationalTheory = Rationals$.MODULE$;
+  public static final Sort FRACTION_SORT = rationalTheory.dom();
 
   public static final Sort STRING_SORT = stringTheory.StringSort();
   public static final Sort REGEX_SORT = stringTheory.RegexSort();
@@ -541,6 +546,8 @@ class PrincessEnvironment {
       return FormulaType.BooleanType;
     } else if (sort == PrincessEnvironment.INTEGER_SORT || sort == PrincessEnvironment.NAT_SORT) {
       return FormulaType.IntegerType;
+    } else if (sort == PrincessEnvironment.FRACTION_SORT) {
+      return FormulaType.RationalType;
     } else if (sort == PrincessEnvironment.STRING_SORT) {
       return FormulaType.StringType;
     } else if (sort == PrincessEnvironment.REGEX_SORT) {

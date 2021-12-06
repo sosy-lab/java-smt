@@ -42,6 +42,9 @@ import ap.terfor.preds.Predicate;
 import ap.theories.ExtArray;
 import ap.theories.bitvectors.ModuloArithmetic;
 import ap.theories.nia.GroebnerMultiplication$;
+import ap.theories.rationals.Fractions.Fraction$;
+import ap.theories.rationals.Fractions.FractionSort$;
+import ap.theories.rationals.Rationals$;
 import ap.theories.strings.SeqStringTheory;
 import ap.theories.strings.SeqStringTheoryBuilder;
 import ap.types.Sort;
@@ -171,9 +174,12 @@ class PrincessFormulaCreator
   private final Table<Sort, Sort, Sort> arraySortCache = HashBasedTable.create();
 
   PrincessFormulaCreator(PrincessEnvironment pEnv) {
-    super(pEnv, PrincessEnvironment.BOOL_SORT, PrincessEnvironment.INTEGER_SORT,
-        null,
-        PrincessEnvironment.STRING_SORT, PrincessEnvironment.REGEX_SORT);
+    super(pEnv,
+        PrincessEnvironment.BOOL_SORT,
+        PrincessEnvironment.INTEGER_SORT,
+        PrincessEnvironment.FRACTION_SORT,
+        PrincessEnvironment.STRING_SORT,
+        PrincessEnvironment.REGEX_SORT);
   }
 
   @Override
@@ -192,6 +198,21 @@ class PrincessFormulaCreator
         case "mod_cast":
           // we found a bitvector BV(lower, upper, ctxt), lets extract the last parameter
           return ((IIntLit) fun.apply(2)).value().bigIntValue();
+        case "_int":
+          assert fun.fun().arity() == 1;
+          ITerm term = fun.apply(0);
+          if (term instanceof IIntLit)
+            return ((IIntLit) term).value().doubleValue();
+          else
+            break;
+        case "_frac":
+          assert fun.fun().arity() == 2;
+          ITerm term1 = fun.apply(0);
+          ITerm term2 = fun.apply(0);
+          if (term1 instanceof IIntLit && term2 instanceof IIntLit)
+            return ((IIntLit) term1).value().doubleValue() / ((IIntLit) term2).value().doubleValue();
+          else
+            break;
         default:
       }
     }
