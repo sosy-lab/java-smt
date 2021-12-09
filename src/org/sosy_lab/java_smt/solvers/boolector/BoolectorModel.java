@@ -77,17 +77,15 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
       // It might be that Boolector uses "BTOR_1@varname" or BTOR2 (their own BTOR format) for some
       // reason as an escape in this method! We set the proper option that it should always return
       // smt2, but ok.
-      // The number before the @ is either 1 or 2, the varname is after the @
+      // There is some number before the @, the varname is after the @
       // There is no further escape in this case, so a var named "@a" will be returned as
       // "BTOR_2@@a"
-      // TODO: cover this case as well
-      BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_OUTPUT_FORMAT.getValue(), 1);
+      // It might occur that it is double escaped, with smt2 escape and btor escape, example:
+      // |BTOR_22@bla|
+      // Further, it might be that Boolector returns the variable name with its own escape added, so
+      // we have to strip this if it occurs
       String termString = BtorJNI.boolector_help_dump_node_smt2(btor, term);
 
-      System.out.println(
-          "option BTOR_OPT_OUTPUT_FORMAT: "
-              + BtorJNI.boolector_get_opt_lng(btor, BtorOption.BTOR_OPT_OUTPUT_FORMAT.getValue()));
-      System.out.println("dump: " + termString);
       List<String> escapedList = new ArrayList<>();
       // Matches all escaped names
       Pattern pattern = Pattern.compile("(\\|.+?\\|(?<!\\\\\\|))");
@@ -103,30 +101,33 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
       for (String escaped : escapedList) {
         inputReplaced = inputReplaced.replace(escaped, "");
       }
-      inputReplaced = inputReplaced.replace("(", " ");
-      inputReplaced = inputReplaced.replace(")", " ");
-
+      // Delete brackets, but keep the spaces, then split on spaces into substrings
+      inputReplaced = inputReplaced.replace("(", " ").replace(")", " ");
       Iterable<String> maybeVars = Splitter.onPattern("\\s+").split(inputReplaced);
 
       // Strings in maybeVars may not have SMTLIB2 keywords
       for (String var : maybeVars) {
+        // Strip Boolector escape sequence (BTOR_number@; example: BTOR_1@)
+        var = var.replaceFirst("^(BTOR_\\d+@)", "");
+
         if (!SMT_KEYWORDS.contains(var) && varsCache.containsKey(var)) {
           variablesBuilder.add(varsCache.get(var));
         }
       }
       // escaped Strings may have SMTLIB2 keywords in them
       for (String var : escapedList) {
-        String varSubs = var.substring(1, var.length() - 1);
+        // Get rid of the sourrounding | and strip Boolector escape sequence (BTOR_number@; example:
+        // BTOR_1@) if present
+        String varSubs = var.substring(1, var.length() - 1).replaceFirst("^(BTOR_\\d+@)", "");
+
         if (varsCache.containsKey(varSubs)) {
           variablesBuilder.add(varsCache.get(varSubs));
         }
       }
-      System.out.println(maybeVars);
-      System.out.println(escapedList);
+
     }
 
-    ImmutableList<ValueAssignment> assignments = toList1(variablesBuilder.build());
-    return assignments;
+    return toList1(variablesBuilder.build());
   }
 
   @SuppressWarnings("unused")
@@ -147,37 +148,32 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
   private ImmutableList<ValueAssignment> toList1(Set<Long> variables) {
     Preconditions.checkState(!closed);
     Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
-    ImmutableList.Builder<ValueAssignment> assignments = ImmutableList.builder();
+    ImmutableList.Builder<ValueAssignment> assignmentBuilder = ImmutableList.builder();
       for (Long entry : variables) {
         if (BtorJNI.boolector_is_array(btor, entry)) {
-        System.out.println("array assignment for: " + entry);
-          assignments.add(getArrayAssignment(entry));
+          assignmentBuilder.add(getArrayAssignment(entry));
         } else if (BtorJNI.boolector_is_const(btor, entry)) {
-        System.out.println("const assignment for: " + entry);
-          assignments.add(getConstAssignment(entry));
+          assignmentBuilder.add(getConstAssignment(entry));
         } else if (BtorJNI.boolector_is_uf(btor, entry)) {
-        System.out.println("uf assignment for: " + entry);
-          assignments.addAll(getUFAssignments(entry));
+          assignmentBuilder.addAll(getUFAssignments(entry));
       } else {
-        System.out.println("bv assignment? for: " + entry);
-        assignments.add(getConstAssignment(entry));
-        System.out.println(getConstAssignment(entry));
-        }
+        assignmentBuilder.add(getConstAssignment(entry));
+      }
     }
-    return assignments.build();
+    return assignmentBuilder.build();
   }
 
   private ValueAssignment getConstAssignment(long key) {
     List<Object> argumentInterpretation = new ArrayList<>();
     Object value = creator.convertValue(key, evalImpl(key));
     Long valueNode = BtorJNI.boolector_get_value(btor, key);
-    System.out.println("Uf name: " + bfCreator.getName(key));
-    System.out.println("const: " + bfCreator.getName(key) + " with: " + value);
+    // Boolector might return the internal name of the variable with a leading BTOR_number@ which we
+    // need to strip!
     return new ValueAssignment(
         creator.encapsulateWithTypeOf(key),
         creator.encapsulateWithTypeOf(valueNode),
         creator.encapsulateBoolean(BtorJNI.boolector_eq(btor, key, valueNode)),
-        bfCreator.getName(key),
+        bfCreator.getName(key).replaceFirst("^(BTOR_\\d+@)", ""),
         value,
         argumentInterpretation);
   }
@@ -199,14 +195,14 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
         argBuilder.add(bfCreator.transformStringToBigInt(arg));
       }
       Long equality = BtorJNI.boolector_eq(btor, key, fun);
-      System.out.println("arguments: " + argBuilder.build());
-      System.out.println("value: " + value);
+      // Boolector might return the internal name of the variable with a leading BTOR_number@ which
+      // we need to strip!
       assignments.add(
           new ValueAssignment(
               creator.encapsulateWithTypeOf(key),
               creator.encapsulateWithTypeOf(fun),
               creator.encapsulateBoolean(equality),
-              bfCreator.getName(key),
+              bfCreator.getName(key).replaceFirst("^(BTOR_\\d+@)", ""),
               value,
               argBuilder.build()));
     }
@@ -223,11 +219,13 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
     }
     Object value = creator.convertValue(key, evalImpl(key));
     Long valueNode = BtorJNI.boolector_get_value(btor, key);
+    // Boolector might return the internal name of the variable with a leading BTOR_number@ which we
+    // need to strip!
     return new ValueAssignment(
         creator.encapsulateWithTypeOf(key),
         creator.encapsulateWithTypeOf(valueNode),
         creator.encapsulateBoolean(BtorJNI.boolector_eq(btor, key, valueNode)),
-        bfCreator.getName(key),
+        bfCreator.getName(key).replaceFirst("^(BTOR_\\d+@)", ""),
         value,
         argumentInterpretation);
   }
