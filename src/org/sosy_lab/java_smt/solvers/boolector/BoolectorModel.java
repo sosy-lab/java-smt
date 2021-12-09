@@ -55,6 +55,28 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
     }
   }
 
+  /* (non-Javadoc)
+  * Escape characters are used if the string contains i.e. spaces or ( ).
+  * If one wants to use |, one needs an escape char, either | or \
+
+  * Get String representation for each asserted term
+  * Search each string for variables/ufs/arrays and gather them by using the vars cache
+
+  * Split of () at the beginning and end, get substrings by spaces if no | is present, get
+  * substrings encasing | | without escape chars else then by spacing
+  * (\|.+?\|(?<!\\\|))|
+
+  * It might be that Boolector uses "BTOR_1@varname" or BTORanyNumber@ (their own BTOR format) for some
+  * reason as an escape for vars! We set the proper option that it should always return
+  * smt2, but ok.
+  * There is some number before the @, the varname is after the @
+  * There is no further escape in this case, so a var named "@a" will be returned as
+  * "BTOR_2@@a"
+  * It might occur that it is double escaped, with smt2 escape and btor escape, example:
+  * |BTOR_22@bla|
+  * Further, it might be that Boolector returns the variable name with its own escape added, so
+  * we have to strip this if it occurs
+  */
   @Override
   protected ImmutableList<ValueAssignment> toList() {
     Preconditions.checkState(!closed);
@@ -63,27 +85,6 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
     ImmutableSet.Builder<Long> variablesBuilder = ImmutableSet.builder();
 
     for (long term : assertedTerms) {
-
-      // Escape characters are used if the string contains i.e. spaces or ( ).
-      // If one wants to use |, one needs an escape char, either | or \
-
-      // Get String representation for each asserted term
-      // Search each string for variables/ufs/arrays and gather them by using the vars cache
-
-      // Split of () at the beginning and end, get substrings by spaces if no | is present, get
-      // substrings encasing | | without escape chars else then by spacing
-      // (\|.+?\|(?<!\\\|))|
-
-      // It might be that Boolector uses "BTOR_1@varname" or BTOR2 (their own BTOR format) for some
-      // reason as an escape in this method! We set the proper option that it should always return
-      // smt2, but ok.
-      // There is some number before the @, the varname is after the @
-      // There is no further escape in this case, so a var named "@a" will be returned as
-      // "BTOR_2@@a"
-      // It might occur that it is double escaped, with smt2 escape and btor escape, example:
-      // |BTOR_22@bla|
-      // Further, it might be that Boolector returns the variable name with its own escape added, so
-      // we have to strip this if it occurs
       String termString = BtorJNI.boolector_help_dump_node_smt2(btor, term);
 
       List<String> escapedList = new ArrayList<>();
@@ -130,21 +131,6 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
     return toList1(variablesBuilder.build());
   }
 
-  @SuppressWarnings("unused")
-  private void getVariables(String termString, Set<String> set) {
-    // Cut off beginning and trailing braces
-    String termStringCutBraces = termString.substring(1, termString.length() - 1);
-    // Now check for | as it might mess up splitting by spaces
-    // But only unescaped | are valid
-    List<String> parts = Splitter.onPattern("(?<!\\\\)\\|").splitToList(termStringCutBraces);
-    // Now we either split the String if a | was found, or not
-    if (parts.size() > 1) {
-      // If this is split into multiple parts, we know that the insides MUST be vars/ufs...
-
-    }
-  }
-
-  @SuppressWarnings("unused")
   private ImmutableList<ValueAssignment> toList1(Set<Long> variables) {
     Preconditions.checkState(!closed);
     Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
@@ -182,7 +168,6 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
     ImmutableList.Builder<ValueAssignment> assignments = ImmutableList.builder();
     // Don't use the creator with convertValue() as while it returns the correct values, the order
     // of values may differ when calling boolector_uf_assignment_helper again to get the arguments!
-    // Object value = creator.convertValue(key, evalImpl(key));
     // The "value" from boolector_get_value() is just
     // a plain copy of the entered node with static results!
     Long fun = BtorJNI.boolector_get_value(btor, key);
