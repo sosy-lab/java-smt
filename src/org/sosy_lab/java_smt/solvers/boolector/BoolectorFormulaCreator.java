@@ -18,8 +18,10 @@ import com.google.common.primitives.Longs;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -40,14 +42,13 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
   // Boolector can give back 'x' for an arbitrary value that we change to this
   private static final char ARBITRARY_VALUE = '1';
 
-  /** Maps a name and a variable or function type to a concrete formula node. */
-  private final Table<String, Long, Long> nameFormulaCache = HashBasedTable.create();
-
-  /*  Experiment: remember all variables, arrays and ufs in this map by their name.
-   *  Reconstruct a model based on the smt-lib2 and this map.
-   *  If this works, remove the nameFormulaCache and make this the vars cache.
+  /**
+   * Maps a name and a variable or function type to a concrete formula node. We allow only 1 type
+   * per var name, meaning there is only 1 column per row!
    */
-  private final Map<String, Long> nameFormulaMap = new HashMap<>();
+  private final Table<String, Long, Long> formulaCache = HashBasedTable.create();
+
+  // Remember uf sorts, as Boolector does not give them back correctly
   private final Map<Long, List<Long>> ufArgumentsSortMap = new HashMap<>();
   // Possibly we need to split this up into vars, ufs, and arrays
 
@@ -181,16 +182,15 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
   // one, potentially with a new internal name (see cache).
   @Override
   public Long makeVariable(Long type, String varName) {
-    Long maybeFormula = nameFormulaCache.get(varName, type);
+    Long maybeFormula = formulaCache.get(varName, type);
     if (maybeFormula != null) {
       return maybeFormula;
     }
-    if (nameFormulaCache.containsRow(varName)) {
+    if (formulaCache.containsRow(varName)) {
       throw new IllegalArgumentException("Symbol already used: " + varName);
     }
     long newVar = BtorJNI.boolector_var(getEnv(), type, varName);
-    nameFormulaCache.put(varName, type, newVar);
-    nameFormulaMap.put(varName, newVar);
+    formulaCache.put(varName, type, newVar);
     return newVar;
   }
 
@@ -260,16 +260,15 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
 
     long[] funSorts = Longs.toArray(pArgTypes);
     long sort = BtorJNI.boolector_fun_sort(getEnv(), funSorts, funSorts.length, pReturnType);
-    Long maybeFormula = nameFormulaCache.get(name, sort);
+    Long maybeFormula = formulaCache.get(name, sort);
     if (maybeFormula != null) {
       return maybeFormula;
     }
-    if (nameFormulaCache.containsRow(name)) {
+    if (formulaCache.containsRow(name)) {
       throw new IllegalArgumentException("Symbol already used: " + name);
     }
     long uf = BtorJNI.boolector_uf(getEnv(), sort, name);
-    nameFormulaCache.put(name, sort, uf);
-    nameFormulaMap.put(name, uf);
+    formulaCache.put(name, sort, uf);
     ufArgumentsSortMap.put(uf, pArgTypes);
     return uf;
   }
@@ -390,17 +389,26 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
     }
   }
 
-  /**
-   * Returns current variables cache.
-   *
-   * @return variables cache.
-   */
+  // Returns the variables cache with keys variable name and type
   protected Table<String, Long, Long> getCache() {
-    return nameFormulaCache;
+    return formulaCache;
   }
 
-  protected Map<String, Long> getModelMap() {
-    return nameFormulaMap;
+  // True if the entered String has an existing variable in the cache.
+  protected boolean formulaCacheContains(String variable) {
+    // There is always only 1 type permitted per variable
+    return formulaCache.containsRow(variable);
+  }
+
+  // Optional that contains the variable to the entered String if there is one.
+  protected Optional<Long> getFormulaFromCache(String variable) {
+    Iterator<java.util.Map.Entry<Long, Long>> entrySetIter =
+        formulaCache.row(variable).entrySet().iterator();
+    if (entrySetIter.hasNext()) {
+      // If there is a non empty row for an entry, there is only one entry
+      return Optional.of(entrySetIter.next().getValue());
+    }
+    return Optional.empty();
   }
 
   @Override

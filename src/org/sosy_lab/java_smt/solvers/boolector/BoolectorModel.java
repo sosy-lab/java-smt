@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -81,7 +80,6 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
   protected ImmutableList<ValueAssignment> toList() {
     Preconditions.checkState(!closed);
     Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
-    Map<String, Long> varsCache = ((BoolectorFormulaCreator) creator).getModelMap();
     ImmutableSet.Builder<Long> variablesBuilder = ImmutableSet.builder();
 
     for (long term : assertedTerms) {
@@ -97,9 +95,9 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
       }
       // Now remove all escaped strings from the term string as it allows
       // special characters/keywords
-      String inputReplaced = "";
+      String inputReplaced = termString;
       for (String escaped : escapedList) {
-        inputReplaced = termString.replace(escaped, "");
+        inputReplaced = inputReplaced.replace(escaped, "");
       }
       // Delete brackets, but keep the spaces, then split on spaces into substrings
       inputReplaced = inputReplaced.replace("(", " ").replace(")", " ");
@@ -110,8 +108,8 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
         // Strip Boolector escape sequence (BTOR_number@; example: BTOR_1@)
         String varReplaced = var.replaceFirst("^(BTOR_\\d+@)", "");
 
-        if (!SMT_KEYWORDS.contains(varReplaced) && varsCache.containsKey(varReplaced)) {
-          variablesBuilder.add(varsCache.get(varReplaced));
+        if (!SMT_KEYWORDS.contains(varReplaced) && bfCreator.formulaCacheContains(varReplaced)) {
+          variablesBuilder.add(bfCreator.getFormulaFromCache(varReplaced).get());
         }
       }
       // escaped Strings may have SMTLIB2 keywords in them
@@ -120,8 +118,8 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
         // BTOR_1@) if present
         String varSubs = var.substring(1, var.length() - 1).replaceFirst("^(BTOR_\\d+@)", "");
 
-        if (varsCache.containsKey(varSubs)) {
-          variablesBuilder.add(varsCache.get(varSubs));
+        if (bfCreator.formulaCacheContains(varSubs)) {
+          variablesBuilder.add(bfCreator.getFormulaFromCache(varSubs).get());
         }
       }
     }
