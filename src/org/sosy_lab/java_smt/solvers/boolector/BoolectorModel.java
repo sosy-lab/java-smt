@@ -13,7 +13,6 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -24,7 +23,66 @@ import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
 
   // TODO: The rest of the keywords any maybe make this a map for O(1) access
-  private static final List<String> SMT_KEYWORDS = Arrays.asList("and", "=", "or");
+  private static final Set<String> SMT_KEYWORDS =
+      ImmutableSet.of(
+          "let",
+          "forall",
+          "exists",
+          "match",
+          "Bool",
+          "continued-execution",
+          "error",
+          "immediate-exit",
+          "incomplete",
+          "logic",
+          "memout",
+          "sat",
+          "success",
+          "theory",
+          "unknown",
+          "unsupported",
+          "unsat",
+          "_",
+          "as",
+          "BINARY",
+          "DECIMAL",
+          "exists",
+          "HEXADECIMAL",
+          "forall",
+          "let",
+          "match",
+          "NUMERAL",
+          "par",
+          "STRING",
+          "assert",
+          "check-sat",
+          "check-sat-assuming",
+          "declare-const",
+          "declare-datatype",
+          "declare-datatypes",
+          "declare-fun",
+          "declare-sort",
+          "define-fun",
+          "define-fun-rec",
+          "define-sort",
+          "echo",
+          "exit",
+          "get-assertions",
+          "get-assignment",
+          "get-info",
+          "get-model",
+          "get-option",
+          "get-proof",
+          "get-unsat-assumptions",
+          "get-unsat-core",
+          "get-value",
+          "pop",
+          "push",
+          "reset",
+          "reset-assertions",
+          "set-info",
+          "set-logic",
+          "set-option");
 
   private final long btor;
   private final BoolectorAbstractProver<?> prover;
