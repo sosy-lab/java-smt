@@ -54,6 +54,31 @@ import org.sosy_lab.java_smt.api.SolverException;
 @RunWith(Parameterized.class)
 public class ModelTest extends SolverBasedTest0 {
 
+  // A list of variables to test that model variable names are correctly applied
+  private static final String[] variableNames =
+      new String[] {
+        "x",
+        "x-x",
+        "x::x",
+        "@x",
+        "x@",
+        "x@x",
+        "@x@",
+        "BTOR_1@",
+        "BTOR_1@var",
+        "BTOR",
+        "BTOR_",
+        "BTOR_@",
+        "BTOR_1",
+        "\"x",
+        "x\"",
+        "\"xx\"",
+        "\"x\"\"x\"",
+        "x ",
+        " x",
+        " x "
+      };
+
   private static final ArrayFormulaType<IntegerFormula, IntegerFormula> ARRAY_TYPE_INT_INT =
       FormulaType.getArrayType(IntegerType, IntegerType);
 
@@ -169,11 +194,46 @@ public class ModelTest extends SolverBasedTest0 {
         "x");
   }
 
+  /** Test that different names are no problem for Bools in the model. */
   @Test
   public void testGetBooleans() throws SolverException, InterruptedException {
-    for (String name : new String[] {"x", "x-x", "x::x", "x@x"}) {
+    // Some names are specificly chosen to test the Boolector model
+    for (String name : variableNames) {
       testModelGetters(bmgr.makeVariable(name), bmgr.makeBoolean(true), true, name);
     }
+  }
+
+  /** Test that different names are no problem for Bitvectors in the model. */
+  @Test
+  public void testGetBvs() throws SolverException, InterruptedException {
+    // Some names are specificly chosen to test the Boolector model
+    // Use 1 instead of 0 or max bv value, as solvers tend to use 0, min or max as default
+    for (String name : variableNames) {
+      testModelGetters(
+          bvmgr.equal(bvmgr.makeVariable(8, name), bvmgr.makeBitvector(8, 1)),
+          bvmgr.makeBitvector(8, 1),
+          BigInteger.ONE,
+          name);
+    }
+  }
+
+  /** Test that different names are no problem for UFs in the model. */
+  @Test
+  public void testGetUfs() throws SolverException, InterruptedException {
+    // Some names are specificly chosen to test the Boolector model
+    // Use 1 instead of 0 or max bv value, as solvers tend to use 0, min or max as default
+      for (String ufName : variableNames) {
+      testModelGetters(
+          bvmgr.equal(
+              bvmgr.makeBitvector(8, 1),
+              fmgr.declareAndCallUF(
+                  ufName,
+                  FormulaType.getBitvectorTypeWithSize(8),
+                  ImmutableList.of(bvmgr.makeVariable(8, "var")))),
+          bvmgr.makeBitvector(8, 1),
+          BigInteger.ONE,
+          ufName);
+      }
   }
 
   @Test
@@ -186,10 +246,10 @@ public class ModelTest extends SolverBasedTest0 {
     } else {
       BitvectorFormula x =
           fmgr.declareAndCallUF(
-              "UF ",
+              "UF",
               FormulaType.getBitvectorTypeWithSize(8),
               ImmutableList.of(bvmgr.makeVariable(8, "arg")));
-      testModelGetters(bvmgr.equal(x, bvmgr.makeBitvector(8, 1)), x, BigInteger.ONE, "UF ");
+      testModelGetters(bvmgr.equal(x, bvmgr.makeBitvector(8, 1)), x, BigInteger.ONE, "UF");
     }
   }
 
