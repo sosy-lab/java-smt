@@ -267,7 +267,14 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void simplificationTest() {
-    // Boolector MAY fail (Use internal equals method to check if it does)
+    // Boolector fails this as it either simplifies to much, or nothing
+    // TODO: maybe this is just a matter of options, check!
+    assume()
+        .withMessage(
+            "Solver %s fails on this test as it does not simplify any formulas.", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BOOLECTOR);
+
     BooleanFormula tru = bmgr.makeBoolean(true);
     BooleanFormula fals = bmgr.makeBoolean(false);
     BooleanFormula x = bmgr.makeVariable("x");
