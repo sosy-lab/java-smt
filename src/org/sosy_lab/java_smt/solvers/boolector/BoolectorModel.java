@@ -90,17 +90,16 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
       List<String> escapedList = new ArrayList<>();
       // Matches all escaped names
       Pattern pattern = Pattern.compile("(\\|.+?\\|(?<!\\\\\\|))");
-      String input = termString;
-      Matcher matcher = pattern.matcher(input);
+      Matcher matcher = pattern.matcher(termString);
 
       while (matcher.find()) {
         escapedList.add(matcher.group());
       }
       // Now remove all escaped strings from the term string as it allows
       // special characters/keywords
-      String inputReplaced = input;
+      String inputReplaced = "";
       for (String escaped : escapedList) {
-        inputReplaced = inputReplaced.replace(escaped, "");
+        inputReplaced = termString.replace(escaped, "");
       }
       // Delete brackets, but keep the spaces, then split on spaces into substrings
       inputReplaced = inputReplaced.replace("(", " ").replace(")", " ");
@@ -125,7 +124,6 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
           variablesBuilder.add(varsCache.get(varSubs));
         }
       }
-
     }
 
     return toList1(variablesBuilder.build());
@@ -135,13 +133,13 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
     Preconditions.checkState(!closed);
     Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
     ImmutableList.Builder<ValueAssignment> assignmentBuilder = ImmutableList.builder();
-      for (Long entry : variables) {
-        if (BtorJNI.boolector_is_array(btor, entry)) {
-          assignmentBuilder.add(getArrayAssignment(entry));
-        } else if (BtorJNI.boolector_is_const(btor, entry)) {
-          assignmentBuilder.add(getConstAssignment(entry));
-        } else if (BtorJNI.boolector_is_uf(btor, entry)) {
-          assignmentBuilder.addAll(getUFAssignments(entry));
+    for (Long entry : variables) {
+      if (BtorJNI.boolector_is_array(btor, entry)) {
+        assignmentBuilder.add(getArrayAssignment(entry));
+      } else if (BtorJNI.boolector_is_const(btor, entry)) {
+        assignmentBuilder.add(getConstAssignment(entry));
+      } else if (BtorJNI.boolector_is_uf(btor, entry)) {
+        assignmentBuilder.addAll(getUFAssignments(entry));
       } else {
         assignmentBuilder.add(getConstAssignment(entry));
       }
