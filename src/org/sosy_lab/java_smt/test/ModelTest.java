@@ -1445,7 +1445,6 @@ public class ModelTest extends SolverBasedTest0 {
       assertThat(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {
-        System.out.println(m);
         assertThat(m.evaluate(variable)).isEqualTo(expectedValue);
 
         for (ValueAssignment va : m) {
