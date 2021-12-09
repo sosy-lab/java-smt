@@ -15,8 +15,8 @@ import com.google.common.collect.ImmutableSet;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -66,9 +66,9 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
   * substrings encasing | | without escape chars else then by spacing
   * (\|.+?\|(?<!\\\|))|
 
-  * It might be that Boolector uses "BTOR_1@varname" or BTORanyNumber@ (their own BTOR format) for some
-  * reason as an escape for vars! We set the proper option that it should always return
-  * smt2, but ok.
+  * It might be that Boolector uses "BTOR_1@varname" or BTORanyNumber@ (their own BTOR format)
+  * for some reason as an escape for vars! We set the proper option that it should always
+  * return smt2, but ok.
   * There is some number before the @, the varname is after the @
   * There is no further escape in this case, so a var named "@a" will be returned as
   * "BTOR_2@@a"
@@ -81,7 +81,7 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
   protected ImmutableList<ValueAssignment> toList() {
     Preconditions.checkState(!closed);
     Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
-    HashMap<String, Long> varsCache = ((BoolectorFormulaCreator) creator).getModelMap();
+    Map<String, Long> varsCache = ((BoolectorFormulaCreator) creator).getModelMap();
     ImmutableSet.Builder<Long> variablesBuilder = ImmutableSet.builder();
 
     for (long term : assertedTerms) {
@@ -108,10 +108,10 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
       // Strings in maybeVars may not have SMTLIB2 keywords
       for (String var : maybeVars) {
         // Strip Boolector escape sequence (BTOR_number@; example: BTOR_1@)
-        var = var.replaceFirst("^(BTOR_\\d+@)", "");
+        String varReplaced = var.replaceFirst("^(BTOR_\\d+@)", "");
 
-        if (!SMT_KEYWORDS.contains(var) && varsCache.containsKey(var)) {
-          variablesBuilder.add(varsCache.get(var));
+        if (!SMT_KEYWORDS.contains(varReplaced) && varsCache.containsKey(varReplaced)) {
+          variablesBuilder.add(varsCache.get(varReplaced));
         }
       }
       // escaped Strings may have SMTLIB2 keywords in them

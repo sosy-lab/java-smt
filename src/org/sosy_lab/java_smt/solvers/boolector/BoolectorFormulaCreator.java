@@ -19,6 +19,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -46,8 +47,8 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
    *  Reconstruct a model based on the smt-lib2 and this map.
    *  If this works, remove the nameFormulaCache and make this the vars cache.
    */
-  private final HashMap<String, Long> nameFormulaMap = new HashMap<>();
-  private final HashMap<Long, List<Long>> ufArgumentsSortMap = new HashMap<>();
+  private final Map<String, Long> nameFormulaMap = new HashMap<>();
+  private final Map<Long, List<Long>> ufArgumentsSortMap = new HashMap<>();
   // Possibly we need to split this up into vars, ufs, and arrays
 
   BoolectorFormulaCreator(Long btor) {
@@ -398,7 +399,7 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
     return nameFormulaCache;
   }
 
-  protected HashMap<String, Long> getModelMap() {
+  protected Map<String, Long> getModelMap() {
     return nameFormulaMap;
   }
 
