@@ -138,7 +138,8 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
   protected ImmutableList<ValueAssignment> toList() {
     Preconditions.checkState(!closed);
     Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
-    ImmutableSet.Builder<Long> variablesBuilder = ImmutableSet.builder();
+    // Use String instead of the node (long) as we need the name again later!
+    ImmutableSet.Builder<String> variablesBuilder = ImmutableSet.builder();
 
     for (long term : assertedTerms) {
       String termString = BtorJNI.boolector_help_dump_node_smt2(btor, term);
@@ -160,14 +161,21 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
       // Delete brackets, but keep the spaces, then split on spaces into substrings
       inputReplaced = inputReplaced.replace("(", " ").replace(")", " ");
       Iterable<String> maybeVars = Splitter.onPattern("\\s+").split(inputReplaced);
+      // maybeVars may include a lot of unnecessary Strings, including SMT keywords or empty
+      // strings. However, removing them would just increase runtime with no benefit as we check
+      // them against the variables cache.
+      // TODO: decide if its benefitial to code cleanness and structure to handle the strings
+      // proper, or else remove the SMT_KEYWORDS
 
       // Strings in maybeVars may not have SMTLIB2 keywords
       for (String var : maybeVars) {
         // Strip Boolector escape sequence (BTOR_number@; example: BTOR_1@)
+        // It seems like that if the escape seq is used as a name, there will be an escape seq
+        // before it. Always only removing the first should be fine
         String varReplaced = var.replaceFirst("^(BTOR_\\d+@)", "");
 
         if (!SMT_KEYWORDS.contains(varReplaced) && bfCreator.formulaCacheContains(varReplaced)) {
-          variablesBuilder.add(bfCreator.getFormulaFromCache(varReplaced).get());
+          variablesBuilder.add(varReplaced);
         }
       }
       // escaped Strings may have SMTLIB2 keywords in them
@@ -177,33 +185,40 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
         String varSubs = var.substring(1, var.length() - 1).replaceFirst("^(BTOR_\\d+@)", "");
 
         if (bfCreator.formulaCacheContains(varSubs)) {
-          variablesBuilder.add(bfCreator.getFormulaFromCache(varSubs).get());
+          variablesBuilder.add(varSubs);
         }
       }
     }
-
     return toList1(variablesBuilder.build());
   }
 
-  private ImmutableList<ValueAssignment> toList1(Set<Long> variables) {
+  private ImmutableList<ValueAssignment> toList1(Set<String> variables) {
     Preconditions.checkState(!closed);
     Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
     ImmutableList.Builder<ValueAssignment> assignmentBuilder = ImmutableList.builder();
-    for (Long entry : variables) {
+    for (String name : variables) {
+      // We get the formula here as we need the name.
+      // Reason: Boolector returns names of variables with its own escape sequence sometimes. If you
+      // however name your variable like the escape sequence, we can't discern anymore if its a real
+      // name or an escape seq.
+      long entry = bfCreator.getFormulaFromCache(name).get();
       if (BtorJNI.boolector_is_array(btor, entry)) {
-        assignmentBuilder.add(getArrayAssignment(entry));
+        assignmentBuilder.add(getArrayAssignment(entry, name));
       } else if (BtorJNI.boolector_is_const(btor, entry)) {
-        assignmentBuilder.add(getConstAssignment(entry));
+        // Don't remove this! Some consts are Ufs in the eyes of Boolector, however,
+        // we want them as consts!
+        assignmentBuilder.add(getConstAssignment(entry, name));
       } else if (BtorJNI.boolector_is_uf(btor, entry)) {
-        assignmentBuilder.addAll(getUFAssignments(entry));
+        assignmentBuilder.addAll(getUFAssignments(entry, name));
       } else {
-        assignmentBuilder.add(getConstAssignment(entry));
+        // This is the Bv case
+        assignmentBuilder.add(getConstAssignment(entry, name));
       }
     }
     return assignmentBuilder.build();
   }
 
-  private ValueAssignment getConstAssignment(long key) {
+  private ValueAssignment getConstAssignment(long key, String name) {
     List<Object> argumentInterpretation = new ArrayList<>();
     Object value = creator.convertValue(key, evalImpl(key));
     Long valueNode = BtorJNI.boolector_get_value(btor, key);
@@ -213,12 +228,12 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
         creator.encapsulateWithTypeOf(key),
         creator.encapsulateWithTypeOf(valueNode),
         creator.encapsulateBoolean(BtorJNI.boolector_eq(btor, key, valueNode)),
-        bfCreator.getName(key).replaceFirst("^(BTOR_\\d+@)", ""),
+        name,
         value,
         argumentInterpretation);
   }
 
-  private ImmutableList<ValueAssignment> getUFAssignments(long key) {
+  private ImmutableList<ValueAssignment> getUFAssignments(long key, String name) {
     ImmutableList.Builder<ValueAssignment> assignments = ImmutableList.builder();
     // Don't use the creator with convertValue() as while it returns the correct values, the order
     // of values may differ when calling boolector_uf_assignment_helper again to get the arguments!
@@ -241,14 +256,14 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
               creator.encapsulateWithTypeOf(key),
               creator.encapsulateWithTypeOf(fun),
               creator.encapsulateBoolean(equality),
-              bfCreator.getName(key).replaceFirst("^(BTOR_\\d+@)", ""),
+              name,
               value,
               argBuilder.build()));
     }
     return assignments.build();
   }
 
-  private ValueAssignment getArrayAssignment(long key) {
+  private ValueAssignment getArrayAssignment(long key, String name) {
     // Don't use the creator with convertValue() as while it returns the correct values, the order
     // of values may differ when calling boolector_array_assignment_helper again to get the
     // arguments!
@@ -264,7 +279,7 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
         creator.encapsulateWithTypeOf(key),
         creator.encapsulateWithTypeOf(valueNode),
         creator.encapsulateBoolean(BtorJNI.boolector_eq(btor, key, valueNode)),
-        bfCreator.getName(key).replaceFirst("^(BTOR_\\d+@)", ""),
+        name,
         value,
         argumentInterpretation);
   }
