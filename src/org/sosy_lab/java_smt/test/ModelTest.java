@@ -187,11 +187,13 @@ public class ModelTest extends SolverBasedTest0 {
   public void testGetRationals() throws SolverException, InterruptedException {
     requireIntegers();
     requireRationals();
-    testModelGetters(
-        rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(Rational.ofString("1/3"))),
-        rmgr.makeVariable("x"),
-        Rational.ofString("1/3"),
-        "x");
+    for (String name : variableNames) {
+      testModelGetters(
+          rmgr.equal(rmgr.makeVariable(name), rmgr.makeNumber(Rational.ofString("1/3"))),
+          rmgr.makeVariable(name),
+          Rational.ofString("1/3"),
+          name);
+    }
   }
 
   /** Test that different names are no problem for Bools in the model. */
@@ -206,6 +208,7 @@ public class ModelTest extends SolverBasedTest0 {
   /** Test that different names are no problem for Bitvectors in the model. */
   @Test
   public void testGetBvs() throws SolverException, InterruptedException {
+    requireBitvectors();
     // Some names are specificly chosen to test the Boolector model
     // Use 1 instead of 0 or max bv value, as solvers tend to use 0, min or max as default
     for (String name : variableNames) {
@@ -217,9 +220,23 @@ public class ModelTest extends SolverBasedTest0 {
     }
   }
 
-  /** Test that different names are no problem for UFs in the model. */
+  /** Test that different names are no problem for Integers in the model. */
   @Test
-  public void testGetUfs() throws SolverException, InterruptedException {
+  public void testGetInts() throws SolverException, InterruptedException {
+    requireIntegers();
+    for (String name : variableNames) {
+      testModelGetters(
+          imgr.equal(imgr.makeVariable(name), imgr.makeNumber(1)),
+          imgr.makeNumber(1),
+          BigInteger.ONE,
+          name);
+    }
+  }
+
+  /** Test that different names are no problem for Bv UFs in the model. */
+  @Test
+  public void testGetBvUfs() throws SolverException, InterruptedException {
+    requireBitvectors();
     // Some names are specificly chosen to test the Boolector model
     // Use 1 instead of 0 or max bv value, as solvers tend to use 0, min or max as default
       for (String ufName : variableNames) {
@@ -234,6 +251,24 @@ public class ModelTest extends SolverBasedTest0 {
           BigInteger.ONE,
           ufName);
       }
+  }
+
+  /** Test that different names are no problem for int UFs in the model. */
+  @Test
+  public void testGetIntUfs() throws SolverException, InterruptedException {
+    requireIntegers();
+    // Some names are specificly chosen to test the Boolector model
+    // Use 1 instead of 0 or max bv value, as solvers tend to use 0, min or max as default
+    for (String ufName : variableNames) {
+      testModelGetters(
+          imgr.equal(
+              imgr.makeNumber(1),
+              fmgr.declareAndCallUF(
+                  ufName, FormulaType.IntegerType, ImmutableList.of(imgr.makeVariable("var")))),
+          imgr.makeNumber(1),
+          BigInteger.ONE,
+          ufName);
+    }
   }
 
   @Test
