@@ -40,7 +40,9 @@ import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.visitors.BooleanFormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.BooleanFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.DefaultBooleanFormulaVisitor;
@@ -380,6 +382,101 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     }
   }
 
+  @Test
+  public void stringInBooleanFormulaIdVisit() throws SolverException, InterruptedException {
+    requireStrings();
+    StringFormula x = smgr.makeVariable("xVariable");
+    StringFormula y = smgr.makeVariable("yVariable");
+    RegexFormula r = smgr.makeRegex("regex1");
+
+    for (BooleanFormula f :
+        ImmutableList.of(
+            smgr.equal(x, y),
+            smgr.contains(x, y),
+            smgr.lessThan(x, y),
+            smgr.lessOrEquals(x, y),
+            smgr.greaterOrEquals(x, y),
+            smgr.greaterThan(x, y),
+            smgr.prefix(x, y),
+            smgr.suffix(x, y),
+            smgr.in(x, r))) {
+      mgr.visit(f, new FunctionDeclarationVisitorNoUF());
+      mgr.visit(f, new FunctionDeclarationVisitorNoOther());
+      BooleanFormula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
+      assertThat(f2).isEqualTo(f);
+      assertThatFormula(f).isEquivalentTo(f2);
+    }
+  }
+
+  @Test
+  public void stringInStringFormulaVisit() throws SolverException, InterruptedException {
+    requireStrings();
+    StringFormula x = smgr.makeVariable("xVariable");
+    StringFormula y = smgr.makeVariable("yVariable");
+    StringFormula z = smgr.makeString("zAsString");
+    IntegerFormula offset = imgr.makeVariable("offset");
+    IntegerFormula len = imgr.makeVariable("len");
+
+    ImmutableList.Builder<StringFormula> formulas =
+        ImmutableList.<StringFormula>builder()
+            .add(smgr.substring(x, offset, len))
+            .add(smgr.replace(x, y, z))
+            .add(smgr.charAt(x, offset))
+            .add(smgr.toStringFormula(offset))
+            .add(smgr.concat(x, y, z));
+    if (solverToUse() != Solvers.Z3) {
+      formulas.add(smgr.replaceAll(x, y, z)); // unsupported in Z3
+    }
+    for (StringFormula f : formulas.build()) {
+      mgr.visit(f, new FunctionDeclarationVisitorNoUF());
+      mgr.visit(f, new FunctionDeclarationVisitorNoOther());
+      StringFormula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
+      assertThat(f2).isEqualTo(f);
+      assertThatFormula(bmgr.not(smgr.equal(f, f2))).isUnsatisfiable();
+    }
+  }
+
+  @Test
+  public void stringInRegexFormulaVisit() {
+    requireStrings();
+    RegexFormula r = smgr.makeRegex("regex1");
+    RegexFormula s = smgr.makeRegex("regex2");
+
+    ImmutableList.Builder<RegexFormula> formulas =
+        ImmutableList.<RegexFormula>builder()
+            .add(smgr.union(r, s))
+            .add(smgr.closure(r))
+            .add(smgr.concat(r, r, r, s, s, s))
+            .add(smgr.cross(r));
+    if (solverToUse() != Solvers.Z3) {
+      formulas.add(smgr.difference(r, s)).add(smgr.complement(r));
+      // invalid function OTHER/INTERNAL in visitor, bug in Z3?
+    }
+    for (RegexFormula f : formulas.build()) {
+      mgr.visit(f, new FunctionDeclarationVisitorNoUF());
+      mgr.visit(f, new FunctionDeclarationVisitorNoOther());
+      RegexFormula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
+      assertThat(f2).isEqualTo(f);
+    }
+  }
+
+  @Test
+  public void stringInIntegerFormulaVisit() throws SolverException, InterruptedException {
+    requireStrings();
+    StringFormula x = smgr.makeVariable("xVariable");
+    StringFormula y = smgr.makeVariable("yVariable");
+    IntegerFormula offset = imgr.makeVariable("offset");
+
+    for (IntegerFormula f :
+        ImmutableList.of(smgr.indexOf(x, y, offset), smgr.length(x), smgr.toIntegerFormula(x))) {
+      mgr.visit(f, new FunctionDeclarationVisitorNoUF());
+      mgr.visit(f, new FunctionDeclarationVisitorNoOther());
+      IntegerFormula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
+      assertThat(f2).isEqualTo(f);
+      assertThatFormula(bmgr.not(imgr.equal(f, f2))).isUnsatisfiable();
+    }
+  }
+
   private void checkKind(Formula f, FunctionDeclarationKind expected) {
     FunctionDeclarationVisitorNoOther visitor = new FunctionDeclarationVisitorNoOther();
     mgr.visit(f, visitor);
@@ -500,6 +597,24 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     BooleanFormula newConstraint =
         bmgr.visit(constraint, new BooleanFormulaTransformationVisitor(mgr) {});
     assertThatFormula(newConstraint).isSatisfiable();
+  }
+
+  @Test
+  public void testIntegerFormulaQuantifierSymbolsExtraction() throws Exception {
+    requireQuantifiers();
+    requireIntegers();
+
+    IntegerFormula x = imgr.makeVariable("x");
+    IntegerFormula y = imgr.makeVariable("y");
+    BooleanFormula xEqy = imgr.equal(x, y);
+    // (x=y) && EX x: (X=y)
+    BooleanFormula constraint = bmgr.and(xEqy, qmgr.forall(ImmutableList.of(x), xEqy));
+
+    // The variable extraction should visit "x" and "y" only once,
+    // otherwise AbstractFormulaManager#extractVariables might throw an exception,
+    // when building an ImmutableMap.
+    assertThat(mgr.extractVariables(constraint)).containsEntry(x.toString(), x);
+    assertThat(mgr.extractVariables(constraint)).containsEntry(y.toString(), y);
   }
 
   @Test

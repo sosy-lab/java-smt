@@ -290,7 +290,7 @@ public class Sudoku {
 
   public static class BooleanBasedSudokuSolver extends SudokuSolver<BooleanFormula[][][]> {
 
-    private BooleanBasedSudokuSolver(SolverContext context) {
+    public BooleanBasedSudokuSolver(SolverContext context) {
       super(context);
     }
 

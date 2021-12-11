@@ -29,6 +29,7 @@ import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.SLFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.api.StringFormulaManager;
 import org.sosy_lab.java_smt.api.Tactic;
 import org.sosy_lab.java_smt.api.UFManager;
 import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
@@ -106,6 +107,13 @@ class SynchronizedFormulaManager implements FormulaManager {
   public QuantifiedFormulaManager getQuantifiedFormulaManager() {
     synchronized (sync) {
       return new SynchronizedQuantifiedFormulaManager(delegate.getQuantifiedFormulaManager(), sync);
+    }
+  }
+
+  @Override
+  public StringFormulaManager getStringFormulaManager() {
+    synchronized (sync) {
+      return new SynchronizedStringFormulaManager(delegate.getStringFormulaManager(), sync);
     }
   }
 

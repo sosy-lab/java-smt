@@ -144,7 +144,9 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         msatEnv,
         msat_get_bool_type(msatEnv),
         msat_get_integer_type(msatEnv),
-        msat_get_rational_type(msatEnv));
+        msat_get_rational_type(msatEnv),
+        null,
+        null);
   }
 
   @Override
@@ -502,12 +504,6 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       default:
         return FunctionDeclarationKind.OTHER;
     }
-  }
-
-  @Override
-  public Object convertValue(Long key) {
-    throw new UnsupportedOperationException(
-        "Mathsat needs a second term to determine a correct type. Please use the other method.");
   }
 
   @Override

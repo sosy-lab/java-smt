@@ -96,6 +96,11 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     // smtEngine.setOption("produce-unsat-cores", new SExpr(true));
     smtEngine.setOption("output-language", new SExpr("smt2"));
     smtEngine.setOption("random-seed", new SExpr(randomSeed));
+    // Set Strings option to enable all String features (such as lessOrEquals)
+    smtEngine.setOption("strings-exp", new SExpr(true));
+    // Enable more complete quantifier solving (for more information see
+    // CVC4QuantifiedFormulaManager)
+    smtEngine.setOption("full-saturate-quant", new SExpr(true));
   }
 
   protected void setOptionForIncremental() {

@@ -42,6 +42,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
+import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
@@ -210,6 +211,8 @@ public class UfElimination {
       t = bfmgr.equivalence((BooleanFormula) pLhs, (BooleanFormula) pRhs);
     } else if (pLhs instanceof IntegerFormula && pRhs instanceof IntegerFormula) {
       t = fmgr.getIntegerFormulaManager().equal((IntegerFormula) pLhs, (IntegerFormula) pRhs);
+    } else if (pLhs instanceof StringFormula && pRhs instanceof StringFormula) {
+      t = fmgr.getStringFormulaManager().equal((StringFormula) pLhs, (StringFormula) pRhs);
     } else if (pLhs instanceof NumeralFormula && pRhs instanceof NumeralFormula) {
       t = fmgr.getRationalFormulaManager().equal((NumeralFormula) pLhs, (NumeralFormula) pRhs);
     } else if (pLhs instanceof BitvectorFormula) {

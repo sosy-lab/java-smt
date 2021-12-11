@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.solvers.princess;
 
 import static scala.collection.JavaConverters.asJava;
 
+import ap.SimpleAPI;
 import ap.SimpleAPI.PartialModel;
 import ap.parser.IAtom;
 import ap.parser.IBinFormula;
@@ -19,6 +20,7 @@ import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.IFunApp;
 import ap.parser.ITerm;
+import ap.terfor.preds.Predicate;
 import ap.theories.ExtArray;
 import ap.types.Sort;
 import com.google.common.collect.ArrayListMultimap;
@@ -27,24 +29,36 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import scala.Option;
 
 class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvironment> {
   private final PartialModel model;
+  private final SimpleAPI api;
 
   PrincessModel(
       PartialModel partialModel,
-      FormulaCreator<IExpression, Sort, PrincessEnvironment, ?> creator) {
+      FormulaCreator<IExpression, Sort, PrincessEnvironment, ?> creator,
+      SimpleAPI pApi) {
     super(creator);
     this.model = partialModel;
+    this.api = pApi;
   }
 
   @Override
   protected ImmutableList<ValueAssignment> toList() {
     scala.collection.Map<IExpression, IExpression> interpretation = model.interpretation();
+
+    // get abbreviations, we do not want to export them.
+    Set<Predicate> abbrevs = new LinkedHashSet<>();
+    for (var entry : asJava(api.ap$SimpleAPI$$abbrevPredicates()).entrySet()) {
+      abbrevs.add(entry.getKey()); // collect the abbreviation.
+      abbrevs.add(entry.getValue()._2()); // the definition is also handled as abbreviation here.
+    }
 
     // first get the addresses of arrays
     Multimap<IFunApp, ITerm> arrays = getArrays(interpretation);
@@ -52,9 +66,15 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
     // then iterate over the model and generate the assignments
     ImmutableSet.Builder<ValueAssignment> assignments = ImmutableSet.builder();
     for (Map.Entry<IExpression, IExpression> entry : asJava(interpretation).entrySet()) {
-      assignments.addAll(getAssignments(entry.getKey(), entry.getValue(), arrays));
+      if (!isAbbrev(abbrevs, entry.getKey())) {
+        assignments.addAll(getAssignments(entry.getKey(), entry.getValue(), arrays));
+      }
     }
     return assignments.build().asList();
+  }
+
+  private boolean isAbbrev(Set<Predicate> abbrevs, IExpression var) {
+    return var instanceof IAtom && abbrevs.contains(((IAtom) var).pred());
   }
 
   /**

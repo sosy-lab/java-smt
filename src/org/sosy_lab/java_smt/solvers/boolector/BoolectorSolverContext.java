@@ -14,6 +14,7 @@ import com.google.common.base.Splitter.MapSplitter;
 import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -63,6 +64,7 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
   private final BoolectorFormulaCreator creator;
   private final ShutdownNotifier shutdownNotifier;
   private boolean closed = false;
+  private final AtomicBoolean isAnyStackAlive = new AtomicBoolean(false);
 
   BoolectorSolverContext(
       BoolectorFormulaManager pManager,
@@ -124,7 +126,8 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> pOptions) {
     Preconditions.checkState(!closed, "solver context is already closed");
     return new ReusableStackTheoremProver(
-        new BoolectorTheoremProver(manager, creator, creator.getEnv(), shutdownNotifier, pOptions));
+        new BoolectorTheoremProver(
+            manager, creator, creator.getEnv(), shutdownNotifier, pOptions, isAnyStackAlive));
   }
 
   @Override

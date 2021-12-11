@@ -154,7 +154,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
           YICES_UNINTERPRETED_TERM);
 
   protected Yices2FormulaCreator() {
-    super(null, yices_bool_type(), yices_int_type(), yices_real_type());
+    super(null, yices_bool_type(), yices_int_type(), yices_real_type(), null, null);
   }
 
   @Override
@@ -730,12 +730,6 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
       throw new IllegalArgumentException(
           String.format("Term: '%s' is not a bitvector constant", yices_term_to_string(pF)));
     }
-  }
-
-  @Override
-  public Object convertValue(Integer key) {
-    throw new UnsupportedOperationException(
-        "Yices needs a second term to determine a correct type. Please use the other method.");
   }
 
   @Override

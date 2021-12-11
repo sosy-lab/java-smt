@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.smtinterpol;
 
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
+import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import org.sosy_lab.java_smt.api.Formula;
@@ -17,9 +18,9 @@ import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
 
 class SmtInterpolArrayFormulaManager
-    extends AbstractArrayFormulaManager<Term, Sort, SmtInterpolEnvironment, FunctionSymbol> {
+    extends AbstractArrayFormulaManager<Term, Sort, Script, FunctionSymbol> {
 
-  private final SmtInterpolEnvironment env;
+  private final Script env;
 
   SmtInterpolArrayFormulaManager(SmtInterpolFormulaCreator pCreator) {
     super(pCreator);

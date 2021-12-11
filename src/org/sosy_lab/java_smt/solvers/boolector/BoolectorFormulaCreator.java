@@ -53,7 +53,7 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
   // Possibly we need to split this up into vars, ufs, and arrays
 
   BoolectorFormulaCreator(Long btor) {
-    super(btor, BtorJNI.boolector_bool_sort(btor), null, null);
+    super(btor, BtorJNI.boolector_bool_sort(btor), null, null, null, null);
   }
 
   @SuppressWarnings("unchecked")
@@ -274,7 +274,7 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
   }
 
   @Override
-  public Object convertValue(Long key, Long term) {
+  public Object convertValue(Long term) {
     String value;
     if (BtorJNI.boolector_is_const(getEnv(), term)) {
       value = BtorJNI.boolector_get_bits(getEnv(), term);
@@ -369,11 +369,6 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
 
   String getName(long pKey) {
     return BtorJNI.boolector_get_symbol(getEnv(), pKey);
-  }
-
-  @Override
-  public Object convertValue(Long pF) {
-    throw new UnsupportedOperationException("Please use the other method.");
   }
 
   @Override

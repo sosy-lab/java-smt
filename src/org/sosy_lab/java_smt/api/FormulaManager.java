@@ -79,6 +79,13 @@ public interface FormulaManager {
   QuantifiedFormulaManager getQuantifiedFormulaManager();
 
   /**
+   * Returns the String Theory.
+   *
+   * @throws UnsupportedOperationException If the theory is not supported by the solver.
+   */
+  StringFormulaManager getStringFormulaManager();
+
+  /**
    * Create variable of the type equal to {@code formulaType}.
    *
    * @param formulaType the type of the variable.
@@ -240,10 +247,10 @@ public interface FormulaManager {
    * own contexts.
    *
    * @param formula Formula belonging to {@code otherContext}.
-   * @param otherContext Formula manager belonging to the other context.
+   * @param otherManager Formula manager belonging to the other context.
    * @return Formula belonging to {@code this} context.
    */
-  BooleanFormula translateFrom(BooleanFormula formula, FormulaManager otherContext);
+  BooleanFormula translateFrom(BooleanFormula formula, FormulaManager otherManager);
 
   /**
    * Check whether the given String can be used as symbol/name for variables or undefined functions.

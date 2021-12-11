@@ -35,6 +35,7 @@ import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.api.StringFormulaManager;
 import org.sosy_lab.java_smt.api.UFManager;
 
 /**
@@ -84,6 +85,7 @@ public abstract class SolverBasedTest0 {
   protected @Nullable QuantifiedFormulaManager qmgr;
   protected @Nullable ArrayFormulaManager amgr;
   protected @Nullable FloatingPointFormulaManager fpmgr;
+  protected @Nullable StringFormulaManager smgr;
   protected ShutdownManager shutdownManager = ShutdownManager.create();
 
   protected ShutdownNotifier shutdownNotifierToUse() {
@@ -152,6 +154,11 @@ public abstract class SolverBasedTest0 {
     } catch (UnsupportedOperationException e) {
       fpmgr = null;
     }
+    try {
+      smgr = mgr.getStringFormulaManager();
+    } catch (UnsupportedOperationException e) {
+      smgr = null;
+    }
   }
 
   @After
@@ -214,6 +221,14 @@ public abstract class SolverBasedTest0 {
     assume()
         .withMessage("Solver %s does not support the theory of floats", solverToUse())
         .that(fpmgr)
+        .isNotNull();
+  }
+
+  /** Skip test if the solver does not support strings. */
+  protected final void requireStrings() {
+    assume()
+        .withMessage("Solver %s does not support the theory of strings", solverToUse())
+        .that(smgr)
         .isNotNull();
   }
 

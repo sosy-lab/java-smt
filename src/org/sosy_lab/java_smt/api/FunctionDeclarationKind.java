@@ -256,6 +256,34 @@ public enum FunctionDeclarationKind {
   FP_AS_IEEEBV,
   FP_FROM_IEEEBV,
 
+  // String and Regex theory
+
+  STR_CONCAT,
+  STR_PREFIX,
+  STR_SUFFIX,
+  STR_CONTAINS,
+  STR_SUBSTRING,
+  STR_REPLACE,
+  STR_REPLACE_ALL,
+  STR_CHAR_AT,
+  STR_LENGTH,
+  STR_INDEX_OF,
+  STR_TO_RE,
+  STR_IN_RE,
+  STR_TO_INT,
+  INT_TO_STR,
+  STR_LT,
+  STR_LE,
+  RE_PLUS,
+  RE_STAR,
+  RE_OPTIONAL,
+  RE_CONCAT,
+  RE_UNION,
+  RE_RANGE,
+  RE_INTERSECT,
+  RE_COMPLEMENT,
+  RE_DIFFERENCE,
+
   // default case
 
   /**

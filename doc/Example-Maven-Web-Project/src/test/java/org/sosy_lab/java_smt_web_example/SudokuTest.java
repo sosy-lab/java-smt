@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt_web_example;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assume.assumeTrue;
 import static org.sosy_lab.java_smt.example.Sudoku.SIZE;
 
 import com.google.common.base.Joiner;
@@ -69,6 +70,36 @@ import org.sosy_lab.java_smt.example.Sudoku.SudokuSolver;
  * </pre>
  */
 public class SudokuTest {
+
+  private static final String OS = System.getProperty("os.name").toLowerCase().replace(" ", "");
+  private static final boolean IS_WINDOWS = OS.startsWith("windows");
+  private static final boolean IS_MAC = OS.startsWith("macos");
+  private static final boolean IS_LINUX = OS.startsWith("linux");
+
+  /**
+   * Let's allow to disable some checks on certain combinations of operating systems and solvers,
+   * because of missing support.
+   *
+   * <p>We update this list, whenever a new solver or operating system is added.
+   */
+  private static boolean isOperatingSystemSupported(Solvers solver) {
+    switch (solver) {
+      case SMTINTERPOL:
+      case PRINCESS:
+        // any operating system is allowed, Java is already available.
+        return true;
+      case BOOLECTOR:
+      case CVC4:
+      case YICES2:
+        return IS_LINUX;
+      case MATHSAT5:
+        return IS_LINUX || IS_WINDOWS;
+      case Z3:
+        return IS_LINUX || IS_WINDOWS || IS_MAC;
+      default:
+        throw new AssertionError("unexpected solver: " + solver);
+    }
+  }
 
   private Configuration config;
   private LogManager logger;
@@ -133,8 +164,28 @@ public class SudokuTest {
     checkSudoku(Solvers.MATHSAT5);
   }
 
+  @Test
+  public void boolectorSudokuTest()
+      throws InvalidConfigurationException, InterruptedException, SolverException {
+    // Boolector does not support Integer logic
+    // checkSudoku(Solvers.BOOLECTOR);
+  }
+
+  @Test
+  public void cvc4SudokuTest()
+      throws InvalidConfigurationException, InterruptedException, SolverException {
+    checkSudoku(Solvers.CVC4);
+  }
+
+  @Test
+  public void yices2SudokuTest()
+      throws InvalidConfigurationException, InterruptedException, SolverException {
+    checkSudoku(Solvers.YICES2);
+  }
+
   private void checkSudoku(Solvers solver)
       throws InvalidConfigurationException, InterruptedException, SolverException {
+    assumeTrue(isOperatingSystemSupported(solver));
 
     context = SolverContextFactory.createSolverContext(config, logger, notifier, solver);
     Integer[][] grid = readGridFromString(input);

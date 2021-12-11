@@ -140,7 +140,7 @@ abstract class PrincessAbstractProver<E, AF> extends AbstractProverWithAllSat<E>
     } catch (SimpleAPIException ex) {
       throw new SolverException(ex.getMessage(), ex);
     }
-    return new PrincessModel(partialModel, creator);
+    return new PrincessModel(partialModel, creator, api);
   }
 
   /**

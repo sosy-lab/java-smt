@@ -3,12 +3,35 @@ This file is part of JavaSMT,
 an API wrapper for a collection of SMT solvers:
 https://github.com/sosy-lab/java-smt
 
-SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+SPDX-FileCopyrightText: 2021 Dirk Beyer <https://www.sosy-lab.org>
 
 SPDX-License-Identifier: Apache-2.0
 -->
 
 # JavaSMT ChangeLog
+
+## JavaSMT 3.11.0
+
+This release comes with support for multiple prover stacks in SMTInterpol.
+
+### Breaking change:
+Users might have accessed the public class `SmtInterpolEnvironment` for direct interaction with SMTInterpol.
+We replace the class `org.sosy_lab.java_smt.solvers.smtinterpol.SmtInterpolEnvironment`
+with the class `de.uni_freiburg.informatik.ultimate.logic.Script`,
+which provides a similar interface and also allows direct interaction with SMTInterpol.
+
+### Updated solvers:
+ - SMTInterpol 2.5-916-ga5843d8b
+ - Boolector 3.2.2
+
+## JavaSMT 3.10.1
+
+This patch release brings several bugfixes for JavaSMT, for example,
+in the bindings of Princess or for quantifier handling.
+Additionally, we now provide Yices2 via Maven.
+
+### Updated solvers:
+ - SMTInterpol 2.5-842-gfcd46532
 
 ## JavaSMT 3.10.0
 

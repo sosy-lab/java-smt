@@ -40,7 +40,8 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
       Z3BitvectorFormulaManager pBitpreciseManager,
       Z3FloatingPointFormulaManager pFloatingPointManager,
       Z3QuantifiedFormulaManager pQuantifiedManager,
-      Z3ArrayFormulaManager pArrayManager) {
+      Z3ArrayFormulaManager pArrayManager,
+      Z3StringFormulaManager pStringManager) {
     super(
         pFormulaCreator,
         pFunctionManager,
@@ -51,7 +52,8 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
         pFloatingPointManager,
         pQuantifiedManager,
         pArrayManager,
-        null);
+        null,
+        pStringManager);
     formulaCreator = pFormulaCreator;
   }
 
@@ -219,8 +221,7 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
   @Override
   public BooleanFormula translateFrom(BooleanFormula other, FormulaManager otherManager) {
     if (otherManager instanceof Z3FormulaManager) {
-      Z3FormulaManager o = (Z3FormulaManager) otherManager;
-      long otherZ3Context = o.getEnvironment();
+      long otherZ3Context = ((Z3FormulaManager) otherManager).getEnvironment();
       if (otherZ3Context == getEnvironment()) {
 
         // Same context.
