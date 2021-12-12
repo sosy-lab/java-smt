@@ -201,7 +201,7 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
       // Reason: Boolector returns names of variables with its own escape sequence sometimes. If you
       // however name your variable like the escape sequence, we can't discern anymore if its a real
       // name or an escape seq.
-      long entry = bfCreator.getFormulaFromCache(name).get();
+      long entry = bfCreator.getFormulaFromCache(name).orElseThrow();
       if (BtorJNI.boolector_is_array(btor, entry)) {
         assignmentBuilder.add(getArrayAssignment(entry, name));
       } else if (BtorJNI.boolector_is_const(btor, entry)) {

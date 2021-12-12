@@ -55,29 +55,28 @@ import org.sosy_lab.java_smt.api.SolverException;
 public class ModelTest extends SolverBasedTest0 {
 
   // A list of variables to test that model variable names are correctly applied
-  private static final String[] variableNames =
-      new String[] {
-        "x",
-        "x-x",
-        "x::x",
-        "@x",
-        "x@",
-        "x@x",
-        "@x@",
-        "BTOR_1@",
-        "BTOR_1@var",
-        "BTOR",
-        "BTOR_",
-        "BTOR_@",
-        "BTOR_1",
-        "\"x",
-        "x\"",
-        "\"xx\"",
-        "\"x\"\"x\"",
-        "x ",
-        " x",
-        " x "
-      };
+  private static final ImmutableList<String> VARIABLE_NAMES =
+      ImmutableList.of(
+          "x",
+          "x-x",
+          "x::x",
+          "@x",
+          "x@",
+          "x@x",
+          "@x@",
+          "BTOR_1@",
+          "BTOR_1@var",
+          "BTOR",
+          "BTOR_",
+          "BTOR_@",
+          "BTOR_1",
+          "\"x",
+          "x\"",
+          "\"xx\"",
+          "\"x\"\"x\"",
+          "x ",
+          " x",
+          " x ");
 
   private static final ArrayFormulaType<IntegerFormula, IntegerFormula> ARRAY_TYPE_INT_INT =
       FormulaType.getArrayType(IntegerType, IntegerType);
@@ -187,7 +186,7 @@ public class ModelTest extends SolverBasedTest0 {
   public void testGetRationals() throws SolverException, InterruptedException {
     requireIntegers();
     requireRationals();
-    for (String name : variableNames) {
+    for (String name : VARIABLE_NAMES) {
       testModelGetters(
           rmgr.equal(rmgr.makeVariable(name), rmgr.makeNumber(Rational.ofString("1/3"))),
           rmgr.makeVariable(name),
@@ -200,7 +199,7 @@ public class ModelTest extends SolverBasedTest0 {
   @Test
   public void testGetBooleans() throws SolverException, InterruptedException {
     // Some names are specificly chosen to test the Boolector model
-    for (String name : variableNames) {
+    for (String name : VARIABLE_NAMES) {
       testModelGetters(bmgr.makeVariable(name), bmgr.makeBoolean(true), true, name);
     }
   }
@@ -211,7 +210,7 @@ public class ModelTest extends SolverBasedTest0 {
     requireBitvectors();
     // Some names are specificly chosen to test the Boolector model
     // Use 1 instead of 0 or max bv value, as solvers tend to use 0, min or max as default
-    for (String name : variableNames) {
+    for (String name : VARIABLE_NAMES) {
       testModelGetters(
           bvmgr.equal(bvmgr.makeVariable(8, name), bvmgr.makeBitvector(8, 1)),
           bvmgr.makeBitvector(8, 1),
@@ -224,7 +223,7 @@ public class ModelTest extends SolverBasedTest0 {
   @Test
   public void testGetInts() throws SolverException, InterruptedException {
     requireIntegers();
-    for (String name : variableNames) {
+    for (String name : VARIABLE_NAMES) {
       testModelGetters(
           imgr.equal(imgr.makeVariable(name), imgr.makeNumber(1)),
           imgr.makeNumber(1),
@@ -239,7 +238,7 @@ public class ModelTest extends SolverBasedTest0 {
     requireBitvectors();
     // Some names are specificly chosen to test the Boolector model
     // Use 1 instead of 0 or max bv value, as solvers tend to use 0, min or max as default
-      for (String ufName : variableNames) {
+    for (String ufName : VARIABLE_NAMES) {
       testModelGetters(
           bvmgr.equal(
               bvmgr.makeBitvector(8, 1),
@@ -250,7 +249,7 @@ public class ModelTest extends SolverBasedTest0 {
           bvmgr.makeBitvector(8, 1),
           BigInteger.ONE,
           ufName);
-      }
+    }
   }
 
   /** Test that different names are no problem for int UFs in the model. */
@@ -259,7 +258,7 @@ public class ModelTest extends SolverBasedTest0 {
     requireIntegers();
     // Some names are specificly chosen to test the Boolector model
     // Use 1 instead of 0 or max bv value, as solvers tend to use 0, min or max as default
-    for (String ufName : variableNames) {
+    for (String ufName : VARIABLE_NAMES) {
       testModelGetters(
           imgr.equal(
               imgr.makeNumber(1),
