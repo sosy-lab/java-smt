@@ -77,8 +77,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
             "Activate replayable logging in Z3."
                 + " The log can be given as an input to the solver and replayed.")
     @FileOption(FileOption.Type.OUTPUT_FILE)
-    @Nullable
-    Path log = null;
+    @Nullable Path log = null;
   }
 
   @SuppressWarnings("checkstyle:parameternumber")

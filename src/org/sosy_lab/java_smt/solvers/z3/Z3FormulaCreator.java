@@ -918,8 +918,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
    * get a previously created application declaration, or <code>NULL</code> if the symbol is
    * unknown.
    */
-  @Nullable
-  Long getKnownDeclaration(String symbolName) {
+  @Nullable Long getKnownDeclaration(String symbolName) {
     return symbolsToDeclarations.get(symbolName);
   }
 }

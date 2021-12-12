@@ -39,8 +39,7 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
    * @return evaluation of the given formula or <code>null</code> if the solver does not provide a
    *     better evaluation.
    */
-  @Nullable
-  <T extends Formula> T eval(T formula);
+  @Nullable <T extends Formula> T eval(T formula);
 
   /**
    * Evaluate a given formula substituting the values from the model.
@@ -55,48 +54,42 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
    * @return Either of: - Number (Rational/Double/BigInteger/Long/Integer) - Boolean
    * @throws IllegalArgumentException if a formula has unexpected type, e.g. Array.
    */
-  @Nullable
-  Object evaluate(Formula f);
+  @Nullable Object evaluate(Formula f);
 
   /**
    * Type-safe evaluation for integer formulas.
    *
    * <p>The formula does not need to be a variable, we also allow complex expression.
    */
-  @Nullable
-  BigInteger evaluate(IntegerFormula f);
+  @Nullable BigInteger evaluate(IntegerFormula f);
 
   /**
    * Type-safe evaluation for rational formulas.
    *
    * <p>The formula does not need to be a variable, we also allow complex expression.
    */
-  @Nullable
-  Rational evaluate(RationalFormula f);
+  @Nullable Rational evaluate(RationalFormula f);
 
   /**
    * Type-safe evaluation for boolean formulas.
    *
    * <p>The formula does not need to be a variable, we also allow complex expression.
    */
-  @Nullable
-  Boolean evaluate(BooleanFormula f);
+  @Nullable Boolean evaluate(BooleanFormula f);
 
   /**
    * Type-safe evaluation for bitvector formulas.
    *
    * <p>The formula does not need to be a variable, we also allow complex expression.
    */
-  @Nullable
-  BigInteger evaluate(BitvectorFormula f);
+  @Nullable BigInteger evaluate(BitvectorFormula f);
 
   /**
    * Type-safe evaluation for string formulas.
    *
    * <p>The formula does not need to be a variable, we also allow complex expression.
    */
-  @Nullable
-  String evaluate(StringFormula f);
+  @Nullable String evaluate(StringFormula f);
 
   /**
    * Iterate over all values present in the model. Note that iterating multiple times may be
