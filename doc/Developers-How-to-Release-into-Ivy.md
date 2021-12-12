@@ -96,21 +96,26 @@ Finally follow the instructions shown in the message at the end.
 
 We prefer to use our own Boolector binaries and Java bindings.
 Boolector's dependencies, mainly Minisat, requires GCC version 7 and does not yet compile with newer compilers.
-We prefer to directly build diretly on Ubuntu 18.04, where gcc-7 is the default compiler.
+We prefer to directly build directly on Ubuntu 18.04, where gcc-7 is the default compiler.
 It should also be possible to set environment varables like CC=gcc-7 on newer systems.
+For simple usage, we provide a Docker definition/environment under `/docker`,
+in which the following command can be run.
 
 To publish Boolector, checkout the [Boolector repository](https://github.com/Boolector/boolector).
 Then execute the following command in the JavaSMT directory,
-where `$BTOR_DIR` is the path to the Boolector directory
-and `$BTOR_VERSION` is the version number:
+where `$BTOR_DIR` is the path to the Boolector directory and `$BTOR_VERSION` is the version number:
 ```
 CC=gcc-7 ant publish-boolector -Dboolector.path=$BTOR_DIR -Dboolector.customRev=$BTOR_VERSION
 ```
 Example:
 ```
-ant publish-boolector -Dboolector.path=../boolector -Dboolector.customRev=3.0.0-2019-11-29
+ant publish-boolector -Dboolector.path=../boolector -Dboolector.customRev=3.2.2
 ```
+Our build script will automatically append the git-revision of Boolector, if available.
+
 Finally follow the instructions shown in the message at the end.
+The instructions for publication via SVN into the Ivy repository are not intended to be executed in the Docker environment,
+but in the normal system environment, where some testing can be applied by the developer before the commit.
 
 
 ### Publishing (Opti)-MathSAT5

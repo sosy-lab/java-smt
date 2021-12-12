@@ -263,10 +263,10 @@ public abstract class SolverBasedTest0 {
   }
 
   protected void requireModel() {
-    assume()
-        .withMessage("Solver %s does not support model generation in a usable way", solverToUse())
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.BOOLECTOR);
+    /*assume()
+    .withMessage("Solver %s does not support model generation in a usable way", solverToUse())
+    .that(solverToUse())
+    .isNotEqualTo(Solvers.BOOLECTOR);*/
   }
 
   protected void requireVisitor() {

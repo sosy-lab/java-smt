@@ -16,7 +16,12 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Table;
 import com.google.common.primitives.Longs;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -37,8 +42,15 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
   // Boolector can give back 'x' for an arbitrary value that we change to this
   private static final char ARBITRARY_VALUE = '1';
 
-  /** Maps a name and a variable or function type to a concrete formula node. */
-  private final Table<String, Long, Long> nameFormulaCache = HashBasedTable.create();
+  /**
+   * Maps a name and a variable or function type to a concrete formula node. We allow only 1 type
+   * per var name, meaning there is only 1 column per row!
+   */
+  private final Table<String, Long, Long> formulaCache = HashBasedTable.create();
+
+  // Remember uf sorts, as Boolector does not give them back correctly
+  private final Map<Long, List<Long>> ufArgumentsSortMap = new HashMap<>();
+  // Possibly we need to split this up into vars, ufs, and arrays
 
   BoolectorFormulaCreator(Long btor) {
     super(btor, BtorJNI.boolector_bool_sort(btor), null, null, null, null);
@@ -72,19 +84,37 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
   @Override
   public FormulaType<?> getFormulaType(Long pFormula) {
     long sort = BtorJNI.boolector_get_sort(getEnv(), pFormula);
-    if (BtorJNI.boolector_is_bitvec_sort(getEnv(), sort)) {
-      if (sort == 1) {
-        return FormulaType.BooleanType;
-      } else {
-        return FormulaType.getBitvectorTypeWithSize(
-            BtorJNI.boolector_get_width(getEnv(), pFormula));
-      }
-    } else if (BtorJNI.boolector_is_array_sort(getEnv(), sort)) {
+    // Careful, Boolector interprets nearly everything as a fun!
+    if (!BtorJNI.boolector_is_array_sort(getEnv(), sort)
+        && !BtorJNI.boolector_is_bitvec_sort(getEnv(), sort)
+        && BtorJNI.boolector_is_fun_sort(getEnv(), sort)) {
+      sort = BtorJNI.boolector_fun_get_codomain_sort(getEnv(), pFormula);
+    }
+    return getFormulaTypeFromSortAndFormula(pFormula, sort);
+  }
+
+  /**
+   * Returns the proper FormulaType for the sort entered.
+   *
+   * @param pFormula Some Boolector node. Either the node of the sort, or its parent. Only has to be
+   *     accurate for arrays.
+   * @param sort The actual sort you want the FormulaType of.
+   * @return FormulaType for the sort.
+   */
+  private FormulaType<?> getFormulaTypeFromSortAndFormula(Long pFormula, Long sort) {
+    if (BtorJNI.boolector_is_array_sort(getEnv(), sort)) {
       int indexWidth = BtorJNI.boolector_get_index_width(getEnv(), pFormula);
       int elementWidth = BtorJNI.boolector_get_width(getEnv(), pFormula);
       return FormulaType.getArrayType(
           FormulaType.getBitvectorTypeWithSize(indexWidth),
           FormulaType.getBitvectorTypeWithSize(elementWidth));
+    } else if (BtorJNI.boolector_is_bitvec_sort(getEnv(), sort)) {
+      int width = BtorJNI.boolector_bitvec_sort_get_width(getEnv(), sort);
+      if (width == 1) {
+        return FormulaType.BooleanType;
+      } else {
+        return FormulaType.getBitvectorTypeWithSize(width);
+      }
     }
     throw new IllegalArgumentException("Unknown formula type for " + pFormula);
   }
@@ -152,15 +182,15 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
   // one, potentially with a new internal name (see cache).
   @Override
   public Long makeVariable(Long type, String varName) {
-    Long maybeFormula = nameFormulaCache.get(varName, type);
+    Long maybeFormula = formulaCache.get(varName, type);
     if (maybeFormula != null) {
       return maybeFormula;
     }
-    if (nameFormulaCache.containsRow(varName)) {
+    if (formulaCache.containsRow(varName)) {
       throw new IllegalArgumentException("Symbol already used: " + varName);
     }
     long newVar = BtorJNI.boolector_var(getEnv(), type, varName);
-    nameFormulaCache.put(varName, type, newVar);
+    formulaCache.put(varName, type, newVar);
     return newVar;
   }
 
@@ -230,34 +260,48 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
 
     long[] funSorts = Longs.toArray(pArgTypes);
     long sort = BtorJNI.boolector_fun_sort(getEnv(), funSorts, funSorts.length, pReturnType);
-    Long maybeFormula = nameFormulaCache.get(name, sort);
+    Long maybeFormula = formulaCache.get(name, sort);
     if (maybeFormula != null) {
       return maybeFormula;
     }
-    if (nameFormulaCache.containsRow(name)) {
+    if (formulaCache.containsRow(name)) {
       throw new IllegalArgumentException("Symbol already used: " + name);
     }
     long uf = BtorJNI.boolector_uf(getEnv(), sort, name);
-    nameFormulaCache.put(name, sort, uf);
+    formulaCache.put(name, sort, uf);
+    ufArgumentsSortMap.put(uf, pArgTypes);
     return uf;
   }
 
   @Override
   public Object convertValue(Long term) {
     String value;
-    if (BtorJNI.boolector_is_array(getEnv(), term)) {
-      value = BtorJNI.boolector_bv_assignment(getEnv(), term);
-    } else if (BtorJNI.boolector_is_const(getEnv(), term)) {
+    if (BtorJNI.boolector_is_const(getEnv(), term)) {
       value = BtorJNI.boolector_get_bits(getEnv(), term);
+      return transformStringToBigInt(value);
+
     } else if (BtorJNI.boolector_is_bitvec_sort(
         getEnv(), BtorJNI.boolector_get_sort(getEnv(), term))) {
       value = BtorJNI.boolector_bv_assignment(getEnv(), term);
-    } else {
-      throw new AssertionError("unknown sort and term");
-      // value = BtorJNI.boolector_bv_assignment(getEnv(), term);
+      return transformStringToBigInt(value);
+
+    } else if (BtorJNI.boolector_is_fun(getEnv(), term)) {
+      value = BtorJNI.boolector_uf_assignment_helper(getEnv(), term)[1][0];
+      return transformStringToBigInt(value);
+
+    } else if (BtorJNI.boolector_is_array(getEnv(), term)) {
+      List<Object> arrayValues = new ArrayList<>();
+      for (String stringArrayEntry : BtorJNI.boolector_array_assignment_helper(getEnv(), term)[1]) {
+        arrayValues.add(transformStringToBigInt(stringArrayEntry));
+      }
+      return arrayValues;
     }
+    throw new AssertionError("unknown sort and term");
+  }
+
+  protected Object transformStringToBigInt(String value) {
     // To get the correct type, we check the width of the term (== 1 means bool).
-    int width = BtorJNI.boolector_get_width(getEnv(), term);
+    int width = value.length();
     if (width == 1) {
       long longValue = parseBigInt(value).longValue();
       if (longValue == 1) {
@@ -340,13 +384,26 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
     }
   }
 
-  /**
-   * Returns current variables cache.
-   *
-   * @return variables cache.
-   */
+  // Returns the variables cache with keys variable name and type
   protected Table<String, Long, Long> getCache() {
-    return nameFormulaCache;
+    return formulaCache;
+  }
+
+  // True if the entered String has an existing variable in the cache.
+  protected boolean formulaCacheContains(String variable) {
+    // There is always only 1 type permitted per variable
+    return formulaCache.containsRow(variable);
+  }
+
+  // Optional that contains the variable to the entered String if there is one.
+  protected Optional<Long> getFormulaFromCache(String variable) {
+    Iterator<java.util.Map.Entry<Long, Long>> entrySetIter =
+        formulaCache.row(variable).entrySet().iterator();
+    if (entrySetIter.hasNext()) {
+      // If there is a non empty row for an entry, there is only one entry
+      return Optional.of(entrySetIter.next().getValue());
+    }
+    return Optional.empty();
   }
 
   @Override
