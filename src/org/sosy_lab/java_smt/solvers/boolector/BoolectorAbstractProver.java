@@ -67,8 +67,6 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   @Override
   public void close() {
     if (!closed) {
-      // Debug if btor instance was terminated using the termination callback (1==true)
-      // System.out.println("did it terminate? = " + BtorJNI.boolector_terminate(btor));
       // Free resources of callback
       BtorJNI.boolector_free_termination(terminationCallbackHelper);
       BtorJNI.boolector_pop(manager.getEnvironment(), assertedFormulas.size());

@@ -165,6 +165,8 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
     BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_SEED.getValue(), randomSeed);
     // Dump in SMT-LIB2 Format
     BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_OUTPUT_FORMAT.getValue(), 2);
+    // Stop Boolector from rewriting formulas in outputs
+    BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_REWRITE_LEVEL.getValue(), 0);
 
     setFurtherOptions(btor, settings.furtherOptions);
 

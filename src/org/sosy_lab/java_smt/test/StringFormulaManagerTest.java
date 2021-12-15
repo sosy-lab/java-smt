@@ -660,13 +660,13 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
 
     StringFormula num1 = smgr.makeString("1");
     StringFormula u = smgr.makeString("u");
-    StringFormula curlyOpen = smgr.makeString("\u007B");
-    StringFormula curlyClose = smgr.makeString("\u007D");
+    StringFormula curlyOpen = smgr.makeString("{");
+    StringFormula curlyClose = smgr.makeString("}");
     StringFormula u1234WOEscape = smgr.makeString("u1234");
     StringFormula au1234WOEscape = smgr.makeString("au1234");
     // Java needs a double {{ as the first one is needed as an escape char for the second, this is a
     // workaround
-    String workaround = "au\u007B1234\u007D";
+    String workaround = "au{1234}";
     StringFormula au1234WOEscapeCurly = smgr.makeString(workaround);
     StringFormula backSlash = smgr.makeString("\\");
     StringFormula a = smgr.makeString("a");
@@ -731,7 +731,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
     StringFormula acurlyClose2BUnicodeb = smgr.makeString("a\\u{7D}b");
     // Java needs a double {{ as the first one is needed as a escape char for the second, this is a
     // workaround
-    String workaround = "au\u007B7B\u007D";
+    String workaround = "au{7B}";
     StringFormula acurlyOpen2BUnicodeWOEscapeCurly = smgr.makeString(workaround);
     // StringFormula backSlash = smgr.makeString("\\");
     StringFormula a = smgr.makeString("a");
@@ -960,7 +960,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
     StringFormula curlyClose2BUnicode = smgr.makeString("\\u{7D}");
     StringFormula multipleCurlys2BUnicode = smgr.makeString("\\u{7B}\\u{7D}\\u{7B}\\u{7B}");
     // Z3 transforms this into {}, but CVC4 does not! CVC4 is on the side of the SMTLIB2 standard as
-    // far as i can see.
+    // far as I can see.
     StringFormula curlys2BUnicodeWOEscape = smgr.makeString("\\u7B\\u7D");
 
     IntegerFormula zero = imgr.makeNumber(0);

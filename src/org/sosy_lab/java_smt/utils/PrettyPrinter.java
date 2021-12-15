@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.utils;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -139,7 +138,7 @@ public class PrettyPrinter {
         if (out.length() != 0) {
           out.append(System.lineSeparator());
         }
-        out.append(Strings.repeat("  ", depth)); // two spaces indent is sufficient
+        out.append("  ".repeat(depth)); // two spaces indent is sufficient
       } else {
         out.append(" "); // just a separator between two tokens
       }
