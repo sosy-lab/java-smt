@@ -34,7 +34,7 @@ public class PrincessStringFormulaManager
 
   static Seq<ITerm> toSeq(List<IExpression> exprs) {
     ArrayList<ITerm> result = new ArrayList<ITerm>();
-    for (IExpression expr : exprs) result.add((ITerm)expr);
+    for (IExpression expr : exprs) result.add((ITerm) expr);
     return PrincessEnvironment.toSeq(result);
   }
 
@@ -115,7 +115,8 @@ public class PrincessStringFormulaManager
 
   @Override
   protected ITerm indexOf(IExpression str, IExpression part, IExpression startIndex) {
-    return new IFunApp(PrincessEnvironment.stringTheory.str_indexof(), toSeq(str, part, startIndex));
+    return new IFunApp(
+        PrincessEnvironment.stringTheory.str_indexof(), toSeq(str, part, startIndex));
   }
 
   @Override
@@ -129,16 +130,15 @@ public class PrincessStringFormulaManager
   }
 
   @Override
-  protected ITerm replace(
-      IExpression fullStr, IExpression target, IExpression replacement) {
-    return new IFunApp(PrincessEnvironment.stringTheory.str_replace(), toSeq(fullStr, target, replacement));
+  protected ITerm replace(IExpression fullStr, IExpression target, IExpression replacement) {
+    return new IFunApp(
+        PrincessEnvironment.stringTheory.str_replace(), toSeq(fullStr, target, replacement));
   }
 
   @Override
-  protected ITerm replaceAll(
-      IExpression fullStr, IExpression target, IExpression replacement) {
-    return new IFunApp(PrincessEnvironment.stringTheory.str_replaceall(), toSeq(fullStr, target,
-        replacement));
+  protected ITerm replaceAll(IExpression fullStr, IExpression target, IExpression replacement) {
+    return new IFunApp(
+        PrincessEnvironment.stringTheory.str_replaceall(), toSeq(fullStr, target, replacement));
   }
 
   @Override
@@ -163,20 +163,22 @@ public class PrincessStringFormulaManager
 
   @Override
   public RegexFormula cross(RegexFormula regex) {
-    return wrapRegex(new IFunApp(PrincessEnvironment.stringTheory.re_$plus(),
-        toSeq(extractInfo(regex))));
+    return wrapRegex(
+        new IFunApp(PrincessEnvironment.stringTheory.re_$plus(), toSeq(extractInfo(regex))));
   }
 
   @Override
   public RegexFormula optional(RegexFormula regex) {
-    return wrapRegex(new IFunApp(PrincessEnvironment.stringTheory.re_opt(),
-        toSeq(extractInfo(regex))));
+    return wrapRegex(
+        new IFunApp(PrincessEnvironment.stringTheory.re_opt(), toSeq(extractInfo(regex))));
   }
 
   @Override
   public RegexFormula difference(RegexFormula regex1, RegexFormula regex2) {
-    return wrapRegex(new IFunApp(PrincessEnvironment.stringTheory.re_diff(),
-        toSeq(extractInfo(regex1), extractInfo(regex2))));
+    return wrapRegex(
+        new IFunApp(
+            PrincessEnvironment.stringTheory.re_diff(),
+            toSeq(extractInfo(regex1), extractInfo(regex2))));
   }
 
   @Override

@@ -11,7 +11,6 @@ package org.sosy_lab.java_smt.solvers.princess;
 import ap.parser.IExpression;
 import ap.parser.IFunApp;
 import ap.parser.ITerm;
-import ap.theories.rationals.Fractions.Fraction$;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -26,7 +25,8 @@ public class PrincessRationalFormulaManager
   private PrincessIntegerFormulaManager pInteger;
 
   PrincessRationalFormulaManager(
-      PrincessFormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic,
+      PrincessFormulaCreator pCreator,
+      NonLinearArithmetic pNonLinearArithmetic,
       PrincessIntegerFormulaManager pInteger) {
     super(pCreator, pNonLinearArithmetic);
     this.pInteger = pInteger;
@@ -77,8 +77,7 @@ public class PrincessRationalFormulaManager
     ArrayList<ITerm> args = new ArrayList<>(2);
     args.add(pInteger.makeNumberImpl(pNumber.unscaledValue()));
     args.add(pInteger.makeNumberImpl(BigInteger.valueOf(10).pow(pNumber.scale())));
-    return new IFunApp(PrincessEnvironment.rationalTheory.frac(),
-        PrincessEnvironment.toSeq(args));
+    return new IFunApp(PrincessEnvironment.rationalTheory.frac(), PrincessEnvironment.toSeq(args));
   }
 
   @Override

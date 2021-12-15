@@ -108,6 +108,7 @@ class PrincessEnvironment {
 
   static int STRING_ALPHABET_SIZE = 500;
   static SeqStringTheory stringTheory;
+
   static {
     SeqStringTheoryBuilder builder = new SeqStringTheoryBuilder();
     builder.setAlphabetSize(STRING_ALPHABET_SIZE);
