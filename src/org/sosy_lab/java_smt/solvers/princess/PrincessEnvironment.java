@@ -8,8 +8,9 @@
 
 package org.sosy_lab.java_smt.solvers.princess;
 
-import static scala.collection.JavaConverters.asJava;
 import static scala.collection.JavaConverters.collectionAsScalaIterableConverter;
+import static scala.collection.JavaConverters.mapAsJavaMap;
+import static scala.collection.JavaConverters.seqAsJavaList;
 
 import ap.SimpleAPI;
 import ap.parser.BooleanCompactifier;
@@ -30,6 +31,7 @@ import ap.parser.SMTParser2InputAbsy.SMTType;
 import ap.terfor.ConstantTerm;
 import ap.terfor.preds.Predicate;
 import ap.theories.ExtArray;
+import ap.theories.ExtArray.ArraySort;
 import ap.theories.bitvectors.ModuloArithmetic;
 import ap.theories.rationals.Fractions;
 import ap.theories.rationals.Rationals$;
@@ -78,7 +80,7 @@ import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import scala.Tuple2;
 import scala.Tuple4;
-import scala.collection.immutable.Seq;
+import scala.collection.Seq;
 
 /**
  * This is a Wrapper around Princess. This Wrapper allows to set a logfile for all Smt-Queries
@@ -270,7 +272,7 @@ class PrincessEnvironment {
   public List<? extends IExpression> parseStringToTerms(String s, PrincessFormulaCreator creator) {
 
     Tuple4<
-            Seq<IFormula>,
+            scala.collection.Seq<IFormula>,
             scala.collection.immutable.Map<IFunction, SMTFunctionType>,
             scala.collection.immutable.Map<ConstantTerm, SMTType>,
             scala.collection.immutable.Map<Predicate, SMTFunctionType>>
@@ -282,7 +284,7 @@ class PrincessEnvironment {
       throw new IllegalArgumentException(nested);
     }
 
-    final List<IFormula> formulas = asJava(parserResult._1());
+    final List<IFormula> formulas = seqAsJavaList(parserResult._1());
 
     ImmutableSet.Builder<IExpression> declaredFunctions = ImmutableSet.builder();
     for (IExpression f : formulas) {
@@ -314,7 +316,7 @@ class PrincessEnvironment {
   /* EnvironmentException is not unused, but the Java compiler does not like Scala. */
   @SuppressWarnings("unused")
   private Tuple4<
-          Seq<IFormula>,
+          scala.collection.Seq<IFormula>,
           scala.collection.immutable.Map<IFunction, SMTFunctionType>,
           scala.collection.immutable.Map<ConstantTerm, SMTType>,
           scala.collection.immutable.Map<Predicate, SMTFunctionType>>
@@ -352,7 +354,7 @@ class PrincessEnvironment {
     Tuple2<IExpression, scala.collection.immutable.Map<IExpression, IExpression>> tuple =
         api.abbrevSharedExpressionsWithMap(formula, 1);
     final IExpression lettedFormula = tuple._1();
-    final Map<IExpression, IExpression> abbrevMap = asJava(tuple._2());
+    final Map<IExpression, IExpression> abbrevMap = mapAsJavaMap(tuple._2());
 
     return new Appenders.AbstractAppender() {
 
@@ -398,7 +400,8 @@ class PrincessEnvironment {
         for (Entry<String, IFunApp> function : ufs.entrySet()) {
           List<String> argSorts =
               Lists.transform(
-                  asJava(function.getValue().args()), a -> getFormulaType(a).toSMTLIBString());
+                  seqAsJavaList(function.getValue().args()),
+                  a -> getFormulaType(a).toSMTLIBString());
           out.append(
               String.format(
                   "(declare-fun %s (%s) %s)%n",
@@ -554,7 +557,7 @@ class PrincessEnvironment {
     } else if (sort == PrincessEnvironment.REGEX_SORT) {
       return FormulaType.RegexType;
     } else if (sort instanceof ExtArray.ArraySort) {
-      Seq<Sort> indexSorts = ((ExtArray.ArraySort) sort).theory().indexSorts();
+      Seq<Sort> indexSorts = ((ArraySort) sort).theory().indexSorts();
       Sort elementSort = ((ExtArray.ArraySort) sort).theory().objSort();
       assert indexSorts.iterator().size() == 1 : "unexpected index type in Array type:" + sort;
       // assert indexSorts.size() == 1; // TODO Eclipse does not like simpler code.

@@ -22,7 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager;
-import scala.collection.immutable.Seq;
+import scala.collection.Seq;
 
 public class PrincessStringFormulaManager
     extends AbstractStringFormulaManager<

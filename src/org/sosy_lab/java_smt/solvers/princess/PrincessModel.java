@@ -8,7 +8,8 @@
 
 package org.sosy_lab.java_smt.solvers.princess;
 
-import static scala.collection.JavaConverters.asJava;
+import static scala.collection.JavaConverters.asJavaIterable;
+import static scala.collection.JavaConverters.mapAsJavaMap;
 
 import ap.SimpleAPI;
 import ap.SimpleAPI.PartialModel;
@@ -55,7 +56,7 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
 
     // get abbreviations, we do not want to export them.
     Set<Predicate> abbrevs = new LinkedHashSet<>();
-    for (var entry : asJava(api.ap$SimpleAPI$$abbrevPredicates()).entrySet()) {
+    for (var entry : mapAsJavaMap(api.ap$SimpleAPI$$abbrevPredicates()).entrySet()) {
       abbrevs.add(entry.getKey()); // collect the abbreviation.
       abbrevs.add(entry.getValue()._2()); // the definition is also handled as abbreviation here.
     }
@@ -65,7 +66,7 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
 
     // then iterate over the model and generate the assignments
     ImmutableSet.Builder<ValueAssignment> assignments = ImmutableSet.builder();
-    for (Map.Entry<IExpression, IExpression> entry : asJava(interpretation).entrySet()) {
+    for (Map.Entry<IExpression, IExpression> entry : mapAsJavaMap(interpretation).entrySet()) {
       if (!isAbbrev(abbrevs, entry.getKey())) {
         assignments.addAll(getAssignments(entry.getKey(), entry.getValue(), arrays));
       }
@@ -103,7 +104,7 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
   private Multimap<IFunApp, ITerm> getArrays(
       scala.collection.Map<IExpression, IExpression> interpretation) {
     Multimap<IFunApp, ITerm> arrays = ArrayListMultimap.create();
-    for (Map.Entry<IExpression, IExpression> entry : asJava(interpretation).entrySet()) {
+    for (Map.Entry<IExpression, IExpression> entry : mapAsJavaMap(interpretation).entrySet()) {
       if (entry.getKey() instanceof IConstant) {
         ITerm maybeArray = (IConstant) entry.getKey();
         IExpression value = entry.getValue();
@@ -155,7 +156,7 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
       // normal variable or UF
       IFunApp cKey = (IFunApp) key;
       argumentInterpretations = new ArrayList<>();
-      for (ITerm arg : asJava(cKey.args())) {
+      for (ITerm arg : asJavaIterable(cKey.args())) {
         argumentInterpretations.add(creator.convertValue(arg));
       }
       name = cKey.fun().name();

@@ -12,7 +12,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier.EXISTS;
 import static org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier.FORALL;
 import static org.sosy_lab.java_smt.solvers.princess.PrincessEnvironment.toSeq;
-import static scala.collection.JavaConverters.asJava;
+import static scala.collection.JavaConverters.asJavaCollection;
 
 import ap.basetypes.IdealInt;
 import ap.parser.IAtom;
@@ -329,7 +329,7 @@ class PrincessFormulaCreator
       return visitor.visitBoundVariable(f, ((IVariable) input).index());
 
       // nullary atoms and constant are variables
-    } else if (((input instanceof IAtom) && asJava(((IAtom) input).args()).isEmpty())
+    } else if (((input instanceof IAtom) && asJavaCollection(((IAtom) input).args()).isEmpty())
         || input instanceof IConstant) {
       return visitor.visitFreeVariable(f, input.toString());
 
@@ -473,7 +473,7 @@ class PrincessFormulaCreator
   }
 
   private FunctionDeclarationKind getDeclarationKind(IExpression input) {
-    assert !(((input instanceof IAtom) && asJava(((IAtom) input).args()).isEmpty())
+    assert !(((input instanceof IAtom) && asJavaCollection(((IAtom) input).args()).isEmpty())
             || input instanceof IConstant)
         : "Variables should be handled somewhere else";
 

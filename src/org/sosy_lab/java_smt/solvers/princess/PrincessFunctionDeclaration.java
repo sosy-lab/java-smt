@@ -28,7 +28,7 @@ import ap.types.Sort$;
 import ap.types.SortedIFunction$;
 import java.util.ArrayList;
 import java.util.List;
-import scala.collection.immutable.Seq;
+import scala.collection.Seq;
 
 /**
  * Unlike other solvers, Princess does not have a class representing the built-in functions (OR,

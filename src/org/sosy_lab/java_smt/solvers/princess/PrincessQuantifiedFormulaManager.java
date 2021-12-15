@@ -9,7 +9,7 @@
 package org.sosy_lab.java_smt.solvers.princess;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static scala.collection.JavaConverters.asScala;
+import static scala.collection.JavaConverters.iterableAsScalaIterable;
 
 import ap.parser.IConstant;
 import ap.parser.IExpression;
@@ -48,7 +48,8 @@ class PrincessQuantifiedFormulaManager
       return new ISortedQuantified(pq, PrincessEnvironment.INTEGER_SORT, (IFormula) body);
     } else {
       // TODO: add support for boolean quantification!
-      return IExpression.quanConsts(pq, asScala(toConstantTerm(vars)), (IFormula) body);
+      return IExpression.quanConsts(
+          pq, iterableAsScalaIterable(toConstantTerm(vars)), (IFormula) body);
     }
   }
 

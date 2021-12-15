@@ -193,18 +193,18 @@ SPDX-License-Identifier: Apache-2.0
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/java/runtime-princess/princess_2.13.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-princess/princess_2.12.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/lib/java-contrib/princess_2.13-sources.zip!/" />
+          <root url="jar://$MODULE_DIR$/lib/java-contrib/princess_2.12-sources.zip!/" />
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/java/runtime-princess/princess-parser_2.13.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-princess/princess-parser_2.12.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -213,7 +213,7 @@ SPDX-License-Identifier: Apache-2.0
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/java/runtime-princess/princess-smt-parser_2.13.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-princess/princess-smt-parser_2.12.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
