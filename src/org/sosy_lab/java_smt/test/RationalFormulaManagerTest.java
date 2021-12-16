@@ -54,6 +54,7 @@ public class RationalFormulaManagerTest extends SolverBasedTest0 {
   @Test
   public void rationalToIntTest() throws SolverException, InterruptedException {
     requireRationals();
+    requireRationalFloor();
     for (double v : SOME_DOUBLES) {
       IntegerFormula i = imgr.makeNumber((int) Math.floor(v));
       RationalFormula r = rmgr.makeNumber(v);
@@ -77,6 +78,7 @@ public class RationalFormulaManagerTest extends SolverBasedTest0 {
   @Test
   public void intToIntWithRmgrTest() throws SolverException, InterruptedException {
     requireRationals();
+    requireRationalFloor();
     for (double v : SOME_DOUBLES) {
       IntegerFormula i = imgr.makeNumber((int) Math.floor(v));
       assertThat(mgr.getFormulaType(i)).isEqualTo(FormulaType.IntegerType);
@@ -89,6 +91,7 @@ public class RationalFormulaManagerTest extends SolverBasedTest0 {
   public void floorIsLessOrEqualsValueTest() throws SolverException, InterruptedException {
     requireRationals();
     requireQuantifiers();
+    requireRationalFloor();
     RationalFormula v = rmgr.makeVariable("v");
     assertThatFormula(rmgr.lessOrEquals(rmgr.floor(v), v)).isTautological();
   }
@@ -97,6 +100,7 @@ public class RationalFormulaManagerTest extends SolverBasedTest0 {
   public void floorIsGreaterThanValueTest() throws SolverException, InterruptedException {
     requireRationals();
     requireQuantifiers();
+    requireRationalFloor();
     RationalFormula v = rmgr.makeVariable("v");
     assertThatFormula(rmgr.lessOrEquals(rmgr.floor(v), v)).isTautological();
   }
@@ -105,6 +109,7 @@ public class RationalFormulaManagerTest extends SolverBasedTest0 {
   public void forallFloorIsLessOrEqualsValueTest() throws SolverException, InterruptedException {
     requireRationals();
     requireQuantifiers();
+    requireRationalFloor();
     RationalFormula v = rmgr.makeVariable("v");
     assertThatFormula(qmgr.forall(v, rmgr.lessOrEquals(rmgr.floor(v), v))).isTautological();
   }
@@ -113,6 +118,7 @@ public class RationalFormulaManagerTest extends SolverBasedTest0 {
   public void forallFloorIsLessThanValueTest() throws SolverException, InterruptedException {
     requireRationals();
     requireQuantifiers();
+    requireRationalFloor();
     RationalFormula v = rmgr.makeVariable("v");
     // counterexample: all integers
     assertThatFormula(qmgr.forall(v, rmgr.lessThan(rmgr.floor(v), v))).isUnsatisfiable();
@@ -121,6 +127,7 @@ public class RationalFormulaManagerTest extends SolverBasedTest0 {
   @Test
   public void visitFloorTest() {
     requireRationals();
+    requireRationalFloor();
     IntegerFormula f = rmgr.floor(rmgr.makeVariable("v"));
     assertThat(mgr.extractVariables(f)).hasSize(1);
     FunctionCollector collector = new FunctionCollector();

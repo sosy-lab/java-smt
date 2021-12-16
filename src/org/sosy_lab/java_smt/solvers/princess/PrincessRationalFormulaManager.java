@@ -84,4 +84,9 @@ public class PrincessRationalFormulaManager
   protected IExpression makeVariableImpl(String varName) {
     return getFormulaCreator().makeVariable(PrincessEnvironment.FRACTION_SORT, varName);
   }
+
+  @Override
+  protected IExpression floor(IExpression number) {
+    throw new AssertionError("floor is not supported in Princess");
+  }
 }

@@ -184,6 +184,13 @@ public abstract class SolverBasedTest0 {
         .isNotNull();
   }
 
+  protected final void requireRationalFloor() {
+    assume()
+        .withMessage("Princess does not support floor for rationals")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.PRINCESS);
+  }
+
   /** Skip test if the solver does not support bitvectors. */
   protected final void requireBitvectors() {
     assume()
