@@ -37,6 +37,7 @@ import ap.theories.rationals.Fractions;
 import ap.theories.rationals.Rationals$;
 import ap.theories.strings.SeqStringTheory;
 import ap.theories.strings.SeqStringTheoryBuilder;
+import ap.theories.strings.StringTheory;
 import ap.types.Sort;
 import ap.types.Sort$;
 import ap.types.Sort.MultipleValueBool$;
@@ -78,6 +79,11 @@ import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
+import ostrich.OFlags;
+import ostrich.OFlags.LengthOptions$;
+import ostrich.OstrichStringTheory;
+import ostrich.OstrichStringTheoryBuilder;
+import ostrich.automata.Transducer;
 import scala.Tuple2;
 import scala.Tuple4;
 import scala.collection.Seq;
@@ -108,20 +114,14 @@ class PrincessEnvironment {
   public static final Sort INTEGER_SORT = Sort.Integer$.MODULE$;
   public static final Sort NAT_SORT = Sort.Nat$.MODULE$;
 
-  static int STRING_ALPHABET_SIZE = 500;
-  static SeqStringTheory stringTheory;
-
-  static {
-    SeqStringTheoryBuilder builder = new SeqStringTheoryBuilder();
-    builder.setAlphabetSize(STRING_ALPHABET_SIZE);
-    stringTheory = builder.theory();
-  }
-
-  static Fractions rationalTheory = Rationals$.MODULE$;
-  public static final Sort FRACTION_SORT = rationalTheory.dom();
-
+  static StringTheory stringTheory =
+      new OstrichStringTheory(toSeq(new ArrayList<Tuple2<String, Transducer>>()),
+      new OFlags(false, false, LengthOptions$.MODULE$.Auto(), false, false));
   public static final Sort STRING_SORT = stringTheory.StringSort();
   public static final Sort REGEX_SORT = stringTheory.RegexSort();
+
+  static Rationals$ rationalTheory = Rationals$.MODULE$;
+  public static final Sort FRACTION_SORT = rationalTheory.dom();
 
   @Option(secure = true, description = "log all queries as Princess-specific Scala code")
   private boolean logAllQueriesAsScala = false;
