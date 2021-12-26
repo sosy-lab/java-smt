@@ -60,15 +60,13 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
   @Override
   public int maximize(Formula objective) {
     Preconditions.checkState(!closed);
-    Z3Formula z3Objective = (Z3Formula) objective;
-    return Native.optimizeMaximize(z3context, z3optSolver, z3Objective.getFormulaInfo());
+    return Native.optimizeMaximize(z3context, z3optSolver, creator.extractInfo(objective));
   }
 
   @Override
   public int minimize(Formula objective) {
     Preconditions.checkState(!closed);
-    Z3Formula z3Objective = (Z3Formula) objective;
-    return Native.optimizeMinimize(z3context, z3optSolver, z3Objective.getFormulaInfo());
+    return Native.optimizeMinimize(z3context, z3optSolver, creator.extractInfo(objective));
   }
 
   @Override
