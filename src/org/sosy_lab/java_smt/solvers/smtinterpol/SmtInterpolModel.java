@@ -19,7 +19,9 @@ import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.model.FunctionValue.Index;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
@@ -27,19 +29,41 @@ class SmtInterpolModel extends CachingAbstractModel<Term, Sort, Script> {
 
   private final Model model;
   private final Script env;
+  private final ImmutableList<Term> assertedTerms;
 
-  SmtInterpolModel(Model pModel, FormulaCreator<Term, Sort, Script, ?> pCreator) {
+  SmtInterpolModel(
+      Model pModel,
+      FormulaCreator<Term, Sort, Script, ?> pCreator,
+      Collection<Term> pAssertedTerms) {
     super(pCreator);
     model = pModel;
     env = pCreator.getEnv();
+    assertedTerms = ImmutableList.copyOf(pAssertedTerms);
   }
 
   @Override
   protected ImmutableList<ValueAssignment> toList() {
 
+    Set<FunctionSymbol> usedSymbols = new LinkedHashSet<>();
+    for (Term assertedTerm : assertedTerms) {
+      for (Term symbol : creator.extractVariablesAndUFs(assertedTerm, true).values()) {
+        if (symbol instanceof ApplicationTerm) {
+          usedSymbols.add(((ApplicationTerm) symbol).getFunction());
+        }
+      }
+    }
+
     ImmutableSet.Builder<ValueAssignment> assignments = ImmutableSet.builder();
 
     for (FunctionSymbol symbol : model.getDefinedFunctions()) {
+
+      // SMTInterpol also reports evaluations for unused symbols, including those from different
+      // prover stacks. Thus, we ignore unused symbols. Those symbols are still shown when
+      // applying model.toString().
+      if (!usedSymbols.contains(symbol)) {
+        continue;
+      }
+
       final String name = unescape(symbol.getApplicationString());
       if (symbol.getParameterSorts().length == 0) { // simple variable or array
         Term variable = env.term(name);

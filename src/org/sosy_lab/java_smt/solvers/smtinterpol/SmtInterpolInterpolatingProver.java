@@ -131,4 +131,9 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String, S
     }
     return env.term("and", termNames.stream().map(env::term).toArray(Term[]::new));
   }
+
+  @Override
+  protected Collection<Term> getAssertedTerms() {
+    return annotatedTerms.values();
+  }
 }

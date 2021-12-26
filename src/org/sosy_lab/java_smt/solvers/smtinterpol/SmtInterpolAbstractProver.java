@@ -124,6 +124,8 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
     }
   }
 
+  protected abstract Collection<Term> getAssertedTerms();
+
   @Override
   public SmtInterpolModel getModel() {
     checkState(!closed);
@@ -139,7 +141,7 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
         throw e;
       }
     }
-    return new SmtInterpolModel(model, creator);
+    return new SmtInterpolModel(model, creator, getAssertedTerms());
   }
 
   protected static String generateTermName() {

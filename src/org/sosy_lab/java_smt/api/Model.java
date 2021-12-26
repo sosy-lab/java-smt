@@ -104,7 +104,16 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
   /** Build a list of assignments that stays valid after closing the model. */
   ImmutableList<ValueAssignment> asList();
 
-  /** Pretty-printing of the model values. */
+  /**
+   * Pretty-printing of the model values.
+   *
+   * <p>Please only use this method for debugging and not for retrieving relevant information about
+   * the model. The returned model representation is not intended for further usage like parsing,
+   * because we do not guarantee any specific format, e.g., for arrays and uninterpreted functions,
+   * and we allow the SMT solver to include arbitrary additional information about the current
+   * solver state, e.g., any available symbol in the solver, even from other provers, and temporary
+   * internal symbols.
+   */
   @Override
   String toString();
 
