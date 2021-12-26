@@ -141,8 +141,7 @@ public class UFManagerTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testDeclareAndCallUFWithIncompatibleTypesIntVsRational()
-      throws SolverException, InterruptedException {
+  public void testDeclareAndCallUFWithIncompatibleTypesIntVsRational() {
     requireIntegers();
     requireRationals();
 
