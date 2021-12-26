@@ -141,16 +141,50 @@ public class UFManagerTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testDeclareAndCallUFWithIncompatibleTypesIntVsRational() {
+  public void testDeclareAndCallUFWithIncompatibleTypesIntVsRational()
+      throws SolverException, InterruptedException {
     requireIntegers();
     requireRationals();
 
     for (String name : VALID_NAMES) {
       FunctionDeclaration<?> declaration =
           fmgr.declareUF(name, FormulaType.IntegerType, ImmutableList.of(FormulaType.IntegerType));
+
       assertThrows(
           IllegalArgumentException.class,
-          () -> mgr.makeApplication(declaration, rmgr.makeNumber(1.5)));
+          () -> mgr.makeApplication(declaration, rmgr.makeNumber(2.88)));
+      assertThrows(
+          IllegalArgumentException.class,
+          () -> mgr.makeApplication(declaration, rmgr.makeNumber(0.001)));
+      assertThrows(
+          IllegalArgumentException.class,
+          () -> mgr.makeApplication(declaration, rmgr.makeNumber(-2.88)));
+    }
+  }
+
+  @Test
+  public void testDeclareAndCallUFWithIncompatibleTypesIntVsBool() {
+    requireIntegers();
+
+    for (String name : VALID_NAMES) {
+      FunctionDeclaration<?> declaration =
+          fmgr.declareUF(name, FormulaType.IntegerType, ImmutableList.of(FormulaType.IntegerType));
+      assertThrows(
+          IllegalArgumentException.class, () -> mgr.makeApplication(declaration, bmgr.makeTrue()));
+    }
+  }
+
+  @Test
+  public void testDeclareAndCallUFWithIncompatibleTypesBoolVsInt() {
+    requireIntegers();
+    requireBooleanArgument();
+
+    for (String name : VALID_NAMES) {
+      FunctionDeclaration<?> declaration =
+          fmgr.declareUF(name, FormulaType.IntegerType, ImmutableList.of(FormulaType.BooleanType));
+      assertThrows(
+          IllegalArgumentException.class,
+          () -> mgr.makeApplication(declaration, imgr.makeNumber(1)));
     }
   }
 
@@ -184,8 +218,8 @@ public class UFManagerTest extends SolverBasedTest0 {
               FormulaType.getBitvectorTypeWithSize(4),
               ImmutableList.of(FormulaType.getBitvectorTypeWithSize(4)));
       assertThrows(
-          IllegalArgumentException.class, () -> mgr.makeApplication(declaration,
-              imgr.makeNumber(123)));
+          IllegalArgumentException.class,
+          () -> mgr.makeApplication(declaration, imgr.makeNumber(123)));
     }
   }
 
@@ -203,6 +237,21 @@ public class UFManagerTest extends SolverBasedTest0 {
       assertThrows(
           IllegalArgumentException.class,
           () -> mgr.makeApplication(declaration, rmgr.makeNumber(1.234)));
+    }
+  }
+
+  @Test
+  public void testDeclareAndCallUFWithBooleanAndBVTypes() {
+    requireBitvectors();
+
+    for (String name : VALID_NAMES) {
+      FunctionDeclaration<?> declaration =
+          fmgr.declareUF(
+              name,
+              FormulaType.getBitvectorTypeWithSize(4),
+              ImmutableList.of(FormulaType.getBitvectorTypeWithSize(1)));
+      assertThrows(
+          IllegalArgumentException.class, () -> mgr.makeApplication(declaration, bmgr.makeTrue()));
     }
   }
 
@@ -319,7 +368,7 @@ public class UFManagerTest extends SolverBasedTest0 {
     assume()
         .withMessage("Solver %s does not support boolean arguments", solverToUse())
         .that(solver)
-        .isNotEqualTo(Solvers.MATHSAT5);
+        .isNoneOf(Solvers.MATHSAT5, Solvers.PRINCESS);
   }
 
   /** utility method: create an UF from given arguments and return type and calls it. */

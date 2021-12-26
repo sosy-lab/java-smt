@@ -443,11 +443,37 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
         declaration.getArgumentTypes().size(),
         args.size());
 
+    for (int i = 0; i < args.size(); i++) {
+      checkArgument(
+          isCompatible(getFormulaType(args.get(i)), declaration.getArgumentTypes().get(i)),
+          "function application '%s' requires argument types %s, but received argument types %s",
+          declaration,
+          declaration.getArgumentTypes(),
+          Lists.transform(args, this::getFormulaType));
+    }
+
     return encapsulate(
         declaration.getType(),
         callFunctionImpl(
             ((FunctionDeclarationImpl<T, TFuncDecl>) declaration).getSolverDeclaration(),
             extractInfo(args)));
+  }
+
+  /**
+   * This function checks whether the used type of the function argument is compatible with the
+   * declared type in the function declaration.
+   *
+   * <p>Identical types are always compatible, a subtype like INT to supertype RATIONAL is also
+   * compatible. A solver-specific wrapper can override this method if it does an explicit
+   * transformation between (some) types, e.g., from BV to BOOLEAN or from BOOLEAN to INT.
+   */
+  protected boolean isCompatible(FormulaType<?> usedType, FormulaType<?> declaredType) {
+    // INT is a subtype of RATIONAL
+    if (usedType.isIntegerType() && declaredType.isRationalType()) {
+      return true;
+    }
+
+    return usedType.equals(declaredType);
   }
 
   public abstract TFormulaInfo callFunctionImpl(TFuncDecl declaration, List<TFormulaInfo> args);
