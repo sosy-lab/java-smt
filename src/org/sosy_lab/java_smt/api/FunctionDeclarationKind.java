@@ -88,6 +88,9 @@ public enum FunctionDeclarationKind {
   /** Floor operation, converts from rationals to integers, also known as {@code to_int}. */
   FLOOR,
 
+  /** Identity operation, converts from integers to rationals, also known as {@code to_real}. */
+  TO_REAL,
+
   // Simple bitvector operations
 
   /** Extraction over bitvectors. */

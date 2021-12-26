@@ -23,6 +23,7 @@ import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.logic.Theory;
+import java.util.ArrayList;
 import java.util.List;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.Formula;
@@ -334,6 +335,8 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
         return FunctionDeclarationKind.GTE;
       case "to_int":
         return FunctionDeclarationKind.FLOOR;
+      case "to_real":
+        return FunctionDeclarationKind.TO_REAL;
       default:
         // TODO: other declaration kinds!
         return FunctionDeclarationKind.OTHER;
@@ -348,7 +351,20 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
 
   @Override
   public Term callFunctionImpl(FunctionSymbol declaration, List<Term> args) {
-    return environment.term(declaration.getName(), args.toArray(new Term[0]));
+
+    // add an explicit cast from INT to RATIONAL if needed
+    final List<Term> castedArgs = new ArrayList<>();
+    for (int i = 0; i < args.size(); i++) {
+      Term arg = args.get(i);
+      Sort argSort = arg.getSort();
+      Sort paramSort = declaration.getParameterSorts()[i];
+      if (getRationalType() == paramSort && getIntegerType() == argSort) {
+        arg = environment.term("to_real", arg);
+      }
+      castedArgs.add(arg);
+    }
+
+    return environment.term(declaration.getName(), castedArgs.toArray(new Term[0]));
   }
 
   @Override
