@@ -25,6 +25,7 @@ import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment.AllSatCallback;
+import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
@@ -160,6 +161,9 @@ public class SolverAllSatTest extends SolverBasedTest0 {
     env.push(bmgr.equivalence(v1, cond1));
     env.push(bmgr.equivalence(v2, cond2));
 
+    // ((i=1) XOR (i=2)) & b1 <=> (i=1) & b2 <=> (i=2)
+    // query ALLSAT for predicates [b1, b2] --> {[b1,-b2], [-b1,b2]}
+
     TestAllSatCallback callback = new TestAllSatCallback();
 
     assertThat(env.allSat(callback, ImmutableList.of(v1, v2))).isEqualTo(EXPECTED_RESULT);
@@ -184,5 +188,67 @@ public class SolverAllSatTest extends SolverBasedTest0 {
             ImmutableList.of(ImmutableList.of(v1)),
             ImmutableList.of(ImmutableList.of(v1, v2), ImmutableList.of(v1, bmgr.not(v2))),
             ImmutableList.of(ImmutableList.of(v1, bmgr.not(v2)), ImmutableList.of(v1, v2)));
+  }
+
+  @Test
+  public void allSatTest_withQuantifier() throws SolverException, InterruptedException {
+    requireBitvectors();
+    requireQuantifiers();
+
+    assume()
+        .withMessage("solver does only partially support quantifiers")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BOOLECTOR);
+
+    if ("opt".equals(proverEnv)) {
+      assume()
+          .withMessage("solver reports a partial model when using optimization")
+          .that(solverToUse())
+          .isNotEqualTo(Solvers.Z3);
+    }
+
+    if ("itp".equals(proverEnv)) {
+      assume()
+          .withMessage("solver reports a inconclusive sat-check when using interpolation")
+          .that(solverToUse())
+          .isNotEqualTo(Solvers.PRINCESS);
+    }
+
+    // (y = 1)
+    // & (PRED1 <-> (y = 1))
+    // & (PRED3 <-> ALL x_0. (3 * x_0 != y))
+    // query ALLSAT for predicates [PRED1, PRED3] --> {[PRED1, -PRED3]}
+
+    // ugly detail in bitvector theory: 2863311531*3=1 mod 2^32,
+    // thus the quantified part from above is FALSE.
+
+    int bitsize = 32;
+    BitvectorFormula y = bvmgr.makeVariable(bitsize, "y");
+    BitvectorFormula one = bvmgr.makeBitvector(bitsize, 1);
+    BitvectorFormula three = bvmgr.makeBitvector(bitsize, 3);
+    BitvectorFormula bound = bvmgr.makeVariable(bitsize, "x_0");
+    BooleanFormula pred1 = bmgr.makeVariable("pred1");
+    BooleanFormula pred3 = bmgr.makeVariable("pred3");
+
+    BooleanFormula query =
+        bmgr.and(
+            bvmgr.equal(y, one),
+            bmgr.equivalence(pred1, bvmgr.equal(y, one)),
+            bmgr.equivalence(
+                pred3,
+                qmgr.forall(
+                    ImmutableList.of(bound),
+                    bmgr.not(bvmgr.equal(y, bvmgr.multiply(three, bound))))));
+
+    env.push(query);
+
+    assertThatFormula(query).isSatisfiable();
+
+    TestAllSatCallback callback = new TestAllSatCallback();
+
+    assertThat(env.allSat(callback, ImmutableList.of(pred1, pred3))).isEqualTo(EXPECTED_RESULT);
+
+    assertThat(callback.models)
+        .isEqualTo(ImmutableList.of(ImmutableList.of(pred1, bmgr.not(pred3))));
   }
 }

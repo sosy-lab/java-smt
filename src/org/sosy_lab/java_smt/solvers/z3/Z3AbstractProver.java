@@ -25,6 +25,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.common.ShutdownNotifier.ShutdownRequestListener;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -47,16 +49,23 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   private final @Nullable PathCounterTemplate logfile;
 
+  private final ShutdownRequestListener interruptListener;
+
   Z3AbstractProver(
       Z3FormulaCreator pCreator,
       long z3params,
       Z3FormulaManager pMgr,
       Set<ProverOptions> pOptions,
-      @Nullable PathCounterTemplate pLogfile) {
-    super(pOptions, pMgr.getBooleanFormulaManager(), pCreator.shutdownNotifier);
+      @Nullable PathCounterTemplate pLogfile,
+      ShutdownNotifier pShutdownNotifier) {
+    super(pOptions, pMgr.getBooleanFormulaManager(), pShutdownNotifier);
     creator = pCreator;
     z3context = creator.getEnv();
     z3solver = Native.mkSolver(z3context);
+
+    interruptListener = reason -> Native.solverInterrupt(z3context, z3solver);
+    shutdownNotifier.register(interruptListener);
+
     logfile = pLogfile;
     mgr = pMgr;
     Native.solverIncRef(z3context, z3solver);
@@ -234,6 +243,8 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
         pop();
       }
       Native.solverDecRef(z3context, z3solver);
+
+      shutdownNotifier.unregister(interruptListener);
 
       closed = true;
     }

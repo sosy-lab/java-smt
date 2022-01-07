@@ -11,6 +11,8 @@ package org.sosy_lab.java_smt.test;
 import static org.junit.Assert.assertThrows;
 
 import com.google.common.truth.TruthJUnit;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.function.Supplier;
 import org.junit.Test;
@@ -27,12 +29,26 @@ import org.sosy_lab.java_smt.api.Tactic;
 @RunWith(Parameterized.class)
 public class TimeoutTest extends SolverBasedTest0 {
 
-  @Parameters(name = "{0}")
-  public static Object[] getAllSolvers() {
-    return Solvers.values();
+  private static final int TIMOUT_MILLISECONDS = 10000;
+
+  private static final int[] DELAYS = {1, 2, 5, 10, 20, 50, 100};
+
+  @Parameters(name = "{0} with delay {1}")
+  public static List<Object[]> getAllSolvers() {
+    List<Object[]> lst = new ArrayList<>();
+    for (Solvers solver : Solvers.values()) {
+      for (int delay : DELAYS) {
+        lst.add(new Object[] {solver, delay});
+      }
+    }
+    return lst;
   }
 
-  @Parameter public Solvers solver;
+  @Parameter(0)
+  public Solvers solver;
+
+  @Parameter(1)
+  public int delay;
 
   @Override
   protected Solvers solverToUse() {
@@ -53,76 +69,65 @@ public class TimeoutTest extends SolverBasedTest0 {
     assertThrows(msg, InterruptedException.class, () -> mgr.applyTactic(test, Tactic.NNF));
   }
 
-  @Test
+  @Test(timeout = TIMOUT_MILLISECONDS)
   public void testProverTimeoutInt() throws InterruptedException {
     requireIntegers();
     TruthJUnit.assume()
         .withMessage(solverToUse() + " does not support interruption")
         .that(solverToUse())
-        .isNoneOf(Solvers.PRINCESS, Solvers.BOOLECTOR, Solvers.YICES2);
+        .isNoneOf(Solvers.PRINCESS, Solvers.BOOLECTOR);
     testBasicProverTimeoutInt(() -> context.newProverEnvironment());
   }
 
-  @Test
+  @Test(timeout = TIMOUT_MILLISECONDS)
   public void testProverTimeoutBv() throws InterruptedException {
     requireBitvectors();
     TruthJUnit.assume()
         .withMessage(solverToUse() + " does not support interruption")
         .that(solverToUse())
-        .isNoneOf(Solvers.PRINCESS, Solvers.YICES2);
+        .isNotEqualTo(Solvers.PRINCESS);
     testBasicProverTimeoutBv(() -> context.newProverEnvironment());
   }
 
-  @Test
+  @Test(timeout = TIMOUT_MILLISECONDS)
   public void testInterpolationProverTimeout() throws InterruptedException {
     requireInterpolation();
     requireIntegers();
     TruthJUnit.assume()
         .withMessage(solverToUse() + " does not support interruption")
         .that(solverToUse())
-        .isNoneOf(Solvers.PRINCESS, Solvers.BOOLECTOR, Solvers.YICES2);
+        .isNoneOf(Solvers.PRINCESS, Solvers.BOOLECTOR);
     testBasicProverTimeoutInt(() -> context.newProverEnvironmentWithInterpolation());
   }
 
-  @Test
+  @Test(timeout = TIMOUT_MILLISECONDS)
   public void testOptimizationProverTimeout() throws InterruptedException {
     requireOptimization();
     requireIntegers();
     testBasicProverTimeoutInt(() -> context.newOptimizationProverEnvironment());
   }
 
-  @SuppressWarnings("CheckReturnValue")
   private void testBasicProverTimeoutInt(Supplier<BasicProverEnvironment<?>> proverConstructor)
       throws InterruptedException {
     HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
-    BooleanFormula instance = gen.generate(20);
-    Thread t =
-        new Thread(
-            () -> {
-              try {
-                Thread.sleep(1);
-                shutdownManager.requestShutdown("Shutdown Request");
-              } catch (InterruptedException pE) {
-                throw new UnsupportedOperationException("Unexpected interrupt");
-              }
-            });
-    try (BasicProverEnvironment<?> pe = proverConstructor.get()) {
-      pe.push(instance);
-      t.start();
-      assertThrows(InterruptedException.class, pe::isUnsat);
-    }
+    testBasicProverTimeout(proverConstructor, gen.generate(100));
   }
 
-  @SuppressWarnings("CheckReturnValue")
   private void testBasicProverTimeoutBv(Supplier<BasicProverEnvironment<?>> proverConstructor)
       throws InterruptedException {
     HardBitvectorFormulaGenerator gen = new HardBitvectorFormulaGenerator(bvmgr, bmgr);
-    BooleanFormula instance = gen.generate(20);
+    testBasicProverTimeout(proverConstructor, gen.generate(100));
+  }
+
+  @SuppressWarnings("CheckReturnValue")
+  private void testBasicProverTimeout(
+      Supplier<BasicProverEnvironment<?>> proverConstructor, BooleanFormula instance)
+      throws InterruptedException {
     Thread t =
         new Thread(
             () -> {
               try {
-                Thread.sleep(1);
+                Thread.sleep(delay);
                 shutdownManager.requestShutdown("Shutdown Request");
               } catch (InterruptedException pE) {
                 throw new UnsupportedOperationException("Unexpected interrupt");

@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.boolector;
 
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
@@ -21,7 +22,8 @@ class BoolectorTheoremProver extends BoolectorAbstractProver<Void> implements Pr
       BoolectorFormulaCreator creator,
       long btor,
       ShutdownNotifier pShutdownNotifier,
-      Set<ProverOptions> pOptions) {
-    super(manager, creator, btor, pShutdownNotifier, pOptions);
+      Set<ProverOptions> pOptions,
+      AtomicBoolean pIsAnyStackAlive) {
+    super(manager, creator, btor, pShutdownNotifier, pOptions, pIsAnyStackAlive);
   }
 }

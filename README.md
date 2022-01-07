@@ -12,8 +12,7 @@ SPDX-License-Identifier: Apache-2.0
 
 [![Build Status](https://gitlab.com/sosy-lab/software/java-smt/badges/master/pipeline.svg)](https://gitlab.com/sosy-lab/software/java-smt/pipelines)
 [![Build Status on Windows](https://ci.appveyor.com/api/projects/status/uehe0fwa8bil8sha/branch/master?svg=true)](https://ci.appveyor.com/project/PhilippWendler/java-smt/branch/master)
-[![Code Quality](https://api.codacy.com/project/badge/Grade/94b27e1928034a4f9d91faad82a0b870)](https://www.codacy.com/app/PhilippWendler/java-smt?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=sosy-lab/java-smt&amp;utm_campaign=Badge_Grade)
-[![Test Coverage](https://api.codacy.com/project/badge/Coverage/94b27e1928034a4f9d91faad82a0b870)](https://www.codacy.com/app/PhilippWendler/java-smt?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=sosy-lab/java-smt&amp;utm_campaign=Badge_Coverage)
+![Test Coverage](https://gitlab.com/sosy-lab/software/java-smt/badges/master/coverage.svg)
 [![Apache 2.0 License](https://img.shields.io/badge/license-Apache--2-brightgreen.svg?style=flat)](https://www.apache.org/licenses/LICENSE-2.0)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.sosy-lab/java-smt/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.sosy-lab/java-smt)
 
@@ -34,8 +33,11 @@ to integer ones at _compile_ time) sometimes at the cost of verbosity.
 
 #### References
 
+- D. Baier, D. Beyer, and K. Friedberger.
+  [**JavaSMT 3: Interacting with SMT Solvers in Java**](https://link.springer.com/content/pdf/10.1007/978-3-030-81688-9_9.pdf).
+  In Proc. CAV, LNCS 12760, pages 1-13, 2021. Springer.
 - E. G. Karpenkov, K. Friedberger, and D. Beyer.
-  [**JavaSMT: A Unified Interface for SMT Solvers in Java.**](https://www.sosy-lab.org/research/pub/2016-VSTTE.JavaSMT_A_Unified_Interface_For_SMT_Solvers_in_Java.pdf)
+  [**JavaSMT: A Unified Interface for SMT Solvers in Java**](https://www.sosy-lab.org/research/pub/2016-VSTTE.JavaSMT_A_Unified_Interface_For_SMT_Solvers_in_Java.pdf).
   In Proc. VSTTE, LNCS 9971, pages 139–148, 2016. Springer.
 
 ### Feature overview
@@ -44,11 +46,15 @@ JavaSMT can express formulas in the following theories:
  - Integer
  - Rational
  - Bitvector
- - Floating point
+ - Floating Point
  - Array
  - Uninterpreted Function
+ - String and RegEx
 
-Currently JavaSMT supports several SMT solvers (see [Getting Started](doc/Getting-started.md)  for installation):
+The concrete support for a certain theory depends on the underlying SMT solver.
+Only a few SMT solvers provide support for theories like Arrays, Floating Point, String or RegEx.
+
+Currently JavaSMT supports several SMT solvers (see [Getting Started](doc/Getting-started.md) for installation):
 
 | SMT Solver | Linux64 | Windows64 | MacOS | Description |
 | --- |:---:|:---:|:---:|:--- |
@@ -77,7 +83,7 @@ We aim for supporting more important features, more SMT solvers, and more system
 If something specific is missing, please [look for or file an issue](https://github.com/sosy-lab/java-smt/issues).
 
 #### Multithreading Support
-The solvers Z3(w and w/o Optimization), SMTInterpol, Princess, MathSAT5, Boolector and CVC4 support multithreading,
+The solvers Z3 (w and w/o Optimization), SMTInterpol, Princess, MathSAT5, Boolector and CVC4 support multithreading,
 provided that different threads use different contexts,
 and _all_ operations on a single context are performed from a single thread.
 Interruption using [ShutdownNotifier][] may be used to interrupt a

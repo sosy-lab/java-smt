@@ -24,10 +24,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
-import org.sosy_lab.common.ShutdownNotifier.ShutdownRequestListener;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
@@ -36,34 +34,13 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
+import org.sosy_lab.java_smt.basicimpl.ShutdownHook;
 
 class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     implements ProverEnvironment, BasicProverEnvironment<Void> {
 
-  private final class ShutdownHook implements ShutdownRequestListener {
-    private final AtomicBoolean isActiveHook = new AtomicBoolean(true);
-
-    // Due to a small delay in CVC4, smtEngine.interrupt() has no effect when it is called too soon.
-    // For example in the case of smtEngine.checkSat(), this is if interrupt() is called
-    // before the line "Result result = d_propEngine->checkSat();" is called in the CVC4 C++
-    // method SmtEngine::check(), which seems to take about 10 ms. When this is fixed in
-    // CVC4, we can remove the Thread.sleep(10), the AtomicBoolean interrupted and the while
-    // loop surrounding this block.
-    @Override
-    public void shutdownRequested(String reason) {
-      while (isActiveHook.get()) { // flag is reset after leaving isUnsat()
-        smtEngine.interrupt();
-        try {
-          Thread.sleep(10);
-        } catch (InterruptedException e) {
-          // ignore
-        }
-      }
-    }
-  }
-
   private final CVC4FormulaCreator creator;
-  private SmtEngine smtEngine; // final except for SL theory
+  SmtEngine smtEngine; // final except for SL theory
   private boolean changedSinceLastSatQuery = false;
 
   /** Tracks formulas on the stack, needed for model generation. */
@@ -119,6 +96,11 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     // smtEngine.setOption("produce-unsat-cores", new SExpr(true));
     smtEngine.setOption("output-language", new SExpr("smt2"));
     smtEngine.setOption("random-seed", new SExpr(randomSeed));
+    // Set Strings option to enable all String features (such as lessOrEquals)
+    smtEngine.setOption("strings-exp", new SExpr(true));
+    // Enable more complete quantifier solving (for more information see
+    // CVC4QuantifiedFormulaManager)
+    smtEngine.setOption("full-saturate-quant", new SExpr(true));
   }
 
   protected void setOptionForIncremental() {
@@ -220,6 +202,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   }
 
   @Override
+  @SuppressWarnings("try")
   public boolean isUnsat() throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
     closeAllModels();
@@ -231,16 +214,11 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     }
 
     Result result;
-    ShutdownHook hook = new ShutdownHook();
-    try {
-      shutdownNotifier.register(hook);
+    try (ShutdownHook hook = new ShutdownHook(shutdownNotifier, smtEngine::interrupt)) {
       shutdownNotifier.shutdownIfNecessary();
       result = smtEngine.checkSat();
-    } finally {
-      hook.isActiveHook.set(false);
-      shutdownNotifier.unregister(hook);
-      shutdownNotifier.shutdownIfNecessary();
     }
+    shutdownNotifier.shutdownIfNecessary();
     return convertSatResult(result);
   }
 

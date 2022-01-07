@@ -16,6 +16,7 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -28,6 +29,9 @@ import org.sosy_lab.java_smt.solvers.boolector.BtorJNI.TerminationCallback;
 abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   // BoolectorAbstractProver<E, AF> extends AbstractProverWithAllSat<E>
   // AF = assertedFormulas; E = ?
+
+  /** Boolector does not support multiple solver stacks. */
+  private final AtomicBoolean isAnyStackAlive;
 
   private final long btor;
   private final BoolectorFormulaManager manager;
@@ -43,20 +47,26 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
       BoolectorFormulaCreator creator,
       long btor,
       ShutdownNotifier pShutdownNotifier,
-      Set<ProverOptions> pOptions) {
+      Set<ProverOptions> pOptions,
+      AtomicBoolean pIsAnyStackAlive) {
     super(pOptions, manager.getBooleanFormulaManager(), pShutdownNotifier);
     this.manager = manager;
     this.creator = creator;
     this.btor = btor;
     terminationCallback = shutdownNotifier::shouldShutdown;
     terminationCallbackHelper = addTerminationCallback();
+
+    isAnyStackAlive = pIsAnyStackAlive;
+    // avoid dual stack usage
+    Preconditions.checkState(
+        !isAnyStackAlive.getAndSet(true),
+        "Boolector does not support the usage of multiple "
+            + "solver stacks at the same time. Please close any existing solver stack.");
   }
 
   @Override
   public void close() {
     if (!closed) {
-      // Debug if btor instance was terminated using the termination callback (1==true)
-      // System.out.println("did it terminate? = " + BtorJNI.boolector_terminate(btor));
       // Free resources of callback
       BtorJNI.boolector_free_termination(terminationCallbackHelper);
       BtorJNI.boolector_pop(manager.getEnvironment(), assertedFormulas.size());
@@ -65,6 +75,7 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
       // Wait till we have visitor/toList, after that we can delete here
       // BtorJNI.boolector_delete(btor);
       closed = true;
+      Preconditions.checkState(isAnyStackAlive.getAndSet(false));
     }
   }
 

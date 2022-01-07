@@ -14,8 +14,9 @@ import com.google.common.base.Splitter.MapSplitter;
 import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -63,6 +64,7 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
   private final BoolectorFormulaCreator creator;
   private final ShutdownNotifier shutdownNotifier;
   private boolean closed = false;
+  private final AtomicBoolean isAnyStackAlive = new AtomicBoolean(false);
 
   BoolectorSolverContext(
       BoolectorFormulaManager pManager,
@@ -78,10 +80,12 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
       Configuration config,
       ShutdownNotifier pShutdownNotifier,
       @Nullable PathCounterTemplate solverLogfile,
-      long randomSeed)
+      long randomSeed,
+      Consumer<String> pLoader)
       throws InvalidConfigurationException {
 
-    NativeLibraries.loadLibrary("boolector");
+    pLoader.accept("boolector");
+
     final long btor = BtorJNI.boolector_new();
     setOptions(config, solverLogfile, randomSeed, btor);
 
@@ -89,7 +93,7 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
     BoolectorUFManager functionTheory = new BoolectorUFManager(creator);
     BoolectorBooleanFormulaManager booleanTheory = new BoolectorBooleanFormulaManager(creator);
     BoolectorBitvectorFormulaManager bitvectorTheory =
-        new BoolectorBitvectorFormulaManager(creator);
+        new BoolectorBitvectorFormulaManager(creator, booleanTheory);
     BoolectorQuantifiedFormulaManager quantifierTheory =
         new BoolectorQuantifiedFormulaManager(creator);
     BoolectorArrayFormulaManager arrayTheory = new BoolectorArrayFormulaManager(creator);
@@ -122,7 +126,8 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> pOptions) {
     Preconditions.checkState(!closed, "solver context is already closed");
     return new ReusableStackTheoremProver(
-        new BoolectorTheoremProver(manager, creator, creator.getEnv(), shutdownNotifier, pOptions));
+        new BoolectorTheoremProver(
+            manager, creator, creator.getEnv(), shutdownNotifier, pOptions, isAnyStackAlive));
   }
 
   @Override
@@ -160,6 +165,8 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
     BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_SEED.getValue(), randomSeed);
     // Dump in SMT-LIB2 Format
     BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_OUTPUT_FORMAT.getValue(), 2);
+    // Stop Boolector from rewriting formulas in outputs
+    BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_REWRITE_LEVEL.getValue(), 0);
 
     setFurtherOptions(btor, settings.furtherOptions);
 

@@ -89,12 +89,12 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
         ImmutableList.of(YVAL_SCALAR, YVAL_FUNCTION, YVAL_MAPPING, YVAL_UNKNOWN, YVAL_TUPLE);
     ImmutableList.Builder<ValueAssignment> assignments = ImmutableList.builder();
     int[] termsInModel = yices_def_terms(model);
-    for (int i = 0; i < termsInModel.length; i++) {
-      int[] yvalTag = yices_get_value(model, termsInModel[i]);
+    for (int term : termsInModel) {
+      int[] yvalTag = yices_get_value(model, term);
       if (!complex.contains(yvalTag[1])) { // TODO Switch with other if for less complex check?
-        assignments.add(getSimpleAssignment(termsInModel[i]));
+        assignments.add(getSimpleAssignment(term));
       } else if (yvalTag[1] == YVAL_FUNCTION) {
-        assignments.addAll(getFunctionAssignment(termsInModel[i], yvalTag));
+        assignments.addAll(getFunctionAssignment(term, yvalTag));
       } else {
         throw new UnsupportedOperationException("YVAL with unexpected tag: " + yvalTag[1]);
       }

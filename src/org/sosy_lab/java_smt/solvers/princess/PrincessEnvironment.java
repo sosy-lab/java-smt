@@ -8,11 +8,11 @@
 
 package org.sosy_lab.java_smt.solvers.princess;
 
-import static com.google.common.collect.Iterables.getOnlyElement;
 import static scala.collection.JavaConverters.asJava;
 import static scala.collection.JavaConverters.collectionAsScalaIterableConverter;
 
 import ap.SimpleAPI;
+import ap.parser.BooleanCompactifier;
 import ap.parser.Environment.EnvironmentException;
 import ap.parser.IAtom;
 import ap.parser.IConstant;
@@ -23,17 +23,23 @@ import ap.parser.IFunction;
 import ap.parser.IIntFormula;
 import ap.parser.ITerm;
 import ap.parser.Parser2InputAbsy.TranslationException;
+import ap.parser.PartialEvaluator;
 import ap.parser.SMTLineariser;
 import ap.parser.SMTParser2InputAbsy.SMTFunctionType;
 import ap.parser.SMTParser2InputAbsy.SMTType;
 import ap.terfor.ConstantTerm;
-import ap.theories.SimpleArray;
+import ap.terfor.preds.Predicate;
+import ap.theories.ExtArray;
+import ap.theories.bitvectors.ModuloArithmetic;
 import ap.types.Sort;
 import ap.types.Sort$;
+import ap.types.Sort.MultipleValueBool$;
 import ap.util.Debug;
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -41,17 +47,18 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeMap;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
@@ -62,9 +69,11 @@ import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.PathCounterTemplate;
+import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import scala.Tuple2;
-import scala.Tuple3;
+import scala.Tuple4;
 import scala.collection.immutable.Seq;
 
 /**
@@ -81,6 +90,13 @@ class PrincessEnvironment {
           "The number of atoms a term has to have before"
               + " it gets abbreviated if there are more identical terms.")
   private int minAtomsForAbbreviation = 100;
+
+  @Option(
+      secure = true,
+      description =
+          "Enable additional assertion checks within Princess. "
+              + "The main usage is debugging. This option can cause a performance overhead.")
+  private boolean enableAssertions = false;
 
   public static final Sort BOOL_SORT = Sort$.MODULE$.Bool();
   public static final Sort INTEGER_SORT = Sort.Integer$.MODULE$;
@@ -108,8 +124,8 @@ class PrincessEnvironment {
   private final ShutdownNotifier shutdownNotifier;
 
   /**
-   * The wrapped API is the first created API. It will never be used outside of this class and never
-   * be closed. If a variable is declared, it is declared in the first api, then copied into all
+   * The wrapped API is the first created API. It will never be used outside this class and never be
+   * closed. If a variable is declared, it is declared in the first api, then copied into all
    * registered APIs. Each API has its own stack for formulas.
    */
   private final SimpleAPI api;
@@ -185,14 +201,11 @@ class PrincessEnvironment {
       scalaDumpBasename = logPath.getFileName().toString();
     }
 
-    // We enable assertions because typically we use the "assertionless" JAR where they have no
-    // effect anyway, but if we use the JAR with assertions we want them to be enabled.
-    // The constructor parameter to SimpleAPI affects only part of the assertions.
-    Debug.enableAllAssertions(true);
+    Debug.enableAllAssertions(enableAssertions);
 
     final SimpleAPI newApi =
         SimpleAPI.apply(
-            true, // enableAssert, see above
+            enableAssertions, // enableAssert, see above
             false, // no sanitiseNames, because variable names may contain chars like "@" and ":".
             smtDumpBasename != null, // dumpSMT
             smtDumpBasename, // smtDumpBasename
@@ -212,7 +225,7 @@ class PrincessEnvironment {
   }
 
   private File getAbsoluteParent(Path path) {
-    return Optional.ofNullable(path.getParent()).orElse(Paths.get(".")).toAbsolutePath().toFile();
+    return Optional.ofNullable(path.getParent()).orElse(Path.of(".")).toAbsolutePath().toFile();
   }
 
   int getMinAtomsForAbbreviation() {
@@ -236,19 +249,20 @@ class PrincessEnvironment {
 
   public List<? extends IExpression> parseStringToTerms(String s, PrincessFormulaCreator creator) {
 
-    Tuple3<
-            scala.collection.immutable.Seq<IFormula>,
+    Tuple4<
+            Seq<IFormula>,
             scala.collection.immutable.Map<IFunction, SMTFunctionType>,
-            scala.collection.immutable.Map<ConstantTerm, SMTType>>
-        triple;
+            scala.collection.immutable.Map<ConstantTerm, SMTType>,
+            scala.collection.immutable.Map<Predicate, SMTFunctionType>>
+        parserResult;
 
     try {
-      triple = extractFromSTMLIB(s);
+      parserResult = extractFromSTMLIB(s);
     } catch (TranslationException | EnvironmentException nested) {
       throw new IllegalArgumentException(nested);
     }
 
-    List<? extends IExpression> formulas = asJava(triple._1());
+    final List<IFormula> formulas = asJava(parserResult._1());
 
     ImmutableSet.Builder<IExpression> declaredFunctions = ImmutableSet.builder();
     for (IExpression f : formulas) {
@@ -256,7 +270,7 @@ class PrincessEnvironment {
     }
     for (IExpression var : declaredFunctions.build()) {
       if (var instanceof IConstant) {
-        sortedVariablesCache.put(var.toString(), (ITerm) var);
+        sortedVariablesCache.put(((IConstant) var).c().name(), (ITerm) var);
         addSymbol((IConstant) var);
       } else if (var instanceof IAtom) {
         boolVariablesCache.put(((IAtom) var).pred().name(), (IFormula) var);
@@ -279,14 +293,37 @@ class PrincessEnvironment {
    */
   /* EnvironmentException is not unused, but the Java compiler does not like Scala. */
   @SuppressWarnings("unused")
-  private Tuple3<
+  private Tuple4<
           Seq<IFormula>,
           scala.collection.immutable.Map<IFunction, SMTFunctionType>,
-          scala.collection.immutable.Map<ConstantTerm, SMTType>>
+          scala.collection.immutable.Map<ConstantTerm, SMTType>,
+          scala.collection.immutable.Map<Predicate, SMTFunctionType>>
       extractFromSTMLIB(String s) throws EnvironmentException, TranslationException {
-    return api.extractSMTLIBAssertionsSymbols(new StringReader(s));
+    // replace let-terms and function definitions by their full term.
+    final boolean fullyInlineLetsAndFunctions = true;
+    return api.extractSMTLIBAssertionsSymbols(new StringReader(s), fullyInlineLetsAndFunctions);
   }
 
+  /**
+   * Utility helper method to hide a checked exception as RuntimeException.
+   *
+   * <p>The generic E simulates a RuntimeException at compile time and lets us throw the correct
+   * Exception at run time.
+   */
+  @SuppressWarnings("unchecked")
+  private static <E extends Throwable> void throwCheckedAsUnchecked(Throwable e) throws E {
+    throw (E) e;
+  }
+
+  /**
+   * This method dumps a formula as SMTLIB2.
+   *
+   * <p>We avoid redundant sub-formulas by replacing them with abbreviations. The replacement is
+   * done "once" when calling this method.
+   *
+   * <p>We return an {@link Appender} to avoid storing larger Strings in memory. We sort the symbols
+   * and abbreviations for the export only "on demand".
+   */
   public Appender dumpFormula(IFormula formula, final PrincessFormulaCreator creator) {
     // remove redundant expressions
     // TODO do we want to remove redundancy completely (as checked in the unit
@@ -301,89 +338,150 @@ class PrincessEnvironment {
 
       @Override
       public void appendTo(Appendable out) throws IOException {
-        // allVars needs to be mutable, but declaredFunctions should have deterministic order
-        Set<IExpression> allVars =
-            ImmutableSet.copyOf(creator.extractVariablesAndUFs(lettedFormula, true).values());
-        Deque<IExpression> declaredFunctions = new ArrayDeque<>(allVars);
-        allVars = new HashSet<>(allVars);
-
-        Set<String> doneFunctions = new HashSet<>();
-        Set<String> todoAbbrevs = new HashSet<>();
-
-        while (!declaredFunctions.isEmpty()) {
-          IExpression var = declaredFunctions.poll();
-          String name = getName(var);
-
-          // we don't want to declare variables twice, so doublecheck
-          // if we have already found the current variable
-          if (doneFunctions.contains(name)) {
-            continue;
-          }
-          doneFunctions.add(name);
-
-          // we do only want to add declare-funs for things we really declared
-          // the rest is done afterwards
-          if (name.startsWith("abbrev_")) {
-            todoAbbrevs.add(name);
-            Set<IExpression> varsFromAbbrev =
-                ImmutableSet.copyOf(
-                    creator.extractVariablesAndUFs(abbrevMap.get(var), true).values());
-            Sets.difference(varsFromAbbrev, allVars).forEach(declaredFunctions::push);
-            allVars.addAll(varsFromAbbrev);
+        try {
+          appendTo0(out);
+        } catch (scala.MatchError e) {
+          // exception might be thrown in case of interrupt, then we wrap it in an interrupt.
+          if (shutdownNotifier.shouldShutdown()) {
+            InterruptedException interrupt = new InterruptedException();
+            interrupt.addSuppressed(e);
+            throwCheckedAsUnchecked(interrupt);
           } else {
-            out.append("(declare-fun ").append(SMTLineariser.quoteIdentifier(name));
-
-            // function parameters
-            out.append(" (");
-            if (var instanceof IFunApp) {
-              IFunApp function = (IFunApp) var;
-              Iterator<ITerm> args = asJava(function.args()).iterator();
-              while (args.hasNext()) {
-                args.next();
-                // Princess does only support IntegerFormulas in UIFs we don't need
-                // to check the type here separately
-                if (args.hasNext()) {
-                  out.append("Int ");
-                } else {
-                  out.append("Int");
-                }
-              }
-            }
-
-            out.append(") ");
-            out.append(getType(var));
-            out.append(")\n");
+            // simply re-throw exception
+            throw e;
           }
         }
+      }
 
-        // now as everything we know from the formula is declared we have to add
-        // the abbreviations, too
-        for (Map.Entry<IExpression, IExpression> entry : abbrevMap.entrySet()) {
-          IExpression abbrev = entry.getKey();
-          IExpression fullFormula = entry.getValue();
-          String name =
-              getName(getOnlyElement(creator.extractVariablesAndUFs(abbrev, true).values()));
+      private void appendTo0(Appendable out) throws IOException {
+        Set<IExpression> allVars =
+            new LinkedHashSet<>(creator.extractVariablesAndUFs(lettedFormula, true).values());
 
-          // only add the necessary abbreviations
-          if (!todoAbbrevs.contains(name)) {
-            continue;
-          }
+        // We use TreeMaps for deterministic/alphabetic ordering.
+        // For abbreviations, we use the ordering, but dump nested abbreviations/dependencies first.
+        Map<String, IExpression> symbols = new TreeMap<>();
+        Map<String, IFunApp> ufs = new TreeMap<>();
+        Map<String, IExpression> usedAbbrevs = new TreeMap<>();
 
-          out.append("(define-fun ").append(SMTLineariser.quoteIdentifier(name));
+        collectAllSymbolsAndAbbreviations(allVars, symbols, ufs, usedAbbrevs);
 
-          // the type of each abbreviation
-          if (fullFormula instanceof IFormula) {
-            out.append(" () Bool ");
-          } else if (fullFormula instanceof ITerm) {
-            out.append(" () Int ");
-          }
+        // declare normal symbols
+        for (Entry<String, IExpression> symbol : symbols.entrySet()) {
+          out.append(
+              String.format(
+                  "(declare-fun %s () %s)%n",
+                  SMTLineariser.quoteIdentifier(symbol.getKey()),
+                  getFormulaType(symbol.getValue()).toSMTLIBString()));
+        }
 
-          // the abbreviated formula
-          out.append(SMTLineariser.asString(fullFormula)).append(" )\n");
+        // declare UFs
+        for (Entry<String, IFunApp> function : ufs.entrySet()) {
+          List<String> argSorts =
+              Lists.transform(
+                  asJava(function.getValue().args()), a -> getFormulaType(a).toSMTLIBString());
+          out.append(
+              String.format(
+                  "(declare-fun %s (%s) %s)%n",
+                  SMTLineariser.quoteIdentifier(function.getKey()),
+                  Joiner.on(" ").join(argSorts),
+                  getFormulaType(function.getValue()).toSMTLIBString()));
+        }
+
+        // now every symbol from the formula or from abbreviations are declared,
+        // let's add the abbreviations, too.
+        for (String abbrev : getOrderedAbbreviations(usedAbbrevs)) {
+          IExpression abbrevFormula = usedAbbrevs.get(abbrev);
+          IExpression fullFormula = abbrevMap.get(abbrevFormula);
+          out.append(
+              String.format(
+                  "(define-fun %s () %s %s)%n",
+                  SMTLineariser.quoteIdentifier(abbrev),
+                  getFormulaType(fullFormula).toSMTLIBString(),
+                  SMTLineariser.asString(fullFormula)));
         }
 
         // now add the final assert
         out.append("(assert ").append(SMTLineariser.asString(lettedFormula)).append(')');
+      }
+
+      /**
+       * determine all used symbols and all used abbreviations by traversing the abbreviations
+       * transitively.
+       *
+       * @param allVars will be updated with further symbols and UFs.
+       * @param symbols will be updated with all found symbols.
+       * @param ufs will be updated with all found UFs.
+       * @param abbrevs will be updated with all found abbreviations.
+       */
+      private void collectAllSymbolsAndAbbreviations(
+          final Set<IExpression> allVars,
+          final Map<String, IExpression> symbols,
+          final Map<String, IFunApp> ufs,
+          final Map<String, IExpression> abbrevs) {
+        final Deque<IExpression> waitlistSymbols = new ArrayDeque<>(allVars);
+        final Set<String> seenSymbols = new HashSet<>();
+        while (!waitlistSymbols.isEmpty()) {
+          IExpression var = waitlistSymbols.poll();
+          String name = getName(var);
+
+          // we don't want to declare variables twice
+          if (!seenSymbols.add(name)) {
+            continue;
+          }
+
+          if (isAbbreviation(var)) {
+            Preconditions.checkState(!abbrevs.containsKey(name));
+            abbrevs.put(name, var);
+            // for abbreviations, we go deeper and analyse the abbreviated formula.
+            Set<IExpression> varsFromAbbrev = getVariablesFromAbbreviation(var);
+            Sets.difference(varsFromAbbrev, allVars).forEach(waitlistSymbols::push);
+            allVars.addAll(varsFromAbbrev);
+          } else if (var instanceof IFunApp) {
+            Preconditions.checkState(!ufs.containsKey(name));
+            ufs.put(name, (IFunApp) var);
+          } else {
+            Preconditions.checkState(!symbols.containsKey(name));
+            symbols.put(name, var);
+          }
+        }
+      }
+
+      /**
+       * Abbreviations can be nested, and thus we need to sort them. The returned list (or iterable)
+       * contains each used abbreviation exactly once. Abbreviations with no dependencies come
+       * first, more complex ones later.
+       */
+      private Iterable<String> getOrderedAbbreviations(Map<String, IExpression> usedAbbrevs) {
+        ArrayDeque<String> waitlist = new ArrayDeque<>(usedAbbrevs.keySet());
+        Set<String> orderedAbbreviations = new LinkedHashSet<>();
+        while (!waitlist.isEmpty()) {
+          String abbrev = waitlist.removeFirst();
+          boolean allDependenciesFinished = true;
+          for (IExpression var : getVariablesFromAbbreviation(usedAbbrevs.get(abbrev))) {
+            String name = getName(var);
+            if (isAbbreviation(var)) {
+              if (!orderedAbbreviations.contains(name)) {
+                allDependenciesFinished = false;
+                waitlist.addLast(name); // part 1: add dependency for later
+              }
+            }
+          }
+          if (allDependenciesFinished) {
+            orderedAbbreviations.add(abbrev);
+          } else {
+            waitlist.addLast(abbrev); // part 2: add again for later
+          }
+        }
+        return orderedAbbreviations;
+      }
+
+      private boolean isAbbreviation(IExpression symbol) {
+        return abbrevMap.containsKey(symbol);
+      }
+
+      private Set<IExpression> getVariablesFromAbbreviation(IExpression var) {
+        return ImmutableSet.copyOf(
+            creator.extractVariablesAndUFs(abbrevMap.get(var), true).values());
       }
     };
   }
@@ -403,16 +501,57 @@ class PrincessEnvironment {
     throw new IllegalArgumentException("The given parameter is no variable or function");
   }
 
-  private static String getType(IExpression var) {
-    if (var instanceof IFormula) {
-      return "Bool";
-
-      // functions are included here, they cannot be handled separate for princess
-    } else if (var instanceof ITerm) {
-      return "Int";
+  static FormulaType<?> getFormulaType(IExpression pFormula) {
+    if (pFormula instanceof IFormula) {
+      return FormulaType.BooleanType;
+    } else if (pFormula instanceof ITerm) {
+      final Sort sort = Sort$.MODULE$.sortOf((ITerm) pFormula);
+      try {
+        return getFormulaTypeFromSort(sort);
+      } catch (IllegalArgumentException e) {
+        // add more info about the formula, then rethrow
+        throw new IllegalArgumentException(
+            String.format(
+                "Unknown formula type '%s' for formula '%s'.", pFormula.getClass(), pFormula),
+            e);
+      }
     }
+    throw new IllegalArgumentException(
+        String.format(
+            "Unknown formula type '%s' for formula '%s'.", pFormula.getClass(), pFormula));
+  }
 
-    throw new IllegalArgumentException("The given parameter is no variable or function");
+  private static FormulaType<?> getFormulaTypeFromSort(final Sort sort) {
+    if (sort == PrincessEnvironment.BOOL_SORT) {
+      return FormulaType.BooleanType;
+    } else if (sort == PrincessEnvironment.INTEGER_SORT) {
+      return FormulaType.IntegerType;
+    } else if (sort instanceof ExtArray.ArraySort) {
+      Seq<Sort> indexSorts = ((ExtArray.ArraySort) sort).theory().indexSorts();
+      Sort elementSort = ((ExtArray.ArraySort) sort).theory().objSort();
+      assert indexSorts.iterator().size() == 1 : "unexpected index type in Array type:" + sort;
+      // assert indexSorts.size() == 1; // TODO Eclipse does not like simpler code.
+      return new ArrayFormulaType<>(
+          getFormulaTypeFromSort(indexSorts.iterator().next()), // get single index-sort
+          getFormulaTypeFromSort(elementSort));
+    } else if (sort instanceof MultipleValueBool$) {
+      return FormulaType.BooleanType;
+    } else {
+      scala.Option<Object> bitWidth = getBitWidth(sort);
+      if (bitWidth.isDefined()) {
+        return FormulaType.getBitvectorTypeWithSize((Integer) bitWidth.get());
+      }
+    }
+    throw new IllegalArgumentException(
+        String.format("Unknown formula type '%s' for sort '%s'.", sort.getClass(), sort));
+  }
+
+  static scala.Option<Object> getBitWidth(final Sort sort) {
+    scala.Option<Object> bitWidth = ModuloArithmetic.UnsignedBVSort$.MODULE$.unapply(sort);
+    if (!bitWidth.isDefined()) {
+      bitWidth = ModuloArithmetic.SignedBVSort$.MODULE$.unapply(sort);
+    }
+    return bitWidth;
   }
 
   public IExpression makeVariable(Sort type, String varname) {
@@ -444,11 +583,7 @@ class PrincessEnvironment {
     } else {
       IFunction funcDecl =
           api.createFunction(
-              name,
-              collectionAsScalaIterableConverter(args).asScala().toSeq(),
-              returnType,
-              false,
-              SimpleAPI.FunctionalityMode$.MODULE$.Full());
+              name, toSeq(args), returnType, false, SimpleAPI.FunctionalityMode$.MODULE$.Full());
       addFunction(funcDecl);
       functionsCache.put(name, funcDecl);
       return funcDecl;
@@ -457,18 +592,20 @@ class PrincessEnvironment {
 
   public ITerm makeSelect(ITerm array, ITerm index) {
     List<ITerm> args = ImmutableList.of(array, index);
-    return api.select(collectionAsScalaIterableConverter(args).asScala().toSeq());
+    ExtArray.ArraySort arraySort = (ExtArray.ArraySort) Sort$.MODULE$.sortOf(array);
+    return new IFunApp(arraySort.theory().select(), toSeq(args));
   }
 
   public ITerm makeStore(ITerm array, ITerm index, ITerm value) {
     List<ITerm> args = ImmutableList.of(array, index, value);
-    return api.store(collectionAsScalaIterableConverter(args).asScala().toSeq());
+    ExtArray.ArraySort arraySort = (ExtArray.ArraySort) Sort$.MODULE$.sortOf(array);
+    return new IFunApp(arraySort.theory().store(), toSeq(args));
   }
 
   public boolean hasArrayType(IExpression exp) {
     if (exp instanceof ITerm) {
       final ITerm t = (ITerm) exp;
-      return Sort$.MODULE$.sortOf(t) instanceof SimpleArray.ArraySort;
+      return Sort$.MODULE$.sortOf(t) instanceof ExtArray.ArraySort;
     } else {
       return false;
     }
@@ -494,5 +631,17 @@ class PrincessEnvironment {
     for (PrincessAbstractProver<?, ?> prover : registeredProvers) {
       prover.addSymbol(funcDecl);
     }
+  }
+
+  static <T> Seq<T> toSeq(List<T> list) {
+    return collectionAsScalaIterableConverter(list).asScala().toSeq();
+  }
+
+  IExpression simplify(IExpression f) {
+    // TODO this method is not tested, check it!
+    if (f instanceof IFormula) {
+      f = BooleanCompactifier.apply((IFormula) f);
+    }
+    return PartialEvaluator.apply(f);
   }
 }

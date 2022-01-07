@@ -9,9 +9,10 @@
 package org.sosy_lab.java_smt.solvers.princess;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static scala.collection.JavaConverters.collectionAsScalaIterableConverter;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessEnvironment.toSeq;
 
 import ap.basetypes.IdealInt;
+import ap.parser.IAtom;
 import ap.parser.IExpression;
 import ap.parser.IExpression.BooleanFunApplier;
 import ap.parser.IFormula;
@@ -20,8 +21,10 @@ import ap.parser.IFunction;
 import ap.parser.IIntLit;
 import ap.parser.ITerm;
 import ap.parser.ITermITE;
+import ap.terfor.preds.Predicate;
 import ap.theories.nia.GroebnerMultiplication;
 import ap.types.Sort;
+import ap.types.Sort$;
 import ap.types.SortedIFunction$;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,18 +42,50 @@ abstract class PrincessFunctionDeclaration {
 
   abstract IExpression makeApp(PrincessEnvironment environment, List<IExpression> args);
 
-  static class PrincessIFunctionDeclaration extends PrincessFunctionDeclaration {
-    private final IFunction app;
+  private abstract static class AbstractDeclaration<T> extends PrincessFunctionDeclaration {
+
+    /** some object representing the functon declaration. */
+    protected final T declarationItem;
+
+    AbstractDeclaration(T pDeclaration) {
+      declarationItem = pDeclaration;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (o instanceof AbstractDeclaration<?>) {
+        return false;
+      }
+      AbstractDeclaration<?> other = (AbstractDeclaration<?>) o;
+      return declarationItem.equals(other.declarationItem);
+    }
+
+    @Override
+    abstract IExpression makeApp(PrincessEnvironment env, List<IExpression> args);
+
+    @Override
+    public int hashCode() {
+      return declarationItem.hashCode();
+    }
+
+    @Override
+    public String toString() {
+      return declarationItem.toString();
+    }
+  }
+
+  static class PrincessIFunctionDeclaration extends AbstractDeclaration<IFunction> {
 
     PrincessIFunctionDeclaration(IFunction pApp) {
-      app = pApp;
+      super(pApp);
     }
 
     @Override
     public IExpression makeApp(PrincessEnvironment env, List<IExpression> args) {
 
       // TODO: check argument types
-      checkArgument(args.size() == app.arity(), "functiontype has different number of args.");
+      checkArgument(
+          args.size() == declarationItem.arity(), "functiontype has different number of args.");
 
       final List<ITerm> argsList = new ArrayList<>();
       for (IExpression arg : args) {
@@ -64,68 +99,77 @@ abstract class PrincessFunctionDeclaration {
         }
         argsList.add(termArg);
       }
-      final Seq<ITerm> argsBuf = collectionAsScalaIterableConverter(argsList).asScala().toSeq();
-      IFunApp returnFormula = new IFunApp(app, argsBuf);
-      Sort returnType = SortedIFunction$.MODULE$.iResultSort(app, returnFormula.args());
+      final Seq<ITerm> argsBuf = toSeq(argsList);
+      IFunApp returnFormula = new IFunApp(declarationItem, argsBuf);
+      Sort returnType = SortedIFunction$.MODULE$.iResultSort(declarationItem, returnFormula.args());
 
       // boolean term, so we have to use the fun-applier instead of the function itself
       if (returnType == PrincessEnvironment.BOOL_SORT) {
-        BooleanFunApplier ap = new BooleanFunApplier(app);
+        BooleanFunApplier ap = new BooleanFunApplier(declarationItem);
         return ap.apply(argsBuf);
       } else {
         return returnFormula;
       }
     }
-
-    @Override
-    public boolean equals(Object o) {
-      if (!(o instanceof PrincessIFunctionDeclaration)) {
-        return false;
-      }
-      PrincessIFunctionDeclaration other = (PrincessIFunctionDeclaration) o;
-      return app.equals(other.app);
-    }
-
-    @Override
-    public int hashCode() {
-      return app.hashCode();
-    }
-
-    @Override
-    public String toString() {
-      return app.toString();
-    }
   }
 
-  static class PrincessByExampleDeclaration extends PrincessFunctionDeclaration {
-    private final IExpression example;
+  static class PrincessByExampleDeclaration extends AbstractDeclaration<IExpression> {
 
     PrincessByExampleDeclaration(IExpression pExample) {
-      example = pExample;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-      if (!(o instanceof PrincessByExampleDeclaration)) {
-        return false;
-      }
-      PrincessByExampleDeclaration other = (PrincessByExampleDeclaration) o;
-      return example.equals(other.example);
+      super(pExample);
     }
 
     @Override
     public IExpression makeApp(PrincessEnvironment env, List<IExpression> args) {
-      return example.update(collectionAsScalaIterableConverter(args).asScala().toSeq());
+      return declarationItem.update(toSeq(args));
+    }
+  }
+
+  static class PrincessBitvectorToBooleanDeclaration extends AbstractDeclaration<Predicate> {
+
+    PrincessBitvectorToBooleanDeclaration(Predicate pPredicate) {
+      super(pPredicate);
     }
 
     @Override
-    public int hashCode() {
-      return example.hashCode();
+    public IExpression makeApp(PrincessEnvironment env, List<IExpression> args) {
+      ITerm arg0 = (ITerm) args.get(0);
+      Sort sort = Sort$.MODULE$.sortOf(arg0);
+      scala.Option<Object> bitWidth = PrincessEnvironment.getBitWidth(sort);
+      checkArgument(bitWidth.isDefined(), "BitvectorFormula with actual type %s: %s", sort, arg0);
+      int bitsize = (Integer) bitWidth.get();
+
+      List<ITerm> newArgs = new ArrayList<>();
+      newArgs.add(new IIntLit(IdealInt.apply(bitsize)));
+      for (IExpression arg : args) {
+        newArgs.add((ITerm) arg);
+      }
+
+      return new IAtom(declarationItem, toSeq(newArgs));
+    }
+  }
+
+  static class PrincessBitvectorToBitvectorDeclaration extends AbstractDeclaration<IFunction> {
+
+    PrincessBitvectorToBitvectorDeclaration(IFunction pFunction) {
+      super(pFunction);
     }
 
     @Override
-    public String toString() {
-      return example.toString();
+    public IExpression makeApp(PrincessEnvironment env, List<IExpression> args) {
+      ITerm arg0 = (ITerm) args.get(0);
+      Sort sort = Sort$.MODULE$.sortOf(arg0);
+      scala.Option<Object> bitWidth = PrincessEnvironment.getBitWidth(sort);
+      checkArgument(bitWidth.isDefined(), "BitvectorFormula with actual type %s: %s", sort, arg0);
+      int bitsize = (Integer) bitWidth.get();
+
+      List<ITerm> newArgs = new ArrayList<>();
+      newArgs.add(new IIntLit(IdealInt.apply(bitsize)));
+      for (IExpression arg : args) {
+        newArgs.add((ITerm) arg);
+      }
+
+      return new IFunApp(declarationItem, toSeq(newArgs));
     }
   }
 

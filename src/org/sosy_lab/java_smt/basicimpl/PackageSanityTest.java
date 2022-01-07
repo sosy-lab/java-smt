@@ -9,11 +9,14 @@
 package org.sosy_lab.java_smt.basicimpl;
 
 import com.google.common.testing.AbstractPackageSanityTests;
+import org.sosy_lab.common.ShutdownManager;
+import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.FormulaType;
 
 public class PackageSanityTest extends AbstractPackageSanityTests {
 
   {
     setDistinctValues(FormulaType.class, FormulaType.BooleanType, FormulaType.IntegerType);
+    setDefault(ShutdownNotifier.class, ShutdownManager.create().getNotifier());
   }
 }

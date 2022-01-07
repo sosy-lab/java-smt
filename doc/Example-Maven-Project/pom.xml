@@ -16,7 +16,7 @@ SPDX-License-Identifier: Apache-2.0
 
   <groupId>org.sosy_lab.java_smt_example</groupId>
   <artifactId>java-smt-maven-example</artifactId>
-  <version>1.2</version>
+  <version>1.5</version>
   <name>java-smt-maven-example</name>
   <description>Example Maven project to show how to use JavaSMT with native solver libraries.</description>
   <url>https://github.com/sosy-lab/java-smt</url>
@@ -74,14 +74,15 @@ SPDX-License-Identifier: Apache-2.0
     <dependency>
       <groupId>org.sosy-lab</groupId>
       <artifactId>java-smt</artifactId>
-      <version>3.7.0-61-gea80187e</version>
+      <version>3.11.0</version>
     </dependency>
 
     <!-- MathSAT5 has one dependency (on Linux) -->
     <dependency>
       <groupId>org.sosy-lab</groupId>
       <artifactId>javasmt-solver-mathsat5</artifactId>
-      <version>5.6.5</version>
+      <version>5.6.6</version>
+      <classifier>libmathsat5j</classifier>
       <type>so</type>
     </dependency>
 
@@ -112,21 +113,21 @@ SPDX-License-Identifier: Apache-2.0
     <dependency>
       <groupId>org.sosy-lab</groupId>
       <artifactId>javasmt-solver-boolector</artifactId>
-      <version>3.2.1-30-g95859db8</version>
+      <version>3.2.2-g0783aa84</version>
       <type>so</type>
       <classifier>libboolector</classifier>
     </dependency>
     <dependency>
       <groupId>org.sosy-lab</groupId>
       <artifactId>javasmt-solver-boolector</artifactId>
-      <version>3.2.1-30-g95859db8</version>
+      <version>3.2.2-g0783aa84</version>
       <type>so</type>
       <classifier>libminisat</classifier>
     </dependency>
     <dependency>
       <groupId>org.sosy-lab</groupId>
       <artifactId>javasmt-solver-boolector</artifactId>
-      <version>3.2.1-30-g95859db8</version>
+      <version>3.2.2-g0783aa84</version>
       <type>so</type>
       <classifier>libpicosat</classifier>
     </dependency>
@@ -159,6 +160,21 @@ SPDX-License-Identifier: Apache-2.0
       <version>1.8-prerelease-2020-06-24-g7825d8f28</version>
       <type>so</type>
       <classifier>libcvc4parser</classifier>
+    </dependency>
+
+    <!-- Yices2 has two dependencies (on Linux) -->
+    <dependency>
+      <groupId>org.sosy-lab</groupId>
+      <artifactId>javasmt-yices2</artifactId>
+      <version>3.10.0</version> <!-- version of Yices2 bindings in JavaSMT -->
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.sosy-lab</groupId>
+      <artifactId>javasmt-solver-yices2</artifactId>
+      <version>2.6.2-396-g194350c1</version> <!-- version of Yices2 release -->
+      <type>so</type>
+      <classifier>libyices2j</classifier>
     </dependency>
 
     <!-- JUnit for testing -->
@@ -255,6 +271,7 @@ SPDX-License-Identifier: Apache-2.0
                 <groupId>org.sosy-lab</groupId>
                 <artifactId>javasmt-solver-mathsat5</artifactId>
                 <type>so</type>
+                <classifier>libmathsat5j</classifier>
                 <destFileName>libmathsat5j.so</destFileName>
               </artifactItem>
 
@@ -321,6 +338,15 @@ SPDX-License-Identifier: Apache-2.0
                 <destFileName>libcvc4parser.so</destFileName>
               </artifactItem>
 
+              <!-- Yices2 has two dependencies (on Linux),
+                   and renaming the JAR file is not required to be copied.-->
+              <artifactItem>
+                <groupId>org.sosy-lab</groupId>
+                <artifactId>javasmt-solver-yices2</artifactId>
+                <type>so</type>
+                <classifier>libyices2j</classifier>
+                <destFileName>libyices2j.so</destFileName>
+              </artifactItem>
             </artifactItems>
           </configuration>
       </plugin>

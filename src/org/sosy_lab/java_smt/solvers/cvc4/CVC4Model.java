@@ -60,10 +60,36 @@ public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
 
   private ImmutableList<ValueAssignment> generateModel() {
     ImmutableSet.Builder<ValueAssignment> builder = ImmutableSet.builder();
+    // Using creator.extractVariablesAndUFs we wouldn't get accurate information anymore as we
+    // translate all bound vars back to their free counterparts in the visitor!
     for (Expr expr : assertedExpressions) {
-      creator.extractVariablesAndUFs(expr, true, (name, f) -> builder.add(getAssignment(f)));
+      // creator.extractVariablesAndUFs(expr, true, (name, f) -> builder.add(getAssignment(f)));
+      recursiveAssignmentFinder(builder, expr);
     }
     return builder.build().asList();
+  }
+
+  private void recursiveAssignmentFinder(ImmutableSet.Builder<ValueAssignment> builder, Expr expr) {
+    if (expr.isConst() || expr.isNull()) {
+      // We don't care about consts.
+      return;
+    } else if (expr.isVariable() && expr.getKind() == Kind.BOUND_VARIABLE) {
+      // We don't care about bound vars (not in a UF), as they don't return a value.
+      return;
+    } else if (expr.isVariable() || expr.getOperator().getType().isFunction()) {
+      // This includes free vars and UFs, as well as bound vars in UFs !
+      builder.add(getAssignment(expr));
+    } else if (expr.getKind() == Kind.FORALL || expr.getKind() == Kind.EXISTS) {
+      // Body of the quantifier, with bound vars!
+      Expr body = expr.getChildren().get(1);
+
+      recursiveAssignmentFinder(builder, body);
+    } else {
+      // Only nested terms (AND, OR, ...) are left
+      for (Expr child : expr) {
+        recursiveAssignmentFinder(builder, child);
+      }
+    }
   }
 
   private ValueAssignment getAssignment(Expr pKeyTerm) {

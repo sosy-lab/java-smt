@@ -16,9 +16,16 @@ import de.uni_freiburg.informatik.ultimate.logic.FormulaLet;
 import de.uni_freiburg.informatik.ultimate.logic.FormulaUnLet;
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
 import de.uni_freiburg.informatik.ultimate.logic.PrintTerm;
+import de.uni_freiburg.informatik.ultimate.logic.SMTLIBException;
+import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
+import de.uni_freiburg.informatik.ultimate.logic.simplification.SimplifyDDA;
+import de.uni_freiburg.informatik.ultimate.smtinterpol.LogProxy;
+import de.uni_freiburg.informatik.ultimate.smtinterpol.option.OptionMap;
+import de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.ParseEnvironment;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.Deque;
@@ -26,12 +33,15 @@ import java.util.HashSet;
 import java.util.Set;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
+import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 
 public class SmtInterpolFormulaManager
-    extends AbstractFormulaManager<Term, Sort, SmtInterpolEnvironment, FunctionSymbol> {
+    extends AbstractFormulaManager<Term, Sort, Script, FunctionSymbol> {
+
+  private final LogManager logger;
 
   SmtInterpolFormulaManager(
       SmtInterpolFormulaCreator pCreator,
@@ -39,7 +49,8 @@ public class SmtInterpolFormulaManager
       SmtInterpolBooleanFormulaManager pBooleanManager,
       SmtInterpolIntegerFormulaManager pIntegerManager,
       SmtInterpolRationalFormulaManager pRationalManager,
-      SmtInterpolArrayFormulaManager pArrayFormulaManager) {
+      SmtInterpolArrayFormulaManager pArrayFormulaManager,
+      LogManager pLogger) {
     super(
         pCreator,
         pFunctionManager,
@@ -50,7 +61,9 @@ public class SmtInterpolFormulaManager
         null,
         null,
         pArrayFormulaManager,
+        null,
         null);
+    logger = pLogger;
   }
 
   BooleanFormula encapsulateBooleanFormula(Term t) {
@@ -59,7 +72,27 @@ public class SmtInterpolFormulaManager
 
   @Override
   public BooleanFormula parse(String pS) throws IllegalArgumentException {
-    Term term = getOnlyElement(getEnvironment().parseStringToTerms(pS));
+    FormulaCollectionScript parseScript =
+        new FormulaCollectionScript(getEnvironment(), getEnvironment().getTheory());
+    LogProxy logProxy = new LogProxyForwarder(logger.withComponentName("SMTInterpol"));
+    final ParseEnvironment parseEnv =
+        new ParseEnvironment(parseScript, new OptionMap(logProxy, true)) {
+          @Override
+          public void printError(String pMessage) {
+            throw new SMTLIBException(pMessage);
+          }
+
+          @Override
+          public void printSuccess() {}
+        };
+
+    try {
+      parseEnv.parseStream(new StringReader(pS), "<stdin>");
+    } catch (SMTLIBException nested) {
+      throw new IllegalArgumentException(nested);
+    }
+
+    Term term = getOnlyElement(parseScript.getAssertedTerms());
     return encapsulateBooleanFormula(new FormulaUnLet().unlet(term));
   }
 
@@ -134,13 +167,9 @@ public class SmtInterpolFormulaManager
     };
   }
 
-  /** This method returns a 'shared' environment or a complete new environment. */
-  SmtInterpolEnvironment createEnvironment() {
-    return getEnvironment();
-  }
-
   @Override
   public Term simplify(Term pF) {
-    return getFormulaCreator().getEnv().simplify(pF);
+    SimplifyDDA s = new SimplifyDDA(getEnvironment(), true);
+    return s.getSimplifiedTerm(pF);
   }
 }

@@ -39,8 +39,7 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
    * @return evaluation of the given formula or <code>null</code> if the solver does not provide a
    *     better evaluation.
    */
-  @Nullable
-  <T extends Formula> T eval(T formula);
+  @Nullable <T extends Formula> T eval(T formula);
 
   /**
    * Evaluate a given formula substituting the values from the model.
@@ -53,42 +52,44 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
    *
    * @param f Input formula
    * @return Either of: - Number (Rational/Double/BigInteger/Long/Integer) - Boolean
-   * @throws IllegalArgumentException if a formula has unexpected type, e.g Array.
+   * @throws IllegalArgumentException if a formula has unexpected type, e.g. Array.
    */
-  @Nullable
-  Object evaluate(Formula f);
+  @Nullable Object evaluate(Formula f);
 
   /**
    * Type-safe evaluation for integer formulas.
    *
    * <p>The formula does not need to be a variable, we also allow complex expression.
    */
-  @Nullable
-  BigInteger evaluate(IntegerFormula f);
+  @Nullable BigInteger evaluate(IntegerFormula f);
 
   /**
    * Type-safe evaluation for rational formulas.
    *
    * <p>The formula does not need to be a variable, we also allow complex expression.
    */
-  @Nullable
-  Rational evaluate(RationalFormula f);
+  @Nullable Rational evaluate(RationalFormula f);
 
   /**
    * Type-safe evaluation for boolean formulas.
    *
    * <p>The formula does not need to be a variable, we also allow complex expression.
    */
-  @Nullable
-  Boolean evaluate(BooleanFormula f);
+  @Nullable Boolean evaluate(BooleanFormula f);
 
   /**
    * Type-safe evaluation for bitvector formulas.
    *
    * <p>The formula does not need to be a variable, we also allow complex expression.
    */
-  @Nullable
-  BigInteger evaluate(BitvectorFormula f);
+  @Nullable BigInteger evaluate(BitvectorFormula f);
+
+  /**
+   * Type-safe evaluation for string formulas.
+   *
+   * <p>The formula does not need to be a variable, we also allow complex expression.
+   */
+  @Nullable String evaluate(StringFormula f);
 
   /**
    * Iterate over all values present in the model. Note that iterating multiple times may be
@@ -103,7 +104,16 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
   /** Build a list of assignments that stays valid after closing the model. */
   ImmutableList<ValueAssignment> asList();
 
-  /** Pretty-printing of the model values. */
+  /**
+   * Pretty-printing of the model values.
+   *
+   * <p>Please only use this method for debugging and not for retrieving relevant information about
+   * the model. The returned model representation is not intended for further usage like parsing,
+   * because we do not guarantee any specific format, e.g., for arrays and uninterpreted functions,
+   * and we allow the SMT solver to include arbitrary additional information about the current
+   * solver state, e.g., any available symbol in the solver, even from other provers, and temporary
+   * internal symbols.
+   */
   @Override
   String toString();
 
@@ -121,7 +131,10 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
      *
      * <p>For UFs we use the application of the UF with arguments.
      *
-     * <p>For arrays we use the selection-statement with an index.
+     * <p>For arrays we use the selection-statement with an index. We do not support Array theory as
+     * {@link #value} during a model evaluation, but we provide assignments like <code>
+     * select(arr, 12) := 34</code> where <code>arr</code> itself is a plain symbol (without an
+     * explicit const- or zero-based initialization, as done by some SMT solvers).
      */
     private final Formula keyFormula;
 
@@ -150,9 +163,11 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
     /**
      * The name should be a 'useful' identifier for the current assignment.
      *
-     * <p>For UFs we use their name without parameters.
+     * <p>For UFs we use their name without parameters. Parameters are given as {@link
+     * #argumentsInterpretation}.
      *
-     * <p>For arrays we use the name without any index.
+     * <p>For arrays we use the name without any index. The index is given as {@link
+     * #argumentsInterpretation}, if required.
      */
     private final String name;
 
@@ -192,7 +207,12 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
       return name;
     }
 
-    /** Value: see the {@link #evaluate} methods for the possible types. */
+    /**
+     * Value: see the {@link #evaluate} methods for the possible types.
+     *
+     * <p>We return only values that can be used in Java, i.e., boolean or numeral values
+     * (Rational/Double/BigInteger/Long/Integer).
+     */
     public Object getValue() {
       return value;
     }

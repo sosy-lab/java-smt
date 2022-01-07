@@ -142,7 +142,7 @@ public interface BooleanFormulaManager {
    * and thus is not prone to StackOverflowErrors.
    *
    * <p>Furthermore, this method also guarantees that every equal part of the formula is visited
-   * only once. Thus it can be used to traverse DAG-like formulas efficiently.
+   * only once. Thus, it can be used to traverse DAG-like formulas efficiently.
    */
   void visitRecursively(BooleanFormula f, BooleanFormulaVisitor<TraversalProcess> rFormulaVisitor);
 
@@ -154,7 +154,7 @@ public interface BooleanFormulaManager {
    * and thus is not prone to StackOverflowErrors.
    *
    * <p>Furthermore, this method also guarantees that every equal part of the formula is visited
-   * only once. Thus it can be used to traverse DAG-like formulas efficiently.
+   * only once. Thus, it can be used to traverse DAG-like formulas efficiently.
    */
   BooleanFormula transformRecursively(
       BooleanFormula f, BooleanFormulaTransformationVisitor pVisitor);

@@ -44,8 +44,9 @@ class BoolectorBitvectorFormulaManager
 
   private final long btor;
 
-  BoolectorBitvectorFormulaManager(BoolectorFormulaCreator creator) {
-    super(creator);
+  BoolectorBitvectorFormulaManager(
+      BoolectorFormulaCreator creator, BoolectorBooleanFormulaManager pBmgr) {
+    super(creator, pBmgr);
     this.btor = creator.getEnv();
   }
 

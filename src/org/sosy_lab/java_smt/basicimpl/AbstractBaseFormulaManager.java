@@ -46,6 +46,8 @@ abstract class AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> 
       t = getFormulaCreator().getIntegerType();
     } else if (formulaType.isRationalType()) {
       t = getFormulaCreator().getRationalType();
+    } else if (formulaType.isStringType()) {
+      t = getFormulaCreator().getStringType();
     } else if (formulaType.isBitvectorType()) {
       FormulaType.BitvectorType bitPreciseType = (FormulaType.BitvectorType) formulaType;
       t = getFormulaCreator().getBitvectorType(bitPreciseType.getSize());

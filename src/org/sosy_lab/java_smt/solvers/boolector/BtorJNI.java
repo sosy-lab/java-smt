@@ -253,7 +253,8 @@ class BtorJNI {
 
   protected static native long boolector_fun(long jarg1, long jarg2, long jarg3, long jarg4);
 
-  protected static native long boolector_apply(long jarg1, long[] jarg2, long jarg3, long jarg4);
+  protected static native long boolector_apply(
+      long btor, long[] argumentNodes, long numberOfArguments, long functionNode);
 
   protected static native long boolector_inc(long jarg1, long jarg2);
 
@@ -316,12 +317,14 @@ class BtorJNI {
 
   protected static native void boolector_free_bv_assignment(long jarg1, String jarg2);
 
+  // Use the helper method instead of this one!
   protected static native void boolector_array_assignment(
-      long jarg1, long jarg2, long jarg3, long jarg4, long jarg5);
+      long btor, long array_operand, long indicies, long values, long size);
 
   protected static native void boolector_free_array_assignment(
       long jarg1, long jarg2, long jarg3, long jarg4);
 
+  // Use the helper method instead of this one!
   protected static native void boolector_uf_assignment(
       long jarg1, long jarg2, long jarg3, long jarg4, long jarg5);
 
@@ -334,7 +337,8 @@ class BtorJNI {
 
   protected static native long boolector_bitvec_sort(long jarg1, long jarg2);
 
-  protected static native long boolector_fun_sort(long jarg1, long[] jarg2, long jarg3, long jarg4);
+  protected static native long boolector_fun_sort(
+      long btor, long[] argumentSorts, long arity, long returnSort);
 
   protected static native long boolector_array_sort(long jarg1, long jarg2, long jarg3);
 
@@ -350,6 +354,7 @@ class BtorJNI {
 
   protected static native boolean boolector_is_fun_sort(long jarg1, long jarg2);
 
+  // Use the helper method instead of this one!
   protected static native long boolector_parse(
       long jarg1, long jarg2, String jarg3, long jarg4, long jarg5, long jarg6);
 
@@ -369,8 +374,10 @@ class BtorJNI {
 
   protected static native void boolector_dump_btor(long jarg1, long jarg2);
 
+  // Use the helper method instead of this one!
   protected static native void boolector_dump_smt2_node(long jarg1, long jarg2, long jarg3);
 
+  // Use the helper method instead of this one!
   protected static native void boolector_dump_smt2(long jarg1, long jarg2);
 
   protected static native void boolector_dump_aiger_ascii(long jarg1, long jarg2, boolean jarg3);
@@ -410,6 +417,8 @@ class BtorJNI {
   protected static native long boolector_roli(long btor, long node, int nbits);
 
   protected static native long boolector_rori(long btor, long node, int nbits);
+
+  protected static native long boolector_get_value(long btor, long node);
 
   /**
    * Returns int representation of BOOLECTOR_PARSE_ERROR. Used for checking return value of
@@ -461,24 +470,26 @@ class BtorJNI {
    * Gives back the assignment of the array node entered. Return will be arguments and assignments
    * in 2 string arrays in an array.
    *
-   * @param jarg1 btor
-   * @param jarg2 array node
+   * @param btor btor instance
+   * @param arrayNode array node
    * @return Returns 2Dim Array or Strings. Size [2][x], x beeing the length of the array used.
    *     First String Array will be argument assignment strings. Second String Array will be value
-   *     assignment strings.
+   *     assignment strings. Example: array[0][0] is the index to value array[1][0]. Note: repeated
+   *     calls to this might change the order of the arrays (but uniformly across both).
    */
-  protected static native String[][] boolector_array_assignment_helper(long jarg1, long jarg2);
+  protected static native String[][] boolector_array_assignment_helper(long btor, long arrayNode);
 
   /**
    * Returns the assignment of the UF node in 2 string arrays in an array length 2.
    *
-   * @param jarg1 btor
-   * @param jarg2 array node
+   * @param btor btor instance
+   * @param ufNode array node
    * @return Returns 2Dim Array or Strings. Size [2][x], x being the length of the uf used. First
-   *     String Array will be argument assignment strings. Second String Array will be value
-   *     assignment strings.
+   *     String Array will be argument assignment strings. For multiple arguments, the argument
+   *     values are seperated by a single space in the same String! Second String Array will be
+   *     value assignment strings.
    */
-  protected static native String[][] boolector_uf_assignment_helper(long jarg1, long jarg2);
+  protected static native String[][] boolector_uf_assignment_helper(long btor, long ufNode);
 
   /**
    * Sets termination callback to chosen implementation of a method.

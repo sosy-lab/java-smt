@@ -46,13 +46,10 @@ class Mathsat5BitvectorFormulaManager
 
   private final long mathsatEnv;
 
-  protected Mathsat5BitvectorFormulaManager(Mathsat5FormulaCreator pCreator) {
-    super(pCreator);
+  protected Mathsat5BitvectorFormulaManager(
+      Mathsat5FormulaCreator pCreator, Mathsat5BooleanFormulaManager pBmgr) {
+    super(pCreator, pBmgr);
     this.mathsatEnv = pCreator.getEnv();
-  }
-
-  public static Mathsat5BitvectorFormulaManager create(Mathsat5FormulaCreator creator) {
-    return new Mathsat5BitvectorFormulaManager(creator);
   }
 
   @Override

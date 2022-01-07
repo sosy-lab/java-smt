@@ -20,7 +20,7 @@ public interface Formula {
    *
    * <p>We do not guarantee that the returned String is in any way related to the formula. The
    * solver might apply escaping or even un-escaping. A user should not use the returned String for
-   * further processing. For analyzing formulas, we recommend to use a {@link FormulaVisitor}.
+   * further processing. For analyzing formulas, we recommend using a {@link FormulaVisitor}.
    */
   @Override
   String toString();

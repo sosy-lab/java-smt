@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.api;
 
 import java.math.BigInteger;
+import java.util.List;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
@@ -124,9 +125,9 @@ public interface BitvectorFormulaManager {
 
   /**
    * @param number The bitvector to extract.
-   * @param msb Upper index. Must be greater then or equal to 0 and less then the bit-width of
+   * @param msb Upper index. Must be greater than or equal to 0 and less than the bit-width of
    *     number.
-   * @param lsb Lower index. Must be less then or equal to msb and greater or equal to 0.
+   * @param lsb Lower index. Must be less than or equal to msb and greater or equal to 0.
    * @param signed Whether the extension should depend on the sign bit. Note: Some SMT-Solvers
    *     ignore this. (i.e. Boolector)
    */
@@ -140,4 +141,7 @@ public interface BitvectorFormulaManager {
    * @param signed Whether the extension should depend on the sign bit.
    */
   BitvectorFormula extend(BitvectorFormula number, int extensionBits, boolean signed);
+
+  /** All given bitvectors are pairwise unequal. */
+  BooleanFormula distinct(List<BitvectorFormula> pBits);
 }

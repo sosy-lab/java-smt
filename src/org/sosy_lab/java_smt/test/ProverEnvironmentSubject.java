@@ -25,8 +25,8 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
 
 /**
- * {@link Subject} subclass for testing assertions about ProverEnvironments with Truth (allows to
- * use <code>assert_().about(...).that(stack).isUnsatisfiable()</code> etc.).
+ * {@link Subject} subclass for testing assertions about ProverEnvironments with Truth (allows using
+ * <code>assert_().about(...).that(stack).isUnsatisfiable()</code> etc.).
  *
  * <p>For a test use {@link SolverBasedTest0#assertThatEnvironment(BasicProverEnvironment)}, or
  * {@link StandardSubjectBuilder#about(com.google.common.truth.Subject.Factory)} and {@link

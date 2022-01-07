@@ -28,12 +28,11 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.io.MoreFiles;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -115,15 +114,7 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
       Mathsat5FormulaCreator creator) {
     super(manager);
 
-    if (!loaded) { // Avoid logging twice.
-      logger.log(
-          Level.WARNING,
-          "MathSAT5 is available for research and evaluation purposes only. It can not be used in"
-              + " a commercial environment, particularly as part of a commercial product, without "
-              + "written permission. MathSAT5 is provided as is, without any warranty. "
-              + "Please write to mathsat@fbk.eu for additional questions regarding licensing "
-              + "MathSAT5 or obtaining more up-to-date versions.");
-    }
+    logLicenseInfo(logger);
     this.logger = logger;
     this.mathsatConfig = mathsatConfig;
     this.settings = settings;
@@ -138,6 +129,20 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
         };
   }
 
+  private static void logLicenseInfo(LogManager logger) {
+    if (!loaded) { // Avoid logging twice.
+      loaded = true;
+      logger.log(
+          Level.WARNING,
+          "MathSAT5 is available for research and evaluation purposes only. It can not be used in"
+              + " a commercial environment, particularly as part of a commercial product, without "
+              + "written permission. MathSAT5 is provided as is, without any warranty. "
+              + "Please write to mathsat@fbk.eu for additional questions regarding licensing "
+              + "MathSAT5 or obtaining more up-to-date versions.");
+    }
+  }
+
+  @SuppressWarnings("ParameterNumber")
   public static Mathsat5SolverContext create(
       LogManager logger,
       Configuration config,
@@ -145,16 +150,17 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
       @Nullable PathCounterTemplate solverLogFile,
       long randomSeed,
       FloatingPointRoundingMode pFloatingPointRoundingMode,
-      NonLinearArithmetic pNonLinearArithmetic)
+      NonLinearArithmetic pNonLinearArithmetic,
+      Consumer<String> pLoader)
       throws InvalidConfigurationException {
 
     // Init Msat
     Mathsat5Settings settings = new Mathsat5Settings(config, solverLogFile);
 
     if (settings.loadOptimathsat5) {
-      NativeLibraries.loadLibrary("optimathsat5j");
+      pLoader.accept("optimathsat5j");
     } else {
-      loadLibrary();
+      loadLibrary(pLoader);
     }
 
     long msatConf = msat_create_config();
@@ -185,7 +191,7 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
     Mathsat5RationalFormulaManager rationalTheory =
         new Mathsat5RationalFormulaManager(creator, pNonLinearArithmetic);
     Mathsat5BitvectorFormulaManager bitvectorTheory =
-        Mathsat5BitvectorFormulaManager.create(creator);
+        new Mathsat5BitvectorFormulaManager(creator, booleanTheory);
     Mathsat5FloatingPointFormulaManager floatingPointTheory =
         new Mathsat5FloatingPointFormulaManager(creator, pFloatingPointRoundingMode);
     Mathsat5ArrayFormulaManager arrayTheory = new Mathsat5ArrayFormulaManager(creator);
@@ -204,33 +210,9 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
   }
 
   @VisibleForTesting
-  static void loadLibrary() {
-    loadLibrary(ImmutableList.of("mathsat5j"), ImmutableList.of("mpir", "mathsat", "mathsat5j"));
-  }
-
-  /**
-   * This method loads the given library, depending on the operating system.
-   *
-   * <p>Each list is applied in the given ordering.
-   */
-  private static void loadLibrary(List<String> linuxLibrary, List<String> windowsLibrary) {
-    // we try Linux first, and then Windows.
-    // TODO we could simply switch over the OS-name.
-    // TODO move this method upwards? more solvers could use it.
-    try {
-      for (String libraryName : linuxLibrary) {
-        NativeLibraries.loadLibrary(libraryName);
-      }
-    } catch (UnsatisfiedLinkError e1) {
-      try {
-        for (String libraryName : windowsLibrary) {
-          NativeLibraries.loadLibrary(libraryName);
-        }
-      } catch (UnsatisfiedLinkError e2) {
-        e1.addSuppressed(e2);
-        throw e1;
-      }
-    }
+  static void loadLibrary(Consumer<String> pLoader) {
+    loadLibrariesWithFallback(
+        pLoader, ImmutableList.of("mathsat5j"), ImmutableList.of("mpir", "mathsat", "mathsat5j"));
   }
 
   long createEnvironment(long cfg) {

@@ -10,11 +10,13 @@ package org.sosy_lab.java_smt.solvers.yices2;
 
 import static com.google.common.base.CharMatcher.inRange;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_APP_TERM;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvtype_size;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_term;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_child;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_constructor;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_to_string;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_children;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_is_bitvector;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_num_children;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_of_term;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_to_string;
@@ -53,6 +55,7 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
         pIntegerManager,
         pRationalManager,
         pBitvectorManager,
+        null,
         null,
         null,
         null,
@@ -110,10 +113,13 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
           }
         }
         // TODO fold formula to avoid exp. overhead
-        out.append("(assert " + yices_term_to_string(formula) + ")");
+        out.append("(assert ").append(yices_term_to_string(formula)).append(")");
       }
 
       private String getTypeRepr(int type) {
+        if (yices_type_is_bitvector(type)) {
+          return "(_ BitVec " + yices_bvtype_size(type) + ")";
+        }
         String typeRepr = yices_type_to_string(type);
         return typeRepr.substring(0, 1).toUpperCase() + typeRepr.substring(1);
       }

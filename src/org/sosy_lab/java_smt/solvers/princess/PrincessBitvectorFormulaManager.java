@@ -23,8 +23,9 @@ class PrincessBitvectorFormulaManager
     extends AbstractBitvectorFormulaManager<
         IExpression, Sort, PrincessEnvironment, PrincessFunctionDeclaration> {
 
-  PrincessBitvectorFormulaManager(PrincessFormulaCreator pCreator) {
-    super(pCreator);
+  PrincessBitvectorFormulaManager(
+      PrincessFormulaCreator pCreator, PrincessBooleanFormulaManager pBmgr) {
+    super(pCreator, pBmgr);
   }
 
   @Override
@@ -132,7 +133,7 @@ class PrincessBitvectorFormulaManager
   @Override
   protected IExpression toIntegerFormulaImpl(IExpression pBVFormula, boolean signed) {
     final Sort sort = Sort$.MODULE$.sortOf((ITerm) pBVFormula);
-    final Option<Object> bitWidth = PrincessFormulaCreator.getBitWidth(sort);
+    final Option<Object> bitWidth = PrincessEnvironment.getBitWidth(sort);
     Preconditions.checkArgument(bitWidth.isDefined());
     final int size = (Integer) bitWidth.get();
 

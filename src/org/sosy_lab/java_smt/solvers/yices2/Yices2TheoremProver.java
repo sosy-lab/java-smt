@@ -53,7 +53,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
  *
  * <p>2) Add additional boolean symbols 'p', add a constraint 'p=f' for each asserted formula 'f',
  * compute the unsat core over all 'p's, and match them back to their formula 'f'. This allows
- * incremental solving, but is more complex to implement. Lets keep this idea is future work for
+ * incremental solving, but is more complex to implement. Let's keep this idea is future work for
  * optimization.
  */
 class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements ProverEnvironment {
@@ -128,22 +128,21 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
-    boolean unsat = false;
+    boolean unsat;
     if (generateUnsatCores) { // unsat core does not work with incremental mode
       int[] allConstraints = getAllConstraints();
       unsat =
           !yices_check_sat_with_assumptions(
-              curEnv, DEFAULT_PARAMS, allConstraints.length, allConstraints);
-      return unsat;
+              curEnv, DEFAULT_PARAMS, allConstraints.length, allConstraints, shutdownNotifier);
     } else {
-      unsat = !yices_check_sat(curEnv, DEFAULT_PARAMS);
+      unsat = !yices_check_sat(curEnv, DEFAULT_PARAMS, shutdownNotifier);
       if (unsat && stackSizeToUnsat == Integer.MAX_VALUE) {
-        stackSizeToUnsat = constraintStack.size(); // If sat check is UNSAT and stackSizeToUnsat was
-        // not already set, set to current
-        // constraintStack size.
+        stackSizeToUnsat = constraintStack.size();
+        // If sat check is UNSAT and stackSizeToUnsat waS not already set,
+        // set to current constraintStack size.
       }
-      return unsat;
     }
+    return unsat;
   }
 
   private int[] getAllConstraints() {
@@ -158,7 +157,7 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
     Preconditions.checkState(!closed);
     // TODO handle BooleanFormulaCollection / check for literals
     return !yices_check_sat_with_assumptions(
-        curEnv, 0, pAssumptions.size(), uncapsulate(pAssumptions));
+        curEnv, DEFAULT_PARAMS, pAssumptions.size(), uncapsulate(pAssumptions), shutdownNotifier);
   }
 
   @Override
@@ -201,9 +200,7 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
       Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
     Preconditions.checkState(!isClosed());
     checkGenerateUnsatCoresOverAssumptions();
-    boolean sat =
-        yices_check_sat_with_assumptions(
-            curEnv, DEFAULT_PARAMS, pAssumptions.size(), uncapsulate(pAssumptions));
+    boolean sat = !isUnsatWithAssumptions(pAssumptions);
     return sat ? Optional.empty() : Optional.of(getUnsatCore0());
   }
 

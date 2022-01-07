@@ -51,7 +51,8 @@ public final class PrincessSolverContext extends AbstractSolverContext {
     PrincessBooleanFormulaManager booleanTheory = new PrincessBooleanFormulaManager(creator);
     PrincessIntegerFormulaManager integerTheory =
         new PrincessIntegerFormulaManager(creator, pNonLinearArithmetic);
-    PrincessBitvectorFormulaManager bitvectorTheory = new PrincessBitvectorFormulaManager(creator);
+    PrincessBitvectorFormulaManager bitvectorTheory =
+        new PrincessBitvectorFormulaManager(creator, booleanTheory);
     PrincessArrayFormulaManager arrayTheory = new PrincessArrayFormulaManager(creator);
     PrincessQuantifiedFormulaManager quantifierTheory =
         new PrincessQuantifiedFormulaManager(creator);

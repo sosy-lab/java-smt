@@ -64,7 +64,7 @@ public interface OptimizationProverEnvironment extends BasicProverEnvironment<Vo
    * (epsilon can even be set to zero). The model can return the assignment x=9. To get an optimal
    * assignment, query the solver with an additional constraint 'x == 10-epsilon'.
    *
-   * <p>Example 2: For the constraint 'x&lt;10' with a integer x, the upper bound of x is '9'
+   * <p>Example 2: For the constraint 'x&lt;10' with an integer x, the upper bound of x is '9'
    * (epsilon is irrelevant here and can be zero). The model returns the optimal assignment x=9.
    */
   @Override

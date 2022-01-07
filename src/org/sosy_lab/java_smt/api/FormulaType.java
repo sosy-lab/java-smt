@@ -62,8 +62,19 @@ public abstract class FormulaType<T extends Formula> {
     return false;
   }
 
+  public boolean isStringType() {
+    return false;
+  }
+
+  public boolean isRegexType() {
+    return false;
+  }
+
   @Override
   public abstract String toString();
+
+  /** return the correctly formatted SMTLIB2 type declaration. */
+  public abstract String toSMTLIBString();
 
   @Immutable
   public abstract static class NumeralType<T extends NumeralFormula> extends FormulaType<T> {
@@ -86,6 +97,11 @@ public abstract class FormulaType<T extends Formula> {
         public String toString() {
           return "Rational";
         }
+
+        @Override
+        public String toSMTLIBString() {
+          return "Real";
+        }
       };
 
   public static final FormulaType<IntegerFormula> IntegerType =
@@ -100,6 +116,11 @@ public abstract class FormulaType<T extends Formula> {
         public String toString() {
           return "Integer";
         }
+
+        @Override
+        public String toSMTLIBString() {
+          return "Int";
+        }
       };
 
   public static final FormulaType<BooleanFormula> BooleanType =
@@ -113,6 +134,11 @@ public abstract class FormulaType<T extends Formula> {
         @Override
         public String toString() {
           return "Boolean";
+        }
+
+        @Override
+        public String toSMTLIBString() {
+          return "Bool";
         }
       };
 
@@ -157,6 +183,11 @@ public abstract class FormulaType<T extends Formula> {
     @Override
     public int hashCode() {
       return size;
+    }
+
+    @Override
+    public String toSMTLIBString() {
+      return "(_ BitVec " + size + ")";
     }
   }
 
@@ -225,6 +256,11 @@ public abstract class FormulaType<T extends Formula> {
     public String toString() {
       return "FloatingPoint<exp=" + exponentSize + ",mant=" + mantissaSize + ">";
     }
+
+    @Override
+    public String toSMTLIBString() {
+      return "(_ FloatingPoint " + exponentSize + " " + mantissaSize + ")";
+    }
   }
 
   public static final FormulaType<FloatingPointRoundingModeFormula> FloatingPointRoundingModeType =
@@ -241,6 +277,12 @@ public abstract class FormulaType<T extends Formula> {
     @Override
     public String toString() {
       return "FloatingPointRoundingMode";
+    }
+
+    @Override
+    public String toSMTLIBString() {
+      throw new UnsupportedOperationException(
+          "rounding mode is not expected in symbol declarations");
     }
   }
 
@@ -277,7 +319,7 @@ public abstract class FormulaType<T extends Formula> {
 
     @Override
     public String toString() {
-      return "Array";
+      return String.format("Array<%s,%s>", indexType, elementType);
     }
 
     @Override
@@ -303,7 +345,50 @@ public abstract class FormulaType<T extends Formula> {
 
       return elementType.equals(other.elementType) && indexType.equals(other.indexType);
     }
+
+    @Override
+    public String toSMTLIBString() {
+      return "(Array " + indexType.toSMTLIBString() + " " + elementType.toSMTLIBString() + ")";
+    }
   }
+
+  public static final FormulaType<StringFormula> StringType =
+      new FormulaType<>() {
+
+        @Override
+        public boolean isStringType() {
+          return true;
+        }
+
+        @Override
+        public String toString() {
+          return "String";
+        }
+
+        @Override
+        public String toSMTLIBString() {
+          return "String";
+        }
+      };
+
+  public static final FormulaType<BooleanFormula> RegexType =
+      new FormulaType<>() {
+
+        @Override
+        public boolean isRegexType() {
+          return true;
+        }
+
+        @Override
+        public String toString() {
+          return "RegLan";
+        }
+
+        @Override
+        public String toSMTLIBString() {
+          return "RegLan";
+        }
+      };
 
   /**
    * Parse a string and return the corresponding type. This method is the counterpart of {@link
@@ -316,6 +401,10 @@ public abstract class FormulaType<T extends Formula> {
       return IntegerType;
     } else if (RationalType.toString().equals(t)) {
       return RationalType;
+    } else if (StringType.toString().equals(t)) {
+      return StringType;
+    } else if (RegexType.toString().equals(t)) {
+      return RegexType;
     } else if (FloatingPointRoundingModeType.toString().equals(t)) {
       return FloatingPointRoundingModeType;
     } else if (t.startsWith("FloatingPoint<")) {

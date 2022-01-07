@@ -9,12 +9,14 @@
 package org.sosy_lab.java_smt.solvers.z3;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.enumerations.Z3_ast_print_mode;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -36,7 +38,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearAr
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 
 @Options(prefix = "solver.z3")
-final class Z3SolverContext extends AbstractSolverContext {
+public final class Z3SolverContext extends AbstractSolverContext {
 
   /** Optimization settings. */
   @Option(
@@ -52,6 +54,7 @@ final class Z3SolverContext extends AbstractSolverContext {
   String objectivePrioritizationMode = "box";
 
   private final ShutdownRequestListener interruptListener;
+  private final ShutdownNotifier shutdownNotifier;
   private final @Nullable PathCounterTemplate logfile;
   private final long z3params;
   private final LogManager logger;
@@ -74,8 +77,7 @@ final class Z3SolverContext extends AbstractSolverContext {
             "Activate replayable logging in Z3."
                 + " The log can be given as an input to the solver and replayed.")
     @FileOption(FileOption.Type.OUTPUT_FILE)
-    @Nullable
-    Path log = null;
+    @Nullable Path log = null;
   }
 
   @SuppressWarnings("checkstyle:parameternumber")
@@ -83,24 +85,25 @@ final class Z3SolverContext extends AbstractSolverContext {
       Z3FormulaCreator pFormulaCreator,
       Configuration config,
       long pZ3params,
-      ShutdownRequestListener pInterruptListener,
       ShutdownNotifier pShutdownNotifier,
       LogManager pLogger,
       Z3FormulaManager pManager,
-      PathCounterTemplate pSolverLogFile)
+      @Nullable PathCounterTemplate pSolverLogFile)
       throws InvalidConfigurationException {
     super(pManager);
 
     creator = pFormulaCreator;
     config.inject(this);
     z3params = pZ3params;
-    interruptListener = pInterruptListener;
+    interruptListener = reason -> Native.interrupt(pFormulaCreator.getEnv());
+    shutdownNotifier = pShutdownNotifier;
     pShutdownNotifier.register(interruptListener);
     logger = pLogger;
     manager = pManager;
     logfile = pSolverLogFile;
   }
 
+  @SuppressWarnings("ParameterNumber")
   public static synchronized Z3SolverContext create(
       LogManager logger,
       Configuration config,
@@ -108,28 +111,20 @@ final class Z3SolverContext extends AbstractSolverContext {
       @Nullable PathCounterTemplate solverLogfile,
       long randomSeed,
       FloatingPointRoundingMode pFloatingPointRoundingMode,
-      NonLinearArithmetic pNonLinearArithmetic)
+      NonLinearArithmetic pNonLinearArithmetic,
+      Consumer<String> pLoader)
       throws InvalidConfigurationException {
     ExtraOptions extraOptions = new ExtraOptions();
     config.inject(extraOptions);
 
-    // We need to load z3 in addition to z3java, because Z3's own class only loads the latter
+    // We need to load z3 in addition to z3java, because Z3's own class only loads the latter,
     // but it will fail to find the former if not loaded previously.
     // We load both libraries here to have all the loading in one place.
-    try {
-      // On Linux and MacOS, the plain name of the library works.
-      System.loadLibrary("z3");
-      System.loadLibrary("z3java");
-    } catch (UnsatisfiedLinkError e1) {
-      try {
-        // On Windows, the library name is different, so we try again.
-        System.loadLibrary("libz3");
-        System.loadLibrary("libz3java");
-      } catch (UnsatisfiedLinkError e2) {
-        e1.addSuppressed(e2);
-        throw e1;
-      }
-    }
+    loadLibrariesWithFallback(
+        pLoader, ImmutableList.of("z3", "z3java"), ImmutableList.of("libz3", "libz3java"));
+
+    // disable Z3's own loading mechanism, see com.microsoft.z3.Native
+    System.setProperty("z3.skipLibraryLoad", "true");
 
     if (extraOptions.log != null) {
       Path absolutePath = extraOptions.log.toAbsolutePath();
@@ -150,17 +145,18 @@ final class Z3SolverContext extends AbstractSolverContext {
     Native.globalParamSet("model.compact", "false");
 
     final long context = Native.mkContextRc(cfg);
-    ShutdownNotifier.ShutdownRequestListener interruptListener =
-        reason -> Native.interrupt(context);
     Native.delConfig(cfg);
 
     long boolSort = Native.mkBoolSort(context);
     Native.incRef(context, Native.sortToAst(context, boolSort));
-
     long integerSort = Native.mkIntSort(context);
     Native.incRef(context, Native.sortToAst(context, integerSort));
     long realSort = Native.mkRealSort(context);
     Native.incRef(context, Native.sortToAst(context, realSort));
+    long stringSort = Native.mkStringSort(context);
+    Native.incRef(context, Native.sortToAst(context, stringSort));
+    long regexSort = Native.mkReSort(context, stringSort);
+    Native.incRef(context, Native.sortToAst(context, regexSort));
 
     // The string representations of Z3s formulas should be in SMTLib2,
     // otherwise serialization wouldn't work.
@@ -172,7 +168,15 @@ final class Z3SolverContext extends AbstractSolverContext {
         context, z3params, Native.mkStringSymbol(context, ":random-seed"), (int) randomSeed);
 
     Z3FormulaCreator creator =
-        new Z3FormulaCreator(context, boolSort, integerSort, realSort, config, pShutdownNotifier);
+        new Z3FormulaCreator(
+            context,
+            boolSort,
+            integerSort,
+            realSort,
+            stringSort,
+            regexSort,
+            config,
+            pShutdownNotifier);
 
     // Create managers
     Z3UFManager functionTheory = new Z3UFManager(creator);
@@ -181,11 +185,13 @@ final class Z3SolverContext extends AbstractSolverContext {
         new Z3IntegerFormulaManager(creator, pNonLinearArithmetic);
     Z3RationalFormulaManager rationalTheory =
         new Z3RationalFormulaManager(creator, pNonLinearArithmetic);
-    Z3BitvectorFormulaManager bitvectorTheory = new Z3BitvectorFormulaManager(creator);
+    Z3BitvectorFormulaManager bitvectorTheory =
+        new Z3BitvectorFormulaManager(creator, booleanTheory);
     Z3FloatingPointFormulaManager floatingPointTheory =
         new Z3FloatingPointFormulaManager(creator, pFloatingPointRoundingMode);
     Z3QuantifiedFormulaManager quantifierManager = new Z3QuantifiedFormulaManager(creator);
     Z3ArrayFormulaManager arrayManager = new Z3ArrayFormulaManager(creator);
+    Z3StringFormulaManager stringTheory = new Z3StringFormulaManager(creator);
 
     // Set the custom error handling
     // which will throw Z3Exception
@@ -202,16 +208,10 @@ final class Z3SolverContext extends AbstractSolverContext {
             bitvectorTheory,
             floatingPointTheory,
             quantifierManager,
-            arrayManager);
+            arrayManager,
+            stringTheory);
     return new Z3SolverContext(
-        creator,
-        config,
-        z3params,
-        interruptListener,
-        pShutdownNotifier,
-        logger,
-        manager,
-        solverLogfile);
+        creator, config, z3params, pShutdownNotifier, logger, manager, solverLogfile);
   }
 
   @Override
@@ -230,7 +230,7 @@ final class Z3SolverContext extends AbstractSolverContext {
         Native.mkStringSymbol(z3context, ":unsat_core"),
         options.contains(ProverOptions.GENERATE_UNSAT_CORE)
             || options.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS));
-    return new Z3TheoremProver(creator, manager, z3params, options, logfile);
+    return new Z3TheoremProver(creator, manager, z3params, options, logfile, shutdownNotifier);
   }
 
   @Override
@@ -244,7 +244,8 @@ final class Z3SolverContext extends AbstractSolverContext {
       Set<ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
     Z3OptimizationProver out =
-        new Z3OptimizationProver(creator, logger, z3params, manager, options, logfile);
+        new Z3OptimizationProver(
+            creator, logger, z3params, manager, options, logfile, shutdownNotifier);
     out.setParam(OPT_ENGINE_CONFIG_KEY, this.optimizationEngine);
     out.setParam(OPT_PRIORITY_CONFIG_KEY, this.objectivePrioritizationMode);
     return out;
@@ -271,6 +272,7 @@ final class Z3SolverContext extends AbstractSolverContext {
       closed = true;
       long context = creator.getEnv();
       creator.forceClose();
+      shutdownNotifier.unregister(interruptListener);
       Native.paramsDecRef(context, z3params);
       Native.closeLog();
       Native.delContext(context);

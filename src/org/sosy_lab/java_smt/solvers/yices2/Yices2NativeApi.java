@@ -8,6 +8,10 @@
 
 package org.sosy_lab.java_smt.solvers.yices2;
 
+import java.util.function.Supplier;
+import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.java_smt.basicimpl.ShutdownHook;
+
 @SuppressWarnings({"unused", "checkstyle:methodname", "checkstyle:parametername"})
 public class Yices2NativeApi {
   private Yices2NativeApi() {}
@@ -637,17 +641,36 @@ public class Yices2NativeApi {
   public static native int[] yices_get_unsat_core(long ctx);
 
   /** @param params Set to 0 for default search parameters. */
-  public static boolean yices_check_sat(long ctx, long params) throws IllegalStateException {
-    return check_result(yices_check_context(ctx, params));
+  public static boolean yices_check_sat(long ctx, long params, ShutdownNotifier shutdownNotifier)
+      throws IllegalStateException, InterruptedException {
+    return satCheckWithShutdownNotifier(
+        () -> yices_check_context(ctx, params), ctx, shutdownNotifier);
   }
 
   /** @param params Set to 0 for default search parameters. */
   public static boolean yices_check_sat_with_assumptions(
-      long ctx, long params, int size, int[] assumptions) throws IllegalStateException {
-    return check_result(yices_check_context_with_assumptions(ctx, params, size, assumptions));
+      long ctx, long params, int size, int[] assumptions, ShutdownNotifier shutdownNotifier)
+      throws InterruptedException {
+    return satCheckWithShutdownNotifier(
+        () -> yices_check_context_with_assumptions(ctx, params, size, assumptions),
+        ctx,
+        shutdownNotifier);
   }
 
-  private static boolean check_result(int result) throws IllegalStateException {
+  @SuppressWarnings("try")
+  private static boolean satCheckWithShutdownNotifier(
+      Supplier<Integer> satCheck, long pCtx, ShutdownNotifier shutdownNotifier)
+      throws InterruptedException {
+    int result;
+    try (ShutdownHook hook = new ShutdownHook(shutdownNotifier, () -> yices_stop_search(pCtx))) {
+      shutdownNotifier.shutdownIfNecessary();
+      result = satCheck.get(); // the expensive computation
+    }
+    shutdownNotifier.shutdownIfNecessary();
+    return check_result(result);
+  }
+
+  private static boolean check_result(int result) {
     switch (result) {
       case YICES_STATUS_SAT:
         return true;

@@ -10,10 +10,8 @@ package org.sosy_lab.java_smt.solvers.princess;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
 
-import ap.parser.BooleanCompactifier;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
-import ap.parser.PartialEvaluator;
 import ap.types.Sort;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -45,6 +43,7 @@ final class PrincessFormulaManager
         null,
         pQuantifierManager,
         pArrayManager,
+        null,
         null);
     creator = pCreator;
   }
@@ -68,10 +67,6 @@ final class PrincessFormulaManager
 
   @Override
   protected IExpression simplify(IExpression f) {
-    // TODO this method is not tested, check it!
-    if (f instanceof IFormula) {
-      f = BooleanCompactifier.apply((IFormula) f);
-    }
-    return PartialEvaluator.apply(f);
+    return getEnvironment().simplify(f);
   }
 }

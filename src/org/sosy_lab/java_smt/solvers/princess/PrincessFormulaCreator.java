@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.solvers.princess;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier.EXISTS;
 import static org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier.FORALL;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessEnvironment.toSeq;
 import static scala.collection.JavaConverters.asJava;
 
 import ap.basetypes.IdealInt;
@@ -20,6 +21,7 @@ import ap.parser.IBinJunctor;
 import ap.parser.IBoolLit;
 import ap.parser.IConstant;
 import ap.parser.IEpsilon;
+import ap.parser.IEquation;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.IFormulaITE;
@@ -37,13 +39,14 @@ import ap.parser.ITimes;
 import ap.parser.IVariable;
 import ap.terfor.conjunctions.Quantifier;
 import ap.terfor.preds.Predicate;
-import ap.theories.SimpleArray;
+import ap.theories.ExtArray;
 import ap.theories.bitvectors.ModuloArithmetic;
 import ap.theories.nia.GroebnerMultiplication$;
 import ap.types.Sort;
 import ap.types.Sort$;
-import ap.types.Sort.MultipleValueBool$;
+import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Table;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -59,6 +62,8 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
+import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessBitvectorToBitvectorDeclaration;
+import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessBitvectorToBooleanDeclaration;
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessByExampleDeclaration;
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessEquationDeclaration;
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessIFunctionDeclaration;
@@ -105,8 +110,18 @@ class PrincessFormulaCreator
     theoryFunctionKind.put(GroebnerMultiplication$.MODULE$.mul(), FunctionDeclarationKind.MUL);
   }
 
+  /**
+   * This mapping is a cache from index sort and element sort to the full array sort.
+   *
+   * <p>This mapping guarantees uniqueness of array types in JavaSMT, i.e. without this cache, we
+   * can not compare arrays, because all of them have distinct sorts, and SELECT/STORE operations
+   * are also incomparable and result in trivially satisfiable SMT queries (with no visible hint on
+   * the reason, except distinct sort objects).
+   */
+  private final Table<Sort, Sort, Sort> arraySortCache = HashBasedTable.create();
+
   PrincessFormulaCreator(PrincessEnvironment pEnv) {
-    super(pEnv, PrincessEnvironment.BOOL_SORT, PrincessEnvironment.INTEGER_SORT, null);
+    super(pEnv, PrincessEnvironment.BOOL_SORT, PrincessEnvironment.INTEGER_SORT, null, null, null);
   }
 
   @Override
@@ -135,36 +150,7 @@ class PrincessFormulaCreator
 
   @Override
   public FormulaType<?> getFormulaType(IExpression pFormula) {
-    if (pFormula instanceof IFormula) {
-      return FormulaType.BooleanType;
-    } else if (pFormula instanceof ITerm) {
-      final Sort sort = Sort$.MODULE$.sortOf((ITerm) pFormula);
-      if (sort == PrincessEnvironment.BOOL_SORT) {
-        return FormulaType.BooleanType;
-      } else if (sort == PrincessEnvironment.INTEGER_SORT) {
-        return FormulaType.IntegerType;
-      } else if (sort instanceof SimpleArray.ArraySort) {
-        return new ArrayFormulaType<>(FormulaType.IntegerType, FormulaType.IntegerType);
-      } else if (sort instanceof MultipleValueBool$) {
-        return FormulaType.BooleanType;
-      } else {
-        scala.Option<Object> bitWidth = getBitWidth(sort);
-        if (bitWidth.isDefined()) {
-          return FormulaType.getBitvectorTypeWithSize((Integer) bitWidth.get());
-        }
-      }
-    }
-    throw new IllegalArgumentException(
-        String.format(
-            "Unknown formula type '%s' for formula '%s'.", pFormula.getClass(), pFormula));
-  }
-
-  static scala.Option<Object> getBitWidth(final Sort sort) {
-    scala.Option<Object> bitWidth = ModuloArithmetic.UnsignedBVSort$.MODULE$.unapply(sort);
-    if (!bitWidth.isDefined()) {
-      bitWidth = ModuloArithmetic.SignedBVSort$.MODULE$.unapply(sort);
-    }
-    return bitWidth;
+    return PrincessEnvironment.getFormulaType(pFormula);
   }
 
   @Override
@@ -184,9 +170,12 @@ class PrincessFormulaCreator
 
   @Override
   public Sort getArrayType(Sort pIndexType, Sort pElementType) {
-    // no special cases here, princess does only support int arrays with int indexes
-    // TODO: check sorts
-    return SimpleArray.ArraySort$.MODULE$.apply(1);
+    Sort result = arraySortCache.get(pIndexType, pElementType);
+    if (result == null) {
+      result = new ExtArray(toSeq(ImmutableList.of(pIndexType)), pElementType).sort();
+      arraySortCache.put(pIndexType, pElementType, result);
+    }
+    return result;
   }
 
   @SuppressWarnings("unchecked")
@@ -195,7 +184,7 @@ class PrincessFormulaCreator
     if (pFormula instanceof BitvectorFormula) {
       ITerm input = (ITerm) extractInfo(pFormula);
       Sort sort = Sort$.MODULE$.sortOf(input);
-      scala.Option<Object> bitWidth = getBitWidth(sort);
+      scala.Option<Object> bitWidth = PrincessEnvironment.getBitWidth(sort);
       checkArgument(
           bitWidth.isDefined(), "BitvectorFormula with actual type %s: %s", sort, pFormula);
       return (FormulaType<T>) FormulaType.getBitvectorTypeWithSize((Integer) bitWidth.get());
@@ -211,8 +200,10 @@ class PrincessFormulaCreator
   }
 
   private String getName(IExpression input) {
-    if (input instanceof IAtom || input instanceof IConstant) {
-      return input.toString();
+    if (input instanceof IAtom) {
+      return ((IAtom) input).pred().name();
+    } else if (input instanceof IConstant) {
+      return ((IConstant) input).c().name();
     } else if (input instanceof IBinFormula) {
       return ((IBinFormula) input).j().toString();
     } else if (input instanceof IFormulaITE || input instanceof ITermITE) {
@@ -234,6 +225,8 @@ class PrincessFormulaCreator
     } else if (input instanceof IEpsilon) {
       // in princess epsilon representation is the complete formula which we do not want here
       return "eps";
+    } else if (input instanceof IEquation) {
+      return "=";
     } else {
       throw new AssertionError("Unhandled type " + input.getClass());
     }
@@ -339,16 +332,23 @@ class PrincessFormulaCreator
         ImmutableList.Builder<Formula> args = ImmutableList.builder();
         ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
         int arity = input.length();
-        for (int i = 0; i < arity; i++) {
-          IExpression arg = input.apply(i);
-          FormulaType<?> argumentType = getFormulaType(arg);
-          args.add(encapsulate(argumentType, arg));
-          argTypes.add(argumentType);
-        }
+        int arityStart = 0;
 
         PrincessFunctionDeclaration solverDeclaration;
-
-        if (input instanceof IFunApp) {
+        if (isBitvectorOperationWithAdditionalArgument(kind)) {
+          // the first argument is the bitsize, and it is not relevant for the user.
+          // we do not want type/sort information as arguments.
+          arityStart = 1;
+          if (input instanceof IAtom) {
+            solverDeclaration = new PrincessBitvectorToBooleanDeclaration(((IAtom) input).pred());
+          } else if (input instanceof IFunApp) {
+            solverDeclaration =
+                new PrincessBitvectorToBitvectorDeclaration(((IFunApp) input).fun());
+          } else {
+            throw new AssertionError(
+                String.format("unexpected bitvector operation '%s' for formula '%s'", kind, input));
+          }
+        } else if (input instanceof IFunApp) {
           if (kind == FunctionDeclarationKind.UF) {
             solverDeclaration = new PrincessIFunctionDeclaration(((IFunApp) input).fun());
           } else if (kind == FunctionDeclarationKind.MUL) {
@@ -360,12 +360,48 @@ class PrincessFormulaCreator
           solverDeclaration = new PrincessByExampleDeclaration(input);
         }
 
+        for (int i = arityStart; i < arity; i++) {
+          IExpression arg = input.apply(i);
+          FormulaType<?> argumentType = getFormulaType(arg);
+          args.add(encapsulate(argumentType, arg));
+          argTypes.add(argumentType);
+        }
+
         return visitor.visitFunction(
             f,
             args.build(),
             FunctionDeclarationImpl.of(
                 getName(input), kind, argTypes.build(), getFormulaType(f), solverDeclaration));
       }
+    }
+  }
+
+  private boolean isBitvectorOperationWithAdditionalArgument(FunctionDeclarationKind kind) {
+    switch (kind) {
+      case BV_NOT:
+      case BV_NEG:
+      case BV_OR:
+      case BV_AND:
+      case BV_XOR:
+      case BV_SUB:
+      case BV_ADD:
+      case BV_SDIV:
+      case BV_UDIV:
+      case BV_SREM:
+      case BV_UREM:
+      case BV_MUL:
+      case BV_ULT:
+      case BV_SLT:
+      case BV_ULE:
+      case BV_SLE:
+      case BV_UGT:
+      case BV_SGT:
+      case BV_UGE:
+      case BV_SGE:
+      case BV_EQ:
+        return true;
+      default:
+        return false;
     }
   }
 
@@ -381,10 +417,14 @@ class PrincessFormulaCreator
       final FunctionDeclarationKind theoryKind = theoryFunctionKind.get(fun);
       if (theoryKind != null) {
         return theoryKind;
-      } else if (SimpleArray.Select$.MODULE$.unapply(fun)) {
+      } else if (ExtArray.Select$.MODULE$.unapply(fun).isDefined()) {
         return FunctionDeclarationKind.SELECT;
-      } else if (SimpleArray.Store$.MODULE$.unapply(fun)) {
+      } else if (ExtArray.Store$.MODULE$.unapply(fun).isDefined()) {
         return FunctionDeclarationKind.STORE;
+      } else if (fun == ModuloArithmetic.mod_cast()) {
+        return FunctionDeclarationKind.OTHER;
+      } else if (fun == ModuloArithmetic.int_cast()) {
+        return FunctionDeclarationKind.OTHER;
       } else {
         return FunctionDeclarationKind.UF;
       }
@@ -409,6 +449,8 @@ class PrincessFormulaCreator
     } else if (input instanceof IPlus) {
       // SUB does not exist in princess a - b is a + (-b) there
       return FunctionDeclarationKind.ADD;
+    } else if (input instanceof IEquation) {
+      return FunctionDeclarationKind.EQ;
     } else if (input instanceof IIntFormula) {
       IIntFormula f = (IIntFormula) input;
       if (f.rel().equals(IIntRelation.EqZero())) {
@@ -429,7 +471,7 @@ class PrincessFormulaCreator
 
     } else {
       // we cannot handle XOR, IMPLIES, DISTINCT, DIV, MODULO, LT, LTE GT in princess
-      // they are either handled implicitly by the above mentioned parts or not at all
+      // they are either handled implicitly by the above-mentioned parts or not at all
       return FunctionDeclarationKind.OTHER;
     }
   }

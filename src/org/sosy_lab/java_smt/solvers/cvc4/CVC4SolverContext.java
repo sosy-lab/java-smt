@@ -14,8 +14,8 @@ import edu.stanford.CVC4.ExprManager;
 import edu.stanford.CVC4.SExpr;
 import edu.stanford.CVC4.SmtEngine;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.logging.Level;
-import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -50,9 +50,10 @@ public final class CVC4SolverContext extends AbstractSolverContext {
       ShutdownNotifier pShutdownNotifier,
       int randomSeed,
       NonLinearArithmetic pNonLinearArithmetic,
-      FloatingPointRoundingMode pFloatingPointRoundingMode) {
+      FloatingPointRoundingMode pFloatingPointRoundingMode,
+      Consumer<String> pLoader) {
 
-    NativeLibraries.loadLibrary("cvc4jni");
+    pLoader.accept("cvc4jni");
 
     // ExprManager is the central class for creating expressions/terms/formulae.
     ExprManager exprManager = new ExprManager();
@@ -63,6 +64,8 @@ public final class CVC4SolverContext extends AbstractSolverContext {
     SmtEngine smtEngine = new SmtEngine(exprManager);
     smtEngine.setOption("output-language", new SExpr("smt2"));
     smtEngine.setOption("random-seed", new SExpr(randomSeed));
+    // Set Strings option to enable all String features (such as lessOrEquals)
+    smtEngine.setOption("strings-exp", new SExpr(true));
     // smtEngine.delete();
 
     // Create managers
@@ -72,7 +75,8 @@ public final class CVC4SolverContext extends AbstractSolverContext {
         new CVC4IntegerFormulaManager(creator, pNonLinearArithmetic);
     CVC4RationalFormulaManager rationalTheory =
         new CVC4RationalFormulaManager(creator, pNonLinearArithmetic);
-    CVC4BitvectorFormulaManager bitvectorTheory = new CVC4BitvectorFormulaManager(creator);
+    CVC4BitvectorFormulaManager bitvectorTheory =
+        new CVC4BitvectorFormulaManager(creator, booleanTheory);
 
     CVC4FloatingPointFormulaManager fpTheory;
     if (Configuration.isBuiltWithSymFPU()) {
@@ -83,8 +87,11 @@ public final class CVC4SolverContext extends AbstractSolverContext {
       // throw new AssertionError("CVC4 was built without support for FloatingPoint theory");
     }
 
+    CVC4QuantifiedFormulaManager qfTheory = new CVC4QuantifiedFormulaManager(creator);
+
     CVC4ArrayFormulaManager arrayTheory = new CVC4ArrayFormulaManager(creator);
     CVC4SLFormulaManager slTheory = new CVC4SLFormulaManager(creator);
+    CVC4StringFormulaManager strTheory = new CVC4StringFormulaManager(creator);
     CVC4FormulaManager manager =
         new CVC4FormulaManager(
             creator,
@@ -94,8 +101,10 @@ public final class CVC4SolverContext extends AbstractSolverContext {
             rationalTheory,
             bitvectorTheory,
             fpTheory,
+            qfTheory,
             arrayTheory,
-            slTheory);
+            slTheory,
+            strTheory);
 
     return new CVC4SolverContext(creator, manager, pShutdownNotifier, randomSeed);
   }

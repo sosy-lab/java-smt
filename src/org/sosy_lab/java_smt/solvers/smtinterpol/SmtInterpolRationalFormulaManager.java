@@ -28,37 +28,35 @@ class SmtInterpolRationalFormulaManager
 
   @Override
   protected Term makeNumberImpl(long i) {
-    return getFormulaCreator().getEnv().decimal(BigDecimal.valueOf(i));
+    return env.decimal(BigDecimal.valueOf(i));
   }
 
   @Override
   protected Term makeNumberImpl(BigInteger pI) {
-    return getFormulaCreator().getEnv().decimal(new BigDecimal(pI));
+    return env.decimal(new BigDecimal(pI));
   }
 
   @Override
   protected Term makeNumberImpl(String pI) {
-    return getFormulaCreator().getEnv().decimal(pI);
+    return env.decimal(pI);
   }
 
   @Override
   protected Term makeNumberImpl(Rational pI) {
-    return getFormulaCreator()
-        .getEnv()
-        .getTheory()
+    return env.getTheory()
         .rational(
             de.uni_freiburg.informatik.ultimate.logic.Rational.valueOf(pI.getNum(), pI.getDen()),
-            getFormulaCreator().getEnv().getTheory().getRealSort());
+            env.getTheory().getRealSort());
   }
 
   @Override
   protected Term makeNumberImpl(double pNumber) {
-    return getFormulaCreator().getEnv().decimal(BigDecimal.valueOf(pNumber));
+    return env.decimal(BigDecimal.valueOf(pNumber));
   }
 
   @Override
   protected Term makeNumberImpl(BigDecimal pNumber) {
-    return getFormulaCreator().getEnv().decimal(pNumber);
+    return env.decimal(pNumber);
   }
 
   @Override
@@ -74,7 +72,7 @@ class SmtInterpolRationalFormulaManager
       Sort realSort = pNumber1.getTheory().getRealSort();
       assert intSort.equals(pNumber1.getSort()) || realSort.equals(pNumber1.getSort());
       assert intSort.equals(pNumber2.getSort()) || realSort.equals(pNumber2.getSort());
-      return getFormulaCreator().getEnv().term("/", pNumber1, pNumber2);
+      return env.term("/", pNumber1, pNumber2);
     } else {
       return super.divide(pNumber1, pNumber2);
     }
@@ -82,6 +80,6 @@ class SmtInterpolRationalFormulaManager
 
   @Override
   protected Term floor(Term pNumber) {
-    return getFormulaCreator().getEnv().term("to_int", pNumber);
+    return env.term("to_int", pNumber);
   }
 }

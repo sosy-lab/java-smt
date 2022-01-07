@@ -34,7 +34,7 @@ SPDX-License-Identifier: Apache-2.0
     <property name="ivy.configuration.main" value="core"/>
     <property name="ivy.configurations" value="build, ${ivy.configuration.main}, ${ivy.solver.configurations}, test, format-source, checkstyle, spotbugs"/>
     <property name="package" value="java_smt"/>
-    <property name="jar.excludes" value="**/*Test.class **/*Test$*.class ${yices2Classes}"/>
+    <property name="jar.excludes" value="**/*Test.class **/*Test$*.class ${yices2Classes} **/*smt2"/>
     <property name="jar.sources.excludes" value="**/*Test.java ${yices2Sources}"/>
     <property name="jar.excludesInYices2Jar" value=""/> <!-- only excluded in the Jar for Yices2 bindings -->
     <property name="ivy.contrib.present" value="true"/> <!-- always download sources -->

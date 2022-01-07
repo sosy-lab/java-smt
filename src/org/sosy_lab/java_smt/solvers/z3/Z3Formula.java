@@ -22,6 +22,8 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
+import org.sosy_lab.java_smt.api.RegexFormula;
+import org.sosy_lab.java_smt.api.StringFormula;
 
 @Immutable
 abstract class Z3Formula implements Formula {
@@ -133,6 +135,20 @@ abstract class Z3Formula implements Formula {
   @Immutable
   static final class Z3BooleanFormula extends Z3Formula implements BooleanFormula {
     Z3BooleanFormula(long z3context, long z3expr) {
+      super(z3context, z3expr);
+    }
+  }
+
+  @Immutable
+  static final class Z3StringFormula extends Z3Formula implements StringFormula {
+    Z3StringFormula(long z3context, long z3expr) {
+      super(z3context, z3expr);
+    }
+  }
+
+  @Immutable
+  static final class Z3RegexFormula extends Z3Formula implements RegexFormula {
+    Z3RegexFormula(long z3context, long z3expr) {
       super(z3context, z3expr);
     }
   }

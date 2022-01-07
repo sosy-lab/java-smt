@@ -13,34 +13,60 @@ import com.google.common.collect.ImmutableSet;
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
 import de.uni_freiburg.informatik.ultimate.logic.Model;
+import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.model.FunctionValue.Index;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
-class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvironment> {
+class SmtInterpolModel extends CachingAbstractModel<Term, Sort, Script> {
 
   private final Model model;
+  private final Script env;
+  private final ImmutableList<Term> assertedTerms;
 
-  SmtInterpolModel(Model pModel, FormulaCreator<Term, Sort, SmtInterpolEnvironment, ?> pCreator) {
+  SmtInterpolModel(
+      Model pModel,
+      FormulaCreator<Term, Sort, Script, ?> pCreator,
+      Collection<Term> pAssertedTerms) {
     super(pCreator);
     model = pModel;
+    env = pCreator.getEnv();
+    assertedTerms = ImmutableList.copyOf(pAssertedTerms);
   }
 
   @Override
   protected ImmutableList<ValueAssignment> toList() {
 
+    Set<FunctionSymbol> usedSymbols = new LinkedHashSet<>();
+    for (Term assertedTerm : assertedTerms) {
+      for (Term symbol : creator.extractVariablesAndUFs(assertedTerm, true).values()) {
+        if (symbol instanceof ApplicationTerm) {
+          usedSymbols.add(((ApplicationTerm) symbol).getFunction());
+        }
+      }
+    }
+
     ImmutableSet.Builder<ValueAssignment> assignments = ImmutableSet.builder();
 
     for (FunctionSymbol symbol : model.getDefinedFunctions()) {
+
+      // SMTInterpol also reports evaluations for unused symbols, including those from different
+      // prover stacks. Thus, we ignore unused symbols. Those symbols are still shown when
+      // applying model.toString().
+      if (!usedSymbols.contains(symbol)) {
+        continue;
+      }
+
       final String name = unescape(symbol.getApplicationString());
       if (symbol.getParameterSorts().length == 0) { // simple variable or array
-        Term variable = creator.getEnv().term(name);
+        Term variable = env.term(name);
         if (symbol.getReturnSort().isArraySort()) {
           assignments.addAll(getArrayAssignment(name, variable, variable, ImmutableList.of()));
         } else {
@@ -84,7 +110,7 @@ class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvir
         List<Object> innerIndices = new ArrayList<>(upperIndices);
         innerIndices.add(evaluateImpl(index));
 
-        Term select = creator.getEnv().term("select", key, index);
+        Term select = env.term("select", key, index);
         if (content.getSort().isArraySort()) {
           assignments.addAll(getArrayAssignment(symbol, select, content, innerIndices));
         } else {
@@ -92,7 +118,7 @@ class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvir
               new ValueAssignment(
                   creator.encapsulateWithTypeOf(select),
                   creator.encapsulateWithTypeOf(model.evaluate(content)),
-                  creator.encapsulateBoolean(creator.getEnv().term("=", select, content)),
+                  creator.encapsulateBoolean(env.term("=", select, content)),
                   symbol,
                   evaluateImpl(content),
                   innerIndices));
@@ -121,9 +147,8 @@ class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvir
     de.uni_freiburg.informatik.ultimate.smtinterpol.model.Model mmodel =
         (de.uni_freiburg.informatik.ultimate.smtinterpol.model.Model) model;
 
-    for (Map.Entry<Index, Term> v : mmodel.getFunctionValue(symbol).values().entrySet()) {
-      assignments.add(
-          getAssignment(name, (ApplicationTerm) creator.getEnv().term(name, v.getKey().toArray())));
+    for (Index key : mmodel.getFunctionValue(symbol).values().keySet()) {
+      assignments.add(getAssignment(name, (ApplicationTerm) env.term(name, key.toArray())));
     }
 
     return assignments;
@@ -139,7 +164,7 @@ class SmtInterpolModel extends CachingAbstractModel<Term, Sort, SmtInterpolEnvir
     return new ValueAssignment(
         creator.encapsulateWithTypeOf(term),
         creator.encapsulateWithTypeOf(value),
-        creator.encapsulateBoolean(creator.getEnv().term("=", term, value)),
+        creator.encapsulateBoolean(env.term("=", term, value)),
         key,
         evaluateImpl(term),
         argumentInterpretation);

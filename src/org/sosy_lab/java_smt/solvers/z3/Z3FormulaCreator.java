@@ -49,7 +49,9 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
+import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
@@ -60,6 +62,8 @@ import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3FloatingPointFormula;
 import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3IntegerFormula;
 import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3RationalFormula;
+import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3RegexFormula;
+import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3StringFormula;
 
 @Options(prefix = "solver.z3")
 class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
@@ -119,15 +123,18 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   private final Timer cleanupTimer = new Timer();
   protected final ShutdownNotifier shutdownNotifier;
 
+  @SuppressWarnings("ParameterNumber")
   Z3FormulaCreator(
       long pEnv,
       long pBoolType,
       long pIntegerType,
       long pRealType,
+      long pStringType,
+      long pRegexType,
       Configuration config,
       ShutdownNotifier pShutdownNotifier)
       throws InvalidConfigurationException {
-    super(pEnv, pBoolType, pIntegerType, pRealType);
+    super(pEnv, pBoolType, pIntegerType, pRealType, pStringType, pRegexType);
     shutdownNotifier = pShutdownNotifier;
     config.inject(this);
   }
@@ -186,19 +193,24 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
             Native.fpaGetEbits(z3context, pSort), Native.fpaGetSbits(z3context, pSort) - 1);
       case Z3_ROUNDING_MODE_SORT:
         return FormulaType.FloatingPointRoundingModeType;
+      case Z3_RE_SORT:
+        return FormulaType.RegexType;
       case Z3_DATATYPE_SORT:
       case Z3_RELATION_SORT:
       case Z3_FINITE_DOMAIN_SORT:
       case Z3_SEQ_SORT:
-      case Z3_RE_SORT:
       case Z3_UNKNOWN_SORT:
       case Z3_UNINTERPRETED_SORT:
-        // TODO: support for remaining sorts.
-        throw new IllegalArgumentException(
-            "Unknown formula type "
-                + Native.sortToString(z3context, pSort)
-                + " with sort "
-                + sortKind);
+        if (Native.isStringSort(z3context, pSort)) {
+          return FormulaType.StringType;
+        } else {
+          // TODO: support for remaining sorts.
+          throw new IllegalArgumentException(
+              "Unknown formula type "
+                  + Native.sortToString(z3context, pSort)
+                  + " with sort "
+                  + sortKind);
+        }
       default:
         throw new UnsupportedOperationException("Unexpected state.");
     }
@@ -257,6 +269,10 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       return (T) storePhantomReference(new Z3IntegerFormula(getEnv(), pTerm), pTerm);
     } else if (pType.isRationalType()) {
       return (T) storePhantomReference(new Z3RationalFormula(getEnv(), pTerm), pTerm);
+    } else if (pType.isStringType()) {
+      return (T) storePhantomReference(new Z3StringFormula(getEnv(), pTerm), pTerm);
+    } else if (pType.isRegexType()) {
+      return (T) storePhantomReference(new Z3RegexFormula(getEnv(), pTerm), pTerm);
     } else if (pType.isBitvectorType()) {
       return (T) storePhantomReference(new Z3BitvectorFormula(getEnv(), pTerm), pTerm);
     } else if (pType.isFloatingPointType()) {
@@ -294,6 +310,28 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     assert getFormulaType(pTerm).isFloatingPointType();
     cleanupReferences();
     return storePhantomReference(new Z3FloatingPointFormula(getEnv(), pTerm), pTerm);
+  }
+
+  @Override
+  protected StringFormula encapsulateString(Long pTerm) {
+    assert getFormulaType(pTerm).isStringType()
+        : String.format(
+            "Term %s has unexpected type %s.",
+            Native.astToString(getEnv(), pTerm),
+            Native.sortToString(getEnv(), Native.getSort(getEnv(), pTerm)));
+    cleanupReferences();
+    return storePhantomReference(new Z3StringFormula(getEnv(), pTerm), pTerm);
+  }
+
+  @Override
+  protected RegexFormula encapsulateRegex(Long pTerm) {
+    assert getFormulaType(pTerm).isRegexType()
+        : String.format(
+            "Term %s has unexpected type %s.",
+            Native.astToString(getEnv(), pTerm),
+            Native.sortToString(getEnv(), Native.getSort(getEnv(), pTerm)));
+    cleanupReferences();
+    return storePhantomReference(new Z3RegexFormula(getEnv(), pTerm), pTerm);
   }
 
   @Override
@@ -351,11 +389,10 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return visitor.visitConstant(formula, convertValue(f));
       case Z3_APP_AST:
         int arity = Native.getAppNumArgs(environment, f);
+        int declKind = Native.getDeclKind(environment, Native.getAppDecl(environment, f));
 
         if (arity == 0) {
-
           // constants
-          int declKind = Native.getDeclKind(environment, Native.getAppDecl(environment, f));
           Object value = Z3_CONSTANTS.get(declKind);
           if (value != null) {
             return visitor.visitConstant(formula, value);
@@ -473,6 +510,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.MODULO;
       case Z3_OP_TO_INT:
         return FunctionDeclarationKind.FLOOR;
+      case Z3_OP_TO_REAL:
+        return FunctionDeclarationKind.TO_REAL;
 
       case Z3_OP_UNINTERPRETED:
         return FunctionDeclarationKind.UF;
@@ -630,6 +669,54 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.FP_IS_SUBNORMAL;
       case Z3_OP_FPA_IS_NORMAL:
         return FunctionDeclarationKind.FP_IS_NORMAL;
+
+      case Z3_OP_SEQ_CONCAT:
+        return FunctionDeclarationKind.STR_CONCAT;
+      case Z3_OP_SEQ_PREFIX:
+        return FunctionDeclarationKind.STR_PREFIX;
+      case Z3_OP_SEQ_SUFFIX:
+        return FunctionDeclarationKind.STR_SUFFIX;
+      case Z3_OP_SEQ_CONTAINS:
+        return FunctionDeclarationKind.STR_CONTAINS;
+      case Z3_OP_SEQ_EXTRACT:
+        return FunctionDeclarationKind.STR_SUBSTRING;
+      case Z3_OP_SEQ_REPLACE:
+        return FunctionDeclarationKind.STR_REPLACE;
+      case Z3_OP_SEQ_AT:
+        return FunctionDeclarationKind.STR_CHAR_AT;
+      case Z3_OP_SEQ_LENGTH:
+        return FunctionDeclarationKind.STR_LENGTH;
+      case Z3_OP_SEQ_INDEX:
+        return FunctionDeclarationKind.STR_INDEX_OF;
+      case Z3_OP_SEQ_TO_RE:
+        return FunctionDeclarationKind.STR_TO_RE;
+      case Z3_OP_SEQ_IN_RE:
+        return FunctionDeclarationKind.STR_IN_RE;
+      case Z3_OP_STR_TO_INT:
+        return FunctionDeclarationKind.STR_TO_INT;
+      case Z3_OP_INT_TO_STR:
+        return FunctionDeclarationKind.INT_TO_STR;
+      case Z3_OP_STRING_LT:
+        return FunctionDeclarationKind.STR_LT;
+      case Z3_OP_STRING_LE:
+        return FunctionDeclarationKind.STR_LE;
+      case Z3_OP_RE_PLUS:
+        return FunctionDeclarationKind.RE_PLUS;
+      case Z3_OP_RE_STAR:
+        return FunctionDeclarationKind.RE_STAR;
+      case Z3_OP_RE_OPTION:
+        return FunctionDeclarationKind.RE_OPTIONAL;
+      case Z3_OP_RE_CONCAT:
+        return FunctionDeclarationKind.RE_CONCAT;
+      case Z3_OP_RE_UNION:
+        return FunctionDeclarationKind.RE_UNION;
+      case Z3_OP_RE_RANGE:
+        return FunctionDeclarationKind.RE_RANGE;
+      case Z3_OP_RE_INTERSECT:
+        return FunctionDeclarationKind.RE_INTERSECT;
+      case Z3_OP_RE_COMPLEMENT:
+        return FunctionDeclarationKind.RE_COMPLEMENT;
+
       default:
         return FunctionDeclarationKind.OTHER;
     }
@@ -642,6 +729,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   public boolean isConstant(long value) {
     return Native.isNumeralAst(environment, value)
         || Native.isAlgebraicNumber(environment, value)
+        || Native.isString(environment, value)
         || isOP(environment, value, Z3_decl_kind.Z3_OP_TRUE.toInt())
         || isOP(environment, value, Z3_decl_kind.Z3_OP_FALSE.toInt());
   }
@@ -673,6 +761,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return new BigInteger(Native.getNumeralString(environment, value));
       } else if (type.isRationalType()) {
         return Rational.ofString(Native.getNumeralString(environment, value));
+      } else if (type.isStringType()) {
+        return Native.getString(environment, value);
       } else if (type.isBitvectorType()) {
         return new BigInteger(Native.getNumeralString(environment, value));
       } else if (type.isFloatingPointType()) {
@@ -830,8 +920,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
    * get a previously created application declaration, or <code>NULL</code> if the symbol is
    * unknown.
    */
-  @Nullable
-  Long getKnownDeclaration(String symbolName) {
+  @Nullable Long getKnownDeclaration(String symbolName) {
     return symbolsToDeclarations.get(symbolName);
   }
 }

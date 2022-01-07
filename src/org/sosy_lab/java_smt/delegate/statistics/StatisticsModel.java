@@ -20,6 +20,7 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
+import org.sosy_lab.java_smt.api.StringFormula;
 
 class StatisticsModel implements Model {
 
@@ -63,6 +64,12 @@ class StatisticsModel implements Model {
 
   @Override
   public @Nullable BigInteger evaluate(BitvectorFormula pF) {
+    stats.modelEvaluations.getAndIncrement();
+    return delegate.evaluate(pF);
+  }
+
+  @Override
+  public @Nullable String evaluate(StringFormula pF) {
     stats.modelEvaluations.getAndIncrement();
     return delegate.evaluate(pF);
   }

@@ -8,6 +8,8 @@
 
 package org.sosy_lab.java_smt.test;
 
+import static com.google.common.truth.TruthJUnit.assume;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.truth.Truth;
@@ -267,7 +269,14 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void simplificationTest() {
-    // Boolector MAY fail (Use internal equals method to check if it does)
+    // Boolector fails this as it either simplifies to much, or nothing
+    // TODO: maybe this is just a matter of options, check!
+    assume()
+        .withMessage(
+            "Solver %s fails on this test as it does not simplify any formulas.", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BOOLECTOR);
+
     BooleanFormula tru = bmgr.makeBoolean(true);
     BooleanFormula fals = bmgr.makeBoolean(false);
     BooleanFormula x = bmgr.makeVariable("x");
@@ -310,5 +319,15 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0 {
     Truth.assertThat(bmgr.or(fals, x, fals)).isEqualTo(x);
 
     Truth.assertThat(bmgr.or(fals, fals, x, tru, y, fals, x, y)).isEqualTo(tru);
+  }
+
+  @Test
+  public void simpleImplicationTest() throws InterruptedException, SolverException {
+    BooleanFormula x = bmgr.makeVariable("x");
+    BooleanFormula y = bmgr.makeVariable("y");
+    BooleanFormula z = bmgr.makeVariable("z");
+
+    BooleanFormula f = bmgr.and(bmgr.equivalence(x, y), bmgr.equivalence(x, z));
+    assertThatFormula(f).implies(bmgr.equivalence(y, z));
   }
 }

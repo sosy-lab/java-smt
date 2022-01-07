@@ -10,10 +10,13 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
+import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,6 +25,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
@@ -37,6 +41,8 @@ import org.sosy_lab.java_smt.api.SolverException;
  */
 @RunWith(Parameterized.class)
 public class BitvectorFormulaManagerTest extends SolverBasedTest0 {
+
+  private static final BitvectorType bvType4 = FormulaType.getBitvectorTypeWithSize(4);
 
   @Parameters(name = "{0}")
   public static Object[] getAllSolvers() {
@@ -357,5 +363,59 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0 {
     // Use bv > 1 because of Boolector
     BitvectorFormula bv = bvmgr.makeBitvector(2, 4);
     bvmgr.extend(bv, -1, true);
+  }
+
+  @Test
+  public void bvIntArray() {
+    requireArrays();
+    assume()
+        .withMessage("Solver %s does not support arrays with integer index", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BOOLECTOR);
+
+    BitvectorFormula bv = bvmgr.makeBitvector(4, 3);
+    ArrayFormula<IntegerFormula, BitvectorFormula> arr =
+        amgr.makeArray("arr", FormulaType.IntegerType, bvType4);
+    IntegerFormula index = imgr.makeNumber(12);
+    arr = amgr.store(arr, index, bv);
+
+    assertThat(mgr.getFormulaType(arr))
+        .isEqualTo(FormulaType.getArrayType(FormulaType.IntegerType, bvType4));
+  }
+
+  @Test
+  public void bvBvArray() {
+    requireArrays();
+
+    BitvectorFormula bv = bvmgr.makeBitvector(4, 3);
+    ArrayFormula<BitvectorFormula, BitvectorFormula> arr = amgr.makeArray("arr", bvType4, bvType4);
+    BitvectorFormula index = bvmgr.makeBitvector(4, 2);
+    arr = amgr.store(arr, index, bv);
+
+    assertThat(mgr.getFormulaType(arr)).isEqualTo(FormulaType.getArrayType(bvType4, bvType4));
+  }
+
+  @Test
+  public void bvDistinct() throws SolverException, InterruptedException {
+    for (int bitsize : new int[] {2, 4, 6}) {
+      List<BitvectorFormula> bvs = new ArrayList<>();
+      for (int i = 0; i < 1 << bitsize; i++) {
+        bvs.add(bvmgr.makeVariable(bitsize, "a" + i + "_" + bitsize));
+      }
+      assertThatFormula(bvmgr.distinct(bvs.subList(0, 1 << (bitsize - 1)))).isSatisfiable();
+      assertThatFormula(bvmgr.distinct(bvs)).isSatisfiable();
+      bvs.add(bvmgr.makeVariable(bitsize, "b" + "_" + bitsize));
+      assertThatFormula(bvmgr.distinct(bvs)).isUnsatisfiable();
+    }
+  }
+
+  @Test
+  public void bvVarDistinct() throws SolverException, InterruptedException {
+    BitvectorFormula a = bvmgr.makeVariable(4, "a");
+    BitvectorFormula num3 = bvmgr.makeBitvector(4, 3);
+
+    assertThatFormula(bvmgr.distinct(List.of(a, num3))).isSatisfiable();
+    assertThatFormula(bvmgr.distinct(List.of(a, a))).isUnsatisfiable();
+    assertThatFormula(bvmgr.distinct(List.of(num3, num3))).isUnsatisfiable();
   }
 }
