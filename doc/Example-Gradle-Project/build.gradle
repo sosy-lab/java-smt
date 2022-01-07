@@ -62,12 +62,11 @@ dependencies {
   runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-z3', version: '4.8.10', classifier: 'libz3', ext: 'so'
   runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-z3', version: '4.8.10', classifier: 'libz3java', ext: 'so'
 
-  // We don't pull MathSAT5 and OptiMathSAT at the moment because MathSAT5 has an inconsistency in Maven till the next release
-  // Retrieve MathSAT5 with Maven
-  //runtime group: 'org.sosy-lab', name: 'javasmt-solver-mathsat5', version: '5.6.5', ext: 'so'
+  // Mathsat5 via Maven
+  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-mathsat5', version: '5.6.6', classifier: 'libmathsat5j', ext: 'so'
 
   // Retrieve OptiMathSAT via Ivy (as it is currently not available in Maven)
-  //runtime 'org.sosy_lab:javasmt-solver-optimathsat:1.7.1-sosy0:liboptimathsat5j@so'
+  runtimeOnly 'org.sosy_lab:javasmt-solver-optimathsat:1.7.2:liboptimathsat5j@so'
 
   runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-cvc4', version: '1.8-prerelease-2020-06-24-g7825d8f28', classifier: 'CVC4', ext: 'jar'
   runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-cvc4', version: '1.8-prerelease-2020-06-24-g7825d8f28', classifier: 'libcvc4', ext: 'so'
@@ -79,10 +78,11 @@ dependencies {
   runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-boolector', version: '3.2.1-30-g95859db8', classifier: 'libminisat', ext: 'so'
   runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-boolector', version: '3.2.1-30-g95859db8', classifier: 'libpicosat', ext: 'so'
 
-  /* Kotlin version for z3 as an example:
-    implementation(group = "org.sosy-lab", name = "javasmt-solver-z3", version = "4.8.10", classifier = "com.microsoft.z3", ext = "jar")
-    implementation(group = "org.sosy-lab", name = "javasmt-solver-z3", version = "4.8.10", classifier = "libz3", ext = "so")
-    implementation(group = "org.sosy-lab", name = "javasmt-solver-z3", version = "4.8.10", classifier = "libz3java", ext = "so")
+  /* 
+  Kotlin version for z3 as an example:
+  implementation(group = "org.sosy-lab", name = "javasmt-solver-z3", version = "4.8.10", classifier = "com.microsoft.z3", ext = "jar")
+  implementation(group = "org.sosy-lab", name = "javasmt-solver-z3", version = "4.8.10", classifier = "libz3", ext = "so")
+  implementation(group = "org.sosy-lab", name = "javasmt-solver-z3", version = "4.8.10", classifier = "libz3java", ext = "so")
   */
 
   // Tell implementation config to use the JavaSMT + dependencies from our dependencies folder
