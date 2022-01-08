@@ -66,18 +66,26 @@ dependencies {
   runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-mathsat5', version: '5.6.6', classifier: 'libmathsat5j', ext: 'so'
 
   // Retrieve OptiMathSAT via Ivy (as it is currently not available in Maven)
-  runtimeOnly 'org.sosy_lab:javasmt-solver-optimathsat:1.7.2:liboptimathsat5j@so'
+  runtimeOnly 'org.sosy_lab:javasmt-solver-optimathsat:1.7.1-sosy0:liboptimathsat5j@so'
 
+  // Retrieve CVC4 via Maven
   runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-cvc4', version: '1.8-prerelease-2020-06-24-g7825d8f28', classifier: 'CVC4', ext: 'jar'
   runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-cvc4', version: '1.8-prerelease-2020-06-24-g7825d8f28', classifier: 'libcvc4', ext: 'so'
   runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-cvc4', version: '1.8-prerelease-2020-06-24-g7825d8f28', classifier: 'libcvc4jni', ext: 'so'
   runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-cvc4', version: '1.8-prerelease-2020-06-24-g7825d8f28', classifier: 'libcvc4parser', ext: 'so'
 
+  // Retrieve Boolector via Maven
+  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-boolector', version: '3.2.2-gcc3a7091', classifier: 'libboolector', ext: 'so'
+  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-boolector', version: '3.2.2-gcc3a7091', classifier: 'libminisat', ext: 'so'
+  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-boolector', version: '3.2.2-gcc3a7091', classifier: 'libpicosat', ext: 'so'
 
-  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-boolector', version: '3.2.1-30-g95859db8', classifier: 'libboolector', ext: 'so'
-  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-boolector', version: '3.2.1-30-g95859db8', classifier: 'libminisat', ext: 'so'
-  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-boolector', version: '3.2.1-30-g95859db8', classifier: 'libpicosat', ext: 'so'
-
+  // Retrieve Princess
+  
+  // Retrieve SMTInterpol
+  
+  // Example as to how to use Yices2 (excluded because of License reasons)
+  
+  
   /* 
   Kotlin version for z3 as an example:
   implementation(group = "org.sosy-lab", name = "javasmt-solver-z3", version = "4.8.10", classifier = "com.microsoft.z3", ext = "jar")
@@ -108,12 +116,12 @@ task copyDependencies(type: Copy) {
   rename '.*(lib[^-]*)-?.*.so', '$1.so'
 }
 
-// cleans the dependencies folder
+// Cleans the dependencies folder
 task cleanDownloadedDependencies(type: Delete) {
   delete fileTree('build/dependencies')
 }
 
-// Copy the JavaSMT depdendencies before using them
+// Copy the JavaSMT depdendencies before using them, to do this we declare a dependency on the copy task of ours here
 compileJava.dependsOn copyDependencies
 
 // When clean is called we want to delete our copied JavaSMT files
