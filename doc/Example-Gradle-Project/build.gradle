@@ -113,10 +113,8 @@ task cleanDownloadedDependencies(type: Delete) {
   delete fileTree('build/dependencies')
 }
 
-// Copy the JavaSMT depdendencies before using them in run and test
+// Copy the JavaSMT depdendencies before using them
 compileJava.dependsOn copyDependencies
-test.dependsOn copyDependencies
-run.dependsOn copyDependencies
 
 // When clean is called we want to delete our copied JavaSMT files
 clean.dependsOn cleanDownloadedDependencies
