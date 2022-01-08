@@ -130,3 +130,7 @@ compileJava.dependsOn copyDependencies
 
 // When clean is called we want to delete our copied JavaSMT files
 clean.dependsOn cleanDownloadedDependencies
+
+// Set duplicate strategy to remove a warning
+distTar.setDuplicatesStrategy(DuplicatesStrategy.INCLUDE)
+distZip.setDuplicatesStrategy(DuplicatesStrategy.INCLUDE)
