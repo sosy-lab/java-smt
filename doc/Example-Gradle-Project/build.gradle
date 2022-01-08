@@ -96,8 +96,9 @@ test {
 }
 
 // Copy and rename all JavaSMT dependencies
-// This is necassary as Gradle renames the JavaSMT dependencies
-// AND they need to be in a specific location for JavaSMT to be found (the easiest ist the same folder)
+// This is necassary as Gradle renames the JavaSMT dependencies, but we need them to have certain names,
+// and they need to be in a specific location for JavaSMT to be found (the easiest ist the same folder)
+// For more information about this look up the sosy-commons loading process
 task copyDependencies(type: Copy) {
   // Delete old dependencies as they might cause trouble
   dependsOn 'cleanDownloadedDependencies'
@@ -113,6 +114,7 @@ task cleanDownloadedDependencies(type: Delete) {
 }
 
 // Copy the JavaSMT depdendencies before using them in run and test
+compileJava.dependsOn copyDependencies
 test.dependsOn copyDependencies
 run.dependsOn copyDependencies
 
