@@ -55,7 +55,7 @@ dependencies {
   testImplementation 'junit:junit:4.13'
 
   // Retrieve JavaSMT with Maven and transitive dependencies via a pom.xml
-  implementation 'org.sosy-lab:java-smt:3.7.0-61-gea80187e'
+  implementation 'org.sosy-lab:java-smt:3.11.0'
 
   // Retrieve Z3 with Maven but without a pom.xml, just the artifacts
   runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-z3', version: '4.8.10', classifier: 'com.microsoft.z3', ext: 'jar'
@@ -82,9 +82,13 @@ dependencies {
   // Retrieve Princess
   
   // Retrieve SMTInterpol
+  runtimeOnly group: 'de.uni-freiburg.informatik.ultimate', name: 'smtinterpol', version: '2.5-916-ga5843d8b', ext: 'jar'
   
-  // Example as to how to use Yices2 (excluded because of License reasons)
-  
+  // Example as to how to use Yices2
+  // First get JavaSMT for Yices2 from Maven (if you want to use only Yices2 use this dependency in the "implementation" part above instead of regual JavaSMT)
+  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-yices2', version: '3.10.0', ext: 'jar'
+  // And the Yices2 solver from Maven
+  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-yices2', version: '2.6.2-396-g194350c1', classifier: 'libyices2j', ext: 'so'
   
   /* 
   Kotlin version for z3 as an example:
