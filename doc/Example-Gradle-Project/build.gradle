@@ -135,3 +135,12 @@ clean.dependsOn cleanDownloadedDependencies
 // Set duplicate strategy to remove a warning
 distTar.setDuplicatesStrategy(DuplicatesStrategy.INCLUDE)
 distZip.setDuplicatesStrategy(DuplicatesStrategy.INCLUDE)
+
+// Configuring the jar task allows not only building our jar but custom classpath usage
+// Note: the classpath will assume that the dependencies are in the same folder as the jar!
+jar {
+  manifest {
+    attributes 'Main-Class': 'org.sosy_lab.java_smt_example.SolverOverviewTable'
+    attributes 'Class-Path': configurations.javaSMTConfig.files.collect { it.getName() }.join(' ')
+  }
+}
