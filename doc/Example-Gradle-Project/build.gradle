@@ -80,6 +80,7 @@ dependencies {
   runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-boolector', version: '3.2.2-gcc3a7091', classifier: 'libpicosat', ext: 'so'
 
   // Retrieve Princess
+  runtimeOnly group: 'io.github.uuverifiers', name: 'princess_2.13', version: '2021-11-15', ext: 'jar'
   
   // Retrieve SMTInterpol
   runtimeOnly group: 'de.uni-freiburg.informatik.ultimate', name: 'smtinterpol', version: '2.5-916-ga5843d8b', ext: 'jar'
