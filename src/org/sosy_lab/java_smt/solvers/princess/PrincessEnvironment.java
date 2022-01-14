@@ -552,14 +552,22 @@ class PrincessEnvironment {
   }
 
   /**
-   * Merge INTEGER and RATIONAL type and return the more general type.
+   * Merge INTEGER and RATIONAL type or INTEGER and BITVECTOR and return the more general type. The
+   * ordering is: RATIONAL > INTEGER > BITVECTOR.
    *
    * @throws IllegalArgumentException for any other type.
    */
   private static FormulaType<?> mergeFormulaTypes(FormulaType<?> type1, FormulaType<?> type2) {
-    Preconditions.checkArgument(type1.isIntegerType() || type1.isRationalType());
-    Preconditions.checkArgument(type2.isIntegerType() || type2.isRationalType());
-    return type1.isRationalType() ? type1 : type2;
+    if ((type1.isIntegerType() || type1.isRationalType())
+        && (type2.isIntegerType() || type2.isRationalType())) {
+      return type1.isRationalType() ? type1 : type2;
+    }
+    if ((type1.isIntegerType() || type1.isBitvectorType())
+        && (type2.isIntegerType() || type2.isBitvectorType())) {
+      return type1.isIntegerType() ? type1 : type2;
+    }
+    throw new IllegalArgumentException(
+        String.format("Types %s and %s can not be merged.", type1, type2));
   }
 
   private static FormulaType<?> getFormulaTypeFromSort(final Sort sort) {
