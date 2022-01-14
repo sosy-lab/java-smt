@@ -33,10 +33,7 @@ import ap.terfor.preds.Predicate;
 import ap.theories.ExtArray;
 import ap.theories.ExtArray.ArraySort;
 import ap.theories.bitvectors.ModuloArithmetic;
-import ap.theories.rationals.Fractions;
 import ap.theories.rationals.Rationals$;
-import ap.theories.strings.SeqStringTheory;
-import ap.theories.strings.SeqStringTheoryBuilder;
 import ap.theories.strings.StringTheory;
 import ap.types.Sort;
 import ap.types.Sort$;
@@ -82,8 +79,6 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import ostrich.OFlags;
 import ostrich.OFlags.LengthOptions$;
 import ostrich.OstrichStringTheory;
-import ostrich.OstrichStringTheoryBuilder;
-import ostrich.automata.Transducer;
 import scala.Tuple2;
 import scala.Tuple4;
 import scala.collection.Seq;
@@ -114,8 +109,7 @@ class PrincessEnvironment {
   public static final Sort INTEGER_SORT = Sort.Integer$.MODULE$;
   public static final Sort NAT_SORT = Sort.Nat$.MODULE$;
 
-  static StringTheory stringTheory =
-      new OstrichStringTheory(toSeq(new ArrayList<Tuple2<String, Transducer>>()),
+  static final StringTheory stringTheory = new OstrichStringTheory(toSeq(new ArrayList<>()),
       new OFlags(false, false, LengthOptions$.MODULE$.Auto(), false, false));
   public static final Sort STRING_SORT = stringTheory.StringSort();
   public static final Sort REGEX_SORT = stringTheory.RegexSort();
