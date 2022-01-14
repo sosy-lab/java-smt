@@ -22,6 +22,7 @@ import ap.parser.IFormula;
 import ap.parser.IFunApp;
 import ap.parser.IFunction;
 import ap.parser.IIntFormula;
+import ap.parser.IPlus;
 import ap.parser.ITerm;
 import ap.parser.ITimes;
 import ap.parser.Parser2InputAbsy.TranslationException;
@@ -529,6 +530,9 @@ class PrincessEnvironment {
       if (pFormula instanceof ITimes) {
         // coeff is always INT, lets check the subterm.
         formula = ((ITimes) formula).subterm();
+      } else if (pFormula instanceof IPlus) {
+        return mergeFormulaTypes(
+            getFormulaType(((IPlus) pFormula).t1()), getFormulaType(((IPlus) pFormula).t2()));
       }
       final Sort sort = Sort$.MODULE$.sortOf(formula);
       try {
@@ -545,6 +549,17 @@ class PrincessEnvironment {
     throw new IllegalArgumentException(
         String.format(
             "Unknown formula type '%s' for formula '%s'.", pFormula.getClass(), pFormula));
+  }
+
+  /**
+   * Merge INTEGER and RATIONAL type and return the more general type.
+   *
+   * @throws IllegalArgumentException for any other type.
+   */
+  private static FormulaType<?> mergeFormulaTypes(FormulaType<?> type1, FormulaType<?> type2) {
+    Preconditions.checkArgument(type1.isIntegerType() || type1.isRationalType());
+    Preconditions.checkArgument(type2.isIntegerType() || type2.isRationalType());
+    return type1.isRationalType() ? type1 : type2;
   }
 
   private static FormulaType<?> getFormulaTypeFromSort(final Sort sort) {

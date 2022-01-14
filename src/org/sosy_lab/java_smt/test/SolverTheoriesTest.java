@@ -731,14 +731,17 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
             FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.RationalType));
 
     RationalFormula valueInMulti = amgr.select(amgr.select(multi, _i), _i);
+    String dump = valueInMulti.toString();
 
     switch (solver) {
       case MATHSAT5:
-        assertThat(valueInMulti.toString())
-            .isEqualTo("(`read_int_rat` (`read_int_<Array, Int, Real, >` multi i) i)");
+        assertThat(dump).isEqualTo("(`read_int_rat` (`read_int_<Array, Int, Real, >` multi i) i)");
+        break;
+      case PRINCESS:
+        assertThat(dump).isEqualTo("select(select(multi, i), i)");
         break;
       default:
-        assertThat(valueInMulti.toString()).isEqualTo("(select (select multi i) i)");
+        assertThat(dump).isEqualTo("(select (select multi i) i)");
     }
   }
 

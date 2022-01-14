@@ -14,6 +14,7 @@ import ap.parser.ITerm;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
@@ -61,6 +62,11 @@ public class PrincessRationalFormulaManager
   @Override
   protected IExpression makeNumberImpl(BigInteger i) {
     return fromInteger(pInteger.makeNumberImpl(i));
+  }
+
+  @Override
+  protected IExpression makeNumberImpl(Rational pI) {
+    return divide(makeNumberImpl(pI.getNum()), makeNumberImpl(pI.getDen()));
   }
 
   @Override

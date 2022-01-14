@@ -51,6 +51,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -197,16 +198,20 @@ class PrincessFormulaCreator
         case "_int":
           assert fun.fun().arity() == 1;
           ITerm term = fun.apply(0);
-          if (term instanceof IIntLit) return ((IIntLit) term).value().doubleValue();
-          else break;
+          if (term instanceof IIntLit) {
+            return ((IIntLit) term).value().bigIntValue();
+          }
+          break;
         case "_frac":
+        case "Rat_frac":
           assert fun.fun().arity() == 2;
           ITerm term1 = fun.apply(0);
-          ITerm term2 = fun.apply(0);
-          if (term1 instanceof IIntLit && term2 instanceof IIntLit)
-            return ((IIntLit) term1).value().doubleValue()
-                / ((IIntLit) term2).value().doubleValue();
-          else break;
+          ITerm term2 = fun.apply(1);
+          if (term1 instanceof IIntLit && term2 instanceof IIntLit) {
+            return Rational.of(
+                ((IIntLit) term1).value().bigIntValue(), ((IIntLit) term2).value().bigIntValue());
+          }
+          break;
         default:
       }
     }
