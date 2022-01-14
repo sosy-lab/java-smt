@@ -126,7 +126,8 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
   }
 
   @Test
-  public void testLinearMultiplicationUnsatisfiable() throws SolverException, InterruptedException {
+  public void testLinearMultiplicationWithConstantUnsatisfiable()
+      throws SolverException, InterruptedException {
     T a = nmgr.makeVariable("a");
 
     BooleanFormula f =

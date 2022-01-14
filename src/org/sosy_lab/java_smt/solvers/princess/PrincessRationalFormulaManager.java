@@ -38,6 +38,7 @@ public class PrincessRationalFormulaManager
       IFunApp fun = (IFunApp) value;
       switch (fun.fun().name()) {
         case "int":
+        case "Rat_int":
           assert fun.fun().arity() == 1;
           return pInteger.isNumeral(fun.apply(0));
         case "frac":
@@ -88,5 +89,15 @@ public class PrincessRationalFormulaManager
   @Override
   protected IExpression floor(IExpression number) {
     throw new AssertionError("floor is not supported in Princess");
+  }
+
+  @Override
+  protected IExpression multiply(IExpression number1, IExpression number2) {
+    return PrincessEnvironment.rationalTheory.mul((ITerm) number1, (ITerm) number2);
+  }
+
+  @Override
+  protected IExpression divide(IExpression number1, IExpression number2) {
+    return PrincessEnvironment.rationalTheory.div((ITerm) number1, (ITerm) number2);
   }
 }

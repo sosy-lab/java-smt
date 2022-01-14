@@ -23,6 +23,7 @@ import ap.parser.IFunApp;
 import ap.parser.IFunction;
 import ap.parser.IIntFormula;
 import ap.parser.ITerm;
+import ap.parser.ITimes;
 import ap.parser.Parser2InputAbsy.TranslationException;
 import ap.parser.PartialEvaluator;
 import ap.parser.SMTLineariser;
@@ -109,8 +110,10 @@ class PrincessEnvironment {
   public static final Sort INTEGER_SORT = Sort.Integer$.MODULE$;
   public static final Sort NAT_SORT = Sort.Nat$.MODULE$;
 
-  static final StringTheory stringTheory = new OstrichStringTheory(toSeq(new ArrayList<>()),
-      new OFlags(false, false, LengthOptions$.MODULE$.Auto(), false, false));
+  static final StringTheory stringTheory =
+      new OstrichStringTheory(
+          toSeq(new ArrayList<>()),
+          new OFlags(false, false, LengthOptions$.MODULE$.Auto(), false, false));
   public static final Sort STRING_SORT = stringTheory.StringSort();
   public static final Sort REGEX_SORT = stringTheory.RegexSort();
 
@@ -518,11 +521,16 @@ class PrincessEnvironment {
     throw new IllegalArgumentException("The given parameter is no variable or function");
   }
 
-  static FormulaType<?> getFormulaType(IExpression pFormula) {
+  static FormulaType<?> getFormulaType(final IExpression pFormula) {
     if (pFormula instanceof IFormula) {
       return FormulaType.BooleanType;
     } else if (pFormula instanceof ITerm) {
-      final Sort sort = Sort$.MODULE$.sortOf((ITerm) pFormula);
+      ITerm formula = (ITerm) pFormula;
+      if (pFormula instanceof ITimes) {
+        // coeff is always INT, lets check the subterm.
+        formula = ((ITimes) formula).subterm();
+      }
+      final Sort sort = Sort$.MODULE$.sortOf(formula);
       try {
         return getFormulaTypeFromSort(sort);
       } catch (IllegalArgumentException e) {
