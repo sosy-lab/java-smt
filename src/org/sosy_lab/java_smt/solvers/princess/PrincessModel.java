@@ -33,6 +33,7 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import scala.Option;
@@ -226,7 +227,7 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
   public void close() {}
 
   @Override
-  protected IExpression evalImpl(IExpression formula) {
+  protected @Nullable IExpression evalImpl(IExpression formula) {
     IExpression evaluation = evaluate(formula);
     if (evaluation == null) {
       // fallback: try to simplify the query and evaluate again.
@@ -235,7 +236,7 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
     return evaluation;
   }
 
-  private IExpression evaluate(IExpression formula) {
+  private @Nullable IExpression evaluate(IExpression formula) {
     if (formula instanceof ITerm) {
       Option<ITerm> out = model.evalToTerm((ITerm) formula);
       return out.isEmpty() ? null : out.get();

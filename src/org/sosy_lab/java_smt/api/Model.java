@@ -51,7 +51,7 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
    * <p>The formula does not need to be a variable, we also allow complex expression.
    *
    * @param f Input formula
-   * @return Either of: - Number (Rational/Double/BigInteger/Long/Integer) - Boolean
+   * @return Either of: - Number (Rational/Double/BigInteger/Long/Integer) - Boolean - String
    * @throws IllegalArgumentException if a formula has unexpected type, e.g. Array.
    */
   @Nullable Object evaluate(Formula f);
