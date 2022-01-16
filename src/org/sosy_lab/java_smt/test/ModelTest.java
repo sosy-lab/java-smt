@@ -2207,9 +2207,16 @@ public class ModelTest extends SolverBasedTest0 {
   @Test
   public void testGetRationals1() throws SolverException, InterruptedException {
     requireRationals();
+    RationalFormula x = rmgr.makeVariable("x");
     evaluateInModel(
-        rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(Rational.ofString("1/3"))),
-        rmgr.divide(rmgr.makeVariable("x"), rmgr.makeNumber(2)),
+        rmgr.equal(x, rmgr.makeNumber(Rational.ofString("1/3"))), x, Rational.ofString("1/3"));
+    evaluateInModel(
+        rmgr.equal(x, rmgr.makeNumber(Rational.ofString("1/3"))),
+        rmgr.multiply(x, rmgr.makeNumber(2)),
+        Rational.ofString("2/3"));
+    evaluateInModel(
+        rmgr.equal(x, rmgr.makeNumber(Rational.ofString("1/3"))),
+        rmgr.divide(x, rmgr.makeNumber(2)),
         Rational.ofString("1/6"));
   }
 
