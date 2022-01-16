@@ -44,9 +44,11 @@ import ap.theories.bitvectors.ModuloArithmetic;
 import ap.theories.nia.GroebnerMultiplication$;
 import ap.types.Sort;
 import ap.types.Sort$;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Table;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -190,13 +192,13 @@ class PrincessFormulaCreator
       IFunApp fun = (IFunApp) value;
       switch (fun.fun().name()) {
         case "false":
-          assert fun.fun().arity() == 0;
+          Preconditions.checkArgument(fun.fun().arity() == 0);
           return false;
         case "mod_cast":
           // we found a bitvector BV(lower, upper, ctxt), lets extract the last parameter
           return ((IIntLit) fun.apply(2)).value().bigIntValue();
         case "_int":
-          assert fun.fun().arity() == 1;
+          Preconditions.checkArgument(fun.fun().arity() == 1);
           ITerm term = fun.apply(0);
           if (term instanceof IIntLit) {
             return ((IIntLit) term).value().bigIntValue();
@@ -204,7 +206,7 @@ class PrincessFormulaCreator
           break;
         case "_frac":
         case "Rat_frac":
-          assert fun.fun().arity() == 2;
+          Preconditions.checkArgument(fun.fun().arity() == 2);
           ITerm term1 = fun.apply(0);
           ITerm term2 = fun.apply(1);
           if (term1 instanceof IIntLit && term2 instanceof IIntLit) {
@@ -212,12 +214,32 @@ class PrincessFormulaCreator
                 ((IIntLit) term1).value().bigIntValue(), ((IIntLit) term2).value().bigIntValue());
           }
           break;
+        case "str_empty":
+        case "str_cons":
+          return strToString(fun);
         default:
       }
     }
 
     throw new IllegalArgumentException(
         "unhandled model value " + value + " of type " + value.getClass());
+  }
+
+  /**
+   * convert a recursive string term like "str_cons(97, str_cons(98, str_cons(99, str_empty)))" to a
+   * real string "abc" for the user.
+   */
+  private Object strToString(IFunApp fun) {
+    final StringBuilder str = new StringBuilder();
+    while ("str_cons".equals(fun.fun().name())) {
+      Preconditions.checkArgument(fun.fun().arity() == 2);
+      BigInteger chr = ((IIntLit) fun.apply(0)).value().bigIntValue();
+      str.append(Character.toString(chr.intValue()));
+      fun = (IFunApp) fun.apply(1);
+    }
+    Preconditions.checkArgument("str_empty".equals(fun.fun().name()));
+    Preconditions.checkArgument(fun.fun().arity() == 0);
+    return str.toString();
   }
 
   @Override
