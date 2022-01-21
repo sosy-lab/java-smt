@@ -28,6 +28,7 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.example.Sudoku.IntegerBasedSudokuSolver;
+import org.sosy_lab.java_smt.example.Sudoku.BooleanBasedSudokuSolver;
 import org.sosy_lab.java_smt.example.Sudoku.SudokuSolver;
 
 /**
@@ -139,10 +140,23 @@ public class SudokuTest {
     checkSudoku(Solvers.Z3);
   }
 
-  // @Test reenable once mathsat is supported by Gradle
+  @Test
   public void mathsatSudokuTest()
       throws InvalidConfigurationException, InterruptedException, SolverException {
     checkSudoku(Solvers.MATHSAT5);
+  }
+  
+  @Test
+  public void boolectorSudokuTest()
+      throws InvalidConfigurationException, InterruptedException, SolverException {
+    // Boolector does not support Integers
+    checkSudokuWithBooleans(Solvers.BOOLECTOR);
+  }
+  
+  @Test
+  public void yicesSudokuTest()
+      throws InvalidConfigurationException, InterruptedException, SolverException {
+    checkSudoku(Solvers.YICES2);
   }
 
   private void checkSudoku(Solvers solver)
@@ -152,6 +166,20 @@ public class SudokuTest {
     Integer[][] grid = readGridFromString(input);
 
     SudokuSolver<?> sudoku = new IntegerBasedSudokuSolver(context);
+    Integer[][] solution = sudoku.solve(grid);
+
+    assertNotNull(solution);
+    assertEquals(sudokuSolution, solutionToString(solution));
+  }
+
+  // Same as checkSudoku but with Booleans instead of Integers
+  private void checkSudokuWithBooleans(Solvers solver)
+      throws InvalidConfigurationException, InterruptedException, SolverException {
+
+    context = SolverContextFactory.createSolverContext(config, logger, notifier, solver);
+    Integer[][] grid = readGridFromString(input);
+
+    SudokuSolver<?> sudoku = new BooleanBasedSudokuSolver(context);
     Integer[][] solution = sudoku.solve(grid);
 
     assertNotNull(solution);
