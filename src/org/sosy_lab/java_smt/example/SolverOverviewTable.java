@@ -174,6 +174,7 @@ public class SolverOverviewTable {
     addIfAvailable(theories, mgr::getQuantifiedFormulaManager, "Quantifier");
     addIfAvailable(theories, mgr::getUFManager, "UF");
     addIfAvailable(theories, mgr::getSLFormulaManager, "Seperation-Logic");
+    addIfAvailable(theories, mgr::getStringFormulaManager, "String");
 
     return theories;
   }
