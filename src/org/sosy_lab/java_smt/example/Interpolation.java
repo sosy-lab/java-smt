@@ -52,6 +52,7 @@ public class Interpolation {
             SolverContextFactory.createSolverContext(config, logger, notifier, solver);
         InterpolatingProverEnvironment<?> prover =
             context.newProverEnvironmentWithInterpolation()) {
+      logger.log(Level.WARNING, "Using solver " + solver + " in version " + context.getVersion());
 
       IntegerFormulaManager imgr = context.getFormulaManager().getIntegerFormulaManager();
 

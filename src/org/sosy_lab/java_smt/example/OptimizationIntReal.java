@@ -66,6 +66,7 @@ public class OptimizationIntReal {
             SolverContextFactory.createSolverContext(config, logger, notifier, solver);
         OptimizationProverEnvironment prover =
             context.newOptimizationProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      logger.log(Level.WARNING, "Using solver " + solver + " in version " + context.getVersion());
 
       BooleanFormulaManager bmgr = context.getFormulaManager().getBooleanFormulaManager();
       IntegerFormulaManager nmgr = context.getFormulaManager().getIntegerFormulaManager();
@@ -134,7 +135,7 @@ public class OptimizationIntReal {
       assert status == OptStatus.OPT;
       Optional<Rational> lower = prover.lower(handleX, EPSILON);
       try (Model model = prover.getModel()) {
-        logger.log(Level.INFO, "lower bound:", lower.orElseThrow(), "with model:", model);
+        logger.log(Level.INFO, "lower bound:", lower.orElseThrow(), "with model:", model.asList());
       }
     }
     prover.pop();
@@ -147,7 +148,7 @@ public class OptimizationIntReal {
       assert status == OptStatus.OPT;
       Optional<Rational> upper = prover.upper(handleX, EPSILON);
       try (Model model = prover.getModel()) {
-        logger.log(Level.INFO, "upper bound:", upper.orElseThrow(), "with model:", model);
+        logger.log(Level.INFO, "upper bound:", upper.orElseThrow(), "with model:", model.asList());
       }
     }
     prover.pop();

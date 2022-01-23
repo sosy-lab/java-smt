@@ -51,6 +51,7 @@ public class OptimizationFormulaWeights {
             SolverContextFactory.createSolverContext(config, logger, notifier, solver);
         OptimizationProverEnvironment prover =
             context.newOptimizationProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      logger.log(Level.WARNING, "Using solver " + solver + " in version " + context.getVersion());
 
       BooleanFormulaManager bmgr = context.getFormulaManager().getBooleanFormulaManager();
       IntegerFormulaManager imgr = context.getFormulaManager().getIntegerFormulaManager();
@@ -124,7 +125,7 @@ public class OptimizationFormulaWeights {
           "maximal sum ",
           prover.upper(handle, Rational.ZERO).orElseThrow(),
           "with model",
-          model);
+          model.asList());
     }
   }
 }

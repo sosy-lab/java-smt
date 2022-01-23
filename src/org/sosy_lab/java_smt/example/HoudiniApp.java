@@ -64,12 +64,13 @@ public class HoudiniApp {
 
     // this example executes the Houdini algorithm for all available solvers
     for (Solvers solver : Solvers.values()) {
-      logger.log(Level.INFO, "using solver", solver);
 
       // create the solver context, which includes all necessary parts for building, manipulating,
       // and solving formulas.
       try (SolverContext solverContext =
           SolverContextFactory.createSolverContext(config, logger, notifier, solver)) {
+        logger.log(
+            Level.WARNING, "Using solver " + solver + " in version " + solverContext.getVersion());
 
         // initialize Houdini
         HoudiniApp houdini = new HoudiniApp(solverContext);

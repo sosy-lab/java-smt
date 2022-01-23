@@ -54,24 +54,24 @@ public class AllSatExample {
           ProverEnvironment prover =
               context.newProverEnvironment(
                   ProverOptions.GENERATE_MODELS, ProverOptions.GENERATE_ALL_SAT)) {
-        System.out.println("\nUsing solver " + solver + " in version " + context.getVersion());
+        logger.log(Level.WARNING, "Using solver " + solver + " in version " + context.getVersion());
 
         AllSatExample ase = new AllSatExample(context, prover);
 
         prover.push();
-        System.out.println(ase.allSatBooleans1());
+        logger.log(Level.INFO, ase.allSatBooleans1());
         prover.pop();
 
         prover.push();
-        System.out.println(ase.allSatBooleans2());
+        logger.log(Level.INFO, ase.allSatBooleans2());
         prover.pop();
 
         prover.push();
-        System.out.println(ase.allSatIntegers());
+        logger.log(Level.INFO, ase.allSatIntegers());
         prover.pop();
 
         prover.push();
-        System.out.println(ase.allSatIntegers2());
+        logger.log(Level.INFO, ase.allSatIntegers2());
         prover.pop();
 
       } catch (InvalidConfigurationException | UnsatisfiedLinkError e) {
