@@ -2,14 +2,14 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2022 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
 package org.sosy_lab.java_smt.api;
 
+import com.google.common.collect.ImmutableList;
 import com.google.errorprone.annotations.Immutable;
-import java.util.List;
 
 /**
  * Function declaration, for both UFs and built-in functions (theory and boolean).
@@ -29,5 +29,5 @@ public interface FunctionDeclaration<E extends Formula> {
   FormulaType<E> getType();
 
   /** @return Sorts of the arguments. */
-  List<FormulaType<?>> getArgumentTypes();
+  ImmutableList<FormulaType<?>> getArgumentTypes();
 }
