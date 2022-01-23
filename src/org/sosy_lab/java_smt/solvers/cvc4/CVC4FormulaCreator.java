@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.cvc4;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -288,7 +289,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   }
 
   private static String getName(Expr e) {
-    Preconditions.checkState(!e.isNull());
+    checkState(!e.isNull());
     if (!e.isConst() && !e.isVariable()) {
       e = e.getOperator();
     }
@@ -306,7 +307,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
 
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula formula, final Expr f) {
-    Preconditions.checkState(!f.isNull());
+    checkState(!f.isNull());
     Type type = f.getType();
 
     if (f.isConst()) {
@@ -372,7 +373,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
         }
       }
 
-      Preconditions.checkState(args.size() == argsTypes.size());
+      checkState(args.size() == argsTypes.size());
 
       // TODO some operations (BV_SIGN_EXTEND, BV_ZERO_EXTEND, maybe more) encode information as
       // part of the operator itself, thus the arity is one too small and there might be no
@@ -390,11 +391,13 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   private Expr normalize(Expr operator) {
     Expr function = functionsCache.get(getName(operator));
     if (function != null) {
-      Preconditions.checkState(
+      checkState(
           function.getId().equals(operator.getId()),
-          String.format(
-              "operator '%s' with ID %s differs from existing function '%s' with ID '%s'.",
-              operator, operator.getId(), function, function.getId()));
+          "operator '%s' with ID %s differs from existing function '%s' with ID '%s'.",
+          operator,
+          operator.getId(),
+          function,
+          function.getId());
       return function;
     }
     return operator;
