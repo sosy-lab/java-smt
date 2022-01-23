@@ -360,7 +360,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       // These are all treated like operators, so we can get the declaration by f.getOperator()!
       List<Formula> args = ImmutableList.copyOf(Iterables.transform(f, this::encapsulate));
       List<FormulaType<?>> argsTypes = new ArrayList<>();
-      Expr operator = f.getOperator();
+      Expr operator = normalize(f.getOperator());
       if (operator.getType().isFunction()) {
         vectorType argTypes = new FunctionType(operator.getType()).getArgTypes();
         for (int i = 0; i < argTypes.size(); i++) {
@@ -382,8 +382,22 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           formula,
           args,
           FunctionDeclarationImpl.of(
-              getName(f), getDeclarationKind(f), argsTypes, getFormulaType(f), f.getOperator()));
+              getName(f), getDeclarationKind(f), argsTypes, getFormulaType(f), operator));
     }
+  }
+
+  /** CVC4 returns new objects when querying operators for UFs. The new operator */
+  private Expr normalize(Expr operator) {
+    Expr function = functionsCache.get(getName(operator));
+    if (function != null) {
+      Preconditions.checkState(
+          function.getId().equals(operator.getId()),
+          String.format(
+              "operator '%s' with ID %s differs from existing function '%s' with ID '%s'.",
+              operator, operator.getId(), function, function.getId()));
+      return function;
+    }
+    return operator;
   }
 
   // see src/theory/*/kinds in CVC4 sources for description of the different CVC4 kinds ;)

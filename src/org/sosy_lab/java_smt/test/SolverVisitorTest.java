@@ -600,7 +600,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testIntegerFormulaQuantifierSymbolsExtraction() throws Exception {
+  public void testIntegerFormulaQuantifierSymbolsExtraction() {
     requireQuantifiers();
     requireIntegers();
 
@@ -613,8 +613,14 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     // The variable extraction should visit "x" and "y" only once,
     // otherwise AbstractFormulaManager#extractVariables might throw an exception,
     // when building an ImmutableMap.
-    assertThat(mgr.extractVariables(constraint)).containsEntry(x.toString(), x);
-    assertThat(mgr.extractVariables(constraint)).containsEntry(y.toString(), y);
+    Map<String, Formula> vars = mgr.extractVariables(constraint);
+    assertThat(vars).hasSize(2);
+    assertThat(vars).containsEntry(x.toString(), x);
+    assertThat(vars).containsEntry(y.toString(), y);
+    Map<String, Formula> varsAndUfs = mgr.extractVariablesAndUFs(constraint);
+    assertThat(varsAndUfs).hasSize(2);
+    assertThat(varsAndUfs).containsEntry(x.toString(), x);
+    assertThat(varsAndUfs).containsEntry(y.toString(), y);
   }
 
   @Test
@@ -848,6 +854,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     IntegerFormula v = imgr.makeVariable("v");
     BooleanFormula q = fmgr.declareAndCallUF("q", FormulaType.BooleanType, v);
     Map<String, Formula> mapping = mgr.extractVariablesAndUFs(q);
+    assertThat(mapping).hasSize(2);
     assertThat(mapping).containsEntry("v", v);
     assertThat(mapping).containsEntry("q", q);
   }
@@ -904,6 +911,72 @@ public class SolverVisitorTest extends SolverBasedTest0 {
 
     Collection<Formula> usedArgs = mgr.visit(uf, argCollectingVisitor);
 
+    assertThat(usedArgs).hasSize(3);
     assertThat(usedArgs).containsExactly(a, b, ab);
+
+    Map<String, Formula> vars = mgr.extractVariables(uf);
+    assertThat(vars).hasSize(2);
+    assertThat(vars.keySet()).containsExactly("a", "b");
+
+    Map<String, Formula> varsUfs = mgr.extractVariablesAndUFs(uf);
+    assertThat(varsUfs).hasSize(3);
+    assertThat(varsUfs.keySet()).containsExactly("a", "b", "testFunc");
+  }
+
+  @Test
+  public void extractionDeclarations() {
+    requireIntegers();
+
+    // Create the variables and uf
+    IntegerFormula a = imgr.makeVariable("a");
+    IntegerFormula b = imgr.makeVariable("b");
+    IntegerFormula ab = imgr.add(a, b);
+    BooleanFormula uf1 = fmgr.declareAndCallUF("testFunc", FormulaType.BooleanType, a, b, ab);
+    BooleanFormula uf2 = fmgr.declareAndCallUF("testFunc", FormulaType.BooleanType, ab, b, a);
+    BooleanFormula f = bmgr.and(uf1, uf2);
+
+    final Collection<Formula> usedArgs = new LinkedHashSet<>();
+    final List<FunctionDeclaration<?>> usedDecls = new ArrayList<>();
+
+    FormulaVisitor<TraversalProcess> argCollectingVisitor =
+        new DefaultFormulaVisitor<>() {
+
+          @Override
+          public TraversalProcess visitFunction(
+              Formula pF, List<Formula> args, FunctionDeclaration<?> pFunctionDeclaration) {
+            usedArgs.addAll(args);
+            usedDecls.add(pFunctionDeclaration);
+            return visitDefault(pF);
+          }
+
+          @Override
+          protected TraversalProcess visitDefault(Formula pF) {
+            return TraversalProcess.CONTINUE;
+          }
+        };
+
+    mgr.visitRecursively(f, argCollectingVisitor);
+
+    // check general stuff about variables, copied from above
+    assertThat(usedArgs).hasSize(5);
+    assertThat(usedArgs).containsExactly(uf1, uf2, a, b, ab);
+
+    Map<String, Formula> vars = mgr.extractVariables(f);
+    assertThat(vars).hasSize(2);
+    assertThat(vars.keySet()).containsExactly("a", "b");
+
+    Map<String, Formula> varsUfs = mgr.extractVariablesAndUFs(f);
+    assertThat(varsUfs).hasSize(3);
+    assertThat(varsUfs.keySet()).containsExactly("a", "b", "testFunc");
+
+    // check correct traversal order of the functions
+    assertThat(usedDecls).hasSize(4);
+    assertThat(usedDecls.get(0).getKind()).isEqualTo(FunctionDeclarationKind.AND);
+    assertThat(usedDecls.get(1).getName()).isEqualTo("testFunc");
+    assertThat(usedDecls.get(2).getKind()).isEqualTo(FunctionDeclarationKind.ADD);
+    assertThat(usedDecls.get(3).getName()).isEqualTo("testFunc");
+
+    // check UF-equality. This check went wrong in CVC4 and was fixed.
+    assertThat(usedDecls.get(1)).isEqualTo(usedDecls.get(3));
   }
 }
