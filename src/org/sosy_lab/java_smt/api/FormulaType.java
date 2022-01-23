@@ -324,11 +324,7 @@ public abstract class FormulaType<T extends Formula> {
 
     @Override
     public int hashCode() {
-      final int prime = 31;
-      int result = 1;
-      result = prime * result + elementType.hashCode();
-      result = prime * result + indexType.hashCode();
-      return result;
+      return 31 * elementType.hashCode() + indexType.hashCode();
     }
 
     @Override
@@ -336,13 +332,10 @@ public abstract class FormulaType<T extends Formula> {
       if (this == obj) {
         return true;
       }
-
       if (!(obj instanceof ArrayFormulaType)) {
         return false;
       }
-
       ArrayFormulaType<?, ?> other = (ArrayFormulaType<?, ?>) obj;
-
       return elementType.equals(other.elementType) && indexType.equals(other.indexType);
     }
 
