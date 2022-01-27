@@ -8,9 +8,9 @@
 
 package org.sosy_lab.java_smt.solvers.smtinterpol;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import de.uni_freiburg.informatik.ultimate.logic.LoggingScript;
@@ -298,14 +298,15 @@ public final class SmtInterpolSolverContext extends AbstractSolverContext {
         prefix += ">"; // separator for next nesting level
       }
       for (Object entry : (Object[]) obj) {
-        Preconditions.checkArgument(
+        checkArgument(
             entry instanceof Object[],
-            "expected key-value-pair, but found an unexpected structure: " + obj);
+            "expected key-value-pair, but found an unexpected structure: %s",
+            obj);
         Object[] keyValue = (Object[]) entry;
-        Preconditions.checkArgument(
+        checkArgument(
             keyValue.length == 2,
-            "expected key-value-pair, but found an unexpected structure: "
-                + Arrays.deepToString(keyValue));
+            "expected key-value-pair, but found an unexpected structure: %s",
+            Arrays.deepToString(keyValue));
         flatten(builder, prefix + keyValue[0], keyValue[1]);
       }
     } else {
