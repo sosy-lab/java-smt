@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.z3;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.io.MoreFiles;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.microsoft.z3.Native;
@@ -230,6 +231,28 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
     }
     Native.astVectorDecRef(z3context, unsatCore);
     return Optional.of(core);
+  }
+
+  @Override
+  public ImmutableMap<String, String> getStatistics() {
+    ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+
+    final long stats = Native.solverGetStatistics(z3context, z3solver);
+    for (int i = 0; i < Native.statsSize(z3context, stats); i++) {
+      String key = Native.statsGetKey(z3context, stats, i);
+      if (Native.statsIsUint(z3context, stats, i)) {
+        builder.put(key, Integer.toString(Native.statsGetUintValue(z3context, stats, i)));
+      } else if (Native.statsIsDouble(z3context, stats, i)) {
+        builder.put(key, Double.toString(Native.statsGetDoubleValue(z3context, stats, i)));
+      } else {
+        throw new IllegalStateException(
+            String.format(
+                "Unknown data entry value for key %s at position %d in statistics '%s'",
+                key, i, Native.statsToString(z3context, stats)));
+      }
+    }
+
+    return builder.build();
   }
 
   @Override

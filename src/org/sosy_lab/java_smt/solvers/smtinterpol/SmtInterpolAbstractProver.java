@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.solvers.smtinterpol;
 
 import static com.google.common.base.Preconditions.checkState;
 
+import com.google.common.collect.ImmutableMap;
 import de.uni_freiburg.informatik.ultimate.logic.Annotation;
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
 import de.uni_freiburg.informatik.ultimate.logic.Model;
@@ -187,6 +188,13 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
         isUnsat() ? Optional.of(getUnsatCore0()) : Optional.empty();
     pop();
     return result;
+  }
+
+  @Override
+  public ImmutableMap<String, String> getStatistics() {
+    ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+    SmtInterpolSolverContext.flatten(builder, "", env.getInfo(":all-statistics"));
+    return builder.build();
   }
 
   @Override
