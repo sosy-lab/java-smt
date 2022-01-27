@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.delegate.synchronize;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableMap;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -86,6 +87,13 @@ class SynchronizedBasicProverEnvironment<T> implements BasicProverEnvironment<T>
       Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
     synchronized (sync) {
       return delegate.unsatCoreOverAssumptions(pAssumptions);
+    }
+  }
+
+  @Override
+  public ImmutableMap<String, String> getStatistics() {
+    synchronized (sync) {
+      return delegate.getStatistics();
     }
   }
 

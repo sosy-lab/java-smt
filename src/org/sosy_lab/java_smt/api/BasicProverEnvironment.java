@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.api;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.Collection;
 import java.util.List;
@@ -97,6 +98,21 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    */
   Optional<List<BooleanFormula>> unsatCoreOverAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException;
+
+  /**
+   * Get statistics for a concrete ProverEnvironment in a solver. The returned mapping is intended
+   * to provide solver-internal statistics for only this instance. The keys can differ between
+   * individual solvers.
+   *
+   * <p>We do not guarantee any specific key to be present, as this depends on the used solver. We
+   * might even return an empty mapping if the solver does not support calling this method or is in
+   * an invalid state.
+   *
+   * @see SolverContext#getStatistics()
+   */
+  default ImmutableMap<String, String> getStatistics() {
+    return ImmutableMap.of();
+  }
 
   /**
    * Closes the prover environment. The object should be discarded, and should not be used after

@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.delegate.synchronize;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -103,6 +104,13 @@ class SynchronizedBasicProverEnvironmentWithContext<T> implements BasicProverEnv
       return Optional.of(translate(core.orElseThrow(), otherManager, manager));
     } else {
       return Optional.empty();
+    }
+  }
+
+  @Override
+  public ImmutableMap<String, String> getStatistics() {
+    synchronized (sync) {
+      return delegate.getStatistics();
     }
   }
 

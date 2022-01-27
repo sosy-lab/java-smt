@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.delegate.logging;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableMap;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -63,6 +64,11 @@ public final class LoggingSolverContext implements SolverContext {
   @Override
   public Solvers getSolverName() {
     return delegate.getSolverName();
+  }
+
+  @Override
+  public ImmutableMap<String, String> getStatistics() {
+    return delegate.getStatistics();
   }
 
   @Override

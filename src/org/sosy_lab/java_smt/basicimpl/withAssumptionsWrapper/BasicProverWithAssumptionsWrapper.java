@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.basicimpl.withAssumptionsWrapper;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -99,6 +100,11 @@ public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironme
     //    } else {
     //      return Optional.empty();
     //    }
+  }
+
+  @Override
+  public ImmutableMap<String, String> getStatistics() {
+    return delegate.getStatistics();
   }
 
   @Override

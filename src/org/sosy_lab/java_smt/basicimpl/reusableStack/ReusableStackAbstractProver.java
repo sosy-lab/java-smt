@@ -12,6 +12,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -90,6 +91,11 @@ abstract class ReusableStackAbstractProver<T, D extends BasicProverEnvironment<T
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
     return delegate.unsatCoreOverAssumptions(assumptions);
+  }
+
+  @Override
+  public ImmutableMap<String, String> getStatistics() {
+    return delegate.getStatistics();
   }
 
   @Override
