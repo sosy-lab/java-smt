@@ -857,6 +857,14 @@ class Mathsat5NativeApi {
    */
   public static native void msat_assert_soft_formula(long e, long term, long weight, String id);
 
+  /**
+   * Returns general search statistics.
+   *
+   * @param e msat_env The environment in which to operate.
+   * @return A string which provides some search statistics information on the search.
+   */
+  public static native String msat_get_search_stats(long e);
+
   /*
    * OptiMathSAT - objective stack iterator
    */
