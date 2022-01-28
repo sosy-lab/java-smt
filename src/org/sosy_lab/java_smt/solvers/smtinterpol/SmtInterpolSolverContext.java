@@ -306,12 +306,21 @@ public final class SmtInterpolSolverContext extends AbstractSolverContext {
         checkArgument(
             keyValue.length == 2,
             "expected key-value-pair, but found an unexpected structure: %s",
-            Arrays.deepToString(keyValue));
+            lazyDeepToString(keyValue));
         flatten(builder, prefix + keyValue[0], keyValue[1]);
       }
     } else {
       builder.put(prefix, obj.toString());
     }
+  }
+
+  private static Object lazyDeepToString(Object[] value) {
+    return new Object() {
+      @Override
+      public String toString() {
+        return Arrays.deepToString(value);
+      }
+    };
   }
 
   @Override
