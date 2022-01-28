@@ -113,6 +113,81 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
     return Solvers.BOOLECTOR;
   }
 
+  /**
+   * Boolector returns a pre-formatted text for statistics. We might need to parse it. Example:
+   *
+   * <pre>
+   * [btor>sat] 15 SAT calls in 0,0 seconds
+   * [btor>core] 0/0/0/0 constraints 0/0/0/0 0,0 MB
+   * [btor>core] 10 assumptions
+   * [btor>core]
+   * [btor>core]     0 max rec. RW
+   * [btor>core]    67 number of expressions ever created
+   * [btor>core]    67 number of final expressions
+   * [btor>core] 0,01 MB allocated for nodes
+   * [btor>core]  bvconst: 5 max 5
+   * [btor>core]  var: 6 max 6
+   * [btor>core]  slice: 6 max 6
+   * [btor>core]  and: 35 max 35
+   * [btor>core]  beq: 13 max 13
+   * [btor>core]  ult: 2 max 2
+   * [btor>core]
+   * [btor>core]     0 variable substitutions
+   * [btor>core]     0 uninterpreted function substitutions
+   * [btor>core]     0 embedded constraint substitutions
+   * [btor>core]     0 synthesized nodes rewritten
+   * [btor>core]     0 linear constraint equations
+   * [btor>core]     0 gaussian eliminations in linear equations
+   * [btor>core]     0 eliminated sliced variables
+   * [btor>core]     0 extracted skeleton constraints
+   * [btor>core]     0 and normalizations
+   * [btor>core]     0 add normalizations
+   * [btor>core]     0 mul normalizations
+   * [btor>core]     0 lambdas merged
+   * [btor>core]     0 static apply propagations over lambdas
+   * [btor>core]     0 static apply propagations over updates
+   * [btor>core]     0 beta reductions
+   * [btor>core]     0 clone calls
+   * [btor>core]
+   * [btor>core] rewrite rule cache
+   * [btor>core]   0 cached (add)
+   * [btor>core]   0 cached (get)
+   * [btor>core]   0 updated
+   * [btor>core]   0 removed (gc)
+   * [btor>core]   0,00 MB cache
+   * [btor>core]
+   * [btor>core] bit blasting statistics:
+   * [btor>core]        65 AIG vectors (65 max)
+   * [btor>core]        35 AIG ANDs (35 max)
+   * [btor>core]        12 AIG variables
+   * [btor>core]        45 CNF variables
+   * [btor>core]       100 CNF clauses
+   * [btor>core]       236 CNF literals
+   * [btor>slvfun]
+   * [btor>slvfun]       0 expression evaluations
+   * [btor>slvfun]       0 partial beta reductions
+   * [btor>slvfun]       0 propagations
+   * [btor>slvfun]       0 propagations down
+   * [btor>core]
+   * [btor>core] 0,0 MB
+   * </pre>
+   */
+  @Override
+  public ImmutableMap<String, String> getStatistics() {
+
+    // get plain statistics
+    final long env = creator.getEnv();
+    BtorJNI.boolector_set_opt(env, BtorOption.BTOR_OPT_VERBOSITY.getValue(), 3);
+    String stats = BtorJNI.boolector_print_stats_helper(env);
+    BtorJNI.boolector_set_opt(env, BtorOption.BTOR_OPT_VERBOSITY.getValue(), 0);
+
+    // then parse them into a map
+    // TODO ... forget it, Boolector dumps it in human-readable form,
+    // there is no simple way of converting it into a key-value-mapping.
+
+    return ImmutableMap.<String, String>builder().put("statistics", stats).build();
+  }
+
   @Override
   public void close() {
     if (!closed) {
