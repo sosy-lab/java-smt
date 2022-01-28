@@ -11,18 +11,20 @@ apply plugin: 'application'
 
 mainClassName = 'org.sosy_lab.java_smt_example.SolverOverviewTable'
 
-// Globally define versions used for our dependencies later
-def javaSMTVersion = '3.11.0'
-def javaSMTYices2Version = '3.10.0'
-def princessVersion = '2021-11-15'
-def smtInterpolVersion = '2.5-916-ga5843d8b'
-def boolectorVersion = '3.2.2-gcc3a7091'
-def z3Version = '4.8.10'
-def yices2Version = '2.6.2-396-g194350c1'
-def cvc4Version = '1.8-prerelease-2020-06-24-g7825d8f28'
-def mathsat5Version = '5.6.6'
-def optiMathsat5Version = '1.7.1-sosy0'
-def junit4Version = '4.13'
+// Globally define versions used for our dependencies later in a map
+def version = [
+  'javasmt': '3.11.0',
+  'javasmtYices2': '3.10.0',
+  'junit4': '4.13',
+  'smtInterpol': '2.5-916-ga5843d8b',
+  'boolector': '3.2.2-gcc3a7091',
+  'z3': '4.8.10',
+  'cvc4': '1.8-prerelease-2020-06-24-g7825d8f28',
+  'mathsat5': '5.6.6',
+  'optiMathsat5': '1.7.1-sosy0',
+  'yices2': '2.6.2-396-g194350c1',
+  'princess': '2021-11-15'
+];
 
 repositories {
   // try to resolve by pom first
@@ -60,44 +62,44 @@ configurations {
 // You can manage the JavaSMT dependencies via a config if you need to split them from your regular dependencies
 dependencies {
   // JUnit 4
-	testImplementation "junit:junit:${junit4Version}"
+	testImplementation "junit:junit:${version.junit4}"
 
   // Retrieve JavaSMT with Maven and transitive dependencies via a pom.xml
-	implementation "org.sosy-lab:java-smt:${javaSMTVersion}"
+	implementation "org.sosy-lab:java-smt:${version.javasmt}"
 
   // Retrieve Z3 with Maven but without a pom.xml, just the artifacts
-  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-z3', version: z3Version, classifier: 'com.microsoft.z3', ext: 'jar'
-  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-z3', version: z3Version, classifier: 'libz3', ext: 'so'
-  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-z3', version: z3Version, classifier: 'libz3java', ext: 'so'
+  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-z3', version: version.z3, classifier: 'com.microsoft.z3', ext: 'jar'
+  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-z3', version: version.z3, classifier: 'libz3', ext: 'so'
+  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-z3', version: version.z3, classifier: 'libz3java', ext: 'so'
 
   // Mathsat5 via Maven
-  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-mathsat5', version: mathsat5Version, classifier: 'libmathsat5j', ext: 'so'
+  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-mathsat5', version: version.mathsat5, classifier: 'libmathsat5j', ext: 'so'
 
   // Retrieve OptiMathSAT via Ivy (as it is currently not available in Maven)
-	runtimeOnly "org.sosy_lab:javasmt-solver-optimathsat:${optiMathsat5Version}:liboptimathsat5j@so"
+	runtimeOnly "org.sosy_lab:javasmt-solver-optimathsat:${version.optiMathsat5}:liboptimathsat5j@so"
 
   // Retrieve CVC4 via Maven
-  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-cvc4', version: cvc4Version, classifier: 'CVC4', ext: 'jar'
-  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-cvc4', version: cvc4Version, classifier: 'libcvc4', ext: 'so'
-  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-cvc4', version: cvc4Version, classifier: 'libcvc4jni', ext: 'so'
-  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-cvc4', version: cvc4Version, classifier: 'libcvc4parser', ext: 'so'
+  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-cvc4', version: version.cvc4, classifier: 'CVC4', ext: 'jar'
+  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-cvc4', version: version.cvc4, classifier: 'libcvc4', ext: 'so'
+  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-cvc4', version: version.cvc4, classifier: 'libcvc4jni', ext: 'so'
+  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-cvc4', version: version.cvc4, classifier: 'libcvc4parser', ext: 'so'
 
   // Retrieve Boolector via Maven
-  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-boolector', version: boolectorVersion, classifier: 'libboolector', ext: 'so'
-  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-boolector', version: boolectorVersion, classifier: 'libminisat', ext: 'so'
-  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-boolector', version: boolectorVersion, classifier: 'libpicosat', ext: 'so'
+  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-boolector', version: version.boolector, classifier: 'libboolector', ext: 'so'
+  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-boolector', version: version.boolector, classifier: 'libminisat', ext: 'so'
+  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-boolector', version: version.boolector, classifier: 'libpicosat', ext: 'so'
 
   // Retrieve Princess
-  runtimeOnly group: 'io.github.uuverifiers', name: 'princess_2.13', version: princessVersion, ext: 'jar'
+  runtimeOnly group: 'io.github.uuverifiers', name: 'princess_2.13', version: version.princess, ext: 'jar'
   
   // Retrieve SMTInterpol
-  runtimeOnly group: 'de.uni-freiburg.informatik.ultimate', name: 'smtinterpol', version: smtInterpolVersion, ext: 'jar'
+  runtimeOnly group: 'de.uni-freiburg.informatik.ultimate', name: 'smtinterpol', version: version.smtInterpol, ext: 'jar'
   
   // Example as to how to use Yices2
   // First get JavaSMT for Yices2 from Maven (if you want to use only Yices2 use this dependency in the "implementation" part above instead of regual JavaSMT)
-  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-yices2', version: javaSMTYices2Version, ext: 'jar'
+  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-yices2', version: version.javasmtYices2, ext: 'jar'
   // And the Yices2 solver from Maven
-  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-yices2', version: yices2Version, classifier: 'libyices2j', ext: 'so'
+  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-yices2', version: version.yices2, classifier: 'libyices2j', ext: 'so'
   
   /* 
   Kotlin version for z3 as an example:
