@@ -712,7 +712,9 @@ class Mathsat5NativeApi {
   public static native void msat_push_backtrack_point(long e);
 
   public static native void msat_pop_backtrack_point(long e);
-  // public static native int msat_num_backtrack_points(long e)
+
+  public static native int msat_num_backtrack_points(long e);
+
   public static native void msat_reset_env(long e);
 
   public static native void msat_assert_formula(long e, long formula);

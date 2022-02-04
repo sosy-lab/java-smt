@@ -979,6 +979,8 @@ ENV_ARG_VOID(1)
 CALL1(int, pop_backtrack_point)
 FAILURE_CODE_RETURN
 
+i_func1s(num_backtrack_points, 1num_1backtrack_1points, size_t, msat_env)
+
 DEFINE_FUNC(void, 1reset_1env) WITH_ONE_ARG(jenv)
 ENV_ARG_VOID(1)
 VOID_CALL1(reset_env)
