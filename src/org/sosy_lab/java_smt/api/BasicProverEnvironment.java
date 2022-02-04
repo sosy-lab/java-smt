@@ -104,6 +104,10 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * to provide solver-internal statistics for only this instance. The keys can differ between
    * individual solvers.
    *
+   * <p>Calling the statistics several times for the same {@link ProverEnvironment}s returns
+   * accumulated number, i.e., we currently do not provide any possibility to reset the statistics.
+   * Calling the statistics for different {@link ProverEnvironment}s returns independent statistics.
+   *
    * <p>We do not guarantee any specific key to be present, as this depends on the used solver. We
    * might even return an empty mapping if the solver does not support calling this method or is in
    * an invalid state.
