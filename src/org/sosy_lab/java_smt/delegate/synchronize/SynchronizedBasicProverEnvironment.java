@@ -53,6 +53,13 @@ class SynchronizedBasicProverEnvironment<T> implements BasicProverEnvironment<T>
   }
 
   @Override
+  public int size() {
+    synchronized (sync) {
+      return delegate.size();
+    }
+  }
+
+  @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
     synchronized (sync) {
       return delegate.isUnsat();

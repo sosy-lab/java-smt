@@ -20,6 +20,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_unsat_assumptions;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_unsat_core;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_last_error_message;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_num_backtrack_points;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_pop_backtrack_point;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_option_checked;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_get_arg;
@@ -138,6 +139,11 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   public void pop() {
     Preconditions.checkState(!closed);
     msat_pop_backtrack_point(curEnv);
+  }
+
+  @Override
+  public int size() {
+    return msat_num_backtrack_points(curEnv);
   }
 
   @Override

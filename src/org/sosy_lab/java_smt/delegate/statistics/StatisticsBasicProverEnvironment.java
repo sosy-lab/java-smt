@@ -54,6 +54,11 @@ class StatisticsBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
+  public int size() {
+    return delegate.size();
+  }
+
+  @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
     unsatTimer.start();
     try {

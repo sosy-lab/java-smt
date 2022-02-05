@@ -71,8 +71,10 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
     return closed;
   }
 
-  int size() {
-    return assertedFormulas.size();
+  @Override
+  public int size() {
+    checkState(!closed);
+    return assertedFormulas.size() - 1;
   }
 
   @Override

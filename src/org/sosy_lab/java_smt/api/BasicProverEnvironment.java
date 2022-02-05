@@ -26,7 +26,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
   String NO_MODEL_HELP = "Model computation failed. Are the pushed formulae satisfiable?";
 
   /**
-   * Push a backtracking point and add a formula to the environment stack, asserting it. The return
+   * Push a backtracking point and add a formula to the current stack, asserting it. The return
    * value may be used to identify this formula later on in a query (this depends on the sub-type of
    * the environment).
    */
@@ -37,16 +37,33 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
     return addConstraint(f);
   }
 
-  /** Remove one formula from the environment stack. */
+  /**
+   * Remove one backtracking point/level from the current stack. This removes the latest level
+   * including all of its formulas, i.e., all formulas that were added for this backtracking point.
+   */
   void pop();
 
-  /** Add constraint to the context. */
+  /** Add a constraint to the latest backtracking point. */
   @Nullable
   @CanIgnoreReturnValue
   T addConstraint(BooleanFormula constraint) throws InterruptedException;
 
-  /** Create backtracking point. */
+  /**
+   * Create a new backtracking point, i.e., a new level on the assertion stack. Each level can hold
+   * several asserted formulas.
+   *
+   * <p>If formulas are added before creating the first backtracking point, they can not be removed
+   * via a POP-operation.
+   */
   void push();
+
+  /**
+   * Get the number of backtracking points/levels on the current stack.
+   *
+   * <p>Caution: This is the number of PUSH-operations, and not necessarily equal to the number of
+   * asserted formulas.
+   */
+  int size();
 
   /** Check whether the conjunction of all formulas on the stack is unsatisfiable. */
   boolean isUnsat() throws SolverException, InterruptedException;
@@ -120,7 +137,8 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
 
   /**
    * Closes the prover environment. The object should be discarded, and should not be used after
-   * closing.
+   * closing. The first call of this method will close the prover instance, further calls are
+   * ignored.
    */
   @Override
   void close();

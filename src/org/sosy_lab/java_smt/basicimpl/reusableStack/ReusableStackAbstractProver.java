@@ -42,7 +42,7 @@ abstract class ReusableStackAbstractProver<T, D extends BasicProverEnvironment<T
 
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
-    Preconditions.checkState(size >= 1);
+    Preconditions.checkState(size() >= 0);
     return delegate.isUnsat();
   }
 
@@ -54,15 +54,21 @@ abstract class ReusableStackAbstractProver<T, D extends BasicProverEnvironment<T
 
   @Override
   public final void push() {
-    size++;
     delegate.push();
+    size++;
   }
 
   @Override
   public void pop() {
-    Preconditions.checkState(size > 1);
-    size--;
+    Preconditions.checkState(size() > 0);
     delegate.pop();
+    size--;
+  }
+
+  @Override
+  public int size() {
+    Preconditions.checkState(size == delegate.size());
+    return size - 1; // do not count the initial level
   }
 
   @Override
@@ -72,13 +78,13 @@ abstract class ReusableStackAbstractProver<T, D extends BasicProverEnvironment<T
 
   @Override
   public Model getModel() throws SolverException {
-    Preconditions.checkState(size >= 1);
+    Preconditions.checkState(size() >= 0);
     return delegate.getModel();
   }
 
   @Override
   public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
-    Preconditions.checkState(size >= 1);
+    Preconditions.checkState(size() >= 0);
     return delegate.getModelAssignments();
   }
 
@@ -108,6 +114,7 @@ abstract class ReusableStackAbstractProver<T, D extends BasicProverEnvironment<T
       size--;
       delegate.close();
     } else {
+      // we have been closed before
       Preconditions.checkState(size == 0);
     }
   }

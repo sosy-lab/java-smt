@@ -139,6 +139,11 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   }
 
   @Override
+  public int size() {
+    return assertedFormulas.size() - 1;
+  }
+
+  @Override
   public @Nullable Void addConstraint(BooleanFormula pF) throws InterruptedException {
     Preconditions.checkState(!closed);
     setChanged();

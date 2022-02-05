@@ -43,8 +43,6 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   protected final long z3solver;
 
-  private int level = 0;
-
   private final UniqueIdGenerator trackId = new UniqueIdGenerator();
   private final @Nullable Map<String, BooleanFormula> storedConstraints;
 
@@ -176,7 +174,6 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
   @Override
   public void push() {
     Preconditions.checkState(!closed);
-    level++;
     Native.solverPush(z3context, z3solver);
   }
 
@@ -184,12 +181,12 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
   public void pop() {
     Preconditions.checkState(!closed);
     Preconditions.checkState(Native.solverGetNumScopes(z3context, z3solver) >= 1);
-    level--;
     Native.solverPop(z3context, z3solver, 1);
   }
 
-  protected int getLevel() {
-    return level;
+  @Override
+  public int size() {
+    return Native.solverGetNumScopes(z3context, z3solver);
   }
 
   @Override
@@ -262,9 +259,7 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
           Native.solverGetNumScopes(z3context, z3solver) >= 0,
           "a negative number of scopes is not allowed");
 
-      while (level > 0) {
-        pop();
-      }
+      Native.solverReset(z3context, z3solver); // remove all assertions from the solver
       Native.solverDecRef(z3context, z3solver);
 
       shutdownNotifier.unregister(interruptListener);

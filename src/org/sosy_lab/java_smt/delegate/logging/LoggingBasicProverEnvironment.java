@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.delegate.logging;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.util.Collection;
@@ -58,6 +59,14 @@ class LoggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   public void push() {
     logger.log(Level.FINE, "up to level " + level++);
     wrapped.push();
+  }
+
+  @Override
+  public int size() {
+    int result = wrapped.size();
+    Preconditions.checkState(result == level);
+    logger.log(Level.FINE, "number of levels " + result);
+    return result;
   }
 
   @Override
