@@ -107,18 +107,21 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @Override
   public void pop() {
+    Preconditions.checkState(!closed);
     assertedFormulas.pop();
     BtorJNI.boolector_pop(manager.getEnvironment(), 1);
   }
 
   @Override
   public void push() {
+    Preconditions.checkState(!closed);
     assertedFormulas.push(new ArrayList<>());
     BtorJNI.boolector_push(manager.getEnvironment(), 1);
   }
 
   @Override
   public int size() {
+    Preconditions.checkState(!closed);
     return assertedFormulas.size();
   }
 

@@ -127,6 +127,7 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
 
   @Override
   public int size() {
+    Preconditions.checkState(!closed);
     return constraintStack.size() - 1;
   }
 

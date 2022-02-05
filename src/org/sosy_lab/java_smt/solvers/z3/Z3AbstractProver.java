@@ -186,6 +186,7 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @Override
   public int size() {
+    Preconditions.checkState(!closed);
     return Native.solverGetNumScopes(z3context, z3solver);
   }
 

@@ -140,6 +140,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
 
   @Override
   public int size() {
+    Preconditions.checkState(!closed);
     return assertedFormulas.size() - 1;
   }
 

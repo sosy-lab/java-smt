@@ -126,6 +126,7 @@ abstract class PrincessAbstractProver<E, AF> extends AbstractProverWithAllSat<E>
 
   @Override
   public int size() {
+    Preconditions.checkState(!closed);
     return assertedFormulas.size();
   }
 

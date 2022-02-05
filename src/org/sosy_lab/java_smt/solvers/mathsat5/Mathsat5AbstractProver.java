@@ -143,6 +143,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
 
   @Override
   public int size() {
+    Preconditions.checkState(!closed);
     return msat_num_backtrack_points(curEnv);
   }
 
