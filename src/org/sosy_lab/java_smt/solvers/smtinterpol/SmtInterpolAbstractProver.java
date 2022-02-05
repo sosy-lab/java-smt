@@ -42,7 +42,7 @@ import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 @SuppressWarnings("ClassTypeParameterName")
 abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
 
-  private boolean closed = false;
+  protected boolean closed = false;
   protected final Script env;
   protected final FormulaCreator<Term, Sort, Script, FunctionSymbol> creator;
   protected final SmtInterpolFormulaManager mgr;
@@ -151,7 +151,7 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
-    checkState(!isClosed());
+    checkState(!closed);
     checkGenerateUnsatCores();
     return getUnsatCore0();
   }
@@ -170,7 +170,7 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) throws InterruptedException {
-    checkState(!isClosed());
+    checkState(!closed);
     checkGenerateUnsatCoresOverAssumptions();
     push();
     checkState(
@@ -199,11 +199,12 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
 
   @Override
   public void close() {
-    checkState(!closed);
-    assertedFormulas.clear();
-    annotatedTerms.clear();
-    env.pop(assertedFormulas.size());
-    closed = true;
+    if (!closed) {
+      assertedFormulas.clear();
+      annotatedTerms.clear();
+      env.pop(assertedFormulas.size());
+      closed = true;
+    }
   }
 
   @Override
@@ -215,7 +216,7 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
   @Override
   public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
-    checkState(!isClosed());
+    checkState(!closed);
     checkGenerateAllSat();
 
     Term[] importantTerms = new Term[important.size()];
