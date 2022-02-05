@@ -64,6 +64,7 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
     creator = pMgr.getFormulaCreator();
     env = pEnv;
     shutdownNotifier = pShutdownNotifier;
+    assertedFormulas.push(new ArrayList<>());
   }
 
   protected boolean isClosed() {

@@ -42,8 +42,6 @@ import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
-import org.sosy_lab.java_smt.basicimpl.reusableStack.ReusableStackInterpolatingProver;
-import org.sosy_lab.java_smt.basicimpl.reusableStack.ReusableStackTheoremProver;
 
 public final class SmtInterpolSolverContext extends AbstractSolverContext {
 
@@ -230,8 +228,7 @@ public final class SmtInterpolSolverContext extends AbstractSolverContext {
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> options) {
     Script newScript = createNewScript(options);
-    return new ReusableStackTheoremProver(
-        new SmtInterpolTheoremProver(manager, newScript, options, shutdownNotifier));
+    return new SmtInterpolTheoremProver(manager, newScript, options, shutdownNotifier);
   }
 
   @SuppressWarnings("resource")
@@ -252,7 +249,7 @@ public final class SmtInterpolSolverContext extends AbstractSolverContext {
               settings.optionsMap,
               settings.smtLogfile.getFreshPath());
     }
-    return new ReusableStackInterpolatingProver<>(prover);
+    return prover;
   }
 
   @Override
