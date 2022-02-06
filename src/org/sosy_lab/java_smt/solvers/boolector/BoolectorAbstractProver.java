@@ -62,6 +62,8 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
         !isAnyStackAlive.getAndSet(true),
         "Boolector does not support the usage of multiple "
             + "solver stacks at the same time. Please close any existing solver stack.");
+    // push an initial level, required for cleaning up later (see #close), for reusage of Boolector.
+    push();
   }
 
   @Override
@@ -69,6 +71,7 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
     if (!closed) {
       // Free resources of callback
       BtorJNI.boolector_free_termination(terminationCallbackHelper);
+      // remove the whole stack, including the initial level from the constructor call.
       BtorJNI.boolector_pop(manager.getEnvironment(), assertedFormulas.size());
       assertedFormulas.clear();
       // You can't use delete here because you wouldn't be able to access model
@@ -108,6 +111,7 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   @Override
   public void pop() {
     Preconditions.checkState(!closed);
+    Preconditions.checkState(size() > 0);
     assertedFormulas.pop();
     BtorJNI.boolector_pop(manager.getEnvironment(), 1);
   }
@@ -122,7 +126,7 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   @Override
   public int size() {
     Preconditions.checkState(!closed);
-    return assertedFormulas.size();
+    return assertedFormulas.size() - 1;
   }
 
   @Override

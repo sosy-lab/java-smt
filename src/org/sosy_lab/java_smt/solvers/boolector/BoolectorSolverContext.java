@@ -28,7 +28,6 @@ import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
-import org.sosy_lab.java_smt.basicimpl.reusableStack.ReusableStackTheoremProver;
 
 public final class BoolectorSolverContext extends AbstractSolverContext {
 
@@ -200,9 +199,8 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> pOptions) {
     Preconditions.checkState(!closed, "solver context is already closed");
-    return new ReusableStackTheoremProver(
-        new BoolectorTheoremProver(
-            manager, creator, creator.getEnv(), shutdownNotifier, pOptions, isAnyStackAlive));
+    return new BoolectorTheoremProver(
+        manager, creator, creator.getEnv(), shutdownNotifier, pOptions, isAnyStackAlive);
   }
 
   @Override
