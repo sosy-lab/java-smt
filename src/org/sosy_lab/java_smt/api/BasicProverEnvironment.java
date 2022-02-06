@@ -61,7 +61,8 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * Get the number of backtracking points/levels on the current stack.
    *
    * <p>Caution: This is the number of PUSH-operations, and not necessarily equal to the number of
-   * asserted formulas.
+   * asserted formulas. On any level there can be an arbitrary number of asserted formulas. Even
+   * with size of 0, formulas can already be asserted (at bottom level).
    */
   int size();
 
