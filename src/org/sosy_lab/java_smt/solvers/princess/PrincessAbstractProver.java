@@ -55,6 +55,9 @@ abstract class PrincessAbstractProver<E, AF> extends AbstractProverWithAllSat<E>
     this.mgr = pMgr;
     this.creator = creator;
     this.api = checkNotNull(pApi);
+
+    assertedFormulas.push(new ArrayList<>());
+    trackingStack.push(new Level(0));
   }
 
   /**
@@ -110,6 +113,7 @@ abstract class PrincessAbstractProver<E, AF> extends AbstractProverWithAllSat<E>
   @Override
   public void pop() {
     Preconditions.checkState(!closed);
+    Preconditions.checkState(size() > 0);
     wasLastSatCheckSat = false;
     assertedFormulas.pop();
     api.pop();
@@ -127,7 +131,7 @@ abstract class PrincessAbstractProver<E, AF> extends AbstractProverWithAllSat<E>
   @Override
   public int size() {
     Preconditions.checkState(!closed);
-    return assertedFormulas.size();
+    return assertedFormulas.size() - 1;
   }
 
   @Override
@@ -190,23 +194,13 @@ abstract class PrincessAbstractProver<E, AF> extends AbstractProverWithAllSat<E>
         "UNSAT cores over assumptions not supported by Princess");
   }
 
-  /**
-   * Clean the stack, such that it can be re-used. The caller has to guarantee, that a stack not
-   * used by several provers after calling {@link #close()}, because there is a dependency from
-   * 'one' prover to 'one' (reusable)
-   */
   @Override
   public void close() {
     checkNotNull(api);
     checkNotNull(mgr);
     if (!closed) {
-      if (!shutdownNotifier.shouldShutdown()) { // normal cleanup
-        for (int i = 0; i < trackingStack.size(); i++) {
-          pop();
-        }
-      }
       api.shutDown();
-      api.reset();
+      api.reset(); // cleanup memory, even if we keep a reference to "api" and "mgr"
       creator.getEnv().unregisterStack(this);
     }
     closed = true;
