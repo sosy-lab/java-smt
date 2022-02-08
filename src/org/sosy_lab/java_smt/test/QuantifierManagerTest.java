@@ -784,6 +784,43 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     assertThatFormula(qFreeF)
         .isEquivalentTo(bvmgr.equal(bvmgr.extract(xx, 0, 0, false), bvmgr.makeBitvector(1, 1)));
   }
+  
+  /** Quant elim test based on a crash in Z3. */
+  @Test
+  public void checkBVQuantifierElimination2() throws InterruptedException, SolverException {
+    requireBitvectors();
+
+    // build formula: exists a2 : (and (= a2 #x00000006)
+    //                                 (= b2 #x00000006)
+    //                                 (= a3 #x00000000))
+    // quantifier-free equivalent: (and (= b2 #x00000006)
+    //                                  (= a3 #x00000000))
+
+    // Boolector quants need to be reworked
+    assume().that(solverUnderTest).isNotEqualTo(Solvers.BOOLECTOR);
+    // Z3 fails this currently. Remove once thats not longer the case!
+    assume().that(solverUnderTest).isNotEqualTo(Solvers.Z3);
+    int width = 32;
+
+    BitvectorFormula a2 = bvmgr.makeVariable(width, "a2");
+    BitvectorFormula b2 = bvmgr.makeVariable(width, "b2");
+    BitvectorFormula a3 = bvmgr.makeVariable(width, "a3");
+
+    BooleanFormula fAnd =
+        bmgr.and(
+            bvmgr.equal(a2, bvmgr.makeBitvector(width, 6)),
+            bvmgr.equal(b2, bvmgr.makeBitvector(width, 6)),
+            bvmgr.equal(a3, bvmgr.makeBitvector(width, 0)));
+
+    BooleanFormula f = qmgr.exists(a2, fAnd);
+    BooleanFormula qFreeF = qmgr.eliminateQuantifiers(f);
+
+    assertThatFormula(qFreeF)
+        .isEquivalentTo(
+            bmgr.and(
+                bvmgr.equal(b2, bvmgr.makeBitvector(width, 6)),
+                bvmgr.equal(a3, bvmgr.makeBitvector(width, 0))));
+  }
 
   @Test
   public void testExistsRestrictedRange() throws SolverException, InterruptedException {
