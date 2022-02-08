@@ -31,6 +31,7 @@ import org.sosy_lab.java_smt.delegate.statistics.StatisticsSolverContext;
 import org.sosy_lab.java_smt.delegate.synchronize.SynchronizedSolverContext;
 import org.sosy_lab.java_smt.solvers.boolector.BoolectorSolverContext;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4SolverContext;
+import org.sosy_lab.java_smt.solvers.cvc5.CVC5SolverContext;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5SolverContext;
 import org.sosy_lab.java_smt.solvers.princess.PrincessSolverContext;
 import org.sosy_lab.java_smt.solvers.smtinterpol.SmtInterpolSolverContext;
@@ -53,6 +54,7 @@ public class SolverContextFactory {
     PRINCESS,
     BOOLECTOR,
     CVC4,
+    CVC5,
     YICES2
   }
 
@@ -229,6 +231,16 @@ public class SolverContextFactory {
     switch (solverToCreate) {
       case CVC4:
         return CVC4SolverContext.create(
+            logger,
+            shutdownNotifier,
+            (int) randomSeed,
+            nonLinearArithmetic,
+            floatingPointRoundingMode,
+            loader);
+
+        // FIXME
+      case CVC5:
+        return CVC5SolverContext.create(
             logger,
             shutdownNotifier,
             (int) randomSeed,
