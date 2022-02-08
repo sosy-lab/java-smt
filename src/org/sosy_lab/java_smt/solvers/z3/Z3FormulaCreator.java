@@ -848,12 +848,10 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     } catch (Z3Exception exp) {
       throw handleZ3Exception(exp);
     }
-    Native.applyResultIncRef(z3context, result);
 
     try {
       return applyResultToAST(z3context, result);
     } finally {
-      Native.applyResultDecRef(z3context, result);
       Native.goalDecRef(z3context, goal);
       Native.tacticDecRef(z3context, tacticObject);
     }
@@ -862,43 +860,24 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   private long applyResultToAST(long z3context, long applyResult) {
     int subgoalsCount = Native.applyResultGetNumSubgoals(z3context, applyResult);
     long[] goalFormulas = new long[subgoalsCount];
-
     for (int i = 0; i < subgoalsCount; i++) {
       long subgoal = Native.applyResultGetSubgoal(z3context, applyResult, i);
-      Native.goalIncRef(z3context, subgoal);
-      long subgoalAst = goalToAST(z3context, subgoal);
-      Native.incRef(z3context, subgoalAst);
-      goalFormulas[i] = subgoalAst;
-      Native.goalDecRef(z3context, subgoal);
+      goalFormulas[i] = goalToAST(z3context, subgoal);
     }
-    try {
-      return goalFormulas.length == 1
-          ? goalFormulas[0]
-          : Native.mkOr(z3context, goalFormulas.length, goalFormulas);
-    } finally {
-      for (int i = 0; i < subgoalsCount; i++) {
-        Native.decRef(z3context, goalFormulas[i]);
-      }
-    }
+    return goalFormulas.length == 1
+        ? goalFormulas[0]
+        : Native.mkOr(z3context, goalFormulas.length, goalFormulas);
   }
 
   private long goalToAST(long z3context, long goal) {
     int subgoalFormulasCount = Native.goalSize(z3context, goal);
     long[] subgoalFormulas = new long[subgoalFormulasCount];
     for (int k = 0; k < subgoalFormulasCount; k++) {
-      long f = Native.goalFormula(z3context, goal, k);
-      Native.incRef(z3context, f);
-      subgoalFormulas[k] = f;
+      subgoalFormulas[k] = Native.goalFormula(z3context, goal, k);
     }
-    try {
-      return subgoalFormulas.length == 1
-          ? subgoalFormulas[0]
-          : Native.mkAnd(z3context, subgoalFormulas.length, subgoalFormulas);
-    } finally {
-      for (int k = 0; k < subgoalFormulasCount; k++) {
-        Native.decRef(z3context, subgoalFormulas[k]);
-      }
-    }
+    return subgoalFormulas.length == 1
+        ? subgoalFormulas[0]
+        : Native.mkAnd(z3context, subgoalFormulas.length, subgoalFormulas);
   }
 
   /** Closing the context. */
