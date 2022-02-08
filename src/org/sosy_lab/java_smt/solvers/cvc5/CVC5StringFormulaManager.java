@@ -28,7 +28,7 @@ class CVC5StringFormulaManager extends AbstractStringFormulaManager<Term, Sort, 
   @Override
   protected Term makeStringImpl(String pValue) {
     // The boolean enables escape characters!
-    return solver.mkConst(new CVC4String(pValue, true));
+    return solver.mkString(pValue));
   }
 
   @Override
