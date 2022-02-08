@@ -820,11 +820,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       throws InterruptedException, SolverException {
     long overallResult = pF;
     for (String tactic : pTactics) {
-      long tacticResult = applyTactic(z3context, overallResult, tactic);
-      if (overallResult != pF) {
-        Native.applyResultDecRef(z3context, overallResult);
-      }
-      overallResult = tacticResult;
+      overallResult = applyTactic(z3context, overallResult, tactic);
     }
     return overallResult;
   }

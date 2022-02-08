@@ -784,7 +784,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     assertThatFormula(qFreeF)
         .isEquivalentTo(bvmgr.equal(bvmgr.extract(xx, 0, 0, false), bvmgr.makeBitvector(1, 1)));
   }
-  
+
   /** Quant elim test based on a crash in Z3. */
   @Test
   public void checkBVQuantifierElimination2() throws InterruptedException, SolverException {
@@ -798,8 +798,6 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
 
     // Boolector quants need to be reworked
     assume().that(solverUnderTest).isNotEqualTo(Solvers.BOOLECTOR);
-    // Z3 fails this currently. Remove once thats not longer the case!
-    assume().that(solverUnderTest).isNotEqualTo(Solvers.Z3);
     int width = 32;
 
     BitvectorFormula a2 = bvmgr.makeVariable(width, "a2");
