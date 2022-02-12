@@ -962,7 +962,6 @@ PLAIN_STRING_RETURN
   TERM_RETURN
 
 make_term_from_string(from_string, 1from_1string)
-
 make_term_from_string(from_smtlib1, 1from_1smtlib1)
 make_term_from_string(from_smtlib2, 1from_1smtlib2)
 term_to_string(to_smtlib1, 1to_1smtlib1)
@@ -979,6 +978,8 @@ DEFINE_FUNC(jfailureCode, 1pop_1backtrack_1point) WITH_ONE_ARG(jenv)
 ENV_ARG_VOID(1)
 CALL1(int, pop_backtrack_point)
 FAILURE_CODE_RETURN
+
+i_func1s(num_backtrack_points, 1num_1backtrack_1points, size_t, msat_env)
 
 DEFINE_FUNC(void, 1reset_1env) WITH_ONE_ARG(jenv)
 ENV_ARG_VOID(1)
@@ -1158,6 +1159,11 @@ SIMPLE_ARG(size_t, 3)
 CALL3(msat_term, get_interpolant)
 FREE_INT_ARRAY_ARG(2)
 TERM_RETURN
+
+DEFINE_FUNC(string, 1get_1search_1stats) WITH_ONE_ARG(jenv)
+ENV_ARG(1)
+CALL1(char *, get_search_stats)
+PLAIN_STRING_RETURN
 
 DEFINE_FUNC(long, 1set_1termination_1callback) WITH_TWO_ARGS(jenv, object)
   ENV_ARG(1)

@@ -36,7 +36,7 @@ class SmtInterpolTheoremProver extends SmtInterpolAbstractProver<Void, Term>
   @Override
   @Nullable
   public Void addConstraint(BooleanFormula constraint) {
-    Preconditions.checkState(!isClosed());
+    Preconditions.checkState(!closed);
     Term t = mgr.extractInfo(constraint);
     if (generateUnsatCores) {
       String termName = generateTermName();

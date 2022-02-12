@@ -13,7 +13,7 @@ RUN apt-get update \
         wget curl git \
         build-essential cmake patchelf \
         openjdk-11-jdk ant maven \
-        mingw-w64 zlib1g-dev
+        mingw-w64 zlib1g-dev m4
 
 # Add the user "developer" with UID:1000, GID:1000, home at /developer.
 # This allows to map the docker-internal user to the local user 1000:1000 outside of the container.
