@@ -8,9 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
-import edu.stanford.CVC4.Expr;
-import edu.stanford.CVC4.Kind;
-import edu.stanford.CVC4.vectorExpr;
+import io.github.cvc5.api.Kind;
 import io.github.cvc5.api.Solver;
 import io.github.cvc5.api.Sort;
 import io.github.cvc5.api.Term;
@@ -23,66 +21,36 @@ import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 public class CVC5BooleanFormulaManager
     extends AbstractBooleanFormulaManager<Term, Sort, Solver, Term> {
 
-  private final Term cvc5True;
-  private final Term cvc5False;
   private final Solver solver;
 
   protected CVC5BooleanFormulaManager(CVC5FormulaCreator pCreator) {
     super(pCreator);
     solver = pCreator.getEnv();
-    cvc5True = solver.mkTrue();
-    cvc5False = solver.mkFalse();
   }
 
   @Override
-  protected Expr makeVariableImpl(String pVar) {
+  protected Term makeVariableImpl(String pVar) {
     return formulaCreator.makeVariable(getFormulaCreator().getBoolType(), pVar);
   }
 
   @Override
-  protected Expr makeBooleanImpl(boolean pValue) {
-    return exprManager.mkConst(pValue);
+  protected Term makeBooleanImpl(boolean pValue) {
+    return solver.mkBoolean(pValue);
   }
 
   @Override
-  protected Expr not(Expr pParam1) {
-    return exprManager.mkExpr(Kind.NOT, pParam1);
+  protected Term not(Term pParam1) {
+    return solver.mkTerm(Kind.NOT, pParam1);
   }
 
   @Override
-  protected Expr and(Expr pParam1, Expr pParam2) {
-    if (isTrue(pParam1)) {
-      return pParam2;
-    } else if (isTrue(pParam2)) {
-      return pParam1;
-    } else if (isFalse(pParam1)) {
-      return cvc5False;
-    } else if (isFalse(pParam2)) {
-      return cvc5False;
-    } else if (pParam1 == pParam2) {
-      return pParam1;
-    }
-    return exprManager.mkExpr(Kind.AND, pParam1, pParam2);
+  protected Term and(Term pParam1, Term pParam2) {
+    return solver.mkTerm(Kind.AND, pParam1, pParam2);
   }
 
   @Override
-  protected Expr andImpl(Collection<Expr> pParams) {
-    vectorExpr vExpr = new vectorExpr();
-    for (Expr e : pParams) {
-      if (isFalse(e)) {
-        return cvc5False;
-      }
-      if (!isTrue(e)) {
-        vExpr.add(e);
-      }
-    }
-    if (vExpr.capacity() == 0) {
-      return cvc5True;
-    } else if (vExpr.capacity() == 1) {
-      return vExpr.get(0);
-    } else {
-      return exprManager.mkExpr(Kind.AND, vExpr);
-    }
+  protected Term andImpl(Collection<Term> pParams) {
+    return solver.mkTerm(Kind.AND, (Term[]) pParams.toArray());
   }
 
   @Override
@@ -91,39 +59,13 @@ public class CVC5BooleanFormulaManager
   }
 
   @Override
-  protected Expr or(Expr pParam1, Expr pParam2) {
-    if (isTrue(pParam1)) {
-      return cvc5True;
-    } else if (isTrue(pParam2)) {
-      return cvc5True;
-    } else if (isFalse(pParam1)) {
-      return pParam2;
-    } else if (isFalse(pParam2)) {
-      return pParam1;
-    } else if (pParam1 == pParam2) {
-      return pParam1;
-    }
-    return exprManager.mkExpr(Kind.OR, pParam1, pParam2);
+  protected Term or(Term pParam1, Term pParam2) {
+    return solver.mkTerm(Kind.OR, pParam1, pParam2);
   }
 
   @Override
-  protected Expr orImpl(Collection<Expr> pParams) {
-    vectorExpr vExpr = new vectorExpr();
-    for (Expr e : pParams) {
-      if (isTrue(e)) {
-        return cvc5True;
-      }
-      if (!isFalse(e)) {
-        vExpr.add(e);
-      }
-    }
-    if (vExpr.capacity() == 0) {
-      return cvc5False;
-    } else if (vExpr.capacity() == 1) {
-      return vExpr.get(0);
-    } else {
-      return exprManager.mkExpr(Kind.OR, vExpr);
-    }
+  protected Term orImpl(Collection<Term> pParams) {
+    return solver.mkTerm(Kind.OR, (Term[]) pParams.toArray());
   }
 
   @Override
@@ -132,27 +74,27 @@ public class CVC5BooleanFormulaManager
   }
 
   @Override
-  protected Expr xor(Expr pParam1, Expr pParam2) {
-    return exprManager.mkExpr(Kind.XOR, pParam1, pParam2);
+  protected Term xor(Term pParam1, Term pParam2) {
+    return solver.mkTerm(Kind.XOR, pParam1, pParam2);
   }
 
   @Override
-  protected Expr equivalence(Expr pBits1, Expr pBits2) {
-    return exprManager.mkExpr(Kind.EQUAL, pBits1, pBits2);
+  protected Term equivalence(Term pBits1, Term pBits2) {
+    return solver.mkTerm(Kind.EQUAL, pBits1, pBits2);
   }
 
   @Override
-  protected boolean isTrue(Expr pBits) {
-    return pBits.isConst() && pBits.getConstBoolean();
+  protected boolean isTrue(Term pBits) {
+    return pBits.isBooleanValue() && pBits.getBooleanValue();
   }
 
   @Override
-  protected boolean isFalse(Expr pBits) {
-    return pBits.isConst() && !pBits.getConstBoolean();
+  protected boolean isFalse(Term pBits) {
+    return pBits.isBooleanValue() && !pBits.getBooleanValue();
   }
 
   @Override
-  protected Expr ifThenElse(Expr pCond, Expr pF1, Expr pF2) {
-    return exprManager.mkExpr(Kind.ITE, pCond, pF1, pF2);
+  protected Term ifThenElse(Term pCond, Term pF1, Term pF2) {
+    return solver.mkTerm(Kind.ITE, pCond, pF1, pF2);
   }
 }
