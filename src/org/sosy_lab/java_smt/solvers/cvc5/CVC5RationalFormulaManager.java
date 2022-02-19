@@ -8,7 +8,8 @@
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
-import edu.stanford.CVC4.Kind;
+import io.github.cvc5.api.Kind;
+import io.github.cvc5.api.Sort;
 import io.github.cvc5.api.Term;
 import java.math.BigDecimal;
 import org.sosy_lab.java_smt.api.NumeralFormula;
