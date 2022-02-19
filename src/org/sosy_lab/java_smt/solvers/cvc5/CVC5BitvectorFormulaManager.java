@@ -45,8 +45,15 @@ public class CVC5BitvectorFormulaManager
       }
       return solver.mkTerm(ext, pParam1);
     } catch (CVC5ApiException e) {
-      // TODO: revisit this with Karlheinz
-      return pParam1;
+      throw new IllegalArgumentException(
+          "You tried creating a invalid bitvector extract from bit "
+              + pMsb
+              + " to bit "
+              + pLsb
+              + " in term "
+              + pParam1
+              + ".",
+          e);
     }
   }
 
@@ -61,8 +68,13 @@ public class CVC5BitvectorFormulaManager
       }
       return solver.mkTerm(op, pParam1);
     } catch (CVC5ApiException e) {
-      // TODO: revisit this with Karlheinz
-      return pParam1;
+      throw new IllegalArgumentException(
+          "You tried creating a invalid bitvector extend with term "
+              + pParam1
+              + " and t "
+              + pExtensionBits
+              + " extension bits.",
+          e);
     }
   }
 
@@ -72,8 +84,13 @@ public class CVC5BitvectorFormulaManager
     try {
       return solver.mkBitVector(pLength, pI.longValue());
     } catch (CVC5ApiException e) {
-      // TODO: this is bad. Revisit this with Karlheinz
-      return null;
+      throw new IllegalArgumentException(
+          "You tried creating a invalid bitvector with length "
+              + pLength
+              + " and value "
+              + pI
+              + ".",
+          e);
     }
   }
 
@@ -84,8 +101,13 @@ public class CVC5BitvectorFormulaManager
       type = solver.mkBitVectorSort(length);
       return getFormulaCreator().makeVariable(type, varName);
     } catch (CVC5ApiException e) {
-      // TODO: this is bad. Revisit this with Karlheinz
-      return null;
+      throw new IllegalArgumentException(
+          "You tried creating a invalid bitvector variable with length "
+              + length
+              + " and name "
+              + varName
+              + ".",
+          e);
     }
   }
 
@@ -208,8 +230,13 @@ public class CVC5BitvectorFormulaManager
       Op length = solver.mkOp(Kind.INT_TO_BITVECTOR, pLength);
       return solver.mkTerm(length, pParam1);
     } catch (CVC5ApiException e) {
-      // TODO: talk with Karlheinz about this try/catch
-      return null;
+      throw new IllegalArgumentException(
+          "You tried creating a invalid bitvector out of a integer term "
+              + pParam1
+              + " with length "
+              + pLength
+              + ".",
+          e);
     }
   }
 
