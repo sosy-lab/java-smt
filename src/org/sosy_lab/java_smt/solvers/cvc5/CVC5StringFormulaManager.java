@@ -9,7 +9,7 @@
 package org.sosy_lab.java_smt.solvers.cvc5;
 
 import com.google.common.base.Preconditions;
-import edu.stanford.CVC4.CVC4String;
+import io.github.cvc5.api.Kind;
 import io.github.cvc5.api.Solver;
 import io.github.cvc5.api.Sort;
 import io.github.cvc5.api.Term;
@@ -27,13 +27,12 @@ class CVC5StringFormulaManager extends AbstractStringFormulaManager<Term, Sort, 
 
   @Override
   protected Term makeStringImpl(String pValue) {
-    // The boolean enables escape characters!
-    return solver.mkString(pValue));
+    return solver.mkString(pValue);
   }
 
   @Override
   protected Term makeVariableImpl(String varName) {
-    Type type = getFormulaCreator().getStringType();
+    Sort type = getFormulaCreator().getStringType();
     return getFormulaCreator().makeVariable(type, varName);
   }
 
@@ -70,9 +69,7 @@ class CVC5StringFormulaManager extends AbstractStringFormulaManager<Term, Sort, 
   @Override
   protected Term concatImpl(List<Term> parts) {
     Preconditions.checkArgument(parts.size() > 1);
-    vectorTerm vector = new vectorTerm();
-    parts.forEach(vector::add);
-    return solver.mkTerm(Kind.STRING_CONCAT, vector);
+    return solver.mkTerm(Kind.STRING_CONCAT, (Term[]) parts.toArray());
   }
 
   @Override
@@ -92,12 +89,12 @@ class CVC5StringFormulaManager extends AbstractStringFormulaManager<Term, Sort, 
 
   @Override
   protected Term contains(Term str, Term part) {
-    return solver.mkTerm(Kind.STRING_STRCTN, str, part);
+    return solver.mkTerm(Kind.STRING_CONTAINS, str, part);
   }
 
   @Override
   protected Term indexOf(Term str, Term part, Term startIndex) {
-    return solver.mkTerm(Kind.STRING_STRIDOF, str, part, startIndex);
+    return solver.mkTerm(Kind.STRING_INDEXOF, str, part, startIndex);
   }
 
   @Override
@@ -112,12 +109,12 @@ class CVC5StringFormulaManager extends AbstractStringFormulaManager<Term, Sort, 
 
   @Override
   protected Term replace(Term fullStr, Term target, Term replacement) {
-    return solver.mkTerm(Kind.STRING_STRREPL, fullStr, target, replacement);
+    return solver.mkTerm(Kind.STRING_REPLACE, fullStr, target, replacement);
   }
 
   @Override
   protected Term replaceAll(Term fullStr, Term target, Term replacement) {
-    return solver.mkTerm(Kind.STRING_STRREPLALL, fullStr, target, replacement);
+    return solver.mkTerm(Kind.STRING_REPLACE_ALL, fullStr, target, replacement);
   }
 
   @Override
@@ -128,7 +125,7 @@ class CVC5StringFormulaManager extends AbstractStringFormulaManager<Term, Sort, 
 
   @Override
   protected Term noneImpl() {
-    return solver.mkTerm(Kind.REGEXP_EMPTY, new vectorTerm());
+    return solver.mkTerm(Kind.REGEXP_NONE);
   }
 
   @Override
@@ -144,9 +141,7 @@ class CVC5StringFormulaManager extends AbstractStringFormulaManager<Term, Sort, 
   @Override
   protected Term concatRegexImpl(List<Term> parts) {
     Preconditions.checkArgument(parts.size() > 1);
-    vectorTerm vector = new vectorTerm();
-    parts.forEach(vector::add);
-    return solver.mkTerm(Kind.REGEXP_CONCAT, vector);
+    return solver.mkTerm(Kind.REGEXP_CONCAT, (Term[]) parts.toArray());
   }
 
   @Override
@@ -176,11 +171,14 @@ class CVC5StringFormulaManager extends AbstractStringFormulaManager<Term, Sort, 
 
   @Override
   protected Term toIntegerFormula(Term pParam) {
-    return solver.mkTerm(Kind.STRING_STOI, pParam);
+    return solver.mkTerm(Kind.STRING_TO_INT, pParam);
   }
 
   @Override
   protected Term toStringFormula(Term pParam) {
-    return solver.mkTerm(Kind.STRING_ITOS, pParam);
+    Preconditions.checkArgument(
+        pParam.isIntegerValue(), "CVC5 only supports INT to STRING conversion.");
+    // There is not other string conversion
+    return solver.mkTerm(Kind.STRING_FROM_INT, pParam);
   }
 }
