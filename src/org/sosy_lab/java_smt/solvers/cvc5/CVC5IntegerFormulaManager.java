@@ -8,14 +8,13 @@
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
-import edu.stanford.CVC4.Expr;
-import edu.stanford.CVC4.Kind;
-import edu.stanford.CVC4.Type;
+import io.github.cvc5.api.Kind;
+import io.github.cvc5.api.Sort;
+import io.github.cvc5.api.Term;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 
 public class CVC5IntegerFormulaManager
     extends CVC5NumeralFormulaManager<IntegerFormula, IntegerFormula>
@@ -26,51 +25,49 @@ public class CVC5IntegerFormulaManager
   }
 
   @Override
-  protected Type getNumeralType() {
+  protected Sort getNumeralType() {
     return getFormulaCreator().getIntegerType();
   }
 
   @Override
-  protected Expr makeNumberImpl(double pNumber) {
+  protected Term makeNumberImpl(double pNumber) {
     return makeNumberImpl((long) pNumber);
   }
 
   @Override
-  protected Expr makeNumberImpl(BigDecimal pNumber) {
+  protected Term makeNumberImpl(BigDecimal pNumber) {
     return decimalAsInteger(pNumber);
   }
 
   @Override
-  public Expr divide(Expr pParam1, Expr pParam2) {
-    return exprManager.mkExpr(Kind.INTS_DIVISION, pParam1, pParam2);
+  public Term divide(Term pParam1, Term pParam2) {
+    return solver.mkTerm(Kind.INTS_DIVISION, pParam1, pParam2);
   }
 
   @Override
-  protected Expr modularCongruence(Expr pNumber1, Expr pNumber2, long pModulo) {
+  protected Term modularCongruence(Term pNumber1, Term pNumber2, long pModulo) {
     return modularCongruence(pNumber1, pNumber2, BigInteger.valueOf(pModulo));
   }
 
   @Override
-  protected Expr modularCongruence(Expr pNumber1, Expr pNumber2, BigInteger pModulo) {
+  protected Term modularCongruence(Term pNumber1, Term pNumber2, BigInteger pModulo) {
     // ((_ divisible n) x)   <==>   (= x (* n (div x n)))
     if (BigInteger.ZERO.compareTo(pModulo) < 0) {
-      Expr n = makeNumberImpl(pModulo);
-      Expr x = subtract(pNumber1, pNumber2);
-      return exprManager.mkExpr(
-          Kind.EQUAL,
-          x,
-          exprManager.mkExpr(Kind.MULT, n, exprManager.mkExpr(Kind.INTS_DIVISION, x, n)));
+      Term n = makeNumberImpl(pModulo);
+      Term x = subtract(pNumber1, pNumber2);
+      return solver.mkTerm(
+          Kind.EQUAL, x, solver.mkTerm(Kind.MULT, n, solver.mkTerm(Kind.INTS_DIVISION, x, n)));
     }
-    return exprManager.mkConst(true);
+    return solver.mkBoolean(true);
   }
 
   @Override
-  protected Expr makeNumberImpl(BigInteger pI) {
+  protected Term makeNumberImpl(BigInteger pI) {
     return makeNumberImpl(pI.toString());
   }
 
   @Override
-  protected Expr makeNumberImpl(String pI) {
+  protected Term makeNumberImpl(String pI) {
     if (!INTEGER_NUMBER.matcher(pI).matches()) {
       throw new NumberFormatException("number is not an integer value: " + pI);
     }
@@ -78,7 +75,7 @@ public class CVC5IntegerFormulaManager
   }
 
   @Override
-  protected Expr makeVariableImpl(String pI) {
+  protected Term makeVariableImpl(String pI) {
     return formulaCreator.makeVariable(getFormulaCreator().getIntegerType(), pI);
   }
 }
