@@ -32,7 +32,9 @@ public interface UFManager {
    */
   <T extends Formula> T callUF(FunctionDeclaration<T> funcType, List<? extends Formula> args);
 
-  /** @see #callUF(FunctionDeclaration, List) */
+  /**
+   * @see #callUF(FunctionDeclaration, List)
+   */
   <T extends Formula> T callUF(FunctionDeclaration<T> funcType, Formula... args);
 
   /**
@@ -47,6 +49,8 @@ public interface UFManager {
   <T extends Formula> T declareAndCallUF(
       String name, FormulaType<T> pReturnType, List<Formula> pArgs);
 
-  /** @see #declareAndCallUF(String, FormulaType, List) */
+  /**
+   * @see #declareAndCallUF(String, FormulaType, List)
+   */
   <T extends Formula> T declareAndCallUF(String name, FormulaType<T> pReturnType, Formula... pArgs);
 }

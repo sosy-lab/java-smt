@@ -52,7 +52,9 @@ public interface BitvectorFormulaManager {
    */
   BitvectorFormula makeVariable(int length, String pVar);
 
-  /** @see #makeVariable(int, String) */
+  /**
+   * @see #makeVariable(int, String)
+   */
   BitvectorFormula makeVariable(BitvectorType type, String pVar);
 
   int getLength(BitvectorFormula number);

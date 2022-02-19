@@ -87,7 +87,9 @@ final class Z3Model extends CachingAbstractModel<Long, Long, Long> {
     }
   }
 
-  /** @return ValueAssignments for a constant declaration in the model */
+  /**
+   * @return ValueAssignments for a constant declaration in the model
+   */
   private Collection<ValueAssignment> getConstAssignments(long keyDecl) {
     Preconditions.checkArgument(
         Native.getArity(z3context, keyDecl) == 0, "Declaration is not a constant");

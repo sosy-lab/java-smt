@@ -118,13 +118,19 @@ public interface StringFormulaManager {
 
   // basic regex operations
 
-  /** @return formula denoting the empty set of strings */
+  /**
+   * @return formula denoting the empty set of strings
+   */
   RegexFormula none();
 
-  /** @return formula denoting the set of all strings, also known as Regex <code>".*"</code>. */
+  /**
+   * @return formula denoting the set of all strings, also known as Regex <code>".*"</code>.
+   */
   RegexFormula all();
 
-  /** @return formula denoting the range regular expression over two sequences of length 1. */
+  /**
+   * @return formula denoting the range regular expression over two sequences of length 1.
+   */
   RegexFormula range(StringFormula start, StringFormula end);
 
   /**
@@ -135,40 +141,60 @@ public interface StringFormulaManager {
     return range(makeString(String.valueOf(start)), makeString(String.valueOf(end)));
   }
 
-  /** @return formula denoting the concatenation */
+  /**
+   * @return formula denoting the concatenation
+   */
   default RegexFormula concat(RegexFormula... parts) {
     return concatRegex(Arrays.asList(parts));
   }
 
-  /** @return formula denoting the concatenation */
+  /**
+   * @return formula denoting the concatenation
+   */
   // TODO the naming of this function collides with #concat(List<StringFormula>).
   //  Maybe we should split String and Regex manager.
   RegexFormula concatRegex(List<RegexFormula> parts);
 
-  /** @return formula denoting the union */
+  /**
+   * @return formula denoting the union
+   */
   RegexFormula union(RegexFormula regex1, RegexFormula regex2);
 
-  /** @return formula denoting the intersection */
+  /**
+   * @return formula denoting the intersection
+   */
   RegexFormula intersection(RegexFormula regex1, RegexFormula regex2);
 
-  /** @return formula denoting the Kleene closure */
+  /**
+   * @return formula denoting the Kleene closure
+   */
   RegexFormula complement(RegexFormula regex);
 
-  /** @return formula denoting the Kleene closure (0 or more), also known as STAR operand. */
+  /**
+   * @return formula denoting the Kleene closure (0 or more), also known as STAR operand.
+   */
   RegexFormula closure(RegexFormula regex);
 
   // derived regex operations
 
-  /** @return formula denoting the difference */
+  /**
+   * @return formula denoting the difference
+   */
   RegexFormula difference(RegexFormula regex1, RegexFormula regex2);
 
-  /** @return formula denoting the Kleene cross (1 or more), also known as PLUS operand. */
+  /**
+   * @return formula denoting the Kleene cross (1 or more), also known as PLUS operand.
+   */
   RegexFormula cross(RegexFormula regex);
 
-  /** @return formula denoting the optionality, also known as QUESTIONMARK operand. */
+  /**
+   * @return formula denoting the optionality, also known as QUESTIONMARK operand.
+   */
   RegexFormula optional(RegexFormula regex);
 
-  /** @return formula denoting the concatenation n times */
+  /**
+   * @return formula denoting the concatenation n times
+   */
   RegexFormula times(RegexFormula regex, int repetitions);
 
   /**
