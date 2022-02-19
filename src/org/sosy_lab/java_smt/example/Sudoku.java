@@ -148,7 +148,11 @@ public class Sudoku {
     private SudokuSolver(SolverContext pContext) {
       context = pContext;
       bmgr = context.getFormulaManager().getBooleanFormulaManager();
-      imgr = context.getFormulaManager().getIntegerFormulaManager();
+      if (context.getSolverName() != Solvers.BOOLECTOR) {
+        imgr = context.getFormulaManager().getIntegerFormulaManager();
+      } else {
+        imgr = null;
+      }
     }
 
     abstract S getSymbols();
