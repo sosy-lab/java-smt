@@ -102,9 +102,25 @@ public class CVC5NativeAPITest {
     assertThat(solver.mkConst(solver.getBooleanSort()).getSort().isBoolean()).isTrue();
   }
 
+  // Try to convert real -> int -> bv -> fp; which fails at the fp step
+  @Test
+  public void checkFPConversion() throws CVC5ApiException {
+    Term oneFourth = solver.mkReal("1/4");
+    Term intOneFourth = solver.mkTerm(Kind.TO_INTEGER, oneFourth);
+    Term bvOneFourth = solver.mkTerm(solver.mkOp(Kind.INT_TO_BITVECTOR, 32), intOneFourth);
+    // Term fpOneFourth = solver.mkFloatingPoint(8, 24, bvOneFourth);
+
+    Exception e =
+        assertThrows(
+            io.github.cvc5.api.CVC5ApiException.class,
+            () -> solver.mkFloatingPoint(8, 24, bvOneFourth));
+    assertThat(e.toString())
+        .contains(
+            "Invalid argument '((_ int2bv 32) (to_int (/ 1 4)))' for 'val', expected bit-vector constant");
+  }
+
   @Test
   public void checkSimpleUnsat() {
-
     solver.assertFormula(solver.mkBoolean(false));
     Result satCheck = solver.checkSat();
     assertThat(satCheck.isUnsat()).isTrue();
