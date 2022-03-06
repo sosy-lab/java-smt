@@ -129,9 +129,21 @@ public class OptimizationTest extends SolverBasedTest0 {
     }
   }
 
-  @Test
+  @Test(timeout = 20_000)
   public void testSwitchingObjectives() throws SolverException, InterruptedException {
     requireRationals();
+
+    if (solverToUse() == Solvers.MATHSAT5) {
+      // see https://github.com/sosy-lab/java-smt/issues/233
+      assume()
+          .withMessage("OptiMathSAT 1.7.2 has a bug with switching objectives")
+          .that(context.getVersion())
+          .doesNotContain("MathSAT5 version 1.7.2");
+      assume()
+          .withMessage("OptiMathSAT 1.7.3 has a bug with switching objectives")
+          .that(context.getVersion())
+          .doesNotContain("MathSAT5 version 1.7.3");
+    }
 
     try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
       RationalFormula x = rmgr.makeVariable("x");
