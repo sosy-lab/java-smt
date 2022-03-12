@@ -13,6 +13,7 @@ import static org.junit.Assert.assertThrows;
 
 import io.github.cvc5.api.CVC5ApiException;
 import io.github.cvc5.api.Kind;
+import io.github.cvc5.api.Op;
 import io.github.cvc5.api.Result;
 import io.github.cvc5.api.RoundingMode;
 import io.github.cvc5.api.Solver;
@@ -102,13 +103,14 @@ public class CVC5NativeAPITest {
     assertThat(solver.mkConst(solver.getBooleanSort()).getSort().isBoolean()).isTrue();
   }
 
-  // Try to convert real -> int -> bv -> fp; which fails at the fp step
+  /*
+   *  Try to convert real -> int -> bv -> fp; which fails at the fp step. Use Kind.FLOATINGPOINT_TO_FP_REAL instead!
+   */
   @Test
   public void checkFPConversion() throws CVC5ApiException {
     Term oneFourth = solver.mkReal("1/4");
     Term intOneFourth = solver.mkTerm(Kind.TO_INTEGER, oneFourth);
     Term bvOneFourth = solver.mkTerm(solver.mkOp(Kind.INT_TO_BITVECTOR, 32), intOneFourth);
-    // Term fpOneFourth = solver.mkFloatingPoint(8, 24, bvOneFourth);
 
     Exception e =
         assertThrows(
@@ -312,12 +314,12 @@ public class CVC5NativeAPITest {
     assertThat(satCheck.isSat()).isTrue();
   }
 
-  @Ignore
   @Test
   public void checkSimpleFPSat() throws CVC5ApiException {
     // x * y = 1/4
     Term rmTerm = solver.mkRoundingMode(RoundingMode.ROUND_NEAREST_TIES_TO_AWAY);
-    Term oneFourth = solver.mkFloatingPoint(8, 24, solver.mkReal(1, 4));
+    Op mkRealOp = solver.mkOp(Kind.FLOATINGPOINT_TO_FP_REAL, 8, 24);
+    Term oneFourth = solver.mkTerm(mkRealOp, rmTerm, solver.mkReal(1, 4));
 
     Term varX = solver.mkConst(solver.mkFloatingPointSort(8, 24), "x");
     Term varY = solver.mkConst(solver.mkFloatingPointSort(8, 24), "y");
@@ -332,16 +334,13 @@ public class CVC5NativeAPITest {
     assertThat(satCheck.isSat()).isTrue();
   }
 
-  /*
-   * CVC5 FP want a bitvector as input....
-   */
-  @Ignore
   @Test
   public void checkSimpleFPUnsat() throws CVC5ApiException {
     // x * y = 1/4 AND x > 0 AND y < 0
     Term rmTerm = solver.mkRoundingMode(RoundingMode.ROUND_NEAREST_TIES_TO_AWAY);
-    Term oneFourth = solver.mkFloatingPoint(8, 24, solver.mkBitVector(32, "1", 10));
-    Term zero = solver.mkFloatingPoint(8, 24, solver.mkReal(0));
+    Op mkRealOp = solver.mkOp(Kind.FLOATINGPOINT_TO_FP_REAL, 8, 24);
+    Term oneFourth = solver.mkTerm(mkRealOp, rmTerm, solver.mkReal(1, 4));
+    Term zero = solver.mkTerm(mkRealOp, rmTerm, solver.mkReal(0));
 
     Term varX = solver.mkConst(solver.mkFloatingPointSort(8, 24), "x");
     Term varY = solver.mkConst(solver.mkFloatingPointSort(8, 24), "y");
