@@ -198,7 +198,7 @@ As long as no API was changed and compilation suceeds, simply execute `ant publi
 If the API was changed, we need to break the dependency cycle for the publication and revert this later:
 edit `lib/ivy.xml` and replace the dependency towards `javasmt-yices2` with the dependency towards `javasmt-solver-yices2`
 (the line can be copied from `solvers_ivy_conf/ivy_javasmt_yices2.xml`).
-Then run `ant publish-artifact-yices2`.
+Then run `ant publish-artifacts-yices2`.
 We still need to figure out how to avoid the warning about a dirty repository in that case, e.g. by a temporary commit.
 
 [Ivy Repository]: http://www.sosy-lab.org/ivy/org.sosy_lab/
