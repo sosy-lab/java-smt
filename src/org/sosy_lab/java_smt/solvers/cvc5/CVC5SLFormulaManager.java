@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
+import io.github.cvc5.api.Kind;
 import io.github.cvc5.api.Solver;
 import io.github.cvc5.api.Sort;
 import io.github.cvc5.api.Term;
@@ -39,11 +40,12 @@ public class CVC5SLFormulaManager extends AbstractSLFormulaManager<Term, Sort, S
 
   @Override
   protected Term makeEmptyHeap(Sort pT1, Sort pT2) {
-    return solver.mkTerm(Kind.SEP_EMP, pT1.mkGroundTerm(), pT2.mkGroundTerm());
+    // According to the documentation this is sortless
+    return solver.mkTerm(Kind.SEP_EMP);
   }
 
   @Override
   protected Term makeNilElement(Sort pSort) {
-    return solver.mkTerm(Kind.SEP_NIL, pSort.mkGroundTerm());
+    return solver.mkSepNil(pSort);
   }
 }
