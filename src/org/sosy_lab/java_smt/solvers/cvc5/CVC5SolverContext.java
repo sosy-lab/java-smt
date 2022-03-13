@@ -35,13 +35,17 @@ public final class CVC5SolverContext extends AbstractSolverContext {
       CVC5FormulaCreator creator,
       CVC5FormulaManager manager,
       ShutdownNotifier pShutdownNotifier,
+      Solver solver,
       int pRandomSeed) {
     super(manager);
     this.creator = creator;
     shutdownNotifier = pShutdownNotifier;
     randomSeed = pRandomSeed;
+    this.solver = solver;
   }
 
+  // CVC5 loads itself when creating a solver
+  @SuppressWarnings({"unused", "resource"})
   public static SolverContext create(
       LogManager pLogger,
       ShutdownNotifier pShutdownNotifier,
@@ -51,17 +55,17 @@ public final class CVC5SolverContext extends AbstractSolverContext {
       Consumer<String> pLoader) {
 
     // Solver is the central class for creating expressions/terms/formulae.
-    solver = new Solver();
-    CVC5FormulaCreator creator = new CVC5FormulaCreator(solver);
+    Solver newSolver = new Solver();
+    CVC5FormulaCreator creator = new CVC5FormulaCreator(newSolver);
 
     // set common options.
-    solver.setOption("random-seed", String.valueOf(randomSeed));
-    solver.setOption("produce-models", "true");
-    solver.setOption("finite-model-find", "true");
-    solver.setOption("sets-ext", "true");
-    solver.setOption("output-language", "smtlib2");
+    newSolver.setOption("random-seed", String.valueOf(randomSeed));
+    newSolver.setOption("produce-models", "true");
+    newSolver.setOption("finite-model-find", "true");
+    newSolver.setOption("sets-ext", "true");
+    newSolver.setOption("output-language", "smtlib2");
     // Set Strings option to enable all String features (such as lessOrEquals)
-    solver.setOption("strings-exp", "true");
+    newSolver.setOption("strings-exp", "true");
 
     // Create managers
     CVC5UFManager functionTheory = new CVC5UFManager(creator);
@@ -100,7 +104,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
             slTheory,
             strTheory);
 
-    return new CVC5SolverContext(creator, manager, pShutdownNotifier, randomSeed);
+    return new CVC5SolverContext(creator, manager, pShutdownNotifier, newSolver, randomSeed);
   }
 
   @Override
