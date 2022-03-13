@@ -8,17 +8,15 @@
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
-import edu.stanford.CVC4.Expr;
-import edu.stanford.CVC4.Kind;
-import edu.stanford.CVC4.vectorExpr;
+import io.github.cvc5.api.Kind;
 import io.github.cvc5.api.Solver;
 import io.github.cvc5.api.Sort;
 import io.github.cvc5.api.Term;
+import java.util.ArrayList;
 import java.util.List;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
-import org.sosy_lab.java_smt.solvers.cvc4.CVC4FormulaCreator;
 
 public class CVC5QuantifiedFormulaManager
     extends AbstractQuantifiedFormulaManager<Term, Sort, Solver, Term> {
@@ -47,19 +45,14 @@ public class CVC5QuantifiedFormulaManager
    * This applies to CVC4 and CVC5!
    */
   @Override
-  protected Term eliminateQuantifiers(Expr pExtractInfo)
+  protected Term eliminateQuantifiers(Term pExtractInfo)
       throws SolverException, InterruptedException {
-    Expr eliminated = pExtractInfo;
-    // The first bool is for partial or full elimination. true is full
-    // The second bool (optional; 2 methods) is whether to output warnings or not, such as when an
-    // unexpected logic is used.
+    Term eliminated = pExtractInfo;
     try {
-      eliminated = smtEngine.doQuantifierElimination(pExtractInfo, true);
+      eliminated = solver.getQuantifierElimination(pExtractInfo);
     } catch (RuntimeException e) {
       // quantifier elimination failed, simply return the input
     }
-    // We don't delete it in the prover.close(), is there a reason for that?
-    smtEngine.delete();
     return eliminated;
   }
 
@@ -70,24 +63,23 @@ public class CVC5QuantifiedFormulaManager
    * for the variable list in quantifiers.
    */
   @Override
-  public Term mkQuantifier(Quantifier pQ, List<Expr> pVars, Expr pBody) {
+  public Term mkQuantifier(Quantifier pQ, List<Term> pVars, Term pBody) {
     if (pVars.isEmpty()) {
       throw new IllegalArgumentException("Empty variable list for quantifier.");
     } else {
-      // CVC4 uses its own lists for quantifier that may only have bound vars
-      vectorExpr vec = new vectorExpr();
-      Expr substBody = pBody;
+      List<Term> boundVars = new ArrayList<>();
+      Term substBody = pBody;
       // every free needs a bound copy. As the internal Id is different for every variable, even
       // with the same name, this is fine.
-      for (Expr var : pVars) {
-        Expr boundCopy = ((CVC4FormulaCreator) formulaCreator).makeBoundCopy(var);
-        vec.add(boundCopy);
+      for (Term var : pVars) {
+        Term boundCopy = ((CVC5FormulaCreator) formulaCreator).makeBoundCopy(var);
+        boundVars.add(boundCopy);
         substBody = substBody.substitute(var, boundCopy);
       }
-      Expr quantifiedVars = exprManager.mkExpr(Kind.BOUND_VAR_LIST, vec);
 
       Kind quant = pQ == Quantifier.EXISTS ? Kind.EXISTS : Kind.FORALL;
-      return exprManager.mkExpr(quant, quantifiedVars, substBody);
+      Term boundVarsList = solver.mkTerm(Kind.VARIABLE_LIST, (Term[]) boundVars.toArray());
+      return solver.mkTerm(quant, boundVarsList, substBody);
     }
   }
 }
