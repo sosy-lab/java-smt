@@ -56,7 +56,7 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, Solver, Term
     creator = pFormulaCreator;
   }
 
-  static Term getCVC5Expr(Formula pT) {
+  static Term getCVC5Term(Formula pT) {
     if (pT instanceof CVC5Formula) {
       return ((CVC5Formula) pT).getTerm();
     }
