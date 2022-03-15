@@ -10,8 +10,7 @@ package org.sosy_lab.java_smt.solvers.cvc5;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import edu.stanford.CVC4.ExprManagerMapCollection;
-import edu.stanford.CVC4.SmtEngine;
+import io.github.cvc5.api.CVC5ApiException;
 import io.github.cvc5.api.Result;
 import io.github.cvc5.api.Solver;
 import io.github.cvc5.api.Term;
@@ -33,8 +32,11 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
-import org.sosy_lab.java_smt.solvers.cvc4.CVC4Model;
 
+/*
+ * TODO: import/export of expressions is currently not supported, hence we need to use 1 solver
+ * (context) for everything! They are working on it. See CVC5 github discussion.
+ */
 class CVC5TheoremProver extends AbstractProverWithAllSat<Void>
     implements ProverEnvironment, BasicProverEnvironment<Void> {
 
@@ -46,13 +48,10 @@ class CVC5TheoremProver extends AbstractProverWithAllSat<Void>
   protected final Deque<List<Term>> assertedFormulas = new ArrayDeque<>();
 
   /**
-   * Tracks provided models to inform them when the SmtEngine is closed. We can no longer access
-   * model evaluation after closing the SmtEngine.
+   * Tracks provided models to inform them when the solver is closed. We can no longer access model
+   * evaluation after closing the solver.
    */
   private final Set<CVC5Model> models = new LinkedHashSet<>();
-
-  /** We copy expression between different ExprManagers. The map serves as cache. */
-  private final ExprManagerMapCollection exportMapping = new ExprManagerMapCollection();
 
   // TODO: does CVC5 support separation logic in incremental mode?
   private final boolean incremental;
@@ -71,6 +70,9 @@ class CVC5TheoremProver extends AbstractProverWithAllSat<Void>
     incremental = !enableSL;
     assertedFormulas.push(new ArrayList<>()); // create initial level
     solver = pSolver;
+
+    // Technically we set some of these options twice now
+    setOptions(randomSeed, pOptions);
   }
 
   private void setOptions(int randomSeed, Set<ProverOptions> pOptions) {
@@ -96,25 +98,18 @@ class CVC5TheoremProver extends AbstractProverWithAllSat<Void>
     solver.setOption("incremental", "true");
   }
 
-  /** import an expression from global context into this prover's context. */
-  protected Term importExpr(Term term) {
-    // TODO: currently not supported! They are working on it. See CVC5 github discussion.
-    return null;
-  }
-
-  /** export an expression from this prover's context into global context. */
-  protected Term exportExpr(Term expr) {
-    // TODO: currently not supported! They are working on it. See CVC5 github discussion.
-    return null;
-  }
-
   @Override
   public void push() {
     Preconditions.checkState(!closed);
     setChanged();
     assertedFormulas.push(new ArrayList<>());
     if (incremental) {
-      solver.push();
+      try {
+        solver.push();
+      } catch (CVC5ApiException e) {
+        throw new IllegalStateException(
+            "You tried to use push() on an CVC5 assertion stack illegally.", e);
+      }
     }
   }
 
@@ -125,7 +120,12 @@ class CVC5TheoremProver extends AbstractProverWithAllSat<Void>
     assertedFormulas.pop();
     Preconditions.checkState(!assertedFormulas.isEmpty(), "initial level must remain until close");
     if (incremental) {
-      solver.pop();
+      try {
+        solver.pop();
+      } catch (CVC5ApiException e) {
+        throw new IllegalStateException(
+            "You tried to use pop() on an CVC5 assertion stack illegally.", e);
+      }
     }
   }
 
@@ -142,14 +142,14 @@ class CVC5TheoremProver extends AbstractProverWithAllSat<Void>
   }
 
   @Override
-  public CVC4Model getModel() {
+  public CVC5Model getModel() {
     Preconditions.checkState(!closed);
     checkGenerateModels();
     return getModelWithoutChecks();
   }
 
   @Override
-  protected CVC4Model getModelWithoutChecks() {
+  protected CVC5Model getModelWithoutChecks() {
     Preconditions.checkState(!changedSinceLastSatQuery);
     CVC5Model model = new CVC5Model(this, creator, getAssertedExpressions());
     models.add(model);
@@ -164,10 +164,6 @@ class CVC5TheoremProver extends AbstractProverWithAllSat<Void>
     if (!changedSinceLastSatQuery) {
       changedSinceLastSatQuery = true;
       closeAllModels();
-      if (!incremental) {
-        // create a new clean smtEngine
-        smtEngine = new SmtEngine(exprManager);
-      }
     }
   }
 
@@ -200,17 +196,14 @@ class CVC5TheoremProver extends AbstractProverWithAllSat<Void>
     closeAllModels();
     changedSinceLastSatQuery = false;
     if (!incremental) {
-      for (Expr expr : getAssertedExpressions()) {
-        solver.assertFormula(importExpr(expr));
+      for (Term term : getAssertedExpressions()) {
+        // We can not translate terms as CVC5 does not support it. We need to use the same solver
+        // for creation, assertion and solving!
+        solver.assertFormula(term);
       }
     }
 
-    // Result result;
-    /* Shutdown currently not possible TODO: revisit
-    try (ShutdownHook hook = new ShutdownHook(shutdownNotifier, solver::interrupt)) {
-      shutdownNotifier.shutdownIfNecessary();
-      result = solver.checkSat();
-    }*/
+    /* Shutdown currently not possible in CVC5. */
     Result result = solver.checkSat();
     shutdownNotifier.shutdownIfNecessary();
     return convertSatResult(result);
@@ -221,7 +214,7 @@ class CVC5TheoremProver extends AbstractProverWithAllSat<Void>
       if (result.getUnknownExplanation().equals(Result.UnknownExplanation.INTERRUPTED)) {
         throw new InterruptedException();
       } else {
-        throw new SolverException("CVC4 returned null or unknown on sat check (" + result + ")");
+        throw new SolverException("CVC5 returned null or unknown on sat check (" + result + ")");
       }
     }
     return result.isUnsat();
@@ -262,10 +255,9 @@ class CVC5TheoremProver extends AbstractProverWithAllSat<Void>
     if (!closed) {
       closeAllModels();
       assertedFormulas.clear();
-      exportMapping.delete();
       // Dont close the solver here, currently we use one solver instance for all stacks + the
       // context!
-      // TODO: revisit once i know how to use multiple solvers.
+      // TODO: revisit once the devs enable formula translation.
       closed = true;
     }
   }
