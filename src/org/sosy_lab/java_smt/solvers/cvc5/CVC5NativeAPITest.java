@@ -84,12 +84,11 @@ public class CVC5NativeAPITest {
   }
 
   /*
-   * CVC5 does not have a check if a term is const or not, but checks for if the value is a
-   * certain sort. Check what happens if you call those checks on const and vars.
+   * Check how to get types/values etc. from constants, variables etc. in CVC5.
    */
   @Test
-  public void checkGetValueOnVariables() throws CVC5ApiException {
-    // Constant values
+  public void checkGetValueAndType() throws CVC5ApiException {
+    // Constant values (NOT Kind,CONSTANT!)
     assertThat(solver.mkBoolean(false).isBooleanValue()).isTrue();
     assertThat(solver.mkInteger(0).isIntegerValue()).isTrue();
     assertThat(solver.mkInteger(999).isIntegerValue()).isTrue();
@@ -101,6 +100,50 @@ public class CVC5NativeAPITest {
     assertThat(solver.mkConst(solver.getIntegerSort()).isIntegerValue()).isFalse();
     // To check for variables we have to check for value and type
     assertThat(solver.mkConst(solver.getBooleanSort()).getSort().isBoolean()).isTrue();
+
+    // Test consts (variables). Consts are always false when checked for isTypedValue(), if you try
+    // getTypedValue() on it anyway an exception is raised. This persists after sat. The only way of
+    // checking and geting the values is via Kind.CONSTANT, type = sort and getValue()
+    Term intVar = solver.mkConst(solver.getIntegerSort(), "int_const");
+    assertThat(intVar.isIntegerValue()).isFalse();
+    assertThat(intVar.getSort().isInteger()).isTrue();
+    Exception e =
+        assertThrows(io.github.cvc5.api.CVC5ApiException.class, () -> intVar.getIntegerValue());
+    assertThat(e.toString())
+        .contains(
+            "Invalid argument 'int_const' for '*d_node', expected Term to be an integer value when calling getIntegerValue()");
+    // Build a formula such that is has a value, assert and check sat and then check again
+    solver.assertFormula(solver.mkTerm(Kind.EQUAL, intVar, solver.mkInteger(1)));
+    // Is sat, no need to check
+    solver.checkSat();
+    assertThat(intVar.isIntegerValue()).isFalse();
+    assertThat(intVar.getSort().isInteger()).isTrue();
+    assertThat(intVar.getKind()).isEqualTo(Kind.CONSTANT);
+    assertThat(intVar.getKind()).isNotEqualTo(Kind.VARIABLE);
+    assertThat(solver.getValue(intVar).toString()).isEqualTo("1");
+    // Note that variables (Kind.VARIABLES) are bound variables!
+    assertThat(solver.mkVar(solver.getIntegerSort()).getKind()).isEqualTo(Kind.VARIABLE);
+    assertThat(solver.mkVar(solver.getIntegerSort()).getKind()).isNotEqualTo(Kind.CONSTANT);
+    // Uf unapplied are CONSTANT
+    Sort intToBoolSort = solver.mkFunctionSort(solver.getIntegerSort(), solver.getBooleanSort());
+    Term uf1 = solver.mkConst(intToBoolSort);
+    assertThat(uf1.getKind()).isNotEqualTo(Kind.VARIABLE);
+    assertThat(uf1.getKind()).isEqualTo(Kind.CONSTANT);
+    assertThat(uf1.getKind()).isNotEqualTo(Kind.APPLY_UF);
+    // arity 1
+    assertThat(uf1.getSort().getFunctionArity()).isEqualTo(1);
+    // apply the uf, the kind is now APPLY_UF
+    Term appliedUf1 = solver.mkTerm(Kind.APPLY_UF, new Term[] {uf1, intVar});
+    assertThat(appliedUf1.getKind()).isNotEqualTo(Kind.VARIABLE);
+    assertThat(appliedUf1.getKind()).isNotEqualTo(Kind.CONSTANT);
+    assertThat(appliedUf1.getKind()).isEqualTo(Kind.APPLY_UF);
+    // The ufs sort is always the returntype
+    assertThat(appliedUf1.getSort()).isEqualTo(solver.getBooleanSort());
+    assertThat(appliedUf1.getNumChildren()).isEqualTo(2);
+    // The first child is the UF
+    assertThat(appliedUf1.getChild(0).getSort()).isEqualTo(intToBoolSort);
+    // The second child onwards are the arguments
+    assertThat(appliedUf1.getChild(1).getSort()).isEqualTo(solver.getIntegerSort());
   }
 
   /*
