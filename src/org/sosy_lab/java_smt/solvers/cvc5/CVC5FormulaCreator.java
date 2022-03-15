@@ -12,15 +12,9 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
-import com.google.common.primitives.UnsignedInteger;
-import com.google.common.primitives.UnsignedLong;
-import edu.stanford.CVC4.FloatingPoint;
-import edu.stanford.CVC4.FloatingPointSize;
-import edu.stanford.CVC4.FunctionType;
-import edu.stanford.CVC4.vectorType;
+import io.github.cvc5.api.CVC5ApiException;
 import io.github.cvc5.api.Kind;
 import io.github.cvc5.api.Solver;
 import io.github.cvc5.api.Sort;
@@ -32,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
+import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -46,7 +42,6 @@ import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
-import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5ArrayFormula;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5BitvectorFormula;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5BooleanFormula;
@@ -103,13 +98,28 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
 
   @Override
   public Sort getBitvectorType(int pBitwidth) {
-    return solver.mkBitVectorSort(pBitwidth);
+    try {
+      return solver.mkBitVectorSort(pBitwidth);
+    } catch (CVC5ApiException e) {
+      throw new IllegalArgumentException(
+          "You tried creating a invalid bitvector sort with size " + pBitwidth + ".", e);
+    }
   }
 
   @Override
   public Sort getFloatingPointType(FloatingPointType pType) {
-    return solver.mkFloatingPointSort(
-        pType.getExponentSize(), pType.getMantissaSize() + 1); // plus sign bit
+    try {
+      // plus sign bit
+      return solver.mkFloatingPointSort(pType.getExponentSize(), pType.getMantissaSize() + 1);
+    } catch (CVC5ApiException e) {
+      throw new IllegalArgumentException(
+          "You tried creating a invalid floatingpoint sort with exponent size "
+              + pType.getExponentSize()
+              + " and mantissa "
+              + pType.getMantissaSize()
+              + ".",
+          e);
+    }
   }
 
   @Override
@@ -303,86 +313,98 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
   public <R> R visit(FormulaVisitor<R> visitor, Formula formula, final Term f) {
     checkState(!f.isNull());
     Sort sort = f.getSort();
-
-    if (f.getKind() == Kind.CONSTANT) {
-      if (sort.isBoolean()) {
-        return visitor.visitConstant(formula, f.getBooleanValue());
-      } else if (sort.isReal()) {
-        return visitor.visitConstant(formula, f.getRealValue());
-      } else if (sort.isInteger()) {
-        return visitor.visitConstant(formula, f.getIntegerValue());
-      } else if (sort.isBitVector()) {
-        return visitor.visitConstant(formula, f.getBitVectorValue());
-      } else if (sort.isFloatingPoint()) {
-        return visitor.visitConstant(formula, f.getFloatingPointValue());
-      } else if (sort.isRoundingMode()) {
-        // TODO: this is most likely bullshit and WILL fail!
-        return visitor.visitConstant(formula, solver.getRoundingModeSort());
-      } else if (sort.isString()) {
-        return visitor.visitConstant(formula, f.getStringValue());
-      } else {
-        throw new UnsupportedOperationException("Unhandled constant " + f + " with Type " + sort);
-      }
-
-    } else if (f.getKind() == Kind.VARIABLE) {
-      // Bound and unbound vars are the same in CVC5!
-      // BOUND vars are used for all vars that are bound to a quantifier in CVC5.
-      // We resubstitute them back to the original free.
-      // CVC5 doesn't give you the de-brujin index
-      Term originalVar = variablesCache.get(formula.toString());
-      return visitor.visitBoundVariable(encapsulate(originalVar), 0);
-
-    } else if (f.getKind() == Kind.FORALL || f.getKind() == Kind.EXISTS) {
-      // QUANTIFIER: replace bound variable with free variable for visitation
-      assert f.getNumChildren() == 2;
-      Term body = f.getChildren().get(1);
-      List<Formula> freeVars = new ArrayList<>();
-      for (Term boundVar : f.getChild(0)) { // unpack grand-children of f.
-        String name = getName(boundVar);
-        Term freeVar = Preconditions.checkNotNull(variablesCache.get(name));
-        body = body.substitute(boundVar, freeVar);
-        freeVars.add(encapsulate(freeVar));
-      }
-      BooleanFormula fBody = encapsulateBoolean(body);
-      Quantifier quant = f.getKind() == Kind.EXISTS ? Quantifier.EXISTS : Quantifier.FORALL;
-      return visitor.visitQuantifier((BooleanFormula) formula, quant, freeVars, fBody);
-
-    } else if (f.isVariable()) {
-      assert f.getKind() != Kind.BOUND_VARIABLE;
-      return visitor.visitFreeVariable(formula, getName(f));
-
-    } else {
-      // Termessions like uninterpreted function calls (Kind.APPLY_UF) or operators (e.g. Kind.AND).
-      // These are all treated like operators, so we can get the declaration by f.getOperator()!
-      List<Formula> args = ImmutableList.copyOf(Iterables.transform(f, this::encapsulate));
-      List<FormulaType<?>> argsTypes = new ArrayList<>();
-      Term operator = normalize(f.getOperator());
-      if (operator.getSort().isFunction()) {
-        vectorType argTypes = new FunctionType(operator.getSort()).getArgTypes();
-        for (int i = 0; i < argTypes.size(); i++) {
-          argsTypes.add(getFormulaTypeFromTermType(argTypes.get(i)));
+    try {
+      if (f.getKind() == Kind.CONSTANT) {
+        if (sort.isBoolean()) {
+          return visitor.visitConstant(formula, f.getBooleanValue());
+        } else if (sort.isReal()) {
+          return visitor.visitConstant(formula, f.getRealValue());
+        } else if (sort.isInteger()) {
+          return visitor.visitConstant(formula, f.getIntegerValue());
+        } else if (sort.isBitVector()) {
+          return visitor.visitConstant(formula, f.getBitVectorValue());
+        } else if (sort.isFloatingPoint()) {
+          return visitor.visitConstant(formula, f.getFloatingPointValue());
+        } else if (sort.isRoundingMode()) {
+          // TODO: this is most likely bullshit and WILL fail!
+          return visitor.visitConstant(formula, solver.getRoundingModeSort());
+        } else if (sort.isString()) {
+          return visitor.visitConstant(formula, f.getStringValue());
+        } else {
+          throw new UnsupportedOperationException("Unhandled constant " + f + " with Type " + sort);
         }
-      } else {
-        for (Term arg : f) {
-          argsTypes.add(getFormulaType(arg));
+
+      } else if (f.getKind() == Kind.VARIABLE) {
+        // Bound and unbound vars are the same in CVC5!
+        // BOUND vars are used for all vars that are bound to a quantifier in CVC5.
+        // We resubstitute them back to the original free.
+        // CVC5 doesn't give you the de-brujin index
+        Term originalVar = variablesCache.get(formula.toString());
+        return visitor.visitBoundVariable(encapsulate(originalVar), 0);
+
+      } else if (f.getKind() == Kind.FORALL || f.getKind() == Kind.EXISTS) {
+        // QUANTIFIER: replace bound variable with free variable for visitation
+        assert f.getNumChildren() == 2;
+        Term body = f.getChild(1);
+        List<Formula> freeVars = new ArrayList<>();
+        for (Term boundVar : f.getChild(0)) { // unpack grand-children of f.
+          String name = getName(boundVar);
+          Term freeVar = Preconditions.checkNotNull(variablesCache.get(name));
+          body = body.substitute(boundVar, freeVar);
+          freeVars.add(encapsulate(freeVar));
         }
+        BooleanFormula fBody = encapsulateBoolean(body);
+        Quantifier quant = f.getKind() == Kind.EXISTS ? Quantifier.EXISTS : Quantifier.FORALL;
+        return visitor.visitQuantifier((BooleanFormula) formula, quant, freeVars, fBody);
+
+      } else if (f.getKind() == Kind.VARIABLE) {
+        // assert f.getKind() != Kind.BOUND_VARIABLE;
+        return visitor.visitFreeVariable(formula, getName(f));
+
+      } else {
+        // Termessions like uninterpreted function calls (Kind.APPLY_UF) or operators (e.g.
+        // Kind.AND).
+        // These are all treated like operators, so we can get the declaration by f.getOperator()!
+        /*
+              List<Formula> args = ImmutableList.copyOf(Iterables.transform(f, this::encapsulate));
+              List<FormulaType<?>> argsTypes = new ArrayList<>();
+
+              Term operator = normalize(f.getOperator());
+              if (operator.getSort().isFunction()) {
+                vectorType argTypes = new FunctionType(operator.getSort()).getArgTypes();
+                for (int i = 0; i < argTypes.size(); i++) {
+                  argsTypes.add(getFormulaTypeFromTermType(argTypes.get(i)));
+                }
+              } else {
+                for (Term arg : f) {
+                  argsTypes.add(getFormulaType(arg));
+                }
+              }
+
+
+              checkState(args.size() == argsTypes.size());
+        */
+        // TODO some operations (BV_SIGN_EXTEND, BV_ZERO_EXTEND, maybe more) encode information as
+        // part of the operator itself, thus the arity is one too small and there might be no
+        // possibility to access the information from user side. Should we encode such information
+        // as
+        // additional parameters? We do so for some methods of Princess.
+        /*
+        return visitor.visitFunction(
+            formula,
+            args,
+            FunctionDeclarationImpl.of(
+                getName(f), getDeclarationKind(f), argsTypes, getFormulaType(f), operator));
+                */
+        return null;
       }
-
-      checkState(args.size() == argsTypes.size());
-
-      // TODO some operations (BV_SIGN_EXTEND, BV_ZERO_EXTEND, maybe more) encode information as
-      // part of the operator itself, thus the arity is one too small and there might be no
-      // possibility to access the information from user side. Should we encode such information as
-      // additional parameters? We do so for some methods of Princess.
-      return visitor.visitFunction(
-          formula,
-          args,
-          FunctionDeclarationImpl.of(
-              getName(f), getDeclarationKind(f), argsTypes, getFormulaType(f), operator));
+    } catch (CVC5ApiException e) {
+      throw new IllegalArgumentException("Failure visiting the Term " + f + ".", e);
     }
   }
 
   /** CVC5 returns new objects when querying operators for UFs. */
+  @SuppressWarnings("unused")
   private Term normalize(Term operator) {
     Term function = functionsCache.get(getName(operator));
     if (function != null) {
@@ -476,17 +498,17 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
           .put(Kind.STRING_CONCAT, FunctionDeclarationKind.STR_CONCAT)
           .put(Kind.STRING_PREFIX, FunctionDeclarationKind.STR_PREFIX)
           .put(Kind.STRING_SUFFIX, FunctionDeclarationKind.STR_SUFFIX)
-          .put(Kind.STRING_STRCTN, FunctionDeclarationKind.STR_CONTAINS)
+          .put(Kind.STRING_CONTAINS, FunctionDeclarationKind.STR_CONTAINS)
           .put(Kind.STRING_SUBSTR, FunctionDeclarationKind.STR_SUBSTRING)
-          .put(Kind.STRING_STRREPL, FunctionDeclarationKind.STR_REPLACE)
-          .put(Kind.STRING_STRREPLALL, FunctionDeclarationKind.STR_REPLACE_ALL)
+          .put(Kind.STRING_REPLACE, FunctionDeclarationKind.STR_REPLACE)
+          .put(Kind.STRING_REPLACE_ALL, FunctionDeclarationKind.STR_REPLACE_ALL)
           .put(Kind.STRING_CHARAT, FunctionDeclarationKind.STR_CHAR_AT)
           .put(Kind.STRING_LENGTH, FunctionDeclarationKind.STR_LENGTH)
-          .put(Kind.STRING_STRIDOF, FunctionDeclarationKind.STR_INDEX_OF)
+          .put(Kind.STRING_INDEXOF, FunctionDeclarationKind.STR_INDEX_OF)
           .put(Kind.STRING_TO_REGEXP, FunctionDeclarationKind.STR_TO_RE)
           .put(Kind.STRING_IN_REGEXP, FunctionDeclarationKind.STR_IN_RE)
-          .put(Kind.STRING_STOI, FunctionDeclarationKind.STR_TO_INT)
-          .put(Kind.STRING_ITOS, FunctionDeclarationKind.INT_TO_STR)
+          .put(Kind.STRING_FROM_INT, FunctionDeclarationKind.INT_TO_STR)
+          .put(Kind.STRING_TO_INT, FunctionDeclarationKind.STR_TO_INT)
           .put(Kind.STRING_LT, FunctionDeclarationKind.STR_LT)
           .put(Kind.STRING_LEQ, FunctionDeclarationKind.STR_LE)
           .put(Kind.REGEXP_PLUS, FunctionDeclarationKind.RE_PLUS)
@@ -500,50 +522,73 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
           .put(Kind.REGEXP_DIFF, FunctionDeclarationKind.RE_DIFFERENCE)
           .build();
 
+  @SuppressWarnings("unused")
   private FunctionDeclarationKind getDeclarationKind(Term f) {
-    Kind kind = f.getKind();
+    try {
+      Kind kind = f.getKind();
 
-    // special case: IFF for Boolean, EQ for all other Types
-    if (kind == Kind.EQUAL && Iterables.all(f, child -> child.getType().isBoolean())) {
-      return FunctionDeclarationKind.IFF;
+      // special case: IFF for Boolean, EQ for all other Types
+      if (kind == Kind.EQUAL && Iterables.all(f, child -> child.getSort().isBoolean())) {
+        return FunctionDeclarationKind.IFF;
+      }
+
+      return KIND_MAPPING.getOrDefault(kind, FunctionDeclarationKind.OTHER);
+    } catch (CVC5ApiException e) {
+      throw new IllegalArgumentException("Failure trying to get the KIND of Term " + f + ".", e);
     }
-
-    return KIND_MAPPING.getOrDefault(kind, FunctionDeclarationKind.OTHER);
   }
 
   @Override
   protected Term getBooleanVarDeclarationImpl(Term pTFormulaInfo) {
-    Kind kind = pTFormulaInfo.getKind();
-    assert kind == Kind.APPLY_UF || kind == Kind.VARIABLE : pTFormulaInfo.getKind();
-    if (kind == Kind.APPLY_UF) {
-      return pTFormulaInfo.getOperator();
-    } else {
-      return pTFormulaInfo;
+    try {
+      Kind kind = pTFormulaInfo.getKind();
+      assert kind == Kind.APPLY_UF || kind == Kind.VARIABLE : pTFormulaInfo.getKind();
+      if (kind == Kind.APPLY_UF) {
+        // TODO: Test this, this is the old internal implementation
+        return pTFormulaInfo.getChild(0);
+        // old
+        // return pTFormulaInfo.getOperator();
+      } else {
+        return pTFormulaInfo;
+      }
+    } catch (CVC5ApiException e) {
+      throw new IllegalArgumentException(
+          "You tried reading a bool variable potentially in a UF application that failed. Checked term: "
+              + pTFormulaInfo
+              + ".",
+          e);
     }
   }
 
   @Override
   public Term callFunctionImpl(Term pDeclaration, List<Term> pArgs) {
     if (pArgs.isEmpty()) {
-      return TermManager.mkTerm(pDeclaration);
+      // CVC5 does not allow argumentless functions!
+      throw new IllegalArgumentException(
+          "You tried calling a UF with no arguments. CVC5 does not allow this.");
     } else {
-      vectorTerm args = new vectorTerm();
-      for (Term Term : pArgs) {
-        args.add(Term);
-      }
-      return TermManager.mkTerm(pDeclaration, args);
+      // Applying UFs in CVC5 works with an array of Terms with the UF being the first argument
+      // If you pull the children out of it the order will be the same!
+      Term[] args =
+          Stream.of(new Term[] {pDeclaration}, (Term[]) pArgs.toArray())
+              .flatMap(Stream::of)
+              .toArray(Term[]::new);
+      return solver.mkTerm(Kind.APPLY_UF, args);
     }
   }
 
   @Override
-  public Term declareUFImpl(String pName, Type pReturnType, List<Type> pArgTypes) {
+  public Term declareUFImpl(String pName, Sort pReturnType, List<Sort> pArgTypes) {
+    if (pArgTypes.isEmpty()) {
+      // Ufs in CVC5 can't have 0 arity. I tried an empty array and nullsort.
+      throw new IllegalArgumentException(
+          "You tried creating a UF with no arguments. CVC5 does not allow this.");
+    }
     Term exp = functionsCache.get(pName);
     if (exp == null) {
-      vectorType args = new vectorType();
-      for (Type t : pArgTypes) {
-        args.add(t);
-      }
-      exp = TermManager.mkVar(pName, TermManager.mkFunctionType(args, pReturnType));
+      // array of argument types and the return type
+      Sort ufToReturnType = solver.mkFunctionSort((Sort[]) pArgTypes.toArray(), pReturnType);
+      exp = solver.mkConst(ufToReturnType, pName);
       functionsCache.put(pName, exp);
     }
     return exp;
@@ -551,66 +596,66 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
 
   @Override
   public Object convertValue(Term expForType, Term value) {
-    final Type Type = expForType.getType();
-    final Type valueType = value.getType();
-    if (value.getKind() == Kind.BOUND_VARIABLE) {
-      // CVC5 does not allow model values for bound vars
-      return value.toString();
-    } else if (valueType.isBoolean()) {
-      return value.getConstBoolean();
+    // Make sure that
+    final Sort type = expForType.getSort();
+    final Sort valueType = value.getSort();
+    // Variables are Kind.CONSTANT and can't be check with isIntegerValue() or getIntegerValue()
+    // etc. but only with solver.getValue() and its String serialization
+    try {
+      if (value.getKind() == Kind.VARIABLE) {
+        // CVC5 does not allow model values for bound vars; just return the name
+        return value.toString();
 
-    } else if (valueType.isInteger() && Type.isInteger()) {
-      return new BigInteger(value.getConstRational().toString());
+      } else if (valueType.isInteger() && type.isInteger()) {
+        return new BigInteger(solver.getValue(value).toString());
 
-    } else if (valueType.isReal() && Type.isReal()) {
-      Rational rat = value.getConstRational();
-      return org.sosy_lab.common.rationals.Rational.of(
-          new BigInteger(rat.getNumerator().toString()),
-          new BigInteger(rat.getDenominator().toString()));
+      } else if (valueType.isReal() && type.isReal()) {
+        Rational rat = Rational.ofString(solver.getValue(value).toString());
+        return org.sosy_lab.common.rationals.Rational.of(
+            new BigInteger(rat.getNum().toString()), new BigInteger(rat.getDen().toString()));
 
-    } else if (valueType.isBitVector()) {
-      Integer bv = value.getConstBitVector().getValue();
-      if (bv.fitsSignedLong()) {
-        return BigInteger.valueOf(bv.getUnsignedLong());
+      } else if (valueType.isBitVector()) {
+        return new BigInteger(solver.getValue(value).toString());
+
+      } else if (valueType.isFloatingPoint()) {
+        return parseFloatingPoint(value);
+
       } else {
-        return value.toString(); // default
+        // String serialization for Strings, booleans and unknown terms.
+        return solver.getValue(value).toString();
       }
-
-    } else if (valueType.isFloatingPoint()) {
-      return parseFloatingPoint(value);
-
-    } else if (valueType.isString()) {
-      return value.getConstString().toString();
-
-    } else {
-      // String serialization for unknown terms.
-      return value.toString();
+    } catch (CVC5ApiException e) {
+      throw new IllegalArgumentException(
+          "Failure trying to convert CVC5 " + valueType + " variable into a " + type + " value.",
+          e);
     }
   }
 
+  @SuppressWarnings("unused")
   private Object parseFloatingPoint(Term fpTerm) {
     Matcher matcher = FLOATING_POINT_PATTERN.matcher(fpTerm.toString());
     if (!matcher.matches()) {
       throw new NumberFormatException("Unknown floating-point format: " + fpTerm);
     }
+    /*
+        // First is exponent, second is mantissa, third if bitvec value of the fp
+        Triplet<Long, Long, Term> fpTriplet = fpTerm.getFloatingPointValue();
+        long expWidth = fpTriplet.first;
+        long mantWidth = fpTriplet.second - 1; // without sign bit
 
-    FloatingPoint fp = fpTerm.getConstFloatingPoint();
-    FloatingPointSize fpType = fp.getT();
-    long expWidth = fpType.exponentWidth();
-    long mantWidth = fpType.significandWidth() - 1; // without sign bit
+        assert matcher.group("sign").length() == 1;
+        assert matcher.group("exp").length() == expWidth;
+        assert matcher.group("mant").length() == mantWidth;
 
-    assert matcher.group("sign").length() == 1;
-    assert matcher.group("exp").length() == expWidth;
-    assert matcher.group("mant").length() == mantWidth;
-
-    String str = matcher.group("sign") + matcher.group("exp") + matcher.group("mant");
-    if (expWidth == 11 && mantWidth == 52) {
-      return Double.longBitsToDouble(UnsignedLong.valueOf(str, 2).longValue());
-    } else if (expWidth == 8 && mantWidth == 23) {
-      return Float.intBitsToFloat(UnsignedInteger.valueOf(str, 2).intValue());
-    }
-
+        String str = matcher.group("sign") + matcher.group("exp") + matcher.group("mant");
+        if (expWidth == 11 && mantWidth == 52) {
+          return Double.longBitsToDouble(UnsignedLong.valueOf(str, 2).longValue());
+        } else if (expWidth == 8 && mantWidth == 23) {
+          return Float.intBitsToFloat(UnsignedInteger.valueOf(str, 2).intValue());
+        }
+    */
     // TODO to be fully correct, we would need to interpret this string
-    return fpTerm.toString();
+    // it may be interpreted with i.e. FLOATINGPOINT_TO_REAL
+    return solver.getValue(fpTerm).toString();
   }
 }
