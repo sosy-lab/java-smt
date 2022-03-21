@@ -11,8 +11,7 @@ package org.sosy_lab.java_smt.solvers.cvc5;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import edu.stanford.CVC4.Expr;
-import edu.stanford.CVC4.Kind;
+import io.github.cvc5.api.Kind;
 import io.github.cvc5.api.Solver;
 import io.github.cvc5.api.Sort;
 import io.github.cvc5.api.Term;
@@ -34,10 +33,9 @@ public class CVC5Model extends CachingAbstractModel<Term, Sort, Solver> {
   CVC5Model(
       CVC5TheoremProver pProver,
       CVC5FormulaCreator pCreator,
-      Solver pSolver,
       Collection<Term> pAssertedExpressions) {
     super(pCreator);
-    solver = pSolver;
+    solver = creator.getEnv();
     prover = pProver;
     assertedExpressions = ImmutableList.copyOf(pAssertedExpressions);
 
@@ -48,28 +46,28 @@ public class CVC5Model extends CachingAbstractModel<Term, Sort, Solver> {
   }
 
   @Override
-  public Expr evalImpl(Expr f) {
+  public Term evalImpl(Term f) {
     Preconditions.checkState(!closed);
-    return getValue(f);
-  }
-
-  /** we need to convert the given expression into the current context. */
-  private Expr getValue(Expr f) {
-    return prover.exportExpr(smtEngine.getValue(prover.importExpr(f)));
+    return solver.getValue(f);
   }
 
   private ImmutableList<ValueAssignment> generateModel() {
     ImmutableSet.Builder<ValueAssignment> builder = ImmutableSet.builder();
     // Using creator.extractVariablesAndUFs we wouldn't get accurate information anymore as we
     // translate all bound vars back to their free counterparts in the visitor!
-    for (Expr expr : assertedExpressions) {
+    for (Term expr : assertedExpressions) {
       // creator.extractVariablesAndUFs(expr, true, (name, f) -> builder.add(getAssignment(f)));
       recursiveAssignmentFinder(builder, expr);
     }
     return builder.build().asList();
   }
 
-  private void recursiveAssignmentFinder(ImmutableSet.Builder<ValueAssignment> builder, Expr expr) {
+  @SuppressWarnings("unused")
+  private void recursiveAssignmentFinder(ImmutableSet.Builder<ValueAssignment> builder, Term expr) {
+    /*
+     * In CVC5 consts are variables! Free variables (created with mkVar() can never have a value!) If you check
+     */
+    /*
     if (expr.isConst() || expr.isNull()) {
       // We don't care about consts.
       return;
@@ -81,32 +79,34 @@ public class CVC5Model extends CachingAbstractModel<Term, Sort, Solver> {
       builder.add(getAssignment(expr));
     } else if (expr.getKind() == Kind.FORALL || expr.getKind() == Kind.EXISTS) {
       // Body of the quantifier, with bound vars!
-      Expr body = expr.getChildren().get(1);
+      Term body = expr.getChildren().get(1);
 
       recursiveAssignmentFinder(builder, body);
     } else {
       // Only nested terms (AND, OR, ...) are left
-      for (Expr child : expr) {
+      for (Term child : expr) {
         recursiveAssignmentFinder(builder, child);
       }
     }
+    */
   }
 
-  private ValueAssignment getAssignment(Expr pKeyTerm) {
+  @SuppressWarnings("unused")
+  private ValueAssignment getAssignment(Term pKeyTerm) {
     List<Object> argumentInterpretation = new ArrayList<>();
-    for (Expr param : pKeyTerm) {
+    for (Term param : pKeyTerm) {
       argumentInterpretation.add(evaluateImpl(param));
     }
-    Expr name = pKeyTerm.hasOperator() ? pKeyTerm.getOperator() : pKeyTerm; // extract UF name
-    String nameStr = name.toString();
+    // Term name = pKeyTerm.hasOperator() ? pKeyTerm.getOperator() : pKeyTerm; // extract UF name
+    String nameStr = pKeyTerm.getSymbol();
     if (nameStr.startsWith("|") && nameStr.endsWith("|")) {
       nameStr = nameStr.substring(1, nameStr.length() - 1);
     }
-    Expr valueTerm = getValue(pKeyTerm);
+    Term valueTerm = solver.getValue(pKeyTerm);
     Formula keyFormula = creator.encapsulateWithTypeOf(pKeyTerm);
     Formula valueFormula = creator.encapsulateWithTypeOf(valueTerm);
     BooleanFormula equation =
-        creator.encapsulateBoolean(creator.getEnv().mkExpr(Kind.EQUAL, pKeyTerm, valueTerm));
+        creator.encapsulateBoolean(solver.mkTerm(Kind.EQUAL, pKeyTerm, valueTerm));
     Object value = creator.convertValue(pKeyTerm, valueTerm);
     return new ValueAssignment(
         keyFormula, valueFormula, equation, nameStr, value, argumentInterpretation);
