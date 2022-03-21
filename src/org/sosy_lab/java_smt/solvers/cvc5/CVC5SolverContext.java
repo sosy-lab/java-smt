@@ -8,10 +8,8 @@
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
-import edu.stanford.CVC4.Configuration;
 import io.github.cvc5.api.Solver;
 import java.util.Set;
-import java.util.function.Consumer;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -51,12 +49,11 @@ public final class CVC5SolverContext extends AbstractSolverContext {
       ShutdownNotifier pShutdownNotifier,
       int randomSeed,
       NonLinearArithmetic pNonLinearArithmetic,
-      FloatingPointRoundingMode pFloatingPointRoundingMode,
-      Consumer<String> pLoader) {
+      FloatingPointRoundingMode pFloatingPointRoundingMode) {
 
     // Solver is the central class for creating expressions/terms/formulae.
+    // Also, creating a solver statically loads CVC5
     Solver newSolver = new Solver();
-    CVC5FormulaCreator creator = new CVC5FormulaCreator(newSolver);
 
     // set common options.
     newSolver.setOption("random-seed", String.valueOf(randomSeed));
@@ -67,32 +64,29 @@ public final class CVC5SolverContext extends AbstractSolverContext {
     // Set Strings option to enable all String features (such as lessOrEquals)
     newSolver.setOption("strings-exp", "true");
 
+    CVC5FormulaCreator pCreator = new CVC5FormulaCreator(newSolver);
+
     // Create managers
-    CVC5UFManager functionTheory = new CVC5UFManager(creator);
-    CVC5BooleanFormulaManager booleanTheory = new CVC5BooleanFormulaManager(creator);
+    CVC5UFManager functionTheory = new CVC5UFManager(pCreator);
+    CVC5BooleanFormulaManager booleanTheory = new CVC5BooleanFormulaManager(pCreator);
     CVC5IntegerFormulaManager integerTheory =
-        new CVC5IntegerFormulaManager(creator, pNonLinearArithmetic);
+        new CVC5IntegerFormulaManager(pCreator, pNonLinearArithmetic);
     CVC5RationalFormulaManager rationalTheory =
-        new CVC5RationalFormulaManager(creator, pNonLinearArithmetic);
+        new CVC5RationalFormulaManager(pCreator, pNonLinearArithmetic);
     CVC5BitvectorFormulaManager bitvectorTheory =
-        new CVC5BitvectorFormulaManager(creator, booleanTheory);
+        new CVC5BitvectorFormulaManager(pCreator, booleanTheory);
 
-    CVC5FloatingPointFormulaManager fpTheory;
-    if (Configuration.isBuiltWithSymFPU()) {
-      fpTheory = new CVC5FloatingPointFormulaManager(creator, pFloatingPointRoundingMode);
-    } else {
-      fpTheory = null;
-      // TODO: is this config check needed?
-    }
+    CVC5FloatingPointFormulaManager fpTheory =
+        new CVC5FloatingPointFormulaManager(pCreator, pFloatingPointRoundingMode);
 
-    CVC5QuantifiedFormulaManager qfTheory = new CVC5QuantifiedFormulaManager(creator);
+    CVC5QuantifiedFormulaManager qfTheory = new CVC5QuantifiedFormulaManager(pCreator);
 
-    CVC5ArrayFormulaManager arrayTheory = new CVC5ArrayFormulaManager(creator);
-    CVC5SLFormulaManager slTheory = new CVC5SLFormulaManager(creator);
-    CVC5StringFormulaManager strTheory = new CVC5StringFormulaManager(creator);
+    CVC5ArrayFormulaManager arrayTheory = new CVC5ArrayFormulaManager(pCreator);
+    CVC5SLFormulaManager slTheory = new CVC5SLFormulaManager(pCreator);
+    CVC5StringFormulaManager strTheory = new CVC5StringFormulaManager(pCreator);
     CVC5FormulaManager manager =
         new CVC5FormulaManager(
-            creator,
+            pCreator,
             functionTheory,
             booleanTheory,
             integerTheory,
@@ -104,7 +98,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
             slTheory,
             strTheory);
 
-    return new CVC5SolverContext(creator, manager, pShutdownNotifier, newSolver, randomSeed);
+    return new CVC5SolverContext(pCreator, manager, pShutdownNotifier, newSolver, randomSeed);
   }
 
   @Override
