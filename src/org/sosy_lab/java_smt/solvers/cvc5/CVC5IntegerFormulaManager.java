@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
+import io.github.cvc5.api.CVC5ApiException;
 import io.github.cvc5.api.Kind;
 import io.github.cvc5.api.Sort;
 import io.github.cvc5.api.Term;
@@ -69,9 +70,13 @@ public class CVC5IntegerFormulaManager
   @Override
   protected Term makeNumberImpl(String pI) {
     if (!INTEGER_NUMBER.matcher(pI).matches()) {
-      throw new NumberFormatException("number is not an integer value: " + pI);
+      throw new NumberFormatException("Number is not an integer value: " + pI);
     }
-    return super.makeNumberImpl(pI);
+    try {
+      return solver.mkInteger(pI);
+    } catch (CVC5ApiException e) {
+      throw new NumberFormatException("Number is not an integer value: " + pI);
+    }
   }
 
   @Override
