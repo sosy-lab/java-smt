@@ -130,6 +130,8 @@ public class CVC5NativeAPITest {
     assertThat(uf1.getKind()).isNotEqualTo(Kind.VARIABLE);
     assertThat(uf1.getKind()).isEqualTo(Kind.CONSTANT);
     assertThat(uf1.getKind()).isNotEqualTo(Kind.APPLY_UF);
+    assertThat(intToBoolSort.isFunction()).isTrue();
+    assertThat(uf1.getSort().isFunction()).isTrue();
     // arity 1
     assertThat(uf1.getSort().getFunctionArity()).isEqualTo(1);
     // apply the uf, the kind is now APPLY_UF
@@ -137,6 +139,7 @@ public class CVC5NativeAPITest {
     assertThat(appliedUf1.getKind()).isNotEqualTo(Kind.VARIABLE);
     assertThat(appliedUf1.getKind()).isNotEqualTo(Kind.CONSTANT);
     assertThat(appliedUf1.getKind()).isEqualTo(Kind.APPLY_UF);
+    assertThat(appliedUf1.getSort().isFunction()).isFalse();
     // The ufs sort is always the returntype
     assertThat(appliedUf1.getSort()).isEqualTo(solver.getBooleanSort());
     assertThat(appliedUf1.getNumChildren()).isEqualTo(2);
