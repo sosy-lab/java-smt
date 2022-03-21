@@ -257,6 +257,7 @@ class CVC5TheoremProver extends AbstractProverWithAllSat<Void>
     if (!closed) {
       closeAllModels();
       assertedFormulas.clear();
+      solver.resetAssertions();
       // Dont close the solver here, currently we use one solver instance for all stacks + the
       // context!
       // TODO: revisit once the devs enable formula translation.
