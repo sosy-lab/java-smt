@@ -238,15 +238,13 @@ public class SolverContextFactory {
             floatingPointRoundingMode,
             loader);
 
-        // FIXME
       case CVC5:
         return CVC5SolverContext.create(
             logger,
             shutdownNotifier,
             (int) randomSeed,
             nonLinearArithmetic,
-            floatingPointRoundingMode,
-            loader);
+            floatingPointRoundingMode);
 
       case SMTINTERPOL:
         return SmtInterpolSolverContext.create(
