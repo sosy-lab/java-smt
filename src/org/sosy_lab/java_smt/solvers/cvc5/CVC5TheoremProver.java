@@ -59,7 +59,7 @@ class CVC5TheoremProver extends AbstractProverWithAllSat<Void>
   protected CVC5TheoremProver(
       CVC5FormulaCreator pFormulaCreator,
       ShutdownNotifier pShutdownNotifier,
-      int randomSeed,
+      @SuppressWarnings("unused") int randomSeed,
       Set<ProverOptions> pOptions,
       BooleanFormulaManager pBmgr,
       Solver pSolver) {
