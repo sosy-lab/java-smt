@@ -41,7 +41,7 @@ class CVC5TheoremProver extends AbstractProverWithAllSat<Void>
     implements ProverEnvironment, BasicProverEnvironment<Void> {
 
   private final CVC5FormulaCreator creator;
-  Solver solver;
+  private final Solver solver;
   private boolean changedSinceLastSatQuery = false;
 
   /** Tracks formulas on the stack, needed for model generation. */
@@ -69,7 +69,6 @@ class CVC5TheoremProver extends AbstractProverWithAllSat<Void>
     solver = pSolver;
     incremental = !enableSL;
     assertedFormulas.push(new ArrayList<>()); // create initial level
-    solver = pSolver;
 
     // We would set some of these options twice now as we only use 1 solver at all times (per
     // context)
