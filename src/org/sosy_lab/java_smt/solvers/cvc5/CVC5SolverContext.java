@@ -63,6 +63,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
     newSolver.setOption("output-language", "smtlib2");
     // Set Strings option to enable all String features (such as lessOrEquals)
     newSolver.setOption("strings-exp", "true");
+    newSolver.setOption("produce-unsat-cores", "true");
 
     CVC5FormulaCreator pCreator = new CVC5FormulaCreator(newSolver);
 
