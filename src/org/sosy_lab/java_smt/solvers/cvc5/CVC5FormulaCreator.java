@@ -612,7 +612,9 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
             new BigInteger(rat.getNum().toString()), new BigInteger(rat.getDen().toString()));
 
       } else if (valueType.isBitVector()) {
-        return new BigInteger(solver.getValue(value).toString());
+        // CVC5 puts 2 chars (#b) in front of the binary result String
+        String valueString = solver.getValue(value).toString();
+        return new BigInteger(valueString.substring(2, valueString.length()), 2);
 
       } else if (valueType.isFloatingPoint()) {
         return parseFloatingPoint(value);
