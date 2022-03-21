@@ -71,12 +71,15 @@ class CVC5TheoremProver extends AbstractProverWithAllSat<Void>
     assertedFormulas.push(new ArrayList<>()); // create initial level
     solver = pSolver;
 
-    // Technically we set some of these options twice now
-    setOptions(randomSeed, pOptions);
+    // We would set some of these options twice now as we only use 1 solver at all times (per
+    // context)
+    // setOptions(randomSeed, pOptions);
   }
 
+  // Keep this until we have more solvers
+  @SuppressWarnings("unused")
   private void setOptions(int randomSeed, Set<ProverOptions> pOptions) {
-    solver.setOption("incremental", "incremental");
+    solver.setOption("incremental", "true");
     if (pOptions.contains(ProverOptions.GENERATE_MODELS)) {
       solver.setOption("produce-models", "true");
     }
