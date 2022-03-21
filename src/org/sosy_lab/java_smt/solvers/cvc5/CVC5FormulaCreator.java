@@ -12,6 +12,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import io.github.cvc5.api.CVC5ApiException;
@@ -42,6 +43,7 @@ import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
+import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5ArrayFormula;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5BitvectorFormula;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5BooleanFormula;
@@ -316,20 +318,17 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
     try {
       if (f.getKind() == Kind.CONSTANT) {
         if (sort.isBoolean()) {
-          return visitor.visitConstant(formula, f.getBooleanValue());
+          return visitor.visitConstant(formula, solver.getValue(f));
         } else if (sort.isReal()) {
-          return visitor.visitConstant(formula, f.getRealValue());
+          return visitor.visitConstant(formula, solver.getValue(f));
         } else if (sort.isInteger()) {
-          return visitor.visitConstant(formula, f.getIntegerValue());
+          return visitor.visitConstant(formula, solver.getValue(f));
         } else if (sort.isBitVector()) {
-          return visitor.visitConstant(formula, f.getBitVectorValue());
+          return visitor.visitConstant(formula, solver.getValue(f));
         } else if (sort.isFloatingPoint()) {
-          return visitor.visitConstant(formula, f.getFloatingPointValue());
-        } else if (sort.isRoundingMode()) {
-          // TODO: this is most likely bullshit and WILL fail!
-          return visitor.visitConstant(formula, solver.getRoundingModeSort());
+          return visitor.visitConstant(formula, solver.getValue(f));
         } else if (sort.isString()) {
-          return visitor.visitConstant(formula, f.getStringValue());
+          return visitor.visitConstant(formula, solver.getValue(f));
         } else {
           throw new UnsupportedOperationException("Unhandled constant " + f + " with Type " + sort);
         }
@@ -358,45 +357,42 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
         return visitor.visitQuantifier((BooleanFormula) formula, quant, freeVars, fBody);
 
       } else if (f.getKind() == Kind.VARIABLE) {
-        // assert f.getKind() != Kind.BOUND_VARIABLE;
+        // TODO: This is kinda pointless, rework
         return visitor.visitFreeVariable(formula, getName(f));
 
       } else {
         // Termessions like uninterpreted function calls (Kind.APPLY_UF) or operators (e.g.
         // Kind.AND).
         // These are all treated like operators, so we can get the declaration by f.getOperator()!
-        /*
-              List<Formula> args = ImmutableList.copyOf(Iterables.transform(f, this::encapsulate));
-              List<FormulaType<?>> argsTypes = new ArrayList<>();
 
-              Term operator = normalize(f.getOperator());
-              if (operator.getSort().isFunction()) {
-                vectorType argTypes = new FunctionType(operator.getSort()).getArgTypes();
-                for (int i = 0; i < argTypes.size(); i++) {
-                  argsTypes.add(getFormulaTypeFromTermType(argTypes.get(i)));
-                }
-              } else {
-                for (Term arg : f) {
-                  argsTypes.add(getFormulaType(arg));
-                }
-              }
+        List<Formula> args = ImmutableList.copyOf(Iterables.transform(f, this::encapsulate));
+        List<FormulaType<?>> argsTypes = new ArrayList<>();
 
+        // Term operator = normalize(f.getSort());
+        Kind kind = f.getKind();
+        if (sort.isFunction() || kind == Kind.APPLY_UF) {
+          // The arguments are all children except the first one
+          for (int i = 1; i < f.getNumChildren() - 1; i++) {
+            argsTypes.add(getFormulaTypeFromTermType(f.getChild(i).getSort()));
+          }
+        } else {
+          for (Term arg : f) {
+            argsTypes.add(getFormulaType(arg));
+          }
+        }
 
-              checkState(args.size() == argsTypes.size());
-        */
+        checkState(args.size() == argsTypes.size());
+
         // TODO some operations (BV_SIGN_EXTEND, BV_ZERO_EXTEND, maybe more) encode information as
         // part of the operator itself, thus the arity is one too small and there might be no
         // possibility to access the information from user side. Should we encode such information
-        // as
-        // additional parameters? We do so for some methods of Princess.
-        /*
+        // as additional parameters? We do so for some methods of Princess.
+
         return visitor.visitFunction(
             formula,
             args,
             FunctionDeclarationImpl.of(
-                getName(f), getDeclarationKind(f), argsTypes, getFormulaType(f), operator));
-                */
-        return null;
+                getName(f), getDeclarationKind(f), argsTypes, getFormulaType(f), f.getChild(0)));
       }
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException("Failure visiting the Term " + f + ".", e);
@@ -441,7 +437,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
           .put(Kind.GT, FunctionDeclarationKind.GT)
           .put(Kind.GEQ, FunctionDeclarationKind.GTE)
           // Bitvector theory
-          .put(Kind.PLUS, FunctionDeclarationKind.BV_ADD)
+          .put(Kind.BITVECTOR_ADD, FunctionDeclarationKind.BV_ADD)
           .put(Kind.BITVECTOR_SUB, FunctionDeclarationKind.BV_SUB)
           .put(Kind.BITVECTOR_MULT, FunctionDeclarationKind.BV_MUL)
           .put(Kind.BITVECTOR_AND, FunctionDeclarationKind.BV_AND)
@@ -484,7 +480,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
           .put(Kind.FLOATINGPOINT_MAX, FunctionDeclarationKind.FP_MAX)
           .put(Kind.FLOATINGPOINT_MIN, FunctionDeclarationKind.FP_MIN)
           .put(Kind.FLOATINGPOINT_SQRT, FunctionDeclarationKind.FP_SQRT)
-          .put(Kind.PLUS, FunctionDeclarationKind.FP_ADD)
+          .put(Kind.FLOATINGPOINT_ADD, FunctionDeclarationKind.FP_ADD)
           .put(Kind.FLOATINGPOINT_SUB, FunctionDeclarationKind.FP_SUB)
           .put(Kind.FLOATINGPOINT_MULT, FunctionDeclarationKind.FP_MUL)
           .put(Kind.FLOATINGPOINT_DIV, FunctionDeclarationKind.FP_DIV)
@@ -586,8 +582,9 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
     }
     Term exp = functionsCache.get(pName);
     if (exp == null) {
+      Sort[] argSorts = pArgTypes.toArray(new Sort[0]);
       // array of argument types and the return type
-      Sort ufToReturnType = solver.mkFunctionSort((Sort[]) pArgTypes.toArray(), pReturnType);
+      Sort ufToReturnType = solver.mkFunctionSort(argSorts, pReturnType);
       exp = solver.mkConst(ufToReturnType, pName);
       functionsCache.put(pName, exp);
     }
