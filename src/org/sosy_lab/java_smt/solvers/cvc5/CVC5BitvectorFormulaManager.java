@@ -82,7 +82,8 @@ public class CVC5BitvectorFormulaManager
   protected Term makeBitvectorImpl(int pLength, BigInteger pI) {
     pI = transformValueToRange(pLength, pI);
     try {
-      return solver.mkBitVector(pLength, pI.longValue());
+      // Use String conversion as it can hold more values
+      return solver.mkBitVector(pLength, pI.toString(), 10);
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
           "You tried creating a invalid bitvector with length "
