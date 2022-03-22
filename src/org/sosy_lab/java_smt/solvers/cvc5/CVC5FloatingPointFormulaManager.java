@@ -172,7 +172,7 @@ public class CVC5FloatingPointFormulaManager
       if (pTargetType.isFloatingPointType()) {
         Op fpToFp =
             solver.mkOp(
-                Kind.FLOATINGPOINT_TO_FP_REAL,
+                Kind.FLOATINGPOINT_TO_FP_FLOATINGPOINT,
                 ((FloatingPointType) pTargetType).getExponentSize(),
                 ((FloatingPointType) pTargetType).getMantissaSize() + 1);
         return solver.mkTerm(fpToFp, pRoundingMode, pNumber);
@@ -194,7 +194,7 @@ public class CVC5FloatingPointFormulaManager
               + pNumber
               + " into a "
               + pTargetType
-              + ". Check that the target type can hold the source type.",
+              + ". Check that the target type can hold the source type. (Note: for target FP types 1 bit is missing in this debug message)",
           e);
     }
   }
