@@ -50,7 +50,7 @@ public class CVC5BooleanFormulaManager
 
   @Override
   protected Term andImpl(Collection<Term> pParams) {
-    return solver.mkTerm(Kind.AND, (Term[]) pParams.toArray());
+    return solver.mkTerm(Kind.AND, pParams.toArray(new Term[0]));
   }
 
   @Override
@@ -65,7 +65,7 @@ public class CVC5BooleanFormulaManager
 
   @Override
   protected Term orImpl(Collection<Term> pParams) {
-    return solver.mkTerm(Kind.OR, (Term[]) pParams.toArray());
+    return solver.mkTerm(Kind.OR, pParams.toArray(new Term[0]));
   }
 
   @Override
