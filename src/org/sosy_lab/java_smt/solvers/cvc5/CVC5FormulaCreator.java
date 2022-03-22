@@ -316,22 +316,20 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
     checkState(!f.isNull());
     Sort sort = f.getSort();
     try {
-      if (f.getKind() == Kind.CONSTANT) {
-        if (sort.isBoolean()) {
-          return visitor.visitConstant(formula, solver.getValue(f));
-        } else if (sort.isReal()) {
-          return visitor.visitConstant(formula, solver.getValue(f));
-        } else if (sort.isInteger()) {
-          return visitor.visitConstant(formula, solver.getValue(f));
-        } else if (sort.isBitVector()) {
-          return visitor.visitConstant(formula, solver.getValue(f));
-        } else if (sort.isFloatingPoint()) {
-          return visitor.visitConstant(formula, solver.getValue(f));
-        } else if (sort.isString()) {
-          return visitor.visitConstant(formula, solver.getValue(f));
-        } else {
-          throw new UnsupportedOperationException("Unhandled constant " + f + " with Type " + sort);
-        }
+      if (f.isBooleanValue()) {
+        return visitor.visitConstant(formula, f.toString());
+
+      } else if (f.isRealValue()) {
+        return visitor.visitConstant(formula, f.toString());
+
+      } else if (f.isIntegerValue()) {
+        return visitor.visitConstant(formula, f.toString());
+
+      } else if (f.isBitVectorValue()) {
+        return visitor.visitConstant(formula, f.toString());
+
+      } else if (f.isFloatingPointValue()) {
+        return visitor.visitConstant(formula, f.toString());
 
       } else if (f.getKind() == Kind.VARIABLE) {
         // Bound and unbound vars are the same in CVC5!
@@ -356,9 +354,8 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
         Quantifier quant = f.getKind() == Kind.EXISTS ? Quantifier.EXISTS : Quantifier.FORALL;
         return visitor.visitQuantifier((BooleanFormula) formula, quant, freeVars, fBody);
 
-      } else if (f.getKind() == Kind.VARIABLE) {
-        // TODO: This is kinda pointless, rework
-        return visitor.visitFreeVariable(formula, getName(f));
+      } else if (f.getKind() == Kind.CONSTANT) {
+        return visitor.visitFreeVariable(formula, f.toString());
 
       } else {
         // Termessions like uninterpreted function calls (Kind.APPLY_UF) or operators (e.g.
