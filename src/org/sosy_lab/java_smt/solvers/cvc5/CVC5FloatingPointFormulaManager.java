@@ -377,12 +377,14 @@ public class CVC5FloatingPointFormulaManager
 
   @Override
   protected Term fromIeeeBitvectorImpl(Term pNumber, FloatingPointType pTargetType) {
-    return solver.mkTerm(Kind.FLOATINGPOINT_FP, pNumber);
+    return solver.mkTerm(Kind.FLOATINGPOINT_TO_FP_IEEE_BITVECTOR, pNumber);
   }
 
   @Override
   protected Term toIeeeBitvectorImpl(Term pNumber) {
-    return solver.mkTerm(Kind.FLOATINGPOINT_TO_FP_IEEE_BITVECTOR, pNumber);
+    // TODO possible work-around: use a tmp-variable "TMP" and add an
+    // additional constraint "pNumer == fromIeeeBitvectorImpl(TMP)" for it in all use-cases.
+    throw new UnsupportedOperationException("FP to IEEE-BV is not supported");
   }
 
   @Override
