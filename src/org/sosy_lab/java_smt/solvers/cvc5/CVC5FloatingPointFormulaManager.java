@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFloatingPointFormulaManager;
 
@@ -177,7 +178,9 @@ public class CVC5FloatingPointFormulaManager
         return solver.mkTerm(fpToFp, pRoundingMode, pNumber);
 
       } else if (pTargetType.isBitvectorType()) {
-        return solver.mkTerm(Kind.FLOATINGPOINT_TO_SBV, pRoundingMode, pNumber);
+        BitvectorType targetType = (BitvectorType) pTargetType;
+        Op operation = solver.mkOp(Kind.FLOATINGPOINT_TO_SBV, targetType.getSize());
+        return solver.mkTerm(operation, pRoundingMode, pNumber);
 
       } else if (pTargetType.isRationalType()) {
         return solver.mkTerm(Kind.FLOATINGPOINT_TO_REAL, pNumber);
