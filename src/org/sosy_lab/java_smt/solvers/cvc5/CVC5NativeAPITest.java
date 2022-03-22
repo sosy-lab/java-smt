@@ -87,6 +87,8 @@ public class CVC5NativeAPITest {
 
   /*
    * Check how to get types/values etc. from constants, variables etc. in CVC5.
+   * You can get the values of constants via toString()
+   * and the name of variables via toString().
    */
   @Test
   public void checkGetValueAndType() throws CVC5ApiException {
