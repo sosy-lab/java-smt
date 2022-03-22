@@ -693,9 +693,9 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
   @Test
   public void fpIeeeConversionTypes() {
     assume()
-        .withMessage("FP-to-BV conversion not available for CVC4")
+        .withMessage("FP-to-BV conversion not available for CVC4 and CVC5")
         .that(solverToUse())
-        .isNotEqualTo(Solvers.CVC4);
+        .isNoneOf(Solvers.CVC4, Solvers.CVC5);
 
     FloatingPointFormula var = fpmgr.makeVariable("var", singlePrecType);
     assertThat(mgr.getFormulaType(fpmgr.toIeeeBitvector(var)))
