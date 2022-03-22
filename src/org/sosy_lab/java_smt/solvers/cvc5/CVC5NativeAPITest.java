@@ -19,7 +19,9 @@ import io.github.cvc5.api.RoundingMode;
 import io.github.cvc5.api.Solver;
 import io.github.cvc5.api.Sort;
 import io.github.cvc5.api.Term;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import org.junit.After;
 import org.junit.AssumptionViolatedException;
 import org.junit.Before;
@@ -661,6 +663,28 @@ public class CVC5NativeAPITest {
     solver.assertFormula(assertion3);
     Result satCheck = solver.checkSat();
     assertThat(satCheck.isSat()).isFalse();
+  }
+
+  @Test
+  public void checkBvDistinct() throws CVC5ApiException {
+    Sort bvSort = solver.mkBitVectorSort(6);
+    List<Term> bvs = new ArrayList<>();
+    for (int i = 0; i < 64; i++) {
+      bvs.add(solver.mkConst(bvSort, "a" + i + "_"));
+    }
+
+    Term distinct2 = solver.mkTerm(Kind.DISTINCT, bvs.toArray(new Term[0]));
+    solver.assertFormula(distinct2);
+    assertThat(solver.checkSat().isSat()).isTrue();
+    solver.resetAssertions();
+
+    // TODO: The following runs endlessly; recheck for new versions!
+    /*
+      bvs.add(solver.mkConst(bvSort, "b" + "_"));
+      Term distinct3 = solver.mkTerm(Kind.DISTINCT, bvs.toArray(new Term[0]));
+      solver.assertFormula(distinct3);
+      assertThat(solver.checkSat().isSat()).isFalse();
+    */
   }
 
   /*
