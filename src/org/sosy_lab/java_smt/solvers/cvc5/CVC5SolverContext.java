@@ -64,6 +64,9 @@ public final class CVC5SolverContext extends AbstractSolverContext {
     // Set Strings option to enable all String features (such as lessOrEquals)
     newSolver.setOption("strings-exp", "true");
     newSolver.setOption("produce-unsat-cores", "true");
+    // Neither simplification, arith-rewrite-equalities, pb-rewrites provide rewrites of trivial
+    // formulas only
+    // Note: with solver.getOptionNames() you can get all options
 
     CVC5FormulaCreator pCreator = new CVC5FormulaCreator(newSolver);
 
