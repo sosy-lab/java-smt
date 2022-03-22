@@ -398,6 +398,11 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0 {
   @Test
   public void bvDistinct() throws SolverException, InterruptedException {
     for (int bitsize : new int[] {2, 4, 6}) {
+      if (solverToUse() == Solvers.CVC5 && bitsize > 4) {
+        // CVC5 runs endlessly for > 4; A issue is open for this as CVC4 can solve this in less than
+        // a second. See: https://github.com/cvc5/cvc5/discussions/8361
+        break;
+      }
       List<BitvectorFormula> bvs = new ArrayList<>();
       for (int i = 0; i < 1 << bitsize; i++) {
         bvs.add(bvmgr.makeVariable(bitsize, "a" + i + "_" + bitsize));
