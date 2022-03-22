@@ -71,7 +71,7 @@ public class CVC5FloatingPointFormulaManager
       Rational rationalValue = toRational(pN);
       Op realToFp =
           solver.mkOp(
-              Kind.FLOATINGPOINT_TO_FP_REAL, pType.getExponentSize(), pType.getMantissaSize());
+              Kind.FLOATINGPOINT_TO_FP_REAL, pType.getExponentSize(), pType.getMantissaSize() + 1);
       return solver.mkTerm(realToFp, pRoundingMode, solver.mkReal(rationalValue.toString()));
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
@@ -120,7 +120,7 @@ public class CVC5FloatingPointFormulaManager
     try {
       // So this should be mkFloatingPointPosInf() but that does not exists, so i guess it was
       // renamed.
-      return solver.mkPosInf(pType.getExponentSize(), pType.getMantissaSize());
+      return solver.mkPosInf(pType.getExponentSize(), pType.getMantissaSize() + 1);
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
           "You tried creating a invalid positive floating point infinity with exponent size "
@@ -137,7 +137,7 @@ public class CVC5FloatingPointFormulaManager
     try {
       // So this should be mkFloatingPointNegInf() but that does not exists, so i guess it was
       // renamed.
-      return solver.mkNegInf(pType.getExponentSize(), pType.getMantissaSize());
+      return solver.mkNegInf(pType.getExponentSize(), pType.getMantissaSize() + 1);
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
           "You tried creating a invalid negative floating point infinity with exponent size "
@@ -152,7 +152,7 @@ public class CVC5FloatingPointFormulaManager
   @Override
   protected Term makeNaNImpl(FloatingPointType pType) {
     try {
-      return solver.mkNaN(pType.getExponentSize(), pType.getMantissaSize());
+      return solver.mkNaN(pType.getExponentSize(), pType.getMantissaSize() + 1);
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
           "You tried creating a invalid NaN with exponent size "
@@ -173,7 +173,7 @@ public class CVC5FloatingPointFormulaManager
             solver.mkOp(
                 Kind.FLOATINGPOINT_TO_FP_REAL,
                 ((FloatingPointType) pTargetType).getExponentSize(),
-                ((FloatingPointType) pTargetType).getMantissaSize());
+                ((FloatingPointType) pTargetType).getMantissaSize() + 1);
         return solver.mkTerm(fpToFp, pRoundingMode, pNumber);
 
       } else if (pTargetType.isBitvectorType()) {
@@ -188,7 +188,7 @@ public class CVC5FloatingPointFormulaManager
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
           "You tried creating a invalid cast from "
-              + pNumber.getSymbol()
+              + pNumber
               + " into a "
               + pTargetType
               + ". Check that the target type can hold the source type.",
@@ -210,7 +210,7 @@ public class CVC5FloatingPointFormulaManager
             solver.mkOp(
                 Kind.FLOATINGPOINT_TO_FP_REAL,
                 pTargetType.getExponentSize(),
-                pTargetType.getMantissaSize());
+                pTargetType.getMantissaSize() + 1);
 
         return solver.mkTerm(realToFp, pRoundingMode, pNumber);
 
@@ -220,14 +220,14 @@ public class CVC5FloatingPointFormulaManager
               solver.mkOp(
                   Kind.FLOATINGPOINT_TO_FP_SIGNED_BITVECTOR,
                   pTargetType.getExponentSize(),
-                  pTargetType.getMantissaSize());
+                  pTargetType.getMantissaSize() + 1);
           return solver.mkTerm(realToSBv, pRoundingMode, pNumber);
         } else {
           Op realToUBv =
               solver.mkOp(
                   Kind.FLOATINGPOINT_TO_FP_UNSIGNED_BITVECTOR,
                   pTargetType.getExponentSize(),
-                  pTargetType.getMantissaSize());
+                  pTargetType.getMantissaSize() + 1);
           return solver.mkTerm(realToUBv, pRoundingMode, pNumber);
         }
 
@@ -236,7 +236,7 @@ public class CVC5FloatingPointFormulaManager
             solver.mkOp(
                 Kind.FLOATINGPOINT_TO_FP_GENERIC,
                 pTargetType.getExponentSize(),
-                pTargetType.getMantissaSize());
+                pTargetType.getMantissaSize() + 1);
         return solver.mkTerm(realToGeneric, pRoundingMode, pNumber);
         // old version; revert to it if generic fails
         // return genericCast(pNumber, pTargetType);
@@ -244,7 +244,7 @@ public class CVC5FloatingPointFormulaManager
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
           "You tried creating a invalid cast from "
-              + pNumber.getSymbol()
+              + pNumber
               + " into a FloatingPoint with exponent size "
               + pTargetType.getExponentSize()
               + " and mantissa size "
