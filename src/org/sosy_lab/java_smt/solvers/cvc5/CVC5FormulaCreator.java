@@ -20,13 +20,12 @@ import io.github.cvc5.api.Kind;
 import io.github.cvc5.api.Solver;
 import io.github.cvc5.api.Sort;
 import io.github.cvc5.api.Term;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.ArrayFormula;
@@ -56,8 +55,8 @@ import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5StringFormula;
 
 public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term> {
 
-  private static final Pattern FLOATING_POINT_PATTERN =
-      Pattern.compile("^\\(fp #b(?<sign>\\d) #b(?<exp>\\d+) #b(?<mant>\\d+)$");
+  // private static final Pattern FLOATING_POINT_PATTERN = Pattern.compile("^\\(fp #b(?<sign>\\d)
+  // #b(?<exp>\\d+) #b(?<mant>\\d+)$");
 
   private final Map<String, Term> variablesCache = new HashMap<>();
   private final Map<String, Term> functionsCache = new HashMap<>();
@@ -630,31 +629,19 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
     }
   }
 
-  @SuppressWarnings("unused")
   private Object parseFloatingPoint(Term fpTerm) {
-    Matcher matcher = FLOATING_POINT_PATTERN.matcher(fpTerm.toString());
-    if (!matcher.matches()) {
-      throw new NumberFormatException("Unknown floating-point format: " + fpTerm);
+    if (fpTerm.isFloatingPointNaN()) {
+      return Float.NaN;
+    } else if (fpTerm.isFloatingPointNegInf()) {
+      return Float.NEGATIVE_INFINITY;
+    } else if (fpTerm.isFloatingPointPosInf()) {
+      return Float.POSITIVE_INFINITY;
+    } else if (fpTerm.isFloatingPointPosZero()) {
+      return BigDecimal.ZERO;
     }
-    /*
-        // First is exponent, second is mantissa, third if bitvec value of the fp
-        Triplet<Long, Long, Term> fpTriplet = fpTerm.getFloatingPointValue();
-        long expWidth = fpTriplet.first;
-        long mantWidth = fpTriplet.second - 1; // without sign bit
-
-        assert matcher.group("sign").length() == 1;
-        assert matcher.group("exp").length() == expWidth;
-        assert matcher.group("mant").length() == mantWidth;
-
-        String str = matcher.group("sign") + matcher.group("exp") + matcher.group("mant");
-        if (expWidth == 11 && mantWidth == 52) {
-          return Double.longBitsToDouble(UnsignedLong.valueOf(str, 2).longValue());
-        } else if (expWidth == 8 && mantWidth == 23) {
-          return Float.intBitsToFloat(UnsignedInteger.valueOf(str, 2).intValue());
-        }
-    */
-    // TODO to be fully correct, we would need to interpret this string
-    // it may be interpreted with i.e. FLOATINGPOINT_TO_REAL
-    return solver.getValue(fpTerm).toString();
+    // Negative zero falls under this category
+    String valueString =
+        solver.getValue(solver.mkTerm(Kind.FLOATINGPOINT_TO_REAL, fpTerm)).toString();
+    return new BigDecimal(valueString).stripTrailingZeros();
   }
 }
