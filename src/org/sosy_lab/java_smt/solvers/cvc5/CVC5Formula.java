@@ -50,7 +50,7 @@ public class CVC5Formula implements Formula {
 
   @Override
   public final int hashCode() {
-    return cvc5term.hashCode();
+    return Long.hashCode(cvc5term.getId());
   }
 
   final Term getTerm() {
