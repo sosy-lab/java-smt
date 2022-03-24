@@ -89,6 +89,9 @@ public class CVC5NativeAPITest {
    * Check how to get types/values etc. from constants, variables etc. in CVC5.
    * You can get the values of constants via toString()
    * and the name of variables via toString().
+   * One can use getOp() on a Term to get its operator.
+   * This operator can be used to create the same Term again with the same arguments.
+   * The Ids match.
    */
   @Test
   public void checkGetValueAndType() throws CVC5ApiException {
@@ -117,7 +120,8 @@ public class CVC5NativeAPITest {
         .contains(
             "Invalid argument 'int_const' for '*d_node', expected Term to be an integer value when calling getIntegerValue()");
     // Build a formula such that is has a value, assert and check sat and then check again
-    solver.assertFormula(solver.mkTerm(Kind.EQUAL, intVar, solver.mkInteger(1)));
+    Term equality = solver.mkTerm(Kind.EQUAL, intVar, solver.mkInteger(1));
+    solver.assertFormula(equality);
     // Is sat, no need to check
     solver.checkSat();
     assertThat(intVar.isIntegerValue()).isFalse();
@@ -125,11 +129,19 @@ public class CVC5NativeAPITest {
     assertThat(intVar.getKind()).isEqualTo(Kind.CONSTANT);
     assertThat(intVar.getKind()).isNotEqualTo(Kind.VARIABLE);
     assertThat(solver.getValue(intVar).toString()).isEqualTo("1");
+    // Op test
+    assertThat(equality.getOp().toString()).isEqualTo("EQUAL");
+    assertThat(
+            solver.mkTerm(equality.getOp(), intVar, solver.mkInteger(1)).getId()
+                == equality.getId())
+        .isTrue();
     // Note that variables (Kind.VARIABLES) are bound variables!
     assertThat(solver.mkVar(solver.getIntegerSort()).getKind()).isEqualTo(Kind.VARIABLE);
     assertThat(solver.mkVar(solver.getIntegerSort()).getKind()).isNotEqualTo(Kind.CONSTANT);
+    // Uf return sort is codomain
     // Uf unapplied are CONSTANT
     Sort intToBoolSort = solver.mkFunctionSort(solver.getIntegerSort(), solver.getBooleanSort());
+    assertThat(intToBoolSort.getFunctionCodomainSort().isBoolean()).isTrue();
     Term uf1 = solver.mkConst(intToBoolSort);
     assertThat(uf1.getKind()).isNotEqualTo(Kind.VARIABLE);
     assertThat(uf1.getKind()).isEqualTo(Kind.CONSTANT);
