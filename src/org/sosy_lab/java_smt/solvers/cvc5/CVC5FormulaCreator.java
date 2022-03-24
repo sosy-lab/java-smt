@@ -188,9 +188,9 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
     } else if (sort.isBitVector()) {
       return FormulaType.getBitvectorTypeWithSize(sort.getBitVectorSize());
     } else if (sort.isFloatingPoint()) {
+      // CVC5 wants the sign bit as part of the mantissa. We add that manually in creation.
       return FormulaType.getFloatingPointType(
-          sort.getFloatingPointExponentSize(),
-          sort.getFloatingPointSignificandSize() - 1); // TODO: check for sign bit
+          sort.getFloatingPointExponentSize(), sort.getFloatingPointSignificandSize() - 1);
     } else if (sort.isRoundingMode()) {
       return FormulaType.FloatingPointRoundingModeType;
     } else if (sort.isReal()) {
@@ -205,6 +205,8 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
       return FormulaType.StringType;
     } else if (sort.isRegExp()) {
       return FormulaType.RegexType;
+    } else if (sort.isFunction()) {
+      return getFormulaTypeFromTermType(sort.getFunctionCodomainSort());
     } else {
       throw new AssertionError(String.format("Encountered unhandled Type '%s'.", sort));
     }
@@ -292,12 +294,15 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
     return new CVC5RegexFormula(pTerm);
   }
 
-  private static String getName(Term e) {
+  private String getName(Term e) {
     checkState(!e.isNull());
-    /* TODO: this will fail most likely
-    if (!e.isConst() && !e.isVariable()) {
-      e = e.getOperator();
-    }*/
+    try {
+      if (e.getKind() == Kind.APPLY_UF) {
+        e = e.getChild(0);
+      }
+    } catch (CVC5ApiException e1) {
+      // Fallback is the String of the original term
+    }
     return dequote(e.toString());
   }
 
@@ -310,6 +315,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
     return s;
   }
 
+  @SuppressWarnings("unused")
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula formula, final Term f) {
     checkState(!f.isNull());
@@ -360,28 +366,32 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
         return visitor.visitFreeVariable(formula, f.toString());
 
       } else {
-        // Termessions like uninterpreted function calls (Kind.APPLY_UF) or operators (e.g.
+        // Term expressions like uninterpreted function calls (Kind.APPLY_UF) or operators (e.g.
         // Kind.AND).
         // These are all treated like operators, so we can get the declaration by f.getOperator()!
 
         List<Formula> args = ImmutableList.copyOf(Iterables.transform(f, this::encapsulate));
+        ImmutableList.Builder<Formula> argsBuilder = ImmutableList.builder();
+
         List<FormulaType<?>> argsTypes = new ArrayList<>();
 
         // Term operator = normalize(f.getSort());
         Kind kind = f.getKind();
         if (sort.isFunction() || kind == Kind.APPLY_UF) {
           // The arguments are all children except the first one
-          for (int i = 1; i < f.getNumChildren() - 1; i++) {
+          for (int i = 1; i < f.getNumChildren(); i++) {
             argsTypes.add(getFormulaTypeFromTermType(f.getChild(i).getSort()));
+            // CVC5s first argument in a function/Uf is the declaration, we don't need that here
+            argsBuilder.add(encapsulate(f.getChild(i)));
           }
         } else {
           for (Term arg : f) {
             argsTypes.add(getFormulaType(arg));
+            argsBuilder.add(encapsulate(arg));
           }
         }
 
-        checkState(args.size() == argsTypes.size());
-
+        // TODO: check if the below still applied in CVC5
         // TODO some operations (BV_SIGN_EXTEND, BV_ZERO_EXTEND, maybe more) encode information as
         // part of the operator itself, thus the arity is one too small and there might be no
         // possibility to access the information from user side. Should we encode such information
@@ -389,30 +399,13 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
 
         return visitor.visitFunction(
             formula,
-            args,
+            argsBuilder.build(),
             FunctionDeclarationImpl.of(
-                getName(f), getDeclarationKind(f), argsTypes, getFormulaType(f), f.getChild(0)));
+                getName(f), getDeclarationKind(f), argsTypes, getFormulaType(f), f.getOp()));
       }
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException("Failure visiting the Term " + f + ".", e);
     }
-  }
-
-  /** CVC5 returns new objects when querying operators for UFs. */
-  @SuppressWarnings("unused")
-  private Term normalize(Term operator) {
-    Term function = functionsCache.get(getName(operator));
-    if (function != null) {
-      checkState(
-          Long.compare(function.getId(), operator.getId()) == 0,
-          "operator '%s' with ID %s differs from existing function '%s' with ID '%s'.",
-          operator,
-          operator.getId(),
-          function,
-          function.getId());
-      return function;
-    }
-    return operator;
   }
 
   // see src/theory/*/kinds in CVC5 sources for description of the different CVC5 kinds ;)
@@ -517,7 +510,6 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
           .put(Kind.REGEXP_DIFF, FunctionDeclarationKind.RE_DIFFERENCE)
           .build();
 
-  @SuppressWarnings("unused")
   private FunctionDeclarationKind getDeclarationKind(Term f) {
     try {
       Kind kind = f.getKind();
@@ -565,7 +557,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
       // Applying UFs in CVC5 works with an array of Terms with the UF being the first argument
       // If you pull the children out of it the order will be the same!
       Term[] args =
-          Stream.of(new Term[] {pDeclaration}, (Term[]) pArgs.toArray())
+          Stream.of(new Term[] {pDeclaration}, pArgs.toArray(new Term[0]))
               .flatMap(Stream::of)
               .toArray(Term[]::new);
       return solver.mkTerm(Kind.APPLY_UF, args);
