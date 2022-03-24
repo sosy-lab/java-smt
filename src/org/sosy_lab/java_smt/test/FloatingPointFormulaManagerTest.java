@@ -705,9 +705,9 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
   @Test
   public void fpIeeeConversion() throws SolverException, InterruptedException {
     assume()
-        .withMessage("FP-to-BV conversion not available for CVC4")
+        .withMessage("FP-to-BV conversion not available for CVC4 and CVC5")
         .that(solverToUse())
-        .isNotEqualTo(Solvers.CVC4);
+        .isNoneOf(Solvers.CVC4, Solvers.CVC5);
 
     FloatingPointFormula var = fpmgr.makeVariable("var", singlePrecType);
     assertThatFormula(
@@ -719,9 +719,9 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
   @Test
   public void ieeeFpConversion() throws SolverException, InterruptedException {
     assume()
-        .withMessage("FP-to-BV conversion not available for CVC4")
+        .withMessage("FP-to-BV conversion not available for CVC4 and CVC5")
         .that(solverToUse())
-        .isNotEqualTo(Solvers.CVC4);
+        .isNoneOf(Solvers.CVC4, Solvers.CVC5);
 
     BitvectorFormula var = bvmgr.makeBitvector(32, 123456789);
     assertThatFormula(
@@ -810,9 +810,9 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
   private void checkFP(FloatingPointType type, BitvectorFormula bv, FloatingPointFormula flt)
       throws SolverException, InterruptedException {
     assume()
-        .withMessage("FP-to-BV conversion not available for CVC4")
+        .withMessage("FP-to-BV conversion not available for CVC4 and CVC5")
         .that(solverToUse())
-        .isNotEqualTo(Solvers.CVC4);
+        .isNoneOf(Solvers.CVC4, Solvers.CVC5);
 
     BitvectorFormula var = bvmgr.makeVariable(type.getTotalSize(), "x");
 
