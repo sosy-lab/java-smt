@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.cvc5;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import de.uni_freiburg.informatik.ultimate.logic.PrintTerm;
 import io.github.cvc5.api.Solver;
@@ -122,5 +123,19 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, Solver, Term
         out.append(')');
       }
     };
+  }
+
+  @Override
+  public <T extends Formula> T substitute(
+      final T pF, final Map<? extends Formula, ? extends Formula> pFromToMapping) {
+    ImmutableList.Builder<Term> changeFrom = ImmutableList.builder();
+    ImmutableList.Builder<Term> changeTo = ImmutableList.builder();
+    for (Map.Entry<? extends Formula, ? extends Formula> e : pFromToMapping.entrySet()) {
+      changeFrom.add(extractInfo(e.getKey()));
+      changeTo.add(extractInfo(e.getValue()));
+    }
+    FormulaType<T> type = getFormulaType(pF);
+    return getFormulaCreator()
+        .encapsulate(type, extractInfo(pF).substitute(changeFrom.build(), changeTo.build()));
   }
 }
