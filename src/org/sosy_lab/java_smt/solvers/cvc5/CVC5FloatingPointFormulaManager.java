@@ -69,6 +69,14 @@ public class CVC5FloatingPointFormulaManager
   @Override
   protected Term makeNumberAndRound(String pN, FloatingPointType pType, Term pRoundingMode) {
     try {
+      if (isNegativeZero(Double.valueOf(pN))) {
+        return solver.mkNegZero(pType.getExponentSize(), pType.getMantissaSize() + 1);
+      }
+    } catch (CVC5ApiException | NumberFormatException e) {
+      // ignore and fallback to floating point from rational numbers
+    }
+
+    try {
       Rational rationalValue = toRational(pN);
       Op realToFp =
           solver.mkOp(
