@@ -177,7 +177,8 @@ class CVC5StringFormulaManager extends AbstractStringFormulaManager<Term, Sort, 
   @Override
   protected Term toStringFormula(Term pParam) {
     Preconditions.checkArgument(
-        pParam.isIntegerValue(), "CVC5 only supports INT to STRING conversion.");
+        pParam.getSort().equals(solver.getIntegerSort()) || pParam.isIntegerValue(),
+        "CVC5 only supports INT to STRING conversion.");
     // There is not other string conversion
     return solver.mkTerm(Kind.STRING_FROM_INT, pParam);
   }
