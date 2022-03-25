@@ -78,6 +78,7 @@ public class CVC5NativeAPITest {
     solver.setOption("finite-model-find", "true");
     solver.setOption("sets-ext", "true");
     solver.setOption("output-language", "smtlib2");
+    solver.setOption("strings-exp", "true");
   }
 
   @After
@@ -1096,6 +1097,28 @@ public class CVC5NativeAPITest {
     solver.assertFormula(assumptions);
     Result satCheck = solver.checkSat();
     assertThat(satCheck.isSat()).isTrue();
+  }
+
+  @Test
+  public void checkStringCompare() {
+    Term var1 = solver.mkConst(solver.getStringSort(), "0");
+    Term var2 = solver.mkConst(solver.getStringSort(), "1");
+
+    Term f =
+        solver
+            .mkTerm(Kind.STRING_LEQ, var1, var2)
+            .andTerm(solver.mkTerm(Kind.STRING_LEQ, var2, var1));
+
+    // Thats no problem
+    solver.assertFormula(f);
+    assertThat(solver.checkSat().isSat()).isTrue();
+
+    // implying that 1 <= 2 & 2 <= 1 -> 1 = 2 however runs indefinitely
+    /*
+    Term implication = f.notTerm().orTerm(solver.mkTerm(Kind.EQUAL, var2, var1));
+    solver.assertFormula(implication.notTerm());
+    assertThat(solver.checkSat().isUnsat()).isTrue();
+    */
   }
 
   /** Sets up array and quantifier based formulas for tests. */
