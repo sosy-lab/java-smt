@@ -187,6 +187,6 @@ abstract class CVC5NumeralFormulaManager<
 
   @Override
   protected Term distinctImpl(List<Term> pParam) {
-    return solver.mkTerm(Kind.DISTINCT, (Term[]) pParam.toArray());
+    return solver.mkTerm(Kind.DISTINCT, pParam.toArray(new Term[0]));
   }
 }

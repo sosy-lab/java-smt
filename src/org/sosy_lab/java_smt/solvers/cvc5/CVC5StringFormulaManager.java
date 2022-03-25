@@ -69,7 +69,7 @@ class CVC5StringFormulaManager extends AbstractStringFormulaManager<Term, Sort, 
   @Override
   protected Term concatImpl(List<Term> parts) {
     Preconditions.checkArgument(parts.size() > 1);
-    return solver.mkTerm(Kind.STRING_CONCAT, (Term[]) parts.toArray());
+    return solver.mkTerm(Kind.STRING_CONCAT, parts.toArray(new Term[0]));
   }
 
   @Override
@@ -141,7 +141,7 @@ class CVC5StringFormulaManager extends AbstractStringFormulaManager<Term, Sort, 
   @Override
   protected Term concatRegexImpl(List<Term> parts) {
     Preconditions.checkArgument(parts.size() > 1);
-    return solver.mkTerm(Kind.REGEXP_CONCAT, (Term[]) parts.toArray());
+    return solver.mkTerm(Kind.REGEXP_CONCAT, parts.toArray(new Term[0]));
   }
 
   @Override
