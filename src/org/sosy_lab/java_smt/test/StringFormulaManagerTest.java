@@ -316,6 +316,11 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testStringCompare() throws SolverException, InterruptedException {
+    assume()
+        .withMessage("Solver %s runs endlessly on this task.", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC5);
+
     StringFormula var1 = smgr.makeVariable("0");
     StringFormula var2 = smgr.makeVariable("1");
     assertThatFormula(bmgr.and(smgr.lessOrEquals(var1, var2), smgr.greaterOrEquals(var1, var2)))
@@ -724,6 +729,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
    */
   @Test
   public void testCharAtWithSpecialCharacters2Byte() throws SolverException, InterruptedException {
+
     StringFormula num7 = smgr.makeString("7");
     StringFormula u = smgr.makeString("u");
     StringFormula curlyOpen2BUnicode = smgr.makeString("\\u{7B}");
@@ -1357,7 +1363,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
     // with replacement (result = replaces; replacement > 0 and != the replaced) results in a
     // string that is equal to the concat of the 2 remaining start strings and the replaced one
     // replaced
-    // This is tested with 2 different implications, 1 that only checks wheter or not the
+    // This is tested with 2 different implications, 1 that only checks whether or not the
     // replacement is contained in the string and not in the original and vice verse for the
     // replaced String
     BooleanFormula formula =
@@ -1376,6 +1382,11 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
             bmgr.and(
                 bmgr.not(smgr.equal(original, replaced)), smgr.contains(replaced, replacement)));
 
+    assume()
+        .withMessage("Solver %s returns the initial formula.", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC5);
+
     // Same as above, but with concat instead of contains
     assertThatFormula(formula)
         .implies(
@@ -1389,7 +1400,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
     assume()
         .withMessage("Solver %s runs endlessly on this task.", solverToUse())
         .that(solverToUse())
-        .isNotEqualTo(Solvers.Z3);
+        .isNoneOf(Solvers.Z3, Solvers.CVC5);
 
     StringFormula var1 = smgr.makeVariable("var1");
     StringFormula var2 = smgr.makeVariable("var2");
