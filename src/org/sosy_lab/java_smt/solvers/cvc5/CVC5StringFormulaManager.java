@@ -27,7 +27,7 @@ class CVC5StringFormulaManager extends AbstractStringFormulaManager<Term, Sort, 
 
   @Override
   protected Term makeStringImpl(String pValue) {
-    return solver.mkString(pValue);
+    return solver.mkString(pValue, true);
   }
 
   @Override
