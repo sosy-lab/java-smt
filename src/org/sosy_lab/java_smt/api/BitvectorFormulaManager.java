@@ -92,7 +92,7 @@ public interface BitvectorFormulaManager {
   /**
    * This method returns the remainder (modulo) for two bitvector formulas.
    *
-   * <p>For signed bitvectors, the sign or the result follows the sign of the numerator, e.g., a
+   * <p>For signed bitvectors, the sign of the result follows the sign of the numerator, e.g., a
    * user can assume the following equations:
    *
    * <ul>
