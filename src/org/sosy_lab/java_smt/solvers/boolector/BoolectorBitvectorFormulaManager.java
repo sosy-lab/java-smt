@@ -23,8 +23,8 @@ import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_sgte;
 import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_sll;
 import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_slt;
 import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_slte;
-import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_smod;
 import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_sra;
+import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_srem;
 import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_srl;
 import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_sub;
 import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_udiv;
@@ -95,7 +95,7 @@ class BoolectorBitvectorFormulaManager
   @Override
   public Long modulo(Long bitVec1, Long bitVec2, boolean signed) {
     if (signed) {
-      return boolector_smod(btor, bitVec1, bitVec2);
+      return boolector_srem(btor, bitVec1, bitVec2);
     } else {
       return boolector_urem(btor, bitVec1, bitVec2);
     }
