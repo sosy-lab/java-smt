@@ -474,7 +474,6 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     BitvectorFormula num82 = bvmgr.makeBitvector(bitsize, 82);
     BitvectorFormula num246 = bvmgr.makeBitvector(bitsize, -10); // == 246 unsinged
     BitvectorFormula num253 = bvmgr.makeBitvector(bitsize, -3); // == 253 unsinged
-    BitvectorFormula num254 = bvmgr.makeBitvector(bitsize, -2); // == 254 unsinged
 
     BooleanFormula aEq246 = bvmgr.equal(a, num246);
     BooleanFormula bEq49 = bvmgr.equal(b, num49);
