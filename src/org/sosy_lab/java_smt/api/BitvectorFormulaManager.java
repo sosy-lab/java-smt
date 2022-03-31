@@ -67,8 +67,47 @@ public interface BitvectorFormulaManager {
 
   BitvectorFormula subtract(BitvectorFormula number1, BitvectorFormula number2);
 
+  /**
+   * This method returns the division for two bitvector formulas.
+   *
+   * <p>For signed bitvectors, the result is rounded towards zero (also called "truncated integer
+   * division", similar to the division in the C99 standard), e.g., a user can assume the following
+   * equations:
+   *
+   * <ul>
+   *   <li>10 / 5 = 2
+   *   <li>10 / 3 = 3
+   *   <li>10 / (-3) = -3
+   *   <li>-10 / 5 = -2
+   *   <li>-10 / 3 = -3
+   *   <li>-10 / (-3) = 3
+   * </ul>
+   *
+   * @param number1 dividend, numerator
+   * @param number2 divisor, denumerator
+   * @param signed whether to interpret all operands as signed or as unsigned numbers.
+   */
   BitvectorFormula divide(BitvectorFormula number1, BitvectorFormula number2, boolean signed);
 
+  /**
+   * This method returns the remainder (modulo) for two bitvector formulas.
+   *
+   * <p>For signed bitvectors, the sign or the result follows the sign of the numerator, e.g., a
+   * user can assume the following equations:
+   *
+   * <ul>
+   *   <li>10 % 5 = 0
+   *   <li>10 % 3 = 1
+   *   <li>10 % (-3) = 1
+   *   <li>-10 % 5 = 0
+   *   <li>-10 % 3 = -1
+   *   <li>-10 % (-3) = -1
+   * </ul>
+   *
+   * @param number1 dividend, numerator
+   * @param number2 divisor, denumerator
+   * @param signed whether to interpret all operands as signed or as unsigned numbers.
+   */
   BitvectorFormula modulo(BitvectorFormula number1, BitvectorFormula number2, boolean signed);
 
   BitvectorFormula multiply(BitvectorFormula number1, BitvectorFormula number2);
