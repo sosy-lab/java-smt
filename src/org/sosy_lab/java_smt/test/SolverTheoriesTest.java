@@ -297,7 +297,6 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     BitvectorFormula num2 = bvmgr.makeBitvector(bitsize, 2);
     BitvectorFormula num1 = bvmgr.makeBitvector(bitsize, 1);
     BitvectorFormula num0 = bvmgr.makeBitvector(bitsize, 0);
-    BitvectorFormula numNeg1 = bvmgr.makeBitvector(bitsize, -1);
     BitvectorFormula numNeg3 = bvmgr.makeBitvector(bitsize, -3);
 
     BooleanFormula aEq10 = bvmgr.equal(a, num10);
@@ -476,11 +475,9 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     BitvectorFormula num246 = bvmgr.makeBitvector(bitsize, -10); // == 246 unsinged
     BitvectorFormula num253 = bvmgr.makeBitvector(bitsize, -3); // == 253 unsinged
     BitvectorFormula num254 = bvmgr.makeBitvector(bitsize, -2); // == 254 unsinged
-    BitvectorFormula num255 = bvmgr.makeBitvector(bitsize, -1); // == 255 unsinged
 
     BooleanFormula aEq246 = bvmgr.equal(a, num246);
     BooleanFormula bEq49 = bvmgr.equal(b, num49);
-    BooleanFormula bEq254 = bvmgr.equal(b, num254);
     BooleanFormula aDiv5EqB = bvmgr.equal(bvmgr.divide(a, num5, false), b);
     BooleanFormula aDiv3Eq82 = bvmgr.equal(bvmgr.divide(a, num3, false), num82);
     BooleanFormula aDiv253Eq0 = bvmgr.equal(bvmgr.divide(a, num253, false), num0);
