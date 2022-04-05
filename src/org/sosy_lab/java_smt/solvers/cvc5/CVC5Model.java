@@ -27,11 +27,11 @@ public class CVC5Model extends CachingAbstractModel<Term, Sort, Solver> {
   private final ImmutableList<ValueAssignment> model;
   private final Solver solver;
   private final ImmutableList<Term> assertedExpressions;
-  private final CVC5TheoremProver prover;
+  private final CVC5AbstractProver<?> prover;
   protected boolean closed = false;
 
   CVC5Model(
-      CVC5TheoremProver pProver,
+      CVC5AbstractProver<?> pProver,
       CVC5FormulaCreator pCreator,
       Collection<Term> pAssertedExpressions) {
     super(pCreator);
