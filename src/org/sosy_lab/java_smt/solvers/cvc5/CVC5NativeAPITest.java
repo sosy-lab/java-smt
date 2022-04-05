@@ -79,6 +79,7 @@ public class CVC5NativeAPITest {
     solver.setOption("sets-ext", "true");
     solver.setOption("output-language", "smtlib2");
     solver.setOption("strings-exp", "true");
+    solver.setOption("produce-interpols", "all");
   }
 
   @After
