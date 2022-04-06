@@ -315,32 +315,34 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
     return s;
   }
 
-  @SuppressWarnings("unused")
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula formula, final Term f) {
     checkState(!f.isNull());
     Sort sort = f.getSort();
     try {
       if (f.isBooleanValue()) {
-        return visitor.visitConstant(formula, f.toString());
+        return visitor.visitConstant(formula, f.getBooleanValue());
+
+      } else if (f.isStringValue()) {
+        return visitor.visitConstant(formula, f.getStringValue());
 
       } else if (f.isRealValue()) {
-        return visitor.visitConstant(formula, f.toString());
+        return visitor.visitConstant(formula, f.getRealValue());
 
       } else if (f.isIntegerValue()) {
-        return visitor.visitConstant(formula, f.toString());
+        return visitor.visitConstant(formula, f.getIntegerValue());
 
       } else if (f.isBitVectorValue()) {
-        return visitor.visitConstant(formula, f.toString());
+        return visitor.visitConstant(formula, f.getBitVectorValue());
 
       } else if (f.isFloatingPointValue()) {
+        // String is easier to parse here
         return visitor.visitConstant(formula, f.toString());
 
       } else if (f.getKind() == Kind.CONST_ROUNDINGMODE) {
         return visitor.visitConstant(formula, f.toString());
 
       } else if (f.getKind() == Kind.VARIABLE) {
-        // Bound and unbound vars are the same in CVC5!
         // BOUND vars are used for all vars that are bound to a quantifier in CVC5.
         // We resubstitute them back to the original free.
         // CVC5 doesn't give you the de-brujin index
@@ -370,7 +372,6 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
         // Kind.AND).
         // These are all treated like operators, so we can get the declaration by f.getOperator()!
 
-        List<Formula> args = ImmutableList.copyOf(Iterables.transform(f, this::encapsulate));
         ImmutableList.Builder<Formula> argsBuilder = ImmutableList.builder();
 
         List<FormulaType<?>> argsTypes = new ArrayList<>();
@@ -396,7 +397,6 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
         // part of the operator itself, thus the arity is one too small and there might be no
         // possibility to access the information from user side. Should we encode such information
         // as additional parameters? We do so for some methods of Princess.
-
         return visitor.visitFunction(
             formula,
             argsBuilder.build(),
@@ -404,7 +404,8 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
                 getName(f), getDeclarationKind(f), argsTypes, getFormulaType(f), f.getOp()));
       }
     } catch (CVC5ApiException e) {
-      throw new IllegalArgumentException("Failure visiting the Term " + f + ".", e);
+      throw new IllegalArgumentException(
+          "Failure visiting the Term " + f + ". " + e.getMessage(), e);
     }
   }
 
@@ -591,16 +592,23 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
     // etc. but only with solver.getValue() and its String serialization
     try {
       if (value.getKind() == Kind.VARIABLE) {
+        // VARIABLE == bound variables
         // CVC5 does not allow model values for bound vars; just return the name
         return value.toString();
 
       } else if (valueType.isInteger() && type.isInteger()) {
-        return new BigInteger(solver.getValue(value).toString());
+        String valueString = solver.getValue(value).toString();
+
+        return new BigInteger(transformString(valueString));
 
       } else if (valueType.isReal() && type.isReal()) {
-        Rational rat = Rational.ofString(solver.getValue(value).toString());
-        return org.sosy_lab.common.rationals.Rational.of(
-            new BigInteger(rat.getNum().toString()), new BigInteger(rat.getDen().toString()));
+        String valueString = transformString(solver.getValue(value).toString());
+        if (valueString.contains(".")) {
+          BigDecimal rat = new BigDecimal(transformString(valueString));
+          return Rational.ofBigDecimal(rat.stripTrailingZeros());
+        } else {
+          return Rational.of(valueString);
+        }
 
       } else if (valueType.isBitVector()) {
         // CVC5 puts 2 chars (#b) in front of the binary result String
@@ -610,8 +618,14 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
       } else if (valueType.isFloatingPoint()) {
         return parseFloatingPoint(value);
 
+      } else if (type.equals(solver.getBooleanSort())) {
+        return solver.getValue(value).equals(solver.mkTrue());
+
+      } else if (value.isStringValue()) {
+        return value.getStringValue();
+
       } else {
-        // String serialization for Strings, booleans and unknown terms.
+        // String serialization for Strings and unknown terms.
         return solver.getValue(value).toString();
       }
     } catch (CVC5ApiException e) {
@@ -619,6 +633,25 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
           "Failure trying to convert CVC5 " + valueType + " variable into a " + type + " value.",
           e);
     }
+  }
+
+  private String transformString(String valueString) {
+    // Some numbers have brackets around them
+    // i.e. (- 12)
+    if (valueString.contains("(")) {
+      valueString = valueString.replace("(", "");
+      valueString = valueString.replace(")", "");
+    }
+    // Minus may have a space in between the minus and the num
+    if (valueString.contains("- ")) {
+      valueString = valueString.replace("- ", "-");
+    }
+    // Fractions are written in prefix notation and need to be transformed
+    if (valueString.contains("/ ")) {
+      valueString = valueString.replace("/ ", "");
+      valueString = valueString.replace(" ", "/");
+    }
+    return valueString;
   }
 
   private Object parseFloatingPoint(Term fpTerm) {
