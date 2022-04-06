@@ -103,6 +103,10 @@ public class CVC5NativeAPITest {
     assertThat(solver.mkInteger(999).isIntegerValue()).isTrue();
     assertThat(solver.mkInteger(-1).isIntegerValue()).isTrue();
     assertThat(solver.mkInteger("0").isIntegerValue()).isTrue();
+    assertThat(solver.mkString("").isStringValue()).isTrue();
+    // Note: toString on String values does not equal the value!!
+    assertThat(solver.mkString("").toString()).isNotEqualTo("");
+    assertThat(solver.mkString("").getStringValue()).isEqualTo("");
     // Variables (named const, because thats not confusing....)
     // Variables (Consts) return false if checked for value!
     assertThat(solver.mkConst(solver.getBooleanSort()).isBooleanValue()).isFalse();
