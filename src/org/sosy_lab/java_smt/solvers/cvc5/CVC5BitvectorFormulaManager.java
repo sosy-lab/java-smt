@@ -153,7 +153,7 @@ public class CVC5BitvectorFormulaManager
 
   @Override
   protected Term add(Term pParam1, Term pParam2) {
-    return solver.mkTerm(Kind.PLUS, pParam1, pParam2);
+    return solver.mkTerm(Kind.BITVECTOR_ADD, pParam1, pParam2);
   }
 
   @Override
