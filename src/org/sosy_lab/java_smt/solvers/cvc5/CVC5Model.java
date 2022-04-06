@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.solvers.cvc5;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import io.github.cvc5.api.CVC5ApiException;
 import io.github.cvc5.api.Kind;
 import io.github.cvc5.api.Solver;
 import io.github.cvc5.api.Sort;
@@ -56,8 +57,8 @@ public class CVC5Model extends CachingAbstractModel<Term, Sort, Solver> {
     // Using creator.extractVariablesAndUFs we wouldn't get accurate information anymore as we
     // translate all bound vars back to their free counterparts in the visitor!
     for (Term expr : assertedExpressions) {
-      // creator.extractVariablesAndUFs(expr, true, (name, f) -> builder.add(getAssignment(f)));
-      recursiveAssignmentFinder(builder, expr);
+      creator.extractVariablesAndUFs(expr, true, (name, f) -> builder.add(getAssignment(f)));
+      // recursiveAssignmentFinder(builder, expr);
     }
     return builder.build().asList();
   }
@@ -91,14 +92,37 @@ public class CVC5Model extends CachingAbstractModel<Term, Sort, Solver> {
     */
   }
 
-  @SuppressWarnings("unused")
   private ValueAssignment getAssignment(Term pKeyTerm) {
     List<Object> argumentInterpretation = new ArrayList<>();
-    for (Term param : pKeyTerm) {
-      argumentInterpretation.add(evaluateImpl(param));
+    try {
+      if (pKeyTerm.getKind() == Kind.APPLY_UF) {
+        // We don't want the first argument of uf applications as it is the declaration
+        for (int i = 1; i < pKeyTerm.getNumChildren(); i++) {
+          argumentInterpretation.add(evaluateImpl(pKeyTerm.getChild(i)));
+        }
+      } else {
+        for (int i = 0; i < pKeyTerm.getNumChildren(); i++) {
+          argumentInterpretation.add(evaluateImpl(pKeyTerm.getChild(i)));
+        }
+      }
+    } catch (CVC5ApiException e) {
+      // This should never trigger, if it does only the model is incomplete and the tests should
+      // detect that
     }
-    // Term name = pKeyTerm.hasOperator() ? pKeyTerm.getOperator() : pKeyTerm; // extract UF name
-    String nameStr = pKeyTerm.getSymbol();
+
+    String nameStr = "";
+    try {
+      if (pKeyTerm.hasSymbol()) {
+        nameStr = pKeyTerm.getSymbol();
+      } else if (pKeyTerm.getKind().equals(Kind.APPLY_UF)) {
+        nameStr = pKeyTerm.getChild(0).getSymbol();
+      } else {
+        nameStr = "UF";
+      }
+    } catch (CVC5ApiException e) {
+      // Should never trigger
+    }
+
     if (nameStr.startsWith("|") && nameStr.endsWith("|")) {
       nameStr = nameStr.substring(1, nameStr.length() - 1);
     }
