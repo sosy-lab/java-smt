@@ -78,7 +78,7 @@ public class CVC5QuantifiedFormulaManager
       }
 
       Kind quant = pQ == Quantifier.EXISTS ? Kind.EXISTS : Kind.FORALL;
-      Term boundVarsList = solver.mkTerm(Kind.VARIABLE_LIST, (Term[]) boundVars.toArray());
+      Term boundVarsList = solver.mkTerm(Kind.VARIABLE_LIST, boundVars.toArray(new Term[0]));
       return solver.mkTerm(quant, boundVarsList, substBody);
     }
   }
