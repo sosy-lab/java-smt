@@ -764,7 +764,7 @@ public class CVC5NativeAPITest {
   }
 
   @Test
-  public void checkQuantifierWithUf() {
+  public void checkQuantifierAndModelWithUf() throws CVC5ApiException {
     Term var = solver.mkConst(solver.getIntegerSort(), "var");
     // start with a normal, free variable!
     Term boundVar = solver.mkConst(solver.getIntegerSort(), "boundVar");
@@ -784,7 +784,7 @@ public class CVC5NativeAPITest {
         solver.mkTerm(Kind.AND, boundVarIsTwo, solver.mkTerm(Kind.EQUAL, var, funcAtBoundVar));
 
     // This is the bound variable used for boundVar
-    Term boundVarBound = solver.mkVar(solver.getIntegerSort(), "boundVarBound");
+    Term boundVarBound = solver.mkVar(solver.getIntegerSort(), "boundVar");
     Term quantifiedVars = solver.mkTerm(Kind.VARIABLE_LIST, boundVarBound);
     // Subst all boundVar variables with the bound version
     Term bodySubst = body.substitute(boundVar, boundVarBound);
@@ -809,6 +809,45 @@ public class CVC5NativeAPITest {
     // funcAtBoundVar and body do not have boundVars in them!
     assertThat(solver.getValue(funcAtBoundVar).toString()).isEqualTo("1");
     assertThat(solver.getValue(body).toString()).isEqualTo("false");
+    // The function is a applied uf
+    assertThat(funcAtBoundVar.getKind() == Kind.APPLY_UF).isTrue();
+    assertThat(funcAtBoundVar.getSort()).isEqualTo(solver.getIntegerSort());
+    assertThat(funcAtBoundVar.hasSymbol()).isFalse();
+    assertThat(solver.getValue(funcAtBoundVar).toString()).isEqualTo("1");
+    // The function has 2 children, 1st is the function, 2nd is the argument
+    assertThat(funcAtBoundVar.getNumChildren()).isEqualTo(2);
+    assertThat(funcAtBoundVar.toString()).isEqualTo("(func boundVar)");
+    assertThat(funcAtBoundVar.getChild(0).toString()).isEqualTo("func");
+    assertThat(funcAtBoundVar.getChild(1).toString()).isEqualTo("boundVar");
+    // Now the same function within the body with the bound var substituted
+    // A quantifier has 2 children, the second is the body
+    assertThat(quantFormula.getNumChildren()).isEqualTo(2);
+    // The body is the AND formula from above, the right child is var = func
+    // The right child of var = func is the func
+    Term funcModel = quantFormula.getChild(1).getChild(1).getChild(1);
+    // This should have the same SMTLIB2 string as the declaration
+    assertThat(funcModel.toString()).isEqualTo(funcAtBoundVar.toString());
+    // But the argument should be a bound var
+    assertThat(funcModel.getNumChildren()).isEqualTo(2);
+    // For some reason the function in an UF is CONSTANT type after a SAT call but if you try to get
+    // the value it changes and is no longer the same as before, but a
+    // LAMBDA Kind with the argument (in some internal string representation + its type) and the
+    // result. You can get the result as the second child (child 1)
+    assertThat(funcModel.getChild(0).getKind()).isEqualTo(Kind.CONSTANT);
+    // Without getValue the Kind and num of children is fine
+    assertThat(funcModel.getChild(0).getNumChildren()).isEqualTo(0);
+    // The Sort is the function sort (which is the lambda)
+    assertThat(funcModel.getChild(0).getSort()).isEqualTo(funcAtBoundVar.getChild(0).getSort());
+    assertThat(solver.getValue(funcModel.getChild(0)).getNumChildren()).isEqualTo(2);
+    assertThat(solver.getValue(funcModel.getChild(0)).getKind()).isEqualTo(Kind.LAMBDA);
+    assertThat(solver.getValue(funcModel.getChild(0)).toString())
+        .isEqualTo("(lambda ((_arg_1 Int)) 1)");
+
+    assertThat(solver.getValue(funcModel.getChild(0)).getChild(1).toString()).isEqualTo("1");
+    // The function parameter is fine
+    assertThat(funcModel.getChild(1).toString()).isEqualTo("boundVar");
+    // Now it is a VARIABLE (bound variables in CVC5)
+    assertThat(funcModel.getChild(1).getKind()).isEqualTo(Kind.VARIABLE);
 
     // CVC5 does not allow the usage of getValue() on bound vars!
     Exception e =
