@@ -810,7 +810,7 @@ public class CVC5NativeAPITest {
     assertThat(solver.getValue(funcAtBoundVar).toString()).isEqualTo("1");
     assertThat(solver.getValue(body).toString()).isEqualTo("false");
     // The function is a applied uf
-    assertThat(funcAtBoundVar.getKind() == Kind.APPLY_UF).isTrue();
+    assertThat(funcAtBoundVar.getKind()).isEqualTo(Kind.APPLY_UF);
     assertThat(funcAtBoundVar.getSort()).isEqualTo(solver.getIntegerSort());
     assertThat(funcAtBoundVar.hasSymbol()).isFalse();
     assertThat(solver.getValue(funcAtBoundVar).toString()).isEqualTo("1");
@@ -825,6 +825,8 @@ public class CVC5NativeAPITest {
     // The body is the AND formula from above, the right child is var = func
     // The right child of var = func is the func
     Term funcModel = quantFormula.getChild(1).getChild(1).getChild(1);
+    // This too is a applied uf
+    assertThat(funcModel.getKind()).isEqualTo(Kind.APPLY_UF);
     // This should have the same SMTLIB2 string as the declaration
     assertThat(funcModel.toString()).isEqualTo(funcAtBoundVar.toString());
     // But the argument should be a bound var
