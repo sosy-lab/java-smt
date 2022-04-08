@@ -830,7 +830,10 @@ public class CVC5NativeAPITest {
     // This should have the same SMTLIB2 string as the declaration
     assertThat(funcModel.toString()).isEqualTo(funcAtBoundVar.toString());
     // But the argument should be a bound var
+    // You can not get a value for the entire function Term as it contains a bound var!
     assertThat(funcModel.getNumChildren()).isEqualTo(2);
+    assertThat(funcModel.getChild(0).hasSymbol()).isTrue();
+    assertThat(funcModel.getChild(0).getSymbol()).isEqualTo("func");
     // For some reason the function in an UF is CONSTANT type after a SAT call but if you try to get
     // the value it changes and is no longer the same as before, but a
     // LAMBDA Kind with the argument (in some internal string representation + its type) and the
