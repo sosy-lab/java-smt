@@ -830,7 +830,7 @@ public class CVC5NativeAPITest {
     // This should have the same SMTLIB2 string as the declaration
     assertThat(funcModel.toString()).isEqualTo(funcAtBoundVar.toString());
     // But the argument should be a bound var
-    // You can not get a value for the entire function Term as it contains a bound var!
+    // You can not get a value for the entire function Term as it contains a bound var! (see below)
     assertThat(funcModel.getNumChildren()).isEqualTo(2);
     assertThat(funcModel.getChild(0).hasSymbol()).isTrue();
     assertThat(funcModel.getChild(0).getSymbol()).isEqualTo("func");
@@ -1146,6 +1146,7 @@ public class CVC5NativeAPITest {
     solver.assertFormula(assumptions);
     Result satCheck = solver.checkSat();
     assertThat(satCheck.isSat()).isTrue();
+    assertThat(solver.getValue(fx).toString()).isEqualTo("0");
   }
 
   @Test
