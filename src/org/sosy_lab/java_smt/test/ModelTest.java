@@ -553,8 +553,8 @@ public class ModelTest extends SolverBasedTest0 {
             BigInteger.ONE,
             ImmutableList.of(BigInteger.ZERO));
 
-    // CVC4 does not give back bound variable values. Not even in UFs.
-    if (solverToUse() == Solvers.CVC4) {
+    // CVC4/5 does not give back bound variable values. Not even in UFs.
+    if (solverToUse() == Solvers.CVC4 || solverToUse() == Solvers.CVC5) {
       expectedValueAssignment =
           new ValueAssignment(
               funcAtBoundVar,
@@ -578,7 +578,7 @@ public class ModelTest extends SolverBasedTest0 {
     }
   }
 
-  // var = 1 & boundVar = 1 & Exists boundVar . (boundVar = 0 & var = f(boundVar))
+  // var = 1 & boundVar = 1 & Exists boundVar . (boundVar = 0 & var = func(boundVar))
   @Test
   public void testQuantifiedUF2() throws SolverException, InterruptedException {
     requireQuantifiers();
@@ -608,8 +608,8 @@ public class ModelTest extends SolverBasedTest0 {
             BigInteger.ONE,
             ImmutableList.of(BigInteger.ZERO));
 
-    // CVC4 does not give back bound variable values. Not even in UFs.
-    if (solverToUse() == Solvers.CVC4) {
+    // CVC4/5 does not give back bound variable values. Not even in UFs.
+    if (solverToUse() == Solvers.CVC4 || solverToUse() == Solvers.CVC5) {
       expectedValueAssignment =
           new ValueAssignment(
               funcAtBoundVar,
