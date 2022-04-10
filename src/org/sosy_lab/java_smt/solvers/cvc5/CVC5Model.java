@@ -16,9 +16,7 @@ import io.github.cvc5.api.Kind;
 import io.github.cvc5.api.Solver;
 import io.github.cvc5.api.Sort;
 import io.github.cvc5.api.Term;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
@@ -57,75 +55,137 @@ public class CVC5Model extends CachingAbstractModel<Term, Sort, Solver> {
     // Using creator.extractVariablesAndUFs we wouldn't get accurate information anymore as we
     // translate all bound vars back to their free counterparts in the visitor!
     for (Term expr : assertedExpressions) {
-      creator.extractVariablesAndUFs(expr, true, (name, f) -> builder.add(getAssignment(f)));
-      // recursiveAssignmentFinder(builder, expr);
+      // creator.extractVariablesAndUFs(expr, true, (name, f) -> builder.add(getAssignment(f)));
+      recursiveAssignmentFinder(builder, expr);
     }
     return builder.build().asList();
   }
 
   @SuppressWarnings("unused")
   private void recursiveAssignmentFinder(ImmutableSet.Builder<ValueAssignment> builder, Term expr) {
-    /*
-     * In CVC5 consts are variables! Free variables (created with mkVar() can never have a value!) If you check
-     */
-    /*
-    if (expr.isConst() || expr.isNull()) {
-      // We don't care about consts.
-      return;
-    } else if (expr.isVariable() && expr.getKind() == Kind.BOUND_VARIABLE) {
-      // We don't care about bound vars (not in a UF), as they don't return a value.
-      return;
-    } else if (expr.isVariable() || expr.getOperator().getType().isFunction()) {
-      // This includes free vars and UFs, as well as bound vars in UFs !
-      builder.add(getAssignment(expr));
-    } else if (expr.getKind() == Kind.FORALL || expr.getKind() == Kind.EXISTS) {
-      // Body of the quantifier, with bound vars!
-      Term body = expr.getChildren().get(1);
+    try {
+      Sort sort = expr.getSort();
+      Kind kind = expr.getKind();
+      if (kind == Kind.VARIABLE || sort.isFunction()) {
+        // We don't care about functions, as thats just the function definition and the nested
+        // lambda term
+        // We don't care about bound vars (not in a UF), as they don't return a value.
+        return;
+      } else if (kind == Kind.CONSTANT) {
+        // Vars and UFs, as well as bound vars in UFs!
+        // In CVC5 consts are variables! Free variables (in CVC5s notation, we call them bound
+        // variables, created with mkVar() can never have a value!)
+        builder.add(getAssignment(expr));
+      } else if (kind == Kind.FORALL || kind == Kind.EXISTS) {
+        // Body of the quantifier, with bound vars!
+        Term body = expr.getChild(1);
+        recursiveAssignmentFinder(builder, body);
+      } else if (kind == Kind.CONST_STRING
+          || kind == Kind.CONST_ARRAY
+          || kind == Kind.CONST_BITVECTOR
+          || kind == Kind.CONST_BOOLEAN
+          || kind == Kind.CONST_FLOATINGPOINT
+          || kind == Kind.CONST_RATIONAL
+          || kind == Kind.CONST_ROUNDINGMODE
+          || kind == Kind.CONST_SEQUENCE) {
+        // Constants, do nothing
+      } else if (kind == Kind.APPLY_UF) {
+        builder.add(getAssignmentForUf(expr));
 
-      recursiveAssignmentFinder(builder, body);
-    } else {
-      // Only nested terms (AND, OR, ...) are left
-      for (Term child : expr) {
-        recursiveAssignmentFinder(builder, child);
+      } else {
+        // Only nested terms (AND, OR, ...) are left
+        for (Term child : expr) {
+          recursiveAssignmentFinder(builder, child);
+        }
       }
+    } catch (CVC5ApiException e) {
+      // Fallthrough, do nothing
     }
-    */
   }
 
-  private ValueAssignment getAssignment(Term pKeyTerm) {
-    List<Object> argumentInterpretation = new ArrayList<>();
-    try {
-      if (pKeyTerm.getKind() == Kind.APPLY_UF) {
-        // We don't want the first argument of uf applications as it is the declaration
-        for (int i = 1; i < pKeyTerm.getNumChildren(); i++) {
-          argumentInterpretation.add(evaluateImpl(pKeyTerm.getChild(i)));
+  private ValueAssignment getAssignmentForUf(Term pKeyTerm) {
+    // Ufs consist of arguments + 1 child, the first child is the function definition as a lambda
+    // and the result, while the remaining children are the arguments. Note: we can't evaluate bound
+    // variables!
+    ImmutableList.Builder<Object> argumentInterpretationBuilder = ImmutableList.builder();
+    boolean boundFound = false;
+    // We don't want the first argument of uf applications as it is the declaration
+    for (int i = 1; i < pKeyTerm.getNumChildren(); i++) {
+      try {
+        Term child = pKeyTerm.getChild(i);
+        if (child.getKind().equals(Kind.VARIABLE)) {
+          // Remember if we encountered bound variables
+          boundFound = true;
+          // Bound vars are extremely volatile in CVC5. Nearly every call to them ends in an
+          // exception. Also we don't want to substitute them with their non bound values.
+          argumentInterpretationBuilder.add(child.toString());
+        } else {
+          argumentInterpretationBuilder.add(evaluateImpl(child));
         }
-      } else {
-        for (int i = 0; i < pKeyTerm.getNumChildren(); i++) {
-          argumentInterpretation.add(evaluateImpl(pKeyTerm.getChild(i)));
-        }
+      } catch (CVC5ApiException e) {
+        // Never triggers because its a out of range exception
       }
-    } catch (CVC5ApiException e) {
-      // This should never trigger, if it does only the model is incomplete and the tests should
-      // detect that
     }
 
-    String nameStr = "";
+    // In applied UFs the child with the name is the 0th child (as it is the declaration)
+    String nameStr;
     try {
-      if (pKeyTerm.hasSymbol()) {
-        nameStr = pKeyTerm.getSymbol();
-      } else if (pKeyTerm.getKind().equals(Kind.APPLY_UF)) {
-        nameStr = pKeyTerm.getChild(0).getSymbol();
-      } else {
-        nameStr = "UF";
-      }
+      nameStr = pKeyTerm.getChild(0).getSymbol();
     } catch (CVC5ApiException e) {
-      // Should never trigger
+      nameStr = "UF";
     }
 
     if (nameStr.startsWith("|") && nameStr.endsWith("|")) {
       nameStr = nameStr.substring(1, nameStr.length() - 1);
     }
+
+    Term valueTerm;
+    // You can't get a value if there is a bound variable present
+    if (!boundFound) {
+       valueTerm = solver.getValue(pKeyTerm);
+    } else {
+      // But you may be able to get one nested in the function itself for some reason
+      try {
+        valueTerm = solver.getValue(pKeyTerm.getChild(0)).getChild(1);
+      } catch (CVC5ApiException e) {
+        // This should never happen
+        throw new IndexOutOfBoundsException(
+            "Accessed a non existing UF value while creating a CVC5 model.");
+      }
+    }
+
+    Formula keyFormula = creator.encapsulateWithTypeOf(pKeyTerm);
+    Formula valueFormula = creator.encapsulateWithTypeOf(valueTerm);
+    BooleanFormula equation =
+        creator.encapsulateBoolean(solver.mkTerm(Kind.EQUAL, pKeyTerm, valueTerm));
+    Object value = creator.convertValue(pKeyTerm, valueTerm);
+
+    return new ValueAssignment(
+        keyFormula, valueFormula, equation, nameStr, value, argumentInterpretationBuilder.build());
+  }
+
+  private ValueAssignment getAssignment(Term pKeyTerm) {
+    ImmutableList.Builder<Object> argumentInterpretationBuilder = ImmutableList.builder();
+    for (int i = 0; i < pKeyTerm.getNumChildren(); i++) {
+      try {
+        argumentInterpretationBuilder.add(evaluateImpl(pKeyTerm.getChild(i)));
+      } catch (CVC5ApiException e) {
+        // This should never trigger
+      }
+    }
+
+    String nameStr = "";
+    if (pKeyTerm.hasSymbol()) {
+      nameStr = pKeyTerm.getSymbol();
+    } else {
+      // Default if there is no name
+      nameStr = "UNKNOWN_VARIABLE";
+    }
+
+    if (nameStr.startsWith("|") && nameStr.endsWith("|")) {
+      nameStr = nameStr.substring(1, nameStr.length() - 1);
+    }
+
     Term valueTerm = solver.getValue(pKeyTerm);
     Formula keyFormula = creator.encapsulateWithTypeOf(pKeyTerm);
     Formula valueFormula = creator.encapsulateWithTypeOf(valueTerm);
@@ -133,7 +193,7 @@ public class CVC5Model extends CachingAbstractModel<Term, Sort, Solver> {
         creator.encapsulateBoolean(solver.mkTerm(Kind.EQUAL, pKeyTerm, valueTerm));
     Object value = creator.convertValue(pKeyTerm, valueTerm);
     return new ValueAssignment(
-        keyFormula, valueFormula, equation, nameStr, value, argumentInterpretation);
+        keyFormula, valueFormula, equation, nameStr, value, argumentInterpretationBuilder.build());
   }
 
   @Override
