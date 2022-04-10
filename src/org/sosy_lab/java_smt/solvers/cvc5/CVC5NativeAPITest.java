@@ -768,10 +768,10 @@ public class CVC5NativeAPITest {
     Term var = solver.mkConst(solver.getIntegerSort(), "var");
     // start with a normal, free variable!
     Term boundVar = solver.mkConst(solver.getIntegerSort(), "boundVar");
-    Term varIsOne = solver.mkTerm(Kind.EQUAL, var, solver.mkInteger(1));
+    Term varIsOne = solver.mkTerm(Kind.EQUAL, var, solver.mkInteger(4));
     // try not to use 0 as this is the default value for CVC5 models
     Term boundVarIsTwo = solver.mkTerm(Kind.EQUAL, boundVar, solver.mkInteger(2));
-    Term boundVarIsOne = solver.mkTerm(Kind.EQUAL, boundVar, solver.mkInteger(1));
+    Term boundVarIsThree = solver.mkTerm(Kind.EQUAL, boundVar, solver.mkInteger(3));
 
     String func = "func";
     Sort intSort = solver.getIntegerSort();
@@ -790,8 +790,8 @@ public class CVC5NativeAPITest {
     Term bodySubst = body.substitute(boundVar, boundVarBound);
     Term quantFormula = solver.mkTerm(Kind.EXISTS, quantifiedVars, bodySubst);
 
-    // var = 1 & boundVar = 1 & exists boundVar . ( boundVar = 2 & f(boundVar) = var )
-    Term overallFormula = solver.mkTerm(Kind.AND, varIsOne, boundVarIsOne, quantFormula);
+    // var = 4 & boundVar = 3 & exists boundVar . ( boundVar = 2 & f(boundVar) = var )
+    Term overallFormula = solver.mkTerm(Kind.AND, varIsOne, boundVarIsThree, quantFormula);
 
     solver.assertFormula(overallFormula);
 
@@ -801,19 +801,19 @@ public class CVC5NativeAPITest {
     assertThat(satCheck.isSat()).isTrue();
 
     // check Model
-    // var = 1 & boundVar = 1 & exists boundVar . ( boundVar = 2 & f(2) = 1 )
+    // var = 4 & boundVar = 3 & exists boundVar . ( boundVar = 2 & f(2) = 4 )
     // It seems like CVC5 can't return quantified variables,
     // therefore we can't get a value for the uf!
-    assertThat(solver.getValue(var).toString()).isEqualTo("1");
-    assertThat(solver.getValue(boundVar).toString()).isEqualTo("1");
+    assertThat(solver.getValue(var).toString()).isEqualTo("4");
+    assertThat(solver.getValue(boundVar).toString()).isEqualTo("3");
     // funcAtBoundVar and body do not have boundVars in them!
-    assertThat(solver.getValue(funcAtBoundVar).toString()).isEqualTo("1");
+    assertThat(solver.getValue(funcAtBoundVar).toString()).isEqualTo("4");
     assertThat(solver.getValue(body).toString()).isEqualTo("false");
     // The function is a applied uf
     assertThat(funcAtBoundVar.getKind()).isEqualTo(Kind.APPLY_UF);
     assertThat(funcAtBoundVar.getSort()).isEqualTo(solver.getIntegerSort());
     assertThat(funcAtBoundVar.hasSymbol()).isFalse();
-    assertThat(solver.getValue(funcAtBoundVar).toString()).isEqualTo("1");
+    assertThat(solver.getValue(funcAtBoundVar).toString()).isEqualTo("4");
     // The function has 2 children, 1st is the function, 2nd is the argument
     assertThat(funcAtBoundVar.getNumChildren()).isEqualTo(2);
     assertThat(funcAtBoundVar.toString()).isEqualTo("(func boundVar)");
@@ -846,9 +846,9 @@ public class CVC5NativeAPITest {
     assertThat(solver.getValue(funcModel.getChild(0)).getNumChildren()).isEqualTo(2);
     assertThat(solver.getValue(funcModel.getChild(0)).getKind()).isEqualTo(Kind.LAMBDA);
     assertThat(solver.getValue(funcModel.getChild(0)).toString())
-        .isEqualTo("(lambda ((_arg_1 Int)) 1)");
+        .isEqualTo("(lambda ((_arg_1 Int)) 4)");
 
-    assertThat(solver.getValue(funcModel.getChild(0)).getChild(1).toString()).isEqualTo("1");
+    assertThat(solver.getValue(funcModel.getChild(0)).getChild(1).toString()).isEqualTo("4");
     // The function parameter is fine
     assertThat(funcModel.getChild(1).toString()).isEqualTo("boundVar");
     // Now it is a VARIABLE (bound variables in CVC5)
