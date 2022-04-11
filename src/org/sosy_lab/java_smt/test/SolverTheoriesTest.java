@@ -476,38 +476,19 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     assertModulo(a, num3, false, num0, aEq246);
     assertModulo(a, num253, false, num246, aEq246);
 
-    switch (solverToUse()) {
-      case CVC4: // TODO bug?
-        // This looks like CVC4 uses the DIV/MOD-definition from INT-theory for BV-theory. :-(
-        // division by zero, signed.
-        assertDivision(false, a, num0, true, b, aEq10, bEqNeg1);
-        assertDivision(false, a, num0, true, b, aEqNeg10, bEq1);
-        assertDivision(false, a, b, true, numNeg1, aEq10, bEq0);
-        assertDivision(false, a, b, true, num1, aEqNeg10, bEq0);
-        assertModulo(false, a, num0, true, numNeg10, aEqNeg10);
+    // division by zero, signed.
+    assertDivision(a, num0, true, b, aEq10, bEqNeg1);
+    assertDivision(a, num0, true, b, aEqNeg10, bEq1);
+    assertDivision(a, b, true, numNeg1, aEq10, bEq0);
+    assertDivision(a, b, true, num1, aEqNeg10, bEq0);
+    assertModulo(a, num0, true, numNeg10, aEqNeg10);
 
-        // division by zero, unsigned.
-        assertDivision(false, a, num0, false, b, aEq10, bEqNeg1);
-        assertDivision(false, a, num0, false, b, aEqNeg10, bEqNeg1);
-        assertDivision(false, a, b, false, numNeg1, aEq10, bEq0);
-        assertDivision(false, a, b, false, numNeg1, aEqNeg10, bEq0);
-        assertModulo(false, a, num0, false, a, aEqNeg10);
-        break;
-      default:
-        // division by zero, signed.
-        assertDivision(a, num0, true, b, aEq10, bEqNeg1);
-        assertDivision(a, num0, true, b, aEqNeg10, bEq1);
-        assertDivision(a, b, true, numNeg1, aEq10, bEq0);
-        assertDivision(a, b, true, num1, aEqNeg10, bEq0);
-        assertModulo(a, num0, true, numNeg10, aEqNeg10);
-
-        // division by zero, unsigned.
-        assertDivision(a, num0, false, b, aEq10, bEqNeg1);
-        assertDivision(a, num0, false, b, aEqNeg10, bEqNeg1);
-        assertDivision(a, b, false, numNeg1, aEq10, bEq0);
-        assertDivision(a, b, false, numNeg1, aEqNeg10, bEq0);
-        assertModulo(a, num0, false, a, aEqNeg10);
-    }
+    // division by zero, unsigned.
+    assertDivision(a, num0, false, b, aEq10, bEqNeg1);
+    assertDivision(a, num0, false, b, aEqNeg10, bEqNeg1);
+    assertDivision(a, b, false, numNeg1, aEq10, bEq0);
+    assertDivision(a, b, false, numNeg1, aEqNeg10, bEq0);
+    assertModulo(a, num0, false, a, aEqNeg10);
   }
 
   @Test
