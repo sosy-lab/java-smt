@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2022 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
@@ -110,6 +111,134 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     assertThatFormula(f).isUnsatisfiable();
   }
 
+  private void assertDivision(
+      IntegerFormula numerator,
+      IntegerFormula denumerator,
+      IntegerFormula expectedResult,
+      BooleanFormula... constraints)
+      throws SolverException, InterruptedException {
+    assertDivision(true, numerator, denumerator, expectedResult, constraints);
+  }
+
+  private void assertDivision(
+      boolean includeNegation,
+      IntegerFormula numerator,
+      IntegerFormula denumerator,
+      IntegerFormula expectedResult,
+      BooleanFormula... constraints)
+      throws SolverException, InterruptedException {
+    assertOperation(
+        includeNegation, buildDivision(numerator, denumerator, expectedResult), constraints);
+  }
+
+  private void assertDivision(
+      BitvectorFormula numerator,
+      BitvectorFormula denumerator,
+      boolean signed,
+      BitvectorFormula expectedResult,
+      BooleanFormula... constraints)
+      throws SolverException, InterruptedException {
+    assertDivision(true, numerator, denumerator, signed, expectedResult, constraints);
+  }
+
+  private void assertDivision(
+      boolean includeNegation,
+      BitvectorFormula numerator,
+      BitvectorFormula denumerator,
+      boolean signed,
+      BitvectorFormula expectedResult,
+      BooleanFormula... constraints)
+      throws SolverException, InterruptedException {
+    assertOperation(
+        includeNegation,
+        buildDivision(numerator, denumerator, signed, expectedResult),
+        constraints);
+  }
+
+  private void assertModulo(
+      IntegerFormula numerator,
+      IntegerFormula denumerator,
+      IntegerFormula expectedResult,
+      BooleanFormula... constraints)
+      throws SolverException, InterruptedException {
+    assertModulo(true, numerator, denumerator, expectedResult, constraints);
+  }
+
+  private void assertModulo(
+      boolean includeNegation,
+      IntegerFormula numerator,
+      IntegerFormula denumerator,
+      IntegerFormula expectedResult,
+      BooleanFormula... constraints)
+      throws SolverException, InterruptedException {
+    assertOperation(
+        includeNegation, buildModulo(numerator, denumerator, expectedResult), constraints);
+  }
+
+  private void assertModulo(
+      BitvectorFormula numerator,
+      BitvectorFormula denumerator,
+      boolean signed,
+      BitvectorFormula expectedResult,
+      BooleanFormula... constraints)
+      throws SolverException, InterruptedException {
+    assertModulo(true, numerator, denumerator, signed, expectedResult, constraints);
+  }
+
+  private void assertModulo(
+      boolean includeNegation,
+      BitvectorFormula numerator,
+      BitvectorFormula denumerator,
+      boolean signed,
+      BitvectorFormula expectedResult,
+      BooleanFormula... constraints)
+      throws SolverException, InterruptedException {
+    assertOperation(
+        includeNegation, buildModulo(numerator, denumerator, signed, expectedResult), constraints);
+  }
+
+  private BooleanFormula buildDivision(
+      IntegerFormula numerator, IntegerFormula denumerator, IntegerFormula expectedResult) {
+    return imgr.equal(imgr.divide(numerator, denumerator), expectedResult);
+  }
+
+  private BooleanFormula buildDivision(
+      BitvectorFormula numerator,
+      BitvectorFormula denumerator,
+      boolean signed,
+      BitvectorFormula expectedResult) {
+    return bvmgr.equal(bvmgr.divide(numerator, denumerator, signed), expectedResult);
+  }
+
+  private BooleanFormula buildModulo(
+      IntegerFormula numerator, IntegerFormula denumerator, IntegerFormula expectedResult) {
+    return imgr.equal(imgr.modulo(numerator, denumerator), expectedResult);
+  }
+
+  private BooleanFormula buildModulo(
+      BitvectorFormula numerator,
+      BitvectorFormula denumerator,
+      boolean signed,
+      BitvectorFormula expectedResult) {
+    return bvmgr.equal(bvmgr.modulo(numerator, denumerator, signed), expectedResult);
+  }
+
+  private void assertOperation(
+      boolean includeNegation, BooleanFormula equation, BooleanFormula... constraints)
+      throws SolverException, InterruptedException {
+    // check positive case
+    assertThatFormula(bmgr.and(bmgr.and(constraints), equation)).isSatisfiable();
+
+    // check negative case
+    BooleanFormulaSubject negation =
+        assertThatFormula(bmgr.and(bmgr.and(constraints), bmgr.not(equation)));
+    if (includeNegation) {
+      negation.isUnsatisfiable();
+    } else {
+      negation.isSatisfiable();
+    }
+  }
+
   @Test
   public void intTest3_DivModLinear() throws SolverException, InterruptedException {
     requireIntegers();
@@ -119,42 +248,113 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     IntegerFormula num10 = imgr.makeNumber(10);
     IntegerFormula num5 = imgr.makeNumber(5);
     IntegerFormula num3 = imgr.makeNumber(3);
+    IntegerFormula num4 = imgr.makeNumber(4);
     IntegerFormula num2 = imgr.makeNumber(2);
     IntegerFormula num1 = imgr.makeNumber(1);
     IntegerFormula num0 = imgr.makeNumber(0);
+    IntegerFormula numNeg2 = imgr.makeNumber(-2);
+    IntegerFormula numNeg3 = imgr.makeNumber(-3);
+    IntegerFormula numNeg4 = imgr.makeNumber(-4);
+    IntegerFormula numNeg10 = imgr.makeNumber(-10);
 
-    BooleanFormula fa = imgr.equal(a, num10);
-    BooleanFormula fb = imgr.equal(b, num2);
-    BooleanFormula aDiv5;
-    try {
-      aDiv5 = imgr.equal(imgr.divide(a, num5), b);
-    } catch (UnsupportedOperationException e) {
-      throw new AssumptionViolatedException("Support for operation DIV is optional", e);
+    BooleanFormula aEq10 = imgr.equal(a, num10);
+    BooleanFormula bEq2 = imgr.equal(b, num2);
+    BooleanFormula aEqNeg10 = imgr.equal(a, numNeg10);
+    BooleanFormula bEqNeg2 = imgr.equal(b, numNeg2);
+
+    assertDivision(num10, num5, num2);
+    assertDivision(num10, num3, num3);
+    assertDivision(numNeg10, num5, numNeg2);
+    assertDivision(numNeg10, numNeg2, num5);
+    assertDivision(num10, num5, num2);
+    assertDivision(num10, num3, num3);
+    assertDivision(num10, numNeg3, numNeg3);
+    assertDivision(num0, num3, num0);
+
+    assertDivision(a, num5, b, aEq10, bEq2);
+    assertDivision(a, num3, num3, aEq10);
+    assertDivision(a, num5, b, aEqNeg10, bEqNeg2);
+    assertDivision(a, num3, numNeg4, aEqNeg10);
+    assertDivision(a, numNeg3, num4, aEqNeg10);
+
+    switch (solverToUse()) {
+      case MATHSAT5: // modulo not supported
+        assertThrows(UnsupportedOperationException.class, () -> buildModulo(num10, num5, num0));
+        break;
+      default:
+        assertModulo(num10, num5, num0);
+        assertModulo(num10, num3, num1, aEq10);
+        assertModulo(numNeg10, num5, num0);
+        assertModulo(numNeg10, num3, num2);
+        assertModulo(numNeg10, numNeg3, num2);
+
+        assertModulo(a, num5, num0, aEq10);
+        assertModulo(a, num3, num1, aEq10);
+        assertModulo(a, num5, num0, aEqNeg10);
+        assertModulo(a, num3, num2, aEqNeg10);
+        assertModulo(a, numNeg3, num2, aEqNeg10);
     }
-    BooleanFormula aDiv3 = imgr.equal(imgr.divide(a, num3), num3);
-    BooleanFormula aMod5;
-    try {
-      aMod5 = imgr.equal(imgr.modulo(a, num5), num0);
-    } catch (UnsupportedOperationException e) {
-      throw new AssumptionViolatedException("Support for operation MOD is optional", e);
+  }
+
+  @Test
+  public void intTest3_DivModLinear_zeroDenumerator() throws SolverException, InterruptedException {
+    requireIntegers();
+    IntegerFormula a = imgr.makeVariable("int_a");
+
+    IntegerFormula num10 = imgr.makeNumber(10);
+    IntegerFormula num1 = imgr.makeNumber(1);
+    IntegerFormula num0 = imgr.makeNumber(0);
+
+    BooleanFormula aEq10 = imgr.equal(a, num10);
+
+    // SMTLIB allows any value for division-by-zero.
+    switch (solverToUse()) {
+      case YICES2:
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> assertThatFormula(buildDivision(num10, num0, num10)).isSatisfiable());
+        break;
+      case PRINCESS: // TODO bug?
+        assertThatFormula(buildDivision(num10, num0, num10)).isUnsatisfiable();
+        break;
+      default:
+        // division-by-zero results in an arbitrary result
+        assertDivision(false, num0, num0, num0);
+        assertDivision(false, num0, num0, num1);
+        assertDivision(false, num0, num0, num10);
+        assertDivision(false, num10, num0, num0);
+        assertDivision(false, num10, num0, num0);
+        assertDivision(false, num10, num0, num10);
+
+        assertDivision(false, a, num0, num0, aEq10);
+        assertDivision(false, a, num0, num1, aEq10);
+        assertDivision(false, a, num0, num10, aEq10);
     }
-    BooleanFormula aMod3 = imgr.equal(imgr.modulo(a, num3), num1);
 
-    // check division-by-constant, a=10 && b=2 && a/5=b
-    assertThatFormula(bmgr.and(fa, fb, aDiv5)).isSatisfiable();
-    assertThatFormula(bmgr.and(fa, fb, bmgr.not(aDiv5))).isUnsatisfiable();
-
-    // check division-by-constant, a=10 && a/3=3
-    assertThatFormula(bmgr.and(fa, fb, aDiv3)).isSatisfiable();
-    assertThatFormula(bmgr.and(fa, fb, bmgr.not(aDiv3))).isUnsatisfiable();
-
-    // check modulo-by-constant, a=10 && a%5=0
-    assertThatFormula(bmgr.and(fa, aMod5)).isSatisfiable();
-    assertThatFormula(bmgr.and(fa, bmgr.not(aMod5))).isUnsatisfiable();
-
-    // check modulo-by-constant, a=10 && a%3=1
-    assertThatFormula(bmgr.and(fa, aMod3)).isSatisfiable();
-    assertThatFormula(bmgr.and(fa, bmgr.not(aMod3))).isUnsatisfiable();
+    switch (solverToUse()) {
+      case YICES2:
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> assertThatFormula(buildModulo(num10, num0, num10)).isSatisfiable());
+        break;
+      case PRINCESS: // TODO bug?
+        assertThatFormula(buildModulo(num10, num0, num10)).isUnsatisfiable();
+        break;
+      case MATHSAT5: // modulo not supported
+        assertThrows(UnsupportedOperationException.class, () -> buildModulo(num10, num0, num10));
+        break;
+      default:
+        // modulo-by-zero results in an arbitrary result
+        assertModulo(false, num0, num0, num0);
+        assertModulo(false, num0, num0, num1);
+        assertModulo(false, num0, num0, num10);
+        assertModulo(false, num10, num0, num0);
+        assertModulo(false, num10, num0, num0);
+        assertModulo(false, num10, num0, num10);
+        assertModulo(false, a, num0, num0, aEq10);
+        assertModulo(false, a, num0, num1, aEq10);
+        assertModulo(false, a, num0, num10, aEq10);
+    }
   }
 
   @Test
@@ -169,353 +369,145 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     IntegerFormula num10 = imgr.makeNumber(10);
     IntegerFormula num5 = imgr.makeNumber(5);
     IntegerFormula num2 = imgr.makeNumber(2);
-
-    BooleanFormula fa = imgr.equal(a, num10);
-    BooleanFormula fb = imgr.equal(b, num2);
-    BooleanFormula aDivB;
-    try {
-      aDivB = imgr.equal(imgr.divide(a, b), num5);
-    } catch (UnsupportedOperationException e) {
-      throw new AssumptionViolatedException("Support for non-linear arithmetic is optional", e);
-    }
-
-    // check division-by-variable, a=10 && b=2 && a/b=5
-    assertThatFormula(bmgr.and(fa, fb, aDivB)).isSatisfiable();
-
-    // TODO disabled, because we would need the option
-    // solver.solver.useNonLinearIntegerArithmetic=true.
-    // assertThatFormula(bmgr.and(fa,fb,bmgr.not(aDivB))).isUnsatisfiable();
-  }
-
-  @Test
-  public void intTest3_DivMod_NegativeNumbersLinear() throws SolverException, InterruptedException {
-    requireIntegers();
-    IntegerFormula a = imgr.makeVariable("int_a");
-    IntegerFormula b = imgr.makeVariable("int_b");
-
-    IntegerFormula numNeg10 = imgr.makeNumber(-10);
-    IntegerFormula num5 = imgr.makeNumber(5);
-    IntegerFormula num4 = imgr.makeNumber(4);
-    IntegerFormula numNeg4 = imgr.makeNumber(-4);
-    IntegerFormula num3 = imgr.makeNumber(3);
-    IntegerFormula numNeg3 = imgr.makeNumber(-3);
-    IntegerFormula numNeg2 = imgr.makeNumber(-2);
-    IntegerFormula num2 = imgr.makeNumber(2);
     IntegerFormula num0 = imgr.makeNumber(0);
-
-    BooleanFormula fa = imgr.equal(a, numNeg10);
-    BooleanFormula fb = imgr.equal(b, numNeg2);
-    BooleanFormula aDiv5;
-    try {
-      aDiv5 = imgr.equal(imgr.divide(a, num5), b);
-    } catch (UnsupportedOperationException e) {
-      throw new AssumptionViolatedException("Support for operation DIV is optional", e);
-    }
-    BooleanFormula aDiv3 = imgr.equal(imgr.divide(a, num3), numNeg4);
-    BooleanFormula aDivNeg3 = imgr.equal(imgr.divide(a, numNeg3), num4);
-    BooleanFormula aMod5;
-    try {
-      aMod5 = imgr.equal(imgr.modulo(a, num5), num0);
-    } catch (UnsupportedOperationException e) {
-      throw new AssumptionViolatedException("Support for operation MOD is optional", e);
-    }
-    BooleanFormula aMod3 = imgr.equal(imgr.modulo(a, num3), num2);
-    BooleanFormula aModNeg3 = imgr.equal(imgr.modulo(a, numNeg3), num2);
-
-    // integer-division for negative numbers is __not__ C99-conform!
-    // SMTlib always rounds against +/- infinity.
-
-    // check division-by-constant, a=-10 && b=-2 && a/5=b
-    assertThatFormula(bmgr.and(fa, fb, aDiv5)).isSatisfiable();
-    assertThatFormula(bmgr.and(fa, fb, bmgr.not(aDiv5))).isUnsatisfiable();
-
-    // check division-by-constant, a=-10 && a/3=-4
-    assertThatFormula(bmgr.and(fa, fb, aDiv3)).isSatisfiable();
-    assertThatFormula(bmgr.and(fa, fb, bmgr.not(aDiv3))).isUnsatisfiable();
-
-    // check division-by-constant, a=-10 && a/(-3)=4
-    assertThatFormula(bmgr.and(fa, fb, aDivNeg3)).isSatisfiable();
-    assertThatFormula(bmgr.and(fa, fb, bmgr.not(aDivNeg3))).isUnsatisfiable();
-
-    // check modulo-by-constant, a=-10 && a%5=0
-    assertThatFormula(bmgr.and(fa, aMod5)).isSatisfiable();
-    assertThatFormula(bmgr.and(fa, bmgr.not(aMod5))).isUnsatisfiable();
-
-    // check modulo-by-constant, a=-10 && a%3=2
-    assertThatFormula(bmgr.and(fa, aMod3)).isSatisfiable();
-    assertThatFormula(bmgr.and(fa, bmgr.not(aMod3))).isUnsatisfiable();
-
-    // check modulo-by-constant, a=-10 && a%(-3)=2
-    assertThatFormula(bmgr.and(fa, aModNeg3)).isSatisfiable();
-    assertThatFormula(bmgr.and(fa, bmgr.not(aModNeg3))).isUnsatisfiable();
-  }
-
-  @Test
-  public void intTest3_DivMod_NegativeNumbersNonLinear()
-      throws SolverException, InterruptedException {
-    // TODO not all solvers support division-by-variable,
-    // we guarantee soundness by allowing any value that yields SAT.
-    requireIntegers();
-
-    IntegerFormula a = imgr.makeVariable("int_a");
-    IntegerFormula b = imgr.makeVariable("int_b");
-
-    IntegerFormula numNeg10 = imgr.makeNumber(-10);
-    IntegerFormula num5 = imgr.makeNumber(5);
     IntegerFormula numNeg2 = imgr.makeNumber(-2);
+    IntegerFormula numNeg10 = imgr.makeNumber(-10);
 
-    BooleanFormula fa = imgr.equal(a, numNeg10);
-    BooleanFormula fb = imgr.equal(b, numNeg2);
-    BooleanFormula aDivB;
-    try {
-      aDivB = imgr.equal(imgr.divide(a, b), num5);
-    } catch (UnsupportedOperationException e) {
-      throw new AssumptionViolatedException("Support for non-linear arithmetic is optional", e);
+    BooleanFormula aEq10 = imgr.equal(a, num10);
+    BooleanFormula bEq2 = imgr.equal(b, num2);
+    BooleanFormula bEqNeg2 = imgr.equal(b, numNeg2);
+    BooleanFormula aEqNeg10 = imgr.equal(a, numNeg10);
+
+    switch (solverToUse()) {
+      case SMTINTERPOL:
+      case YICES2:
+        assertThrows(UnsupportedOperationException.class, () -> buildDivision(a, b, num5));
+        assertThrows(UnsupportedOperationException.class, () -> buildModulo(a, b, num0));
+        break;
+      case MATHSAT5: // modulo not supported
+        assertDivision(a, b, num5, aEq10, bEq2);
+        assertDivision(a, b, num5, aEqNeg10, bEqNeg2);
+        assertThrows(UnsupportedOperationException.class, () -> buildModulo(num10, num5, num0));
+        break;
+      default:
+        assertDivision(a, b, num5, aEq10, bEq2);
+        assertDivision(a, b, num5, aEqNeg10, bEqNeg2);
+        assertModulo(a, b, num0, aEq10, bEq2);
+        assertModulo(a, b, num0, aEqNeg10, bEqNeg2);
     }
 
-    // integer-division for negative numbers is __not__ C99-conform!
-    // SMTlib always rounds against +/- infinity.
-
-    // check division-by-variable, a=-10 && b=-2 && a/b=5
-    assertThatFormula(bmgr.and(fa, fb, aDivB)).isSatisfiable();
-    // TODO disabled, because we would need the option
+    // TODO negative case is disabled, because we would need the option
     // solver.solver.useNonLinearIntegerArithmetic=true.
-    // assertThatFormula(bmgr.and(fa,fb,bmgr.not(aDivB))).isUnsatisfiable();
   }
 
   @Test
-  public void intTestBV_DivMod_Signed() throws SolverException, InterruptedException {
+  public void intTestBV_DivMod() throws SolverException, InterruptedException {
     requireBitvectors();
 
     final int bitsize = 8;
     BitvectorFormula a = bvmgr.makeVariable(bitsize, "int_a");
     BitvectorFormula b = bvmgr.makeVariable(bitsize, "int_b");
 
-    BitvectorFormula num10 = bvmgr.makeBitvector(bitsize, 10);
-    BitvectorFormula num5 = bvmgr.makeBitvector(bitsize, 5);
-    BitvectorFormula num3 = bvmgr.makeBitvector(bitsize, 3);
-    BitvectorFormula num2 = bvmgr.makeBitvector(bitsize, 2);
-    BitvectorFormula num1 = bvmgr.makeBitvector(bitsize, 1);
-    BitvectorFormula num0 = bvmgr.makeBitvector(bitsize, 0);
-    BitvectorFormula numNeg3 = bvmgr.makeBitvector(bitsize, -3);
-
-    BooleanFormula aEq10 = bvmgr.equal(a, num10);
-    BooleanFormula bEq2 = bvmgr.equal(b, num2);
-    BooleanFormula aDiv5EqB = bvmgr.equal(bvmgr.divide(a, num5, true), b);
-    BooleanFormula aDiv3Eq3 = bvmgr.equal(bvmgr.divide(a, num3, true), num3);
-    BooleanFormula aDivNeg3EqNeg3 = bvmgr.equal(bvmgr.divide(a, numNeg3, true), numNeg3);
-    BooleanFormula aDivBEq5 = bvmgr.equal(bvmgr.divide(a, b, true), num5);
-    BooleanFormula aMod5Eq0 = bvmgr.equal(bvmgr.modulo(a, num5, true), num0);
-    BooleanFormula aMod3Eq1 = bvmgr.equal(bvmgr.modulo(a, num3, true), num1);
-    BooleanFormula aModNeg3Eq1 = bvmgr.equal(bvmgr.modulo(a, numNeg3, true), num1);
-
-    // check division-by-constant, a=10 && b=2 && a/5=b
-    assertThatFormula(bmgr.and(aEq10, bEq2, aDiv5EqB)).isSatisfiable();
-    assertThatFormula(bmgr.and(aEq10, bEq2, bmgr.not(aDiv5EqB))).isUnsatisfiable();
-
-    // check division-by-constant, a=10 && a/3=3
-    assertThatFormula(bmgr.and(aEq10, aDiv3Eq3)).isSatisfiable();
-    assertThatFormula(bmgr.and(aEq10, bmgr.not(aDiv3Eq3))).isUnsatisfiable();
-
-    // check division-by-constant, a=10 && a/-3=-3
-    assertThatFormula(bmgr.and(aEq10, aDivNeg3EqNeg3)).isSatisfiable();
-    assertThatFormula(bmgr.and(aEq10, bmgr.not(aDivNeg3EqNeg3))).isUnsatisfiable();
-
-    // check division-by-variable, a=10 && b=2 && a/b=5
-    // TODO not all solvers support division-by-variable,
-    // we guarantee soundness by allowing any value that yields SAT.
-    assertThatFormula(bmgr.and(aEq10, bEq2, aDivBEq5)).isSatisfiable();
-    assertThatFormula(bmgr.and(aEq10, bEq2, bmgr.not(aDivBEq5))).isUnsatisfiable();
-
-    // check modulo-by-constant, a=10 && a%5=0
-    assertThatFormula(bmgr.and(aEq10, aMod5Eq0)).isSatisfiable();
-    assertThatFormula(bmgr.and(aEq10, bmgr.not(aMod5Eq0))).isUnsatisfiable();
-
-    // check modulo-by-constant, a=10 && a%3=1
-    assertThatFormula(bmgr.and(aEq10, aMod3Eq1)).isSatisfiable();
-    assertThatFormula(bmgr.and(aEq10, bmgr.not(aMod3Eq1))).isUnsatisfiable();
-
-    // check modulo-by-constant, a=10 && a%(-3)=1
-    assertThatFormula(bmgr.and(aEq10, aModNeg3Eq1)).isSatisfiable();
-    assertThatFormula(bmgr.and(aEq10, bmgr.not(aModNeg3Eq1))).isUnsatisfiable();
-  }
-
-  @Test
-  public void intTestBV_DivMod_Unsigned() throws SolverException, InterruptedException {
-    requireBitvectors();
-
-    final int bitsize = 8;
-    BitvectorFormula a = bvmgr.makeVariable(bitsize, "int_a");
-    BitvectorFormula b = bvmgr.makeVariable(bitsize, "int_b");
-
-    BitvectorFormula num0 = bvmgr.makeBitvector(bitsize, 0);
-    BitvectorFormula num1 = bvmgr.makeBitvector(bitsize, 1);
-    BitvectorFormula num2 = bvmgr.makeBitvector(bitsize, 2);
-    BitvectorFormula num3 = bvmgr.makeBitvector(bitsize, 3);
-    BitvectorFormula num5 = bvmgr.makeBitvector(bitsize, 5);
-    BitvectorFormula num10 = bvmgr.makeBitvector(bitsize, 10);
     BitvectorFormula num253 = bvmgr.makeBitvector(bitsize, -3); // == 253 unsigned
-
-    BooleanFormula aEq10 = bvmgr.equal(a, num10);
-    BooleanFormula bEq2 = bvmgr.equal(b, num2);
-    BooleanFormula aDiv5EqB = bvmgr.equal(bvmgr.divide(a, num5, false), b);
-    BooleanFormula aDiv3Eq3 = bvmgr.equal(bvmgr.divide(a, num3, false), num3);
-    BooleanFormula aDiv253Eq0 = bvmgr.equal(bvmgr.divide(a, num253, false), num0);
-    BooleanFormula aDivBEq5 = bvmgr.equal(bvmgr.divide(a, b, false), num5);
-    BooleanFormula aMod5Eq0 = bvmgr.equal(bvmgr.modulo(a, num5, false), num0);
-    BooleanFormula aMod3Eq1 = bvmgr.equal(bvmgr.modulo(a, num3, false), num1);
-    BooleanFormula aMod253Eq10 = bvmgr.equal(bvmgr.modulo(a, num253, false), num10);
-
-    // check division-by-constant, a=10 && b=2 && a/5=b
-    assertThatFormula(bmgr.and(aEq10, bEq2, aDiv5EqB)).isSatisfiable();
-    assertThatFormula(bmgr.and(aEq10, bEq2, bmgr.not(aDiv5EqB))).isUnsatisfiable();
-
-    // check division-by-constant, a=10 && a/3=3
-    assertThatFormula(bmgr.and(aEq10, aDiv3Eq3)).isSatisfiable();
-    assertThatFormula(bmgr.and(aEq10, bmgr.not(aDiv3Eq3))).isUnsatisfiable();
-
-    // check division-by-constant, a=10 && a/253=0
-    assertThatFormula(bmgr.and(aEq10, aDiv253Eq0)).isSatisfiable();
-    assertThatFormula(bmgr.and(aEq10, bmgr.not(aDiv253Eq0))).isUnsatisfiable();
-
-    // check division-by-variable, a=10 && b=2 && a/b=5
-    // TODO not all solvers support division-by-variable,
-    // we guarantee soundness by allowing any value that yields SAT.
-    assertThatFormula(bmgr.and(aEq10, bEq2, aDivBEq5)).isSatisfiable();
-    assertThatFormula(bmgr.and(aEq10, bEq2, bmgr.not(aDivBEq5))).isUnsatisfiable();
-
-    // check modulo-by-constant, a=10 && a%5=0
-    assertThatFormula(bmgr.and(aEq10, aMod5Eq0)).isSatisfiable();
-    assertThatFormula(bmgr.and(aEq10, bmgr.not(aMod5Eq0))).isUnsatisfiable();
-
-    // check modulo-by-constant, a=10 && a%3=1
-    assertThatFormula(bmgr.and(aEq10, aMod3Eq1)).isSatisfiable();
-    assertThatFormula(bmgr.and(aEq10, bmgr.not(aMod3Eq1))).isUnsatisfiable();
-
-    // check modulo-by-constant, a=10 && a%253=10
-    assertThatFormula(bmgr.and(aEq10, aMod253Eq10)).isSatisfiable();
-    assertThatFormula(bmgr.and(aEq10, bmgr.not(aMod253Eq10))).isUnsatisfiable();
-  }
-
-  @Test
-  public void intTestBV_DivMod_NegativeNumbers_Signed()
-      throws SolverException, InterruptedException {
-    requireBitvectors();
-
-    final int bitsize = 8;
-    BitvectorFormula a = bvmgr.makeVariable(bitsize, "int_a");
-    BitvectorFormula b = bvmgr.makeVariable(bitsize, "int_b");
-
-    BitvectorFormula numNeg10 = bvmgr.makeBitvector(bitsize, -10);
-    BitvectorFormula numNeg3 = bvmgr.makeBitvector(bitsize, -3);
-    BitvectorFormula numNeg2 = bvmgr.makeBitvector(bitsize, -2);
-    BitvectorFormula numNeg1 = bvmgr.makeBitvector(bitsize, -1);
-    BitvectorFormula num0 = bvmgr.makeBitvector(bitsize, 0);
-    BitvectorFormula num3 = bvmgr.makeBitvector(bitsize, 3);
-    BitvectorFormula num5 = bvmgr.makeBitvector(bitsize, 5);
-
-    BooleanFormula aEqNeg10 = bvmgr.equal(a, numNeg10);
-    BooleanFormula bEqNeg2 = bvmgr.equal(b, numNeg2);
-    BooleanFormula aDiv5EqB = bvmgr.equal(bvmgr.divide(a, num5, true), b);
-    BooleanFormula aDiv3EqNeg3 = bvmgr.equal(bvmgr.divide(a, num3, true), numNeg3);
-    BooleanFormula aDivNeg3Eq3 = bvmgr.equal(bvmgr.divide(a, numNeg3, true), num3);
-    BooleanFormula aDivBEq5 = bvmgr.equal(bvmgr.divide(a, b, true), num5);
-    BooleanFormula aMod5Eq0 = bvmgr.equal(bvmgr.modulo(a, num5, true), num0);
-    BooleanFormula aMod3EqNeg1 = bvmgr.equal(bvmgr.modulo(a, num3, true), numNeg1);
-    BooleanFormula aModNeg3EqNeg1 = bvmgr.equal(bvmgr.modulo(a, numNeg3, true), numNeg1);
-
-    // bitvector-division for negative numbers is C99-conform!
-
-    // check division-by-constant, a=-10 && b=-2 && a/5=b
-    assertThatFormula(bmgr.and(aEqNeg10, bEqNeg2, aDiv5EqB)).isSatisfiable();
-    assertThatFormula(bmgr.and(aEqNeg10, bEqNeg2, bmgr.not(aDiv5EqB))).isUnsatisfiable();
-
-    // check division-by-constant, a=-10 && a/3=-3
-    assertThatFormula(bmgr.and(aEqNeg10, aDiv3EqNeg3)).isSatisfiable();
-    assertThatFormula(bmgr.and(aEqNeg10, bmgr.not(aDiv3EqNeg3))).isUnsatisfiable();
-
-    // check division-by-constant, a=-10 && a/(-3)=3
-    assertThatFormula(bmgr.and(aEqNeg10, aDivNeg3Eq3)).isSatisfiable();
-    assertThatFormula(bmgr.and(aEqNeg10, bmgr.not(aDivNeg3Eq3))).isUnsatisfiable();
-
-    // check division-by-variable, a=-10 && b=-2 && a/b=5
-    // TODO not all solvers support division-by-variable
-    // we guarantee soundness by allowing any value, that yields SAT.
-    assertThatFormula(bmgr.and(aEqNeg10, bEqNeg2, aDivBEq5)).isSatisfiable();
-    assertThatFormula(bmgr.and(aEqNeg10, bEqNeg2, bmgr.not(aDivBEq5))).isUnsatisfiable();
-
-    // check modulo-by-constant, a=-10 && a%5=0
-    assertThatFormula(bmgr.and(aEqNeg10, aMod5Eq0)).isSatisfiable();
-    assertThatFormula(bmgr.and(aEqNeg10, bmgr.not(aMod5Eq0))).isUnsatisfiable();
-
-    // check modulo-by-constant, a=-10 && a%3=-1
-    assertThatFormula(bmgr.and(aEqNeg10, aMod3EqNeg1)).isSatisfiable();
-    assertThatFormula(bmgr.and(aEqNeg10, bmgr.not(aMod3EqNeg1))).isUnsatisfiable();
-
-    // check modulo-by-constant, a=-10 && a%(-3)=-1
-    assertThatFormula(bmgr.and(aEqNeg10, aModNeg3EqNeg1)).isSatisfiable();
-    assertThatFormula(bmgr.and(aEqNeg10, bmgr.not(aModNeg3EqNeg1))).isUnsatisfiable();
-  }
-
-  @Test
-  public void intTestBV_DivMod_NegativeNumbers_Unsigned()
-      throws SolverException, InterruptedException {
-    requireBitvectors();
-
-    final int bitsize = 8;
-    BitvectorFormula a = bvmgr.makeVariable(bitsize, "int_a");
-    BitvectorFormula b = bvmgr.makeVariable(bitsize, "int_b");
-
-    BitvectorFormula num0 = bvmgr.makeBitvector(bitsize, 0);
-    BitvectorFormula num1 = bvmgr.makeBitvector(bitsize, 1);
-    BitvectorFormula num3 = bvmgr.makeBitvector(bitsize, 3);
-    BitvectorFormula num5 = bvmgr.makeBitvector(bitsize, 5);
-    BitvectorFormula num49 = bvmgr.makeBitvector(bitsize, 49);
+    BitvectorFormula num246 = bvmgr.makeBitvector(bitsize, -10); // == 246 unsigned
     BitvectorFormula num82 = bvmgr.makeBitvector(bitsize, 82);
-    BitvectorFormula num246 = bvmgr.makeBitvector(bitsize, -10); // == 246 unsinged
-    BitvectorFormula num253 = bvmgr.makeBitvector(bitsize, -3); // == 253 unsinged
+    BitvectorFormula num49 = bvmgr.makeBitvector(bitsize, 49);
+    BitvectorFormula num10 = bvmgr.makeBitvector(bitsize, 10);
+    BitvectorFormula num5 = bvmgr.makeBitvector(bitsize, 5);
+    BitvectorFormula num3 = bvmgr.makeBitvector(bitsize, 3);
+    BitvectorFormula num2 = bvmgr.makeBitvector(bitsize, 2);
+    BitvectorFormula num1 = bvmgr.makeBitvector(bitsize, 1);
+    BitvectorFormula num0 = bvmgr.makeBitvector(bitsize, 0);
+    BitvectorFormula numNeg1 = bvmgr.makeBitvector(bitsize, -1);
+    BitvectorFormula numNeg2 = bvmgr.makeBitvector(bitsize, -2);
+    BitvectorFormula numNeg3 = bvmgr.makeBitvector(bitsize, -3);
+    BitvectorFormula numNeg10 = bvmgr.makeBitvector(bitsize, -10);
 
     BooleanFormula aEq246 = bvmgr.equal(a, num246);
+    BooleanFormula aEq10 = bvmgr.equal(a, num10);
+    BooleanFormula bEq2 = bvmgr.equal(b, num2);
+    BooleanFormula bEq0 = bvmgr.equal(b, num0);
+    BooleanFormula aEqNeg10 = bvmgr.equal(a, numNeg10);
     BooleanFormula bEq49 = bvmgr.equal(b, num49);
-    BooleanFormula aDiv5EqB = bvmgr.equal(bvmgr.divide(a, num5, false), b);
-    BooleanFormula aDiv3Eq82 = bvmgr.equal(bvmgr.divide(a, num3, false), num82);
-    BooleanFormula aDiv253Eq0 = bvmgr.equal(bvmgr.divide(a, num253, false), num0);
-    BooleanFormula aDivBEq5 = bvmgr.equal(bvmgr.divide(a, b, false), num5);
-    BooleanFormula aMod5Eq1 = bvmgr.equal(bvmgr.modulo(a, num5, false), num1);
-    BooleanFormula aMod3Eq0 = bvmgr.equal(bvmgr.modulo(a, num3, false), num0);
-    BooleanFormula aMod253Eq246 = bvmgr.equal(bvmgr.modulo(a, num253, false), num246);
+    BooleanFormula bEq1 = bvmgr.equal(b, num1);
+    BooleanFormula bEqNeg1 = bvmgr.equal(b, numNeg1);
+    BooleanFormula bEqNeg2 = bvmgr.equal(b, numNeg2);
 
+    // positive numbers, signed.
+    assertDivision(a, num5, true, b, aEq10, bEq2);
+    assertDivision(a, num3, true, num3, aEq10);
+    if (solverToUse() == Solvers.PRINCESS) {
+      // TODO bug was reported, bugfix was promised with next release of Princess
+      assertThatFormula(buildDivision(a, numNeg3, true, numNeg3)).isUnsatisfiable();
+    } else {
+      assertDivision(a, numNeg3, true, numNeg3, aEq10);
+    }
+    assertDivision(a, b, true, num5, aEq10, bEq2);
+    assertModulo(a, num5, true, num0, aEq10);
+    assertModulo(a, num3, true, num1, aEq10);
+    assertModulo(a, numNeg3, true, num1, aEq10);
+
+    // positive numbers, unsigned.
+    assertDivision(a, num5, false, b, aEq10, bEq2);
+    assertDivision(a, num3, false, num3, aEq10);
+    assertDivision(a, num253, false, num0, aEq10);
+    assertDivision(a, b, false, num5, aEq10, bEq2);
+    assertModulo(a, num5, false, num0, aEq10);
+    assertModulo(a, num3, false, num1, aEq10);
+    assertModulo(a, num253, false, num10, aEq10);
+
+    // negative numbers, signed.
     // bitvector-division for negative numbers is C99-conform!
+    assertDivision(a, num5, true, b, aEqNeg10, bEqNeg2);
+    assertDivision(a, num3, true, numNeg3, aEqNeg10);
+    assertDivision(a, numNeg3, true, num3, aEqNeg10);
+    assertDivision(a, b, true, num5, aEqNeg10, bEqNeg2);
+    assertModulo(a, num5, true, num0, aEqNeg10);
+    assertModulo(a, num3, true, numNeg1, aEqNeg10);
+    assertModulo(a, numNeg3, true, numNeg1, aEqNeg10);
 
-    // check division-by-constant, a=246 && b=49 && a/5=b
-    assertThatFormula(bmgr.and(aEq246, bEq49, aDiv5EqB)).isSatisfiable();
-    assertThatFormula(bmgr.and(aEq246, bEq49, bmgr.not(aDiv5EqB))).isUnsatisfiable();
+    // negative numbers, unsigned.
+    // bitvector-division for negative numbers is C99-conform!
+    assertDivision(a, num5, false, b, aEq246, bEq49);
+    assertDivision(a, num3, false, num82, aEq246);
+    assertDivision(a, num253, false, num0, aEq246);
+    assertDivision(a, b, false, num5, aEq246, bEq49);
+    assertModulo(a, num5, false, num1, aEq246);
+    assertModulo(a, num3, false, num0, aEq246);
+    assertModulo(a, num253, false, num246, aEq246);
 
-    // check division-by-constant, a=246 && a/3=82
-    assertThatFormula(bmgr.and(aEq246, aDiv3Eq82)).isSatisfiable();
-    assertThatFormula(bmgr.and(aEq246, bmgr.not(aDiv3Eq82))).isUnsatisfiable();
+    switch (solverToUse()) {
+      case CVC4: // TODO bug?
+        // This looks like CVC4 uses the DIV/MOD-definition from INT-theory for BV-theory. :-(
+        // division by zero, signed.
+        assertDivision(false, a, num0, true, b, aEq10, bEqNeg1);
+        assertDivision(false, a, num0, true, b, aEqNeg10, bEq1);
+        assertDivision(false, a, b, true, numNeg1, aEq10, bEq0);
+        assertDivision(false, a, b, true, num1, aEqNeg10, bEq0);
+        assertModulo(false, a, num0, true, numNeg10, aEqNeg10);
 
-    // check division-by-constant, a=246 && a/253=0
-    assertThatFormula(bmgr.and(aEq246, aDiv253Eq0)).isSatisfiable();
-    assertThatFormula(bmgr.and(aEq246, bmgr.not(aDiv253Eq0))).isUnsatisfiable();
+        // division by zero, unsigned.
+        assertDivision(false, a, num0, false, b, aEq10, bEqNeg1);
+        assertDivision(false, a, num0, false, b, aEqNeg10, bEqNeg1);
+        assertDivision(false, a, b, false, numNeg1, aEq10, bEq0);
+        assertDivision(false, a, b, false, numNeg1, aEqNeg10, bEq0);
+        assertModulo(false, a, num0, false, a, aEqNeg10);
+        break;
+      default:
+        // division by zero, signed.
+        assertDivision(a, num0, true, b, aEq10, bEqNeg1);
+        assertDivision(a, num0, true, b, aEqNeg10, bEq1);
+        assertDivision(a, b, true, numNeg1, aEq10, bEq0);
+        assertDivision(a, b, true, num1, aEqNeg10, bEq0);
+        assertModulo(a, num0, true, numNeg10, aEqNeg10);
 
-    // check division-by-variable, a=246 && b=49 && a/b=5
-    // TODO not all solvers support division-by-variable
-    // we guarantee soundness by allowing any value, that yields SAT.
-    assertThatFormula(bmgr.and(aEq246, bEq49, aDivBEq5)).isSatisfiable();
-    assertThatFormula(bmgr.and(aEq246, bEq49, bmgr.not(aDivBEq5))).isUnsatisfiable();
-
-    // check modulo-by-constant, a=246 && a%5=1
-    assertThatFormula(bmgr.and(aEq246, aMod5Eq1)).isSatisfiable();
-    assertThatFormula(bmgr.and(aEq246, bmgr.not(aMod5Eq1))).isUnsatisfiable();
-
-    // check modulo-by-constant, a=246 && a%3=0
-    assertThatFormula(bmgr.and(aEq246, aMod3Eq0)).isSatisfiable();
-    assertThatFormula(bmgr.and(aEq246, bmgr.not(aMod3Eq0))).isUnsatisfiable();
-
-    // check modulo-by-constant, a=246 && a%253=246
-    assertThatFormula(bmgr.and(aEq246, aMod253Eq246)).isSatisfiable();
-    assertThatFormula(bmgr.and(aEq246, bmgr.not(aMod253Eq246))).isUnsatisfiable();
+        // division by zero, unsigned.
+        assertDivision(a, num0, false, b, aEq10, bEqNeg1);
+        assertDivision(a, num0, false, b, aEqNeg10, bEqNeg1);
+        assertDivision(a, b, false, numNeg1, aEq10, bEq0);
+        assertDivision(a, b, false, numNeg1, aEqNeg10, bEq0);
+        assertModulo(a, num0, false, a, aEqNeg10);
+    }
   }
 
   @Test
