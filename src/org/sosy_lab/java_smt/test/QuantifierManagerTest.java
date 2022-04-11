@@ -134,6 +134,11 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testLIAForallArrayConjunctUnsat() throws SolverException, InterruptedException {
+    assume()
+        .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC5);
+
     // (forall x . b[x] = 0) AND (b[123] = 1) is UNSAT
     requireIntegers();
 
@@ -146,6 +151,11 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testBVForallArrayConjunctUnsat() throws SolverException, InterruptedException {
+    assume()
+        .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC5);
+
     // (forall x . b[x] = 0) AND (b[123] = 1) is UNSAT
     requireBitvectors();
     // Princess does not support bitvectors in arrays
@@ -164,6 +174,11 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testLIAForallArrayConjunctSat() throws SolverException, InterruptedException {
+    assume()
+        .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC5);
+
     // (forall x . b[x] = 0) AND (b[123] = 0) is SAT
     requireIntegers();
 
@@ -181,6 +196,11 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testBVForallArrayConjunctSat() throws SolverException, InterruptedException {
+    assume()
+        .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC5);
+
     // (forall x . b[x] = 0) AND (b[123] = 0) is SAT
     requireBitvectors();
     // Princess does not support bitvectors in arrays
@@ -204,6 +224,11 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testLIAForallArrayDisjunct1() throws SolverException, InterruptedException {
+    assume()
+        .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC5);
+
     // (forall x . b[x] = 0) AND (b[123] = 1 OR b[123] = 0) is SAT
     requireIntegers();
     BooleanFormula f =
@@ -238,6 +263,11 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testLIANotExistsArrayConjunct1() throws SolverException, InterruptedException {
+    assume()
+        .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC5);
+
     // (not exists x . not b[x] = 0) AND (b[123] = 1) is UNSAT
     requireIntegers();
     BooleanFormula f =
@@ -253,6 +283,16 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testLIANotExistsArrayConjunct2() throws SolverException, InterruptedException {
+    assume()
+        .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC5);
+
+    assume()
+        .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC5);
+
     // (not exists x . not b[x] = 0) AND (b[123] = 0) is SAT
     requireIntegers();
     BooleanFormula f =
@@ -268,6 +308,11 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testLIANotExistsArrayConjunct3() throws SolverException, InterruptedException {
+    assume()
+        .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC5);
+
     // (not exists x . b[x] = 0) AND (b[123] = 0) is UNSAT
     requireIntegers();
     BooleanFormula f =
@@ -279,6 +324,11 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testLIANotExistsArrayDisjunct1() throws SolverException, InterruptedException {
+    assume()
+        .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC5);
+
     // (not exists x . not b[x] = 0) AND (b[123] = 1 OR b[123] = 0) is SAT
     requireIntegers();
     BooleanFormula f =
@@ -342,6 +392,11 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testLIAExistsArrayConjunct2() throws SolverException, InterruptedException {
+    assume()
+        .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC5);
+
     // (exists x . b[x] = 1) AND  (forall x . b[x] = 0) is UNSAT
 
     requireIntegers();
@@ -352,6 +407,11 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testBVExistsArrayConjunct2() throws SolverException, InterruptedException {
+    assume()
+        .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC5);
+
     // (exists x . b[x] = 1) AND (forall x . b[x] = 0) is UNSAT
     requireBitvectors();
     // Princess does not support bitvectors in arrays
@@ -366,6 +426,11 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testLIAExistsArrayConjunct3() throws SolverException, InterruptedException {
+    assume()
+        .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC5);
+
     // (exists x . b[x] = 0) AND  (forall x . b[x] = 0) is SAT
     requireIntegers();
 
@@ -384,9 +449,11 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     // (exists x . b[x] = 0) AND (forall x . b[x] = 0) is SAT
     requireBitvectors();
     // Princess does not support bitvectors in arrays
-    assume().that(solverUnderTest).isNotEqualTo(Solvers.PRINCESS);
     // Boolector quants need to be reworked
-    assume().that(solverUnderTest).isNotEqualTo(Solvers.BOOLECTOR);
+    assume()
+        .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
+        .that(solverToUse())
+        .isNoneOf(Solvers.CVC5, Solvers.CVC4, Solvers.BOOLECTOR);
 
     BooleanFormula f =
         bmgr.and(qmgr.exists(ImmutableList.of(xbv), bvArray_at_x_eq_0), bv_forall_x_a_at_x_eq_0);
@@ -717,6 +784,11 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
 
   @Test
   public void checkLIAQuantifierEliminationFail() throws InterruptedException, SolverException {
+    assume()
+        .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC5);
+
     // build formula: (exists x : arr[x] = 3) && (forall y: arr[y] = 2)
     // as there is no quantifier free equivalent, it should return the input formula.
     requireIntegers();
@@ -740,9 +812,11 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     // as there is no quantifier free equivalent, it should return the input formula.
     requireBitvectors();
     // Boolector quants need to be reworked
-    assume().that(solverUnderTest).isNotEqualTo(Solvers.BOOLECTOR);
     // Princess does not support bitvectors in arrays
-    assume().that(solverUnderTest).isNotEqualTo(Solvers.PRINCESS);
+    assume()
+        .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
+        .that(solverToUse())
+        .isNoneOf(Solvers.CVC5, Solvers.BOOLECTOR, Solvers.PRINCESS);
 
     int width = 2;
     BitvectorFormula xx = bvmgr.makeVariable(width, "x_bv");
@@ -824,6 +898,11 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testExistsRestrictedRange() throws SolverException, InterruptedException {
+    assume()
+        .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC5);
+
     ArrayFormula<IntegerFormula, IntegerFormula> b =
         amgr.makeArray("b", FormulaType.IntegerType, FormulaType.IntegerType);
     BooleanFormula bAtXEq1 = imgr.equal(amgr.select(b, x), imgr.makeNumber(1));
@@ -855,7 +934,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     assume()
         .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.CVC4, Solvers.PRINCESS);
+        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.PRINCESS);
 
     ArrayFormula<IntegerFormula, IntegerFormula> b =
         amgr.makeArray("b", FormulaType.IntegerType, FormulaType.IntegerType);
@@ -875,6 +954,11 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testForallRestrictedRange() throws SolverException, InterruptedException {
+    assume()
+        .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC5);
+
     ArrayFormula<IntegerFormula, IntegerFormula> b =
         amgr.makeArray("b", FormulaType.IntegerType, FormulaType.IntegerType);
     BooleanFormula bAtXEq1 = imgr.equal(amgr.select(b, x), imgr.makeNumber(1));
@@ -907,7 +991,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     assume()
         .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.CVC4, Solvers.PRINCESS);
+        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.PRINCESS);
 
     ArrayFormula<IntegerFormula, IntegerFormula> b =
         amgr.makeArray("b", FormulaType.IntegerType, FormulaType.IntegerType);
