@@ -8,9 +8,12 @@
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
+import static com.google.common.collect.Iterables.getLast;
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth.assertWithMessage;
 import static org.junit.Assert.assertThrows;
 
+import com.google.common.collect.ImmutableList;
 import io.github.cvc5.CVC5ApiException;
 import io.github.cvc5.Kind;
 import io.github.cvc5.Op;
@@ -82,13 +85,81 @@ public class CVC5NativeAPITest {
     solver.setOption("strings-exp", "true");
     // Unsat core and interpolation may not be activated at the same time!
     // solver.setOption("produce-interpolants", "true");
-    solver.setOption("produce-unsat-cores", "true");
-    solver.setOption("produce-proofs", "true");
   }
 
   @After
   public void freeEnvironment() {
     solver.close();
+  }
+
+  @Test
+  public void checkInterpolation() {
+    // solver.setOption("produce-unsat-cores", "true");
+    solver.setOption("produce-interpolants", "true");
+
+    Term zero = solver.mkInteger(0);
+    Term one = solver.mkInteger(1);
+
+    Term a = solver.mkConst(solver.getIntegerSort(), "a");
+    Term b = solver.mkConst(solver.getIntegerSort(), "b");
+    Term c = solver.mkConst(solver.getIntegerSort(), "c");
+
+    // build formula:  1 = A = B = C = 0
+    Term A = solver.mkTerm(Kind.EQUAL, one, a);
+    Term B = solver.mkTerm(Kind.EQUAL, a, b);
+    Term C = solver.mkTerm(Kind.EQUAL, b, c);
+    Term D = solver.mkTerm(Kind.EQUAL, c, zero);
+
+    solver.assertFormula(A);
+    solver.assertFormula(B);
+    solver.assertFormula(C);
+    solver.assertFormula(D);
+
+    assertThat(solver.checkSat().isUnsat()).isTrue();
+
+    // TODO: ask Karlheinz if true is correct for an empty interpolation group!
+    Term itp = solver.getInterpolant(solver.mkBoolean(true));
+    Term itpA = solver.getInterpolant(A);
+    Term itpAB = solver.getInterpolant(A.andTerm(B));
+    Term itpABC = solver.getInterpolant(A.andTerm(B).andTerm(C));
+    Term itpD = solver.getInterpolant(D);
+    Term itpDC = solver.getInterpolant(D.andTerm(C));
+    Term itpDCB = solver.getInterpolant(D.andTerm(C).andTerm(B));
+    Term itpABCD = solver.getInterpolant(A.andTerm(B).andTerm(C).andTerm(D));
+
+    // special cases: start and end of sequence might need special handling in the solver
+    assertThat(solver.mkBoolean(true).toString()).isEqualTo(itp.toString());
+    assertThat(solver.mkBoolean(false).toString()).isEqualTo(itpABCD.toString());
+
+    // we check here the stricter properties for sequential interpolants,
+    // but this simple example should work for all solvers
+    checkItpSequence(ImmutableList.of(A, B, C, D), ImmutableList.of(itpA, itpAB, itpABC));
+    checkItpSequence(ImmutableList.of(D, C, B, A), ImmutableList.of(itpD, itpDC, itpDCB));
+  }
+
+  private void checkItpSequence(List<Term> formulas, List<Term> itps) {
+
+    assertWithMessage(
+            "there should be N-1 interpolants for N formulas, but we got %s for %s", itps, formulas)
+        .that(formulas.size() - 1 == itps.size())
+        .isTrue();
+
+    if (!itps.isEmpty()) {
+      solver.resetAssertions();
+      Term initFormula = formulas.get(0).impTerm(itps.get(0));
+      solver.assertFormula(initFormula);
+      assertThat(solver.checkSat().isSat()).isTrue();
+      for (int i = 1; i < formulas.size() - 1; i++) {
+        solver.resetAssertions();
+        Term innerFormula = itps.get(i - 1).andTerm(formulas.get(i)).impTerm(itps.get(i));
+        solver.assertFormula(innerFormula);
+        assertThat(solver.checkSat().isSat()).isTrue();
+      }
+      solver.resetAssertions();
+      Term lastImply = getLast(itps).andTerm(getLast(formulas)).impTerm(solver.mkBoolean(false));
+      solver.assertFormula(lastImply);
+      assertThat(solver.checkSat().isSat()).isTrue();
+    }
   }
 
   /*
@@ -963,6 +1034,8 @@ public class CVC5NativeAPITest {
 
   @Test
   public void checkUnsatCore() {
+    solver.setOption("produce-unsat-cores", "true");
+    solver.setOption("produce-proofs", "true");
     // (a & b) & (not(a OR b))
     // Enable UNSAT Core first!
     solver.setOption("produce-unsat-cores", "true");
