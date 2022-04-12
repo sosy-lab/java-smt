@@ -11,14 +11,14 @@ package org.sosy_lab.java_smt.solvers.cvc5;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertThrows;
 
-import io.github.cvc5.api.CVC5ApiException;
-import io.github.cvc5.api.Kind;
-import io.github.cvc5.api.Op;
-import io.github.cvc5.api.Result;
-import io.github.cvc5.api.RoundingMode;
-import io.github.cvc5.api.Solver;
-import io.github.cvc5.api.Sort;
-import io.github.cvc5.api.Term;
+import io.github.cvc5.CVC5ApiException;
+import io.github.cvc5.Kind;
+import io.github.cvc5.Op;
+import io.github.cvc5.Result;
+import io.github.cvc5.RoundingMode;
+import io.github.cvc5.Solver;
+import io.github.cvc5.Sort;
+import io.github.cvc5.Term;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -45,13 +45,13 @@ public class CVC5NativeAPITest {
       "Cannot get value unless after a SAT or UNKNOWN response.";
 
   private static final String INVALID_GETVALUE_STRING_BOUND_VAR =
-      "Cannot get value of term containing free variables";
+      "Cannot process term with free variable";
 
   private static final String INVALID_MODEL_STRING =
       "Cannot get model unless after a SAT or UNKNOWN response.";
 
   @BeforeClass
-  public static void loadCVC4() {
+  public static void loadCVC5() {
     try {
       NativeLibraries.loadLibrary("cvc5jni");
     } catch (UnsatisfiedLinkError e) {
@@ -74,12 +74,16 @@ public class CVC5NativeAPITest {
     solver.setLogic("ALL");
 
     // options
+    solver.setOption("incremental", "true");
     solver.setOption("produce-models", "true");
     solver.setOption("finite-model-find", "true");
     solver.setOption("sets-ext", "true");
     solver.setOption("output-language", "smtlib2");
     solver.setOption("strings-exp", "true");
-    solver.setOption("produce-interpols", "all");
+    // Unsat core and interpolation may not be activated at the same time!
+    // solver.setOption("produce-interpolants", "true");
+    solver.setOption("produce-unsat-cores", "true");
+    solver.setOption("produce-proofs", "true");
   }
 
   @After
@@ -121,7 +125,7 @@ public class CVC5NativeAPITest {
     assertThat(intVar.isIntegerValue()).isFalse();
     assertThat(intVar.getSort().isInteger()).isTrue();
     Exception e =
-        assertThrows(io.github.cvc5.api.CVC5ApiException.class, () -> intVar.getIntegerValue());
+        assertThrows(io.github.cvc5.CVC5ApiException.class, () -> intVar.getIntegerValue());
     assertThat(e.toString())
         .contains(
             "Invalid argument 'int_const' for '*d_node', expected Term to be an integer value when calling getIntegerValue()");
@@ -182,7 +186,7 @@ public class CVC5NativeAPITest {
 
     Exception e =
         assertThrows(
-            io.github.cvc5.api.CVC5ApiException.class,
+            io.github.cvc5.CVC5ApiException.class,
             () -> solver.mkFloatingPoint(8, 24, bvOneFourth));
     assertThat(e.toString())
         .contains(
@@ -245,7 +249,7 @@ public class CVC5NativeAPITest {
   public void checkSimpleLIAEqualitySat() {
     Term one = solver.mkInteger(1);
     Term two = solver.mkInteger(2);
-    Term assertion = solver.mkTerm(Kind.EQUAL, solver.mkTerm(Kind.PLUS, one, one), two);
+    Term assertion = solver.mkTerm(Kind.EQUAL, solver.mkTerm(Kind.ADD, one, one), two);
     solver.assertFormula(assertion);
     Result satCheck = solver.checkSat();
     assertThat(satCheck.isSat()).isTrue();
@@ -254,7 +258,7 @@ public class CVC5NativeAPITest {
   @Test
   public void checkSimpleLIAEqualityUnsat() {
     Term one = solver.mkInteger(1);
-    Term assertion = solver.mkTerm(Kind.EQUAL, solver.mkTerm(Kind.PLUS, one, one), one);
+    Term assertion = solver.mkTerm(Kind.EQUAL, solver.mkTerm(Kind.ADD, one, one), one);
     solver.assertFormula(assertion);
     Result satCheck = solver.checkSat();
     assertThat(satCheck.isSat()).isFalse();
@@ -267,7 +271,7 @@ public class CVC5NativeAPITest {
     Term varX = solver.mkConst(solver.getIntegerSort(), "x");
     Term varY = solver.mkConst(solver.getIntegerSort(), "y");
     Term assertion1 = solver.mkTerm(Kind.EQUAL, solver.mkTerm(Kind.MULT, varX, varY), four);
-    Term assertion2 = solver.mkTerm(Kind.EQUAL, solver.mkTerm(Kind.PLUS, varX, varY), four);
+    Term assertion2 = solver.mkTerm(Kind.EQUAL, solver.mkTerm(Kind.ADD, varX, varY), four);
     solver.assertFormula(assertion1);
     solver.assertFormula(assertion2);
     Result satCheck = solver.checkSat();
@@ -289,7 +293,7 @@ public class CVC5NativeAPITest {
     Term varX = solver.mkConst(solver.getIntegerSort(), "x");
     Term varY = solver.mkConst(solver.getIntegerSort(), "y");
     Term assertion1 = solver.mkTerm(Kind.EQUAL, solver.mkTerm(Kind.MULT, varX, varY), one);
-    Term assertion2 = solver.mkTerm(Kind.EQUAL, solver.mkTerm(Kind.PLUS, varX, varY), one);
+    Term assertion2 = solver.mkTerm(Kind.EQUAL, solver.mkTerm(Kind.ADD, varX, varY), one);
     solver.assertFormula(assertion1);
     solver.assertFormula(assertion2);
     Result satCheck = solver.checkSat();
@@ -303,7 +307,7 @@ public class CVC5NativeAPITest {
     Term one = solver.mkInteger(1);
     Term two = solver.mkInteger(2);
     Term var = solver.mkConst(solver.getIntegerSort());
-    Term assertion = solver.mkTerm(Kind.EQUAL, solver.mkTerm(Kind.PLUS, one, two), var);
+    Term assertion = solver.mkTerm(Kind.EQUAL, solver.mkTerm(Kind.ADD, one, two), var);
     solver.assertFormula(assertion);
     Result result = solver.checkSat();
     assertThat(result.isSat()).isTrue();
@@ -319,7 +323,7 @@ public class CVC5NativeAPITest {
     Term varX = solver.mkConst(solver.getRealSort(), "x");
     Term varY = solver.mkConst(solver.getRealSort(), "y");
     Term assertion1 = solver.mkTerm(Kind.EQUAL, solver.mkTerm(Kind.MULT, varX, varY), threeHalf);
-    Term assertion2 = solver.mkTerm(Kind.EQUAL, solver.mkTerm(Kind.PLUS, varX, varY), threeHalf);
+    Term assertion2 = solver.mkTerm(Kind.EQUAL, solver.mkTerm(Kind.ADD, varX, varY), threeHalf);
     solver.assertFormula(assertion1);
     solver.assertFormula(assertion2);
     Result satCheck = solver.checkSat();
@@ -337,7 +341,7 @@ public class CVC5NativeAPITest {
     Term assertion2 = solver.mkTerm(Kind.GT, varY, zero);
     Term assertion3 = solver.mkTerm(Kind.LT, varX, eightFifth);
     Term assertion4 = solver.mkTerm(Kind.LT, varY, eightFifth);
-    Term assertion5 = solver.mkTerm(Kind.EQUAL, solver.mkTerm(Kind.PLUS, varX, varY), eightFifth);
+    Term assertion5 = solver.mkTerm(Kind.EQUAL, solver.mkTerm(Kind.ADD, varX, varY), eightFifth);
     solver.assertFormula(assertion1);
     solver.assertFormula(assertion2);
     solver.assertFormula(assertion3);
@@ -386,7 +390,7 @@ public class CVC5NativeAPITest {
   public void checkSimpleFPSat() throws CVC5ApiException {
     // x * y = 1/4
     Term rmTerm = solver.mkRoundingMode(RoundingMode.ROUND_NEAREST_TIES_TO_AWAY);
-    Op mkRealOp = solver.mkOp(Kind.FLOATINGPOINT_TO_FP_REAL, 8, 24);
+    Op mkRealOp = solver.mkOp(Kind.FLOATINGPOINT_TO_FP_FROM_REAL, 8, 24);
     Term oneFourth = solver.mkTerm(mkRealOp, rmTerm, solver.mkReal(1, 4));
 
     Term varX = solver.mkConst(solver.mkFloatingPointSort(8, 24), "x");
@@ -406,7 +410,7 @@ public class CVC5NativeAPITest {
   public void checkSimpleFPUnsat() throws CVC5ApiException {
     // x * y = 1/4 AND x > 0 AND y < 0
     Term rmTerm = solver.mkRoundingMode(RoundingMode.ROUND_NEAREST_TIES_TO_AWAY);
-    Op mkRealOp = solver.mkOp(Kind.FLOATINGPOINT_TO_FP_REAL, 8, 24);
+    Op mkRealOp = solver.mkOp(Kind.FLOATINGPOINT_TO_FP_FROM_REAL, 8, 24);
     Term oneFourth = solver.mkTerm(mkRealOp, rmTerm, solver.mkReal(1, 4));
     Term zero = solver.mkTerm(mkRealOp, rmTerm, solver.mkReal(0));
 
@@ -435,8 +439,8 @@ public class CVC5NativeAPITest {
     Term varY = solver.mkConst(solver.getRealSort(), "y");
     Term assertion1 =
         solver.mkTerm(
-            Kind.EQUAL, solver.mkTerm(Kind.MULT, varX, varY), solver.mkTerm(Kind.PLUS, varX, varY));
-    Term assertion2 = solver.mkTerm(Kind.EQUAL, solver.mkTerm(Kind.MINUS, varX, one), zero);
+            Kind.EQUAL, solver.mkTerm(Kind.MULT, varX, varY), solver.mkTerm(Kind.ADD, varX, varY));
+    Term assertion2 = solver.mkTerm(Kind.EQUAL, solver.mkTerm(Kind.SUB, varX, one), zero);
     solver.assertFormula(assertion1);
     solver.assertFormula(assertion2);
     Result satCheck = solver.checkSat();
@@ -450,7 +454,7 @@ public class CVC5NativeAPITest {
     Term varX = solver.mkConst(solver.getRealSort(), "x");
     Term varY = solver.mkConst(solver.getRealSort(), "y");
     Term assertion1 = solver.mkTerm(Kind.EQUAL, solver.mkTerm(Kind.MULT, varX, varY), threeHalf);
-    Term assertion2 = solver.mkTerm(Kind.EQUAL, solver.mkTerm(Kind.PLUS, varX, varY), threeHalf);
+    Term assertion2 = solver.mkTerm(Kind.EQUAL, solver.mkTerm(Kind.ADD, varX, varY), threeHalf);
     solver.assertFormula(assertion1);
     solver.assertFormula(assertion2);
     Result satCheck = solver.checkSat();
@@ -468,10 +472,10 @@ public class CVC5NativeAPITest {
     // this alone is SAT
     Term assertion1 =
         solver.mkTerm(
-            Kind.EQUAL, solver.mkTerm(Kind.MULT, varX, varY), solver.mkTerm(Kind.PLUS, varX, varY));
+            Kind.EQUAL, solver.mkTerm(Kind.MULT, varX, varY), solver.mkTerm(Kind.ADD, varX, varY));
     // both 2 and 3 make it UNSAT (either one)
-    Term assertion2 = solver.mkTerm(Kind.EQUAL, solver.mkTerm(Kind.PLUS, varX, varY), threeHalf);
-    Term assertion3 = solver.mkTerm(Kind.EQUAL, solver.mkTerm(Kind.MINUS, varX, one), zero);
+    Term assertion2 = solver.mkTerm(Kind.EQUAL, solver.mkTerm(Kind.ADD, varX, varY), threeHalf);
+    Term assertion3 = solver.mkTerm(Kind.EQUAL, solver.mkTerm(Kind.SUB, varX, one), zero);
     solver.push();
     solver.assertFormula(assertion1);
     Result satCheck = solver.checkSat();
@@ -501,7 +505,7 @@ public class CVC5NativeAPITest {
     assertThat(result.isSat()).isFalse();
     Exception e =
         assertThrows(
-            io.github.cvc5.api.CVC5ApiRecoverableException.class, () -> solver.getValue(assertion));
+            io.github.cvc5.CVC5ApiRecoverableException.class, () -> solver.getValue(assertion));
     assertThat(e.toString()).contains(INVALID_GETVALUE_STRING_SAT);
   }
 
@@ -517,8 +521,7 @@ public class CVC5NativeAPITest {
 
     Exception e =
         assertThrows(
-            io.github.cvc5.api.CVC5ApiRecoverableException.class,
-            () -> solver.getModel(sorts, terms));
+            io.github.cvc5.CVC5ApiRecoverableException.class, () -> solver.getModel(sorts, terms));
     assertThat(e.toString()).contains(INVALID_MODEL_STRING);
   }
 
@@ -538,8 +541,7 @@ public class CVC5NativeAPITest {
     assertThat(result.isSat()).isTrue();
     Exception e =
         assertThrows(
-            io.github.cvc5.api.CVC5ApiRecoverableException.class,
-            () -> solver.getModel(sorts, terms));
+            io.github.cvc5.CVC5ApiRecoverableException.class, () -> solver.getModel(sorts, terms));
     assertThat(e.toString()).contains("Expecting an uninterpreted sort as argument to getModel.");
   }
 
@@ -554,8 +556,7 @@ public class CVC5NativeAPITest {
     assertThat(result.isSat()).isTrue();
     Exception e =
         assertThrows(
-            io.github.cvc5.api.CVC5ApiRecoverableException.class,
-            () -> solver.getModel(sorts, terms));
+            io.github.cvc5.CVC5ApiRecoverableException.class, () -> solver.getModel(sorts, terms));
     assertThat(e.toString()).contains("Expecting a free constant as argument to getModel.");
   }
 
@@ -595,8 +596,7 @@ public class CVC5NativeAPITest {
     Term assertion = solver.mkTerm(Kind.BITVECTOR_AND, bvVar, bvVar);
 
     Exception e =
-        assertThrows(
-            io.github.cvc5.api.CVC5ApiException.class, () -> solver.assertFormula(assertion));
+        assertThrows(io.github.cvc5.CVC5ApiException.class, () -> solver.assertFormula(assertion));
     assertThat(e.toString()).contains("Expected term with sort Bool");
   }
 
@@ -610,18 +610,17 @@ public class CVC5NativeAPITest {
 
     Exception e =
         assertThrows(
-            io.github.cvc5.api.CVC5ApiException.class, () -> solver.mkTerm(Kind.AND, bvVar, bvVar));
+            io.github.cvc5.CVC5ApiException.class, () -> solver.mkTerm(Kind.AND, bvVar, bvVar));
     assertThat(e.toString()).contains("expecting a Boolean subexpression");
 
     e =
         assertThrows(
-            io.github.cvc5.api.CVC5ApiException.class,
-            () -> solver.mkTerm(Kind.AND, intVar, intVar));
+            io.github.cvc5.CVC5ApiException.class, () -> solver.mkTerm(Kind.AND, intVar, intVar));
     assertThat(e.toString()).contains("expecting a Boolean subexpression");
 
     e =
         assertThrows(
-            io.github.cvc5.api.CVC5ApiException.class,
+            io.github.cvc5.CVC5ApiException.class,
             () -> solver.mkTerm(Kind.AND, arrayVar, arrayVar));
     assertThat(e.toString()).contains("expecting a Boolean subexpression");
   }
@@ -629,14 +628,14 @@ public class CVC5NativeAPITest {
   @Test
   public void checkBvInvalidZeroWidthAssertion() {
     Exception e =
-        assertThrows(io.github.cvc5.api.CVC5ApiException.class, () -> solver.mkBitVector(0, 1));
+        assertThrows(io.github.cvc5.CVC5ApiException.class, () -> solver.mkBitVector(0, 1));
     assertThat(e.toString()).contains("Invalid argument '0' for 'size', expected a bit-width > 0");
   }
 
   @Test
   public void checkBvInvalidNegativeWidthCheckAssertion() {
     Exception e =
-        assertThrows(io.github.cvc5.api.CVC5ApiException.class, () -> solver.mkBitVector(-1, 1));
+        assertThrows(io.github.cvc5.CVC5ApiException.class, () -> solver.mkBitVector(-1, 1));
     assertThat(e.toString()).contains("Expected size '-1' to be non negative.");
   }
 
@@ -685,7 +684,7 @@ public class CVC5NativeAPITest {
     assertThat(satCheck.isSat()).isFalse();
   }
 
-  @Test
+  @Ignore
   public void checkBvDistinct() throws CVC5ApiException {
     Sort bvSort = solver.mkBitVectorSort(6);
     List<Term> bvs = new ArrayList<>();
@@ -693,6 +692,8 @@ public class CVC5NativeAPITest {
       bvs.add(solver.mkConst(bvSort, "a" + i + "_"));
     }
 
+    // TODO: this got worse in the 1.0.0 release and now this runs endlessly as well, check in later
+    // version again.
     Term distinct2 = solver.mkTerm(Kind.DISTINCT, bvs.toArray(new Term[0]));
     solver.assertFormula(distinct2);
     assertThat(solver.checkSat().isSat()).isTrue();
@@ -727,12 +728,10 @@ public class CVC5NativeAPITest {
     Term selectEq0 = solver.mkTerm(Kind.EQUAL, select123, zero);
     Term assertion = solver.mkTerm(Kind.AND, notExists, selectEq0);
 
-    // assertFormula has a return value, check?
-    solver.assertFormula(assertion);
-    Result satCheck = solver.checkSat();
-    // CVC5 fails this test as incomplete
-    assertThat(satCheck.isSatUnknown()).isTrue();
-    assertThat(satCheck.getUnknownExplanation()).isEqualTo(Result.UnknownExplanation.INCOMPLETE);
+    // CVC5 does not allow non quantifier formulas as the top most formula
+    Exception e =
+        assertThrows(io.github.cvc5.CVC5ApiException.class, () -> solver.assertFormula(assertion));
+    assertThat(e.toString()).contains("Cannot process term with free variable");
   }
 
   @Test
@@ -748,7 +747,7 @@ public class CVC5NativeAPITest {
     Term y = solver.mkConst(solver.getIntegerSort(), "y");
 
     Term first = solver.mkTerm(Kind.LT, x, five);
-    Term second = solver.mkTerm(Kind.LT, seven, solver.mkTerm(Kind.PLUS, x, y));
+    Term second = solver.mkTerm(Kind.LT, seven, solver.mkTerm(Kind.ADD, x, y));
     Term body = solver.mkTerm(Kind.OR, first, second);
 
     Term xBound = solver.mkVar(solver.getIntegerSort(), "xBound");
@@ -856,13 +855,9 @@ public class CVC5NativeAPITest {
 
     // CVC5 does not allow the usage of getValue() on bound vars!
     Exception e =
-        assertThrows(
-            io.github.cvc5.api.CVC5ApiRecoverableException.class,
-            () -> solver.getValue(boundVarBound));
+        assertThrows(io.github.cvc5.CVC5ApiException.class, () -> solver.getValue(boundVarBound));
     assertThat(e.toString()).contains(INVALID_GETVALUE_STRING_BOUND_VAR);
-    e =
-        assertThrows(
-            io.github.cvc5.api.CVC5ApiRecoverableException.class, () -> solver.getValue(bodySubst));
+    e = assertThrows(io.github.cvc5.CVC5ApiException.class, () -> solver.getValue(bodySubst));
     assertThat(e.toString()).contains(INVALID_GETVALUE_STRING_BOUND_VAR);
   }
 
@@ -908,12 +903,12 @@ public class CVC5NativeAPITest {
 
     Term quantElim = solver.getQuantifierElimination(assertion);
 
-    assertThat(solver.getValue(quantElim).toString())
-        .isEqualTo(
-            "(= (concat ((_ extract 0 0) (witness ((x0 (_ BitVec 2))) (or (= (bvmul x_bv x0) #b01) (not (= (concat #b0 ((_ extract 0 0) (bvor x_bv (bvneg x_bv)))) #b01))))) #b0) #b01)");
     assertThat(quantElim.toString())
         .isEqualTo(
             "(= (bvmul x_bv (witness ((x0 (_ BitVec 2))) (or (= (bvmul x_bv x0) #b01) (not (= (concat #b0 ((_ extract 0 0) (bvor x_bv (bvneg x_bv)))) #b01))))) #b01)");
+
+    // TODO: formely you could get a better result Term by using getValue(). But now getValue() only
+    // works after SAT since 1.0.0 and then getValue() prints trivial statements like false.
   }
 
   @Test
@@ -922,10 +917,10 @@ public class CVC5NativeAPITest {
     Term five = solver.mkInteger(5);
     Term oneTwoThree = solver.mkInteger(123);
 
-    Term xInt = solver.mkVar(solver.getIntegerSort(), "x_int");
+    Term xInt = solver.mkConst(solver.getIntegerSort(), "x_int");
 
     Sort arraySort = solver.mkArraySort(solver.getIntegerSort(), solver.getIntegerSort());
-    Term arr = solver.mkVar(arraySort, "arr");
+    Term arr = solver.mkConst(arraySort, "arr");
 
     Term xEq123 = solver.mkTerm(Kind.EQUAL, xInt, oneTwoThree);
     Term selAat5Eq123 =
@@ -947,10 +942,10 @@ public class CVC5NativeAPITest {
     Term five = solver.mkInteger(5);
     Term oneTwoThree = solver.mkInteger(123);
 
-    Term xInt = solver.mkVar(solver.getIntegerSort(), "x_int");
+    Term xInt = solver.mkConst(solver.getIntegerSort(), "x_int");
 
     Sort arraySort = solver.mkArraySort(solver.getIntegerSort(), solver.getIntegerSort());
-    Term arr = solver.mkVar(arraySort, "arr");
+    Term arr = solver.mkConst(arraySort, "arr");
 
     Term xEq123 = solver.mkTerm(Kind.EQUAL, xInt, oneTwoThree);
     Term selAat5Eq123 =
@@ -973,8 +968,8 @@ public class CVC5NativeAPITest {
     solver.setOption("produce-unsat-cores", "true");
 
     Sort boolSort = solver.getBooleanSort();
-    Term a = solver.mkVar(boolSort, "a");
-    Term b = solver.mkVar(boolSort, "b");
+    Term a = solver.mkConst(boolSort, "a");
+    Term b = solver.mkConst(boolSort, "b");
 
     Term aAndb = solver.mkTerm(Kind.AND, a, b);
     Term notaOrb = solver.mkTerm(Kind.NOT, solver.mkTerm(Kind.OR, a, b));
@@ -1011,8 +1006,8 @@ public class CVC5NativeAPITest {
     Sort mySortToInt = solver.mkFunctionSort(mySort, intSort);
     Sort intToBool = solver.mkFunctionSort(intSort, boolSort);
 
-    Term xTyped = solver.mkVar(mySort, "x");
-    Term yTyped = solver.mkVar(mySort, "y");
+    Term xTyped = solver.mkConst(mySort, "x");
+    Term yTyped = solver.mkConst(mySort, "y");
 
     // declare UFs
     Term f = solver.mkConst(mySortToInt, "f");
@@ -1021,7 +1016,7 @@ public class CVC5NativeAPITest {
     // Apply UFs
     Term fx = solver.mkTerm(Kind.APPLY_UF, f, xTyped);
     Term fy = solver.mkTerm(Kind.APPLY_UF, f, yTyped);
-    Term sum = solver.mkTerm(Kind.PLUS, fx, fy);
+    Term sum = solver.mkTerm(Kind.ADD, fx, fy);
     Term p0 = solver.mkTerm(Kind.APPLY_UF, p, zero);
     Term pfy = solver.mkTerm(Kind.APPLY_UF, p, fy);
 
@@ -1084,7 +1079,7 @@ public class CVC5NativeAPITest {
     // Apply UFs
     Term fx = solver.mkTerm(Kind.APPLY_UF, f, xInt);
     Term fy = solver.mkTerm(Kind.APPLY_UF, f, yInt);
-    Term plus = solver.mkTerm(Kind.PLUS, fx, fy);
+    Term plus = solver.mkTerm(Kind.ADD, fx, fy);
 
     // Make some assumptions
     Term assumptions1 =
@@ -1097,8 +1092,8 @@ public class CVC5NativeAPITest {
     Term assumptions2 =
         solver.mkTerm(
             Kind.AND,
-            solver.mkTerm(Kind.EQUAL, fx, solver.mkTerm(Kind.PLUS, xInt, one)),
-            solver.mkTerm(Kind.EQUAL, fy, solver.mkTerm(Kind.MINUS, yInt, one)),
+            solver.mkTerm(Kind.EQUAL, fx, solver.mkTerm(Kind.ADD, xInt, one)),
+            solver.mkTerm(Kind.EQUAL, fy, solver.mkTerm(Kind.SUB, yInt, one)),
             solver.mkTerm(Kind.EQUAL, plus, yInt));
 
     solver.assertFormula(assumptions1);
@@ -1128,7 +1123,7 @@ public class CVC5NativeAPITest {
     // Apply UFs
     Term fx = solver.mkTerm(Kind.APPLY_UF, f, xInt);
     Term fy = solver.mkTerm(Kind.APPLY_UF, f, yInt);
-    Term plus = solver.mkTerm(Kind.PLUS, fx, fy);
+    Term plus = solver.mkTerm(Kind.ADD, fx, fy);
 
     Term plusEqx = solver.mkTerm(Kind.EQUAL, plus, xInt);
     Term plusEqy = solver.mkTerm(Kind.EQUAL, plus, yInt);
@@ -1139,8 +1134,8 @@ public class CVC5NativeAPITest {
     Term assumptions =
         solver.mkTerm(
             Kind.AND,
-            solver.mkTerm(Kind.EQUAL, fx, solver.mkTerm(Kind.PLUS, xInt, one)),
-            solver.mkTerm(Kind.EQUAL, fy, solver.mkTerm(Kind.MINUS, yInt, one)),
+            solver.mkTerm(Kind.EQUAL, fx, solver.mkTerm(Kind.ADD, xInt, one)),
+            solver.mkTerm(Kind.EQUAL, fy, solver.mkTerm(Kind.SUB, yInt, one)),
             xEqyImplplusEqxAndy);
 
     solver.assertFormula(assumptions);
