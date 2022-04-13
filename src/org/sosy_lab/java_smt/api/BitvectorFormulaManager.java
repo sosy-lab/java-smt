@@ -67,9 +67,68 @@ public interface BitvectorFormulaManager {
 
   BitvectorFormula subtract(BitvectorFormula number1, BitvectorFormula number2);
 
-  BitvectorFormula divide(BitvectorFormula number1, BitvectorFormula number2, boolean signed);
+  /**
+   * This method returns the division for two bitvector formulas.
+   *
+   * <p>For signed bitvectors, the result is rounded towards zero (also called "truncated integer
+   * division", similar to the division in the C99 standard), e.g., a user can assume the following
+   * equations:
+   *
+   * <ul>
+   *   <li>10 / 5 = 2
+   *   <li>10 / 3 = 3
+   *   <li>10 / (-3) = -3
+   *   <li>-10 / 5 = -2
+   *   <li>-10 / 3 = -3
+   *   <li>-10 / (-3) = 3
+   * </ul>
+   *
+   * <p>If the denumerator evaluates to zero (division-by-zero), either directly as value or
+   * indirectly via an additional constraint, then the result of the division is defined as:
+   *
+   * <ul>
+   *   <li>"-1" interpreted as bitvector (i.e., all bits set to "1"), if the numerator is
+   *       non-negative, and
+   *   <li>"1" interpreted as bitvector (i.e., all bits set to "0", except the last bit), if the
+   *       numerator is negative.
+   * </ul>
+   *
+   * <p>We refer to the SMTLIB standard for the division and modulo operators in BV theory.
+   *
+   * <p>Note: Some solvers, e.g., CVC4, return an arbitrary value when exploring a division-by-zero.
+   * This is not compliant to the SMTLIB standard, but sadly happens.
+   *
+   * @param numerator dividend
+   * @param denumerator divisor
+   * @param signed whether to interpret all operands as signed or as unsigned numbers.
+   */
+  BitvectorFormula divide(BitvectorFormula numerator, BitvectorFormula denumerator, boolean signed);
 
-  BitvectorFormula modulo(BitvectorFormula number1, BitvectorFormula number2, boolean signed);
+  /**
+   * This method returns the remainder (modulo) for two bitvector formulas.
+   *
+   * <p>For signed bitvectors, the sign of the result follows the sign of the numerator, e.g., a
+   * user can assume the following equations:
+   *
+   * <ul>
+   *   <li>10 % 5 = 0
+   *   <li>10 % 3 = 1
+   *   <li>10 % (-3) = 1
+   *   <li>-10 % 5 = 0
+   *   <li>-10 % 3 = -1
+   *   <li>-10 % (-3) = -1
+   * </ul>
+   *
+   * <p>If the denumerator evaluates to zero (modulo-by-zero), either directly as value or
+   * indirectly via an additional constraint, then the result of the modulo operation is defined as
+   * the numerator itself. We refer to the SMTLIB standard for the division and modulo operators in
+   * BV theory.
+   *
+   * @param numerator dividend
+   * @param denumerator divisor
+   * @param signed whether to interpret all operands as signed or as unsigned numbers.
+   */
+  BitvectorFormula modulo(BitvectorFormula numerator, BitvectorFormula denumerator, boolean signed);
 
   BitvectorFormula multiply(BitvectorFormula number1, BitvectorFormula number2);
 

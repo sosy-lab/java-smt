@@ -22,6 +22,7 @@ import edu.stanford.CVC4.Type;
 import edu.stanford.CVC4.vectorExpr;
 import java.math.BigInteger;
 import java.util.List;
+import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
 
 public class CVC4BitvectorFormulaManager
@@ -119,21 +120,33 @@ public class CVC4BitvectorFormulaManager
   }
 
   @Override
-  protected Expr divide(Expr pParam1, Expr pParam2, boolean signed) {
-    if (signed) {
-      return exprManager.mkExpr(Kind.BITVECTOR_SDIV, pParam1, pParam2);
-    } else {
-      return exprManager.mkExpr(Kind.BITVECTOR_UDIV, pParam1, pParam2);
-    }
+  protected Expr divide(Expr numerator, Expr denumerator, boolean signed) {
+    final Kind operator = signed ? Kind.BITVECTOR_SDIV : Kind.BITVECTOR_UDIV;
+    final Expr division = exprManager.mkExpr(operator, numerator, denumerator);
+    // CVC4 does not align with SMTLIB standard when it comes to divide-by-zero.
+    // For divide-by-zero, we compute the result as: return "1" with the opposite
+    // sign than the numerator.
+    final int bitsize = ((BitvectorType) formulaCreator.getFormulaType(numerator)).getSize();
+    final Expr zero = makeBitvectorImpl(bitsize, 0);
+    final Expr one = makeBitvectorImpl(bitsize, 1);
+    final Expr maxValue = makeBitvectorImpl(bitsize, -1); // all bits equal "1"
+    return exprManager.mkExpr(
+        Kind.ITE,
+        exprManager.mkExpr(Kind.EQUAL, denumerator, zero),
+        exprManager.mkExpr(Kind.ITE, lessThan(numerator, zero, signed), one, maxValue),
+        division);
   }
 
   @Override
-  protected Expr modulo(Expr pParam1, Expr pParam2, boolean signed) {
-    if (signed) {
-      return exprManager.mkExpr(Kind.BITVECTOR_SREM, pParam1, pParam2);
-    } else {
-      return exprManager.mkExpr(Kind.BITVECTOR_UREM, pParam1, pParam2);
-    }
+  protected Expr modulo(Expr numerator, Expr denumerator, boolean signed) {
+    final Kind operator = signed ? Kind.BITVECTOR_SREM : Kind.BITVECTOR_UREM;
+    final Expr remainder = exprManager.mkExpr(operator, numerator, denumerator);
+    // CVC4 does not align with SMTLIB standard when it comes to modulo-by-zero.
+    // For modulo-by-zero, we compute the result as: "return the numerator".
+    final int bitsize = ((BitvectorType) formulaCreator.getFormulaType(numerator)).getSize();
+    final Expr zero = makeBitvectorImpl(bitsize, 0);
+    return exprManager.mkExpr(
+        Kind.ITE, exprManager.mkExpr(Kind.EQUAL, denumerator, zero), numerator, remainder);
   }
 
   @Override

@@ -352,6 +352,20 @@ public class SolverVisitorTest extends SolverBasedTest0 {
                 case NOT:
                   assertThat(pArgs).hasSize(1);
                   break;
+                case ITE:
+                  assertThat(pArgs).hasSize(3);
+                  break;
+                case EQ:
+                case BV_SLT:
+                case BV_SLE:
+                case BV_SGT:
+                case BV_SGE:
+                case BV_ULT:
+                case BV_ULE:
+                case BV_UGT:
+                case BV_UGE:
+                  assertThat(pArgs).hasSize(2);
+                  break;
                 case BV_NOT:
                 case BV_NEG:
                   // Yices is special in some cases
