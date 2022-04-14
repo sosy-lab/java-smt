@@ -118,9 +118,6 @@ public interface BitvectorFormulaManager {
    *
    * <p>We refer to the SMTLIB standard for the division and modulo operators in BV theory.
    *
-   * <p>Note: Some solvers, e.g., CVC4, return an arbitrary value when exploring a division-by-zero.
-   * This is not compliant to the SMTLIB standard, but sadly happens.
-   *
    * @param numerator dividend
    * @param denumerator divisor
    * @param signed whether to interpret all operands as signed or as unsigned numbers.
