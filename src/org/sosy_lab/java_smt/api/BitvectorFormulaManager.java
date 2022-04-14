@@ -57,14 +57,37 @@ public interface BitvectorFormulaManager {
    */
   BitvectorFormula makeVariable(BitvectorType type, String pVar);
 
+  /** This method returns the length of a bitvector, also denoted as bit-size. */
   int getLength(BitvectorFormula number);
 
   // Numeric Operations
 
+  /**
+   * This method returns the negated number, i.e., it is multiplied by "-1". The given number is
+   * interpreted as signed bitvector.
+   */
   BitvectorFormula negate(BitvectorFormula number);
 
+  /**
+   * This method returns the addition of the given bitvectors. The result has the same length as the
+   * given parameters. There can be an overflow, i.e., as one would expect from bitvector logic.
+   * There is no difference in signed and unsigned numbers.
+   *
+   * @param number1 a Formula
+   * @param number2 a Formula
+   * @return {@code number1 + number2}
+   */
   BitvectorFormula add(BitvectorFormula number1, BitvectorFormula number2);
 
+  /**
+   * This method returns the subtraction of the given bitvectors. The result has the same length as
+   * the given parameters. There can be an overflow, i.e., as one would expect from bitvector logic.
+   * There is no difference in signed and unsigned numbers.
+   *
+   * @param number1 a Formula
+   * @param number2 a Formula
+   * @return {@code number1 - number2}
+   */
   BitvectorFormula subtract(BitvectorFormula number1, BitvectorFormula number2);
 
   /**
@@ -130,6 +153,15 @@ public interface BitvectorFormulaManager {
    */
   BitvectorFormula modulo(BitvectorFormula numerator, BitvectorFormula denumerator, boolean signed);
 
+  /**
+   * This method returns the multiplication of the given bitvectors. The result has the same length
+   * as the given parameters. There can be an overflow, i.e., as one would expect from bitvector
+   * logic. There is no difference in signed and unsigned numbers.
+   *
+   * @param number1 a Formula
+   * @param number2 a Formula
+   * @return {@code number1 - number2}
+   */
   BitvectorFormula multiply(BitvectorFormula number1, BitvectorFormula number2);
 
   // ----------------- Numeric relations -----------------
@@ -148,41 +180,57 @@ public interface BitvectorFormulaManager {
   // Bitvector operations
 
   /**
-   * Creates a formula representing a negation of the argument.
+   * This method returns the bit-wise complement of the given bitvector.
    *
    * @param bits Formula
-   * @return {@code !f1}
+   * @return {@code ~bits}
    */
   BitvectorFormula not(BitvectorFormula bits);
 
   /**
-   * Creates a formula representing an AND of the two arguments.
+   * This method returns the bit-wise AND of the given bitvectors.
    *
    * @param bits1 a Formula
    * @param bits2 a Formula
-   * @return {@code f1 & f2}
+   * @return {@code bits1 & bits2}
    */
   BitvectorFormula and(BitvectorFormula bits1, BitvectorFormula bits2);
 
   /**
-   * Creates a formula representing an OR of the two arguments.
+   * This method returns the bit-wise OR of the given bitvectors.
    *
    * @param bits1 a Formula
    * @param bits2 a Formula
-   * @return {@code f1 | f2}
+   * @return {@code bits1 | bits2}
    */
   BitvectorFormula or(BitvectorFormula bits1, BitvectorFormula bits2);
 
+  /**
+   * This method returns the bit-wise XOR of the given bitvectors.
+   *
+   * @param bits1 a Formula
+   * @param bits2 a Formula
+   * @return {@code bits1 ^ bits2}
+   */
   BitvectorFormula xor(BitvectorFormula bits1, BitvectorFormula bits2);
 
   /**
-   * Return a term representing the (arithmetic if signed is true) right shift of number by toShift.
+   * This method returns a term representing the (arithmetic if signed is true) right shift of
+   * number by toShift. The result has the same length as the given number. On the left side, we
+   * fill up the most significant bits with ones, if the number is signed and negative, else with
+   * zeroes.
    */
   BitvectorFormula shiftRight(BitvectorFormula number, BitvectorFormula toShift, boolean signed);
 
+  /**
+   * This method returns a term representing the (arithmetic if signed is true) left shift of number
+   * by toShift. The result has the same length as the given number. On the right side, we fill up
+   * the least significant bits with zeroes.
+   */
   BitvectorFormula shiftLeft(BitvectorFormula number, BitvectorFormula toShift);
 
-  BitvectorFormula concat(BitvectorFormula number, BitvectorFormula append);
+  /** This method returns the concatenation of two bitvectors. */
+  BitvectorFormula concat(BitvectorFormula prefix, BitvectorFormula suffix);
 
   /**
    * Extract a range of bits from a bitvector.
@@ -198,7 +246,8 @@ public interface BitvectorFormulaManager {
   BitvectorFormula extract(BitvectorFormula number, int msb, int lsb);
 
   /**
-   * Extend a bitvector to the left (add most significant bits).
+   * Extend a bitvector to the left (add most significant bits). If signed is set and the given
+   * number is negative, then the bit "1" will be added several times, else "0".
    *
    * @param number The bitvector to extend.
    * @param extensionBits How many bits to add.

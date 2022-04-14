@@ -210,7 +210,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
 
   @Override
   public BitvectorFormula and(BitvectorFormula pBits1, BitvectorFormula pBits2) {
-    assert getLength(pBits1) == getLength(pBits2);
+    checkSameSize(pBits1, pBits2, "combine");
     TFormulaInfo param1 = extractInfo(pBits1);
     TFormulaInfo param2 = extractInfo(pBits2);
 
@@ -221,7 +221,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
 
   @Override
   public BitvectorFormula or(BitvectorFormula pBits1, BitvectorFormula pBits2) {
-    assert getLength(pBits1) == getLength(pBits2);
+    checkSameSize(pBits1, pBits2, "combine");
     TFormulaInfo param1 = extractInfo(pBits1);
     TFormulaInfo param2 = extractInfo(pBits2);
 
@@ -232,7 +232,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
 
   @Override
   public BitvectorFormula xor(BitvectorFormula pBits1, BitvectorFormula pBits2) {
-    assert getLength(pBits1) == getLength(pBits2);
+    checkSameSize(pBits1, pBits2, "combine");
     TFormulaInfo param1 = extractInfo(pBits1);
     TFormulaInfo param2 = extractInfo(pBits2);
 
@@ -326,6 +326,10 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
 
   @Override
   public final BitvectorFormula extract(BitvectorFormula pNumber, int pMsb, int pLsb) {
+    final int bitsize = getLength(pNumber);
+    checkArgument(0 <= pLsb, "index out of bounds (negative index %d)", pLsb);
+    checkArgument(pLsb <= pMsb, "invalid range (lsb %d larger than msb %d)", pLsb, pMsb);
+    checkArgument(pMsb < bitsize, "index out of bounds (index %d beyond length %d)", pMsb, bitsize);
     return wrap(extract(extractInfo(pNumber), pMsb, pLsb));
   }
 
@@ -334,6 +338,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
   @Override
   public final BitvectorFormula extend(
       BitvectorFormula pNumber, int pExtensionBits, boolean pSigned) {
+    checkArgument(0 <= pExtensionBits, "can not extend a negative number of bits");
     return wrap(extend(extractInfo(pNumber), pExtensionBits, pSigned));
   }
 
