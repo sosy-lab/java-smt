@@ -327,9 +327,9 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
   @Override
   public final BitvectorFormula extract(BitvectorFormula pNumber, int pMsb, int pLsb) {
     final int bitsize = getLength(pNumber);
-    checkArgument(0 <= pLsb, "index out of bounds (negative index %d)", pLsb);
-    checkArgument(pLsb <= pMsb, "invalid range (lsb %d larger than msb %d)", pLsb, pMsb);
-    checkArgument(pMsb < bitsize, "index out of bounds (index %d beyond length %d)", pMsb, bitsize);
+    checkArgument(0 <= pLsb, "index out of bounds (negative index %s)", pLsb);
+    checkArgument(pLsb <= pMsb, "invalid range (lsb %s larger than msb %s)", pLsb, pMsb);
+    checkArgument(pMsb < bitsize, "index out of bounds (index %s beyond length %s)", pMsb, bitsize);
     return wrap(extract(extractInfo(pNumber), pMsb, pLsb));
   }
 
