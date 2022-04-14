@@ -194,8 +194,8 @@ public class SolverVisitorTest extends SolverBasedTest0 {
               bvmgr.modulo(x, y, false),
               bvmgr.not(x),
               bvmgr.negate(x),
-              bvmgr.extract(x, 7, 5, true),
-              bvmgr.extract(x, 7, 5, false),
+              bvmgr.extract(x, 7, 5),
+              bvmgr.extract(x, 7, 5),
               bvmgr.concat(x, y))) {
         mgr.visit(f, new FunctionDeclarationVisitorNoUF());
         if (Solvers.PRINCESS != solver) {

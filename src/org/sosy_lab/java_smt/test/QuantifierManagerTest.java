@@ -782,7 +782,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     BooleanFormula qFreeF = qmgr.eliminateQuantifiers(f);
 
     assertThatFormula(qFreeF)
-        .isEquivalentTo(bvmgr.equal(bvmgr.extract(xx, 0, 0, false), bvmgr.makeBitvector(1, 1)));
+        .isEquivalentTo(bvmgr.equal(bvmgr.extract(xx, 0, 0), bvmgr.makeBitvector(1, 1)));
   }
 
   /** Quant elim test based on a crash in Z3. */

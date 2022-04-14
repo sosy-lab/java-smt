@@ -42,7 +42,7 @@ public class CVC4BitvectorFormulaManager
   }
 
   @Override
-  protected Expr extract(Expr pParam1, int pMsb, int pLsb, boolean signed) {
+  protected Expr extract(Expr pParam1, int pMsb, int pLsb) {
     Expr ext = exprManager.mkConst(new BitVectorExtract(pMsb, pLsb));
     return exprManager.mkExpr(Kind.BITVECTOR_EXTRACT, ext, pParam1);
   }

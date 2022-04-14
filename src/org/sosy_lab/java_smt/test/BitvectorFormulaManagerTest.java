@@ -314,7 +314,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0 {
   public void bvExtractTooLargeNumEndSigned() {
     // Use bv > 1 because of Boolector
     BitvectorFormula bv = bvmgr.makeBitvector(2, 4);
-    bvmgr.extract(bv, 5, 0, true);
+    bvmgr.extract(bv, 5, 0);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -322,7 +322,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0 {
   public void bvExtractTooLargeNumStartSigned() {
     // Use bv > 1 because of Boolector
     BitvectorFormula bv = bvmgr.makeBitvector(2, 4);
-    bvmgr.extract(bv, 4, 5, true);
+    bvmgr.extract(bv, 4, 5);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -330,7 +330,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0 {
   public void bvExtractTooLargeNumStartAltSigned() {
     // Use bv > 1 because of Boolector
     BitvectorFormula bv = bvmgr.makeBitvector(2, 4);
-    bvmgr.extract(bv, 3, 4, true);
+    bvmgr.extract(bv, 3, 4);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -338,7 +338,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0 {
   public void bvExtractNegNumEnd() {
     // Use bv > 1 because of Boolector
     BitvectorFormula bv = bvmgr.makeBitvector(2, 4);
-    bvmgr.extract(bv, -1, 0, true);
+    bvmgr.extract(bv, -1, 0);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -346,7 +346,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0 {
   public void bvExtractNegNumStart() {
     // Use bv > 1 because of Boolector
     BitvectorFormula bv = bvmgr.makeBitvector(2, 4);
-    bvmgr.extract(bv, 1, -1, true);
+    bvmgr.extract(bv, 1, -1);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -354,7 +354,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0 {
   public void bvExtractNegNumStartEnd() {
     // Use bv > 1 because of Boolector
     BitvectorFormula bv = bvmgr.makeBitvector(2, 4);
-    bvmgr.extract(bv, -1, -1, true);
+    bvmgr.extract(bv, -1, -1);
   }
 
   @Test(expected = IllegalArgumentException.class)

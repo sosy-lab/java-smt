@@ -197,7 +197,7 @@ public class Yices2BitvectorFormulaManager
   }
 
   @Override
-  protected Integer extract(Integer pNumber, int pMsb, int pLsb, boolean pSigned) {
+  protected Integer extract(Integer pNumber, int pMsb, int pLsb) {
     return yices_bvextract(pNumber, pLsb, pMsb);
   }
 

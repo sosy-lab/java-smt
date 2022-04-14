@@ -325,22 +325,16 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
   protected abstract TFormulaInfo concat(TFormulaInfo number, TFormulaInfo pAppend);
 
   @Override
-  public final BitvectorFormula extract(
-      BitvectorFormula pNumber, int pMsb, int pLsb, boolean pSigned) {
-    TFormulaInfo param = extractInfo(pNumber);
-
-    return wrap(extract(param, pMsb, pLsb, pSigned));
+  public final BitvectorFormula extract(BitvectorFormula pNumber, int pMsb, int pLsb) {
+    return wrap(extract(extractInfo(pNumber), pMsb, pLsb));
   }
 
-  protected abstract TFormulaInfo extract(
-      TFormulaInfo pNumber, int pMsb, int pLsb, boolean pSigned);
+  protected abstract TFormulaInfo extract(TFormulaInfo pNumber, int pMsb, int pLsb);
 
   @Override
   public final BitvectorFormula extend(
       BitvectorFormula pNumber, int pExtensionBits, boolean pSigned) {
-    TFormulaInfo param = extractInfo(pNumber);
-
-    return wrap(extend(param, pExtensionBits, pSigned));
+    return wrap(extend(extractInfo(pNumber), pExtensionBits, pSigned));
   }
 
   protected abstract TFormulaInfo extend(TFormulaInfo pNumber, int pExtensionBits, boolean pSigned);

@@ -185,14 +185,17 @@ public interface BitvectorFormulaManager {
   BitvectorFormula concat(BitvectorFormula number, BitvectorFormula append);
 
   /**
-   * @param number The bitvector to extract.
-   * @param msb Upper index. Must be greater than or equal to 0 and less than the bit-width of
-   *     number.
-   * @param lsb Lower index. Must be less than or equal to msb and greater or equal to 0.
-   * @param signed Whether the extension should depend on the sign bit. Note: Some SMT-Solvers
-   *     ignore this. (i.e. Boolector)
+   * Extract a range of bits from a bitvector.
+   *
+   * <p>If msb equals lsb, then a single bit will be returned, i.e., the bit from the given
+   * position. If lsb equals 0 and msb equals bitsize-1, then the complete bitvector will be
+   * returned.
+   *
+   * @param number from where the bits are extracted.
+   * @param msb Upper index. Must be in interval from lsb to bitsize-1.
+   * @param lsb Lower index. Must be in interval from 0 to msb.
    */
-  BitvectorFormula extract(BitvectorFormula number, int msb, int lsb, boolean signed);
+  BitvectorFormula extract(BitvectorFormula number, int msb, int lsb);
 
   /**
    * Extend a bitvector to the left (add most significant bits).

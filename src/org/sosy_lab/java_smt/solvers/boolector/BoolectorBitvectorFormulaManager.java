@@ -193,7 +193,7 @@ class BoolectorBitvectorFormulaManager
   }
 
   @Override
-  public Long extract(Long pNode, int pMsb, int pLsb, boolean pSigned) {
+  public Long extract(Long pNode, int pMsb, int pLsb) {
     return BtorJNI.boolector_slice(btor, pNode, pMsb, pLsb);
   }
 
