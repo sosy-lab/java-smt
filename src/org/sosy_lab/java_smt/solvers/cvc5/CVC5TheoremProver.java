@@ -8,7 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
-import io.github.cvc5.api.Solver;
+import io.github.cvc5.Solver;
 import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;

@@ -8,19 +8,19 @@
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
-import static io.github.cvc5.api.Kind.DIVISION;
-import static io.github.cvc5.api.Kind.INTS_DIVISION;
-import static io.github.cvc5.api.Kind.INTS_MODULUS;
-import static io.github.cvc5.api.Kind.MINUS;
-import static io.github.cvc5.api.Kind.MULT;
-import static io.github.cvc5.api.Kind.PLUS;
+import static io.github.cvc5.Kind.ADD;
+import static io.github.cvc5.Kind.DIVISION;
+import static io.github.cvc5.Kind.INTS_DIVISION;
+import static io.github.cvc5.Kind.INTS_MODULUS;
+import static io.github.cvc5.Kind.MULT;
+import static io.github.cvc5.Kind.SUB;
 
 import com.google.common.collect.ImmutableSet;
-import io.github.cvc5.api.CVC5ApiException;
-import io.github.cvc5.api.Kind;
-import io.github.cvc5.api.Solver;
-import io.github.cvc5.api.Sort;
-import io.github.cvc5.api.Term;
+import io.github.cvc5.CVC5ApiException;
+import io.github.cvc5.Kind;
+import io.github.cvc5.Solver;
+import io.github.cvc5.Sort;
+import io.github.cvc5.Term;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -47,7 +47,7 @@ abstract class CVC5NumeralFormulaManager<
    */
   @SuppressWarnings("unused")
   private static final ImmutableSet<Kind> NUMERIC_FUNCTIONS =
-      ImmutableSet.of(PLUS, MINUS, MULT, DIVISION, INTS_DIVISION, INTS_MODULUS);
+      ImmutableSet.of(ADD, SUB, MULT, DIVISION, INTS_DIVISION, INTS_MODULUS);
 
   protected final Solver solver;
 
@@ -147,17 +147,17 @@ abstract class CVC5NumeralFormulaManager<
 
   @Override
   protected Term negate(Term pParam1) {
-    return solver.mkTerm(Kind.UMINUS, pParam1);
+    return solver.mkTerm(Kind.NEG, pParam1);
   }
 
   @Override
   protected Term add(Term pParam1, Term pParam2) {
-    return solver.mkTerm(Kind.PLUS, pParam1, pParam2);
+    return solver.mkTerm(Kind.ADD, pParam1, pParam2);
   }
 
   @Override
   protected Term subtract(Term pParam1, Term pParam2) {
-    return solver.mkTerm(Kind.MINUS, pParam1, pParam2);
+    return solver.mkTerm(Kind.SUB, pParam1, pParam2);
   }
 
   @Override

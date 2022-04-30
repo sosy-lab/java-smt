@@ -8,8 +8,8 @@
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
-import io.github.cvc5.api.Solver;
-import io.github.cvc5.api.Term;
+import io.github.cvc5.Solver;
+import io.github.cvc5.Term;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;

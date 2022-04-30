@@ -457,6 +457,8 @@ public class CVC5NativeAPITest {
     assertThat(satCheck.isSat()).isTrue();
   }
 
+  // TODO: schreibe test von fp variable nach real bzw. umgekehrt. ALso fp formel -> real formel
+
   @Test
   public void checkSimpleFPSat() throws CVC5ApiException {
     // x * y = 1/4

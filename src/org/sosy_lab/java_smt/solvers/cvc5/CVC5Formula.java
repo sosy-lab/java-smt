@@ -9,7 +9,7 @@
 package org.sosy_lab.java_smt.solvers.cvc5;
 
 import com.google.errorprone.annotations.Immutable;
-import io.github.cvc5.api.Term;
+import io.github.cvc5.Term;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;

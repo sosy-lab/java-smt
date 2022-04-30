@@ -8,10 +8,10 @@
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
-import io.github.cvc5.api.Kind;
-import io.github.cvc5.api.Solver;
-import io.github.cvc5.api.Sort;
-import io.github.cvc5.api.Term;
+import io.github.cvc5.Kind;
+import io.github.cvc5.Solver;
+import io.github.cvc5.Sort;
+import io.github.cvc5.Term;
 import java.util.Collection;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;

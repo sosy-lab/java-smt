@@ -15,11 +15,11 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
-import io.github.cvc5.api.CVC5ApiException;
-import io.github.cvc5.api.Kind;
-import io.github.cvc5.api.Solver;
-import io.github.cvc5.api.Sort;
-import io.github.cvc5.api.Term;
+import io.github.cvc5.CVC5ApiException;
+import io.github.cvc5.Kind;
+import io.github.cvc5.Solver;
+import io.github.cvc5.Sort;
+import io.github.cvc5.Term;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -421,9 +421,9 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
           .put(Kind.XOR, FunctionDeclarationKind.XOR)
           .put(Kind.ITE, FunctionDeclarationKind.ITE)
           .put(Kind.APPLY_UF, FunctionDeclarationKind.UF)
-          .put(Kind.PLUS, FunctionDeclarationKind.ADD)
+          .put(Kind.ADD, FunctionDeclarationKind.ADD)
           .put(Kind.MULT, FunctionDeclarationKind.MUL)
-          .put(Kind.MINUS, FunctionDeclarationKind.SUB)
+          .put(Kind.SUB, FunctionDeclarationKind.SUB)
           .put(Kind.DIVISION, FunctionDeclarationKind.DIV)
           .put(Kind.LT, FunctionDeclarationKind.LT)
           .put(Kind.LEQ, FunctionDeclarationKind.LTE)
@@ -459,15 +459,15 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
           .put(Kind.TO_INTEGER, FunctionDeclarationKind.FLOOR)
           .put(Kind.FLOATINGPOINT_TO_SBV, FunctionDeclarationKind.FP_CASTTO_SBV)
           .put(Kind.FLOATINGPOINT_TO_UBV, FunctionDeclarationKind.FP_CASTTO_UBV)
-          .put(Kind.FLOATINGPOINT_TO_FP_FLOATINGPOINT, FunctionDeclarationKind.FP_CASTTO_FP)
-          .put(Kind.FLOATINGPOINT_TO_FP_SIGNED_BITVECTOR, FunctionDeclarationKind.BV_SCASTTO_FP)
-          .put(Kind.FLOATINGPOINT_TO_FP_UNSIGNED_BITVECTOR, FunctionDeclarationKind.BV_UCASTTO_FP)
-          .put(Kind.FLOATINGPOINT_ISNAN, FunctionDeclarationKind.FP_IS_NAN)
-          .put(Kind.FLOATINGPOINT_ISNEG, FunctionDeclarationKind.FP_IS_NEGATIVE)
-          .put(Kind.FLOATINGPOINT_ISINF, FunctionDeclarationKind.FP_IS_INF)
-          .put(Kind.FLOATINGPOINT_ISN, FunctionDeclarationKind.FP_IS_NORMAL)
-          .put(Kind.FLOATINGPOINT_ISSN, FunctionDeclarationKind.FP_IS_SUBNORMAL)
-          .put(Kind.FLOATINGPOINT_ISZ, FunctionDeclarationKind.FP_IS_ZERO)
+          .put(Kind.FLOATINGPOINT_TO_FP_FROM_FP, FunctionDeclarationKind.FP_CASTTO_FP)
+          .put(Kind.FLOATINGPOINT_TO_SBV, FunctionDeclarationKind.BV_SCASTTO_FP)
+          .put(Kind.FLOATINGPOINT_TO_UBV, FunctionDeclarationKind.BV_UCASTTO_FP)
+          .put(Kind.FLOATINGPOINT_IS_NAN, FunctionDeclarationKind.FP_IS_NAN)
+          .put(Kind.FLOATINGPOINT_IS_NEG, FunctionDeclarationKind.FP_IS_NEGATIVE)
+          .put(Kind.FLOATINGPOINT_IS_INF, FunctionDeclarationKind.FP_IS_INF)
+          .put(Kind.FLOATINGPOINT_IS_NORMAL, FunctionDeclarationKind.FP_IS_NORMAL)
+          .put(Kind.FLOATINGPOINT_IS_SUBNORMAL, FunctionDeclarationKind.FP_IS_SUBNORMAL)
+          .put(Kind.FLOATINGPOINT_IS_ZERO, FunctionDeclarationKind.FP_IS_ZERO)
           .put(Kind.FLOATINGPOINT_EQ, FunctionDeclarationKind.FP_EQ)
           .put(Kind.FLOATINGPOINT_ABS, FunctionDeclarationKind.FP_ABS)
           .put(Kind.FLOATINGPOINT_MAX, FunctionDeclarationKind.FP_MAX)
@@ -482,7 +482,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
           .put(Kind.FLOATINGPOINT_GT, FunctionDeclarationKind.FP_GT)
           .put(Kind.FLOATINGPOINT_GEQ, FunctionDeclarationKind.FP_GE)
           .put(Kind.FLOATINGPOINT_RTI, FunctionDeclarationKind.FP_ROUND_TO_INTEGRAL)
-          .put(Kind.FLOATINGPOINT_TO_FP_IEEE_BITVECTOR, FunctionDeclarationKind.FP_AS_IEEEBV)
+          .put(Kind.FLOATINGPOINT_TO_FP_FROM_IEEE_BV, FunctionDeclarationKind.FP_FROM_IEEEBV)
           // String and Regex theory
           .put(Kind.STRING_CONCAT, FunctionDeclarationKind.STR_CONCAT)
           .put(Kind.STRING_PREFIX, FunctionDeclarationKind.STR_PREFIX)
@@ -588,17 +588,17 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
     // Make sure that
     final Sort type = expForType.getSort();
     final Sort valueType = value.getSort();
+
     // Variables are Kind.CONSTANT and can't be check with isIntegerValue() or getIntegerValue()
     // etc. but only with solver.getValue() and its String serialization
     try {
       if (value.getKind() == Kind.VARIABLE) {
         // VARIABLE == bound variables
         // CVC5 does not allow model values for bound vars; just return the name
-        return value.toString();
+        return value.getSymbol();
 
       } else if (valueType.isInteger() && type.isInteger()) {
         String valueString = solver.getValue(value).toString();
-
         return new BigInteger(transformString(valueString));
 
       } else if (valueType.isReal() && type.isReal()) {

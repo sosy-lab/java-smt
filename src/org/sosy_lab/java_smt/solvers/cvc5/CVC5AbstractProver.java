@@ -10,10 +10,11 @@ package org.sosy_lab.java_smt.solvers.cvc5;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import io.github.cvc5.api.CVC5ApiException;
-import io.github.cvc5.api.Result;
-import io.github.cvc5.api.Solver;
-import io.github.cvc5.api.Term;
+import io.github.cvc5.CVC5ApiException;
+import io.github.cvc5.Result;
+import io.github.cvc5.Solver;
+import io.github.cvc5.Term;
+import io.github.cvc5.UnknownExplanation;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -208,11 +209,12 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   private boolean convertSatResult(Result result) throws InterruptedException, SolverException {
-    if (result.isSatUnknown()) {
-      if (result.getUnknownExplanation().equals(Result.UnknownExplanation.INTERRUPTED)) {
+    if (result.isUnknown()) {
+      if (result.getUnknownExplanation().equals(UnknownExplanation.INTERRUPTED)) {
         throw new InterruptedException();
       } else {
-        throw new SolverException("CVC5 returned null or unknown on sat check (" + result + ")");
+        throw new SolverException(
+            "CVC5 returned null or unknown on sat check. Exact result: " + result + ".");
       }
     }
     return result.isUnsat();

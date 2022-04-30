@@ -9,12 +9,11 @@
 package org.sosy_lab.java_smt.solvers.cvc5;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import de.uni_freiburg.informatik.ultimate.logic.PrintTerm;
-import io.github.cvc5.api.Solver;
-import io.github.cvc5.api.Sort;
-import io.github.cvc5.api.Term;
+import io.github.cvc5.Solver;
+import io.github.cvc5.Sort;
+import io.github.cvc5.Term;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -128,14 +127,12 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, Solver, Term
   @Override
   public <T extends Formula> T substitute(
       final T pF, final Map<? extends Formula, ? extends Formula> pFromToMapping) {
-    ImmutableList.Builder<Term> changeFrom = ImmutableList.builder();
-    ImmutableList.Builder<Term> changeTo = ImmutableList.builder();
+    Term termThatGetsSubst = extractInfo(pF);
     for (Map.Entry<? extends Formula, ? extends Formula> e : pFromToMapping.entrySet()) {
-      changeFrom.add(extractInfo(e.getKey()));
-      changeTo.add(extractInfo(e.getValue()));
+      termThatGetsSubst =
+          termThatGetsSubst.substitute(extractInfo(e.getKey()), extractInfo(e.getValue()));
     }
     FormulaType<T> type = getFormulaType(pF);
-    return getFormulaCreator()
-        .encapsulate(type, extractInfo(pF).substitute(changeFrom.build(), changeTo.build()));
+    return getFormulaCreator().encapsulate(type, termThatGetsSubst);
   }
 }

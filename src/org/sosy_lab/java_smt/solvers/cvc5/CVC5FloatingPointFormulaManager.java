@@ -9,13 +9,13 @@
 package org.sosy_lab.java_smt.solvers.cvc5;
 
 import com.google.common.collect.ImmutableList;
-import io.github.cvc5.api.CVC5ApiException;
-import io.github.cvc5.api.Kind;
-import io.github.cvc5.api.Op;
-import io.github.cvc5.api.RoundingMode;
-import io.github.cvc5.api.Solver;
-import io.github.cvc5.api.Sort;
-import io.github.cvc5.api.Term;
+import io.github.cvc5.CVC5ApiException;
+import io.github.cvc5.Kind;
+import io.github.cvc5.Op;
+import io.github.cvc5.RoundingMode;
+import io.github.cvc5.Solver;
+import io.github.cvc5.Sort;
+import io.github.cvc5.Term;
 import java.math.BigDecimal;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
@@ -70,7 +70,7 @@ public class CVC5FloatingPointFormulaManager
   protected Term makeNumberAndRound(String pN, FloatingPointType pType, Term pRoundingMode) {
     try {
       if (isNegativeZero(Double.valueOf(pN))) {
-        return solver.mkNegZero(pType.getExponentSize(), pType.getMantissaSize() + 1);
+        return solver.mkFloatingPointNegZero(pType.getExponentSize(), pType.getMantissaSize() + 1);
       }
     } catch (CVC5ApiException | NumberFormatException e) {
       // ignore and fallback to floating point from rational numbers
@@ -80,7 +80,9 @@ public class CVC5FloatingPointFormulaManager
       Rational rationalValue = toRational(pN);
       Op realToFp =
           solver.mkOp(
-              Kind.FLOATINGPOINT_TO_FP_REAL, pType.getExponentSize(), pType.getMantissaSize() + 1);
+              Kind.FLOATINGPOINT_TO_FP_FROM_REAL,
+              pType.getExponentSize(),
+              pType.getMantissaSize() + 1);
       return solver.mkTerm(realToFp, pRoundingMode, solver.mkReal(rationalValue.toString()));
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
@@ -129,7 +131,7 @@ public class CVC5FloatingPointFormulaManager
     try {
       // So this should be mkFloatingPointPosInf() but that does not exists, so i guess it was
       // renamed.
-      return solver.mkPosInf(pType.getExponentSize(), pType.getMantissaSize() + 1);
+      return solver.mkFloatingPointPosInf(pType.getExponentSize(), pType.getMantissaSize() + 1);
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
           "You tried creating a invalid positive floating point infinity with exponent size "
@@ -146,7 +148,7 @@ public class CVC5FloatingPointFormulaManager
     try {
       // So this should be mkFloatingPointNegInf() but that does not exists, so i guess it was
       // renamed.
-      return solver.mkNegInf(pType.getExponentSize(), pType.getMantissaSize() + 1);
+      return solver.mkFloatingPointNegInf(pType.getExponentSize(), pType.getMantissaSize() + 1);
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
           "You tried creating a invalid negative floating point infinity with exponent size "
@@ -161,7 +163,7 @@ public class CVC5FloatingPointFormulaManager
   @Override
   protected Term makeNaNImpl(FloatingPointType pType) {
     try {
-      return solver.mkNaN(pType.getExponentSize(), pType.getMantissaSize() + 1);
+      return solver.mkFloatingPointNaN(pType.getExponentSize(), pType.getMantissaSize() + 1);
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
           "You tried creating a invalid NaN with exponent size "
@@ -180,7 +182,7 @@ public class CVC5FloatingPointFormulaManager
       if (pTargetType.isFloatingPointType()) {
         Op fpToFp =
             solver.mkOp(
-                Kind.FLOATINGPOINT_TO_FP_FLOATINGPOINT,
+                Kind.FLOATINGPOINT_TO_FP_FROM_FP,
                 ((FloatingPointType) pTargetType).getExponentSize(),
                 ((FloatingPointType) pTargetType).getMantissaSize() + 1);
         return solver.mkTerm(fpToFp, pRoundingMode, pNumber);
@@ -219,7 +221,7 @@ public class CVC5FloatingPointFormulaManager
       } else if (formulaType.isRationalType()) {
         Op realToFp =
             solver.mkOp(
-                Kind.FLOATINGPOINT_TO_FP_REAL,
+                Kind.FLOATINGPOINT_TO_FP_FROM_REAL,
                 pTargetType.getExponentSize(),
                 pTargetType.getMantissaSize() + 1);
 
@@ -229,28 +231,22 @@ public class CVC5FloatingPointFormulaManager
         if (pSigned) {
           Op realToSBv =
               solver.mkOp(
-                  Kind.FLOATINGPOINT_TO_FP_SIGNED_BITVECTOR,
+                  Kind.FLOATINGPOINT_TO_FP_FROM_SBV,
                   pTargetType.getExponentSize(),
                   pTargetType.getMantissaSize() + 1);
           return solver.mkTerm(realToSBv, pRoundingMode, pNumber);
         } else {
           Op realToUBv =
               solver.mkOp(
-                  Kind.FLOATINGPOINT_TO_FP_UNSIGNED_BITVECTOR,
+                  Kind.FLOATINGPOINT_TO_FP_FROM_UBV,
                   pTargetType.getExponentSize(),
                   pTargetType.getMantissaSize() + 1);
           return solver.mkTerm(realToUBv, pRoundingMode, pNumber);
         }
 
       } else {
-        Op realToGeneric =
-            solver.mkOp(
-                Kind.FLOATINGPOINT_TO_FP_GENERIC,
-                pTargetType.getExponentSize(),
-                pTargetType.getMantissaSize() + 1);
-        return solver.mkTerm(realToGeneric, pRoundingMode, pNumber);
-        // old version; revert to it if generic fails
-        // return genericCast(pNumber, pTargetType);
+        // Generic cast was removed in the 1.0.0 version
+        return genericCast(pNumber, pTargetType);
       }
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
@@ -305,7 +301,7 @@ public class CVC5FloatingPointFormulaManager
 
   @Override
   protected Term add(Term pParam1, Term pParam2, Term pRoundingMode) {
-    return solver.mkTerm(Kind.PLUS, pRoundingMode, pParam1, pParam2);
+    return solver.mkTerm(Kind.ADD, pRoundingMode, pParam1, pParam2);
   }
 
   @Override
@@ -355,37 +351,37 @@ public class CVC5FloatingPointFormulaManager
 
   @Override
   protected Term isNaN(Term pParam1) {
-    return solver.mkTerm(Kind.FLOATINGPOINT_ISNAN, pParam1);
+    return solver.mkTerm(Kind.FLOATINGPOINT_IS_NAN, pParam1);
   }
 
   @Override
   protected Term isInfinity(Term pParam1) {
-    return solver.mkTerm(Kind.FLOATINGPOINT_ISINF, pParam1);
+    return solver.mkTerm(Kind.FLOATINGPOINT_IS_INF, pParam1);
   }
 
   @Override
   protected Term isZero(Term pParam1) {
-    return solver.mkTerm(Kind.FLOATINGPOINT_ISZ, pParam1);
+    return solver.mkTerm(Kind.FLOATINGPOINT_IS_ZERO, pParam1);
   }
 
   @Override
   protected Term isSubnormal(Term pParam1) {
-    return solver.mkTerm(Kind.FLOATINGPOINT_ISSN, pParam1);
+    return solver.mkTerm(Kind.FLOATINGPOINT_IS_SUBNORMAL, pParam1);
   }
 
   @Override
   protected Term isNormal(Term pParam) {
-    return solver.mkTerm(Kind.FLOATINGPOINT_ISN, pParam);
+    return solver.mkTerm(Kind.FLOATINGPOINT_IS_NORMAL, pParam);
   }
 
   @Override
   protected Term isNegative(Term pParam) {
-    return solver.mkTerm(Kind.FLOATINGPOINT_ISNEG, pParam);
+    return solver.mkTerm(Kind.FLOATINGPOINT_IS_NEG, pParam);
   }
 
   @Override
   protected Term fromIeeeBitvectorImpl(Term pNumber, FloatingPointType pTargetType) {
-    return solver.mkTerm(Kind.FLOATINGPOINT_TO_FP_IEEE_BITVECTOR, pNumber);
+    return solver.mkTerm(Kind.FLOATINGPOINT_TO_FP_FROM_IEEE_BV, pNumber);
   }
 
   @Override
