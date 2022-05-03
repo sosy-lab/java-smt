@@ -166,7 +166,7 @@ SPDX-License-Identifier: Apache-2.0
             numbers from the ivy repository. The script will append the git revision.
         </fail>
 
-        <!-- get a nive version -->
+        <!-- get a naive version -->
         <exec executable="git" dir="${cvc4.path}" outputproperty="cvc4.revision" failonerror="true">
             <arg value="show"/>
             <arg value="-s"/>
@@ -238,6 +238,120 @@ SPDX-License-Identifier: Apache-2.0
             You now want to run
             svn add repository/${ivy.organisation}/${ivy.module}/*-${cvc4.version}*
             svn ci repository/${ivy.organisation}/${ivy.module} -m"publish version ${cvc4.version} of CVC4 Solver"
+            to make the new version publicly available.</echo>
+    </target>
+
+    <!-- Build options for CVC5 i used:
+          Note: most - are double - below (not the last one)
+          Reasoning: auto download loads all dependencies automatically, statistics for the new statistics stuff, prefix because i don't want it to use system installed or install systemwide, fPIC because it complained when i didn't use it.
+./configure.sh production -java-bindings -auto-download -statistics -prefix=/home/baierd/cvc5-main/build/install -DVAR=fPIC
+Theoretically CVC5s performance should be improveable by using -best (uses the best known general performance/dependencies) but this does not auto download
+     -->
+    <!-- SECTION: Publishing CVC5
+         ==================================================================
+    -->
+    <target name="package-cvc5" depends="">
+        <!-- Copy CVC5 binaries to the root folder along with the version postfix. -->
+        <fail unless="cvc5.path">
+            Please specify the path to CVC5 with the flag -Dcvc5.path=/path/to/cvc5.
+            The path has to point to the root CVC5 folder, i.e.,
+            a checkout of the official git repositoy from 'https://github.com/cvc5/cvc5'.
+            Note that shell substitutions do not work and a full absolute
+            path has to be specified.
+        </fail>
+        <fail unless="cvc5.customRev">
+            Please specify a custom revision with the flag -Dcvc5.customRev=XXX.
+            The custom revision has to be unique amongst the already known version
+            numbers from the ivy repository. The script will append the git revision.
+        </fail>
+
+        <!-- get a new version -->
+        <exec executable="git" dir="${cvc5.path}" outputproperty="cvc5.revision" failonerror="true">
+            <arg value="show"/>
+            <arg value="-s"/>
+            <arg value="--format=%h"/>
+        </exec>
+        <property name="cvc5.version" value="${cvc5.customRev}-g${cvc5.revision}"/>
+        <echo message="Building CVC5 in version '${cvc5.version}'"/>
+
+        <!-- build CVC5 -->
+        <exec executable="rm" dir="${cvc5.path}" failonerror="true">
+            <arg value="-rf"/>
+            <arg value="build"/>
+        </exec>
+        <exec executable="./configure.sh" dir="${cvc5.path}" failonerror="true">
+            <arg value="production"/>
+            <arg value="--java-bindings"/>
+            <arg value="--auto-download"/>
+            <arg value="--statistics"/>
+            <arg value="--prefix=${cvc5.path}/build/install"/>
+            <arg value="-DVAR=fPIC"/>
+        </exec>
+        <exec executable="make" dir="${cvc5.path}/build/" failonerror="true">
+            <arg value="-j4" />
+        </exec>
+
+        <!-- remove unneeded symbols -->
+        <exec executable="strip" dir="${cvc5.path}/build/src/bindings/java/" failonerror="true">
+            <arg value="libcvc5jni.so" />
+        </exec>
+        <exec executable="strip" dir="${cvc5.path}/build/src/" failonerror="true">
+            <arg value="libcvc5.so" />
+        </exec>
+        <exec executable="strip" dir="${cvc5.path}/build/src/parser/" failonerror="true">
+            <arg value="libcvc5parser.so" />
+        </exec>
+
+        <!-- fix RPATH and library dependencies -->
+        <exec executable="patchelf" dir="${cvc5.path}/build/src/parser/" failonerror="true">
+            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
+            <arg value="--replace-needed"/><arg value="libpoly.so.0"/><arg value="libpoly.so"/>
+            <arg value="--replace-needed"/><arg value="libpolyxx.so.0"/><arg value="libpolyxx.so"/>
+            <arg value="libcvc5parser.so"/>
+        </exec>
+        <exec executable="patchelf" dir="${cvc5.path}/build/src/" failonerror="true">
+            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
+            <arg value="--replace-needed"/><arg value="libpolyxx.so.0"/><arg value="libpolyxx.so"/>
+            <arg value="--replace-needed"/><arg value="libpoly.so.0"/><arg value="libpoly.so"/>
+            <arg value="libcvc5.so"/>
+        </exec>
+        <exec executable="patchelf" dir="${cvc5.path}/build/src/api/java/" failonerror="true">
+            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
+            <arg value="--replace-needed"/><arg value="libpolyxx.so.0"/><arg value="libpolyxx.so"/>
+            <arg value="--replace-needed"/><arg value="libpoly.so.0"/><arg value="libpoly.so"/>
+            <arg value="libcvc5jni.so"/>
+        </exec>
+        <exec executable="patchelf" dir="${cvc5.path}/build/deps/lib/" failonerror="true">
+            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
+            <arg value="--replace-needed"/><arg value="libpoly.so.0"/><arg value="libpoly.so"/>
+            <arg value="libpolyxx.so"/>
+        </exec>
+
+        <!-- copy library files into directory to be published for IVY -->
+        <copy file="${cvc5.path}/build/src/libcvc5.so" tofile="libcvc5-${cvc5.version}.so"/>
+        <copy file="${cvc5.path}/build/src/parser/libcvc5parser.so" tofile="libcvc5parser-${cvc5.version}.so"/>
+        <copy file="${cvc5.path}/build/src/bindings/java/libcvc5jni.so" tofile="libcvc5jni-${cvc5.version}.so"/>
+        <copy file="${cvc5.path}/build/src/bindings/java/CVC5.jar" tofile="CVC5-${cvc5.version}.jar"/>
+    </target>
+
+    <target name="publish-cvc5" depends="package-cvc5, load-ivy"
+        description="Publish CVC5 binaries to Ivy repository.">
+
+        <ivy:resolve conf="solver-cvc5" file="solvers_ivy_conf/ivy_cvc5.xml" />
+        <available property="ivy.hasrepository" file="repository/${ivy.organisation}/${ivy.module}" />
+        <fail unless="ivy.hasrepository"
+            message="Cannot publish without 'repository' dir, please run 'svn co https://svn.sosy-lab.org/software/ivy/repository/${ivy.organisation}/${ivy.module} repository/${ivy.organisation}/${ivy.module}'." />
+
+        <ivy:publish
+            pubrevision="${cvc5.version}"
+            resolver="Sosy-Lab-Publish"
+            artifactspattern="[artifact]-[revision].[ext]"
+            status="release"
+            />
+        <echo>
+            You now want to run
+            svn add repository/${ivy.organisation}/${ivy.module}/*-${cvc5.version}*
+            svn ci repository/${ivy.organisation}/${ivy.module} -m"publish version ${cvc5.version} of CVC5 Solver"
             to make the new version publicly available.</echo>
     </target>
 
