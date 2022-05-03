@@ -19,15 +19,23 @@ import com.google.errorprone.annotations.Immutable;
 @Immutable
 public interface FunctionDeclaration<E extends Formula> {
 
-  /** @return Type of the function (LT / GT / UF / etc...). */
+  /**
+   * @return Type of the function (LT / GT / UF / etc...).
+   */
   FunctionDeclarationKind getKind();
 
-  /** @return Name of the function (UF name / "LT" / etc...). */
+  /**
+   * @return Name of the function (UF name / "LT" / etc...).
+   */
   String getName();
 
-  /** @return Sort of the function output. */
+  /**
+   * @return Sort of the function output.
+   */
   FormulaType<E> getType();
 
-  /** @return Sorts of the arguments. */
+  /**
+   * @return Sorts of the arguments.
+   */
   ImmutableList<FormulaType<?>> getArgumentTypes();
 }

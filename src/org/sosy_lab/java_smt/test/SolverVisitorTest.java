@@ -194,8 +194,8 @@ public class SolverVisitorTest extends SolverBasedTest0 {
               bvmgr.modulo(x, y, false),
               bvmgr.not(x),
               bvmgr.negate(x),
-              bvmgr.extract(x, 7, 5, true),
-              bvmgr.extract(x, 7, 5, false),
+              bvmgr.extract(x, 7, 5),
+              bvmgr.extract(x, 7, 5),
               bvmgr.concat(x, y))) {
         mgr.visit(f, new FunctionDeclarationVisitorNoUF());
         if (Solvers.PRINCESS != solver) {
@@ -351,6 +351,20 @@ public class SolverVisitorTest extends SolverBasedTest0 {
               switch (pDeclaration.getKind()) {
                 case NOT:
                   assertThat(pArgs).hasSize(1);
+                  break;
+                case ITE:
+                  assertThat(pArgs).hasSize(3);
+                  break;
+                case EQ:
+                case BV_SLT:
+                case BV_SLE:
+                case BV_SGT:
+                case BV_SGE:
+                case BV_ULT:
+                case BV_ULE:
+                case BV_UGT:
+                case BV_UGE:
+                  assertThat(pArgs).hasSize(2);
                   break;
                 case BV_NOT:
                 case BV_NEG:

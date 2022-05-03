@@ -16,9 +16,11 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_crea
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_config;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_env;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_free_termination_callback;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_search_stats;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_unsat_assumptions;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_unsat_core;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_last_error_message;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_num_backtrack_points;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_pop_backtrack_point;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_option_checked;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_get_arg;
@@ -26,6 +28,8 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_not;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Longs;
 import java.util.ArrayList;
@@ -125,7 +129,9 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
     return new Mathsat5Model(getMsatModel(), creator, this);
   }
 
-  /** @throws SolverException if an expected MathSAT failure occurs */
+  /**
+   * @throws SolverException if an expected MathSAT failure occurs
+   */
   protected long getMsatModel() throws SolverException {
     checkGenerateModels();
     return Mathsat5NativeApi.msat_get_model(curEnv);
@@ -135,6 +141,12 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   public void pop() {
     Preconditions.checkState(!closed);
     msat_pop_backtrack_point(curEnv);
+  }
+
+  @Override
+  public int size() {
+    Preconditions.checkState(!closed);
+    return msat_num_backtrack_points(curEnv);
   }
 
   @Override
@@ -164,6 +176,13 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
       result.add(creator.encapsulateBoolean(t));
     }
     return result;
+  }
+
+  @Override
+  public ImmutableMap<String, String> getStatistics() {
+    final String stats = msat_get_search_stats(curEnv);
+    return ImmutableMap.copyOf(
+        Splitter.on("\n").trimResults().omitEmptyStrings().withKeyValueSeparator(" ").split(stats));
   }
 
   @Override

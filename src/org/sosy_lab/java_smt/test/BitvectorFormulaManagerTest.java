@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2022 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import java.math.BigInteger;
@@ -99,9 +100,8 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0 {
   @Test(expected = IllegalArgumentException.class)
   @SuppressWarnings("CheckReturnValue")
   public void bvTooLargeNum() {
-    if (solver == Solvers.BOOLECTOR) {
-      bvmgr.makeBitvector(2, 4); // value 4 is too large for size 2
-    } else {
+    bvmgr.makeBitvector(2, 4); // value 4 is too large for size 2
+    if (solver != Solvers.BOOLECTOR) {
       bvmgr.makeBitvector(1, 2); // value 2 is too large for size 1
     }
   }
@@ -109,9 +109,8 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0 {
   @Test
   @SuppressWarnings("CheckReturnValue")
   public void bvLargeNum() {
-    if (solver == Solvers.BOOLECTOR) {
-      bvmgr.makeBitvector(2, 3); // value 3 should be possible for size 2
-    } else {
+    bvmgr.makeBitvector(2, 3); // value 3 should be possible for size 2
+    if (solver != Solvers.BOOLECTOR) {
       bvmgr.makeBitvector(1, 1); // value 1 should be possible for size 1
     }
   }
@@ -119,20 +118,19 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0 {
   @Test
   @SuppressWarnings("CheckReturnValue")
   public void bvSmallNum() {
-    if (solver == Solvers.BOOLECTOR) {
-      bvmgr.makeBitvector(2, -1); // value -1 should be possible for size 2
-    } else {
+    bvmgr.makeBitvector(2, -1); // value -1 should be possible for size 2
+    if (solver != Solvers.BOOLECTOR) {
       bvmgr.makeBitvector(1, -1); // value -1 should be possible for size 1
     }
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  @SuppressWarnings("CheckReturnValue")
+  @Test
   public void bvTooSmallNum() {
-    if (solver == Solvers.BOOLECTOR) {
-      bvmgr.makeBitvector(2, -4); // value -4 is too small for size 2
-    } else {
-      bvmgr.makeBitvector(1, -2); // value -2 is too small for size 1
+    // value -4 is too small for size 2
+    assertThrows(IllegalArgumentException.class, () -> bvmgr.makeBitvector(2, -4));
+    if (solver != Solvers.BOOLECTOR) {
+      // value -2 is too small for size 1
+      assertThrows(IllegalArgumentException.class, () -> bvmgr.makeBitvector(1, -2));
     }
   }
 
@@ -309,60 +307,53 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0 {
     }
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  @SuppressWarnings("CheckReturnValue")
+  @Test
   public void bvExtractTooLargeNumEndSigned() {
     // Use bv > 1 because of Boolector
-    BitvectorFormula bv = bvmgr.makeBitvector(2, 4);
-    bvmgr.extract(bv, 5, 0, true);
+    BitvectorFormula bv = bvmgr.makeBitvector(4, 4);
+    assertThrows(IllegalArgumentException.class, () -> bvmgr.extract(bv, 5, 0));
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  @SuppressWarnings("CheckReturnValue")
+  @Test
   public void bvExtractTooLargeNumStartSigned() {
     // Use bv > 1 because of Boolector
-    BitvectorFormula bv = bvmgr.makeBitvector(2, 4);
-    bvmgr.extract(bv, 4, 5, true);
+    BitvectorFormula bv = bvmgr.makeBitvector(4, 4);
+    assertThrows(IllegalArgumentException.class, () -> bvmgr.extract(bv, 4, 5));
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  @SuppressWarnings("CheckReturnValue")
+  @Test
   public void bvExtractTooLargeNumStartAltSigned() {
     // Use bv > 1 because of Boolector
-    BitvectorFormula bv = bvmgr.makeBitvector(2, 4);
-    bvmgr.extract(bv, 3, 4, true);
+    BitvectorFormula bv = bvmgr.makeBitvector(4, 4);
+    assertThrows(IllegalArgumentException.class, () -> bvmgr.extract(bv, 3, 4));
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  @SuppressWarnings("CheckReturnValue")
+  @Test
   public void bvExtractNegNumEnd() {
     // Use bv > 1 because of Boolector
-    BitvectorFormula bv = bvmgr.makeBitvector(2, 4);
-    bvmgr.extract(bv, -1, 0, true);
+    BitvectorFormula bv = bvmgr.makeBitvector(4, 4);
+    assertThrows(IllegalArgumentException.class, () -> bvmgr.extract(bv, -1, 0));
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  @SuppressWarnings("CheckReturnValue")
+  @Test
   public void bvExtractNegNumStart() {
     // Use bv > 1 because of Boolector
-    BitvectorFormula bv = bvmgr.makeBitvector(2, 4);
-    bvmgr.extract(bv, 1, -1, true);
+    BitvectorFormula bv = bvmgr.makeBitvector(4, 4);
+    assertThrows(IllegalArgumentException.class, () -> bvmgr.extract(bv, 1, -1));
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  @SuppressWarnings("CheckReturnValue")
+  @Test
   public void bvExtractNegNumStartEnd() {
     // Use bv > 1 because of Boolector
-    BitvectorFormula bv = bvmgr.makeBitvector(2, 4);
-    bvmgr.extract(bv, -1, -1, true);
+    BitvectorFormula bv = bvmgr.makeBitvector(4, 4);
+    assertThrows(IllegalArgumentException.class, () -> bvmgr.extract(bv, -1, -1));
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  @SuppressWarnings("CheckReturnValue")
+  @Test
   public void bvExtendNegNum() {
     // Use bv > 1 because of Boolector
-    BitvectorFormula bv = bvmgr.makeBitvector(2, 4);
-    bvmgr.extend(bv, -1, true);
+    BitvectorFormula bv = bvmgr.makeBitvector(4, 4);
+    assertThrows(IllegalArgumentException.class, () -> bvmgr.extend(bv, -1, true));
   }
 
   @Test

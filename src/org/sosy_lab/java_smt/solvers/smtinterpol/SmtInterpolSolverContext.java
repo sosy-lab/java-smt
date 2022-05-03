@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.smtinterpol;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
@@ -22,6 +23,7 @@ import de.uni_freiburg.informatik.ultimate.smtinterpol.option.OptionMap.CopyMode
 import de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.SMTInterpol;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,8 +42,6 @@ import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
-import org.sosy_lab.java_smt.basicimpl.reusableStack.ReusableStackInterpolatingProver;
-import org.sosy_lab.java_smt.basicimpl.reusableStack.ReusableStackTheoremProver;
 
 public final class SmtInterpolSolverContext extends AbstractSolverContext {
 
@@ -228,8 +228,7 @@ public final class SmtInterpolSolverContext extends AbstractSolverContext {
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> options) {
     Script newScript = createNewScript(options);
-    return new ReusableStackTheoremProver(
-        new SmtInterpolTheoremProver(manager, newScript, options, shutdownNotifier));
+    return new SmtInterpolTheoremProver(manager, newScript, options, shutdownNotifier);
   }
 
   @SuppressWarnings("resource")
@@ -250,7 +249,7 @@ public final class SmtInterpolSolverContext extends AbstractSolverContext {
               settings.optionsMap,
               settings.smtLogfile.getFreshPath());
     }
-    return new ReusableStackInterpolatingProver<>(prover);
+    return prover;
   }
 
   @Override
@@ -269,6 +268,56 @@ public final class SmtInterpolSolverContext extends AbstractSolverContext {
   @Override
   public Solvers getSolverName() {
     return Solvers.SMTINTERPOL;
+  }
+
+  @Override // TODO remove?
+  public ImmutableMap<String, String> getStatistics() {
+    ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+    flatten(builder, "", manager.getEnvironment().getInfo(":all-statistics"));
+    return builder.build();
+  }
+
+  /**
+   * This method returns a flattened mapping converted from a nested array-based structure, in which
+   * each entry is a key-value-pair. The key of such a key-value-pair is a String, the value can be
+   * a numeric value or a String.
+   *
+   * <p>We assume only a small nesting level and only a few keys, otherwise we must improve
+   * performance of this method.
+   *
+   * <p>Example:
+   * <li>input: {[a, {[b, 1], [c, 2]}], [d, 3], [e, {[f, 4]}]}
+   * <li>output: {ab:1, ac:2, d:3, ef:4}
+   */
+  static void flatten(ImmutableMap.Builder<String, String> builder, String prefix, Object obj) {
+    if (obj instanceof Object[]) { // very type-safe structure! :-(
+      if (!prefix.isEmpty()) {
+        prefix += ">"; // separator for next nesting level
+      }
+      for (Object entry : (Object[]) obj) {
+        checkArgument(
+            entry instanceof Object[],
+            "expected key-value-pair, but found an unexpected structure: %s",
+            obj);
+        Object[] keyValue = (Object[]) entry;
+        checkArgument(
+            keyValue.length == 2,
+            "expected key-value-pair, but found an unexpected structure: %s",
+            lazyDeepToString(keyValue));
+        flatten(builder, prefix + keyValue[0], keyValue[1]);
+      }
+    } else {
+      builder.put(prefix, obj.toString());
+    }
+  }
+
+  private static Object lazyDeepToString(Object[] value) {
+    return new Object() {
+      @Override
+      public String toString() {
+        return Arrays.deepToString(value);
+      }
+    };
   }
 
   @Override

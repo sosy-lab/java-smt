@@ -39,6 +39,7 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String, S
 
   @Override
   public void pop() {
+    Preconditions.checkState(!closed);
     for (String removed : assertedFormulas.peek()) {
       annotatedTerms.remove(removed);
     }
@@ -47,7 +48,7 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String, S
 
   @Override
   public String addConstraint(BooleanFormula f) {
-    Preconditions.checkState(!isClosed());
+    Preconditions.checkState(!closed);
     String termName = generateTermName();
     Term t = mgr.extractInfo(f);
     Term annotatedTerm = env.annotate(t, new Annotation(":named", termName));
@@ -60,7 +61,7 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String, S
   @Override
   public BooleanFormula getInterpolant(Collection<String> pTermNamesOfA)
       throws SolverException, InterruptedException {
-    Preconditions.checkState(!isClosed());
+    Preconditions.checkState(!closed);
 
     // SMTInterpol is not able to handle the trivial cases,
     // so we need to check them explicitly
@@ -87,7 +88,7 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String, S
   public List<BooleanFormula> getTreeInterpolants(
       List<? extends Collection<String>> partitionedTermNames, int[] startOfSubTree)
       throws SolverException, InterruptedException {
-    Preconditions.checkState(!isClosed());
+    Preconditions.checkState(!closed);
     assert InterpolatingProverEnvironment.checkTreeStructure(
         partitionedTermNames.size(), startOfSubTree);
 
@@ -123,7 +124,7 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String, S
   }
 
   private Term buildConjunctionOfNamedTerms(Collection<String> termNames) {
-    Preconditions.checkState(!isClosed());
+    Preconditions.checkState(!closed);
     Preconditions.checkArgument(!termNames.isEmpty());
 
     if (termNames.size() == 1) {

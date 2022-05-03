@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.solvers.smtinterpol;
 
 import static com.google.common.base.Preconditions.checkState;
 
+import com.google.common.collect.ImmutableMap;
 import de.uni_freiburg.informatik.ultimate.logic.Annotation;
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
 import de.uni_freiburg.informatik.ultimate.logic.Model;
@@ -41,7 +42,7 @@ import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 @SuppressWarnings("ClassTypeParameterName")
 abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
 
-  private boolean closed = false;
+  protected boolean closed = false;
   protected final Script env;
   protected final FormulaCreator<Term, Sort, Script, FunctionSymbol> creator;
   protected final SmtInterpolFormulaManager mgr;
@@ -63,14 +64,17 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
     creator = pMgr.getFormulaCreator();
     env = pEnv;
     shutdownNotifier = pShutdownNotifier;
+    assertedFormulas.push(new ArrayList<>());
   }
 
   protected boolean isClosed() {
     return closed;
   }
 
-  int size() {
-    return assertedFormulas.size();
+  @Override
+  public int size() {
+    checkState(!closed);
+    return assertedFormulas.size() - 1;
   }
 
   @Override
@@ -150,7 +154,7 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
-    checkState(!isClosed());
+    checkState(!closed);
     checkGenerateUnsatCores();
     return getUnsatCore0();
   }
@@ -169,7 +173,7 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) throws InterruptedException {
-    checkState(!isClosed());
+    checkState(!closed);
     checkGenerateUnsatCoresOverAssumptions();
     push();
     checkState(
@@ -190,12 +194,20 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
   }
 
   @Override
+  public ImmutableMap<String, String> getStatistics() {
+    ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+    SmtInterpolSolverContext.flatten(builder, "", env.getInfo(":all-statistics"));
+    return builder.build();
+  }
+
+  @Override
   public void close() {
-    checkState(!closed);
-    assertedFormulas.clear();
-    annotatedTerms.clear();
-    env.pop(assertedFormulas.size());
-    closed = true;
+    if (!closed) {
+      assertedFormulas.clear();
+      annotatedTerms.clear();
+      env.pop(assertedFormulas.size());
+      closed = true;
+    }
   }
 
   @Override
@@ -207,7 +219,7 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
   @Override
   public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
-    checkState(!isClosed());
+    checkState(!closed);
     checkGenerateAllSat();
 
     Term[] importantTerms = new Term[important.size()];

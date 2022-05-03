@@ -10,6 +10,15 @@ SPDX-License-Identifier: Apache-2.0
 
 # JavaSMT ChangeLog
 
+## JavaSMT 3.12.0
+
+This release comes with an initial support for String theory for SMT solvers like Z3 and CVC4.
+Now, JavaSMT provides statistics on the solving process, depending on the used SMT solver.
+And we include several bugfixes and internal cleanup.
+
+### Breaking change:
+The public API was enriched with new methods to retrieve a StringFormulaManager and statistics.
+
 ## JavaSMT 3.11.0
 
 This release comes with support for multiple prover stacks in SMTInterpol.

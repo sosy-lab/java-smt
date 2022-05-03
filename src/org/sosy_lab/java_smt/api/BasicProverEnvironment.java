@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.api;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.Collection;
 import java.util.List;
@@ -25,7 +26,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
   String NO_MODEL_HELP = "Model computation failed. Are the pushed formulae satisfiable?";
 
   /**
-   * Push a backtracking point and add a formula to the environment stack, asserting it. The return
+   * Push a backtracking point and add a formula to the current stack, asserting it. The return
    * value may be used to identify this formula later on in a query (this depends on the sub-type of
    * the environment).
    */
@@ -36,16 +37,34 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
     return addConstraint(f);
   }
 
-  /** Remove one formula from the environment stack. */
+  /**
+   * Remove one backtracking point/level from the current stack. This removes the latest level
+   * including all of its formulas, i.e., all formulas that were added for this backtracking point.
+   */
   void pop();
 
-  /** Add constraint to the context. */
+  /** Add a constraint to the latest backtracking point. */
   @Nullable
   @CanIgnoreReturnValue
   T addConstraint(BooleanFormula constraint) throws InterruptedException;
 
-  /** Create backtracking point. */
+  /**
+   * Create a new backtracking point, i.e., a new level on the assertion stack. Each level can hold
+   * several asserted formulas.
+   *
+   * <p>If formulas are added before creating the first backtracking point, they can not be removed
+   * via a POP-operation.
+   */
   void push();
+
+  /**
+   * Get the number of backtracking points/levels on the current stack.
+   *
+   * <p>Caution: This is the number of PUSH-operations, and not necessarily equal to the number of
+   * asserted formulas. On any level there can be an arbitrary number of asserted formulas. Even
+   * with size of 0, formulas can already be asserted (at bottom level).
+   */
+  int size();
 
   /** Check whether the conjunction of all formulas on the stack is unsatisfiable. */
   boolean isUnsat() throws SolverException, InterruptedException;
@@ -99,8 +118,28 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
       throws SolverException, InterruptedException;
 
   /**
+   * Get statistics for a concrete ProverEnvironment in a solver. The returned mapping is intended
+   * to provide solver-internal statistics for only this instance. The keys can differ between
+   * individual solvers.
+   *
+   * <p>Calling the statistics several times for the same {@link ProverEnvironment}s returns
+   * accumulated number, i.e., we currently do not provide any possibility to reset the statistics.
+   * Calling the statistics for different {@link ProverEnvironment}s returns independent statistics.
+   *
+   * <p>We do not guarantee any specific key to be present, as this depends on the used solver. We
+   * might even return an empty mapping if the solver does not support calling this method or is in
+   * an invalid state.
+   *
+   * @see SolverContext#getStatistics()
+   */
+  default ImmutableMap<String, String> getStatistics() {
+    return ImmutableMap.of();
+  }
+
+  /**
    * Closes the prover environment. The object should be discarded, and should not be used after
-   * closing.
+   * closing. The first call of this method will close the prover instance, further calls are
+   * ignored.
    */
   @Override
   void close();

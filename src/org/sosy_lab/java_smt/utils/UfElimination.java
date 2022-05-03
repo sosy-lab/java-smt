@@ -75,22 +75,30 @@ public class UfElimination {
       ufs = checkNotNull(pUfs);
     }
 
-    /** @return the new {@link Formula} without UFs */
+    /**
+     * @return the new {@link Formula} without UFs
+     */
     public BooleanFormula getFormula() {
       return formula;
     }
 
-    /** @return the constraints enforcing the functional consistency. */
+    /**
+     * @return the constraints enforcing the functional consistency.
+     */
     public BooleanFormula getConstraints() {
       return constraints;
     }
 
-    /** @return the substitution used to replace UFs */
+    /**
+     * @return the substitution used to replace UFs
+     */
     public Map<Formula, Formula> getSubstitution() {
       return substitutions;
     }
 
-    /** @return all eliminated application of Ufs */
+    /**
+     * @return all eliminated application of Ufs
+     */
     Multimap<FunctionDeclaration<?>, UninterpretedFunctionApplication> getUfs() {
       return ufs;
     }

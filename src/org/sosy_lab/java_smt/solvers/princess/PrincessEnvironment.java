@@ -233,7 +233,8 @@ class PrincessEnvironment {
   }
 
   void unregisterStack(PrincessAbstractProver<?, ?> stack) {
-    assert registeredProvers.contains(stack) : "cannot unregister stack, it is not registered";
+    Preconditions.checkState(
+        registeredProvers.contains(stack), "cannot unregister stack, it is not registered");
     registeredProvers.remove(stack);
   }
 

@@ -122,6 +122,8 @@ but in the normal system environment, where some testing can be applied by the d
 
 We publish MathSAT for both Linux and Windows systems at once.
 The build process can fully be done on a Linux system.
+We prefer to use the Docker container based on Ubuntu 18.04 for compiling the dependencies and assembling the libraries,
+because GMP and MPIR might cause problems with newer versions of GCC and MinGW during compilation.
 
 For publishing MathSAT5, you need to use a Linux machine with at least GCC 7.5.0 and x86_64-w64-mingw32-gcc 7.3.
 First, [download the (reentrant!) Linux and Windows64 binary release](http://mathsat.fbk.eu/download.html) in the same version, unpack them,
@@ -196,7 +198,7 @@ As long as no API was changed and compilation suceeds, simply execute `ant publi
 If the API was changed, we need to break the dependency cycle for the publication and revert this later:
 edit `lib/ivy.xml` and replace the dependency towards `javasmt-yices2` with the dependency towards `javasmt-solver-yices2`
 (the line can be copied from `solvers_ivy_conf/ivy_javasmt_yices2.xml`).
-Then run `ant publish-artifact-yices2`.
+Then run `ant publish-artifacts-yices2`.
 We still need to figure out how to avoid the warning about a dirty repository in that case, e.g. by a temporary commit.
 
 [Ivy Repository]: http://www.sosy-lab.org/ivy/org.sosy_lab/

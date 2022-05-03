@@ -29,8 +29,8 @@ class Z3BitvectorFormulaManager extends AbstractBitvectorFormulaManager<Long, Lo
   }
 
   @Override
-  public Long extract(Long pFirst, int pMsb, int pLsb, boolean pSigned) {
-    return Native.mkExtract(z3context, pMsb, pLsb, pFirst);
+  public Long extract(Long pNumber, int pMsb, int pLsb) {
+    return Native.mkExtract(z3context, pMsb, pLsb, pNumber);
   }
 
   @Override
