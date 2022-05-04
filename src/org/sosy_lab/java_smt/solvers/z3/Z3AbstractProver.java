@@ -233,6 +233,9 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @Override
   public ImmutableMap<String, String> getStatistics() {
+    // Z3 sigsevs if you try to get statistics for closed environments
+    Preconditions.checkState(!closed);
+
     ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
 
     final long stats = Native.solverGetStatistics(z3context, z3solver);
