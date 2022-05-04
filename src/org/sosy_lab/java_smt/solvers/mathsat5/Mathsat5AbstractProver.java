@@ -180,6 +180,8 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
 
   @Override
   public ImmutableMap<String, String> getStatistics() {
+    // Mathsat sigsevs if you try to get statistics for closed environments
+    Preconditions.checkState(!closed);
     final String stats = msat_get_search_stats(curEnv);
     return ImmutableMap.copyOf(
         Splitter.on("\n").trimResults().omitEmptyStrings().withKeyValueSeparator(" ").split(stats));
