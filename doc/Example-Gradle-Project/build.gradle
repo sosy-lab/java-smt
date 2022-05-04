@@ -71,10 +71,12 @@ dependencies {
   //runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-z3', version: version.z3, classifier: 'com.microsoft.z3', ext: 'jar'
   //runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-z3', version: version.z3, classifier: 'libz3', ext: 'so'
   //runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-z3', version: version.z3, classifier: 'libz3java', ext: 'so'
-        implementation("org.sosy-lab:javasmt-solver-z3:4.8.10:com.microsoft.z3@jar")
-        implementation("org.sosy-lab:javasmt-solver-z3:4.8.10:com.microsoft.z3@jar")
-        implementation("org.sosy-lab:javasmt-solver-z3:4.8.10:libz3@so")
-        implementation("org.sosy-lab:javasmt-solver-z3:4.8.10:libz3java@so")
+
+  // Kotlin version as an alternative. Both should be equal
+  runtimeOnly("org.sosy-lab:javasmt-solver-z3:4.8.10:com.microsoft.z3@jar")
+  runtimeOnly("org.sosy-lab:javasmt-solver-z3:4.8.10:libz3@so")
+  runtimeOnly("org.sosy-lab:javasmt-solver-z3:4.8.10:libz3java@so")
+  
   // Mathsat5 via Maven
   runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-mathsat5', version: version.mathsat5, classifier: 'libmathsat5j', ext: 'so'
 
