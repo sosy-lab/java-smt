@@ -86,9 +86,25 @@ If something specific is missing, please [look for or file an issue](https://git
 The solvers Z3 (w and w/o Optimization), SMTInterpol, Princess, MathSAT5, Boolector and CVC4 support multithreading,
 provided that different threads use different contexts,
 and _all_ operations on a single context are performed from a single thread.
-Interruption using [ShutdownNotifier][] may be used to interrupt a
-a solver from any thread.
+
 CVC4 supports multithreading on a single context with multiple stacks(=provers).
+
+| SMT Solver | Concurrent context usage¹ | Concurrent prover usage² |
+| --- |:---:|:---:|:---:|:--- |
+| [Boolector](https://boolector.github.io/) | :heavy_check_mark: |  |
+| [CVC4](https://cvc4.github.io/) | :heavy_check_mark: | :heavy_check_mark: |
+| [MathSAT5](http://mathsat.fbk.eu/) | :heavy_check_mark: |  |
+| [OptiMathSAT](http://optimathsat.disi.unitn.it/) | :heavy_check_mark: |  |
+| [Princess](http://www.philipp.ruemmer.org/princess.shtml) | :heavy_check_mark: |  |
+| [SMTInterpol](https://ultimate.informatik.uni-freiburg.de/smtinterpol/) | :heavy_check_mark: |  |
+| [Yices2](https://yices.csl.sri.com/) |  |  |
+| [Z3](https://github.com/Z3Prover/z3) | :heavy_check_mark: |  |
+
+Interruption using a [ShutdownNotifier][] may be used to interrupt a
+a solver from any thread.
+
+¹ Multiple contexts, but all operations on each context only from a single thread.
+² Multiple provers on one or more contexts, with each prover using its own thread.
 
 #### Garbage Collection in Native Solvers
 JavaSMT exposes an API for performing garbage collection on solvers
