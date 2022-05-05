@@ -615,7 +615,7 @@ public class SolverConcurrencyTest {
     }
     try {
       assertWithMessage("Timeout initializing the Threads for " + testName)
-          .that(allExecutorThreadsReady.await(NUMBER_OF_THREADS * 10, TimeUnit.MILLISECONDS))
+          .that(allExecutorThreadsReady.await(NUMBER_OF_THREADS * 20, TimeUnit.MILLISECONDS))
           .isTrue();
       afterInitBlocker.countDown();
       assertWithMessage("Timeout in " + testName)
