@@ -90,7 +90,7 @@ and _all_ operations on a single context are performed from a single thread.
 CVC4 supports multithreading on a single context with multiple stacks(=provers).
 
 | SMT Solver | Concurrent context usage¹ | Concurrent prover usage² |
-| --- |:---:|:---:|:---:|:--- |
+| --- |:---:|:---:|
 | [Boolector](https://boolector.github.io/) | :heavy_check_mark: |  |
 | [CVC4](https://cvc4.github.io/) | :heavy_check_mark: | :heavy_check_mark: |
 | [MathSAT5](http://mathsat.fbk.eu/) | :heavy_check_mark: |  |
