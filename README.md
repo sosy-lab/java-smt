@@ -83,12 +83,6 @@ We aim for supporting more important features, more SMT solvers, and more system
 If something specific is missing, please [look for or file an issue](https://github.com/sosy-lab/java-smt/issues).
 
 #### Multithreading Support
-The solvers Z3 (w and w/o Optimization), SMTInterpol, Princess, MathSAT5, Boolector and CVC4 support multithreading,
-provided that different threads use different contexts,
-and _all_ operations on a single context are performed from a single thread.
-
-CVC4 supports multithreading on a single context with multiple stacks(=provers).
-
 | SMT Solver | Concurrent context usage¹ | Concurrent prover usage² |
 | --- |:---:|:---:|
 | [Boolector](https://boolector.github.io/) | :heavy_check_mark: |  |
@@ -101,9 +95,10 @@ CVC4 supports multithreading on a single context with multiple stacks(=provers).
 | [Z3](https://github.com/Z3Prover/z3) | :heavy_check_mark: |  |
 
 Interruption using a [ShutdownNotifier][] may be used to interrupt a
-a solver from any thread.
+a solver from any thread.  
+Formulas are translatable in between contexts/provers/threads using _FormulaManager.translateFrom()_.
 
-¹ Multiple contexts, but all operations on each context only from a single thread.
+¹ Multiple contexts, but all operations on each context only from a single thread.  
 ² Multiple provers on one or more contexts, with each prover using its own thread.
 
 #### Garbage Collection in Native Solvers
