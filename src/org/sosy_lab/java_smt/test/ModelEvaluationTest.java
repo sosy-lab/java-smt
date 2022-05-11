@@ -33,6 +33,24 @@ import org.sosy_lab.java_smt.api.SolverException;
 @RunWith(Parameterized.class)
 public class ModelEvaluationTest extends SolverBasedTest0 {
 
+  /**
+   * This is the default boolean value for unknown model evaluations. For unknown model evaluation
+   * for variables or formulas, the solver can return NULL or a default value.
+   */
+  private static final boolean DEFAULT_MODEL_BOOLEAN = false;
+
+  /**
+   * This is the default integer value for unknown model evaluations. For unknown model evaluation
+   * for variables or formulas, the solver can return NULL or a default value.
+   */
+  private static final int DEFAULT_MODEL_INT = 0;
+
+  /**
+   * This is the default String value for unknown model evaluations. For unknown model evaluation
+   * for variables or formulas, the solver can return NULL or a default value.
+   */
+  private static final String DEFAULT_MODEL_STRING = "";
+
   @Parameters(name = "{0}")
   public static Object[] getAllSolvers() {
     return Solvers.values();
@@ -59,7 +77,7 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
       try (Model m = prover.getModel()) {
         assertThat(m.evaluate(formula)).isIn(possibleExpectedValues);
 
-        // lets try to check evaluations. Actually the whole method is based on some default values
+        // let's try to check evaluations. Actually the whole method is based on some default values
         // in the solvers, because we do not use constraints for the evaluated formulas.
         Formula eval = m.eval(formula);
         if (eval != null && solver == Solvers.SMTINTERPOL) {
@@ -80,8 +98,8 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
     evaluateInModel(
         imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(10)),
         imgr.add(imgr.makeVariable("y"), imgr.makeVariable("z")),
-        Lists.newArrayList(null, BigInteger.ZERO),
-        Lists.newArrayList(null, imgr.makeNumber(0)));
+        Lists.newArrayList(null, BigInteger.valueOf(DEFAULT_MODEL_INT)),
+        Lists.newArrayList(null, imgr.makeNumber(DEFAULT_MODEL_INT)));
   }
 
   @Test
@@ -111,8 +129,8 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
     evaluateInModel(
         rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(1)),
         rmgr.add(rmgr.makeVariable("y"), rmgr.makeVariable("y")),
-        Lists.newArrayList(null, Rational.ZERO),
-        Lists.newArrayList(null, rmgr.makeNumber(0)));
+        Lists.newArrayList(null, Rational.of(DEFAULT_MODEL_INT)),
+        Lists.newArrayList(null, rmgr.makeNumber(DEFAULT_MODEL_INT)));
   }
 
   @Test
@@ -122,8 +140,8 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
     evaluateInModel(
         rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(1)),
         rmgr.makeVariable("y"),
-        Lists.newArrayList(null, Rational.ZERO),
-        Lists.newArrayList(null, rmgr.makeNumber(0)));
+        Lists.newArrayList(null, Rational.of(DEFAULT_MODEL_INT)),
+        Lists.newArrayList(null, rmgr.makeNumber(DEFAULT_MODEL_INT)));
   }
 
   @Test
@@ -132,8 +150,8 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
     evaluateInModel(
         rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(Rational.ofString("1/3"))),
         rmgr.divide(rmgr.makeVariable("y"), rmgr.makeNumber(2)),
-        Lists.newArrayList(null, Rational.ZERO),
-        Lists.newArrayList(null, rmgr.makeNumber(0)));
+        Lists.newArrayList(null, Rational.of(DEFAULT_MODEL_INT)),
+        Lists.newArrayList(null, rmgr.makeNumber(DEFAULT_MODEL_INT)));
   }
 
   @Test
@@ -141,7 +159,17 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
     evaluateInModel(
         bmgr.makeVariable("x"),
         bmgr.makeVariable("y"),
-        Lists.newArrayList(null, false),
-        Lists.newArrayList(null, bmgr.makeBoolean(false)));
+        Lists.newArrayList(null, DEFAULT_MODEL_BOOLEAN),
+        Lists.newArrayList(null, bmgr.makeBoolean(DEFAULT_MODEL_BOOLEAN)));
+  }
+
+  @Test
+  public void testGetStringsEvaluation() throws SolverException, InterruptedException {
+    requireStrings();
+    evaluateInModel(
+        smgr.equal(smgr.makeVariable("x"), smgr.makeString("hello")),
+        smgr.makeVariable("y"),
+        Lists.newArrayList(null, DEFAULT_MODEL_STRING),
+        Lists.newArrayList(null, smgr.makeString(DEFAULT_MODEL_STRING)));
   }
 }

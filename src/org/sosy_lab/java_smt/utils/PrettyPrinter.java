@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.utils;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -139,7 +138,7 @@ public class PrettyPrinter {
         if (out.length() != 0) {
           out.append(System.lineSeparator());
         }
-        out.append(Strings.repeat("  ", depth)); // two spaces indent is sufficient
+        out.append("  ".repeat(depth)); // two spaces indent is sufficient
       } else {
         out.append(" "); // just a separator between two tokens
       }
@@ -200,7 +199,7 @@ public class PrettyPrinter {
         new StringBuilder(
             "digraph SMT {" + System.lineSeparator() + "  rankdir=LR" + System.lineSeparator());
 
-    // lets print leave-nodes lazily, having them on same rank looks nicer in the plot.
+    // let's print leave-nodes lazily, having them on same rank looks nicer in the plot.
     private final List<String> leaves = new ArrayList<>();
 
     private DotVisitor(Collection<PrinterOption> pOptions) {
@@ -210,7 +209,7 @@ public class PrettyPrinter {
     @Override
     public String toString() {
 
-      // lets put non-expanded leaf-nodes onto the right side
+      // let's put non-expanded leaf-nodes onto the right side
       if (!leaves.isEmpty()) {
         out.append("  { rank=same;").append(System.lineSeparator());
         leaves.forEach(out::append);

@@ -3770,6 +3770,8 @@ SWIGEXPORT jobjectArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_B
   char ***arg3 = (char ***) 0 ;
   char ***arg4 = (char ***) 0 ;
   uint32_t *arg5 = (uint32_t *) 0 ;
+  char **args, **values;
+  uint32_t size;
 
   (void)jenv;
   (void)jcls;
@@ -3780,16 +3782,16 @@ SWIGEXPORT jobjectArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_B
   arg1 = *(Btor **)&jarg1;
   arg2 = *(BoolectorNode **)&jarg2;
 
-  boolector_uf_assignment(arg1,arg2,arg3,arg4,arg5);
+  boolector_uf_assignment(arg1, arg2, &args, &values, &size);
 
-  if (arg3 == 0 || arg4 == 0 || arg5 == 0) {
+  if (args == 0 || values == 0 || size == 0) {
     SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "boolector_uf_assignment_helper returned NULL");
     return 0;
   }
 
-  jsize arrayLength = *arg5;
-  int arrayLengthInt = *arg5;
-  char **workArray = *arg3;
+  jsize arrayLength = size;
+  int arrayLengthInt = size;
+  char **workArray = args;
 
   jclass classString = (*jenv)->FindClass(jenv, "java/lang/String");
   jclass classArray = (*jenv)->FindClass(jenv, "[Ljava/lang/Object;");
@@ -3803,7 +3805,7 @@ SWIGEXPORT jobjectArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_B
       (*jenv)->SetObjectArrayElement(jenv, innerJNIArray, j, (*jenv)->NewStringUTF(jenv, workArray[j]));
     }
     //switch to second Array
-    workArray = *arg4;
+    workArray = values;
     (*jenv)->SetObjectArrayElement(jenv, outerJNIArray, i, innerJNIArray);
     (*jenv)->DeleteLocalRef(jenv, innerJNIArray);
   }
@@ -3816,11 +3818,10 @@ SWIGEXPORT jobjectArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_B
 
 //helper method for arrays similiar to the uf one
 SWIGEXPORT jobjectArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1array_1assignment_1helper(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
-  Btor *arg1 = (Btor *) 0 ;
-  BoolectorNode *arg2 = (BoolectorNode *) 0 ;
-  char ***arg3 = (char ***) 0 ;
-  char ***arg4 = (char ***) 0 ;
-  uint32_t *arg5 = (uint32_t *) 0 ;
+  Btor *btor = (Btor *) 0 ;
+  BoolectorNode *node = (BoolectorNode *) 0 ;
+  char **indices, **values;
+  uint32_t size;
 
   (void)jenv;
   (void)jcls;
@@ -3828,16 +3829,17 @@ SWIGEXPORT jobjectArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_B
   int i = 0;
   int j = 0;
 
-  arg1 = *(Btor **)&jarg1;
-  arg2 = *(BoolectorNode **)&jarg2;
+  btor = *(Btor **)&jarg1;
+  node = *(BoolectorNode **)&jarg2;
 
-  boolector_array_assignment(arg1,arg2,arg3,arg4,arg5);
+  boolector_array_assignment(btor, node, &indices, &values, &size);
 
-  if (arg3 == 0 || arg4 == 0 || arg5 == 0) return ((void*)0) ;
+  // TODO: is the check for indices and values good?
+  if (indices == 0 || values == 0 || size == 0) return ((void*)0) ;
 
-  jsize arrayLength = *arg5;
-  int arrayLengthInt = *arg5;
-  char **workArray = *arg3;
+  jsize arrayLength = size;
+  int arrayLengthInt = size;
+  char **workArray = indices;
 
   jclass classString = (*jenv)->FindClass(jenv, "java/lang/String");
   jclass classArray = (*jenv)->FindClass(jenv, "[Ljava/lang/Object;");
@@ -3851,7 +3853,7 @@ SWIGEXPORT jobjectArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_B
       (*jenv)->SetObjectArrayElement(jenv, innerJNIArray, j, (*jenv)->NewStringUTF(jenv, workArray[j]));
     }
     //switch to second Array
-    workArray = *arg4;
+    workArray = values;
     (*jenv)->SetObjectArrayElement(jenv, outerJNIArray, i, innerJNIArray);
     (*jenv)->DeleteLocalRef(jenv, innerJNIArray);
   }
@@ -3860,6 +3862,22 @@ SWIGEXPORT jobjectArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_B
   (*jenv)->DeleteLocalRef(jenv, classArray);
 
   return outerJNIArray;
+}
+
+// Call to get a model value for any node (note: this returns a node, not a String! One can use methods of the type boolector_..._assignment to get the string representation)
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1get_1value(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  Btor *arg1 = (Btor *) 0 ;
+  BoolectorNode *arg2 = (BoolectorNode *) 0 ;
+  jlong jresult = 0 ;
+  BoolectorNode *result = 0 ;
+
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  result = (BoolectorNode *) boolector_get_value(arg1,arg2);
+  *(BoolectorNode **)&jresult = result;
+  return jresult;
 }
 
 SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1set_1termination(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg2) {
@@ -3912,6 +3930,70 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
   (*jenv)->DeleteGlobalRef(jenv, helper->obj);
   helper->obj = NULL;
   free(helper);
+}
+
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1print_1stats_1helper(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  Btor *arg1 = (Btor *) 0 ;
+
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(Btor **)&jarg1;
+
+  // Save the stdout 
+  int saved_stdout = dup(1);
+
+  // Create a tempfile
+  char *tempfileName = addTemppathToFilename("boolector_temp_XXXXXX");
+
+  if (tempfileName == NULL) {
+    perror("ERROR CREATING TEMPORARY FILE FOR BOOLECTOR_HELP_DUMP_NODE_SMT2");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "FileName may not be NULL");
+    return NULL;
+  }
+
+  int fileDesrc = mkstemp(tempfileName);
+
+  if (fileDesrc == -1) {
+    free(tempfileName);
+    perror("ERROR CREATING TEMPORARY FILE FOR BOOLECTOR_HELP_DUMP_NODE_SMT2");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "FileDescriptor may not be NULL");
+    return NULL;
+  }
+
+  FILE *file = fdopen(fileDesrc, "w+");
+
+  // Make sure that the file is deleted once the function ends
+  unlink(tempfileName);
+  free(tempfileName);
+
+  if (file == NULL) {
+    perror("ERROR: COULDNT DUMP NODE BECAUSE IT COULDNT CREATE A DUMP FILE");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "File may not be NULL");
+    return NULL;
+  }
+
+  // Flush the stdout and switch it to the file
+  fflush(stdout);
+  int dup2ret = dup2(fileDesrc, 1);
+
+  if (dup2ret == -1) {
+    fclose(file);
+    dup2(saved_stdout, 1);
+    close(saved_stdout);
+    return NULL;
+  }
+
+  // Use the print stats method that prints to the stdout and flush to make sure its in the file
+  boolector_print_stats(arg1);
+
+  fflush(stdout);
+  // Transform the file into a string and return the stdout back and close everything
+  jstring jresult = copyFileContentToString(jenv, file);
+  fclose(file);
+  dup2(saved_stdout, 1);
+  close(saved_stdout);
+
+  return jresult;
 }
 
 #ifdef __cplusplus

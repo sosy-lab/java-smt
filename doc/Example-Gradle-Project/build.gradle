@@ -1,0 +1,161 @@
+// This file is part of JavaSMT,
+// an API wrapper for a collection of SMT solvers:
+// https://github.com/sosy-lab/java-smt
+//
+// SPDX-FileCopyrightText: 2021 Dirk Beyer <https://www.sosy-lab.org>
+//
+// SPDX-License-Identifier: Apache-2.0
+
+apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = 'org.sosy_lab.java_smt_example.SolverOverviewTable'
+
+// Globally define versions used for our dependencies later in a map
+def version = [
+  'javasmt': '3.12.0',
+  'javasmtYices2': '3.12.0',
+  'junit4': '4.13',
+  'smtInterpol': '2.5-916-ga5843d8b',
+  'boolector': '3.2.2-g1a89c229',
+  'z3': '4.8.10',
+  'cvc4': '1.8-prerelease-2020-06-24-g7825d8f28',
+  'mathsat5': '5.6.6-sosy1',
+  'optiMathsat5': '1.7.1-sosy0',
+  'yices2': '2.6.2-396-g194350c1',
+  'princess': '2021-11-15'
+];
+
+repositories {
+  // try to resolve by pom first
+  mavenCentral {
+    metadataSources {
+      mavenPom()
+    }
+  }
+    // try to get artifacts if no useful pom is found
+  mavenCentral {
+    metadataSources {
+      artifact()
+    }
+  }
+    // Ivy can be used as well
+  ivy {
+    url "https://www.sosy-lab.org/ivy"
+    patternLayout {
+      artifact "/[organisation]/[module]/[classifier]-[revision].[ext]"
+      //ivy "/[organisation]/[module]/ivy-[revision].xml"
+    }
+    metadataSources {
+       artifact()
+    }
+  }
+}
+
+configurations {
+  // Use a custom config that inherits all dependencies from runtimeOnly and implementation.
+  // If you want to seperate your dependencies from the JavaSMT ones
+  // simply use it when pulling the dependencies.
+  javaSMTConfig.extendsFrom(runtimeOnly, implementation)
+}
+
+// You can manage the JavaSMT dependencies via a config if you need to split them from your regular dependencies
+dependencies {
+  // JUnit 4
+	testImplementation "junit:junit:${version.junit4}"
+
+  // Retrieve JavaSMT with Maven and transitive dependencies via a pom.xml
+	implementation "org.sosy-lab:java-smt:${version.javasmt}"
+
+  // Retrieve Z3 with Maven but without a pom.xml, just the artifacts
+  //runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-z3', version: version.z3, classifier: 'com.microsoft.z3', ext: 'jar'
+  //runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-z3', version: version.z3, classifier: 'libz3', ext: 'so'
+  //runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-z3', version: version.z3, classifier: 'libz3java', ext: 'so'
+
+  // Kotlin version as an alternative. Both should be equal
+  runtimeOnly("org.sosy-lab:javasmt-solver-z3:4.8.10:com.microsoft.z3@jar")
+  runtimeOnly("org.sosy-lab:javasmt-solver-z3:4.8.10:libz3@so")
+  runtimeOnly("org.sosy-lab:javasmt-solver-z3:4.8.10:libz3java@so")
+  
+  // Mathsat5 via Maven
+  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-mathsat5', version: version.mathsat5, classifier: 'libmathsat5j', ext: 'so'
+
+  // Retrieve OptiMathSAT via Ivy (as it is currently not available in Maven)
+	runtimeOnly "org.sosy_lab:javasmt-solver-optimathsat:${version.optiMathsat5}:liboptimathsat5j@so"
+
+  // Retrieve CVC4 via Maven
+  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-cvc4', version: version.cvc4, classifier: 'CVC4', ext: 'jar'
+  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-cvc4', version: version.cvc4, classifier: 'libcvc4', ext: 'so'
+  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-cvc4', version: version.cvc4, classifier: 'libcvc4jni', ext: 'so'
+  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-cvc4', version: version.cvc4, classifier: 'libcvc4parser', ext: 'so'
+
+  // Retrieve Boolector via Maven
+  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-boolector', version: version.boolector, classifier: 'libboolector', ext: 'so'
+  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-boolector', version: version.boolector, classifier: 'libminisat', ext: 'so'
+  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-boolector', version: version.boolector, classifier: 'libpicosat', ext: 'so'
+
+  // Retrieve Princess
+  runtimeOnly group: 'io.github.uuverifiers', name: 'princess_2.13', version: version.princess, ext: 'jar'
+  
+  // Retrieve SMTInterpol
+  runtimeOnly group: 'de.uni-freiburg.informatik.ultimate', name: 'smtinterpol', version: version.smtInterpol, ext: 'jar'
+  
+  // Example as to how to use Yices2
+  // First get JavaSMT for Yices2 from Maven (if you want to use only Yices2 use this dependency in the "implementation" part above instead of regual JavaSMT)
+  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-yices2', version: version.javasmtYices2, ext: 'jar'
+  // And the Yices2 solver from Maven
+  runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-yices2', version: version.yices2, classifier: 'libyices2j', ext: 'so'
+  
+  /* 
+  Kotlin version for z3 as an example:
+  implementation(group = "org.sosy-lab", name = "javasmt-solver-z3", version = "4.8.10", classifier = "com.microsoft.z3", ext = "jar")
+  implementation(group = "org.sosy-lab", name = "javasmt-solver-z3", version = "4.8.10", classifier = "libz3", ext = "so")
+  implementation(group = "org.sosy-lab", name = "javasmt-solver-z3", version = "4.8.10", classifier = "libz3java", ext = "so")
+  */
+
+  // Tell implementation config to use the JavaSMT + dependencies from our dependencies folder
+  implementation fileTree(dir: 'build/dependencies', include: '*.jar')
+}
+
+// Test with JUnit4 (see dependencies) and 1gig heap
+test {
+  useJUnit()
+  maxHeapSize = '1G'
+}
+
+// Copy and rename all JavaSMT dependencies
+// This is necassary as Gradle renames the JavaSMT dependencies, but we need them to have certain names,
+// and they need to be in a specific location for JavaSMT to be found (the easiest ist the same folder)
+// For more information about this look up the sosy-commons loading process
+task copyDependencies(type: Copy) {
+  // Delete old dependencies as they might cause trouble
+  dependsOn 'cleanDownloadedDependencies'
+  from configurations.javaSMTConfig
+  into 'build/dependencies'
+  // Renames the dependencies
+  rename '.*(lib[^-]*)-?.*.so', '$1.so'
+}
+
+// Cleans the dependencies folder
+task cleanDownloadedDependencies(type: Delete) {
+  delete fileTree('build/dependencies')
+}
+
+// Copy the JavaSMT depdendencies before using them, to do this we declare a dependency on the copy task of ours here
+compileJava.dependsOn copyDependencies
+
+// When clean is called we want to delete our copied JavaSMT files
+clean.dependsOn cleanDownloadedDependencies
+
+// Set duplicate strategy to remove a warning
+distTar.setDuplicatesStrategy(DuplicatesStrategy.INCLUDE)
+distZip.setDuplicatesStrategy(DuplicatesStrategy.INCLUDE)
+
+// Configuring the jar task allows not only building our jar but custom classpath usage
+// Note: the classpath will assume that the dependencies are in the same folder as the jar!
+jar {
+  manifest {
+    attributes 'Main-Class': 'org.sosy_lab.java_smt_example.SolverOverviewTable'
+    attributes 'Class-Path': configurations.javaSMTConfig.files.collect { it.getName() }.join(' ')
+  }
+}

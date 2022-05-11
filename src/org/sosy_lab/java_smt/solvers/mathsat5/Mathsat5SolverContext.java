@@ -114,15 +114,7 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
       Mathsat5FormulaCreator creator) {
     super(manager);
 
-    if (!loaded) { // Avoid logging twice.
-      logger.log(
-          Level.WARNING,
-          "MathSAT5 is available for research and evaluation purposes only. It can not be used in"
-              + " a commercial environment, particularly as part of a commercial product, without "
-              + "written permission. MathSAT5 is provided as is, without any warranty. "
-              + "Please write to mathsat@fbk.eu for additional questions regarding licensing "
-              + "MathSAT5 or obtaining more up-to-date versions.");
-    }
+    logLicenseInfo(logger);
     this.logger = logger;
     this.mathsatConfig = mathsatConfig;
     this.settings = settings;
@@ -135,6 +127,19 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
           shutdownNotifier.shutdownIfNecessary();
           return false;
         };
+  }
+
+  private static void logLicenseInfo(LogManager logger) {
+    if (!loaded) { // Avoid logging twice.
+      loaded = true;
+      logger.log(
+          Level.WARNING,
+          "MathSAT5 is available for research and evaluation purposes only. It can not be used in"
+              + " a commercial environment, particularly as part of a commercial product, without "
+              + "written permission. MathSAT5 is provided as is, without any warranty. "
+              + "Please write to mathsat@fbk.eu for additional questions regarding licensing "
+              + "MathSAT5 or obtaining more up-to-date versions.");
+    }
   }
 
   @SuppressWarnings("ParameterNumber")

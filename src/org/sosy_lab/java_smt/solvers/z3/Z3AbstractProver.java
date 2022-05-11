@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.z3;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.io.MoreFiles;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.microsoft.z3.Native;
@@ -41,8 +42,6 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
   private final Z3FormulaManager mgr;
 
   protected final long z3solver;
-
-  private int level = 0;
 
   private final UniqueIdGenerator trackId = new UniqueIdGenerator();
   private final @Nullable Map<String, BooleanFormula> storedConstraints;
@@ -175,7 +174,6 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
   @Override
   public void push() {
     Preconditions.checkState(!closed);
-    level++;
     Native.solverPush(z3context, z3solver);
   }
 
@@ -183,12 +181,13 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
   public void pop() {
     Preconditions.checkState(!closed);
     Preconditions.checkState(Native.solverGetNumScopes(z3context, z3solver) >= 1);
-    level--;
     Native.solverPop(z3context, z3solver, 1);
   }
 
-  protected int getLevel() {
-    return level;
+  @Override
+  public int size() {
+    Preconditions.checkState(!closed);
+    return Native.solverGetNumScopes(z3context, z3solver);
   }
 
   @Override
@@ -233,15 +232,38 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   @Override
+  public ImmutableMap<String, String> getStatistics() {
+    // Z3 sigsevs if you try to get statistics for closed environments
+    Preconditions.checkState(!closed);
+
+    ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+
+    final long stats = Native.solverGetStatistics(z3context, z3solver);
+    for (int i = 0; i < Native.statsSize(z3context, stats); i++) {
+      String key = Native.statsGetKey(z3context, stats, i);
+      if (Native.statsIsUint(z3context, stats, i)) {
+        builder.put(key, Integer.toString(Native.statsGetUintValue(z3context, stats, i)));
+      } else if (Native.statsIsDouble(z3context, stats, i)) {
+        builder.put(key, Double.toString(Native.statsGetDoubleValue(z3context, stats, i)));
+      } else {
+        throw new IllegalStateException(
+            String.format(
+                "Unknown data entry value for key %s at position %d in statistics '%s'",
+                key, i, Native.statsToString(z3context, stats)));
+      }
+    }
+
+    return builder.build();
+  }
+
+  @Override
   public void close() {
     if (!closed) {
       Preconditions.checkArgument(
           Native.solverGetNumScopes(z3context, z3solver) >= 0,
           "a negative number of scopes is not allowed");
 
-      while (level > 0) {
-        pop();
-      }
+      Native.solverReset(z3context, z3solver); // remove all assertions from the solver
       Native.solverDecRef(z3context, z3solver);
 
       shutdownNotifier.unregister(interruptListener);

@@ -77,8 +77,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
             "Activate replayable logging in Z3."
                 + " The log can be given as an input to the solver and replayed.")
     @FileOption(FileOption.Type.OUTPUT_FILE)
-    @Nullable
-    Path log = null;
+    @Nullable Path log = null;
   }
 
   @SuppressWarnings("checkstyle:parameternumber")
@@ -118,7 +117,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
     ExtraOptions extraOptions = new ExtraOptions();
     config.inject(extraOptions);
 
-    // We need to load z3 in addition to z3java, because Z3's own class only loads the latter
+    // We need to load z3 in addition to z3java, because Z3's own class only loads the latter,
     // but it will fail to find the former if not loaded previously.
     // We load both libraries here to have all the loading in one place.
     loadLibrariesWithFallback(
@@ -154,6 +153,10 @@ public final class Z3SolverContext extends AbstractSolverContext {
     Native.incRef(context, Native.sortToAst(context, integerSort));
     long realSort = Native.mkRealSort(context);
     Native.incRef(context, Native.sortToAst(context, realSort));
+    long stringSort = Native.mkStringSort(context);
+    Native.incRef(context, Native.sortToAst(context, stringSort));
+    long regexSort = Native.mkReSort(context, stringSort);
+    Native.incRef(context, Native.sortToAst(context, regexSort));
 
     // The string representations of Z3s formulas should be in SMTLib2,
     // otherwise serialization wouldn't work.
@@ -165,7 +168,15 @@ public final class Z3SolverContext extends AbstractSolverContext {
         context, z3params, Native.mkStringSymbol(context, ":random-seed"), (int) randomSeed);
 
     Z3FormulaCreator creator =
-        new Z3FormulaCreator(context, boolSort, integerSort, realSort, config, pShutdownNotifier);
+        new Z3FormulaCreator(
+            context,
+            boolSort,
+            integerSort,
+            realSort,
+            stringSort,
+            regexSort,
+            config,
+            pShutdownNotifier);
 
     // Create managers
     Z3UFManager functionTheory = new Z3UFManager(creator);
@@ -180,6 +191,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
         new Z3FloatingPointFormulaManager(creator, pFloatingPointRoundingMode);
     Z3QuantifiedFormulaManager quantifierManager = new Z3QuantifiedFormulaManager(creator);
     Z3ArrayFormulaManager arrayManager = new Z3ArrayFormulaManager(creator);
+    Z3StringFormulaManager stringTheory = new Z3StringFormulaManager(creator);
 
     // Set the custom error handling
     // which will throw Z3Exception
@@ -196,7 +208,8 @@ public final class Z3SolverContext extends AbstractSolverContext {
             bitvectorTheory,
             floatingPointTheory,
             quantifierManager,
-            arrayManager);
+            arrayManager,
+            stringTheory);
     return new Z3SolverContext(
         creator, config, z3params, pShutdownNotifier, logger, manager, solverLogfile);
   }

@@ -148,7 +148,11 @@ public class Sudoku {
     private SudokuSolver(SolverContext pContext) {
       context = pContext;
       bmgr = context.getFormulaManager().getBooleanFormulaManager();
-      imgr = context.getFormulaManager().getIntegerFormulaManager();
+      if (context.getSolverName() != Solvers.BOOLECTOR) {
+        imgr = context.getFormulaManager().getIntegerFormulaManager();
+      } else {
+        imgr = null;
+      }
     }
 
     abstract S getSymbols();
@@ -290,7 +294,7 @@ public class Sudoku {
 
   public static class BooleanBasedSudokuSolver extends SudokuSolver<BooleanFormula[][][]> {
 
-    private BooleanBasedSudokuSolver(SolverContext context) {
+    public BooleanBasedSudokuSolver(SolverContext context) {
       super(context);
     }
 

@@ -60,7 +60,7 @@ public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
 
   private ImmutableList<ValueAssignment> generateModel() {
     ImmutableSet.Builder<ValueAssignment> builder = ImmutableSet.builder();
-    // Using creator.extractVariablesAndUFs we wouldn't get accurate information any more as we
+    // Using creator.extractVariablesAndUFs we wouldn't get accurate information anymore as we
     // translate all bound vars back to their free counterparts in the visitor!
     for (Expr expr : assertedExpressions) {
       // creator.extractVariablesAndUFs(expr, true, (name, f) -> builder.add(getAssignment(f)));

@@ -8,7 +8,16 @@
 
 package org.sosy_lab.java_smt.example;
 
+import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.BOOLECTOR;
+import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.CVC4;
+import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.MATHSAT5;
+import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.PRINCESS;
+import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.SMTINTERPOL;
+import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.YICES2;
+import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.Z3;
+
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +30,8 @@ import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment.AllSatCallback;
+import org.sosy_lab.java_smt.api.BitvectorFormula;
+import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
@@ -38,8 +49,14 @@ import org.sosy_lab.java_smt.api.SolverException;
 @SuppressWarnings("unused")
 public class AllSatExample {
 
-  private final BooleanFormulaManager bfmgr;
-  private final IntegerFormulaManager ifmgr;
+  private static final ImmutableSet<Solvers> SOLVERS_WITH_INTEGERS =
+      ImmutableSet.of(MATHSAT5, SMTINTERPOL, Z3, PRINCESS, CVC4, YICES2);
+  private static final ImmutableSet<Solvers> SOLVERS_WITH_BITVECTORS =
+      ImmutableSet.of(MATHSAT5, Z3, PRINCESS, BOOLECTOR, CVC4);
+
+  private BooleanFormulaManager bfmgr;
+  private IntegerFormulaManager ifmgr;
+  private BitvectorFormulaManager bvfmgr;
   private final ProverEnvironment prover;
   private final SolverContext context;
 
@@ -54,25 +71,33 @@ public class AllSatExample {
           ProverEnvironment prover =
               context.newProverEnvironment(
                   ProverOptions.GENERATE_MODELS, ProverOptions.GENERATE_ALL_SAT)) {
-        System.out.println("\nUsing solver " + solver + " in version " + context.getVersion());
+        logger.log(Level.WARNING, "Using solver " + solver + " in version " + context.getVersion());
 
         AllSatExample ase = new AllSatExample(context, prover);
 
         prover.push();
-        System.out.println(ase.allSatBooleans1());
+        logger.log(Level.INFO, ase.allSatBooleans1());
         prover.pop();
 
         prover.push();
-        System.out.println(ase.allSatBooleans2());
+        logger.log(Level.INFO, ase.allSatBooleans2());
         prover.pop();
 
-        prover.push();
-        System.out.println(ase.allSatIntegers());
-        prover.pop();
+        if (SOLVERS_WITH_INTEGERS.contains(solver)) {
+          prover.push();
+          logger.log(Level.INFO, ase.allSatIntegers());
+          prover.pop();
 
-        prover.push();
-        System.out.println(ase.allSatIntegers2());
-        prover.pop();
+          prover.push();
+          logger.log(Level.INFO, ase.allSatIntegers2());
+          prover.pop();
+        }
+
+        if (SOLVERS_WITH_BITVECTORS.contains(solver)) {
+          prover.push();
+          logger.log(Level.INFO, ase.allSatBitvectors());
+          prover.pop();
+        }
 
       } catch (InvalidConfigurationException | UnsatisfiedLinkError e) {
 
@@ -87,8 +112,6 @@ public class AllSatExample {
   }
 
   public AllSatExample(SolverContext pContext, ProverEnvironment pProver) {
-    bfmgr = pContext.getFormulaManager().getBooleanFormulaManager();
-    ifmgr = pContext.getFormulaManager().getIntegerFormulaManager();
     prover = pProver;
     context = pContext;
   }
@@ -96,7 +119,9 @@ public class AllSatExample {
   /** For boolean symbols we can directly use the method {@link ProverEnvironment#allSat}. */
   private List<List<BooleanFormula>> allSatBooleans1()
       throws InterruptedException, SolverException {
+    bfmgr = context.getFormulaManager().getBooleanFormulaManager();
 
+    // formula (p --> q) with 3 models
     BooleanFormula p = bfmgr.makeVariable("p");
     BooleanFormula q = bfmgr.makeVariable("q");
 
@@ -105,7 +130,7 @@ public class AllSatExample {
     return prover.allSat(
         new AllSatCallback<>() {
 
-          List<List<BooleanFormula>> models = new ArrayList<>();
+          private final List<List<BooleanFormula>> models = new ArrayList<>();
 
           @Override
           public void apply(List<BooleanFormula> pModel) {
@@ -123,7 +148,9 @@ public class AllSatExample {
   /** For boolean symbols we can also ask the model directly for evaluations of symbols. */
   private List<List<ValueAssignment>> allSatBooleans2()
       throws InterruptedException, SolverException {
+    bfmgr = context.getFormulaManager().getBooleanFormulaManager();
 
+    // formula (p --> q) with 3 models
     BooleanFormula p = bfmgr.makeVariable("p");
     BooleanFormula q = bfmgr.makeVariable("q");
 
@@ -160,7 +187,10 @@ public class AllSatExample {
    */
   private List<List<ValueAssignment>> allSatIntegers()
       throws InterruptedException, SolverException {
+    bfmgr = context.getFormulaManager().getBooleanFormulaManager();
+    ifmgr = context.getFormulaManager().getIntegerFormulaManager();
 
+    // formula ((1 <= a <= 10) && (1 <= b <= 10) && (a >= 2 * b)) with 25 models
     IntegerFormula a = ifmgr.makeVariable("a");
     IntegerFormula b = ifmgr.makeVariable("b");
 
@@ -195,7 +225,10 @@ public class AllSatExample {
    */
   private List<List<ValueAssignment>> allSatIntegers2()
       throws InterruptedException, SolverException {
+    bfmgr = context.getFormulaManager().getBooleanFormulaManager();
+    ifmgr = context.getFormulaManager().getIntegerFormulaManager();
 
+    // formula ((1 <= a <= 3) && (0 == b) && (p == q)) with 6 models
     IntegerFormula a = ifmgr.makeVariable("a");
     IntegerFormula b = ifmgr.makeVariable("b");
     BooleanFormula p = bfmgr.makeVariable("p");
@@ -232,5 +265,49 @@ public class AllSatExample {
 
   private IntegerFormula num(BigInteger number) {
     return ifmgr.makeNumber(number);
+  }
+
+  /**
+   * For bitvector formulas, we can implement the allsat-loop and collect all models when iterating.
+   */
+  private List<List<ValueAssignment>> allSatBitvectors()
+      throws InterruptedException, SolverException {
+    bfmgr = context.getFormulaManager().getBooleanFormulaManager();
+    bvfmgr = context.getFormulaManager().getBitvectorFormulaManager();
+
+    // formula ((1 <= a <= 3) && (0 == b) && (p == q)) with 6 models
+    final int bitsize = 4;
+    BitvectorFormula a = bvfmgr.makeVariable(bitsize, "c");
+    BitvectorFormula b = bvfmgr.makeVariable(bitsize, "d");
+    BooleanFormula p = bfmgr.makeVariable("r");
+    BooleanFormula q = bfmgr.makeVariable("s");
+
+    prover.addConstraint(bvfmgr.lessOrEquals(bv(bitsize, 1), a, true));
+    prover.addConstraint(bvfmgr.equal(bv(bitsize, 0), b));
+    prover.addConstraint(bvfmgr.lessOrEquals(a, bv(bitsize, 3), true));
+    prover.addConstraint(bfmgr.equivalence(p, q));
+
+    List<List<ValueAssignment>> models = new ArrayList<>();
+
+    // loop over all possible models for "1<=a<=3 AND p=q"
+    while (!prover.isUnsat()) {
+      final ImmutableList<ValueAssignment> modelAssignments = prover.getModelAssignments();
+
+      models.add(modelAssignments);
+
+      final List<BooleanFormula> modelAssignmentsAsFormulas = new ArrayList<>();
+      for (ValueAssignment va : modelAssignments) {
+        modelAssignmentsAsFormulas.add(va.getAssignmentAsFormula());
+      }
+
+      // prevent next model from using the same assignment as a previous model
+      prover.addConstraint(bfmgr.not(bfmgr.and(modelAssignmentsAsFormulas)));
+    }
+
+    return models;
+  }
+
+  private BitvectorFormula bv(int bitsize, int number) {
+    return bvfmgr.makeBitvector(bitsize, number);
   }
 }

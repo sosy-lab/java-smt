@@ -13,6 +13,7 @@ import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
 import de.uni_freiburg.informatik.ultimate.logic.ConstantTerm;
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
 import de.uni_freiburg.informatik.ultimate.logic.Rational;
+import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import java.util.ArrayDeque;
@@ -28,13 +29,13 @@ import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager;
 abstract class SmtInterpolNumeralFormulaManager<
         ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
     extends AbstractNumeralFormulaManager<
-        Term, Sort, SmtInterpolEnvironment, ParamFormulaType, ResultFormulaType, FunctionSymbol> {
+        Term, Sort, Script, ParamFormulaType, ResultFormulaType, FunctionSymbol> {
 
   /** Operators for arithmetic functions that return a numeric value. */
   private static final ImmutableSet<String> NUMERIC_FUNCTIONS =
       ImmutableSet.of("+", "-", "*", "/", "div", "mod");
 
-  protected final SmtInterpolEnvironment env;
+  protected final Script env;
 
   SmtInterpolNumeralFormulaManager(
       SmtInterpolFormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {

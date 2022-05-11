@@ -40,7 +40,8 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
       Z3BitvectorFormulaManager pBitpreciseManager,
       Z3FloatingPointFormulaManager pFloatingPointManager,
       Z3QuantifiedFormulaManager pQuantifiedManager,
-      Z3ArrayFormulaManager pArrayManager) {
+      Z3ArrayFormulaManager pArrayManager,
+      Z3StringFormulaManager pStringManager) {
     super(
         pFormulaCreator,
         pFunctionManager,
@@ -51,7 +52,8 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
         pFloatingPointManager,
         pQuantifiedManager,
         pArrayManager,
-        null);
+        null,
+        pStringManager);
     formulaCreator = pFormulaCreator;
   }
 
@@ -66,7 +68,7 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
 
     final long env = getEnvironment();
 
-    // JavaSMT does currently not allow to define new sorts, future work?
+    // JavaSMT does currently not allow defining new sorts, future work?
     long[] sortSymbols = new long[0];
     long[] sorts = new long[0];
 
@@ -173,7 +175,7 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
         new Object() {
           @Override
           public String toString() {
-            // Serializing a solver is a simplest way to dump a formula in Z3,
+            // Serializing a solver is the simplest way to dump a formula in Z3,
             // cf https://github.com/Z3Prover/z3/issues/397
             long z3solver = Native.mkSolver(getEnvironment());
             Native.solverIncRef(getEnvironment(), z3solver);
@@ -220,8 +222,7 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
   @Override
   public BooleanFormula translateFrom(BooleanFormula other, FormulaManager otherManager) {
     if (otherManager instanceof Z3FormulaManager) {
-      Z3FormulaManager o = (Z3FormulaManager) otherManager;
-      long otherZ3Context = o.getEnvironment();
+      long otherZ3Context = ((Z3FormulaManager) otherManager).getEnvironment();
       if (otherZ3Context == getEnvironment()) {
 
         // Same context.

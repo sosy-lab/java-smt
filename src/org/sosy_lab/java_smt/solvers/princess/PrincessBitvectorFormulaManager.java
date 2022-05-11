@@ -183,8 +183,7 @@ class PrincessBitvectorFormulaManager
   }
 
   @Override
-  protected IExpression extract(IExpression pNumber, int pMsb, int pLsb, boolean pSigned) {
-    // TODO: pSigned?
+  protected IExpression extract(IExpression pNumber, int pMsb, int pLsb) {
     return ModuloArithmetic$.MODULE$.extract(pMsb, pLsb, (ITerm) pNumber);
   }
 

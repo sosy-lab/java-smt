@@ -79,6 +79,13 @@ public interface FormulaManager {
   QuantifiedFormulaManager getQuantifiedFormulaManager();
 
   /**
+   * Returns the String Theory.
+   *
+   * @throws UnsupportedOperationException If the theory is not supported by the solver.
+   */
+  StringFormulaManager getStringFormulaManager();
+
+  /**
    * Create variable of the type equal to {@code formulaType}.
    *
    * @param formulaType the type of the variable.
@@ -167,7 +174,7 @@ public interface FormulaManager {
    *
    * <p>Please be aware that calling this method might cause extensive stack usage depending on the
    * nesting of the given formula and the given {@link FormulaVisitor}. Additionally, sub-formulas
-   * that are used several times in the formula might be visited several times. For a efficient
+   * that are used several times in the formula might be visited several times. For an efficient
    * formula traversing, we also provide {@link #visitRecursively(Formula, FormulaVisitor)}.
    *
    * @param f formula to be visited
@@ -185,7 +192,7 @@ public interface FormulaManager {
    * and thus is not prone to StackOverflowErrors.
    *
    * <p>Furthermore, this method also guarantees that every equal part of the formula is visited
-   * only once. Thus it can be used to traverse DAG-like formulas efficiently.
+   * only once. Thus, it can be used to traverse DAG-like formulas efficiently.
    */
   void visitRecursively(Formula f, FormulaVisitor<TraversalProcess> rFormulaVisitor);
 
@@ -196,7 +203,7 @@ public interface FormulaManager {
    * and thus is not prone to StackOverflowErrors.
    *
    * <p>Furthermore, this method also guarantees that every equal part of the formula is visited
-   * only once. Thus it can be used to traverse DAG-like formulas efficiently.
+   * only once. Thus, it can be used to traverse DAG-like formulas efficiently.
    *
    * @param pFormulaVisitor Transformation described by the user.
    */
@@ -240,10 +247,10 @@ public interface FormulaManager {
    * own contexts.
    *
    * @param formula Formula belonging to {@code otherContext}.
-   * @param otherContext Formula manager belonging to the other context.
+   * @param otherManager Formula manager belonging to the other context.
    * @return Formula belonging to {@code this} context.
    */
-  BooleanFormula translateFrom(BooleanFormula formula, FormulaManager otherContext);
+  BooleanFormula translateFrom(BooleanFormula formula, FormulaManager otherManager);
 
   /**
    * Check whether the given String can be used as symbol/name for variables or undefined functions.
@@ -253,10 +260,10 @@ public interface FormulaManager {
    * possible not use logical or mathematical operators, or keywords strongly depending on SMTlib.
    *
    * <p>If a variable name is rejected, a possibility is escaping, e.g. either substituting the
-   * whole variable name or just every invalid character with an escaped form. We recommend to use
-   * an escape sequence based on the token "JAVASMT", because it might be unusual enough to appear
-   * when encoding a user's problem in SMT. Please not that you might also have to handle escaping
-   * the escape sequence. Examples:
+   * whole variable name or just every invalid character with an escaped form. We recommend using an
+   * escape sequence based on the token "JAVASMT", because it might be unusual enough to appear when
+   * encoding a user's problem in SMT. Please note that you might also have to handle escaping the
+   * escape sequence. Examples:
    *
    * <ul>
    *   <li>the invalid variable name <code>"="</code> (logical operator for equality) can be

@@ -82,8 +82,7 @@ final class FormulaTransformationVisitorImpl implements FormulaVisitor<Void> {
     // of the function were already processed.
     if (allArgumentsTransformed) {
 
-      // Create an processed version of the
-      // function application.
+      // Create a processed version of the function application.
       if (!toProcess.isEmpty()) {
         toProcess.pop();
       }

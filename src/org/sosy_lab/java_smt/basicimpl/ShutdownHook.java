@@ -41,7 +41,7 @@ public final class ShutdownHook implements ShutdownRequestListener, AutoCloseabl
     while (isActiveHook.get()) { // flag is reset in #cancelHook
       interruptCall.run();
       try {
-        Thread.sleep(10); // lets wait a few steps
+        Thread.sleep(10); // let's wait a few steps
       } catch (InterruptedException e) {
         // ignore
       }

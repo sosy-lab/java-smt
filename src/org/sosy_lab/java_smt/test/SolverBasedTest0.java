@@ -35,6 +35,7 @@ import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.api.StringFormulaManager;
 import org.sosy_lab.java_smt.api.UFManager;
 
 /**
@@ -84,6 +85,7 @@ public abstract class SolverBasedTest0 {
   protected @Nullable QuantifiedFormulaManager qmgr;
   protected @Nullable ArrayFormulaManager amgr;
   protected @Nullable FloatingPointFormulaManager fpmgr;
+  protected @Nullable StringFormulaManager smgr;
   protected ShutdownManager shutdownManager = ShutdownManager.create();
 
   protected ShutdownNotifier shutdownNotifierToUse() {
@@ -121,7 +123,7 @@ public abstract class SolverBasedTest0 {
 
     fmgr = mgr.getUFManager();
     bmgr = mgr.getBooleanFormulaManager();
-    // Needed for Boolector tests (Doesnt support Integer Formulas)
+    // Needed for Boolector tests (Does not support Integer Formulas)
     try {
       imgr = mgr.getIntegerFormulaManager();
     } catch (UnsupportedOperationException e) {
@@ -151,6 +153,11 @@ public abstract class SolverBasedTest0 {
       fpmgr = mgr.getFloatingPointFormulaManager();
     } catch (UnsupportedOperationException e) {
       fpmgr = null;
+    }
+    try {
+      smgr = mgr.getStringFormulaManager();
+    } catch (UnsupportedOperationException e) {
+      smgr = null;
     }
   }
 
@@ -217,6 +224,14 @@ public abstract class SolverBasedTest0 {
         .isNotNull();
   }
 
+  /** Skip test if the solver does not support strings. */
+  protected final void requireStrings() {
+    assume()
+        .withMessage("Solver %s does not support the theory of strings", solverToUse())
+        .that(smgr)
+        .isNotNull();
+  }
+
   /** Skip test if the solver does not support optimization. */
   protected final void requireOptimization() {
     try {
@@ -248,10 +263,10 @@ public abstract class SolverBasedTest0 {
   }
 
   protected void requireModel() {
-    assume()
-        .withMessage("Solver %s does not support model generation in a usable way", solverToUse())
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.BOOLECTOR);
+    /*assume()
+    .withMessage("Solver %s does not support model generation in a usable way", solverToUse())
+    .that(solverToUse())
+    .isNotEqualTo(Solvers.BOOLECTOR);*/
   }
 
   protected void requireVisitor() {

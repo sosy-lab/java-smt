@@ -21,6 +21,7 @@ import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.api.StringFormula;
 
 class SynchronizedModel implements Model {
 
@@ -69,6 +70,13 @@ class SynchronizedModel implements Model {
 
   @Override
   public @Nullable BigInteger evaluate(BitvectorFormula pF) {
+    synchronized (sync) {
+      return delegate.evaluate(pF);
+    }
+  }
+
+  @Override
+  public @Nullable String evaluate(StringFormula pF) {
     synchronized (sync) {
       return delegate.evaluate(pF);
     }

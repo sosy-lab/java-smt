@@ -212,9 +212,9 @@ class SynchronizedBitvectorFormulaManager implements BitvectorFormulaManager {
   }
 
   @Override
-  public BitvectorFormula extract(BitvectorFormula pNumber, int pMsb, int pLsb, boolean pSigned) {
+  public BitvectorFormula extract(BitvectorFormula pNumber, int pMsb, int pLsb) {
     synchronized (sync) {
-      return delegate.extract(pNumber, pMsb, pLsb, pSigned);
+      return delegate.extract(pNumber, pMsb, pLsb);
     }
   }
 

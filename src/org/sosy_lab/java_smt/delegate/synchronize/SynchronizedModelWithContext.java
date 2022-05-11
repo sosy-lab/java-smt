@@ -22,6 +22,7 @@ import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.api.StringFormula;
 
 class SynchronizedModelWithContext implements Model {
 
@@ -72,6 +73,11 @@ class SynchronizedModelWithContext implements Model {
 
   @Override
   public @Nullable BigInteger evaluate(BitvectorFormula pF) {
+    throw new UnsupportedOperationException(UNSUPPORTED_OPERATION);
+  }
+
+  @Override
+  public @Nullable String evaluate(StringFormula pF) {
     throw new UnsupportedOperationException(UNSUPPORTED_OPERATION);
   }
 

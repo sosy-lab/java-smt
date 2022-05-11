@@ -40,7 +40,9 @@ import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.visitors.BooleanFormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.BooleanFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.DefaultBooleanFormulaVisitor;
@@ -192,8 +194,8 @@ public class SolverVisitorTest extends SolverBasedTest0 {
               bvmgr.modulo(x, y, false),
               bvmgr.not(x),
               bvmgr.negate(x),
-              bvmgr.extract(x, 7, 5, true),
-              bvmgr.extract(x, 7, 5, false),
+              bvmgr.extract(x, 7, 5),
+              bvmgr.extract(x, 7, 5),
               bvmgr.concat(x, y))) {
         mgr.visit(f, new FunctionDeclarationVisitorNoUF());
         if (Solvers.PRINCESS != solver) {
@@ -350,6 +352,20 @@ public class SolverVisitorTest extends SolverBasedTest0 {
                 case NOT:
                   assertThat(pArgs).hasSize(1);
                   break;
+                case ITE:
+                  assertThat(pArgs).hasSize(3);
+                  break;
+                case EQ:
+                case BV_SLT:
+                case BV_SLE:
+                case BV_SGT:
+                case BV_SGE:
+                case BV_ULT:
+                case BV_ULE:
+                case BV_UGT:
+                case BV_UGE:
+                  assertThat(pArgs).hasSize(2);
+                  break;
                 case BV_NOT:
                 case BV_NEG:
                   // Yices is special in some cases
@@ -377,6 +393,101 @@ public class SolverVisitorTest extends SolverBasedTest0 {
               return visitDefault(pF);
             }
           });
+    }
+  }
+
+  @Test
+  public void stringInBooleanFormulaIdVisit() throws SolverException, InterruptedException {
+    requireStrings();
+    StringFormula x = smgr.makeVariable("xVariable");
+    StringFormula y = smgr.makeVariable("yVariable");
+    RegexFormula r = smgr.makeRegex("regex1");
+
+    for (BooleanFormula f :
+        ImmutableList.of(
+            smgr.equal(x, y),
+            smgr.contains(x, y),
+            smgr.lessThan(x, y),
+            smgr.lessOrEquals(x, y),
+            smgr.greaterOrEquals(x, y),
+            smgr.greaterThan(x, y),
+            smgr.prefix(x, y),
+            smgr.suffix(x, y),
+            smgr.in(x, r))) {
+      mgr.visit(f, new FunctionDeclarationVisitorNoUF());
+      mgr.visit(f, new FunctionDeclarationVisitorNoOther());
+      BooleanFormula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
+      assertThat(f2).isEqualTo(f);
+      assertThatFormula(f).isEquivalentTo(f2);
+    }
+  }
+
+  @Test
+  public void stringInStringFormulaVisit() throws SolverException, InterruptedException {
+    requireStrings();
+    StringFormula x = smgr.makeVariable("xVariable");
+    StringFormula y = smgr.makeVariable("yVariable");
+    StringFormula z = smgr.makeString("zAsString");
+    IntegerFormula offset = imgr.makeVariable("offset");
+    IntegerFormula len = imgr.makeVariable("len");
+
+    ImmutableList.Builder<StringFormula> formulas =
+        ImmutableList.<StringFormula>builder()
+            .add(smgr.substring(x, offset, len))
+            .add(smgr.replace(x, y, z))
+            .add(smgr.charAt(x, offset))
+            .add(smgr.toStringFormula(offset))
+            .add(smgr.concat(x, y, z));
+    if (solverToUse() != Solvers.Z3) {
+      formulas.add(smgr.replaceAll(x, y, z)); // unsupported in Z3
+    }
+    for (StringFormula f : formulas.build()) {
+      mgr.visit(f, new FunctionDeclarationVisitorNoUF());
+      mgr.visit(f, new FunctionDeclarationVisitorNoOther());
+      StringFormula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
+      assertThat(f2).isEqualTo(f);
+      assertThatFormula(bmgr.not(smgr.equal(f, f2))).isUnsatisfiable();
+    }
+  }
+
+  @Test
+  public void stringInRegexFormulaVisit() {
+    requireStrings();
+    RegexFormula r = smgr.makeRegex("regex1");
+    RegexFormula s = smgr.makeRegex("regex2");
+
+    ImmutableList.Builder<RegexFormula> formulas =
+        ImmutableList.<RegexFormula>builder()
+            .add(smgr.union(r, s))
+            .add(smgr.closure(r))
+            .add(smgr.concat(r, r, r, s, s, s))
+            .add(smgr.cross(r));
+    if (solverToUse() != Solvers.Z3) {
+      formulas.add(smgr.difference(r, s)).add(smgr.complement(r));
+      // invalid function OTHER/INTERNAL in visitor, bug in Z3?
+    }
+    for (RegexFormula f : formulas.build()) {
+      mgr.visit(f, new FunctionDeclarationVisitorNoUF());
+      mgr.visit(f, new FunctionDeclarationVisitorNoOther());
+      RegexFormula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
+      assertThat(f2).isEqualTo(f);
+    }
+  }
+
+  @Test
+  public void stringInIntegerFormulaVisit() throws SolverException, InterruptedException {
+    requireStrings();
+    StringFormula x = smgr.makeVariable("xVariable");
+    StringFormula y = smgr.makeVariable("yVariable");
+    IntegerFormula offset = imgr.makeVariable("offset");
+
+    for (IntegerFormula f :
+        ImmutableList.of(smgr.indexOf(x, y, offset), smgr.length(x), smgr.toIntegerFormula(x))) {
+      mgr.visit(f, new FunctionDeclarationVisitorNoUF());
+      mgr.visit(f, new FunctionDeclarationVisitorNoOther());
+      IntegerFormula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
+      assertThat(f2).isEqualTo(f);
+      assertThatFormula(bmgr.not(imgr.equal(f, f2))).isUnsatisfiable();
     }
   }
 
@@ -503,6 +614,30 @@ public class SolverVisitorTest extends SolverBasedTest0 {
   }
 
   @Test
+  public void testIntegerFormulaQuantifierSymbolsExtraction() {
+    requireQuantifiers();
+    requireIntegers();
+
+    IntegerFormula x = imgr.makeVariable("x");
+    IntegerFormula y = imgr.makeVariable("y");
+    BooleanFormula xEqy = imgr.equal(x, y);
+    // (x=y) && EX x: (X=y)
+    BooleanFormula constraint = bmgr.and(xEqy, qmgr.forall(ImmutableList.of(x), xEqy));
+
+    // The variable extraction should visit "x" and "y" only once,
+    // otherwise AbstractFormulaManager#extractVariables might throw an exception,
+    // when building an ImmutableMap.
+    Map<String, Formula> vars = mgr.extractVariables(constraint);
+    assertThat(vars).hasSize(2);
+    assertThat(vars).containsEntry(x.toString(), x);
+    assertThat(vars).containsEntry(y.toString(), y);
+    Map<String, Formula> varsAndUfs = mgr.extractVariablesAndUFs(constraint);
+    assertThat(varsAndUfs).hasSize(2);
+    assertThat(varsAndUfs).containsEntry(x.toString(), x);
+    assertThat(varsAndUfs).containsEntry(y.toString(), y);
+  }
+
+  @Test
   public void testIntegerFormulaQuantifierHandlingTrivialUNSAT() throws Exception {
     requireQuantifiers();
     requireIntegers();
@@ -616,7 +751,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
         });
 
     assertThat(found).containsAtLeast("a", "b");
-    assertThat(found).hasSize(3); // all of the above plus the boolean "and" function
+    assertThat(found).hasSize(3); // all the above plus the boolean "and" function
     assertThat(found).doesNotContain(ab.toString());
   }
 
@@ -733,13 +868,14 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     IntegerFormula v = imgr.makeVariable("v");
     BooleanFormula q = fmgr.declareAndCallUF("q", FormulaType.BooleanType, v);
     Map<String, Formula> mapping = mgr.extractVariablesAndUFs(q);
+    assertThat(mapping).hasSize(2);
     assertThat(mapping).containsEntry("v", v);
     assertThat(mapping).containsEntry("q", q);
   }
 
   @Test
   public void extractionTest2() {
-    // the same than above, but with nullary UF.
+    // the same as above, but with nullary UF.
     IntegerFormula v = fmgr.declareAndCallUF("v", FormulaType.IntegerType);
     BooleanFormula q = fmgr.declareAndCallUF("q", FormulaType.BooleanType, v);
     Map<String, Formula> mapping = mgr.extractVariablesAndUFs(q);
@@ -789,6 +925,72 @@ public class SolverVisitorTest extends SolverBasedTest0 {
 
     Collection<Formula> usedArgs = mgr.visit(uf, argCollectingVisitor);
 
+    assertThat(usedArgs).hasSize(3);
     assertThat(usedArgs).containsExactly(a, b, ab);
+
+    Map<String, Formula> vars = mgr.extractVariables(uf);
+    assertThat(vars).hasSize(2);
+    assertThat(vars.keySet()).containsExactly("a", "b");
+
+    Map<String, Formula> varsUfs = mgr.extractVariablesAndUFs(uf);
+    assertThat(varsUfs).hasSize(3);
+    assertThat(varsUfs.keySet()).containsExactly("a", "b", "testFunc");
+  }
+
+  @Test
+  public void extractionDeclarations() {
+    requireIntegers();
+
+    // Create the variables and uf
+    IntegerFormula a = imgr.makeVariable("a");
+    IntegerFormula b = imgr.makeVariable("b");
+    IntegerFormula ab = imgr.add(a, b);
+    BooleanFormula uf1 = fmgr.declareAndCallUF("testFunc", FormulaType.BooleanType, a, b, ab);
+    BooleanFormula uf2 = fmgr.declareAndCallUF("testFunc", FormulaType.BooleanType, ab, b, a);
+    BooleanFormula f = bmgr.and(uf1, uf2);
+
+    final Collection<Formula> usedArgs = new LinkedHashSet<>();
+    final List<FunctionDeclaration<?>> usedDecls = new ArrayList<>();
+
+    FormulaVisitor<TraversalProcess> argCollectingVisitor =
+        new DefaultFormulaVisitor<>() {
+
+          @Override
+          public TraversalProcess visitFunction(
+              Formula pF, List<Formula> args, FunctionDeclaration<?> pFunctionDeclaration) {
+            usedArgs.addAll(args);
+            usedDecls.add(pFunctionDeclaration);
+            return visitDefault(pF);
+          }
+
+          @Override
+          protected TraversalProcess visitDefault(Formula pF) {
+            return TraversalProcess.CONTINUE;
+          }
+        };
+
+    mgr.visitRecursively(f, argCollectingVisitor);
+
+    // check general stuff about variables, copied from above
+    assertThat(usedArgs).hasSize(5);
+    assertThat(usedArgs).containsExactly(uf1, uf2, a, b, ab);
+
+    Map<String, Formula> vars = mgr.extractVariables(f);
+    assertThat(vars).hasSize(2);
+    assertThat(vars.keySet()).containsExactly("a", "b");
+
+    Map<String, Formula> varsUfs = mgr.extractVariablesAndUFs(f);
+    assertThat(varsUfs).hasSize(3);
+    assertThat(varsUfs.keySet()).containsExactly("a", "b", "testFunc");
+
+    // check correct traversal order of the functions
+    assertThat(usedDecls).hasSize(4);
+    assertThat(usedDecls.get(0).getKind()).isEqualTo(FunctionDeclarationKind.AND);
+    assertThat(usedDecls.get(1).getName()).isEqualTo("testFunc");
+    assertThat(usedDecls.get(2).getKind()).isEqualTo(FunctionDeclarationKind.ADD);
+    assertThat(usedDecls.get(3).getName()).isEqualTo("testFunc");
+
+    // check UF-equality. This check went wrong in CVC4 and was fixed.
+    assertThat(usedDecls.get(1)).isEqualTo(usedDecls.get(3));
   }
 }

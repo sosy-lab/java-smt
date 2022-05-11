@@ -12,6 +12,8 @@
 # check Java version
 #------------------------------------------------------------------------------
 
+set -e
+
 [ -z "$JAVA" ] && JAVA=java
 java_version="`$JAVA -XX:-UsePerfData -Xmx5m -version 2>&1`"
 result=$?
@@ -84,14 +86,18 @@ done
 # PerfDisableSharedMem avoids hsperfdata in /tmp (disable it to connect easily with VisualConsole and Co.).
 
 for EXAMPLE in AllSatExample HoudiniApp Interpolation OptimizationFormulaWeights OptimizationIntReal SolverOverviewTable; do
+  tput setaf 2 # set green color
+  echo ""
   echo "####################################################"
-  echo "#  executing example $EXAMPLE"
+  echo "#  executing example '$EXAMPLE'"
   echo "####################################################"
+  echo ""
+  tput sgr 0 # reset color
   "$JAVA" \
       -XX:+PerfDisableSharedMem \
       -Djava.awt.headless=true \
       -ea \
-	  -cp "$CLASSPATH" \
+      -cp "$CLASSPATH" \
       $JAVA_VM_ARGUMENTS \
       org.sosy_lab.java_smt.example.$EXAMPLE
 done

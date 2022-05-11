@@ -21,6 +21,8 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
+import org.sosy_lab.java_smt.api.RegexFormula;
+import org.sosy_lab.java_smt.api.StringFormula;
 
 /**
  * A Formula represented as a TFormulaInfo object.
@@ -130,6 +132,22 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
       implements RationalFormula {
     RationalFormulaImpl(TFormulaInfo pTerm) {
       super(pTerm);
+    }
+  }
+
+  /** Simple StringFormula implementation. */
+  static final class StringFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo>
+      implements StringFormula {
+    StringFormulaImpl(TFormulaInfo pT) {
+      super(pT);
+    }
+  }
+
+  /** Simple RegexFormula implementation. */
+  static final class RegexFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo>
+      implements RegexFormula {
+    RegexFormulaImpl(TFormulaInfo pT) {
+      super(pT);
     }
   }
 }

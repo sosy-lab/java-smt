@@ -21,6 +21,7 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
+import org.sosy_lab.java_smt.api.StringFormula;
 
 @SuppressWarnings("ClassTypeParameterName")
 public abstract class AbstractModel<TFormulaInfo, TType, TEnv> implements Model {
@@ -54,6 +55,12 @@ public abstract class AbstractModel<TFormulaInfo, TType, TEnv> implements Model 
   @Override
   public Boolean evaluate(BooleanFormula f) {
     return (Boolean) evaluateImpl(creator.extractInfo(f));
+  }
+
+  @Nullable
+  @Override
+  public String evaluate(StringFormula f) {
+    return (String) evaluateImpl(creator.extractInfo(f));
   }
 
   @Nullable

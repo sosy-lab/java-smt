@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.delegate.statistics;
 
+import com.google.common.collect.ImmutableMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.sosy_lab.common.time.TimeSpan;
 
@@ -36,6 +37,7 @@ public class SolverStatistics {
   final AtomicInteger bvOperations = new AtomicInteger();
   final AtomicInteger fpOperations = new AtomicInteger();
   final AtomicInteger typeOperations = new AtomicInteger();
+  final AtomicInteger stringOperations = new AtomicInteger();
 
   // model operations
   final AtomicInteger modelEvaluations = new AtomicInteger();
@@ -140,11 +142,47 @@ public class SolverStatistics {
     return fpOperations.get();
   }
 
+  public int getNumberOfStringOperations() {
+    return stringOperations.get();
+  }
+
   public int getNumberOfModelEvaluationQueries() {
     return modelEvaluations.get();
   }
 
   public int getNumberOfModelListings() {
     return modelListings.get();
+  }
+
+  public ImmutableMap<String, Object> asMap() {
+    return ImmutableMap.<String, Object>builder()
+        .put("number of prover environments", getNumberOfProverEnvironments())
+        .put("number of pop queries", getNumberOfPopQueries())
+        .put("number of push queries", getNumberOfPushQueries())
+        .put("number of addConstraint queries", getNumberOfAddConstraintQueries())
+        .put("number of model queries", getNumberOfModelQueries())
+        .put("number of unsatCore queries", getNumberOfUnsatCoreQueries())
+        .put("number of isUnsat queries", getNumberOfIsUnsatQueries())
+        .put("sumTime of isUnsat queries", getSumTimeOfIsUnsatQueries())
+        .put("maxTime of isUnsat queries", getMaxTimeOfIsUnsatQueries())
+        .put("number of allSat queries", getNumberOfAllSatQueries())
+        .put("sumTime of allSat queries", getSumTimeOfAllSatQueries())
+        .put("maxTime of allSat queries", getMaxTimeOfAllSatQueries())
+        .put("number of interpolation queries", getNumberOfInterpolationQueries())
+        .put("sumTime of interpolation queries", getSumTimeOfInterpolationQueries())
+        .put("maxTime of interpolation queries", getMaxTimeOfInterpolationQueries())
+        .put("number of visits", getNumberOfVisits())
+        .put("number of Boolean operations", getNumberOfBooleanOperations())
+        .put("number of Numeric operations", getNumberOfNumericOperations())
+        .put("number of Array operations", getNumberOfArrayOperations())
+        .put("number of SL  operations", getNumberOfSLOperations())
+        .put("number of UF operations", getNumberOfUFOperations())
+        .put("number of Quantifier operations", getNumberOfQuantifierOperations())
+        .put("number of BV operations", getNumberOfBVOperations())
+        .put("number of FP operations", getNumberOfFPOperations())
+        .put("number of String operations", getNumberOfStringOperations())
+        .put("number of model evaluation queries", getNumberOfModelEvaluationQueries())
+        .put("number of model listings", getNumberOfModelListings())
+        .build();
   }
 }

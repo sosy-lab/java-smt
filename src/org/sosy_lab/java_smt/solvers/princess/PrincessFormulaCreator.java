@@ -121,7 +121,7 @@ class PrincessFormulaCreator
   private final Table<Sort, Sort, Sort> arraySortCache = HashBasedTable.create();
 
   PrincessFormulaCreator(PrincessEnvironment pEnv) {
-    super(pEnv, PrincessEnvironment.BOOL_SORT, PrincessEnvironment.INTEGER_SORT, null);
+    super(pEnv, PrincessEnvironment.BOOL_SORT, PrincessEnvironment.INTEGER_SORT, null, null, null);
   }
 
   @Override
@@ -471,7 +471,7 @@ class PrincessFormulaCreator
 
     } else {
       // we cannot handle XOR, IMPLIES, DISTINCT, DIV, MODULO, LT, LTE GT in princess
-      // they are either handled implicitly by the above mentioned parts or not at all
+      // they are either handled implicitly by the above-mentioned parts or not at all
       return FunctionDeclarationKind.OTHER;
     }
   }

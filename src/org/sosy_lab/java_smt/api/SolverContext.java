@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.api;
 
+import com.google.common.collect.ImmutableMap;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 
 /**
@@ -59,27 +60,27 @@ public interface SolverContext extends AutoCloseable {
    * Create a fresh new {@link ProverEnvironment} which encapsulates an assertion stack and can be
    * used to check formulas for unsatisfiability.
    *
-   * @param options Options specified for the prover environment. All of the options specified in
+   * @param options Options specified for the prover environment. All the options specified in
    *     {@link ProverOptions} are turned off by default.
    */
   ProverEnvironment newProverEnvironment(ProverOptions... options);
 
   /**
    * Create a fresh new {@link InterpolatingProverEnvironment} which encapsulates an assertion stack
-   * and allows to generate and retrieve interpolants for unsatisfiable formulas. If the SMT solver
+   * and allows generating and retrieve interpolants for unsatisfiable formulas. If the SMT solver
    * is able to handle satisfiability tests with assumptions please consider implementing the {@link
    * InterpolatingProverEnvironment} interface, and return an Object of this type here.
    *
-   * @param options Options specified for the prover environment. All of the options specified in
+   * @param options Options specified for the prover environment. All the options specified in
    *     {@link ProverOptions} are turned off by default.
    */
   InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation(ProverOptions... options);
 
   /**
    * Create a fresh new {@link OptimizationProverEnvironment} which encapsulates an assertion stack
-   * and allows to solve optimization queries.
+   * and allows solving optimization queries.
    *
-   * @param options Options specified for the prover environment. All of the options specified in
+   * @param options Options specified for the prover environment. All the options specified in
    *     {@link ProverOptions} are turned off by default.
    */
   OptimizationProverEnvironment newOptimizationProverEnvironment(ProverOptions... options);
@@ -100,12 +101,29 @@ public interface SolverContext extends AutoCloseable {
   Solvers getSolverName();
 
   /**
+   * Get statistics for a complete solver context. The returned mapping is intended to provide the
+   * solver-internal statistics. The keys can differ between individual solvers.
+   *
+   * <p>Calling the statistics several times for the same context returns accumulated number, i.e.,
+   * we currently do not provide any possibility to reset the statistics.
+   *
+   * <p>We do not guarantee any specific key to be present, as this depends on the used solver. We
+   * might even return an empty mapping if the solver does not support calling this method or is in
+   * an invalid state.
+   *
+   * @see ProverEnvironment#getStatistics()
+   */
+  default ImmutableMap<String, String> getStatistics() {
+    return ImmutableMap.of();
+  }
+
+  /**
    * Close the solver context.
    *
    * <p>After calling this method, further access to any object that had been returned from this
-   * context is not wanted, i.e., it is depending on the solver. Java-based solvers might wait for
-   * the next garbage collection with any cleanup operation. Native solvers might even reference
-   * invalid memory and cause segmentation faults.
+   * context is not wanted, i.e., it depends on the solver. Java-based solvers might wait for the
+   * next garbage collection with any cleanup operation. Native solvers might even reference invalid
+   * memory and cause segmentation faults.
    *
    * <p>Necessary for the solvers implemented in native code, frees the associated memory.
    */

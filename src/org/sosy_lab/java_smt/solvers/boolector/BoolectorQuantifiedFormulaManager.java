@@ -35,7 +35,7 @@ public class BoolectorQuantifiedFormulaManager
 
   /**
    * Note: Boolector only supports bitvector quantifier! The vars used MUST be boolector_param (not
-   * boolector_var)! Therefore we have to change every var into param with the visitor! Additionaly
+   * boolector_var)! Therefore, we have to change every var into param with the visitor! Additionaly
    * no param may be used twice (Boolector will end if you do!).
    */
   @Override

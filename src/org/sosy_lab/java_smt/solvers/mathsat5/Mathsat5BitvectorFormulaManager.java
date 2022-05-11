@@ -58,7 +58,7 @@ class Mathsat5BitvectorFormulaManager
   }
 
   @Override
-  public Long extract(Long pFirst, int pMsb, int pLsb, boolean pSigned) {
+  public Long extract(Long pFirst, int pMsb, int pLsb) {
     return msat_make_bv_extract(mathsatEnv, pMsb, pLsb, pFirst);
   }
 

@@ -13,11 +13,14 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import de.uni_freiburg.informatik.ultimate.logic.Annotation;
+import de.uni_freiburg.informatik.ultimate.logic.SMTLIBException;
+import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
@@ -26,12 +29,17 @@ import org.sosy_lab.java_smt.api.SolverException;
 class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String, String>
     implements InterpolatingProverEnvironment<String> {
 
-  SmtInterpolInterpolatingProver(SmtInterpolFormulaManager pMgr, Set<ProverOptions> options) {
-    super(pMgr, options);
+  SmtInterpolInterpolatingProver(
+      SmtInterpolFormulaManager pMgr,
+      Script pScript,
+      Set<ProverOptions> options,
+      ShutdownNotifier pShutdownNotifier) {
+    super(pMgr, pScript, options, pShutdownNotifier);
   }
 
   @Override
   public void pop() {
+    Preconditions.checkState(!closed);
     for (String removed : assertedFormulas.peek()) {
       annotatedTerms.remove(removed);
     }
@@ -40,7 +48,7 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String, S
 
   @Override
   public String addConstraint(BooleanFormula f) {
-    Preconditions.checkState(!isClosed());
+    Preconditions.checkState(!closed);
     String termName = generateTermName();
     Term t = mgr.extractInfo(f);
     Term annotatedTerm = env.annotate(t, new Annotation(":named", termName));
@@ -53,9 +61,9 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String, S
   @Override
   public BooleanFormula getInterpolant(Collection<String> pTermNamesOfA)
       throws SolverException, InterruptedException {
-    Preconditions.checkState(!isClosed());
+    Preconditions.checkState(!closed);
 
-    // SMTInterpol is not able to handle the trivial cases
+    // SMTInterpol is not able to handle the trivial cases,
     // so we need to check them explicitly
     if (pTermNamesOfA.isEmpty()) {
       return mgr.getBooleanFormulaManager().makeBoolean(true);
@@ -80,7 +88,7 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String, S
   public List<BooleanFormula> getTreeInterpolants(
       List<? extends Collection<String>> partitionedTermNames, int[] startOfSubTree)
       throws SolverException, InterruptedException {
-    Preconditions.checkState(!isClosed());
+    Preconditions.checkState(!closed);
     assert InterpolatingProverEnvironment.checkTreeStructure(
         partitionedTermNames.size(), startOfSubTree);
 
@@ -90,7 +98,22 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String, S
     }
 
     // get interpolants of groups
-    final Term[] itps = env.getTreeInterpolants(formulas, startOfSubTree);
+    final Term[] itps;
+    try {
+      itps = env.getInterpolants(formulas, startOfSubTree);
+    } catch (UnsupportedOperationException e) {
+      if (e.getMessage() != null && e.getMessage().startsWith("Cannot interpolate ")) {
+        // Not a bug, interpolation procedure is incomplete
+        throw new SolverException(e.getMessage(), e);
+      } else {
+        throw e;
+      }
+    } catch (SMTLIBException e) {
+      if ("Timeout exceeded".equals(e.getMessage())) {
+        shutdownNotifier.shutdownIfNecessary();
+      }
+      throw new AssertionError(e);
+    }
 
     final List<BooleanFormula> result = new ArrayList<>();
     for (Term itp : itps) {
@@ -101,12 +124,17 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String, S
   }
 
   private Term buildConjunctionOfNamedTerms(Collection<String> termNames) {
-    Preconditions.checkState(!isClosed());
+    Preconditions.checkState(!closed);
     Preconditions.checkArgument(!termNames.isEmpty());
 
     if (termNames.size() == 1) {
       return env.term(Iterables.getOnlyElement(termNames));
     }
     return env.term("and", termNames.stream().map(env::term).toArray(Term[]::new));
+  }
+
+  @Override
+  protected Collection<Term> getAssertedTerms() {
+    return annotatedTerms.values();
   }
 }

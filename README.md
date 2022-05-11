@@ -33,8 +33,11 @@ to integer ones at _compile_ time) sometimes at the cost of verbosity.
 
 #### References
 
+- D. Baier, D. Beyer, and K. Friedberger.
+  [**JavaSMT 3: Interacting with SMT Solvers in Java**](https://link.springer.com/content/pdf/10.1007/978-3-030-81688-9_9.pdf).
+  In Proc. CAV, LNCS 12760, pages 1-13, 2021. Springer.
 - E. G. Karpenkov, K. Friedberger, and D. Beyer.
-  [**JavaSMT: A Unified Interface for SMT Solvers in Java.**](https://www.sosy-lab.org/research/pub/2016-VSTTE.JavaSMT_A_Unified_Interface_For_SMT_Solvers_in_Java.pdf)
+  [**JavaSMT: A Unified Interface for SMT Solvers in Java**](https://www.sosy-lab.org/research/pub/2016-VSTTE.JavaSMT_A_Unified_Interface_For_SMT_Solvers_in_Java.pdf).
   In Proc. VSTTE, LNCS 9971, pages 139–148, 2016. Springer.
 
 ### Feature overview
@@ -43,11 +46,15 @@ JavaSMT can express formulas in the following theories:
  - Integer
  - Rational
  - Bitvector
- - Floating point
+ - Floating Point
  - Array
  - Uninterpreted Function
+ - String and RegEx
 
-Currently JavaSMT supports several SMT solvers (see [Getting Started](doc/Getting-started.md)  for installation):
+The concrete support for a certain theory depends on the underlying SMT solver.
+Only a few SMT solvers provide support for theories like Arrays, Floating Point, String or RegEx.
+
+Currently JavaSMT supports several SMT solvers (see [Getting Started](doc/Getting-started.md) for installation):
 
 | SMT Solver | Linux64 | Windows64 | MacOS | Description |
 | --- |:---:|:---:|:---:|:--- |
@@ -76,12 +83,23 @@ We aim for supporting more important features, more SMT solvers, and more system
 If something specific is missing, please [look for or file an issue](https://github.com/sosy-lab/java-smt/issues).
 
 #### Multithreading Support
-The solvers Z3(w and w/o Optimization), SMTInterpol, Princess, MathSAT5, Boolector and CVC4 support multithreading,
-provided that different threads use different contexts,
-and _all_ operations on a single context are performed from a single thread.
-Interruption using [ShutdownNotifier][] may be used to interrupt a
-a solver from any thread.
-CVC4 supports multithreading on a single context with multiple stacks(=provers).
+| SMT Solver | Concurrent context usage¹ | Concurrent prover usage² |
+| --- |:---:|:---:|
+| [Boolector](https://boolector.github.io/) | :heavy_check_mark: |  |
+| [CVC4](https://cvc4.github.io/) | :heavy_check_mark: | :heavy_check_mark: |
+| [MathSAT5](http://mathsat.fbk.eu/) | :heavy_check_mark: |  |
+| [OptiMathSAT](http://optimathsat.disi.unitn.it/) | :heavy_check_mark: |  |
+| [Princess](http://www.philipp.ruemmer.org/princess.shtml) | :heavy_check_mark: |  |
+| [SMTInterpol](https://ultimate.informatik.uni-freiburg.de/smtinterpol/) | :heavy_check_mark: |  |
+| [Yices2](https://yices.csl.sri.com/) |  |  |
+| [Z3](https://github.com/Z3Prover/z3) | :heavy_check_mark: |  |
+
+Interruption using a [ShutdownNotifier][] may be used to interrupt a
+a solver from any thread.  
+Formulas are translatable in between contexts/provers/threads using _FormulaManager.translateFrom()_.
+
+¹ Multiple contexts, but all operations on each context only from a single thread.  
+² Multiple provers on one or more contexts, with each prover using its own thread.
 
 #### Garbage Collection in Native Solvers
 JavaSMT exposes an API for performing garbage collection on solvers

@@ -14,7 +14,6 @@ import com.google.common.collect.Iterables;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -67,7 +66,7 @@ public class FormulaClassifier {
       if (arg.startsWith("-solver=")) {
         solver = Solvers.valueOf(arg.substring(8));
       } else if (path == null) {
-        path = Paths.get(arg);
+        path = Path.of(arg);
       } else {
         help();
       }

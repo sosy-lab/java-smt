@@ -121,7 +121,7 @@ public class SolverContextFactory {
 
   /**
    * This constructor instantiates a factory for building solver contexts for a configured SMT
-   * solver (via the parameter <code>pConfig</code>). Each created context is independent from other
+   * solver (via the parameter <code>pConfig</code>). Each created context is independent of other
    * contexts and uses its own environment for building formulas and querying the solver.
    *
    * @param pConfig The configuration to be used when instantiating JavaSMT and the solvers. By
@@ -204,9 +204,8 @@ public class SolverContextFactory {
     } catch (UnsatisfiedLinkError | NoClassDefFoundError e) {
       throw new InvalidConfigurationException(
           String.format(
-              "The SMT solver %s is not available on this machine because of missing libraries "
-                  + "(%s). "
-                  + "You may experiment with SMTInterpol by setting solver.solver=SMTInterpol.",
+              "The SMT solver %s is not available on this machine because of missing libraries"
+                  + " (%s).",
               solverToCreate, e.getMessage()),
           e);
     }

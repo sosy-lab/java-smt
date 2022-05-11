@@ -66,6 +66,7 @@ public class OptimizationIntReal {
             SolverContextFactory.createSolverContext(config, logger, notifier, solver);
         OptimizationProverEnvironment prover =
             context.newOptimizationProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      logger.log(Level.WARNING, "Using solver " + solver + " in version " + context.getVersion());
 
       BooleanFormulaManager bmgr = context.getFormulaManager().getBooleanFormulaManager();
       IntegerFormulaManager nmgr = context.getFormulaManager().getIntegerFormulaManager();
@@ -134,20 +135,20 @@ public class OptimizationIntReal {
       assert status == OptStatus.OPT;
       Optional<Rational> lower = prover.lower(handleX, EPSILON);
       try (Model model = prover.getModel()) {
-        logger.log(Level.INFO, "lower bound:", lower.orElseThrow(), "with model:", model);
+        logger.log(Level.INFO, "lower bound:", lower.orElseThrow(), "with model:", model.asList());
       }
     }
     prover.pop();
 
     prover.push();
-    { // maximize x and get a upper bound of x: x < 10
+    { // maximize x and get an upper bound of x: x < 10
       // --> bound is (10 - EPSILON) for rational symbols and 9 for integer symbols.
       int handleX = prover.maximize(x);
       OptStatus status = prover.check();
       assert status == OptStatus.OPT;
       Optional<Rational> upper = prover.upper(handleX, EPSILON);
       try (Model model = prover.getModel()) {
-        logger.log(Level.INFO, "upper bound:", upper.orElseThrow(), "with model:", model);
+        logger.log(Level.INFO, "upper bound:", upper.orElseThrow(), "with model:", model.asList());
       }
     }
     prover.pop();

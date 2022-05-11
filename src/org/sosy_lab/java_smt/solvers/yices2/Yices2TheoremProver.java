@@ -53,7 +53,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
  *
  * <p>2) Add additional boolean symbols 'p', add a constraint 'p=f' for each asserted formula 'f',
  * compute the unsat core over all 'p's, and match them back to their formula 'f'. This allows
- * incremental solving, but is more complex to implement. Lets keep this idea is future work for
+ * incremental solving, but is more complex to implement. Let's keep this idea is future work for
  * optimization.
  */
 class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements ProverEnvironment {
@@ -126,9 +126,15 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   }
 
   @Override
+  public int size() {
+    Preconditions.checkState(!closed);
+    return constraintStack.size() - 1;
+  }
+
+  @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
-    boolean unsat = false;
+    boolean unsat;
     if (generateUnsatCores) { // unsat core does not work with incremental mode
       int[] allConstraints = getAllConstraints();
       unsat =

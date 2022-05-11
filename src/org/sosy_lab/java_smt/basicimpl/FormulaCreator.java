@@ -19,6 +19,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,6 +40,8 @@ import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
+import org.sosy_lab.java_smt.api.RegexFormula;
+import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
@@ -49,6 +52,8 @@ import org.sosy_lab.java_smt.basicimpl.AbstractFormula.FloatingPointFormulaImpl;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormula.FloatingPointRoundingModeFormulaImpl;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormula.IntegerFormulaImpl;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormula.RationalFormulaImpl;
+import org.sosy_lab.java_smt.basicimpl.AbstractFormula.RegexFormulaImpl;
+import org.sosy_lab.java_smt.basicimpl.AbstractFormula.StringFormulaImpl;
 
 /**
  * This is a helper class with several methods that are commonly used throughout the basicimpl
@@ -66,14 +71,23 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
   private final TType boolType;
   private final @Nullable TType integerType;
   private final @Nullable TType rationalType;
+  private final @Nullable TType stringType;
+  private final @Nullable TType regexType;
   protected final TEnv environment;
 
   protected FormulaCreator(
-      TEnv env, TType boolType, @Nullable TType pIntegerType, @Nullable TType pRationalType) {
+      TEnv env,
+      TType boolType,
+      @Nullable TType pIntegerType,
+      @Nullable TType pRationalType,
+      @Nullable TType stringType,
+      @Nullable TType regexType) {
     this.environment = env;
     this.boolType = boolType;
     this.integerType = pIntegerType;
     this.rationalType = pRationalType;
+    this.stringType = stringType;
+    this.regexType = regexType;
   }
 
   public final TEnv getEnv() {
@@ -104,6 +118,20 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
 
   public abstract TType getArrayType(TType indexType, TType elementType);
 
+  public final TType getStringType() {
+    if (stringType == null) {
+      throw new UnsupportedOperationException("String theory is not supported by this solver.");
+    }
+    return stringType;
+  }
+
+  public final TType getRegexType() {
+    if (regexType == null) {
+      throw new UnsupportedOperationException("String theory is not supported by this solver.");
+    }
+    return regexType;
+  }
+
   public abstract TFormulaInfo makeVariable(TType type, String varName);
 
   public BooleanFormula encapsulateBoolean(TFormulaInfo pTerm) {
@@ -132,6 +160,16 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
     return new ArrayFormulaImpl<>(pTerm, pIndexType, pElementType);
   }
 
+  protected StringFormula encapsulateString(TFormulaInfo pTerm) {
+    assert getFormulaType(pTerm).isStringType();
+    return new StringFormulaImpl<>(pTerm);
+  }
+
+  protected RegexFormula encapsulateRegex(TFormulaInfo pTerm) {
+    assert getFormulaType(pTerm).isRegexType();
+    return new RegexFormulaImpl<>(pTerm);
+  }
+
   public Formula encapsulateWithTypeOf(TFormulaInfo pTerm) {
     return encapsulate(getFormulaType(pTerm), pTerm);
   }
@@ -148,6 +186,10 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
       return (T) new IntegerFormulaImpl<>(pTerm);
     } else if (pType.isRationalType()) {
       return (T) new RationalFormulaImpl<>(pTerm);
+    } else if (pType.isStringType()) {
+      return (T) new StringFormulaImpl<>(pTerm);
+    } else if (pType.isRegexType()) {
+      return (T) new RegexFormulaImpl<>(pTerm);
     } else if (pType.isBitvectorType()) {
       return (T) new BitvectorFormulaImpl<>(pTerm);
     } else if (pType.isFloatingPointType()) {
@@ -194,6 +236,10 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
       t = FormulaType.IntegerType;
     } else if (formula instanceof RationalFormula) {
       t = FormulaType.RationalType;
+    } else if (formula instanceof StringFormula) {
+      t = FormulaType.StringType;
+    } else if (formula instanceof RegexFormula) {
+      t = FormulaType.RegexType;
     } else if (formula instanceof FloatingPointRoundingModeFormula) {
       t = FormulaType.FloatingPointRoundingModeType;
     } else if (formula instanceof ArrayFormula) {
@@ -308,7 +354,9 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
       final Formula pFormula,
       final boolean extractUF,
       final BiConsumer<String, Formula> pConsumer) {
-    visitRecursively(new VariableAndUFExtractor(extractUF, pConsumer, ImmutableSet.of()), pFormula);
+    visitRecursively(
+        new VariableAndUFExtractor(extractUF, pConsumer, ImmutableSet.of(), new LinkedHashSet<>()),
+        pFormula);
   }
 
   private class VariableAndUFExtractor extends DefaultFormulaVisitor<TraversalProcess> {
@@ -317,13 +365,21 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
     private final BiConsumer<String, Formula> consumer;
     private final Set<Formula> boundVariablesInContext;
 
+    /**
+     * let's collect all visited symbols here, to avoid redundant visitation of symbols in nested
+     * quantified formulas.
+     */
+    private final Set<Formula> alreadyVisited;
+
     VariableAndUFExtractor(
         boolean pExtractUF,
         BiConsumer<String, Formula> pConsumer,
-        Set<Formula> pBoundVariablesInContext) {
+        Set<Formula> pBoundVariablesInContext,
+        Set<Formula> pAlreadyVisited) {
       extractUF = pExtractUF;
       consumer = pConsumer;
       boundVariablesInContext = pBoundVariablesInContext;
+      alreadyVisited = pAlreadyVisited;
     }
 
     @Override
@@ -338,7 +394,9 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
       if (!boundVariablesInContext.contains(f) // TODO can UFs be bounded?
           && functionDeclaration.getKind() == FunctionDeclarationKind.UF
           && extractUF) {
-        consumer.accept(functionDeclaration.getName(), f);
+        if (alreadyVisited.add(f)) {
+          consumer.accept(functionDeclaration.getName(), f);
+        }
       }
       return TraversalProcess.CONTINUE;
     }
@@ -349,7 +407,9 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
       // If we are inside a quantified formula, bound variables appear to be free,
       // but they are actually bound by the surrounding context.
       if (!boundVariablesInContext.contains(f)) {
-        consumer.accept(name, f);
+        if (alreadyVisited.add(f)) {
+          consumer.accept(name, f);
+        }
       }
       return TraversalProcess.CONTINUE;
     }
@@ -364,7 +424,8 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
           new VariableAndUFExtractor(
               extractUF,
               consumer,
-              Sets.union(boundVariablesInContext, ImmutableSet.copyOf(boundVariables))),
+              Sets.union(boundVariablesInContext, ImmutableSet.copyOf(boundVariables)),
+              alreadyVisited),
           body);
 
       // Afterwards, we skip the already finished body-formula.
@@ -382,11 +443,37 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
         declaration.getArgumentTypes().size(),
         args.size());
 
+    for (int i = 0; i < args.size(); i++) {
+      checkArgument(
+          isCompatible(getFormulaType(args.get(i)), declaration.getArgumentTypes().get(i)),
+          "function application '%s' requires argument types %s, but received argument types %s",
+          declaration,
+          declaration.getArgumentTypes(),
+          Lists.transform(args, this::getFormulaType));
+    }
+
     return encapsulate(
         declaration.getType(),
         callFunctionImpl(
             ((FunctionDeclarationImpl<T, TFuncDecl>) declaration).getSolverDeclaration(),
             extractInfo(args)));
+  }
+
+  /**
+   * This function checks whether the used type of the function argument is compatible with the
+   * declared type in the function declaration.
+   *
+   * <p>Identical types are always compatible, a subtype like INT to supertype RATIONAL is also
+   * compatible. A solver-specific wrapper can override this method if it does an explicit
+   * transformation between (some) types, e.g., from BV to BOOLEAN or from BOOLEAN to INT.
+   */
+  protected boolean isCompatible(FormulaType<?> usedType, FormulaType<?> declaredType) {
+    // INT is a subtype of RATIONAL
+    if (usedType.isIntegerType() && declaredType.isRationalType()) {
+      return true;
+    }
+
+    return usedType.equals(declaredType);
   }
 
   public abstract TFormulaInfo callFunctionImpl(TFuncDecl declaration, List<TFormulaInfo> args);
@@ -403,11 +490,15 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
    * Convert the formula into a Java object as far as possible, i.e., try to match a primitive or
    * simple type like Boolean, BigInteger, or Rational.
    *
-   * <p>If the formula is not a simple constant expression, we simple return <code>null</code>.
+   * <p>If the formula is not a simple constant expression, we simply return <code>null</code>.
    *
    * @param pF the formula to be converted.
    */
-  public abstract Object convertValue(TFormulaInfo pF);
+  public Object convertValue(TFormulaInfo pF) {
+    throw new UnsupportedOperationException(
+        "This SMT solver needs a second term to determine a correct type. "
+            + "Please use the other method 'convertValue(formula, formula)'.");
+  }
 
   /**
    * Convert the formula into a Java object as far as possible, i.e., try to match a primitive or
@@ -416,7 +507,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
    * @param pAdditionalF an additonal formula where the type can be received from.
    * @param pF the formula to be converted.
    */
-  // TODO only Mathsat5 needs the second (first) parameter, other solvers ignore it. Avoid it?
+  // only some solvers require the additional (first) parameter, other solvers ignore it.
   public Object convertValue(
       @SuppressWarnings("unused") TFormulaInfo pAdditionalF, TFormulaInfo pF) {
     return convertValue(pF);

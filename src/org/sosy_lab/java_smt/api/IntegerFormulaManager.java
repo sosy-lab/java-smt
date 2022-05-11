@@ -25,7 +25,18 @@ public interface IntegerFormulaManager
   /** Create a term representing the constraint {@code number1 == number2 (mod n)}. */
   BooleanFormula modularCongruence(IntegerFormula number1, IntegerFormula number2, long n);
 
-  IntegerFormula modulo(IntegerFormula number1, IntegerFormula number2);
+  /**
+   * Create a formula representing the modulo of two operands.
+   *
+   * <p>If the denumerator evaluates to zero (modulo-by-zero), either directly as value or
+   * indirectly via an additional constraint, then the solver is allowed to choose an arbitrary
+   * value for the result of the modulo operation (cf. SMTLIB standard for the division operator in
+   * Ints or Reals theory).
+   *
+   * <p>Note: Some solvers, e.g., Yices2, abort with an exception when exploring a modulo-by-zero
+   * during the SAT-check. This is not compliant to the SMTLIB standard, but sadly happens.
+   */
+  IntegerFormula modulo(IntegerFormula numerator, IntegerFormula denumerator);
 
   @Override
   default FormulaType<IntegerFormula> getFormulaType() {

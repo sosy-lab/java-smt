@@ -9,6 +9,9 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 <FindBugsFilter>
+    <!-- These checks are too pessimistic: https://github.com/spotbugs/spotbugs/issues/1601 -->
+    <Match><Bug pattern="EI_EXPOSE_REP"/></Match>
+    <Match><Bug pattern="EI_EXPOSE_REP2"/></Match>
     <!-- SpotBugs does not support @org.checkerframework.checker.nullness.qual.Nullable
          (cf. https://github.com/spotbugs/spotbugs/issues/643) -->
     <Match><Bug code="NP,RCN"/></Match>

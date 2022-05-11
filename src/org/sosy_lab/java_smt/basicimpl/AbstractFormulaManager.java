@@ -36,6 +36,7 @@ import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.SLFormulaManager;
+import org.sosy_lab.java_smt.api.StringFormulaManager;
 import org.sosy_lab.java_smt.api.Tactic;
 import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
@@ -88,7 +89,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
 
   /** Mapping of disallowed char to their escaped counterparts. */
   /* Keep this map in sync with {@link #DISALLOWED_CHARACTERS}.
-   * Counterparts can be any unique string. For optimization we could even use plain chars. */
+   * Counterparts can be any unique string. For optimization, we could even use plain chars. */
   @VisibleForTesting
   public static final ImmutableBiMap<Character, String> DISALLOWED_CHARACTER_REPLACEMENT =
       ImmutableBiMap.<Character, String>builder().put('|', "pipe").put('\\', "backslash").build();
@@ -117,6 +118,9 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
 
   private final @Nullable AbstractSLFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> slManager;
 
+  private final @Nullable AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
+      strManager;
+
   private final FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> formulaCreator;
 
   /** Builds a solver from the given theory implementations. */
@@ -127,15 +131,15 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
       AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> booleanManager,
       @Nullable IntegerFormulaManager pIntegerManager,
       @Nullable RationalFormulaManager pRationalManager,
-      @Nullable
-          AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> bitvectorManager,
-      @Nullable
-          AbstractFloatingPointFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
-              floatingPointManager,
-      @Nullable
-          AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> quantifiedManager,
+      @Nullable AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
+          bitvectorManager,
+      @Nullable AbstractFloatingPointFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
+          floatingPointManager,
+      @Nullable AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
+          quantifiedManager,
       @Nullable AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> arrayManager,
-      @Nullable AbstractSLFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> slManager) {
+      @Nullable AbstractSLFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> slManager,
+      @Nullable AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> strManager) {
 
     this.arrayManager = arrayManager;
     this.quantifiedManager = quantifiedManager;
@@ -146,6 +150,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     this.bitvectorManager = bitvectorManager;
     this.floatingPointManager = floatingPointManager;
     this.slManager = slManager;
+    this.strManager = strManager;
     this.formulaCreator = pFormulaCreator;
 
     checkArgument(
@@ -228,6 +233,14 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
       throw new UnsupportedOperationException("Solver does not support arrays");
     }
     return arrayManager;
+  }
+
+  @Override
+  public StringFormulaManager getStringFormulaManager() {
+    if (strManager == null) {
+      throw new UnsupportedOperationException("Solver does not support string theory");
+    }
+    return strManager;
   }
 
   public abstract Appender dumpFormula(TFormulaInfo t);
@@ -372,11 +385,11 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   }
 
   @Override
-  public BooleanFormula translateFrom(BooleanFormula formula, FormulaManager otherContext) {
-    if (this == otherContext) {
+  public BooleanFormula translateFrom(BooleanFormula formula, FormulaManager otherManager) {
+    if (this == otherManager) {
       return formula; // shortcut
     }
-    return parse(otherContext.dumpFormula(formula).toString());
+    return parse(otherManager.dumpFormula(formula).toString());
   }
 
   @Override
@@ -391,6 +404,9 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     } else if (formulaType.isRationalType()) {
       assert rationalManager != null;
       t = rationalManager.makeVariable(name);
+    } else if (formulaType.isStringType()) {
+      assert strManager != null;
+      t = strManager.makeVariable(name);
     } else if (formulaType.isBitvectorType()) {
       assert bitvectorManager != null;
       t = bitvectorManager.makeVariable((BitvectorType) formulaType, name);
@@ -492,17 +508,18 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
         !variableName.isEmpty(), "Identifier for variable should not be empty.");
     Preconditions.checkArgument(
         !BASIC_OPERATORS.contains(variableName),
-        "Identifier '%s' should not be a simple operator. %s",
+        "Identifier '%s' can not be used, because it is a simple operator. %s",
         variableName,
         help);
     Preconditions.checkArgument(
         !SMTLIB2_KEYWORDS.contains(variableName),
-        "Identifier '%s' should not be a keyword of SMT-LIB2. %s",
+        "Identifier '%s' can not be used, because it is a keyword of SMT-LIB2. %s",
         variableName,
         help);
     Preconditions.checkArgument(
         DISALLOWED_CHARACTERS.matchesNoneOf(variableName),
-        "Identifier '%s' should contain an escape character %s of SMT-LIB2. %s",
+        "Identifier '%s' can not be used, "
+            + "because it should not contain an escape character %s of SMT-LIB2. %s",
         variableName,
         DISALLOWED_CHARACTER_REPLACEMENT
             .keySet(), // toString prints UTF8-encoded escape sequence, better than nothing.

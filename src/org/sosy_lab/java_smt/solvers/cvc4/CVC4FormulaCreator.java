@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.cvc4;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -46,6 +47,8 @@ import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
+import org.sosy_lab.java_smt.api.RegexFormula;
+import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
@@ -56,6 +59,8 @@ import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4FloatingPointFormula;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4IntegerFormula;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4RationalFormula;
+import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4RegexFormula;
+import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4StringFormula;
 
 public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, Expr> {
 
@@ -71,7 +76,9 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
         pExprManager,
         pExprManager.booleanType(),
         pExprManager.integerType(),
-        pExprManager.realType());
+        pExprManager.realType(),
+        pExprManager.stringType(),
+        pExprManager.regExpType());
     exprManager = pExprManager;
   }
 
@@ -86,7 +93,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   }
 
   /**
-   * Makes a bound copy of an variable for use in quantifier. Note that all occurrences of the free
+   * Makes a bound copy of a variable for use in quantifier. Note that all occurrences of the free
    * var have to be substituted by the bound once it exists.
    *
    * @param var Variable you want a bound copy of.
@@ -189,8 +196,13 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       FormulaType<?> indexType = getFormulaTypeFromTermType(arrayType.getIndexType());
       FormulaType<?> elementType = getFormulaTypeFromTermType(arrayType.getConstituentType());
       return FormulaType.getArrayType(indexType, elementType);
+    } else if (t.isString()) {
+      return FormulaType.StringType;
+    } else if (t.isRegExp()) {
+      return FormulaType.RegexType;
     } else {
-      throw new AssertionError("Unhandled type " + t.getBaseType());
+      throw new AssertionError(
+          String.format("Unhandled type '%s' with base type '%s'.", t, t.getBaseType()));
     }
   }
 
@@ -218,6 +230,10 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       return (T) new CVC4FloatingPointFormula(pTerm);
     } else if (pType.isFloatingPointRoundingModeType()) {
       return (T) new CVC4FloatingPointRoundingModeFormula(pTerm);
+    } else if (pType.isStringType()) {
+      return (T) new CVC4StringFormula(pTerm);
+    } else if (pType.isRegexType()) {
+      return (T) new CVC4RegexFormula(pTerm);
     }
     throw new IllegalArgumentException("Cannot create formulas of type " + pType + " in CVC4");
   }
@@ -258,8 +274,22 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     return new CVC4ArrayFormula<>(pTerm, pIndexType, pElementType);
   }
 
+  @Override
+  protected StringFormula encapsulateString(Expr pTerm) {
+    assert getFormulaType(pTerm).isStringType()
+        : String.format(
+            "%s is no String, but %s (%s)", pTerm, pTerm.getType(), getFormulaType(pTerm));
+    return new CVC4StringFormula(pTerm);
+  }
+
+  @Override
+  protected RegexFormula encapsulateRegex(Expr pTerm) {
+    assert getFormulaType(pTerm).isRegexType();
+    return new CVC4RegexFormula(pTerm);
+  }
+
   private static String getName(Expr e) {
-    Preconditions.checkState(!e.isNull());
+    checkState(!e.isNull());
     if (!e.isConst() && !e.isVariable()) {
       e = e.getOperator();
     }
@@ -277,7 +307,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
 
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula formula, final Expr f) {
-    Preconditions.checkState(!f.isNull());
+    checkState(!f.isNull());
     Type type = f.getType();
 
     if (f.isConst()) {
@@ -294,6 +324,8 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       } else if (type.isRoundingMode()) {
         // TODO is this correct?
         return visitor.visitConstant(formula, f.getConstRoundingMode());
+      } else if (type.isString()) {
+        return visitor.visitConstant(formula, f.getConstString());
       } else {
         throw new UnsupportedOperationException("Unhandled constant " + f + " with type " + type);
       }
@@ -329,7 +361,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       // These are all treated like operators, so we can get the declaration by f.getOperator()!
       List<Formula> args = ImmutableList.copyOf(Iterables.transform(f, this::encapsulate));
       List<FormulaType<?>> argsTypes = new ArrayList<>();
-      Expr operator = f.getOperator();
+      Expr operator = normalize(f.getOperator());
       if (operator.getType().isFunction()) {
         vectorType argTypes = new FunctionType(operator.getType()).getArgTypes();
         for (int i = 0; i < argTypes.size(); i++) {
@@ -341,7 +373,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
         }
       }
 
-      Preconditions.checkState(args.size() == argsTypes.size());
+      checkState(args.size() == argsTypes.size());
 
       // TODO some operations (BV_SIGN_EXTEND, BV_ZERO_EXTEND, maybe more) encode information as
       // part of the operator itself, thus the arity is one too small and there might be no
@@ -351,8 +383,24 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           formula,
           args,
           FunctionDeclarationImpl.of(
-              getName(f), getDeclarationKind(f), argsTypes, getFormulaType(f), f.getOperator()));
+              getName(f), getDeclarationKind(f), argsTypes, getFormulaType(f), operator));
     }
+  }
+
+  /** CVC4 returns new objects when querying operators for UFs. The new operator */
+  private Expr normalize(Expr operator) {
+    Expr function = functionsCache.get(getName(operator));
+    if (function != null) {
+      checkState(
+          function.getId().equals(operator.getId()),
+          "operator '%s' with ID %s differs from existing function '%s' with ID '%s'.",
+          operator,
+          operator.getId(),
+          function,
+          function.getId());
+      return function;
+    }
+    return operator;
   }
 
   // see src/theory/*/kinds in CVC4 sources for description of the different CVC4 kinds ;)
@@ -375,6 +423,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           .put(Kind.LEQ, FunctionDeclarationKind.LTE)
           .put(Kind.GT, FunctionDeclarationKind.GT)
           .put(Kind.GEQ, FunctionDeclarationKind.GTE)
+          // Bitvector theory
           .put(Kind.BITVECTOR_PLUS, FunctionDeclarationKind.BV_ADD)
           .put(Kind.BITVECTOR_SUB, FunctionDeclarationKind.BV_SUB)
           .put(Kind.BITVECTOR_MULT, FunctionDeclarationKind.BV_MUL)
@@ -400,6 +449,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           .put(Kind.BITVECTOR_CONCAT, FunctionDeclarationKind.BV_CONCAT)
           .put(Kind.BITVECTOR_SIGN_EXTEND, FunctionDeclarationKind.BV_SIGN_EXTENSION)
           .put(Kind.BITVECTOR_ZERO_EXTEND, FunctionDeclarationKind.BV_ZERO_EXTENSION)
+          // Floating-point theory
           .put(Kind.TO_INTEGER, FunctionDeclarationKind.FLOOR)
           .put(Kind.FLOATINGPOINT_TO_SBV, FunctionDeclarationKind.FP_CASTTO_SBV)
           .put(Kind.FLOATINGPOINT_TO_UBV, FunctionDeclarationKind.FP_CASTTO_UBV)
@@ -427,6 +477,32 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           .put(Kind.FLOATINGPOINT_GEQ, FunctionDeclarationKind.FP_GE)
           .put(Kind.FLOATINGPOINT_RTI, FunctionDeclarationKind.FP_ROUND_TO_INTEGRAL)
           .put(Kind.FLOATINGPOINT_TO_FP_IEEE_BITVECTOR, FunctionDeclarationKind.FP_AS_IEEEBV)
+          // String and Regex theory
+          .put(Kind.STRING_CONCAT, FunctionDeclarationKind.STR_CONCAT)
+          .put(Kind.STRING_PREFIX, FunctionDeclarationKind.STR_PREFIX)
+          .put(Kind.STRING_SUFFIX, FunctionDeclarationKind.STR_SUFFIX)
+          .put(Kind.STRING_STRCTN, FunctionDeclarationKind.STR_CONTAINS)
+          .put(Kind.STRING_SUBSTR, FunctionDeclarationKind.STR_SUBSTRING)
+          .put(Kind.STRING_STRREPL, FunctionDeclarationKind.STR_REPLACE)
+          .put(Kind.STRING_STRREPLALL, FunctionDeclarationKind.STR_REPLACE_ALL)
+          .put(Kind.STRING_CHARAT, FunctionDeclarationKind.STR_CHAR_AT)
+          .put(Kind.STRING_LENGTH, FunctionDeclarationKind.STR_LENGTH)
+          .put(Kind.STRING_STRIDOF, FunctionDeclarationKind.STR_INDEX_OF)
+          .put(Kind.STRING_TO_REGEXP, FunctionDeclarationKind.STR_TO_RE)
+          .put(Kind.STRING_IN_REGEXP, FunctionDeclarationKind.STR_IN_RE)
+          .put(Kind.STRING_STOI, FunctionDeclarationKind.STR_TO_INT)
+          .put(Kind.STRING_ITOS, FunctionDeclarationKind.INT_TO_STR)
+          .put(Kind.STRING_LT, FunctionDeclarationKind.STR_LT)
+          .put(Kind.STRING_LEQ, FunctionDeclarationKind.STR_LE)
+          .put(Kind.REGEXP_PLUS, FunctionDeclarationKind.RE_PLUS)
+          .put(Kind.REGEXP_STAR, FunctionDeclarationKind.RE_STAR)
+          .put(Kind.REGEXP_OPT, FunctionDeclarationKind.RE_OPTIONAL)
+          .put(Kind.REGEXP_CONCAT, FunctionDeclarationKind.RE_CONCAT)
+          .put(Kind.REGEXP_UNION, FunctionDeclarationKind.RE_UNION)
+          .put(Kind.REGEXP_RANGE, FunctionDeclarationKind.RE_RANGE)
+          .put(Kind.REGEXP_INTER, FunctionDeclarationKind.RE_INTERSECT)
+          .put(Kind.REGEXP_COMPLEMENT, FunctionDeclarationKind.RE_COMPLEMENT)
+          .put(Kind.REGEXP_DIFF, FunctionDeclarationKind.RE_DIFFERENCE)
           .build();
 
   private FunctionDeclarationKind getDeclarationKind(Expr f) {
@@ -479,30 +555,25 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   }
 
   @Override
-  public Object convertValue(Expr pF) {
-    throw new UnsupportedOperationException(
-        "CVC4 needs a second term to determine a correct type. Please use the other method.");
-  }
-
-  @Override
   public Object convertValue(Expr expForType, Expr value) {
     final Type type = expForType.getType();
+    final Type valueType = value.getType();
     if (value.getKind() == Kind.BOUND_VARIABLE) {
       // CVC4 does not allow model values for bound vars
       return value.toString();
-    } else if (value.getType().isBoolean()) {
+    } else if (valueType.isBoolean()) {
       return value.getConstBoolean();
 
-    } else if (value.getType().isInteger() && type.isInteger()) {
+    } else if (valueType.isInteger() && type.isInteger()) {
       return new BigInteger(value.getConstRational().toString());
 
-    } else if (value.getType().isReal() && type.isReal()) {
+    } else if (valueType.isReal() && type.isReal()) {
       Rational rat = value.getConstRational();
       return org.sosy_lab.common.rationals.Rational.of(
           new BigInteger(rat.getNumerator().toString()),
           new BigInteger(rat.getDenominator().toString()));
 
-    } else if (value.getType().isBitVector()) {
+    } else if (valueType.isBitVector()) {
       Integer bv = value.getConstBitVector().getValue();
       if (bv.fitsSignedLong()) {
         return BigInteger.valueOf(bv.getUnsignedLong());
@@ -510,8 +581,11 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
         return value.toString(); // default
       }
 
-    } else if (value.getType().isFloatingPoint()) {
+    } else if (valueType.isFloatingPoint()) {
       return parseFloatingPoint(value);
+
+    } else if (valueType.isString()) {
+      return value.getConstString().toString();
 
     } else {
       // String serialization for unknown terms.

@@ -1,17 +1,8 @@
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index e2781eb..b838d8e 100644
-
-# This file is part of JavaSMT,
-# an API wrapper for a collection of SMT solvers:
-# https://github.com/sosy-lab/java-smt
-#
-# SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
-#
-# SPDX-License-Identifier: Apache-2.0
-
+index b51e10a1..a675f90e 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
-@@ -1,6 +1,7 @@
+@@ -8,6 +8,7 @@
  set(libboolector_src_files
    aigprop.c
    boolector.c
@@ -19,7 +10,7 @@ index e2781eb..b838d8e 100644
    boolectormc.c
    btorabort.c
    btoraig.c
-@@ -96,6 +97,14 @@ target_include_directories(boolector
+@@ -105,6 +106,14 @@ target_include_directories(boolector
  target_include_directories(boolector PRIVATE ${Btor2Tools_INCLUDE_DIR})
  target_link_libraries(boolector ${Btor2Tools_LIBRARIES})
  
