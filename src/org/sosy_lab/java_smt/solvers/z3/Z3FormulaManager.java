@@ -61,7 +61,7 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
   public BooleanFormula parse(String str) throws IllegalArgumentException {
 
     // Z3 does not access the existing symbols on its own,
-    // but requires all symbols as part of the query and does
+    // but requires all symbols as part of the query.
     // Thus, we track the used symbols on our own and give them to the parser call, if required.
     // Later, we collect all symbols from the parsed query and
     // define them again to have them tracked.
@@ -96,7 +96,8 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
         // get the missing symbol and restart the parsing with them
         Pattern pattern =
             Pattern.compile(
-                "\\(error \"line \\d+ column \\d+: unknown (?:function\\/)?constant (.*)\"\\)\\n");
+                "\\(error \"line \\d+ column \\d+: unknown constant"
+                    + " (?<name>.*?)\\s?(?<sorts>\\(.*\\))?\\s?\\\"\\)\\n");
         Matcher matcher = pattern.matcher(nested.getMessage());
         if (matcher.matches()) {
           String missingSymbol = matcher.group(1);

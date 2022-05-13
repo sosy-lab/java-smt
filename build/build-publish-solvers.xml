@@ -67,6 +67,10 @@ SPDX-License-Identifier: Apache-2.0
             Please provide all releases (Linux64, MacOS, and Windows64) together in the same root directory,
             e.g., copy the releases (especially the content of their `bin` directories) together into one directory.
             The only overlap between those releases is the JAR file, which should be equal anyway.
+            Additionally, make the Java sources available in this directory.
+            This can be done by:
+            - copying the content of sources-zip into the current directory (or vice versa)
+            - executing `python scripts/mk_make.py --java` to generate all Java related files. Executing `make` is not required.
         </fail>
         <echo>Option -Dz3.version=... not specified. Trying to determine z3.version from git repository. This will fail if git repository is not available.</echo>
         <exec executable="git" dir="${z3.path}" outputproperty="z3.version" failonerror="true">
