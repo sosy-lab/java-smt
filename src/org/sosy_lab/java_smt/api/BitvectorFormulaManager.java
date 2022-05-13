@@ -270,7 +270,7 @@ public interface BitvectorFormulaManager {
   BitvectorFormula concat(BitvectorFormula prefix, BitvectorFormula suffix);
 
   /**
-   * Extract a range of bits from a bitvector. We require "0 <= lsb <= msb < bitsize".
+   * Extract a range of bits from a bitvector. We require {@code 0 <= lsb <= msb < bitsize}.
    *
    * <p>If msb equals lsb, then a single bit will be returned, i.e., the bit from the given
    * position. If lsb equals 0 and msb equals bitsize-1, then the complete bitvector will be
