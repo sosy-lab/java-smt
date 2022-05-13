@@ -16,7 +16,7 @@ variables:
   # Needs to be synchronized with Error Prone version in lib/ivy.xml
   REFASTER_VERSION: 2.11.0
 
-build:jdk-14:
+build:jdk-17:
   variables:
     # https://github.com/google/error-prone/issues/1106
     ANT_PROPS_BUILD: "-Divy.disable=true -Derrorprone.disable=true"
