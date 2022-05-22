@@ -11,14 +11,14 @@ apply plugin: 'application'
 
 mainClassName = 'org.sosy_lab.java_smt_example.SolverOverviewTable'
 
-// Globally define versions used for our dependencies later in a map
+// Globally define versions used for our dependencies
 def version = [
   'javasmt': '3.12.0',
   'javasmtYices2': '3.12.0',
   'junit4': '4.13',
   'smtInterpol': '2.5-916-ga5843d8b',
   'boolector': '3.2.2-g1a89c229',
-  'z3': '4.8.10',
+  'z3': '4.8.17',
   'cvc4': '1.8-prerelease-2020-06-24-g7825d8f28',
   'mathsat5': '5.6.6-sosy1',
   'optiMathsat5': '1.7.1-sosy0',
@@ -33,18 +33,18 @@ repositories {
       mavenPom()
     }
   }
-    // try to get artifacts if no useful pom is found
+  // try to get artifacts if no useful pom is found
   mavenCentral {
     metadataSources {
       artifact()
     }
   }
-    // Ivy can be used as well
+  // Ivy can be used as well
   ivy {
     url "https://www.sosy-lab.org/ivy"
     patternLayout {
       artifact "/[organisation]/[module]/[classifier]-[revision].[ext]"
-      //ivy "/[organisation]/[module]/ivy-[revision].xml"
+      // ivy "/[organisation]/[module]/ivy-[revision].xml"
     }
     metadataSources {
        artifact()
@@ -73,9 +73,9 @@ dependencies {
   //runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-z3', version: version.z3, classifier: 'libz3java', ext: 'so'
 
   // Kotlin version as an alternative. Both should be equal
-  runtimeOnly("org.sosy-lab:javasmt-solver-z3:4.8.10:com.microsoft.z3@jar")
-  runtimeOnly("org.sosy-lab:javasmt-solver-z3:4.8.10:libz3@so")
-  runtimeOnly("org.sosy-lab:javasmt-solver-z3:4.8.10:libz3java@so")
+  runtimeOnly("org/sosy-lab:javasmt-solver-z3:${version.z3}:com.microsoft.z3@jar")
+  runtimeOnly("org/sosy-lab:javasmt-solver-z3:${version.z3}:libz3@so")
+  runtimeOnly("org/sosy-lab:javasmt-solver-z3:${version.z3}:libz3java@so")
   
   // Mathsat5 via Maven
   runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-mathsat5', version: version.mathsat5, classifier: 'libmathsat5j', ext: 'so'
@@ -105,13 +105,6 @@ dependencies {
   runtimeOnly group: 'org.sosy-lab', name: 'javasmt-yices2', version: version.javasmtYices2, ext: 'jar'
   // And the Yices2 solver from Maven
   runtimeOnly group: 'org.sosy-lab', name: 'javasmt-solver-yices2', version: version.yices2, classifier: 'libyices2j', ext: 'so'
-  
-  /* 
-  Kotlin version for z3 as an example:
-  implementation(group = "org.sosy-lab", name = "javasmt-solver-z3", version = "4.8.10", classifier = "com.microsoft.z3", ext = "jar")
-  implementation(group = "org.sosy-lab", name = "javasmt-solver-z3", version = "4.8.10", classifier = "libz3", ext = "so")
-  implementation(group = "org.sosy-lab", name = "javasmt-solver-z3", version = "4.8.10", classifier = "libz3java", ext = "so")
-  */
 
   // Tell implementation config to use the JavaSMT + dependencies from our dependencies folder
   implementation fileTree(dir: 'build/dependencies', include: '*.jar')
