@@ -25,8 +25,14 @@ lib/native/*/*.asc
 doc/Example-Maven-Project/target*
 doc/Example-Maven-Web-Project/target*
 doc/Example-Gradle-Project/.gradle
+doc/Example-Gradle-Project/.settings
+doc/Example-Gradle-Project/.project
 doc/Example-Gradle-Project/dependencies
 doc/Example-Gradle-Project/build
+doc/Example-Gradle-Project-Kotlin/.gradle
+doc/Example-Gradle-Project-Kotlin/.settings
+doc/Example-Gradle-Project-Kotlin/.project
+doc/Example-Gradle-Project-Kotlin/build
 
 solvers_maven_conf/*.asc
 
