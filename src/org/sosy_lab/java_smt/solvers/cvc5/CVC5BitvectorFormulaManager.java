@@ -35,7 +35,7 @@ public class CVC5BitvectorFormulaManager
   }
 
   @Override
-  protected Term extract(Term pParam1, int pMsb, int pLsb, boolean signed) {
+  protected Term extract(Term pParam1, int pMsb, int pLsb) {
     Op ext;
     try {
       if (pMsb < pLsb || pMsb >= pParam1.getSort().getBitVectorSize() || pLsb < 0 || pMsb < 0) {
