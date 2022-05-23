@@ -18,7 +18,7 @@ SPDX-License-Identifier: Apache-2.0
       <license name="The Apache Software License, Version 2.0" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
 
       <description homepage="https://github.com/sosy-lab/java-smt">
-          Java wrapper for SMT solvers like Z3, MathSAT5, SMTInterpol, Princess, CVC4, Boolector, and Yices2.
+          Java wrapper for SMT solvers like Z3, MathSAT5, SMTInterpol, Princess, CVC4, CVC5, Boolector, and Yices2.
       </description>
     </info>
 
@@ -48,7 +48,7 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- The normal dependencies with all solvers included, except those unter GPL. -->
         <conf name="runtime-without-gpl"
-              extends="runtime-mathsat,runtime-optimathsat,runtime-smtinterpol,runtime-princess,runtime-z3,runtime-cvc4,runtime-boolector"
+              extends="runtime-mathsat,runtime-optimathsat,runtime-smtinterpol,runtime-princess,runtime-z3,runtime-cvc4,runtime-cvc5,runtime-boolector"
               description="all solvers included, except those unter GPL"/>
 
         <!-- Dependencies needed for building or running tests. -->
@@ -161,7 +161,7 @@ SPDX-License-Identifier: Apache-2.0
         <dependency org="org.sosy_lab" name="javasmt-solver-z3" rev="4.8.10" conf="runtime-z3->solver-z3; contrib->sources,javadoc" />
         <dependency org="org.sosy_lab" name="javasmt-solver-optimathsat" rev="1.7.1-sosy0" conf="runtime-optimathsat->solver-optimathsat" />
         <dependency org="org.sosy_lab" name="javasmt-solver-cvc4" rev="1.8-prerelease-2020-06-24-g7825d8f28" conf="runtime-cvc4->solver-cvc4" />
-        <dependency org="org.sosy_lab" name="javasmt-solver-cvc5" rev="0.0.6" conf="runtime-cvc5->solver-cvc5" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-cvc5" rev="1.0.0-g24fc4950d" conf="runtime-cvc5->solver-cvc5" />
         <dependency org="org.sosy_lab" name="javasmt-solver-boolector" rev="3.2.2-g1a89c229" conf="runtime-boolector->solver-boolector" />
 
         <!-- additional JavaSMT components with Solver Binaries -->
