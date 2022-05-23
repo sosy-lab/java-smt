@@ -262,4 +262,9 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
       closed = true;
     }
   }
+
+  @Override
+  public int size() {
+    return assertedFormulas.size() - 1;
+  }
 }
