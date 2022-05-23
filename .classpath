@@ -30,6 +30,7 @@ SPDX-License-Identifier: Apache-2.0
 	<classpathentry kind="lib" path="lib/java/runtime-princess/java-cup-runtime.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime-z3/com.microsoft.z3.jar" sourcepath="lib/java-contrib/com.microsoft.z3-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime-cvc4/CVC4.jar"/>
+    <classpathentry kind="lib" path="lib/java/runtime-cvc5/cvc5.jar"/>
 	<classpathentry kind="lib" path="lib/java/test/truth-java8-extension.jar" sourcepath="lib/java-contrib/truth-java8-extension-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/core/checker-qual.jar" sourcepath="lib/java-contrib/checker-qual-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/test/diffutils.jar"/>
