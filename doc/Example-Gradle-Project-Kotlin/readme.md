@@ -18,7 +18,6 @@ Run the project (SolverOverviewTable):
   gradle run
 
 Run the tests (run when building anyway):
-This does nothing at the moment. For JavaSMT tests see the Java Gradle example project.
   gradle test
 
 Build a jar:

@@ -14,7 +14,36 @@ class AppTest {
 
   @Test
   fun z3SudokuTest() {
-    // This fails for some reason
-    //   SudokuTest().z3SudokuTest()
+    SudokuTest().z3SudokuTest()
+  }
+
+  @Test
+  fun princessSudokuTest() {
+    SudokuTest().princessSudokuTest()
+  }
+
+  @Test
+  fun smtInterpolSudokuTest() {
+    SudokuTest().smtInterpolSudokuTest()
+  }
+
+  @Test
+  fun cvc4SudokuTest() {
+    SudokuTest().cvc4SudokuTest()
+  }
+
+  @Test
+  fun mathsatSudokuTest() {
+    SudokuTest().mathsatSudokuTest()
+  }
+
+  @Test
+  fun boolectorSudokuTest() {
+    SudokuTest().boolectorSudokuTest()
+  }
+
+  @Test
+  fun yicesSudokuTest() {
+    SudokuTest().yicesSudokuTest()
   }
 }
