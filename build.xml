@@ -24,6 +24,7 @@ SPDX-License-Identifier: Apache-2.0
     <property name="ivy.solver.configurations" value="
         runtime-boolector,
         runtime-cvc4,
+        runtime-cvc5,
         runtime-mathsat,
         runtime-optimathsat,
         runtime-princess,
