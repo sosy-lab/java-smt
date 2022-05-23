@@ -145,6 +145,19 @@ SPDX-License-Identifier: Apache-2.0
         <stage-solver-file filename="libcvc4parser" fileending="so"/>
     </target>
 
+    <target name="stage-cvc5" depends="build-dependencies"
+            description="deploy current version of CVC5 to Maven staging repository">
+        <!-- get revision from dependencies -->
+        <ivy:artifactproperty name="[artifact].revision" value="[revision]"/>
+        <property name="stage.solver" value="cvc5"/>
+        <property name="stage.revision" value="${CVC5.revision}"/>
+        <!-- then publish the files -->
+        <stage-solver-file filename="cvc5" fileending="jar"/>
+        <stage-solver-file filename="libcvc5" fileending="so"/>
+        <stage-solver-file filename="libcvc5jni" fileending="so"/>
+        <stage-solver-file filename="libcvc5parser" fileending="so"/>
+    </target>
+
     <!--
     Yices2 consists of two parts:
      - we release our JavaSMT-based bindings for Yices2.
