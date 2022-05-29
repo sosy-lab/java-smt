@@ -312,6 +312,7 @@ class PrincessEnvironment {
    * Exception at run time.
    */
   @SuppressWarnings("unchecked")
+  @SuppressFBWarnings("THROWS_METHOD_THROWS_CLAUSE_THROWABLE")
   private static <E extends Throwable> void throwCheckedAsUnchecked(Throwable e) throws E {
     throw (E) e;
   }
