@@ -385,9 +385,9 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
   private void checkNearInf(int mantissa, int exponent, long value)
       throws SolverException, InterruptedException {
     FloatingPointType type = FormulaType.getFloatingPointType(exponent, mantissa);
-    FloatingPointFormula fp1 = fpmgr.makeNumber((double) value, type);
+    FloatingPointFormula fp1 = fpmgr.makeNumber(BigDecimal.valueOf(value), type);
     assertThatFormula(fpmgr.isInfinity(fp1)).isTautological();
-    FloatingPointFormula fp2 = fpmgr.makeNumber((double) value - 1, type);
+    FloatingPointFormula fp2 = fpmgr.makeNumber(BigDecimal.valueOf(value - 1), type);
     assertThatFormula(fpmgr.isInfinity(fp2)).isUnsatisfiable();
   }
 
@@ -420,9 +420,9 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
   private void checkNearMinusInf(int mantissa, int exponent, long value)
       throws SolverException, InterruptedException {
     FloatingPointType type = FormulaType.getFloatingPointType(exponent, mantissa);
-    FloatingPointFormula fp1 = fpmgr.makeNumber((double) value, type);
+    FloatingPointFormula fp1 = fpmgr.makeNumber(BigDecimal.valueOf(value), type);
     assertThatFormula(fpmgr.isInfinity(fp1)).isTautological();
-    FloatingPointFormula fp2 = fpmgr.makeNumber((double) value + 1, type);
+    FloatingPointFormula fp2 = fpmgr.makeNumber(BigDecimal.valueOf(value + 1), type);
     assertThatFormula(fpmgr.isInfinity(fp2)).isUnsatisfiable();
   }
 
