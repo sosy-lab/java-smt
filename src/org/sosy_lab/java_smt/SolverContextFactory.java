@@ -269,8 +269,7 @@ public class SolverContextFactory {
         return Yices2SolverContext.create(nonLinearArithmetic, shutdownNotifier, loader);
 
       case BOOLECTOR:
-        return BoolectorSolverContext.create(
-            config, shutdownNotifier, logfile, (int) randomSeed, loader);
+        return BoolectorSolverContext.create(config, shutdownNotifier, logfile, randomSeed, loader);
 
       default:
         throw new AssertionError("no solver selected");
