@@ -14,6 +14,7 @@ import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.BOOLECTOR;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.CVC4;
+import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.CVC5;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.MATHSAT5;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.PRINCESS;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.Z3;
@@ -141,7 +142,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
         .withMessage(
             "Solver %s does not support unsat core generation over assumptions", solverToUse())
         .that(solverToUse())
-        .isNoneOf(PRINCESS, BOOLECTOR, CVC4);
+        .isNoneOf(PRINCESS, BOOLECTOR, CVC4, CVC5);
 
     try (ProverEnvironment pe =
         context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
@@ -155,7 +156,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
         .withMessage(
             "Solver %s does not support unsat core generation over assumptions", solverToUse())
         .that(solverToUse())
-        .isNoneOf(PRINCESS, BOOLECTOR, CVC4);
+        .isNoneOf(PRINCESS, BOOLECTOR, CVC4, CVC5);
     try (ProverEnvironment pe =
         context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       pe.push();
