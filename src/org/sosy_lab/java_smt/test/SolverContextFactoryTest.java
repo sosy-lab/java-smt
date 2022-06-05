@@ -89,6 +89,7 @@ public class SolverContextFactoryTest {
         return;
       case BOOLECTOR:
       case CVC4:
+      case CVC5:
       case YICES2:
         assume.that(IS_LINUX).isTrue();
         return;
