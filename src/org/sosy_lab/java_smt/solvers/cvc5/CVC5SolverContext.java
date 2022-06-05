@@ -60,7 +60,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
     Solver newSolver = new Solver();
 
     // set common options.
-    newSolver.setOption("random-seed", String.valueOf(randomSeed));
+    newSolver.setOption("seed", String.valueOf(randomSeed));
     newSolver.setOption("produce-models", "true");
     newSolver.setOption("finite-model-find", "true");
     newSolver.setOption("sets-ext", "true");
@@ -68,7 +68,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
     // Set Strings option to enable all String features (such as lessOrEquals)
     newSolver.setOption("strings-exp", "true");
     newSolver.setOption("produce-unsat-cores", "true");
-    newSolver.setOption("produce-interpols", "all");
+    // newSolver.setOption("produce-interpolants", "true");
     // Neither simplification, arith-rewrite-equalities, pb-rewrites provide rewrites of trivial
     // formulas only
     // Note: with solver.getOptionNames() you can get all options
