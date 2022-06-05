@@ -30,7 +30,9 @@ SPDX-License-Identifier: Apache-2.0
         <artifact name="libcvc5jni"    conf="solver-cvc5" type="shared-object" ext="so"/>
         <artifact name="libcvc5"       conf="solver-cvc5" type="shared-object" ext="so"/>
         <artifact name="libcvc5parser" conf="solver-cvc5" type="shared-object" ext="so"/>
-        <artifact name="cvc5" conf="solver-cvc5" />
+        <artifact name="libpolyxx"     conf="solver-cvc5" type="shared-object" ext="so"/>
+        <artifact name="libpoly"       conf="solver-cvc5" type="shared-object" ext="so"/>
+        <artifact name="cvc5"          conf="solver-cvc5" />
     </publications>
 
     <dependencies></dependencies>
