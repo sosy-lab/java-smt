@@ -283,7 +283,7 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="build"/>
         </exec>
         <exec executable="./configure.sh" dir="${cvc5.path}" failonerror="true">
-            <arg value="production"/>
+            <!--<arg value="production"/>-->
             <arg value="--java-bindings"/>
             <arg value="--auto-download"/>
             <arg value="--statistics"/>
@@ -308,8 +308,6 @@ SPDX-License-Identifier: Apache-2.0
         <!-- fix RPATH and library dependencies -->
         <exec executable="patchelf" dir="${cvc5.path}/build/src/parser/" failonerror="true">
             <arg value="--set-rpath"/><arg value="$ORIGIN"/>
-            <arg value="--replace-needed"/><arg value="libpoly.so.0"/><arg value="libpoly.so"/>
-            <arg value="--replace-needed"/><arg value="libpolyxx.so.0"/><arg value="libpolyxx.so"/>
             <arg value="libcvc5parser.so"/>
         </exec>
         <exec executable="patchelf" dir="${cvc5.path}/build/src/" failonerror="true">
@@ -320,8 +318,6 @@ SPDX-License-Identifier: Apache-2.0
         </exec>
         <exec executable="patchelf" dir="${cvc5.path}/build/src/api/java/" failonerror="true">
             <arg value="--set-rpath"/><arg value="$ORIGIN"/>
-            <arg value="--replace-needed"/><arg value="libpolyxx.so.0"/><arg value="libpolyxx.so"/>
-            <arg value="--replace-needed"/><arg value="libpoly.so.0"/><arg value="libpoly.so"/>
             <arg value="libcvc5jni.so"/>
         </exec>
         <exec executable="patchelf" dir="${cvc5.path}/build/deps/lib/" failonerror="true">
@@ -341,6 +337,8 @@ SPDX-License-Identifier: Apache-2.0
         <copy file="${cvc5.path}/build/src/parser/libcvc5parser.so" tofile="libcvc5parser-${cvc5.version}.so"/>
         <copy file="${cvc5.path}/build/src/api/java/libcvc5jni.so" tofile="libcvc5jni-${cvc5.version}.so"/>
         <copy file="${cvc5.jar}" tofile="cvc5-${cvc5.version}.jar"/>
+        <copy file="${cvc5.path}/build/deps/lib/libpolyxx.so" tofile="libpolyxx-${cvc5.version}.so"/>
+        <copy file="${cvc5.path}/build/deps/lib/libpoly.so" tofile="libpoly-${cvc5.version}.so"/>
     </target>
 
     <target name="publish-cvc5" depends="package-cvc5, load-ivy"
