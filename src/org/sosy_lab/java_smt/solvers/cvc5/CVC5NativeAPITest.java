@@ -71,7 +71,8 @@ public class CVC5NativeAPITest {
 
   @Before
   public void createEnvironment() throws CVC5ApiException {
-    // CVC5 loads its own library statically
+    // CVC5 loads its own library statically in this call. We have to do it before CVC5 does it
+    // correctly!
     solver = new Solver();
     // Set the logic
     solver.setLogic("ALL");

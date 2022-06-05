@@ -243,7 +243,8 @@ public class SolverContextFactory {
             shutdownNotifier,
             (int) randomSeed,
             nonLinearArithmetic,
-            floatingPointRoundingMode);
+            floatingPointRoundingMode,
+            loader);
 
       case SMTINTERPOL:
         return SmtInterpolSolverContext.create(

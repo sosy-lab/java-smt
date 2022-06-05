@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.solvers.cvc5;
 
 import io.github.cvc5.Solver;
 import java.util.Set;
+import java.util.function.Consumer;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -49,10 +50,13 @@ public final class CVC5SolverContext extends AbstractSolverContext {
       ShutdownNotifier pShutdownNotifier,
       int randomSeed,
       NonLinearArithmetic pNonLinearArithmetic,
-      FloatingPointRoundingMode pFloatingPointRoundingMode) {
+      FloatingPointRoundingMode pFloatingPointRoundingMode,
+      Consumer<String> pLoader) {
 
+    pLoader.accept("cvc5jni");
     // Solver is the central class for creating expressions/terms/formulae.
-    // Also, creating a solver statically loads CVC5
+    // Also, creating a solver statically loads CVC5. We have to do it before CVC5 does it correctly
+    // though.
     Solver newSolver = new Solver();
 
     // set common options.
