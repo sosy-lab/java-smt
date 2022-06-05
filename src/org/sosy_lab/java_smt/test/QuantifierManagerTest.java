@@ -247,6 +247,10 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testLIAForallArrayDisjunctSat2() throws SolverException, InterruptedException {
+    assume()
+        .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC5);
     // (forall x . b[x] = 0) OR (b[123] = 1) is SAT
     requireIntegers();
     BooleanFormula f =
@@ -343,6 +347,10 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
   @Test
   public void testLIANotExistsArrayDisjunct2() throws SolverException, InterruptedException {
     // (not exists x . not b[x] = 0) OR (b[123] = 1) is SAT
+    assume()
+        .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC5);
     requireIntegers();
     BooleanFormula f =
         bmgr.or(
