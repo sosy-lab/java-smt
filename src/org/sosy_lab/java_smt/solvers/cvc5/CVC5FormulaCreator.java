@@ -365,6 +365,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
         return visitor.visitQuantifier((BooleanFormula) formula, quant, freeVars, fBody);
 
       } else if (f.getKind() == Kind.CONSTANT) {
+        // CVC5 returns toString() with escape chars!
         return visitor.visitFreeVariable(formula, f.toString());
 
       } else {
@@ -530,7 +531,8 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
   protected Term getBooleanVarDeclarationImpl(Term pTFormulaInfo) {
     try {
       Kind kind = pTFormulaInfo.getKind();
-      assert kind == Kind.APPLY_UF || kind == Kind.VARIABLE : pTFormulaInfo.getKind();
+      // CONSTANTS are "variables" and Kind.VARIABLEs are bound variables in for example quantifiers
+      assert kind == Kind.APPLY_UF || kind == Kind.CONSTANT : pTFormulaInfo.getKind();
       if (kind == Kind.APPLY_UF) {
         // TODO: Test this, this is the old internal implementation
         return pTFormulaInfo.getChild(0);
