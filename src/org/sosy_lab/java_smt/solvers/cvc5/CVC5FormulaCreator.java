@@ -392,16 +392,30 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
           }
         }
 
-        // TODO: check if the below still applied in CVC5
         // TODO some operations (BV_SIGN_EXTEND, BV_ZERO_EXTEND, maybe more) encode information as
         // part of the operator itself, thus the arity is one too small and there might be no
         // possibility to access the information from user side. Should we encode such information
         // as additional parameters? We do so for some methods of Princess.
-        return visitor.visitFunction(
-            formula,
-            argsBuilder.build(),
-            FunctionDeclarationImpl.of(
-                getName(f), getDeclarationKind(f), argsTypes, getFormulaType(f), f.getOp()));
+        if (sort.isFunction()) {
+          return visitor.visitFunction(
+              formula,
+              argsBuilder.build(),
+              FunctionDeclarationImpl.of(
+                  getName(f), getDeclarationKind(f), argsTypes, getFormulaType(f), f));
+        } else if (kind == Kind.APPLY_UF) {
+          return visitor.visitFunction(
+              formula,
+              argsBuilder.build(),
+              FunctionDeclarationImpl.of(
+                  getName(f), getDeclarationKind(f), argsTypes, getFormulaType(f), f.getChild(0)));
+        } else {
+          // TODO: check if the below is correct
+          return visitor.visitFunction(
+              formula,
+              argsBuilder.build(),
+              FunctionDeclarationImpl.of(
+                  getName(f), getDeclarationKind(f), argsTypes, getFormulaType(f), f.getOp()));
+        }
       }
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
@@ -574,6 +588,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
           "You tried creating a UF with no arguments. CVC5 does not allow this.");
     }
     Term exp = functionsCache.get(pName);
+    // TODO: check that the args match
     if (exp == null) {
       Sort[] argSorts = pArgTypes.toArray(new Sort[0]);
       // array of argument types and the return type
