@@ -346,7 +346,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
         // BOUND vars are used for all vars that are bound to a quantifier in CVC5.
         // We resubstitute them back to the original free.
         // CVC5 doesn't give you the de-brujin index
-        Term originalVar = variablesCache.get(formula.toString());
+        Term originalVar = variablesCache.get(dequote(formula.toString()));
         return visitor.visitBoundVariable(encapsulate(originalVar), 0);
 
       } else if (f.getKind() == Kind.FORALL || f.getKind() == Kind.EXISTS) {
@@ -365,8 +365,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
         return visitor.visitQuantifier((BooleanFormula) formula, quant, freeVars, fBody);
 
       } else if (f.getKind() == Kind.CONSTANT) {
-        // CVC5 returns toString() with escape chars!
-        return visitor.visitFreeVariable(formula, f.toString());
+        return visitor.visitFreeVariable(formula, dequote(f.toString()));
 
       } else {
         // Term expressions like uninterpreted function calls (Kind.APPLY_UF) or operators (e.g.
