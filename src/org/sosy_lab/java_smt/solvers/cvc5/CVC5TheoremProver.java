@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.solvers.cvc5;
 
 import io.github.cvc5.Solver;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
@@ -29,7 +30,9 @@ class CVC5TheoremProver extends CVC5AbstractProver<Void>
       @SuppressWarnings("unused") int randomSeed,
       Set<ProverOptions> pOptions,
       BooleanFormulaManager pBmgr,
-      Solver pSolver) {
-    super(pFormulaCreator, pShutdownNotifier, randomSeed, pOptions, pBmgr, pSolver);
+      Solver pSolver,
+      AtomicBoolean pIsAnyStackAlive) {
+    super(
+        pFormulaCreator, pShutdownNotifier, randomSeed, pOptions, pBmgr, pSolver, pIsAnyStackAlive);
   }
 }

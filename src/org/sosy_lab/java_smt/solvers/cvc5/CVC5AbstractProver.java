@@ -23,6 +23,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -37,6 +38,10 @@ import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
  * (context) for everything! They are working on it. See CVC5 github discussion.
  */
 public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
+
+  /** CVC5 does not support multiple solver stacks. */
+  private final AtomicBoolean isAnyStackAlive;
+
   private final CVC5FormulaCreator creator;
   private final Solver solver;
   private boolean changedSinceLastSatQuery = false;
@@ -53,14 +58,25 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   // TODO: does CVC5 support separation logic in incremental mode?
   private final boolean incremental;
 
+  /*
+   * Note: since CVC5 interacts only via the Solver and nothing else, we can't create multiple stacks from it. (Communication to other solver instances is very limited/not possible since parsing/dumping is not completely supported and no translate method is available yet, but will be added in the future)
+   */
   protected CVC5AbstractProver(
       CVC5FormulaCreator pFormulaCreator,
       ShutdownNotifier pShutdownNotifier,
       @SuppressWarnings("unused") int randomSeed,
       Set<ProverOptions> pOptions,
       BooleanFormulaManager pBmgr,
-      Solver pSolver) {
+      Solver pSolver,
+      AtomicBoolean pIsAnyStackAlive) {
     super(pOptions, pBmgr, pShutdownNotifier);
+
+    isAnyStackAlive = pIsAnyStackAlive;
+    // avoid dual stack usage
+    Preconditions.checkState(
+        !isAnyStackAlive.getAndSet(true),
+        "CVC5 does not support the usage of multiple "
+            + "solver stacks at the same time. Please close any existing solver stack.");
 
     creator = pFormulaCreator;
     solver = pSolver;
@@ -256,10 +272,11 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
       closeAllModels();
       assertedFormulas.clear();
       solver.resetAssertions();
-      // Dont close the solver here, currently we use one solver instance for all stacks + the
+      // Don't close the solver here, currently we use one solver instance for all stacks + the
       // context!
       // TODO: revisit once the devs enable formula translation.
       closed = true;
+      Preconditions.checkState(isAnyStackAlive.getAndSet(false));
     }
   }
 

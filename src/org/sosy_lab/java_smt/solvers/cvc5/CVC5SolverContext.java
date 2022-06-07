@@ -8,8 +8,10 @@
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
+import com.google.common.base.Preconditions;
 import io.github.cvc5.Solver;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.log.LogManager;
@@ -29,6 +31,8 @@ public final class CVC5SolverContext extends AbstractSolverContext {
   private Solver solver;
   private final ShutdownNotifier shutdownNotifier;
   private final int randomSeed;
+  private final AtomicBoolean isAnyStackAlive = new AtomicBoolean(false);
+  private boolean closed = false;
 
   private CVC5SolverContext(
       CVC5FormulaCreator creator,
@@ -119,6 +123,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
   @Override
   public void close() {
     if (creator != null) {
+      closed = true;
       solver.close();
       creator = null;
     }
@@ -131,13 +136,15 @@ public final class CVC5SolverContext extends AbstractSolverContext {
 
   @Override
   public ProverEnvironment newProverEnvironment0(Set<ProverOptions> pOptions) {
+    Preconditions.checkState(!closed, "solver context is already closed");
     return new CVC5TheoremProver(
         creator,
         shutdownNotifier,
         randomSeed,
         pOptions,
         getFormulaManager().getBooleanFormulaManager(),
-        solver);
+        solver,
+        isAnyStackAlive);
   }
 
   @Override

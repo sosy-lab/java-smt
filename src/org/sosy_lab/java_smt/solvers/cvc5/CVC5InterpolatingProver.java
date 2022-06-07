@@ -13,6 +13,7 @@ import io.github.cvc5.Term;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
@@ -32,8 +33,16 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
       int pRandomSeed,
       Set<ProverOptions> pOptions,
       BooleanFormulaManager pBmgr,
-      Solver pSolver) {
-    super(pFormulaCreator, pShutdownNotifier, pRandomSeed, pOptions, pBmgr, pSolver);
+      Solver pSolver,
+      AtomicBoolean pIsAnyStackAlive) {
+    super(
+        pFormulaCreator,
+        pShutdownNotifier,
+        pRandomSeed,
+        pOptions,
+        pBmgr,
+        pSolver,
+        pIsAnyStackAlive);
     solver = pSolver;
   }
 
