@@ -1202,7 +1202,12 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
   private static final ImmutableSet<Solvers> VAR_TRACKING_SOLVERS =
       ImmutableSet.of(
-          Solvers.SMTINTERPOL, Solvers.MATHSAT5, Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2);
+          Solvers.SMTINTERPOL,
+          Solvers.MATHSAT5,
+          Solvers.CVC4,
+          Solvers.BOOLECTOR,
+          Solvers.YICES2,
+          Solvers.CVC5);
   private static final ImmutableSet<Solvers> VAR_AND_UF_TRACKING_SOLVERS =
       ImmutableSet.of(Solvers.SMTINTERPOL, Solvers.MATHSAT5, Solvers.BOOLECTOR, Solvers.YICES2);
 
@@ -1259,7 +1264,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     assume()
         .withMessage("Solver %s does not support UFs without arguments", solverToUse())
         .that(solverToUse())
-        .isNotEqualTo(Solvers.BOOLECTOR);
+        .isNoneOf(Solvers.BOOLECTOR, Solvers.CVC5);
 
     BooleanFormula z1 = bmgr.makeVariable("z");
     BooleanFormula z2 = fmgr.declareAndCallUF("z", FormulaType.BooleanType);
