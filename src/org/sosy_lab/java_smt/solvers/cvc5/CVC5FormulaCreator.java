@@ -588,13 +588,32 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
           "You tried creating a UF with no arguments. CVC5 does not allow this.");
     }
     Term exp = functionsCache.get(pName);
-    // TODO: check that the args match
+
     if (exp == null) {
       Sort[] argSorts = pArgTypes.toArray(new Sort[0]);
       // array of argument types and the return type
       Sort ufToReturnType = solver.mkFunctionSort(argSorts, pReturnType);
       exp = solver.mkConst(ufToReturnType, pName);
       functionsCache.put(pName, exp);
+    } else {
+      Preconditions.checkArgument(
+          exp.getSort().equals(exp.getSort()),
+          "Symbol %s already in use for different return type %s",
+          exp,
+          exp.getSort());
+      for (int i = 1; i < exp.getNumChildren(); i++) {
+        // CVC5s first argument in a function/Uf is the declaration, we don't need that here
+        try {
+          Preconditions.checkArgument(
+              pArgTypes.get(i).equals(exp.getChild(i).getSort()),
+              "Argument %s with type %s does not match expected type %s",
+              i - 1,
+              pArgTypes.get(i),
+              exp.getChild(i).getSort());
+        } catch (CVC5ApiException e) {
+          // Will never be triggered as we don't access beyond the num of children
+        }
+      }
     }
     return exp;
   }
