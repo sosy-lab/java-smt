@@ -283,7 +283,8 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     checkKind(fpmgr.max(x, y), FunctionDeclarationKind.FP_MAX);
     checkKind(fpmgr.min(x, y), FunctionDeclarationKind.FP_MIN);
     checkKind(fpmgr.sqrt(x), FunctionDeclarationKind.FP_SQRT);
-    if (Solvers.CVC4 != solverToUse()) { // CVC4 does not support this operation
+    if (Solvers.CVC4 != solverToUse()
+        && Solvers.CVC5 != solverToUse()) { // CVC4/CVC5 do not support this operation
       checkKind(fpmgr.toIeeeBitvector(x), FunctionDeclarationKind.FP_AS_IEEEBV);
     }
     checkKind(
