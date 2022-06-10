@@ -58,6 +58,14 @@ public class SolverContextTest extends SolverBasedTest0 {
 
     // For the remaining test, we try to execute as much as possible after closing the context.
 
+    // CVC5 does not allow any access after close()
+    assume()
+        .withMessage(
+            "Solver %s does not support to access formulae after closing the context",
+            solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC5);
+
     assertThat(term).isEqualTo(term2);
     assertThat(term).isNotEqualTo(term3);
     assertThat(term).isNotEqualTo(termTrue);
@@ -70,6 +78,7 @@ public class SolverContextTest extends SolverBasedTest0 {
             solverToUse())
         .that(solverToUse())
         .isNotEqualTo(Solvers.BOOLECTOR);
+
 
     assertThat(term.hashCode()).isEqualTo(hash);
 
