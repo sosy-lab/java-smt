@@ -558,7 +558,8 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
       }
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
-          "You tried reading a bool variable potentially in a UF application that failed. Checked term: "
+          "You tried reading a bool variable potentially in a UF application that failed. Checked"
+              + " term: "
               + pTFormulaInfo
               + ".",
           e);

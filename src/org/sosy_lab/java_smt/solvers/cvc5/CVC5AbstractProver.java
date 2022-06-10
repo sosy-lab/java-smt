@@ -59,7 +59,10 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   private final boolean incremental;
 
   /*
-   * Note: since CVC5 interacts only via the Solver and nothing else, we can't create multiple stacks from it. (Communication to other solver instances is very limited/not possible since parsing/dumping is not completely supported and no translate method is available yet, but will be added in the future)
+   * Note: since CVC5 interacts only via the Solver and nothing else, we can't create multiple
+   * stacks from it. (Communication to other solver instances is very limited/not possible
+   * since parsing/dumping is not completely supported and no translate method is available yet,
+   * but will be added in the future)
    */
   protected CVC5AbstractProver(
       CVC5FormulaCreator pFormulaCreator,

@@ -131,7 +131,8 @@ abstract class CVC5NumeralFormulaManager<
   protected Term multiply(Term pParam1, Term pParam2) {
     return solver.mkTerm(Kind.MULT, pParam1, pParam2);
     /*
-     * In CVC4 we had to check if the terms consist of only numerals, if this fails we have to do it again!
+     * In CVC4 we had to check if the terms consist of only numerals, if this
+     * fails we have to do it again!
     if (consistsOfNumerals(pParam1) || consistsOfNumerals(pParam2)) {
       return solver.mkTerm(Kind.MULT, pParam1, pParam2);
     } else {

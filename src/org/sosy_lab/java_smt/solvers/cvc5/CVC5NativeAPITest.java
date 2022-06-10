@@ -106,27 +106,26 @@ public class CVC5NativeAPITest {
     Term c = solver.mkConst(solver.getIntegerSort(), "c");
 
     // build formula:  1 = A = B = C = 0
-    Term A = solver.mkTerm(Kind.EQUAL, one, a);
-    Term B = solver.mkTerm(Kind.EQUAL, a, b);
-    Term C = solver.mkTerm(Kind.EQUAL, b, c);
-    Term D = solver.mkTerm(Kind.EQUAL, c, zero);
+    Term aEq1 = solver.mkTerm(Kind.EQUAL, one, a);
+    Term aEqb = solver.mkTerm(Kind.EQUAL, a, b);
+    Term bEqc = solver.mkTerm(Kind.EQUAL, b, c);
+    Term cEq0 = solver.mkTerm(Kind.EQUAL, c, zero);
 
-    solver.assertFormula(A);
-    solver.assertFormula(B);
-    solver.assertFormula(C);
-    solver.assertFormula(D);
+    solver.assertFormula(aEq1);
+    solver.assertFormula(aEqb);
+    solver.assertFormula(bEqc);
+    solver.assertFormula(cEq0);
 
     assertThat(solver.checkSat().isUnsat()).isTrue();
 
-    // TODO: ask Karlheinz if true is correct for an empty interpolation group!
     Term itp = solver.getInterpolant(solver.mkBoolean(true));
-    Term itpA = solver.getInterpolant(A);
-    Term itpAB = solver.getInterpolant(A.andTerm(B));
-    Term itpABC = solver.getInterpolant(A.andTerm(B).andTerm(C));
-    Term itpD = solver.getInterpolant(D);
-    Term itpDC = solver.getInterpolant(D.andTerm(C));
-    Term itpDCB = solver.getInterpolant(D.andTerm(C).andTerm(B));
-    Term itpABCD = solver.getInterpolant(A.andTerm(B).andTerm(C).andTerm(D));
+    Term itpA = solver.getInterpolant(aEq1);
+    Term itpAB = solver.getInterpolant(aEq1.andTerm(aEqb));
+    Term itpABC = solver.getInterpolant(aEq1.andTerm(aEqb).andTerm(bEqc));
+    Term itpD = solver.getInterpolant(cEq0);
+    Term itpDC = solver.getInterpolant(cEq0.andTerm(bEqc));
+    Term itpDCB = solver.getInterpolant(cEq0.andTerm(bEqc).andTerm(aEqb));
+    Term itpABCD = solver.getInterpolant(aEq1.andTerm(aEqb).andTerm(bEqc).andTerm(cEq0));
 
     // special cases: start and end of sequence might need special handling in the solver
     assertThat(solver.mkBoolean(true).toString()).isEqualTo(itp.toString());
@@ -134,8 +133,10 @@ public class CVC5NativeAPITest {
 
     // we check here the stricter properties for sequential interpolants,
     // but this simple example should work for all solvers
-    checkItpSequence(ImmutableList.of(A, B, C, D), ImmutableList.of(itpA, itpAB, itpABC));
-    checkItpSequence(ImmutableList.of(D, C, B, A), ImmutableList.of(itpD, itpDC, itpDCB));
+    checkItpSequence(
+        ImmutableList.of(aEq1, aEqb, bEqc, cEq0), ImmutableList.of(itpA, itpAB, itpABC));
+    checkItpSequence(
+        ImmutableList.of(cEq0, bEqc, aEqb, aEq1), ImmutableList.of(itpD, itpDC, itpDCB));
   }
 
   private void checkItpSequence(List<Term> formulas, List<Term> itps) {
@@ -200,7 +201,8 @@ public class CVC5NativeAPITest {
         assertThrows(io.github.cvc5.CVC5ApiException.class, () -> intVar.getIntegerValue());
     assertThat(e.toString())
         .contains(
-            "Invalid argument 'int_const' for '*d_node', expected Term to be an integer value when calling getIntegerValue()");
+            "Invalid argument 'int_const' for '*d_node', expected Term to be an integer value when"
+                + " calling getIntegerValue()");
     // Build a formula such that is has a value, assert and check sat and then check again
     Term equality = solver.mkTerm(Kind.EQUAL, intVar, solver.mkInteger(1));
     solver.assertFormula(equality);
@@ -248,7 +250,8 @@ public class CVC5NativeAPITest {
   }
 
   /*
-   *  Try to convert real -> int -> bv -> fp; which fails at the fp step. Use Kind.FLOATINGPOINT_TO_FP_REAL instead!
+   *  Try to convert real -> int -> bv -> fp; which fails at the fp step.
+   *  Use Kind.FLOATINGPOINT_TO_FP_REAL instead!
    */
   @Test
   public void checkFPConversion() throws CVC5ApiException {
@@ -262,7 +265,8 @@ public class CVC5NativeAPITest {
             () -> solver.mkFloatingPoint(8, 24, bvOneFourth));
     assertThat(e.toString())
         .contains(
-            "Invalid argument '((_ int2bv 32) (to_int (/ 1 4)))' for 'val', expected bit-vector constant");
+            "Invalid argument '((_ int2bv 32) (to_int (/ 1 4)))' for 'val', expected bit-vector"
+                + " constant");
   }
 
   @Test
@@ -423,7 +427,7 @@ public class CVC5NativeAPITest {
     assertThat(satCheck.isSat()).isTrue();
   }
 
-  /** Real uses the same operators as int (plain plus, mult etc.) */
+  /** Real uses the same operators as int (plain plus, mult etc.). */
   @Test
   public void checkSimpleLRASat() {
     // x * y = 8/5 AND x < 4/5
@@ -680,7 +684,8 @@ public class CVC5NativeAPITest {
     Sort bvSort = solver.mkBitVectorSort(16);
     Term bvVar = solver.mkConst(bvSort);
     Term intVar = solver.mkConst(solver.getIntegerSort());
-    Term arrayVar = solver.mkConst(solver.mkArraySort(solver.getIntegerSort(), solver.getIntegerSort()));
+    Term arrayVar =
+        solver.mkConst(solver.mkArraySort(solver.getIntegerSort(), solver.getIntegerSort()));
 
     Exception e =
         assertThrows(
@@ -979,7 +984,8 @@ public class CVC5NativeAPITest {
 
     assertThat(quantElim.toString())
         .isEqualTo(
-            "(= (bvmul x_bv (witness ((x0 (_ BitVec 2))) (or (= (bvmul x_bv x0) #b01) (not (= (concat #b0 ((_ extract 0 0) (bvor x_bv (bvneg x_bv)))) #b01))))) #b01)");
+            "(= (bvmul x_bv (witness ((x0 (_ BitVec 2))) (or (= (bvmul x_bv x0) #b01) (not (="
+                + " (concat #b0 ((_ extract 0 0) (bvor x_bv (bvneg x_bv)))) #b01))))) #b01)");
 
     // TODO: formely you could get a better result Term by using getValue(). But now getValue() only
     // works after SAT since 1.0.0 and then getValue() prints trivial statements like false.
@@ -1257,7 +1263,7 @@ public class CVC5NativeAPITest {
   }
 
   /**
-   * For some reason CVC5 does not provide API to create max (or min) size signed/unsiged
+   * For some reason CVC5 does not provide API to create max (or min) size signed/unsigned
    * bitvectors.
    *
    * @param width of the bitvector term.
@@ -1267,10 +1273,10 @@ public class CVC5NativeAPITest {
   public Term makeMaxCVC5Bitvector(int width, boolean signed) throws CVC5ApiException {
     String bitvecString;
     if (signed) {
-      bitvecString = new String(new char[width - 1]).replace("\0", "1");
+      bitvecString = String.valueOf(new char[width - 1]).replace("\0", "1");
       bitvecString = "0" + bitvecString;
     } else {
-      bitvecString = new String(new char[width]).replace("\0", "1");
+      bitvecString = String.valueOf(new char[width]).replace("\0", "1");
     }
     return solver.mkBitVector(width, bitvecString, 2);
   }

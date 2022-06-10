@@ -95,7 +95,6 @@ public class CVC5FloatingPointFormulaManager
               + ".",
           e);
     }
-
   }
 
   /**
@@ -204,7 +203,8 @@ public class CVC5FloatingPointFormulaManager
               + pNumber
               + " into a "
               + pTargetType
-              + ". Check that the target type can hold the source type. (Note: for target FP types 1 bit is missing in this debug message)",
+              + ". Check that the target type can hold the source type. (Note: for target FP types"
+              + " 1 bit is missing in this debug message)",
           e);
     }
   }

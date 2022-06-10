@@ -142,7 +142,7 @@ public class CVC5Model extends CachingAbstractModel<Term, Sort, Solver> {
     Term valueTerm;
     // You can't get a value if there is a bound variable present
     if (!boundFound) {
-       valueTerm = solver.getValue(pKeyTerm);
+      valueTerm = solver.getValue(pKeyTerm);
     } else {
       // But you may be able to get one nested in the function itself for some reason
       try {

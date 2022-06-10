@@ -79,7 +79,6 @@ public class SolverContextTest extends SolverBasedTest0 {
         .that(solverToUse())
         .isNotEqualTo(Solvers.BOOLECTOR);
 
-
     assertThat(term.hashCode()).isEqualTo(hash);
 
     // MathSAT5 allow nothing, lets abort here.
