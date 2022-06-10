@@ -75,7 +75,7 @@ public class TimeoutTest extends SolverBasedTest0 {
     TruthJUnit.assume()
         .withMessage(solverToUse() + " does not support interruption")
         .that(solverToUse())
-        .isNoneOf(Solvers.PRINCESS, Solvers.BOOLECTOR);
+        .isNoneOf(Solvers.PRINCESS, Solvers.BOOLECTOR, Solvers.CVC5);
     testBasicProverTimeoutInt(() -> context.newProverEnvironment());
   }
 
@@ -85,7 +85,7 @@ public class TimeoutTest extends SolverBasedTest0 {
     TruthJUnit.assume()
         .withMessage(solverToUse() + " does not support interruption")
         .that(solverToUse())
-        .isNotEqualTo(Solvers.PRINCESS);
+        .isNoneOf(Solvers.PRINCESS, Solvers.CVC5);
     testBasicProverTimeoutBv(() -> context.newProverEnvironment());
   }
 
@@ -96,7 +96,7 @@ public class TimeoutTest extends SolverBasedTest0 {
     TruthJUnit.assume()
         .withMessage(solverToUse() + " does not support interruption")
         .that(solverToUse())
-        .isNoneOf(Solvers.PRINCESS, Solvers.BOOLECTOR);
+        .isNoneOf(Solvers.PRINCESS, Solvers.BOOLECTOR, Solvers.CVC5);
     testBasicProverTimeoutInt(() -> context.newProverEnvironmentWithInterpolation());
   }
 
