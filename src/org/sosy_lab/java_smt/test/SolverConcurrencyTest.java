@@ -131,7 +131,8 @@ public class SolverConcurrencyTest {
             Solvers.MATHSAT5,
             Solvers.Z3,
             Solvers.PRINCESS,
-            Solvers.YICES2);
+            Solvers.YICES2,
+            Solvers.CVC5);
   }
 
   private void requireIntegers() {
@@ -153,7 +154,12 @@ public class SolverConcurrencyTest {
         .withMessage("Solver does not support optimization")
         .that(solver)
         .isNoneOf(
-            Solvers.SMTINTERPOL, Solvers.BOOLECTOR, Solvers.PRINCESS, Solvers.CVC4, Solvers.YICES2);
+            Solvers.SMTINTERPOL,
+            Solvers.BOOLECTOR,
+            Solvers.PRINCESS,
+            Solvers.CVC4,
+            Solvers.CVC5,
+            Solvers.YICES2);
   }
 
   /**
@@ -203,7 +209,7 @@ public class SolverConcurrencyTest {
     assume()
         .withMessage("Solver does not support translation of formulas")
         .that(solver)
-        .isNoneOf(Solvers.CVC4, Solvers.PRINCESS);
+        .isNoneOf(Solvers.CVC4, Solvers.PRINCESS, Solvers.CVC5);
     /** Helperclass to pack a SolverContext together with a Formula */
     class ContextAndFormula {
       private final SolverContext context;
@@ -269,6 +275,12 @@ public class SolverConcurrencyTest {
   @Test
   public void testIntConcurrencyWithoutConcurrentContext() throws InvalidConfigurationException {
     requireIntegers();
+
+    assume()
+        .withMessage("Solver does not support concurrency without concurrent context.")
+        .that(solver)
+        .isNotEqualTo(Solvers.CVC5);
+
     ConcurrentLinkedQueue<SolverContext> contextList = new ConcurrentLinkedQueue<>();
     // Initialize contexts before using them in the threads
     for (int i = 0; i < NUMBER_OF_THREADS; i++) {
@@ -288,6 +300,12 @@ public class SolverConcurrencyTest {
   @Test
   public void testBvConcurrencyWithoutConcurrentContext() throws InvalidConfigurationException {
     requireBitvectors();
+
+    assume()
+        .withMessage("Solver does not support concurrency without concurrent context.")
+        .that(solver)
+        .isNotEqualTo(Solvers.CVC5);
+
     ConcurrentLinkedQueue<SolverContext> contextList = new ConcurrentLinkedQueue<>();
     // Initialize contexts before using them in the threads
     for (int i = 0; i < NUMBER_OF_THREADS; i++) {
@@ -420,7 +438,7 @@ public class SolverConcurrencyTest {
     assume()
         .withMessage("Solver does not support translation of formulas")
         .that(solver)
-        .isNoneOf(Solvers.CVC4, Solvers.PRINCESS);
+        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.PRINCESS);
     /** Helperclass to pack a SolverContext together with a Formula */
     class ContextAndFormula {
       private final SolverContext context;
