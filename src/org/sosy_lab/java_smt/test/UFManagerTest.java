@@ -115,6 +115,17 @@ public class UFManagerTest extends SolverBasedTest0 {
 
       Formula f2 = mgr.makeApplication(declaration, imgr.makeNumber(1));
       switch (solverToUse()) {
+        case CVC5:
+          // CVC5 displays the int value as 1 and the real value as 1.0, but does not encapsulate
+          // them in a cast
+          Truth.assertThat(f2).isNotEqualTo(f);
+          List<Formula> argsf2 = getArguments(f2);
+          Truth.assertThat(argsf2).hasSize(1);
+          Truth.assertThat(argsf2.get(0).toString()).isEqualTo("1");
+          List<Formula> argsf = getArguments(f);
+          Truth.assertThat(argsf).hasSize(1);
+          Truth.assertThat(argsf.get(0).toString()).isEqualTo("1.0");
+          break;
         case SMTINTERPOL:
         case Z3:
           // some solvers have an explicit cast for the parameter
