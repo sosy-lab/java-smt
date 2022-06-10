@@ -17,6 +17,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import io.github.cvc5.CVC5ApiException;
 import io.github.cvc5.Kind;
+import io.github.cvc5.Pair;
 import io.github.cvc5.Solver;
 import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
@@ -327,7 +328,8 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
         return visitor.visitConstant(formula, f.getStringValue());
 
       } else if (f.isRealValue()) {
-        return visitor.visitConstant(formula, f.getRealValue());
+        Pair<BigInteger, BigInteger> realValue = f.getRealValue();
+        return visitor.visitConstant(formula, Rational.of(realValue.first, realValue.second));
 
       } else if (f.isIntegerValue()) {
         return visitor.visitConstant(formula, f.getIntegerValue());
@@ -566,9 +568,8 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
   @Override
   public Term callFunctionImpl(Term pDeclaration, List<Term> pArgs) {
     if (pArgs.isEmpty()) {
-      // CVC5 does not allow argumentless functions!
-      throw new IllegalArgumentException(
-          "You tried calling a UF with no arguments. CVC5 does not allow this.");
+      // CVC5 does not allow argumentless functions! We use variables as a workaround.
+      return pDeclaration;
     } else {
       // Applying UFs in CVC5 works with an array of Terms with the UF being the first argument
       // If you pull the children out of it the order will be the same!
@@ -582,18 +583,19 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
 
   @Override
   public Term declareUFImpl(String pName, Sort pReturnType, List<Sort> pArgTypes) {
-    if (pArgTypes.isEmpty()) {
-      // Ufs in CVC5 can't have 0 arity. I tried an empty array and nullsort.
-      throw new IllegalArgumentException(
-          "You tried creating a UF with no arguments. CVC5 does not allow this.");
-    }
     Term exp = functionsCache.get(pName);
 
     if (exp == null) {
-      Sort[] argSorts = pArgTypes.toArray(new Sort[0]);
-      // array of argument types and the return type
-      Sort ufToReturnType = solver.mkFunctionSort(argSorts, pReturnType);
-      exp = solver.mkConst(ufToReturnType, pName);
+      if (pArgTypes.isEmpty()) {
+        // Ufs in CVC5 can't have 0 arity. I tried an empty array and nullsort.
+        // We just use a variable as a workaround
+        exp = solver.mkConst(pReturnType, pName);
+      } else {
+        Sort[] argSorts = pArgTypes.toArray(new Sort[0]);
+        // array of argument types and the return type
+        Sort ufToReturnType = solver.mkFunctionSort(argSorts, pReturnType);
+        exp = solver.mkConst(ufToReturnType, pName);
+      }
       functionsCache.put(pName, exp);
     } else {
       Preconditions.checkArgument(
