@@ -242,7 +242,7 @@ public class SolverAllSatTest extends SolverBasedTest0 {
 
     env.push(query);
 
-    assertThatFormula(query).isSatisfiable();
+    assertThat(env.isUnsat()).isFalse();
 
     TestAllSatCallback callback = new TestAllSatCallback();
 
