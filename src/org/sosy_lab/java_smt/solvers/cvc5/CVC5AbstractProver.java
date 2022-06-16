@@ -42,8 +42,8 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   /** CVC5 does not support multiple solver stacks. */
   private final AtomicBoolean isAnyStackAlive;
 
-  private final CVC5FormulaCreator creator;
-  private final Solver solver;
+  protected final CVC5FormulaCreator creator;
+  protected final Solver solver;
   private boolean changedSinceLastSatQuery = false;
 
   /** Tracks formulas on the stack, needed for model generation. */
@@ -56,7 +56,7 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   private final Set<CVC5Model> models = new LinkedHashSet<>();
 
   // TODO: does CVC5 support separation logic in incremental mode?
-  private final boolean incremental;
+  protected final boolean incremental;
 
   /*
    * Note: since CVC5 interacts only via the Solver and nothing else, we can't create multiple
@@ -178,7 +178,7 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     models.remove(model);
   }
 
-  private void setChanged() {
+  protected void setChanged() {
     if (!changedSinceLastSatQuery) {
       changedSinceLastSatQuery = true;
       closeAllModels();

@@ -72,7 +72,6 @@ public final class CVC5SolverContext extends AbstractSolverContext {
     // Set Strings option to enable all String features (such as lessOrEquals)
     newSolver.setOption("strings-exp", "true");
     newSolver.setOption("produce-unsat-cores", "true");
-    // newSolver.setOption("produce-interpolants", "true");
     // Neither simplification, arith-rewrite-equalities, pb-rewrites provide rewrites of trivial
     // formulas only
     // Note: with solver.getOptionNames() you can get all options
@@ -154,10 +153,19 @@ public final class CVC5SolverContext extends AbstractSolverContext {
 
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
-      Set<ProverOptions> pSet) {
-    // CVC5 DOES support interpolation, but the Java API needs fixes and will only be available in
-    // the next release
-    throw new UnsupportedOperationException("CVC5 does not support interpolation");
+      Set<ProverOptions> pOptions) {
+    Preconditions.checkState(!closed, "solver context is already closed");
+    // Unsat Core and interpolation may not be active both at once!
+    solver.setOption("produce-unsat-cores", "false");
+    solver.setOption("produce-interpolants", "true");
+    return new CVC5InterpolatingProver(
+        creator,
+        shutdownNotifier,
+        randomSeed,
+        pOptions,
+        getFormulaManager().getBooleanFormulaManager(),
+        solver,
+        isAnyStackAlive);
   }
 
   @Override
