@@ -93,6 +93,9 @@ public class CVC5NativeAPITest {
     solver.close();
   }
 
+  /*
+   * Note: CVC5s interpolation does not produce useful interpolants! Just true/false statements!
+   */
   @Test
   public void checkInterpolation() {
     // solver.setOption("produce-unsat-cores", "true");
