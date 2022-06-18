@@ -268,10 +268,16 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     BitvectorFormula z = bvmgr.makeVariable(32, "z");
 
     checkKind(
-        fpmgr.castTo(x, FormulaType.getBitvectorTypeWithSize(32)),
+        fpmgr.castTo(x, true, FormulaType.getBitvectorTypeWithSize(32)),
         FunctionDeclarationKind.FP_CASTTO_SBV);
     checkKind(
-        fpmgr.castTo(x, FormulaType.getDoublePrecisionFloatingPointType()),
+        fpmgr.castTo(x, true, FormulaType.getDoublePrecisionFloatingPointType()),
+        FunctionDeclarationKind.FP_CASTTO_FP);
+    checkKind(
+        fpmgr.castTo(x, false, FormulaType.getBitvectorTypeWithSize(32)),
+        FunctionDeclarationKind.FP_CASTTO_UBV);
+    checkKind(
+        fpmgr.castTo(x, false, FormulaType.getDoublePrecisionFloatingPointType()),
         FunctionDeclarationKind.FP_CASTTO_FP);
     checkKind(fpmgr.isNaN(x), FunctionDeclarationKind.FP_IS_NAN);
     checkKind(fpmgr.isNegative(x), FunctionDeclarationKind.FP_IS_NEGATIVE);

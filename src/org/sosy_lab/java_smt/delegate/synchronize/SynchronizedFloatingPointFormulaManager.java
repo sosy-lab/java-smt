@@ -124,19 +124,21 @@ class SynchronizedFloatingPointFormulaManager implements FloatingPointFormulaMan
   }
 
   @Override
-  public <T extends Formula> T castTo(FloatingPointFormula pNumber, FormulaType<T> pTargetType) {
+  public <T extends Formula> T castTo(
+      FloatingPointFormula pNumber, boolean pSigned, FormulaType<T> pTargetType) {
     synchronized (sync) {
-      return delegate.castTo(pNumber, pTargetType);
+      return delegate.castTo(pNumber, pSigned, pTargetType);
     }
   }
 
   @Override
   public <T extends Formula> T castTo(
       FloatingPointFormula pNumber,
+      boolean pSigned,
       FormulaType<T> pTargetType,
       FloatingPointRoundingMode pFloatingPointRoundingMode) {
     synchronized (sync) {
-      return delegate.castTo(pNumber, pTargetType, pFloatingPointRoundingMode);
+      return delegate.castTo(pNumber, pSigned, pTargetType, pFloatingPointRoundingMode);
     }
   }
 

@@ -645,6 +645,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.BV_UCASTTO_FP;
       case Z3_OP_FPA_TO_SBV:
         return FunctionDeclarationKind.FP_CASTTO_SBV;
+      case Z3_OP_FPA_TO_UBV:
+        return FunctionDeclarationKind.FP_CASTTO_UBV;
       case Z3_OP_FPA_TO_IEEE_BV:
         return FunctionDeclarationKind.FP_AS_IEEEBV;
       case Z3_OP_FPA_TO_FP:

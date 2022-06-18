@@ -40,6 +40,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_sqrt;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_times;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_to_sbv;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_to_ubv;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_uf;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_get_type;
 
@@ -130,7 +131,8 @@ class Mathsat5FloatingPointFormulaManager
   }
 
   @Override
-  protected Long castToImpl(Long pNumber, FormulaType<?> pTargetType, Long pRoundingMode) {
+  protected Long castToImpl(
+      Long pNumber, boolean pSigned, FormulaType<?> pTargetType, Long pRoundingMode) {
     if (pTargetType.isFloatingPointType()) {
       FormulaType.FloatingPointType targetType = (FormulaType.FloatingPointType) pTargetType;
       return msat_make_fp_cast(
@@ -142,7 +144,11 @@ class Mathsat5FloatingPointFormulaManager
 
     } else if (pTargetType.isBitvectorType()) {
       FormulaType.BitvectorType targetType = (FormulaType.BitvectorType) pTargetType;
-      return msat_make_fp_to_sbv(mathsatEnv, targetType.getSize(), pRoundingMode, pNumber);
+      if (pSigned) {
+        return msat_make_fp_to_sbv(mathsatEnv, targetType.getSize(), pRoundingMode, pNumber);
+      } else {
+        return msat_make_fp_to_ubv(mathsatEnv, targetType.getSize(), pRoundingMode, pNumber);
+      }
 
     } else {
       return genericCast(pNumber, pTargetType);
@@ -151,14 +157,14 @@ class Mathsat5FloatingPointFormulaManager
 
   @Override
   protected Long castFromImpl(
-      Long pNumber, boolean signed, FloatingPointType pTargetType, Long pRoundingMode) {
+      Long pNumber, boolean pSigned, FloatingPointType pTargetType, Long pRoundingMode) {
     FormulaType<?> formulaType = getFormulaCreator().getFormulaType(pNumber);
 
     if (formulaType.isFloatingPointType()) {
-      return castToImpl(pNumber, pTargetType, pRoundingMode);
+      return castToImpl(pNumber, pSigned, pTargetType, pRoundingMode);
 
     } else if (formulaType.isBitvectorType()) {
-      if (signed) {
+      if (pSigned) {
         return msat_make_fp_from_sbv(
             mathsatEnv,
             pTargetType.getExponentSize(),
