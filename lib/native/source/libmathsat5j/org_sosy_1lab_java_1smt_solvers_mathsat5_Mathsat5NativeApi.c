@@ -645,12 +645,20 @@ TERM_ARG(3)
 CALL3(msat_term, make_fp_round_to_int)
 TERM_RETURN
 
-DEFINE_FUNC(jterm, 1make_1fp_1to_1bv) WITH_FOUR_ARGS(jenv, int, jterm, jterm)
+DEFINE_FUNC(jterm, 1make_1fp_1to_1sbv) WITH_FOUR_ARGS(jenv, int, jterm, jterm)
 ENV_ARG(1)
 SIMPLE_ARG(size_t, 2)
 TERM_ARG(3)
 TERM_ARG(4)
-CALL4(msat_term, make_fp_to_bv)
+CALL4(msat_term, make_fp_to_sbv)
+TERM_RETURN
+
+DEFINE_FUNC(jterm, 1make_1fp_1to_1ubv) WITH_FOUR_ARGS(jenv, int, jterm, jterm)
+ENV_ARG(1)
+SIMPLE_ARG(size_t, 2)
+TERM_ARG(3)
+TERM_ARG(4)
+CALL4(msat_term, make_fp_to_ubv)
 TERM_RETURN
 
 DEFINE_FUNC(jterm, 1make_1fp_1as_1ieeebv) WITH_TWO_ARGS(jenv, jterm)
@@ -1224,6 +1232,10 @@ CONST_STRING_RETURN
 DEFINE_FUNC(string, 1get_1version) WITHOUT_ARGS
 CALL0(char *, get_version)
 PLAIN_STRING_RETURN
+
+DEFINE_FUNC(string, 1get_1version_1id) WITHOUT_ARGS
+CALL0(const char *, get_version_id)
+PLAIN_CONST_STRING_RETURN
 
 
 DEFINE_FUNC(object, 1named_1list_1from_1smtlib2) WITH_TWO_ARGS(jenv, string)

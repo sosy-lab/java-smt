@@ -59,7 +59,8 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_ROUND_TO_INT;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_SQRT;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_SUB;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_TO_BV;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_TO_SBV;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_TO_UBV;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_IFF;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_ITE;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_LEQ;
@@ -464,8 +465,10 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.BV_SCASTTO_FP;
       case MSAT_TAG_FP_FROM_UBV:
         return FunctionDeclarationKind.BV_UCASTTO_FP;
-      case MSAT_TAG_FP_TO_BV:
+      case MSAT_TAG_FP_TO_SBV:
         return FunctionDeclarationKind.FP_CASTTO_SBV;
+      case MSAT_TAG_FP_TO_UBV:
+        return FunctionDeclarationKind.FP_CASTTO_UBV;
       case MSAT_TAG_FP_AS_IEEEBV:
         return FunctionDeclarationKind.FP_AS_IEEEBV;
       case MSAT_TAG_FP_CAST:

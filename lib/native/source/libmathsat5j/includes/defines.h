@@ -212,18 +212,22 @@ typedef void jvoid; // for symmetry to jint, jlong etc.
   } \
   PLAIN_STRING_RETURN
 
-#define CONST_STRING_RETURN \
-  if (retval == NULL) { \
-    const char *msg = msat_last_error_message(m_arg1); \
-    throwException(jenv, "java/lang/IllegalArgumentException", msg); \
-    return NULL; \
-  } \
+#define PLAIN_CONST_STRING_RETURN \
   jstring jretval = NULL; \
   if (!(*jenv)->ExceptionCheck(jenv)) { \
     jretval = (*jenv)->NewStringUTF(jenv, retval); \
   } \
   return jretval; \
 }
+
+#define CONST_STRING_RETURN \
+  if (retval == NULL) { \
+    const char *msg = msat_last_error_message(m_arg1); \
+    throwException(jenv, "java/lang/IllegalArgumentException", msg); \
+    return NULL; \
+  } \
+  PLAIN_CONST_STRING_RETURN
+
 
 #define FAILURE_CODE_RETURN \
   if (retval != 0) { \
