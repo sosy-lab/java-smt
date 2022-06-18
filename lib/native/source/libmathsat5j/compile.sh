@@ -42,17 +42,6 @@
 # compile this library with --with-pic,
 # and put the resulting libstdc++.a file in this directory.
 
-# This script uses a crude hack to produce downwards-compatible binaries.
-# On systems with libc6 >= 2.14, there is a new memcpy function.
-# Binaries which link against this function do not work on older systems (e.g., Ubuntu before 12.04)
-# We force the linker to use memcpy from libc6 2.2.5 with the following trick:
-# 1) Define a wrapper function which just calls memcpy in versions.c.
-# 2) Also in versions.c, set the version of memcpy to GLIBC_2.2.5.
-# 3) Tell the linker that it should wrap all calls to memcpy with the wrapper function.
-# This will need to be extended if there appear other functions in newer a libc
-# which are also not downwards compatible.
-# Always check with ldd -v what the newest required version of libc and libstdc++ are.
-
 SOURCE="${BASH_SOURCE[0]}"
 while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
   DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
@@ -70,7 +59,7 @@ MSAT_LIB_DIR="$1"/lib
 GMP_LIB_DIR="$2"/.libs
 GMP_HEADER_DIR="$2"
 
-SRC_FILES="org_sosy_1lab_java_1smt_solvers_mathsat5_Mathsat5NativeApi.c versions.c"
+SRC_FILES="org_sosy_1lab_java_1smt_solvers_mathsat5_Mathsat5NativeApi.c"
 OBJ_FILES="org_sosy_1lab_java_1smt_solvers_mathsat5_Mathsat5NativeApi.o"
 
 # check requirements
@@ -108,7 +97,7 @@ echo "Linking libraries together into one file..."
 # Everything except the standard libraries is included statically.
 # The result is a single shared library containing all necessary components.
 if [ `uname -m` = "x86_64" ]; then
-    gcc -Wall -g -o ${OUT_FILE} -shared -Wl,-soname,libmathsat5j.so -L. -L${MSAT_LIB_DIR} -L${GMP_LIB_DIR} -I${GMP_HEADER_DIR} versions.o ${OBJ_FILES} -Wl,-Bstatic -lmathsat -lgmpxx -lgmp -static-libstdc++ -lstdc++ -Wl,-Bdynamic -lc -lm -Wl,--wrap=memcpy -Wl,--version-script=libmathsat5j.version
+    gcc -Wall -g -o ${OUT_FILE} -shared -Wl,-soname,libmathsat5j.so -L. -L${MSAT_LIB_DIR} -L${GMP_LIB_DIR} -I${GMP_HEADER_DIR} ${OBJ_FILES} -Wl,-Bstatic -lmathsat -lgmpxx -lgmp -static-libstdc++ -lstdc++ -Wl,-Bdynamic -lc -lm
 else
     # TODO compiling for/on a 32bit system was not done for quite a long time. We should drop it.
     gcc -Wall -g -o ${OUT_FILE} -shared -Wl,-soname,libmathsat5j.so -L${MSAT_LIB_DIR} -L${GMP_LIB_DIR} -I${GMP_HEADER_DIR} ${OBJ_FILES} -Wl,-Bstatic -lmathsat -lgmpxx -lgmp -Wl,-Bdynamic -lc -lm -lstdc++
@@ -134,5 +123,5 @@ if [ ! -z "$MISSING_SYMBOLS" ]; then
 fi
 
 echo "All Done"
-echo "Please check in the following output that the library does not depend on any GLIBC version >= 2.11, otherwise it will not work on Ubuntu 10.04:"
+echo "Please check the following dependencies that will be required at runtime by mathsat5j.so:"
 LANG=C objdump -p ${OUT_FILE} | grep -A50 "required from"
