@@ -864,6 +864,42 @@ public class SolverVisitorTest extends SolverBasedTest0 {
   }
 
   @Test
+  public void testTransformationInsideQuantifiersWithTrue()
+      throws SolverException, InterruptedException {
+    requireQuantifiers();
+    List<IntegerFormula> quantifiedVars = ImmutableList.of(imgr.makeVariable("x"));
+    BooleanFormula body = bmgr.makeTrue();
+    BooleanFormula f = qmgr.exists(quantifiedVars, body);
+    BooleanFormula transformed = qmgr.eliminateQuantifiers(f);
+    assertThat(mgr.extractVariablesAndUFs(transformed)).isEmpty();
+    assertThatFormula(transformed).isEquivalentTo(body);
+  }
+
+  @Test
+  public void testTransformationInsideQuantifiersWithFalse()
+      throws SolverException, InterruptedException {
+    requireQuantifiers();
+    List<IntegerFormula> quantifiedVars = ImmutableList.of(imgr.makeVariable("x"));
+    BooleanFormula body = bmgr.makeFalse();
+    BooleanFormula f = qmgr.exists(quantifiedVars, body);
+    BooleanFormula transformed = qmgr.eliminateQuantifiers(f);
+    assertThat(mgr.extractVariablesAndUFs(transformed)).isEmpty();
+    assertThatFormula(transformed).isEquivalentTo(body);
+  }
+
+  @Test
+  public void testTransformationInsideQuantifiersWithVariable()
+      throws SolverException, InterruptedException {
+    requireQuantifiers();
+    List<IntegerFormula> quantifiedVars = ImmutableList.of(imgr.makeVariable("x"));
+    BooleanFormula body = bmgr.makeVariable("b");
+    BooleanFormula f = qmgr.exists(quantifiedVars, body);
+    BooleanFormula transformed = qmgr.eliminateQuantifiers(f);
+    assertThat(mgr.extractVariablesAndUFs(transformed)).containsEntry("b", body);
+    assertThatFormula(transformed).isEquivalentTo(body);
+  }
+
+  @Test
   public void extractionTest1() {
     IntegerFormula v = imgr.makeVariable("v");
     BooleanFormula q = fmgr.declareAndCallUF("q", FormulaType.BooleanType, v);

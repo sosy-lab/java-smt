@@ -397,19 +397,20 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
           if (value != null) {
             return visitor.visitConstant(formula, value);
 
+            // Rounding mode
           } else if (declKind == Z3_decl_kind.Z3_OP_FPA_NUM.toInt()
               || Native.getSortKind(environment, Native.getSort(environment, f))
                   == Z3_sort_kind.Z3_ROUNDING_MODE_SORT.toInt()) {
             return visitor.visitConstant(formula, convertValue(f));
 
-          } else {
-
-            // Has to be a variable otherwise.
-            // TODO: assert that.
+            // Free variable
+          } else if (declKind == Z3_decl_kind.Z3_OP_UNINTERPRETED.toInt()
+              || declKind == Z3_decl_kind.Z3_OP_INTERNAL.toInt()) {
             return visitor.visitFreeVariable(formula, getAppName(f));
-          }
+          } // else: fall-through with a function application
         }
 
+        // Function application with zero or more parameters
         ImmutableList.Builder<Formula> args = ImmutableList.builder();
         ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
         for (int i = 0; i < arity; i++) {
