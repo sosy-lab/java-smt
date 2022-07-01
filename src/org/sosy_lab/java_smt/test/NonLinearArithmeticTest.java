@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -186,6 +187,25 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
             nmgr.equal(nmgr.makeNumber(2 * 3), a),
             nmgr.equal(nmgr.divide(a, nmgr.makeNumber(3)), nmgr.makeNumber(2)),
             nmgr.equal(nmgr.divide(a, nmgr.makeNumber(2)), nmgr.makeNumber(3)));
+
+    assertThatFormula(f).isSatisfiable();
+  }
+
+  @Test
+  public void testDivisionByZero() throws SolverException, InterruptedException {
+    assume()
+        .withMessage("Solver %s does not support division by zero", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.YICES2);
+
+    T a = nmgr.makeVariable("a");
+    T b = nmgr.makeVariable("b");
+    T zero = nmgr.makeNumber(0);
+
+    BooleanFormula f =
+        bmgr.and(
+            nmgr.equal(nmgr.divide(a, zero), nmgr.makeNumber(2)),
+            nmgr.equal(nmgr.divide(b, zero), nmgr.makeNumber(4)));
 
     assertThatFormula(f).isSatisfiable();
   }
