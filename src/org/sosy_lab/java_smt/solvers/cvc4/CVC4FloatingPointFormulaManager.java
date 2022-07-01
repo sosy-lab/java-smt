@@ -18,6 +18,7 @@ import edu.stanford.CVC4.FloatingPointToFPFloatingPoint;
 import edu.stanford.CVC4.FloatingPointToFPSignedBitVector;
 import edu.stanford.CVC4.FloatingPointToFPUnsignedBitVector;
 import edu.stanford.CVC4.FloatingPointToSBV;
+import edu.stanford.CVC4.FloatingPointToUBV;
 import edu.stanford.CVC4.Kind;
 import edu.stanford.CVC4.Rational;
 import edu.stanford.CVC4.RoundingMode;
@@ -173,7 +174,8 @@ public class CVC4FloatingPointFormulaManager
   }
 
   @Override
-  protected Expr castToImpl(Expr pNumber, FormulaType<?> pTargetType, Expr pRoundingMode) {
+  protected Expr castToImpl(
+      Expr pNumber, boolean pSigned, FormulaType<?> pTargetType, Expr pRoundingMode) {
     if (pTargetType.isFloatingPointType()) {
       FloatingPointType targetType = (FloatingPointType) pTargetType;
       FloatingPointConvertSort fpConvertSort = new FloatingPointConvertSort(getFPSize(targetType));
@@ -182,7 +184,10 @@ public class CVC4FloatingPointFormulaManager
 
     } else if (pTargetType.isBitvectorType()) {
       BitvectorType targetType = (BitvectorType) pTargetType;
-      Expr op = exprManager.mkConst(new FloatingPointToSBV(targetType.getSize()));
+      Expr op =
+          pSigned
+              ? exprManager.mkConst(new FloatingPointToSBV(targetType.getSize()))
+              : exprManager.mkConst(new FloatingPointToUBV(targetType.getSize()));
       return exprManager.mkExpr(op, pRoundingMode, pNumber);
 
     } else if (pTargetType.isRationalType()) {
@@ -198,7 +203,7 @@ public class CVC4FloatingPointFormulaManager
       Expr pNumber, boolean pSigned, FloatingPointType pTargetType, Expr pRoundingMode) {
     FormulaType<?> formulaType = getFormulaCreator().getFormulaType(pNumber);
     if (formulaType.isFloatingPointType()) {
-      return castToImpl(pNumber, pTargetType, pRoundingMode);
+      return castToImpl(pNumber, pSigned, pTargetType, pRoundingMode);
 
     } else if (formulaType.isBitvectorType()) {
       long pExponentSize = pTargetType.getExponentSize();

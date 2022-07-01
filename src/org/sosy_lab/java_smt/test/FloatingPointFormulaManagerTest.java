@@ -431,8 +431,8 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
     FloatingPointFormula doublePrecNumber = fpmgr.makeNumber(1.5, doublePrecType);
     FloatingPointFormula singlePrecNumber = fpmgr.makeNumber(1.5, singlePrecType);
 
-    FloatingPointFormula narrowedNumber = fpmgr.castTo(doublePrecNumber, singlePrecType);
-    FloatingPointFormula widenedNumber = fpmgr.castTo(singlePrecNumber, doublePrecType);
+    FloatingPointFormula narrowedNumber = fpmgr.castTo(doublePrecNumber, true, singlePrecType);
+    FloatingPointFormula widenedNumber = fpmgr.castTo(singlePrecNumber, true, doublePrecType);
 
     assertThatFormula(fpmgr.equalWithFPSemantics(narrowedNumber, singlePrecNumber))
         .isTautological();
@@ -442,7 +442,8 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
         fpmgr.makeNumber(5.8774717541114375E-39, doublePrecType);
     FloatingPointFormula singlePrecSmallNumber =
         fpmgr.makeNumber(5.8774717541114375E-39, singlePrecType);
-    FloatingPointFormula widenedSmallNumber = fpmgr.castTo(singlePrecSmallNumber, doublePrecType);
+    FloatingPointFormula widenedSmallNumber =
+        fpmgr.castTo(singlePrecSmallNumber, true, doublePrecType);
     assertThatFormula(fpmgr.equalWithFPSemantics(widenedSmallNumber, doublePrecSmallNumber))
         .isTautological();
   }
@@ -606,7 +607,7 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
     FloatingPointFormula fp = fpmgr.makeNumber(i, prec);
 
     BitvectorFormula fpToBv =
-        fpmgr.castTo(fp, FormulaType.getBitvectorTypeWithSize(prec.getTotalSize()));
+        fpmgr.castTo(fp, true, FormulaType.getBitvectorTypeWithSize(prec.getTotalSize()));
     assertThatFormula(bvmgr.equal(bv, fpToBv)).isTautological();
   }
 
@@ -645,7 +646,7 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
     NumeralFormula ratOne = rmgr.makeNumber(1);
     FloatingPointFormula fpOne = fpmgr.makeNumber(1.0, singlePrecType);
 
-    NumeralFormula fpToRatOne = fpmgr.castTo(fpOne, FormulaType.RationalType);
+    NumeralFormula fpToRatOne = fpmgr.castTo(fpOne, true, FormulaType.RationalType);
 
     assertThatFormula(rmgr.equal(ratOne, fpToRatOne)).isSatisfiable();
   }
@@ -657,7 +658,7 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
     NumeralFormula ratOne = rmgr.makeNumber(-1);
     FloatingPointFormula fpOne = fpmgr.makeNumber(-1.0, singlePrecType);
 
-    NumeralFormula fpToRatOne = fpmgr.castTo(fpOne, FormulaType.RationalType);
+    NumeralFormula fpToRatOne = fpmgr.castTo(fpOne, true, FormulaType.RationalType);
 
     assertThatFormula(rmgr.equal(ratOne, fpToRatOne)).isSatisfiable();
   }
