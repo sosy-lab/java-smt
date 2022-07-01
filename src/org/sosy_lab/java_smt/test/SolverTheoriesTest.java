@@ -802,7 +802,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     switch (solver) {
       case MATHSAT5:
         // Mathsat5 has a different internal representation of the formula
-        assertThat(_b_at_i.toString()).isEqualTo("(`read_<BitVec, 64, >_<BitVec, 32, >` b i)");
+        assertThat(_b_at_i.toString()).isEqualTo("(`read_T(18)_T(20)` b i)");
         break;
       case BOOLECTOR:
         assume()
@@ -834,7 +834,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     switch (solver) {
       case MATHSAT5:
         assertThat(valueInMulti.toString())
-            .isEqualTo("(`read_int_rat` (`read_int_<Array, Int, Real, >` multi i) i)");
+            .isEqualTo("(`read_int_rat` (`read_int_T(17)` multi i) i)");
         break;
       default:
         assertThat(valueInMulti.toString()).isEqualTo("(select (select multi i) i)");
@@ -864,8 +864,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
     switch (solver) {
       case MATHSAT5:
-        String readWrite =
-            "(`read_int_<BitVec, 32, >` (`read_int_<Array, Int, <BitVec, 32, >, >` multi i) i)";
+        String readWrite = "(`read_int_T(18)` (`read_int_T(19)` multi i) i)";
         assertThat(valueInMulti.toString()).isEqualTo(readWrite);
         break;
       default:
