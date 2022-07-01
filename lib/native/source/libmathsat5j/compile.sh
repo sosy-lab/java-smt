@@ -64,7 +64,7 @@ OBJ_FILES="org_sosy_1lab_java_1smt_solvers_mathsat5_Mathsat5NativeApi.o"
 
 # check requirements
 if [ ! -f "$MSAT_LIB_DIR/libmathsat.a" ]; then
-    echo "You need to specify the directory with the downloaded Mathsat on the command line!"
+    echo "You need to specify the directory with the downloaded MathSAT5 on the command line!"
     exit 1
 fi
 if [ ! -f "$GMP_LIB_DIR/libgmp.a" ]; then
