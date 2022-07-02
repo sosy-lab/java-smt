@@ -314,9 +314,6 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
             IllegalArgumentException.class,
             () -> assertThatFormula(buildDivision(num10, num0, num10)).isSatisfiable());
         break;
-      case PRINCESS: // TODO bug?
-        assertThatFormula(buildDivision(num10, num0, num10)).isUnsatisfiable();
-        break;
       default:
         // division-by-zero results in an arbitrary result
         assertDivision(false, num0, num0, num0);
@@ -336,9 +333,6 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
         assertThrows(
             IllegalArgumentException.class,
             () -> assertThatFormula(buildModulo(num10, num0, num10)).isSatisfiable());
-        break;
-      case PRINCESS: // TODO bug?
-        assertThatFormula(buildModulo(num10, num0, num10)).isUnsatisfiable();
         break;
       case MATHSAT5: // modulo not supported
         assertThrows(UnsupportedOperationException.class, () -> buildModulo(num10, num0, num10));
@@ -436,12 +430,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     // positive numbers, signed.
     assertDivision(a, num5, true, b, aEq10, bEq2);
     assertDivision(a, num3, true, num3, aEq10);
-    if (solverToUse() == Solvers.PRINCESS) {
-      // TODO bug was reported, bugfix was promised with next release of Princess
-      assertThatFormula(buildDivision(a, numNeg3, true, numNeg3)).isUnsatisfiable();
-    } else {
-      assertDivision(a, numNeg3, true, numNeg3, aEq10);
-    }
+    assertDivision(a, numNeg3, true, numNeg3, aEq10);
     assertDivision(a, b, true, num5, aEq10, bEq2);
     assertModulo(a, num5, true, num0, aEq10);
     assertModulo(a, num3, true, num1, aEq10);
