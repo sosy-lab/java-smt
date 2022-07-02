@@ -129,6 +129,11 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
       }
     } else if (key instanceof IFunApp) {
       IFunApp cKey = (IFunApp) key;
+      if ("valueAlmostEverywhere".equals(cKey.fun().name())
+          && cKey.args().length() == 1
+          && creator.getEnv().hasArrayType(cKey.args().apply(0))) {
+        return ImmutableList.of();
+      }
       if (ExtArray.Select$.MODULE$.unapply(cKey.fun()).isDefined()) {
         return getAssignmentsFromArraySelect(value, cKey, pArrays);
       } else if (ExtArray.Store$.MODULE$.unapply(cKey.fun()).isDefined()) {
