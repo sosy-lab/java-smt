@@ -3,12 +3,26 @@ This file is part of JavaSMT,
 an API wrapper for a collection of SMT solvers:
 https://github.com/sosy-lab/java-smt
 
-SPDX-FileCopyrightText: 2021 Dirk Beyer <https://www.sosy-lab.org>
+SPDX-FileCopyrightText: 2022 Dirk Beyer <https://www.sosy-lab.org>
 
 SPDX-License-Identifier: Apache-2.0
 -->
 
 # JavaSMT ChangeLog
+
+## JavaSMT 3.13.0
+
+This release comes with several bugfixes, e.g.,
+we improved DIV and MOD operations in Integer theory.
+
+### Updated solvers:
+ - MathSAT 5.6.8
+ - Princess 2022-07-01
+ - Z3 4.8.17
+
+### Breaking change:
+The public API for FloatingPointManager was changed to support conversion
+of FloatingPoint to signed and unsigned Bitvectors.
 
 ## JavaSMT 3.12.0
 
