@@ -937,6 +937,60 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     }
   }
 
+  private final FormulaVisitor<Formula> plainFunctionVisitor =
+      new DefaultFormulaVisitor<>() {
+
+        @Override
+        public Formula visitFunction(
+            Formula pF, List<Formula> args, FunctionDeclaration<?> pFunctionDeclaration) {
+          return fmgr.callUF(pFunctionDeclaration, args);
+        }
+
+        @Override
+        protected Formula visitDefault(Formula pF) {
+          return pF;
+        }
+      };
+
+  @Test
+  public void visitBooleanOperationWithMoreArgsTest() throws SolverException, InterruptedException {
+    BooleanFormula u = bmgr.makeVariable("u");
+    BooleanFormula v = bmgr.makeVariable("v");
+    BooleanFormula w = bmgr.makeVariable("w");
+    BooleanFormula fAnd = bmgr.and(u, v, w);
+    BooleanFormula fOr = bmgr.or(u, v, w);
+
+    Formula transformedAnd = mgr.visit(fAnd, plainFunctionVisitor);
+    assertThatFormula((BooleanFormula) transformedAnd).isEquisatisfiableTo(fAnd);
+
+    Formula transformedOr = mgr.visit(fOr, plainFunctionVisitor);
+    assertThatFormula((BooleanFormula) transformedOr).isEquisatisfiableTo(fOr);
+  }
+
+  @Test
+  public void visitArithmeticOperationWithMoreArgsTest()
+      throws SolverException, InterruptedException {
+    requireIntegers();
+    requireParser();
+
+    String abc =
+        "(declare-fun aa () Int) (declare-fun bb () Real)"
+            + "(declare-fun cc () Real) (declare-fun dd () Int)";
+    BooleanFormula sum = mgr.parse(abc + "(assert (= 0 (+ aa bb cc dd)))");
+    BooleanFormula equals = mgr.parse(abc + "(assert (= aa bb cc dd))");
+    BooleanFormula distinct = mgr.parse(abc + "(assert (distinct aa bb cc dd))");
+    BooleanFormula less = mgr.parse(abc + "(assert (< aa bb cc dd))");
+    BooleanFormula lessEquals = mgr.parse(abc + "(assert (<= aa bb cc dd))");
+    BooleanFormula greater = mgr.parse(abc + "(assert (> aa bb cc dd))");
+    BooleanFormula greaterEquals = mgr.parse(abc + "(assert (>= aa bb cc dd))");
+
+    for (BooleanFormula bf :
+        ImmutableList.of(sum, equals, distinct, less, lessEquals, greater, greaterEquals)) {
+      Formula transformed = mgr.visit(bf, plainFunctionVisitor);
+      assertThatFormula((BooleanFormula) transformed).isEquisatisfiableTo(bf);
+    }
+  }
+
   @Test
   public void extractionArguments() {
     requireIntegers();

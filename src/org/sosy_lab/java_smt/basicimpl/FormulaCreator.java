@@ -437,15 +437,18 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
   public final <T extends Formula> T callFunction(
       FunctionDeclaration<T> declaration, List<? extends Formula> args) {
     checkArgument(
-        args.size() == declaration.getArgumentTypes().size(),
+        args.size() >= declaration.getArgumentTypes().size(),
         "function application '%s' requires %s arguments, but received %s arguments",
         declaration,
         declaration.getArgumentTypes().size(),
         args.size());
 
     for (int i = 0; i < args.size(); i++) {
+      // For chainable functions like EQ, DISTINCT, ADD, LESS, LESS_EQUAL, ..., with a variable
+      // number of arguments, we repeat the last argument-type several times.
+      int index = Math.min(i, declaration.getArgumentTypes().size() - 1);
       checkArgument(
-          isCompatible(getFormulaType(args.get(i)), declaration.getArgumentTypes().get(i)),
+          isCompatible(getFormulaType(args.get(i)), declaration.getArgumentTypes().get(index)),
           "function application '%s' requires argument types %s, but received argument types %s",
           declaration,
           declaration.getArgumentTypes(),
