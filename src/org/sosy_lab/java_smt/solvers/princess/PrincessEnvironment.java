@@ -31,6 +31,7 @@ import ap.terfor.ConstantTerm;
 import ap.terfor.preds.Predicate;
 import ap.theories.ExtArray;
 import ap.theories.bitvectors.ModuloArithmetic;
+import ap.theories.rationals.Fractions.FractionSort$;
 import ap.types.Sort;
 import ap.types.Sort$;
 import ap.types.Sort.MultipleValueBool$;
@@ -528,6 +529,8 @@ class PrincessEnvironment {
       return FormulaType.BooleanType;
     } else if (sort == PrincessEnvironment.INTEGER_SORT) {
       return FormulaType.IntegerType;
+    } else if (sort instanceof FractionSort$) {
+      return FormulaType.RationalType;
     } else if (sort instanceof ExtArray.ArraySort) {
       Seq<Sort> indexSorts = ((ExtArray.ArraySort) sort).theory().indexSorts();
       Sort elementSort = ((ExtArray.ArraySort) sort).theory().objSort();
