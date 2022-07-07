@@ -10,6 +10,10 @@ SPDX-License-Identifier: Apache-2.0
 
 # JavaSMT ChangeLog
 
+## JavaSMT 3.13.1
+
+This patch release contains with several smaller fixes for the integration of SMTInterpol and Princess.
+
 ## JavaSMT 3.13.0
 
 This release comes with several bugfixes, e.g.,
