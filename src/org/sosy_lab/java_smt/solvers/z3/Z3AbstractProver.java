@@ -51,7 +51,6 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   private final ShutdownRequestListener interruptListener;
 
-  @SuppressWarnings("checkstyle:parameternumber")
   Z3AbstractProver(
       Z3FormulaCreator pCreator,
       Z3FormulaManager pMgr,
