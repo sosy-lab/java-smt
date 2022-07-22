@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.solvers.z3;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.enumerations.Z3_ast_print_mode;
 import java.io.IOException;
@@ -243,12 +244,19 @@ public final class Z3SolverContext extends AbstractSolverContext {
   public OptimizationProverEnvironment newOptimizationProverEnvironment0(
       Set<ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
-    Z3OptimizationProver out =
-        new Z3OptimizationProver(
-            creator, logger, z3params, manager, options, logfile, shutdownNotifier);
-    out.setParam(OPT_ENGINE_CONFIG_KEY, this.optimizationEngine);
-    out.setParam(OPT_PRIORITY_CONFIG_KEY, this.objectivePrioritizationMode);
-    return out;
+    final ImmutableMap<String, String> optimizationOptions =
+        ImmutableMap.of(
+            OPT_ENGINE_CONFIG_KEY, optimizationEngine,
+            OPT_PRIORITY_CONFIG_KEY, objectivePrioritizationMode);
+    return new Z3OptimizationProver(
+        creator,
+        logger,
+        z3params,
+        manager,
+        options,
+        optimizationOptions,
+        logfile,
+        shutdownNotifier);
   }
 
   @Override
