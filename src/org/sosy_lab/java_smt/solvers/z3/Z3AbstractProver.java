@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -50,11 +51,12 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   private final ShutdownRequestListener interruptListener;
 
+  @SuppressWarnings("checkstyle:parameternumber")
   Z3AbstractProver(
       Z3FormulaCreator pCreator,
-      long z3params,
       Z3FormulaManager pMgr,
       Set<ProverOptions> pOptions,
+      ImmutableMap<String, Object> pSolverOptions,
       @Nullable PathCounterTemplate pLogfile,
       ShutdownNotifier pShutdownNotifier) {
     super(pOptions, pMgr.getBooleanFormulaManager(), pShutdownNotifier);
@@ -64,13 +66,39 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
     interruptListener = reason -> Native.solverInterrupt(z3context, z3solver);
     shutdownNotifier.register(interruptListener);
+    storedConstraints =
+        pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE) ? new HashMap<>() : null;
 
     logfile = pLogfile;
     mgr = pMgr;
     Native.solverIncRef(z3context, z3solver);
+
+    long z3params = Native.mkParams(z3context);
+    Native.paramsIncRef(z3context, z3params);
+    for (Entry<String, Object> entry : pSolverOptions.entrySet()) {
+      addParameter(z3params, entry.getKey(), entry.getValue());
+    }
     Native.solverSetParams(z3context, z3solver, z3params);
-    storedConstraints =
-        pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE) ? new HashMap<>() : null;
+    Native.paramsDecRef(z3context, z3params);
+  }
+
+  void addParameter(long z3params, String key, Object value) {
+    long keySymbol = Native.mkStringSymbol(z3context, key);
+    if (value instanceof Boolean) {
+      Native.paramsSetBool(z3context, z3params, keySymbol, (Boolean) value);
+    } else if (value instanceof Integer) {
+      Native.paramsSetUint(z3context, z3params, keySymbol, (Integer) value);
+    } else if (value instanceof Double) {
+      Native.paramsSetDouble(z3context, z3params, keySymbol, (Double) value);
+    } else if (value instanceof String) {
+      long valueSymbol = Native.mkStringSymbol(z3context, (String) value);
+      Native.paramsSetSymbol(z3context, z3params, keySymbol, valueSymbol);
+    } else {
+      throw new IllegalArgumentException(
+          String.format(
+              "unexpected type '%s' with value '%s' for parameter '%s'",
+              value.getClass(), value, key));
+    }
   }
 
   @Override

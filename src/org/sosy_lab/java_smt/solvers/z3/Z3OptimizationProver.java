@@ -40,13 +40,13 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
   Z3OptimizationProver(
       Z3FormulaCreator creator,
       LogManager pLogger,
-      long z3params,
       Z3FormulaManager pMgr,
       Set<ProverOptions> pOptions,
+      ImmutableMap<String, Object> pSolverOptions,
       ImmutableMap<String, String> pOptimizationOptions,
       @Nullable PathCounterTemplate pLogfile,
       ShutdownNotifier pShutdownNotifier) {
-    super(creator, z3params, pMgr, pOptions, pLogfile, pShutdownNotifier);
+    super(creator, pMgr, pOptions, pSolverOptions, pLogfile, pShutdownNotifier);
     z3optSolver = Native.mkOptimize(z3context);
     Native.optimizeIncRef(z3context, z3optSolver);
     logger = pLogger;
@@ -55,9 +55,7 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
     long params = Native.mkParams(z3context);
     Native.paramsIncRef(z3context, params);
     for (Entry<String, String> entry : pOptimizationOptions.entrySet()) {
-      long keySymbol = Native.mkStringSymbol(z3context, entry.getKey());
-      long valueSymbol = Native.mkStringSymbol(z3context, entry.getValue());
-      Native.paramsSetSymbol(z3context, params, keySymbol, valueSymbol);
+      addParameter(params, entry.getKey(), entry.getValue());
     }
     Native.optimizeSetParams(z3context, z3optSolver, params);
     Native.paramsDecRef(z3context, params);

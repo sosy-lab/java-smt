@@ -57,7 +57,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
   private final ShutdownRequestListener interruptListener;
   private final ShutdownNotifier shutdownNotifier;
   private final @Nullable PathCounterTemplate logfile;
-  private final long z3params;
+  private final int randomSeed;
   private final LogManager logger;
   private final Z3FormulaCreator creator;
   private final Z3FormulaManager manager;
@@ -85,23 +85,23 @@ public final class Z3SolverContext extends AbstractSolverContext {
   private Z3SolverContext(
       Z3FormulaCreator pFormulaCreator,
       Configuration config,
-      long pZ3params,
       ShutdownNotifier pShutdownNotifier,
       LogManager pLogger,
       Z3FormulaManager pManager,
-      @Nullable PathCounterTemplate pSolverLogFile)
+      @Nullable PathCounterTemplate pSolverLogFile,
+      int pRandomSeed)
       throws InvalidConfigurationException {
     super(pManager);
 
     creator = pFormulaCreator;
     config.inject(this);
-    z3params = pZ3params;
     interruptListener = reason -> Native.interrupt(pFormulaCreator.getEnv());
     shutdownNotifier = pShutdownNotifier;
     pShutdownNotifier.register(interruptListener);
     logger = pLogger;
     manager = pManager;
     logfile = pSolverLogFile;
+    randomSeed = pRandomSeed;
   }
 
   @SuppressWarnings("ParameterNumber")
@@ -163,11 +163,6 @@ public final class Z3SolverContext extends AbstractSolverContext {
     // otherwise serialization wouldn't work.
     Native.setAstPrintMode(context, Z3_ast_print_mode.Z3_PRINT_SMTLIB2_COMPLIANT.toInt());
 
-    long z3params = Native.mkParams(context);
-    Native.paramsIncRef(context, z3params);
-    Native.paramsSetUint(
-        context, z3params, Native.mkStringSymbol(context, ":random-seed"), (int) randomSeed);
-
     Z3FormulaCreator creator =
         new Z3FormulaCreator(
             context,
@@ -212,26 +207,25 @@ public final class Z3SolverContext extends AbstractSolverContext {
             arrayManager,
             stringTheory);
     return new Z3SolverContext(
-        creator, config, z3params, pShutdownNotifier, logger, manager, solverLogfile);
+        creator, config, pShutdownNotifier, logger, manager, solverLogfile, (int) randomSeed);
   }
 
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
-    long z3context = creator.getEnv();
-    Native.paramsSetBool(
-        z3context,
-        z3params,
-        Native.mkStringSymbol(z3context, ":model"),
-        options.contains(ProverOptions.GENERATE_MODELS)
-            || options.contains(ProverOptions.GENERATE_ALL_SAT));
-    Native.paramsSetBool(
-        z3context,
-        z3params,
-        Native.mkStringSymbol(z3context, ":unsat_core"),
-        options.contains(ProverOptions.GENERATE_UNSAT_CORE)
-            || options.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS));
-    return new Z3TheoremProver(creator, manager, z3params, options, logfile, shutdownNotifier);
+    final ImmutableMap<String, Object> solverOptions =
+        ImmutableMap.<String, Object>builder()
+            .put(":random-seed", randomSeed)
+            .put(
+                ":model",
+                options.contains(ProverOptions.GENERATE_MODELS)
+                    || options.contains(ProverOptions.GENERATE_ALL_SAT))
+            .put(
+                ":unsat_core",
+                options.contains(ProverOptions.GENERATE_UNSAT_CORE)
+                    || options.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS))
+            .build();
+    return new Z3TheoremProver(creator, manager, options, solverOptions, logfile, shutdownNotifier);
   }
 
   @Override
@@ -244,6 +238,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
   public OptimizationProverEnvironment newOptimizationProverEnvironment0(
       Set<ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
+    final ImmutableMap<String, Object> solverOptions = ImmutableMap.of(":random-seed", randomSeed);
     final ImmutableMap<String, String> optimizationOptions =
         ImmutableMap.of(
             OPT_ENGINE_CONFIG_KEY, optimizationEngine,
@@ -251,9 +246,9 @@ public final class Z3SolverContext extends AbstractSolverContext {
     return new Z3OptimizationProver(
         creator,
         logger,
-        z3params,
         manager,
         options,
+        solverOptions,
         optimizationOptions,
         logfile,
         shutdownNotifier);
@@ -281,7 +276,6 @@ public final class Z3SolverContext extends AbstractSolverContext {
       long context = creator.getEnv();
       creator.forceClose();
       shutdownNotifier.unregister(interruptListener);
-      Native.paramsDecRef(context, z3params);
       Native.closeLog();
       Native.delContext(context);
     }
