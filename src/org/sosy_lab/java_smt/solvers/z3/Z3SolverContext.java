@@ -38,27 +38,12 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 
-@Options(prefix = "solver.z3")
 public final class Z3SolverContext extends AbstractSolverContext {
-
-  /** Optimization settings. */
-  @Option(
-      secure = true,
-      description = "Engine to use for the optimization",
-      values = {"basic", "farkas", "symba"})
-  String optimizationEngine = "basic";
-
-  @Option(
-      secure = true,
-      description = "Ordering for objectives in the optimization context",
-      values = {"lex", "pareto", "box"})
-  String objectivePrioritizationMode = "box";
 
   private final ShutdownRequestListener interruptListener;
   private final ShutdownNotifier shutdownNotifier;
-  private final @Nullable PathCounterTemplate logfile;
-  private final int randomSeed;
   private final LogManager logger;
+  private final ExtraOptions extraOptions;
   private final Z3FormulaCreator creator;
   private final Z3FormulaManager manager;
   private boolean closed = false;
@@ -79,29 +64,47 @@ public final class Z3SolverContext extends AbstractSolverContext {
                 + " The log can be given as an input to the solver and replayed.")
     @FileOption(FileOption.Type.OUTPUT_FILE)
     @Nullable Path log = null;
+
+    /** Optimization settings. */
+    @Option(
+        secure = true,
+        description = "Engine to use for the optimization",
+        values = {"basic", "farkas", "symba"})
+    String optimizationEngine = "basic";
+
+    @Option(
+        secure = true,
+        description = "Ordering for objectives in the optimization context",
+        values = {"lex", "pareto", "box"})
+    String objectivePrioritizationMode = "box";
+
+    private final @Nullable PathCounterTemplate logfile;
+
+    private final int randomSeed;
+
+    ExtraOptions(Configuration config, @Nullable PathCounterTemplate pLogfile, int pRandomSeed)
+        throws InvalidConfigurationException {
+      config.inject(this);
+      randomSeed = pRandomSeed;
+      logfile = pLogfile;
+    }
   }
 
-  @SuppressWarnings("checkstyle:parameternumber")
   private Z3SolverContext(
       Z3FormulaCreator pFormulaCreator,
-      Configuration config,
       ShutdownNotifier pShutdownNotifier,
       LogManager pLogger,
       Z3FormulaManager pManager,
-      @Nullable PathCounterTemplate pSolverLogFile,
-      int pRandomSeed)
-      throws InvalidConfigurationException {
+      ExtraOptions pExtraOptions) {
     super(pManager);
 
     creator = pFormulaCreator;
-    config.inject(this);
     interruptListener = reason -> Native.interrupt(pFormulaCreator.getEnv());
     shutdownNotifier = pShutdownNotifier;
     pShutdownNotifier.register(interruptListener);
     logger = pLogger;
     manager = pManager;
-    logfile = pSolverLogFile;
-    randomSeed = pRandomSeed;
+    extraOptions = pExtraOptions;
   }
 
   @SuppressWarnings("ParameterNumber")
@@ -115,8 +118,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
       NonLinearArithmetic pNonLinearArithmetic,
       Consumer<String> pLoader)
       throws InvalidConfigurationException {
-    ExtraOptions extraOptions = new ExtraOptions();
-    config.inject(extraOptions);
+    ExtraOptions extraOptions = new ExtraOptions(config, solverLogfile, (int) randomSeed);
 
     // We need to load z3 in addition to z3java, because Z3's own class only loads the latter,
     // but it will fail to find the former if not loaded previously.
@@ -206,8 +208,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
             quantifierManager,
             arrayManager,
             stringTheory);
-    return new Z3SolverContext(
-        creator, config, pShutdownNotifier, logger, manager, solverLogfile, (int) randomSeed);
+    return new Z3SolverContext(creator, pShutdownNotifier, logger, manager, extraOptions);
   }
 
   @Override
@@ -215,7 +216,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
     Preconditions.checkState(!closed, "solver context is already closed");
     final ImmutableMap<String, Object> solverOptions =
         ImmutableMap.<String, Object>builder()
-            .put(":random-seed", randomSeed)
+            .put(":random-seed", extraOptions.randomSeed)
             .put(
                 ":model",
                 options.contains(ProverOptions.GENERATE_MODELS)
@@ -225,7 +226,8 @@ public final class Z3SolverContext extends AbstractSolverContext {
                 options.contains(ProverOptions.GENERATE_UNSAT_CORE)
                     || options.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS))
             .build();
-    return new Z3TheoremProver(creator, manager, options, solverOptions, logfile, shutdownNotifier);
+    return new Z3TheoremProver(
+        creator, manager, options, solverOptions, extraOptions.logfile, shutdownNotifier);
   }
 
   @Override
@@ -238,11 +240,12 @@ public final class Z3SolverContext extends AbstractSolverContext {
   public OptimizationProverEnvironment newOptimizationProverEnvironment0(
       Set<ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
-    final ImmutableMap<String, Object> solverOptions = ImmutableMap.of(":random-seed", randomSeed);
+    final ImmutableMap<String, Object> solverOptions =
+        ImmutableMap.of(":random-seed", extraOptions.randomSeed);
     final ImmutableMap<String, String> optimizationOptions =
         ImmutableMap.of(
-            OPT_ENGINE_CONFIG_KEY, optimizationEngine,
-            OPT_PRIORITY_CONFIG_KEY, objectivePrioritizationMode);
+            OPT_ENGINE_CONFIG_KEY, extraOptions.optimizationEngine,
+            OPT_PRIORITY_CONFIG_KEY, extraOptions.objectivePrioritizationMode);
     return new Z3OptimizationProver(
         creator,
         logger,
@@ -250,7 +253,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
         options,
         solverOptions,
         optimizationOptions,
-        logfile,
+        extraOptions.logfile,
         shutdownNotifier);
   }
 
