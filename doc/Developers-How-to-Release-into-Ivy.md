@@ -46,7 +46,7 @@ there are scripts for publishing available at the root of the [Ivy Repository](h
 We prefer to use the official Z3 binaries,
 please build from source only if necessary (e.g., in case of an important bugfix).
 
-To publish Z3, download the **Ubuntu 16.04**, **Windows**, and **OSX** binary
+To publish Z3, download the **Ubuntu**, **Windows**, and **OSX** binary
 and the sources (for JavaDoc) for the [latest release](https://github.com/Z3Prover/z3/releases) and unzip them.
 In the unpacked sources directory, prepare Java sources via `python scripts/mk_make.py --java`.
 For simpler handling, we then copy the files from the three `bin` directories together into one directory,
