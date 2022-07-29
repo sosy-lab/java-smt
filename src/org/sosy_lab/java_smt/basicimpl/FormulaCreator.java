@@ -491,7 +491,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
 
   /**
    * Convert the formula into a Java object as far as possible, i.e., try to match a primitive or
-   * simple type like Boolean, BigInteger, or Rational.
+   * simple type like Boolean, BigInteger, Rational, or String.
    *
    * <p>If the formula is not a simple constant expression, we simply return <code>null</code>.
    *
@@ -507,7 +507,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
    * Convert the formula into a Java object as far as possible, i.e., try to match a primitive or
    * simple type.
    *
-   * @param pAdditionalF an additonal formula where the type can be received from.
+   * @param pAdditionalF an additional formula where the type can be received from.
    * @param pF the formula to be converted.
    */
   // only some solvers require the additional (first) parameter, other solvers ignore it.

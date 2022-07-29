@@ -403,6 +403,12 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
                   == Z3_sort_kind.Z3_ROUNDING_MODE_SORT.toInt()) {
             return visitor.visitConstant(formula, convertValue(f));
 
+            // string constant
+          } else if (declKind == Z3_decl_kind.Z3_OP_INTERNAL.toInt()
+              && Native.getSortKind(environment, Native.getSort(environment, f))
+                  == Z3_sort_kind.Z3_SEQ_SORT.toInt()) {
+            return visitor.visitConstant(formula, convertValue(f));
+
             // Free variable
           } else if (declKind == Z3_decl_kind.Z3_OP_UNINTERPRETED.toInt()
               || declKind == Z3_decl_kind.Z3_OP_INTERNAL.toInt()) {
@@ -740,7 +746,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   /**
    * @param value Z3_ast representing a constant value.
    * @return {@link BigInteger} or {@link Double} or {@link Rational} or {@link Boolean} or {@link
-   *     FloatingPointRoundingMode}.
+   *     FloatingPointRoundingMode} or {@link String}.
    */
   @Override
   public Object convertValue(Long value) {
