@@ -1550,6 +1550,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
             smgr.lessThan(smgr.makeString("y"), smgr.makeString("yy")));
     Map<String, Formula> freeVars = mgr.extractVariables(eq);
     assertThat(freeVars).isEmpty();
+    Map<String, Formula> freeVarsAndUfs = mgr.extractVariablesAndUFs(eq);
+    assertThat(freeVarsAndUfs).isEmpty();
   }
 
   @Test
@@ -1557,19 +1559,25 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
     RegexFormula concat = smgr.concat(smgr.makeRegex("x"), smgr.makeRegex("xx"));
     Map<String, Formula> freeVars = mgr.extractVariables(concat);
     assertThat(freeVars).isEmpty();
+    Map<String, Formula> freeVarsAndUfs = mgr.extractVariablesAndUFs(concat);
+    assertThat(freeVarsAndUfs).isEmpty();
   }
 
   @Test
   public void testVisitorForStringSymbols() {
     BooleanFormula eq = smgr.equal(smgr.makeVariable("x"), smgr.makeString("xx"));
     Map<String, Formula> freeVars = mgr.extractVariables(eq);
-    assertThat(freeVars).containsEntry("x", smgr.makeVariable("x"));
+    assertThat(freeVars).containsExactly("x", smgr.makeVariable("x"));
+    Map<String, Formula> freeVarsAndUfs = mgr.extractVariablesAndUFs(eq);
+    assertThat(freeVarsAndUfs).containsExactly("x", smgr.makeVariable("x"));
   }
 
   @Test
   public void testVisitorForRegexSymbols() {
     BooleanFormula in = smgr.in(smgr.makeVariable("x"), smgr.makeRegex("xx"));
     Map<String, Formula> freeVars = mgr.extractVariables(in);
-    assertThat(freeVars).containsEntry("x", smgr.makeVariable("x"));
+    assertThat(freeVars).containsExactly("x", smgr.makeVariable("x"));
+    Map<String, Formula> freeVarsAndUfs = mgr.extractVariablesAndUFs(in);
+    assertThat(freeVarsAndUfs).containsExactly("x", smgr.makeVariable("x"));
   }
 }
