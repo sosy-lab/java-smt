@@ -365,9 +365,9 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    */
   @Override
   public Map<String, Formula> extractVariables(Formula f) {
-    ImmutableMap.Builder<String, Formula> found = ImmutableMap.builder();
+    Map<String, Formula> found = new LinkedHashMap<>();
     formulaCreator.extractVariablesAndUFs(f, false, found::put);
-    return found.build();
+    return ImmutableMap.copyOf(found);
   }
 
   /**
