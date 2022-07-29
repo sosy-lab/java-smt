@@ -225,7 +225,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
                 ":unsat_core",
                 options.contains(ProverOptions.GENERATE_UNSAT_CORE)
                     || options.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS))
-            .build();
+            .buildOrThrow();
     return new Z3TheoremProver(
         creator, manager, options, solverOptions, extraOptions.logfile, shutdownNotifier);
   }

@@ -87,7 +87,7 @@ public final class SmtInterpolSolverContext extends AbstractSolverContext {
       for (String option : furtherOptions) {
         opt.put(option, true);
       }
-      optionsMap = opt.build();
+      optionsMap = opt.buildOrThrow();
     }
   }
 
@@ -274,7 +274,7 @@ public final class SmtInterpolSolverContext extends AbstractSolverContext {
   public ImmutableMap<String, String> getStatistics() {
     ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
     flatten(builder, "", manager.getEnvironment().getInfo(":all-statistics"));
-    return builder.build();
+    return builder.buildOrThrow();
   }
 
   /**

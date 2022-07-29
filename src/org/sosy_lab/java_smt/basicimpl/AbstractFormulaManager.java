@@ -92,7 +92,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    * Counterparts can be any unique string. For optimization, we could even use plain chars. */
   @VisibleForTesting
   public static final ImmutableBiMap<Character, String> DISALLOWED_CHARACTER_REPLACEMENT =
-      ImmutableBiMap.<Character, String>builder().put('|', "pipe").put('\\', "backslash").build();
+      ImmutableBiMap.of('|', "pipe", '\\', "backslash");
 
   private static final char ESCAPE = '$'; // just some allowed symbol, can be any char
 
@@ -367,7 +367,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   public Map<String, Formula> extractVariables(Formula f) {
     ImmutableMap.Builder<String, Formula> found = ImmutableMap.builder();
     formulaCreator.extractVariablesAndUFs(f, false, found::put);
-    return found.build();
+    return found.buildOrThrow(); // visitation should not visit any symbol twice
   }
 
   /**

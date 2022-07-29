@@ -280,7 +280,7 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
       }
     }
 
-    return builder.build();
+    return builder.buildOrThrow();
   }
 
   @Override

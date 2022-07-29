@@ -90,7 +90,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
               Z3_decl_kind.Z3_OP_FPA_RM_TOWARD_NEGATIVE.toInt(),
               FloatingPointRoundingMode.TOWARD_NEGATIVE)
           .put(Z3_decl_kind.Z3_OP_FPA_RM_TOWARD_ZERO.toInt(), FloatingPointRoundingMode.TOWARD_ZERO)
-          .build();
+          .buildOrThrow();
 
   // Set of error messages that might occur if Z3 is interrupted.
   private static final ImmutableSet<String> Z3_INTERRUPT_ERRORS =

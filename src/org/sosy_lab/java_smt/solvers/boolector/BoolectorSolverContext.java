@@ -184,7 +184,7 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
     // TODO ... forget it, Boolector dumps it in human-readable form,
     // there is no simple way of converting it into a key-value-mapping.
 
-    return ImmutableMap.<String, String>builder().put("statistics", stats).build();
+    return ImmutableMap.of("statistics", stats);
   }
 
   @Override
