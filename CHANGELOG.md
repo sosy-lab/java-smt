@@ -10,6 +10,10 @@ SPDX-License-Identifier: Apache-2.0
 
 # JavaSMT ChangeLog
 
+## JavaSMT 3.13.3
+
+This patch release comes with a smaller bugfix for String-theory formulas in Z3.
+
 ## JavaSMT 3.13.2
 
 This patch release comes with some updated solvers and some smaller bugfixes.
