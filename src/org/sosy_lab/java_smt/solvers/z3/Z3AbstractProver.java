@@ -21,6 +21,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -264,10 +265,11 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
     Preconditions.checkState(!closed);
 
     ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+    Set<String> seenKeys = new HashSet<>();
 
     final long stats = Native.solverGetStatistics(z3context, z3solver);
     for (int i = 0; i < Native.statsSize(z3context, stats); i++) {
-      String key = Native.statsGetKey(z3context, stats, i);
+      String key = getUnusedKey(seenKeys, Native.statsGetKey(z3context, stats, i));
       if (Native.statsIsUint(z3context, stats, i)) {
         builder.put(key, Integer.toString(Native.statsGetUintValue(z3context, stats, i)));
       } else if (Native.statsIsDouble(z3context, stats, i)) {
@@ -281,6 +283,23 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
     }
 
     return builder.buildOrThrow();
+  }
+
+  /**
+   * In some cases, Z3 uses the same statistics key twice. In those cases, we append an index to the
+   * second usage.
+   */
+  private String getUnusedKey(Set<String> seenKeys, final String originalKey) {
+    if (seenKeys.add(originalKey)) {
+      return originalKey;
+    }
+    String key;
+    int index = 0;
+    do {
+      index++;
+      key = originalKey + " (" + index + ")";
+    } while (!seenKeys.add(key));
+    return key;
   }
 
   @Override
