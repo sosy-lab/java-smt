@@ -623,19 +623,9 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
           }
           return solver.mkTerm(kind, pArgs.toArray(Term[]::new));
         } catch (CVC5ApiException e) {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
           throw new RuntimeException(e);
         }
       }
-      // Applying UFs in CVC5 works with an array of Terms with the UF being the first argument
-      // If you pull the children out of it the order will be the same!
-      /*Term[] args =
-      Stream.of(new Term[] {pDeclaration}, pArgs.toArray(new Term[0]))
-          .flatMap(Stream::of)
-          .toArray(Term[]::new);*/
-
-      // return solver.mkTerm(pDeclaration.getKind(), pArgs.toArray(Term[]::new));
     }
   }
 

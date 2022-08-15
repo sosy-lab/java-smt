@@ -103,6 +103,8 @@ public class UFManagerTest extends SolverBasedTest0 {
     requireIntegers();
     requireRationals();
 
+    // TODO: decide if we want to disable this test for CVC5 or ask the devs or try to cast the
+    // value ourselfs
     IntegerFormula x = imgr.makeVariable("x");
     IntegerFormula value = imgr.makeNumber(1234);
 
