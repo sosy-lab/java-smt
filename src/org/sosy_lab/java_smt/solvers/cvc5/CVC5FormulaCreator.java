@@ -425,7 +425,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
                   getDeclarationKind(f),
                   argsTypes,
                   getFormulaType(f),
-                  f.getChild(0)));
+                  normalize(f.getChild(0))));
         } else {
           // TODO: check if the below is correct
           return visitor.visitFunction(
@@ -443,6 +443,25 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
       throw new IllegalArgumentException(
           "Failure visiting the Term " + f + ". " + e.getMessage(), e);
     }
+  }
+
+  /**
+   * CVC5 returns new objects when querying operators for UFs. The new operator has to be translated
+   * back to a common one.
+   */
+  private Term normalize(Term operator) {
+    Term function = functionsCache.get(getName(operator));
+    if (function != null) {
+      checkState(
+          function.getId() == operator.getId(),
+          "operator '%s' with ID %s differs from existing function '%s' with ID '%s'.",
+          operator,
+          operator.getId(),
+          function,
+          function.getId());
+      return function;
+    }
+    return operator;
   }
 
   // see src/theory/*/kinds in CVC5 sources for description of the different CVC5 kinds ;)
