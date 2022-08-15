@@ -12,6 +12,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
@@ -298,6 +299,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
 
   private String getName(Term e) {
     checkState(!e.isNull());
+    String repr = e.toString();
     try {
       if (e.getKind() == Kind.APPLY_UF) {
         e = e.getChild(0);
@@ -307,13 +309,15 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
     }
     if (e.hasSymbol()) {
       return e.getSymbol();
-    } else if (e.toString().startsWith("(", 0)) {
+    } else if (repr.startsWith("(", 0)) {
       // Some function
       // Functions are packaged like this: (functionName arg1 arg2 ...)
       // But can use |(name)| to enable () inside of the variable name
-      return dequote(e.toString()).substring(1).split(" ")[0];
+      // TODO what happens for function names containing whitepsace?
+      String dequoted = dequote(repr);
+      return Iterables.get(Splitter.on(' ').split(dequoted.substring(1)), 0);
     } else {
-      return dequote(e.toString());
+      return dequote(repr);
     }
   }
 
