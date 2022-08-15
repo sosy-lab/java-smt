@@ -157,8 +157,7 @@ SPDX-License-Identifier: Apache-2.0
             Please specify the path to CVC4 with the flag -Dcvc4.path=/path/to/cvc4.
             The path has to point to the root CVC4 folder, i.e.,
             a checkout of the official git repositoy from 'https://github.com/CVC4/CVC4.git'.
-            Note that shell substitutions do not work and a full absolute
-            path has to be specified.
+            Note that shell substitutions do not work and a full absolute path has to be specified.
         </fail>
         <fail unless="cvc4.customRev">
             Please specify a custom revision with the flag -Dcvc4.customRev=XXX.
@@ -241,15 +240,16 @@ SPDX-License-Identifier: Apache-2.0
             to make the new version publicly available.</echo>
     </target>
 
-    <!-- Build options for CVC5 i used:
-          Note: most - are double - below (not the last one)
-          Reasoning: auto download loads all dependencies automatically, statistics for the new
-          statistics stuff, prefix because i don't want it to use system installed or install
-          systemwide, fPIC because it complained when i didn't use it.
-            ./configure.sh production -java-bindings -auto-download -statistics -prefix=/home/baierd/cvc5-main/build/install -DVAR=fPIC
+    <!-- Build options for CVC5, Reasoning:
+          - 'auto-download' loads all dependencies automatically,
+          - 'statistics' for the new statistics stuff,
+          - 'prefix' because i don't want it to use system installed or install systemwide,
+          - 'fPIC' for position-independent code, required for shared libraries.
+          The full cmdline for building CVC5 is (note the double-dashes!):
+            ./configure.sh production - -java-bindings - -auto-download - -statistics - -prefix=$WORKSPACE/cvc5-main/build/install -DVAR=fPIC
           Theoretically CVC5s performance should be improveable by using -best (uses the best 
-          known general performance/dependencies) but this does not auto download
-     -->
+          known general performance/dependencies) but this can not be combined with auto-download.
+    -->
     <!-- SECTION: Publishing CVC5
          ==================================================================
     -->
@@ -259,8 +259,7 @@ SPDX-License-Identifier: Apache-2.0
             Please specify the path to CVC5 with the flag -Dcvc5.path=/path/to/cvc5.
             The path has to point to the root CVC5 folder, i.e.,
             a checkout of the official git repositoy from 'https://github.com/cvc5/cvc5'.
-            Note that shell substitutions do not work and a full absolute
-            path has to be specified.
+            Note that shell substitutions do not work and a full absolute path has to be specified.
         </fail>
         <fail unless="cvc5.customRev">
             Please specify a custom revision with the flag -Dcvc5.customRev=XXX.
@@ -278,11 +277,13 @@ SPDX-License-Identifier: Apache-2.0
         <echo message="Building CVC5 in version '${cvc5.version}'"/>
 
         <!-- build CVC5 -->
+        <echo message="Cleaning old build files"/>
         <exec executable="rm" dir="${cvc5.path}" failonerror="true">
             <arg value="-rf"/>
             <arg value="build"/>
         </exec>
 
+        <echo message="Configuring and building CVC5 in version '${cvc5.version}'"/>
         <exec executable="./configure.sh" dir="${cvc5.path}" failonerror="true">
             <!--<arg value="production"/>-->
             <arg value="--java-bindings"/>
@@ -296,6 +297,7 @@ SPDX-License-Identifier: Apache-2.0
         </exec>
 
         <!-- remove unneeded symbols -->
+        <echo message="Strip unneeded symbols"/>
         <exec executable="strip" dir="${cvc5.path}/build/src/api/java/" failonerror="true">
             <arg value="libcvc5jni.so" />
         </exec>
@@ -307,6 +309,7 @@ SPDX-License-Identifier: Apache-2.0
         </exec>
 
         <!-- fix RPATH and library dependencies -->
+        <echo message="Fixing library path for all artifact libraries"/>
         <exec executable="patchelf" dir="${cvc5.path}/build/src/parser/" failonerror="true">
             <arg value="--set-rpath"/><arg value="$ORIGIN"/>
             <arg value="libcvc5parser.so"/>
@@ -338,6 +341,7 @@ SPDX-License-Identifier: Apache-2.0
         </exec>
 
         <!-- copy library files into directory to be published for IVY -->
+        <echo message="Copying artifact files into current directory"/>
         <copy file="${cvc5.path}/build/src/libcvc5.so" tofile="libcvc5-${cvc5.version}.so"/>
         <copy file="${cvc5.path}/build/src/parser/libcvc5parser.so" tofile="libcvc5parser-${cvc5.version}.so"/>
         <copy file="${cvc5.path}/build/src/api/java/libcvc5jni.so" tofile="libcvc5jni-${cvc5.version}.so"/>
