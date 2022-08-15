@@ -33,9 +33,6 @@ public final class CVC5SolverContext extends AbstractSolverContext {
   private final int randomSeed;
   private final AtomicBoolean isAnyStackAlive = new AtomicBoolean(false);
   private boolean closed = false;
-  // CVC5 does not like changing options after a stack was used. We remember what the last stack was
-  // with this.
-  private boolean wasInterpolationStackBefore = false;
 
   private CVC5SolverContext(
       CVC5FormulaCreator creator,
@@ -157,21 +154,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> pOptions) {
-    Preconditions.checkState(!closed, "solver context is already closed");
-    if (!wasInterpolationStackBefore) {
-      // Unsat Core and interpolation may not be active both at once!
-      solver.setOption("produce-unsat-cores", "false");
-      solver.setOption("produce-interpolants", "true");
-      wasInterpolationStackBefore = true;
-    }
-    return new CVC5InterpolatingProver(
-        creator,
-        shutdownNotifier,
-        randomSeed,
-        pOptions,
-        getFormulaManager().getBooleanFormulaManager(),
-        solver,
-        isAnyStackAlive);
+    throw new UnsupportedOperationException("CVC5 does not support Craig interpolation.");
   }
 
   @Override
