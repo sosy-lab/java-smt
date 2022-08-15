@@ -8,12 +8,9 @@
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
-import static com.google.common.collect.Iterables.getLast;
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assertWithMessage;
 import static org.junit.Assert.assertThrows;
 
-import com.google.common.collect.ImmutableList;
 import io.github.cvc5.CVC5ApiException;
 import io.github.cvc5.Kind;
 import io.github.cvc5.Op;
@@ -84,87 +81,11 @@ public class CVC5NativeAPITest {
     solver.setOption("sets-ext", "true");
     solver.setOption("output-language", "smtlib2");
     solver.setOption("strings-exp", "true");
-    // Unsat core and interpolation may not be activated at the same time!
-    // solver.setOption("produce-interpolants", "true");
   }
 
   @After
   public void freeEnvironment() {
     solver.close();
-  }
-
-  /*
-   * Note: CVC5s interpolation does not produce useful interpolants! Just true/false statements!
-   */
-  @Test
-  public void checkInterpolation() {
-    // solver.setOption("produce-unsat-cores", "true");
-    solver.setOption("produce-interpolants", "true");
-
-    Term zero = solver.mkInteger(0);
-    Term one = solver.mkInteger(1);
-
-    Term a = solver.mkConst(solver.getIntegerSort(), "a");
-    Term b = solver.mkConst(solver.getIntegerSort(), "b");
-    Term c = solver.mkConst(solver.getIntegerSort(), "c");
-
-    // build formula:  1 = A = B = C = 0
-    Term aEq1 = solver.mkTerm(Kind.EQUAL, one, a);
-    Term aEqb = solver.mkTerm(Kind.EQUAL, a, b);
-    Term bEqc = solver.mkTerm(Kind.EQUAL, b, c);
-    Term cEq0 = solver.mkTerm(Kind.EQUAL, c, zero);
-
-    solver.assertFormula(aEq1);
-    solver.assertFormula(aEqb);
-    solver.assertFormula(bEqc);
-    solver.assertFormula(cEq0);
-
-    assertThat(solver.checkSat().isUnsat()).isTrue();
-
-    Term itp = solver.getInterpolant(solver.mkBoolean(true));
-    Term itpA = solver.getInterpolant(aEq1);
-    Term itpAB = solver.getInterpolant(aEq1.andTerm(aEqb));
-    Term itpABC = solver.getInterpolant(aEq1.andTerm(aEqb).andTerm(bEqc));
-    Term itpD = solver.getInterpolant(cEq0);
-    Term itpDC = solver.getInterpolant(cEq0.andTerm(bEqc));
-    Term itpDCB = solver.getInterpolant(cEq0.andTerm(bEqc).andTerm(aEqb));
-    Term itpABCD = solver.getInterpolant(aEq1.andTerm(aEqb).andTerm(bEqc).andTerm(cEq0));
-
-    // special cases: start and end of sequence might need special handling in the solver
-    assertThat(solver.mkBoolean(true).toString()).isEqualTo(itp.toString());
-    assertThat(solver.mkBoolean(false).toString()).isEqualTo(itpABCD.toString());
-
-    // we check here the stricter properties for sequential interpolants,
-    // but this simple example should work for all solvers
-    checkItpSequence(
-        ImmutableList.of(aEq1, aEqb, bEqc, cEq0), ImmutableList.of(itpA, itpAB, itpABC));
-    checkItpSequence(
-        ImmutableList.of(cEq0, bEqc, aEqb, aEq1), ImmutableList.of(itpD, itpDC, itpDCB));
-  }
-
-  private void checkItpSequence(List<Term> formulas, List<Term> itps) {
-
-    assertWithMessage(
-            "there should be N-1 interpolants for N formulas, but we got %s for %s", itps, formulas)
-        .that(formulas.size() - 1 == itps.size())
-        .isTrue();
-
-    if (!itps.isEmpty()) {
-      solver.resetAssertions();
-      Term initFormula = formulas.get(0).impTerm(itps.get(0));
-      solver.assertFormula(initFormula);
-      assertThat(solver.checkSat().isSat()).isTrue();
-      for (int i = 1; i < formulas.size() - 1; i++) {
-        solver.resetAssertions();
-        Term innerFormula = itps.get(i - 1).andTerm(formulas.get(i)).impTerm(itps.get(i));
-        solver.assertFormula(innerFormula);
-        assertThat(solver.checkSat().isSat()).isTrue();
-      }
-      solver.resetAssertions();
-      Term lastImply = getLast(itps).andTerm(getLast(formulas)).impTerm(solver.mkBoolean(false));
-      solver.assertFormula(lastImply);
-      assertThat(solver.checkSat().isSat()).isTrue();
-    }
   }
 
   /*
