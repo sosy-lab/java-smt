@@ -296,44 +296,6 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="-j4" />
         </exec>
 
-        <!-- remove unneeded symbols -->
-        <echo message="Strip unneeded symbols"/>
-        <exec executable="strip" dir="${cvc5.path}/build/src/api/java/" failonerror="true">
-            <arg value="libcvc5jni.so" />
-        </exec>
-        <exec executable="strip" dir="${cvc5.path}/build/src/" failonerror="true">
-            <arg value="libcvc5.so" />
-        </exec>
-        <exec executable="strip" dir="${cvc5.path}/build/src/parser/" failonerror="true">
-            <arg value="libcvc5parser.so" />
-        </exec>
-
-        <!-- fix RPATH and library dependencies -->
-        <echo message="Fixing library path for all artifact libraries"/>
-        <exec executable="patchelf" dir="${cvc5.path}/build/src/parser/" failonerror="true">
-            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
-            <arg value="libcvc5parser.so"/>
-        </exec>
-        <exec executable="patchelf" dir="${cvc5.path}/build/src/" failonerror="true">
-            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
-            <arg value="--replace-needed"/><arg value="libpolyxx.so.0"/><arg value="libpolyxx.so"/>
-            <arg value="--replace-needed"/><arg value="libpoly.so.0"/><arg value="libpoly.so"/>
-            <arg value="libcvc5.so"/>
-        </exec>
-        <exec executable="patchelf" dir="${cvc5.path}/build/src/api/java/" failonerror="true">
-            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
-            <arg value="libcvc5jni.so"/>
-        </exec>
-        <exec executable="patchelf" dir="${cvc5.path}/build/deps/lib/" failonerror="true">
-            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
-            <arg value="--replace-needed"/><arg value="libpoly.so.0"/><arg value="libpoly.so"/>
-            <arg value="libpolyxx.so"/>
-        </exec>
-        <exec executable="patchelf" dir="${cvc5.path}/build/deps/lib/" failonerror="true">
-            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
-            <arg value="libpoly.so"/>
-        </exec>
-
         <!-- get the actual jar location as cvc5.jar is just a link -->
         <exec executable="readlink" dir="${cvc5.path}/build/src/api/java" outputproperty="cvc5.jar" failonerror="true">
             <arg value="-f"/>
@@ -348,6 +310,55 @@ SPDX-License-Identifier: Apache-2.0
         <copy file="${cvc5.jar}" tofile="cvc5-${cvc5.version}.jar"/>
         <copy file="${cvc5.path}/build/deps/lib/libpolyxx.so" tofile="libpolyxx-${cvc5.version}.so"/>
         <copy file="${cvc5.path}/build/deps/lib/libpoly.so" tofile="libpoly-${cvc5.version}.so"/>
+
+        <!-- remove unneeded symbols -->
+        <echo message="Strip unneeded symbols"/>
+        <exec executable="strip" dir="./" failonerror="true">
+            <arg value="libcvc5-${cvc5.version}.so"/>
+        </exec>
+        <exec executable="strip" dir="./" failonerror="true">
+            <arg value="libcvc5jni-${cvc5.version}.so"/>
+        </exec>
+        <exec executable="strip" dir="./" failonerror="true">
+            <arg value="libcvc5parser-${cvc5.version}.so"/>
+        </exec>
+        <exec executable="strip" dir="./" failonerror="true">
+            <arg value="libpoly-${cvc5.version}.so"/>
+        </exec>
+        <exec executable="strip" dir="./" failonerror="true">
+            <arg value="libpolyxx-${cvc5.version}.so"/>
+        </exec>
+
+        <!-- fix RPATH and library dependencies -->
+        <echo message="Fixing library path for all artifact libraries"/>
+        <exec executable="patchelf" dir="./" failonerror="true">
+            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
+            <arg value="--replace-needed"/><arg value="libpolyxx.so.0"/><arg value="libpolyxx.so"/>
+            <arg value="--replace-needed"/><arg value="libpoly.so.0"/><arg value="libpoly.so"/>
+            <arg value="libcvc5-${cvc5.version}.so"/>
+        </exec>
+        <exec executable="patchelf" dir="./" failonerror="true">
+            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
+            <arg value="libcvc5jni-${cvc5.version}.so"/>
+        </exec>
+        <exec executable="patchelf" dir="./" failonerror="true">
+            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
+            <arg value="libcvc5parser-${cvc5.version}.so"/>
+        </exec>
+        <!-- patchelf finds two dependencies and needs to be called twice for libpolyxx.so -->
+        <exec executable="patchelf" dir="./" failonerror="true">
+            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
+            <arg value="--replace-needed"/><arg value="libpoly.so.0"/><arg value="libpoly.so"/>
+            <arg value="libpolyxx-${cvc5.version}.so"/>
+        </exec>
+        <exec executable="patchelf" dir="./" failonerror="true">
+            <arg value="--replace-needed"/><arg value="libpoly.so.0"/><arg value="libpoly.so"/>
+            <arg value="libpolyxx-${cvc5.version}.so"/>
+        </exec>
+        <exec executable="patchelf" dir="./" failonerror="true">
+            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
+            <arg value="libpoly-${cvc5.version}.so"/>
+        </exec>
     </target>
 
     <target name="publish-cvc5" depends="package-cvc5, load-ivy"
