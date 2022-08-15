@@ -301,7 +301,7 @@ public class CVC5FloatingPointFormulaManager
 
   @Override
   protected Term add(Term pParam1, Term pParam2, Term pRoundingMode) {
-    return solver.mkTerm(Kind.ADD, pRoundingMode, pParam1, pParam2);
+    return solver.mkTerm(Kind.FLOATINGPOINT_ADD, pRoundingMode, pParam1, pParam2);
   }
 
   @Override
