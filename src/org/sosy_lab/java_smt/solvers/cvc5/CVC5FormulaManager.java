@@ -11,6 +11,8 @@ package org.sosy_lab.java_smt.solvers.cvc5;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import de.uni_freiburg.informatik.ultimate.logic.PrintTerm;
+import io.github.cvc5.CVC5ApiException;
+import io.github.cvc5.Kind;
 import io.github.cvc5.Solver;
 import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
@@ -92,7 +94,16 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, Solver, Term
           out.append("(declare-fun ").append(PrintTerm.quoteIdentifier(name)).append(" (");
 
           // add function parameters
-          Iterable<Sort> childrenTypes = Iterables.transform(var, Term::getSort);
+          Iterable<Sort> childrenTypes;
+          try {
+            if (var.getSort().isFunction() || var.getKind() == Kind.APPLY_UF) {
+              childrenTypes = Iterables.skip(Iterables.transform(var, Term::getSort), 1);
+            } else {
+              childrenTypes = Iterables.transform(var, Term::getSort);
+            }
+          } catch (CVC5ApiException e) {
+            childrenTypes = Iterables.transform(var, Term::getSort);
+          }
           out.append(Joiner.on(" ").join(childrenTypes));
 
           // and return type
@@ -129,8 +140,14 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, Solver, Term
       final T pF, final Map<? extends Formula, ? extends Formula> pFromToMapping) {
     Term termThatGetsSubst = extractInfo(pF);
     for (Map.Entry<? extends Formula, ? extends Formula> e : pFromToMapping.entrySet()) {
-      termThatGetsSubst =
-          termThatGetsSubst.substitute(extractInfo(e.getKey()), extractInfo(e.getValue()));
+      // CVC5 stops after the first term is replaced, rerun until nothing changes
+      boolean matches = false;
+      while (!matches) {
+        Term newTerm =
+            termThatGetsSubst.substitute(extractInfo(e.getKey()), extractInfo(e.getValue()));
+        matches = termThatGetsSubst.equals(newTerm);
+        termThatGetsSubst = newTerm;
+      }
     }
     FormulaType<T> type = getFormulaType(pF);
     return getFormulaCreator().encapsulate(type, termThatGetsSubst);
