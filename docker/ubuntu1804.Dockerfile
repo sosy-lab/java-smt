@@ -8,12 +8,18 @@
 
 FROM ubuntu:bionic
 
+# Install basic packages for building several solvers
 RUN apt-get update \
  && apt-get install -y \
         wget curl git \
         build-essential cmake patchelf \
         openjdk-11-jdk ant maven \
         mingw-w64 zlib1g-dev m4
+
+# CVC5 requires python and toml
+RUN apt-get update \
+ && apt-get install -y \
+        python3 python3-toml
 
 # Add the user "developer" with UID:1000, GID:1000, home at /developer.
 # This allows to map the docker-internal user to the local user 1000:1000 outside of the container.
