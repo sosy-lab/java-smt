@@ -17,6 +17,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import io.github.cvc5.CVC5ApiException;
 import io.github.cvc5.Kind;
+import io.github.cvc5.Op;
 import io.github.cvc5.Pair;
 import io.github.cvc5.Solver;
 import io.github.cvc5.Sort;
@@ -304,19 +305,16 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
     } catch (CVC5ApiException e1) {
       // Fallback is the String of the original term
     }
-    return dequote(e.toString());
-  }
-
-  private String getFunctionName(Term e) {
-    try {
-      if (e.getKind() == Kind.APPLY_UF) {
-        e = e.getChild(0);
-      }
-    } catch (CVC5ApiException e1) {
-      // Fallback is the String of the original term
+    if (e.hasSymbol()) {
+      return e.getSymbol();
+    } else if (e.toString().startsWith("(", 0)) {
+      // Some function
+      // Functions are packaged like this: (functionName arg1 arg2 ...)
+      // But can use |(name)| to enable () inside of the variable name
+      return dequote(e.toString()).substring(1).split(" ")[0];
+    } else {
+      return dequote(e.toString());
     }
-    // Functions are packaged like this: (functionName arg1 arg2 ...)
-    return dequote(e.toString()).replace("(", "").split(" ")[0];
   }
 
   /** Variable names can be wrapped with "|". This function removes those chars. */
@@ -415,13 +413,13 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
               formula,
               argsBuilder.build(),
               FunctionDeclarationImpl.of(
-                  getFunctionName(f), getDeclarationKind(f), argsTypes, getFormulaType(f), f));
+                  getName(f), getDeclarationKind(f), argsTypes, getFormulaType(f), normalize(f)));
         } else if (kind == Kind.APPLY_UF) {
           return visitor.visitFunction(
               formula,
               argsBuilder.build(),
               FunctionDeclarationImpl.of(
-                  getFunctionName(f),
+                  getName(f),
                   getDeclarationKind(f),
                   argsTypes,
                   getFormulaType(f),
@@ -432,11 +430,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
               formula,
               argsBuilder.build(),
               FunctionDeclarationImpl.of(
-                  getFunctionName(f),
-                  getDeclarationKind(f),
-                  argsTypes,
-                  getFormulaType(f),
-                  f.getOp()));
+                  getName(f), getDeclarationKind(f), argsTypes, getFormulaType(f), normalize(f)));
         }
       }
     } catch (CVC5ApiException e) {
@@ -611,13 +605,37 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
       // CVC5 does not allow argumentless functions! We use variables as a workaround.
       return pDeclaration;
     } else {
+
+      if (pDeclaration.hasOp()) {
+        Op op = pDeclaration.getOp();
+        return solver.mkTerm(op, pArgs.toArray(Term[]::new));
+      } else {
+        try {
+          Kind kind = pDeclaration.getKind();
+          if (kind == Kind.CONSTANT) {
+            // This seems to be a uf application. Note: we need the declration of the UF as first
+            // argument!
+            Term[] args =
+                Stream.of(new Term[] {pDeclaration}, pArgs.toArray(new Term[0]))
+                    .flatMap(Stream::of)
+                    .toArray(Term[]::new);
+            return solver.mkTerm(Kind.APPLY_UF, args);
+          }
+          return solver.mkTerm(kind, pArgs.toArray(Term[]::new));
+        } catch (CVC5ApiException e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+          throw new RuntimeException(e);
+        }
+      }
       // Applying UFs in CVC5 works with an array of Terms with the UF being the first argument
       // If you pull the children out of it the order will be the same!
-      Term[] args =
-          Stream.of(new Term[] {pDeclaration}, pArgs.toArray(new Term[0]))
-              .flatMap(Stream::of)
-              .toArray(Term[]::new);
-      return solver.mkTerm(Kind.APPLY_UF, args);
+      /*Term[] args =
+      Stream.of(new Term[] {pDeclaration}, pArgs.toArray(new Term[0]))
+          .flatMap(Stream::of)
+          .toArray(Term[]::new);*/
+
+      // return solver.mkTerm(pDeclaration.getKind(), pArgs.toArray(Term[]::new));
     }
   }
 
