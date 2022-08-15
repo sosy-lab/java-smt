@@ -326,6 +326,10 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="--replace-needed"/><arg value="libpoly.so.0"/><arg value="libpoly.so"/>
             <arg value="libpolyxx.so"/>
         </exec>
+        <exec executable="patchelf" dir="${cvc5.path}/build/deps/lib/" failonerror="true">
+            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
+            <arg value="libpoly.so"/>
+        </exec>
 
         <!-- get the actual jar location as cvc5.jar is just a link -->
         <exec executable="readlink" dir="${cvc5.path}/build/src/api/java" outputproperty="cvc5.jar" failonerror="true">
