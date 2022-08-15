@@ -307,6 +307,18 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
     return dequote(e.toString());
   }
 
+  private String getFunctionName(Term e) {
+    try {
+      if (e.getKind() == Kind.APPLY_UF) {
+        e = e.getChild(0);
+      }
+    } catch (CVC5ApiException e1) {
+      // Fallback is the String of the original term
+    }
+    // Functions are packaged like this: (functionName arg1 arg2 ...)
+    return dequote(e.toString()).replace("(", "").split(" ")[0];
+  }
+
   /** Variable names can be wrapped with "|". This function removes those chars. */
   private static String dequote(String s) {
     int l = s.length();
@@ -403,20 +415,28 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
               formula,
               argsBuilder.build(),
               FunctionDeclarationImpl.of(
-                  getName(f), getDeclarationKind(f), argsTypes, getFormulaType(f), f));
+                  getFunctionName(f), getDeclarationKind(f), argsTypes, getFormulaType(f), f));
         } else if (kind == Kind.APPLY_UF) {
           return visitor.visitFunction(
               formula,
               argsBuilder.build(),
               FunctionDeclarationImpl.of(
-                  getName(f), getDeclarationKind(f), argsTypes, getFormulaType(f), f.getChild(0)));
+                  getFunctionName(f),
+                  getDeclarationKind(f),
+                  argsTypes,
+                  getFormulaType(f),
+                  f.getChild(0)));
         } else {
           // TODO: check if the below is correct
           return visitor.visitFunction(
               formula,
               argsBuilder.build(),
               FunctionDeclarationImpl.of(
-                  getName(f), getDeclarationKind(f), argsTypes, getFormulaType(f), f.getOp()));
+                  getFunctionName(f),
+                  getDeclarationKind(f),
+                  argsTypes,
+                  getFormulaType(f),
+                  f.getOp()));
         }
       }
     } catch (CVC5ApiException e) {
