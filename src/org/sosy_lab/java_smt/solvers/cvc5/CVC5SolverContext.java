@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import io.github.cvc5.Solver;
 import java.util.Set;
@@ -47,6 +48,13 @@ public final class CVC5SolverContext extends AbstractSolverContext {
     this.solver = solver;
   }
 
+  @VisibleForTesting
+  static void loadLibrary(Consumer<String> pLoader) {
+    pLoader.accept("cvc5jni");
+    // disable CVC5's own loading mechanism, see io.github.cvc5.Util#loadLibraries
+    System.setProperty("cvc5.skipLibraryLoad", "true");
+  }
+
   // CVC5 loads itself when creating a solver
   @SuppressWarnings({"unused", "resource"})
   public static SolverContext create(
@@ -57,7 +65,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
       FloatingPointRoundingMode pFloatingPointRoundingMode,
       Consumer<String> pLoader) {
 
-    pLoader.accept("cvc5jni");
+    loadLibrary(pLoader);
     // Solver is the central class for creating expressions/terms/formulae.
     // Also, creating a solver statically loads CVC5. We have to do it before CVC5 does it correctly
     // though.

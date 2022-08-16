@@ -53,7 +53,7 @@ public class CVC5NativeAPITest {
   @BeforeClass
   public static void loadCVC5() {
     try {
-      NativeLibraries.loadLibrary("cvc5jni");
+      CVC5SolverContext.loadLibrary(NativeLibraries::loadLibrary);
     } catch (UnsatisfiedLinkError e) {
       throw new AssumptionViolatedException("CVC5 is not available", e);
     }
