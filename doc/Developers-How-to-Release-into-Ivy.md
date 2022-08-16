@@ -74,20 +74,22 @@ ant publish-z3 -Dz3.path=$Z3_DIR/build
 Finally follow the instructions shown in the message at the end.
 
 
-### Publishing CVC4
+### Publishing CVC5 (previously CVC4)
 
-We prefer to use our own CVC4 binaries and Java bindings.
+We prefer to compile our own CVC5 binaries and Java bindings.
+For simple usage, we provide a Docker definition/environment under `/docker`,
+in which the following command can be run.
 
-To publish CVC4, checkout the [CVC4 repository](https://github.com/kfriedberger/CVC4).
+To publish CVC4, checkout the [CVC5 repository](https://github.com/kfriedberger/cvc5).
 Then execute the following command in the JavaSMT directory,
-where `$CVC4_DIR` is the path to the CVC4 directory
-and `$CVC4_VERSION` is the version number:
+where `$CVC5_DIR` is the path to the CVC4 directory
+and `$CVC5_VERSION` is the version number:
 ```
-ant publish-cvc4 -Dcvc4.path=$CVC4_DIR -Dcvc4.customRev=$CVC4_VERSION
+ant publish-cvc5 -Dcvc5.path=$CVC5_DIR -Dcvc5.customRev=$CVC5_VERSION
 ```
 Example:
 ```
-ant publish-cvc4 -Dcvc4.path=../CVC4 -Dcvc4.customRev=1.8-prerelease-2019-10-05
+ant publish-cvc5 -Dcvc5.path=../CVC5 -Dcvc5.customRev=1.0.1
 ```
 Finally follow the instructions shown in the message at the end.
 
