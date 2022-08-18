@@ -122,7 +122,7 @@ public class CVC5NativeAPITest {
     assertThat(intVar.isIntegerValue()).isFalse();
     assertThat(intVar.getSort().isInteger()).isTrue();
     Exception e =
-        assertThrows(io.github.cvc5.CVC5ApiException.class, () -> intVar.getIntegerValue());
+        assertThrows(io.github.cvc5.CVC5ApiException.class, intVar::getIntegerValue);
     assertThat(e.toString())
         .contains(
             "Invalid argument 'int_const' for '*d_node', expected Term to be an integer value when"
@@ -442,7 +442,11 @@ public class CVC5NativeAPITest {
     Term assertion1 =
         solver.mkTerm(
             Kind.EQUAL, solver.mkTerm(Kind.MULT, varX, varY), solver.mkTerm(Kind.ADD, varX, varY));
-    Term assertion2 = solver.mkTerm(Kind.EQUAL, solver.mkTerm(Kind.SUB, varX, one), zero);
+    Term assertion2 =
+        solver.mkTerm(
+            Kind.EQUAL,
+            solver.mkTerm(Kind.SUB, varX, solver.mkTerm(Kind.TO_REAL, one)),
+            solver.mkTerm(Kind.TO_REAL, zero));
     solver.assertFormula(assertion1);
     solver.assertFormula(assertion2);
     Result satCheck = solver.checkSat();
@@ -477,7 +481,11 @@ public class CVC5NativeAPITest {
             Kind.EQUAL, solver.mkTerm(Kind.MULT, varX, varY), solver.mkTerm(Kind.ADD, varX, varY));
     // both 2 and 3 make it UNSAT (either one)
     Term assertion2 = solver.mkTerm(Kind.EQUAL, solver.mkTerm(Kind.ADD, varX, varY), threeHalf);
-    Term assertion3 = solver.mkTerm(Kind.EQUAL, solver.mkTerm(Kind.SUB, varX, one), zero);
+    Term assertion3 =
+        solver.mkTerm(
+            Kind.EQUAL,
+            solver.mkTerm(Kind.SUB, varX, solver.mkTerm(Kind.TO_REAL, one)),
+            solver.mkTerm(Kind.TO_REAL, zero));
     solver.push();
     solver.assertFormula(assertion1);
     Result satCheck = solver.checkSat();
