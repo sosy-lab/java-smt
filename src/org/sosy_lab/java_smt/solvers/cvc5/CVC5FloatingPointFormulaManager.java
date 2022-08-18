@@ -172,7 +172,8 @@ public class CVC5FloatingPointFormulaManager
 
   // FP -> other type
   @Override
-  protected Term castToImpl(Term pNumber, FormulaType<?> pTargetType, Term pRoundingMode) {
+  protected Term castToImpl(
+      Term pNumber, boolean pSigned, FormulaType<?> pTargetType, Term pRoundingMode) {
     try {
       if (pTargetType.isFloatingPointType()) {
         Op fpToFp =
@@ -184,7 +185,8 @@ public class CVC5FloatingPointFormulaManager
 
       } else if (pTargetType.isBitvectorType()) {
         BitvectorType targetType = (BitvectorType) pTargetType;
-        Op operation = solver.mkOp(Kind.FLOATINGPOINT_TO_SBV, targetType.getSize());
+        Kind kind = pSigned ? Kind.FLOATINGPOINT_TO_SBV : Kind.FLOATINGPOINT_TO_UBV;
+        Op operation = solver.mkOp(kind, targetType.getSize());
         return solver.mkTerm(operation, pRoundingMode, pNumber);
 
       } else if (pTargetType.isRationalType()) {
@@ -212,7 +214,7 @@ public class CVC5FloatingPointFormulaManager
     FormulaType<?> formulaType = getFormulaCreator().getFormulaType(pNumber);
     try {
       if (formulaType.isFloatingPointType()) {
-        return castToImpl(pNumber, pTargetType, pRoundingMode);
+        return castToImpl(pNumber, pSigned, pTargetType, pRoundingMode);
 
       } else if (formulaType.isRationalType()) {
         Op realToFp =

@@ -121,8 +121,7 @@ public class CVC5NativeAPITest {
     Term intVar = solver.mkConst(solver.getIntegerSort(), "int_const");
     assertThat(intVar.isIntegerValue()).isFalse();
     assertThat(intVar.getSort().isInteger()).isTrue();
-    Exception e =
-        assertThrows(io.github.cvc5.CVC5ApiException.class, intVar::getIntegerValue);
+    Exception e = assertThrows(io.github.cvc5.CVC5ApiException.class, intVar::getIntegerValue);
     assertThat(e.toString())
         .contains(
             "Invalid argument 'int_const' for '*d_node', expected Term to be an integer value when"
