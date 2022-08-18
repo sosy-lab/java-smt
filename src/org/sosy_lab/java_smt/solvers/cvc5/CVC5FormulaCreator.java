@@ -603,7 +603,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
 
       if (pDeclaration.hasOp()) {
         Op op = pDeclaration.getOp();
-        return solver.mkTerm(op, pArgs.toArray(Term[]::new));
+        return solver.mkTerm(op, pArgs.toArray(new Term[0]));
       } else {
         try {
           Kind kind = pDeclaration.getKind();
