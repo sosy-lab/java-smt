@@ -512,4 +512,13 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
       @SuppressWarnings("unused") TFormulaInfo pAdditionalF, TFormulaInfo pF) {
     return convertValue(pF);
   }
+
+  /** Variable names (symbols) can be wrapped with "|". This function removes those chars. */
+  protected static String dequote(String s) {
+    int l = s.length();
+    if (s.charAt(0) == '|' && s.charAt(l - 1) == '|') {
+      return s.substring(1, l - 1);
+    }
+    return s;
+  }
 }

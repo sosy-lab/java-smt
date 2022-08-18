@@ -296,15 +296,6 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     return dequote(e.toString());
   }
 
-  /** Variable names can be wrapped with "|". This function removes those chars. */
-  private static String dequote(String s) {
-    int l = s.length();
-    if (s.charAt(0) == '|' && s.charAt(l - 1) == '|') {
-      return s.substring(1, l - 1);
-    }
-    return s;
-  }
-
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula formula, final Expr f) {
     checkState(!f.isNull());
