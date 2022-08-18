@@ -68,7 +68,7 @@ public class BoolectorNativeApiTest {
           .put("BTOR_OPT_BETA_REDUCE", "BTOR_OPT_BETA_REDUCE")
           .put("BTOR_OPT_DUMP_DIMACS", "BTOR_OPT_PRINT_DIMACS")
           .put("BTOR_OPT_SIMP_NORM_ADDS", "BTOR_OPT_SIMP_NORMAMLIZE_ADDERS")
-          .build();
+          .buildOrThrow();
 
   @Test
   public void optionNameTest() {

@@ -90,7 +90,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
               Z3_decl_kind.Z3_OP_FPA_RM_TOWARD_NEGATIVE.toInt(),
               FloatingPointRoundingMode.TOWARD_NEGATIVE)
           .put(Z3_decl_kind.Z3_OP_FPA_RM_TOWARD_ZERO.toInt(), FloatingPointRoundingMode.TOWARD_ZERO)
-          .build();
+          .buildOrThrow();
 
   // Set of error messages that might occur if Z3 is interrupted.
   private static final ImmutableSet<String> Z3_INTERRUPT_ERRORS =
@@ -397,19 +397,26 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
           if (value != null) {
             return visitor.visitConstant(formula, value);
 
+            // Rounding mode
           } else if (declKind == Z3_decl_kind.Z3_OP_FPA_NUM.toInt()
               || Native.getSortKind(environment, Native.getSort(environment, f))
                   == Z3_sort_kind.Z3_ROUNDING_MODE_SORT.toInt()) {
             return visitor.visitConstant(formula, convertValue(f));
 
-          } else {
+            // string constant
+          } else if (declKind == Z3_decl_kind.Z3_OP_INTERNAL.toInt()
+              && Native.getSortKind(environment, Native.getSort(environment, f))
+                  == Z3_sort_kind.Z3_SEQ_SORT.toInt()) {
+            return visitor.visitConstant(formula, convertValue(f));
 
-            // Has to be a variable otherwise.
-            // TODO: assert that.
+            // Free variable
+          } else if (declKind == Z3_decl_kind.Z3_OP_UNINTERPRETED.toInt()
+              || declKind == Z3_decl_kind.Z3_OP_INTERNAL.toInt()) {
             return visitor.visitFreeVariable(formula, getAppName(f));
-          }
+          } // else: fall-through with a function application
         }
 
+        // Function application with zero or more parameters
         ImmutableList.Builder<Formula> args = ImmutableList.builder();
         ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
         for (int i = 0; i < arity; i++) {
@@ -645,6 +652,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.BV_UCASTTO_FP;
       case Z3_OP_FPA_TO_SBV:
         return FunctionDeclarationKind.FP_CASTTO_SBV;
+      case Z3_OP_FPA_TO_UBV:
+        return FunctionDeclarationKind.FP_CASTTO_UBV;
       case Z3_OP_FPA_TO_IEEE_BV:
         return FunctionDeclarationKind.FP_AS_IEEEBV;
       case Z3_OP_FPA_TO_FP:
@@ -737,7 +746,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   /**
    * @param value Z3_ast representing a constant value.
    * @return {@link BigInteger} or {@link Double} or {@link Rational} or {@link Boolean} or {@link
-   *     FloatingPointRoundingMode}.
+   *     FloatingPointRoundingMode} or {@link String}.
    */
   @Override
   public Object convertValue(Long value) {

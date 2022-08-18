@@ -78,7 +78,8 @@ class Z3FloatingPointFormulaManager
         || pType.getMantissaSize() <= highPrec.getMantissaSize()) {
       long highPrecNumber = Native.mkNumeral(z3context, pN, mkFpaSort(highPrec));
       Native.incRef(z3context, highPrecNumber);
-      long smallPrecNumber = castToImpl(highPrecNumber, pType, pRoundingMode);
+      long smallPrecNumber =
+          castToImpl(highPrecNumber, /* irrelevant: */ true, pType, pRoundingMode);
       Native.incRef(z3context, smallPrecNumber);
       long result = Native.simplify(z3context, smallPrecNumber);
       Native.decRef(z3context, highPrecNumber);
@@ -109,14 +110,19 @@ class Z3FloatingPointFormulaManager
   }
 
   @Override
-  protected Long castToImpl(Long pNumber, FormulaType<?> pTargetType, Long pRoundingMode) {
+  protected Long castToImpl(
+      Long pNumber, boolean pSigned, FormulaType<?> pTargetType, Long pRoundingMode) {
     if (pTargetType.isFloatingPointType()) {
       FormulaType.FloatingPointType targetType = (FormulaType.FloatingPointType) pTargetType;
       return Native.mkFpaToFpFloat(z3context, pRoundingMode, pNumber, mkFpaSort(targetType));
 
     } else if (pTargetType.isBitvectorType()) {
       FormulaType.BitvectorType targetType = (FormulaType.BitvectorType) pTargetType;
-      return Native.mkFpaToSbv(z3context, pRoundingMode, pNumber, targetType.getSize());
+      if (pSigned) {
+        return Native.mkFpaToSbv(z3context, pRoundingMode, pNumber, targetType.getSize());
+      } else {
+        return Native.mkFpaToUbv(z3context, pRoundingMode, pNumber, targetType.getSize());
+      }
 
     } else if (pTargetType.isRationalType()) {
       return Native.mkFpaToReal(z3context, pNumber);
@@ -128,14 +134,14 @@ class Z3FloatingPointFormulaManager
 
   @Override
   protected Long castFromImpl(
-      Long pNumber, boolean signed, FloatingPointType pTargetType, Long pRoundingMode) {
+      Long pNumber, boolean pSigned, FloatingPointType pTargetType, Long pRoundingMode) {
     FormulaType<?> formulaType = getFormulaCreator().getFormulaType(pNumber);
 
     if (formulaType.isFloatingPointType()) {
-      return castToImpl(pNumber, pTargetType, pRoundingMode);
+      return castToImpl(pNumber, pSigned, pTargetType, pRoundingMode);
 
     } else if (formulaType.isBitvectorType()) {
-      if (signed) {
+      if (pSigned) {
         return Native.mkFpaToFpSigned(z3context, pRoundingMode, pNumber, mkFpaSort(pTargetType));
       } else {
         return Native.mkFpaToFpUnsigned(z3context, pRoundingMode, pNumber, mkFpaSort(pTargetType));

@@ -58,10 +58,44 @@ public interface FloatingPointFormulaManager {
 
   FloatingPointFormula makeNaN(FloatingPointType type);
 
-  <T extends Formula> T castTo(FloatingPointFormula number, FormulaType<T> targetType);
-
+  /**
+   * Build a formula of compatible type from a {@link FloatingPointFormula}. This method uses the
+   * default rounding mode.
+   *
+   * <p>Compatible formula types are all numeral types and (signed/unsigned) bitvector types. It is
+   * also possible to cast a floating-point number into another floating-point type. We do not
+   * support casting from boolean or array types. We try to keep an exact representation, however
+   * fall back to rounding if needed.
+   *
+   * @param source the source formula of floating-point type
+   * @param signed if a {@link BitvectorFormula} is given as target, we additionally use this flag.
+   *     Otherwise, we ignore it.
+   * @param targetType the type of the resulting formula
+   * @throws IllegalArgumentException if an incompatible type is used, e.g. a {@link
+   *     FloatingPointFormula} cannot be cast to {@link BooleanFormula}.
+   */
   <T extends Formula> T castTo(
-      FloatingPointFormula number,
+      FloatingPointFormula source, boolean signed, FormulaType<T> targetType);
+
+  /**
+   * Build a formula of compatible type from a {@link FloatingPointFormula}.
+   *
+   * <p>Compatible formula types are all numeral types and (signed/unsigned) bitvector types. It is
+   * also possible to cast a floating-point number into another floating-point type. We do not
+   * support casting from boolean or array types. We try to keep an exact representation, however
+   * fall back to rounding if needed.
+   *
+   * @param source the source formula of floating-point type
+   * @param signed if a {@link BitvectorFormula} is given as target, we additionally use this flag.
+   *     Otherwise, we ignore it.
+   * @param targetType the type of the resulting formula
+   * @param pFloatingPointRoundingMode if rounding is needed, we apply the rounding mode.
+   * @throws IllegalArgumentException if an incompatible type is used, e.g. a {@link
+   *     FloatingPointFormula} cannot be cast to {@link BooleanFormula}.
+   */
+  <T extends Formula> T castTo(
+      FloatingPointFormula source,
+      boolean signed,
       FormulaType<T> targetType,
       FloatingPointRoundingMode pFloatingPointRoundingMode);
 
@@ -69,10 +103,10 @@ public interface FloatingPointFormulaManager {
    * Build a {@link FloatingPointFormula} from another compatible formula. This method uses the
    * default rounding mode.
    *
-   * <p>Compatible formula types are all numeral types and bitvector types. It is also possible to
-   * cast a floating-point number into another floating-point type. We do not support casting from
-   * boolean or array types. We try to keep an exact representation, however fall back to rounding
-   * if needed.
+   * <p>Compatible formula types are all numeral types and (signed/unsigned) bitvector types. It is
+   * also possible to cast a floating-point number into another floating-point type. We do not
+   * support casting from boolean or array types. We try to keep an exact representation, however
+   * fall back to rounding if needed.
    *
    * @param source the source formula of compatible type
    * @param signed if a {@link BitvectorFormula} is given as source, we additionally use this flag.
@@ -86,10 +120,10 @@ public interface FloatingPointFormulaManager {
   /**
    * Build a {@link FloatingPointFormula} from another compatible formula.
    *
-   * <p>Compatible formula types are all numeral types and bitvector types. It is also possible to
-   * cast a floating-point number into another floating-point type. We do not support casting from
-   * boolean or array types. We try to keep an exact representation, however fall back to rounding
-   * if needed.
+   * <p>Compatible formula types are all numeral types and (signed/unsigned) bitvector types. It is
+   * also possible to cast a floating-point number into another floating-point type. We do not
+   * support casting from boolean or array types. We try to keep an exact representation, however
+   * fall back to rounding if needed.
    *
    * @param source the source formula of compatible type
    * @param signed if a {@link BitvectorFormula} is given as source, we additionally use this flag.

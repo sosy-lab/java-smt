@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.z3;
 
+import com.google.common.collect.ImmutableMap;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -21,11 +22,11 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
   Z3TheoremProver(
       Z3FormulaCreator creator,
       Z3FormulaManager pMgr,
-      long z3params,
       Set<ProverOptions> pOptions,
+      ImmutableMap<String, Object> pSolverOptions,
       @Nullable PathCounterTemplate pLogfile,
       ShutdownNotifier pShutdownNotifier) {
-    super(creator, z3params, pMgr, pOptions, pLogfile, pShutdownNotifier);
+    super(creator, pMgr, pOptions, pSolverOptions, pLogfile, pShutdownNotifier);
   }
 
   @Override

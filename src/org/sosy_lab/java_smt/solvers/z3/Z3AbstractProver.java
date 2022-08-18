@@ -21,8 +21,10 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -52,9 +54,9 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   Z3AbstractProver(
       Z3FormulaCreator pCreator,
-      long z3params,
       Z3FormulaManager pMgr,
       Set<ProverOptions> pOptions,
+      ImmutableMap<String, Object> pSolverOptions,
       @Nullable PathCounterTemplate pLogfile,
       ShutdownNotifier pShutdownNotifier) {
     super(pOptions, pMgr.getBooleanFormulaManager(), pShutdownNotifier);
@@ -64,13 +66,39 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
     interruptListener = reason -> Native.solverInterrupt(z3context, z3solver);
     shutdownNotifier.register(interruptListener);
+    storedConstraints =
+        pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE) ? new HashMap<>() : null;
 
     logfile = pLogfile;
     mgr = pMgr;
     Native.solverIncRef(z3context, z3solver);
+
+    long z3params = Native.mkParams(z3context);
+    Native.paramsIncRef(z3context, z3params);
+    for (Entry<String, Object> entry : pSolverOptions.entrySet()) {
+      addParameter(z3params, entry.getKey(), entry.getValue());
+    }
     Native.solverSetParams(z3context, z3solver, z3params);
-    storedConstraints =
-        pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE) ? new HashMap<>() : null;
+    Native.paramsDecRef(z3context, z3params);
+  }
+
+  void addParameter(long z3params, String key, Object value) {
+    long keySymbol = Native.mkStringSymbol(z3context, key);
+    if (value instanceof Boolean) {
+      Native.paramsSetBool(z3context, z3params, keySymbol, (Boolean) value);
+    } else if (value instanceof Integer) {
+      Native.paramsSetUint(z3context, z3params, keySymbol, (Integer) value);
+    } else if (value instanceof Double) {
+      Native.paramsSetDouble(z3context, z3params, keySymbol, (Double) value);
+    } else if (value instanceof String) {
+      long valueSymbol = Native.mkStringSymbol(z3context, (String) value);
+      Native.paramsSetSymbol(z3context, z3params, keySymbol, valueSymbol);
+    } else {
+      throw new IllegalArgumentException(
+          String.format(
+              "unexpected type '%s' with value '%s' for parameter '%s'",
+              value.getClass(), value, key));
+    }
   }
 
   @Override
@@ -233,11 +261,15 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @Override
   public ImmutableMap<String, String> getStatistics() {
+    // Z3 sigsevs if you try to get statistics for closed environments
+    Preconditions.checkState(!closed);
+
     ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+    Set<String> seenKeys = new HashSet<>();
 
     final long stats = Native.solverGetStatistics(z3context, z3solver);
     for (int i = 0; i < Native.statsSize(z3context, stats); i++) {
-      String key = Native.statsGetKey(z3context, stats, i);
+      String key = getUnusedKey(seenKeys, Native.statsGetKey(z3context, stats, i));
       if (Native.statsIsUint(z3context, stats, i)) {
         builder.put(key, Integer.toString(Native.statsGetUintValue(z3context, stats, i)));
       } else if (Native.statsIsDouble(z3context, stats, i)) {
@@ -250,7 +282,24 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
       }
     }
 
-    return builder.build();
+    return builder.buildOrThrow();
+  }
+
+  /**
+   * In some cases, Z3 uses the same statistics key twice. In those cases, we append an index to the
+   * second usage.
+   */
+  private String getUnusedKey(Set<String> seenKeys, final String originalKey) {
+    if (seenKeys.add(originalKey)) {
+      return originalKey;
+    }
+    String key;
+    int index = 0;
+    do {
+      index++;
+      key = originalKey + " (" + index + ")";
+    } while (!seenKeys.add(key));
+    return key;
   }
 
   @Override

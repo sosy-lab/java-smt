@@ -85,7 +85,7 @@ public interface NumeralFormulaManager<
 
   BooleanFormula equal(ParamFormulaType number1, ParamFormulaType number2);
 
-  /** all given numbers are pairwise unequal. */
+  /** All given numbers are pairwise unequal. */
   BooleanFormula distinct(List<ParamFormulaType> pNumbers);
 
   BooleanFormula greaterThan(ParamFormulaType number1, ParamFormulaType number2);
@@ -100,7 +100,7 @@ public interface NumeralFormulaManager<
    * The {@code floor} operation returns the nearest integer formula that is less or equal to the
    * given argument formula.
    *
-   * <p>For rational formulae, SMTlib2 denotes this operation as {@code to_int}.
+   * <p>For rational formulas, SMTlib2 denotes this operation as {@code to_int}.
    */
   IntegerFormula floor(ParamFormulaType formula);
 }

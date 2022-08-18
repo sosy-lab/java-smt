@@ -355,9 +355,11 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
     // add an explicit cast from INT to RATIONAL if needed
     final List<Term> castedArgs = new ArrayList<>();
     for (int i = 0; i < args.size(); i++) {
+      // for chainable functions like EQ, DISTINCT, ADD, we repeat the last argument-type
+      int index = Math.min(i, declaration.getParameterSorts().length - 1);
       Term arg = args.get(i);
       Sort argSort = arg.getSort();
-      Sort paramSort = declaration.getParameterSorts()[i];
+      Sort paramSort = declaration.getParameterSorts()[index];
       if (getRationalType() == paramSort && getIntegerType() == argSort) {
         arg = environment.term("to_real", arg);
       }

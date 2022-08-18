@@ -46,7 +46,7 @@ there are scripts for publishing available at the root of the [Ivy Repository](h
 We prefer to use the official Z3 binaries,
 please build from source only if necessary (e.g., in case of an important bugfix).
 
-To publish Z3, download the **Ubuntu 16.04**, **Windows**, and **OSX** binary
+To publish Z3, download the **Ubuntu**, **Windows**, and **OSX** binary
 and the sources (for JavaDoc) for the [latest release](https://github.com/Z3Prover/z3/releases) and unzip them.
 In the unpacked sources directory, prepare Java sources via `python scripts/mk_make.py --java`.
 For simpler handling, we then copy the files from the three `bin` directories together into one directory,
@@ -145,12 +145,12 @@ and `$MATHSAT_VERSION` is the version number of MathSAT (all-in-one, runtime: le
 Concrete example (`$WD` is a working directory where all dependencies are located):
 ```
   ant publish-mathsat \
-      -Dmathsat.path=$WD/mathsat-5.6.4-linux-x86_64-reentrant \
+      -Dmathsat.path=$WD/mathsat-5.6.7-linux-x86_64-reentrant \
       -Dgmp.path=$WD/gmp-6.1.2 \
-      -Dmathsat-windows.path=$WD/mathsat-5.6.4-win64-msvc \
+      -Dmathsat-windows.path=$WD/mathsat-5.6.7-win64-msvc \
       -Dmpir-windows.path=$WD/mpir-2.7.2-win \
       -Djdk-windows.path=$WD/jdk-11 \
-      -Dmathsat.version=5.6.4-debug
+      -Dmathsat.version=5.6.7
 ```
 Finally follow the instructions shown in the message at the end.
 

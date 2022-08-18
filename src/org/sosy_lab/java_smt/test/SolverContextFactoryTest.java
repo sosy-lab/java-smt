@@ -19,6 +19,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
+import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -98,10 +99,28 @@ public class SolverContextFactoryTest {
         return;
       case Z3:
         assume.that(IS_LINUX || IS_WINDOWS || IS_MAC).isTrue();
+        if (IS_LINUX) {
+          assume.that(isSufficientVersionOfLibcxx()).isTrue();
+        }
         return;
       default:
         throw new AssertionError("unexpected solver: " + solverToUse());
     }
+  }
+
+  /**
+   * The official Z3 release does only run with GLIBCXX in version 3.4.26 or newer. This excludes
+   * Ubuntu 18.04.
+   */
+  private boolean isSufficientVersionOfLibcxx() {
+    try {
+      NativeLibraries.loadLibrary("z3");
+    } catch (UnsatisfiedLinkError e) {
+      if (e.getMessage().contains("version `GLIBCXX_3.4.26' not found")) {
+        return false;
+      }
+    }
+    return true;
   }
 
   @Before

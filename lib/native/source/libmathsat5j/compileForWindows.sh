@@ -58,7 +58,7 @@ SRC_FILES="org_sosy_1lab_java_1smt_solvers_mathsat5_Mathsat5NativeApi.c"
 
 # check requirements
 if [ ! -f "$MSAT_LIB_DIR/mathsat.dll" ]; then
-    echo "You need to specify the directory with the downloaded Mathsat on the command line!"
+    echo "You need to specify the directory with the downloaded MathSAT5 on the command line!"
     echo "Can not find $MSAT_LIB_DIR/mathsat.dll"
     exit 1
 fi

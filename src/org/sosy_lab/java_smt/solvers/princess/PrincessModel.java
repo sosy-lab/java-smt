@@ -26,6 +26,7 @@ import ap.types.Sort;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -129,6 +130,10 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
       }
     } else if (key instanceof IFunApp) {
       IFunApp cKey = (IFunApp) key;
+      if ("valueAlmostEverywhere".equals(cKey.fun().name())
+          && creator.getEnv().hasArrayType(Iterables.getOnlyElement(asJava(cKey.args())))) {
+        return ImmutableList.of();
+      }
       if (ExtArray.Select$.MODULE$.unapply(cKey.fun()).isDefined()) {
         return getAssignmentsFromArraySelect(value, cKey, pArrays);
       } else if (ExtArray.Store$.MODULE$.unapply(cKey.fun()).isDefined()) {

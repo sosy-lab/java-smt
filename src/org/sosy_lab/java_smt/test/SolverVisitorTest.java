@@ -268,10 +268,16 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     BitvectorFormula z = bvmgr.makeVariable(32, "z");
 
     checkKind(
-        fpmgr.castTo(x, FormulaType.getBitvectorTypeWithSize(32)),
+        fpmgr.castTo(x, true, FormulaType.getBitvectorTypeWithSize(32)),
         FunctionDeclarationKind.FP_CASTTO_SBV);
     checkKind(
-        fpmgr.castTo(x, FormulaType.getDoublePrecisionFloatingPointType()),
+        fpmgr.castTo(x, true, FormulaType.getDoublePrecisionFloatingPointType()),
+        FunctionDeclarationKind.FP_CASTTO_FP);
+    checkKind(
+        fpmgr.castTo(x, false, FormulaType.getBitvectorTypeWithSize(32)),
+        FunctionDeclarationKind.FP_CASTTO_UBV);
+    checkKind(
+        fpmgr.castTo(x, false, FormulaType.getDoublePrecisionFloatingPointType()),
         FunctionDeclarationKind.FP_CASTTO_FP);
     checkKind(fpmgr.isNaN(x), FunctionDeclarationKind.FP_IS_NAN);
     checkKind(fpmgr.isNegative(x), FunctionDeclarationKind.FP_IS_NEGATIVE);
@@ -865,6 +871,42 @@ public class SolverVisitorTest extends SolverBasedTest0 {
   }
 
   @Test
+  public void testTransformationInsideQuantifiersWithTrue()
+      throws SolverException, InterruptedException {
+    requireQuantifiers();
+    List<IntegerFormula> quantifiedVars = ImmutableList.of(imgr.makeVariable("x"));
+    BooleanFormula body = bmgr.makeTrue();
+    BooleanFormula f = qmgr.exists(quantifiedVars, body);
+    BooleanFormula transformed = qmgr.eliminateQuantifiers(f);
+    assertThat(mgr.extractVariablesAndUFs(transformed)).isEmpty();
+    assertThatFormula(transformed).isEquivalentTo(body);
+  }
+
+  @Test
+  public void testTransformationInsideQuantifiersWithFalse()
+      throws SolverException, InterruptedException {
+    requireQuantifiers();
+    List<IntegerFormula> quantifiedVars = ImmutableList.of(imgr.makeVariable("x"));
+    BooleanFormula body = bmgr.makeFalse();
+    BooleanFormula f = qmgr.exists(quantifiedVars, body);
+    BooleanFormula transformed = qmgr.eliminateQuantifiers(f);
+    assertThat(mgr.extractVariablesAndUFs(transformed)).isEmpty();
+    assertThatFormula(transformed).isEquivalentTo(body);
+  }
+
+  @Test
+  public void testTransformationInsideQuantifiersWithVariable()
+      throws SolverException, InterruptedException {
+    requireQuantifiers();
+    List<IntegerFormula> quantifiedVars = ImmutableList.of(imgr.makeVariable("x"));
+    BooleanFormula body = bmgr.makeVariable("b");
+    BooleanFormula f = qmgr.exists(quantifiedVars, body);
+    BooleanFormula transformed = qmgr.eliminateQuantifiers(f);
+    assertThat(mgr.extractVariablesAndUFs(transformed)).containsEntry("b", body);
+    assertThatFormula(transformed).isEquivalentTo(body);
+  }
+
+  @Test
   public void extractionTest1() {
     IntegerFormula v = imgr.makeVariable("v");
     BooleanFormula q = fmgr.declareAndCallUF("q", FormulaType.BooleanType, v);
@@ -893,6 +935,60 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     } else {
       assertThat(mapping2).hasSize(1);
       assertThat(mapping2).containsEntry("v", v);
+    }
+  }
+
+  private final FormulaVisitor<Formula> plainFunctionVisitor =
+      new DefaultFormulaVisitor<>() {
+
+        @Override
+        public Formula visitFunction(
+            Formula pF, List<Formula> args, FunctionDeclaration<?> pFunctionDeclaration) {
+          return fmgr.callUF(pFunctionDeclaration, args);
+        }
+
+        @Override
+        protected Formula visitDefault(Formula pF) {
+          return pF;
+        }
+      };
+
+  @Test
+  public void visitBooleanOperationWithMoreArgsTest() throws SolverException, InterruptedException {
+    BooleanFormula u = bmgr.makeVariable("u");
+    BooleanFormula v = bmgr.makeVariable("v");
+    BooleanFormula w = bmgr.makeVariable("w");
+    BooleanFormula fAnd = bmgr.and(u, v, w);
+    BooleanFormula fOr = bmgr.or(u, v, w);
+
+    Formula transformedAnd = mgr.visit(fAnd, plainFunctionVisitor);
+    assertThatFormula((BooleanFormula) transformedAnd).isEquisatisfiableTo(fAnd);
+
+    Formula transformedOr = mgr.visit(fOr, plainFunctionVisitor);
+    assertThatFormula((BooleanFormula) transformedOr).isEquisatisfiableTo(fOr);
+  }
+
+  @Test
+  public void visitArithmeticOperationWithMoreArgsTest()
+      throws SolverException, InterruptedException {
+    requireIntegers();
+    requireParser();
+
+    String abc =
+        "(declare-fun aa () Int) (declare-fun bb () Real)"
+            + "(declare-fun cc () Real) (declare-fun dd () Int)";
+    BooleanFormula sum = mgr.parse(abc + "(assert (= 0 (+ aa bb cc dd)))");
+    BooleanFormula equals = mgr.parse(abc + "(assert (= aa bb cc dd))");
+    BooleanFormula distinct = mgr.parse(abc + "(assert (distinct aa bb cc dd))");
+    BooleanFormula less = mgr.parse(abc + "(assert (< aa bb cc dd))");
+    BooleanFormula lessEquals = mgr.parse(abc + "(assert (<= aa bb cc dd))");
+    BooleanFormula greater = mgr.parse(abc + "(assert (> aa bb cc dd))");
+    BooleanFormula greaterEquals = mgr.parse(abc + "(assert (>= aa bb cc dd))");
+
+    for (BooleanFormula bf :
+        ImmutableList.of(sum, equals, distinct, less, lessEquals, greater, greaterEquals)) {
+      Formula transformed = mgr.visit(bf, plainFunctionVisitor);
+      assertThatFormula((BooleanFormula) transformed).isEquisatisfiableTo(bf);
     }
   }
 

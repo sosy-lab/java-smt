@@ -71,7 +71,7 @@ public class StatisticsSolverContext implements SolverContext {
     for (Map.Entry<String, Object> entry : getSolverStatistics().asMap().entrySet()) {
       builder.put(entry.getKey(), entry.getValue().toString());
     }
-    return builder.build();
+    return builder.buildOrThrow();
   }
 
   @Override

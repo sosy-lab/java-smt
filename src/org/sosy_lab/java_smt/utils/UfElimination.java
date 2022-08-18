@@ -182,7 +182,7 @@ public class UfElimination {
     }
 
     // Get rid of UFs.
-    ImmutableMap<Formula, Formula> substitutions = substitutionsBuilder.build();
+    ImmutableMap<Formula, Formula> substitutions = substitutionsBuilder.buildOrThrow();
     BooleanFormula formulaWithoutUFs = fmgr.substitute(f, substitutions);
 
     // substitute all UFs in the additional constraints,
@@ -194,7 +194,7 @@ public class UfElimination {
     Map<Formula, Formula> otherSubstitution =
         difference(pOtherResult.getSubstitution(), substitutions).entriesOnlyOnLeft();
     substitutionsBuilder.putAll(otherSubstitution);
-    ImmutableMap<Formula, Formula> allSubstitutions = substitutionsBuilder.build();
+    ImmutableMap<Formula, Formula> allSubstitutions = substitutionsBuilder.buildOrThrow();
     BooleanFormula constraints = bfmgr.and(extraConstraints);
     return new Result(
         formulaWithoutUFs, constraints, allSubstitutions, ImmutableListMultimap.copyOf(ufs));

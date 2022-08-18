@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2022 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -31,14 +31,14 @@ public interface BitvectorFormulaManager {
   BitvectorFormula makeBitvector(int length, BigInteger pI);
 
   /**
-   * Convert/Cast a numeral formula into a bitvector with given size.
+   * Convert/Cast/Interpret a numeral formula into a bitvector with given size.
    *
    * <p>If the numeral formula is too large for the given length, we cut off the largest bits and
-   * only use the smallest bits.
+   * only use the lest significant bits.
    */
   BitvectorFormula makeBitvector(int length, IntegerFormula pI);
 
-  /** Interpret a signed/unsigned bitvector formula as an integer formula. */
+  /** Convert/Cast/Interpret a signed/unsigned bitvector formula as an integer formula. */
   IntegerFormula toIntegerFormula(BitvectorFormula pI, boolean signed);
 
   /**
@@ -64,7 +64,8 @@ public interface BitvectorFormulaManager {
 
   /**
    * This method returns the negated number, i.e., it is multiplied by "-1". The given number is
-   * interpreted as signed bitvector.
+   * interpreted as signed bitvector and corresponds to "2^BITSIZE - number". The result has the
+   * same length as the given number.
    */
   BitvectorFormula negate(BitvectorFormula number);
 
@@ -163,15 +164,54 @@ public interface BitvectorFormulaManager {
 
   // ----------------- Numeric relations -----------------
 
+  /**
+   * This method returns the bit-wise equality of the given bitvectors.
+   *
+   * @param number1 a Formula
+   * @param number2 a Formula
+   * @return {@code number1 == number2}
+   */
   BooleanFormula equal(BitvectorFormula number1, BitvectorFormula number2);
 
+  /**
+   * Compare the given bitvectors.
+   *
+   * @param number1 a Formula
+   * @param number2 a Formula
+   * @param signed interpret the bitvectors as signed numbers instead of unsigned numbers
+   * @return {@code number1 > number2}
+   */
   BooleanFormula greaterThan(BitvectorFormula number1, BitvectorFormula number2, boolean signed);
 
+  /**
+   * Compare the given bitvectors.
+   *
+   * @param number1 a Formula
+   * @param number2 a Formula
+   * @param signed interpret the bitvectors as signed numbers instead of unsigned numbers
+   * @return {@code number1 >= number2}
+   */
   BooleanFormula greaterOrEquals(
       BitvectorFormula number1, BitvectorFormula number2, boolean signed);
 
+  /**
+   * Compare the given bitvectors.
+   *
+   * @param number1 a Formula
+   * @param number2 a Formula
+   * @param signed interpret the bitvectors as signed numbers instead of unsigned numbers
+   * @return {@code number1 < number2}
+   */
   BooleanFormula lessThan(BitvectorFormula number1, BitvectorFormula number2, boolean signed);
 
+  /**
+   * Compare the given bitvectors.
+   *
+   * @param number1 a Formula
+   * @param number2 a Formula
+   * @param signed interpret the bitvectors as signed numbers instead of unsigned numbers
+   * @return {@code number1 <= number2}
+   */
   BooleanFormula lessOrEquals(BitvectorFormula number1, BitvectorFormula number2, boolean signed);
 
   // Bitvector operations
@@ -212,33 +252,33 @@ public interface BitvectorFormulaManager {
   BitvectorFormula xor(BitvectorFormula bits1, BitvectorFormula bits2);
 
   /**
-   * This method returns a term representing the (arithmetic if signed is true) right shift of
-   * number by toShift. The result has the same length as the given number. On the left side, we
-   * fill up the most significant bits with ones, if the number is signed and negative, else with
+   * This method returns a term representing the right shift of number by toShift. The result has
+   * the same length as the given number. On the left side, we fill up the most significant bits
+   * with ones (i.e., arithmetic shift), if the number is signed and negative, else we fill up with
    * zeroes.
    */
   BitvectorFormula shiftRight(BitvectorFormula number, BitvectorFormula toShift, boolean signed);
 
   /**
-   * This method returns a term representing the (arithmetic if signed is true) left shift of number
-   * by toShift. The result has the same length as the given number. On the right side, we fill up
-   * the least significant bits with zeroes.
+   * This method returns a term representing the left shift of number by toShift. The result has the
+   * same length as the given number. On the right side, we fill up the least significant bits with
+   * zeroes.
    */
   BitvectorFormula shiftLeft(BitvectorFormula number, BitvectorFormula toShift);
 
-  /** This method returns the concatenation of two bitvectors. */
+  /** Concatenate two bitvectors. */
   BitvectorFormula concat(BitvectorFormula prefix, BitvectorFormula suffix);
 
   /**
-   * Extract a range of bits from a bitvector.
+   * Extract a range of bits from a bitvector. We require {@code 0 <= lsb <= msb < bitsize}.
    *
    * <p>If msb equals lsb, then a single bit will be returned, i.e., the bit from the given
    * position. If lsb equals 0 and msb equals bitsize-1, then the complete bitvector will be
    * returned.
    *
    * @param number from where the bits are extracted.
-   * @param msb Upper index. Must be in interval from lsb to bitsize-1.
-   * @param lsb Lower index. Must be in interval from 0 to msb.
+   * @param msb Upper index for the most significant bit. Must be in interval from lsb to bitsize-1.
+   * @param lsb Lower index for the least significant bit. Must be in interval from 0 to msb.
    */
   BitvectorFormula extract(BitvectorFormula number, int msb, int lsb);
 

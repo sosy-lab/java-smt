@@ -183,6 +183,6 @@ public class SolverStatistics {
         .put("number of String operations", getNumberOfStringOperations())
         .put("number of model evaluation queries", getNumberOfModelEvaluationQueries())
         .put("number of model listings", getNumberOfModelListings())
-        .build();
+        .buildOrThrow();
   }
 }

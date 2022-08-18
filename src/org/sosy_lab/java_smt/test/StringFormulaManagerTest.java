@@ -8,11 +8,13 @@
 
 package org.sosy_lab.java_smt.test;
 
+import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.collect.ImmutableList;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Map;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -22,6 +24,7 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -1548,5 +1551,44 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
   @Test
   public void testStringSimpleRegex() {
     // TODO
+  }
+
+  @Test
+  public void testVisitorForStringConstants() {
+    BooleanFormula eq =
+        bmgr.and(
+            smgr.equal(smgr.makeString("x"), smgr.makeString("xx")),
+            smgr.lessThan(smgr.makeString("y"), smgr.makeString("yy")));
+    Map<String, Formula> freeVars = mgr.extractVariables(eq);
+    assertThat(freeVars).isEmpty();
+    Map<String, Formula> freeVarsAndUfs = mgr.extractVariablesAndUFs(eq);
+    assertThat(freeVarsAndUfs).isEmpty();
+  }
+
+  @Test
+  public void testVisitorForRegexConstants() {
+    RegexFormula concat = smgr.concat(smgr.makeRegex("x"), smgr.makeRegex("xx"));
+    Map<String, Formula> freeVars = mgr.extractVariables(concat);
+    assertThat(freeVars).isEmpty();
+    Map<String, Formula> freeVarsAndUfs = mgr.extractVariablesAndUFs(concat);
+    assertThat(freeVarsAndUfs).isEmpty();
+  }
+
+  @Test
+  public void testVisitorForStringSymbols() {
+    BooleanFormula eq = smgr.equal(smgr.makeVariable("x"), smgr.makeString("xx"));
+    Map<String, Formula> freeVars = mgr.extractVariables(eq);
+    assertThat(freeVars).containsExactly("x", smgr.makeVariable("x"));
+    Map<String, Formula> freeVarsAndUfs = mgr.extractVariablesAndUFs(eq);
+    assertThat(freeVarsAndUfs).containsExactly("x", smgr.makeVariable("x"));
+  }
+
+  @Test
+  public void testVisitorForRegexSymbols() {
+    BooleanFormula in = smgr.in(smgr.makeVariable("x"), smgr.makeRegex("xx"));
+    Map<String, Formula> freeVars = mgr.extractVariables(in);
+    assertThat(freeVars).containsExactly("x", smgr.makeVariable("x"));
+    Map<String, Formula> freeVarsAndUfs = mgr.extractVariablesAndUFs(in);
+    assertThat(freeVarsAndUfs).containsExactly("x", smgr.makeVariable("x"));
   }
 }

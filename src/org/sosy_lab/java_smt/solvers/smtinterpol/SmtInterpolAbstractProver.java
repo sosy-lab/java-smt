@@ -197,7 +197,7 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
   public ImmutableMap<String, String> getStatistics() {
     ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
     SmtInterpolSolverContext.flatten(builder, "", env.getInfo(":all-statistics"));
-    return builder.build();
+    return builder.buildOrThrow();
   }
 
   @Override

@@ -314,9 +314,6 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
             IllegalArgumentException.class,
             () -> assertThatFormula(buildDivision(num10, num0, num10)).isSatisfiable());
         break;
-      case PRINCESS: // TODO bug?
-        assertThatFormula(buildDivision(num10, num0, num10)).isUnsatisfiable();
-        break;
       default:
         // division-by-zero results in an arbitrary result
         assertDivision(false, num0, num0, num0);
@@ -336,9 +333,6 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
         assertThrows(
             IllegalArgumentException.class,
             () -> assertThatFormula(buildModulo(num10, num0, num10)).isSatisfiable());
-        break;
-      case PRINCESS: // TODO bug?
-        assertThatFormula(buildModulo(num10, num0, num10)).isUnsatisfiable();
         break;
       case MATHSAT5: // modulo not supported
         assertThrows(UnsupportedOperationException.class, () -> buildModulo(num10, num0, num10));
@@ -436,12 +430,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     // positive numbers, signed.
     assertDivision(a, num5, true, b, aEq10, bEq2);
     assertDivision(a, num3, true, num3, aEq10);
-    if (solverToUse() == Solvers.PRINCESS) {
-      // TODO bug was reported, bugfix was promised with next release of Princess
-      assertThatFormula(buildDivision(a, numNeg3, true, numNeg3)).isUnsatisfiable();
-    } else {
-      assertDivision(a, numNeg3, true, numNeg3, aEq10);
-    }
+    assertDivision(a, numNeg3, true, numNeg3, aEq10);
     assertDivision(a, b, true, num5, aEq10, bEq2);
     assertModulo(a, num5, true, num0, aEq10);
     assertModulo(a, num3, true, num1, aEq10);
@@ -802,7 +791,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     switch (solver) {
       case MATHSAT5:
         // Mathsat5 has a different internal representation of the formula
-        assertThat(_b_at_i.toString()).isEqualTo("(`read_<BitVec, 64, >_<BitVec, 32, >` b i)");
+        assertThat(_b_at_i.toString()).isEqualTo("(`read_T(18)_T(20)` b i)");
         break;
       case BOOLECTOR:
         assume()
@@ -834,7 +823,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     switch (solver) {
       case MATHSAT5:
         assertThat(valueInMulti.toString())
-            .isEqualTo("(`read_int_rat` (`read_int_<Array, Int, Real, >` multi i) i)");
+            .isEqualTo("(`read_int_rat` (`read_int_T(17)` multi i) i)");
         break;
       default:
         assertThat(valueInMulti.toString()).isEqualTo("(select (select multi i) i)");
@@ -864,8 +853,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
     switch (solver) {
       case MATHSAT5:
-        String readWrite =
-            "(`read_int_<BitVec, 32, >` (`read_int_<Array, Int, <BitVec, 32, >, >` multi i) i)";
+        String readWrite = "(`read_int_T(18)` (`read_int_T(19)` multi i) i)";
         assertThat(valueInMulti.toString()).isEqualTo(readWrite);
         break;
       default:

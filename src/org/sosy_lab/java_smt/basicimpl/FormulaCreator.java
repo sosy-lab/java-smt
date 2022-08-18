@@ -437,15 +437,18 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
   public final <T extends Formula> T callFunction(
       FunctionDeclaration<T> declaration, List<? extends Formula> args) {
     checkArgument(
-        args.size() == declaration.getArgumentTypes().size(),
+        args.size() >= declaration.getArgumentTypes().size(),
         "function application '%s' requires %s arguments, but received %s arguments",
         declaration,
         declaration.getArgumentTypes().size(),
         args.size());
 
     for (int i = 0; i < args.size(); i++) {
+      // For chainable functions like EQ, DISTINCT, ADD, LESS, LESS_EQUAL, ..., with a variable
+      // number of arguments, we repeat the last argument-type several times.
+      int index = Math.min(i, declaration.getArgumentTypes().size() - 1);
       checkArgument(
-          isCompatible(getFormulaType(args.get(i)), declaration.getArgumentTypes().get(i)),
+          isCompatible(getFormulaType(args.get(i)), declaration.getArgumentTypes().get(index)),
           "function application '%s' requires argument types %s, but received argument types %s",
           declaration,
           declaration.getArgumentTypes(),
@@ -488,7 +491,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
 
   /**
    * Convert the formula into a Java object as far as possible, i.e., try to match a primitive or
-   * simple type like Boolean, BigInteger, or Rational.
+   * simple type like Boolean, BigInteger, Rational, or String.
    *
    * <p>If the formula is not a simple constant expression, we simply return <code>null</code>.
    *
@@ -504,7 +507,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
    * Convert the formula into a Java object as far as possible, i.e., try to match a primitive or
    * simple type.
    *
-   * @param pAdditionalF an additonal formula where the type can be received from.
+   * @param pAdditionalF an additional formula where the type can be received from.
    * @param pF the formula to be converted.
    */
   // only some solvers require the additional (first) parameter, other solvers ignore it.

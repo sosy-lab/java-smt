@@ -14,9 +14,9 @@ variables:
   # Version of https://gitlab.com/sosy-lab/software/refaster/ to use
   REFASTER_REPO_REVISION: 8b7f38e2afedf64b3cfa9592bbb8790b88f58352
   # Needs to be synchronized with Error Prone version in lib/ivy.xml
-  REFASTER_VERSION: 2.11.0
+  REFASTER_VERSION: 2.14.0
 
-build:jdk-14:
+build:jdk-17:
   variables:
     # https://github.com/google/error-prone/issues/1106
     ANT_PROPS_BUILD: "-Divy.disable=true -Derrorprone.disable=true"

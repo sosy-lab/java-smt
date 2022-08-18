@@ -9,12 +9,14 @@
 package org.sosy_lab.java_smt.solvers.z3;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Native.IntPtr;
 import com.microsoft.z3.Z3Exception;
 import com.microsoft.z3.enumerations.Z3_lbool;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
@@ -34,18 +36,29 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
   private final LogManager logger;
   private final long z3optSolver;
 
+  @SuppressWarnings("checkstyle:parameternumber")
   Z3OptimizationProver(
       Z3FormulaCreator creator,
       LogManager pLogger,
-      long z3params,
       Z3FormulaManager pMgr,
       Set<ProverOptions> pOptions,
+      ImmutableMap<String, Object> pSolverOptions,
+      ImmutableMap<String, String> pOptimizationOptions,
       @Nullable PathCounterTemplate pLogfile,
       ShutdownNotifier pShutdownNotifier) {
-    super(creator, z3params, pMgr, pOptions, pLogfile, pShutdownNotifier);
+    super(creator, pMgr, pOptions, pSolverOptions, pLogfile, pShutdownNotifier);
     z3optSolver = Native.mkOptimize(z3context);
     Native.optimizeIncRef(z3context, z3optSolver);
     logger = pLogger;
+
+    // set parameters for the optimization solver
+    long params = Native.mkParams(z3context);
+    Native.paramsIncRef(z3context, params);
+    for (Entry<String, String> entry : pOptimizationOptions.entrySet()) {
+      addParameter(params, entry.getKey(), entry.getValue());
+    }
+    Native.optimizeSetParams(z3context, z3optSolver, params);
+    Native.paramsDecRef(z3context, params);
   }
 
   @Override
@@ -176,14 +189,6 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
   @Override
   protected void assertContraint(long negatedModel) {
     Native.optimizeAssert(z3context, z3optSolver, negatedModel);
-  }
-
-  void setParam(String key, String value) {
-    long keySymbol = Native.mkStringSymbol(z3context, key);
-    long valueSymbol = Native.mkStringSymbol(z3context, value);
-    long params = Native.mkParams(z3context);
-    Native.paramsSetSymbol(z3context, params, keySymbol, valueSymbol);
-    Native.optimizeSetParams(z3context, z3optSolver, params);
   }
 
   @Override
