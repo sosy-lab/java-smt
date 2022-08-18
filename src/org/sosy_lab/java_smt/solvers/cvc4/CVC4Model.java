@@ -69,6 +69,7 @@ public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
     return builder.build().asList();
   }
 
+  // TODO this method is highly recursive and should be rewritten with a proper visitor
   private void recursiveAssignmentFinder(ImmutableSet.Builder<ValueAssignment> builder, Expr expr) {
     if (expr.isConst() || expr.isNull()) {
       // We don't care about consts.

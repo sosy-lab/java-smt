@@ -128,12 +128,10 @@ public class CVC5FloatingPointFormulaManager
   @Override
   protected Term makePlusInfinityImpl(FloatingPointType pType) {
     try {
-      // So this should be mkFloatingPointPosInf() but that does not exists, so i guess it was
-      // renamed.
       return solver.mkFloatingPointPosInf(pType.getExponentSize(), pType.getMantissaSize() + 1);
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
-          "You tried creating a invalid positive floating point infinity with exponent size "
+          "You tried creating a invalid positive floating point +infinity with exponent size "
               + pType.getExponentSize()
               + " and mantissa size "
               + pType.getMantissaSize()
@@ -145,12 +143,10 @@ public class CVC5FloatingPointFormulaManager
   @Override
   protected Term makeMinusInfinityImpl(FloatingPointType pType) {
     try {
-      // So this should be mkFloatingPointNegInf() but that does not exists, so i guess it was
-      // renamed.
       return solver.mkFloatingPointNegInf(pType.getExponentSize(), pType.getMantissaSize() + 1);
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
-          "You tried creating a invalid negative floating point infinity with exponent size "
+          "You tried creating a invalid negative floating point -infinity with exponent size "
               + pType.getExponentSize()
               + " and mantissa size "
               + pType.getMantissaSize()
@@ -388,6 +384,7 @@ public class CVC5FloatingPointFormulaManager
   protected Term toIeeeBitvectorImpl(Term pNumber) {
     // TODO possible work-around: use a tmp-variable "TMP" and add an
     // additional constraint "pNumer == fromIeeeBitvectorImpl(TMP)" for it in all use-cases.
+    // --> This has to be done on user-side, not in JavaSMT.
     throw new UnsupportedOperationException("FP to IEEE-BV is not supported");
   }
 

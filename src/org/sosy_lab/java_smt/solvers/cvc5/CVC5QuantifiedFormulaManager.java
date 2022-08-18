@@ -31,7 +31,7 @@ public class CVC5QuantifiedFormulaManager
 
   /*
    * (non-Javadoc) CVC4s quantifier support is dependent on the options used.
-   * Without any options it tends to run infenitly on many theories or examples.
+   * Without any options it tends to run infinitely on many theories or examples.
    * There are 2 options improving this: full-saturate-quant and sygus-inst.
    * full-saturate-quant is activated in JavaSMT per default.
    * You can try combinations of them, or just one if a query is not solveable.
@@ -45,22 +45,20 @@ public class CVC5QuantifiedFormulaManager
    * This applies to CVC4 and CVC5!
    */
   @Override
-  protected Term eliminateQuantifiers(Term pExtractInfo)
-      throws SolverException, InterruptedException {
-    Term eliminated = pExtractInfo;
+  protected Term eliminateQuantifiers(Term input) throws SolverException, InterruptedException {
     try {
-      eliminated = solver.getQuantifierElimination(pExtractInfo);
+      return solver.getQuantifierElimination(input);
     } catch (RuntimeException e) {
       // quantifier elimination failed, simply return the input
+      return input;
     }
-    return eliminated;
   }
 
   /*
-   * Makes the quantifier entered in CVC4. Note that CVC4 uses bound variables in quantified
-   * formulas instead of the normal free vars. We create a bound copy for every var and substitute
-   * the free var for the bound var in the body Formula. Note that CVC4 uses their internal Lists
-   * for the variable list in quantifiers.
+   * Makes the quantifier entered in CVC4/CVC5. Note that CVC4/CVC5 uses bound variables in
+   * quantified formulas instead of the normal free vars. We create a bound copy for every var
+   * and substitute the free var for the bound var in the body Formula. Note that CVC4/CVC5 uses
+   * their internal Lists for the variable list in quantifiers.
    */
   @Override
   public Term mkQuantifier(Quantifier pQ, List<Term> pVars, Term pBody) {

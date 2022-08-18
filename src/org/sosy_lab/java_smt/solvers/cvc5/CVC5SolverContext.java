@@ -36,26 +36,27 @@ public final class CVC5SolverContext extends AbstractSolverContext {
   private boolean closed = false;
 
   private CVC5SolverContext(
-      CVC5FormulaCreator creator,
+      CVC5FormulaCreator pCreator,
       CVC5FormulaManager manager,
       ShutdownNotifier pShutdownNotifier,
-      Solver solver,
+      Solver pSolver,
       int pRandomSeed) {
     super(manager);
-    this.creator = creator;
+    creator = pCreator;
     shutdownNotifier = pShutdownNotifier;
     randomSeed = pRandomSeed;
-    this.solver = solver;
+    solver = pSolver;
   }
 
   @VisibleForTesting
   static void loadLibrary(Consumer<String> pLoader) {
     pLoader.accept("cvc5jni");
-    // disable CVC5's own loading mechanism, see io.github.cvc5.Util#loadLibraries
+
+    // disable CVC5's own loading mechanism,
+    // see io.github.cvc5.Util#loadLibraries and https://github.com/cvc5/cvc5/pull/9047
     System.setProperty("cvc5.skipLibraryLoad", "true");
   }
 
-  // CVC5 loads itself when creating a solver
   @SuppressWarnings({"unused", "resource"})
   public static SolverContext create(
       LogManager pLogger,
@@ -66,9 +67,8 @@ public final class CVC5SolverContext extends AbstractSolverContext {
       Consumer<String> pLoader) {
 
     loadLibrary(pLoader);
+
     // Solver is the central class for creating expressions/terms/formulae.
-    // Also, creating a solver statically loads CVC5. We have to do it before CVC5 does it correctly
-    // though.
     Solver newSolver = new Solver();
 
     // set common options.
@@ -95,12 +95,9 @@ public final class CVC5SolverContext extends AbstractSolverContext {
         new CVC5RationalFormulaManager(pCreator, pNonLinearArithmetic);
     CVC5BitvectorFormulaManager bitvectorTheory =
         new CVC5BitvectorFormulaManager(pCreator, booleanTheory);
-
     CVC5FloatingPointFormulaManager fpTheory =
         new CVC5FloatingPointFormulaManager(pCreator, pFloatingPointRoundingMode);
-
     CVC5QuantifiedFormulaManager qfTheory = new CVC5QuantifiedFormulaManager(pCreator);
-
     CVC5ArrayFormulaManager arrayTheory = new CVC5ArrayFormulaManager(pCreator);
     CVC5SLFormulaManager slTheory = new CVC5SLFormulaManager(pCreator);
     CVC5StringFormulaManager strTheory = new CVC5StringFormulaManager(pCreator);

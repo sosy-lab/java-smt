@@ -13,6 +13,7 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
@@ -29,7 +30,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -198,7 +198,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
       return FormulaType.FloatingPointRoundingModeType;
     } else if (sort.isReal()) {
       // The theory REAL in CVC5 is the theory of (infinite precision!) real numbers.
-      // As such, the theory RATIONAL is contained in REAL. TODO: find a better solution.
+      // As such, the theory RATIONAL is contained in REAL.
       return FormulaType.RationalType;
     } else if (sort.isArray()) {
       FormulaType<?> indexType = getFormulaTypeFromTermType(sort.getArrayIndexSort());
@@ -309,7 +309,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
     }
     if (e.hasSymbol()) {
       return e.getSymbol();
-    } else if (repr.startsWith("(", 0)) {
+    } else if (repr.startsWith("(")) {
       // Some function
       // Functions are packaged like this: (functionName arg1 arg2 ...)
       // But can use |(name)| to enable () inside of the variable name
@@ -595,7 +595,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
   }
 
   @Override
-  public Term callFunctionImpl(Term pDeclaration, List<Term> pArgs) {
+  public Term callFunctionImpl(final Term pDeclaration, final List<Term> pArgs) {
     if (pArgs.isEmpty()) {
       // CVC5 does not allow argumentless functions! We use variables as a workaround.
       return pDeclaration;
@@ -607,16 +607,13 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
       } else {
         try {
           Kind kind = pDeclaration.getKind();
+          FluentIterable<Term> args = FluentIterable.from(pArgs);
           if (kind == Kind.CONSTANT) {
-            // This seems to be a uf application. Note: we need the declration of the UF as first
-            // argument!
-            Term[] args =
-                Stream.of(new Term[] {pDeclaration}, pArgs.toArray(new Term[0]))
-                    .flatMap(Stream::of)
-                    .toArray(Term[]::new);
-            return solver.mkTerm(Kind.APPLY_UF, args);
+            // For UF application, we need the declaration of the UF as first argument!
+            kind = Kind.APPLY_UF;
+            args = FluentIterable.of(pDeclaration).append(pArgs);
           }
-          return solver.mkTerm(kind, pArgs.toArray(Term[]::new));
+          return solver.mkTerm(kind, args.toArray(Term.class));
         } catch (CVC5ApiException e) {
           throw new RuntimeException(e);
         }
@@ -656,7 +653,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
               pArgTypes.get(i),
               exp.getChild(i).getSort());
         } catch (CVC5ApiException e) {
-          // Will never be triggered as we don't access beyond the num of children
+          throw new RuntimeException(e);
         }
       }
     }
@@ -693,7 +690,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
       } else if (valueType.isBitVector()) {
         // CVC5 puts 2 chars (#b) in front of the binary result String
         String valueString = solver.getValue(value).toString();
-        return new BigInteger(valueString.substring(2, valueString.length()), 2);
+        return new BigInteger(valueString.substring(2), 2);
 
       } else if (valueType.isFloatingPoint()) {
         return parseFloatingPoint(value);
@@ -715,6 +712,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
     }
   }
 
+  // TODO this method looks dangerous and might break easily. Replace with proper value access.
   private String transformString(String valueString) {
     // Some numbers have brackets around them
     // i.e. (- 12)

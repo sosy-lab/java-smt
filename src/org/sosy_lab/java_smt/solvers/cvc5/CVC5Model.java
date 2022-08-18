@@ -61,7 +61,7 @@ public class CVC5Model extends CachingAbstractModel<Term, Sort, Solver> {
     return builder.build().asList();
   }
 
-  @SuppressWarnings("unused")
+  // TODO this method is highly recursive and should be rewritten with a proper visitor
   private void recursiveAssignmentFinder(ImmutableSet.Builder<ValueAssignment> builder, Term expr) {
     try {
       Sort sort = expr.getSort();
@@ -99,7 +99,7 @@ public class CVC5Model extends CachingAbstractModel<Term, Sort, Solver> {
         }
       }
     } catch (CVC5ApiException e) {
-      // Fallthrough, do nothing
+      throw new RuntimeException(e);
     }
   }
 
@@ -123,7 +123,7 @@ public class CVC5Model extends CachingAbstractModel<Term, Sort, Solver> {
           argumentInterpretationBuilder.add(evaluateImpl(child));
         }
       } catch (CVC5ApiException e) {
-        // Never triggers because its a out of range exception
+        throw new RuntimeException(e);
       }
     }
 
@@ -170,7 +170,7 @@ public class CVC5Model extends CachingAbstractModel<Term, Sort, Solver> {
       try {
         argumentInterpretationBuilder.add(evaluateImpl(pKeyTerm.getChild(i)));
       } catch (CVC5ApiException e) {
-        // This should never trigger
+        throw new RuntimeException(e);
       }
     }
 

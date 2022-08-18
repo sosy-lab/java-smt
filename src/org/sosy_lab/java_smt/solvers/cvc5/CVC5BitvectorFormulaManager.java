@@ -97,9 +97,8 @@ public class CVC5BitvectorFormulaManager
 
   @Override
   protected Term makeVariableImpl(int length, String varName) {
-    Sort type;
     try {
-      type = solver.mkBitVectorSort(length);
+      Sort type = solver.mkBitVectorSort(length);
       return getFormulaCreator().makeVariable(type, varName);
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(

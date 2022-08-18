@@ -6,5 +6,5 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-/** Interface to the SMT solver CVC5 (based on CVC5s own Java bindings). */
+/** Interface to the SMT solver CVC5 (based on CVC5's Java bindings). */
 package org.sosy_lab.java_smt.solvers.cvc5;
