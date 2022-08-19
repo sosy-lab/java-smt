@@ -12,7 +12,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import io.github.cvc5.Solver;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.log.LogManager;
@@ -29,10 +28,9 @@ public final class CVC5SolverContext extends AbstractSolverContext {
 
   // creator is final, except after closing, then null.
   private CVC5FormulaCreator creator;
-  private Solver solver;
+  private final Solver solver;
   private final ShutdownNotifier shutdownNotifier;
   private final int randomSeed;
-  private final AtomicBoolean isAnyStackAlive = new AtomicBoolean(false);
   private boolean closed = false;
 
   private CVC5SolverContext(
@@ -68,21 +66,11 @@ public final class CVC5SolverContext extends AbstractSolverContext {
 
     loadLibrary(pLoader);
 
-    // Solver is the central class for creating expressions/terms/formulae.
+    // This Solver is the central class for creating expressions/terms/formulae.
+    // We keep this instance available until the whole context is closed.
     Solver newSolver = new Solver();
 
-    // set common options.
-    newSolver.setOption("seed", String.valueOf(randomSeed));
-    newSolver.setOption("produce-models", "true");
-    newSolver.setOption("finite-model-find", "true");
-    newSolver.setOption("sets-ext", "true");
-    newSolver.setOption("output-language", "smtlib2");
-    // Set Strings option to enable all String features (such as lessOrEquals)
-    newSolver.setOption("strings-exp", "true");
-    newSolver.setOption("produce-unsat-cores", "true");
-    // Neither simplification, arith-rewrite-equalities, pb-rewrites provide rewrites of trivial
-    // formulas only
-    // Note: with solver.getOptionNames() you can get all options
+    setSolverOptions(newSolver, randomSeed);
 
     CVC5FormulaCreator pCreator = new CVC5FormulaCreator(newSolver);
 
@@ -118,6 +106,26 @@ public final class CVC5SolverContext extends AbstractSolverContext {
     return new CVC5SolverContext(pCreator, manager, pShutdownNotifier, newSolver, randomSeed);
   }
 
+  /** Set common options for a CVC5 solver. */
+  private static void setSolverOptions(Solver pSolver, int randomSeed) {
+    pSolver.setOption("seed", String.valueOf(randomSeed));
+    pSolver.setOption("output-language", "smtlib2");
+
+    // Set Strings option to enable all String features (such as lessOrEquals).
+    // This should not have any effect for non-string theories.
+    // pSolver.setOption("strings-exp", "true");
+
+    // pSolver.setOption("finite-model-find", "true");
+    // pSolver.setOption("sets-ext", "true");
+
+    // pSolver.setOption("produce-models", "true");
+    // pSolver.setOption("produce-unsat-cores", "true");
+
+    // Neither simplification, arith-rewrite-equalities, pb-rewrites provide rewrites of trivial
+    // formulas only.
+    // Note: with solver.getOptionNames() you can get all options
+  }
+
   @Override
   public String getVersion() {
     // TODO: This is incorrect. Maybe there is no version info.
@@ -146,9 +154,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
         shutdownNotifier,
         randomSeed,
         pOptions,
-        getFormulaManager().getBooleanFormulaManager(),
-        solver,
-        isAnyStackAlive);
+        getFormulaManager().getBooleanFormulaManager());
   }
 
   @Override

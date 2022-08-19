@@ -23,7 +23,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -33,14 +32,7 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 
-/*
- * TODO: import/export of expressions is currently not supported, hence we need to use 1 solver
- * (context) for everything! They are working on it. See CVC5 github discussion.
- */
 public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
-
-  /** CVC5 does not support multiple solver stacks. */
-  private final AtomicBoolean isAnyStackAlive;
 
   protected final CVC5FormulaCreator creator;
   protected final Solver solver;
@@ -69,32 +61,22 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
       ShutdownNotifier pShutdownNotifier,
       @SuppressWarnings("unused") int randomSeed,
       Set<ProverOptions> pOptions,
-      BooleanFormulaManager pBmgr,
-      Solver pSolver,
-      AtomicBoolean pIsAnyStackAlive) {
+      BooleanFormulaManager pBmgr) {
     super(pOptions, pBmgr, pShutdownNotifier);
 
-    isAnyStackAlive = pIsAnyStackAlive;
-    // avoid dual stack usage
-    Preconditions.checkState(
-        !isAnyStackAlive.getAndSet(true),
-        "CVC5 does not support the usage of multiple "
-            + "solver stacks at the same time. Please close any existing solver stack.");
-
     creator = pFormulaCreator;
-    solver = pSolver;
     incremental = !enableSL;
     assertedFormulas.push(new ArrayList<>()); // create initial level
 
-    // We would set some of these options twice now as we only use 1 solver at all times (per
-    // context)
-    // setOptions(randomSeed, pOptions);
+    solver = new Solver();
+
+    setSolverOptions(randomSeed, pOptions);
   }
 
-  // Keep this until we have more solvers
-  @SuppressWarnings("unused")
-  private void setOptions(int randomSeed, Set<ProverOptions> pOptions) {
-    solver.setOption("incremental", "true");
+  private void setSolverOptions(int randomSeed, Set<ProverOptions> pOptions) {
+    if (incremental) {
+      solver.setOption("incremental", "true");
+    }
     if (pOptions.contains(ProverOptions.GENERATE_MODELS)) {
       solver.setOption("produce-models", "true");
     }
@@ -104,16 +86,13 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     solver.setOption("produce-assertions", "true");
     solver.setOption("dump-models", "true");
     solver.setOption("output-language", "smt2");
-    solver.setOption("random-seed", String.valueOf(randomSeed));
+    solver.setOption("seed", String.valueOf(randomSeed));
+
     // Set Strings option to enable all String features (such as lessOrEquals)
     solver.setOption("strings-exp", "true");
-    // Enable more complete quantifier solving (for more information see
-    // CVC5QuantifiedFormulaManager)
-    solver.setOption("full-saturate-quant", "true");
-  }
 
-  protected void setOptionForIncremental() {
-    solver.setOption("incremental", "true");
+    // Enable more complete quantifier solving (for more info see CVC5QuantifiedFormulaManager)
+    solver.setOption("full-saturate-quant", "true");
   }
 
   @Override
@@ -274,12 +253,8 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     if (!closed) {
       closeAllModels();
       assertedFormulas.clear();
-      solver.resetAssertions();
-      // Don't close the solver here, currently we use one solver instance for all stacks + the
-      // context!
-      // TODO: revisit once the devs enable formula translation.
+      solver.close();
       closed = true;
-      Preconditions.checkState(isAnyStackAlive.getAndSet(false));
     }
   }
 

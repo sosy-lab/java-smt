@@ -34,7 +34,7 @@ public class CVC5Model extends CachingAbstractModel<Term, Sort, Solver> {
       CVC5FormulaCreator pCreator,
       Collection<Term> pAssertedExpressions) {
     super(pCreator);
-    solver = creator.getEnv();
+    solver = pProver.solver;
     prover = pProver;
     assertedExpressions = ImmutableList.copyOf(pAssertedExpressions);
 

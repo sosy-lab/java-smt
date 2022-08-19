@@ -8,19 +8,13 @@
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
-import io.github.cvc5.Solver;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 
-/*
- * TODO: import/export of expressions is currently not supported, hence we need to use 1 solver
- * (context) for everything! They are working on it. See CVC5 github discussion.
- */
 class CVC5TheoremProver extends CVC5AbstractProver<Void>
     implements ProverEnvironment, BasicProverEnvironment<Void> {
 
@@ -29,10 +23,7 @@ class CVC5TheoremProver extends CVC5AbstractProver<Void>
       ShutdownNotifier pShutdownNotifier,
       @SuppressWarnings("unused") int randomSeed,
       Set<ProverOptions> pOptions,
-      BooleanFormulaManager pBmgr,
-      Solver pSolver,
-      AtomicBoolean pIsAnyStackAlive) {
-    super(
-        pFormulaCreator, pShutdownNotifier, randomSeed, pOptions, pBmgr, pSolver, pIsAnyStackAlive);
+      BooleanFormulaManager pBmgr) {
+    super(pFormulaCreator, pShutdownNotifier, randomSeed, pOptions, pBmgr);
   }
 }

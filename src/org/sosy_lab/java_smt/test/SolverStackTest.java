@@ -76,7 +76,7 @@ public class SolverStackTest extends SolverBasedTest0 {
     assume()
         .withMessage("Solver does not support multiple stacks yet")
         .that(solver)
-        .isNoneOf(Solvers.BOOLECTOR, Solvers.CVC5);
+        .isNotEqualTo(Solvers.BOOLECTOR);
   }
 
   protected final void requireUfValuesInModel() {

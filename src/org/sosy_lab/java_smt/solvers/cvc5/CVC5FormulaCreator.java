@@ -24,6 +24,7 @@ import io.github.cvc5.Pair;
 import io.github.cvc5.Solver;
 import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
+import io.github.cvc5.Triplet;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -669,7 +670,6 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
 
   @Override
   public Object convertValue(Term expForType, Term value) {
-    // Make sure that
     final Sort type = expForType.getSort();
     final Sort valueType = value.getSort();
 
@@ -681,77 +681,53 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
         // CVC5 does not allow model values for bound vars; just return the name
         return value.getSymbol();
 
-      } else if (valueType.isInteger() && type.isInteger()) {
-        String valueString = solver.getValue(value).toString();
-        return new BigInteger(transformString(valueString));
+      } else if (value.isIntegerValue()) {
+        return value.getIntegerValue();
 
-      } else if (valueType.isReal() && type.isReal()) {
-        String valueString = transformString(solver.getValue(value).toString());
-        if (valueString.contains(".")) {
-          BigDecimal rat = new BigDecimal(transformString(valueString));
-          return Rational.ofBigDecimal(rat.stripTrailingZeros());
-        } else {
-          return Rational.of(valueString);
-        }
+      } else if (value.isRealValue()) {
+        Pair<BigInteger, BigInteger> realValue = value.getRealValue();
+        return Rational.of(realValue.first, realValue.second);
 
-      } else if (valueType.isBitVector()) {
+      } else if (value.isBitVectorValue()) {
+        String bitvectorValue = value.getBitVectorValue();
         // CVC5 puts 2 chars (#b) in front of the binary result String
-        String valueString = solver.getValue(value).toString();
-        return new BigInteger(valueString.substring(2), 2);
+        return new BigInteger(bitvectorValue.substring(2), 2);
 
-      } else if (valueType.isFloatingPoint()) {
-        return parseFloatingPoint(value);
+      } else if (value.isFloatingPointNaN()) {
+        return Float.NaN;
 
-      } else if (type.equals(solver.getBooleanSort())) {
-        return solver.getValue(value).equals(solver.mkTrue());
+      } else if (value.isFloatingPointNegInf()) {
+        return Float.NEGATIVE_INFINITY;
+
+      } else if (value.isFloatingPointPosInf()) {
+        return Float.POSITIVE_INFINITY;
+
+      } else if (value.isFloatingPointPosZero()) {
+        return BigDecimal.ZERO;
+
+      } else if (value.isFloatingPointValue()) {
+        // Negative zero falls under this category
+        // String valueString =
+        // solver.getValue(solver.mkTerm(Kind.FLOATINGPOINT_TO_REAL, fpTerm)).toString();
+        // return new BigDecimal(valueString).stripTrailingZeros();
+        Triplet<Long, Long, Term> fpValue = value.getFloatingPointValue();
+        // TODO
+        throw new AssertionError("this needs to be implemented: FP " + fpValue);
+
+      } else if (value.isBooleanValue()) {
+        return value.getBooleanValue();
 
       } else if (value.isStringValue()) {
         return value.getStringValue();
 
       } else {
         // String serialization for Strings and unknown terms.
-        return solver.getValue(value).toString();
+        return value.toString();
       }
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
           "Failure trying to convert CVC5 " + valueType + " variable into a " + type + " value.",
           e);
     }
-  }
-
-  // TODO this method looks dangerous and might break easily. Replace with proper value access.
-  private String transformString(String valueString) {
-    // Some numbers have brackets around them
-    // i.e. (- 12)
-    if (valueString.contains("(")) {
-      valueString = valueString.replace("(", "");
-      valueString = valueString.replace(")", "");
-    }
-    // Minus may have a space in between the minus and the num
-    if (valueString.contains("- ")) {
-      valueString = valueString.replace("- ", "-");
-    }
-    // Fractions are written in prefix notation and need to be transformed
-    if (valueString.contains("/ ")) {
-      valueString = valueString.replace("/ ", "");
-      valueString = valueString.replace(" ", "/");
-    }
-    return valueString;
-  }
-
-  private Object parseFloatingPoint(Term fpTerm) {
-    if (fpTerm.isFloatingPointNaN()) {
-      return Float.NaN;
-    } else if (fpTerm.isFloatingPointNegInf()) {
-      return Float.NEGATIVE_INFINITY;
-    } else if (fpTerm.isFloatingPointPosInf()) {
-      return Float.POSITIVE_INFINITY;
-    } else if (fpTerm.isFloatingPointPosZero()) {
-      return BigDecimal.ZERO;
-    }
-    // Negative zero falls under this category
-    String valueString =
-        solver.getValue(solver.mkTerm(Kind.FLOATINGPOINT_TO_REAL, fpTerm)).toString();
-    return new BigDecimal(valueString).stripTrailingZeros();
   }
 }
