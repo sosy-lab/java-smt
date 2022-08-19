@@ -99,7 +99,7 @@ public class CVC5Model extends CachingAbstractModel<Term, Sort, Solver> {
         }
       }
     } catch (CVC5ApiException e) {
-      throw new RuntimeException(e);
+      throw new IllegalArgumentException("Failure visiting the Term '" + expr + "'.", e);
     }
   }
 
@@ -123,7 +123,7 @@ public class CVC5Model extends CachingAbstractModel<Term, Sort, Solver> {
           argumentInterpretationBuilder.add(evaluateImpl(child));
         }
       } catch (CVC5ApiException e) {
-        throw new RuntimeException(e);
+        throw new IllegalArgumentException("Failure visiting the Term '" + pKeyTerm + "'.", e);
       }
     }
 
@@ -148,7 +148,6 @@ public class CVC5Model extends CachingAbstractModel<Term, Sort, Solver> {
       try {
         valueTerm = solver.getValue(pKeyTerm.getChild(0)).getChild(1);
       } catch (CVC5ApiException e) {
-        // This should never happen
         throw new IndexOutOfBoundsException(
             "Accessed a non existing UF value while creating a CVC5 model.");
       }
@@ -170,7 +169,8 @@ public class CVC5Model extends CachingAbstractModel<Term, Sort, Solver> {
       try {
         argumentInterpretationBuilder.add(evaluateImpl(pKeyTerm.getChild(i)));
       } catch (CVC5ApiException e) {
-        throw new RuntimeException(e);
+        throw new IndexOutOfBoundsException(
+            "Accessed a non existing UF value while creating a CVC5 model.");
       }
     }
 

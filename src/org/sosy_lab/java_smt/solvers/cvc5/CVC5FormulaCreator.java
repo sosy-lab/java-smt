@@ -429,8 +429,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
         }
       }
     } catch (CVC5ApiException e) {
-      throw new IllegalArgumentException(
-          "Failure visiting the Term " + f + ". " + e.getMessage(), e);
+      throw new IllegalArgumentException("Failure visiting the Term '" + f + "'.", e);
     }
   }
 
@@ -566,7 +565,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
 
       return KIND_MAPPING.getOrDefault(kind, FunctionDeclarationKind.OTHER);
     } catch (CVC5ApiException e) {
-      throw new IllegalArgumentException("Failure trying to get the KIND of Term " + f + ".", e);
+      throw new IllegalArgumentException("Failure trying to get the KIND of Term '" + f + "'.", e);
     }
   }
 
@@ -615,7 +614,14 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
           }
           return solver.mkTerm(kind, args.toArray(Term.class));
         } catch (CVC5ApiException e) {
-          throw new RuntimeException(e);
+          throw new IllegalArgumentException(
+              "Failure when building the UF '"
+                  + pDeclaration
+                  + "'"
+                  + " with arguments '"
+                  + pArgs
+                  + "'.",
+              e);
         }
       }
     }
@@ -653,7 +659,8 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
               pArgTypes.get(i),
               exp.getChild(i).getSort());
         } catch (CVC5ApiException e) {
-          throw new RuntimeException(e);
+          throw new IllegalArgumentException(
+              "Failure visiting the Term '" + exp + "' at index " + i + ".", e);
         }
       }
     }
