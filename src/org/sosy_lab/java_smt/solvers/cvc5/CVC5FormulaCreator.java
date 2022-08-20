@@ -13,7 +13,6 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
-import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
@@ -31,6 +30,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -501,6 +502,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
           .put(Kind.BITVECTOR_ZERO_EXTEND, FunctionDeclarationKind.BV_ZERO_EXTENSION)
           // Floating-point theory
           .put(Kind.TO_INTEGER, FunctionDeclarationKind.FLOOR)
+          .put(Kind.TO_REAL, FunctionDeclarationKind.TO_REAL)
           .put(Kind.FLOATINGPOINT_TO_SBV, FunctionDeclarationKind.FP_CASTTO_SBV)
           .put(Kind.FLOATINGPOINT_TO_UBV, FunctionDeclarationKind.FP_CASTTO_UBV)
           .put(Kind.FLOATINGPOINT_TO_FP_FROM_FP, FunctionDeclarationKind.FP_CASTTO_FP)
@@ -603,17 +605,18 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
 
       if (pDeclaration.hasOp()) {
         Op op = pDeclaration.getOp();
-        return solver.mkTerm(op, pArgs.toArray(new Term[0]));
+        return solver.mkTerm(op, pArgs.toArray(new Term[] {}));
       } else {
         try {
+          Sort[] paramSorts = pDeclaration.getSort().getFunctionDomainSorts();
+          List<Term> args = castToParamTypeIfRequired(pArgs, paramSorts);
           Kind kind = pDeclaration.getKind();
-          FluentIterable<Term> args = FluentIterable.from(pArgs);
           if (kind == Kind.CONSTANT) {
             // For UF application, we need the declaration of the UF as first argument!
             kind = Kind.APPLY_UF;
-            args = FluentIterable.of(pDeclaration).append(pArgs);
+            args.add(0, pDeclaration);
           }
-          return solver.mkTerm(kind, args.toArray(Term.class));
+          return solver.mkTerm(kind, args.toArray(new Term[] {}));
         } catch (CVC5ApiException e) {
           throw new IllegalArgumentException(
               "Failure when building the UF '"
@@ -626,6 +629,31 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
         }
       }
     }
+  }
+
+  /**
+   * CVC5 does not allow subtyping for INT and REAL/RATIONAL, but requires a cast. This method
+   * inserts a cast, if required by the parameter type.
+   *
+   * @param pArgs input arguments to be casted.
+   * @param pParamSorts target type for all arguments.
+   * @return a list of potentially casted arguments.
+   */
+  @Nonnull
+  private List<Term> castToParamTypeIfRequired(List<Term> pArgs, Sort[] pParamSorts) {
+    final List<Term> args = new ArrayList<>();
+    for (int i = 0; i < pArgs.size(); i++) {
+      args.add(
+          castToParamTypeIfRequired(pArgs.get(i), pParamSorts.length > i ? pParamSorts[i] : null));
+    }
+    return args;
+  }
+
+  private Term castToParamTypeIfRequired(Term input, @Nullable Sort targetSort) {
+    if (input.getSort().isInteger() && targetSort.isReal()) {
+      return solver.mkTerm(Kind.TO_REAL, input);
+    }
+    return input;
   }
 
   @Override
