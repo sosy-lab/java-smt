@@ -319,11 +319,6 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testStringCompare() throws SolverException, InterruptedException {
-    assume()
-        .withMessage("Solver %s runs endlessly on this task.", solverToUse())
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.CVC5);
-
     StringFormula var1 = smgr.makeVariable("0");
     StringFormula var2 = smgr.makeVariable("1");
     assertThatFormula(bmgr.and(smgr.lessOrEquals(var1, var2), smgr.greaterOrEquals(var1, var2)))
