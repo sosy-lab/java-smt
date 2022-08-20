@@ -690,8 +690,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
 
       } else if (value.isBitVectorValue()) {
         String bitvectorValue = value.getBitVectorValue();
-        // CVC5 puts 2 chars (#b) in front of the binary result String
-        return new BigInteger(bitvectorValue.substring(2), 2);
+        return new BigInteger(bitvectorValue, 2);
 
       } else if (value.isFloatingPointNaN()) {
         return Float.NaN;
@@ -710,10 +709,21 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
         // String valueString =
         // solver.getValue(solver.mkTerm(Kind.FLOATINGPOINT_TO_REAL, fpTerm)).toString();
         // return new BigDecimal(valueString).stripTrailingZeros();
-        Triplet<Long, Long, Term> fpValue = value.getFloatingPointValue();
-        // TODO
-        throw new AssertionError("this needs to be implemented: FP " + fpValue);
+        final Triplet<Long, Long, Term> fpValue = value.getFloatingPointValue();
+        final long expWidth = fpValue.first;
+        final long mantWidth = fpValue.second - 1; // CVC5 also counts the sign-bit in the mantissa
+        final Term bvValue = fpValue.third;
+        Preconditions.checkState(bvValue.isBitVectorValue());
+        BigInteger bits = new BigInteger(bvValue.getBitVectorValue(), 2);
 
+        if (expWidth == 11 && mantWidth == 52) { // standard IEEE double type with 64 bits
+          return Double.longBitsToDouble(bits.longValue());
+        } else if (expWidth == 8 && mantWidth == 23) { // standard IEEE float type with 32 bits
+          return Float.intBitsToFloat(bits.intValue());
+        } else {
+          // TODO to be fully correct, we would need to interpret the BV as FP or Rational
+          return value.toString(); // returns a BV representation of the FP
+        }
       } else if (value.isBooleanValue()) {
         return value.getBooleanValue();
 
@@ -726,7 +736,9 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
       }
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
-          "Failure trying to convert CVC5 " + valueType + " variable into a " + type + " value.",
+          String.format(
+              "Failure trying to convert constant %s with type %s to type %s.",
+              value, valueType, type),
           e);
     }
   }
