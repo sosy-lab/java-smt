@@ -31,8 +31,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -644,7 +643,6 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
    * @param pParamSorts target type for all arguments.
    * @return a list of potentially casted arguments.
    */
-  @Nonnull
   private List<Term> castToParamTypeIfRequired(List<Term> pArgs, Sort[] pParamSorts) {
     final List<Term> args = new ArrayList<>();
     for (int i = 0; i < pArgs.size(); i++) {
