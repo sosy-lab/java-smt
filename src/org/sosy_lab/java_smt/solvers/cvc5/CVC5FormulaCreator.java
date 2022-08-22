@@ -15,6 +15,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import io.github.cvc5.CVC5ApiException;
 import io.github.cvc5.Kind;
@@ -60,6 +61,9 @@ import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5StringFormula;
 
 public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term> {
 
+  /** CVC5 does not allow using some key-functions from SMTLIB2 as identifiers. */
+  private static final ImmutableSet<String> UNSUPPORTED_IDENTIFIERS = ImmutableSet.of("let");
+
   // private static final Pattern FLOATING_POINT_PATTERN = Pattern.compile("^\\(fp #b(?<sign>\\d)
   // #b(?<exp>\\d+) #b(?<mant>\\d+)$");
 
@@ -80,6 +84,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
 
   @Override
   public Term makeVariable(Sort sort, String name) {
+    checkSymbol(name);
     Term exp = variablesCache.computeIfAbsent(name, n -> solver.mkConst(sort, name));
     Preconditions.checkArgument(
         sort.equals(exp.getSort()),
@@ -656,8 +661,23 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
     return input;
   }
 
+  /**
+   * Check that the symbol does not contain characters that CVC5 interpretes as SMTLIB2 commands.
+   *
+   * @param symbol the symbol to check
+   * @throws IllegalArgumentException if symbol can not be used with CVC5.
+   */
+  private void checkSymbol(String symbol) {
+    checkArgument(
+        !UNSUPPORTED_IDENTIFIERS.contains(symbol),
+        "CVC5 does not support %s as identifier.",
+        symbol);
+  }
+
   @Override
   public Term declareUFImpl(String pName, Sort pReturnType, List<Sort> pArgTypes) {
+    checkSymbol(pName);
+
     Term exp = functionsCache.get(pName);
 
     if (exp == null) {

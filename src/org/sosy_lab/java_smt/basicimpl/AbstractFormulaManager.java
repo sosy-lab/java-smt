@@ -75,7 +75,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    */
   @VisibleForTesting
   public static final ImmutableSet<String> SMTLIB2_KEYWORDS =
-      ImmutableSet.of("true", "false", "and", "or", "select", "store", "xor", "distinct");
+      ImmutableSet.of("true", "false", "and", "or", "select", "store", "xor", "distinct", "let");
 
   /**
    * Avoid using escape characters of SMT-LIB2 as part of names for symbols.
