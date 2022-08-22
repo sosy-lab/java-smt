@@ -710,7 +710,11 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
         return value.getSymbol();
 
       } else if (value.isIntegerValue()) {
-        return value.getIntegerValue();
+        if (type.isReal()) { // real-based integers like "12.0" are returned as Rationals.
+          return Rational.ofBigInteger(value.getIntegerValue());
+        } else {
+          return value.getIntegerValue();
+        }
 
       } else if (value.isRealValue()) {
         Pair<BigInteger, BigInteger> realValue = value.getRealValue();
