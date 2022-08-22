@@ -661,17 +661,14 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
     Term exp = functionsCache.get(pName);
 
     if (exp == null) {
-      if (pArgTypes.isEmpty()) {
-        // Ufs in CVC5 can't have 0 arity. I tried an empty array and nullsort.
-        // We just use a variable as a workaround
-        exp = solver.mkConst(pReturnType, pName);
-      } else {
-        Sort[] argSorts = pArgTypes.toArray(new Sort[0]);
-        // array of argument types and the return type
-        Sort ufToReturnType = solver.mkFunctionSort(argSorts, pReturnType);
-        exp = solver.mkConst(ufToReturnType, pName);
-      }
+      // Ufs in CVC5 can't have 0 arity. We just use a variable as a workaround.
+      Sort sort =
+          pArgTypes.isEmpty()
+              ? pReturnType
+              : solver.mkFunctionSort(pArgTypes.toArray(new Sort[0]), pReturnType);
+      exp = solver.mkConst(sort, pName);
       functionsCache.put(pName, exp);
+
     } else {
       Preconditions.checkArgument(
           exp.getSort().equals(exp.getSort()),
