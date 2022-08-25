@@ -67,20 +67,23 @@ public class CVC5NativeAPITest {
   private Solver solver;
 
   @Before
-  public void createEnvironment() throws CVC5ApiException {
-    // CVC5 loads its own library statically in this call. We have to do it before CVC5 does it
-    // correctly!
-    solver = new Solver();
-    // Set the logic
-    solver.setLogic("ALL");
+  public void init() throws CVC5ApiException {
+    solver = createEnvironment();
+  }
+
+  private static Solver createEnvironment() throws CVC5ApiException {
+    Solver newSolver = new Solver();
+    newSolver.setLogic("ALL");
 
     // options
-    solver.setOption("incremental", "true");
-    solver.setOption("produce-models", "true");
-    solver.setOption("finite-model-find", "true");
-    solver.setOption("sets-ext", "true");
-    solver.setOption("output-language", "smtlib2");
-    solver.setOption("strings-exp", "true");
+    newSolver.setOption("incremental", "true");
+    newSolver.setOption("produce-models", "true");
+    newSolver.setOption("finite-model-find", "true");
+    newSolver.setOption("sets-ext", "true");
+    newSolver.setOption("output-language", "smtlib2");
+    newSolver.setOption("strings-exp", "true");
+
+    return newSolver;
   }
 
   @After
@@ -1180,7 +1183,7 @@ public class CVC5NativeAPITest {
   }
 
   /** Sets up array and quantifier based formulas for tests. */
-  public void setupArrayQuant() {
+  private void setupArrayQuant() {
     Term zero = solver.mkInteger(0);
     Term one = solver.mkInteger(1);
 
@@ -1201,7 +1204,7 @@ public class CVC5NativeAPITest {
    * @param signed true if signed. false for unsigned.
    * @return Max size bitvector term.
    */
-  public Term makeMaxCVC5Bitvector(int width, boolean signed) throws CVC5ApiException {
+  private Term makeMaxCVC5Bitvector(int width, boolean signed) throws CVC5ApiException {
     String bitvecString;
     if (signed) {
       bitvecString = String.valueOf(new char[width - 1]).replace("\0", "1");
@@ -1210,5 +1213,25 @@ public class CVC5NativeAPITest {
       bitvecString = String.valueOf(new char[width]).replace("\0", "1");
     }
     return solver.mkBitVector(width, bitvecString, 2);
+  }
+
+  @Test
+  public void termAccessAfterModelClosed() throws CVC5ApiException {
+    Solver secondSolver = createEnvironment();
+
+    Term x = solver.mkConst(solver.getIntegerSort(), "x");
+    Term one = solver.mkInteger(1);
+    Term eq = solver.mkTerm(Kind.EQUAL, x, one); // x==1
+
+    secondSolver.assertFormula(eq);
+    Result result = secondSolver.checkSat();
+    assertThat(result.isSat());
+
+    Term valueX = secondSolver.getValue(x);
+    System.out.println(valueX);
+
+    secondSolver.close();
+
+    // System.out.println(valueX); // Segmentation fault, because valueX is already cleaned up.
   }
 }
