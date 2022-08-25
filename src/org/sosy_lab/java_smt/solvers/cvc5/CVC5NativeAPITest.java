@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.solvers.cvc5;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertThrows;
 
+import com.google.common.base.Preconditions;
 import io.github.cvc5.CVC5ApiException;
 import io.github.cvc5.Kind;
 import io.github.cvc5.Op;
@@ -1228,9 +1229,10 @@ public class CVC5NativeAPITest {
     assertThat(result.isSat()).isTrue();
 
     Term valueV = secondSolver.getValue(v);
+    Preconditions.checkNotNull(valueV);
 
     secondSolver.close();
 
-    // System.out.println(valueX); // Segmentation fault, because valueX is already cleaned up.
+    // System.out.println(valueV); // Segmentation fault, because valueX is already cleaned up.
   }
 }
