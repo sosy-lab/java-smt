@@ -1225,7 +1225,7 @@ public class CVC5NativeAPITest {
 
     secondSolver.assertFormula(eq);
     Result result = secondSolver.checkSat();
-    assertThat(result.isSat());
+    assertThat(result.isSat()).isTrue();
 
     Term valueX = secondSolver.getValue(x);
     System.out.println(valueX);
