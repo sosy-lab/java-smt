@@ -23,6 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
@@ -1578,14 +1579,39 @@ public class ModelTest extends SolverBasedTest0 {
           assertThat(assignment.getValue()).isEqualTo(expectedValue);
           assertThat(m.evaluate(assignment.getKey())).isEqualTo(expectedValue);
         }
+
+        // before closing the model
+        checkModelAssignmentsValid(constraint, modelAssignments);
+      }
+
+      // after closing the model, before closing the prover
+      if (solverToUse() != Solvers.CVC5) { // TODO SegFault otherwise, fix this
+        checkModelAssignmentsValid(constraint, modelAssignments);
       }
     }
+
+    // after closing the prover.
+    if (solverToUse() != Solvers.CVC5) { // TODO SegFault otherwise, fix this
+      checkModelAssignmentsValid(constraint, modelAssignments);
+    }
+  }
+
+  /**
+   * This method checks two things: First, we check whether the model evaluation is implied by the
+   * given constraint, i.e., whether this is a valid model. Second, we check whether all formulas
+   * are still valid before/after closing the model and before/after closing the corresponding
+   * prover.
+   */
+  private void checkModelAssignmentsValid(
+      BooleanFormula constraint, List<BooleanFormula> pModelAssignments)
+      throws SolverException, InterruptedException {
     // This can't work in Boolector with ufs as it always crashes with:
     // [btorslvfun] add_function_inequality_constraints: equality over non-array lambdas not
     // supported yet
     // TODO: only filter out UF formulas here, not all
     if (solver != Solvers.BOOLECTOR) {
-      assertThatFormula(bmgr.and(modelAssignments)).implies(constraint);
+      // CVC5 crashes here
+      assertThatFormula(bmgr.and(pModelAssignments)).implies(constraint);
     }
   }
 
@@ -2225,6 +2251,53 @@ public class ModelTest extends SolverBasedTest0 {
         bmgr.makeVariable("x"),
         bmgr.and(bmgr.makeVariable("x"), bmgr.not(bmgr.makeVariable("x"))),
         false);
+  }
+
+  @Test // (timeout = 10_000)
+  // TODO CVC5 crashes on making the first boolean symbol when using timeout ???.
+  public void testDeeplyNestedFormulaLIA() throws SolverException, InterruptedException {
+    requireIntegers();
+
+    testDeeplyNestedFormula(
+        depth -> imgr.makeVariable("i_" + depth),
+        var -> imgr.equal(var, imgr.makeNumber(0)),
+        var -> imgr.equal(var, imgr.makeNumber(1)));
+  }
+
+  @Test // (timeout = 10_000)
+  // TODO CVC5 crashes on making the first boolean symbol when using timeout ???.
+  public void testDeeplyNestedFormulaBV() throws SolverException, InterruptedException {
+    requireBitvectors();
+
+    testDeeplyNestedFormula(
+        depth -> bvmgr.makeVariable(4, "bv_" + depth),
+        var -> bvmgr.equal(var, bvmgr.makeBitvector(4, 0)),
+        var -> bvmgr.equal(var, bvmgr.makeBitvector(4, 1)));
+  }
+
+  /**
+   * Build a deep nesting that is easy to solve and can not be simplified by the solver. If any part
+   * of JavaSMT or the solver tries to analyse all branches of this formula, the runtime is
+   * exponential. We should avoid such a case.
+   */
+  private <T> void testDeeplyNestedFormula(
+      Function<Integer, T> makeVar,
+      Function<T, BooleanFormula> makeEqZero,
+      Function<T, BooleanFormula> makeEqOne)
+      throws SolverException, InterruptedException {
+    // Warning: do never call "toString" on this formula!
+    BooleanFormula f = bmgr.makeVariable("basis");
+
+    for (int depth = 0; depth < 17; depth++) {
+      T var = makeVar.apply(depth);
+      f = bmgr.or(bmgr.and(f, makeEqZero.apply(var)), bmgr.and(f, makeEqOne.apply(var)));
+    }
+
+    // A depth of 16 results in 65.536 paths and model generation requires about 10-20 seconds if
+    // badly implemented.
+    // We expect the following model-generation to be 'fast', e.g., the 17 variables should be
+    // evaluated in an instant. If the time consumption is high, there is a bug in JavaSMT.
+    evaluateInModel(f, bmgr.makeVariable("basis"), true);
   }
 
   private void evaluateInModel(BooleanFormula constraint, Formula variable, Object expectedValue)
