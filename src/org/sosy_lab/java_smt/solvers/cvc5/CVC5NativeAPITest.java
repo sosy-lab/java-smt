@@ -1219,16 +1219,15 @@ public class CVC5NativeAPITest {
   public void termAccessAfterModelClosed() throws CVC5ApiException {
     Solver secondSolver = createEnvironment();
 
-    Term x = solver.mkConst(solver.getIntegerSort(), "x");
+    Term v = solver.mkConst(solver.getIntegerSort(), "v");
     Term one = solver.mkInteger(1);
-    Term eq = solver.mkTerm(Kind.EQUAL, x, one); // x==1
+    Term eq = solver.mkTerm(Kind.EQUAL, v, one); // x==1
 
     secondSolver.assertFormula(eq);
     Result result = secondSolver.checkSat();
     assertThat(result.isSat()).isTrue();
 
-    Term valueX = secondSolver.getValue(x);
-    System.out.println(valueX);
+    Term valueV = secondSolver.getValue(v);
 
     secondSolver.close();
 
