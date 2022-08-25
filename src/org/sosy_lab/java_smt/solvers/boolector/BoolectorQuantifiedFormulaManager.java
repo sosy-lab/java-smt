@@ -35,9 +35,11 @@ public class BoolectorQuantifiedFormulaManager
 
   /**
    * Note: Boolector only supports bitvector quantifier! The vars used MUST be boolector_param (not
-   * boolector_var)! Therefore, we have to change every var into param with the visitor! Additionaly
-   * no param may be used twice (Boolector will end if you do!).
+   * boolector_var)! Therefore, we have to change every var into param with the visitor!
+   * Additionally, no param may be used twice (Boolector will end if you do!).
    */
+  // TODO with the comment above, the user has no way to call boolector_param.
+  //      This implementation seems to be broken and not usable.
   @Override
   public Long mkQuantifier(Quantifier pQ, List<Long> pVars, Long pBody) {
     checkArgument(!pVars.isEmpty(), "List of quantified variables can not be empty");

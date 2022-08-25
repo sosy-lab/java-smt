@@ -99,13 +99,13 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
 
   @Before
   public void setUpBV() {
-    if (solverUnderTest == Solvers.PRINCESS || solverUnderTest == Solvers.BOOLECTOR) {
-      // Princess does not support bv in arrays
-      return;
-    }
     requireBitvectors();
     requireArrays();
     requireQuantifiers();
+    assume()
+        .withMessage("Solver %s does not support quantifiers via JavaSMT", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BOOLECTOR);
 
     xbv = bvmgr.makeVariable(bvWidth, "xbv");
     bvArray =
