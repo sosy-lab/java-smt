@@ -257,21 +257,33 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
 
   public abstract FormulaType<?> getFormulaType(TFormulaInfo formula);
 
+  /**
+   * @see org.sosy_lab.java_smt.api.FormulaManager#visit
+   */
   @CanIgnoreReturnValue
   public <R> R visit(Formula input, FormulaVisitor<R> visitor) {
     return visit(visitor, input, extractInfo(input));
   }
 
+  /**
+   * @see org.sosy_lab.java_smt.api.FormulaManager#visit
+   */
   public abstract <R> R visit(FormulaVisitor<R> visitor, Formula formula, TFormulaInfo f);
 
   protected List<TFormulaInfo> extractInfo(List<? extends Formula> input) {
     return Lists.transform(input, this::extractInfo);
   }
 
+  /**
+   * @see org.sosy_lab.java_smt.api.FormulaManager#visitRecursively
+   */
   public void visitRecursively(FormulaVisitor<TraversalProcess> pFormulaVisitor, Formula pF) {
     visitRecursively(pFormulaVisitor, pF, t -> true);
   }
 
+  /**
+   * @see org.sosy_lab.java_smt.api.FormulaManager#visitRecursively
+   */
   public void visitRecursively(
       FormulaVisitor<TraversalProcess> pFormulaVisitor,
       Formula pF,
