@@ -95,6 +95,19 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
    * Iterate over all values present in the model. Note that iterating multiple times may be
    * inefficient for some solvers, it is recommended to use {@link
    * BasicProverEnvironment#getModelAssignments()} instead in this case.
+   *
+   * <p>The iteration includes value assignments for...
+   *
+   * <ul>
+   *   <li>all relevant free variables of simple type. If a variable is irrelevant for
+   *       satisfiability, it can be <code>null</code> or missing in the iteration.
+   *   <li>(nested) arrays with all accesses. If an array access is applied within a quantified
+   *       context, some value assignments can be missing in the iteration. Please use a direct
+   *       evaluation query to get the evaluation in such a case.
+   *   <li>uninterpreted functions with all applications. If an uninterpreted function is applied
+   *       within a quantified context, some value assignments can be missing in the iteration.
+   *       Please use a direct evaluation query to get the evaluation in such a case.
+   * </ul>
    */
   @Override
   default Iterator<ValueAssignment> iterator() {
