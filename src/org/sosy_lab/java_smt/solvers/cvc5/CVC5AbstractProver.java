@@ -26,7 +26,7 @@ import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.BooleanFormulaManager;
+import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -34,6 +34,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 
 public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
+  private final FormulaManager mgr;
   protected final CVC5FormulaCreator creator;
   protected final Solver solver;
   private boolean changedSinceLastSatQuery = false;
@@ -61,9 +62,10 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
       ShutdownNotifier pShutdownNotifier,
       @SuppressWarnings("unused") int randomSeed,
       Set<ProverOptions> pOptions,
-      BooleanFormulaManager pBmgr) {
-    super(pOptions, pBmgr, pShutdownNotifier);
+      FormulaManager pMgr) {
+    super(pOptions, pMgr.getBooleanFormulaManager(), pShutdownNotifier);
 
+    mgr = pMgr;
     creator = pFormulaCreator;
     incremental = !enableSL;
     assertedFormulas.push(new ArrayList<>()); // create initial level
@@ -148,7 +150,7 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   @Override
   protected CVC5Model getModelWithoutChecks() {
     Preconditions.checkState(!changedSinceLastSatQuery);
-    CVC5Model model = new CVC5Model(this, creator, getAssertedExpressions());
+    CVC5Model model = new CVC5Model(this, mgr, creator, getAssertedExpressions());
     models.add(model);
     return model;
   }

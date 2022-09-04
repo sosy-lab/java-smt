@@ -11,7 +11,7 @@ package org.sosy_lab.java_smt.solvers.cvc5;
 import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
-import org.sosy_lab.java_smt.api.BooleanFormulaManager;
+import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 
@@ -23,7 +23,7 @@ class CVC5TheoremProver extends CVC5AbstractProver<Void>
       ShutdownNotifier pShutdownNotifier,
       @SuppressWarnings("unused") int randomSeed,
       Set<ProverOptions> pOptions,
-      BooleanFormulaManager pBmgr) {
-    super(pFormulaCreator, pShutdownNotifier, randomSeed, pOptions, pBmgr);
+      FormulaManager pMgr) {
+    super(pFormulaCreator, pShutdownNotifier, randomSeed, pOptions, pMgr);
   }
 }
