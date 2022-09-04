@@ -1657,7 +1657,14 @@ public class ModelTest extends SolverBasedTest0 {
                             && (ufArgs == null
                                 || assignment.getArgumentsInterpretation().equals(ufArgs)))
                 .collect(Collectors.toList());
-        assertThat(relevantAssignments).isNotEmpty();
+        assert_()
+            .withMessage(
+                "No relevant assignment in model %s available for name '%s' with %s found.",
+                prover.getModelAssignments(),
+                varName,
+                ufArgs == null ? "arbitrary parameters" : ("parameters " + ufArgs))
+            .that(relevantAssignments)
+            .isNotEmpty();
 
         if (isArray) {
           List<ValueAssignment> arrayAssignments =
