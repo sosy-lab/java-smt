@@ -335,11 +335,11 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
           + "(define-fun v18750 () Bool (and v6142 v18749))"
           + "(assert v18750)";
 
-  // TODO The next method crashes with MathSAT5 version 5.6.4
+  // The next method crashed with MathSAT5 version 5.6.4
   // (NullPointer during iterator creation).
-  // The bug is reported, we need to check this with the next release.
-  @Ignore
-  public void modelIteratorCrash()
+  // The bug was reported and fixed with the next release.
+  @Test
+  public void modelIteratorTest()
       throws IllegalStateException, InterruptedException, SolverException {
 
     long parsedFormula = msat_from_smtlib2(env, QUERY);

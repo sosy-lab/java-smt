@@ -22,7 +22,6 @@ import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 
 class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
 
-  // TODO: The rest of the keywords any maybe make this a map for O(1) access
   private static final ImmutableSet<String> SMT_KEYWORDS =
       ImmutableSet.of(
           "let",

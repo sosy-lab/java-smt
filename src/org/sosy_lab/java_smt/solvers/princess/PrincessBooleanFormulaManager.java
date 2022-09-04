@@ -21,7 +21,6 @@ import ap.types.Sort;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 import scala.Enumeration;
 
-// TODO: rewrite
 class PrincessBooleanFormulaManager
     extends AbstractBooleanFormulaManager<
         IExpression, Sort, PrincessEnvironment, PrincessFunctionDeclaration> {
