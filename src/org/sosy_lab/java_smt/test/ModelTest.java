@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -249,7 +250,9 @@ public class ModelTest extends SolverBasedTest0 {
                   ImmutableList.of(bvmgr.makeVariable(8, "var")))),
           bvmgr.makeBitvector(8, 1),
           BigInteger.ONE,
-          ufName);
+          ufName,
+          false,
+          null);
     }
   }
 
@@ -261,13 +264,19 @@ public class ModelTest extends SolverBasedTest0 {
     // Use 1 instead of 0 or max bv value, as solvers tend to use 0, min or max as default
     for (String ufName : VARIABLE_NAMES) {
       testModelGetters(
-          imgr.equal(
-              imgr.makeNumber(1),
-              fmgr.declareAndCallUF(
-                  ufName, FormulaType.IntegerType, ImmutableList.of(imgr.makeVariable("var")))),
+          bmgr.and(
+              imgr.equal(imgr.makeVariable("var"), imgr.makeNumber(123)),
+              imgr.equal(
+                  imgr.makeNumber(1),
+                  fmgr.declareAndCallUF(
+                      ufName,
+                      FormulaType.IntegerType,
+                      ImmutableList.of(imgr.makeVariable("var"))))),
           imgr.makeNumber(1),
           BigInteger.ONE,
-          ufName);
+          ufName,
+          false,
+          ImmutableList.of(BigInteger.valueOf(123)));
     }
   }
 
@@ -277,14 +286,66 @@ public class ModelTest extends SolverBasedTest0 {
     if (imgr != null) {
       IntegerFormula x =
           fmgr.declareAndCallUF("UF", IntegerType, ImmutableList.of(imgr.makeVariable("arg")));
-      testModelGetters(imgr.equal(x, imgr.makeNumber(1)), x, BigInteger.ONE, "UF");
+      testModelGetters(
+          bmgr.and(
+              imgr.equal(x, imgr.makeNumber(1)),
+              imgr.equal(imgr.makeVariable("arg"), imgr.makeNumber(123))),
+          x,
+          BigInteger.ONE,
+          "UF",
+          false,
+          ImmutableList.of(BigInteger.valueOf(123)));
     } else {
       BitvectorFormula x =
           fmgr.declareAndCallUF(
               "UF",
               FormulaType.getBitvectorTypeWithSize(8),
               ImmutableList.of(bvmgr.makeVariable(8, "arg")));
-      testModelGetters(bvmgr.equal(x, bvmgr.makeBitvector(8, 1)), x, BigInteger.ONE, "UF");
+      testModelGetters(
+          bmgr.and(
+              bvmgr.equal(x, bvmgr.makeBitvector(8, 1)),
+              bvmgr.equal(bvmgr.makeVariable(8, "arg"), bvmgr.makeBitvector(8, 123))),
+          x,
+          BigInteger.ONE,
+          "UF",
+          false,
+          ImmutableList.of(BigInteger.valueOf(123)));
+    }
+  }
+
+  @Test
+  public void testGetUFsWithMultipleAssignments() throws SolverException, InterruptedException {
+    requireIntegers();
+
+    List<BooleanFormula> constraints = new ArrayList<>();
+    int num = 4;
+    for (int i = 0; i < num; i++) {
+      IntegerFormula arg1 = imgr.makeVariable("arg1" + i);
+      IntegerFormula arg2 = imgr.makeVariable("arg2" + i);
+      IntegerFormula arg3 = imgr.makeVariable("arg3" + i);
+      IntegerFormula func = fmgr.declareAndCallUF("UF", IntegerType, arg1, arg2, arg3);
+      constraints.add(imgr.equal(func, imgr.makeNumber(2 * i + 31)));
+      constraints.add(imgr.equal(arg1, imgr.makeNumber(i)));
+      constraints.add(imgr.equal(arg2, imgr.makeNumber(i + 17)));
+      constraints.add(imgr.equal(arg3, imgr.makeNumber(i + 23)));
+    }
+    BooleanFormula constraint = bmgr.and(constraints);
+    for (int i = 0; i < num; i++) {
+      IntegerFormula func =
+          fmgr.declareAndCallUF(
+              "UF",
+              IntegerType,
+              imgr.makeVariable("arg1" + i),
+              imgr.makeVariable("arg2" + i),
+              imgr.makeVariable("arg3" + i));
+      testModelGetters(
+          constraint,
+          func,
+          BigInteger.valueOf(2 * i + 31),
+          "UF",
+          false,
+          ImmutableList.of(
+              BigInteger.valueOf(i), BigInteger.valueOf(i + 17), BigInteger.valueOf(i + 23)));
     }
   }
 
@@ -297,14 +358,15 @@ public class ModelTest extends SolverBasedTest0 {
               "UF",
               IntegerType,
               ImmutableList.of(imgr.makeVariable("arg1"), imgr.makeVariable("arg2")));
-      testModelGetters(imgr.equal(x, imgr.makeNumber(1)), x, BigInteger.ONE, "UF");
+      testModelGetters(imgr.equal(x, imgr.makeNumber(1)), x, BigInteger.ONE, "UF", false, null);
     } else {
       BitvectorFormula x =
           fmgr.declareAndCallUF(
               "UF",
               FormulaType.getBitvectorTypeWithSize(8),
               ImmutableList.of(bvmgr.makeVariable(8, "arg1"), bvmgr.makeVariable(8, "arg2")));
-      testModelGetters(bvmgr.equal(x, bvmgr.makeBitvector(8, 1)), x, BigInteger.ONE, "UF");
+      testModelGetters(
+          bvmgr.equal(x, bvmgr.makeBitvector(8, 1)), x, BigInteger.ONE, "UF", false, null);
     }
   }
 
@@ -535,10 +597,10 @@ public class ModelTest extends SolverBasedTest0 {
     IntegerFormula var = imgr.makeVariable("var");
     BooleanFormula varIsOne = imgr.equal(var, imgr.makeNumber(1));
     IntegerFormula boundVar = imgr.makeVariable("boundVar");
-    BooleanFormula boundVarIsZero = imgr.equal(boundVar, imgr.makeNumber(0));
+    BooleanFormula boundVarIsZero = imgr.equal(boundVar, imgr.makeNumber(2));
 
     String func = "func";
-    IntegerFormula funcAtZero = fmgr.declareAndCallUF(func, IntegerType, imgr.makeNumber(0));
+    IntegerFormula funcAtTwo = fmgr.declareAndCallUF(func, IntegerType, imgr.makeNumber(2));
     IntegerFormula funcAtBoundVar = fmgr.declareAndCallUF(func, IntegerType, boundVar);
 
     BooleanFormula body = bmgr.and(boundVarIsZero, imgr.equal(var, funcAtBoundVar));
@@ -547,12 +609,12 @@ public class ModelTest extends SolverBasedTest0 {
 
     ValueAssignment expectedValueAssignment =
         new ValueAssignment(
-            funcAtZero,
+            funcAtTwo,
             one,
-            imgr.equal(funcAtZero, one),
+            imgr.equal(funcAtTwo, one),
             func,
             BigInteger.ONE,
-            ImmutableList.of(BigInteger.ZERO));
+            ImmutableList.of(BigInteger.TWO));
 
     // CVC4/5 does not give back bound variable values. Not even in UFs.
     if (solverToUse() == Solvers.CVC4 || solverToUse() == Solvers.CVC5) {
@@ -1118,7 +1180,8 @@ public class ModelTest extends SolverBasedTest0 {
             imgr.makeNumber(1)),
         BigInteger.valueOf(123),
         "arr",
-        true);
+        true,
+        ImmutableList.of(BigInteger.valueOf(5), BigInteger.valueOf(3), BigInteger.ONE));
   }
 
   @Test
@@ -1143,7 +1206,8 @@ public class ModelTest extends SolverBasedTest0 {
         amgr.select(amgr.makeArray("arr", ARRAY_TYPE_INT_INT), imgr.makeNumber(5)),
         BigInteger.valueOf(123),
         "arr",
-        true);
+        true,
+        ImmutableList.of(BigInteger.valueOf(5)));
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -1194,7 +1258,8 @@ public class ModelTest extends SolverBasedTest0 {
         amgr.select(amgr.makeArray("arr", ARRAY_TYPE_INT_INT), imgr.makeNumber(5)),
         BigInteger.valueOf(123),
         "arr",
-        true);
+        true,
+        ImmutableList.of(BigInteger.valueOf(5)));
   }
 
   @Test
@@ -1222,19 +1287,22 @@ public class ModelTest extends SolverBasedTest0 {
         amgr.select(amgr.makeArray("arrgh", ARRAY_TYPE_INT_INT), imgr.makeNumber(5)),
         BigInteger.valueOf(123),
         "arrgh",
-        true);
+        true,
+        ImmutableList.of(BigInteger.valueOf(5)));
     testModelGetters(
         f,
         amgr.select(amgr.makeArray("arrgh", ARRAY_TYPE_INT_INT), imgr.makeNumber(6)),
         BigInteger.valueOf(123),
         "arrgh",
-        true);
+        true,
+        ImmutableList.of(BigInteger.valueOf(6)));
     testModelGetters(
         f,
         amgr.select(amgr.makeArray("ahoi", ARRAY_TYPE_INT_INT), imgr.makeNumber(55)),
         BigInteger.valueOf(123),
         "ahoi",
-        true);
+        true,
+        ImmutableList.of(BigInteger.valueOf(55)));
 
     // The value for 'ahoi[66]' is not determined by the constraints from above,
     // because we only 'store' it in (a copy of) the array, but never read it.
@@ -1272,13 +1340,15 @@ public class ModelTest extends SolverBasedTest0 {
         amgr.select(amgr.makeArray("arrgh", ARRAY_TYPE_INT_INT), imgr.makeNumber(5)),
         BigInteger.valueOf(123),
         "arrgh",
-        true);
+        true,
+        ImmutableList.of(BigInteger.valueOf(5)));
     testModelGetters(
         f,
         amgr.select(amgr.makeArray("ahoi", ARRAY_TYPE_INT_INT), imgr.makeNumber(5)),
         BigInteger.valueOf(123),
         "ahoi",
-        true);
+        true,
+        ImmutableList.of(BigInteger.valueOf(5)));
   }
 
   @Test
@@ -1305,13 +1375,15 @@ public class ModelTest extends SolverBasedTest0 {
         amgr.select(amgr.makeArray("arrgh", ARRAY_TYPE_INT_INT), imgr.makeNumber(5)),
         BigInteger.valueOf(123),
         "arrgh",
-        true);
+        true,
+        ImmutableList.of(BigInteger.valueOf(5)));
     testModelGetters(
         f,
         amgr.select(amgr.makeArray("ahoi", ARRAY_TYPE_INT_INT), imgr.makeNumber(7)),
         BigInteger.valueOf(123),
         "ahoi",
-        true);
+        true,
+        ImmutableList.of(BigInteger.valueOf(7)));
   }
 
   @Test
@@ -1338,13 +1410,15 @@ public class ModelTest extends SolverBasedTest0 {
         amgr.select(amgr.makeArray("arrgh", ARRAY_TYPE_INT_INT), imgr.makeNumber(5)),
         BigInteger.valueOf(123),
         "arrgh",
-        true);
+        true,
+        ImmutableList.of(BigInteger.valueOf(5)));
     testModelGetters(
         f,
         amgr.select(amgr.makeArray("ahoi", ARRAY_TYPE_INT_INT), imgr.makeNumber(5)),
         BigInteger.valueOf(123),
         "ahoi",
-        true);
+        true,
+        ImmutableList.of(BigInteger.valueOf(5)));
   }
 
   @Test
@@ -1373,13 +1447,15 @@ public class ModelTest extends SolverBasedTest0 {
         amgr.select(amgr.makeArray("arrgh", ARRAY_TYPE_INT_INT), imgr.makeNumber(5)),
         BigInteger.valueOf(123),
         "arrgh",
-        true);
+        true,
+        ImmutableList.of(BigInteger.valueOf(5)));
     testModelGetters(
         f,
         amgr.select(amgr.makeArray("ahoi", ARRAY_TYPE_INT_INT), imgr.makeNumber(5)),
         BigInteger.valueOf(123),
         "ahoi",
-        true);
+        true,
+        ImmutableList.of(BigInteger.valueOf(5)));
   }
 
   @Test
@@ -1544,6 +1620,21 @@ public class ModelTest extends SolverBasedTest0 {
       String varName,
       boolean isArray)
       throws SolverException, InterruptedException {
+    testModelGetters(constraint, variable, expectedValue, varName, isArray, ImmutableList.of());
+  }
+
+  /**
+   * @param ufArgs use NULL to disable the argument check. Use NULL with care, whenever a
+   *     nondeterministic result is expected, e.g., different assignments from different solvers!
+   */
+  private void testModelGetters(
+      BooleanFormula constraint,
+      Formula variable,
+      Object expectedValue,
+      String varName,
+      boolean isArray,
+      @Nullable List<Object> ufArgs)
+      throws SolverException, InterruptedException {
 
     List<BooleanFormula> modelAssignments = new ArrayList<>();
 
@@ -1560,7 +1651,11 @@ public class ModelTest extends SolverBasedTest0 {
 
         List<ValueAssignment> relevantAssignments =
             prover.getModelAssignments().stream()
-                .filter(assignment -> assignment.getName().equals(varName))
+                .filter(
+                    assignment ->
+                        assignment.getName().equals(varName)
+                            && (ufArgs == null
+                                || assignment.getArgumentsInterpretation().equals(ufArgs)))
                 .collect(Collectors.toList());
         assertThat(relevantAssignments).isNotEmpty();
 
@@ -1573,7 +1668,7 @@ public class ModelTest extends SolverBasedTest0 {
               .isNotEmpty(); // at least one assignment should have the wanted value
 
         } else {
-          // normal variables or UFs have exactly one evaluation assigned to their name
+          // normal variables have exactly one evaluation assigned to their name
           assertThat(relevantAssignments).hasSize(1);
           ValueAssignment assignment = Iterables.getOnlyElement(relevantAssignments);
           assertThat(assignment.getValue()).isEqualTo(expectedValue);
