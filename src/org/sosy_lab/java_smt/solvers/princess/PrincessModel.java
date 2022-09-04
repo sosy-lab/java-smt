@@ -29,10 +29,11 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import scala.Option;
@@ -146,7 +147,7 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
 
     String name;
     IFormula fAssignment;
-    Collection<Object> argumentInterpretations = ImmutableList.of();
+    List<Object> argumentInterpretations = ImmutableList.of();
 
     if (key instanceof IAtom) {
       name = key.toString();
@@ -239,6 +240,7 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
     return evaluation;
   }
 
+  @Nullable
   private IExpression evaluate(IExpression formula) {
     if (formula instanceof ITerm) {
       Option<ITerm> out = model.evalToTerm((ITerm) formula);

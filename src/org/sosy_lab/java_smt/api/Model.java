@@ -12,8 +12,8 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import java.math.BigInteger;
-import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.rationals.Rational;
@@ -190,7 +190,7 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
         BooleanFormula formula,
         String name,
         Object value,
-        Collection<?> argumentInterpretation) {
+        List<?> argumentInterpretation) {
 
       this.keyFormula = Preconditions.checkNotNull(keyFormula);
       this.valueFormula = Preconditions.checkNotNull(valueFormula);
