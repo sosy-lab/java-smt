@@ -157,6 +157,12 @@ class StatisticsStringFormulaManager implements StringFormulaManager {
   }
 
   @Override
+  public RegexFormula allChar() {
+    stats.stringOperations.getAndIncrement();
+    return delegate.allChar();
+  }
+
+  @Override
   public RegexFormula range(StringFormula start, StringFormula end) {
     stats.stringOperations.getAndIncrement();
     return delegate.range(start, end);

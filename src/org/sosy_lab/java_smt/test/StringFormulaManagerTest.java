@@ -129,6 +129,14 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
   }
 
   @Test
+  public void testRegexAllChar() throws SolverException, InterruptedException {
+    RegexFormula regexAllChar = smgr.allChar();
+    RegexFormula regexDot = smgr.makeRegex(".");
+    assertThatFormula(smgr.in(smgr.makeString("a"), regexAllChar)).isSatisfiable();
+    assertThatFormula(smgr.in(smgr.makeString("a"), regexDot)).isUnsatisfiable();
+  }
+
+  @Test
   public void testStringRegex2() throws SolverException, InterruptedException {
     RegexFormula regex = smgr.concat(smgr.closure(a2z), smgr.makeRegex("ll"), smgr.closure(a2z));
     assertThatFormula(smgr.in(hello, regex)).isSatisfiable();

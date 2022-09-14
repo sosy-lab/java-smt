@@ -128,6 +128,12 @@ public interface StringFormulaManager {
    */
   RegexFormula all();
 
+ /**
+   * @return formula denoting the set of all strings of length 1, also known as DOT operator which
+   *     represents an arbitrary char. .
+   */
+  RegexFormula allChar();
+
   /**
    * @return formula denoting the range regular expression over two sequences of length 1.
    */
