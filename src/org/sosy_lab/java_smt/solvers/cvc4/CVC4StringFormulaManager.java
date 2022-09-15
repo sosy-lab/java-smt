@@ -140,7 +140,7 @@ class CVC4StringFormulaManager extends AbstractStringFormulaManager<Expr, Type, 
 
   @Override
   protected Expr allCharImpl() {
-    return exprManager.mkExpr(Kind.REGEXP_SIGMA, noneImpl());
+    return exprManager.mkExpr(Kind.REGEXP_SIGMA, new vectorExpr());
   }
 
   @Override
