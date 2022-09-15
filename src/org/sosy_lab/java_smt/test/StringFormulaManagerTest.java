@@ -137,7 +137,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
     assertThatFormula(smgr.in(smgr.makeString(""), regexAllChar)).isUnsatisfiable();
     assertThatFormula(smgr.in(smgr.makeString("ab"), smgr.times(regexAllChar, 2))).isSatisfiable();
     assertThatFormula(
-            smgr.in(smgr.makeVariable("x"), smgr.intersection(smgr.range('a', '9'), regexAllChar)))
+            smgr.in(smgr.makeVariable("x"), smgr.intersection(smgr.range('9', 'a'), regexAllChar)))
         .isSatisfiable();
 
     RegexFormula regexDot = smgr.makeRegex(".");
