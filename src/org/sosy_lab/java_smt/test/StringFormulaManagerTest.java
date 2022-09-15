@@ -134,6 +134,31 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
     RegexFormula regexDot = smgr.makeRegex(".");
     assertThatFormula(smgr.in(smgr.makeString("a"), regexAllChar)).isSatisfiable();
     assertThatFormula(smgr.in(smgr.makeString("a"), regexDot)).isUnsatisfiable();
+    assertThatFormula(smgr.in(smgr.makeString("ab"), regexAllChar)).isUnsatisfiable();
+    assertThatFormula(smgr.in(smgr.makeString(""), regexAllChar)).isUnsatisfiable();
+    assertThatFormula(smgr.in(smgr.makeString("ab"), smgr.times(regexAllChar, 2))).isSatisfiable();
+    assertThatFormula(smgr.in(smgr.makeVariable("x"), smgr.intersection(smgr.range('a', '9'),
+        regexAllChar))).isSatisfiable();
+  }
+
+  @Test
+  public void testRegexAllCharUnicode() throws SolverException, InterruptedException {
+    RegexFormula regexAllChar = smgr.allChar();
+    if (solverUnderTest == Solvers.Z3) {
+      // Z3 supports Unicode characters in the theory of strings.
+      assertThatFormula(smgr.in(smgr.makeString("\\u0394"), regexAllChar)).isSatisfiable();
+      assertThatFormula(smgr.in(smgr.makeString("\\u{1fa6a}"), regexAllChar)).isSatisfiable();
+      assertThatFormula(smgr.in(smgr.makeVariable("x"), smgr.intersection(smgr.range('a', 'Δ'),
+          regexAllChar))).isSatisfiable();
+      // Combining characters are not matched as one character.
+      assertThatFormula(smgr.in(smgr.makeString("a\\u0336"), regexAllChar)).isUnsatisfiable();
+      // Non-ascii non-printable characters should use the codepoint representation
+      assertThatFormula(smgr.in(smgr.makeString("Δ"), regexAllChar)).isUnsatisfiable();
+      assertThatFormula(smgr.in(smgr.makeString("\\n"), regexAllChar)).isUnsatisfiable();
+    } else if (solverUnderTest == Solvers.CVC4){
+      // CVC4 does not support Unicode characters
+      assertThatFormula(smgr.in(smgr.makeString("\\u0394"), regexAllChar)).isUnsatisfiable();
+    }
   }
 
   @Test
