@@ -124,13 +124,17 @@ public interface StringFormulaManager {
   RegexFormula none();
 
   /**
+   * Note: The size of the used alphabet depends on the underlying SMT solver.
+   *
    * @return formula denoting the set of all strings, also known as Regex <code>".*"</code>.
    */
   RegexFormula all();
 
- /**
+  /**
+   * Note: The size of the used alphabet depends on the underlying SMT solver.
+   *
    * @return formula denoting the set of all strings of length 1, also known as DOT operator which
-   *     represents an arbitrary char. .
+   *     represents one arbitrary char, or as Regex <code>"."</code>.
    */
   RegexFormula allChar();
 
