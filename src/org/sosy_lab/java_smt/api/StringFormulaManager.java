@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.api;
 
+import com.google.common.base.Preconditions;
 import java.util.Arrays;
 import java.util.List;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
@@ -124,9 +125,19 @@ public interface StringFormulaManager {
   RegexFormula none();
 
   /**
+   * Note: The size of the used alphabet depends on the underlying SMT solver.
+   *
    * @return formula denoting the set of all strings, also known as Regex <code>".*"</code>.
    */
   RegexFormula all();
+
+  /**
+   * Note: The size of the used alphabet depends on the underlying SMT solver.
+   *
+   * @return formula denoting the set of all strings of length 1, also known as DOT operator which
+   *     represents one arbitrary char, or as Regex <code>"."</code>.
+   */
+  RegexFormula allChar();
 
   /**
    * @return formula denoting the range regular expression over two sequences of length 1.
@@ -138,6 +149,13 @@ public interface StringFormulaManager {
    * @see #range(StringFormula, StringFormula)
    */
   default RegexFormula range(char start, char end) {
+    Preconditions.checkArgument(
+        start <= end,
+        "Range from start '%s' (%s) to end '%s' (%s) is empty.",
+        start,
+        (int) start,
+        end,
+        (int) end);
     return range(makeString(String.valueOf(start)), makeString(String.valueOf(end)));
   }
 

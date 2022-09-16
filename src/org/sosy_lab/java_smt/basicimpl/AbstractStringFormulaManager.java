@@ -206,6 +206,13 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
   protected abstract TFormulaInfo allImpl();
 
   @Override
+  public RegexFormula allChar() {
+    return wrapRegex(allCharImpl());
+  }
+
+  protected abstract TFormulaInfo allCharImpl();
+
+  @Override
   public RegexFormula range(StringFormula start, StringFormula end) {
     return wrapRegex(range(extractInfo(start), extractInfo(end)));
   }

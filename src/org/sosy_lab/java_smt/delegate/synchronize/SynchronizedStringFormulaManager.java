@@ -179,6 +179,13 @@ class SynchronizedStringFormulaManager implements StringFormulaManager {
   }
 
   @Override
+  public RegexFormula allChar() {
+    synchronized (sync) {
+      return delegate.allChar();
+    }
+  }
+
+  @Override
   public RegexFormula range(StringFormula start, StringFormula end) {
     synchronized (sync) {
       return delegate.range(start, end);

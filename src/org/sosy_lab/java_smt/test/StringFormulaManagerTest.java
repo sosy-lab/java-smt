@@ -129,6 +129,47 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
   }
 
   @Test
+  public void testRegexAllChar() throws SolverException, InterruptedException {
+    RegexFormula regexAllChar = smgr.allChar();
+
+    assertThatFormula(smgr.in(smgr.makeString("a"), regexAllChar)).isSatisfiable();
+    assertThatFormula(smgr.in(smgr.makeString("ab"), regexAllChar)).isUnsatisfiable();
+    assertThatFormula(smgr.in(smgr.makeString(""), regexAllChar)).isUnsatisfiable();
+    assertThatFormula(smgr.in(smgr.makeString("ab"), smgr.times(regexAllChar, 2))).isSatisfiable();
+    assertThatFormula(
+            smgr.in(smgr.makeVariable("x"), smgr.intersection(smgr.range('9', 'a'), regexAllChar)))
+        .isSatisfiable();
+
+    RegexFormula regexDot = smgr.makeRegex(".");
+    assertThatFormula(smgr.in(smgr.makeString("a"), regexDot)).isUnsatisfiable();
+  }
+
+  @Test
+  public void testRegexAllCharUnicode() throws SolverException, InterruptedException {
+    RegexFormula regexAllChar = smgr.allChar();
+
+    // Single characters.
+    assertThatFormula(smgr.in(smgr.makeString("\\u0394"), regexAllChar)).isSatisfiable();
+    assertThatFormula(smgr.in(smgr.makeString("\\u{1fa6a}"), regexAllChar)).isSatisfiable();
+
+    // Combining characters are not matched as one character.
+    assertThatFormula(smgr.in(smgr.makeString("a\\u0336"), regexAllChar)).isUnsatisfiable();
+    assertThatFormula(smgr.in(smgr.makeString("\\n"), regexAllChar)).isUnsatisfiable();
+
+    if (solverUnderTest != Solvers.CVC4) {
+      // CVC4 does not support Unicode characters.
+      // Z3 and other solvers support Unicode characters in the theory of strings.
+      assertThatFormula(
+              smgr.in(
+                  smgr.makeVariable("x"), smgr.intersection(smgr.range('a', 'Δ'), regexAllChar)))
+          .isSatisfiable();
+      // Combining characters are not matched as one character.
+      // Non-ascii non-printable characters should use the codepoint representation
+      assertThatFormula(smgr.in(smgr.makeString("Δ"), regexAllChar)).isUnsatisfiable();
+    }
+  }
+
+  @Test
   public void testStringRegex2() throws SolverException, InterruptedException {
     RegexFormula regex = smgr.concat(smgr.closure(a2z), smgr.makeRegex("ll"), smgr.closure(a2z));
     assertThatFormula(smgr.in(hello, regex)).isSatisfiable();
