@@ -15,6 +15,7 @@ import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariab
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Collection;
@@ -333,6 +334,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
     }
 
     private List<BooleanFormula> getBoolArgs(List<Formula> args) {
+      checkState(Iterables.all(args, arg -> arg instanceof BooleanFormula));
       @SuppressWarnings("unchecked")
       List<BooleanFormula> out = (List<BooleanFormula>) (List<?>) args;
       return out;
@@ -343,7 +345,6 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
         Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
       switch (functionDeclaration.getKind()) {
         case AND:
-          checkState(args.iterator().next() instanceof BooleanFormula);
           R out = delegate.visitAnd(getBoolArgs(args));
           return out;
         case NOT:
@@ -353,7 +354,6 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
           checkArgument(arg instanceof BooleanFormula);
           return delegate.visitNot((BooleanFormula) arg);
         case OR:
-          checkState(args.iterator().next() instanceof BooleanFormula);
           R out2 = delegate.visitOr(getBoolArgs(args));
           return out2;
         case IFF:
