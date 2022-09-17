@@ -10,6 +10,11 @@ SPDX-License-Identifier: Apache-2.0
 
 # JavaSMT ChangeLog
 
+## JavaSMT 3.14.0
+
+This minor release comes a new method 'allChar' in String theory
+and brings with a smaller bugfix for formula visitation.
+
 ## JavaSMT 3.13.3
 
 This patch release comes with a smaller bugfix for String-theory formulas in Z3.
