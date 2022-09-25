@@ -322,8 +322,10 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
       case "-":
         return FunctionDeclarationKind.SUB;
       case "/":
+      case "div":
         return FunctionDeclarationKind.DIV;
       case "%":
+      case "mod":
         return FunctionDeclarationKind.MODULO;
       case "<":
         return FunctionDeclarationKind.LT;
