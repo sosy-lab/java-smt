@@ -10,6 +10,11 @@ SPDX-License-Identifier: Apache-2.0
 
 # JavaSMT ChangeLog
 
+## JavaSMT 3.14.2
+
+This patch release brings small bugfixes for String theory.
+We also include the brand-new bindings for the solver CVC5.
+
 ## JavaSMT 3.14.1
 
 This patch release brings small bugfixes and improved documentation for formula visitation.
