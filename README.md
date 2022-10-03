@@ -60,8 +60,9 @@ Currently JavaSMT supports several SMT solvers (see [Getting Started](doc/Gettin
 | --- |:---:|:---:|:---:|:--- |
 | [Boolector](https://boolector.github.io/) | :heavy_check_mark: |  |  | a fast solver for bitvector logic, misses formula introspection |
 | [CVC4](https://cvc4.github.io/) | :heavy_check_mark: |  |  |  |
+| [CVC5](https://cvc5.github.io/) | :heavy_check_mark: |  |  | new! |
 | [MathSAT5](http://mathsat.fbk.eu/) | :heavy_check_mark: | :heavy_check_mark: |  |  |
-| [OptiMathSAT](http://optimathsat.disi.unitn.it/) | :heavy_check_mark: |  |  | same as MathSAT5, but with support for optimization |
+| [OptiMathSAT](http://optimathsat.disi.unitn.it/) | :heavy_check_mark: |  |  | based on MathSAT5, with support for optimization |
 | [Princess](http://www.philipp.ruemmer.org/princess.shtml) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | Java-based SMT solver |
 | [SMTInterpol](https://ultimate.informatik.uni-freiburg.de/smtinterpol/) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | Java-based SMT solver |
 | [Yices2](https://yices.csl.sri.com/) | :heavy_check_mark: | [soon](https://github.com/sosy-lab/java-smt/pull/215) |  |  |
@@ -87,6 +88,7 @@ If something specific is missing, please [look for or file an issue](https://git
 | --- |:---:|:---:|
 | [Boolector](https://boolector.github.io/) | :heavy_check_mark: |  |
 | [CVC4](https://cvc4.github.io/) | :heavy_check_mark: | :heavy_check_mark: |
+| [CVC5](https://cvc4.github.io/) | :heavy_check_mark: | |
 | [MathSAT5](http://mathsat.fbk.eu/) | :heavy_check_mark: |  |
 | [OptiMathSAT](http://optimathsat.disi.unitn.it/) | :heavy_check_mark: |  |
 | [Princess](http://www.philipp.ruemmer.org/princess.shtml) | :heavy_check_mark: |  |
@@ -95,10 +97,10 @@ If something specific is missing, please [look for or file an issue](https://git
 | [Z3](https://github.com/Z3Prover/z3) | :heavy_check_mark: |  |
 
 Interruption using a [ShutdownNotifier][] may be used to interrupt a
-a solver from any thread.  
+a solver from any thread.
 Formulas are translatable in between contexts/provers/threads using _FormulaManager.translateFrom()_.
 
-¹ Multiple contexts, but all operations on each context only from a single thread.  
+¹ Multiple contexts, but all operations on each context only from a single thread.
 ² Multiple provers on one or more contexts, with each prover using its own thread.
 
 #### Garbage Collection in Native Solvers
