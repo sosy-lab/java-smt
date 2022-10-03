@@ -128,8 +128,11 @@ public final class CVC5SolverContext extends AbstractSolverContext {
 
   @Override
   public String getVersion() {
-    // TODO: This is incorrect. Maybe there is no version info.
-    return "CVC5 " + solver.getOptionInfo("version");
+    String version = solver.getInfo("version");
+    if (version.startsWith("\"") && version.endsWith("\"")) {
+      version = version.substring(1, version.length() - 2);
+    }
+    return "CVC5 " + version;
   }
 
   @Override

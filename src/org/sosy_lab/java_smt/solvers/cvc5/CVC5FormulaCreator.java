@@ -87,8 +87,8 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
     Term exp = variablesCache.computeIfAbsent(name, n -> solver.mkConst(sort, name));
     Preconditions.checkArgument(
         sort.equals(exp.getSort()),
-        "symbol name already in use for different Type %s",
-        exp.getSort());
+        "symbol name %s with sort %s already in use for different sort %s",
+        name, sort, exp.getSort());
     return exp;
   }
 
@@ -112,7 +112,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
       return solver.mkBitVectorSort(pBitwidth);
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
-          "You tried creating a invalid bitvector sort with size " + pBitwidth + ".", e);
+          "Cannot create bitvector sort with size " + pBitwidth + ".", e);
     }
   }
 
@@ -123,11 +123,11 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
       return solver.mkFloatingPointSort(pType.getExponentSize(), pType.getMantissaSize() + 1);
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
-          "You tried creating a invalid floatingpoint sort with exponent size "
+          "Cannot create floatingpoint sort with exponent size "
               + pType.getExponentSize()
               + " and mantissa "
               + pType.getMantissaSize()
-              + ".",
+              + " (plus sign bit).",
           e);
     }
   }
@@ -228,7 +228,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
             || (pType.equals(FormulaType.RationalType)
                 && getFormulaType(pTerm).equals(FormulaType.IntegerType))
         : String.format(
-            "Trying to encapsulate formula %s of Type %s as %s",
+            "Cannot encapsulate formula %s of Type %s as %s",
             pTerm, getFormulaType(pTerm), pType);
     if (pType.isBooleanType()) {
       return (T) new CVC5BooleanFormula(pTerm);
