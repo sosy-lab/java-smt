@@ -43,14 +43,21 @@ public interface BooleanFormulaVisitor<R> {
   R visitNot(BooleanFormula operand);
 
   /**
-   * Visit an AND-expression.
+   * Visit an AND-expression with an arbitrary number of boolean arguments.
+   *
+   * <p>An AND-expression with zero arguments is equisatisfiable to 'TRUE'. An AND-expression with
+   * one argument is equal to the argument itself. In all other cases, default boolean logic
+   * applies.
    *
    * @see BooleanFormulaManager#and
    */
   R visitAnd(List<BooleanFormula> operands);
 
   /**
-   * Visit an OR-expression.
+   * Visit an OR-expression with an arbitrary number of boolean arguments.
+   *
+   * <p>An OR-expression with zero arguments is equisatisfiable to 'TRUE'. An OR-expression with one
+   * argument is equal to the argument itself. In all other cases, default boolean logic applies.
    *
    * @see BooleanFormulaManager#or
    */

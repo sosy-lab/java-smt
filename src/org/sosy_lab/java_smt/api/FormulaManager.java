@@ -193,6 +193,10 @@ public interface FormulaManager {
    *
    * <p>Furthermore, this method also guarantees that every equal part of the formula is visited
    * only once. Thus, it can be used to traverse DAG-like formulas efficiently.
+   *
+   * <p>The traversal is done in PRE-ORDER manner with regard to caching identical subtrees, i.e., a
+   * parent will be visited BEFORE its children. The unmodified child-formulas are passed as
+   * argument to the parent's visitation.
    */
   void visitRecursively(Formula f, FormulaVisitor<TraversalProcess> rFormulaVisitor);
 
@@ -204,6 +208,10 @@ public interface FormulaManager {
    *
    * <p>Furthermore, this method also guarantees that every equal part of the formula is visited
    * only once. Thus, it can be used to traverse DAG-like formulas efficiently.
+   *
+   * <p>The traversal is done in POST-ORDER manner with regard to caching identical subtrees, i.e.,
+   * a parent will be visited AFTER its children. The result of the child-visitation is passed as
+   * argument to the parent's visitation.
    *
    * @param pFormulaVisitor Transformation described by the user.
    */
