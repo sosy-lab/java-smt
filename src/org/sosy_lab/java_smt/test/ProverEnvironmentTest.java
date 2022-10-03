@@ -103,7 +103,6 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
   @Test
   public void unsatCoreTestForInterpolation() throws SolverException, InterruptedException {
     requireInterpolation();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
     try (BasicProverEnvironment<?> pe =
         context.newProverEnvironmentWithInterpolation(GENERATE_UNSAT_CORE)) {
       unsatCoreTest0(pe);

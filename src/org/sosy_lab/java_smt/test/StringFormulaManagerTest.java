@@ -1356,7 +1356,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
     StringFormula middle = smgr.makeVariable("middle");
     StringFormula end = smgr.makeVariable("end");
 
-    // If beginning + middle + end (length of each > 0) get concated (in original), replacing
+    // If beginning + middle + end (length of each > 0) get concatenated (in original), replacing
     // beginning/middle/end
     // with replacement (result = replaces; replacement > 0 and != the replaced) results in a
     // string that is equal to the concat of the 2 remaining start strings and the replaced one
