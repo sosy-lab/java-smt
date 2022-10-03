@@ -134,6 +134,11 @@ class CVC5StringFormulaManager extends AbstractStringFormulaManager<Term, Sort, 
   }
 
   @Override
+  protected Term allCharImpl() {
+    return solver.mkTerm(Kind.REGEXP_ALLCHAR);
+  }
+
+  @Override
   protected Term range(Term start, Term end) {
     return solver.mkTerm(Kind.REGEXP_RANGE, start, end);
   }

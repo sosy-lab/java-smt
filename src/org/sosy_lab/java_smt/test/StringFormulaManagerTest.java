@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.assertThrows;
 
 import com.google.common.collect.ImmutableList;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -156,8 +157,10 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
     assertThatFormula(smgr.in(smgr.makeString("a\\u0336"), regexAllChar)).isUnsatisfiable();
     assertThatFormula(smgr.in(smgr.makeString("\\n"), regexAllChar)).isUnsatisfiable();
 
-    if (solverUnderTest != Solvers.CVC4) {
-      // CVC4 does not support Unicode characters.
+    if (ImmutableList.of(Solvers.CVC4, Solvers.CVC5).contains(solverUnderTest)) {
+      // CVC4 and CVC5 do not support Unicode characters.
+      assertThrows(Exception.class, () -> smgr.range('a', 'Δ'));
+    } else {
       // Z3 and other solvers support Unicode characters in the theory of strings.
       assertThatFormula(
               smgr.in(
