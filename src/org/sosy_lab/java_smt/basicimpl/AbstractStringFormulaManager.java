@@ -242,7 +242,7 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
 
   @Override
   public RegexFormula intersection(RegexFormula regex1, RegexFormula regex2) {
-    return wrapRegex(union(extractInfo(regex1), extractInfo(regex2)));
+    return wrapRegex(intersection(extractInfo(regex1), extractInfo(regex2)));
   }
 
   protected abstract TFormulaInfo intersection(TFormulaInfo pParam1, TFormulaInfo pParam2);
@@ -267,7 +267,7 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
   }
 
   protected TFormulaInfo difference(TFormulaInfo pParam1, TFormulaInfo pParam2) {
-    return union(pParam1, complement(pParam2));
+    return intersection(pParam1, complement(pParam2));
   }
 
   @Override
