@@ -1687,15 +1687,11 @@ public class ModelTest extends SolverBasedTest0 {
       }
 
       // after closing the model, before closing the prover
-      if (solverToUse() != Solvers.CVC5) { // TODO SegFault otherwise, fix this
-        checkModelAssignmentsValid(constraint, modelAssignments);
-      }
+      checkModelAssignmentsValid(constraint, modelAssignments);
     }
 
     // after closing the prover.
-    if (solverToUse() != Solvers.CVC5) { // TODO SegFault otherwise, fix this
-      checkModelAssignmentsValid(constraint, modelAssignments);
-    }
+    checkModelAssignmentsValid(constraint, modelAssignments);
   }
 
   /**

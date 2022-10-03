@@ -252,10 +252,15 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @Override
   public void close() {
+    // TODO FIX ME!
+    // We disable the closing of models and do not close the solver instance here,
+    // because the formulas returned from a model will cause SegFaults if the solver instance
+    // is gone. This is a small memory leak. See https://github.com/cvc5/cvc5-projects/issues/20
+    // and https://github.com/sosy-lab/java-smt/pull/279#issuecomment-1265253898 for details.
     if (!closed) {
-      closeAllModels();
+      // closeAllModels();
       assertedFormulas.clear();
-      solver.close();
+      // solver.close();
       closed = true;
     }
   }
