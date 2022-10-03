@@ -258,7 +258,7 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     // is gone. This is a small memory leak. See https://github.com/cvc5/cvc5-projects/issues/20
     // and https://github.com/sosy-lab/java-smt/pull/279#issuecomment-1265253898 for details.
     if (!closed) {
-      // closeAllModels();
+      closeAllModels();
       assertedFormulas.clear();
       // solver.close();
       closed = true;
