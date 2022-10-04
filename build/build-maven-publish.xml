@@ -150,12 +150,14 @@ SPDX-License-Identifier: Apache-2.0
         <!-- get revision from dependencies -->
         <ivy:artifactproperty name="[artifact].revision" value="[revision]"/>
         <property name="stage.solver" value="cvc5"/>
-        <property name="stage.revision" value="${CVC5.revision}"/>
+        <property name="stage.revision" value="${cvc5.revision}"/>
         <!-- then publish the files -->
         <stage-solver-file filename="cvc5" fileending="jar"/>
         <stage-solver-file filename="libcvc5" fileending="so"/>
         <stage-solver-file filename="libcvc5jni" fileending="so"/>
         <stage-solver-file filename="libcvc5parser" fileending="so"/>
+        <stage-solver-file filename="libpoly" fileending="so"/>
+        <stage-solver-file filename="libpolyxx" fileending="so"/>
     </target>
 
     <!--
