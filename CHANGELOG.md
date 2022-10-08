@@ -10,6 +10,10 @@ SPDX-License-Identifier: Apache-2.0
 
 # JavaSMT ChangeLog
 
+## JavaSMT 3.14.3
+
+This patch release updates SMTInterpol to version 2.5-1242-g5c50fb6d.
+
 ## JavaSMT 3.14.2
 
 This patch release brings small bugfixes for String theory.
