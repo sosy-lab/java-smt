@@ -88,7 +88,9 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
     Preconditions.checkArgument(
         sort.equals(exp.getSort()),
         "symbol name %s with sort %s already in use for different sort %s",
-        name, sort, exp.getSort());
+        name,
+        sort,
+        exp.getSort());
     return exp;
   }
 
@@ -228,8 +230,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
             || (pType.equals(FormulaType.RationalType)
                 && getFormulaType(pTerm).equals(FormulaType.IntegerType))
         : String.format(
-            "Cannot encapsulate formula %s of Type %s as %s",
-            pTerm, getFormulaType(pTerm), pType);
+            "Cannot encapsulate formula %s of Type %s as %s", pTerm, getFormulaType(pTerm), pType);
     if (pType.isBooleanType()) {
       return (T) new CVC5BooleanFormula(pTerm);
     } else if (pType.isIntegerType()) {

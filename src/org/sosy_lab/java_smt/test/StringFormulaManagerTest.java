@@ -163,8 +163,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
     } else {
       // Z3 and other solvers support Unicode characters in the theory of strings.
       assertThatFormula(
-              smgr.in(
-                  smgr.makeVariable("x"), smgr.union(smgr.range('a', 'Δ'), regexAllChar)))
+              smgr.in(smgr.makeVariable("x"), smgr.union(smgr.range('a', 'Δ'), regexAllChar)))
           .isSatisfiable();
       // Combining characters are not matched as one character.
       // Non-ascii non-printable characters should use the codepoint representation
@@ -191,7 +190,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testRegexUnion() throws  SolverException, InterruptedException {
+  public void testRegexUnion() throws SolverException, InterruptedException {
     RegexFormula regex = smgr.union(smgr.makeRegex("a"), smgr.makeRegex("b"));
     assertThatFormula(smgr.in(smgr.makeString("a"), regex)).isSatisfiable();
     assertThatFormula(smgr.in(smgr.makeString("b"), regex)).isSatisfiable();
@@ -199,22 +198,23 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testRegexIntersection() throws  SolverException, InterruptedException {
+  public void testRegexIntersection() throws SolverException, InterruptedException {
     RegexFormula regex = smgr.intersection(smgr.makeRegex("a"), smgr.makeRegex("b"));
     StringFormula variable = smgr.makeVariable("var");
     assertThatFormula(smgr.in(variable, regex)).isUnsatisfiable();
 
-    regex = smgr.intersection(
-        smgr.union(smgr.makeRegex("a"), smgr.makeRegex("b")),
-        smgr.union(smgr.makeRegex("b"), smgr.makeRegex("c")));
+    regex =
+        smgr.intersection(
+            smgr.union(smgr.makeRegex("a"), smgr.makeRegex("b")),
+            smgr.union(smgr.makeRegex("b"), smgr.makeRegex("c")));
     assertThatFormula(smgr.in(smgr.makeString("a"), regex)).isUnsatisfiable();
     assertThatFormula(smgr.in(smgr.makeString("b"), regex)).isSatisfiable();
   }
 
   @Test
-  public void testRegexDifference() throws  SolverException, InterruptedException {
-    RegexFormula regex = smgr.difference(
-        smgr.union(smgr.makeRegex("a"), smgr.makeRegex("b")), smgr.makeRegex("b"));
+  public void testRegexDifference() throws SolverException, InterruptedException {
+    RegexFormula regex =
+        smgr.difference(smgr.union(smgr.makeRegex("a"), smgr.makeRegex("b")), smgr.makeRegex("b"));
     assertThatFormula(smgr.in(smgr.makeString("a"), regex)).isSatisfiable();
     assertThatFormula(smgr.in(smgr.makeString("b"), regex)).isUnsatisfiable();
   }
