@@ -329,7 +329,8 @@ class PrincessFormulaCreator
 
       } else if (kind == FunctionDeclarationKind.OTHER
           && input instanceof IFunApp
-          && ((IFunApp) input).fun() == ModuloArithmetic.mod_cast()) {
+          && ((IFunApp) input).fun() == ModuloArithmetic.mod_cast()
+          && ((IFunApp) input).apply(2) instanceof IIntLit) {
         return visitor.visitConstant(f, convertValue(input));
 
       } else {
