@@ -304,11 +304,21 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     if (f.isConst()) {
       if (type.isBoolean()) {
         return visitor.visitConstant(formula, f.getConstBoolean());
-      } else if (type.isInteger() || type.isReal()) {
-        return visitor.visitConstant(formula, f.getConstRational());
+      } else if (type.isInteger()) {
+        Rational rationalValue = f.getConstRational();
+        Preconditions.checkState("1".equals(rationalValue.getDenominator().toString()));
+        return visitor.visitConstant(
+            formula, new BigInteger(rationalValue.getNumerator().toString()));
+      } else if (type.isReal()) {
+        Rational rationalValue = f.getConstRational();
+        return visitor.visitConstant(
+            formula,
+            org.sosy_lab.common.rationals.Rational.of(
+                new BigInteger(rationalValue.getNumerator().toString()),
+                new BigInteger(rationalValue.getDenominator().toString())));
       } else if (type.isBitVector()) {
-        // TODO is this correct?
-        return visitor.visitConstant(formula, f.getConstBitVector().getValue());
+        return visitor.visitConstant(
+            formula, new BigInteger(f.getConstBitVector().getValue().toString(10)));
       } else if (type.isFloatingPoint()) {
         // TODO is this correct?
         return visitor.visitConstant(formula, f.getConstFloatingPoint());

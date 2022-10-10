@@ -13,6 +13,7 @@ import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.truth.Truth;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -28,6 +29,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
+import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -99,6 +101,23 @@ public class SolverVisitorTest extends SolverBasedTest0 {
       for (Formula arg : args) {
         mgr.visit(arg, this);
       }
+      return visitDefault(f);
+    }
+
+    @Override
+    protected Formula visitDefault(Formula pF) {
+      return pF;
+    }
+  }
+
+  /** visit a constant and iore other opeations. */
+  private final class ConstantsVisitor extends DefaultFormulaVisitor<Formula> {
+
+    private final List<Object> found = new ArrayList<>();
+
+    @Override
+    public Formula visitConstant(Formula f, Object value) {
+      found.add(value);
       return visitDefault(f);
     }
 
@@ -225,6 +244,73 @@ public class SolverVisitorTest extends SolverBasedTest0 {
       BitvectorFormula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
       assertThat(f2).isEqualTo(f);
       assertThatFormula(bmgr.not(bvmgr.equal(f, f2))).isUnsatisfiable();
+    }
+  }
+
+  @Test
+  public void integerConstantVisit() {
+    requireIntegers();
+    for (long n :
+        new long[] {
+          0, 1, 2, 17, 127, 255, -1, -2, -17, -127, 127000, 255000, -100, -200, -1700, -127000,
+          -255000
+        }) {
+      ConstantsVisitor visitor = new ConstantsVisitor();
+      mgr.visit(imgr.makeNumber(n), visitor);
+      assertThat(visitor.found).containsExactly(BigInteger.valueOf(n));
+    }
+  }
+
+  @Test
+  public void rationalConstantVisit() {
+    requireRationals();
+    for (long n :
+        new long[] {
+          0, 1, 2, 17, 127, 255, -1, -2, -17, -127, 127000, 255000, -100, -200, -1700, -127000,
+          -255000
+        }) {
+      ConstantsVisitor visitor = new ConstantsVisitor();
+      mgr.visit(rmgr.makeNumber(n), visitor); // normal integers as rationals
+      assertThat(visitor.found).containsExactly(BigInteger.valueOf(n));
+    }
+    for (long n :
+        new long[] {
+          1, 2, 17, 127, 255, -1, -2, -17, -127, 127000, 255000, -100, -200, -1700, -127000, -255000
+        }) {
+      ConstantsVisitor visitor = new ConstantsVisitor();
+      mgr.visit(rmgr.makeNumber(Rational.ofLongs(n, 321)), visitor);
+      assertThat(visitor.found).containsExactly(Rational.ofLongs(n, 321));
+    }
+  }
+
+  @Test
+  public void bitvectorConstantVisit() {
+    requireBitvectors();
+
+    // check small bitsize
+    for (long n : new long[] {0, 1, 2, 17, 99, 127, 255}) {
+      ConstantsVisitor visitor = new ConstantsVisitor();
+      mgr.visit(bvmgr.makeBitvector(8, n), visitor);
+      assertThat(visitor.found).containsExactly(BigInteger.valueOf(n));
+    }
+    for (long n : new long[] {-1, -2, -17, -99, -127}) {
+      ConstantsVisitor visitor = new ConstantsVisitor();
+      mgr.visit(bvmgr.makeBitvector(8, n), visitor);
+      assertThat(visitor.found)
+          .containsExactly(BigInteger.ONE.shiftLeft(8).add(BigInteger.valueOf(n)));
+    }
+
+    // check normal bitsize
+    for (long n : new long[] {0, 100, 200, 1700, 99000, 127000, 255000}) {
+      ConstantsVisitor visitor = new ConstantsVisitor();
+      mgr.visit(bvmgr.makeBitvector(32, n), visitor);
+      assertThat(visitor.found).containsExactly(BigInteger.valueOf(n));
+    }
+    for (long n : new long[] {-100, -200, -1700, -99000, -127000, -255000}) {
+      ConstantsVisitor visitor = new ConstantsVisitor();
+      mgr.visit(bvmgr.makeBitvector(32, n), visitor);
+      assertThat(visitor.found)
+          .containsExactly(BigInteger.ONE.shiftLeft(32).add(BigInteger.valueOf(n)));
     }
   }
 

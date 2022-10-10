@@ -341,13 +341,17 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
 
       } else if (f.isRealValue()) {
         Pair<BigInteger, BigInteger> realValue = f.getRealValue();
-        return visitor.visitConstant(formula, Rational.of(realValue.first, realValue.second));
+        Object number =
+            BigInteger.ONE.equals(realValue.second)
+                ? realValue.first
+                : Rational.of(realValue.first, realValue.second);
+        return visitor.visitConstant(formula, number);
 
       } else if (f.isIntegerValue()) {
         return visitor.visitConstant(formula, f.getIntegerValue());
 
       } else if (f.isBitVectorValue()) {
-        return visitor.visitConstant(formula, f.getBitVectorValue());
+        return visitor.visitConstant(formula, new BigInteger(f.getBitVectorValue(), 2));
 
       } else if (f.isFloatingPointValue()) {
         // String is easier to parse here

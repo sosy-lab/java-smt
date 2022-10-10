@@ -327,6 +327,11 @@ class PrincessFormulaCreator
         // this is really a Boolean formula, visit the lhs of the equation
         return visit(visitor, f, ((IIntFormula) input).t());
 
+      } else if (kind == FunctionDeclarationKind.OTHER
+          && input instanceof IFunApp
+          && ((IFunApp) input).fun() == ModuloArithmetic.mod_cast()) {
+        return visitor.visitConstant(f, convertValue(input));
+
       } else {
 
         ImmutableList.Builder<Formula> args = ImmutableList.builder();

@@ -23,6 +23,7 @@ import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.logic.Theory;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import org.sosy_lab.java_smt.api.ArrayFormula;
@@ -200,7 +201,8 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
       Object interpolValue = ((ConstantTerm) input).getValue();
       if (interpolValue instanceof Rational) {
         Rational rat = (Rational) interpolValue;
-        if (input.getSort().getName().equals("Int") && rat.isIntegral()) {
+        if ((input.getSort().getName().equals("Int") && rat.isIntegral())
+            || BigInteger.ONE.equals(rat.denominator())) {
           outValue = rat.numerator();
         } else {
           outValue = org.sosy_lab.common.rationals.Rational.of(rat.numerator(), rat.denominator());
