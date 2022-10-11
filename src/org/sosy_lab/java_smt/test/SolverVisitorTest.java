@@ -276,7 +276,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     for (long n :
         new long[] {
           1, 2, 17, 127, 255, -1, -2, -17, -127, 127000, 255000, -100, -200, -1700, -127000,
-            -255000,
+          -255000,
         }) {
       ConstantsVisitor visitor = new ConstantsVisitor();
       mgr.visit(rmgr.makeNumber(Rational.ofLongs(n, 321)), visitor);
