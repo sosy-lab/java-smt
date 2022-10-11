@@ -129,7 +129,8 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
     evaluateInModel(
         rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(1)),
         rmgr.add(rmgr.makeVariable("y"), rmgr.makeVariable("y")),
-        Lists.newArrayList(null, Rational.of(DEFAULT_MODEL_INT)),
+        Lists.newArrayList(
+            null, BigInteger.valueOf(DEFAULT_MODEL_INT), Rational.of(DEFAULT_MODEL_INT)),
         Lists.newArrayList(null, rmgr.makeNumber(DEFAULT_MODEL_INT)));
   }
 
@@ -140,7 +141,8 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
     evaluateInModel(
         rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(1)),
         rmgr.makeVariable("y"),
-        Lists.newArrayList(null, Rational.of(DEFAULT_MODEL_INT)),
+        Lists.newArrayList(
+            null, BigInteger.valueOf(DEFAULT_MODEL_INT), Rational.of(DEFAULT_MODEL_INT)),
         Lists.newArrayList(null, rmgr.makeNumber(DEFAULT_MODEL_INT)));
   }
 
@@ -150,7 +152,8 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
     evaluateInModel(
         rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(Rational.ofString("1/3"))),
         rmgr.divide(rmgr.makeVariable("y"), rmgr.makeNumber(2)),
-        Lists.newArrayList(null, Rational.of(DEFAULT_MODEL_INT)),
+        Lists.newArrayList(
+            null, BigInteger.valueOf(DEFAULT_MODEL_INT), Rational.of(DEFAULT_MODEL_INT)),
         Lists.newArrayList(null, rmgr.makeNumber(DEFAULT_MODEL_INT)));
   }
 

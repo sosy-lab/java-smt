@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Random;
 import org.junit.Before;
@@ -866,7 +867,13 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
         ValueAssignment oneAssignment =
             new ValueAssignment(oneVar, one, oneEq, "one", oneValue, ImmutableList.of());
         assertThat(oneValue)
-            .isAnyOf(new ExtendedRational(Rational.ONE), Rational.ONE, BigDecimal.ONE, 1.0, 1.0f);
+            .isAnyOf(
+                new ExtendedRational(Rational.ONE),
+                BigInteger.ONE,
+                Rational.ONE,
+                BigDecimal.ONE,
+                1.0,
+                1.0f);
 
         Object nanValue = model.evaluate(nanVar);
         ValueAssignment nanAssignment =

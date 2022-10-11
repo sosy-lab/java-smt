@@ -518,7 +518,8 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     if (type.isBooleanType()) {
       return msat_term_is_true(getEnv(), term);
     } else if (type.isRationalType()) {
-      return Rational.ofString(repr);
+      Rational rat = Rational.ofString(repr);
+      return rat.isIntegral() ? rat.getNum() : rat;
     } else if (type.isIntegerType()) {
       return new BigInteger(repr);
     } else if (type.isBitvectorType()) {
