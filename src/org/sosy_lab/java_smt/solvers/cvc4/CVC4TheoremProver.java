@@ -202,9 +202,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
     Preconditions.checkState(!closed);
     Preconditions.checkState(!changedSinceLastSatQuery);
-    try (CVC4Model model = getModel()) {
-      return model.toList();
-    }
+    return super.getModelAssignments();
   }
 
   @Override

@@ -183,9 +183,7 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
     Preconditions.checkState(!closed);
     Preconditions.checkState(!changedSinceLastSatQuery);
-    try (CVC5Model model = getModel()) {
-      return model.toList();
-    }
+    return super.getModelAssignments();
   }
 
   @Override
