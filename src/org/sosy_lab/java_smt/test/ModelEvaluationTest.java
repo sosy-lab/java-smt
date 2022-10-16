@@ -11,7 +11,6 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.Truth.assertThat;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
-import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import java.math.BigInteger;
 import java.util.Collection;
@@ -80,13 +79,17 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
         // let's try to check evaluations. Actually the whole method is based on some default values
         // in the solvers, because we do not use constraints for the evaluated formulas.
         Formula eval = m.eval(formula);
-        if (eval != null && solver == Solvers.SMTINTERPOL) {
-          // SMTInterpol uses Rationals for model values, we use BigDecimals/Rational/BigInteger,
-          // thus comparison is not directly possible and we have to use String representation
-          assertThat(eval.toString())
-              .isIn(Collections2.transform(possibleExpectedFormulas, f -> "" + f));
-        } else {
-          //          assertThat(eval).isIn(possibleExpectedFormulas);
+        if (eval != null) {
+          switch (solver) {
+            case Z3:
+              // ignore, Z3 provides arbitrary values
+              break;
+            case BOOLECTOR:
+              // ignore, Boolector provides no useful values
+              break;
+            default:
+              assertThat(eval).isIn(possibleExpectedFormulas);
+          }
         }
       }
     }
