@@ -769,8 +769,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       } else if (type.isIntegerType()) {
         return new BigInteger(Native.getNumeralString(environment, value));
       } else if (type.isRationalType()) {
-        Rational rat = Rational.ofString(Native.getNumeralString(environment, value));
-        return rat.isIntegral() ? rat.getNum() : rat;
+        return Rational.ofString(Native.getNumeralString(environment, value));
       } else if (type.isStringType()) {
         return Native.getString(environment, value);
       } else if (type.isBitvectorType()) {

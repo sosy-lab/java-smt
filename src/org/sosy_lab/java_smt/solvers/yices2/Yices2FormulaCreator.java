@@ -706,8 +706,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     if (yices_term_constructor(pF) == YICES_ARITH_CONST) {
       String value = yices_rational_const_value(pF);
       if (type.isRationalType()) {
-        Rational rat = Rational.of(value);
-        return rat.isIntegral() ? rat.getNum() : rat;
+        return Rational.of(value);
       } else if (type.isIntegerType()) {
         return new BigInteger(value);
       } else {

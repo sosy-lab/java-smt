@@ -735,7 +735,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
         // CVC5 does not allow model values for bound vars; just return the name
         return value.getSymbol();
 
-      } else if (value.isIntegerValue()) {
+      } else if (value.isIntegerValue() && type.isInteger()) {
         return value.getIntegerValue();
 
       } else if (value.isRealValue()) {

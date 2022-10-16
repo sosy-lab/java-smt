@@ -172,8 +172,10 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
               rationalValue.numerator(), rationalValue.denominator());
       if (getFormulaTypeOfSort(value.getSort()).isIntegerType()) {
         Preconditions.checkState(out.isIntegral());
+        return out.getNum();
+      } else {
+        return out;
       }
-      return out.isIntegral() ? out.getNum() : out;
     } else {
       throw new IllegalArgumentException("Unexpected value: " + value);
     }

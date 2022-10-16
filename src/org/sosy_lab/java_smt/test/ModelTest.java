@@ -168,7 +168,7 @@ public class ModelTest extends SolverBasedTest0 {
     testModelGetters(
         rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(1)),
         rmgr.makeVariable("x"),
-        BigInteger.ONE,
+        Rational.of(1),
         "x");
   }
 
@@ -180,7 +180,7 @@ public class ModelTest extends SolverBasedTest0 {
     testModelGetters(
         rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(large)),
         rmgr.makeVariable("x"),
-        large,
+        Rational.ofBigInteger(large),
         "x");
   }
 
@@ -2325,7 +2325,7 @@ public class ModelTest extends SolverBasedTest0 {
     evaluateInModel(
         rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(1)),
         rmgr.add(rmgr.makeVariable("x"), rmgr.makeVariable("x")),
-        BigInteger.TWO);
+        Rational.of(2));
   }
 
   @Test

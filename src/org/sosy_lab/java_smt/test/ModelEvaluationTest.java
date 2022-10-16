@@ -24,9 +24,12 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.Model;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.StringFormula;
 
 /** Test that we can request evaluations from models. */
 @RunWith(Parameterized.class)
@@ -75,6 +78,15 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
 
       try (Model m = prover.getModel()) {
         assertThat(m.evaluate(formula)).isIn(possibleExpectedValues);
+        if (formula instanceof BooleanFormula) {
+          assertThat(m.evaluate((BooleanFormula) formula)).isIn(possibleExpectedValues);
+        } else if (formula instanceof IntegerFormula) {
+          assertThat(m.evaluate((IntegerFormula) formula)).isIn(possibleExpectedValues);
+        } else if (formula instanceof RationalFormula) {
+          assertThat(m.evaluate((RationalFormula) formula)).isIn(possibleExpectedValues);
+        } else if (formula instanceof StringFormula) {
+          assertThat(m.evaluate((StringFormula) formula)).isIn(possibleExpectedValues);
+        }
 
         // let's try to check evaluations. Actually the whole method is based on some default values
         // in the solvers, because we do not use constraints for the evaluated formulas.
@@ -132,8 +144,7 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
     evaluateInModel(
         rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(1)),
         rmgr.add(rmgr.makeVariable("y"), rmgr.makeVariable("y")),
-        Lists.newArrayList(
-            null, BigInteger.valueOf(DEFAULT_MODEL_INT), Rational.of(DEFAULT_MODEL_INT)),
+        Lists.newArrayList(null, Rational.of(DEFAULT_MODEL_INT)),
         Lists.newArrayList(null, rmgr.makeNumber(DEFAULT_MODEL_INT)));
   }
 
@@ -144,8 +155,7 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
     evaluateInModel(
         rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(1)),
         rmgr.makeVariable("y"),
-        Lists.newArrayList(
-            null, BigInteger.valueOf(DEFAULT_MODEL_INT), Rational.of(DEFAULT_MODEL_INT)),
+        Lists.newArrayList(null, Rational.of(DEFAULT_MODEL_INT)),
         Lists.newArrayList(null, rmgr.makeNumber(DEFAULT_MODEL_INT)));
   }
 
@@ -155,9 +165,18 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
     evaluateInModel(
         rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(Rational.ofString("1/3"))),
         rmgr.divide(rmgr.makeVariable("y"), rmgr.makeNumber(2)),
-        Lists.newArrayList(
-            null, BigInteger.valueOf(DEFAULT_MODEL_INT), Rational.of(DEFAULT_MODEL_INT)),
+        Lists.newArrayList(null, Rational.of(DEFAULT_MODEL_INT)),
         Lists.newArrayList(null, rmgr.makeNumber(DEFAULT_MODEL_INT)));
+    evaluateInModel(
+        rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(Rational.ofString("15"))),
+        rmgr.makeVariable("x"),
+        Lists.newArrayList(null, Rational.of(15)),
+        Lists.newArrayList(null, rmgr.makeNumber(15)));
+    evaluateInModel(
+        rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(Rational.ofString("15"))),
+        rmgr.divide(rmgr.makeVariable("x"), rmgr.makeNumber(3)),
+        Lists.newArrayList(null, Rational.of(5)),
+        Lists.newArrayList(null, rmgr.makeNumber(5)));
   }
 
   @Test

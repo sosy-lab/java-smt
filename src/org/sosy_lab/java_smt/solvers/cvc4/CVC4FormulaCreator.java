@@ -576,13 +576,9 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
 
     } else if (valueType.isReal() && type.isReal()) {
       Rational rat = value.getConstRational();
-      if ("1".equals(rat.getDenominator().toString())) {
-        return new BigInteger(rat.getNumerator().toString());
-      } else {
-        return org.sosy_lab.common.rationals.Rational.of(
-            new BigInteger(rat.getNumerator().toString()),
-            new BigInteger(rat.getDenominator().toString()));
-      }
+      return org.sosy_lab.common.rationals.Rational.of(
+          new BigInteger(rat.getNumerator().toString()),
+          new BigInteger(rat.getDenominator().toString()));
 
     } else if (valueType.isBitVector()) {
       Integer bv = value.getConstBitVector().getValue();
