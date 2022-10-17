@@ -32,16 +32,12 @@ final class Z3Model extends CachingAbstractModel<Long, Long, Long> {
   private final Z3FormulaCreator z3creator;
   private boolean closed = false;
 
-  private Z3Model(long z3context, long z3model, Z3FormulaCreator pCreator) {
+  Z3Model(long z3context, long z3model, Z3FormulaCreator pCreator) {
     super(pCreator);
     Native.modelIncRef(z3context, z3model);
     model = z3model;
     this.z3context = z3context;
     z3creator = pCreator;
-  }
-
-  static Z3Model create(long z3context, long z3model, Z3FormulaCreator pCreator) {
-    return new Z3Model(z3context, z3model, pCreator);
   }
 
   @Override

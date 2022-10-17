@@ -29,6 +29,7 @@ import java.util.Optional;
 import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
@@ -135,7 +136,7 @@ abstract class PrincessAbstractProver<E, AF> extends AbstractProverWithAllSat<E>
   }
 
   @Override
-  public PrincessModel getModel() throws SolverException {
+  public Model getModel() throws SolverException {
     Preconditions.checkState(!closed);
     Preconditions.checkState(wasLastSatCheckSat, NO_MODEL_HELP);
     checkGenerateModels();
@@ -143,7 +144,7 @@ abstract class PrincessAbstractProver<E, AF> extends AbstractProverWithAllSat<E>
   }
 
   @Override
-  protected PrincessModel getModelWithoutChecks() throws SolverException {
+  protected Model getModelWithoutChecks() throws SolverException {
     final PartialModel partialModel;
     try {
       partialModel = partialModel();

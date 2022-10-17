@@ -33,6 +33,7 @@ import org.sosy_lab.common.ShutdownNotifier.ShutdownRequestListener;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
@@ -160,15 +161,15 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   @Override
-  public Z3Model getModel() {
+  public Model getModel() {
     Preconditions.checkState(!closed);
     checkGenerateModels();
     return getModelWithoutChecks();
   }
 
   @Override
-  protected Z3Model getModelWithoutChecks() {
-    return Z3Model.create(z3context, getZ3Model(), creator);
+  protected Model getModelWithoutChecks() {
+    return new Z3Model(z3context, getZ3Model(), creator);
   }
 
   protected long getZ3Model() {

@@ -42,6 +42,7 @@ import java.util.Optional;
 import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
@@ -123,7 +124,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   }
 
   @Override
-  public Mathsat5Model getModel() throws SolverException {
+  public Model getModel() throws SolverException {
     Preconditions.checkState(!closed);
     checkGenerateModels();
     return new Mathsat5Model(getMsatModel(), creator, this);
