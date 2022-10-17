@@ -13,15 +13,20 @@ import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.Lists;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import javax.annotation.Nonnull;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
+import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
@@ -53,6 +58,8 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
    */
   private static final String DEFAULT_MODEL_STRING = "";
 
+  private static int PROBLEM_SIZE;
+
   @Parameters(name = "{0}")
   public static Object[] getAllSolvers() {
     return Solvers.values();
@@ -63,6 +70,16 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
   @Override
   protected Solvers solverToUse() {
     return solver;
+  }
+
+  @Override
+  protected ConfigurationBuilder createTestConfigBuilder() {
+    PROBLEM_SIZE = solverToUse() == Solvers.PRINCESS ? 10 : 100; // Princess is too slow.
+    ConfigurationBuilder builder = super.createTestConfigBuilder();
+    if (solverToUse() == Solvers.MATHSAT5) {
+      builder.setOption("solver.mathsat5.furtherOptions", "model_generation=true");
+    }
+    return builder;
   }
 
   private void evaluateInModel(
@@ -196,5 +213,54 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
         smgr.makeVariable("y"),
         Lists.newArrayList(null, DEFAULT_MODEL_STRING),
         Lists.newArrayList(null, smgr.makeString(DEFAULT_MODEL_STRING)));
+  }
+
+  @Test
+  public void testModelGeneration() throws SolverException, InterruptedException {
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(bmgr.and(getConstraints()));
+      assertThat(prover).isSatisfiable();
+
+      for (int i = 0; i < PROBLEM_SIZE; i++) {
+        try (Model m = prover.getModel()) {
+          BooleanFormula x = bmgr.makeVariable("x" + i);
+          prover.push(m.evaluate(x) ? bmgr.not(x) : x);
+          assertThat(prover).isSatisfiable();
+        }
+      }
+    }
+  }
+
+  @Test
+  public void testEvaluatorGeneration() throws SolverException, InterruptedException {
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(bmgr.and(getConstraints()));
+      assertThat(prover).isSatisfiable();
+
+      for (int i = 0; i < PROBLEM_SIZE; i++) {
+        try (Evaluator m = prover.getEvaluator()) {
+          BooleanFormula x = bmgr.makeVariable("x" + i);
+          prover.push(m.evaluate(x) ? bmgr.not(x) : x);
+          assertThat(prover).isSatisfiable();
+        }
+      }
+    }
+  }
+
+  @Nonnull
+  private List<BooleanFormula> getConstraints() {
+    List<BooleanFormula> constraints = new ArrayList<>();
+    for (int i = 0; i < PROBLEM_SIZE; i++) {
+      BooleanFormula x = bmgr.makeVariable("x" + i);
+      for (int j = 0; j < 5; j++) {
+        BooleanFormula y = bmgr.makeVariable("y" + i + "_" + j);
+        constraints.add(bmgr.equivalence(x, y));
+        constraints.add(bmgr.makeVariable("a" + i + "_" + j));
+        constraints.add(bmgr.makeVariable("b" + i + "_" + j));
+        constraints.add(bmgr.makeVariable("c" + i + "_" + j));
+        constraints.add(bmgr.makeVariable("d" + i + "_" + j));
+      }
+    }
+    return constraints;
   }
 }
