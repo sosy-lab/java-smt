@@ -63,7 +63,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
    * This method registers the Evaluator to be cleaned up before the next change on the prover
    * stack.
    */
-  protected <T extends Evaluator> T registerEvaluator(T pEvaluator) {
+  protected <E extends Evaluator> E registerEvaluator(E pEvaluator) {
     evaluators.add(pEvaluator);
     return pEvaluator;
   }
