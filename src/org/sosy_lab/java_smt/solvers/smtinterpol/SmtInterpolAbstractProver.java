@@ -131,6 +131,7 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
 
   protected abstract Collection<Term> getAssertedTerms();
 
+  @SuppressWarnings("resource")
   @Override
   public org.sosy_lab.java_smt.api.Model getModel() {
     checkState(!closed);

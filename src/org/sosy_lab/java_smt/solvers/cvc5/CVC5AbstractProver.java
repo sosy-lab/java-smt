@@ -134,6 +134,7 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     return null;
   }
 
+  @SuppressWarnings("resource")
   @Override
   public CVC5Model getModel() {
     Preconditions.checkState(!closed);
@@ -144,6 +145,7 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     return registerEvaluator(new CVC5Model(this, mgr, creator, getAssertedExpressions()));
   }
 
+  @SuppressWarnings("resource")
   @Override
   public Evaluator getEvaluator() {
     Preconditions.checkState(!closed);

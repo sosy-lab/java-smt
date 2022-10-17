@@ -167,6 +167,7 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
         curEnv, DEFAULT_PARAMS, pAssumptions.size(), uncapsulate(pAssumptions), shutdownNotifier);
   }
 
+  @SuppressWarnings("resource")
   @Override
   public Model getModel() throws SolverException {
     Preconditions.checkState(!closed);

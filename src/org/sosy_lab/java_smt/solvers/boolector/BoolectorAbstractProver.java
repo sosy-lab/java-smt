@@ -140,6 +140,7 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
     return isUnsat();
   }
 
+  @SuppressWarnings("resource")
   @Override
   public Model getModel() throws SolverException {
     Preconditions.checkState(!closed);

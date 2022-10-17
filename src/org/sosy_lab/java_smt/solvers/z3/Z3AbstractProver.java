@@ -161,6 +161,7 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
     }
   }
 
+  @SuppressWarnings("resource")
   @Override
   public Model getModel() {
     Preconditions.checkState(!closed);

@@ -150,6 +150,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     return null;
   }
 
+  @SuppressWarnings("resource")
   @Override
   public CVC4Model getModel() {
     Preconditions.checkState(!closed);
@@ -160,6 +161,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     return registerEvaluator(new CVC4Model(this, creator, smtEngine, getAssertedExpressions()));
   }
 
+  @SuppressWarnings("resource")
   @Override
   public Evaluator getEvaluator() {
     Preconditions.checkState(!closed);

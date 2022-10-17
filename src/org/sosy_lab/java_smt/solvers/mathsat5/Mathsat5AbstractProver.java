@@ -125,6 +125,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
     }
   }
 
+  @SuppressWarnings("resource")
   @Override
   public Model getModel() throws SolverException {
     Preconditions.checkState(!closed);
@@ -140,6 +141,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
     return Mathsat5NativeApi.msat_get_model(curEnv);
   }
 
+  @SuppressWarnings("resource")
   @Override
   public Evaluator getEvaluator() {
     Preconditions.checkState(!closed);
