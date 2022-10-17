@@ -27,7 +27,6 @@ public class CVC5Model extends AbstractModel<Term, Sort, Solver> {
   private final ImmutableList<ValueAssignment> model;
   private final Solver solver;
   private final ImmutableList<Term> assertedExpressions;
-  private final CVC5AbstractProver<?> prover;
 
   @SuppressWarnings("unused")
   private final FormulaManager mgr;
@@ -37,9 +36,8 @@ public class CVC5Model extends AbstractModel<Term, Sort, Solver> {
       FormulaManager pMgr,
       CVC5FormulaCreator pCreator,
       Collection<Term> pAssertedExpressions) {
-    super(pCreator);
+    super(pProver, pCreator);
     solver = pProver.solver;
-    prover = pProver;
     mgr = pMgr;
     assertedExpressions = ImmutableList.copyOf(pAssertedExpressions);
 
@@ -199,12 +197,6 @@ public class CVC5Model extends AbstractModel<Term, Sort, Solver> {
     Object value = creator.convertValue(pKeyTerm, valueTerm);
     return new ValueAssignment(
         keyFormula, valueFormula, equation, nameStr, value, argumentInterpretationBuilder.build());
-  }
-
-  @Override
-  public void close() {
-    prover.unregisterModel(this);
-    super.close();
   }
 
   @Override

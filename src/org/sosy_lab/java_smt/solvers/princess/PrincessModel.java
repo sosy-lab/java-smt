@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
+import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import scala.Option;
 
@@ -43,10 +44,11 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
   private final SimpleAPI api;
 
   PrincessModel(
+      AbstractProver<?> pProver,
       PartialModel partialModel,
       FormulaCreator<IExpression, Sort, PrincessEnvironment, ?> creator,
       SimpleAPI pApi) {
-    super(creator);
+    super(pProver, creator);
     this.model = partialModel;
     this.api = pApi;
   }

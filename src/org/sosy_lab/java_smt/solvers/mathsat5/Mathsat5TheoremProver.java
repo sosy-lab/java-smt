@@ -40,6 +40,7 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
   @Nullable
   public Void addConstraint(BooleanFormula constraint) {
     Preconditions.checkState(!closed);
+    closeAllEvaluators();
     msat_assert_formula(curEnv, getMsatTerm(constraint));
     return null;
   }

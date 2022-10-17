@@ -41,7 +41,7 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
   private final Mathsat5AbstractProver<?> prover;
 
   Mathsat5Model(long model, Mathsat5FormulaCreator creator, Mathsat5AbstractProver<?> pProver) {
-    super(creator);
+    super(pProver, creator);
     this.model = model;
     formulaCreator = creator;
     prover = pProver;

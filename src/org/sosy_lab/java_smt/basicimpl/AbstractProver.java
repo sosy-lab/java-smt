@@ -9,8 +9,10 @@
 package org.sosy_lab.java_smt.basicimpl;
 
 import com.google.common.base.Preconditions;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
+import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 
 public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
@@ -20,6 +22,8 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   protected final boolean generateUnsatCores;
   private final boolean generateUnsatCoresOverAssumptions;
   protected final boolean enableSL;
+
+  private final Set<Evaluator> evaluators = new LinkedHashSet<>();
 
   private static final String TEMPLATE = "Please set the prover option %s.";
 
@@ -53,5 +57,28 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
   protected final void checkEnableSeparationLogic() {
     Preconditions.checkState(enableSL, TEMPLATE, ProverOptions.ENABLE_SEPARATION_LOGIC);
+  }
+
+  /**
+   * This method registers the Evaluator to be cleaned up before the next change on the prover
+   * stack.
+   */
+  protected <T extends Evaluator> T registerEvaluator(T pEvaluator) {
+    evaluators.add(pEvaluator);
+    return pEvaluator;
+  }
+
+  protected void unregisterEvaluator(Evaluator pEvaluator) {
+    evaluators.remove(pEvaluator);
+  }
+
+  protected void closeAllEvaluators() {
+    evaluators.forEach(Evaluator::close);
+    evaluators.clear();
+  }
+
+  @Override
+  public void close() {
+    closeAllEvaluators();
   }
 }

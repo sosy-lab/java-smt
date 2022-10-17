@@ -72,6 +72,7 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
   @Override
   public Integer addConstraint(BooleanFormula f) {
     Preconditions.checkState(!closed);
+    closeAllEvaluators();
     int group = msat_create_itp_group(curEnv);
     msat_set_itp_group(curEnv, group);
     long t = creator.extractInfo(f);

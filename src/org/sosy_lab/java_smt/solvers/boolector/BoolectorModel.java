@@ -93,7 +93,7 @@ class BoolectorModel extends AbstractModel<Long, Long, Long> {
       BoolectorFormulaCreator creator,
       BoolectorAbstractProver<?> pProver,
       Collection<Long> assertedTerms) {
-    super(creator);
+    super(pProver, creator);
     this.bfCreator = creator;
     this.btor = btor;
     this.prover = pProver;

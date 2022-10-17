@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
+import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 
 final class Z3Model extends AbstractModel<Long, Long, Long> {
 
@@ -31,8 +32,8 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
 
   private final Z3FormulaCreator z3creator;
 
-  Z3Model(long z3context, long z3model, Z3FormulaCreator pCreator) {
-    super(pCreator);
+  Z3Model(AbstractProver<?> pProver, long z3context, long z3model, Z3FormulaCreator pCreator) {
+    super(pProver, pCreator);
     Native.modelIncRef(z3context, z3model);
     model = z3model;
     this.z3context = z3context;

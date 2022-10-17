@@ -19,13 +19,13 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
@@ -41,12 +41,6 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   /** Tracks formulas on the stack, needed for model generation. */
   protected final Deque<List<Term>> assertedFormulas = new ArrayDeque<>();
-
-  /**
-   * Tracks provided models to inform them when the solver is closed. We can no longer access model
-   * evaluation after closing the solver.
-   */
-  private final Set<CVC5Model> models = new LinkedHashSet<>();
 
   // TODO: does CVC5 support separation logic in incremental mode?
   protected final boolean incremental;
@@ -150,33 +144,23 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   @Override
   protected CVC5Model getModelWithoutChecks() {
     Preconditions.checkState(!changedSinceLastSatQuery);
-    CVC5Model model = new CVC5Model(this, mgr, creator, getAssertedExpressions());
-    models.add(model);
-    return model;
+    // special case for CVC5: Models are not permanent and need to be closed
+    // before any change is applied to the prover stack. So, we register the Model as Evaluator.
+    return registerEvaluator(new CVC5Model(this, mgr, creator, getAssertedExpressions()));
   }
 
-  void unregisterModel(CVC5Model model) {
-    models.remove(model);
+  @Override
+  public Evaluator getEvaluator() {
+    Preconditions.checkState(!closed);
+    checkGenerateModels();
+    return registerEvaluator(new CVC5Evaluator(this, creator));
   }
 
   protected void setChanged() {
     if (!changedSinceLastSatQuery) {
       changedSinceLastSatQuery = true;
-      closeAllModels();
+      closeAllEvaluators();
     }
-  }
-
-  /**
-   * whenever the SmtEngine changes, we need to invalidate all models.
-   *
-   * <p>See for details <a href="https://github.com/CVC4/CVC4/issues/2648">Issue 2648</a> . This is
-   * legacy CVC4. TODO: decide whether we need this or not
-   */
-  private void closeAllModels() {
-    for (CVC5Model model : ImmutableList.copyOf(models)) {
-      model.close();
-    }
-    Preconditions.checkState(models.isEmpty(), "all models should be closed");
   }
 
   @Override
@@ -190,7 +174,7 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   @SuppressWarnings("try")
   public boolean isUnsat() throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
-    closeAllModels();
+    closeAllEvaluators();
     changedSinceLastSatQuery = false;
     if (!incremental) {
       for (Term term : getAssertedExpressions()) {
@@ -256,11 +240,11 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     // is gone. This is a small memory leak. See https://github.com/cvc5/cvc5-projects/issues/20
     // and https://github.com/sosy-lab/java-smt/pull/279#issuecomment-1265253898 for details.
     if (!closed) {
-      closeAllModels();
       assertedFormulas.clear();
       // solver.close();
       closed = true;
     }
+    super.close();
   }
 
   @Override

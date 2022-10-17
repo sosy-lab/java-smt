@@ -146,7 +146,7 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
         throw e;
       }
     }
-    return new CachingModel(new SmtInterpolModel(model, creator, getAssertedTerms()));
+    return new CachingModel(new SmtInterpolModel(this, model, creator, getAssertedTerms()));
   }
 
   protected static String generateTermName() {

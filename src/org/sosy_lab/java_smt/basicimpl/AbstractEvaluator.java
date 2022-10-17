@@ -24,10 +24,13 @@ import org.sosy_lab.java_smt.api.StringFormula;
 @SuppressWarnings("ClassTypeParameterName")
 public abstract class AbstractEvaluator<TFormulaInfo, TType, TEnv> implements Evaluator {
 
+  private final AbstractProver<?> prover;
   protected final FormulaCreator<TFormulaInfo, TType, TEnv, ?> creator;
   private boolean closed = false;
 
-  protected AbstractEvaluator(FormulaCreator<TFormulaInfo, TType, TEnv, ?> creator) {
+  protected AbstractEvaluator(
+      AbstractProver<?> pProver, FormulaCreator<TFormulaInfo, TType, TEnv, ?> creator) {
+    this.prover = pProver;
     this.creator = creator;
   }
 
@@ -110,6 +113,7 @@ public abstract class AbstractEvaluator<TFormulaInfo, TType, TEnv> implements Ev
 
   @Override
   public void close() {
+    prover.unregisterEvaluator(this);
     closed = true;
   }
 }

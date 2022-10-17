@@ -170,7 +170,7 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @Override
   protected Model getModelWithoutChecks() {
-    return new CachingModel(new Z3Model(z3context, getZ3Model(), creator));
+    return new CachingModel(new Z3Model(this, z3context, getZ3Model(), creator));
   }
 
   protected long getZ3Model() {

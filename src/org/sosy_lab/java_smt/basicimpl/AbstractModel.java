@@ -15,8 +15,9 @@ import org.sosy_lab.java_smt.api.Model;
 public abstract class AbstractModel<TFormulaInfo, TType, TEnv>
     extends AbstractEvaluator<TFormulaInfo, TType, TEnv> implements Model {
 
-  protected AbstractModel(FormulaCreator<TFormulaInfo, TType, TEnv, ?> creator) {
-    super(creator);
+  protected AbstractModel(
+      AbstractProver prover, FormulaCreator<TFormulaInfo, TType, TEnv, ?> creator) {
+    super(prover, creator);
   }
 
   @Override

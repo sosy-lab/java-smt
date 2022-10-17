@@ -35,7 +35,7 @@ public class CVC4Model extends AbstractModel<Expr, Type, ExprManager> {
       CVC4FormulaCreator pCreator,
       SmtEngine pSmtEngine,
       Collection<Expr> pAssertedExpressions) {
-    super(pCreator);
+    super(pProver, pCreator);
     smtEngine = pSmtEngine;
     prover = pProver;
     assertedExpressions = ImmutableList.copyOf(pAssertedExpressions);
@@ -48,6 +48,9 @@ public class CVC4Model extends AbstractModel<Expr, Type, ExprManager> {
 
   @Override
   public Expr evalImpl(Expr f) {
+    // This method looks like a violation of the constraint above: the SMT engine can be changed
+    // before querying this method. However, the prover guarantees to close the model before this
+    // can happen.
     Preconditions.checkState(!isClosed());
     return getValue(f);
   }
@@ -110,12 +113,6 @@ public class CVC4Model extends AbstractModel<Expr, Type, ExprManager> {
     Object value = creator.convertValue(pKeyTerm, valueTerm);
     return new ValueAssignment(
         keyFormula, valueFormula, equation, nameStr, value, argumentInterpretation);
-  }
-
-  @Override
-  public void close() {
-    prover.unregisterModel(this);
-    super.close();
   }
 
   @Override
