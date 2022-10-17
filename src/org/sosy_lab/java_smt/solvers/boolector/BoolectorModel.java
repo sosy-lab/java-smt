@@ -86,8 +86,6 @@ class BoolectorModel extends AbstractModel<Long, Long, Long> {
   private final long btor;
   private final BoolectorAbstractProver<?> prover;
   private final BoolectorFormulaCreator bfCreator;
-  private boolean closed = false;
-
   private final ImmutableList<Long> assertedTerms;
 
   BoolectorModel(
@@ -104,11 +102,10 @@ class BoolectorModel extends AbstractModel<Long, Long, Long> {
 
   @Override
   public void close() {
-    if (!closed) {
-      // Technically boolector has no model,
-      // but you could release all bindings.
-      closed = true;
+    if (!isClosed()) {
+      // TODO Technically Boolector has no model, but you could release all bindings.
     }
+    super.close();
   }
 
   /* (non-Javadoc)
@@ -135,7 +132,7 @@ class BoolectorModel extends AbstractModel<Long, Long, Long> {
   */
   @Override
   public ImmutableList<ValueAssignment> asList() {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
     // Use String instead of the node (long) as we need the name again later!
     ImmutableSet.Builder<String> variablesBuilder = ImmutableSet.builder();
@@ -192,7 +189,7 @@ class BoolectorModel extends AbstractModel<Long, Long, Long> {
   }
 
   private ImmutableList<ValueAssignment> toList1(Set<String> variables) {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
     ImmutableList.Builder<ValueAssignment> assignmentBuilder = ImmutableList.builder();
     for (String name : variables) {
@@ -285,7 +282,7 @@ class BoolectorModel extends AbstractModel<Long, Long, Long> {
 
   @Override
   protected Long evalImpl(Long pFormula) {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     return pFormula;
   }
 }

@@ -30,7 +30,6 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
   private static final Pattern Z3_IRRELEVANT_MODEL_TERM_PATTERN = Pattern.compile(".*![0-9]+");
 
   private final Z3FormulaCreator z3creator;
-  private boolean closed = false;
 
   Z3Model(long z3context, long z3model, Z3FormulaCreator pCreator) {
     super(pCreator);
@@ -42,7 +41,7 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
 
   @Override
   public ImmutableList<ValueAssignment> asList() {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     ImmutableList.Builder<ValueAssignment> out = ImmutableList.builder();
 
     // Iterate through constants.
@@ -362,16 +361,16 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
 
   @Override
   public String toString() {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     return Native.modelToString(z3context, model);
   }
 
   @Override
   public void close() {
-    if (!closed) {
+    if (!isClosed()) {
       Native.modelDecRef(z3context, model);
-      closed = true;
     }
+    super.close();
   }
 
   @Override

@@ -32,8 +32,6 @@ public class CVC5Model extends AbstractModel<Term, Sort, Solver> {
   @SuppressWarnings("unused")
   private final FormulaManager mgr;
 
-  protected boolean closed = false;
-
   CVC5Model(
       CVC5AbstractProver<?> pProver,
       FormulaManager pMgr,
@@ -53,7 +51,7 @@ public class CVC5Model extends AbstractModel<Term, Sort, Solver> {
 
   @Override
   public Term evalImpl(Term f) {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     return solver.getValue(f);
   }
 
@@ -206,7 +204,7 @@ public class CVC5Model extends AbstractModel<Term, Sort, Solver> {
   @Override
   public void close() {
     prover.unregisterModel(this);
-    closed = true;
+    super.close();
   }
 
   @Override

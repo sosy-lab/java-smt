@@ -29,7 +29,6 @@ public class CVC4Model extends AbstractModel<Expr, Type, ExprManager> {
   private final SmtEngine smtEngine;
   private final ImmutableList<Expr> assertedExpressions;
   private final CVC4TheoremProver prover;
-  protected boolean closed = false;
 
   CVC4Model(
       CVC4TheoremProver pProver,
@@ -49,7 +48,7 @@ public class CVC4Model extends AbstractModel<Expr, Type, ExprManager> {
 
   @Override
   public Expr evalImpl(Expr f) {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     return getValue(f);
   }
 
@@ -116,7 +115,7 @@ public class CVC4Model extends AbstractModel<Expr, Type, ExprManager> {
   @Override
   public void close() {
     prover.unregisterModel(this);
-    closed = true;
+    super.close();
   }
 
   @Override
