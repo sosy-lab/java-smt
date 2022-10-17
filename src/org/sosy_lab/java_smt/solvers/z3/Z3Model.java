@@ -21,9 +21,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
-import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
+import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 
-final class Z3Model extends CachingAbstractModel<Long, Long, Long> {
+final class Z3Model extends AbstractModel<Long, Long, Long> {
 
   private final long model;
   private final long z3context;
@@ -41,7 +41,7 @@ final class Z3Model extends CachingAbstractModel<Long, Long, Long> {
   }
 
   @Override
-  protected ImmutableList<ValueAssignment> toList() {
+  public ImmutableList<ValueAssignment> asList() {
     Preconditions.checkState(!closed);
     ImmutableList.Builder<ValueAssignment> out = ImmutableList.builder();
 

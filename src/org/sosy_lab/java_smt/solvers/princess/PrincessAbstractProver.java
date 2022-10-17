@@ -33,6 +33,7 @@ import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
+import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import scala.Enumeration.Value;
 
 @SuppressWarnings("ClassTypeParameterName")
@@ -151,7 +152,7 @@ abstract class PrincessAbstractProver<E, AF> extends AbstractProverWithAllSat<E>
     } catch (SimpleAPIException ex) {
       throw new SolverException(ex.getMessage(), ex);
     }
-    return new PrincessModel(partialModel, creator, api);
+    return new CachingModel(new PrincessModel(partialModel, creator, api));
   }
 
   /**

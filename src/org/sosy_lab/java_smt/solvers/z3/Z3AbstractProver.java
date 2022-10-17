@@ -37,6 +37,7 @@ import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
+import org.sosy_lab.java_smt.basicimpl.CachingModel;
 
 abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
@@ -169,7 +170,7 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @Override
   protected Model getModelWithoutChecks() {
-    return new Z3Model(z3context, getZ3Model(), creator);
+    return new CachingModel(new Z3Model(z3context, getZ3Model(), creator));
   }
 
   protected long getZ3Model() {

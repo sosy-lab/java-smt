@@ -24,6 +24,7 @@ import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
+import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import org.sosy_lab.java_smt.solvers.boolector.BtorJNI.TerminationCallback;
 
 abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
@@ -161,7 +162,7 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @Override
   protected Model getModelWithoutChecks() {
-    return new BoolectorModel(btor, creator, this, getAssertedTerms());
+    return new CachingModel(new BoolectorModel(btor, creator, this, getAssertedTerms()));
   }
 
   @Override

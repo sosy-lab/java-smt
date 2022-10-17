@@ -18,9 +18,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
+import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 
-class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
+class BoolectorModel extends AbstractModel<Long, Long, Long> {
 
   private static final ImmutableSet<String> SMT_KEYWORDS =
       ImmutableSet.of(
@@ -134,7 +134,7 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
   * we have to strip this if it occurs
   */
   @Override
-  protected ImmutableList<ValueAssignment> toList() {
+  public ImmutableList<ValueAssignment> asList() {
     Preconditions.checkState(!closed);
     Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
     // Use String instead of the node (long) as we need the name again later!

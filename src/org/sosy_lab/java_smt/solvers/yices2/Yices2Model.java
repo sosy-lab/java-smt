@@ -57,9 +57,9 @@ import java.util.ArrayList;
 import java.util.List;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.rationals.Rational;
-import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
+import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 
-public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
+public class Yices2Model extends AbstractModel<Integer, Integer, Long> {
 
   private final long model;
   private final Yices2TheoremProver prover;
@@ -82,7 +82,7 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
   }
 
   @Override
-  protected ImmutableList<ValueAssignment> toList() {
+  public ImmutableList<ValueAssignment> asList() {
     Preconditions.checkState(!closed);
     Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
     List<Integer> complex =

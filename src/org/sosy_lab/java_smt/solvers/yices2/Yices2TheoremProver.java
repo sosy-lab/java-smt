@@ -42,6 +42,7 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
+import org.sosy_lab.java_smt.basicimpl.CachingModel;
 
 /**
  * Info about the option {@link ProverOptions#GENERATE_UNSAT_CORE}: Yices provides the unsat core
@@ -222,6 +223,6 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
 
   @Override
   protected Model getModelWithoutChecks() {
-    return new Yices2Model(yices_get_model(curEnv, 1), this, creator);
+    return new CachingModel(new Yices2Model(yices_get_model(curEnv, 1), this, creator));
   }
 }

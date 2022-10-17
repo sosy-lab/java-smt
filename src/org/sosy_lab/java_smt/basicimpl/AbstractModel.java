@@ -10,7 +10,6 @@ package org.sosy_lab.java_smt.basicimpl;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import java.math.BigInteger;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.rationals.Rational;
@@ -99,26 +98,5 @@ public abstract class AbstractModel<TFormulaInfo, TType, TEnv> implements Model 
   @Override
   public String toString() {
     return Joiner.on('\n').join(iterator());
-  }
-
-  public abstract static class CachingAbstractModel<TFormulaInfo, TType, TEnv>
-      extends AbstractModel<TFormulaInfo, TType, TEnv> {
-
-    private @Nullable ImmutableList<ValueAssignment> modelAssignments = null;
-
-    protected CachingAbstractModel(FormulaCreator<TFormulaInfo, TType, TEnv, ?> pCreator) {
-      super(pCreator);
-    }
-
-    @Override
-    public ImmutableList<ValueAssignment> asList() {
-      if (modelAssignments == null) {
-        modelAssignments = toList();
-      }
-      return modelAssignments;
-    }
-
-    /** Build a list of all available assignments from the model. */
-    protected abstract ImmutableList<ValueAssignment> toList();
   }
 }

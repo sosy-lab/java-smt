@@ -21,9 +21,9 @@ import java.util.Collection;
 import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
+import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 
-public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
+public class CVC4Model extends AbstractModel<Expr, Type, ExprManager> {
 
   private final ImmutableList<ValueAssignment> model;
   private final SmtEngine smtEngine;
@@ -120,7 +120,7 @@ public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
   }
 
   @Override
-  protected ImmutableList<ValueAssignment> toList() {
+  public ImmutableList<ValueAssignment> asList() {
     return model;
   }
 }

@@ -34,11 +34,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
+import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import scala.Option;
 
-class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvironment> {
+class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment> {
   private final PartialModel model;
   private final SimpleAPI api;
 
@@ -52,7 +52,7 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
   }
 
   @Override
-  protected ImmutableList<ValueAssignment> toList() {
+  public ImmutableList<ValueAssignment> asList() {
     scala.collection.Map<IExpression, IExpression> interpretation = model.interpretation();
 
     // get abbreviations, we do not want to export them.

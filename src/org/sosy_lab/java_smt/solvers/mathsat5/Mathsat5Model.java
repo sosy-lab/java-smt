@@ -30,9 +30,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
+import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 
-class Mathsat5Model extends CachingAbstractModel<Long, Long, Long> {
+class Mathsat5Model extends AbstractModel<Long, Long, Long> {
 
   private final long model;
   private final Mathsat5FormulaCreator formulaCreator;
@@ -49,7 +49,7 @@ class Mathsat5Model extends CachingAbstractModel<Long, Long, Long> {
   }
 
   @Override
-  protected ImmutableList<ValueAssignment> toList() {
+  public ImmutableList<ValueAssignment> asList() {
     Preconditions.checkState(!closed);
     Preconditions.checkState(!prover.closed, "cannot use model after prover is closed");
     ImmutableList.Builder<ValueAssignment> assignments = ImmutableList.builder();
