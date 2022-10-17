@@ -171,7 +171,7 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   public Model getModel() throws SolverException {
     Preconditions.checkState(!closed);
     checkGenerateModels();
-    return getModelWithoutChecks();
+    return new CachingModel(new Yices2Model(yices_get_model(curEnv, 1), this, creator));
   }
 
   private List<BooleanFormula> encapsulate(int[] terms) {
@@ -219,10 +219,5 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
       constraintStack.clear();
       closed = true;
     }
-  }
-
-  @Override
-  protected Model getModelWithoutChecks() {
-    return new CachingModel(new Yices2Model(yices_get_model(curEnv, 1), this, creator));
   }
 }

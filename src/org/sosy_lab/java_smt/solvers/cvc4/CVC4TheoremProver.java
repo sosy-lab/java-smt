@@ -153,13 +153,8 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   @Override
   public CVC4Model getModel() {
     Preconditions.checkState(!closed);
-    checkGenerateModels();
-    return getModelWithoutChecks();
-  }
-
-  @Override
-  protected CVC4Model getModelWithoutChecks() {
     Preconditions.checkState(!changedSinceLastSatQuery);
+    checkGenerateModels();
     // special case for CVC4: Models are not permanent and need to be closed
     // before any change is applied to the prover stack. So, we register the Model as Evaluator.
     return registerEvaluator(new CVC4Model(this, creator, smtEngine, getAssertedExpressions()));

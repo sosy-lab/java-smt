@@ -165,11 +165,6 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
   public Model getModel() {
     Preconditions.checkState(!closed);
     checkGenerateModels();
-    return getModelWithoutChecks();
-  }
-
-  @Override
-  protected Model getModelWithoutChecks() {
     return new CachingModel(new Z3Model(this, z3context, getZ3Model(), creator));
   }
 

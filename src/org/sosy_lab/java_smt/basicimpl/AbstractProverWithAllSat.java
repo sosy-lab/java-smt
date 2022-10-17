@@ -17,7 +17,7 @@ import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
-import org.sosy_lab.java_smt.api.Model;
+import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
@@ -73,9 +73,9 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
       shutdownNotifier.shutdownIfNecessary();
 
       ImmutableList.Builder<BooleanFormula> valuesOfModel = ImmutableList.builder();
-      try (Model model = getModelWithoutChecks()) {
+      try (Evaluator evaluator = getEvaluator()) {
         for (BooleanFormula formula : importantPredicates) {
-          Boolean value = model.evaluate(formula);
+          Boolean value = evaluator.evaluate(formula);
           if (value == null) {
             // This is a legal return value for evaluation.
             // The value doesn't matter. We ignore this assignment.
@@ -145,11 +145,4 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
       valuesOfModel.pop();
     }
   }
-
-  /**
-   * model computation without checks for further options.
-   *
-   * @throws SolverException if model can not be constructed.
-   */
-  protected abstract Model getModelWithoutChecks() throws SolverException;
 }

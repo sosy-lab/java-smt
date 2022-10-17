@@ -145,7 +145,7 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
     Preconditions.checkState(!closed);
     Preconditions.checkState(wasLastSatCheckSat, NO_MODEL_HELP);
     checkGenerateModels();
-    return getModelWithoutChecks();
+    return new CachingModel(new BoolectorModel(btor, creator, this, getAssertedTerms()));
   }
 
   @Override
@@ -158,11 +158,6 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
       Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
     throw new UnsupportedOperationException(
         "Unsat core with assumptions is not supported by Boolector.");
-  }
-
-  @Override
-  protected Model getModelWithoutChecks() {
-    return new CachingModel(new BoolectorModel(btor, creator, this, getAssertedTerms()));
   }
 
   @Override

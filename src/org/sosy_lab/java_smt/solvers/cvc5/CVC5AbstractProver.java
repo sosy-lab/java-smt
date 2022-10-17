@@ -137,13 +137,8 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   @Override
   public CVC5Model getModel() {
     Preconditions.checkState(!closed);
-    checkGenerateModels();
-    return getModelWithoutChecks();
-  }
-
-  @Override
-  protected CVC5Model getModelWithoutChecks() {
     Preconditions.checkState(!changedSinceLastSatQuery);
+    checkGenerateModels();
     // special case for CVC5: Models are not permanent and need to be closed
     // before any change is applied to the prover stack. So, we register the Model as Evaluator.
     return registerEvaluator(new CVC5Model(this, mgr, creator, getAssertedExpressions()));

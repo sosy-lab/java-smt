@@ -141,11 +141,6 @@ abstract class PrincessAbstractProver<E, AF> extends AbstractProverWithAllSat<E>
     Preconditions.checkState(!closed);
     Preconditions.checkState(wasLastSatCheckSat, NO_MODEL_HELP);
     checkGenerateModels();
-    return getModelWithoutChecks();
-  }
-
-  @Override
-  protected Model getModelWithoutChecks() throws SolverException {
     final PartialModel partialModel;
     try {
       partialModel = partialModel();
