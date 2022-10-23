@@ -146,7 +146,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   public Evaluator getEvaluator() {
     Preconditions.checkState(!closed);
     checkGenerateModels();
-    return registerEvaluator(new Mathsat5Evaluator(this, creator));
+    return registerEvaluator(new Mathsat5Evaluator(this, creator, curEnv));
   }
 
   @Override

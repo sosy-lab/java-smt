@@ -17,13 +17,17 @@ import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 /** This class requires an option for MathSAT: model_generation=true. TODO option does not work? */
 class Mathsat5Evaluator extends AbstractEvaluator<Long, Long, Long> {
 
-  Mathsat5Evaluator(AbstractProver<?> prover, Mathsat5FormulaCreator creator) {
+  private final long proverEnvironment;
+
+  Mathsat5Evaluator(
+      AbstractProver<?> prover, Mathsat5FormulaCreator creator, long pProverEnvironment) {
     super(prover, creator);
+    proverEnvironment = pProverEnvironment;
   }
 
   @Override
   protected Long evalImpl(Long formula) {
     Preconditions.checkState(!isClosed());
-    return msat_get_model_value(creator.getEnv(), formula);
+    return msat_get_model_value(proverEnvironment, formula);
   }
 }
