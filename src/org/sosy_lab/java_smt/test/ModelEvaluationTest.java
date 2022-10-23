@@ -219,13 +219,10 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
   public void testModelGeneration() throws SolverException, InterruptedException {
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(bmgr.and(getConstraints()));
-      assertThat(prover).isSatisfiable();
-
       for (int i = 0; i < PROBLEM_SIZE; i++) {
+        assertThat(prover).isSatisfiable();
         try (Model m = prover.getModel()) {
-          BooleanFormula x = bmgr.makeVariable("x" + i);
-          prover.push(m.evaluate(x) ? bmgr.not(x) : x);
-          assertThat(prover).isSatisfiable();
+          prover.push(getNewConstraints(i, m));
         }
       }
     }
@@ -235,13 +232,11 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
   public void testEvaluatorGeneration() throws SolverException, InterruptedException {
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(bmgr.and(getConstraints()));
-      assertThat(prover).isSatisfiable();
 
       for (int i = 0; i < PROBLEM_SIZE; i++) {
+        assertThat(prover).isSatisfiable();
         try (Evaluator m = prover.getEvaluator()) {
-          BooleanFormula x = bmgr.makeVariable("x" + i);
-          prover.push(m.evaluate(x) ? bmgr.not(x) : x);
-          assertThat(prover).isSatisfiable();
+          prover.push(getNewConstraints(i, m));
         }
       }
     }
@@ -262,5 +257,11 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
       }
     }
     return constraints;
+  }
+
+  private BooleanFormula getNewConstraints(int i, Evaluator m) {
+    BooleanFormula x = bmgr.makeVariable("x" + i);
+    // prover.push(m.evaluate(x) ? bmgr.not(x) : x);
+    return m.evaluate(x) ? x : bmgr.not(x);
   }
 }
