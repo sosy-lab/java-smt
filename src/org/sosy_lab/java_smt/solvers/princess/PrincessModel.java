@@ -10,8 +10,8 @@ package org.sosy_lab.java_smt.solvers.princess;
 
 import static scala.collection.JavaConverters.asJava;
 
-import ap.SimpleAPI;
-import ap.SimpleAPI.PartialModel;
+import ap.api.PartialModel;
+import ap.api.SimpleAPI;
 import ap.parser.IAtom;
 import ap.parser.IBinFormula;
 import ap.parser.IBinJunctor;
@@ -57,7 +57,7 @@ class PrincessModel extends CachingAbstractModel<IExpression, Sort, PrincessEnvi
 
     // get abbreviations, we do not want to export them.
     Set<Predicate> abbrevs = new LinkedHashSet<>();
-    for (var entry : asJava(api.ap$SimpleAPI$$abbrevPredicates()).entrySet()) {
+    for (var entry : asJava(api.ap$api$SimpleAPI$$apiStack().abbrevPredicates()).entrySet()) {
       abbrevs.add(entry.getKey()); // collect the abbreviation.
       abbrevs.add(entry.getValue()._2()); // the definition is also handled as abbreviation here.
     }

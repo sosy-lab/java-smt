@@ -8,7 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.princess;
 
-import ap.SimpleAPI;
+import ap.api.SimpleAPI;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
 import com.google.common.base.Preconditions;

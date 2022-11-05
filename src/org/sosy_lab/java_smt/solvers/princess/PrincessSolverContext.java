@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.princess;
 
+import ap.api.SimpleAPI;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -92,7 +93,7 @@ public final class PrincessSolverContext extends AbstractSolverContext {
 
   @Override
   public String getVersion() {
-    return "Princess " + ap.SimpleAPI.version();
+    return "Princess " + SimpleAPI.version();
   }
 
   @Override
