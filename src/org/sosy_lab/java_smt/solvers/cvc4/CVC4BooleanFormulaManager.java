@@ -141,6 +141,11 @@ public class CVC4BooleanFormulaManager
   }
 
   @Override
+  protected Expr implication(Expr bits1, Expr bits2) {
+    return exprManager.mkExpr(Kind.IMPLIES, bits1, bits2);
+  }
+
+  @Override
   protected boolean isTrue(Expr pBits) {
     return pBits.isConst() && pBits.getConstBoolean();
   }
