@@ -173,9 +173,7 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
    * legacy CVC4. TODO: decide whether we need this or not
    */
   private void closeAllModels() {
-    for (CVC5Model model : ImmutableList.copyOf(models)) {
-      model.close();
-    }
+    ImmutableList.copyOf(models).forEach(CVC5Model::close);
     Preconditions.checkState(models.isEmpty(), "all models should be closed");
   }
 
@@ -193,11 +191,7 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     closeAllModels();
     changedSinceLastSatQuery = false;
     if (!incremental) {
-      for (Term term : getAssertedExpressions()) {
-        // We can not translate terms as CVC5 does not support it. We need to use the same solver
-        // for creation, assertion and solving!
-        solver.assertFormula(term);
-      }
+      getAssertedExpressions().forEach(solver::assertFormula);
     }
 
     /* Shutdown currently not possible in CVC5. */
