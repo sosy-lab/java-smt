@@ -48,7 +48,13 @@ public abstract class AbstractModel<TFormulaInfo, TType, TEnv> implements Model 
   @Nullable
   @Override
   public Rational evaluate(RationalFormula f) {
-    return (Rational) evaluateImpl(creator.extractInfo(f));
+    Object value = evaluateImpl(creator.extractInfo(f));
+    if (value instanceof BigInteger) {
+      // We simplified the value internally. Here, we need to convert it back to Rational.
+      return Rational.ofBigInteger((BigInteger) value);
+    } else {
+      return (Rational) value;
+    }
   }
 
   @Nullable

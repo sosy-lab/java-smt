@@ -11,7 +11,6 @@ package org.sosy_lab.java_smt.solvers.smtinterpol;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.common.collect.Collections3.transformedImmutableListCopy;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
@@ -167,15 +166,10 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
        * and currently we do not support bitvectors for SmtInterpol.
        */
       Rational rationalValue = (Rational) ((ConstantTerm) value).getValue();
-      org.sosy_lab.common.rationals.Rational out =
+      org.sosy_lab.common.rationals.Rational ratValue =
           org.sosy_lab.common.rationals.Rational.of(
               rationalValue.numerator(), rationalValue.denominator());
-      if (getFormulaTypeOfSort(value.getSort()).isIntegerType()) {
-        Preconditions.checkState(out.isIntegral());
-        return out.getNum();
-      } else {
-        return out;
-      }
+      return ratValue.isIntegral() ? ratValue.getNum() : ratValue;
     } else {
       throw new IllegalArgumentException("Unexpected value: " + value);
     }

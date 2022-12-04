@@ -740,7 +740,8 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
 
       } else if (value.isRealValue()) {
         Pair<BigInteger, BigInteger> realValue = value.getRealValue();
-        return Rational.of(realValue.first, realValue.second);
+        Rational ratValue = Rational.of(realValue.first, realValue.second);
+        return ratValue.isIntegral() ? ratValue.getNum() : ratValue;
 
       } else if (value.isBitVectorValue()) {
         String bitvectorValue = value.getBitVectorValue();
