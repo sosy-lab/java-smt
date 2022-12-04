@@ -139,7 +139,6 @@ public final class CVC5SolverContext extends AbstractSolverContext {
   public void close() {
     if (creator != null) {
       closed = true;
-      solver.close();
       creator = null;
     }
   }
