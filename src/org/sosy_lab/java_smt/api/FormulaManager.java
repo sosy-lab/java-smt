@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.api;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.List;
 import java.util.Map;
@@ -223,7 +224,7 @@ public interface FormulaManager {
    * @param f The input formula
    * @return Map from variable names to the corresponding formulas.
    */
-  Map<String, Formula> extractVariables(Formula f);
+  ImmutableMap<String, Formula> extractVariables(Formula f);
 
   /**
    * Extract the names of all free variables and UFs in a formula.
@@ -232,7 +233,7 @@ public interface FormulaManager {
    * @return Map from variable names to the corresponding formulas. If an UF occurs multiple times
    *     in the input formula, an arbitrary instance of an application of this UF is in the map.
    */
-  Map<String, Formula> extractVariablesAndUFs(Formula f);
+  ImmutableMap<String, Formula> extractVariablesAndUFs(Formula f);
 
   /**
    * Substitute every occurrence of any item from {@code changeFrom} in formula {@code f} to the

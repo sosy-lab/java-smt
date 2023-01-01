@@ -18,7 +18,6 @@ import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -364,7 +363,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    * @param f The input formula
    */
   @Override
-  public Map<String, Formula> extractVariables(Formula f) {
+  public ImmutableMap<String, Formula> extractVariables(Formula f) {
     ImmutableMap.Builder<String, Formula> found = ImmutableMap.builder();
     formulaCreator.extractVariablesAndUFs(f, false, found::put);
     return found.buildOrThrow(); // visitation should not visit any symbol twice
@@ -376,12 +375,12 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    * @param f The input formula
    */
   @Override
-  public Map<String, Formula> extractVariablesAndUFs(Formula f) {
-    // Need LinkedHashMap because we can find duplicate keys with different values,
-    // and ImmutableMap.Builder rejects them.
-    Map<String, Formula> found = new LinkedHashMap<>();
+  public ImmutableMap<String, Formula> extractVariablesAndUFs(Formula f) {
+    ImmutableMap.Builder<String, Formula> found = ImmutableMap.builder();
     formulaCreator.extractVariablesAndUFs(f, true, found::put);
-    return ImmutableMap.copyOf(found);
+    // We can find duplicate keys with different values, like UFs with distinct parameters.
+    // In such a case, we use only one appearance (the last one).
+    return found.buildKeepingLast();
   }
 
   @Override
