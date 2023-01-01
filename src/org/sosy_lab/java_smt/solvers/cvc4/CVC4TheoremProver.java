@@ -161,11 +161,16 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     return registerEvaluator(new CVC4Model(this, creator, smtEngine, getAssertedExpressions()));
   }
 
-  @SuppressWarnings("resource")
   @Override
   public Evaluator getEvaluator() {
     Preconditions.checkState(!closed);
     checkGenerateModels();
+    return getEvaluatorWithoutChecks();
+  }
+
+  @SuppressWarnings("resource")
+  @Override
+  protected Evaluator getEvaluatorWithoutChecks() {
     return registerEvaluator(new CVC4Evaluator(this, creator, smtEngine));
   }
 

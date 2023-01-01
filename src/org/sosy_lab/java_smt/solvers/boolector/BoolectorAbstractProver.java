@@ -146,7 +146,12 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
     Preconditions.checkState(!closed);
     Preconditions.checkState(wasLastSatCheckSat, NO_MODEL_HELP);
     checkGenerateModels();
-    return new CachingModel(new BoolectorModel(btor, creator, this, getAssertedTerms()));
+    return new CachingModel(getEvaluatorWithoutChecks());
+  }
+
+  @Override
+  protected BoolectorModel getEvaluatorWithoutChecks() {
+    return new BoolectorModel(btor, creator, this, getAssertedTerms());
   }
 
   @Override

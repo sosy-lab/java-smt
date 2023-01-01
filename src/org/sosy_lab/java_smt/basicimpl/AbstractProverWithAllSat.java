@@ -73,7 +73,7 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
       shutdownNotifier.shutdownIfNecessary();
 
       ImmutableList.Builder<BooleanFormula> valuesOfModel = ImmutableList.builder();
-      try (Evaluator evaluator = getEvaluator()) {
+      try (Evaluator evaluator = getEvaluatorWithoutChecks()) {
         for (BooleanFormula formula : importantPredicates) {
           Boolean value = evaluator.evaluate(formula);
           if (value == null) {
@@ -145,4 +145,16 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
       valuesOfModel.pop();
     }
   }
+
+  /**
+   * Get an evaluator instance for model evaluation without executing checks for prover options.
+   *
+   * <p>This method allows model evaluation without explicitly enabling the prover-option {@link
+   * ProverOptions#GENERATE_MODELS}. We only use this method internally, when we know about a valid
+   * solver state. The returned evaluator does not have caching or any direct optimization for user
+   * interaction.
+   *
+   * @throws SolverException if model can not be constructed.
+   */
+  protected abstract Evaluator getEvaluatorWithoutChecks() throws SolverException;
 }
