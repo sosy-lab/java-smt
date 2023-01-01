@@ -146,9 +146,9 @@ SPDX-License-Identifier: Apache-2.0
         <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.5-1242-g5c50fb6d" conf="runtime-smtinterpol->master; contrib->sources"/>
 
         <!-- Princess for our Maven release -->
-        <dependency org="io.github.uuverifiers" name="princess_2.13" rev="2022-07-01" conf="runtime-princess-with-javacup->default; contrib->sources"/>
+        <dependency org="io.github.uuverifiers" name="princess_2.13" rev="2022-11-03" conf="runtime-princess-with-javacup->default; contrib->sources"/>
         <!-- Princess for our Ivy release-->
-        <dependency org="io.github.uuverifiers" name="princess_2.13" rev="2022-07-01" conf="runtime-princess->default; contrib->sources">
+        <dependency org="io.github.uuverifiers" name="princess_2.13" rev="2022-11-03" conf="runtime-princess->default; contrib->sources">
           <!-- Exclude dependency on java-cup and replace it with java-cup-runtime, which is enough.
                We use the JAR that is published by us instead of the one from net.sf.squirrel-sql.thirdparty-non-maven
                because the latter does not provide a separate JAR for java-cup-runtime. -->
@@ -161,7 +161,7 @@ SPDX-License-Identifier: Apache-2.0
         <dependency org="org.sosy_lab" name="javasmt-solver-z3" rev="4.10.1" conf="runtime-z3->solver-z3; contrib->sources,javadoc" />
         <dependency org="org.sosy_lab" name="javasmt-solver-optimathsat" rev="1.7.1-sosy0" conf="runtime-optimathsat->solver-optimathsat" />
         <dependency org="org.sosy_lab" name="javasmt-solver-cvc4" rev="1.8-prerelease-2020-06-24-g7825d8f28" conf="runtime-cvc4->solver-cvc4" />
-        <dependency org="org.sosy_lab" name="javasmt-solver-cvc5" rev="1.0.1-g8c2b8db17" conf="runtime-cvc5->solver-cvc5" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-cvc5" rev="1.0.2-g40f1137e5" conf="runtime-cvc5->solver-cvc5" />
         <dependency org="org.sosy_lab" name="javasmt-solver-boolector" rev="3.2.2-g1a89c229" conf="runtime-boolector->solver-boolector" />
 
         <!-- additional JavaSMT components with Solver Binaries -->

@@ -89,7 +89,7 @@ public class CVC5NativeAPITest {
 
   @After
   public void freeEnvironment() {
-    solver.close();
+    solver.deletePointer();
   }
 
   /*
@@ -1218,19 +1218,18 @@ public class CVC5NativeAPITest {
 
   @Test
   public void termAccessAfterModelClosed() throws CVC5ApiException {
-    try (Solver secondSolver = createEnvironment()) {
-      Term v = solver.mkConst(solver.getIntegerSort(), "v");
-      Term one = solver.mkInteger(1);
-      Term eq = solver.mkTerm(Kind.EQUAL, v, one); // v==1
+    Solver secondSolver = createEnvironment();
+    Term v = solver.mkConst(solver.getIntegerSort(), "v");
+    Term one = solver.mkInteger(1);
+    Term eq = solver.mkTerm(Kind.EQUAL, v, one); // v==1
 
-      secondSolver.assertFormula(eq);
-      Result result = secondSolver.checkSat();
-      assertThat(result.isSat()).isTrue();
+    secondSolver.assertFormula(eq);
+    Result result = secondSolver.checkSat();
+    assertThat(result.isSat()).isTrue();
 
-      Term valueV = secondSolver.getValue(v);
-      Preconditions.checkNotNull(valueV);
-    }
+    Term valueV = secondSolver.getValue(v);
+    Preconditions.checkNotNull(valueV);
 
-    // System.out.println(valueV); // Segmentation fault, because valueX is already cleaned up.
+    System.out.println(valueV);
   }
 }

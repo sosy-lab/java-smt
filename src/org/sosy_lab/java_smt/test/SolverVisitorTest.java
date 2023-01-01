@@ -110,7 +110,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     }
   }
 
-  /** visit a constant and iore other opeations. */
+  /** visit only constants and ignore other operations. */
   private static final class ConstantsVisitor extends DefaultFormulaVisitor<Formula> {
 
     private final List<Object> found = new ArrayList<>();

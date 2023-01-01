@@ -487,6 +487,47 @@ public class SolverStackTest extends SolverBasedTest0 {
     assertThat(stack2.size()).isEqualTo(0);
   }
 
+  @Test
+  public void multiStackTest() throws SolverException, InterruptedException {
+    requireMultipleStackSupport();
+    int limit = 10;
+
+    BooleanFormula a = bmgr.makeVariable("bool_a");
+    BooleanFormula not = bmgr.not(a);
+
+    List<BasicProverEnvironment<?>> stacks = new ArrayList<>();
+    for (int i = 0; i < limit; i++) {
+      stacks.add(newEnvironmentForTest());
+    }
+
+    for (int i = 0; i < limit; i++) {
+      stacks.get(i).push(a); // L1
+      stacks.get(i).push(bmgr.makeBoolean(true));
+      assertThat(stacks.get(i)).isSatisfiable();
+      assertThat(stacks.get(i).size()).isEqualTo(2);
+
+      stacks.get(i).push();
+      stacks.get(i).push();
+      assertThat(stacks.get(i).size()).isEqualTo(4);
+      stacks.get(i).pop();
+      stacks.get(i).pop();
+    }
+
+    for (int i = 0; i < limit; i++) {
+      stacks.get(i).push(not);
+      assertThat(stacks.get(i)).isUnsatisfiable();
+      assertThat(stacks.get(i).size()).isEqualTo(3);
+      stacks.get(i).pop();
+      assertThat(stacks.get(i).size()).isEqualTo(2);
+    }
+
+    for (int i = 0; i < limit; i++) {
+      stacks.get(i).pop();
+      assertThat(stacks.get(i).size()).isEqualTo(1);
+      stacks.get(i).close();
+    }
+  }
+
   @Test(expected = IllegalStateException.class)
   @SuppressWarnings("CheckReturnValue")
   public void avoidDualStacksIfNotSupported() throws InterruptedException {
@@ -501,6 +542,7 @@ public class SolverStackTest extends SolverBasedTest0 {
     // creating a new environment is not allowed with non-empty stack -> fail
     newEnvironmentForTest();
   }
+
   /**
    * This test checks that an SMT solver uses "global declarations": regardless of the stack at
    * declaration time, declarations always live for the full lifetime of the solver (i.e., they do

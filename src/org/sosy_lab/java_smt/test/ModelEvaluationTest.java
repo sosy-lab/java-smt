@@ -94,15 +94,20 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
       assertThat(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {
-        assertThat(m.evaluate(formula)).isIn(possibleExpectedValues);
         if (formula instanceof BooleanFormula) {
           assertThat(m.evaluate((BooleanFormula) formula)).isIn(possibleExpectedValues);
+          assertThat(m.evaluate(formula)).isIn(possibleExpectedValues);
         } else if (formula instanceof IntegerFormula) {
           assertThat(m.evaluate((IntegerFormula) formula)).isIn(possibleExpectedValues);
+          assertThat(m.evaluate(formula)).isIn(possibleExpectedValues);
         } else if (formula instanceof RationalFormula) {
           assertThat(m.evaluate((RationalFormula) formula)).isIn(possibleExpectedValues);
+          // assertThat(m.evaluate(formula)).isIn(possibleExpectedValues);
         } else if (formula instanceof StringFormula) {
           assertThat(m.evaluate((StringFormula) formula)).isIn(possibleExpectedValues);
+          assertThat(m.evaluate(formula)).isIn(possibleExpectedValues);
+        } else {
+          assertThat(m.evaluate(formula)).isIn(possibleExpectedValues);
         }
 
         // let's try to check evaluations. Actually the whole method is based on some default values

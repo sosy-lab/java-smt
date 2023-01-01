@@ -80,10 +80,9 @@ We prefer to compile our own CVC5 binaries and Java bindings.
 For simple usage, we provide a Docker definition/environment under `/docker`,
 in which the following command can be run.
 
-To publish CVC4, checkout the [CVC5 repository](https://github.com/kfriedberger/cvc5).
+To publish CVC5, checkout the [CVC5 repository](https://github.com/cvc5/cvc5).
 Then execute the following command in the JavaSMT directory,
-where `$CVC5_DIR` is the path to the CVC4 directory
-and `$CVC5_VERSION` is the version number:
+where `$CVC5_DIR` is the path to the CVC5 directory and `$CVC5_VERSION` is the version number:
 ```
 ant publish-cvc5 -Dcvc5.path=$CVC5_DIR -Dcvc5.customRev=$CVC5_VERSION
 ```
@@ -91,6 +90,7 @@ Example:
 ```
 ant publish-cvc5 -Dcvc5.path=../CVC5 -Dcvc5.customRev=1.0.1
 ```
+During the build process, our script automatically appends the git-revision after the version.
 Finally follow the instructions shown in the message at the end.
 
 

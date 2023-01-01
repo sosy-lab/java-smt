@@ -52,9 +52,14 @@ public abstract class AbstractEvaluator<TFormulaInfo, TType, TEnv> implements Ev
 
   @Nullable
   @Override
-  public final Rational evaluate(RationalFormula f) {
-    Preconditions.checkState(!isClosed());
-    return (Rational) evaluateImpl(creator.extractInfo(f));
+  public Rational evaluate(RationalFormula f) {
+    Object value = evaluateImpl(creator.extractInfo(f));
+    if (value instanceof BigInteger) {
+      // We simplified the value internally. Here, we need to convert it back to Rational.
+      return Rational.ofBigInteger((BigInteger) value);
+    } else {
+      return (Rational) value;
+    }
   }
 
   @Nullable

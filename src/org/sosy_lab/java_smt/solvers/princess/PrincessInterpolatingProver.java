@@ -11,7 +11,7 @@ package org.sosy_lab.java_smt.solvers.princess;
 import static scala.collection.JavaConverters.asJava;
 import static scala.collection.JavaConverters.asScala;
 
-import ap.SimpleAPI;
+import ap.api.SimpleAPI;
 import ap.basetypes.Tree;
 import ap.parser.IBoolLit;
 import ap.parser.IExpression;

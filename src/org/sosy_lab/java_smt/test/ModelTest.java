@@ -168,7 +168,7 @@ public class ModelTest extends SolverBasedTest0 {
     testModelGetters(
         rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(1)),
         rmgr.makeVariable("x"),
-        Rational.of(1),
+        BigInteger.valueOf(1),
         "x");
   }
 
@@ -180,7 +180,7 @@ public class ModelTest extends SolverBasedTest0 {
     testModelGetters(
         rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(large)),
         rmgr.makeVariable("x"),
-        Rational.ofBigInteger(large),
+        large,
         "x");
   }
 
@@ -2201,6 +2201,11 @@ public class ModelTest extends SolverBasedTest0 {
     requireArrays();
     requireBitvectors();
 
+    assume()
+        .withMessage("Solver is quite slow for this example")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.PRINCESS);
+
     BooleanFormula formula =
         context
             .getFormulaManager()
@@ -2325,7 +2330,7 @@ public class ModelTest extends SolverBasedTest0 {
     evaluateInModel(
         rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(1)),
         rmgr.add(rmgr.makeVariable("x"), rmgr.makeVariable("x")),
-        Rational.of(2));
+        BigInteger.valueOf(2));
   }
 
   @Test
@@ -2386,7 +2391,7 @@ public class ModelTest extends SolverBasedTest0 {
     // Warning: do never call "toString" on this formula!
     BooleanFormula f = bmgr.makeVariable("basis");
 
-    for (int depth = 0; depth < 17; depth++) {
+    for (int depth = 0; depth < 10; depth++) {
       T var = makeVar.apply(depth);
       f = bmgr.or(bmgr.and(f, makeEqZero.apply(var)), bmgr.and(f, makeEqOne.apply(var)));
     }

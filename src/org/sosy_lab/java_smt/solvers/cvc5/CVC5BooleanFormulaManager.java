@@ -84,6 +84,11 @@ public class CVC5BooleanFormulaManager
   }
 
   @Override
+  protected Term implication(Term bits1, Term bits2) {
+    return solver.mkTerm(Kind.IMPLIES, bits1, bits2);
+  }
+
+  @Override
   protected boolean isTrue(Term pBits) {
     return pBits.isBooleanValue() && pBits.getBooleanValue();
   }

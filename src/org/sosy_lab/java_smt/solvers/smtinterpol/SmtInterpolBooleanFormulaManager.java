@@ -114,4 +114,9 @@ class SmtInterpolBooleanFormulaManager
   public Term xor(Term pBits1, Term pBits2) {
     return theory.xor(pBits1, pBits2);
   }
+
+  @Override
+  protected Term implication(Term bits1, Term bits2) {
+    return theory.implies(bits1, bits2);
+  }
 }

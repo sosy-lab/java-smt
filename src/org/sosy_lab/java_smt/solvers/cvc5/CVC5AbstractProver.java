@@ -45,12 +45,6 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   // TODO: does CVC5 support separation logic in incremental mode?
   protected final boolean incremental;
 
-  /*
-   * Note: since CVC5 interacts only via the Solver and nothing else, we can't create multiple
-   * stacks from it. (Communication to other solver instances is very limited/not possible
-   * since parsing/dumping is not completely supported and no translate method is available yet,
-   * but will be added in the future)
-   */
   protected CVC5AbstractProver(
       CVC5FormulaCreator pFormulaCreator,
       ShutdownNotifier pShutdownNotifier,
@@ -174,11 +168,7 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     closeAllEvaluators();
     changedSinceLastSatQuery = false;
     if (!incremental) {
-      for (Term term : getAssertedExpressions()) {
-        // We can not translate terms as CVC5 does not support it. We need to use the same solver
-        // for creation, assertion and solving!
-        solver.assertFormula(term);
-      }
+      getAssertedExpressions().forEach(solver::assertFormula);
     }
 
     /* Shutdown currently not possible in CVC5. */
@@ -231,14 +221,9 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @Override
   public void close() {
-    // TODO FIX ME!
-    // We disable the closing of models and do not close the solver instance here,
-    // because the formulas returned from a model will cause SegFaults if the solver instance
-    // is gone. This is a small memory leak. See https://github.com/cvc5/cvc5-projects/issues/20
-    // and https://github.com/sosy-lab/java-smt/pull/279#issuecomment-1265253898 for details.
     if (!closed) {
       assertedFormulas.clear();
-      // solver.close();
+      solver.deletePointer();
       closed = true;
     }
     super.close();

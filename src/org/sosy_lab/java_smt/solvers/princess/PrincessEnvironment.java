@@ -11,7 +11,7 @@ package org.sosy_lab.java_smt.solvers.princess;
 import static scala.collection.JavaConverters.asJava;
 import static scala.collection.JavaConverters.collectionAsScalaIterableConverter;
 
-import ap.SimpleAPI;
+import ap.api.SimpleAPI;
 import ap.parser.BooleanCompactifier;
 import ap.parser.Environment.EnvironmentException;
 import ap.parser.IAtom;

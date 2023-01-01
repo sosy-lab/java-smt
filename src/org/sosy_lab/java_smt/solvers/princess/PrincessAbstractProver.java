@@ -12,9 +12,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static scala.collection.JavaConverters.asJava;
 import static scala.collection.JavaConverters.asScala;
 
-import ap.SimpleAPI;
-import ap.SimpleAPI.PartialModel;
-import ap.SimpleAPI.SimpleAPIException;
+import ap.api.PartialModel;
+import ap.api.SimpleAPI;
+import ap.api.SimpleAPI.SimpleAPIException;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.IFunction;
