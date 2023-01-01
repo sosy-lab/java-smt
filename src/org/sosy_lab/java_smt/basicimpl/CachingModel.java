@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import java.math.BigInteger;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -27,7 +28,7 @@ public class CachingModel implements Model {
   private @Nullable ImmutableList<ValueAssignment> modelAssignments = null;
 
   public CachingModel(Model pDelegate) {
-    delegate = pDelegate;
+    delegate = Preconditions.checkNotNull(pDelegate);
   }
 
   @Override

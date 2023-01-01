@@ -118,7 +118,9 @@ public abstract class AbstractEvaluator<TFormulaInfo, TType, TEnv> implements Ev
 
   @Override
   public void close() {
-    prover.unregisterEvaluator(this);
+    if (prover != null) { // can be NULL for testing
+      prover.unregisterEvaluator(this);
+    }
     closed = true;
   }
 }
