@@ -16,7 +16,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -58,7 +58,7 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
    */
   private static final String DEFAULT_MODEL_STRING = "";
 
-  private static int PROBLEM_SIZE;
+  private static int problemSize;
 
   @Parameters(name = "{0}")
   public static Object[] getAllSolvers() {
@@ -74,7 +74,7 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
 
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() {
-    PROBLEM_SIZE = solverToUse() == Solvers.PRINCESS ? 10 : 100; // Princess is too slow.
+    problemSize = solverToUse() == Solvers.PRINCESS ? 10 : 100; // Princess is too slow.
     ConfigurationBuilder builder = super.createTestConfigBuilder();
     if (solverToUse() == Solvers.MATHSAT5) {
       builder.setOption("solver.mathsat5.furtherOptions", "model_generation=true");
@@ -219,7 +219,7 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
   public void testModelGeneration() throws SolverException, InterruptedException {
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(bmgr.and(getConstraints()));
-      for (int i = 0; i < PROBLEM_SIZE; i++) {
+      for (int i = 0; i < problemSize; i++) {
         assertThat(prover).isSatisfiable();
         try (Model m = prover.getModel()) {
           prover.push(getNewConstraints(i, m));
@@ -233,7 +233,7 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(bmgr.and(getConstraints()));
 
-      for (int i = 0; i < PROBLEM_SIZE; i++) {
+      for (int i = 0; i < problemSize; i++) {
         assertThat(prover).isSatisfiable();
         try (Evaluator m = prover.getEvaluator()) {
           prover.push(getNewConstraints(i, m));
@@ -242,10 +242,10 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
     }
   }
 
-  @Nonnull
+  @NonNull
   private List<BooleanFormula> getConstraints() {
     List<BooleanFormula> constraints = new ArrayList<>();
-    for (int i = 0; i < PROBLEM_SIZE; i++) {
+    for (int i = 0; i < problemSize; i++) {
       BooleanFormula x = bmgr.makeVariable("x" + i);
       for (int j = 0; j < 5; j++) {
         BooleanFormula y = bmgr.makeVariable("y" + i + "_" + j);

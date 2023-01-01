@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.princess;
 
-
 import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.types.Sort;
