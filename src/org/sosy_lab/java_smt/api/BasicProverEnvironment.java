@@ -79,12 +79,25 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
       throws SolverException, InterruptedException;
 
   /**
-   * Get a satisfying assignment. This should be called only immediately after an {@link #isUnsat()}
-   * call that returned <code>false</code>. A model might contain additional symbols with their
-   * evaluation, if a solver uses its own temporary symbols. There should be at least a
-   * value-assignment for each free symbol.
+   * Get a satisfying assignment. This method should be called only immediately after an {@link
+   * #isUnsat()} call that returned <code>false</code>. The returned model is guaranteed to stay
+   * constant and valid as long as the solver context is available, even if constraints are added
+   * to, pushed or popped from the prover stack.
+   *
+   * <p>A model might contain additional symbols with their evaluation, if a solver uses its own
+   * temporary symbols. There should be at least a value-assignment for each free symbol.
    */
   Model getModel() throws SolverException;
+
+  /**
+   * Get a temporary view on the current satisfying assignment. This should be called only
+   * immediately after an {@link #isUnsat()} call that returned <code>false</code>. The evaluator
+   * should no longer be used as soon as any constraints are added to, pushed, or popped from the
+   * prover stack.
+   */
+  default Evaluator getEvaluator() throws SolverException {
+    return getModel();
+  }
 
   /**
    * Get a list of satisfying assignments. This is equivalent to <code>

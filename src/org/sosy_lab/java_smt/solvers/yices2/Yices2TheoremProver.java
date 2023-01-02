@@ -42,6 +42,7 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
+import org.sosy_lab.java_smt.basicimpl.CachingModel;
 
 /**
  * Info about the option {@link ProverOptions#GENERATE_UNSAT_CORE}: Yices provides the unsat core
@@ -166,11 +167,17 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
         curEnv, DEFAULT_PARAMS, pAssumptions.size(), uncapsulate(pAssumptions), shutdownNotifier);
   }
 
+  @SuppressWarnings("resource")
   @Override
   public Model getModel() throws SolverException {
     Preconditions.checkState(!closed);
     checkGenerateModels();
-    return getModelWithoutChecks();
+    return new CachingModel(getEvaluatorWithoutChecks());
+  }
+
+  @Override
+  protected Yices2Model getEvaluatorWithoutChecks() {
+    return new Yices2Model(yices_get_model(curEnv, 1), this, creator);
   }
 
   private List<BooleanFormula> encapsulate(int[] terms) {
@@ -218,10 +225,5 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
       constraintStack.clear();
       closed = true;
     }
-  }
-
-  @Override
-  protected Model getModelWithoutChecks() {
-    return new Yices2Model(yices_get_model(curEnv, 1), this, creator);
   }
 }

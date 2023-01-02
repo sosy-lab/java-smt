@@ -116,7 +116,7 @@ class PrincessBooleanFormulaManager
   }
 
   /**
-   * simplification based on distibution property of boolean operands, to avoid identical subgraphs
+   * simplification based on distribution property of boolean operands, to avoid identical subgraphs
    * in basic boolean operations:
    *
    * <ul>

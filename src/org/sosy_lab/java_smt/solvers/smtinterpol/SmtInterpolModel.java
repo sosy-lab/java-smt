@@ -22,27 +22,29 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
+import org.sosy_lab.java_smt.basicimpl.AbstractModel;
+import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
-class SmtInterpolModel extends CachingAbstractModel<Term, Sort, Script> {
+class SmtInterpolModel extends AbstractModel<Term, Sort, Script> {
 
   private final Model model;
   private final Script env;
   private final ImmutableList<Term> assertedTerms;
 
   SmtInterpolModel(
+      AbstractProver<?> pProver,
       Model pModel,
       FormulaCreator<Term, Sort, Script, ?> pCreator,
       Collection<Term> pAssertedTerms) {
-    super(pCreator);
+    super(pProver, pCreator);
     model = pModel;
     env = pCreator.getEnv();
     assertedTerms = ImmutableList.copyOf(pAssertedTerms);
   }
 
   @Override
-  protected ImmutableList<ValueAssignment> toList() {
+  public ImmutableList<ValueAssignment> asList() {
 
     Set<FunctionSymbol> usedSymbols = new LinkedHashSet<>();
     for (Term assertedTerm : assertedTerms) {

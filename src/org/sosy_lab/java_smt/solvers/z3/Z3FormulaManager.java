@@ -114,7 +114,8 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
 
     Preconditions.checkState(e != 0, "parsing aborted");
     final int size = Native.astVectorSize(env, e);
-    Preconditions.checkState(size == 1, "parsing expects exactly one asserted term.");
+    Preconditions.checkState(
+        size == 1, "parsing expects exactly one asserted term, but got %s terms", size);
     final long term = Native.astVectorGet(env, e, 0);
 
     // last step: all parsed symbols need to be declared again to have them tracked in the creator.

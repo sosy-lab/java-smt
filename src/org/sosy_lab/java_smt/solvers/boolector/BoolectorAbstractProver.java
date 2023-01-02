@@ -24,6 +24,7 @@ import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
+import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import org.sosy_lab.java_smt.solvers.boolector.BtorJNI.TerminationCallback;
 
 abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
@@ -139,12 +140,18 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
     return isUnsat();
   }
 
+  @SuppressWarnings("resource")
   @Override
   public Model getModel() throws SolverException {
     Preconditions.checkState(!closed);
     Preconditions.checkState(wasLastSatCheckSat, NO_MODEL_HELP);
     checkGenerateModels();
-    return getModelWithoutChecks();
+    return new CachingModel(getEvaluatorWithoutChecks());
+  }
+
+  @Override
+  protected BoolectorModel getEvaluatorWithoutChecks() {
+    return new BoolectorModel(btor, creator, this, getAssertedTerms());
   }
 
   @Override
@@ -157,11 +164,6 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
       Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
     throw new UnsupportedOperationException(
         "Unsat core with assumptions is not supported by Boolector.");
-  }
-
-  @Override
-  protected Model getModelWithoutChecks() {
-    return new BoolectorModel(btor, creator, this, getAssertedTerms());
   }
 
   @Override

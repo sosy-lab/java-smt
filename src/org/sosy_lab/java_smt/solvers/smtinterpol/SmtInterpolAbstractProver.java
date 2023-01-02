@@ -37,6 +37,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
+import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 @SuppressWarnings("ClassTypeParameterName")
@@ -130,8 +131,9 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
 
   protected abstract Collection<Term> getAssertedTerms();
 
+  @SuppressWarnings("resource")
   @Override
-  public SmtInterpolModel getModel() {
+  public org.sosy_lab.java_smt.api.Model getModel() {
     checkState(!closed);
     checkGenerateModels();
     final Model model;
@@ -145,7 +147,7 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
         throw e;
       }
     }
-    return new SmtInterpolModel(model, creator, getAssertedTerms());
+    return new CachingModel(new SmtInterpolModel(this, model, creator, getAssertedTerms()));
   }
 
   protected static String generateTermName() {

@@ -1,0 +1,81 @@
+// This file is part of JavaSMT,
+// an API wrapper for a collection of SMT solvers:
+// https://github.com/sosy-lab/java-smt
+//
+// SPDX-FileCopyrightText: 2022 Dirk Beyer <https://www.sosy-lab.org>
+//
+// SPDX-License-Identifier: Apache-2.0
+
+package org.sosy_lab.java_smt.basicimpl;
+
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
+import java.math.BigInteger;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.sosy_lab.common.rationals.Rational;
+import org.sosy_lab.java_smt.api.BitvectorFormula;
+import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.Model;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
+import org.sosy_lab.java_smt.api.StringFormula;
+
+public class CachingModel implements Model {
+
+  private final Model delegate;
+
+  private @Nullable ImmutableList<ValueAssignment> modelAssignments = null;
+
+  public CachingModel(Model pDelegate) {
+    delegate = Preconditions.checkNotNull(pDelegate);
+  }
+
+  @Override
+  public ImmutableList<ValueAssignment> asList() {
+    if (modelAssignments == null) {
+      modelAssignments = delegate.asList();
+    }
+    return modelAssignments;
+  }
+
+  @Override
+  public void close() {
+    delegate.close();
+  }
+
+  @Override
+  public <T extends Formula> @Nullable T eval(T formula) {
+    return delegate.eval(formula);
+  }
+
+  @Override
+  public @Nullable Object evaluate(Formula formula) {
+    return delegate.evaluate(formula);
+  }
+
+  @Override
+  public @Nullable BigInteger evaluate(IntegerFormula formula) {
+    return delegate.evaluate(formula);
+  }
+
+  @Override
+  public @Nullable Rational evaluate(RationalFormula formula) {
+    return delegate.evaluate(formula);
+  }
+
+  @Override
+  public @Nullable Boolean evaluate(BooleanFormula formula) {
+    return delegate.evaluate(formula);
+  }
+
+  @Override
+  public @Nullable BigInteger evaluate(BitvectorFormula formula) {
+    return delegate.evaluate(formula);
+  }
+
+  @Override
+  public @Nullable String evaluate(StringFormula formula) {
+    return delegate.evaluate(formula);
+  }
+}

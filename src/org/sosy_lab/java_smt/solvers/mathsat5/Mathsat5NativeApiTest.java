@@ -18,6 +18,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_dest
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_from_smtlib2;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_integer_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_model;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_model_value;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_rational_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_asin;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_eq;
@@ -39,6 +40,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_push
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_option_checked;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_get_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_pi;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_repr;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_type_equals;
 
 import org.junit.AssumptionViolatedException;
@@ -433,7 +435,6 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
   @Test
   public void linearArithmeticModelTest()
       throws IllegalStateException, InterruptedException, SolverException {
-    System.out.println(LIA_QUERY);
     long parsed = msat_from_smtlib2(env, LIA_QUERY);
     msat_assert_formula(env, parsed);
     boolean isSat = msat_check_sat(env);
@@ -453,5 +454,22 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
       // System.out.println(k + " := " + v);
     }
     msat_destroy_model_iterator(iter);
+  }
+
+  @Test
+  public void evaluationWithoutModelTest()
+      throws IllegalStateException, InterruptedException, SolverException {
+    long x = msat_make_variable(env, "x", msat_get_integer_type(env));
+    long num = msat_make_number(env, "10");
+
+    msat_push_backtrack_point(env);
+    msat_assert_formula(env, msat_make_equal(env, x, num));
+    assertThat(msat_check_sat(env)).isTrue();
+
+    boolean isSat = msat_check_sat(env);
+    assertThat(isSat).isTrue();
+
+    long value = msat_get_model_value(env, x);
+    assertThat(msat_term_repr(value)).isEqualTo("10");
   }
 }

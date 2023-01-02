@@ -57,17 +57,16 @@ import java.util.ArrayList;
 import java.util.List;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.rationals.Rational;
-import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
+import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 
-public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
+public class Yices2Model extends AbstractModel<Integer, Integer, Long> {
 
   private final long model;
   private final Yices2TheoremProver prover;
   private final Yices2FormulaCreator formulaCreator;
-  private boolean closed = false;
 
   protected Yices2Model(long model, Yices2TheoremProver prover, Yices2FormulaCreator pCreator) {
-    super(pCreator);
+    super(prover, pCreator);
     this.model = model;
     this.prover = prover; // can be NULL for testing
     this.formulaCreator = Preconditions.checkNotNull(pCreator);
@@ -75,15 +74,15 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
 
   @Override
   public void close() {
-    if (!closed) {
+    if (!isClosed()) {
       yices_free_model(model);
-      closed = true;
     }
+    super.close();
   }
 
   @Override
-  protected ImmutableList<ValueAssignment> toList() {
-    Preconditions.checkState(!closed);
+  public ImmutableList<ValueAssignment> asList() {
+    Preconditions.checkState(!isClosed());
     Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
     List<Integer> complex =
         ImmutableList.of(YVAL_SCALAR, YVAL_FUNCTION, YVAL_MAPPING, YVAL_UNKNOWN, YVAL_TUPLE);
@@ -208,7 +207,7 @@ public class Yices2Model extends CachingAbstractModel<Integer, Integer, Long> {
   @Override
   protected @Nullable Integer evalImpl(Integer pFormula) {
     // TODO Can UF appear here?? // Built in Functions like "add" seem to be OK
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     // TODO REENABLE after testing
     // Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
     int val = yices_get_value_as_term(model, pFormula);

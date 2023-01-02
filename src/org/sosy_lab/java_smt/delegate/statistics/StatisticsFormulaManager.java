@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.delegate.statistics;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -163,12 +164,12 @@ class StatisticsFormulaManager implements FormulaManager {
   }
 
   @Override
-  public Map<String, Formula> extractVariables(Formula pF) {
+  public ImmutableMap<String, Formula> extractVariables(Formula pF) {
     return delegate.extractVariables(pF);
   }
 
   @Override
-  public Map<String, Formula> extractVariablesAndUFs(Formula pF) {
+  public ImmutableMap<String, Formula> extractVariablesAndUFs(Formula pF) {
     return delegate.extractVariablesAndUFs(pF);
   }
 

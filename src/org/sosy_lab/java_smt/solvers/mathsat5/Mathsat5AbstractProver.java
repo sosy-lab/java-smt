@@ -42,9 +42,12 @@ import java.util.Optional;
 import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Evaluator;
+import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
+import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.AllSatModelCallback;
 
 /** Common base class for {@link Mathsat5TheoremProver} and {@link Mathsat5InterpolatingProver}. */
@@ -122,11 +125,12 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
     }
   }
 
+  @SuppressWarnings("resource")
   @Override
-  public Mathsat5Model getModel() throws SolverException {
+  public Model getModel() throws SolverException {
     Preconditions.checkState(!closed);
     checkGenerateModels();
-    return new Mathsat5Model(getMsatModel(), creator, this);
+    return new CachingModel(new Mathsat5Model(getMsatModel(), creator, this));
   }
 
   /**
@@ -137,9 +141,18 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
     return Mathsat5NativeApi.msat_get_model(curEnv);
   }
 
+  @SuppressWarnings("resource")
+  @Override
+  public Evaluator getEvaluator() {
+    Preconditions.checkState(!closed);
+    checkGenerateModels();
+    return registerEvaluator(new Mathsat5Evaluator(this, creator, curEnv));
+  }
+
   @Override
   public void pop() {
     Preconditions.checkState(!closed);
+    closeAllEvaluators();
     msat_pop_backtrack_point(curEnv);
   }
 
@@ -161,6 +174,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
     Preconditions.checkNotNull(assumptions);
+    closeAllEvaluators();
 
     if (!isUnsatWithAssumptions(assumptions)) {
       return Optional.empty();
@@ -195,6 +209,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
       msat_destroy_config(curConfig);
       closed = true;
     }
+    super.close();
   }
 
   @Override
@@ -202,6 +217,8 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
       throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
     checkGenerateAllSat();
+    closeAllEvaluators();
+
     long[] imp = new long[important.size()];
     int i = 0;
     for (BooleanFormula impF : important) {

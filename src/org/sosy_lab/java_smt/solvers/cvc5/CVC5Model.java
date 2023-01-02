@@ -20,28 +20,24 @@ import java.util.Collection;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
-import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
+import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 
-public class CVC5Model extends CachingAbstractModel<Term, Sort, Solver> {
+public class CVC5Model extends AbstractModel<Term, Sort, Solver> {
 
   private final ImmutableList<ValueAssignment> model;
   private final Solver solver;
   private final ImmutableList<Term> assertedExpressions;
-  private final CVC5AbstractProver<?> prover;
 
   @SuppressWarnings("unused")
   private final FormulaManager mgr;
-
-  protected boolean closed = false;
 
   CVC5Model(
       CVC5AbstractProver<?> pProver,
       FormulaManager pMgr,
       CVC5FormulaCreator pCreator,
       Collection<Term> pAssertedExpressions) {
-    super(pCreator);
+    super(pProver, pCreator);
     solver = pProver.solver;
-    prover = pProver;
     mgr = pMgr;
     assertedExpressions = ImmutableList.copyOf(pAssertedExpressions);
 
@@ -53,7 +49,7 @@ public class CVC5Model extends CachingAbstractModel<Term, Sort, Solver> {
 
   @Override
   public Term evalImpl(Term f) {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     return solver.getValue(f);
   }
 
@@ -204,13 +200,7 @@ public class CVC5Model extends CachingAbstractModel<Term, Sort, Solver> {
   }
 
   @Override
-  public void close() {
-    prover.unregisterModel(this);
-    closed = true;
-  }
-
-  @Override
-  protected ImmutableList<ValueAssignment> toList() {
+  public ImmutableList<ValueAssignment> asList() {
     return model;
   }
 }

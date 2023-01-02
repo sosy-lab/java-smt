@@ -21,32 +21,28 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
-import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
+import org.sosy_lab.java_smt.basicimpl.AbstractModel;
+import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 
-final class Z3Model extends CachingAbstractModel<Long, Long, Long> {
+final class Z3Model extends AbstractModel<Long, Long, Long> {
 
   private final long model;
   private final long z3context;
   private static final Pattern Z3_IRRELEVANT_MODEL_TERM_PATTERN = Pattern.compile(".*![0-9]+");
 
   private final Z3FormulaCreator z3creator;
-  private boolean closed = false;
 
-  private Z3Model(long z3context, long z3model, Z3FormulaCreator pCreator) {
-    super(pCreator);
+  Z3Model(AbstractProver<?> pProver, long z3context, long z3model, Z3FormulaCreator pCreator) {
+    super(pProver, pCreator);
     Native.modelIncRef(z3context, z3model);
     model = z3model;
     this.z3context = z3context;
     z3creator = pCreator;
   }
 
-  static Z3Model create(long z3context, long z3model, Z3FormulaCreator pCreator) {
-    return new Z3Model(z3context, z3model, pCreator);
-  }
-
   @Override
-  protected ImmutableList<ValueAssignment> toList() {
-    Preconditions.checkState(!closed);
+  public ImmutableList<ValueAssignment> asList() {
+    Preconditions.checkState(!isClosed());
     ImmutableList.Builder<ValueAssignment> out = ImmutableList.builder();
 
     // Iterate through constants.
@@ -366,16 +362,16 @@ final class Z3Model extends CachingAbstractModel<Long, Long, Long> {
 
   @Override
   public String toString() {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     return Native.modelToString(z3context, model);
   }
 
   @Override
   public void close() {
-    if (!closed) {
+    if (!isClosed()) {
       Native.modelDecRef(z3context, model);
-      closed = true;
     }
+    super.close();
   }
 
   @Override
