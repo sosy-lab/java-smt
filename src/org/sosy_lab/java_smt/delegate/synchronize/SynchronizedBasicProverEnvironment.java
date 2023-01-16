@@ -46,7 +46,7 @@ class SynchronizedBasicProverEnvironment<T> implements BasicProverEnvironment<T>
   }
 
   @Override
-  public void push() {
+  public void push() throws InterruptedException {
     synchronized (sync) {
       delegate.push();
     }

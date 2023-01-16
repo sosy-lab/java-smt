@@ -56,7 +56,7 @@ class LoggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public void push() {
+  public void push() throws InterruptedException {
     logger.log(Level.FINE, "up to level " + level++);
     wrapped.push();
   }

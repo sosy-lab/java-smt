@@ -48,7 +48,7 @@ class StatisticsBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public void push() {
+  public void push() throws InterruptedException {
     stats.push.getAndIncrement();
     delegate.push();
   }

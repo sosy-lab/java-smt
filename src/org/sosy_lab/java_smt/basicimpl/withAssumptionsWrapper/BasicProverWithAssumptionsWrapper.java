@@ -49,7 +49,7 @@ public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironme
   }
 
   @Override
-  public void push() {
+  public void push() throws InterruptedException {
     clearAssumptions();
     delegate.push();
   }

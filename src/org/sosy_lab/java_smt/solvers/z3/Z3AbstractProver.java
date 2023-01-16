@@ -203,9 +203,13 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   @Override
-  public void push() {
+  public void push() throws InterruptedException {
     Preconditions.checkState(!closed);
-    Native.solverPush(z3context, z3solver);
+    try {
+      Native.solverPush(z3context, z3solver);
+    } catch (Z3Exception exception) {
+      throw creator.handleZ3Exception(exception);
+    }
   }
 
   @Override

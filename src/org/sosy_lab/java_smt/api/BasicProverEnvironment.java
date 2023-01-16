@@ -55,7 +55,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * <p>If formulas are added before creating the first backtracking point, they can not be removed
    * via a POP-operation.
    */
-  void push();
+  void push() throws InterruptedException;
 
   /**
    * Get the number of backtracking points/levels on the current stack.

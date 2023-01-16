@@ -221,7 +221,7 @@ public class SolverStackTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void stackTest2() {
+  public void stackTest2() throws InterruptedException {
     BasicProverEnvironment<?> stack = newEnvironmentForTest();
     stack.push();
     assertThat(stack.size()).isEqualTo(1);
@@ -230,7 +230,7 @@ public class SolverStackTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void stackTest3() {
+  public void stackTest3() throws InterruptedException {
     BasicProverEnvironment<?> stack = newEnvironmentForTest();
     stack.push();
     assertThat(stack.size()).isEqualTo(1);
@@ -243,7 +243,7 @@ public class SolverStackTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void stackTest4() {
+  public void stackTest4() throws InterruptedException {
     BasicProverEnvironment<?> stack = newEnvironmentForTest();
     stack.push();
     stack.push();
@@ -289,7 +289,7 @@ public class SolverStackTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void stackTest5() {
+  public void stackTest5() throws InterruptedException {
     BasicProverEnvironment<?> stack = newEnvironmentForTest();
     stack.push();
     stack.pop();
