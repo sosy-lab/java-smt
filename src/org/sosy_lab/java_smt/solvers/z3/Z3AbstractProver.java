@@ -155,9 +155,15 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
       throws Z3SolverException, InterruptedException {
     if (solverStatus == Z3_lbool.Z3_L_UNDEF.toInt()) {
       creator.shutdownNotifier.shutdownIfNecessary();
-      throw new Z3SolverException(
-          "Solver returned 'unknown' status, reason: "
-              + Native.solverGetReasonUnknown(z3context, z3solver));
+      final String reason = Native.solverGetReasonUnknown(z3context, z3solver);
+      switch (reason) {
+        case "canceled": // see Z3: src/tactic/tactic.cpp
+        case "interrupted": // see Z3: src/solver/check_sat_result.cpp
+        case "interrupted from keyboard": // see Z3: src/solver/check_sat_result.cpp
+          throw new InterruptedException(reason);
+        default:
+          throw new Z3SolverException("Solver returned 'unknown' status, reason: " + reason);
+      }
     }
   }
 
