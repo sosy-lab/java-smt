@@ -59,7 +59,25 @@ ant publish-z3 -Dz3.path=$Z3_DIR/bin -Dz3.version=$Z3_VERSION
 ```
 Finally follow the instructions shown in the message at the end.
 
-#### Optional
+#### Optional (from source for Linux target with older GLIBC)
+This step is for the following use case:
+Newer releases of Z3 depend on newer versions of GLIBC (>=v2.35),
+so we want to compile the Linux release on our own and then combine it with the provided libraries for Windows and MacOS.
+We follow the steps from above, download and unpack the given zip archives for all platforms, except the Linux release (where the GLIBC is too new).
+For simple usage, we provide a Docker definition/environment under `/docker` (based on Ubuntu 18.04 with GLIBC 2.27),
+in which the following build command can be run in the unpacked source directory:
+```
+python3 scripts/mk_make.py --java && cd build && make -j 2
+```
+Afterwards copy the native libraries for Linux (`libz3.so` and `libz3java.so`) from the directory `./build` into `./bin`.
+Then perform as written above with adding the additional pre-compiled binaries for other operating systems,
+and publish the directory `./bin` with an ant command like the one from above:
+```
+ant publish-z3 -Dz3.path=$Z3_DIR/bin -Dz3.version=$Z3_VERSION-glibc_2.27
+```
+
+
+#### Optional (outdated: from source for Linux target)
 To publish Z3 from source, [download it](https://github.com/Z3Prover/z3) and build
 it with the following command in its directory on a 64bit Ubuntu 16.04 system:
 ```
