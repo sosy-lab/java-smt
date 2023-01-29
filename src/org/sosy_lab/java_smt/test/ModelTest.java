@@ -2204,7 +2204,9 @@ public class ModelTest extends SolverBasedTest0 {
     assume()
         .withMessage("Solver is quite slow for this example")
         .that(solverToUse())
-        .isNotEqualTo(Solvers.PRINCESS);
+        .isNoneOf(Solvers.PRINCESS, Solvers.Z3);
+    // TODO regression:
+    //  the Z3 library was able to solve this in v4.11.2, but no longer in v4.12.1-glibc_2.27.
 
     BooleanFormula formula =
         context
