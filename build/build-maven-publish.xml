@@ -67,6 +67,20 @@ SPDX-License-Identifier: Apache-2.0
       </sequential>
     </macrodef>
 
+    <!-- macro for preparing a pom-file for a solver before pushing it into a Maven repository -->
+    <macrodef name="generate-solver-pom-file">
+      <attribute name="pomFileTemplate" default="solvers_maven_conf/maven_${stage.solver}_pom_template.xml"/>
+      <attribute name="pomFile" default="solvers_maven_conf/maven_${stage.solver}_pom.xml"/>
+      <sequential>
+        <ivy:makepom ivyfile="solvers_ivy_conf/ivy_${stage.solver}.xml" conf="solver-${stage.solver}"
+                     pomfile="@{pomFile}" templatefile="@{pomFileTemplate}">
+            <mapping conf="solver-${stage.solver}" scope="compile"/>
+            <!-- We currently do not have Ivy-based dependencies for solver libraries.
+                 The mapping is irrelevant and the generated pom-file does not contain dependencies. -->
+        </ivy:makepom>
+      </sequential>
+    </macrodef>
+
     <!-- macro for pushing solvers into a Maven repository
          (push into the staging area, from there manual publication is required afterwards) -->
     <macrodef name="stage-solver-file">
@@ -97,6 +111,8 @@ SPDX-License-Identifier: Apache-2.0
         <ivy:artifactproperty name="[artifact].revision" value="[revision]"/>
         <property name="stage.solver" value="mathsat"/>
         <property name="stage.revision" value="${mathsat.revision}"/>
+        <!-- prepare the pom-file -->
+        <generate-solver-pom-file/>
         <!-- then publish the files -->
         <stage-solver-file filename="libmathsat5j" fileending="so"/>
         <stage-solver-file filename="mathsat" fileending="dll"/>
@@ -110,6 +126,8 @@ SPDX-License-Identifier: Apache-2.0
         <ivy:artifactproperty name="[artifact].revision" value="[revision]"/>
         <property name="stage.solver" value="z3"/>
         <property name="stage.revision" value="${com.microsoft.z3.revision}"/>
+        <!-- prepare the pom-file -->
+        <generate-solver-pom-file/>
         <!-- then publish the files -->
         <stage-solver-file filename="com.microsoft.z3" fileending="jar"/>
         <stage-solver-file filename="libz3java" fileending="so"/>
@@ -126,6 +144,8 @@ SPDX-License-Identifier: Apache-2.0
         <ivy:artifactproperty name="[artifact].revision" value="[revision]"/>
         <property name="stage.solver" value="boolector"/>
         <property name="stage.revision" value="${libboolector.revision}"/>
+        <!-- prepare the pom-file -->
+        <generate-solver-pom-file/>
         <!-- then publish the files -->
         <stage-solver-file filename="libboolector" fileending="so"/>
         <stage-solver-file filename="libminisat" fileending="so"/>
@@ -138,6 +158,8 @@ SPDX-License-Identifier: Apache-2.0
         <ivy:artifactproperty name="[artifact].revision" value="[revision]"/>
         <property name="stage.solver" value="cvc4"/>
         <property name="stage.revision" value="${CVC4.revision}"/>
+        <!-- prepare the pom-file -->
+        <generate-solver-pom-file/>
         <!-- then publish the files -->
         <stage-solver-file filename="CVC4" fileending="jar"/>
         <stage-solver-file filename="libcvc4" fileending="so"/>
@@ -151,6 +173,8 @@ SPDX-License-Identifier: Apache-2.0
         <ivy:artifactproperty name="[artifact].revision" value="[revision]"/>
         <property name="stage.solver" value="cvc5"/>
         <property name="stage.revision" value="${cvc5.revision}"/>
+        <!-- prepare the pom-file -->
+        <generate-solver-pom-file/>
         <!-- then publish the files -->
         <stage-solver-file filename="cvc5" fileending="jar"/>
         <stage-solver-file filename="libcvc5" fileending="so"/>
@@ -173,6 +197,8 @@ SPDX-License-Identifier: Apache-2.0
         <ivy:artifactproperty name="[artifact].revision" value="[revision]"/>
         <property name="stage.solver" value="javasmt_yices2"/>
         <property name="stage.revision" value="${javasmt-yices2.revision}"/>
+        <!-- prepare the pom-file -->
+        <generate-solver-pom-file/>
         <!-- then publish the files -->
         <stage-solver-file filename="javasmt-yices2" fileending="jar" classifier=""/>
         <stage-solver-file filename="javasmt-yices2-sources" fileending="jar" classifier="sources" filedirectory="lib/java-contrib"/>
@@ -183,6 +209,8 @@ SPDX-License-Identifier: Apache-2.0
         <ivy:artifactproperty name="[artifact].revision" value="[revision]"/>
         <property name="stage.solver" value="yices2"/>
         <property name="stage.revision" value="${libyices2j.revision}"/>
+        <!-- prepare the pom-file -->
+        <generate-solver-pom-file/>
         <!-- then publish the file -->
         <stage-solver-file filename="libyices2j" fileending="so"/>
     </target>
