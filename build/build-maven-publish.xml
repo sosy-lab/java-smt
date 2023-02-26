@@ -171,13 +171,11 @@ SPDX-License-Identifier: Apache-2.0
             description="deploy current version of Yices2 to Maven staging repository">
         <!-- get revision from dependencies -->
         <ivy:artifactproperty name="[artifact].revision" value="[revision]"/>
-        <property name="stage.solver" value="yices2"/> <!-- <==unused -->
+        <property name="stage.solver" value="javasmt_yices2"/>
         <property name="stage.revision" value="${javasmt-yices2.revision}"/>
         <!-- then publish the files -->
-        <stage-solver-file filename="javasmt-yices2" fileending="jar" classifier=""
-            pomFile="solvers_maven_conf/maven_javasmt_yices2_pom.xml"/>
-        <stage-solver-file filename="javasmt-yices2-sources" fileending="jar" classifier="sources"
-            pomFile="solvers_maven_conf/maven_javasmt_yices2_pom.xml" filedirectory="lib/java-contrib"/>
+        <stage-solver-file filename="javasmt-yices2" fileending="jar" classifier=""/>
+        <stage-solver-file filename="javasmt-yices2-sources" fileending="jar" classifier="sources" filedirectory="lib/java-contrib"/>
     </target>
     <target name="stage-yices2" depends="build-dependencies"
             description="deploy current version of Yices2 to Maven staging repository">
