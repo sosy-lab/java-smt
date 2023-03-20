@@ -360,4 +360,3 @@ class NQueen extends NQueensSolver {
 
 
 
-s
