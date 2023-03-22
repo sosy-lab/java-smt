@@ -1,8 +1,4 @@
-
-
-
-
-
+package org.sosy_lab.java_smt.example;
 /*
  *  JavaSMT is an API wrapper for a collection of SMT solvers.
  *  This file is part of JavaSMT.
@@ -22,30 +18,15 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
-
-
-
-
-
-
 /*
 *  The Output of this code
-
-
-
-
 * The Queen can be placed in these ways:
 0100
 0001
 1000
 0010
-
 * here '1' indicates position of queen that has been placed
-
-
-* */
-
+ */
 
 import com.google.common.base.Joiner;
 import edu.umd.cs.findbugs.annotations.Nullable;
@@ -69,33 +50,17 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
-
-public class NQueens
-{
-
-
-
-
-
-
-
+public class NQueens {
     public static void main(String... args)
             throws InvalidConfigurationException, SolverException, InterruptedException, IOException {
         Configuration config = Configuration.defaultConfiguration();
         LogManager logger = BasicLogManager.create(config);
-        ShutdownNotifier notifier = ShutdownNotifier.createDummy();
-
-
-        {
+        ShutdownNotifier notifier = ShutdownNotifier.createDummy();{
             Solvers solver = Solvers.PRINCESS;
             try (SolverContext context =
                          SolverContextFactory.createSolverContext(config, logger, notifier, solver)) {
-
-
-                NQueensSolver<?> MyQueen = new NQueen(context,4);
-
+                NQueensSolver MyQueen = new NQueen(context,4);
                 Boolean[][] solution = MyQueen.solve(4);
-
                 if (solution == null) {
                     System.out.println("The Queen can't be placed in this condition.");
                 } else {
@@ -106,7 +71,6 @@ public class NQueens
                 }
             } catch (InvalidConfigurationException | UnsatisfiedLinkError e) {
 
-
                 logger.logUserException(Level.INFO, e, "Solver " + solver + " is not available.");
 
             } catch (UnsupportedOperationException e) {
@@ -114,16 +78,12 @@ public class NQueens
             }
         }
     }
-
-
-
 }
-abstract class NQueensSolver<S> {
+abstract class NQueensSolver {
 
     private final SolverContext context;
     final BooleanFormulaManager bmgr;
     final IntegerFormulaManager imgr;
-
     NQueensSolver(SolverContext pContext) {
         context = pContext;
         bmgr = context.getFormulaManager().getBooleanFormulaManager();
@@ -133,13 +93,9 @@ abstract class NQueensSolver<S> {
             imgr = null;
         }
     }
-
     abstract BooleanFormula[][] getSymbols();
-
     abstract List<BooleanFormula> getRules(BooleanFormula[][] symbols, SolverContext context);
-
     abstract List<BooleanFormula> getAssignments(BooleanFormula[][] symbols, int n);
-
     abstract Boolean getValue(BooleanFormula[][] symbols, Model model, int row, int col);
 
     /**
@@ -167,36 +123,20 @@ abstract class NQueensSolver<S> {
             try (Model model = prover.getModel()) {
                 for (int row = 0; row < n; row++) {
                     for (int col = 0; col < n; col++) {
-
-
                         solution[row][col] = getValue(symbols, model, row,col);
                     }
                 }
                 return solution;
             }
         }
-
-
     }
-
-
-
-
 }
-
-
-
-
-
 class NQueen extends NQueensSolver {
-
     private final int n;
-
     public NQueen(SolverContext context, int n) {
         super(context);
         this.n = n;
     }
-
     /**
      * prepare symbols: one symbol for each of the N*N cells.
      */
@@ -210,13 +150,10 @@ class NQueen extends NQueensSolver {
         }
         return symbols;
     }
-
-  /*
+    /*
  getRules is the method used to add constraints that ensure that no two queens are in the same
  row, column, or diagonal.
-
  */
-
     @Override
     List<BooleanFormula> getRules(BooleanFormula[][] symbols, SolverContext context) {
         List<BooleanFormula> rules = new ArrayList<>();
@@ -281,11 +218,8 @@ class NQueen extends NQueensSolver {
                 }
             }
         }
-
         return rules;
     }
-
-
     @Override
       /*
         getAssignments method is used to create constraints for the solver
@@ -311,7 +245,6 @@ class NQueen extends NQueensSolver {
             }
             assignments.add(bmgr.or(colFormula));
             assignments.add(bmgr.and(colFormula));
-
         }
 
         // Add the diagonal constraints
@@ -340,14 +273,12 @@ class NQueen extends NQueensSolver {
 
         return assignments;
     }
-
     @Override
     @org.checkerframework.checker.nullness.qual.Nullable
     Boolean getValue(BooleanFormula[][] symbols, Model model, int row, int col) {
         BooleanFormula symb=symbols[row][col];
         return model.evaluate(symb);
     }
-
     public BooleanFormula Equals(IntegerFormula a, IntegerFormula b) {
         return bmgr.and(
                 imgr.lessOrEquals(a, b),
