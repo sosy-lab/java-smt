@@ -43,9 +43,7 @@ import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
-import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.Model;
-import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
@@ -56,7 +54,7 @@ public class NQueens {
         Configuration config = Configuration.defaultConfiguration();
         LogManager logger = BasicLogManager.create(config);
         ShutdownNotifier notifier = ShutdownNotifier.createDummy();{
-            Solvers solver = Solvers.PRINCESS;
+            Solvers solver = Solvers.SMTINTERPOL;
             try (SolverContext context =
                          SolverContextFactory.createSolverContext(config, logger, notifier, solver)) {
                 NQueensSolver MyQueen = new NQueen(context,4);
@@ -64,9 +62,15 @@ public class NQueens {
                 if (solution == null) {
                     System.out.println("The Queen can't be placed in this condition.");
                 } else {
-                    System.out.println("The Queen can be placed in these ways:");
-                    for (Boolean[] line : solution) {
-                        System.out.println(Joiner.on("").join(line));
+                    for (int row = 0; row < solution.length; row++) {
+                        for (int col = 0; col < solution[0].length; col++) {
+                            if (solution[row][col]) {
+                                System.out.print("Q ");
+                            } else {
+                                System.out.print("_ ");
+                            }
+                        }
+                        System.out.println();
                     }
                 }
             } catch (InvalidConfigurationException | UnsatisfiedLinkError e) {
@@ -83,19 +87,13 @@ abstract class NQueensSolver {
 
     private final SolverContext context;
     final BooleanFormulaManager bmgr;
-    final IntegerFormulaManager imgr;
+
     NQueensSolver(SolverContext pContext) {
         context = pContext;
         bmgr = context.getFormulaManager().getBooleanFormulaManager();
-        if (context.getSolverName() != Solvers.BOOLECTOR) {
-            imgr = context.getFormulaManager().getIntegerFormulaManager();
-        } else {
-            imgr = null;
-        }
     }
     abstract BooleanFormula[][] getSymbols();
     abstract List<BooleanFormula> getRules(BooleanFormula[][] symbols, SolverContext context);
-    abstract List<BooleanFormula> getAssignments(BooleanFormula[][] symbols, int n);
     abstract Boolean getValue(BooleanFormula[][] symbols, Model model, int row, int col);
 
     /**
@@ -106,13 +104,9 @@ abstract class NQueensSolver {
     public Boolean[][] solve(int n) throws InterruptedException, SolverException {
         BooleanFormula[][] symbols = getSymbols();
         List<BooleanFormula> rules = getRules(symbols, context);
-        List<BooleanFormula> assignments = getAssignments(symbols, n);
-
         // solve N-Queens
         try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
             prover.push(bmgr.and(rules));
-            prover.push(bmgr.and(assignments));
-
             boolean isUnsolvable = prover.isUnsat();
             if (isUnsolvable) {
                 return null;
@@ -133,10 +127,12 @@ abstract class NQueensSolver {
 }
 class NQueen extends NQueensSolver {
     private final int n;
+
     public NQueen(SolverContext context, int n) {
         super(context);
         this.n = n;
     }
+
     /**
      * prepare symbols: one symbol for each of the N*N cells.
      */
@@ -150,140 +146,59 @@ class NQueen extends NQueensSolver {
         }
         return symbols;
     }
+
     /*
- getRules is the method used to add constraints that ensure that no two queens are in the same
- row, column, or diagonal.
- */
+     * getRules is the method used to add constraints that ensure that no two queens are in the same
+     * row, column, or diagonal.
+     */
     @Override
     List<BooleanFormula> getRules(BooleanFormula[][] symbols, SolverContext context) {
         List<BooleanFormula> rules = new ArrayList<>();
 
         // Add constraints to ensure that only one queen is placed in each row
         for (int row = 0; row < n; row++) {
-            BooleanFormula rowConstraint = bmgr.or(symbols[row]);
-            rules.add(rowConstraint);
+            List<BooleanFormula> ors = new ArrayList<>();
+            for (int col = 0; col < n; col++) {
+                ors.add(symbols[row][col]);
+            }
+            rules.add(bmgr.or(ors));
         }
-
         // Add constraints to ensure that only one queen is placed in each column
         for (int col = 0; col < n; col++) {
-            BooleanFormula[] colSymbols = new BooleanFormula[n];
+            List<BooleanFormula> ors = new ArrayList<>();
             for (int row = 0; row < n; row++) {
-                colSymbols[row] = symbols[row][col];
+                ors.add(symbols[row][col]);
             }
-            BooleanFormula colConstraint = bmgr.or(colSymbols);
-            rules.add(colConstraint);
+            rules.add(bmgr.or(ors));
         }
 
         // Add constraints to ensure that only one queen is placed in each diagonal
-        for (int row = 0; row < n; row++) {
-            for (int col = 0; col < n; col++) {
-                // Check diagonals starting from the current position to the top-left corner
-                List<BooleanFormula> diagSymbols = new ArrayList<>();
-                for (int i = row, j = col; i >= 0 && j >= 0; i--, j--) {
-                    diagSymbols.add(symbols[i][j]);
+        for (int i = 0; i < n; i++) {
+            List<BooleanFormula> ors1 = new ArrayList<>();
+            List<BooleanFormula> ors2 = new ArrayList<>();
+            for (int j = 0; j < n; j++) {
+                if (i + j < n) {
+                    ors1.add(symbols[i + j][j]);
+                    ors2.add(symbols[j][i + j]);
                 }
-                if (!diagSymbols.isEmpty()) {
-                    BooleanFormula diagConstraint1 = bmgr.or(diagSymbols.toArray(new BooleanFormula[0]));
-                    rules.add(diagConstraint1);
-                }
-
-                // Check diagonals starting from the current position to the bottom-right corner
-                diagSymbols.clear();
-                for (int i = row, j = col; i < n && j < n; i++, j++) {
-                    diagSymbols.add(symbols[i][j]);
-                }
-                if (!diagSymbols.isEmpty()) {
-                    BooleanFormula diagConstraint2 = bmgr.or(diagSymbols.toArray(new BooleanFormula[0]));
-                    rules.add(diagConstraint2);
-                }
-
-                // Check diagonals starting from the current position to the top-right corner
-                diagSymbols.clear();
-                for (int i = row, j = col; i >= 0 && j < n; i--, j++) {
-                    diagSymbols.add(symbols[i][j]);
-                }
-                if (!diagSymbols.isEmpty()) {
-                    BooleanFormula diagConstraint3 = bmgr.or(diagSymbols.toArray(new BooleanFormula[0]));
-                    rules.add(diagConstraint3);
-                }
-
-                // Check diagonals starting from the current position to the bottom-left corner
-                diagSymbols.clear();
-                for (int i = row, j = col; i < n && j >= 0; i++, j--) {
-                    diagSymbols.add(symbols[i][j]);
-                }
-                if (!diagSymbols.isEmpty()) {
-                    BooleanFormula diagConstraint4 = bmgr.or(diagSymbols.toArray(new BooleanFormula[0]));
-                    rules.add(diagConstraint4);
+                if (j - i >= 0) {
+                    ors1.add(symbols[j - i][j]);
+                    ors2.add(symbols[j][j - i]);
                 }
             }
+            rules.add(bmgr.or(ors1));
+            rules.add(bmgr.or(ors2));
         }
         return rules;
     }
+    /**
+     * getValue returns a Boolean value indicating whether a queen is placed on the cell
+     * corresponding to the given row and column.
+     * We modify this method to return true if the queen is placed, false otherwise.
+     */
     @Override
-      /*
-        getAssignments method is used to create constraints for the solver
-    */
-    List<BooleanFormula> getAssignments(BooleanFormula[][] symbols, int n) {
-        final List<BooleanFormula> assignments = new ArrayList<>();
-
-        // Add the row constraints
-        for (int row = 0; row < n; row++) {
-            List<BooleanFormula> rowFormula = new ArrayList<>();
-            for (int col = 0; col < n; col++) {
-                rowFormula.add(symbols[row][col]);
-            }
-            assignments.add(bmgr.or(rowFormula));
-            assignments.add(bmgr.and(rowFormula));
-        }
-
-        // Add the column constraints
-        for (int col = 0; col < n; col++) {
-            List<BooleanFormula> colFormula = new ArrayList<>();
-            for (int row = 0; row < n; row++) {
-                colFormula.add(symbols[row][col]);
-            }
-            assignments.add(bmgr.or(colFormula));
-            assignments.add(bmgr.and(colFormula));
-        }
-
-        // Add the diagonal constraints
-        for (int i = 0; i < n; i++) {
-            List<BooleanFormula> diag1Formula = new ArrayList<>();
-            List<BooleanFormula> diag2Formula = new ArrayList<>();
-            for (int j = 0; j < n; j++) {
-                int r1 = j - i;
-                int r2 = n - j - i - 1;
-                if (r1 >= 0 && r1 < n) {
-                    diag1Formula.add(symbols[r1][j]);
-                }
-                if (r2 >= 0 && r2 < n) {
-                    diag2Formula.add(symbols[r2][j]);
-                }
-            }
-            if (diag1Formula.size() > 0) {
-                assignments.add(bmgr.or(diag1Formula));
-                assignments.add(bmgr.and(diag1Formula));
-            }
-            if (diag2Formula.size() > 0) {
-                assignments.add(bmgr.or(diag2Formula));
-                assignments.add(bmgr.and(diag2Formula));
-            }
-        }
-
-        return assignments;
-    }
-    @Override
-    @org.checkerframework.checker.nullness.qual.Nullable
     Boolean getValue(BooleanFormula[][] symbols, Model model, int row, int col) {
-        BooleanFormula symb=symbols[row][col];
-        return model.evaluate(symb);
-    }
-    public BooleanFormula Equals(IntegerFormula a, IntegerFormula b) {
-        return bmgr.and(
-                imgr.lessOrEquals(a, b),
-                imgr.lessOrEquals(b, a)
-        );
+        return model.evaluate(symbols[row][col]);
     }
 }
 
