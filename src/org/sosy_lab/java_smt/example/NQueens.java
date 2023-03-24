@@ -127,7 +127,6 @@ abstract class NQueensSolver {
 }
 class NQueen extends NQueensSolver {
     private final int n;
-
     public NQueen(SolverContext context, int n) {
         super(context);
         this.n = n;
@@ -157,40 +156,50 @@ class NQueen extends NQueensSolver {
 
         // Add constraints to ensure that only one queen is placed in each row
         for (int row = 0; row < n; row++) {
-            List<BooleanFormula> ors = new ArrayList<>();
-            for (int col = 0; col < n; col++) {
-                ors.add(symbols[row][col]);
+            List<BooleanFormula> ands = new ArrayList<>();
+            for (int col1 = 0; col1 < n; col1++) {
+                for (int col2 = col1 + 1; col2 < n; col2++) {
+                    ands.add(bmgr.or(bmgr.not(symbols[row][col1]), bmgr.not(symbols[row][col2])));
+                }
             }
-            rules.add(bmgr.or(ors));
-        }
-        // Add constraints to ensure that only one queen is placed in each column
-        for (int col = 0; col < n; col++) {
-            List<BooleanFormula> ors = new ArrayList<>();
-            for (int row = 0; row < n; row++) {
-                ors.add(symbols[row][col]);
-            }
-            rules.add(bmgr.or(ors));
+            rules.add(bmgr.and(ands));
         }
 
-        // Add constraints to ensure that only one queen is placed in each diagonal
-        for (int i = 0; i < n; i++) {
+        // Add constraints to ensure that only one queen is placed in each column
+        for (int col = 0; col < n; col++) {
+            List<BooleanFormula> ands = new ArrayList<>();
+            for (int row1 = 0; row1 < n; row1++) {
+                for (int row2 = row1 + 1; row2 < n; row2++) {
+                    ands.add(bmgr.or(bmgr.not(symbols[row1][col]), bmgr.not(symbols[row2][col])));
+                }
+            }
+            rules.add(bmgr.and(ands));
+        }
+        // Add constraints to ensure that at most one queen is placed in each diagonal
+        for (int i = -n + 1; i < n; i++) {
             List<BooleanFormula> ors1 = new ArrayList<>();
             List<BooleanFormula> ors2 = new ArrayList<>();
             for (int j = 0; j < n; j++) {
-                if (i + j < n) {
-                    ors1.add(symbols[i + j][j]);
-                    ors2.add(symbols[j][i + j]);
+                if (j + i >= 0 && j + i < n) {
+                    ors1.add(symbols[j+i][j]);
+                    ors2.add(symbols[j][j+i]);
                 }
-                if (j - i >= 0) {
-                    ors1.add(symbols[j - i][j]);
-                    ors2.add(symbols[j][j - i]);
+                if (j - i >= 0 && j - i < n) {
+                    ors1.add(symbols[j-i][j]);
+                    ors2.add(symbols[j][j-i]);
                 }
             }
-            rules.add(bmgr.or(ors1));
-            rules.add(bmgr.or(ors2));
+                rules.add(bmgr.or(ors1));
+                rules.add(bmgr.or(ors2));
         }
         return rules;
     }
+
+    /*
+     * getAssignments is the method used to set the initial assignments for the variables.
+     * We do not need any initial assignments in this case.
+     */
+
     /**
      * getValue returns a Boolean value indicating whether a queen is placed on the cell
      * corresponding to the given row and column.
