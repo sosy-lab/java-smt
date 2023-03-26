@@ -54,9 +54,9 @@ public class NQueens {
         try (SolverContext context = SolverContextFactory.createSolverContext(config, logger, notifier, solver)) {
             /*
             The outer loop present here is used to check whether my constraints give out correct
-            solution for any of the value on n upto 12
+            solution for any of the value on n upto 13
             */
-            for (int n = 1; n <= 12; n++) {
+            for (int n = 1; n <= 13; n++) {
                 NQueensSolver MyQueen = new NQueen(context, n);
                 Boolean[][] solutions = MyQueen.solve(n);
                 if (solutions==null) {
