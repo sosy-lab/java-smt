@@ -18,17 +18,13 @@ package org.sosy_lab.java_smt.example;
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+
 /*
 *  The Output of this code
 * The Queen can be placed in these ways:
-0100
-0001
-1000
-0010
-* here '1' indicates position of queen that has been placed
+* would update this part once I get the complete solution
  */
 
-import com.google.common.base.Joiner;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -50,36 +46,42 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 public class NQueens {
     public static void main(String... args)
-            throws InvalidConfigurationException, SolverException, InterruptedException, IOException {
+        throws InvalidConfigurationException, SolverException, InterruptedException, IOException {
         Configuration config = Configuration.defaultConfiguration();
         LogManager logger = BasicLogManager.create(config);
-        ShutdownNotifier notifier = ShutdownNotifier.createDummy();{
-            Solvers solver = Solvers.SMTINTERPOL;
-            try (SolverContext context =
-                         SolverContextFactory.createSolverContext(config, logger, notifier, solver)) {
-                NQueensSolver MyQueen = new NQueen(context,4);
-                Boolean[][] solution = MyQueen.solve(4);
-                if (solution == null) {
-                    System.out.println("The Queen can't be placed in this condition.");
+        ShutdownNotifier notifier = ShutdownNotifier.createDummy();
+        Solvers solver = Solvers.PRINCESS;
+        try (SolverContext context = SolverContextFactory.createSolverContext(config, logger, notifier, solver)) {
+            /*
+            The outer loop present here is used to check whether my constraints give out correct
+            solution for any of the value on n upto 12
+            */
+            for (int n = 1; n <= 12; n++) {
+                NQueensSolver MyQueen = new NQueen(context, n);
+                Boolean[][] solutions = MyQueen.solve(n);
+                if (solutions==null) {
+                    System.out.println("No solutions found for " + n + " queens.");
                 } else {
-                    for (int row = 0; row < solution.length; row++) {
-                        for (int col = 0; col < solution[0].length; col++) {
-                            if (solution[row][col]) {
-                                System.out.print("Q ");
-                            } else {
-                                System.out.print("_ ");
+                    System.out.println("Solutions for " + n + " queens:");
+                    for (Boolean[] sol : solutions) {
+                        for (int row = 0; row < solutions.length; row++) {
+                            for (int col = 0; col < solutions[0].length; col++) {
+                                if (solutions[row][col]) {
+                                    System.out.print("Q ");
+                                } else {
+                                    System.out.print("_ ");
+                                }
                             }
+                            System.out.println();
                         }
                         System.out.println();
                     }
                 }
-            } catch (InvalidConfigurationException | UnsatisfiedLinkError e) {
-
-                logger.logUserException(Level.INFO, e, "Solver " + solver + " is not available.");
-
-            } catch (UnsupportedOperationException e) {
-                logger.logUserException(Level.INFO, e, e.getMessage());
             }
+        } catch (InvalidConfigurationException | UnsatisfiedLinkError e) {
+            logger.logUserException(Level.INFO, e, "Solver " + solver + " is not available.");
+        } catch (UnsupportedOperationException e) {
+            logger.logUserException(Level.INFO, e, e.getMessage());
         }
     }
 }
@@ -156,50 +158,58 @@ class NQueen extends NQueensSolver {
 
         // Add constraints to ensure that only one queen is placed in each row
         for (int row = 0; row < n; row++) {
-            List<BooleanFormula> ands = new ArrayList<>();
+            List<BooleanFormula> rowconstraint = new ArrayList<>();
             for (int col1 = 0; col1 < n; col1++) {
                 for (int col2 = col1 + 1; col2 < n; col2++) {
-                    ands.add(bmgr.or(bmgr.not(symbols[row][col1]), bmgr.not(symbols[row][col2])));
+                    rowconstraint.add(bmgr.or(bmgr.not(symbols[row][col1]), bmgr.not(symbols[row][col2])));
                 }
             }
-            rules.add(bmgr.and(ands));
+            rules.add(bmgr.and(rowconstraint));
         }
 
         // Add constraints to ensure that only one queen is placed in each column
         for (int col = 0; col < n; col++) {
-            List<BooleanFormula> ands = new ArrayList<>();
+            List<BooleanFormula> colconstraint = new ArrayList<>();
             for (int row1 = 0; row1 < n; row1++) {
                 for (int row2 = row1 + 1; row2 < n; row2++) {
-                    ands.add(bmgr.or(bmgr.not(symbols[row1][col]), bmgr.not(symbols[row2][col])));
+                    colconstraint.add(bmgr.or(bmgr.not(symbols[row1][col]), bmgr.not(symbols[row2][col])));
                 }
             }
-            rules.add(bmgr.and(ands));
+            rules.add(bmgr.and(colconstraint));
         }
         // Add constraints to ensure that at most one queen is placed in each diagonal
         for (int i = -n + 1; i < n; i++) {
             List<BooleanFormula> ors1 = new ArrayList<>();
             List<BooleanFormula> ors2 = new ArrayList<>();
+            List<BooleanFormula> ors3 = new ArrayList<>();
+            List<BooleanFormula> ors4 = new ArrayList<>();
             for (int j = 0; j < n; j++) {
                 if (j + i >= 0 && j + i < n) {
                     ors1.add(symbols[j+i][j]);
                     ors2.add(symbols[j][j+i]);
+                    ors3.add(bmgr.or(symbols[j+i][j], symbols[j][j+i]));
                 }
                 if (j - i >= 0 && j - i < n) {
                     ors1.add(symbols[j-i][j]);
                     ors2.add(symbols[j][j-i]);
+                    ors4.add(bmgr.or(symbols[j-i][j], symbols[j][j-i]));
+                }
+
+                int x1 = i + j;
+                int x2 = n - 1 - i + j;
+                if (x1 >= 0 && x1 < n && x2 >= 0 && x2 < n) {
+                    ors3.add(bmgr.or(symbols[i][j], symbols[x1][x1]));
+                    ors4.add(bmgr.or(symbols[i][j], symbols[x2][n-1-x2]));
                 }
             }
-                rules.add(bmgr.or(ors1));
-                rules.add(bmgr.or(ors2));
+            rules.add(bmgr.or(ors1));
+            rules.add(bmgr.or(ors2));
+            rules.add(bmgr.or(ors3));
+            rules.add(bmgr.or(ors4));
         }
+
         return rules;
     }
-
-    /*
-     * getAssignments is the method used to set the initial assignments for the variables.
-     * We do not need any initial assignments in this case.
-     */
-
     /**
      * getValue returns a Boolean value indicating whether a queen is placed on the cell
      * corresponding to the given row and column.
