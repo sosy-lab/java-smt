@@ -179,33 +179,39 @@ class NQueen extends NQueensSolver {
             }
         }
         // At most one queen per diagonal
-        for (int k = 1 - n; k < n; k++) {
-            List<BooleanFormula> diagonal1 = new ArrayList<>();
-            List<BooleanFormula> diagonal2 = new ArrayList<>();
+        int numDiagonals = 2 * n - 1;
+        BooleanFormula[][] diagonals1 = new BooleanFormula[numDiagonals][n];
+        BooleanFormula[][] diagonals2 = new BooleanFormula[numDiagonals][n];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                diagonals1[i + j][i] = symbols[i][j];
+                diagonals2[i - j + n - 1][i] = symbols[i][j];
+            }
+        }
+
+        for (int d = 0; d < numDiagonals; d++) {
+            BooleanFormula[] diagonal1 = diagonals1[d];
+            BooleanFormula[] diagonal2 = diagonals2[d];
+            List<BooleanFormula> queen1 = new ArrayList<>();
+            List<BooleanFormula> queen2 = new ArrayList<>();
             for (int i = 0; i < n; i++) {
-                int j1 = i - k;
-                int j2 = k + i;
-                if (j1 >= 0 && j1 < n) {
-                    diagonal1.add(symbols[i][j1]);
+                if (diagonal1[i] != null) {
+                    queen1.add(diagonal1[i]);
                 }
-                if (j2 >= 0 && j2 < n) {
-                    diagonal2.add(symbols[i][j2]);
+                if (diagonal2[i] != null) {
+                    queen2.add(diagonal2[i]);
                 }
             }
-            if (diagonal1.size() > 1) {
-                for (int i1 = 0; i1 < diagonal1.size(); i1++) {
-                    for (int i2 = i1 + 1; i2 < diagonal1.size(); i2++) {
-                        rules.add(bmgr.not(bmgr.and(diagonal1.get(i1), diagonal1.get(i2))));
+                for (int i = 0; i < queen1.size(); i++) {
+                    for (int j = i + 1; j < queen1.size(); j++) {
+                        rules.add(bmgr.not(bmgr.and(queen1.get(i), queen1.get(j))));
                     }
                 }
-            }
-            if (diagonal2.size() > 1) {
-                for (int i1 = 0; i1 < diagonal2.size(); i1++) {
-                    for (int i2 = i1 + 1; i2 < diagonal2.size(); i2++) {
-                        rules.add(bmgr.not(bmgr.and(diagonal2.get(i1), diagonal2.get(i2))));
+                for (int i = 0; i < queen2.size(); i++) {
+                    for (int j = i + 1; j < queen2.size(); j++) {
+                        rules.add(bmgr.not(bmgr.and(queen2.get(i), queen2.get(j))));
                     }
                 }
-            }
         }
         return rules;
     }
