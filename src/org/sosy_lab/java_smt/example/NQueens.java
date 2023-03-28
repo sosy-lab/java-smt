@@ -19,14 +19,18 @@ package org.sosy_lab.java_smt.example;
  *  limitations under the License.
  */
 
-/*
-*  The Output of this code
-* Solution:
- _ _ Q _
-Q _ _ _
-_ _ _ Q
-_ Q _ _
- */
+/**
+ * This example program solves a NQueens problem of given size and prints a possible solution.
+ *
+ * <p>For example, the Queen can be placed in these ways for a field size of 4:
+ *
+ * <pre>
+ *   .Q..
+ *   ...Q
+ *   Q...
+ *   ..Q.
+ * </pre>
+ **/
 
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
@@ -56,12 +60,8 @@ public class NQueens {
         ShutdownNotifier notifier = ShutdownNotifier.createDummy();
         Solvers solver = Solvers.SMTINTERPOL ;
         try (SolverContext context = SolverContextFactory.createSolverContext(config, logger, notifier, solver)) {
-            /*
-            The outer loop present here is used to check whether my constraints give out correct
-            solution for any of the value on n up to 10
-            */
-                NQueensSolver MyQueen = new NQueen(context, 4);
-                Boolean[][] solutions = MyQueen.solve(4);
+                NQueensSolver MyQueen = new NQueen(context, 12);
+                Boolean[][] solutions = MyQueen.solve(12);
                 if (solutions==null) {
                     System.out.println("No solutions found.");
                 } else {
@@ -147,30 +147,56 @@ class NQueen extends NQueensSolver {
         }
         return symbols;
     }
-    /*
-     * getRules is the method used to add constraints that ensure that no two queens are in the same
-     * row, column, or diagonal.
+    /**
+
+     * This method generates a list of rules that represent the constraints for the N-Queens problem
+
+     * @param symbols: a 2D boolean array representing the placement of the queens on the board
+
+     * @param context: SolverContext instance
+
+     * @return List<BooleanFormula>: a list of boolean formulas that represent the constraints for
+     *  the problem
      */
     @Override
     public List<BooleanFormula> getRules(BooleanFormula[][] symbols, SolverContext context) {
         List<BooleanFormula> rules = new ArrayList<>();
         int n = symbols.length;
 
-        // At least one queen per row
-        for (BooleanFormula[] pSymbol : symbols) {
-            List<BooleanFormula> clause = new ArrayList<>(Arrays.asList(pSymbol).subList(0, n));
+        /*Rule 1: At least one queen per row,
+        or we can say make sure that there are N Queens on the board
+        *
+        */
+        for (BooleanFormula[] rowSymbols : symbols) {
+            List<BooleanFormula> clause = new ArrayList<>(Arrays.asList(rowSymbols).subList(0, n));
             rules.add(this.bmgr.or(clause));
         }
 
-        // At most one queen per row
-        for (BooleanFormula[] pSymbol : symbols) {
+        /*Rule 2: Add constraints to ensure that at most one queen is placed in each row.
+         * For n=4:
+         *   0123
+         * 0 ----
+         * 1 ----
+         * 2 ----
+         * 3 ----
+         * We add a negation of the conjunction of all possible pairs of variables in each row.
+         */
+        for (BooleanFormula[] rowSymbol : symbols) {
             for (int j1 = 0; j1 < n; j1++) {
                 for (int j2 = j1 + 1; j2 < n; j2++) {
-                    rules.add(bmgr.not(bmgr.and(pSymbol[j1], pSymbol[j2])));
+                    rules.add(bmgr.not(bmgr.and(rowSymbol[j1], rowSymbol[j2])));
                 }
             }
         }
-        // At most one queen per column
+        /* Rule 3: Add constraints to ensure that at most one queen is placed in each column.
+         * For n=4:
+         *   0123
+         * 0 ||||
+         * 1 ||||
+         * 2 ||||
+         * 3 ||||
+         * We add a negation of the conjunction of all possible pairs of variables in each column.
+         */
         for (int j = 0; j < n; j++) {
             for (int i1 = 0; i1 < n; i1++) {
                 for (int i2 = i1 + 1; i2 < n; i2++) {
@@ -178,38 +204,57 @@ class NQueen extends NQueensSolver {
                 }
             }
         }
-        // At most one queen per diagonal
+        /* Rule 4: At most one queen per diagonal
+         transform the field (=symbols) from square shape into a (downwards/upwards directed)
+         rhombus that is embedded in a rectangle (=DownwardDiagonal/UpwardDiagonal)
+
+         For example for N=4 from this square:
+         0123
+         0 xxxx
+         1 xxxx
+         2 xxxx
+         3 xxxx
+
+         to this rhombus/rectangle:
+         0123
+         0 x---
+         1 xx--
+         2 xxx-
+         3 xxxx
+         4 -xxx
+         5 --xx
+         6 ---x*/
         int numDiagonals = 2 * n - 1;
-        BooleanFormula[][] diagonals1 = new BooleanFormula[numDiagonals][n];
-        BooleanFormula[][] diagonals2 = new BooleanFormula[numDiagonals][n];
+        BooleanFormula[][] DownwardDiagonal = new BooleanFormula[numDiagonals][n];
+        BooleanFormula[][] UpwardDiagonal = new BooleanFormula[numDiagonals][n];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                diagonals1[i + j][i] = symbols[i][j];
-                diagonals2[i - j + n - 1][i] = symbols[i][j];
+                DownwardDiagonal[i + j][i] = symbols[i][j];
+                UpwardDiagonal[i - j + n - 1][i] = symbols[i][j];
             }
         }
 
         for (int d = 0; d < numDiagonals; d++) {
-            BooleanFormula[] diagonal1 = diagonals1[d];
-            BooleanFormula[] diagonal2 = diagonals2[d];
-            List<BooleanFormula> queen1 = new ArrayList<>();
-            List<BooleanFormula> queen2 = new ArrayList<>();
+            BooleanFormula[] diagonal1 = DownwardDiagonal[d];
+            BooleanFormula[] diagonal2 = UpwardDiagonal[d];
+            List<BooleanFormula> DownwardDiagonalQueen = new ArrayList<>();
+            List<BooleanFormula> UpwardDiagonalQueen = new ArrayList<>();
             for (int i = 0; i < n; i++) {
                 if (diagonal1[i] != null) {
-                    queen1.add(diagonal1[i]);
+                    DownwardDiagonalQueen.add(diagonal1[i]);
                 }
                 if (diagonal2[i] != null) {
-                    queen2.add(diagonal2[i]);
+                    UpwardDiagonalQueen.add(diagonal2[i]);
                 }
             }
-                for (int i = 0; i < queen1.size(); i++) {
-                    for (int j = i + 1; j < queen1.size(); j++) {
-                        rules.add(bmgr.not(bmgr.and(queen1.get(i), queen1.get(j))));
+                for (int i = 0; i < DownwardDiagonalQueen.size(); i++) {
+                    for (int j = i + 1; j < DownwardDiagonalQueen.size(); j++) {
+                        rules.add(bmgr.not(bmgr.and(DownwardDiagonalQueen.get(i), DownwardDiagonalQueen.get(j))));
                     }
                 }
-                for (int i = 0; i < queen2.size(); i++) {
-                    for (int j = i + 1; j < queen2.size(); j++) {
-                        rules.add(bmgr.not(bmgr.and(queen2.get(i), queen2.get(j))));
+                for (int i = 0; i < UpwardDiagonalQueen.size(); i++) {
+                    for (int j = i + 1; j < UpwardDiagonalQueen.size(); j++) {
+                        rules.add(bmgr.not(bmgr.and(UpwardDiagonalQueen.get(i), UpwardDiagonalQueen.get(j))));
                     }
                 }
         }
