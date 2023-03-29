@@ -87,7 +87,7 @@ abstract class NQueensSolver {
         bmgr = context.getFormulaManager().getBooleanFormulaManager();
     }
     abstract BooleanFormula[][] getSymbols();
-    abstract List<BooleanFormula> getRules(BooleanFormula[][] symbols, SolverContext context);
+    abstract List<BooleanFormula> getRules(BooleanFormula[][] symbols);
     abstract Boolean getValue(BooleanFormula[][] symbols, Model model, int row, int col);
 
     /** Solves the N-Queens problem for the given board size and returns a possible solution.
@@ -96,7 +96,7 @@ abstract class NQueensSolver {
     @Nullable
     public Boolean[][] solve(int n) throws InterruptedException, SolverException {
         BooleanFormula[][] symbols = getSymbols();
-        List<BooleanFormula> rules = getRules(symbols, context);
+        List<BooleanFormula> rules = getRules(symbols);
         // solve N-Queens
         try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
             prover.push(bmgr.and(rules));
@@ -134,21 +134,16 @@ class NQueen extends NQueensSolver {
         }
         return symbols;
     }
-    /** This method generates a list of rules that represent the constraints for the N-Queens problem
-     * @param symbols: a 2D boolean array representing the placement of the queens on the board
-     * @param context: SolverContext instance
-     * @return List<BooleanFormula>: a list of boolean formulas that represent the constraints for
-      *  the problem
-      */
+    /* This method generates a list of rules that represent the constraints for the N-Queens problem*/
     @Override
-    public List<BooleanFormula> getRules(BooleanFormula[][] symbols, SolverContext context) {
+    public List<BooleanFormula> getRules(BooleanFormula[][] symbols) {
         List<BooleanFormula> rules = new ArrayList<>();
-        int n = symbols.length;
+        int symbolSize = symbols.length;
         /* Rule 1: At least one queen per row,
         or we can say make sure that there are N Queens on the board
         */
         for (BooleanFormula[] rowSymbols : symbols) {
-            List<BooleanFormula> clause = new ArrayList<>(Arrays.asList(rowSymbols).subList(0, n));
+            List<BooleanFormula> clause = new ArrayList<>(Arrays.asList(rowSymbols).subList(0, symbolSize));
             rules.add(this.bmgr.or(clause));
         }
         /* Rule 2: Add constraints to ensure that at most one queen is placed in each row.
@@ -161,8 +156,8 @@ class NQueen extends NQueensSolver {
          * We add a negation of the conjunction of all possible pairs of variables in each row.
          */
         for (BooleanFormula[] rowSymbol : symbols) {
-            for (int j1 = 0; j1 < n; j1++) {
-                for (int j2 = j1 + 1; j2 < n; j2++) {
+            for (int j1 = 0; j1 < symbolSize; j1++) {
+                for (int j2 = j1 + 1; j2 < symbolSize; j2++) {
                     rules.add(bmgr.not(bmgr.and(rowSymbol[j1], rowSymbol[j2])));
                 }
             }
@@ -176,9 +171,9 @@ class NQueen extends NQueensSolver {
          * 3 ||||
          * We add a negation of the conjunction of all possible pairs of variables in each column.
          */
-        for (int j = 0; j < n; j++) {
-            for (int i1 = 0; i1 < n; i1++) {
-                for (int i2 = i1 + 1; i2 < n; i2++) {
+        for (int j = 0; j < symbolSize; j++) {
+            for (int i1 = 0; i1 < symbolSize; i1++) {
+                for (int i2 = i1 + 1; i2 < symbolSize; i2++) {
                     rules.add(bmgr.not(bmgr.and(symbols[i1][j], symbols[i2][j])));
                 }
             }
@@ -203,13 +198,13 @@ class NQueen extends NQueensSolver {
          5 --xx
          6 ---x
          */
-        int numDiagonals = 2 * n - 1;
-        BooleanFormula[][] downwardDiagonal = new BooleanFormula[numDiagonals][n];
-        BooleanFormula[][] upwardDiagonal = new BooleanFormula[numDiagonals][n];
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
+        int numDiagonals = 2 * symbolSize - 1;
+        BooleanFormula[][] downwardDiagonal = new BooleanFormula[numDiagonals][symbolSize];
+        BooleanFormula[][] upwardDiagonal = new BooleanFormula[numDiagonals][symbolSize];
+        for (int i = 0; i < symbolSize; i++) {
+            for (int j = 0; j < symbolSize; j++) {
                 downwardDiagonal[i + j][i] = symbols[i][j];
-                upwardDiagonal[i - j + n - 1][i] = symbols[i][j];
+                upwardDiagonal[i - j + symbolSize - 1][i] = symbols[i][j];
             }
         }
         for (int d = 0; d < numDiagonals; d++) {
@@ -217,7 +212,7 @@ class NQueen extends NQueensSolver {
             BooleanFormula[] diagonal2 = upwardDiagonal[d];
             List<BooleanFormula> downwardDiagonalQueen = new ArrayList<>();
             List<BooleanFormula> upwardDiagonalQueen = new ArrayList<>();
-            for (int i = 0; i < n; i++) {
+            for (int i = 0; i < symbolSize; i++) {
                 if (diagonal1[i] != null) {
                     downwardDiagonalQueen.add(diagonal1[i]);
                 }
