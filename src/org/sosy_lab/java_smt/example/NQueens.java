@@ -86,6 +86,7 @@ public class NQueens {
       logger.logUserException(Level.INFO, e, e.getMessage());
     }
   }
+
   /* prepare symbols: one symbol for each of the N*N cells.*/
   BooleanFormula[][] getSymbols() {
     final BooleanFormula[][] symbols = new BooleanFormula[n][n];
@@ -97,17 +98,19 @@ public class NQueens {
     return symbols;
   }
 
-  public List<BooleanFormula> getRules(BooleanFormula[][] symbols) {
+  // This method generates a list of rules that represent the constraints for the N-Queens problem
+  List<BooleanFormula> getRules(BooleanFormula[][] symbols) {
     List<BooleanFormula> rules = new ArrayList<>();
     int symbolLength = symbols.length;
-      /* Rule 1: At least one queen per row,
+    /* Rule 1: At least one queen per row,
          or we can say make sure that there are N Queens on the board
-      */
+    */
     for (BooleanFormula[] rowSymbols : symbols) {
       List<BooleanFormula> clause =
           new ArrayList<>(Arrays.asList(rowSymbols).subList(0, symbolLength));
       rules.add(this.bmgr.or(clause));
     }
+
     /* Rule 2: Add constraints to ensure that at most one queen is placed in each row.
      * For n=4:
      *   0123
@@ -124,6 +127,7 @@ public class NQueens {
         }
       }
     }
+
     /* Rule 3: Add constraints to ensure that at most one queen is placed in each column.
      * For n=4:
      *   0123
@@ -140,6 +144,7 @@ public class NQueens {
         }
       }
     }
+
       /* Rule 4: At most one queen per diagonal
          transform the field (=symbols) from square shape into a (downwards/upwards directed)
          rhombus that is embedded in a rectangle (=downwardDiagonal/upwardDiagonal)
@@ -210,7 +215,7 @@ public class NQueens {
      * Solves the N-Queens problem for the given board size and returns a possible solution.
      * Returns <code>Null</code> if no solution exists.
      */
-    public Boolean[][] solve(int n) throws InterruptedException, SolverException {
+    Boolean[][] solve(int n) throws InterruptedException, SolverException {
       BooleanFormula[][] symbols = getSymbols();
       List<BooleanFormula> rules = getRules(symbols);
       // solve N-Queens
