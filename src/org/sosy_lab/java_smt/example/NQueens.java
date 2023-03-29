@@ -2,15 +2,13 @@ package org.sosy_lab.java_smt.example;
 /*
  *  JavaSMT is an API wrapper for a collection of SMT solvers.
  *  This file is part of JavaSMT.
- *
  *  Copyright (C) 2007-2016  Dirk Beyer
  *  All rights reserved.
- *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *        http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,18 +17,15 @@ package org.sosy_lab.java_smt.example;
  *  limitations under the License.
  */
 
-/**
- * This example program solves a NQueens problem of given size and prints a possible solution.
- *
- * <p>For example, the Queen can be placed in these ways for a field size of 4:
- *
- * <pre>
+/*  This example program solves a NQueens problem of given size and prints a possible solution.
+ *  p>For example, the Queen can be placed in these ways for a field size of 4:
+ *  <pre>
  *   .Q..
  *   ...Q
  *   Q...
  *   ..Q.
  * </pre>
- **/
+ */
 
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
@@ -60,25 +55,24 @@ public class NQueens {
         ShutdownNotifier notifier = ShutdownNotifier.createDummy();
         Solvers solver = Solvers.SMTINTERPOL ;
         try (SolverContext context = SolverContextFactory.createSolverContext(config, logger, notifier, solver)) {
-                NQueensSolver MyQueen = new NQueen(context, 12);
-                Boolean[][] solutions = MyQueen.solve(12);
-                if (solutions==null) {
-                    System.out.println("No solutions found.");
-                } else {
-                    System.out.println("Solution:");
-                    for (Boolean[] pSolution : solutions) {
-                        for (int col = 0; col < solutions[0].length; col++) {
-                            if (pSolution[col]) {
-                                System.out.print("Q ");
-                            } else {
-                                System.out.print("_ ");
-                            }
+            NQueensSolver MyQueen = new NQueen(context, 12);
+            Boolean[][] solutions = MyQueen.solve(12);
+            if (solutions==null) {
+                System.out.println("No solutions found.");
+            } else {
+                System.out.println("Solution:");
+                for (Boolean[] pSolution : solutions) {
+                    for (int col = 0; col < solutions[0].length; col++) {
+                        if (pSolution[col]) {
+                            System.out.print("Q ");
+                        } else {
+                            System.out.print("_ ");
                         }
-                        System.out.println();
                     }
-                        System.out.println();
+                    System.out.println();
                 }
-
+                System.out.println();
+            }
         } catch (InvalidConfigurationException | UnsatisfiedLinkError e) {
             logger.logUserException(Level.INFO, e, "Solver " + solver + " is not available.");
         } catch (UnsupportedOperationException e) {
@@ -98,8 +92,7 @@ abstract class NQueensSolver {
     abstract List<BooleanFormula> getRules(BooleanFormula[][] symbols, SolverContext context);
     abstract Boolean getValue(BooleanFormula[][] symbols, Model model, int row, int col);
 
-    /**
-     * Solves the N-Queens problem for the given board size and returns a possible solution.
+    /** Solves the N-Queens problem for the given board size and returns a possible solution.
      * Returns <code>Null</code> if no solution exists.
      */
     @Nullable
@@ -113,7 +106,6 @@ abstract class NQueensSolver {
             if (isUnsolvable) {
                 return null;
             }
-
             // get model and convert it
             Boolean[][] solution = new Boolean[n][n] ;
             try (Model model = prover.getModel()) {
@@ -133,10 +125,7 @@ class NQueen extends NQueensSolver {
         super(context);
         this.n = n;
     }
-
-    /**
-     * prepare symbols: one symbol for each of the N*N cells.
-     */
+    /* prepare symbols: one symbol for each of the N*N cells.*/
     @Override
     BooleanFormula[][] getSymbols() {
         final BooleanFormula[][] symbols = new BooleanFormula[n][n];
@@ -147,12 +136,8 @@ class NQueen extends NQueensSolver {
         }
         return symbols;
     }
-    /**
-
-     * This method generates a list of rules that represent the constraints for the N-Queens problem
-
+    /** This method generates a list of rules that represent the constraints for the N-Queens problem
      * @param symbols: a 2D boolean array representing the placement of the queens on the board
-
      * @param context: SolverContext instance
 
      * @return List<BooleanFormula>: a list of boolean formulas that represent the constraints for
@@ -162,17 +147,14 @@ class NQueen extends NQueensSolver {
     public List<BooleanFormula> getRules(BooleanFormula[][] symbols, SolverContext context) {
         List<BooleanFormula> rules = new ArrayList<>();
         int n = symbols.length;
-
-        /*Rule 1: At least one queen per row,
+        /* Rule 1: At least one queen per row,
         or we can say make sure that there are N Queens on the board
-        *
         */
         for (BooleanFormula[] rowSymbols : symbols) {
             List<BooleanFormula> clause = new ArrayList<>(Arrays.asList(rowSymbols).subList(0, n));
             rules.add(this.bmgr.or(clause));
         }
-
-        /*Rule 2: Add constraints to ensure that at most one queen is placed in each row.
+        /* Rule 2: Add constraints to ensure that at most one queen is placed in each row.
          * For n=4:
          *   0123
          * 0 ----
@@ -206,7 +188,7 @@ class NQueen extends NQueensSolver {
         }
         /* Rule 4: At most one queen per diagonal
          transform the field (=symbols) from square shape into a (downwards/upwards directed)
-         rhombus that is embedded in a rectangle (=DownwardDiagonal/UpwardDiagonal)
+         rhombus that is embedded in a rectangle (=downwardDiagonal/upwardDiagonal)
 
          For example for N=4 from this square:
          0123
@@ -214,7 +196,6 @@ class NQueen extends NQueensSolver {
          1 xxxx
          2 xxxx
          3 xxxx
-
          to this rhombus/rectangle:
          0123
          0 x---
@@ -225,42 +206,40 @@ class NQueen extends NQueensSolver {
          5 --xx
          6 ---x*/
         int numDiagonals = 2 * n - 1;
-        BooleanFormula[][] DownwardDiagonal = new BooleanFormula[numDiagonals][n];
-        BooleanFormula[][] UpwardDiagonal = new BooleanFormula[numDiagonals][n];
+        BooleanFormula[][] downwardDiagonal = new BooleanFormula[numDiagonals][n];
+        BooleanFormula[][] upwardDiagonal = new BooleanFormula[numDiagonals][n];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                DownwardDiagonal[i + j][i] = symbols[i][j];
-                UpwardDiagonal[i - j + n - 1][i] = symbols[i][j];
+                downwardDiagonal[i + j][i] = symbols[i][j];
+                upwardDiagonal[i - j + n - 1][i] = symbols[i][j];
             }
         }
-
         for (int d = 0; d < numDiagonals; d++) {
-            BooleanFormula[] diagonal1 = DownwardDiagonal[d];
-            BooleanFormula[] diagonal2 = UpwardDiagonal[d];
-            List<BooleanFormula> DownwardDiagonalQueen = new ArrayList<>();
-            List<BooleanFormula> UpwardDiagonalQueen = new ArrayList<>();
+            BooleanFormula[] diagonal1 = downwardDiagonal[d];
+            BooleanFormula[] diagonal2 = upwardDiagonal[d];
+            List<BooleanFormula> downwardDiagonalQueen = new ArrayList<>();
+            List<BooleanFormula> upwardDiagonalQueen = new ArrayList<>();
             for (int i = 0; i < n; i++) {
                 if (diagonal1[i] != null) {
-                    DownwardDiagonalQueen.add(diagonal1[i]);
+                    downwardDiagonalQueen.add(diagonal1[i]);
                 }
                 if (diagonal2[i] != null) {
-                    UpwardDiagonalQueen.add(diagonal2[i]);
+                    upwardDiagonalQueen.add(diagonal2[i]);
                 }
             }
-                for (int i = 0; i < DownwardDiagonalQueen.size(); i++) {
-                    for (int j = i + 1; j < DownwardDiagonalQueen.size(); j++) {
-                        rules.add(bmgr.not(bmgr.and(DownwardDiagonalQueen.get(i), DownwardDiagonalQueen.get(j))));
-                    }
+            for (int i = 0; i < downwardDiagonalQueen.size(); i++) {
+                for (int j = i + 1; j < downwardDiagonalQueen.size(); j++) {
+                    rules.add(bmgr.not(bmgr.and(downwardDiagonalQueen.get(i), downwardDiagonalQueen.get(j))));
                 }
-                for (int i = 0; i < UpwardDiagonalQueen.size(); i++) {
-                    for (int j = i + 1; j < UpwardDiagonalQueen.size(); j++) {
-                        rules.add(bmgr.not(bmgr.and(UpwardDiagonalQueen.get(i), UpwardDiagonalQueen.get(j))));
-                    }
+            }
+            for (int i = 0; i < upwardDiagonalQueen.size(); i++) {
+                for (int j = i + 1; j < upwardDiagonalQueen.size(); j++) {
+                    rules.add(bmgr.not(bmgr.and(upwardDiagonalQueen.get(i), upwardDiagonalQueen.get(j))));
                 }
+            }
         }
         return rules;
     }
-
     /**
      * getValue returns a Boolean value indicating whether a queen is placed on the cell
      * corresponding to the given row and column.
@@ -271,7 +250,6 @@ class NQueen extends NQueensSolver {
         return model.evaluate(symbols[row][col]);
     }
 }
-
 
 
 
