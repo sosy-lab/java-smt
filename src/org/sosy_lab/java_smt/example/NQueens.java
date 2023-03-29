@@ -7,9 +7,7 @@ package org.sosy_lab.java_smt.example;
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
- *
  *        http://www.apache.org/licenses/LICENSE-2.0
- *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,8 +15,9 @@ package org.sosy_lab.java_smt.example;
  *  limitations under the License.
  */
 
+
 /*  This example program solves a NQueens problem of given size and prints a possible solution.
- *  p>For example, the Queen can be placed in these ways for a field size of 4:
+ * <p>For example, the Queen can be placed in these ways for a field size of 4:
  *  <pre>
  *   .Q..
  *   ...Q
@@ -139,10 +138,9 @@ class NQueen extends NQueensSolver {
     /** This method generates a list of rules that represent the constraints for the N-Queens problem
      * @param symbols: a 2D boolean array representing the placement of the queens on the board
      * @param context: SolverContext instance
-
      * @return List<BooleanFormula>: a list of boolean formulas that represent the constraints for
-     *  the problem
-     */
+      *  the problem
+      */
     @Override
     public List<BooleanFormula> getRules(BooleanFormula[][] symbols, SolverContext context) {
         List<BooleanFormula> rules = new ArrayList<>();
@@ -204,7 +202,8 @@ class NQueen extends NQueensSolver {
          3 xxxx
          4 -xxx
          5 --xx
-         6 ---x*/
+         6 ---x
+         */
         int numDiagonals = 2 * n - 1;
         BooleanFormula[][] downwardDiagonal = new BooleanFormula[numDiagonals][n];
         BooleanFormula[][] upwardDiagonal = new BooleanFormula[numDiagonals][n];
