@@ -15,7 +15,6 @@ package org.sosy_lab.java_smt.example;
  *  limitations under the License.
  */
 
-
 /*  This example program solves a NQueens problem of given size and prints a possible solution.
  * <p>For example, the Queen can be placed in these ways for a field size of 4:
  *  <pre>
