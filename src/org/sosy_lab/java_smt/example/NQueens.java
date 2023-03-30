@@ -18,6 +18,7 @@ package org.sosy_lab.java_smt.example;
  * </pre>
  */
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -43,7 +44,7 @@ public class NQueens {
   final BooleanFormulaManager bmgr;
   final int n;
   final Boolean[][] unsolvableBoard = null;
-  private NQueens(SolverContext pContext,int n) {
+  private NQueens(SolverContext pContext, int n) {
     context = pContext;
     bmgr = context.getFormulaManager().getBooleanFormulaManager();
     this.n=n;
@@ -57,13 +58,14 @@ public class NQueens {
     Solvers solver = Solvers.SMTINTERPOL;
     try (SolverContext context = SolverContextFactory.createSolverContext(config,
         logger, notifier, solver)) {
-      Scanner sc= new Scanner(System.in);
+      Scanner sc = new Scanner(System.in,
+          Charset.defaultCharset().name());
       //Takes input from the user for number of queens to be placed
       System.out.println("Enter the number of Queens to be "
           + "placed on the board:");
       int n=sc.nextInt();
-      NQueens myQueen = new NQueens(context,n);
-      Boolean[][] solutions = myQueen.solve(n);
+      NQueens myQueen = new NQueens(context, n);
+      Boolean[][] solutions = myQueen.solve();
       if (solutions == null) {
         System.out.println("No solutions found.");
       } else {
@@ -80,6 +82,7 @@ public class NQueens {
         }
         System.out.println();
       }
+      sc.close();
     } catch (InvalidConfigurationException | UnsatisfiedLinkError e) {
       logger.logUserException(Level.INFO, e, "Solver " + solver + " is not available.");
     } catch (UnsupportedOperationException e) {
@@ -98,7 +101,8 @@ public class NQueens {
     return symbols;
   }
 
-  // This method generates a list of rules that represent the constraints for the N-Queens problem
+  // This method generates a list of rules that represent the constraints for
+  // the N-Queens problem
   List<BooleanFormula> getRules(BooleanFormula[][] symbols) {
     List<BooleanFormula> rules = new ArrayList<>();
     int symbolLength = symbols.length;
@@ -127,7 +131,6 @@ public class NQueens {
         }
       }
     }
-
     /* Rule 3: Add constraints to ensure that at most one queen is placed in each column.
      * For n=4:
      *   0123
@@ -136,7 +139,7 @@ public class NQueens {
      * 2 ||||
      * 3 ||||
      * We add a negation of the conjunction of all possible pairs of variables in each column.
-     */
+    */
     for (int j = 0; j < symbolLength; j++) {
       for (int i1 = 0; i1 < symbolLength; i1++) {
         for (int i2 = i1 + 1; i2 < symbolLength; i2++) {
@@ -144,8 +147,7 @@ public class NQueens {
         }
       }
     }
-
-      /* Rule 4: At most one queen per diagonal
+    /* Rule 4: At most one queen per diagonal
          transform the field (=symbols) from square shape into a (downwards/upwards directed)
          rhombus that is embedded in a rectangle (=downwardDiagonal/upwardDiagonal)
          For example for N=4 from this square:
@@ -163,7 +165,7 @@ public class NQueens {
          4 -xxx
          5 --xx
          6 ---x
-      */
+    */
     int numDiagonals = 2 * symbolLength - 1;
     BooleanFormula[][] downwardDiagonal = new BooleanFormula[numDiagonals][symbolLength];
     BooleanFormula[][] upwardDiagonal = new BooleanFormula[numDiagonals][symbolLength];
@@ -215,7 +217,7 @@ public class NQueens {
      * Solves the N-Queens problem for the given board size and returns a possible solution.
      * Returns <code>Null</code> if no solution exists.
      */
-    Boolean[][] solve(int n) throws InterruptedException, SolverException {
+    Boolean[][] solve() throws InterruptedException, SolverException {
       BooleanFormula[][] symbols = getSymbols();
       List<BooleanFormula> rules = getRules(symbols);
       // solve N-Queens
