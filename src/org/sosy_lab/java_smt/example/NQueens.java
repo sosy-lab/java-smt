@@ -58,31 +58,31 @@ public class NQueens {
     Solvers solver = Solvers.SMTINTERPOL;
     try (SolverContext context = SolverContextFactory.createSolverContext(config,
         logger, notifier, solver)) {
-      Scanner sc = new Scanner(System.in,
-          Charset.defaultCharset().name());
-      //Takes input from the user for number of queens to be placed
-      System.out.println("Enter the number of Queens to be "
-          + "placed on the board:");
-      int n=sc.nextInt();
-      NQueens myQueen = new NQueens(context, n);
-      Boolean[][] solutions = myQueen.solve();
-      if (solutions == null) {
-        System.out.println("No solutions found.");
-      } else {
-        System.out.println("Solution:");
-        for (Boolean[] pSolution : solutions) {
-          for (int col = 0; col < solutions[0].length; col++) {
-            if (pSolution[col]) {
-              System.out.print("Q ");
-            } else {
-              System.out.print("_ ");
+      try(Scanner sc = new Scanner(System.in,
+          Charset.defaultCharset().name())) {
+        //Takes input from the user for number of queens to be placed
+        System.out.println("Enter the number of Queens to be "
+            + "placed on the board:");
+        int n = sc.nextInt();
+        NQueens myQueen = new NQueens(context, n);
+        Boolean[][] solutions = myQueen.solve();
+        if (solutions == null) {
+          System.out.println("No solutions found.");
+        } else {
+          System.out.println("Solution:");
+          for (Boolean[] pSolution : solutions) {
+            for (int col = 0; col < solutions[0].length; col++) {
+              if (pSolution[col]) {
+                System.out.print("Q ");
+              } else {
+                System.out.print("_ ");
+              }
             }
+            System.out.println();
           }
           System.out.println();
         }
-        System.out.println();
       }
-      sc.close();
     } catch (InvalidConfigurationException | UnsatisfiedLinkError e) {
       logger.logUserException(Level.INFO, e, "Solver " + solver + " is not available.");
     } catch (UnsupportedOperationException e) {
@@ -123,7 +123,7 @@ public class NQueens {
      * 2 ----
      * 3 ----
      * We add a negation of the conjunction of all possible pairs of variables in each row.
-     */
+    */
     for (BooleanFormula[] rowSymbol : symbols) {
       for (int j1 = 0; j1 < symbolLength; j1++) {
         for (int j2 = j1 + 1; j2 < symbolLength; j2++) {
@@ -208,7 +208,7 @@ public class NQueens {
    * getValue returns a Boolean value indicating whether a queen is placed on the cell
    * corresponding to the given row and column.
    * We modify this method to return true if the queen is placed, false otherwise.
-   */
+  */
   Boolean getValue(BooleanFormula[][] symbols, Model model, int row, int col) {
     return model.evaluate(symbols[row][col]);
   }
