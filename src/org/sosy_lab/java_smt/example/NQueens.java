@@ -8,16 +8,6 @@
 
 package org.sosy_lab.java_smt.example;
 
-/**  This example program solves a NQueens problem of given size and prints a possible solution.
- * <p>For example, the Queen can be placed in these ways for a field size of 4:
- *  <pre>
- *   .Q..
- *   ...Q
- *   Q...
- *   ..Q.
- * </pre>
- */
-
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,15 +29,28 @@ import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
+/**
+ * This example program solves a NQueens problem of given size and prints a possible solution.
+ *
+ * <p>For example, the Queen can be placed in these ways for a field size of 4:
+ *
+ * <pre>
+ *   .Q..
+ *   ...Q
+ *   Q...
+ *   ..Q.
+ * </pre>
+ */
 public class NQueens {
   private final SolverContext context;
   final BooleanFormulaManager bmgr;
   final int n;
   final Boolean[][] unsolvableBoard = null;
+
   private NQueens(SolverContext pContext, int n) {
     context = pContext;
     bmgr = context.getFormulaManager().getBooleanFormulaManager();
-    this.n=n;
+    this.n = n;
   }
 
   public static void main(String... args)
@@ -56,13 +59,11 @@ public class NQueens {
     LogManager logger = BasicLogManager.create(config);
     ShutdownNotifier notifier = ShutdownNotifier.createDummy();
     Solvers solver = Solvers.SMTINTERPOL;
-    try (SolverContext context = SolverContextFactory.createSolverContext(config,
-        logger, notifier, solver)) {
-      try (Scanner sc = new Scanner(System.in,
-          Charset.defaultCharset().name())) {
-        //Takes input from the user for number of queens to be placed
-        System.out.println("Enter the number of Queens to be "
-            + "placed on the board:");
+    try (SolverContext context =
+             SolverContextFactory.createSolverContext(config, logger, notifier, solver)) {
+      try (Scanner sc = new Scanner(System.in, Charset.defaultCharset().name())) {
+        // Takes input from the user for number of queens to be placed
+        System.out.println("Enter the number of Queens to be " + "placed on the board:");
         int n = sc.nextInt();
         NQueens myQueen = new NQueens(context, n);
         Boolean[][] solutions = myQueen.solve();
@@ -123,7 +124,7 @@ public class NQueens {
      * 2 ----
      * 3 ----
      * We add a negation of the conjunction of all possible pairs of variables in each row.
-    */
+     */
     for (BooleanFormula[] rowSymbol : symbols) {
       for (int j1 = 0; j1 < symbolLength; j1++) {
         for (int j2 = j1 + 1; j2 < symbolLength; j2++) {
@@ -139,7 +140,7 @@ public class NQueens {
      * 2 ||||
      * 3 ||||
      * We add a negation of the conjunction of all possible pairs of variables in each column.
-    */
+     */
     for (int j = 0; j < symbolLength; j++) {
       for (int i1 = 0; i1 < symbolLength; i1++) {
         for (int i2 = i1 + 1; i2 < symbolLength; i2++) {
@@ -190,14 +191,12 @@ public class NQueens {
       }
       for (int i = 0; i < downwardDiagonalQueen.size(); i++) {
         for (int j = i + 1; j < downwardDiagonalQueen.size(); j++) {
-          rules.add(
-              bmgr.not(bmgr.and(downwardDiagonalQueen.get(i), downwardDiagonalQueen.get(j))));
+          rules.add(bmgr.not(bmgr.and(downwardDiagonalQueen.get(i), downwardDiagonalQueen.get(j))));
         }
       }
       for (int i = 0; i < upwardDiagonalQueen.size(); i++) {
         for (int j = i + 1; j < upwardDiagonalQueen.size(); j++) {
-          rules.add(bmgr.not(bmgr.and(upwardDiagonalQueen.get(i),
-              upwardDiagonalQueen.get(j))));
+          rules.add(bmgr.not(bmgr.and(upwardDiagonalQueen.get(i), upwardDiagonalQueen.get(j))));
         }
       }
     }
@@ -205,38 +204,38 @@ public class NQueens {
   }
 
   /**
-   * getValue returns a Boolean value indicating whether a queen is placed on the cell
-   * corresponding to the given row and column.
-   * We modify this method to return true if the queen is placed, false otherwise.
-  */
+   * getValue returns a Boolean value indicating whether a queen is placed on the cell corresponding
+   * to the given row and column. We modify this method to return true if the queen is placed, false
+   * otherwise.
+   */
   Boolean getValue(BooleanFormula[][] symbols, Model model, int row, int col) {
     return model.evaluate(symbols[row][col]);
   }
 
-    /**
-     * Solves the N-Queens problem for the given board size and returns a possible solution.
-     * Returns <code>Null</code> if no solution exists.
-     */
-    Boolean[][] solve() throws InterruptedException, SolverException {
-      BooleanFormula[][] symbols = getSymbols();
-      List<BooleanFormula> rules = getRules(symbols);
-      // solve N-Queens
-      try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
-        prover.push(bmgr.and(rules));
-        boolean isUnsolvable = prover.isUnsat();
-        if (isUnsolvable) {
-          return unsolvableBoard;
-        }
-        // get model and convert it
-        Boolean[][] solution = new Boolean[n][n];
-        try (Model model = prover.getModel()) {
-          for (int row = 0; row < n; row++) {
-            for (int col = 0; col < n; col++) {
-              solution[row][col] = getValue(symbols, model, row, col);
-            }
+  /**
+   * Solves the N-Queens problem for the given board size and returns a possible solution. Returns
+   * <code>Null</code> if no solution exists.
+   */
+  Boolean[][] solve() throws InterruptedException, SolverException {
+    BooleanFormula[][] symbols = getSymbols();
+    List<BooleanFormula> rules = getRules(symbols);
+    // solve N-Queens
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(bmgr.and(rules));
+      boolean isUnsolvable = prover.isUnsat();
+      if (isUnsolvable) {
+        return unsolvableBoard;
+      }
+      // get model and convert it
+      Boolean[][] solution = new Boolean[n][n];
+      try (Model model = prover.getModel()) {
+        for (int row = 0; row < n; row++) {
+          for (int col = 0; col < n; col++) {
+            solution[row][col] = getValue(symbols, model, row, col);
           }
-          return solution;
         }
+        return solution;
       }
     }
+  }
 }
