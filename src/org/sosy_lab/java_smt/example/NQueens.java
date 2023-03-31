@@ -10,7 +10,6 @@ package org.sosy_lab.java_smt.example;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -71,9 +70,9 @@ public class NQueens {
           System.out.println("No solutions found.");
         } else {
           System.out.println("Solution:");
-          for (Boolean[] pSolution : solutions) {
+          for (int row = 0; row < solutions.length; row++) {
             for (int col = 0; col < solutions[0].length; col++) {
-              if (pSolution[col]) {
+              if (solutions[row][col]) {
                 System.out.print("Q ");
               } else {
                 System.out.print("_ ");
@@ -106,14 +105,15 @@ public class NQueens {
   // the N-Queens problem
   List<BooleanFormula> getRules(BooleanFormula[][] symbols) {
     List<BooleanFormula> rules = new ArrayList<>();
-    int symbolLength = symbols.length;
     /* Rule 1: At least one queen per row,
          or we can say make sure that there are N Queens on the board
     */
     for (BooleanFormula[] rowSymbols : symbols) {
-      List<BooleanFormula> clause =
-          new ArrayList<>(Arrays.asList(rowSymbols).subList(0, symbolLength));
-      rules.add(this.bmgr.or(clause));
+      List<BooleanFormula> clause = new ArrayList<>();
+      for (int i = 0; i < n; i++) {
+        clause.add(rowSymbols[i]);
+      }
+      rules.add(bmgr.or(clause));
     }
 
     /* Rule 2: Add constraints to ensure that at most one queen is placed in each row.
@@ -126,8 +126,8 @@ public class NQueens {
      * We add a negation of the conjunction of all possible pairs of variables in each row.
      */
     for (BooleanFormula[] rowSymbol : symbols) {
-      for (int j1 = 0; j1 < symbolLength; j1++) {
-        for (int j2 = j1 + 1; j2 < symbolLength; j2++) {
+      for (int j1 = 0; j1 < n; j1++) {
+        for (int j2 = j1 + 1; j2 < n; j2++) {
           rules.add(bmgr.not(bmgr.and(rowSymbol[j1], rowSymbol[j2])));
         }
       }
@@ -141,9 +141,9 @@ public class NQueens {
      * 3 ||||
      * We add a negation of the conjunction of all possible pairs of variables in each column.
      */
-    for (int j = 0; j < symbolLength; j++) {
-      for (int i1 = 0; i1 < symbolLength; i1++) {
-        for (int i2 = i1 + 1; i2 < symbolLength; i2++) {
+    for (int j = 0; j < n; j++) {
+      for (int i1 = 0; i1 < n; i1++) {
+        for (int i2 = i1 + 1; i2 < n; i2++) {
           rules.add(bmgr.not(bmgr.and(symbols[i1][j], symbols[i2][j])));
         }
       }
@@ -167,13 +167,13 @@ public class NQueens {
          5 --xx
          6 ---x
     */
-    int numDiagonals = 2 * symbolLength - 1;
-    BooleanFormula[][] downwardDiagonal = new BooleanFormula[numDiagonals][symbolLength];
-    BooleanFormula[][] upwardDiagonal = new BooleanFormula[numDiagonals][symbolLength];
-    for (int i = 0; i < symbolLength; i++) {
-      for (int j = 0; j < symbolLength; j++) {
+    int numDiagonals = 2 * n - 1;
+    BooleanFormula[][] downwardDiagonal = new BooleanFormula[numDiagonals][n];
+    BooleanFormula[][] upwardDiagonal = new BooleanFormula[numDiagonals][n];
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < n; j++) {
         downwardDiagonal[i + j][i] = symbols[i][j];
-        upwardDiagonal[i - j + symbolLength - 1][i] = symbols[i][j];
+        upwardDiagonal[i - j + n - 1][i] = symbols[i][j];
       }
     }
     for (int d = 0; d < numDiagonals; d++) {
@@ -181,7 +181,7 @@ public class NQueens {
       BooleanFormula[] diagonal2 = upwardDiagonal[d];
       List<BooleanFormula> downwardDiagonalQueen = new ArrayList<>();
       List<BooleanFormula> upwardDiagonalQueen = new ArrayList<>();
-      for (int i = 0; i < symbolLength; i++) {
+      for (int i = 0; i < n; i++) {
         if (diagonal1[i] != null) {
           downwardDiagonalQueen.add(diagonal1[i]);
         }
