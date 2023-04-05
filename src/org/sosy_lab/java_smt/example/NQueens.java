@@ -71,9 +71,9 @@ public class NQueens {
           System.out.println("No solutions found.");
         } else {
           System.out.println("Solution:");
-          for (int row = 0; row < solutions.length; row++) {
-            for (int col = 0; col < solutions[0].length; col++) {
-              if (solutions[row][col]) {
+          for (Boolean[] row : solutions) {
+            for (Boolean col : row) {
+              if (col) {
                 System.out.print("Q ");
               } else {
                 System.out.print("_ ");
@@ -91,7 +91,7 @@ public class NQueens {
     }
   }
 
-  /* prepare symbols: one symbol for each of the N*N cells.*/
+  //prepare symbols: one symbol for each of the N*N cells.
   private BooleanFormula[][] getSymbols() {
     final BooleanFormula[][] symbols = new BooleanFormula[n][n];
     for (int row = 0; row < n; row++) {
@@ -104,8 +104,9 @@ public class NQueens {
 
   private List<BooleanFormula> rowRule1(BooleanFormula[][] symbols) {
 
-    /* Rule 1: At least one queen per row,
-         or we can say make sure that there are N Queens on the board
+    /**
+     * Rule 1: At least one queen per row,
+     * or we can say make sure that there are N Queens on the board
     */
     for (BooleanFormula[] rowSymbols : symbols) {
       List<BooleanFormula> clause = new ArrayList<>();
@@ -118,7 +119,8 @@ public class NQueens {
   }
 
   private List<BooleanFormula> rowRule2(BooleanFormula[][] symbols) {
-    /* Rule 2: Add constraints to ensure that at most one queen is placed in each row.
+    /**
+     * Rule 2: Add constraints to ensure that at most one queen is placed in each row.
      * For n=4:
      *   0123
      * 0 ----
@@ -138,7 +140,8 @@ public class NQueens {
   }
 
   private List<BooleanFormula> columnRule(BooleanFormula[][] symbols) {
-    /* Rule 3: Add constraints to ensure that at most one queen is placed in each column.
+    /**
+     *  Rule 3: Add constraints to ensure that at most one queen is placed in each column.
      * For n=4:
      *   0123
      * 0 ||||
@@ -158,24 +161,25 @@ public class NQueens {
   }
 
   private List<BooleanFormula> diagonalRule(BooleanFormula[][] symbols) {
-    /* Rule 4: At most one queen per diagonal
-         transform the field (=symbols) from square shape into a (downwards/upwards directed)
-         rhombus that is embedded in a rectangle (=downwardDiagonal/upwardDiagonal)
-         For example for N=4 from this square:
-         0123
-         0 xxxx
-         1 xxxx
-         2 xxxx
-         3 xxxx
-         to this rhombus/rectangle:
-         0123
-         0 x---
-         1 xx--
-         2 xxx-
-         3 xxxx
-         4 -xxx
-         5 --xx
-         6 ---x
+    /**
+     * Rule 4: At most one queen per diagonal
+     *transform the field (=symbols) from square shape into a (downwards/upwards directed)
+     *rhombus that is embedded in a rectangle (=downwardDiagonal/upwardDiagonal)
+     *For example for N=4 from this square:
+     *  0123
+     *0 xxxx
+     *1 xxxx
+     *2 xxxx
+     *3 xxxx
+     *to this rhombus/rectangle:
+     *  0123
+     *0 x---
+     *1 xx--
+     *2 xxx-
+     *3 xxxx
+     *4 -xxx
+     *5 --xx
+     *6 ---x
     */
     int numDiagonals = 2 * n - 1;
     BooleanFormula[][] downwardDiagonal = new BooleanFormula[numDiagonals][n];
