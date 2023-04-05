@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
+import javax.annotation.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -42,9 +43,9 @@ import org.sosy_lab.java_smt.api.SolverException;
  */
 public class NQueens {
   private final SolverContext context;
-  final BooleanFormulaManager bmgr;
-  final int n;
-  final Boolean[][] unsolvableBoard = null;
+  private final BooleanFormulaManager bmgr;
+  private final int n;
+  private final List<BooleanFormula> rules = new ArrayList<>();
 
   private NQueens(SolverContext pContext, int n) {
     context = pContext;
@@ -91,7 +92,7 @@ public class NQueens {
   }
 
   /* prepare symbols: one symbol for each of the N*N cells.*/
-  BooleanFormula[][] getSymbols() {
+  private BooleanFormula[][] getSymbols() {
     final BooleanFormula[][] symbols = new BooleanFormula[n][n];
     for (int row = 0; row < n; row++) {
       for (int col = 0; col < n; col++) {
@@ -101,10 +102,8 @@ public class NQueens {
     return symbols;
   }
 
-  // This method generates a list of rules that represent the constraints for
-  // the N-Queens problem
-  List<BooleanFormula> getRules(BooleanFormula[][] symbols) {
-    List<BooleanFormula> rules = new ArrayList<>();
+  private List<BooleanFormula> rowRule1(BooleanFormula[][] symbols) {
+
     /* Rule 1: At least one queen per row,
          or we can say make sure that there are N Queens on the board
     */
@@ -115,7 +114,10 @@ public class NQueens {
       }
       rules.add(bmgr.or(clause));
     }
+    return rules;
+  }
 
+  private List<BooleanFormula> rowRule2(BooleanFormula[][] symbols) {
     /* Rule 2: Add constraints to ensure that at most one queen is placed in each row.
      * For n=4:
      *   0123
@@ -132,6 +134,10 @@ public class NQueens {
         }
       }
     }
+    return rules;
+  }
+
+  private List<BooleanFormula> columnRule(BooleanFormula[][] symbols) {
     /* Rule 3: Add constraints to ensure that at most one queen is placed in each column.
      * For n=4:
      *   0123
@@ -148,6 +154,10 @@ public class NQueens {
         }
       }
     }
+    return rules;
+  }
+
+  private List<BooleanFormula> diagonalRule(BooleanFormula[][] symbols) {
     /* Rule 4: At most one queen per diagonal
          transform the field (=symbols) from square shape into a (downwards/upwards directed)
          rhombus that is embedded in a rectangle (=downwardDiagonal/upwardDiagonal)
@@ -208,7 +218,7 @@ public class NQueens {
    * to the given row and column. We modify this method to return true if the queen is placed, false
    * otherwise.
    */
-  Boolean getValue(BooleanFormula[][] symbols, Model model, int row, int col) {
+  private Boolean getValue(BooleanFormula[][] symbols, Model model, int row, int col) {
     return model.evaluate(symbols[row][col]);
   }
 
@@ -216,15 +226,20 @@ public class NQueens {
    * Solves the N-Queens problem for the given board size and returns a possible solution. Returns
    * <code>Null</code> if no solution exists.
    */
-  Boolean[][] solve() throws InterruptedException, SolverException {
+  @Nullable
+  private Boolean[][] solve() throws InterruptedException, SolverException {
     BooleanFormula[][] symbols = getSymbols();
-    List<BooleanFormula> rules = getRules(symbols);
+    List<BooleanFormula> rules = new ArrayList<>();
+    rules.addAll(rowRule1(symbols));
+    rules.addAll(rowRule2(symbols));
+    rules.addAll(columnRule(symbols));
+    rules.addAll(diagonalRule(symbols));
     // solve N-Queens
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(bmgr.and(rules));
       boolean isUnsolvable = prover.isUnsat();
       if (isUnsolvable) {
-        return unsolvableBoard;
+        return null;
       }
       // get model and convert it
       Boolean[][] solution = new Boolean[n][n];
