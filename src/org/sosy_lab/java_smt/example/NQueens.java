@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.logging.Level;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -67,18 +66,14 @@ public class NQueens {
         System.out.println("Enter the number of Queens to be " + "placed on the board:");
         int n = sc.nextInt();
         NQueens myQueen = new NQueens(context, n);
-        Optional<Boolean[][]> solutions = myQueen.solve();
+        Optional<boolean[][]> solutions = myQueen.solve();
         if (solutions.isEmpty()) {
           System.out.println("No solutions found.");
         } else {
           System.out.println("Solution:");
-          for (Boolean[] row : solutions.get()) {
-            for (Boolean col : row) {
-              if (col) {
-                System.out.print("Q ");
-              } else {
-                System.out.print("_ ");
-              }
+          for (boolean[] row : solutions.orElseThrow()) {
+            for (boolean col : row) {
+              System.out.print(col ? "Q " : "_ ");
             }
             System.out.println();
           }
@@ -264,8 +259,8 @@ public class NQueens {
    * @param col the column index of the cell to check.
    * @return true if a queen is placed on the cell, false otherwise.
    */
-  private @Nullable Boolean getValue(BooleanFormula[][] symbols, Model model, int row, int col) {
-    return model.evaluate(symbols[row][col]);
+  private boolean getValue(BooleanFormula[][] symbols, Model model, int row, int col) {
+    return Boolean.TRUE.equals(model.evaluate(symbols[row][col]));
   }
 
   /**
@@ -276,7 +271,7 @@ public class NQueens {
    * @throws InterruptedException if the solving process is interrupted
    * @throws SolverException if an error occurs during the solving process
    */
-  private Optional<Boolean[][]> solve() throws InterruptedException, SolverException {
+  private Optional<boolean[][]> solve() throws InterruptedException, SolverException {
     BooleanFormula[][] symbols = getSymbols();
     List<BooleanFormula> rules =
         ImmutableList.<BooleanFormula>builder()
@@ -293,7 +288,7 @@ public class NQueens {
         return Optional.empty();
       }
       // get model and convert it
-      Boolean[][] solution = new Boolean[n][n];
+      boolean[][] solution = new boolean[n][n];
       try (Model model = prover.getModel()) {
         for (int row = 0; row < n; row++) {
           for (int col = 0; col < n; col++) {
