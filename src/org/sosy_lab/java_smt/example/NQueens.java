@@ -8,12 +8,14 @@
 
 package org.sosy_lab.java_smt.example;
 
+import com.google.common.collect.ImmutableList;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.logging.Level;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -45,7 +47,6 @@ public class NQueens {
   private final SolverContext context;
   private final BooleanFormulaManager bmgr;
   private final int n;
-  private final List<BooleanFormula> rules = new ArrayList<>();
 
   private NQueens(SolverContext pContext, int n) {
     context = pContext;
@@ -60,18 +61,18 @@ public class NQueens {
     ShutdownNotifier notifier = ShutdownNotifier.createDummy();
     Solvers solver = Solvers.SMTINTERPOL;
     try (SolverContext context =
-             SolverContextFactory.createSolverContext(config, logger, notifier, solver)) {
+        SolverContextFactory.createSolverContext(config, logger, notifier, solver)) {
       try (Scanner sc = new Scanner(System.in, Charset.defaultCharset().name())) {
         // Takes input from the user for number of queens to be placed
         System.out.println("Enter the number of Queens to be " + "placed on the board:");
         int n = sc.nextInt();
         NQueens myQueen = new NQueens(context, n);
-        Boolean[][] solutions = myQueen.solve();
-        if (solutions == null) {
+        Optional<Boolean[][]> solutions = myQueen.solve();
+        if (solutions.isEmpty()) {
           System.out.println("No solutions found.");
         } else {
           System.out.println("Solution:");
-          for (Boolean[] row : solutions) {
+          for (Boolean[] row : solutions.get()) {
             for (Boolean col : row) {
               if (col) {
                 System.out.print("Q ");
@@ -92,11 +93,11 @@ public class NQueens {
   }
 
   /**
-   * Creates a 2D array of BooleanFormula objects to represent the variables for each cell in a
-   * grid of size N x N.
+   * Creates a 2D array of BooleanFormula objects to represent the variables for each cell in a grid
+   * of size N x N.
    *
    * @return a 2D array of BooleanFormula objects, where each BooleanFormula object represents a
-   * variable for a cell in the grid.
+   *     variable for a cell in the grid.
    */
   private BooleanFormula[][] getSymbols() {
     final BooleanFormula[][] symbols = new BooleanFormula[n][n];
@@ -109,14 +110,15 @@ public class NQueens {
   }
 
   /**
-   * Rule 1: At least one queen per row,
-   * or we can say make sure that there are N Queens on the board
+   * Rule 1: At least one queen per row, or we can say make sure that there are N Queens on the
+   * board.
    *
-   * @param symbols a 2D Boolean array representing the board.
-   *                Each element is true if there is a queen in that cell, false otherwise.
+   * @param symbols a 2D Boolean array representing the board. Each element is true if there is a
+   *     queen in that cell, false otherwise.
    * @return a List of BooleanFormulas representing the rules for this constraint.
    */
   private List<BooleanFormula> rowRule1(BooleanFormula[][] symbols) {
+    final List<BooleanFormula> rules = new ArrayList<>();
     for (BooleanFormula[] rowSymbols : symbols) {
       List<BooleanFormula> clause = new ArrayList<>();
       for (int i = 0; i < n; i++) {
@@ -128,20 +130,24 @@ public class NQueens {
   }
 
   /**
-   * Rule 2: Add constraints to ensure that at most one queen is placed in each row.
-   * For n=4:
+   * Rule 2: Add constraints to ensure that at most one queen is placed in each row. For n=4:
+   *
+   * <pre>
    *   0123
    * 0 ----
    * 1 ----
    * 2 ----
    * 3 ----
-   * We add a negation of the conjunction of all possible pairs of variables in each row.
+   * </pre>
    *
-   * @param symbols a 2D array of BooleanFormula objects representing the variables for each
-   *        cell on the board.
+   * <p>We add a negation of the conjunction of all possible pairs of variables in each row.
+   *
+   * @param symbols a 2D array of BooleanFormula objects representing the variables for each cell on
+   *     the board.
    * @return a list of BooleanFormula objects representing the constraints added by this rule.
    */
   private List<BooleanFormula> rowRule2(BooleanFormula[][] symbols) {
+    final List<BooleanFormula> rules = new ArrayList<>();
     for (BooleanFormula[] rowSymbol : symbols) {
       for (int j1 = 0; j1 < n; j1++) {
         for (int j2 = j1 + 1; j2 < n; j2++) {
@@ -153,20 +159,24 @@ public class NQueens {
   }
 
   /**
-   * Rule 3: Add constraints to ensure that at most one queen is placed in each column.
-   * For n=4:
+   * Rule 3: Add constraints to ensure that at most one queen is placed in each column. For n=4:
+   *
+   * <pre>
    *   0123
    * 0 ||||
    * 1 ||||
    * 2 ||||
    * 3 ||||
-   * We add a negation of the conjunction of all possible pairs of variables in each column.
+   * </pre>
+   *
+   * <p>We add a negation of the conjunction of all possible pairs of variables in each column.
    *
    * @param symbols a 2D array of BooleanFormula representing the placement of queens on the
-   *        chessboard
+   *     chessboard
    * @return a list of BooleanFormula objects representing the constraints added by this rule.
    */
   private List<BooleanFormula> columnRule(BooleanFormula[][] symbols) {
+    final List<BooleanFormula> rules = new ArrayList<>();
     for (int j = 0; j < n; j++) {
       for (int i1 = 0; i1 < n; i1++) {
         for (int i2 = i1 + 1; i2 < n; i2++) {
@@ -177,30 +187,37 @@ public class NQueens {
     return rules;
   }
   /**
-   * Rule 4: At most one queen per diagonal
-   * transform the field (=symbols) from square shape into a (downwards/upwards directed)
-   * rhombus that is embedded in a rectangle (=downwardDiagonal/upwardDiagonal)
-   * For example for N=4 from this square:
-   *  0123
-   *0 xxxx
-   *1 xxxx
-   *2 xxxx
-   *3 xxxx
-   *to this rhombus/rectangle:
-   *  0123
-   *0 x---
-   *1 xx--
-   *2 xxx-
-   *3 xxxx
-   *4 -xxx
-   *5 --xx
-   *6 ---x
+   * Rule 4: At most one queen per diagonal transform the field (=symbols) from square shape into a
+   * (downwards/upwards directed) rhombus that is embedded in a rectangle
+   * (=downwardDiagonal/upwardDiagonal). For example for N=4 from this square:
+   *
+   * <pre>
+   *   0123
+   * 0 xxxx
+   * 1 xxxx
+   * 2 xxxx
+   * 3 xxxx
+   * </pre>
+   *
+   * <p>to this rhombus/rectangle:
+   *
+   * <pre>
+   *   0123
+   * 0 x---
+   * 1 xx--
+   * 2 xxx-
+   * 3 xxxx
+   * 4 -xxx
+   * 5 --xx
+   * 6 ---x
+   * </pre>
    *
    * @param symbols a two-dimensional array of Boolean formulas representing the chessboard
-   *        configuration
+   *     configuration
    * @return a list of BooleanFormula objects representing the constraints added by this rule.
    */
   private List<BooleanFormula> diagonalRule(BooleanFormula[][] symbols) {
+    final List<BooleanFormula> rules = new ArrayList<>();
     int numDiagonals = 2 * n - 1;
     BooleanFormula[][] downwardDiagonal = new BooleanFormula[numDiagonals][n];
     BooleanFormula[][] upwardDiagonal = new BooleanFormula[numDiagonals][n];
@@ -238,8 +255,8 @@ public class NQueens {
   }
 
   /**
-   * Returns a boolean value indicating whether a queen is placed on the cell corresponding
-   * to the given row and column.
+   * Returns a boolean value indicating whether a queen is placed on the cell corresponding to the
+   * given row and column.
    *
    * @param symbols a 2D BooleanFormula array representing the cells of the chess board.
    * @param model the Model object representing the current state of the board.
@@ -247,32 +264,33 @@ public class NQueens {
    * @param col the column index of the cell to check.
    * @return true if a queen is placed on the cell, false otherwise.
    */
-  private Boolean getValue(BooleanFormula[][] symbols, Model model, int row, int col) {
+  private @Nullable Boolean getValue(BooleanFormula[][] symbols, Model model, int row, int col) {
     return model.evaluate(symbols[row][col]);
   }
 
   /**
    * Solves the N-Queens problem for the given board size and returns a possible solution.
    *
-   * @return A two-dimensional array of booleans representing the solution. Returns {@code null}
-   * if no solution exists.
+   * @return A two-dimensional array of booleans representing the solution. Returns {@code empty
+   *     object } if no solution exists.
    * @throws InterruptedException if the solving process is interrupted
    * @throws SolverException if an error occurs during the solving process
    */
-  @Nullable
-  private Boolean[][] solve() throws InterruptedException, SolverException {
+  private Optional<Boolean[][]> solve() throws InterruptedException, SolverException {
     BooleanFormula[][] symbols = getSymbols();
-    List<BooleanFormula> rules = new ArrayList<>();
-    rules.addAll(rowRule1(symbols));
-    rules.addAll(rowRule2(symbols));
-    rules.addAll(columnRule(symbols));
-    rules.addAll(diagonalRule(symbols));
+    List<BooleanFormula> rules =
+        ImmutableList.<BooleanFormula>builder()
+            .addAll(rowRule1(symbols))
+            .addAll(rowRule2(symbols))
+            .addAll(columnRule(symbols))
+            .addAll(diagonalRule(symbols))
+            .build();
     // solve N-Queens
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(bmgr.and(rules));
       boolean isUnsolvable = prover.isUnsat();
       if (isUnsolvable) {
-        return null;
+        return Optional.empty();
       }
       // get model and convert it
       Boolean[][] solution = new Boolean[n][n];
@@ -282,9 +300,8 @@ public class NQueens {
             solution[row][col] = getValue(symbols, model, row, col);
           }
         }
-        return solution;
+        return Optional.of(solution);
       }
     }
   }
-
 }
