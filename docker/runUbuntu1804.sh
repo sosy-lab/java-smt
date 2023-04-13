@@ -16,4 +16,4 @@ docker run -it \
     --mount type=bind,source=${WORKSPACE},target=/workspace \
     --workdir /workspace/java-smt \
     --user $(id -u ${USER}):$(id -g ${USER}) \
-    devel:ubuntu1804
+    registry.gitlab.com/sosy-lab/software/java-smt/develop:ubuntu1804
