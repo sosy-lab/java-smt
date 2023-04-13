@@ -130,7 +130,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
   public String getVersion() {
     String version = solver.getInfo("version");
     if (version.startsWith("\"") && version.endsWith("\"")) {
-      version = version.substring(1, version.length() - 2);
+      version = version.substring(1, version.length() - 1);
     }
     return "CVC5 " + version;
   }
