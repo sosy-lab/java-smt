@@ -45,8 +45,8 @@ public class CVC5NativeAPITest {
   private static final String INVALID_GETVALUE_STRING_SAT =
       "Cannot get value unless after a SAT or UNKNOWN response.";
 
-  private static final String INVALID_GETVALUE_STRING_BOUND_VAR =
-      "Cannot process term with free variable";
+  private static final String INVALID_TERM_BOUND_VAR =
+      "Cannot process term .* with free variables: .*";
 
   private static final String INVALID_MODEL_STRING =
       "Cannot get model unless after a SAT or UNKNOWN response.";
@@ -745,7 +745,7 @@ public class CVC5NativeAPITest {
     // CVC5 does not allow non quantifier formulas as the top most formula
     Exception e =
         assertThrows(io.github.cvc5.CVC5ApiException.class, () -> solver.assertFormula(assertion));
-    assertThat(e.toString()).contains("Cannot process term with free variable");
+    assertThat(e.getMessage().strip()).matches(INVALID_TERM_BOUND_VAR);
   }
 
   @Test
@@ -870,9 +870,9 @@ public class CVC5NativeAPITest {
     // CVC5 does not allow the usage of getValue() on bound vars!
     Exception e =
         assertThrows(io.github.cvc5.CVC5ApiException.class, () -> solver.getValue(boundVarBound));
-    assertThat(e.toString()).contains(INVALID_GETVALUE_STRING_BOUND_VAR);
+    assertThat(e.getMessage().strip()).matches(INVALID_TERM_BOUND_VAR);
     e = assertThrows(io.github.cvc5.CVC5ApiException.class, () -> solver.getValue(bodySubst));
-    assertThat(e.toString()).contains(INVALID_GETVALUE_STRING_BOUND_VAR);
+    assertThat(e.getMessage().strip()).matches(INVALID_TERM_BOUND_VAR);
   }
 
   /** CVC5 does not support Array quantifier elimination. This would run endlessly! */

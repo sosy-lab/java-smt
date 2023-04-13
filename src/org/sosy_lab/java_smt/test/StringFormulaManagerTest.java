@@ -395,9 +395,10 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
     assume()
         .withMessage("Solver is quite slow for this example")
         .that(solverToUse())
-        .isNotEqualTo(Solvers.Z3);
+        .isNoneOf(Solvers.Z3, Solvers.CVC5);
     // TODO regression:
-    //  the Z3 library was able to solve this in v4.11.2, but no longer in v4.12.1-glibc_2.27.
+    // - the Z3 library was able to solve this in v4.11.2, but no longer in v4.12.1-glibc_2.27.
+    // - CVC5 was able to solve this in v1.0.2, but no longer in v1.0.5
 
     StringFormula var1 = smgr.makeVariable("0");
     StringFormula var2 = smgr.makeVariable("1");
