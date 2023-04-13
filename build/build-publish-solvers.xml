@@ -251,7 +251,7 @@ SPDX-License-Identifier: Apache-2.0
           - 'fPIC' for position-independent code, required for shared libraries.
           The full cmdline for building CVC5 is (note the double-dashes!):
             ./configure.sh production - -java-bindings - -auto-download - -statistics - -prefix=$WORKSPACE/cvc5-main/build/install -DVAR=fPIC
-          Theoretically CVC5s performance should be improveable by using -best (uses the best 
+          Theoretically CVC5s performance should be improveable by using -best (uses the best
           known general performance/dependencies) but this can not be combined with auto-download.
     -->
     <!-- SECTION: Publishing CVC5
@@ -343,10 +343,12 @@ SPDX-License-Identifier: Apache-2.0
         </exec>
         <exec executable="patchelf" dir="./" failonerror="true">
             <arg value="--set-rpath"/><arg value="$ORIGIN"/>
+            <arg value="--replace-needed"/><arg value="libcvc5.so.1"/><arg value="libcvc5.so"/>
             <arg value="libcvc5jni-${cvc5.version}.so"/>
         </exec>
         <exec executable="patchelf" dir="./" failonerror="true">
             <arg value="--set-rpath"/><arg value="$ORIGIN"/>
+            <arg value="--replace-needed"/><arg value="libcvc5.so.1"/><arg value="libcvc5.so"/>
             <arg value="libcvc5parser-${cvc5.version}.so"/>
         </exec>
         <!-- patchelf finds two dependencies and needs to be called twice for libpolyxx.so -->
