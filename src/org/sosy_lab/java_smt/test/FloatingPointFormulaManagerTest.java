@@ -274,8 +274,8 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
   @Test
   public void numberConstants() throws SolverException, InterruptedException {
     checkEqualityOfNumberConstantsFor(1.0, singlePrecType);
-    checkEqualityOfNumberConstantsFor(-5.8774717541114375E-39, singlePrecType);
-    checkEqualityOfNumberConstantsFor(-5.8774717541114375E-39, doublePrecType);
+    checkEqualityOfNumberConstantsFor(-5.877471754111438E-39, singlePrecType);
+    checkEqualityOfNumberConstantsFor(-5.877471754111438E-39, doublePrecType);
     checkEqualityOfNumberConstantsFor(3.4028234663852886e+38, singlePrecType);
     checkEqualityOfNumberConstantsFor(3.4028234663852886e+38, doublePrecType);
 
@@ -440,9 +440,9 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
     assertThatFormula(fpmgr.equalWithFPSemantics(widenedNumber, doublePrecNumber)).isTautological();
 
     FloatingPointFormula doublePrecSmallNumber =
-        fpmgr.makeNumber(5.8774717541114375E-39, doublePrecType);
+        fpmgr.makeNumber(5.877471754111438E-39, doublePrecType);
     FloatingPointFormula singlePrecSmallNumber =
-        fpmgr.makeNumber(5.8774717541114375E-39, singlePrecType);
+        fpmgr.makeNumber(5.877471754111438E-39, singlePrecType);
     FloatingPointFormula widenedSmallNumber =
         fpmgr.castTo(singlePrecSmallNumber, true, doublePrecType);
     assertThatFormula(fpmgr.equalWithFPSemantics(widenedSmallNumber, doublePrecSmallNumber))
