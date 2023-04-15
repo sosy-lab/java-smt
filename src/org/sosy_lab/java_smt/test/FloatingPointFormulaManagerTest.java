@@ -272,6 +272,7 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
   }
 
   @Test
+  @SuppressWarnings("FloatingPointLiteralPrecision")
   public void numberConstants() throws SolverException, InterruptedException {
     checkEqualityOfNumberConstantsFor(1.0, singlePrecType);
     checkEqualityOfNumberConstantsFor(-5.877471754111438E-39, singlePrecType);
@@ -428,6 +429,7 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
   }
 
   @Test
+  @SuppressWarnings("FloatingPointLiteralPrecision")
   public void cast() throws SolverException, InterruptedException {
     FloatingPointFormula doublePrecNumber = fpmgr.makeNumber(1.5, doublePrecType);
     FloatingPointFormula singlePrecNumber = fpmgr.makeNumber(1.5, singlePrecType);
