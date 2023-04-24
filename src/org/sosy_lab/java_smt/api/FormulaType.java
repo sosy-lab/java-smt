@@ -8,8 +8,10 @@
 
 package org.sosy_lab.java_smt.api;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.Immutable;
 import java.util.List;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
@@ -67,6 +69,10 @@ public abstract class FormulaType<T extends Formula> {
   }
 
   public boolean isRegexType() {
+    return false;
+  }
+
+  public boolean isEnumerationType() {
     return false;
   }
 
@@ -342,6 +348,61 @@ public abstract class FormulaType<T extends Formula> {
     @Override
     public String toSMTLIBString() {
       return "(Array " + indexType.toSMTLIBString() + " " + elementType.toSMTLIBString() + ")";
+    }
+  }
+
+  public static final class EnumerationFormulaType extends FormulaType<EnumerationFormula> {
+
+    private final String name;
+    private final ImmutableSet<String> elements;
+
+    public EnumerationFormulaType(String pName, ImmutableSet<String> pElements) {
+      this.name = Preconditions.checkNotNull(pName);
+      this.elements = pElements;
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public ImmutableSet<String> getElements() {
+      return elements;
+    }
+
+    public int getCardinality() {
+      return elements.size();
+    }
+
+    @Override
+    public boolean isEnumerationType() {
+      return true;
+    }
+
+    @Override
+    public String toString() {
+      return String.format("%s (%s)", name, Joiner.on(", ").join(elements));
+    }
+
+    @Override
+    public int hashCode() {
+      return 31 * name.hashCode() + elements.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj) {
+        return true;
+      }
+      if (!(obj instanceof EnumerationFormulaType)) {
+        return false;
+      }
+      EnumerationFormulaType other = (EnumerationFormulaType) obj;
+      return name.equals(other.name) && elements.equals(other.elements);
+    }
+
+    @Override
+    public String toSMTLIBString() {
+      return "(" + this + ")";
     }
   }
 
