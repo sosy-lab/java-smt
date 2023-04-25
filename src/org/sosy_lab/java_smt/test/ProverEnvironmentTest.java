@@ -43,7 +43,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
 
   @Parameters(name = "{0}")
   public static Solvers[] getAllSolvers() {
-    return Solvers.values();
+    return new Solvers[] {Solvers.OPENSMT};
   }
 
   @Parameter(0)

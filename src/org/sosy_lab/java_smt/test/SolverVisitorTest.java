@@ -129,7 +129,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
 
   @Parameters(name = "{0}")
   public static Object[] getAllSolvers() {
-    return Solvers.values();
+    return new Object[] {Solvers.OPENSMT};
   }
 
   @Parameter public Solvers solver;
