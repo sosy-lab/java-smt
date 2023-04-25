@@ -115,7 +115,7 @@ Finally follow the instructions shown in the message at the end.
 Download [OpenSMT](https://github.com/usi-verification-and-security/opensmt) using git and make sure its in the same directory as your copy of JavaSMT. Then create a link to this directory and run the Docker container to build the binaries:
 ```
 cd ~ \
-ln $WORKSPACE workspace \
+ln -s $WORKSPACE workspace \
 cd workspace/java-smt/docker \
 ./buildUbuntu1804.sh \
 ./runUbuntu1804.sh \
