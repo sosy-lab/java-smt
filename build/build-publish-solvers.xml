@@ -51,6 +51,7 @@ SPDX-License-Identifier: Apache-2.0
         <!-- Build OpenSMT -->
         <exec executable="cmake" dir="${path.build}" failonerror="true">
             <arg value="-DCMAKE_INSTALL_PREFIX:PATH=${path.install}"/>
+            <arg value="FORCE_STATIC_GMP=ON"/>
             <arg value=".."/>
         </exec>
         <exec executable="make" dir="${path.build}" failonerror="true">

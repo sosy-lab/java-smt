@@ -21,18 +21,28 @@ RUN apt-get update \
  && apt-get install -y \
         python3 python3-toml
 
-# OpenSMT requires gmp, flex and bison
-# SWIG needs to be built manually to get version 4.1 (which is required as we use unique_ptr)
+# OpenSMT requires swig, gmp, flex and bison
+# - swig needs to built manually to get version 4.1 for unique_ptr support
+# - libpcre2-dev is a dependency of swig
+# - gmp needs to be recompiled to generate PIC code
+# - lzip is required to unpack the gmp tar ball
 RUN apt-get update \
  && apt-get install -y \
-        libgmp-dev \
         flex \
         bison \
         libpcre2-dev  \
+        lzip \
  && wget http://prdownloads.sourceforge.net/swig/swig-4.1.1.tar.gz \
  && tar xf swig-4.1.1.tar.gz \
  && cd swig-4.1.1 \
  && ./configure \
+ && make \
+ && make install \
+ && cd .. \
+ && wget https://gmplib.org/download/gmp/gmp-6.2.1.tar.lz \
+ && tar xf gmp-6.2.1.tar.lz \
+ && cd gmp-6.2.1 \
+ && ./configure --enable-cxx --with-pic --disable-shared --enable-fat \
  && make \
  && make install
 
