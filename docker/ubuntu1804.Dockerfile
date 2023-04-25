@@ -21,6 +21,21 @@ RUN apt-get update \
  && apt-get install -y \
         python3 python3-toml
 
+# OpenSMT requires gmp, flex and bison
+# SWIG needs to be built manually to get version 4.1 (which is required as we use unique_ptr)
+RUN apt-get update \
+ && apt-get install -y \
+        libgmp-dev \
+        flex \
+        bison \
+        libpcre2-dev  \
+ && wget http://prdownloads.sourceforge.net/swig/swig-4.1.1.tar.gz \
+ && tar xf swig-4.1.1.tar.gz \
+ && cd swig-4.1.1 \
+ && ./configure \
+ && make \
+ && make install
+
 # Add the user "developer" with UID:1000, GID:1000, home at /developer.
 # This allows to map the docker-internal user to the local user 1000:1000 outside of the container.
 # This avoids to have new files created with root-rights.

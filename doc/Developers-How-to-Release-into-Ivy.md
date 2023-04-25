@@ -111,6 +111,17 @@ ant publish-cvc5 -Dcvc5.path=../CVC5 -Dcvc5.customRev=1.0.1
 During the build process, our script automatically appends the git-revision after the version.
 Finally follow the instructions shown in the message at the end.
 
+### Publishing OpenSMT
+Download [OpenSMT](https://github.com/usi-verification-and-security/opensmt) using git and make sure its in the same directory as your copy of JavaSMT. Then create a link to this directory and run the Docker container to build the binaries:
+```
+cd ~ \
+ln $WORKSPACE workspace \
+cd workspace/java-smt/docker \
+./buildUbuntu1804.sh \
+./runUbuntu1804.sh \
+ant publish-opensmt -Dopensmt.path=/workspace/$OPENSMT_FOLDER -Dopensmt.cusotomRev=$OPENSMT_REV
+```
+Then upload the binaries to the Ivy repository using SVN as described in the message on the screen.
 
 ### Publishing Boolector
 

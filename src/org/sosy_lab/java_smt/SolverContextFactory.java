@@ -48,6 +48,7 @@ import org.sosy_lab.java_smt.solvers.z3.Z3SolverContext;
 public class SolverContextFactory {
 
   public enum Solvers {
+    OPENSMT,
     MATHSAT5,
     SMTINTERPOL,
     Z3,
