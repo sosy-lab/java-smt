@@ -364,7 +364,7 @@ public abstract class FormulaType<T extends Formula> {
         }
       };
 
-  public static final FormulaType<BooleanFormula> RegexType =
+  public static final FormulaType<RegexFormula> RegexType =
       new FormulaType<>() {
 
         @Override
