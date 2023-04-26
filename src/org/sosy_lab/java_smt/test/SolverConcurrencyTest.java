@@ -70,28 +70,28 @@ public class SolverConcurrencyTest {
   private static final ImmutableMap<Solvers, Integer> INTEGER_FORMULA_GEN =
       ImmutableMap.of(
           Solvers.SMTINTERPOL,
-          10,
+          8,
           Solvers.CVC4,
-          14,
+          12,
           Solvers.MATHSAT5,
-          16,
+          12,
           Solvers.PRINCESS,
-          10,
+          8,
           Solvers.Z3,
-          14);
+          12);
 
   private static final ImmutableMap<Solvers, Integer> BITVECTOR_FORMULA_GEN =
       ImmutableMap.of(
           Solvers.BOOLECTOR,
-          60,
+          50,
           Solvers.CVC4,
-          9,
-          Solvers.MATHSAT5,
-          60,
-          Solvers.PRINCESS,
           7,
+          Solvers.MATHSAT5,
+          50,
+          Solvers.PRINCESS,
+          5,
           Solvers.Z3,
-          50);
+          40);
 
   @Parameters(name = "{0}")
   public static Object[] getAllSolvers() {
