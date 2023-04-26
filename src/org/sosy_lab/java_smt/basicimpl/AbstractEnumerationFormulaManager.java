@@ -19,6 +19,7 @@ import org.sosy_lab.java_smt.api.EnumerationFormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.EnumerationFormulaType;
 
+@SuppressWarnings("ClassTypeParameterName")
 public abstract class AbstractEnumerationFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     implements EnumerationFormulaManager {
