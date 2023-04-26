@@ -14,6 +14,7 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.Immutable;
 import java.util.List;
+import java.util.Set;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 
@@ -356,9 +357,9 @@ public abstract class FormulaType<T extends Formula> {
     private final String name;
     private final ImmutableSet<String> elements;
 
-    public EnumerationFormulaType(String pName, ImmutableSet<String> pElements) {
+    public EnumerationFormulaType(String pName, Set<String> pElements) {
       this.name = Preconditions.checkNotNull(pName);
-      this.elements = pElements;
+      this.elements = ImmutableSet.copyOf(pElements);
     }
 
     public String getName() {
@@ -470,6 +471,12 @@ public abstract class FormulaType<T extends Formula> {
       // Bitvector<32>
       return FormulaType.getBitvectorTypeWithSize(
           Integer.parseInt(t.substring(10, t.length() - 1)));
+    } else if (t.matches(".*\\(.*\\)")) {
+      // Color (Red, Green, Blue)
+      String name = t.substring(0, t.indexOf("(") - 1);
+      String elementsStr = t.substring(t.indexOf("(") + 1, t.length() - 1);
+      Set<String> elements = ImmutableSet.copyOf(Splitter.on(", ").split(elementsStr));
+      return new EnumerationFormulaType(name, elements);
     } else {
       throw new AssertionError("unknown type:" + t);
     }

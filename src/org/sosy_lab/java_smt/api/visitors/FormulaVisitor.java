@@ -45,11 +45,13 @@ public interface FormulaVisitor<R> {
   R visitBoundVariable(Formula f, int deBruijnIdx);
 
   /**
-   * Visit a constant, such as "true"/"false" or a numeric constant like "1" or "1.0".
+   * Visit a constant, such as "true"/"false", a numeric constant like "1" or "1.0", a String
+   * constant like 2hello world" or enumeration constant like "Blue".
    *
    * @param f Formula representing the constant.
-   * @param value The value of the constant. It is either of type {@link Boolean} or of a subtype of
-   *     {@link Number}, mostly a {@link BigInteger}, a {@link BigDecimal}, or a {@link Rational}.
+   * @param value The value of the constant. It is either of type {@link Boolean}, of a subtype of
+   *     {@link Number} (mostly a {@link BigInteger}, a {@link BigDecimal}, or a {@link Rational}),
+   *     or {@link String}.
    * @return An arbitrary return value that is passed to the caller.
    */
   R visitConstant(Formula f, Object value);

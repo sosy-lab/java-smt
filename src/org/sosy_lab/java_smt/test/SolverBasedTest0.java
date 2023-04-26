@@ -29,6 +29,7 @@ import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
+import org.sosy_lab.java_smt.api.EnumerationFormulaManager;
 import org.sosy_lab.java_smt.api.FloatingPointFormulaManager;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
@@ -86,6 +87,7 @@ public abstract class SolverBasedTest0 {
   protected @Nullable ArrayFormulaManager amgr;
   protected @Nullable FloatingPointFormulaManager fpmgr;
   protected @Nullable StringFormulaManager smgr;
+  protected @Nullable EnumerationFormulaManager emgr;
   protected ShutdownManager shutdownManager = ShutdownManager.create();
 
   protected ShutdownNotifier shutdownNotifierToUse() {
@@ -159,6 +161,11 @@ public abstract class SolverBasedTest0 {
     } catch (UnsupportedOperationException e) {
       smgr = null;
     }
+    try {
+      emgr = mgr.getEnumerationFormulaManager();
+    } catch (UnsupportedOperationException e) {
+      emgr = null;
+    }
   }
 
   @After
@@ -229,6 +236,14 @@ public abstract class SolverBasedTest0 {
     assume()
         .withMessage("Solver %s does not support the theory of strings", solverToUse())
         .that(smgr)
+        .isNotNull();
+  }
+
+  /** Skip test if the solver does not support enumeration theory. */
+  protected final void requireEnumeration() {
+    assume()
+        .withMessage("Solver %s does not support the theory of enumerations", solverToUse())
+        .that(emgr)
         .isNotNull();
   }
 

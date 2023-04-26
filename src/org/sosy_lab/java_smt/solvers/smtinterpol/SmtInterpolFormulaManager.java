@@ -62,6 +62,7 @@ public class SmtInterpolFormulaManager
         null,
         pArrayFormulaManager,
         null,
+        null,
         null);
     logger = pLogger;
   }

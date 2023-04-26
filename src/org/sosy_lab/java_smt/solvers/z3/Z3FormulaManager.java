@@ -53,7 +53,8 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
         pQuantifiedManager,
         pArrayManager,
         null,
-        pStringManager);
+        pStringManager,
+        null);
     formulaCreator = pFormulaCreator;
   }
 

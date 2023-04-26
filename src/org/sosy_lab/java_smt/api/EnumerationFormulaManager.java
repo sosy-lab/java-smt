@@ -8,7 +8,10 @@
 
 package org.sosy_lab.java_smt.api;
 
-import java.util.List;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableSet;
+import java.util.Set;
 import org.sosy_lab.java_smt.api.FormulaType.EnumerationFormulaType;
 
 /**
@@ -20,21 +23,29 @@ public interface EnumerationFormulaManager {
   /**
    * Declare an enumeration.
    *
-   * @param name the name of the enumeration type.
-   * @param elementNames names for all individual elements of this enumeration type.
+   * @param pName the name of the enumeration type.
+   * @param ppElementNames names for all individual elements of this enumeration type.
    */
-  EnumerationFormulaType declareEnumeration(String name, List<String> elementNames);
+  EnumerationFormulaType declareEnumeration(String pName, Set<String> ppElementNames);
 
   /**
-   * @see #declareEnumeration(String, List)
+   * @see #declareEnumeration(String, Set)
    */
-  EnumerationFormulaType declareEnumeration(String name, String... elementNames);
+  default EnumerationFormulaType declareEnumeration(String pName, String... pElementNames) {
+    final Set<String> elements = ImmutableSet.copyOf(pElementNames);
+    Preconditions.checkArgument(
+        pElementNames.length == elements.size(),
+        "An enumeration type requires pairwise distinct elements. "
+            + "The following elements were given multiple times: %s",
+        FluentIterable.from(pElementNames).filter(e -> !elements.contains(e)));
+    return declareEnumeration(pName, elements);
+  }
 
   /**
    * Creates a constant of given enumeration type with exactly the given name. This constant
    * (symbol) needs to be an element from the given enumeration type.
    */
-  EnumerationFormula makeConstant(String pVar, EnumerationFormulaType pType);
+  EnumerationFormula makeConstant(String pName, EnumerationFormulaType pType);
 
   /**
    * Creates a variable of given enumeration type with exactly the given name.

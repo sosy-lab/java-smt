@@ -38,6 +38,8 @@ public class SolverStatistics {
   final AtomicInteger fpOperations = new AtomicInteger();
   final AtomicInteger typeOperations = new AtomicInteger();
   final AtomicInteger stringOperations = new AtomicInteger();
+  final AtomicInteger enumerationDeclarations = new AtomicInteger();
+  final AtomicInteger enumerationOperations = new AtomicInteger();
 
   // model operations
   final AtomicInteger modelEvaluations = new AtomicInteger();
