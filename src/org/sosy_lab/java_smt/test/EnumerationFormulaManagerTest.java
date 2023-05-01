@@ -232,6 +232,7 @@ public class EnumerationFormulaManagerTest extends SolverBasedTest0 {
   public void testModel() throws SolverException, InterruptedException {
     EnumerationFormulaType colorType = emgr.declareEnumeration("ColorM", "Blue", "White");
     EnumerationFormula blue = emgr.makeConstant("Blue", colorType);
+    EnumerationFormula white = emgr.makeConstant("White", colorType);
     EnumerationFormula varColor = emgr.makeVariable("varColor", colorType);
 
     EnumerationFormulaType shapeType =
@@ -249,7 +250,7 @@ public class EnumerationFormulaManagerTest extends SolverBasedTest0 {
         bmgr.not(emgr.equivalence(blue, varColor)),
         varColor,
         Lists.newArrayList("White"),
-        Lists.newArrayList(blue));
+        Lists.newArrayList(white));
 
     evaluateInModel(
         bmgr.and(emgr.equivalence(blue, varColor), emgr.equivalence(triangle, varShape)),
