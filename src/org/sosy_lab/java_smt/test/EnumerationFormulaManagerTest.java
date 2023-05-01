@@ -12,6 +12,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertThrows;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import java.util.HashSet;
 import java.util.List;
@@ -225,5 +226,41 @@ public class EnumerationFormulaManagerTest extends SolverBasedTest0 {
     mgr.visitRecursively(eq, visitor2);
     assertThat(visitor2.functions).containsExactly(FunctionDeclarationKind.EQ);
     assertThat(visitor2.constants).containsExactly("Blue");
+  }
+
+  @Test
+  public void testModel() throws SolverException, InterruptedException {
+    EnumerationFormulaType colorType = emgr.declareEnumeration("ColorM", "Blue", "White");
+    EnumerationFormula blue = emgr.makeConstant("Blue", colorType);
+    EnumerationFormula varColor = emgr.makeVariable("varColor", colorType);
+
+    EnumerationFormulaType shapeType =
+        emgr.declareEnumeration("ShapeM", "Circle", "Reactangle", "Triangle");
+    EnumerationFormula triangle = emgr.makeConstant("Triangle", shapeType);
+    EnumerationFormula varShape = emgr.makeVariable("varShape", shapeType);
+
+    evaluateInModel(
+        emgr.equivalence(blue, varColor),
+        varColor,
+        Lists.newArrayList("Blue"),
+        Lists.newArrayList(blue));
+
+    evaluateInModel(
+        bmgr.not(emgr.equivalence(blue, varColor)),
+        varColor,
+        Lists.newArrayList("White"),
+        Lists.newArrayList(blue));
+
+    evaluateInModel(
+        bmgr.and(emgr.equivalence(blue, varColor), emgr.equivalence(triangle, varShape)),
+        varColor,
+        Lists.newArrayList("Blue"),
+        Lists.newArrayList(blue));
+
+    evaluateInModel(
+        bmgr.and(emgr.equivalence(blue, varColor), emgr.equivalence(triangle, varShape)),
+        varShape,
+        Lists.newArrayList("Triangle"),
+        Lists.newArrayList(triangle));
   }
 }

@@ -2,19 +2,17 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2023 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
 package org.sosy_lab.java_smt.test;
 
-import static com.google.common.truth.Truth.assertThat;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.Lists;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.Test;
@@ -27,14 +25,10 @@ import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Evaluator;
-import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.Model;
-import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.api.StringFormula;
 
 /** Test that we can request evaluations from models. */
 @RunWith(Parameterized.class)
@@ -80,53 +74,6 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
       builder.setOption("solver.mathsat5.furtherOptions", "model_generation=true");
     }
     return builder;
-  }
-
-  private void evaluateInModel(
-      BooleanFormula constraint,
-      Formula formula,
-      Collection<Object> possibleExpectedValues,
-      Collection<Formula> possibleExpectedFormulas)
-      throws SolverException, InterruptedException {
-
-    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
-      prover.push(constraint);
-      assertThat(prover).isSatisfiable();
-
-      try (Model m = prover.getModel()) {
-        if (formula instanceof BooleanFormula) {
-          assertThat(m.evaluate((BooleanFormula) formula)).isIn(possibleExpectedValues);
-          assertThat(m.evaluate(formula)).isIn(possibleExpectedValues);
-        } else if (formula instanceof IntegerFormula) {
-          assertThat(m.evaluate((IntegerFormula) formula)).isIn(possibleExpectedValues);
-          assertThat(m.evaluate(formula)).isIn(possibleExpectedValues);
-        } else if (formula instanceof RationalFormula) {
-          assertThat(m.evaluate((RationalFormula) formula)).isIn(possibleExpectedValues);
-          // assertThat(m.evaluate(formula)).isIn(possibleExpectedValues);
-        } else if (formula instanceof StringFormula) {
-          assertThat(m.evaluate((StringFormula) formula)).isIn(possibleExpectedValues);
-          assertThat(m.evaluate(formula)).isIn(possibleExpectedValues);
-        } else {
-          assertThat(m.evaluate(formula)).isIn(possibleExpectedValues);
-        }
-
-        // let's try to check evaluations. Actually the whole method is based on some default values
-        // in the solvers, because we do not use constraints for the evaluated formulas.
-        Formula eval = m.eval(formula);
-        if (eval != null) {
-          switch (solver) {
-            case Z3:
-              // ignore, Z3 provides arbitrary values
-              break;
-            case BOOLECTOR:
-              // ignore, Boolector provides no useful values
-              break;
-            default:
-              assertThat(eval).isIn(possibleExpectedFormulas);
-          }
-        }
-      }
-    }
   }
 
   @Test
