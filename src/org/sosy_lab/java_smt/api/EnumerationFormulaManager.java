@@ -23,7 +23,7 @@ public interface EnumerationFormulaManager {
   /**
    * Declare an enumeration.
    *
-   * @param pName the name of the enumeration type.
+   * @param pName the unique name to identify the new enumeration type.
    * @param ppElementNames names for all individual elements of this enumeration type.
    */
   EnumerationFormulaType declareEnumeration(String pName, Set<String> ppElementNames);
