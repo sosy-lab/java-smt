@@ -13,11 +13,14 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import io.github.cvc5.CVC5ApiException;
+import io.github.cvc5.Datatype;
+import io.github.cvc5.DatatypeConstructor;
 import io.github.cvc5.Kind;
 import io.github.cvc5.Op;
 import io.github.cvc5.Pair;
@@ -36,6 +39,7 @@ import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.EnumerationFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -51,6 +55,7 @@ import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5ArrayFormula;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5BitvectorFormula;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5BooleanFormula;
+import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5EnumerationFormula;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5FloatingPointFormula;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5IntegerFormula;
@@ -164,26 +169,29 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
     Sort cvc5sort = extractInfo(pFormula).getSort();
     if (pFormula instanceof BitvectorFormula) {
       checkArgument(
-          cvc5sort.isBitVector(), "BitvectorFormula with actual Type %s: %s", cvc5sort, pFormula);
-      return (FormulaType<T>) getFormulaType(extractInfo(pFormula));
+          cvc5sort.isBitVector(), "BitvectorFormula with actual type %s: %s", cvc5sort, pFormula);
+      return (FormulaType<T>) getFormulaTypeFromTermType(cvc5sort);
 
     } else if (pFormula instanceof FloatingPointFormula) {
       checkArgument(
           cvc5sort.isFloatingPoint(),
-          "FloatingPointFormula with actual Type %s: %s",
+          "FloatingPointFormula with actual type %s: %s",
           cvc5sort,
           pFormula);
-      return (FormulaType<T>)
-          FormulaType.getFloatingPointType(
-              cvc5sort.getFloatingPointExponentSize(),
-              cvc5sort.getFloatingPointSignificandSize() - 1); // TODO: check for sign bit
+      return (FormulaType<T>) getFormulaTypeFromTermType(cvc5sort);
 
     } else if (pFormula instanceof ArrayFormula<?, ?>) {
-      FormulaType<T> arrayIndexType = getArrayFormulaIndexType((ArrayFormula<T, T>) pFormula);
-      FormulaType<T> arrayElementType = getArrayFormulaElementType((ArrayFormula<T, T>) pFormula);
-      return (FormulaType<T>) FormulaType.getArrayType(arrayIndexType, arrayElementType);
+      checkArgument(cvc5sort.isArray(), "ArrayFormula with actual type %s: %s", cvc5sort, pFormula);
+      return (FormulaType<T>) getFormulaTypeFromTermType(cvc5sort);
+
+    } else if (pFormula instanceof EnumerationFormula) {
+      checkArgument(
+          cvc5sort.isDatatype(), "EnumerationFormula with actual type %s: %s", cvc5sort, pFormula);
+      return (FormulaType<T>) getFormulaTypeFromTermType(cvc5sort);
+
+    } else {
+      return super.getFormulaType(pFormula);
     }
-    return super.getFormulaType(pFormula);
   }
 
   @Override
@@ -218,8 +226,19 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
       return FormulaType.RegexType;
     } else if (sort.isFunction()) {
       return getFormulaTypeFromTermType(sort.getFunctionCodomainSort());
+    } else if (sort.isDatatype()) {
+      Datatype enumType = sort.getDatatype();
+      return FormulaType.getEnumerationType(
+          enumType.getName(),
+          FluentIterable.from(enumType).transform(DatatypeConstructor::getName).toSet());
     } else {
-      throw new AssertionError(String.format("Encountered unhandled Type '%s'.", sort));
+      try {
+        throw new AssertionError(
+            String.format("Encountered unhandled Type '%s' %s.", sort, sort.getKind()));
+      } catch (CVC5ApiException pE) {
+        pE.printStackTrace();
+        return null;
+      }
     }
   }
 
@@ -250,6 +269,8 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
       return (T) new CVC5StringFormula(pTerm);
     } else if (pType.isRegexType()) {
       return (T) new CVC5RegexFormula(pTerm);
+    } else if (pType.isEnumerationType()) {
+      return (T) new CVC5EnumerationFormula(pTerm);
     }
     throw new IllegalArgumentException("Cannot create formulas of Type " + pType + " in CVC5");
   }
@@ -302,6 +323,12 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
   protected RegexFormula encapsulateRegex(Term pTerm) {
     assert getFormulaType(pTerm).isRegexType();
     return new CVC5RegexFormula(pTerm);
+  }
+
+  @Override
+  protected EnumerationFormula encapsulateEnumeration(Term pTerm) {
+    assert getFormulaType(pTerm).isEnumerationType();
+    return new CVC5EnumerationFormula(pTerm);
   }
 
   private String getName(Term e) {
@@ -384,6 +411,11 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
 
       } else if (f.getKind() == Kind.CONSTANT) {
         return visitor.visitFreeVariable(formula, dequote(f.toString()));
+
+      } else if (f.getKind() == Kind.APPLY_CONSTRUCTOR) {
+        Preconditions.checkState(
+            f.getNumChildren() == 1, "Unexpected formula '%s' with sort '%s'", f, f.getSort());
+        return visitor.visitConstant(formula, f.getChild(0).getSymbol());
 
       } else {
         // Term expressions like uninterpreted function calls (Kind.APPLY_UF) or operators (e.g.

@@ -89,6 +89,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
     CVC5ArrayFormulaManager arrayTheory = new CVC5ArrayFormulaManager(pCreator);
     CVC5SLFormulaManager slTheory = new CVC5SLFormulaManager(pCreator);
     CVC5StringFormulaManager strTheory = new CVC5StringFormulaManager(pCreator);
+    CVC5EnumerationFormulaManager enumTheory = new CVC5EnumerationFormulaManager(pCreator);
     CVC5FormulaManager manager =
         new CVC5FormulaManager(
             pCreator,
@@ -101,7 +102,8 @@ public final class CVC5SolverContext extends AbstractSolverContext {
             qfTheory,
             arrayTheory,
             slTheory,
-            strTheory);
+            strTheory,
+            enumTheory);
 
     return new CVC5SolverContext(pCreator, manager, pShutdownNotifier, newSolver, randomSeed);
   }
