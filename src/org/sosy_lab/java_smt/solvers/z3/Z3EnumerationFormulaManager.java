@@ -85,7 +85,7 @@ class Z3EnumerationFormulaManager
       Native.incRef(z3context, constantApp);
       constantsMapping.put(elements[i], constantApp);
     }
-    return new EnumType(pType, enumType, constantsMapping.build());
+    return new EnumType(pType, enumType, constantsMapping.buildOrThrow());
   }
 
   @Override
