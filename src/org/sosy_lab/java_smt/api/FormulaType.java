@@ -352,12 +352,16 @@ public abstract class FormulaType<T extends Formula> {
     }
   }
 
+  public static EnumerationFormulaType getEnumerationType(String pName, Set<String> pElements) {
+    return new EnumerationFormulaType(pName, pElements);
+  }
+
   public static final class EnumerationFormulaType extends FormulaType<EnumerationFormula> {
 
     private final String name;
     private final ImmutableSet<String> elements;
 
-    public EnumerationFormulaType(String pName, Set<String> pElements) {
+    private EnumerationFormulaType(String pName, Set<String> pElements) {
       this.name = Preconditions.checkNotNull(pName);
       this.elements = ImmutableSet.copyOf(pElements);
     }

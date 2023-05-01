@@ -16,7 +16,7 @@ import org.sosy_lab.java_smt.api.FormulaType.EnumerationFormulaType;
 
 /**
  * This interface represents the theory of enumeration, i.e., datatype of limited domain sort (as
- * defined in the SMTLIB2 standard)
+ * defined in the SMTLIB2 standard).
  */
 public interface EnumerationFormulaManager {
 

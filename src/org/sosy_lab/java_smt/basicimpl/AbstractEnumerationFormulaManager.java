@@ -24,7 +24,7 @@ public abstract class AbstractEnumerationFormulaManager<TFormulaInfo, TType, TEn
     extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     implements EnumerationFormulaManager {
 
-  AbstractEnumerationFormulaManager(
+  protected AbstractEnumerationFormulaManager(
       FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pFormulaCreator) {
     super(pFormulaCreator);
   }
@@ -80,5 +80,5 @@ public abstract class AbstractEnumerationFormulaManager<TFormulaInfo, TType, TEn
     return wrapBool(equivalenceImpl(extractInfo(pF1), extractInfo(pF2)));
   }
 
-  protected abstract TFormulaInfo equivalenceImpl(TFormulaInfo f1, TFormulaInfo f2);
+  protected abstract TFormulaInfo equivalenceImpl(TFormulaInfo pF1, TFormulaInfo pF2);
 }
