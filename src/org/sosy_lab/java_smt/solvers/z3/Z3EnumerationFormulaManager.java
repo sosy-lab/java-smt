@@ -23,6 +23,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractEnumerationFormulaManager;
 class Z3EnumerationFormulaManager
     extends AbstractEnumerationFormulaManager<Long, Long, Long, Long> {
 
+  /** The class 'EnumType' is just a plain internal value-holding class. */
   private static class EnumType {
     private final EnumerationFormulaType eType;
     private final long type;
@@ -38,7 +39,7 @@ class Z3EnumerationFormulaManager
 
   private final long z3context;
 
-  private final Map<String, EnumType> enumConstants = new LinkedHashMap<>();
+  private final Map<String, EnumType> enumerations = new LinkedHashMap<>();
 
   Z3EnumerationFormulaManager(Z3FormulaCreator creator) {
     super(creator);
@@ -48,9 +49,9 @@ class Z3EnumerationFormulaManager
   @Override
   protected EnumerationFormulaType declareEnumerationImpl(String pName, Set<String> pElementNames) {
     final EnumerationFormulaType type = FormulaType.getEnumerationType(pName, pElementNames);
-    EnumType existingType = enumConstants.get(pName);
+    EnumType existingType = enumerations.get(pName);
     if (existingType == null) {
-      enumConstants.put(pName, declareEnumeration0(type));
+      enumerations.put(pName, declareEnumeration0(type));
     } else {
       Preconditions.checkArgument(
           type.equals(existingType.eType),
@@ -90,12 +91,12 @@ class Z3EnumerationFormulaManager
 
   @Override
   protected Long makeConstantImpl(String pName, EnumerationFormulaType pType) {
-    return checkNotNull(enumConstants.get(pType.getName()).constants.get(pName));
+    return checkNotNull(enumerations.get(pType.getName()).constants.get(pName));
   }
 
   @Override
   protected Long makeVariableImpl(String pVar, EnumerationFormulaType pType) {
-    return getFormulaCreator().makeVariable(enumConstants.get(pType.getName()).type, pVar);
+    return getFormulaCreator().makeVariable(enumerations.get(pType.getName()).type, pVar);
   }
 
   @Override
