@@ -29,7 +29,6 @@ import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -332,7 +331,7 @@ public class FormulaManagerTest extends SolverBasedTest0 {
     requireArrays();
     // exists arr : (arr[0]=5 && x=arr[0]) --> simplified: x=5
     ArrayFormula<IntegerFormula, IntegerFormula> arr =
-        amgr.makeArray("arr", new ArrayFormulaType<>(IntegerType, IntegerType));
+        amgr.makeArray("arr", FormulaType.getArrayType(IntegerType, IntegerType));
     IntegerFormula index = imgr.makeNumber(0);
     IntegerFormula value = imgr.makeNumber(5);
     IntegerFormula x = imgr.makeVariable("x");

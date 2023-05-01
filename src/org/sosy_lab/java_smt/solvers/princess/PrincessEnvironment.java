@@ -71,7 +71,6 @@ import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import scala.Tuple2;
 import scala.Tuple4;
@@ -536,7 +535,7 @@ class PrincessEnvironment {
       Sort elementSort = ((ExtArray.ArraySort) sort).theory().objSort();
       assert indexSorts.iterator().size() == 1 : "unexpected index type in Array type:" + sort;
       // assert indexSorts.size() == 1; // TODO Eclipse does not like simpler code.
-      return new ArrayFormulaType<>(
+      return FormulaType.getArrayType(
           getFormulaTypeFromSort(indexSorts.iterator().next()), // get single index-sort
           getFormulaTypeFromSort(elementSort));
     } else if (sort instanceof MultipleValueBool$) {

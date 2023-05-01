@@ -306,7 +306,7 @@ public abstract class FormulaType<T extends Formula> {
     private final FormulaType<TE> elementType;
     private final FormulaType<TI> indexType;
 
-    public ArrayFormulaType(FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
+    private ArrayFormulaType(FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
       this.indexType = Preconditions.checkNotNull(pIndexType);
       this.elementType = Preconditions.checkNotNull(pElementType);
     }
