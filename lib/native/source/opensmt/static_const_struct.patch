@@ -1,0 +1,52 @@
+diff --git a/src/logics/Theory.h b/src/logics/Theory.h
+index ef231407..0799d499 100644
+--- a/src/logics/Theory.h
++++ b/src/logics/Theory.h
+@@ -102,7 +102,7 @@ struct PFRef {
+     inline friend bool operator== (const PFRef& a1, const PFRef& a2) { return a1.x == a2.x; };
+ };
+ 
+-const static struct PFRef PFRef_Undef = {INT32_MAX};
++static const struct PFRef PFRef_Undef = {INT32_MAX};
+ 
+ // No global variable for storing the push frame id.  I decided to
+ // implement this as my own memory allocation.  There's no free though
+diff --git a/src/sorts/SSort.h b/src/sorts/SSort.h
+index 990da3b0..14922397 100644
+--- a/src/sorts/SSort.h
++++ b/src/sorts/SSort.h
+@@ -40,7 +40,7 @@ struct SSymRef {
+     inline friend bool operator!= (SSymRef a1, SSymRef a2) {return a1.x != a2.x; }
+ };
+ 
+-const static struct SSymRef SSymRef_Undef = {INT32_MAX};
++static const struct SSymRef SSymRef_Undef = {INT32_MAX};
+ 
+ struct SSymRefHash {
+     uint32_t operator () (SSymRef s) const {
+@@ -66,8 +66,8 @@ struct SRef {
+     inline friend bool operator!= (SRef a1, SRef a2) {return a1.x != a2.x; }
+ };
+ 
+-const static struct SRef SRef_Undef = {INT32_MAX};
+-const static struct SRef SRef_Nil   = {INT32_MAX-1};
++static const struct SRef SRef_Undef = {INT32_MAX};
++static const struct SRef SRef_Nil   = {INT32_MAX-1};
+ 
+ struct SRefHash {
+     uint32_t operator () (const SRef& s) const {
+diff --git a/src/symbols/SymRef.h b/src/symbols/SymRef.h
+index 693d332f..d70758cb 100644
+--- a/src/symbols/SymRef.h
++++ b/src/symbols/SymRef.h
+@@ -35,8 +35,8 @@ struct SymRef {
+     inline friend bool operator!= (const SymRef& a1, const SymRef& a2) {return a1.x != a2.x; }
+ };
+ 
+-const static struct SymRef SymRef_Undef = {INT32_MAX};
+-const static struct SymRef SymRef_Nil   = {INT32_MAX-1};
++static const struct SymRef SymRef_Undef = {INT32_MAX};
++static const struct SymRef SymRef_Nil   = {INT32_MAX-1};
+ 
+ struct SymRefHash {
+     uint32_t operator () (const SymRef& s) const {

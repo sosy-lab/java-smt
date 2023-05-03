@@ -15,31 +15,31 @@
 
 %include <std_string.i>
 %include <std_vector.i>
+
+%template(VectorInt)   std::vector<int>;
+%template(VectorPTRef) std::vector<PTRef>;
+%template(VectorSRef)  std::vector<SRef>;
+
 %include <std_unique_ptr.i>
 
 %unique_ptr(Model);
 %unique_ptr(InterpolationContext);
 
 %rename(OpenSmt) Opensmt;
-%ignore Opensmt::Opensmt(opensmt_logic _logic, const char* name);
-%ignore Opensmt::Opensmt(opensmt_logic _logic, const char* name, std::unique_ptr<SMTConfig> config);
-%ignore Opensmt::getCUFLogic();
-%ignore Opensmt::getSolver();
+%ignore Opensmt::Opensmt (opensmt_logic _logic, const char *name);
+%ignore Opensmt::Opensmt (opensmt_logic _logic, const char *name, std::unique_ptr< SMTConfig > config);
+%ignore Opensmt::getCUFLogic ();
+%ignore Opensmt::getSolver ();
 %extend Opensmt {
-  %newobject build;
-  static Opensmt& build(opensmt_logic _logic, const char* name, bool prodInterpolants=false) {
+  %newobject Opensmt;
+  Opensmt(opensmt_logic _logic, const char* name, bool prodInterpolants=false) {
     auto config = std::make_unique<SMTConfig>();
     const char* msg;
     bool ok = config->setOption(SMTConfig::o_produce_inter, SMTOption(prodInterpolants), msg);
     if(!ok)
       throw std::runtime_error(msg);
-    else {
-      Opensmt* osmt = new Opensmt(_logic, name, std::move(config));
-      return *osmt;
-    }
-  }
-  const char* getVersion() {
-    return "2.5.0";
+    else
+      return new Opensmt(_logic, name, std::move(config));
   }
  }
 
@@ -53,7 +53,7 @@
 
 %ignore SMTOption::SMTOption(ASTNode const & n);
 %ignore SMTOption::getValue() const;
-
+   
 %ignore SpType;
 %ignore SpPref;
 %ignore SpFormat;
@@ -195,10 +195,6 @@
 %ignore SMTConfig::setReduction (int r);
 %ignore SMTConfig::setReductionGraph (int r);
 %ignore SMTConfig::setReductionLoops (int r);
-// %ignore SMTConfig::setBooleanInterpolationAlgorithm (ItpAlgorithm i);
-// %ignore SMTConfig::setEUFInterpolationAlgorithm (ItpAlgorithm i);
-// %ignore SMTConfig::setLRAInterpolationAlgorithm (ItpAlgorithm i);
-// %ignore SMTConfig::setLRAStrengthFactor (const char *factor);
 %ignore SMTConfig::setInstanceName (const char *name);
 %ignore SMTConfig::getBooleanInterpolationAlgorithm () const;
 %ignore SMTConfig::getEUFInterpolationAlgorithm () const;
@@ -436,6 +432,62 @@
 
 %include "include/opensmt/PTRef.h"
 
+%ignore SSymRef;
+%ignore SSymRef_Undef;
+%ignore SSymRefHash;
+%ignore SortSymbol;
+
+%ignore SRef::operator= (uint32_t v);
+%ignore operator== (SRef a1, SRef a2);
+%ignore operator!= (SRef a1, SRef a2);
+
+%ignore SRef_Undef;
+%ignore SRef_Nil;
+
+%ignore SRefHash;
+
+%ignore Sort;
+%ignore SortKey;
+%ignore SortSymbolAllocator;
+
+%ignore SortAllocator;
+
+%include "include/opensmt/SSort.h"
+
+%ignore SymRef::operator=(uint32_t v);
+%ignore operator== (const SymRef& a1, const SymRef& a2);
+%ignore operator!= (const SymRef& a1, const SymRef& a2);
+
+%ignore SymRef_Undef;
+%ignore SymRef_Nil;
+
+%ignore SymRefHash;
+%ignore Equal;
+
+%include "include/opensmt/SymRef.h"
+
+%ignore FunctionSignature;
+
+%ignore TemplateFunction::TemplateFunction (const std::string &name, const vec< PTRef > &args_, SRef ret_sort, PTRef tr_body);
+%ignore TemplateFunction::TemplateFunction (FunctionSignature &&signature, PTRef body); 
+%ignore TemplateFunction::TemplateFunction (const TemplateFunction &other);
+%ignore TemplateFunction::TemplateFunction (TemplateFunction &&other);
+%ignore TemplateFunction::operator= (TemplateFunction &&);
+%ignore TemplateFunction::getArgs () const;
+%extend TemplateFunction {
+  TemplateFunction(const std::string &name, const std::vector< PTRef > &args_, SRef ret_sort, PTRef tr_body) {
+    return new TemplateFunction(name, vec(args_), ret_sort, tr_body);
+  }
+  %newobject getArgs;
+  const std::vector<PTRef>& getArgs() const {
+    std::vector<PTRef> res;
+    for(a : $self->getArgs())
+      res.emplaceBack(a);
+  }
+}
+
+%include "include/opensmt/FunctionTools.h"
+
 %ignore Logic::propFormulasAppearingInUF;
 %ignore Logic::tk_val_uf_default;
 %ignore Logic::tk_val_bool_default;
@@ -464,60 +516,86 @@
 %ignore Logic::hasUFs () const;
 %ignore Logic::hasIntegers () const;
 %ignore Logic::hasReals () const;
-%ignore Logic::getSortRef (PTRef tr) const; 
+//%ignore Logic::getSortRef (PTRef tr) const; 
 %ignore Logic::getSortRef (SymRef sr) const;
 %ignore Logic::printSort (SRef s) const;
 %ignore Logic::getSortSize (SRef s) const;
-%ignore Logic::declareUninterpretedSort (std::string const &);
-%ignore Logic::isArraySort (SRef sref) const;
+//%ignore Logic::isArraySort (SRef sref) const;
 %ignore Logic::hasArrays () const;
 %ignore Logic::isArrayStore (SymRef) const;
-%ignore Logic::isArrayStore (PTRef) const;
 %ignore Logic::isArraySelect (SymRef) const;
-%ignore Logic::isArraySelect (PTRef) const;
 %ignore Logic::mkStore (vec< PTRef > &&);
 %ignore Logic::mkSelect (vec< PTRef > &&);
+%extend Logic {
+  PTRef mkStore(PTRef array, PTRef index, PTRef value) {
+    return $self->mkStore({array, index, value});
+  }
+  PTRef mkSelect(PTRef array, PTRef index) {
+    return $self->mkSelect({array, index});
+  }
+ }
 %ignore Logic::getUniqueArgSort (SymRef sr) const;
 %ignore Logic::getUniqueArgSort (PTRef tr) const;
 %ignore Logic::getSym (const SymRef s) const;
 %ignore Logic::getSym (const PTRef tr) const;
 %ignore Logic::getSymRef (const PTRef tr) const;
-%ignore Logic::getSymName (const PTRef tr) const;
+//%ignore Logic::getSymName (const PTRef tr) const;
 %ignore Logic::getSymName (const SymRef s) const;
 %ignore Logic::symNameToRef (const char *s);
 %ignore Logic::hasSym (const char *s) const;
 %ignore Logic::commutes (const SymRef s) const;
 %ignore Logic::getPterm (const PTRef tr);
+%extend Logic {
+  %newobject getSubterms;
+  std::vector<PTRef> getSubterms(PTRef tr) {
+    std::vector<PTRef> res;
+    Pterm& pt = $self->getPterm(tr);
+    for(auto i=0; i<pt.size(); i++)
+      res.emplace_back(pt[i]);
+    return res;
+  }
+ }
 %ignore Logic::getPterm (const PTRef tr) const;
 %ignore Logic::getPtermIter ();
 %ignore Logic::getTermMarks (PTId maxTermId) const;
 %ignore Logic::getDefaultValue (const PTRef tr) const;
 %ignore Logic::getDefaultValuePTRef (const PTRef tr) const;
 %ignore Logic::getDefaultValuePTRef (const SRef sref) const;
+%extend Logic {
+  PTRef getDefaultValue(SRef sref) const {
+    return $self->getDefaultValuePTRef(sref);
+  }
+ }
 %ignore Logic::mkUninterpFun (SymRef f, vec< PTRef > &&args);
 %ignore Logic::mkUninterpFun (SymRef f, vec< PTRef > const &args);
+%extend Logic {
+  PTRef mkUninterpFun(SymRef f, std::vector<PTRef> const &args) {
+    return $self->mkUninterpFun(f, vec(args));
+  }
+ }
 %ignore Logic::mkAnd (vec< PTRef > &&);
 %ignore Logic::mkAnd (vec< PTRef > const &args);
-//%extend Logic {
-//  PTRef mkAnd(std::vector<PTRef> const &args) {
-//    return mkAnd(vec(args));
-//  }
-//  }
 %ignore Logic::mkOr (vec< PTRef > &&);
 %ignore Logic::mkOr (vec< PTRef > const &args);
 %ignore Logic::mkXor (vec< PTRef > &&); 
 %ignore Logic::mkImpl (vec< PTRef > &&);
 %ignore Logic::mkNot (vec< PTRef > &&);
 %ignore Logic::mkIte (vec< PTRef > &&);
+%ignore Logic::mkIte (PTRef c, PTRef t, PTRef e);
 %ignore Logic::mkEq (vec< PTRef > &&args);
 %ignore Logic::mkEq (vec< PTRef > const &args);
 %ignore Logic::mkDistinct (vec< PTRef > &&args);
 %ignore Logic::mkVar (SRef, const char *, bool isInterpreted=false);
-%ignore Logic::mkUniqueAbstractValue (SRef);
+//%ignore Logic::mkUniqueAbstractValue (SRef);
 %ignore Logic::mkConst (const char *); 
-%ignore Logic::mkConst (SRef, const char *);
+//%ignore Logic::mkConst (SRef, const char *);
 %ignore Logic::declareFun (std::string const &fname, SRef rsort, vec< SRef > const &args, SymbolConfig const &symbolConfig);
 %ignore Logic::declareFun (std::string const &fname, SRef rsort, vec< SRef > const &args);
+%extend Logic {
+  SymRef declareFun (std::string const &fname, SRef rsort, std::vector< SRef > const &args) {
+    return $self->declareFun (fname, rsort, vec(args));
+  }
+}
 %ignore Logic::declareFun_NoScoping (std::string const &s, SRef rsort, vec< SRef > const &args);
 %ignore Logic::declareFun_NoScoping_LeftAssoc (std::string const &s, SRef rsort, vec< SRef > const &args);
 %ignore Logic::declareFun_NoScoping_RightAssoc (std::string const &s, SRef rsort, vec< SRef > const &args);
@@ -542,6 +620,11 @@
 %ignore Logic::dumpWithLets (std::ostream &out, PTRef formula) const;
 %ignore Logic::dumpWithLets (PTRef formula) const;
 %ignore Logic::instantiateFunctionTemplate (TemplateFunction const &tmplt, vec< PTRef > const &args);
+%extend Logic {
+  PTRef instantiateFunctionTemplate (TemplateFunction const &tmplt, std::vector< PTRef > const &args) {
+    return $self->instantiateFunctionTemplate(tmplt, vec(args));
+  }
+ }
 %ignore Logic::getSortSymIndexed () const;
 %ignore Logic::getSym_true () const;
 %ignore Logic::getSym_false () const;
@@ -554,9 +637,9 @@
 %ignore Logic::getSym_implies () const;
 %ignore Logic::getSym_distinct () const;
 %ignore Logic::getSym_uf_not () const;
-%ignore Logic::getSort_bool () const;
+//%ignore Logic::getSort_bool () const;
 %ignore Logic::isEquality (SymRef tr) const;
-%ignore Logic::isEquality (PTRef tr) const;
+//%ignore Logic::isEquality (PTRef tr) const;
 %ignore Logic::isUFEquality (PTRef tr) const;
 %ignore Logic::isTheoryEquality (PTRef tr) const;
 %ignore Logic::isDisequality (SymRef tr) const;
@@ -575,17 +658,17 @@
 %ignore Logic::isBuiltinConstant (const PTRef tr) const;
 %ignore Logic::isBuiltinFunction (const SymRef sr) const;
 %ignore Logic::isConstant (const SymRef sr) const;
-%ignore Logic::isConstant (PTRef tr) const;
+//%ignore Logic::isConstant (PTRef tr) const;
 %ignore Logic::yieldsSortUninterpreted (PTRef tr) const;
 %ignore Logic::isUFSort (const SRef sr) const;
 %ignore Logic::appearsInUF (PTRef tr) const; 
 %ignore Logic::setAppearsInUF (PTRef tr);
 %ignore Logic::getNestedBoolRoots (PTRef tr) const;
 %ignore Logic::isVar (SymRef sr) const;
-%ignore Logic::isVar (PTRef tr) const;
+//%ignore Logic::isVar (PTRef tr) const;
 %ignore Logic::isVarOrIte (SymRef sr) const;
 %ignore Logic::isVarOrIte (PTRef tr) const;
-%ignore Logic::isAtom (PTRef tr) const;
+//%ignore Logic::isAtom (PTRef tr) const;
 %ignore Logic::isBoolAtom (PTRef tr) const;
 %ignore Logic::isInterpreted (SymRef sr) const;
 %ignore Logic::isUP (PTRef) const;
@@ -593,23 +676,23 @@
 %ignore Logic::isUF (SymRef) const;
 %ignore Logic::isIF (PTRef) const;
 %ignore Logic::isIF (SymRef) const;
-%ignore Logic::isAnd (PTRef tr) const;
+//%ignore Logic::isAnd (PTRef tr) const;
 %ignore Logic::isAnd (SymRef sr) const;
-%ignore Logic::isOr (PTRef tr) const;
+//%ignore Logic::isOr (PTRef tr) const;
 %ignore Logic::isOr (SymRef sr) const;
-%ignore Logic::isNot (PTRef tr) const;
+//%ignore Logic::isNot (PTRef tr) const;
 %ignore Logic::isNot (SymRef sr) const;
 %ignore Logic::isXor (SymRef sr) const;
-%ignore Logic::isXor (PTRef tr) const;
+//%ignore Logic::isXor (PTRef tr) const;
 %ignore Logic::isImplies (SymRef sr) const;
-%ignore Logic::isImplies (PTRef tr) const;
+//%ignore Logic::isImplies (PTRef tr) const;
 %ignore Logic::isTrue (SymRef sr) const;
-%ignore Logic::isTrue (PTRef tr) const;
+//%ignore Logic::isTrue (PTRef tr) const;
 %ignore Logic::isFalse (SymRef sr) const;
-%ignore Logic::isFalse (PTRef tr) const;
+//%ignore Logic::isFalse (PTRef tr) const;
 %ignore Logic::isIff (SymRef sr) const;
-%ignore Logic::isIff (PTRef tr) const;
-%ignore Logic::hasSortBool (PTRef tr) const; 
+//%ignore Logic::isIff (PTRef tr) const;
+//%ignore Logic::hasSortBool (PTRef tr) const; 
 %ignore Logic::hasSortBool (SymRef sr) const;
 %ignore Logic::hasEquality (vec< PTRef > &args);
 %ignore Logic::resolveTerm (const char *s, vec< PTRef > &&args, SRef sortRef=SRef_Undef, SymbolMatcher symbolMatcher=SymbolMatcher::Any);
@@ -667,10 +750,10 @@
 %ignore ArithLogic::ArithLogic (opensmt::Logic_t type);
 %ignore ArithLogic::isBuiltinFunction (SymRef sr) const override;
 %ignore ArithLogic::insertTerm (SymRef sym, vec< PTRef > &&terms) override;
-%ignore ArithLogic::getSort_real () const;
-%ignore ArithLogic::getSort_int () const;
+//%ignore ArithLogic::getSort_real () const;
+//%ignore ArithLogic::getSort_int () const;
 %ignore ArithLogic::mkConst (const char *name) override;
-%ignore ArithLogic::mkConst (SRef s, const char *name) override;
+//%ignore ArithLogic::mkConst (SRef s, const char *name) override;
 %ignore ArithLogic::mkConst (SRef s, const std::string &name);
 %ignore ArithLogic::mkConst (SRef s, opensmt::Number const &c);
 %ignore ArithLogic::mkIntConst (opensmt::Number const &c);
@@ -689,11 +772,11 @@
 %ignore ArithLogic::isBuiltinSortSym (SSymRef ssr) const override;
 %ignore ArithLogic::isBuiltinConstant (SymRef sr) const override;
 %ignore ArithLogic::isNumConst (SymRef sr) const;
-%ignore ArithLogic::isNumConst (PTRef tr) const;
+//%ignore ArithLogic::isNumConst (PTRef tr) const;
 %ignore ArithLogic::isIntConst (SymRef sr) const;
-%ignore ArithLogic::isIntConst (PTRef tr) const;
+//%ignore ArithLogic::isIntConst (PTRef tr) const;
 %ignore ArithLogic::isRealConst (SymRef sr) const;
-%ignore ArithLogic::isRealConst (PTRef tr) const;
+//%ignore ArithLogic::isRealConst (PTRef tr) const;
 %ignore ArithLogic::isNonNegNumConst (PTRef tr) const;
 %ignore ArithLogic::isSortInt (SRef sr) const;
 %ignore ArithLogic::isSortReal (SRef sr) const;
@@ -741,24 +824,29 @@
 %ignore ArithLogic::checkHasReals () const;
 %ignore ArithLogic::checkHasIntegers () const;
 %ignore ArithLogic::isPlus (SymRef sr) const;
-%ignore ArithLogic::isPlus (PTRef tr) const;
+//%ignore ArithLogic::isPlus (PTRef tr) const;
 %ignore ArithLogic::isIntPlus (PTRef tr) const;
 %ignore ArithLogic::isRealPlus (PTRef tr) const;
 %ignore ArithLogic::isIntPlus (SymRef sr) const;
 %ignore ArithLogic::isRealPlus (SymRef sr) const;
 %ignore ArithLogic::isMinus (SymRef sr) const;
+%extend ArithLogic {
+  bool isMinus(PTRef tr) const {
+    return $self->isMinus($self->getPterm(tr).symb());
+  }
+ }
 %ignore ArithLogic::isIntMinus (PTRef tr) const;
 %ignore ArithLogic::isRealMinus (PTRef tr) const;
 %ignore ArithLogic::isIntMinus (SymRef sr) const;
 %ignore ArithLogic::isRealMinus (SymRef sr) const;
 %ignore ArithLogic::isNeg (SymRef sr) const;
-%ignore ArithLogic::isNeg (PTRef tr) const;
+//%ignore ArithLogic::isNeg (PTRef tr) const;
 %ignore ArithLogic::isIntNeg (PTRef tr) const;
 %ignore ArithLogic::isRealNeg (PTRef tr) const;
 %ignore ArithLogic::isIntNeg (SymRef sr) const;
 %ignore ArithLogic::isRealNeg (SymRef sr) const;
 %ignore ArithLogic::isTimes (SymRef sr) const;
-%ignore ArithLogic::isTimes (PTRef tr) const;
+//%ignore ArithLogic::isTimes (PTRef tr) const;
 %ignore ArithLogic::isIntTimes (PTRef tr) const;
 %ignore ArithLogic::isRealTimes (PTRef tr) const;
 %ignore ArithLogic::isIntTimes (SymRef sr) const;
@@ -815,11 +903,11 @@
 %ignore ArithLogic::isRealOne (SymRef sr) const;
 %ignore ArithLogic::isNumTerm (PTRef tr) const;
 //%ignore ArithLogic::getTerm_IntZero () const;
-%ignore ArithLogic::getTerm_RealZero () const;
+//%ignore ArithLogic::getTerm_RealZero () const;
 //%ignore ArithLogic::getTerm_IntOne () const;
-%ignore ArithLogic::getTerm_RealOne () const;
-%ignore ArithLogic::getTerm_IntMinusOne () const;
-%ignore ArithLogic::getTerm_RealMinusOne () const;
+//%ignore ArithLogic::getTerm_RealOne () const;
+//%ignore ArithLogic::getTerm_IntMinusOne () const;
+//%ignore ArithLogic::getTerm_RealMinusOne () const;
 %ignore ArithLogic::checkSortInt (PTRef tr);
 %ignore ArithLogic::checkSortReal (PTRef tr);
 %ignore ArithLogic::checkSortInt (vec< PTRef > const &args);
@@ -949,20 +1037,6 @@
     $self->getSingleInterpolant(interpolants, mask);
     return interpolants[0];
   }
-  /*
-  bool getPathInterpolants (std::vector<PTRef>& interpolants, const std::vector<std::vector<int>>& partitions) {
-    std::vector<ipartitions_t> masks;
-    for(std::vector<int> partition : partitions) {
-      ipartitions_t mask;
-      for(int i: partition)
-        opensmt::setbit(mask, i);
-      masks.push_back(mask);
-    }
-    return $self->getPathInterpolants(interpolants, masks);
-    }*/
  }
 
 %include "include/opensmt/InterpolationContext.h"
-
-// %template(VectorPTRef) std::vector<PTRef>;
-%template(VectorInt) std::vector<int>;

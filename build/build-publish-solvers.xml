@@ -47,6 +47,14 @@ SPDX-License-Identifier: Apache-2.0
         
         <mkdir dir="${path.build}"/>
         <mkdir dir="${path.install}"/>
+
+        <!-- Patch OpenSMT to avoid swig parser errors
+             This will change some 'const static struct' declarations to 'static const struct' declarations and
+             should not affect the final binary. -->
+        <exec executable="git" dir="${opensmt.path}" failonerror="true">
+            <arg value="apply"/>
+            <arg value="${path.source}/static_const_struct.patch"/>
+        </exec>
         
         <!-- Build OpenSMT -->
         <exec executable="cmake" dir="${path.build}" failonerror="true">
@@ -58,6 +66,13 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="install"/>
         </exec>
 
+        <!-- Reverse the patch -->
+        <exec executable="git" dir="${opensmt.path}" failonerror="true">
+            <arg value="apply"/>
+            <arg value="-R"/>
+            <arg value="${path.source}/static_const_struct.patch"/>
+        </exec>
+        
         <!-- Copy swig file to the install directory -->
         <copy file="${path.source}/opensmt.i" toFile="${path.install}/opensmt.i"/>
         
@@ -91,8 +106,13 @@ SPDX-License-Identifier: Apache-2.0
                 <include name="PTRef.java"/>
                 <include name="SMTConfig.java"/>
                 <include name="SMTOption.java"/>
+                <include name="SRef.java"/>
+                <include name="SymRef.java"/>
+                <include name="TemplateFunction.java"/>
                 <include name="sstat.java"/>
                 <include name="VectorInt.java"/>
+                <include name="VectorPTRef.java"/>
+                <include name="VectorSRef.java"/>
             </fileset>
         </copy>
 
