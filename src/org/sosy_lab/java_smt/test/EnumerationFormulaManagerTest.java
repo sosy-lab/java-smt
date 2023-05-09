@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.TruthJUnit.assume;
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertThrows;
 
@@ -53,6 +54,16 @@ public class EnumerationFormulaManagerTest extends SolverBasedTest0 {
   @Before
   public void init() {
     requireEnumeration();
+
+    if (solverToUse() == Solvers.MATHSAT5) {
+      System.out.println(context.getVersion());
+      assume()
+          .withMessage(
+              "Solver %s in version 5.6.8 does not yet support the theory of enumerations",
+              solverToUse())
+          .that(context.getVersion())
+          .doesNotContain("MathSAT5 version 5.6.8");
+    }
   }
 
   @Test
@@ -96,15 +107,20 @@ public class EnumerationFormulaManagerTest extends SolverBasedTest0 {
     assertThrows(
         IllegalArgumentException.class, () -> emgr.declareEnumeration("Color", otherColors));
 
-    // different type with same elements is allowed
-    EnumerationFormulaType sameColorType = emgr.declareEnumeration("SameColor", colors);
-    assertEquals("SameColor", sameColorType.getName());
-    assertEquals(colors, sameColorType.getElements());
+    if (solverToUse() == Solvers.MATHSAT5) {
+      assertThrows(
+          IllegalArgumentException.class, () -> emgr.declareEnumeration("SameColor", colors));
+    } else {
+      // different type with same elements is allowed
+      EnumerationFormulaType sameColorType = emgr.declareEnumeration("SameColor", colors);
+      assertEquals("SameColor", sameColorType.getName());
+      assertEquals(colors, sameColorType.getElements());
 
-    // different type with same elements is allowed
-    EnumerationFormulaType otherColorType = emgr.declareEnumeration("OtherColor", otherColors);
-    assertThat(otherColorType.getName()).isEqualTo("OtherColor");
-    assertThat(otherColorType.getElements()).isEqualTo(otherColors);
+      // different type with same elements is allowed
+      EnumerationFormulaType otherColorType = emgr.declareEnumeration("OtherColor", otherColors);
+      assertThat(otherColorType.getName()).isEqualTo("OtherColor");
+      assertThat(otherColorType.getElements()).isEqualTo(otherColors);
+    }
   }
 
   @Test

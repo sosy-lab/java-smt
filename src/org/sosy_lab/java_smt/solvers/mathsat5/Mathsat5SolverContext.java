@@ -195,6 +195,8 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
     Mathsat5FloatingPointFormulaManager floatingPointTheory =
         new Mathsat5FloatingPointFormulaManager(creator, pFloatingPointRoundingMode);
     Mathsat5ArrayFormulaManager arrayTheory = new Mathsat5ArrayFormulaManager(creator);
+    Mathsat5EnumerationFormulaManager enumerationTheory =
+        new Mathsat5EnumerationFormulaManager(creator);
     Mathsat5FormulaManager manager =
         new Mathsat5FormulaManager(
             creator,
@@ -204,7 +206,8 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
             rationalTheory,
             bitvectorTheory,
             floatingPointTheory,
-            arrayTheory);
+            arrayTheory,
+            enumerationTheory);
     return new Mathsat5SolverContext(
         logger, msatConf, settings, randomSeed, pShutdownNotifier, manager, creator);
   }
