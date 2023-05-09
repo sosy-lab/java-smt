@@ -482,6 +482,7 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
   }
 
   @Test
+  @Ignore // disable until we have MathSAT 5.6.9 or later
   public void enumTypeTest() throws SolverException, InterruptedException {
     String[] colors = {"blue", "red", "green"};
 
