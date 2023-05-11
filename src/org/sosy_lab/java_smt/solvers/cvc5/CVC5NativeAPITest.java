@@ -1232,4 +1232,34 @@ public class CVC5NativeAPITest {
 
     System.out.println(valueV);
   }
+
+  @Test
+  public void checkCVC5InterpolationMethod() throws CVC5ApiException {
+    solver.setOption("produce-interpolants", "true");
+
+    Term x = solver.mkConst(solver.getIntegerSort(), "x");
+    Term y = solver.mkConst(solver.getIntegerSort(), "y");
+    Term z = solver.mkConst(solver.getIntegerSort(), "z");
+
+    Term f1 = solver.mkTerm(Kind.EQUAL, y, solver.mkTerm(Kind.MULT, solver.mkInteger(2), x));
+    Term f2 =
+        solver.mkTerm(
+            Kind.EQUAL,
+            y,
+            solver.mkTerm(
+                Kind.ADD,
+                solver.mkInteger(1),
+                solver.mkTerm(Kind.MULT, z, solver.mkInteger(2))));
+    System.out.println(f1.toString());
+    System.out.println(f2.toString());
+    Term interpol = solver.mkTerm(Kind.AND, f1, solver.mkTerm(Kind.NOT, f2));
+    solver.assertFormula(interpol);
+    Result result = solver.checkSat();
+    System.out.println(result.toString());
+    Term interpolation = solver.getInterpolant(interpol);
+    System.out.println(interpolation.toString());
+    // solver.assertFormula(interpol);
+    // Result result = solver.checkSat();
+    // System.out.println(result.toString());
+  }
 }
