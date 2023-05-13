@@ -36,10 +36,10 @@ public class Mathsat5EnumerationFormulaManager
     // MathSAT does not support equal-named enumeration elements in distinct enumeration types.
     for (EnumType existingType : enumerations.values()) {
       Preconditions.checkArgument(
-          Iterables.all(pType.getElements(), e -> !existingType.constants.containsKey(e)),
+          Iterables.all(pType.getElements(), e -> !existingType.hasConstants(e)),
           "Enumeration type '%s' has elements that already appear in enumeration type '%s'.",
           pType,
-          existingType.enumerationFormulaType);
+          existingType.getEnumerationFormulaType());
     }
 
     String[] elements = pType.getElements().toArray(new String[] {});

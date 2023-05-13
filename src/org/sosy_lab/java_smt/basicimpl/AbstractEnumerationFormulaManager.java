@@ -30,9 +30,9 @@ public abstract class AbstractEnumerationFormulaManager<TFormulaInfo, TType, TEn
 
   /** The class 'EnumType' is just a plain internal value-holding class. */
   protected class EnumType {
-    public final EnumerationFormulaType enumerationFormulaType;
-    public final TType nativeType;
-    public final ImmutableMap<String, TFormulaInfo> constants;
+    private final EnumerationFormulaType enumerationFormulaType;
+    private final TType nativeType;
+    private final ImmutableMap<String, TFormulaInfo> constants;
 
     public EnumType(
         EnumerationFormulaType pEnumerationFormulaType,
@@ -41,6 +41,14 @@ public abstract class AbstractEnumerationFormulaManager<TFormulaInfo, TType, TEn
       enumerationFormulaType = pEnumerationFormulaType;
       nativeType = pNativeType;
       constants = pConstants;
+    }
+
+    public EnumerationFormulaType getEnumerationFormulaType() {
+      return enumerationFormulaType;
+    }
+
+    public boolean hasConstants(String name) {
+      return constants.containsKey(name);
     }
   }
 
@@ -80,10 +88,10 @@ public abstract class AbstractEnumerationFormulaManager<TFormulaInfo, TType, TEn
       enumerations.put(pName, declareEnumeration0(type));
     } else {
       Preconditions.checkArgument(
-          type.equals(existingType.enumerationFormulaType),
+          type.equals(existingType.getEnumerationFormulaType()),
           "Enumeration type '%s' is already declared as '%s'.",
           type,
-          existingType.enumerationFormulaType);
+          existingType.getEnumerationFormulaType());
     }
     return type;
   }
