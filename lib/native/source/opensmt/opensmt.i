@@ -117,10 +117,10 @@
   static ItpAlgorithm getLraFactor() {
     return itp_lra_alg_factor;
   }
-  static ItpAlgorithm getLraDecompStrong() {
+  static ItpAlgorithm getLraDecomposingStrong() {
     return itp_lra_alg_decomposing_strong;
   }
-  static ItpAlgorithm getLraDecompWeak() {
+  static ItpAlgorithm getLraDecomposingWeak() {
     return itp_lra_alg_decomposing_weak;
   }
   static const char* getLraFactor0() {
@@ -430,6 +430,19 @@
 %ignore PTRefHash;
 %ignore PTRefPairHash;
 
+%typemap(javacode) PTRef %{
+  public boolean equals(Object object) {
+    if(object instanceof $javaclassname) {
+      PTRef that = ($javaclassname) object;
+      return this.getX() == that.getX();
+    }
+    return false;
+  }  
+  public int hashCode() {
+    return Long.hashCode(this.getX());
+  }
+%}
+
 %include "include/opensmt/PTRef.h"
 
 %ignore SSymRef;
@@ -585,8 +598,13 @@
 %ignore Logic::mkEq (vec< PTRef > &&args);
 %ignore Logic::mkEq (vec< PTRef > const &args);
 %ignore Logic::mkDistinct (vec< PTRef > &&args);
-%ignore Logic::mkVar (SRef, const char *, bool isInterpreted=false);
-//%ignore Logic::mkUniqueAbstractValue (SRef);
+%extend Logic {
+  PTRef mkDistinct(std::vector<PTRef> const &args) {
+    return $self->mkDistinct(vec(args));
+  }
+ }
+//%ignore Logic::mkVar (SRef, const char *, bool isInterpreted=false);
+%ignore Logic::mkUniqueAbstractValue (SRef);
 %ignore Logic::mkConst (const char *); 
 //%ignore Logic::mkConst (SRef, const char *);
 %ignore Logic::declareFun (std::string const &fname, SRef rsort, vec< SRef > const &args, SymbolConfig const &symbolConfig);
@@ -989,7 +1007,7 @@
 %ignore s_Undef;
 %ignore s_Error;
 
-%ignore MainSolver::MainSolver (Logic &logic, SMTConfig &conf, std::string name);
+//%ignore MainSolver::MainSolver (Logic &logic, SMTConfig &conf, std::string name);
 %ignore MainSolver::MainSolver(std::unique_ptr<Theory>, std::unique_ptr<TermMapper>, std::unique_ptr<THandler>, std::unique_ptr<SimpSMTSolver>, Logic&, SMTConfig&, std::string);
 %ignore MainSolver::getConfig();
 %ignore MainSolver::getSMTSolver();
@@ -1030,7 +1048,7 @@
 %ignore InterpolationContext::getPathInterpolants (vec< PTRef > &interpolants, const std::vector< ipartitions_t > &A_masks);
 %extend InterpolationContext  {
   PTRef getSingleInterpolant (const std::vector<int>& partition) {
-    std::vector<PTRef> interpolants(1);
+    std::vector<PTRef> interpolants;
     ipartitions_t mask;
     for(int i : partition)
       opensmt::setbit(mask, i);

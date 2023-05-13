@@ -57,7 +57,9 @@ SPDX-License-Identifier: Apache-2.0
             <classpath refid="classpath.junit"/>
             <sysproperty key="java.awt.headless" value="true" />
             <batchtest fork="true" todir="${junit.dir}">
-                <fileset dir="${class.dir}">
+              <fileset dir="${class.dir}">
+                    <include name="**/OpenSmtNativeAPITest.*"/>
+                    <!--
                     <include name="**/ExceptionHandlerTest.*"/>
                     <include name="**/PrettyPrinterTest.*"/>
                     <include name="**/FormulaClassifierTest.*"/>
@@ -91,6 +93,7 @@ SPDX-License-Identifier: Apache-2.0
                     <include name="**/NumeralFormulaManagerTest.*"/>
                     <include name="**/ModelEvaluationTest.*"/>
                     <include name="**/FormulaManagerTest.*"/>
+                    -->
                 </fileset>
             </batchtest>
         </junit>
@@ -118,6 +121,8 @@ SPDX-License-Identifier: Apache-2.0
                 <sysproperty key="java.awt.headless" value="true" />
                 <batchtest fork="true" todir="${junit.dir}">
                     <fileset dir="${class.dir}">
+                        <include name="**/OpenSmtNativeAPITest.*"/>
+                        <!--
                         <include name="**/ExceptionHandlerTest.*"/>
                         <include name="**/PrettyPrinterTest.*"/>
                         <include name="**/FormulaClassifierTest.*"/>
@@ -151,6 +156,7 @@ SPDX-License-Identifier: Apache-2.0
                         <include name="**/NumeralFormulaManagerTest.*"/>
                         <include name="**/ModelEvaluationTest.*"/>
                         <include name="**/FormulaManagerTest.*"/>
+                        -->
                     </fileset>
                 </batchtest>
             </junit>

@@ -141,6 +141,7 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="-L${user.dir}"/>
             <arg value="-lopensmt"/>
             <arg value="-lstdc++"/>
+            <arg value="-l:libgmp.a"/>
         </exec>
         <delete file="libopensmt.so"/>
 
