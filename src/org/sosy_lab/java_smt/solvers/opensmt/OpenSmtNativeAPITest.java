@@ -282,7 +282,7 @@ public class OpenSmtNativeAPITest {
     arg_1.add(app_0);
     PTRef app_1 = logic.instantiateFunctionTemplate(negate_tf, arg_1);
     
-    // Term negate(negate(a)) = a
+    // Term negate(negate(a)) ≠ a
     PTRef f = logic.mkNot(logic.mkEq(app_1, var_a));
     
     MainSolver solver = osmt.getMainSolver();
