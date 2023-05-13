@@ -9,9 +9,13 @@
 package org.sosy_lab.java_smt.basicimpl;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.EnumerationFormula;
@@ -23,6 +27,24 @@ import org.sosy_lab.java_smt.api.FormulaType.EnumerationFormulaType;
 public abstract class AbstractEnumerationFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     implements EnumerationFormulaManager {
+
+  /** The class 'EnumType' is just a plain internal value-holding class. */
+  protected class EnumType {
+    public final EnumerationFormulaType enumerationFormulaType;
+    public final TType nativeType;
+    public final ImmutableMap<String, TFormulaInfo> constants;
+
+    public EnumType(
+        EnumerationFormulaType pEnumerationFormulaType,
+        TType pNativeType,
+        ImmutableMap<String, TFormulaInfo> pConstants) {
+      enumerationFormulaType = pEnumerationFormulaType;
+      nativeType = pNativeType;
+      constants = pConstants;
+    }
+  }
+
+  protected final Map<String, EnumType> enumerations = new LinkedHashMap<>();
 
   protected AbstractEnumerationFormulaManager(
       FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pFormulaCreator) {
@@ -51,8 +73,22 @@ public abstract class AbstractEnumerationFormulaManager<TFormulaInfo, TType, TEn
     return declareEnumerationImpl(pName, pElementNames);
   }
 
-  protected abstract EnumerationFormulaType declareEnumerationImpl(
-      String pName, Set<String> pElementNames);
+  protected EnumerationFormulaType declareEnumerationImpl(String pName, Set<String> pElementNames) {
+    final EnumerationFormulaType type = FormulaType.getEnumerationType(pName, pElementNames);
+    EnumType existingType = enumerations.get(pName);
+    if (existingType == null) {
+      enumerations.put(pName, declareEnumeration0(type));
+    } else {
+      Preconditions.checkArgument(
+          type.equals(existingType.enumerationFormulaType),
+          "Enumeration type '%s' is already declared as '%s'.",
+          type,
+          existingType.enumerationFormulaType);
+    }
+    return type;
+  }
+
+  protected abstract EnumType declareEnumeration0(EnumerationFormulaType pType);
 
   @Override
   public EnumerationFormula makeConstant(String pName, EnumerationFormulaType pType) {
@@ -64,7 +100,9 @@ public abstract class AbstractEnumerationFormulaManager<TFormulaInfo, TType, TEn
     return wrap(makeConstantImpl(pName, pType));
   }
 
-  protected abstract TFormulaInfo makeConstantImpl(String pName, EnumerationFormulaType pType);
+  protected TFormulaInfo makeConstantImpl(String pName, EnumerationFormulaType pType) {
+    return checkNotNull(enumerations.get(pType.getName()).constants.get(pName));
+  }
 
   @Override
   public EnumerationFormula makeVariable(String pVar, EnumerationFormulaType pType) {
@@ -72,7 +110,9 @@ public abstract class AbstractEnumerationFormulaManager<TFormulaInfo, TType, TEn
     return wrap(makeVariableImpl(pVar, pType));
   }
 
-  protected abstract TFormulaInfo makeVariableImpl(String pVar, EnumerationFormulaType pType);
+  protected TFormulaInfo makeVariableImpl(String pVar, EnumerationFormulaType pType) {
+    return getFormulaCreator().makeVariable(enumerations.get(pType.getName()).nativeType, pVar);
+  }
 
   @Override
   public BooleanFormula equivalence(EnumerationFormula pF1, EnumerationFormula pF2) {
