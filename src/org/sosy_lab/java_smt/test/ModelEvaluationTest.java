@@ -16,10 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -31,8 +27,7 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 /** Test that we can request evaluations from models. */
-@RunWith(Parameterized.class)
-public class ModelEvaluationTest extends SolverBasedTest0 {
+public class ModelEvaluationTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   /**
    * This is the default boolean value for unknown model evaluations. For unknown model evaluation
@@ -53,18 +48,6 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
   private static final String DEFAULT_MODEL_STRING = "";
 
   private static int problemSize;
-
-  @Parameters(name = "{0}")
-  public static Object[] getAllSolvers() {
-    return Solvers.values();
-  }
-
-  @Parameter public Solvers solver;
-
-  @Override
-  protected Solvers solverToUse() {
-    return solver;
-  }
 
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() {

@@ -20,10 +20,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.ArrayFormula;
@@ -39,21 +35,7 @@ import org.sosy_lab.java_smt.api.Tactic;
 import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 
 @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE", justification = "test code")
-@RunWith(Parameterized.class)
-public class QuantifierManagerTest extends SolverBasedTest0 {
-
-  @Parameters(name = "{0}")
-  public static Object[] getAllSolvers() {
-    return Solvers.values();
-  }
-
-  @Parameter(0)
-  public Solvers solverUnderTest;
-
-  @Override
-  protected Solvers solverToUse() {
-    return solverUnderTest;
-  }
+public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   private IntegerFormula x;
   private ArrayFormula<IntegerFormula, IntegerFormula> a;
@@ -124,7 +106,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     // The tests in this class use quantifiers and thus solver failures are expected.
     // We do not ignore all SolverExceptions in order to not hide bugs,
     // but only for Princess and CVC4 which are known to not be able to solve all tests here.
-    if (solverUnderTest == Solvers.PRINCESS || solverUnderTest == Solvers.CVC4) {
+    if (solverToUse() == Solvers.PRINCESS || solverToUse() == Solvers.CVC4) {
       assume().withMessage(e.getMessage()).fail();
     }
     throw e;
@@ -159,9 +141,9 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     // (forall x . b[x] = 0) AND (b[123] = 1) is UNSAT
     requireBitvectors();
     // Princess does not support bitvectors in arrays
-    assume().that(solverUnderTest).isNotEqualTo(Solvers.PRINCESS);
+    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
     // Boolector quants need to be reworked
-    assume().that(solverUnderTest).isNotEqualTo(Solvers.BOOLECTOR);
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
 
     BooleanFormula f =
         bmgr.and(
@@ -204,9 +186,9 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     // (forall x . b[x] = 0) AND (b[123] = 0) is SAT
     requireBitvectors();
     // Princess does not support bitvectors in arrays
-    assume().that(solverUnderTest).isNotEqualTo(Solvers.PRINCESS);
+    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
     // Boolector quants need to be reworked
-    assume().that(solverUnderTest).isNotEqualTo(Solvers.BOOLECTOR);
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
 
     BooleanFormula f =
         bmgr.and(
@@ -380,9 +362,9 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     // (exists x . b[x] = 0) AND (b[123] = 1) is SAT
     requireBitvectors();
     // Princess does not support bitvectors in arrays
-    assume().that(solverUnderTest).isNotEqualTo(Solvers.PRINCESS);
+    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
     // Boolector quants need to be reworked
-    assume().that(solverUnderTest).isNotEqualTo(Solvers.BOOLECTOR);
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
 
     BooleanFormula f =
         bmgr.and(
@@ -418,9 +400,9 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     // (exists x . b[x] = 1) AND (forall x . b[x] = 0) is UNSAT
     requireBitvectors();
     // Princess does not support bitvectors in arrays
-    assume().that(solverUnderTest).isNotEqualTo(Solvers.PRINCESS);
+    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
     // Boolector quants need to be reworked
-    assume().that(solverUnderTest).isNotEqualTo(Solvers.BOOLECTOR);
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
 
     BooleanFormula f =
         bmgr.and(qmgr.exists(ImmutableList.of(xbv), bvArray_at_x_eq_1), bv_forall_x_a_at_x_eq_0);
@@ -485,9 +467,9 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     // (exists x . b[x] = 0) OR (forall x . b[x] = 1) is SAT
     requireBitvectors();
     // Princess does not support bitvectors in arrays
-    assume().that(solverUnderTest).isNotEqualTo(Solvers.PRINCESS);
+    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
     // Boolector quants need to be reworked
-    assume().that(solverUnderTest).isNotEqualTo(Solvers.BOOLECTOR);
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
 
     BooleanFormula f =
         bmgr.or(
@@ -513,9 +495,9 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     // (exists x . b[x] = 1) OR (exists x . b[x] = 1) is SAT
     requireBitvectors();
     // Princess does not support bitvectors in arrays
-    assume().that(solverUnderTest).isNotEqualTo(Solvers.PRINCESS);
+    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
     // Boolector quants need to be reworked
-    assume().that(solverUnderTest).isNotEqualTo(Solvers.BOOLECTOR);
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
 
     BooleanFormula f =
         bmgr.or(
@@ -539,7 +521,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     // forall x . x = x+1 is UNSAT
     requireBitvectors();
     // Boolector quants need to be reworked
-    assume().that(solverUnderTest).isNotEqualTo(Solvers.BOOLECTOR);
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
 
     int width = 16;
     BitvectorFormula z = bvmgr.makeVariable(width, "z");
@@ -568,7 +550,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     // forall z . z+2 = z+1+1 is SAT
     requireBitvectors();
     // Boolector quants need to be reworked
-    assume().that(solverUnderTest).isNotEqualTo(Solvers.BOOLECTOR);
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
 
     int width = 16;
     BitvectorFormula z = bvmgr.makeVariable(width, "z");
@@ -598,7 +580,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
   public void testBVEquality() throws SolverException, InterruptedException {
     requireBitvectors();
     // Boolector quants need to be reworked
-    assume().that(solverUnderTest).isNotEqualTo(Solvers.BOOLECTOR);
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
 
     BitvectorFormula z = bvmgr.makeVariable(bvWidth, "z");
     BitvectorFormula y = bvmgr.makeVariable(bvWidth, "y");
@@ -611,7 +593,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
   public void testBVEquality2() throws SolverException, InterruptedException {
     requireBitvectors();
     // Boolector quants need to be reworked
-    assume().that(solverUnderTest).isNotEqualTo(Solvers.BOOLECTOR);
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
 
     BitvectorFormula z = bvmgr.makeVariable(bvWidth, "z");
     BitvectorFormula y = bvmgr.makeVariable(bvWidth, "y");
@@ -625,7 +607,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     // UNSAT because of bv behaviour
     requireBitvectors();
     // Boolector quants need to be reworked
-    assume().that(solverUnderTest).isNotEqualTo(Solvers.BOOLECTOR);
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
 
     BitvectorFormula z = bvmgr.makeVariable(bvWidth, "z");
     BitvectorFormula zPlusTwo =
@@ -657,7 +639,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     // If the free and bound vars are equal, this will be UNSAT
     requireBitvectors();
     // Boolector quants need to be reworked
-    assume().that(solverUnderTest).isNotEqualTo(Solvers.BOOLECTOR);
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
 
     int width = 2;
     BitvectorFormula aa = bvmgr.makeVariable(width, "aa");
@@ -848,7 +830,7 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     //                      or     extract_0_0 x = 1
 
     // Boolector quants need to be reworked
-    assume().that(solverUnderTest).isNotEqualTo(Solvers.BOOLECTOR);
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     int i = index.getFreshId();
     int width = 2;
 
@@ -874,9 +856,9 @@ public class QuantifierManagerTest extends SolverBasedTest0 {
     //                                  (= a3 #x00000000))
 
     // Boolector quants need to be reworked
-    assume().that(solverUnderTest).isNotEqualTo(Solvers.BOOLECTOR);
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     // Z3 fails this currently. Remove once thats not longer the case!
-    assume().that(solverUnderTest).isNotEqualTo(Solvers.Z3);
+    assume().that(solverToUse()).isNotEqualTo(Solvers.Z3);
     int width = 32;
 
     BitvectorFormula a2 = bvmgr.makeVariable(width, "a2");

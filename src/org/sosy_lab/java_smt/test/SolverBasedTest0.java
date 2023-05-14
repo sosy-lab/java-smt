@@ -18,6 +18,10 @@ import java.util.Collection;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
@@ -371,6 +375,23 @@ public abstract class SolverBasedTest0 {
           }
         }
       }
+    }
+  }
+
+  @RunWith(Parameterized.class)
+  public abstract static class ParameterizedSolverBasedTest0 extends SolverBasedTest0 {
+
+    @Parameters(name = "{0}")
+    public static Object[] getAllSolvers() {
+      return Solvers.values();
+    }
+
+    @Parameter(0)
+    public Solvers solver;
+
+    @Override
+    protected Solvers solverToUse() {
+      return solver;
     }
   }
 }
