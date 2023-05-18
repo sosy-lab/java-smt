@@ -36,10 +36,12 @@
     auto config = std::make_unique<SMTConfig>();
     const char* msg;
     bool ok = config->setOption(SMTConfig::o_produce_inter, SMTOption(prodInterpolants), msg);
-    if(!ok)
+    if (!ok) {
       throw std::runtime_error(msg);
-    else
+    }
+    else {
       return new Opensmt(_logic, name, std::move(config));
+    }
   }
  }
 
@@ -532,11 +534,27 @@
 //%ignore Logic::getSortRef (PTRef tr) const; 
 %ignore Logic::getSortRef (SymRef sr) const;
 %ignore Logic::printSort (SRef s) const;
-%ignore Logic::getSortSize (SRef s) const;
+//%ignore Logic::getSortSize (SRef s) const;
+%extend Logic {
+  SRef getArraySort(SRef sortIndex, SRef sortElements) {
+    SortSymbol symbol("Array", 2);
+    SSymRef symRef;
+    bool known = $self->peekSortSymbol(symbol, symRef);
+    if (!known) {
+      throw std::runtime_error("Failed to create Array sort");
+    }
+    else {
+      vec<SRef> args;
+      args.push(sortIndex);
+      args.push(sortElements);
+      return $self->getSort(symRef, std::move(args));
+    }
+  }
+ }
 //%ignore Logic::isArraySort (SRef sref) const;
 %ignore Logic::hasArrays () const;
-%ignore Logic::isArrayStore (SymRef) const;
-%ignore Logic::isArraySelect (SymRef) const;
+//%ignore Logic::isArrayStore (SymRef) const;
+//%ignore Logic::isArraySelect (SymRef) const;
 %ignore Logic::mkStore (vec< PTRef > &&);
 %ignore Logic::mkSelect (vec< PTRef > &&);
 %extend Logic {
@@ -588,19 +606,45 @@
  }
 %ignore Logic::mkAnd (vec< PTRef > &&);
 %ignore Logic::mkAnd (vec< PTRef > const &args);
+%extend Logic {
+  PTRef mkAnd(std::vector<PTRef> const &args) {
+    return $self->mkAnd(vec(args));
+  }
+ }
 %ignore Logic::mkOr (vec< PTRef > &&);
 %ignore Logic::mkOr (vec< PTRef > const &args);
-%ignore Logic::mkXor (vec< PTRef > &&); 
+%extend Logic {
+  PTRef mkOr(std::vector<PTRef> const &args) {
+    return $self->mkOr(vec(args));
+  }
+ }
+%ignore Logic::mkXor (vec< PTRef > &&);
 %ignore Logic::mkImpl (vec< PTRef > &&);
+%extend Logic {
+  PTRef mkImpl(std::vector<PTRef> const &args) {
+    return $self->mkImpl(vec(args));
+  }
+ }
 %ignore Logic::mkNot (vec< PTRef > &&);
 %ignore Logic::mkIte (vec< PTRef > &&);
 %ignore Logic::mkIte (PTRef c, PTRef t, PTRef e);
 %ignore Logic::mkEq (vec< PTRef > &&args);
 %ignore Logic::mkEq (vec< PTRef > const &args);
+%extend Logic {
+  PTRef mkEq(std::vector<PTRef> const &args) {
+    return $self->mkEq(vec(args));
+  }
+ }
 %ignore Logic::mkDistinct (vec< PTRef > &&args);
 %extend Logic {
   PTRef mkDistinct(std::vector<PTRef> const &args) {
     return $self->mkDistinct(vec(args));
+  }
+  PTRef mkDistinct(PTRef a, PTRef b) {
+    std::vector<PTRef> args;
+    args.emplace_back(a);
+    args.emplace_back(b);
+    return $self->mkDistinct(args);
   }
  }
 //%ignore Logic::mkVar (SRef, const char *, bool isInterpreted=false);

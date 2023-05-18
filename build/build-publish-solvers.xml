@@ -51,7 +51,7 @@ SPDX-License-Identifier: Apache-2.0
         <!-- Patch OpenSMT to avoid swig parser errors
              This will change some 'const static struct' declarations to 'static const struct' declarations and
              should not affect the final binary. -->
-        <exec executable="git" dir="${opensmt.path}" failonerror="true">
+        <exec executable="git" dir="${opensmt.path}" failonerror="false">
             <arg value="apply"/>
             <arg value="${path.source}/static_const_struct.patch"/>
         </exec>
@@ -62,15 +62,9 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="FORCE_STATIC_GMP=ON"/>
             <arg value=".."/>
         </exec>
+        
         <exec executable="make" dir="${path.build}" failonerror="true">
             <arg value="install"/>
-        </exec>
-
-        <!-- Reverse the patch -->
-        <exec executable="git" dir="${opensmt.path}" failonerror="true">
-            <arg value="apply"/>
-            <arg value="-R"/>
-            <arg value="${path.source}/static_const_struct.patch"/>
         </exec>
         
         <!-- Copy swig file to the install directory -->

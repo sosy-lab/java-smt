@@ -244,7 +244,41 @@ public class OpenSmtNativeAPITest {
 
   @Test
   public void testIntegerArray() {
-    // TODO: add array test
+    OpenSmt osmt = new OpenSmt(opensmt_logic.qf_alia, "opensmt-test", false);
+    ArithLogic logic = osmt.getLIALogic();
+
+    // Declare an integer array variable
+    SRef sortIntArray = logic.getArraySort(logic.getSort_int(), logic.getSort_int());
+    PTRef varA = logic.mkVar(sortIntArray, "a");
+
+    // Declare variables for the indices i,j and the element e
+    PTRef varI = logic.mkIntVar("i");
+    PTRef varJ = logic.mkIntVar("j");
+    PTRef varE = logic.mkIntVar("e");
+
+    // Term e = select(store(a,i,e),i)
+    PTRef eq0 = logic.mkEq(varE, logic.mkSelect(logic.mkStore(varA, varI, varE), varI));
+
+    // Term a = store(a,i,select(a,i))
+    PTRef eq1 = logic.mkEq(varA, logic.mkStore(varA, varI, logic.mkSelect(varA, varI)));
+
+    // Term i≠j ⇒ select(store(a,i,e),j) = select(a,j)
+    PTRef eq2 =
+        logic.mkImpl(
+            logic.mkDistinct(varI, varJ),
+            logic.mkEq(
+                logic.mkSelect(logic.mkStore(varA, varI, varE), varJ), logic.mkSelect(varA, varJ)));
+
+    VectorPTRef neg =
+        new VectorPTRef(new PTRef[] {logic.mkNot(eq0), logic.mkNot(eq1), logic.mkNot(eq2)});
+    PTRef f = logic.mkOr(neg);
+
+    // Prove that the equations hold for all models
+    MainSolver solver = osmt.getMainSolver();
+    solver.push(f);
+
+    sstat r = solver.check();
+    assertThat(r.isFalse()).isTrue();
   }
 
   @Test
