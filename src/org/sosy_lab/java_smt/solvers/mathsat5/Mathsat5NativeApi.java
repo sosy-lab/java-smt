@@ -254,6 +254,8 @@ class Mathsat5NativeApi {
   public static native long msat_get_function_type(
       long e, long[] paramTypes, int size, long returnType);
 
+  public static native long msat_get_enum_type(long e, String name, int size, String[] elements);
+
   public static native boolean msat_is_bool_type(long e, long t);
 
   public static native boolean msat_is_rational_type(long e, long t);
@@ -273,6 +275,14 @@ class Mathsat5NativeApi {
   public static native int msat_get_fp_type_mant_width(long e, long t);
 
   public static native boolean msat_is_fp_roundingmode_type(long e, long t);
+
+  // disable this method until we get a proper MathSAT 5.6.9 or later.
+  // public static native boolean msat_is_enum_type(long e, long t);
+  public static boolean msat_is_enum_type(long e, long t) {
+    return false;
+  }
+
+  public static native long[] msat_get_enum_constants(long e, long t);
 
   public static native boolean msat_type_equals(long t1, long t2);
 

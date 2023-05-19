@@ -190,6 +190,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
     Z3QuantifiedFormulaManager quantifierManager = new Z3QuantifiedFormulaManager(creator);
     Z3ArrayFormulaManager arrayManager = new Z3ArrayFormulaManager(creator);
     Z3StringFormulaManager stringTheory = new Z3StringFormulaManager(creator);
+    Z3EnumerationFormulaManager enumTheory = new Z3EnumerationFormulaManager(creator);
 
     // Set the custom error handling
     // which will throw Z3Exception
@@ -207,7 +208,8 @@ public final class Z3SolverContext extends AbstractSolverContext {
             floatingPointTheory,
             quantifierManager,
             arrayManager,
-            stringTheory);
+            stringTheory,
+            enumTheory);
     return new Z3SolverContext(creator, pShutdownNotifier, logger, manager, extraOptions);
   }
 

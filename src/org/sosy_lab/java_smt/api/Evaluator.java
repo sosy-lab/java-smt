@@ -100,6 +100,13 @@ public interface Evaluator extends AutoCloseable {
   @Nullable String evaluate(StringFormula formula);
 
   /**
+   * Type-safe evaluation for enumeration formulas.
+   *
+   * <p>The formula does not need to be a variable, we also allow complex expression.
+   */
+  @Nullable String evaluate(EnumerationFormula formula);
+
+  /**
    * Free resources associated with this evaluator (existing {@link Formula} instances stay valid,
    * but {@link #evaluate(Formula)} etc. must not be called again).
    */

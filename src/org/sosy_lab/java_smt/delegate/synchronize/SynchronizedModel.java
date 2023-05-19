@@ -16,6 +16,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.EnumerationFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
@@ -77,6 +78,13 @@ class SynchronizedModel implements Model {
 
   @Override
   public @Nullable String evaluate(StringFormula pF) {
+    synchronized (sync) {
+      return delegate.evaluate(pF);
+    }
+  }
+
+  @Override
+  public @Nullable String evaluate(EnumerationFormula pF) {
     synchronized (sync) {
       return delegate.evaluate(pF);
     }

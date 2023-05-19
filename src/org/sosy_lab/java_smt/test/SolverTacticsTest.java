@@ -19,10 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
@@ -35,21 +31,8 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.Tactic;
 import org.sosy_lab.java_smt.api.visitors.BooleanFormulaVisitor;
 
-@RunWith(Parameterized.class)
 @SuppressWarnings("LocalVariableName")
-public class SolverTacticsTest extends SolverBasedTest0 {
-
-  @Parameters(name = "{0}")
-  public static Object[] getAllSolvers() {
-    return Solvers.values();
-  }
-
-  @Parameter public Solvers solver;
-
-  @Override
-  protected Solvers solverToUse() {
-    return solver;
-  }
+public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
   public void nnfTacticDefaultTest1() throws SolverException, InterruptedException {

@@ -16,10 +16,6 @@ import com.google.common.truth.Truth;
 import java.util.List;
 import org.junit.AssumptionViolatedException;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -28,21 +24,7 @@ import org.sosy_lab.java_smt.api.SolverException;
  * Uses bitvector theory if there is no integer theory available. Notice: Boolector does not support
  * bitvectors length 1.
  */
-@RunWith(Parameterized.class)
-public class BooleanFormulaManagerTest extends SolverBasedTest0 {
-
-  @Parameters(name = "{0}")
-  public static Object[] getAllSolvers() {
-    return Solvers.values();
-  }
-
-  @Parameter(0)
-  public Solvers solver;
-
-  @Override
-  protected Solvers solverToUse() {
-    return solver;
-  }
+public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
   public void testVariableNamedTrue() throws SolverException, InterruptedException {

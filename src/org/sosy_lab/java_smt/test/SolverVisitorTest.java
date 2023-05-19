@@ -25,10 +25,6 @@ import java.util.Set;
 import java.util.stream.Stream;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -53,8 +49,7 @@ import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
-@RunWith(Parameterized.class)
-public class SolverVisitorTest extends SolverBasedTest0 {
+public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   /** visit a formula and fail on OTHER, i.e., unexpected function declaration type. */
   private final class FunctionDeclarationVisitorNoOther extends DefaultFormulaVisitor<Formula> {
@@ -125,18 +120,6 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     protected Formula visitDefault(Formula pF) {
       return pF;
     }
-  }
-
-  @Parameters(name = "{0}")
-  public static Object[] getAllSolvers() {
-    return Solvers.values();
-  }
-
-  @Parameter public Solvers solver;
-
-  @Override
-  protected Solvers solverToUse() {
-    return solver;
   }
 
   @Before

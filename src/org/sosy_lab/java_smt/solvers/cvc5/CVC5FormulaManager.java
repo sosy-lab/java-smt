@@ -42,7 +42,8 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, Solver, Term
       CVC5QuantifiedFormulaManager pQfmgr,
       CVC5ArrayFormulaManager pAfmgr,
       CVC5SLFormulaManager pSLfmgr,
-      CVC5StringFormulaManager pStrmgr) {
+      CVC5StringFormulaManager pStrmgr,
+      CVC5EnumerationFormulaManager pEfmgr) {
     super(
         pFormulaCreator,
         pFfmgr,
@@ -54,7 +55,8 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, Solver, Term
         pQfmgr,
         pAfmgr,
         pSLfmgr,
-        pStrmgr);
+        pStrmgr,
+        pEfmgr);
     creator = pFormulaCreator;
   }
 

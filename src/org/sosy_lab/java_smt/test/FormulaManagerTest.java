@@ -20,35 +20,16 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Map;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 
-@RunWith(Parameterized.class)
-public class FormulaManagerTest extends SolverBasedTest0 {
-
-  @Parameters(name = "{0}")
-  public static Object[] getAllSolvers() {
-    return Solvers.values();
-  }
-
-  @Parameter(0)
-  public Solvers solver;
-
-  @Override
-  protected Solvers solverToUse() {
-    return solver;
-  }
+public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
   public void testEmptySubstitution() throws SolverException, InterruptedException {
@@ -332,7 +313,7 @@ public class FormulaManagerTest extends SolverBasedTest0 {
     requireArrays();
     // exists arr : (arr[0]=5 && x=arr[0]) --> simplified: x=5
     ArrayFormula<IntegerFormula, IntegerFormula> arr =
-        amgr.makeArray("arr", new ArrayFormulaType<>(IntegerType, IntegerType));
+        amgr.makeArray("arr", FormulaType.getArrayType(IntegerType, IntegerType));
     IntegerFormula index = imgr.makeNumber(0);
     IntegerFormula value = imgr.makeNumber(5);
     IntegerFormula x = imgr.makeVariable("x");

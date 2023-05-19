@@ -32,7 +32,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearAr
 public class NonLinearArithmeticWithModuloTest extends SolverBasedTest0 {
 
   @Parameters(name = "{0} {1}")
-  public static Iterable<Object[]> getAllSolvers() {
+  public static Iterable<Object[]> getAllSolversAndTheories() {
     return Lists.cartesianProduct(
             Arrays.asList(Solvers.values()), Arrays.asList(NonLinearArithmetic.values()))
         .stream()
