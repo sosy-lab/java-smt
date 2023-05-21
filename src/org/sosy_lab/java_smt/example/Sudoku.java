@@ -108,11 +108,10 @@ public class Sudoku {
         Integer[][] grid = readGridFromStdin();
 
         for (SudokuSolver<?> sudoku :
-            new SudokuSolver[] {
-              new IntegerBasedSudokuSolver(context),
-              new EnumerationBasedSudokuSolver(context),
-              new BooleanBasedSudokuSolver(context)
-            }) {
+            List.of(
+                new IntegerBasedSudokuSolver(context),
+                new EnumerationBasedSudokuSolver(context),
+                new BooleanBasedSudokuSolver(context))) {
           long start = System.currentTimeMillis();
 
           Integer[][] solution = sudoku.solve(grid);
@@ -429,7 +428,7 @@ public class Sudoku {
 
     private final EnumerationFormulaType type;
     private static final String[] VALUES = {
-      "ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE"
+      "ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE",
     };
 
     public EnumerationBasedSudokuSolver(SolverContext context) {
