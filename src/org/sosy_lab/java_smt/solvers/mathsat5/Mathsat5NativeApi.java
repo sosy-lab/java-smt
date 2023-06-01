@@ -276,11 +276,7 @@ class Mathsat5NativeApi {
 
   public static native boolean msat_is_fp_roundingmode_type(long e, long t);
 
-  // disable this method until we get a proper MathSAT 5.6.9 or later.
-  // public static native boolean msat_is_enum_type(long e, long t);
-  public static boolean msat_is_enum_type(long e, long t) {
-    return false;
-  }
+  public static native boolean msat_is_enum_type(long e, long t);
 
   public static native long[] msat_get_enum_constants(long e, long t);
 
