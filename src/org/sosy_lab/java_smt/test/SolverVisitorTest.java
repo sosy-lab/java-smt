@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -928,7 +929,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
                   BooleanFormula pAtom, FunctionDeclaration<BooleanFormula> decl) {
                 if (decl.getKind() == FunctionDeclarationKind.VAR) {
                   // Uppercase all variables.
-                  return bmgr.makeVariable(decl.getName().toUpperCase());
+                  return bmgr.makeVariable(decl.getName().toUpperCase(Locale.getDefault()));
                 } else {
                   return pAtom;
                 }
@@ -936,7 +937,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
             });
     assertThat(
             mgr.extractVariables(transformed).keySet().stream()
-                .allMatch(pS -> pS.equals(pS.toUpperCase())))
+                .allMatch(pS -> pS.equals(pS.toUpperCase(Locale.getDefault()))))
         .isTrue();
   }
 

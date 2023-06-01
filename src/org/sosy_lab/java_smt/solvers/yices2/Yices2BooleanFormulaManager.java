@@ -51,6 +51,7 @@ public class Yices2BooleanFormulaManager
   protected Integer and(Integer pParam1, Integer pParam2) {
     return yices_and2(pParam1, pParam2);
   }
+
   // Causes BooleanFormulaManagerTest/testConjunctionCollector to fail.
   // @Override
   // protected Integer andImpl(Collection<Integer> pParams) {

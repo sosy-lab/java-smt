@@ -181,6 +181,7 @@ public class NQueens {
     }
     return rules;
   }
+
   /**
    * Rule 4: At most one queen per diagonal transform the field (=symbols) from square shape into a
    * (downwards/upwards directed) rhombus that is embedded in a rectangle

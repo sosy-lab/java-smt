@@ -50,6 +50,7 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
 
   // Remember uf sorts, as Boolector does not give them back correctly
   private final Map<Long, List<Long>> ufArgumentsSortMap = new HashMap<>();
+
   // Possibly we need to split this up into vars, ufs, and arrays
 
   BoolectorFormulaCreator(Long btor) {
