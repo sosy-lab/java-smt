@@ -27,6 +27,14 @@ RUN apt-get update \
  && make \
  && make install
 
+# set default locale
+RUN apt-get update \
+ && apt-get install -y \
+        locales locales-all
+ENV LC_ALL en_US.UTF-8
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US.UTF-8
+
 # Add the user "developer" with UID:1000, GID:1000, home at /developer.
 # This allows to map the docker-internal user to the local user 1000:1000 outside of the container.
 # This avoids to have new files created with root-rights.
