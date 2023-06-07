@@ -10,6 +10,11 @@ SPDX-License-Identifier: Apache-2.0
 
 # JavaSMT ChangeLog
 
+## JavaSMT 4.0.2
+
+This patch release improves documentation and updates the dependency for our Yices2 component.
+We skip version 4.0.1 which was internally used for releasing the Yices2 component.
+
 ## JavaSMT 4.0.0
 
 This major release comes with several updated solvers and dependencies,
