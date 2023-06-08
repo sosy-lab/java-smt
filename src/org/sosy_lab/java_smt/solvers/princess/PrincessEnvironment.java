@@ -9,7 +9,6 @@
 package org.sosy_lab.java_smt.solvers.princess;
 
 import static scala.collection.JavaConverters.asJava;
-import static scala.collection.JavaConverters.asScala;
 import static scala.collection.JavaConverters.collectionAsScalaIterableConverter;
 
 import ap.api.SimpleAPI;
@@ -76,6 +75,7 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import scala.Tuple2;
 import scala.Tuple4;
 import scala.collection.immutable.Seq;
+import scala.collection.immutable.Set$;
 
 /**
  * This is a Wrapper around Princess. This Wrapper allows to set a logfile for all Smt-Queries
@@ -216,7 +216,7 @@ class PrincessEnvironment {
             SimpleAPI.apply$default$8(), // tightFunctionScopes
             SimpleAPI.apply$default$9(), // genTotalityAxioms
             new scala.Some<>(randomSeed), // randomSeed
-            asScala(ImmutableSet.of()).toSet() // empty Set<LOG_FLAG>, no internal logging
+            Set$.MODULE$.empty() // empty Set<LOG_FLAG>, no internal logging
             );
 
     if (constructProofs) { // needed for interpolation and unsat cores
