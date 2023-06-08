@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.princess;
 
 import static scala.collection.JavaConverters.asJava;
+import static scala.collection.JavaConverters.asScala;
 import static scala.collection.JavaConverters.collectionAsScalaIterableConverter;
 
 import ap.api.SimpleAPI;
@@ -214,7 +215,8 @@ class PrincessEnvironment {
             directory, // dumpDirectory
             SimpleAPI.apply$default$8(), // tightFunctionScopes
             SimpleAPI.apply$default$9(), // genTotalityAxioms
-            new scala.Some<>(randomSeed) // randomSeed
+            new scala.Some<>(randomSeed), // randomSeed
+            asScala(ImmutableSet.of()).toSet() // empty Set<LOG_FLAG>, no internal logging
             );
 
     if (constructProofs) { // needed for interpolation and unsat cores
