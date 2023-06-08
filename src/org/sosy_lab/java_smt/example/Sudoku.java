@@ -169,13 +169,11 @@ public class Sudoku {
     private final SolverContext context;
     final BooleanFormulaManager bmgr;
     final IntegerFormulaManager imgr;
-    final EnumerationFormulaManager emgr;
 
     private SudokuSolver(SolverContext pContext) {
       context = pContext;
       bmgr = context.getFormulaManager().getBooleanFormulaManager();
       imgr = context.getFormulaManager().getIntegerFormulaManager();
-      emgr = context.getFormulaManager().getEnumerationFormulaManager();
     }
 
     abstract S getSymbols();
@@ -426,6 +424,7 @@ public class Sudoku {
 
   public static class EnumerationBasedSudokuSolver extends SudokuSolver<EnumerationFormula[][]> {
 
+    private final EnumerationFormulaManager emgr;
     private final EnumerationFormulaType type;
     private static final String[] VALUES = {
       "ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE",
@@ -433,6 +432,7 @@ public class Sudoku {
 
     public EnumerationBasedSudokuSolver(SolverContext context) {
       super(context);
+      emgr = context.getFormulaManager().getEnumerationFormulaManager();
       type = emgr.declareEnumeration("VALUES", VALUES);
     }
 
