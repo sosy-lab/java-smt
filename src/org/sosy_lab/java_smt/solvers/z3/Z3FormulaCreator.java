@@ -98,6 +98,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   private static final ImmutableSet<String> Z3_INTERRUPT_ERRORS =
       ImmutableSet.of(
           "canceled", // Z3::src/util/common_msgs.cpp
+          "push canceled", // src/smt/smt_context.cpp
+          "interrupted from keyboard", // Z3: src/solver/check_sat_result.cpp
           "Proof error!",
           "interrupted", // Z3::src/solver/check_sat_result.cpp
           "maximization suspended" // Z3::src/opt/opt_solver.cpp
