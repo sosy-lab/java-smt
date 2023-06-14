@@ -1,3 +1,17 @@
+     inline friend bool operator== (const PFRef& a1, const PFRef& a2) { return a1.x == a2.x; };
+diff --git a/src/logics/FunctionTools.h b/src/logics/FunctionTools.h
+index fc9dbfb7..d3540bf9 100644
+--- a/src/logics/FunctionTools.h
++++ b/src/logics/FunctionTools.h
+@@ -33,7 +33,7 @@ class TemplateFunction {
+     FunctionSignature signature;
+     PTRef tr_body;
+ 
+-    inline static std::string_view constexpr template_arg_prefix = ".arg";
++    inline static constexpr std::string_view template_arg_prefix = ".arg";
+     inline static std::size_t template_arg_counter = 0;
+ public:
+     static std::string nextFreeArgumentName() { return std::string(template_arg_prefix) + std::to_string(template_arg_counter++); }
 diff --git a/src/logics/Theory.h b/src/logics/Theory.h
 index ef231407..0799d499 100644
 --- a/src/logics/Theory.h

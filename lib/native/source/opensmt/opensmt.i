@@ -187,9 +187,9 @@
 %ignore SMTConfig::getStatsOut ();
 %ignore SMTConfig::getRegularOut ();
 %ignore SMTConfig::getDiagnosticOut ();
-%ignore SMTConfig::getRandomSeed () const;
+//%ignore SMTConfig::getRandomSeed () const;
 %ignore SMTConfig::setProduceModels ();
-%ignore SMTConfig::setRandomSeed (int seed);
+//%ignore SMTConfig::setRandomSeed (int seed);
 %ignore SMTConfig::setUsedForInitiliazation ();
 %ignore SMTConfig::produceProof ();
 %ignore SMTConfig::setTimeQueries ();
@@ -627,7 +627,7 @@
  }
 %ignore Logic::mkNot (vec< PTRef > &&);
 %ignore Logic::mkIte (vec< PTRef > &&);
-%ignore Logic::mkIte (PTRef c, PTRef t, PTRef e);
+// %ignore Logic::mkIte (PTRef c, PTRef t, PTRef e);
 %ignore Logic::mkEq (vec< PTRef > &&args);
 %ignore Logic::mkEq (vec< PTRef > const &args);
 %extend Logic {
