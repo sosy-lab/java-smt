@@ -84,8 +84,8 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="opensmt.i"/>
         </exec>
         
-        <!-- Copy (only!) the required java files to the source tree
-             This should make sure that compilation fails if the OpenSMT interface changed, but the SWIG header wasn't updated  -->
+        <!-- Copy (only!) the required java files to the source tree. This should make sure that compilation fails
+             if the OpenSMT interface changed, but the swig header wasn't updated  -->
         <copy todir="${path.source}/src/opensmt">
             <fileset dir="${path.install}/java/opensmt">
                 <include name="ArithLogic.java"/>
@@ -110,6 +110,15 @@ SPDX-License-Identifier: Apache-2.0
             </fileset>
         </copy>
 
+        <!-- Package swig generated source code -->
+        <jar destfile="opensmt-${opensmt.version}-sources.jar" basedir="${path.source}/src"/>
+        
+        <!-- Generate and package javadoc documentation -->
+        <mkdir dir="${path.source}/doc"/>
+        <javadoc sourcepath="${path.source}/src" destdir="${path.source}/doc"/>
+        <jar destfile="opensmt-${opensmt.version}-javadoc.jar" basedir="${path.source}/doc"/>
+        <delete dir="${path.source}/doc"/>
+        
         <!-- Copy the lib to the root directory for later packaging-->
         <copy file="${path.install}/lib/libopensmt.so" toFile="libopensmt-${opensmt.version}.so"/>
         
@@ -138,7 +147,7 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="-l:libgmp.a"/>
         </exec>
         <delete file="libopensmt.so"/>
-
+        
         <!-- Compile java proxies and create jar file -->
         <mkdir dir="${path.source}/bin"/>
         <javac srcdir="${path.source}/src/" destdir="${path.source}/bin/" includeantruntime="false">
@@ -159,7 +168,7 @@ SPDX-License-Identifier: Apache-2.0
         <ivy:publish
             pubrevision="${opensmt.version}"
             resolver="Sosy-Lab-Publish"
-            artifactspattern="[artifact]-[revision].[ext]"
+            artifactspattern="[artifact]-[revision](-[classifier]).[ext]"
             status="release"
             />
         <echo>
