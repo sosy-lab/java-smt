@@ -280,7 +280,7 @@ public abstract class SolverBasedTest0 {
     assume()
         .withMessage("Solver %s does not support unsat core generation", solverToUse())
         .that(solverToUse())
-        .isNotEqualTo(Solvers.BOOLECTOR);
+        .isNoneOf(Solvers.BOOLECTOR, Solvers.OPENSMT);
   }
 
   /**
