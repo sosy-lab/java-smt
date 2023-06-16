@@ -33,6 +33,7 @@ import org.sosy_lab.java_smt.solvers.boolector.BoolectorSolverContext;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4SolverContext;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5SolverContext;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5SolverContext;
+import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtSolverContext;
 import org.sosy_lab.java_smt.solvers.princess.PrincessSolverContext;
 import org.sosy_lab.java_smt.solvers.smtinterpol.SmtInterpolSolverContext;
 import org.sosy_lab.java_smt.solvers.yices2.Yices2SolverContext;
@@ -229,6 +230,10 @@ public class SolverContextFactory {
   private SolverContext generateContext0(Solvers solverToCreate)
       throws InvalidConfigurationException {
     switch (solverToCreate) {
+      case OPENSMT:
+        return OpenSmtSolverContext.create(
+            logger, shutdownNotifier, randomSeed, nonLinearArithmetic, loader);
+
       case CVC4:
         return CVC4SolverContext.create(
             logger,

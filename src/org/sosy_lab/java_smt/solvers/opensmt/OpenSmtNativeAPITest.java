@@ -51,7 +51,7 @@ public class OpenSmtNativeAPITest {
     }
   }
 
-  /** Verify that interpolant conditions are fullfilled See VerificationUtils.h in OpenSmt. */
+  /** Verify that we have a valid interpolant. See VerificationUtils.h in OpenSmt for details. */
   private boolean verifyInterpolant(Logic logic, PTRef partA, PTRef partB, PTRef interpol) {
     SMTConfig config = new SMTConfig();
     MainSolver solver = new MainSolver(logic, config, "opensmt-verifier");

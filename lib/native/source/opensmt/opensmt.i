@@ -72,18 +72,23 @@
   static ItpAlgorithm getBoolMcmillan() {
     return itp_alg_mcmillan;
     }
+  
   static ItpAlgorithm getBoolPudlak() {
     return itp_alg_pudlak;
     }
+  
   static ItpAlgorithm getBoolMcmillanp() {
     return itp_alg_mcmillanp;
     }
+  
   static ItpAlgorithm getBoolPs() {
     return itp_alg_ps;
     }
+  
   static ItpAlgorithm getBoolPsw() {
     return itp_alg_psw;
     }
+  
   static ItpAlgorithm getBoolPss() {
     return itp_alg_pss;
     }
@@ -96,10 +101,12 @@
   static ItpAlgorithm getEufStrong() {
     return itp_euf_alg_strong;
   }
+  
   static ItpAlgorithm getEufWeak() {
     return itp_euf_alg_weak;
   }
- static ItpAlgorithm getEufRandom() {
+  
+  static ItpAlgorithm getEufRandom() {
     return itp_euf_alg_random;
   }
  }
@@ -113,18 +120,23 @@
   static ItpAlgorithm getLraStrong() {
     return itp_lra_alg_strong;
   }
+  
   static ItpAlgorithm getLraWeak() {
     return itp_lra_alg_weak;
   }
+  
   static ItpAlgorithm getLraFactor() {
     return itp_lra_alg_factor;
   }
+  
   static ItpAlgorithm getLraDecomposingStrong() {
     return itp_lra_alg_decomposing_strong;
   }
+  
   static ItpAlgorithm getLraDecomposingWeak() {
     return itp_lra_alg_decomposing_weak;
   }
+  
   static const char* getLraFactor0() {
     return itp_lra_factor_0;
   }
@@ -439,7 +451,8 @@
       return this.getX() == that.getX();
     }
     return false;
-  }  
+  }
+  
   public int hashCode() {
     return Long.hashCode(this.getX());
   }
@@ -493,6 +506,7 @@
   TemplateFunction(const std::string &name, const std::vector< PTRef > &args_, SRef ret_sort, PTRef tr_body) {
     return new TemplateFunction(name, vec(args_), ret_sort, tr_body);
   }
+  
   %newobject getArgs;
   const std::vector<PTRef>& getArgs() const {
     std::vector<PTRef> res;
@@ -561,6 +575,7 @@
   PTRef mkStore(PTRef array, PTRef index, PTRef value) {
     return $self->mkStore({array, index, value});
   }
+  
   PTRef mkSelect(PTRef array, PTRef index) {
     return $self->mkSelect({array, index});
   }
@@ -569,7 +584,7 @@
 %ignore Logic::getUniqueArgSort (PTRef tr) const;
 %ignore Logic::getSym (const SymRef s) const;
 %ignore Logic::getSym (const PTRef tr) const;
-%ignore Logic::getSymRef (const PTRef tr) const;
+//%ignore Logic::getSymRef (const PTRef tr) const;
 //%ignore Logic::getSymName (const PTRef tr) const;
 %ignore Logic::getSymName (const SymRef s) const;
 %ignore Logic::symNameToRef (const char *s);
@@ -640,6 +655,7 @@
   PTRef mkDistinct(std::vector<PTRef> const &args) {
     return $self->mkDistinct(vec(args));
   }
+  
   PTRef mkDistinct(PTRef a, PTRef b) {
     std::vector<PTRef> args;
     args.emplace_back(a);
@@ -700,6 +716,12 @@
 %ignore Logic::getSym_distinct () const;
 %ignore Logic::getSym_uf_not () const;
 //%ignore Logic::getSort_bool () const;
+%extend Logic {
+  bool isSortBool (SRef sort) {
+    SRef sortBool = $self->getSort_bool();
+    return sort == sortBool;
+  }
+ }
 %ignore Logic::isEquality (SymRef tr) const;
 //%ignore Logic::isEquality (PTRef tr) const;
 %ignore Logic::isUFEquality (PTRef tr) const;
@@ -760,6 +782,11 @@
 %ignore Logic::resolveTerm (const char *s, vec< PTRef > &&args, SRef sortRef=SRef_Undef, SymbolMatcher symbolMatcher=SymbolMatcher::Any);
 %ignore Logic::insertTerm (SymRef sym, vec< PTRef > &&args);
 %ignore Logic::insertTerm (SymRef sym, vec< PTRef > const &args);
+%extend Logic {
+  PTRef insertTerm (SymRef sym, std::vector<PTRef> const &args) {
+    return $self->insertTerm(sym, vec(args));
+  }
+ }
 %ignore Logic::getNewFacts (PTRef root, MapWithKeys< PTRef, lbool, PTRefHash > &facts);
 %ignore Logic::retrieveSubstitutions (const vec< PtAsgn > &units);
 %ignore Logic::substitutionsTransitiveClosure (SubstMap &substs);
@@ -824,6 +851,7 @@
   PTRef mkIntConst(const std::string& c) {
     return $self->mkIntConst(FastRational(c.c_str()));
   }
+  
   PTRef mkRealConst(const std::string& c) {
     return $self->mkRealConst(FastRational(c.c_str()));
   }
@@ -840,8 +868,8 @@
 %ignore ArithLogic::isRealConst (SymRef sr) const;
 //%ignore ArithLogic::isRealConst (PTRef tr) const;
 %ignore ArithLogic::isNonNegNumConst (PTRef tr) const;
-%ignore ArithLogic::isSortInt (SRef sr) const;
-%ignore ArithLogic::isSortReal (SRef sr) const;
+//%ignore ArithLogic::isSortInt (SRef sr) const;
+//%ignore ArithLogic::isSortReal (SRef sr) const;
 %ignore ArithLogic::isSortNum (SRef sr) const;
 %ignore ArithLogic::yieldsSortInt (SymRef sr) const;
 %ignore ArithLogic::yieldsSortInt (PTRef tr) const;
@@ -1036,12 +1064,15 @@
   bool isTrue() {
     return $self->getValue() == s_True.getValue();
   }
+  
   bool isFalse() {
     return $self->getValue() == s_False.getValue();
   }
+  
   bool isUndef() {
     return $self->getValue() == s_Undef.getValue();
   }
+  
   bool isError() {
     return $self->getValue() == s_Error.getValue();
   }
@@ -1061,16 +1092,17 @@
 %ignore MainSolver::getTheory();
 %ignore MainSolver::getTheory() const;
 %ignore MainSolver::getPartitionManager();
-%ignore MainSolver::push();
+//%ignore MainSolver::push(PTRef);
+//%ignore MainSolver::push();
 %ignore MainSolver::insertFormula(PTRef, char**);
-%ignore MainSolver::insertFormula(PTRef);;
+//%ignore MainSolver::insertFormula(PTRef);;
 %ignore MainSolver::initialize();
 %ignore MainSolver::simplifyFormulas();
 %ignore MainSolver::printFramesAsQuery() const;
 %ignore MainSolver::solverEmpty() const;
 %ignore MainSolver::writeSolverState_smtlib2(const char*, char**) const;
 %ignore MainSolver::getTermValue(PTRef) const;
-%ignore MainSolver::stop();
+//%ignore MainSolver::stop();
 %ignore MainSolver::createTheory(Logic&, SMTConfig&);
 // %ignore MainSolver::getInterpolationContext ();
 
