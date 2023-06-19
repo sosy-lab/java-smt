@@ -306,7 +306,7 @@ public class OpenSmtNativeAPITest {
 
     // Define function negate(a) = -1*a
 
-    // FIXME: This will fail the test. Are formal arguments not scoped?
+    // FIXME: This will fail the test. Are formal arguments not scoped? See Interpret.cc, line 750
     // PTRef negate_a = logic.mkIntVar("a");
 
     PTRef negateA = logic.mkIntVar("negate_a");
