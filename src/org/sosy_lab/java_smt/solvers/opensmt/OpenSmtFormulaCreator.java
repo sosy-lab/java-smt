@@ -70,7 +70,7 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, OpenSmt, 
   }
 
   // FIXME: This is a bit of a hack. OpenSmt has no way of accessing the element and index types
-  // of an array. We just store them here for now. Maaybe there's a better way?
+  // of an array. We just store them here for now. Maybe there's a better way?
   private Map<SRef, SRef> arrayIndexTypes = new HashMap<SRef, SRef>();
   private Map<SRef, SRef> arrayElementTypes = new HashMap<SRef, SRef>();
 
@@ -99,18 +99,18 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, OpenSmt, 
 
   @Override
   @SuppressWarnings("MethodTypeParameterName")
-  protected <TD extends Formula, TR extends Formula> FormulaType<TR> getArrayFormulaElementType(
-      ArrayFormula<TD, TR> pArray) {
-    OpenSmtArrayFormula<TD, TR> array = (OpenSmtArrayFormula<TD, TR>) pArray;
-    return array.getElementType();
-  }
-
-  @Override
-  @SuppressWarnings("MethodTypeParameterName")
   protected <TD extends Formula, TR extends Formula> FormulaType<TD> getArrayFormulaIndexType(
       ArrayFormula<TD, TR> pArray) {
     OpenSmtArrayFormula<TD, TR> array = (OpenSmtArrayFormula<TD, TR>) pArray;
     return array.getIndexType();
+  }
+
+  @Override
+  @SuppressWarnings("MethodTypeParameterName")
+  protected <TD extends Formula, TR extends Formula> FormulaType<TR> getArrayFormulaElementType(
+      ArrayFormula<TD, TR> pArray) {
+    OpenSmtArrayFormula<TD, TR> array = (OpenSmtArrayFormula<TD, TR>) pArray;
+    return array.getElementType();
   }
 
   @SuppressWarnings("unchecked")
@@ -129,7 +129,7 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, OpenSmt, 
     SRef sort = getEnv().getLogic().getSortRef(pFormula);
     return getFormulaTypeFromTermType(sort);
   }
-
+  
   private FormulaType<?> getFormulaTypeFromTermType(SRef sort) {
     Logic logic = getEnv().getLogic();
     if (logic.isSortBool(sort)) {

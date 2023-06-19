@@ -474,6 +474,20 @@
 
 %ignore SRefHash;
 
+%typemap(javacode) SRef %{
+  public boolean equals(Object object) {
+    if(object instanceof $javaclassname) {
+      SRef that = ($javaclassname) object;
+      return this.getX() == that.getX();
+    }
+    return false;
+  }
+  
+  public int hashCode() {
+    return Long.hashCode(this.getX());
+  }
+%}
+
 %ignore Sort;
 %ignore SortKey;
 %ignore SortSymbolAllocator;
@@ -491,6 +505,20 @@
 
 %ignore SymRefHash;
 %ignore Equal;
+
+%typemap(javacode) SymRef %{
+  public boolean equals(Object object) {
+    if(object instanceof $javaclassname) {
+      SymRef that = ($javaclassname) object;
+      return this.getX() == that.getX();
+    }
+    return false;
+  }
+  
+  public int hashCode() {
+    return Long.hashCode(this.getX());
+  }
+%}
 
 %include "include/opensmt/SymRef.h"
 
@@ -859,7 +887,7 @@
 //%ignore ArithLogic::mkIntVar (const char *name);
 //%ignore ArithLogic::mkRealVar (const char *name);
 %ignore ArithLogic::isBuiltinSort (SRef sr) const override;
-%ignore ArithLogic::isBuiltinSortSym (SSymRef ssr) const override; @SuppressWarnings("unused")
+%ignore ArithLogic::isBuiltinSortSym (SSymRef ssr) const override;
 %ignore ArithLogic::isBuiltinConstant (SymRef sr) const override;
 %ignore ArithLogic::isNumConst (SymRef sr) const;
 //%ignore ArithLogic::isNumConst (PTRef tr) const;
