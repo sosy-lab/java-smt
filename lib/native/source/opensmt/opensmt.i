@@ -567,8 +567,8 @@
  }
 //%ignore Logic::isArraySort (SRef sref) const;
 %ignore Logic::hasArrays () const;
-//%ignore Logic::isArrayStore (SymRef) const;
-//%ignore Logic::isArraySelect (SymRef) const;
+%ignore Logic::isArrayStore (SymRef) const;
+%ignore Logic::isArraySelect (SymRef) const;
 %ignore Logic::mkStore (vec< PTRef > &&);
 %ignore Logic::mkSelect (vec< PTRef > &&);
 %extend Logic {
@@ -727,9 +727,9 @@
 %ignore Logic::isUFEquality (PTRef tr) const;
 %ignore Logic::isTheoryEquality (PTRef tr) const;
 %ignore Logic::isDisequality (SymRef tr) const;
-%ignore Logic::isDisequality (PTRef tr) const;
+//%ignore Logic::isDisequality (PTRef tr) const;
 %ignore Logic::isIte (SymRef tr) const;
-%ignore Logic::isIte (PTRef tr) const;
+//%ignore Logic::isIte (PTRef tr) const;
 %ignore Logic::isNonBoolIte (SymRef sr) const;
 %ignore Logic::isNonBoolIte (PTRef tr) const;
 %ignore Logic::isTheorySymbol (SymRef tr) const;
@@ -752,11 +752,11 @@
 //%ignore Logic::isVar (PTRef tr) const;
 %ignore Logic::isVarOrIte (SymRef sr) const;
 %ignore Logic::isVarOrIte (PTRef tr) const;
-//%ignore Logic::isAtom (PTRef tr) const;
+%ignore Logic::isAtom (PTRef tr) const;
 %ignore Logic::isBoolAtom (PTRef tr) const;
 %ignore Logic::isInterpreted (SymRef sr) const;
 %ignore Logic::isUP (PTRef) const;
-%ignore Logic::isUF (PTRef) const;
+//%ignore Logic::isUF (PTRef) const;
 %ignore Logic::isUF (SymRef) const;
 %ignore Logic::isIF (PTRef) const;
 %ignore Logic::isIF (SymRef) const;
@@ -856,10 +856,10 @@
     return $self->mkRealConst(FastRational(c.c_str()));
   }
  }
-// PTRef        mkIntVar (const char *name)
-// PTRef 	mkRealVar (const char *name)
+//%ignore ArithLogic::mkIntVar (const char *name);
+//%ignore ArithLogic::mkRealVar (const char *name);
 %ignore ArithLogic::isBuiltinSort (SRef sr) const override;
-%ignore ArithLogic::isBuiltinSortSym (SSymRef ssr) const override;
+%ignore ArithLogic::isBuiltinSortSym (SSymRef ssr) const override; @SuppressWarnings("unused")
 %ignore ArithLogic::isBuiltinConstant (SymRef sr) const override;
 %ignore ArithLogic::isNumConst (SymRef sr) const;
 //%ignore ArithLogic::isNumConst (PTRef tr) const;
@@ -878,6 +878,12 @@
 %ignore ArithLogic::yieldsSortNum (SymRef sr) const;
 %ignore ArithLogic::yieldsSortNum (PTRef tr) const;
 %ignore ArithLogic::getNumConst (PTRef tr) const;
+%extend ArithLogic {
+  std::string getNumConst (PTRef tr) {
+    const FastRational& rat = $self->getNumConst(tr);
+    return rat.get_str();
+  }
+ }
 %ignore ArithLogic::isUFEquality (PTRef tr) const override;
 %ignore ArithLogic::isAtom (PTRef tr) const override; 
 %ignore ArithLogic::getDefaultValue (PTRef tr) const override;
@@ -945,7 +951,17 @@
 %ignore ArithLogic::isRealDiv (SymRef sr) const; 
 %ignore ArithLogic::isIntDiv (PTRef tr) const;
 %ignore ArithLogic::isIntDiv (SymRef sr) const;
+%extend ArithLogic {
+  bool isDiv(PTRef tr) const {
+    return $self->isIntDiv(tr) || $self->isRealDiv(tr);
+  }
+ }
 %ignore ArithLogic::isMod (SymRef sr) const;
+%extend ArithLogic {
+  bool isMod(PTRef tr) const {
+    return $self->isMod($self->getPterm(tr).symb());
+  }
+ }
 %ignore ArithLogic::isNumEq (SymRef sr) const;
 %ignore ArithLogic::isNumEq (PTRef tr) const;
 %ignore ArithLogic::isIntEq (PTRef tr) const;
@@ -953,25 +969,25 @@
 %ignore ArithLogic::isIntEq (SymRef sr) const;
 %ignore ArithLogic::isRealEq (SymRef sr) const;
 %ignore ArithLogic::isLeq (SymRef sr) const;
-%ignore ArithLogic::isLeq (PTRef tr) const;
+//%ignore ArithLogic::isLeq (PTRef tr) const;
 %ignore ArithLogic::isIntLeq (PTRef tr) const;
 %ignore ArithLogic::isRealLeq (PTRef tr) const;
 %ignore ArithLogic::isIntLeq (SymRef sr) const;
 %ignore ArithLogic::isRealLeq (SymRef sr) const;
 %ignore ArithLogic::isLt (SymRef sr) const;
-%ignore ArithLogic::isLt (PTRef tr) const;
+//%ignore ArithLogic::isLt (PTRef tr) const;
 %ignore ArithLogic::isIntLt (PTRef tr) const;
 %ignore ArithLogic::isRealLt (PTRef tr) const;
 %ignore ArithLogic::isIntLt (SymRef sr) const;
 %ignore ArithLogic::isRealLt (SymRef sr) const;
 %ignore ArithLogic::isGeq (SymRef sr) const;
-%ignore ArithLogic::isGeq (PTRef tr) const;
+//%ignore ArithLogic::isGeq (PTRef tr) const;
 %ignore ArithLogic::isIntGeq (PTRef tr) const;
 %ignore ArithLogic::isRealGeq (PTRef tr) const;
 %ignore ArithLogic::isIntGeq (SymRef sr) const; 
 %ignore ArithLogic::isRealGeq (SymRef sr) const;
 %ignore ArithLogic::isGt (SymRef sr) const;
-%ignore ArithLogic::isGt (PTRef tr) const;
+//%ignore ArithLogic::isGt (PTRef tr) const;
 %ignore ArithLogic::isIntGt (PTRef tr) const;
 %ignore ArithLogic::isRealGt (PTRef tr) const;
 %ignore ArithLogic::isIntGt (SymRef sr) const;
