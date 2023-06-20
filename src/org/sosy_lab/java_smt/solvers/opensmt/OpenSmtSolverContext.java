@@ -107,7 +107,7 @@ public class OpenSmtSolverContext extends AbstractSolverContext {
   @Override
   public String getVersion() {
     // FIXME
-    throw new UnsupportedOperationException();
+    return "2.5.1-7";
   }
 
   @Override

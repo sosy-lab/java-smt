@@ -84,8 +84,8 @@ public class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<T> {
   public void pop() {
     Preconditions.checkState(!closed);
     setChanged();
+    Preconditions.checkState(size() > 0, "Tried to pop from an empty solver stack");
     assertedFormulas.pop();
-    Preconditions.checkState(size() > 0, "Tried to pop from an solver stack");
     osmtSolver.pop();
   }
 
