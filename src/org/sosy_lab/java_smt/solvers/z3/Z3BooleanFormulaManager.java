@@ -8,7 +8,10 @@
 
 package org.sosy_lab.java_smt.solvers.z3;
 
+import static org.sosy_lab.java_smt.solvers.z3.Z3FormulaCreator.isOP;
+
 import com.microsoft.z3.Native;
+import com.microsoft.z3.enumerations.Z3_decl_kind;
 import java.util.Collection;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -153,12 +156,12 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
 
   @Override
   protected boolean isTrue(Long pParam) {
-    return Native.isEqAst(z3context, pParam, z3true);
+    return isOP(z3context, pParam, Z3_decl_kind.Z3_OP_TRUE);
   }
 
   @Override
   protected boolean isFalse(Long pParam) {
-    return Native.isEqAst(z3context, pParam, z3false);
+    return isOP(z3context, pParam, Z3_decl_kind.Z3_OP_FALSE);
   }
 
   @Override

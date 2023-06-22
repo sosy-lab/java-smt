@@ -772,8 +772,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     return Native.isNumeralAst(environment, value)
         || Native.isAlgebraicNumber(environment, value)
         || Native.isString(environment, value)
-        || isOP(environment, value, Z3_decl_kind.Z3_OP_TRUE.toInt())
-        || isOP(environment, value, Z3_decl_kind.Z3_OP_FALSE.toInt());
+        || isOP(environment, value, Z3_decl_kind.Z3_OP_TRUE)
+        || isOP(environment, value, Z3_decl_kind.Z3_OP_FALSE);
   }
 
   /**
@@ -798,7 +798,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     try {
       FormulaType<?> type = getFormulaType(value);
       if (type.isBooleanType()) {
-        return isOP(environment, value, Z3_decl_kind.Z3_OP_TRUE.toInt());
+        return isOP(environment, value, Z3_decl_kind.Z3_OP_TRUE);
       } else if (type.isIntegerType()) {
         return new BigInteger(Native.getNumeralString(environment, value));
       } else if (type.isRationalType()) {
@@ -845,13 +845,13 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   }
 
   /** returns, if the function of the expression is the given operation. */
-  static boolean isOP(long z3context, long expr, int op) {
+  static boolean isOP(long z3context, long expr, Z3_decl_kind op) {
     if (!Native.isApp(z3context, expr)) {
       return false;
     }
 
     long decl = Native.getAppDecl(z3context, expr);
-    return Native.getDeclKind(z3context, decl) == op;
+    return Native.getDeclKind(z3context, decl) == op.toInt();
   }
 
   /**
