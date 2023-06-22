@@ -10,9 +10,13 @@ package org.sosy_lab.java_smt.solvers.z3;
 
 import static org.sosy_lab.java_smt.solvers.z3.Z3FormulaCreator.isOP;
 
+import com.google.common.collect.Iterables;
+import com.google.common.primitives.Longs;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.enumerations.Z3_decl_kind;
 import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 
 class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, Long, Long> {
@@ -87,49 +91,47 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
 
   @Override
   protected Long orImpl(Collection<Long> params) {
-    // Z3 does not do any simplifications, so we filter "false" and short-circuit on "true".
-    final long[] operands = new long[params.size()]; // over-approximate size
-    int count = 0;
+    // Z3 does not do any simplifications,
+    // so we filter "true", short-circuit on "false", and filter out (simple) redundancies.
+    final Set<Long> operands = new LinkedHashSet<>();
     for (final Long operand : params) {
       if (isTrue(operand)) {
-        return operand;
+        return z3true;
       }
       if (!isFalse(operand)) {
-        operands[count] = operand;
-        count++;
+        operands.add(operand);
       }
     }
-    switch (count) {
+    switch (operands.size()) {
       case 0:
         return z3false;
       case 1:
-        return operands[0];
+        return Iterables.getOnlyElement(operands);
       default:
-        return Native.mkOr(z3context, count, operands); // we can pass partially filled array to Z3
+        return Native.mkOr(z3context, operands.size(), Longs.toArray(operands));
     }
   }
 
   @Override
   protected Long andImpl(Collection<Long> params) {
-    // Z3 does not do any simplifications, so we filter "true" and short-circuit on "false".
-    final long[] operands = new long[params.size()]; // over-approximate size
-    int count = 0;
+    // Z3 does not do any simplifications,
+    // so we filter "true", short-circuit on "false", and filter out (simple) redundancies.
+    final Set<Long> operands = new LinkedHashSet<>();
     for (final Long operand : params) {
       if (isFalse(operand)) {
-        return operand;
+        return z3false;
       }
       if (!isTrue(operand)) {
-        operands[count] = operand;
-        count++;
+        operands.add(operand);
       }
     }
-    switch (count) {
+    switch (operands.size()) {
       case 0:
         return z3true;
       case 1:
-        return operands[0];
+        return Iterables.getOnlyElement(operands);
       default:
-        return Native.mkAnd(z3context, count, operands); // we can pass partially filled array to Z3
+        return Native.mkAnd(z3context, operands.size(), Longs.toArray(operands));
     }
   }
 

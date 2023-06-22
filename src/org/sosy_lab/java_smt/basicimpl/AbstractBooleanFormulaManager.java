@@ -132,7 +132,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
    */
   protected TFormulaInfo andImpl(Collection<TFormulaInfo> pParams) {
     TFormulaInfo result = makeBooleanImpl(true);
-    for (TFormulaInfo formula : pParams) {
+    for (TFormulaInfo formula : ImmutableSet.copyOf(pParams)) {
       if (isFalse(formula)) {
         return formula;
       }
@@ -194,7 +194,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
    */
   protected TFormulaInfo orImpl(Collection<TFormulaInfo> pParams) {
     TFormulaInfo result = makeBooleanImpl(false);
-    for (TFormulaInfo formula : pParams) {
+    for (TFormulaInfo formula : ImmutableSet.copyOf(pParams)) {
       if (isTrue(formula)) {
         return formula;
       }
