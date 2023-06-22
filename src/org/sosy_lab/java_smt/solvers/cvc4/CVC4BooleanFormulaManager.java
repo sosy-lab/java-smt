@@ -42,6 +42,13 @@ public class CVC4BooleanFormulaManager
 
   @Override
   protected Expr not(Expr pParam1) {
+    if (isTrue(pParam1)) {
+      return cvc4False;
+    } else if (isFalse(pParam1)) {
+      return cvc4True;
+    } else if (pParam1.getKind() == Kind.NOT) {
+      return pParam1.getChild(0);
+    }
     return exprManager.mkExpr(Kind.NOT, pParam1);
   }
 

@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
+import io.github.cvc5.CVC5ApiException;
 import io.github.cvc5.Kind;
 import io.github.cvc5.Solver;
 import io.github.cvc5.Sort;
@@ -37,6 +38,17 @@ public class CVC5BooleanFormulaManager
 
   @Override
   protected Term not(Term pParam1) {
+    try {
+      if (isTrue(pParam1)) {
+        return makeBooleanImpl(false);
+      } else if (isFalse(pParam1)) {
+        return makeBooleanImpl(true);
+      } else if (pParam1.getKind() == Kind.NOT) {
+        return pParam1.getChild(0);
+      }
+    } catch (CVC5ApiException e) {
+      throw new IllegalArgumentException("Failure when negating the term '" + pParam1 + "'.", e);
+    }
     return solver.mkTerm(Kind.NOT, pParam1);
   }
 

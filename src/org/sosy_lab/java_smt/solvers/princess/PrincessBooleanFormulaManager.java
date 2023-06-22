@@ -68,7 +68,11 @@ class PrincessBooleanFormulaManager
 
   @Override
   public IFormula not(IExpression pBits) {
-    if (pBits instanceof INot) {
+    if (isTrue(pBits)) {
+      return pFalse;
+    } else if (isFalse(pBits)) {
+      return pTrue;
+    } else if (pBits instanceof INot) {
       return ((INot) pBits).subformula(); // "not not a" == "a"
     } else {
       return new INot((IFormula) pBits);
@@ -79,17 +83,13 @@ class PrincessBooleanFormulaManager
   public IFormula and(IExpression t1, IExpression t2) {
     if (t1 == t2) {
       return (IFormula) t1;
-    }
-    if (isTrue(t1)) {
+    } else if (isTrue(t1)) {
       return (IFormula) t2;
-    }
-    if (isTrue(t2)) {
+    } else if (isTrue(t2)) {
       return (IFormula) t1;
-    }
-    if (isFalse(t1)) {
+    } else if (isFalse(t1)) {
       return pFalse;
-    }
-    if (isFalse(t2)) {
+    } else if (isFalse(t2)) {
       return pFalse;
     }
     return simplify(new IBinFormula(IBinJunctor.And(), (IFormula) t1, (IFormula) t2));
@@ -99,17 +99,13 @@ class PrincessBooleanFormulaManager
   public IFormula or(IExpression t1, IExpression t2) {
     if (t1 == t2) {
       return (IFormula) t1;
-    }
-    if (isTrue(t1)) {
+    } else if (isTrue(t1)) {
       return pTrue;
-    }
-    if (isTrue(t2)) {
+    } else if (isTrue(t2)) {
       return pTrue;
-    }
-    if (isFalse(t1)) {
+    } else if (isFalse(t1)) {
       return (IFormula) t2;
-    }
-    if (isFalse(t2)) {
+    } else if (isFalse(t2)) {
       return (IFormula) t1;
     }
     return simplify(new IBinFormula(IBinJunctor.Or(), (IFormula) t1, (IFormula) t2));

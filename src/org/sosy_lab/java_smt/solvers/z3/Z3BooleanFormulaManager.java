@@ -43,6 +43,13 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
 
   @Override
   protected Long not(Long pParam) {
+    if (isTrue(pParam)) {
+      return z3false;
+    } else if (isFalse(pParam)) {
+      return z3true;
+    } else if (isOP(z3context, pParam, Z3_decl_kind.Z3_OP_NOT)) {
+      return Native.getAppArg(z3context, pParam, 0);
+    }
     return Native.mkNot(z3context, pParam);
   }
 
