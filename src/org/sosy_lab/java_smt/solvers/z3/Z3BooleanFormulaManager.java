@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.solvers.z3;
 
 import com.microsoft.z3.Native;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -80,17 +81,18 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
 
   @Override
   protected Long orImpl(Collection<Long> params) {
-    // Z3 does not do any simplifications, so we filter "false" and short-circuit on "true".
+    // Z3 does not do any simplifications, so we filter "false" and duplicate elements.
+    // Need to use iterator for short-circuiting on "true".
+    final Iterator<Long> it = params.stream().filter(f -> !isFalse(f)).distinct().iterator();
     final long[] operands = new long[params.size()]; // over-approximate size
     int count = 0;
-    for (final Long operand : params) {
+    while (it.hasNext()) {
+      final Long operand = it.next();
       if (isTrue(operand)) {
         return operand;
       }
-      if (!isFalse(operand)) {
-        operands[count] = operand;
-        count++;
-      }
+      operands[count] = operand;
+      count++;
     }
     switch (count) {
       case 0:
@@ -109,17 +111,18 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
 
   @Override
   protected Long andImpl(Collection<Long> params) {
-    // Z3 does not do any simplifications, so we filter "true" and short-circuit on "false".
+    // Z3 does not do any simplifications, so we filter "true" and duplicate elements.
+    // Need to use iterator for short-circuiting on "false".
+    final Iterator<Long> it = params.stream().filter(f -> !isTrue(f)).distinct().iterator();
     final long[] operands = new long[params.size()]; // over-approximate size
     int count = 0;
-    for (final Long operand : params) {
+    while (it.hasNext()) {
+      final Long operand = it.next();
       if (isFalse(operand)) {
         return operand;
       }
-      if (!isTrue(operand)) {
-        operands[count] = operand;
-        count++;
-      }
+      operands[count] = operand;
+      count++;
     }
     switch (count) {
       case 0:

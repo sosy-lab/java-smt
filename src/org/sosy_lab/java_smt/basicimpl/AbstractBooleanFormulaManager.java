@@ -124,15 +124,19 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
 
   /**
    * Create an n-ary conjunction. The default implementation delegates to {@link #and(Object,
-   * Object)} and assumes that all simplifications are done by that method. This method can be
-   * overridden, in which case it should filter out irrelevant operands.
+   * Object)}. This method can be overridden, in which case it should filter out irrelevant
+   * operands.
    *
    * @param pParams A collection of at least 3 operands.
    * @return A term that is equivalent to a conjunction of pParams.
    */
   protected TFormulaInfo andImpl(Collection<TFormulaInfo> pParams) {
+    // Binary or cannot eliminate duplicates in cases like or(x, y, x), so we use Stream.distinct()
+    // Need to use iterator for short-circuiting on "false".
+    Iterator<TFormulaInfo> it = pParams.stream().filter(f -> !isTrue(f)).distinct().iterator();
     TFormulaInfo result = makeBooleanImpl(true);
-    for (TFormulaInfo formula : pParams) {
+    while (it.hasNext()) {
+      TFormulaInfo formula = it.next();
       if (isFalse(formula)) {
         return formula;
       }
@@ -186,15 +190,19 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
 
   /**
    * Create an n-ary disjunction. The default implementation delegates to {@link #or(Object,
-   * Object)} and assumes that all simplifications are done by that method. This method can be
-   * overridden, in which case it should filter out irrelevant operands.
+   * Object)}. This method can be overridden, in which case it should filter out irrelevant
+   * operands.
    *
    * @param pParams A collection of at least 3 operands.
    * @return A term that is equivalent to a disjunction of pParams.
    */
   protected TFormulaInfo orImpl(Collection<TFormulaInfo> pParams) {
+    // Binary or cannot eliminate duplicates in cases like or(x, y, x), so we use Stream.distinct()
+    // Need to use iterator for short-circuiting on "true".
+    Iterator<TFormulaInfo> it = pParams.stream().filter(f -> !isFalse(f)).distinct().iterator();
     TFormulaInfo result = makeBooleanImpl(false);
-    for (TFormulaInfo formula : pParams) {
+    while (it.hasNext()) {
+      TFormulaInfo formula = it.next();
       if (isTrue(formula)) {
         return formula;
       }
