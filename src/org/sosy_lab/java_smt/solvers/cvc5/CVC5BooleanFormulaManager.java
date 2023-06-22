@@ -13,9 +13,6 @@ import io.github.cvc5.Solver;
 import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
 import java.util.Collection;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
-import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 
 public class CVC5BooleanFormulaManager
@@ -54,11 +51,6 @@ public class CVC5BooleanFormulaManager
   }
 
   @Override
-  public Collector<BooleanFormula, ?, BooleanFormula> toConjunction() {
-    return Collectors.collectingAndThen(Collectors.toList(), this::and);
-  }
-
-  @Override
   protected Term or(Term pParam1, Term pParam2) {
     return solver.mkTerm(Kind.OR, pParam1, pParam2);
   }
@@ -66,11 +58,6 @@ public class CVC5BooleanFormulaManager
   @Override
   protected Term orImpl(Collection<Term> pParams) {
     return solver.mkTerm(Kind.OR, pParams.toArray(new Term[0]));
-  }
-
-  @Override
-  public Collector<BooleanFormula, ?, BooleanFormula> toDisjunction() {
-    return Collectors.collectingAndThen(Collectors.toList(), this::or);
   }
 
   @Override

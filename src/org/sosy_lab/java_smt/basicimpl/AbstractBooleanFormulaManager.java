@@ -142,8 +142,8 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
   }
 
   @Override
-  public Collector<BooleanFormula, ?, BooleanFormula> toConjunction() {
-    return Collectors.reducing(makeTrue(), this::and);
+  public final Collector<BooleanFormula, ?, BooleanFormula> toConjunction() {
+    return Collectors.collectingAndThen(Collectors.toList(), this::and);
   }
 
   @Override
@@ -204,8 +204,8 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
   }
 
   @Override
-  public Collector<BooleanFormula, ?, BooleanFormula> toDisjunction() {
-    return Collectors.reducing(makeFalse(), this::or);
+  public final Collector<BooleanFormula, ?, BooleanFormula> toDisjunction() {
+    return Collectors.collectingAndThen(Collectors.toList(), this::or);
   }
 
   protected abstract TFormulaInfo xor(TFormulaInfo pParam1, TFormulaInfo pParam2);

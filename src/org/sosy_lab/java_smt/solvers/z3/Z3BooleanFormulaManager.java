@@ -13,9 +13,6 @@ import static org.sosy_lab.java_smt.solvers.z3.Z3FormulaCreator.isOP;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.enumerations.Z3_decl_kind;
 import java.util.Collection;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
-import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 
 class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, Long, Long> {
@@ -106,11 +103,6 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
   }
 
   @Override
-  public Collector<BooleanFormula, ?, BooleanFormula> toDisjunction() {
-    return Collectors.collectingAndThen(Collectors.toList(), this::or);
-  }
-
-  @Override
   protected Long andImpl(Collection<Long> params) {
     // Z3 does not do any simplifications, so we filter "true" and short-circuit on "false".
     final long[] operands = new long[params.size()]; // over-approximate size
@@ -132,11 +124,6 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
       default:
         return Native.mkAnd(z3context, count, operands); // we can pass partially filled array to Z3
     }
-  }
-
-  @Override
-  public Collector<BooleanFormula, ?, BooleanFormula> toConjunction() {
-    return Collectors.collectingAndThen(Collectors.toList(), this::and);
   }
 
   @Override
