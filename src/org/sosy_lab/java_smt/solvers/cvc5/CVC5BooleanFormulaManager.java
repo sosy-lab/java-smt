@@ -164,6 +164,17 @@ public class CVC5BooleanFormulaManager
 
   @Override
   protected Term ifThenElse(Term pCond, Term pF1, Term pF2) {
+    if (isTrue(pCond)) {
+      return pF1;
+    } else if (isFalse(pCond)) {
+      return pF2;
+    } else if (pF1.equals(pF2)) {
+      return pF1;
+    } else if (isTrue(pF1) && isFalse(pF2)) {
+      return pCond;
+    } else if (isFalse(pF1) && isTrue(pF2)) {
+      return not(pCond);
+    }
     return solver.mkTerm(Kind.ITE, pCond, pF1, pF2);
   }
 }

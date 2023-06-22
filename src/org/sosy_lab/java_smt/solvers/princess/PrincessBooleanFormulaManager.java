@@ -59,6 +59,17 @@ class PrincessBooleanFormulaManager
 
   @Override
   public IExpression ifThenElse(IExpression condition, IExpression t1, IExpression t2) {
+    if (isTrue(condition)) {
+      return t1;
+    } else if (isFalse(condition)) {
+      return t2;
+    } else if (t1.equals(t2)) {
+      return t1;
+    } else if (isTrue(t1) && isFalse(t2)) {
+      return condition;
+    } else if (isFalse(t1) && isTrue(t2)) {
+      return not(condition);
+    }
     if (t1 instanceof IFormula) {
       return new IFormulaITE((IFormula) condition, (IFormula) t1, (IFormula) t2);
     } else {

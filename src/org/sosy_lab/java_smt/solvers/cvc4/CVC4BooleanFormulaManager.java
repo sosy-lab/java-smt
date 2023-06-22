@@ -168,6 +168,17 @@ public class CVC4BooleanFormulaManager
 
   @Override
   protected Expr ifThenElse(Expr pCond, Expr pF1, Expr pF2) {
+    if (isTrue(pCond)) {
+      return pF1;
+    } else if (isFalse(pCond)) {
+      return pF2;
+    } else if (pF1.equals(pF2)) {
+      return pF1;
+    } else if (isTrue(pF1) && isFalse(pF2)) {
+      return pCond;
+    } else if (isFalse(pF1) && isTrue(pF2)) {
+      return not(pCond);
+    }
     return exprManager.mkExpr(Kind.ITE, pCond, pF1, pF2);
   }
 }
