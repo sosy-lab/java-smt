@@ -163,7 +163,13 @@ public final class CVC5SolverContext extends AbstractSolverContext {
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> pOptions) {
-    throw new UnsupportedOperationException("CVC5 does not support Craig interpolation.");
+    Preconditions.checkState(!closed, "solver context is already closed");
+    return new CVC5InterpolatingProver(
+        creator,
+        shutdownNotifier,
+        randomSeed,
+        pOptions,
+        getFormulaManager());
   }
 
   @Override
