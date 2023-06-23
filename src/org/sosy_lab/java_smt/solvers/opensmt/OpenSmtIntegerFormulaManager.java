@@ -40,6 +40,11 @@ class OpenSmtIntegerFormulaManager
   }
 
   @Override
+  protected PTRef divide(PTRef pParam1, PTRef pParam2) {
+    return logic.mkIntDiv(pParam1, pParam2);
+  }
+
+  @Override
   protected PTRef modularCongruence(PTRef pNumber1, PTRef pNumber2, long pModulo) {
     return modularCongruence(pNumber1, pNumber2, BigInteger.valueOf(pModulo));
   }

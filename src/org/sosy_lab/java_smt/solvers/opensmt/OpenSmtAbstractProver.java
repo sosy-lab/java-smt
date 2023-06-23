@@ -103,8 +103,10 @@ public class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<T> {
   @SuppressWarnings("resource")
   @Override
   public Model getModel() {
-    // FIXME
-    throw new UnsupportedOperationException();
+    List<PTRef> assertedTerms = new ArrayList<>();
+    assertedFormulas.forEach(assertedTerms::addAll);
+
+    return new OpenSmtModel(this, creator, assertedTerms);
   }
 
   @Override

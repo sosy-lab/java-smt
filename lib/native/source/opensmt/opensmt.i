@@ -536,10 +536,12 @@
   }
   
   %newobject getArgs;
-  const std::vector<PTRef>& getArgs() const {
+  std::vector<PTRef> getArgs() {
     std::vector<PTRef> res;
-    for(a : $self->getArgs())
-      res.emplaceBack(a);
+    for(PTRef a : $self->getArgs()) {
+      res.emplace_back(a);
+    }
+    return res;
   }
 }
 
@@ -1155,7 +1157,7 @@
 %ignore Model::Model (Logic &logic, Evaluation basicEval, SymbolDefinition symbolDef); 
 %ignore Model::Model (Logic &logic, Evaluation basicEval);
   
-%ignore Model::getDefinition (SymRef) const;
+//%ignore Model::getDefinition (SymRef) const;
 %ignore Model::getFormalArgBaseNameForSymbol (const Logic &logic, SymRef sr, const std::string &formalArgDefaultPrefix);
 
 %include "include/opensmt/Model.h"

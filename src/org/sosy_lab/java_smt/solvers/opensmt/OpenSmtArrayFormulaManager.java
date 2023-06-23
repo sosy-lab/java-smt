@@ -37,7 +37,7 @@ public class OpenSmtArrayFormulaManager
   protected PTRef store(PTRef pArray, PTRef pIndex, PTRef pValue) {
     return logic.mkStore(pArray, pIndex, pValue);
   }
-  
+
   @Override
   @SuppressWarnings("MethodTypeParameterName")
   protected <TI extends Formula, TE extends Formula> PTRef internalMakeArray(
