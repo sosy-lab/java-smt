@@ -53,7 +53,14 @@ SPDX-License-Identifier: Apache-2.0
              should not affect the final binary. -->
         <exec executable="git" dir="${opensmt.path}" failonerror="false">
             <arg value="apply"/>
-            <arg value="${path.source}/static_const_struct.patch"/>
+            <arg value="${path.source}/static_const.patch"/>
+        </exec>
+
+        <!-- Patch in support for parsing formulas through the native interface
+             Hopefully this will make it to the mainbranch.. -->
+        <exec executable="git" dir="${opensmt.path}" failonerror="false">
+            <arg value="apply"/>
+            <arg value="${path.source}/interpret.patch"/>
         </exec>
         
         <!-- Build OpenSMT -->

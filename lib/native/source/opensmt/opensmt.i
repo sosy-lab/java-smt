@@ -638,7 +638,7 @@
 %ignore Logic::getDefaultValuePTRef (const PTRef tr) const;
 %ignore Logic::getDefaultValuePTRef (const SRef sref) const;
 %extend Logic {
-  PTRef getDefaultValue(SRef sref) const {
+  PTRef getDefaultValue(SRef sref) {
     return $self->getDefaultValuePTRef(sref);
   }
  }

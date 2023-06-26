@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.opensmt;
 
+import opensmt.Logic;
 import opensmt.OpenSmt;
 import opensmt.PTRef;
 import opensmt.SRef;
@@ -17,6 +18,9 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 
 class OpenSmtFormulaManager extends AbstractFormulaManager<PTRef, SRef, OpenSmt, SymRef> {
+  private final OpenSmtFormulaCreator creator;
+  private final Logic osmtLogic;
+
   OpenSmtFormulaManager(
       OpenSmtFormulaCreator pFormulaCreator,
       OpenSmtUFManager pFfmgr,
@@ -36,12 +40,14 @@ class OpenSmtFormulaManager extends AbstractFormulaManager<PTRef, SRef, OpenSmt,
         pAfmgr,
         null, // pSLfmgr,
         null); // pStrmgr);
+
+    creator = pFormulaCreator;
+    osmtLogic = pFormulaCreator.getEnv().getLogic();
   }
 
   @Override
   public BooleanFormula parse(String pS) throws IllegalArgumentException {
-    // FIXME
-    throw new UnsupportedOperationException();
+    return creator.encapsulateBoolean(osmtLogic.parseFormula(pS));
   }
 
   @Override

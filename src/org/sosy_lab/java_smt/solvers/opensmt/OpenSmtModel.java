@@ -47,10 +47,7 @@ public class OpenSmtModel extends AbstractModel<PTRef, SRef, OpenSmt> {
     ImmutableList.Builder<ValueAssignment> builder = ImmutableList.builder();
 
     for (PTRef term : userDeclarations.values()) {
-      SymRef sym = osmtLogic.getSymRef(term);
-      TemplateFunction tf = osmtSolver.getModel().getDefinition(sym);
-
-      Integer numArgs = tf.getArgs().size();
+      Integer numArgs = osmtLogic.getSubterms(term).size();
 
       if (numArgs == 0) {
         PTRef value = osmtSolver.getModel().evaluate(term);
@@ -64,6 +61,9 @@ public class OpenSmtModel extends AbstractModel<PTRef, SRef, OpenSmt> {
                 pCreator.convertValue(value),
                 new ArrayList<>()));
       } else {
+        SymRef sym = osmtLogic.getSymRef(term);
+        TemplateFunction tf = osmtSolver.getModel().getDefinition(sym);
+
         for (List<PTRef> path : unfold(numArgs, tf.getBody())) {
           List<PTRef> args = path.subList(0, numArgs);
 

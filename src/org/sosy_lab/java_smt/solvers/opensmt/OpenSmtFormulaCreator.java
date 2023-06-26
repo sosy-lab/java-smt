@@ -326,7 +326,7 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, OpenSmt, 
       return ratValue.isIntegral() ? ratValue.getNum() : ratValue;
     }
 
-    throw new UnsupportedOperationException("Term is not a value");
+    throw new UnsupportedOperationException("Term `" + logic.pp(value) + "` is not a value");
   }
 
   @Override

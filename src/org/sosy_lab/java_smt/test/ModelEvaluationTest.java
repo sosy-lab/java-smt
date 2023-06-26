@@ -203,6 +203,7 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
 
   @Test
   public void testGetBooleansEvaluation() throws SolverException, InterruptedException {
+    // FIXME Defautl value for boolean in OpenSMT is 'true'
     evaluateInModel(
         bmgr.makeVariable("x"),
         bmgr.makeVariable("y"),
@@ -222,6 +223,7 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
 
   @Test
   public void testModelGeneration() throws SolverException, InterruptedException {
+    // FIXME Crashes the JVM
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(bmgr.and(getConstraints()));
       for (int i = 0; i < problemSize; i++) {
@@ -235,6 +237,7 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
 
   @Test
   public void testEvaluatorGeneration() throws SolverException, InterruptedException {
+    // FIXME Crashes the JVM
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(bmgr.and(getConstraints()));
 

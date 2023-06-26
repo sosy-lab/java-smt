@@ -65,6 +65,8 @@ public class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<T> {
     assertedFormulas.push(new ArrayList<>()); // create initial level
 
     // FIXME: Handle prover options
+    // if (pOptions.contains(ProverOptions.GENERATE_MODELS)) {
+    //   solver.setOption("produce-models", "true");
   }
 
   final MainSolver getOsmtSolver() {
@@ -111,6 +113,7 @@ public class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @Override
   public Evaluator getEvaluator() {
+    // FIXME IS this even called?
     Preconditions.checkState(!closed);
     checkGenerateModels();
     return getEvaluatorWithoutChecks();

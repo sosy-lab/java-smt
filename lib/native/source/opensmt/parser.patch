@@ -1,0 +1,118 @@
+diff --git a/src/api/Interpret.cc b/src/api/Interpret.cc
+index 0c778b9f..0e5caef4 100644
+--- a/src/api/Interpret.cc
++++ b/src/api/Interpret.cc
+@@ -1067,11 +1067,13 @@ void Interpret::comment_formatted(const char* fmt_str, ...) const {
+ 
+ 
+ void Interpret::notify_formatted(bool error, const char* fmt_str, ...) {
++    std::stringstream out;
++    
+     va_list ap;
+     int d;
+     char c1, *t;
+     if (error)
+-        std::cout << "(error \"";
++        out << "(error \"";
+     
+     va_start(ap, fmt_str);
+     while (true) {
+@@ -1080,25 +1082,27 @@ void Interpret::notify_formatted(bool error, const char* fmt_str, ...) {
+             switch (*fmt_str++) {
+             case 's':
+                 t = va_arg(ap, char *);
+-                std::cout << t;
++                out << t;
+                 break;
+             case 'd':
+                 d = va_arg(ap, int);
+-                std::cout << d;
++                out << d;
+                 break;
+             case '%':
+-                std::cout << '%';
++                out << '%';
+                 break;
+             }
+         }
+         else if (c1 != '\0')
+-            std::cout << c1;
++            out << c1;
+         else break;
+     }
+     va_end(ap);
+     if (error)
+-        std::cout << "\")" << '\n';
+-    std::cout << std::endl;
++        out << "\")" << '\n';
++    out << std::endl;
++    
++    throw new OsmtApiException(out.str());
+ }
+ 
+ void Interpret::notify_success() {
+diff --git a/src/api/Interpret.h b/src/api/Interpret.h
+index e43b7691..6137c322 100644
+--- a/src/api/Interpret.h
++++ b/src/api/Interpret.h
+@@ -191,6 +191,15 @@ class Interpret {
+         , f_exit     (false)
+         { }
+     
++    Interpret(SMTConfig & c, Logic & l)
++        : config     (c)
++        , f_exit     (false)
++        {
++          logic.reset(&l);
++          main_solver = createMainSolver(l.getName().c_str());
++          main_solver->initialize();
++        }
++    
+     ~Interpret();
+ 
+     int interpFile(FILE* in);
+diff --git a/src/logics/Logic.cc b/src/logics/Logic.cc
+index 486222e4..13255954 100644
+--- a/src/logics/Logic.cc
++++ b/src/logics/Logic.cc
+@@ -15,6 +15,7 @@
+ #include "Substitutor.h"
+ #include "smt2tokens.h"
+ #include "IteHandler.h"
++#include "Interpret.h"
+ 
+ #include <iostream>
+ #include <map>
+@@ -1423,6 +1424,19 @@ Logic::dumpFunction(ostream& dump_out, const TemplateFunction& tpl_fun)
+     dump_out << ")\n";
+ }
+ 
++PTRef Logic::parseFormula(std::string input) {
++
++  SMTConfig* config = new SMTConfig();
++  Interpret* repl = new Interpret(*config, *this);
++  
++  int rval = repl->interpFile(input.data());
++  if (rval != 0) {
++    throw OsmtApiException("Failed to parse input formula");
++  }
++  
++  return repl->getParsedFormula();
++}
++
+ PTRef Logic::instantiateFunctionTemplate(TemplateFunction const & tmplt, vec<PTRef> const & args) {
+     auto const & targs = tmplt.getArgs();
+     if (args.size() != targs.size()) {
+diff --git a/src/logics/Logic.h b/src/logics/Logic.h
+index 2edf68dd..45e42694 100644
+--- a/src/logics/Logic.h
++++ b/src/logics/Logic.h
+@@ -273,6 +273,8 @@ public:
+     void dumpWithLets(std::ostream & out, PTRef formula) const;
+     std::string dumpWithLets(PTRef formula) const;
+     
++    PTRef parseFormula(std::string input);
++    
+     PTRef instantiateFunctionTemplate(TemplateFunction const & tmplt, vec<PTRef> const & args);
+ 
+     SSymRef       getSortSymIndexed()              const { return sym_IndexedSort; }
