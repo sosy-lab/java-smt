@@ -48,19 +48,13 @@ SPDX-License-Identifier: Apache-2.0
         <mkdir dir="${path.build}"/>
         <mkdir dir="${path.install}"/>
 
-        <!-- Patch OpenSMT to avoid swig parser errors
-             This will change some 'const static struct' declarations to 'static const struct' declarations and
-             should not affect the final binary. -->
+        <!-- Patch OpenSMT to avoid swig errors and add some required features
+             * Change some 'const static struct' declarations to 'static const struct' declarations
+             * Add supoort for parsing formulas
+             * Add interface to access sort definitions -->
         <exec executable="git" dir="${opensmt.path}" failonerror="false">
             <arg value="apply"/>
-            <arg value="${path.source}/static_const.patch"/>
-        </exec>
-
-        <!-- Patch in support for parsing formulas through the native interface
-             Hopefully this will make it to the mainbranch.. -->
-        <exec executable="git" dir="${opensmt.path}" failonerror="false">
-            <arg value="apply"/>
-            <arg value="${path.source}/interpret.patch"/>
+            <arg value="${path.source}/api.patch"/>
         </exec>
         
         <!-- Build OpenSMT -->
@@ -104,16 +98,22 @@ SPDX-License-Identifier: Apache-2.0
                 <include name="OpenSmt.java"/>
                 <include name="opensmt_logic.java"/>
                 <include name="OsmtNativeJNI.java"/>
+                <include name="Pterm.java"/>
                 <include name="PTRef.java"/>
                 <include name="SMTConfig.java"/>
                 <include name="SMTOption.java"/>
+                <include name="Sort.java"/>
+                <include name="SortSymbol.java"/>
                 <include name="SRef.java"/>
+                <include name="SSymRef.java"/>
+                <include name="Symbol.java"/>
                 <include name="SymRef.java"/>
                 <include name="TemplateFunction.java"/>
                 <include name="sstat.java"/>
                 <include name="VectorInt.java"/>
                 <include name="VectorPTRef.java"/>
                 <include name="VectorSRef.java"/>
+                <include name="VectorSymRef.java"/>
             </fileset>
         </copy>
 

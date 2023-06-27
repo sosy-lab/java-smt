@@ -43,7 +43,7 @@ public class OpenSmtNativeAPITest {
       return vars;
     } else {
       VectorPTRef vars = new VectorPTRef();
-      for (PTRef sub : logic.getSubterms(term)) {
+      for (PTRef sub : logic.getPterm(term).getArgs()) {
         VectorPTRef res = variables(logic, sub);
         vars.addAll(res);
       }

@@ -1,0 +1,241 @@
+diff --git a/src/api/Interpret.cc b/src/api/Interpret.cc
+index 0c778b9f..7896e60b 100644
+--- a/src/api/Interpret.cc
++++ b/src/api/Interpret.cc
+@@ -1067,11 +1067,13 @@ void Interpret::comment_formatted(const char* fmt_str, ...) const {
+ 
+ 
+ void Interpret::notify_formatted(bool error, const char* fmt_str, ...) {
++    std::stringstream out;
++
+     va_list ap;
+     int d;
+     char c1, *t;
+     if (error)
+-        std::cout << "(error \"";
++        out << "(error \"";
+ 
+     va_start(ap, fmt_str);
+     while (true) {
+@@ -1080,25 +1082,27 @@ void Interpret::notify_formatted(bool error, const char* fmt_str, ...) {
+             switch (*fmt_str++) {
+             case 's':
+                 t = va_arg(ap, char *);
+-                std::cout << t;
++                out << t;
+                 break;
+             case 'd':
+                 d = va_arg(ap, int);
+-                std::cout << d;
++                out << d;
+                 break;
+             case '%':
+-                std::cout << '%';
++                out << '%';
+                 break;
+             }
+         }
+         else if (c1 != '\0')
+-            std::cout << c1;
++            out << c1;
+         else break;
+     }
+     va_end(ap);
+     if (error)
+-        std::cout << "\")" << '\n';
+-    std::cout << std::endl;
++        out << "\")" << '\n';
++    out << std::endl;
++
++    throw new OsmtApiException(out.str());
+ }
+ 
+ void Interpret::notify_success() {
+diff --git a/src/api/Interpret.h b/src/api/Interpret.h
+index e43b7691..062936fd 100644
+--- a/src/api/Interpret.h
++++ b/src/api/Interpret.h
+@@ -191,6 +191,15 @@ class Interpret {
+         , f_exit     (false)
+         { }
+ 
++    Interpret(SMTConfig & c, Logic & l)
++        : config     (c)
++        , f_exit     (false)
++        {
++          logic.reset(&l);
++          main_solver = createMainSolver(l.getName().c_str());
++          main_solver->initialize();
++        }
++
+     ~Interpret();
+ 
+     int interpFile(FILE* in);
+diff --git a/src/logics/FunctionTools.h b/src/logics/FunctionTools.h
+index fc9dbfb7..943a466d 100644
+--- a/src/logics/FunctionTools.h
++++ b/src/logics/FunctionTools.h
+@@ -33,7 +33,7 @@ class TemplateFunction {
+     FunctionSignature signature;
+     PTRef tr_body;
+ 
+-    inline static std::string_view constexpr template_arg_prefix = ".arg";
++    inline static constexpr std::string_view template_arg_prefix = ".arg";
+     inline static std::size_t template_arg_counter = 0;
+ public:
+     static std::string nextFreeArgumentName() { return std::string(template_arg_prefix) + std::to_string(template_arg_counter++); }
+diff --git a/src/logics/Logic.cc b/src/logics/Logic.cc
+index 486222e4..55b29e76 100644
+--- a/src/logics/Logic.cc
++++ b/src/logics/Logic.cc
+@@ -15,6 +15,7 @@
+ #include "Substitutor.h"
+ #include "smt2tokens.h"
+ #include "IteHandler.h"
++#include "Interpret.h"
+ 
+ #include <iostream>
+ #include <map>
+@@ -758,6 +759,18 @@ PTRef Logic::mkBoolVar(const char* name)
+     return mkFun(sr, {});
+ }
+ 
++PTRef Logic::parseFormula(std::string input) {
++    SMTConfig* config = new SMTConfig();
++    Interpret* repl = new Interpret(*config, *this);
++
++    int rval = repl->interpFile(input.data());
++    if (rval != 0) {
++      throw OsmtApiException("Failed to parse input formula");
++    }
++
++    return repl->getParsedFormula();
++}
++
+ void Logic::instantiateFunctions(SRef sr)
+ {
+     // Equality
+@@ -1488,6 +1501,9 @@ Logic::collectStats(PTRef root, int& n_of_conn, int& n_of_eq, int& n_of_uf, int&
+ 
+ PTRef Logic::conjoinExtras(PTRef root) { return root; }
+ 
++Sort const&       Logic::getSortDefinition (SRef s)     const { return sort_store[s]; }
++SortSymbol const& Logic::getSortSymbol     (SSymRef ss) const { return sort_store[ss]; }
++
+ // Fetching sorts
+ SRef        Logic::getSortRef    (const PTRef tr)        const { return getSortRef(getPterm(tr).symb()); }
+ SRef        Logic::getSortRef    (const SymRef sr)       const { return getSym(sr).rsort(); }
+diff --git a/src/logics/Logic.h b/src/logics/Logic.h
+index 2edf68dd..e163d4b4 100644
+--- a/src/logics/Logic.h
++++ b/src/logics/Logic.h
+@@ -145,6 +145,9 @@ class Logic {
+     void        markConstant  (SymId sid);
+ 
+   public:
++    const Sort&       getSortDefinition (SRef s)     const;
++    const SortSymbol& getSortSymbol     (SSymRef ss) const;
++
+     SRef                getSortRef (PTRef tr)  const;
+     SRef                getSortRef (SymRef sr) const;
+     std::string         printSort  (SRef s)    const;
+@@ -273,6 +276,8 @@ public:
+     void dumpWithLets(std::ostream & out, PTRef formula) const;
+     std::string dumpWithLets(PTRef formula) const;
+ 
++    PTRef parseFormula(std::string input);
++
+     PTRef instantiateFunctionTemplate(TemplateFunction const & tmplt, vec<PTRef> const & args);
+ 
+     SSymRef       getSortSymIndexed()              const { return sym_IndexedSort; }
+diff --git a/src/logics/Theory.h b/src/logics/Theory.h
+index ef231407..0799d499 100644
+--- a/src/logics/Theory.h
++++ b/src/logics/Theory.h
+@@ -102,7 +102,7 @@ struct PFRef {
+     inline friend bool operator== (const PFRef& a1, const PFRef& a2) { return a1.x == a2.x; };
+ };
+ 
+-const static struct PFRef PFRef_Undef = {INT32_MAX};
++static const struct PFRef PFRef_Undef = {INT32_MAX};
+ 
+ // No global variable for storing the push frame id.  I decided to
+ // implement this as my own memory allocation.  There's no free though
+diff --git a/src/sorts/SSort.h b/src/sorts/SSort.h
+index 990da3b0..14922397 100644
+--- a/src/sorts/SSort.h
++++ b/src/sorts/SSort.h
+@@ -40,7 +40,7 @@ struct SSymRef {
+     inline friend bool operator!= (SSymRef a1, SSymRef a2) {return a1.x != a2.x; }
+ };
+ 
+-const static struct SSymRef SSymRef_Undef = {INT32_MAX};
++static const struct SSymRef SSymRef_Undef = {INT32_MAX};
+ 
+ struct SSymRefHash {
+     uint32_t operator () (SSymRef s) const {
+@@ -66,8 +66,8 @@ struct SRef {
+     inline friend bool operator!= (SRef a1, SRef a2) {return a1.x != a2.x; }
+ };
+ 
+-const static struct SRef SRef_Undef = {INT32_MAX};
+-const static struct SRef SRef_Nil   = {INT32_MAX-1};
++static const struct SRef SRef_Undef = {INT32_MAX};
++static const struct SRef SRef_Nil   = {INT32_MAX-1};
+ 
+ struct SRefHash {
+     uint32_t operator () (const SRef& s) const {
+diff --git a/src/symbols/SymRef.h b/src/symbols/SymRef.h
+index 693d332f..d70758cb 100644
+--- a/src/symbols/SymRef.h
++++ b/src/symbols/SymRef.h
+@@ -35,8 +35,8 @@ struct SymRef {
+     inline friend bool operator!= (const SymRef& a1, const SymRef& a2) {return a1.x != a2.x; }
+ };
+ 
+-const static struct SymRef SymRef_Undef = {INT32_MAX};
+-const static struct SymRef SymRef_Nil   = {INT32_MAX-1};
++static const struct SymRef SymRef_Undef = {INT32_MAX};
++static const struct SymRef SymRef_Nil   = {INT32_MAX-1};
+ 
+ struct SymRefHash {
+     uint32_t operator () (const SymRef& s) const {
+diff --git a/src/symbols/Symbol.h b/src/symbols/Symbol.h
+index e795bd56..4b6f6018 100644
+--- a/src/symbols/Symbol.h
++++ b/src/symbols/Symbol.h
+@@ -48,20 +48,20 @@ struct SymbolConfig {
+ };
+ 
+ namespace SymConf {
+-    constexpr auto Default = SymbolConfig{false, false, false, SymbolProperty::None};
+-    constexpr auto Interpreted = SymbolConfig{true, false, false, SymbolProperty::None};
+-    constexpr auto LeftAssoc = SymbolConfig{false, false, false, SymbolProperty::LeftAssoc};
+-    constexpr auto RightAssoc = SymbolConfig{false, false, false, SymbolProperty::RightAssoc};
+-    constexpr auto Chainable = SymbolConfig{false, false, false, SymbolProperty::Chainable};
+-    constexpr auto Pairwise = SymbolConfig{false, false, false, SymbolProperty::Pairwise};
+-    constexpr auto NoScopingLeftAssoc = SymbolConfig{true, false, true, SymbolProperty::LeftAssoc};
+-    constexpr auto NoScopingRightAssoc = SymbolConfig{true, false, true, SymbolProperty::RightAssoc};
+-    constexpr auto NoScopingPairwise = SymbolConfig{true, false, true, SymbolProperty::Pairwise};
+-    constexpr auto NoScopingChainable = SymbolConfig{true, false, true, SymbolProperty::Chainable};
+-    constexpr auto NoScoping = SymbolConfig{true, false, true, SymbolProperty::None};
+-    constexpr auto CommutativeNoScopingLeftAssoc = SymbolConfig{true, true, true, SymbolProperty::LeftAssoc};
+-    constexpr auto CommutativeNoScopingChainable = SymbolConfig{true, true, true, SymbolProperty::Chainable};
+-    constexpr auto CommutativeNoScopingPairwise = SymbolConfig{true, true, true, SymbolProperty::Pairwise};
++    constexpr SymbolConfig Default = SymbolConfig{false, false, false, SymbolProperty::None};
++    constexpr SymbolConfig Interpreted = SymbolConfig{true, false, false, SymbolProperty::None};
++    constexpr SymbolConfig LeftAssoc = SymbolConfig{false, false, false, SymbolProperty::LeftAssoc};
++    constexpr SymbolConfig RightAssoc = SymbolConfig{false, false, false, SymbolProperty::RightAssoc};
++    constexpr SymbolConfig Chainable = SymbolConfig{false, false, false, SymbolProperty::Chainable};
++    constexpr SymbolConfig Pairwise = SymbolConfig{false, false, false, SymbolProperty::Pairwise};
++    constexpr SymbolConfig NoScopingLeftAssoc = SymbolConfig{true, false, true, SymbolProperty::LeftAssoc};
++    constexpr SymbolConfig NoScopingRightAssoc = SymbolConfig{true, false, true, SymbolProperty::RightAssoc};
++    constexpr SymbolConfig NoScopingPairwise = SymbolConfig{true, false, true, SymbolProperty::Pairwise};
++    constexpr SymbolConfig NoScopingChainable = SymbolConfig{true, false, true, SymbolProperty::Chainable};
++    constexpr SymbolConfig NoScoping = SymbolConfig{true, false, true, SymbolProperty::None};
++    constexpr SymbolConfig CommutativeNoScopingLeftAssoc = SymbolConfig{true, true, true, SymbolProperty::LeftAssoc};
++    constexpr SymbolConfig CommutativeNoScopingChainable = SymbolConfig{true, true, true, SymbolProperty::Chainable};
++    constexpr SymbolConfig CommutativeNoScopingPairwise = SymbolConfig{true, true, true, SymbolProperty::Pairwise};
+ }
+ 
+ enum class SymbolMatcher : char {

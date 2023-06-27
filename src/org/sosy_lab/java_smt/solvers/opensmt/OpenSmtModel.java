@@ -47,7 +47,7 @@ public class OpenSmtModel extends AbstractModel<PTRef, SRef, OpenSmt> {
     ImmutableList.Builder<ValueAssignment> builder = ImmutableList.builder();
 
     for (PTRef term : userDeclarations.values()) {
-      Integer numArgs = osmtLogic.getSubterms(term).size();
+      Integer numArgs = osmtLogic.getPterm(term).size();
 
       if (numArgs == 0) {
         PTRef value = osmtSolver.getModel().evaluate(term);
@@ -90,10 +90,10 @@ public class OpenSmtModel extends AbstractModel<PTRef, SRef, OpenSmt> {
     ArrayList<ArrayList<PTRef>> unwrapped = new ArrayList<ArrayList<PTRef>>();
 
     if (osmtLogic.isIte(body)) {
-      VectorPTRef subterms = osmtLogic.getSubterms(body);
+      VectorPTRef subterms = osmtLogic.getPterm(body).getArgs();
       PTRef left = subterms.get(1);
       PTRef right = subterms.get(2);
-      PTRef value = osmtLogic.getSubterms(subterms.get(0)).get(0);
+      PTRef value = osmtLogic.getPterm(subterms.get(0)).getArgs().get(0);
 
       for (ArrayList<PTRef> nested : unfold(numArgs - 1, left)) {
         ArrayList<PTRef> prefixed = new ArrayList<PTRef>();

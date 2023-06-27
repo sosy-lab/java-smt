@@ -342,7 +342,7 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, OpenSmt, 
 
     // FIXME: Handle abstract values for arrays?
 
-    VectorPTRef subterms = logic.getSubterms(f);
+    VectorPTRef subterms = logic.getPterm(f).getArgs();
 
     ImmutableList.Builder<Formula> argTerms = ImmutableList.builder();
     ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();

@@ -16,9 +16,10 @@
 %include <std_string.i>
 %include <std_vector.i>
 
-%template(VectorInt)   std::vector<int>;
-%template(VectorPTRef) std::vector<PTRef>;
-%template(VectorSRef)  std::vector<SRef>;
+%template(VectorInt)    std::vector<int>;
+%template(VectorPTRef)  std::vector<PTRef>;
+%template(VectorSRef)   std::vector<SRef>;
+%template(VectorSymRef) std::vector<SymRef>;
 
 %include <std_unique_ptr.i>
 
@@ -460,11 +461,85 @@
 
 %include "include/opensmt/PTRef.h"
 
-%ignore SSymRef;
+%ignore PTLKey;
+%ignore PTLHash;
+%ignore PTId;
+
+//%ignore Pterm::size () const;
+%ignore Pterm::operator[] (int i) const;
+//%ignore Pterm::symb () const;
+%ignore Pterm::has_extra () const;
+%ignore Pterm::reloced () const;
+%ignore Pterm::relocation () const;
+%ignore Pterm::relocate (PTRef t);
+%ignore Pterm::type () const;
+%ignore Pterm::type (uint32_t m);
+%ignore Pterm::left_assoc () const;
+%ignore Pterm::right_assoc () const;
+%ignore Pterm::chainable () const;
+%ignore Pterm::pairwise () const;
+%ignore Pterm::noScoping () const;
+%ignore Pterm::nargs () const;
+%ignore Pterm::setLeftAssoc ();
+%ignore Pterm::setRightAssoc ();
+%ignore Pterm::setChainable ();
+%ignore Pterm::setPairwise ();
+%ignore Pterm::setNoScoping ();
+%ignore Pterm::getId () const;
+%ignore Pterm::setId (int i);
+%ignore Pterm::shrink (int s);
+%ignore Pterm::begin () const;
+%ignore Pterm::end () const;
+%extend Pterm {
+  %newobject getArgs;
+  std::vector<PTRef> getArgs() {
+    std::vector<PTRef> args;
+    for(auto i=0; i<$self->size(); i++)
+      args.emplace_back($self->operator[](i));
+    return args;
+  }
+ }
+
+%ignore PtPair;
+%ignore PtChild;
+%ignore PtChildHash;
+%ignore PtermAllocator;
+
+%include "include/opensmt/Pterm.h"
+
+//%ignore SSymRef;
+%ignore SSymRef::operator= (uint32_t v);
+%ignore operator== (SSymRef a1, SSymRef a2);
+%ignore operator!= (SSymRef a1, SSymRef a2);
+
 %ignore SSymRef_Undef;
 %ignore SSymRefHash;
-%ignore SortSymbol;
 
+%typemap(javacode) SSymRef %{
+  public boolean equals(Object object) {
+    if(object instanceof $javaclassname) {
+      SSymRef that = ($javaclassname) object;
+      return this.getX() == that.getX();
+    }
+    return false;
+  }
+  
+  public int hashCode() {
+    return Long.hashCode(this.getX());
+  }
+%}
+
+//%ignore SortSymbol;
+%ignore SortSymbol::SortSymbol (std::string name_, unsigned int arity);
+%ignore SortSymbol::SortSymbol (std::string name_, unsigned int arity, unsigned int flags);
+%ignore SortSymbol::SortSymbol (SortSymbol &&);
+%ignore SortSymbol::SortSymbol (SortSymbol const &);
+//%ignore SortSymbol::isInternal () const;
+//%ignore SortSymbol::name;
+//%ignore SortSymbol::arity;
+%ignore SortSymbol::flags;
+
+//$ignore SRef;
 %ignore SRef::operator= (uint32_t v);
 %ignore operator== (SRef a1, SRef a2);
 %ignore operator!= (SRef a1, SRef a2);
@@ -488,7 +563,22 @@
   }
 %}
 
-%ignore Sort;
+//%ignore Sort;
+%ignore Sort::Sort (SSymRef symRef_, sortid_t uniq_id_, vec< SRef > const &rest);
+%ignore Sort::getId () const;
+//%ignore Sort::getSymRef () const;
+//%ignore Sort::getSize () const;
+%ignore Sort::operator[] (uint32_t index) const;
+%extend Sort {
+  %newobject getArgs;
+  std::vector<SRef> getArgs() {
+    std::vector<SRef> args;
+    for(auto i=0; i<$self->getSize(); i++)
+      args.emplace_back($self->operator[](i));
+    return args;
+  }
+ }
+
 %ignore SortKey;
 %ignore SortSymbolAllocator;
 
@@ -521,6 +611,44 @@
 %}
 
 %include "include/opensmt/SymRef.h"
+
+%ignore SymbolProperty;
+%ignore SymbolConfig;
+%ignore SymConf;
+%ignore SymbolMatcher;
+
+//%ignore Symbol;
+//%ignore Symbol::size ();
+%ignore Symbol::operator[] (int i);
+%ignore Symbol::begin () const;
+%ignore Symbol::end () const;
+//%ignore Symbol::rsort () const;
+%ignore Symbol::commutes () const;
+%ignore Symbol::relocation () const;
+%ignore Symbol::type () const;
+%ignore Symbol::left_assoc () const;
+%ignore Symbol::right_assoc () const;
+%ignore Symbol::chainable () const;
+%ignore Symbol::pairwise () const;
+%ignore Symbol::noScoping () const;
+%ignore Symbol::nargs () const;
+%ignore Symbol::getId () const;
+%ignore Symbol::setId (int i);
+//%ignore Symbol::isInterpreted () const;
+%ignore Symbol::matches (SymbolMatcher matcher) const;
+%extend Symbol {
+  %newobject getArgs;
+  std::vector<SRef> getArgs() {
+    std::vector<SRef> args;
+    for(auto i=0; i<$self->size(); i++)
+      args.emplace_back($self->operator[](i));
+    return args;
+  }
+ }
+
+%ignore SymbolAllocator;
+
+%include "include/opensmt/Symbol.h"
 
 %ignore FunctionSignature;
 
@@ -620,17 +748,7 @@
 %ignore Logic::symNameToRef (const char *s);
 %ignore Logic::hasSym (const char *s) const;
 %ignore Logic::commutes (const SymRef s) const;
-%ignore Logic::getPterm (const PTRef tr);
-%extend Logic {
-  %newobject getSubterms;
-  std::vector<PTRef> getSubterms(PTRef tr) {
-    std::vector<PTRef> res;
-    Pterm& pt = $self->getPterm(tr);
-    for(auto i=0; i<pt.size(); i++)
-      res.emplace_back(pt[i]);
-    return res;
-  }
- }
+//%ignore Logic::getPterm (const PTRef tr);
 %ignore Logic::getPterm (const PTRef tr) const;
 %ignore Logic::getPtermIter ();
 %ignore Logic::getTermMarks (PTId maxTermId) const;
