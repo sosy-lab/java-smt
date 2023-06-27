@@ -77,6 +77,7 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     solver.setOption("dump-models", "true");
     solver.setOption("output-language", "smt2");
     solver.setOption("seed", String.valueOf(randomSeed));
+    solver.setOption("produce-interpolants", "true");
 
     // Set Strings option to enable all String features (such as lessOrEquals)
     solver.setOption("strings-exp", "true");
