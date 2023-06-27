@@ -68,18 +68,10 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, OpenSmt, 
   public SymRef declareUFImpl(String pName, SRef pReturnType, List<SRef> pArgTypes) {
     return getEnv().getLogic().declareFun(pName, pReturnType, new VectorSRef(pArgTypes));
   }
-
-  // FIXME: This is a bit of a hack. OpenSmt has no way of accessing the element and index types
-  // of an array. We just store them here for now. Maybe there's a better way?
-  private Map<SRef, SRef> arrayIndexTypes = new HashMap<SRef, SRef>();
-  private Map<SRef, SRef> arrayElementTypes = new HashMap<SRef, SRef>();
-
+  
   @Override
   public SRef getArrayType(SRef indexType, SRef elementType) {
-    SRef array = getEnv().getLogic().getArraySort(indexType, elementType);
-    arrayIndexTypes.put(array, indexType);
-    arrayElementTypes.put(array, elementType);
-    return array;
+    return getEnv().getLogic().getArraySort(indexType, elementType);
   }
 
   @Override
@@ -136,8 +128,9 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, OpenSmt, 
       return FormulaType.BooleanType;
     }
     if (logic.isArraySort(sort)) {
-      FormulaType<?> indexType = getFormulaTypeFromTermType(arrayIndexTypes.get(sort));
-      FormulaType<?> elementType = getFormulaTypeFromTermType(arrayElementTypes.get(sort));
+      VectorSRef args = getEnv().getLogic().getSortDefinition(sort).getArgs();
+      FormulaType<?> indexType = getFormulaTypeFromTermType(args.get(0));
+      FormulaType<?> elementType = getFormulaTypeFromTermType(args.get(1));
       return FormulaType.getArrayType(indexType, elementType);
     }
     ArithLogic alogic = getEnv().getLRALogic();
