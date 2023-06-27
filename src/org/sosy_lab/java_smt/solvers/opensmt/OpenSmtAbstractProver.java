@@ -64,9 +64,12 @@ public class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<T> {
 
     assertedFormulas.push(new ArrayList<>()); // create initial level
 
-    // FIXME: Handle prover options
+    // FIXME Handle prover options
     // if (pOptions.contains(ProverOptions.GENERATE_MODELS)) {
     //   solver.setOption("produce-models", "true");
+
+    // FIXME Disable Model generation if arrays are required
+    // https://github.com/usi-verification-and-security/opensmt/issues/630
   }
 
   final MainSolver getOsmtSolver() {

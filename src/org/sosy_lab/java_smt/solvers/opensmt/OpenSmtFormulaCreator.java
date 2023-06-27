@@ -128,7 +128,8 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, OpenSmt, 
       return FormulaType.BooleanType;
     }
     if (logic.isArraySort(sort)) {
-      VectorSRef args = getEnv().getLogic().getSortDefinition(sort).getArgs();
+      VectorSRef args = getEnv().getLogic().getSortDef(sort).getArgs();
+      
       FormulaType<?> indexType = getFormulaTypeFromTermType(args.get(0));
       FormulaType<?> elementType = getFormulaTypeFromTermType(args.get(1));
       return FormulaType.getArrayType(indexType, elementType);
@@ -329,14 +330,17 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, OpenSmt, 
     if (logic.isConstant(f)) {
       return visitor.visitConstant(formula, convertValue(f));
     }
+    
     if (logic.isVar(f)) {
-      return visitor.visitFreeVariable(formula, dequote(logic.getSymName(f)));
+      String varName = logic.getSymName(logic.getSymRef(f));
+      return visitor.visitFreeVariable(formula, dequote(varName));
     }
 
     // FIXME: Handle abstract values for arrays?
-
+    
+    String varName = logic.getSymName(logic.getSymRef(f));
     VectorPTRef subterms = logic.getPterm(f).getArgs();
-
+    
     ImmutableList.Builder<Formula> argTerms = ImmutableList.builder();
     ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
 
@@ -349,7 +353,7 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, OpenSmt, 
         formula,
         argTerms.build(),
         FunctionDeclarationImpl.of(
-            logic.getSymName(f),
+            varName,
             getDeclarationKind(f),
             argTypes.build(),
             getFormulaType(f),

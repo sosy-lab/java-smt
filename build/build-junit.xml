@@ -58,41 +58,12 @@ SPDX-License-Identifier: Apache-2.0
             <sysproperty key="java.awt.headless" value="true" />
             <batchtest fork="true" todir="${junit.dir}">
               <fileset dir="${class.dir}">
-                    <include name="**/OpenSmtNativeAPITest.*"/>
-                    <include name="**/ExceptionHandlerTest.*"/>
-                    <include name="**/PrettyPrinterTest.*"/>
-                    <include name="**/FormulaClassifierTest.*"/>
-                    <include name="**/ProverEnvironmentSubjectTest.*"/>
-                    <include name="**/SolverFormulaWithAssumptionsTest.*"/>
-                    <include name="**/SolverTacticsTest.*"/>
-                    <include name="**/NonLinearArithmeticTest.*"/>
-                    <include name="**/StringFormulaManagerTest.*"/>
-                    <include name="**/ArrayFormulaManagerTest.*"/>
-                    <include name="**/SolverAllSatTest.*"/>
-                    <include name="**/SolverVisitorTest.*"/>
-                    <include name="**/FloatingPointFormulaManagerTest.*"/>
-                    <include name="**/TimeoutTest.*"/>
-                    <include name="**/BitvectorFormulaManagerTest.*"/>
-                    <include name="**/SolverContextFactoryTest.*"/>
-                    <include name="**/RationalFormulaManagerTest.*"/>
-                    <include name="**/SolverConcurrencyTest.*"/>
-                    <include name="**/NonLinearArithmeticWithModuloTest.*"/>
-                    <include name="**/UFManagerTest.*"/>
-                    <include name="**/ProverEnvironmentTest.*"/>
-                    <include name="**/QuantifierManagerTest.*"/>
-                    <include name="**/SolverContextTest.*"/>
-                    <include name="**/SolverFormulaIODeclarationsTest.*"/>
-                    <include name="**/SolverTheoriesTest.*"/>
-                    <include name="**/BooleanFormulaManagerTest.*"/>
-                    <include name="**/OptimizationTest.*"/>
-                    <include name="**/ModelTest.*"/>
-                    <include name="**/SolverFormulaIOTest.*"/>
-                    <include name="**/UfEliminationTest.*"/>
-                    <include name="**/BooleanFormulaSubjectTest.*"/>
-                    <include name="**/NumeralFormulaManagerTest.*"/>
-                    <include name="**/ModelEvaluationTest.*"/>
-                    <include name="**/FormulaManagerTest.*"/>
-                </fileset>
+                    <include name="**/*Test.*"/>
+                    <exclude name="**/*$*Test.*"/>
+                    <exclude name="**/*NativeApiTest.*"/>
+                    <exclude name="**/VariableNamesTest.*"/>
+                    <exclude name="**/VariableNamesEscaperTest.*"/>
+              </fileset>
             </batchtest>
         </junit>
         <junitreport todir="${junit.dir}">
@@ -119,40 +90,12 @@ SPDX-License-Identifier: Apache-2.0
                 <sysproperty key="java.awt.headless" value="true" />
                 <batchtest fork="true" todir="${junit.dir}">
                     <fileset dir="${class.dir}">
-                        <include name="**/OpenSmtNativeAPITest.*"/>
-                        <include name="**/ExceptionHandlerTest.*"/>
-                        <include name="**/PrettyPrinterTest.*"/>
-                        <include name="**/FormulaClassifierTest.*"/>
-                        <include name="**/ProverEnvironmentSubjectTest.*"/>
-                        <include name="**/SolverFormulaWithAssumptionsTest.*"/>
-                        <include name="**/SolverTacticsTest.*"/>
-                        <include name="**/NonLinearArithmeticTest.*"/>
-                        <include name="**/StringFormulaManagerTest.*"/>
-                        <include name="**/ArrayFormulaManagerTest.*"/>
-                        <include name="**/SolverAllSatTest.*"/>
-                        <include name="**/SolverVisitorTest.*"/>
-                        <include name="**/FloatingPointFormulaManagerTest.*"/>
-                        <include name="**/TimeoutTest.*"/>
-                        <include name="**/BitvectorFormulaManagerTest.*"/>
-                        <include name="**/SolverContextFactoryTest.*"/>
-                        <include name="**/RationalFormulaManagerTest.*"/>
-                        <include name="**/SolverConcurrencyTest.*"/>
-                        <include name="**/NonLinearArithmeticWithModuloTest.*"/>
-                        <include name="**/UFManagerTest.*"/>
-                        <include name="**/ProverEnvironmentTest.*"/>
-                        <include name="**/QuantifierManagerTest.*"/>
-                        <include name="**/SolverContextTest.*"/>
-                        <include name="**/SolverFormulaIODeclarationsTest.*"/>
-                        <include name="**/SolverTheoriesTest.*"/>
-                        <include name="**/BooleanFormulaManagerTest.*"/>
-                        <include name="**/OptimizationTest.*"/>
-                        <include name="**/ModelTest.*"/>
-                        <include name="**/SolverFormulaIOTest.*"/>
-                        <include name="**/UfEliminationTest.*"/>
-                        <include name="**/BooleanFormulaSubjectTest.*"/>
-                        <include name="**/NumeralFormulaManagerTest.*"/>
-                        <include name="**/ModelEvaluationTest.*"/>
-                        <include name="**/FormulaManagerTest.*"/>
+                        <include name="**/*Test.*"/>
+                        <exclude name="**/*$*Test.*"/>
+                        <exclude name="**/*NativeApiTest.*"/>
+                        <exclude name="**/*NativeAPITest.*"/>
+                        <exclude name="**/VariableNamesTest.*"/>
+                        <exclude name="**/VariableNamesEscaperTest.*"/>
                     </fileset>
                 </batchtest>
             </junit>

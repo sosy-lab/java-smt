@@ -619,7 +619,7 @@
 
 //%ignore Symbol;
 //%ignore Symbol::size ();
-%ignore Symbol::operator[] (int i);
+%ignore Symbol::operator[] (int i) const;
 %ignore Symbol::begin () const;
 %ignore Symbol::end () const;
 //%ignore Symbol::rsort () const;
@@ -705,7 +705,7 @@
 %ignore Logic::hasReals () const;
 //%ignore Logic::getSortRef (PTRef tr) const; 
 %ignore Logic::getSortRef (SymRef sr) const;
-%ignore Logic::printSort (SRef s) const;
+//%ignore Logic::printSort (SRef s) const;
 //%ignore Logic::getSortSize (SRef s) const;
 %extend Logic {
   SRef getArraySort(SRef sortIndex, SRef sortElements) {
@@ -740,11 +740,11 @@
  }
 %ignore Logic::getUniqueArgSort (SymRef sr) const;
 %ignore Logic::getUniqueArgSort (PTRef tr) const;
-%ignore Logic::getSym (const SymRef s) const;
+//%ignore Logic::getSym (const SymRef s) const;
 %ignore Logic::getSym (const PTRef tr) const;
 //%ignore Logic::getSymRef (const PTRef tr) const;
-//%ignore Logic::getSymName (const PTRef tr) const;
-%ignore Logic::getSymName (const SymRef s) const;
+%ignore Logic::getSymName (const PTRef tr) const;
+//%ignore Logic::getSymName (const SymRef s) const;
 %ignore Logic::symNameToRef (const char *s);
 %ignore Logic::hasSym (const char *s) const;
 %ignore Logic::commutes (const SymRef s) const;
