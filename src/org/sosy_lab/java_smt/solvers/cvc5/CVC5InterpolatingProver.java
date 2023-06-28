@@ -81,6 +81,10 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     // TODO Auto-generated method stub
     Preconditions.checkState(!closed);
 
+    if (pFormulasOfA.isEmpty()) {
+      return mgr.getBooleanFormulaManager().makeBoolean(true);
+    }
+
     Set<Term> formulasOfA = ImmutableSet.copyOf(pFormulasOfA);
     // formulasOfB := assertedFormulas - formulas
     Set<Term> formulasOfB =
@@ -88,30 +92,40 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
             .filter(n -> !formulasOfA.contains(n))
             .collect(ImmutableSet.toImmutableSet());
 
+    ArrayList<Collection<Term>> formAAsList = new ArrayList<>();
+    ArrayList<Collection<Term>> formBAsList = new ArrayList<>();
 
-    //Term assertions = solver.mkBoolean(false);
+    formAAsList.add(formulasOfA);
+    formBAsList.add(formulasOfB);
 
-    //for (Term t : pFormulasOfA) {
-    //  assertions = solver.mkTerm(Kind.OR, solver.mkTerm(Kind.NEG, t), assertions);
-    //}
+    ArrayList<ArrayList<Collection<Term>>> interpolPair = new ArrayList<>();
+    interpolPair.add(formAAsList);
+    interpolPair.add(formBAsList);
 
-    // Term itp = solver.getInterpolant(assertions);
+    Term itp = getCVC5Interpolation(interpolPair);
 
-    // BooleanFormula result = creator.encapsulateBoolean(itp);
+    BooleanFormula result = creator.encapsulateBoolean(itp);
 
-    // return result;
-    return Iterables.getOnlyElement(getSeqInterpolants(ImmutableList.of(formulasOfA, formulasOfB)));
+    return result;
+    // return Iterables.getOnlyElement(getSeqInterpolants(ImmutableList.of(formulasOfA,
+    // formulasOfB)));
   }
 
-  /*
-   * @Override public List<BooleanFormula> getSeqInterpolants(List<? extends Collection<Term>>
-   * partitionedFormulas) throws SolverException { Preconditions.checkArgument(
-   * !partitionedFormulas.isEmpty(), "at least one partition should be available.");
-   * 
-   * final List<BooleanFormula> itps = new ArrayList<>(); for (int i = 1; i <
-   * partitionedFormulas.size(); i++) { itps.add( getInterpolant(
-   * ImmutableList.copyOf(Iterables.concat(partitionedFormulas.subList(0, i))))); } return itps; }
-   */
+  @Override
+  public List<BooleanFormula>
+      getSeqInterpolants(List<? extends Collection<Term>> partitionedFormulas)
+          throws SolverException, InterruptedException {
+    Preconditions.checkArgument(
+        !partitionedFormulas.isEmpty(),
+        "at least one partition should be available.");
+    final List<BooleanFormula> itps = new ArrayList<>();
+    for (int i = 1; i < partitionedFormulas.size(); i++) {
+      itps.add(
+          getInterpolant(
+              ImmutableList.copyOf(Iterables.concat(partitionedFormulas.subList(0, i)))));
+    }
+    return itps;
+  }
 
   @Override
   public List<BooleanFormula>
