@@ -59,7 +59,7 @@ public class OpenSmtSolverContext extends AbstractSolverContext {
     pLoader.accept("opensmtjava");
 
     // Create a solver instance
-    OpenSmt newSolver = new OpenSmt(opensmt_logic.qf_auflia, "javasmt", false);
+    OpenSmt newSolver = new OpenSmt(opensmt_logic.qf_auflira, "javasmt", false);
     newSolver.getConfig().setRandomSeed((int) randomSeed);
 
     OpenSmtFormulaCreator creator = new OpenSmtFormulaCreator(newSolver);
@@ -69,18 +69,13 @@ public class OpenSmtSolverContext extends AbstractSolverContext {
     OpenSmtBooleanFormulaManager booleanTheory = new OpenSmtBooleanFormulaManager(creator);
     OpenSmtIntegerFormulaManager integerTheory =
         new OpenSmtIntegerFormulaManager(creator, pNonLinearArithmetic);
-    // OpenSmtRationalFormulaManager rationalTheory = new OpenSmtRationalFormulaManager(creator,
-    // pNonLinearArithmetic);
+    OpenSmtRationalFormulaManager rationalTheory =
+        new OpenSmtRationalFormulaManager(creator, pNonLinearArithmetic);
     OpenSmtArrayFormulaManager arrayTheory = new OpenSmtArrayFormulaManager(creator);
 
     OpenSmtFormulaManager manager =
         new OpenSmtFormulaManager(
-            creator,
-            functionTheory,
-            booleanTheory,
-            integerTheory,
-            // rationalTheory,
-            arrayTheory);
+            creator, functionTheory, booleanTheory, integerTheory, rationalTheory, arrayTheory);
 
     return new OpenSmtSolverContext(creator, manager, pLogger, pShutdownNotifier);
   }

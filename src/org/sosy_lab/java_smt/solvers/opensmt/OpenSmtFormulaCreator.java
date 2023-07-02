@@ -10,9 +10,7 @@ package org.sosy_lab.java_smt.solvers.opensmt;
 
 import com.google.common.collect.ImmutableList;
 import java.math.BigInteger;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import opensmt.ArithLogic;
 import opensmt.Logic;
 import opensmt.OpenSmt;
@@ -68,7 +66,7 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, OpenSmt, 
   public SymRef declareUFImpl(String pName, SRef pReturnType, List<SRef> pArgTypes) {
     return getEnv().getLogic().declareFun(pName, pReturnType, new VectorSRef(pArgTypes));
   }
-  
+
   @Override
   public SRef getArrayType(SRef indexType, SRef elementType) {
     return getEnv().getLogic().getArraySort(indexType, elementType);
@@ -129,7 +127,7 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, OpenSmt, 
     }
     if (logic.isArraySort(sort)) {
       VectorSRef args = getEnv().getLogic().getSortDefinition(sort).getArgs();
-      
+
       FormulaType<?> indexType = getFormulaTypeFromTermType(args.get(0));
       FormulaType<?> elementType = getFormulaTypeFromTermType(args.get(1));
       return FormulaType.getArrayType(indexType, elementType);
@@ -330,17 +328,17 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, OpenSmt, 
     if (logic.isConstant(f)) {
       return visitor.visitConstant(formula, convertValue(f));
     }
-    
+
     if (logic.isVar(f)) {
       String varName = logic.getSymName(logic.getSymRef(f));
       return visitor.visitFreeVariable(formula, dequote(varName));
     }
 
     // FIXME: Handle abstract values for arrays?
-    
+
     String varName = logic.getSymName(logic.getSymRef(f));
     VectorPTRef subterms = logic.getPterm(f).getArgs();
-    
+
     ImmutableList.Builder<Formula> argTerms = ImmutableList.builder();
     ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
 

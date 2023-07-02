@@ -25,20 +25,20 @@ abstract class OpenSmtNumeralFormulaManager<
     extends AbstractNumeralFormulaManager<
         PTRef, SRef, OpenSmt, ParamFormulaType, ResultFormulaType, SymRef> {
 
-  protected final ArithLogic logic;
+  protected final ArithLogic osmtLogic;
 
   OpenSmtNumeralFormulaManager(
       OpenSmtFormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
     super(pCreator, pNonLinearArithmetic);
     // FIXME: maybe we should rename this to getArithLogic()?
-    logic = pCreator.getEnv().getLIALogic();
+    osmtLogic = pCreator.getEnv().getLIALogic();
   }
 
   protected abstract SRef getNumeralType();
 
   @Override
   protected boolean isNumeral(PTRef pVal) {
-    return logic.isNumConst(pVal);
+    return osmtLogic.isNumConst(pVal);
   }
 
   @Override
@@ -55,7 +55,7 @@ abstract class OpenSmtNumeralFormulaManager<
   @Override
   protected PTRef makeNumberImpl(String pI) {
     SRef type = getNumeralType();
-    return logic.mkConst(type, pI);
+    return osmtLogic.mkConst(type, pI);
   }
 
   @Override
@@ -66,56 +66,56 @@ abstract class OpenSmtNumeralFormulaManager<
 
   @Override
   protected PTRef multiply(PTRef pParam1, PTRef pParam2) {
-    return logic.mkTimes(pParam1, pParam2);
+    return osmtLogic.mkTimes(pParam1, pParam2);
   }
 
   @Override
   protected PTRef modulo(PTRef pParam1, PTRef pParam2) {
-    return logic.mkMod(pParam1, pParam2);
+    return osmtLogic.mkMod(pParam1, pParam2);
   }
 
   @Override
   protected PTRef negate(PTRef pParam1) {
-    return logic.mkNeg(pParam1);
+    return osmtLogic.mkNeg(pParam1);
   }
 
   @Override
   protected PTRef add(PTRef pParam1, PTRef pParam2) {
-    return logic.mkPlus(pParam1, pParam2);
+    return osmtLogic.mkPlus(pParam1, pParam2);
   }
 
   @Override
   protected PTRef subtract(PTRef pParam1, PTRef pParam2) {
-    return logic.mkMinus(pParam1, pParam2);
+    return osmtLogic.mkMinus(pParam1, pParam2);
   }
 
   @Override
   protected PTRef equal(PTRef pParam1, PTRef pParam2) {
-    return logic.mkEq(pParam1, pParam2);
+    return osmtLogic.mkEq(pParam1, pParam2);
   }
 
   @Override
   protected PTRef greaterThan(PTRef pParam1, PTRef pParam2) {
-    return logic.mkGt(pParam1, pParam2);
+    return osmtLogic.mkGt(pParam1, pParam2);
   }
 
   @Override
   protected PTRef greaterOrEquals(PTRef pParam1, PTRef pParam2) {
-    return logic.mkGeq(pParam1, pParam2);
+    return osmtLogic.mkGeq(pParam1, pParam2);
   }
 
   @Override
   protected PTRef lessThan(PTRef pParam1, PTRef pParam2) {
-    return logic.mkLt(pParam1, pParam2);
+    return osmtLogic.mkLt(pParam1, pParam2);
   }
 
   @Override
   protected PTRef lessOrEquals(PTRef pParam1, PTRef pParam2) {
-    return logic.mkLeq(pParam1, pParam2);
+    return osmtLogic.mkLeq(pParam1, pParam2);
   }
 
   @Override
   protected PTRef distinctImpl(List<PTRef> pParam) {
-    return logic.mkDistinct(new VectorPTRef(pParam));
+    return osmtLogic.mkDistinct(new VectorPTRef(pParam));
   }
 }

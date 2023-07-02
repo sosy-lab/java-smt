@@ -8,15 +8,15 @@
 
 package org.sosy_lab.java_smt.solvers.opensmt;
 
+import java.io.IOException;
+import java.util.Map;
 import java.util.stream.Collectors;
 import opensmt.Logic;
 import opensmt.OpenSmt;
 import opensmt.PTRef;
 import opensmt.SRef;
-import opensmt.Symbol;
 import opensmt.SymRef;
-import java.io.IOException;
-import java.util.Map;
+import opensmt.Symbol;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -32,20 +32,9 @@ class OpenSmtFormulaManager extends AbstractFormulaManager<PTRef, SRef, OpenSmt,
       OpenSmtUFManager pFfmgr,
       OpenSmtBooleanFormulaManager pBfmgr,
       OpenSmtIntegerFormulaManager pIfmgr,
-      // OpenSmtRationalFormulaManager pRfmgr,
+      OpenSmtRationalFormulaManager pRfmgr,
       OpenSmtArrayFormulaManager pAfmgr) {
-    super(
-        pFormulaCreator,
-        pFfmgr,
-        pBfmgr,
-        pIfmgr,
-        null, // pRfmgr,
-        null, // pBvfmgr,
-        null, // pFpfmgr,
-        null, // pQfmgr,
-        pAfmgr,
-        null, // pSLfmgr,
-        null); // pStrmgr);
+    super(pFormulaCreator, pFfmgr, pBfmgr, pIfmgr, pRfmgr, null, null, null, pAfmgr, null, null);
 
     creator = pFormulaCreator;
     osmtLogic = pFormulaCreator.getEnv().getLogic();
@@ -60,39 +49,38 @@ class OpenSmtFormulaManager extends AbstractFormulaManager<PTRef, SRef, OpenSmt,
   public Appender dumpFormula(PTRef f) {
     assert getFormulaCreator().getFormulaType(f) == FormulaType.BooleanType
         : "Only BooleanFormulas may be dumped";
-    
+
     return new Appenders.AbstractAppender() {
       @Override
       public void appendTo(Appendable out) throws IOException {
         Map<String, PTRef> userDeclarations = creator.extractVariablesAndUFs(f, true);
-        
+
         for (PTRef term : userDeclarations.values()) {
           SymRef ref = osmtLogic.getSymRef(term);
           Symbol sym = osmtLogic.getSym(ref);
-          
-          int numArgs = sym.size()-1;
-          
+
+          int numArgs = sym.size() - 1;
+
           if (numArgs == 0) {
             out.append(
-              "(declare-const "
-              + osmtLogic.getSymName(ref)
-              + osmtLogic.printSort(sym.rsort())
-              + ")\n");
-          } else {            
+                "(declare-const "
+                    + osmtLogic.getSymName(ref)
+                    + osmtLogic.printSort(sym.rsort())
+                    + ")\n");
+          } else {
             out.append(
-              "(declare-fun "
-              + osmtLogic.getSymName(ref)
-              + " ("
-              + sym.getArgs().stream().map((atype) -> osmtLogic.printSort(atype)).collect(Collectors.joining(" "))
-              + ") "
-              + osmtLogic.printSort(sym.rsort())
-              + ")\n");
+                "(declare-fun "
+                    + osmtLogic.getSymName(ref)
+                    + " ("
+                    + sym.getArgs().stream()
+                        .map((atype) -> osmtLogic.printSort(atype))
+                        .collect(Collectors.joining(" "))
+                    + ") "
+                    + osmtLogic.printSort(sym.rsort())
+                    + ")\n");
           }
         }
-        out.append(
-          "(assert "
-          + osmtLogic.pp(f)
-          +')');
+        out.append("(assert " + osmtLogic.pp(f) + ')');
       }
     };
   }

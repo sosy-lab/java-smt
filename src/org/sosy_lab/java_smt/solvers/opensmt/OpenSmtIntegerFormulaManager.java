@@ -41,7 +41,7 @@ class OpenSmtIntegerFormulaManager
 
   @Override
   protected PTRef divide(PTRef pParam1, PTRef pParam2) {
-    return logic.mkIntDiv(pParam1, pParam2);
+    return osmtLogic.mkIntDiv(pParam1, pParam2);
   }
 
   @Override
@@ -55,8 +55,8 @@ class OpenSmtIntegerFormulaManager
     if (BigInteger.ZERO.compareTo(pModulo) < 0) {
       PTRef n = makeNumberImpl(pModulo);
       PTRef x = subtract(pNumber1, pNumber2);
-      return logic.mkEq(x, logic.mkTimes(n, logic.mkIntDiv(x, n)));
+      return osmtLogic.mkEq(x, osmtLogic.mkTimes(n, osmtLogic.mkIntDiv(x, n)));
     }
-    return logic.getTerm_true();
+    return osmtLogic.getTerm_true();
   }
 }
