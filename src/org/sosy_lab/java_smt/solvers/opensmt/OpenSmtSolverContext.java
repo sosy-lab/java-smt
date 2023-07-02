@@ -61,7 +61,7 @@ public class OpenSmtSolverContext extends AbstractSolverContext {
     // Create a solver instance
     OpenSmt newSolver = new OpenSmt(opensmt_logic.qf_auflira, "javasmt", false);
     newSolver.getConfig().setRandomSeed((int) randomSeed);
-
+    
     OpenSmtFormulaCreator creator = new OpenSmtFormulaCreator(newSolver);
 
     // Create managers
@@ -92,25 +92,19 @@ public class OpenSmtSolverContext extends AbstractSolverContext {
   public Solvers getSolverName() {
     return Solvers.OPENSMT;
   }
-  /*
-  @Override
-  public ImmutableMap<String,String> getStatistics() {
-    // FIXME
-    throw new UnsupportedOperationException();
-  }
-  */
+  
   @Override
   public String getVersion() {
-    // FIXME
-    return "2.5.1-7";
+    // FIXME: OpenSMT does not provide a way to read the version number. We'll have to patch the source or get it from the lib
+    throw new UnsupportedOperationException();
   }
-
+  
   @Override
   protected OptimizationProverEnvironment newOptimizationProverEnvironment0(
-      Set<SolverContext.ProverOptions> pSet) {
+      Set<SolverContext.ProverOptions> options) {
     throw new UnsupportedOperationException("OpenSMT does not support optimization.");
   }
-
+  
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<SolverContext.ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
@@ -119,9 +113,9 @@ public class OpenSmtSolverContext extends AbstractSolverContext {
 
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
-      Set<SolverContext.ProverOptions> pSet) {
-    // FIXME
-    throw new UnsupportedOperationException();
+      Set<SolverContext.ProverOptions> options) {
+    Preconditions.checkState(!closed, "solver context is already closed");
+    return new OpenSmtInterpolatingProver(creator, manager, shutdownNotifier, options);
   }
 
   @Override

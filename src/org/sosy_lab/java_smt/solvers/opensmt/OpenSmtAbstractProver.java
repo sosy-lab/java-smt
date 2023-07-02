@@ -32,7 +32,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.basicimpl.ShutdownHook;
 
-public class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<T> {
+public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   protected final OpenSmtFormulaCreator creator;
   protected final MainSolver osmtSolver;
@@ -49,9 +49,8 @@ public class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<T> {
     super(pOptions, pMgr.getBooleanFormulaManager(), pShutdownNotifier);
 
     creator = pFormulaCreator;
-    osmtSolver =
-        new MainSolver(creator.getEnv().getLogic(), creator.getEnv().getConfig(), "javasmt");
-
+    osmtSolver = new MainSolver(creator.getEnv().getLogic(), creator.getEnv().getConfig(), "javasmt");
+    
     shutdownListener =
         new ShutdownHook(
             pShutdownNotifier,
@@ -63,11 +62,11 @@ public class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<T> {
             });
 
     assertedFormulas.push(new ArrayList<>()); // create initial level
-
+    
     // FIXME Handle prover options
     // if (pOptions.contains(ProverOptions.GENERATE_MODELS)) {
     //   solver.setOption("produce-models", "true");
-
+    
     // FIXME Disable Model generation if arrays are required
     // https://github.com/usi-verification-and-security/opensmt/issues/630
   }
@@ -93,30 +92,34 @@ public class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<T> {
     assertedFormulas.pop();
     osmtSolver.pop();
   }
-
+  
+  @Nullable
+  abstract protected T getConstraintName(BooleanFormula pF);
+  
   @Override
-  public @Nullable T addConstraint(BooleanFormula pF) throws InterruptedException {
+  @Nullable
+  public T addConstraint(BooleanFormula pF) throws InterruptedException {
     Preconditions.checkState(!closed);
     setChanged();
+    
     PTRef exp = creator.extractInfo(pF);
-    assertedFormulas.peek().add(exp);
     osmtSolver.insertFormula(exp);
-    // FIXME: Return index of the assertion. Needed for interpolation to define the A set
-    return null;
+    
+    T label = getConstraintName(pF);
+    assertedFormulas.peek().add(exp);
+    return label;
   }
-
+  
   @SuppressWarnings("resource")
   @Override
   public Model getModel() {
     List<PTRef> assertedTerms = new ArrayList<>();
     assertedFormulas.forEach(assertedTerms::addAll);
-
     return new OpenSmtModel(this, creator, assertedTerms);
   }
 
   @Override
   public Evaluator getEvaluator() {
-    // FIXME IS this even called?
     Preconditions.checkState(!closed);
     checkGenerateModels();
     return getEvaluatorWithoutChecks();
@@ -148,7 +151,7 @@ public class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<T> {
     Preconditions.checkState(!closed);
     closeAllEvaluators();
     changedSinceLastSatQuery = false;
-    // TODO: Check for error or undefined
+    // FIXME: Check for error or undefined
     return osmtSolver.check().isFalse();
   }
 
@@ -184,7 +187,7 @@ public class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<T> {
     }
     super.close();
   }
-
+  
   @Override
   public int size() {
     Preconditions.checkState(!closed);
