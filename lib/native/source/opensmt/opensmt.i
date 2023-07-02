@@ -707,22 +707,7 @@
 %ignore Logic::getSortRef (SymRef sr) const;
 //%ignore Logic::printSort (SRef s) const;
 //%ignore Logic::getSortSize (SRef s) const;
-%extend Logic {
-  SRef getArraySort(SRef sortIndex, SRef sortElements) {
-    SortSymbol symbol("Array", 2);
-    SSymRef symRef;
-    bool known = $self->peekSortSymbol(symbol, symRef);
-    if (!known) {
-      throw std::runtime_error("Failed to create Array sort");
-    }
-    else {
-      vec<SRef> args;
-      args.push(sortIndex);
-      args.push(sortElements);
-      return $self->getSort(symRef, std::move(args));
-    }
-  }
- }
+//%ignore Logic::getArraySort(SRef domain, SRef codomain);
 //%ignore Logic::isArraySort (SRef sref) const;
 %ignore Logic::hasArrays () const;
 %ignore Logic::isArrayStore (SymRef) const;

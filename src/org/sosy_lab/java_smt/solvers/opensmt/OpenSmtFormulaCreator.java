@@ -128,7 +128,7 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, OpenSmt, 
       return FormulaType.BooleanType;
     }
     if (logic.isArraySort(sort)) {
-      VectorSRef args = getEnv().getLogic().getSortDef(sort).getArgs();
+      VectorSRef args = getEnv().getLogic().getSortDefinition(sort).getArgs();
       
       FormulaType<?> indexType = getFormulaTypeFromTermType(args.get(0));
       FormulaType<?> elementType = getFormulaTypeFromTermType(args.get(1));
