@@ -55,6 +55,13 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
     classifier = new FormulaClassifier(context);
   }
 
+  private void requireNonlinear() {
+    assume()
+        .withMessage("Solver %s does not support nonlinear formulas", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.OPENSMT);
+  }
+
   @Test
   public void test_AUFLIA() {
     requireParser();
@@ -74,17 +81,21 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
 
   @Test
   public void test_QF_AUFLIRA() {
+    throw new RuntimeException("BROKEN - Reason unknown.");
+    /* FIXME
     requireParser();
     requireRationals();
     String query = VARS + "(assert (= (select arr x) (bar (/ 1 2))))";
     classifier.visit(mgr.parse(query));
     assertThat(classifier.toString()).isEqualTo("QF_AUFLIRA");
+    */
   }
 
   @Test
   public void test_QF_AUFNIRA() {
     requireParser();
     requireRationals();
+    requireNonlinear();
     String query = VARS + "(assert (= (select arr (* x x)) (bar (/ 1 2))))";
     classifier.visit(mgr.parse(query));
     assertThat(classifier.toString()).isEqualTo("QF_AUFNIRA");
@@ -162,6 +173,7 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
   @Test
   public void test_QF_NIA() {
     requireParser();
+    requireNonlinear();
     String query = VARS + "(assert (< xx (* x x)))";
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
     classifier.visit(mgr.parse(query));
@@ -171,6 +183,7 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
   @Test
   public void test_QF_NRA() {
     requireParser();
+    requireNonlinear();
     String query = VARS + "(assert (< yy (* y y)))";
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
     classifier.visit(mgr.parse(query));
@@ -217,6 +230,7 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
   @Test
   public void test_QF_UFNRA() {
     requireParser();
+    requireNonlinear();
     String query = VARS + "(assert (< (* y yy) (bar y)))";
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
     classifier.visit(mgr.parse(query));

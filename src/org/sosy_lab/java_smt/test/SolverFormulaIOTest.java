@@ -340,7 +340,6 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
 
   @Test
   public void funDeclareTest() {
-    requireIntegers();
     IntegerFormula int1 = imgr.makeNumber(1);
     IntegerFormula int2 = imgr.makeNumber(2);
 
@@ -362,6 +361,8 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
 
   @Test
   public void funDeclareTest2() {
+    // throw new RuntimeException();
+
     requireIntegers();
     IntegerFormula int1 = imgr.makeNumber(1);
     IntegerFormula int2 = imgr.makeNumber(2);

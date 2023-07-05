@@ -12,8 +12,10 @@ import static org.junit.Assert.assertThrows;
 
 import com.google.common.truth.TruthJUnit;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.function.Supplier;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,6 +25,7 @@ import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.SolverContext.LogicFeatures;
 import org.sosy_lab.java_smt.api.Tactic;
 
 /** Check that timeout is handled gracefully. */
@@ -53,6 +56,12 @@ public class TimeoutTest extends SolverBasedTest0 {
   @Override
   protected Solvers solverToUse() {
     return solver;
+  }
+
+  // INFO: OpenSmt only support interpolation for QF_LIA, QF_LRA and QF_UF
+  @Override
+  protected Set<LogicFeatures> logicToUse() {
+    return EnumSet.of(LogicFeatures.HAS_INTEGERS);
   }
 
   @Test
@@ -91,6 +100,9 @@ public class TimeoutTest extends SolverBasedTest0 {
 
   @Test(timeout = TIMOUT_MILLISECONDS)
   public void testInterpolationProverTimeout() throws InterruptedException {
+    throw new RuntimeException("");
+
+    /* FIXME
     requireInterpolation();
     requireIntegers();
     TruthJUnit.assume()
@@ -98,6 +110,7 @@ public class TimeoutTest extends SolverBasedTest0 {
         .that(solverToUse())
         .isNoneOf(Solvers.PRINCESS, Solvers.BOOLECTOR, Solvers.CVC5);
     testBasicProverTimeoutInt(() -> context.newProverEnvironmentWithInterpolation());
+    */
   }
 
   @Test(timeout = TIMOUT_MILLISECONDS)

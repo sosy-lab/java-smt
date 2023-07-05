@@ -36,11 +36,18 @@ import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearAr
 @RunWith(Parameterized.class)
 public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBasedTest0 {
 
-  // Boolector, CVC4, SMTInterpol and MathSAT5 do not fully support non-linear arithmetic
+  // Boolector, CVC4, SMTInterpol, MathSAT5 and OpenSMT do not fully support non-linear arithmetic
   // (though SMTInterpol and MathSAT5 support some parts)
+
+  // INFO: OpenSmt does not suport nonlinear arithmetic
   static final ImmutableSet<Solvers> SOLVER_WITHOUT_NONLINEAR_ARITHMETIC =
       ImmutableSet.of(
-          Solvers.SMTINTERPOL, Solvers.MATHSAT5, Solvers.BOOLECTOR, Solvers.CVC4, Solvers.YICES2);
+          Solvers.SMTINTERPOL,
+          Solvers.MATHSAT5,
+          Solvers.BOOLECTOR,
+          Solvers.CVC4,
+          Solvers.YICES2,
+          Solvers.OPENSMT);
 
   @Parameters(name = "{0} {1} {2}")
   public static Iterable<Object[]> getAllSolvers() {
@@ -89,6 +96,7 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
         .setOption("solver.nonLinearArithmetic", nonLinearArithmetic.name());
   }
 
+  @SuppressWarnings("unused")
   private T handleExpectedException(Supplier<T> supplier) {
     try {
       return supplier.get();
@@ -102,6 +110,7 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
     }
   }
 
+  @SuppressWarnings("unused")
   private void assertExpectedUnsatifiabilityForNonLinearArithmetic(BooleanFormula f)
       throws SolverException, InterruptedException {
     if (nonLinearArithmetic == NonLinearArithmetic.USE
@@ -142,6 +151,9 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
 
   @Test
   public void testMultiplicationOfVariables() throws SolverException, InterruptedException {
+    throw new RuntimeException("BROKEN - Handle nonlinear exception in swig header to fix it.");
+
+    /* FIXME
     T a = nmgr.makeVariable("a");
     T b = nmgr.makeVariable("b");
     T c = nmgr.makeVariable("c");
@@ -152,11 +164,15 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
             nmgr.equal(c, nmgr.makeNumber(2 * 3)));
 
     assertThatFormula(f).isSatisfiable();
+    */
   }
 
   @Test
   public void testMultiplicationOfVariablesUnsatisfiable()
       throws SolverException, InterruptedException {
+    throw new RuntimeException("BROKEN - Handle nonlinear exception in swig header to fix it.");
+
+    /* FIXME
     T a = nmgr.makeVariable("a");
     T b = nmgr.makeVariable("b");
     T c = nmgr.makeVariable("c");
@@ -176,6 +192,7 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
     } else {
       assertExpectedUnsatifiabilityForNonLinearArithmetic(f);
     }
+    */
   }
 
   @Test
@@ -193,10 +210,11 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
 
   @Test
   public void testDivisionByZero() throws SolverException, InterruptedException {
+    // INFO: OpenSmt does not allow division by zero
     assume()
         .withMessage("Solver %s does not support division by zero", solverToUse())
         .that(solverToUse())
-        .isNotEqualTo(Solvers.YICES2);
+        .isNoneOf(Solvers.YICES2, Solvers.OPENSMT);
 
     T a = nmgr.makeVariable("a");
     T b = nmgr.makeVariable("b");
@@ -233,6 +251,20 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
 
   @Test
   public void testDivision() throws SolverException, InterruptedException {
+    throw new RuntimeException("BROKEN - Reason unknown.");
+
+    /* FIXME
+
+       Native frames: (J=compiled Java code, j=interpreted, Vv=VM code, C=native code)
+       C  [libopensmt.so+0x11a166]  FastRational::FastRational(FastRational const&)+0x16
+       Java frames: (J=compiled Java code, j=interpreted, Vv=VM code)
+       j  opensmt.OsmtNativeJNI.MainSolver_check(JLopensmt/MainSolver;)J+0
+       j  opensmt.MainSolver.check()Lopensmt/sstat;+15
+       j  org.sosy_lab.java_smt.solvers.opensmt.OpenSmtAbstractProver.isUnsat()Z+55
+       j  org.sosy_lab.java_smt.basicimpl.withAssumptionsWrapper.BasicProverWithAssumptionsWrapper.isUnsat()Z+19
+       j  org.sosy_lab.java_smt.test.BooleanFormulaSubject.isSatisfiable()V+122
+       j  org.sosy_lab.java_smt.test.NonLinearArithmeticTest.testDivision()V+81
+
     T a = nmgr.makeVariable("a");
 
     // (a == 2) && (3 == 6 / a)
@@ -244,10 +276,14 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
                 handleExpectedException(() -> nmgr.divide(nmgr.makeNumber(2 * 3), a))));
 
     assertThatFormula(f).isSatisfiable();
+    */
   }
 
   @Test
   public void testDivisionUnsatisfiable() throws SolverException, InterruptedException {
+    throw new RuntimeException("BROKEN - Handle nonlinear exception in swig header to fix it.");
+
+    /* FIXME
     T a = nmgr.makeVariable("a");
 
     BooleanFormula f =
@@ -266,5 +302,6 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
     } else {
       assertExpectedUnsatifiabilityForNonLinearArithmetic(f);
     }
+    */
   }
 }

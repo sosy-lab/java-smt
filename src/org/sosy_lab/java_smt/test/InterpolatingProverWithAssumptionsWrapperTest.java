@@ -8,11 +8,20 @@
 
 package org.sosy_lab.java_smt.test;
 
+import java.util.EnumSet;
+import java.util.Set;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverContext.LogicFeatures;
 import org.sosy_lab.java_smt.basicimpl.withAssumptionsWrapper.InterpolatingProverWithAssumptionsWrapper;
 
 public class InterpolatingProverWithAssumptionsWrapperTest
     extends SolverFormulaWithAssumptionsTest {
+
+  // INFO: OpenSmt only support interpolation for QF_LIA, QF_LRA and QF_UF
+  @Override
+  protected Set<LogicFeatures> logicToUse() {
+    return EnumSet.of(LogicFeatures.HAS_INTEGERS);
+  }
 
   @Override
   @SuppressWarnings({"unchecked", "rawtypes", "resource"})

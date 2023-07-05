@@ -14,7 +14,9 @@ import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,6 +30,7 @@ import org.sosy_lab.java_smt.api.BasicProverEnvironment.AllSatCallback;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.SolverContext.LogicFeatures;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
@@ -54,6 +57,12 @@ public class SolverAllSatTest extends SolverBasedTest0 {
   @Override
   protected Solvers solverToUse() {
     return solver;
+  }
+
+  // INFO: OpenSmt only support interpolation for QF_LIA, QF_LRA and QF_UF
+  @Override
+  protected Set<LogicFeatures> logicToUse() {
+    return EnumSet.of(LogicFeatures.HAS_INTEGERS);
   }
 
   private BasicProverEnvironment<?> env;

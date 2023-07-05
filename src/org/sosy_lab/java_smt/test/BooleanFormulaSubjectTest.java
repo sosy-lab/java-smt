@@ -83,10 +83,11 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0 {
 
   @Test
   public void testIsSatisfiableNo() {
+    // INFO: OpenSMT does not support unsat core
     assume()
         .withMessage("Solver does not support unsat core generation in a usable way")
         .that(solverToUse())
-        .isNotEqualTo(Solvers.BOOLECTOR);
+        .isNoneOf(Solvers.BOOLECTOR, Solvers.OPENSMT);
 
     AssertionError failure =
         expectFailure(whenTesting -> whenTesting.that(contradiction).isSatisfiable());

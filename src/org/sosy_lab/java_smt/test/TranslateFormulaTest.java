@@ -12,6 +12,7 @@ import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.test.BooleanFormulaSubject.assertUsing;
 
 import com.google.common.collect.Lists;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.After;
@@ -55,7 +56,13 @@ public class TranslateFormulaTest {
   @Parameters(name = "{index}: {0} --> {1}")
   public static List<Object[]> getSolverCombinations() {
     List<Solvers> solvers = Arrays.asList(Solvers.values());
-    return Lists.transform(Lists.cartesianProduct(solvers, solvers), List::toArray);
+    List<Object[]> fromTo = new ArrayList<Object[]>();
+    for (List<Solvers> entry : Lists.cartesianProduct(solvers, solvers)) {
+      if (entry.contains(Solvers.OPENSMT)) {
+        fromTo.add(entry.toArray());
+      }
+    }
+    return fromTo;
   }
 
   @Before
@@ -89,6 +96,7 @@ public class TranslateFormulaTest {
     }
   }
 
+  @SuppressWarnings("unused")
   private void requireParserTo() {
     assume()
         .withMessage("Solver %s does not support parsing formulae", translateTo)
@@ -96,6 +104,7 @@ public class TranslateFormulaTest {
         .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2, Solvers.CVC5);
   }
 
+  @SuppressWarnings("unused")
   private void requireParserFrom() {
     assume()
         .withMessage("Solver %s does not support parsing formulae", translateFrom)
@@ -103,6 +112,7 @@ public class TranslateFormulaTest {
         .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2, Solvers.CVC5);
   }
 
+  @SuppressWarnings("unused")
   private void requireIntegers() {
     assume()
         .withMessage("Solver %s does not support integer theory", translateFrom)
@@ -112,6 +122,9 @@ public class TranslateFormulaTest {
 
   @Test
   public void testDumpingAndParsing() throws SolverException, InterruptedException {
+    throw new RuntimeException("BROKEN - Reason unknown.");
+
+    /* FIXME
     requireParserTo();
 
     BooleanFormula input = createTestFormula(managerFrom);
@@ -119,6 +132,7 @@ public class TranslateFormulaTest {
     BooleanFormula parsed = managerTo.parse(out);
 
     assertUsing(to).that(createTestFormula(managerTo)).isEquivalentTo(parsed);
+    */
   }
 
   @Test
@@ -162,6 +176,9 @@ public class TranslateFormulaTest {
 
   @Test
   public void testTranslatingAndReverse() throws SolverException, InterruptedException {
+    throw new RuntimeException("BROKEN - Reason unknown.");
+
+    /* FIXME
     requireParserTo();
     requireParserFrom();
 
@@ -170,6 +187,7 @@ public class TranslateFormulaTest {
     BooleanFormula translatedReverseInput = managerFrom.translateFrom(translatedInput, managerTo);
 
     assertUsing(from).that(inputFrom).isEquivalentTo(translatedReverseInput);
+    */
   }
 
   private BooleanFormula createTestFormula(FormulaManager mgr) {

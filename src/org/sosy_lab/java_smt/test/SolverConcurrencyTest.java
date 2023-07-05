@@ -121,6 +121,7 @@ public class SolverConcurrencyTest {
     }
   }
 
+  @SuppressWarnings("unused")
   private void requireConcurrentMultipleStackSupport() {
     assume()
         .withMessage("Solver does not support concurrent solving in multiple stacks")
@@ -143,13 +144,15 @@ public class SolverConcurrencyTest {
   }
 
   private void requireBitvectors() {
+    // INFO: OpenSmt does not support bitvectors
     assume()
         .withMessage("Solver does not support bitvectors")
         .that(solver)
-        .isNoneOf(Solvers.SMTINTERPOL, Solvers.YICES2);
+        .isNoneOf(Solvers.SMTINTERPOL, Solvers.YICES2, Solvers.OPENSMT);
   }
 
   private void requireOptimization() {
+    // INFO: OpenSmt does not support optimization
     assume()
         .withMessage("Solver does not support optimization")
         .that(solver)
@@ -159,7 +162,8 @@ public class SolverConcurrencyTest {
             Solvers.PRINCESS,
             Solvers.CVC4,
             Solvers.CVC5,
-            Solvers.YICES2);
+            Solvers.YICES2,
+            Solvers.OPENSMT);
   }
 
   /**
@@ -344,6 +348,9 @@ public class SolverConcurrencyTest {
    */
   @Test
   public void testConcurrentStack() throws InvalidConfigurationException, InterruptedException {
+    throw new RuntimeException("BROKEN - malloc(): unaligned tcache chunk detected");
+
+    /* FIXME
     requireConcurrentMultipleStackSupport();
     SolverContext context = initSolver();
     FormulaManager mgr = context.getFormulaManager();
@@ -367,6 +374,7 @@ public class SolverConcurrencyTest {
               .isTrue();
         });
     closeSolver(context);
+    */
   }
 
   /**

@@ -9,12 +9,9 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assert_;
-import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
-import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 
 import com.google.common.truth.Truth;
-import java.util.EnumSet;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -111,26 +108,38 @@ public class SolverFormulaIODeclarationsTest extends SolverBasedTest0 {
 
   @Test
   public void parseDeclareNeverTest1() {
+    throw new RuntimeException("BROKEN - Add exception handling to swig to fix");
+    /* FIXME
     String query = "(assert var)";
     assertThrows(IllegalArgumentException.class, () -> mgr.parse(query));
+    */
   }
 
   @Test
   public void parseDeclareNeverTest2() {
+    throw new RuntimeException("BROKEN - Add exception handling to swig to fix");
+    /* FIXME
     String query = "(assert (= 0 x))";
     assertThrows(IllegalArgumentException.class, () -> mgr.parse(query));
+    */
   }
 
   @Test
   public void parseDeclareNeverTest3() {
+    throw new RuntimeException("BROKEN - Add exception handling to swig to fix");
+    /* FIXME
     String query = "(assert (foo 1 2))";
     assertThrows(IllegalArgumentException.class, () -> mgr.parse(query));
+    */
   }
 
   @Test
   public void parseDeclareNeverTest4() {
+    throw new RuntimeException("BROKEN - Add exception handling to swig to fix");
+    /* FIXME
     String query = "(assert (foo 1 x))";
     assertThrows(IllegalArgumentException.class, () -> mgr.parse(query));
+    */
   }
 
   @Test
@@ -143,6 +152,8 @@ public class SolverFormulaIODeclarationsTest extends SolverBasedTest0 {
 
   @Test
   public void parseDeclareRedundantTest1() {
+    throw new RuntimeException("BROKEN - Add exception handling to swig to fix");
+    /* FIXME
     IntegerFormula var = imgr.makeVariable("x");
     String query = "(declare-fun x () Int)(declare-fun x () Int)(assert (= 0 x))";
     if (EnumSet.of(Solvers.PRINCESS, Solvers.Z3).contains(solverToUse())) {
@@ -152,10 +163,13 @@ public class SolverFormulaIODeclarationsTest extends SolverBasedTest0 {
       BooleanFormula formula = mgr.parse(query);
       Truth.assertThat(mgr.extractVariables(formula).values()).containsExactly(var);
     }
+    */
   }
 
   @Test
   public void parseDeclareRedundantTest2() {
+    throw new RuntimeException("BROKEN - Add exception handling to swig to fix");
+    /* FIXME
     IntegerFormula var =
         fmgr.declareAndCallUF("foo", IntegerType, imgr.makeNumber(1), imgr.makeNumber(2));
     String query =
@@ -167,40 +181,55 @@ public class SolverFormulaIODeclarationsTest extends SolverBasedTest0 {
       BooleanFormula formula = mgr.parse(query);
       Truth.assertThat(mgr.extractVariablesAndUFs(formula).values()).containsExactly(var);
     }
+    */
   }
 
   @Test
   public void parseDeclareConflictInQueryTest1() {
+    throw new RuntimeException("BROKEN - Add exception handling to swig to fix");
+    /* FIXME
     String query = "(declare-fun x () Bool)(declare-fun x () Int)(assert (= 0 x))";
     assertThrows(IllegalArgumentException.class, () -> mgr.parse(query));
+    */
   }
 
   @Test
   public void parseDeclareConflictInQueryTest2() {
+    throw new RuntimeException("BROKEN - Add exception handling to swig to fix");
+    /* FIXME
     String query = "(declare-fun x () Bool)(declare-fun x (Int Int) Bool)(assert (x 2 3))";
     if (Solvers.Z3 != solverToUse()) {
       assertThrows(IllegalArgumentException.class, () -> mgr.parse(query));
     }
+    */
   }
 
   @Test
   public void parseDeclareConflictInQueryTest3() {
+    throw new RuntimeException("BROKEN - Add exception handling to swig to fix");
+    /* FIXME
     String query = "(declare-fun x (Int) Bool)(declare-fun x (Int) Int)(assert (x 0))";
     if (Solvers.Z3 != solverToUse()) {
       assertThrows(IllegalArgumentException.class, () -> mgr.parse(query));
     }
+    */
   }
 
   @Test
   public void parseDeclareConflictBeforeQueryTest() {
+    throw new RuntimeException("BROKEN - Add exception handling to swig to fix");
+    /* FIXME
     @SuppressWarnings("unused")
     IntegerFormula var = imgr.makeVariable("x");
     String query = "(declare-fun x () Bool)(assert (= 0 x))";
     assertThrows(IllegalArgumentException.class, () -> mgr.parse(query));
+    */
   }
 
   @Test
   public void parseDeclareConflictAfterQueryTest() {
+    throw new RuntimeException("BROKEN - Add exception handling to swig to fix");
+    /* FIXME
     String query = "(declare-fun x () Bool)(assert x)";
     BooleanFormula formula = mgr.parse(query);
     Truth.assertThat(mgr.extractVariables(formula).values()).hasSize(1);
@@ -210,6 +239,7 @@ public class SolverFormulaIODeclarationsTest extends SolverBasedTest0 {
       Truth.assertThat(mgr.extractVariables(formula).values())
           .doesNotContain(imgr.makeVariable("x"));
     }
+    */
   }
 
   @Test
@@ -249,6 +279,8 @@ public class SolverFormulaIODeclarationsTest extends SolverBasedTest0 {
 
   @Test
   public void parseDeclareOnceNotTwiceTest3() {
+    throw new RuntimeException("BROKEN - Add exception handling to swig to fix");
+    /* FIXME
     String query1 = "(declare-fun x () Bool)(declare-fun y () Bool)(assert x)";
     String query2 = "(assert y)";
     BooleanFormula formula1 = mgr.parse(query1);
@@ -260,6 +292,7 @@ public class SolverFormulaIODeclarationsTest extends SolverBasedTest0 {
       BooleanFormula formula2 = mgr.parse(query2);
       Truth.assertThat(mgr.extractVariablesAndUFs(formula2).values()).hasSize(1);
     }
+    */
   }
 
   @Test

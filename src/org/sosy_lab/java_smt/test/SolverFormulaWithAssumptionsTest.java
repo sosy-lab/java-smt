@@ -16,7 +16,9 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -28,6 +30,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverContext.LogicFeatures;
 import org.sosy_lab.java_smt.api.SolverException;
 
 @RunWith(Parameterized.class)
@@ -44,6 +47,12 @@ public class SolverFormulaWithAssumptionsTest extends SolverBasedTest0 {
   @Override
   protected Solvers solverToUse() {
     return solver;
+  }
+
+  // INFO: OpenSmt only support interpolation for QF_LIA, QF_LRA and QF_UF
+  @Override
+  protected Set<LogicFeatures> logicToUse() {
+    return EnumSet.of(LogicFeatures.HAS_INTEGERS);
   }
 
   /**

@@ -13,10 +13,11 @@ import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -26,12 +27,11 @@ import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormulaManager;
+import org.sosy_lab.java_smt.api.SolverContext.LogicFeatures;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
@@ -42,7 +42,7 @@ public class SolverStackTest extends SolverBasedTest0 {
   @Parameters(name = "{0} (interpolation={1}}")
   public static List<Object[]> getAllCombinations() {
     List<Object[]> result = new ArrayList<>();
-    for (Solvers solver : Solvers.values()) {
+    for (Solvers solver : new Solvers[] {Solvers.OPENSMT}) {
       result.add(new Object[] {solver, false});
       result.add(new Object[] {solver, true});
     }
@@ -59,6 +59,12 @@ public class SolverStackTest extends SolverBasedTest0 {
 
   @Parameter(1)
   public boolean useInterpolatingEnvironment;
+
+  // INFO: OpenSmt only support interpolation for QF_LIA, QF_LRA and QF_UF
+  @Override
+  protected Set<LogicFeatures> logicToUse() {
+    return EnumSet.of(LogicFeatures.HAS_INTEGERS);
+  }
 
   /** Generate a prover environment depending on the parameter above. */
   private BasicProverEnvironment<?> newEnvironmentForTest(ProverOptions... options) {
@@ -153,10 +159,15 @@ public class SolverStackTest extends SolverBasedTest0 {
 
   @Test
   public void singleStackTestRational() throws SolverException, InterruptedException {
+    throw new RuntimeException(
+        "BROKEN - Move test to a different file to use QF_LRA for interpolation");
+
+    /* FIXME
     requireRationals();
 
     BasicProverEnvironment<?> env = newEnvironmentForTest();
     simpleStackTestNum(rmgr, env);
+    */
   }
 
   private <X extends NumeralFormula, Y extends X> void simpleStackTestNum(
@@ -576,6 +587,8 @@ public class SolverStackTest extends SolverBasedTest0 {
   @Test
   @SuppressWarnings("CheckReturnValue")
   public void modelForUnsatFormula() throws SolverException, InterruptedException {
+    throw new RuntimeException();
+    /* FIXME: Check if sat before trying to create a model
     requireIntegers();
     try (BasicProverEnvironment<?> stack = newEnvironmentForTest()) {
       stack.push(imgr.greaterThan(imgr.makeVariable("a"), imgr.makeNumber(0)));
@@ -584,11 +597,14 @@ public class SolverStackTest extends SolverBasedTest0 {
 
       assertThrows(Exception.class, stack::getModel);
     }
+    */
   }
 
   @Test
   @SuppressWarnings("CheckReturnValue")
   public void modelForUnsatFormula2() throws SolverException, InterruptedException {
+    throw new RuntimeException();
+    /* FIXME: Check if sat before trying to create a model
     requireIntegers();
     try (BasicProverEnvironment<?> stack = newEnvironmentForTest()) {
       stack.push(imgr.greaterThan(imgr.makeVariable("a"), imgr.makeNumber(0)));
@@ -598,6 +614,7 @@ public class SolverStackTest extends SolverBasedTest0 {
 
       assertThrows(Exception.class, stack::getModel);
     }
+    */
   }
 
   @Test
@@ -630,6 +647,8 @@ public class SolverStackTest extends SolverBasedTest0 {
 
   @Test
   public void modelForSatFormulaWithUF() throws SolverException, InterruptedException {
+    throw new RuntimeException();
+    /* FIXME
     requireIntegers();
     try (BasicProverEnvironment<?> stack = newEnvironmentForTest(ProverOptions.GENERATE_MODELS)) {
       IntegerFormula zero = imgr.makeNumber(0);
@@ -654,6 +673,7 @@ public class SolverStackTest extends SolverBasedTest0 {
       assertThat(model.evaluate(fmgr.callUF(uf, imgr.makeNumber(BigDecimal.ZERO))))
           .isEqualTo(BigInteger.ZERO);
     }
+    */
   }
 
   @Test

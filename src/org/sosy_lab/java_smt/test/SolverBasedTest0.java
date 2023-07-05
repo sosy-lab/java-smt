@@ -13,6 +13,8 @@ import static org.sosy_lab.java_smt.test.BooleanFormulaSubject.assertUsing;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.EnumSet;
+import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.After;
 import org.junit.Before;
@@ -35,6 +37,7 @@ import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.api.SolverContext.LogicFeatures;
 import org.sosy_lab.java_smt.api.StringFormulaManager;
 import org.sosy_lab.java_smt.api.UFManager;
 
@@ -100,6 +103,10 @@ public abstract class SolverBasedTest0 {
     return Solvers.SMTINTERPOL;
   }
 
+  protected Set<LogicFeatures> logicToUse() {
+    return EnumSet.noneOf(LogicFeatures.class);
+  }
+
   protected ConfigurationBuilder createTestConfigBuilder() {
     return Configuration.builder().setOption("solver.solver", solverToUse().toString());
   }
@@ -110,7 +117,7 @@ public abstract class SolverBasedTest0 {
 
     factory = new SolverContextFactory(config, logger, shutdownNotifierToUse());
     try {
-      context = factory.generateContext();
+      context = factory.generateContext(logicToUse());
     } catch (InvalidConfigurationException e) {
       assume()
           .withMessage(e.getMessage())
@@ -210,7 +217,7 @@ public abstract class SolverBasedTest0 {
   }
 
   /** Skip test if the solver does not support arrays. */
-  protected final void requireArrays() {
+  protected /*final*/ void requireArrays() {
     assume()
         .withMessage("Solver %s does not support the theory of arrays", solverToUse())
         .that(amgr)
@@ -229,6 +236,10 @@ public abstract class SolverBasedTest0 {
     assume()
         .withMessage("Solver %s does not support the theory of strings", solverToUse())
         .that(smgr)
+        .isNotNull();
+    assume()
+        .withMessage("Solver %s does not support the theory of arrays", solverToUse())
+        .that(amgr)
         .isNotNull();
   }
 

@@ -1058,6 +1058,8 @@ public class SolverVisitorTest extends SolverBasedTest0 {
   @Test
   public void visitArithmeticOperationWithMoreArgsTest()
       throws SolverException, InterruptedException {
+    // throw new RuntimeException("Broken - ");
+    // FIXME: Throws OsmtApiException
     requireIntegers();
     requireParser();
 

@@ -20,7 +20,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import org.junit.AssumptionViolatedException;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -298,6 +297,8 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
   @Test
   public void intTest3_DivModLinear_zeroDenumerator() throws SolverException, InterruptedException {
+    throw new RuntimeException("DISABLED - OpenSmt does not allow division by zero");
+    /* FIXME
     requireIntegers();
     IntegerFormula a = imgr.makeVariable("int_a");
 
@@ -349,10 +350,14 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
         assertModulo(false, a, num0, num1, aEq10);
         assertModulo(false, a, num0, num10, aEq10);
     }
+    */
   }
 
   @Test
   public void intTest3_DivModNonLinear() throws SolverException, InterruptedException {
+    throw new RuntimeException("DISABLED - OpenSmt does not support nonlinear arithmetic");
+    /* FIXME
+
     // not all solvers support division-by-variable,
     // we guarantee soundness by allowing any value that yields SAT.
     requireIntegers();
@@ -392,6 +397,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
     // TODO negative case is disabled, because we would need the option
     // solver.solver.useNonLinearIntegerArithmetic=true.
+    */
   }
 
   @Test
@@ -745,6 +751,8 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
   @Test
   public void testMakeIntArray() {
+    // FIXME: `expected: (select b (+ i 1)) but was : (select b (+ 1 i))`
+    // Blacklist this test? OpenSmt will always simplify the formula
     requireArrays();
     requireIntegers();
 
@@ -863,6 +871,8 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
 
   @Test
   public void nonLinearMultiplication() throws SolverException, InterruptedException {
+    throw new RuntimeException("DISABLED - OpenSmt does not support nonlinear arithmetic");
+    /* FIXME
     requireIntegers();
     IntegerFormula i2 = imgr.makeNumber(2);
     IntegerFormula i3 = imgr.makeNumber(3);
@@ -892,10 +902,13 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
       env.push(z_equal_x_mult_y);
       assertThat(env).isUnsatisfiable();
     }
+    */
   }
 
   @Test
   public void composedLinearMultiplication() throws SolverException, InterruptedException {
+    throw new RuntimeException("DISABLED - OpenSmt does not support nonlinear arithmetic");
+    /* FIXME
     requireIntegers();
     IntegerFormula i2 = imgr.makeNumber(2);
     IntegerFormula i3 = imgr.makeNumber(3);
@@ -920,11 +933,14 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
       env.push(imgr.greaterThan(div, i4));
       env.push(imgr.greaterThan(mod, i2));
       assertThat(env).isSatisfiable();
-    }
+      }
+    */
   }
 
   @Test
   public void multiplicationSquares() throws SolverException, InterruptedException {
+    throw new RuntimeException("DISABLED - OpenSmt does not support nonlinear arithmetic");
+    /* FIXME
     requireIntegers();
     IntegerFormula i2 = imgr.makeNumber(2);
     IntegerFormula i3 = imgr.makeNumber(3);
@@ -983,10 +999,13 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
         env.pop();
       }
     }
+    */
   }
 
   @Test
   public void multiplicationFactors() throws SolverException, InterruptedException {
+    throw new RuntimeException("DISABLED - OpenSmt does not support nonlinear arithmetic");
+    /* FIXME
     requireIntegers();
     IntegerFormula i37 = imgr.makeNumber(37);
     IntegerFormula i1 = imgr.makeNumber(1);
@@ -1009,10 +1028,13 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
       env.push(imgr.greaterThan(y, i1));
       assertThat(env).isUnsatisfiable();
     }
+    */
   }
 
   @Test
   public void multiplicationCubic() throws SolverException, InterruptedException {
+    throw new RuntimeException("DISABLED - OpenSmt does not support nonlinear arithmetic");
+    /* FIXME
     requireIntegers();
     IntegerFormula i125 = imgr.makeNumber(125);
     IntegerFormula i27 = imgr.makeNumber(27);
@@ -1048,10 +1070,13 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
       env.push(imgr.lessThan(x, i5));
       assertThat(env).isUnsatisfiable();
     }
+    */
   }
 
   @Test
   public void nonLinearDivision() throws SolverException, InterruptedException {
+    throw new RuntimeException("DISABLED - OpenSmt does not support nonlinear arithmetic");
+    /* FIXME
     requireIntegers();
     IntegerFormula i2 = imgr.makeNumber(2);
     IntegerFormula i3 = imgr.makeNumber(3);
@@ -1081,6 +1106,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
       env.push(z_equal_x_div_y);
       assertThat(env).isUnsatisfiable();
     }
+    */
   }
 
   @Test

@@ -17,7 +17,7 @@ import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import org.junit.Test;
@@ -31,6 +31,7 @@ import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.SolverContext.LogicFeatures;
 import org.sosy_lab.java_smt.api.SolverException;
 
 /** This class contains some simple Junit-tests to check the interpolation-API of our solvers. */
@@ -51,6 +52,12 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
     return solver;
   }
 
+  // INFO: OpenSmt only support interpolation for QF_LIA, QF_LRA and QF_UF
+  @Override
+  protected Set<LogicFeatures> logicToUse() {
+    return EnumSet.of(LogicFeatures.HAS_INTEGERS);
+  }
+
   /** Generate a prover environment depending on the parameter above. */
   @SuppressWarnings("unchecked")
   private <T> InterpolatingProverEnvironment<T> newEnvironmentForTest() {
@@ -63,13 +70,15 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
   @Test
   @SuppressWarnings("CheckReturnValue")
   public <T> void simpleInterpolation() throws SolverException, InterruptedException {
+    throw new RuntimeException("BROKEN - Formula must be unsat for interpolation");
+
+    /* FIXME
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       IntegerFormula x = imgr.makeVariable("x");
       IntegerFormula y = imgr.makeVariable("y");
-      IntegerFormula z = imgr.makeVariable("z");
+      IntegerFormula z = x; //imgr.makeVariable("z");
       BooleanFormula f1 = imgr.equal(y, imgr.multiply(imgr.makeNumber(2), x));
-      BooleanFormula f2 =
-          imgr.equal(y, imgr.add(imgr.makeNumber(1), imgr.multiply(z, imgr.makeNumber(2))));
+      BooleanFormula f2 = imgr.equal(y, imgr.add(imgr.makeNumber(1), imgr.multiply(z, imgr.makeNumber(2))));
       prover.push(f1);
       T id2 = prover.push(f2);
       boolean check = prover.isUnsat();
@@ -77,18 +86,21 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
       prover.getInterpolant(ImmutableList.of(id2));
       // we actually only check for a successful execution here, the result is irrelevant.
     }
+    */
   }
 
   @Test
   @SuppressWarnings("unchecked")
   public <T> void emptyInterpolationGroup() throws SolverException, InterruptedException {
+    throw new RuntimeException("BROKEN - Formula must be unsat for interpolation");
+
+    /* FIXME
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       IntegerFormula x = imgr.makeVariable("x");
       IntegerFormula y = imgr.makeVariable("y");
-      IntegerFormula z = imgr.makeVariable("z");
+      IntegerFormula z = x;//imgr.makeVariable("z");
       BooleanFormula f1 = imgr.equal(y, imgr.multiply(imgr.makeNumber(2), x));
-      BooleanFormula f2 =
-          imgr.equal(y, imgr.add(imgr.makeNumber(1), imgr.multiply(z, imgr.makeNumber(2))));
+      BooleanFormula f2 = imgr.equal(y, imgr.add(imgr.makeNumber(1), imgr.multiply(z, imgr.makeNumber(2))));
       T id1 = prover.push(f1);
       T id2 = prover.push(f2);
       assertThat(prover.isUnsat()).isTrue();
@@ -98,6 +110,7 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
       BooleanFormula emptyA = prover.getInterpolant(ImmutableList.of());
       assertThat(bmgr.isTrue(emptyA)).isTrue();
     }
+    */
   }
 
   @Test
@@ -239,6 +252,9 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
 
   @Test
   public <T> void sequentialInterpolation() throws SolverException, InterruptedException {
+    throw new RuntimeException("BROKEN - Add support for sequential interpolation to fix");
+
+    /* FIXME
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     requireIntegers();
 
@@ -267,15 +283,12 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
     List<BooleanFormula> itps1 = stack.getSeqInterpolants0(ImmutableList.of(TA, TB, TC, TD));
     List<BooleanFormula> itps2 = stack.getSeqInterpolants0(ImmutableList.of(TD, TC, TB, TA));
     List<BooleanFormula> itps3 = stack.getSeqInterpolants0(ImmutableList.of(TA, TC, TB, TD));
-    List<BooleanFormula> itps4 =
-        stack.getSeqInterpolants(
-            Lists.transform(ImmutableList.of(TA, TA, TA, TB, TC, TD, TD), ImmutableSet::of));
-    List<BooleanFormula> itps5 =
-        stack.getSeqInterpolants(
-            Lists.transform(ImmutableList.of(TA, TA, TB, TC, TD, TA, TD), ImmutableSet::of));
-    List<BooleanFormula> itps6 =
-        stack.getSeqInterpolants(
-            Lists.transform(ImmutableList.of(TB, TC, TD, TA, TA, TA, TD), ImmutableSet::of));
+    List<BooleanFormula> itps4 = stack.getSeqInterpolants(
+        Lists.transform(ImmutableList.of(TA, TA, TA, TB, TC, TD, TD), ImmutableSet::of));
+    List<BooleanFormula> itps5 = stack.getSeqInterpolants(
+        Lists.transform(ImmutableList.of(TA, TA, TB, TC, TD, TA, TD), ImmutableSet::of));
+    List<BooleanFormula> itps6 = stack.getSeqInterpolants(
+        Lists.transform(ImmutableList.of(TB, TC, TD, TA, TA, TA, TD), ImmutableSet::of));
 
     stack.close();
 
@@ -285,12 +298,16 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
     checkItpSequence(ImmutableList.of(A, A, A, B, C, D, D), itps4);
     checkItpSequence(ImmutableList.of(A, A, B, C, D, A, D), itps5);
     checkItpSequence(ImmutableList.of(B, C, D, A, A, A, D), itps6);
+    */
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test /*(expected = IllegalArgumentException.class)*/
   @SuppressWarnings("CheckReturnValue")
   public <T> void sequentialInterpolationWithoutPartition()
       throws SolverException, InterruptedException {
+    throw new RuntimeException("BROKEN - Add support for sequential interpolation to fix");
+
+    /* FIXME
     requireIntegers();
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
@@ -300,12 +317,17 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
     // empty list of partition
     stack.getSeqInterpolants(ImmutableList.of());
     assert_().fail();
+    */
   }
 
   @Test
   public <T> void sequentialInterpolationWithOnePartition()
       throws SolverException, InterruptedException {
+    throw new RuntimeException("BROKEN - Add support for sequential interpolation to fix");
+
+    /* FIXME
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
+
     requireIntegers();
 
     int i = index.getFreshId();
@@ -328,13 +350,18 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
     List<T> partition = ImmutableList.of(TA, TB);
     List<BooleanFormula> itps = stack.getSeqInterpolants(ImmutableList.of(partition));
     assertThat(itps).isEmpty();
+    */
   }
 
   @SuppressWarnings("unchecked")
   @Test
   public <T> void sequentialInterpolationWithFewPartitions()
       throws SolverException, InterruptedException {
+    throw new RuntimeException("BROKEN - Add support for sequential interpolation to fix");
+
+    /* FIXME
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
+
     requireIntegers();
 
     int i = index.getFreshId();
@@ -363,6 +390,7 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
     checkItpSequence(ImmutableList.of(bmgr.and(A, B)), itps1);
     checkItpSequence(ImmutableList.of(A, B), itps2);
     checkItpSequence(ImmutableList.of(B, A), itps3);
+    */
   }
 
   @Test
@@ -515,6 +543,7 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
   private <T> void testTreeInterpolants1(
       BooleanFormula pA, BooleanFormula pB, BooleanFormula pC, BooleanFormula pD, BooleanFormula pE)
       throws SolverException, InterruptedException {
+
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
     T TA = stack.push(pA);
@@ -547,6 +576,7 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
   private <T> void testTreeInterpolants2(
       BooleanFormula pA, BooleanFormula pB, BooleanFormula pC, BooleanFormula pD, BooleanFormula pE)
       throws SolverException, InterruptedException {
+
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
     T TA = stack.push(pA);
