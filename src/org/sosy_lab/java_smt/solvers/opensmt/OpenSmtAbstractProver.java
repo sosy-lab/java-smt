@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.Set;
 import opensmt.MainSolver;
 import opensmt.PTRef;
+import opensmt.SMTConfig;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.ShutdownNotifier.ShutdownRequestListener;
@@ -45,12 +46,13 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
       OpenSmtFormulaCreator pFormulaCreator,
       FormulaManager pMgr,
       ShutdownNotifier pShutdownNotifier,
+      SMTConfig pConfig,
       Set<ProverOptions> pOptions) {
     super(pOptions, pMgr.getBooleanFormulaManager(), pShutdownNotifier);
 
     creator = pFormulaCreator;
-    osmtSolver = new MainSolver(creator.getEnv().getLogic(), creator.getEnv().getConfig(), "javasmt");
-    
+    osmtSolver = new MainSolver(creator.getEnv(), pConfig, "JavaSmt");
+
     shutdownListener =
         new ShutdownHook(
             pShutdownNotifier,
@@ -62,13 +64,20 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
             });
 
     assertedFormulas.push(new ArrayList<>()); // create initial level
-    
+
     // FIXME Handle prover options
     // if (pOptions.contains(ProverOptions.GENERATE_MODELS)) {
     //   solver.setOption("produce-models", "true");
-    
+
     // FIXME Disable Model generation if arrays are required
     // https://github.com/usi-verification-and-security/opensmt/issues/630
+  }
+
+  protected static SMTConfig getConfigInstance(int randomSeed, boolean interpolation) {
+    SMTConfig config = new SMTConfig();
+    config.setRandomSeed(randomSeed);
+    config.setInterpolation(interpolation);
+    return config;
   }
 
   final MainSolver getOsmtSolver() {
@@ -92,24 +101,24 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     assertedFormulas.pop();
     osmtSolver.pop();
   }
-  
+
   @Nullable
-  abstract protected T getConstraintName(BooleanFormula pF);
-  
+  protected abstract T getConstraintName(BooleanFormula pF);
+
   @Override
   @Nullable
   public T addConstraint(BooleanFormula pF) throws InterruptedException {
     Preconditions.checkState(!closed);
     setChanged();
-    
+
     PTRef exp = creator.extractInfo(pF);
     osmtSolver.insertFormula(exp);
-    
+
     T label = getConstraintName(pF);
     assertedFormulas.peek().add(exp);
     return label;
   }
-  
+
   @SuppressWarnings("resource")
   @Override
   public Model getModel() {
@@ -187,7 +196,7 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     }
     super.close();
   }
-  
+
   @Override
   public int size() {
     Preconditions.checkState(!closed);

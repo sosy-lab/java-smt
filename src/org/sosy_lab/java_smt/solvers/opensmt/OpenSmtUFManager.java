@@ -8,13 +8,13 @@
 
 package org.sosy_lab.java_smt.solvers.opensmt;
 
-import opensmt.OpenSmt;
+import opensmt.Logic;
 import opensmt.PTRef;
 import opensmt.SRef;
 import opensmt.SymRef;
 import org.sosy_lab.java_smt.basicimpl.AbstractUFManager;
 
-class OpenSmtUFManager extends AbstractUFManager<PTRef, SymRef, SRef, OpenSmt> {
+class OpenSmtUFManager extends AbstractUFManager<PTRef, SymRef, SRef, Logic> {
 
   OpenSmtUFManager(OpenSmtFormulaCreator pCreator) {
     super(pCreator);

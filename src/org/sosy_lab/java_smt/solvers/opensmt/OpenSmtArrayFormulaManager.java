@@ -9,7 +9,6 @@
 package org.sosy_lab.java_smt.solvers.opensmt;
 
 import opensmt.Logic;
-import opensmt.OpenSmt;
 import opensmt.PTRef;
 import opensmt.SRef;
 import opensmt.SymRef;
@@ -19,13 +18,13 @@ import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
 
 public class OpenSmtArrayFormulaManager
-    extends AbstractArrayFormulaManager<PTRef, SRef, OpenSmt, SymRef> {
+    extends AbstractArrayFormulaManager<PTRef, SRef, Logic, SymRef> {
 
   private final Logic logic;
 
   public OpenSmtArrayFormulaManager(OpenSmtFormulaCreator pFormulaCreator) {
     super(pFormulaCreator);
-    logic = pFormulaCreator.getEnv().getLogic();
+    logic = pFormulaCreator.getEnv();
   }
 
   @Override

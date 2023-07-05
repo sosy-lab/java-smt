@@ -9,10 +9,6 @@
 package org.sosy_lab.java_smt.solvers.opensmt;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -23,7 +19,6 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
-import org.sosy_lab.java_smt.api.SolverException;
 
 class OpenSmtInterpolatingProver extends OpenSmtAbstractProver<Integer>
     implements InterpolatingProverEnvironment<Integer> {
@@ -32,8 +27,10 @@ class OpenSmtInterpolatingProver extends OpenSmtAbstractProver<Integer>
       OpenSmtFormulaCreator pFormulaCreator,
       FormulaManager pMgr,
       ShutdownNotifier pShutdownNotifier,
+      int pRandom,
       Set<ProverOptions> pOptions) {
-    super(pFormulaCreator, pMgr, pShutdownNotifier, pOptions);
+
+    super(pFormulaCreator, pMgr, pShutdownNotifier, getConfigInstance(pRandom, true), pOptions);
   }
 
   @Override
@@ -41,22 +38,24 @@ class OpenSmtInterpolatingProver extends OpenSmtAbstractProver<Integer>
   protected Integer getConstraintName(BooleanFormula pF) {
     return getAssertedExpressions().size();
   }
-  
+
   @Override
   public BooleanFormula getInterpolant(Collection<Integer> formulasOfA) {
     Preconditions.checkState(!closed);
     return creator.encapsulateBoolean(
-      osmtSolver.getInterpolationContext().getSingleInterpolant(new VectorInt(formulasOfA)));
+        osmtSolver.getInterpolationContext().getSingleInterpolant(new VectorInt(formulasOfA)));
   }
-  
+
   @Override
-  public List<BooleanFormula> getSeqInterpolants(List<? extends Collection<Integer>> partitionedFormulas) {
+  public List<BooleanFormula> getSeqInterpolants(
+      List<? extends Collection<Integer>> partitionedFormulas) {
     // FIXME: Add support for interpolation sequences
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public List<BooleanFormula> getTreeInterpolants(List<? extends Collection<Integer>> partitionedFormulas, int[] startOfSubTree) {
+  public List<BooleanFormula> getTreeInterpolants(
+      List<? extends Collection<Integer>> partitionedFormulas, int[] startOfSubTree) {
     throw new UnsupportedOperationException("OpenSMT does not support tree interpolants");
   }
 }

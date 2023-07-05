@@ -24,6 +24,19 @@ public interface SolverContext extends AutoCloseable {
   /** Get the formula manager, which is used for formula manipulation. */
   FormulaManager getFormulaManager();
 
+  enum LogicFeatures {
+    HAS_QUANTIFIERS,
+    HAS_UF,
+    HAS_INTEGERS,
+    HAS_RATIONALS,
+    HAS_NONLINEAR,
+    HAS_DIFF,
+    HAS_ARRAYS,
+    HAS_BITVECTORS,
+    HAS_SL,
+    HAS_REGEXP,
+  };
+
   /** Options for the prover environment. */
   enum ProverOptions {
 
@@ -52,6 +65,7 @@ public interface SolverContext extends AutoCloseable {
      */
     GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS,
 
+    // FIXME: Replace with LogicFeatures.HAS_SL ?
     /** Whether the solver should enable support for formulae build in SL theory. */
     ENABLE_SEPARATION_LOGIC
   }

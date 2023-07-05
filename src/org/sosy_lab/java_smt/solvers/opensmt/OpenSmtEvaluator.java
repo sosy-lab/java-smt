@@ -9,13 +9,13 @@
 package org.sosy_lab.java_smt.solvers.opensmt;
 
 import com.google.common.base.Preconditions;
+import opensmt.Logic;
 import opensmt.MainSolver;
-import opensmt.OpenSmt;
 import opensmt.PTRef;
 import opensmt.SRef;
 import org.sosy_lab.java_smt.basicimpl.AbstractEvaluator;
 
-public class OpenSmtEvaluator extends AbstractEvaluator<PTRef, SRef, OpenSmt> {
+public class OpenSmtEvaluator extends AbstractEvaluator<PTRef, SRef, Logic> {
 
   private final MainSolver osmtSolver;
 

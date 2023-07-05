@@ -10,15 +10,20 @@ package org.sosy_lab.java_smt.solvers.opensmt;
 
 import com.google.common.collect.ImmutableList;
 import java.math.BigInteger;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import opensmt.ArithLogic;
 import opensmt.Logic;
+import opensmt.LogicFactory;
+import opensmt.Logic_t;
 import opensmt.OpenSmt;
 import opensmt.PTRef;
 import opensmt.SRef;
 import opensmt.SymRef;
 import opensmt.VectorPTRef;
 import opensmt.VectorSRef;
+import opensmt.opensmt_logic;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -26,6 +31,7 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
+import org.sosy_lab.java_smt.api.SolverContext.LogicFeatures;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
@@ -34,42 +40,81 @@ import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtFormula.OpenSmtBooleanFormul
 import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtFormula.OpenSmtIntegerFormula;
 import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtFormula.OpenSmtRationalFormula;
 
-public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, OpenSmt, SymRef> {
+public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, SymRef> {
 
-  protected final Logic osmtLogic;
-
-  OpenSmtFormulaCreator(OpenSmt solver) {
-    // FIXME: We need srefs that are independant of the logic. Map to sref_undef if the sort is not
-    // supported?
+  private OpenSmtFormulaCreator(Logic logic) {
     super(
-        solver,
-        solver.getLogic().getSort_bool(),
-        solver.getLRALogic().getSort_int(),
-        solver.getLRALogic().getSort_real(),
+        logic,
+        logic.getSort_bool(),
+        (logic instanceof ArithLogic) ? ((ArithLogic) logic).getSort_int() : null,
+        (logic instanceof ArithLogic) ? ((ArithLogic) logic).getSort_real() : null,
         null,
         null);
-    osmtLogic = solver.getLogic();
+  }
+
+  public static OpenSmtFormulaCreator newCreator(Set<LogicFeatures> features) {
+    if (features.contains(LogicFeatures.HAS_QUANTIFIERS)) {
+      throw new UnsupportedOperationException(
+          "Could not initialze logic. Opensmt does not support quantifiers.");
+    }
+    if (features.contains(LogicFeatures.HAS_NONLINEAR)) {
+      throw new UnsupportedOperationException(
+          "Could not initialze logic. Opensmt does not support nonlinear terms.");
+    }
+    if (features.contains(LogicFeatures.HAS_BITVECTORS)) {
+      throw new UnsupportedOperationException(
+          "Could not initialze logic. Opensmt does not support bitvectors.");
+    }
+    if (features.contains(LogicFeatures.HAS_SL)) {
+      throw new UnsupportedOperationException(
+          "Could not initialze logic. Opensmt does not support separation logic.");
+    }
+    if (features.contains(LogicFeatures.HAS_REGEXP)) {
+      throw new UnsupportedOperationException(
+          "Could not initialze logic. Opensmt does not support regular expressions.");
+    }
+    if (features.contains(LogicFeatures.HAS_INTEGERS)
+        && features.contains(LogicFeatures.HAS_RATIONALS)) {
+      throw new UnsupportedOperationException(
+          "Could not initialze logic. Opensmt does not support mixed integer-rational terms.");
+    }
+
+    if (features.equals(Collections.singleton(LogicFeatures.HAS_UF))) {
+      return new OpenSmtFormulaCreator(LogicFactory.getInstance(Logic_t.QF_UF));
+    }
+    if (features.equals(Collections.singleton(LogicFeatures.HAS_INTEGERS))) {
+      OpenSmt osmt = new OpenSmt(opensmt_logic.qf_lia, "JavaSmt", true);
+      return new OpenSmtFormulaCreator(osmt.getLRALogic());
+      // return new OpenSmtFormulaCreator(LogicFactory.getInstance(Logic_t.QF_LIA));
+    }
+    if (features.equals(Collections.singleton(LogicFeatures.HAS_RATIONALS))) {
+      return new OpenSmtFormulaCreator(LogicFactory.getInstance(Logic_t.QF_LRA));
+    }
+
+    OpenSmt osmt = new OpenSmt(opensmt_logic.qf_auflira, "JavaSmt", false);
+    return new OpenSmtFormulaCreator(osmt.getLRALogic());
+    // return new OpenSmtFormulaCreator((ArithLogic)LogicFactory.getInstance(Logic_t.QF_AUFLIRA));
   }
 
   @Override
   public PTRef extractInfo(Formula pT) {
-    OpenSmtFormula osmtFormula = (OpenSmtFormula) pT;
-    return osmtFormula.getOsmtTerm();
+    OpenSmtFormula formula = (OpenSmtFormula) pT;
+    return formula.getOsmtTerm();
   }
 
   @Override
   public PTRef callFunctionImpl(SymRef declaration, List<PTRef> args) {
-    return getEnv().getLogic().insertTerm(declaration, new VectorPTRef(args));
+    return getEnv().insertTerm(declaration, new VectorPTRef(args));
   }
 
   @Override
   public SymRef declareUFImpl(String pName, SRef pReturnType, List<SRef> pArgTypes) {
-    return getEnv().getLogic().declareFun(pName, pReturnType, new VectorSRef(pArgTypes));
+    return getEnv().declareFun(pName, pReturnType, new VectorSRef(pArgTypes));
   }
 
   @Override
   public SRef getArrayType(SRef indexType, SRef elementType) {
-    return getEnv().getLogic().getArraySort(indexType, elementType);
+    return getEnv().getArraySort(indexType, elementType);
   }
 
   @Override
@@ -79,7 +124,7 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, OpenSmt, 
 
   @Override
   public SymRef getBooleanVarDeclarationImpl(PTRef pPTRef) {
-    return getEnv().getLogic().getSymRef(pPTRef);
+    return getEnv().getSymRef(pPTRef);
   }
 
   @Override
@@ -116,23 +161,23 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, OpenSmt, 
 
   @Override
   public FormulaType<?> getFormulaType(PTRef pFormula) {
-    SRef sort = getEnv().getLogic().getSortRef(pFormula);
+    SRef sort = getEnv().getSortRef(pFormula);
     return getFormulaTypeFromTermType(sort);
   }
 
   private FormulaType<?> getFormulaTypeFromTermType(SRef sort) {
-    Logic logic = getEnv().getLogic();
+    Logic logic = getEnv();
     if (logic.isSortBool(sort)) {
       return FormulaType.BooleanType;
     }
     if (logic.isArraySort(sort)) {
-      VectorSRef args = getEnv().getLogic().getSortDefinition(sort).getArgs();
+      VectorSRef args = getEnv().getSortDefinition(sort).getArgs();
 
       FormulaType<?> indexType = getFormulaTypeFromTermType(args.get(0));
       FormulaType<?> elementType = getFormulaTypeFromTermType(args.get(1));
       return FormulaType.getArrayType(indexType, elementType);
     }
-    ArithLogic alogic = getEnv().getLRALogic();
+    ArithLogic alogic = (ArithLogic) getEnv();
     if (alogic.isSortInt(sort)) {
       return FormulaType.IntegerType;
     }
@@ -151,18 +196,18 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, OpenSmt, 
         : String.format(
             "Cannot encapsulate formula %s of Type %s as %s", pTerm, getFormulaType(pTerm), pType);
     if (pType.isBooleanType()) {
-      return (T) new OpenSmtBooleanFormula(osmtLogic, pTerm);
+      return (T) new OpenSmtBooleanFormula(getEnv(), pTerm);
     }
     if (pType.isIntegerType()) {
-      return (T) new OpenSmtIntegerFormula(osmtLogic, pTerm);
+      return (T) new OpenSmtIntegerFormula(getEnv(), pTerm);
     }
     if (pType.isRationalType()) {
-      return (T) new OpenSmtRationalFormula(osmtLogic, pTerm);
+      return (T) new OpenSmtRationalFormula(getEnv(), pTerm);
     }
     if (pType.isArrayType()) {
       ArrayFormulaType<?, ?> arrFt = (ArrayFormulaType<?, ?>) pType;
       return (T)
-          new OpenSmtArrayFormula<>(osmtLogic, pTerm, arrFt.getIndexType(), arrFt.getElementType());
+          new OpenSmtArrayFormula<>(getEnv(), pTerm, arrFt.getIndexType(), arrFt.getElementType());
     }
     throw new IllegalArgumentException("Cannot create formulas of Type " + pType + " in OpenSMT");
   }
@@ -176,8 +221,8 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, OpenSmt, 
     assert getFormulaType(pTerm).isBooleanType()
         : String.format(
             "%s is not boolean, but %s (%s)",
-            pTerm, osmtLogic.getSortRef(pTerm), getFormulaType(pTerm));
-    return new OpenSmtBooleanFormula(osmtLogic, pTerm);
+            pTerm, getEnv().getSortRef(pTerm), getFormulaType(pTerm));
+    return new OpenSmtBooleanFormula(getEnv(), pTerm);
   }
 
   @Override
@@ -187,18 +232,18 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, OpenSmt, 
     assert getFormulaType(pTerm).equals(FormulaType.getArrayType(pIndexType, pElementType))
         : String.format(
             "%s is no array, but %s (%s)",
-            pTerm, osmtLogic.getSortRef(pTerm), getFormulaType(pTerm));
-    return new OpenSmtArrayFormula<>(osmtLogic, pTerm, pIndexType, pElementType);
+            pTerm, getEnv().getSortRef(pTerm), getFormulaType(pTerm));
+    return new OpenSmtArrayFormula<>(getEnv(), pTerm, pIndexType, pElementType);
   }
 
   @Override
   public PTRef makeVariable(SRef type, String varName) {
-    return getEnv().getLogic().mkVar(type, varName);
+    return getEnv().mkVar(type, varName);
   }
 
   @SuppressWarnings("unused")
   private FunctionDeclarationKind getDeclarationKind(PTRef f) {
-    Logic logic = getEnv().getLogic();
+    Logic logic = getEnv();
     /*
     AND
     IFF        If and only if.
@@ -243,7 +288,7 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, OpenSmt, 
       return FunctionDeclarationKind.XOR;
     }
 
-    ArithLogic alogic = getEnv().getLRALogic();
+    ArithLogic alogic = (ArithLogic) getEnv();
     /*
     ADD        Addition over integers and rationals.
     DISTINCT   Distinct operator for a set of numeric formulas.
@@ -301,15 +346,14 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, OpenSmt, 
 
   @Override
   public Object convertValue(PTRef value) {
-    Logic logic = getEnv().getLogic();
+    Logic logic = getEnv();
     if (logic.isTrue(value)) {
       return Boolean.TRUE;
     }
     if (logic.isFalse(value)) {
       return Boolean.FALSE;
     }
-
-    ArithLogic alogic = getEnv().getLRALogic();
+    ArithLogic alogic = (ArithLogic) getEnv();
     if (alogic.isIntConst(value)) {
       return new BigInteger(alogic.getNumConst(value));
     }
@@ -317,13 +361,12 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, OpenSmt, 
       Rational ratValue = Rational.ofString(alogic.getNumConst(value));
       return ratValue.isIntegral() ? ratValue.getNum() : ratValue;
     }
-
     throw new UnsupportedOperationException("Term `" + logic.pp(value) + "` is not a value");
   }
 
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula formula, PTRef f) {
-    Logic logic = getEnv().getLogic();
+    Logic logic = getEnv();
 
     if (logic.isConstant(f)) {
       return visitor.visitConstant(formula, convertValue(f));

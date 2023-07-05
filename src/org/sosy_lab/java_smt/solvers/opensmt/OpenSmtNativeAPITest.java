@@ -14,7 +14,10 @@ import opensmt.ArithLogic;
 import opensmt.InterpolationContext;
 import opensmt.ItpAlgorithm;
 import opensmt.Logic;
+import opensmt.LogicFactory;
+import opensmt.Logic_t;
 import opensmt.MainSolver;
+import opensmt.Model;
 import opensmt.OpenSmt;
 import opensmt.PTRef;
 import opensmt.SMTConfig;
@@ -76,6 +79,31 @@ public class OpenSmtNativeAPITest {
 
     // Check symb(I) ⊆ symb(A) ∩ symb(B)
     return varsPartA.containsAll(varsInterpol) && varsPartB.containsAll(varsInterpol);
+  }
+
+  @Test
+  public void testSolverFactory() {
+    Logic logic = LogicFactory.getInstance(Logic_t.QF_UF);
+
+    PTRef varA = logic.mkBoolVar("a");
+    PTRef varB = logic.mkBoolVar("b");
+
+    PTRef f = logic.mkEq(varA, varB);
+
+    SMTConfig config = new SMTConfig();
+
+    MainSolver mainSolver = new MainSolver(logic, config, "JavaSmt");
+    mainSolver.push(f);
+
+    sstat r = mainSolver.check();
+    assertThat(r.isTrue()).isTrue();
+
+    Model model = mainSolver.getModel();
+
+    PTRef valA = model.evaluate(varA);
+    PTRef valB = model.evaluate(varB);
+
+    assertThat(valA.equals(valB)).isTrue();
   }
 
   @Test

@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.EnumSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -25,6 +26,7 @@ import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.api.SolverContext.LogicFeatures;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 import org.sosy_lab.java_smt.delegate.logging.LoggingSolverContext;
 import org.sosy_lab.java_smt.delegate.statistics.StatisticsSolverContext;
@@ -131,7 +133,7 @@ public class SolverContextFactory {
    * @param pConfig The configuration to be used when instantiating JavaSMT and the solvers. By
    *     default, the configuration specifies the solver to use via the option <code>
    *     solver.solver=...</code>. This option can be overridden when calling the method {@link
-   *     #generateContext(Solvers)}.
+   *     #generateContext(Solvers, LogicFeatures...)}.
    * @param pLogger The processing of log messages from SMT solvers (or their bindings) is handled
    *     via this LogManager.
    * @param pShutdownNotifier This central instance allows to request the termination of all
@@ -194,17 +196,28 @@ public class SolverContextFactory {
     return generateContext(solver);
   }
 
+  public SolverContext generateContext(Set<LogicFeatures> features)
+      throws InvalidConfigurationException {
+    return generateContext(solver, features);
+  }
+
   /**
    * Create new context with solver name supplied.
    *
    * @see #generateContext()
    */
-  @SuppressWarnings("resource") // returns unclosed context object
   public SolverContext generateContext(Solvers solverToCreate)
       throws InvalidConfigurationException {
+    return generateContext(solverToCreate, EnumSet.noneOf(LogicFeatures.class));
+  }
+
+  @SuppressWarnings("resource") // returns unclosed context object
+  public SolverContext generateContext(Solvers solverToCreate, Set<LogicFeatures> features)
+      throws InvalidConfigurationException {
+
     SolverContext context;
     try {
-      context = generateContext0(solverToCreate);
+      context = generateContext0(solverToCreate, features);
     } catch (UnsatisfiedLinkError | NoClassDefFoundError e) {
       throw new InvalidConfigurationException(
           String.format(
@@ -227,12 +240,12 @@ public class SolverContextFactory {
     return context;
   }
 
-  private SolverContext generateContext0(Solvers solverToCreate)
+  private SolverContext generateContext0(Solvers solverToCreate, Set<LogicFeatures> features)
       throws InvalidConfigurationException {
     switch (solverToCreate) {
       case OPENSMT:
         return OpenSmtSolverContext.create(
-            logger, shutdownNotifier, randomSeed, nonLinearArithmetic, loader);
+            features, logger, shutdownNotifier, randomSeed, nonLinearArithmetic, loader);
 
       case CVC4:
         return CVC4SolverContext.create(

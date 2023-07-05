@@ -17,16 +17,15 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import opensmt.Logic;
 import opensmt.MainSolver;
-import opensmt.Symbol;
-import opensmt.OpenSmt;
 import opensmt.PTRef;
 import opensmt.SRef;
 import opensmt.SymRef;
+import opensmt.Symbol;
 import opensmt.TemplateFunction;
 import opensmt.VectorPTRef;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 
-public class OpenSmtModel extends AbstractModel<PTRef, SRef, OpenSmt> {
+public class OpenSmtModel extends AbstractModel<PTRef, SRef, Logic> {
 
   private final Logic osmtLogic;
   private final MainSolver osmtSolver;
@@ -39,24 +38,26 @@ public class OpenSmtModel extends AbstractModel<PTRef, SRef, OpenSmt> {
       Collection<PTRef> pAssertedExpressions) {
     super(pProver, pCreator);
 
-    osmtLogic = pCreator.getEnv().getLogic();
+    osmtLogic = pCreator.getEnv();
     osmtSolver = pProver.getOsmtSolver();
 
     PTRef asserts = osmtLogic.mkAnd(new VectorPTRef(pAssertedExpressions));
     Map<String, PTRef> userDeclarations = pCreator.extractVariablesAndUFs(asserts, true);
-    
+
     ImmutableList.Builder<ValueAssignment> builder = ImmutableList.builder();
-    
+
     for (PTRef term : userDeclarations.values()) {
+      //      System.out.println(name + " = " + osmtLogic.pp(term));
+
       SymRef ref = osmtLogic.getSymRef(term);
       Symbol sym = osmtLogic.getSym(ref);
-      
-      int numArgs = sym.size()-1;
-      
+
+      int numArgs = sym.size() - 1;
+
       if (numArgs == 0) {
         PTRef key = osmtLogic.mkVar(sym.rsort(), osmtLogic.getSymName(ref));
         PTRef value = osmtSolver.getModel().evaluate(key);
-        
+
         builder.add(
             new ValueAssignment(
                 pCreator.encapsulate(key),
@@ -67,13 +68,13 @@ public class OpenSmtModel extends AbstractModel<PTRef, SRef, OpenSmt> {
                 new ArrayList<>()));
       } else {
         TemplateFunction tf = osmtSolver.getModel().getDefinition(ref);
-        
+
         for (List<PTRef> path : unfold(numArgs, tf.getBody())) {
           List<PTRef> args = path.subList(0, numArgs);
-          
+
           PTRef key = osmtLogic.insertTerm(ref, new VectorPTRef(args));
           PTRef value = path.get(numArgs);
-          
+
           builder.add(
               new ValueAssignment(
                   pCreator.encapsulate(key),

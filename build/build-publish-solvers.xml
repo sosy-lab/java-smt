@@ -93,6 +93,8 @@ SPDX-License-Identifier: Apache-2.0
                 <include name="InterpolationContext.java"/>
                 <include name="ItpAlgorithm.java"/>
                 <include name="Logic.java"/>
+                <include name="LogicFactory.java"/>
+                <include name="Logic_t.java"/>
                 <include name="MainSolver.java"/>
                 <include name="Model.java"/>
                 <include name="OpenSmt.java"/>

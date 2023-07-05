@@ -11,8 +11,6 @@ package org.sosy_lab.java_smt.solvers.opensmt;
 import com.google.common.base.Preconditions;
 import java.util.Set;
 import java.util.function.Consumer;
-import opensmt.OpenSmt;
-import opensmt.opensmt_logic;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -30,6 +28,7 @@ public class OpenSmtSolverContext extends AbstractSolverContext {
   @SuppressWarnings("unused")
   private final LogManager logger;
 
+  private final int randomSeed;
   private final ShutdownNotifier shutdownNotifier;
 
   private boolean closed = false;
@@ -37,20 +36,23 @@ public class OpenSmtSolverContext extends AbstractSolverContext {
   private OpenSmtSolverContext(
       OpenSmtFormulaCreator pCreator,
       OpenSmtFormulaManager pManager,
+      int pRandom,
       LogManager pLogger,
       ShutdownNotifier pShutdownNotifier) {
 
     super(pManager);
     creator = pCreator;
     manager = pManager;
+    randomSeed = pRandom;
     logger = pLogger;
     shutdownNotifier = pShutdownNotifier;
   }
 
   public static SolverContext create(
+      Set<LogicFeatures> features,
       LogManager pLogger,
       ShutdownNotifier pShutdownNotifier,
-      long randomSeed,
+      long pRandom,
       NonLinearArithmetic pNonLinearArithmetic,
       Consumer<String> pLoader) {
 
@@ -59,10 +61,7 @@ public class OpenSmtSolverContext extends AbstractSolverContext {
     pLoader.accept("opensmtjava");
 
     // Create a solver instance
-    OpenSmt newSolver = new OpenSmt(opensmt_logic.qf_auflira, "javasmt", false);
-    newSolver.getConfig().setRandomSeed((int) randomSeed);
-    
-    OpenSmtFormulaCreator creator = new OpenSmtFormulaCreator(newSolver);
+    OpenSmtFormulaCreator creator = OpenSmtFormulaCreator.newCreator(features);
 
     // Create managers
     OpenSmtUFManager functionTheory = new OpenSmtUFManager(creator);
@@ -77,7 +76,7 @@ public class OpenSmtSolverContext extends AbstractSolverContext {
         new OpenSmtFormulaManager(
             creator, functionTheory, booleanTheory, integerTheory, rationalTheory, arrayTheory);
 
-    return new OpenSmtSolverContext(creator, manager, pLogger, pShutdownNotifier);
+    return new OpenSmtSolverContext(creator, manager, (int) pRandom, pLogger, pShutdownNotifier);
   }
 
   @Override
@@ -92,30 +91,31 @@ public class OpenSmtSolverContext extends AbstractSolverContext {
   public Solvers getSolverName() {
     return Solvers.OPENSMT;
   }
-  
+
   @Override
   public String getVersion() {
-    // FIXME: OpenSMT does not provide a way to read the version number. We'll have to patch the source or get it from the lib
+    // FIXME: OpenSMT does not provide a way to read the version number. We'll have to patch the
+    // source or get it from the lib
     throw new UnsupportedOperationException();
   }
-  
+
   @Override
   protected OptimizationProverEnvironment newOptimizationProverEnvironment0(
       Set<SolverContext.ProverOptions> options) {
     throw new UnsupportedOperationException("OpenSMT does not support optimization.");
   }
-  
+
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<SolverContext.ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
-    return new OpenSmtTheoremProver(creator, manager, shutdownNotifier, options);
+    return new OpenSmtTheoremProver(creator, manager, shutdownNotifier, randomSeed, options);
   }
 
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<SolverContext.ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
-    return new OpenSmtInterpolatingProver(creator, manager, shutdownNotifier, options);
+    return new OpenSmtInterpolatingProver(creator, manager, shutdownNotifier, randomSeed, options);
   }
 
   @Override

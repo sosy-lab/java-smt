@@ -9,20 +9,19 @@
 package org.sosy_lab.java_smt.solvers.opensmt;
 
 import opensmt.Logic;
-import opensmt.OpenSmt;
 import opensmt.PTRef;
 import opensmt.SRef;
 import opensmt.SymRef;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 
 public class OpenSmtBooleanFormulaManager
-    extends AbstractBooleanFormulaManager<PTRef, SRef, OpenSmt, SymRef> {
+    extends AbstractBooleanFormulaManager<PTRef, SRef, Logic, SymRef> {
 
   private final Logic logic;
 
   OpenSmtBooleanFormulaManager(OpenSmtFormulaCreator pCreator) {
     super(pCreator);
-    logic = pCreator.getEnv().getLogic();
+    logic = pCreator.getEnv();
   }
 
   @Override

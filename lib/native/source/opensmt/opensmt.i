@@ -48,6 +48,31 @@
 
 %include "include/opensmt/Opensmt.h"
 
+%ignore Arithmetic_t;
+
+%ignore ArithProperty;
+%ignore no_arith;
+
+%ignore UFProperty;
+%ignore no_uf;
+
+%ignore BVProperty;
+%ignore no_bv;
+
+%ignore LogicProperty;
+
+//%ignore Logic_t;
+
+%ignore QFLogicToProperties;
+%ignore getLogicFromString(const std::string & name);
+%ignore getStringFromLogic(const Logic_t logic);
+
+//%ignore LogicFactory;
+%ignore LogicFactory::getLRAInstance();
+%ignore LogicFactory::getLIAInstance();
+
+%include "include/opensmt/LogicFactory.h"
+
 %ignore ASTType;
 %ignore ASTNode;
 %ignore ConfType;
@@ -433,7 +458,15 @@
 %ignore SMTConfig::server_port;
 %ignore SMTConfig::database_host;
 %ignore SMTConfig::database_port;
-
+%extend SMTConfig {
+  void setInterpolation (bool enable) {
+    const char* msg;
+    bool ok = $self->setOption(SMTConfig::o_produce_inter, SMTOption(enable), msg);
+    if (!ok) {
+      throw std::runtime_error(msg);
+    }
+  }
+ }
 %include "include/opensmt/SMTConfig.h"
 
 %ignore operator==(PTRef, PTRef);
@@ -631,7 +664,7 @@
 %ignore Symbol::chainable () const;
 %ignore Symbol::pairwise () const;
 %ignore Symbol::noScoping () const;
-%ignore Symbol::nargs () const;
+//%ignore Symbol::nargs () const;
 %ignore Symbol::getId () const;
 %ignore Symbol::setId (int i);
 //%ignore Symbol::isInterpreted () const;
@@ -640,7 +673,7 @@
   %newobject getArgs;
   std::vector<SRef> getArgs() {
     std::vector<SRef> args;
-    for(auto i=0; i<$self->size(); i++)
+    for(auto i=0; i<$self->nargs(); i++)
       args.emplace_back($self->operator[](i));
     return args;
   }

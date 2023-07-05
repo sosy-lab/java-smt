@@ -11,7 +11,7 @@ package org.sosy_lab.java_smt.solvers.opensmt;
 import java.math.BigInteger;
 import java.util.List;
 import opensmt.ArithLogic;
-import opensmt.OpenSmt;
+import opensmt.Logic;
 import opensmt.PTRef;
 import opensmt.SRef;
 import opensmt.SymRef;
@@ -23,7 +23,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager;
 abstract class OpenSmtNumeralFormulaManager<
         ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
     extends AbstractNumeralFormulaManager<
-        PTRef, SRef, OpenSmt, ParamFormulaType, ResultFormulaType, SymRef> {
+        PTRef, SRef, Logic, ParamFormulaType, ResultFormulaType, SymRef> {
 
   protected final ArithLogic osmtLogic;
 
@@ -31,7 +31,7 @@ abstract class OpenSmtNumeralFormulaManager<
       OpenSmtFormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
     super(pCreator, pNonLinearArithmetic);
     // FIXME: maybe we should rename this to getArithLogic()?
-    osmtLogic = pCreator.getEnv().getLIALogic();
+    osmtLogic = (ArithLogic) pCreator.getEnv();
   }
 
   protected abstract SRef getNumeralType();

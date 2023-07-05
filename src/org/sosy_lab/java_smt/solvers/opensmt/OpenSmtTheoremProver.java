@@ -11,8 +11,8 @@ package org.sosy_lab.java_smt.solvers.opensmt;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
-import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 
@@ -22,8 +22,9 @@ class OpenSmtTheoremProver extends OpenSmtAbstractProver<Void> implements Prover
       OpenSmtFormulaCreator pFormulaCreator,
       FormulaManager pMgr,
       ShutdownNotifier pShutdownNotifier,
+      int pRandom,
       Set<ProverOptions> pOptions) {
-    super(pFormulaCreator, pMgr, pShutdownNotifier, pOptions);
+    super(pFormulaCreator, pMgr, pShutdownNotifier, getConfigInstance(pRandom, false), pOptions);
   }
 
   @Override
