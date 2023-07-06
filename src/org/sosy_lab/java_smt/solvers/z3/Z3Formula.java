@@ -57,7 +57,9 @@ abstract class Z3Formula implements Formula {
       return false;
     }
     Z3Formula other = (Z3Formula) obj;
-    return (z3context == other.z3context) && Native.isEqAst(z3context, z3expr, other.z3expr);
+    return (z3context == other.z3context)
+        && (Native.isEqAst(z3context, z3expr, other.z3expr)
+            || (this.toString().equals(other.toString())));
   }
 
   @Override

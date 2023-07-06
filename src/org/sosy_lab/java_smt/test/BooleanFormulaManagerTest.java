@@ -395,4 +395,40 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
     Truth.assertThat(bmgr.ifThenElse(var1, fTrue, fFalse)).isEqualTo(var1);
     Truth.assertThat(bmgr.ifThenElse(var1, fFalse, fTrue)).isEqualTo(bmgr.not(var1));
   }
+
+  @Test
+  public void testAssociativity1() {
+    BooleanFormula var1 = bmgr.makeVariable("var1");
+    BooleanFormula var2 = bmgr.makeVariable("var2");
+    BooleanFormula var3 = bmgr.makeVariable("var3");
+
+    Truth.assertThat(bmgr.and(var1, bmgr.and(var2, var3)))
+        .isEqualTo(bmgr.and(bmgr.and(var1, var2), var3));
+    Truth.assertThat(bmgr.or(var1, bmgr.or(var2, var3)))
+        .isEqualTo(bmgr.or(bmgr.or(var1, var2), var3));
+  }
+
+  @Test
+  public void testAssociativity2() {
+    BooleanFormula var1 = bmgr.makeVariable("var1");
+    BooleanFormula var2 = bmgr.makeVariable("var2");
+    BooleanFormula var3 = bmgr.makeVariable("var3");
+
+    Truth.assertThat(bmgr.and(var1, bmgr.and(var2, var3))).isEqualTo(bmgr.and(var1, var2, var3));
+    Truth.assertThat(bmgr.or(var1, bmgr.or(var2, var3))).isEqualTo(bmgr.or(var1, var2, var3));
+  }
+
+  @Test
+  public void testAssociativity3() {
+    BooleanFormula var1 = bmgr.makeVariable("var1");
+    BooleanFormula var2 = bmgr.makeVariable("var2");
+    BooleanFormula var3 = bmgr.makeVariable("var3");
+    BooleanFormula var4 = bmgr.makeVariable("var4");
+
+    Truth.assertThat(bmgr.and(bmgr.and(var1, var2), bmgr.and(var3, var4)))
+        .isEqualTo(bmgr.and(var1, var2, var3, var4));
+    Truth.assertThat(bmgr.or(bmgr.or(var1, var2), bmgr.or(var3, var4)))
+        .isEqualTo(bmgr.or(var1, var2, var3, var4));
+  }
+
 }
