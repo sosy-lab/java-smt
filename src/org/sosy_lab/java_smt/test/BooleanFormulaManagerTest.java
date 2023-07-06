@@ -430,5 +430,4 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
     Truth.assertThat(bmgr.or(bmgr.or(var1, var2), bmgr.or(var3, var4)))
         .isEqualTo(bmgr.or(var1, var2, var3, var4));
   }
-
 }
