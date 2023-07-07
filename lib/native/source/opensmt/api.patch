@@ -71,6 +71,18 @@ index e43b7691..062936fd 100644
      ~Interpret();
  
      int interpFile(FILE* in);
+diff --git a/src/api/MainSolver.cc b/src/api/MainSolver.cc
+index 49874f9d..b7a6208c 100644
+--- a/src/api/MainSolver.cc
++++ b/src/api/MainSolver.cc
+@@ -203,6 +203,7 @@ PTRef MainSolver::rewriteMaxArity(PTRef root)
+ }
+ 
+ std::unique_ptr<Model> MainSolver::getModel() {
++    if (status != s_True) { throw OsmtApiException("Model cannot be created if solver is not in SAT state"); }
+ 
+     ModelBuilder modelBuilder {logic};
+     ts.solver.fillBooleanVars(modelBuilder);
 diff --git a/src/logics/FunctionTools.h b/src/logics/FunctionTools.h
 index fc9dbfb7..943a466d 100644
 --- a/src/logics/FunctionTools.h
@@ -85,7 +97,7 @@ index fc9dbfb7..943a466d 100644
  public:
      static std::string nextFreeArgumentName() { return std::string(template_arg_prefix) + std::to_string(template_arg_counter++); }
 diff --git a/src/logics/Logic.cc b/src/logics/Logic.cc
-index b90430c2..41df9e9c 100644
+index b90430c2..3b1fcd3a 100644
 --- a/src/logics/Logic.cc
 +++ b/src/logics/Logic.cc
 @@ -15,6 +15,7 @@
@@ -133,6 +145,23 @@ index b90430c2..41df9e9c 100644
  void Logic::instantiateFunctions(SRef sr)
  {
      // Equality
+@@ -1346,14 +1359,14 @@ void Logic::dumpWithLets(std::ostream & dump_out, PTRef formula) const {
+         if (term.size() > 0) dump_out << ")";
+ 
+         // Closes binding
+-        dump_out << "))\n";
++        dump_out << ")) ";
+         // Keep track of number of lets to close
+         num_lets++;
+ 
+         assert(enode_to_def.find(e) == enode_to_def.end());
+         enode_to_def[e] = std::move(definition);
+     }
+-    dump_out << '\n' << enode_to_def[formula] << '\n';
++    dump_out << enode_to_def[formula];
+ 
+     // Close all lets
+     for (unsigned n = 1; n <= num_lets; n++) dump_out << ")";
 @@ -1488,6 +1501,9 @@ Logic::collectStats(PTRef root, int& n_of_conn, int& n_of_eq, int& n_of_uf, int&
  
  PTRef Logic::conjoinExtras(PTRef root) { return root; }

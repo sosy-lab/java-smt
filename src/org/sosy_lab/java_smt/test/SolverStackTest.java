@@ -281,6 +281,18 @@ public class SolverStackTest extends SolverBasedTest0 {
 
   @Test
   public void largerStackUsageTest() throws InterruptedException, SolverException {
+    throw new RuntimeException("BROKEN - Reson unknown.");
+    /* FIXME
+       Native frames: (J=compiled Java code, j=interpreted, Vv=VM code, C=native code)
+       C  [libopensmt.so+0x1b2e17]  SymStore::newSymb(char const*, SRef, vec<SRef> const&, SymbolConfig const&)+0x317
+       Java frames: (J=compiled Java code, j=interpreted, Vv=VM code)
+       J 2163  opensmt.OsmtNativeJNI.Logic_mkBoolVar(JLopensmt/Logic;Ljava/lang/String;)J (0 bytes) @ 0x00007fd3507c5021 [0x00007fd3507c4fa0+0x0000000000000081]
+       J 2162 c1 opensmt.Logic.mkBoolVar(Ljava/lang/String;)Lopensmt/PTRef; (30 bytes) @ 0x00007fd3490369a4 [0x00007fd3490368c0+0x00000000000000e4]
+       J 2161 c1 org.sosy_lab.java_smt.solvers.opensmt.OpenSmtBooleanFormulaManager.makeVariableImpl(Ljava/lang/String;)Lopensmt/PTRef; (20 bytes) @ 0x00007fd349036524 [0x00007fd349036420+0x0000000000000104]
+       J 2160 c1 org.sosy_lab.java_smt.solvers.opensmt.OpenSmtBooleanFormulaManager.makeVariableImpl(Ljava/lang/String;)Ljava/lang/Object; (17 bytes) @ 0x00007fd3490360a4 [0x00007fd349036020+0x0000000000000084]
+       J 2159 c1 org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager.makeVariable(Ljava/lang/String;)Lorg/sosy_lab/java_smt/api/BooleanFormula; (29 bytes) @ 0x00007fd3490355b4 [0x00007fd3490354c0+0x00000000000000f4]
+       j  org.sosy_lab.java_smt.test.SolverStackTest.largerStackUsageTest()V+190
+    
     assume()
         .withMessage("Solver does not support larger stacks yet")
         .that(solver)
@@ -297,6 +309,7 @@ public class SolverStackTest extends SolverBasedTest0 {
       stack.addConstraint(bmgr.equivalence(bmgr.makeVariable("X" + i), bmgr.makeVariable("Y" + i)));
     }
     assertThat(stack.isUnsat()).isFalse();
+    */
   }
 
   @Test
@@ -587,8 +600,6 @@ public class SolverStackTest extends SolverBasedTest0 {
   @Test
   @SuppressWarnings("CheckReturnValue")
   public void modelForUnsatFormula() throws SolverException, InterruptedException {
-    throw new RuntimeException();
-    /* FIXME: Check if sat before trying to create a model
     requireIntegers();
     try (BasicProverEnvironment<?> stack = newEnvironmentForTest()) {
       stack.push(imgr.greaterThan(imgr.makeVariable("a"), imgr.makeNumber(0)));
@@ -597,14 +608,11 @@ public class SolverStackTest extends SolverBasedTest0 {
 
       assertThrows(Exception.class, stack::getModel);
     }
-    */
   }
 
   @Test
   @SuppressWarnings("CheckReturnValue")
   public void modelForUnsatFormula2() throws SolverException, InterruptedException {
-    throw new RuntimeException();
-    /* FIXME: Check if sat before trying to create a model
     requireIntegers();
     try (BasicProverEnvironment<?> stack = newEnvironmentForTest()) {
       stack.push(imgr.greaterThan(imgr.makeVariable("a"), imgr.makeNumber(0)));
@@ -614,7 +622,6 @@ public class SolverStackTest extends SolverBasedTest0 {
 
       assertThrows(Exception.class, stack::getModel);
     }
-    */
   }
 
   @Test
