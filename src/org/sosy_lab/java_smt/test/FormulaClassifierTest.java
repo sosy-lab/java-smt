@@ -56,6 +56,7 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
   }
 
   private void requireNonlinear() {
+    // INFO: OpenSMT does not allow nonlinear formulas, even when the solver is not called
     assume()
         .withMessage("Solver %s does not support nonlinear formulas", solverToUse())
         .that(solverToUse())
@@ -81,14 +82,18 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
 
   @Test
   public void test_QF_AUFLIRA() {
-    throw new RuntimeException("BROKEN - Reason unknown.");
-    /* FIXME
+    // INFO: AUFLIRA only support integers OR reals in OpenSMT
+    assume()
+        .withMessage("Solver %s does not support mixed integer-real arithmetic", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.OPENSMT);
+    
     requireParser();
     requireRationals();
     String query = VARS + "(assert (= (select arr x) (bar (/ 1 2))))";
     classifier.visit(mgr.parse(query));
     assertThat(classifier.toString()).isEqualTo("QF_AUFLIRA");
-    */
+    
   }
 
   @Test
