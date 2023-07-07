@@ -122,10 +122,6 @@ public class NonLinearArithmeticWithModuloTest extends SolverBasedTest0 {
 
   @Test
   public void testModulo() throws SolverException, InterruptedException {
-    throw new RuntimeException(
-        "Broken - Handle `Divisor must be constant` exception in swig to fix this.");
-
-    /* FIXME
     requireIntegers();
     IntegerFormula a = imgr.makeVariable("a");
 
@@ -137,15 +133,10 @@ public class NonLinearArithmeticWithModuloTest extends SolverBasedTest0 {
                 handleExpectedException(() -> imgr.modulo(imgr.makeNumber(3), a))));
 
     assertThatFormula(f).isSatisfiable();
-    */
   }
 
   @Test
   public void testModuloUnsatisfiable() throws SolverException, InterruptedException {
-    throw new RuntimeException(
-        "Broken - Handle `Divisor must be constant` exception in swig to fix this.");
-
-    /* FIXME
     requireIntegers();
     IntegerFormula a = imgr.makeVariable("a");
 
@@ -163,6 +154,5 @@ public class NonLinearArithmeticWithModuloTest extends SolverBasedTest0 {
     } else {
       assertExpectedUnsatifiabilityForNonLinearArithmetic(f);
     }
-    */
   }
 }

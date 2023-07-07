@@ -41,7 +41,11 @@ class OpenSmtFormulaManager extends AbstractFormulaManager<PTRef, SRef, Logic, S
 
   @Override
   public BooleanFormula parse(String pS) throws IllegalArgumentException {
-    return creator.encapsulateBoolean(osmtLogic.parseFormula(pS));
+    try {
+      return creator.encapsulateBoolean(osmtLogic.parseFormula(pS));
+    } catch (RuntimeException e) {
+      throw new IllegalArgumentException();
+    }
   }
 
   @Override

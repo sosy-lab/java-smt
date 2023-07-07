@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth.assert_;
 
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
@@ -88,14 +89,19 @@ public class NumeralFormulaManagerTest extends SolverBasedTest0 {
   }
 
   @SuppressWarnings("CheckReturnValue")
-  @Test /*(expected = Exception.class)*/
-  public void failOnInvalidString() {
-    throw new RuntimeException("BROKEN - Handle exceptions in swig to fix it.");
-    /* FIXME
+  @Test(expected = Exception.class)
+  public void failOnInvalidStringInteger() {
     requireIntegers();
     imgr.makeNumber("a");
     assert_().fail();
-    */
+  }
+
+  @SuppressWarnings("CheckReturnValue")
+  @Test(expected = Exception.class)
+  public void failOnInvalidStringRational() {
+    requireIntegers();
+    rmgr.makeNumber("a");
+    assert_().fail();
   }
 
   @SuppressWarnings("CheckReturnValue")

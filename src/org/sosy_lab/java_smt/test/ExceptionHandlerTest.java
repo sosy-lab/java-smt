@@ -31,13 +31,10 @@ public class ExceptionHandlerTest extends SolverBasedTest0 {
     return solver;
   }
 
-  @Test /*(expected = Exception.class)*/
+  @Test(expected = Exception.class)
   @SuppressWarnings("CheckReturnValue")
   public void testErrorHandling() {
-    throw new RuntimeException("Broken - Handle exception in swig to fix this.");
-    /* FIXME
     // Will exit(1) without an exception handler.
     rmgr.makeNumber("not-a-number");
-    */
   }
 }

@@ -26,6 +26,36 @@
 %unique_ptr(Model);
 %unique_ptr(InterpolationContext);
 
+%exception {
+  try { $action }
+  catch(ArithDivisionByZeroException& e) {
+    jclass exceptionType = jenv->FindClass("java/lang/UnsupportedOperationException");
+    jenv->ThrowNew(exceptionType, e.what());
+    return $null;
+  }
+  catch(LANonLinearException& e) {
+    jclass exceptionType = jenv->FindClass("java/lang/UnsupportedOperationException");
+    jenv->ThrowNew(exceptionType, e.what());
+    return $null;
+  }
+  catch(OsmtApiException& e) {
+    jclass exceptionType = jenv->FindClass("java/lang/UnsupportedOperationException");
+    jenv->ThrowNew(exceptionType, e.what());
+    return $null;
+  } 
+  catch(OutOfMemoryException& e) {
+    jclass exceptionType = jenv->FindClass("java/lang/OutOfMemoryError");
+    jenv->ThrowNew(exceptionType, "");
+    return $null;
+  } 
+  catch(...) {
+    jclass exceptionType = jenv->FindClass("java/lang/RuntimeException");
+    jenv->ThrowNew(exceptionType, "");
+    return $null;
+  }
+}
+
+
 %rename(OpenSmt) Opensmt;
 %ignore Opensmt::Opensmt (opensmt_logic _logic, const char *name);
 %ignore Opensmt::Opensmt (opensmt_logic _logic, const char *name, std::unique_ptr< SMTConfig > config);

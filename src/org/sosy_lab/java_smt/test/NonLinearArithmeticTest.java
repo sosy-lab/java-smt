@@ -151,9 +151,6 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
 
   @Test
   public void testMultiplicationOfVariables() throws SolverException, InterruptedException {
-    throw new RuntimeException("BROKEN - Handle nonlinear exception in swig header to fix it.");
-
-    /* FIXME
     T a = nmgr.makeVariable("a");
     T b = nmgr.makeVariable("b");
     T c = nmgr.makeVariable("c");
@@ -164,15 +161,11 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
             nmgr.equal(c, nmgr.makeNumber(2 * 3)));
 
     assertThatFormula(f).isSatisfiable();
-    */
   }
 
   @Test
   public void testMultiplicationOfVariablesUnsatisfiable()
       throws SolverException, InterruptedException {
-    throw new RuntimeException("BROKEN - Handle nonlinear exception in swig header to fix it.");
-
-    /* FIXME
     T a = nmgr.makeVariable("a");
     T b = nmgr.makeVariable("b");
     T c = nmgr.makeVariable("c");
@@ -192,7 +185,6 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
     } else {
       assertExpectedUnsatifiabilityForNonLinearArithmetic(f);
     }
-    */
   }
 
   @Test
@@ -252,7 +244,6 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
   @Test
   public void testDivision() throws SolverException, InterruptedException {
     throw new RuntimeException("BROKEN - Reason unknown.");
-
     /* FIXME
 
        Native frames: (J=compiled Java code, j=interpreted, Vv=VM code, C=native code)
@@ -281,8 +272,7 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
 
   @Test
   public void testDivisionUnsatisfiable() throws SolverException, InterruptedException {
-    throw new RuntimeException("BROKEN - Handle nonlinear exception in swig header to fix it.");
-
+    throw new RuntimeException("BROKEN - Reason unknown.");
     /* FIXME
     T a = nmgr.makeVariable("a");
 

@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth.assert_;
 
 import com.google.common.collect.Iterables;
 import java.util.HashSet;
@@ -146,12 +147,9 @@ public class RationalFormulaManagerTest extends SolverBasedTest0 {
   }
 
   @SuppressWarnings("CheckReturnValue")
-  @Test /*(expected = Exception.class)*/
+  @Test(expected = Exception.class)
   public void failOnInvalidString() {
-    throw new RuntimeException("BROKEN - Handle exceptions in swig to fix this.");
-    /* FIXME
     rmgr.makeNumber("a");
     assert_().fail();
-    */
   }
 }
