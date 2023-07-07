@@ -892,7 +892,7 @@
 %ignore Logic::dumpFormulaToFile (std::ostream &dump_out, PTRef formula, bool negate=false, bool toassert=true) const;
 %ignore Logic::dumpChecksatToFile (std::ostream &dump_out) const;
 %ignore Logic::dumpWithLets (std::ostream &out, PTRef formula) const;
-%ignore Logic::dumpWithLets (PTRef formula) const;
+//%ignore Logic::dumpWithLets (PTRef formula) const;
 %ignore Logic::instantiateFunctionTemplate (TemplateFunction const &tmplt, vec< PTRef > const &args);
 %extend Logic {
   PTRef instantiateFunctionTemplate (TemplateFunction const &tmplt, std::vector< PTRef > const &args) {

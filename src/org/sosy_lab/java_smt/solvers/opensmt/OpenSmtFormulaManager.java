@@ -73,7 +73,7 @@ class OpenSmtFormulaManager extends AbstractFormulaManager<PTRef, SRef, Logic, S
                   + osmtLogic.printSort(sym.rsort())
                   + ")\n");
         }
-        out.append("(assert " + osmtLogic.pp(f) + ')');
+        out.append("(assert " + osmtLogic.dumpWithLets(f) + ')');
       }
     };
   }
