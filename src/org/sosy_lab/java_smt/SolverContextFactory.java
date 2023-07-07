@@ -214,7 +214,10 @@ public class SolverContextFactory {
   @SuppressWarnings("resource") // returns unclosed context object
   public SolverContext generateContext(Solvers solverToCreate, Set<LogicFeatures> features)
       throws InvalidConfigurationException {
-
+    if (features == null) {
+      throw new NullPointerException();
+    }
+    
     SolverContext context;
     try {
       context = generateContext0(solverToCreate, features);
