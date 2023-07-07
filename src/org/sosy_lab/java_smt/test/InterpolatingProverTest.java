@@ -76,7 +76,7 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       IntegerFormula x = imgr.makeVariable("x");
       IntegerFormula y = imgr.makeVariable("y");
-      IntegerFormula z = x; //imgr.makeVariable("z");
+      IntegerFormula z = imgr.makeVariable("z");
       BooleanFormula f1 = imgr.equal(y, imgr.multiply(imgr.makeNumber(2), x));
       BooleanFormula f2 = imgr.equal(y, imgr.add(imgr.makeNumber(1), imgr.multiply(z, imgr.makeNumber(2))));
       prover.push(f1);
@@ -98,7 +98,7 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       IntegerFormula x = imgr.makeVariable("x");
       IntegerFormula y = imgr.makeVariable("y");
-      IntegerFormula z = x;//imgr.makeVariable("z");
+      IntegerFormula z = imgr.makeVariable("z");
       BooleanFormula f1 = imgr.equal(y, imgr.multiply(imgr.makeNumber(2), x));
       BooleanFormula f2 = imgr.equal(y, imgr.add(imgr.makeNumber(1), imgr.multiply(z, imgr.makeNumber(2))));
       T id1 = prover.push(f1);

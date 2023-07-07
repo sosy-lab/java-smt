@@ -85,7 +85,7 @@ index fc9dbfb7..943a466d 100644
  public:
      static std::string nextFreeArgumentName() { return std::string(template_arg_prefix) + std::to_string(template_arg_counter++); }
 diff --git a/src/logics/Logic.cc b/src/logics/Logic.cc
-index 486222e4..55b29e76 100644
+index b90430c2..41df9e9c 100644
 --- a/src/logics/Logic.cc
 +++ b/src/logics/Logic.cc
 @@ -15,6 +15,7 @@
@@ -96,6 +96,24 @@ index 486222e4..55b29e76 100644
  
  #include <iostream>
  #include <map>
+@@ -32,7 +33,7 @@ const char* Logic::e_argnum_mismatch = "incorrect number of arguments";
+ const char* Logic::e_bad_constant    = "incorrect constant for logic";
+ 
+ const char* Logic::tk_val_uf_default   = "UFDefault";
+-const char* Logic::tk_val_bool_default = "true";
++const char* Logic::tk_val_bool_default = "false";
+ 
+ const char* Logic::tk_true     = "true";
+ const char* Logic::tk_false    = "false";
+@@ -391,7 +392,7 @@ Logic::getDefaultValue(const PTRef tr) const
+ 
+ PTRef
+ Logic::getDefaultValuePTRef(const SRef sref) const {
+-    if (sref == sort_BOOL) { return term_TRUE; }
++    if (sref == sort_BOOL) { return term_FALSE; }
+     else {
+         return defaultValueForSort[sref];
+ 
 @@ -758,6 +759,18 @@ PTRef Logic::mkBoolVar(const char* name)
      return mkFun(sr, {});
  }
@@ -126,10 +144,10 @@ index 486222e4..55b29e76 100644
  SRef        Logic::getSortRef    (const PTRef tr)        const { return getSortRef(getPterm(tr).symb()); }
  SRef        Logic::getSortRef    (const SymRef sr)       const { return getSym(sr).rsort(); }
 diff --git a/src/logics/Logic.h b/src/logics/Logic.h
-index 2edf68dd..e163d4b4 100644
+index 73513cd1..888f970c 100644
 --- a/src/logics/Logic.h
 +++ b/src/logics/Logic.h
-@@ -145,6 +145,9 @@ class Logic {
+@@ -144,6 +144,9 @@ class Logic {
      void        markConstant  (SymId sid);
  
    public:
@@ -139,7 +157,7 @@ index 2edf68dd..e163d4b4 100644
      SRef                getSortRef (PTRef tr)  const;
      SRef                getSortRef (SymRef sr) const;
      std::string         printSort  (SRef s)    const;
-@@ -273,6 +276,8 @@ public:
+@@ -275,6 +278,8 @@ public:
      void dumpWithLets(std::ostream & out, PTRef formula) const;
      std::string dumpWithLets(PTRef formula) const;
  

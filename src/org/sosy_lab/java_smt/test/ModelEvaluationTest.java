@@ -204,7 +204,7 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
 
   @Test
   public void testGetBooleansEvaluation() throws SolverException, InterruptedException {
-    // FIXME: Default value for boolean in OpenSMT is 'true'
+    // NOTE: Default value for boolean in OpenSMT is 'true'. We patched it to resolve the issue.
     evaluateInModel(
         bmgr.makeVariable("x"),
         bmgr.makeVariable("y"),
