@@ -85,13 +85,12 @@ public class OpenSmtNativeAPITest {
   public void testSolverFactory() {
     Logic logic = LogicFactory.getInstance(Logic_t.QF_UF);
 
+    // a = b
     PTRef varA = logic.mkBoolVar("a");
     PTRef varB = logic.mkBoolVar("b");
-
     PTRef f = logic.mkEq(varA, varB);
 
     SMTConfig config = new SMTConfig();
-
     MainSolver mainSolver = new MainSolver(logic, config, "JavaSmt");
     mainSolver.push(f);
 
