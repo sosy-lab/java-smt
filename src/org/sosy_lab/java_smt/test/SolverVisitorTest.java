@@ -1061,9 +1061,10 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     requireIntegers();
     requireParser();
 
+    // INFO: OpenSMT does not support mixed integer-real logic. So we changed the types of bb and cc.
     String abc =
-        "(declare-fun aa () Int) (declare-fun bb () Real)"
-            + "(declare-fun cc () Real) (declare-fun dd () Int)";
+        "(declare-fun aa () Int) (declare-fun bb () Int)"
+            + "(declare-fun cc () Int) (declare-fun dd () Int)";
     BooleanFormula sum = mgr.parse(abc + "(assert (= 0 (+ aa bb cc dd)))");
     BooleanFormula equals = mgr.parse(abc + "(assert (= aa bb cc dd))");
     BooleanFormula distinct = mgr.parse(abc + "(assert (distinct aa bb cc dd))");
@@ -1073,7 +1074,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     BooleanFormula greaterEquals = mgr.parse(abc + "(assert (>= aa bb cc dd))");
 
     for (BooleanFormula bf :
-        ImmutableList.of(sum, equals, distinct, less, lessEquals, greater, greaterEquals)) {
+           ImmutableList.of(sum, equals, distinct, less, lessEquals, greater, greaterEquals)) {
       Formula transformed = mgr.visit(bf, plainFunctionVisitor);
       assertThatFormula((BooleanFormula) transformed).isEquisatisfiableTo(bf);
     }
