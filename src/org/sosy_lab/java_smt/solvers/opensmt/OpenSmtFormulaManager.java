@@ -64,7 +64,7 @@ class OpenSmtFormulaManager extends AbstractFormulaManager<PTRef, SRef, Logic, S
 
           out.append(
               "(declare-fun "
-                  + osmtLogic.getSymName(ref)
+                  + osmtLogic.protectName(ref)
                   + " ("
                   + sym.getArgs().stream()
                       .map((atype) -> osmtLogic.printSort(atype))

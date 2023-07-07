@@ -994,7 +994,7 @@
 %ignore Logic::isAmbiguousUninterpretedNullarySymbolName (std::string_view name) const;
 %ignore Logic::protectName (std::string const &name, bool isInterpreted) const;
 %ignore Logic::disambiguateName (std::string const &protectedName, SRef retSort, bool isNullary, bool isInterpreted) const;
-%ignore Logic::protectName (SymRef sr) const;
+//%ignore Logic::protectName (SymRef sr) const;
 %ignore Logic::printTerm_ (PTRef tr, bool l, bool s) const;
 %ignore Logic::printTerm (PTRef tr) const;
 %ignore Logic::printTerm (PTRef tr, bool l, bool s) const;
