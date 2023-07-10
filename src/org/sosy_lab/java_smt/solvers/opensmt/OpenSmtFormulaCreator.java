@@ -78,22 +78,18 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, Sy
       throw new UnsupportedOperationException(
           "Could not initialze logic. Opensmt does not support mixed integer-rational terms.");
     }
-
+    
     if (features.equals(Collections.singleton(LogicFeatures.HAS_UF))) {
       return new OpenSmtFormulaCreator(LogicFactory.getInstance(Logic_t.QF_UF));
     }
     if (features.equals(Collections.singleton(LogicFeatures.HAS_INTEGERS))) {
-      OpenSmt osmt = new OpenSmt(opensmt_logic.qf_lia, "JavaSmt", true);
-      return new OpenSmtFormulaCreator(osmt.getLRALogic());
-      // return new OpenSmtFormulaCreator(LogicFactory.getInstance(Logic_t.QF_LIA));
+      return new OpenSmtFormulaCreator(LogicFactory.getLIAInstance());
     }
     if (features.equals(Collections.singleton(LogicFeatures.HAS_RATIONALS))) {
-      return new OpenSmtFormulaCreator(LogicFactory.getInstance(Logic_t.QF_LRA));
+      return new OpenSmtFormulaCreator(LogicFactory.getLRAInstance());
     }
-
-    OpenSmt osmt = new OpenSmt(opensmt_logic.qf_auflira, "JavaSmt", false);
-    return new OpenSmtFormulaCreator(osmt.getLRALogic());
-    // return new OpenSmtFormulaCreator((ArithLogic)LogicFactory.getInstance(Logic_t.QF_AUFLIRA));
+    
+    return new OpenSmtFormulaCreator(LogicFactory.getLogicAll());
   }
 
   @Override
@@ -164,7 +160,7 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, Sy
     SRef sort = getEnv().getSortRef(pFormula);
     return getFormulaTypeFromTermType(sort);
   }
-
+  
   private FormulaType<?> getFormulaTypeFromTermType(SRef sort) {
     Logic logic = getEnv();
     if (logic.isSortBool(sort)) {
@@ -207,7 +203,7 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, Sy
     if (pType.isArrayType()) {
       ArrayFormulaType<?, ?> arrFt = (ArrayFormulaType<?, ?>) pType;
       return (T)
-          new OpenSmtArrayFormula<>(getEnv(), pTerm, arrFt.getIndexType(), arrFt.getElementType());
+        new OpenSmtArrayFormula<>(getEnv(), pTerm, arrFt.getIndexType(), arrFt.getElementType());
     }
     throw new IllegalArgumentException("Cannot create formulas of Type " + pType + " in OpenSMT");
   }

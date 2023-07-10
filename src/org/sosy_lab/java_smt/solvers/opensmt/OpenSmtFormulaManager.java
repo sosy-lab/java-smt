@@ -44,7 +44,7 @@ class OpenSmtFormulaManager extends AbstractFormulaManager<PTRef, SRef, Logic, S
     try {
       return creator.encapsulateBoolean(osmtLogic.parseFormula(pS));
     } catch (RuntimeException e) {
-      throw new IllegalArgumentException();
+      throw new IllegalArgumentException(e.getMessage());
     }
   }
 

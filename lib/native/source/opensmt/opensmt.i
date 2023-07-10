@@ -98,8 +98,11 @@
 %ignore getStringFromLogic(const Logic_t logic);
 
 //%ignore LogicFactory;
-%ignore LogicFactory::getLRAInstance();
-%ignore LogicFactory::getLIAInstance();
+
+%newobject LogicFactory::getInstance(Logic_t);
+%newobject LogicFactory::getLRAInstance();
+%newobject LogicFactory::getLIAInstance();
+%newobject LogicFactory::getLogicAll();
 
 %include "include/opensmt/LogicFactory.h"
 
