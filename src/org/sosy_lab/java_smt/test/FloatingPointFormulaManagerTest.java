@@ -271,6 +271,7 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
     assertThatFormula(bmgr.and(eq1, eq2, eq3)).isTautological();
   }
 
+  @SuppressWarnings("FloatingPointLiteralPrecision")
   @Test
   public void numberConstants() throws SolverException, InterruptedException {
     checkEqualityOfNumberConstantsFor(1.0, singlePrecType);
@@ -427,6 +428,7 @@ public class FloatingPointFormulaManagerTest extends SolverBasedTest0 {
     assertThatFormula(fpmgr.isInfinity(fp2)).isUnsatisfiable();
   }
 
+  @SuppressWarnings("FloatingPointLiteralPrecision")
   @Test
   public void cast() throws SolverException, InterruptedException {
     FloatingPointFormula doublePrecNumber = fpmgr.makeNumber(1.5, doublePrecType);
