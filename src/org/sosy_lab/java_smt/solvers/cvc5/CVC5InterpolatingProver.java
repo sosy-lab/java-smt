@@ -81,6 +81,8 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     // TODO Auto-generated method stub
     Preconditions.checkState(!closed);
 
+    System.out.println("Entered getInterpolant");
+
     if (pFormulasOfA.isEmpty()) {
       return mgr.getBooleanFormulaManager().makeBoolean(true);
     }
@@ -91,6 +93,10 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
         assertedFormulaHash.stream()
             .filter(n -> !formulasOfA.contains(n))
             .collect(ImmutableSet.toImmutableSet());
+
+    if (formulasOfB.isEmpty()) {
+      return mgr.getBooleanFormulaManager().makeBoolean(false);
+    }
 
     ArrayList<Collection<Term>> formAAsList = new ArrayList<>();
     ArrayList<Collection<Term>> formBAsList = new ArrayList<>();
@@ -106,6 +112,8 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
 
     BooleanFormula result = creator.encapsulateBoolean(itp);
 
+    System.out.println("Exit getInterpolant");
+
     return result;
     // return Iterables.getOnlyElement(getSeqInterpolants(ImmutableList.of(formulasOfA,
     // formulasOfB)));
@@ -118,12 +126,17 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     Preconditions.checkArgument(
         !partitionedFormulas.isEmpty(),
         "at least one partition should be available.");
+
+    // System.out.printf("Entered Sequential Interpolant for %f\n", partitionedFormulas.size());
+    System.out.println("Entered Sequential Interpolant");
+
     final List<BooleanFormula> itps = new ArrayList<>();
     for (int i = 1; i < partitionedFormulas.size(); i++) {
       itps.add(
           getInterpolant(
               ImmutableList.copyOf(Iterables.concat(partitionedFormulas.subList(0, i)))));
     }
+    System.out.println("Exit Sequential Interpolant");
     return itps;
   }
 
@@ -169,6 +182,8 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
   private Term getCVC5Interpolation(ArrayList<ArrayList<Collection<Term>>> formulaPair) {
     assert formulaPair.size() == 2;
 
+    System.out.println("In CVC5 Interpolation");
+
     Deque<List<Term>> assertedFormulasCopy = assertedFormulas; // Clone/Copy not Working???
     Set<Term> assertedFormulaHashCopy = assertedFormulaHash;
 
@@ -178,6 +193,8 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     ArrayList<Collection<Term>> combinedInterpols = new ArrayList<Collection<Term>>();
     combinedInterpols.addAll(assertedInterpols);
     combinedInterpols.addAll(addedInterpols);
+
+    System.out.println("Got combinedInterpolants");
 
     Collection<Term> extraAssertions =
         getAssertedTermsNotInCollection(combinedInterpols);
@@ -189,17 +206,33 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
       extraAssert = buildConjunctionOfFormulas(extraAssertions);
     }
 
+    System.out.println("Generating phim, phip");
+
     Term phim = buildConjunctionOfCollectionOfFormula(assertedInterpols);
     Term phip = buildConjunctionOfCollectionOfFormula(addedInterpols);
+
+    System.out.println("Finished generating phim, phip");
+
+    // Solver backup =
+
+    // System.out.println(solver.toString());
 
     solver.resetAssertions();
     solver.assertFormula(solver.mkTerm(Kind.AND, extraAssert, phim));
 
+    System.out.println("Interpolating....");
+
     Term interpolant = solver.getInterpolant(solver.mkTerm(Kind.NOT, phip));
+
+    System.out.println("Finished Interpolating");
 
     solver.resetAssertions();
 
+    System.out.println("Restoring Solver State");
+
     assertedFormulaHash.forEach((n) -> solver.assertFormula(n));
+
+    System.out.println("Exit CVC5 Interpolation");
 
     return interpolant;
 
