@@ -1390,7 +1390,7 @@ public class CVC5NativeAPITest {
   }
 
   private Term interpolateAndCheck(Solver solver, Term interpolantA, Term interpolantB) {
-    solver.setOption("produce-interpolants", "true");
+    // solver.setOption("produce-interpolants", "true");
     solver.assertFormula(interpolantA);
     Term interpolation = solver.getInterpolant(solver.mkTerm(Kind.NOT, interpolantB));
 
@@ -1433,6 +1433,39 @@ public class CVC5NativeAPITest {
     }
 
     return interpolation;
+  }
+
+  @Test
+  public void testSimpleInterpolation() throws CVC5ApiException {
+    // Out of Interpolation tests
+    // IntegerFormula x = imgr.makeVariable("x");
+    // IntegerFormula y = imgr.makeVariable("y");
+    // IntegerFormula z = imgr.makeVariable("z");
+    // BooleanFormula f1 = imgr.equal(y, imgr.multiply(imgr.makeNumber(2), x));
+    // BooleanFormula f2 =
+    // imgr.equal(y, imgr.add(imgr.makeNumber(1), imgr.multiply(z, imgr.makeNumber(2))));
+    // prover.push(f1);
+    // T id2 = prover.push(f2);
+    // boolean check = prover.isUnsat();
+    // assertWithMessage("formulas must be contradicting").that(check).isTrue();
+    // prover.getInterpolant(ImmutableList.of(id2));
+    solver.setOption("produce-interpolants", "true");
+    Term x = solver.mkConst(solver.getIntegerSort(), "x");
+    Term y = solver.mkConst(solver.getIntegerSort(), "y");
+    Term z = solver.mkConst(solver.getIntegerSort(), "z");
+    Term f1 = solver.mkTerm(Kind.EQUAL, y, solver.mkTerm(Kind.MULT, solver.mkInteger(2), x));
+    Term f2 =
+        solver.mkTerm(
+            Kind.EQUAL,
+            y,
+            solver.mkTerm(
+                Kind.ADD,
+                solver.mkInteger(1),
+                solver.mkTerm(Kind.MULT, z, solver.mkInteger(2))));
+    // solver.assertFormula(f1);
+    // solver.assertFormula(f2);
+    Term i1 = interpolateAndCheck(solver, f1, f2);
+    System.out.println(i1.toString());
   }
 
 }

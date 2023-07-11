@@ -235,6 +235,7 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
     assume()
         .withMessage("Solver does not support tree-interpolation.")
         .that(solver)
+        // .isAnyOf(Solvers.Z3, Solvers.SMTINTERPOL, Solvers.PRINCESS);
         .isAnyOf(Solvers.Z3, Solvers.SMTINTERPOL, Solvers.PRINCESS);
   }
 
