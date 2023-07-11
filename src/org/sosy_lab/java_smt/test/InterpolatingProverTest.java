@@ -27,11 +27,11 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.SolverContextFactory.Logics;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.java_smt.api.SolverContext.LogicFeatures;
 import org.sosy_lab.java_smt.api.SolverException;
 
 /** This class contains some simple Junit-tests to check the interpolation-API of our solvers. */
@@ -54,8 +54,8 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
 
   // INFO: OpenSmt only support interpolation for QF_LIA, QF_LRA and QF_UF
   @Override
-  protected Set<LogicFeatures> logicToUse() {
-    return EnumSet.of(LogicFeatures.HAS_INTEGERS);
+  protected Logics logicToUse() {
+    return Logics.QF_LIA;
   }
 
   /** Generate a prover environment depending on the parameter above. */

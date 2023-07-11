@@ -13,7 +13,9 @@ import java.util.Set;
 import java.util.function.Consumer;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.log.LogManager;
+
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.SolverContextFactory.Logics;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
@@ -49,7 +51,7 @@ public class OpenSmtSolverContext extends AbstractSolverContext {
   }
 
   public static SolverContext create(
-      Set<LogicFeatures> features,
+      Logics pLogic,
       LogManager pLogger,
       ShutdownNotifier pShutdownNotifier,
       long pRandom,
@@ -61,7 +63,7 @@ public class OpenSmtSolverContext extends AbstractSolverContext {
     pLoader.accept("opensmtjava");
 
     // Create a solver instance
-    OpenSmtFormulaCreator creator = OpenSmtFormulaCreator.newCreator(features);
+    OpenSmtFormulaCreator creator = OpenSmtFormulaCreator.newCreator(pLogic);
 
     // Create managers
     OpenSmtUFManager functionTheory = new OpenSmtUFManager(creator);

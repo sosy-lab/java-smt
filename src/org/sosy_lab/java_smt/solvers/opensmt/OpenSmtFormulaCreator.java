@@ -24,14 +24,15 @@ import opensmt.SymRef;
 import opensmt.VectorPTRef;
 import opensmt.VectorSRef;
 import opensmt.opensmt_logic;
+
 import org.sosy_lab.common.rationals.Rational;
+import org.sosy_lab.java_smt.SolverContextFactory.Logics;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
-import org.sosy_lab.java_smt.api.SolverContext.LogicFeatures;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
@@ -52,44 +53,18 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, Sy
         null);
   }
 
-  public static OpenSmtFormulaCreator newCreator(Set<LogicFeatures> features) {
-    if (features.contains(LogicFeatures.HAS_QUANTIFIERS)) {
-      throw new UnsupportedOperationException(
-          "Could not initialze logic. Opensmt does not support quantifiers.");
+  public static OpenSmtFormulaCreator newCreator(Logics logicToUse) {
+    switch (logicToUse) {
+      case CORE:
+      case QF_UF:
+        return new OpenSmtFormulaCreator(LogicFactory.getInstance(Logic_t.QF_UF));
+      case QF_LIA:
+        return new OpenSmtFormulaCreator(LogicFactory.getLIAInstance());
+      case QF_LRA:
+        return new OpenSmtFormulaCreator(LogicFactory.getLRAInstance());
+      default:
+        return new OpenSmtFormulaCreator(LogicFactory.getLogicAll());
     }
-    if (features.contains(LogicFeatures.HAS_NONLINEAR)) {
-      throw new UnsupportedOperationException(
-          "Could not initialze logic. Opensmt does not support nonlinear terms.");
-    }
-    if (features.contains(LogicFeatures.HAS_BITVECTORS)) {
-      throw new UnsupportedOperationException(
-          "Could not initialze logic. Opensmt does not support bitvectors.");
-    }
-    if (features.contains(LogicFeatures.HAS_SL)) {
-      throw new UnsupportedOperationException(
-          "Could not initialze logic. Opensmt does not support separation logic.");
-    }
-    if (features.contains(LogicFeatures.HAS_REGEXP)) {
-      throw new UnsupportedOperationException(
-          "Could not initialze logic. Opensmt does not support regular expressions.");
-    }
-    if (features.contains(LogicFeatures.HAS_INTEGERS)
-        && features.contains(LogicFeatures.HAS_RATIONALS)) {
-      throw new UnsupportedOperationException(
-          "Could not initialze logic. Opensmt does not support mixed integer-rational terms.");
-    }
-    
-    if (features.equals(Collections.singleton(LogicFeatures.HAS_UF))) {
-      return new OpenSmtFormulaCreator(LogicFactory.getInstance(Logic_t.QF_UF));
-    }
-    if (features.equals(Collections.singleton(LogicFeatures.HAS_INTEGERS))) {
-      return new OpenSmtFormulaCreator(LogicFactory.getLIAInstance());
-    }
-    if (features.equals(Collections.singleton(LogicFeatures.HAS_RATIONALS))) {
-      return new OpenSmtFormulaCreator(LogicFactory.getLRAInstance());
-    }
-    
-    return new OpenSmtFormulaCreator(LogicFactory.getLogicAll());
   }
 
   @Override
