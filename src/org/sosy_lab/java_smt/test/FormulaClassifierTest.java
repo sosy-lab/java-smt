@@ -87,13 +87,12 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
         .withMessage("Solver %s does not support mixed integer-real arithmetic", solverToUse())
         .that(solverToUse())
         .isNotEqualTo(Solvers.OPENSMT);
-    
+
     requireParser();
     requireRationals();
     String query = VARS + "(assert (= (select arr x) (bar (/ 1 2))))";
     classifier.visit(mgr.parse(query));
     assertThat(classifier.toString()).isEqualTo("QF_AUFLIRA");
-    
   }
 
   @Test

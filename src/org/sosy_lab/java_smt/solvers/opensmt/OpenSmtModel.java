@@ -92,7 +92,7 @@ public class OpenSmtModel extends AbstractModel<PTRef, SRef, Logic> {
   }
 
   private ArrayList<ArrayList<PTRef>> unfold(int numArgs, PTRef body) {
-    ArrayList<ArrayList<PTRef>> unwrapped = new ArrayList<ArrayList<PTRef>>();
+    ArrayList<ArrayList<PTRef>> unwrapped = new ArrayList<>();
 
     if (osmtLogic.isIte(body)) {
       VectorPTRef subterms = osmtLogic.getPterm(body).getArgs();
@@ -101,7 +101,7 @@ public class OpenSmtModel extends AbstractModel<PTRef, SRef, Logic> {
       PTRef value = osmtLogic.getPterm(subterms.get(0)).getArgs().get(0);
 
       for (ArrayList<PTRef> nested : unfold(numArgs - 1, left)) {
-        ArrayList<PTRef> prefixed = new ArrayList<PTRef>();
+        ArrayList<PTRef> prefixed = new ArrayList<>();
         prefixed.add(value);
         prefixed.addAll(nested);
 
@@ -111,7 +111,7 @@ public class OpenSmtModel extends AbstractModel<PTRef, SRef, Logic> {
     }
 
     if (numArgs == 0) {
-      ArrayList<PTRef> value = new ArrayList<PTRef>();
+      ArrayList<PTRef> value = new ArrayList<>();
       value.add(body);
 
       unwrapped.add(value);

@@ -23,7 +23,7 @@ public interface SolverContext extends AutoCloseable {
 
   /** Get the formula manager, which is used for formula manipulation. */
   FormulaManager getFormulaManager();
-  
+
   /** Options for the prover environment. */
   enum ProverOptions {
 

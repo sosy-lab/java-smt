@@ -10,21 +10,16 @@ package org.sosy_lab.java_smt.solvers.opensmt;
 
 import com.google.common.collect.ImmutableList;
 import java.math.BigInteger;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import opensmt.ArithLogic;
 import opensmt.Logic;
 import opensmt.LogicFactory;
 import opensmt.Logic_t;
-import opensmt.OpenSmt;
 import opensmt.PTRef;
 import opensmt.SRef;
 import opensmt.SymRef;
 import opensmt.VectorPTRef;
 import opensmt.VectorSRef;
-import opensmt.opensmt_logic;
-
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.SolverContextFactory.Logics;
 import org.sosy_lab.java_smt.api.ArrayFormula;
@@ -135,7 +130,7 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, Sy
     SRef sort = getEnv().getSortRef(pFormula);
     return getFormulaTypeFromTermType(sort);
   }
-  
+
   private FormulaType<?> getFormulaTypeFromTermType(SRef sort) {
     Logic logic = getEnv();
     if (logic.isSortBool(sort)) {
@@ -178,7 +173,7 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, Sy
     if (pType.isArrayType()) {
       ArrayFormulaType<?, ?> arrFt = (ArrayFormulaType<?, ?>) pType;
       return (T)
-        new OpenSmtArrayFormula<>(getEnv(), pTerm, arrFt.getIndexType(), arrFt.getElementType());
+          new OpenSmtArrayFormula<>(getEnv(), pTerm, arrFt.getIndexType(), arrFt.getElementType());
     }
     throw new IllegalArgumentException("Cannot create formulas of Type " + pType + " in OpenSMT");
   }

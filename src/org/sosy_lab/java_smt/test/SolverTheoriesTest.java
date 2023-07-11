@@ -339,7 +339,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
             IllegalArgumentException.class,
             () -> assertThatFormula(buildModulo(num10, num0, num10)).isSatisfiable());
         break;
-      case OPENSMT:  // INFO
+      case OPENSMT: // INFO
       case MATHSAT5: // modulo not supported
         assertThrows(UnsupportedOperationException.class, () -> buildModulo(num10, num0, num10));
         break;
@@ -774,8 +774,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
         break;
       case OPENSMT:
         // INFO: OpenSmt changes the order of the terms in the sum
-        assertThat(_b_at_i_plus_1.toString())
-            .isEqualTo("(select b (+ 1 i))");
+        assertThat(_b_at_i_plus_1.toString()).isEqualTo("(select b (+ 1 i))");
         break;
       default:
         assertThat(_b_at_i_plus_1.toString())

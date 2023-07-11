@@ -13,24 +13,19 @@ import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.EnumSet;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.common.UniqueIdGenerator;
-import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.SolverContextFactory.Logics;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
@@ -295,7 +290,7 @@ public class SolverStackTest extends SolverBasedTest0 {
        J 2160 c1 org.sosy_lab.java_smt.solvers.opensmt.OpenSmtBooleanFormulaManager.makeVariableImpl(Ljava/lang/String;)Ljava/lang/Object; (17 bytes) @ 0x00007fd3490360a4 [0x00007fd349036020+0x0000000000000084]
        J 2159 c1 org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager.makeVariable(Ljava/lang/String;)Lorg/sosy_lab/java_smt/api/BooleanFormula; (29 bytes) @ 0x00007fd3490355b4 [0x00007fd3490354c0+0x00000000000000f4]
        j  org.sosy_lab.java_smt.test.SolverStackTest.largerStackUsageTest()V+190
-    
+
     assume()
         .withMessage("Solver does not support larger stacks yet")
         .that(solver)

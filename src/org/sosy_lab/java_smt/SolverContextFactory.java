@@ -10,7 +10,6 @@ package org.sosy_lab.java_smt;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.EnumSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -63,14 +62,14 @@ public class SolverContextFactory {
 
   public enum Logics {
     CORE,
-    
+
     QF_AX,
     QF_UF,
     QF_IDL,
     QF_RDL,
     QF_LIA,
     QF_LRA,
-    
+
     QF_ALIA,
     QF_ALRA,
 
@@ -82,7 +81,7 @@ public class SolverContextFactory {
 
     ALL
   }
-  
+
   @Option(secure = true, description = "Export solver queries in SmtLib format into a file.")
   private boolean logAllQueries = false;
 
@@ -106,7 +105,7 @@ public class SolverContextFactory {
 
   @Option(secure = true, description = "Logic to be used by the solver.")
   private Logics logic = Logics.ALL;
-  
+
   @Option(secure = true, description = "Log solver actions, this may be slow!")
   private boolean useLogger = false;
 
@@ -220,8 +219,7 @@ public class SolverContextFactory {
     return generateContext(solver);
   }
 
-  public SolverContext generateContext(Logics logicToUse)
-      throws InvalidConfigurationException {
+  public SolverContext generateContext(Logics logicToUse) throws InvalidConfigurationException {
     return generateContext(solver, logicToUse);
   }
 
@@ -241,7 +239,7 @@ public class SolverContextFactory {
     if (logicToUse == null) {
       throw new NullPointerException();
     }
-    
+
     SolverContext context;
     try {
       context = generateContext0(solverToCreate, logicToUse);

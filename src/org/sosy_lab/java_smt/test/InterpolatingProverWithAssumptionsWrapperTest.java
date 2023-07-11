@@ -8,8 +8,6 @@
 
 package org.sosy_lab.java_smt.test;
 
-import java.util.EnumSet;
-import java.util.Set;
 import org.sosy_lab.java_smt.SolverContextFactory.Logics;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.basicimpl.withAssumptionsWrapper.InterpolatingProverWithAssumptionsWrapper;

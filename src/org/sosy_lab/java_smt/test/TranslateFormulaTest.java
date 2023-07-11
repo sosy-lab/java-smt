@@ -56,7 +56,7 @@ public class TranslateFormulaTest {
   @Parameters(name = "{index}: {0} --> {1}")
   public static List<Object[]> getSolverCombinations() {
     List<Solvers> solvers = Arrays.asList(Solvers.values());
-    List<Object[]> fromTo = new ArrayList<Object[]>();
+    List<Object[]> fromTo = new ArrayList<>();
     for (List<Solvers> entry : Lists.cartesianProduct(solvers, solvers)) {
       if (entry.contains(Solvers.OPENSMT)) {
         fromTo.add(entry.toArray());
