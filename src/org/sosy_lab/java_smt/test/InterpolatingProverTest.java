@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import java.util.List;
 import java.util.Set;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -939,7 +938,6 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
   }
 
   @Test
-  @Ignore
   public <T> void bigSeqInterpolationTest() throws InterruptedException, SolverException {
     requireBitvectors();
     requireInterpolation();

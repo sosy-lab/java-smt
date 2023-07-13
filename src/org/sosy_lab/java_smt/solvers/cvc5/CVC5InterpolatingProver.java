@@ -16,7 +16,6 @@ import io.github.cvc5.Kind;
 import io.github.cvc5.Term;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -30,10 +29,10 @@ import org.sosy_lab.java_smt.api.SolverException;
 public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     implements InterpolatingProverEnvironment<Term> {
 
-  // protected final Deque<List<Term>> assertedFormulas = new ArrayDeque<>();
   private final FormulaManager mgr;
   private final CVC5FormulaCreator creator;
-  private final Set<Term> assertedFormulaHash = new HashSet<>();
+  private final Set<Term> assertedFormulaHash = new HashSet<>(); // comparable to SMTInterpols
+                                                                 // annotatedTerms
 
   CVC5InterpolatingProver(
       CVC5FormulaCreator pFormulaCreator,
@@ -58,7 +57,6 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
 
   @Override
   public Term addConstraint(BooleanFormula pConstraint) throws InterruptedException {
-    // TODO Auto-generated method stub
     Preconditions.checkState(!closed);
     Term t = creator.extractInfo(pConstraint);
     assertedFormulaHash.add(t);
@@ -70,7 +68,6 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
   @Override
   public <R> R allSat(AllSatCallback<R> pCallback, List<BooleanFormula> pImportant)
       throws InterruptedException, SolverException {
-    // TODO Auto-generated method stub
     R result = super.allSat(pCallback, pImportant);
     return result;
   }
@@ -78,10 +75,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
   @Override
   public BooleanFormula getInterpolant(Collection<Term> pFormulasOfA)
       throws SolverException, InterruptedException {
-    // TODO Auto-generated method stub
     Preconditions.checkState(!closed);
-
-    System.out.println("Entered getInterpolant");
 
     if (pFormulasOfA.isEmpty()) {
       return mgr.getBooleanFormulaManager().makeBoolean(true);
@@ -112,11 +106,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
 
     BooleanFormula result = creator.encapsulateBoolean(itp);
 
-    System.out.println("Exit getInterpolant");
-
     return result;
-    // return Iterables.getOnlyElement(getSeqInterpolants(ImmutableList.of(formulasOfA,
-    // formulasOfB)));
   }
 
   @Override
@@ -127,44 +117,34 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
         !partitionedFormulas.isEmpty(),
         "at least one partition should be available.");
 
-    // System.out.printf("Entered Sequential Interpolant for %f\n", partitionedFormulas.size());
-    System.out.println("Entered Sequential Interpolant");
-
     final List<BooleanFormula> itps = new ArrayList<>();
     for (int i = 1; i < partitionedFormulas.size(); i++) {
       itps.add(
           getInterpolant(
               ImmutableList.copyOf(Iterables.concat(partitionedFormulas.subList(0, i)))));
     }
-    System.out.println("Exit Sequential Interpolant");
     return itps;
   }
 
+  // Experimental!
   @Override
   public List<BooleanFormula>
       getTreeInterpolants(List<? extends Collection<Term>> pPartitionedFormulas, int[] pStartOfSubTree)
           throws SolverException, InterruptedException {
-    // TODO Auto-generated method stub
     Preconditions.checkState(!closed);
     assert InterpolatingProverEnvironment
         .checkTreeStructure(pPartitionedFormulas.size(), pStartOfSubTree);
 
-    // final Term[] formulas =
-    // pPartitionedFormulas.stream().map(x -> buildConjunctionOfFormulas(x)).toArray(Term[]::new);
-
     ArrayList<ArrayList<ArrayList<Collection<Term>>>> interpolationPairs =
         getTreeInterpolationPairs(pPartitionedFormulas, pStartOfSubTree);
 
-    // final Term[] itps;
     final ArrayList<Term> itps = new ArrayList<>();
     try {
       for (int i = 0; i < interpolationPairs.size(); i++) {
-        // Term interpolant = getCVC5Interpolation(interpolationPairs.get(i));
         itps.add(getCVC5Interpolation(interpolationPairs.get(i)));
       }
-      // itps = (Term[]) interpolationPairs.stream().map(n -> getCVC5Interpolation(n)).toArray();
     } catch (UnsupportedOperationException e) {
-      if (e.getMessage() != null) {// Test when occures
+      if (e.getMessage() != null) {
         throw new SolverException(e.getMessage(), e);
       } else {
         throw e;
@@ -179,13 +159,11 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     return result;
   }
 
+  /*
+   * Interpolates a Tuple of Interpolants according to Craig-Interpolation using CVC5-Interpolation.
+   */
   private Term getCVC5Interpolation(ArrayList<ArrayList<Collection<Term>>> formulaPair) {
     assert formulaPair.size() == 2;
-
-    System.out.println("In CVC5 Interpolation");
-
-    Deque<List<Term>> assertedFormulasCopy = assertedFormulas; // Clone/Copy not Working???
-    Set<Term> assertedFormulaHashCopy = assertedFormulaHash;
 
     ArrayList<Collection<Term>> assertedInterpols = formulaPair.get(0);
     ArrayList<Collection<Term>> addedInterpols = formulaPair.get(1);
@@ -193,8 +171,6 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     ArrayList<Collection<Term>> combinedInterpols = new ArrayList<Collection<Term>>();
     combinedInterpols.addAll(assertedInterpols);
     combinedInterpols.addAll(addedInterpols);
-
-    System.out.println("Got combinedInterpolants");
 
     Collection<Term> extraAssertions =
         getAssertedTermsNotInCollection(combinedInterpols);
@@ -206,33 +182,17 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
       extraAssert = buildConjunctionOfFormulas(extraAssertions);
     }
 
-    System.out.println("Generating phim, phip");
-
     Term phim = buildConjunctionOfCollectionOfFormula(assertedInterpols);
     Term phip = buildConjunctionOfCollectionOfFormula(addedInterpols);
-
-    System.out.println("Finished generating phim, phip");
-
-    // Solver backup =
-
-    // System.out.println(solver.toString());
 
     solver.resetAssertions();
     solver.assertFormula(solver.mkTerm(Kind.AND, extraAssert, phim));
 
-    System.out.println("Interpolating....");
-
     Term interpolant = solver.getInterpolant(solver.mkTerm(Kind.NOT, phip));
-
-    System.out.println("Finished Interpolating");
 
     solver.resetAssertions();
 
-    System.out.println("Restoring Solver State");
-
     assertedFormulaHash.forEach((n) -> solver.assertFormula(n));
-
-    System.out.println("Exit CVC5 Interpolation");
 
     return interpolant;
 
@@ -250,7 +210,6 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
   }
 
   private Term buildConjunctionOfCollectionOfFormula(ArrayList<Collection<Term>> formula) {
-    ArrayList<Collection<Term>> recformula = new ArrayList<Collection<Term>>();
     Collection<Term> currColTerm = formula.get(0);
     formula.remove(0);
     if (formula.size() == 0) {
@@ -262,7 +221,23 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
         buildConjunctionOfCollectionOfFormula(formula));
   }
 
-  // Generates Pairs of Interpolants
+  private Term buildConjunctionOfFormulas(Collection<Term> formulas) {
+    Preconditions.checkState(!closed);
+    Preconditions.checkArgument(!formulas.isEmpty());
+
+    Term formula = formulas.iterator().next();
+
+    Collection<Term> removedFormulas =
+        formulas.stream().filter(n -> !formula.equals(n)).collect(ImmutableList.toImmutableList());
+
+    if (removedFormulas.size() == 0) {
+      return formula;
+    }
+
+    return solver.mkTerm(Kind.AND, formula, buildConjunctionOfFormulas(removedFormulas));
+  }
+
+  // Generates Interpolation Pairs for Tree Interpolation. Experimental!
   private ArrayList<ArrayList<ArrayList<Collection<Term>>>> getTreeInterpolationPairs(
       List<? extends Collection<Term>> pPartitionedFormulas,
       int[] pStartOfSubTree) {
@@ -318,32 +293,6 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     }
     assert result.size() == pStartOfSubTree.length - 1;
     return result;
-  }
-
-  private List<Collection<Term>> invertSelection(
-      List<? extends Collection<Term>> pPartitionedFormulas,
-      List<Collection<Term>> currSelection) {
-    return pPartitionedFormulas.stream()
-        .filter(n -> !currSelection.contains(n))
-        .collect(ImmutableList.toImmutableList());
-  }
-
-  private Term buildConjunctionOfFormulas(Collection<Term> formulas) {
-    Preconditions.checkState(!closed);
-    Preconditions.checkArgument(!formulas.isEmpty());
-
-    Term formula = formulas.iterator().next();
-
-    // formulas.remove(formula); // doens't work?
-
-    Collection<Term> removedFormulas =
-        formulas.stream().filter(n -> !formula.equals(n)).collect(ImmutableList.toImmutableList());
-
-    if (removedFormulas.size() == 0) {
-      return formula;
-    }
-
-    return solver.mkTerm(Kind.AND, formula, buildConjunctionOfFormulas(removedFormulas));
   }
 
 }
