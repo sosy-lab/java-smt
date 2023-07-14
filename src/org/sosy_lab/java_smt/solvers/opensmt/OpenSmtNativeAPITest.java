@@ -366,4 +366,38 @@ public class OpenSmtNativeAPITest {
     sstat r = solver.check();
     assertThat(r.isFalse()).isTrue();
   }
+
+  @Test
+  public void testAbort() {
+    OpenSmt osmt = new OpenSmt(opensmt_logic.qf_lia, "opensmt-test", false);
+    ArithLogic logic = osmt.getLIALogic();
+
+    /*
+    // FIXME: The formula here is to simple and will reduce to false during the simplification stage
+    PTRef varA = logic.mkBoolVar("a");
+    PTRef notA = logic.mkNot(varA);
+    PTRef f = logic.mkAnd(varA, notA);
+    */
+
+    // Declare variables
+    PTRef varA = logic.mkIntVar("a");
+    PTRef varC = logic.mkIntVar("c");
+
+    // Create integer constants
+    PTRef const0 = logic.mkIntConst("0");
+    PTRef const3 = logic.mkIntConst("3");
+
+    // Terms a+3 < c, c ≥ 0
+    PTRef f0 = logic.mkLt(logic.mkPlus(varA, const3), varC);
+    PTRef f1 = logic.mkGeq(varC, const0);
+
+    MainSolver mainSolver = osmt.getMainSolver();
+    mainSolver.push(f0);
+    mainSolver.push(f1);
+
+    mainSolver.stop();
+    sstat r = mainSolver.check();
+
+    assertThat(r.isUndef()).isTrue();
+  }
 }

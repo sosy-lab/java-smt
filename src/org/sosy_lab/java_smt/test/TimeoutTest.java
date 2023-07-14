@@ -98,9 +98,6 @@ public class TimeoutTest extends SolverBasedTest0 {
 
   @Test(timeout = TIMOUT_MILLISECONDS)
   public void testInterpolationProverTimeout() throws InterruptedException {
-    throw new RuntimeException("");
-
-    /* FIXME
     requireInterpolation();
     requireIntegers();
     TruthJUnit.assume()
@@ -108,7 +105,6 @@ public class TimeoutTest extends SolverBasedTest0 {
         .that(solverToUse())
         .isNoneOf(Solvers.PRINCESS, Solvers.BOOLECTOR, Solvers.CVC5);
     testBasicProverTimeoutInt(() -> context.newProverEnvironmentWithInterpolation());
-    */
   }
 
   @Test(timeout = TIMOUT_MILLISECONDS)
@@ -144,6 +140,7 @@ public class TimeoutTest extends SolverBasedTest0 {
                 throw new UnsupportedOperationException("Unexpected interrupt");
               }
             });
+
     try (BasicProverEnvironment<?> pe = proverConstructor.get()) {
       pe.push(instance);
       t.start();

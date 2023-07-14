@@ -22,7 +22,6 @@ import opensmt.PTRef;
 import opensmt.SMTConfig;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
-import org.sosy_lab.common.ShutdownNotifier.ShutdownRequestListener;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -37,7 +36,6 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
 
   protected final OpenSmtFormulaCreator creator;
   protected final MainSolver osmtSolver;
-  protected final ShutdownRequestListener shutdownListener;
   protected final Deque<List<PTRef>> assertedFormulas = new ArrayDeque<>();
 
   private boolean changedSinceLastSatQuery = false;
@@ -52,16 +50,6 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
 
     creator = pFormulaCreator;
     osmtSolver = new MainSolver(creator.getEnv(), pConfig, "JavaSmt");
-
-    shutdownListener =
-        new ShutdownHook(
-            pShutdownNotifier,
-            new Runnable() {
-              @Override
-              public void run() {
-                osmtSolver.stop();
-              }
-            });
 
     assertedFormulas.push(new ArrayList<>()); // create initial level
 
@@ -90,7 +78,6 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     setChanged();
     assertedFormulas.push(new ArrayList<>());
     osmtSolver.push();
-    // FIXME: Check solver state for error
   }
 
   @Override
@@ -160,8 +147,20 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     Preconditions.checkState(!closed);
     closeAllEvaluators();
     changedSinceLastSatQuery = false;
-    // FIXME: Check for error or undefined
-    return osmtSolver.check().isFalse();
+
+    try (ShutdownHook listener = new ShutdownHook(shutdownNotifier, osmtSolver::stop)) {
+      shutdownNotifier.shutdownIfNecessary();
+      sstat r = osmtSolver.check();
+      shutdownNotifier.shutdownIfNecessary();
+
+      if (r.isError()) {
+        throw new SolverException("Error in Mainsolver.check()");
+      }
+      if (r.isUndef()) {
+        throw new InterruptedException();
+      }
+      return r.isFalse();
+    }
   }
 
   @Override
