@@ -20,6 +20,7 @@ import java.util.Set;
 import opensmt.MainSolver;
 import opensmt.PTRef;
 import opensmt.SMTConfig;
+import opensmt.sstat;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
