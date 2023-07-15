@@ -110,6 +110,53 @@ index 49874f9d..b7a6208c 100644
  
      ModelBuilder modelBuilder {logic};
      ts.solver.fillBooleanVars(modelBuilder);
+diff --git a/src/common/FastRational.cc b/src/common/FastRational.cc
+index 8ccc5a51..2af7bfbf 100644
+--- a/src/common/FastRational.cc
++++ b/src/common/FastRational.cc
+@@ -11,18 +11,22 @@ Copyright (c) 2008, 2009 Centre national de la recherche scientifique (CNRS)
+ mpq_ptr FastRational::mpqPool::alloc()
+ {
+     mpq_ptr r;
++    cs.lock();
+     if (!pool.empty()) {
+         r = pool.top();
+         pool.pop();
+     } else {
+         r = store.emplace().get_mpq_t();
+     }
++    cs.unlock();
+     return r;
+ }
+ 
+ void FastRational::mpqPool::release(mpq_ptr ptr)
+ {
++    cs.lock();
+     pool.push(ptr);
++    cs.unlock();
+ }
+ 
+ FastRational::FastRational( const char * s, const int base )
+diff --git a/src/common/FastRational.h b/src/common/FastRational.h
+index a3f4bb1c..9fc7ac3d 100644
+--- a/src/common/FastRational.h
++++ b/src/common/FastRational.h
+@@ -13,6 +13,7 @@ Copyright (c) 2008, 2009 Centre national de la recherche scientifique (CNRS)
+ #include "Vec.h"
+ #include <stack>
+ #include <vector>
++#include <mutex>
+ 
+ typedef int32_t  word;
+ typedef uint32_t uword;
+@@ -71,6 +72,7 @@ class FastRational
+ {
+     class mpqPool
+     {
++        std::mutex cs; // We use a mutex to make the pool thread-safe
+         std::stack<mpq_class> store; // uses deque as storage to avoid realloc
+         std::stack<mpq_ptr, std::vector<mpq_ptr>> pool;
+     public:
 diff --git a/src/logics/FunctionTools.h b/src/logics/FunctionTools.h
 index fc9dbfb7..943a466d 100644
 --- a/src/logics/FunctionTools.h

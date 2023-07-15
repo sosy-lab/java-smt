@@ -129,6 +129,7 @@ public class SolverConcurrencyTest {
         .isNoneOf(
             Solvers.SMTINTERPOL,
             Solvers.BOOLECTOR,
+            Solvers.OPENSMT,
             Solvers.MATHSAT5,
             Solvers.Z3,
             Solvers.PRINCESS,
@@ -214,6 +215,7 @@ public class SolverConcurrencyTest {
         .withMessage("Solver does not support translation of formulas")
         .that(solver)
         .isNoneOf(Solvers.CVC4, Solvers.PRINCESS, Solvers.CVC5);
+    
     /** Helperclass to pack a SolverContext together with a Formula */
     class ContextAndFormula {
       private final SolverContext context;
@@ -348,9 +350,6 @@ public class SolverConcurrencyTest {
    */
   @Test
   public void testConcurrentStack() throws InvalidConfigurationException, InterruptedException {
-    throw new RuntimeException("BROKEN - malloc(): unaligned tcache chunk detected");
-
-    /* FIXME
     requireConcurrentMultipleStackSupport();
     SolverContext context = initSolver();
     FormulaManager mgr = context.getFormulaManager();
@@ -374,7 +373,6 @@ public class SolverConcurrencyTest {
               .isTrue();
         });
     closeSolver(context);
-    */
   }
 
   /**
