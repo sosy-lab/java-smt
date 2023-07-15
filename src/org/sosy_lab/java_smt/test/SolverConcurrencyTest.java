@@ -129,7 +129,7 @@ public class SolverConcurrencyTest {
         .isNoneOf(
             Solvers.SMTINTERPOL,
             Solvers.BOOLECTOR,
-            Solvers.OPENSMT,
+            Solvers.OPENSMT,  // INFO: OpenSMT does not support concurrent stacks
             Solvers.MATHSAT5,
             Solvers.Z3,
             Solvers.PRINCESS,
