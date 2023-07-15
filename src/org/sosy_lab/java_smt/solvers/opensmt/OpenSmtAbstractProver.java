@@ -37,6 +37,7 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
 
   protected final OpenSmtFormulaCreator creator;
   protected final MainSolver osmtSolver;
+  protected final SMTConfig config;
   protected final Deque<List<PTRef>> assertedFormulas = new ArrayDeque<>();
 
   private boolean changedSinceLastSatQuery = false;
@@ -50,6 +51,9 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     super(pOptions, pMgr.getBooleanFormulaManager(), pShutdownNotifier);
 
     creator = pFormulaCreator;
+
+    // BUGFIX: We need to store the SMTConfig reference here to make sure the underlying C++ object does not get garbage collected
+    config = pConfig;
     osmtSolver = new MainSolver(creator.getEnv(), pConfig, "JavaSmt");
 
     assertedFormulas.push(new ArrayList<>()); // create initial level
