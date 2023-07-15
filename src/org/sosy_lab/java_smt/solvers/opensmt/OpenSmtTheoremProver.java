@@ -24,6 +24,7 @@ class OpenSmtTheoremProver extends OpenSmtAbstractProver<Void> implements Prover
       ShutdownNotifier pShutdownNotifier,
       int pRandom,
       Set<ProverOptions> pOptions) {
+
     super(pFormulaCreator, pMgr, pShutdownNotifier, getConfigInstance(pRandom, false), pOptions);
   }
 

@@ -69,7 +69,7 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
   @Test
   @SuppressWarnings("CheckReturnValue")
   public <T> void simpleInterpolation() throws SolverException, InterruptedException {
-    throw new RuntimeException("BROKEN - Formula must be unsat for interpolation");
+    throw new RuntimeException("TIMEOUT - OpenSMT struggles to prove `2x ≠ 1+2y` for all integers x,y");
 
     /* FIXME
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
@@ -81,6 +81,7 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
       prover.push(f1);
       T id2 = prover.push(f2);
       boolean check = prover.isUnsat();
+
       assertWithMessage("formulas must be contradicting").that(check).isTrue();
       prover.getInterpolant(ImmutableList.of(id2));
       // we actually only check for a successful execution here, the result is irrelevant.
@@ -91,7 +92,7 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
   @Test
   @SuppressWarnings("unchecked")
   public <T> void emptyInterpolationGroup() throws SolverException, InterruptedException {
-    throw new RuntimeException("BROKEN - Formula must be unsat for interpolation");
+    throw new RuntimeException("TIMEOUT - OpenSMT struggles to prove `2x ≠ 1+2y` for all integers x,y");
 
     /* FIXME
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
