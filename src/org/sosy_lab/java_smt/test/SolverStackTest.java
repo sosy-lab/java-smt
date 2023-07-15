@@ -13,6 +13,7 @@ import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,16 +23,24 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.common.UniqueIdGenerator;
-import org.sosy_lab.java_smt.SolverContextFactory.Logics;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.SolverContextFactory.Logics;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.IntegerFormulaManager;
+import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FormulaManager;
+import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormulaManager;
+import org.sosy_lab.java_smt.api.RationalFormulaManager;
+import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.UFManager;
 
 @RunWith(Parameterized.class)
 @SuppressWarnings("resource")
@@ -156,16 +165,19 @@ public class SolverStackTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void singleStackTestRational() throws SolverException, InterruptedException {
-    throw new RuntimeException(
-        "BROKEN - Move test to a different file to use QF_LRA for interpolation");
-
-    /* FIXME
+  public void singleStackTestRational() throws SolverException, InterruptedException, InvalidConfigurationException {
     requireRationals();
 
-    BasicProverEnvironment<?> env = newEnvironmentForTest();
-    simpleStackTestNum(rmgr, env);
-    */
+    SolverContext context = initSolver("solver.logic", "QF_LRA");
+
+    FormulaManager mgr = context.getFormulaManager();
+    RationalFormulaManager rmgr = mgr.getRationalFormulaManager();
+
+    try (BasicProverEnvironment<?> env = context.newProverEnvironmentWithInterpolation(ProverOptions.GENERATE_MODELS)) {
+      simpleStackTestNum(rmgr, env);
+    }
+
+    closeSolver(context);
   }
 
   private <X extends NumeralFormula, Y extends X> void simpleStackTestNum(
@@ -279,18 +291,6 @@ public class SolverStackTest extends SolverBasedTest0 {
 
   @Test
   public void largerStackUsageTest() throws InterruptedException, SolverException {
-    throw new RuntimeException("BROKEN - Reson unknown.");
-    /* FIXME
-       Native frames: (J=compiled Java code, j=interpreted, Vv=VM code, C=native code)
-       C  [libopensmt.so+0x1b2e17]  SymStore::newSymb(char const*, SRef, vec<SRef> const&, SymbolConfig const&)+0x317
-       Java frames: (J=compiled Java code, j=interpreted, Vv=VM code)
-       J 2163  opensmt.OsmtNativeJNI.Logic_mkBoolVar(JLopensmt/Logic;Ljava/lang/String;)J (0 bytes) @ 0x00007fd3507c5021 [0x00007fd3507c4fa0+0x0000000000000081]
-       J 2162 c1 opensmt.Logic.mkBoolVar(Ljava/lang/String;)Lopensmt/PTRef; (30 bytes) @ 0x00007fd3490369a4 [0x00007fd3490368c0+0x00000000000000e4]
-       J 2161 c1 org.sosy_lab.java_smt.solvers.opensmt.OpenSmtBooleanFormulaManager.makeVariableImpl(Ljava/lang/String;)Lopensmt/PTRef; (20 bytes) @ 0x00007fd349036524 [0x00007fd349036420+0x0000000000000104]
-       J 2160 c1 org.sosy_lab.java_smt.solvers.opensmt.OpenSmtBooleanFormulaManager.makeVariableImpl(Ljava/lang/String;)Ljava/lang/Object; (17 bytes) @ 0x00007fd3490360a4 [0x00007fd349036020+0x0000000000000084]
-       J 2159 c1 org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager.makeVariable(Ljava/lang/String;)Lorg/sosy_lab/java_smt/api/BooleanFormula; (29 bytes) @ 0x00007fd3490355b4 [0x00007fd3490354c0+0x00000000000000f4]
-       j  org.sosy_lab.java_smt.test.SolverStackTest.largerStackUsageTest()V+190
-
     assume()
         .withMessage("Solver does not support larger stacks yet")
         .that(solver)
@@ -307,7 +307,6 @@ public class SolverStackTest extends SolverBasedTest0 {
       stack.addConstraint(bmgr.equivalence(bmgr.makeVariable("X" + i), bmgr.makeVariable("Y" + i)));
     }
     assertThat(stack.isUnsat()).isFalse();
-    */
   }
 
   @Test
@@ -651,11 +650,16 @@ public class SolverStackTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void modelForSatFormulaWithUF() throws SolverException, InterruptedException {
-    throw new RuntimeException("BROKEN - Reason unknown.");
-    /* FIXME
+  public void modelForSatFormulaWithUF() throws SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    try (BasicProverEnvironment<?> stack = newEnvironmentForTest(ProverOptions.GENERATE_MODELS)) {
+
+    SolverContext context = initSolver("solver.logic", "ALL");
+
+    FormulaManager mgr = context.getFormulaManager();
+    IntegerFormulaManager imgr = mgr.getIntegerFormulaManager();
+    UFManager fmgr = mgr.getUFManager();
+
+    try (BasicProverEnvironment<?> stack = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       IntegerFormula zero = imgr.makeNumber(0);
       IntegerFormula varA = imgr.makeVariable("a");
       IntegerFormula varB = imgr.makeVariable("b");
@@ -678,7 +682,8 @@ public class SolverStackTest extends SolverBasedTest0 {
       assertThat(model.evaluate(fmgr.callUF(uf, imgr.makeNumber(BigDecimal.ZERO))))
           .isEqualTo(BigInteger.ZERO);
     }
-    */
+
+    closeSolver(context);
   }
 
   @Test

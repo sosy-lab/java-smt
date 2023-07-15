@@ -173,6 +173,43 @@ public abstract class SolverBasedTest0 {
     }
   }
 
+  /**
+   * Creates and returns a completely new SolverContext for the currently used solver (We need this
+   * to get more than one Context in 1 method in a controlled way).
+   *
+   * @param additionalOptions a list of pairs (key, value) for creating a new solver context.
+   * @return new and unique SolverContext for current solver (Parameter(0))
+   */
+  protected SolverContext initSolver(String... additionalOptions)
+      throws InvalidConfigurationException {
+    try {
+      ConfigurationBuilder options =
+          Configuration.builder().setOption("solver.solver", solverToUse().toString());
+      for (int i = 0; i < additionalOptions.length; i += 2) {
+        options.setOption(additionalOptions[i], additionalOptions[i + 1]);
+      }
+      Configuration config = options.build();
+      LogManager logger = LogManager.createTestLogManager();
+      ShutdownNotifier shutdownNotifier = ShutdownManager.create().getNotifier();
+
+      SolverContextFactory factory = new SolverContextFactory(config, logger, shutdownNotifier);
+      return factory.generateContext();
+    } catch (InvalidConfigurationException e) {
+      assume()
+          .withMessage(e.getMessage())
+          .that(e)
+          .hasCauseThat()
+          .isNotInstanceOf(UnsatisfiedLinkError.class);
+      throw e;
+    }
+  }
+
+  protected void closeSolver(SolverContext context) {
+    if (context != null) {
+      context.close();
+    }
+  }
+
   /** Skip test if the solver does not support integers. */
   protected final void requireIntegers() {
     assume()
