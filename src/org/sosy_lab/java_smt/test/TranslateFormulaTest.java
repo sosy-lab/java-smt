@@ -122,9 +122,6 @@ public class TranslateFormulaTest {
 
   @Test
   public void testDumpingAndParsing() throws SolverException, InterruptedException {
-    throw new RuntimeException("BROKEN - Reason unknown.");
-
-    /* FIXME
     requireParserTo();
 
     BooleanFormula input = createTestFormula(managerFrom);
@@ -132,7 +129,6 @@ public class TranslateFormulaTest {
     BooleanFormula parsed = managerTo.parse(out);
 
     assertUsing(to).that(createTestFormula(managerTo)).isEquivalentTo(parsed);
-    */
   }
 
   @Test
@@ -147,7 +143,7 @@ public class TranslateFormulaTest {
   }
 
   @Test
-  public void testTranslatingForIContextdentity() throws SolverException, InterruptedException {
+  public void testTranslatingForIContextIdentity() throws SolverException, InterruptedException {
     assume().that(translateTo).isEqualTo(translateFrom);
     FormulaManager manager = managerFrom;
 
@@ -176,9 +172,6 @@ public class TranslateFormulaTest {
 
   @Test
   public void testTranslatingAndReverse() throws SolverException, InterruptedException {
-    throw new RuntimeException("BROKEN - Reason unknown.");
-
-    /* FIXME
     requireParserTo();
     requireParserFrom();
 
@@ -186,8 +179,7 @@ public class TranslateFormulaTest {
     BooleanFormula translatedInput = managerTo.translateFrom(inputFrom, managerFrom);
     BooleanFormula translatedReverseInput = managerFrom.translateFrom(translatedInput, managerTo);
 
-    assertUsing(from).that(inputFrom).isEquivalentTo(translatedReverseInput);
-    */
+    assertUsing(from).that(inputFrom).isEquivalentTo(translatedReverseInput); 
   }
 
   private BooleanFormula createTestFormula(FormulaManager mgr) {
