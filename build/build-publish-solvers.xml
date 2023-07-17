@@ -107,15 +107,16 @@ SPDX-License-Identifier: Apache-2.0
                 <include name="Sort.java"/>
                 <include name="SortSymbol.java"/>
                 <include name="SRef.java"/>
+                <include name="sstat.java"/>
                 <include name="SSymRef.java"/>
                 <include name="Symbol.java"/>
                 <include name="SymRef.java"/>
                 <include name="TemplateFunction.java"/>
-                <include name="sstat.java"/>
                 <include name="VectorInt.java"/>
                 <include name="VectorPTRef.java"/>
                 <include name="VectorSRef.java"/>
                 <include name="VectorSymRef.java"/>
+                <include name="VectorVectorInt.java"/>
             </fileset>
         </copy>
 

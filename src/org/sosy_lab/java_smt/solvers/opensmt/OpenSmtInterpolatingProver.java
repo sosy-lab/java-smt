@@ -9,10 +9,14 @@
 package org.sosy_lab.java_smt.solvers.opensmt;
 
 import com.google.common.base.Preconditions;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import opensmt.PTRef;
 import opensmt.VectorInt;
+import opensmt.VectorPTRef;
+import opensmt.VectorVectorInt;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -49,8 +53,28 @@ class OpenSmtInterpolatingProver extends OpenSmtAbstractProver<Integer>
   @Override
   public List<BooleanFormula> getSeqInterpolants(
       List<? extends Collection<Integer>> partitionedFormulas) {
-    // FIXME: Add support for interpolation sequences
-    throw new UnsupportedOperationException();
+    Preconditions.checkState(!closed);
+
+    if (partitionedFormulas.size() == 0) {
+      throw new IllegalArgumentException("Interpolation sequence must have length of at least 1");
+    }
+
+    VectorVectorInt partitions = new VectorVectorInt();
+    for (int i = 1; i < partitionedFormulas.size(); i++) {
+      VectorInt prefix = new VectorInt();
+      for (Collection<Integer> key : partitionedFormulas.subList(0, i)) {
+        prefix.addAll(key);
+      }
+      partitions.add(prefix);
+    }
+
+    VectorPTRef itps = osmtSolver.getInterpolationContext().getPathInterpolants(partitions);
+
+    List<BooleanFormula> result = new ArrayList<>();
+    for (PTRef itp : itps) {
+      result.add(creator.encapsulateBoolean(itp));
+    }
+    return result;
   }
 
   @Override

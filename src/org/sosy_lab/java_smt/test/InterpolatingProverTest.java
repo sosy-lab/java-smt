@@ -17,6 +17,7 @@ import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import java.util.List;
 import java.util.Set;
 import org.junit.Test;
@@ -252,9 +253,6 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
 
   @Test
   public <T> void sequentialInterpolation() throws SolverException, InterruptedException {
-    throw new RuntimeException("BROKEN - Add support for sequential interpolation to fix");
-
-    /* FIXME
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     requireIntegers();
 
@@ -298,16 +296,11 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
     checkItpSequence(ImmutableList.of(A, A, A, B, C, D, D), itps4);
     checkItpSequence(ImmutableList.of(A, A, B, C, D, A, D), itps5);
     checkItpSequence(ImmutableList.of(B, C, D, A, A, A, D), itps6);
-    */
   }
 
-  @Test /*(expected = IllegalArgumentException.class)*/
+  @Test(expected = IllegalArgumentException.class)
   @SuppressWarnings("CheckReturnValue")
-  public <T> void sequentialInterpolationWithoutPartition()
-      throws SolverException, InterruptedException {
-    throw new RuntimeException("BROKEN - Add support for sequential interpolation to fix");
-
-    /* FIXME
+  public <T> void sequentialInterpolationWithoutPartition() throws SolverException, InterruptedException {
     requireIntegers();
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
@@ -317,15 +310,11 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
     // empty list of partition
     stack.getSeqInterpolants(ImmutableList.of());
     assert_().fail();
-    */
   }
 
   @Test
   public <T> void sequentialInterpolationWithOnePartition()
       throws SolverException, InterruptedException {
-    throw new RuntimeException("BROKEN - Add support for sequential interpolation to fix");
-
-    /* FIXME
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
     requireIntegers();
@@ -350,16 +339,12 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
     List<T> partition = ImmutableList.of(TA, TB);
     List<BooleanFormula> itps = stack.getSeqInterpolants(ImmutableList.of(partition));
     assertThat(itps).isEmpty();
-    */
   }
 
   @SuppressWarnings("unchecked")
   @Test
   public <T> void sequentialInterpolationWithFewPartitions()
       throws SolverException, InterruptedException {
-    throw new RuntimeException("BROKEN - Add support for sequential interpolation to fix");
-
-    /* FIXME
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
     requireIntegers();
@@ -390,7 +375,6 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
     checkItpSequence(ImmutableList.of(bmgr.and(A, B)), itps1);
     checkItpSequence(ImmutableList.of(A, B), itps2);
     checkItpSequence(ImmutableList.of(B, A), itps3);
-    */
   }
 
   @Test

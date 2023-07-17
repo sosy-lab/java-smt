@@ -16,10 +16,11 @@
 %include <std_string.i>
 %include <std_vector.i>
 
-%template(VectorInt)    std::vector<int>;
-%template(VectorPTRef)  std::vector<PTRef>;
-%template(VectorSRef)   std::vector<SRef>;
-%template(VectorSymRef) std::vector<SymRef>;
+%template(VectorInt)       std::vector<int>;
+%template(VectorPTRef)     std::vector<PTRef>;
+%template(VectorSRef)      std::vector<SRef>;
+%template(VectorSymRef)    std::vector<SymRef>;
+%template(VectorVectorInt) std::vector<std::vector<int>>;
 
 %include <std_unique_ptr.i>
 
@@ -54,7 +55,6 @@
     return $null;
   }
 }
-
 
 %rename(OpenSmt) Opensmt;
 %ignore Opensmt::Opensmt (opensmt_logic _logic, const char *name);
@@ -1345,6 +1345,23 @@
       opensmt::setbit(mask, i);
     $self->getSingleInterpolant(interpolants, mask);
     return interpolants[0];
+  }
+
+  %newobject getPathInterpolant;
+  std::vector<PTRef> getPathInterpolants (const std::vector<std::vector<int>>& partitions) {
+    vec<PTRef> interpolants;
+    std::vector<ipartitions_t> masks;
+    for(const std::vector<int>& partition : partitions) {
+      ipartitions_t mask;
+      for (int i : partition)
+        opensmt::setbit(mask, i);
+      masks.emplace_back(mask);
+    }
+    $self->getPathInterpolants(interpolants, masks);
+    std::vector<PTRef> result;
+    for (int i = 0; i < interpolants.size(); i++)
+      result.emplace_back(interpolants[i]);
+    return result;
   }
  }
 
