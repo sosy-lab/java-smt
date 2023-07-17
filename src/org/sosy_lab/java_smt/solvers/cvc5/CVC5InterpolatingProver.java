@@ -77,7 +77,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
 
-    if (pFormulasOfA.isEmpty()) {
+    if (pFormulasOfA.isEmpty()) { // Catch trivial case
       return mgr.getBooleanFormulaManager().makeBoolean(true);
     }
 
@@ -88,9 +88,11 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
             .filter(n -> !formulasOfA.contains(n))
             .collect(ImmutableSet.toImmutableSet());
 
-    if (formulasOfB.isEmpty()) {
+    if (formulasOfB.isEmpty()) { // Catch trivial case
       return mgr.getBooleanFormulaManager().makeBoolean(false);
     }
+
+    // fit the Input to work with getCVC5Interpolation
 
     ArrayList<Collection<Term>> formAAsList = new ArrayList<>();
     ArrayList<Collection<Term>> formBAsList = new ArrayList<>();
@@ -135,11 +137,12 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     assert InterpolatingProverEnvironment
         .checkTreeStructure(pPartitionedFormulas.size(), pStartOfSubTree);
 
+    // Generate every Interpolation Pair
     ArrayList<ArrayList<ArrayList<Collection<Term>>>> interpolationPairs =
         getTreeInterpolationPairs(pPartitionedFormulas, pStartOfSubTree);
 
     final ArrayList<Term> itps = new ArrayList<>();
-    try {
+    try { // Interpolate every Interpolation Pair
       for (int i = 0; i < interpolationPairs.size(); i++) {
         itps.add(getCVC5Interpolation(interpolationPairs.get(i)));
       }
@@ -159,15 +162,20 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     return result;
   }
 
-  /*
+  /**
    * Interpolates a Tuple of Interpolants according to Craig-Interpolation using CVC5-Interpolation.
+   *
+   * @param formulaPair Interpolation Pair
+   * @return Interpolation of the Interpolation Pair following the definition of
+   *         Craig-Interpolation.
    */
   private Term getCVC5Interpolation(ArrayList<ArrayList<Collection<Term>>> formulaPair) {
-    assert formulaPair.size() == 2;
+    assert formulaPair.size() == 2; // Check that formulaPair is a Tuple
 
     ArrayList<Collection<Term>> assertedInterpols = formulaPair.get(0);
     ArrayList<Collection<Term>> addedInterpols = formulaPair.get(1);
 
+    // Respect Asserted Formulas not in the Interpolation Pairs
     ArrayList<Collection<Term>> combinedInterpols = new ArrayList<Collection<Term>>();
     combinedInterpols.addAll(assertedInterpols);
     combinedInterpols.addAll(addedInterpols);
@@ -182,14 +190,17 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
       extraAssert = buildConjunctionOfFormulas(extraAssertions);
     }
 
-    Term phim = buildConjunctionOfCollectionOfFormula(assertedInterpols);
-    Term phip = buildConjunctionOfCollectionOfFormula(addedInterpols);
+    Term phim = buildConjunctionOfFormulasOverArray(assertedInterpols);
+    Term phip = buildConjunctionOfFormulasOverArray(addedInterpols);
 
     solver.resetAssertions();
     solver.assertFormula(solver.mkTerm(Kind.AND, extraAssert, phim));
 
+    // with Phip negated, CVC5 Interpolation produces an equivalent interpolation to
+    // Craig-Interpolation
     Term interpolant = solver.getInterpolant(solver.mkTerm(Kind.NOT, phip));
 
+    // restore Assertion state
     solver.resetAssertions();
 
     assertedFormulaHash.forEach((n) -> solver.assertFormula(n));
@@ -198,6 +209,13 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
 
   }
 
+  /**
+   * Returns Asserted Formulas (from the formula Stack), not present in the given collection of
+   * Terms.
+   *
+   * @param collTerms asserted Formulas to invert the selection
+   * @return asserted Formulas not in collTerms, but in the formula Stack
+   */
   private Collection<Term> getAssertedTermsNotInCollection(ArrayList<Collection<Term>> collTerms) {
     Set<Term> assertedTerms = ImmutableSet.copyOf(assertedFormulaHash);
     ArrayList<Term> retTerms = new ArrayList<Term>();
@@ -209,7 +227,14 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     return filteredAssertedTerms;
   }
 
-  private Term buildConjunctionOfCollectionOfFormula(ArrayList<Collection<Term>> formula) {
+  /**
+   * Turns an Array of Collections of Formulas to a Single Conjunction of the Formulas e.g.:
+   * [[A,B],[C]] -> A/\B/\C
+   *
+   * @param formula Array of Collections of formulas
+   * @return concatenated Formulas with AND as CVC5 Term
+   */
+  private Term buildConjunctionOfFormulasOverArray(ArrayList<Collection<Term>> formula) {
     Collection<Term> currColTerm = formula.get(0);
     formula.remove(0);
     if (formula.size() == 0) {
@@ -218,9 +243,15 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     return solver.mkTerm(
         Kind.AND,
         buildConjunctionOfFormulas(currColTerm),
-        buildConjunctionOfCollectionOfFormula(formula));
+        buildConjunctionOfFormulasOverArray(formula));
   }
 
+  /**
+   * Turns a collection of Formulas to a Single Conjunction of the Formulas e.g.: [A,B,C] -> A/\B/\C
+   *
+   * @param formulas collection of formulas
+   * @return concatenated Formulas with AND as CVC5 Term
+   */
   private Term buildConjunctionOfFormulas(Collection<Term> formulas) {
     Preconditions.checkState(!closed);
     Preconditions.checkArgument(!formulas.isEmpty());
@@ -237,35 +268,47 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     return solver.mkTerm(Kind.AND, formula, buildConjunctionOfFormulas(removedFormulas));
   }
 
-  // Generates Interpolation Pairs for Tree Interpolation. Experimental!
+  /**
+   * Generates Interpolation Pairs for Tree Interpolation. Experimental!
+   *
+   * @param pPartitionedFormulas of formulas
+   * @param pStartOfSubTree The start of the subtree containing the formula at this index as root.
+   * @return An Array of Interpolation Pairs (as Tuple) containing Arrays of Collection of Terms
+   */
   private ArrayList<ArrayList<ArrayList<Collection<Term>>>> getTreeInterpolationPairs(
       List<? extends Collection<Term>> pPartitionedFormulas,
       int[] pStartOfSubTree) {
-    ArrayList<ArrayList<ArrayList<Collection<Term>>>> result = new ArrayList<>(); // Exp
-                                                                                  // [[[A,B],[C]],[[A],[B,C]]]
-    ArrayList<Collection<Term>> currA = new ArrayList<Collection<Term>>();// Exp [(A),(B)]
+    ArrayList<ArrayList<ArrayList<Collection<Term>>>> result = new ArrayList<>();
+    // current generated LHS of Tuple
+    ArrayList<Collection<Term>> currA = new ArrayList<Collection<Term>>();
+    // current generated RHS of Tuple
     ArrayList<Collection<Term>> currB = new ArrayList<Collection<Term>>(pPartitionedFormulas);
+    // current generated Interpolation Tuple
     ArrayList<ArrayList<Collection<Term>>> betweenRes =
         new ArrayList<ArrayList<Collection<Term>>>();
     ArrayList<Collection<Term>> copyOfFormulas =
         new ArrayList<Collection<Term>>(pPartitionedFormulas);
     List<Integer> leafes = new ArrayList<Integer>();
 
+    // First Interpolation Pair
     leafes.add(pStartOfSubTree[0]);
-
     currA.add(copyOfFormulas.get(0));
     currB.remove(0);
     betweenRes.add((ArrayList<Collection<Term>>) currA.clone());
     betweenRes.add((ArrayList<Collection<Term>>) currB.clone());
     result.add(betweenRes);
+    // clear between Storage
     betweenRes = new ArrayList<ArrayList<Collection<Term>>>();
+    // iterate through Tree structure
     for (int i = 1; i < pStartOfSubTree.length - 1; i++) {
+      // if the leave does not change, continue like Sequential Interpolation
       if (pStartOfSubTree[i] == pStartOfSubTree[i - 1]) {
         currA.add(copyOfFormulas.get(i));
         currB.remove(0);
         betweenRes.add((ArrayList<Collection<Term>>) currA.clone());
         betweenRes.add((ArrayList<Collection<Term>>) currB.clone());
       } else {
+        // if the leave for the node already existed, rebuild the arrays, split at the node
         if (leafes.contains(pStartOfSubTree[i])) {
           currA = new ArrayList<Collection<Term>>();
           currB = new ArrayList<Collection<Term>>();
@@ -278,6 +321,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
           }
           betweenRes.add((ArrayList<Collection<Term>>) currA.clone());
           betweenRes.add((ArrayList<Collection<Term>>) currB.clone());
+          // rebuild currA from beginning with new node
         } else {
           currB.addAll(currA);
           currA = new ArrayList<Collection<Term>>();
