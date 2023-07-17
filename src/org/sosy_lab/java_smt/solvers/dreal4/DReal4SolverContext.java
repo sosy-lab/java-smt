@@ -70,8 +70,9 @@ public class DReal4SolverContext extends AbstractSolverContext {
         pNonLinearArithmetic);
     DReal4RationalFormulaManager rationalTheory = new DReal4RationalFormulaManager(creator,
         pNonLinearArithmetic);
+    DReal4QuantifiedFormulaManager quantifierTheory = new DReal4QuantifiedFormulaManager(creator);
     DReal4FormulaManager manager = new DReal4FormulaManager(creator, functionTheory,
-        booleanTheory, integerTheory, rationalTheory);
+        booleanTheory, integerTheory, rationalTheory, quantifierTheory);
     return new DReal4SolverContext(manager, creator, pShutdownNotifier);
 
   }

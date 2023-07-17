@@ -53,10 +53,9 @@ public class DReal4BooleanFormulaManager
   protected DRealTerm not(DRealTerm pParam1) {
     if (pParam1.isFormula()) {
       return new DRealTerm(null, null, dreal.Not(pParam1.getFormula()));
-    } else if (pParam1.isVar()) {
-      return new DRealTerm(null, null, dreal.Not(pParam1.getVariable()));
     } else {
-      throw new UnsupportedOperationException("dReal does not support not on Expressions.");
+      throw new UnsupportedOperationException("dReal does not support not on Variabele "
+          + "or Expressions.");
     }
   }
 

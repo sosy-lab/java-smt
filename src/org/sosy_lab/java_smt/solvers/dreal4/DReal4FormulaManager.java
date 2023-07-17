@@ -32,7 +32,8 @@ public class DReal4FormulaManager extends AbstractFormulaManager<DRealTerm, Type
   DReal4FormulaManager(DReal4FormulaCreator pFormulaCreator, DReal4UFManager pFunctionManager,
                        DReal4BooleanFormulaManager pBooleanManager,
                        DReal4IntegerFormulaManager pIntegerManager,
-                       DReal4RationalFormulaManager pRationalManager) {
+                       DReal4RationalFormulaManager pRationalManager,
+                       DReal4QuantifiedFormulaManager pQuantifierManager) {
     super(
         pFormulaCreator,
         pFunctionManager,
@@ -41,7 +42,7 @@ public class DReal4FormulaManager extends AbstractFormulaManager<DRealTerm, Type
         pRationalManager,
         null,
         null,
-        null,
+        pQuantifierManager,
         null,
         null,
         null,

@@ -29,6 +29,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Context;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Expression;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.ExpressionKind;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable.Type;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.dreal;
 
@@ -59,17 +60,17 @@ public abstract class DReal4NumeralFormulaManager<
 
   @Override
   protected DRealTerm makeNumberImpl(long i) {
-    return null;
+    return new DRealTerm(null, new Expression((double) i), null);
   }
 
   @Override
   protected DRealTerm makeNumberImpl(BigInteger i) {
-    return null;
+    return makeNumberImpl(i.toString());
   }
 
   @Override
   protected DRealTerm makeNumberImpl(String i) {
-    return null;
+    return new DRealTerm(null, new Expression(Double.parseDouble(i)), null);
   }
 
   protected abstract Type getNumeralType();
@@ -81,7 +82,7 @@ public abstract class DReal4NumeralFormulaManager<
 
   @Override
   protected DRealTerm makeNumberImpl(BigDecimal pNumber) {
-    return null;
+    return makeNumberImpl(pNumber.toString());
   }
 
   @Override
@@ -91,7 +92,7 @@ public abstract class DReal4NumeralFormulaManager<
 
   @Override
   protected DRealTerm negate(DRealTerm pParam1) {
-    return null;
+    return new DRealTerm(null, null, dreal.Not(pParam1.getVariable()));
   }
 
   @Override
@@ -116,6 +117,15 @@ public abstract class DReal4NumeralFormulaManager<
   protected DRealTerm subtract(DRealTerm pParam1, DRealTerm pParam2) {
     if (pParam1.isExp() && pParam2.isExp()) {
       return new DRealTerm(null, dreal.Substract(pParam1.getExpression(), pParam2.getExpression()), null);
+    } else if (pParam1.isVar() && pParam2.isVar()) {
+      return new DRealTerm(null, dreal.Substract(new Expression(pParam1.getVariable()),
+          new Expression(pParam1.getVariable())), null);
+    } else if (pParam1.isExp() && pParam2.isVar()) {
+      return new DRealTerm(null, dreal.Substract(pParam1.getExpression(),
+          new Expression(pParam2.getVariable())), null);
+    } else if (pParam1.isVar() && pParam2.isExp()) {
+      return new DRealTerm(null, dreal.Substract(new Expression(pParam1.getVariable()),
+          pParam2.getExpression()), null);
     } else {
       throw new UnsupportedOperationException("dReal does not support subtract on Variables or "
           + "Formulas.");
@@ -183,7 +193,32 @@ public abstract class DReal4NumeralFormulaManager<
 
   @Override
   protected DRealTerm distinctImpl(List<DRealTerm> pNumbers) {
-    return null;
+    // dReal does not directly support this method, so we need to build the whole term
+    Formula andFormula = helperFunction(pNumbers.get(1), pNumbers.get(0));
+    for (int i = 2; i < pNumbers.size(); i++) {
+      for (int j = 0; j < i; j++) {
+        andFormula = dreal.And(andFormula, helperFunction(pNumbers.get(i), pNumbers.get(j)));
+      }
+    }
+    return new DRealTerm(null, null, andFormula);
+  }
+
+  // Takes two DRealTerms and creates a NotEqual Formula to use in distinctImpl
+  private Formula helperFunction(DRealTerm pTerm1, DRealTerm pTerm2) {
+    if (pTerm1.isVar() && pTerm2.isVar()) {
+      return dreal.NotEqual(pTerm1.getVariable(), pTerm2.getVariable());
+    } else if (pTerm1.isExp() && pTerm2.isVar()) {
+      return dreal.NotEqual(pTerm1.getExpression(),
+          new Expression(pTerm2.getVariable()));
+    } else if (pTerm1.isVar() && pTerm2.isExp()) {
+      return dreal.NotEqual(new Expression(pTerm1.getVariable()),
+          pTerm2.getExpression());
+    } else if (pTerm1.isExp() && pTerm1.isExp()) {
+      return dreal.NotEqual(pTerm1.getExpression(),
+          pTerm2.getExpression());
+    } else {
+      throw new UnsupportedOperationException("dReal does not support distinctImpl on Formulas.");
+    }
   }
 
   @Override

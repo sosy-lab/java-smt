@@ -19,6 +19,7 @@
  */
 
 package org.sosy_lab.java_smt.solvers.dreal4;
+import de.uni_freiburg.informatik.ultimate.logic.QuantifiedFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
