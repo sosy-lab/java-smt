@@ -243,19 +243,6 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
 
   @Test
   public void testDivision() throws SolverException, InterruptedException {
-    throw new RuntimeException("BROKEN - Reason unknown.");
-    /* FIXME
-
-       Native frames: (J=compiled Java code, j=interpreted, Vv=VM code, C=native code)
-       C  [libopensmt.so+0x11a166]  FastRational::FastRational(FastRational const&)+0x16
-       Java frames: (J=compiled Java code, j=interpreted, Vv=VM code)
-       j  opensmt.OsmtNativeJNI.MainSolver_check(JLopensmt/MainSolver;)J+0
-       j  opensmt.MainSolver.check()Lopensmt/sstat;+15
-       j  org.sosy_lab.java_smt.solvers.opensmt.OpenSmtAbstractProver.isUnsat()Z+55
-       j  org.sosy_lab.java_smt.basicimpl.withAssumptionsWrapper.BasicProverWithAssumptionsWrapper.isUnsat()Z+19
-       j  org.sosy_lab.java_smt.test.BooleanFormulaSubject.isSatisfiable()V+122
-       j  org.sosy_lab.java_smt.test.NonLinearArithmeticTest.testDivision()V+81
-
     T a = nmgr.makeVariable("a");
 
     // (a == 2) && (3 == 6 / a)
@@ -267,13 +254,11 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
                 handleExpectedException(() -> nmgr.divide(nmgr.makeNumber(2 * 3), a))));
 
     assertThatFormula(f).isSatisfiable();
-    */
+    
   }
 
   @Test
   public void testDivisionUnsatisfiable() throws SolverException, InterruptedException {
-    throw new RuntimeException("BROKEN - Reason unknown.");
-    /* FIXME
     T a = nmgr.makeVariable("a");
 
     BooleanFormula f =
@@ -292,6 +277,5 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
     } else {
       assertExpectedUnsatifiabilityForNonLinearArithmetic(f);
     }
-    */
   }
 }

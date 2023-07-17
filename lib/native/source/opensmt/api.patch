@@ -157,6 +157,28 @@ index a3f4bb1c..9fc7ac3d 100644
          std::stack<mpq_class> store; // uses deque as storage to avoid realloc
          std::stack<mpq_ptr, std::vector<mpq_ptr>> pool;
      public:
+diff --git a/src/logics/ArithLogic.cc b/src/logics/ArithLogic.cc
+index 8609ef55..a1aa5240 100644
+--- a/src/logics/ArithLogic.cc
++++ b/src/logics/ArithLogic.cc
+@@ -807,7 +807,7 @@ PTRef ArithLogic::mkMod(vec<PTRef> && args) {
+     PTRef dividend = args[0];
+     PTRef divisor = args[1];
+ 
+-    if (not isNumConst(divisor)) { throw OsmtApiException("Divisor must be constant in linear logic"); }
++    if (not isNumConst(divisor)) { throw LANonLinearException("Divisor must be constant in linear logic"); }
+     if (isZero(divisor)) { throw ArithDivisionByZeroException(); }
+     if (isOne(divisor) or isMinusOne(divisor)) { return getTerm_IntZero(); }
+     if (isConstant(dividend)) {
+@@ -829,7 +829,7 @@ PTRef ArithLogic::mkIntDiv(vec<PTRef> && args) {
+     assert(args.size() == 2);
+     PTRef dividend = args[0];
+     PTRef divisor = args[1];
+-    if (not isConstant(divisor) and not isConstant(dividend)) { throw LANonLinearException("Divisor or dividend must be constant in linear logic"); }
++    if (not isConstant(divisor)) { throw LANonLinearException("Divisor or dividend must be constant in linear logic"); }
+     if (isZero(divisor)) { throw ArithDivisionByZeroException(); }
+     if (isOne(divisor)) { return dividend; }
+     if (isMinusOne(divisor)) { return mkNeg(dividend); }
 diff --git a/src/logics/FunctionTools.h b/src/logics/FunctionTools.h
 index fc9dbfb7..943a466d 100644
 --- a/src/logics/FunctionTools.h

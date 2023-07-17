@@ -30,7 +30,6 @@ abstract class OpenSmtNumeralFormulaManager<
   OpenSmtNumeralFormulaManager(
       OpenSmtFormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
     super(pCreator, pNonLinearArithmetic);
-    // FIXME: maybe we should rename this to getArithLogic()?
     osmtLogic = (ArithLogic) pCreator.getEnv();
   }
 
