@@ -25,7 +25,12 @@ class OpenSmtTheoremProver extends OpenSmtAbstractProver<Void> implements Prover
       int pRandom,
       Set<ProverOptions> pOptions) {
 
-    super(pFormulaCreator, pMgr, pShutdownNotifier, getConfigInstance(pRandom, false), pOptions);
+    super(
+      pFormulaCreator,
+      pMgr,
+      pShutdownNotifier,
+      getConfigInstance(pRandom, false),
+      pOptions);
   }
 
   @Override

@@ -74,7 +74,7 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
 
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() {
-    // FIXME: OpenSmt seems to run out of memory if the problemSize is to large
+    // FIXME: OpenSmt crashes if problemSize is to large
     problemSize = (solver == Solvers.PRINCESS || solver == Solvers.OPENSMT) ? 10 : 100;
     ConfigurationBuilder builder = super.createTestConfigBuilder();
     if (solverToUse() == Solvers.MATHSAT5) {

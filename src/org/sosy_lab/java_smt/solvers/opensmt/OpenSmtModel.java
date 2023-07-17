@@ -47,8 +47,6 @@ public class OpenSmtModel extends AbstractModel<PTRef, SRef, Logic> {
     ImmutableList.Builder<ValueAssignment> builder = ImmutableList.builder();
 
     for (PTRef term : userDeclarations.values()) {
-      //      System.out.println(name + " = " + osmtLogic.pp(term));
-
       SymRef ref = osmtLogic.getSymRef(term);
       Symbol sym = osmtLogic.getSym(ref);
 

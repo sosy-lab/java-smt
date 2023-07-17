@@ -69,8 +69,7 @@
     bool ok = config->setOption(SMTConfig::o_produce_inter, SMTOption(prodInterpolants), msg);
     if (!ok) {
       throw std::runtime_error(msg);
-    }
-    else {
+    } else {
       return new Opensmt(_logic, name, std::move(config));
     }
   }

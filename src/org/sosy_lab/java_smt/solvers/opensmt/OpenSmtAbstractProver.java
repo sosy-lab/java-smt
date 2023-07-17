@@ -51,16 +51,11 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     super(pOptions, pMgr.getBooleanFormulaManager(), pShutdownNotifier);
 
     creator = pFormulaCreator;
-
-    // BUGFIX: We need to store the SMTConfig reference here to make sure the underlying C++ object does not get garbage collected
-    config = pConfig;
+    config = pConfig; // BUGFIX: We need to store the SMTConfig reference to make sure the underlying C++ object does not get garbage collected
+    
     osmtSolver = new MainSolver(creator.getEnv(), pConfig, "JavaSmt");
-
+    
     assertedFormulas.push(new ArrayList<>()); // create initial level
-
-    // FIXME Handle prover options
-    // if (pOptions.contains(ProverOptions.GENERATE_MODELS)) {
-    //   solver.setOption("produce-models", "true");
 
     // FIXME Disable Model generation if arrays are required
     // https://github.com/usi-verification-and-security/opensmt/issues/630
@@ -114,6 +109,9 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
   @SuppressWarnings("resource")
   @Override
   public Model getModel() {
+    Preconditions.checkState(!closed);
+    checkGenerateModels();
+
     List<PTRef> assertedTerms = new ArrayList<>();
     assertedFormulas.forEach(assertedTerms::addAll);
     return new OpenSmtModel(this, creator, assertedTerms);

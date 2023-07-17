@@ -34,7 +34,12 @@ class OpenSmtInterpolatingProver extends OpenSmtAbstractProver<Integer>
       int pRandom,
       Set<ProverOptions> pOptions) {
 
-    super(pFormulaCreator, pMgr, pShutdownNotifier, getConfigInstance(pRandom, true), pOptions);
+    super(
+      pFormulaCreator,
+      pMgr,
+      pShutdownNotifier,
+      getConfigInstance(pRandom, true),
+      pOptions);
   }
 
   @Override
