@@ -1234,66 +1234,67 @@ public class CVC5NativeAPITest {
   }
 
   @Test
-  public void checkCVC5InterpolationMethod() throws CVC5ApiException {
+  public void checkCVC5InterpolationMethod() {
     solver.setOption("produce-interpolants", "true");
-    Term x = solver.mkConst(solver.getIntegerSort(), "x");
+    Term xp = solver.mkConst(solver.getIntegerSort(), "xp");
     Term y = solver.mkConst(solver.getIntegerSort(), "y");
 
-    Term ip0 = solver.mkTerm(Kind.GT, x, y);
-    Term ip1 = solver.mkTerm(Kind.EQUAL, x, solver.mkInteger(0));
+    Term ip0 = solver.mkTerm(Kind.GT, xp, y);
+    Term ip1 = solver.mkTerm(Kind.EQUAL, xp, solver.mkInteger(0));
     Term ip2 = solver.mkTerm(Kind.GT, y, solver.mkInteger(0));
 
     Term a = ip0;
     Term b = solver.mkTerm(Kind.AND, ip1, ip2);
 
-    Term interpolation = interpolateAndCheck(solver, a, b);
+    assertThat(!interpolateAndCheck(solver, a, b).isNull()).isTrue();
   }
 
   /**
    * Interpolates Terms after CVC5 and checks the Definition of Craig-Interpolation for the
    * interpolation.
    *
-   * @retrun Interpolantion of interpolantA and interpolantB after CVC5 Interpolation Definition
+   * @return Interpolantion of interpolantA and interpolantB after CVC5 Interpolation Definition
    */
-  private Term interpolateAndCheck(Solver solver, Term interpolantA, Term interpolantB) {
+  private Term interpolateAndCheck(Solver solverP, Term interpolantA, Term interpolantB) {
     // solver.setOption("produce-interpolants", "true");
-    solver.assertFormula(interpolantA);
-    Term interpolation = solver.getInterpolant(solver.mkTerm(Kind.NOT, interpolantB));
+    solverP.assertFormula(interpolantA);
+    Term interpolation = solverP.getInterpolant(solverP.mkTerm(Kind.NOT, interpolantB));
 
-    solver.resetAssertions();
-    Term cvc51 = solver.mkTerm(Kind.IMPLIES, interpolantA, interpolation);
-    Term cvc52 = solver.mkTerm(Kind.IMPLIES, interpolation, solver.mkTerm(Kind.NOT, interpolantB));
+    solverP.resetAssertions();
+    Term cvc51 = solverP.mkTerm(Kind.IMPLIES, interpolantA, interpolation);
+    Term cvc52 =
+        solverP.mkTerm(Kind.IMPLIES, interpolation, solverP.mkTerm(Kind.NOT, interpolantB));
 
-    solver.assertFormula(cvc51);
-    solver.assertFormula(cvc52);
-    if (solver.checkSat().isUnsat()) {
+    solverP.assertFormula(cvc51);
+    solverP.assertFormula(cvc52);
+    if (solverP.checkSat().isUnsat()) {
       System.out.println("Does not satisfy CVC5 Interpolation Definition");
       return null;
     }
 
-    solver.resetAssertions();
-    solver.assertFormula(solver.mkTerm(Kind.NOT, solver.mkTerm(Kind.AND, cvc51, cvc52)));
-    if (solver.checkSat().isSat()) {
+    solverP.resetAssertions();
+    solverP.assertFormula(solverP.mkTerm(Kind.NOT, solverP.mkTerm(Kind.AND, cvc51, cvc52)));
+    if (solverP.checkSat().isSat()) {
       System.out.println("Does not satisfy generally CVC5 Interpolation Definition");
       return null;
     }
 
-    solver.resetAssertions();
-    Term craig1 = solver.mkTerm(Kind.IMPLIES, interpolantA, interpolation);
+    solverP.resetAssertions();
+    Term craig1 = solverP.mkTerm(Kind.IMPLIES, interpolantA, interpolation);
     Term craig2 =
-        solver.mkTerm(
+        solverP.mkTerm(
             Kind.EQUAL,
-            solver.mkTerm(Kind.AND, interpolation, interpolantB),
-            solver.mkBoolean(false));
-    solver.assertFormula(craig1);
-    solver.assertFormula(craig2);
-    if (solver.checkSat().isUnsat()) {
+            solverP.mkTerm(Kind.AND, interpolation, interpolantB),
+            solverP.mkBoolean(false));
+    solverP.assertFormula(craig1);
+    solverP.assertFormula(craig2);
+    if (solverP.checkSat().isUnsat()) {
       System.out.println("Does not satisfy Craig Interpolation Definition");
       return null;
     }
-    solver.resetAssertions();
-    solver.assertFormula(solver.mkTerm(Kind.NOT, solver.mkTerm(Kind.AND, craig1, craig2)));
-    if (solver.checkSat().isSat()) {
+    solverP.resetAssertions();
+    solverP.assertFormula(solverP.mkTerm(Kind.NOT, solverP.mkTerm(Kind.AND, craig1, craig2)));
+    if (solverP.checkSat().isSat()) {
       System.out.println("Does not satisfy generally Craig Interpolation Definition");
       return null;
     }
@@ -1303,30 +1304,20 @@ public class CVC5NativeAPITest {
 
   @Test
   @Ignore // Does not terminate
-  public void testSimpleInterpolation() throws CVC5ApiException {
-    // Out of Interpolation tests
-    // IntegerFormula x = imgr.makeVariable("x");
-    // IntegerFormula y = imgr.makeVariable("y");
-    // IntegerFormula z = imgr.makeVariable("z");
-    // BooleanFormula f1 = imgr.equal(y, imgr.multiply(imgr.makeNumber(2), x));
-    // BooleanFormula f2 =
-    // imgr.equal(y, imgr.add(imgr.makeNumber(1), imgr.multiply(z, imgr.makeNumber(2))));
-    // prover.push(f1);
-    // T id2 = prover.push(f2);
-    // boolean check = prover.isUnsat();
-    // assertWithMessage("formulas must be contradicting").that(check).isTrue();
-    // prover.getInterpolant(ImmutableList.of(id2));
+  public void testSimpleInterpolation() {
+    // Out of InterpolatingProverTest.java
+    // Line: 65
     solver.setOption("produce-interpolants", "true");
-    Term x = solver.mkConst(solver.getIntegerSort(), "x");
+    Term xprime = solver.mkConst(solver.getIntegerSort(), "x");
     Term y = solver.mkConst(solver.getIntegerSort(), "y");
     Term z = solver.mkConst(solver.getIntegerSort(), "z");
-    Term f1 = solver.mkTerm(Kind.EQUAL, y, solver.mkTerm(Kind.MULT, solver.mkInteger(2), x));
+    Term f1 = solver.mkTerm(Kind.EQUAL, y, solver.mkTerm(Kind.MULT, solver.mkInteger(2), xprime));
     Term f2 =
         solver.mkTerm(
             Kind.EQUAL,
             y,
             solver.mkTerm(
                 Kind.ADD, solver.mkInteger(1), solver.mkTerm(Kind.MULT, z, solver.mkInteger(2))));
-    Term i1 = interpolateAndCheck(solver, f1, f2);
+    interpolateAndCheck(solver, f1, f2);
   }
 }

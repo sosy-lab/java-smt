@@ -30,7 +30,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     implements InterpolatingProverEnvironment<Term> {
 
   private final FormulaManager mgr;
-  private final CVC5FormulaCreator creator;
+  // private final CVC5FormulaCreator creator;
   private final Set<Term> assertedFormulaHash = new HashSet<>(); // comparable to SMTInterpols
   // annotatedTerms
 
@@ -42,15 +42,13 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
       FormulaManager pMgr) {
     super(pFormulaCreator, pShutdownNotifier, randomSeed, pOptions, pMgr);
     mgr = pMgr;
-    creator = pFormulaCreator;
+    // creator = pFormulaCreator;
   }
 
   @Override
   public void pop() {
     Preconditions.checkState(!closed);
-    for (Term removed : assertedFormulas.peek()) {
-      assertedFormulaHash.remove(removed);
-    }
+    assertedFormulaHash.removeAll(assertedFormulas.peek());
     super.pop();
   }
 
@@ -174,14 +172,14 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     ArrayList<Collection<Term>> addedInterpols = formulaPair.get(1);
 
     // Respect Asserted Formulas not in the Interpolation Pairs
-    ArrayList<Collection<Term>> combinedInterpols = new ArrayList<Collection<Term>>();
+    ArrayList<Collection<Term>> combinedInterpols = new ArrayList<>();
     combinedInterpols.addAll(assertedInterpols);
     combinedInterpols.addAll(addedInterpols);
 
     Collection<Term> extraAssertions = getAssertedTermsNotInCollection(combinedInterpols);
     Term extraAssert = new Term();
 
-    if (extraAssertions.size() == 0) {
+    if (extraAssertions.isEmpty()) {
       extraAssert = solver.mkTrue();
     } else {
       extraAssert = buildConjunctionOfFormulas(extraAssertions);
@@ -213,8 +211,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
    * @return asserted Formulas not in collTerms, but in the formula Stack
    */
   private Collection<Term> getAssertedTermsNotInCollection(ArrayList<Collection<Term>> collTerms) {
-    Set<Term> assertedTerms = ImmutableSet.copyOf(assertedFormulaHash);
-    ArrayList<Term> retTerms = new ArrayList<Term>();
+    ArrayList<Term> retTerms = new ArrayList<>();
     collTerms.forEach((n) -> retTerms.addAll(n));
     Set<Term> filteredAssertedTerms =
         assertedFormulaHash.stream()
@@ -271,19 +268,20 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
    * @param pStartOfSubTree The start of the subtree containing the formula at this index as root.
    * @return An Array of Interpolation Pairs (as Tuple) containing Arrays of Collection of Terms
    */
+  @SuppressWarnings("unchecked")
   private ArrayList<ArrayList<ArrayList<Collection<Term>>>> getTreeInterpolationPairs(
       List<? extends Collection<Term>> pPartitionedFormulas, int[] pStartOfSubTree) {
     ArrayList<ArrayList<ArrayList<Collection<Term>>>> result = new ArrayList<>();
     // current generated LHS of Tuple
-    ArrayList<Collection<Term>> currA = new ArrayList<Collection<Term>>();
+    ArrayList<Collection<Term>> currA = new ArrayList<>();
     // current generated RHS of Tuple
-    ArrayList<Collection<Term>> currB = new ArrayList<Collection<Term>>(pPartitionedFormulas);
+    ArrayList<Collection<Term>> currB = new ArrayList<>(pPartitionedFormulas);
     // current generated Interpolation Tuple
     ArrayList<ArrayList<Collection<Term>>> betweenRes =
-        new ArrayList<ArrayList<Collection<Term>>>();
+        new ArrayList<>();
     ArrayList<Collection<Term>> copyOfFormulas =
-        new ArrayList<Collection<Term>>(pPartitionedFormulas);
-    List<Integer> leafes = new ArrayList<Integer>();
+        new ArrayList<>(pPartitionedFormulas);
+    List<Integer> leafes = new ArrayList<>();
 
     // First Interpolation Pair
     leafes.add(pStartOfSubTree[0]);
@@ -293,7 +291,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     betweenRes.add((ArrayList<Collection<Term>>) currB.clone());
     result.add(betweenRes);
     // clear between Storage
-    betweenRes = new ArrayList<ArrayList<Collection<Term>>>();
+    betweenRes = new ArrayList<>();
     // iterate through Tree structure
     for (int i = 1; i < pStartOfSubTree.length - 1; i++) {
       // if the leave does not change, continue like Sequential Interpolation
@@ -305,9 +303,9 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
       } else {
         // if the leave for the node already existed, rebuild the arrays, split at the node
         if (leafes.contains(pStartOfSubTree[i])) {
-          currA = new ArrayList<Collection<Term>>();
-          currB = new ArrayList<Collection<Term>>();
-          for (int j = 0; j < pStartOfSubTree.length; i++) {
+          currA = new ArrayList<>();
+          currB = new ArrayList<>();
+          for (int j = 0; j < pStartOfSubTree.length; j++) {
             if (j <= i) {
               currA.add(copyOfFormulas.get(j));
             } else {
@@ -319,7 +317,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
           // rebuild currA from beginning with new node
         } else {
           currB.addAll(currA);
-          currA = new ArrayList<Collection<Term>>();
+          currA = new ArrayList<>();
           currA.add(copyOfFormulas.get(i));
           currB.remove(0);
           betweenRes.add((ArrayList<Collection<Term>>) currA.clone());
@@ -328,7 +326,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
         }
       }
       result.add(betweenRes);
-      betweenRes = new ArrayList<ArrayList<Collection<Term>>>();
+      betweenRes = new ArrayList<>();
     }
     assert result.size() == pStartOfSubTree.length - 1;
     return result;
