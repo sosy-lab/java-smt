@@ -165,11 +165,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
       Set<ProverOptions> pOptions) {
     Preconditions.checkState(!closed, "solver context is already closed");
     return new CVC5InterpolatingProver(
-        creator,
-        shutdownNotifier,
-        randomSeed,
-        pOptions,
-        getFormulaManager());
+        creator, shutdownNotifier, randomSeed, pOptions, getFormulaManager());
   }
 
   @Override

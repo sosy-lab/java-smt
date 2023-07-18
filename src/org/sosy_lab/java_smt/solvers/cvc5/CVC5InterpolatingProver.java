@@ -32,15 +32,14 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
   private final FormulaManager mgr;
   private final CVC5FormulaCreator creator;
   private final Set<Term> assertedFormulaHash = new HashSet<>(); // comparable to SMTInterpols
-                                                                 // annotatedTerms
+  // annotatedTerms
 
   CVC5InterpolatingProver(
       CVC5FormulaCreator pFormulaCreator,
       ShutdownNotifier pShutdownNotifier,
       @SuppressWarnings("unused") int randomSeed,
       Set<ProverOptions> pOptions,
-      FormulaManager pMgr
-      ) {
+      FormulaManager pMgr) {
     super(pFormulaCreator, pShutdownNotifier, randomSeed, pOptions, pMgr);
     mgr = pMgr;
     creator = pFormulaCreator;
@@ -112,12 +111,11 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
   }
 
   @Override
-  public List<BooleanFormula>
-      getSeqInterpolants(List<? extends Collection<Term>> partitionedFormulas)
-          throws SolverException, InterruptedException {
+  public List<BooleanFormula> getSeqInterpolants(
+      List<? extends Collection<Term>> partitionedFormulas)
+      throws SolverException, InterruptedException {
     Preconditions.checkArgument(
-        !partitionedFormulas.isEmpty(),
-        "at least one partition should be available.");
+        !partitionedFormulas.isEmpty(), "at least one partition should be available.");
 
     final List<BooleanFormula> itps = new ArrayList<>();
     for (int i = 1; i < partitionedFormulas.size(); i++) {
@@ -130,12 +128,12 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
 
   // Experimental!
   @Override
-  public List<BooleanFormula>
-      getTreeInterpolants(List<? extends Collection<Term>> pPartitionedFormulas, int[] pStartOfSubTree)
-          throws SolverException, InterruptedException {
+  public List<BooleanFormula> getTreeInterpolants(
+      List<? extends Collection<Term>> pPartitionedFormulas, int[] pStartOfSubTree)
+      throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
-    assert InterpolatingProverEnvironment
-        .checkTreeStructure(pPartitionedFormulas.size(), pStartOfSubTree);
+    assert InterpolatingProverEnvironment.checkTreeStructure(
+        pPartitionedFormulas.size(), pStartOfSubTree);
 
     // Generate every Interpolation Pair
     ArrayList<ArrayList<ArrayList<Collection<Term>>>> interpolationPairs =
@@ -167,7 +165,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
    *
    * @param formulaPair Interpolation Pair
    * @return Interpolation of the Interpolation Pair following the definition of
-   *         Craig-Interpolation.
+   *     Craig-Interpolation.
    */
   private Term getCVC5Interpolation(ArrayList<ArrayList<Collection<Term>>> formulaPair) {
     assert formulaPair.size() == 2; // Check that formulaPair is a Tuple
@@ -180,8 +178,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     combinedInterpols.addAll(assertedInterpols);
     combinedInterpols.addAll(addedInterpols);
 
-    Collection<Term> extraAssertions =
-        getAssertedTermsNotInCollection(combinedInterpols);
+    Collection<Term> extraAssertions = getAssertedTermsNotInCollection(combinedInterpols);
     Term extraAssert = new Term();
 
     if (extraAssertions.size() == 0) {
@@ -206,7 +203,6 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     assertedFormulaHash.forEach((n) -> solver.assertFormula(n));
 
     return interpolant;
-
   }
 
   /**
@@ -276,8 +272,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
    * @return An Array of Interpolation Pairs (as Tuple) containing Arrays of Collection of Terms
    */
   private ArrayList<ArrayList<ArrayList<Collection<Term>>>> getTreeInterpolationPairs(
-      List<? extends Collection<Term>> pPartitionedFormulas,
-      int[] pStartOfSubTree) {
+      List<? extends Collection<Term>> pPartitionedFormulas, int[] pStartOfSubTree) {
     ArrayList<ArrayList<ArrayList<Collection<Term>>>> result = new ArrayList<>();
     // current generated LHS of Tuple
     ArrayList<Collection<Term>> currA = new ArrayList<Collection<Term>>();
@@ -338,5 +333,4 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     assert result.size() == pStartOfSubTree.length - 1;
     return result;
   }
-
 }

@@ -1302,7 +1302,7 @@ public class CVC5NativeAPITest {
   }
 
   @Test
-  @Ignore //Does not terminate
+  @Ignore // Does not terminate
   public void testSimpleInterpolation() throws CVC5ApiException {
     // Out of Interpolation tests
     // IntegerFormula x = imgr.makeVariable("x");
@@ -1326,10 +1326,7 @@ public class CVC5NativeAPITest {
             Kind.EQUAL,
             y,
             solver.mkTerm(
-                Kind.ADD,
-                solver.mkInteger(1),
-                solver.mkTerm(Kind.MULT, z, solver.mkInteger(2))));
+                Kind.ADD, solver.mkInteger(1), solver.mkTerm(Kind.MULT, z, solver.mkInteger(2))));
     Term i1 = interpolateAndCheck(solver, f1, f2);
   }
-
 }
