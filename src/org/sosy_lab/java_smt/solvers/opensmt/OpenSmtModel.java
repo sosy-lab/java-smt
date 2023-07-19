@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import opensmt.Logic;
 import opensmt.MainSolver;
+import opensmt.Model;
 import opensmt.PTRef;
 import opensmt.SRef;
 import opensmt.SymRef;
@@ -29,7 +30,8 @@ public class OpenSmtModel extends AbstractModel<PTRef, SRef, Logic> {
 
   private final Logic osmtLogic;
   private final MainSolver osmtSolver;
-
+  private final Model osmtModel;
+  
   private final ImmutableList<ValueAssignment> model;
 
   OpenSmtModel(
@@ -40,7 +42,8 @@ public class OpenSmtModel extends AbstractModel<PTRef, SRef, Logic> {
 
     osmtLogic = pCreator.getEnv();
     osmtSolver = pProver.getOsmtSolver();
-
+    osmtModel = osmtSolver.getModel();
+    
     PTRef asserts = osmtLogic.mkAnd(new VectorPTRef(pAssertedExpressions));
     Map<String, PTRef> userDeclarations = pCreator.extractVariablesAndUFs(asserts, true);
 
@@ -54,7 +57,7 @@ public class OpenSmtModel extends AbstractModel<PTRef, SRef, Logic> {
 
       if (numArgs == 0) {
         PTRef key = osmtLogic.mkVar(sym.rsort(), osmtLogic.getSymName(ref));
-        PTRef value = osmtSolver.getModel().evaluate(key);
+        PTRef value = osmtModel.evaluate(key);
 
         builder.add(
             new ValueAssignment(
@@ -65,7 +68,7 @@ public class OpenSmtModel extends AbstractModel<PTRef, SRef, Logic> {
                 pCreator.convertValue(value),
                 new ArrayList<>()));
       } else {
-        TemplateFunction tf = osmtSolver.getModel().getDefinition(ref);
+        TemplateFunction tf = osmtModel.getDefinition(ref);
 
         for (List<PTRef> path : unfold(numArgs, tf.getBody())) {
           List<PTRef> args = path.subList(0, numArgs);
@@ -120,7 +123,7 @@ public class OpenSmtModel extends AbstractModel<PTRef, SRef, Logic> {
   @Override
   public PTRef evalImpl(PTRef f) {
     Preconditions.checkState(!isClosed());
-    return osmtSolver.getModel().evaluate(f);
+    return osmtModel.evaluate(f);
   }
 
   @Override

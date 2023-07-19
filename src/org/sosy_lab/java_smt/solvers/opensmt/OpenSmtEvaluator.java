@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.solvers.opensmt;
 import com.google.common.base.Preconditions;
 import opensmt.Logic;
 import opensmt.MainSolver;
+import opensmt.Model;
 import opensmt.PTRef;
 import opensmt.SRef;
 import org.sosy_lab.java_smt.basicimpl.AbstractEvaluator;
@@ -18,15 +19,17 @@ import org.sosy_lab.java_smt.basicimpl.AbstractEvaluator;
 public class OpenSmtEvaluator extends AbstractEvaluator<PTRef, SRef, Logic> {
 
   private final MainSolver osmtSolver;
-
+  private final Model osmtModel;
+  
   OpenSmtEvaluator(OpenSmtAbstractProver<?> pProver, OpenSmtFormulaCreator pCreator) {
     super(pProver, pCreator);
     osmtSolver = pProver.getOsmtSolver();
+    osmtModel = osmtSolver.getModel();
   }
 
   @Override
   public PTRef evalImpl(PTRef f) {
     Preconditions.checkState(!isClosed());
-    return osmtSolver.getModel().evaluate(f);
+    return osmtModel.evaluate(f);
   }
 }
