@@ -13,10 +13,12 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import io.github.cvc5.Kind;
+import io.github.cvc5.Solver;
 import io.github.cvc5.Term;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.Deque;
 import java.util.List;
 import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -30,9 +32,9 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     implements InterpolatingProverEnvironment<Term> {
 
   private final FormulaManager mgr;
-  // private final CVC5FormulaCreator creator;
-  private final Set<Term> assertedFormulaHash = new HashSet<>(); // comparable to SMTInterpols
-  // annotatedTerms
+  private final Deque<Term> assertedFormulaDeque = new ArrayDeque<>();
+  Solver interpolationSolver = new Solver(); // Uses a separate Solver instance to leave to original
+  // solver-context unmodified
 
   CVC5InterpolatingProver(
       CVC5FormulaCreator pFormulaCreator,
@@ -42,13 +44,41 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
       FormulaManager pMgr) {
     super(pFormulaCreator, pShutdownNotifier, randomSeed, pOptions, pMgr);
     mgr = pMgr;
-    // creator = pFormulaCreator;
+
+    setSolverOptions(randomSeed, pOptions, interpolationSolver);
+  }
+
+  /**
+   * Sets the same solver Options of the Original Solver to the separate interpolationSolver. From
+   * CVC5AbstractProver Line 66
+   */
+  private void setSolverOptions(int randomSeed, Set<ProverOptions> pOptions, Solver solvertoSet) {
+    if (incremental) {
+      solvertoSet.setOption("incremental", "true");
+    }
+    if (pOptions.contains(ProverOptions.GENERATE_MODELS)) {
+      solvertoSet.setOption("produce-models", "true");
+    }
+    if (pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE)) {
+      solvertoSet.setOption("produce-unsat-cores", "true");
+    }
+    solvertoSet.setOption("produce-assertions", "true");
+    solvertoSet.setOption("dump-models", "true");
+    solvertoSet.setOption("output-language", "smt2");
+    solvertoSet.setOption("seed", String.valueOf(randomSeed));
+    solvertoSet.setOption("produce-interpolants", "true");
+
+    // Set Strings option to enable all String features (such as lessOrEquals)
+    solvertoSet.setOption("strings-exp", "true");
+
+    // Enable more complete quantifier solving (for more info see CVC5QuantifiedFormulaManager)
+    solvertoSet.setOption("full-saturate-quant", "true");
   }
 
   @Override
   public void pop() {
     Preconditions.checkState(!closed);
-    assertedFormulaHash.removeAll(assertedFormulas.peek());
+    assertedFormulaDeque.removeAll(assertedFormulas.peek());
     super.pop();
   }
 
@@ -56,17 +86,10 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
   public Term addConstraint(BooleanFormula pConstraint) throws InterruptedException {
     Preconditions.checkState(!closed);
     Term t = creator.extractInfo(pConstraint);
-    assertedFormulaHash.add(t);
+    assertedFormulaDeque.add(t);
 
     super.addConstraint(pConstraint);
     return t;
-  }
-
-  @Override
-  public <R> R allSat(AllSatCallback<R> pCallback, List<BooleanFormula> pImportant)
-      throws InterruptedException, SolverException {
-    R result = super.allSat(pCallback, pImportant);
-    return result;
   }
 
   @Override
@@ -81,7 +104,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     Set<Term> formulasOfA = ImmutableSet.copyOf(pFormulasOfA);
     // formulasOfB := assertedFormulas - formulas
     Set<Term> formulasOfB =
-        assertedFormulaHash.stream()
+        assertedFormulaDeque.stream()
             .filter(n -> !formulasOfA.contains(n))
             .collect(ImmutableSet.toImmutableSet());
 
@@ -97,11 +120,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     formAAsList.add(formulasOfA);
     formBAsList.add(formulasOfB);
 
-    ArrayList<ArrayList<Collection<Term>>> interpolPair = new ArrayList<>();
-    interpolPair.add(formAAsList);
-    interpolPair.add(formBAsList);
-
-    Term itp = getCVC5Interpolation(interpolPair);
+    Term itp = getCVC5Interpolation(formAAsList, formBAsList);
 
     BooleanFormula result = creator.encapsulateBoolean(itp);
 
@@ -140,7 +159,9 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     final ArrayList<Term> itps = new ArrayList<>();
     try { // Interpolate every Interpolation Pair
       for (int i = 0; i < interpolationPairs.size(); i++) {
-        itps.add(getCVC5Interpolation(interpolationPairs.get(i)));
+        itps.add(
+            getCVC5Interpolation(
+                interpolationPairs.get(i).get(0), interpolationPairs.get(i).get(1)));
       }
     } catch (UnsupportedOperationException e) {
       if (e.getMessage() != null) {
@@ -161,15 +182,13 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
   /**
    * Interpolates a Tuple of Interpolants according to Craig-Interpolation using CVC5-Interpolation.
    *
-   * @param formulaPair Interpolation Pair
+   * @param assertedInterpols Asserted Formulas
+   * @param addedInterpols Formulas to Interpolate
    * @return Interpolation of the Interpolation Pair following the definition of
    *     Craig-Interpolation.
    */
-  private Term getCVC5Interpolation(ArrayList<ArrayList<Collection<Term>>> formulaPair) {
-    assert formulaPair.size() == 2; // Check that formulaPair is a Tuple
-
-    ArrayList<Collection<Term>> assertedInterpols = formulaPair.get(0);
-    ArrayList<Collection<Term>> addedInterpols = formulaPair.get(1);
+  private Term getCVC5Interpolation(
+      ArrayList<Collection<Term>> assertedInterpols, ArrayList<Collection<Term>> addedInterpols) {
 
     // Respect Asserted Formulas not in the Interpolation Pairs
     ArrayList<Collection<Term>> combinedInterpols = new ArrayList<>();
@@ -180,7 +199,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     Term extraAssert = new Term();
 
     if (extraAssertions.isEmpty()) {
-      extraAssert = solver.mkTrue();
+      extraAssert = interpolationSolver.mkTrue();
     } else {
       extraAssert = buildConjunctionOfFormulas(extraAssertions);
     }
@@ -188,17 +207,15 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     Term phim = buildConjunctionOfFormulasOverArray(assertedInterpols);
     Term phip = buildConjunctionOfFormulasOverArray(addedInterpols);
 
-    solver.resetAssertions();
-    solver.assertFormula(solver.mkTerm(Kind.AND, extraAssert, phim));
+    interpolationSolver.resetAssertions();
+
+    interpolationSolver.assertFormula(interpolationSolver.mkTerm(Kind.AND, extraAssert, phim));
 
     // with Phip negated, CVC5 Interpolation produces an equivalent interpolation to
     // Craig-Interpolation
-    Term interpolant = solver.getInterpolant(solver.mkTerm(Kind.NOT, phip));
 
-    // restore Assertion state
-    solver.resetAssertions();
-
-    assertedFormulaHash.forEach((n) -> solver.assertFormula(n));
+    Term interpolant =
+        interpolationSolver.getInterpolant(interpolationSolver.mkTerm(Kind.NOT, phip));
 
     return interpolant;
   }
@@ -214,7 +231,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     ArrayList<Term> retTerms = new ArrayList<>();
     collTerms.forEach((n) -> retTerms.addAll(n));
     Set<Term> filteredAssertedTerms =
-        assertedFormulaHash.stream()
+        assertedFormulaDeque.stream()
             .filter(n -> !retTerms.contains(n))
             .collect(ImmutableSet.toImmutableSet());
     return filteredAssertedTerms;
@@ -233,7 +250,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     if (formula.size() == 0) {
       return buildConjunctionOfFormulas(currColTerm);
     }
-    return solver.mkTerm(
+    return interpolationSolver.mkTerm(
         Kind.AND,
         buildConjunctionOfFormulas(currColTerm),
         buildConjunctionOfFormulasOverArray(formula));
@@ -258,7 +275,8 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
       return formula;
     }
 
-    return solver.mkTerm(Kind.AND, formula, buildConjunctionOfFormulas(removedFormulas));
+    return interpolationSolver.mkTerm(
+        Kind.AND, formula, buildConjunctionOfFormulas(removedFormulas));
   }
 
   /**
@@ -277,10 +295,8 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     // current generated RHS of Tuple
     ArrayList<Collection<Term>> currB = new ArrayList<>(pPartitionedFormulas);
     // current generated Interpolation Tuple
-    ArrayList<ArrayList<Collection<Term>>> betweenRes =
-        new ArrayList<>();
-    ArrayList<Collection<Term>> copyOfFormulas =
-        new ArrayList<>(pPartitionedFormulas);
+    ArrayList<ArrayList<Collection<Term>>> betweenRes = new ArrayList<>();
+    ArrayList<Collection<Term>> copyOfFormulas = new ArrayList<>(pPartitionedFormulas);
     List<Integer> leafes = new ArrayList<>();
 
     // First Interpolation Pair
