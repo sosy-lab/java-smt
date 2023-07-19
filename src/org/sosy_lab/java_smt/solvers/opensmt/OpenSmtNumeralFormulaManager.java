@@ -59,8 +59,13 @@ abstract class OpenSmtNumeralFormulaManager<
 
   @Override
   protected PTRef makeVariableImpl(String varName) {
+    // FIXME: IllegalArgumentException should be thrown directly in the swig heade
     SRef type = getNumeralType();
-    return getFormulaCreator().makeVariable(type, varName);
+    try {
+      return getFormulaCreator().makeVariable(type, varName);
+    } catch (RuntimeException e) {
+      throw new IllegalArgumentException(e.getMessage());
+    }
   }
 
   @Override
