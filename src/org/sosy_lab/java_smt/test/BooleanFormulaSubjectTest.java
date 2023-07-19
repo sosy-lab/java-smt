@@ -181,10 +181,10 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testIsEquisatisfiableoNo() {
+  public void testIsEquisatisfiableToNo() {
     BooleanFormula simpleFormula2;
     if (imgr != null) {
-      simpleFormula2 = imgr.equal(imgr.makeVariable("a"), imgr.makeVariable("2"));
+      simpleFormula2 = imgr.equal(imgr.makeVariable("a"), imgr.makeNumber("2"));
     } else {
       simpleFormula2 = bvmgr.equal(bvmgr.makeVariable(2, "a"), bvmgr.makeVariable(2, "2"));
     }
