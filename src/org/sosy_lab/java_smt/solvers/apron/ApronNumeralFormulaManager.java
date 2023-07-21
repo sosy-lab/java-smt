@@ -20,6 +20,7 @@
 
 package org.sosy_lab.java_smt.solvers.apron;
 
+import apron.Environment;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
@@ -27,99 +28,16 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulas;
 
-public class ApronNumeralFormulaManager<
+abstract class ApronNumeralFormulaManager <
     ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
     extends AbstractNumeralFormulaManager<
-    Long, Long, Long, ParamFormulaType, ResultFormulaType, Long> {
+    ApronFormulas, ApronFormulaType, Environment, ParamFormulaType, ResultFormulaType, Long>{
   protected ApronNumeralFormulaManager(
-      FormulaCreator<Long, Long, Long, Long> pCreator,
+      FormulaCreator<ApronFormulas, ApronFormulaType, Environment, Long> pCreator,
       NonLinearArithmetic pNonLinearArithmetic) {
     super(pCreator, pNonLinearArithmetic);
-  }
-
-  @Override
-  public FormulaType<ResultFormulaType> getFormulaType() {
-    return null;
-  }
-
-  @Override
-  protected boolean isNumeral(Long val) {
-    return false;
-  }
-
-  @Override
-  protected Long makeNumberImpl(long i) {
-    return null;
-  }
-
-  @Override
-  protected Long makeNumberImpl(BigInteger i) {
-    return null;
-  }
-
-  @Override
-  protected Long makeNumberImpl(String i) {
-    return null;
-  }
-
-  @Override
-  protected Long makeNumberImpl(double pNumber) {
-    return null;
-  }
-
-  @Override
-  protected Long makeNumberImpl(BigDecimal pNumber) {
-    return null;
-  }
-
-  @Override
-  protected Long makeVariableImpl(String i) {
-    return null;
-  }
-
-  @Override
-  protected Long negate(Long pParam1) {
-    return null;
-  }
-
-  @Override
-  protected Long add(Long pParam1, Long pParam2) {
-    return null;
-  }
-
-  @Override
-  protected Long subtract(Long pParam1, Long pParam2) {
-    return null;
-  }
-
-  @Override
-  protected Long equal(Long pParam1, Long pParam2) {
-    return null;
-  }
-
-  @Override
-  protected Long distinctImpl(List<Long> pNumbers) {
-    return null;
-  }
-
-  @Override
-  protected Long greaterThan(Long pParam1, Long pParam2) {
-    return null;
-  }
-
-  @Override
-  protected Long greaterOrEquals(Long pParam1, Long pParam2) {
-    return null;
-  }
-
-  @Override
-  protected Long lessThan(Long pParam1, Long pParam2) {
-    return null;
-  }
-
-  @Override
-  protected Long lessOrEquals(Long pParam1, Long pParam2) {
-    return null;
   }
 }

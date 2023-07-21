@@ -37,20 +37,20 @@ public class ApronExamples
 
     Environment environment = new Environment(intVars, realVars);
     //x <= 2 and x >= -3
-
     //x <= 2 --> -x+2 >= 0
     Lincons1 cons1 = new Lincons1(environment);
     cons1.setCoeff("x",new MpqScalar(-1));
     cons1.setCst(new MpqScalar(+2));
     cons1.setKind(Lincons1.SUPEQ);
-    //x >= 3 --> x-3 >= 0
+    //x >= - 3 --> x+3 >= 0
     Lincons1 cons2 = new Lincons1(environment);
     cons2.setCoeff("x",new MpqScalar(1));
-    cons2.setCst(new MpqScalar(-3));
+    cons2.setCst(new MpqScalar(+3));
     cons2.setKind(Lincons1.SUPEQ);
+    Abstract1 abstract1 = new Abstract1(pManager, new Lincons1[]{cons1,cons2});
 
-    Lincons1[] constraints = {cons1, cons2};
-    Abstract1 abstract1 = new Abstract1(pManager, constraints);
+    System.out.println("Variable has to be in: "+abstract1.getBound(pManager, "x"));
+    System.out.println(abstract1.toString(pManager));
     //is x = 1 satisfiable?
     Lincons1 cons3 = new Lincons1(environment);
     cons3.setCoeff("x",new MpqScalar(1));
@@ -68,7 +68,7 @@ public class ApronExamples
   }
 
   public static void main(String[] args) throws ApronException {
-    Manager manager = new Box();
+    Manager manager = new Polka(false);
     testBox(manager);
   }
 }

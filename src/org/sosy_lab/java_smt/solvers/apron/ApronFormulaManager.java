@@ -20,6 +20,7 @@
 
 package org.sosy_lab.java_smt.solvers.apron;
 
+import apron.Environment;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Appender;
@@ -39,15 +40,15 @@ import org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractUFManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
-public class ApronFormulaManager extends AbstractFormulaManager <Long, Long, Long, Long>{
+public class ApronFormulaManager extends AbstractFormulaManager <Long, Long, Environment, Long>{
   /**
    * Builds a solver from the given theory implementations.
    *
    * @param pFormulaCreator
    * @param functionManager
    * @param booleanManager
-   * @param pIntegerManager
-   * @param pRationalManager
+   * @param pIntegerFormulaManager
+   * @param pRationalFormulaManager
    * @param bitvectorManager
    * @param floatingPointManager
    * @param quantifiedManager
@@ -57,11 +58,11 @@ public class ApronFormulaManager extends AbstractFormulaManager <Long, Long, Lon
    * @param enumManager
    */
   protected ApronFormulaManager(
-      FormulaCreator pFormulaCreator,
-      AbstractUFManager functionManager,
-      AbstractBooleanFormulaManager booleanManager,
-      @Nullable IntegerFormulaManager pIntegerManager,
-      @Nullable RationalFormulaManager pRationalManager,
+      ApronFormulaCreator pFormulaCreator,
+      ApronUFManager functionManager,
+      ApronBooleanFormulaManager booleanManager,
+      ApronIntegerFormulaManager pIntegerFormulaManager,
+      ApronRationalFormulaManager pRationalFormulaManager,
       @Nullable AbstractBitvectorFormulaManager bitvectorManager,
       @Nullable AbstractFloatingPointFormulaManager floatingPointManager,
       @Nullable AbstractQuantifiedFormulaManager quantifiedManager,
@@ -69,7 +70,8 @@ public class ApronFormulaManager extends AbstractFormulaManager <Long, Long, Lon
       @Nullable AbstractSLFormulaManager slManager,
       @Nullable AbstractStringFormulaManager strManager,
       @Nullable AbstractEnumerationFormulaManager enumManager) {
-    super(pFormulaCreator, functionManager, booleanManager, pIntegerManager, pRationalManager,
+    super(pFormulaCreator, functionManager, booleanManager, pIntegerFormulaManager,
+        pRationalFormulaManager,
         bitvectorManager, floatingPointManager, quantifiedManager, arrayManager, slManager,
         strManager, enumManager);
   }

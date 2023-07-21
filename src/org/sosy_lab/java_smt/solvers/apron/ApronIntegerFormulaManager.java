@@ -20,6 +20,7 @@
 
 package org.sosy_lab.java_smt.solvers.apron;
 
+import apron.Environment;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
@@ -28,130 +29,96 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulas;
 
 public class ApronIntegerFormulaManager extends ApronNumeralFormulaManager<IntegerFormula, IntegerFormula>
     implements IntegerFormulaManager {
+
   protected ApronIntegerFormulaManager(
-      FormulaCreator pCreator,
+      FormulaCreator<ApronFormulas, ApronFormulaType, Environment, Long> pCreator,
       NonLinearArithmetic pNonLinearArithmetic) {
     super(pCreator, pNonLinearArithmetic);
   }
 
   @Override
-  public BooleanFormula modularCongruence(
-      IntegerFormula number1,
-      IntegerFormula number2,
-      BigInteger n) {
+  protected boolean isNumeral(ApronFormulas val) {
+    return false;
+  }
+
+  @Override
+  protected ApronFormulas makeNumberImpl(long i) {
     return null;
   }
 
   @Override
-  public BooleanFormula modularCongruence(IntegerFormula number1, IntegerFormula number2, long n) {
+  protected ApronFormulas makeNumberImpl(BigInteger i) {
     return null;
   }
 
   @Override
-  public IntegerFormula modulo(IntegerFormula numerator, IntegerFormula denumerator) {
+  protected ApronFormulas makeNumberImpl(String i) {
     return null;
   }
 
   @Override
-  public IntegerFormula makeNumber(long number) {
+  protected ApronFormulas makeNumberImpl(double pNumber) {
     return null;
   }
 
   @Override
-  public IntegerFormula makeNumber(BigInteger number) {
+  protected ApronFormulas makeNumberImpl(BigDecimal pNumber) {
     return null;
   }
 
   @Override
-  public IntegerFormula makeNumber(double number) {
+  protected ApronFormulas makeVariableImpl(String i) {
     return null;
   }
 
   @Override
-  public IntegerFormula makeNumber(BigDecimal number) {
+  protected ApronFormulas negate(ApronFormulas pParam1) {
     return null;
   }
 
   @Override
-  public IntegerFormula makeNumber(String pI) {
+  protected ApronFormulas add(ApronFormulas pParam1, ApronFormulas pParam2) {
     return null;
   }
 
   @Override
-  public IntegerFormula makeNumber(Rational pRational) {
+  protected ApronFormulas subtract(ApronFormulas pParam1, ApronFormulas pParam2) {
     return null;
   }
 
   @Override
-  public IntegerFormula makeVariable(String pVar) {
+  protected ApronFormulas equal(ApronFormulas pParam1, ApronFormulas pParam2) {
     return null;
   }
 
   @Override
-  public IntegerFormula negate(IntegerFormula number) {
+  protected ApronFormulas distinctImpl(List<ApronFormulas> pNumbers) {
     return null;
   }
 
   @Override
-  public IntegerFormula add(IntegerFormula number1, IntegerFormula number2) {
+  protected ApronFormulas greaterThan(ApronFormulas pParam1, ApronFormulas pParam2) {
     return null;
   }
 
   @Override
-  public IntegerFormula sum(List operands) {
+  protected ApronFormulas greaterOrEquals(ApronFormulas pParam1, ApronFormulas pParam2) {
     return null;
   }
 
   @Override
-  public IntegerFormula subtract(IntegerFormula number1, IntegerFormula number2) {
+  protected ApronFormulas lessThan(ApronFormulas pParam1, ApronFormulas pParam2) {
     return null;
   }
 
   @Override
-  public IntegerFormula divide(IntegerFormula numerator, IntegerFormula denumerator) {
+  protected ApronFormulas lessOrEquals(ApronFormulas pParam1, ApronFormulas pParam2) {
     return null;
   }
 
-  @Override
-  public IntegerFormula multiply(IntegerFormula number1, IntegerFormula number2) {
-    return null;
-  }
-
-  @Override
-  public BooleanFormula equal(IntegerFormula number1, IntegerFormula number2) {
-    return null;
-  }
-
-  @Override
-  public BooleanFormula distinct(List pNumbers) {
-    return null;
-  }
-
-  @Override
-  public BooleanFormula greaterThan(IntegerFormula number1, IntegerFormula number2) {
-    return null;
-  }
-
-  @Override
-  public BooleanFormula greaterOrEquals(IntegerFormula number1, IntegerFormula number2) {
-    return null;
-  }
-
-  @Override
-  public BooleanFormula lessThan(IntegerFormula number1, IntegerFormula number2) {
-    return null;
-  }
-
-  @Override
-  public BooleanFormula lessOrEquals(IntegerFormula number1, IntegerFormula number2) {
-    return null;
-  }
-
-  @Override
-  public IntegerFormula floor(IntegerFormula formula) {
-    return null;
-  }
 }

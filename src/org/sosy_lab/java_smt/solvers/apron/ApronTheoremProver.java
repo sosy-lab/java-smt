@@ -20,11 +20,14 @@
 
 package org.sosy_lab.java_smt.solvers.apron;
 
+import apron.Abstract1;
+import apron.ApronException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nullable;
+import org.checkerframework.checker.units.qual.A;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
@@ -33,13 +36,21 @@ import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
+import org.sosy_lab.java_smt.utils.SolverUtils;
 
 public class ApronTheoremProver extends AbstractProverWithAllSat<Void> implements ProverEnvironment {
+
+  private Abstract1 abstract1;
+  private ApronSolverContext solverContext;
   protected ApronTheoremProver(
       Set pSet,
       BooleanFormulaManager pBmgr,
-      ShutdownNotifier pShutdownNotifier) {
+      ShutdownNotifier pShutdownNotifier,
+      ApronSolverContext pApronSolverContext) throws ApronException {
     super(pSet, pBmgr, pShutdownNotifier);
+    this.solverContext  = pApronSolverContext;
+    this.abstract1 = new Abstract1(pApronSolverContext.getManager(),
+        pApronSolverContext.getFormulaCreator().getEnvironment());
   }
 
   @Override
@@ -64,10 +75,19 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void> implement
   }
 
   @Override
-  public boolean isUnsat() throws SolverException, InterruptedException {
-    return false;
+  public boolean isUnsat() throws SolverException, InterruptedException{
+    return isUnsatApron();
   }
 
+  private boolean isUnsatApron(){
+    try {
+      return abstract1.isBottom(solverContext.getManager());
+    } catch (ApronException pApronException){
+      System.out.println(pApronException.toString());
+      System.exit(0);
+      return false;
+    }
+  }
   @Override
   public Model getModel() throws SolverException {
     return null;

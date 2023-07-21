@@ -24,8 +24,11 @@ import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager {
-  protected ApronBooleanFormulaManager(FormulaCreator pCreator) {
+
+  private ApronFormulaCreator formulaCreator;
+  protected ApronBooleanFormulaManager(ApronFormulaCreator pCreator) {
     super(pCreator);
+    this.formulaCreator = pCreator;
   }
 
   @Override

@@ -20,6 +20,9 @@
 
 package org.sosy_lab.java_smt.solvers.apron;
 
+import apron.Environment;
+import apron.Var;
+import com.google.common.base.Preconditions;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.sosy_lab.java_smt.api.Formula;
@@ -27,60 +30,105 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.Type;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulas;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.ApronBooleanType;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.ApronIntegerType;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.ApronRationalType;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulas.ApronVar;
 
-public class ApronFormulaCreator extends FormulaCreator {
+public class ApronFormulaCreator extends FormulaCreator<ApronFormulas, ApronFormulaType,Environment,Long> {
+
+  private Environment environment;
   protected ApronFormulaCreator(
-      Object pO,
-      Object boolType,
-      @Nullable Object pIntegerType,
-      @Nullable Object pRationalType,
-      @Nullable Object stringType,
-      @Nullable Object regexType) {
-    super(pO, boolType, pIntegerType, pRationalType, stringType, regexType);
+      Environment pO,
+      ApronBooleanType boolType,
+      @Nullable ApronIntegerType pIntegerType,
+      @Nullable ApronRationalType pRationalType,
+      @Nullable Long stringType,
+      @Nullable Long regexType) {
+    super(pO, boolType, pIntegerType, pRationalType, null, null);
+    this.environment = pO;
+
+  }
+
+  public Environment getEnvironment(){
+    return this.environment;
   }
 
   @Override
-  public Object getBitvectorType(int bitwidth) {
+  public ApronFormulaType getBitvectorType(int bitwidth) {
     return null;
   }
 
   @Override
-  public Object getFloatingPointType(FloatingPointType type) {
+  public ApronFormulaType getFloatingPointType(FloatingPointType type) {
     return null;
   }
 
   @Override
-  public Object getArrayType(Object indexType, Object elementType) {
+  public ApronFormulaType getArrayType(ApronFormulaType indexType, ApronFormulaType elementType) {
     return null;
   }
 
   @Override
-  public Object makeVariable(Object pO, String varName) {
+  public ApronFormulas makeVariable(ApronFormulaType pApronFormulaType, String varName) {
+    Preconditions.checkArgument(!environment.hasVar(varName),"Variablename already exists!");
+    Preconditions.checkArgument(
+        (pApronFormulaType.getType().equals(Type.INTEGER) || pApronFormulaType.getType().equals(Type.RATIONAL)),
+        "Only Integer or rational variables allowed1");
+      if(pApronFormulaType.getType().equals(Type.INTEGER)){
+        String[] intvars = new String[]{varName};
+        this.environment.add(intvars,new String[]{});
+        return new ApronVar();
+      }else {
+        String[] realvars = new String[]{varName};
+        this.environment.add(new String[]{}, realvars);
+        return new ApronVar();
+      }
+  }
+
+  @Override
+  public FormulaType<ApronFormulas> getFormulaType(ApronFormulas formula) {
+    //TODO
+    switch (formula.getFormulaType()){
+      case VAR:
+        //...
+      case TERM:
+        //...
+      case COEFF:
+        //...
+      case CONSTRAINT:
+        //...
+      case EXPRESSION:
+        //...
+      default:
+        //....
+    }
     return null;
   }
 
   @Override
-  public FormulaType<?> getFormulaType(Object formula) {
+  public <R> R visit(FormulaVisitor<R> visitor, Formula formula, ApronFormulas f) {
     return null;
   }
 
   @Override
-  public Object callFunctionImpl(Object declaration, List args) {
+  public ApronFormulas callFunctionImpl(Long declaration, List<ApronFormulas> args) {
     return null;
   }
 
   @Override
-  public Object declareUFImpl(String pName, Object pReturnType, List pArgTypes) {
+  public Long declareUFImpl(
+      String pName,
+      ApronFormulaType pReturnType,
+      List<ApronFormulaType> pArgTypes) {
     return null;
   }
 
   @Override
-  protected Object getBooleanVarDeclarationImpl(Object pO) {
-    return null;
-  }
-
-  @Override
-  public Object visit(FormulaVisitor visitor, Formula formula, Object f) {
+  protected Long getBooleanVarDeclarationImpl(ApronFormulas pApronFormula) {
     return null;
   }
 }
