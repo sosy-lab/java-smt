@@ -20,6 +20,9 @@
 
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
+import java.util.Iterator;
+import java.util.Map.Entry;
+
 public class Program_synthesis {
     static {
         try {
@@ -44,6 +47,21 @@ public class Program_synthesis {
         Expression t = new Expression(1000.0);
         Expression nh = new Expression(-100.0);
         Expression h = new Expression(100.0);
+
+        Expression test = new Expression(dreal.Multiply(dreal.Multiply(b, b), dreal.pow(x,
+            new Expression(1.0))));
+        System.out.println(test.to_string());
+
+        ExpressionExpressionMap map = dreal.get_base_to_exponent_map_in_multiplication(test);
+        java.util.Set<Entry<Expression, Expression>> set = map.entrySet();
+        Iterator<Entry<Expression, Expression>> entry = set.iterator();
+        Entry<Expression, Expression> entry1;
+        for (int i = 0; i < map.size(); i++) {
+            entry1 = entry.next();
+            System.out.println(entry1.getKey().to_string());
+            System.out.println(entry1.getValue().to_string());
+        }
+
 
         Formula sndimply = new Formula(dreal.imply(dreal.GraterEqual(x, c), dreal.Equal(dreal.abs(x), dreal.Multiply(a, x))));
         Formula thrdimply = new Formula(dreal.imply(dreal.Less(x, c), dreal.Equal(dreal.abs(x), dreal.Multiply(b, x))));

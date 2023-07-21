@@ -37,10 +37,13 @@ public class DRealTerm {
   @Nullable
   private Formula formula;
 
-  public DRealTerm(Variable pVar, Expression pExp, Formula pFormula) {
+  private Type type;
+
+  public DRealTerm(Variable pVar, Expression pExp, Formula pFormula, Type pType) {
     this.var = pVar;
     this.exp = pExp;
     this.formula = pFormula;
+    this.type = pType;
   }
 
   public boolean isVar() {
@@ -67,6 +70,10 @@ public class DRealTerm {
     return formula;
   }
 
+  public Type getType() {
+    return type;
+  }
+
   public Type getVariableKind() {
     return var.get_type();
   }
@@ -77,5 +84,15 @@ public class DRealTerm {
 
   public FormulaKind getFormulaKind() {
     return formula.get_kind();
+  }
+
+  public String to_string() {
+    if (isVar()) {
+      return getVariable().to_string();
+    } else if (isExp()) {
+      return getExpression().to_string();
+    } else {
+      return getFormula().to_string();
+    }
   }
 }

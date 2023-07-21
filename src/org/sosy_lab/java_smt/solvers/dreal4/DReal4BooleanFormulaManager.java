@@ -43,16 +43,16 @@ public class DReal4BooleanFormulaManager
   @Override
   protected DRealTerm makeBooleanImpl(boolean value) {
     if (value) {
-      return new DRealTerm(null, null, Formula.True());
+      return new DRealTerm(null, null, Formula.True(), Type.BOOLEAN);
     } else {
-      return new DRealTerm(null, null, Formula.False());
+      return new DRealTerm(null, null, Formula.False(), Type.BOOLEAN);
     }
   }
 
   @Override
   protected DRealTerm not(DRealTerm pParam1) {
     if (pParam1.isFormula()) {
-      return new DRealTerm(null, null, dreal.Not(pParam1.getFormula()));
+      return new DRealTerm(null, null, dreal.Not(pParam1.getFormula()), Type.BOOLEAN);
     } else {
       throw new UnsupportedOperationException("dReal does not support not on Variabele "
           + "or Expressions.");
@@ -62,13 +62,13 @@ public class DReal4BooleanFormulaManager
   @Override
   protected DRealTerm and(DRealTerm pParam1, DRealTerm pParam2) {
     if (pParam1.isVar() && pParam2.isFormula()) {
-      return new DRealTerm(null, null, dreal.And(pParam1.getVariable(), pParam2.getFormula()));
+      return new DRealTerm(null, null, dreal.And(pParam1.getVariable(), pParam2.getFormula()), Type.BOOLEAN);
     } else if (pParam1.isFormula() && pParam2.isVar()) {
-      return new DRealTerm(null, null, dreal.And(pParam1.getFormula(), pParam2.getVariable()));
+      return new DRealTerm(null, null, dreal.And(pParam1.getFormula(), pParam2.getVariable()), Type.BOOLEAN);
     } else if (pParam1.isVar() && pParam2.isVar()) {
-      return new DRealTerm(null, null, dreal.And(pParam1.getVariable(), pParam2.getVariable()));
+      return new DRealTerm(null, null, dreal.And(pParam1.getVariable(), pParam2.getVariable()), Type.BOOLEAN);
     } else if (pParam1.isFormula() && pParam2.isFormula()) {
-      return new DRealTerm(null, null, dreal.And(pParam1.getFormula(), pParam2.getFormula()));
+      return new DRealTerm(null, null, dreal.And(pParam1.getFormula(), pParam2.getFormula()), Type.BOOLEAN);
     } else {
       throw new UnsupportedOperationException("dReal does not support and on Expressions.");
     }
@@ -77,13 +77,13 @@ public class DReal4BooleanFormulaManager
   @Override
   protected DRealTerm or(DRealTerm pParam1, DRealTerm pParam2) {
     if (pParam1.isVar() && pParam2.isFormula()) {
-      return new DRealTerm(null, null, dreal.Or(pParam1.getVariable(), pParam2.getFormula()));
+      return new DRealTerm(null, null, dreal.Or(pParam1.getVariable(), pParam2.getFormula()), Type.BOOLEAN);
     } else if (pParam1.isFormula() && pParam2.isVar()) {
-      return new DRealTerm(null, null, dreal.Or(pParam1.getFormula(), pParam2.getVariable()));
+      return new DRealTerm(null, null, dreal.Or(pParam1.getFormula(), pParam2.getVariable()), Type.BOOLEAN);
     } else if (pParam1.isVar() && pParam2.isVar()) {
-      return new DRealTerm(null, null, dreal.Or(pParam1.getVariable(), pParam2.getVariable()));
+      return new DRealTerm(null, null, dreal.Or(pParam1.getVariable(), pParam2.getVariable()), Type.BOOLEAN);
     } else if (pParam1.isFormula() && pParam2.isFormula()) {
-      return new DRealTerm(null, null, dreal.Or(pParam1.getFormula(), pParam2.getFormula()));
+      return new DRealTerm(null, null, dreal.Or(pParam1.getFormula(), pParam2.getFormula()), Type.BOOLEAN);
     } else {
       throw new UnsupportedOperationException("dReal does not support or on Expressions.");
     }
@@ -96,22 +96,22 @@ public class DReal4BooleanFormulaManager
       return new DRealTerm(null, null, dreal.And(dreal.Not(dreal.And(pParam1.getVariable(),
               pParam2.getFormula())),
           dreal.Not(dreal.And(dreal.Not(pParam1.getVariable()),
-              dreal.Not(pParam2.getFormula())))));
+              dreal.Not(pParam2.getFormula())))), Type.BOOLEAN);
     } else if (pParam1.isFormula() && pParam2.isVar()) {
       return new DRealTerm(null, null, dreal.And(dreal.Not(dreal.And(pParam1.getFormula(),
               pParam2.getVariable())),
           dreal.Not(dreal.And(dreal.Not(pParam1.getFormula()),
-              dreal.Not(pParam2.getVariable())))));
+              dreal.Not(pParam2.getVariable())))), Type.BOOLEAN);
     } else if (pParam1.isVar() && pParam2.isVar()) {
       return new DRealTerm(null, null, dreal.And(dreal.Not(dreal.And(pParam1.getVariable(),
               pParam2.getVariable())),
           dreal.Not(dreal.And(dreal.Not(pParam1.getVariable()),
-              dreal.Not(pParam2.getVariable())))));
+              dreal.Not(pParam2.getVariable())))), Type.BOOLEAN);
     } else if (pParam1.isFormula() && pParam2.isFormula()) {
       return new DRealTerm(null, null, dreal.And(dreal.Not(dreal.And(pParam1.getFormula(),
               pParam2.getFormula())),
           dreal.Not(dreal.And(dreal.Not(pParam1.getFormula()),
-              dreal.Not(pParam2.getFormula())))));
+              dreal.Not(pParam2.getFormula())))), Type.BOOLEAN);
     } else {
       throw new UnsupportedOperationException("dReal does not support xor on Expressions.");
     }
@@ -120,13 +120,13 @@ public class DReal4BooleanFormulaManager
   @Override
   protected DRealTerm equivalence(DRealTerm bits1, DRealTerm bits2) {
     if (bits1.isVar() && bits2.isFormula()) {
-      return new DRealTerm(null, null, dreal.iff(bits1.getVariable(), bits2.getFormula()));
+      return new DRealTerm(null, null, dreal.iff(bits1.getVariable(), bits2.getFormula()), Type.BOOLEAN);
     } else if (bits1.isFormula() && bits2.isVar()) {
-      return new DRealTerm(null, null, dreal.iff(bits1.getFormula(), bits2.getVariable()));
+      return new DRealTerm(null, null, dreal.iff(bits1.getFormula(), bits2.getVariable()), Type.BOOLEAN);
     } else if (bits1.isVar() && bits2.isVar()) {
-      return new DRealTerm(null, null, dreal.iff(bits1.getVariable(), bits2.getVariable()));
+      return new DRealTerm(null, null, dreal.iff(bits1.getVariable(), bits2.getVariable()), Type.BOOLEAN);
     } else if (bits1.isFormula() && bits2.isFormula()) {
-      return new DRealTerm(null, null, dreal.iff(bits1.getFormula(), bits2.getFormula()));
+      return new DRealTerm(null, null, dreal.iff(bits1.getFormula(), bits2.getFormula()), Type.BOOLEAN);
     } else {
       throw new UnsupportedOperationException("dReal does not support iff on Expressions.");
     }
@@ -157,19 +157,19 @@ public class DReal4BooleanFormulaManager
     if (cond.isFormula()) {
       if (dreal.is_true(cond.getFormula())) {
         if (f1.isVar()) {
-          return new DRealTerm(f1.getVariable(), null, null);
+          return new DRealTerm(f1.getVariable(), null, null, Type.BOOLEAN);
         } else if (f1.isExp()) {
-          return new DRealTerm(null, f1.getExpression(), null);
+          return new DRealTerm(null, f1.getExpression(), null, Type.BOOLEAN);
         } else {
-          return new DRealTerm(null, null, f1.getFormula());
+          return new DRealTerm(null, null, f1.getFormula(), Type.BOOLEAN);
         }
       } else {
         if (f2.isVar()) {
-          return new DRealTerm(f2.getVariable(), null, null);
+          return new DRealTerm(f2.getVariable(), null, null, Type.BOOLEAN);
         } else if (f2.isExp()) {
-          return new DRealTerm(null, f2.getExpression(), null);
+          return new DRealTerm(null, f2.getExpression(), null, Type.BOOLEAN);
         } else {
-          return new DRealTerm(null, null, f2.getFormula());
+          return new DRealTerm(null, null, f2.getFormula(), Type.BOOLEAN);
         }
       }
     } else {

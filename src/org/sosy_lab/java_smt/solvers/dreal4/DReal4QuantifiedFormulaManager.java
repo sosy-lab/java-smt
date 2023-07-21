@@ -60,7 +60,7 @@ public class DReal4QuantifiedFormulaManager extends AbstractQuantifiedFormulaMan
         }
       }
       if (pBody.isFormula()) {
-        return new DRealTerm(null, null, dreal.forall(vars, pBody.getFormula()));
+        return new DRealTerm(null, null, dreal.forall(vars, pBody.getFormula()), pBody.getType());
       } else {
         throw new IllegalArgumentException("The given Formula is not a Formula.");
       }

@@ -76,8 +76,8 @@ abstract class DReal4Formula implements Formula {
     }
   }
 
-  static final class DReal4RelationalFormula extends DReal4Formula implements RationalFormula {
-    DReal4RelationalFormula(DRealTerm pTerm) {
+  static final class DReal4RationalFormula extends DReal4Formula implements RationalFormula {
+    DReal4RationalFormula(DRealTerm pTerm) {
       super(pTerm);
     }
   }
