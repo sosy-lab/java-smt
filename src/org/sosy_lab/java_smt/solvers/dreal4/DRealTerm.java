@@ -28,6 +28,13 @@ import org.sosy_lab.java_smt.solvers.dreal4.drealjni.FormulaKind;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable.Type;
 
+
+/*
+This is a wrapper class to use the different classes of dReal to create Formulas. In dReal we
+have Variables, Expression and Formulas. To create a Formula, Variables and Expressions are
+needed. Because in FormulaCreator there is only one excepted type, this wrapper class is needed,
+so that all three types are available.  
+ */
 public class DRealTerm {
 
   @Nullable
