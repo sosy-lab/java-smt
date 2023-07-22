@@ -53,7 +53,7 @@ import org.sosy_lab.java_smt.solvers.dreal4.drealjni.dreal;
 
 
 public class DReal4FormulaCreator extends FormulaCreator<DRealTerm, Type, Context,
-    DRealTerm> {
+    FunctionDeclarationKind> {
 
   public DReal4FormulaCreator(Context context) {
     super(context, Type.BOOLEAN, Type.INTEGER, Type.CONTINUOUS, null, null);
@@ -202,7 +202,7 @@ public class DReal4FormulaCreator extends FormulaCreator<DRealTerm, Type, Contex
     final ImmutableList<Formula> args = argsBuilder.build();
 
     return visitor.visitFunction(formula, args, FunctionDeclarationImpl.of(functionName,
-        functionKind, argTypes, f.getType(), ));
+        functionKind, argTypes, getFormulaType(f), functionKind));
 
   }
 
@@ -325,17 +325,84 @@ public class DReal4FormulaCreator extends FormulaCreator<DRealTerm, Type, Contex
 
 
   @Override
-  public DRealTerm callFunctionImpl(DRealTerm declaration, List<DRealTerm> args) {
+  public DRealTerm callFunctionImpl(FunctionDeclarationKind declaration, List<DRealTerm> args) {
+    if (args.isEmpty()) {
+      throw new IllegalArgumentException("dReal does not support UFs without argmuents.");
+    } else {
+      Expression expression;
+      org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula formula;
+      switch (declaration) {
+        case ITE:
+          return new DRealTerm(null, dreal.if_then_else(args.get(0).getFormula(), args.get(1).getExpression(),
+              args.get(2).getExpression()),
+              null,
+              args.get(2).getType());
+        case DIV:
+          return new DRealTerm(null, dreal.Divide(args.get(0).getExpression(),
+              args.get(1).getExpression()), null, args.get(0).getType());
+        case MUL:
+          expression = dreal.Multiply(args.get(0).getExpression(), args.get(1).getExpression());
+          if (args.size() > 2) {
+            for (int i = 2; i < args.size(); i++) {
+              expression = (dreal.Multiply(expression, args.get(i).getExpression()));
+            }
+          }
+          return new DRealTerm(null, expression, null, args.get(0).getType());
+        case ADD:
+          expression = dreal.Add(args.get(0).getExpression(), args.get(1).getExpression());
+          if (args.size() > 2) {
+            for (int i = 2; i < args.size(); i++) {
+              expression = (dreal.Add(expression, args.get(i).getExpression()));
+            }
+          }
+          return new DRealTerm(null, expression, null, args.get(0).getType());
+        case NOT:
+          return new DRealTerm(null, null, dreal.Not(args.get(0).getFormula()),
+              args.get(0).getType());
+        case EQ:
+          return new DRealTerm(null, null, dreal.Equal(args.get(0).getExpression(),
+              args.get(1).getExpression()), args.get(0).getType());
+        case GT:
+          return new DRealTerm(null, null, dreal.Grater(args.get(0).getExpression(),
+              args.get(1).getExpression()), args.get(0).getType());
+        case GTE:
+          return new DRealTerm(null, null, dreal.GraterEqual(args.get(0).getExpression(),
+              args.get(1).getExpression()), args.get(0).getType());
+        case LT:
+          return new DRealTerm(null, null, dreal.Less(args.get(0).getExpression(),
+              args.get(1).getExpression()), args.get(0).getType());
+        case LTE:
+          return new DRealTerm(null, null, dreal.LessEqual(args.get(0).getExpression(),
+              args.get(1).getExpression()), args.get(0).getType());
+        case AND:
+          formula = dreal.And(args.get(0).getFormula(), args.get(1).getFormula());
+          if (args.size() > 2) {
+            for (int i = 2; i < args.size(); i++) {
+              formula = dreal.And(formula, args.get(i).getFormula());
+            }
+          }
+          return new DRealTerm(null, null, formula, Type.BOOLEAN);
+        case OR:
+          formula = dreal.Or(args.get(0).getFormula(), args.get(1).getFormula());
+          if (args.size() > 2) {
+            for (int i = 2; i < args.size(); i++) {
+              formula = dreal.Or(formula, args.get(i).getFormula());
+            }
+          }
+          return new DRealTerm(null, null, formula, Type.BOOLEAN);
+        default:
+          throw new IllegalArgumentException("Unknown function declaration.");
+      }
+    }
+  }
+
+  @Override
+  public FunctionDeclarationKind declareUFImpl(String pName, Type pReturnType, List<Type> pArgTypes) {
     return null;
   }
 
   @Override
-  public DRealTerm declareUFImpl(String pName, Type pReturnType, List<Type> pArgTypes) {
-    return null;
-  }
-
-  @Override
-  protected DRealTerm getBooleanVarDeclarationImpl(DRealTerm pDRealTerm) {
+  protected FunctionDeclarationKind getBooleanVarDeclarationImpl(DRealTerm pDRealTerm) {
     return null;
   }
 }
