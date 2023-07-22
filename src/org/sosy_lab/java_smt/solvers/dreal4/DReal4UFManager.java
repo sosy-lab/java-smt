@@ -20,11 +20,12 @@
 
 package org.sosy_lab.java_smt.solvers.dreal4;
 
+import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.basicimpl.AbstractUFManager;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Context;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable.Type;
 
-public class DReal4UFManager extends AbstractUFManager<DRealTerm, DRealTerm, Type, Context> {
+public class DReal4UFManager extends AbstractUFManager<DRealTerm, FunctionDeclarationKind, Type, Context> {
 
   DReal4UFManager(DReal4FormulaCreator pCreator) {
     super(pCreator);

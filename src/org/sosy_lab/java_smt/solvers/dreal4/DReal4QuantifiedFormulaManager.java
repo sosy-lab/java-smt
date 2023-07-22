@@ -21,6 +21,7 @@
 package org.sosy_lab.java_smt.solvers.dreal4;
 
 import java.util.List;
+import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
@@ -30,9 +31,9 @@ import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variables;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.dreal;
 
 public class DReal4QuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<DRealTerm,
-    Type, Context, DRealTerm> {
+    Type, Context, FunctionDeclarationKind> {
 
-  protected DReal4QuantifiedFormulaManager(FormulaCreator<DRealTerm, Type, Context, DRealTerm> pFormulaCreator) {
+  protected DReal4QuantifiedFormulaManager(FormulaCreator<DRealTerm, Type, Context, FunctionDeclarationKind> pFormulaCreator) {
     super(pFormulaCreator);
   }
 

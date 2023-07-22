@@ -24,6 +24,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Context;
@@ -36,7 +37,7 @@ import org.sosy_lab.java_smt.solvers.dreal4.drealjni.dreal;
 public abstract class DReal4NumeralFormulaManager<
     ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
     extends AbstractNumeralFormulaManager<
-    DRealTerm, Type, Context, ParamFormulaType, ResultFormulaType, DRealTerm> {
+    DRealTerm, Type, Context, ParamFormulaType, ResultFormulaType, FunctionDeclarationKind> {
 
   DReal4NumeralFormulaManager(
       DReal4FormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {

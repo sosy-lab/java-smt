@@ -20,6 +20,7 @@
 
 package org.sosy_lab.java_smt.solvers.dreal4;
 
+import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Context;
@@ -29,7 +30,7 @@ import org.sosy_lab.java_smt.solvers.dreal4.drealjni.dreal;
 
 
 public class DReal4BooleanFormulaManager
-    extends AbstractBooleanFormulaManager<DRealTerm, Type, Context, DRealTerm> {
+    extends AbstractBooleanFormulaManager<DRealTerm, Type, Context, FunctionDeclarationKind> {
 
   protected DReal4BooleanFormulaManager(FormulaCreator pCreator) {
     super(pCreator);
