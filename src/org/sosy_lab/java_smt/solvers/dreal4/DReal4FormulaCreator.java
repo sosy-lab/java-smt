@@ -230,10 +230,14 @@ public class DReal4FormulaCreator extends FormulaCreator<DRealTerm, Type, Contex
     if (parent.isExp()) {
       throw new IllegalArgumentException("Term is Expression.");
     } else if (parent.isFormula()) {
+      Type type = getTypeForExpressions(dreal.get_lhs_expression(parent.getFormula()));
+      if (type == null) {
+        type = getTypeForExpressions(dreal.get_rhs_expression(parent.getFormula()));
+      }
       children.add(new DRealTerm(null, dreal.get_lhs_expression(parent.getFormula()), null,
-          parent.getType()));
+         type));
       children.add(new DRealTerm(null, dreal.get_rhs_expression(parent.getFormula()), null,
-          parent.getType()));
+          type));
       return children;
     } else {
       throw new IllegalArgumentException("Term is Variable.");
@@ -282,7 +286,8 @@ public class DReal4FormulaCreator extends FormulaCreator<DRealTerm, Type, Contex
     if (pTerm.isVar() || pTerm.isFormula()) {
       throw new IllegalArgumentException("Term is Variable or Formula.");
     } else {
-      terms.add(new DRealTerm(null, new Expression(dreal.get_constant_in_addition(pTerm.getExpression())), null,
+      terms.add(new DRealTerm(null,
+          new Expression(dreal.get_constant_in_addition(pTerm.getExpression())), null,
           pTerm.getType()));
       ExpressionDoubleMap map = dreal.get_expr_to_coeff_map_in_addition(pTerm.getExpression());
       Set<Entry<Expression, Double>> set = map.entrySet();
@@ -316,13 +321,58 @@ public class DReal4FormulaCreator extends FormulaCreator<DRealTerm, Type, Contex
         // int as exponent -> convert back multiplication
         // this should be changed if pow is supported in JavaSMT
         for (double j = 0; j < parseDouble(entry.getValue().to_string()); j++) {
-          terms.add(new DRealTerm(null, new Expression(entry.getKey()), null, pTerm.getType()));
+          terms.add(new DRealTerm(null, new Expression(entry.getKey()), null,
+              pTerm.getType()));
         }
       }
       return terms;
     }
   }
 
+  /*
+  Needed if we split a formula. For example, we have x + 2 < 10. In visit we will
+  extract the first and second expression and need the type for the Expression. Because we
+  have only the parent to get the type from, it will always return Boolean Type, but the
+  expression should be some kind of NumeralFormula Type
+  */
+  private static Type getTypeForExpressions(Expression pExpression) {
+    // If the Expression is Constant we return null, because from constant we cannot get the
+    // type, but this function is always called from a formula, so this is called two times, and
+    // one of them has a Variable, else this Formula would have been a True or False formula
+    if (pExpression.get_kind() == ExpressionKind.Constant) {
+      return null;
+    } else if (pExpression.get_kind() == ExpressionKind.Var) {
+      return dreal.get_variable(pExpression).get_type();
+    } else if (pExpression.get_kind() == ExpressionKind.Div) {
+      Expression lhs = dreal.get_first_argument(pExpression);
+      Expression rhs = dreal.get_second_argument(pExpression);
+      // Division has at least one Variable, else it would be a constant;
+      if (lhs.get_kind() == ExpressionKind.Var) {
+        return dreal.get_variable(lhs).get_type();
+      } else {
+        return dreal.get_variable(rhs).get_type();
+      }
+    } else if (pExpression.get_kind() == ExpressionKind.Mul) {
+      // we will always get a Variable, else it would be a constant 3*3 -> 9
+      ExpressionExpressionMap map =
+          dreal.get_base_to_exponent_map_in_multiplication(pExpression);
+      Set<Entry<Expression, Expression>> set = map.entrySet();
+      Iterator<Entry<Expression, Expression>> iterator = set.iterator();
+      // we only need one, because the type is the same from all of them
+      Entry<Expression, Expression> entry = iterator.next();
+      return dreal.get_variable(entry.getKey()).get_type();
+    } else if (pExpression.get_kind() == ExpressionKind.Add) {
+      ExpressionDoubleMap map = dreal.get_expr_to_coeff_map_in_addition(pExpression);
+      Set<Entry<Expression, Double>> set = map.entrySet();
+      Iterator<Entry<Expression, Double>> iterator = set.iterator();
+      // we only need one, because the type is the same from all of them
+      Entry<Expression, Double> entry = iterator.next();
+      return dreal.get_variable(entry.getKey()).get_type();
+    }
+    else {
+      throw new AssertionError("Kind not known, this should not be possible.");
+    }
+  }
 
   @Override
   public DRealTerm callFunctionImpl(FunctionDeclarationKind declaration, List<DRealTerm> args) {
@@ -403,6 +453,9 @@ public class DReal4FormulaCreator extends FormulaCreator<DRealTerm, Type, Contex
 
   @Override
   protected FunctionDeclarationKind getBooleanVarDeclarationImpl(DRealTerm pDRealTerm) {
+    // FunctionDeclarationKind wieder ändern zu DRealTerm
+    // return pDrealTerm , weil ich dann in den DRealTerm die Funktion schreibe getType, aslo neu
+    // implementiere?
     return null;
   }
 }
