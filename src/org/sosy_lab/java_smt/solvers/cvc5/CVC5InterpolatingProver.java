@@ -73,6 +73,15 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
   }
 
   @Override
+  public Term addConstraint(BooleanFormula pConstraint) throws InterruptedException {
+    Preconditions.checkState(!closed);
+    Term t = creator.extractInfo(pConstraint);
+
+    super.addConstraint(pConstraint);
+    return t; // t is not returned in the Abstract Class
+  }
+
+  @Override
   public BooleanFormula getInterpolant(Collection<Term> pFormulasOfA)
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
@@ -88,7 +97,6 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
             .flatMap(c -> c.stream())
             .filter(n -> !formulasOfA.contains(n))
             .collect(ImmutableSet.toImmutableSet());
-
 
     if (formulasOfB.isEmpty()) { // Catch trivial case
       return mgr.getBooleanFormulaManager().makeBoolean(false);
@@ -217,7 +225,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     collTerms.forEach((n) -> retTerms.addAll(n));
     Set<Term> filteredAssertedTerms =
         assertedFormulas.stream()
-          .flatMap(c -> c.stream())
+            .flatMap(c -> c.stream())
             .filter(n -> !retTerms.contains(n))
             .collect(ImmutableSet.toImmutableSet());
     return filteredAssertedTerms;
