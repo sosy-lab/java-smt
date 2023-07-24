@@ -16,6 +16,7 @@ import opensmt.Logic;
 import opensmt.LogicFactory;
 import opensmt.Logic_t;
 import opensmt.PTRef;
+import opensmt.Pterm;
 import opensmt.SRef;
 import opensmt.SymRef;
 import opensmt.VectorPTRef;
@@ -346,16 +347,26 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, Sy
     // FIXME: Handle abstract values for arrays?
 
     String varName = logic.getSymName(logic.getSymRef(f));
-    VectorPTRef subterms = logic.getPterm(f).getArgs();
-
+    
     ImmutableList.Builder<Formula> argTerms = ImmutableList.builder();
     ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
+
+    /* FIXME Caused crashes in ModelEvaluationTest
+    VectorPTRef subterms = logic.getPterm(f).getArgs();
 
     for (PTRef sub : subterms) {
       argTerms.add(encapsulate(sub));
       argTypes.add(getFormulaType(sub));
     }
+    */
 
+    Pterm pterm = logic.getPterm(f);
+    for (int i = 0; i < pterm.size(); i++) {
+      PTRef sub = pterm.at(i);
+      argTerms.add(encapsulate(sub));
+      argTypes.add(getFormulaType(sub));       
+    }
+    
     return visitor.visitFunction(
         formula,
         argTerms.build(),

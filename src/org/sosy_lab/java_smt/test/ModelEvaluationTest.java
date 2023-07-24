@@ -25,6 +25,7 @@ import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.SolverContextFactory.Logics;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.Formula;
@@ -59,7 +60,7 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
   private static final String DEFAULT_MODEL_STRING = "";
 
   private static int problemSize;
-
+  
   @Parameters(name = "{0}")
   public static Object[] getAllSolvers() {
     return new Object[] {Solvers.OPENSMT};
@@ -74,15 +75,14 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
 
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() {
-    // FIXME: OpenSmt crashes if problemSize is to large
-    problemSize = (solver == Solvers.PRINCESS || solver == Solvers.OPENSMT) ? 10 : 100;
+    problemSize = (solver == Solvers.PRINCESS) ? 10 : 100;
     ConfigurationBuilder builder = super.createTestConfigBuilder();
     if (solverToUse() == Solvers.MATHSAT5) {
       builder.setOption("solver.mathsat5.furtherOptions", "model_generation=true");
     }
     return builder;
   }
-
+  
   private void evaluateInModel(
       BooleanFormula constraint,
       Formula formula,
@@ -224,7 +224,6 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
 
   @Test
   public void testModelGeneration() throws SolverException, InterruptedException {
-    // FIXME: Crashes the JVM if problemsize too large
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(bmgr.and(getConstraints()));
       for (int i = 0; i < problemSize; i++) {
@@ -235,13 +234,11 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
       }
     }
   }
-
+  
   @Test
   public void testEvaluatorGeneration() throws SolverException, InterruptedException {
-    // FIXME: Crashes the JVM if problemsize too large
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(bmgr.and(getConstraints()));
-
       for (int i = 0; i < problemSize; i++) {
         assertThat(prover).isSatisfiable();
         try (Evaluator m = prover.getEvaluator()) {
@@ -250,7 +247,7 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
       }
     }
   }
-
+  
   @NonNull
   private List<BooleanFormula> getConstraints() {
     List<BooleanFormula> constraints = new ArrayList<>();

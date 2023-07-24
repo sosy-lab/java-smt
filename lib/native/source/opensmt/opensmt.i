@@ -556,14 +556,29 @@
 %ignore Pterm::begin () const;
 %ignore Pterm::end () const;
 %extend Pterm {
-  %newobject getArgs;
+  /* FIXME: Crashes ModelEvaluationTest
+  
   std::vector<PTRef> getArgs() {
     std::vector<PTRef> args;
     for(auto i=0; i<$self->size(); i++)
-      args.emplace_back($self->operator[](i));
+      args.push_back($self->operator[](i));
     return args;
   }
- }
+  */
+
+  // FIXME: Works, but has memory leak?    
+  std::vector<PTRef>* getArgs() {
+    std::vector<PTRef>* args = new std::vector<PTRef>();
+    for(auto i=0; i<$self->size(); i++)
+      args->push_back($self->operator[](i));
+    return args;
+  }
+
+  // FIXME: Workaround
+  PTRef at(int i) {
+    return $self->operator[](i);
+  }
+}
 
 %ignore PtPair;
 %ignore PtChild;

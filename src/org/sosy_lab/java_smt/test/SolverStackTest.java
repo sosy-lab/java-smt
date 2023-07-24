@@ -167,7 +167,6 @@ public class SolverStackTest extends SolverBasedTest0 {
   @Test
   public void singleStackTestRational() throws SolverException, InterruptedException, InvalidConfigurationException {
     requireRationals();
-
     SolverContext context = initSolver("solver.logic", "QF_LRA");
 
     FormulaManager mgr = context.getFormulaManager();
