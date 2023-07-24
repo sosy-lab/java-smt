@@ -20,7 +20,6 @@
 
 package org.sosy_lab.java_smt.solvers.dreal4;
 
-import javax.annotation.Nullable;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Expression;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.ExpressionKind;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula;
@@ -29,77 +28,102 @@ import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable.Type;
 
 
+
 /*
 This is a wrapper class to use the different classes of dReal to create Formulas. In dReal we
 have Variables, Expression and Formulas. To create a Formula, Variables and Expressions are
 needed. Because in FormulaCreator there is only one excepted type, this wrapper class is needed,
 so that all three types are available.  
  */
-public class DRealTerm {
+public class DRealTerm<Term, Kind> {
 
-  @Nullable
-  private Variable var;
-  @Nullable
-  private Expression exp;
-  @Nullable
-  private Formula formula;
+//  @Nullable
+//  private Variable var;
+//  @Nullable
+//  private Expression exp;
+//  @Nullable
+//  private Formula formula;
 
-  private Type type;
+  private final Term term;
+  private final Kind declaration;
 
-  public DRealTerm(Variable pVar, Expression pExp, Formula pFormula, Type pType) {
-    this.var = pVar;
-    this.exp = pExp;
-    this.formula = pFormula;
+  private final Type type;
+
+  public DRealTerm(Term pTerm, Type pType, Kind pKind) {
+    this.term = pTerm;
     this.type = pType;
+    this.declaration = pKind;
   }
 
   public boolean isVar() {
-    return var != null;
+    return term instanceof Variable;
   }
 
   public boolean isExp() {
-    return exp != null;
+    return term instanceof Expression;
   }
 
   public boolean isFormula() {
-    return formula != null;
+    return term instanceof Formula;
   }
 
   public Variable getVariable() {
-    return var;
+    if (isVar()) {
+      return (Variable) term;
+    } else {
+      throw new IllegalArgumentException("Not a Variable.");
+    }
   }
 
   public Expression getExpression() {
-    return exp;
+    if (isExp()) {
+      return (Expression) term;
+    } else {
+      throw new IllegalArgumentException("Not a Variable.");
+    }
   }
 
   public Formula getFormula() {
-    return formula;
+    if (isFormula()) {
+      return (Formula) term;
+    } else {
+      throw new IllegalArgumentException("Not a Variable.");
+    }
   }
 
   public Type getType() {
     return type;
   }
 
-  public Type getVariableKind() {
-    return var.get_type();
-  }
-
   public ExpressionKind getExpressionKind() {
-    return exp.get_kind();
+    if (isExp()) {
+      Expression exp = (Expression) term;
+      return exp.get_kind();
+    } else {
+      throw new IllegalArgumentException("Not an Expression.");
+    }
   }
 
   public FormulaKind getFormulaKind() {
-    return formula.get_kind();
+    if (isFormula()) {
+      Formula formula = (Formula) term;
+      return formula.get_kind();
+    } else {
+      throw new IllegalArgumentException("Not an Expression.");
+    }
   }
 
   public String to_string() {
     if (isVar()) {
-      return getVariable().to_string();
+      Variable var = (Variable) term;
+      return var.to_string();
     } else if (isExp()) {
-      return getExpression().to_string();
+      Expression exp = (Expression) term;
+      return exp.to_string();
     } else {
-      return getFormula().to_string();
+      Formula formula = (Formula) term;
+      return formula.to_string();
     }
   }
+
 }

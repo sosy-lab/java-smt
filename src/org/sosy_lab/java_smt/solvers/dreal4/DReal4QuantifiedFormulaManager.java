@@ -26,14 +26,15 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Context;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.FormulaKind;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable.Type;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variables;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.dreal;
 
 public class DReal4QuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<DRealTerm,
-    Type, Context, FunctionDeclarationKind> {
+    Type, Context, DRealTerm> {
 
-  protected DReal4QuantifiedFormulaManager(FormulaCreator<DRealTerm, Type, Context, FunctionDeclarationKind> pFormulaCreator) {
+  protected DReal4QuantifiedFormulaManager(FormulaCreator<DRealTerm, Type, Context, DRealTerm> pFormulaCreator) {
     super(pFormulaCreator);
   }
 
@@ -61,7 +62,8 @@ public class DReal4QuantifiedFormulaManager extends AbstractQuantifiedFormulaMan
         }
       }
       if (pBody.isFormula()) {
-        return new DRealTerm(null, null, dreal.forall(vars, pBody.getFormula()), pBody.getType());
+        return new DRealTerm(dreal.forall(vars, pBody.getFormula()), pBody.getType(),
+            FormulaKind.Forall);
       } else {
         throw new IllegalArgumentException("The given Formula is not a Formula.");
       }

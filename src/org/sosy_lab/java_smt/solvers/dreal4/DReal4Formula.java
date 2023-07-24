@@ -51,11 +51,11 @@ abstract class DReal4Formula implements Formula {
   @Override
   public final String toString() {
     if (term.isExp()) {
-      return term.getExpression().toString();
+      return term.getExpression().to_string();
     } else if (term.isFormula()){
-      return term.getFormula().toString();
+      return term.getFormula().to_string();
     } else {
-      return term.getVariable().toString();
+      return term.getVariable().to_string();
     }
   }
 
