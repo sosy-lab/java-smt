@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.test;
 
+import static com.google.common.truth.TruthJUnit.assume;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assert_;
 
@@ -50,10 +51,15 @@ public class RationalFormulaManagerTest extends SolverBasedTest0 {
   protected Solvers solverToUse() {
     return solver;
   }
-
+  
   @Test
   public void rationalToIntTest() throws SolverException, InterruptedException {
     requireRationals();
+    assume()
+        .withMessage("Solver %s does not support floor operation", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.OPENSMT);
+
     for (double v : SOME_DOUBLES) {
       IntegerFormula i = imgr.makeNumber((int) Math.floor(v));
       RationalFormula r = rmgr.makeNumber(v);
@@ -121,6 +127,11 @@ public class RationalFormulaManagerTest extends SolverBasedTest0 {
   @Test
   public void visitFloorTest() {
     requireRationals();
+    assume()
+        .withMessage("Solver %s does not support floor operation", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.OPENSMT);
+
     IntegerFormula f = rmgr.floor(rmgr.makeVariable("v"));
     assertThat(mgr.extractVariables(f)).hasSize(1);
     FunctionCollector collector = new FunctionCollector();

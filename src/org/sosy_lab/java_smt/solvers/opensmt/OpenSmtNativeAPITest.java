@@ -371,14 +371,7 @@ public class OpenSmtNativeAPITest {
   public void testAbort() {
     OpenSmt osmt = new OpenSmt(opensmt_logic.qf_lia, "opensmt-test", false);
     ArithLogic logic = osmt.getLIALogic();
-
-    /*
-    // FIXME: The formula here is to simple and will reduce to false during the simplification stage
-    PTRef varA = logic.mkBoolVar("a");
-    PTRef notA = logic.mkNot(varA);
-    PTRef f = logic.mkAnd(varA, notA);
-    */
-
+    
     // Declare variables
     PTRef varA = logic.mkIntVar("a");
     PTRef varC = logic.mkIntVar("c");
@@ -396,8 +389,30 @@ public class OpenSmtNativeAPITest {
     mainSolver.push(f1);
 
     mainSolver.stop();
+    
     sstat r = mainSolver.check();
-
     assertThat(r.isUndef()).isTrue();
   }
+
+  /* FIXME: Hangs if interpolation is enabled. Translated from InterpolatingProverTest
+  @Test
+  public void testSimpleInterpolation() {
+    OpenSmt osmt = new OpenSmt(opensmt_logic.qf_lia, "opensmt-test", true);
+    ArithLogic logic = osmt.getLIALogic();
+
+    PTRef x = logic.mkIntVar("x");
+    PTRef y = logic.mkIntVar("y");
+    PTRef z = logic.mkIntVar("z");
+
+    PTRef f1 = logic.mkEq(y, logic.mkTimes(logic.mkIntConst("2"), x));
+    PTRef f2 = logic.mkEq(y, logic.mkPlus(logic.mkIntConst("1"), logic.mkTimes(z, logic.mkIntConst("2"))));
+
+    MainSolver mainSolver = osmt.getMainSolver();
+    mainSolver.push(f1);
+    mainSolver.push(f2);
+
+    sstat r = mainSolver.check();
+    assertThat(r.isFalse()).isTrue();
+  }
+  */
 }
