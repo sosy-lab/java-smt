@@ -70,6 +70,25 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
   @Test
   @SuppressWarnings("CheckReturnValue")
   public <T> void simpleInterpolation() throws SolverException, InterruptedException {
+    /* FIXME
+    throw new RuntimeException("TIMEOUT - OpenSMT struggles to prove `2x ≠ 1+2y` for all integers x,y");
+    
+    try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
+      IntegerFormula x = imgr.makeVariable("x");
+      IntegerFormula y = imgr.makeVariable("y");
+      IntegerFormula z = imgr.makeVariable("z");
+      BooleanFormula f1 = imgr.equal(y, imgr.multiply(imgr.makeNumber(2), x));
+      BooleanFormula f2 = imgr.equal(y, imgr.add(imgr.makeNumber(1), imgr.multiply(z, imgr.makeNumber(2))));
+      prover.push(f1);
+      T id2 = prover.push(f2);
+      boolean check = prover.isUnsat();
+
+      assertWithMessage("formulas must be contradicting").that(check).isTrue();
+      prover.getInterpolant(ImmutableList.of(id2));
+      // we actually only check for a successful execution here, the result is irrelevant.
+    }
+    */
+
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       IntegerFormula x = imgr.makeVariable("x");
       IntegerFormula y = imgr.makeVariable("y");
@@ -83,12 +102,31 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
       prover.getInterpolant(ImmutableList.of(id2));
       // we actually only check for a successful execution here, the result is irrelevant.
     }
-    //
   }
 
   @Test
   @SuppressWarnings("unchecked")
   public <T> void emptyInterpolationGroup() throws SolverException, InterruptedException {
+    /* FIXME
+    throw new RuntimeException("TIMEOUT - OpenSMT struggles to prove `2x ≠ 1+2y` for all integers x,y");
+
+    try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
+      IntegerFormula x = imgr.makeVariable("x");
+      IntegerFormula y = imgr.makeVariable("y");
+      IntegerFormula z = imgr.makeVariable("z");
+      BooleanFormula f1 = imgr.equal(y, imgr.multiply(imgr.makeNumber(2), x));
+      BooleanFormula f2 = imgr.equal(y, imgr.add(imgr.makeNumber(1), imgr.multiply(z, imgr.makeNumber(2))));
+      T id1 = prover.push(f1);
+      T id2 = prover.push(f2);
+      assertThat(prover.isUnsat()).isTrue();
+
+      BooleanFormula emptyB = prover.getInterpolant(ImmutableList.of(id1, id2));
+      assertThat(bmgr.isFalse(emptyB)).isTrue();
+      BooleanFormula emptyA = prover.getInterpolant(ImmutableList.of());
+      assertThat(bmgr.isTrue(emptyA)).isTrue();
+    }
+    */
+
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       IntegerFormula x = imgr.makeVariable("x");
       IntegerFormula y = imgr.makeVariable("y");
