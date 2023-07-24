@@ -15,10 +15,8 @@ import com.google.common.collect.Iterables;
 import io.github.cvc5.Kind;
 import io.github.cvc5.Solver;
 import io.github.cvc5.Term;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Deque;
 import java.util.List;
 import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -32,7 +30,6 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     implements InterpolatingProverEnvironment<Term> {
 
   private final FormulaManager mgr;
-  private final Deque<Term> assertedFormulaDeque = new ArrayDeque<>();
   Solver interpolationSolver = new Solver(); // Uses a separate Solver instance to leave to original
   // solver-context unmodified
 
@@ -76,23 +73,6 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
   }
 
   @Override
-  public void pop() {
-    Preconditions.checkState(!closed);
-    assertedFormulaDeque.removeAll(assertedFormulas.peek());
-    super.pop();
-  }
-
-  @Override
-  public Term addConstraint(BooleanFormula pConstraint) throws InterruptedException {
-    Preconditions.checkState(!closed);
-    Term t = creator.extractInfo(pConstraint);
-    assertedFormulaDeque.add(t);
-
-    super.addConstraint(pConstraint);
-    return t;
-  }
-
-  @Override
   public BooleanFormula getInterpolant(Collection<Term> pFormulasOfA)
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
@@ -104,9 +84,11 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     Set<Term> formulasOfA = ImmutableSet.copyOf(pFormulasOfA);
     // formulasOfB := assertedFormulas - formulas
     Set<Term> formulasOfB =
-        assertedFormulaDeque.stream()
+        assertedFormulas.stream()
+            .flatMap(c -> c.stream())
             .filter(n -> !formulasOfA.contains(n))
             .collect(ImmutableSet.toImmutableSet());
+
 
     if (formulasOfB.isEmpty()) { // Catch trivial case
       return mgr.getBooleanFormulaManager().makeBoolean(false);
@@ -191,10 +173,13 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
       ArrayList<Collection<Term>> assertedInterpols, ArrayList<Collection<Term>> addedInterpols) {
 
     // Respect Asserted Formulas not in the Interpolation Pairs
+
     ArrayList<Collection<Term>> combinedInterpols = new ArrayList<>();
     combinedInterpols.addAll(assertedInterpols);
     combinedInterpols.addAll(addedInterpols);
 
+    // checks, that no Assertions in the Assertion stack are left out. Can happen in Tree
+    // Interpolation
     Collection<Term> extraAssertions = getAssertedTermsNotInCollection(combinedInterpols);
     Term extraAssert = new Term();
 
@@ -231,7 +216,8 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     ArrayList<Term> retTerms = new ArrayList<>();
     collTerms.forEach((n) -> retTerms.addAll(n));
     Set<Term> filteredAssertedTerms =
-        assertedFormulaDeque.stream()
+        assertedFormulas.stream()
+          .flatMap(c -> c.stream())
             .filter(n -> !retTerms.contains(n))
             .collect(ImmutableSet.toImmutableSet());
     return filteredAssertedTerms;
