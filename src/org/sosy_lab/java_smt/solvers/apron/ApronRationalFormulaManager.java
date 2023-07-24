@@ -22,45 +22,31 @@ package org.sosy_lab.java_smt.solvers.apron;
 
 import apron.Environment;
 import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.List;
-import org.sosy_lab.common.rationals.Rational;
-import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula;
-import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.ApronRationalType;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.Type;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulas;
 
-public class ApronRationalFormulaManager extends ApronNumeralFormulaManager<NumeralFormula,
-    RationalFormula> implements RationalFormulaManager {
+public class ApronRationalFormulaManager extends
+                                         ApronNumeralFormulaManager<NumeralFormula, RationalFormula>
+    implements RationalFormulaManager {
+
+  private ApronFormulaCreator formulaCreator;
+  private ApronFormulaType rationalType = new ApronRationalType();
 
   protected ApronRationalFormulaManager(
-      FormulaCreator<ApronFormulas, ApronFormulaType, Environment, Long> pCreator,
+      ApronFormulaCreator pFormulaCreator,
       NonLinearArithmetic pNonLinearArithmetic) {
-    super(pCreator, pNonLinearArithmetic);
+    super(pFormulaCreator, pNonLinearArithmetic);
+    this.formulaCreator = pFormulaCreator;
   }
-
   @Override
-  protected boolean isNumeral(ApronFormulas val) {
-    return false;
-  }
-
-  @Override
-  protected ApronFormulas makeNumberImpl(long i) {
-    return null;
-  }
-
-  @Override
-  protected ApronFormulas makeNumberImpl(BigInteger i) {
-    return null;
-  }
-
-  @Override
-  protected ApronFormulas makeNumberImpl(String i) {
-    return null;
+  protected Type getNumeralType() {
+    return Type.RATIONAL;
   }
 
   @Override
@@ -73,53 +59,10 @@ public class ApronRationalFormulaManager extends ApronNumeralFormulaManager<Nume
     return null;
   }
 
+
   @Override
   protected ApronFormulas makeVariableImpl(String i) {
-    return null;
+    return formulaCreator.makeVariable(rationalType,i);
   }
 
-  @Override
-  protected ApronFormulas negate(ApronFormulas pParam1) {
-    return null;
-  }
-
-  @Override
-  protected ApronFormulas add(ApronFormulas pParam1, ApronFormulas pParam2) {
-    return null;
-  }
-
-  @Override
-  protected ApronFormulas subtract(ApronFormulas pParam1, ApronFormulas pParam2) {
-    return null;
-  }
-
-  @Override
-  protected ApronFormulas equal(ApronFormulas pParam1, ApronFormulas pParam2) {
-    return null;
-  }
-
-  @Override
-  protected ApronFormulas distinctImpl(List<ApronFormulas> pNumbers) {
-    return null;
-  }
-
-  @Override
-  protected ApronFormulas greaterThan(ApronFormulas pParam1, ApronFormulas pParam2) {
-    return null;
-  }
-
-  @Override
-  protected ApronFormulas greaterOrEquals(ApronFormulas pParam1, ApronFormulas pParam2) {
-    return null;
-  }
-
-  @Override
-  protected ApronFormulas lessThan(ApronFormulas pParam1, ApronFormulas pParam2) {
-    return null;
-  }
-
-  @Override
-  protected ApronFormulas lessOrEquals(ApronFormulas pParam1, ApronFormulas pParam2) {
-    return null;
-  }
 }

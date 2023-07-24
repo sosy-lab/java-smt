@@ -21,7 +21,6 @@
 package org.sosy_lab.java_smt.solvers.apron;
 
 import apron.Environment;
-import apron.Var;
 import com.google.common.base.Preconditions;
 import java.util.List;
 import javax.annotation.Nullable;

@@ -21,23 +21,101 @@
 package org.sosy_lab.java_smt.solvers.apron;
 
 import apron.Environment;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
-import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.Type;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulas;
 
 abstract class ApronNumeralFormulaManager <
     ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
     extends AbstractNumeralFormulaManager<
-    ApronFormulas, ApronFormulaType, Environment, ParamFormulaType, ResultFormulaType, Long>{
+    ApronFormulas, ApronFormulaType, Environment, ParamFormulaType, ResultFormulaType, Long> {
   protected ApronNumeralFormulaManager(
       FormulaCreator<ApronFormulas, ApronFormulaType, Environment, Long> pCreator,
       NonLinearArithmetic pNonLinearArithmetic) {
     super(pCreator, pNonLinearArithmetic);
+  }
+
+
+  protected boolean isNumeral(ApronFormulas val){
+    return false;
+  }
+  protected abstract Type getNumeralType();
+  @Override
+  protected ApronFormulas makeNumberImpl(long i) {
+    return null;
+  }
+
+  @Override
+  protected ApronFormulas makeNumberImpl(BigInteger i) {
+    return null;
+  }
+
+  @Override
+  protected ApronFormulas makeNumberImpl(String i) {
+    return null;
+  }
+
+  @Override
+  protected ApronFormulas negate(ApronFormulas pParam1) {
+    return null;
+  }
+
+  @Override
+  protected ApronFormulas add(ApronFormulas pParam1, ApronFormulas pParam2) {
+    return null;
+  }
+
+  @Override
+  protected ApronFormulas sumImpl(List<ApronFormulas> operands){
+    return null;
+  }
+  @Override
+  protected ApronFormulas subtract(ApronFormulas pParam1, ApronFormulas pParam2) {
+    return null;
+  }
+
+  @Override
+  protected ApronFormulas divide(ApronFormulas pParam1, ApronFormulas pParam2) {
+    return null;
+  }
+
+  @Override
+  protected ApronFormulas multiply(ApronFormulas pParam1, ApronFormulas pParam2) {
+    return null;
+  }
+
+  @Override
+  protected ApronFormulas equal(ApronFormulas pParam1, ApronFormulas pParam2) {
+    return null;
+  }
+
+  @Override
+  protected ApronFormulas distinctImpl(List pNumbers) {
+    return null;
+  }
+
+  @Override
+  protected ApronFormulas greaterThan(ApronFormulas pParam1, ApronFormulas pParam2) {
+    return null;
+  }
+
+  @Override
+  protected ApronFormulas greaterOrEquals(ApronFormulas pParam1, ApronFormulas pParam2) {
+    return null;
+  }
+
+  @Override
+  protected ApronFormulas lessThan(ApronFormulas pParam1, ApronFormulas pParam2) {
+    return null;
+  }
+
+  @Override
+  protected ApronFormulas lessOrEquals(ApronFormulas pParam1, ApronFormulas pParam2) {
+    return null;
   }
 }
