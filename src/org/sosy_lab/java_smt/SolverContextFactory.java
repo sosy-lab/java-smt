@@ -285,7 +285,9 @@ public class SolverContextFactory {
         return BoolectorSolverContext.create(config, shutdownNotifier, logfile, randomSeed, loader);
 
       case APRON:
-        return ApronSolverContext.create();
+        return ApronSolverContext.create(nonLinearArithmetic, config, shutdownNotifier, logfile,
+            logger,
+            randomSeed);
 
       default:
         throw new AssertionError("no solver selected");

@@ -56,7 +56,7 @@ solvers_maven_conf/*.asc
 
 .idea/workspace.xml
 .idea/uiDesigner.xml
-
+.idea
 /*.so
 /*.dll
 /*.jar

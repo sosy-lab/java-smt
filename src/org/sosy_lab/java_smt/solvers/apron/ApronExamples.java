@@ -22,6 +22,7 @@ package org.sosy_lab.java_smt.solvers.apron;
 
 import java.util.Arrays;
 import apron.*;
+import org.junit.Assert;
 import org.junit.AssumptionViolatedException;
 import org.sosy_lab.common.NativeLibraries;
 
@@ -49,14 +50,12 @@ public class ApronExamples
     cons2.setKind(Lincons1.SUPEQ);
     Abstract1 abstract1 = new Abstract1(pManager, new Lincons1[]{cons1,cons2});
 
-    System.out.println("Variable has to be in: "+abstract1.getBound(pManager, "x"));
-    System.out.println(abstract1.toString(pManager));
     //is x = 1 satisfiable?
     Lincons1 cons3 = new Lincons1(environment);
     cons3.setCoeff("x",new MpqScalar(1));
     cons3.setCst(new MpqScalar(-1));
     cons3.setKind(Lincons1.EQ);
-    System.out.println("Constraint is satisfiable: "+abstract1.satisfy(pManager, cons3));
+    assert abstract1.satisfy(pManager,cons3);
 
     //always unsat example, 1 = 0
     Lincons1 cons4 = new Lincons1(environment);
@@ -64,7 +63,7 @@ public class ApronExamples
     cons4.setCst(new MpqScalar(1));
     cons4.setKind(Lincons1.EQ);
     Abstract1 abstract2 = new Abstract1(pManager, new Lincons1[]{cons4});
-    System.out.println("Abstract-Obj. is Bottom: "+abstract2.isBottom(pManager));
+    assert abstract2.isBottom(pManager);
   }
 
   public static void main(String[] args) throws ApronException {

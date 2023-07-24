@@ -24,11 +24,15 @@ import apron.ApronException;
 import apron.Box;
 import apron.Environment;
 import apron.Manager;
-import com.microsoft.z3.Native;
 import java.util.Set;
+import java.util.logging.Level;
+import javax.annotation.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.common.ShutdownNotifier.ShutdownRequestListener;
+import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.io.PathCounterTemplate;
+import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
-import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
@@ -40,19 +44,43 @@ public class ApronSolverContext extends AbstractSolverContext {
 
   private Manager manager;
   private final ApronFormulaCreator formulaCreator;
-  protected ShutdownNotifier shutdownNotifier;
+  private ShutdownNotifier shutdownNotifier;
+  private Configuration config;
+  private @Nullable PathCounterTemplate logfile;
+  private LogManager logger;
+  private long randomSeed;
+
+  private ShutdownRequestListener shutdownRequestListener;
+  private boolean closed = false;
+
   protected ApronSolverContext(ApronFormulaManager fmgr,
                                Manager pManager,
                                ApronFormulaCreator pFormulaCreator,
-                               ShutdownNotifier pShutdownNotifier) {
+                               ShutdownNotifier pShutdownNotifier,
+                               Configuration pConfig,
+                               PathCounterTemplate pLogfile,
+                               LogManager pLogger,
+                               long pRandomSeed) {
     super(fmgr);
     this.manager = pManager;
     this.formulaCreator = pFormulaCreator;
     this.shutdownNotifier = pShutdownNotifier;
+    this.shutdownRequestListener = reason -> {
+
+    };
+    shutdownNotifier.register(shutdownRequestListener);
+    this.config = pConfig;
+    this.logfile = pLogfile;
+    this.randomSeed = pRandomSeed;
+    this.logger = pLogger;
   }
 
   public static synchronized ApronSolverContext create(NonLinearArithmetic pNonLinearArithmetic,
-                                                       ShutdownNotifier pShutdownNotifier){
+                                                       Configuration pConfiguration,
+                                                       ShutdownNotifier pShutdownNotifier,
+                                                       PathCounterTemplate logfile,
+                                                       LogManager pLogger,
+                                                       long randomSeed){
 
     Environment env = new Environment();
     Manager manager = new Box();
@@ -68,7 +96,8 @@ public class ApronSolverContext extends AbstractSolverContext {
     ApronFormulaManager fmgr = new ApronFormulaManager(formulaCreator, ufManager,
         booleanFormulaManager,integerFormulaManager,rationalFormulaManager,null,null,null,null,
         null,null,null);
-    return new ApronSolverContext(fmgr, manager, formulaCreator, pShutdownNotifier);
+    return new ApronSolverContext(fmgr, manager, formulaCreator, pShutdownNotifier,pConfiguration
+        ,logfile,pLogger,randomSeed);
   }
 
   public Manager getManager(){
@@ -90,7 +119,12 @@ public class ApronSolverContext extends AbstractSolverContext {
 
   @Override
   public void close() {
-    //TODO
+    //TODO was muss hier noch passieren?
+    if(!closed){
+      closed = true;
+      logger.log(Level.FINER, "Freeing Apron Environment");
+      shutdownNotifier.unregister(shutdownRequestListener);
+    }
   }
 
   @Override

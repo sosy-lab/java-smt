@@ -44,8 +44,8 @@ public class ApronFormulaCreator extends FormulaCreator<ApronFormulas, ApronForm
   protected ApronFormulaCreator(
       Environment pO,
       ApronBooleanType boolType,
-      @Nullable ApronIntegerType pIntegerType,
-      @Nullable ApronRationalType pRationalType,
+      ApronIntegerType pIntegerType,
+      ApronRationalType pRationalType,
       @Nullable Long stringType,
       @Nullable Long regexType) {
     super(pO, boolType, pIntegerType, pRationalType, null, null);
@@ -59,7 +59,7 @@ public class ApronFormulaCreator extends FormulaCreator<ApronFormulas, ApronForm
 
   @Override
   public ApronFormulaType getBitvectorType(int bitwidth) {
-    return null;
+    throw new UnsupportedOperationException("Apron does not support bitvector operations.");
   }
 
   @Override
@@ -69,7 +69,7 @@ public class ApronFormulaCreator extends FormulaCreator<ApronFormulas, ApronForm
 
   @Override
   public ApronFormulaType getArrayType(ApronFormulaType indexType, ApronFormulaType elementType) {
-    return null;
+    throw new UnsupportedOperationException("Apron does not support array operations.");
   }
 
   @Override
@@ -110,17 +110,20 @@ public class ApronFormulaCreator extends FormulaCreator<ApronFormulas, ApronForm
   }
 
   @Override
-  public <R> R visit(FormulaVisitor<R> visitor, Formula formula, ApronFormulas f) {
+  public <R> R visit(FormulaVisitor<R> visitor, Formula formula, ApronFormulas f) { //hinten
+    // anstellen, Frage kann man eine formel in alle kleinteile zerlegen und dann wieder
+    // zusammenbauen?
     return null;
   }
 
   @Override
-  public ApronFormulas callFunctionImpl(Long declaration, List<ApronFormulas> args) {
+  public ApronFormulas callFunctionImpl(Long declaration, List<ApronFormulas> args) { // nicht
+    // supported
     return null;
   }
 
   @Override
-  public Long declareUFImpl(
+  public Long declareUFImpl( //nicht supported
       String pName,
       ApronFormulaType pReturnType,
       List<ApronFormulaType> pArgTypes) {
@@ -128,7 +131,7 @@ public class ApronFormulaCreator extends FormulaCreator<ApronFormulas, ApronForm
   }
 
   @Override
-  protected Long getBooleanVarDeclarationImpl(ApronFormulas pApronFormula) {
+  protected Long getBooleanVarDeclarationImpl(ApronFormulas pApronFormula) { //brauche ich nicht
     return null;
   }
 }
