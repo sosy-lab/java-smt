@@ -56,9 +56,6 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     osmtSolver = new MainSolver(creator.getEnv(), pConfig, "JavaSmt");
     
     assertedFormulas.push(new ArrayList<>()); // create initial level
-
-    // FIXME Disable Model generation if arrays are required
-    // https://github.com/usi-verification-and-security/opensmt/issues/630
   }
 
   protected static SMTConfig getConfigInstance(int randomSeed, boolean interpolation) {

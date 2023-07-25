@@ -19,6 +19,7 @@ import opensmt.Logic;
 import opensmt.MainSolver;
 import opensmt.Model;
 import opensmt.PTRef;
+import opensmt.Sort;
 import opensmt.SRef;
 import opensmt.SymRef;
 import opensmt.Symbol;
@@ -31,7 +32,7 @@ public class OpenSmtModel extends AbstractModel<PTRef, SRef, Logic> {
   private final Logic osmtLogic;
   private final MainSolver osmtSolver;
   private final Model osmtModel;
-  
+
   private final ImmutableList<ValueAssignment> model;
 
   OpenSmtModel(
@@ -43,7 +44,7 @@ public class OpenSmtModel extends AbstractModel<PTRef, SRef, Logic> {
     osmtLogic = pCreator.getEnv();
     osmtSolver = pProver.getOsmtSolver();
     osmtModel = osmtSolver.getModel();
-    
+
     PTRef asserts = osmtLogic.mkAnd(new VectorPTRef(pAssertedExpressions));
     Map<String, PTRef> userDeclarations = pCreator.extractVariablesAndUFs(asserts, true);
 
@@ -54,9 +55,16 @@ public class OpenSmtModel extends AbstractModel<PTRef, SRef, Logic> {
       Symbol sym = osmtLogic.getSym(ref);
 
       int numArgs = sym.size() - 1;
+      SRef sort = sym.rsort();
+  
+      if (osmtLogic.isArraySort(sort)) {
+        // INFO: Disable model generation if arrays are used
+        // https://github.com/usi-verification-and-security/opensmt/issues/630
+        throw new UnsupportedOperationException("OpenSMT does not support model generation when arrays are used");
+      }
 
       if (numArgs == 0) {
-        PTRef key = osmtLogic.mkVar(sym.rsort(), osmtLogic.getSymName(ref));
+        PTRef key = osmtLogic.mkVar(sort, osmtLogic.getSymName(ref));
         PTRef value = osmtModel.evaluate(key);
 
         builder.add(
@@ -120,9 +128,23 @@ public class OpenSmtModel extends AbstractModel<PTRef, SRef, Logic> {
     return unwrapped;
   }
 
+  private void hasNoArrays(PTRef f) {
+    Map<String, PTRef> userDeclarations = creator.extractVariablesAndUFs(f, true);
+
+    for (PTRef term : userDeclarations.values()) {
+      SRef sort = osmtLogic.getSortRef(term);
+      if (osmtLogic.isArraySort(sort)) {
+        // INFO: Disable model generation if arrays are used
+        // https://github.com/usi-verification-and-security/opensmt/issues/630
+        throw new UnsupportedOperationException("OpenSMT does not support model generation when arrays are used");
+      }
+    }
+  }
+
   @Override
   public PTRef evalImpl(PTRef f) {
     Preconditions.checkState(!isClosed());
+    hasNoArrays(f);
     return osmtModel.evaluate(f);
   }
 
