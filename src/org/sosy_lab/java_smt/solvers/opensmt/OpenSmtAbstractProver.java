@@ -37,8 +37,8 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
 
   protected final OpenSmtFormulaCreator creator;
   protected final MainSolver osmtSolver;
-  protected final SMTConfig config;
-  protected final Deque<List<PTRef>> assertedFormulas = new ArrayDeque<>();
+  protected final SMTConfig osmtConfig;
+  protected final Deque<List<PTRef>> assertionStack = new ArrayDeque<>();
 
   private boolean changedSinceLastSatQuery = false;
 
@@ -50,12 +50,12 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
       Set<ProverOptions> pOptions) {
     super(pOptions, pMgr.getBooleanFormulaManager(), pShutdownNotifier);
 
-    creator = pFormulaCreator;
-    config = pConfig; // BUGFIX: We need to store the SMTConfig reference to make sure the underlying C++ object does not get garbage collected
-    
+    osmtConfig = pConfig; // BUGFIX: We need to store the SMTConfig reference to make sure the underlying C++ object does not get garbage collected
     osmtSolver = new MainSolver(creator.getEnv(), pConfig, "JavaSmt");
-    
-    assertedFormulas.push(new ArrayList<>()); // create initial level
+
+    creator = pFormulaCreator;
+
+    assertionStack.push(new ArrayList<>()); // create initial level
   }
 
   protected static SMTConfig getConfigInstance(int randomSeed, boolean interpolation) {
@@ -73,7 +73,7 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
   public void push() {
     Preconditions.checkState(!closed);
     setChanged();
-    assertedFormulas.push(new ArrayList<>());
+    assertionStack.push(new ArrayList<>());
     osmtSolver.push();
   }
 
@@ -82,24 +82,24 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     Preconditions.checkState(!closed);
     setChanged();
     Preconditions.checkState(size() > 0, "Tried to pop from an empty solver stack");
-    assertedFormulas.pop();
+    assertionStack.pop();
     osmtSolver.pop();
   }
 
-  @Nullable
-  protected abstract T getConstraintName(BooleanFormula pF);
 
+  @Nullable
+  protected abstract T addConstraintImpl(PTRef f) throws InterruptedException;
+  
   @Override
   @Nullable
   public T addConstraint(BooleanFormula pF) throws InterruptedException {
     Preconditions.checkState(!closed);
     setChanged();
 
-    PTRef exp = creator.extractInfo(pF);
-    osmtSolver.insertFormula(exp);
+    PTRef f = creator.extractInfo(pF);
+    T label = addConstraintImpl(f);
 
-    T label = getConstraintName(pF);
-    assertedFormulas.peek().add(exp);
+    assertionStack.peek().add(f);
     return label;
   }
 
@@ -109,9 +109,8 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     Preconditions.checkState(!closed);
     checkGenerateModels();
 
-    List<PTRef> assertedTerms = new ArrayList<>();
-    assertedFormulas.forEach(assertedTerms::addAll);
-    return new OpenSmtModel(this, creator, assertedTerms);
+    Model model = new OpenSmtModel(this, creator, getAssertedFormulas());
+    return registerEvaluator(model);
   }
 
   @Override
@@ -154,7 +153,7 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
       shutdownNotifier.shutdownIfNecessary();
 
       if (r.isError()) {
-        throw new SolverException("Error in Mainsolver.check()");
+        throw new SolverException("OpenSMT crashed while checking satisfiablity");
       }
       if (r.isUndef()) {
         throw new InterruptedException();
@@ -180,9 +179,9 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     throw new UnsupportedOperationException("OpenSMT does not support unsat core.");
   }
 
-  protected Collection<PTRef> getAssertedExpressions() {
+  protected Collection<PTRef> getAssertedFormulas() {
     List<PTRef> result = new ArrayList<>();
-    assertedFormulas.forEach(result::addAll);
+    assertionStack.forEach(result::addAll);
     return result;
   }
 
@@ -190,7 +189,7 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
   public void close() {
     if (!closed) {
       closed = true;
-      assertedFormulas.clear();
+      assertionStack.clear();
       osmtSolver.delete();
     }
     super.close();
@@ -199,6 +198,6 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
   @Override
   public int size() {
     Preconditions.checkState(!closed);
-    return assertedFormulas.size() - 1;
+    return assertionStack.size() - 1;
   }
 }

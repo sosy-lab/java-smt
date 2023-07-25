@@ -43,9 +43,9 @@ class OpenSmtInterpolatingProver extends OpenSmtAbstractProver<Integer>
   }
 
   @Override
-  @Nullable
-  protected Integer getConstraintName(BooleanFormula pF) {
-    return getAssertedExpressions().size();
+  public Integer addConstraintImpl(PTRef f) throws InterruptedException {
+    osmtSolver.insertFormula(f);
+    return getAssertedFormulas().size();
   }
 
   @Override

@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.opensmt;
 
 import java.util.Set;
+import opensmt.PTRef;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -34,8 +35,8 @@ class OpenSmtTheoremProver extends OpenSmtAbstractProver<Void> implements Prover
   }
 
   @Override
-  @Nullable
-  protected Void getConstraintName(BooleanFormula pF) {
+  public Void addConstraintImpl(PTRef f) throws InterruptedException {
+    osmtSolver.insertFormula(f);
     return null;
   }
 }
