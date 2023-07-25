@@ -50,10 +50,10 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
       Set<ProverOptions> pOptions) {
     super(pOptions, pMgr.getBooleanFormulaManager(), pShutdownNotifier);
 
+    creator = pFormulaCreator;
+
     osmtConfig = pConfig; // BUGFIX: We need to store the SMTConfig reference to make sure the underlying C++ object does not get garbage collected
     osmtSolver = new MainSolver(creator.getEnv(), pConfig, "JavaSmt");
-
-    creator = pFormulaCreator;
 
     assertionStack.push(new ArrayList<>()); // create initial level
   }
