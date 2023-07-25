@@ -26,36 +26,37 @@ import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Context;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.FormulaKind;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable.Type;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.dreal;
 
 
 public class DReal4BooleanFormulaManager
-    extends AbstractBooleanFormulaManager<DRealTerm, Type, Context, DRealTerm> {
+    extends AbstractBooleanFormulaManager<DRealTerm<?, ?>, Type, Context, DRealTerm<?, ?>> {
 
-  protected DReal4BooleanFormulaManager(FormulaCreator pCreator) {
+  protected DReal4BooleanFormulaManager(DReal4FormulaCreator pCreator) {
     super(pCreator);
   }
 
   @Override
-  protected DRealTerm makeVariableImpl(String pVar) {
+  protected DRealTerm<?, ?> makeVariableImpl(String pVar) {
     return formulaCreator.makeVariable(getFormulaCreator().getBoolType(), pVar);
   }
 
   @Override
-  protected DRealTerm makeBooleanImpl(boolean value) {
+  protected DRealTerm<Formula, FormulaKind> makeBooleanImpl(boolean value) {
     if (value) {
-      return new DRealTerm(Formula.True(), Type.BOOLEAN, FormulaKind.True);
+      return new DRealTerm<>(Formula.True(), Type.BOOLEAN, FormulaKind.True);
     } else {
-      return new DRealTerm(Formula.False(), Type.BOOLEAN, FormulaKind.False);
+      return new DRealTerm<>(Formula.False(), Type.BOOLEAN, FormulaKind.False);
     }
   }
 
   @Override
-  protected DRealTerm not(DRealTerm pParam1) {
+  protected DRealTerm<Formula, FormulaKind> not(DRealTerm<?, ?> pParam1) {
     if (pParam1.isFormula()) {
-      return new DRealTerm(dreal.Not(pParam1.getFormula()), Type.BOOLEAN,
-          FunctionDeclarationKind.NOT);
+      return new DRealTerm<>(dreal.Not(pParam1.getFormula()), Type.BOOLEAN,
+          FormulaKind.Not);
     } else {
       throw new UnsupportedOperationException("dReal does not support not on Variabele "
           + "or Expressions.");
@@ -63,18 +64,18 @@ public class DReal4BooleanFormulaManager
   }
 
   @Override
-  protected DRealTerm and(DRealTerm pParam1, DRealTerm pParam2) {
+  protected DRealTerm<Formula, FormulaKind> and(DRealTerm<?, ?> pParam1, DRealTerm<?, ?> pParam2) {
     if (pParam1.isVar() && pParam2.isFormula()) {
-      return new DRealTerm(dreal.And(pParam1.getVariable(), pParam2.getFormula()),
+      return new DRealTerm<>(dreal.And(pParam1.getVariable(), pParam2.getFormula()),
           Type.BOOLEAN, FormulaKind.And);
     } else if (pParam1.isFormula() && pParam2.isVar()) {
-      return new DRealTerm(dreal.And(pParam1.getFormula(), pParam2.getVariable()),
+      return new DRealTerm<>(dreal.And(pParam1.getFormula(), pParam2.getVariable()),
           Type.BOOLEAN, FormulaKind.And);
     } else if (pParam1.isVar() && pParam2.isVar()) {
-      return new DRealTerm(dreal.And(pParam1.getVariable(), pParam2.getVariable()),
+      return new DRealTerm<>(dreal.And(pParam1.getVariable(), pParam2.getVariable()),
           Type.BOOLEAN, FormulaKind.And);
     } else if (pParam1.isFormula() && pParam2.isFormula()) {
-      return new DRealTerm(dreal.And(pParam1.getFormula(), pParam2.getFormula()),
+      return new DRealTerm<>(dreal.And(pParam1.getFormula(), pParam2.getFormula()),
           Type.BOOLEAN, FormulaKind.And);
     } else {
       throw new UnsupportedOperationException("dReal does not support and on Expressions.");
@@ -82,18 +83,18 @@ public class DReal4BooleanFormulaManager
   }
 
   @Override
-  protected DRealTerm or(DRealTerm pParam1, DRealTerm pParam2) {
+  protected DRealTerm<Formula, FormulaKind> or(DRealTerm<?, ?> pParam1, DRealTerm<?, ?> pParam2) {
     if (pParam1.isVar() && pParam2.isFormula()) {
-      return new DRealTerm(dreal.Or(pParam1.getVariable(), pParam2.getFormula()),
+      return new DRealTerm<>(dreal.Or(pParam1.getVariable(), pParam2.getFormula()),
           Type.BOOLEAN, FormulaKind.Or);
     } else if (pParam1.isFormula() && pParam2.isVar()) {
-      return new DRealTerm(dreal.Or(pParam1.getFormula(), pParam2.getVariable()),
+      return new DRealTerm<>(dreal.Or(pParam1.getFormula(), pParam2.getVariable()),
           Type.BOOLEAN, FormulaKind.Or);
     } else if (pParam1.isVar() && pParam2.isVar()) {
-      return new DRealTerm(dreal.Or(pParam1.getVariable(), pParam2.getVariable()),
+      return new DRealTerm<>(dreal.Or(pParam1.getVariable(), pParam2.getVariable()),
           Type.BOOLEAN, FormulaKind.Or);
     } else if (pParam1.isFormula() && pParam2.isFormula()) {
-      return new DRealTerm(dreal.Or(pParam1.getFormula(), pParam2.getFormula()),
+      return new DRealTerm<>(dreal.Or(pParam1.getFormula(), pParam2.getFormula()),
           Type.BOOLEAN, FormulaKind.Or);
     } else {
       throw new UnsupportedOperationException("dReal does not support or on Expressions.");
@@ -102,24 +103,24 @@ public class DReal4BooleanFormulaManager
 
   // a xor b = (NOT(A AND B)) AND (NOT(NOT A AND NOT B))
   @Override
-  protected DRealTerm xor(DRealTerm pParam1, DRealTerm pParam2) {
+  protected DRealTerm<Formula, FormulaKind> xor(DRealTerm<?, ?> pParam1, DRealTerm<?, ?> pParam2) {
     if (pParam1.isVar() && pParam2.isFormula()) {
-      return new DRealTerm(dreal.And(dreal.Not(dreal.And(pParam1.getVariable(),
+      return new DRealTerm<>(dreal.And(dreal.Not(dreal.And(pParam1.getVariable(),
               pParam2.getFormula())),
           dreal.Not(dreal.And(dreal.Not(pParam1.getVariable()),
               dreal.Not(pParam2.getFormula())))), Type.BOOLEAN, FormulaKind.And);
     } else if (pParam1.isFormula() && pParam2.isVar()) {
-      return new DRealTerm(dreal.And(dreal.Not(dreal.And(pParam1.getFormula(),
+      return new DRealTerm<>(dreal.And(dreal.Not(dreal.And(pParam1.getFormula(),
               pParam2.getVariable())),
           dreal.Not(dreal.And(dreal.Not(pParam1.getFormula()),
               dreal.Not(pParam2.getVariable())))), Type.BOOLEAN, FormulaKind.And);
     } else if (pParam1.isVar() && pParam2.isVar()) {
-      return new DRealTerm(dreal.And(dreal.Not(dreal.And(pParam1.getVariable(),
+      return new DRealTerm<>(dreal.And(dreal.Not(dreal.And(pParam1.getVariable(),
               pParam2.getVariable())),
           dreal.Not(dreal.And(dreal.Not(pParam1.getVariable()),
               dreal.Not(pParam2.getVariable())))), Type.BOOLEAN, FormulaKind.And);
     } else if (pParam1.isFormula() && pParam2.isFormula()) {
-      return new DRealTerm(dreal.And(dreal.Not(dreal.And(pParam1.getFormula(),
+      return new DRealTerm<>(dreal.And(dreal.Not(dreal.And(pParam1.getFormula(),
               pParam2.getFormula())),
           dreal.Not(dreal.And(dreal.Not(pParam1.getFormula()),
               dreal.Not(pParam2.getFormula())))), Type.BOOLEAN, FormulaKind.And);
@@ -129,18 +130,19 @@ public class DReal4BooleanFormulaManager
   }
 
   @Override
-  protected DRealTerm equivalence(DRealTerm bits1, DRealTerm bits2) {
+  protected DRealTerm<Formula, FormulaKind> equivalence(DRealTerm<?, ?> bits1,
+                                                        DRealTerm<?, ?> bits2) {
     if (bits1.isVar() && bits2.isFormula()) {
-      return new DRealTerm(dreal.iff(bits1.getVariable(), bits2.getFormula()),
+      return new DRealTerm<>(dreal.iff(bits1.getVariable(), bits2.getFormula()),
           Type.BOOLEAN, FormulaKind.And);
     } else if (bits1.isFormula() && bits2.isVar()) {
-      return new DRealTerm(dreal.iff(bits1.getFormula(), bits2.getVariable()),
+      return new DRealTerm<>(dreal.iff(bits1.getFormula(), bits2.getVariable()),
           Type.BOOLEAN, FormulaKind.And);
     } else if (bits1.isVar() && bits2.isVar()) {
-      return new DRealTerm(dreal.iff(bits1.getVariable(), bits2.getVariable()),
+      return new DRealTerm<>(dreal.iff(bits1.getVariable(), bits2.getVariable()),
           Type.BOOLEAN, FormulaKind.And);
     } else if (bits1.isFormula() && bits2.isFormula()) {
-      return new DRealTerm(dreal.iff(bits1.getFormula(), bits2.getFormula()),
+      return new DRealTerm<>(dreal.iff(bits1.getFormula(), bits2.getFormula()),
           Type.BOOLEAN, FormulaKind.And);
     } else {
       throw new UnsupportedOperationException("dReal does not support iff on Expressions.");
@@ -148,7 +150,7 @@ public class DReal4BooleanFormulaManager
   }
 
   @Override
-  protected boolean isTrue(DRealTerm bits) {
+  protected boolean isTrue(DRealTerm<?, ?> bits) {
     if (bits.isFormula()) {
       return dreal.is_true(bits.getFormula());
     } else {
@@ -158,7 +160,7 @@ public class DReal4BooleanFormulaManager
   }
 
   @Override
-  protected boolean isFalse(DRealTerm bits) {
+  protected boolean isFalse(DRealTerm<?, ?> bits) {
     if (bits.isFormula()) {
       return dreal.is_false(bits.getFormula());
     } else {
@@ -168,29 +170,30 @@ public class DReal4BooleanFormulaManager
   }
 
   @Override
-  protected DRealTerm ifThenElse(DRealTerm cond, DRealTerm f1, DRealTerm f2) {
+  protected DRealTerm<?, ?> ifThenElse(DRealTerm<?, ?> cond, DRealTerm<?, ?> f1,
+                                                       DRealTerm<?, ?> f2) {
     if (cond.isFormula()) {
       if (dreal.is_true(cond.getFormula())) {
         if (f1.isVar()) {
-          return new DRealTerm(f1.getVariable(), Type.BOOLEAN,
-              f1.getDeclaration());
+          return new DRealTerm<>(f1.getVariable(), Type.BOOLEAN,
+              Type.BOOLEAN);
         } else if (f1.isExp()) {
-          return new DRealTerm( f1.getExpression(), Type.BOOLEAN,
-              f1.getDeclaration());
+          return new DRealTerm<>(f1.getExpression(), Type.BOOLEAN,
+              f1.getExpressionKind());
         } else {
-          return new DRealTerm(f1.getFormula(), Type.BOOLEAN,
-              f1.getDeclaration());
+          return new DRealTerm<>(f1.getFormula(), Type.BOOLEAN,
+              f1.getFormulaKind());
         }
       } else {
         if (f2.isVar()) {
-          return new DRealTerm(f2.getVariable(), Type.BOOLEAN,
-             f2.getDeclaration());
+          return new DRealTerm<>(f2.getVariable(), Type.BOOLEAN,
+             Type.BOOLEAN);
         } else if (f2.isExp()) {
-          return new DRealTerm(f2.getExpression(), Type.BOOLEAN,
-              f2.getDeclaration());
+          return new DRealTerm<>(f2.getExpression(), Type.BOOLEAN,
+              f2.getExpressionKind());
         } else {
-          return new DRealTerm(f2.getFormula(), Type.BOOLEAN,
-              f2.getDeclaration());
+          return new DRealTerm<>(f2.getFormula(), Type.BOOLEAN,
+              f2.getFormulaKind());
         }
       }
     } else {

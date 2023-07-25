@@ -37,13 +37,6 @@ so that all three types are available.
  */
 public class DRealTerm<Term, Kind> {
 
-//  @Nullable
-//  private Variable var;
-//  @Nullable
-//  private Expression exp;
-//  @Nullable
-//  private Formula formula;
-
   private final Term term;
   private final Kind declaration;
 

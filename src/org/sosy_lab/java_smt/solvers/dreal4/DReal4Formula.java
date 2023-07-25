@@ -24,16 +24,17 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.FormulaKind;
 
 abstract class DReal4Formula implements Formula {
 
-  private final DRealTerm term;
+  private final DRealTerm<?, ?> term;
 
-  DReal4Formula(DRealTerm pTerm) {
+  DReal4Formula(DRealTerm<?, ?> pTerm) {
     this.term = pTerm;
   }
 
-  final DRealTerm getTerm() {
+  final DRealTerm<?, ?> getTerm() {
     return term;
   }
 
@@ -45,7 +46,8 @@ abstract class DReal4Formula implements Formula {
     if (!(o instanceof DRealTerm)) {
       return false;
     }
-    return term == ((DReal4Formula) o).term;
+    // ?
+    return term == o;
   }
 
   @Override
@@ -71,19 +73,19 @@ abstract class DReal4Formula implements Formula {
   }
 
   static final class DReal4BooleanFormula extends DReal4Formula implements BooleanFormula {
-    DReal4BooleanFormula(DRealTerm pTerm) {
+    DReal4BooleanFormula(DRealTerm<?, ?> pTerm) {
       super(pTerm);
     }
   }
 
   static final class DReal4RationalFormula extends DReal4Formula implements RationalFormula {
-    DReal4RationalFormula(DRealTerm pTerm) {
+    DReal4RationalFormula(DRealTerm<?, ?> pTerm) {
       super(pTerm);
     }
   }
 
   static final class DReal4IntegerFormula extends DReal4Formula implements IntegerFormula {
-    DReal4IntegerFormula(DRealTerm pTerm) {
+    DReal4IntegerFormula(DRealTerm<?, ?> pTerm) {
       super(pTerm);
     }
   }

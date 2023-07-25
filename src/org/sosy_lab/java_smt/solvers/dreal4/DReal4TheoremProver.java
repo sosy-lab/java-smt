@@ -21,7 +21,11 @@
 package org.sosy_lab.java_smt.solvers.dreal4;
 
 
+import com.google.common.base.Preconditions;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -34,44 +38,68 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import java.util.Set;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Box;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Config;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Context;
+
 
 class DReal4TheoremProver extends AbstractProverWithAllSat<Void> implements ProverEnvironment {
 
   private final DReal4FormulaCreator creator;
   private final Config curCfg;
   private final Context curCnt;
+
+  protected final Deque<List<DRealTerm<?, ?>>> assertedFormulas = new ArrayDeque<>();
+
+  // use Box to save result?
+  private Box model;
+
   protected DReal4TheoremProver(DReal4FormulaCreator creator, Set<ProverOptions> pOptions,
                                 DReal4FormulaManager pFmgr, ShutdownNotifier pShutdownNotifier) {
     super(pOptions, pFmgr.getBooleanFormulaManager(), pShutdownNotifier);
     this.creator = creator;
     curCfg = new Config();
     curCnt = new Context(curCfg);
+    model = new Box();
   }
 
   @Override
   public void pop() {
-
+    Preconditions.checkState(!closed);
+    Preconditions.checkState(size() > 0);
+    assertedFormulas.pop();
+    curCnt.Pop(1);
   }
 
   @Override
   public @Nullable Void addConstraint(BooleanFormula constraint) throws InterruptedException {
+    Preconditions.checkState(!closed);
+    DRealTerm<?, ?> formula = creator.extractInfo(constraint);
+    assertedFormulas.peek().add(formula);
+    //TODO: declare Variables of formula
+    curCnt.Assert(formula.getFormula());
     return null;
   }
 
   @Override
   public void push() throws InterruptedException {
-
+    Preconditions.checkState(!closed);
+    assertedFormulas.push(new ArrayList<>());
+    curCnt.Push(1);
   }
 
   @Override
   public int size() {
-    return 0;
+    Preconditions.checkState(!closed);
+    return assertedFormulas.size() - 1;
   }
 
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
+    Preconditions.checkState(!closed);
+    //TODO: CheckSat() return optional<Box> -> write CheckSat() that returns a boolean and saves
+    // the model to a box (s. Api call CheckSatisfiability)
+
     return false;
   }
 

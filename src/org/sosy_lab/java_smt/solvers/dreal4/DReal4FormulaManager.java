@@ -22,13 +22,12 @@ package org.sosy_lab.java_smt.solvers.dreal4;
 
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Context;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable.Type;
 
-public class DReal4FormulaManager extends AbstractFormulaManager<DRealTerm, Type, Context,
-    DRealTerm> {
+public class DReal4FormulaManager extends AbstractFormulaManager<DRealTerm<?, ?>, Type, Context,
+    DRealTerm<?, ?>> {
 
   DReal4FormulaManager(DReal4FormulaCreator pFormulaCreator, DReal4UFManager pFunctionManager,
                        DReal4BooleanFormulaManager pBooleanManager,
@@ -50,13 +49,21 @@ public class DReal4FormulaManager extends AbstractFormulaManager<DRealTerm, Type
         null);
   }
 
+  static DRealTerm<?, ?> getDReal4Formula(org.sosy_lab.java_smt.api.Formula pT) {
+    if (pT instanceof DReal4Formula) {
+      return ((DReal4Formula) pT).getTerm();
+    }
+    throw new IllegalArgumentException(
+        "Cannot get the formula info of type " + pT.getClass().getSimpleName() + " in the Solver!");
+  }
+
   @Override
   public BooleanFormula parse(String s) throws IllegalArgumentException {
     return null;
   }
 
   @Override
-  public Appender dumpFormula(DRealTerm t) {
+  public Appender dumpFormula(DRealTerm<?, ?> t) {
     return null;
   }
 }
