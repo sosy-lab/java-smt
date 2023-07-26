@@ -37,9 +37,12 @@ so that all three types are available.
  */
 public class DRealTerm<Term, Kind> {
 
+  // This is the term, so a Variable, an Expression or a Formula.
   private final Term term;
+  // Here the declarationKind is stored, (3 * x) the kind is multiplication.
   private final Kind declaration;
 
+  // Type of the Variable, Expression or Formula
   private final Type type;
 
   public DRealTerm(Term pTerm, Type pType, Kind pKind) {
@@ -72,7 +75,7 @@ public class DRealTerm<Term, Kind> {
     if (isExp()) {
       return (Expression) term;
     } else {
-      throw new IllegalArgumentException("Not a Variable.");
+      throw new IllegalArgumentException("Not an Expression.");
     }
   }
 
@@ -80,7 +83,7 @@ public class DRealTerm<Term, Kind> {
     if (isFormula()) {
       return (Formula) term;
     } else {
-      throw new IllegalArgumentException("Not a Variable.");
+      throw new IllegalArgumentException("Not a Formula.");
     }
   }
 
@@ -102,7 +105,7 @@ public class DRealTerm<Term, Kind> {
       Formula formula = (Formula) term;
       return formula.get_kind();
     } else {
-      throw new IllegalArgumentException("Not an Expression.");
+      throw new IllegalArgumentException("Not a Formula.");
     }
   }
 

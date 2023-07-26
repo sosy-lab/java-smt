@@ -76,7 +76,7 @@ class DReal4TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
     Preconditions.checkState(!closed);
     DRealTerm<?, ?> formula = creator.extractInfo(constraint);
     assertedFormulas.peek().add(formula);
-    //TODO: declare Variables of formula
+    curCnt.declareVaribales(formula.getFormula());
     curCnt.Assert(formula.getFormula());
     return null;
   }
@@ -97,10 +97,8 @@ class DReal4TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
-    //TODO: CheckSat() return optional<Box> -> write CheckSat() that returns a boolean and saves
-    // the model to a box (s. Api call CheckSatisfiability)
-
-    return false;
+    boolean unsat = curCnt.CheckSat(model);
+    return unsat;
   }
 
   @Override
