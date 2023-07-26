@@ -24,16 +24,19 @@ import static java.lang.String.valueOf;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import edu.stanford.CVC4.Expr;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
+import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
@@ -50,6 +53,7 @@ import org.sosy_lab.java_smt.solvers.dreal4.drealjni.FormulaKind;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.FormulaSet;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable.Type;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.VariableSet;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variables;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.dreal;
 
@@ -118,6 +122,13 @@ public class DReal4FormulaCreator extends FormulaCreator<DRealTerm<?, ?>, Type, 
   }
 
   @Override
+  public BooleanFormula encapsulateBoolean(DRealTerm<?, ?> pTerm) {
+    assert getFormulaType(pTerm).isBooleanType()
+        : String.format(
+        "%s is not boolean, but %s (%s)", pTerm.to_string(), pTerm.getType(), getFormulaType(pTerm));
+    return new DReal4BooleanFormula(pTerm);
+  }
+  @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula formula, DRealTerm<?, ?> f) {
 
     final FunctionDeclarationKind functionKind;
@@ -169,7 +180,19 @@ public class DReal4FormulaCreator extends FormulaCreator<DRealTerm<?, ?>, Type, 
     } else {
       FormulaKind kind = f.getFormulaKind();
       if (kind == FormulaKind.Forall) {
-        // TODO: Need to implement a wrapper to get the bounded variables
+        VariableSet set = f.getFormula().getQuantifiedVariables();
+        List<Formula> boundVariables = new ArrayList<>();
+        DRealTerm<?, ?> var;
+        Iterator<Variable> iter = set.iterator();
+        for (int i = 0; i < set.size(); i++) {
+          var = new DRealTerm<>(iter.next(), iter.next().get_type(), iter.next().get_type());
+          boundVariables.add(encapsulate(getFormulaType(var), var));
+        }
+        DRealTerm<org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula, FormulaKind> quantifiedFormula =
+            new DRealTerm<>(dreal.get_quantified_formula(f.getFormula()),
+            Type.BOOLEAN, dreal.get_quantified_formula(f.getFormula()).get_kind());
+        visitor.visitQuantifier((BooleanFormula) formula, Quantifier.FORALL, boundVariables,
+            encapsulateBoolean(quantifiedFormula));
         throw new UnsupportedOperationException("Not supported.");
       } else if (kind == FormulaKind.And) {
         functionKind = FunctionDeclarationKind.AND;
