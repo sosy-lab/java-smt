@@ -161,4 +161,11 @@ public class Formula {
     return drealJNI.Formula_include_ite(swigCPtr, this);
   }
 
+  // self written
+  public VariableSet getQuantifiedVariables() {
+    VariableSet set = new VariableSet();
+    drealJNI.Formula_getQuantifiedVariables(VariableSet.getCPtr(set), Formula.getCPtr(this));
+    return set;
+  }
+
 }

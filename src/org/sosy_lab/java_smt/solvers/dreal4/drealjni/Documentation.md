@@ -6,8 +6,6 @@ c++### Fragen:
 
 ### TODO:
 - Generell Box printen? Bisher keine möglichkeit Ergebnis auszugeben
-- mutable_... zum laufen kriegen
-- tests schreiben 
 
 ##### Config:
 - uint32_t needs to be changed to long -> per Hand und mit Exceptions

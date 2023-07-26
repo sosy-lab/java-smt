@@ -600,6 +600,24 @@ public class drealJNI {
   public final static native long Context_box(long jarg1, Context jarg1_);
   public final static native long Context_get_model(long jarg1, Context jarg1_);
 
+  // for VariableSet, added later
+  public final static native void VariableSet_Iterator_incrementUnchecked(long jarg1, VariableSet.Iterator jarg1_);
+  public final static native long VariableSet_Iterator_derefUnchecked(long jarg1, VariableSet.Iterator jarg1_);
+  public final static native boolean VariableSet_Iterator_isNot(long jarg1, VariableSet.Iterator jarg1_, long jarg2, VariableSet.Iterator jarg2_);
+  public final static native void delete_VariableSet_Iterator(long jarg1);
+  public final static native long new_VariableSet__SWIG_0();
+  public final static native long new_VariableSet__SWIG_1(long jarg1, VariableSet jarg1_);
+  public final static native boolean VariableSet_isEmpty(long jarg1, VariableSet jarg1_);
+  public final static native void VariableSet_clear(long jarg1, VariableSet jarg1_);
+  public final static native long VariableSet_begin(long jarg1, VariableSet jarg1_);
+  public final static native long VariableSet_end(long jarg1, VariableSet jarg1_);
+  public final static native boolean VariableSet_addImpl(long jarg1, VariableSet jarg1_, long jarg2, Variable jarg2_);
+  public final static native boolean VariableSet_containsImpl(long jarg1, VariableSet jarg1_, long jarg2, Variable jarg2_);
+  public final static native boolean VariableSet_removeImpl(long jarg1, VariableSet jarg1_, long jarg2, Variable jarg2_);
+  public final static native int VariableSet_sizeImpl(long jarg1, VariableSet jarg1_);
+  public final static native boolean VariableSet_hasNextImpl(long jarg1, VariableSet jarg1_, long jarg2, VariableSet.Iterator jarg2_);
+  public final static native void delete_VariableSet(long jarg1);
+
   // self written:
   public final static native void Config_mutable_precision_0(double value, long config);
   public final static native void Config_mutable_produce_models_0(boolean bool, long config);
@@ -616,7 +634,9 @@ public class drealJNI {
   public final static native void Config_mutable_nlopt_maxtime_0(double value, long config);
   public final static native void Config_mutable_random_seed_0(long seed,  long config);
   public final static native void Config_mutable_smtlib2_compliant_0(boolean bool, long config);
-
+  public final static native void Context_declareVariables(long context, long formula);
+  public final static native boolean Context_CheckSat_0(long context, long box);
+  public final static native long Formula_getQuantifiedVariables(long set, long formula);
 
 
   // For debuging and testing

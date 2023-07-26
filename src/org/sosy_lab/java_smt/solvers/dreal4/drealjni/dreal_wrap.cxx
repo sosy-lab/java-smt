@@ -643,6 +643,30 @@ SWIGINTERN void std_unordered_map_Sl_dreal_drake_symbolic_Variable_Sc_int_Sg__pu
 SWIGINTERN void std_unordered_map_Sl_dreal_drake_symbolic_Variable_Sc_int_Sg__removeUnchecked(std::unordered_map< dreal::drake::symbolic::Variable,int > *self,std::unordered_map< dreal::drake::symbolic::Variable,int >::iterator const itr){
         self->erase(itr);
       }
+SWIGINTERN void std_set_Sl_dreal_drake_symbolic_Variable_Sg__iterator_incrementUnchecked(std::set< dreal::drake::symbolic::Variable >::iterator *self){
+          ++(*self);
+        }
+SWIGINTERN dreal::drake::symbolic::Variable std_set_Sl_dreal_drake_symbolic_Variable_Sg__iterator_derefUnchecked(std::set< dreal::drake::symbolic::Variable >::iterator const *self){
+          return **self;
+        }
+SWIGINTERN bool std_set_Sl_dreal_drake_symbolic_Variable_Sg__iterator_isNot(std::set< dreal::drake::symbolic::Variable >::iterator const *self,std::set< dreal::drake::symbolic::Variable >::iterator other){
+          return (*self != other);
+        }
+SWIGINTERN bool std_set_Sl_dreal_drake_symbolic_Variable_Sg__addImpl(std::set< dreal::drake::symbolic::Variable > *self,dreal::drake::symbolic::Variable const &key){
+        return self->insert(key).second;
+      }
+SWIGINTERN bool std_set_Sl_dreal_drake_symbolic_Variable_Sg__containsImpl(std::set< dreal::drake::symbolic::Variable > *self,dreal::drake::symbolic::Variable const &key){
+        return (self->count(key) > 0);
+      }
+SWIGINTERN bool std_set_Sl_dreal_drake_symbolic_Variable_Sg__removeImpl(std::set< dreal::drake::symbolic::Variable > *self,dreal::drake::symbolic::Variable const &key){
+        return (self->erase(key) > 0);
+      }
+SWIGINTERN jint std_set_Sl_dreal_drake_symbolic_Variable_Sg__sizeImpl(std::set< dreal::drake::symbolic::Variable > const *self){
+        return SWIG_SetSize(self->size());
+      }
+SWIGINTERN bool std_set_Sl_dreal_drake_symbolic_Variable_Sg__hasNextImpl(std::set< dreal::drake::symbolic::Variable > const *self,std::set< dreal::drake::symbolic::Variable >::iterator const &itr){
+        return (itr != self->end());
+      }
 
 #include <memory>
 
@@ -11407,6 +11431,273 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
   return jresult;
 }
 
+// VariableSet added later
+
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VariableSet_1Iterator_1incrementUnchecked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  std::set< dreal::drake::symbolic::Variable >::iterator *arg1 = (std::set< dreal::drake::symbolic::Variable >::iterator *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(std::set< dreal::drake::symbolic::Variable >::iterator **)&jarg1; 
+  std_set_Sl_dreal_drake_symbolic_Variable_Sg__iterator_incrementUnchecked(arg1);
+}
+
+
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VariableSet_1Iterator_1derefUnchecked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  std::set< dreal::drake::symbolic::Variable >::iterator *arg1 = (std::set< dreal::drake::symbolic::Variable >::iterator *) 0 ;
+  dreal::drake::symbolic::Variable result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(std::set< dreal::drake::symbolic::Variable >::iterator **)&jarg1; 
+  result = std_set_Sl_dreal_drake_symbolic_Variable_Sg__iterator_derefUnchecked((std::set< dreal::drake::symbolic::Variable >::iterator const *)arg1);
+  *(dreal::drake::symbolic::Variable **)&jresult = new dreal::drake::symbolic::Variable(result); 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VariableSet_1Iterator_1isNot(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jboolean jresult = 0 ;
+  std::set< dreal::drake::symbolic::Variable >::iterator *arg1 = (std::set< dreal::drake::symbolic::Variable >::iterator *) 0 ;
+  std::set< dreal::drake::symbolic::Variable >::iterator arg2 ;
+  std::set< dreal::drake::symbolic::Variable >::iterator *argp2 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(std::set< dreal::drake::symbolic::Variable >::iterator **)&jarg1; 
+  argp2 = *(std::set< dreal::drake::symbolic::Variable >::iterator **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null std::set< dreal::drake::symbolic::Variable >::iterator");
+    return 0;
+  }
+  arg2 = *argp2; 
+  result = (bool)std_set_Sl_dreal_drake_symbolic_Variable_Sg__iterator_isNot((std::set< dreal::drake::symbolic::Variable >::iterator const *)arg1,SWIG_STD_MOVE(arg2));
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_delete_1VariableSet_1Iterator(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  std::set< dreal::drake::symbolic::Variable >::iterator *arg1 = (std::set< dreal::drake::symbolic::Variable >::iterator *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(std::set< dreal::drake::symbolic::Variable >::iterator **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1VariableSet_1_1SWIG_10(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  std::set< dreal::drake::symbolic::Variable > *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (std::set< dreal::drake::symbolic::Variable > *)new std::set< dreal::drake::symbolic::Variable >();
+  *(std::set< dreal::drake::symbolic::Variable > **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1VariableSet_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  std::set< dreal::drake::symbolic::Variable > *arg1 = 0 ;
+  std::set< dreal::drake::symbolic::Variable > *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(std::set< dreal::drake::symbolic::Variable > **)&jarg1;
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "std::set< dreal::drake::symbolic::Variable > const & is null");
+    return 0;
+  } 
+  result = (std::set< dreal::drake::symbolic::Variable > *)new std::set< dreal::drake::symbolic::Variable >((std::set< dreal::drake::symbolic::Variable > const &)*arg1);
+  *(std::set< dreal::drake::symbolic::Variable > **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VariableSet_1isEmpty(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  std::set< dreal::drake::symbolic::Variable > *arg1 = (std::set< dreal::drake::symbolic::Variable > *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(std::set< dreal::drake::symbolic::Variable > **)&jarg1; 
+  result = (bool)((std::set< dreal::drake::symbolic::Variable > const *)arg1)->empty();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VariableSet_1clear(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  std::set< dreal::drake::symbolic::Variable > *arg1 = (std::set< dreal::drake::symbolic::Variable > *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(std::set< dreal::drake::symbolic::Variable > **)&jarg1; 
+  (arg1)->clear();
+}
+
+
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VariableSet_1begin(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  std::set< dreal::drake::symbolic::Variable > *arg1 = (std::set< dreal::drake::symbolic::Variable > *) 0 ;
+  std::set< dreal::drake::symbolic::Variable >::iterator result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(std::set< dreal::drake::symbolic::Variable > **)&jarg1; 
+  result = (arg1)->begin();
+  *(std::set< dreal::drake::symbolic::Variable >::iterator **)&jresult = new std::set< dreal::drake::symbolic::Variable >::iterator(result); 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VariableSet_1end(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  std::set< dreal::drake::symbolic::Variable > *arg1 = (std::set< dreal::drake::symbolic::Variable > *) 0 ;
+  std::set< dreal::drake::symbolic::Variable >::iterator result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(std::set< dreal::drake::symbolic::Variable > **)&jarg1; 
+  result = (arg1)->end();
+  *(std::set< dreal::drake::symbolic::Variable >::iterator **)&jresult = new std::set< dreal::drake::symbolic::Variable >::iterator(result); 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VariableSet_1addImpl(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jboolean jresult = 0 ;
+  std::set< dreal::drake::symbolic::Variable > *arg1 = (std::set< dreal::drake::symbolic::Variable > *) 0 ;
+  dreal::drake::symbolic::Variable *arg2 = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(std::set< dreal::drake::symbolic::Variable > **)&jarg1; 
+  arg2 = *(dreal::drake::symbolic::Variable **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "dreal::drake::symbolic::Variable const & is null");
+    return 0;
+  } 
+  result = (bool)std_set_Sl_dreal_drake_symbolic_Variable_Sg__addImpl(arg1,(dreal::drake::symbolic::Variable const &)*arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VariableSet_1containsImpl(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jboolean jresult = 0 ;
+  std::set< dreal::drake::symbolic::Variable > *arg1 = (std::set< dreal::drake::symbolic::Variable > *) 0 ;
+  dreal::drake::symbolic::Variable *arg2 = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(std::set< dreal::drake::symbolic::Variable > **)&jarg1; 
+  arg2 = *(dreal::drake::symbolic::Variable **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "dreal::drake::symbolic::Variable const & is null");
+    return 0;
+  } 
+  result = (bool)std_set_Sl_dreal_drake_symbolic_Variable_Sg__containsImpl(arg1,(dreal::drake::symbolic::Variable const &)*arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VariableSet_1removeImpl(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jboolean jresult = 0 ;
+  std::set< dreal::drake::symbolic::Variable > *arg1 = (std::set< dreal::drake::symbolic::Variable > *) 0 ;
+  dreal::drake::symbolic::Variable *arg2 = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(std::set< dreal::drake::symbolic::Variable > **)&jarg1; 
+  arg2 = *(dreal::drake::symbolic::Variable **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "dreal::drake::symbolic::Variable const & is null");
+    return 0;
+  } 
+  result = (bool)std_set_Sl_dreal_drake_symbolic_Variable_Sg__removeImpl(arg1,(dreal::drake::symbolic::Variable const &)*arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VariableSet_1sizeImpl(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  std::set< dreal::drake::symbolic::Variable > *arg1 = (std::set< dreal::drake::symbolic::Variable > *) 0 ;
+  jint result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(std::set< dreal::drake::symbolic::Variable > **)&jarg1; 
+  try {
+    result = std_set_Sl_dreal_drake_symbolic_Variable_Sg__sizeImpl((std::set< dreal::drake::symbolic::Variable > const *)arg1);
+  } catch(std::out_of_range &_e) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, (&_e)->what());
+    return 0;
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VariableSet_1hasNextImpl(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jboolean jresult = 0 ;
+  std::set< dreal::drake::symbolic::Variable > *arg1 = (std::set< dreal::drake::symbolic::Variable > *) 0 ;
+  std::set< dreal::drake::symbolic::Variable >::iterator *arg2 = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(std::set< dreal::drake::symbolic::Variable > **)&jarg1; 
+  arg2 = *(std::set< dreal::drake::symbolic::Variable >::iterator **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "std::set< dreal::drake::symbolic::Variable >::iterator const & is null");
+    return 0;
+  } 
+  result = (bool)std_set_Sl_dreal_drake_symbolic_Variable_Sg__hasNextImpl((std::set< dreal::drake::symbolic::Variable > const *)arg1,(std::set< dreal::drake::symbolic::Variable >::iterator const &)*arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_delete_1VariableSet(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  std::set< dreal::drake::symbolic::Variable > *arg1 = (std::set< dreal::drake::symbolic::Variable > *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(std::set< dreal::drake::symbolic::Variable > **)&jarg1; 
+  delete arg1;
+}
+
+
 //Start of self written JNI calls
 
 SWIGEXPORT void Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1mutable_1precision_10(JNIEnv *jenv, jclass jcls, jdouble value, jlong config) {
@@ -11513,6 +11804,65 @@ SWIGEXPORT void Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Co
   configure = *(dreal::Config **)&config;
   configure->mutable_smtlib2_compliant() = binary;
 }
+
+SWIGEXPORT void Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Context_1declareVariables(JNIEnv *jenv, jclass jcls, jlong cntxt, jlong f) {
+  dreal::Context *context = (dreal::Context *) 0;
+  context = *(dreal::Context **)&cntxt;
+  dreal::drake::symbolic::Formula *formula = (dreal::drake::symbolic::Formula *) 0;
+  formula = *(dreal::drake::symbolic::Formula **)&f;
+
+  (void)jenv;
+  (void)jcls;
+
+  if (!f) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "dreal::drake::symbolic::Formula const & is null");
+    return;
+  }
+
+  for (const dreal::drake::symbolic::Variable& v: formula->GetFreeVariables()) {
+    context->DeclareVariable(v);
+  }
+}
+
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Context_1CheckSat_10(JNIEnv *jenv, jclass jcls, jlong cntxt, jlong b) {
+  jboolean jresult = 0 ;
+  dreal::Box *box = (dreal::Box *) 0 ;
+  box = *(dreal::Box **)&b;
+  dreal::Context *context = (dreal::Context *) 0;
+  context = *(dreal::Context **)&cntxt; 
+  
+  (void)jenv;
+  (void)jcls;
+
+  dreal::optional<dreal::Box> result = context->CheckSat();
+  
+  if (result) {
+    DREAL_ASSERT(box);
+    *box = *result;
+    jresult = (jboolean)true;
+  } else {
+    jresult = (jboolean)false;
+  }
+  return jresult;
+}
+
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Formula_1getQuantifiedVariables(JNIEnv *jenv, jclass jcls, jlong set, jlong f) {
+  jlong returnSet = 0;
+  
+  dreal::drake::symbolic::Formula *formula = (dreal::drake::symbolic::Formula *) 0;
+  formula = *(dreal::drake::symbolic::Formula **)&f;
+  std::set< dreal::drake::symbolic::Variable > *s = (std::set< dreal::drake::symbolic::Variable > *) 0 ;
+  s = *(std::set< dreal::drake::symbolic::Variable > **)&set;
+
+  for (dreal::drake::symbolic::Variable v : dreal::drake::symbolic::get_quantified_variables(*formula)) {
+    s->insert(v);
+  }
+  
+  *(std::set< dreal::drake::symbolic::Variable > **)&returnSet = s; 
+  
+  return returnSet;
+}
+
 
 // Functions for debugging and trying to figure stuff out
 
