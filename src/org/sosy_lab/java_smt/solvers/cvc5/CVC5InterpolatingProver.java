@@ -30,8 +30,9 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     implements InterpolatingProverEnvironment<Term> {
 
   private final FormulaManager mgr;
-  Solver interpolationSolver = new Solver(); // Uses a separate Solver instance to leave to original
-  // solver-context unmodified
+  private final Set<ProverOptions> solverOptions;
+  private final int seed;
+  // Solver interpolationSolver = new Solver();
 
   CVC5InterpolatingProver(
       CVC5FormulaCreator pFormulaCreator,
@@ -41,13 +42,13 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
       FormulaManager pMgr) {
     super(pFormulaCreator, pShutdownNotifier, randomSeed, pOptions, pMgr);
     mgr = pMgr;
-
-    setSolverOptions(randomSeed, pOptions, interpolationSolver);
+    solverOptions = pOptions;
+    seed = randomSeed;
   }
 
   /**
-   * Sets the same solver Options of the Original Solver to the separate interpolationSolver. From
-   * CVC5AbstractProver Line 66
+   * Sets the same solver Options of the Original Solver to the separate solvertoSet, except for
+   * produce-interpolants which is set here. From CVC5AbstractProver Line 66
    */
   private void setSolverOptions(int randomSeed, Set<ProverOptions> pOptions, Solver solvertoSet) {
     if (incremental) {
@@ -191,14 +192,19 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     Collection<Term> extraAssertions = getAssertedTermsNotInCollection(combinedInterpols);
     Term extraAssert = new Term();
 
+    Solver interpolationSolver = new Solver(); // Uses a separate Solver instance to leave to
+                                               // original solver-context unmodified
+
+    setSolverOptions(seed, solverOptions, interpolationSolver);
+
     if (extraAssertions.isEmpty()) {
       extraAssert = interpolationSolver.mkTrue();
     } else {
-      extraAssert = buildConjunctionOfFormulas(extraAssertions);
+      extraAssert = buildConjunctionOfFormulas(extraAssertions, interpolationSolver);
     }
 
-    Term phim = buildConjunctionOfFormulasOverArray(assertedInterpols);
-    Term phip = buildConjunctionOfFormulasOverArray(addedInterpols);
+    Term phim = buildConjunctionOfFormulasOverArray(assertedInterpols, interpolationSolver);
+    Term phip = buildConjunctionOfFormulasOverArray(addedInterpols, interpolationSolver);
 
     interpolationSolver.resetAssertions();
 
@@ -209,6 +215,8 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
 
     Term interpolant =
         interpolationSolver.getInterpolant(interpolationSolver.mkTerm(Kind.NOT, phip));
+
+    interpolationSolver.deletePointer();
 
     return interpolant;
   }
@@ -236,27 +244,30 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
    * [[A,B],[C]] -> A/\B/\C
    *
    * @param formula Array of Collections of formulas
+   * @param usingSolver the CVC5 Solver Instance to use
    * @return concatenated Formulas with AND as CVC5 Term
    */
-  private Term buildConjunctionOfFormulasOverArray(ArrayList<Collection<Term>> formula) {
+  private Term
+      buildConjunctionOfFormulasOverArray(ArrayList<Collection<Term>> formula, Solver usingSolver) {
     Collection<Term> currColTerm = formula.get(0);
     formula.remove(0);
     if (formula.size() == 0) {
-      return buildConjunctionOfFormulas(currColTerm);
+      return buildConjunctionOfFormulas(currColTerm, usingSolver);
     }
-    return interpolationSolver.mkTerm(
+    return usingSolver.mkTerm(
         Kind.AND,
-        buildConjunctionOfFormulas(currColTerm),
-        buildConjunctionOfFormulasOverArray(formula));
+        buildConjunctionOfFormulas(currColTerm, usingSolver),
+        buildConjunctionOfFormulasOverArray(formula, usingSolver));
   }
 
   /**
    * Turns a collection of Formulas to a Single Conjunction of the Formulas e.g.: [A,B,C] -> A/\B/\C
    *
    * @param formulas collection of formulas
+   * @param usingSolver the CVC5 Solver Instance to use
    * @return concatenated Formulas with AND as CVC5 Term
    */
-  private Term buildConjunctionOfFormulas(Collection<Term> formulas) {
+  private Term buildConjunctionOfFormulas(Collection<Term> formulas, Solver usingSolver) {
     Preconditions.checkState(!closed);
     Preconditions.checkArgument(!formulas.isEmpty());
 
@@ -269,8 +280,8 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
       return formula;
     }
 
-    return interpolationSolver.mkTerm(
-        Kind.AND, formula, buildConjunctionOfFormulas(removedFormulas));
+    return usingSolver
+        .mkTerm(Kind.AND, formula, buildConjunctionOfFormulas(removedFormulas, usingSolver));
   }
 
   /**
