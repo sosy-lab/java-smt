@@ -32,7 +32,6 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
   private final FormulaManager mgr;
   private final Set<ProverOptions> solverOptions;
   private final int seed;
-  // Solver interpolationSolver = new Solver();
 
   CVC5InterpolatingProver(
       CVC5FormulaCreator pFormulaCreator,
@@ -173,6 +172,24 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
   /**
    * Interpolates a Tuple of Interpolants according to Craig-Interpolation using CVC5-Interpolation.
    *
+   * <p>CVC5's getInterpolant: There is a Model, such that the Interpolant I, with A -> I = True
+   * (1CVC5) and I -> B = True (2CVC5).
+   *
+   * <p>Craig Interpolation: There is a Model, such that the Interpolant psi, with phi- -> psi =
+   * True (1Craig), not(psi /\ phi+) = True (2Craig).
+   *
+   * <p>With A current set of assertions and B Formulas to interpolate.
+   *
+   * <p>CVC5 -> Craig Interpolation:
+   *
+   * <p>(1CVC5) <=> (1Craig) due to subst of A with phi- and reflexivity.
+   *
+   * <p>(2CVC5) <=> I -> B = True <=> (not I) \/ B = True <=> not (I /\ (not B)) = True <=> (2Craig)
+   * due to subst of (not B) with phi+ and reflexivity.
+   *
+   * <p>Hence, CVC5's Interpolation produces an equivalent Interpolation to Craig Interpolation, if
+   * B is negated during CVC5 Interpolation.
+   *
    * @param assertedInterpols Asserted Formulas
    * @param addedInterpols Formulas to Interpolate
    * @return Interpolation of the Interpolation Pair following the definition of
@@ -193,7 +210,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     Term extraAssert = new Term();
 
     Solver interpolationSolver = new Solver(); // Uses a separate Solver instance to leave to
-                                               // original solver-context unmodified
+    // original solver-context unmodified
 
     setSolverOptions(seed, solverOptions, interpolationSolver);
 
@@ -203,18 +220,14 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
       extraAssert = buildConjunctionOfFormulas(extraAssertions, interpolationSolver);
     }
 
-    Term phim = buildConjunctionOfFormulasOverArray(assertedInterpols, interpolationSolver);
-    Term phip = buildConjunctionOfFormulasOverArray(addedInterpols, interpolationSolver);
+    Term A = buildConjunctionOfFormulasOverArray(assertedInterpols, interpolationSolver);
+    Term B = buildConjunctionOfFormulasOverArray(addedInterpols, interpolationSolver);
 
     interpolationSolver.resetAssertions();
 
-    interpolationSolver.assertFormula(interpolationSolver.mkTerm(Kind.AND, extraAssert, phim));
+    interpolationSolver.assertFormula(interpolationSolver.mkTerm(Kind.AND, extraAssert, A));
 
-    // with Phip negated, CVC5 Interpolation produces an equivalent interpolation to
-    // Craig-Interpolation
-
-    Term interpolant =
-        interpolationSolver.getInterpolant(interpolationSolver.mkTerm(Kind.NOT, phip));
+    Term interpolant = interpolationSolver.getInterpolant(interpolationSolver.mkTerm(Kind.NOT, B));
 
     interpolationSolver.deletePointer();
 
@@ -247,8 +260,8 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
    * @param usingSolver the CVC5 Solver Instance to use
    * @return concatenated Formulas with AND as CVC5 Term
    */
-  private Term
-      buildConjunctionOfFormulasOverArray(ArrayList<Collection<Term>> formula, Solver usingSolver) {
+  private Term buildConjunctionOfFormulasOverArray(
+      ArrayList<Collection<Term>> formula, Solver usingSolver) {
     Collection<Term> currColTerm = formula.get(0);
     formula.remove(0);
     if (formula.size() == 0) {
@@ -280,8 +293,8 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
       return formula;
     }
 
-    return usingSolver
-        .mkTerm(Kind.AND, formula, buildConjunctionOfFormulas(removedFormulas, usingSolver));
+    return usingSolver.mkTerm(
+        Kind.AND, formula, buildConjunctionOfFormulas(removedFormulas, usingSolver));
   }
 
   /**
