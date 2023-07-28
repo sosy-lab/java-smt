@@ -32,6 +32,7 @@ import org.sosy_lab.java_smt.delegate.synchronize.SynchronizedSolverContext;
 import org.sosy_lab.java_smt.solvers.boolector.BoolectorSolverContext;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4SolverContext;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5SolverContext;
+import org.sosy_lab.java_smt.solvers.dreal4.DReal4SolverContext;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5SolverContext;
 import org.sosy_lab.java_smt.solvers.princess.PrincessSolverContext;
 import org.sosy_lab.java_smt.solvers.smtinterpol.SmtInterpolSolverContext;
@@ -282,6 +283,10 @@ public class SolverContextFactory {
 
       case BOOLECTOR:
         return BoolectorSolverContext.create(config, shutdownNotifier, logfile, randomSeed, loader);
+
+      case DREAL4:
+        return DReal4SolverContext.create(logger, shutdownNotifier, (int) randomSeed,
+            nonLinearArithmetic);
 
       default:
         throw new AssertionError("no solver selected");

@@ -52,8 +52,7 @@ public class DReal4SolverContext extends AbstractSolverContext {
       LogManager pLogger,
       ShutdownNotifier pShutdownNotifier,
       int randomSeed,
-      NonLinearArithmetic pNonLinearArithmetic,
-      FloatingPointRoundingMode pFloatingPointRoundingMode
+      NonLinearArithmetic pNonLinearArithmetic
       ) {
 
     // Create config
