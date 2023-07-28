@@ -103,7 +103,7 @@ public abstract class DReal4NumeralFormulaManager<
           pParam1.getType(), ExpressionKind.Add);
     } else if (pParam1.isVar() && pParam2.isVar()) {
       return new DRealTerm<>(dreal.Add(new Expression(pParam1.getVariable()),
-          new Expression(pParam1.getVariable())), pParam1.getType(), ExpressionKind.Add);
+          new Expression(pParam2.getVariable())), pParam1.getType(), ExpressionKind.Add);
     } else if (pParam1.isExp() && pParam2.isVar()) {
       return new DRealTerm<>(dreal.Add(pParam1.getExpression(),
           new Expression(pParam2.getVariable())), pParam1.getType(), ExpressionKind.Add);
@@ -123,7 +123,7 @@ public abstract class DReal4NumeralFormulaManager<
           pParam2.getExpression()), pParam1.getType(), ExpressionKind.Add);
     } else if (pParam1.isVar() && pParam2.isVar()) {
       return new DRealTerm<>(dreal.Substract(new Expression(pParam1.getVariable()),
-          new Expression(pParam1.getVariable())), pParam1.getType(), ExpressionKind.Add);
+          new Expression(pParam2.getVariable())), pParam1.getType(), ExpressionKind.Add);
     } else if (pParam1.isExp() && pParam2.isVar()) {
       return new DRealTerm<>(dreal.Substract(pParam1.getExpression(),
           new Expression(pParam2.getVariable())), pParam1.getType(), ExpressionKind.Add);
