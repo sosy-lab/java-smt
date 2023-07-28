@@ -55,7 +55,8 @@ public class SolverContextFactory {
     BOOLECTOR,
     CVC4,
     CVC5,
-    YICES2
+    YICES2,
+    BITWUZLA
   }
 
   @Option(secure = true, description = "Export solver queries in SmtLib format into a file.")
