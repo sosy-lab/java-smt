@@ -124,6 +124,52 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
+  public void testSubstitutionMultipleInstances() throws SolverException, InterruptedException {
+    requireSubstitution();
+    requireIntegers();
+
+    IntegerFormula a = imgr.makeVariable("a");
+    IntegerFormula b = imgr.makeVariable("b");
+    IntegerFormula num12 = imgr.makeNumber(12);
+    BooleanFormula input = imgr.lessThan(num12, imgr.add(imgr.add(imgr.add(a, a), a), b));
+
+    ImmutableMap<IntegerFormula, IntegerFormula> substitution = ImmutableMap.of(a, b);
+    BooleanFormula out = mgr.substitute(input, substitution);
+    assertThatFormula(out)
+        .isEquivalentTo(imgr.lessThan(num12, imgr.add(imgr.add(imgr.add(b, b), b), b)));
+
+    BooleanFormula out2 = mgr.substitute(out, substitution);
+    assertThatFormula(out2).isEquivalentTo(out);
+  }
+
+  @Test
+  public void testSubstitutionSelfReference() throws SolverException, InterruptedException {
+    requireSubstitution();
+    requireIntegers();
+
+    IntegerFormula a = imgr.makeVariable("a");
+    IntegerFormula num1 = imgr.makeNumber(1);
+    IntegerFormula incremented = imgr.add(a, num1);
+    BooleanFormula input = imgr.lessThan(num1, a);
+
+    ImmutableMap<IntegerFormula, IntegerFormula> substitution = ImmutableMap.of(a, incremented);
+    BooleanFormula out1 = mgr.substitute(input, substitution);
+    assertThatFormula(out1).isEquivalentTo(imgr.lessThan(num1, imgr.add(a, num1)));
+
+    BooleanFormula out2 = mgr.substitute(out1, substitution);
+    assertThatFormula(out2).isEquivalentTo(imgr.lessThan(num1, imgr.add(imgr.add(a, num1), num1)));
+
+    BooleanFormula out3 = mgr.substitute(out2, substitution);
+    assertThatFormula(out3)
+        .isEquivalentTo(imgr.lessThan(num1, imgr.add(imgr.add(imgr.add(a, num1), num1), num1)));
+
+    BooleanFormula out4 = mgr.substitute(out3, substitution);
+    assertThatFormula(out4)
+        .isEquivalentTo(
+            imgr.lessThan(num1, imgr.add(imgr.add(imgr.add(imgr.add(a, num1), num1), num1), num1)));
+  }
+
+  @Test
   public void formulaEqualsAndHashCode() {
     // Solvers without integers (Boolector) get their own test below
     assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
