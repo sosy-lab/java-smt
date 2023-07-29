@@ -33,8 +33,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
 
   @Test
   public void testEmptySubstitution() throws SolverException, InterruptedException {
-    // Boolector does not support substitution
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
+    requireSubstitution();
     assume().withMessage("Princess fails").that(solver).isNotEqualTo(Solvers.PRINCESS);
 
     IntegerFormula variable1 = imgr.makeVariable("variable1");
@@ -54,8 +53,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
 
   @Test
   public void testNoSubstitution() throws SolverException, InterruptedException {
-    // Boolector does not support substitution
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
+    requireSubstitution();
     assume().withMessage("Princess fails").that(solver).isNotEqualTo(Solvers.PRINCESS);
 
     IntegerFormula variable1 = imgr.makeVariable("variable1");
@@ -81,8 +79,8 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
 
   @Test
   public void testSubstitution() throws SolverException, InterruptedException {
-    // Boolector does not support substitution
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
+    requireSubstitution();
+
     BooleanFormula input =
         bmgr.or(
             bmgr.and(bmgr.makeVariable("a"), bmgr.makeVariable("b")),
@@ -103,8 +101,8 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
 
   @Test
   public void testSubstitutionTwice() throws SolverException, InterruptedException {
-    // Boolector does not support substitution
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
+    requireSubstitution();
+
     BooleanFormula input =
         bmgr.or(
             bmgr.and(bmgr.makeVariable("a"), bmgr.makeVariable("b")),
