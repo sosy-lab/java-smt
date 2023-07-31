@@ -134,6 +134,7 @@ public class SolverContextTest extends SolverBasedTest0.ParameterizedSolverBased
     }
   }
 
+  @SuppressWarnings("resource")
   @Test
   public void testProverCopyCloseInitialProver() throws SolverException, InterruptedException {
     requireProverCopying();
