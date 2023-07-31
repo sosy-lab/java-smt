@@ -37,7 +37,7 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
       ImmutableMap<String, Object> pSolverOptions,
       @Nullable PathCounterTemplate pLogfile,
       ShutdownNotifier pShutdownNotifier) {
-    super(creator, pMgr, pOptions, pSolverOptions, pLogfile, pShutdownNotifier);
+    super(creator, pMgr, pZ3solver, pOptions, pSolverOptions, pLogfile, pShutdownNotifier);
   }
 
   @Override
