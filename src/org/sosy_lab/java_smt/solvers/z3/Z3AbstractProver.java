@@ -45,6 +45,7 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
   protected final long z3context;
   private final Z3FormulaManager mgr;
 
+  // m_n_obj in Z3
   protected final long z3solver;
 
   private final UniqueIdGenerator trackId = new UniqueIdGenerator();
@@ -73,6 +74,34 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
     logfile = pLogfile;
     mgr = pMgr;
+    postProcessProverCreation(pSolverOptions);
+  }
+
+  Z3AbstractProver(
+      Z3FormulaCreator pCreator,
+      Z3FormulaManager pMgr,
+      final long pZ3solver,
+      Set<ProverOptions> pOptions,
+      ImmutableMap<String, Object> pSolverOptions,
+      @Nullable PathCounterTemplate pLogfile,
+      ShutdownNotifier pShutdownNotifier) {
+    super(pOptions, pMgr.getBooleanFormulaManager(), pShutdownNotifier);
+    creator = pCreator;
+    z3context = creator.getEnv();
+    z3solver = pZ3solver;
+
+    interruptListener = reason -> Native.solverInterrupt(z3context, z3solver);
+    shutdownNotifier.register(interruptListener);
+    storedConstraints =
+        pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE) ? new HashMap<>() : null;
+
+    logfile = pLogfile;
+    mgr = pMgr;
+
+    postProcessProverCreation(pSolverOptions);
+  }
+
+  private void postProcessProverCreation(ImmutableMap<String, Object> pSolverOptions) {
     Native.solverIncRef(z3context, z3solver);
 
     long z3params = Native.mkParams(z3context);
@@ -351,5 +380,9 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   protected void assertContraint(long negatedModel) {
     Native.solverAssert(z3context, z3solver, negatedModel);
+  }
+
+  protected final long getZ3Solver() {
+    return z3solver;
   }
 }

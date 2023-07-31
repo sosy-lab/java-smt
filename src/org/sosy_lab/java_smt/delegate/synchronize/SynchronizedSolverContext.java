@@ -94,6 +94,24 @@ public class SynchronizedSolverContext implements SolverContext {
     }
   }
 
+  @Override
+  public ProverEnvironment copyProverEnvironment(
+      ProverEnvironment proverToCopy, ProverOptions... options) {
+    synchronized (sync) {
+      if (useSeperateProvers) {
+        SolverContext otherContext = createOtherContext();
+        return new SynchronizedProverEnvironmentWithContext(
+            otherContext.copyProverEnvironment(proverToCopy, options),
+            sync,
+            delegate.getFormulaManager(),
+            otherContext.getFormulaManager());
+      } else {
+        return new SynchronizedProverEnvironment(
+            delegate.copyProverEnvironment(proverToCopy, options), delegate);
+      }
+    }
+  }
+
   @SuppressWarnings("resource")
   @Override
   public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation(
@@ -109,6 +127,24 @@ public class SynchronizedSolverContext implements SolverContext {
       } else {
         return new SynchronizedInterpolatingProverEnvironment<>(
             delegate.newProverEnvironmentWithInterpolation(pOptions), delegate);
+      }
+    }
+  }
+
+  @Override
+  public InterpolatingProverEnvironment<?> copyProverEnvironmentWithInterpolation(
+      ProverEnvironment proverToCopy, ProverOptions... options) {
+    synchronized (sync) {
+      if (useSeperateProvers) {
+        SolverContext otherContext = createOtherContext();
+        return new SynchronizedInterpolatingProverEnvironmentWithContext<>(
+            otherContext.copyProverEnvironmentWithInterpolation(proverToCopy, options),
+            sync,
+            delegate.getFormulaManager(),
+            otherContext.getFormulaManager());
+      } else {
+        return new SynchronizedInterpolatingProverEnvironment<>(
+            delegate.copyProverEnvironmentWithInterpolation(proverToCopy, options), delegate);
       }
     }
   }

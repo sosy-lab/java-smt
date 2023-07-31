@@ -267,10 +267,24 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
   }
 
   @Override
+  protected ProverEnvironment copyProverEnvironment0(
+      ProverEnvironment proverToCopy, Set<ProverOptions> options) {
+    throw new UnsupportedOperationException(
+        "MathSAT5 does not support copying of prover " + "environments");
+  }
+
+  @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
     return new Mathsat5InterpolatingProver(this, shutdownNotifier, creator, options);
+  }
+
+  @Override
+  protected InterpolatingProverEnvironment<?> copyProverEnvironmentWithInterpolation0(
+      ProverEnvironment proverToCopy, Set<ProverOptions> pSet) {
+    throw new UnsupportedOperationException(
+        "MathSAT5 does not support copying of prover " + "environments");
   }
 
   @Override

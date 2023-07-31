@@ -231,6 +231,13 @@ public final class SmtInterpolSolverContext extends AbstractSolverContext {
     return new SmtInterpolTheoremProver(manager, newScript, options, shutdownNotifier);
   }
 
+  @Override
+  protected ProverEnvironment copyProverEnvironment0(
+      ProverEnvironment proverToCopy, Set<ProverOptions> options) {
+    throw new UnsupportedOperationException(
+        "SMTInterpol does not support the copying of " + "ProverEnvironments");
+  }
+
   @SuppressWarnings("resource")
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
@@ -250,6 +257,13 @@ public final class SmtInterpolSolverContext extends AbstractSolverContext {
               settings.smtLogfile.getFreshPath());
     }
     return prover;
+  }
+
+  @Override
+  protected InterpolatingProverEnvironment<?> copyProverEnvironmentWithInterpolation0(
+      ProverEnvironment proverToCopy, Set<ProverOptions> pSet) {
+    throw new UnsupportedOperationException(
+        "SMTInterpol does not support the copying of " + "ProverEnvironments");
   }
 
   @Override

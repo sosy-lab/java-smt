@@ -66,6 +66,18 @@ public interface SolverContext extends AutoCloseable {
   ProverEnvironment newProverEnvironment(ProverOptions... options);
 
   /**
+   * Create a new {@link ProverEnvironment} which encapsulates an assertion stack and can be used to
+   * check formulas for unsatisfiability, but retains the current assertion stack of the given
+   * {@link ProverEnvironment}.
+   *
+   * @param proverToCopy An existing {@link ProverEnvironment}, whichs assertion stack is to be
+   *     copied into the new one.
+   * @param options Options specified for the prover environment. All the options specified in
+   *     {@link ProverOptions} are turned off by default.
+   */
+  ProverEnvironment copyProverEnvironment(ProverEnvironment proverToCopy, ProverOptions... options);
+
+  /**
    * Create a fresh new {@link InterpolatingProverEnvironment} which encapsulates an assertion stack
    * and allows generating and retrieve interpolants for unsatisfiable formulas. If the SMT solver
    * is able to handle satisfiability tests with assumptions please consider implementing the {@link
@@ -75,6 +87,22 @@ public interface SolverContext extends AutoCloseable {
    *     {@link ProverOptions} are turned off by default.
    */
   InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation(ProverOptions... options);
+
+  /**
+   * Create a fresh new {@link InterpolatingProverEnvironment} which encapsulates an assertion stack
+   * and allows generating and retrieve interpolants for unsatisfiable formulas. The new {@link
+   * ProverEnvironment} retains the current assertion stack of the given {@link ProverEnvironment}.
+   * If the SMT solver is able to handle satisfiability tests with assumptions please consider
+   * implementing the {@link InterpolatingProverEnvironment} interface, and return an Object of this
+   * type here.
+   *
+   * @param proverToCopy An existing {@link ProverEnvironment}, whichs assertion stack is to be
+   *     copied into the new one.
+   * @param options Options specified for the prover environment. All the options specified in
+   *     {@link ProverOptions} are turned off by default.
+   */
+  InterpolatingProverEnvironment<?> copyProverEnvironmentWithInterpolation(
+      ProverEnvironment proverToCopy, ProverOptions... options);
 
   /**
    * Create a fresh new {@link OptimizationProverEnvironment} which encapsulates an assertion stack

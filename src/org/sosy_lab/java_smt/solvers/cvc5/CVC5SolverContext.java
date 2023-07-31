@@ -158,6 +158,13 @@ public final class CVC5SolverContext extends AbstractSolverContext {
   }
 
   @Override
+  protected ProverEnvironment copyProverEnvironment0(
+      ProverEnvironment proverToCopy, Set<ProverOptions> options) {
+    throw new UnsupportedOperationException(
+        "CVC5 does not support the copying of " + "ProverEnvironments");
+  }
+
+  @Override
   protected boolean supportsAssumptionSolving() {
     return false;
   }
@@ -166,6 +173,13 @@ public final class CVC5SolverContext extends AbstractSolverContext {
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> pOptions) {
     throw new UnsupportedOperationException("CVC5 does not support Craig interpolation.");
+  }
+
+  @Override
+  protected InterpolatingProverEnvironment<?> copyProverEnvironmentWithInterpolation0(
+      ProverEnvironment proverToCopy, Set<ProverOptions> pSet) {
+    throw new UnsupportedOperationException(
+        "CVC5 does not support the copying of " + "ProverEnvironments");
   }
 
   @Override

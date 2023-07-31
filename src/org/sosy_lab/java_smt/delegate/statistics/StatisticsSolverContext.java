@@ -39,12 +39,26 @@ public class StatisticsSolverContext implements SolverContext {
     return new StatisticsProverEnvironment(delegate.newProverEnvironment(pOptions), stats);
   }
 
+  @Override
+  public ProverEnvironment copyProverEnvironment(
+      ProverEnvironment proverToCopy, ProverOptions... options) {
+    return new StatisticsProverEnvironment(
+        delegate.copyProverEnvironment(proverToCopy, options), stats);
+  }
+
   @SuppressWarnings("resource")
   @Override
   public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation(
       ProverOptions... pOptions) {
     return new StatisticsInterpolatingProverEnvironment<>(
         delegate.newProverEnvironmentWithInterpolation(pOptions), stats);
+  }
+
+  @Override
+  public InterpolatingProverEnvironment<?> copyProverEnvironmentWithInterpolation(
+      ProverEnvironment proverToCopy, ProverOptions... options) {
+    return new StatisticsInterpolatingProverEnvironment<>(
+        delegate.copyProverEnvironmentWithInterpolation(proverToCopy, options), stats);
   }
 
   @SuppressWarnings("resource")

@@ -41,12 +41,28 @@ public final class LoggingSolverContext implements SolverContext {
     return new LoggingProverEnvironment(logger, delegate.newProverEnvironment(pOptions));
   }
 
+  @Override
+  public ProverEnvironment copyProverEnvironment(
+      ProverEnvironment proverToCopy, ProverOptions... options) {
+    // TODO: log this? Because this is not a normal new prover?
+    return new LoggingProverEnvironment(
+        logger, delegate.copyProverEnvironment(proverToCopy, options));
+  }
+
   @SuppressWarnings("resource")
   @Override
   public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation(
       ProverOptions... options) {
     return new LoggingInterpolatingProverEnvironment<>(
         logger, delegate.newProverEnvironmentWithInterpolation(options));
+  }
+
+  @Override
+  public InterpolatingProverEnvironment<?> copyProverEnvironmentWithInterpolation(
+      ProverEnvironment proverToCopy, ProverOptions... options) {
+    // TODO: log this? Because this is not a normal new prover?
+    return new LoggingInterpolatingProverEnvironment<>(
+        logger, delegate.copyProverEnvironmentWithInterpolation(proverToCopy, options));
   }
 
   @SuppressWarnings("resource")

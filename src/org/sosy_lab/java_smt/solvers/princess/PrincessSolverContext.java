@@ -77,12 +77,26 @@ public final class PrincessSolverContext extends AbstractSolverContext {
     return (PrincessTheoremProver) creator.getEnv().getNewProver(false, manager, creator, options);
   }
 
+  @Override
+  protected ProverEnvironment copyProverEnvironment0(
+      ProverEnvironment proverToCopy, Set<ProverOptions> options) {
+    throw new UnsupportedOperationException(
+        "Princess does not support the copying of " + "ProverEnvironments");
+  }
+
   @SuppressWarnings("resource")
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> options) {
     return (PrincessInterpolatingProver)
         creator.getEnv().getNewProver(true, manager, creator, options);
+  }
+
+  @Override
+  protected InterpolatingProverEnvironment<?> copyProverEnvironmentWithInterpolation0(
+      ProverEnvironment proverToCopy, Set<ProverOptions> pSet) {
+    throw new UnsupportedOperationException(
+        "Princess does not support the copying of " + "ProverEnvironments");
   }
 
   @Override

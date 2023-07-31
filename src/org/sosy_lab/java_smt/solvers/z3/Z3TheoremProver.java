@@ -29,6 +29,17 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
     super(creator, pMgr, pOptions, pSolverOptions, pLogfile, pShutdownNotifier);
   }
 
+  Z3TheoremProver(
+      Z3FormulaCreator creator,
+      Z3FormulaManager pMgr,
+      final long pZ3solver,
+      Set<ProverOptions> pOptions,
+      ImmutableMap<String, Object> pSolverOptions,
+      @Nullable PathCounterTemplate pLogfile,
+      ShutdownNotifier pShutdownNotifier) {
+    super(creator, pMgr, pOptions, pSolverOptions, pLogfile, pShutdownNotifier);
+  }
+
   @Override
   @Nullable
   public Void addConstraint(BooleanFormula f) throws InterruptedException {
