@@ -126,19 +126,23 @@ public class SolverContextTest extends SolverBasedTest0.ParameterizedSolverBased
   @Test
   public void testProverCopying() throws SolverException, InterruptedException {
     requireProverCopying();
-    ProverEnvironment prover = context.newProverEnvironment();
-    assertThat(prover.isUnsat()).isFalse();
-    ProverEnvironment copiedProver = context.copyProverEnvironment(prover);
-    assertThat(copiedProver.isUnsat()).isFalse();
+    try (ProverEnvironment prover = context.newProverEnvironment()) {
+      assertThat(prover.isUnsat()).isFalse();
+      try (ProverEnvironment copiedProver = context.copyProverEnvironment(prover)) {
+        assertThat(copiedProver.isUnsat()).isFalse();
+      }
+    }
   }
 
   @Test
   public void testProverCopyCloseInitialProver() throws SolverException, InterruptedException {
     requireProverCopying();
-    ProverEnvironment prover = context.newProverEnvironment();
-    ProverEnvironment copiedProver = context.copyProverEnvironment(prover);
-    prover.close();
-    assertThat(copiedProver.isUnsat()).isFalse();
+    try (ProverEnvironment prover = context.newProverEnvironment()) {
+      try (ProverEnvironment copiedProver = context.copyProverEnvironment(prover)) {
+        prover.close();
+        assertThat(copiedProver.isUnsat()).isFalse();
+      }
+    }
   }
 
   /*
@@ -149,24 +153,26 @@ public class SolverContextTest extends SolverBasedTest0.ParameterizedSolverBased
     requireProverCopying();
     IntegerFormula x = imgr.makeVariable("x");
     IntegerFormula one = imgr.makeNumber("1");
-    ProverEnvironment prover = context.newProverEnvironment();
-    BooleanFormula sat = bmgr.and(imgr.equal(x, one), imgr.greaterOrEquals(x, one));
-    BooleanFormula f = bmgr.makeFalse();
-    prover.push();
-    prover.addConstraint(sat);
-    assertThat(prover.isUnsat()).isFalse();
-    prover.push();
-    prover.addConstraint(f);
-    assertThat(prover.isUnsat()).isTrue();
+    try (ProverEnvironment prover = context.newProverEnvironment()) {
+      BooleanFormula sat = bmgr.and(imgr.equal(x, one), imgr.greaterOrEquals(x, one));
+      BooleanFormula f = bmgr.makeFalse();
+      prover.push();
+      prover.addConstraint(sat);
+      assertThat(prover.isUnsat()).isFalse();
+      prover.push();
+      prover.addConstraint(f);
+      assertThat(prover.isUnsat()).isTrue();
 
-    ProverEnvironment copiedProver = context.copyProverEnvironment(prover);
-    assertThat(copiedProver.isUnsat()).isTrue();
-    copiedProver.pop();
-    assertThat(copiedProver.isUnsat()).isFalse();
-    copiedProver.pop();
-    assertThat(copiedProver.isUnsat()).isFalse();
+      try (ProverEnvironment copiedProver = context.copyProverEnvironment(prover)) {
+        assertThat(copiedProver.isUnsat()).isTrue();
+        copiedProver.pop();
+        assertThat(copiedProver.isUnsat()).isFalse();
+        copiedProver.pop();
+        assertThat(copiedProver.isUnsat()).isFalse();
 
-    // Test that the initial prover is unaffected
-    assertThat(prover.isUnsat()).isTrue();
+        // Test that the initial prover is unaffected
+        assertThat(prover.isUnsat()).isTrue();
+      }
+    }
   }
 }
