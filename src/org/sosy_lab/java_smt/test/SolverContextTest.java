@@ -137,11 +137,10 @@ public class SolverContextTest extends SolverBasedTest0.ParameterizedSolverBased
   @Test
   public void testProverCopyCloseInitialProver() throws SolverException, InterruptedException {
     requireProverCopying();
-    try (ProverEnvironment prover = context.newProverEnvironment()) {
-      try (ProverEnvironment copiedProver = context.copyProverEnvironment(prover)) {
-        prover.close();
-        assertThat(copiedProver.isUnsat()).isFalse();
-      }
+    ProverEnvironment prover = context.newProverEnvironment();
+    try (ProverEnvironment copiedProver = context.copyProverEnvironment(prover)) {
+      prover.close();
+      assertThat(copiedProver.isUnsat()).isFalse();
     }
   }
 
