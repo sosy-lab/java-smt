@@ -149,6 +149,7 @@ public class SolverContextTest extends SolverBasedTest0.ParameterizedSolverBased
    * Create a prover, push a SAT and an UNSAT formula on 2 levels, copy the prover, check that
    * the stack is copied correctly.
    */
+  @Test
   public void testProverCopyWithStackAndAssertions() throws InterruptedException, SolverException {
     requireProverCopying();
     IntegerFormula x = imgr.makeVariable("x");
