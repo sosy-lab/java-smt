@@ -223,7 +223,7 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
       yices_free_context(curEnv);
       yices_free_config(curCfg);
       constraintStack.clear();
-      closed = true;
     }
+    super.close();
   }
 }

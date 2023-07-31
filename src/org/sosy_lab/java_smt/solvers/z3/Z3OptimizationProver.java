@@ -206,9 +206,10 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
 
   @Override
   public void close() {
-    Preconditions.checkState(!closed);
-    Native.optimizeDecRef(z3context, z3optSolver);
-    closed = true;
+    if (!closed) {
+      Native.optimizeDecRef(z3context, z3optSolver);
+    }
+    super.close();
   }
 
   /**

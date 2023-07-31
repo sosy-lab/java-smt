@@ -78,9 +78,9 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
       // You can't use delete here because you wouldn't be able to access model
       // Wait till we have visitor/toList, after that we can delete here
       // BtorJNI.boolector_delete(btor);
-      closed = true;
       Preconditions.checkState(isAnyStackAlive.getAndSet(false));
     }
+    super.close();
   }
 
   /*

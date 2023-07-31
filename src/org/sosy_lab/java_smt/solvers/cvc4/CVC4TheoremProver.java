@@ -267,7 +267,6 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
       exportMapping.delete();
       // smtEngine.delete();
       exprManager.delete();
-      closed = true;
     }
     super.close();
   }

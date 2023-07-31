@@ -326,9 +326,8 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
       Native.solverDecRef(z3context, z3solver);
 
       shutdownNotifier.unregister(interruptListener);
-
-      closed = true;
     }
+    super.close();
   }
 
   @Override

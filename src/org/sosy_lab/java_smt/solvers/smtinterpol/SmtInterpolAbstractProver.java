@@ -43,7 +43,6 @@ import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 @SuppressWarnings("ClassTypeParameterName")
 abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
 
-  protected boolean closed = false;
   protected final Script env;
   protected final FormulaCreator<Term, Sort, Script, FunctionSymbol> creator;
   protected final SmtInterpolFormulaManager mgr;
@@ -208,8 +207,8 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
       assertedFormulas.clear();
       annotatedTerms.clear();
       env.pop(assertedFormulas.size());
-      closed = true;
     }
+    super.close();
   }
 
   @Override

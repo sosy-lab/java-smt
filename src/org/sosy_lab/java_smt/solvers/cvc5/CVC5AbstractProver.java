@@ -229,7 +229,6 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     if (!closed) {
       assertedFormulas.clear();
       solver.deletePointer();
-      closed = true;
     }
     super.close();
   }

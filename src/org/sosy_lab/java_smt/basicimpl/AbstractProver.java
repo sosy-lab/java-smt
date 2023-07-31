@@ -22,6 +22,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   protected final boolean generateUnsatCores;
   private final boolean generateUnsatCoresOverAssumptions;
   protected final boolean enableSL;
+  protected boolean closed = false;
 
   private final Set<Evaluator> evaluators = new LinkedHashSet<>();
 
@@ -80,5 +81,6 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   @Override
   public void close() {
     closeAllEvaluators();
+    closed = true;
   }
 }

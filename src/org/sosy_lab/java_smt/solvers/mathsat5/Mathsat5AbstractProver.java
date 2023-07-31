@@ -58,7 +58,6 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   private final long curConfig;
   private final long terminationTest;
   protected final Mathsat5FormulaCreator creator;
-  protected boolean closed = false;
   private final ShutdownNotifier shutdownNotifier;
 
   protected Mathsat5AbstractProver(
@@ -207,9 +206,12 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
       msat_destroy_env(curEnv);
       msat_free_termination_callback(terminationTest);
       msat_destroy_config(curConfig);
-      closed = true;
     }
     super.close();
+  }
+
+  protected boolean isClosed() {
+    return closed;
   }
 
   @Override

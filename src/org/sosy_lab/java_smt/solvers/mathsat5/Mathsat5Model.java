@@ -50,7 +50,7 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
   @Override
   public ImmutableList<ValueAssignment> asList() {
     Preconditions.checkState(!isClosed());
-    Preconditions.checkState(!prover.closed, "cannot use model after prover is closed");
+    Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
     ImmutableList.Builder<ValueAssignment> assignments = ImmutableList.builder();
 
     long modelIterator = msat_model_create_iterator(model);
@@ -136,7 +136,7 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
   @Override
   protected Long evalImpl(Long formula) {
     Preconditions.checkState(!isClosed());
-    Preconditions.checkState(!prover.closed, "cannot use model after prover is closed");
+    Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
     return msat_model_eval(model, formula);
   }
 }
