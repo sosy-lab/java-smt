@@ -71,6 +71,9 @@ SPDX-License-Identifier: Apache-2.0
         <!-- Copy swig file to the install directory -->
         <copy file="${path.source}/opensmt.i" toFile="${path.install}/opensmt.i"/>
         
+        <!-- Dump ${opensmt.version} to a file so that we can use it from swig -->
+        <echo file="${path.install}/Version.h">#define VERSION "${opensmt.version}"</echo>
+
         <!-- Run swig to generate java proxies and the jni wrapper -->
         <mkdir dir="${path.install}/java/opensmt"/>
         <exec executable="swig" dir="${path.install}" failonerror="true">

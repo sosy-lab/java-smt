@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.solvers.opensmt;
 import com.google.common.base.Preconditions;
 import java.util.Set;
 import java.util.function.Consumer;
+import opensmt.LogicFactory;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Logics;
@@ -95,9 +96,7 @@ public class OpenSmtSolverContext extends AbstractSolverContext {
 
   @Override
   public String getVersion() {
-    // FIXME: OpenSMT does not provide a way to read the version number. We'll have to patch the
-    // source or get it from the lib
-    throw new UnsupportedOperationException();
+    return "OpenSMT " + LogicFactory.getVersion();
   }
 
   @Override

@@ -8,6 +8,7 @@
 
 %module OsmtNative
 %{
+#include "Version.h"
 #include "include/opensmt/Opensmt.h"
 %}
 
@@ -102,6 +103,12 @@
 %newobject LogicFactory::getLRAInstance();
 %newobject LogicFactory::getLIAInstance();
 %newobject LogicFactory::getLogicAll();
+
+%extend opensmt::LogicFactory {
+  static std::string getVersion() {
+    return std::string(VERSION);
+  }
+ }
 
 %include "include/opensmt/LogicFactory.h"
 
