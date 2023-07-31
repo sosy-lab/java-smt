@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.smtinterpol;
 
 import static com.google.common.base.Preconditions.checkState;
+import static org.sosy_lab.common.collect.Collections3.transformedImmutableSetCopy;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.FluentIterable;
@@ -163,7 +164,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
             this,
             model,
             creator,
-            FluentIterable.from(getAssertedFormulas()).transform(mgr::extractInfo).toSet()));
+            transformedImmutableSetCopy(getAssertedFormulas(), mgr::extractInfo)));
   }
 
   protected static String generateTermName() {
