@@ -77,6 +77,7 @@ public abstract class AbstractSolverContext implements SolverContext {
     return out;
   }
 
+  @SuppressWarnings("resource")
   @Override
   public final InterpolatingProverEnvironment<?> copyProverEnvironmentWithInterpolation(
       ProverEnvironment proverToCopy, ProverOptions... options) {

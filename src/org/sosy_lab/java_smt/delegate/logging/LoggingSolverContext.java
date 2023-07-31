@@ -41,6 +41,7 @@ public final class LoggingSolverContext implements SolverContext {
     return new LoggingProverEnvironment(logger, delegate.newProverEnvironment(pOptions));
   }
 
+  @SuppressWarnings("resource")
   @Override
   public ProverEnvironment copyProverEnvironment(
       ProverEnvironment proverToCopy, ProverOptions... options) {
@@ -57,6 +58,7 @@ public final class LoggingSolverContext implements SolverContext {
         logger, delegate.newProverEnvironmentWithInterpolation(options));
   }
 
+  @SuppressWarnings("resource")
   @Override
   public InterpolatingProverEnvironment<?> copyProverEnvironmentWithInterpolation(
       ProverEnvironment proverToCopy, ProverOptions... options) {

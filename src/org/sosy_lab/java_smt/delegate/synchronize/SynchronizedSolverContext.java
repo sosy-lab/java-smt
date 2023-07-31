@@ -94,6 +94,7 @@ public class SynchronizedSolverContext implements SolverContext {
     }
   }
 
+  @SuppressWarnings("resource")
   @Override
   public ProverEnvironment copyProverEnvironment(
       ProverEnvironment proverToCopy, ProverOptions... options) {
@@ -131,6 +132,7 @@ public class SynchronizedSolverContext implements SolverContext {
     }
   }
 
+  @SuppressWarnings("resource")
   @Override
   public InterpolatingProverEnvironment<?> copyProverEnvironmentWithInterpolation(
       ProverEnvironment proverToCopy, ProverOptions... options) {
