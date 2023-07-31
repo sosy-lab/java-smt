@@ -319,6 +319,20 @@ public abstract class SolverBasedTest0 {
         .isNotEqualTo(Solvers.BOOLECTOR);
   }
 
+  protected void requireProverCopying() {
+    assume()
+        .withMessage("Solver %s does not support copying of ProverEnvironments", solverToUse())
+        .that(solverToUse())
+        .isNoneOf(
+            Solvers.CVC4,
+            Solvers.CVC5,
+            Solvers.YICES2,
+            Solvers.BOOLECTOR,
+            Solvers.MATHSAT5,
+            Solvers.PRINCESS,
+            Solvers.SMTINTERPOL);
+  }
+
   /**
    * Use this for checking assertions about BooleanFormulas with Truth: <code>
    * assertThatFormula(formula).is...()</code>.

@@ -14,6 +14,9 @@ import static com.google.common.truth.TruthJUnit.assume;
 import org.junit.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverException;
 
 public class SolverContextTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
@@ -118,5 +121,52 @@ public class SolverContextTest extends SolverBasedTest0.ParameterizedSolverBased
     BooleanFormula opTerm = bmgr.and(notTerm, term2);
     assertThat(bmgr.isTrue(opTerm)).isFalse();
     assertThat(bmgr.isFalse(opTerm)).isFalse();
+  }
+
+  @Test
+  public void testProverCopying() throws SolverException, InterruptedException {
+    requireProverCopying();
+    ProverEnvironment prover = context.newProverEnvironment();
+    assertThat(prover.isUnsat()).isFalse();
+    ProverEnvironment copiedProver = context.copyProverEnvironment(prover);
+    assertThat(copiedProver.isUnsat()).isFalse();
+  }
+
+  @Test
+  public void testProverCopyCloseInitialProver() throws SolverException, InterruptedException {
+    requireProverCopying();
+    ProverEnvironment prover = context.newProverEnvironment();
+    ProverEnvironment copiedProver = context.copyProverEnvironment(prover);
+    prover.close();
+    assertThat(copiedProver.isUnsat()).isFalse();
+  }
+
+  /*
+   * Create a prover, push a SAT and an UNSAT formula on 2 levels, copy the prover, check that
+   * the stack is copied correctly.
+   */
+  public void testProverCopyWithStackAndAssertions() throws InterruptedException, SolverException {
+    requireProverCopying();
+    IntegerFormula x = imgr.makeVariable("x");
+    IntegerFormula one = imgr.makeNumber("1");
+    ProverEnvironment prover = context.newProverEnvironment();
+    BooleanFormula sat = bmgr.and(imgr.equal(x, one), imgr.greaterOrEquals(x, one));
+    BooleanFormula f = bmgr.makeFalse();
+    prover.push();
+    prover.addConstraint(sat);
+    assertThat(prover.isUnsat()).isFalse();
+    prover.push();
+    prover.addConstraint(f);
+    assertThat(prover.isUnsat()).isTrue();
+
+    ProverEnvironment copiedProver = context.copyProverEnvironment(prover);
+    assertThat(copiedProver.isUnsat()).isTrue();
+    copiedProver.pop();
+    assertThat(copiedProver.isUnsat()).isFalse();
+    copiedProver.pop();
+    assertThat(copiedProver.isUnsat()).isFalse();
+
+    // Test that the initial prover is unaffected
+    assertThat(prover.isUnsat()).isTrue();
   }
 }
