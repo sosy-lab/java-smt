@@ -20,7 +20,6 @@ import java.lang.ref.ReferenceQueue;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.IdentityHashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.logging.Level;
@@ -54,7 +53,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
   private boolean closed = false;
 
   private final ReferenceQueue<Long> referenceQueue = new ReferenceQueue<>();
-  private final Map<PhantomReference<Long>, Long> referenceMap = new IdentityHashMap<>();
+  private final IdentityHashMap<PhantomReference<Long>, Long> referenceMap = new IdentityHashMap<>();
 
   private static final String OPT_ENGINE_CONFIG_KEY = "optsmt_engine";
   private static final String OPT_PRIORITY_CONFIG_KEY = "priority";
