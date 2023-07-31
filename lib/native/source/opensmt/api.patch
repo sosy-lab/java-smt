@@ -179,6 +179,26 @@ index 8609ef55..a1aa5240 100644
      if (isZero(divisor)) { throw ArithDivisionByZeroException(); }
      if (isOne(divisor)) { return dividend; }
      if (isMinusOne(divisor)) { return mkNeg(dividend); }
+diff --git a/src/logics/ArithLogic.h b/src/logics/ArithLogic.h
+index 6f2669f9..fa8a7e26 100644
+--- a/src/logics/ArithLogic.h
++++ b/src/logics/ArithLogic.h
+@@ -4,7 +4,7 @@
+ #include "Number.h"
+ #include <numeric>
+ 
+-class LANonLinearException : std::runtime_error
++class LANonLinearException : public std::runtime_error
+ {
+     std::string msg;
+ public:
+@@ -417,4 +417,4 @@ public:
+     bool operator ()  (PTRef x_, PTRef y_) const;
+ 
+ };
+-#endif
+\ No newline at end of file
++#endif
 diff --git a/src/logics/FunctionTools.h b/src/logics/FunctionTools.h
 index fc9dbfb7..943a466d 100644
 --- a/src/logics/FunctionTools.h
@@ -325,6 +345,18 @@ index ef231407..0799d499 100644
  
  // No global variable for storing the push frame id.  I decided to
  // implement this as my own memory allocation.  There's no free though
+diff --git a/src/models/Model.cc b/src/models/Model.cc
+index 1ab10b07..2f182d05 100644
+--- a/src/models/Model.cc
++++ b/src/models/Model.cc
+@@ -114,4 +114,5 @@ TemplateFunction Model::getDefinition(SymRef sr) const {
+         }
+         return TemplateFunction(symName, formalArgs, logic.getSym(sr).rsort(), logic.getDefaultValuePTRef(logic.getSym(sr).rsort()));
+     }
+-}
+\ No newline at end of file
++
++}
 diff --git a/src/sorts/SSort.h b/src/sorts/SSort.h
 index 990da3b0..14922397 100644
 --- a/src/sorts/SSort.h
@@ -350,10 +382,10 @@ index 990da3b0..14922397 100644
  struct SRefHash {
      uint32_t operator () (const SRef& s) const {
 diff --git a/src/symbols/SymRef.h b/src/symbols/SymRef.h
-index 693d332f..d70758cb 100644
+index 693d332f..315cee13 100644
 --- a/src/symbols/SymRef.h
 +++ b/src/symbols/SymRef.h
-@@ -35,8 +35,8 @@ struct SymRef {
+@@ -35,17 +35,19 @@ struct SymRef {
      inline friend bool operator!= (const SymRef& a1, const SymRef& a2) {return a1.x != a2.x; }
  };
  
@@ -364,6 +396,17 @@ index 693d332f..d70758cb 100644
  
  struct SymRefHash {
      uint32_t operator () (const SymRef& s) const {
+         return (uint32_t)s.x; }
+ };
+ 
++/*
+ template <>
+ struct Equal<const SymRef> {
+     bool operator() (const SymRef& s1, const SymRef& s2) { return s1 == s2; }
+ };
++*/
+ 
+ #endif //OPENSMT_SYMREF_H
 diff --git a/src/symbols/SymStore.cc b/src/symbols/SymStore.cc
 index 9b2c3241..a2b06c2d 100644
 --- a/src/symbols/SymStore.cc

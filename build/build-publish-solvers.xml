@@ -79,6 +79,7 @@ SPDX-License-Identifier: Apache-2.0
         <exec executable="swig" dir="${path.install}" failonerror="true">
             <arg value="-java"/>
             <arg value="-c++"/>
+            <arg value="-werror"/>
             <arg value="-package"/>
             <arg value="opensmt"/>
             <arg value="-outdir"/>
