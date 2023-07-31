@@ -152,6 +152,14 @@ public class SolverContextTest extends SolverBasedTest0.ParameterizedSolverBased
   @Test
   public void testProverCopyWithStackAndAssertions() throws InterruptedException, SolverException {
     requireProverCopying();
+
+    assume()
+        .withMessage(
+            "Solver %s does not support prover copying for non-base-level provers",
+            solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3);
+
     IntegerFormula x = imgr.makeVariable("x");
     IntegerFormula one = imgr.makeNumber("1");
     try (ProverEnvironment prover = context.newProverEnvironment()) {
