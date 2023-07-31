@@ -105,14 +105,14 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
 
   @Override
   public List<BooleanFormula> getSeqInterpolants(
-      final List<? extends Collection<Integer>> partitions) throws SolverException {
+      final List<? extends Collection<Integer>> pPartitions) throws SolverException {
     Preconditions.checkState(!closed);
     Preconditions.checkArgument(
-        !partitions.isEmpty(), "at least one partition should be available.");
+        !pPartitions.isEmpty(), "at least one partition should be available.");
 
     // convert to needed data-structure
     final ArrayBuffer<scala.collection.immutable.Set<Object>> args = new ArrayBuffer<>();
-    for (Collection<Integer> partition : partitions) {
+    for (Collection<Integer> partition : pPartitions) {
       args.$plus$eq(asScala(partition).toSet());
     }
 
@@ -128,7 +128,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer, Intege
           "Princess ran out of stack memory, try increasing the stack size.", e);
     }
 
-    assert itps.length() == partitions.size() - 1
+    assert itps.length() == pPartitions.size() - 1
         : "There should be (n-1) interpolants for n partitions";
 
     // convert data-structure back

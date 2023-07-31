@@ -28,8 +28,6 @@ import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import org.sosy_lab.java_smt.solvers.boolector.BtorJNI.TerminationCallback;
 
 abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
-  // BoolectorAbstractProver<E, AF> extends AbstractProverWithAllSat<E>
-  // AF = assertedFormulas; E = ?
 
   /** Boolector does not support multiple solver stacks. */
   private final AtomicBoolean isAnyStackAlive;

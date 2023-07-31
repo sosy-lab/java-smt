@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
+import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
@@ -346,15 +347,19 @@ public class SolverStackTest extends SolverBasedTest0 {
 
     BasicProverEnvironment<?> stack = newEnvironmentForTest(ProverOptions.GENERATE_MODELS);
 
+    assertEquals(0, stack.size());
     stack.push();
+    assertEquals(1, stack.size());
     BooleanFormula q1 = bmgr.makeVariable("q");
     stack.addConstraint(q1);
     assertThat(stack).isSatisfiable();
     Model m1 = stack.getModel();
     assertThat(m1).isNotEmpty();
     stack.pop();
+    assertEquals(0, stack.size());
 
     stack.push();
+    assertEquals(1, stack.size());
     BooleanFormula q2 = bmgr.makeVariable("q");
     assertThat(q2).isEqualTo(q1);
     stack.addConstraint(q1);
@@ -362,6 +367,7 @@ public class SolverStackTest extends SolverBasedTest0 {
     Model m2 = stack.getModel();
     assertThat(m2).isNotEmpty();
     stack.pop();
+    assertEquals(0, stack.size());
   }
 
   @Test
@@ -403,6 +409,7 @@ public class SolverStackTest extends SolverBasedTest0 {
     BooleanFormula a = bmgr.makeVariable("bool_a");
 
     try (BasicProverEnvironment<?> stack = newEnvironmentForTest()) {
+      assertThat(stack.size()).isEqualTo(0);
       stack.push(a);
       assertThat(stack.size()).isEqualTo(1);
       assertThat(stack).isSatisfiable();
