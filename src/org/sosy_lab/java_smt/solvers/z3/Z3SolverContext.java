@@ -265,7 +265,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
         shutdownNotifier);
   }
 
-  private final ImmutableMap<String, Object> generateSolverOptions(Set<ProverOptions> options) {
+  private ImmutableMap<String, Object> generateSolverOptions(Set<ProverOptions> options) {
     return ImmutableMap.<String, Object>builder()
         .put(":random-seed", extraOptions.randomSeed)
         .put(
