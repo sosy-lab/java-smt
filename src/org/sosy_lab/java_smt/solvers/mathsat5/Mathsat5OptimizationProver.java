@@ -19,8 +19,6 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_number;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_objective_value_is_unbounded;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_objective_value_term;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_pop_backtrack_point;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_push_backtrack_point;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_repr;
 
 import java.util.ArrayDeque;
@@ -71,7 +69,8 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
 
   @Override
   @Nullable
-  public Void addConstraint(BooleanFormula constraint) {
+  public Void addConstraint(BooleanFormula constraint) throws InterruptedException {
+    super.addConstraint(constraint);
     msat_assert_formula(curEnv, getMsatTerm(constraint));
     return null;
   }
@@ -105,15 +104,15 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
   }
 
   @Override
-  public void push() {
-    msat_push_backtrack_point(curEnv);
+  public void push() throws InterruptedException {
+    super.push();
     stack.add(objectiveMap);
   }
 
   @Override
   public void pop() {
-    msat_pop_backtrack_point(curEnv);
     objectiveMap = stack.pop();
+    super.pop();
   }
 
   @Override

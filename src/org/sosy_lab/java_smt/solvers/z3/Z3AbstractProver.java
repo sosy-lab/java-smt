@@ -18,12 +18,12 @@ import com.microsoft.z3.enumerations.Z3_lbool;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
@@ -31,6 +31,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.ShutdownNotifier.ShutdownRequestListener;
 import org.sosy_lab.common.UniqueIdGenerator;
+import org.sosy_lab.common.collect.PathCopyingPersistentTreeMap;
+import org.sosy_lab.common.collect.PersistentMap;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
@@ -48,7 +50,7 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
   protected final long z3solver;
 
   private final UniqueIdGenerator trackId = new UniqueIdGenerator();
-  private final @Nullable Map<String, BooleanFormula> storedConstraints;
+  private final Deque<PersistentMap<String, BooleanFormula>> storedConstraints;
 
   private final @Nullable PathCounterTemplate logfile;
 
@@ -68,8 +70,13 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
     interruptListener = reason -> Native.solverInterrupt(z3context, z3solver);
     shutdownNotifier.register(interruptListener);
-    storedConstraints =
-        pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE) ? new HashMap<>() : null;
+
+    if (pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE)) {
+      storedConstraints = new ArrayDeque<>();
+      storedConstraints.push(PathCopyingPersistentTreeMap.of());
+    } else {
+      storedConstraints = null; // we use NULL as flag for "no unsat-core"
+    }
 
     logfile = pLogfile;
     mgr = pMgr;
@@ -195,7 +202,7 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
         BooleanFormula t = mgr.getBooleanFormulaManager().makeVariable(varName);
 
         Native.solverAssertAndTrack(z3context, z3solver, e, creator.extractInfo(t));
-        storedConstraints.put(varName, f);
+        storedConstraints.push(storedConstraints.pop().putAndCopy(varName, f));
         Native.decRef(z3context, e);
       } else {
         assertContraint(e);
@@ -208,27 +215,31 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
     return e;
   }
 
-  @Override
-  public void push() throws InterruptedException {
+  protected void push0() throws InterruptedException {
     Preconditions.checkState(!closed);
-    try {
-      Native.solverPush(z3context, z3solver);
-    } catch (Z3Exception exception) {
-      throw creator.handleZ3Exception(exception);
+    super.push();
+    if (storedConstraints != null) {
+      storedConstraints.push(storedConstraints.peek());
     }
   }
 
-  @Override
-  public void pop() {
+  protected void pop0() {
     Preconditions.checkState(!closed);
-    Preconditions.checkState(Native.solverGetNumScopes(z3context, z3solver) >= 1);
-    Native.solverPop(z3context, z3solver, 1);
+    if (storedConstraints != null) {
+      storedConstraints.pop();
+    }
+    super.pop();
   }
 
   @Override
   public int size() {
     Preconditions.checkState(!closed);
-    return Native.solverGetNumScopes(z3context, z3solver);
+    Preconditions.checkState(
+        Native.solverGetNumScopes(z3context, z3solver) == super.size(),
+        "prover-size %s does not match stack-size %s",
+        Native.solverGetNumScopes(z3context, z3solver),
+        super.size());
+    return super.size();
   }
 
   @Override
@@ -248,7 +259,7 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
       Native.incRef(z3context, ast);
       String varName = Native.astToString(z3context, ast);
       Native.decRef(z3context, ast);
-      constraints.add(storedConstraints.get(varName));
+      constraints.add(storedConstraints.peek().get(varName));
     }
     Native.astVectorDecRef(z3context, unsatCore);
     return constraints;
@@ -324,7 +335,9 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
       Native.solverReset(z3context, z3solver); // remove all assertions from the solver
       Native.solverDecRef(z3context, z3solver);
-
+      if (storedConstraints != null) {
+        storedConstraints.clear();
+      }
       shutdownNotifier.unregister(interruptListener);
     }
     super.close();

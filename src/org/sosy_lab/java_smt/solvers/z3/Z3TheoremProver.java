@@ -8,7 +8,10 @@
 
 package org.sosy_lab.java_smt.solvers.z3;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
+import com.microsoft.z3.Native;
+import com.microsoft.z3.Z3Exception;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -27,6 +30,24 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
       @Nullable PathCounterTemplate pLogfile,
       ShutdownNotifier pShutdownNotifier) {
     super(creator, pMgr, pOptions, pSolverOptions, pLogfile, pShutdownNotifier);
+  }
+
+  @Override
+  public void push() throws InterruptedException {
+    Preconditions.checkState(!closed);
+    push0();
+    try {
+      Native.solverPush(z3context, z3solver);
+    } catch (Z3Exception exception) {
+      throw creator.handleZ3Exception(exception);
+    }
+  }
+
+  @Override
+  public void pop() {
+    Preconditions.checkState(!closed);
+    Native.solverPop(z3context, z3solver, 1);
+    pop0();
   }
 
   @Override
