@@ -29,16 +29,16 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
  * ----------------------------------------------------------------------------- */
 
 
-public class _IO_FILE {
+public class SWIG__IO_FILE {
   private transient long swigCPtr;
   protected transient boolean swigCMemOwn;
 
-  protected _IO_FILE(long cPtr, boolean cMemoryOwn) {
+  protected SWIG__IO_FILE(long cPtr, boolean cMemoryOwn) {
     swigCMemOwn = cMemoryOwn;
     swigCPtr = cPtr;
   }
 
-  protected static long getCPtr(_IO_FILE obj) {
+  protected static long getCPtr(SWIG__IO_FILE obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
@@ -162,13 +162,13 @@ public class _IO_FILE {
 //    return (cPtr == 0) ? null : new SWIGTYPE_p__IO_marker(cPtr, false);
 //  }
 
-  public void set_chain(_IO_FILE value) {
-    BitwuzlaJNI._IO_FILE__chain_set(swigCPtr, this, _IO_FILE.getCPtr(value), value);
+  public void set_chain(SWIG__IO_FILE value) {
+    BitwuzlaJNI._IO_FILE__chain_set(swigCPtr, this, SWIG__IO_FILE.getCPtr(value), value);
   }
 
-  public _IO_FILE get_chain() {
+  public SWIG__IO_FILE get_chain() {
     long cPtr = BitwuzlaJNI._IO_FILE__chain_get(swigCPtr, this);
-    return (cPtr == 0) ? null : new _IO_FILE(cPtr, false);
+    return (cPtr == 0) ? null : new SWIG__IO_FILE(cPtr, false);
   }
 
   public void set_fileno(int value) {
@@ -254,13 +254,13 @@ public class _IO_FILE {
 //    return (cPtr == 0) ? null : new SWIGTYPE_p__IO_wide_data(cPtr, false);
 //  }
 
-  public void set_freeres_list(_IO_FILE value) {
-    BitwuzlaJNI._IO_FILE__freeres_list_set(swigCPtr, this, _IO_FILE.getCPtr(value), value);
+  public void set_freeres_list(SWIG__IO_FILE value) {
+    BitwuzlaJNI._IO_FILE__freeres_list_set(swigCPtr, this, SWIG__IO_FILE.getCPtr(value), value);
   }
 
-  public _IO_FILE get_freeres_list() {
+  public SWIG__IO_FILE get_freeres_list() {
     long cPtr = BitwuzlaJNI._IO_FILE__freeres_list_get(swigCPtr, this);
-    return (cPtr == 0) ? null : new _IO_FILE(cPtr, false);
+    return (cPtr == 0) ? null : new SWIG__IO_FILE(cPtr, false);
   }
 
 //  public void set_freeres_buf(SWIGTYPE_p_void value) {
@@ -296,7 +296,7 @@ public class _IO_FILE {
     return BitwuzlaJNI._IO_FILE__unused2_get(swigCPtr, this);
   }
 
-  public _IO_FILE() {
+  public SWIG__IO_FILE() {
     this(BitwuzlaJNI.new__IO_FILE(), true);
   }
 
