@@ -53,7 +53,8 @@ public final class Z3SolverContext extends AbstractSolverContext {
   private boolean closed = false;
 
   private final ReferenceQueue<Long> referenceQueue = new ReferenceQueue<>();
-  private final IdentityHashMap<PhantomReference<Long>, Long> referenceMap = new IdentityHashMap<>();
+  private final IdentityHashMap<PhantomReference<Long>, Long> referenceMap =
+      new IdentityHashMap<>();
 
   private static final String OPT_ENGINE_CONFIG_KEY = "optsmt_engine";
   private static final String OPT_PRIORITY_CONFIG_KEY = "priority";

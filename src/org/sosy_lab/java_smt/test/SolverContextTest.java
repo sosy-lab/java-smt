@@ -155,8 +155,7 @@ public class SolverContextTest extends SolverBasedTest0.ParameterizedSolverBased
 
     assume()
         .withMessage(
-            "Solver %s does not support prover copying for non-base-level provers",
-            solverToUse())
+            "Solver %s does not support prover copying for non-base-level provers", solverToUse())
         .that(solverToUse())
         .isNotEqualTo(Solvers.Z3);
 

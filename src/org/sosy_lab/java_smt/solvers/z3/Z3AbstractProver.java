@@ -62,19 +62,8 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
       ImmutableMap<String, Object> pSolverOptions,
       @Nullable PathCounterTemplate pLogfile,
       ShutdownNotifier pShutdownNotifier) {
-    super(pOptions, pMgr.getBooleanFormulaManager(), pShutdownNotifier);
-    creator = pCreator;
-    z3context = creator.getEnv();
-    z3solver = Native.mkSolver(z3context);
-
-    interruptListener = reason -> Native.solverInterrupt(z3context, z3solver);
-    shutdownNotifier.register(interruptListener);
-    storedConstraints =
-        pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE) ? new HashMap<>() : null;
-
-    logfile = pLogfile;
-    mgr = pMgr;
-    postProcessProverCreation(pSolverOptions);
+    this(pCreator, pMgr, Native.mkSolver(pCreator.getEnv()), pOptions, pSolverOptions, pLogfile,
+        pShutdownNotifier);
   }
 
   Z3AbstractProver(
@@ -97,7 +86,6 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
     logfile = pLogfile;
     mgr = pMgr;
-
     postProcessProverCreation(pSolverOptions);
   }
 
