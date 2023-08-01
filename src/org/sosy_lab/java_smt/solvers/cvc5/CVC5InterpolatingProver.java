@@ -90,12 +90,11 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
       return mgr.getBooleanFormulaManager().makeBoolean(true);
     }
 
-    Set<Term> formulasOfA = ImmutableSet.copyOf(pFormulasOfA);
-    // formulasOfB := assertedFormulas - formulas
+    // formulasOfB := assertedFormulas - pFormulasOfA
     Set<Term> formulasOfB =
         assertedFormulas.stream()
             .flatMap(c -> c.stream())
-            .filter(n -> !formulasOfA.contains(n))
+            .filter(n -> !pFormulasOfA.contains(n))
             .collect(ImmutableSet.toImmutableSet());
 
     if (formulasOfB.isEmpty()) { // Catch trivial case
@@ -107,14 +106,12 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     ArrayList<Collection<Term>> formAAsList = new ArrayList<>();
     ArrayList<Collection<Term>> formBAsList = new ArrayList<>();
 
-    formAAsList.add(formulasOfA);
+    formAAsList.add(pFormulasOfA);
     formBAsList.add(formulasOfB);
 
     Term itp = getCVC5Interpolation(formAAsList, formBAsList);
 
-    BooleanFormula result = creator.encapsulateBoolean(itp);
-
-    return result;
+    return creator.encapsulateBoolean(itp);
   }
 
   @Override
@@ -172,28 +169,35 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
   /**
    * Interpolates a Tuple of Interpolants according to Craig-Interpolation using CVC5-Interpolation.
    *
-   * <p>CVC5's getInterpolant: There is a Model, such that the Interpolant I, with A -> I = True
+   * <p>
+   * CVC5's getInterpolant: There is a Model, such that the Interpolant I, with A -> I = True
    * (1CVC5) and I -> B = True (2CVC5).
    *
-   * <p>Craig Interpolation: There is a Model, such that the Interpolant psi, with phi- -> psi =
-   * True (1Craig), not(psi /\ phi+) = True (2Craig).
+   * <p>
+   * Craig Interpolation: There is a Model, such that the Interpolant psi, with phi- -> psi = True
+   * (1Craig), not(psi /\ phi+) = True (2Craig).
    *
-   * <p>With A current set of assertions and B Formulas to interpolate.
+   * <p>
+   * With A/phi- current set of assertions and B/phi+ Formulas to interpolate.
    *
-   * <p>CVC5 -> Craig Interpolation:
+   * <p>
+   * CVC5 -> Craig Interpolation:
    *
-   * <p>(1CVC5) <=> (1Craig) due to subst of A with phi- and reflexivity.
+   * <p>
+   * (1CVC5) <=> (1Craig) due to subst of A with phi- and reflexivity.
    *
-   * <p>(2CVC5) <=> I -> B = True <=> (not I) \/ B = True <=> not (I /\ (not B)) = True <=> (2Craig)
+   * <p>
+   * (2CVC5) <=> I -> B = True <=> (not I) \/ B = True <=> not (I /\ (not B)) = True <=> (2Craig)
    * due to subst of (not B) with phi+ and reflexivity.
    *
-   * <p>Hence, CVC5's Interpolation produces an equivalent Interpolation to Craig Interpolation, if
-   * B is negated during CVC5 Interpolation.
+   * <p>
+   * Hence, CVC5's Interpolation produces an equivalent Interpolation to Craig Interpolation, if B
+   * is negated during CVC5 Interpolation.
    *
-   * @param assertedInterpols Asserted Formulas
-   * @param addedInterpols Formulas to Interpolate
+   * @param assertedInterpols current Set of Assertions A
+   * @param addedInterpols Formulas to Interpolate B
    * @return Interpolation of the Interpolation Pair following the definition of
-   *     Craig-Interpolation.
+   *         Craig-Interpolation.
    */
   private Term getCVC5Interpolation(
       ArrayList<Collection<Term>> assertedInterpols, ArrayList<Collection<Term>> addedInterpols) {
@@ -205,27 +209,25 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     combinedInterpols.addAll(addedInterpols);
 
     // checks, that no Assertions in the Assertion stack are left out. Can happen in Tree
-    // Interpolation
+    // Interpolation, if pPartitionedFormulas does not contain every Set of Formulas from the
+    // Assertion stack.
     Collection<Term> extraAssertions = getAssertedTermsNotInCollection(combinedInterpols);
-    Term extraAssert = new Term();
 
-    Solver interpolationSolver = new Solver(); // Uses a separate Solver instance to leave to
-    // original solver-context unmodified
+    // Uses a separate Solver instance to leave the original solver-context unmodified
+    Solver interpolationSolver = new Solver();
 
     setSolverOptions(seed, solverOptions, interpolationSolver);
 
-    if (extraAssertions.isEmpty()) {
-      extraAssert = interpolationSolver.mkTrue();
-    } else {
-      extraAssert = buildConjunctionOfFormulas(extraAssertions, interpolationSolver);
-    }
-
     Term A = buildConjunctionOfFormulasOverArray(assertedInterpols, interpolationSolver);
+
+    if (!extraAssertions.isEmpty()) {
+      Term extraAssert = new Term();
+      extraAssert = buildConjunctionOfFormulas(extraAssertions, interpolationSolver);
+      A = interpolationSolver.mkTerm(Kind.AND, extraAssert, A);
+    }
     Term B = buildConjunctionOfFormulasOverArray(addedInterpols, interpolationSolver);
 
-    interpolationSolver.resetAssertions();
-
-    interpolationSolver.assertFormula(interpolationSolver.mkTerm(Kind.AND, extraAssert, A));
+    interpolationSolver.assertFormula(A);
 
     Term interpolant = interpolationSolver.getInterpolant(interpolationSolver.mkTerm(Kind.NOT, B));
 
