@@ -96,19 +96,18 @@ public class SynchronizedSolverContext implements SolverContext {
 
   @SuppressWarnings("resource")
   @Override
-  public ProverEnvironment copyProverEnvironment(
-      ProverEnvironment proverToCopy, ProverOptions... options) {
+  public ProverEnvironment copyProverEnvironment(ProverEnvironment proverToCopy) {
     synchronized (sync) {
       if (useSeperateProvers) {
         SolverContext otherContext = createOtherContext();
         return new SynchronizedProverEnvironmentWithContext(
-            otherContext.copyProverEnvironment(proverToCopy, options),
+            otherContext.copyProverEnvironment(proverToCopy),
             sync,
             delegate.getFormulaManager(),
             otherContext.getFormulaManager());
       } else {
         return new SynchronizedProverEnvironment(
-            delegate.copyProverEnvironment(proverToCopy, options), delegate);
+            delegate.copyProverEnvironment(proverToCopy), delegate);
       }
     }
   }
@@ -135,18 +134,18 @@ public class SynchronizedSolverContext implements SolverContext {
   @SuppressWarnings("resource")
   @Override
   public InterpolatingProverEnvironment<?> copyProverEnvironmentWithInterpolation(
-      ProverEnvironment proverToCopy, ProverOptions... options) {
+      InterpolatingProverEnvironment<?> proverToCopy) {
     synchronized (sync) {
       if (useSeperateProvers) {
         SolverContext otherContext = createOtherContext();
         return new SynchronizedInterpolatingProverEnvironmentWithContext<>(
-            otherContext.copyProverEnvironmentWithInterpolation(proverToCopy, options),
+            otherContext.copyProverEnvironmentWithInterpolation(proverToCopy),
             sync,
             delegate.getFormulaManager(),
             otherContext.getFormulaManager());
       } else {
         return new SynchronizedInterpolatingProverEnvironment<>(
-            delegate.copyProverEnvironmentWithInterpolation(proverToCopy, options), delegate);
+            delegate.copyProverEnvironmentWithInterpolation(proverToCopy), delegate);
       }
     }
   }
@@ -160,6 +159,14 @@ public class SynchronizedSolverContext implements SolverContext {
       return new SynchronizedOptimizationProverEnvironment(
           delegate.newOptimizationProverEnvironment(pOptions), delegate);
     }
+  }
+
+  @SuppressWarnings("resource")
+  @Override
+  public OptimizationProverEnvironment copyOptimizationProverEnvironment(
+      OptimizationProverEnvironment proverToCopy) {
+    return new SynchronizedOptimizationProverEnvironment(
+        delegate.copyOptimizationProverEnvironment(proverToCopy), delegate);
   }
 
   @Override

@@ -138,8 +138,7 @@ public final class CVC4SolverContext extends AbstractSolverContext {
   }
 
   @Override
-  protected ProverEnvironment copyProverEnvironment0(
-      ProverEnvironment proverToCopy, Set<ProverOptions> options) {
+  protected ProverEnvironment copyProverEnvironment0(ProverEnvironment proverToCopy) {
     throw new UnsupportedOperationException(
         "CVC4 does not support the copying of " + "ProverEnvironments");
   }
@@ -157,7 +156,7 @@ public final class CVC4SolverContext extends AbstractSolverContext {
 
   @Override
   protected InterpolatingProverEnvironment<?> copyProverEnvironmentWithInterpolation0(
-      ProverEnvironment proverToCopy, Set<ProverOptions> pSet) {
+      InterpolatingProverEnvironment<?> proverToCopy) {
     throw new UnsupportedOperationException(
         "CVC4 does not support the copying of " + "ProverEnvironments");
   }
@@ -165,6 +164,12 @@ public final class CVC4SolverContext extends AbstractSolverContext {
   @Override
   protected OptimizationProverEnvironment newOptimizationProverEnvironment0(
       Set<ProverOptions> pSet) {
+    throw new UnsupportedOperationException("CVC4 does not support optimization");
+  }
+
+  @Override
+  public OptimizationProverEnvironment copyOptimizationProverEnvironment(
+      OptimizationProverEnvironment proverToCopy) {
     throw new UnsupportedOperationException("CVC4 does not support optimization");
   }
 }

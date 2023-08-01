@@ -234,8 +234,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
   }
 
   @Override
-  protected ProverEnvironment copyProverEnvironment0(
-      ProverEnvironment proverToCopy, Set<ProverOptions> options) {
+  protected ProverEnvironment copyProverEnvironment0(ProverEnvironment proverToCopy) {
     Preconditions.checkState(!closed, "solver context is already closed");
     Preconditions.checkArgument(
         proverToCopy instanceof Z3AbstractProver,
@@ -254,6 +253,9 @@ public final class Z3SolverContext extends AbstractSolverContext {
       long z3ast = referenceMap.remove(ref);
       Native.solverDecRef(creator.getEnv(), z3ast);
     }
+
+    // Get the original options from the previous solver
+    Set<ProverOptions> options = ((Z3AbstractProver<?>) proverToCopy).getZ3ProverOptions();
 
     return new Z3TheoremProver(
         creator,
@@ -287,7 +289,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
 
   @Override
   protected InterpolatingProverEnvironment<?> copyProverEnvironmentWithInterpolation0(
-      ProverEnvironment proverToCopy, Set<ProverOptions> pSet) {
+      InterpolatingProverEnvironment<?> proverToCopy) {
     throw new UnsupportedOperationException("Z3 does not support interpolation");
   }
 
@@ -310,6 +312,13 @@ public final class Z3SolverContext extends AbstractSolverContext {
         optimizationOptions,
         extraOptions.logfile,
         shutdownNotifier);
+  }
+
+  @Override
+  public OptimizationProverEnvironment copyOptimizationProverEnvironment(
+      OptimizationProverEnvironment proverToCopy) {
+    // TODO: check if we can do this!
+    throw new UnsupportedOperationException("Z3 does not support copying of optimization provers.");
   }
 
   @Override

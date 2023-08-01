@@ -41,10 +41,8 @@ public class StatisticsSolverContext implements SolverContext {
 
   @SuppressWarnings("resource")
   @Override
-  public ProverEnvironment copyProverEnvironment(
-      ProverEnvironment proverToCopy, ProverOptions... options) {
-    return new StatisticsProverEnvironment(
-        delegate.copyProverEnvironment(proverToCopy, options), stats);
+  public ProverEnvironment copyProverEnvironment(ProverEnvironment proverToCopy) {
+    return new StatisticsProverEnvironment(delegate.copyProverEnvironment(proverToCopy), stats);
   }
 
   @SuppressWarnings("resource")
@@ -58,9 +56,9 @@ public class StatisticsSolverContext implements SolverContext {
   @SuppressWarnings("resource")
   @Override
   public InterpolatingProverEnvironment<?> copyProverEnvironmentWithInterpolation(
-      ProverEnvironment proverToCopy, ProverOptions... options) {
+      InterpolatingProverEnvironment<?> proverToCopy) {
     return new StatisticsInterpolatingProverEnvironment<>(
-        delegate.copyProverEnvironmentWithInterpolation(proverToCopy, options), stats);
+        delegate.copyProverEnvironmentWithInterpolation(proverToCopy), stats);
   }
 
   @SuppressWarnings("resource")
@@ -68,6 +66,14 @@ public class StatisticsSolverContext implements SolverContext {
   public OptimizationProverEnvironment newOptimizationProverEnvironment(ProverOptions... pOptions) {
     return new StatisticsOptimizationProverEnvironment(
         delegate.newOptimizationProverEnvironment(pOptions), stats);
+  }
+
+  @SuppressWarnings("resource")
+  @Override
+  public OptimizationProverEnvironment copyOptimizationProverEnvironment(
+      OptimizationProverEnvironment proverToCopy) {
+    return new StatisticsOptimizationProverEnvironment(
+        delegate.copyOptimizationProverEnvironment(proverToCopy), stats);
   }
 
   @Override

@@ -43,11 +43,9 @@ public final class LoggingSolverContext implements SolverContext {
 
   @SuppressWarnings("resource")
   @Override
-  public ProverEnvironment copyProverEnvironment(
-      ProverEnvironment proverToCopy, ProverOptions... options) {
+  public ProverEnvironment copyProverEnvironment(ProverEnvironment proverToCopy) {
     // TODO: log this? Because this is not a normal new prover?
-    return new LoggingProverEnvironment(
-        logger, delegate.copyProverEnvironment(proverToCopy, options));
+    return new LoggingProverEnvironment(logger, delegate.copyProverEnvironment(proverToCopy));
   }
 
   @SuppressWarnings("resource")
@@ -61,10 +59,10 @@ public final class LoggingSolverContext implements SolverContext {
   @SuppressWarnings("resource")
   @Override
   public InterpolatingProverEnvironment<?> copyProverEnvironmentWithInterpolation(
-      ProverEnvironment proverToCopy, ProverOptions... options) {
+      InterpolatingProverEnvironment<?> proverToCopy) {
     // TODO: log this? Because this is not a normal new prover?
     return new LoggingInterpolatingProverEnvironment<>(
-        logger, delegate.copyProverEnvironmentWithInterpolation(proverToCopy, options));
+        logger, delegate.copyProverEnvironmentWithInterpolation(proverToCopy));
   }
 
   @SuppressWarnings("resource")
@@ -72,6 +70,14 @@ public final class LoggingSolverContext implements SolverContext {
   public OptimizationProverEnvironment newOptimizationProverEnvironment(ProverOptions... options) {
     return new LoggingOptimizationProverEnvironment(
         logger, delegate.newOptimizationProverEnvironment(options));
+  }
+
+  @SuppressWarnings("resource")
+  @Override
+  public OptimizationProverEnvironment copyOptimizationProverEnvironment(
+      OptimizationProverEnvironment proverToCopy) {
+    return new LoggingOptimizationProverEnvironment(
+        logger, delegate.copyOptimizationProverEnvironment(proverToCopy));
   }
 
   @Override

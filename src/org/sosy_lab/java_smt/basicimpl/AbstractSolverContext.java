@@ -47,9 +47,8 @@ public abstract class AbstractSolverContext implements SolverContext {
   }
 
   @Override
-  public final ProverEnvironment copyProverEnvironment(
-      ProverEnvironment proverToCopy, ProverOptions... options) {
-    ProverEnvironment out = copyProverEnvironment0(proverToCopy, toSet(options));
+  public final ProverEnvironment copyProverEnvironment(ProverEnvironment proverToCopy) {
+    ProverEnvironment out = copyProverEnvironment0(proverToCopy);
     if (!supportsAssumptionSolving()) {
       // In the case we do not already have a prover environment with assumptions,
       // we add a wrapper to it
@@ -60,8 +59,7 @@ public abstract class AbstractSolverContext implements SolverContext {
 
   protected abstract ProverEnvironment newProverEnvironment0(Set<ProverOptions> options);
 
-  protected abstract ProverEnvironment copyProverEnvironment0(
-      ProverEnvironment proverToCopy, Set<ProverOptions> options);
+  protected abstract ProverEnvironment copyProverEnvironment0(ProverEnvironment proverToCopy);
 
   @SuppressWarnings("resource")
   @Override
@@ -80,10 +78,9 @@ public abstract class AbstractSolverContext implements SolverContext {
   @SuppressWarnings("resource")
   @Override
   public final InterpolatingProverEnvironment<?> copyProverEnvironmentWithInterpolation(
-      ProverEnvironment proverToCopy, ProverOptions... options) {
+      InterpolatingProverEnvironment<?> proverToCopy) {
 
-    InterpolatingProverEnvironment<?> out =
-        copyProverEnvironmentWithInterpolation0(proverToCopy, toSet(options));
+    InterpolatingProverEnvironment<?> out = copyProverEnvironmentWithInterpolation0(proverToCopy);
     if (!supportsAssumptionSolving()) {
       // In the case we do not already have a prover environment with assumptions,
       // we add a wrapper to it
@@ -96,7 +93,7 @@ public abstract class AbstractSolverContext implements SolverContext {
       Set<ProverOptions> pSet);
 
   protected abstract InterpolatingProverEnvironment<?> copyProverEnvironmentWithInterpolation0(
-      ProverEnvironment proverToCopy, Set<ProverOptions> pSet);
+      InterpolatingProverEnvironment<?> proverToCopy);
 
   @SuppressWarnings("resource")
   @Override

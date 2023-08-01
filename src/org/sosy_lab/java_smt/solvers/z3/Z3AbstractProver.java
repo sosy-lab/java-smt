@@ -48,6 +48,8 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
   // m_n_obj in Z3
   protected final long z3solver;
 
+  private final Set<ProverOptions> options;
+
   private final UniqueIdGenerator trackId = new UniqueIdGenerator();
   private final @Nullable Map<String, BooleanFormula> storedConstraints;
 
@@ -62,7 +64,13 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
       ImmutableMap<String, Object> pSolverOptions,
       @Nullable PathCounterTemplate pLogfile,
       ShutdownNotifier pShutdownNotifier) {
-    this(pCreator, pMgr, Native.mkSolver(pCreator.getEnv()), pOptions, pSolverOptions, pLogfile,
+    this(
+        pCreator,
+        pMgr,
+        Native.mkSolver(pCreator.getEnv()),
+        pOptions,
+        pSolverOptions,
+        pLogfile,
         pShutdownNotifier);
   }
 
@@ -86,6 +94,7 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
     logfile = pLogfile;
     mgr = pMgr;
+    options = pOptions;
     postProcessProverCreation(pSolverOptions);
   }
 
@@ -372,5 +381,9 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   protected final long getZ3Solver() {
     return z3solver;
+  }
+
+  protected Set<ProverOptions> getZ3ProverOptions() {
+    return options;
   }
 }
