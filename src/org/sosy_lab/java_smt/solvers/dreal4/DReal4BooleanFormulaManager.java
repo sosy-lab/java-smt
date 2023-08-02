@@ -20,13 +20,12 @@
 
 package org.sosy_lab.java_smt.solvers.dreal4;
 
-import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
+import com.google.common.base.Preconditions;
+import java.util.Collection;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
-import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Context;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.FormulaKind;
-import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable.Type;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.dreal;
 
@@ -57,40 +56,78 @@ public class DReal4BooleanFormulaManager
     if (pParam1.isFormula()) {
       return new DRealTerm<>(dreal.Not(pParam1.getFormula()), Type.BOOLEAN,
           FormulaKind.Not);
+    } else if (pParam1.isVar()) {
+      Preconditions.checkState(pParam1.getVariable().get_type() == Type.BOOLEAN);
+      return new DRealTerm<>(dreal.Not(new Formula(pParam1.getVariable())), Type.BOOLEAN,
+          FormulaKind.Not);
     } else {
-      throw new UnsupportedOperationException("dReal does not support not on Variabele "
-          + "or Expressions.");
+      throw new UnsupportedOperationException("dReal does not support not on Expressions.");
     }
   }
 
   @Override
   protected DRealTerm<Formula, FormulaKind> and(DRealTerm<?, ?> pParam1, DRealTerm<?, ?> pParam2) {
     if (pParam1.isVar() && pParam2.isFormula()) {
+      // Only Variables with type boolean are allowed
+      Preconditions.checkState(pParam1.getVariable().get_type() == Type.BOOLEAN);
       return new DRealTerm<>(dreal.And(pParam1.getVariable(), pParam2.getFormula()),
           Type.BOOLEAN, FormulaKind.And);
     } else if (pParam1.isFormula() && pParam2.isVar()) {
+      // Only Variables with type boolean are allowed
+      Preconditions.checkState(pParam2.getVariable().get_type() == Type.BOOLEAN);
       return new DRealTerm<>(dreal.And(pParam1.getFormula(), pParam2.getVariable()),
           Type.BOOLEAN, FormulaKind.And);
     } else if (pParam1.isVar() && pParam2.isVar()) {
+      // Only Variables with type boolean are allowed
+      Preconditions.checkState(pParam1.getVariable().get_type() == Type.BOOLEAN);
+      Preconditions.checkState(pParam2.getVariable().get_type() == Type.BOOLEAN);
       return new DRealTerm<>(dreal.And(pParam1.getVariable(), pParam2.getVariable()),
           Type.BOOLEAN, FormulaKind.And);
     } else if (pParam1.isFormula() && pParam2.isFormula()) {
+      DRealTerm<?, ?> test = new DRealTerm<>(dreal.And(pParam1.getFormula(), pParam2.getFormula()),
+          Type.BOOLEAN, FormulaKind.And);
       return new DRealTerm<>(dreal.And(pParam1.getFormula(), pParam2.getFormula()),
           Type.BOOLEAN, FormulaKind.And);
     } else {
       throw new UnsupportedOperationException("dReal does not support and on Expressions.");
     }
   }
+  @Override
+  protected DRealTerm<Formula, FormulaKind> andImpl(Collection<DRealTerm<?, ?>> pParams) {
+    Formula result = Formula.True();
+    for (DRealTerm<?, ?> formula : pParams) {
+      if (formula.isFormula()) {
+        if (formula.getFormula().get_kind() == FormulaKind.True) {
+          return new DRealTerm<>(Formula.True(), Type.BOOLEAN, FormulaKind.True);
+        }
+        result = dreal.And(result, formula.getFormula());
+      } else if (formula.isVar() && formula.getVariable().get_type() == Type.BOOLEAN) {
+        result = dreal.And(result, formula.getVariable());
+      } else {
+        throw new IllegalArgumentException("Expression and Variable of not type boolean are not "
+            + "supported to create an And-Formula.");
+      }
+    }
+    return new DRealTerm<>(result, Type.BOOLEAN, FormulaKind.And);
+  }
+
 
   @Override
   protected DRealTerm<Formula, FormulaKind> or(DRealTerm<?, ?> pParam1, DRealTerm<?, ?> pParam2) {
     if (pParam1.isVar() && pParam2.isFormula()) {
+      // Only Variables with type boolean are allowed
+      Preconditions.checkState(pParam1.getVariable().get_type() == Type.BOOLEAN);
       return new DRealTerm<>(dreal.Or(pParam1.getVariable(), pParam2.getFormula()),
           Type.BOOLEAN, FormulaKind.Or);
     } else if (pParam1.isFormula() && pParam2.isVar()) {
+      // Only Variables with type boolean are allowed
+      Preconditions.checkState(pParam2.getVariable().get_type() == Type.BOOLEAN);
       return new DRealTerm<>(dreal.Or(pParam1.getFormula(), pParam2.getVariable()),
           Type.BOOLEAN, FormulaKind.Or);
     } else if (pParam1.isVar() && pParam2.isVar()) {
+      // Only Variables with type boolean are allowed
+      Preconditions.checkState(pParam1.getVariable().get_type() == Type.BOOLEAN);
+      Preconditions.checkState(pParam2.getVariable().get_type() == Type.BOOLEAN);
       return new DRealTerm<>(dreal.Or(pParam1.getVariable(), pParam2.getVariable()),
           Type.BOOLEAN, FormulaKind.Or);
     } else if (pParam1.isFormula() && pParam2.isFormula()) {
@@ -101,20 +138,45 @@ public class DReal4BooleanFormulaManager
     }
   }
 
+  @Override
+  protected DRealTerm<Formula, FormulaKind> orImpl(Collection<DRealTerm<?, ?>> pParams) {
+    Formula result = Formula.False();
+    for (DRealTerm<?, ?> formula : pParams) {
+      // Only Formulas or Variables of boolean type are accepted when creating an Or-Formula
+      Preconditions.checkState(formula.isFormula() || (formula.isVar()) && (formula.getVariable().get_type() == Type.BOOLEAN));
+      if (formula.isFormula()) {
+        if (formula.getFormula().get_kind() == FormulaKind.True) {
+          return new DRealTerm<>(Formula.True(), Type.BOOLEAN, FormulaKind.True);
+        }
+        result = dreal.Or(result, formula.getFormula());
+      } else if (formula.isVar() && formula.getVariable().get_type() == Type.BOOLEAN) {
+        result = dreal.Or(result, formula.getVariable());
+      }
+    }
+    return new DRealTerm<>(result, Type.BOOLEAN, FormulaKind.Or);
+  }
+
   // a xor b = (NOT(A AND B)) AND (NOT(NOT A AND NOT B))
   @Override
   protected DRealTerm<Formula, FormulaKind> xor(DRealTerm<?, ?> pParam1, DRealTerm<?, ?> pParam2) {
     if (pParam1.isVar() && pParam2.isFormula()) {
+      // Only Variables with type boolean are allowed
+      Preconditions.checkState(pParam1.getVariable().get_type() == Type.BOOLEAN);
       return new DRealTerm<>(dreal.And(dreal.Not(dreal.And(pParam1.getVariable(),
               pParam2.getFormula())),
           dreal.Not(dreal.And(dreal.Not(pParam1.getVariable()),
               dreal.Not(pParam2.getFormula())))), Type.BOOLEAN, FormulaKind.And);
     } else if (pParam1.isFormula() && pParam2.isVar()) {
+      // Only Variables with type boolean are allowed
+      Preconditions.checkState(pParam2.getVariable().get_type() == Type.BOOLEAN);
       return new DRealTerm<>(dreal.And(dreal.Not(dreal.And(pParam1.getFormula(),
               pParam2.getVariable())),
           dreal.Not(dreal.And(dreal.Not(pParam1.getFormula()),
               dreal.Not(pParam2.getVariable())))), Type.BOOLEAN, FormulaKind.And);
     } else if (pParam1.isVar() && pParam2.isVar()) {
+      // Only Variables with type boolean are allowed
+      Preconditions.checkState(pParam1.getVariable().get_type() == Type.BOOLEAN);
+      Preconditions.checkState(pParam2.getVariable().get_type() == Type.BOOLEAN);
       return new DRealTerm<>(dreal.And(dreal.Not(dreal.And(pParam1.getVariable(),
               pParam2.getVariable())),
           dreal.Not(dreal.And(dreal.Not(pParam1.getVariable()),
@@ -133,12 +195,19 @@ public class DReal4BooleanFormulaManager
   protected DRealTerm<Formula, FormulaKind> equivalence(DRealTerm<?, ?> bits1,
                                                         DRealTerm<?, ?> bits2) {
     if (bits1.isVar() && bits2.isFormula()) {
+      // Only Variables with type boolean are allowed
+      Preconditions.checkState(bits1.getVariable().get_type() == Type.BOOLEAN);
       return new DRealTerm<>(dreal.iff(bits1.getVariable(), bits2.getFormula()),
           Type.BOOLEAN, FormulaKind.And);
     } else if (bits1.isFormula() && bits2.isVar()) {
+      // Only Variables with type boolean are allowed
+      Preconditions.checkState(bits2.getVariable().get_type() == Type.BOOLEAN);
       return new DRealTerm<>(dreal.iff(bits1.getFormula(), bits2.getVariable()),
           Type.BOOLEAN, FormulaKind.And);
     } else if (bits1.isVar() && bits2.isVar()) {
+      // Only Variables with type boolean are allowed
+      Preconditions.checkState(bits1.getVariable().get_type() == Type.BOOLEAN);
+      Preconditions.checkState(bits2.getVariable().get_type() == Type.BOOLEAN);
       return new DRealTerm<>(dreal.iff(bits1.getVariable(), bits2.getVariable()),
           Type.BOOLEAN, FormulaKind.And);
     } else if (bits1.isFormula() && bits2.isFormula()) {
@@ -175,24 +244,24 @@ public class DReal4BooleanFormulaManager
     if (cond.isFormula()) {
       if (dreal.is_true(cond.getFormula())) {
         if (f1.isVar()) {
-          return new DRealTerm<>(f1.getVariable(), Type.BOOLEAN,
-              Type.BOOLEAN);
+          return new DRealTerm<>(f1.getVariable(), f1.getType(),
+              f1.getType());
         } else if (f1.isExp()) {
-          return new DRealTerm<>(f1.getExpression(), Type.BOOLEAN,
+          return new DRealTerm<>(f1.getExpression(), f1.getType(),
               f1.getExpressionKind());
         } else {
-          return new DRealTerm<>(f1.getFormula(), Type.BOOLEAN,
+          return new DRealTerm<>(f1.getFormula(), f1.getType(),
               f1.getFormulaKind());
         }
       } else {
         if (f2.isVar()) {
-          return new DRealTerm<>(f2.getVariable(), Type.BOOLEAN,
-             Type.BOOLEAN);
+          return new DRealTerm<>(f2.getVariable(), f2.getType(),
+             f2.getType());
         } else if (f2.isExp()) {
-          return new DRealTerm<>(f2.getExpression(), Type.BOOLEAN,
+          return new DRealTerm<>(f2.getExpression(), f2.getType(),
               f2.getExpressionKind());
         } else {
-          return new DRealTerm<>(f2.getFormula(), Type.BOOLEAN,
+          return new DRealTerm<>(f2.getFormula(), f2.getType(),
               f2.getFormulaKind());
         }
       }
