@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2023 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -14,7 +14,6 @@ import com.google.common.io.MoreFiles;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Z3Exception;
-import com.microsoft.z3.enumerations.Z3_lbool;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,7 +23,6 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -47,14 +45,12 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
   protected final long z3context;
   private final Z3FormulaManager mgr;
 
-  protected final long z3solver;
-
   private final UniqueIdGenerator trackId = new UniqueIdGenerator();
   private final Deque<PersistentMap<String, BooleanFormula>> storedConstraints;
 
   private final @Nullable PathCounterTemplate logfile;
 
-  private final ShutdownRequestListener interruptListener;
+  protected ShutdownRequestListener interruptListener;
 
   Z3AbstractProver(
       Z3FormulaCreator pCreator,
@@ -66,10 +62,6 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
     super(pOptions, pMgr.getBooleanFormulaManager(), pShutdownNotifier);
     creator = pCreator;
     z3context = creator.getEnv();
-    z3solver = Native.mkSolver(z3context);
-
-    interruptListener = reason -> Native.solverInterrupt(z3context, z3solver);
-    shutdownNotifier.register(interruptListener);
 
     if (pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE)) {
       storedConstraints = new ArrayDeque<>();
@@ -80,15 +72,6 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
     logfile = pLogfile;
     mgr = pMgr;
-    Native.solverIncRef(z3context, z3solver);
-
-    long z3params = Native.mkParams(z3context);
-    Native.paramsIncRef(z3context, z3params);
-    for (Entry<String, Object> entry : pSolverOptions.entrySet()) {
-      addParameter(z3params, entry.getKey(), entry.getValue());
-    }
-    Native.solverSetParams(z3context, z3solver, z3params);
-    Native.paramsDecRef(z3context, z3params);
   }
 
   void addParameter(long z3params, String key, Object value) {
@@ -110,66 +93,16 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
     }
   }
 
-  @Override
-  public boolean isUnsat() throws Z3SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
-    logSolverStack();
-    int result;
-    try {
-      result = Native.solverCheck(z3context, z3solver);
-    } catch (Z3Exception e) {
-      throw creator.handleZ3Exception(e);
-    }
-    undefinedStatusToException(result);
-    return result == Z3_lbool.Z3_L_FALSE.toInt();
-  }
-
   /** dump the current solver stack into a new SMTLIB file. */
-  private void logSolverStack() throws Z3SolverException {
+  protected void logSolverStack() throws Z3SolverException {
     if (logfile != null) { // if logging is not disabled
       try {
         // write stack content to logfile
         Path filename = logfile.getFreshPath();
         MoreFiles.createParentDirectories(filename);
-        Files.writeString(filename, Native.solverToString(z3context, z3solver) + "(check-sat)\n");
+        Files.writeString(filename, this + "(check-sat)\n");
       } catch (IOException e) {
         throw new Z3SolverException("Cannot write Z3 log file: " + e.getMessage());
-      }
-    }
-  }
-
-  @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
-      throws Z3SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
-
-    int result;
-    try {
-      result =
-          Native.solverCheckAssumptions(
-              z3context,
-              z3solver,
-              assumptions.size(),
-              assumptions.stream().mapToLong(creator::extractInfo).toArray());
-    } catch (Z3Exception e) {
-      throw creator.handleZ3Exception(e);
-    }
-    undefinedStatusToException(result);
-    return result == Z3_lbool.Z3_L_FALSE.toInt();
-  }
-
-  protected final void undefinedStatusToException(int solverStatus)
-      throws Z3SolverException, InterruptedException {
-    if (solverStatus == Z3_lbool.Z3_L_UNDEF.toInt()) {
-      creator.shutdownNotifier.shutdownIfNecessary();
-      final String reason = Native.solverGetReasonUnknown(z3context, z3solver);
-      switch (reason) {
-        case "canceled": // see Z3: src/tactic/tactic.cpp
-        case "interrupted": // see Z3: src/solver/check_sat_result.cpp
-        case "interrupted from keyboard": // see Z3: src/solver/check_sat_result.cpp
-          throw new InterruptedException(reason);
-        default:
-          throw new Z3SolverException("Solver returned 'unknown' status, reason: " + reason);
       }
     }
   }
@@ -187,9 +120,11 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
     return new Z3Model(this, z3context, getZ3Model(), creator);
   }
 
-  protected long getZ3Model() {
-    return Native.solverGetModel(z3context, z3solver);
-  }
+  protected abstract long getZ3Model();
+
+  protected abstract void assertContraint(long constraint);
+
+  protected abstract void assertContraintAndTrack(long constraint, long symbol);
 
   @CanIgnoreReturnValue
   protected long addConstraint0(BooleanFormula f) throws InterruptedException {
@@ -201,7 +136,7 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
         String varName = String.format("Z3_UNSAT_CORE_%d", trackId.getFreshId());
         BooleanFormula t = mgr.getBooleanFormulaManager().makeVariable(varName);
 
-        Native.solverAssertAndTrack(z3context, z3solver, e, creator.extractInfo(t));
+        assertContraintAndTrack(e, creator.extractInfo(t));
         storedConstraints.push(storedConstraints.pop().putAndCopy(varName, f));
         Native.decRef(z3context, e);
       } else {
@@ -231,16 +166,7 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
     super.pop();
   }
 
-  @Override
-  public int size() {
-    Preconditions.checkState(!closed);
-    Preconditions.checkState(
-        Native.solverGetNumScopes(z3context, z3solver) == super.size(),
-        "prover-size %s does not match stack-size %s",
-        Native.solverGetNumScopes(z3context, z3solver),
-        super.size());
-    return super.size();
-  }
+  protected abstract long getUnsatCore0();
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
@@ -252,7 +178,7 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
     }
 
     List<BooleanFormula> constraints = new ArrayList<>();
-    long unsatCore = Native.solverGetUnsatCore(z3context, z3solver);
+    long unsatCore = getUnsatCore0();
     Native.astVectorIncRef(z3context, unsatCore);
     for (int i = 0; i < Native.astVectorSize(z3context, unsatCore); i++) {
       long ast = Native.astVectorGet(z3context, unsatCore, i);
@@ -273,7 +199,7 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
       return Optional.empty();
     }
     List<BooleanFormula> core = new ArrayList<>();
-    long unsatCore = Native.solverGetUnsatCore(z3context, z3solver);
+    long unsatCore = getUnsatCore0();
     Native.astVectorIncRef(z3context, unsatCore);
     for (int i = 0; i < Native.astVectorSize(z3context, unsatCore); i++) {
       long ast = Native.astVectorGet(z3context, unsatCore, i);
@@ -283,6 +209,8 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
     return Optional.of(core);
   }
 
+  protected abstract long getStatistics0();
+
   @Override
   public ImmutableMap<String, String> getStatistics() {
     // Z3 sigsevs if you try to get statistics for closed environments
@@ -291,7 +219,7 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
     ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
     Set<String> seenKeys = new HashSet<>();
 
-    final long stats = Native.solverGetStatistics(z3context, z3solver);
+    final long stats = getStatistics0();
     for (int i = 0; i < Native.statsSize(z3context, stats); i++) {
       String key = getUnusedKey(seenKeys, Native.statsGetKey(z3context, stats, i));
       if (Native.statsIsUint(z3context, stats, i)) {
@@ -329,26 +257,12 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
   @Override
   public void close() {
     if (!closed) {
-      Preconditions.checkArgument(
-          Native.solverGetNumScopes(z3context, z3solver) >= 0,
-          "a negative number of scopes is not allowed");
-
-      Native.solverReset(z3context, z3solver); // remove all assertions from the solver
-      Native.solverDecRef(z3context, z3solver);
       if (storedConstraints != null) {
         storedConstraints.clear();
       }
       shutdownNotifier.unregister(interruptListener);
     }
     super.close();
-  }
-
-  @Override
-  public String toString() {
-    if (closed) {
-      return "Closed Z3Solver";
-    }
-    return Native.solverToString(z3context, z3solver);
   }
 
   @Override
@@ -359,9 +273,5 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
     } catch (Z3Exception e) {
       throw creator.handleZ3Exception(e);
     }
-  }
-
-  protected void assertContraint(long negatedModel) {
-    Native.solverAssert(z3context, z3solver, negatedModel);
   }
 }
