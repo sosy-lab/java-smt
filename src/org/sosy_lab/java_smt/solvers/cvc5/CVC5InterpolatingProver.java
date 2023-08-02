@@ -210,17 +210,18 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
 
     setSolverOptions(seed, solverOptions, interpolationSolver);
 
-    Term A = buildConjunctionOfFormulasOverList(pFormAAsList, interpolationSolver);
+    Term interpolantA = buildConjunctionOfFormulasOverList(pFormAAsList, interpolationSolver);
 
     if (!extraAssertions.isEmpty()) {
       Term extraAssert = buildConjunctionOfFormulas(extraAssertions, interpolationSolver);
-      A = interpolationSolver.mkTerm(Kind.AND, extraAssert, A);
+      interpolantA = interpolationSolver.mkTerm(Kind.AND, extraAssert, interpolantA);
     }
-    Term B = buildConjunctionOfFormulasOverList(pFormBAsList, interpolationSolver);
+    Term interpolantB = buildConjunctionOfFormulasOverList(pFormBAsList, interpolationSolver);
 
-    interpolationSolver.assertFormula(A);
+    interpolationSolver.assertFormula(interpolantA);
 
-    Term interpolant = interpolationSolver.getInterpolant(interpolationSolver.mkTerm(Kind.NOT, B));
+    Term interpolant =
+        interpolationSolver.getInterpolant(interpolationSolver.mkTerm(Kind.NOT, interpolantB));
 
     interpolationSolver.deletePointer();
 
@@ -251,7 +252,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
 
   /**
    * Turns a List of Collections of Formulas to a Single Conjunction of the Formulas e.g.:
-   * [[A,B],[C]] -> A/\B/\C
+   * [[A,B],[C]] -> A/\B/\C.
    *
    * @param formula List of Collections of formulas
    * @param usingSolver the CVC5 Solver Instance to use
@@ -271,7 +272,8 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
   }
 
   /**
-   * Turns a collection of Formulas to a Single Conjunction of the Formulas e.g.: [A,B,C] -> A/\B/\C
+   * Turns a collection of Formulas to a Single Conjunction of the Formulas e.g.: [A,B,C] ->
+   * A/\B/\C.
    *
    * @param formulas collection of formulas
    * @param usingSolver the CVC5 Solver Instance to use
