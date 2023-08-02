@@ -125,7 +125,7 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
   @Override
   public void pop() {
     Preconditions.checkState(!closed);
-    Native.optimizePop(z3context, z3solver);
+    Native.optimizePop(z3context, z3optSolver);
     pop0();
   }
 
