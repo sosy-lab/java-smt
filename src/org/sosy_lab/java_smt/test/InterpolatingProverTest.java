@@ -70,30 +70,19 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
   @Test
   @SuppressWarnings("CheckReturnValue")
   public <T> void simpleInterpolation() throws SolverException, InterruptedException {
-    /* FIXME
-    throw new RuntimeException("TIMEOUT - OpenSMT struggles to prove `2x ≠ 1+2y` for all integers x,y");
-    
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       IntegerFormula x = imgr.makeVariable("x");
       IntegerFormula y = imgr.makeVariable("y");
-      IntegerFormula z = imgr.makeVariable("z");
+      /* INFO: Due to limitations in OpenSMT we need to use a simpler formular for this solver
+       * Setting z=x means that the original formula `2x ≠ 1+2z`simplifies to `0 ≠ 1`, which is trivially true
+       *
+       * https://github.com/usi-verification-and-security/opensmt/issues/638
+       */
+      IntegerFormula z = solverToUse() == Solvers.OPENSMT ? x : imgr.makeVariable("z");
+      
       BooleanFormula f1 = imgr.equal(y, imgr.multiply(imgr.makeNumber(2), x));
       BooleanFormula f2 = imgr.equal(y, imgr.add(imgr.makeNumber(1), imgr.multiply(z, imgr.makeNumber(2))));
-      prover.push(f1);
-      T id2 = prover.push(f2);
-      boolean check = prover.isUnsat();
-
-      assertWithMessage("formulas must be contradicting").that(check).isTrue();
-      prover.getInterpolant(ImmutableList.of(id2));
-      // we actually only check for a successful execution here, the result is irrelevant.
-    }
-    */
-
-    try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
-      IntegerFormula x = imgr.makeVariable("x");
-      IntegerFormula y = imgr.makeVariable("y");
-      BooleanFormula f1 = imgr.equal(y, imgr.multiply(imgr.makeNumber(2), x));
-      BooleanFormula f2 = imgr.equal(y, imgr.add(imgr.makeNumber(1), imgr.multiply(x, imgr.makeNumber(2))));
+      
       prover.push(f1);
       T id2 = prover.push(f2);
       boolean check = prover.isUnsat();
@@ -107,31 +96,18 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
   @Test
   @SuppressWarnings("unchecked")
   public <T> void emptyInterpolationGroup() throws SolverException, InterruptedException {
-    /* FIXME
-    throw new RuntimeException("TIMEOUT - OpenSMT struggles to prove `2x ≠ 1+2y` for all integers x,y");
-
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       IntegerFormula x = imgr.makeVariable("x");
       IntegerFormula y = imgr.makeVariable("y");
-      IntegerFormula z = imgr.makeVariable("z");
+      /* INFO: Due to limitations in OpenSMT we need to use a simpler formular for this solver
+       * Setting z=x means that the original formula `2x ≠ 1+2z`simplifies to `0 ≠ 1`, which is trivially true
+       *
+       * https://github.com/usi-verification-and-security/opensmt/issues/638
+       */
+      IntegerFormula z = solverToUse() == Solvers.OPENSMT ? x : imgr.makeVariable("z");
+
       BooleanFormula f1 = imgr.equal(y, imgr.multiply(imgr.makeNumber(2), x));
       BooleanFormula f2 = imgr.equal(y, imgr.add(imgr.makeNumber(1), imgr.multiply(z, imgr.makeNumber(2))));
-      T id1 = prover.push(f1);
-      T id2 = prover.push(f2);
-      assertThat(prover.isUnsat()).isTrue();
-
-      BooleanFormula emptyB = prover.getInterpolant(ImmutableList.of(id1, id2));
-      assertThat(bmgr.isFalse(emptyB)).isTrue();
-      BooleanFormula emptyA = prover.getInterpolant(ImmutableList.of());
-      assertThat(bmgr.isTrue(emptyA)).isTrue();
-    }
-    */
-
-    try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
-      IntegerFormula x = imgr.makeVariable("x");
-      IntegerFormula y = imgr.makeVariable("y");
-      BooleanFormula f1 = imgr.equal(y, imgr.multiply(imgr.makeNumber(2), x));
-      BooleanFormula f2 = imgr.equal(y, imgr.add(imgr.makeNumber(1), imgr.multiply(x, imgr.makeNumber(2))));
       T id1 = prover.push(f1);
       T id2 = prover.push(f2);
       assertThat(prover.isUnsat()).isTrue();
