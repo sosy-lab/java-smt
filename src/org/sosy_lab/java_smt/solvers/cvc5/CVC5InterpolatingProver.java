@@ -262,7 +262,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
       ImmutableList<Collection<Term>> formula, Solver usingSolver) {
     Collection<Term> currColTerm = formula.get(0);
     ImmutableList<Collection<Term>> recList = formula.subList(1, formula.size());
-    if (recList.size() == 0) {
+    if (recList.isEmpty()) {
       return buildConjunctionOfFormulas(currColTerm, usingSolver);
     }
     return usingSolver.mkTerm(
@@ -288,7 +288,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     Collection<Term> removedFormulas =
         formulas.stream().filter(n -> !formula.equals(n)).collect(ImmutableList.toImmutableList());
 
-    if (removedFormulas.size() == 0) {
+    if (removedFormulas.isEmpty()) {
       return formula;
     }
 
