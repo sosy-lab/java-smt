@@ -30,7 +30,7 @@ import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
-class Z3OptimizationProver extends Z3AbstractProver<Void> implements OptimizationProverEnvironment {
+class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProverEnvironment {
 
   private final LogManager logger;
   private final long z3optSolver;
@@ -42,10 +42,9 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
       Z3FormulaManager pMgr,
       Set<ProverOptions> pOptions,
       ImmutableMap<String, Object> pSolverOptions,
-      ImmutableMap<String, String> pOptimizationOptions,
       @Nullable PathCounterTemplate pLogfile,
       ShutdownNotifier pShutdownNotifier) {
-    super(creator, pMgr, pOptions, pSolverOptions, pLogfile, pShutdownNotifier);
+    super(creator, pMgr, pOptions, pLogfile, pShutdownNotifier);
     z3optSolver = Native.mkOptimize(z3context);
     Native.optimizeIncRef(z3context, z3optSolver);
     logger = pLogger;
@@ -56,7 +55,7 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
     // set parameters for the optimization solver
     long params = Native.mkParams(z3context);
     Native.paramsIncRef(z3context, params);
-    for (Entry<String, String> entry : pOptimizationOptions.entrySet()) {
+    for (Entry<String, Object> entry : pSolverOptions.entrySet()) {
       addParameter(params, entry.getKey(), entry.getValue());
     }
     Native.optimizeSetParams(z3context, z3optSolver, params);
@@ -120,16 +119,6 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
     Preconditions.checkState(!closed);
     Native.optimizePop(z3context, z3optSolver);
     pop0();
-  }
-
-  @Override
-  @Nullable
-  public Void addConstraint(BooleanFormula constraint) throws InterruptedException {
-    Preconditions.checkState(!closed);
-    super.addConstraint(constraint);
-    long z3Constraint = creator.extractInfo(constraint);
-    Native.optimizeAssert(z3context, z3optSolver, z3Constraint);
-    return null;
   }
 
   @Override

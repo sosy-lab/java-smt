@@ -11,7 +11,6 @@ package org.sosy_lab.java_smt.solvers.z3;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.MoreFiles;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Z3Exception;
 import java.io.IOException;
@@ -39,7 +38,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
 
-abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
+abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
 
   protected final Z3FormulaCreator creator;
   protected final long z3context;
@@ -56,7 +55,6 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
       Z3FormulaCreator pCreator,
       Z3FormulaManager pMgr,
       Set<ProverOptions> pOptions,
-      ImmutableMap<String, Object> pSolverOptions,
       @Nullable PathCounterTemplate pLogfile,
       ShutdownNotifier pShutdownNotifier) {
     super(pOptions, pMgr.getBooleanFormulaManager(), pShutdownNotifier);
@@ -126,8 +124,8 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   protected abstract void assertContraintAndTrack(long constraint, long symbol);
 
-  @CanIgnoreReturnValue
-  protected long addConstraint0(BooleanFormula f) throws InterruptedException {
+  @Override
+  public Void addConstraint(BooleanFormula f) throws InterruptedException {
     Preconditions.checkState(!closed);
     long e = creator.extractInfo(f);
     Native.incRef(z3context, e);
@@ -146,8 +144,7 @@ abstract class Z3AbstractProver<T> extends AbstractProverWithAllSat<T> {
       throw creator.handleZ3Exception(exception);
     }
     Native.decRef(z3context, e);
-
-    return e;
+    return null;
   }
 
   protected void push0() throws InterruptedException {

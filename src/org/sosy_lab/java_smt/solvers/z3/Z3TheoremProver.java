@@ -23,7 +23,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 
-class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironment {
+class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
 
   private final long z3solver;
 
@@ -34,7 +34,7 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
       ImmutableMap<String, Object> pSolverOptions,
       @Nullable PathCounterTemplate pLogfile,
       ShutdownNotifier pShutdownNotifier) {
-    super(creator, pMgr, pOptions, pSolverOptions, pLogfile, pShutdownNotifier);
+    super(creator, pMgr, pOptions, pLogfile, pShutdownNotifier);
     z3solver = Native.mkSolver(z3context);
     Native.solverIncRef(z3context, z3solver);
 
@@ -66,13 +66,6 @@ class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironmen
     Preconditions.checkState(!closed);
     Native.solverPop(z3context, z3solver, 1);
     pop0();
-  }
-
-  @Override
-  @Nullable
-  public Void addConstraint(BooleanFormula f) throws InterruptedException {
-    super.addConstraint0(f);
-    return null;
   }
 
   @Override
