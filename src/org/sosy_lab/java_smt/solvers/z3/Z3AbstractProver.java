@@ -26,7 +26,6 @@ import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
-import org.sosy_lab.common.ShutdownNotifier.ShutdownRequestListener;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.collect.PathCopyingPersistentTreeMap;
 import org.sosy_lab.common.collect.PersistentMap;
@@ -48,8 +47,6 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
   private final Deque<PersistentMap<String, BooleanFormula>> storedConstraints;
 
   private final @Nullable PathCounterTemplate logfile;
-
-  protected ShutdownRequestListener interruptListener;
 
   Z3AbstractProver(
       Z3FormulaCreator pCreator,
@@ -257,7 +254,6 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
       if (storedConstraints != null) {
         storedConstraints.clear();
       }
-      shutdownNotifier.unregister(interruptListener);
     }
     super.close();
   }

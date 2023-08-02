@@ -18,6 +18,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.common.ShutdownNotifier.ShutdownRequestListener;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
@@ -26,6 +27,7 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
 
   private final long z3solver;
+  private final ShutdownRequestListener interruptListener;
 
   Z3TheoremProver(
       Z3FormulaCreator creator,
@@ -169,6 +171,7 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
 
       Native.solverReset(z3context, z3solver); // remove all assertions from the solver
       Native.solverDecRef(z3context, z3solver);
+      shutdownNotifier.unregister(interruptListener);
     }
     super.close();
   }

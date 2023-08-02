@@ -49,9 +49,6 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
     Native.optimizeIncRef(z3context, z3optSolver);
     logger = pLogger;
 
-    interruptListener = reason -> Native.solverInterrupt(z3context, z3optSolver);
-    shutdownNotifier.register(interruptListener);
-
     // set parameters for the optimization solver
     long params = Native.mkParams(z3context);
     Native.paramsIncRef(z3context, params);
