@@ -241,6 +241,10 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
       prover.push(bmgr.and(getConstraints()));
       for (int i = 0; i < problemSize; i++) {
         assertThat(prover).isSatisfiable();
+        /* FIXME: For some reason getEvaluator() seems to call the default implementation from
+         *        the interface, which will then use getModel(). This makes the test identical to
+         *        testModelGeneration
+         */
         try (Evaluator m = prover.getEvaluator()) {
           prover.push(getNewConstraints(i, m));
         }
