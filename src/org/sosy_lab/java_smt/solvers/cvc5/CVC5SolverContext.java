@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.solvers.cvc5;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
+import io.github.cvc5.Context;
 import io.github.cvc5.Solver;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -141,6 +142,9 @@ public final class CVC5SolverContext extends AbstractSolverContext {
   public void close() {
     if (creator != null) {
       closed = true;
+      solver.deletePointer();
+      // Don't use Context.deletePointers(); as it deletes statically information from all
+      // existing contexts, not only this one!
       creator = null;
     }
   }
