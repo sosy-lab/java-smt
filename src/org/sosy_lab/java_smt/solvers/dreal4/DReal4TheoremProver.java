@@ -38,6 +38,7 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import java.util.Set;
+import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Box;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Config;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Context;
@@ -61,6 +62,7 @@ class DReal4TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
     curCfg = new Config();
     curCnt = new Context(curCfg);
     model = new Box();
+    assertedFormulas.push(new ArrayList<>());
   }
 
   @Override
@@ -93,12 +95,11 @@ class DReal4TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
     Preconditions.checkState(!closed);
     return assertedFormulas.size() - 1;
   }
-
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     boolean unsat = curCnt.CheckSat(model);
-    return unsat;
+    return !unsat;
   }
 
   @Override
@@ -109,7 +110,9 @@ class DReal4TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
 
   @Override
   public Model getModel() throws SolverException {
-    return null;
+    Preconditions.checkState(!closed);
+    checkGenerateModels();
+    return new CachingModel(getEvaluatorWithoutChecks());
   }
 
   @Override
@@ -124,7 +127,7 @@ class DReal4TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   }
 
   @Override
-  protected Evaluator getEvaluatorWithoutChecks() throws SolverException {
-    return null;
+  protected DReal4Model getEvaluatorWithoutChecks(){
+    return new DReal4Model(this, creator, model);
   }
 }
