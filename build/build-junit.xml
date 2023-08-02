@@ -94,8 +94,6 @@ SPDX-License-Identifier: Apache-2.0
                         <exclude name="**/*$*Test.*"/>
                         <exclude name="**/*NativeApiTest.*"/>
                         <exclude name="**/*NativeAPITest.*"/>
-                        <exclude name="**/VariableNamesTest.*"/>
-                        <exclude name="**/VariableNamesEscaperTest.*"/>
                     </fileset>
                 </batchtest>
             </junit>
