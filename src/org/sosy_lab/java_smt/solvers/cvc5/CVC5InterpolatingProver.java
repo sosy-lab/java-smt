@@ -15,10 +15,11 @@ import com.google.common.collect.Iterables;
 import io.github.cvc5.Kind;
 import io.github.cvc5.Solver;
 import io.github.cvc5.Term;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -103,11 +104,8 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
 
     // fit the Input to work with getCVC5Interpolation
 
-    ArrayList<Collection<Term>> formAAsList = new ArrayList<>();
-    ArrayList<Collection<Term>> formBAsList = new ArrayList<>();
-
-    formAAsList.add(pFormulasOfA);
-    formBAsList.add(formulasOfB);
+    ImmutableList<Collection<Term>> formAAsList = ImmutableList.of(pFormulasOfA);
+    ImmutableList<Collection<Term>> formBAsList = ImmutableList.of(formulasOfB);
 
     Term itp = getCVC5Interpolation(formAAsList, formBAsList);
 
@@ -121,7 +119,8 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     Preconditions.checkArgument(
         !partitionedFormulas.isEmpty(), "at least one partition should be available.");
 
-    final List<BooleanFormula> itps = new ArrayList<>();
+    // final List<BooleanFormula> itps = new ArrayList<>();
+    List<BooleanFormula> itps = Stream.of(new BooleanFormula[] {}).collect(Collectors.toList());
     for (int i = 1; i < partitionedFormulas.size(); i++) {
       itps.add(
           getInterpolant(
@@ -140,10 +139,11 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
         pPartitionedFormulas.size(), pStartOfSubTree);
 
     // Generate every Interpolation Pair
-    ArrayList<ArrayList<ArrayList<Collection<Term>>>> interpolationPairs =
+    ImmutableList<ImmutableList<ImmutableList<Collection<Term>>>> interpolationPairs =
         getTreeInterpolationPairs(pPartitionedFormulas, pStartOfSubTree);
 
-    final ArrayList<Term> itps = new ArrayList<>();
+    // final ArrayList<Term> itps = new ArrayList<>();
+    final List<Term> itps = Stream.of(new Term[] {}).collect(Collectors.toList());
     try { // Interpolate every Interpolation Pair
       for (int i = 0; i < interpolationPairs.size(); i++) {
         itps.add(
@@ -158,7 +158,9 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
       }
     }
 
-    final List<BooleanFormula> result = new ArrayList<>();
+    // final List<BooleanFormula> result = new ArrayList<>();
+    final List<BooleanFormula> result =
+        Stream.of(new BooleanFormula[] {}).collect(Collectors.toList());
     for (Term itp : itps) {
       result.add(creator.encapsulateBoolean(itp));
     }
@@ -194,19 +196,24 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
    * Hence, CVC5's Interpolation produces an equivalent Interpolation to Craig Interpolation, if B
    * is negated during CVC5 Interpolation.
    *
-   * @param assertedInterpols current Set of Assertions A
-   * @param addedInterpols Formulas to Interpolate B
+   * @param pFormAAsList current Set of Assertions A
+   * @param pFormBAsList Formulas to Interpolate B
    * @return Interpolation of the Interpolation Pair following the definition of
    *         Craig-Interpolation.
    */
   private Term getCVC5Interpolation(
-      ArrayList<Collection<Term>> assertedInterpols, ArrayList<Collection<Term>> addedInterpols) {
+      ImmutableList<Collection<Term>> pFormAAsList,
+      ImmutableList<Collection<Term>> pFormBAsList) {
 
     // Respect Asserted Formulas not in the Interpolation Pairs
 
-    ArrayList<Collection<Term>> combinedInterpols = new ArrayList<>();
-    combinedInterpols.addAll(assertedInterpols);
-    combinedInterpols.addAll(addedInterpols);
+    // ArrayList<Collection<Term>> combinedInterpols = new ArrayList<>();
+    // combinedInterpols.addAll(pFormAAsList);
+    // combinedInterpols.addAll(pFormBAsList);
+
+    ImmutableList<Collection<Term>> combinedInterpols =
+        Stream.concat(pFormAAsList.stream(), pFormBAsList.stream())
+            .collect(ImmutableList.toImmutableList());
 
     // checks, that no Assertions in the Assertion stack are left out. Can happen in Tree
     // Interpolation, if pPartitionedFormulas does not contain every Set of Formulas from the
@@ -218,14 +225,14 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
 
     setSolverOptions(seed, solverOptions, interpolationSolver);
 
-    Term A = buildConjunctionOfFormulasOverArray(assertedInterpols, interpolationSolver);
+    Term A = buildConjunctionOfFormulasOverArray(pFormAAsList, interpolationSolver);
 
     if (!extraAssertions.isEmpty()) {
       Term extraAssert = new Term();
       extraAssert = buildConjunctionOfFormulas(extraAssertions, interpolationSolver);
       A = interpolationSolver.mkTerm(Kind.AND, extraAssert, A);
     }
-    Term B = buildConjunctionOfFormulasOverArray(addedInterpols, interpolationSolver);
+    Term B = buildConjunctionOfFormulasOverArray(pFormBAsList, interpolationSolver);
 
     interpolationSolver.assertFormula(A);
 
@@ -240,12 +247,16 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
    * Returns Asserted Formulas (from the formula Stack), not present in the given collection of
    * Terms.
    *
-   * @param collTerms asserted Formulas to invert the selection
+   * @param pCombinedInterpols asserted Formulas to invert the selection
    * @return asserted Formulas not in collTerms, but in the formula Stack
    */
-  private Collection<Term> getAssertedTermsNotInCollection(ArrayList<Collection<Term>> collTerms) {
-    ArrayList<Term> retTerms = new ArrayList<>();
-    collTerms.forEach((n) -> retTerms.addAll(n));
+  private Collection<Term>
+      getAssertedTermsNotInCollection(ImmutableList<Collection<Term>> pCombinedInterpols) {
+    ImmutableList<Term> retTerms =
+        pCombinedInterpols.stream()
+            .flatMap(Collection::stream)
+            .collect(ImmutableList.toImmutableList());
+    // pCombinedInterpols.forEach((n) -> retTerms.addAll(n));
     Set<Term> filteredAssertedTerms =
         assertedFormulas.stream()
             .flatMap(c -> c.stream())
@@ -263,16 +274,17 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
    * @return concatenated Formulas with AND as CVC5 Term
    */
   private Term buildConjunctionOfFormulasOverArray(
-      ArrayList<Collection<Term>> formula, Solver usingSolver) {
+      ImmutableList<Collection<Term>> formula,
+      Solver usingSolver) {
     Collection<Term> currColTerm = formula.get(0);
-    formula.remove(0);
-    if (formula.size() == 0) {
+    ImmutableList<Collection<Term>> recList = formula.subList(1, formula.size());
+    if (recList.size() == 0) {
       return buildConjunctionOfFormulas(currColTerm, usingSolver);
     }
     return usingSolver.mkTerm(
         Kind.AND,
         buildConjunctionOfFormulas(currColTerm, usingSolver),
-        buildConjunctionOfFormulasOverArray(formula, usingSolver));
+        buildConjunctionOfFormulasOverArray(recList, usingSolver));
   }
 
   /**
@@ -307,62 +319,98 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
    * @return An Array of Interpolation Pairs (as Tuple) containing Arrays of Collection of Terms
    */
   @SuppressWarnings("unchecked")
-  private ArrayList<ArrayList<ArrayList<Collection<Term>>>> getTreeInterpolationPairs(
+  private ImmutableList<ImmutableList<ImmutableList<Collection<Term>>>> getTreeInterpolationPairs(
       List<? extends Collection<Term>> pPartitionedFormulas, int[] pStartOfSubTree) {
-    ArrayList<ArrayList<ArrayList<Collection<Term>>>> result = new ArrayList<>();
     // current generated LHS of Tuple
-    ArrayList<Collection<Term>> currA = new ArrayList<>();
+    // ArrayList<Collection<Term>> currA = new ArrayList<>();
     // current generated RHS of Tuple
-    ArrayList<Collection<Term>> currB = new ArrayList<>(pPartitionedFormulas);
+    // ArrayList<Collection<Term>> currB = new ArrayList<>(pPartitionedFormulas);
     // current generated Interpolation Tuple
-    ArrayList<ArrayList<Collection<Term>>> betweenRes = new ArrayList<>();
-    ArrayList<Collection<Term>> copyOfFormulas = new ArrayList<>(pPartitionedFormulas);
-    List<Integer> leafes = new ArrayList<>();
+    // ArrayList<ArrayList<Collection<Term>>> betweenRes = new ArrayList<>();
+    // ArrayList<Collection<Term>> copyOfFormulas = new ArrayList<>(pPartitionedFormulas);
+    ImmutableList<Collection<Term>> copyOfFormulas = ImmutableList.copyOf(pPartitionedFormulas);
+    // List<Integer> leafes = new ArrayList<>();
 
     // First Interpolation Pair
-    leafes.add(pStartOfSubTree[0]);
-    currA.add(copyOfFormulas.get(0));
-    currB.remove(0);
-    betweenRes.add((ArrayList<Collection<Term>>) currA.clone());
-    betweenRes.add((ArrayList<Collection<Term>>) currB.clone());
-    result.add(betweenRes);
+    // leafes.add(pStartOfSubTree[0]);
+    ImmutableList<Integer> leafes = ImmutableList.of(pStartOfSubTree[0]);
+    // currA.add(copyOfFormulas.get(0));
+    ImmutableList<Collection<Term>> currA = ImmutableList.of(copyOfFormulas.get(0));
+    // currB.remove(0);
+    ImmutableList<Collection<Term>> currB =
+        ImmutableList.copyOf(copyOfFormulas.subList(1, copyOfFormulas.size()));
+    // betweenRes.add((ArrayList<Collection<Term>>) currA.clone());
+    // betweenRes.add((ArrayList<Collection<Term>>) currB.clone());
+    ImmutableList<ImmutableList<Collection<Term>>> betweenRes = ImmutableList.of(currA, currB);
+    // result.add(betweenRes);
+    ImmutableList<ImmutableList<ImmutableList<Collection<Term>>>> result =
+        ImmutableList.of(betweenRes);
     // clear between Storage
-    betweenRes = new ArrayList<>();
+    // betweenRes = new ArrayList<>();
     // iterate through Tree structure
     for (int i = 1; i < pStartOfSubTree.length - 1; i++) {
       // if the leave does not change, continue like Sequential Interpolation
       if (pStartOfSubTree[i] == pStartOfSubTree[i - 1]) {
-        currA.add(copyOfFormulas.get(i));
-        currB.remove(0);
-        betweenRes.add((ArrayList<Collection<Term>>) currA.clone());
-        betweenRes.add((ArrayList<Collection<Term>>) currB.clone());
+        // currA.add(copyOfFormulas.get(i));
+        currA =
+            Stream.concat(currA.stream(), ImmutableList.of(copyOfFormulas.get(i)).stream())
+                .collect(ImmutableList.toImmutableList());
+        // currB.remove(0);
+        currB = currB.subList(1, currB.size());
+        // betweenRes.add((ArrayList<Collection<Term>>) currA.clone());
+        // betweenRes.add((ArrayList<Collection<Term>>) currB.clone());
+        betweenRes = ImmutableList.of(currA, currB);
       } else {
         // if the leave for the node already existed, rebuild the arrays, split at the node
         if (leafes.contains(pStartOfSubTree[i])) {
-          currA = new ArrayList<>();
-          currB = new ArrayList<>();
+          // currA = new ArrayList<>();
+          currA = new ImmutableList.Builder<Collection<Term>>().build();
+          // currB = new ArrayList<>();
+          currB = new ImmutableList.Builder<Collection<Term>>().build();
           for (int j = 0; j < pStartOfSubTree.length; j++) {
             if (j <= i) {
-              currA.add(copyOfFormulas.get(j));
+              // currA.add(copyOfFormulas.get(j));
+              currA =
+                  Stream.concat(currA.stream(), ImmutableList.of(copyOfFormulas.get(j)).stream())
+                      .collect(ImmutableList.toImmutableList());
             } else {
-              currB.add(copyOfFormulas.get(j));
+              // currB.add(copyOfFormulas.get(j));
+              currB =
+                  Stream.concat(currA.stream(), ImmutableList.of(copyOfFormulas.get(j)).stream())
+                      .collect(ImmutableList.toImmutableList());
             }
           }
-          betweenRes.add((ArrayList<Collection<Term>>) currA.clone());
-          betweenRes.add((ArrayList<Collection<Term>>) currB.clone());
+          // betweenRes.add((ArrayList<Collection<Term>>) currA.clone());
+          // betweenRes.add((ArrayList<Collection<Term>>) currB.clone());
+          betweenRes = ImmutableList.of(currA, currB);
           // rebuild currA from beginning with new node
         } else {
-          currB.addAll(currA);
-          currA = new ArrayList<>();
-          currA.add(copyOfFormulas.get(i));
-          currB.remove(0);
-          betweenRes.add((ArrayList<Collection<Term>>) currA.clone());
-          betweenRes.add((ArrayList<Collection<Term>>) currB.clone());
-          leafes.add(pStartOfSubTree[i]);
+          // currB.addAll(currA);
+          currB =
+              Stream.concat(currB.stream(), currA.stream())
+                  .collect(ImmutableList.toImmutableList());
+          // currA = new ArrayList<>();
+          currA = new ImmutableList.Builder<Collection<Term>>().build();
+          // currA.add(copyOfFormulas.get(i));
+          currA =
+              Stream.concat(currA.stream(), ImmutableList.of(copyOfFormulas.get(i)).stream())
+                  .collect(ImmutableList.toImmutableList());
+          // currB.remove(0);
+          currB = currB.subList(1, currB.size());
+          // betweenRes.add((ArrayList<Collection<Term>>) currA.clone());
+          // betweenRes.add((ArrayList<Collection<Term>>) currB.clone());
+          betweenRes = ImmutableList.of(currA, currB);
+          // leafes.add(pStartOfSubTree[i]);
+          leafes =
+              Stream.concat(leafes.stream(), ImmutableList.of(pStartOfSubTree[i]).stream())
+                  .collect(ImmutableList.toImmutableList());
         }
       }
-      result.add(betweenRes);
-      betweenRes = new ArrayList<>();
+      // result.add(betweenRes);
+      result =
+          Stream.concat(result.stream(), ImmutableList.of(betweenRes).stream())
+              .collect(ImmutableList.toImmutableList());
+      // betweenRes = new ArrayList<>();
     }
     assert result.size() == pStartOfSubTree.length - 1;
     return result;
