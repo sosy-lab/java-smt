@@ -44,8 +44,9 @@ public class SolverStackTest extends SolverBasedTest0 {
   public static List<Object[]> getAllCombinations() {
     List<Object[]> result = new ArrayList<>();
     for (Solvers solver : Solvers.values()) {
-      result.add(new Object[] {solver, false});
-      result.add(new Object[] {solver, true});
+      for (String kind : new String[] {"default", "optimize", "interpolation"}) {
+        result.add(new Object[] {solver, kind});
+      }
     }
     return result;
   }
@@ -59,15 +60,19 @@ public class SolverStackTest extends SolverBasedTest0 {
   }
 
   @Parameter(1)
-  public boolean useInterpolatingEnvironment;
+  public String kind;
 
   /** Generate a prover environment depending on the parameter above. */
   private BasicProverEnvironment<?> newEnvironmentForTest(ProverOptions... options) {
-    if (useInterpolatingEnvironment) {
-      requireInterpolation();
-      return context.newProverEnvironmentWithInterpolation(options);
-    } else {
-      return context.newProverEnvironment(options);
+    switch (kind) {
+      case "optimize":
+        requireOptimization();
+        return context.newOptimizationProverEnvironment(options);
+      case "interpolation":
+        requireInterpolation();
+        return context.newProverEnvironmentWithInterpolation(options);
+      default:
+        return context.newProverEnvironment(options);
     }
   }
 
