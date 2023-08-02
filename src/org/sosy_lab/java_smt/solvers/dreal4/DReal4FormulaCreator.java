@@ -22,13 +22,16 @@ package org.sosy_lab.java_smt.solvers.dreal4;
 import static java.lang.Double.parseDouble;
 import static java.lang.String.valueOf;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import edu.stanford.CVC4.Expr;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -56,10 +59,10 @@ import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable.Type;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.VariableSet;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variables;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.dreal;
-
-
 public class DReal4FormulaCreator extends FormulaCreator<DRealTerm<?, ?>, Type, Context,
     DRealTerm<?, ?>> {
+
+  private final Map<String, DRealTerm<Variable, Type>> variablesCache = new HashMap<>();
 
   public DReal4FormulaCreator(Context context) {
     super(context, Type.BOOLEAN, Type.INTEGER, Type.CONTINUOUS, null, null);
@@ -82,8 +85,20 @@ public class DReal4FormulaCreator extends FormulaCreator<DRealTerm<?, ?>, Type, 
 
   @Override
   public DRealTerm<Variable, Type> makeVariable(Type pType, String varName) {
-    return new DRealTerm<>(new Variable(varName, pType), pType,
-        pType);
+    if (variablesCache.get(varName) == null) {
+      DRealTerm<Variable, Type> var =
+          new DRealTerm<>(new Variable(varName, pType), pType, pType);
+      variablesCache.put(varName, var);
+      return var;
+    } else {
+      DRealTerm<Variable, Type> var = variablesCache.get(varName);
+      if (var.getVariable().get_type() == pType) {
+        return var;
+      } else {
+        throw new IllegalArgumentException("Symbol name already in use for different type "
+            + var.getType());
+      }
+    }
   }
 
   @Override
@@ -239,14 +254,13 @@ public class DReal4FormulaCreator extends FormulaCreator<DRealTerm<?, ?>, Type, 
 
     DRealTerm<?, ?> pDeclaration;
 
+    // Variable should be handled above, just to be sure
+    Preconditions.checkState(f.isExp() || f.isFormula());
     if (f.isExp()) {
       pDeclaration = new DRealTerm<>(new Expression(), f.getType(),f.getExpressionKind());
-    } else if (f.isFormula()) {
+    } else {
       pDeclaration = new DRealTerm<>(new org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula(),
           f.getType(), f.getFormulaKind());
-    } else {
-      throw new AssertionError("We should not get a Variable, the function should have already " 
-          + "returned visitFreeVariable.");
     }
 
 
