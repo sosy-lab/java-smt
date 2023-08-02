@@ -36,6 +36,8 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   protected boolean closed = false;
 
   private final Set<Evaluator> evaluators = new LinkedHashSet<>();
+
+  /** This data-structure tracks all formulas that were asserted on different levels. */
   private final List<Collection<BooleanFormula>> assertedFormulas = new ArrayList<>();
 
   private static final String TEMPLATE = "Please set the prover option %s.";
