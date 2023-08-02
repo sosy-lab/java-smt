@@ -286,7 +286,7 @@ public class SolverContextFactory {
 
       case DREAL4:
         return DReal4SolverContext.create(logger, shutdownNotifier, (int) randomSeed,
-            nonLinearArithmetic);
+            nonLinearArithmetic, loader);
 
       default:
         throw new AssertionError("no solver selected");

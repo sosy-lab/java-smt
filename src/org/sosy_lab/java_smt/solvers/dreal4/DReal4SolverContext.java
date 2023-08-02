@@ -20,6 +20,7 @@
 
 package org.sosy_lab.java_smt.solvers.dreal4;
 
+import java.util.function.Consumer;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
@@ -52,8 +53,11 @@ public class DReal4SolverContext extends AbstractSolverContext {
       LogManager pLogger,
       ShutdownNotifier pShutdownNotifier,
       int randomSeed,
-      NonLinearArithmetic pNonLinearArithmetic
+      NonLinearArithmetic pNonLinearArithmetic,
+      Consumer<String> pLoader
       ) {
+
+    pLoader.accept("dreal4");
 
     // Create config
     Config config = new Config();
@@ -95,12 +99,12 @@ public class DReal4SolverContext extends AbstractSolverContext {
 
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(Set<ProverOptions> pSet) {
-    throw new UnsupportedOperationException("dReal does not support interpolation");
+    throw new UnsupportedOperationException("dReal does not support interpolation.");
   }
 
   @Override
   protected OptimizationProverEnvironment newOptimizationProverEnvironment0(Set<ProverOptions> pSet) {
-    return null;
+    throw new UnsupportedOperationException("dReal does not support optimization.");
   }
 
   @Override
