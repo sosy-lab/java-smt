@@ -108,14 +108,33 @@ public class Yices2SolverContext extends AbstractSolverContext {
   }
 
   @Override
+  protected ProverEnvironment copyProverEnvironment0(ProverEnvironment proverToCopy) {
+    throw new UnsupportedOperationException(
+        "Yices2 does not support the copying of " + "ProverEnvironments");
+  }
+
+  @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> pSet) {
     throw new UnsupportedOperationException("Yices does not support interpolation");
   }
 
   @Override
+  protected InterpolatingProverEnvironment<?> copyProverEnvironmentWithInterpolation0(
+      InterpolatingProverEnvironment<?> proverToCopy) {
+    throw new UnsupportedOperationException(
+        "Yices2 does not support the copying of " + "ProverEnvironments");
+  }
+
+  @Override
   protected OptimizationProverEnvironment newOptimizationProverEnvironment0(
       Set<ProverOptions> pSet) {
+    throw new UnsupportedOperationException("Yices does not support optimization");
+  }
+
+  @Override
+  public OptimizationProverEnvironment copyOptimizationProverEnvironment(
+      OptimizationProverEnvironment proverToCopy) {
     throw new UnsupportedOperationException("Yices does not support optimization");
   }
 

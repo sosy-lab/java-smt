@@ -231,6 +231,12 @@ public final class SmtInterpolSolverContext extends AbstractSolverContext {
     return new SmtInterpolTheoremProver(manager, newScript, options, shutdownNotifier);
   }
 
+  @Override
+  protected ProverEnvironment copyProverEnvironment0(ProverEnvironment proverToCopy) {
+    throw new UnsupportedOperationException(
+        "SMTInterpol does not support the copying of ProverEnvironments");
+  }
+
   @SuppressWarnings("resource")
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
@@ -253,8 +259,21 @@ public final class SmtInterpolSolverContext extends AbstractSolverContext {
   }
 
   @Override
+  protected InterpolatingProverEnvironment<?> copyProverEnvironmentWithInterpolation0(
+      InterpolatingProverEnvironment<?> proverToCopy) {
+    throw new UnsupportedOperationException(
+        "SMTInterpol does not support the copying of ProverEnvironments");
+  }
+
+  @Override
   public OptimizationProverEnvironment newOptimizationProverEnvironment0(
       Set<ProverOptions> options) {
+    throw new UnsupportedOperationException("SMTInterpol does not support optimization");
+  }
+
+  @Override
+  public OptimizationProverEnvironment copyOptimizationProverEnvironment(
+      OptimizationProverEnvironment proverToCopy) {
     throw new UnsupportedOperationException("SMTInterpol does not support optimization");
   }
 

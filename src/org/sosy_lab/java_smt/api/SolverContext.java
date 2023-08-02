@@ -66,6 +66,16 @@ public interface SolverContext extends AutoCloseable {
   ProverEnvironment newProverEnvironment(ProverOptions... options);
 
   /**
+   * Create a new {@link ProverEnvironment} which encapsulates an assertion stack and can be used to
+   * check formulas for unsatisfiability, but retains the current assertion stack of the given
+   * {@link ProverEnvironment}. Options are carried over from proverToCopy.
+   *
+   * @param proverToCopy An existing {@link ProverEnvironment}, whichs assertion stack is to be
+   *     copied into the new one.
+   */
+  ProverEnvironment copyProverEnvironment(ProverEnvironment proverToCopy);
+
+  /**
    * Create a fresh new {@link InterpolatingProverEnvironment} which encapsulates an assertion stack
    * and allows generating and retrieve interpolants for unsatisfiable formulas. If the SMT solver
    * is able to handle satisfiability tests with assumptions please consider implementing the {@link
@@ -77,6 +87,20 @@ public interface SolverContext extends AutoCloseable {
   InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation(ProverOptions... options);
 
   /**
+   * Create a fresh new {@link InterpolatingProverEnvironment} which encapsulates an assertion stack
+   * and allows generating and retrieve interpolants for unsatisfiable formulas. The new {@link
+   * InterpolatingProverEnvironment} retains the current assertion stack of the given {@link
+   * InterpolatingProverEnvironment}. If the SMT solver is able to handle satisfiability tests with
+   * assumptions please consider implementing the {@link InterpolatingProverEnvironment} interface,
+   * and return an Object of this type here. Options are carried over from proverToCopy.
+   *
+   * @param proverToCopy An existing {@link InterpolatingProverEnvironment}, whichs assertion stack
+   *     is to be copied into the new one.
+   */
+  InterpolatingProverEnvironment<?> copyProverEnvironmentWithInterpolation(
+      InterpolatingProverEnvironment<?> proverToCopy);
+
+  /**
    * Create a fresh new {@link OptimizationProverEnvironment} which encapsulates an assertion stack
    * and allows solving optimization queries.
    *
@@ -84,6 +108,18 @@ public interface SolverContext extends AutoCloseable {
    *     {@link ProverOptions} are turned off by default.
    */
   OptimizationProverEnvironment newOptimizationProverEnvironment(ProverOptions... options);
+
+  /**
+   * Create a fresh new {@link OptimizationProverEnvironment} which encapsulates an assertion stack
+   * and allows solving optimization queries. The new {@link OptimizationProverEnvironment} retains
+   * the current assertion stack of the given {@link OptimizationProverEnvironment}. Options are
+   * carried over from proverToCopy.
+   *
+   * @param proverToCopy An existing {@link ProverEnvironment}, whichs assertion stack is to be
+   *     copied into the new one.
+   */
+  OptimizationProverEnvironment copyOptimizationProverEnvironment(
+      OptimizationProverEnvironment proverToCopy);
 
   /**
    * Get version information out of the solver.

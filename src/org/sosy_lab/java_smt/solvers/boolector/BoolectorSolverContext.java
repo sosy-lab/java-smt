@@ -205,14 +205,33 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
   }
 
   @Override
+  protected ProverEnvironment copyProverEnvironment0(ProverEnvironment proverToCopy) {
+    throw new UnsupportedOperationException(
+        "Boolector does not support the copying of ProverEnvironments");
+  }
+
+  @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> pSet) {
     throw new UnsupportedOperationException("Boolector does not support interpolation");
   }
 
   @Override
+  protected InterpolatingProverEnvironment<?> copyProverEnvironmentWithInterpolation0(
+      InterpolatingProverEnvironment<?> proverToCopy) {
+    throw new UnsupportedOperationException(
+        "Boolector does not support the copying of ProverEnvironments");
+  }
+
+  @Override
   protected OptimizationProverEnvironment newOptimizationProverEnvironment0(
       Set<ProverOptions> pSet) {
+    throw new UnsupportedOperationException("Boolector does not support optimization");
+  }
+
+  @Override
+  public OptimizationProverEnvironment copyOptimizationProverEnvironment(
+      OptimizationProverEnvironment proverToCopy) {
     throw new UnsupportedOperationException("Boolector does not support optimization");
   }
 

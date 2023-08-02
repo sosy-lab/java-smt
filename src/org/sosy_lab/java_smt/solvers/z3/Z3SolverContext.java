@@ -14,8 +14,12 @@ import com.google.common.collect.ImmutableMap;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.enumerations.Z3_ast_print_mode;
 import java.io.IOException;
+import java.lang.ref.PhantomReference;
+import java.lang.ref.Reference;
+import java.lang.ref.ReferenceQueue;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.IdentityHashMap;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.logging.Level;
@@ -47,6 +51,10 @@ public final class Z3SolverContext extends AbstractSolverContext {
   private final Z3FormulaCreator creator;
   private final Z3FormulaManager manager;
   private boolean closed = false;
+
+  private final ReferenceQueue<Long> referenceQueue = new ReferenceQueue<>();
+  private final IdentityHashMap<PhantomReference<Long>, Long> referenceMap =
+      new IdentityHashMap<>();
 
   private static final String OPT_ENGINE_CONFIG_KEY = "optsmt_engine";
   private static final String OPT_PRIORITY_CONFIG_KEY = "priority";
@@ -216,25 +224,72 @@ public final class Z3SolverContext extends AbstractSolverContext {
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
-    final ImmutableMap<String, Object> solverOptions =
-        ImmutableMap.<String, Object>builder()
-            .put(":random-seed", extraOptions.randomSeed)
-            .put(
-                ":model",
-                options.contains(ProverOptions.GENERATE_MODELS)
-                    || options.contains(ProverOptions.GENERATE_ALL_SAT))
-            .put(
-                ":unsat_core",
-                options.contains(ProverOptions.GENERATE_UNSAT_CORE)
-                    || options.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS))
-            .buildOrThrow();
     return new Z3TheoremProver(
-        creator, manager, options, solverOptions, extraOptions.logfile, shutdownNotifier);
+        creator,
+        manager,
+        options,
+        generateSolverOptions(options),
+        extraOptions.logfile,
+        shutdownNotifier);
+  }
+
+  @Override
+  protected ProverEnvironment copyProverEnvironment0(ProverEnvironment proverToCopy) {
+    Preconditions.checkState(!closed, "solver context is already closed");
+    Preconditions.checkArgument(
+        proverToCopy instanceof Z3AbstractProver,
+        "You may only copy " + "ProverEnvironments of the same solver.");
+
+    final Long z3solver =
+        Native.solverTranslate(
+            creator.getEnv(), ((Z3AbstractProver<?>) proverToCopy).getZ3Solver(), creator.getEnv());
+
+    Native.solverIncRef(creator.getEnv(), z3solver);
+
+    referenceMap.put(new PhantomReference<>(z3solver, referenceQueue), z3solver);
+
+    Reference<? extends Long> ref;
+    while ((ref = referenceQueue.poll()) != null) {
+      long z3ast = referenceMap.remove(ref);
+      Native.solverDecRef(creator.getEnv(), z3ast);
+    }
+
+    // Get the original options from the previous solver
+    Set<ProverOptions> options = ((Z3AbstractProver<?>) proverToCopy).getZ3ProverOptions();
+
+    return new Z3TheoremProver(
+        creator,
+        manager,
+        z3solver,
+        options,
+        generateSolverOptions(options),
+        extraOptions.logfile,
+        shutdownNotifier);
+  }
+
+  private ImmutableMap<String, Object> generateSolverOptions(Set<ProverOptions> options) {
+    return ImmutableMap.<String, Object>builder()
+        .put(":random-seed", extraOptions.randomSeed)
+        .put(
+            ":model",
+            options.contains(ProverOptions.GENERATE_MODELS)
+                || options.contains(ProverOptions.GENERATE_ALL_SAT))
+        .put(
+            ":unsat_core",
+            options.contains(ProverOptions.GENERATE_UNSAT_CORE)
+                || options.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS))
+        .buildOrThrow();
   }
 
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> options) {
+    throw new UnsupportedOperationException("Z3 does not support interpolation");
+  }
+
+  @Override
+  protected InterpolatingProverEnvironment<?> copyProverEnvironmentWithInterpolation0(
+      InterpolatingProverEnvironment<?> proverToCopy) {
     throw new UnsupportedOperationException("Z3 does not support interpolation");
   }
 
@@ -257,6 +312,13 @@ public final class Z3SolverContext extends AbstractSolverContext {
         optimizationOptions,
         extraOptions.logfile,
         shutdownNotifier);
+  }
+
+  @Override
+  public OptimizationProverEnvironment copyOptimizationProverEnvironment(
+      OptimizationProverEnvironment proverToCopy) {
+    // TODO: check if we can do this!
+    throw new UnsupportedOperationException("Z3 does not support copying of optimization provers.");
   }
 
   @Override

@@ -46,7 +46,20 @@ public abstract class AbstractSolverContext implements SolverContext {
     return out;
   }
 
+  @Override
+  public final ProverEnvironment copyProverEnvironment(ProverEnvironment proverToCopy) {
+    ProverEnvironment out = copyProverEnvironment0(proverToCopy);
+    if (!supportsAssumptionSolving()) {
+      // In the case we do not already have a prover environment with assumptions,
+      // we add a wrapper to it
+      out = new ProverWithAssumptionsWrapper(out);
+    }
+    return out;
+  }
+
   protected abstract ProverEnvironment newProverEnvironment0(Set<ProverOptions> options);
+
+  protected abstract ProverEnvironment copyProverEnvironment0(ProverEnvironment proverToCopy);
 
   @SuppressWarnings("resource")
   @Override
@@ -62,8 +75,25 @@ public abstract class AbstractSolverContext implements SolverContext {
     return out;
   }
 
+  @SuppressWarnings("resource")
+  @Override
+  public final InterpolatingProverEnvironment<?> copyProverEnvironmentWithInterpolation(
+      InterpolatingProverEnvironment<?> proverToCopy) {
+
+    InterpolatingProverEnvironment<?> out = copyProverEnvironmentWithInterpolation0(proverToCopy);
+    if (!supportsAssumptionSolving()) {
+      // In the case we do not already have a prover environment with assumptions,
+      // we add a wrapper to it
+      out = new InterpolatingProverWithAssumptionsWrapper<>(out, fmgr);
+    }
+    return out;
+  }
+
   protected abstract InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> pSet);
+
+  protected abstract InterpolatingProverEnvironment<?> copyProverEnvironmentWithInterpolation0(
+      InterpolatingProverEnvironment<?> proverToCopy);
 
   @SuppressWarnings("resource")
   @Override
