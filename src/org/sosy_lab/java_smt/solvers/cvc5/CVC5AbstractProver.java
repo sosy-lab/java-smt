@@ -9,16 +9,15 @@
 package org.sosy_lab.java_smt.solvers.cvc5;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import io.github.cvc5.CVC5ApiException;
 import io.github.cvc5.Result;
 import io.github.cvc5.Solver;
 import io.github.cvc5.Term;
 import io.github.cvc5.UnknownExplanation;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -39,9 +38,6 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   protected final Solver solver;
   private boolean changedSinceLastSatQuery = false;
 
-  /** Tracks formulas on the stack, needed for model generation. */
-  protected final Deque<List<Term>> assertedFormulas = new ArrayDeque<>();
-
   // TODO: does CVC5 support separation logic in incremental mode?
   protected final boolean incremental;
 
@@ -56,8 +52,6 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     mgr = pMgr;
     creator = pFormulaCreator;
     incremental = !enableSL;
-    assertedFormulas.push(new ArrayList<>()); // create initial level
-
     solver = new Solver();
 
     setSolverOptions(randomSeed, pOptions);
@@ -86,10 +80,10 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   @Override
-  public void push() {
+  public void push() throws InterruptedException {
     Preconditions.checkState(!closed);
     setChanged();
-    assertedFormulas.push(new ArrayList<>());
+    super.push();
     if (incremental) {
       try {
         solver.push();
@@ -104,8 +98,6 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   public void pop() {
     Preconditions.checkState(!closed);
     setChanged();
-    assertedFormulas.pop();
-    Preconditions.checkState(!assertedFormulas.isEmpty(), "initial level must remain until close");
     if (incremental) {
       try {
         solver.pop();
@@ -114,14 +106,15 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
             "You tried to use pop() on an CVC5 assertion stack illegally.", e);
       }
     }
+    super.pop();
   }
 
   @Override
   public @Nullable T addConstraint(BooleanFormula pF) throws InterruptedException {
     Preconditions.checkState(!closed);
     setChanged();
+    super.addConstraint(pF);
     Term exp = creator.extractInfo(pF);
-    assertedFormulas.peek().add(exp);
     if (incremental) {
       solver.assertFormula(exp);
     }
@@ -136,7 +129,12 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     checkGenerateModels();
     // special case for CVC5: Models are not permanent and need to be closed
     // before any change is applied to the prover stack. So, we register the Model as Evaluator.
-    return registerEvaluator(new CVC5Model(this, mgr, creator, getAssertedExpressions()));
+    return registerEvaluator(
+        new CVC5Model(
+            this,
+            mgr,
+            creator,
+            Collections2.transform(getAssertedFormulas(), creator::extractInfo)));
   }
 
   @Override
@@ -173,7 +171,7 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     closeAllEvaluators();
     changedSinceLastSatQuery = false;
     if (!incremental) {
-      getAssertedExpressions().forEach(solver::assertFormula);
+      getAssertedFormulas().forEach(f -> solver.assertFormula(creator.extractInfo(f)));
     }
 
     /* Shutdown currently not possible in CVC5. */
@@ -218,25 +216,11 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     throw new UnsupportedOperationException();
   }
 
-  protected Collection<Term> getAssertedExpressions() {
-    List<Term> result = new ArrayList<>();
-    assertedFormulas.forEach(result::addAll);
-    return result;
-  }
-
   @Override
   public void close() {
     if (!closed) {
-      assertedFormulas.clear();
       solver.deletePointer();
-      closed = true;
     }
     super.close();
-  }
-
-  @Override
-  public int size() {
-    Preconditions.checkState(!closed);
-    return assertedFormulas.size() - 1;
   }
 }

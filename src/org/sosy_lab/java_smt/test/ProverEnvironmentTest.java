@@ -17,7 +17,6 @@ import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.CVC4;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.CVC5;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.MATHSAT5;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.PRINCESS;
-import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.Z3;
 import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE;
 import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
@@ -96,7 +95,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
     requireOptimization();
 
     // Z3 and Boolector do not implement unsat core for optimization
-    assume().that(solverToUse()).isNoneOf(Z3, BOOLECTOR);
+    assume().that(solverToUse()).isNotEqualTo(BOOLECTOR);
 
     try (BasicProverEnvironment<?> pe =
         context.newOptimizationProverEnvironment(GENERATE_UNSAT_CORE)) {
