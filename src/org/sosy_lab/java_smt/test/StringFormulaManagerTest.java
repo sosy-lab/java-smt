@@ -19,10 +19,6 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
@@ -33,8 +29,7 @@ import org.sosy_lab.java_smt.api.StringFormula;
 
 @SuppressWarnings("ConstantConditions")
 @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE", justification = "test code")
-@RunWith(Parameterized.class)
-public class StringFormulaManagerTest extends SolverBasedTest0 {
+public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   private static final ImmutableList<String> WORDS =
       ImmutableList.of(
@@ -71,18 +66,6 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
 
   private StringFormula hello;
   private RegexFormula a2z;
-
-  @Parameters(name = "{0}")
-  public static Object[] getAllSolvers() {
-    return Solvers.values();
-  }
-
-  @Parameter public Solvers solverUnderTest;
-
-  @Override
-  protected Solvers solverToUse() {
-    return solverUnderTest;
-  }
 
   @Before
   public void setup() {
@@ -157,7 +140,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
     assertThatFormula(smgr.in(smgr.makeString("a\\u0336"), regexAllChar)).isUnsatisfiable();
     assertThatFormula(smgr.in(smgr.makeString("\\n"), regexAllChar)).isUnsatisfiable();
 
-    if (ImmutableList.of(Solvers.CVC4, Solvers.CVC5).contains(solverUnderTest)) {
+    if (ImmutableList.of(Solvers.CVC4, Solvers.CVC5).contains(solverToUse())) {
       // CVC4 and CVC5 do not support Unicode characters.
       assertThrows(Exception.class, () -> smgr.range('a', 'Δ'));
     } else {

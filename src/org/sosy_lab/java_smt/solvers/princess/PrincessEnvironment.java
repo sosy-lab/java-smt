@@ -71,11 +71,11 @@ import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import scala.Tuple2;
 import scala.Tuple4;
 import scala.collection.immutable.Seq;
+import scala.collection.immutable.Set$;
 
 /**
  * This is a Wrapper around Princess. This Wrapper allows to set a logfile for all Smt-Queries
@@ -215,7 +215,8 @@ class PrincessEnvironment {
             directory, // dumpDirectory
             SimpleAPI.apply$default$8(), // tightFunctionScopes
             SimpleAPI.apply$default$9(), // genTotalityAxioms
-            new scala.Some<>(randomSeed) // randomSeed
+            new scala.Some<>(randomSeed), // randomSeed
+            Set$.MODULE$.empty() // empty Set<LOG_FLAG>, no internal logging
             );
 
     if (constructProofs) { // needed for interpolation and unsat cores
@@ -536,7 +537,7 @@ class PrincessEnvironment {
       Sort elementSort = ((ExtArray.ArraySort) sort).theory().objSort();
       assert indexSorts.iterator().size() == 1 : "unexpected index type in Array type:" + sort;
       // assert indexSorts.size() == 1; // TODO Eclipse does not like simpler code.
-      return new ArrayFormulaType<>(
+      return FormulaType.getArrayType(
           getFormulaTypeFromSort(indexSorts.iterator().next()), // get single index-sort
           getFormulaTypeFromSort(elementSort));
     } else if (sort instanceof MultipleValueBool$) {

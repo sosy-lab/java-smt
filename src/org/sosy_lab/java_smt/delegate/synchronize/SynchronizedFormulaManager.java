@@ -20,6 +20,7 @@ import org.sosy_lab.java_smt.api.ArrayFormulaManager;
 import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
+import org.sosy_lab.java_smt.api.EnumerationFormulaManager;
 import org.sosy_lab.java_smt.api.FloatingPointFormulaManager;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -115,6 +116,14 @@ class SynchronizedFormulaManager implements FormulaManager {
   public StringFormulaManager getStringFormulaManager() {
     synchronized (sync) {
       return new SynchronizedStringFormulaManager(delegate.getStringFormulaManager(), sync);
+    }
+  }
+
+  @Override
+  public EnumerationFormulaManager getEnumerationFormulaManager() {
+    synchronized (sync) {
+      return new SynchronizedEnumerationFormulaManager(
+          delegate.getEnumerationFormulaManager(), sync);
     }
   }
 

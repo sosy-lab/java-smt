@@ -24,6 +24,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.java_smt.api.ArrayFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.EnumerationFormulaManager;
 import org.sosy_lab.java_smt.api.FloatingPointFormulaManager;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -120,6 +121,9 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   private final @Nullable AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
       strManager;
 
+  private final @Nullable AbstractEnumerationFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
+      enumManager;
+
   private final FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> formulaCreator;
 
   /** Builds a solver from the given theory implementations. */
@@ -138,7 +142,9 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
           quantifiedManager,
       @Nullable AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> arrayManager,
       @Nullable AbstractSLFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> slManager,
-      @Nullable AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> strManager) {
+      @Nullable AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> strManager,
+      @Nullable AbstractEnumerationFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
+          enumManager) {
 
     this.arrayManager = arrayManager;
     this.quantifiedManager = quantifiedManager;
@@ -150,6 +156,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     this.floatingPointManager = floatingPointManager;
     this.slManager = slManager;
     this.strManager = strManager;
+    this.enumManager = enumManager;
     this.formulaCreator = pFormulaCreator;
 
     checkArgument(
@@ -157,7 +164,9 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
             && functionManager.getFormulaCreator() == formulaCreator
             && !(bitvectorManager != null && bitvectorManager.getFormulaCreator() != formulaCreator)
             && !(floatingPointManager != null
-                && floatingPointManager.getFormulaCreator() != formulaCreator),
+                && floatingPointManager.getFormulaCreator() != formulaCreator)
+            && !(quantifiedManager != null
+                && quantifiedManager.getFormulaCreator() != formulaCreator),
         "The creator instances must match across the managers!");
   }
 
@@ -212,7 +221,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   @Override
   public SLFormulaManager getSLFormulaManager() {
     if (slManager == null) {
-      throw new UnsupportedOperationException("Solver does not support seperation logic theory");
+      throw new UnsupportedOperationException("Solver does not support separation logic theory");
     }
     return slManager;
   }
@@ -240,6 +249,14 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
       throw new UnsupportedOperationException("Solver does not support string theory");
     }
     return strManager;
+  }
+
+  @Override
+  public EnumerationFormulaManager getEnumerationFormulaManager() {
+    if (enumManager == null) {
+      throw new UnsupportedOperationException("Solver does not support enumeration theory");
+    }
+    return enumManager;
   }
 
   public abstract Appender dumpFormula(TFormulaInfo t);

@@ -200,7 +200,7 @@ SPDX-License-Identifier: Apache-2.0
         <!-- prepare the pom-file -->
         <generate-solver-pom-file/>
         <!-- then publish the files -->
-        <stage-solver-file filename="javasmt-yices2" fileending="jar" classifier=""/>
+        <stage-solver-file filename="javasmt-yices2" fileending="jar" classifier="" filedirectory="lib/java/runtime-yices2"/>
         <stage-solver-file filename="javasmt-yices2-sources" fileending="jar" classifier="sources" filedirectory="lib/java-contrib"/>
     </target>
     <target name="stage-yices2" depends="build-dependencies"

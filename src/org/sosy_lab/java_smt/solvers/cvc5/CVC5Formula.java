@@ -13,6 +13,7 @@ import io.github.cvc5.Term;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.EnumerationFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
@@ -133,6 +134,13 @@ public class CVC5Formula implements Formula {
   @Immutable
   static final class CVC5RegexFormula extends CVC5Formula implements RegexFormula {
     CVC5RegexFormula(Term pTerm) {
+      super(pTerm);
+    }
+  }
+
+  @Immutable
+  static final class CVC5EnumerationFormula extends CVC5Formula implements EnumerationFormula {
+    CVC5EnumerationFormula(Term pTerm) {
       super(pTerm);
     }
   }

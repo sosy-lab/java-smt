@@ -29,6 +29,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.EnumerationFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
@@ -48,6 +49,7 @@ import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormula.ArrayFormulaImpl;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormula.BitvectorFormulaImpl;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormula.BooleanFormulaImpl;
+import org.sosy_lab.java_smt.basicimpl.AbstractFormula.EnumerationFormulaImpl;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormula.FloatingPointFormulaImpl;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormula.FloatingPointRoundingModeFormulaImpl;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormula.IntegerFormulaImpl;
@@ -170,6 +172,11 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
     return new RegexFormulaImpl<>(pTerm);
   }
 
+  protected EnumerationFormula encapsulateEnumeration(TFormulaInfo pTerm) {
+    assert getFormulaType(pTerm).isEnumerationType();
+    return new EnumerationFormulaImpl<>(pTerm);
+  }
+
   public Formula encapsulateWithTypeOf(TFormulaInfo pTerm) {
     return encapsulate(getFormulaType(pTerm), pTerm);
   }
@@ -199,6 +206,8 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
     } else if (pType.isArrayType()) {
       ArrayFormulaType<?, ?> arrayType = (ArrayFormulaType<?, ?>) pType;
       return (T) encapsulateArray(pTerm, arrayType.getIndexType(), arrayType.getElementType());
+    } else if (pType.isEnumerationType()) {
+      return (T) new EnumerationFormulaImpl<>(pTerm);
     }
     throw new IllegalArgumentException(
         "Cannot create formulas of type " + pType + " in the Solver!");
@@ -249,6 +258,10 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
       throw new UnsupportedOperationException(
           "SMT solvers with support for bitvectors "
               + "need to overwrite FormulaCreator.getFormulaType()");
+    } else if (formula instanceof EnumerationFormula) {
+      throw new UnsupportedOperationException(
+          "SMT solvers with support for enumerations need to overwrite FormulaCreator"
+              + ".getFormulaType()");
     } else {
       throw new IllegalArgumentException("Formula with unexpected type " + formula.getClass());
     }

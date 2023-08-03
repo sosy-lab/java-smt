@@ -12,6 +12,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.base.Splitter.MapSplitter;
 import com.google.common.collect.ImmutableMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -227,7 +228,8 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
     BoolectorSettings settings = new BoolectorSettings(config);
 
     Preconditions.checkNotNull(settings.satSolver);
-    BtorJNI.boolector_set_sat_solver(btor, settings.satSolver.name().toLowerCase());
+    BtorJNI.boolector_set_sat_solver(
+        btor, settings.satSolver.name().toLowerCase(Locale.getDefault()));
     // Default Options to enable multiple SAT, auto cleanup on close, incremental mode
     BtorJNI.boolector_set_opt(btor, BtorOption.BTOR_OPT_MODEL_GEN.getValue(), 2);
     // Auto memory clean after closing

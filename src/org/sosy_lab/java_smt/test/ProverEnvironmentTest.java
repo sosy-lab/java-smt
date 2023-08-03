@@ -26,10 +26,6 @@ import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.Optional;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -38,21 +34,7 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
-@RunWith(Parameterized.class)
-public class ProverEnvironmentTest extends SolverBasedTest0 {
-
-  @Parameters(name = "{0}")
-  public static Solvers[] getAllSolvers() {
-    return Solvers.values();
-  }
-
-  @Parameter(0)
-  public Solvers solver;
-
-  @Override
-  protected Solvers solverToUse() {
-    return solver;
-  }
+public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
   public void assumptionsTest() throws SolverException, InterruptedException {

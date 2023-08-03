@@ -612,6 +612,7 @@ public class Yices2NativeApi {
   // TODO can return up to UINT32_MAX ?
   /** Returns an array in the form [term,power]. */
   public static native int[] yices_product_component(int t, int i);
+
   /*
    * SAT Checking
    */

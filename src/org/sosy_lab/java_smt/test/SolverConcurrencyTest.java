@@ -18,6 +18,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
@@ -113,7 +114,7 @@ public class SolverConcurrencyTest {
   public void checkThatSolverIsAvailable() throws InvalidConfigurationException {
     initSolver().close();
 
-    if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
+    if (System.getProperty("os.name").toLowerCase(Locale.getDefault()).startsWith("win")) {
       assume()
           .withMessage("MathSAT5 is not reentant on Windows")
           .that(solver)
@@ -194,6 +195,25 @@ public class SolverConcurrencyTest {
         });
   }
 
+  /** Helperclass to pack a SolverContext together with a Formula. */
+  private static class ContextAndFormula {
+    private final SolverContext context;
+    private final BooleanFormula formula;
+
+    private ContextAndFormula(SolverContext context, BooleanFormula formula) {
+      this.context = context;
+      this.formula = formula;
+    }
+
+    SolverContext getContext() {
+      return context;
+    }
+
+    BooleanFormula getFormula() {
+      return formula;
+    }
+  }
+
   /**
    * Test translation of formulas used on distinct contexts to a new, unrelated context. Every
    * thread creates a context, generates a formula, those are collected and handed back to the main
@@ -210,24 +230,7 @@ public class SolverConcurrencyTest {
         .withMessage("Solver does not support translation of formulas")
         .that(solver)
         .isNoneOf(Solvers.CVC4, Solvers.PRINCESS, Solvers.CVC5);
-    /** Helperclass to pack a SolverContext together with a Formula */
-    class ContextAndFormula {
-      private final SolverContext context;
-      private final BooleanFormula formula;
 
-      protected ContextAndFormula(SolverContext context, BooleanFormula formula) {
-        this.context = context;
-        this.formula = formula;
-      }
-
-      public SolverContext getContext() {
-        return context;
-      }
-
-      public BooleanFormula getFormula() {
-        return formula;
-      }
-    }
     ConcurrentLinkedQueue<ContextAndFormula> contextAndFormulaList = new ConcurrentLinkedQueue<>();
 
     assertConcurrency(
@@ -439,24 +442,7 @@ public class SolverConcurrencyTest {
         .withMessage("Solver does not support translation of formulas")
         .that(solver)
         .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.PRINCESS);
-    /** Helperclass to pack a SolverContext together with a Formula */
-    class ContextAndFormula {
-      private final SolverContext context;
-      private final BooleanFormula formula;
 
-      protected ContextAndFormula(SolverContext context, BooleanFormula formula) {
-        this.context = context;
-        this.formula = formula;
-      }
-
-      public SolverContext getContext() {
-        return context;
-      }
-
-      public BooleanFormula getFormula() {
-        return formula;
-      }
-    }
     // This is fine! We might access this more than once at a time,
     // but that gives only access to the bucket, which is threadsafe.
     AtomicReferenceArray<BlockingQueue<ContextAndFormula>> bucketQueue =

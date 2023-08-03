@@ -25,6 +25,7 @@ import com.google.common.base.CharMatcher;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import java.io.IOException;
+import java.util.Locale;
 import java.util.Map;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
@@ -55,6 +56,7 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
         pIntegerManager,
         pRationalManager,
         pBitvectorManager,
+        null,
         null,
         null,
         null,
@@ -121,7 +123,7 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
           return "(_ BitVec " + yices_bvtype_size(type) + ")";
         }
         String typeRepr = yices_type_to_string(type);
-        return typeRepr.substring(0, 1).toUpperCase() + typeRepr.substring(1);
+        return typeRepr.substring(0, 1).toUpperCase(Locale.getDefault()) + typeRepr.substring(1);
       }
     };
   }

@@ -209,6 +209,20 @@ FREE_TYPE_ARRAY_ARG(2);
 TYPE_RETURN
 
 /*
+ * msat_type msat_get_enum_type(msat_env env, const char *name,
+ *                              size_t domain_size, const char **domain);
+ */
+DEFINE_FUNC(jtype, 1get_1enum_1type) WITH_FOUR_ARGS(jenv, string, int, objectArray)
+ENV_ARG(1)
+STRING_ARG(2)
+SIMPLE_ARG(int, 3)
+STRING_ARRAY_ARG(4)
+CALL4(msat_type, get_enum_type)
+FREE_STRING_ARRAY_ARG(4);
+FREE_STRING_ARG(2);
+TYPE_RETURN
+
+/*
  * int msat_is_bool_type(msat_env env, msat_type tp);
  */
 DEFINE_FUNC(jboolean, 1is_1bool_1type) WITH_TWO_ARGS(jenv, jtype)
@@ -333,6 +347,55 @@ ENV_ARG(1)
 TYPE_ARG(2)
 CALL2(int, is_fp_roundingmode_type)
 BOOLEAN_RETURN
+
+/*
+ * int msat_is_enum_type(msat_env env, msat_type tp,
+ *                       size_t *out_domain_size, msat_decl **out_domain);
+ * with 3rd and 4th argument set to NULL.
+ */
+DEFINE_FUNC(jboolean, 1is_1enum_1type) WITH_TWO_ARGS(jenv, jtype)
+ENV_ARG(1)
+TYPE_ARG(2)
+NULL_ARG(size_t, 3)
+NULL_ARG(msat_decl*, 4)
+CALL4(int, is_enum_type)
+BOOLEAN_RETURN
+
+/*
+ * int msat_is_enum_type(msat_env env, msat_type tp,
+ *                       size_t *out_domain_size, msat_decl **out_domain);
+ * with 3rd and 4th argument set to temporary memory.
+ * We use the same call than above, but do not return the return-value,
+ * but we return the content of the 4th argument.
+ */
+DEFINE_FUNC(longArray, 1get_1enum_1constants) WITH_TWO_ARGS(jenv, jtype)
+ENV_ARG(1)
+TYPE_ARG(2)
+size_t sz_tmp = 0;
+size_t *m_arg3 = &sz_tmp;
+msat_decl *out_domain_tmp;
+msat_decl **m_arg4 = &out_domain_tmp;
+CALL4(int, is_enum_type)
+  if (retval != 1) {
+    throwException(jenv, "java/lang/IllegalArgumentException", "Cannot get enum constants for non-enum type");
+    return NULL;
+  }
+  jlong *jarr = malloc(sizeof(jlong) * sz_tmp);
+  if (jarr == ((void *) 0)) {
+  	throwException(jenv, "java/lang/OutOfMemoryError", "Cannot allocate native memory for passing return value from Mathsat");
+  	goto out;
+  }
+  for (size_t i = 0; i < sz_tmp; ++i) {
+    jarr[i] = (jlong)((size_t)out_domain_tmp[i].repr);
+  }
+  jlongArray jretval = (*jenv)->NewLongArray(jenv, sz_tmp);
+  if (jretval != ((void *) 0)) {
+    (*jenv)->SetLongArrayRegion(jenv, jretval, 0, sz_tmp, jarr);
+  }
+  free(jarr);
+  out: msat_free(out_domain_tmp);
+  return jretval;
+}
 
 DEFINE_FUNC(jboolean, 1type_1equals) WITH_TWO_ARGS(jtype, jtype)
 TYPE_ARG(1)

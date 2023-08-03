@@ -20,6 +20,7 @@ import org.sosy_lab.java_smt.api.ArrayFormulaManager;
 import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
+import org.sosy_lab.java_smt.api.EnumerationFormulaManager;
 import org.sosy_lab.java_smt.api.FloatingPointFormulaManager;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -95,6 +96,11 @@ class StatisticsFormulaManager implements FormulaManager {
   @Override
   public StringFormulaManager getStringFormulaManager() {
     return new StatisticsStringFormulaManager(delegate.getStringFormulaManager(), stats);
+  }
+
+  @Override
+  public EnumerationFormulaManager getEnumerationFormulaManager() {
+    return new StatisticsEnumerationFormulaManager(delegate.getEnumerationFormulaManager(), stats);
   }
 
   @Override

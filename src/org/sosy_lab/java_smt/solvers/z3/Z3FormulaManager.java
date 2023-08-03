@@ -41,7 +41,8 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
       Z3FloatingPointFormulaManager pFloatingPointManager,
       Z3QuantifiedFormulaManager pQuantifiedManager,
       Z3ArrayFormulaManager pArrayManager,
-      Z3StringFormulaManager pStringManager) {
+      Z3StringFormulaManager pStringManager,
+      Z3EnumerationFormulaManager pEnumerationManager) {
     super(
         pFormulaCreator,
         pFunctionManager,
@@ -53,7 +54,8 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
         pQuantifiedManager,
         pArrayManager,
         null,
-        pStringManager);
+        pStringManager,
+        pEnumerationManager);
     formulaCreator = pFormulaCreator;
   }
 

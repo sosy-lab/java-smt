@@ -19,16 +19,13 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -53,8 +50,7 @@ import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
-@RunWith(Parameterized.class)
-public class SolverVisitorTest extends SolverBasedTest0 {
+public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   /** visit a formula and fail on OTHER, i.e., unexpected function declaration type. */
   private final class FunctionDeclarationVisitorNoOther extends DefaultFormulaVisitor<Formula> {
@@ -125,18 +121,6 @@ public class SolverVisitorTest extends SolverBasedTest0 {
     protected Formula visitDefault(Formula pF) {
       return pF;
     }
-  }
-
-  @Parameters(name = "{0}")
-  public static Object[] getAllSolvers() {
-    return Solvers.values();
-  }
-
-  @Parameter public Solvers solver;
-
-  @Override
-  protected Solvers solverToUse() {
-    return solver;
   }
 
   @Before
@@ -945,7 +929,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
                   BooleanFormula pAtom, FunctionDeclaration<BooleanFormula> decl) {
                 if (decl.getKind() == FunctionDeclarationKind.VAR) {
                   // Uppercase all variables.
-                  return bmgr.makeVariable(decl.getName().toUpperCase());
+                  return bmgr.makeVariable(decl.getName().toUpperCase(Locale.getDefault()));
                 } else {
                   return pAtom;
                 }
@@ -953,7 +937,7 @@ public class SolverVisitorTest extends SolverBasedTest0 {
             });
     assertThat(
             mgr.extractVariables(transformed).keySet().stream()
-                .allMatch(pS -> pS.equals(pS.toUpperCase())))
+                .allMatch(pS -> pS.equals(pS.toUpperCase(Locale.getDefault()))))
         .isTrue();
   }
 

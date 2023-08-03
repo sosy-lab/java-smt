@@ -10,6 +10,27 @@ SPDX-License-Identifier: Apache-2.0
 
 # JavaSMT ChangeLog
 
+## JavaSMT 4.0.2
+
+This patch release improves documentation and updates the dependency for our Yices2 component.
+We skip version 4.0.1 which was internally used for releasing the Yices2 component.
+
+## JavaSMT 4.0.0
+
+This major release comes with several updated solvers and dependencies,
+a new (potentially faster) evaluator for models,
+and support for the theory of enumerations (domains of fixed size).
+
+### Breaking changes:
+ - The push-method in ProverEnvironments can throw InterruptedExceptions.
+ - Model evalation supports enumeration theory.
+ - Direct construction ArrayFormulaType was replaced with a static building method.
+
+### Updated solvers:
+ - MathSAT 5.6.10
+ - Z3 4.12.2
+ - CVC5 1.0.5
+
 ## JavaSMT 3.14.3
 
 This patch release updates SMTInterpol to version 2.5-1242-g5c50fb6d.

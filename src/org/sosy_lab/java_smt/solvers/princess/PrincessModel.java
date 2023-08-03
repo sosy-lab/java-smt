@@ -22,7 +22,9 @@ import ap.parser.IFunApp;
 import ap.parser.ITerm;
 import ap.terfor.preds.Predicate;
 import ap.theories.ExtArray;
+import ap.theories.ExtArray.ArraySort;
 import ap.types.Sort;
+import ap.types.Sort$;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -137,10 +139,16 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
           && creator.getEnv().hasArrayType(Iterables.getOnlyElement(asJava(cKey.args())))) {
         return ImmutableList.of();
       }
+      Sort sort = Sort$.MODULE$.sortOf(cKey);
       if (ExtArray.Select$.MODULE$.unapply(cKey.fun()).isDefined()) {
         return getAssignmentsFromArraySelect(value, cKey, pArrays);
-      } else if (ExtArray.Store$.MODULE$.unapply(cKey.fun()).isDefined()) {
-        return getAssignmentsFromArrayStore((IFunApp) value, cKey, pArrays);
+      } else if (sort instanceof ArraySort) {
+        ExtArray arrayTheory = ((ArraySort) sort).theory();
+        if (arrayTheory.store() == cKey.fun()) {
+          return getAssignmentsFromArrayStore((IFunApp) value, cKey, pArrays);
+        } else if (arrayTheory.store2() == cKey.fun()) {
+          return getAssignmentsFromArrayStore((IFunApp) value, cKey, pArrays);
+        }
       }
     }
 

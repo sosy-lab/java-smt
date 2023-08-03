@@ -15,6 +15,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.EnumerationFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
@@ -147,6 +148,14 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
   static final class RegexFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo>
       implements RegexFormula {
     RegexFormulaImpl(TFormulaInfo pT) {
+      super(pT);
+    }
+  }
+
+  /** Simple EnumerationFormula implementation. */
+  static final class EnumerationFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo>
+      implements EnumerationFormula {
+    EnumerationFormulaImpl(TFormulaInfo pT) {
       super(pT);
     }
   }

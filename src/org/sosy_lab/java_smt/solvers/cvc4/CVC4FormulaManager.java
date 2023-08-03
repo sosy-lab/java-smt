@@ -53,7 +53,8 @@ class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, ExprManager,
         pQfmgr,
         pAfmgr,
         pSLfmgr,
-        pStrmgr);
+        pStrmgr,
+        null);
     creator = pFormulaCreator;
   }
 

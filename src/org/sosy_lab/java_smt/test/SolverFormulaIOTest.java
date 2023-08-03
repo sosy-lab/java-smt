@@ -20,10 +20,6 @@ import com.google.common.collect.Multiset;
 import com.google.common.truth.TruthJUnit;
 import java.util.function.Supplier;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -32,9 +28,8 @@ import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 
-@RunWith(Parameterized.class)
 @SuppressWarnings("checkstyle:linelength")
-public class SolverFormulaIOTest extends SolverBasedTest0 {
+public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   private static final String MATHSAT_DUMP1 =
       "(set-info :source |printed by MathSAT|)\n"
           + "(declare-fun a () Bool)\n"
@@ -99,19 +94,6 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
           + "(declare-fun u () Bool)\n"
           + "(assert  (let (($x35 (and (xor q (= (+ a b) c)) (>= a b)))) (let (($x9 (= a b))) (and"
           + " (and (or $x35 u) q) (and $x9 $x35)))))";
-
-  @Parameters(name = "{0}")
-  public static Object[] getAllSolvers() {
-    return Solvers.values();
-  }
-
-  @Parameter(0)
-  public Solvers solver;
-
-  @Override
-  protected Solvers solverToUse() {
-    return solver;
-  }
 
   @Test
   public void varDumpTest() {
