@@ -260,15 +260,13 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
    */
   private Term buildConjunctionOfFormulasOverList(
       ImmutableList<Collection<Term>> formula, Solver usingSolver) {
-    Collection<Term> currColTerm = formula.get(0);
-    ImmutableList<Collection<Term>> recList = formula.subList(1, formula.size());
-    if (recList.isEmpty()) {
-      return buildConjunctionOfFormulas(currColTerm, usingSolver);
-    }
-    return usingSolver.mkTerm(
-        Kind.AND,
-        buildConjunctionOfFormulas(currColTerm, usingSolver),
-        buildConjunctionOfFormulasOverList(recList, usingSolver));
+    Collection<Term> eachCollectionOfTermsConcat =
+        formula.stream()
+            .map(n -> buildConjunctionOfFormulas(n, usingSolver))
+            .collect(ImmutableList.toImmutableList());
+    Term concatTerm = buildConjunctionOfFormulas(eachCollectionOfTermsConcat, usingSolver);
+
+    return concatTerm;
   }
 
   /**
