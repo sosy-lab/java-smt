@@ -20,10 +20,16 @@
 
 package org.sosy_lab.java_smt.solvers.dreal4;
 
+import com.google.common.base.Preconditions;
+import java.util.Map;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Context;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Expression;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.FormulaKind;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable.Type;
 
 public class DReal4FormulaManager extends AbstractFormulaManager<DRealTerm<?, ?>, Type, Context,
@@ -66,4 +72,42 @@ public class DReal4FormulaManager extends AbstractFormulaManager<DRealTerm<?, ?>
   public Appender dumpFormula(DRealTerm<?, ?> t) {
     return null;
   }
+
+  @Override
+  public <T extends Formula> T substitute(
+      final T pF, final Map<? extends Formula, ? extends Formula> pFromToMapping) {
+    DRealTerm<?, ?>[] changeFrom = new DRealTerm<?, ?>[pFromToMapping.size()];
+    DRealTerm<?, ?>[] changeTo = new DRealTerm<?, ?>[pFromToMapping.size()];
+    int idx = 0;
+    for (Map.Entry<? extends Formula, ? extends Formula> e : pFromToMapping.entrySet()) {
+      changeFrom[idx] = extractInfo(e.getKey());
+      changeTo[idx] = extractInfo(e.getValue());
+      idx++;
+    }
+    DRealTerm<?, ?> f = extractInfo(pF);
+    // Expected is a formula
+    Preconditions.checkState(f.isFormula());
+    org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula formula = f.getFormula();
+    for (int i = 0; i < changeFrom.length; i++) {
+      DRealTerm<?, ?> changeFromTerm = changeFrom[i];
+      DRealTerm<?, ?> changeToTerm = changeTo[i];
+      // Only Variables can be substituted
+      Preconditions.checkState(changeFromTerm.isVar());
+      if (changeToTerm.isVar()) {
+        formula = formula.Substitute(changeFromTerm.getVariable(),
+            new Expression(changeToTerm.getVariable()));
+      } else if (changeToTerm.isExp()) {
+        formula = formula.Substitute(changeFromTerm.getVariable(), changeToTerm.getExpression());
+      } else {
+        formula = formula.Substitute(changeFromTerm.getVariable(), changeToTerm.getFormula());
+      }
+    }
+    FormulaType<T> type = getFormulaType(pF);
+    return getFormulaCreator().encapsulate(type, new DRealTerm<>(formula, f.getType(),
+        formula.get_kind()));
+  }
+
 }
+
+
+
