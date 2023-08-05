@@ -20,6 +20,7 @@
 
 package org.sosy_lab.java_smt.solvers.dreal4;
 
+import com.google.common.base.Preconditions;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.Normalizer.Form;
@@ -52,14 +53,13 @@ public abstract class DReal4NumeralFormulaManager<
     if (val.isExp()) {
       return val.getExpression().get_kind() == ExpressionKind.Constant;
     } else {
-      throw new UnsupportedOperationException("dReal does not support isNumeral on Variable or "
-          + "Formula.");
+      return false;
     }
   }
 
   @Override
   protected DRealTerm<Expression, ExpressionKind> makeNumberImpl(long i) {
-    return new DRealTerm<>(new Expression((double) i), getNumeralType(), ExpressionKind.Constant);
+    return new DRealTerm<>(new Expression(i), getNumeralType(), ExpressionKind.Constant);
   }
 
   @Override
@@ -69,7 +69,15 @@ public abstract class DReal4NumeralFormulaManager<
 
   @Override
   protected DRealTerm<Expression, ExpressionKind> makeNumberImpl(String i) {
-    return new DRealTerm<>(new Expression(Double.parseDouble(i)), getNumeralType(),
+    double d;
+    if (i.contains("/")) {
+      String[] rat = i.split("/");
+      d = Double.parseDouble(rat[0]) / Double.parseDouble(rat[1]);
+
+    } else {
+      d = Double.parseDouble(i);
+    }
+    return new DRealTerm<>(new Expression(d), getNumeralType(),
         ExpressionKind.Constant);
   }
 
@@ -91,8 +99,16 @@ public abstract class DReal4NumeralFormulaManager<
   }
 
   @Override
-  protected DRealTerm<Formula, FormulaKind> negate(DRealTerm<?, ?> pParam1) {
-    return new DRealTerm<>(dreal.Not(pParam1.getVariable()), pParam1.getType(), FormulaKind.Not);
+  protected DRealTerm<Expression, ExpressionKind> negate(DRealTerm<?, ?> pParam1) {
+    // Only Expression or Variables are expected
+    Preconditions.checkState(pParam1.isVar() || pParam1.isExp());
+    if (pParam1.isVar()) {
+      return new DRealTerm<>(dreal.pow(new Expression(pParam1.getVariable()), new Expression(-1))
+          , pParam1.getType(), ExpressionKind.Pow);
+    } else {
+      return new DRealTerm<>(dreal.pow(pParam1.getExpression(), new Expression(-1)),
+          pParam1.getType(), ExpressionKind.Constant);
+    }
   }
 
   @Override
