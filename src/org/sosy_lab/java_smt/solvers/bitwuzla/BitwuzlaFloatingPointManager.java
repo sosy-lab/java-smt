@@ -20,7 +20,12 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
+import static org.sosy_lab.java_smt.solvers.bitwuzla.SWIG_BitwuzlaKind.*;
+
 import com.microsoft.z3.Native;
+import io.github.cvc5.CVC5ApiException;
+import io.github.cvc5.Kind;
+import io.github.cvc5.Op;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
@@ -114,21 +119,22 @@ public class BitwuzlaFloatingPointManager extends
       Long pRoundingMode) {
     if (pTargetType.isFloatingPointType()) {
       FormulaType.FloatingPointType targetType = (FormulaType.FloatingPointType) pTargetType;
-      return Native.mkFpaToFpFloat(z3context, pRoundingMode, pNumber, mkFpaSort(targetType));
-
+      return BitwuzlaJNI.bitwuzla_mk_term2_indexed2(bitwuzla,
+          BITWUZLA_KIND_FP_TO_FP_FROM_FP.swigValue(), pRoundingMode, pNumber,
+          targetType.getExponentSize(), targetType.getMantissaSize());
     } else if (pTargetType.isBitvectorType()) {
       FormulaType.BitvectorType targetType = (FormulaType.BitvectorType) pTargetType;
       if (pSigned) {
-        return Native.mkFpaToSbv(z3context, pRoundingMode, pNumber, targetType.getSize());
+        return BitwuzlaJNI.bitwuzla_mk_term2_indexed1(bitwuzla, BITWUZLA_KIND_FP_TO_SBV.swigValue(),
+            pRoundingMode, pNumber,
+            targetType.getSize());
       } else {
-        return Native.mkFpaToUbv(z3context, pRoundingMode, pNumber, targetType.getSize());
+        return BitwuzlaJNI.bitwuzla_mk_term2_indexed1(bitwuzla, BITWUZLA_KIND_FP_TO_UBV.swigValue(),
+            pRoundingMode, pNumber,
+            targetType.getSize());
       }
-
-    } else if (pTargetType.isRationalType()) {
-      return Native.mkFpaToReal(z3context, pNumber);
-
     } else {
-      return genericCast(pNumber, pTargetType);
+        throw new UnsupportedOperationException("Attempted cast to an unsupported type.");
     }
   }
 
@@ -139,154 +145,182 @@ public class BitwuzlaFloatingPointManager extends
       boolean pSigned,
       FloatingPointType pTargetType,
       Long pRoundingMode) {
-    long signed = pSigned ? 1 : 0;
-    if (pTargetType.isFloatingPointType()) {
-      // FormulaType.FloatingPointType targetType = (FormulaType.FloatingPointType) pTargetType;
-      return BitwuzlaJNI.bitwuzla_mk_term2_indexed2(bitwuzla,
-          SWIG_BitwuzlaKind.BITWUZLA_KIND_FP_TO_FP_FROM_FP.swigValue(), pRoundingMode,
-          pNumber,
-          pTargetType
-          , signed);
+    FormulaType<?> formulaType = getFormulaCreator().getFormulaType(pNumber);
+      if (formulaType.isFloatingPointType()) {
+        return castToImpl(pNumber, pSigned, pTargetType, pRoundingMode);
+      } else if (formulaType.isBitvectorType()) {
+        if (pSigned) {
+          return BitwuzlaJNI.bitwuzla_mk_term2_indexed2(bitwuzla,
+              BITWUZLA_KIND_FP_TO_FP_FROM_SBV.swigValue()
+              , roundingMode, pNumber, pTargetType.getExponentSize(),
+              pTargetType.getMantissaSize() + 1);
+        } else {
+          return BitwuzlaJNI.bitwuzla_mk_term2_indexed2(bitwuzla,
+              BITWUZLA_KIND_FP_TO_FP_FROM_UBV.swigValue()
+              , roundingMode, pNumber, pTargetType.getExponentSize(),
+              pTargetType.getMantissaSize() + 1);
+        }
 
-    } else if (pTargetType.isBitvectorType()) {
-      FormulaType.BitvectorType targetType = (FormulaType.BitvectorType) pTargetType;
-      if (pSigned) {
-        return Native.mkFpaToSbv(z3context, pRoundingMode, pNumber, targetType.getSize());
       } else {
-        return Native.mkFpaToUbv(z3context, pRoundingMode, pNumber, targetType.getSize());
+        throw new UnsupportedOperationException("Attempted cast from an unsupported type.");
       }
-
-    } else if (pTargetType.isRationalType()) {
-      return Native.mkFpaToReal(z3context, pNumber);
-
-    } else {
-      return genericCast(pNumber, pTargetType);
     }
-  }
 
   @Override
   protected Long fromIeeeBitvectorImpl(Long pNumber, FloatingPointType pTargetType) {
     return BitwuzlaJNI.bitwuzla_mk_term1_indexed2(bitwuzla,
-        SWIG_BitwuzlaKind.BITWUZLA_KIND_FP_TO_FP_FROM_BV.swigValue(), pNumber,
-        pTargetType.getExponentSize(), pTargetType.getMantissaSize());
+        BITWUZLA_KIND_FP_TO_FP_FROM_BV.swigValue(), pNumber,
+        pTargetType.getExponentSize(), pTargetType.getMantissaSize() + 1);
   }
 
-  // TODO Should this be to unsigned or signed BV? Is the Roundingmode correct?
+  // TODO Should this be to unsigned or signed BV? Is the Roundingmode correct? Is this perhaps
+  // just not supported by Bitwuzla?
   @Override
   protected Long toIeeeBitvectorImpl(Long pNumber) {
     String roundingMode = BitwuzlaJNI.bitwuzla_get_rm_value(bitwuzla, pNumber);
     long pRoundingMode = getRoundingModeImpl(FloatingPointRoundingMode.valueOf(roundingMode));
+    long inputBits =
+        BitwuzlaJNI.bitwuzla_sort_fp_get_exp_size(pNumber) + BitwuzlaJNI.bitwuzla_sort_fp_get_sig_size(pNumber);
     return BitwuzlaJNI.bitwuzla_mk_term2_indexed1(bitwuzla,
-        SWIG_BitwuzlaKind.BITWUZLA_KIND_FP_TO_SBV,  pNumber);
+        BITWUZLA_KIND_FP_TO_SBV.swigValue(),  pRoundingMode, pNumber, inputBits);
   }
 
   @Override
   protected Long negate(Long pParam1) {
-    return null;
+    return BitwuzlaJNI.bitwuzla_mk_term1(bitwuzla,  BITWUZLA_KIND_FP_NEG.swigValue(),
+        pParam1);
   }
 
   @Override
   protected Long abs(Long pParam1) {
-    return null;
+    return BitwuzlaJNI.bitwuzla_mk_term1(bitwuzla,
+        BITWUZLA_KIND_FP_ABS.swigValue(),
+        pParam1);
   }
 
   @Override
   protected Long max(Long pParam1, Long pParam2) {
-    return null;
+    return BitwuzlaJNI.bitwuzla_mk_term2(bitwuzla,
+        BITWUZLA_KIND_FP_MAX.swigValue(),
+        pParam1, pParam2);
   }
 
   @Override
   protected Long min(Long pParam1, Long pParam2) {
-    return null;
+    return BitwuzlaJNI.bitwuzla_mk_term2(bitwuzla,
+        BITWUZLA_KIND_FP_MIN.swigValue(),
+        pParam1, pParam2);
   }
 
   @Override
   protected Long sqrt(Long pNumber, Long pRoundingMode) {
-    return null;
+    return BitwuzlaJNI.bitwuzla_mk_term2(bitwuzla,
+        BITWUZLA_KIND_FP_SQRT.swigValue(),
+        pRoundingMode, pNumber);
   }
 
   @Override
   protected Long add(Long pParam1, Long pParam2, Long pRoundingMode) {
-    return null;
+    return BitwuzlaJNI.bitwuzla_mk_term3(bitwuzla,
+        BITWUZLA_KIND_FP_ADD.swigValue(), pRoundingMode,
+        pParam1, pParam2);
   }
 
   @Override
   protected Long subtract(Long pParam1, Long pParam2, Long pFloatingPointRoundingMode) {
-    return null;
+    return BitwuzlaJNI.bitwuzla_mk_term3(bitwuzla,
+        BITWUZLA_KIND_FP_SUB.swigValue(), pFloatingPointRoundingMode,
+        pParam1, pParam2);
   }
 
   @Override
   protected Long divide(Long pParam1, Long pParam2, Long pFloatingPointRoundingMode) {
-    return null;
+    return BitwuzlaJNI.bitwuzla_mk_term3(bitwuzla,
+        BITWUZLA_KIND_FP_DIV.swigValue(), pFloatingPointRoundingMode,
+        pParam1, pParam2);
   }
 
   @Override
   protected Long multiply(Long pParam1, Long pParam2, Long pFloatingPointRoundingMode) {
-    return null;
+    return BitwuzlaJNI.bitwuzla_mk_term3(bitwuzla,
+        BITWUZLA_KIND_FP_MUL.swigValue(), pFloatingPointRoundingMode,
+        pParam1, pParam2);
   }
 
   @Override
   protected Long assignment(Long pParam1, Long pParam2) {
-    return null;
+    return BitwuzlaJNI.bitwuzla_mk_term2(bitwuzla, BITWUZLA_KIND_EQUAL.swigValue(), pParam1, pParam2);
   }
 
   @Override
   protected Long equalWithFPSemantics(Long pParam1, Long pParam2) {
-    return null;
+    return BitwuzlaJNI.bitwuzla_mk_term2(bitwuzla, BITWUZLA_KIND_FP_EQ.swigValue(), pParam1, pParam2);
+
   }
 
   @Override
   protected Long greaterThan(Long pParam1, Long pParam2) {
-    return null;
+    return BitwuzlaJNI.bitwuzla_mk_term2(bitwuzla, BITWUZLA_KIND_FP_GT.swigValue(), pParam1,
+        pParam2);
   }
 
   @Override
   protected Long greaterOrEquals(Long pParam1, Long pParam2) {
-    return null;
+    return BitwuzlaJNI.bitwuzla_mk_term2(bitwuzla, BITWUZLA_KIND_FP_GEQ.swigValue(), pParam1,
+        pParam2);
   }
 
   @Override
   protected Long lessThan(Long pParam1, Long pParam2) {
-    return null;
+    return BitwuzlaJNI.bitwuzla_mk_term2(bitwuzla, BITWUZLA_KIND_FP_LT.swigValue(), pParam1,
+        pParam2);
   }
 
   @Override
   protected Long lessOrEquals(Long pParam1, Long pParam2) {
-    return null;
+    return BitwuzlaJNI.bitwuzla_mk_term2(bitwuzla, BITWUZLA_KIND_FP_LEQ.swigValue(), pParam1,
+        pParam2);
   }
 
   @Override
   protected Long isNaN(Long pParam) {
-    return null;
+    return BitwuzlaJNI.bitwuzla_mk_term1(bitwuzla,  BITWUZLA_KIND_FP_IS_NAN.swigValue(),
+        pParam);
   }
 
   @Override
   protected Long isInfinity(Long pParam) {
-    return null;
+    return BitwuzlaJNI.bitwuzla_mk_term1(bitwuzla,  BITWUZLA_KIND_FP_IS_INF.swigValue(),
+        pParam);
   }
 
   @Override
   protected Long isZero(Long pParam) {
-    return null;
+    return BitwuzlaJNI.bitwuzla_mk_term1(bitwuzla,  BITWUZLA_KIND_FP_IS_ZERO.swigValue(),
+        pParam);
   }
 
   @Override
   protected Long isSubnormal(Long pParam) {
-    return null;
+    return BitwuzlaJNI.bitwuzla_mk_term1(bitwuzla,  BITWUZLA_KIND_FP_IS_SUBNORMAL.swigValue(),
+        pParam);
   }
 
   @Override
   protected Long isNormal(Long pParam) {
-    return null;
+    return BitwuzlaJNI.bitwuzla_mk_term1(bitwuzla,  BITWUZLA_KIND_FP_IS_NORMAL.swigValue(),
+        pParam);
   }
 
   @Override
   protected Long isNegative(Long pParam) {
-    return null;
+    return BitwuzlaJNI.bitwuzla_mk_term1(bitwuzla,  BITWUZLA_KIND_FP_IS_NEG.swigValue(),
+        pParam);
   }
 
   @Override
   protected Long round(Long pFormula, FloatingPointRoundingMode pRoundingMode) {
-    return null;
+    return BitwuzlaJNI.bitwuzla_mk_term2(bitwuzla,  BITWUZLA_KIND_FP_IS_NAN.swigValue(),
+        getRoundingModeImpl(pRoundingMode), pFormula);
   }
 }
