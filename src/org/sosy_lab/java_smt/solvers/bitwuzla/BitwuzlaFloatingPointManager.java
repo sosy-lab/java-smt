@@ -22,15 +22,10 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import static org.sosy_lab.java_smt.solvers.bitwuzla.SWIG_BitwuzlaKind.*;
 
-import com.microsoft.z3.Native;
-import io.github.cvc5.CVC5ApiException;
-import io.github.cvc5.Kind;
-import io.github.cvc5.Op;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFloatingPointFormulaManager;
-import org.sosy_lab.java_smt.basicimpl.AbstractUFManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 public class BitwuzlaFloatingPointManager extends
