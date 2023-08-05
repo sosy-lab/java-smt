@@ -130,6 +130,7 @@ public class dreal {
   }
 
   public static Expression Divide(Expression lhs, Expression rhs) {
+
     return new Expression(drealJNI.Divide(Expression.getCPtr(lhs), lhs, Expression.getCPtr(rhs), rhs), true);
   }
 
@@ -773,6 +774,39 @@ public class dreal {
   public static boolean CheckSatisfiability(Formula f) {
     return drealJNI.CheckSatisfiability__SWIG_2(Formula.getCPtr(f));
   }
+
+  /**
+   * This function reads the result of one variable from the model(Box). It should be known what
+   * variable is called, to save the String with the associated variable.
+   * @param box to read the values of the variables
+   * @param i to get the i-th value associated with a variable of the box
+   * @return String with the value, value is the lower-bound or ENTIRE or EMPTY
+   */
+  public static String getResult(Box box, int i) {
+    // returns EMPTY or lower-bound; upperbound as String
+    String result =  drealJNI.getResult(Box.getCPtr(box), i);
+    if (result.equals("EMPTY")) {
+      return "EMPTY";
+    }
+    String[] bounds = result.split("; ");
+    if (bounds[0].equals(bounds[1])) {
+      return bounds[0];
+      // Probably not needed, because it is already evaluated to True e.g. x * 1 == x is
+      // evaluated to True and variable x does not exist in result anymore
+    } else if (bounds[0].equals("-inf") && bounds[1].equals("inf")) {
+      return "ENTIRE";
+    } else if (bounds[0].equals("-inf") || bounds[1].equals("inf")){
+      if (bounds[0].equals("-inf")) {
+        return bounds[1];
+      } else {
+        return bounds[0];
+      }
+    } else {
+      return bounds[0];
+    }
+  }
+
+  // Zum testen
   public static boolean CheckSatisfiabilityTest(Formula f, double delta, Box box) {
     System.out.println("Aufruf von Main und jetzt wird drealJNI und dann wrapper aufgerufen");
     return drealJNI.CheckSatisfiability__SWIG_3(Formula.getCPtr(f), delta, Box.getCPtr(box));

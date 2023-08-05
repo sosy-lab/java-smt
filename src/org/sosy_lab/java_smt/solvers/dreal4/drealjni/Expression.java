@@ -84,6 +84,11 @@ public class Expression {
     this(drealJNI.new_Expression__SWIG_2(d), true);
   }
 
+  public Expression(long l) {
+    this(drealJNI.new_Expression__SWIG_4(l), true);
+  }
+
+
   public Expression(Variable var) {
     this(drealJNI.new_Expression__SWIG_3(Variable.getCPtr(var), var), true);
   }

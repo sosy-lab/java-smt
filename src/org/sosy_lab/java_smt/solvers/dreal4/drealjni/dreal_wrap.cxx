@@ -11863,7 +11863,41 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
   return returnSet;
 }
 
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1Expression_1_1SWIG_14(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  long arg1 ;
+  dreal::drake::symbolic::Expression *result = 0 ;
 
+  (void)jenv;
+  (void)jcls;
+  arg1 = (long)jarg1;
+  result = (dreal::drake::symbolic::Expression *)new dreal::drake::symbolic::Expression(arg1);
+  *(dreal::drake::symbolic::Expression **)&jresult = result;
+  return jresult;
+}
+
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_getResult(JNIEnv *jenv, jclass jcls, jlong model, jint index) {
+  jstring result = 0;
+  dreal::Box *box = (dreal::Box *) 0;
+  int i;
+
+  i = (int)index;
+  box = *(dreal::Box **)&model;
+  dreal::Box copyBox{*box};
+  std::string res;
+  //dreal::Box::Interval interval{box->values_[i]};
+  dreal::Box::Interval interval = copyBox[i];
+  if (interval.is_empty()) {
+  res = "EMPTY";
+  } else {
+    std::string lb = std::to_string(interval.lb());
+    std::string ub = std::to_string(interval.ub());
+    res = lb + "; " + ub;
+  }
+
+  result = jenv->NewStringUTF((&res)->c_str());
+  return result;
+}  
 // Functions for debugging and trying to figure stuff out
 
 // trying to figure out how CheckSatisfiability works and why it does not work

@@ -637,6 +637,8 @@ public class drealJNI {
   public final static native void Context_declareVariables(long context, long formula);
   public final static native boolean Context_CheckSat_0(long context, long box);
   public final static native long Formula_getQuantifiedVariables(long set, long formula);
+  public final static native long new_Expression__SWIG_4(long jarg1);
+  public final static native String getResult(long box, int i);
 
 
   // For debuging and testing
