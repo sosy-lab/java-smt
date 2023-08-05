@@ -23,14 +23,10 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.SWIG_BitwuzlaKind.BITWUZLA_KIND_EQUAL;
 
 import com.google.common.collect.Table;
-import io.github.cvc5.Sort;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
-import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
-import org.sosy_lab.java_smt.solvers.bitwuzla.SWIG_BitwuzlaKind;
-import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 public class BitwuzlaArrayFormulaManager extends
                                          AbstractArrayFormulaManager<Long, Long, Long, Long> {
