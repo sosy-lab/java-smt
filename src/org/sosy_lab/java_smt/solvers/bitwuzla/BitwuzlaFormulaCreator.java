@@ -21,6 +21,7 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
+import com.microsoft.z3.Native;
 import java.util.List;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.Formula;
@@ -47,9 +48,13 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
     return null;
   }
 
+  // Assuming that JavaSMT FLoatingPointType follows IEEE 754, if it is in the decimal
+  // system instead use bitwuzla_mk_fp_value_from_real somehow or convert myself
   @Override
   public Long getFloatingPointType(FloatingPointType type) {
-    return null;
+    long fpSort = BitwuzlaJNI.bitwuzla_mk_fp_sort(getEnv(), type.getExponentSize(),
+        type.getMantissaSize());
+    return fpSort;
   }
 
   @Override

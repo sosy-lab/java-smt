@@ -93,17 +93,17 @@ public class BitwuzlaFloatingPointManager extends
 
   @Override
   protected Long makePlusInfinityImpl(FloatingPointType pType) {
-    return BitwuzlaJNI.bitwuzla_mk_fp_pos_inf(pType);
+    return BitwuzlaJNI.bitwuzla_mk_fp_pos_inf(bitwuzla, mkFpaSort(pType));
   }
 
   @Override
   protected Long makeMinusInfinityImpl(FloatingPointType pType) {
-    return BitwuzlaJNI.bitwuzla_mk_fp_neg_inf(pType);
+    return BitwuzlaJNI.bitwuzla_mk_fp_neg_inf(bitwuzla, mkFpaSort(pType));
   }
 
   @Override
   protected Long makeNaNImpl(FloatingPointType pType) {
-    return BitwuzlaJNI.bitwuzla_mk_fp_nan(pType);
+    return BitwuzlaJNI.bitwuzla_mk_fp_nan(bitwuzla, mkFpaSort(pType));
   }
 
   @Override
@@ -166,12 +166,18 @@ public class BitwuzlaFloatingPointManager extends
 
   @Override
   protected Long fromIeeeBitvectorImpl(Long pNumber, FloatingPointType pTargetType) {
-    return null;
+    return BitwuzlaJNI.bitwuzla_mk_term1_indexed2(bitwuzla,
+        SWIG_BitwuzlaKind.BITWUZLA_KIND_FP_TO_FP_FROM_BV.swigValue(), pNumber,
+        pTargetType.getExponentSize(), pTargetType.getMantissaSize());
   }
 
+  // TODO Should this be to unsigned or signed BV? Is the Roundingmode correct?
   @Override
   protected Long toIeeeBitvectorImpl(Long pNumber) {
-    return null;
+    String roundingMode = BitwuzlaJNI.bitwuzla_get_rm_value(bitwuzla, pNumber);
+    long pRoundingMode = getRoundingModeImpl(FloatingPointRoundingMode.valueOf(roundingMode));
+    return BitwuzlaJNI.bitwuzla_mk_term2_indexed1(bitwuzla,
+        SWIG_BitwuzlaKind.BITWUZLA_KIND_FP_TO_SBV,  pNumber);
   }
 
   @Override
