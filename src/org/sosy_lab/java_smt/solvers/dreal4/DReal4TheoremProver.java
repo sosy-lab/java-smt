@@ -42,6 +42,8 @@ import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Box;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Config;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Context;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable.Type;
 
 
 class DReal4TheoremProver extends AbstractProverWithAllSat<Void> implements ProverEnvironment {
@@ -78,10 +80,21 @@ class DReal4TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
     Preconditions.checkState(!closed);
     DRealTerm<?, ?> formula = creator.extractInfo(constraint);
     assertedFormulas.peek().add(formula);
-    curCnt.declareVaribales(formula.getFormula());
-    curCnt.Assert(formula.getFormula());
-    return null;
+    // It is not possible to assert an Expression, only Variable of type boolean or a formula
+    Preconditions.checkState(!formula.isExp());
+    if (formula.isVar()) {
+      Preconditions.checkState(formula.getType() == Type.BOOLEAN);
+      Formula f = new Formula(formula.getVariable());
+      curCnt.declareVaribales(f);
+      curCnt.Assert(f);
+      return null;
+    } else {
+      curCnt.declareVaribales(formula.getFormula());
+      curCnt.Assert(formula.getFormula());
+      return null;
+    }
   }
+
 
   @Override
   public void push() throws InterruptedException {
@@ -129,5 +142,14 @@ class DReal4TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   @Override
   protected DReal4Model getEvaluatorWithoutChecks(){
     return new DReal4Model(this, creator, model);
+  }
+
+  @Override
+  public void close() {
+    if (!closed) {
+      assertedFormulas.clear();
+      Context.Exit();
+      closed = true;
+    }
   }
 }
