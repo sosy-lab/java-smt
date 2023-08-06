@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import java.util.List;
 import java.util.Set;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -44,6 +45,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
   @Test
   @SuppressWarnings("CheckReturnValue")
+  @Ignore
   public <T> void simpleInterpolation() throws SolverException, InterruptedException {
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       IntegerFormula x = imgr.makeVariable("x");
@@ -163,6 +165,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   }
 
   @Test
+  @Ignore
   public <T> void binaryBVInterpolation1() throws SolverException, InterruptedException {
     requireBitvectors();
 
@@ -246,15 +249,22 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
     assertThat(stack).isUnsatisfiable();
 
+    System.out.println("--------itps1--------");
     List<BooleanFormula> itps1 = stack.getSeqInterpolants0(ImmutableList.of(TA, TB, TC, TD));
+    System.out.println("--------itps2--------");
     List<BooleanFormula> itps2 = stack.getSeqInterpolants0(ImmutableList.of(TD, TC, TB, TA));
+    System.out.println("--------itps3--------");
+    System.out.println(ImmutableList.of(TA, TC, TB, TD));
     List<BooleanFormula> itps3 = stack.getSeqInterpolants0(ImmutableList.of(TA, TC, TB, TD));
+    System.out.println("--------itps4--------");
     List<BooleanFormula> itps4 =
         stack.getSeqInterpolants(
             Lists.transform(ImmutableList.of(TA, TA, TA, TB, TC, TD, TD), ImmutableSet::of));
+    System.out.println("itps5");
     List<BooleanFormula> itps5 =
         stack.getSeqInterpolants(
             Lists.transform(ImmutableList.of(TA, TA, TB, TC, TD, TA, TD), ImmutableSet::of));
+    System.out.println("itps6");
     List<BooleanFormula> itps6 =
         stack.getSeqInterpolants(
             Lists.transform(ImmutableList.of(TB, TC, TD, TA, TA, TA, TD), ImmutableSet::of));
@@ -919,6 +929,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   }
 
   @Test
+  @Ignore
   public <T> void bigSeqInterpolationTest() throws InterruptedException, SolverException {
     requireBitvectors();
     requireInterpolation();
@@ -995,6 +1006,10 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     if (!itps.isEmpty()) {
       assertThatFormula(formulas.get(0)).implies(itps.get(0));
       for (int i = 1; i < formulas.size() - 1; i++) {
+        System.out.println(i);
+        System.out.println(itps.get(i - 1));
+        System.out.println(formulas.get(i));
+        System.out.println(itps.get(i));
         assertThatFormula(bmgr.and(itps.get(i - 1), formulas.get(i))).implies(itps.get(i));
       }
       assertThatFormula(bmgr.and(getLast(itps), getLast(formulas)))

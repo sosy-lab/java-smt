@@ -1258,8 +1258,10 @@ public class CVC5NativeAPITest {
   private Term interpolateAndCheck(Solver solverP, Term interpolantA, Term interpolantB) {
     // solver.setOption("produce-interpolants", "true");
     solverP.assertFormula(interpolantA);
+    System.out.println(
+        "Interpolation Pair:\n" + interpolantA + "\n" + solverP.mkTerm(Kind.NOT, interpolantB));
     Term interpolation = solverP.getInterpolant(solverP.mkTerm(Kind.NOT, interpolantB));
-
+    System.out.println("Interpolation: " + interpolation);
     solverP.resetAssertions();
     Term cvc51 = solverP.mkTerm(Kind.IMPLIES, interpolantA, interpolation);
     Term cvc52 =
@@ -1298,8 +1300,44 @@ public class CVC5NativeAPITest {
       System.out.println("Does not satisfy generally Craig Interpolation Definition");
       return null;
     }
-
+    System.out.println("------------");
     return interpolation;
+  }
+
+  @Test
+  public void testSequentialInterpolation() {
+    solver.setOption("incremental", "true");
+    solver.setOption("produce-interpolants", "true");
+    solver.setOption("produce-assertions", "true");
+    solver.setOption("dump-models", "true");
+    solver.setOption("output-language", "smt2");
+
+    // Set Strings option to enable all String features (such as lessOrEquals)
+    solver.setOption("strings-exp", "true");
+
+    // Enable more complete quantifier solving (for more info see CVC5QuantifiedFormulaManager)
+    solver.setOption("full-saturate-quant", "true");
+    solver.resetAssertions();
+
+    Term zero = solver.mkInteger(0);
+    Term one = solver.mkInteger(1);
+
+    Term a = solver.mkConst(solver.getIntegerSort(), "a");
+    Term b = solver.mkConst(solver.getIntegerSort(), "b");
+    Term c = solver.mkConst(solver.getIntegerSort(), "c");
+
+    Term A = solver.mkTerm(Kind.EQUAL, one, a);
+    Term B = solver.mkTerm(Kind.EQUAL, a, b);
+    Term C = solver.mkTerm(Kind.EQUAL, b, c);
+    Term D = solver.mkTerm(Kind.EQUAL, c, zero);
+
+    Term itps3_1 = interpolateAndCheck(solver, A, solver.mkTerm(Kind.AND, C, B, D));
+    Term itps3_2 =
+        interpolateAndCheck(solver, solver.mkTerm(Kind.AND, A, C), solver.mkTerm(Kind.AND, B, D));
+    Term itps3_3 = interpolateAndCheck(solver, solver.mkTerm(Kind.AND, A, C, B), D);
+    // System.out.println(itps3_1);
+    // System.out.println(itps3_2);
+    // System.out.println(itps3_3);
   }
 
   @Test

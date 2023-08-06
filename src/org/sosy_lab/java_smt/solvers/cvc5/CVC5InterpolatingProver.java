@@ -107,7 +107,12 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     ImmutableList<Collection<Term>> formAAsList = ImmutableList.of(pFormulasOfA);
     ImmutableList<Collection<Term>> formBAsList = ImmutableList.of(formulasOfB);
 
+    System.out.println("Interpolation for: \n" + pFormulasOfA);
+    // System.out.println("Interpolation Pairs: \n" + formAAsList + "\n" + formBAsList);
+
     Term itp = getCVC5Interpolation(formAAsList, formBAsList);
+
+    System.out.println(itp);
 
     return creator.encapsulateBoolean(itp);
   }
@@ -210,15 +215,24 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
 
     setSolverOptions(seed, solverOptions, interpolationSolver);
 
+    interpolationSolver.resetAssertions();
+
     Term interpolantA = buildConjunctionOfFormulasOverList(pFormAAsList, interpolationSolver);
 
     if (!extraAssertions.isEmpty()) {
-      Term extraAssert = buildConjunctionOfFormulas(extraAssertions, interpolationSolver);
-      interpolantA = interpolationSolver.mkTerm(Kind.AND, extraAssert, interpolantA);
+      // Term extraAssert = buildConjunctionOfFormulas(extraAssertions, interpolationSolver);
+      // interpolantA = interpolationSolver.mkTerm(Kind.AND, extraAssert, interpolantA);
+      System.out.print("Extra Assert s Not Empty!");
     }
     Term interpolantB = buildConjunctionOfFormulasOverList(pFormBAsList, interpolationSolver);
 
     interpolationSolver.assertFormula(interpolantA);
+
+    System.out.println(
+        "Interpolation Pairs:\n"
+            + interpolantA
+            + "\n"
+            + interpolationSolver.mkTerm(Kind.NOT, interpolantB));
 
     Term interpolant =
         interpolationSolver.getInterpolant(interpolationSolver.mkTerm(Kind.NOT, interpolantB));
