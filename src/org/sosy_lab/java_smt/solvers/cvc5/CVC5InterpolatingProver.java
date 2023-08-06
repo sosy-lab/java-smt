@@ -50,27 +50,10 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
    * Sets the same solver Options of the Original Solver to the separate solvertoSet, except for
    * produce-interpolants which is set here. From CVC5AbstractProver Line 66
    */
-  private void setSolverOptions(int randomSeed, Set<ProverOptions> pOptions, Solver solvertoSet) {
-    if (incremental) {
-      solvertoSet.setOption("incremental", "true");
-    }
-    if (pOptions.contains(ProverOptions.GENERATE_MODELS)) {
-      solvertoSet.setOption("produce-models", "true");
-    }
-    if (pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE)) {
-      solvertoSet.setOption("produce-unsat-cores", "true");
-    }
-    solvertoSet.setOption("produce-assertions", "true");
-    solvertoSet.setOption("dump-models", "true");
-    solvertoSet.setOption("output-language", "smt2");
-    solvertoSet.setOption("seed", String.valueOf(randomSeed));
-    solvertoSet.setOption("produce-interpolants", "true");
-
-    // Set Strings option to enable all String features (such as lessOrEquals)
-    solvertoSet.setOption("strings-exp", "true");
-
-    // Enable more complete quantifier solving (for more info see CVC5QuantifiedFormulaManager)
-    solvertoSet.setOption("full-saturate-quant", "true");
+  @Override
+  protected void setSolverOptions(int randomSeed, Set<ProverOptions> pOptions, Solver pSolver) {
+    super.setSolverOptions(randomSeed, pOptions, pSolver);
+    pSolver.setOption("produce-interpolants", "true");
   }
 
   @Override
@@ -295,17 +278,14 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     Preconditions.checkState(!closed);
     Preconditions.checkArgument(!formulas.isEmpty());
 
-    Term formula = formulas.iterator().next();
-
-    Collection<Term> removedFormulas =
-        formulas.stream().filter(n -> !formula.equals(n)).collect(ImmutableList.toImmutableList());
-
-    if (removedFormulas.isEmpty()) {
-      return formula;
+    switch (formulas.size()) {
+      case 0:
+        return usingSolver.mkBoolean(true);
+      case 1:
+        return Iterables.getOnlyElement(formulas);
+      default:
+        return usingSolver.mkTerm(Kind.AND, formulas.toArray(new Term[0]));
     }
-
-    return usingSolver.mkTerm(
-        Kind.AND, formula, buildConjunctionOfFormulas(removedFormulas, usingSolver));
   }
 
   /**
