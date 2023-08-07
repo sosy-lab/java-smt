@@ -11876,17 +11876,21 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
   return jresult;
 }
 
-SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_getResult(JNIEnv *jenv, jclass jcls, jlong model, jint index) {
+SWIGEXPORT jstring JNICALL
+Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_getResult(JNIEnv *jenv, jclass
+jcls, jlong model, jlong var) {
   jstring result = 0;
   dreal::Box *box = (dreal::Box *) 0;
-  int i;
+  dreal::drake::symbolic::Variable *variable = (dreal::drake::symbolic::Variable *) 0;
 
-  i = (int)index;
+  variable = *(dreal::drake::symbolic::Variable**)&var;
   box = *(dreal::Box **)&model;
   dreal::Box copyBox{*box};
   std::string res;
-  //dreal::Box::Interval interval{box->values_[i]};
-  dreal::Box::Interval interval = copyBox[i];
+
+  dreal::drake::symbolic::Variable copyVar{*variable};
+
+  dreal::Box::Interval interval = copyBox[copyVar];
   if (interval.is_empty()) {
   res = "EMPTY";
   } else {
@@ -11899,6 +11903,25 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_
   return result;
 }  
 // Functions for debugging and trying to figure stuff out
+
+SWIGEXPORT jboolean JNICALL
+Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Box_1has_1variable_10(JNIEnv *jenv,
+jclass
+jcls, jlong model, jlong var) {
+  dreal::Box *box = (dreal::Box *) 0;
+  dreal::drake::symbolic::Variable *variable = (dreal::drake::symbolic::Variable *) 0;
+
+  box = *(dreal::Box **)&model;
+  variable = *(dreal::drake::symbolic::Variable **)&var;
+
+  dreal::Box cb{*box};
+  dreal::drake::symbolic::Variable cv{*variable};
+
+  std::cerr << cb.has_variable(cv) << std::endl;
+
+  return true;
+}
+
 
 // trying to figure out how CheckSatisfiability works and why it does not work
 SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_CheckSatisfiability_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1) {

@@ -638,10 +638,12 @@ public class drealJNI {
   public final static native boolean Context_CheckSat_0(long context, long box);
   public final static native long Formula_getQuantifiedVariables(long set, long formula);
   public final static native long new_Expression__SWIG_4(long jarg1);
-  public final static native String getResult(long box, int i);
+  public final static native String getResult(long box, long var);
 
 
   // For debuging and testing
+
+  public final static native boolean Box_has_variable_0(long box, long var);
   public final static native boolean CheckSatisfiability__SWIG_2(long formula);
   public final static native boolean CheckSatisfiability__SWIG_3(long formula, double delta, long box);
 

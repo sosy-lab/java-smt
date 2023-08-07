@@ -779,12 +779,12 @@ public class dreal {
    * This function reads the result of one variable from the model(Box). It should be known what
    * variable is called, to save the String with the associated variable.
    * @param box to read the values of the variables
-   * @param i to get the i-th value associated with a variable of the box
+   * @param var to get the value associated with the variable of the box
    * @return String with the value, value is the lower-bound or ENTIRE or EMPTY
    */
-  public static String getResult(Box box, int i) {
+  public static String getResult(Box box, Variable var) {
     // returns EMPTY or lower-bound; upperbound as String
-    String result =  drealJNI.getResult(Box.getCPtr(box), i);
+    String result =  drealJNI.getResult(Box.getCPtr(box), Variable.getCPtr(var));
     if (result.equals("EMPTY")) {
       return "EMPTY";
     }
@@ -807,6 +807,10 @@ public class dreal {
   }
 
   // Zum testen
+
+  public static boolean has_variable(Box box, Variable var) {
+    return drealJNI.Box_has_variable_0(Box.getCPtr(box), Variable.getCPtr(var));
+  }
   public static boolean CheckSatisfiabilityTest(Formula f, double delta, Box box) {
     System.out.println("Aufruf von Main und jetzt wird drealJNI und dann wrapper aufgerufen");
     return drealJNI.CheckSatisfiability__SWIG_3(Formula.getCPtr(f), delta, Box.getCPtr(box));
