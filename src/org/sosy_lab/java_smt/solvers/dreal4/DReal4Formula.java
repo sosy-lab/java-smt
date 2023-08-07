@@ -43,20 +43,20 @@ abstract class DReal4Formula implements Formula {
     if ( o == this) {
       return true;
     }
-    if (!(o instanceof DRealTerm)) {
+    if (!(o instanceof DReal4Formula)) {
       return false;
     }
-    if (term.isVar() && ((DRealTerm<?, ?>) o).isVar()) {
-      return term.getVariable().equal_to(((DRealTerm<?, ?>) o).getVariable());
-    } else if (term.isExp() && ((DRealTerm<?, ?>) o).isExp()) {
-      return term.getExpression().EqualTo(((DRealTerm<?, ?>) o).getExpression());
-    } else if (term.isFormula() && ((DRealTerm<?, ?>) o).isFormula()) {
-      return term.getFormula().EqualTo(((DRealTerm<?, ?>) o).getFormula());
+    // equal_to only checks for the same structure
+    DRealTerm<?, ?> oTerm = ((DReal4Formula) o).getTerm();
+    if (term.isVar() && oTerm.isVar()) {
+      return term.getVariable().equal_to(oTerm.getVariable());
+    } else if (term.isExp() && oTerm.isExp()) {
+      return term.getExpression().EqualTo(oTerm.getExpression());
+    } else if (term.isFormula() && oTerm.isFormula()) {
+      return term.getFormula().EqualTo(oTerm.getFormula());
     } else {
       return false;
     }
-/*    // ?
-    return term == o;*/
   }
 
   @Override
