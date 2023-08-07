@@ -29,9 +29,12 @@ import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Box;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Context;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Expression;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.ExpressionKind;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.FormulaKind;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable.Type;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variables;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.dreal;
 
 
@@ -53,37 +56,99 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Type, Context> {
     return null;
   }
 
-  // This will always return True, different solution?
   @Override
   protected @Nullable DRealTerm<?, ?> evalImpl(DRealTerm<?, ?> formula) {
-    Preconditions.checkState(formula.isFormula());
-    Formula f = formula.getFormula();
-    HashMap<Variable, Double> result = extractResults();
-    for (Map.Entry<Variable, Double> entry : result.entrySet()) {
-      Variable var = entry.getKey();
-      Double res = entry.getValue();
+    // this will return a constant for the result of the variable
+    if (formula.isVar()) {
+      Variable variable = formula.getVariable();
+      // if we find a variable that is not in the model, abort
+      if (!model.has_variable(variable)) {
+        return null;
+      }
+      Double res = extractResultsVariable(variable);
       if (res.isNaN()) {
         // When is result "EMPTY"?
         return null;
       } else {
-        if (var.get_type() == Type.BOOLEAN) {
-          if (res > 0) {
-            f.Substitute(var, Formula.True());
+        if (variable.get_type() == Type.BOOLEAN) {
+          if (res > 0 ) {
+            return new DRealTerm<>(Formula.True(), formula.getType(), FormulaKind.True);
           } else {
-            f.Substitute(var, Formula.False());
+            return new DRealTerm<>(Formula.False(), formula.getType(), FormulaKind.False);
           }
         } else {
-          f.Substitute(var, new Expression(res));
+          return new DRealTerm<>(new Expression(res), formula.getType(), ExpressionKind.Constant);
         }
       }
+    } else if (formula.isExp()) {
+      // this will return the constant of the Expression -> if expression is (x + 1) and x
+      // evaluates to 5, it will return 6 and not (5+1)
+      Expression exp = formula.getExpression();
+      // if expression is already a constang, just return it
+      if (exp.get_kind() == ExpressionKind.Constant) {
+        return new DRealTerm<>(exp, formula.getType(), ExpressionKind.Constant);
+      }
+      HashMap<Variable, Double> result = extractResults();
+      Variables vars = exp.GetVariables();
+      //TODO: to use the same extractResults()-function to extract the result of the whole formula
+      // is not a "good" solution, but it works, because dReal just does nothing when
+      // substituting a variable that is not in an expression
+      for (Map.Entry<Variable, Double> entry : result.entrySet()) {
+        Variable var = entry.getKey();
+        // if we find a variable that is set in the model, but not in the Expression, abort?
+        if (!vars.include(var)) {
+          return null;
+        }
+        Double res = entry.getValue();
+        if (res.isNaN()) {
+          // When is result "EMPTY"?
+          return null;
+        } else {
+          // TODO: Is it possible to get an Expression with BooleanType?
+          Preconditions.checkState(formula.getType() != Type.BOOLEAN);
+          exp = exp.Substitute(var, new Expression(res));
+        }
+      }
+      return new DRealTerm<>(exp, formula.getType(), formula.getExpressionKind());
+    } else {
+      // this will always return a True formula
+      Formula f = formula.getFormula();
+      // if formula is already true or false, just return the formula
+      if (f.get_kind() == FormulaKind.True || f.get_kind() == FormulaKind.False) {
+        return new DRealTerm<>(f, formula.getType(), f.get_kind());
+      }
+      //TODO: How can I get all the Variables in a quantified Formula, is it needed?
+      Variables vars = f.GetFreeVariables();
+      HashMap<Variable, Double> result = extractResults();
+      for (Map.Entry<Variable, Double> entry : result.entrySet()) {
+        Variable var = entry.getKey();
+        Double res = entry.getValue();
+        // if we find a variable that is set in the model, but not in the Expression, abort?
+        if (!vars.include(var)) {
+          return null;
+        }
+        if (res.isNaN()) {
+          // When is result "EMPTY"?
+          return null;
+        } else {
+          if (var.get_type() == Type.BOOLEAN) {
+            if (res > 0) {
+              f = f.Substitute(var, Formula.True());
+            } else {
+              f = f.Substitute(var, Formula.False());
+            }
+          } else {
+            f = f.Substitute(var, new Expression(res));
+          }
+        }
+      }
+      return new DRealTerm<>(f, formula.getType(), formula.getFormulaKind());
     }
-    return new DRealTerm<>(f, formula.getType(), formula.getFormulaKind());
   }
 
-
   /**
-   * This function extracts the results. The function iterates through the model (Box) and gets the
-   * variable and calls getResult to get the value associated with the variable
+   * This function extracts the results of a formula. The function iterates through the model
+   * (Box) and gets the variable and calls getResult to get the value associated with the variable
    * @return HashMap with variable as key and result as Double as value
    */
   private HashMap<Variable, Double> extractResults() {
@@ -92,13 +157,17 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Type, Context> {
     String res;
     for (int i = 0; i < model.size(); i++) {
       var = model.variable(i);
-      res = dreal.getResult(model, i);
+      res = dreal.getResult(model, var);
       result.put(var, parseResult(res));
     }
     return result;
   }
 
-  private double parseResult(String string) {
+  private Double extractResultsVariable(Variable var) {
+    return parseResult(dreal.getResult(model, var));
+  }
+
+  private Double parseResult(String string) {
     if (string.equals("EMPTY")) {
       return Double.NaN;
     } else if (string.equals("ENTIRE")) {
