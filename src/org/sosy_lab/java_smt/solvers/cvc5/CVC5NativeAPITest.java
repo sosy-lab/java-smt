@@ -1335,9 +1335,9 @@ public class CVC5NativeAPITest {
     Term itps3_2 =
         interpolateAndCheck(solver, solver.mkTerm(Kind.AND, A, C), solver.mkTerm(Kind.AND, B, D));
     Term itps3_3 = interpolateAndCheck(solver, solver.mkTerm(Kind.AND, A, C, B), D);
-    // System.out.println(itps3_1);
-    // System.out.println(itps3_2);
-    // System.out.println(itps3_3);
+    System.out.println(itps3_1);
+    System.out.println(itps3_2);
+    System.out.println(itps3_3);
   }
 
   @Test
