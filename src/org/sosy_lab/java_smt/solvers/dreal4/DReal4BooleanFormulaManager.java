@@ -24,6 +24,8 @@ import com.google.common.base.Preconditions;
 import java.util.Collection;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Context;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Expression;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.ExpressionKind;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.FormulaKind;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable.Type;
@@ -92,6 +94,7 @@ public class DReal4BooleanFormulaManager
       throw new UnsupportedOperationException("dReal does not support and on Expressions.");
     }
   }
+
   @Override
   protected DRealTerm<Formula, FormulaKind> andImpl(Collection<DRealTerm<?, ?>> pParams) {
     Formula result = Formula.True();
@@ -143,7 +146,9 @@ public class DReal4BooleanFormulaManager
     Formula result = Formula.False();
     for (DRealTerm<?, ?> formula : pParams) {
       // Only Formulas or Variables of boolean type are accepted when creating an Or-Formula
-      Preconditions.checkState(formula.isFormula() || (formula.isVar()) && (formula.getVariable().get_type() == Type.BOOLEAN));
+      Preconditions.checkState(
+          formula.isFormula() || (formula.isVar()) && (formula.getVariable().get_type()
+              == Type.BOOLEAN));
       if (formula.isFormula()) {
         if (formula.getFormula().get_kind() == FormulaKind.True) {
           return new DRealTerm<>(Formula.True(), Type.BOOLEAN, FormulaKind.True);
@@ -192,8 +197,9 @@ public class DReal4BooleanFormulaManager
   }
 
   @Override
-  protected DRealTerm<Formula, FormulaKind> equivalence(DRealTerm<?, ?> bits1,
-                                                        DRealTerm<?, ?> bits2) {
+  protected DRealTerm<Formula, FormulaKind> equivalence(
+      DRealTerm<?, ?> bits1,
+      DRealTerm<?, ?> bits2) {
     if (bits1.isVar() && bits2.isFormula()) {
       // Only Variables with type boolean are allowed
       Preconditions.checkState(bits1.getVariable().get_type() == Type.BOOLEAN);
@@ -222,9 +228,16 @@ public class DReal4BooleanFormulaManager
   protected boolean isTrue(DRealTerm<?, ?> bits) {
     if (bits.isFormula()) {
       return dreal.is_true(bits.getFormula());
-    } else {
-      throw new UnsupportedOperationException("dReal does not support isTrue on "
-          + "Variables and Expressions.");
+    } else if (bits.isVar()) {
+      if (bits.getType() == Type.BOOLEAN) {
+        return dreal.is_true(new Formula(bits.getVariable()));
+      } else {
+        throw new UnsupportedOperationException("dReal does not support isTrue on Variables not "
+            + "being Boolean type.");
+      }
+    }
+    else {
+      throw new UnsupportedOperationException("dReal does not support isTrue on Expressions.");
     }
   }
 
@@ -232,42 +245,81 @@ public class DReal4BooleanFormulaManager
   protected boolean isFalse(DRealTerm<?, ?> bits) {
     if (bits.isFormula()) {
       return dreal.is_false(bits.getFormula());
-    } else {
-      throw new UnsupportedOperationException("dReal does not support isTrue on "
-          + "Variables and Expressions.");
+    } else if (bits.isVar()) {
+      if (bits.getType() == Type.BOOLEAN) {
+        return dreal.is_false(new Formula(bits.getVariable()));
+      } else {
+        throw new UnsupportedOperationException("dReal does not support isTrue on Variables not "
+            + "being Boolean type.");
+      }
+    }
+    else {
+      throw new UnsupportedOperationException("dReal does not support isTrue on Expressions.");
     }
   }
 
   @Override
   protected DRealTerm<?, ?> ifThenElse(DRealTerm<?, ?> cond, DRealTerm<?, ?> f1,
-                                                       DRealTerm<?, ?> f2) {
-    if (cond.isFormula()) {
-      if (dreal.is_true(cond.getFormula())) {
-        if (f1.isVar()) {
-          return new DRealTerm<>(f1.getVariable(), f1.getType(),
-              f1.getType());
-        } else if (f1.isExp()) {
-          return new DRealTerm<>(f1.getExpression(), f1.getType(),
-              f1.getExpressionKind());
+      DRealTerm<?, ?> f2) {
+    if (cond.isVar()) {
+      if (cond.getType() == Type.BOOLEAN) {
+        if (f1.isExp() && f2.isExp()) {
+          return new DRealTerm<>(dreal.if_then_else(new Formula(cond.getVariable()),
+              f1.getExpression(),
+              f2.getExpression()), f1.getType(), ExpressionKind.IfThenElse);
+        } else if (f1.isVar() && f2.isExp()) {
+          return new DRealTerm<>(dreal.if_then_else(new Formula(cond.getVariable()),
+              new Expression(f1.getVariable()), f2.getExpression()), f1.getType(),
+              ExpressionKind.IfThenElse);
+        } else if (f1.isExp() && f2.isVar()) {
+          return new DRealTerm<>(dreal.if_then_else(new Formula(cond.getVariable()),
+              f1.getExpression(),
+              new Expression(f2.getVariable())), f1.getType(), ExpressionKind.IfThenElse);
+        } else if (f1.isVar() && f2.isVar()) {
+          return new DRealTerm<>(dreal.if_then_else(new Formula(cond.getVariable()),
+              new Expression(f1.getVariable()), new Expression(f2.getVariable())), f1.getType(),
+              ExpressionKind.IfThenElse);
+        }
+        // dReal does not support ITE on Formulas
+        else if (f1.isFormula() && f2.isFormula()) {
+            return new DRealTerm<>(dreal.And(dreal.Or(dreal.Not(new Formula(cond.getVariable())),
+             f1.getFormula()), dreal.Or(new Formula(cond.getVariable()), f2.getFormula())),
+                f1.getType(), FormulaKind.And);
         } else {
-          return new DRealTerm<>(f1.getFormula(), f1.getType(),
-              f1.getFormulaKind());
+          throw new UnsupportedOperationException("dReal does not support Expression and Formula "
+              + "as then and else.");
         }
       } else {
-        if (f2.isVar()) {
-          return new DRealTerm<>(f2.getVariable(), f2.getType(),
-             f2.getType());
-        } else if (f2.isExp()) {
-          return new DRealTerm<>(f2.getExpression(), f2.getType(),
-              f2.getExpressionKind());
-        } else {
-          return new DRealTerm<>(f2.getFormula(), f2.getType(),
-              f2.getFormulaKind());
-        }
+        throw new UnsupportedOperationException("dReal does not support a Variable of not boolean"
+            + " type as condition.");
+      }
+    } else if (cond.isFormula()) {
+      if (f1.isExp() && f2.isExp()) {
+        return new DRealTerm<>(dreal.if_then_else(cond.getFormula(), f1.getExpression(),
+            f2.getExpression()), f1.getType(), ExpressionKind.IfThenElse);
+      } else if (f1.isVar() && f2.isExp()) {
+        return new DRealTerm<>(dreal.if_then_else(cond.getFormula(),
+            new Expression(f1.getVariable()), f2.getExpression()), f1.getType(),
+            ExpressionKind.IfThenElse);
+      } else if (f1.isExp() && f2.isVar()) {
+        return new DRealTerm<>(dreal.if_then_else(cond.getFormula(), f1.getExpression(),
+            new Expression(f2.getVariable())), f1.getType(), ExpressionKind.IfThenElse);
+      } else if (f1.isVar() && f2.isVar()) {
+        return new DRealTerm<>(dreal.if_then_else(cond.getFormula(),
+            new Expression(f1.getVariable()), new Expression(f2.getVariable())), f1.getType(),
+            ExpressionKind.IfThenElse);
+      }
+      // dReal does not support ITE on Formulas
+      else if (f1.isFormula() && f2.isFormula()) {
+        return new DRealTerm<>(dreal.And(dreal.Or(dreal.Not(cond.getFormula()),
+            f1.getFormula()), dreal.Or(cond.getFormula(), f2.getFormula())),
+            f1.getType(), FormulaKind.And);
+      } else {
+        throw new UnsupportedOperationException("dReal does not support Expression and Formula "
+            + "as then and else.");
       }
     } else {
-      throw new UnsupportedOperationException("dReal does not suppord ifThenElse with first "
-          + "argument beeing not a Formula.");
+      throw new UnsupportedOperationException("dReal does not support an Expression as condition.");
     }
   }
 
