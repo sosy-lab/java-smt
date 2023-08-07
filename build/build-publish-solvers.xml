@@ -60,7 +60,7 @@ SPDX-License-Identifier: Apache-2.0
         <!-- Build OpenSMT -->
         <exec executable="cmake" dir="${path.build}" failonerror="true">
             <arg value="-DCMAKE_INSTALL_PREFIX:PATH=${path.install}"/>
-            <arg value="FORCE_STATIC_GMP=ON"/>
+            <arg value="-DFORCE_STATIC_GMP=ON"/>
             <arg value=".."/>
         </exec>
         
@@ -75,6 +75,7 @@ SPDX-License-Identifier: Apache-2.0
         <echo file="${path.install}/Version.h">#define VERSION "${opensmt.version}"</echo>
 
         <!-- Run swig to generate java proxies and the jni wrapper -->
+
         <mkdir dir="${path.install}/java/opensmt"/>
         <exec executable="swig" dir="${path.install}" failonerror="true">
             <arg value="-java"/>
