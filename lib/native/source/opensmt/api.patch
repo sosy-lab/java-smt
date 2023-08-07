@@ -213,7 +213,7 @@ index fc9dbfb7..943a466d 100644
  public:
      static std::string nextFreeArgumentName() { return std::string(template_arg_prefix) + std::to_string(template_arg_counter++); }
 diff --git a/src/logics/Logic.cc b/src/logics/Logic.cc
-index b90430c2..3289ad82 100644
+index b90430c2..7eb1fed4 100644
 --- a/src/logics/Logic.cc
 +++ b/src/logics/Logic.cc
 @@ -15,6 +15,7 @@
@@ -233,7 +233,32 @@ index b90430c2..3289ad82 100644
  
  const char* Logic::tk_true     = "true";
  const char* Logic::tk_false    = "false";
-@@ -391,7 +392,7 @@ Logic::getDefaultValue(const PTRef tr) const
+@@ -130,12 +131,13 @@ bool Logic::hasQuotableChars(std::string const & name) const
+         0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+         0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+         0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0
+     };
+ 
+     if (name.front() == '|' and name.back() == '|') return false; // Already quoted
+ 
+-    for (auto c : name) {
+-        if (quotable[(int)c])
++    for (unsigned char c : name) {
++        if (quotable[c])
+             return true;
+     }
+     return false;
+@@ -150,7 +152,7 @@ std::string Logic::disambiguateName(std::string const & protectedName, SRef sort
+         return protectedName;
+     }
+ 
+-    auto isQuoted = [](std::string const &s) { return s.size() > 3 and *s.begin() == '|' and *(s.end()-1) == '|'; };
++    auto isQuoted = [](std::string const &s) { return s.size() > 2 and *s.begin() == '|' and *(s.end()-1) == '|'; };
+     auto name = isQuoted(protectedName) ?
+             std::string_view(protectedName.data()+1, protectedName.size()-2) : std::string_view(protectedName);
+ 
+@@ -391,7 +393,7 @@ Logic::getDefaultValue(const PTRef tr) const
  
  PTRef
  Logic::getDefaultValuePTRef(const SRef sref) const {
@@ -242,7 +267,7 @@ index b90430c2..3289ad82 100644
      else {
          return defaultValueForSort[sref];
  
-@@ -758,6 +759,18 @@ PTRef Logic::mkBoolVar(const char* name)
+@@ -758,6 +760,18 @@ PTRef Logic::mkBoolVar(const char* name)
      return mkFun(sr, {});
  }
  
@@ -261,7 +286,7 @@ index b90430c2..3289ad82 100644
  void Logic::instantiateFunctions(SRef sr)
  {
      // Equality
-@@ -1346,14 +1359,14 @@ void Logic::dumpWithLets(std::ostream & dump_out, PTRef formula) const {
+@@ -1346,14 +1360,14 @@ void Logic::dumpWithLets(std::ostream & dump_out, PTRef formula) const {
          if (term.size() > 0) dump_out << ")";
  
          // Closes binding
@@ -278,7 +303,7 @@ index b90430c2..3289ad82 100644
  
      // Close all lets
      for (unsigned n = 1; n <= num_lets; n++) dump_out << ")";
-@@ -1488,6 +1501,9 @@ Logic::collectStats(PTRef root, int& n_of_conn, int& n_of_eq, int& n_of_uf, int&
+@@ -1488,6 +1502,9 @@ Logic::collectStats(PTRef root, int& n_of_conn, int& n_of_eq, int& n_of_uf, int&
  
  PTRef Logic::conjoinExtras(PTRef root) { return root; }
  

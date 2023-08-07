@@ -81,8 +81,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
           // "'", "''", "'''",
           "\n",
           "\t",
-          // FIXME: Broken for OpenSMT
-          // "\u0000",
+          "\u0000",
           "\u0001",
           "\u1234",
           "\u2e80",
