@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.cvc5;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -87,8 +88,8 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
 
     // fit the Input to work with getCVC5Interpolation
 
-    ImmutableList<Collection<Term>> formAAsList = ImmutableList.of(pFormulasOfA);
-    ImmutableList<Collection<Term>> formBAsList = ImmutableList.of(formulasOfB);
+    Set<Collection<Term>> formAAsList = Set.of(pFormulasOfA);
+    Set<Collection<Term>> formBAsList = Set.of(formulasOfB);
 
     System.out.println("Interpolation for: \n" + pFormulasOfA);
     // System.out.println("Interpolation Pairs: \n" + formAAsList + "\n" + formBAsList);
@@ -134,7 +135,8 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
       for (int i = 0; i < interpolationPairs.size(); i++) {
         itps.add(
             getCVC5Interpolation(
-                interpolationPairs.get(i).get(0), interpolationPairs.get(i).get(1)));
+                interpolationPairs.get(i).get(0).stream().collect(Collectors.toSet()),
+                interpolationPairs.get(i).get(1).stream().collect(Collectors.toSet())));
       }
     } catch (UnsupportedOperationException e) {
       if (e.getMessage() != null) {
@@ -180,13 +182,13 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
    *     Craig-Interpolation.
    */
   private Term getCVC5Interpolation(
-      ImmutableList<Collection<Term>> pFormAAsList, ImmutableList<Collection<Term>> pFormBAsList) {
+      Set<Collection<Term>> pFormAAsList,
+      Set<Collection<Term>> pFormBAsList) {
 
     // Respect Asserted Formulas not in the Interpolation Pairs
 
-    ImmutableList<Collection<Term>> combinedInterpols =
-        Stream.concat(pFormAAsList.stream(), pFormBAsList.stream())
-            .collect(ImmutableList.toImmutableList());
+    Set<Collection<Term>> combinedInterpols =
+        Stream.concat(pFormAAsList.stream(), pFormBAsList.stream()).collect(Collectors.toSet());
 
     // checks, that no Assertions in the Assertion stack are left out. Can happen in Tree
     // Interpolation, if pPartitionedFormulas does not contain every Set of Formulas from the
@@ -233,17 +235,17 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
    * @return asserted Formulas not in collTerms, but in the formula Stack
    */
   private Collection<Term> getAssertedTermsNotInCollection(
-      ImmutableList<Collection<Term>> pCombinedInterpols) {
-    ImmutableList<Term> retTerms =
+      Set<Collection<Term>> pCombinedInterpols) {
+    Set<Term> retTerms =
         pCombinedInterpols.stream()
             .flatMap(Collection::stream)
-            .collect(ImmutableList.toImmutableList());
+            .collect(Collectors.toSet());
 
     Set<Term> filteredAssertedTerms =
         assertedFormulas.stream()
             .flatMap(c -> c.stream())
             .filter(n -> !retTerms.contains(n))
-            .collect(ImmutableSet.toImmutableSet());
+            .collect(Collectors.toSet());
     return filteredAssertedTerms;
   }
 
@@ -251,17 +253,17 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
    * Turns a List of Collections of Formulas to a Single Conjunction of the Formulas e.g.:
    * [[A,B],[C]] -> A/\B/\C.
    *
-   * @param formula List of Collections of formulas
+   * @param setFormulasCollection List of Collections of formulas
    * @param usingSolver the CVC5 Solver Instance to use
    * @return concatenated Formulas with AND as CVC5 Term
    */
   private Term buildConjunctionOfFormulasOverList(
-      ImmutableList<Collection<Term>> formula, Solver usingSolver) {
-    Collection<Term> eachCollectionOfTermsConcat =
-        formula.stream()
-            .map(n -> buildConjunctionOfFormulas(n, usingSolver))
-            .collect(ImmutableList.toImmutableList());
-    Term concatTerm = buildConjunctionOfFormulas(eachCollectionOfTermsConcat, usingSolver);
+      Set<Collection<Term>> setFormulasCollection,
+      Solver usingSolver) {
+    Term concatTerm =
+        buildConjunctionOfFormulas(
+            FluentIterable.concat(setFormulasCollection).toSet(),
+            usingSolver);
 
     return concatTerm;
   }
