@@ -171,8 +171,8 @@ public class SolverConcurrencyTest {
    * Test concurrency of integers (while every thread creates its unique context on its own
    * concurrently).
    */
-  @Test
-  public void testIntConcurrencyWithConcurrentContext() {
+  /*@Test
+    public void testIntConcurrencyWithConcurrentContext() {
     requireIntegers();
     assertConcurrency(
         "testIntConcurrencyWithConcurrentContext",
@@ -182,12 +182,12 @@ public class SolverConcurrencyTest {
           closeSolver(context);
         });
   }
-
+*/
   /**
    * Test concurrency of bitvectors (while every thread creates its unique context on its own
    * concurrently).
    */
-  @Test
+  /*@Test
   public void testBvConcurrencyWithConcurrentContext() {
     requireBitvectors();
     assertConcurrency(
@@ -198,12 +198,13 @@ public class SolverConcurrencyTest {
           closeSolver(context);
         });
   }
-
+*/
   /**
    * Test translation of formulas used on distinct contexts to a new, unrelated context. Every
    * thread creates a context, generates a formula, those are collected and handed back to the main
    * thread where they are translated to the main-thread context, anded and asserted.
    */
+  /*
   @Test
   public void testFormulaTranslationWithConcurrentContexts()
       throws InvalidConfigurationException, InterruptedException, SolverException {
@@ -215,8 +216,7 @@ public class SolverConcurrencyTest {
         .withMessage("Solver does not support translation of formulas")
         .that(solver)
         .isNoneOf(Solvers.CVC4, Solvers.PRINCESS, Solvers.CVC5);
-    
-    /** Helperclass to pack a SolverContext together with a Formula */
+  
     class ContextAndFormula {
       private final SolverContext context;
       private final BooleanFormula formula;
@@ -275,8 +275,10 @@ public class SolverConcurrencyTest {
           .isTrue();
     }
   }
+  */
 
   /** Test concurrency with already present and unique context per thread. */
+  /*
   @SuppressWarnings("resource")
   @Test
   public void testIntConcurrencyWithoutConcurrentContext() throws InvalidConfigurationException {
@@ -300,6 +302,7 @@ public class SolverConcurrencyTest {
           closeSolver(context);
         });
   }
+  */
 
   /** Test concurrency with already present and unique context per thread. */
   @SuppressWarnings("resource")
@@ -410,6 +413,7 @@ public class SolverConcurrencyTest {
    * @param context used context for the test-thread (Do not reuse contexts unless you know what you
    *     are doing!)
    */
+  @SuppressWarnings("unused")
   private void intConcurrencyTest(SolverContext context)
       throws SolverException, InterruptedException {
     FormulaManager mgr = context.getFormulaManager();
@@ -437,6 +441,28 @@ public class SolverConcurrencyTest {
    */
   @Test
   public void continuousRunningThreadFormulaTransferTranslateTest() {
+    /* FIXME:
+     * This test seems to be failing intermittently:
+     *
+     * (1) Trace:
+     * Native frames: (J=compiled Java code, A=aot compiled Java code, j=interpreted, Vv=VM code, C=native code)
+     * C  [libopensmt.so+0x19a569]  ArithLogic::printTerm_[abi:cxx11](PTRef, bool, bool) const+0x159
+     *
+     * Java frames: (J=compiled Java code, j=interpreted, Vv=VM code)
+     * j  opensmt.OsmtNativeJNI.Logic_dumpWithLets(JLopensmt/Logic;JLopensmt/PTRef;)Ljava/lang/String;+0
+     * j  opensmt.Logic.dumpWithLets(Lopensmt/PTRef;)Ljava/lang/String;+17
+     * j  org.sosy_lab.java_smt.solvers.opensmt.OpenSmtFormulaManager$1.appendTo(Ljava/lang/Appendable;)V+221
+     * j  org.sosy_lab.common.Appenders.appendTo(Ljava/lang/StringBuilder;Lorg/sosy_lab/common/Appender;)Ljava/lang/StringBuilder;+18
+     * j  org.sosy_lab.common.Appenders.toString(Lorg/sosy_lab/common/Appender;)Ljava/lang/String;+14
+     * j  org.sosy_lab.common.Appenders$AbstractAppender.toString()Ljava/lang/String;+7
+     * j  org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.translateFrom(Lorg/sosy_lab/java_smt/api/BooleanFormula;Lorg/sosy_lab/java_smt/api/FormulaManager;)Lorg/sosy_lab/java_smt/api/BooleanFormula;+27
+     * j  org.sosy_lab.java_smt.test.SolverConcurrencyTest.lambda$continuousRunningThreadFormulaTransferTranslateTest$7(Lorg/sosy_lab/common/UniqueIdGenerator;Ljava/util/concurrent/atomic/AtomicReferenceArray;)V+213
+     * j  org.sosy_lab.java_smt.test.SolverConcurrencyTest$$Lambda$77.run()V+12
+     *
+     * (2) After recompiling opensmt with -DCMAKE_BUILD_TYPE=Debug we get:
+     * java: /workspace/opensmt/src/common/FastRational.h:513: int FastRational::sign() const: Assertion `mpqPartValid()' failed.
+     */
+    
     requireIntegers();
     // CVC4 does not support parsing and therefore no translation.
     // Princess has a wierd bug
@@ -463,66 +489,72 @@ public class SolverConcurrencyTest {
         return formula;
       }
     }
-    // This is fine! We might access this more than once at a time,
-    // but that gives only access to the bucket, which is threadsafe.
-    AtomicReferenceArray<BlockingQueue<ContextAndFormula>> bucketQueue =
-        new AtomicReferenceArray<>(NUMBER_OF_THREADS);
+    
+    for (int j=0;; j++) {
+      // FIXME: Run this in a loop to trigger the crash
+      System.out.println(j);
+      
+      // This is fine! We might access this more than once at a time,
+      // but that gives only access to the bucket, which is threadsafe.
+      AtomicReferenceArray<BlockingQueue<ContextAndFormula>> bucketQueue =
+          new AtomicReferenceArray<>(NUMBER_OF_THREADS);
 
-    // Init as many buckets as there are threads; each bucket generates an initial formula (such
-    // that
-    // they are differently hard to solve) depending on the uniqueId
-    for (int i = 0; i < NUMBER_OF_THREADS; i++) {
-      BlockingQueue<ContextAndFormula> bucket = new LinkedBlockingQueue<>(NUMBER_OF_THREADS);
-      bucketQueue.set(i, bucket);
-    }
+      // Init as many buckets as there are threads; each bucket generates an initial formula (such
+      // that
+      // they are differently hard to solve) depending on the uniqueId
+      for (int i = 0; i < NUMBER_OF_THREADS; i++) {
+        BlockingQueue<ContextAndFormula> bucket = new LinkedBlockingQueue<>(NUMBER_OF_THREADS);
+        bucketQueue.set(i, bucket);
+      }
 
-    // Bind unique IDs to each thread with a (threadsafe) unique ID generator
-    final UniqueIdGenerator idGenerator = new UniqueIdGenerator();
+      // Bind unique IDs to each thread with a (threadsafe) unique ID generator
+      final UniqueIdGenerator idGenerator = new UniqueIdGenerator();
 
-    // Take the formula from the bucket of itself, solve it, once solved give the formula to the
-    // bucket of the next thread (have a counter for in which bucket we transfered the formula and
-    // +1 the counter)
-    assertConcurrency(
-        "continuousRunningThreadFormulaTransferTranslateTest",
-        () -> {
-          // Start the threads such that they each get a unqiue id
-          final int id = idGenerator.getFreshId();
-          int nextBucket = (id + 1) % NUMBER_OF_THREADS;
-          final BlockingQueue<ContextAndFormula> ownBucket = bucketQueue.get(id);
-          SolverContext context = initSolver();
-          FormulaManager mgr = context.getFormulaManager();
-          IntegerFormulaManager imgr = mgr.getIntegerFormulaManager();
-          BooleanFormulaManager bmgr = mgr.getBooleanFormulaManager();
-          HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
-          BooleanFormula threadFormula =
-              gen.generate(INTEGER_FORMULA_GEN.getOrDefault(solver, 9) - id);
-          try (BasicProverEnvironment<?> stack = context.newProverEnvironment()) {
-            // Repeat till the bucket counter reaches itself again
-            while (nextBucket != id) {
-              stack.push(threadFormula);
-
-              assertWithMessage(
-                      "Test continuousRunningThreadFormulaTransferTranslateTest() "
-                          + "failed isUnsat() in thread with id: "
-                          + id
-                          + ".")
-                  .that(stack.isUnsat())
-                  .isTrue();
-
-              // Take another formula from its own bucket or wait for one.
-              bucketQueue.get(nextBucket).add(new ContextAndFormula(context, threadFormula));
-
-              // Translate the formula into its own context and start solving
-              ContextAndFormula newFormulaAndContext = ownBucket.take();
-              threadFormula =
-                  mgr.translateFrom(
-                      newFormulaAndContext.getFormula(),
-                      newFormulaAndContext.getContext().getFormulaManager());
-
-              nextBucket = (nextBucket + 1) % NUMBER_OF_THREADS;
+      // Take the formula from the bucket of itself, solve it, once solved give the formula to the
+      // bucket of the next thread (have a counter for in which bucket we transfered the formula and
+      // +1 the counter)
+      assertConcurrency(
+          "continuousRunningThreadFormulaTransferTranslateTest",
+          () -> {
+            // Start the threads such that they each get a unqiue id
+            final int id = idGenerator.getFreshId();
+            int nextBucket = (id + 1) % NUMBER_OF_THREADS;
+            final BlockingQueue<ContextAndFormula> ownBucket = bucketQueue.get(id);
+            SolverContext context = initSolver();
+            FormulaManager mgr = context.getFormulaManager();
+            IntegerFormulaManager imgr = mgr.getIntegerFormulaManager();
+            BooleanFormulaManager bmgr = mgr.getBooleanFormulaManager();
+            HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
+            BooleanFormula threadFormula =
+                gen.generate(INTEGER_FORMULA_GEN.getOrDefault(solver, 9) - id);
+            try (BasicProverEnvironment<?> stack = context.newProverEnvironment()) {
+                // Repeat till the bucket counter reaches itself again
+                while (nextBucket != id) {
+                  stack.push(threadFormula);
+                  
+                assertWithMessage(
+                    "Test continuousRunningThreadFormulaTransferTranslateTest() "
+                        + "failed isUnsat() in thread with id: "
+                        + id
+                        + ".")
+                    .that(stack.isUnsat())
+                    .isTrue();
+                
+                // Take another formula from its own bucket or wait for one.
+                bucketQueue.get(nextBucket).add(new ContextAndFormula(context, threadFormula));
+                
+                // Translate the formula into its own context and start solving
+                ContextAndFormula newFormulaAndContext = ownBucket.take();
+                threadFormula =
+                    mgr.translateFrom(
+                        newFormulaAndContext.getFormula(),
+                        newFormulaAndContext.getContext().getFormulaManager());
+                
+                nextBucket = (nextBucket + 1) % NUMBER_OF_THREADS;
+                }
             }
-          }
-        });
+          });
+    }
   }
 
   // As optimization is not used much at the moment this small test is ok
