@@ -73,6 +73,7 @@ public class DReal4FormulaManager extends AbstractFormulaManager<DRealTerm<?, ?>
     return null;
   }
 
+  //TODO: in dReal only Variables can be substituted, but not a formula
   @Override
   public <T extends Formula> T substitute(
       final T pF, final Map<? extends Formula, ? extends Formula> pFromToMapping) {
@@ -94,8 +95,13 @@ public class DReal4FormulaManager extends AbstractFormulaManager<DRealTerm<?, ?>
       // Only Variables can be substituted
       Preconditions.checkState(changeFromTerm.isVar());
       if (changeToTerm.isVar()) {
-        formula = formula.Substitute(changeFromTerm.getVariable(),
-            new Expression(changeToTerm.getVariable()));
+        if (changeToTerm.getType() == Type.BOOLEAN) {
+          formula = formula.Substitute(changeFromTerm.getVariable(),
+              new org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula(changeToTerm.getVariable()));
+        } else {
+          formula = formula.Substitute(changeFromTerm.getVariable(),
+              new Expression(changeToTerm.getVariable()));
+        }
       } else if (changeToTerm.isExp()) {
         formula = formula.Substitute(changeFromTerm.getVariable(), changeToTerm.getExpression());
       } else {
