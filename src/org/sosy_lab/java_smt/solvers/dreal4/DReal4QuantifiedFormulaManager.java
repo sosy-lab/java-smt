@@ -20,6 +20,7 @@
 
 package org.sosy_lab.java_smt.solvers.dreal4;
 
+import com.google.common.base.Preconditions;
 import java.util.List;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -28,6 +29,7 @@ import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Context;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.FormulaKind;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable.Type;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variables;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.dreal;
@@ -51,24 +53,37 @@ public class DReal4QuantifiedFormulaManager extends AbstractQuantifiedFormulaMan
                                          List<DRealTerm<?, ?>> pVars,
                                                       DRealTerm<? ,?> pBody) {
     if (pVars.isEmpty()) {
-      throw new IllegalArgumentException("Empty variable llist for quantifier.");
-    } else if (pQ == Quantifier.EXISTS) {
-      // Doch eigentlich schon, aber noch nicht gefunden??
+      throw new IllegalArgumentException("Empty variable list for quantifier.");
+    }
+    // create Variables from pVars to create forall formula
+    Variables vars = new Variables();
+    for (DRealTerm<?, ?> term : pVars) {
+      if (term.isVar()) {
+        vars.insert(term.getVariable());
+      } else {
+        throw new IllegalArgumentException("This term is not a Variable.");
+      }
+    }
+    if (pQ == Quantifier.EXISTS) {
+      // Does dReal support exist?
       throw new UnsupportedOperationException("dReal does not support exist??");
     } else {
-      Variables vars = new Variables();
-      for (DRealTerm<?, ?> term : pVars) {
-        if (term.isVar()) {
-          vars.insert(term.getVariable());
-        } else {
-          throw new IllegalArgumentException("This term is not a Variable and will be "
-              + "skipped.");
-        }
-      }
       if (pBody.isFormula()) {
         return new DRealTerm<>(dreal.forall(vars, pBody.getFormula()), pBody.getType(),
             FormulaKind.Forall);
-      } else {
+      } else if (pBody.isVar()) {
+        Variable var = pBody.getVariable();
+        if (var.get_type() == Type.BOOLEAN) {
+          Formula f = new Formula(var);
+          Formula quantified = dreal.forall(vars, f);
+          //return new DRealTerm<>(quantified, var.get_type(), FormulaKind.Forall);
+          throw new UnsupportedOperationException("This does not work?");
+        } else {
+          throw new IllegalArgumentException("The given Formula is a Variable and not of type "
+              + "Boolean.");
+        }
+      }
+      else {
         throw new IllegalArgumentException("The given Formula is not a Formula.");
       }
     }
