@@ -21,6 +21,7 @@
 package org.sosy_lab.java_smt.solvers.dreal4;
 import static java.lang.Double.parseDouble;
 import static java.lang.String.valueOf;
+import static org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier.FORALL;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -213,8 +214,8 @@ public class DReal4FormulaCreator extends FormulaCreator<DRealTerm<?, ?>, Type, 
         DRealTerm<org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula, FormulaKind> quantifiedFormula =
             new DRealTerm<>(dreal.get_quantified_formula(f.getFormula()),
             Type.BOOLEAN, dreal.get_quantified_formula(f.getFormula()).get_kind());
-/*        return visitor.visitQuantifier((BooleanFormula) formula, Quantifier.FORALL, boundVariables,
-            encapsulateBoolean(quantifiedFormula));*/
+        //return visitor.visitQuantifier((BooleanFormula) formula, FORALL, boundVariables,
+        //    encapsulateBoolean(quantifiedFormula));
         throw new UnsupportedOperationException("Not supported.");
       } else if (kind == FormulaKind.And) {
         functionKind = FunctionDeclarationKind.AND;
@@ -570,6 +571,27 @@ public class DReal4FormulaCreator extends FormulaCreator<DRealTerm<?, ?>, Type, 
     } else {
       return new DRealTerm<>(new org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula(),
           pDRealTerm.getType(), pDRealTerm.getFormulaKind());
+    }
+  }
+
+  @Override
+  public Object convertValue(DRealTerm<?, ?> pTerm) {
+    Preconditions.checkState(pTerm.isExp() || pTerm.isFormula());
+    if (pTerm.isExp()) {
+      // This should be a constant, Integer or Rational
+      Preconditions.checkState(pTerm.getExpression().get_kind() == ExpressionKind.Constant);
+      if (pTerm.getType() == Type.INTEGER) {
+        return new BigInteger(pTerm.getExpression().to_string());
+      } else {
+        return Rational.ofString(pTerm.getExpression().to_string());
+      }
+    } else {
+      if (pTerm.getFormulaKind() == FormulaKind.True || pTerm.getFormulaKind() == FormulaKind.False) {
+        return dreal.is_true(pTerm.getFormula());
+      } else {
+        throw new UnsupportedOperationException("Can not convert Formula to Value.");
+      }
+
     }
   }
 
