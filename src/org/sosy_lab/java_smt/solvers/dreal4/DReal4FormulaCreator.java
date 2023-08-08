@@ -336,10 +336,11 @@ public class DReal4FormulaCreator extends FormulaCreator<DRealTerm<?, ?>, Type, 
     }
   }
 
+  // TODO: use Preconditions in getExpressionFrom...()
   private static List<DRealTerm<?, ?>> getExpressionsFromDiv(DRealTerm<?, ?> pTerm) {
     List<DRealTerm<?, ?>> children = new ArrayList<>();
-    if (pTerm.isVar() || pTerm.isExp()) {
-      throw new IllegalArgumentException("Term is Variable or Expression");
+    if (pTerm.isVar() || pTerm.isFormula()) {
+      throw new IllegalArgumentException("Term is Variable or Formula");
     } else {
       children.add(new DRealTerm<>(dreal.get_first_argument(pTerm.getExpression()),
           pTerm.getType(), dreal.get_first_argument(pTerm.getExpression()).get_kind()));
@@ -417,7 +418,7 @@ public class DReal4FormulaCreator extends FormulaCreator<DRealTerm<?, ?>, Type, 
   have only the parent to get the type from, it will always return Boolean Type, but the
   expression should be some kind of NumeralFormula Type
   */
-  private static Type getTypeForExpressions(Expression pExpression) {
+  protected static Type getTypeForExpressions(Expression pExpression) {
     // If the Expression is Constant we return null, because from constant we cannot get the
     // type, but this function is always called from a formula, so this is called two times, and
     // one of them has a Variable, else this Formula would have been a True or False formula
