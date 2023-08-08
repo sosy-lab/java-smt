@@ -77,7 +77,7 @@ public class DReal4QuantifiedFormulaManager extends AbstractQuantifiedFormulaMan
           Formula f = new Formula(var);
           Formula quantified = dreal.forall(vars, f);
           //return new DRealTerm<>(quantified, var.get_type(), FormulaKind.Forall);
-          throw new UnsupportedOperationException("This does not work?");
+          throw new UnsupportedOperationException("This does not work? BOOLEAN and ForALL");
         } else {
           throw new IllegalArgumentException("The given Formula is a Variable and not of type "
               + "Boolean.");

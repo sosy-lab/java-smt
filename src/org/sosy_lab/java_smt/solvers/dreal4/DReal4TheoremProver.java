@@ -22,6 +22,7 @@ package org.sosy_lab.java_smt.solvers.dreal4;
 
 
 import com.google.common.base.Preconditions;
+import edu.stanford.CVC4.Expr;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -141,7 +142,7 @@ class DReal4TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
 
   @Override
   protected DReal4Model getEvaluatorWithoutChecks(){
-    return new DReal4Model(this, creator, model);
+    return new DReal4Model(this, creator, model, getAssertedExpressions());
   }
 
   @Override
@@ -151,5 +152,11 @@ class DReal4TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
       Context.Exit();
       closed = true;
     }
+  }
+
+  protected Collection<DRealTerm<?, ?>> getAssertedExpressions() {
+    List<DRealTerm<?, ?>> result = new ArrayList<>();
+    assertedFormulas.forEach(result::addAll);
+    return result;
   }
 }
