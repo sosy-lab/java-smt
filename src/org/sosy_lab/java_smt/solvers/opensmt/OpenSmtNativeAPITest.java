@@ -10,6 +10,8 @@ package org.sosy_lab.java_smt.solvers.opensmt;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import java.util.Arrays;
+import opensmt.SMTOption;
 import opensmt.ArithLogic;
 import opensmt.InterpolationContext;
 import opensmt.ItpAlgorithm;
@@ -61,14 +63,14 @@ public class OpenSmtNativeAPITest {
 
     // Check A ⊨ I
     solver.push(logic.mkNot(logic.mkImpl(partA, interpol)));
-    if (!solver.check().isFalse()) {
+    if (!solver.check().equals(sstat.False())) {
       return false;
     }
     solver.pop();
 
     // Check I ⊨ ¬B
     solver.push(logic.mkNot(logic.mkImpl(interpol, logic.mkNot(partB))));
-    if (!solver.check().isFalse()) {
+    if (!solver.check().equals(sstat.False())) {
       return false;
     }
     solver.pop();
@@ -95,14 +97,14 @@ public class OpenSmtNativeAPITest {
     mainSolver.push(f);
 
     sstat r = mainSolver.check();
-    assertThat(r.isTrue()).isTrue();
+    assertThat(r).isEqualTo(sstat.True());
 
     Model model = mainSolver.getModel();
 
     PTRef valA = model.evaluate(varA);
     PTRef valB = model.evaluate(varB);
 
-    assertThat(valA.equals(valB)).isTrue();
+    assertThat(valA).isEqualTo(valB);
   }
 
   @Test
@@ -119,7 +121,7 @@ public class OpenSmtNativeAPITest {
     mainSolver.push(f);
 
     sstat r = mainSolver.check();
-    assertThat(r.isFalse()).isTrue();
+    assertThat(r).isEqualTo(sstat.False());
   }
 
   @Test
@@ -163,7 +165,7 @@ public class OpenSmtNativeAPITest {
     mainSolver.push(f1);
 
     sstat r = mainSolver.check();
-    assertThat(r.isFalse()).isTrue();
+    assertThat(r).isEqualTo(sstat.False());
   }
 
   @Test
@@ -193,7 +195,7 @@ public class OpenSmtNativeAPITest {
     mainSolver.push(f1);
 
     sstat r = mainSolver.check();
-    assertThat(r.isFalse()).isTrue();
+    assertThat(r).isEqualTo(sstat.False());
 
     InterpolationContext context = mainSolver.getInterpolationContext();
     VectorInt mask = new VectorInt();
@@ -226,7 +228,7 @@ public class OpenSmtNativeAPITest {
     mainSolver.push(f1);
 
     sstat r = mainSolver.check();
-    assertThat(r.isTrue()).isTrue();
+    assertThat(r).isEqualTo(sstat.True());
   }
 
   @Test
@@ -250,7 +252,7 @@ public class OpenSmtNativeAPITest {
     solver.push(f1);
 
     sstat r = solver.check();
-    assertThat(r.isFalse()).isTrue();
+    assertThat(r).isEqualTo(sstat.False());
 
     InterpolationContext context = solver.getInterpolationContext();
     VectorInt mask = new VectorInt();
@@ -305,7 +307,7 @@ public class OpenSmtNativeAPITest {
     solver.push(f);
 
     sstat r = solver.check();
-    assertThat(r.isFalse()).isTrue();
+    assertThat(r).isEqualTo(sstat.False());
   }
 
   @Test
@@ -364,7 +366,7 @@ public class OpenSmtNativeAPITest {
     solver.push(f);
 
     sstat r = solver.check();
-    assertThat(r.isFalse()).isTrue();
+    assertThat(r).isEqualTo(sstat.False());
   }
 
   @Test
@@ -391,7 +393,7 @@ public class OpenSmtNativeAPITest {
     mainSolver.stop();
     
     sstat r = mainSolver.check();
-    assertThat(r.isUndef()).isTrue();
+    assertThat(r).isEqualTo(sstat.Undef());
   }
 
   /* INFO:
@@ -434,5 +436,40 @@ public class OpenSmtNativeAPITest {
        * need to quote the escape sequence for \u0000.
        */
     }
+  }
+
+  @Test
+  public void testExample() {
+    ArithLogic logic = LogicFactory.getLIAInstance();
+
+    PTRef varA = logic.mkIntVar("a");
+    PTRef varB = logic.mkIntVar("b");
+    PTRef varC = logic.mkIntVar("c");
+
+    PTRef formulaA = logic.mkAnd(logic.mkLt(varA, varB), logic.mkLt(varC, varA));
+    PTRef formulaB = logic.mkLt(varB, varC);
+
+    SMTConfig config = new SMTConfig();
+    config.setOption(":produce-interpolants", new SMTOption(1));
+
+    MainSolver mainSolver = new MainSolver(logic, config, "JavaSmt");
+    mainSolver.push(formulaA);
+    mainSolver.push(formulaB);
+
+    sstat check1 = mainSolver.check();
+    System.out.println(check1);
+
+    InterpolationContext context = mainSolver.getInterpolationContext();
+    VectorInt mask = new VectorInt(Arrays.asList(0));
+    PTRef interpol = context.getSingleInterpolant(mask);
+    System.out.println(logic.pp(interpol));
+
+    mainSolver.pop();
+
+    sstat check2 = mainSolver.check();
+    System.out.println(check2);
+
+    Model model = mainSolver.getModel();
+    System.out.println(model);
   }
 }

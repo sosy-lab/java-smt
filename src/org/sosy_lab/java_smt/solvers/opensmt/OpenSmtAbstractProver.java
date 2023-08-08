@@ -152,13 +152,14 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
       sstat r = osmtSolver.check();
       shutdownNotifier.shutdownIfNecessary();
 
-      if (r.isError()) {
+      if (r.equals(sstat.Error())) {
         throw new SolverException("OpenSMT crashed while checking satisfiablity");
       }
-      if (r.isUndef()) {
+      if (r.equals(sstat.Undef())) {
         throw new InterruptedException();
       }
-      return r.isFalse();
+
+      return r.equals(sstat.False());
     }
   }
 

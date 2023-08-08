@@ -498,6 +498,14 @@
 %ignore SMTConfig::database_host;
 %ignore SMTConfig::database_port;
 %extend SMTConfig {
+  void setOption(const char* option, SMTOption& value) {
+    const char* msg;
+    bool ok = $self->setOption(option, value, msg);
+    if (!ok) {
+      throw std::runtime_error(msg);
+    }
+  }
+
   void setInterpolation (bool enable) {
     const char* msg;
     bool ok = $self->setOption(SMTConfig::o_produce_inter, SMTOption(enable), msg);
@@ -1294,25 +1302,46 @@
 %ignore sstat::sstat(lbool l);
 %ignore sstat::operator==(sstat s) const;
 %ignore sstat::operator!=(sstat s) const;
-%ignore sstat::getValue() const;
+// %ignore sstat::getValue() const;
 %ignore toSstat(int);
 %extend sstat {
-  bool isTrue() {
-    return $self->getValue() == s_True.getValue();
-  }
-  
-  bool isFalse() {
-    return $self->getValue() == s_False.getValue();
-  }
-  
-  bool isUndef() {
-    return $self->getValue() == s_Undef.getValue();
-  }
-  
-  bool isError() {
-    return $self->getValue() == s_Error.getValue();
-  }
+  /* FIXME: This whole class should probably be an enum */
+  static sstat True()  { return s_True; }
+  static sstat False() { return s_False; }
+  static sstat Undef() { return s_Undef; }
+  static sstat Error() { return s_Error; }
  }
+
+%typemap(javacode) sstat %{
+  public boolean equals(Object object) {
+    if(object instanceof $javaclassname) {
+      sstat that = ($javaclassname) object;
+      return this.getValue() == that.getValue();
+    }
+    return false;
+  }
+
+  public int hashCode() {
+    return Long.hashCode(this.getValue());
+  }
+
+  public String toString() {
+    if (this.equals(sstat.True())) {
+      return "true";
+    }
+    if (this.equals(sstat.False())) {
+      return "false";
+    }
+    if (this.equals(sstat.Undef())) {
+      return "undef";
+    }
+    if (this.equals(sstat.Error())) {
+      return "error";
+    }
+    throw new RuntimeException();
+  }
+%}
+
 %ignore s_True;
 %ignore s_False;
 %ignore s_Undef;
