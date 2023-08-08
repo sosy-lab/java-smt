@@ -59,7 +59,7 @@ class BoolectorBitvectorFormulaManager
 
   @Override
   protected Long makeBitvectorImpl(int length, Long value) {
-    // The value is a pointer to an expression. Do not use the plain numberal value.
+    // The value is a pointer to an expression. Do not use the plain numeral value.
     throw new UnsupportedOperationException("Boolector does not support INT theory");
   }
 

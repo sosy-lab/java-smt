@@ -105,6 +105,11 @@ class StatisticsBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
+  public String toString() {
+    return delegate.toString();
+  }
+
+  @Override
   public <R> R allSat(AllSatCallback<R> pCallback, List<BooleanFormula> pImportant)
       throws InterruptedException, SolverException {
     allSatTimer.start();

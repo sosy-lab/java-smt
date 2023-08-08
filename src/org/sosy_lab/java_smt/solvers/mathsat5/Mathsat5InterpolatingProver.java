@@ -11,7 +11,6 @@ package org.sosy_lab.java_smt.solvers.mathsat5;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_assert_formula;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_itp_group;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_interpolant;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_push_backtrack_point;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_itp_group;
 
 import com.google.common.base.Preconditions;
@@ -78,12 +77,6 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
     long t = creator.extractInfo(f);
     msat_assert_formula(curEnv, t);
     return group;
-  }
-
-  @Override
-  public void push() {
-    Preconditions.checkState(!closed);
-    msat_push_backtrack_point(curEnv);
   }
 
   @Override

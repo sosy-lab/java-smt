@@ -84,4 +84,9 @@ public class CachingModel implements Model {
   public @Nullable String evaluate(EnumerationFormula formula) {
     return delegate.evaluate(formula);
   }
+
+  @Override
+  public String toString() {
+    return delegate.toString();
+  }
 }

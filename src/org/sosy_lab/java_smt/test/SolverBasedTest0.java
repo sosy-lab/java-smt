@@ -312,6 +312,13 @@ public abstract class SolverBasedTest0 {
         .isNotEqualTo(Solvers.BOOLECTOR);
   }
 
+  protected void requireSubstitution() {
+    assume()
+        .withMessage("Solver %s does not support formula substitution", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BOOLECTOR);
+  }
+
   /**
    * Use this for checking assertions about BooleanFormulas with Truth: <code>
    * assertThatFormula(formula).is...()</code>.
