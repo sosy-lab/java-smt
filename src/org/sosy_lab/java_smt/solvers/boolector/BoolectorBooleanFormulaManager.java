@@ -24,10 +24,14 @@ public class BoolectorBooleanFormulaManager
     extends AbstractBooleanFormulaManager<Long, Long, Long, Long> {
 
   private final long btor;
+  private final long pTrue;
+  private final long pFalse;
 
   BoolectorBooleanFormulaManager(BoolectorFormulaCreator pCreator) {
     super(pCreator);
     this.btor = pCreator.getEnv();
+    pTrue = boolector_true(btor);
+    pFalse = boolector_false(btor);
   }
 
   @Override
@@ -38,11 +42,7 @@ public class BoolectorBooleanFormulaManager
 
   @Override
   public Long makeBooleanImpl(boolean pValue) {
-    if (pValue) {
-      return boolector_true(btor);
-    } else {
-      return boolector_false(btor);
-    }
+    return pValue ? pTrue : pFalse;
   }
 
   @Override
@@ -52,11 +52,33 @@ public class BoolectorBooleanFormulaManager
 
   @Override
   public Long and(Long pParam1, Long pParam2) {
+    if (isTrue(pParam1)) {
+      return pParam2;
+    } else if (isTrue(pParam2)) {
+      return pParam1;
+    } else if (isFalse(pParam1)) {
+      return pFalse;
+    } else if (isFalse(pParam2)) {
+      return pFalse;
+    } else if (pParam1.equals(pParam2)) {
+      return pParam1;
+    }
     return boolector_and(btor, pParam1, pParam2);
   }
 
   @Override
   public Long or(Long pParam1, Long pParam2) {
+    if (isTrue(pParam1)) {
+      return pTrue;
+    } else if (isTrue(pParam2)) {
+      return pTrue;
+    } else if (isFalse(pParam1)) {
+      return pParam2;
+    } else if (isFalse(pParam2)) {
+      return pParam1;
+    } else if (pParam1.equals(pParam2)) {
+      return pParam1;
+    }
     return boolector_or(btor, pParam1, pParam2);
   }
 
@@ -96,6 +118,17 @@ public class BoolectorBooleanFormulaManager
 
   @Override
   public Long ifThenElse(Long pCond, Long pF1, Long pF2) {
+    if (isTrue(pCond)) {
+      return pF1;
+    } else if (isFalse(pCond)) {
+      return pF2;
+    } else if (pF1.equals(pF2)) {
+      return pF1;
+    } else if (isTrue(pF1) && isFalse(pF2)) {
+      return pCond;
+    } else if (isFalse(pF1) && isTrue(pF2)) {
+      return not(pCond);
+    }
     return boolector_cond(btor, pCond, pF1, pF2);
   }
 }

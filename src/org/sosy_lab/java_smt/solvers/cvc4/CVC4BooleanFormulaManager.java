@@ -8,15 +8,15 @@
 
 package org.sosy_lab.java_smt.solvers.cvc4;
 
+import com.google.common.collect.Iterables;
 import edu.stanford.CVC4.Expr;
 import edu.stanford.CVC4.ExprManager;
 import edu.stanford.CVC4.Kind;
 import edu.stanford.CVC4.Type;
 import edu.stanford.CVC4.vectorExpr;
 import java.util.Collection;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
-import org.sosy_lab.java_smt.api.BooleanFormula;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 
 public class CVC4BooleanFormulaManager
@@ -40,11 +40,18 @@ public class CVC4BooleanFormulaManager
 
   @Override
   protected Expr makeBooleanImpl(boolean pValue) {
-    return exprManager.mkConst(pValue);
+    return pValue ? cvc4True : cvc4False;
   }
 
   @Override
   protected Expr not(Expr pParam1) {
+    if (isTrue(pParam1)) {
+      return cvc4False;
+    } else if (isFalse(pParam1)) {
+      return cvc4True;
+    } else if (pParam1.getKind() == Kind.NOT) {
+      return pParam1.getChild(0);
+    }
     return exprManager.mkExpr(Kind.NOT, pParam1);
   }
 
@@ -66,27 +73,29 @@ public class CVC4BooleanFormulaManager
 
   @Override
   protected Expr andImpl(Collection<Expr> pParams) {
-    vectorExpr vExpr = new vectorExpr();
-    for (Expr e : pParams) {
-      if (isFalse(e)) {
+    // CVC4 does not do any simplifications,
+    // so we filter "true", short-circuit on "false", and filter out (simple) redundancies.
+    final Set<Expr> operands = new LinkedHashSet<>();
+    for (final Expr operand : pParams) {
+      if (isFalse(operand)) {
         return cvc4False;
       }
-      if (!isTrue(e)) {
-        vExpr.add(e);
+      if (!isTrue(operand)) {
+        operands.add(operand);
       }
     }
-    if (vExpr.capacity() == 0) {
-      return cvc4True;
-    } else if (vExpr.capacity() == 1) {
-      return vExpr.get(0);
-    } else {
-      return exprManager.mkExpr(Kind.AND, vExpr);
+    switch (operands.size()) {
+      case 0:
+        return cvc4True;
+      case 1:
+        return Iterables.getOnlyElement(operands);
+      default:
+        vectorExpr vExpr = new vectorExpr();
+        for (Expr e : operands) {
+          vExpr.add(e);
+        }
+        return exprManager.mkExpr(Kind.AND, vExpr);
     }
-  }
-
-  @Override
-  public Collector<BooleanFormula, ?, BooleanFormula> toConjunction() {
-    return Collectors.collectingAndThen(Collectors.toList(), this::and);
   }
 
   @Override
@@ -107,27 +116,29 @@ public class CVC4BooleanFormulaManager
 
   @Override
   protected Expr orImpl(Collection<Expr> pParams) {
-    vectorExpr vExpr = new vectorExpr();
-    for (Expr e : pParams) {
-      if (isTrue(e)) {
+    // CVC4 does not do any simplifications,
+    // so we filter "true", short-circuit on "false", and filter out (simple) redundancies.
+    final Set<Expr> operands = new LinkedHashSet<>();
+    for (final Expr operand : pParams) {
+      if (isTrue(operand)) {
         return cvc4True;
       }
-      if (!isFalse(e)) {
-        vExpr.add(e);
+      if (!isFalse(operand)) {
+        operands.add(operand);
       }
     }
-    if (vExpr.capacity() == 0) {
-      return cvc4False;
-    } else if (vExpr.capacity() == 1) {
-      return vExpr.get(0);
-    } else {
-      return exprManager.mkExpr(Kind.OR, vExpr);
+    switch (operands.size()) {
+      case 0:
+        return cvc4False;
+      case 1:
+        return Iterables.getOnlyElement(operands);
+      default:
+        vectorExpr vExpr = new vectorExpr();
+        for (Expr e : operands) {
+          vExpr.add(e);
+        }
+        return exprManager.mkExpr(Kind.OR, vExpr);
     }
-  }
-
-  @Override
-  public Collector<BooleanFormula, ?, BooleanFormula> toDisjunction() {
-    return Collectors.collectingAndThen(Collectors.toList(), this::or);
   }
 
   @Override
@@ -157,6 +168,17 @@ public class CVC4BooleanFormulaManager
 
   @Override
   protected Expr ifThenElse(Expr pCond, Expr pF1, Expr pF2) {
+    if (isTrue(pCond)) {
+      return pF1;
+    } else if (isFalse(pCond)) {
+      return pF2;
+    } else if (pF1.equals(pF2)) {
+      return pF1;
+    } else if (isTrue(pF1) && isFalse(pF2)) {
+      return pCond;
+    } else if (isFalse(pF1) && isTrue(pF2)) {
+      return not(pCond);
+    }
     return exprManager.mkExpr(Kind.ITE, pCond, pF1, pF2);
   }
 }
