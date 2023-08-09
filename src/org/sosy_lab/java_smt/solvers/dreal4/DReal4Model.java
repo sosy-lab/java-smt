@@ -81,7 +81,7 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Type, Context> {
         return null;
       } else {
         if (variable.get_type() == Type.BOOLEAN) {
-          if (res > 0 ) {
+          if (res > 0) {
             return new DRealTerm<>(Formula.True(), formula.getType(), FormulaKind.True);
           } else {
             return new DRealTerm<>(Formula.False(), formula.getType(), FormulaKind.False);
@@ -102,29 +102,24 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Type, Context> {
         Variable var = dreal.get_variable(exp);
         return new DRealTerm<>(evalImpl(new DRealTerm<>(var, var.get_type(), var.get_type())),
             var.get_type(), var.get_type());
-      }
-      HashMap<Variable, Double> result = extractResults();
-      Variables vars = exp.GetVariables();
-      //TODO: to use the same extractResults()-function to extract the result of the whole formula
-      // is not a "good" solution, but it works, because dReal just does nothing when
-      // substituting a variable that is not in an expression
-      for (Map.Entry<Variable, Double> entry : result.entrySet()) {
-        Variable var = entry.getKey();
-        // if we find a variable that is set in the model, but not in the Expression, abort?
-        if (!vars.include(var)) {
-          return null;
-        }
-        Double res = entry.getValue();
-        if (res.isNaN()) {
-          // When is result "EMPTY"?
-          return null;
-        } else {
-          // TODO: Is it possible to get an Expression with BooleanType?
+      } else {
+        HashMap<Variable, Double> result = new HashMap<>();
+        VariableSet expSet = exp.getVariables();
+        for (Variable var : expSet) {
+          // if we find a variable that is not in the model, abort
+          if (!model.has_variable(var)) {
+            return null;
+          }
+          Double res = extractResultsVariable(var);
+          // TODO: can expression have a variable of boolean type?
           Preconditions.checkState(formula.getType() != Type.BOOLEAN);
-          exp = exp.Substitute(var, new Expression(res));
+          exp = substituteExpWithResult(exp, var, res);
+          if (exp == null) {
+            return null;
+          }
         }
+        return new DRealTerm<>(exp, formula.getType(), formula.getExpressionKind());
       }
-      return new DRealTerm<>(exp, formula.getType(), formula.getExpressionKind());
     } else {
       // this will always return a True formula
       Formula f = formula.getFormula();
@@ -136,34 +131,65 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Type, Context> {
         Variable var = dreal.get_variable(f);
         return new DRealTerm<>(evalImpl(new DRealTerm<>(var, var.get_type(), var.get_type())),
             var.get_type(), var.get_type());
-      }
-      //TODO: How can I get all the Variables in a quantified Formula, is it needed?
-      // use getQuantifiedVariables!
-      Variables vars = f.GetFreeVariables();
-      HashMap<Variable, Double> result = extractResults();
-      for (Map.Entry<Variable, Double> entry : result.entrySet()) {
-        Variable var = entry.getKey();
-        Double res = entry.getValue();
-        // if we find a variable that is set in the model, but not in the Formula, abort?
-        if (!vars.include(var)) {
-          return null;
-        }
-        if (res.isNaN()) {
-          // When is result "EMPTY"?
-          return null;
-        } else {
-          if (var.get_type() == Type.BOOLEAN) {
-            if (res > 0) {
-              f = f.Substitute(var, Formula.True());
-            } else {
-              f = f.Substitute(var, Formula.False());
-            }
-          } else {
-            f = f.Substitute(var, new Expression(res));
+        // we can only get quantified Variables if the Formula is a forall formula. So if we have
+        // a Formula like (x == 10 and forall{y}.y == y } evalImpl does not work
+      } else if (f.get_kind() == FormulaKind.Forall) {
+        VariableSet quantifiedVars = f.getQuantifiedVariables();
+        for (Variable var : quantifiedVars) {
+          // if we find a variable that is not in the model, abort
+          if (!model.has_variable(var)) {
+            return null;
+          }
+          Double res = extractResultsVariable(var);
+          f = substituteFormulaWithResult(f, var, res);
+          if (f == null) {
+            return null;
           }
         }
+        return new DRealTerm<>(f, formula.getType(), formula.getFormulaKind());
+      } else {
+        VariableSet freeVars = f.getFreeVariables();
+        for (Variable var : freeVars) {
+          // if we find a variable that is not in the model, abort
+          if (!model.has_variable(var)) {
+            return null;
+          }
+          Double res = extractResultsVariable(var);
+          f = substituteFormulaWithResult(f, var, res);
+          if (f == null) {
+            return null;
+          }
+        }
+        return new DRealTerm<>(f, formula.getType(), formula.getFormulaKind());
       }
-      return new DRealTerm<>(f, formula.getType(), formula.getFormulaKind());
+    }
+  }
+
+  private Expression substituteExpWithResult(Expression exp, Variable var, Double res) {
+    if (res.isNaN()) {
+      // When is result "EMPTY"?
+      return null;
+    } else {
+      exp =  exp.Substitute(var, new Expression(res));
+      return exp;
+    }
+  }
+
+  private Formula substituteFormulaWithResult(Formula f, Variable var, Double res) {
+    if (res.isNaN()) {
+      // When is result "EMPTY"?
+      return null;
+    } else {
+      if (var.get_type() == Type.BOOLEAN) {
+        if (res > 0) {
+          f = f.Substitute(var, Formula.True());
+        } else {
+          f = f.Substitute(var, Formula.False());
+        }
+      } else {
+        f = f.Substitute(var, new Expression(res));
+      }
+      return f;
     }
   }
 
@@ -328,12 +354,12 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Type, Context> {
       equation =
           creator.encapsulateBoolean(new DRealTerm<>(
               new Formula(dreal.Equal(new Expression(term.getVariable()),
-                  valueTerm.getExpression())), term.getType(), FormulaKind.Eq));
+                  valueTerm.getExpression())), Type.BOOLEAN, FormulaKind.Eq));
     } else if (valueTerm.isFormula()) {
       equation =
           creator.encapsulateBoolean(new DRealTerm<>(
               new Formula(dreal.Equal(term.getVariable(),
-                  valueTerm.getFormula())), term.getType(), FormulaKind.Eq));
+                  valueTerm.getFormula())), Type.BOOLEAN, FormulaKind.Eq));
     } else {
       throw new UnsupportedOperationException("Trying to get an Assignment from an Expression " + term.to_string() + " .");
     }
