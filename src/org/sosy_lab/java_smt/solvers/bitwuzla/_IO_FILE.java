@@ -29,16 +29,16 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
  * ----------------------------------------------------------------------------- */
 
 
-public class SWIG__IO_FILE {
+public class _IO_FILE {
   private transient long swigCPtr;
   protected transient boolean swigCMemOwn;
 
-  protected SWIG__IO_FILE(long cPtr, boolean cMemoryOwn) {
+  protected _IO_FILE(long cPtr, boolean cMemoryOwn) {
     swigCMemOwn = cMemoryOwn;
     swigCPtr = cPtr;
   }
 
-  protected static long getCPtr(SWIG__IO_FILE obj) {
+  protected static long getCPtr(_IO_FILE obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
@@ -51,106 +51,106 @@ public class SWIG__IO_FILE {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        BitwuzlaJNI.delete__IO_FILE(swigCPtr);
+        bitwuzlaJNI.delete__IO_FILE(swigCPtr);
       }
       swigCPtr = 0;
     }
   }
 
   public void set_flags(int value) {
-    BitwuzlaJNI._IO_FILE__flags_set(swigCPtr, this, value);
+    bitwuzlaJNI._IO_FILE__flags_set(swigCPtr, this, value);
   }
 
   public int get_flags() {
-    return BitwuzlaJNI._IO_FILE__flags_get(swigCPtr, this);
+    return bitwuzlaJNI._IO_FILE__flags_get(swigCPtr, this);
   }
 
   public void set_IO_read_ptr(String value) {
-    BitwuzlaJNI._IO_FILE__IO_read_ptr_set(swigCPtr, this, value);
+    bitwuzlaJNI._IO_FILE__IO_read_ptr_set(swigCPtr, this, value);
   }
 
   public String get_IO_read_ptr() {
-    return BitwuzlaJNI._IO_FILE__IO_read_ptr_get(swigCPtr, this);
+    return bitwuzlaJNI._IO_FILE__IO_read_ptr_get(swigCPtr, this);
   }
 
   public void set_IO_read_end(String value) {
-    BitwuzlaJNI._IO_FILE__IO_read_end_set(swigCPtr, this, value);
+    bitwuzlaJNI._IO_FILE__IO_read_end_set(swigCPtr, this, value);
   }
 
   public String get_IO_read_end() {
-    return BitwuzlaJNI._IO_FILE__IO_read_end_get(swigCPtr, this);
+    return bitwuzlaJNI._IO_FILE__IO_read_end_get(swigCPtr, this);
   }
 
   public void set_IO_read_base(String value) {
-    BitwuzlaJNI._IO_FILE__IO_read_base_set(swigCPtr, this, value);
+    bitwuzlaJNI._IO_FILE__IO_read_base_set(swigCPtr, this, value);
   }
 
   public String get_IO_read_base() {
-    return BitwuzlaJNI._IO_FILE__IO_read_base_get(swigCPtr, this);
+    return bitwuzlaJNI._IO_FILE__IO_read_base_get(swigCPtr, this);
   }
 
   public void set_IO_write_base(String value) {
-    BitwuzlaJNI._IO_FILE__IO_write_base_set(swigCPtr, this, value);
+    bitwuzlaJNI._IO_FILE__IO_write_base_set(swigCPtr, this, value);
   }
 
   public String get_IO_write_base() {
-    return BitwuzlaJNI._IO_FILE__IO_write_base_get(swigCPtr, this);
+    return bitwuzlaJNI._IO_FILE__IO_write_base_get(swigCPtr, this);
   }
 
   public void set_IO_write_ptr(String value) {
-    BitwuzlaJNI._IO_FILE__IO_write_ptr_set(swigCPtr, this, value);
+    bitwuzlaJNI._IO_FILE__IO_write_ptr_set(swigCPtr, this, value);
   }
 
   public String get_IO_write_ptr() {
-    return BitwuzlaJNI._IO_FILE__IO_write_ptr_get(swigCPtr, this);
+    return bitwuzlaJNI._IO_FILE__IO_write_ptr_get(swigCPtr, this);
   }
 
   public void set_IO_write_end(String value) {
-    BitwuzlaJNI._IO_FILE__IO_write_end_set(swigCPtr, this, value);
+    bitwuzlaJNI._IO_FILE__IO_write_end_set(swigCPtr, this, value);
   }
 
   public String get_IO_write_end() {
-    return BitwuzlaJNI._IO_FILE__IO_write_end_get(swigCPtr, this);
+    return bitwuzlaJNI._IO_FILE__IO_write_end_get(swigCPtr, this);
   }
 
   public void set_IO_buf_base(String value) {
-    BitwuzlaJNI._IO_FILE__IO_buf_base_set(swigCPtr, this, value);
+    bitwuzlaJNI._IO_FILE__IO_buf_base_set(swigCPtr, this, value);
   }
 
   public String get_IO_buf_base() {
-    return BitwuzlaJNI._IO_FILE__IO_buf_base_get(swigCPtr, this);
+    return bitwuzlaJNI._IO_FILE__IO_buf_base_get(swigCPtr, this);
   }
 
   public void set_IO_buf_end(String value) {
-    BitwuzlaJNI._IO_FILE__IO_buf_end_set(swigCPtr, this, value);
+    bitwuzlaJNI._IO_FILE__IO_buf_end_set(swigCPtr, this, value);
   }
 
   public String get_IO_buf_end() {
-    return BitwuzlaJNI._IO_FILE__IO_buf_end_get(swigCPtr, this);
+    return bitwuzlaJNI._IO_FILE__IO_buf_end_get(swigCPtr, this);
   }
 
   public void set_IO_save_base(String value) {
-    BitwuzlaJNI._IO_FILE__IO_save_base_set(swigCPtr, this, value);
+    bitwuzlaJNI._IO_FILE__IO_save_base_set(swigCPtr, this, value);
   }
 
   public String get_IO_save_base() {
-    return BitwuzlaJNI._IO_FILE__IO_save_base_get(swigCPtr, this);
+    return bitwuzlaJNI._IO_FILE__IO_save_base_get(swigCPtr, this);
   }
 
   public void set_IO_backup_base(String value) {
-    BitwuzlaJNI._IO_FILE__IO_backup_base_set(swigCPtr, this, value);
+    bitwuzlaJNI._IO_FILE__IO_backup_base_set(swigCPtr, this, value);
   }
 
   public String get_IO_backup_base() {
-    return BitwuzlaJNI._IO_FILE__IO_backup_base_get(swigCPtr, this);
+    return bitwuzlaJNI._IO_FILE__IO_backup_base_get(swigCPtr, this);
   }
 
   public void set_IO_save_end(String value) {
-    BitwuzlaJNI._IO_FILE__IO_save_end_set(swigCPtr, this, value);
+    bitwuzlaJNI._IO_FILE__IO_save_end_set(swigCPtr, this, value);
   }
 
   public String get_IO_save_end() {
-    return BitwuzlaJNI._IO_FILE__IO_save_end_get(swigCPtr, this);
+    return bitwuzlaJNI._IO_FILE__IO_save_end_get(swigCPtr, this);
   }
 
 //  public void set_markers(SWIGTYPE_p__IO_marker value) {
@@ -162,61 +162,61 @@ public class SWIG__IO_FILE {
 //    return (cPtr == 0) ? null : new SWIGTYPE_p__IO_marker(cPtr, false);
 //  }
 
-  public void set_chain(SWIG__IO_FILE value) {
-    BitwuzlaJNI._IO_FILE__chain_set(swigCPtr, this, SWIG__IO_FILE.getCPtr(value), value);
+  public void set_chain(_IO_FILE value) {
+    bitwuzlaJNI._IO_FILE__chain_set(swigCPtr, this, _IO_FILE.getCPtr(value), value);
   }
 
-  public SWIG__IO_FILE get_chain() {
-    long cPtr = BitwuzlaJNI._IO_FILE__chain_get(swigCPtr, this);
-    return (cPtr == 0) ? null : new SWIG__IO_FILE(cPtr, false);
+  public _IO_FILE get_chain() {
+    long cPtr = bitwuzlaJNI._IO_FILE__chain_get(swigCPtr, this);
+    return (cPtr == 0) ? null : new _IO_FILE(cPtr, false);
   }
 
   public void set_fileno(int value) {
-    BitwuzlaJNI._IO_FILE__fileno_set(swigCPtr, this, value);
+    bitwuzlaJNI._IO_FILE__fileno_set(swigCPtr, this, value);
   }
 
   public int get_fileno() {
-    return BitwuzlaJNI._IO_FILE__fileno_get(swigCPtr, this);
+    return bitwuzlaJNI._IO_FILE__fileno_get(swigCPtr, this);
   }
 
   public void set_flags2(int value) {
-    BitwuzlaJNI._IO_FILE__flags2_set(swigCPtr, this, value);
+    bitwuzlaJNI._IO_FILE__flags2_set(swigCPtr, this, value);
   }
 
   public int get_flags2() {
-    return BitwuzlaJNI._IO_FILE__flags2_get(swigCPtr, this);
+    return bitwuzlaJNI._IO_FILE__flags2_get(swigCPtr, this);
   }
 
   public void set_old_offset(int value) {
-    BitwuzlaJNI._IO_FILE__old_offset_set(swigCPtr, this, value);
+    bitwuzlaJNI._IO_FILE__old_offset_set(swigCPtr, this, value);
   }
 
   public int get_old_offset() {
-    return BitwuzlaJNI._IO_FILE__old_offset_get(swigCPtr, this);
+    return bitwuzlaJNI._IO_FILE__old_offset_get(swigCPtr, this);
   }
 
   public void set_cur_column(int value) {
-    BitwuzlaJNI._IO_FILE__cur_column_set(swigCPtr, this, value);
+    bitwuzlaJNI._IO_FILE__cur_column_set(swigCPtr, this, value);
   }
 
   public int get_cur_column() {
-    return BitwuzlaJNI._IO_FILE__cur_column_get(swigCPtr, this);
+    return bitwuzlaJNI._IO_FILE__cur_column_get(swigCPtr, this);
   }
 
   public void set_vtable_offset(byte value) {
-    BitwuzlaJNI._IO_FILE__vtable_offset_set(swigCPtr, this, value);
+    bitwuzlaJNI._IO_FILE__vtable_offset_set(swigCPtr, this, value);
   }
 
   public byte get_vtable_offset() {
-    return BitwuzlaJNI._IO_FILE__vtable_offset_get(swigCPtr, this);
+    return bitwuzlaJNI._IO_FILE__vtable_offset_get(swigCPtr, this);
   }
 
   public void set_shortbuf(String value) {
-    BitwuzlaJNI._IO_FILE__shortbuf_set(swigCPtr, this, value);
+    bitwuzlaJNI._IO_FILE__shortbuf_set(swigCPtr, this, value);
   }
 
   public String get_shortbuf() {
-    return BitwuzlaJNI._IO_FILE__shortbuf_get(swigCPtr, this);
+    return bitwuzlaJNI._IO_FILE__shortbuf_get(swigCPtr, this);
   }
 
 //  public void set_lock(SWIGTYPE_p_void value) {
@@ -229,11 +229,11 @@ public class SWIG__IO_FILE {
 //  }
 
   public void set_offset(long value) {
-    BitwuzlaJNI._IO_FILE__offset_set(swigCPtr, this, value);
+    bitwuzlaJNI._IO_FILE__offset_set(swigCPtr, this, value);
   }
 
   public long get_offset() {
-    return BitwuzlaJNI._IO_FILE__offset_get(swigCPtr, this);
+    return bitwuzlaJNI._IO_FILE__offset_get(swigCPtr, this);
   }
 
 //  public void set_codecvt(SWIGTYPE_p__IO_codecvt value) {
@@ -254,13 +254,13 @@ public class SWIG__IO_FILE {
 //    return (cPtr == 0) ? null : new SWIGTYPE_p__IO_wide_data(cPtr, false);
 //  }
 
-  public void set_freeres_list(SWIG__IO_FILE value) {
-    BitwuzlaJNI._IO_FILE__freeres_list_set(swigCPtr, this, SWIG__IO_FILE.getCPtr(value), value);
+  public void set_freeres_list(_IO_FILE value) {
+    bitwuzlaJNI._IO_FILE__freeres_list_set(swigCPtr, this, _IO_FILE.getCPtr(value), value);
   }
 
-  public SWIG__IO_FILE get_freeres_list() {
-    long cPtr = BitwuzlaJNI._IO_FILE__freeres_list_get(swigCPtr, this);
-    return (cPtr == 0) ? null : new SWIG__IO_FILE(cPtr, false);
+  public _IO_FILE get_freeres_list() {
+    long cPtr = bitwuzlaJNI._IO_FILE__freeres_list_get(swigCPtr, this);
+    return (cPtr == 0) ? null : new _IO_FILE(cPtr, false);
   }
 
 //  public void set_freeres_buf(SWIGTYPE_p_void value) {
@@ -273,31 +273,31 @@ public class SWIG__IO_FILE {
 //  }
 
   public void set__pad5(long value) {
-    BitwuzlaJNI._IO_FILE___pad5_set(swigCPtr, this, value);
+    bitwuzlaJNI._IO_FILE___pad5_set(swigCPtr, this, value);
   }
 
   public long get__pad5() {
-    return BitwuzlaJNI._IO_FILE___pad5_get(swigCPtr, this);
+    return bitwuzlaJNI._IO_FILE___pad5_get(swigCPtr, this);
   }
 
   public void set_mode(int value) {
-    BitwuzlaJNI._IO_FILE__mode_set(swigCPtr, this, value);
+    bitwuzlaJNI._IO_FILE__mode_set(swigCPtr, this, value);
   }
 
   public int get_mode() {
-    return BitwuzlaJNI._IO_FILE__mode_get(swigCPtr, this);
+    return bitwuzlaJNI._IO_FILE__mode_get(swigCPtr, this);
   }
 
   public void set_unused2(String value) {
-    BitwuzlaJNI._IO_FILE__unused2_set(swigCPtr, this, value);
+    bitwuzlaJNI._IO_FILE__unused2_set(swigCPtr, this, value);
   }
 
   public String get_unused2() {
-    return BitwuzlaJNI._IO_FILE__unused2_get(swigCPtr, this);
+    return bitwuzlaJNI._IO_FILE__unused2_get(swigCPtr, this);
   }
 
-  public SWIG__IO_FILE() {
-    this(BitwuzlaJNI.new__IO_FILE(), true);
+  public _IO_FILE() {
+    this(bitwuzlaJNI.new__IO_FILE(), true);
   }
 
 }

@@ -42,14 +42,14 @@ public class BitwuzlaArrayFormulaManager extends
 
   @Override
   protected Long select(Long pArray, Long pIndex) {
-    return BitwuzlaJNI.bitwuzla_mk_term2(this.bitwuzla,
+    return bitwuzlaJNI.bitwuzla_mk_term2(this.bitwuzla,
         SWIG_BitwuzlaKind.BITWUZLA_KIND_ARRAY_SELECT.swigValue()
         , pArray, pIndex);
   }
 
   @Override
   protected Long store(Long pArray, Long pIndex, Long pValue) {
-    return BitwuzlaJNI.bitwuzla_mk_term3(this.bitwuzla,
+    return bitwuzlaJNI.bitwuzla_mk_term3(this.bitwuzla,
         SWIG_BitwuzlaKind.BITWUZLA_KIND_ARRAY_SELECT.swigValue()
         , pArray, pIndex, pValue);
   }
@@ -68,7 +68,7 @@ public class BitwuzlaArrayFormulaManager extends
 
   @Override
   protected Long equivalence(Long pArray1, Long pArray2) {
-    return BitwuzlaJNI.bitwuzla_mk_term2(bitwuzla, BITWUZLA_KIND_EQUAL.swigValue(), pArray1, pArray2);
+    return bitwuzlaJNI.bitwuzla_mk_term2(bitwuzla, BITWUZLA_KIND_EQUAL.swigValue(), pArray1, pArray2);
 
   }
 }
