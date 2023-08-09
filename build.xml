@@ -81,7 +81,7 @@ SPDX-License-Identifier: Apache-2.0
         <delete includeEmptyDirs="true">
             <fileset dir="." includes="${class.dir}/** ${ivy.module}-*.jar ivy-*.xml *.so *.dll *.dylib *.jar"/>
             <fileset dir="lib/native/source/libmathsat5j" includes="*.so *.dll *.o"/>
-            <fileset dir="lib/native/source/opensmt" includes="src opensmt-wrap.o"/>
+            <fileset dir="lib/native/source/opensmt" includes="src/**/*.java src/opensmt src opensmt-wrap.o"/>
         </delete>
     </target>
 
