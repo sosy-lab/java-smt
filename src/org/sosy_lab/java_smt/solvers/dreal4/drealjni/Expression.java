@@ -198,4 +198,11 @@ public class Expression {
     return new Expression(drealJNI.Expression_Decrement__SWIG_1(swigCPtr, this, arg0), true);
   }
 
+  // self written
+  public VariableSet getVariables() {
+    VariableSet set = new VariableSet();
+    drealJNI.Expression_getVariables(VariableSet.getCPtr(set), Expression.getCPtr(this));
+    return set;
+  }
+
 }

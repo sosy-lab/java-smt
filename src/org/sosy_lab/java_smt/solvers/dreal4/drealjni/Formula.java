@@ -168,4 +168,10 @@ public class Formula {
     return set;
   }
 
+  public VariableSet getFreeVariables() {
+    VariableSet set = new VariableSet();
+    drealJNI.Formula_getFreeVariables(VariableSet.getCPtr(set), Formula.getCPtr(this));
+    return set;
+  }
+
 }

@@ -636,9 +636,12 @@ public class drealJNI {
   public final static native void Config_mutable_smtlib2_compliant_0(boolean bool, long config);
   public final static native void Context_declareVariables(long context, long formula);
   public final static native boolean Context_CheckSat_0(long context, long box);
-  public final static native long Formula_getQuantifiedVariables(long set, long formula);
+  public final static native void Formula_getQuantifiedVariables(long set, long formula);
   public final static native long new_Expression__SWIG_4(long jarg1);
   public final static native String getResult(long box, long var);
+
+  public final static native void Expression_getVariables(long set, long exp);
+  public final static native void Formula_getFreeVariables(long set, long f);
 
 
   // For debuging and testing

@@ -11846,9 +11846,8 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
   return jresult;
 }
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Formula_1getQuantifiedVariables(JNIEnv *jenv, jclass jcls, jlong set, jlong f) {
-  jlong returnSet = 0;
-  
+SWIGEXPORT void JNICALL
+Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Formula_1getQuantifiedVariables(JNIEnv *jenv, jclass jcls, jlong set, jlong f) {
   dreal::drake::symbolic::Formula *formula = (dreal::drake::symbolic::Formula *) 0;
   formula = *(dreal::drake::symbolic::Formula **)&f;
   std::set< dreal::drake::symbolic::Variable > *s = (std::set< dreal::drake::symbolic::Variable > *) 0 ;
@@ -11857,10 +11856,6 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
   for (dreal::drake::symbolic::Variable v : dreal::drake::symbolic::get_quantified_variables(*formula)) {
     s->insert(v);
   }
-  
-  *(std::set< dreal::drake::symbolic::Variable > **)&returnSet = s; 
-  
-  return returnSet;
 }
 
 SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1Expression_1_1SWIG_14(JNIEnv *jenv, jclass jcls, jlong jarg1) {
@@ -11901,7 +11896,33 @@ jcls, jlong model, jlong var) {
 
   result = jenv->NewStringUTF((&res)->c_str());
   return result;
-}  
+}
+
+SWIGEXPORT jlong JNICALL
+Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Expression_1getVariables
+(JNIEnv *jenv, jclass jcls, jlong set, jlong exp) {
+  dreal::drake::symbolic::Expression *expression = (dreal::drake::symbolic::Expression *) 0;
+  expression = *(dreal::drake::symbolic::Expression **)&exp;
+  std::set< dreal::drake::symbolic::Variable > *s = (std::set< dreal::drake::symbolic::Variable > *) 0 ;
+  s = *(std::set< dreal::drake::symbolic::Variable > **)&set;
+
+  for (dreal::drake::symbolic::Variable v : expression->GetVariables()) {
+    s->insert(v);
+  }
+}
+
+SWIGEXPORT void JNICALL
+Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Formula_1getFreeVariables(JNIEnv
+*jenv, jclass jcls, jlong set, jlong f) {
+  dreal::drake::symbolic::Formula *formula = (dreal::drake::symbolic::Formula *) 0;
+  formula = *(dreal::drake::symbolic::Formula **)&f;
+  std::set< dreal::drake::symbolic::Variable > *s = (std::set< dreal::drake::symbolic::Variable > *) 0 ;
+  s = *(std::set< dreal::drake::symbolic::Variable > **)&set;
+
+  for (dreal::drake::symbolic::Variable v : formula->GetFreeVariables()) {
+    s->insert(v);
+  }
+}
 // Functions for debugging and trying to figure stuff out
 
 SWIGEXPORT jboolean JNICALL
