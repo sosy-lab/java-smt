@@ -470,6 +470,9 @@ public class OpenSmtNativeAPITest {
     System.out.println(check2);
 
     Model model = mainSolver.getModel();
-    System.out.println(model);
+    for (PTRef var : Arrays.asList(varA, varB, varC)) {
+      PTRef val = model.evaluate(var);
+      System.out.println(logic.pp(val));
+    }
   }
 }
