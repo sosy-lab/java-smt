@@ -25,43 +25,55 @@ import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 public class BitwuzlaBooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, Long
     , Long> {
+  private final long bitwuzla;
+  private final long pTrue;
+  private final long pFalse;
   protected BitwuzlaBooleanFormulaManager(FormulaCreator<Long, Long, Long, Long> pCreator) {
     super(pCreator);
+    bitwuzla = getFormulaCreator().getEnv();
+    pTrue = bitwuzlaJNI.bitwuzla_mk_true(bitwuzla);
+    pFalse = bitwuzlaJNI.bitwuzla_mk_false(bitwuzla);
   }
 
   @Override
   protected Long makeVariableImpl(String pVar) {
-    return null;
+    long boolType = getFormulaCreator().getBoolType();
+    return getFormulaCreator().makeVariable(boolType, pVar);
   }
 
   @Override
   protected Long makeBooleanImpl(boolean value) {
-    return null;
+    return value ? pTrue : pFalse;
   }
 
   @Override
   protected Long not(Long pParam1) {
-    return null;
+    return bitwuzlaJNI.bitwuzla_mk_term1(bitwuzla, SWIG_BitwuzlaKind.BITWUZLA_KIND_NOT.swigValue(), pParam1);
   }
 
   @Override
   protected Long and(Long pParam1, Long pParam2) {
-    return null;
+    return bitwuzlaJNI.bitwuzla_mk_term2(bitwuzla,
+        SWIG_BitwuzlaKind.BITWUZLA_KIND_AND.swigValue(), pParam1, pParam2);
+
   }
 
   @Override
   protected Long or(Long pParam1, Long pParam2) {
-    return null;
+    return bitwuzlaJNI.bitwuzla_mk_term2(bitwuzla,
+        SWIG_BitwuzlaKind.BITWUZLA_KIND_OR.swigValue(), pParam1, pParam2);
   }
 
   @Override
   protected Long xor(Long pParam1, Long pParam2) {
-    return null;
+    return bitwuzlaJNI.bitwuzla_mk_term2(bitwuzla,
+        SWIG_BitwuzlaKind.BITWUZLA_KIND_XOR.swigValue(), pParam1, pParam2);
   }
 
   @Override
   protected Long equivalence(Long bits1, Long bits2) {
-    return null;
+    return bitwuzlaJNI.bitwuzla_mk_term2(bitwuzla,
+        SWIG_BitwuzlaKind.BITWUZLA_KIND_IFF.swigValue(), bits1, bits2);
   }
 
   @Override
@@ -76,6 +88,7 @@ public class BitwuzlaBooleanFormulaManager extends AbstractBooleanFormulaManager
 
   @Override
   protected Long ifThenElse(Long cond, Long f1, Long f2) {
-    return null;
+    return bitwuzlaJNI.bitwuzla_mk_term2(bitwuzla,
+        SWIG_BitwuzlaKind.BITWUZLA_KIND_ITE.swigValue(), f1, f2);
   }
 }
