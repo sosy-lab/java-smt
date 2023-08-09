@@ -54,8 +54,7 @@ solvers_maven_conf/*.asc
 /Javadoc-z3
 /gh-pages
 
-.idea/workspace.xml
-.idea/uiDesigner.xml
+.idea/
 
 /*.so
 /*.dll
