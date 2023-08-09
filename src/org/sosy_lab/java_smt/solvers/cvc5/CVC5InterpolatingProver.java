@@ -102,29 +102,65 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
   }
 
   @Override
-  public List<BooleanFormula> getSeqInterpolants(
-      List<? extends Collection<Term>> partitionedFormulas)
-      throws SolverException, InterruptedException {
+  public List<BooleanFormula>
+      getSeqInterpolants(List<? extends Collection<Term>> partitionedFormulas)
+          throws SolverException, InterruptedException {
     Preconditions.checkArgument(
-        !partitionedFormulas.isEmpty(), "at least one partition should be available.");
+        !partitionedFormulas.isEmpty(),
+        "at least one partition should be available.");
 
     List<BooleanFormula> itps = Stream.of(new BooleanFormula[] {}).collect(Collectors.toList());
-    for (int i = 1; i < partitionedFormulas.size(); i++) {
-      itps.add(
-          getInterpolant(
-              ImmutableList.copyOf(Iterables.concat(partitionedFormulas.subList(0, i)))));
-    }
+
+    //for (int i = 1; i < partitionedFormulas.size(); i++) {
+    //  BooleanFormula currInterpol =
+    //      getInterpolant(ImmutableList.copyOf(Iterables.concat(partitionedFormulas.subList(0, i))));
+    //  itps.add(currInterpol);
+    //}
+
+     System.out.println("Amout of Formulas: " + partitionedFormulas.size());
+     if
+     (partitionedFormulas.size() == 1) {
+     return itps;
+     }
+     itps.add(
+     getInterpolant(ImmutableList.copyOf(Iterables.concat(partitionedFormulas.subList(0, 1)))));
+     Integer n = partitionedFormulas.size();
+     for (int i = 2; i < n; i++) {
+     Term preInterpol = creator.extractInfo(itps.get(i - 2));
+    // ImmutableList<Term> toInterpolate =
+    // Stream
+    // .concat(
+    // ImmutableList.copyOf(Iterables.concat(partitionedFormulas.subList(0, i)))
+    // .stream(),
+    // ImmutableList.of(preInterpol).stream())
+    // .collect(ImmutableList.toImmutableList());
+     Term currFormulaInterpol =
+     getCVC5Interpolation(
+     Set.of(Set.of(preInterpol)),
+     Set.of(
+                 ImmutableList.copyOf(Iterables.concat(partitionedFormulas.subList(i, n)))
+     .stream()
+     .collect(ImmutableSet.toImmutableSet())));
+    itps.add(creator.encapsulateBoolean(currFormulaInterpol));
+    // itps.add(getInterpolant(toInterpolate));
+
+  }
+    System.out.println("Sequential Interpolants:" + itps.size());
+    System.out.println("Formulas: " + partitionedFormulas.toString());
+    System.out.println("ITPS: " + itps.toString());
+
     return itps;
   }
 
   // Experimental!
   @Override
   public List<BooleanFormula> getTreeInterpolants(
-      List<? extends Collection<Term>> pPartitionedFormulas, int[] pStartOfSubTree)
+      List<? extends Collection<Term>> pPartitionedFormulas,
+      int[] pStartOfSubTree)
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
-    assert InterpolatingProverEnvironment.checkTreeStructure(
-        pPartitionedFormulas.size(), pStartOfSubTree);
+    assert InterpolatingProverEnvironment
+        .checkTreeStructure(pPartitionedFormulas.size(), pStartOfSubTree);
 
     // Generate every Interpolation Pair
     ImmutableList<ImmutableList<ImmutableList<Collection<Term>>>> interpolationPairs =
@@ -158,32 +194,38 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
   /**
    * Interpolates a Tuple of Interpolants according to Craig-Interpolation using CVC5-Interpolation.
    *
-   * <p>CVC5's getInterpolant: There is a Model, such that the Interpolant I, with A -> I = True
+   * <p>
+   * CVC5's getInterpolant: There is a Model, such that the Interpolant I, with A -> I = True
    * (1CVC5) and I -> B = True (2CVC5).
    *
-   * <p>Craig Interpolation: There is a Model, such that the Interpolant psi, with phi- -> psi =
-   * True (1Craig), not(psi /\ phi+) = True (2Craig).
+   * <p>
+   * Craig Interpolation: There is a Model, such that the Interpolant psi, with phi- -> psi = True
+   * (1Craig), not(psi /\ phi+) = True (2Craig).
    *
-   * <p>With A/phi- current set of assertions and B/phi+ Formulas to interpolate.
+   * <p>
+   * With A/phi- current set of assertions and B/phi+ Formulas to interpolate.
    *
-   * <p>CVC5 -> Craig Interpolation:
+   * <p>
+   * CVC5 -> Craig Interpolation:
    *
-   * <p>(1CVC5) <=> (1Craig) due to subst of A with phi- and reflexivity.
+   * <p>
+   * (1CVC5) <=> (1Craig) due to subst of A with phi- and reflexivity.
    *
-   * <p>(2CVC5) <=> I -> B = True <=> (not I) \/ B = True <=> not (I /\ (not B)) = True <=> (2Craig)
+   * <p>
+   * (2CVC5) <=> I -> B = True <=> (not I) \/ B = True <=> not (I /\ (not B)) = True <=> (2Craig)
    * due to subst of (not B) with phi+ and reflexivity.
    *
-   * <p>Hence, CVC5's Interpolation produces an equivalent Interpolation to Craig Interpolation, if
-   * B is negated during CVC5 Interpolation.
+   * <p>
+   * Hence, CVC5's Interpolation produces an equivalent Interpolation to Craig Interpolation, if B
+   * is negated during CVC5 Interpolation.
    *
    * @param pFormAAsList current Set of Assertions A
    * @param pFormBAsList Formulas to Interpolate B
    * @return Interpolation of the Interpolation Pair following the definition of
-   *     Craig-Interpolation.
+   *         Craig-Interpolation.
    */
-  private Term getCVC5Interpolation(
-      Set<Collection<Term>> pFormAAsList,
-      Set<Collection<Term>> pFormBAsList) {
+  private Term
+      getCVC5Interpolation(Set<Collection<Term>> pFormAAsList, Set<Collection<Term>> pFormBAsList) {
 
     // Respect Asserted Formulas not in the Interpolation Pairs
 
@@ -207,7 +249,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     if (!extraAssertions.isEmpty()) {
       // Term extraAssert = buildConjunctionOfFormulas(extraAssertions, interpolationSolver);
       // interpolantA = interpolationSolver.mkTerm(Kind.AND, extraAssert, interpolantA);
-      System.out.print("Extra Assert s Not Empty!");
+      System.out.println("Extra Assert s Not Empty!");
     }
     Term interpolantB = buildConjunctionOfFormulasOverList(pFormBAsList, interpolationSolver);
 
@@ -222,6 +264,8 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     Term interpolant =
         interpolationSolver.getInterpolant(interpolationSolver.mkTerm(Kind.NOT, interpolantB));
 
+    System.out.println("Interpolant: " + interpolant.toString());
+
     interpolationSolver.deletePointer();
 
     return interpolant;
@@ -234,12 +278,10 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
    * @param pCombinedInterpols asserted Formulas to invert the selection
    * @return asserted Formulas not in collTerms, but in the formula Stack
    */
-  private Collection<Term> getAssertedTermsNotInCollection(
-      Set<Collection<Term>> pCombinedInterpols) {
+  private Collection<Term>
+      getAssertedTermsNotInCollection(Set<Collection<Term>> pCombinedInterpols) {
     Set<Term> retTerms =
-        pCombinedInterpols.stream()
-            .flatMap(Collection::stream)
-            .collect(Collectors.toSet());
+        pCombinedInterpols.stream().flatMap(Collection::stream).collect(Collectors.toSet());
 
     Set<Term> filteredAssertedTerms =
         assertedFormulas.stream()
@@ -296,11 +338,12 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
    * @param pPartitionedFormulas of formulas
    * @param pStartOfSubTree The start of the subtree containing the formula at this index as root.
    * @return An List of Interpolation Pairs (as Tuple (a List)) containing Lists of Collection of
-   *     Terms
+   *         Terms
    */
   @SuppressWarnings("unchecked")
   private ImmutableList<ImmutableList<ImmutableList<Collection<Term>>>> getTreeInterpolationPairs(
-      List<? extends Collection<Term>> pPartitionedFormulas, int[] pStartOfSubTree) {
+      List<? extends Collection<Term>> pPartitionedFormulas,
+      int[] pStartOfSubTree) {
     // First Interpolation Pair
     ImmutableList<Integer> leafes = ImmutableList.of(pStartOfSubTree[0]);
     // current generated LHS of Tuple
@@ -329,13 +372,17 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
           for (int j = 0; j < pStartOfSubTree.length; j++) {
             if (j <= i) {
               currA =
-                  Stream.concat(
-                          currA.stream(), ImmutableList.of(pPartitionedFormulas.get(j)).stream())
+                  Stream
+                      .concat(
+                          currA.stream(),
+                          ImmutableList.of(pPartitionedFormulas.get(j)).stream())
                       .collect(ImmutableList.toImmutableList());
             } else {
               currB =
-                  Stream.concat(
-                          currA.stream(), ImmutableList.of(pPartitionedFormulas.get(j)).stream())
+                  Stream
+                      .concat(
+                          currA.stream(),
+                          ImmutableList.of(pPartitionedFormulas.get(j)).stream())
                       .collect(ImmutableList.toImmutableList());
             }
           }

@@ -1331,10 +1331,31 @@ public class CVC5NativeAPITest {
     Term C = solver.mkTerm(Kind.EQUAL, b, c);
     Term D = solver.mkTerm(Kind.EQUAL, c, zero);
 
-    Term itps3_1 = interpolateAndCheck(solver, A, solver.mkTerm(Kind.AND, C, B, D));
+    Solver interpolationSolver = new Solver();
+
+    interpolationSolver.setOption("incremental", "true");
+    interpolationSolver.setOption("produce-interpolants", "true");
+    interpolationSolver.setOption("produce-assertions", "true");
+    interpolationSolver.setOption("dump-models", "true");
+    interpolationSolver.setOption("output-language", "smt2");
+
+    // Set Strings option to enable all String features (such as lessOrEquals)
+    interpolationSolver.setOption("strings-exp", "true");
+
+    // Enable more complete quantifier solving (for more info see CVC5QuantifiedFormulaManager)
+    interpolationSolver.setOption("full-saturate-quant", "true");
+
+    interpolationSolver.resetAssertions();
+
+    Term itps3_1 =
+        interpolateAndCheck(interpolationSolver, A, interpolationSolver.mkTerm(Kind.AND, C, B, D));
     Term itps3_2 =
-        interpolateAndCheck(solver, solver.mkTerm(Kind.AND, A, C), solver.mkTerm(Kind.AND, B, D));
-    Term itps3_3 = interpolateAndCheck(solver, solver.mkTerm(Kind.AND, A, C, B), D);
+        interpolateAndCheck(
+            interpolationSolver,
+            interpolationSolver.mkTerm(Kind.AND, A, C),
+            interpolationSolver.mkTerm(Kind.AND, B, D));
+    Term itps3_3 =
+        interpolateAndCheck(interpolationSolver, interpolationSolver.mkTerm(Kind.AND, A, C, B), D);
     System.out.println(itps3_1);
     System.out.println(itps3_2);
     System.out.println(itps3_3);
