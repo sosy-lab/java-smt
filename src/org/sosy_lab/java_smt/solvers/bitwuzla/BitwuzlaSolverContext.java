@@ -21,12 +21,8 @@
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Splitter;
-import com.google.common.base.Splitter.MapSplitter;
-import com.google.common.collect.ImmutableMap;
 import java.util.Collection;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -99,7 +95,7 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
    */
   @Override
   public String getVersion() {
-    return "Bitwuzla " + BitwuzlaJNI.bitwuzla_version(creator.getEnv());
+    return "Bitwuzla " + bitwuzlaJNI.bitwuzla_version(creator.getEnv());
   }
 
   /**
@@ -126,7 +122,7 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
   public void close() {
     if (!closed) {
       closed = true;
-      BitwuzlaJNI.bitwuzla_delete(creator.getEnv());
+      bitwuzlaJNI.bitwuzla_delete(creator.getEnv());
     }
   }
 
@@ -177,19 +173,19 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
     BitwuzlaSettings settings = new BitwuzlaSettings(config);
 
     Preconditions.checkNotNull(settings.satSolver);
-    BitwuzlaJNI.bitwuzla_set_option_str(
+    bitwuzlaJNI.bitwuzla_set_option_str(
         bitwuzla, SWIG_BitwuzlaOption.BITWUZLA_OPT_SAT_ENGINE.swigValue(),
         settings.satSolver.name().toLowerCase(Locale.getDefault()));
     // Default Options to enable multiple SAT, auto cleanup on close, incremental mode
-    BitwuzlaJNI.bitwuzla_set_option(bitwuzla, SWIG_BitwuzlaOption.BITWUZLA_OPT_PRODUCE_MODELS.swigValue(), 2);
+    bitwuzlaJNI.bitwuzla_set_option(bitwuzla, SWIG_BitwuzlaOption.BITWUZLA_OPT_PRODUCE_MODELS.swigValue(), 2);
     // TODO: Not available in Bitwzula?
 //    BitwuzlaJNI.bitwuzla_set_option(bitwuzla, SWIG_BitwuzlaOption.BTOR_OPT_AUTO_CLEANUP.getValue(), 1);
     // Incremental needed for push/pop!
-    BitwuzlaJNI.bitwuzla_set_option(bitwuzla, SWIG_BitwuzlaOption.BITWUZLA_OPT_INCREMENTAL.swigValue(), 1);
+    bitwuzlaJNI.bitwuzla_set_option(bitwuzla, SWIG_BitwuzlaOption.BITWUZLA_OPT_INCREMENTAL.swigValue(), 1);
     // Sets randomseed accordingly
-    BitwuzlaJNI.bitwuzla_set_option(bitwuzla, SWIG_BitwuzlaOption.BITWUZLA_OPT_SEED.swigValue(), randomSeed);
+    bitwuzlaJNI.bitwuzla_set_option(bitwuzla, SWIG_BitwuzlaOption.BITWUZLA_OPT_SEED.swigValue(), randomSeed);
     // Stop Boolector from rewriting formulas in outputs
-    BitwuzlaJNI.bitwuzla_set_option(bitwuzla, SWIG_BitwuzlaOption.BITWUZLA_OPT_RW_LEVEL.swigValue(), 0);
+    bitwuzlaJNI.bitwuzla_set_option(bitwuzla, SWIG_BitwuzlaOption.BITWUZLA_OPT_RW_LEVEL.swigValue(), 0);
 
     //setFurtherOptions(bitwuzla, settings.furtherOptions);
 // TODO: This seems to be setting a logfile. Perhaps the SWIG _IO_FILE could be used instead?

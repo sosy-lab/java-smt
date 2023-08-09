@@ -29,16 +29,16 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
  * ----------------------------------------------------------------------------- */
 
 
-public class SWIG_BitwuzlaOptionInfo {
+public class BitwuzlaOptionInfo {
   private transient long swigCPtr;
   protected transient boolean swigCMemOwn;
 
-  protected SWIG_BitwuzlaOptionInfo(long cPtr, boolean cMemoryOwn) {
+  protected BitwuzlaOptionInfo(long cPtr, boolean cMemoryOwn) {
     swigCMemOwn = cMemoryOwn;
     swigCPtr = cPtr;
   }
 
-  protected static long getCPtr(SWIG_BitwuzlaOptionInfo obj) {
+  protected static long getCPtr(BitwuzlaOptionInfo obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
@@ -51,54 +51,54 @@ public class SWIG_BitwuzlaOptionInfo {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        BitwuzlaJNI.delete_BitwuzlaOptionInfo(swigCPtr);
+        bitwuzlaJNI.delete_BitwuzlaOptionInfo(swigCPtr);
       }
       swigCPtr = 0;
     }
   }
 
   public void setOpt(SWIG_BitwuzlaOption value) {
-    BitwuzlaJNI.BitwuzlaOptionInfo_opt_set(swigCPtr, this, value.swigValue());
+    bitwuzlaJNI.BitwuzlaOptionInfo_opt_set(swigCPtr, this, value.swigValue());
   }
 
   public SWIG_BitwuzlaOption getOpt() {
-    return SWIG_BitwuzlaOption.swigToEnum(BitwuzlaJNI.BitwuzlaOptionInfo_opt_get(swigCPtr, this));
+    return SWIG_BitwuzlaOption.swigToEnum(bitwuzlaJNI.BitwuzlaOptionInfo_opt_get(swigCPtr, this));
   }
 
   public void setShrt(String value) {
-    BitwuzlaJNI.BitwuzlaOptionInfo_shrt_set(swigCPtr, this, value);
+    bitwuzlaJNI.BitwuzlaOptionInfo_shrt_set(swigCPtr, this, value);
   }
 
   public String getShrt() {
-    return BitwuzlaJNI.BitwuzlaOptionInfo_shrt_get(swigCPtr, this);
+    return bitwuzlaJNI.BitwuzlaOptionInfo_shrt_get(swigCPtr, this);
   }
 
   public void setLng(String value) {
-    BitwuzlaJNI.BitwuzlaOptionInfo_lng_set(swigCPtr, this, value);
+    bitwuzlaJNI.BitwuzlaOptionInfo_lng_set(swigCPtr, this, value);
   }
 
   public String getLng() {
-    return BitwuzlaJNI.BitwuzlaOptionInfo_lng_get(swigCPtr, this);
+    return bitwuzlaJNI.BitwuzlaOptionInfo_lng_get(swigCPtr, this);
   }
 
   public void setDesc(String value) {
-    BitwuzlaJNI.BitwuzlaOptionInfo_desc_set(swigCPtr, this, value);
+    bitwuzlaJNI.BitwuzlaOptionInfo_desc_set(swigCPtr, this, value);
   }
 
   public String getDesc() {
-    return BitwuzlaJNI.BitwuzlaOptionInfo_desc_get(swigCPtr, this);
+    return bitwuzlaJNI.BitwuzlaOptionInfo_desc_get(swigCPtr, this);
   }
 
   public void setIs_numeric(boolean value) {
-    BitwuzlaJNI.BitwuzlaOptionInfo_is_numeric_set(swigCPtr, this, value);
+    bitwuzlaJNI.BitwuzlaOptionInfo_is_numeric_set(swigCPtr, this, value);
   }
 
   public boolean getIs_numeric() {
-    return BitwuzlaJNI.BitwuzlaOptionInfo_is_numeric_get(swigCPtr, this);
+    return bitwuzlaJNI.BitwuzlaOptionInfo_is_numeric_get(swigCPtr, this);
   }
 
-  public SWIG_BitwuzlaOptionInfo() {
-    this(BitwuzlaJNI.new_BitwuzlaOptionInfo(), true);
+  public BitwuzlaOptionInfo() {
+    this(bitwuzlaJNI.new_BitwuzlaOptionInfo(), true);
   }
 
 }
