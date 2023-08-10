@@ -53,7 +53,7 @@ public class SharedPointerToUnorderedMap {
   }
 
   @SuppressWarnings("deprecation")
-  protected void finalize() {
+  protected void finalize1() {
     delete();
   }
 
@@ -67,6 +67,7 @@ public class SharedPointerToUnorderedMap {
     }
   }
 
+  @SuppressWarnings("unused")
   public SharedPointerToUnorderedMap() {
     this(drealJNI.new_SharedPointerToUnorderedMap(), true);
   }

@@ -46,6 +46,7 @@ public final class FormulaKind {
     return swigValue;
   }
 
+  @Override
   public String toString() {
     return swigName;
   }
@@ -63,13 +64,13 @@ public final class FormulaKind {
     this.swigName = swigName;
     this.swigValue = swigNext++;
   }
-
+  @SuppressWarnings({"unused", "StaticAssignmentInConstructor"})
   private FormulaKind(String swigName, int swigValue) {
     this.swigName = swigName;
     this.swigValue = swigValue;
     swigNext = swigValue+1;
   }
-
+  @SuppressWarnings({"unused", "StaticAssignmentInConstructor"})
   private FormulaKind(String swigName, FormulaKind swigEnum) {
     this.swigName = swigName;
     this.swigValue = swigEnum.swigValue;

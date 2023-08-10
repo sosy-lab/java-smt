@@ -35,9 +35,9 @@ import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variables;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.dreal;
 
 public class DReal4QuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<DRealTerm<?,
-    ?>, Type, Context, DRealTerm<?, ?>> {
+    ?>, Variable.Type, Context, DRealTerm<?, ?>> {
 
-  protected DReal4QuantifiedFormulaManager(FormulaCreator<DRealTerm<?, ?>, Type, Context,
+  protected DReal4QuantifiedFormulaManager(FormulaCreator<DRealTerm<?, ?>, Variable.Type, Context,
       DRealTerm<?, ?>> pFormulaCreator) {
     super(pFormulaCreator);
   }
@@ -73,9 +73,9 @@ public class DReal4QuantifiedFormulaManager extends AbstractQuantifiedFormulaMan
             FormulaKind.Forall);
       } else if (pBody.isVar()) {
         Variable var = pBody.getVariable();
-        if (var.get_type() == Type.BOOLEAN) {
-          Formula f = new Formula(var);
-          Formula quantified = dreal.forall(vars, f);
+        if (var.get_type() == Variable.Type.BOOLEAN) {
+          //Formula f = new Formula(var);
+          //Formula quantified = dreal.forall(vars, f);
           //return new DRealTerm<>(quantified, var.get_type(), FormulaKind.Forall);
           throw new UnsupportedOperationException("This does not work? BOOLEAN and ForALL");
         } else {

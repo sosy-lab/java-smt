@@ -53,7 +53,7 @@ public class VaribaleIntUnorderedMap extends java.util.AbstractMap<Variable, Int
   }
 
   @SuppressWarnings("deprecation")
-  protected void finalize() {
+  protected void finalize1() {
     delete();
   }
 
@@ -67,11 +67,11 @@ public class VaribaleIntUnorderedMap extends java.util.AbstractMap<Variable, Int
     }
   }
 
-
+  @Override
   public int size() {
     return sizeImpl();
   }
-
+  @Override
   public boolean containsKey(java.lang.Object key) {
     if (!(key instanceof Variable)) {
       return false;
@@ -79,7 +79,7 @@ public class VaribaleIntUnorderedMap extends java.util.AbstractMap<Variable, Int
 
     return containsImpl((Variable)key);
   }
-
+  @Override
   public Integer get(java.lang.Object key) {
     if (!(key instanceof Variable)) {
       return null;
@@ -92,9 +92,9 @@ public class VaribaleIntUnorderedMap extends java.util.AbstractMap<Variable, Int
 
     return null;
   }
-
+  @Override
   public Integer put(Variable key, Integer value) {
-    Iterator itr = find((Variable) key);
+    Iterator itr = find(key);
     if (itr.isNot(end())) {
       Integer oldValue = itr.getValue();
       itr.setValue(value);
@@ -104,7 +104,7 @@ public class VaribaleIntUnorderedMap extends java.util.AbstractMap<Variable, Int
       return null;
     }
   }
-
+  @Override
   public Integer remove(java.lang.Object key) {
     if (!(key instanceof Variable)) {
       return null;
@@ -119,7 +119,7 @@ public class VaribaleIntUnorderedMap extends java.util.AbstractMap<Variable, Int
       return null;
     }
   }
-
+  @Override
   public java.util.Set<Entry<Variable, Integer>> entrySet() {
     java.util.Set<Entry<Variable, Integer>> setToReturn =
         new java.util.HashSet<Entry<Variable, Integer>>();
@@ -134,15 +134,15 @@ public class VaribaleIntUnorderedMap extends java.util.AbstractMap<Variable, Int
           this.iterator = iterator;
           return this;
         }
-
+        @Override
         public Variable getKey() {
           return iterator.getKey();
         }
-
+        @Override
         public Integer getValue() {
           return iterator.getValue();
         }
-
+        @Override
         public Integer setValue(Integer newValue) {
           Integer oldValue = iterator.getValue();
           iterator.setValue(newValue);
@@ -189,7 +189,7 @@ public class VaribaleIntUnorderedMap extends java.util.AbstractMap<Variable, Int
     }
   
     @SuppressWarnings("deprecation")
-    protected void finalize() {
+    protected void finalize1() {
       delete();
     }
   
@@ -224,11 +224,11 @@ public class VaribaleIntUnorderedMap extends java.util.AbstractMap<Variable, Int
     }
   
   }
-
+  @Override
   public boolean isEmpty() {
     return drealJNI.VaribaleIntUnorderedMap_isEmpty(swigCPtr, this);
   }
-
+  @Override
   public void clear() {
     drealJNI.VaribaleIntUnorderedMap_clear(swigCPtr, this);
   }

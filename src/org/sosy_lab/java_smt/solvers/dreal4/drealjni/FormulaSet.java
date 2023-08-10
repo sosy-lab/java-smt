@@ -53,7 +53,7 @@ public class FormulaSet extends java.util.AbstractSet<Formula> {
   }
 
   @SuppressWarnings("deprecation")
-  protected void finalize() {
+  protected void finalize1() {
     delete();
   }
 
@@ -71,15 +71,15 @@ public class FormulaSet extends java.util.AbstractSet<Formula> {
     this();
     addAll(collection);
   }
-
+  @Override
   public int size() {
     return sizeImpl();
   }
-
+  @Override
   public boolean add(Formula key) {
     return addImpl(key);
   }
-
+  @Override
   public boolean addAll(java.util.Collection<? extends Formula> collection) {
     boolean didAddElement = false;
     for (java.lang.Object object : collection) {
@@ -88,7 +88,7 @@ public class FormulaSet extends java.util.AbstractSet<Formula> {
 
     return didAddElement;
   }
-
+  @Override
   public java.util.Iterator<Formula> iterator() {
     return new java.util.Iterator<Formula>() {
       private Iterator curr;
@@ -99,7 +99,7 @@ public class FormulaSet extends java.util.AbstractSet<Formula> {
         end = FormulaSet.this.end();
         return this;
       }
-
+      @Override
       public Formula next() {
         if (!hasNext()) {
           throw new java.util.NoSuchElementException();
@@ -111,17 +111,17 @@ public class FormulaSet extends java.util.AbstractSet<Formula> {
         curr.incrementUnchecked();
         return currValue;
       }
-
+      @Override
       public boolean hasNext() {
         return curr.isNot(end);
       }
-
+      @Override
       public void remove() {
         throw new java.lang.UnsupportedOperationException();
       }
     }.init();
   }
-
+  @Override
   public boolean containsAll(java.util.Collection<?> collection) {
     for (java.lang.Object object : collection) {
       if (!contains(object)) {
@@ -131,7 +131,7 @@ public class FormulaSet extends java.util.AbstractSet<Formula> {
 
     return true;
   }
-
+  @Override
   public boolean contains(java.lang.Object object) {
     if (!(object instanceof Formula)) {
       return false;
@@ -139,7 +139,7 @@ public class FormulaSet extends java.util.AbstractSet<Formula> {
 
     return containsImpl((Formula)object);
   }
-
+  @Override
   public boolean removeAll(java.util.Collection<?> collection) {
     boolean didRemoveElement = false;
     for (java.lang.Object object : collection) {
@@ -148,7 +148,7 @@ public class FormulaSet extends java.util.AbstractSet<Formula> {
 
     return didRemoveElement;
   }
-
+  @Override
   public boolean remove(java.lang.Object object) {
     if (!(object instanceof Formula)) {
       return false;
@@ -183,7 +183,7 @@ public class FormulaSet extends java.util.AbstractSet<Formula> {
     }
   
     @SuppressWarnings("deprecation")
-    protected void finalize() {
+    protected void finalize1() {
       delete();
     }
   
@@ -218,11 +218,11 @@ public class FormulaSet extends java.util.AbstractSet<Formula> {
   public FormulaSet(FormulaSet other) {
     this(drealJNI.new_FormulaSet__SWIG_1(FormulaSet.getCPtr(other), other), true);
   }
-
+  @Override
   public boolean isEmpty() {
     return drealJNI.FormulaSet_isEmpty(swigCPtr, this);
   }
-
+  @Override
   public void clear() {
     drealJNI.FormulaSet_clear(swigCPtr, this);
   }
@@ -251,6 +251,7 @@ public class FormulaSet extends java.util.AbstractSet<Formula> {
     return drealJNI.FormulaSet_sizeImpl(swigCPtr, this);
   }
 
+  @SuppressWarnings("unused")
   private boolean hasNextImpl(FormulaSet.Iterator itr) {
     return drealJNI.FormulaSet_hasNextImpl(swigCPtr, this, FormulaSet.Iterator.getCPtr(itr), itr);
   }

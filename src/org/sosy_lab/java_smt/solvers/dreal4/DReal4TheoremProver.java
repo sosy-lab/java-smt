@@ -44,6 +44,7 @@ import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Box;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Config;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Context;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable.Type;
 
 
@@ -84,7 +85,7 @@ class DReal4TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
     // It is not possible to assert an Expression, only Variable of type boolean or a formula
     Preconditions.checkState(!formula.isExp());
     if (formula.isVar()) {
-      Preconditions.checkState(formula.getType() == Type.BOOLEAN);
+      Preconditions.checkState(formula.getType() == Variable.Type.BOOLEAN);
       Formula f = new Formula(formula.getVariable());
       curCnt.declareVaribales(f);
       curCnt.Assert(f);
@@ -119,7 +120,7 @@ class DReal4TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
-    return false;
+    throw new UnsupportedOperationException("dReal does not support isUnsatWSithAssumptions");
   }
 
   @Override
@@ -131,13 +132,13 @@ class DReal4TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
-    return null;
+    throw new UnsupportedOperationException("dReal does not support getUnsatCore.");
   }
 
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
-    return Optional.empty();
+    throw new UnsupportedOperationException("dReal does not support unsatCoreOverAssumptions.");
   }
 
   @Override

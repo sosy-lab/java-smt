@@ -54,7 +54,7 @@ public class ExpressionExpressionMap extends java.util.AbstractMap<Expression, E
   }
 
   @SuppressWarnings("deprecation")
-  protected void finalize() {
+  protected void finalize1() {
     delete();
   }
 
@@ -68,11 +68,11 @@ public class ExpressionExpressionMap extends java.util.AbstractMap<Expression, E
     }
   }
 
-
+  @Override
   public int size() {
     return sizeImpl();
   }
-
+  @Override
   public boolean containsKey(java.lang.Object key) {
     if (!(key instanceof Expression)) {
       return false;
@@ -80,7 +80,7 @@ public class ExpressionExpressionMap extends java.util.AbstractMap<Expression, E
 
     return containsImpl((Expression)key);
   }
-
+  @Override
   public Expression get(java.lang.Object key) {
     if (!(key instanceof Expression)) {
       return null;
@@ -93,9 +93,9 @@ public class ExpressionExpressionMap extends java.util.AbstractMap<Expression, E
 
     return null;
   }
-
+  @Override
   public Expression put(Expression key, Expression value) {
-    Iterator itr = find((Expression) key);
+    Iterator itr = find(key);
     if (itr.isNot(end())) {
       Expression oldValue = itr.getValue();
       itr.setValue(value);
@@ -105,7 +105,7 @@ public class ExpressionExpressionMap extends java.util.AbstractMap<Expression, E
       return null;
     }
   }
-
+  @Override
   public Expression remove(java.lang.Object key) {
     if (!(key instanceof Expression)) {
       return null;
@@ -120,7 +120,7 @@ public class ExpressionExpressionMap extends java.util.AbstractMap<Expression, E
       return null;
     }
   }
-
+  @Override
   public java.util.Set<Entry<Expression, Expression>> entrySet() {
     java.util.Set<Entry<Expression, Expression>> setToReturn =
         new java.util.HashSet<Entry<Expression, Expression>>();
@@ -135,15 +135,15 @@ public class ExpressionExpressionMap extends java.util.AbstractMap<Expression, E
           this.iterator = iterator;
           return this;
         }
-
+        @Override
         public Expression getKey() {
           return iterator.getKey();
         }
-
+        @Override
         public Expression getValue() {
           return iterator.getValue();
         }
-
+        @Override
         public Expression setValue(Expression newValue) {
           Expression oldValue = iterator.getValue();
           iterator.setValue(newValue);
@@ -190,7 +190,7 @@ public class ExpressionExpressionMap extends java.util.AbstractMap<Expression, E
     }
   
     @SuppressWarnings("deprecation")
-    protected void finalize() {
+    protected void finalize1() {
       delete();
     }
   
@@ -226,10 +226,11 @@ public class ExpressionExpressionMap extends java.util.AbstractMap<Expression, E
   
   }
 
+  @Override
   public boolean isEmpty() {
     return drealJNI.ExpressionExpressionMap_isEmpty(swigCPtr, this);
   }
-
+  @Override
   public void clear() {
     drealJNI.ExpressionExpressionMap_clear(swigCPtr, this);
   }

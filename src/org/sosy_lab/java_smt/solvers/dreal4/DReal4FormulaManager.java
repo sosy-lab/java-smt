@@ -30,9 +30,10 @@ import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Context;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Expression;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.FormulaKind;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable.Type;
 
-public class DReal4FormulaManager extends AbstractFormulaManager<DRealTerm<?, ?>, Type, Context,
+public class DReal4FormulaManager extends AbstractFormulaManager<DRealTerm<?, ?>, Variable.Type, Context,
     DRealTerm<?, ?>> {
 
   DReal4FormulaManager(DReal4FormulaCreator pFormulaCreator, DReal4UFManager pFunctionManager,
@@ -95,7 +96,7 @@ public class DReal4FormulaManager extends AbstractFormulaManager<DRealTerm<?, ?>
       // Only Variables can be substituted
       Preconditions.checkState(changeFromTerm.isVar());
       if (changeToTerm.isVar()) {
-        if (changeToTerm.getType() == Type.BOOLEAN) {
+        if (changeToTerm.getType() == Variable.Type.BOOLEAN) {
           formula = formula.Substitute(changeFromTerm.getVariable(),
               new org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula(changeToTerm.getVariable()));
         } else {

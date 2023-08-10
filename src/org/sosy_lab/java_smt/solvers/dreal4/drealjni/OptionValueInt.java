@@ -53,7 +53,7 @@ public class OptionValueInt {
   }
 
   @SuppressWarnings("deprecation")
-  protected void finalize() {
+  protected void finalize1() {
     delete();
   }
 
@@ -108,7 +108,7 @@ public class OptionValueInt {
     public final int swigValue() {
       return swigValue;
     }
-
+    @Override
     public String toString() {
       return swigName;
     }
@@ -126,13 +126,13 @@ public class OptionValueInt {
       this.swigName = swigName;
       this.swigValue = swigNext++;
     }
-
+    @SuppressWarnings({"unused", "StaticAssignmentInConstructor"})
     private Type(String swigName, int swigValue) {
       this.swigName = swigName;
       this.swigValue = swigValue;
       swigNext = swigValue+1;
     }
-
+    @SuppressWarnings({"unused", "StaticAssignmentInConstructor"})
     private Type(String swigName, Type swigEnum) {
       this.swigName = swigName;
       this.swigValue = swigEnum.swigValue;

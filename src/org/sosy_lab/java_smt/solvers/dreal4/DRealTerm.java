@@ -43,9 +43,9 @@ public class DRealTerm<Term, Kind> {
   private final Kind declaration;
 
   // Type of the Variable, Expression or Formula
-  private final Type type;
+  private final Variable.Type type;
 
-  public DRealTerm(Term pTerm, Type pType, Kind pKind) {
+  public DRealTerm(Term pTerm, Variable.Type pType, Kind pKind) {
     this.term = pTerm;
     this.type = pType;
     this.declaration = pKind;
@@ -87,7 +87,7 @@ public class DRealTerm<Term, Kind> {
     }
   }
 
-  public Type getType() {
+  public Variable.Type getType() {
     return type;
   }
 
@@ -120,6 +120,10 @@ public class DRealTerm<Term, Kind> {
       Formula formula = (Formula) term;
       return formula.to_string();
     }
+  }
+
+  public Kind getKind() {
+    return declaration;
   }
 
 }

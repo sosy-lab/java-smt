@@ -53,7 +53,7 @@ public class VariableVector extends java.util.AbstractList<Variable> implements 
   }
 
   @SuppressWarnings("deprecation")
-  protected void finalize() {
+  protected void finalize1() {
     delete();
   }
 
@@ -83,35 +83,36 @@ public class VariableVector extends java.util.AbstractList<Variable> implements 
     }
   }
 
+  @Override
   public Variable get(int index) {
     return doGet(index);
   }
-
+  @Override
   public Variable set(int index, Variable e) {
     return doSet(index, e);
   }
-
+  @Override
   public boolean add(Variable e) {
     modCount++;
     doAdd(e);
     return true;
   }
-
+  @Override
   public void add(int index, Variable e) {
     modCount++;
     doAdd(index, e);
   }
-
+  @Override
   public Variable remove(int index) {
     modCount++;
     return doRemove(index);
   }
-
+  @Override
   protected void removeRange(int fromIndex, int toIndex) {
     modCount++;
     doRemoveRange(fromIndex, toIndex);
   }
-
+  @Override
   public int size() {
     return doSize();
   }
@@ -131,11 +132,11 @@ public class VariableVector extends java.util.AbstractList<Variable> implements 
   public void reserve(long n) {
     drealJNI.VariableVector_reserve(swigCPtr, this, n);
   }
-
+  @Override
   public boolean isEmpty() {
     return drealJNI.VariableVector_isEmpty(swigCPtr, this);
   }
-
+  @Override
   public void clear() {
     drealJNI.VariableVector_clear(swigCPtr, this);
   }

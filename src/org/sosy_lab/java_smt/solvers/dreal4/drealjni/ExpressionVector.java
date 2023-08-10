@@ -53,7 +53,7 @@ public class ExpressionVector extends java.util.AbstractList<Expression> impleme
   }
 
   @SuppressWarnings("deprecation")
-  protected void finalize() {
+  protected void finalize1() {
     delete();
   }
 
@@ -83,35 +83,36 @@ public class ExpressionVector extends java.util.AbstractList<Expression> impleme
     }
   }
 
+  @Override
   public Expression get(int index) {
     return doGet(index);
   }
-
+  @Override
   public Expression set(int index, Expression e) {
     return doSet(index, e);
   }
-
+  @Override
   public boolean add(Expression e) {
     modCount++;
     doAdd(e);
     return true;
   }
-
+  @Override
   public void add(int index, Expression e) {
     modCount++;
     doAdd(index, e);
   }
-
+  @Override
   public Expression remove(int index) {
     modCount++;
     return doRemove(index);
   }
-
+  @Override
   protected void removeRange(int fromIndex, int toIndex) {
     modCount++;
     doRemoveRange(fromIndex, toIndex);
   }
-
+  @Override
   public int size() {
     return doSize();
   }
@@ -131,11 +132,11 @@ public class ExpressionVector extends java.util.AbstractList<Expression> impleme
   public void reserve(long n) {
     drealJNI.ExpressionVector_reserve(swigCPtr, this, n);
   }
-
+  @Override
   public boolean isEmpty() {
     return drealJNI.ExpressionVector_isEmpty(swigCPtr, this);
   }
-
+  @Override
   public void clear() {
     drealJNI.ExpressionVector_clear(swigCPtr, this);
   }

@@ -53,8 +53,7 @@ public class DoubleIntPair {
     return ptr;
   }
 
-  @SuppressWarnings("deprecation")
-  protected void finalize() {
+  protected void finalize1() {
     delete();
   }
 

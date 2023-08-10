@@ -33,7 +33,7 @@ public class VariableSet extends java.util.AbstractSet<Variable> {
   }
 
   @SuppressWarnings("deprecation")
-  protected void finalize() {
+  protected void finalize1() {
     delete();
   }
 
@@ -51,15 +51,17 @@ public class VariableSet extends java.util.AbstractSet<Variable> {
     this();
     addAll(collection);
   }
-
+  @Override
   public int size() {
     return sizeImpl();
   }
 
+  @Override
   public boolean add(Variable key) {
     return addImpl(key);
   }
 
+  @Override
   public boolean addAll(java.util.Collection<? extends Variable> collection) {
     boolean didAddElement = false;
     for (java.lang.Object object : collection) {
@@ -68,7 +70,7 @@ public class VariableSet extends java.util.AbstractSet<Variable> {
 
     return didAddElement;
   }
-
+  @Override
   public java.util.Iterator<Variable> iterator() {
     return new java.util.Iterator<Variable>() {
       private Iterator curr;
@@ -79,7 +81,7 @@ public class VariableSet extends java.util.AbstractSet<Variable> {
         end = VariableSet.this.end();
         return this;
       }
-
+      @Override
       public Variable next() {
         if (!hasNext()) {
           throw new java.util.NoSuchElementException();
@@ -91,17 +93,17 @@ public class VariableSet extends java.util.AbstractSet<Variable> {
         curr.incrementUnchecked();
         return currValue;
       }
-
+      @Override
       public boolean hasNext() {
         return curr.isNot(end);
       }
-
+      @Override
       public void remove() {
         throw new java.lang.UnsupportedOperationException();
       }
     }.init();
   }
-
+  @Override
   public boolean containsAll(java.util.Collection<?> collection) {
     for (java.lang.Object object : collection) {
       if (!contains(object)) {
@@ -111,7 +113,7 @@ public class VariableSet extends java.util.AbstractSet<Variable> {
 
     return true;
   }
-
+  @Override
   public boolean contains(java.lang.Object object) {
     if (!(object instanceof Variable)) {
       return false;
@@ -119,7 +121,7 @@ public class VariableSet extends java.util.AbstractSet<Variable> {
 
     return containsImpl((Variable)object);
   }
-
+  @Override
   public boolean removeAll(java.util.Collection<?> collection) {
     boolean didRemoveElement = false;
     for (java.lang.Object object : collection) {
@@ -128,7 +130,7 @@ public class VariableSet extends java.util.AbstractSet<Variable> {
 
     return didRemoveElement;
   }
-
+  @Override
   public boolean remove(java.lang.Object object) {
     if (!(object instanceof Variable)) {
       return false;
@@ -163,7 +165,7 @@ public class VariableSet extends java.util.AbstractSet<Variable> {
     }
   
     @SuppressWarnings("deprecation")
-    protected void finalize() {
+    protected void finalize1() {
       delete();
     }
   
@@ -198,11 +200,11 @@ public class VariableSet extends java.util.AbstractSet<Variable> {
   public VariableSet(VariableSet other) {
     this(drealJNI.new_VariableSet__SWIG_1(VariableSet.getCPtr(other), other), true);
   }
-
+  @Override
   public boolean isEmpty() {
     return drealJNI.VariableSet_isEmpty(swigCPtr, this);
   }
-
+  @Override
   public void clear() {
     drealJNI.VariableSet_clear(swigCPtr, this);
   }
@@ -231,6 +233,7 @@ public class VariableSet extends java.util.AbstractSet<Variable> {
     return drealJNI.VariableSet_sizeImpl(swigCPtr, this);
   }
 
+  @SuppressWarnings("unused")
   private boolean hasNextImpl(VariableSet.Iterator itr) {
     return drealJNI.VariableSet_hasNextImpl(swigCPtr, this, VariableSet.Iterator.getCPtr(itr), itr);
   }

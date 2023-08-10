@@ -54,7 +54,7 @@ public class Config {
   }
 
   @SuppressWarnings("deprecation")
-  protected void finalize() {
+  protected void finalize1() {
     delete();
   }
 
@@ -254,7 +254,7 @@ public class Config {
   }
 
   public long random_seed() {
-    return (drealJNI.Config_random_seed(swigCPtr, this));
+    return drealJNI.Config_random_seed(swigCPtr, this);
   }
 
   public OptionValueUnsignedInt mutable_random_seed() {
@@ -309,7 +309,7 @@ public class Config {
     public final int swigValue() {
       return swigValue;
     }
-
+    @Override
     public String toString() {
       return swigName;
     }
@@ -323,17 +323,19 @@ public class Config {
       throw new IllegalArgumentException("No enum " + SatDefaultPhase.class + " with value " + swigValue);
     }
 
+    @SuppressWarnings("unused")
     private SatDefaultPhase(String swigName) {
       this.swigName = swigName;
       this.swigValue = swigNext++;
     }
-
+    @SuppressWarnings("StaticAssignmentInConstructor")
     private SatDefaultPhase(String swigName, int swigValue) {
       this.swigName = swigName;
       this.swigValue = swigValue;
       swigNext = swigValue+1;
     }
 
+    @SuppressWarnings({"unused", "StaticAssignmentInConstructor"})
     private SatDefaultPhase(String swigName, SatDefaultPhase swigEnum) {
       this.swigName = swigName;
       this.swigValue = swigEnum.swigValue;
@@ -341,6 +343,7 @@ public class Config {
     }
 
     private static SatDefaultPhase[] swigValues = { False, True, JeroslowWang, RandomInitialPhase };
+    @SuppressWarnings("unused")
     private static int swigNext = 0;
     private final int swigValue;
     private final String swigName;

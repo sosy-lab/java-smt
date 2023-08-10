@@ -55,7 +55,7 @@ public class ExpressionDoubleMap extends java.util.AbstractMap<Expression, Doubl
   }
 
   @SuppressWarnings("deprecation")
-  protected void finalize() {
+  protected void finalize1() {
     delete();
   }
 
@@ -69,11 +69,11 @@ public class ExpressionDoubleMap extends java.util.AbstractMap<Expression, Doubl
     }
   }
 
-
+  @Override
   public int size() {
     return sizeImpl();
   }
-
+  @Override
   public boolean containsKey(java.lang.Object key) {
     if (!(key instanceof Expression)) {
       return false;
@@ -81,7 +81,7 @@ public class ExpressionDoubleMap extends java.util.AbstractMap<Expression, Doubl
 
     return containsImpl((Expression)key);
   }
-
+  @Override
   public Double get(java.lang.Object key) {
     if (!(key instanceof Expression)) {
       return null;
@@ -95,8 +95,9 @@ public class ExpressionDoubleMap extends java.util.AbstractMap<Expression, Doubl
     return null;
   }
 
+  @Override
   public Double put(Expression key, Double value) {
-    Iterator itr = find((Expression) key);
+    Iterator itr = find(key);
     if (itr.isNot(end())) {
       Double oldValue = itr.getValue();
       itr.setValue(value);
@@ -107,6 +108,7 @@ public class ExpressionDoubleMap extends java.util.AbstractMap<Expression, Doubl
     }
   }
 
+  @Override
   public Double remove(java.lang.Object key) {
     if (!(key instanceof Expression)) {
       return null;
@@ -122,6 +124,7 @@ public class ExpressionDoubleMap extends java.util.AbstractMap<Expression, Doubl
     }
   }
 
+  @Override
   public java.util.Set<Entry<Expression, Double>> entrySet() {
     java.util.Set<Entry<Expression, Double>> setToReturn =
         new java.util.HashSet<Entry<Expression, Double>>();
@@ -136,15 +139,15 @@ public class ExpressionDoubleMap extends java.util.AbstractMap<Expression, Doubl
           this.iterator = iterator;
           return this;
         }
-
+        @Override
         public Expression getKey() {
           return iterator.getKey();
         }
-
+        @Override
         public Double getValue() {
           return iterator.getValue();
         }
-
+        @Override
         public Double setValue(Double newValue) {
           Double oldValue = iterator.getValue();
           iterator.setValue(newValue);
@@ -191,7 +194,7 @@ public class ExpressionDoubleMap extends java.util.AbstractMap<Expression, Doubl
     }
   
     @SuppressWarnings("deprecation")
-    protected void finalize() {
+    protected void finalize1() {
       delete();
     }
   
@@ -212,7 +215,7 @@ public class ExpressionDoubleMap extends java.util.AbstractMap<Expression, Doubl
     private boolean isNot(ExpressionDoubleMap.Iterator other) {
       return drealJNI.ExpressionDoubleMap_Iterator_isNot(swigCPtr, this, ExpressionDoubleMap.Iterator.getCPtr(other), other);
     }
-  
+
     private Expression getKey() {
       return new Expression(drealJNI.ExpressionDoubleMap_Iterator_getKey(swigCPtr, this), true);
     }
@@ -226,11 +229,11 @@ public class ExpressionDoubleMap extends java.util.AbstractMap<Expression, Doubl
     }
   
   }
-
+  @Override
   public boolean isEmpty() {
     return drealJNI.ExpressionDoubleMap_isEmpty(swigCPtr, this);
   }
-
+  @Override
   public void clear() {
     drealJNI.ExpressionDoubleMap_clear(swigCPtr, this);
   }

@@ -59,6 +59,7 @@ public final class ExpressionKind {
     return swigValue;
   }
 
+  @Override
   public String toString() {
     return swigName;
   }
@@ -77,12 +78,13 @@ public final class ExpressionKind {
     this.swigValue = swigNext++;
   }
 
+  @SuppressWarnings({"unused", "StaticAssignmentInConstructor"})
   private ExpressionKind(String swigName, int swigValue) {
     this.swigName = swigName;
     this.swigValue = swigValue;
     swigNext = swigValue+1;
   }
-
+  @SuppressWarnings({"unused", "StaticAssignmentInConstructor"})
   private ExpressionKind(String swigName, ExpressionKind swigEnum) {
     this.swigName = swigName;
     this.swigValue = swigEnum.swigValue;

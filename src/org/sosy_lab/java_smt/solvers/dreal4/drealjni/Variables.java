@@ -27,7 +27,7 @@
  * ----------------------------------------------------------------------------- */
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
-
+@SuppressWarnings("unused")
 public class Variables {
   private transient long swigCPtr;
   protected transient boolean swigCMemOwn;
@@ -54,7 +54,7 @@ public class Variables {
   }
 
   @SuppressWarnings("deprecation")
-  protected void finalize() {
+  protected void finalize1() {
     delete();
   }
 
@@ -96,7 +96,7 @@ public class Variables {
   }
 
   public long size() {
-    return (drealJNI.Variables_size(swigCPtr, this));
+    return drealJNI.Variables_size(swigCPtr, this);
   }
 
   public boolean empty() {
@@ -148,11 +148,11 @@ public class Variables {
   }
 
   public long erase(Variable key) {
-    return (drealJNI.Variables_erase__SWIG_0(swigCPtr, this, Variable.getCPtr(key), key));
+    return drealJNI.Variables_erase__SWIG_0(swigCPtr, this, Variable.getCPtr(key), key);
   }
 
   public long erase(Variables vars) {
-    return (drealJNI.Variables_erase__SWIG_1(swigCPtr, this, Variables.getCPtr(vars), vars));
+    return drealJNI.Variables_erase__SWIG_1(swigCPtr, this, Variables.getCPtr(vars), vars);
   }
 
   public SWIGTYPE_p_std__setT_dreal__drake__symbolic__Variable_t__iterator find(Variable key) {

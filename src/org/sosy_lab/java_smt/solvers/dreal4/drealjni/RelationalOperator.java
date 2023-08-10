@@ -38,7 +38,7 @@ public final class RelationalOperator {
   public final int swigValue() {
     return swigValue;
   }
-
+  @Override
   public String toString() {
     return swigName;
   }
@@ -56,13 +56,13 @@ public final class RelationalOperator {
     this.swigName = swigName;
     this.swigValue = swigNext++;
   }
-
+  @SuppressWarnings({"unused", "StaticAssignmentInConstructor"})
   private RelationalOperator(String swigName, int swigValue) {
     this.swigName = swigName;
     this.swigValue = swigValue;
     swigNext = swigValue+1;
   }
-
+  @SuppressWarnings({"unused", "StaticAssignmentInConstructor"})
   private RelationalOperator(String swigName, RelationalOperator swigEnum) {
     this.swigName = swigName;
     this.swigValue = swigEnum.swigValue;

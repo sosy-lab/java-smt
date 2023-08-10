@@ -53,7 +53,7 @@ public class FormulaVector extends java.util.AbstractList<Formula> implements ja
   }
 
   @SuppressWarnings("deprecation")
-  protected void finalize() {
+  protected void finalize1() {
     delete();
   }
 
@@ -66,7 +66,7 @@ public class FormulaVector extends java.util.AbstractList<Formula> implements ja
       swigCPtr = 0;
     }
   }
-
+  @SuppressWarnings("unused")
   public FormulaVector(Formula[] initialElements) {
     this();
     reserve(initialElements.length);
@@ -75,43 +75,43 @@ public class FormulaVector extends java.util.AbstractList<Formula> implements ja
       add(element);
     }
   }
-
+  @SuppressWarnings("unused")
   public FormulaVector(Iterable<Formula> initialElements) {
     this();
     for (Formula element : initialElements) {
       add(element);
     }
   }
-
+  @Override
   public Formula get(int index) {
     return doGet(index);
   }
-
+  @Override
   public Formula set(int index, Formula e) {
     return doSet(index, e);
   }
-
+  @Override
   public boolean add(Formula e) {
     modCount++;
     doAdd(e);
     return true;
   }
-
+  @Override
   public void add(int index, Formula e) {
     modCount++;
     doAdd(index, e);
   }
-
+  @Override
   public Formula remove(int index) {
     modCount++;
     return doRemove(index);
   }
-
+  @Override
   protected void removeRange(int fromIndex, int toIndex) {
     modCount++;
     doRemoveRange(fromIndex, toIndex);
   }
-
+  @Override
   public int size() {
     return doSize();
   }
@@ -131,11 +131,11 @@ public class FormulaVector extends java.util.AbstractList<Formula> implements ja
   public void reserve(long n) {
     drealJNI.FormulaVector_reserve(swigCPtr, this, n);
   }
-
+  @Override
   public boolean isEmpty() {
     return drealJNI.FormulaVector_isEmpty(swigCPtr, this);
   }
-
+  @Override
   public void clear() {
     drealJNI.FormulaVector_clear(swigCPtr, this);
   }

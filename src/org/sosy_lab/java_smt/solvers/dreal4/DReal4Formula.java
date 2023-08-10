@@ -27,7 +27,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.FormulaKind;
 
 abstract class DReal4Formula implements Formula {
-
+  @SuppressWarnings("Immutable")
   private final DRealTerm<?, ?> term;
 
   DReal4Formula(DRealTerm<?, ?> pTerm) {

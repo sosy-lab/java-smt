@@ -53,7 +53,7 @@ public class SharedPointerToUnorderedMapWithHashValue {
   }
 
   @SuppressWarnings("deprecation")
-  protected void finalize() {
+  protected void finalize1() {
     delete();
   }
 
@@ -66,7 +66,7 @@ public class SharedPointerToUnorderedMapWithHashValue {
       swigCPtr = 0;
     }
   }
-
+  @SuppressWarnings("unused")
   public SharedPointerToUnorderedMapWithHashValue() {
     this(drealJNI.new_SharedPointerToUnorderedMapWithHashValue(), true);
   }

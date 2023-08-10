@@ -24,6 +24,7 @@ package org.sosy_lab.java_smt.solvers.dreal4;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable.Type;
 
 
@@ -36,7 +37,7 @@ public class DReal4RationalFormulaManager
   }
 
   @Override
-  protected Type getNumeralType() {
+  protected Variable.Type getNumeralType() {
     return getFormulaCreator().getRationalType();
   }
 }

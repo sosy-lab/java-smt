@@ -788,7 +788,7 @@ public class dreal {
     if (result.equals("EMPTY")) {
       return "EMPTY";
     }
-    String[] bounds = result.split("; ");
+    String[] bounds = result.split("; ", -1);
     if (bounds[0].equals(bounds[1])) {
       return bounds[0];
       // Probably not needed, because it is already evaluated to True e.g. x * 1 == x is

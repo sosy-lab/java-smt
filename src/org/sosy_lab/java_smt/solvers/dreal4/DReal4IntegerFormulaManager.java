@@ -22,6 +22,7 @@ package org.sosy_lab.java_smt.solvers.dreal4;
 
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable.Type;
 
 
@@ -35,7 +36,7 @@ public class DReal4IntegerFormulaManager
   }
 
   @Override
-  protected Type getNumeralType() {
+  protected Variable.Type getNumeralType() {
     return getFormulaCreator().getIntegerType();
   }
 }

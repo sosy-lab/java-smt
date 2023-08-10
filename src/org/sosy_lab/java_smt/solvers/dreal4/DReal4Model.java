@@ -48,10 +48,12 @@ import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variables;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.dreal;
 
 
-public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Type, Context> {
+public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Variable.Type, Context> {
 
   private final Box model;
   private final DReal4FormulaCreator formulaCreator;
+
+  @SuppressWarnings("unused")
   private final DReal4TheoremProver prover;
   private final ImmutableList<DRealTerm<?, ?>> assertedFormulas;
 
@@ -80,7 +82,7 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Type, Context> {
         // When is result "EMPTY"?
         return null;
       } else {
-        if (variable.get_type() == Type.BOOLEAN) {
+        if (variable.get_type() == Variable.Type.BOOLEAN) {
           if (res > 0) {
             return new DRealTerm<>(Formula.True(), formula.getType(), FormulaKind.True);
           } else {
@@ -103,7 +105,6 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Type, Context> {
         return new DRealTerm<>(evalImpl(new DRealTerm<>(var, var.get_type(), var.get_type())),
             var.get_type(), var.get_type());
       } else {
-        HashMap<Variable, Double> result = new HashMap<>();
         VariableSet expSet = exp.getVariables();
         for (Variable var : expSet) {
           // if we find a variable that is not in the model, abort
@@ -112,7 +113,7 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Type, Context> {
           }
           Double res = extractResultsVariable(var);
           // TODO: can expression have a variable of boolean type?
-          Preconditions.checkState(formula.getType() != Type.BOOLEAN);
+          Preconditions.checkState(formula.getType() != Variable.Type.BOOLEAN);
           exp = substituteExpWithResult(exp, var, res);
           if (exp == null) {
             return null;
@@ -180,7 +181,7 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Type, Context> {
       // When is result "EMPTY"?
       return null;
     } else {
-      if (var.get_type() == Type.BOOLEAN) {
+      if (var.get_type() == Variable.Type.BOOLEAN) {
         if (res > 0) {
           f = f.Substitute(var, Formula.True());
         } else {
@@ -194,22 +195,11 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Type, Context> {
   }
 
   /**
-   * This function extracts the results of a formula. The function iterates through the model
-   * (Box) and gets the variable and calls getResult to get the value associated with the variable
-   * @return HashMap with variable as key and result as Double as value
+   * This function extracts the results of a formula. The function takes the variable and calls
+   * getResult to get the value associated with the variable from the box.
+   * @param var Variable to get the result from
+   * @return Double as result
    */
-  private HashMap<Variable, Double> extractResults() {
-    HashMap<Variable, Double> result = new HashMap<>();
-    Variable var;
-    String res;
-    for (int i = 0; i < model.size(); i++) {
-      var = model.variable(i);
-      res = dreal.getResult(model, var);
-      result.put(var, parseResult(res));
-    }
-    return result;
-  }
-
   private Double extractResultsVariable(Variable var) {
     return parseResult(dreal.getResult(model, var));
   }
@@ -219,10 +209,10 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Type, Context> {
       return Double.NaN;
     } else if (string.equals("ENTIRE")) {
       // probably unnecassary, and what should I return?
-      return new Double(1);
+      return Double.valueOf(1);
     } else {
-      String[] numbers = string.split(",");
-      return new Double(numbers[0] + "." + numbers[1]);
+      String[] numbers = string.split(",", -1);
+      return Double.valueOf(numbers[0] + "." + numbers[1]);
 
     }
   }
@@ -313,7 +303,7 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Type, Context> {
           || fKind == FormulaKind.Neq) {
         Expression leftChild = dreal.get_lhs_expression(term.getFormula());
         Expression rightChild = dreal.get_rhs_expression(term.getFormula());
-        Type type;
+        Variable.Type type;
         type = DReal4FormulaCreator.getTypeForExpressions(leftChild);
         // if type is null, we did not find a variable in left child, we can ignore the formula,
         // else both child could have variable
@@ -354,12 +344,12 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Type, Context> {
       equation =
           creator.encapsulateBoolean(new DRealTerm<>(
               new Formula(dreal.Equal(new Expression(term.getVariable()),
-                  valueTerm.getExpression())), Type.BOOLEAN, FormulaKind.Eq));
+                  valueTerm.getExpression())), Variable.Type.BOOLEAN, FormulaKind.Eq));
     } else if (valueTerm.isFormula()) {
       equation =
           creator.encapsulateBoolean(new DRealTerm<>(
               new Formula(dreal.Equal(term.getVariable(),
-                  valueTerm.getFormula())), Type.BOOLEAN, FormulaKind.Eq));
+                  valueTerm.getFormula())), Variable.Type.BOOLEAN, FormulaKind.Eq));
     } else {
       throw new UnsupportedOperationException("Trying to get an Assignment from an Expression " + term.to_string() + " .");
     }
