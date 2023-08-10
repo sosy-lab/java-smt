@@ -39,8 +39,10 @@ import org.sosy_lab.java_smt.basicimpl.AbstractSLFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractUFManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulas;
 
-public class ApronFormulaManager extends AbstractFormulaManager <Long, Long, Environment, Long>{
+public class ApronFormulaManager extends AbstractFormulaManager <ApronFormulas, ApronFormulaType,Environment,Long>{
   /**
    * Builds a solver from the given theory implementations.
    *
@@ -70,14 +72,17 @@ public class ApronFormulaManager extends AbstractFormulaManager <Long, Long, Env
       @Nullable AbstractSLFormulaManager slManager,
       @Nullable AbstractStringFormulaManager strManager,
       @Nullable AbstractEnumerationFormulaManager enumManager) {
-    super(pFormulaCreator, functionManager, booleanManager, pIntegerFormulaManager,
-        pRationalFormulaManager,
-        bitvectorManager, floatingPointManager, quantifiedManager, arrayManager, slManager,
-        strManager, enumManager);
+    super(pFormulaCreator,functionManager,booleanManager,pIntegerFormulaManager,
+        pRationalFormulaManager,null,null,null,null,null,null,null);
   }
 
   @Override
   public BooleanFormula parse(String s) throws IllegalArgumentException {
+    return null;
+  }
+
+  @Override
+  public Appender dumpFormula(ApronFormulas t) {
     return null;
   }
 
@@ -87,8 +92,4 @@ public class ApronFormulaManager extends AbstractFormulaManager <Long, Long, Env
     return null;
   }
 
-  @Override
-  public Appender dumpFormula(Long t) {
-    return null;
-  }
 }
