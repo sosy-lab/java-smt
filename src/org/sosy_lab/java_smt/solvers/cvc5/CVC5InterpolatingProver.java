@@ -295,16 +295,16 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
    * Turns a List of Collections of Formulas to a Single Conjunction of the Formulas e.g.:
    * [[A,B],[C]] -> A/\B/\C.
    *
-   * @param setFormulasCollection List of Collections of formulas
+   * @param setOfFormulasToConcat List of Collections of formulas
    * @param usingSolver the CVC5 Solver Instance to use
    * @return concatenated Formulas with AND as CVC5 Term
    */
   private Term buildConjunctionOfFormulasOverList(
-      Set<Collection<Term>> setFormulasCollection,
+      Set<Collection<Term>> setOfFormulasToConcat,
       Solver usingSolver) {
     Term concatTerm =
         buildConjunctionOfFormulas(
-            FluentIterable.concat(setFormulasCollection).toSet(),
+            FluentIterable.concat(setOfFormulasToConcat).toSet(),
             usingSolver);
 
     return concatTerm;
