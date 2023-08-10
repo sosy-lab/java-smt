@@ -20,16 +20,14 @@
 
 package org.sosy_lab.java_smt.solvers.apron;
 
-import apron.Environment;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.ApronIntegerType;
-import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.Type;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.FormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulas;
 
 public class ApronIntegerFormulaManager extends ApronNumeralFormulaManager<IntegerFormula,IntegerFormula> implements
@@ -45,8 +43,8 @@ public class ApronIntegerFormulaManager extends ApronNumeralFormulaManager<Integ
   }
 
   @Override
-  protected Type getNumeralType() {
-    return Type.INTEGER;
+  protected FormulaType getNumeralType() {
+    return FormulaType.INTEGER;
   }
 
   protected ApronFormulas makeNumberImpl(double pNumber) {

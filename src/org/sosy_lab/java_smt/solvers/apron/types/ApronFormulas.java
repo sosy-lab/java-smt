@@ -21,13 +21,22 @@
 package org.sosy_lab.java_smt.solvers.apron.types;
 
 import apron.Coeff;
+import apron.Environment;
 import apron.Linexpr1;
 import apron.Linterm1;
+import apron.MpqScalar;
+import apron.Scalar;
+import apron.Var;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.FormulaType;
+
+/**
+ * Wrapper-class for Apron Numerical Types;
+ */
 
 public interface ApronFormulas extends Formula {
 
-  enum ApronFormulaType {
+  enum FormulaCategory {
     VAR,
     COEFF,
     TERM,
@@ -35,60 +44,189 @@ public interface ApronFormulas extends Formula {
     CONSTRAINT
   }
 
-  ApronFormulaType getFormulaType();
+  FormulaCategory getFormulaType();
+  FormulaType getType();
 
-  class ApronVar implements ApronFormulas {
+  class ApronVar implements ApronFormulas,Var {
 
-    public ApronVar(){}
+    private FormulaType type;
+    private String varName;
+    private Var apronVar;
+
+    public ApronVar(String pVarName, FormulaType pType){
+      this.type = pType;
+      this.varName = pVarName;
+    }
     @Override
-    public ApronFormulaType getFormulaType() {
-      return ApronFormulaType.VAR;
+    public FormulaCategory getFormulaType() {
+      return FormulaCategory.VAR;
+    }
+
+    public String getVarName() {
+      return varName;
+    }
+
+    @Override
+    public FormulaType getType() {
+      return type;
+    }
+
+    @Override
+    public Var clone() {
+      return null;
+    }
+
+    @Override
+    public int compareTo(Var var) {
+      ApronVar apronVar1 = (ApronVar) var;
+      if (apronVar1.getVarName().equals(this.varName)){
+        return 1;
+      }
+      return 0;
     }
   }
 
   class ApronCoeff implements ApronFormulas {
 
-    public ApronCoeff(){}
-    @Override
-    public ApronFormulaType getFormulaType() {
-      return ApronFormulaType.COEFF;
+    private Coeff apronCoeff;
+    private int value;
+    private FormulaType type;
+
+    public ApronCoeff(int pValue, FormulaType pType){
+      this.apronCoeff = new MpqScalar(pValue);
+      this.type = pType;
+      this.value = pValue;
     }
+    @Override
+    public FormulaCategory getFormulaType() {
+      return FormulaCategory.COEFF;
+    }
+
+    public int getValue() {
+      return value;
+    }
+
+    public void setValue(int pValue) {
+      value = pValue;
+      this.apronCoeff = new MpqScalar(pValue);
+    }
+
+    @Override
+    public FormulaType getType() {
+      return type;
+    }
+
+    private Coeff getApronCoeff(){
+      return apronCoeff;
+    }
+
+    public void negate(){
+      this.value = (-1)*value;
+      this.apronCoeff = new MpqScalar(value);
+    }
+
   }
 
   class ApronTerm implements ApronFormulas {
     private Linterm1 linterm1;
+    private FormulaType type;
 
-    public ApronTerm(String pVar,Coeff pCoeff){
-      this.linterm1 = new Linterm1(pVar,pCoeff);
+    private ApronVar apronVar;
+    private ApronCoeff apronCoeff;
+
+    public ApronTerm(String pVar,ApronCoeff pCoeff, FormulaType pType){
+      this.linterm1 = new Linterm1(pVar,new MpqScalar(pCoeff.getValue()));
+      this.type = pType;
+      this.apronVar = new ApronVar(pVar,pType);
+      this.apronCoeff = pCoeff;
     }
 
     @Override
-    public ApronFormulaType getFormulaType() {
-      return ApronFormulaType.TERM;
+    public FormulaCategory getFormulaType() {
+      return FormulaCategory.TERM;
+    }
+
+    @Override
+    public FormulaType getType() {
+      return type;
+    }
+
+    private Linterm1 getApronTerm(){
+      return linterm1;
+    }
+
+    public ApronVar getApronVar() {
+      return apronVar;
+    }
+
+    public ApronCoeff getApronCoeff() {
+      return apronCoeff;
     }
   }
 
   class ApronExpr implements ApronFormulas {
     private Linexpr1 linexpr1;
+    private FormulaType type;
+    private ApronTerm[] apronTerms;
 
-    public ApronExpr(){
+    private int cstValue;
 
+    public ApronExpr(ApronTerm[] pApronTerms,int pCstValue,
+                     Environment pEnvironment,
+                     FormulaType pType){
+      Linterm1[] terms = new Linterm1[pApronTerms.length];
+      for(int i =0;i<pApronTerms.length;i++){
+        Linterm1 term = new Linterm1(apronTerms[i].getApronVar().getVarName(),
+            apronTerms[i].getApronCoeff().getApronCoeff());
+      }
+      this.linexpr1 = new Linexpr1(pEnvironment,terms,new MpqScalar(pCstValue));
+      this.type = pType;
+      this.cstValue = pCstValue;
+      this.apronTerms = pApronTerms;
     }
 
     @Override
-    public ApronFormulaType getFormulaType() {
-      return ApronFormulaType.EXPRESSION;
+    public FormulaCategory getFormulaType() {
+      return FormulaCategory.EXPRESSION;
+    }
+
+    @Override
+    public FormulaType getType() {
+      return type;
+    }
+
+    private Linexpr1 getApronExpression(){
+      return this.linexpr1;
+    }
+
+    public int getCstValue() {
+      return cstValue;
+    }
+
+    public void setCstValue(int pCstValue) {
+      cstValue = pCstValue;
+      this.linexpr1.setCst(new MpqScalar(pCstValue));
+    }
+
+    public ApronTerm[] getApronTerms() {
+      return apronTerms;
     }
   }
 
   class ApronCons implements ApronFormulas {
+    private FormulaType type = FormulaType.BOOLEAN;
     public ApronCons(){
 
     }
 
     @Override
-    public ApronFormulaType getFormulaType() {
-      return ApronFormulaType.CONSTRAINT;
+    public FormulaCategory getFormulaType() {
+      return FormulaCategory.CONSTRAINT;
+    }
+
+    @Override
+    public FormulaType getType() {
+      return type;
     }
   }
 }

@@ -20,15 +20,13 @@
 
 package org.sosy_lab.java_smt.solvers.apron;
 
-import apron.Environment;
 import java.math.BigDecimal;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
-import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.ApronRationalType;
-import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.Type;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.FormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulas;
 
 public class ApronRationalFormulaManager extends
@@ -45,8 +43,8 @@ public class ApronRationalFormulaManager extends
     this.formulaCreator = pFormulaCreator;
   }
   @Override
-  protected Type getNumeralType() {
-    return Type.RATIONAL;
+  protected FormulaType getNumeralType() {
+    return FormulaType.RATIONAL;
   }
 
   @Override

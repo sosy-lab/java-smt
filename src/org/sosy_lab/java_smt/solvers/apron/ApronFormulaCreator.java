@@ -25,17 +25,17 @@ import com.google.common.base.Preconditions;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
-import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.Type;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.FormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulas;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.ApronBooleanType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.ApronIntegerType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.ApronRationalType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulas.ApronVar;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulas.FormulaCategory;
 
 public class ApronFormulaCreator extends FormulaCreator<ApronFormulas, ApronFormulaType,Environment,Long> {
 
@@ -75,36 +75,22 @@ public class ApronFormulaCreator extends FormulaCreator<ApronFormulas, ApronForm
   public ApronFormulas makeVariable(ApronFormulaType pApronFormulaType, String varName) {
     Preconditions.checkArgument(!environment.hasVar(varName),"Variablename already exists!");
     Preconditions.checkArgument(
-        (pApronFormulaType.getType().equals(Type.INTEGER) || pApronFormulaType.getType().equals(Type.RATIONAL)),
+        (pApronFormulaType.getType().equals(FormulaType.INTEGER) || pApronFormulaType.getType().equals(
+            FormulaType.RATIONAL)),
         "Only Integer or rational variables allowed1");
-      if(pApronFormulaType.getType().equals(Type.INTEGER)){
+      if(pApronFormulaType.getType().equals(FormulaType.INTEGER)){
         String[] intvars = new String[]{varName};
         this.environment.add(intvars,new String[]{});
-        return new ApronVar();
+        return new ApronVar(varName,FormulaType.INTEGER);
       }else {
         String[] realvars = new String[]{varName};
         this.environment.add(new String[]{}, realvars);
-        return new ApronVar();
+        return new ApronVar(varName,FormulaType.RATIONAL);
       }
   }
 
   @Override
-  public FormulaType<ApronFormulas> getFormulaType(ApronFormulas formula) {
-    //TODO
-    switch (formula.getFormulaType()){
-      case VAR:
-        //...
-      case TERM:
-        //...
-      case COEFF:
-        //...
-      case CONSTRAINT:
-        //...
-      case EXPRESSION:
-        //...
-      default:
-        //....
-    }
+  public org.sosy_lab.java_smt.api.FormulaType<ApronFormulas> getFormulaType(ApronFormulas formula) {
     return null;
   }
 
@@ -116,13 +102,13 @@ public class ApronFormulaCreator extends FormulaCreator<ApronFormulas, ApronForm
   }
 
   @Override
-  public ApronFormulas callFunctionImpl(Long declaration, List<ApronFormulas> args) { // nicht
-    // supported
+  public ApronFormulas callFunctionImpl(Long declaration, List<ApronFormulas> args) {
+    // not supported
     return null;
   }
 
   @Override
-  public Long declareUFImpl( //nicht supported
+  public Long declareUFImpl( //not supported
       String pName,
       ApronFormulaType pReturnType,
       List<ApronFormulaType> pArgTypes) {
