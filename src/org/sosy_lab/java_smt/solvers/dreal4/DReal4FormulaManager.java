@@ -33,8 +33,8 @@ import org.sosy_lab.java_smt.solvers.dreal4.drealjni.FormulaKind;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable.Type;
 
-public class DReal4FormulaManager extends AbstractFormulaManager<DRealTerm<?, ?>, Variable.Type, Context,
-    DRealTerm<?, ?>> {
+public class DReal4FormulaManager extends AbstractFormulaManager<DRealTerm<?>, Variable.Type, Context,
+    DRealTerm<?>> {
 
   DReal4FormulaManager(DReal4FormulaCreator pFormulaCreator, DReal4UFManager pFunctionManager,
                        DReal4BooleanFormulaManager pBooleanManager,
@@ -56,7 +56,7 @@ public class DReal4FormulaManager extends AbstractFormulaManager<DRealTerm<?, ?>
         null);
   }
 
-  static DRealTerm<?, ?> getDReal4Formula(org.sosy_lab.java_smt.api.Formula pT) {
+  static DRealTerm<?> getDReal4Formula(org.sosy_lab.java_smt.api.Formula pT) {
     if (pT instanceof DReal4Formula) {
       return ((DReal4Formula) pT).getTerm();
     }
@@ -66,33 +66,33 @@ public class DReal4FormulaManager extends AbstractFormulaManager<DRealTerm<?, ?>
 
   @Override
   public BooleanFormula parse(String s) throws IllegalArgumentException {
-    return null;
+    throw new UnsupportedOperationException("dReal does not support parsing.");
   }
 
   @Override
-  public Appender dumpFormula(DRealTerm<?, ?> t) {
-    return null;
+  public Appender dumpFormula(DRealTerm<?> t) {
+    throw new UnsupportedOperationException("dReal does not support dumping.");
   }
 
   //TODO: in dReal only Variables can be substituted, but not a formula
   @Override
   public <T extends Formula> T substitute(
       final T pF, final Map<? extends Formula, ? extends Formula> pFromToMapping) {
-    DRealTerm<?, ?>[] changeFrom = new DRealTerm<?, ?>[pFromToMapping.size()];
-    DRealTerm<?, ?>[] changeTo = new DRealTerm<?, ?>[pFromToMapping.size()];
+    DRealTerm<?>[] changeFrom = new DRealTerm<?>[pFromToMapping.size()];
+    DRealTerm<?>[] changeTo = new DRealTerm<?>[pFromToMapping.size()];
     int idx = 0;
     for (Map.Entry<? extends Formula, ? extends Formula> e : pFromToMapping.entrySet()) {
       changeFrom[idx] = extractInfo(e.getKey());
       changeTo[idx] = extractInfo(e.getValue());
       idx++;
     }
-    DRealTerm<?, ?> f = extractInfo(pF);
+    DRealTerm<?> f = extractInfo(pF);
     // Expected is a formula
     Preconditions.checkState(f.isFormula());
     org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula formula = f.getFormula();
     for (int i = 0; i < changeFrom.length; i++) {
-      DRealTerm<?, ?> changeFromTerm = changeFrom[i];
-      DRealTerm<?, ?> changeToTerm = changeTo[i];
+      DRealTerm<?> changeFromTerm = changeFrom[i];
+      DRealTerm<?> changeToTerm = changeTo[i];
       // Only Variables can be substituted
       Preconditions.checkState(changeFromTerm.isVar());
       if (changeToTerm.isVar()) {
@@ -110,8 +110,7 @@ public class DReal4FormulaManager extends AbstractFormulaManager<DRealTerm<?, ?>
       }
     }
     FormulaType<T> type = getFormulaType(pF);
-    return getFormulaCreator().encapsulate(type, new DRealTerm<>(formula, f.getType(),
-        formula.get_kind()));
+    return getFormulaCreator().encapsulate(type, new DRealTerm<>(formula, f.getType()));
   }
 
 }

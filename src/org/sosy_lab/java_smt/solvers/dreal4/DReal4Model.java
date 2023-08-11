@@ -48,17 +48,17 @@ import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variables;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.dreal;
 
 
-public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Variable.Type, Context> {
+public class DReal4Model extends AbstractModel<DRealTerm<?>, Variable.Type, Context> {
 
   private final Box model;
   private final DReal4FormulaCreator formulaCreator;
 
   @SuppressWarnings("unused")
   private final DReal4TheoremProver prover;
-  private final ImmutableList<DRealTerm<?, ?>> assertedFormulas;
+  private final ImmutableList<DRealTerm<?>> assertedFormulas;
 
   DReal4Model(DReal4TheoremProver prover, DReal4FormulaCreator pCreator, Box model,
-              Collection<DRealTerm<?, ?>> pAssertedFormulas) {
+              Collection<DRealTerm<?>> pAssertedFormulas) {
     super(prover, pCreator);
     // create a copy of the model, because the model changes, if the context is used somewhere
     // else, the values we get out of it might change
@@ -69,7 +69,7 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Variable.Type, C
   }
 
   @Override
-  protected @Nullable DRealTerm<?, ?> evalImpl(DRealTerm<?, ?> formula) {
+  protected @Nullable DRealTerm<?> evalImpl(DRealTerm<?> formula) {
     // this will return a constant for the result of the variable
     if (formula.isVar()) {
       Variable variable = formula.getVariable();
@@ -84,12 +84,12 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Variable.Type, C
       } else {
         if (variable.get_type() == Variable.Type.BOOLEAN) {
           if (res > 0) {
-            return new DRealTerm<>(Formula.True(), formula.getType(), FormulaKind.True);
+            return new DRealTerm<>(Formula.True(), formula.getType());
           } else {
-            return new DRealTerm<>(Formula.False(), formula.getType(), FormulaKind.False);
+            return new DRealTerm<>(Formula.False(), formula.getType());
           }
         } else {
-          return new DRealTerm<>(new Expression(res), formula.getType(), ExpressionKind.Constant);
+          return new DRealTerm<>(new Expression(res), formula.getType());
         }
       }
     } else if (formula.isExp()) {
@@ -98,12 +98,11 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Variable.Type, C
       Expression exp = formula.getExpression();
       // if expression is already a constant, just return it
       if (exp.get_kind() == ExpressionKind.Constant) {
-        return new DRealTerm<>(exp, formula.getType(), ExpressionKind.Constant);
+        return new DRealTerm<>(exp, formula.getType());
       } else if (exp.get_kind() == ExpressionKind.Var) {
         // we only get one variable back
         Variable var = dreal.get_variable(exp);
-        return new DRealTerm<>(evalImpl(new DRealTerm<>(var, var.get_type(), var.get_type())),
-            var.get_type(), var.get_type());
+        return new DRealTerm<>(evalImpl(new DRealTerm<>(var, var.get_type())), var.get_type());
       } else {
         VariableSet expSet = exp.getVariables();
         for (Variable var : expSet) {
@@ -119,19 +118,18 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Variable.Type, C
             return null;
           }
         }
-        return new DRealTerm<>(exp, formula.getType(), formula.getExpressionKind());
+        return new DRealTerm<>(exp, formula.getType());
       }
     } else {
       // this will always return a True formula
       Formula f = formula.getFormula();
       // if formula is already true or false, just return the formula
       if (f.get_kind() == FormulaKind.True || f.get_kind() == FormulaKind.False) {
-        return new DRealTerm<>(f, formula.getType(), f.get_kind());
+        return new DRealTerm<>(f, formula.getType());
       } else if (f.get_kind() == FormulaKind.Var) {
         // we only get one Variable back
         Variable var = dreal.get_variable(f);
-        return new DRealTerm<>(evalImpl(new DRealTerm<>(var, var.get_type(), var.get_type())),
-            var.get_type(), var.get_type());
+        return new DRealTerm<>(evalImpl(new DRealTerm<>(var, var.get_type())), var.get_type());
         // we can only get quantified Variables if the Formula is a forall formula. So if we have
         // a Formula like (x == 10 and forall{y}.y == y } evalImpl does not work
       } else if (f.get_kind() == FormulaKind.Forall) {
@@ -147,7 +145,7 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Variable.Type, C
             return null;
           }
         }
-        return new DRealTerm<>(f, formula.getType(), formula.getFormulaKind());
+        return new DRealTerm<>(f, formula.getType());
       } else {
         VariableSet freeVars = f.getFreeVariables();
         for (Variable var : freeVars) {
@@ -161,7 +159,7 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Variable.Type, C
             return null;
           }
         }
-        return new DRealTerm<>(f, formula.getType(), formula.getFormulaKind());
+        return new DRealTerm<>(f, formula.getType());
       }
     }
   }
@@ -223,14 +221,14 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Variable.Type, C
   @Override
   public ImmutableList<ValueAssignment> asList() {
     ImmutableSet.Builder<ValueAssignment> builder = ImmutableSet.builder();
-    for (DRealTerm<?, ?> term : assertedFormulas) {
+    for (DRealTerm<?> term : assertedFormulas) {
       recursiveAssignmentFinder(builder, term);
     }
     return builder.build().asList();
   }
 
   private void recursiveAssignmentFinder(ImmutableSet.Builder<ValueAssignment> builder,
-                                         DRealTerm<?, ?> term) {
+                                         DRealTerm<?> term) {
     if (term.isVar()) {
       builder.add(getAssignment(term));
     } else if (term.isExp()) {
@@ -239,26 +237,23 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Variable.Type, C
         return;
       } else if (expKind == ExpressionKind.Var) {
         Variable var = dreal.get_variable(term.getExpression());
-        builder.add(getAssignment(new DRealTerm<>(var, var.get_type(), var.get_type())));
+        builder.add(getAssignment(new DRealTerm<>(var, var.get_type())));
       } else if (expKind == ExpressionKind.Pow) {
         Expression lhs = dreal.get_first_argument(term.getExpression());
         recursiveAssignmentFinder(builder,
-            new DRealTerm<>(lhs, term.getType(), lhs.get_kind()));
+            new DRealTerm<>(lhs, term.getType()));
       } else if (expKind == ExpressionKind.Div) {
         Expression firstArg = dreal.get_first_argument(term.getExpression());
         Expression secondArg = dreal.get_second_argument(term.getExpression());
-        recursiveAssignmentFinder(builder, new DRealTerm<>(firstArg, term.getType(), firstArg.get_kind()));
-        recursiveAssignmentFinder(builder, new DRealTerm<>(secondArg, term.getType(),
-            secondArg.get_kind()));
+        recursiveAssignmentFinder(builder, new DRealTerm<>(firstArg, term.getType()));
+        recursiveAssignmentFinder(builder, new DRealTerm<>(secondArg, term.getType()));
       } else if (expKind == ExpressionKind.IfThenElse) {
         Formula cond = dreal.get_conditional_formula(term.getExpression());
         Expression expThen = dreal.get_then_expression(term.getExpression());
         Expression expElse = dreal.get_else_expression(term.getExpression());
-        recursiveAssignmentFinder(builder, new DRealTerm<>(cond, term.getType(), cond.get_kind()));
-        recursiveAssignmentFinder(builder, new DRealTerm<>(expThen, term.getType(),
-            expThen.get_kind()));
-        recursiveAssignmentFinder(builder, new DRealTerm<>(expElse, term.getType(),
-            expElse.get_kind()));
+        recursiveAssignmentFinder(builder, new DRealTerm<>(cond, term.getType()));
+        recursiveAssignmentFinder(builder, new DRealTerm<>(expThen, term.getType()));
+        recursiveAssignmentFinder(builder, new DRealTerm<>(expElse, term.getType()));
       } else if (expKind == ExpressionKind.Add) {
         // We have map of Expression and Double. Expression is the variable and Double the
         // constant of the addition. (2*x + 3*y) We can ignore the double value and only
@@ -267,8 +262,7 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Variable.Type, C
         // exp))
         ExpressionDoubleMap map = dreal.get_expr_to_coeff_map_in_addition(term.getExpression());
         for (Map.Entry<Expression, Double> entry : map.entrySet()) {
-          recursiveAssignmentFinder(builder, new DRealTerm<>(entry.getKey(), term.getType(),
-              entry.getKey().get_kind()));
+          recursiveAssignmentFinder(builder, new DRealTerm<>(entry.getKey(), term.getType()));
         }
       } else if (expKind == ExpressionKind.Mul) {
         // We get a map of Expression and Expression with the second Expression being the
@@ -277,8 +271,7 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Variable.Type, C
         ExpressionExpressionMap map =
             dreal.get_base_to_exponent_map_in_multiplication(term.getExpression());
         for (Map.Entry<Expression, Expression> entry : map.entrySet()) {
-          recursiveAssignmentFinder(builder, new DRealTerm<>(entry.getKey(), term.getType(),
-              entry.getKey().get_kind()));
+          recursiveAssignmentFinder(builder, new DRealTerm<>(entry.getKey(), term.getType()));
         }
       } else if (expKind == ExpressionKind.UninterpretedFunction) {
         throw new UnsupportedOperationException("Not implemented yet");
@@ -289,12 +282,12 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Variable.Type, C
       FormulaKind fKind = term.getFormulaKind();
       if (fKind == FormulaKind.Var) {
         Variable var = dreal.get_variable(term.getFormula());
-        builder.add(getAssignment(new DRealTerm<>(var, var.get_type(), var.get_type())));
+        builder.add(getAssignment(new DRealTerm<>(var, var.get_type())));
       } else if (fKind == FormulaKind.True || fKind == FormulaKind.False) {
         return;
       } else if (fKind == FormulaKind.Not) {
         Formula fNot = dreal.get_operand(term.getFormula());
-        recursiveAssignmentFinder(builder, new DRealTerm<>(fNot, term.getType(), fNot.get_kind()));
+        recursiveAssignmentFinder(builder, new DRealTerm<>(fNot, term.getType()));
       } else if (fKind == FormulaKind.Eq
           || fKind == FormulaKind.Gt
           || fKind == FormulaKind.Geq
@@ -309,33 +302,33 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Variable.Type, C
         // else both child could have variable
         if (type == null) {
           type = DReal4FormulaCreator.getTypeForExpressions(rightChild);
-          recursiveAssignmentFinder(builder, new DRealTerm<>(rightChild, type, rightChild.get_kind()));
+          recursiveAssignmentFinder(builder, new DRealTerm<>(rightChild, type));
         } else {
-          recursiveAssignmentFinder(builder, new DRealTerm<>(leftChild, type, leftChild.get_kind()));
-          recursiveAssignmentFinder(builder, new DRealTerm<>(rightChild, type, rightChild.get_kind()));
+          recursiveAssignmentFinder(builder, new DRealTerm<>(leftChild, type));
+          recursiveAssignmentFinder(builder, new DRealTerm<>(rightChild, type));
         }
       } else if (fKind == FormulaKind.And || fKind == FormulaKind.Or) {
         FormulaSet fSet = dreal.get_operands(term.getFormula());
         for (Formula f : fSet) {
-          recursiveAssignmentFinder(builder, new DRealTerm<>(f, term.getType(), f.get_kind()));
+          recursiveAssignmentFinder(builder, new DRealTerm<>(f, term.getType()));
         }
       } else {
         //We only go through the bound variables, because we have a quantified formula
         VariableSet varSet = term.getFormula().getQuantifiedVariables();
         for (Variable var : varSet) {
-          builder.add(getAssignment(new DRealTerm<>(var, var.get_type(), var.get_type())));
+          builder.add(getAssignment(new DRealTerm<>(var, var.get_type())));
         }
       }
 
     }
   }
 
-  private ValueAssignment getAssignment(DRealTerm<?, ?> term) {
+  private ValueAssignment getAssignment(DRealTerm<?> term) {
     // valueTerm should be a variable
     Preconditions.checkState(term.isVar());
     ImmutableList.Builder<Object> argumentInterpretationBuilder = ImmutableList.builder();
     // valueTerm can be Formula or Expression
-    DRealTerm<?, ?> valueTerm = evalImpl(term);
+    DRealTerm<?> valueTerm = evalImpl(term);
     org.sosy_lab.java_smt.api.Formula keyFormula = formulaCreator.encapsulateWithTypeOf(term);
     org.sosy_lab.java_smt.api.Formula valueFormula =
         formulaCreator.encapsulateWithTypeOf(valueTerm);
@@ -344,12 +337,12 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Variable.Type, C
       equation =
           creator.encapsulateBoolean(new DRealTerm<>(
               new Formula(dreal.Equal(new Expression(term.getVariable()),
-                  valueTerm.getExpression())), Variable.Type.BOOLEAN, FormulaKind.Eq));
+                  valueTerm.getExpression())), Variable.Type.BOOLEAN));
     } else if (valueTerm.isFormula()) {
       equation =
           creator.encapsulateBoolean(new DRealTerm<>(
               new Formula(dreal.Equal(term.getVariable(),
-                  valueTerm.getFormula())), Variable.Type.BOOLEAN, FormulaKind.Eq));
+                  valueTerm.getFormula())), Variable.Type.BOOLEAN));
     } else {
       throw new UnsupportedOperationException("Trying to get an Assignment from an Expression " + term.to_string() + " .");
     }

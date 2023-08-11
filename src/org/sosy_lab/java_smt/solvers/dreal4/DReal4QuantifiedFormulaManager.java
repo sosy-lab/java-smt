@@ -34,30 +34,30 @@ import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable.Type;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variables;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.dreal;
 
-public class DReal4QuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<DRealTerm<?,
-    ?>, Variable.Type, Context, DRealTerm<?, ?>> {
+public class DReal4QuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<DRealTerm<?>,
+    Variable.Type, Context, DRealTerm<?>> {
 
-  protected DReal4QuantifiedFormulaManager(FormulaCreator<DRealTerm<?, ?>, Variable.Type, Context,
-      DRealTerm<?, ?>> pFormulaCreator) {
+  protected DReal4QuantifiedFormulaManager(FormulaCreator<DRealTerm<?>, Variable.Type, Context,
+      DRealTerm<?>> pFormulaCreator) {
     super(pFormulaCreator);
   }
 
   @Override
-  protected DRealTerm<?, ?> eliminateQuantifiers(DRealTerm<?, ?> pExtractInfo)
+  protected DRealTerm<?> eliminateQuantifiers(DRealTerm<?> pExtractInfo)
       throws SolverException, InterruptedException {
     throw new UnsupportedOperationException("dReal can not eliminate quantifiers.");
   }
 
   @Override
-  public DRealTerm<Formula, FormulaKind> mkQuantifier(Quantifier pQ,
-                                         List<DRealTerm<?, ?>> pVars,
-                                                      DRealTerm<? ,?> pBody) {
+  public DRealTerm<Formula> mkQuantifier(Quantifier pQ,
+                                         List<DRealTerm<?>> pVars,
+                                                      DRealTerm<?> pBody) {
     if (pVars.isEmpty()) {
       throw new IllegalArgumentException("Empty variable list for quantifier.");
     }
     // create Variables from pVars to create forall formula
     Variables vars = new Variables();
-    for (DRealTerm<?, ?> term : pVars) {
+    for (DRealTerm<?> term : pVars) {
       if (term.isVar()) {
         vars.insert(term.getVariable());
       } else {
@@ -69,8 +69,7 @@ public class DReal4QuantifiedFormulaManager extends AbstractQuantifiedFormulaMan
       throw new UnsupportedOperationException("dReal does not support exist??");
     } else {
       if (pBody.isFormula()) {
-        return new DRealTerm<>(dreal.forall(vars, pBody.getFormula()), pBody.getType(),
-            FormulaKind.Forall);
+        return new DRealTerm<>(dreal.forall(vars, pBody.getFormula()), pBody.getType());
       } else if (pBody.isVar()) {
         Variable var = pBody.getVariable();
         if (var.get_type() == Variable.Type.BOOLEAN) {
