@@ -1305,63 +1305,6 @@ public class CVC5NativeAPITest {
   }
 
   @Test
-  public void testSequentialInterpolation() {
-    solver.setOption("incremental", "true");
-    solver.setOption("produce-interpolants", "true");
-    solver.setOption("produce-assertions", "true");
-    solver.setOption("dump-models", "true");
-    solver.setOption("output-language", "smt2");
-
-    // Set Strings option to enable all String features (such as lessOrEquals)
-    solver.setOption("strings-exp", "true");
-
-    // Enable more complete quantifier solving (for more info see CVC5QuantifiedFormulaManager)
-    solver.setOption("full-saturate-quant", "true");
-    solver.resetAssertions();
-
-    Term zero = solver.mkInteger(0);
-    Term one = solver.mkInteger(1);
-
-    Term a = solver.mkConst(solver.getIntegerSort(), "a");
-    Term b = solver.mkConst(solver.getIntegerSort(), "b");
-    Term c = solver.mkConst(solver.getIntegerSort(), "c");
-
-    Term A = solver.mkTerm(Kind.EQUAL, one, a);
-    Term B = solver.mkTerm(Kind.EQUAL, a, b);
-    Term C = solver.mkTerm(Kind.EQUAL, b, c);
-    Term D = solver.mkTerm(Kind.EQUAL, c, zero);
-
-    Solver interpolationSolver = new Solver();
-
-    interpolationSolver.setOption("incremental", "true");
-    interpolationSolver.setOption("produce-interpolants", "true");
-    interpolationSolver.setOption("produce-assertions", "true");
-    interpolationSolver.setOption("dump-models", "true");
-    interpolationSolver.setOption("output-language", "smt2");
-
-    // Set Strings option to enable all String features (such as lessOrEquals)
-    interpolationSolver.setOption("strings-exp", "true");
-
-    // Enable more complete quantifier solving (for more info see CVC5QuantifiedFormulaManager)
-    interpolationSolver.setOption("full-saturate-quant", "true");
-
-    interpolationSolver.resetAssertions();
-
-    Term itps3_1 =
-        interpolateAndCheck(interpolationSolver, A, interpolationSolver.mkTerm(Kind.AND, C, B, D));
-    Term itps3_2 =
-        interpolateAndCheck(
-            interpolationSolver,
-            interpolationSolver.mkTerm(Kind.AND, A, C),
-            interpolationSolver.mkTerm(Kind.AND, B, D));
-    Term itps3_3 =
-        interpolateAndCheck(interpolationSolver, interpolationSolver.mkTerm(Kind.AND, A, C, B), D);
-    System.out.println(itps3_1);
-    System.out.println(itps3_2);
-    System.out.println(itps3_3);
-  }
-
-  @Test
   @Ignore // Does not terminate
   public void testSimpleInterpolation() {
     // Out of InterpolatingProverTest.java

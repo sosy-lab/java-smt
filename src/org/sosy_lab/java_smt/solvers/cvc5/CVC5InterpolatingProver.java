@@ -116,9 +116,8 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
       Term currFormulaInterpol =
           getCVC5Interpolation(
               ImmutableList.of(Set.of(preInterpol), partitionedFormulas.get(i - 1)),
-              ImmutableList.of(
-                  ImmutableList.copyOf(Iterables.concat(partitionedFormulas.subList(i, n))).stream()
-                      .collect(ImmutableSet.toImmutableSet())));
+              ImmutableList
+                  .of(ImmutableList.copyOf(Iterables.concat(partitionedFormulas.subList(i, n)))));
       itps.add(creator.encapsulateBoolean(currFormulaInterpol));
     }
 
@@ -143,9 +142,8 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
       for (int i = 0; i < interpolationPairs.size(); i++) {
         itps.add(
             getCVC5Interpolation(
-                interpolationPairs.get(i).get(0).stream().collect(ImmutableList.toImmutableList()),
-                interpolationPairs.get(i).get(1).stream()
-                    .collect(ImmutableList.toImmutableList())));
+                ImmutableList.copyOf(interpolationPairs.get(i).get(0)),
+                ImmutableList.copyOf(interpolationPairs.get(i).get(1))));
       }
     } catch (UnsupportedOperationException e) {
       if (e.getMessage() != null) {
