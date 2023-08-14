@@ -97,7 +97,7 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
   }
 
   @Override
-  public <T extends Formula> org.sosy_lab.java_smt.api.FormulaType<T> getFormulaType(T pFormula) {
+  public org.sosy_lab.java_smt.api.FormulaType<?> getFormulaType(ApronNode formula) {
     return null;
   }
 
