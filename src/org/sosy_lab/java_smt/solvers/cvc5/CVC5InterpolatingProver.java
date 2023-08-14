@@ -115,9 +115,9 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
       Term preInterpol = creator.extractInfo(itps.get(i - 2));
       Term currFormulaInterpol =
           getCVC5Interpolation(
-              ImmutableList.of(Set.of(preInterpol), partitionedFormulas.get(i - 1)),
-              ImmutableList
-                  .of(ImmutableList.copyOf(Iterables.concat(partitionedFormulas.subList(i, n)))));
+              ImmutableList.of(ImmutableSet.of(preInterpol), partitionedFormulas.get(i - 1)),
+              ImmutableList.of(
+                  ImmutableList.copyOf(Iterables.concat(partitionedFormulas.subList(i, n)))));
       itps.add(creator.encapsulateBoolean(currFormulaInterpol));
     }
 
