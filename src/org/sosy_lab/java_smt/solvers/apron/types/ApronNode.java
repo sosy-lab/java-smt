@@ -35,6 +35,9 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.NumeralFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.FormulaType;
 
 public interface ApronNode extends Formula {
@@ -42,13 +45,12 @@ public interface ApronNode extends Formula {
   FormulaType getType();
   Texpr1Node getNode();
 
-  class ApronCstNode implements ApronNode {
+  class ApronRatCstNode implements ApronNode, RationalFormula {
 
-    private FormulaType type;
-    private Texpr1CstNode cstNode;
+    private final FormulaType type = FormulaType.RATIONAL;
+    private final Texpr1CstNode cstNode;
 
-    public ApronCstNode(FormulaType pType, BigInteger pNumerator, BigInteger pDenominator){
-      this.type = pType;
+    public ApronRatCstNode(BigInteger pNumerator, BigInteger pDenominator){
       this.cstNode = new Texpr1CstNode(new MpqScalar(pNumerator.divide(pDenominator)));
     }
 
@@ -62,13 +64,12 @@ public interface ApronNode extends Formula {
     }
   }
 
-  class ApronVarNode implements ApronNode{
+  class ApronRatVarNode implements ApronNode, RationalFormula{
 
-    private FormulaType type;
-    private Texpr1VarNode varNode;
+    private final FormulaType type = FormulaType.RATIONAL;
+    private final Texpr1VarNode varNode;
 
-    public ApronVarNode(FormulaType pType, String pVarName){
-      this.type = pType;
+    public ApronRatVarNode(String pVarName){
       this.varNode = new Texpr1VarNode(pVarName);
     }
     @Override
@@ -81,12 +82,11 @@ public interface ApronNode extends Formula {
     }
   }
 
-  class ApronUnaryNode implements ApronNode{
-    private FormulaType type;
-    private Texpr1UnNode unaryNode;
+  class ApronRatUnaryNode implements ApronNode, RationalFormula {
+    private final FormulaType type = FormulaType.RATIONAL;
+    private final Texpr1UnNode unaryNode;
 
-    public ApronUnaryNode(FormulaType pType, ApronNode param,int op ){
-      this.type = pType;
+    public ApronRatUnaryNode(ApronNode param,int op ){
       this.unaryNode = new Texpr1UnNode(op,param.getNode());
     }
     @Override
@@ -99,13 +99,86 @@ public interface ApronNode extends Formula {
     }
   }
 
-  class ApronBinaryNode implements ApronNode{
+  class ApronRatBinaryNode implements ApronNode, RationalFormula{
 
-    private FormulaType type;
+    private FormulaType type = FormulaType.RATIONAL;
     private Texpr1BinNode binaryNode;
 
-    public ApronBinaryNode(FormulaType pType, ApronNode param1, ApronNode param2, int op){
-      this.type = pType;
+    public ApronRatBinaryNode(ApronNode param1, ApronNode param2, int op){
+      this.binaryNode = new Texpr1BinNode(op,param1.getNode(),param2.getNode());
+    }
+    @Override
+    public FormulaType getType() {
+      return this.type;
+    }
+
+    @Override
+    public Texpr1Node getNode() {
+      return this.binaryNode;
+    }
+  }
+
+  class ApronIntCstNode implements ApronNode, IntegerFormula {
+
+    private final FormulaType type = FormulaType.INTEGER;
+    private final Texpr1CstNode cstNode;
+
+    public ApronIntCstNode(BigInteger pNumerator){
+      this.cstNode = new Texpr1CstNode(new MpqScalar(pNumerator));
+    }
+
+    @Override
+    public FormulaType getType() {
+      return this.type;
+    }
+
+    public Texpr1CstNode getNode() {
+      return cstNode;
+    }
+  }
+
+  class ApronIntVarNode implements ApronNode, IntegerFormula{
+
+    private final FormulaType type = FormulaType.INTEGER;
+    private final Texpr1VarNode varNode;
+
+    public ApronIntVarNode(String pVarName){
+      this.varNode = new Texpr1VarNode(pVarName);
+    }
+    @Override
+    public FormulaType getType() {
+      return this.type;
+    }
+
+    public Texpr1VarNode getNode() {
+      return varNode;
+    }
+
+  }
+
+  class ApronIntUnaryNode implements ApronNode, IntegerFormula {
+    private final FormulaType type = FormulaType.INTEGER;
+    private final Texpr1UnNode unaryNode;
+
+    public ApronIntUnaryNode(ApronNode param,int op ){
+      this.unaryNode = new Texpr1UnNode(op,param.getNode());
+    }
+    @Override
+    public FormulaType getType() {
+      return null;
+    }
+
+    public Texpr1UnNode getNode(){
+      return this.unaryNode;
+    }
+  }
+
+  class ApronIntBinaryNode implements ApronNode, IntegerFormula{
+
+    private final FormulaType type = FormulaType.INTEGER;
+    private final Texpr1BinNode binaryNode;
+
+    public ApronIntBinaryNode(ApronNode param1, ApronNode param2, int op){
       this.binaryNode = new Texpr1BinNode(op,param1.getNode(),param2.getNode());
     }
     @Override

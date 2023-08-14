@@ -20,7 +20,12 @@
 
 package org.sosy_lab.java_smt.solvers.apron;
 
+import apron.Tcons1;
+import apron.Texpr1BinNode;
+import apron.Texpr1UnNode;
 import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.List;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
@@ -28,6 +33,10 @@ import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.ApronRationalType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.FormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronConstraint;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronRatBinaryNode;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronRatCstNode;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronRatUnaryNode;
 
 public class ApronRationalFormulaManager extends
                                          ApronNumeralFormulaManager<NumeralFormula, RationalFormula>
@@ -61,6 +70,109 @@ public class ApronRationalFormulaManager extends
   @Override
   protected ApronNode makeVariableImpl(String i) {
     return formulaCreator.makeVariable(rationalType,i);
+  }
+  protected ApronNode makeNumberImpl(long i) {
+    return new ApronRatCstNode(BigInteger.valueOf(i), BigInteger.ONE);
+  }
+
+  @Override
+  protected ApronNode makeNumberImpl(BigInteger i) {
+    return new ApronRatCstNode(i,BigInteger.ONE);
+  }
+
+  @Override
+  protected ApronNode makeNumberImpl(String i) {
+    return null;
+  }
+
+  @Override
+  protected ApronNode negate(ApronNode pParam1) {
+    ApronRatUnaryNode unaryNode = new ApronRatUnaryNode(pParam1,
+        Texpr1UnNode.OP_NEG);
+    return unaryNode;
+  }
+
+  @Override
+  protected ApronNode add(ApronNode pParam1, ApronNode pParam2) {
+    ApronRatBinaryNode binaryNode = new ApronRatBinaryNode(pParam1,pParam2,
+        Texpr1BinNode.OP_ADD);
+    return binaryNode;
+  }
+
+  @Override
+  protected ApronNode sumImpl(List<ApronNode> operands) {
+    return null;
+  }
+
+  @Override
+  protected ApronNode subtract(ApronNode pParam1, ApronNode pParam2) {
+    ApronRatBinaryNode binaryNode = new ApronRatBinaryNode(pParam1,pParam2,
+        Texpr1BinNode.OP_SUB);
+    return binaryNode;
+  }
+
+  @Override
+  protected ApronNode divide(ApronNode pParam1, ApronNode pParam2) {
+    ApronRatBinaryNode binaryNode = new ApronRatBinaryNode(pParam1,pParam2,
+        Texpr1BinNode.OP_DIV);
+    return binaryNode;
+  }
+
+  @Override
+  protected ApronNode multiply(ApronNode pParam1, ApronNode pParam2) {
+    ApronRatBinaryNode binaryNode = new ApronRatBinaryNode(pParam1,pParam2,
+        Texpr1BinNode.OP_MUL);
+    return binaryNode;
+  }
+
+  @Override
+  protected ApronNode equal(ApronNode pParam1, ApronNode pParam2) {
+    ApronRatBinaryNode binaryNode = new ApronRatBinaryNode(pParam1,pParam2,
+        Texpr1BinNode.OP_SUB);
+    ApronConstraint constraint = new ApronConstraint(Tcons1.EQ,formulaCreator.getEnvironment(),
+        binaryNode.getNode());
+    return constraint;
+  }
+
+  @Override
+  protected ApronNode distinctImpl(List pNumbers) {
+    return null;
+  }
+
+  @Override
+  protected ApronNode greaterThan(ApronNode pParam1, ApronNode pParam2) {
+    ApronRatBinaryNode binaryNode = new ApronRatBinaryNode(pParam1,pParam2,
+        Texpr1BinNode.OP_SUB);
+    ApronConstraint constraint = new ApronConstraint(Tcons1.SUP,formulaCreator.getEnvironment(),
+        binaryNode.getNode());
+    return constraint;
+  }
+
+  @Override
+  protected ApronNode greaterOrEquals(ApronNode pParam1, ApronNode pParam2) {
+    ApronRatBinaryNode binaryNode = new ApronRatBinaryNode(pParam1,pParam2,
+        Texpr1BinNode.OP_SUB);
+    ApronConstraint constraint = new ApronConstraint(Tcons1.SUPEQ,formulaCreator.getEnvironment(),
+        binaryNode.getNode());
+    return constraint;
+  }
+
+  @Override
+  protected ApronNode lessThan(ApronNode pParam1, ApronNode pParam2) {
+    ApronRatBinaryNode binaryNode = new ApronRatBinaryNode(pParam2,pParam1,
+        Texpr1BinNode.OP_SUB);
+    ApronConstraint constraint = new ApronConstraint(Tcons1.SUP,formulaCreator.getEnvironment(),
+        binaryNode.getNode());
+    return constraint;
+  }
+
+  @Override
+  protected ApronNode lessOrEquals(ApronNode pParam1, ApronNode pParam2) {
+    ApronRatBinaryNode binaryNode = new ApronRatBinaryNode(pParam2,pParam1,
+        Texpr1BinNode.OP_SUB);
+    ApronConstraint constraint = new ApronConstraint(Tcons1.SUPEQ,formulaCreator.getEnvironment(),
+        binaryNode.getNode());
+    return constraint;
   }
 
 }

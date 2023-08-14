@@ -34,7 +34,8 @@ import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.ApronBooleanTy
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.ApronIntegerType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.ApronRationalType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
-import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronVarNode;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronIntVarNode;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronRatVarNode;
 
 public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaType,Environment,
     Long> {
@@ -81,11 +82,11 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
       if(pApronFormulaType.getType().equals(FormulaType.INTEGER)){
         String[] intvars = new String[]{varName};
         this.environment.add(intvars,new String[]{});
-        return new ApronVarNode(FormulaType.INTEGER, varName);
+        return new ApronIntVarNode(varName);
       }else {
         String[] realvars = new String[]{varName};
         this.environment.add(new String[]{}, realvars);
-        return new ApronVarNode(FormulaType.RATIONAL, varName);
+        return new ApronRatVarNode(varName);
       }
   }
 
