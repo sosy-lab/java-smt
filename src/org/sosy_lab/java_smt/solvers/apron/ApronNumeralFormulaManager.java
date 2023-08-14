@@ -21,6 +21,7 @@
 package org.sosy_lab.java_smt.solvers.apron;
 
 import apron.Environment;
+import apron.Tcons1;
 import apron.Texpr1BinNode;
 import apron.Texpr1Node;
 import apron.Texpr1UnNode;
@@ -34,6 +35,7 @@ import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.FormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronBinaryNode;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronConstraint;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronUnaryNode;
 
 abstract class ApronNumeralFormulaManager<
@@ -118,7 +120,11 @@ abstract class ApronNumeralFormulaManager<
 
   @Override
   protected ApronNode equal(ApronNode pParam1, ApronNode pParam2) {
-    return null;
+    ApronBinaryNode binaryNode = new ApronBinaryNode(pParam1.getType(), pParam1,pParam2,
+        Texpr1BinNode.OP_SUB);
+    ApronConstraint constraint = new ApronConstraint(Tcons1.EQ,formulaCreator.getEnvironment(),
+        binaryNode.getNode());
+    return constraint;
   }
 
   @Override
@@ -128,21 +134,37 @@ abstract class ApronNumeralFormulaManager<
 
   @Override
   protected ApronNode greaterThan(ApronNode pParam1, ApronNode pParam2) {
-    return null;
+    ApronBinaryNode binaryNode = new ApronBinaryNode(pParam1.getType(), pParam1,pParam2,
+        Texpr1BinNode.OP_SUB);
+    ApronConstraint constraint = new ApronConstraint(Tcons1.SUP,formulaCreator.getEnvironment(),
+        binaryNode.getNode());
+    return constraint;
   }
 
   @Override
   protected ApronNode greaterOrEquals(ApronNode pParam1, ApronNode pParam2) {
-    return null;
+    ApronBinaryNode binaryNode = new ApronBinaryNode(pParam1.getType(), pParam1,pParam2,
+        Texpr1BinNode.OP_SUB);
+    ApronConstraint constraint = new ApronConstraint(Tcons1.SUPEQ,formulaCreator.getEnvironment(),
+        binaryNode.getNode());
+    return constraint;
   }
 
   @Override
   protected ApronNode lessThan(ApronNode pParam1, ApronNode pParam2) {
-    return null;
+    ApronBinaryNode binaryNode = new ApronBinaryNode(pParam1.getType(), pParam2,pParam1,
+        Texpr1BinNode.OP_SUB);
+    ApronConstraint constraint = new ApronConstraint(Tcons1.SUP,formulaCreator.getEnvironment(),
+        binaryNode.getNode());
+    return constraint;
   }
 
   @Override
   protected ApronNode lessOrEquals(ApronNode pParam1, ApronNode pParam2) {
-    return null;
+    ApronBinaryNode binaryNode = new ApronBinaryNode(pParam1.getType(), pParam2,pParam1,
+        Texpr1BinNode.OP_SUB);
+    ApronConstraint constraint = new ApronConstraint(Tcons1.SUPEQ,formulaCreator.getEnvironment(),
+        binaryNode.getNode());
+    return constraint;
   }
 }

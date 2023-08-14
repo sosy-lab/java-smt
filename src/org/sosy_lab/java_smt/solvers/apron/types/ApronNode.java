@@ -33,6 +33,7 @@ import gmp.Mpq;
 import gmp.Mpz;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.FormulaType;
 
@@ -118,7 +119,7 @@ public interface ApronNode extends Formula {
     }
   }
 
-  class ApronConstraint implements ApronNode{
+  class ApronConstraint implements ApronNode, BooleanFormula {
 
     private Tcons1 constraintNode;
     private Texpr1Node node;
