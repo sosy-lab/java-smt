@@ -20,10 +20,14 @@
 
 package org.sosy_lab.java_smt.solvers.dreal4;
 
+import java.math.BigInteger;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Expression;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.ExpressionKind;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable.Type;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.dreal;
 
 
 public class DReal4IntegerFormulaManager
@@ -39,4 +43,67 @@ public class DReal4IntegerFormulaManager
   protected Variable.Type getNumeralType() {
     return getFormulaCreator().getIntegerType();
   }
+
+  // Division with Integer can be a problem. See Issue 304 (https://github.com/dreal/dreal4/issues/304).
+  // With two Constant being divided I manually round off, but if we have a division with a variable,
+  // it can cause problems
+  @Override
+  public DRealTerm<Expression, ExpressionKind> divide(DRealTerm<?, ?> pParam1,
+                                      DRealTerm<?, ?> pParam2) {
+    if (pParam1.isExp() && pParam2.isExp()) {
+      if (pParam1.getExpressionKind() == ExpressionKind.Constant
+          && pParam2.getExpressionKind() == ExpressionKind.Constant) {
+        if (Double.parseDouble(pParam2.to_string()) == 0.0) {
+          throw new IllegalArgumentException("dReal does not support division by zero.");
+        }
+        DRealTerm<Expression, ExpressionKind> exp =
+            new DRealTerm<>(dreal.Divide(pParam1.getExpression(),
+            pParam2.getExpression()), pParam1.getType(), ExpressionKind.Div);
+        int roundedDouble = (int)Math.floor(Double.parseDouble(exp.to_string()));
+        return new DRealTerm<>(new Expression(roundedDouble), Variable.Type.INTEGER,
+            ExpressionKind.Constant);
+      }
+      return new DRealTerm<>(dreal.Divide(pParam1.getExpression(), pParam2.getExpression()),
+          pParam1.getType(), ExpressionKind.Div);
+    } else if (pParam1.isVar() && pParam2.isExp()) {
+      if (pParam2.getExpressionKind() == ExpressionKind.Constant) {
+        if (Double.parseDouble(pParam2.to_string()) == 0.0) {
+          throw new IllegalArgumentException("dReal does not support division by zero.");
+        }
+      }
+      return new DRealTerm<>(dreal.Divide(new Expression(pParam1.getVariable()),
+          pParam2.getExpression()), pParam1.getType(), ExpressionKind.Div);
+    } else if (pParam1.isExp() && pParam2.isVar()) {
+      return new DRealTerm<>(dreal.Divide(pParam1.getExpression(),
+          new Expression(pParam2.getVariable())), pParam1.getType(), ExpressionKind.Div);
+    } else if (pParam1.isVar() && pParam2.isVar()) {
+      return new DRealTerm<>(dreal.Divide(new Expression(pParam1.getVariable()),
+          new Expression(pParam2.getVariable())), pParam1.getType(), ExpressionKind.Div);
+    } else {
+      throw new UnsupportedOperationException("dReal does not support divide with Formulas.");
+    }
+  }
+
+  @Override
+  protected DRealTerm<?, ?> modularCongruence(DRealTerm<?, ?> pNumber1, DRealTerm<?, ?> pNumber2,
+                                           BigInteger pModulo) {
+    return modularCongruence0(pNumber1, pNumber2, pModulo.toString());
+  }
+
+  @Override
+  protected DRealTerm<?, ?> modularCongruence(DRealTerm<?, ?> pNumber1, DRealTerm<?, ?> pNumber2,
+                                            long pModulo) {
+    return modularCongruence0(pNumber1, pNumber2, Long.toString(pModulo));
+  }
+
+  protected DRealTerm<?, ?> modularCongruence0(DRealTerm<?, ?> pNumber1, DRealTerm<?, ?> pNumber2,
+                                             String pModulo) {
+    // ((_ divisible n) x) <==> (= x (* n (div x n)))
+    DRealTerm<Expression, ExpressionKind> mod = makeNumberImpl(pModulo);
+    DRealTerm<Expression,ExpressionKind> sub = subtract(pNumber1, pNumber2);
+    DRealTerm<Expression, ExpressionKind> div = divide(sub, mod);
+    DRealTerm<Expression, ExpressionKind> mul = multiply(mod, div);
+    return equal(sub, mul);
+  }
+
 }
