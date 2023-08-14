@@ -186,8 +186,7 @@ public class Context {
     return drealJNI.Context_CheckSat_0(Context.getCPtr(this), Box.getCPtr(box));
   }
 
-  // This is only needed, if it is not possible to retrieve a Variable from Variables
-  public void declareVaribales(Formula f) {
+  public void declareVariables(Formula f) {
     drealJNI.Context_declareVariables(Context.getCPtr(this), Formula.getCPtr(f));
   }
 
