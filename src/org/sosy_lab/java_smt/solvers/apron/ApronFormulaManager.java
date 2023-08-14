@@ -26,23 +26,19 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.api.IntegerFormulaManager;
-import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
-import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractEnumerationFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractFloatingPointFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractSLFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager;
-import org.sosy_lab.java_smt.basicimpl.AbstractUFManager;
-import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
-import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulas;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
 
-public class ApronFormulaManager extends AbstractFormulaManager <ApronFormulas, ApronFormulaType,Environment,Long>{
+public class ApronFormulaManager extends AbstractFormulaManager <ApronNode, ApronFormulaType,
+    Environment,Long>{
   /**
    * Builds a solver from the given theory implementations.
    *
@@ -82,7 +78,7 @@ public class ApronFormulaManager extends AbstractFormulaManager <ApronFormulas, 
   }
 
   @Override
-  public Appender dumpFormula(ApronFormulas t) {
+  public Appender dumpFormula(ApronNode t) {
     return null;
   }
 

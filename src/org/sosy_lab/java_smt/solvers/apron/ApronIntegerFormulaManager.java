@@ -28,7 +28,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.ApronIntegerType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.FormulaType;
-import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulas;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
 
 public class ApronIntegerFormulaManager extends ApronNumeralFormulaManager<IntegerFormula,IntegerFormula> implements
                                                                            IntegerFormulaManager {
@@ -47,12 +47,12 @@ public class ApronIntegerFormulaManager extends ApronNumeralFormulaManager<Integ
     return FormulaType.INTEGER;
   }
 
-  protected ApronFormulas makeNumberImpl(double pNumber) {
+  protected ApronNode makeNumberImpl(double pNumber) {
     return null;
   }
 
   @Override
-  protected ApronFormulas makeNumberImpl(BigDecimal pNumber) {
+  protected ApronNode makeNumberImpl(BigDecimal pNumber) {
     return null;
   }
 
@@ -76,7 +76,7 @@ public class ApronIntegerFormulaManager extends ApronNumeralFormulaManager<Integ
 
 
   @Override
-  protected ApronFormulas makeVariableImpl(String i) {
+  protected ApronNode makeVariableImpl(String i) {
     return this.formulaCreator.makeVariable(integerType,i);
   }
 

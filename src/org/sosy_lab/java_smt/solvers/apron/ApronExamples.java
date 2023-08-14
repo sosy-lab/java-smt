@@ -50,6 +50,14 @@ public class ApronExamples
     cons2.setKind(Lincons1.SUPEQ);
     Abstract1 abstract1 = new Abstract1(pManager, new Lincons1[]{cons1,cons2});
 
+    // x+x-x=0
+    Linterm1 linterm1 = new Linterm1("x",new MpqScalar(1));
+    Linterm1 linterm2 = new Linterm1("x",new MpqScalar(1));
+    Linterm1 linterm3 = new Linterm1("x",new MpqScalar(-1));
+    Linterm1[] terms = new Linterm1[]{linterm3,linterm2,linterm1};
+    Linexpr1 linexpr1 = new Linexpr1(environment,terms,new MpqScalar(0));
+    Lincons1 cons = new Lincons1(Lincons1.EQ,linexpr1);
+
     //is x = 1 satisfiable?
     Lincons1 cons3 = new Lincons1(environment);
     cons3.setCoeff("x",new MpqScalar(1));

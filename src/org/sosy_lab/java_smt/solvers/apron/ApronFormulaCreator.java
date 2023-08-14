@@ -29,15 +29,15 @@ import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.FormulaType;
-import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulas;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.ApronBooleanType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.ApronIntegerType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.ApronRationalType;
-import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulas.ApronVar;
-import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulas.FormulaCategory;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronVarNode;
 
-public class ApronFormulaCreator extends FormulaCreator<ApronFormulas, ApronFormulaType,Environment,Long> {
+public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaType,Environment,
+    Long> {
 
   private Environment environment;
   protected ApronFormulaCreator(
@@ -72,51 +72,50 @@ public class ApronFormulaCreator extends FormulaCreator<ApronFormulas, ApronForm
   }
 
   @Override
-  public ApronFormulas makeVariable(ApronFormulaType pApronFormulaType, String varName) {
+  public ApronNode makeVariable(ApronFormulaType pApronFormulaType, String varName) {
     Preconditions.checkArgument(!environment.hasVar(varName),"Variablename already exists!");
     Preconditions.checkArgument(
         (pApronFormulaType.getType().equals(FormulaType.INTEGER) || pApronFormulaType.getType().equals(
             FormulaType.RATIONAL)),
-        "Only Integer or rational variables allowed1");
+        "Only Integer or rational variables allowed!");
       if(pApronFormulaType.getType().equals(FormulaType.INTEGER)){
         String[] intvars = new String[]{varName};
         this.environment.add(intvars,new String[]{});
-        return new ApronVar(varName,FormulaType.INTEGER);
+        return new ApronVarNode(FormulaType.INTEGER, varName);
       }else {
         String[] realvars = new String[]{varName};
         this.environment.add(new String[]{}, realvars);
-        return new ApronVar(varName,FormulaType.RATIONAL);
+        return new ApronVarNode(FormulaType.RATIONAL, varName);
       }
   }
 
   @Override
-  public org.sosy_lab.java_smt.api.FormulaType<ApronFormulas> getFormulaType(ApronFormulas formula) {
+  public org.sosy_lab.java_smt.api.FormulaType<ApronNode> getFormulaType(ApronNode formula) {
     return null;
   }
 
   @Override
-  public <R> R visit(FormulaVisitor<R> visitor, Formula formula, ApronFormulas f) { //hinten
+  public <R> R visit(FormulaVisitor<R> visitor, Formula formula, ApronNode f) { //hinten
     // anstellen, Frage kann man eine formel in alle kleinteile zerlegen und dann wieder
     // zusammenbauen?
     return null;
   }
 
   @Override
-  public ApronFormulas callFunctionImpl(Long declaration, List<ApronFormulas> args) {
-    // not supported
-    return null;
+  public ApronNode callFunctionImpl(Long declaration, List<ApronNode> args) {
+    throw  new UnsupportedOperationException();
   }
 
   @Override
-  public Long declareUFImpl( //not supported
+  public Long declareUFImpl(
       String pName,
       ApronFormulaType pReturnType,
       List<ApronFormulaType> pArgTypes) {
-    return null;
+    throw new UnsupportedOperationException("Apron does not support uninterpreted functions.");
   }
 
   @Override
-  protected Long getBooleanVarDeclarationImpl(ApronFormulas pApronFormula) { //brauche ich nicht
+  protected Long getBooleanVarDeclarationImpl(ApronNode pApronFormula) { //brauche ich nicht
     return null;
   }
 }

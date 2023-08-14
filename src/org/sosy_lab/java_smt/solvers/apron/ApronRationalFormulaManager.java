@@ -27,7 +27,7 @@ import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.ApronRationalType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.FormulaType;
-import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulas;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
 
 public class ApronRationalFormulaManager extends
                                          ApronNumeralFormulaManager<NumeralFormula, RationalFormula>
@@ -48,18 +48,18 @@ public class ApronRationalFormulaManager extends
   }
 
   @Override
-  protected ApronFormulas makeNumberImpl(double pNumber) {
+  protected ApronNode makeNumberImpl(double pNumber) {
     return null;
   }
 
   @Override
-  protected ApronFormulas makeNumberImpl(BigDecimal pNumber) {
+  protected ApronNode makeNumberImpl(BigDecimal pNumber) {
     return null;
   }
 
 
   @Override
-  protected ApronFormulas makeVariableImpl(String i) {
+  protected ApronNode makeVariableImpl(String i) {
     return formulaCreator.makeVariable(rationalType,i);
   }
 
