@@ -31,13 +31,13 @@ import org.sosy_lab.java_smt.solvers.dreal4.drealjni.dreal;
 
 abstract class DReal4Formula implements Formula {
   @SuppressWarnings("Immutable")
-  private final DRealTerm<?> term;
+  private final DRealTerm<?, ?> term;
 
-  DReal4Formula(DRealTerm<?> pTerm) {
+  DReal4Formula(DRealTerm<?, ?> pTerm) {
     this.term = pTerm;
   }
 
-  final DRealTerm<?> getTerm() {
+  final DRealTerm<?, ?> getTerm() {
     return term;
   }
 
@@ -50,7 +50,7 @@ abstract class DReal4Formula implements Formula {
       return false;
     }
     // equal_to only checks for the same structure
-    DRealTerm<?> oTerm = ((DReal4Formula) o).getTerm();
+    DRealTerm<?, ?> oTerm = ((DReal4Formula) o).getTerm();
     if (term.isVar()) {
       if (oTerm.isVar()) {
         return term.getVariable().equal_to(oTerm.getVariable());
@@ -66,7 +66,7 @@ abstract class DReal4Formula implements Formula {
     } else if (term.isExp()) {
       if (term.getExpressionKind() == ExpressionKind.Var) {
         if (oTerm.isVar()) {
-          oTerm.getVariable().equal_to(dreal.get_variable(term.getExpression()));
+          return oTerm.getVariable().equal_to(dreal.get_variable(term.getExpression()));
         } else if (oTerm.isExp()) {
           return term.getExpression().EqualTo(oTerm.getExpression());
         } else {
@@ -124,19 +124,19 @@ abstract class DReal4Formula implements Formula {
   }
 
   static final class DReal4BooleanFormula extends DReal4Formula implements BooleanFormula {
-    DReal4BooleanFormula(DRealTerm<?> pTerm) {
+    DReal4BooleanFormula(DRealTerm<?, ?> pTerm) {
       super(pTerm);
     }
   }
 
   static final class DReal4RationalFormula extends DReal4Formula implements RationalFormula {
-    DReal4RationalFormula(DRealTerm<?> pTerm) {
+    DReal4RationalFormula(DRealTerm<?, ?> pTerm) {
       super(pTerm);
     }
   }
 
   static final class DReal4IntegerFormula extends DReal4Formula implements IntegerFormula {
-    DReal4IntegerFormula(DRealTerm<?> pTerm) {
+    DReal4IntegerFormula(DRealTerm<?, ?> pTerm) {
       super(pTerm);
     }
   }

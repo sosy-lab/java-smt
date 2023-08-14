@@ -54,7 +54,7 @@ class DReal4TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   private final Config curCfg;
   private final Context curCnt;
 
-  protected final Deque<List<DRealTerm<?>>> assertedFormulas = new ArrayDeque<>();
+  protected final Deque<List<DRealTerm<?, ?>>> assertedFormulas = new ArrayDeque<>();
 
   // use Box to save result?
   private Box model;
@@ -80,18 +80,18 @@ class DReal4TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   @Override
   public @Nullable Void addConstraint(BooleanFormula constraint) throws InterruptedException {
     Preconditions.checkState(!closed);
-    DRealTerm<?> formula = creator.extractInfo(constraint);
+    DRealTerm<?, ?> formula = creator.extractInfo(constraint);
     assertedFormulas.peek().add(formula);
     // It is not possible to assert an Expression, only Variable of type boolean or a formula
     Preconditions.checkState(!formula.isExp());
     if (formula.isVar()) {
       Preconditions.checkState(formula.getType() == Variable.Type.BOOLEAN);
       Formula f = new Formula(formula.getVariable());
-      curCnt.declareVaribales(f);
+      curCnt.declareVariables(f);
       curCnt.Assert(f);
       return null;
     } else {
-      curCnt.declareVaribales(formula.getFormula());
+      curCnt.declareVariables(formula.getFormula());
       curCnt.Assert(formula.getFormula());
       return null;
     }
@@ -155,8 +155,8 @@ class DReal4TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
     }
   }
 
-  protected Collection<DRealTerm<?>> getAssertedExpressions() {
-    List<DRealTerm<?>> result = new ArrayList<>();
+  protected Collection<DRealTerm<?, ?>> getAssertedExpressions() {
+    List<DRealTerm<?, ?>> result = new ArrayList<>();
     assertedFormulas.forEach(result::addAll);
     return result;
   }
