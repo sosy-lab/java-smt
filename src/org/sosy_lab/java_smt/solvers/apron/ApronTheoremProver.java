@@ -22,6 +22,7 @@ package org.sosy_lab.java_smt.solvers.apron;
 
 import apron.Abstract1;
 import apron.ApronException;
+import apron.Tcons1;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +37,7 @@ import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronConstraint;
 import org.sosy_lab.java_smt.utils.SolverUtils;
 
 public class ApronTheoremProver extends AbstractProverWithAllSat<Void> implements ProverEnvironment {
@@ -58,10 +60,28 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void> implement
 
   }
 
-  @Nullable
   @Override
-  public @org.checkerframework.checker.nullness.qual.Nullable Void addConstraint(BooleanFormula constraint) throws InterruptedException {
+  public @Nullable Void addConstraint(BooleanFormula constraint)
+      throws InterruptedException{
+    ApronConstraint apronConstraint = (ApronConstraint) constraint;
+    addConstraintException(apronConstraint);
     return null;
+  }
+
+  private void addConstraintException(ApronConstraint pConstraint) {
+    try {
+      Tcons1[] consOld = abstract1.toTcons(solverContext.getManager());
+      Tcons1[] newCons = new Tcons1[consOld.length+1];
+      int i=0;
+      for(Tcons1 c : consOld){
+        newCons[i] = c;
+        i++;
+      }
+      newCons[consOld.length] = pConstraint.getConstraintNode();
+      this.abstract1 = new Abstract1(solverContext.getManager(), newCons);
+    } catch (ApronException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @Override
@@ -83,9 +103,7 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void> implement
     try {
       return abstract1.isBottom(solverContext.getManager());
     } catch (ApronException pApronException){
-      System.out.println(pApronException.toString());
-      System.exit(0);
-      return false;
+      throw new RuntimeException(pApronException);
     }
   }
   @Override

@@ -20,12 +20,18 @@
 
 package org.sosy_lab.java_smt.solvers.apron;
 
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvtype_size;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_of_term;
+
 import apron.Environment;
 import com.google.common.base.Preconditions;
 import java.util.List;
 import javax.annotation.Nullable;
+import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
+import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.FormulaType;
@@ -64,7 +70,7 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
 
   @Override
   public ApronFormulaType getFloatingPointType(FloatingPointType type) {
-    return null;
+    throw new UnsupportedOperationException("Apron does not support floating point operations.");
   }
 
   @Override
@@ -91,7 +97,7 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
   }
 
   @Override
-  public org.sosy_lab.java_smt.api.FormulaType<ApronNode> getFormulaType(ApronNode formula) {
+  public <T extends Formula> org.sosy_lab.java_smt.api.FormulaType<T> getFormulaType(T pFormula) {
     return null;
   }
 

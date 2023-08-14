@@ -213,5 +213,9 @@ public interface ApronNode extends Formula {
     public Texpr1Node getNode() {
       return this.node;
     }
+
+    public Tcons1 getConstraintNode() {
+      return constraintNode;
+    }
   }
 }

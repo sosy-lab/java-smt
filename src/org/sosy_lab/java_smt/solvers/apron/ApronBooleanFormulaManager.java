@@ -20,10 +20,14 @@
 
 package org.sosy_lab.java_smt.solvers.apron;
 
+import apron.Environment;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
 
-public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager {
+public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<ApronNode,
+    ApronFormulaType, Environment, Long> {
 
   private ApronFormulaCreator formulaCreator;
   protected ApronBooleanFormulaManager(ApronFormulaCreator pCreator) {
@@ -32,52 +36,52 @@ public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager {
   }
 
   @Override
-  protected Object makeVariableImpl(String pVar) {
+  protected ApronNode makeVariableImpl(String pVar) {
+    throw new UnsupportedOperationException("Apron supports only numeral variables.");
+  }
+
+  @Override
+  protected ApronNode makeBooleanImpl(boolean value) {
     return null;
   }
 
   @Override
-  protected Object makeBooleanImpl(boolean value) {
+  protected ApronNode not(ApronNode pParam1) {
     return null;
   }
 
   @Override
-  protected Object not(Object pParam1) {
+  protected ApronNode and(ApronNode pParam1, ApronNode pParam2) {
     return null;
   }
 
   @Override
-  protected Object and(Object pParam1, Object pParam2) {
+  protected ApronNode or(ApronNode pParam1, ApronNode pParam2) {
     return null;
   }
 
   @Override
-  protected Object or(Object pParam1, Object pParam2) {
+  protected ApronNode xor(ApronNode pParam1, ApronNode pParam2) {
     return null;
   }
 
   @Override
-  protected Object xor(Object pParam1, Object pParam2) {
+  protected ApronNode equivalence(ApronNode bits1, ApronNode bits2) {
     return null;
   }
 
   @Override
-  protected Object equivalence(Object bits1, Object bits2) {
-    return null;
-  }
-
-  @Override
-  protected boolean isTrue(Object bits) {
+  protected boolean isTrue(ApronNode bits) {
     return false;
   }
 
   @Override
-  protected boolean isFalse(Object bits) {
+  protected boolean isFalse(ApronNode bits) {
     return false;
   }
 
   @Override
-  protected Object ifThenElse(Object cond, Object f1, Object f2) {
+  protected ApronNode ifThenElse(ApronNode cond, ApronNode f1, ApronNode f2) {
     return null;
   }
 }

@@ -20,16 +20,18 @@
 
 package org.sosy_lab.java_smt.solvers.apron;
 
+import apron.Environment;
 import com.google.common.collect.ImmutableList;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
-import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
 
-public class ApronModel extends AbstractModel {
+public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Environment> {
   protected ApronModel(
-      AbstractProver prover,
-      FormulaCreator creator) {
+      AbstractProver<ApronTheoremProver> prover,
+      ApronFormulaCreator creator) {
     super(prover, creator);
   }
 
@@ -38,9 +40,8 @@ public class ApronModel extends AbstractModel {
     return null;
   }
 
-  @Nullable
   @Override
-  protected Object evalImpl(Object formula) {
+  protected @Nullable ApronNode evalImpl(ApronNode formula) {
     return null;
   }
 }
