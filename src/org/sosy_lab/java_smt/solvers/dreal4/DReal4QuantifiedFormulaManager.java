@@ -34,31 +34,40 @@ import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable.Type;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variables;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.dreal;
 
-public class DReal4QuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<DRealTerm<?>,
-    Variable.Type, Context, DRealTerm<?>> {
+public class DReal4QuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<DRealTerm<?,
+    ?>, Variable.Type, Context, DRealTerm<?, ?>> {
 
-  protected DReal4QuantifiedFormulaManager(FormulaCreator<DRealTerm<?>, Variable.Type, Context,
-      DRealTerm<?>> pFormulaCreator) {
+  protected DReal4QuantifiedFormulaManager(FormulaCreator<DRealTerm<?, ?>, Variable.Type, Context,
+      DRealTerm<?, ?>> pFormulaCreator) {
     super(pFormulaCreator);
   }
 
   @Override
-  protected DRealTerm<?> eliminateQuantifiers(DRealTerm<?> pExtractInfo)
+  protected DRealTerm<?, ?> eliminateQuantifiers(DRealTerm<?, ?> pExtractInfo)
       throws SolverException, InterruptedException {
     throw new UnsupportedOperationException("dReal can not eliminate quantifiers.");
   }
 
+  // It is allowed to create a quantified Formula with boolean Variables, but as soon as CheckSat
+  // is called on a formula with a quantified boolean Variable, dReal returns an error. Therefore,
+  // it is not allowed to create a quantifier with a boolean Variable, because if Unsat would be
+  // called, an error would be created
   @Override
-  public DRealTerm<Formula> mkQuantifier(Quantifier pQ,
-                                         List<DRealTerm<?>> pVars,
-                                                      DRealTerm<?> pBody) {
+  public DRealTerm<Formula, FormulaKind> mkQuantifier(Quantifier pQ,
+                                         List<DRealTerm<?,?>> pVars,
+                                                      DRealTerm<?, ?> pBody) {
     if (pVars.isEmpty()) {
       throw new IllegalArgumentException("Empty variable list for quantifier.");
     }
     // create Variables from pVars to create forall formula
     Variables vars = new Variables();
-    for (DRealTerm<?> term : pVars) {
+    for (DRealTerm<?, ?> term : pVars) {
       if (term.isVar()) {
+        if (term.getType() == Variable.Type.BOOLEAN) {
+          throw new UnsupportedOperationException("dReal does not allow to check for Unsat with "
+              + "boolean variable in quantified formula, therefore it is not allowed to create "
+              + "such a formula.");
+        }
         vars.insert(term.getVariable());
       } else {
         throw new IllegalArgumentException("This term is not a Variable.");
@@ -69,14 +78,14 @@ public class DReal4QuantifiedFormulaManager extends AbstractQuantifiedFormulaMan
       throw new UnsupportedOperationException("dReal does not support exist??");
     } else {
       if (pBody.isFormula()) {
-        return new DRealTerm<>(dreal.forall(vars, pBody.getFormula()), pBody.getType());
+        return new DRealTerm<>(dreal.forall(vars, pBody.getFormula()), pBody.getType(),
+            FormulaKind.Forall);
       } else if (pBody.isVar()) {
         Variable var = pBody.getVariable();
         if (var.get_type() == Variable.Type.BOOLEAN) {
-          //Formula f = new Formula(var);
-          //Formula quantified = dreal.forall(vars, f);
-          //return new DRealTerm<>(quantified, var.get_type(), FormulaKind.Forall);
-          throw new UnsupportedOperationException("This does not work? BOOLEAN and ForALL");
+          Formula f = new Formula(var);
+          Formula quantified = dreal.forall(vars, f);
+          return new DRealTerm<>(quantified, var.get_type(), FormulaKind.Forall);
         } else {
           throw new IllegalArgumentException("The given Formula is a Variable and not of type "
               + "Boolean.");
