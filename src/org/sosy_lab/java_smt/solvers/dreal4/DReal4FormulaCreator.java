@@ -54,16 +54,19 @@ import org.sosy_lab.java_smt.solvers.dreal4.drealjni.ExpressionExpressionMap;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.ExpressionKind;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.FormulaKind;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.FormulaSet;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.FormulaVector;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable.Type;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.VariableSet;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variables;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.dreal;
-public class DReal4FormulaCreator extends FormulaCreator<DRealTerm<?>, Variable.Type, Context,
-    DRealTerm<?>> {
+import scala.concurrent.impl.FutureConvertersImpl.P;
 
-  private final Map<String, DRealTerm<Variable>> variablesCache = new HashMap<>();
-  private final Map<String, DRealTerm<?>> functionCache = new HashMap<>();
+public class DReal4FormulaCreator extends FormulaCreator<DRealTerm<?, ?>, Variable.Type, Context,
+    DRealTerm<?, ?>> {
+
+  private final Map<String, DRealTerm<Variable, Variable.Type>> variablesCache = new HashMap<>();
+  //private final Map<String, DRealTerm<?, ?>> functionCache = new HashMap<>();
 
   public DReal4FormulaCreator(Context context) {
     super(context, Variable.Type.BOOLEAN, Variable.Type.INTEGER, Variable.Type.CONTINUOUS, null, null);
@@ -85,14 +88,14 @@ public class DReal4FormulaCreator extends FormulaCreator<DRealTerm<?>, Variable.
   }
 
   @Override
-  public DRealTerm<Variable> makeVariable(Variable.Type pType, String varName) {
+  public DRealTerm<Variable, Variable.Type> makeVariable(Variable.Type pType, String varName) {
     if (variablesCache.get(varName) == null) {
-      DRealTerm<Variable> var =
-          new DRealTerm<>(new Variable(varName, pType), pType);
+      DRealTerm<Variable, Variable.Type> var =
+          new DRealTerm<>(new Variable(varName, pType), pType,pType);
       variablesCache.put(varName, var);
       return var;
     } else {
-      DRealTerm<Variable> var = variablesCache.get(varName);
+      DRealTerm<Variable, Variable.Type> var = variablesCache.get(varName);
       if (var.getVariable().get_type() == pType) {
         return var;
       } else {
@@ -103,12 +106,12 @@ public class DReal4FormulaCreator extends FormulaCreator<DRealTerm<?>, Variable.
   }
 
   @Override
-  public DRealTerm<?> extractInfo(Formula pT) {
+  public DRealTerm<?, ?> extractInfo(Formula pT) {
     return DReal4FormulaManager.getDReal4Formula(pT);
   }
 
   @Override
-  public FormulaType<?> getFormulaType(DRealTerm<?> formula) {
+  public FormulaType<?> getFormulaType(DRealTerm<?, ?> formula) {
     if (formula.getType() == Variable.Type.BOOLEAN) {
       return FormulaType.BooleanType;
     } else if (formula.getType() == Variable.Type.INTEGER) {
@@ -119,7 +122,7 @@ public class DReal4FormulaCreator extends FormulaCreator<DRealTerm<?>, Variable.
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T extends Formula> T encapsulate(FormulaType<T> pType, DRealTerm<?> pTerm) {
+  public <T extends Formula> T encapsulate(FormulaType<T> pType, DRealTerm<?, ?> pTerm) {
     assert FormulaType.IntegerType.equals(pType)
         || (FormulaType.RationalType.equals(pType)
         && FormulaType.IntegerType.equals(getFormulaType(pTerm)))
@@ -138,64 +141,79 @@ public class DReal4FormulaCreator extends FormulaCreator<DRealTerm<?>, Variable.
   }
 
   @Override
-  public BooleanFormula encapsulateBoolean(DRealTerm<?> pTerm) {
+  public BooleanFormula encapsulateBoolean(DRealTerm<?, ?> pTerm) {
     assert getFormulaType(pTerm).isBooleanType()
         : String.format(
         "%s is not boolean, but %s (%s)", pTerm.to_string(), pTerm.getType(), getFormulaType(pTerm));
     return new DReal4BooleanFormula(pTerm);
   }
   @Override
-  public <R> R visit(FormulaVisitor<R> visitor, Formula formula, DRealTerm<?> f) {
+  public <R> R visit(FormulaVisitor<R> visitor, Formula formula, DRealTerm<?, ?> f) {
 
     final FunctionDeclarationKind functionKind;
-    List<DRealTerm<?>> functionArgs = null;
+    FormulaKind formulaKind = null;
+    ExpressionKind expressionKind = null;
+    List<DRealTerm<?, ?>> functionArgs = null;
 
     if (f.isVar()) {
       return visitor.visitFreeVariable(formula, f.getVariable().to_string());
     } else if (f.isExp()) {
       ExpressionKind kind = f.getExpressionKind();
       if (kind == ExpressionKind.Constant) {
-        // not possible to create an Expression from a boolean Variable
+        String s = f.to_string();
+        int idx = s.indexOf(".");
+        if (idx == -1) {
+          return visitor.visitConstant(formula, new BigInteger(s));
+        } else {
+          return visitor.visitConstant(formula, BigDecimal.valueOf(parseDouble(s)));
+        }
+/*        // not possible to create an Expression from a boolean Variable
         if (f.getType() == Variable.Type.INTEGER) {
           return visitor.visitConstant(formula, new BigInteger(f.getExpression().to_string()));
         } else {
           return visitor.visitConstant(formula,
               BigDecimal.valueOf(parseDouble(f.getExpression().to_string())));
-        }
+        }*/
       } else if (kind == ExpressionKind.Var) {
         return visitor.visitFreeVariable(formula, f.getExpression().to_string());
       } else if (kind == ExpressionKind.IfThenElse) {
         functionKind = FunctionDeclarationKind.ITE;
+        expressionKind = ExpressionKind.IfThenElse;
         functionArgs = getExpressionFromITE(f);
       } else if (kind == ExpressionKind.Pow) {
         // the exponent should only be an int i >= 2, because the only way to get an
         // expression with an exponent is to create an expression like (x*x*x), because pow is
         // not supported in JavaSMT or if a variable gets negated, so pow(x,-1)
-        DRealTerm<Expression> pow;
+        DRealTerm<Expression, ExpressionKind> pow;
         Expression lhs = dreal.get_first_argument(f.getExpression());
         Expression rhs = dreal.get_second_argument(f.getExpression());
         double exponent = parseDouble(rhs.to_string());
         if (exponent < 0) {
           functionKind = FunctionDeclarationKind.DIV;
+          expressionKind = ExpressionKind.Div;
           pow = new DRealTerm<>(dreal.Divide(Expression.One(), lhs),
-              dreal.get_variable(lhs).get_type());
+              dreal.get_variable(lhs).get_type(), ExpressionKind.Div);
         } else {
           functionKind = FunctionDeclarationKind.MUL;
+          expressionKind = ExpressionKind.Mul;
           Expression exp = dreal.Multiply(lhs, lhs);
           for (int i = 2; i < exponent; i++) {
             exp = dreal.Multiply(exp, lhs);
           }
-          pow = new DRealTerm<>(exp, dreal.get_variable(lhs).get_type());
+          pow = new DRealTerm<>(exp, dreal.get_variable(lhs).get_type(), ExpressionKind.Mul);
         }
         functionArgs = getExpressionFromMul(pow);
       } else if (kind == ExpressionKind.Add) {
         functionKind = FunctionDeclarationKind.ADD;
+        expressionKind = ExpressionKind.Add;
         functionArgs = getExpressionFromAdd(f);
       } else if (kind == ExpressionKind.Mul) {
         functionKind = FunctionDeclarationKind.MUL;
+        expressionKind = ExpressionKind.Mul;
         functionArgs = getExpressionFromMul(f);
       } else {
         functionKind = FunctionDeclarationKind.DIV;
+        expressionKind = ExpressionKind.Div;
         functionArgs = getExpressionsFromDiv(f);
       }
     } else {
@@ -203,47 +221,56 @@ public class DReal4FormulaCreator extends FormulaCreator<DRealTerm<?>, Variable.
       if (kind == FormulaKind.Forall) {
         VariableSet set = f.getFormula().getQuantifiedVariables();
         List<Formula> boundVariables = new ArrayList<>();
-        DRealTerm<?> var;
+        DRealTerm<Variable, Variable.Type> var;
         Iterator<Variable> iter = set.iterator();
         Variable next;
         for (int i = 0; i < set.size(); i++) {
           next = iter.next();
-          var = new DRealTerm<>(next, next.get_type());
+          var = new DRealTerm<>(next, next.get_type(), next.get_type());
           boundVariables.add(encapsulate(getFormulaType(var), var));
         }
-        DRealTerm<org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula> quantifiedFormula =
+        DRealTerm<org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula, FormulaKind> quantifiedFormula =
             new DRealTerm<>(dreal.get_quantified_formula(f.getFormula()),
-                Variable.Type.BOOLEAN);
+                Variable.Type.BOOLEAN, f.getFormula().get_kind());
         return visitor.visitQuantifier((BooleanFormula) formula, FORALL, boundVariables,
             encapsulateBoolean(quantifiedFormula));
       } else if (kind == FormulaKind.And) {
         functionKind = FunctionDeclarationKind.AND;
+        formulaKind = FormulaKind.And;
         functionArgs = getFormulaArgs(f);
       } else if (kind == FormulaKind.Or) {
         functionKind = FunctionDeclarationKind.OR;
+        formulaKind = FormulaKind.Or;
         functionArgs = getFormulaArgs(f);
       } else if (kind == FormulaKind.Not) {
         functionKind = FunctionDeclarationKind.NOT;
+        formulaKind = FormulaKind.Not;
         functionArgs = getFormulaFromNot(f);
       } else if (kind == FormulaKind.Eq) {
         functionKind = FunctionDeclarationKind.EQ;
+        formulaKind = FormulaKind.Eq;
       } else if (kind == FormulaKind.Geq) {
         functionKind = FunctionDeclarationKind.GTE;
+        formulaKind = FormulaKind.Geq;
       } else if (kind == FormulaKind.Gt) {
         functionKind = FunctionDeclarationKind.GT;
+        formulaKind = FormulaKind.Gt;
       } else if (kind == FormulaKind.Leq) {
         functionKind = FunctionDeclarationKind.LT;
+        formulaKind = FormulaKind.Lt;
       } else if (kind == FormulaKind.Lt) {
         functionKind = FunctionDeclarationKind.LTE;
+        formulaKind = FormulaKind.Leq;
       } else if (kind == FormulaKind.Neq) {
         // lhs ≠ rhs -> (lhs > rhs) ∨ (lhs < rhs)
         Expression lhs = dreal.get_lhs_expression(f.getFormula());
         Expression rhs = dreal.get_rhs_expression(f.getFormula());
-        DRealTerm<org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula> neqTerm =
+        DRealTerm<org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula, FormulaKind> neqTerm =
             new DRealTerm<>(
                 new org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula(dreal.Or(dreal.Grater(lhs,
-                    rhs), dreal.Less(lhs, rhs))), Variable.Type.BOOLEAN);
+                    rhs), dreal.Less(lhs, rhs))), Variable.Type.BOOLEAN, FormulaKind.Or);
         functionKind = FunctionDeclarationKind.OR;
+        formulaKind = FormulaKind.Or;
         functionArgs = getFormulaArgs(neqTerm);
       } else if (kind == FormulaKind.Var) {
         return visitor.visitFreeVariable(formula, f.getFormula().to_string());
@@ -261,15 +288,15 @@ public class DReal4FormulaCreator extends FormulaCreator<DRealTerm<?>, Variable.
       functionArgs = getExpressionArgs(f);
     }
 
-    DRealTerm<?> pDeclaration;
+    DRealTerm<?, ?> pDeclaration;
 
     // Variable should be handled above, just to be sure
     Preconditions.checkState(f.isExp() || f.isFormula());
     if (f.isExp()) {
-      pDeclaration = new DRealTerm<>(new Expression(), f.getType());
+      pDeclaration = new DRealTerm<>(new Expression(), f.getType(), expressionKind);
     } else {
       pDeclaration = new DRealTerm<>(new org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula(),
-          f.getType());
+          f.getType(), formulaKind);
     }
 
 
@@ -285,12 +312,12 @@ public class DReal4FormulaCreator extends FormulaCreator<DRealTerm<?>, Variable.
         functionKind, argTypes, getFormulaType(f), pDeclaration));
 
   }
-  private List<FormulaType<?>> toType(final List<DRealTerm<?>> args) {
+  private List<FormulaType<?>> toType(final List<DRealTerm<?, ?>> args) {
     return Lists.transform(args, this::getFormulaType);
   }
 
-  private static List<DRealTerm<?>> getFormulaArgs(DRealTerm<?> pTerm) {
-    List<DRealTerm<?>> formulas = new ArrayList<>();
+  private static List<DRealTerm<?, ?>> getFormulaArgs(DRealTerm<?, ?> pTerm) {
+    List<DRealTerm<?, ?>> formulas = new ArrayList<>();
     org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula formula;
 
     if (pTerm.isFormula()) {
@@ -298,7 +325,7 @@ public class DReal4FormulaCreator extends FormulaCreator<DRealTerm<?>, Variable.
       Iterator<org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula> iter = set.iterator();
       for (int i = 0; i < set.size(); i++) {
         formula = iter.next();
-        formulas.add(new DRealTerm<>(formula, pTerm.getType()));
+        formulas.add(new DRealTerm<>(formula, pTerm.getType(), formula.get_kind()));
       }
       return formulas;
     } else {
@@ -306,8 +333,8 @@ public class DReal4FormulaCreator extends FormulaCreator<DRealTerm<?>, Variable.
     }
   }
 
-  private static List<DRealTerm<?>> getExpressionArgs(DRealTerm<?> parent) {
-    List<DRealTerm<?>> children = new ArrayList<>();
+  private static List<DRealTerm<?, ?>> getExpressionArgs(DRealTerm<?, ?> parent) {
+    List<DRealTerm<?, ?>> children = new ArrayList<>();
     if (parent.isExp()) {
       throw new IllegalArgumentException("Term is Expression.");
     } else if (parent.isFormula()) {
@@ -315,84 +342,89 @@ public class DReal4FormulaCreator extends FormulaCreator<DRealTerm<?>, Variable.
       if (type == null) {
         type = getTypeForExpressions(dreal.get_rhs_expression(parent.getFormula()));
       }
-      children.add(new DRealTerm<>(dreal.get_lhs_expression(parent.getFormula()), type));
-      children.add(new DRealTerm<>(dreal.get_rhs_expression(parent.getFormula()), type));
+      Expression left = dreal.get_lhs_expression(parent.getFormula());
+      Expression right = dreal.get_rhs_expression(parent.getFormula());
+      children.add(new DRealTerm<>(left, type, left.get_kind()));
+      children.add(new DRealTerm<>(right, type, right.get_kind()));
       return children;
     } else {
       throw new IllegalArgumentException("Term is Variable.");
     }
   }
 
-  private static List<DRealTerm<?>> getFormulaFromNot(DRealTerm<?> pTerm) {
-    List<DRealTerm<?>> formula = new ArrayList<>();
+  private static List<DRealTerm<?, ?>> getFormulaFromNot(DRealTerm<?, ?> pTerm) {
+    List<DRealTerm<?, ?>> formula = new ArrayList<>();
     if (pTerm.isVar() || pTerm.isExp()) {
       throw new IllegalArgumentException("Term is Expression or Variable.");
     } else {
       org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula term = dreal.get_operand(pTerm.getFormula());
-      formula.add(new DRealTerm<>(term, Variable.Type.BOOLEAN));
+      formula.add(new DRealTerm<>(term, Variable.Type.BOOLEAN, term.get_kind()));
       return formula;
     }
   }
 
   // TODO: use Preconditions in getExpressionFrom...()
-  private static List<DRealTerm<?>> getExpressionsFromDiv(DRealTerm<?> pTerm) {
-    List<DRealTerm<?>> children = new ArrayList<>();
+  private static List<DRealTerm<?, ?>> getExpressionsFromDiv(DRealTerm<?, ?> pTerm) {
+    List<DRealTerm<?, ?>> children = new ArrayList<>();
     if (pTerm.isVar() || pTerm.isFormula()) {
       throw new IllegalArgumentException("Term is Variable or Formula");
     } else {
-      children.add(new DRealTerm<>(dreal.get_first_argument(pTerm.getExpression()),
-          pTerm.getType()));
-      children.add(new DRealTerm<>(dreal.get_second_argument(pTerm.getExpression()),
-          pTerm.getType()));
+      Expression first = dreal.get_first_argument(pTerm.getExpression());
+      Expression second = dreal.get_second_argument(pTerm.getExpression());
+      children.add(new DRealTerm<>(first, pTerm.getType(), first.get_kind()));
+      children.add(new DRealTerm<>(second, pTerm.getType(), second.get_kind()));
       return children;
     }
   }
 
-  private static List<DRealTerm<?>> getExpressionFromITE(DRealTerm<?> pTerm) {
-    List<DRealTerm<?>> children = new ArrayList<>();
+  private static List<DRealTerm<?, ?>> getExpressionFromITE(DRealTerm<?, ?> pTerm) {
+    List<DRealTerm<?, ?>> children = new ArrayList<>();
     if (pTerm.isFormula() || pTerm.isVar()) {
       throw new IllegalArgumentException("Term is Variable or Formula");
     } else {
-      children.add(new DRealTerm<>(dreal.get_conditional_formula(pTerm.getExpression()),
-          pTerm.getType()));
-      children.add(new DRealTerm<>(dreal.get_then_expression(pTerm.getExpression()),
-          pTerm.getType()));
-      children.add(new DRealTerm<>(dreal.get_else_expression(pTerm.getExpression()),
-          pTerm.getType()));
+      org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula cond =
+          dreal.get_conditional_formula(pTerm.getExpression());
+      Expression expThen = dreal.get_then_expression(pTerm.getExpression());
+      Expression expElse = dreal.get_else_expression(pTerm.getExpression());
+      children.add(new DRealTerm<>(cond, pTerm.getType(), cond.get_kind()));
+      children.add(new DRealTerm<>(expThen, pTerm.getType(), expThen.get_kind()));
+      children.add(new DRealTerm<>(expElse, pTerm.getType(), expElse.get_kind()));
       return children;
     }
   }
 
-  private static List<DRealTerm<?>> getExpressionFromAdd(DRealTerm<?> pTerm) {
-    List<DRealTerm<?>> terms = new ArrayList<>();
+  private static List<DRealTerm<?, ?>> getExpressionFromAdd(DRealTerm<?, ?> pTerm) {
+    List<DRealTerm<?, ?>> terms = new ArrayList<>();
     if (pTerm.isVar() || pTerm.isFormula()) {
       throw new IllegalArgumentException("Term is Variable or Formula.");
     } else {
+
       terms.add(new DRealTerm<>(new Expression(dreal.get_constant_in_addition(pTerm.getExpression())),
-          pTerm.getType()));
+          pTerm.getType(), ExpressionKind.Constant));
       ExpressionDoubleMap map = dreal.get_expr_to_coeff_map_in_addition(pTerm.getExpression());
       for (Map.Entry<Expression, Double> entry : map.entrySet()) {
         terms.add(new DRealTerm<>(new Expression(dreal.Multiply(entry.getKey(),
-            new Expression(entry.getValue()))), pTerm.getType()));
+            new Expression(entry.getValue()))), pTerm.getType(), ExpressionKind.Mul));
       }
       return terms;
     }
   }
 
-  private static List<DRealTerm<?>> getExpressionFromMul(DRealTerm<?> pTerm) {
-    List<DRealTerm<?>> terms = new ArrayList<>();
+  private static List<DRealTerm<?, ?>> getExpressionFromMul(DRealTerm<?, ?> pTerm) {
+    List<DRealTerm<?, ?>> terms = new ArrayList<>();
     if (pTerm.isFormula() || pTerm.isVar()) {
       throw new IllegalArgumentException("Term is Variable or Formula");
     } else {
       terms.add(new DRealTerm<>(
           new Expression(dreal.get_constant_in_multiplication(pTerm.getExpression())),
-          pTerm.getType()));
+          pTerm.getType(), ExpressionKind.Constant));
       ExpressionExpressionMap map =
           dreal.get_base_to_exponent_map_in_multiplication(pTerm.getExpression());
       // Map of Variable and exponent, exponent can be -1 or grater than 0, we will return pow
       // (var, exp), visit will handle pow
       for (Map.Entry<Expression, Expression> entry : map.entrySet()) {
-        terms.add(new DRealTerm<>(dreal.pow(entry.getKey(), entry.getValue()), pTerm.getType()));
+        terms.add(new DRealTerm<>(dreal.pow(entry.getKey(), entry.getValue()), pTerm.getType(),
+            ExpressionKind.Pow));
       }
       return terms;
     }
@@ -469,90 +501,342 @@ public class DReal4FormulaCreator extends FormulaCreator<DRealTerm<?>, Variable.
     }
   }
 
-  //TODO: nicht richtig so -> antwort von dReal?
   @Override
-  public DRealTerm<?> callFunctionImpl(DRealTerm<?> declaration, List<DRealTerm<?>> args) {
+  public DRealTerm<?, ?> declareUFImpl(String pName, Variable.Type pReturnType,
+                                    List<Variable.Type> pArgTypes) {
+    return null;
+    //throw new UnsupportedOperationException("dReal does not support UF's.");
+  }
+
+  // TODO: Funtkion schreiben, um nicht immer wieder die Fälle durchzugehen sondern das auslagern
+  //  wenn möglich
+  @Override
+  public DRealTerm<?, ?> callFunctionImpl(DRealTerm<?, ?> declaration, List<DRealTerm<?, ?>> args) {
     if (args.isEmpty()) {
-      // Variable erstellen
-      throw new IllegalArgumentException("dReal does not support UFs without arguments.");
+      // create variable with type of declaration term
+      return new DRealTerm<>(new Variable("newVar", declaration.getType()),
+          declaration.getType(), declaration.getType());
     } else {
       Expression expression;
       org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula formula;
       if (declaration.isExp()) {
-        ExpressionKind expressionKind = declaration.getExpressionKind();
+        ExpressionKind expressionKind = (ExpressionKind) declaration.getDeclaration();
         if (expressionKind.equals(ExpressionKind.IfThenElse)) {
-          return new DRealTerm<>(
-              dreal.if_then_else(args.get(0).getFormula(), args.get(1).getExpression(),
-                  args.get(2).getExpression()), args.get(2).getType());
+          // ITE cond has to be a formula
+          Preconditions.checkState(args.get(0).isFormula());
+          DRealTerm<?, ?> args1 = args.get(1);
+          DRealTerm<?, ?> args2 = args.get(2);
+          Expression ite;
+          // ITE else and then must be expression or variable
+          Preconditions.checkState(args1.isExp() || args1.isVar()
+              && args2.isExp() || args2.isVar());
+          if (args1.isVar() && args2.isVar()) {
+            ite = dreal.if_then_else(args.get(0).getFormula(),
+                new Expression(args1.getVariable()), new Expression(args2.getVariable()));
+          } else if (args1.isVar() && args2.isExp()) {
+            ite = dreal.if_then_else(args.get(0).getFormula(), new Expression(args1.getVariable()),
+                args2.getExpression());
+          } else if (args1.isExp() && args2.isVar()) {
+            ite = dreal.if_then_else(args.get(0).getFormula(),
+                args1.getExpression(), new Expression(args2.getVariable()));
+          } else {
+            ite = dreal.if_then_else(args.get(0).getFormula(), args1.getExpression(),
+                args2.getExpression());
+          }
+          return new DRealTerm<>(ite, args2.getType(), ExpressionKind.IfThenElse);
         } else if (expressionKind.equals(ExpressionKind.Div)) {
-          return new DRealTerm<>(dreal.Divide(args.get(0).getExpression(),
-              args.get(1).getExpression()), args.get(0).getType());
+          DRealTerm<?, ?> args1 = args.get(0);
+          DRealTerm<?, ?> args2 = args.get(1);
+          Expression div;
+          // Numerator and denumerator must be expression or variable
+          Preconditions.checkState(args1.isExp() || args1.isVar()
+              && args2.isExp() || args2.isVar());
+          if (args1.isVar() && args2.isVar()) {
+            div = dreal.Divide(new Expression(args1.getVariable()),
+                new Expression(args2.getVariable()));
+          } else if (args1.isVar() && args2.isExp()) {
+            div = dreal.Divide(new Expression(args1.getVariable()),
+                args2.getExpression());
+          } else if (args1.isExp() && args2.isVar()) {
+            div = dreal.Divide(args1.getExpression(),
+                new Expression(args2.getVariable()));
+          } else {
+            div = dreal.Divide(args1.getExpression(),
+                args2.getExpression());
+          }
+          return new DRealTerm<>(div, args1.getType(), ExpressionKind.Div);
         } else if (expressionKind.equals(ExpressionKind.Mul)) {
-          expression = dreal.Multiply(args.get(0).getExpression(), args.get(1).getExpression());
+          DRealTerm<?, ?> args1 = args.get(0);
+          DRealTerm<?, ?> args2 = args.get(1);
+          Expression mult;
+          // First/Second argument must be expression or variable
+          Preconditions.checkState(args1.isExp() || args1.isVar()
+              && args2.isExp() || args2.isVar());
+          if (args1.isVar() && args2.isVar()) {
+            mult = dreal.Multiply(new Expression(args1.getVariable()),
+                new Expression(args2.getVariable()));
+          } else if (args1.isVar() && args2.isExp()) {
+            mult = dreal.Multiply(new Expression(args1.getVariable()),
+                args2.getExpression());
+          } else if (args1.isExp() && args2.isVar()) {
+            mult = dreal.Multiply(args1.getExpression(),
+                new Expression(args2.getVariable()));
+          } else {
+            mult = dreal.Multiply(args1.getExpression(),
+                args2.getExpression());
+          }
           if (args.size() > 2) {
             for (int i = 2; i < args.size(); i++) {
-              expression = dreal.Multiply(expression, args.get(i).getExpression());
+              if (args.get(i).isExp()) {
+                mult = dreal.Multiply(mult, args.get(i).getExpression());
+              } else {
+                mult = dreal.Multiply(mult, new Expression(args.get(i).getVariable()));
+              }
             }
           }
-          return new DRealTerm<>(expression, args.get(0).getType());
+          return new DRealTerm<>(mult, args.get(0).getType(), ExpressionKind.Mul);
         } else if (expressionKind.equals(ExpressionKind.Add)) {
-          expression = dreal.Add(args.get(0).getExpression(), args.get(1).getExpression());
+          DRealTerm<?, ?> args1 = args.get(0);
+          DRealTerm<?, ?> args2 = args.get(1);
+          Expression add;
+          // First/Second argument must be expression or variable
+          Preconditions.checkState(args1.isExp() || args1.isVar()
+              && args2.isExp() || args2.isVar());
+          if (args1.isVar() && args2.isVar()) {
+            add = dreal.Add(new Expression(args1.getVariable()),
+                new Expression(args2.getVariable()));
+          } else if (args1.isVar() && args2.isExp()) {
+            add = dreal.Add(new Expression(args1.getVariable()),
+                args2.getExpression());
+          } else if (args1.isExp() && args2.isVar()) {
+            add = dreal.Add(args1.getExpression(),
+                new Expression(args2.getVariable()));
+          } else {
+            add = dreal.Add(args1.getExpression(),
+                args2.getExpression());
+          }
           if (args.size() > 2) {
             for (int i = 2; i < args.size(); i++) {
-              expression = dreal.Add(expression, args.get(i).getExpression());
+              if (args.get(i).isExp()) {
+                add = dreal.Add(add, args.get(i).getExpression());
+              } else {
+                add = dreal.Add(add, new Expression(args.get(i).getVariable()));
+              }
             }
           }
-          return new DRealTerm<>(expression, args.get(0).getType());
-        } else if (expressionKind.equals(ExpressionKind.UninterpretedFunction)) {
-          //TODO: Was soll passieren?
-          return new DRealTerm<>(args.get(0).getExpression(), args.get(0).getType());
+          return new DRealTerm<>(add, args.get(0).getType(), ExpressionKind.Add);
+        } else {
+          throw new UnsupportedOperationException("No known declarationkind and UF's are not "
+              + "supported.");
         }
       } else if (declaration.isFormula()) {
-        FormulaKind formulaKind = declaration.getFormulaKind();
+        FormulaKind formulaKind = (FormulaKind) declaration.getDeclaration();
         if (formulaKind.equals(FormulaKind.Not)) {
-          return new DRealTerm<>(dreal.Not(args.get(0).getFormula()), args.get(0).getType());
+          DRealTerm<?, ?> args1 = args.get(0);
+          org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula not;
+          // Argument must be formula or variable
+          Preconditions.checkState(args1.isFormula() || args1.isVar());
+          if (args1.isVar() && args1.getType() == Variable.Type.BOOLEAN) {
+            not = dreal.Not(new Variable(args1.getVariable()));
+          }  else if (args1.isFormula()) {
+            not = dreal.Not(args1.getFormula());
+          } else {
+            throw new IllegalArgumentException("Variable is not of boolean type and therefore a "
+                + "formula can not be created.");
+          }
+          return new DRealTerm<>(not, Variable.Type.BOOLEAN,
+              FormulaKind.Not);
         } else if (formulaKind.equals(FormulaKind.Eq)) {
-          return new DRealTerm<>(dreal.Equal(args.get(0).getExpression(),
-              args.get(1).getExpression()), args.get(0).getType());
+          DRealTerm<?, ?> args1 = args.get(0);
+          DRealTerm<?, ?> args2 = args.get(1);
+          org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula eq;
+          if (args1.isVar() && args2.isVar()) {
+            eq = dreal.Equal(args1.getVariable(), args2.getVariable());
+          } else if (args1.isVar() && args2.isExp()) {
+            eq = dreal.Equal(new Expression(args1.getVariable()), args2.getExpression());
+          } else if (args1.isVar() && args2.isFormula()) {
+                          eq = dreal.Equal(args1.getVariable(), args2.getFormula());
+          } else if (args1.isExp() && args2.isVar()) {
+            eq = dreal.Equal(args1.getExpression(), new Expression(args2.getVariable()));
+          } else if (args1.isExp() && args2.isExp()) {
+            eq = dreal.Equal(args1.getExpression(), args2.getExpression());
+          } else if (args1.isFormula() && args2.isVar()) {
+            eq = dreal.Equal(args1.getFormula(), args2.getVariable());
+          } else if (args1.isFormula() && args2.isFormula()) {
+            eq = dreal.Equal(args1.getFormula(), args2.getFormula());
+          } else {
+            throw new UnsupportedOperationException("Can not create an equal formula from "
+                + "Expression and Formula.");
+          }
+          return new DRealTerm<>(eq, Variable.Type.BOOLEAN, FormulaKind.Eq);
         } else if (formulaKind.equals(FormulaKind.Gt)) {
-          return new DRealTerm<>(dreal.Grater(args.get(0).getExpression(),
-              args.get(1).getExpression()), args.get(0).getType());
+          DRealTerm<?, ?> args1 = args.get(0);
+          DRealTerm<?, ?> args2 = args.get(1);
+          org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula gt;
+          // First/Second argument must be expression or variable
+          Preconditions.checkState(args1.isExp() || args1.isVar()
+              && args2.isExp() || args2.isVar());
+          if (args1.isVar() && args2.isVar()) {
+            gt = dreal.Grater(new Expression(args1.getVariable()),
+                new Expression(args2.getVariable()));
+          } else if (args1.isVar() && args2.isExp()) {
+            gt = dreal.Grater(new Expression(args1.getVariable()),
+                args2.getExpression());
+          } else if (args1.isExp() && args2.isVar()) {
+            gt = dreal.Grater(args1.getExpression(),
+                new Expression(args2.getVariable()));
+          } else {
+            gt = dreal.Grater(args1.getExpression(),
+                args2.getExpression());
+          }
+          return new DRealTerm<>(gt, args.get(0).getType(), FormulaKind.Gt);
         } else if (formulaKind.equals(FormulaKind.Geq)) {
-          return new DRealTerm<>(dreal.GraterEqual(args.get(0).getExpression(),
-              args.get(1).getExpression()), args.get(0).getType());
+          DRealTerm<?, ?> args1 = args.get(0);
+          DRealTerm<?, ?> args2 = args.get(1);
+          org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula geq;
+          // First/Second argument must be expression or variable
+          Preconditions.checkState(args1.isExp() || args1.isVar()
+              && args2.isExp() || args2.isVar());
+          if (args1.isVar() && args2.isVar()) {
+            geq = dreal.GraterEqual(new Expression(args1.getVariable()),
+                new Expression(args2.getVariable()));
+          } else if (args1.isVar() && args2.isExp()) {
+            geq = dreal.GraterEqual(new Expression(args1.getVariable()),
+                args2.getExpression());
+          } else if (args1.isExp() && args2.isVar()) {
+            geq = dreal.GraterEqual(args1.getExpression(),
+                new Expression(args2.getVariable()));
+          } else {
+            geq = dreal.GraterEqual(args1.getExpression(),
+                args2.getExpression());
+          }
+          return new DRealTerm<>(geq, args.get(0).getType(), FormulaKind.Geq);
         } else if (formulaKind.equals(FormulaKind.Lt)) {
-          return new DRealTerm<>(dreal.Less(args.get(0).getExpression(),
-              args.get(1).getExpression()), args.get(0).getType());
+          DRealTerm<?, ?> args1 = args.get(0);
+          DRealTerm<?, ?> args2 = args.get(1);
+          org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula lt;
+          // First/Second argument must be expression or variable
+          Preconditions.checkState(args1.isExp() || args1.isVar()
+              && args2.isExp() || args2.isVar());
+          if (args1.isVar() && args2.isVar()) {
+            lt = dreal.Less(new Expression(args1.getVariable()),
+                new Expression(args2.getVariable()));
+          } else if (args1.isVar() && args2.isExp()) {
+            lt = dreal.Less(new Expression(args1.getVariable()),
+                args2.getExpression());
+          } else if (args1.isExp() && args2.isVar()) {
+            lt = dreal.Less(args1.getExpression(),
+                new Expression(args2.getVariable()));
+          } else {
+            lt = dreal.Less(args1.getExpression(),
+                args2.getExpression());
+          }
+          return new DRealTerm<>(lt, args.get(0).getType(), FormulaKind.Lt);
         } else if (formulaKind.equals(FormulaKind.Leq)) {
-          return new DRealTerm<>(dreal.LessEqual(args.get(0).getExpression(),
-              args.get(1).getExpression()), args.get(0).getType());
+          DRealTerm<?, ?> args1 = args.get(0);
+          DRealTerm<?, ?> args2 = args.get(1);
+          org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula leq;
+          // First/Second argument must be expression or variable
+          Preconditions.checkState(args1.isExp() || args1.isVar()
+              && args2.isExp() || args2.isVar());
+          if (args1.isVar() && args2.isVar()) {
+            leq = dreal.LessEqual(new Expression(args1.getVariable()),
+                new Expression(args2.getVariable()));
+          } else if (args1.isVar() && args2.isExp()) {
+            leq = dreal.LessEqual(new Expression(args1.getVariable()),
+                args2.getExpression());
+          } else if (args1.isExp() && args2.isVar()) {
+            leq = dreal.LessEqual(args1.getExpression(),
+                new Expression(args2.getVariable()));
+          } else {
+            leq = dreal.LessEqual(args1.getExpression(),
+                args2.getExpression());
+          }
+          return new DRealTerm<>(leq, args.get(0).getType(), FormulaKind.Leq);
         } else if (formulaKind.equals(FormulaKind.And)) {
-          formula = dreal.And(args.get(0).getFormula(), args.get(1).getFormula());
+          DRealTerm<?, ?> args1 = args.get(0);
+          DRealTerm<?, ?> args2 = args.get(1);
+          org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula and;
+          if (args1.isVar() && args1.getType() == Variable.Type.BOOLEAN
+              && args2.isVar() && args2.getType() == Variable.Type.BOOLEAN) {
+            and = dreal.And(new org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula(args1.getVariable()),
+                new org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula(args2.getVariable()));
+          } else if (args1.isVar() && args1.getType() == Variable.Type.BOOLEAN
+              && args2.isFormula()) {
+            and = dreal.And(new org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula(args1.getVariable()),
+                args2.getFormula());
+          } else if (args1.isFormula()
+              && args2.isVar() && args2.getType() == Variable.Type.BOOLEAN) {
+            and = dreal.And(args1.getFormula(),
+                new org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula(args2.getVariable()));
+          } else if (args1.isFormula() && args2.isFormula()){
+            and = dreal.And(args1.getFormula(), args2.getFormula());
+          } else {
+            throw new UnsupportedOperationException("And-Formula from Expression or Variable of "
+                + "not boolean type is not supported.");
+          }
           if (args.size() > 2) {
             for (int i = 2; i < args.size(); i++) {
-              formula = dreal.And(formula, args.get(i).getFormula());
+              if (args.get(i).isVar() && args.get(i).getType() == Variable.Type.BOOLEAN) {
+                and = dreal.And(and, new org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula(args.get(i).getVariable()));
+              } else if (args.get(i).isFormula()) {
+                and = dreal.And(and, args.get(i).getFormula());
+              } else {
+                throw new UnsupportedOperationException("And-Formula from Expression or Variable "
+                    + "of not boolean type is not supported.");
+              }
             }
           }
-          return new DRealTerm<>(formula, Variable.Type.BOOLEAN);
+          return new DRealTerm<>(and, Variable.Type.BOOLEAN, FormulaKind.And);
         } else if (formulaKind.equals(FormulaKind.Or)) {
-          formula = dreal.Or(args.get(0).getFormula(), args.get(1).getFormula());
+          DRealTerm<?, ?> args1 = args.get(0);
+          DRealTerm<?, ?> args2 = args.get(1);
+          org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula or;
+          if (args1.isVar() && args1.getType() == Variable.Type.BOOLEAN
+              && args2.isVar() && args2.getType() == Variable.Type.BOOLEAN) {
+            or =
+                dreal.Or(new org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula(args1.getVariable()),
+                new org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula(args2.getVariable()));
+          } else if (args1.isVar() && args1.getType() == Variable.Type.BOOLEAN
+              && args2.isFormula()) {
+            or =
+                dreal.Or(new org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula(args1.getVariable()),
+                args2.getFormula());
+          } else if (args1.isFormula()
+              && args2.isVar() && args2.getType() == Variable.Type.BOOLEAN) {
+            or = dreal.Or(args1.getFormula(),
+                new org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula(args2.getVariable()));
+          } else if (args1.isFormula() && args2.isFormula()){
+            or = dreal.Or(args1.getFormula(), args2.getFormula());
+          } else {
+            throw new UnsupportedOperationException("or-Formula from Expression or Variable of "
+                + "not boolean type is not supported.");
+          }
           if (args.size() > 2) {
             for (int i = 2; i < args.size(); i++) {
-              formula = dreal.Or(formula, args.get(i).getFormula());
+              if (args.get(i).isVar() && args.get(i).getType() == Variable.Type.BOOLEAN) {
+                or = dreal.Or(or,
+                    new org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula(args.get(i).getVariable()));
+              } else if (args.get(i).isFormula()) {
+                or = dreal.Or(or, args.get(i).getFormula());
+              } else {
+                throw new UnsupportedOperationException("or-Formula from Expression or Variable "
+                    + "of not boolean type is not supported.");
+              }
             }
           }
-          return new DRealTerm<>(formula, Variable.Type.BOOLEAN);
+          return new DRealTerm<>(or, Variable.Type.BOOLEAN, FormulaKind.And);
         }
       } else {
-        // Variable?
-        return null;
+        throw new UnsupportedOperationException("No known declarationkind and UF's are not "
+            + "supported.");
       }
       throw new IllegalArgumentException("Unknown function declaration.");
     }
   }
 
-  //TODO: nicht richtig so -> antwort von dReal?
-  @Override
+  //TODO: nicht richtig so -> nicht unterstützt
+/*  @Override
   public DRealTerm<?> declareUFImpl(String pName, Variable.Type pReturnType, List<Variable.Type> pArgTypes) {
     DRealTerm<?> term = functionCache.get(pName);
     if (term == null) {
@@ -571,32 +855,33 @@ public class DReal4FormulaCreator extends FormulaCreator<DRealTerm<?>, Variable.
     } else {
       throw new IllegalArgumentException("symbol already exist for UF with different type.");
     }
-  }
+  }*/
 
   @Override
-  protected DRealTerm<?> getBooleanVarDeclarationImpl(DRealTerm<?> pDRealTerm) {
-    // create DRealTerm with dummy Variable, Expression, Formula, only to save declaration in
-    // DRealTerm
+  protected DRealTerm<?, ?> getBooleanVarDeclarationImpl(DRealTerm<?, ?> pDRealTerm) {
     if (pDRealTerm.isVar()) {
-      return new DRealTerm<>(new Variable(), pDRealTerm.getType());
+      return new DRealTerm<>(new Variable(), pDRealTerm.getType(), pDRealTerm.getType());
     } else if (pDRealTerm.isExp()) {
-      return new DRealTerm<>(new Expression(), pDRealTerm.getType());
+      return new DRealTerm<>(new Expression(), pDRealTerm.getType(),
+          (ExpressionKind) pDRealTerm.getDeclaration());
     } else {
       return new DRealTerm<>(new org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula(),
-          pDRealTerm.getType());
+          pDRealTerm.getType(), (FormulaKind) pDRealTerm.getDeclaration());
     }
   }
 
   @Override
-  public Object convertValue(DRealTerm<?> pTerm) {
+  public Object convertValue(DRealTerm<?, ?> pTerm) {
     Preconditions.checkState(pTerm.isExp() || pTerm.isFormula());
     if (pTerm.isExp()) {
-      // This should be a constant, Integer or Rational
+      // This should be a constant
       Preconditions.checkState(pTerm.getExpression().get_kind() == ExpressionKind.Constant);
-      if (pTerm.getType() == Variable.Type.INTEGER) {
-        return new BigInteger(pTerm.getExpression().to_string());
+      String s = pTerm.to_string();
+      int idx = s.indexOf(".");
+      if (idx == -1) {
+        return new BigInteger(s);
       } else {
-        return Rational.ofString(pTerm.getExpression().to_string());
+        return BigDecimal.valueOf(parseDouble(s));
       }
     } else {
       if (pTerm.getFormulaKind() == FormulaKind.True || pTerm.getFormulaKind() == FormulaKind.False) {
