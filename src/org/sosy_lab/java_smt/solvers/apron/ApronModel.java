@@ -29,10 +29,13 @@ import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
 
 public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Environment> {
+
+  private ApronFormulaCreator formulaCreator;
   protected ApronModel(
-      AbstractProver<ApronTheoremProver> prover,
+      AbstractProver<ApronTheoremProver> pProver,
       ApronFormulaCreator creator) {
-    super(prover, creator);
+    super(pProver, creator);
+    this.formulaCreator = creator;
   }
 
   @Override

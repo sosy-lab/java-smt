@@ -34,7 +34,7 @@ public class ApronExamples
 {
   private static void testBox(Manager pManager) throws ApronException {
     String[] intVars = {"x"};
-    String[] realVars = {};
+    String[] realVars = {"y"};
 
     Environment environment = new Environment(intVars, realVars);
     //x <= 2 and x >= -3

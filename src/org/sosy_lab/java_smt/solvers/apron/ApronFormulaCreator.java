@@ -20,18 +20,12 @@
 
 package org.sosy_lab.java_smt.solvers.apron;
 
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvtype_size;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_of_term;
-
 import apron.Environment;
 import com.google.common.base.Preconditions;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
-import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.FormulaType;
@@ -63,6 +57,10 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
     return this.environment;
   }
 
+  public void setEnvironment(Environment pEnvironment) {
+    environment = pEnvironment;
+  }
+
   @Override
   public ApronFormulaType getBitvectorType(int bitwidth) {
     throw new UnsupportedOperationException("Apron does not support bitvector operations.");
@@ -86,13 +84,9 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
             FormulaType.RATIONAL)),
         "Only Integer or rational variables allowed!");
       if(pApronFormulaType.getType().equals(FormulaType.INTEGER)){
-        String[] intvars = new String[]{varName};
-        this.environment.add(intvars,new String[]{});
-        return new ApronIntVarNode(varName);
+        return new ApronIntVarNode(varName,this);
       }else {
-        String[] realvars = new String[]{varName};
-        this.environment.add(new String[]{}, realvars);
-        return new ApronRatVarNode(varName);
+        return new ApronRatVarNode(varName, this);
       }
   }
 

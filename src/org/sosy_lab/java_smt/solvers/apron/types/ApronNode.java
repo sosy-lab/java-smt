@@ -23,12 +23,14 @@ package org.sosy_lab.java_smt.solvers.apron.types;
 import apron.Environment;
 import apron.MpfrScalar;
 import apron.MpqScalar;
+import apron.StringVar;
 import apron.Tcons1;
 import apron.Texpr1BinNode;
 import apron.Texpr1CstNode;
 import apron.Texpr1Node;
 import apron.Texpr1UnNode;
 import apron.Texpr1VarNode;
+import apron.Var;
 import gmp.Mpq;
 import gmp.Mpz;
 import java.math.BigDecimal;
@@ -38,6 +40,7 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
+import org.sosy_lab.java_smt.solvers.apron.ApronFormulaCreator;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.FormulaType;
 
 public interface ApronNode extends Formula {
@@ -68,13 +71,29 @@ public interface ApronNode extends Formula {
 
     private final FormulaType type = FormulaType.RATIONAL;
     private final Texpr1VarNode varNode;
+    private final String varName;
 
-    public ApronRatVarNode(String pVarName){
+    private ApronFormulaCreator formulaCreator;
+    public ApronRatVarNode(String pVarName, ApronFormulaCreator pFormulaCreator){
       this.varNode = new Texpr1VarNode(pVarName);
+      this.formulaCreator = pFormulaCreator;
+      this.varName = pVarName;
     }
     @Override
     public FormulaType getType() {
       return this.type;
+    }
+    private void addVarToEnv(){
+      Var[] intVars = formulaCreator.getEnvironment().getIntVars();
+      Var[] realVars = formulaCreator.getEnvironment().getRealVars();
+      Var[] newRealVars = new Var[realVars.length+1];
+      int i=0;
+      for(Var var : realVars){
+        newRealVars[i] = var;
+        i++;
+      }
+      newRealVars[realVars.length] = new StringVar(this.varName);
+      formulaCreator.setEnvironment(new Environment(intVars, newRealVars));
     }
 
     public Texpr1VarNode getNode() {
@@ -141,9 +160,13 @@ public interface ApronNode extends Formula {
 
     private final FormulaType type = FormulaType.INTEGER;
     private final Texpr1VarNode varNode;
+    private final String varName;
+    private final ApronFormulaCreator formulaCreator;
 
-    public ApronIntVarNode(String pVarName){
+    public ApronIntVarNode(String pVarName, ApronFormulaCreator pFormulaCreator){
       this.varNode = new Texpr1VarNode(pVarName);
+      this.varName =pVarName;
+      this.formulaCreator = pFormulaCreator;
     }
     @Override
     public FormulaType getType() {
@@ -152,6 +175,19 @@ public interface ApronNode extends Formula {
 
     public Texpr1VarNode getNode() {
       return varNode;
+    }
+
+    private void addVarToEnv(){
+      Var[] intVars = formulaCreator.getEnvironment().getIntVars();
+      Var[] realVars = formulaCreator.getEnvironment().getRealVars();
+      Var[] newIntVars = new Var[intVars.length+1];
+      int i=0;
+      for(Var var : intVars){
+        newIntVars[i] = var;
+        i++;
+      }
+      newIntVars[realVars.length] = new StringVar(this.varName);
+      formulaCreator.setEnvironment(new Environment(newIntVars, realVars));
     }
 
   }
