@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.solvers.cvc5;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import io.github.cvc5.Kind;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
@@ -198,14 +200,29 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
 
     interpolationSolver.resetAssertions();
 
-    Term interpolantA = buildConjunctionOfFormulasOverList(pFormAAsList, interpolationSolver);
+    Term interpolA = buildConjunctionOfFormulasOverList(pFormAAsList, interpolationSolver);
 
-    Term interpolantB = buildConjunctionOfFormulasOverList(pFormBAsList, interpolationSolver);
+    Term interpolB = buildConjunctionOfFormulasOverList(pFormBAsList, interpolationSolver);
 
-    interpolationSolver.assertFormula(interpolantA);
+    interpolationSolver.assertFormula(interpolA);
 
     Term interpolant =
-        interpolationSolver.getInterpolant(interpolationSolver.mkTerm(Kind.NOT, interpolantB));
+        interpolationSolver.getInterpolant(interpolationSolver.mkTerm(Kind.NOT, interpolB));
+
+    ImmutableMap<String, Formula> interpolantSymbols =
+        mgr.extractVariablesAndUFs(creator.encapsulateBoolean(interpolant));
+    ImmutableMap<String, Formula> interpolASymbols =
+        mgr.extractVariablesAndUFs(creator.encapsulateBoolean(interpolA));
+    ImmutableMap<String, Formula> interpolBSymbols =
+        mgr.extractVariablesAndUFs(creator.encapsulateBoolean(interpolB));
+    boolean interpolSymbolMatch = true;
+    for (String key : interpolantSymbols.keySet()) {
+      if (!(interpolASymbols.containsKey(key) || interpolBSymbols.containsKey(key))) {
+        interpolSymbolMatch = false;
+      }
+    }
+
+    Preconditions.checkArgument(interpolSymbolMatch, "Interpolant contains Symbols not in A or B.");
 
     interpolationSolver.deletePointer();
 
