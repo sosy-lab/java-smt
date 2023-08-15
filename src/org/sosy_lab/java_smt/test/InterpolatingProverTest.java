@@ -165,7 +165,6 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   }
 
   @Test
-  @Ignore
   public <T> void binaryBVInterpolation1() throws SolverException, InterruptedException {
     requireBitvectors();
 

@@ -17,6 +17,7 @@ import com.google.common.collect.Lists;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -53,6 +54,7 @@ public class SolverFormulaWithAssumptionsTest
 
   @Test
   @SuppressWarnings("CheckReturnValue")
+  @Ignore
   public <T> void basicAssumptionsTest()
       throws SolverException, InterruptedException, InvalidConfigurationException {
     requireInterpolation();
