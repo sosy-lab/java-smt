@@ -21,21 +21,19 @@
 package org.sosy_lab.java_smt.solvers.dreal4;
 
 import com.google.common.base.Preconditions;
-import com.google.errorprone.annotations.Var;
 import java.util.Collection;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
-import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Context;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Config;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Expression;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.ExpressionKind;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.FormulaKind;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable;
-import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable.Type;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.dreal;
 
 
 public class DReal4BooleanFormulaManager
-    extends AbstractBooleanFormulaManager<DRealTerm<?, ?>, Variable.Type, Context, DRealTerm<?,
+    extends AbstractBooleanFormulaManager<DRealTerm<?, ?>, Variable.Type, Config, DRealTerm<?,
     ?>> {
 
   protected DReal4BooleanFormulaManager(DReal4FormulaCreator pCreator) {
@@ -266,13 +264,17 @@ public class DReal4BooleanFormulaManager
     }
   }
 
-  // dReal only allows ITE on Formulas as condition, so Formulas and Variables of boolean types
-  // and else and then arguments to be Expression, so variables of not type boolean and
-  // expressions. The rest ist implemented with (!(cond) || f1) && (cond || f2) or an exception
-  // is thrown if not possible
+  // dReal only allows ITE on Formulas as condition, and else and then arguments to be
+  // Expressions. But because a formula can be created from a variable of boolean type and an
+  // expression can be created from a variable, there are a lot of cases that need to be
+  // considered. The rest ist implemented with (!(cond) || f1) && (cond || f2) or an exception is
+  // thrown if not possible
   @Override
   protected DRealTerm<?, ?> ifThenElse(DRealTerm<?, ?> cond, DRealTerm<?, ?> f1,
       DRealTerm<?, ?> f2) {
+    if (f1.equals(f2)) {
+      return f1;
+    }
     if (cond.isVar()) {
       if (cond.getType() == Variable.Type.BOOLEAN) {
         if (f1.isExp() && f2.isExp()) {
