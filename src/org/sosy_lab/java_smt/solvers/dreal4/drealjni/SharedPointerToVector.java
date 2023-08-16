@@ -70,5 +70,4 @@ public class SharedPointerToVector {
   public SharedPointerToVector() {
     this(drealJNI.new_SharedPointerToVector(), true);
   }
-
 }

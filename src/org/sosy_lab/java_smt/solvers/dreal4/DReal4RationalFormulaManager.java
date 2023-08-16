@@ -20,23 +20,20 @@
 
 package org.sosy_lab.java_smt.solvers.dreal4;
 
-
-import com.google.common.base.Preconditions;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Expression;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.ExpressionKind;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable;
-import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable.Type;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.dreal;
-
 
 public class DReal4RationalFormulaManager
     extends DReal4NumeralFormulaManager<NumeralFormula, RationalFormula>
     implements RationalFormulaManager {
 
-  DReal4RationalFormulaManager(DReal4FormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
+  DReal4RationalFormulaManager(
+      DReal4FormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
     super(pCreator, pNonLinearArithmetic);
   }
 
@@ -46,32 +43,44 @@ public class DReal4RationalFormulaManager
   }
 
   @Override
-  public DRealTerm<Expression, ExpressionKind> divide(DRealTerm<?, ?> pParam1,
-                                      DRealTerm<?, ?> pParam2) {
+  public DRealTerm<Expression, ExpressionKind> divide(
+      DRealTerm<?, ?> pParam1, DRealTerm<?, ?> pParam2) {
     if (pParam1.isExp() && pParam2.isExp()) {
-      if (pParam1.getExpressionKind() == ExpressionKind.Constant && pParam2.getExpressionKind() == ExpressionKind.Constant) {
+      if (pParam1.getExpressionKind() == ExpressionKind.Constant
+          && pParam2.getExpressionKind() == ExpressionKind.Constant) {
         if (Double.parseDouble(pParam2.to_string()) == 0.0) {
           throw new IllegalArgumentException("dReal does not support division by zero.");
         }
-          return new DRealTerm<>(dreal.Divide(pParam1.getExpression(),
-            pParam2.getExpression()), pParam1.getType(), ExpressionKind.Div);
+        return new DRealTerm<>(
+            dreal.Divide(pParam1.getExpression(), pParam2.getExpression()),
+            pParam1.getType(),
+            ExpressionKind.Div);
       }
-      return new DRealTerm<>(dreal.Divide(pParam1.getExpression(), pParam2.getExpression()),
-          pParam1.getType(), ExpressionKind.Div);
+      return new DRealTerm<>(
+          dreal.Divide(pParam1.getExpression(), pParam2.getExpression()),
+          pParam1.getType(),
+          ExpressionKind.Div);
     } else if (pParam1.isVar() && pParam2.isExp()) {
       if (pParam2.getExpressionKind() == ExpressionKind.Constant) {
         if (Double.parseDouble(pParam2.to_string()) == 0.0) {
           throw new IllegalArgumentException("dReal does not support division by zero.");
         }
       }
-      return new DRealTerm<>(dreal.Divide(new Expression(pParam1.getVariable()),
-          pParam2.getExpression()), pParam1.getType(), ExpressionKind.Div);
+      return new DRealTerm<>(
+          dreal.Divide(new Expression(pParam1.getVariable()), pParam2.getExpression()),
+          pParam1.getType(),
+          ExpressionKind.Div);
     } else if (pParam1.isExp() && pParam2.isVar()) {
-      return new DRealTerm<>(dreal.Divide(pParam1.getExpression(),
-          new Expression(pParam2.getVariable())), pParam1.getType(), ExpressionKind.Div);
+      return new DRealTerm<>(
+          dreal.Divide(pParam1.getExpression(), new Expression(pParam2.getVariable())),
+          pParam1.getType(),
+          ExpressionKind.Div);
     } else if (pParam1.isVar() && pParam2.isVar()) {
-      return new DRealTerm<>(dreal.Divide(new Expression(pParam1.getVariable()),
-          new Expression(pParam2.getVariable())), pParam1.getType(), ExpressionKind.Div);
+      return new DRealTerm<>(
+          dreal.Divide(
+              new Expression(pParam1.getVariable()), new Expression(pParam2.getVariable())),
+          pParam1.getType(),
+          ExpressionKind.Div);
     } else {
       throw new UnsupportedOperationException("dReal does not support divide with Formulas.");
     }

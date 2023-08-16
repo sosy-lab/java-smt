@@ -71,23 +71,27 @@ public class FormulaSet extends java.util.AbstractSet<Formula> {
     this();
     addAll(collection);
   }
+
   @Override
   public int size() {
     return sizeImpl();
   }
+
   @Override
   public boolean add(Formula key) {
     return addImpl(key);
   }
+
   @Override
   public boolean addAll(java.util.Collection<? extends Formula> collection) {
     boolean didAddElement = false;
     for (java.lang.Object object : collection) {
-      didAddElement |= add((Formula)object);
+      didAddElement |= add((Formula) object);
     }
 
     return didAddElement;
   }
+
   @Override
   public java.util.Iterator<Formula> iterator() {
     return new java.util.Iterator<Formula>() {
@@ -99,6 +103,7 @@ public class FormulaSet extends java.util.AbstractSet<Formula> {
         end = FormulaSet.this.end();
         return this;
       }
+
       @Override
       public Formula next() {
         if (!hasNext()) {
@@ -111,16 +116,19 @@ public class FormulaSet extends java.util.AbstractSet<Formula> {
         curr.incrementUnchecked();
         return currValue;
       }
+
       @Override
       public boolean hasNext() {
         return curr.isNot(end);
       }
+
       @Override
       public void remove() {
         throw new java.lang.UnsupportedOperationException();
       }
     }.init();
   }
+
   @Override
   public boolean containsAll(java.util.Collection<?> collection) {
     for (java.lang.Object object : collection) {
@@ -131,14 +139,16 @@ public class FormulaSet extends java.util.AbstractSet<Formula> {
 
     return true;
   }
+
   @Override
   public boolean contains(java.lang.Object object) {
     if (!(object instanceof Formula)) {
       return false;
     }
 
-    return containsImpl((Formula)object);
+    return containsImpl((Formula) object);
   }
+
   @Override
   public boolean removeAll(java.util.Collection<?> collection) {
     boolean didRemoveElement = false;
@@ -148,28 +158,29 @@ public class FormulaSet extends java.util.AbstractSet<Formula> {
 
     return didRemoveElement;
   }
+
   @Override
   public boolean remove(java.lang.Object object) {
     if (!(object instanceof Formula)) {
       return false;
     }
 
-    return removeImpl((Formula)object);
+    return removeImpl((Formula) object);
   }
 
-  static protected class Iterator {
+  protected static class Iterator {
     private transient long swigCPtr;
     protected transient boolean swigCMemOwn;
-  
+
     protected Iterator(long cPtr, boolean cMemoryOwn) {
       swigCMemOwn = cMemoryOwn;
       swigCPtr = cPtr;
     }
-  
+
     protected static long getCPtr(Iterator obj) {
       return (obj == null) ? 0 : obj.swigCPtr;
     }
-  
+
     protected static long swigRelease(Iterator obj) {
       long ptr = 0;
       if (obj != null) {
@@ -181,12 +192,12 @@ public class FormulaSet extends java.util.AbstractSet<Formula> {
       }
       return ptr;
     }
-  
+
     @SuppressWarnings("deprecation")
     protected void finalize1() {
       delete();
     }
-  
+
     public synchronized void delete() {
       if (swigCPtr != 0) {
         if (swigCMemOwn) {
@@ -196,19 +207,19 @@ public class FormulaSet extends java.util.AbstractSet<Formula> {
         swigCPtr = 0;
       }
     }
-  
+
     private void incrementUnchecked() {
       drealJNI.FormulaSet_Iterator_incrementUnchecked(swigCPtr, this);
     }
-  
+
     private Formula derefUnchecked() {
       return new Formula(drealJNI.FormulaSet_Iterator_derefUnchecked(swigCPtr, this), true);
     }
-  
+
     private boolean isNot(FormulaSet.Iterator other) {
-      return drealJNI.FormulaSet_Iterator_isNot(swigCPtr, this, FormulaSet.Iterator.getCPtr(other), other);
+      return drealJNI.FormulaSet_Iterator_isNot(
+          swigCPtr, this, FormulaSet.Iterator.getCPtr(other), other);
     }
-  
   }
 
   public FormulaSet() {
@@ -218,10 +229,12 @@ public class FormulaSet extends java.util.AbstractSet<Formula> {
   public FormulaSet(FormulaSet other) {
     this(drealJNI.new_FormulaSet__SWIG_1(FormulaSet.getCPtr(other), other), true);
   }
+
   @Override
   public boolean isEmpty() {
     return drealJNI.FormulaSet_isEmpty(swigCPtr, this);
   }
+
   @Override
   public void clear() {
     drealJNI.FormulaSet_clear(swigCPtr, this);
@@ -255,5 +268,4 @@ public class FormulaSet extends java.util.AbstractSet<Formula> {
   private boolean hasNextImpl(FormulaSet.Iterator itr) {
     return drealJNI.FormulaSet_hasNextImpl(swigCPtr, this, FormulaSet.Iterator.getCPtr(itr), itr);
   }
-
 }

@@ -28,19 +28,19 @@
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
 public final class FormulaKind {
-  public final static FormulaKind False = new FormulaKind("False");
-  public final static FormulaKind True = new FormulaKind("True");
-  public final static FormulaKind Var = new FormulaKind("Var");
-  public final static FormulaKind Eq = new FormulaKind("Eq");
-  public final static FormulaKind Neq = new FormulaKind("Neq");
-  public final static FormulaKind Gt = new FormulaKind("Gt");
-  public final static FormulaKind Geq = new FormulaKind("Geq");
-  public final static FormulaKind Lt = new FormulaKind("Lt");
-  public final static FormulaKind Leq = new FormulaKind("Leq");
-  public final static FormulaKind And = new FormulaKind("And");
-  public final static FormulaKind Or = new FormulaKind("Or");
-  public final static FormulaKind Not = new FormulaKind("Not");
-  public final static FormulaKind Forall = new FormulaKind("Forall");
+  public static final FormulaKind False = new FormulaKind("False");
+  public static final FormulaKind True = new FormulaKind("True");
+  public static final FormulaKind Var = new FormulaKind("Var");
+  public static final FormulaKind Eq = new FormulaKind("Eq");
+  public static final FormulaKind Neq = new FormulaKind("Neq");
+  public static final FormulaKind Gt = new FormulaKind("Gt");
+  public static final FormulaKind Geq = new FormulaKind("Geq");
+  public static final FormulaKind Lt = new FormulaKind("Lt");
+  public static final FormulaKind Leq = new FormulaKind("Leq");
+  public static final FormulaKind And = new FormulaKind("And");
+  public static final FormulaKind Or = new FormulaKind("Or");
+  public static final FormulaKind Not = new FormulaKind("Not");
+  public static final FormulaKind Forall = new FormulaKind("Forall");
 
   public final int swigValue() {
     return swigValue;
@@ -52,11 +52,11 @@ public final class FormulaKind {
   }
 
   public static FormulaKind swigToEnum(int swigValue) {
-    if (swigValue < swigValues.length && swigValue >= 0 && swigValues[swigValue].swigValue == swigValue)
-      return swigValues[swigValue];
+    if (swigValue < swigValues.length
+        && swigValue >= 0
+        && swigValues[swigValue].swigValue == swigValue) return swigValues[swigValue];
     for (int i = 0; i < swigValues.length; i++)
-      if (swigValues[i].swigValue == swigValue)
-        return swigValues[i];
+      if (swigValues[i].swigValue == swigValue) return swigValues[i];
     throw new IllegalArgumentException("No enum " + FormulaKind.class + " with value " + swigValue);
   }
 
@@ -64,22 +64,25 @@ public final class FormulaKind {
     this.swigName = swigName;
     this.swigValue = swigNext++;
   }
+
   @SuppressWarnings({"unused", "StaticAssignmentInConstructor"})
   private FormulaKind(String swigName, int swigValue) {
     this.swigName = swigName;
     this.swigValue = swigValue;
-    swigNext = swigValue+1;
+    swigNext = swigValue + 1;
   }
+
   @SuppressWarnings({"unused", "StaticAssignmentInConstructor"})
   private FormulaKind(String swigName, FormulaKind swigEnum) {
     this.swigName = swigName;
     this.swigValue = swigEnum.swigValue;
-    swigNext = this.swigValue+1;
+    swigNext = this.swigValue + 1;
   }
 
-  private static FormulaKind[] swigValues = { False, True, Var, Eq, Neq, Gt, Geq, Lt, Leq, And, Or, Not, Forall };
+  private static FormulaKind[] swigValues = {
+    False, True, Var, Eq, Neq, Gt, Geq, Lt, Leq, And, Or, Not, Forall
+  };
   private static int swigNext = 0;
   private final int swigValue;
   private final String swigName;
 }
-

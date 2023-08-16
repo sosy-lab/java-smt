@@ -27,7 +27,6 @@
  * ----------------------------------------------------------------------------- */
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
-
 public class OptionValueUnsignedInt {
   private transient long swigCPtr;
   protected transient boolean swigCMemOwn;
@@ -73,15 +72,23 @@ public class OptionValueUnsignedInt {
   }
 
   public OptionValueUnsignedInt(OptionValueUnsignedInt arg0) {
-    this(drealJNI.new_OptionValueUnsignedInt__SWIG_1(OptionValueUnsignedInt.getCPtr(arg0), arg0), true);
+    this(
+        drealJNI.new_OptionValueUnsignedInt__SWIG_1(OptionValueUnsignedInt.getCPtr(arg0), arg0),
+        true);
   }
 
   public OptionValueUnsignedInt AssignOperator(OptionValueUnsignedInt arg0) {
-    return new OptionValueUnsignedInt(drealJNI.OptionValueUnsignedInt_AssignOperator__SWIG_0(swigCPtr, this, OptionValueUnsignedInt.getCPtr(arg0), arg0), false);
+    return new OptionValueUnsignedInt(
+        drealJNI.OptionValueUnsignedInt_AssignOperator__SWIG_0(
+            swigCPtr, this, OptionValueUnsignedInt.getCPtr(arg0), arg0),
+        false);
   }
 
   public OptionValueUnsignedInt AssignOperator(SWIGTYPE_p_uint32_t value) {
-    return new OptionValueUnsignedInt(drealJNI.OptionValueUnsignedInt_AssignOperator__SWIG_2(swigCPtr, this, SWIGTYPE_p_uint32_t.getCPtr(value)), false);
+    return new OptionValueUnsignedInt(
+        drealJNI.OptionValueUnsignedInt_AssignOperator__SWIG_2(
+            swigCPtr, this, SWIGTYPE_p_uint32_t.getCPtr(value)),
+        false);
   }
 
   public SWIGTYPE_p_uint32_t get() {
@@ -89,33 +96,40 @@ public class OptionValueUnsignedInt {
   }
 
   public void set_from_command_line(SWIGTYPE_p_uint32_t value) {
-    drealJNI.OptionValueUnsignedInt_set_from_command_line(swigCPtr, this, SWIGTYPE_p_uint32_t.getCPtr(value));
+    drealJNI.OptionValueUnsignedInt_set_from_command_line(
+        swigCPtr, this, SWIGTYPE_p_uint32_t.getCPtr(value));
   }
 
   public void set_from_file(SWIGTYPE_p_uint32_t value) {
-    drealJNI.OptionValueUnsignedInt_set_from_file(swigCPtr, this, SWIGTYPE_p_uint32_t.getCPtr(value));
+    drealJNI.OptionValueUnsignedInt_set_from_file(
+        swigCPtr, this, SWIGTYPE_p_uint32_t.getCPtr(value));
   }
 
-  public final static class Type {
-    public final static OptionValueUnsignedInt.Type DEFAULT = new OptionValueUnsignedInt.Type("DEFAULT");
-    public final static OptionValueUnsignedInt.Type FROM_FILE = new OptionValueUnsignedInt.Type("FROM_FILE");
-    public final static OptionValueUnsignedInt.Type FROM_COMMAND_LINE = new OptionValueUnsignedInt.Type("FROM_COMMAND_LINE");
-    public final static OptionValueUnsignedInt.Type FROM_CODE = new OptionValueUnsignedInt.Type("FROM_CODE");
+  public static final class Type {
+    public static final OptionValueUnsignedInt.Type DEFAULT =
+        new OptionValueUnsignedInt.Type("DEFAULT");
+    public static final OptionValueUnsignedInt.Type FROM_FILE =
+        new OptionValueUnsignedInt.Type("FROM_FILE");
+    public static final OptionValueUnsignedInt.Type FROM_COMMAND_LINE =
+        new OptionValueUnsignedInt.Type("FROM_COMMAND_LINE");
+    public static final OptionValueUnsignedInt.Type FROM_CODE =
+        new OptionValueUnsignedInt.Type("FROM_CODE");
 
     public final int swigValue() {
       return swigValue;
     }
+
     @Override
     public String toString() {
       return swigName;
     }
 
     public static Type swigToEnum(int swigValue) {
-      if (swigValue < swigValues.length && swigValue >= 0 && swigValues[swigValue].swigValue == swigValue)
-        return swigValues[swigValue];
+      if (swigValue < swigValues.length
+          && swigValue >= 0
+          && swigValues[swigValue].swigValue == swigValue) return swigValues[swigValue];
       for (int i = 0; i < swigValues.length; i++)
-        if (swigValues[i].swigValue == swigValue)
-          return swigValues[i];
+        if (swigValues[i].swigValue == swigValue) return swigValues[i];
       throw new IllegalArgumentException("No enum " + Type.class + " with value " + swigValue);
     }
 
@@ -123,23 +137,24 @@ public class OptionValueUnsignedInt {
       this.swigName = swigName;
       this.swigValue = swigNext++;
     }
+
     @SuppressWarnings({"unused", "StaticAssignmentInConstructor"})
     private Type(String swigName, int swigValue) {
       this.swigName = swigName;
       this.swigValue = swigValue;
-      swigNext = swigValue+1;
+      swigNext = swigValue + 1;
     }
+
     @SuppressWarnings({"unused", "StaticAssignmentInConstructor"})
     private Type(String swigName, Type swigEnum) {
       this.swigName = swigName;
       this.swigValue = swigEnum.swigValue;
-      swigNext = this.swigValue+1;
+      swigNext = this.swigValue + 1;
     }
 
-    private static Type[] swigValues = { DEFAULT, FROM_FILE, FROM_COMMAND_LINE, FROM_CODE };
+    private static Type[] swigValues = {DEFAULT, FROM_FILE, FROM_COMMAND_LINE, FROM_CODE};
     private static int swigNext = 0;
     private final int swigValue;
     private final String swigName;
   }
-
 }

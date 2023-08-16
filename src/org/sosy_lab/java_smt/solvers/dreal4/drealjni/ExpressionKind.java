@@ -28,32 +28,33 @@
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
 public final class ExpressionKind {
-  public final static ExpressionKind Constant = new ExpressionKind("Constant");
-  public final static ExpressionKind RealConstant = new ExpressionKind("RealConstant");
-  public final static ExpressionKind Var = new ExpressionKind("Var");
-  public final static ExpressionKind Add = new ExpressionKind("Add");
-  public final static ExpressionKind Mul = new ExpressionKind("Mul");
-  public final static ExpressionKind Div = new ExpressionKind("Div");
-  public final static ExpressionKind Log = new ExpressionKind("Log");
-  public final static ExpressionKind Abs = new ExpressionKind("Abs");
-  public final static ExpressionKind Exp = new ExpressionKind("Exp");
-  public final static ExpressionKind Sqrt = new ExpressionKind("Sqrt");
-  public final static ExpressionKind Pow = new ExpressionKind("Pow");
-  public final static ExpressionKind Sin = new ExpressionKind("Sin");
-  public final static ExpressionKind Cos = new ExpressionKind("Cos");
-  public final static ExpressionKind Tan = new ExpressionKind("Tan");
-  public final static ExpressionKind Asin = new ExpressionKind("Asin");
-  public final static ExpressionKind Acos = new ExpressionKind("Acos");
-  public final static ExpressionKind Atan = new ExpressionKind("Atan");
-  public final static ExpressionKind Atan2 = new ExpressionKind("Atan2");
-  public final static ExpressionKind Sinh = new ExpressionKind("Sinh");
-  public final static ExpressionKind Cosh = new ExpressionKind("Cosh");
-  public final static ExpressionKind Tanh = new ExpressionKind("Tanh");
-  public final static ExpressionKind Min = new ExpressionKind("Min");
-  public final static ExpressionKind Max = new ExpressionKind("Max");
-  public final static ExpressionKind IfThenElse = new ExpressionKind("IfThenElse");
-  public final static ExpressionKind NaN = new ExpressionKind("NaN");
-  public final static ExpressionKind UninterpretedFunction = new ExpressionKind("UninterpretedFunction");
+  public static final ExpressionKind Constant = new ExpressionKind("Constant");
+  public static final ExpressionKind RealConstant = new ExpressionKind("RealConstant");
+  public static final ExpressionKind Var = new ExpressionKind("Var");
+  public static final ExpressionKind Add = new ExpressionKind("Add");
+  public static final ExpressionKind Mul = new ExpressionKind("Mul");
+  public static final ExpressionKind Div = new ExpressionKind("Div");
+  public static final ExpressionKind Log = new ExpressionKind("Log");
+  public static final ExpressionKind Abs = new ExpressionKind("Abs");
+  public static final ExpressionKind Exp = new ExpressionKind("Exp");
+  public static final ExpressionKind Sqrt = new ExpressionKind("Sqrt");
+  public static final ExpressionKind Pow = new ExpressionKind("Pow");
+  public static final ExpressionKind Sin = new ExpressionKind("Sin");
+  public static final ExpressionKind Cos = new ExpressionKind("Cos");
+  public static final ExpressionKind Tan = new ExpressionKind("Tan");
+  public static final ExpressionKind Asin = new ExpressionKind("Asin");
+  public static final ExpressionKind Acos = new ExpressionKind("Acos");
+  public static final ExpressionKind Atan = new ExpressionKind("Atan");
+  public static final ExpressionKind Atan2 = new ExpressionKind("Atan2");
+  public static final ExpressionKind Sinh = new ExpressionKind("Sinh");
+  public static final ExpressionKind Cosh = new ExpressionKind("Cosh");
+  public static final ExpressionKind Tanh = new ExpressionKind("Tanh");
+  public static final ExpressionKind Min = new ExpressionKind("Min");
+  public static final ExpressionKind Max = new ExpressionKind("Max");
+  public static final ExpressionKind IfThenElse = new ExpressionKind("IfThenElse");
+  public static final ExpressionKind NaN = new ExpressionKind("NaN");
+  public static final ExpressionKind UninterpretedFunction =
+      new ExpressionKind("UninterpretedFunction");
 
   public final int swigValue() {
     return swigValue;
@@ -65,12 +66,13 @@ public final class ExpressionKind {
   }
 
   public static ExpressionKind swigToEnum(int swigValue) {
-    if (swigValue < swigValues.length && swigValue >= 0 && swigValues[swigValue].swigValue == swigValue)
-      return swigValues[swigValue];
+    if (swigValue < swigValues.length
+        && swigValue >= 0
+        && swigValues[swigValue].swigValue == swigValue) return swigValues[swigValue];
     for (int i = 0; i < swigValues.length; i++)
-      if (swigValues[i].swigValue == swigValue)
-        return swigValues[i];
-    throw new IllegalArgumentException("No enum " + ExpressionKind.class + " with value " + swigValue);
+      if (swigValues[i].swigValue == swigValue) return swigValues[i];
+    throw new IllegalArgumentException(
+        "No enum " + ExpressionKind.class + " with value " + swigValue);
   }
 
   private ExpressionKind(String swigName) {
@@ -82,18 +84,45 @@ public final class ExpressionKind {
   private ExpressionKind(String swigName, int swigValue) {
     this.swigName = swigName;
     this.swigValue = swigValue;
-    swigNext = swigValue+1;
+    swigNext = swigValue + 1;
   }
+
   @SuppressWarnings({"unused", "StaticAssignmentInConstructor"})
   private ExpressionKind(String swigName, ExpressionKind swigEnum) {
     this.swigName = swigName;
     this.swigValue = swigEnum.swigValue;
-    swigNext = this.swigValue+1;
+    swigNext = this.swigValue + 1;
   }
 
-  private static ExpressionKind[] swigValues = { Constant, RealConstant, Var, Add, Mul, Div, Log, Abs, Exp, Sqrt, Pow, Sin, Cos, Tan, Asin, Acos, Atan, Atan2, Sinh, Cosh, Tanh, Min, Max, IfThenElse, NaN, UninterpretedFunction };
+  private static ExpressionKind[] swigValues = {
+    Constant,
+    RealConstant,
+    Var,
+    Add,
+    Mul,
+    Div,
+    Log,
+    Abs,
+    Exp,
+    Sqrt,
+    Pow,
+    Sin,
+    Cos,
+    Tan,
+    Asin,
+    Acos,
+    Atan,
+    Atan2,
+    Sinh,
+    Cosh,
+    Tanh,
+    Min,
+    Max,
+    IfThenElse,
+    NaN,
+    UninterpretedFunction
+  };
   private static int swigNext = 0;
   private final int swigValue;
   private final String swigName;
 }
-

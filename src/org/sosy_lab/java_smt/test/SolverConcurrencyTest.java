@@ -14,7 +14,6 @@ import static com.google.common.truth.Truth8.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.collect.ImmutableMap;
-import io.github.cvc5.Solver;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -164,6 +163,7 @@ public class SolverConcurrencyTest {
             Solvers.YICES2,
             Solvers.DREAL4);
   }
+
   /**
    * Test concurrency of integers (while every thread creates its unique context on its own
    * concurrently).

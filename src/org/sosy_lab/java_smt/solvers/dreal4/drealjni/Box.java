@@ -80,7 +80,8 @@ public class Box {
   }
 
   public Box AssignOperator(Box arg0) {
-    return new Box(drealJNI.Box_AssignOperator__SWIG_0(swigCPtr, this, Box.getCPtr(arg0), arg0), false);
+    return new Box(
+        drealJNI.Box_AssignOperator__SWIG_0(swigCPtr, this, Box.getCPtr(arg0), arg0), false);
   }
 
   public void Add(Variable v) {
@@ -108,7 +109,8 @@ public class Box {
   }
 
   public SWIGTYPE_p_ibex__Interval Indexing(Variable var) {
-    return new SWIGTYPE_p_ibex__Interval(drealJNI.Box_Indexing__SWIG_1(swigCPtr, this, Variable.getCPtr(var), var), false);
+    return new SWIGTYPE_p_ibex__Interval(
+        drealJNI.Box_Indexing__SWIG_1(swigCPtr, this, Variable.getCPtr(var), var), false);
   }
 
   public VariableVector variables() {
@@ -128,7 +130,8 @@ public class Box {
   }
 
   public SWIGTYPE_p_ibex__IntervalVector mutable_interval_vector() {
-    return new SWIGTYPE_p_ibex__IntervalVector(drealJNI.Box_mutable_interval_vector(swigCPtr, this), false);
+    return new SWIGTYPE_p_ibex__IntervalVector(
+        drealJNI.Box_mutable_interval_vector(swigCPtr, this), false);
   }
 
   public int index(Variable var) {
@@ -144,11 +147,11 @@ public class Box {
   }
 
   public BoxBoxPair bisect(Variable var) {
-    return new BoxBoxPair(drealJNI.Box_bisect__SWIG_1(swigCPtr, this, Variable.getCPtr(var), var), true);
+    return new BoxBoxPair(
+        drealJNI.Box_bisect__SWIG_1(swigCPtr, this, Variable.getCPtr(var), var), true);
   }
 
   public Box InplaceUnion(Box b) {
     return new Box(drealJNI.Box_InplaceUnion(swigCPtr, this, Box.getCPtr(b), b), false);
   }
-
 }

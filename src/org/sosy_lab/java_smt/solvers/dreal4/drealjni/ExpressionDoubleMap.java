@@ -27,8 +27,6 @@
  * ----------------------------------------------------------------------------- */
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
-
-
 public class ExpressionDoubleMap extends java.util.AbstractMap<Expression, Double> {
   private transient long swigCPtr;
   protected transient boolean swigCMemOwn;
@@ -73,14 +71,16 @@ public class ExpressionDoubleMap extends java.util.AbstractMap<Expression, Doubl
   public int size() {
     return sizeImpl();
   }
+
   @Override
   public boolean containsKey(java.lang.Object key) {
     if (!(key instanceof Expression)) {
       return false;
     }
 
-    return containsImpl((Expression)key);
+    return containsImpl((Expression) key);
   }
+
   @Override
   public Double get(java.lang.Object key) {
     if (!(key instanceof Expression)) {
@@ -132,28 +132,32 @@ public class ExpressionDoubleMap extends java.util.AbstractMap<Expression, Doubl
     Iterator itr = begin();
     final Iterator end = end();
     while (itr.isNot(end)) {
-      setToReturn.add(new Entry<Expression, Double>() {
-        private Iterator iterator;
+      setToReturn.add(
+          new Entry<Expression, Double>() {
+            private Iterator iterator;
 
-        private Entry<Expression, Double> init(Iterator iterator) {
-          this.iterator = iterator;
-          return this;
-        }
-        @Override
-        public Expression getKey() {
-          return iterator.getKey();
-        }
-        @Override
-        public Double getValue() {
-          return iterator.getValue();
-        }
-        @Override
-        public Double setValue(Double newValue) {
-          Double oldValue = iterator.getValue();
-          iterator.setValue(newValue);
-          return oldValue;
-        }
-      }.init(itr));
+            private Entry<Expression, Double> init(Iterator iterator) {
+              this.iterator = iterator;
+              return this;
+            }
+
+            @Override
+            public Expression getKey() {
+              return iterator.getKey();
+            }
+
+            @Override
+            public Double getValue() {
+              return iterator.getValue();
+            }
+
+            @Override
+            public Double setValue(Double newValue) {
+              Double oldValue = iterator.getValue();
+              iterator.setValue(newValue);
+              return oldValue;
+            }
+          }.init(itr));
       itr = itr.getNextUnchecked();
     }
 
@@ -168,19 +172,19 @@ public class ExpressionDoubleMap extends java.util.AbstractMap<Expression, Doubl
     this(drealJNI.new_ExpressionDoubleMap__SWIG_1(ExpressionDoubleMap.getCPtr(other), other), true);
   }
 
-  static protected class Iterator {
+  protected static class Iterator {
     private transient long swigCPtr;
     protected transient boolean swigCMemOwn;
-  
+
     protected Iterator(long cPtr, boolean cMemoryOwn) {
       swigCMemOwn = cMemoryOwn;
       swigCPtr = cPtr;
     }
-  
+
     protected static long getCPtr(Iterator obj) {
       return (obj == null) ? 0 : obj.swigCPtr;
     }
-  
+
     protected static long swigRelease(Iterator obj) {
       long ptr = 0;
       if (obj != null) {
@@ -192,12 +196,12 @@ public class ExpressionDoubleMap extends java.util.AbstractMap<Expression, Doubl
       }
       return ptr;
     }
-  
+
     @SuppressWarnings("deprecation")
     protected void finalize1() {
       delete();
     }
-  
+
     public synchronized void delete() {
       if (swigCPtr != 0) {
         if (swigCMemOwn) {
@@ -207,43 +211,48 @@ public class ExpressionDoubleMap extends java.util.AbstractMap<Expression, Doubl
         swigCPtr = 0;
       }
     }
-  
+
     private ExpressionDoubleMap.Iterator getNextUnchecked() {
-      return new ExpressionDoubleMap.Iterator(drealJNI.ExpressionDoubleMap_Iterator_getNextUnchecked(swigCPtr, this), true);
+      return new ExpressionDoubleMap.Iterator(
+          drealJNI.ExpressionDoubleMap_Iterator_getNextUnchecked(swigCPtr, this), true);
     }
-  
+
     private boolean isNot(ExpressionDoubleMap.Iterator other) {
-      return drealJNI.ExpressionDoubleMap_Iterator_isNot(swigCPtr, this, ExpressionDoubleMap.Iterator.getCPtr(other), other);
+      return drealJNI.ExpressionDoubleMap_Iterator_isNot(
+          swigCPtr, this, ExpressionDoubleMap.Iterator.getCPtr(other), other);
     }
 
     private Expression getKey() {
       return new Expression(drealJNI.ExpressionDoubleMap_Iterator_getKey(swigCPtr, this), true);
     }
-  
+
     private double getValue() {
       return drealJNI.ExpressionDoubleMap_Iterator_getValue(swigCPtr, this);
     }
-  
+
     private void setValue(double newValue) {
       drealJNI.ExpressionDoubleMap_Iterator_setValue(swigCPtr, this, newValue);
     }
-  
   }
+
   @Override
   public boolean isEmpty() {
     return drealJNI.ExpressionDoubleMap_isEmpty(swigCPtr, this);
   }
+
   @Override
   public void clear() {
     drealJNI.ExpressionDoubleMap_clear(swigCPtr, this);
   }
 
   private ExpressionDoubleMap.Iterator find(Expression key) {
-    return new ExpressionDoubleMap.Iterator(drealJNI.ExpressionDoubleMap_find(swigCPtr, this, Expression.getCPtr(key), key), true);
+    return new ExpressionDoubleMap.Iterator(
+        drealJNI.ExpressionDoubleMap_find(swigCPtr, this, Expression.getCPtr(key), key), true);
   }
 
   private ExpressionDoubleMap.Iterator begin() {
-    return new ExpressionDoubleMap.Iterator(drealJNI.ExpressionDoubleMap_begin(swigCPtr, this), true);
+    return new ExpressionDoubleMap.Iterator(
+        drealJNI.ExpressionDoubleMap_begin(swigCPtr, this), true);
   }
 
   private ExpressionDoubleMap.Iterator end() {
@@ -263,7 +272,7 @@ public class ExpressionDoubleMap extends java.util.AbstractMap<Expression, Doubl
   }
 
   private void removeUnchecked(ExpressionDoubleMap.Iterator itr) {
-    drealJNI.ExpressionDoubleMap_removeUnchecked(swigCPtr, this, ExpressionDoubleMap.Iterator.getCPtr(itr), itr);
+    drealJNI.ExpressionDoubleMap_removeUnchecked(
+        swigCPtr, this, ExpressionDoubleMap.Iterator.getCPtr(itr), itr);
   }
-
 }

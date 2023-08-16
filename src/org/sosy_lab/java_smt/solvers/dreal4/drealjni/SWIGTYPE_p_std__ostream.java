@@ -46,4 +46,3 @@ public class SWIGTYPE_p_std__ostream {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 }
-

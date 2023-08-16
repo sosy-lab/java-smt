@@ -20,33 +20,28 @@
 
 package org.sosy_lab.java_smt.solvers.dreal4;
 
-
 import com.google.common.base.Preconditions;
-import edu.stanford.CVC4.Expr;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
-import java.util.Set;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Box;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Config;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Context;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable;
-import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable.Type;
-
 
 class DReal4TheoremProver extends AbstractProverWithAllSat<Void> implements ProverEnvironment {
 
@@ -57,8 +52,11 @@ class DReal4TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   protected final Deque<List<DRealTerm<?, ?>>> assertedFormulas = new ArrayDeque<>();
   private Box model;
 
-  protected DReal4TheoremProver(DReal4FormulaCreator creator, Set<ProverOptions> pOptions,
-                                DReal4FormulaManager pFmgr, ShutdownNotifier pShutdownNotifier) {
+  protected DReal4TheoremProver(
+      DReal4FormulaCreator creator,
+      Set<ProverOptions> pOptions,
+      DReal4FormulaManager pFmgr,
+      ShutdownNotifier pShutdownNotifier) {
     super(pOptions, pFmgr.getBooleanFormulaManager(), pShutdownNotifier);
     this.creator = creator;
     config = creator.getEnv();
@@ -95,7 +93,6 @@ class DReal4TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
     }
   }
 
-
   @Override
   public void push() throws InterruptedException {
     Preconditions.checkState(!closed);
@@ -108,6 +105,7 @@ class DReal4TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
     Preconditions.checkState(!closed);
     return assertedFormulas.size() - 1;
   }
+
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
@@ -134,13 +132,13 @@ class DReal4TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   }
 
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(Collection<BooleanFormula> assumptions)
-      throws SolverException, InterruptedException {
+  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+      Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
     throw new UnsupportedOperationException("dReal does not support unsatCoreOverAssumptions.");
   }
 
   @Override
-  protected DReal4Model getEvaluatorWithoutChecks(){
+  protected DReal4Model getEvaluatorWithoutChecks() {
     return new DReal4Model(this, creator, model, getAssertedExpressions());
   }
 

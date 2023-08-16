@@ -9,7 +9,6 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -66,7 +65,7 @@ public class NonLinearArithmeticWithModuloTest extends SolverBasedTest0 {
       return supplier.get();
     } catch (UnsupportedOperationException e) {
       if ((nonLinearArithmetic == NonLinearArithmetic.USE
-          && NonLinearArithmeticTest.SOLVER_WITHOUT_NONLINEAR_ARITHMETIC.contains(solver))
+              && NonLinearArithmeticTest.SOLVER_WITHOUT_NONLINEAR_ARITHMETIC.contains(solver))
           || solverToUse() == Solvers.DREAL4) {
         throw new AssumptionViolatedException(
             "Expected UnsupportedOperationException was thrown correctly");

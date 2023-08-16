@@ -27,7 +27,6 @@
  * ----------------------------------------------------------------------------- */
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
-
 public class DoubleIntPair {
   private transient long swigCPtr;
   protected transient boolean swigCMemOwn;
@@ -94,5 +93,4 @@ public class DoubleIntPair {
   public int getSecond() {
     return drealJNI.DoubleIntPair_second_get(swigCPtr, this);
   }
-
 }

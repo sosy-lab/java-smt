@@ -27,7 +27,6 @@
  * ----------------------------------------------------------------------------- */
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
-
 public class Expression {
   private transient long swigCPtr;
   protected transient boolean swigCMemOwn;
@@ -73,7 +72,9 @@ public class Expression {
   }
 
   public Expression AssignOperator(Expression arg0) {
-    return new Expression(drealJNI.Expression_AssignOperator__SWIG_0(swigCPtr, this, Expression.getCPtr(arg0), arg0), false);
+    return new Expression(
+        drealJNI.Expression_AssignOperator__SWIG_0(swigCPtr, this, Expression.getCPtr(arg0), arg0),
+        false);
   }
 
   public Expression() {
@@ -87,7 +88,6 @@ public class Expression {
   public Expression(long l) {
     this(drealJNI.new_Expression__SWIG_4(l), true);
   }
-
 
   public Expression(Variable var) {
     this(drealJNI.new_Expression__SWIG_3(Variable.getCPtr(var), var), true);
@@ -130,7 +130,8 @@ public class Expression {
   }
 
   public Expression EvaluatePartial(Environment env) {
-    return new Expression(drealJNI.Expression_EvaluatePartial(swigCPtr, this, Environment.getCPtr(env), env), true);
+    return new Expression(
+        drealJNI.Expression_EvaluatePartial(swigCPtr, this, Environment.getCPtr(env), env), true);
   }
 
   public Expression Expand() {
@@ -138,24 +139,55 @@ public class Expression {
   }
 
   public Expression Substitute(Variable var, Expression e) {
-    return new Expression(drealJNI.Expression_Substitute__SWIG_0(swigCPtr, this, Variable.getCPtr(var), var, Expression.getCPtr(e), e), true);
+    return new Expression(
+        drealJNI.Expression_Substitute__SWIG_0(
+            swigCPtr, this, Variable.getCPtr(var), var, Expression.getCPtr(e), e),
+        true);
   }
 
   public Expression Substitute(
-      SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Expression_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t expr_subst, SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Formula_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t formula_subst) {
-    return new Expression(drealJNI.Expression_Substitute__SWIG_1(swigCPtr, this, SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Expression_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t.getCPtr(expr_subst), SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Formula_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t.getCPtr(formula_subst)), true);
+      SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Expression_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t
+          expr_subst,
+      SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Formula_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t
+          formula_subst) {
+    return new Expression(
+        drealJNI.Expression_Substitute__SWIG_1(
+            swigCPtr,
+            this,
+            SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Expression_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t
+                .getCPtr(expr_subst),
+            SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Formula_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t
+                .getCPtr(formula_subst)),
+        true);
   }
 
-  public Expression Substitute(SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Expression_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t expr_subst) {
-    return new Expression(drealJNI.Expression_Substitute__SWIG_2(swigCPtr, this, SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Expression_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t.getCPtr(expr_subst)), true);
+  public Expression Substitute(
+      SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Expression_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t
+          expr_subst) {
+    return new Expression(
+        drealJNI.Expression_Substitute__SWIG_2(
+            swigCPtr,
+            this,
+            SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Expression_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t
+                .getCPtr(expr_subst)),
+        true);
   }
 
-  public Expression Substitute(SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Formula_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t formula_subst) {
-    return new Expression(drealJNI.Expression_Substitute__SWIG_3(swigCPtr, this, SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Formula_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t.getCPtr(formula_subst)), true);
+  public Expression Substitute(
+      SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Formula_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t
+          formula_subst) {
+    return new Expression(
+        drealJNI.Expression_Substitute__SWIG_3(
+            swigCPtr,
+            this,
+            SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Formula_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t
+                .getCPtr(formula_subst)),
+        true);
   }
 
   public Expression Differentiate(Variable x) {
-    return new Expression(drealJNI.Expression_Differentiate(swigCPtr, this, Variable.getCPtr(x), x), true);
+    return new Expression(
+        drealJNI.Expression_Differentiate(swigCPtr, this, Variable.getCPtr(x), x), true);
   }
 
   public String to_string() {
@@ -204,5 +236,4 @@ public class Expression {
     drealJNI.Expression_getVariables(VariableSet.getCPtr(set), Expression.getCPtr(this));
     return set;
   }
-
 }

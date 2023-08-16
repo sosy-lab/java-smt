@@ -24,75 +24,80 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 
 public class Program_synthesis {
-    static {
-        try {
-            System.loadLibrary("dreal4");
-        } catch(UnsatisfiedLinkError e) {
-            System.err.println("Native code library failed to load.\n" + e);
-            System.exit(1);
-        }
+  static {
+    try {
+      System.loadLibrary("dreal4");
+    } catch (UnsatisfiedLinkError e) {
+      System.err.println("Native code library failed to load.\n" + e);
+      System.exit(1);
+    }
+  }
+
+  public static void main(String[] args) {
+    Variable var_x = new Variable("x");
+    Variable var_a = new Variable("a");
+    Variable var_b = new Variable("b");
+    Variable var_c = new Variable("c");
+
+    Expression x = new Expression(var_x);
+    Expression a = new Expression(var_a);
+    Expression b = new Expression(var_b);
+    Expression c = new Expression(var_c);
+    Expression nt = new Expression(-1000.0);
+    Expression t = new Expression(1000.0);
+    Expression nh = new Expression(-100.0);
+    Expression h = new Expression(100.0);
+
+    Expression test =
+        new Expression(dreal.Multiply(dreal.Multiply(b, b), dreal.pow(x, new Expression(1.0))));
+    System.out.println(test.to_string());
+
+    ExpressionExpressionMap map = dreal.get_base_to_exponent_map_in_multiplication(test);
+    java.util.Set<Entry<Expression, Expression>> set = map.entrySet();
+    Iterator<Entry<Expression, Expression>> entry = set.iterator();
+    Entry<Expression, Expression> entry1;
+    for (int i = 0; i < map.size(); i++) {
+      entry1 = entry.next();
+      System.out.println(entry1.getKey().to_string());
+      System.out.println(entry1.getValue().to_string());
     }
 
-    public static void main(String[] args) {
-        Variable var_x = new Variable("x");
-        Variable var_a = new Variable("a");
-        Variable var_b = new Variable("b");
-        Variable var_c = new Variable("c");
+    Formula sndimply =
+        new Formula(
+            dreal.imply(dreal.GraterEqual(x, c), dreal.Equal(dreal.abs(x), dreal.Multiply(a, x))));
+    Formula thrdimply =
+        new Formula(dreal.imply(dreal.Less(x, c), dreal.Equal(dreal.abs(x), dreal.Multiply(b, x))));
 
-        Expression x = new Expression(var_x);
-        Expression a = new Expression(var_a);
-        Expression b = new Expression(var_b);
-        Expression c = new Expression(var_c);
-        Expression nt = new Expression(-1000.0);
-        Expression t = new Expression(1000.0);
-        Expression nh = new Expression(-100.0);
-        Expression h = new Expression(100.0);
+    Formula nested =
+        new Formula(
+            dreal.imply(
+                dreal.And(dreal.LessEqual(nt, x), dreal.LessEqual(x, t)),
+                dreal.And(sndimply, thrdimply)));
 
-        Expression test = new Expression(dreal.Multiply(dreal.Multiply(b, b), dreal.pow(x,
-            new Expression(1.0))));
-        System.out.println(test.to_string());
+    Formula quantified = new Formula(dreal.forall(new Variables(new Variable[] {var_x}), nested));
 
-        ExpressionExpressionMap map = dreal.get_base_to_exponent_map_in_multiplication(test);
-        java.util.Set<Entry<Expression, Expression>> set = map.entrySet();
-        Iterator<Entry<Expression, Expression>> entry = set.iterator();
-        Entry<Expression, Expression> entry1;
-        for (int i = 0; i < map.size(); i++) {
-            entry1 = entry.next();
-            System.out.println(entry1.getKey().to_string());
-            System.out.println(entry1.getValue().to_string());
-        }
+    Box box = new Box();
 
+    Config config = new Config();
+    config.mutable_precision(0.001);
+    config.mutable_use_polytope_in_forall(true);
+    config.mutable_use_local_optimization(true);
 
-        Formula sndimply = new Formula(dreal.imply(dreal.GraterEqual(x, c), dreal.Equal(dreal.abs(x), dreal.Multiply(a, x))));
-        Formula thrdimply = new Formula(dreal.imply(dreal.Less(x, c), dreal.Equal(dreal.abs(x), dreal.Multiply(b, x))));
+    Formula f1 = new Formula(dreal.And(dreal.LessEqual(nh, a), dreal.LessEqual(a, h)));
+    Formula f2 = new Formula(dreal.And(dreal.LessEqual(nh, b), dreal.LessEqual(b, h)));
+    Formula f3 = new Formula(dreal.And(dreal.LessEqual(nh, c), dreal.LessEqual(c, h)));
 
-        Formula nested = new Formula(dreal.imply(dreal.And(dreal.LessEqual(nt, x), dreal.LessEqual(x, t)), dreal.And(sndimply, thrdimply)));
+    Formula f1f2 = new Formula(dreal.And(f1, f2));
+    Formula f3quantified = new Formula(dreal.And(f3, quantified));
 
-        Formula quantified = new Formula(dreal.forall(new Variables(new Variable[] {var_x}), nested));
+    Formula check = new Formula(dreal.And(f1f2, f3quantified));
 
-        Box box = new Box();
+    boolean result = dreal.CheckSatisfiability(check, config, box);
 
-        Config config = new Config();
-        config.mutable_precision(0.001);
-        config.mutable_use_polytope_in_forall(true);
-        config.mutable_use_local_optimization(true);
-
-        Formula f1 = new Formula(dreal.And(dreal.LessEqual(nh, a), dreal.LessEqual(a, h)));
-        Formula f2 = new Formula(dreal.And(dreal.LessEqual(nh, b), dreal.LessEqual(b, h)));
-        Formula f3 = new Formula(dreal.And(dreal.LessEqual(nh, c), dreal.LessEqual(c, h)));
-
-        Formula f1f2 = new Formula(dreal.And(f1, f2));
-        Formula f3quantified = new Formula(dreal.And(f3, quantified));
-
-        Formula check = new Formula(dreal.And(f1f2, f3quantified));
-
-        boolean result = dreal.CheckSatisfiability(check, config, box);
-
-        if (result) {
-            System.out.println("Formula is sat.");
-        } else {
-            System.out.println("Formula is unsat");
-        }
-
+    if (result) {
+      System.out.println("Formula is sat.");
+    } else {
+      System.out.println("Formula is unsat");
     }
+  }
 }

@@ -46,4 +46,3 @@ public class SWIGTYPE_p_uint32_t {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 }
-

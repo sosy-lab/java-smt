@@ -20,26 +20,23 @@
 
 package org.sosy_lab.java_smt.solvers.dreal4;
 
-import com.google.common.base.Preconditions;
 import java.util.List;
-import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Config;
-import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Context;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.FormulaKind;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable;
-import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable.Type;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variables;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.dreal;
 
-public class DReal4QuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<DRealTerm<?,
-    ?>, Variable.Type, Config, DRealTerm<?, ?>> {
+public class DReal4QuantifiedFormulaManager
+    extends AbstractQuantifiedFormulaManager<
+        DRealTerm<?, ?>, Variable.Type, Config, DRealTerm<?, ?>> {
 
-  protected DReal4QuantifiedFormulaManager(FormulaCreator<DRealTerm<?, ?>, Variable.Type, Config,
-      DRealTerm<?, ?>> pFormulaCreator) {
+  protected DReal4QuantifiedFormulaManager(
+      FormulaCreator<DRealTerm<?, ?>, Variable.Type, Config, DRealTerm<?, ?>> pFormulaCreator) {
     super(pFormulaCreator);
   }
 
@@ -54,9 +51,8 @@ public class DReal4QuantifiedFormulaManager extends AbstractQuantifiedFormulaMan
   // it is not allowed to create a quantifier with a boolean Variable, because if Unsat would be
   // called, an error would be created
   @Override
-  public DRealTerm<Formula, FormulaKind> mkQuantifier(Quantifier pQ,
-                                         List<DRealTerm<?,?>> pVars,
-                                                      DRealTerm<?, ?> pBody) {
+  public DRealTerm<Formula, FormulaKind> mkQuantifier(
+      Quantifier pQ, List<DRealTerm<?, ?>> pVars, DRealTerm<?, ?> pBody) {
     if (pVars.isEmpty()) {
       throw new IllegalArgumentException("Empty variable list for quantifier.");
     }
@@ -65,9 +61,10 @@ public class DReal4QuantifiedFormulaManager extends AbstractQuantifiedFormulaMan
     for (DRealTerm<?, ?> term : pVars) {
       if (term.isVar()) {
         if (term.getType() == Variable.Type.BOOLEAN) {
-          throw new UnsupportedOperationException("dReal does not allow to check for Unsat with "
-              + "boolean variable in quantified formula, therefore it is not allowed to create "
-              + "such a formula.");
+          throw new UnsupportedOperationException(
+              "dReal does not allow to check for Unsat with "
+                  + "boolean variable in quantified formula, therefore it is not allowed to create "
+                  + "such a formula.");
         }
         vars.insert(term.getVariable());
       } else {
@@ -79,8 +76,8 @@ public class DReal4QuantifiedFormulaManager extends AbstractQuantifiedFormulaMan
       throw new UnsupportedOperationException("dReal does not support exist??");
     } else {
       if (pBody.isFormula()) {
-        return new DRealTerm<>(dreal.forall(vars, pBody.getFormula()), pBody.getType(),
-            FormulaKind.Forall);
+        return new DRealTerm<>(
+            dreal.forall(vars, pBody.getFormula()), pBody.getType(), FormulaKind.Forall);
       } else if (pBody.isVar()) {
         Variable var = pBody.getVariable();
         if (var.get_type() == Variable.Type.BOOLEAN) {
@@ -88,14 +85,12 @@ public class DReal4QuantifiedFormulaManager extends AbstractQuantifiedFormulaMan
           Formula quantified = dreal.forall(vars, f);
           return new DRealTerm<>(quantified, var.get_type(), FormulaKind.Forall);
         } else {
-          throw new IllegalArgumentException("The given Formula is a Variable and not of type "
-              + "Boolean.");
+          throw new IllegalArgumentException(
+              "The given Formula is a Variable and not of type " + "Boolean.");
         }
-      }
-      else {
+      } else {
         throw new IllegalArgumentException("The given Formula is not a Formula.");
       }
     }
   }
-
 }

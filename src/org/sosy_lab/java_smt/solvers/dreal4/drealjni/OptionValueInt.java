@@ -76,15 +76,22 @@ public class OptionValueInt {
   }
 
   public OptionValueInt AssignOperator(OptionValueInt arg0) {
-    return new OptionValueInt(drealJNI.OptionValueInt_AssignOperator__SWIG_0(swigCPtr, this, OptionValueInt.getCPtr(arg0), arg0), false);
+    return new OptionValueInt(
+        drealJNI.OptionValueInt_AssignOperator__SWIG_0(
+            swigCPtr, this, OptionValueInt.getCPtr(arg0), arg0),
+        false);
   }
 
   public OptionValueInt AssignOperator(int value) {
-    return new OptionValueInt(drealJNI.OptionValueInt_AssignOperator__SWIG_2(swigCPtr, this, value), false);
+    return new OptionValueInt(
+        drealJNI.OptionValueInt_AssignOperator__SWIG_2(swigCPtr, this, value), false);
   }
 
   public OptionValueInt AssignOperator(SWIGTYPE_p_int value) {
-    return new OptionValueInt(drealJNI.OptionValueInt_AssignOperator__SWIG_3(swigCPtr, this, SWIGTYPE_p_int.swigRelease(value)), false);
+    return new OptionValueInt(
+        drealJNI.OptionValueInt_AssignOperator__SWIG_3(
+            swigCPtr, this, SWIGTYPE_p_int.swigRelease(value)),
+        false);
   }
 
   public int get() {
@@ -99,26 +106,28 @@ public class OptionValueInt {
     drealJNI.OptionValueInt_set_from_file(swigCPtr, this, value);
   }
 
-  public final static class Type {
-    public final static OptionValueInt.Type DEFAULT = new OptionValueInt.Type("DEFAULT");
-    public final static OptionValueInt.Type FROM_FILE = new OptionValueInt.Type("FROM_FILE");
-    public final static OptionValueInt.Type FROM_COMMAND_LINE = new OptionValueInt.Type("FROM_COMMAND_LINE");
-    public final static OptionValueInt.Type FROM_CODE = new OptionValueInt.Type("FROM_CODE");
+  public static final class Type {
+    public static final OptionValueInt.Type DEFAULT = new OptionValueInt.Type("DEFAULT");
+    public static final OptionValueInt.Type FROM_FILE = new OptionValueInt.Type("FROM_FILE");
+    public static final OptionValueInt.Type FROM_COMMAND_LINE =
+        new OptionValueInt.Type("FROM_COMMAND_LINE");
+    public static final OptionValueInt.Type FROM_CODE = new OptionValueInt.Type("FROM_CODE");
 
     public final int swigValue() {
       return swigValue;
     }
+
     @Override
     public String toString() {
       return swigName;
     }
 
     public static Type swigToEnum(int swigValue) {
-      if (swigValue < swigValues.length && swigValue >= 0 && swigValues[swigValue].swigValue == swigValue)
-        return swigValues[swigValue];
+      if (swigValue < swigValues.length
+          && swigValue >= 0
+          && swigValues[swigValue].swigValue == swigValue) return swigValues[swigValue];
       for (int i = 0; i < swigValues.length; i++)
-        if (swigValues[i].swigValue == swigValue)
-          return swigValues[i];
+        if (swigValues[i].swigValue == swigValue) return swigValues[i];
       throw new IllegalArgumentException("No enum " + Type.class + " with value " + swigValue);
     }
 
@@ -126,23 +135,24 @@ public class OptionValueInt {
       this.swigName = swigName;
       this.swigValue = swigNext++;
     }
+
     @SuppressWarnings({"unused", "StaticAssignmentInConstructor"})
     private Type(String swigName, int swigValue) {
       this.swigName = swigName;
       this.swigValue = swigValue;
-      swigNext = swigValue+1;
+      swigNext = swigValue + 1;
     }
+
     @SuppressWarnings({"unused", "StaticAssignmentInConstructor"})
     private Type(String swigName, Type swigEnum) {
       this.swigName = swigName;
       this.swigValue = swigEnum.swigValue;
-      swigNext = this.swigValue+1;
+      swigNext = this.swigValue + 1;
     }
 
-    private static Type[] swigValues = { DEFAULT, FROM_FILE, FROM_COMMAND_LINE, FROM_CODE };
+    private static Type[] swigValues = {DEFAULT, FROM_FILE, FROM_COMMAND_LINE, FROM_CODE};
     private static int swigNext = 0;
     private final int swigValue;
     private final String swigName;
   }
-
 }

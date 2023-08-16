@@ -27,7 +27,8 @@
  * ----------------------------------------------------------------------------- */
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
-public class ExpressionVector extends java.util.AbstractList<Expression> implements java.util.RandomAccess {
+public class ExpressionVector extends java.util.AbstractList<Expression>
+    implements java.util.RandomAccess {
   private transient long swigCPtr;
   protected transient boolean swigCMemOwn;
 
@@ -87,31 +88,37 @@ public class ExpressionVector extends java.util.AbstractList<Expression> impleme
   public Expression get(int index) {
     return doGet(index);
   }
+
   @Override
   public Expression set(int index, Expression e) {
     return doSet(index, e);
   }
+
   @Override
   public boolean add(Expression e) {
     modCount++;
     doAdd(e);
     return true;
   }
+
   @Override
   public void add(int index, Expression e) {
     modCount++;
     doAdd(index, e);
   }
+
   @Override
   public Expression remove(int index) {
     modCount++;
     return doRemove(index);
   }
+
   @Override
   protected void removeRange(int fromIndex, int toIndex) {
     modCount++;
     doRemoveRange(fromIndex, toIndex);
   }
+
   @Override
   public int size() {
     return doSize();
@@ -132,10 +139,12 @@ public class ExpressionVector extends java.util.AbstractList<Expression> impleme
   public void reserve(long n) {
     drealJNI.ExpressionVector_reserve(swigCPtr, this, n);
   }
+
   @Override
   public boolean isEmpty() {
     return drealJNI.ExpressionVector_isEmpty(swigCPtr, this);
   }
+
   @Override
   public void clear() {
     drealJNI.ExpressionVector_clear(swigCPtr, this);
@@ -166,11 +175,11 @@ public class ExpressionVector extends java.util.AbstractList<Expression> impleme
   }
 
   private Expression doSet(int index, Expression val) {
-    return new Expression(drealJNI.ExpressionVector_doSet(swigCPtr, this, index, Expression.getCPtr(val), val), true);
+    return new Expression(
+        drealJNI.ExpressionVector_doSet(swigCPtr, this, index, Expression.getCPtr(val), val), true);
   }
 
   private void doRemoveRange(int fromIndex, int toIndex) {
     drealJNI.ExpressionVector_doRemoveRange(swigCPtr, this, fromIndex, toIndex);
   }
-
 }

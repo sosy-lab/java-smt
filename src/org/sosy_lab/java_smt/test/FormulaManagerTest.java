@@ -33,7 +33,6 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
 
   @Test
   public void testEmptySubstitution() throws SolverException, InterruptedException {
-    //requireUF();
     // Boolector does not support substitution
     assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     assume().withMessage("Princess fails").that(solver).isNotEqualTo(Solvers.PRINCESS);
@@ -132,7 +131,8 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
               ImmutableMap.of(
                   bmgr.makeVariable("a"), bmgr.makeVariable("a1"),
                   bmgr.makeVariable("b"), bmgr.makeVariable("b1"),
-                  bmgr.and(bmgr.makeVariable("c"), bmgr.makeVariable("d")), bmgr.makeVariable("e")));
+                  bmgr.and(bmgr.makeVariable("c"), bmgr.makeVariable("d")),
+                      bmgr.makeVariable("e")));
       assertThatFormula(out)
           .isEquivalentTo(
               bmgr.or(

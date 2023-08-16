@@ -46,4 +46,3 @@ public class SWIGTYPE_p_ibex__Interval {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 }
-

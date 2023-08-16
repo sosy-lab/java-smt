@@ -266,7 +266,8 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
       ConstantsVisitor visitor = new ConstantsVisitor();
       mgr.visit(rmgr.makeNumber(Rational.ofLongs(n, 321)), visitor);
       if (solverToUse() == Solvers.DREAL4) {
-        assertThat(visitor.found).containsExactly(Rational.ofBigDecimal(BigDecimal.valueOf((double)n / 321)));
+        assertThat(visitor.found)
+            .containsExactly(Rational.ofBigDecimal(BigDecimal.valueOf((double) n / 321)));
       } else {
         assertThat(visitor.found).containsExactly(Rational.ofLongs(n, 321));
       }
@@ -769,8 +770,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     if (solverToUse() == Solvers.DREAL4) {
       constraint = qmgr.forall(ImmutableList.of(x), xEq1);
     } else {
-      constraint =
-          qmgr.exists(ImmutableList.of(x), qmgr.forall(ImmutableList.of(x), xEq1));
+      constraint = qmgr.exists(ImmutableList.of(x), qmgr.forall(ImmutableList.of(x), xEq1));
     }
     assertThatFormula(constraint).isUnsatisfiable();
     BooleanFormula newConstraint =
@@ -791,10 +791,9 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     BooleanFormula constraint;
 
     if (solverToUse() == Solvers.DREAL4) {
-      constraint =qmgr.forall(ImmutableList.of(x), xEq1);
+      constraint = qmgr.forall(ImmutableList.of(x), xEq1);
     } else {
-      constraint =
-          qmgr.exists(ImmutableList.of(x), qmgr.forall(ImmutableList.of(x), xEq1));
+      constraint = qmgr.exists(ImmutableList.of(x), qmgr.forall(ImmutableList.of(x), xEq1));
     }
 
     assertThatFormula(constraint).isUnsatisfiable();
@@ -1041,7 +1040,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     IntegerFormula v = imgr.makeVariable("v");
     IntegerFormula z = imgr.makeVariable("z");
     BooleanFormula q = imgr.equal(v, z);
-        Map<String, Formula> mapping = mgr.extractVariables(q);
+    Map<String, Formula> mapping = mgr.extractVariables(q);
     assertThat(mapping).hasSize(2);
     assertThat(mapping).containsEntry("v", v);
     assertThat(mapping).containsEntry("z", z);
@@ -1206,7 +1205,6 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     assertThat(vars).hasSize(4);
     assertThat(vars.keySet()).containsExactly("a", "b", "c", "d");
   }
-
 
   @Test
   public void extractionDeclarations() {

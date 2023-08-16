@@ -46,4 +46,3 @@ public class SWIGTYPE_p_int {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 }
-

@@ -19,12 +19,11 @@
  */
 
 package org.sosy_lab.java_smt.solvers.dreal4;
-import de.uni_freiburg.informatik.ultimate.logic.QuantifiedFormula;
+
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
-import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Expression;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.ExpressionKind;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.FormulaKind;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.dreal;
@@ -43,7 +42,7 @@ abstract class DReal4Formula implements Formula {
 
   @Override
   public final boolean equals(Object o) {
-    if ( o == this) {
+    if (o == this) {
       return true;
     }
     if (!(o instanceof DReal4Formula)) {
@@ -71,7 +70,9 @@ abstract class DReal4Formula implements Formula {
           return term.getExpression().EqualTo(oTerm.getExpression());
         } else {
           if (oTerm.getFormulaKind() == FormulaKind.Var) {
-            return dreal.get_variable(term.getExpression()).equal_to(dreal.get_variable(oTerm.getFormula()));
+            return dreal
+                .get_variable(term.getExpression())
+                .equal_to(dreal.get_variable(oTerm.getFormula()));
           }
         }
       } else {
@@ -85,11 +86,15 @@ abstract class DReal4Formula implements Formula {
           return oTerm.getVariable().equal_to(dreal.get_variable(term.getFormula()));
         } else if (oTerm.isExp()) {
           if (oTerm.getExpressionKind() == ExpressionKind.Var) {
-            return dreal.get_variable(term.getFormula()).equal_to(dreal.get_variable(oTerm.getExpression()));
+            return dreal
+                .get_variable(term.getFormula())
+                .equal_to(dreal.get_variable(oTerm.getExpression()));
           }
         } else {
           if (oTerm.getFormulaKind() == FormulaKind.Var) {
-            return dreal.get_variable(term.getFormula()).equal_to(dreal.get_variable(oTerm.getFormula()));
+            return dreal
+                .get_variable(term.getFormula())
+                .equal_to(dreal.get_variable(oTerm.getFormula()));
           }
         }
       } else {
@@ -105,7 +110,7 @@ abstract class DReal4Formula implements Formula {
   public final String toString() {
     if (term.isExp()) {
       return term.getExpression().to_string();
-    } else if (term.isFormula()){
+    } else if (term.isFormula()) {
       return term.getFormula().to_string();
     } else {
       return term.getVariable().to_string();
@@ -116,7 +121,7 @@ abstract class DReal4Formula implements Formula {
   public final int hashCode() {
     if (term.isExp()) {
       return (int) term.getExpression().get_hash();
-    } else if (term.isFormula()){
+    } else if (term.isFormula()) {
       return (int) term.getFormula().get_hash();
     } else {
       return (int) term.getVariable().get_hash();
@@ -140,5 +145,4 @@ abstract class DReal4Formula implements Formula {
       super(pTerm);
     }
   }
-
 }

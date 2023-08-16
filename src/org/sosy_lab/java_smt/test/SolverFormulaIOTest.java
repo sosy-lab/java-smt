@@ -100,6 +100,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
   public void checkThatSolverIsAvailable() {
     requireDumping();
   }
+
   @Test
   public void varDumpTest() {
     // Boolector will fail this anyway since bools are bitvecs for btor

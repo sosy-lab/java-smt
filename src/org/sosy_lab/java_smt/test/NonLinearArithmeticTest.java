@@ -274,8 +274,7 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
       // dReal does not support UF's and APPROXIMATE_ALWAYS/FALLBACK is disabled, so result should
       // not change
       assertThatFormula(f).isUnsatisfiable();
-    }
-    else {
+    } else {
       assertExpectedUnsatifiabilityForNonLinearArithmetic(f);
     }
   }

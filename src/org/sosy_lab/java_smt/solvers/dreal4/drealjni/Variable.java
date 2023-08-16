@@ -27,7 +27,6 @@
  * ----------------------------------------------------------------------------- */
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
-
 public class Variable {
   private transient long swigCPtr;
   protected transient boolean swigCMemOwn;
@@ -73,7 +72,9 @@ public class Variable {
   }
 
   public Variable AssignOperator(Variable arg0) {
-    return new Variable(drealJNI.Variable_AssignOperator__SWIG_0(swigCPtr, this, Variable.getCPtr(arg0), arg0), false);
+    return new Variable(
+        drealJNI.Variable_AssignOperator__SWIG_0(swigCPtr, this, Variable.getCPtr(arg0), arg0),
+        false);
   }
 
   public Variable() {
@@ -124,11 +125,11 @@ public class Variable {
     return drealJNI.Variable_less(swigCPtr, this, Variable.getCPtr(v), v);
   }
 
-  public final static class Type {
-    public final static Variable.Type CONTINUOUS = new Variable.Type("CONTINUOUS");
-    public final static Variable.Type INTEGER = new Variable.Type("INTEGER");
-    public final static Variable.Type BINARY = new Variable.Type("BINARY");
-    public final static Variable.Type BOOLEAN = new Variable.Type("BOOLEAN");
+  public static final class Type {
+    public static final Variable.Type CONTINUOUS = new Variable.Type("CONTINUOUS");
+    public static final Variable.Type INTEGER = new Variable.Type("INTEGER");
+    public static final Variable.Type BINARY = new Variable.Type("BINARY");
+    public static final Variable.Type BOOLEAN = new Variable.Type("BOOLEAN");
 
     public final int swigValue() {
       return swigValue;
@@ -140,11 +141,11 @@ public class Variable {
     }
 
     public static Type swigToEnum(int swigValue) {
-      if (swigValue < swigValues.length && swigValue >= 0 && swigValues[swigValue].swigValue == swigValue)
-        return swigValues[swigValue];
+      if (swigValue < swigValues.length
+          && swigValue >= 0
+          && swigValues[swigValue].swigValue == swigValue) return swigValues[swigValue];
       for (int i = 0; i < swigValues.length; i++)
-        if (swigValues[i].swigValue == swigValue)
-          return swigValues[i];
+        if (swigValues[i].swigValue == swigValue) return swigValues[i];
       throw new IllegalArgumentException("No enum " + Type.class + " with value " + swigValue);
     }
 
@@ -157,19 +158,19 @@ public class Variable {
     private Type(String swigName, int swigValue) {
       this.swigName = swigName;
       this.swigValue = swigValue;
-      swigNext = swigValue+1;
+      swigNext = swigValue + 1;
     }
+
     @SuppressWarnings({"unused", "StaticAssignmentInConstructor"})
     private Type(String swigName, Type swigEnum) {
       this.swigName = swigName;
       this.swigValue = swigEnum.swigValue;
-      swigNext = this.swigValue+1;
+      swigNext = this.swigValue + 1;
     }
 
-    private static Type[] swigValues = { CONTINUOUS, INTEGER, BINARY, BOOLEAN };
+    private static Type[] swigValues = {CONTINUOUS, INTEGER, BINARY, BOOLEAN};
     private static int swigNext = 0;
     private final int swigValue;
     private final String swigName;
   }
-
 }

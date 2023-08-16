@@ -34,6 +34,7 @@ public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   public void initSolvers() {
     requireUF();
   }
+
   @Test
   public void testDeclareAndCallUFWithInt() throws SolverException, InterruptedException {
     requireIntegers();

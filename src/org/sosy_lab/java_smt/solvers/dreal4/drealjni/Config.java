@@ -27,7 +27,6 @@
  * ----------------------------------------------------------------------------- */
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
-
 public class Config {
   private transient long swigCPtr;
   protected transient boolean swigCMemOwn;
@@ -77,7 +76,8 @@ public class Config {
   }
 
   public Config AssignOperator(Config arg0) {
-    return new Config(drealJNI.Config_AssignOperator__SWIG_0(swigCPtr, this, Config.getCPtr(arg0), arg0), false);
+    return new Config(
+        drealJNI.Config_AssignOperator__SWIG_0(swigCPtr, this, Config.getCPtr(arg0), arg0), false);
   }
 
   public double precision() {
@@ -121,7 +121,8 @@ public class Config {
   }
 
   public OptionValueBool mutable_use_polytope_in_forall() {
-    return new OptionValueBool(drealJNI.Config_mutable_use_polytope_in_forall(swigCPtr, this), false);
+    return new OptionValueBool(
+        drealJNI.Config_mutable_use_polytope_in_forall(swigCPtr, this), false);
   }
 
   public void mutable_use_polytope_in_forall(boolean bool) {
@@ -133,7 +134,8 @@ public class Config {
   }
 
   public OptionValueBool mutable_use_worklist_fixpoint() {
-    return new OptionValueBool(drealJNI.Config_mutable_use_worklist_fixpoint(swigCPtr, this), false);
+    return new OptionValueBool(
+        drealJNI.Config_mutable_use_worklist_fixpoint(swigCPtr, this), false);
   }
 
   public void mutable_use_worklist_fixpoint(boolean bool) {
@@ -145,7 +147,8 @@ public class Config {
   }
 
   public OptionValueBool mutable_use_local_optimization() {
-    return new OptionValueBool(drealJNI.Config_mutable_use_local_optimization(swigCPtr, this), false);
+    return new OptionValueBool(
+        drealJNI.Config_mutable_use_local_optimization(swigCPtr, this), false);
   }
 
   public void mutable_use_local_optimization(boolean bool) {
@@ -163,7 +166,6 @@ public class Config {
   public void mutable_dump_theory_literals(boolean bool) {
     drealJNI.Config_mutable_dump_theory_literals_0(bool, Config.getCPtr(this));
   }
-
 
   public int number_of_jobs() {
     return drealJNI.Config_number_of_jobs(swigCPtr, this);
@@ -189,12 +191,18 @@ public class Config {
     drealJNI.Config_mutable_stack_left_box_first_0(bool, Config.getCPtr(this));
   }
 
-  public SWIGTYPE_p_std__functionT_int_fdreal__Box_const_R_DynamicBitset_const_R_dreal__Box_p_dreal__Box_pF_t brancher() {
-    return new SWIGTYPE_p_std__functionT_int_fdreal__Box_const_R_DynamicBitset_const_R_dreal__Box_p_dreal__Box_pF_t(drealJNI.Config_brancher(swigCPtr, this), false);
+  public
+  SWIGTYPE_p_std__functionT_int_fdreal__Box_const_R_DynamicBitset_const_R_dreal__Box_p_dreal__Box_pF_t
+      brancher() {
+    return new SWIGTYPE_p_std__functionT_int_fdreal__Box_const_R_DynamicBitset_const_R_dreal__Box_p_dreal__Box_pF_t(
+        drealJNI.Config_brancher(swigCPtr, this), false);
   }
 
-  public SWIGTYPE_p_dreal__OptionValueT_std__functionT_int_fdreal__Box_const_R_DynamicBitset_const_R_dreal__Box_p_dreal__Box_pF_t_t mutable_brancher() {
-    return new SWIGTYPE_p_dreal__OptionValueT_std__functionT_int_fdreal__Box_const_R_DynamicBitset_const_R_dreal__Box_p_dreal__Box_pF_t_t(drealJNI.Config_mutable_brancher(swigCPtr, this), false);
+  public
+  SWIGTYPE_p_dreal__OptionValueT_std__functionT_int_fdreal__Box_const_R_DynamicBitset_const_R_dreal__Box_p_dreal__Box_pF_t_t
+      mutable_brancher() {
+    return new SWIGTYPE_p_dreal__OptionValueT_std__functionT_int_fdreal__Box_const_R_DynamicBitset_const_R_dreal__Box_p_dreal__Box_pF_t_t(
+        drealJNI.Config_mutable_brancher(swigCPtr, this), false);
   }
 
   public double nlopt_ftol_rel() {
@@ -249,8 +257,10 @@ public class Config {
     return Config.SatDefaultPhase.swigToEnum(drealJNI.Config_sat_default_phase(swigCPtr, this));
   }
 
-  public SWIGTYPE_p_dreal__OptionValueT_dreal__Config__SatDefaultPhase_t mutable_sat_default_phase() {
-    return new SWIGTYPE_p_dreal__OptionValueT_dreal__Config__SatDefaultPhase_t(drealJNI.Config_mutable_sat_default_phase(swigCPtr, this), false);
+  public SWIGTYPE_p_dreal__OptionValueT_dreal__Config__SatDefaultPhase_t
+      mutable_sat_default_phase() {
+    return new SWIGTYPE_p_dreal__OptionValueT_dreal__Config__SatDefaultPhase_t(
+        drealJNI.Config_mutable_sat_default_phase(swigCPtr, this), false);
   }
 
   public long random_seed() {
@@ -261,11 +271,11 @@ public class Config {
     return new OptionValueUnsignedInt(drealJNI.Config_mutable_random_seed(swigCPtr, this), false);
   }
 
-  public void mutable_random_seed(long seed){
+  public void mutable_random_seed(long seed) {
     if (seed < 0) {
       throw new IllegalArgumentException("Seed must be greater than zero");
     }
-    drealJNI.Config_mutable_random_seed_0(seed,  Config.getCPtr(this));
+    drealJNI.Config_mutable_random_seed_0(seed, Config.getCPtr(this));
   }
 
   public boolean smtlib2_compliant() {
@@ -300,27 +310,35 @@ public class Config {
     return drealJNI.Config_kDefaultNloptMaxTime_get();
   }
 
-  public final static class SatDefaultPhase {
-    public final static Config.SatDefaultPhase False = new Config.SatDefaultPhase("False", drealJNI.Config_SatDefaultPhase_False_get());
-    public final static Config.SatDefaultPhase True = new Config.SatDefaultPhase("True", drealJNI.Config_SatDefaultPhase_True_get());
-    public final static Config.SatDefaultPhase JeroslowWang = new Config.SatDefaultPhase("JeroslowWang", drealJNI.Config_SatDefaultPhase_JeroslowWang_get());
-    public final static Config.SatDefaultPhase RandomInitialPhase = new Config.SatDefaultPhase("RandomInitialPhase", drealJNI.Config_SatDefaultPhase_RandomInitialPhase_get());
+  public static final class SatDefaultPhase {
+    public static final Config.SatDefaultPhase False =
+        new Config.SatDefaultPhase("False", drealJNI.Config_SatDefaultPhase_False_get());
+    public static final Config.SatDefaultPhase True =
+        new Config.SatDefaultPhase("True", drealJNI.Config_SatDefaultPhase_True_get());
+    public static final Config.SatDefaultPhase JeroslowWang =
+        new Config.SatDefaultPhase(
+            "JeroslowWang", drealJNI.Config_SatDefaultPhase_JeroslowWang_get());
+    public static final Config.SatDefaultPhase RandomInitialPhase =
+        new Config.SatDefaultPhase(
+            "RandomInitialPhase", drealJNI.Config_SatDefaultPhase_RandomInitialPhase_get());
 
     public final int swigValue() {
       return swigValue;
     }
+
     @Override
     public String toString() {
       return swigName;
     }
 
     public static SatDefaultPhase swigToEnum(int swigValue) {
-      if (swigValue < swigValues.length && swigValue >= 0 && swigValues[swigValue].swigValue == swigValue)
-        return swigValues[swigValue];
+      if (swigValue < swigValues.length
+          && swigValue >= 0
+          && swigValues[swigValue].swigValue == swigValue) return swigValues[swigValue];
       for (int i = 0; i < swigValues.length; i++)
-        if (swigValues[i].swigValue == swigValue)
-          return swigValues[i];
-      throw new IllegalArgumentException("No enum " + SatDefaultPhase.class + " with value " + swigValue);
+        if (swigValues[i].swigValue == swigValue) return swigValues[i];
+      throw new IllegalArgumentException(
+          "No enum " + SatDefaultPhase.class + " with value " + swigValue);
     }
 
     @SuppressWarnings("unused")
@@ -328,25 +346,27 @@ public class Config {
       this.swigName = swigName;
       this.swigValue = swigNext++;
     }
+
     @SuppressWarnings("StaticAssignmentInConstructor")
     private SatDefaultPhase(String swigName, int swigValue) {
       this.swigName = swigName;
       this.swigValue = swigValue;
-      swigNext = swigValue+1;
+      swigNext = swigValue + 1;
     }
 
     @SuppressWarnings({"unused", "StaticAssignmentInConstructor"})
     private SatDefaultPhase(String swigName, SatDefaultPhase swigEnum) {
       this.swigName = swigName;
       this.swigValue = swigEnum.swigValue;
-      swigNext = this.swigValue+1;
+      swigNext = this.swigValue + 1;
     }
 
-    private static SatDefaultPhase[] swigValues = { False, True, JeroslowWang, RandomInitialPhase };
+    private static SatDefaultPhase[] swigValues = {False, True, JeroslowWang, RandomInitialPhase};
+
     @SuppressWarnings("unused")
     private static int swigNext = 0;
+
     private final int swigValue;
     private final String swigName;
   }
-
 }

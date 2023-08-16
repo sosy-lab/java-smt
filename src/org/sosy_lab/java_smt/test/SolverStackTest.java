@@ -617,8 +617,9 @@ public class SolverStackTest extends SolverBasedTest0 {
   @Test
   public void modelForSatFormulaWithLargeValue() throws SolverException, InterruptedException {
     assume()
-        .withMessage("This number is to big for integers in dReal, BigIntegers are not supported,"
-            + " only in rationals.")
+        .withMessage(
+            "This number is to big for integers in dReal, BigIntegers are not supported,"
+                + " only in rationals.")
         .that(solverToUse())
         .isNotEqualTo(Solvers.DREAL4);
 

@@ -71,5 +71,4 @@ public class SharedPointerToUnorderedMap {
   public SharedPointerToUnorderedMap() {
     this(drealJNI.new_SharedPointerToUnorderedMap(), true);
   }
-
 }

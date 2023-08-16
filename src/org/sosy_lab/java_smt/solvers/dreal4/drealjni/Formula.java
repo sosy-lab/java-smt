@@ -27,7 +27,6 @@
  * ----------------------------------------------------------------------------- */
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
-
 public class Formula {
   private transient long swigCPtr;
   protected transient boolean swigCMemOwn;
@@ -77,7 +76,9 @@ public class Formula {
   }
 
   public Formula AssignOperator(Formula arg0) {
-    return new Formula(drealJNI.Formula_AssignOperator__SWIG_0(swigCPtr, this, Formula.getCPtr(arg0), arg0), false);
+    return new Formula(
+        drealJNI.Formula_AssignOperator__SWIG_0(swigCPtr, this, Formula.getCPtr(arg0), arg0),
+        false);
   }
 
   public Formula(Variable var) {
@@ -113,24 +114,57 @@ public class Formula {
   }
 
   public Formula Substitute(Variable var, Expression e) {
-    return new Formula(drealJNI.Formula_Substitute__SWIG_0(swigCPtr, this, Variable.getCPtr(var), var, Expression.getCPtr(e), e), true);
+    return new Formula(
+        drealJNI.Formula_Substitute__SWIG_0(
+            swigCPtr, this, Variable.getCPtr(var), var, Expression.getCPtr(e), e),
+        true);
   }
 
   public Formula Substitute(Variable var, Formula f) {
-    return new Formula(drealJNI.Formula_Substitute__SWIG_1(swigCPtr, this, Variable.getCPtr(var), var, Formula.getCPtr(f), f), true);
+    return new Formula(
+        drealJNI.Formula_Substitute__SWIG_1(
+            swigCPtr, this, Variable.getCPtr(var), var, Formula.getCPtr(f), f),
+        true);
   }
 
   public Formula Substitute(
-      SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Expression_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t expr_subst, SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Formula_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t formula_subst) {
-    return new Formula(drealJNI.Formula_Substitute__SWIG_2(swigCPtr, this, SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Expression_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t.getCPtr(expr_subst), SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Formula_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t.getCPtr(formula_subst)), true);
+      SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Expression_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t
+          expr_subst,
+      SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Formula_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t
+          formula_subst) {
+    return new Formula(
+        drealJNI.Formula_Substitute__SWIG_2(
+            swigCPtr,
+            this,
+            SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Expression_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t
+                .getCPtr(expr_subst),
+            SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Formula_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t
+                .getCPtr(formula_subst)),
+        true);
   }
 
-  public Formula Substitute(SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Expression_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t expr_subst) {
-    return new Formula(drealJNI.Formula_Substitute__SWIG_3(swigCPtr, this, SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Expression_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t.getCPtr(expr_subst)), true);
+  public Formula Substitute(
+      SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Expression_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t
+          expr_subst) {
+    return new Formula(
+        drealJNI.Formula_Substitute__SWIG_3(
+            swigCPtr,
+            this,
+            SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Expression_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t
+                .getCPtr(expr_subst)),
+        true);
   }
 
-  public Formula Substitute(SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Formula_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t formula_subst) {
-    return new Formula(drealJNI.Formula_Substitute__SWIG_4(swigCPtr, this, SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Formula_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t.getCPtr(formula_subst)), true);
+  public Formula Substitute(
+      SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Formula_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t
+          formula_subst) {
+    return new Formula(
+        drealJNI.Formula_Substitute__SWIG_4(
+            swigCPtr,
+            this,
+            SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Formula_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t
+                .getCPtr(formula_subst)),
+        true);
   }
 
   public String to_string() {
@@ -150,11 +184,13 @@ public class Formula {
   }
 
   public static Formula make_conjunction(Formula f1, Formula f2) {
-    return new Formula(drealJNI.Formula_make_conjunction(Formula.getCPtr(f1), f1, Formula.getCPtr(f2), f2), true);
+    return new Formula(
+        drealJNI.Formula_make_conjunction(Formula.getCPtr(f1), f1, Formula.getCPtr(f2), f2), true);
   }
 
   public static Formula make_disjunction(Formula f1, Formula f2) {
-    return new Formula(drealJNI.Formula_make_disjunction(Formula.getCPtr(f1), f1, Formula.getCPtr(f2), f2), true);
+    return new Formula(
+        drealJNI.Formula_make_disjunction(Formula.getCPtr(f1), f1, Formula.getCPtr(f2), f2), true);
   }
 
   public boolean include_ite() {
@@ -173,5 +209,4 @@ public class Formula {
     drealJNI.Formula_getFreeVariables(VariableSet.getCPtr(set), Formula.getCPtr(this));
     return set;
   }
-
 }

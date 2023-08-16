@@ -262,10 +262,9 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
       assertDivision(a, numNeg3, num4, aEqNeg10);
     }
 
-
     switch (solverToUse()) {
       case MATHSAT5:
-      case DREAL4:  // modulo not supported
+      case DREAL4: // modulo not supported
         assertThrows(UnsupportedOperationException.class, () -> buildModulo(num10, num5, num0));
         break;
       default:
@@ -302,9 +301,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
             () -> assertThatFormula(buildDivision(num10, num0, num10)).isSatisfiable());
         break;
       case DREAL4: // does not support division by zero
-        assertThrows(
-          IllegalArgumentException.class,
-          () -> buildDivision(num10, num0, num10));
+        assertThrows(IllegalArgumentException.class, () -> buildDivision(num10, num0, num10));
         break;
       default:
         // division-by-zero results in an arbitrary result
@@ -477,8 +474,9 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   @Test
   public void intTest4_ModularCongruence_Simple() throws SolverException, InterruptedException {
     assume()
-        .withMessage("dReal does not use real integer division. Therefore modularCongruence "
-            + "may produce incorrect results.")
+        .withMessage(
+            "dReal does not use real integer division. Therefore modularCongruence "
+                + "may produce incorrect results.")
         .that(solver)
         .isNotEqualTo(Solvers.DREAL4);
 
@@ -539,7 +537,6 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
       assertThatFormula(bmgr.and(fa, fc, bmgr.not(fConc7))).isSatisfiable();
       assertThatFormula(bmgr.and(fa, fd, bmgr.not(fCond7))).isSatisfiable();
     }
-
   }
 
   @Test
@@ -569,8 +566,9 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   @Test
   public void testHardCongruence() throws SolverException, InterruptedException {
     assume()
-        .withMessage("dReal does not use real integer division. Therefore modularCongruence "
-        + "may produce incorrect results.")
+        .withMessage(
+            "dReal does not use real integer division. Therefore modularCongruence "
+                + "may produce incorrect results.")
         .that(solver)
         .isNotEqualTo(Solvers.DREAL4);
 
@@ -703,14 +701,14 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
     BooleanFormula gt_bMinusC_1000 = imgr.greaterThan(minus_b_c, num_1000);
     BooleanFormula and_cEq2_bMinusCgt1000 = bmgr.and(eq_c_2, gt_bMinusC_1000);
 
-
-
     switch (solverToUse()) {
       case DREAL4:
         BooleanFormula g = qmgr.forall(ImmutableList.of(var_C), and_cEq2_bMinusCgt1000);
-        assertThrows(UnsupportedOperationException.class, () -> {
-          qmgr.eliminateQuantifiers(g);
-      });
+        assertThrows(
+            UnsupportedOperationException.class,
+            () -> {
+              qmgr.eliminateQuantifiers(g);
+            });
         break;
       default:
         BooleanFormula f = qmgr.exists(ImmutableList.of(var_C), and_cEq2_bMinusCgt1000);
@@ -1114,8 +1112,8 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   @Test
   public void integerDivisionRounding() throws SolverException, InterruptedException {
     assume()
-        .withMessage("dReal does not round if we have division with variables, only for "
-        + "constants.")
+        .withMessage(
+            "dReal does not round if we have division with variables, only for " + "constants.")
         .that(solver)
         .isNotEqualTo(Solvers.DREAL4);
 

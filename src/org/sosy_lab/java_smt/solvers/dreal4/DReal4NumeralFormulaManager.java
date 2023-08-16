@@ -21,15 +21,12 @@
 package org.sosy_lab.java_smt.solvers.dreal4;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
-import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Config;
-import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Context;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Expression;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.ExpressionKind;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula;
@@ -38,9 +35,14 @@ import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.dreal;
 
 public abstract class DReal4NumeralFormulaManager<
-    ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
+        ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
     extends AbstractNumeralFormulaManager<
-    DRealTerm<?, ?>, Variable.Type, Config, ParamFormulaType, ResultFormulaType, DRealTerm<?, ?>> {
+        DRealTerm<?, ?>,
+        Variable.Type,
+        Config,
+        ParamFormulaType,
+        ResultFormulaType,
+        DRealTerm<?, ?>> {
 
   DReal4NumeralFormulaManager(
       DReal4FormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
@@ -101,70 +103,100 @@ public abstract class DReal4NumeralFormulaManager<
     // Only Expression or Variables are expected
     Preconditions.checkState(pParam1.isVar() || pParam1.isExp());
     if (pParam1.isVar()) {
-      return new DRealTerm<>(dreal.pow(new Expression(pParam1.getVariable()), new Expression(-1))
-          , pParam1.getType(), ExpressionKind.Pow);
+      return new DRealTerm<>(
+          dreal.pow(new Expression(pParam1.getVariable()), new Expression(-1)),
+          pParam1.getType(),
+          ExpressionKind.Pow);
     } else {
-      return new DRealTerm<>(dreal.pow(pParam1.getExpression(), new Expression(-1)),
-          pParam1.getType(), ExpressionKind.Pow);
+      return new DRealTerm<>(
+          dreal.pow(pParam1.getExpression(), new Expression(-1)),
+          pParam1.getType(),
+          ExpressionKind.Pow);
     }
   }
 
   @Override
-  protected DRealTerm<Expression, ExpressionKind> add(DRealTerm<?, ?> pParam1,
-                                                      DRealTerm<?, ?> pParam2) {
+  protected DRealTerm<Expression, ExpressionKind> add(
+      DRealTerm<?, ?> pParam1, DRealTerm<?, ?> pParam2) {
     if (pParam1.isExp() && pParam2.isExp()) {
-      return new DRealTerm<>(dreal.Add(pParam1.getExpression(), pParam2.getExpression()),
-          pParam1.getType(), ExpressionKind.Add);
+      return new DRealTerm<>(
+          dreal.Add(pParam1.getExpression(), pParam2.getExpression()),
+          pParam1.getType(),
+          ExpressionKind.Add);
     } else if (pParam1.isVar() && pParam2.isVar()) {
-      return new DRealTerm<>(dreal.Add(new Expression(pParam1.getVariable()),
-          new Expression(pParam2.getVariable())), pParam1.getType(), ExpressionKind.Add);
+      return new DRealTerm<>(
+          dreal.Add(new Expression(pParam1.getVariable()), new Expression(pParam2.getVariable())),
+          pParam1.getType(),
+          ExpressionKind.Add);
     } else if (pParam1.isExp() && pParam2.isVar()) {
-      return new DRealTerm<>(dreal.Add(pParam1.getExpression(),
-          new Expression(pParam2.getVariable())), pParam1.getType(), ExpressionKind.Add);
+      return new DRealTerm<>(
+          dreal.Add(pParam1.getExpression(), new Expression(pParam2.getVariable())),
+          pParam1.getType(),
+          ExpressionKind.Add);
     } else if (pParam1.isVar() && pParam2.isExp()) {
-      return new DRealTerm<>(dreal.Add(new Expression(pParam1.getVariable()),
-          pParam2.getExpression()), pParam1.getType(), ExpressionKind.Add);
+      return new DRealTerm<>(
+          dreal.Add(new Expression(pParam1.getVariable()), pParam2.getExpression()),
+          pParam1.getType(),
+          ExpressionKind.Add);
     } else {
       throw new UnsupportedOperationException("dReal does not support add on Formulas.");
     }
   }
 
   @Override
-  protected DRealTerm<Expression, ExpressionKind> subtract(DRealTerm<?, ?> pParam1,
-                                                           DRealTerm<?, ?> pParam2) {
+  protected DRealTerm<Expression, ExpressionKind> subtract(
+      DRealTerm<?, ?> pParam1, DRealTerm<?, ?> pParam2) {
     if (pParam1.isExp() && pParam2.isExp()) {
-      return new DRealTerm<>(dreal.Substract(pParam1.getExpression(),
-          pParam2.getExpression()), pParam1.getType(), ExpressionKind.Add);
+      return new DRealTerm<>(
+          dreal.Substract(pParam1.getExpression(), pParam2.getExpression()),
+          pParam1.getType(),
+          ExpressionKind.Add);
     } else if (pParam1.isVar() && pParam2.isVar()) {
-      return new DRealTerm<>(dreal.Substract(new Expression(pParam1.getVariable()),
-          new Expression(pParam2.getVariable())), pParam1.getType(), ExpressionKind.Add);
+      return new DRealTerm<>(
+          dreal.Substract(
+              new Expression(pParam1.getVariable()), new Expression(pParam2.getVariable())),
+          pParam1.getType(),
+          ExpressionKind.Add);
     } else if (pParam1.isExp() && pParam2.isVar()) {
-      return new DRealTerm<>(dreal.Substract(pParam1.getExpression(),
-          new Expression(pParam2.getVariable())), pParam1.getType(), ExpressionKind.Add);
+      return new DRealTerm<>(
+          dreal.Substract(pParam1.getExpression(), new Expression(pParam2.getVariable())),
+          pParam1.getType(),
+          ExpressionKind.Add);
     } else if (pParam1.isVar() && pParam2.isExp()) {
-      return new DRealTerm<>(dreal.Substract(new Expression(pParam1.getVariable()),
-          pParam2.getExpression()), pParam1.getType(), ExpressionKind.Add);
+      return new DRealTerm<>(
+          dreal.Substract(new Expression(pParam1.getVariable()), pParam2.getExpression()),
+          pParam1.getType(),
+          ExpressionKind.Add);
     } else {
-      throw new UnsupportedOperationException("dReal does not support subtract on Variables or "
-          + "Formulas.");
+      throw new UnsupportedOperationException(
+          "dReal does not support subtract on Variables or " + "Formulas.");
     }
   }
 
   @Override
-  public DRealTerm<Expression, ExpressionKind> multiply(DRealTerm<?, ?> pParam1,
-                                                        DRealTerm<?, ?> pParam2) {
+  public DRealTerm<Expression, ExpressionKind> multiply(
+      DRealTerm<?, ?> pParam1, DRealTerm<?, ?> pParam2) {
     if (pParam1.isExp() && pParam2.isExp()) {
-      return new DRealTerm<>(dreal.Multiply(pParam1.getExpression(), pParam2.getExpression()),
-          pParam1.getType(), ExpressionKind.Mul);
+      return new DRealTerm<>(
+          dreal.Multiply(pParam1.getExpression(), pParam2.getExpression()),
+          pParam1.getType(),
+          ExpressionKind.Mul);
     } else if (pParam1.isVar() && pParam2.isExp()) {
-      return new DRealTerm<>(dreal.Multiply(new Expression(pParam1.getVariable()),
-          pParam2.getExpression()), pParam1.getType(), ExpressionKind.Mul);
+      return new DRealTerm<>(
+          dreal.Multiply(new Expression(pParam1.getVariable()), pParam2.getExpression()),
+          pParam1.getType(),
+          ExpressionKind.Mul);
     } else if (pParam1.isExp() && pParam2.isVar()) {
-      return new DRealTerm<>(dreal.Multiply(pParam1.getExpression(),
-          new Expression(pParam2.getVariable())), pParam1.getType(), ExpressionKind.Mul);
+      return new DRealTerm<>(
+          dreal.Multiply(pParam1.getExpression(), new Expression(pParam2.getVariable())),
+          pParam1.getType(),
+          ExpressionKind.Mul);
     } else if (pParam1.isVar() && pParam2.isVar()) {
-      return new DRealTerm<>(dreal.Multiply(new Expression(pParam1.getVariable()),
-          new Expression(pParam2.getVariable())), pParam1.getType(), ExpressionKind.Mul);
+      return new DRealTerm<>(
+          dreal.Multiply(
+              new Expression(pParam1.getVariable()), new Expression(pParam2.getVariable())),
+          pParam1.getType(),
+          ExpressionKind.Mul);
     } else {
       throw new UnsupportedOperationException("dReal does not support multiply with Formulas.");
     }
@@ -172,25 +204,32 @@ public abstract class DReal4NumeralFormulaManager<
 
   // only use Equal(Expression exp1, Expression exp2), Equal with Formulas is same as iff
   @Override
-  protected DRealTerm<Formula, FormulaKind> equal(DRealTerm<?, ?> pParam1,
-                                                  DRealTerm<?, ?> pParam2) {
+  protected DRealTerm<Formula, FormulaKind> equal(
+      DRealTerm<?, ?> pParam1, DRealTerm<?, ?> pParam2) {
     if (pParam1.isExp() && pParam2.isExp()) {
-      return new DRealTerm<>(dreal.Equal(pParam1.getExpression(),
-          pParam2.getExpression()), Variable.Type.BOOLEAN, FormulaKind.Eq);
+      return new DRealTerm<>(
+          dreal.Equal(pParam1.getExpression(), pParam2.getExpression()),
+          Variable.Type.BOOLEAN,
+          FormulaKind.Eq);
     } else if (pParam1.isVar() && pParam2.isVar()) {
-      return new DRealTerm<>(dreal.Equal(new Expression(pParam1.getVariable()),
-          new Expression(pParam2.getVariable())), Variable.Type.BOOLEAN, FormulaKind.Eq);
+      return new DRealTerm<>(
+          dreal.Equal(new Expression(pParam1.getVariable()), new Expression(pParam2.getVariable())),
+          Variable.Type.BOOLEAN,
+          FormulaKind.Eq);
     } else if (pParam1.isExp() && pParam2.isVar()) {
-      return new DRealTerm<>(dreal.Equal(pParam1.getExpression(),
-          new Expression(pParam2.getVariable())), Variable.Type.BOOLEAN, FormulaKind.Eq);
+      return new DRealTerm<>(
+          dreal.Equal(pParam1.getExpression(), new Expression(pParam2.getVariable())),
+          Variable.Type.BOOLEAN,
+          FormulaKind.Eq);
     } else if (pParam1.isVar() && pParam2.isExp()) {
-      return new DRealTerm<>(dreal.Equal(new Expression(pParam1.getVariable()),
-          pParam2.getExpression()), Variable.Type.BOOLEAN, FormulaKind.Eq);
+      return new DRealTerm<>(
+          dreal.Equal(new Expression(pParam1.getVariable()), pParam2.getExpression()),
+          Variable.Type.BOOLEAN,
+          FormulaKind.Eq);
     } else {
       throw new UnsupportedOperationException("dReal does not support equal on Formulas.");
     }
   }
-
 
   @Override
   protected DRealTerm<Formula, FormulaKind> distinctImpl(List<DRealTerm<?, ?>> pNumbers) {
@@ -209,95 +248,127 @@ public abstract class DReal4NumeralFormulaManager<
     if (pTerm1.isVar() && pTerm2.isVar()) {
       return dreal.NotEqual(pTerm1.getVariable(), pTerm2.getVariable());
     } else if (pTerm1.isExp() && pTerm2.isVar()) {
-      return dreal.NotEqual(pTerm1.getExpression(),
-          new Expression(pTerm2.getVariable()));
+      return dreal.NotEqual(pTerm1.getExpression(), new Expression(pTerm2.getVariable()));
     } else if (pTerm1.isVar() && pTerm2.isExp()) {
-      return dreal.NotEqual(new Expression(pTerm1.getVariable()),
-          pTerm2.getExpression());
+      return dreal.NotEqual(new Expression(pTerm1.getVariable()), pTerm2.getExpression());
     } else if (pTerm1.isExp() && pTerm2.isExp()) {
-      return dreal.NotEqual(pTerm1.getExpression(),
-          pTerm2.getExpression());
+      return dreal.NotEqual(pTerm1.getExpression(), pTerm2.getExpression());
     } else {
       throw new UnsupportedOperationException("dReal does not support distinctImpl on Formulas.");
     }
   }
 
   @Override
-  protected DRealTerm<Formula, FormulaKind> greaterThan(DRealTerm<?, ?> pParam1,
-                                                        DRealTerm<?, ?> pParam2) {
+  protected DRealTerm<Formula, FormulaKind> greaterThan(
+      DRealTerm<?, ?> pParam1, DRealTerm<?, ?> pParam2) {
     if (pParam1.isVar() && pParam2.isVar()) {
-      return new DRealTerm<>(dreal.Grater(new Expression(pParam1.getVariable()),
-          new Expression(pParam2.getVariable())), Variable.Type.BOOLEAN, FormulaKind.Gt);
-    } else if(pParam1.isVar() && pParam2.isExp()) {
-      return new DRealTerm<>(dreal.Grater(new Expression(pParam1.getVariable()),
-          pParam2.getExpression()), Variable.Type.BOOLEAN, FormulaKind.Gt);
+      return new DRealTerm<>(
+          dreal.Grater(
+              new Expression(pParam1.getVariable()), new Expression(pParam2.getVariable())),
+          Variable.Type.BOOLEAN,
+          FormulaKind.Gt);
+    } else if (pParam1.isVar() && pParam2.isExp()) {
+      return new DRealTerm<>(
+          dreal.Grater(new Expression(pParam1.getVariable()), pParam2.getExpression()),
+          Variable.Type.BOOLEAN,
+          FormulaKind.Gt);
     } else if (pParam1.isExp() && pParam2.isVar()) {
-      return new DRealTerm<>(dreal.Grater(pParam1.getExpression(),
-          new Expression(pParam2.getVariable())), Variable.Type.BOOLEAN, FormulaKind.Gt);
+      return new DRealTerm<>(
+          dreal.Grater(pParam1.getExpression(), new Expression(pParam2.getVariable())),
+          Variable.Type.BOOLEAN,
+          FormulaKind.Gt);
     } else if (pParam1.isExp() && pParam2.isExp()) {
-      return new DRealTerm<>(dreal.Grater(pParam1.getExpression(),
-          pParam2.getExpression()), Variable.Type.BOOLEAN, FormulaKind.Gt);
+      return new DRealTerm<>(
+          dreal.Grater(pParam1.getExpression(), pParam2.getExpression()),
+          Variable.Type.BOOLEAN,
+          FormulaKind.Gt);
     } else {
       throw new UnsupportedOperationException("dReal does not support greaterThan on Formulas.");
     }
   }
 
   @Override
-  protected DRealTerm<Formula, FormulaKind> greaterOrEquals(DRealTerm<?, ?> pParam1,
-                                                            DRealTerm<?, ?> pParam2) {
+  protected DRealTerm<Formula, FormulaKind> greaterOrEquals(
+      DRealTerm<?, ?> pParam1, DRealTerm<?, ?> pParam2) {
     if (pParam1.isVar() && pParam2.isVar()) {
-      return new DRealTerm<>(dreal.GraterEqual(new Expression(pParam1.getVariable()),
-          new Expression(pParam2.getVariable())), Variable.Type.BOOLEAN, FormulaKind.Geq);
-    } else if(pParam1.isVar() && pParam2.isExp()) {
-      return new DRealTerm<>(dreal.GraterEqual(new Expression(pParam1.getVariable()),
-          pParam2.getExpression()), Variable.Type.BOOLEAN, FormulaKind.Geq);
+      return new DRealTerm<>(
+          dreal.GraterEqual(
+              new Expression(pParam1.getVariable()), new Expression(pParam2.getVariable())),
+          Variable.Type.BOOLEAN,
+          FormulaKind.Geq);
+    } else if (pParam1.isVar() && pParam2.isExp()) {
+      return new DRealTerm<>(
+          dreal.GraterEqual(new Expression(pParam1.getVariable()), pParam2.getExpression()),
+          Variable.Type.BOOLEAN,
+          FormulaKind.Geq);
     } else if (pParam1.isExp() && pParam2.isVar()) {
-      return new DRealTerm<>(dreal.GraterEqual(pParam1.getExpression(),
-          new Expression(pParam2.getVariable())), Variable.Type.BOOLEAN, FormulaKind.Geq);
+      return new DRealTerm<>(
+          dreal.GraterEqual(pParam1.getExpression(), new Expression(pParam2.getVariable())),
+          Variable.Type.BOOLEAN,
+          FormulaKind.Geq);
     } else if (pParam1.isExp() && pParam2.isExp()) {
-      return new DRealTerm<>(dreal.GraterEqual(pParam1.getExpression(),
-          pParam2.getExpression()), Variable.Type.BOOLEAN, FormulaKind.Geq);
+      return new DRealTerm<>(
+          dreal.GraterEqual(pParam1.getExpression(), pParam2.getExpression()),
+          Variable.Type.BOOLEAN,
+          FormulaKind.Geq);
     } else {
-      throw new UnsupportedOperationException("dReal does not support greaterOrEquals on Formulas"
-          + ".");
+      throw new UnsupportedOperationException(
+          "dReal does not support greaterOrEquals on Formulas" + ".");
     }
   }
 
   @Override
-  protected DRealTerm<Formula, FormulaKind> lessThan(DRealTerm<?, ?> pParam1,
-                                                     DRealTerm<?, ?> pParam2) {
+  protected DRealTerm<Formula, FormulaKind> lessThan(
+      DRealTerm<?, ?> pParam1, DRealTerm<?, ?> pParam2) {
     if (pParam1.isVar() && pParam2.isVar()) {
-      return new DRealTerm<>(dreal.Less(new Expression(pParam1.getVariable()),
-          new Expression(pParam2.getVariable())), Variable.Type.BOOLEAN, FormulaKind.Lt);
-    } else if(pParam1.isVar() && pParam2.isExp()) {
-      return new DRealTerm<>(dreal.Less(new Expression(pParam1.getVariable()),
-          pParam2.getExpression()), Variable.Type.BOOLEAN, FormulaKind.Lt);
+      return new DRealTerm<>(
+          dreal.Less(new Expression(pParam1.getVariable()), new Expression(pParam2.getVariable())),
+          Variable.Type.BOOLEAN,
+          FormulaKind.Lt);
+    } else if (pParam1.isVar() && pParam2.isExp()) {
+      return new DRealTerm<>(
+          dreal.Less(new Expression(pParam1.getVariable()), pParam2.getExpression()),
+          Variable.Type.BOOLEAN,
+          FormulaKind.Lt);
     } else if (pParam1.isExp() && pParam2.isVar()) {
-      return new DRealTerm<>(dreal.Less(pParam1.getExpression(),
-          new Expression(pParam2.getVariable())), Variable.Type.BOOLEAN, FormulaKind.Lt);
+      return new DRealTerm<>(
+          dreal.Less(pParam1.getExpression(), new Expression(pParam2.getVariable())),
+          Variable.Type.BOOLEAN,
+          FormulaKind.Lt);
     } else if (pParam1.isExp() && pParam2.isExp()) {
-      return new DRealTerm<>(dreal.Less(pParam1.getExpression(),
-          pParam2.getExpression()), Variable.Type.BOOLEAN, FormulaKind.Lt);
+      return new DRealTerm<>(
+          dreal.Less(pParam1.getExpression(), pParam2.getExpression()),
+          Variable.Type.BOOLEAN,
+          FormulaKind.Lt);
     } else {
       throw new UnsupportedOperationException("dReal does not support lessThan on Formulas.");
     }
   }
 
   @Override
-  protected DRealTerm<Formula, FormulaKind> lessOrEquals(DRealTerm<?, ?> pParam1,
-                                                         DRealTerm<?, ?> pParam2) {
+  protected DRealTerm<Formula, FormulaKind> lessOrEquals(
+      DRealTerm<?, ?> pParam1, DRealTerm<?, ?> pParam2) {
     if (pParam1.isVar() && pParam2.isVar()) {
-      return new DRealTerm<>(dreal.LessEqual(new Expression(pParam1.getVariable()),
-          new Expression(pParam2.getVariable())), Variable.Type.BOOLEAN, FormulaKind.Leq);
-    } else if(pParam1.isVar() && pParam2.isExp()) {
-      return new DRealTerm<>(dreal.LessEqual(new Expression(pParam1.getVariable()),
-          pParam2.getExpression()), Variable.Type.BOOLEAN, FormulaKind.Leq);
+      return new DRealTerm<>(
+          dreal.LessEqual(
+              new Expression(pParam1.getVariable()), new Expression(pParam2.getVariable())),
+          Variable.Type.BOOLEAN,
+          FormulaKind.Leq);
+    } else if (pParam1.isVar() && pParam2.isExp()) {
+      return new DRealTerm<>(
+          dreal.LessEqual(new Expression(pParam1.getVariable()), pParam2.getExpression()),
+          Variable.Type.BOOLEAN,
+          FormulaKind.Leq);
     } else if (pParam1.isExp() && pParam2.isVar()) {
-      return new DRealTerm<>(dreal.LessEqual(pParam1.getExpression(),
-          new Expression(pParam2.getVariable())), Variable.Type.BOOLEAN, FormulaKind.Leq);
+      return new DRealTerm<>(
+          dreal.LessEqual(pParam1.getExpression(), new Expression(pParam2.getVariable())),
+          Variable.Type.BOOLEAN,
+          FormulaKind.Leq);
     } else if (pParam1.isExp() && pParam2.isExp()) {
-      return new DRealTerm<>(dreal.LessEqual(pParam1.getExpression(),
-          pParam2.getExpression()), Variable.Type.BOOLEAN, FormulaKind.Leq);
+      return new DRealTerm<>(
+          dreal.LessEqual(pParam1.getExpression(), pParam2.getExpression()),
+          Variable.Type.BOOLEAN,
+          FormulaKind.Leq);
     } else {
       throw new UnsupportedOperationException("dReal does not support lessOrEquals on Formulas.");
     }

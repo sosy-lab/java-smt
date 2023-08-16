@@ -27,7 +27,6 @@
  * ----------------------------------------------------------------------------- */
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
-
 public class BoxBoxPair {
   private transient long swigCPtr;
   protected transient boolean swigCMemOwn;
@@ -73,7 +72,9 @@ public class BoxBoxPair {
   }
 
   public BoxBoxPair(Box first, Box second) {
-    this(drealJNI.new_BoxBoxPair__SWIG_1(Box.getCPtr(first), first, Box.getCPtr(second), second), true);
+    this(
+        drealJNI.new_BoxBoxPair__SWIG_1(Box.getCPtr(first), first, Box.getCPtr(second), second),
+        true);
   }
 
   public BoxBoxPair(BoxBoxPair other) {
@@ -97,5 +98,4 @@ public class BoxBoxPair {
     long cPtr = drealJNI.BoxBoxPair_second_get(swigCPtr, this);
     return (cPtr == 0) ? null : new Box(cPtr, false);
   }
-
 }

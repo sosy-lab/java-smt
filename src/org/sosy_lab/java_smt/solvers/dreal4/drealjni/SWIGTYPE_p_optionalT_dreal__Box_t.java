@@ -30,7 +30,8 @@ package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 public class SWIGTYPE_p_optionalT_dreal__Box_t {
   private transient long swigCPtr;
 
-  protected SWIGTYPE_p_optionalT_dreal__Box_t(long cPtr, @SuppressWarnings("unused") boolean futureUse) {
+  protected SWIGTYPE_p_optionalT_dreal__Box_t(
+      long cPtr, @SuppressWarnings("unused") boolean futureUse) {
     swigCPtr = cPtr;
   }
 
@@ -46,4 +47,3 @@ public class SWIGTYPE_p_optionalT_dreal__Box_t {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 }
-

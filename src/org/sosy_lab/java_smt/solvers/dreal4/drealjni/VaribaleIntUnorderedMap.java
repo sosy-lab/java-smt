@@ -71,14 +71,16 @@ public class VaribaleIntUnorderedMap extends java.util.AbstractMap<Variable, Int
   public int size() {
     return sizeImpl();
   }
+
   @Override
   public boolean containsKey(java.lang.Object key) {
     if (!(key instanceof Variable)) {
       return false;
     }
 
-    return containsImpl((Variable)key);
+    return containsImpl((Variable) key);
   }
+
   @Override
   public Integer get(java.lang.Object key) {
     if (!(key instanceof Variable)) {
@@ -92,6 +94,7 @@ public class VaribaleIntUnorderedMap extends java.util.AbstractMap<Variable, Int
 
     return null;
   }
+
   @Override
   public Integer put(Variable key, Integer value) {
     Iterator itr = find(key);
@@ -104,6 +107,7 @@ public class VaribaleIntUnorderedMap extends java.util.AbstractMap<Variable, Int
       return null;
     }
   }
+
   @Override
   public Integer remove(java.lang.Object key) {
     if (!(key instanceof Variable)) {
@@ -119,6 +123,7 @@ public class VaribaleIntUnorderedMap extends java.util.AbstractMap<Variable, Int
       return null;
     }
   }
+
   @Override
   public java.util.Set<Entry<Variable, Integer>> entrySet() {
     java.util.Set<Entry<Variable, Integer>> setToReturn =
@@ -127,28 +132,32 @@ public class VaribaleIntUnorderedMap extends java.util.AbstractMap<Variable, Int
     Iterator itr = begin();
     final Iterator end = end();
     while (itr.isNot(end)) {
-      setToReturn.add(new Entry<Variable, Integer>() {
-        private Iterator iterator;
+      setToReturn.add(
+          new Entry<Variable, Integer>() {
+            private Iterator iterator;
 
-        private Entry<Variable, Integer> init(Iterator iterator) {
-          this.iterator = iterator;
-          return this;
-        }
-        @Override
-        public Variable getKey() {
-          return iterator.getKey();
-        }
-        @Override
-        public Integer getValue() {
-          return iterator.getValue();
-        }
-        @Override
-        public Integer setValue(Integer newValue) {
-          Integer oldValue = iterator.getValue();
-          iterator.setValue(newValue);
-          return oldValue;
-        }
-      }.init(itr));
+            private Entry<Variable, Integer> init(Iterator iterator) {
+              this.iterator = iterator;
+              return this;
+            }
+
+            @Override
+            public Variable getKey() {
+              return iterator.getKey();
+            }
+
+            @Override
+            public Integer getValue() {
+              return iterator.getValue();
+            }
+
+            @Override
+            public Integer setValue(Integer newValue) {
+              Integer oldValue = iterator.getValue();
+              iterator.setValue(newValue);
+              return oldValue;
+            }
+          }.init(itr));
       itr = itr.getNextUnchecked();
     }
 
@@ -160,22 +169,24 @@ public class VaribaleIntUnorderedMap extends java.util.AbstractMap<Variable, Int
   }
 
   public VaribaleIntUnorderedMap(VaribaleIntUnorderedMap other) {
-    this(drealJNI.new_VaribaleIntUnorderedMap__SWIG_1(VaribaleIntUnorderedMap.getCPtr(other), other), true);
+    this(
+        drealJNI.new_VaribaleIntUnorderedMap__SWIG_1(VaribaleIntUnorderedMap.getCPtr(other), other),
+        true);
   }
 
-  static protected class Iterator {
+  protected static class Iterator {
     private transient long swigCPtr;
     protected transient boolean swigCMemOwn;
-  
+
     protected Iterator(long cPtr, boolean cMemoryOwn) {
       swigCMemOwn = cMemoryOwn;
       swigCPtr = cPtr;
     }
-  
+
     protected static long getCPtr(Iterator obj) {
       return (obj == null) ? 0 : obj.swigCPtr;
     }
-  
+
     protected static long swigRelease(Iterator obj) {
       long ptr = 0;
       if (obj != null) {
@@ -187,12 +198,12 @@ public class VaribaleIntUnorderedMap extends java.util.AbstractMap<Variable, Int
       }
       return ptr;
     }
-  
+
     @SuppressWarnings("deprecation")
     protected void finalize1() {
       delete();
     }
-  
+
     public synchronized void delete() {
       if (swigCPtr != 0) {
         if (swigCMemOwn) {
@@ -202,47 +213,53 @@ public class VaribaleIntUnorderedMap extends java.util.AbstractMap<Variable, Int
         swigCPtr = 0;
       }
     }
-  
+
     private VaribaleIntUnorderedMap.Iterator getNextUnchecked() {
-      return new VaribaleIntUnorderedMap.Iterator(drealJNI.VaribaleIntUnorderedMap_Iterator_getNextUnchecked(swigCPtr, this), true);
+      return new VaribaleIntUnorderedMap.Iterator(
+          drealJNI.VaribaleIntUnorderedMap_Iterator_getNextUnchecked(swigCPtr, this), true);
     }
-  
+
     private boolean isNot(VaribaleIntUnorderedMap.Iterator other) {
-      return drealJNI.VaribaleIntUnorderedMap_Iterator_isNot(swigCPtr, this, VaribaleIntUnorderedMap.Iterator.getCPtr(other), other);
+      return drealJNI.VaribaleIntUnorderedMap_Iterator_isNot(
+          swigCPtr, this, VaribaleIntUnorderedMap.Iterator.getCPtr(other), other);
     }
-  
+
     private Variable getKey() {
       return new Variable(drealJNI.VaribaleIntUnorderedMap_Iterator_getKey(swigCPtr, this), true);
     }
-  
+
     private int getValue() {
       return drealJNI.VaribaleIntUnorderedMap_Iterator_getValue(swigCPtr, this);
     }
-  
+
     private void setValue(int newValue) {
       drealJNI.VaribaleIntUnorderedMap_Iterator_setValue(swigCPtr, this, newValue);
     }
-  
   }
+
   @Override
   public boolean isEmpty() {
     return drealJNI.VaribaleIntUnorderedMap_isEmpty(swigCPtr, this);
   }
+
   @Override
   public void clear() {
     drealJNI.VaribaleIntUnorderedMap_clear(swigCPtr, this);
   }
 
   private VaribaleIntUnorderedMap.Iterator find(Variable key) {
-    return new VaribaleIntUnorderedMap.Iterator(drealJNI.VaribaleIntUnorderedMap_find(swigCPtr, this, Variable.getCPtr(key), key), true);
+    return new VaribaleIntUnorderedMap.Iterator(
+        drealJNI.VaribaleIntUnorderedMap_find(swigCPtr, this, Variable.getCPtr(key), key), true);
   }
 
   private VaribaleIntUnorderedMap.Iterator begin() {
-    return new VaribaleIntUnorderedMap.Iterator(drealJNI.VaribaleIntUnorderedMap_begin(swigCPtr, this), true);
+    return new VaribaleIntUnorderedMap.Iterator(
+        drealJNI.VaribaleIntUnorderedMap_begin(swigCPtr, this), true);
   }
 
   private VaribaleIntUnorderedMap.Iterator end() {
-    return new VaribaleIntUnorderedMap.Iterator(drealJNI.VaribaleIntUnorderedMap_end(swigCPtr, this), true);
+    return new VaribaleIntUnorderedMap.Iterator(
+        drealJNI.VaribaleIntUnorderedMap_end(swigCPtr, this), true);
   }
 
   private int sizeImpl() {
@@ -250,15 +267,17 @@ public class VaribaleIntUnorderedMap extends java.util.AbstractMap<Variable, Int
   }
 
   private boolean containsImpl(Variable key) {
-    return drealJNI.VaribaleIntUnorderedMap_containsImpl(swigCPtr, this, Variable.getCPtr(key), key);
+    return drealJNI.VaribaleIntUnorderedMap_containsImpl(
+        swigCPtr, this, Variable.getCPtr(key), key);
   }
 
   private void putUnchecked(Variable key, int value) {
-    drealJNI.VaribaleIntUnorderedMap_putUnchecked(swigCPtr, this, Variable.getCPtr(key), key, value);
+    drealJNI.VaribaleIntUnorderedMap_putUnchecked(
+        swigCPtr, this, Variable.getCPtr(key), key, value);
   }
 
   private void removeUnchecked(VaribaleIntUnorderedMap.Iterator itr) {
-    drealJNI.VaribaleIntUnorderedMap_removeUnchecked(swigCPtr, this, VaribaleIntUnorderedMap.Iterator.getCPtr(itr), itr);
+    drealJNI.VaribaleIntUnorderedMap_removeUnchecked(
+        swigCPtr, this, VaribaleIntUnorderedMap.Iterator.getCPtr(itr), itr);
   }
-
 }

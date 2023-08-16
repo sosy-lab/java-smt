@@ -66,9 +66,9 @@ public class SharedPointerToUnorderedMapWithHashValue {
       swigCPtr = 0;
     }
   }
+
   @SuppressWarnings("unused")
   public SharedPointerToUnorderedMapWithHashValue() {
     this(drealJNI.new_SharedPointerToUnorderedMapWithHashValue(), true);
   }
-
 }

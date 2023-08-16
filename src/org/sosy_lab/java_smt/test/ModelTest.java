@@ -136,8 +136,9 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void testGetLargeIntegers() throws SolverException, InterruptedException {
     assume()
-        .withMessage("This number is to big for integers in dReal, BigIntegers are not supported,"
-            + " only in rationals.")
+        .withMessage(
+            "This number is to big for integers in dReal, BigIntegers are not supported,"
+                + " only in rationals.")
         .that(solverToUse())
         .isNotEqualTo(Solvers.DREAL4);
 
@@ -176,9 +177,10 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void testGetRationals() throws SolverException, InterruptedException {
     assume()
-        .withMessage("dReal does get the an answer, just not as precise, because dReal uses "
-            + "double as rationals. Therefore the solution here is 333333/1000000 because of "
-            + "rounding.")
+        .withMessage(
+            "dReal does get the an answer, just not as precise, because dReal uses "
+                + "double as rationals. Therefore the solution here is 333333/1000000 because of "
+                + "rounding.")
         .that(solverToUse())
         .isNotEqualTo(Solvers.DREAL4);
 
@@ -2351,9 +2353,10 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void testGetRationals1() throws SolverException, InterruptedException {
     assume()
-        .withMessage("dReal does get the an answer, just not as precise, because dReal uses "
-        + "double as rationals. Therefore the solution here is 333333/2000000 because of "
-        + "rounding.")
+        .withMessage(
+            "dReal does get the an answer, just not as precise, because dReal uses "
+                + "double as rationals. Therefore the solution here is 333333/2000000 because of "
+                + "rounding.")
         .that(solverToUse())
         .isNotEqualTo(Solvers.DREAL4);
 

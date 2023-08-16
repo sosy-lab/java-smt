@@ -28,23 +28,21 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Config;
-import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Context;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Expression;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.ExpressionKind;
-import org.sosy_lab.java_smt.solvers.dreal4.drealjni.FormulaKind;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable;
-import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable.Type;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.dreal;
 
-public class DReal4FormulaManager extends AbstractFormulaManager<DRealTerm<?, ?>, Variable.Type,
-    Config,
-    DRealTerm<?, ?>> {
+public class DReal4FormulaManager
+    extends AbstractFormulaManager<DRealTerm<?, ?>, Variable.Type, Config, DRealTerm<?, ?>> {
 
-  DReal4FormulaManager(DReal4FormulaCreator pFormulaCreator, DReal4UFManager pFunctionManager,
-                       DReal4BooleanFormulaManager pBooleanManager,
-                       DReal4IntegerFormulaManager pIntegerManager,
-                       DReal4RationalFormulaManager pRationalManager,
-                       DReal4QuantifiedFormulaManager pQuantifierManager) {
+  DReal4FormulaManager(
+      DReal4FormulaCreator pFormulaCreator,
+      DReal4UFManager pFunctionManager,
+      DReal4BooleanFormulaManager pBooleanManager,
+      DReal4IntegerFormulaManager pIntegerManager,
+      DReal4RationalFormulaManager pRationalManager,
+      DReal4QuantifiedFormulaManager pQuantifierManager) {
     super(
         pFormulaCreator,
         pFunctionManager,
@@ -103,22 +101,24 @@ public class DReal4FormulaManager extends AbstractFormulaManager<DRealTerm<?, ?>
         if (changeFromTerm.getExpressionKind() == ExpressionKind.Var) {
           var = dreal.get_variable(changeFromTerm.getExpression());
         } else {
-          throw new UnsupportedOperationException("dReal does not support substitution on "
-              + "expressions.");
+          throw new UnsupportedOperationException(
+              "dReal does not support substitution on " + "expressions.");
         }
       } else if (changeFromTerm.isVar()) {
         var = changeFromTerm.getVariable();
       } else {
-        throw new UnsupportedOperationException("dReal does not support substitutions on Formulas"
-            + ".");
+        throw new UnsupportedOperationException(
+            "dReal does not support substitutions on Formulas" + ".");
       }
       if (changeToTerm.isVar()) {
         if (changeToTerm.getType() == Variable.Type.BOOLEAN) {
-          formula = formula.Substitute(var,
-              new org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula(changeToTerm.getVariable()));
+          formula =
+              formula.Substitute(
+                  var,
+                  new org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula(
+                      changeToTerm.getVariable()));
         } else {
-          formula = formula.Substitute(var,
-              new Expression(changeToTerm.getVariable()));
+          formula = formula.Substitute(var, new Expression(changeToTerm.getVariable()));
         }
       } else if (changeToTerm.isExp()) {
         formula = formula.Substitute(var, changeToTerm.getExpression());
@@ -127,10 +127,7 @@ public class DReal4FormulaManager extends AbstractFormulaManager<DRealTerm<?, ?>
       }
     }
     FormulaType<T> type = getFormulaType(pF);
-    return getFormulaCreator().encapsulate(type, new DRealTerm<>(formula, f.getType(), formula.get_kind()));
+    return getFormulaCreator()
+        .encapsulate(type, new DRealTerm<>(formula, f.getType(), formula.get_kind()));
   }
-
 }
-
-
-

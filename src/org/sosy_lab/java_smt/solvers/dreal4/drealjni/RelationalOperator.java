@@ -28,50 +28,53 @@
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
 public final class RelationalOperator {
-  public final static RelationalOperator EQ = new RelationalOperator("EQ");
-  public final static RelationalOperator NEQ = new RelationalOperator("NEQ");
-  public final static RelationalOperator GT = new RelationalOperator("GT");
-  public final static RelationalOperator GEQ = new RelationalOperator("GEQ");
-  public final static RelationalOperator LT = new RelationalOperator("LT");
-  public final static RelationalOperator LEQ = new RelationalOperator("LEQ");
+  public static final RelationalOperator EQ = new RelationalOperator("EQ");
+  public static final RelationalOperator NEQ = new RelationalOperator("NEQ");
+  public static final RelationalOperator GT = new RelationalOperator("GT");
+  public static final RelationalOperator GEQ = new RelationalOperator("GEQ");
+  public static final RelationalOperator LT = new RelationalOperator("LT");
+  public static final RelationalOperator LEQ = new RelationalOperator("LEQ");
 
   public final int swigValue() {
     return swigValue;
   }
+
   @Override
   public String toString() {
     return swigName;
   }
 
   public static RelationalOperator swigToEnum(int swigValue) {
-    if (swigValue < swigValues.length && swigValue >= 0 && swigValues[swigValue].swigValue == swigValue)
-      return swigValues[swigValue];
+    if (swigValue < swigValues.length
+        && swigValue >= 0
+        && swigValues[swigValue].swigValue == swigValue) return swigValues[swigValue];
     for (int i = 0; i < swigValues.length; i++)
-      if (swigValues[i].swigValue == swigValue)
-        return swigValues[i];
-    throw new IllegalArgumentException("No enum " + RelationalOperator.class + " with value " + swigValue);
+      if (swigValues[i].swigValue == swigValue) return swigValues[i];
+    throw new IllegalArgumentException(
+        "No enum " + RelationalOperator.class + " with value " + swigValue);
   }
 
   private RelationalOperator(String swigName) {
     this.swigName = swigName;
     this.swigValue = swigNext++;
   }
+
   @SuppressWarnings({"unused", "StaticAssignmentInConstructor"})
   private RelationalOperator(String swigName, int swigValue) {
     this.swigName = swigName;
     this.swigValue = swigValue;
-    swigNext = swigValue+1;
+    swigNext = swigValue + 1;
   }
+
   @SuppressWarnings({"unused", "StaticAssignmentInConstructor"})
   private RelationalOperator(String swigName, RelationalOperator swigEnum) {
     this.swigName = swigName;
     this.swigValue = swigEnum.swigValue;
-    swigNext = this.swigValue+1;
+    swigNext = this.swigValue + 1;
   }
 
-  private static RelationalOperator[] swigValues = { EQ, NEQ, GT, GEQ, LT, LEQ };
+  private static RelationalOperator[] swigValues = {EQ, NEQ, GT, GEQ, LT, LEQ};
   private static int swigNext = 0;
   private final int swigValue;
   private final String swigName;
 }
-

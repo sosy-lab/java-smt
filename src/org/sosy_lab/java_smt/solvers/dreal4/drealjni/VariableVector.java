@@ -27,7 +27,8 @@
  * ----------------------------------------------------------------------------- */
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
-public class VariableVector extends java.util.AbstractList<Variable> implements java.util.RandomAccess {
+public class VariableVector extends java.util.AbstractList<Variable>
+    implements java.util.RandomAccess {
   private transient long swigCPtr;
   protected transient boolean swigCMemOwn;
 
@@ -87,31 +88,37 @@ public class VariableVector extends java.util.AbstractList<Variable> implements 
   public Variable get(int index) {
     return doGet(index);
   }
+
   @Override
   public Variable set(int index, Variable e) {
     return doSet(index, e);
   }
+
   @Override
   public boolean add(Variable e) {
     modCount++;
     doAdd(e);
     return true;
   }
+
   @Override
   public void add(int index, Variable e) {
     modCount++;
     doAdd(index, e);
   }
+
   @Override
   public Variable remove(int index) {
     modCount++;
     return doRemove(index);
   }
+
   @Override
   protected void removeRange(int fromIndex, int toIndex) {
     modCount++;
     doRemoveRange(fromIndex, toIndex);
   }
+
   @Override
   public int size() {
     return doSize();
@@ -132,10 +139,12 @@ public class VariableVector extends java.util.AbstractList<Variable> implements 
   public void reserve(long n) {
     drealJNI.VariableVector_reserve(swigCPtr, this, n);
   }
+
   @Override
   public boolean isEmpty() {
     return drealJNI.VariableVector_isEmpty(swigCPtr, this);
   }
+
   @Override
   public void clear() {
     drealJNI.VariableVector_clear(swigCPtr, this);
@@ -166,11 +175,11 @@ public class VariableVector extends java.util.AbstractList<Variable> implements 
   }
 
   private Variable doSet(int index, Variable val) {
-    return new Variable(drealJNI.VariableVector_doSet(swigCPtr, this, index, Variable.getCPtr(val), val), true);
+    return new Variable(
+        drealJNI.VariableVector_doSet(swigCPtr, this, index, Variable.getCPtr(val), val), true);
   }
 
   private void doRemoveRange(int fromIndex, int toIndex) {
     drealJNI.VariableVector_doRemoveRange(swigCPtr, this, fromIndex, toIndex);
   }
-
 }

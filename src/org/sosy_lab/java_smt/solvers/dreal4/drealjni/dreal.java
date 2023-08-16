@@ -27,14 +27,19 @@
  * ----------------------------------------------------------------------------- */
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
-
 public class dreal {
   public static SWIGTYPE_p_std__ostream InsertOperator(SWIGTYPE_p_std__ostream os, Variable var) {
-    return new SWIGTYPE_p_std__ostream(drealJNI.InsertOperator__SWIG_0(SWIGTYPE_p_std__ostream.getCPtr(os), Variable.getCPtr(var), var), false);
+    return new SWIGTYPE_p_std__ostream(
+        drealJNI.InsertOperator__SWIG_0(
+            SWIGTYPE_p_std__ostream.getCPtr(os), Variable.getCPtr(var), var),
+        false);
   }
 
-  public static SWIGTYPE_p_std__ostream InsertOperator(SWIGTYPE_p_std__ostream os, Variable.Type type) {
-    return new SWIGTYPE_p_std__ostream(drealJNI.InsertOperator__SWIG_1(SWIGTYPE_p_std__ostream.getCPtr(os), type.swigValue()), false);
+  public static SWIGTYPE_p_std__ostream InsertOperator(
+      SWIGTYPE_p_std__ostream os, Variable.Type type) {
+    return new SWIGTYPE_p_std__ostream(
+        drealJNI.InsertOperator__SWIG_1(SWIGTYPE_p_std__ostream.getCPtr(os), type.swigValue()),
+        false);
   }
 
   public static boolean Equal(Variables vars1, Variables vars2) {
@@ -45,52 +50,78 @@ public class dreal {
     return drealJNI.Less__SWIG_0(Variables.getCPtr(vars1), vars1, Variables.getCPtr(vars2), vars2);
   }
 
-  public static SWIGTYPE_p_std__ostream InsertOperator(SWIGTYPE_p_std__ostream arg0, Variables vars) {
-    return new SWIGTYPE_p_std__ostream(drealJNI.InsertOperator__SWIG_2(SWIGTYPE_p_std__ostream.getCPtr(arg0), Variables.getCPtr(vars), vars), false);
+  public static SWIGTYPE_p_std__ostream InsertOperator(
+      SWIGTYPE_p_std__ostream arg0, Variables vars) {
+    return new SWIGTYPE_p_std__ostream(
+        drealJNI.InsertOperator__SWIG_2(
+            SWIGTYPE_p_std__ostream.getCPtr(arg0), Variables.getCPtr(vars), vars),
+        false);
   }
 
   public static Variables intersect(Variables vars1, Variables vars2) {
-    return new Variables(drealJNI.intersect(Variables.getCPtr(vars1), vars1, Variables.getCPtr(vars2), vars2), true);
+    return new Variables(
+        drealJNI.intersect(Variables.getCPtr(vars1), vars1, Variables.getCPtr(vars2), vars2), true);
   }
 
   public static Variables AddEqual(Variables vars1, Variables vars2) {
-    return new Variables(drealJNI.AddEqual__SWIG_0(Variables.getCPtr(vars1), vars1, Variables.getCPtr(vars2), vars2), true);
+    return new Variables(
+        drealJNI.AddEqual__SWIG_0(Variables.getCPtr(vars1), vars1, Variables.getCPtr(vars2), vars2),
+        true);
   }
 
   public static Variables AddEqual(Variables vars, Variable var) {
-    return new Variables(drealJNI.AddEqual__SWIG_1(Variables.getCPtr(vars), vars, Variable.getCPtr(var), var), true);
+    return new Variables(
+        drealJNI.AddEqual__SWIG_1(Variables.getCPtr(vars), vars, Variable.getCPtr(var), var), true);
   }
 
   public static Variables Add(Variables vars1, Variables vars2) {
-    return new Variables(drealJNI.Add__SWIG_0(Variables.getCPtr(vars1), vars1, Variables.getCPtr(vars2), vars2), true);
+    return new Variables(
+        drealJNI.Add__SWIG_0(Variables.getCPtr(vars1), vars1, Variables.getCPtr(vars2), vars2),
+        true);
   }
 
   public static Variables Add(Variables vars, Variable var) {
-    return new Variables(drealJNI.Add__SWIG_1(Variables.getCPtr(vars), vars, Variable.getCPtr(var), var), true);
+    return new Variables(
+        drealJNI.Add__SWIG_1(Variables.getCPtr(vars), vars, Variable.getCPtr(var), var), true);
   }
 
   public static Variables Add(Variable var, Variables vars) {
-    return new Variables(drealJNI.Add__SWIG_2(Variable.getCPtr(var), var, Variables.getCPtr(vars), vars), true);
+    return new Variables(
+        drealJNI.Add__SWIG_2(Variable.getCPtr(var), var, Variables.getCPtr(vars), vars), true);
   }
 
   public static Variables SubstractEqual(Variables vars1, Variables vars2) {
-    return new Variables(drealJNI.SubstractEqual__SWIG_0(Variables.getCPtr(vars1), vars1, Variables.getCPtr(vars2), vars2), true);
+    return new Variables(
+        drealJNI.SubstractEqual__SWIG_0(
+            Variables.getCPtr(vars1), vars1, Variables.getCPtr(vars2), vars2),
+        true);
   }
 
   public static Variables SubstractEqual(Variables vars, Variable var) {
-    return new Variables(drealJNI.SubstractEqual__SWIG_1(Variables.getCPtr(vars), vars, Variable.getCPtr(var), var), true);
+    return new Variables(
+        drealJNI.SubstractEqual__SWIG_1(Variables.getCPtr(vars), vars, Variable.getCPtr(var), var),
+        true);
   }
 
   public static Variables Substract(Variables vars1, Variables vars2) {
-    return new Variables(drealJNI.Substract__SWIG_0(Variables.getCPtr(vars1), vars1, Variables.getCPtr(vars2), vars2), true);
+    return new Variables(
+        drealJNI.Substract__SWIG_0(
+            Variables.getCPtr(vars1), vars1, Variables.getCPtr(vars2), vars2),
+        true);
   }
 
   public static Variables Substract(Variables vars, Variable var) {
-    return new Variables(drealJNI.Substract__SWIG_1(Variables.getCPtr(vars), vars, Variable.getCPtr(var), var), true);
+    return new Variables(
+        drealJNI.Substract__SWIG_1(Variables.getCPtr(vars), vars, Variable.getCPtr(var), var),
+        true);
   }
 
-  public static SWIGTYPE_p_std__ostream InsertOperator(SWIGTYPE_p_std__ostream os, Environment env) {
-    return new SWIGTYPE_p_std__ostream(drealJNI.InsertOperator__SWIG_3(SWIGTYPE_p_std__ostream.getCPtr(os), Environment.getCPtr(env), env), false);
+  public static SWIGTYPE_p_std__ostream InsertOperator(
+      SWIGTYPE_p_std__ostream os, Environment env) {
+    return new SWIGTYPE_p_std__ostream(
+        drealJNI.InsertOperator__SWIG_3(
+            SWIGTYPE_p_std__ostream.getCPtr(os), Environment.getCPtr(env), env),
+        false);
   }
 
   public static boolean Less(ExpressionKind k1, ExpressionKind k2) {
@@ -98,19 +129,26 @@ public class dreal {
   }
 
   public static Expression Add(Expression lhs, Expression rhs) {
-    return new Expression(drealJNI.Add__SWIG_3(Expression.getCPtr(lhs), lhs, Expression.getCPtr(rhs), rhs), true);
+    return new Expression(
+        drealJNI.Add__SWIG_3(Expression.getCPtr(lhs), lhs, Expression.getCPtr(rhs), rhs), true);
   }
 
   public static Expression AddEqual(Expression lhs, Expression rhs) {
-    return new Expression(drealJNI.AddEqual__SWIG_2(Expression.getCPtr(lhs), lhs, Expression.getCPtr(rhs), rhs), false);
+    return new Expression(
+        drealJNI.AddEqual__SWIG_2(Expression.getCPtr(lhs), lhs, Expression.getCPtr(rhs), rhs),
+        false);
   }
 
   public static Expression Substract(Expression lhs, Expression rhs) {
-    return new Expression(drealJNI.Substract__SWIG_2(Expression.getCPtr(lhs), lhs, Expression.getCPtr(rhs), rhs), true);
+    return new Expression(
+        drealJNI.Substract__SWIG_2(Expression.getCPtr(lhs), lhs, Expression.getCPtr(rhs), rhs),
+        true);
   }
 
   public static Expression SubstractEqual(Expression lhs, Expression rhs) {
-    return new Expression(drealJNI.SubstractEqual__SWIG_2(Expression.getCPtr(lhs), lhs, Expression.getCPtr(rhs), rhs), false);
+    return new Expression(
+        drealJNI.SubstractEqual__SWIG_2(Expression.getCPtr(lhs), lhs, Expression.getCPtr(rhs), rhs),
+        false);
   }
 
   public static Expression Add(Expression e) {
@@ -122,20 +160,25 @@ public class dreal {
   }
 
   public static Expression Multiply(Expression lhs, Expression rhs) {
-    return new Expression(drealJNI.Multiply__SWIG_0(Expression.getCPtr(lhs), lhs, Expression.getCPtr(rhs), rhs), true);
+    return new Expression(
+        drealJNI.Multiply__SWIG_0(Expression.getCPtr(lhs), lhs, Expression.getCPtr(rhs), rhs),
+        true);
   }
 
   public static Expression MultiplyEqual(Expression lhs, Expression rhs) {
-    return new Expression(drealJNI.MultiplyEqual(Expression.getCPtr(lhs), lhs, Expression.getCPtr(rhs), rhs), false);
+    return new Expression(
+        drealJNI.MultiplyEqual(Expression.getCPtr(lhs), lhs, Expression.getCPtr(rhs), rhs), false);
   }
 
   public static Expression Divide(Expression lhs, Expression rhs) {
 
-    return new Expression(drealJNI.Divide(Expression.getCPtr(lhs), lhs, Expression.getCPtr(rhs), rhs), true);
+    return new Expression(
+        drealJNI.Divide(Expression.getCPtr(lhs), lhs, Expression.getCPtr(rhs), rhs), true);
   }
 
   public static Expression DivideEqual(Expression lhs, Expression rhs) {
-    return new Expression(drealJNI.DivideEqual(Expression.getCPtr(lhs), lhs, Expression.getCPtr(rhs), rhs), false);
+    return new Expression(
+        drealJNI.DivideEqual(Expression.getCPtr(lhs), lhs, Expression.getCPtr(rhs), rhs), false);
   }
 
   public static Expression real_constant(double lb, double ub, boolean use_lb_as_representative) {
@@ -159,7 +202,8 @@ public class dreal {
   }
 
   public static Expression pow(Expression e1, Expression e2) {
-    return new Expression(drealJNI.pow(Expression.getCPtr(e1), e1, Expression.getCPtr(e2), e2), true);
+    return new Expression(
+        drealJNI.pow(Expression.getCPtr(e1), e1, Expression.getCPtr(e2), e2), true);
   }
 
   public static Expression sin(Expression e) {
@@ -187,7 +231,8 @@ public class dreal {
   }
 
   public static Expression atan2(Expression e1, Expression e2) {
-    return new Expression(drealJNI.atan2(Expression.getCPtr(e1), e1, Expression.getCPtr(e2), e2), true);
+    return new Expression(
+        drealJNI.atan2(Expression.getCPtr(e1), e1, Expression.getCPtr(e2), e2), true);
   }
 
   public static Expression sinh(Expression e) {
@@ -203,23 +248,37 @@ public class dreal {
   }
 
   public static Expression min(Expression e1, Expression e2) {
-    return new Expression(drealJNI.min(Expression.getCPtr(e1), e1, Expression.getCPtr(e2), e2), true);
+    return new Expression(
+        drealJNI.min(Expression.getCPtr(e1), e1, Expression.getCPtr(e2), e2), true);
   }
 
   public static Expression max(Expression e1, Expression e2) {
-    return new Expression(drealJNI.max(Expression.getCPtr(e1), e1, Expression.getCPtr(e2), e2), true);
+    return new Expression(
+        drealJNI.max(Expression.getCPtr(e1), e1, Expression.getCPtr(e2), e2), true);
   }
 
   public static Expression if_then_else(Formula f_cond, Expression e_then, Expression e_else) {
-    return new Expression(drealJNI.if_then_else(Formula.getCPtr(f_cond), f_cond, Expression.getCPtr(e_then), e_then, Expression.getCPtr(e_else), e_else), true);
+    return new Expression(
+        drealJNI.if_then_else(
+            Formula.getCPtr(f_cond),
+            f_cond,
+            Expression.getCPtr(e_then),
+            e_then,
+            Expression.getCPtr(e_else),
+            e_else),
+        true);
   }
 
   public static Expression uninterpreted_function(String name, Variables vars) {
-    return new Expression(drealJNI.uninterpreted_function(name, Variables.getCPtr(vars), vars), true);
+    return new Expression(
+        drealJNI.uninterpreted_function(name, Variables.getCPtr(vars), vars), true);
   }
 
   public static SWIGTYPE_p_std__ostream InsertOperator(SWIGTYPE_p_std__ostream os, Expression e) {
-    return new SWIGTYPE_p_std__ostream(drealJNI.InsertOperator__SWIG_4(SWIGTYPE_p_std__ostream.getCPtr(os), Expression.getCPtr(e), e), false);
+    return new SWIGTYPE_p_std__ostream(
+        drealJNI.InsertOperator__SWIG_4(
+            SWIGTYPE_p_std__ostream.getCPtr(os), Expression.getCPtr(e), e),
+        false);
   }
 
   public static boolean is_constant(Expression e) {
@@ -391,7 +450,8 @@ public class dreal {
   }
 
   public static ExpressionDoubleMap get_expr_to_coeff_map_in_addition(Expression e) {
-    return new ExpressionDoubleMap(drealJNI.get_expr_to_coeff_map_in_addition(Expression.getCPtr(e), e), false);
+    return new ExpressionDoubleMap(
+        drealJNI.get_expr_to_coeff_map_in_addition(Expression.getCPtr(e), e), false);
   }
 
   public static double get_constant_in_multiplication(Expression e) {
@@ -399,7 +459,8 @@ public class dreal {
   }
 
   public static ExpressionExpressionMap get_base_to_exponent_map_in_multiplication(Expression e) {
-    return new ExpressionExpressionMap(drealJNI.get_base_to_exponent_map_in_multiplication(Expression.getCPtr(e), e), false);
+    return new ExpressionExpressionMap(
+        drealJNI.get_base_to_exponent_map_in_multiplication(Expression.getCPtr(e), e), false);
   }
 
   public static Formula get_conditional_formula(Expression e) {
@@ -431,7 +492,9 @@ public class dreal {
   }
 
   public static SWIGTYPE_p_std__ostream InsertOperator(SWIGTYPE_p_std__ostream os, Formula f) {
-    return new SWIGTYPE_p_std__ostream(drealJNI.InsertOperator__SWIG_5(SWIGTYPE_p_std__ostream.getCPtr(os), Formula.getCPtr(f), f), false);
+    return new SWIGTYPE_p_std__ostream(
+        drealJNI.InsertOperator__SWIG_5(SWIGTYPE_p_std__ostream.getCPtr(os), Formula.getCPtr(f), f),
+        false);
   }
 
   public static boolean is_false(Formula f) {
@@ -495,27 +558,33 @@ public class dreal {
   }
 
   public static Formula Equal(Expression e1, Expression e2) {
-    return new Formula(drealJNI.Equal__SWIG_1(Expression.getCPtr(e1), e1, Expression.getCPtr(e2), e2), true);
+    return new Formula(
+        drealJNI.Equal__SWIG_1(Expression.getCPtr(e1), e1, Expression.getCPtr(e2), e2), true);
   }
 
   public static Formula NotEqual(Expression e1, Expression e2) {
-    return new Formula(drealJNI.NotEqual__SWIG_0(Expression.getCPtr(e1), e1, Expression.getCPtr(e2), e2), true);
+    return new Formula(
+        drealJNI.NotEqual__SWIG_0(Expression.getCPtr(e1), e1, Expression.getCPtr(e2), e2), true);
   }
 
   public static Formula Less(Expression e1, Expression e2) {
-    return new Formula(drealJNI.Less__SWIG_3(Expression.getCPtr(e1), e1, Expression.getCPtr(e2), e2), true);
+    return new Formula(
+        drealJNI.Less__SWIG_3(Expression.getCPtr(e1), e1, Expression.getCPtr(e2), e2), true);
   }
 
   public static Formula LessEqual(Expression e1, Expression e2) {
-    return new Formula(drealJNI.LessEqual(Expression.getCPtr(e1), e1, Expression.getCPtr(e2), e2), true);
+    return new Formula(
+        drealJNI.LessEqual(Expression.getCPtr(e1), e1, Expression.getCPtr(e2), e2), true);
   }
 
   public static Formula Grater(Expression e1, Expression e2) {
-    return new Formula(drealJNI.Grater(Expression.getCPtr(e1), e1, Expression.getCPtr(e2), e2), true);
+    return new Formula(
+        drealJNI.Grater(Expression.getCPtr(e1), e1, Expression.getCPtr(e2), e2), true);
   }
 
   public static Formula GraterEqual(Expression e1, Expression e2) {
-    return new Formula(drealJNI.GraterEqual(Expression.getCPtr(e1), e1, Expression.getCPtr(e2), e2), true);
+    return new Formula(
+        drealJNI.GraterEqual(Expression.getCPtr(e1), e1, Expression.getCPtr(e2), e2), true);
   }
 
   public static Formula forall(Variables vars, Formula f) {
@@ -523,7 +592,8 @@ public class dreal {
   }
 
   public static Formula And(Formula f1, Formula f2) {
-    return new Formula(drealJNI.And__SWIG_0(Formula.getCPtr(f1), f1, Formula.getCPtr(f2), f2), true);
+    return new Formula(
+        drealJNI.And__SWIG_0(Formula.getCPtr(f1), f1, Formula.getCPtr(f2), f2), true);
   }
 
   public static Formula And(Variable v, Formula f) {
@@ -535,7 +605,8 @@ public class dreal {
   }
 
   public static Formula And(Variable v1, Variable v2) {
-    return new Formula(drealJNI.And__SWIG_8(Variable.getCPtr(v1), v1, Variable.getCPtr(v2), v2), true);
+    return new Formula(
+        drealJNI.And__SWIG_8(Variable.getCPtr(v1), v1, Variable.getCPtr(v2), v2), true);
   }
 
   public static Formula Or(Formula f1, Formula f2) {
@@ -551,7 +622,8 @@ public class dreal {
   }
 
   public static Formula Or(Variable v1, Variable v2) {
-    return new Formula(drealJNI.Or__SWIG_8(Variable.getCPtr(v1), v1, Variable.getCPtr(v2), v2), true);
+    return new Formula(
+        drealJNI.Or__SWIG_8(Variable.getCPtr(v1), v1, Variable.getCPtr(v2), v2), true);
   }
 
   public static Formula Not(Variable v) {
@@ -559,11 +631,13 @@ public class dreal {
   }
 
   public static Formula Equal(Variable v1, Variable v2) {
-    return new Formula(drealJNI.Equal__SWIG_2(Variable.getCPtr(v1), v1, Variable.getCPtr(v2), v2), true);
+    return new Formula(
+        drealJNI.Equal__SWIG_2(Variable.getCPtr(v1), v1, Variable.getCPtr(v2), v2), true);
   }
 
   public static Formula Equal(Formula f1, Formula f2) {
-    return new Formula(drealJNI.Equal__SWIG_3(Formula.getCPtr(f1), f1, Formula.getCPtr(f2), f2), true);
+    return new Formula(
+        drealJNI.Equal__SWIG_3(Formula.getCPtr(f1), f1, Formula.getCPtr(f2), f2), true);
   }
 
   public static Formula Equal(Variable v, Formula f) {
@@ -575,19 +649,23 @@ public class dreal {
   }
 
   public static Formula NotEqual(Variable v1, Variable v2) {
-    return new Formula(drealJNI.NotEqual__SWIG_1(Variable.getCPtr(v1), v1, Variable.getCPtr(v2), v2), true);
+    return new Formula(
+        drealJNI.NotEqual__SWIG_1(Variable.getCPtr(v1), v1, Variable.getCPtr(v2), v2), true);
   }
 
   public static Formula NotEqual(Formula f1, Formula f2) {
-    return new Formula(drealJNI.NotEqual__SWIG_2(Formula.getCPtr(f1), f1, Formula.getCPtr(f2), f2), true);
+    return new Formula(
+        drealJNI.NotEqual__SWIG_2(Formula.getCPtr(f1), f1, Formula.getCPtr(f2), f2), true);
   }
 
   public static Formula NotEqual(Variable v, Formula f) {
-    return new Formula(drealJNI.NotEqual__SWIG_3(Variable.getCPtr(v), v, Formula.getCPtr(f), f), true);
+    return new Formula(
+        drealJNI.NotEqual__SWIG_3(Variable.getCPtr(v), v, Formula.getCPtr(f), f), true);
   }
 
   public static Formula NotEqual(Formula f, Variable v) {
-    return new Formula(drealJNI.NotEqual__SWIG_4(Formula.getCPtr(f), f, Variable.getCPtr(v), v), true);
+    return new Formula(
+        drealJNI.NotEqual__SWIG_4(Formula.getCPtr(f), f, Variable.getCPtr(v), v), true);
   }
 
   public static boolean is_nary(Formula f) {
@@ -627,7 +705,8 @@ public class dreal {
   }
 
   public static Formula imply(Formula f1, Formula f2) {
-    return new Formula(drealJNI.imply__SWIG_0(Formula.getCPtr(f1), f1, Formula.getCPtr(f2), f2), true);
+    return new Formula(
+        drealJNI.imply__SWIG_0(Formula.getCPtr(f1), f1, Formula.getCPtr(f2), f2), true);
   }
 
   public static Formula imply(Variable v, Formula f) {
@@ -639,11 +718,13 @@ public class dreal {
   }
 
   public static Formula imply(Variable v1, Variable v2) {
-    return new Formula(drealJNI.imply__SWIG_3(Variable.getCPtr(v1), v1, Variable.getCPtr(v2), v2), true);
+    return new Formula(
+        drealJNI.imply__SWIG_3(Variable.getCPtr(v1), v1, Variable.getCPtr(v2), v2), true);
   }
 
   public static Formula iff(Formula f1, Formula f2) {
-    return new Formula(drealJNI.iff__SWIG_0(Formula.getCPtr(f1), f1, Formula.getCPtr(f2), f2), true);
+    return new Formula(
+        drealJNI.iff__SWIG_0(Formula.getCPtr(f1), f1, Formula.getCPtr(f2), f2), true);
   }
 
   public static Formula iff(Variable v, Formula f) {
@@ -655,11 +736,21 @@ public class dreal {
   }
 
   public static Formula iff(Variable v1, Variable v2) {
-    return new Formula(drealJNI.iff__SWIG_3(Variable.getCPtr(v1), v1, Variable.getCPtr(v2), v2), true);
+    return new Formula(
+        drealJNI.iff__SWIG_3(Variable.getCPtr(v1), v1, Variable.getCPtr(v2), v2), true);
   }
 
-  public static FormulaSet map(FormulaSet formulas, SWIGTYPE_p_std__functionT_dreal__drake__symbolic__Formula_fdreal__drake__symbolic__Formula_const_RF_t func) {
-    return new FormulaSet(drealJNI.map(FormulaSet.getCPtr(formulas), formulas, SWIGTYPE_p_std__functionT_dreal__drake__symbolic__Formula_fdreal__drake__symbolic__Formula_const_RF_t.getCPtr(func)), true);
+  public static FormulaSet map(
+      FormulaSet formulas,
+      SWIGTYPE_p_std__functionT_dreal__drake__symbolic__Formula_fdreal__drake__symbolic__Formula_const_RF_t
+          func) {
+    return new FormulaSet(
+        drealJNI.map(
+            FormulaSet.getCPtr(formulas),
+            formulas,
+            SWIGTYPE_p_std__functionT_dreal__drake__symbolic__Formula_fdreal__drake__symbolic__Formula_const_RF_t
+                .getCPtr(func)),
+        true);
   }
 
   public static boolean is_atomic(Formula f) {
@@ -679,7 +770,8 @@ public class dreal {
   }
 
   public static boolean HaveIntersection(Variables variables1, Variables variables2) {
-    return drealJNI.HaveIntersection(Variables.getCPtr(variables1), variables1, Variables.getCPtr(variables2), variables2);
+    return drealJNI.HaveIntersection(
+        Variables.getCPtr(variables1), variables1, Variables.getCPtr(variables2), variables2);
   }
 
   public static Formula DeltaStrengthen(Formula f, double delta) {
@@ -718,8 +810,11 @@ public class dreal {
     return RelationalOperator.swigToEnum(drealJNI.Not(op.swigValue()));
   }
 
-  public static SWIGTYPE_p_std__ostream InsertOperator(SWIGTYPE_p_std__ostream os, RelationalOperator op) {
-    return new SWIGTYPE_p_std__ostream(drealJNI.InsertOperator__SWIG_6(SWIGTYPE_p_std__ostream.getCPtr(os), op.swigValue()), false);
+  public static SWIGTYPE_p_std__ostream InsertOperator(
+      SWIGTYPE_p_std__ostream os, RelationalOperator op) {
+    return new SWIGTYPE_p_std__ostream(
+        drealJNI.InsertOperator__SWIG_6(SWIGTYPE_p_std__ostream.getCPtr(os), op.swigValue()),
+        false);
   }
 
   public static Logic parse_logic(String s) {
@@ -727,11 +822,15 @@ public class dreal {
   }
 
   public static SWIGTYPE_p_std__ostream InsertOperator(SWIGTYPE_p_std__ostream os, Logic logic) {
-    return new SWIGTYPE_p_std__ostream(drealJNI.InsertOperator__SWIG_7(SWIGTYPE_p_std__ostream.getCPtr(os), logic.swigValue()), false);
+    return new SWIGTYPE_p_std__ostream(
+        drealJNI.InsertOperator__SWIG_7(SWIGTYPE_p_std__ostream.getCPtr(os), logic.swigValue()),
+        false);
   }
 
   public static SWIGTYPE_p_std__ostream InsertOperator(SWIGTYPE_p_std__ostream os, Box box) {
-    return new SWIGTYPE_p_std__ostream(drealJNI.InsertOperator__SWIG_8(SWIGTYPE_p_std__ostream.getCPtr(os), Box.getCPtr(box), box), false);
+    return new SWIGTYPE_p_std__ostream(
+        drealJNI.InsertOperator__SWIG_8(SWIGTYPE_p_std__ostream.getCPtr(os), Box.getCPtr(box), box),
+        false);
   }
 
   public static boolean Equal(Box b1, Box b2) {
@@ -742,32 +841,67 @@ public class dreal {
     return drealJNI.NotEqual(Box.getCPtr(b1), b1, Box.getCPtr(b2), b2);
   }
 
-  public static SWIGTYPE_p_std__ostream DisplayDiff(SWIGTYPE_p_std__ostream os, VariableVector variables, SWIGTYPE_p_ibex__IntervalVector old_iv, SWIGTYPE_p_ibex__IntervalVector new_iv) {
-    return new SWIGTYPE_p_std__ostream(drealJNI.DisplayDiff(SWIGTYPE_p_std__ostream.getCPtr(os), VariableVector.getCPtr(variables), variables, SWIGTYPE_p_ibex__IntervalVector.getCPtr(old_iv), SWIGTYPE_p_ibex__IntervalVector.getCPtr(new_iv)), false);
+  public static SWIGTYPE_p_std__ostream DisplayDiff(
+      SWIGTYPE_p_std__ostream os,
+      VariableVector variables,
+      SWIGTYPE_p_ibex__IntervalVector old_iv,
+      SWIGTYPE_p_ibex__IntervalVector new_iv) {
+    return new SWIGTYPE_p_std__ostream(
+        drealJNI.DisplayDiff(
+            SWIGTYPE_p_std__ostream.getCPtr(os),
+            VariableVector.getCPtr(variables),
+            variables,
+            SWIGTYPE_p_ibex__IntervalVector.getCPtr(old_iv),
+            SWIGTYPE_p_ibex__IntervalVector.getCPtr(new_iv)),
+        false);
   }
 
-  public static SWIGTYPE_p_std__ostream InsertOperator(SWIGTYPE_p_std__ostream os, Config.SatDefaultPhase sat_default_phase) {
-    return new SWIGTYPE_p_std__ostream(drealJNI.InsertOperator__SWIG_9(SWIGTYPE_p_std__ostream.getCPtr(os), sat_default_phase.swigValue()), false);
+  public static SWIGTYPE_p_std__ostream InsertOperator(
+      SWIGTYPE_p_std__ostream os, Config.SatDefaultPhase sat_default_phase) {
+    return new SWIGTYPE_p_std__ostream(
+        drealJNI.InsertOperator__SWIG_9(
+            SWIGTYPE_p_std__ostream.getCPtr(os), sat_default_phase.swigValue()),
+        false);
   }
 
   public static SWIGTYPE_p_std__ostream InsertOperator(SWIGTYPE_p_std__ostream os, Config config) {
-    return new SWIGTYPE_p_std__ostream(drealJNI.InsertOperator__SWIG_22(SWIGTYPE_p_std__ostream.getCPtr(os), Config.getCPtr(config), config), false);
+    return new SWIGTYPE_p_std__ostream(
+        drealJNI.InsertOperator__SWIG_22(
+            SWIGTYPE_p_std__ostream.getCPtr(os), Config.getCPtr(config), config),
+        false);
   }
 
   public static boolean CheckSatisfiability(Formula f, double delta, Box box) {
-    return drealJNI.CheckSatisfiability__SWIG_0(Formula.getCPtr(f), f, delta, Box.getCPtr(box), box);
+    return drealJNI.CheckSatisfiability__SWIG_0(
+        Formula.getCPtr(f), f, delta, Box.getCPtr(box), box);
   }
 
   public static boolean CheckSatisfiability(Formula f, Config config, Box box) {
-    return drealJNI.CheckSatisfiability__SWIG_1(Formula.getCPtr(f), f, Config.getCPtr(config), config, Box.getCPtr(box), box);
+    return drealJNI.CheckSatisfiability__SWIG_1(
+        Formula.getCPtr(f), f, Config.getCPtr(config), config, Box.getCPtr(box), box);
   }
 
   public static boolean Minimize(Expression objective, Formula constraint, double delta, Box box) {
-    return drealJNI.Minimize__SWIG_0(Expression.getCPtr(objective), objective, Formula.getCPtr(constraint), constraint, delta, Box.getCPtr(box), box);
+    return drealJNI.Minimize__SWIG_0(
+        Expression.getCPtr(objective),
+        objective,
+        Formula.getCPtr(constraint),
+        constraint,
+        delta,
+        Box.getCPtr(box),
+        box);
   }
 
   public static boolean Minimize(Expression objective, Formula constraint, Config config, Box box) {
-    return drealJNI.Minimize__SWIG_1(Expression.getCPtr(objective), objective, Formula.getCPtr(constraint), constraint, Config.getCPtr(config), config, Box.getCPtr(box), box);
+    return drealJNI.Minimize__SWIG_1(
+        Expression.getCPtr(objective),
+        objective,
+        Formula.getCPtr(constraint),
+        constraint,
+        Config.getCPtr(config),
+        config,
+        Box.getCPtr(box),
+        box);
   }
 
   // self written
@@ -778,13 +912,14 @@ public class dreal {
   /**
    * This function reads the result of one variable from the model(Box). It should be known what
    * variable is called, to save the String with the associated variable.
+   *
    * @param box to read the values of the variables
    * @param var to get the value associated with the variable of the box
    * @return String with the value, value is the lower-bound or ENTIRE or EMPTY
    */
   public static String getResult(Box box, Variable var) {
     // returns EMPTY or lower-bound; upperbound as String
-    String result =  drealJNI.getResult(Box.getCPtr(box), Variable.getCPtr(var));
+    String result = drealJNI.getResult(Box.getCPtr(box), Variable.getCPtr(var));
     if (result.equals("EMPTY")) {
       return "EMPTY";
     }
@@ -795,7 +930,7 @@ public class dreal {
       // evaluated to True and variable x does not exist in result anymore
     } else if (bounds[0].equals("-inf") && bounds[1].equals("inf")) {
       return "ENTIRE";
-    } else if (bounds[0].equals("-inf") || bounds[1].equals("inf")){
+    } else if (bounds[0].equals("-inf") || bounds[1].equals("inf")) {
       if (bounds[0].equals("-inf")) {
         return bounds[1];
       } else {
@@ -811,6 +946,7 @@ public class dreal {
   public static boolean has_variable(Box box, Variable var) {
     return drealJNI.Box_has_variable_0(Box.getCPtr(box), Variable.getCPtr(var));
   }
+
   public static boolean CheckSatisfiabilityTest(Formula f, double delta, Box box) {
     System.out.println("Aufruf von Main und jetzt wird drealJNI und dann wrapper aufgerufen");
     return drealJNI.CheckSatisfiability__SWIG_3(Formula.getCPtr(f), delta, Box.getCPtr(box));
@@ -818,12 +954,14 @@ public class dreal {
 
   public static void Test() {
     drealJNI.Context_Test();
-  };
+  }
+  ;
+
   public static void TestCheckSat() {
     drealJNI.Context_TestCheckSat();
   }
+
   public static void satCheck() {
     drealJNI.satCheck();
   }
-
 }
