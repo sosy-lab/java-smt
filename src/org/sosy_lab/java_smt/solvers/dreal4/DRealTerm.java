@@ -25,6 +25,7 @@ import org.sosy_lab.java_smt.solvers.dreal4.drealjni.ExpressionKind;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.FormulaKind;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.dreal;
 
 /*
 This is a wrapper class to use the different classes of dReal to create Formulas. In dReal we
@@ -110,7 +111,8 @@ public class DRealTerm<Term, Declaration> {
     }
   }
 
-  public String to_string() {
+  @Override
+  public String toString() {
     if (isVar()) {
       Variable var = (Variable) term;
       return var.to_string();
@@ -121,5 +123,82 @@ public class DRealTerm<Term, Declaration> {
       Formula formula = (Formula) term;
       return formula.to_string();
     }
+  }
+
+  @Override
+  public final int hashCode() {
+    if (isExp()) {
+      return (int) getExpression().get_hash();
+    } else if (isFormula()) {
+      return (int) getFormula().get_hash();
+    } else {
+      return (int) getVariable().get_hash();
+    }
+  }
+
+  @Override
+  public final boolean equals(Object o) {
+    if (o == this) {
+      return true;
+    }
+    if (!(o instanceof DReal4Formula)) {
+      return false;
+    }
+    // equal_to only checks for the same structure
+    DRealTerm<?, ?> oTerm = ((DReal4Formula) o).getTerm();
+    if (isVar()) {
+      if (oTerm.isVar()) {
+        return getVariable().equal_to(oTerm.getVariable());
+      } else if (oTerm.isExp()) {
+        if (oTerm.getExpressionKind() == ExpressionKind.Var) {
+          return getVariable().equal_to(dreal.get_variable(oTerm.getExpression()));
+        }
+      } else {
+        if (oTerm.getFormulaKind() == FormulaKind.Var) {
+          return getVariable().equal_to(dreal.get_variable(oTerm.getFormula()));
+        }
+      }
+    } else if (isExp()) {
+      if (getExpressionKind() == ExpressionKind.Var) {
+        if (oTerm.isVar()) {
+          return oTerm.getVariable().equal_to(dreal.get_variable(getExpression()));
+        } else if (oTerm.isExp()) {
+          return getExpression().EqualTo(oTerm.getExpression());
+        } else {
+          if (oTerm.getFormulaKind() == FormulaKind.Var) {
+            return dreal
+                .get_variable(getExpression())
+                .equal_to(dreal.get_variable(oTerm.getFormula()));
+          }
+        }
+      } else {
+        if (oTerm.isExp()) {
+          return getExpression().EqualTo(oTerm.getExpression());
+        }
+      }
+    } else {
+      if (getFormulaKind() == FormulaKind.Var) {
+        if (oTerm.isVar()) {
+          return oTerm.getVariable().equal_to(dreal.get_variable(getFormula()));
+        } else if (oTerm.isExp()) {
+          if (oTerm.getExpressionKind() == ExpressionKind.Var) {
+            return dreal
+                .get_variable(getFormula())
+                .equal_to(dreal.get_variable(oTerm.getExpression()));
+          }
+        } else {
+          if (oTerm.getFormulaKind() == FormulaKind.Var) {
+            return dreal
+                .get_variable(getFormula())
+                .equal_to(dreal.get_variable(oTerm.getFormula()));
+          }
+        }
+      } else {
+        if (oTerm.isFormula()) {
+          return getFormula().EqualTo(oTerm.getFormula());
+        }
+      }
+    }
+    return false;
   }
 }
