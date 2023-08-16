@@ -13,6 +13,7 @@ import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.truth.Truth;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -264,7 +265,11 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
         }) {
       ConstantsVisitor visitor = new ConstantsVisitor();
       mgr.visit(rmgr.makeNumber(Rational.ofLongs(n, 321)), visitor);
-      assertThat(visitor.found).containsExactly(Rational.ofLongs(n, 321));
+      if (solverToUse() == Solvers.DREAL4) {
+        assertThat(visitor.found).containsExactly(Rational.ofBigDecimal(BigDecimal.valueOf((double)n / 321)));
+      } else {
+        assertThat(visitor.found).containsExactly(Rational.ofLongs(n, 321));
+      }
     }
   }
 
@@ -634,9 +639,9 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   public void testBooleanFormulaQuantifierHandling() throws Exception {
     requireQuantifiers();
     assume()
-        .withMessage("Princess does not support quantifier over boolean variables")
+        .withMessage("Solver %s does not support quantifier over boolean variables.", solverToUse())
         .that(solverToUse())
-        .isNotEqualTo(Solvers.PRINCESS);
+        .isNoneOf(Solvers.PRINCESS, Solvers.DREAL4);
 
     BooleanFormula x = bmgr.makeVariable("x");
     BooleanFormula constraint = qmgr.forall(ImmutableList.of(x), x);
@@ -650,9 +655,9 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   public void testBooleanFormulaQuantifierRecursiveHandling() throws Exception {
     requireQuantifiers();
     assume()
-        .withMessage("Princess does not support quantifier over boolean variables")
+        .withMessage("Solver %s does not support quantifier over boolean variables.", solverToUse())
         .that(solverToUse())
-        .isNotEqualTo(Solvers.PRINCESS);
+        .isNoneOf(Solvers.PRINCESS, Solvers.DREAL4);
 
     BooleanFormula x = bmgr.makeVariable("x");
     BooleanFormula constraint = qmgr.forall(ImmutableList.of(x), x);
@@ -665,6 +670,11 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   // Same as testBooleanFormulaQuantifierHandling but with Ints
   @Test
   public void testIntegerFormulaQuantifierHandlingUNSAT() throws Exception {
+    assume()
+        .withMessage("dReal solves the Formula with x equal to entire.")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.DREAL4);
+
     requireQuantifiers();
     requireIntegers();
 
@@ -681,6 +691,10 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   public void testIntegerFormulaQuantifierHandlingTrivialSAT() throws Exception {
     requireQuantifiers();
     requireIntegers();
+    assume()
+        .withMessage("Solver %s does not support quantifier over boolean variables.", solverToUse())
+        .that(solverToUse())
+        .isNoneOf(Solvers.PRINCESS, Solvers.DREAL4);
 
     IntegerFormula x = imgr.makeVariable("x");
     BooleanFormula xEqx = imgr.equal(x, x);
@@ -719,6 +733,12 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   public void testIntegerFormulaQuantifierHandlingTrivialUNSAT() throws Exception {
     requireQuantifiers();
     requireIntegers();
+    requireQuantifiers();
+    requireIntegers();
+    assume()
+        .withMessage("Solver %s does not support quantifier over boolean variables.", solverToUse())
+        .that(solverToUse())
+        .isNoneOf(Solvers.PRINCESS, Solvers.DREAL4);
 
     IntegerFormula x = imgr.makeVariable("x");
     BooleanFormula notxEqx = bmgr.not(imgr.equal(x, x));
@@ -745,8 +765,13 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
 
     IntegerFormula x = imgr.makeVariable("x");
     BooleanFormula xEq1 = imgr.equal(x, imgr.makeNumber(1));
-    BooleanFormula constraint =
-        qmgr.exists(ImmutableList.of(x), qmgr.forall(ImmutableList.of(x), xEq1));
+    BooleanFormula constraint;
+    if (solverToUse() == Solvers.DREAL4) {
+      constraint = qmgr.forall(ImmutableList.of(x), xEq1);
+    } else {
+      constraint =
+          qmgr.exists(ImmutableList.of(x), qmgr.forall(ImmutableList.of(x), xEq1));
+    }
     assertThatFormula(constraint).isUnsatisfiable();
     BooleanFormula newConstraint =
         bmgr.visit(constraint, new BooleanFormulaTransformationVisitor(mgr) {});
@@ -763,8 +788,15 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
 
     IntegerFormula x = imgr.makeVariable("x");
     BooleanFormula xEq1 = imgr.equal(x, imgr.makeNumber(1));
-    BooleanFormula constraint =
-        qmgr.exists(ImmutableList.of(x), qmgr.forall(ImmutableList.of(x), xEq1));
+    BooleanFormula constraint;
+
+    if (solverToUse() == Solvers.DREAL4) {
+      constraint =qmgr.forall(ImmutableList.of(x), xEq1);
+    } else {
+      constraint =
+          qmgr.exists(ImmutableList.of(x), qmgr.forall(ImmutableList.of(x), xEq1));
+    }
+
     assertThatFormula(constraint).isUnsatisfiable();
     BooleanFormula newConstraint =
         bmgr.transformRecursively(constraint, new BooleanFormulaTransformationVisitor(mgr) {});
@@ -908,9 +940,9 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     requireQuantifiers();
     // TODO Maybe rewrite using quantified integer variable to allow testing with Princess
     assume()
-        .withMessage("Princess does not support quantifier over boolean variables")
+        .withMessage("Solver %s does not support quantifier over boolean variables.", solverToUse())
         .that(solverToUse())
-        .isNotEqualTo(Solvers.PRINCESS);
+        .isNoneOf(Solvers.PRINCESS, Solvers.DREAL4);
 
     BooleanFormula[] usedVars =
         Stream.of("a", "b", "c", "d", "e", "f")
@@ -944,6 +976,11 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   @Test
   public void testTransformationInsideQuantifiersWithTrue()
       throws SolverException, InterruptedException {
+    assume()
+        .withMessage("dReal does not support elimination.")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.DREAL4);
+
     requireQuantifiers();
     List<IntegerFormula> quantifiedVars = ImmutableList.of(imgr.makeVariable("x"));
     BooleanFormula body = bmgr.makeTrue();
@@ -956,6 +993,11 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   @Test
   public void testTransformationInsideQuantifiersWithFalse()
       throws SolverException, InterruptedException {
+    assume()
+        .withMessage("dReal does not support elimination.")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.DREAL4);
+
     requireQuantifiers();
     List<IntegerFormula> quantifiedVars = ImmutableList.of(imgr.makeVariable("x"));
     BooleanFormula body = bmgr.makeFalse();
@@ -968,6 +1010,11 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   @Test
   public void testTransformationInsideQuantifiersWithVariable()
       throws SolverException, InterruptedException {
+    assume()
+        .withMessage("dReal does not support elimination.")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.DREAL4);
+
     requireQuantifiers();
     List<IntegerFormula> quantifiedVars = ImmutableList.of(imgr.makeVariable("x"));
     BooleanFormula body = bmgr.makeVariable("b");
@@ -979,6 +1026,8 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
 
   @Test
   public void extractionTest1() {
+    requireUF();
+
     IntegerFormula v = imgr.makeVariable("v");
     BooleanFormula q = fmgr.declareAndCallUF("q", FormulaType.BooleanType, v);
     Map<String, Formula> mapping = mgr.extractVariablesAndUFs(q);
@@ -988,7 +1037,20 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
+  public void extractionTest1WithOutUF() {
+    IntegerFormula v = imgr.makeVariable("v");
+    IntegerFormula z = imgr.makeVariable("z");
+    BooleanFormula q = imgr.equal(v, z);
+        Map<String, Formula> mapping = mgr.extractVariables(q);
+    assertThat(mapping).hasSize(2);
+    assertThat(mapping).containsEntry("v", v);
+    assertThat(mapping).containsEntry("z", z);
+  }
+
+  @Test
   public void extractionTest2() {
+    requireUF();
+
     // the same as above, but with nullary UF.
     IntegerFormula v = fmgr.declareAndCallUF("v", FormulaType.IntegerType);
     BooleanFormula q = fmgr.declareAndCallUF("q", FormulaType.BooleanType, v);
@@ -1065,6 +1127,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
 
   @Test
   public void extractionArguments() {
+    requireUF();
     requireIntegers();
 
     // Create the variables and uf
@@ -1106,7 +1169,48 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
+  public void extractionArgumentsWithOutUF() {
+    // Create the variables
+    IntegerFormula a = imgr.makeVariable("a");
+    IntegerFormula b = imgr.makeVariable("b");
+    IntegerFormula c = imgr.makeVariable("c");
+    IntegerFormula d = imgr.makeVariable("d");
+    BooleanFormula ab = imgr.equal(imgr.add(a, b), imgr.makeNumber(10));
+    BooleanFormula cd = imgr.lessOrEquals(c, d);
+    BooleanFormula and = bmgr.and(cd, ab);
+
+    FormulaVisitor<Collection<Formula>> argCollectingVisitor =
+        new DefaultFormulaVisitor<>() {
+
+          final Collection<Formula> usedArgs = new LinkedHashSet<>();
+
+          @Override
+          public Collection<Formula> visitFunction(
+              Formula pF, List<Formula> args, FunctionDeclaration<?> pFunctionDeclaration) {
+            usedArgs.addAll(args);
+            return usedArgs;
+          }
+
+          @Override
+          protected Collection<Formula> visitDefault(Formula pF) {
+            return usedArgs;
+          }
+        };
+
+    Collection<Formula> usedArgs = mgr.visit(and, argCollectingVisitor);
+
+    assertThat(usedArgs).hasSize(2);
+    assertThat(usedArgs).containsExactly(ab, cd);
+
+    Map<String, Formula> vars = mgr.extractVariables(and);
+    assertThat(vars).hasSize(4);
+    assertThat(vars.keySet()).containsExactly("a", "b", "c", "d");
+  }
+
+
+  @Test
   public void extractionDeclarations() {
+    requireUF();
     requireIntegers();
 
     // Create the variables and uf
