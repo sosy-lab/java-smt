@@ -14,6 +14,7 @@ import static com.google.common.truth.Truth8.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.collect.ImmutableMap;
+import io.github.cvc5.Solver;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -147,7 +148,7 @@ public class SolverConcurrencyTest {
     assume()
         .withMessage("Solver does not support bitvectors")
         .that(solver)
-        .isNoneOf(Solvers.SMTINTERPOL, Solvers.YICES2);
+        .isNoneOf(Solvers.SMTINTERPOL, Solvers.YICES2, Solvers.DREAL4);
   }
 
   private void requireOptimization() {
@@ -160,9 +161,9 @@ public class SolverConcurrencyTest {
             Solvers.PRINCESS,
             Solvers.CVC4,
             Solvers.CVC5,
-            Solvers.YICES2);
+            Solvers.YICES2,
+            Solvers.DREAL4);
   }
-
   /**
    * Test concurrency of integers (while every thread creates its unique context on its own
    * concurrently).
@@ -229,7 +230,7 @@ public class SolverConcurrencyTest {
     assume()
         .withMessage("Solver does not support translation of formulas")
         .that(solver)
-        .isNoneOf(Solvers.CVC4, Solvers.PRINCESS, Solvers.CVC5);
+        .isNoneOf(Solvers.CVC4, Solvers.PRINCESS, Solvers.CVC5, Solvers.DREAL4);
 
     ConcurrentLinkedQueue<ContextAndFormula> contextAndFormulaList = new ConcurrentLinkedQueue<>();
 
@@ -441,7 +442,7 @@ public class SolverConcurrencyTest {
     assume()
         .withMessage("Solver does not support translation of formulas")
         .that(solver)
-        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.PRINCESS);
+        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.PRINCESS, Solvers.DREAL4);
 
     // This is fine! We might access this more than once at a time,
     // but that gives only access to the bucket, which is threadsafe.

@@ -19,6 +19,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Multiset;
 import com.google.common.truth.TruthJUnit;
 import java.util.function.Supplier;
+import org.junit.Before;
 import org.junit.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -95,6 +96,10 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
           + "(assert  (let (($x35 (and (xor q (= (+ a b) c)) (>= a b)))) (let (($x9 (= a b))) (and"
           + " (and (or $x35 u) q) (and $x9 $x35)))))";
 
+  @Before
+  public void checkThatSolverIsAvailable() {
+    requireDumping();
+  }
   @Test
   public void varDumpTest() {
     // Boolector will fail this anyway since bools are bitvecs for btor

@@ -66,10 +66,7 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0.ParameterizedSol
 
   @Test
   public void testIsSatisfiableNo() {
-    assume()
-        .withMessage("Solver does not support unsat core generation in a usable way")
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.BOOLECTOR);
+    requireUnsatCore();
 
     AssertionError failure =
         expectFailure(whenTesting -> whenTesting.that(contradiction).isSatisfiable());
