@@ -42,7 +42,7 @@ public class OpenSmtModel extends AbstractModel<PTRef, SRef, Logic> {
 
     osmtLogic = pCreator.getEnv();
     osmtModel = pProver.getOsmtSolver().getModel();
-    
+
     PTRef asserts = osmtLogic.mkAnd(new VectorPTRef(pAssertedTerms));
     Map<String, PTRef> userDeclarations = creator.extractVariablesAndUFs(asserts, true);
 
@@ -126,19 +126,23 @@ public class OpenSmtModel extends AbstractModel<PTRef, SRef, Logic> {
     ArrayList<ArrayList<PTRef>> unwrapped = new ArrayList<>();
 
     if (osmtLogic.isIte(body)) {
-      VectorPTRef subterms = osmtLogic.getPterm(body).getArgs();
-      PTRef left = subterms.get(1);
-      PTRef right = subterms.get(2);
-      PTRef value = osmtLogic.getPterm(subterms.get(0)).getArgs().get(0);
+      PTRef sub0 = osmtLogic.getPterm(body).at(0);
+      PTRef sub1 = osmtLogic.getPterm(body).at(1);
+      PTRef sub2 = osmtLogic.getPterm(body).at(2);
 
-      for (ArrayList<PTRef> nested : unfold(numArgs - 1, left)) {
+      PTRef sub00 = osmtLogic.getPterm(sub0).at(0);
+      PTRef sub01 = osmtLogic.getPterm(sub0).at(1);
+
+      PTRef value = osmtLogic.isVar(sub00) ? sub01 : sub00;
+
+      for (ArrayList<PTRef> nested : unfold(numArgs - 1, sub1)) {
         ArrayList<PTRef> prefixed = new ArrayList<>();
         prefixed.add(value);
         prefixed.addAll(nested);
 
         unwrapped.add(prefixed);
       }
-      unwrapped.addAll(unfold(numArgs, right));
+      unwrapped.addAll(unfold(numArgs, sub2));
     }
 
     if (numArgs == 0) {
