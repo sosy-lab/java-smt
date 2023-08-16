@@ -905,10 +905,6 @@ public class dreal {
   }
 
   // self written
-  public static boolean CheckSatisfiability(Formula f) {
-    return drealJNI.CheckSatisfiability__SWIG_2(Formula.getCPtr(f));
-  }
-
   /**
    * This function reads the result of one variable from the model(Box). It should be known what
    * variable is called, to save the String with the associated variable.
