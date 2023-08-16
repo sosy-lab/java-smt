@@ -173,6 +173,10 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
       // MathSAT supports non-linear multiplication
       assertThatFormula(f).isUnsatisfiable();
 
+    } else if (solver == Solvers.DREAL4) {
+      // dReal does not support UF's and APPROXIMATE_ALWAYS/FALLBACK is disabled, so result should
+      // not change
+      assertThatFormula(f).isUnsatisfiable();
     } else {
       assertExpectedUnsatifiabilityForNonLinearArithmetic(f);
     }
@@ -196,7 +200,7 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
     assume()
         .withMessage("Solver %s does not support division by zero", solverToUse())
         .that(solverToUse())
-        .isNotEqualTo(Solvers.YICES2);
+        .isNoneOf(Solvers.YICES2, Solvers.DREAL4);
 
     T a = nmgr.makeVariable("a");
     T b = nmgr.makeVariable("b");
@@ -221,11 +225,14 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
                 nmgr.equal(nmgr.divide(a, nmgr.makeNumber(3)), nmgr.makeNumber(2)),
                 nmgr.equal(nmgr.divide(a, nmgr.makeNumber(2)), nmgr.makeNumber(3))));
 
-    if (formulaType.equals(FormulaType.IntegerType)
+    if (solverToUse() == Solvers.DREAL4) {
+      // dReal does not support UF's and APPROXIMATE_ALWAYS/FALLBACK is disabled, so result should
+      // not change
+      assertThatFormula(f).isUnsatisfiable();
+    } else if (formulaType.equals(FormulaType.IntegerType)
         && nonLinearArithmetic == NonLinearArithmetic.APPROXIMATE_ALWAYS) {
       // Integer division is always non-linear due to rounding rules
       assertThatFormula(f).isSatisfiable();
-
     } else {
       assertThatFormula(f).isUnsatisfiable();
     }
@@ -263,7 +270,12 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
       // some solvers support non-linear multiplication (partially)
       assertThatFormula(f).isUnsatisfiable();
 
-    } else {
+    } else if (solverToUse() == Solvers.DREAL4) {
+      // dReal does not support UF's and APPROXIMATE_ALWAYS/FALLBACK is disabled, so result should
+      // not change
+      assertThatFormula(f).isUnsatisfiable();
+    }
+    else {
       assertExpectedUnsatifiabilityForNonLinearArithmetic(f);
     }
   }
