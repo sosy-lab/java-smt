@@ -102,13 +102,13 @@ public class DReal4FormulaManager
           var = dreal.get_variable(changeFromTerm.getExpression());
         } else {
           throw new UnsupportedOperationException(
-              "dReal does not support substitution on " + "expressions.");
+              "dReal does not support substitution on expressions.");
         }
       } else if (changeFromTerm.isVar()) {
         var = changeFromTerm.getVariable();
       } else {
         throw new UnsupportedOperationException(
-            "dReal does not support substitutions on Formulas" + ".");
+            "dReal does not support substitutions on Formulas.");
       }
       if (changeToTerm.isVar()) {
         if (changeToTerm.getType() == Variable.Type.BOOLEAN) {
