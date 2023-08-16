@@ -45,9 +45,6 @@ public class DReal4RationalFormulaManager
     return getFormulaCreator().getRationalType();
   }
 
-  // Division with Integer can be a problem. See Issue 304 (https://github.com/dreal/dreal4/issues/304).
-  // With two Constant being divided I manually round off, but if we have a division with a variable,
-  // it can cause problems
   @Override
   public DRealTerm<Expression, ExpressionKind> divide(DRealTerm<?, ?> pParam1,
                                       DRealTerm<?, ?> pParam2) {
@@ -80,6 +77,9 @@ public class DReal4RationalFormulaManager
     }
   }
 
+  // Also not possible to change the type of a variable, therefore not possible to hard code
+  // (forall{x}. floor(x) <= x) would not be a tautology, because floor(x) would create a new
+  // variable with integer type, but would not have a reference to x.
   @Override
   protected DRealTerm<?, ?> floor(DRealTerm<?, ?> number) {
     throw new UnsupportedOperationException("dReal does not support floor.");

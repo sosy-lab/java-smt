@@ -21,24 +21,26 @@
 package org.sosy_lab.java_smt.solvers.dreal4;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
+import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Config;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Context;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Expression;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.ExpressionKind;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.FormulaKind;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable;
-import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable.Type;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.dreal;
 
 public abstract class DReal4NumeralFormulaManager<
     ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
     extends AbstractNumeralFormulaManager<
-    DRealTerm<?, ?>, Variable.Type, Context, ParamFormulaType, ResultFormulaType, DRealTerm<?, ?>> {
+    DRealTerm<?, ?>, Variable.Type, Config, ParamFormulaType, ResultFormulaType, DRealTerm<?, ?>> {
 
   DReal4NumeralFormulaManager(
       DReal4FormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
@@ -61,8 +63,6 @@ public abstract class DReal4NumeralFormulaManager<
 
   @Override
   protected DRealTerm<Expression, ExpressionKind> makeNumberImpl(BigInteger i) {
-    System.out.println(i.toString());
-    System.out.println(Double.parseDouble(i.toString()));
     return makeNumberImpl(i.toString());
   }
 

@@ -51,22 +51,20 @@ import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable.Type;
 class DReal4TheoremProver extends AbstractProverWithAllSat<Void> implements ProverEnvironment {
 
   private final DReal4FormulaCreator creator;
-  private final Config curCfg;
+  private final Config config;
   private final Context curCnt;
 
   protected final Deque<List<DRealTerm<?, ?>>> assertedFormulas = new ArrayDeque<>();
-
-  // use Box to save result?
   private Box model;
 
   protected DReal4TheoremProver(DReal4FormulaCreator creator, Set<ProverOptions> pOptions,
                                 DReal4FormulaManager pFmgr, ShutdownNotifier pShutdownNotifier) {
     super(pOptions, pFmgr.getBooleanFormulaManager(), pShutdownNotifier);
     this.creator = creator;
-    curCfg = new Config();
-    curCnt = new Context(curCfg);
+    config = creator.getEnv();
     model = new Box();
     assertedFormulas.push(new ArrayList<>());
+    curCnt = new Context(config);
   }
 
   @Override

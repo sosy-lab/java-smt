@@ -39,7 +39,6 @@ public class DReal4SolverContext extends AbstractSolverContext {
   private final DReal4FormulaManager manager;
   private final DReal4FormulaCreator creator;
   private final ShutdownNotifier shutdownNotifier;
-
   public DReal4SolverContext(
       DReal4FormulaManager pManager, DReal4FormulaCreator pCreator,
       ShutdownNotifier pShutdownNotifier) {
@@ -63,8 +62,7 @@ public class DReal4SolverContext extends AbstractSolverContext {
     Config config = new Config();
     config.mutable_random_seed(randomSeed);
 
-    Context context = new Context(config);
-    DReal4FormulaCreator creator = new DReal4FormulaCreator(context);
+    DReal4FormulaCreator creator = new DReal4FormulaCreator(config);
 
     // Create manager
     DReal4UFManager functionTheory = new DReal4UFManager(creator);

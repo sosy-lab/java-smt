@@ -24,15 +24,12 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Box;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Config;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Context;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Expression;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.ExpressionDoubleMap;
@@ -42,13 +39,11 @@ import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.FormulaKind;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.FormulaSet;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable;
-import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable.Type;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.VariableSet;
-import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variables;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.dreal;
 
 
-public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Variable.Type, Context> {
+public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Variable.Type, Config> {
 
   private final Box model;
   private final DReal4FormulaCreator formulaCreator;
@@ -111,7 +106,7 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Variable.Type, C
             return null;
           }
           Double res = extractResultsVariable(var);
-          // TODO: can expression have a variable of boolean type?
+          // expression can not have variable of boolean type
           Preconditions.checkState(formula.getType() != Variable.Type.BOOLEAN);
           exp = substituteExpWithResult(exp, var, res);
           if (exp == null) {
@@ -121,9 +116,8 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Variable.Type, C
         return new DRealTerm<>(exp, formula.getType(), exp.get_kind());
       }
     } else {
-      // this will always return a True formula
+      // this will always return a True formula, because of rewrites in dReal
       Formula f = formula.getFormula();
-      // if formula is already true or false, just return the formula
       if (f.get_kind() == FormulaKind.True || f.get_kind() == FormulaKind.False) {
         return new DRealTerm<>(f, formula.getType(), f.get_kind());
       } else if (f.get_kind() == FormulaKind.Var) {

@@ -27,6 +27,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Config;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Context;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Expression;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.ExpressionKind;
@@ -36,7 +37,7 @@ import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable.Type;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.dreal;
 
 public class DReal4FormulaManager extends AbstractFormulaManager<DRealTerm<?, ?>, Variable.Type,
-    Context,
+    Config,
     DRealTerm<?, ?>> {
 
   DReal4FormulaManager(DReal4FormulaCreator pFormulaCreator, DReal4UFManager pFunctionManager,
