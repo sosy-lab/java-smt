@@ -43,7 +43,7 @@ public class DReal4QuantifiedFormulaManager
   @Override
   protected DRealTerm<?, ?> eliminateQuantifiers(DRealTerm<?, ?> pExtractInfo)
       throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException("dReal can not eliminate quantifiers.");
+    throw new UnsupportedOperationException("dReal does not support to eliminate quantifiers.");
   }
 
   // It is allowed to create a quantified Formula with boolean Variables, but as soon as CheckSat
@@ -68,12 +68,11 @@ public class DReal4QuantifiedFormulaManager
         }
         vars.insert(term.getVariable());
       } else {
-        throw new IllegalArgumentException("This term is not a Variable.");
+        throw new IllegalArgumentException("It is only possible to bound variables.");
       }
     }
     if (pQ == Quantifier.EXISTS) {
-      // Does dReal support exist?
-      throw new UnsupportedOperationException("dReal does not support exist??");
+      throw new UnsupportedOperationException("dReal does not support existential quantifiers.");
     } else {
       if (pBody.isFormula()) {
         return new DRealTerm<>(
@@ -86,7 +85,7 @@ public class DReal4QuantifiedFormulaManager
           return new DRealTerm<>(quantified, var.get_type(), FormulaKind.Forall);
         } else {
           throw new IllegalArgumentException(
-              "The given Formula is a Variable and not of type " + "Boolean.");
+              "The given Formula is a Variable and the variable is not of type Boolean.");
         }
       } else {
         throw new IllegalArgumentException("The given Formula is not a Formula.");

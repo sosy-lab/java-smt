@@ -44,7 +44,7 @@ public class DReal4IntegerFormulaManager
 
   // Division with Integer can be a problem. See Issue 304
   // (https://github.com/dreal/dreal4/issues/304).
-  // With two Constant being divided I manually round off, but if we have a division with a
+  // With two Constant being divided it is manually rounded off, but if we have a division with a
   // variable,
   // it is not real integer division. Therefore it could result in wrong results. Use with caution.
   @Override
@@ -53,7 +53,7 @@ public class DReal4IntegerFormulaManager
     if (pParam1.isExp() && pParam2.isExp()) {
       if (pParam1.getExpressionKind() == ExpressionKind.Constant
           && pParam2.getExpressionKind() == ExpressionKind.Constant) {
-        if (Double.parseDouble(pParam2.to_string()) == 0.0) {
+        if (Double.parseDouble(pParam2.toString()) == 0.0) {
           throw new IllegalArgumentException("dReal does not support division by zero.");
         }
         double dParam1 = Double.parseDouble(pParam1.getExpression().to_string());
@@ -67,7 +67,7 @@ public class DReal4IntegerFormulaManager
           ExpressionKind.Div);
     } else if (pParam1.isVar() && pParam2.isExp()) {
       if (pParam2.getExpressionKind() == ExpressionKind.Constant) {
-        if (Double.parseDouble(pParam2.to_string()) == 0.0) {
+        if (Double.parseDouble(pParam2.toString()) == 0.0) {
           throw new IllegalArgumentException("dReal does not support division by zero.");
         }
       }
@@ -91,7 +91,7 @@ public class DReal4IntegerFormulaManager
     }
   }
 
-  // Use with caution, becaue of integer division. Integer division is not real integer division,
+  // Use with caution, because of integer division. Integer division is not real integer division,
   // therefore the results could be incorrect
   @Override
   protected DRealTerm<?, ?> modularCongruence(

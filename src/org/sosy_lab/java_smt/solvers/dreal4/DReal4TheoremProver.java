@@ -85,12 +85,11 @@ class DReal4TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
       Formula f = new Formula(formula.getVariable());
       curCnt.declareVariables(f);
       curCnt.Assert(f);
-      return null;
     } else {
       curCnt.declareVariables(formula.getFormula());
       curCnt.Assert(formula.getFormula());
-      return null;
     }
+    return null;
   }
 
   @Override

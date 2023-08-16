@@ -76,7 +76,7 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Variable.Type, C
       }
       Double res = extractResultsVariable(variable);
       if (res.isNaN()) {
-        // When is result "EMPTY"?
+        // Result was "EMPTY"
         return null;
       } else {
         if (variable.get_type() == Variable.Type.BOOLEAN) {
@@ -91,7 +91,7 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Variable.Type, C
       }
     } else if (formula.isExp()) {
       // this will return the constant of the Expression -> if expression is (x + 1) and x
-      // evaluates to 5, it will return 6 and not (5+1)
+      // evaluates to 5, it will return 6 and not (5+1), because of rewrites in dReal
       Expression exp = formula.getExpression();
       // if expression is already a constant, just return it
       if (exp.get_kind() == ExpressionKind.Constant) {
@@ -162,7 +162,7 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Variable.Type, C
 
   private Expression substituteExpWithResult(Expression exp, Variable var, Double res) {
     if (res.isNaN()) {
-      // When is result "EMPTY"?
+      //result was "EMPTY"
       return null;
     } else {
       exp = exp.Substitute(var, new Expression(res));
@@ -172,7 +172,7 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Variable.Type, C
 
   private Formula substituteFormulaWithResult(Formula f, Variable var, Double res) {
     if (res.isNaN()) {
-      // When is result "EMPTY"?
+      // result was "EMTPY"
       return null;
     } else {
       if (var.get_type() == Variable.Type.BOOLEAN) {
@@ -203,7 +203,6 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Variable.Type, C
     if (string.equals("EMPTY")) {
       return Double.NaN;
     } else if (string.equals("ENTIRE")) {
-      // probably unnecassary, and what should I return?
       return Double.valueOf(1);
     } else {
       String[] numbers = string.split(",", -1);
@@ -211,9 +210,6 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Variable.Type, C
     }
   }
 
-  // x + 2 = 10 dann ist KeyFormula = x und ValueFormel = 8 (beides Formulas). Die
-  // BooleanFormula die gesamte Formel und value = 8 als JavaInterpretation
-  // Brauche alle asserted formulas,
   @Override
   public ImmutableList<ValueAssignment> asList() {
     ImmutableSet.Builder<ValueAssignment> builder = ImmutableSet.builder();
@@ -274,10 +270,8 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Variable.Type, C
           recursiveAssignmentFinder(
               builder, new DRealTerm<>(entry.getKey(), term.getType(), entry.getKey().get_kind()));
         }
-      } else if (expKind == ExpressionKind.UninterpretedFunction) {
-        throw new UnsupportedOperationException("Not implemented yet");
       } else {
-        throw new IllegalArgumentException("Failure visiting the Term " + term.to_string() + " .");
+        throw new IllegalArgumentException("Failure visiting the Term " + term + ".");
       }
     } else {
       FormulaKind fKind = term.getFormulaKind();
@@ -327,7 +321,7 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Variable.Type, C
   }
 
   private ValueAssignment getAssignment(DRealTerm<?, ?> term) {
-    // valueTerm should be a variable
+    // term should be a variable
     Preconditions.checkState(term.isVar());
     ImmutableList.Builder<Object> argumentInterpretationBuilder = ImmutableList.builder();
     // valueTerm can be Formula or Expression
@@ -353,7 +347,7 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Variable.Type, C
                   FormulaKind.Eq));
     } else {
       throw new UnsupportedOperationException(
-          "Trying to get an Assignment from an Expression " + term.to_string() + " .");
+          "Trying to get an Assignment from an Expression " + term + ".");
     }
     Object value = formulaCreator.convertValue(valueTerm);
     return new ValueAssignment(

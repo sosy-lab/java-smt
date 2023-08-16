@@ -48,7 +48,7 @@ public class DReal4RationalFormulaManager
     if (pParam1.isExp() && pParam2.isExp()) {
       if (pParam1.getExpressionKind() == ExpressionKind.Constant
           && pParam2.getExpressionKind() == ExpressionKind.Constant) {
-        if (Double.parseDouble(pParam2.to_string()) == 0.0) {
+        if (Double.parseDouble(pParam2.toString()) == 0.0) {
           throw new IllegalArgumentException("dReal does not support division by zero.");
         }
         return new DRealTerm<>(
@@ -62,7 +62,7 @@ public class DReal4RationalFormulaManager
           ExpressionKind.Div);
     } else if (pParam1.isVar() && pParam2.isExp()) {
       if (pParam2.getExpressionKind() == ExpressionKind.Constant) {
-        if (Double.parseDouble(pParam2.to_string()) == 0.0) {
+        if (Double.parseDouble(pParam2.toString()) == 0.0) {
           throw new IllegalArgumentException("dReal does not support division by zero.");
         }
       }
@@ -82,7 +82,7 @@ public class DReal4RationalFormulaManager
           pParam1.getType(),
           ExpressionKind.Div);
     } else {
-      throw new UnsupportedOperationException("dReal does not support divide with Formulas.");
+      throw new UnsupportedOperationException("dReal does not support to divide with Formulas.");
     }
   }
 

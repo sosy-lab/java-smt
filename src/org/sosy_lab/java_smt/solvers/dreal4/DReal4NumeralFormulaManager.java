@@ -63,6 +63,8 @@ public abstract class DReal4NumeralFormulaManager<
     return new DRealTerm<>(new Expression(i), getNumeralType(), ExpressionKind.Constant);
   }
 
+  // makeNumberImpl with BigInteger to create a constant in an integerFormula can cause a
+  // problem, because dReal can not handle BigInteger in integer formulas, only in real formulas.
   @Override
   protected DRealTerm<Expression, ExpressionKind> makeNumberImpl(BigInteger i) {
     return makeNumberImpl(i.toString());
@@ -139,7 +141,8 @@ public abstract class DReal4NumeralFormulaManager<
           pParam1.getType(),
           ExpressionKind.Add);
     } else {
-      throw new UnsupportedOperationException("dReal does not support add on Formulas.");
+      throw new UnsupportedOperationException("dReal does not support to create an Add-Formula "
+          + "from Formulas.");
     }
   }
 
@@ -169,7 +172,7 @@ public abstract class DReal4NumeralFormulaManager<
           ExpressionKind.Add);
     } else {
       throw new UnsupportedOperationException(
-          "dReal does not support subtract on Variables or " + "Formulas.");
+          "dReal does not support to create a subtract-Formula from Formulas.");
     }
   }
 
@@ -198,7 +201,8 @@ public abstract class DReal4NumeralFormulaManager<
           pParam1.getType(),
           ExpressionKind.Mul);
     } else {
-      throw new UnsupportedOperationException("dReal does not support multiply with Formulas.");
+      throw new UnsupportedOperationException("dReal does not support to create multiply-Formulas "
+          + "with Formulas.");
     }
   }
 
@@ -227,7 +231,8 @@ public abstract class DReal4NumeralFormulaManager<
           Variable.Type.BOOLEAN,
           FormulaKind.Eq);
     } else {
-      throw new UnsupportedOperationException("dReal does not support equal on Formulas.");
+      throw new UnsupportedOperationException("dReal does not support to create an equal-Formula "
+          + "from Formulas.");
     }
   }
 
@@ -283,7 +288,8 @@ public abstract class DReal4NumeralFormulaManager<
           Variable.Type.BOOLEAN,
           FormulaKind.Gt);
     } else {
-      throw new UnsupportedOperationException("dReal does not support greaterThan on Formulas.");
+      throw new UnsupportedOperationException("dReal does not support to create a "
+          + "greaterThan-Formula form formulas.");
     }
   }
 
@@ -313,7 +319,7 @@ public abstract class DReal4NumeralFormulaManager<
           FormulaKind.Geq);
     } else {
       throw new UnsupportedOperationException(
-          "dReal does not support greaterOrEquals on Formulas" + ".");
+          "dReal does not support to create a greaterOrEquals-Formula from formulas.");
     }
   }
 
@@ -341,7 +347,8 @@ public abstract class DReal4NumeralFormulaManager<
           Variable.Type.BOOLEAN,
           FormulaKind.Lt);
     } else {
-      throw new UnsupportedOperationException("dReal does not support lessThan on Formulas.");
+      throw new UnsupportedOperationException("dReal does not support to create a "
+          + "lessThan-Formula from Formulas.");
     }
   }
 
@@ -370,7 +377,8 @@ public abstract class DReal4NumeralFormulaManager<
           Variable.Type.BOOLEAN,
           FormulaKind.Leq);
     } else {
-      throw new UnsupportedOperationException("dReal does not support lessOrEquals on Formulas.");
+      throw new UnsupportedOperationException("dReal does not support to create a "
+          + "lessOrEquals-Formula from Formulas.");
     }
   }
 }
