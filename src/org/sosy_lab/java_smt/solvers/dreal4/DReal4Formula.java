@@ -24,9 +24,6 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
-import org.sosy_lab.java_smt.solvers.dreal4.drealjni.ExpressionKind;
-import org.sosy_lab.java_smt.solvers.dreal4.drealjni.FormulaKind;
-import org.sosy_lab.java_smt.solvers.dreal4.drealjni.dreal;
 
 abstract class DReal4Formula implements Formula {
   @SuppressWarnings("Immutable")
@@ -42,90 +39,17 @@ abstract class DReal4Formula implements Formula {
 
   @Override
   public final boolean equals(Object o) {
-    if (o == this) {
-      return true;
-    }
-    if (!(o instanceof DReal4Formula)) {
-      return false;
-    }
-    // equal_to only checks for the same structure
-    DRealTerm<?, ?> oTerm = ((DReal4Formula) o).getTerm();
-    if (term.isVar()) {
-      if (oTerm.isVar()) {
-        return term.getVariable().equal_to(oTerm.getVariable());
-      } else if (oTerm.isExp()) {
-        if (oTerm.getExpressionKind() == ExpressionKind.Var) {
-          return term.getVariable().equal_to(dreal.get_variable(oTerm.getExpression()));
-        }
-      } else {
-        if (oTerm.getFormulaKind() == FormulaKind.Var) {
-          return term.getVariable().equal_to(dreal.get_variable(oTerm.getFormula()));
-        }
-      }
-    } else if (term.isExp()) {
-      if (term.getExpressionKind() == ExpressionKind.Var) {
-        if (oTerm.isVar()) {
-          return oTerm.getVariable().equal_to(dreal.get_variable(term.getExpression()));
-        } else if (oTerm.isExp()) {
-          return term.getExpression().EqualTo(oTerm.getExpression());
-        } else {
-          if (oTerm.getFormulaKind() == FormulaKind.Var) {
-            return dreal
-                .get_variable(term.getExpression())
-                .equal_to(dreal.get_variable(oTerm.getFormula()));
-          }
-        }
-      } else {
-        if (oTerm.isExp()) {
-          return term.getExpression().EqualTo(oTerm.getExpression());
-        }
-      }
-    } else {
-      if (term.getFormulaKind() == FormulaKind.Var) {
-        if (oTerm.isVar()) {
-          return oTerm.getVariable().equal_to(dreal.get_variable(term.getFormula()));
-        } else if (oTerm.isExp()) {
-          if (oTerm.getExpressionKind() == ExpressionKind.Var) {
-            return dreal
-                .get_variable(term.getFormula())
-                .equal_to(dreal.get_variable(oTerm.getExpression()));
-          }
-        } else {
-          if (oTerm.getFormulaKind() == FormulaKind.Var) {
-            return dreal
-                .get_variable(term.getFormula())
-                .equal_to(dreal.get_variable(oTerm.getFormula()));
-          }
-        }
-      } else {
-        if (oTerm.isFormula()) {
-          return term.getFormula().EqualTo(oTerm.getFormula());
-        }
-      }
-    }
-    return false;
+    return term.equals(o);
   }
 
   @Override
   public final String toString() {
-    if (term.isExp()) {
-      return term.getExpression().to_string();
-    } else if (term.isFormula()) {
-      return term.getFormula().to_string();
-    } else {
-      return term.getVariable().to_string();
-    }
+    return term.toString();
   }
 
   @Override
   public final int hashCode() {
-    if (term.isExp()) {
-      return (int) term.getExpression().get_hash();
-    } else if (term.isFormula()) {
-      return (int) term.getFormula().get_hash();
-    } else {
-      return (int) term.getVariable().get_hash();
-    }
+    return term.hashCode();
   }
 
   static final class DReal4BooleanFormula extends DReal4Formula implements BooleanFormula {
