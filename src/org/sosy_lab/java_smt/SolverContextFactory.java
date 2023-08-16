@@ -284,9 +284,12 @@ public class SolverContextFactory {
       case BOOLECTOR:
         return BoolectorSolverContext.create(config, shutdownNotifier, logfile, randomSeed, loader);
 
+      // NonLinearArithmetic.USE is set, because otherwise the option to set to ALWAYS/FALLBACK
+      // would be available, but because of missing UF support, these option are not usable and
+      // only USE should be available.
       case DREAL4:
         return DReal4SolverContext.create(logger, shutdownNotifier, (int) randomSeed,
-            nonLinearArithmetic, loader);
+            NonLinearArithmetic.USE, loader);
 
       default:
         throw new AssertionError("no solver selected");
