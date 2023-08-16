@@ -528,7 +528,7 @@ public class DReal4FormulaCreator
         // created with Expression
         Preconditions.checkState(
             (args.get(0).isExp() || args.get(0).isVar())
-                && (args.get(0).isExp() || args.get(0).isVar()));
+                && (args.get(1).isExp() || args.get(1).isVar()));
         Expression[] expArgs = getExpressionArgs(args.get(0), args.get(1));
         if (formulaKind == FormulaKind.Gt) {
           return new DRealTerm<>(
