@@ -46,7 +46,7 @@ public class DReal4IntegerFormulaManager
 
   // Division with Integer can be a problem. See Issue 304 (https://github.com/dreal/dreal4/issues/304).
   // With two Constant being divided I manually round off, but if we have a division with a variable,
-  // it can cause problems
+  // it is not real integer division. Therefore it could result in wrong results. Use with caution.
   @Override
   public DRealTerm<Expression, ExpressionKind> divide(DRealTerm<?, ?> pParam1,
                                       DRealTerm<?, ?> pParam2) {
@@ -56,12 +56,10 @@ public class DReal4IntegerFormulaManager
         if (Double.parseDouble(pParam2.to_string()) == 0.0) {
           throw new IllegalArgumentException("dReal does not support division by zero.");
         }
-        DRealTerm<Expression, ExpressionKind> exp =
-            new DRealTerm<>(dreal.Divide(pParam1.getExpression(),
-            pParam2.getExpression()), pParam1.getType(), ExpressionKind.Div);
-        int roundedDouble = (int)Math.floor(Double.parseDouble(exp.to_string()));
-        return new DRealTerm<>(new Expression(roundedDouble), Variable.Type.INTEGER,
-            ExpressionKind.Constant);
+        double dParam1 = Double.parseDouble(pParam1.getExpression().to_string());
+        double dParam2 = Double.parseDouble(pParam2.getExpression().to_string());
+        int res = (int) (dParam1 / dParam2);
+        return new DRealTerm<>(new Expression(res), Variable.Type.INTEGER, ExpressionKind.Constant);
       }
       return new DRealTerm<>(dreal.Divide(pParam1.getExpression(), pParam2.getExpression()),
           pParam1.getType(), ExpressionKind.Div);
@@ -84,6 +82,8 @@ public class DReal4IntegerFormulaManager
     }
   }
 
+  // Use with caution, becaue of integer division. Integer division is not real integer division,
+  // therefore the results could be incorrect
   @Override
   protected DRealTerm<?, ?> modularCongruence(DRealTerm<?, ?> pNumber1, DRealTerm<?, ?> pNumber2,
                                            BigInteger pModulo) {
