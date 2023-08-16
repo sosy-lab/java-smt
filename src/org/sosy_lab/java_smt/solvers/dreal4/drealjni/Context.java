@@ -209,5 +209,4 @@ public class Context {
   public void declareVariables(Formula f) {
     drealJNI.Context_declareVariables(Context.getCPtr(this), Formula.getCPtr(f));
   }
-
 }

@@ -162,7 +162,7 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Variable.Type, C
 
   private Expression substituteExpWithResult(Expression exp, Variable var, Double res) {
     if (res.isNaN()) {
-      //result was "EMPTY"
+      // result was "EMPTY"
       return null;
     } else {
       exp = exp.Substitute(var, new Expression(res));
