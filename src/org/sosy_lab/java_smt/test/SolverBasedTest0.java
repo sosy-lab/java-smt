@@ -288,7 +288,14 @@ public abstract class SolverBasedTest0 {
     assume()
         .withMessage("Solver %s does not support parsing formulae", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2, Solvers.CVC5);
+        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2, Solvers.CVC5, Solvers.DREAL4);
+  }
+
+  protected void requireDumping() {
+    assume()
+        .withMessage("Solver %s does not support dumping a formulae", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.DREAL4);
   }
 
   protected void requireModel() {
@@ -309,7 +316,31 @@ public abstract class SolverBasedTest0 {
     assume()
         .withMessage("Solver %s does not support unsat core generation", solverToUse())
         .that(solverToUse())
-        .isNotEqualTo(Solvers.BOOLECTOR);
+        .isNoneOf(Solvers.BOOLECTOR, Solvers.DREAL4);
+  }
+
+  /** Skip test if solver does not support uninterpreted function. */
+  protected final void requireUF() {
+    assume()
+        .withMessage("Solver %s does not support uninterpreted function.", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.DREAL4);
+  }
+
+  /** Skip test if solver does not support exist quantifier. */
+  protected final void requireExistQuantifier() {
+    assume()
+        .withMessage("Solver %s does not support existential quantifier.", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.DREAL4);
+  }
+
+  /** Skip test if solver does not support floor operation. */
+  protected final void requireFloor() {
+    assume()
+        .withMessage("Solver %s does not support floor opertion.", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.DREAL4);
   }
 
   /**
