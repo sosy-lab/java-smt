@@ -1527,20 +1527,4 @@ public class drealJNI {
 
   public static final native void Formula_getFreeVariables(long set, long f);
 
-  // For debuging and testing
-
-  public static final native boolean Box_has_variable_0(long box, long var);
-
-  public static final native boolean CheckSatisfiability__SWIG_2(long formula);
-
-  public static final native boolean CheckSatisfiability__SWIG_3(
-      long formula, double delta, long box);
-
-  public static final native long Context_CheckSatBox(long jarg1);
-
-  public static final native void Context_Test();
-
-  public static final native void Context_TestCheckSat();
-
-  public static final native void satCheck();
 }

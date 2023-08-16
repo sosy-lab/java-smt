@@ -210,8 +210,4 @@ public class Context {
     drealJNI.Context_declareVariables(Context.getCPtr(this), Formula.getCPtr(f));
   }
 
-  // For Testing
-  public Box CheckSatBox() {
-    return new Box(drealJNI.Context_CheckSatBox(Context.getCPtr(this)), true);
-  }
 }

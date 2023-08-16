@@ -940,28 +940,4 @@ public class dreal {
       return bounds[0];
     }
   }
-
-  // Zum testen
-
-  public static boolean has_variable(Box box, Variable var) {
-    return drealJNI.Box_has_variable_0(Box.getCPtr(box), Variable.getCPtr(var));
-  }
-
-  public static boolean CheckSatisfiabilityTest(Formula f, double delta, Box box) {
-    System.out.println("Aufruf von Main und jetzt wird drealJNI und dann wrapper aufgerufen");
-    return drealJNI.CheckSatisfiability__SWIG_3(Formula.getCPtr(f), delta, Box.getCPtr(box));
-  }
-
-  public static void Test() {
-    drealJNI.Context_Test();
-  }
-  ;
-
-  public static void TestCheckSat() {
-    drealJNI.Context_TestCheckSat();
-  }
-
-  public static void satCheck() {
-    drealJNI.satCheck();
-  }
 }
