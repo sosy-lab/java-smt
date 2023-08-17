@@ -1530,5 +1530,5 @@ public final class DrealJNI {
 
   public static final native void expressionGetVariables(long set, long exp);
 
-  public static final native void formulaGetFreeVariables(long set, long f);
+  public static final native void formulaGetFreeVariables0(long set, long f);
 }

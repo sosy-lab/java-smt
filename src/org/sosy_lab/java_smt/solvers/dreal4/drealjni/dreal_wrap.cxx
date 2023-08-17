@@ -11912,7 +11912,7 @@ Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Expression_1getVar
 }
 
 SWIGEXPORT void JNICALL
-Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaGetFreeVariables(JNIEnv
+Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaGetFreeVariables0(JNIEnv
 *jenv, jclass jcls, jlong set, jlong f) {
   dreal::drake::symbolic::Formula *formula = (dreal::drake::symbolic::Formula *) 0;
   formula = *(dreal::drake::symbolic::Formula **)&f;
