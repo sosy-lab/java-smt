@@ -61,68 +61,69 @@ public class Variable {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        drealJNI.delete_Variable(swigCPtr);
+        DrealJNI.deleteVariable(swigCPtr);
       }
       swigCPtr = 0;
     }
   }
 
   public Variable(Variable arg0) {
-    this(drealJNI.new_Variable__SWIG_0(Variable.getCPtr(arg0), arg0), true);
+    this(DrealJNI.newVariableSWIG0(Variable.getCPtr(arg0), arg0), true);
   }
 
-  public Variable AssignOperator(Variable arg0) {
+  public Variable assignOperator(Variable arg0) {
     return new Variable(
-        drealJNI.Variable_AssignOperator__SWIG_0(swigCPtr, this, Variable.getCPtr(arg0), arg0),
+        DrealJNI.variableAssignOperatorSWIG0(swigCPtr, this, Variable.getCPtr(arg0), arg0),
         false);
   }
 
   public Variable() {
-    this(drealJNI.new_Variable__SWIG_1(), true);
+    this(DrealJNI.newVariableSWIG1(), true);
   }
 
   public Variable(String name, Variable.Type type) {
-    this(drealJNI.new_Variable__SWIG_2(name, type.swigValue()), true);
+    this(DrealJNI.newVariableSWIG2(name, type.swigValue()), true);
   }
 
   public Variable(String name) {
-    this(drealJNI.new_Variable__SWIG_3(name), true);
+    this(DrealJNI.newVariableSWIG3(name), true);
   }
 
   public Variable(String name, Variable.Type type, boolean model_variable) {
-    this(drealJNI.new_Variable__SWIG_4(name, type.swigValue(), model_variable), true);
+    this(DrealJNI.newVariableSWIG4(name, type.swigValue(), model_variable), true);
   }
 
-  public boolean is_dummy() {
-    return drealJNI.Variable_is_dummy(swigCPtr, this);
+  public boolean isDummy() {
+    return DrealJNI.variableIsDummy(swigCPtr, this);
   }
 
-  public long get_id() {
-    return drealJNI.Variable_get_id(swigCPtr, this);
+  public long getId() {
+    return DrealJNI.variableGetId(swigCPtr, this);
   }
 
-  public Variable.Type get_type() {
-    return Variable.Type.swigToEnum(drealJNI.Variable_get_type(swigCPtr, this));
+  public Variable.Type getType() {
+    return Variable.Type.swigToEnum(DrealJNI.variableGetType(swigCPtr, this));
   }
 
-  public long get_hash() {
-    return drealJNI.Variable_get_hash(swigCPtr, this);
+  public long getHash() {
+    return DrealJNI.variableGetHash(swigCPtr, this);
   }
 
-  public String get_name() {
-    return drealJNI.Variable_get_name(swigCPtr, this);
+  public String getName() {
+    return DrealJNI.variableGetName(swigCPtr, this);
   }
 
-  public String to_string() {
-    return drealJNI.Variable_to_string(swigCPtr, this);
+  @Override
+  public String toString() {
+    return DrealJNI.variableToString(swigCPtr, this);
   }
 
-  public boolean equal_to(Variable v) {
-    return drealJNI.Variable_equal_to(swigCPtr, this, Variable.getCPtr(v), v);
+  public boolean equalTo(Variable v) {
+    return DrealJNI.variableEqualTo(swigCPtr, this, Variable.getCPtr(v), v);
   }
 
   public boolean less(Variable v) {
-    return drealJNI.Variable_less(swigCPtr, this, Variable.getCPtr(v), v);
+    return DrealJNI.variableLess(swigCPtr, this, Variable.getCPtr(v), v);
   }
 
   public static final class Type {

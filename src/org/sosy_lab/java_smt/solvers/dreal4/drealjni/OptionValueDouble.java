@@ -61,49 +61,49 @@ public class OptionValueDouble {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        drealJNI.delete_OptionValueDouble(swigCPtr);
+        DrealJNI.deleteOptionValueDouble(swigCPtr);
       }
       swigCPtr = 0;
     }
   }
 
   public OptionValueDouble(double value) {
-    this(drealJNI.new_OptionValueDouble__SWIG_0(value), true);
+    this(DrealJNI.newOptionValueDoubleSWIG0(value), true);
   }
 
   public OptionValueDouble(OptionValueDouble arg0) {
-    this(drealJNI.new_OptionValueDouble__SWIG_1(OptionValueDouble.getCPtr(arg0), arg0), true);
+    this(DrealJNI.newOptionValueDoubleSWIG1(OptionValueDouble.getCPtr(arg0), arg0), true);
   }
 
-  public OptionValueDouble AssignOperator(OptionValueDouble arg0) {
+  public OptionValueDouble assignOperator(OptionValueDouble arg0) {
     return new OptionValueDouble(
-        drealJNI.OptionValueDouble_AssignOperator__SWIG_0(
+        DrealJNI.optionValueDoubleAssignOperatorSWIG0(
             swigCPtr, this, OptionValueDouble.getCPtr(arg0), arg0),
         false);
   }
 
-  public OptionValueDouble AssignOperator(double value) {
+  public OptionValueDouble assignOperator(double value) {
     return new OptionValueDouble(
-        drealJNI.OptionValueDouble_AssignOperator__SWIG_2(swigCPtr, this, value), false);
+        DrealJNI.optionValueDoubleAssignOperatorSWIG2(swigCPtr, this, value), false);
   }
 
-  public OptionValueDouble AssignOperator(SWIGTYPE_p_double value) {
+  public OptionValueDouble assignOperator(SwigTypePDouble value) {
     return new OptionValueDouble(
-        drealJNI.OptionValueDouble_AssignOperator__SWIG_3(
-            swigCPtr, this, SWIGTYPE_p_double.swigRelease(value)),
+        DrealJNI.optionValueDoubleAssignOperatorSWIG3(
+            swigCPtr, this, SwigTypePDouble.swigRelease(value)),
         false);
   }
 
   public double get() {
-    return drealJNI.OptionValueDouble_get(swigCPtr, this);
+    return DrealJNI.optionValueDoubleGet(swigCPtr, this);
   }
 
-  public void set_from_command_line(double value) {
-    drealJNI.OptionValueDouble_set_from_command_line(swigCPtr, this, value);
+  public void setFromCommandLine(double value) {
+    DrealJNI.optionValueDoubleSetFromCommandLine(swigCPtr, this, value);
   }
 
-  public void set_from_file(double value) {
-    drealJNI.OptionValueDouble_set_from_file(swigCPtr, this, value);
+  public void setFromFile(double value) {
+    DrealJNI.optionValueDoubleSetFromFile(swigCPtr, this, value);
   }
 
   public static final class Type {

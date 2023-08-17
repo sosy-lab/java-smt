@@ -62,7 +62,7 @@ public class ExpressionVector extends java.util.AbstractList<Expression>
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        drealJNI.delete_ExpressionVector(swigCPtr);
+        DrealJNI.deleteExpressionVector(swigCPtr);
       }
       swigCPtr = 0;
     }
@@ -125,61 +125,62 @@ public class ExpressionVector extends java.util.AbstractList<Expression>
   }
 
   public ExpressionVector() {
-    this(drealJNI.new_ExpressionVector__SWIG_0(), true);
+    this(DrealJNI.newExpressionVectorSWIG0(), true);
   }
 
   public ExpressionVector(ExpressionVector other) {
-    this(drealJNI.new_ExpressionVector__SWIG_1(ExpressionVector.getCPtr(other), other), true);
+    this(DrealJNI.newExpressionVectorSWIG1(ExpressionVector.getCPtr(other), other), true);
   }
 
   public long capacity() {
-    return drealJNI.ExpressionVector_capacity(swigCPtr, this);
+    return DrealJNI.expressionVectorCapacity(swigCPtr, this);
   }
 
   public void reserve(long n) {
-    drealJNI.ExpressionVector_reserve(swigCPtr, this, n);
+    DrealJNI.expressionVectorReserve(swigCPtr, this, n);
   }
 
   @Override
   public boolean isEmpty() {
-    return drealJNI.ExpressionVector_isEmpty(swigCPtr, this);
+    return DrealJNI.expressionVectorIsEmpty(swigCPtr, this);
   }
 
   @Override
   public void clear() {
-    drealJNI.ExpressionVector_clear(swigCPtr, this);
+    DrealJNI.expressionVectorClear(swigCPtr, this);
   }
 
   public ExpressionVector(int count, Expression value) {
-    this(drealJNI.new_ExpressionVector__SWIG_2(count, Expression.getCPtr(value), value), true);
+    this(DrealJNI.newExpressionVectorSWIG2(count, Expression.getCPtr(value), value), true);
   }
 
   private int doSize() {
-    return drealJNI.ExpressionVector_doSize(swigCPtr, this);
+    return DrealJNI.expressionVectorDoSize(swigCPtr, this);
   }
 
   private void doAdd(Expression x) {
-    drealJNI.ExpressionVector_doAdd__SWIG_0(swigCPtr, this, Expression.getCPtr(x), x);
+    DrealJNI.expressionVectorDoAddSWIG0(swigCPtr, this, Expression.getCPtr(x), x);
   }
 
   private void doAdd(int index, Expression x) {
-    drealJNI.ExpressionVector_doAdd__SWIG_1(swigCPtr, this, index, Expression.getCPtr(x), x);
+    DrealJNI.expressionVectorDoAddSWIG1(swigCPtr, this, index, Expression.getCPtr(x), x);
   }
 
   private Expression doRemove(int index) {
-    return new Expression(drealJNI.ExpressionVector_doRemove(swigCPtr, this, index), true);
+    return new Expression(DrealJNI.expressionVectorDoRemove(swigCPtr, this, index), true);
   }
 
   private Expression doGet(int index) {
-    return new Expression(drealJNI.ExpressionVector_doGet(swigCPtr, this, index), false);
+    return new Expression(DrealJNI.expressionVectorDoGet(swigCPtr, this, index), false);
   }
 
   private Expression doSet(int index, Expression val) {
     return new Expression(
-        drealJNI.ExpressionVector_doSet(swigCPtr, this, index, Expression.getCPtr(val), val), true);
+        DrealJNI.expressionVectorDoSet(swigCPtr, this, index, Expression.getCPtr(val), val),
+        true);
   }
 
   private void doRemoveRange(int fromIndex, int toIndex) {
-    drealJNI.ExpressionVector_doRemoveRange(swigCPtr, this, fromIndex, toIndex);
+    DrealJNI.expressionVectorDoRemoveRange(swigCPtr, this, fromIndex, toIndex);
   }
 }

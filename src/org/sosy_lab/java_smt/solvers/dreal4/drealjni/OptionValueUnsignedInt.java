@@ -61,48 +61,48 @@ public class OptionValueUnsignedInt {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        drealJNI.delete_OptionValueUnsignedInt(swigCPtr);
+        DrealJNI.deleteOptionValueUnsignedInt(swigCPtr);
       }
       swigCPtr = 0;
     }
   }
 
-  public OptionValueUnsignedInt(SWIGTYPE_p_uint32_t value) {
-    this(drealJNI.new_OptionValueUnsignedInt__SWIG_0(SWIGTYPE_p_uint32_t.getCPtr(value)), true);
+  public OptionValueUnsignedInt(SwigTypePUnit32T value) {
+    this(DrealJNI.newOptionValueUnsignedIntSWIG0(SwigTypePUnit32T.getCPtr(value)), true);
   }
 
   public OptionValueUnsignedInt(OptionValueUnsignedInt arg0) {
     this(
-        drealJNI.new_OptionValueUnsignedInt__SWIG_1(OptionValueUnsignedInt.getCPtr(arg0), arg0),
+        DrealJNI.newOptionValueUnsignedIntSWIG1(OptionValueUnsignedInt.getCPtr(arg0), arg0),
         true);
   }
 
-  public OptionValueUnsignedInt AssignOperator(OptionValueUnsignedInt arg0) {
+  public OptionValueUnsignedInt assignOperator(OptionValueUnsignedInt arg0) {
     return new OptionValueUnsignedInt(
-        drealJNI.OptionValueUnsignedInt_AssignOperator__SWIG_0(
+        DrealJNI.optionValueUnsignedIntAssignOperatorSWIG0(
             swigCPtr, this, OptionValueUnsignedInt.getCPtr(arg0), arg0),
         false);
   }
 
-  public OptionValueUnsignedInt AssignOperator(SWIGTYPE_p_uint32_t value) {
+  public OptionValueUnsignedInt assignOperator(SwigTypePUnit32T value) {
     return new OptionValueUnsignedInt(
-        drealJNI.OptionValueUnsignedInt_AssignOperator__SWIG_2(
-            swigCPtr, this, SWIGTYPE_p_uint32_t.getCPtr(value)),
+        DrealJNI.optionValueUnsignedIntAssignOperatorSWIG2(
+            swigCPtr, this, SwigTypePUnit32T.getCPtr(value)),
         false);
   }
 
-  public SWIGTYPE_p_uint32_t get() {
-    return new SWIGTYPE_p_uint32_t(drealJNI.OptionValueUnsignedInt_get(swigCPtr, this), false);
+  public SwigTypePUnit32T get() {
+    return new SwigTypePUnit32T(DrealJNI.optionValueUnsignedIntGet(swigCPtr, this), false);
   }
 
-  public void set_from_command_line(SWIGTYPE_p_uint32_t value) {
-    drealJNI.OptionValueUnsignedInt_set_from_command_line(
-        swigCPtr, this, SWIGTYPE_p_uint32_t.getCPtr(value));
+  public void setFromCommandLine(SwigTypePUnit32T value) {
+    DrealJNI.optionValueUnsignedIntSetFromCommandLine(
+        swigCPtr, this, SwigTypePUnit32T.getCPtr(value));
   }
 
-  public void set_from_file(SWIGTYPE_p_uint32_t value) {
-    drealJNI.OptionValueUnsignedInt_set_from_file(
-        swigCPtr, this, SWIGTYPE_p_uint32_t.getCPtr(value));
+  public void setFromFile(SwigTypePUnit32T value) {
+    DrealJNI.optionValueUnsignedIntSetFromFile(
+        swigCPtr, this, SwigTypePUnit32T.getCPtr(value));
   }
 
   public static final class Type {

@@ -61,7 +61,7 @@ public class SharedPointerToUnorderedMap {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        drealJNI.delete_SharedPointerToUnorderedMap(swigCPtr);
+        DrealJNI.deleteSharedPointerToUnorderedMap(swigCPtr);
       }
       swigCPtr = 0;
     }
@@ -69,6 +69,6 @@ public class SharedPointerToUnorderedMap {
 
   @SuppressWarnings("unused")
   public SharedPointerToUnorderedMap() {
-    this(drealJNI.new_SharedPointerToUnorderedMap(), true);
+    this(DrealJNI.newSharedPointerToUnorderedMap(), true);
   }
 }

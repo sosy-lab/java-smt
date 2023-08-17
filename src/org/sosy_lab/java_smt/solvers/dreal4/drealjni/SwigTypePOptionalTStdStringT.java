@@ -27,23 +27,23 @@
  * ----------------------------------------------------------------------------- */
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
-public class SWIGTYPE_p_optionalT_dreal__Box_t {
+public class SwigTypePOptionalTStdStringT {
   private transient long swigCPtr;
 
-  protected SWIGTYPE_p_optionalT_dreal__Box_t(
+  protected SwigTypePOptionalTStdStringT(
       long cPtr, @SuppressWarnings("unused") boolean futureUse) {
     swigCPtr = cPtr;
   }
 
-  protected SWIGTYPE_p_optionalT_dreal__Box_t() {
+  protected SwigTypePOptionalTStdStringT() {
     swigCPtr = 0;
   }
 
-  protected static long getCPtr(SWIGTYPE_p_optionalT_dreal__Box_t obj) {
+  protected static long getCPtr(SwigTypePOptionalTStdStringT obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
-  protected static long swigRelease(SWIGTYPE_p_optionalT_dreal__Box_t obj) {
+  protected static long swigRelease(SwigTypePOptionalTStdStringT obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 }

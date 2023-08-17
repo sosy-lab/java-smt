@@ -27,22 +27,22 @@
  * ----------------------------------------------------------------------------- */
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
-public class SWIGTYPE_p_uint32_t {
+public class SwigTypePBool {
   private transient long swigCPtr;
 
-  protected SWIGTYPE_p_uint32_t(long cPtr, @SuppressWarnings("unused") boolean futureUse) {
+  protected SwigTypePBool(long cPtr, @SuppressWarnings("unused") boolean futureUse) {
     swigCPtr = cPtr;
   }
 
-  protected SWIGTYPE_p_uint32_t() {
+  protected SwigTypePBool() {
     swigCPtr = 0;
   }
 
-  protected static long getCPtr(SWIGTYPE_p_uint32_t obj) {
+  protected static long getCPtr(SwigTypePBool obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
-  protected static long swigRelease(SWIGTYPE_p_uint32_t obj) {
+  protected static long swigRelease(SwigTypePBool obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 }

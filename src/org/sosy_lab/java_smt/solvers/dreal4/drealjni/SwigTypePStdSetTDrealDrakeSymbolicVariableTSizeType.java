@@ -27,30 +27,25 @@
  * ----------------------------------------------------------------------------- */
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
-public
-class SWIGTYPE_p_std__functionT_dreal__drake__symbolic__Formula_fdreal__drake__symbolic__Formula_const_RF_t {
+public class SwigTypePStdSetTDrealDrakeSymbolicVariableTSizeType {
   private transient long swigCPtr;
 
-  protected
-  SWIGTYPE_p_std__functionT_dreal__drake__symbolic__Formula_fdreal__drake__symbolic__Formula_const_RF_t(
+  protected SwigTypePStdSetTDrealDrakeSymbolicVariableTSizeType(
       long cPtr, @SuppressWarnings("unused") boolean futureUse) {
     swigCPtr = cPtr;
   }
 
-  protected
-  SWIGTYPE_p_std__functionT_dreal__drake__symbolic__Formula_fdreal__drake__symbolic__Formula_const_RF_t() {
+  protected SwigTypePStdSetTDrealDrakeSymbolicVariableTSizeType() {
     swigCPtr = 0;
   }
 
   protected static long getCPtr(
-      SWIGTYPE_p_std__functionT_dreal__drake__symbolic__Formula_fdreal__drake__symbolic__Formula_const_RF_t
-          obj) {
+      SwigTypePStdSetTDrealDrakeSymbolicVariableTSizeType obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
   protected static long swigRelease(
-      SWIGTYPE_p_std__functionT_dreal__drake__symbolic__Formula_fdreal__drake__symbolic__Formula_const_RF_t
-          obj) {
+      SwigTypePStdSetTDrealDrakeSymbolicVariableTSizeType obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 }

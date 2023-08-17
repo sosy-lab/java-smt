@@ -61,7 +61,7 @@ public class FormulaSet extends java.util.AbstractSet<Formula> {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        drealJNI.delete_FormulaSet(swigCPtr);
+        DrealJNI.deleteFormulaSet(swigCPtr);
       }
       swigCPtr = 0;
     }
@@ -202,70 +202,70 @@ public class FormulaSet extends java.util.AbstractSet<Formula> {
       if (swigCPtr != 0) {
         if (swigCMemOwn) {
           swigCMemOwn = false;
-          drealJNI.delete_FormulaSet_Iterator(swigCPtr);
+          DrealJNI.deleteFormulaSetIterator(swigCPtr);
         }
         swigCPtr = 0;
       }
     }
 
     private void incrementUnchecked() {
-      drealJNI.FormulaSet_Iterator_incrementUnchecked(swigCPtr, this);
+      DrealJNI.formulaSetIteratorIncrementUnchecked(swigCPtr, this);
     }
 
     private Formula derefUnchecked() {
-      return new Formula(drealJNI.FormulaSet_Iterator_derefUnchecked(swigCPtr, this), true);
+      return new Formula(DrealJNI.formulaSetIteratorDerefUnchecked(swigCPtr, this), true);
     }
 
     private boolean isNot(FormulaSet.Iterator other) {
-      return drealJNI.FormulaSet_Iterator_isNot(
+      return DrealJNI.formulaSetIteratorIsNot(
           swigCPtr, this, FormulaSet.Iterator.getCPtr(other), other);
     }
   }
 
   public FormulaSet() {
-    this(drealJNI.new_FormulaSet__SWIG_0(), true);
+    this(DrealJNI.newFormulaSetSWIG0(), true);
   }
 
   public FormulaSet(FormulaSet other) {
-    this(drealJNI.new_FormulaSet__SWIG_1(FormulaSet.getCPtr(other), other), true);
+    this(DrealJNI.newFormulaSetSWIG1(FormulaSet.getCPtr(other), other), true);
   }
 
   @Override
   public boolean isEmpty() {
-    return drealJNI.FormulaSet_isEmpty(swigCPtr, this);
+    return DrealJNI.formulaSetIsEmpty(swigCPtr, this);
   }
 
   @Override
   public void clear() {
-    drealJNI.FormulaSet_clear(swigCPtr, this);
+    DrealJNI.formulaSetClear(swigCPtr, this);
   }
 
   private FormulaSet.Iterator begin() {
-    return new FormulaSet.Iterator(drealJNI.FormulaSet_begin(swigCPtr, this), true);
+    return new FormulaSet.Iterator(DrealJNI.formulaSetBegin(swigCPtr, this), true);
   }
 
   private FormulaSet.Iterator end() {
-    return new FormulaSet.Iterator(drealJNI.FormulaSet_end(swigCPtr, this), true);
+    return new FormulaSet.Iterator(DrealJNI.formulaSetEnd(swigCPtr, this), true);
   }
 
   public boolean addImpl(Formula key) {
-    return drealJNI.FormulaSet_addImpl(swigCPtr, this, Formula.getCPtr(key), key);
+    return DrealJNI.formulaSetAddImpl(swigCPtr, this, Formula.getCPtr(key), key);
   }
 
   private boolean containsImpl(Formula key) {
-    return drealJNI.FormulaSet_containsImpl(swigCPtr, this, Formula.getCPtr(key), key);
+    return DrealJNI.formulaSetContainsImpl(swigCPtr, this, Formula.getCPtr(key), key);
   }
 
   private boolean removeImpl(Formula key) {
-    return drealJNI.FormulaSet_removeImpl(swigCPtr, this, Formula.getCPtr(key), key);
+    return DrealJNI.formulaSetRemoveImpl(swigCPtr, this, Formula.getCPtr(key), key);
   }
 
   private int sizeImpl() {
-    return drealJNI.FormulaSet_sizeImpl(swigCPtr, this);
+    return DrealJNI.formulaSetSizeImpl(swigCPtr, this);
   }
 
   @SuppressWarnings("unused")
   private boolean hasNextImpl(FormulaSet.Iterator itr) {
-    return drealJNI.FormulaSet_hasNextImpl(swigCPtr, this, FormulaSet.Iterator.getCPtr(itr), itr);
+    return DrealJNI.formulaSetHasNextImpl(swigCPtr, this, FormulaSet.Iterator.getCPtr(itr), itr);
   }
 }

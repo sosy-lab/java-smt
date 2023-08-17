@@ -62,43 +62,43 @@ public class Context {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        drealJNI.delete_Context(swigCPtr);
+        DrealJNI.deleteContext(swigCPtr);
       }
       swigCPtr = 0;
     }
   }
 
   public Context() {
-    this(drealJNI.new_Context__SWIG_0(), true);
+    this(DrealJNI.newContextSWIG0(), true);
   }
 
   public Context(Context context) {
-    this(drealJNI.new_Context__SWIG_1(Context.swigRelease(context), context), true);
+    this(DrealJNI.newContextSWIG1(Context.swigRelease(context), context), true);
   }
 
   public Context(Config config) {
-    this(drealJNI.new_Context__SWIG_2(Config.getCPtr(config), config), true);
+    this(DrealJNI.newContextSWIG2(Config.getCPtr(config), config), true);
   }
 
-  public void Assert(Formula f) {
-    drealJNI.Context_Assert(swigCPtr, this, Formula.getCPtr(f), f);
+  public void assertion(Formula f) {
+    DrealJNI.contextAssert(swigCPtr, this, Formula.getCPtr(f), f);
   }
 
-  public SWIGTYPE_p_optionalT_dreal__Box_t CheckSat() {
-    return new SWIGTYPE_p_optionalT_dreal__Box_t(drealJNI.Context_CheckSat(swigCPtr, this), true);
+  public SwigTypePOptionalTDrealBoxT checkSat() {
+    return new SwigTypePOptionalTDrealBoxT(DrealJNI.contextCheckSat(swigCPtr, this), true);
   }
 
-  public void DeclareVariable(Variable v, boolean is_model_variable) {
-    drealJNI.Context_DeclareVariable__SWIG_0(
+  public void declareVariable(Variable v, boolean is_model_variable) {
+    DrealJNI.contextDeclareVariableSWIG0(
         swigCPtr, this, Variable.getCPtr(v), v, is_model_variable);
   }
 
-  public void DeclareVariable(Variable v) {
-    drealJNI.Context_DeclareVariable__SWIG_1(swigCPtr, this, Variable.getCPtr(v), v);
+  public void declareVariable(Variable v) {
+    DrealJNI.contextDeclareVariableSWIG1(swigCPtr, this, Variable.getCPtr(v), v);
   }
 
-  public void DeclareVariable(Variable v, Expression lb, Expression ub, boolean is_model_variable) {
-    drealJNI.Context_DeclareVariable__SWIG_2(
+  public void declareVariable(Variable v, Expression lb, Expression ub, boolean is_model_variable) {
+    DrealJNI.contextDeclareVariableSWIG2(
         swigCPtr,
         this,
         Variable.getCPtr(v),
@@ -110,8 +110,8 @@ public class Context {
         is_model_variable);
   }
 
-  public void DeclareVariable(Variable v, Expression lb, Expression ub) {
-    drealJNI.Context_DeclareVariable__SWIG_3(
+  public void declareVariable(Variable v, Expression lb, Expression ub) {
+    DrealJNI.contextDeclareVariableSWIG3(
         swigCPtr,
         this,
         Variable.getCPtr(v),
@@ -122,91 +122,91 @@ public class Context {
         ub);
   }
 
-  public static void Exit() {
-    drealJNI.Context_Exit();
+  public static void exit() {
+    DrealJNI.contextExit();
   }
 
-  public void Minimize(Expression f) {
-    drealJNI.Context_Minimize__SWIG_0(swigCPtr, this, Expression.getCPtr(f), f);
+  public void minimize(Expression f) {
+    DrealJNI.contextMinimizeSWIG0(swigCPtr, this, Expression.getCPtr(f), f);
   }
 
-  public void Minimize(ExpressionVector functions) {
-    drealJNI.Context_Minimize__SWIG_1(
+  public void minimize(ExpressionVector functions) {
+    DrealJNI.contextMinimizeSWIG1(
         swigCPtr, this, ExpressionVector.getCPtr(functions), functions);
   }
 
-  public void Maximize(Expression f) {
-    drealJNI.Context_Maximize(swigCPtr, this, Expression.getCPtr(f), f);
+  public void maximize(Expression f) {
+    DrealJNI.contextMaximize(swigCPtr, this, Expression.getCPtr(f), f);
   }
 
-  public void Pop(int n) {
-    drealJNI.Context_Pop(swigCPtr, this, n);
+  public void pop(int n) {
+    DrealJNI.contextPop(swigCPtr, this, n);
   }
 
-  public void Push(int n) {
-    drealJNI.Context_Push(swigCPtr, this, n);
+  public void push(int n) {
+    DrealJNI.contextPush(swigCPtr, this, n);
   }
 
-  public void SetInfo(String key, double val) {
-    drealJNI.Context_SetInfo__SWIG_0(swigCPtr, this, key, val);
+  public void setInfo(String key, double val) {
+    DrealJNI.contextSetInfoSWIG0(swigCPtr, this, key, val);
   }
 
-  public void SetInfo(String key, String val) {
-    drealJNI.Context_SetInfo__SWIG_1(swigCPtr, this, key, val);
+  public void setInfo(String key, String val) {
+    DrealJNI.contextSetInfoSWIG1(swigCPtr, this, key, val);
   }
 
-  public void SetInterval(Variable v, double lb, double ub) {
-    drealJNI.Context_SetInterval(swigCPtr, this, Variable.getCPtr(v), v, lb, ub);
+  public void setInterval(Variable v, double lb, double ub) {
+    DrealJNI.contextSetInterval(swigCPtr, this, Variable.getCPtr(v), v, lb, ub);
   }
 
-  public void SetLogic(Logic logic) {
-    drealJNI.Context_SetLogic(swigCPtr, this, logic.swigValue());
+  public void setLogic(Logic logic) {
+    DrealJNI.contextSetLogic(swigCPtr, this, logic.swigValue());
   }
 
-  public void SetOption(String key, double val) {
-    drealJNI.Context_SetOption__SWIG_0(swigCPtr, this, key, val);
+  public void setOption(String key, double val) {
+    DrealJNI.contextSetOptionSWIG0(swigCPtr, this, key, val);
   }
 
-  public void SetOption(String key, String val) {
-    drealJNI.Context_SetOption__SWIG_1(swigCPtr, this, key, val);
+  public void setOption(String key, String val) {
+    DrealJNI.contextSetOptionSWIG1(swigCPtr, this, key, val);
   }
 
-  public SWIGTYPE_p_optionalT_std__string_t GetOption(String key) {
-    return new SWIGTYPE_p_optionalT_std__string_t(
-        drealJNI.Context_GetOption(swigCPtr, this, key), true);
+  public SwigTypePOptionalTStdStringT getOption(String key) {
+    return new SwigTypePOptionalTStdStringT(
+        DrealJNI.contextGetOption(swigCPtr, this, key), true);
   }
 
   public Config config() {
-    return new Config(drealJNI.Context_config(swigCPtr, this), false);
+    return new Config(DrealJNI.contextConfig(swigCPtr, this), false);
   }
 
-  public Config mutable_config() {
-    return new Config(drealJNI.Context_mutable_config(swigCPtr, this), false);
+  public Config mutableConfig() {
+    return new Config(DrealJNI.contextMutableConfig(swigCPtr, this), false);
   }
 
   public static String version() {
-    return drealJNI.Context_version();
+    return DrealJNI.contextVersion();
   }
 
-  public SWIGTYPE_p_ScopedVectorT_dreal__drake__symbolic__Formula_t assertions() {
-    return new SWIGTYPE_p_ScopedVectorT_dreal__drake__symbolic__Formula_t(
-        drealJNI.Context_assertions(swigCPtr, this), false);
+  public SwigTypePScopedVectorTDrealDrakeSymbolicFormulaT assertions() {
+    return new SwigTypePScopedVectorTDrealDrakeSymbolicFormulaT(
+        DrealJNI.contextAssertions(swigCPtr, this), false);
   }
 
   public Box box() {
-    return new Box(drealJNI.Context_box(swigCPtr, this), false);
+    return new Box(DrealJNI.contextBox(swigCPtr, this), false);
   }
 
   public Box get_model() {
-    return new Box(drealJNI.Context_get_model(swigCPtr, this), false);
+    return new Box(DrealJNI.contextGetModel(swigCPtr, this), false);
   }
 
   // self written
-  public boolean CheckSat(Box box) {
-    return drealJNI.Context_CheckSat_0(Context.getCPtr(this), Box.getCPtr(box));
+  public boolean checkSat(Box box) {
+    return DrealJNI.contextCheckSat0(Context.getCPtr(this), Box.getCPtr(box));
   }
 
   public void declareVariables(Formula f) {
-    drealJNI.Context_declareVariables(Context.getCPtr(this), Formula.getCPtr(f));
+    DrealJNI.contextDeclareVariables(Context.getCPtr(this), Formula.getCPtr(f));
   }
 }

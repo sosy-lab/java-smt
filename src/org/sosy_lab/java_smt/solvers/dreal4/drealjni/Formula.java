@@ -61,152 +61,153 @@ public class Formula {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        drealJNI.delete_Formula(swigCPtr);
+        DrealJNI.deleteFormula(swigCPtr);
       }
       swigCPtr = 0;
     }
   }
 
   public Formula() {
-    this(drealJNI.new_Formula__SWIG_0(), true);
+    this(DrealJNI.newFormulaSWIG0(), true);
   }
 
   public Formula(Formula arg0) {
-    this(drealJNI.new_Formula__SWIG_1(Formula.getCPtr(arg0), arg0), true);
+    this(DrealJNI.newFormulaSWIG1(Formula.getCPtr(arg0), arg0), true);
   }
 
-  public Formula AssignOperator(Formula arg0) {
+  public Formula assignOperator(Formula arg0) {
     return new Formula(
-        drealJNI.Formula_AssignOperator__SWIG_0(swigCPtr, this, Formula.getCPtr(arg0), arg0),
+        DrealJNI.formulaAssignOperatorSWIG0(swigCPtr, this, Formula.getCPtr(arg0), arg0),
         false);
   }
 
   public Formula(Variable var) {
-    this(drealJNI.new_Formula__SWIG_2(Variable.getCPtr(var), var), true);
+    this(DrealJNI.newFormulaSWIG2(Variable.getCPtr(var), var), true);
   }
 
-  public FormulaKind get_kind() {
-    return FormulaKind.swigToEnum(drealJNI.Formula_get_kind(swigCPtr, this));
+  public FormulaKind getKind() {
+    return FormulaKind.swigToEnum(DrealJNI.formulaGetKind(swigCPtr, this));
   }
 
-  public long get_hash() {
-    return drealJNI.Formula_get_hash(swigCPtr, this);
+  public long getHash() {
+    return DrealJNI.formulaGetHash(swigCPtr, this);
   }
 
-  public Variables GetFreeVariables() {
-    return new Variables(drealJNI.Formula_GetFreeVariables(swigCPtr, this), false);
+  public Variables variableGetFreeVariables() {
+    return new Variables(DrealJNI.formulaGetFreeVariables(swigCPtr, this), false);
   }
 
-  public boolean EqualTo(Formula f) {
-    return drealJNI.Formula_EqualTo(swigCPtr, this, Formula.getCPtr(f), f);
+  public boolean equalTo(Formula f) {
+    return DrealJNI.formulaEqualTo(swigCPtr, this, Formula.getCPtr(f), f);
   }
 
-  public boolean Less(Formula f) {
-    return drealJNI.Formula_Less(swigCPtr, this, Formula.getCPtr(f), f);
+  public boolean less(Formula f) {
+    return DrealJNI.formulaLess(swigCPtr, this, Formula.getCPtr(f), f);
   }
 
-  public boolean Evaluate(Environment env) {
-    return drealJNI.Formula_Evaluate__SWIG_0(swigCPtr, this, Environment.getCPtr(env), env);
+  public boolean evaluate(Environment env) {
+    return DrealJNI.formulaEvaluateSWIG0(swigCPtr, this, Environment.getCPtr(env), env);
   }
 
-  public boolean Evaluate() {
-    return drealJNI.Formula_Evaluate__SWIG_1(swigCPtr, this);
+  public boolean evaluate() {
+    return DrealJNI.formulaEvaluateSWIG1(swigCPtr, this);
   }
 
-  public Formula Substitute(Variable var, Expression e) {
+  public Formula substitute(Variable var, Expression e) {
     return new Formula(
-        drealJNI.Formula_Substitute__SWIG_0(
+        DrealJNI.formulaSubstituteSWIG0(
             swigCPtr, this, Variable.getCPtr(var), var, Expression.getCPtr(e), e),
         true);
   }
 
-  public Formula Substitute(Variable var, Formula f) {
+  public Formula substitute(Variable var, Formula f) {
     return new Formula(
-        drealJNI.Formula_Substitute__SWIG_1(
+        DrealJNI.formulaSubstituteSWIG1(
             swigCPtr, this, Variable.getCPtr(var), var, Formula.getCPtr(f), f),
         true);
   }
 
-  public Formula Substitute(
-      SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Expression_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t
+  public Formula substitute(
+      SwigTypePStdUnorderedMapTDrealDrakeSymbolicVariableDrealDrakeSymbolicExpressionDrealDrakeHashValueTDrealDrakeSymbolicVariable
           expr_subst,
-      SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Formula_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t
+      SwigTypePStdUnorderedMapTDrealDrakeSymbolicVariableDrealDrakeSymbolicFormulaDrealDdrakeHashValueTDrealDrakeSymbolicVariable
           formula_subst) {
     return new Formula(
-        drealJNI.Formula_Substitute__SWIG_2(
+        DrealJNI.formulaSubstituteSWIG2(
             swigCPtr,
             this,
-            SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Expression_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t
+            SwigTypePStdUnorderedMapTDrealDrakeSymbolicVariableDrealDrakeSymbolicExpressionDrealDrakeHashValueTDrealDrakeSymbolicVariable
                 .getCPtr(expr_subst),
-            SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Formula_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t
+            SwigTypePStdUnorderedMapTDrealDrakeSymbolicVariableDrealDrakeSymbolicFormulaDrealDdrakeHashValueTDrealDrakeSymbolicVariable
                 .getCPtr(formula_subst)),
         true);
   }
 
-  public Formula Substitute(
-      SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Expression_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t
+  public Formula substitute(
+      SwigTypePStdUnorderedMapTDrealDrakeSymbolicVariableDrealDrakeSymbolicExpressionDrealDrakeHashValueTDrealDrakeSymbolicVariable
           expr_subst) {
     return new Formula(
-        drealJNI.Formula_Substitute__SWIG_3(
+        DrealJNI.formulaSubstituteSWIG3(
             swigCPtr,
             this,
-            SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Expression_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t
+            SwigTypePStdUnorderedMapTDrealDrakeSymbolicVariableDrealDrakeSymbolicExpressionDrealDrakeHashValueTDrealDrakeSymbolicVariable
                 .getCPtr(expr_subst)),
         true);
   }
 
-  public Formula Substitute(
-      SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Formula_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t
+  public Formula substitute(
+      SwigTypePStdUnorderedMapTDrealDrakeSymbolicVariableDrealDrakeSymbolicFormulaDrealDdrakeHashValueTDrealDrakeSymbolicVariable
           formula_subst) {
     return new Formula(
-        drealJNI.Formula_Substitute__SWIG_4(
+        DrealJNI.formulaSubstituteSWIG4(
             swigCPtr,
             this,
-            SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Formula_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t
+            SwigTypePStdUnorderedMapTDrealDrakeSymbolicVariableDrealDrakeSymbolicFormulaDrealDdrakeHashValueTDrealDrakeSymbolicVariable
                 .getCPtr(formula_subst)),
         true);
   }
 
-  public String to_string() {
-    return drealJNI.Formula_to_string(swigCPtr, this);
+  @Override
+  public String toString() {
+    return DrealJNI.formulaToString(swigCPtr, this);
   }
 
-  public static Formula True() {
-    return new Formula(drealJNI.Formula_True(), true);
+  public static Formula formulaTrue() {
+    return new Formula(DrealJNI.formulaTrue(), true);
   }
 
-  public static Formula False() {
-    return new Formula(drealJNI.Formula_False(), true);
+  public static Formula formulaFalse() {
+    return new Formula(DrealJNI.formulaFalse(), true);
   }
 
-  public boolean BoolOperator() {
-    return drealJNI.Formula_BoolOperator(swigCPtr, this);
+  public boolean boolOperator() {
+    return DrealJNI.formulaBoolOperator(swigCPtr, this);
   }
 
-  public static Formula make_conjunction(Formula f1, Formula f2) {
+  public static Formula makeConjunction(Formula f1, Formula f2) {
     return new Formula(
-        drealJNI.Formula_make_conjunction(Formula.getCPtr(f1), f1, Formula.getCPtr(f2), f2), true);
+        DrealJNI.formulaMakeConjunction(Formula.getCPtr(f1), f1, Formula.getCPtr(f2), f2), true);
   }
 
-  public static Formula make_disjunction(Formula f1, Formula f2) {
+  public static Formula makeDisjunction(Formula f1, Formula f2) {
     return new Formula(
-        drealJNI.Formula_make_disjunction(Formula.getCPtr(f1), f1, Formula.getCPtr(f2), f2), true);
+        DrealJNI.formulaMakeDisjunction(Formula.getCPtr(f1), f1, Formula.getCPtr(f2), f2), true);
   }
 
-  public boolean include_ite() {
-    return drealJNI.Formula_include_ite(swigCPtr, this);
+  public boolean includeIte() {
+    return DrealJNI.formulaIncludeIte(swigCPtr, this);
   }
 
   // self written
   public VariableSet getQuantifiedVariables() {
     VariableSet set = new VariableSet();
-    drealJNI.Formula_getQuantifiedVariables(VariableSet.getCPtr(set), Formula.getCPtr(this));
+    DrealJNI.formulaGetQuantifiedVariables(VariableSet.getCPtr(set), Formula.getCPtr(this));
     return set;
   }
 
   public VariableSet getFreeVariables() {
     VariableSet set = new VariableSet();
-    drealJNI.Formula_getFreeVariables(VariableSet.getCPtr(set), Formula.getCPtr(this));
+    DrealJNI.formulaGetFreeVariables0(VariableSet.getCPtr(set), Formula.getCPtr(this));
     return set;
   }
 }

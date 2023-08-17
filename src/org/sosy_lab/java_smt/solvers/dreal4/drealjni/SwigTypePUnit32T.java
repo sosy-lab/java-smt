@@ -27,22 +27,22 @@
  * ----------------------------------------------------------------------------- */
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
-public class SWIGTYPE_p_std__ostream {
+public class SwigTypePUnit32T {
   private transient long swigCPtr;
 
-  protected SWIGTYPE_p_std__ostream(long cPtr, @SuppressWarnings("unused") boolean futureUse) {
+  protected SwigTypePUnit32T(long cPtr, @SuppressWarnings("unused") boolean futureUse) {
     swigCPtr = cPtr;
   }
 
-  protected SWIGTYPE_p_std__ostream() {
+  protected SwigTypePUnit32T() {
     swigCPtr = 0;
   }
 
-  protected static long getCPtr(SWIGTYPE_p_std__ostream obj) {
+  protected static long getCPtr(SwigTypePUnit32T obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
-  protected static long swigRelease(SWIGTYPE_p_std__ostream obj) {
+  protected static long swigRelease(SwigTypePUnit32T obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 }

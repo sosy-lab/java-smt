@@ -61,268 +61,266 @@ public class Config {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        drealJNI.delete_Config(swigCPtr);
+        DrealJNI.deleteConfig(swigCPtr);
       }
       swigCPtr = 0;
     }
   }
 
   public Config() {
-    this(drealJNI.new_Config__SWIG_0(), true);
+    this(DrealJNI.newConfigSWIG0(), true);
   }
 
   public Config(Config arg0) {
-    this(drealJNI.new_Config__SWIG_1(Config.getCPtr(arg0), arg0), true);
+    this(DrealJNI.newConfigSWIG1(Config.getCPtr(arg0), arg0), true);
   }
 
-  public Config AssignOperator(Config arg0) {
+  public Config assignOperator(Config arg0) {
     return new Config(
-        drealJNI.Config_AssignOperator__SWIG_0(swigCPtr, this, Config.getCPtr(arg0), arg0), false);
+        DrealJNI.configAssignOperatorSWIG0(swigCPtr, this, Config.getCPtr(arg0), arg0), false);
   }
 
   public double precision() {
-    return drealJNI.Config_precision(swigCPtr, this);
+    return DrealJNI.configPrecision(swigCPtr, this);
   }
 
-  public OptionValueDouble mutable_precision() {
-    return new OptionValueDouble(drealJNI.Config_mutable_precision(swigCPtr, this), false);
+  public OptionValueDouble mutablePrecision() {
+    return new OptionValueDouble(DrealJNI.configMutablePrecision(swigCPtr, this), false);
   }
 
-  public void mutable_precision(double value) {
-    drealJNI.Config_mutable_precision_0(value, Config.getCPtr(this));
+  public void mutablePrecision(double value) {
+    DrealJNI.configMutablePrecision0(value, Config.getCPtr(this));
   }
 
-  public boolean produce_models() {
-    return drealJNI.Config_produce_models(swigCPtr, this);
+  public boolean produceModels() {
+    return DrealJNI.configProduceModels(swigCPtr, this);
   }
 
-  public OptionValueBool mutable_produce_models() {
-    return new OptionValueBool(drealJNI.Config_mutable_produce_models(swigCPtr, this), false);
+  public OptionValueBool mutableProduceModels() {
+    return new OptionValueBool(DrealJNI.configMutableProduceModels(swigCPtr, this), false);
   }
 
-  public void mutable_produce_models(boolean bool) {
-    drealJNI.Config_mutable_produce_models_0(bool, Config.getCPtr(this));
+  public void mutableProduceModels(boolean bool) {
+    DrealJNI.configMutableProduceModels0(bool, Config.getCPtr(this));
   }
 
-  public boolean use_polytope() {
-    return drealJNI.Config_use_polytope(swigCPtr, this);
+  public boolean usePolytope() {
+    return DrealJNI.configUsePolytope(swigCPtr, this);
   }
 
-  public OptionValueBool mutable_use_polytope() {
-    return new OptionValueBool(drealJNI.Config_mutable_use_polytope(swigCPtr, this), false);
+  public OptionValueBool mutableUsePolytope() {
+    return new OptionValueBool(DrealJNI.configMutableUsePolytope(swigCPtr, this), false);
   }
 
-  public void mutable_use_polytope(boolean bool) {
-    drealJNI.Config_mutable_use_polytope_0(bool, Config.getCPtr(this));
+  public void mutableUsePolytope(boolean bool) {
+    DrealJNI.configMutableUsePolytope0(bool, Config.getCPtr(this));
   }
 
-  public boolean use_polytope_in_forall() {
-    return drealJNI.Config_use_polytope_in_forall(swigCPtr, this);
+  public boolean usePpolytopeInForall() {
+    return DrealJNI.configUsePolytopeInForall(swigCPtr, this);
   }
 
-  public OptionValueBool mutable_use_polytope_in_forall() {
+  public OptionValueBool mutableUsePolytopeInForall() {
     return new OptionValueBool(
-        drealJNI.Config_mutable_use_polytope_in_forall(swigCPtr, this), false);
+        DrealJNI.configMutableUsePolytopeInForall(swigCPtr, this), false);
   }
 
-  public void mutable_use_polytope_in_forall(boolean bool) {
-    drealJNI.Config_mutable_use_polytope_in_forall_0(bool, Config.getCPtr(this));
+  public void mutableUsePolytopeInForall(boolean bool) {
+    DrealJNI.configMutableUsePolytopeInForall0(bool, Config.getCPtr(this));
   }
 
-  public boolean use_worklist_fixpoint() {
-    return drealJNI.Config_use_worklist_fixpoint(swigCPtr, this);
+  public boolean useWorklistFixpoint() {
+    return DrealJNI.configUseWorklistFixpoint(swigCPtr, this);
   }
 
-  public OptionValueBool mutable_use_worklist_fixpoint() {
+  public OptionValueBool mutableUseWorklistFixpoint() {
     return new OptionValueBool(
-        drealJNI.Config_mutable_use_worklist_fixpoint(swigCPtr, this), false);
+        DrealJNI.configMutableUseWorklistFixpoint(swigCPtr, this), false);
   }
 
-  public void mutable_use_worklist_fixpoint(boolean bool) {
-    drealJNI.Config_mutable_use_worklist_fixpoint_0(bool, Config.getCPtr(this));
+  public void mutableUseWorklistFixpoint(boolean bool) {
+    DrealJNI.configMutableUseWorklistFixpoint0(bool, Config.getCPtr(this));
   }
 
-  public boolean use_local_optimization() {
-    return drealJNI.Config_use_local_optimization(swigCPtr, this);
+  public boolean useLocalOtimization() {
+    return DrealJNI.configUseLocalOptimization(swigCPtr, this);
   }
 
-  public OptionValueBool mutable_use_local_optimization() {
+  public OptionValueBool mutableUseLocalOptimization() {
     return new OptionValueBool(
-        drealJNI.Config_mutable_use_local_optimization(swigCPtr, this), false);
+        DrealJNI.configMutableUseLocalOptimization(swigCPtr, this), false);
   }
 
-  public void mutable_use_local_optimization(boolean bool) {
-    drealJNI.Config_mutable_use_local_optimization_0(bool, Config.getCPtr(this));
+  public void mutableUseLocalOptimization(boolean bool) {
+    DrealJNI.configMutableUseLocalOptimization0(bool, Config.getCPtr(this));
   }
 
-  public boolean dump_theory_literals() {
-    return drealJNI.Config_dump_theory_literals(swigCPtr, this);
+  public boolean dumpTheoryLiterals() {
+    return DrealJNI.configDumpTheoryLiterals(swigCPtr, this);
   }
 
-  public OptionValueBool mutable_dump_theory_literals() {
-    return new OptionValueBool(drealJNI.Config_mutable_dump_theory_literals(swigCPtr, this), false);
+  public OptionValueBool mutableDumpTheoryLiterals() {
+    return new OptionValueBool(DrealJNI.configMutableDumpTheoryLiterals(swigCPtr, this), false);
   }
 
-  public void mutable_dump_theory_literals(boolean bool) {
-    drealJNI.Config_mutable_dump_theory_literals_0(bool, Config.getCPtr(this));
+  public void mutableDumpTheoryLiterals(boolean bool) {
+    DrealJNI.configMutableDumpTheoryLiterals0(bool, Config.getCPtr(this));
   }
 
-  public int number_of_jobs() {
-    return drealJNI.Config_number_of_jobs(swigCPtr, this);
+  public int numberOfJobs() {
+    return DrealJNI.configNumberOfJobs(swigCPtr, this);
   }
 
-  public OptionValueInt mutable_number_of_jobs() {
-    return new OptionValueInt(drealJNI.Config_mutable_number_of_jobs(swigCPtr, this), false);
+  public OptionValueInt mutableNumberOfJobs() {
+    return new OptionValueInt(DrealJNI.configMutableNumberOfJobs(swigCPtr, this), false);
   }
 
-  public void mutable_number_of_jobs(int i) {
-    drealJNI.Config_mutable_number_of_jobs_0(i, Config.getCPtr(this));
+  public void mutableNumberOfJobs(int i) {
+    DrealJNI.configMutableNumberOfJobs0(i, Config.getCPtr(this));
   }
 
-  public boolean stack_left_box_first() {
-    return drealJNI.Config_stack_left_box_first(swigCPtr, this);
+  public boolean stackLeftBoxFirst() {
+    return DrealJNI.configStackLeftBoxFirst(swigCPtr, this);
   }
 
-  public OptionValueBool mutable_stack_left_box_first() {
-    return new OptionValueBool(drealJNI.Config_mutable_stack_left_box_first(swigCPtr, this), false);
+  public OptionValueBool mutableStackLeftBoxFirst() {
+    return new OptionValueBool(DrealJNI.configMutableStackLeftBoxFirst(swigCPtr, this), false);
   }
 
-  public void mutable_stack_left_box_first(boolean bool) {
-    drealJNI.Config_mutable_stack_left_box_first_0(bool, Config.getCPtr(this));
+  public void mutableStackLeftBoxFirst(boolean bool) {
+    DrealJNI.configMutableStackLeftBoxFirst0(bool, Config.getCPtr(this));
   }
 
-  public
-  SWIGTYPE_p_std__functionT_int_fdreal__Box_const_R_DynamicBitset_const_R_dreal__Box_p_dreal__Box_pF_t
+  public SwigTypePStdFunctionTIntFDrealBoxConstRDynamicBitsetConstRDrealBoxPDrealBoxpFT
       brancher() {
-    return new SWIGTYPE_p_std__functionT_int_fdreal__Box_const_R_DynamicBitset_const_R_dreal__Box_p_dreal__Box_pF_t(
-        drealJNI.Config_brancher(swigCPtr, this), false);
+    return new SwigTypePStdFunctionTIntFDrealBoxConstRDynamicBitsetConstRDrealBoxPDrealBoxpFT(
+        DrealJNI.configBrancher(swigCPtr, this), false);
   }
 
-  public
-  SWIGTYPE_p_dreal__OptionValueT_std__functionT_int_fdreal__Box_const_R_DynamicBitset_const_R_dreal__Box_p_dreal__Box_pF_t_t
-      mutable_brancher() {
-    return new SWIGTYPE_p_dreal__OptionValueT_std__functionT_int_fdreal__Box_const_R_DynamicBitset_const_R_dreal__Box_p_dreal__Box_pF_t_t(
-        drealJNI.Config_mutable_brancher(swigCPtr, this), false);
+  public SwigTypePDrealOptionValueTStdFunctionTIntFDrealBoxConstRDynamicBitsetConstRDrealBoxPDrealBoxPFTT
+      mutableBrancher() {
+    return new SwigTypePDrealOptionValueTStdFunctionTIntFDrealBoxConstRDynamicBitsetConstRDrealBoxPDrealBoxPFTT(
+        DrealJNI.configMutableBrancher(swigCPtr, this), false);
   }
 
-  public double nlopt_ftol_rel() {
-    return drealJNI.Config_nlopt_ftol_rel(swigCPtr, this);
+  public double nloptFtolRel() {
+    return DrealJNI.configNloptFtolRel(swigCPtr, this);
   }
 
-  public OptionValueDouble mutable_nlopt_ftol_rel() {
-    return new OptionValueDouble(drealJNI.Config_mutable_nlopt_ftol_rel(swigCPtr, this), false);
+  public OptionValueDouble mutableNloptFtolRel() {
+    return new OptionValueDouble(DrealJNI.configMutableNloptFtolRel(swigCPtr, this), false);
   }
 
-  public void mutable_nlopt_ftol_rel(double value) {
-    drealJNI.Config_mutable_nlopt_ftol_rel_0(value, Config.getCPtr(this));
+  public void mutableNloptFtolRel(double value) {
+    DrealJNI.configMutableNloptFtolRel0(value, Config.getCPtr(this));
   }
 
-  public double nlopt_ftol_abs() {
-    return drealJNI.Config_nlopt_ftol_abs(swigCPtr, this);
+  public double nloptFtolAbs() {
+    return DrealJNI.configNloptFtolAbs(swigCPtr, this);
   }
 
-  public OptionValueDouble mutable_nlopt_ftol_abs() {
-    return new OptionValueDouble(drealJNI.Config_mutable_nlopt_ftol_abs(swigCPtr, this), false);
+  public OptionValueDouble mutableNloptFtolAbs() {
+    return new OptionValueDouble(DrealJNI.configMutableNloptFtolAbs(swigCPtr, this), false);
   }
 
-  public void mutable_nlopt_ftol_abs(double value) {
-    drealJNI.Config_mutable_nlopt_ftol_abs_0(value, Config.getCPtr(this));
+  public void mutableNloptFtolAbs(double value) {
+    DrealJNI.configMutableNloptFtolAbs0(value, Config.getCPtr(this));
   }
 
-  public int nlopt_maxeval() {
-    return drealJNI.Config_nlopt_maxeval(swigCPtr, this);
+  public int nloptMaxeval() {
+    return DrealJNI.configNloptMaxeval(swigCPtr, this);
   }
 
-  public OptionValueInt mutable_nlopt_maxeval() {
-    return new OptionValueInt(drealJNI.Config_mutable_nlopt_maxeval(swigCPtr, this), false);
+  public OptionValueInt mutableNloptMaxeval() {
+    return new OptionValueInt(DrealJNI.configMutableNloptMaxeval(swigCPtr, this), false);
   }
 
-  public void mutable_nlopt_maxeval(int i) {
-    drealJNI.Config_mutable_nlopt_maxeval_0(i, Config.getCPtr(this));
+  public void mutableNloptMaxeval(int i) {
+    DrealJNI.configMutableNloptMaxeval0(i, Config.getCPtr(this));
   }
 
-  public double nlopt_maxtime() {
-    return drealJNI.Config_nlopt_maxtime(swigCPtr, this);
+  public double nloptMaxtime() {
+    return DrealJNI.configNloptMaxtime(swigCPtr, this);
   }
 
-  public OptionValueDouble mutable_nlopt_maxtime() {
-    return new OptionValueDouble(drealJNI.Config_mutable_nlopt_maxtime(swigCPtr, this), false);
+  public OptionValueDouble mutableNloptMaxtime() {
+    return new OptionValueDouble(DrealJNI.configMutableNloptMaxtime(swigCPtr, this), false);
   }
 
-  public void mutable_nlopt_maxtime(double value) {
-    drealJNI.Config_mutable_nlopt_maxtime_0(value, Config.getCPtr(this));
+  public void mutableNloptMaxtime(double value) {
+    DrealJNI.configMutableNloptMaxtime0(value, Config.getCPtr(this));
   }
 
-  public Config.SatDefaultPhase sat_default_phase() {
-    return Config.SatDefaultPhase.swigToEnum(drealJNI.Config_sat_default_phase(swigCPtr, this));
+  public Config.SatDefaultPhase satDefaultPhase() {
+    return Config.SatDefaultPhase.swigToEnum(DrealJNI.configSatDefaultPhase(swigCPtr, this));
   }
 
-  public SWIGTYPE_p_dreal__OptionValueT_dreal__Config__SatDefaultPhase_t
-      mutable_sat_default_phase() {
-    return new SWIGTYPE_p_dreal__OptionValueT_dreal__Config__SatDefaultPhase_t(
-        drealJNI.Config_mutable_sat_default_phase(swigCPtr, this), false);
+  public SwigTypePDrealOptionValueTDrealConfigSatDefaultPhaseT
+      mutableSatDefaultPhase() {
+    return new SwigTypePDrealOptionValueTDrealConfigSatDefaultPhaseT(
+        DrealJNI.configMutableSatDefaultPhase(swigCPtr, this), false);
   }
 
-  public long random_seed() {
-    return drealJNI.Config_random_seed(swigCPtr, this);
+  public long randomSeed() {
+    return DrealJNI.configRandomSeed(swigCPtr, this);
   }
 
-  public OptionValueUnsignedInt mutable_random_seed() {
-    return new OptionValueUnsignedInt(drealJNI.Config_mutable_random_seed(swigCPtr, this), false);
+  public OptionValueUnsignedInt mutableRandomSeed() {
+    return new OptionValueUnsignedInt(DrealJNI.configMutableRandomSeed(swigCPtr, this), false);
   }
 
-  public void mutable_random_seed(long seed) {
+  public void mutableRandomSeed(long seed) {
     if (seed < 0) {
       throw new IllegalArgumentException("Seed must be greater than zero");
     }
-    drealJNI.Config_mutable_random_seed_0(seed, Config.getCPtr(this));
+    DrealJNI.configMutableRandomSeed0(seed, Config.getCPtr(this));
   }
 
-  public boolean smtlib2_compliant() {
-    return drealJNI.Config_smtlib2_compliant(swigCPtr, this);
+  public boolean smtlib2Compliant() {
+    return DrealJNI.configSmtlib2Compliant(swigCPtr, this);
   }
 
-  public OptionValueBool mutable_smtlib2_compliant() {
-    return new OptionValueBool(drealJNI.Config_mutable_smtlib2_compliant(swigCPtr, this), false);
+  public OptionValueBool mutableSmtlib2Compliant() {
+    return new OptionValueBool(DrealJNI.configMutableSmtlib2Compliant(swigCPtr, this), false);
   }
 
-  public void mutable_smtlib2_compliant(boolean bool) {
-    drealJNI.Config_mutable_smtlib2_compliant_0(bool, Config.getCPtr(this));
+  public void mutableSmtlib2Compliant(boolean bool) {
+    DrealJNI.configMutableSmtlib2Compliant0(bool, Config.getCPtr(this));
   }
 
   public static double getKDefaultPrecision() {
-    return drealJNI.Config_kDefaultPrecision_get();
+    return DrealJNI.configKDefaultPrecisionGet();
   }
 
   public static double getKDefaultNloptFtolRel() {
-    return drealJNI.Config_kDefaultNloptFtolRel_get();
+    return DrealJNI.configKDefaultNloptFtolRelGet();
   }
 
   public static double getKDefaultNloptFtolAbs() {
-    return drealJNI.Config_kDefaultNloptFtolAbs_get();
+    return DrealJNI.configKDefaultNloptFtolAbsGet();
   }
 
   public static int getKDefaultNloptMaxEval() {
-    return drealJNI.Config_kDefaultNloptMaxEval_get();
+    return DrealJNI.configKDefaultNloptMaxEvalGet();
   }
 
   public static double getKDefaultNloptMaxTime() {
-    return drealJNI.Config_kDefaultNloptMaxTime_get();
+    return DrealJNI.configKDefaultNloptMaxTimeGet();
   }
 
   public static final class SatDefaultPhase {
     public static final Config.SatDefaultPhase False =
-        new Config.SatDefaultPhase("False", drealJNI.Config_SatDefaultPhase_False_get());
+        new Config.SatDefaultPhase("False", DrealJNI.configSatDefaultPhaseFalseGet());
     public static final Config.SatDefaultPhase True =
-        new Config.SatDefaultPhase("True", drealJNI.Config_SatDefaultPhase_True_get());
+        new Config.SatDefaultPhase("True", DrealJNI.configSatDefaultPhaseTrueGet());
     public static final Config.SatDefaultPhase JeroslowWang =
         new Config.SatDefaultPhase(
-            "JeroslowWang", drealJNI.Config_SatDefaultPhase_JeroslowWang_get());
+            "JeroslowWang", DrealJNI.configSatDefaultPhaseJeroslowWangGet());
     public static final Config.SatDefaultPhase RandomInitialPhase =
         new Config.SatDefaultPhase(
-            "RandomInitialPhase", drealJNI.Config_SatDefaultPhase_RandomInitialPhase_get());
+            "RandomInitialPhase", DrealJNI.configSatDefaultPhaseRandomInitialPhaseGet());
 
-    public final int swigValue() {
+    public int swigValue() {
       return swigValue;
     }
 

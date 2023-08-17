@@ -27,22 +27,28 @@
  * ----------------------------------------------------------------------------- */
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
-public class SWIGTYPE_p_ibex__Interval {
+public
+class SwigTypePStdInitializerListTStdUnorderedMapTDrealDrakeSymbolicVariableDoubleDrealDrakeHashValueTDrealDrakeSymboliVariableValueTypeT {
   private transient long swigCPtr;
 
-  protected SWIGTYPE_p_ibex__Interval(long cPtr, @SuppressWarnings("unused") boolean futureUse) {
+  protected SwigTypePStdInitializerListTStdUnorderedMapTDrealDrakeSymbolicVariableDoubleDrealDrakeHashValueTDrealDrakeSymboliVariableValueTypeT(
+      long cPtr, @SuppressWarnings("unused") boolean futureUse) {
     swigCPtr = cPtr;
   }
 
-  protected SWIGTYPE_p_ibex__Interval() {
+  protected SwigTypePStdInitializerListTStdUnorderedMapTDrealDrakeSymbolicVariableDoubleDrealDrakeHashValueTDrealDrakeSymboliVariableValueTypeT() {
     swigCPtr = 0;
   }
 
-  protected static long getCPtr(SWIGTYPE_p_ibex__Interval obj) {
+  protected static long getCPtr(
+      SwigTypePStdInitializerListTStdUnorderedMapTDrealDrakeSymbolicVariableDoubleDrealDrakeHashValueTDrealDrakeSymboliVariableValueTypeT
+          obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
-  protected static long swigRelease(SWIGTYPE_p_ibex__Interval obj) {
+  protected static long swigRelease(
+      SwigTypePStdInitializerListTStdUnorderedMapTDrealDrakeSymbolicVariableDoubleDrealDrakeHashValueTDrealDrakeSymboliVariableValueTypeT
+          obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 }

@@ -28,28 +28,26 @@
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
 public
-class SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Expression_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t {
+class SwigTypePDrealOptionValueTStdFunctionTIntFDrealBoxConstRDynamicBitsetConstRDrealBoxPDrealBoxPFTT {
   private transient long swigCPtr;
 
-  protected
-  SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Expression_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t(
+  protected SwigTypePDrealOptionValueTStdFunctionTIntFDrealBoxConstRDynamicBitsetConstRDrealBoxPDrealBoxPFTT(
       long cPtr, @SuppressWarnings("unused") boolean futureUse) {
     swigCPtr = cPtr;
   }
 
-  protected
-  SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Expression_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t() {
+  protected SwigTypePDrealOptionValueTStdFunctionTIntFDrealBoxConstRDynamicBitsetConstRDrealBoxPDrealBoxPFTT() {
     swigCPtr = 0;
   }
 
   protected static long getCPtr(
-      SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Expression_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t
+      SwigTypePDrealOptionValueTStdFunctionTIntFDrealBoxConstRDynamicBitsetConstRDrealBoxPDrealBoxPFTT
           obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
   protected static long swigRelease(
-      SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Expression_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t
+      SwigTypePDrealOptionValueTStdFunctionTIntFDrealBoxConstRDynamicBitsetConstRDrealBoxPDrealBoxPFTT
           obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }

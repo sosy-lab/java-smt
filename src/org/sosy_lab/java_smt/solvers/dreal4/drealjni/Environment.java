@@ -61,27 +61,27 @@ public class Environment {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        drealJNI.delete_Environment(swigCPtr);
+        DrealJNI.deleteEnvironment(swigCPtr);
       }
       swigCPtr = 0;
     }
   }
 
   public Environment(Environment arg0) {
-    this(drealJNI.new_Environment__SWIG_0(Environment.getCPtr(arg0), arg0), true);
+    this(DrealJNI.newEnvironmentSWIG0(Environment.getCPtr(arg0), arg0), true);
   }
 
-  public Environment AssignOperator(Environment arg0) {
+  public Environment assignOperator(Environment arg0) {
     return new Environment(
-        drealJNI.Environment_AssignOperator__SWIG_0(
+        DrealJNI.environmentAssignOperatorSWIG0(
             swigCPtr, this, Environment.getCPtr(arg0), arg0),
         false);
   }
 
   public Environment(Variable[] varArr) {
-    this(drealJNI.new_Environment__SWIG_1(), true);
+    this(DrealJNI.newEnvironmentSWIG1(), true);
     for (Variable var : varArr) {
-      if (var.is_dummy()) {
+      if (var.isDummy()) {
         throw new IllegalArgumentException(
             "Dummy variable is detected in the initialization of an environment.");
       } else {
@@ -91,93 +91,89 @@ public class Environment {
   }
 
   public Environment() {
-    this(drealJNI.new_Environment__SWIG_1(), true);
+    this(DrealJNI.newEnvironmentSWIG1(), true);
   }
 
   public Environment(
-      SWIGTYPE_p_std__initializer_listT_std__unordered_mapT_dreal__drake__symbolic__Variable_double_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t__value_type_t
+      SwigTypePStdInitializerListTStdUnorderedMapTDrealDrakeSymbolicVariableDoubleDrealDrakeHashValueTDrealDrakeSymboliVariableValueTypeT
           init) {
     this(
-        drealJNI.new_Environment__SWIG_2(
-            SWIGTYPE_p_std__initializer_listT_std__unordered_mapT_dreal__drake__symbolic__Variable_double_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t__value_type_t
+        DrealJNI.newEnvironmentSWIG2(
+            SwigTypePStdInitializerListTStdUnorderedMapTDrealDrakeSymbolicVariableDoubleDrealDrakeHashValueTDrealDrakeSymboliVariableValueTypeT
                 .getCPtr(init)),
         true);
   }
 
-  public Environment(SWIGTYPE_p_std__initializer_listT_dreal__drake__symbolic__Variable_t vars) {
+  public Environment(SwigTypePStdInitializerListTDrealDrakeSymboliVariableT vars) {
     this(
-        drealJNI.new_Environment__SWIG_3(
-            SWIGTYPE_p_std__initializer_listT_dreal__drake__symbolic__Variable_t.getCPtr(vars)),
+        DrealJNI.newEnvironmentSWIG3(
+            SwigTypePStdInitializerListTDrealDrakeSymboliVariableT.getCPtr(vars)),
         true);
   }
 
   public Environment(
-      SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_double_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t
+      SwigTypePStdUnorderedMapTDrealDrakeSymbolicVariableDoubleDrealDrakeHashValueTDrealDrakeSymbolicVariableTT
           m) {
     this(
-        drealJNI.new_Environment__SWIG_4(
-            SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_double_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t
+        DrealJNI.newEnvironmentSWIG4(
+            SwigTypePStdUnorderedMapTDrealDrakeSymbolicVariableDoubleDrealDrakeHashValueTDrealDrakeSymbolicVariableTT
                 .getCPtr(m)),
         true);
   }
 
-  public
-  SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_double_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t__iterator
+  public SwigTypePStdUnorderedMapTDrealDrakeSymbolicVariableDoubleDrealDrakeHashValueTDrealDrakeSymbolicVariableIterator
       begin() {
-    return new SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_double_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t__iterator(
-        drealJNI.Environment_begin__SWIG_0(swigCPtr, this), true);
+    return new SwigTypePStdUnorderedMapTDrealDrakeSymbolicVariableDoubleDrealDrakeHashValueTDrealDrakeSymbolicVariableIterator(
+        DrealJNI.environmentBeginSWIG0(swigCPtr, this), true);
   }
 
-  public
-  SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_double_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t__iterator
+  public SwigTypePStdUnorderedMapTDrealDrakeSymbolicVariableDoubleDrealDrakeHashValueTDrealDrakeSymbolicVariableIterator
       end() {
-    return new SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_double_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t__iterator(
-        drealJNI.Environment_end__SWIG_0(swigCPtr, this), true);
+    return new SwigTypePStdUnorderedMapTDrealDrakeSymbolicVariableDoubleDrealDrakeHashValueTDrealDrakeSymbolicVariableIterator(
+        DrealJNI.environmentEndSWIG0(swigCPtr, this), true);
   }
 
-  public
-  SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_double_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t__const_iterator
+  public SwigTypePStdUnorderedMapTDrealDrakeSymbolicVariableDoublDrealDrakeHashValueTDrealDrakeSymbolicVariableConstIterator
       cbegin() {
-    return new SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_double_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t__const_iterator(
-        drealJNI.Environment_cbegin(swigCPtr, this), true);
+    return new SwigTypePStdUnorderedMapTDrealDrakeSymbolicVariableDoublDrealDrakeHashValueTDrealDrakeSymbolicVariableConstIterator(
+        DrealJNI.environmentCbegin(swigCPtr, this), true);
   }
 
-  public
-  SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_double_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t__const_iterator
+  public SwigTypePStdUnorderedMapTDrealDrakeSymbolicVariableDoublDrealDrakeHashValueTDrealDrakeSymbolicVariableConstIterator
       cend() {
-    return new SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_double_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t__const_iterator(
-        drealJNI.Environment_cend(swigCPtr, this), true);
+    return new SwigTypePStdUnorderedMapTDrealDrakeSymbolicVariableDoublDrealDrakeHashValueTDrealDrakeSymbolicVariableConstIterator(
+        DrealJNI.environmentCend(swigCPtr, this), true);
   }
 
   public void insert(Variable key, double elem) {
-    drealJNI.Environment_insert(swigCPtr, this, Variable.getCPtr(key), key, elem);
+    DrealJNI.environmentInsert(swigCPtr, this, Variable.getCPtr(key), key, elem);
   }
 
   public boolean empty() {
-    return drealJNI.Environment_empty(swigCPtr, this);
+    return DrealJNI.environmentEmpty(swigCPtr, this);
   }
 
   public long size() {
-    return drealJNI.Environment_size(swigCPtr, this);
+    return DrealJNI.environmentSize(swigCPtr, this);
   }
 
-  public
-  SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_double_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t__iterator
+  public SwigTypePStdUnorderedMapTDrealDrakeSymbolicVariableDoubleDrealDrakeHashValueTDrealDrakeSymbolicVariableIterator
       find(Variable key) {
-    return new SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_double_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t__iterator(
-        drealJNI.Environment_find__SWIG_0(swigCPtr, this, Variable.getCPtr(key), key), true);
+    return new SwigTypePStdUnorderedMapTDrealDrakeSymbolicVariableDoubleDrealDrakeHashValueTDrealDrakeSymbolicVariableIterator(
+        DrealJNI.environmentFindSWIG0(swigCPtr, this, Variable.getCPtr(key), key), true);
   }
 
   public Variables domain() {
-    return new Variables(drealJNI.Environment_domain(swigCPtr, this), true);
+    return new Variables(DrealJNI.environmentDomain(swigCPtr, this), true);
   }
 
-  public String to_string() {
-    return drealJNI.Environment_to_string(swigCPtr, this);
+  @Override
+  public String toString() {
+    return DrealJNI.environmentToString(swigCPtr, this);
   }
 
-  public SWIGTYPE_p_double Indexing(Variable key) {
-    return new SWIGTYPE_p_double(
-        drealJNI.Environment_Indexing__SWIG_0(swigCPtr, this, Variable.getCPtr(key), key), false);
+  public SwigTypePDouble indexing(Variable key) {
+    return new SwigTypePDouble(
+        DrealJNI.environmentIndexingSWIG0(swigCPtr, this, Variable.getCPtr(key), key), false);
   }
 }

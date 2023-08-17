@@ -42,7 +42,7 @@ public class VariableSet extends java.util.AbstractSet<Variable> {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        drealJNI.delete_VariableSet(swigCPtr);
+        DrealJNI.deleteVariableSet(swigCPtr);
       }
       swigCPtr = 0;
     }
@@ -183,70 +183,70 @@ public class VariableSet extends java.util.AbstractSet<Variable> {
       if (swigCPtr != 0) {
         if (swigCMemOwn) {
           swigCMemOwn = false;
-          drealJNI.delete_VariableSet_Iterator(swigCPtr);
+          DrealJNI.deleteVariableSetIterator(swigCPtr);
         }
         swigCPtr = 0;
       }
     }
 
     private void incrementUnchecked() {
-      drealJNI.VariableSet_Iterator_incrementUnchecked(swigCPtr, this);
+      DrealJNI.variableSetIteratorIncrementUnchecked(swigCPtr, this);
     }
 
     private Variable derefUnchecked() {
-      return new Variable(drealJNI.VariableSet_Iterator_derefUnchecked(swigCPtr, this), true);
+      return new Variable(DrealJNI.variableSetIteratorDerefUnchecked(swigCPtr, this), true);
     }
 
     private boolean isNot(VariableSet.Iterator other) {
-      return drealJNI.VariableSet_Iterator_isNot(
+      return DrealJNI.variableSetIteratorIsNot(
           swigCPtr, this, VariableSet.Iterator.getCPtr(other), other);
     }
   }
 
   public VariableSet() {
-    this(drealJNI.new_VariableSet__SWIG_0(), true);
+    this(DrealJNI.newVariableSetSWIG0(), true);
   }
 
   public VariableSet(VariableSet other) {
-    this(drealJNI.new_VariableSet__SWIG_1(VariableSet.getCPtr(other), other), true);
+    this(DrealJNI.newVariableSetSWIG1(VariableSet.getCPtr(other), other), true);
   }
 
   @Override
   public boolean isEmpty() {
-    return drealJNI.VariableSet_isEmpty(swigCPtr, this);
+    return DrealJNI.variableSetIsEmpty(swigCPtr, this);
   }
 
   @Override
   public void clear() {
-    drealJNI.VariableSet_clear(swigCPtr, this);
+    DrealJNI.variableSetClear(swigCPtr, this);
   }
 
   private VariableSet.Iterator begin() {
-    return new VariableSet.Iterator(drealJNI.VariableSet_begin(swigCPtr, this), true);
+    return new VariableSet.Iterator(DrealJNI.variableSetBegin(swigCPtr, this), true);
   }
 
   private VariableSet.Iterator end() {
-    return new VariableSet.Iterator(drealJNI.VariableSet_end(swigCPtr, this), true);
+    return new VariableSet.Iterator(DrealJNI.variableSetEnd(swigCPtr, this), true);
   }
 
   public boolean addImpl(Variable key) {
-    return drealJNI.VariableSet_addImpl(swigCPtr, this, Variable.getCPtr(key), key);
+    return DrealJNI.variableSetAddImpl(swigCPtr, this, Variable.getCPtr(key), key);
   }
 
   private boolean containsImpl(Variable key) {
-    return drealJNI.VariableSet_containsImpl(swigCPtr, this, Variable.getCPtr(key), key);
+    return DrealJNI.variableSetContainsImpl(swigCPtr, this, Variable.getCPtr(key), key);
   }
 
   private boolean removeImpl(Variable key) {
-    return drealJNI.VariableSet_removeImpl(swigCPtr, this, Variable.getCPtr(key), key);
+    return DrealJNI.variableSetRemoveImpl(swigCPtr, this, Variable.getCPtr(key), key);
   }
 
   private int sizeImpl() {
-    return drealJNI.VariableSet_sizeImpl(swigCPtr, this);
+    return DrealJNI.variableSetSizeImpl(swigCPtr, this);
   }
 
   @SuppressWarnings("unused")
   private boolean hasNextImpl(VariableSet.Iterator itr) {
-    return drealJNI.VariableSet_hasNextImpl(swigCPtr, this, VariableSet.Iterator.getCPtr(itr), itr);
+    return DrealJNI.variableSetHasNextImpl(swigCPtr, this, VariableSet.Iterator.getCPtr(itr), itr);
   }
 }

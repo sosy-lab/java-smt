@@ -62,7 +62,7 @@ public class FormulaVector extends java.util.AbstractList<Formula>
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        drealJNI.delete_FormulaVector(swigCPtr);
+        DrealJNI.deleteFormulaVector(swigCPtr);
       }
       swigCPtr = 0;
     }
@@ -127,61 +127,61 @@ public class FormulaVector extends java.util.AbstractList<Formula>
   }
 
   public FormulaVector() {
-    this(drealJNI.new_FormulaVector__SWIG_0(), true);
+    this(DrealJNI.newFormulaVectorSWIG0(), true);
   }
 
   public FormulaVector(FormulaVector other) {
-    this(drealJNI.new_FormulaVector__SWIG_1(FormulaVector.getCPtr(other), other), true);
+    this(DrealJNI.newFormulaVectorSWIG1(FormulaVector.getCPtr(other), other), true);
   }
 
   public long capacity() {
-    return drealJNI.FormulaVector_capacity(swigCPtr, this);
+    return DrealJNI.formulaVectorCapacity(swigCPtr, this);
   }
 
   public void reserve(long n) {
-    drealJNI.FormulaVector_reserve(swigCPtr, this, n);
+    DrealJNI.formulaVectorReserve(swigCPtr, this, n);
   }
 
   @Override
   public boolean isEmpty() {
-    return drealJNI.FormulaVector_isEmpty(swigCPtr, this);
+    return DrealJNI.formulaVectorIsEmpty(swigCPtr, this);
   }
 
   @Override
   public void clear() {
-    drealJNI.FormulaVector_clear(swigCPtr, this);
+    DrealJNI.formulaVectorClear(swigCPtr, this);
   }
 
   public FormulaVector(int count, Formula value) {
-    this(drealJNI.new_FormulaVector__SWIG_2(count, Formula.getCPtr(value), value), true);
+    this(DrealJNI.newFormulaVectorSWIG2(count, Formula.getCPtr(value), value), true);
   }
 
   private int doSize() {
-    return drealJNI.FormulaVector_doSize(swigCPtr, this);
+    return DrealJNI.formulaVectorDoSize(swigCPtr, this);
   }
 
   private void doAdd(Formula x) {
-    drealJNI.FormulaVector_doAdd__SWIG_0(swigCPtr, this, Formula.getCPtr(x), x);
+    DrealJNI.formulaVectorDoAddSWIG0(swigCPtr, this, Formula.getCPtr(x), x);
   }
 
   private void doAdd(int index, Formula x) {
-    drealJNI.FormulaVector_doAdd__SWIG_1(swigCPtr, this, index, Formula.getCPtr(x), x);
+    DrealJNI.formulaVectorDoAddSWIG1(swigCPtr, this, index, Formula.getCPtr(x), x);
   }
 
   private Formula doRemove(int index) {
-    return new Formula(drealJNI.FormulaVector_doRemove(swigCPtr, this, index), true);
+    return new Formula(DrealJNI.formulaVectorDoRemove(swigCPtr, this, index), true);
   }
 
   private Formula doGet(int index) {
-    return new Formula(drealJNI.FormulaVector_doGet(swigCPtr, this, index), false);
+    return new Formula(DrealJNI.formulaVectorDoGet(swigCPtr, this, index), false);
   }
 
   private Formula doSet(int index, Formula val) {
     return new Formula(
-        drealJNI.FormulaVector_doSet(swigCPtr, this, index, Formula.getCPtr(val), val), true);
+        DrealJNI.formulaVectorDoSet(swigCPtr, this, index, Formula.getCPtr(val), val), true);
   }
 
   private void doRemoveRange(int fromIndex, int toIndex) {
-    drealJNI.FormulaVector_doRemoveRange(swigCPtr, this, fromIndex, toIndex);
+    DrealJNI.formulaVectorDoRemoveRange(swigCPtr, this, fromIndex, toIndex);
   }
 }

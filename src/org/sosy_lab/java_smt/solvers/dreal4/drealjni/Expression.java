@@ -61,179 +61,180 @@ public class Expression {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        drealJNI.delete_Expression(swigCPtr);
+        DrealJNI.deleteExpression(swigCPtr);
       }
       swigCPtr = 0;
     }
   }
 
   public Expression(Expression arg0) {
-    this(drealJNI.new_Expression__SWIG_0(Expression.getCPtr(arg0), arg0), true);
+    this(DrealJNI.newExpressionSWIG0(Expression.getCPtr(arg0), arg0), true);
   }
 
-  public Expression AssignOperator(Expression arg0) {
+  public Expression assignOperator(Expression arg0) {
     return new Expression(
-        drealJNI.Expression_AssignOperator__SWIG_0(swigCPtr, this, Expression.getCPtr(arg0), arg0),
+        DrealJNI.expressionAssignOperatorSWIG0(swigCPtr, this, Expression.getCPtr(arg0), arg0),
         false);
   }
 
   public Expression() {
-    this(drealJNI.new_Expression__SWIG_1(), true);
+    this(DrealJNI.newExpressionSWIG1(), true);
   }
 
   public Expression(double d) {
-    this(drealJNI.new_Expression__SWIG_2(d), true);
+    this(DrealJNI.newExpressionSWIG2(d), true);
   }
 
   public Expression(long l) {
-    this(drealJNI.new_Expression__SWIG_4(l), true);
+    this(DrealJNI.newExpressionSWIG4(l), true);
   }
 
   public Expression(Variable var) {
-    this(drealJNI.new_Expression__SWIG_3(Variable.getCPtr(var), var), true);
+    this(DrealJNI.newExpressionSWIG3(Variable.getCPtr(var), var), true);
   }
 
-  public ExpressionKind get_kind() {
-    return ExpressionKind.swigToEnum(drealJNI.Expression_get_kind(swigCPtr, this));
+  public ExpressionKind getKind() {
+    return ExpressionKind.swigToEnum(DrealJNI.expressionGetKind(swigCPtr, this));
   }
 
-  public long get_hash() {
-    return drealJNI.Expression_get_hash(swigCPtr, this);
+  public long getHash() {
+    return DrealJNI.expressionGetHash(swigCPtr, this);
   }
 
-  public Variables GetVariables() {
-    return new Variables(drealJNI.Expression_GetVariables(swigCPtr, this), false);
+  public Variables expressionGetVariables() {
+    return new Variables(DrealJNI.expressionGetVariables(swigCPtr, this), false);
   }
 
-  public boolean EqualTo(Expression e) {
-    return drealJNI.Expression_EqualTo(swigCPtr, this, Expression.getCPtr(e), e);
+  public boolean equalTo(Expression e) {
+    return DrealJNI.expressionEqualTo(swigCPtr, this, Expression.getCPtr(e), e);
   }
 
-  public boolean Less(Expression e) {
-    return drealJNI.Expression_Less(swigCPtr, this, Expression.getCPtr(e), e);
+  public boolean less(Expression e) {
+    return DrealJNI.expressionLess(swigCPtr, this, Expression.getCPtr(e), e);
   }
 
-  public boolean is_polynomial() {
-    return drealJNI.Expression_is_polynomial(swigCPtr, this);
+  public boolean isPolynomial() {
+    return DrealJNI.expressionIsPolynomial(swigCPtr, this);
   }
 
-  public boolean include_ite() {
-    return drealJNI.Expression_include_ite(swigCPtr, this);
+  public boolean includeIte() {
+    return DrealJNI.expressionIncludeIte(swigCPtr, this);
   }
 
-  public double Evaluate(Environment env) {
-    return drealJNI.Expression_Evaluate__SWIG_0(swigCPtr, this, Environment.getCPtr(env), env);
+  public double evaluate(Environment env) {
+    return DrealJNI.expressionEvaluateSWIG0(swigCPtr, this, Environment.getCPtr(env), env);
   }
 
-  public double Evaluate() {
-    return drealJNI.Expression_Evaluate__SWIG_1(swigCPtr, this);
+  public double evaluate() {
+    return DrealJNI.expressionEvaluateSWIG1(swigCPtr, this);
   }
 
-  public Expression EvaluatePartial(Environment env) {
+  public Expression evaluatePartial(Environment env) {
     return new Expression(
-        drealJNI.Expression_EvaluatePartial(swigCPtr, this, Environment.getCPtr(env), env), true);
+        DrealJNI.expressionEvaluatePartial(swigCPtr, this, Environment.getCPtr(env), env), true);
   }
 
-  public Expression Expand() {
-    return new Expression(drealJNI.Expression_Expand(swigCPtr, this), true);
+  public Expression expand() {
+    return new Expression(DrealJNI.expressionExpand(swigCPtr, this), true);
   }
 
-  public Expression Substitute(Variable var, Expression e) {
+  public Expression substitute(Variable var, Expression e) {
     return new Expression(
-        drealJNI.Expression_Substitute__SWIG_0(
+        DrealJNI.expressionSubstituteSWIG0(
             swigCPtr, this, Variable.getCPtr(var), var, Expression.getCPtr(e), e),
         true);
   }
 
-  public Expression Substitute(
-      SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Expression_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t
+  public Expression substitute(
+      SwigTypePStdUnorderedMapTDrealDrakeSymbolicVariableDrealDrakeSymbolicExpressionDrealDrakeHashValueTDrealDrakeSymbolicVariable
           expr_subst,
-      SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Formula_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t
+      SwigTypePStdUnorderedMapTDrealDrakeSymbolicVariableDrealDrakeSymbolicFormulaDrealDdrakeHashValueTDrealDrakeSymbolicVariable
           formula_subst) {
     return new Expression(
-        drealJNI.Expression_Substitute__SWIG_1(
+        DrealJNI.expressionSubstituteSWIG1(
             swigCPtr,
             this,
-            SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Expression_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t
+            SwigTypePStdUnorderedMapTDrealDrakeSymbolicVariableDrealDrakeSymbolicExpressionDrealDrakeHashValueTDrealDrakeSymbolicVariable
                 .getCPtr(expr_subst),
-            SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Formula_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t
+            SwigTypePStdUnorderedMapTDrealDrakeSymbolicVariableDrealDrakeSymbolicFormulaDrealDdrakeHashValueTDrealDrakeSymbolicVariable
                 .getCPtr(formula_subst)),
         true);
   }
 
-  public Expression Substitute(
-      SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Expression_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t
+  public Expression substitute(
+      SwigTypePStdUnorderedMapTDrealDrakeSymbolicVariableDrealDrakeSymbolicExpressionDrealDrakeHashValueTDrealDrakeSymbolicVariable
           expr_subst) {
     return new Expression(
-        drealJNI.Expression_Substitute__SWIG_2(
+        DrealJNI.expressionSubstituteSWIG2(
             swigCPtr,
             this,
-            SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Expression_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t
+            SwigTypePStdUnorderedMapTDrealDrakeSymbolicVariableDrealDrakeSymbolicExpressionDrealDrakeHashValueTDrealDrakeSymbolicVariable
                 .getCPtr(expr_subst)),
         true);
   }
 
-  public Expression Substitute(
-      SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Formula_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t
+  public Expression substitute(
+      SwigTypePStdUnorderedMapTDrealDrakeSymbolicVariableDrealDrakeSymbolicFormulaDrealDdrakeHashValueTDrealDrakeSymbolicVariable
           formula_subst) {
     return new Expression(
-        drealJNI.Expression_Substitute__SWIG_3(
+        DrealJNI.expressionSubstituteSWIG3(
             swigCPtr,
             this,
-            SWIGTYPE_p_std__unordered_mapT_dreal__drake__symbolic__Variable_dreal__drake__symbolic__Formula_dreal__drake__hash_valueT_dreal__drake__symbolic__Variable_t_t
+            SwigTypePStdUnorderedMapTDrealDrakeSymbolicVariableDrealDrakeSymbolicFormulaDrealDdrakeHashValueTDrealDrakeSymbolicVariable
                 .getCPtr(formula_subst)),
         true);
   }
 
-  public Expression Differentiate(Variable x) {
+  public Expression differentiate(Variable x) {
     return new Expression(
-        drealJNI.Expression_Differentiate(swigCPtr, this, Variable.getCPtr(x), x), true);
+        DrealJNI.expressionDifferentiate(swigCPtr, this, Variable.getCPtr(x), x), true);
   }
 
-  public String to_string() {
-    return drealJNI.Expression_to_string(swigCPtr, this);
+  @Override
+  public String toString() {
+    return DrealJNI.expressionToString(swigCPtr, this);
   }
 
-  public static Expression Zero() {
-    return new Expression(drealJNI.Expression_Zero(), true);
+  public static Expression zero() {
+    return new Expression(DrealJNI.expressionZero(), true);
   }
 
-  public static Expression One() {
-    return new Expression(drealJNI.Expression_One(), true);
+  public static Expression one() {
+    return new Expression(DrealJNI.expressionOne(), true);
   }
 
-  public static Expression Pi() {
-    return new Expression(drealJNI.Expression_Pi(), true);
+  public static Expression pi() {
+    return new Expression(DrealJNI.expressionPi(), true);
   }
 
-  public static Expression E() {
-    return new Expression(drealJNI.Expression_E(), true);
+  public static Expression e() {
+    return new Expression(DrealJNI.expressionE(), true);
   }
 
-  public static Expression NaN() {
-    return new Expression(drealJNI.Expression_NaN(), true);
+  public static Expression naN() {
+    return new Expression(DrealJNI.expressionNaN(), true);
   }
 
-  public Expression Increment() {
-    return new Expression(drealJNI.Expression_Increment__SWIG_0(swigCPtr, this), false);
+  public Expression increment() {
+    return new Expression(DrealJNI.expressionIncrementSWIG0(swigCPtr, this), false);
   }
 
-  public Expression Increment(int arg0) {
-    return new Expression(drealJNI.Expression_Increment__SWIG_1(swigCPtr, this, arg0), true);
+  public Expression increment(int arg0) {
+    return new Expression(DrealJNI.expressionIncrementSWIG1(swigCPtr, this, arg0), true);
   }
 
-  public Expression Decrement() {
-    return new Expression(drealJNI.Expression_Decrement__SWIG_0(swigCPtr, this), false);
+  public Expression decrement() {
+    return new Expression(DrealJNI.expressionDecrementSWIG0(swigCPtr, this), false);
   }
 
-  public Expression Decrement(int arg0) {
-    return new Expression(drealJNI.Expression_Decrement__SWIG_1(swigCPtr, this, arg0), true);
+  public Expression decrement(int arg0) {
+    return new Expression(DrealJNI.expressionDecrementSWIG1(swigCPtr, this, arg0), true);
   }
 
   // self written
   public VariableSet getVariables() {
     VariableSet set = new VariableSet();
-    drealJNI.Expression_getVariables(VariableSet.getCPtr(set), Expression.getCPtr(this));
+    DrealJNI.getVariables(VariableSet.getCPtr(set), Expression.getCPtr(this));
     return set;
   }
 }

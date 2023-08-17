@@ -62,7 +62,7 @@ public class VariableVector extends java.util.AbstractList<Variable>
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        drealJNI.delete_VariableVector(swigCPtr);
+        DrealJNI.deleteVariableVector(swigCPtr);
       }
       swigCPtr = 0;
     }
@@ -125,61 +125,61 @@ public class VariableVector extends java.util.AbstractList<Variable>
   }
 
   public VariableVector() {
-    this(drealJNI.new_VariableVector__SWIG_0(), true);
+    this(DrealJNI.newVariableVectorSWIG0(), true);
   }
 
   public VariableVector(VariableVector other) {
-    this(drealJNI.new_VariableVector__SWIG_1(VariableVector.getCPtr(other), other), true);
+    this(DrealJNI.newVariableVectorSWIG1(VariableVector.getCPtr(other), other), true);
   }
 
   public long capacity() {
-    return drealJNI.VariableVector_capacity(swigCPtr, this);
+    return DrealJNI.variableVectorCapacity(swigCPtr, this);
   }
 
   public void reserve(long n) {
-    drealJNI.VariableVector_reserve(swigCPtr, this, n);
+    DrealJNI.variableVectorReserve(swigCPtr, this, n);
   }
 
   @Override
   public boolean isEmpty() {
-    return drealJNI.VariableVector_isEmpty(swigCPtr, this);
+    return DrealJNI.variableVectorIsEmpty(swigCPtr, this);
   }
 
   @Override
   public void clear() {
-    drealJNI.VariableVector_clear(swigCPtr, this);
+    DrealJNI.variableVectorClear(swigCPtr, this);
   }
 
   public VariableVector(int count, Variable value) {
-    this(drealJNI.new_VariableVector__SWIG_2(count, Variable.getCPtr(value), value), true);
+    this(DrealJNI.newVariableVectorSWIG2(count, Variable.getCPtr(value), value), true);
   }
 
   private int doSize() {
-    return drealJNI.VariableVector_doSize(swigCPtr, this);
+    return DrealJNI.variableVectorDoSize(swigCPtr, this);
   }
 
   private void doAdd(Variable x) {
-    drealJNI.VariableVector_doAdd__SWIG_0(swigCPtr, this, Variable.getCPtr(x), x);
+    DrealJNI.variableVectorDoAddSWIG0(swigCPtr, this, Variable.getCPtr(x), x);
   }
 
   private void doAdd(int index, Variable x) {
-    drealJNI.VariableVector_doAdd__SWIG_1(swigCPtr, this, index, Variable.getCPtr(x), x);
+    DrealJNI.variableVectorDoAddSWIG1(swigCPtr, this, index, Variable.getCPtr(x), x);
   }
 
   private Variable doRemove(int index) {
-    return new Variable(drealJNI.VariableVector_doRemove(swigCPtr, this, index), true);
+    return new Variable(DrealJNI.variableVectorDoRemove(swigCPtr, this, index), true);
   }
 
   private Variable doGet(int index) {
-    return new Variable(drealJNI.VariableVector_doGet(swigCPtr, this, index), false);
+    return new Variable(DrealJNI.variableVectorDoGet(swigCPtr, this, index), false);
   }
 
   private Variable doSet(int index, Variable val) {
     return new Variable(
-        drealJNI.VariableVector_doSet(swigCPtr, this, index, Variable.getCPtr(val), val), true);
+        DrealJNI.variableVectorDoSet(swigCPtr, this, index, Variable.getCPtr(val), val), true);
   }
 
   private void doRemoveRange(int fromIndex, int toIndex) {
-    drealJNI.VariableVector_doRemoveRange(swigCPtr, this, fromIndex, toIndex);
+    DrealJNI.variableVectorDoRemoveRange(swigCPtr, this, fromIndex, toIndex);
   }
 }

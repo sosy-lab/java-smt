@@ -27,24 +27,22 @@
  * ----------------------------------------------------------------------------- */
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
-public class SWIGTYPE_p_ScopedVectorT_dreal__drake__symbolic__Formula_t {
+public class SwigTypePStdOstream {
   private transient long swigCPtr;
 
-  protected SWIGTYPE_p_ScopedVectorT_dreal__drake__symbolic__Formula_t(
-      long cPtr, @SuppressWarnings("unused") boolean futureUse) {
+  protected SwigTypePStdOstream(long cPtr, @SuppressWarnings("unused") boolean futureUse) {
     swigCPtr = cPtr;
   }
 
-  protected SWIGTYPE_p_ScopedVectorT_dreal__drake__symbolic__Formula_t() {
+  protected SwigTypePStdOstream() {
     swigCPtr = 0;
   }
 
-  protected static long getCPtr(SWIGTYPE_p_ScopedVectorT_dreal__drake__symbolic__Formula_t obj) {
+  protected static long getCPtr(SwigTypePStdOstream obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
-  protected static long swigRelease(
-      SWIGTYPE_p_ScopedVectorT_dreal__drake__symbolic__Formula_t obj) {
+  protected static long swigRelease(SwigTypePStdOstream obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 }

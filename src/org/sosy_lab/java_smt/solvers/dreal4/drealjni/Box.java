@@ -61,97 +61,97 @@ public class Box {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        drealJNI.delete_Box(swigCPtr);
+        DrealJNI.deleteBox(swigCPtr);
       }
       swigCPtr = 0;
     }
   }
 
   public Box() {
-    this(drealJNI.new_Box__SWIG_0(), true);
+    this(DrealJNI.newBoxSWIG0(), true);
   }
 
   public Box(VariableVector variables) {
-    this(drealJNI.new_Box__SWIG_1(VariableVector.getCPtr(variables), variables), true);
+    this(DrealJNI.newBoxSWIG1(VariableVector.getCPtr(variables), variables), true);
   }
 
   public Box(Box arg0) {
-    this(drealJNI.new_Box__SWIG_2(Box.getCPtr(arg0), arg0), true);
+    this(DrealJNI.newBoxSWIG2(Box.getCPtr(arg0), arg0), true);
   }
 
-  public Box AssignOperator(Box arg0) {
+  public Box assignOperator(Box arg0) {
     return new Box(
-        drealJNI.Box_AssignOperator__SWIG_0(swigCPtr, this, Box.getCPtr(arg0), arg0), false);
+        DrealJNI.boxAssignOperatorSWIG0(swigCPtr, this, Box.getCPtr(arg0), arg0), false);
   }
 
-  public void Add(Variable v) {
-    drealJNI.Box_Add__SWIG_0(swigCPtr, this, Variable.getCPtr(v), v);
+  public void add(Variable v) {
+    DrealJNI.boxAddSWIG0(swigCPtr, this, Variable.getCPtr(v), v);
   }
 
-  public void Add(Variable v, double lb, double ub) {
-    drealJNI.Box_Add__SWIG_1(swigCPtr, this, Variable.getCPtr(v), v, lb, ub);
+  public void add(Variable v, double lb, double ub) {
+    DrealJNI.boxAddSWIG1(swigCPtr, this, Variable.getCPtr(v), v, lb, ub);
   }
 
   public boolean empty() {
-    return drealJNI.Box_empty(swigCPtr, this);
+    return DrealJNI.boxEmpty(swigCPtr, this);
   }
 
   public void set_empty() {
-    drealJNI.Box_set_empty(swigCPtr, this);
+    DrealJNI.boxSetEmpty(swigCPtr, this);
   }
 
   public int size() {
-    return drealJNI.Box_size(swigCPtr, this);
+    return DrealJNI.boxSize(swigCPtr, this);
   }
 
-  public SWIGTYPE_p_ibex__Interval Indexing(int i) {
-    return new SWIGTYPE_p_ibex__Interval(drealJNI.Box_Indexing__SWIG_0(swigCPtr, this, i), false);
+  public SwigTypePIbexInterval indexing(int i) {
+    return new SwigTypePIbexInterval(DrealJNI.boxIndexingSWIG0(swigCPtr, this, i), false);
   }
 
-  public SWIGTYPE_p_ibex__Interval Indexing(Variable var) {
-    return new SWIGTYPE_p_ibex__Interval(
-        drealJNI.Box_Indexing__SWIG_1(swigCPtr, this, Variable.getCPtr(var), var), false);
+  public SwigTypePIbexInterval indexing(Variable var) {
+    return new SwigTypePIbexInterval(
+        DrealJNI.boxIndexingSWIG1(swigCPtr, this, Variable.getCPtr(var), var), false);
   }
 
   public VariableVector variables() {
-    return new VariableVector(drealJNI.Box_variables(swigCPtr, this), false);
+    return new VariableVector(DrealJNI.boxVariables(swigCPtr, this), false);
   }
 
   public Variable variable(int i) {
-    return new Variable(drealJNI.Box_variable(swigCPtr, this, i), false);
+    return new Variable(DrealJNI.boxVariable(swigCPtr, this, i), false);
   }
 
-  public boolean has_variable(Variable var) {
-    return drealJNI.Box_has_variable(swigCPtr, this, Variable.getCPtr(var), var);
+  public boolean hasVariable(Variable var) {
+    return DrealJNI.boxHasVariable(swigCPtr, this, Variable.getCPtr(var), var);
   }
 
-  public SWIGTYPE_p_ibex__IntervalVector interval_vector() {
-    return new SWIGTYPE_p_ibex__IntervalVector(drealJNI.Box_interval_vector(swigCPtr, this), false);
+  public SwigTypePIbexIntervalVector intervalVector() {
+    return new SwigTypePIbexIntervalVector(DrealJNI.boxIntervalVector(swigCPtr, this), false);
   }
 
-  public SWIGTYPE_p_ibex__IntervalVector mutable_interval_vector() {
-    return new SWIGTYPE_p_ibex__IntervalVector(
-        drealJNI.Box_mutable_interval_vector(swigCPtr, this), false);
+  public SwigTypePIbexIntervalVector mutableIntervalVector() {
+    return new SwigTypePIbexIntervalVector(
+        DrealJNI.boxMutableIntervalVector(swigCPtr, this), false);
   }
 
   public int index(Variable var) {
-    return drealJNI.Box_index(swigCPtr, this, Variable.getCPtr(var), var);
+    return DrealJNI.boxIndex(swigCPtr, this, Variable.getCPtr(var), var);
   }
 
-  public DoubleIntPair MaxDiam() {
-    return new DoubleIntPair(drealJNI.Box_MaxDiam(swigCPtr, this), true);
+  public DoubleIntPair maxDiam() {
+    return new DoubleIntPair(DrealJNI.boxMaxDiam(swigCPtr, this), true);
   }
 
   public BoxBoxPair bisect(int i) {
-    return new BoxBoxPair(drealJNI.Box_bisect__SWIG_0(swigCPtr, this, i), true);
+    return new BoxBoxPair(DrealJNI.boxBisectSWIG0(swigCPtr, this, i), true);
   }
 
   public BoxBoxPair bisect(Variable var) {
     return new BoxBoxPair(
-        drealJNI.Box_bisect__SWIG_1(swigCPtr, this, Variable.getCPtr(var), var), true);
+        DrealJNI.boxBisectSWIG1(swigCPtr, this, Variable.getCPtr(var), var), true);
   }
 
-  public Box InplaceUnion(Box b) {
-    return new Box(drealJNI.Box_InplaceUnion(swigCPtr, this, Box.getCPtr(b), b), false);
+  public Box inplaceUnion(Box b) {
+    return new Box(DrealJNI.boxInplaceUnion(swigCPtr, this, Box.getCPtr(b), b), false);
   }
 }

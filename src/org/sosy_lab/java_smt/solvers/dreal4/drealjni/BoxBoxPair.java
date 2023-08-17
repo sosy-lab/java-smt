@@ -61,41 +61,41 @@ public class BoxBoxPair {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        drealJNI.delete_BoxBoxPair(swigCPtr);
+        DrealJNI.deleteBoxBoxPair(swigCPtr);
       }
       swigCPtr = 0;
     }
   }
 
   public BoxBoxPair() {
-    this(drealJNI.new_BoxBoxPair__SWIG_0(), true);
+    this(DrealJNI.newBoxBoxPairSWIG0(), true);
   }
 
   public BoxBoxPair(Box first, Box second) {
     this(
-        drealJNI.new_BoxBoxPair__SWIG_1(Box.getCPtr(first), first, Box.getCPtr(second), second),
+        DrealJNI.newBoxBoxPairSWIG1(Box.getCPtr(first), first, Box.getCPtr(second), second),
         true);
   }
 
   public BoxBoxPair(BoxBoxPair other) {
-    this(drealJNI.new_BoxBoxPair__SWIG_2(BoxBoxPair.getCPtr(other), other), true);
+    this(DrealJNI.newBoxBoxPairSWIG2(BoxBoxPair.getCPtr(other), other), true);
   }
 
   public void setFirst(Box value) {
-    drealJNI.BoxBoxPair_first_set(swigCPtr, this, Box.getCPtr(value), value);
+    DrealJNI.boxBoxPairFirstSet(swigCPtr, this, Box.getCPtr(value), value);
   }
 
   public Box getFirst() {
-    long cPtr = drealJNI.BoxBoxPair_first_get(swigCPtr, this);
+    long cPtr = DrealJNI.boxBoxPairFirstGet(swigCPtr, this);
     return (cPtr == 0) ? null : new Box(cPtr, false);
   }
 
   public void setSecond(Box value) {
-    drealJNI.BoxBoxPair_second_set(swigCPtr, this, Box.getCPtr(value), value);
+    DrealJNI.boxBoxPairSecondSet(swigCPtr, this, Box.getCPtr(value), value);
   }
 
   public Box getSecond() {
-    long cPtr = drealJNI.BoxBoxPair_second_get(swigCPtr, this);
+    long cPtr = DrealJNI.boxBoxPairSecondGet(swigCPtr, this);
     return (cPtr == 0) ? null : new Box(cPtr, false);
   }
 }

@@ -60,37 +60,37 @@ public class DoubleIntPair {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        drealJNI.delete_DoubleIntPair(swigCPtr);
+        DrealJNI.deleteDoubleIntPair(swigCPtr);
       }
       swigCPtr = 0;
     }
   }
 
   public DoubleIntPair() {
-    this(drealJNI.new_DoubleIntPair__SWIG_0(), true);
+    this(DrealJNI.newDoubleIntPairSWIG0(), true);
   }
 
   public DoubleIntPair(double first, int second) {
-    this(drealJNI.new_DoubleIntPair__SWIG_1(first, second), true);
+    this(DrealJNI.newDoubleIntPairSWIG1(first, second), true);
   }
 
   public DoubleIntPair(DoubleIntPair other) {
-    this(drealJNI.new_DoubleIntPair__SWIG_2(DoubleIntPair.getCPtr(other), other), true);
+    this(DrealJNI.newDoubleIntPairSWIG2(DoubleIntPair.getCPtr(other), other), true);
   }
 
   public void setFirst(double value) {
-    drealJNI.DoubleIntPair_first_set(swigCPtr, this, value);
+    DrealJNI.doubleIntPairFirstSet(swigCPtr, this, value);
   }
 
   public double getFirst() {
-    return drealJNI.DoubleIntPair_first_get(swigCPtr, this);
+    return DrealJNI.doubleIntPairFirstGet(swigCPtr, this);
   }
 
   public void setSecond(int value) {
-    drealJNI.DoubleIntPair_second_set(swigCPtr, this, value);
+    DrealJNI.doubleIntPairSecondSet(swigCPtr, this, value);
   }
 
   public int getSecond() {
-    return drealJNI.DoubleIntPair_second_get(swigCPtr, this);
+    return DrealJNI.doubleIntPairSecondGet(swigCPtr, this);
   }
 }

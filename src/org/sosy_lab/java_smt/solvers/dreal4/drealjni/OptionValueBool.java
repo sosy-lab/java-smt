@@ -61,49 +61,49 @@ public class OptionValueBool {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        drealJNI.delete_OptionValueBool(swigCPtr);
+        DrealJNI.deleteOptionValueBool(swigCPtr);
       }
       swigCPtr = 0;
     }
   }
 
   public OptionValueBool(boolean value) {
-    this(drealJNI.new_OptionValueBool__SWIG_0(value), true);
+    this(DrealJNI.newOptionValueBoolSWIG0(value), true);
   }
 
   public OptionValueBool(OptionValueBool arg0) {
-    this(drealJNI.new_OptionValueBool__SWIG_1(OptionValueBool.getCPtr(arg0), arg0), true);
+    this(DrealJNI.newOptionValueBoolSWIG1(OptionValueBool.getCPtr(arg0), arg0), true);
   }
 
-  public OptionValueBool AssignOperator(OptionValueBool arg0) {
+  public OptionValueBool assignOperator(OptionValueBool arg0) {
     return new OptionValueBool(
-        drealJNI.OptionValueBool_AssignOperator__SWIG_0(
+        DrealJNI.optionValueBoolAssignOperatorSWIG0(
             swigCPtr, this, OptionValueBool.getCPtr(arg0), arg0),
         false);
   }
 
-  public OptionValueBool AssignOperator(boolean value) {
+  public OptionValueBool assignOperator(boolean value) {
     return new OptionValueBool(
-        drealJNI.OptionValueBool_AssignOperator__SWIG_2(swigCPtr, this, value), false);
+        DrealJNI.optionValueBoolAssignOperatorSWIG2(swigCPtr, this, value), false);
   }
 
-  public OptionValueBool AssignOperator(SWIGTYPE_p_bool value) {
+  public OptionValueBool assignOperator(SwigTypePBool value) {
     return new OptionValueBool(
-        drealJNI.OptionValueBool_AssignOperator__SWIG_3(
-            swigCPtr, this, SWIGTYPE_p_bool.swigRelease(value)),
+        DrealJNI.optionValueBoolAssignOperatorSWIG3(
+            swigCPtr, this, SwigTypePBool.swigRelease(value)),
         false);
   }
 
   public boolean get() {
-    return drealJNI.OptionValueBool_get(swigCPtr, this);
+    return DrealJNI.optionValueBoolGet(swigCPtr, this);
   }
 
-  public void set_from_command_line(boolean value) {
-    drealJNI.OptionValueBool_set_from_command_line(swigCPtr, this, value);
+  public void setFromCommandLine(boolean value) {
+    DrealJNI.optionValueBoolSetFromCommandLine(swigCPtr, this, value);
   }
 
-  public void set_from_file(boolean value) {
-    drealJNI.OptionValueBool_set_from_file(swigCPtr, this, value);
+  public void setFromFile(boolean value) {
+    DrealJNI.optionValueBoolSetFromFile(swigCPtr, this, value);
   }
 
   public static final class Type {

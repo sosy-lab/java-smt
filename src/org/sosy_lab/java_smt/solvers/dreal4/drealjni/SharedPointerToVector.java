@@ -61,13 +61,13 @@ public class SharedPointerToVector {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        drealJNI.delete_SharedPointerToVector(swigCPtr);
+        DrealJNI.deleteSharedPointerToVector(swigCPtr);
       }
       swigCPtr = 0;
     }
   }
 
   public SharedPointerToVector() {
-    this(drealJNI.new_SharedPointerToVector(), true);
+    this(DrealJNI.newSharedPointerToVector(), true);
   }
 }

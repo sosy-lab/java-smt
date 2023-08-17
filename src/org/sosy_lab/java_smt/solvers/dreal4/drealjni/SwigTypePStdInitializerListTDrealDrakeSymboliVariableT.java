@@ -27,30 +27,25 @@
  * ----------------------------------------------------------------------------- */
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
-public
-class SWIGTYPE_p_dreal__OptionValueT_std__functionT_int_fdreal__Box_const_R_DynamicBitset_const_R_dreal__Box_p_dreal__Box_pF_t_t {
+public class SwigTypePStdInitializerListTDrealDrakeSymboliVariableT {
   private transient long swigCPtr;
 
-  protected
-  SWIGTYPE_p_dreal__OptionValueT_std__functionT_int_fdreal__Box_const_R_DynamicBitset_const_R_dreal__Box_p_dreal__Box_pF_t_t(
+  protected SwigTypePStdInitializerListTDrealDrakeSymboliVariableT(
       long cPtr, @SuppressWarnings("unused") boolean futureUse) {
     swigCPtr = cPtr;
   }
 
-  protected
-  SWIGTYPE_p_dreal__OptionValueT_std__functionT_int_fdreal__Box_const_R_DynamicBitset_const_R_dreal__Box_p_dreal__Box_pF_t_t() {
+  protected SwigTypePStdInitializerListTDrealDrakeSymboliVariableT() {
     swigCPtr = 0;
   }
 
   protected static long getCPtr(
-      SWIGTYPE_p_dreal__OptionValueT_std__functionT_int_fdreal__Box_const_R_DynamicBitset_const_R_dreal__Box_p_dreal__Box_pF_t_t
-          obj) {
+      SwigTypePStdInitializerListTDrealDrakeSymboliVariableT obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
   protected static long swigRelease(
-      SWIGTYPE_p_dreal__OptionValueT_std__functionT_int_fdreal__Box_const_R_DynamicBitset_const_R_dreal__Box_p_dreal__Box_pF_t_t
-          obj) {
+      SwigTypePStdInitializerListTDrealDrakeSymboliVariableT obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 }

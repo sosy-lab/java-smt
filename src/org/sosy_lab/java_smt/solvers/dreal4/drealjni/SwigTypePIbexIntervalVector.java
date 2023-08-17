@@ -27,25 +27,23 @@
  * ----------------------------------------------------------------------------- */
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
-public class SWIGTYPE_p_std__initializer_listT_dreal__drake__symbolic__Variable_t {
+public class SwigTypePIbexIntervalVector {
   private transient long swigCPtr;
 
-  protected SWIGTYPE_p_std__initializer_listT_dreal__drake__symbolic__Variable_t(
+  protected SwigTypePIbexIntervalVector(
       long cPtr, @SuppressWarnings("unused") boolean futureUse) {
     swigCPtr = cPtr;
   }
 
-  protected SWIGTYPE_p_std__initializer_listT_dreal__drake__symbolic__Variable_t() {
+  protected SwigTypePIbexIntervalVector() {
     swigCPtr = 0;
   }
 
-  protected static long getCPtr(
-      SWIGTYPE_p_std__initializer_listT_dreal__drake__symbolic__Variable_t obj) {
+  protected static long getCPtr(SwigTypePIbexIntervalVector obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
-  protected static long swigRelease(
-      SWIGTYPE_p_std__initializer_listT_dreal__drake__symbolic__Variable_t obj) {
+  protected static long swigRelease(SwigTypePIbexIntervalVector obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 }

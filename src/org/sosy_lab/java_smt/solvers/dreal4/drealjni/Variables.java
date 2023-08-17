@@ -62,134 +62,135 @@ public class Variables {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        drealJNI.delete_Variables(swigCPtr);
+        DrealJNI.deleteVariables(swigCPtr);
       }
       swigCPtr = 0;
     }
   }
 
   public Variables(Variables arg0) {
-    this(drealJNI.new_Variables__SWIG_0(Variables.getCPtr(arg0), arg0), true);
+    this(DrealJNI.newVariablesSWIG0(Variables.getCPtr(arg0), arg0), true);
   }
 
-  public Variables AssignOperator(Variables arg0) {
+  public Variables assignOperator(Variables arg0) {
     return new Variables(
-        drealJNI.Variables_AssignOperator__SWIG_0(swigCPtr, this, Variables.getCPtr(arg0), arg0),
+        DrealJNI.variablesAssignOperatorSWIG0(swigCPtr, this, Variables.getCPtr(arg0), arg0),
         false);
   }
 
   public Variables() {
-    this(drealJNI.new_Variables__SWIG_1(), true);
+    this(DrealJNI.newVariablesSWIG1(), true);
   }
 
   public Variables(Variable[] arr) {
-    this(drealJNI.new_Variables__SWIG_1(), true);
+    this(DrealJNI.newVariablesSWIG1(), true);
     for (Variable var : arr) {
       this.insert(var);
     }
   }
 
-  public Variables(SWIGTYPE_p_std__initializer_listT_dreal__drake__symbolic__Variable_t init) {
+  public Variables(SwigTypePStdInitializerListTDrealDrakeSymboliVariableT init) {
     this(
-        drealJNI.new_Variables__SWIG_2(
-            SWIGTYPE_p_std__initializer_listT_dreal__drake__symbolic__Variable_t.getCPtr(init)),
+        DrealJNI.newVariablesSWIG2(
+            SwigTypePStdInitializerListTDrealDrakeSymboliVariableT.getCPtr(init)),
         true);
   }
 
-  public long get_hash() {
-    return drealJNI.Variables_get_hash(swigCPtr, this);
+  public long getHash() {
+    return DrealJNI.variablesGetHash(swigCPtr, this);
   }
 
   public long size() {
-    return drealJNI.Variables_size(swigCPtr, this);
+    return DrealJNI.variablesSize(swigCPtr, this);
   }
 
   public boolean empty() {
-    return drealJNI.Variables_empty(swigCPtr, this);
+    return DrealJNI.variablesEmpty(swigCPtr, this);
   }
 
-  public String to_string() {
-    return drealJNI.Variables_to_string(swigCPtr, this);
+  @Override
+  public String toString() {
+    return DrealJNI.variablesToString(swigCPtr, this);
   }
 
-  public SWIGTYPE_p_std__setT_dreal__drake__symbolic__Variable_t__iterator begin() {
-    return new SWIGTYPE_p_std__setT_dreal__drake__symbolic__Variable_t__iterator(
-        drealJNI.Variables_begin__SWIG_0(swigCPtr, this), true);
+  public SwigTypePStdSetTDrealDrakeSymbolicVariableTIterator begin() {
+    return new SwigTypePStdSetTDrealDrakeSymbolicVariableTIterator(
+        DrealJNI.variablesBeginSWIG0(swigCPtr, this), true);
   }
 
-  public SWIGTYPE_p_std__setT_dreal__drake__symbolic__Variable_t__iterator end() {
-    return new SWIGTYPE_p_std__setT_dreal__drake__symbolic__Variable_t__iterator(
-        drealJNI.Variables_end__SWIG_0(swigCPtr, this), true);
+  public SwigTypePStdSetTDrealDrakeSymbolicVariableTIterator end() {
+    return new SwigTypePStdSetTDrealDrakeSymbolicVariableTIterator(
+        DrealJNI.variablesEndSWIG0(swigCPtr, this), true);
   }
 
-  public SWIGTYPE_p_std__setT_dreal__drake__symbolic__Variable_t__const_iterator cbegin() {
-    return new SWIGTYPE_p_std__setT_dreal__drake__symbolic__Variable_t__const_iterator(
-        drealJNI.Variables_cbegin(swigCPtr, this), true);
+  public SwigTypePStdSetTDrealDrakeSymbolicVariableTConstIterator cbegin() {
+    return new SwigTypePStdSetTDrealDrakeSymbolicVariableTConstIterator(
+        DrealJNI.variablesCbegin(swigCPtr, this), true);
   }
 
-  public SWIGTYPE_p_std__setT_dreal__drake__symbolic__Variable_t__const_iterator cend() {
-    return new SWIGTYPE_p_std__setT_dreal__drake__symbolic__Variable_t__const_iterator(
-        drealJNI.Variables_cend(swigCPtr, this), true);
+  public SwigTypePStdSetTDrealDrakeSymbolicVariableTConstIterator cend() {
+    return new SwigTypePStdSetTDrealDrakeSymbolicVariableTConstIterator(
+        DrealJNI.variablesCend(swigCPtr, this), true);
   }
 
-  public SWIGTYPE_p_std__setT_dreal__drake__symbolic__Variable_t__reverse_iterator rbegin() {
-    return new SWIGTYPE_p_std__setT_dreal__drake__symbolic__Variable_t__reverse_iterator(
-        drealJNI.Variables_rbegin__SWIG_0(swigCPtr, this), true);
+  public SwigTypePStdSetTDrealDrakeSymbolicVariableTReverseIterator rbegin() {
+    return new SwigTypePStdSetTDrealDrakeSymbolicVariableTReverseIterator(
+        DrealJNI.variablesRbeginSWIG0(swigCPtr, this), true);
   }
 
-  public SWIGTYPE_p_std__setT_dreal__drake__symbolic__Variable_t__reverse_iterator rend() {
-    return new SWIGTYPE_p_std__setT_dreal__drake__symbolic__Variable_t__reverse_iterator(
-        drealJNI.Variables_rend__SWIG_0(swigCPtr, this), true);
+  public SwigTypePStdSetTDrealDrakeSymbolicVariableTReverseIterator rend() {
+    return new SwigTypePStdSetTDrealDrakeSymbolicVariableTReverseIterator(
+        DrealJNI.variablesRendSWIG0(swigCPtr, this), true);
   }
 
-  public SWIGTYPE_p_std__setT_dreal__drake__symbolic__Variable_t__const_reverse_iterator crbegin() {
-    return new SWIGTYPE_p_std__setT_dreal__drake__symbolic__Variable_t__const_reverse_iterator(
-        drealJNI.Variables_crbegin(swigCPtr, this), true);
+  public SwigTypePStdSetTDrealDrakeSymbolicVariableTConstReverseIterator crbegin() {
+    return new SwigTypePStdSetTDrealDrakeSymbolicVariableTConstReverseIterator(
+        DrealJNI.variablesCrbegin(swigCPtr, this), true);
   }
 
-  public SWIGTYPE_p_std__setT_dreal__drake__symbolic__Variable_t__const_reverse_iterator crend() {
-    return new SWIGTYPE_p_std__setT_dreal__drake__symbolic__Variable_t__const_reverse_iterator(
-        drealJNI.Variables_crend(swigCPtr, this), true);
+  public SwigTypePStdSetTDrealDrakeSymbolicVariableTConstReverseIterator crend() {
+    return new SwigTypePStdSetTDrealDrakeSymbolicVariableTConstReverseIterator(
+        DrealJNI.variablesCrend(swigCPtr, this), true);
   }
 
   public void insert(Variable var) {
-    drealJNI.Variables_insert__SWIG_0(swigCPtr, this, Variable.getCPtr(var), var);
+    DrealJNI.variablesInsertSWIG0(swigCPtr, this, Variable.getCPtr(var), var);
   }
 
   public void insert(Variables vars) {
-    drealJNI.Variables_insert__SWIG_2(swigCPtr, this, Variables.getCPtr(vars), vars);
+    DrealJNI.variablesInsertSWIG2(swigCPtr, this, Variables.getCPtr(vars), vars);
   }
 
   public long erase(Variable key) {
-    return drealJNI.Variables_erase__SWIG_0(swigCPtr, this, Variable.getCPtr(key), key);
+    return DrealJNI.variablesEraseSWIG0(swigCPtr, this, Variable.getCPtr(key), key);
   }
 
   public long erase(Variables vars) {
-    return drealJNI.Variables_erase__SWIG_1(swigCPtr, this, Variables.getCPtr(vars), vars);
+    return DrealJNI.variablesEraseSWIG1(swigCPtr, this, Variables.getCPtr(vars), vars);
   }
 
-  public SWIGTYPE_p_std__setT_dreal__drake__symbolic__Variable_t__iterator find(Variable key) {
-    return new SWIGTYPE_p_std__setT_dreal__drake__symbolic__Variable_t__iterator(
-        drealJNI.Variables_find__SWIG_0(swigCPtr, this, Variable.getCPtr(key), key), true);
+  public SwigTypePStdSetTDrealDrakeSymbolicVariableTIterator find(Variable key) {
+    return new SwigTypePStdSetTDrealDrakeSymbolicVariableTIterator(
+        DrealJNI.variablesFindSWIG0(swigCPtr, this, Variable.getCPtr(key), key), true);
   }
 
   public boolean include(Variable key) {
-    return drealJNI.Variables_include(swigCPtr, this, Variable.getCPtr(key), key);
+    return DrealJNI.variablesInclude(swigCPtr, this, Variable.getCPtr(key), key);
   }
 
-  public boolean IsSubsetOf(Variables vars) {
-    return drealJNI.Variables_IsSubsetOf(swigCPtr, this, Variables.getCPtr(vars), vars);
+  public boolean isSubsetOf(Variables vars) {
+    return DrealJNI.variablesIsSubsetOf(swigCPtr, this, Variables.getCPtr(vars), vars);
   }
 
-  public boolean IsSupersetOf(Variables vars) {
-    return drealJNI.Variables_IsSupersetOf(swigCPtr, this, Variables.getCPtr(vars), vars);
+  public boolean isSupersetOf(Variables vars) {
+    return DrealJNI.variablesIsSupersetOf(swigCPtr, this, Variables.getCPtr(vars), vars);
   }
 
-  public boolean IsStrictSubsetOf(Variables vars) {
-    return drealJNI.Variables_IsStrictSubsetOf(swigCPtr, this, Variables.getCPtr(vars), vars);
+  public boolean isStrictSubsetOf(Variables vars) {
+    return DrealJNI.variablesIsStrictSubsetOf(swigCPtr, this, Variables.getCPtr(vars), vars);
   }
 
-  public boolean IsStrictSupersetOf(Variables vars) {
-    return drealJNI.Variables_IsStrictSupersetOf(swigCPtr, this, Variables.getCPtr(vars), vars);
+  public boolean isStrictSupersetOf(Variables vars) {
+    return DrealJNI.variablesIsStrictSupersetOf(swigCPtr, this, Variables.getCPtr(vars), vars);
   }
 }

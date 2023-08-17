@@ -28,28 +28,26 @@
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
 public
-class SWIGTYPE_p_std__functionT_int_fdreal__Box_const_R_DynamicBitset_const_R_dreal__Box_p_dreal__Box_pF_t {
+class SwigTypePStdFunctionTIntFDrealBoxConstRDynamicBitsetConstRDrealBoxPDrealBoxpFT {
   private transient long swigCPtr;
 
-  protected
-  SWIGTYPE_p_std__functionT_int_fdreal__Box_const_R_DynamicBitset_const_R_dreal__Box_p_dreal__Box_pF_t(
+  protected SwigTypePStdFunctionTIntFDrealBoxConstRDynamicBitsetConstRDrealBoxPDrealBoxpFT(
       long cPtr, @SuppressWarnings("unused") boolean futureUse) {
     swigCPtr = cPtr;
   }
 
-  protected
-  SWIGTYPE_p_std__functionT_int_fdreal__Box_const_R_DynamicBitset_const_R_dreal__Box_p_dreal__Box_pF_t() {
+  protected SwigTypePStdFunctionTIntFDrealBoxConstRDynamicBitsetConstRDrealBoxPDrealBoxpFT() {
     swigCPtr = 0;
   }
 
   protected static long getCPtr(
-      SWIGTYPE_p_std__functionT_int_fdreal__Box_const_R_DynamicBitset_const_R_dreal__Box_p_dreal__Box_pF_t
+      SwigTypePStdFunctionTIntFDrealBoxConstRDynamicBitsetConstRDrealBoxPDrealBoxpFT
           obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
   protected static long swigRelease(
-      SWIGTYPE_p_std__functionT_int_fdreal__Box_const_R_DynamicBitset_const_R_dreal__Box_p_dreal__Box_pF_t
+      SwigTypePStdFunctionTIntFDrealBoxConstRDynamicBitsetConstRDrealBoxPDrealBoxpFT
           obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }

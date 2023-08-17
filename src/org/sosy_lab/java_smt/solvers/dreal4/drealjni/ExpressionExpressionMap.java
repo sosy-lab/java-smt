@@ -61,7 +61,7 @@ public class ExpressionExpressionMap extends java.util.AbstractMap<Expression, E
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        drealJNI.delete_ExpressionExpressionMap(swigCPtr);
+        DrealJNI.deleteExpressionExpressionMap(swigCPtr);
       }
       swigCPtr = 0;
     }
@@ -127,7 +127,7 @@ public class ExpressionExpressionMap extends java.util.AbstractMap<Expression, E
   @Override
   public java.util.Set<Entry<Expression, Expression>> entrySet() {
     java.util.Set<Entry<Expression, Expression>> setToReturn =
-        new java.util.HashSet<Entry<Expression, Expression>>();
+        new java.util.HashSet<>();
 
     Iterator itr = begin();
     final Iterator end = end();
@@ -136,8 +136,8 @@ public class ExpressionExpressionMap extends java.util.AbstractMap<Expression, E
           new Entry<Expression, Expression>() {
             private Iterator iterator;
 
-            private Entry<Expression, Expression> init(Iterator iterator) {
-              this.iterator = iterator;
+            private Entry<Expression, Expression> init(Iterator iter) {
+              this.iterator = iter;
               return this;
             }
 
@@ -165,12 +165,12 @@ public class ExpressionExpressionMap extends java.util.AbstractMap<Expression, E
   }
 
   public ExpressionExpressionMap() {
-    this(drealJNI.new_ExpressionExpressionMap__SWIG_0(), true);
+    this(DrealJNI.newExpressionExpressionMapSWIG0(), true);
   }
 
   public ExpressionExpressionMap(ExpressionExpressionMap other) {
     this(
-        drealJNI.new_ExpressionExpressionMap__SWIG_1(ExpressionExpressionMap.getCPtr(other), other),
+        DrealJNI.newExpressionExpressionMapSWIG1(ExpressionExpressionMap.getCPtr(other), other),
         true);
   }
 
@@ -208,7 +208,7 @@ public class ExpressionExpressionMap extends java.util.AbstractMap<Expression, E
       if (swigCPtr != 0) {
         if (swigCMemOwn) {
           swigCMemOwn = false;
-          drealJNI.delete_ExpressionExpressionMap_Iterator(swigCPtr);
+          DrealJNI.deleteExpressionExpressionMapIterator(swigCPtr);
         }
         swigCPtr = 0;
       }
@@ -216,70 +216,70 @@ public class ExpressionExpressionMap extends java.util.AbstractMap<Expression, E
 
     private ExpressionExpressionMap.Iterator getNextUnchecked() {
       return new ExpressionExpressionMap.Iterator(
-          drealJNI.ExpressionExpressionMap_Iterator_getNextUnchecked(swigCPtr, this), true);
+          DrealJNI.expressionExpressionMapIteratorGetNextUnchecked(swigCPtr, this), true);
     }
 
     private boolean isNot(ExpressionExpressionMap.Iterator other) {
-      return drealJNI.ExpressionExpressionMap_Iterator_isNot(
+      return DrealJNI.expressionExpressionMapIteratorIsNot(
           swigCPtr, this, ExpressionExpressionMap.Iterator.getCPtr(other), other);
     }
 
     private Expression getKey() {
-      return new Expression(drealJNI.ExpressionExpressionMap_Iterator_getKey(swigCPtr, this), true);
+      return new Expression(DrealJNI.expressionExpressionMapIteratorGetKey(swigCPtr, this), true);
     }
 
     private Expression getValue() {
       return new Expression(
-          drealJNI.ExpressionExpressionMap_Iterator_getValue(swigCPtr, this), true);
+          DrealJNI.expressionExpressionMapIteratorGetValue(swigCPtr, this), true);
     }
 
     private void setValue(Expression newValue) {
-      drealJNI.ExpressionExpressionMap_Iterator_setValue(
+      DrealJNI.expressionExpressionMapIteratorSetValue(
           swigCPtr, this, Expression.getCPtr(newValue), newValue);
     }
   }
 
   @Override
   public boolean isEmpty() {
-    return drealJNI.ExpressionExpressionMap_isEmpty(swigCPtr, this);
+    return DrealJNI.expressionExpressionMapIsEmpty(swigCPtr, this);
   }
 
   @Override
   public void clear() {
-    drealJNI.ExpressionExpressionMap_clear(swigCPtr, this);
+    DrealJNI.expressionExpressionMapClear(swigCPtr, this);
   }
 
   private ExpressionExpressionMap.Iterator find(Expression key) {
     return new ExpressionExpressionMap.Iterator(
-        drealJNI.ExpressionExpressionMap_find(swigCPtr, this, Expression.getCPtr(key), key), true);
+        DrealJNI.expressionExpressionMapFind(swigCPtr, this, Expression.getCPtr(key), key), true);
   }
 
   private ExpressionExpressionMap.Iterator begin() {
     return new ExpressionExpressionMap.Iterator(
-        drealJNI.ExpressionExpressionMap_begin(swigCPtr, this), true);
+        DrealJNI.expressionExpressionMapBegin(swigCPtr, this), true);
   }
 
   private ExpressionExpressionMap.Iterator end() {
     return new ExpressionExpressionMap.Iterator(
-        drealJNI.ExpressionExpressionMap_end(swigCPtr, this), true);
+        DrealJNI.expressionExpressionMapEnd(swigCPtr, this), true);
   }
 
   private int sizeImpl() {
-    return drealJNI.ExpressionExpressionMap_sizeImpl(swigCPtr, this);
+    return DrealJNI.expressionExpressionMapSizeImpl(swigCPtr, this);
   }
 
   private boolean containsImpl(Expression key) {
-    return drealJNI.ExpressionExpressionMap_containsImpl(
+    return DrealJNI.expressionExpressionMapContainsImpl(
         swigCPtr, this, Expression.getCPtr(key), key);
   }
 
   private void putUnchecked(Expression key, Expression value) {
-    drealJNI.ExpressionExpressionMap_putUnchecked(
+    DrealJNI.expressionExpressionMapPutUnchecked(
         swigCPtr, this, Expression.getCPtr(key), key, Expression.getCPtr(value), value);
   }
 
   private void removeUnchecked(ExpressionExpressionMap.Iterator itr) {
-    drealJNI.ExpressionExpressionMap_removeUnchecked(
+    DrealJNI.expressionExpressionMapRemoveUnchecked(
         swigCPtr, this, ExpressionExpressionMap.Iterator.getCPtr(itr), itr);
   }
 }

@@ -27,25 +27,25 @@
  * ----------------------------------------------------------------------------- */
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
-public class SWIGTYPE_p_dreal__OptionValueT_dreal__Config__SatDefaultPhase_t {
+public class SwigTypePStdSetTDrealDrakeSymbolicVariableTConstIterator {
   private transient long swigCPtr;
 
-  protected SWIGTYPE_p_dreal__OptionValueT_dreal__Config__SatDefaultPhase_t(
+  protected SwigTypePStdSetTDrealDrakeSymbolicVariableTConstIterator(
       long cPtr, @SuppressWarnings("unused") boolean futureUse) {
     swigCPtr = cPtr;
   }
 
-  protected SWIGTYPE_p_dreal__OptionValueT_dreal__Config__SatDefaultPhase_t() {
+  protected SwigTypePStdSetTDrealDrakeSymbolicVariableTConstIterator() {
     swigCPtr = 0;
   }
 
   protected static long getCPtr(
-      SWIGTYPE_p_dreal__OptionValueT_dreal__Config__SatDefaultPhase_t obj) {
+      SwigTypePStdSetTDrealDrakeSymbolicVariableTConstIterator obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
   protected static long swigRelease(
-      SWIGTYPE_p_dreal__OptionValueT_dreal__Config__SatDefaultPhase_t obj) {
+      SwigTypePStdSetTDrealDrakeSymbolicVariableTConstIterator obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 }
