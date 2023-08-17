@@ -17,11 +17,10 @@ import com.google.common.collect.Iterables;
 import io.github.cvc5.Kind;
 import io.github.cvc5.Solver;
 import io.github.cvc5.Term;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
@@ -105,7 +104,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     Preconditions.checkArgument(
         !partitionedFormulas.isEmpty(), "at least one partition should be available.");
 
-    List<BooleanFormula> itps = Stream.of(new BooleanFormula[] {}).collect(Collectors.toList());
+    final List<BooleanFormula> itps = new ArrayList<>();
 
     if (partitionedFormulas.size() == 1) {
       return itps;
@@ -126,42 +125,12 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     return itps;
   }
 
-  // Experimental!
   @Override
   public List<BooleanFormula> getTreeInterpolants(
-      List<? extends Collection<Term>> pPartitionedFormulas, int[] pStartOfSubTree)
-      throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
-    assert InterpolatingProverEnvironment.checkTreeStructure(
-        pPartitionedFormulas.size(), pStartOfSubTree);
-
-    // Generate every Interpolation Pair
-    ImmutableList<ImmutableList<ImmutableList<Collection<Term>>>> interpolationPairs =
-        getTreeInterpolationPairs(pPartitionedFormulas, pStartOfSubTree);
-
-    final List<Term> itps = Stream.of(new Term[] {}).collect(Collectors.toList());
-    try { // Interpolate every Interpolation Pair
-      for (int i = 0; i < interpolationPairs.size(); i++) {
-        itps.add(
-            getCVC5Interpolation(
-                ImmutableList.copyOf(interpolationPairs.get(i).get(0)),
-                ImmutableList.copyOf(interpolationPairs.get(i).get(1))));
-      }
-    } catch (UnsupportedOperationException e) {
-      if (e.getMessage() != null) {
-        throw new SolverException(e.getMessage(), e);
-      } else {
-        throw e;
-      }
-    }
-
-    final List<BooleanFormula> result =
-        Stream.of(new BooleanFormula[] {}).collect(Collectors.toList());
-    for (Term itp : itps) {
-      result.add(creator.encapsulateBoolean(itp));
-    }
-    assert result.size() == pStartOfSubTree.length - 1;
-    return result;
+      List<? extends Collection<Term>> partitionedFormulas, int[] startOfSubTree) {
+    throw new UnsupportedOperationException(
+        "directly receiving tree interpolants is not supported."
+            + "Use another solver or another strategy for interpolants.");
   }
 
   /**
@@ -197,8 +166,6 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     Solver interpolationSolver = new Solver();
 
     setSolverOptions(seed, solverOptions, interpolationSolver);
-
-    interpolationSolver.resetAssertions();
 
     Term interpolA = buildConjunctionOfFormulasOverList(pFormAAsList, interpolationSolver);
 
@@ -266,79 +233,5 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
       default:
         return usingSolver.mkTerm(Kind.AND, formulas.toArray(new Term[0]));
     }
-  }
-
-  /**
-   * Generates Interpolation Pairs for Tree Interpolation. Experimental!
-   *
-   * @param pPartitionedFormulas of formulas
-   * @param pStartOfSubTree The start of the subtree containing the formula at this index as root.
-   * @return An List of Interpolation Pairs (as Tuple (a List)) containing Lists of Collection of
-   *     Terms
-   */
-  @SuppressWarnings("unchecked")
-  private ImmutableList<ImmutableList<ImmutableList<Collection<Term>>>> getTreeInterpolationPairs(
-      List<? extends Collection<Term>> pPartitionedFormulas, int[] pStartOfSubTree) {
-    // First Interpolation Pair
-    ImmutableList<Integer> leafes = ImmutableList.of(pStartOfSubTree[0]);
-    // current generated LHS of Tuple
-    ImmutableList<Collection<Term>> currA = ImmutableList.of(pPartitionedFormulas.get(0));
-    // current generated RHS of Tuple
-    ImmutableList<Collection<Term>> currB =
-        ImmutableList.copyOf(pPartitionedFormulas.subList(1, pPartitionedFormulas.size()));
-    // current generated Interpolation Tuple
-    ImmutableList<ImmutableList<Collection<Term>>> betweenRes = ImmutableList.of(currA, currB);
-    ImmutableList<ImmutableList<ImmutableList<Collection<Term>>>> result =
-        ImmutableList.of(betweenRes);
-    // iterate through Tree structure
-    for (int i = 1; i < pStartOfSubTree.length - 1; i++) {
-      // if the leave does not change, continue like Sequential Interpolation
-      if (pStartOfSubTree[i] == pStartOfSubTree[i - 1]) {
-        currA =
-            Stream.concat(currA.stream(), ImmutableList.of(pPartitionedFormulas.get(i)).stream())
-                .collect(ImmutableList.toImmutableList());
-        currB = currB.subList(1, currB.size());
-        betweenRes = ImmutableList.of(currA, currB);
-      } else {
-        // if the leave for the node already existed, rebuild the lists, split at the node
-        if (leafes.contains(pStartOfSubTree[i])) {
-          currA = new ImmutableList.Builder<Collection<Term>>().build();
-          currB = new ImmutableList.Builder<Collection<Term>>().build();
-          for (int j = 0; j < pStartOfSubTree.length; j++) {
-            if (j <= i) {
-              currA =
-                  Stream.concat(
-                          currA.stream(), ImmutableList.of(pPartitionedFormulas.get(j)).stream())
-                      .collect(ImmutableList.toImmutableList());
-            } else {
-              currB =
-                  Stream.concat(
-                          currA.stream(), ImmutableList.of(pPartitionedFormulas.get(j)).stream())
-                      .collect(ImmutableList.toImmutableList());
-            }
-          }
-          betweenRes = ImmutableList.of(currA, currB);
-          // rebuild currA from beginning with new node
-        } else {
-          currB =
-              Stream.concat(currB.stream(), currA.stream())
-                  .collect(ImmutableList.toImmutableList());
-          currA = new ImmutableList.Builder<Collection<Term>>().build();
-          currA =
-              Stream.concat(currA.stream(), ImmutableList.of(pPartitionedFormulas.get(i)).stream())
-                  .collect(ImmutableList.toImmutableList());
-          currB = currB.subList(1, currB.size());
-          betweenRes = ImmutableList.of(currA, currB);
-          leafes =
-              Stream.concat(leafes.stream(), ImmutableList.of(pStartOfSubTree[i]).stream())
-                  .collect(ImmutableList.toImmutableList());
-        }
-      }
-      result =
-          Stream.concat(result.stream(), ImmutableList.of(betweenRes).stream())
-              .collect(ImmutableList.toImmutableList());
-    }
-    assert result.size() == pStartOfSubTree.length - 1;
-    return result;
   }
 }
