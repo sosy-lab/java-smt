@@ -1,31 +1,16 @@
-/*
- *  JavaSMT is an API wrapper for a collection of SMT solvers.
- *  This file is part of JavaSMT.
- *
- *  Copyright (C) 2007-2016  Dirk Beyer
- *  All rights reserved.
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
+// This file is part of JavaSMT,
+// an API wrapper for a collection of SMT solvers:
+// https://github.com/sosy-lab/java-smt
+//
+// SPDX-FileCopyrightText: 2023 Dirk Beyer <https://www.sosy-lab.org>
+//
+// SPDX-License-Identifier: Apache-2.0 OR GPL-3.0-or-later
 
 package org.sosy_lab.java_smt.solvers.dreal4;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static com.google.common.truth.Truth.assertThat;
 
-import java.util.ArrayList;
+import com.google.common.collect.ImmutableList;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.After;
@@ -79,7 +64,7 @@ public class DReal4NativeAPITest {
     Formula formula = dreal.And(fTrue, fFalse);
     context.declareVariables(formula);
     context.Assert(formula);
-    assertFalse(context.CheckSat(model));
+    assertThat(context.CheckSat(model)).isFalse();
   }
 
   @Test
@@ -88,7 +73,7 @@ public class DReal4NativeAPITest {
     Formula formula = dreal.And(fTrue, fTrue);
     context.declareVariables(formula);
     context.Assert(formula);
-    assertTrue(context.CheckSat(model));
+    assertThat(context.CheckSat(model)).isTrue();
   }
 
   @Test
@@ -98,7 +83,7 @@ public class DReal4NativeAPITest {
     Formula f = new Formula(dreal.Equal(zero, one));
     context.declareVariables(f);
     context.Assert(f);
-    assertFalse(context.CheckSat(model));
+    assertThat(context.CheckSat(model)).isFalse();
   }
 
   @Test
@@ -107,7 +92,7 @@ public class DReal4NativeAPITest {
     Formula f = new Formula(dreal.Equal(zero, zero));
     context.declareVariables(f);
     context.Assert(f);
-    assertTrue(context.CheckSat(model));
+    assertThat(context.CheckSat(model)).isTrue();
   }
 
   @Test
@@ -116,7 +101,7 @@ public class DReal4NativeAPITest {
     Formula f = new Formula(dreal.NotEqual(zero, zero));
     context.declareVariables(f);
     context.Assert(f);
-    assertFalse(context.CheckSat(model));
+    assertThat(context.CheckSat(model)).isFalse();
   }
 
   @Test
@@ -126,7 +111,7 @@ public class DReal4NativeAPITest {
     Formula f = new Formula(dreal.NotEqual(zero, one));
     context.declareVariables(f);
     context.Assert(f);
-    assertTrue(context.CheckSat(model));
+    assertThat(context.CheckSat(model)).isTrue();
   }
 
   @Test
@@ -135,7 +120,7 @@ public class DReal4NativeAPITest {
     Formula f = new Formula(dreal.Equal(dreal.Add(one, one), one));
     context.declareVariables(f);
     context.Assert(f);
-    assertFalse(context.CheckSat(model));
+    assertThat(context.CheckSat(model)).isFalse();
   }
 
   @Test
@@ -145,7 +130,7 @@ public class DReal4NativeAPITest {
     Formula f = new Formula(dreal.Equal(dreal.Add(zero, one), one));
     context.declareVariables(f);
     context.Assert(f);
-    assertTrue(context.CheckSat(model));
+    assertThat(context.CheckSat(model)).isTrue();
   }
 
   @Test
@@ -158,7 +143,7 @@ public class DReal4NativeAPITest {
     context.Assert(assertion1);
     context.declareVariables(assertion2);
     context.Assert(assertion2);
-    assertTrue(context.CheckSat(model));
+    assertThat(context.CheckSat(model)).isTrue();
   }
 
   @Test
@@ -171,7 +156,7 @@ public class DReal4NativeAPITest {
     context.Assert(assertion1);
     context.declareVariables(assertion2);
     context.Assert(assertion2);
-    assertFalse(context.CheckSat(model));
+    assertThat(context.CheckSat(model)).isFalse();
   }
 
   @Test
@@ -186,7 +171,7 @@ public class DReal4NativeAPITest {
     Formula assertion = new Formula(dreal.And(k, dreal.Equal(dreal.Add(x, y), eightFith)));
     context.declareVariables(assertion);
     context.Assert(assertion);
-    assertTrue(context.CheckSat(model));
+    assertThat(context.CheckSat(model)).isTrue();
   }
 
   @Test
@@ -196,7 +181,7 @@ public class DReal4NativeAPITest {
     Formula f = new Formula(dreal.Or(dreal.Grater(zero, zero), dreal.Grater(one, zero)));
     context.declareVariables(f);
     context.Assert(f);
-    assertTrue(context.CheckSat(model));
+    assertThat(context.CheckSat(model)).isTrue();
   }
 
   @Test
@@ -205,7 +190,7 @@ public class DReal4NativeAPITest {
     Formula f = new Formula(dreal.Or(dreal.Grater(zero, zero), dreal.Grater(zero, zero)));
     context.declareVariables(f);
     context.Assert(f);
-    assertFalse(context.CheckSat(model));
+    assertThat(context.CheckSat(model)).isFalse();
   }
 
   @Test
@@ -218,26 +203,26 @@ public class DReal4NativeAPITest {
     context.Push(1);
     context.declareVariables(assertion1);
     context.Assert(assertion1);
-    assertTrue(context.CheckSat(model));
+    assertThat(context.CheckSat(model)).isTrue();
     context.Push(1);
     context.declareVariables(assertion2);
     context.Assert(assertion2);
-    assertFalse(context.CheckSat(model));
+    assertThat(context.CheckSat(model)).isFalse();
     context.Pop(1);
-    assertTrue(context.CheckSat(model));
+    assertThat(context.CheckSat(model)).isTrue();
   }
 
   @Test
   public void programSynthesis() {
-    Variable var_x = new Variable("x");
-    Variable var_a = new Variable("a");
-    Variable var_b = new Variable("b");
-    Variable var_c = new Variable("c");
+    Variable varX = new Variable("x");
+    Variable varA = new Variable("a");
+    Variable varB = new Variable("b");
+    Variable varC = new Variable("c");
 
-    Expression x = new Expression(var_x);
-    Expression a = new Expression(var_a);
-    Expression b = new Expression(var_b);
-    Expression c = new Expression(var_c);
+    Expression x = new Expression(varX);
+    Expression a = new Expression(varA);
+    Expression b = new Expression(varB);
+    Expression c = new Expression(varC);
     Expression nt = new Expression(-1000.0);
     Expression t = new Expression(1000.0);
     Expression nh = new Expression(-100.0);
@@ -255,7 +240,7 @@ public class DReal4NativeAPITest {
                 dreal.And(dreal.LessEqual(nt, x), dreal.LessEqual(x, t)),
                 dreal.And(sndimply, thrdimply)));
 
-    Formula quantified = new Formula(dreal.forall(new Variables(new Variable[] {var_x}), nested));
+    Formula quantified = new Formula(dreal.forall(new Variables(new Variable[] {varX}), nested));
 
     Formula f1 = new Formula(dreal.And(dreal.LessEqual(nh, a), dreal.LessEqual(a, h)));
     Formula f2 = new Formula(dreal.And(dreal.LessEqual(nh, b), dreal.LessEqual(b, h)));
@@ -268,7 +253,7 @@ public class DReal4NativeAPITest {
 
     context.declareVariables(check);
     context.Assert(check);
-    assertTrue(context.CheckSat(model));
+    assertThat(context.CheckSat(model)).isTrue();
   }
 
   @Test
@@ -277,12 +262,10 @@ public class DReal4NativeAPITest {
     Variable y = new Variable("y");
     Variables vars = new Variables(new Variable[] {x, y});
     Formula f = dreal.forall(vars, dreal.Equal(new Expression(x), new Expression(y)));
-    List<Long> expected = Arrays.asList(x.get_hash(), y.get_hash());
-    ArrayList<Long> output = new ArrayList<>();
+    List<Long> expected = ImmutableList.of(x.get_hash(), y.get_hash());
     for (Variable var : f.getQuantifiedVariables()) {
-      output.add(var.get_hash());
+      assertThat(expected).contains(var.get_hash());
     }
-    assertEquals(expected, output);
   }
 
   @Test
@@ -291,11 +274,9 @@ public class DReal4NativeAPITest {
     Variable y = new Variable("y");
     Formula f = new Formula(dreal.Equal(new Expression(x), new Expression(y)));
     List<Long> expected = Arrays.asList(x.get_hash(), y.get_hash());
-    ArrayList<Long> output = new ArrayList<>();
     for (Variable var : f.getFreeVariables()) {
-      output.add(var.get_hash());
+        assertThat(expected).contains(var.get_hash());
     }
-    assertEquals(expected, output);
   }
 
   @Test
@@ -304,11 +285,9 @@ public class DReal4NativeAPITest {
     Variable y = new Variable("y");
     Expression exp = new Expression(dreal.Add(new Expression(x), new Expression(y)));
     List<Long> expected = Arrays.asList(x.get_hash(), y.get_hash());
-    ArrayList<Long> output = new ArrayList<>();
     for (Variable var : exp.getVariables()) {
-      output.add(var.get_hash());
+      assertThat(expected).contains(var.get_hash());
     }
-    assertEquals(expected, output);
   }
 
   @Test
@@ -317,9 +296,9 @@ public class DReal4NativeAPITest {
     Variable y = new Variable("y", Variable.Type.INTEGER);
     Variable z = new Variable("z", Variable.Type.CONTINUOUS);
     Variable a = new Variable("a");
-    assertSame(x.get_type(), Variable.Type.BOOLEAN);
-    assertSame(y.get_type(), Variable.Type.INTEGER);
-    assertSame(z.get_type(), Variable.Type.CONTINUOUS);
-    assertSame(a.get_type(), Variable.Type.CONTINUOUS);
+    assertThat(x.get_type()).isEqualTo(Variable.Type.BOOLEAN);
+    assertThat(y.get_type()).isEqualTo(Variable.Type.INTEGER);
+    assertThat(z.get_type()).isEqualTo(Variable.Type.CONTINUOUS);
+    assertThat(a.get_type()).isEqualTo(Variable.Type.CONTINUOUS);
   }
 }
