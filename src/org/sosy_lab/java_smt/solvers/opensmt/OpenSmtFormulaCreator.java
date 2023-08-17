@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.solvers.opensmt;
 import com.google.common.collect.ImmutableList;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Arrays;
 import opensmt.ArithLogic;
 import opensmt.Logic;
 import opensmt.LogicFactory;
@@ -39,7 +40,9 @@ import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtFormula.OpenSmtRationalFormu
 
 public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, SymRef> {
 
-  private OpenSmtFormulaCreator(Logic logic) {
+  private Logics logicToUse;
+  
+  private OpenSmtFormulaCreator(Logics logicType, Logic logic) {
     super(
         logic,
         logic.getSort_bool(),
@@ -47,20 +50,85 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, Sy
         (logic instanceof ArithLogic) ? ((ArithLogic) logic).getSort_real() : null,
         null,
         null);
+    
+    logicToUse = logicType;
   }
 
-  public static OpenSmtFormulaCreator newCreator(Logics logicToUse) {
-    switch (logicToUse) {
+  public static OpenSmtFormulaCreator newCreator(Logics logicType) {
+    switch (logicType) {
       case CORE:
+        return new OpenSmtFormulaCreator(logicType, LogicFactory.getInstance(Logic_t.QF_BOOL));
       case QF_UF:
-        return new OpenSmtFormulaCreator(LogicFactory.getInstance(Logic_t.QF_UF));
+        return new OpenSmtFormulaCreator(logicType, LogicFactory.getInstance(Logic_t.QF_UF));
       case QF_LIA:
-        return new OpenSmtFormulaCreator(LogicFactory.getLIAInstance());
+        return new OpenSmtFormulaCreator(logicType, LogicFactory.getLIAInstance());
       case QF_LRA:
-        return new OpenSmtFormulaCreator(LogicFactory.getLRAInstance());
+        return new OpenSmtFormulaCreator(logicType, LogicFactory.getLRAInstance());
       default:
-        return new OpenSmtFormulaCreator(LogicFactory.getLogicAll());
+        return new OpenSmtFormulaCreator(Logics.ALL, LogicFactory.getLogicAll());
     }
+  }
+
+  boolean hasArrays() {
+    List<Logics> supported =
+      Arrays.asList(
+        Logics.QF_AX,
+        Logics.QF_ALIA,
+        Logics.QF_ALRA,
+        Logics.QF_AUFLIA,
+        Logics.QF_AUFLRA,
+        Logics.ALL);
+    
+    return supported.contains(logicToUse);
+  }
+
+  boolean hasUFs() {
+    List<Logics> supported =
+      Arrays.asList(
+        Logics.QF_UF,
+        Logics.QF_UFLIA,
+        Logics.QF_UFLRA,
+        Logics.QF_AUFLIA,
+        Logics.QF_AUFLRA,
+        Logics.ALL);
+
+    return supported.contains(logicToUse);
+  }
+
+  boolean hasIntegers() {
+    List<Logics> supported =
+      Arrays.asList(
+        Logics.QF_IDL,
+        Logics.QF_LIA,
+        Logics.QF_ALIA,
+        Logics.QF_UFLIA,
+        Logics.QF_AUFLIA,
+        Logics.ALL);
+
+    return supported.contains(logicToUse);
+  }
+
+  boolean hasReals() {
+    List<Logics> supported =
+      Arrays.asList(
+        Logics.QF_RDL,
+        Logics.QF_LRA,
+        Logics.QF_ALRA,
+        Logics.QF_UFLRA,
+        Logics.QF_AUFLRA,
+        Logics.ALL);
+
+    return supported.contains(logicToUse);
+  }
+
+  boolean hasInterpolation() {
+    List<Logics> supported =
+      Arrays.asList(
+        Logics.QF_UF,
+        Logics.QF_LIA,
+        Logics.QF_LRA);
+
+    return supported.contains(logicToUse);
   }
 
   @Override

@@ -213,7 +213,7 @@ index fc9dbfb7..943a466d 100644
  public:
      static std::string nextFreeArgumentName() { return std::string(template_arg_prefix) + std::to_string(template_arg_counter++); }
 diff --git a/src/logics/Logic.cc b/src/logics/Logic.cc
-index b90430c2..7eb1fed4 100644
+index b90430c2..1161b068 100644
 --- a/src/logics/Logic.cc
 +++ b/src/logics/Logic.cc
 @@ -15,6 +15,7 @@
@@ -286,7 +286,24 @@ index b90430c2..7eb1fed4 100644
  void Logic::instantiateFunctions(SRef sr)
  {
      // Equality
-@@ -1346,14 +1360,14 @@ void Logic::dumpWithLets(std::ostream & dump_out, PTRef formula) const {
+@@ -841,12 +855,10 @@ PTRef Logic::insertTerm(SymRef sym, vec<PTRef>&& terms)
+         assert(terms.size() == 0);
+         return mkFun(sym, std::move(terms));
+     }
+-    if (hasArrays()) {
+-        if (isArrayStore(sym))
+-            return mkStore(std::move(terms));
+-        if (isArraySelect(sym))
+-            return mkSelect(std::move(terms));
+-    }
++    if (isArrayStore(sym))
++      return mkStore(std::move(terms));
++    if (isArraySelect(sym))
++      return mkSelect(std::move(terms));
+     return mkUninterpFun(sym, std::move(terms));
+ }
+ 
+@@ -1346,14 +1358,14 @@ void Logic::dumpWithLets(std::ostream & dump_out, PTRef formula) const {
          if (term.size() > 0) dump_out << ")";
  
          // Closes binding
@@ -303,7 +320,7 @@ index b90430c2..7eb1fed4 100644
  
      // Close all lets
      for (unsigned n = 1; n <= num_lets; n++) dump_out << ")";
-@@ -1488,6 +1502,9 @@ Logic::collectStats(PTRef root, int& n_of_conn, int& n_of_eq, int& n_of_uf, int&
+@@ -1488,6 +1500,9 @@ Logic::collectStats(PTRef root, int& n_of_conn, int& n_of_eq, int& n_of_uf, int&
  
  PTRef Logic::conjoinExtras(PTRef root) { return root; }
  

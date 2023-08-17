@@ -15,12 +15,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import opensmt.Logic;
 import opensmt.MainSolver;
 import opensmt.PTRef;
 import opensmt.SMTConfig;
+import opensmt.SRef;
+import opensmt.Symbol;
+import opensmt.SymRef;
 import opensmt.sstat;
+import opensmt.VectorPTRef;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -140,10 +146,71 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     return super.getModelAssignments();
   }
 
+  /** Make sure that the assertions only use features supported by the selected sublogic. */
+  private void checkCompatability() throws SolverException {
+
+    Logic osmtLogic = creator.getEnv();
+    PTRef asserted = osmtLogic.mkAnd(new VectorPTRef(getAssertedFormulas()));
+
+    Map<String, PTRef> userDeclarations = creator.extractVariablesAndUFs(asserted, true);
+
+    boolean usesUFs = false;
+    boolean usesIntegers = false;
+    boolean usesReals = false;
+    boolean usesArrays = false;
+
+    for (PTRef term : userDeclarations.values()) {
+      SymRef ref = osmtLogic.getSymRef(term);
+      Symbol sym = osmtLogic.getSym(ref);
+
+      if (sym.size() > 1) {
+        usesUFs = true;
+      }
+
+      SRef sort = sym.rsort();
+      if (osmtLogic.isArraySort(sort)) {
+        usesArrays = true;
+      }
+      if (sort.equals(creator.getIntegerType())) {
+        usesIntegers = true;
+      }
+      if (sort.equals(creator.getRationalType())) {
+        usesReals = true;
+      }
+    }
+
+    if (usesIntegers && usesReals) {
+      throw new SolverException(
+          "OpenSMT does not support mixed integer-real arithmetics");
+    }
+
+    List<String> errors = new ArrayList<>();
+    if (usesUFs && !creator.hasUFs()) {
+      errors.add("uninterpreted functions");
+    }
+    if (usesIntegers && !creator.hasIntegers()) {
+      errors.add("integers");
+    }
+    if (usesReals && !creator.hasReals()) {
+      errors.add("reals");
+    }
+    if (usesArrays && !creator.hasArrays()) {
+      errors.add("arrays");
+    }
+
+    if (errors.size() > 0) {
+      throw new SolverException(
+          "Assertions use features that are not supported by the selected logic "
+          + errors.toString());
+    }
+  }
+
   @Override
   @SuppressWarnings("try")
   public boolean isUnsat() throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
+    checkCompatability();
+
     closeAllEvaluators();
     changedSinceLastSatQuery = false;
 

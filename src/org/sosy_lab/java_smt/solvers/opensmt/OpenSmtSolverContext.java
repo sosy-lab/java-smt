@@ -75,8 +75,7 @@ public class OpenSmtSolverContext extends AbstractSolverContext {
     OpenSmtArrayFormulaManager arrayTheory = new OpenSmtArrayFormulaManager(creator);
 
     OpenSmtFormulaManager manager =
-        new OpenSmtFormulaManager(
-            creator, functionTheory, booleanTheory, integerTheory, rationalTheory, arrayTheory);
+        new OpenSmtFormulaManager(creator, functionTheory, booleanTheory, integerTheory, rationalTheory, arrayTheory);
 
     return new OpenSmtSolverContext(creator, manager, (int) pRandom, pLogger, pShutdownNotifier);
   }

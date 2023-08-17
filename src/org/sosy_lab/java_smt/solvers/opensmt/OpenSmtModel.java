@@ -43,8 +43,8 @@ public class OpenSmtModel extends AbstractModel<PTRef, SRef, Logic> {
     osmtLogic = pCreator.getEnv();
     osmtModel = pProver.getOsmtSolver().getModel();
 
-    PTRef asserts = osmtLogic.mkAnd(new VectorPTRef(pAssertedTerms));
-    Map<String, PTRef> userDeclarations = creator.extractVariablesAndUFs(asserts, true);
+    PTRef asserted = osmtLogic.mkAnd(new VectorPTRef(pAssertedTerms));
+    Map<String, PTRef> userDeclarations = creator.extractVariablesAndUFs(asserted, true);
 
     ImmutableList.Builder<ValueAssignment> builder = ImmutableList.builder();
 
@@ -102,6 +102,8 @@ public class OpenSmtModel extends AbstractModel<PTRef, SRef, Logic> {
   public PTRef evalImpl(PTRef f) {
     Preconditions.checkState(!isClosed());
     Map<String, PTRef> userDeclarations = creator.extractVariablesAndUFs(f, true);
+
+    // FIXME: rewrite to use checkCompatability from AbstractProver
 
     for (PTRef term : userDeclarations.values()) {
       SRef sort = osmtLogic.getSortRef(term);
