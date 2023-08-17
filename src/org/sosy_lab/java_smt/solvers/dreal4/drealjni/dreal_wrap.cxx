@@ -675,7 +675,7 @@ SWIGINTERN bool std_set_Sl_dreal_drake_symbolic_Variable_Sg__hasNextImpl(std::se
 extern "C" {
 #endif
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_FormulaSet_1Iterator_1incrementUnchecked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaSetIteratorIncrementUnchecked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   std::set< dreal::drake::symbolic::Formula >::iterator *arg1 = (std::set< dreal::drake::symbolic::Formula >::iterator *) 0 ;
 
   (void)jenv;
@@ -686,7 +686,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_FormulaSet_1Iterator_1derefUnchecked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaSetIteratorDerefUnchecked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   std::set< dreal::drake::symbolic::Formula >::iterator *arg1 = (std::set< dreal::drake::symbolic::Formula >::iterator *) 0 ;
   dreal::drake::symbolic::Formula result;
@@ -701,7 +701,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_FormulaSet_1Iterator_1isNot(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaSetIteratorIsNot(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jboolean jresult = 0 ;
   std::set< dreal::drake::symbolic::Formula >::iterator *arg1 = (std::set< dreal::drake::symbolic::Formula >::iterator *) 0 ;
   std::set< dreal::drake::symbolic::Formula >::iterator arg2 ;
@@ -725,7 +725,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_delete_1FormulaSet_1Iterator(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_deleteFormulaSetIterator(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   std::set< dreal::drake::symbolic::Formula >::iterator *arg1 = (std::set< dreal::drake::symbolic::Formula >::iterator *) 0 ;
 
   (void)jenv;
@@ -735,7 +735,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1FormulaSet_1_1SWIG_10(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newFormulaSetSWIG0(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   std::set< dreal::drake::symbolic::Formula > *result = 0 ;
 
@@ -747,7 +747,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1FormulaSet_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newFormulaSetSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   std::set< dreal::drake::symbolic::Formula > *arg1 = 0 ;
   std::set< dreal::drake::symbolic::Formula > *result = 0 ;
@@ -766,7 +766,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_FormulaSet_1isEmpty(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaSetIsEmpty(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   std::set< dreal::drake::symbolic::Formula > *arg1 = (std::set< dreal::drake::symbolic::Formula > *) 0 ;
   bool result;
@@ -781,7 +781,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_FormulaSet_1clear(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaSetClear(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   std::set< dreal::drake::symbolic::Formula > *arg1 = (std::set< dreal::drake::symbolic::Formula > *) 0 ;
 
   (void)jenv;
@@ -792,7 +792,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_FormulaSet_1begin(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaSetBegin(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   std::set< dreal::drake::symbolic::Formula > *arg1 = (std::set< dreal::drake::symbolic::Formula > *) 0 ;
   std::set< dreal::drake::symbolic::Formula >::iterator result;
@@ -807,7 +807,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_FormulaSet_1end(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaSetEnd(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   std::set< dreal::drake::symbolic::Formula > *arg1 = (std::set< dreal::drake::symbolic::Formula > *) 0 ;
   std::set< dreal::drake::symbolic::Formula >::iterator result;
@@ -822,7 +822,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_FormulaSet_1addImpl(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaSetAddImpl(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jboolean jresult = 0 ;
   std::set< dreal::drake::symbolic::Formula > *arg1 = (std::set< dreal::drake::symbolic::Formula > *) 0 ;
   dreal::drake::symbolic::Formula *arg2 = 0 ;
@@ -844,7 +844,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_FormulaSet_1containsImpl(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaSetContainsImpl(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jboolean jresult = 0 ;
   std::set< dreal::drake::symbolic::Formula > *arg1 = (std::set< dreal::drake::symbolic::Formula > *) 0 ;
   dreal::drake::symbolic::Formula *arg2 = 0 ;
@@ -866,7 +866,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_FormulaSet_1removeImpl(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaSetRemoveImpl(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jboolean jresult = 0 ;
   std::set< dreal::drake::symbolic::Formula > *arg1 = (std::set< dreal::drake::symbolic::Formula > *) 0 ;
   dreal::drake::symbolic::Formula *arg2 = 0 ;
@@ -888,7 +888,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_FormulaSet_1sizeImpl(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaSetSizeImpl(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   std::set< dreal::drake::symbolic::Formula > *arg1 = (std::set< dreal::drake::symbolic::Formula > *) 0 ;
   jint result;
@@ -908,7 +908,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_FormulaSet_1hasNextImpl(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaSetHasNextImpl(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jboolean jresult = 0 ;
   std::set< dreal::drake::symbolic::Formula > *arg1 = (std::set< dreal::drake::symbolic::Formula > *) 0 ;
   std::set< dreal::drake::symbolic::Formula >::iterator *arg2 = 0 ;
@@ -930,7 +930,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_delete_1FormulaSet(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_deleteFormulaSet(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   std::set< dreal::drake::symbolic::Formula > *arg1 = (std::set< dreal::drake::symbolic::Formula > *) 0 ;
 
   (void)jenv;
@@ -940,7 +940,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1FormulaVector_1_1SWIG_10(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newFormulaVectorSWIG0(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   std::vector< dreal::drake::symbolic::Formula > *result = 0 ;
 
@@ -952,7 +952,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1FormulaVector_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newFormulaVectorSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   std::vector< dreal::drake::symbolic::Formula > *arg1 = 0 ;
   std::vector< dreal::drake::symbolic::Formula > *result = 0 ;
@@ -971,7 +971,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_FormulaVector_1capacity(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaVectorCapacity(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   std::vector< dreal::drake::symbolic::Formula > *arg1 = (std::vector< dreal::drake::symbolic::Formula > *) 0 ;
   std::vector< dreal::drake::symbolic::Formula >::size_type result;
@@ -986,7 +986,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_FormulaVector_1reserve(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaVectorReserve(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   std::vector< dreal::drake::symbolic::Formula > *arg1 = (std::vector< dreal::drake::symbolic::Formula > *) 0 ;
   std::vector< dreal::drake::symbolic::Formula >::size_type arg2 ;
 
@@ -1004,7 +1004,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_FormulaVector_1isEmpty(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaVectorIsEmpty(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   std::vector< dreal::drake::symbolic::Formula > *arg1 = (std::vector< dreal::drake::symbolic::Formula > *) 0 ;
   bool result;
@@ -1019,7 +1019,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_FormulaVector_1clear(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaVectorClear(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   std::vector< dreal::drake::symbolic::Formula > *arg1 = (std::vector< dreal::drake::symbolic::Formula > *) 0 ;
 
   (void)jenv;
@@ -1030,7 +1030,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1FormulaVector_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newFormulaVectorSWIG2(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   jint arg1 ;
   dreal::drake::symbolic::Formula *arg2 = 0 ;
@@ -1056,7 +1056,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_FormulaVector_1doSize(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaVectorDoSize(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   std::vector< dreal::drake::symbolic::Formula > *arg1 = (std::vector< dreal::drake::symbolic::Formula > *) 0 ;
   jint result;
@@ -1076,7 +1076,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_FormulaVector_1doAdd_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaVectorDoAddSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   std::vector< dreal::drake::symbolic::Formula > *arg1 = (std::vector< dreal::drake::symbolic::Formula > *) 0 ;
   std::vector< dreal::drake::symbolic::Formula >::value_type *arg2 = 0 ;
 
@@ -1094,7 +1094,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_FormulaVector_1doAdd_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jlong jarg3, jobject jarg3_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaVectorDoAddSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jlong jarg3, jobject jarg3_) {
   std::vector< dreal::drake::symbolic::Formula > *arg1 = (std::vector< dreal::drake::symbolic::Formula > *) 0 ;
   jint arg2 ;
   std::vector< dreal::drake::symbolic::Formula >::value_type *arg3 = 0 ;
@@ -1119,7 +1119,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_FormulaVector_1doRemove(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaVectorDoRemove(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   jlong jresult = 0 ;
   std::vector< dreal::drake::symbolic::Formula > *arg1 = (std::vector< dreal::drake::symbolic::Formula > *) 0 ;
   jint arg2 ;
@@ -1141,7 +1141,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_FormulaVector_1doGet(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaVectorDoGet(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   jlong jresult = 0 ;
   std::vector< dreal::drake::symbolic::Formula > *arg1 = (std::vector< dreal::drake::symbolic::Formula > *) 0 ;
   jint arg2 ;
@@ -1163,7 +1163,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_FormulaVector_1doSet(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jlong jarg3, jobject jarg3_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaVectorDoSet(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jlong jarg3, jobject jarg3_) {
   jlong jresult = 0 ;
   std::vector< dreal::drake::symbolic::Formula > *arg1 = (std::vector< dreal::drake::symbolic::Formula > *) 0 ;
   jint arg2 ;
@@ -1192,7 +1192,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_FormulaVector_1doRemoveRange(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_FormulaVectorDoRemoveRange(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3) {
   std::vector< dreal::drake::symbolic::Formula > *arg1 = (std::vector< dreal::drake::symbolic::Formula > *) 0 ;
   jint arg2 ;
   jint arg3 ;
@@ -1212,7 +1212,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_delete_1FormulaVector(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_deleteFormulaVector(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   std::vector< dreal::drake::symbolic::Formula > *arg1 = (std::vector< dreal::drake::symbolic::Formula > *) 0 ;
 
   (void)jenv;
@@ -1222,7 +1222,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1VariableVector_1_1SWIG_10(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newVariableVectorSWIG0(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   std::vector< dreal::drake::symbolic::Variable > *result = 0 ;
 
@@ -1234,7 +1234,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1VariableVector_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newVariableVectorSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   std::vector< dreal::drake::symbolic::Variable > *arg1 = 0 ;
   std::vector< dreal::drake::symbolic::Variable > *result = 0 ;
@@ -1253,7 +1253,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VariableVector_1capacity(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variableVectorCapacity(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   std::vector< dreal::drake::symbolic::Variable > *arg1 = (std::vector< dreal::drake::symbolic::Variable > *) 0 ;
   std::vector< dreal::drake::symbolic::Variable >::size_type result;
@@ -1268,7 +1268,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VariableVector_1reserve(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variableVectorReserve(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   std::vector< dreal::drake::symbolic::Variable > *arg1 = (std::vector< dreal::drake::symbolic::Variable > *) 0 ;
   std::vector< dreal::drake::symbolic::Variable >::size_type arg2 ;
 
@@ -1286,7 +1286,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VariableVector_1isEmpty(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variableVectorIsEmpty(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   std::vector< dreal::drake::symbolic::Variable > *arg1 = (std::vector< dreal::drake::symbolic::Variable > *) 0 ;
   bool result;
@@ -1301,7 +1301,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VariableVector_1clear(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variableVectorClear(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   std::vector< dreal::drake::symbolic::Variable > *arg1 = (std::vector< dreal::drake::symbolic::Variable > *) 0 ;
 
   (void)jenv;
@@ -1312,7 +1312,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1VariableVector_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newVariableVectorSWIG2(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   jint arg1 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
@@ -1338,7 +1338,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VariableVector_1doSize(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variableVectorDoSize(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   std::vector< dreal::drake::symbolic::Variable > *arg1 = (std::vector< dreal::drake::symbolic::Variable > *) 0 ;
   jint result;
@@ -1358,7 +1358,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VariableVector_1doAdd_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variableVectorDoAddSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   std::vector< dreal::drake::symbolic::Variable > *arg1 = (std::vector< dreal::drake::symbolic::Variable > *) 0 ;
   std::vector< dreal::drake::symbolic::Variable >::value_type *arg2 = 0 ;
 
@@ -1376,7 +1376,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VariableVector_1doAdd_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jlong jarg3, jobject jarg3_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variableVectorDoAddSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jlong jarg3, jobject jarg3_) {
   std::vector< dreal::drake::symbolic::Variable > *arg1 = (std::vector< dreal::drake::symbolic::Variable > *) 0 ;
   jint arg2 ;
   std::vector< dreal::drake::symbolic::Variable >::value_type *arg3 = 0 ;
@@ -1401,7 +1401,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VariableVector_1doRemove(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variableVectorDoRemove(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   jlong jresult = 0 ;
   std::vector< dreal::drake::symbolic::Variable > *arg1 = (std::vector< dreal::drake::symbolic::Variable > *) 0 ;
   jint arg2 ;
@@ -1423,7 +1423,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VariableVector_1doGet(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variableVectorDoGet(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   jlong jresult = 0 ;
   std::vector< dreal::drake::symbolic::Variable > *arg1 = (std::vector< dreal::drake::symbolic::Variable > *) 0 ;
   jint arg2 ;
@@ -1445,7 +1445,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VariableVector_1doSet(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jlong jarg3, jobject jarg3_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variableVectorDoSet(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jlong jarg3, jobject jarg3_) {
   jlong jresult = 0 ;
   std::vector< dreal::drake::symbolic::Variable > *arg1 = (std::vector< dreal::drake::symbolic::Variable > *) 0 ;
   jint arg2 ;
@@ -1474,7 +1474,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VariableVector_1doRemoveRange(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variableVectorDoRemoveRange(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3) {
   std::vector< dreal::drake::symbolic::Variable > *arg1 = (std::vector< dreal::drake::symbolic::Variable > *) 0 ;
   jint arg2 ;
   jint arg3 ;
@@ -1494,7 +1494,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_delete_1VariableVector(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_deleteVariableVector(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   std::vector< dreal::drake::symbolic::Variable > *arg1 = (std::vector< dreal::drake::symbolic::Variable > *) 0 ;
 
   (void)jenv;
@@ -1504,7 +1504,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1ExpressionVector_1_1SWIG_10(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newExpressionVectorSWIG0(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   std::vector< dreal::drake::symbolic::Expression > *result = 0 ;
 
@@ -1516,7 +1516,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1ExpressionVector_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newExpressionVectorSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   std::vector< dreal::drake::symbolic::Expression > *arg1 = 0 ;
   std::vector< dreal::drake::symbolic::Expression > *result = 0 ;
@@ -1535,7 +1535,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_ExpressionVector_1capacity(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionVectorCapacity(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   std::vector< dreal::drake::symbolic::Expression > *arg1 = (std::vector< dreal::drake::symbolic::Expression > *) 0 ;
   std::vector< dreal::drake::symbolic::Expression >::size_type result;
@@ -1550,7 +1550,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_ExpressionVector_1reserve(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionVectorReserve(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   std::vector< dreal::drake::symbolic::Expression > *arg1 = (std::vector< dreal::drake::symbolic::Expression > *) 0 ;
   std::vector< dreal::drake::symbolic::Expression >::size_type arg2 ;
 
@@ -1568,7 +1568,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_ExpressionVector_1isEmpty(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionVectorIsEmpty(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   std::vector< dreal::drake::symbolic::Expression > *arg1 = (std::vector< dreal::drake::symbolic::Expression > *) 0 ;
   bool result;
@@ -1583,7 +1583,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_ExpressionVector_1clear(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionVectorClear(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   std::vector< dreal::drake::symbolic::Expression > *arg1 = (std::vector< dreal::drake::symbolic::Expression > *) 0 ;
 
   (void)jenv;
@@ -1594,7 +1594,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1ExpressionVector_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newExpressionVectorSWIG2(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   jint arg1 ;
   dreal::drake::symbolic::Expression *arg2 = 0 ;
@@ -1620,7 +1620,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_ExpressionVector_1doSize(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionVectorDoSize(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   std::vector< dreal::drake::symbolic::Expression > *arg1 = (std::vector< dreal::drake::symbolic::Expression > *) 0 ;
   jint result;
@@ -1640,7 +1640,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_ExpressionVector_1doAdd_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionVectorDoAddSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   std::vector< dreal::drake::symbolic::Expression > *arg1 = (std::vector< dreal::drake::symbolic::Expression > *) 0 ;
   std::vector< dreal::drake::symbolic::Expression >::value_type *arg2 = 0 ;
 
@@ -1658,7 +1658,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_ExpressionVector_1doAdd_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jlong jarg3, jobject jarg3_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionVectorDoAddSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jlong jarg3, jobject jarg3_) {
   std::vector< dreal::drake::symbolic::Expression > *arg1 = (std::vector< dreal::drake::symbolic::Expression > *) 0 ;
   jint arg2 ;
   std::vector< dreal::drake::symbolic::Expression >::value_type *arg3 = 0 ;
@@ -1683,7 +1683,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_ExpressionVector_1doRemove(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionVectorDoRemove(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   jlong jresult = 0 ;
   std::vector< dreal::drake::symbolic::Expression > *arg1 = (std::vector< dreal::drake::symbolic::Expression > *) 0 ;
   jint arg2 ;
@@ -1705,7 +1705,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_ExpressionVector_1doGet(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionVectorDoGet(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   jlong jresult = 0 ;
   std::vector< dreal::drake::symbolic::Expression > *arg1 = (std::vector< dreal::drake::symbolic::Expression > *) 0 ;
   jint arg2 ;
@@ -1727,7 +1727,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_ExpressionVector_1doSet(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jlong jarg3, jobject jarg3_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionVectorDoSet(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jlong jarg3, jobject jarg3_) {
   jlong jresult = 0 ;
   std::vector< dreal::drake::symbolic::Expression > *arg1 = (std::vector< dreal::drake::symbolic::Expression > *) 0 ;
   jint arg2 ;
@@ -1756,7 +1756,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_ExpressionVector_1doRemoveRange(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionVectorDoRemoveRange(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3) {
   std::vector< dreal::drake::symbolic::Expression > *arg1 = (std::vector< dreal::drake::symbolic::Expression > *) 0 ;
   jint arg2 ;
   jint arg3 ;
@@ -1776,7 +1776,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_delete_1ExpressionVector(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_deleteExpressionVector(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   std::vector< dreal::drake::symbolic::Expression > *arg1 = (std::vector< dreal::drake::symbolic::Expression > *) 0 ;
 
   (void)jenv;
@@ -1786,7 +1786,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1ExpressionDoubleMap_1_1SWIG_10(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newExpressionDoubleMapSWIG0(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   std::map< dreal::drake::symbolic::Expression,double > *result = 0 ;
 
@@ -1798,7 +1798,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1ExpressionDoubleMap_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newExpressionDoubleMapSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   std::map< dreal::drake::symbolic::Expression,double > *arg1 = 0 ;
   std::map< dreal::drake::symbolic::Expression,double > *result = 0 ;
@@ -1817,7 +1817,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_ExpressionDoubleMap_1Iterator_1getNextUnchecked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionDoubleMapIteratorGetNextUnchecked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   std::map< dreal::drake::symbolic::Expression,double >::iterator *arg1 = (std::map< dreal::drake::symbolic::Expression,double >::iterator *) 0 ;
   std::map< dreal::drake::symbolic::Expression,double,std::less< dreal::drake::symbolic::Expression > >::iterator result;
@@ -1832,7 +1832,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_ExpressionDoubleMap_1Iterator_1isNot(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionDoubleMapIteratorIsNot(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jboolean jresult = 0 ;
   std::map< dreal::drake::symbolic::Expression,double >::iterator *arg1 = (std::map< dreal::drake::symbolic::Expression,double >::iterator *) 0 ;
   std::map< dreal::drake::symbolic::Expression,double >::iterator arg2 ;
@@ -1856,7 +1856,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_ExpressionDoubleMap_1Iterator_1getKey(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionDoubleMapIteratorGetKey(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   std::map< dreal::drake::symbolic::Expression,double >::iterator *arg1 = (std::map< dreal::drake::symbolic::Expression,double >::iterator *) 0 ;
   dreal::drake::symbolic::Expression result;
@@ -1871,7 +1871,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_ExpressionDoubleMap_1Iterator_1getValue(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionDoubleMapIteratorGetValue(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jdouble jresult = 0 ;
   std::map< dreal::drake::symbolic::Expression,double >::iterator *arg1 = (std::map< dreal::drake::symbolic::Expression,double >::iterator *) 0 ;
   double result;
@@ -1886,7 +1886,7 @@ SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_ExpressionDoubleMap_1Iterator_1setValue(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jdouble jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionDoubleMapIteratorSsetValue(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jdouble jarg2) {
   std::map< dreal::drake::symbolic::Expression,double >::iterator *arg1 = (std::map< dreal::drake::symbolic::Expression,double >::iterator *) 0 ;
   double *arg2 = 0 ;
   double temp2 ;
@@ -1901,7 +1901,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_delete_1ExpressionDoubleMap_1Iterator(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_deleteExpressionDoubleMapIterator(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   std::map< dreal::drake::symbolic::Expression,double >::iterator *arg1 = (std::map< dreal::drake::symbolic::Expression,double >::iterator *) 0 ;
 
   (void)jenv;
@@ -1911,7 +1911,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_ExpressionDoubleMap_1isEmpty(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionDoubleMapIsEmpty(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   std::map< dreal::drake::symbolic::Expression,double > *arg1 = (std::map< dreal::drake::symbolic::Expression,double > *) 0 ;
   bool result;
@@ -1926,7 +1926,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_ExpressionDoubleMap_1clear(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionDoubleMapClear(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   std::map< dreal::drake::symbolic::Expression,double > *arg1 = (std::map< dreal::drake::symbolic::Expression,double > *) 0 ;
 
   (void)jenv;
@@ -1937,7 +1937,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_ExpressionDoubleMap_1find(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionDoubleMapFind(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   std::map< dreal::drake::symbolic::Expression,double > *arg1 = (std::map< dreal::drake::symbolic::Expression,double > *) 0 ;
   dreal::drake::symbolic::Expression *arg2 = 0 ;
@@ -1959,7 +1959,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_ExpressionDoubleMap_1begin(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionDoubleMapBegin(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   std::map< dreal::drake::symbolic::Expression,double > *arg1 = (std::map< dreal::drake::symbolic::Expression,double > *) 0 ;
   std::map< dreal::drake::symbolic::Expression,double >::iterator result;
@@ -1974,7 +1974,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_ExpressionDoubleMap_1end(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionDoubleMapEnd(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   std::map< dreal::drake::symbolic::Expression,double > *arg1 = (std::map< dreal::drake::symbolic::Expression,double > *) 0 ;
   std::map< dreal::drake::symbolic::Expression,double >::iterator result;
@@ -1989,7 +1989,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_ExpressionDoubleMap_1sizeImpl(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionDoubleMapSizeImpl(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   std::map< dreal::drake::symbolic::Expression,double > *arg1 = (std::map< dreal::drake::symbolic::Expression,double > *) 0 ;
   jint result;
@@ -2009,7 +2009,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_ExpressionDoubleMap_1containsImpl(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionDoubleMapContainsImpl(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jboolean jresult = 0 ;
   std::map< dreal::drake::symbolic::Expression,double > *arg1 = (std::map< dreal::drake::symbolic::Expression,double > *) 0 ;
   dreal::drake::symbolic::Expression *arg2 = 0 ;
@@ -2031,7 +2031,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_ExpressionDoubleMap_1putUnchecked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jdouble jarg3) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionDoubleMapPutUnchecked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jdouble jarg3) {
   std::map< dreal::drake::symbolic::Expression,double > *arg1 = (std::map< dreal::drake::symbolic::Expression,double > *) 0 ;
   dreal::drake::symbolic::Expression *arg2 = 0 ;
   double *arg3 = 0 ;
@@ -2053,7 +2053,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_ExpressionDoubleMap_1removeUnchecked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionDoubleMapRemoveUnchecked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   std::map< dreal::drake::symbolic::Expression,double > *arg1 = (std::map< dreal::drake::symbolic::Expression,double > *) 0 ;
   std::map< dreal::drake::symbolic::Expression,double,std::less< dreal::drake::symbolic::Expression > >::iterator arg2 ;
   std::map< dreal::drake::symbolic::Expression,double,std::less< dreal::drake::symbolic::Expression > >::iterator const *argp2 ;
@@ -2073,7 +2073,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_delete_1ExpressionDoubleMap(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_deleteExpressionDoubleMap(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   std::map< dreal::drake::symbolic::Expression,double > *arg1 = (std::map< dreal::drake::symbolic::Expression,double > *) 0 ;
 
   (void)jenv;
@@ -2083,7 +2083,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1ExpressionExpressionMap_1_1SWIG_10(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newExpressionExpressionMapSWIG0(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression > *result = 0 ;
 
@@ -2095,7 +2095,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1ExpressionExpressionMap_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newExpressionExpressionMapSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression > *arg1 = 0 ;
   std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression > *result = 0 ;
@@ -2114,7 +2114,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_ExpressionExpressionMap_1Iterator_1getNextUnchecked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionExpressionMapIteratorGetNextUnchecked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression >::iterator *arg1 = (std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression >::iterator *) 0 ;
   std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression,std::less< dreal::drake::symbolic::Expression > >::iterator result;
@@ -2129,7 +2129,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_ExpressionExpressionMap_1Iterator_1isNot(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionExpressionMapIteratorIsNot(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jboolean jresult = 0 ;
   std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression >::iterator *arg1 = (std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression >::iterator *) 0 ;
   std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression >::iterator arg2 ;
@@ -2153,7 +2153,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_ExpressionExpressionMap_1Iterator_1getKey(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionExpressionMapIteratorGetKey(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression >::iterator *arg1 = (std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression >::iterator *) 0 ;
   dreal::drake::symbolic::Expression result;
@@ -2168,7 +2168,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_ExpressionExpressionMap_1Iterator_1getValue(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionExpressionMapIteratorGetValue(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression >::iterator *arg1 = (std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression >::iterator *) 0 ;
   dreal::drake::symbolic::Expression result;
@@ -2183,7 +2183,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_ExpressionExpressionMap_1Iterator_1setValue(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionExpressionMapIteratorSetValue(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression >::iterator *arg1 = (std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression >::iterator *) 0 ;
   dreal::drake::symbolic::Expression *arg2 = 0 ;
 
@@ -2201,7 +2201,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_delete_1ExpressionExpressionMap_1Iterator(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_deleteExpressionExpressionMapIterator(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression >::iterator *arg1 = (std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression >::iterator *) 0 ;
 
   (void)jenv;
@@ -2211,7 +2211,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_ExpressionExpressionMap_1isEmpty(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionExpressionMapIsEmpty(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression > *arg1 = (std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression > *) 0 ;
   bool result;
@@ -2226,7 +2226,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_ExpressionExpressionMap_1clear(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionExpressionMapClear(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression > *arg1 = (std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression > *) 0 ;
 
   (void)jenv;
@@ -2237,7 +2237,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_ExpressionExpressionMap_1find(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionExpressionMapFind(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression > *arg1 = (std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression > *) 0 ;
   dreal::drake::symbolic::Expression *arg2 = 0 ;
@@ -2259,7 +2259,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_ExpressionExpressionMap_1begin(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionExpressionMapBegin(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression > *arg1 = (std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression > *) 0 ;
   std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression >::iterator result;
@@ -2274,7 +2274,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_ExpressionExpressionMap_1end(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionExpressionMapEnd(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression > *arg1 = (std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression > *) 0 ;
   std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression >::iterator result;
@@ -2289,7 +2289,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_ExpressionExpressionMap_1sizeImpl(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionExpressionMapSizeImpl(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression > *arg1 = (std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression > *) 0 ;
   jint result;
@@ -2309,7 +2309,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_ExpressionExpressionMap_1containsImpl(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionExpressionMapContainsImpl(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jboolean jresult = 0 ;
   std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression > *arg1 = (std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression > *) 0 ;
   dreal::drake::symbolic::Expression *arg2 = 0 ;
@@ -2331,7 +2331,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_ExpressionExpressionMap_1putUnchecked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionExpressionMapPutUnchecked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
   std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression > *arg1 = (std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression > *) 0 ;
   dreal::drake::symbolic::Expression *arg2 = 0 ;
   dreal::drake::symbolic::Expression *arg3 = 0 ;
@@ -2356,7 +2356,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_ExpressionExpressionMap_1removeUnchecked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionExpressionMapRemoveUnchecked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression > *arg1 = (std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression > *) 0 ;
   std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression,std::less< dreal::drake::symbolic::Expression > >::iterator arg2 ;
   std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression,std::less< dreal::drake::symbolic::Expression > >::iterator const *argp2 ;
@@ -2376,7 +2376,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_delete_1ExpressionExpressionMap(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_deleteExpressionExpressionMap(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression > *arg1 = (std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression > *) 0 ;
 
   (void)jenv;
@@ -2386,7 +2386,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1DoubleIntPair_1_1SWIG_10(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newDoubleIntPairSWIG0(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   std::pair< double,int > *result = 0 ;
 
@@ -2398,7 +2398,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1DoubleIntPair_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jdouble jarg1, jint jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newDoubleIntPairSWIG1(JNIEnv *jenv, jclass jcls, jdouble jarg1, jint jarg2) {
   jlong jresult = 0 ;
   double arg1 ;
   int arg2 ;
@@ -2414,7 +2414,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1DoubleIntPair_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newDoubleIntPairSWIG2(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   std::pair< double,int > *arg1 = 0 ;
   std::pair< double,int > *result = 0 ;
@@ -2433,7 +2433,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_DoubleIntPair_1first_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jdouble jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_doubleIntPairFirstSet(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jdouble jarg2) {
   std::pair< double,int > *arg1 = (std::pair< double,int > *) 0 ;
   double arg2 ;
 
@@ -2446,7 +2446,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_DoubleIntPair_1first_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_doubleIntPairFirstGet(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jdouble jresult = 0 ;
   std::pair< double,int > *arg1 = (std::pair< double,int > *) 0 ;
   double result;
@@ -2461,7 +2461,7 @@ SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_DoubleIntPair_1second_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_doubleIntPairSecondSet(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   std::pair< double,int > *arg1 = (std::pair< double,int > *) 0 ;
   int arg2 ;
 
@@ -2474,7 +2474,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_DoubleIntPair_1second_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_doubleIntPairSecondGet(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   std::pair< double,int > *arg1 = (std::pair< double,int > *) 0 ;
   int result;
@@ -2489,7 +2489,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_delete_1DoubleIntPair(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_deleteDoubleIntPair(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   std::pair< double,int > *arg1 = (std::pair< double,int > *) 0 ;
 
   (void)jenv;
@@ -2499,7 +2499,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1BoxBoxPair_1_1SWIG_10(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newBoxBoxPairSWIG0(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   std::pair< dreal::Box,dreal::Box > *result = 0 ;
 
@@ -2511,7 +2511,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1BoxBoxPair_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newBoxBoxPairSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::Box arg1 ;
   dreal::Box arg2 ;
@@ -2541,7 +2541,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1BoxBoxPair_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newBoxBoxPairSWIG2(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   std::pair< dreal::Box,dreal::Box > *arg1 = 0 ;
   std::pair< dreal::Box,dreal::Box > *result = 0 ;
@@ -2560,7 +2560,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_BoxBoxPair_1first_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_boxBoxPairFirstSet(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   std::pair< dreal::Box,dreal::Box > *arg1 = (std::pair< dreal::Box,dreal::Box > *) 0 ;
   dreal::Box *arg2 = (dreal::Box *) 0 ;
 
@@ -2574,7 +2574,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_BoxBoxPair_1first_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_boxBoxPairFirstGet(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   std::pair< dreal::Box,dreal::Box > *arg1 = (std::pair< dreal::Box,dreal::Box > *) 0 ;
   dreal::Box *result = 0 ;
@@ -2589,7 +2589,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_BoxBoxPair_1second_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_boxBoxPairSecondSet(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   std::pair< dreal::Box,dreal::Box > *arg1 = (std::pair< dreal::Box,dreal::Box > *) 0 ;
   dreal::Box *arg2 = (dreal::Box *) 0 ;
 
@@ -2603,7 +2603,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_BoxBoxPair_1second_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_boxBoxPairSecondGet(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   std::pair< dreal::Box,dreal::Box > *arg1 = (std::pair< dreal::Box,dreal::Box > *) 0 ;
   dreal::Box *result = 0 ;
@@ -2618,7 +2618,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_delete_1BoxBoxPair(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_deleteBoxBoxPair(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   std::pair< dreal::Box,dreal::Box > *arg1 = (std::pair< dreal::Box,dreal::Box > *) 0 ;
 
   (void)jenv;
@@ -2628,7 +2628,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1VaribaleIntUnorderedMap_1_1SWIG_10(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newVaribaleIntUnorderedMapSWIG0(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   std::unordered_map< dreal::drake::symbolic::Variable,int > *result = 0 ;
 
@@ -2640,7 +2640,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1VaribaleIntUnorderedMap_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newVaribaleIntUnorderedMapSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   std::unordered_map< dreal::drake::symbolic::Variable,int > *arg1 = 0 ;
   std::unordered_map< dreal::drake::symbolic::Variable,int > *result = 0 ;
@@ -2659,7 +2659,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VaribaleIntUnorderedMap_1Iterator_1getNextUnchecked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_varibaleIntUnorderedMapIteratorGetNextUnchecked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   std::unordered_map< dreal::drake::symbolic::Variable,int >::iterator *arg1 = (std::unordered_map< dreal::drake::symbolic::Variable,int >::iterator *) 0 ;
   std::unordered_map< dreal::drake::symbolic::Variable,int >::iterator result;
@@ -2674,7 +2674,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VaribaleIntUnorderedMap_1Iterator_1isNot(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_varibaleIntUnorderedMapIteratorIsNot(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jboolean jresult = 0 ;
   std::unordered_map< dreal::drake::symbolic::Variable,int >::iterator *arg1 = (std::unordered_map< dreal::drake::symbolic::Variable,int >::iterator *) 0 ;
   std::unordered_map< dreal::drake::symbolic::Variable,int >::iterator arg2 ;
@@ -2698,7 +2698,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VaribaleIntUnorderedMap_1Iterator_1getKey(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_varibaleIntUnorderedMapIteratorGetKey(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   std::unordered_map< dreal::drake::symbolic::Variable,int >::iterator *arg1 = (std::unordered_map< dreal::drake::symbolic::Variable,int >::iterator *) 0 ;
   dreal::drake::symbolic::Variable result;
@@ -2713,7 +2713,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VaribaleIntUnorderedMap_1Iterator_1getValue(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_varibaleIntUnorderedMapIteratorGetValue(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   std::unordered_map< dreal::drake::symbolic::Variable,int >::iterator *arg1 = (std::unordered_map< dreal::drake::symbolic::Variable,int >::iterator *) 0 ;
   int result;
@@ -2728,7 +2728,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VaribaleIntUnorderedMap_1Iterator_1setValue(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_varibaleIntUnorderedMapIteratorSetValue(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   std::unordered_map< dreal::drake::symbolic::Variable,int >::iterator *arg1 = (std::unordered_map< dreal::drake::symbolic::Variable,int >::iterator *) 0 ;
   int *arg2 = 0 ;
   int temp2 ;
@@ -2743,7 +2743,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_delete_1VaribaleIntUnorderedMap_1Iterator(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_deleteVaribaleIntUnorderedMapIterator(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   std::unordered_map< dreal::drake::symbolic::Variable,int >::iterator *arg1 = (std::unordered_map< dreal::drake::symbolic::Variable,int >::iterator *) 0 ;
 
   (void)jenv;
@@ -2753,7 +2753,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VaribaleIntUnorderedMap_1isEmpty(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_varibaleIntUnorderedMapIsEmpty(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   std::unordered_map< dreal::drake::symbolic::Variable,int > *arg1 = (std::unordered_map< dreal::drake::symbolic::Variable,int > *) 0 ;
   bool result;
@@ -2768,7 +2768,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VaribaleIntUnorderedMap_1clear(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_varibaleIntUnorderedMapClear(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   std::unordered_map< dreal::drake::symbolic::Variable,int > *arg1 = (std::unordered_map< dreal::drake::symbolic::Variable,int > *) 0 ;
 
   (void)jenv;
@@ -2779,7 +2779,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VaribaleIntUnorderedMap_1find(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_varibaleIntUnorderedMapFind(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   std::unordered_map< dreal::drake::symbolic::Variable,int > *arg1 = (std::unordered_map< dreal::drake::symbolic::Variable,int > *) 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
@@ -2801,7 +2801,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VaribaleIntUnorderedMap_1begin(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_varibaleIntUnorderedMapBegin(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   std::unordered_map< dreal::drake::symbolic::Variable,int > *arg1 = (std::unordered_map< dreal::drake::symbolic::Variable,int > *) 0 ;
   std::unordered_map< dreal::drake::symbolic::Variable,int >::iterator result;
@@ -2816,7 +2816,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VaribaleIntUnorderedMap_1end(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_varibaleIntUnorderedMapEnd(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   std::unordered_map< dreal::drake::symbolic::Variable,int > *arg1 = (std::unordered_map< dreal::drake::symbolic::Variable,int > *) 0 ;
   std::unordered_map< dreal::drake::symbolic::Variable,int >::iterator result;
@@ -2831,7 +2831,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VaribaleIntUnorderedMap_1sizeImpl(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_varibaleIntUnorderedMapSizeImpl(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   std::unordered_map< dreal::drake::symbolic::Variable,int > *arg1 = (std::unordered_map< dreal::drake::symbolic::Variable,int > *) 0 ;
   jint result;
@@ -2851,7 +2851,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VaribaleIntUnorderedMap_1containsImpl(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_varibaleIntUnorderedMapContainsImpl(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jboolean jresult = 0 ;
   std::unordered_map< dreal::drake::symbolic::Variable,int > *arg1 = (std::unordered_map< dreal::drake::symbolic::Variable,int > *) 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
@@ -2873,7 +2873,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VaribaleIntUnorderedMap_1putUnchecked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jint jarg3) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_varibaleIntUnorderedMapPutUnchecked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jint jarg3) {
   std::unordered_map< dreal::drake::symbolic::Variable,int > *arg1 = (std::unordered_map< dreal::drake::symbolic::Variable,int > *) 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
   int *arg3 = 0 ;
@@ -2895,7 +2895,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VaribaleIntUnorderedMap_1removeUnchecked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_varibaleIntUnorderedMapRemoveUnchecked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   std::unordered_map< dreal::drake::symbolic::Variable,int > *arg1 = (std::unordered_map< dreal::drake::symbolic::Variable,int > *) 0 ;
   std::unordered_map< dreal::drake::symbolic::Variable,int >::iterator arg2 ;
   std::unordered_map< dreal::drake::symbolic::Variable,int >::iterator const *argp2 ;
@@ -2915,7 +2915,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_delete_1VaribaleIntUnorderedMap(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_deleteVaribaleIntUnorderedMap(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   std::unordered_map< dreal::drake::symbolic::Variable,int > *arg1 = (std::unordered_map< dreal::drake::symbolic::Variable,int > *) 0 ;
 
   (void)jenv;
@@ -2925,7 +2925,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1SharedPointerToVector(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newSharedPointerToVector(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   std::shared_ptr< std::vector< dreal::drake::symbolic::Variable > > *result = 0 ;
 
@@ -2937,7 +2937,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_delete_1SharedPointerToVector(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_deleteSharedPointerToVector(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   std::shared_ptr< std::vector< dreal::drake::symbolic::Variable > > *arg1 = (std::shared_ptr< std::vector< dreal::drake::symbolic::Variable > > *) 0 ;
 
   (void)jenv;
@@ -2947,7 +2947,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1SharedPointerToUnorderedMapWithHashValue(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newSharedPointerToUnorderedMapWithHashValue(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   std::shared_ptr< std::unordered_map< dreal::drake::symbolic::Variable,int,dreal::drake::hash_value< dreal::drake::symbolic::Variable > > > *result = 0 ;
 
@@ -2959,7 +2959,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_delete_1SharedPointerToUnorderedMapWithHashValue(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_deleteSharedPointerToUnorderedMapWithHashValue(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   std::shared_ptr< std::unordered_map< dreal::drake::symbolic::Variable,int,dreal::drake::hash_value< dreal::drake::symbolic::Variable > > > *arg1 = (std::shared_ptr< std::unordered_map< dreal::drake::symbolic::Variable,int,dreal::drake::hash_value< dreal::drake::symbolic::Variable > > > *) 0 ;
 
   (void)jenv;
@@ -2969,7 +2969,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1SharedPointerToUnorderedMap(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newSharedPointerToUnorderedMap(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   std::shared_ptr< std::unordered_map< int,dreal::drake::symbolic::Variable > > *result = 0 ;
 
@@ -2981,7 +2981,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_delete_1SharedPointerToUnorderedMap(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_deleteSharedPointerToUnorderedMap(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   std::shared_ptr< std::unordered_map< int,dreal::drake::symbolic::Variable > > *arg1 = (std::shared_ptr< std::unordered_map< int,dreal::drake::symbolic::Variable > > *) 0 ;
 
   (void)jenv;
@@ -2991,7 +2991,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1Variable_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newVariableSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variable *arg1 = 0 ;
   dreal::drake::symbolic::Variable *result = 0 ;
@@ -3010,7 +3010,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Variable_1AssignOperator_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variableAssignOperatorSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variable *arg1 = (dreal::drake::symbolic::Variable *) 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
@@ -3032,7 +3032,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1Variable_1_1SWIG_11(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newVariableSWIG1(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variable *result = 0 ;
 
@@ -3044,7 +3044,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_delete_1Variable(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_deleteVariable(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   dreal::drake::symbolic::Variable *arg1 = (dreal::drake::symbolic::Variable *) 0 ;
 
   (void)jenv;
@@ -3054,7 +3054,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1Variable_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jstring jarg1, jint jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newVariableSWIG2(JNIEnv *jenv, jclass jcls, jstring jarg1, jint jarg2) {
   jlong jresult = 0 ;
   std::string arg1 ;
   dreal::drake::symbolic::Variable::Type arg2 ;
@@ -3077,7 +3077,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1Variable_1_1SWIG_13(JNIEnv *jenv, jclass jcls, jstring jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newVariableSWIG3(JNIEnv *jenv, jclass jcls, jstring jarg1) {
   jlong jresult = 0 ;
   std::string arg1 ;
   dreal::drake::symbolic::Variable *result = 0 ;
@@ -3098,7 +3098,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1Variable_1_1SWIG_14(JNIEnv *jenv, jclass jcls, jstring jarg1, jint jarg2, jboolean jarg3) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newVariableSWIG4(JNIEnv *jenv, jclass jcls, jstring jarg1, jint jarg2, jboolean jarg3) {
   jlong jresult = 0 ;
   std::string arg1 ;
   dreal::drake::symbolic::Variable::Type arg2 ;
@@ -3123,7 +3123,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Variable_1is_1dummy(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variableIsDummy(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Variable *arg1 = (dreal::drake::symbolic::Variable *) 0 ;
   bool result;
@@ -3138,7 +3138,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Variable_1get_1id(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variableGetId(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variable *arg1 = (dreal::drake::symbolic::Variable *) 0 ;
   dreal::drake::symbolic::Variable::Id result;
@@ -3153,7 +3153,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Variable_1get_1type(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variableGetType(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   dreal::drake::symbolic::Variable *arg1 = (dreal::drake::symbolic::Variable *) 0 ;
   dreal::drake::symbolic::Variable::Type result;
@@ -3168,7 +3168,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Variable_1get_1hash(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variableGgetHash(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variable *arg1 = (dreal::drake::symbolic::Variable *) 0 ;
   size_t result;
@@ -3183,7 +3183,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Variable_1get_1name(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variableGetName(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jstring jresult = 0 ;
   dreal::drake::symbolic::Variable *arg1 = (dreal::drake::symbolic::Variable *) 0 ;
   std::string result;
@@ -3198,7 +3198,7 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_
 }
 
 
-SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Variable_1to_1string(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variableToString(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jstring jresult = 0 ;
   dreal::drake::symbolic::Variable *arg1 = (dreal::drake::symbolic::Variable *) 0 ;
   std::string result;
@@ -3213,7 +3213,7 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Variable_1equal_1to(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variableEqualTo(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Variable *arg1 = (dreal::drake::symbolic::Variable *) 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
@@ -3235,7 +3235,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Variable_1less(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variableLess(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Variable *arg1 = (dreal::drake::symbolic::Variable *) 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
@@ -3257,7 +3257,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_InsertOperator_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_insertOperatorSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   std::ostream *arg1 = 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
@@ -3282,7 +3282,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_InsertOperator_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_insertOperatorSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
   jlong jresult = 0 ;
   std::ostream *arg1 = 0 ;
   dreal::drake::symbolic::Variable::Type arg2 ;
@@ -3302,7 +3302,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1Variables_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newVariablesSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variables *arg1 = 0 ;
   dreal::drake::symbolic::Variables *result = 0 ;
@@ -3321,7 +3321,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Variables_1AssignOperator_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variablesAssignOperatorSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variables *arg1 = (dreal::drake::symbolic::Variables *) 0 ;
   dreal::drake::symbolic::Variables *arg2 = 0 ;
@@ -3343,7 +3343,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1Variables_1_1SWIG_11(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newVariablesSWIG1(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variables *result = 0 ;
 
@@ -3355,7 +3355,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_delete_1Variables(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_deleteVariables(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   dreal::drake::symbolic::Variables *arg1 = (dreal::drake::symbolic::Variables *) 0 ;
 
   (void)jenv;
@@ -3365,7 +3365,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1Variables_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newVariablesSWIG2(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
   SwigValueWrapper< std::initializer_list< dreal::drake::symbolic::Variable > > arg1 ;
   dreal::drake::symbolic::Variables *result = 0 ;
@@ -3379,7 +3379,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Variables_1get_1hash(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variablesGetHash(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variables *arg1 = (dreal::drake::symbolic::Variables *) 0 ;
   size_t result;
@@ -3394,7 +3394,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Variables_1size(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variablesSize(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variables *arg1 = (dreal::drake::symbolic::Variables *) 0 ;
   //SwigValueWrapper< std::set< dreal::drake::symbolic::Variable >::size_type > result;
@@ -3411,7 +3411,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Variables_1empty(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variablesEmpty(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Variables *arg1 = (dreal::drake::symbolic::Variables *) 0 ;
   bool result;
@@ -3426,7 +3426,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Variables_1to_1string(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variablesToString(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jstring jresult = 0 ;
   dreal::drake::symbolic::Variables *arg1 = (dreal::drake::symbolic::Variables *) 0 ;
   std::string result;
@@ -3441,7 +3441,7 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Variables_1begin_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variablesBeginSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variables *arg1 = (dreal::drake::symbolic::Variables *) 0 ;
   SwigValueWrapper< std::set< dreal::drake::symbolic::Variable >::iterator > result;
@@ -3456,7 +3456,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Variables_1end_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variablesEndSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variables *arg1 = (dreal::drake::symbolic::Variables *) 0 ;
   SwigValueWrapper< std::set< dreal::drake::symbolic::Variable >::iterator > result;
@@ -3471,7 +3471,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Variables_1cbegin(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variablesCbegin(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variables *arg1 = (dreal::drake::symbolic::Variables *) 0 ;
   SwigValueWrapper< std::set< dreal::drake::symbolic::Variable >::const_iterator > result;
@@ -3486,7 +3486,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Variables_1cend(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variablesCend(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variables *arg1 = (dreal::drake::symbolic::Variables *) 0 ;
   SwigValueWrapper< std::set< dreal::drake::symbolic::Variable >::const_iterator > result;
@@ -3501,7 +3501,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Variables_1rbegin_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variablesRbeginSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variables *arg1 = (dreal::drake::symbolic::Variables *) 0 ;
   SwigValueWrapper< std::set< dreal::drake::symbolic::Variable >::reverse_iterator > result;
@@ -3516,7 +3516,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Variables_1rend_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variablesRendSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variables *arg1 = (dreal::drake::symbolic::Variables *) 0 ;
   SwigValueWrapper< std::set< dreal::drake::symbolic::Variable >::reverse_iterator > result;
@@ -3531,7 +3531,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Variables_1crbegin(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variablesCrbegin(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variables *arg1 = (dreal::drake::symbolic::Variables *) 0 ;
   SwigValueWrapper< std::set< dreal::drake::symbolic::Variable >::const_reverse_iterator > result;
@@ -3546,7 +3546,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Variables_1crend(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variablesCrend(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variables *arg1 = (dreal::drake::symbolic::Variables *) 0 ;
   SwigValueWrapper< std::set< dreal::drake::symbolic::Variable >::const_reverse_iterator > result;
@@ -3561,7 +3561,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Variables_1insert_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variablesInsertSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   dreal::drake::symbolic::Variables *arg1 = (dreal::drake::symbolic::Variables *) 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
 
@@ -3579,7 +3579,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Variables_1insert_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variablesInsertSWIG2(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   dreal::drake::symbolic::Variables *arg1 = (dreal::drake::symbolic::Variables *) 0 ;
   dreal::drake::symbolic::Variables *arg2 = 0 ;
 
@@ -3597,7 +3597,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Variables_1erase_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variablesEraseSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variables *arg1 = (dreal::drake::symbolic::Variables *) 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
@@ -3621,7 +3621,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Variables_1erase_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variablesEraseSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variables *arg1 = (dreal::drake::symbolic::Variables *) 0 ;
   dreal::drake::symbolic::Variables *arg2 = 0 ;
@@ -3645,7 +3645,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Variables_1find_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variablesFindSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variables *arg1 = (dreal::drake::symbolic::Variables *) 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
@@ -3667,7 +3667,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Variables_1include(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variablesInclude(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Variables *arg1 = (dreal::drake::symbolic::Variables *) 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
@@ -3689,7 +3689,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Variables_1IsSubsetOf(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variablesIsSubsetOf(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Variables *arg1 = (dreal::drake::symbolic::Variables *) 0 ;
   dreal::drake::symbolic::Variables *arg2 = 0 ;
@@ -3711,7 +3711,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Variables_1IsSupersetOf(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variablesIsSupersetOf(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Variables *arg1 = (dreal::drake::symbolic::Variables *) 0 ;
   dreal::drake::symbolic::Variables *arg2 = 0 ;
@@ -3733,7 +3733,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Variables_1IsStrictSubsetOf(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variablesIsStrictSubsetOf(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Variables *arg1 = (dreal::drake::symbolic::Variables *) 0 ;
   dreal::drake::symbolic::Variables *arg2 = 0 ;
@@ -3755,7 +3755,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Variables_1IsStrictSupersetOf(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variablesIsStrictSupersetOf(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Variables *arg1 = (dreal::drake::symbolic::Variables *) 0 ;
   dreal::drake::symbolic::Variables *arg2 = 0 ;
@@ -3777,7 +3777,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Equal_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_equalSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Variables *arg1 = 0 ;
   dreal::drake::symbolic::Variables *arg2 = 0 ;
@@ -3803,7 +3803,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Less_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_lessSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Variables *arg1 = 0 ;
   dreal::drake::symbolic::Variables *arg2 = 0 ;
@@ -3829,7 +3829,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_InsertOperator_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_insertOperatorSWIG2(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   std::ostream *arg1 = 0 ;
   dreal::drake::symbolic::Variables *arg2 = 0 ;
@@ -3880,7 +3880,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_AddEqual_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_addEqualSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variables *arg1 = 0 ;
   dreal::drake::symbolic::Variables *arg2 = 0 ;
@@ -3906,7 +3906,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_AddEqual_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_addEqualSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variables *arg1 = 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
@@ -3932,7 +3932,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Add_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_addSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variables arg1 ;
   dreal::drake::symbolic::Variables *arg2 = 0 ;
@@ -3960,7 +3960,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Add_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_addSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variables arg1 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
@@ -3988,7 +3988,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Add_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_addSWIG2(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variable *arg1 = 0 ;
   dreal::drake::symbolic::Variables arg2 ;
@@ -4016,7 +4016,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_SubstractEqual_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_substractEqualSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variables *arg1 = 0 ;
   dreal::drake::symbolic::Variables *arg2 = 0 ;
@@ -4042,7 +4042,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_SubstractEqual_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_substractEqualSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variables *arg1 = 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
@@ -4068,7 +4068,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Substract_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_substractSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variables arg1 ;
   dreal::drake::symbolic::Variables *arg2 = 0 ;
@@ -4096,7 +4096,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Substract_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_substractSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variables arg1 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
@@ -4124,7 +4124,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1Environment_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newEnvironmentSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Environment *arg1 = 0 ;
   dreal::drake::symbolic::Environment *result = 0 ;
@@ -4143,7 +4143,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Environment_1AssignOperator_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_environmentAssignOperatorSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Environment *arg1 = (dreal::drake::symbolic::Environment *) 0 ;
   dreal::drake::symbolic::Environment *arg2 = 0 ;
@@ -4165,7 +4165,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1Environment_1_1SWIG_11(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newEnvironmentSWIG1(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Environment *result = 0 ;
 
@@ -4177,7 +4177,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_delete_1Environment(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_deleteEnvironment(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   dreal::drake::symbolic::Environment *arg1 = (dreal::drake::symbolic::Environment *) 0 ;
 
   (void)jenv;
@@ -4187,7 +4187,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1Environment_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newEnvironmentSWIG2(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
   SwigValueWrapper< std::initializer_list< std::unordered_map< dreal::drake::symbolic::Variable,double,dreal::drake::hash_value< dreal::drake::symbolic::Variable > >::value_type > > arg1 ;
   dreal::drake::symbolic::Environment *result = 0 ;
@@ -4201,7 +4201,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1Environment_1_1SWIG_13(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newEnvironmentSWIG3(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
   SwigValueWrapper< std::initializer_list< dreal::drake::symbolic::Variable > > arg1 ;
   dreal::drake::symbolic::Environment *result = 0 ;
@@ -4215,7 +4215,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1Environment_1_1SWIG_14(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newEnvironmentSWIG4(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
   SwigValueWrapper< std::unordered_map< dreal::drake::symbolic::Variable,double,dreal::drake::hash_value< dreal::drake::symbolic::Variable > > > arg1 ;
   dreal::drake::symbolic::Environment::map *argp1 ;
@@ -4235,7 +4235,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Environment_1begin_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_environmentBeginSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Environment *arg1 = (dreal::drake::symbolic::Environment *) 0 ;
   SwigValueWrapper< std::unordered_map< dreal::drake::symbolic::Variable,double,dreal::drake::hash_value< dreal::drake::symbolic::Variable > >::iterator > result;
@@ -4250,7 +4250,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Environment_1end_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_environmentEndSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Environment *arg1 = (dreal::drake::symbolic::Environment *) 0 ;
   SwigValueWrapper< std::unordered_map< dreal::drake::symbolic::Variable,double,dreal::drake::hash_value< dreal::drake::symbolic::Variable > >::iterator > result;
@@ -4265,7 +4265,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Environment_1cbegin(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_EnvironmentCbegin(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Environment *arg1 = (dreal::drake::symbolic::Environment *) 0 ;
   SwigValueWrapper< std::unordered_map< dreal::drake::symbolic::Variable,double,dreal::drake::hash_value< dreal::drake::symbolic::Variable > >::const_iterator > result;
@@ -4280,7 +4280,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Environment_1cend(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_environmentCend(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Environment *arg1 = (dreal::drake::symbolic::Environment *) 0 ;
   SwigValueWrapper< std::unordered_map< dreal::drake::symbolic::Variable,double,dreal::drake::hash_value< dreal::drake::symbolic::Variable > >::const_iterator > result;
@@ -4295,7 +4295,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Environment_1insert(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jdouble jarg3) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_environmentInsert(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jdouble jarg3) {
   dreal::drake::symbolic::Environment *arg1 = (dreal::drake::symbolic::Environment *) 0 ;
   dreal::drake::symbolic::Environment::key_type *arg2 = 0 ;
   dreal::drake::symbolic::Environment::mapped_type *arg3 = 0 ;
@@ -4317,7 +4317,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Environment_1empty(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_environmentEmpty(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Environment *arg1 = (dreal::drake::symbolic::Environment *) 0 ;
   bool result;
@@ -4332,7 +4332,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Environment_1size(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_environmentSize(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Environment *arg1 = (dreal::drake::symbolic::Environment *) 0 ;
   size_t result;
@@ -4347,7 +4347,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Environment_1find_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_environmentFindSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Environment *arg1 = (dreal::drake::symbolic::Environment *) 0 ;
   dreal::drake::symbolic::Environment::key_type *arg2 = 0 ;
@@ -4369,7 +4369,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Environment_1domain(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_environmentDomain(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Environment *arg1 = (dreal::drake::symbolic::Environment *) 0 ;
   dreal::drake::symbolic::Variables result;
@@ -4384,7 +4384,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Environment_1to_1string(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_environmentToString(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jstring jresult = 0 ;
   dreal::drake::symbolic::Environment *arg1 = (dreal::drake::symbolic::Environment *) 0 ;
   std::string result;
@@ -4399,7 +4399,7 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Environment_1Indexing_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_environmentIndexingSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Environment *arg1 = (dreal::drake::symbolic::Environment *) 0 ;
   dreal::drake::symbolic::Environment::key_type *arg2 = 0 ;
@@ -4421,7 +4421,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_InsertOperator_1_1SWIG_13(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_insertOperatorSWIG3(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   std::ostream *arg1 = 0 ;
   dreal::drake::symbolic::Environment *arg2 = 0 ;
@@ -4446,7 +4446,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Less_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jint jarg1, jint jarg2) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_lessSWIG1(JNIEnv *jenv, jclass jcls, jint jarg1, jint jarg2) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::ExpressionKind arg1 ;
   dreal::drake::symbolic::ExpressionKind arg2 ;
@@ -4462,7 +4462,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1Expression_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newExpressionSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   dreal::drake::symbolic::Expression *result = 0 ;
@@ -4481,7 +4481,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Expression_1AssignOperator_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionAssignOperatorSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = (dreal::drake::symbolic::Expression *) 0 ;
   dreal::drake::symbolic::Expression *arg2 = 0 ;
@@ -4503,7 +4503,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_delete_1Expression(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_deleteExpression(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   dreal::drake::symbolic::Expression *arg1 = (dreal::drake::symbolic::Expression *) 0 ;
 
   (void)jenv;
@@ -4513,7 +4513,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1Expression_1_1SWIG_11(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newExpressionSWIG1(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression *result = 0 ;
 
@@ -4525,7 +4525,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1Expression_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jdouble jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newExpressionSWIG2(JNIEnv *jenv, jclass jcls, jdouble jarg1) {
   jlong jresult = 0 ;
   double arg1 ;
   dreal::drake::symbolic::Expression *result = 0 ;
@@ -4539,7 +4539,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1Expression_1_1SWIG_13(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newExpressionSWIG3(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variable *arg1 = 0 ;
   dreal::drake::symbolic::Expression *result = 0 ;
@@ -4558,7 +4558,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Expression_1get_1kind(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionGetKind(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = (dreal::drake::symbolic::Expression *) 0 ;
   dreal::drake::symbolic::ExpressionKind result;
@@ -4573,7 +4573,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Expression_1get_1hash(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionGetHash(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = (dreal::drake::symbolic::Expression *) 0 ;
   size_t result;
@@ -4588,7 +4588,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Expression_1GetVariables(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionGetVariables(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = (dreal::drake::symbolic::Expression *) 0 ;
   dreal::drake::symbolic::Variables *result = 0 ;
@@ -4603,7 +4603,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Expression_1EqualTo(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionEqualTo(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = (dreal::drake::symbolic::Expression *) 0 ;
   dreal::drake::symbolic::Expression *arg2 = 0 ;
@@ -4625,7 +4625,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Expression_1Less(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionLess(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = (dreal::drake::symbolic::Expression *) 0 ;
   dreal::drake::symbolic::Expression *arg2 = 0 ;
@@ -4647,7 +4647,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Expression_1is_1polynomial(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionIsPolynomial(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = (dreal::drake::symbolic::Expression *) 0 ;
   bool result;
@@ -4662,7 +4662,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Expression_1include_1ite(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionIncludeIte(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = (dreal::drake::symbolic::Expression *) 0 ;
   bool result;
@@ -4677,7 +4677,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Expression_1Evaluate_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionEvaluateSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jdouble jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = (dreal::drake::symbolic::Expression *) 0 ;
   dreal::drake::symbolic::Environment *arg2 = 0 ;
@@ -4699,7 +4699,7 @@ SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_
 }
 
 
-SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Expression_1Evaluate_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionEvaluateSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jdouble jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = (dreal::drake::symbolic::Expression *) 0 ;
   double result;
@@ -4714,7 +4714,7 @@ SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Expression_1EvaluatePartial(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionEvaluatePartial(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = (dreal::drake::symbolic::Expression *) 0 ;
   dreal::drake::symbolic::Environment *arg2 = 0 ;
@@ -4736,7 +4736,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Expression_1Expand(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionExpand(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = (dreal::drake::symbolic::Expression *) 0 ;
   dreal::drake::symbolic::Expression result;
@@ -4751,7 +4751,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Expression_1Substitute_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionSubstituteSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = (dreal::drake::symbolic::Expression *) 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
@@ -4780,7 +4780,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Expression_1Substitute_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionSubstituteSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = (dreal::drake::symbolic::Expression *) 0 ;
   dreal::drake::symbolic::ExpressionSubstitution *arg2 = 0 ;
@@ -4807,7 +4807,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Expression_1Substitute_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionSubstituteSWIG2(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = (dreal::drake::symbolic::Expression *) 0 ;
   dreal::drake::symbolic::ExpressionSubstitution *arg2 = 0 ;
@@ -4828,7 +4828,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Expression_1Substitute_1_1SWIG_13(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionSubstituteSWIG3(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = (dreal::drake::symbolic::Expression *) 0 ;
   dreal::drake::symbolic::FormulaSubstitution *arg2 = 0 ;
@@ -4849,7 +4849,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Expression_1Differentiate(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionDifferentiate(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = (dreal::drake::symbolic::Expression *) 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
@@ -4871,7 +4871,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Expression_1to_1string(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionToString(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jstring jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = (dreal::drake::symbolic::Expression *) 0 ;
   std::string result;
@@ -4886,7 +4886,7 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Expression_1Zero(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionZero(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression result;
 
@@ -4898,7 +4898,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Expression_1One(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionOne(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression result;
 
@@ -4910,7 +4910,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Expression_1Pi(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionPi(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression result;
 
@@ -4922,7 +4922,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Expression_1E(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionE(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression result;
 
@@ -4934,7 +4934,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Expression_1NaN(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionNaN(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression result;
 
@@ -4946,7 +4946,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Add_1_1SWIG_13(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_addSWIG3(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   dreal::drake::symbolic::Expression *arg2 = 0 ;
@@ -4972,7 +4972,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_AddEqual_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_addEqualSWIG2(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   dreal::drake::symbolic::Expression *arg2 = 0 ;
@@ -4998,7 +4998,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Expression_1Increment_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionIncrementSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = (dreal::drake::symbolic::Expression *) 0 ;
   dreal::drake::symbolic::Expression *result = 0 ;
@@ -5013,7 +5013,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Expression_1Increment_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionIncrementSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = (dreal::drake::symbolic::Expression *) 0 ;
   int arg2 ;
@@ -5030,7 +5030,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Substract_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_substractSWIG2(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   dreal::drake::symbolic::Expression *arg2 = 0 ;
@@ -5056,7 +5056,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_SubstractEqual_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_substractEqualSWIG2(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   dreal::drake::symbolic::Expression *arg2 = 0 ;
@@ -5082,7 +5082,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Add_1_1SWIG_17(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_addSWIG7(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   dreal::drake::symbolic::Expression result;
@@ -5101,7 +5101,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Substract_1_1SWIG_16(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_substractSWIG6(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   dreal::drake::symbolic::Expression result;
@@ -5120,7 +5120,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Expression_1Decrement_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionDecrementSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = (dreal::drake::symbolic::Expression *) 0 ;
   dreal::drake::symbolic::Expression *result = 0 ;
@@ -5135,7 +5135,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Expression_1Decrement_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_expressionDecrementSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = (dreal::drake::symbolic::Expression *) 0 ;
   int arg2 ;
@@ -5152,7 +5152,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Multiply_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_multiplySWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   dreal::drake::symbolic::Expression *arg2 = 0 ;
@@ -5178,7 +5178,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_MultiplyEqual(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_multiplyEqual(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   dreal::drake::symbolic::Expression *arg2 = 0 ;
@@ -5204,7 +5204,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Divide(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_divide(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression arg1 ;
   dreal::drake::symbolic::Expression *arg2 = 0 ;
@@ -5232,7 +5232,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_DivideEqual(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_divideEqual(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   dreal::drake::symbolic::Expression *arg2 = 0 ;
@@ -5258,7 +5258,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_real_1constant(JNIEnv *jenv, jclass jcls, jdouble jarg1, jdouble jarg2, jboolean jarg3) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_realConstant(JNIEnv *jenv, jclass jcls, jdouble jarg1, jdouble jarg2, jboolean jarg3) {
   jlong jresult = 0 ;
   double arg1 ;
   double arg2 ;
@@ -5627,7 +5627,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_if_1then_1else(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_ifThenElse(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   dreal::drake::symbolic::Expression *arg2 = 0 ;
@@ -5660,7 +5660,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_uninterpreted_1function(JNIEnv *jenv, jclass jcls, jstring jarg1, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_uninterpretedFunction(JNIEnv *jenv, jclass jcls, jstring jarg1, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   std::string *arg1 = 0 ;
   dreal::drake::symbolic::Variables *arg2 = 0 ;
@@ -5689,7 +5689,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_InsertOperator_1_1SWIG_14(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_insertOperatorSWIG4(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   std::ostream *arg1 = 0 ;
   dreal::drake::symbolic::Expression *arg2 = 0 ;
@@ -5714,7 +5714,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1constant_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isConstantSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   bool result;
@@ -5733,7 +5733,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1real_1constant(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isRealConstant(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   bool result;
@@ -5752,7 +5752,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1variable_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isVvariableSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   bool result;
@@ -5771,7 +5771,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1addition(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isAddition(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   bool result;
@@ -5790,7 +5790,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1multiplication(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isMultiplication(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   bool result;
@@ -5809,7 +5809,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1division(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isDivision(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   bool result;
@@ -5828,7 +5828,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1log(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isLog(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   bool result;
@@ -5847,7 +5847,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1abs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isAbs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   bool result;
@@ -5866,7 +5866,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1exp(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isExp(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   bool result;
@@ -5885,7 +5885,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1sqrt(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isSqrt(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   bool result;
@@ -5904,7 +5904,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1pow(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isPow(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   bool result;
@@ -5923,7 +5923,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1sin(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isSin(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   bool result;
@@ -5942,7 +5942,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1cos(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isCos(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   bool result;
@@ -5961,7 +5961,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1tan(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isTan(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   bool result;
@@ -5980,7 +5980,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1asin(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isAsin(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   bool result;
@@ -5999,7 +5999,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1acos(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isAcos(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   bool result;
@@ -6018,7 +6018,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1atan(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isAtan(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   bool result;
@@ -6037,7 +6037,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1atan2(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isAtan2(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   bool result;
@@ -6056,7 +6056,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1sinh(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isSinh(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   bool result;
@@ -6075,7 +6075,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1cosh(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isCosh(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   bool result;
@@ -6094,7 +6094,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1tanh(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isTanh(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   bool result;
@@ -6113,7 +6113,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1min(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isMin(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   bool result;
@@ -6132,7 +6132,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1max(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isMax(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   bool result;
@@ -6151,7 +6151,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1if_1then_1else(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1ifThenElse(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   bool result;
@@ -6170,7 +6170,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1uninterpreted_1function(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isUninterpretedFunction(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   bool result;
@@ -6189,7 +6189,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Sum(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_sum(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   std::vector< dreal::drake::symbolic::Expression > *arg1 = 0 ;
   dreal::drake::symbolic::Expression result;
@@ -6208,7 +6208,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Prod(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_prod(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   std::vector< dreal::drake::symbolic::Expression > *arg1 = 0 ;
   dreal::drake::symbolic::Expression result;
@@ -6249,7 +6249,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1constant_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jdouble jarg2) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isConstantSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jdouble jarg2) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   double arg2 ;
@@ -6270,7 +6270,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1zero(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isZero(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   bool result;
@@ -6289,7 +6289,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1one(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isOne(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   bool result;
@@ -6308,7 +6308,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1neg_1one(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isNegOne(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   bool result;
@@ -6327,7 +6327,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1two(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isTwo(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   bool result;
@@ -6346,7 +6346,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1nan(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isNan(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   bool result;
@@ -6365,7 +6365,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_get_1constant_1value(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_getConstantValue(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jdouble jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   double result;
@@ -6384,7 +6384,7 @@ SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_
 }
 
 
-SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_get_1lb_1of_1real_1constant(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_getLbOfRealConstant(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jdouble jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   double result;
@@ -6403,7 +6403,7 @@ SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_
 }
 
 
-SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_get_1ub_1of_1real_1constant(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_getUbOfRealConstant(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jdouble jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   double result;
@@ -6422,7 +6422,7 @@ SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_get_1variable_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_getVariableSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   dreal::drake::symbolic::Variable *result = 0 ;
@@ -6441,7 +6441,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_get_1argument(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_getArgument(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   dreal::drake::symbolic::Expression *result = 0 ;
@@ -6460,7 +6460,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_get_1first_1argument(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_getFirstArgument(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   dreal::drake::symbolic::Expression *result = 0 ;
@@ -6479,7 +6479,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_get_1second_1argument(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_getSecondArgument(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   dreal::drake::symbolic::Expression *result = 0 ;
@@ -6498,7 +6498,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_get_1constant_1in_1addition(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_getConstantInAddition(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jdouble jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   double result;
@@ -6517,7 +6517,7 @@ SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_get_1expr_1to_1coeff_1map_1in_1addition(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_getExprToCoeffMapInAddition(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   std::map< dreal::drake::symbolic::Expression,double,std::less< dreal::drake::symbolic::Expression > > *result = 0 ;
@@ -6536,7 +6536,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_get_1constant_1in_1multiplication(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_getConstantInMultiplication(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jdouble jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   double result;
@@ -6555,7 +6555,7 @@ SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_get_1base_1to_1exponent_1map_1in_1multiplication(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_getBaseToExponentMapInMultiplication(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   std::map< dreal::drake::symbolic::Expression,dreal::drake::symbolic::Expression,std::less< dreal::drake::symbolic::Expression > > *result = 0 ;
@@ -6574,7 +6574,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_get_1conditional_1formula(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_getConditionalFormula(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   dreal::drake::symbolic::Formula *result = 0 ;
@@ -6593,7 +6593,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_get_1then_1expression(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_getThenExpression(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   dreal::drake::symbolic::Expression *result = 0 ;
@@ -6612,7 +6612,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_get_1else_1expression(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_getElseExpression(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   dreal::drake::symbolic::Expression *result = 0 ;
@@ -6631,7 +6631,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_get_1uninterpreted_1function_1name(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_getUninterpretedFunction_1name(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jstring jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   std::string *result = 0 ;
@@ -6650,7 +6650,7 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Add_1_1SWIG_18(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_addSWIG8(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variable *arg1 = 0 ;
   dreal::drake::symbolic::Expression result;
@@ -6669,7 +6669,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Substract_1_1SWIG_18(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_substractSWIG8(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variable *arg1 = 0 ;
   dreal::drake::symbolic::Expression result;
@@ -6688,7 +6688,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Less_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jint jarg1, jint jarg2) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_lessSWIG2(JNIEnv *jenv, jclass jcls, jint jarg1, jint jarg2) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::FormulaKind arg1 ;
   dreal::drake::symbolic::FormulaKind arg2 ;
@@ -6704,7 +6704,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1Formula_1_1SWIG_10(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newFormulaSWIG0(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Formula *result = 0 ;
 
@@ -6716,7 +6716,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1Formula_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newFormulaSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   dreal::drake::symbolic::Formula *result = 0 ;
@@ -6735,7 +6735,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Formula_1AssignOperator_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaAssignOperatorSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = (dreal::drake::symbolic::Formula *) 0 ;
   dreal::drake::symbolic::Formula *arg2 = 0 ;
@@ -6757,7 +6757,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_delete_1Formula(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_deleteFormula(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   dreal::drake::symbolic::Formula *arg1 = (dreal::drake::symbolic::Formula *) 0 ;
 
   (void)jenv;
@@ -6767,7 +6767,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1Formula_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newFormulaSWIG2(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variable *arg1 = 0 ;
   dreal::drake::symbolic::Formula *result = 0 ;
@@ -6786,7 +6786,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Formula_1get_1kind(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaGetKind(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = (dreal::drake::symbolic::Formula *) 0 ;
   dreal::drake::symbolic::FormulaKind result;
@@ -6801,7 +6801,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Formula_1get_1hash(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaGetHash(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = (dreal::drake::symbolic::Formula *) 0 ;
   size_t result;
@@ -6816,7 +6816,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Formula_1GetFreeVariables(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaGetFreeVariables(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = (dreal::drake::symbolic::Formula *) 0 ;
   dreal::drake::symbolic::Variables *result = 0 ;
@@ -6831,7 +6831,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Formula_1EqualTo(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaEqualTo(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = (dreal::drake::symbolic::Formula *) 0 ;
   dreal::drake::symbolic::Formula *arg2 = 0 ;
@@ -6853,7 +6853,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Formula_1Less(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaLess(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = (dreal::drake::symbolic::Formula *) 0 ;
   dreal::drake::symbolic::Formula *arg2 = 0 ;
@@ -6875,7 +6875,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Formula_1Evaluate_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaEvaluateSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = (dreal::drake::symbolic::Formula *) 0 ;
   dreal::drake::symbolic::Environment *arg2 = 0 ;
@@ -6897,7 +6897,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Formula_1Evaluate_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaEvaluateSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = (dreal::drake::symbolic::Formula *) 0 ;
   bool result;
@@ -6912,7 +6912,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Formula_1Substitute_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaSubstituteSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = (dreal::drake::symbolic::Formula *) 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
@@ -6941,7 +6941,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Formula_1Substitute_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaSubstituteSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = (dreal::drake::symbolic::Formula *) 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
@@ -6970,7 +6970,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Formula_1Substitute_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaSubstituteSWIG2(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = (dreal::drake::symbolic::Formula *) 0 ;
   dreal::drake::symbolic::ExpressionSubstitution *arg2 = 0 ;
@@ -6997,7 +6997,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Formula_1Substitute_1_1SWIG_13(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaSubstituteSWIG3(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = (dreal::drake::symbolic::Formula *) 0 ;
   dreal::drake::symbolic::ExpressionSubstitution *arg2 = 0 ;
@@ -7018,7 +7018,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Formula_1Substitute_1_1SWIG_14(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaSubstituteSWIG4(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = (dreal::drake::symbolic::Formula *) 0 ;
   dreal::drake::symbolic::FormulaSubstitution *arg2 = 0 ;
@@ -7039,7 +7039,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Formula_1to_1string(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaToString(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jstring jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = (dreal::drake::symbolic::Formula *) 0 ;
   std::string result;
@@ -7054,7 +7054,7 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Formula_1True(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaTrue(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Formula result;
 
@@ -7066,7 +7066,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Formula_1False(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaFalse(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Formula result;
 
@@ -7078,7 +7078,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Formula_1BoolOperator(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaBoolOperator(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = (dreal::drake::symbolic::Formula *) 0 ;
   bool result;
@@ -7093,7 +7093,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_InsertOperator_1_1SWIG_15(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_insertOperatorSWIG5(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   std::ostream *arg1 = 0 ;
   dreal::drake::symbolic::Formula *arg2 = 0 ;
@@ -7118,7 +7118,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1false(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isFalse(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   bool result;
@@ -7137,7 +7137,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1true(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isTrue(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   bool result;
@@ -7156,7 +7156,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1variable_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isVariableSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   bool result;
@@ -7175,7 +7175,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1equal_1to(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isEqualTo(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   bool result;
@@ -7194,7 +7194,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1not_1equal_1to(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isNotEqualTo(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   bool result;
@@ -7213,7 +7213,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1greater_1than(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isGreaterThan(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   bool result;
@@ -7232,7 +7232,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1greater_1than_1or_1equal_1to(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isGreaterThanOrEqualTo(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   bool result;
@@ -7251,7 +7251,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1less_1than(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isLessThan(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   bool result;
@@ -7270,7 +7270,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1less_1than_1or_1equal_1to(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isLessThanOrEqualTo(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   bool result;
@@ -7289,7 +7289,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1relational(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isRelational(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   bool result;
@@ -7308,7 +7308,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1conjunction(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isConjunction(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   bool result;
@@ -7327,7 +7327,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1disjunction(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isDisjunction(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   bool result;
@@ -7346,7 +7346,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1negation(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isNegation(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   bool result;
@@ -7365,7 +7365,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1forall(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isForall(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   bool result;
@@ -7384,7 +7384,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Formula_1make_1conjunction(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaMakeConjunction(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   dreal::drake::symbolic::Formula *arg2 = 0 ;
@@ -7410,7 +7410,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Formula_1make_1disjunction(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaMakeDisjunction(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   dreal::drake::symbolic::Formula *arg2 = 0 ;
@@ -7436,7 +7436,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Not_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_notSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   dreal::drake::symbolic::Formula result;
@@ -7455,7 +7455,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Equal_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_equalSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   dreal::drake::symbolic::Expression *arg2 = 0 ;
@@ -7481,7 +7481,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_NotEqual_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_notEqualSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   dreal::drake::symbolic::Expression *arg2 = 0 ;
@@ -7507,7 +7507,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Less_1_1SWIG_13(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_lessSWIG3(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   dreal::drake::symbolic::Expression *arg2 = 0 ;
@@ -7533,7 +7533,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_LessEqual(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_lessEqual(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   dreal::drake::symbolic::Expression *arg2 = 0 ;
@@ -7559,7 +7559,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Grater(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_grater(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   dreal::drake::symbolic::Expression *arg2 = 0 ;
@@ -7585,7 +7585,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_GraterEqual(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_graterEqual(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   dreal::drake::symbolic::Expression *arg2 = 0 ;
@@ -7611,7 +7611,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Formula_1include_1ite(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaIncludeIte(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = (dreal::drake::symbolic::Formula *) 0 ;
   bool result;
@@ -7652,7 +7652,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_And_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_andSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   dreal::drake::symbolic::Formula *arg2 = 0 ;
@@ -7678,7 +7678,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_And_1_1SWIG_14(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_andSWIG4(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variable *arg1 = 0 ;
   dreal::drake::symbolic::Formula *arg2 = 0 ;
@@ -7704,7 +7704,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_And_1_1SWIG_16(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_andSWIG6(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
@@ -7730,7 +7730,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_And_1_1SWIG_18(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_andSWIG8(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variable *arg1 = 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
@@ -7756,7 +7756,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Or_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_orSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   dreal::drake::symbolic::Formula *arg2 = 0 ;
@@ -7782,7 +7782,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Or_1_1SWIG_14(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_orSWIG4(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variable *arg1 = 0 ;
   dreal::drake::symbolic::Formula *arg2 = 0 ;
@@ -7808,7 +7808,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Or_1_1SWIG_16(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_orSWIG6(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
@@ -7834,7 +7834,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Or_1_1SWIG_18(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_orSWIG8(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variable *arg1 = 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
@@ -7860,7 +7860,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Not_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_notSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variable *arg1 = 0 ;
   dreal::drake::symbolic::Formula result;
@@ -7879,7 +7879,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Equal_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_equalSWIG2(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variable *arg1 = 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
@@ -7905,7 +7905,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Equal_1_1SWIG_13(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_equalSWIG3(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   dreal::drake::symbolic::Formula *arg2 = 0 ;
@@ -7931,7 +7931,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Equal_1_1SWIG_14(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_equalSWIG4(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variable *arg1 = 0 ;
   dreal::drake::symbolic::Formula *arg2 = 0 ;
@@ -7957,7 +7957,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Equal_1_1SWIG_15(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_equalSWIG5(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
@@ -7983,7 +7983,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_NotEqual_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_notEqualSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variable *arg1 = 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
@@ -8009,7 +8009,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_NotEqual_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_notEqualSWIG2(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   dreal::drake::symbolic::Formula *arg2 = 0 ;
@@ -8035,7 +8035,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_NotEqual_1_1SWIG_13(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_notEqualSWIG3(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variable *arg1 = 0 ;
   dreal::drake::symbolic::Formula *arg2 = 0 ;
@@ -8061,7 +8061,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_NotEqual_1_1SWIG_14(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_notEqualSWIG4(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
@@ -8087,7 +8087,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1nary(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isNary(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   bool result;
@@ -8106,7 +8106,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_get_1variable_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_getVariableSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   dreal::drake::symbolic::Variable *result = 0 ;
@@ -8125,7 +8125,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_get_1lhs_1expression(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_getLhsExpression(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   dreal::drake::symbolic::Expression *result = 0 ;
@@ -8144,7 +8144,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_get_1rhs_1expression(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_getRhsExpression(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   dreal::drake::symbolic::Expression *result = 0 ;
@@ -8163,7 +8163,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_get_1operands(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_getOperands(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   std::set< dreal::drake::symbolic::Formula > *result = 0 ;
@@ -8182,7 +8182,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_get_1operand(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_getOperand(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   dreal::drake::symbolic::Formula *result = 0 ;
@@ -8201,7 +8201,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_get_1quantified_1variables(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_getQuantifiedVariables(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   dreal::drake::symbolic::Variables *result = 0 ;
@@ -8220,7 +8220,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_get_1quantified_1formula(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_getQuantifiedFormula(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   dreal::drake::symbolic::Formula *result = 0 ;
@@ -8239,7 +8239,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_logic_1and(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_logicAnd(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   dreal::drake::symbolic::Formula *arg2 = 0 ;
@@ -8265,7 +8265,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_imply_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_implySWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   dreal::drake::symbolic::Formula *arg2 = 0 ;
@@ -8291,7 +8291,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_imply_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_implySWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variable *arg1 = 0 ;
   dreal::drake::symbolic::Formula *arg2 = 0 ;
@@ -8317,7 +8317,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_imply_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_implySWIG2(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
@@ -8343,7 +8343,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_imply_1_1SWIG_13(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_implySWIG3(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variable *arg1 = 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
@@ -8369,7 +8369,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_iff_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_iffSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   dreal::drake::symbolic::Formula *arg2 = 0 ;
@@ -8395,7 +8395,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_iff_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_iffSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variable *arg1 = 0 ;
   dreal::drake::symbolic::Formula *arg2 = 0 ;
@@ -8421,7 +8421,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_iff_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_iffSWIG2(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
@@ -8447,7 +8447,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_iff_1_1SWIG_13(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_iffSWIG3(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Variable *arg1 = 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
@@ -8498,7 +8498,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1atomic(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isAtomic(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   bool result;
@@ -8517,7 +8517,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1clause(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isClause(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   bool result;
@@ -8536,7 +8536,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_get_1clauses(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_getClauses(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   std::set< dreal::drake::symbolic::Formula > result;
@@ -8555,7 +8555,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_is_1cnf(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isCnf(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   bool result;
@@ -8574,7 +8574,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_HaveIntersection(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_haveIntersection(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Variables *arg1 = 0 ;
   dreal::drake::symbolic::Variables *arg2 = 0 ;
@@ -8600,7 +8600,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_DeltaStrengthen(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jdouble jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_deltaStrengthen(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jdouble jarg2) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   double arg2 ;
@@ -8621,7 +8621,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_DeltaWeaken(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jdouble jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_deltaWeaken(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jdouble jarg2) {
   jlong jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   double arg2 ;
@@ -8642,7 +8642,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_IsDifferentiable_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isDifferentiableSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   bool result;
@@ -8661,7 +8661,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_IsDifferentiable_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_isDifferentiableSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   bool result;
@@ -8680,7 +8680,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_make_1conjunction(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_makeConjunction(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   std::vector< dreal::drake::symbolic::Formula > *arg1 = 0 ;
   dreal::drake::symbolic::Formula result;
@@ -8699,7 +8699,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_make_1disjunction(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_makeDisjunction(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   std::vector< dreal::drake::symbolic::Formula > *arg1 = 0 ;
   dreal::drake::symbolic::Formula result;
@@ -8718,7 +8718,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_CreateVector_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jstring jarg1, jint jarg2, jint jarg3) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_createVectorSWIG0(JNIEnv *jenv, jclass jcls, jstring jarg1, jint jarg2, jint jarg3) {
   jlong jresult = 0 ;
   std::string *arg1 = 0 ;
   int arg2 ;
@@ -8744,7 +8744,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_CreateVector_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jstring jarg1, jint jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_createVectorSWIG1(JNIEnv *jenv, jclass jcls, jstring jarg1, jint jarg2) {
   jlong jresult = 0 ;
   std::string *arg1 = 0 ;
   int arg2 ;
@@ -8768,7 +8768,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Not(JNIEnv *jenv, jclass jcls, jint jarg1) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_not(JNIEnv *jenv, jclass jcls, jint jarg1) {
   jint jresult = 0 ;
   dreal::RelationalOperator arg1 ;
   dreal::RelationalOperator result;
@@ -8782,7 +8782,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_InsertOperator_1_1SWIG_16(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_insertOperatorSWIG6(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
   jlong jresult = 0 ;
   std::ostream *arg1 = 0 ;
   dreal::RelationalOperator arg2 ;
@@ -8802,7 +8802,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_parse_1logic(JNIEnv *jenv, jclass jcls, jstring jarg1) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_parseLogic(JNIEnv *jenv, jclass jcls, jstring jarg1) {
   jint jresult = 0 ;
   std::string *arg1 = 0 ;
   dreal::Logic result;
@@ -8824,7 +8824,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_InsertOperator_1_1SWIG_17(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_insertOperatorSWIG7(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
   jlong jresult = 0 ;
   std::ostream *arg1 = 0 ;
   dreal::Logic *arg2 = 0 ;
@@ -8846,7 +8846,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1Box_1_1SWIG_10(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newBoxSWIG0(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   dreal::Box *result = 0 ;
 
@@ -8858,7 +8858,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1Box_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newBoxSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   std::vector< dreal::drake::symbolic::Variable > *arg1 = 0 ;
   dreal::Box *result = 0 ;
@@ -8877,7 +8877,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1Box_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newBoxSWIG2(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::Box *arg1 = 0 ;
   dreal::Box *result = 0 ;
@@ -8896,7 +8896,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Box_1AssignOperator_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_boxAssignOperatorSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::Box *arg1 = (dreal::Box *) 0 ;
   dreal::Box *arg2 = 0 ;
@@ -8918,7 +8918,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_delete_1Box(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_deleteBox(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   dreal::Box *arg1 = (dreal::Box *) 0 ;
 
   (void)jenv;
@@ -8928,7 +8928,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Box_1Add_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_boxAddSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   dreal::Box *arg1 = (dreal::Box *) 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
 
@@ -8946,7 +8946,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Box_1Add_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jdouble jarg3, jdouble jarg4) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_boxAdd_SWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jdouble jarg3, jdouble jarg4) {
   dreal::Box *arg1 = (dreal::Box *) 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
   double arg3 ;
@@ -8968,7 +8968,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Box_1empty(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_boxEmpty(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::Box *arg1 = (dreal::Box *) 0 ;
   bool result;
@@ -8983,7 +8983,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Box_1set_1empty(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_boxSetEmpty(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   dreal::Box *arg1 = (dreal::Box *) 0 ;
 
   (void)jenv;
@@ -8994,7 +8994,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Box_1size(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_boxSize(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   dreal::Box *arg1 = (dreal::Box *) 0 ;
   int result;
@@ -9009,7 +9009,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Box_1Indexing_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_boxIndexingSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   jlong jresult = 0 ;
   dreal::Box *arg1 = (dreal::Box *) 0 ;
   int arg2 ;
@@ -9026,7 +9026,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Box_1Indexing_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_boxIndexingSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::Box *arg1 = (dreal::Box *) 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
@@ -9048,7 +9048,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Box_1variables(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_boxVariables(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::Box *arg1 = (dreal::Box *) 0 ;
   std::vector< dreal::drake::symbolic::Variable > *result = 0 ;
@@ -9063,7 +9063,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Box_1variable(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_boxVariable(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   jlong jresult = 0 ;
   dreal::Box *arg1 = (dreal::Box *) 0 ;
   int arg2 ;
@@ -9080,7 +9080,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Box_1has_1variable(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_boxHasVariable(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jboolean jresult = 0 ;
   dreal::Box *arg1 = (dreal::Box *) 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
@@ -9102,7 +9102,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Box_1interval_1vector(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_boxIntervalVector(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::Box *arg1 = (dreal::Box *) 0 ;
   dreal::Box::IntervalVector *result = 0 ;
@@ -9117,7 +9117,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Box_1mutable_1interval_1vector(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_boxMutableIntervalVector(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::Box *arg1 = (dreal::Box *) 0 ;
   dreal::Box::IntervalVector *result = 0 ;
@@ -9132,7 +9132,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Box_1index(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_boxIndex(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jint jresult = 0 ;
   dreal::Box *arg1 = (dreal::Box *) 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
@@ -9154,7 +9154,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Box_1MaxDiam(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_boxMaxDiam(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::Box *arg1 = (dreal::Box *) 0 ;
   std::pair< double,int > result;
@@ -9169,7 +9169,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Box_1bisect_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_boxBisectSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   jlong jresult = 0 ;
   dreal::Box *arg1 = (dreal::Box *) 0 ;
   int arg2 ;
@@ -9186,7 +9186,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Box_1bisect_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_boxBisectSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::Box *arg1 = (dreal::Box *) 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
@@ -9208,7 +9208,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Box_1InplaceUnion(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_boxInplaceUnion(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::Box *arg1 = (dreal::Box *) 0 ;
   dreal::Box *arg2 = 0 ;
@@ -9230,7 +9230,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_InsertOperator_1_1SWIG_18(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_insertOperatorSWIG8(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   std::ostream *arg1 = 0 ;
   dreal::Box *arg2 = 0 ;
@@ -9255,7 +9255,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Equal(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_equal(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jboolean jresult = 0 ;
   dreal::Box *arg1 = 0 ;
   dreal::Box *arg2 = 0 ;
@@ -9281,7 +9281,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_NotEqual(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_notEqual(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jboolean jresult = 0 ;
   dreal::Box *arg1 = 0 ;
   dreal::Box *arg2 = 0 ;
@@ -9307,7 +9307,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_DisplayDiff(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jobject jarg2_, jlong jarg3, jlong jarg4) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_displayDiff(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jobject jarg2_, jlong jarg3, jlong jarg4) {
   jlong jresult = 0 ;
   std::ostream *arg1 = 0 ;
   std::vector< dreal::drake::symbolic::Variable > *arg2 = 0 ;
@@ -9344,7 +9344,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1OptionValueBool_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jboolean jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newOptionValueBoolSWIG0(JNIEnv *jenv, jclass jcls, jboolean jarg1) {
   jlong jresult = 0 ;
   bool arg1 ;
   dreal::OptionValue< bool > *result = 0 ;
@@ -9358,7 +9358,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1OptionValueBool_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newOptionValueBoolSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::OptionValue< bool > *arg1 = 0 ;
   dreal::OptionValue< bool > *result = 0 ;
@@ -9377,7 +9377,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_OptionValueBool_1AssignOperator_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_optionValueBoolAssignOperatorSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::OptionValue< bool > *arg1 = (dreal::OptionValue< bool > *) 0 ;
   dreal::OptionValue< bool > *arg2 = 0 ;
@@ -9399,7 +9399,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_delete_1OptionValueBool(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_deleteOptionValueBool(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   dreal::OptionValue< bool > *arg1 = (dreal::OptionValue< bool > *) 0 ;
 
   (void)jenv;
@@ -9409,7 +9409,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_OptionValueBool_1AssignOperator_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jboolean jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_optionValueBoolAssignOperatorSWIG2(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jboolean jarg2) {
   jlong jresult = 0 ;
   dreal::OptionValue< bool > *arg1 = (dreal::OptionValue< bool > *) 0 ;
   bool *arg2 = 0 ;
@@ -9428,7 +9428,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_OptionValueBool_1AssignOperator_1_1SWIG_13(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_optionValueBoolAssignOperatorSWIG3(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   jlong jresult = 0 ;
   dreal::OptionValue< bool > *arg1 = (dreal::OptionValue< bool > *) 0 ;
   bool *arg2 = 0 ;
@@ -9451,7 +9451,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_OptionValueBool_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_optionValueBoolGet(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::OptionValue< bool > *arg1 = (dreal::OptionValue< bool > *) 0 ;
   bool *result = 0 ;
@@ -9466,7 +9466,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_OptionValueBool_1set_1from_1command_1line(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jboolean jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_optionValueBoolSetFromCommandLine(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jboolean jarg2) {
   dreal::OptionValue< bool > *arg1 = (dreal::OptionValue< bool > *) 0 ;
   bool *arg2 = 0 ;
   bool temp2 ;
@@ -9481,7 +9481,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_OptionValueBool_1set_1from_1file(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jboolean jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_optionValueBoolSetFromFile(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jboolean jarg2) {
   dreal::OptionValue< bool > *arg1 = (dreal::OptionValue< bool > *) 0 ;
   bool *arg2 = 0 ;
   bool temp2 ;
@@ -9496,7 +9496,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1OptionValueInt_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jint jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newOptionValueIntSWIG0(JNIEnv *jenv, jclass jcls, jint jarg1) {
   jlong jresult = 0 ;
   int arg1 ;
   dreal::OptionValue< int > *result = 0 ;
@@ -9510,7 +9510,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1OptionValueInt_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newOptionValueIntSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::OptionValue< int > *arg1 = 0 ;
   dreal::OptionValue< int > *result = 0 ;
@@ -9529,7 +9529,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_OptionValueInt_1AssignOperator_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_optionValueIntAssignOperatorSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::OptionValue< int > *arg1 = (dreal::OptionValue< int > *) 0 ;
   dreal::OptionValue< int > *arg2 = 0 ;
@@ -9551,7 +9551,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_delete_1OptionValueInt(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_deleteOptionValueInt(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   dreal::OptionValue< int > *arg1 = (dreal::OptionValue< int > *) 0 ;
 
   (void)jenv;
@@ -9561,7 +9561,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_OptionValueInt_1AssignOperator_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_optionValueIntAssignOperatorSWIG2(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   jlong jresult = 0 ;
   dreal::OptionValue< int > *arg1 = (dreal::OptionValue< int > *) 0 ;
   int *arg2 = 0 ;
@@ -9580,7 +9580,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_OptionValueInt_1AssignOperator_1_1SWIG_13(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_optionValueIntAssignOperatorSWIG3(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   jlong jresult = 0 ;
   dreal::OptionValue< int > *arg1 = (dreal::OptionValue< int > *) 0 ;
   int *arg2 = 0 ;
@@ -9603,7 +9603,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_OptionValueInt_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_optionValueIntGet(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   dreal::OptionValue< int > *arg1 = (dreal::OptionValue< int > *) 0 ;
   int *result = 0 ;
@@ -9618,7 +9618,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_OptionValueInt_1set_1from_1command_1line(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_optionValueIntSetFromCommandLine(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   dreal::OptionValue< int > *arg1 = (dreal::OptionValue< int > *) 0 ;
   int *arg2 = 0 ;
   int temp2 ;
@@ -9633,7 +9633,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_OptionValueInt_1set_1from_1file(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_optionValueIntSetFromFile(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   dreal::OptionValue< int > *arg1 = (dreal::OptionValue< int > *) 0 ;
   int *arg2 = 0 ;
   int temp2 ;
@@ -9648,7 +9648,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1OptionValueDouble_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jdouble jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newOptionValueDoubleSWIG0(JNIEnv *jenv, jclass jcls, jdouble jarg1) {
   jlong jresult = 0 ;
   double arg1 ;
   dreal::OptionValue< double > *result = 0 ;
@@ -9662,7 +9662,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1OptionValueDouble_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newOptionValueDoubleSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::OptionValue< double > *arg1 = 0 ;
   dreal::OptionValue< double > *result = 0 ;
@@ -9681,7 +9681,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_OptionValueDouble_1AssignOperator_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_optionValueDoubleAssignOperatorSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::OptionValue< double > *arg1 = (dreal::OptionValue< double > *) 0 ;
   dreal::OptionValue< double > *arg2 = 0 ;
@@ -9703,7 +9703,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_delete_1OptionValueDouble(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_deleteOptionValueDouble(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   dreal::OptionValue< double > *arg1 = (dreal::OptionValue< double > *) 0 ;
 
   (void)jenv;
@@ -9713,7 +9713,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_OptionValueDouble_1AssignOperator_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jdouble jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_optionValueDoubleAssignOperatorSWIG2(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jdouble jarg2) {
   jlong jresult = 0 ;
   dreal::OptionValue< double > *arg1 = (dreal::OptionValue< double > *) 0 ;
   double *arg2 = 0 ;
@@ -9732,7 +9732,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_OptionValueDouble_1AssignOperator_1_1SWIG_13(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_optionValueDoubleAssignOperatorSWIG3(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   jlong jresult = 0 ;
   dreal::OptionValue< double > *arg1 = (dreal::OptionValue< double > *) 0 ;
   double *arg2 = 0 ;
@@ -9755,7 +9755,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_OptionValueDouble_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_optionValueDoubleGet(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jdouble jresult = 0 ;
   dreal::OptionValue< double > *arg1 = (dreal::OptionValue< double > *) 0 ;
   double *result = 0 ;
@@ -9770,7 +9770,7 @@ SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_OptionValueDouble_1set_1from_1command_1line(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jdouble jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_optionValueDoubleSetFromCommandLine(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jdouble jarg2) {
   dreal::OptionValue< double > *arg1 = (dreal::OptionValue< double > *) 0 ;
   double *arg2 = 0 ;
   double temp2 ;
@@ -9785,7 +9785,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_OptionValueDouble_1set_1from_1file(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jdouble jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_optionValueDoubleSetFromFile(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jdouble jarg2) {
   dreal::OptionValue< double > *arg1 = (dreal::OptionValue< double > *) 0 ;
   double *arg2 = 0 ;
   double temp2 ;
@@ -9800,7 +9800,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1OptionValueUnsignedInt_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newOptionValueUnsignedIntSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
   uint32_t arg1 ;
   uint32_t *argp1 ;
@@ -9820,7 +9820,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1OptionValueUnsignedInt_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newOptionValueUnsignedIntSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::OptionValue< uint32_t > *arg1 = 0 ;
   dreal::OptionValue< uint32_t > *result = 0 ;
@@ -9839,7 +9839,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_OptionValueUnsignedInt_1AssignOperator_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_optionValueUnsignedIntAssignOperatorSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::OptionValue< uint32_t > *arg1 = (dreal::OptionValue< uint32_t > *) 0 ;
   dreal::OptionValue< uint32_t > *arg2 = 0 ;
@@ -9861,7 +9861,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_delete_1OptionValueUnsignedInt(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_deleteOptionValueUnsignedInt(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   dreal::OptionValue< uint32_t > *arg1 = (dreal::OptionValue< uint32_t > *) 0 ;
 
   (void)jenv;
@@ -9871,7 +9871,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_OptionValueUnsignedInt_1AssignOperator_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_optionValueUnsignedIntAssignOperatorSWIG2(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   jlong jresult = 0 ;
   dreal::OptionValue< uint32_t > *arg1 = (dreal::OptionValue< uint32_t > *) 0 ;
   uint32_t *arg2 = 0 ;
@@ -9892,7 +9892,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_OptionValueUnsignedInt_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_optionValueUnsignedIntGet(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::OptionValue< uint32_t > *arg1 = (dreal::OptionValue< uint32_t > *) 0 ;
   uint32_t *result = 0 ;
@@ -9907,7 +9907,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_OptionValueUnsignedInt_1set_1from_1command_1line(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_optionValueUnsignedIntSetFromCommandLine(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   dreal::OptionValue< uint32_t > *arg1 = (dreal::OptionValue< uint32_t > *) 0 ;
   uint32_t *arg2 = 0 ;
 
@@ -9924,7 +9924,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_OptionValueUnsignedInt_1set_1from_1file(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_optionValueUnsignedIntSetFromFile(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   dreal::OptionValue< uint32_t > *arg1 = (dreal::OptionValue< uint32_t > *) 0 ;
   uint32_t *arg2 = 0 ;
 
@@ -9941,7 +9941,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1Config_1_1SWIG_10(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newConfigSWIG0(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   dreal::Config *result = 0 ;
 
@@ -9977,7 +9977,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1Config_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newConfigSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::Config *arg1 = 0 ;
   dreal::Config *result = 0 ;
@@ -9996,7 +9996,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1AssignOperator_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configAssignOperatorSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   dreal::Config *arg1 = (dreal::Config *) 0 ;
   dreal::Config *arg2 = 0 ;
@@ -10018,7 +10018,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_delete_1Config(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_deleteConfig(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   dreal::Config *arg1 = (dreal::Config *) 0 ;
 
   (void)jenv;
@@ -10028,7 +10028,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1precision(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configPrecision(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jdouble jresult = 0 ;
   dreal::Config *arg1 = (dreal::Config *) 0 ;
   double result;
@@ -10043,7 +10043,7 @@ SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1mutable_1precision(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configMutablePrecision(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::Config *arg1 = (dreal::Config *) 0 ;
   dreal::OptionValue< double > *result = 0 ;
@@ -10058,7 +10058,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1produce_1models(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configProduceModels(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::Config *arg1 = (dreal::Config *) 0 ;
   bool result;
@@ -10073,7 +10073,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1mutable_1produce_1models(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configMutableProduceModels(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::Config *arg1 = (dreal::Config *) 0 ;
   dreal::OptionValue< bool > *result = 0 ;
@@ -10088,7 +10088,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1use_1polytope(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configUsePolytope(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::Config *arg1 = (dreal::Config *) 0 ;
   bool result;
@@ -10103,7 +10103,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1mutable_1use_1polytope(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configMutableUsePolytope(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::Config *arg1 = (dreal::Config *) 0 ;
   dreal::OptionValue< bool > *result = 0 ;
@@ -10118,7 +10118,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1use_1polytope_1in_1forall(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configUsePolytopeInForall(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::Config *arg1 = (dreal::Config *) 0 ;
   bool result;
@@ -10133,7 +10133,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1mutable_1use_1polytope_1in_1forall(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configMutableUsePolytopeInForall(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::Config *arg1 = (dreal::Config *) 0 ;
   dreal::OptionValue< bool > *result = 0 ;
@@ -10148,7 +10148,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1use_1worklist_1fixpoint(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configUseWorklistFixpoint(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::Config *arg1 = (dreal::Config *) 0 ;
   bool result;
@@ -10163,7 +10163,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1mutable_1use_1worklist_1fixpoint(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configMutableUseWorklistFixpoint(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::Config *arg1 = (dreal::Config *) 0 ;
   dreal::OptionValue< bool > *result = 0 ;
@@ -10178,7 +10178,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1use_1local_1optimization(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configUseLocalOptimization(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::Config *arg1 = (dreal::Config *) 0 ;
   bool result;
@@ -10193,7 +10193,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1mutable_1use_1local_1optimization(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configMutableUseLocalOptimization(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::Config *arg1 = (dreal::Config *) 0 ;
   dreal::OptionValue< bool > *result = 0 ;
@@ -10238,7 +10238,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 // }
 
 
-SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1number_1of_1jobs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configNumberOfJobs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   dreal::Config *arg1 = (dreal::Config *) 0 ;
   int result;
@@ -10253,7 +10253,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1mutable_1number_1of_1jobs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configMutableNumberOfJobs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::Config *arg1 = (dreal::Config *) 0 ;
   dreal::OptionValue< int > *result = 0 ;
@@ -10268,7 +10268,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1stack_1left_1box_1first(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configStackLeftBoxFirst(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::Config *arg1 = (dreal::Config *) 0 ;
   bool result;
@@ -10283,7 +10283,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1mutable_1stack_1left_1box_1first(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configMutableStackLeftBoxFirst(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::Config *arg1 = (dreal::Config *) 0 ;
   dreal::OptionValue< bool > *result = 0 ;
@@ -10298,7 +10298,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1brancher(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configBrancher(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::Config *arg1 = (dreal::Config *) 0 ;
   dreal::Config::Brancher *result = 0 ;
@@ -10313,7 +10313,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1mutable_1brancher(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configMutableBrancher(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::Config *arg1 = (dreal::Config *) 0 ;
   dreal::OptionValue< dreal::Config::Brancher > *result = 0 ;
@@ -10328,7 +10328,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1nlopt_1ftol_1rel(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configNloptFtolRel(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jdouble jresult = 0 ;
   dreal::Config *arg1 = (dreal::Config *) 0 ;
   double result;
@@ -10343,7 +10343,7 @@ SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1mutable_1nlopt_1ftol_1rel(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configMutableNloptFtolRel(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::Config *arg1 = (dreal::Config *) 0 ;
   dreal::OptionValue< double > *result = 0 ;
@@ -10358,7 +10358,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1nlopt_1ftol_1abs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configNloptFtolAbs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jdouble jresult = 0 ;
   dreal::Config *arg1 = (dreal::Config *) 0 ;
   double result;
@@ -10373,7 +10373,7 @@ SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1mutable_1nlopt_1ftol_1abs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configMutableNloptFtolAbs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::Config *arg1 = (dreal::Config *) 0 ;
   dreal::OptionValue< double > *result = 0 ;
@@ -10388,7 +10388,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1nlopt_1maxeval(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configNloptMaxeval(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   dreal::Config *arg1 = (dreal::Config *) 0 ;
   int result;
@@ -10403,7 +10403,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1mutable_1nlopt_1maxeval(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configMutableNloptMaxeval(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::Config *arg1 = (dreal::Config *) 0 ;
   dreal::OptionValue< int > *result = 0 ;
@@ -10418,7 +10418,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1nlopt_1maxtime(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configNloptMaxtime(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jdouble jresult = 0 ;
   dreal::Config *arg1 = (dreal::Config *) 0 ;
   double result;
@@ -10433,7 +10433,7 @@ SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1mutable_1nlopt_1maxtime(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configMutableNloptMaxtime(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::Config *arg1 = (dreal::Config *) 0 ;
   dreal::OptionValue< double > *result = 0 ;
@@ -10448,7 +10448,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1SatDefaultPhase_1False_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configSatDefaultPhaseFalseGet(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   dreal::Config::SatDefaultPhase result;
 
@@ -10460,7 +10460,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1SatDefaultPhase_1True_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configSatDefaultPhaseTrueGet(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   dreal::Config::SatDefaultPhase result;
 
@@ -10472,7 +10472,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1SatDefaultPhase_1JeroslowWang_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configSatDefaultPhaseJeroslowWangGet(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   dreal::Config::SatDefaultPhase result;
 
@@ -10484,7 +10484,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1SatDefaultPhase_1RandomInitialPhase_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configSatDefaultPhaseRandomInitialPhaseGet(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   dreal::Config::SatDefaultPhase result;
 
@@ -10496,7 +10496,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1sat_1default_1phase(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configSatDefaultPhase(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   dreal::Config *arg1 = (dreal::Config *) 0 ;
   dreal::Config::SatDefaultPhase result;
@@ -10511,7 +10511,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1mutable_1sat_1default_1phase(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configMutableSatDefaultPhase(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::Config *arg1 = (dreal::Config *) 0 ;
   dreal::OptionValue< dreal::Config::SatDefaultPhase > *result = 0 ;
@@ -10526,7 +10526,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1random_1seed(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configRandomSeed(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::Config *arg1 = (dreal::Config *) 0 ;
   uint32_t result;
@@ -10542,7 +10542,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1mutable_1random_1seed(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configMutableRandomSeed(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::Config *arg1 = (dreal::Config *) 0 ;
   dreal::OptionValue< uint32_t > *result = 0 ;
@@ -10557,7 +10557,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1smtlib2_1compliant(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configSmtlib2Compliant(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   dreal::Config *arg1 = (dreal::Config *) 0 ;
   bool result;
@@ -10572,7 +10572,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1mutable_1smtlib2_1compliant(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configMutableSmtlib2Compliant(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::Config *arg1 = (dreal::Config *) 0 ;
   dreal::OptionValue< bool > *result = 0 ;
@@ -10587,7 +10587,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1kDefaultPrecision_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configKDefaultPrecisionGet(JNIEnv *jenv, jclass jcls) {
   jdouble jresult = 0 ;
   double result;
 
@@ -10599,7 +10599,7 @@ SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_
 }
 
 
-SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1kDefaultNloptFtolRel_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configKDefaultNloptFtolRelGet(JNIEnv *jenv, jclass jcls) {
   jdouble jresult = 0 ;
   double result;
 
@@ -10611,7 +10611,7 @@ SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_
 }
 
 
-SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1kDefaultNloptFtolAbs_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configKDefaultNloptFtolAbsGet(JNIEnv *jenv, jclass jcls) {
   jdouble jresult = 0 ;
   double result;
 
@@ -10623,7 +10623,7 @@ SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1kDefaultNloptMaxEval_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configKDefaultNloptMaxEvalGet(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
 
@@ -10635,7 +10635,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1kDefaultNloptMaxTime_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configKDefaultNloptMaxTimeGet(JNIEnv *jenv, jclass jcls) {
   jdouble jresult = 0 ;
   double result;
 
@@ -10647,7 +10647,7 @@ SWIGEXPORT jdouble JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_InsertOperator_1_1SWIG_19(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_insertOperatorSWIG9(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
   jlong jresult = 0 ;
   std::ostream *arg1 = 0 ;
   dreal::Config::SatDefaultPhase *arg2 = 0 ;
@@ -10669,7 +10669,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_InsertOperator_1_1SWIG_122(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_insertOperatorSWIG22(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   std::ostream *arg1 = 0 ;
   dreal::Config *arg2 = 0 ;
@@ -10694,7 +10694,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_CheckSatisfiability_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jdouble jarg2, jlong jarg3, jobject jarg3_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_checkSatisfiabilitySWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jdouble jarg2, jlong jarg3, jobject jarg3_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Formula *arg1 = 0 ;
   double arg2 ;
@@ -10718,7 +10718,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 // rewritten
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_CheckSatisfiability_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_checkSatisfiabilitySWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Formula *f = 0 ;
   dreal::Box *box = (dreal::Box *) 0 ;
@@ -10820,7 +10820,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 // }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Minimize_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jdouble jarg3, jlong jarg4, jobject jarg4_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_minimizeSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jdouble jarg3, jlong jarg4, jobject jarg4_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   dreal::drake::symbolic::Formula *arg2 = 0 ;
@@ -10851,7 +10851,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Minimize_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_, jlong jarg4, jobject jarg4_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_minimizeSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_, jlong jarg4, jobject jarg4_) {
   jboolean jresult = 0 ;
   dreal::drake::symbolic::Expression *arg1 = 0 ;
   dreal::drake::symbolic::Formula *arg2 = 0 ;
@@ -10889,7 +10889,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1Context_1_1SWIG_10(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newContextSWIG0(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   dreal::Context *result = 0 ;
 
@@ -10901,7 +10901,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1Context_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newContextSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::Context *arg1 = 0 ;
   std::unique_ptr< dreal::Context > rvrdeleter1 ;
@@ -10922,7 +10922,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_delete_1Context(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_deleteContext(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   dreal::Context *arg1 = (dreal::Context *) 0 ;
 
   (void)jenv;
@@ -10932,7 +10932,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1Context_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newContextSWIG2(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::Config *arg1 = 0 ;
   dreal::Context *result = 0 ;
@@ -10951,7 +10951,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Context_1Assert(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_contextAssert(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   dreal::Context *arg1 = (dreal::Context *) 0 ;
   dreal::drake::symbolic::Formula *arg2 = 0 ;
 
@@ -10969,7 +10969,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Context_1CheckSat(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_contextCheckSat(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::Context *arg1 = (dreal::Context *) 0 ;
   SwigValueWrapper< dreal::optional< dreal::Box > > result;
@@ -10984,7 +10984,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Context_1DeclareVariable_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jboolean jarg3) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_contextDeclareVariableSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jboolean jarg3) {
   dreal::Context *arg1 = (dreal::Context *) 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
   bool arg3 ;
@@ -11004,7 +11004,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Context_1DeclareVariable_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_contextDeclareVariableSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   dreal::Context *arg1 = (dreal::Context *) 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
 
@@ -11022,7 +11022,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Context_1DeclareVariable_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_, jlong jarg4, jobject jarg4_, jboolean jarg5) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_contextDeclareVariableSWIG2(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_, jlong jarg4, jobject jarg4_, jboolean jarg5) {
   dreal::Context *arg1 = (dreal::Context *) 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
   dreal::drake::symbolic::Expression *arg3 = 0 ;
@@ -11056,7 +11056,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Context_1DeclareVariable_1_1SWIG_13(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_, jlong jarg4, jobject jarg4_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_contextDeclareVariableSWIG3(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_, jlong jarg4, jobject jarg4_) {
   dreal::Context *arg1 = (dreal::Context *) 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
   dreal::drake::symbolic::Expression *arg3 = 0 ;
@@ -11088,14 +11088,14 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Context_1Exit(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_contextExit(JNIEnv *jenv, jclass jcls) {
   (void)jenv;
   (void)jcls;
   dreal::Context::Exit();
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Context_1Minimize_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_contextMinimizeSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   dreal::Context *arg1 = (dreal::Context *) 0 ;
   dreal::drake::symbolic::Expression *arg2 = 0 ;
 
@@ -11113,7 +11113,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Context_1Minimize_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_contextMinimizeSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   dreal::Context *arg1 = (dreal::Context *) 0 ;
   std::vector< dreal::drake::symbolic::Expression > *arg2 = 0 ;
 
@@ -11131,7 +11131,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Context_1Maximize(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_contextMaximize(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   dreal::Context *arg1 = (dreal::Context *) 0 ;
   dreal::drake::symbolic::Expression *arg2 = 0 ;
 
@@ -11149,7 +11149,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Context_1Pop(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_contextPop(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   dreal::Context *arg1 = (dreal::Context *) 0 ;
   int arg2 ;
 
@@ -11162,7 +11162,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Context_1Push(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_contextPush(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   dreal::Context *arg1 = (dreal::Context *) 0 ;
   int arg2 ;
 
@@ -11175,7 +11175,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Context_1SetInfo_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jdouble jarg3) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_contextSetInfoSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jdouble jarg3) {
   dreal::Context *arg1 = (dreal::Context *) 0 ;
   std::string *arg2 = 0 ;
   double arg3 ;
@@ -11198,7 +11198,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Context_1SetInfo_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_contextSetInfoSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3) {
   dreal::Context *arg1 = (dreal::Context *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
@@ -11229,7 +11229,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Context_1SetInterval(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jdouble jarg3, jdouble jarg4) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_contextSetInterval(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jdouble jarg3, jdouble jarg4) {
   dreal::Context *arg1 = (dreal::Context *) 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
   double arg3 ;
@@ -11251,7 +11251,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Context_1SetLogic(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_contextSetLogic(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   dreal::Context *arg1 = (dreal::Context *) 0 ;
   dreal::Logic *arg2 = 0 ;
   dreal::Logic temp2 ;
@@ -11266,7 +11266,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Context_1SetOption_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jdouble jarg3) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_contextSetOptionSWIG0(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jdouble jarg3) {
   dreal::Context *arg1 = (dreal::Context *) 0 ;
   std::string *arg2 = 0 ;
   double arg3 ;
@@ -11289,7 +11289,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Context_1SetOption_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_contextSetOptionSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3) {
   dreal::Context *arg1 = (dreal::Context *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
@@ -11320,7 +11320,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Context_1GetOption(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_contextGetOption(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   jlong jresult = 0 ;
   dreal::Context *arg1 = (dreal::Context *) 0 ;
   std::string *arg2 = 0 ;
@@ -11345,7 +11345,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Context_1config(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_contextConfig(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::Context *arg1 = (dreal::Context *) 0 ;
   dreal::Config *result = 0 ;
@@ -11360,7 +11360,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Context_1mutable_1config(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_contextMutableConfig(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::Context *arg1 = (dreal::Context *) 0 ;
   dreal::Config *result = 0 ;
@@ -11375,7 +11375,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Context_1version(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_contextVersion(JNIEnv *jenv, jclass jcls) {
   jstring jresult = 0 ;
   std::string result;
 
@@ -11387,7 +11387,7 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Context_1assertions(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_contextAssertions(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::Context *arg1 = (dreal::Context *) 0 ;
   dreal::ScopedVector< dreal::drake::symbolic::Formula > *result = 0 ;
@@ -11402,7 +11402,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Context_1box(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_contextBox(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::Context *arg1 = (dreal::Context *) 0 ;
   dreal::Box *result = 0 ;
@@ -11417,7 +11417,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Context_1get_1model(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_contextGetModel(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   dreal::Context *arg1 = (dreal::Context *) 0 ;
   dreal::Box *result = 0 ;
@@ -11433,7 +11433,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 
 // VariableSet added later
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VariableSet_1Iterator_1incrementUnchecked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variableSetIteratorIncrementUnchecked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   std::set< dreal::drake::symbolic::Variable >::iterator *arg1 = (std::set< dreal::drake::symbolic::Variable >::iterator *) 0 ;
   
   (void)jenv;
@@ -11444,7 +11444,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VariableSet_1Iterator_1derefUnchecked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variableSetIteratorDerefUnchecked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   std::set< dreal::drake::symbolic::Variable >::iterator *arg1 = (std::set< dreal::drake::symbolic::Variable >::iterator *) 0 ;
   dreal::drake::symbolic::Variable result;
@@ -11459,7 +11459,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VariableSet_1Iterator_1isNot(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variableSetteratorIsNot(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jboolean jresult = 0 ;
   std::set< dreal::drake::symbolic::Variable >::iterator *arg1 = (std::set< dreal::drake::symbolic::Variable >::iterator *) 0 ;
   std::set< dreal::drake::symbolic::Variable >::iterator arg2 ;
@@ -11483,7 +11483,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_delete_1VariableSet_1Iterator(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_deleteVariableSetIterator(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   std::set< dreal::drake::symbolic::Variable >::iterator *arg1 = (std::set< dreal::drake::symbolic::Variable >::iterator *) 0 ;
   
   (void)jenv;
@@ -11493,7 +11493,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1VariableSet_1_1SWIG_10(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newVariableSetSWIG0(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   std::set< dreal::drake::symbolic::Variable > *result = 0 ;
   
@@ -11505,7 +11505,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1VariableSet_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newVariableSetSWIG1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   std::set< dreal::drake::symbolic::Variable > *arg1 = 0 ;
   std::set< dreal::drake::symbolic::Variable > *result = 0 ;
@@ -11524,7 +11524,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VariableSet_1isEmpty(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variableSetIsEmpty(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   std::set< dreal::drake::symbolic::Variable > *arg1 = (std::set< dreal::drake::symbolic::Variable > *) 0 ;
   bool result;
@@ -11539,7 +11539,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VariableSet_1clear(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variableSetClear(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   std::set< dreal::drake::symbolic::Variable > *arg1 = (std::set< dreal::drake::symbolic::Variable > *) 0 ;
   
   (void)jenv;
@@ -11550,7 +11550,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VariableSet_1begin(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variableSetBegin(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   std::set< dreal::drake::symbolic::Variable > *arg1 = (std::set< dreal::drake::symbolic::Variable > *) 0 ;
   std::set< dreal::drake::symbolic::Variable >::iterator result;
@@ -11565,7 +11565,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VariableSet_1end(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variableSetEnd(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   std::set< dreal::drake::symbolic::Variable > *arg1 = (std::set< dreal::drake::symbolic::Variable > *) 0 ;
   std::set< dreal::drake::symbolic::Variable >::iterator result;
@@ -11580,7 +11580,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dr
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VariableSet_1addImpl(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variableSetAddImpl(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jboolean jresult = 0 ;
   std::set< dreal::drake::symbolic::Variable > *arg1 = (std::set< dreal::drake::symbolic::Variable > *) 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
@@ -11602,7 +11602,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VariableSet_1containsImpl(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variableSetContainsImpl(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jboolean jresult = 0 ;
   std::set< dreal::drake::symbolic::Variable > *arg1 = (std::set< dreal::drake::symbolic::Variable > *) 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
@@ -11624,7 +11624,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VariableSet_1removeImpl(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variableSetRemoveImpl(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jboolean jresult = 0 ;
   std::set< dreal::drake::symbolic::Variable > *arg1 = (std::set< dreal::drake::symbolic::Variable > *) 0 ;
   dreal::drake::symbolic::Variable *arg2 = 0 ;
@@ -11646,7 +11646,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VariableSet_1sizeImpl(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variableSetSizeImpl(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   std::set< dreal::drake::symbolic::Variable > *arg1 = (std::set< dreal::drake::symbolic::Variable > *) 0 ;
   jint result;
@@ -11666,7 +11666,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_VariableSet_1hasNextImpl(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_variableSetHasNextImpl(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jboolean jresult = 0 ;
   std::set< dreal::drake::symbolic::Variable > *arg1 = (std::set< dreal::drake::symbolic::Variable > *) 0 ;
   std::set< dreal::drake::symbolic::Variable >::iterator *arg2 = 0 ;
@@ -11688,7 +11688,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_delete_1VariableSet(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_deleteVariableSet(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   std::set< dreal::drake::symbolic::Variable > *arg1 = (std::set< dreal::drake::symbolic::Variable > *) 0 ;
   
   (void)jenv;
@@ -11700,42 +11700,42 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_dre
 
 //Start of self written JNI calls
 
-SWIGEXPORT void Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1mutable_1precision_10(JNIEnv *jenv, jclass jcls, jdouble value, jlong config) {
+SWIGEXPORT void Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configMutablePrecision0(JNIEnv *jenv, jclass jcls, jdouble value, jlong config) {
   double val = (double)value;
   dreal::Config *configure = (dreal::Config *) 0;
   configure = *(dreal::Config **)&config;
   configure->mutable_precision() = val;
 }
 
-SWIGEXPORT void Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1mutable_1produce_1models_10(JNIEnv *jenv, jclass jcls, jboolean boolean, jlong config) {
+SWIGEXPORT void Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configMutableProduceModels0(JNIEnv *jenv, jclass jcls, jboolean boolean, jlong config) {
   bool binary = (bool)boolean;
   dreal::Config *configure = (dreal::Config *) 0;
   configure = *(dreal::Config **)&config;
   configure->mutable_produce_models() = binary;
 }
 
-SWIGEXPORT void Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1mutable_1use_1polytope_10(JNIEnv *jenv, jclass jcls, jboolean boolean, jlong config) {
+SWIGEXPORT void Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configMutableUsePolytope0(JNIEnv *jenv, jclass jcls, jboolean boolean, jlong config) {
   bool binary = (bool)boolean;
   dreal::Config *configure = (dreal::Config *) 0;
   configure = *(dreal::Config **)&config;
   configure->mutable_use_polytope() = binary;
 }
 
-SWIGEXPORT void Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1mutable_1use_1polytope_1in_1forall_10(JNIEnv *jenv, jclass jcls, jboolean boolean, jlong config) {
+SWIGEXPORT void Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configMutableUsePolytopeInForall0(JNIEnv *jenv, jclass jcls, jboolean boolean, jlong config) {
   bool binary = (bool)boolean;
   dreal::Config *configure = (dreal::Config *) 0;
   configure = *(dreal::Config **)&config;
   configure->mutable_use_polytope_in_forall() = binary;
 }
 
-SWIGEXPORT void Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1mutable_1use_1worklist_1fixpoint_10(JNIEnv *jenv, jclass jcls, jboolean boolean, jlong config) {
+SWIGEXPORT void Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configMutableUseWorklistFixpoint0(JNIEnv *jenv, jclass jcls, jboolean boolean, jlong config) {
   bool binary = (bool)boolean;
   dreal::Config *configure = (dreal::Config *) 0;
   configure = *(dreal::Config **)&config;
   configure->mutable_use_worklist_fixpoint() = binary;
 }
 
-SWIGEXPORT void Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1mutable_1use_1local_1optimization_10(JNIEnv *jenv, jclass jcls, jboolean boolean, jlong config) {
+SWIGEXPORT void Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configMutableUseLocalOptimization0(JNIEnv *jenv, jclass jcls, jboolean boolean, jlong config) {
   bool binary = (bool)boolean;
   dreal::Config *configure = (dreal::Config *) 0;
   configure = *(dreal::Config **)&config;
@@ -11749,63 +11749,63 @@ SWIGEXPORT void Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Co
 //   configure->mutable_dump_theory_literals() = binary;
 // }
 
-SWIGEXPORT void Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1mutable_1number_1of_1jobs_10(JNIEnv *jenv, jclass jcls, jint value, jlong config) {
+SWIGEXPORT void Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configMutableNumberOfJobs0(JNIEnv *jenv, jclass jcls, jint value, jlong config) {
   int val = (int)value;
   dreal::Config *configure = (dreal::Config *) 0;
   configure = *(dreal::Config **)&config;
   configure->mutable_number_of_jobs() = val;
 }
 
-SWIGEXPORT void Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1mutable_1stack_1left_1box_1first_10(JNIEnv *jenv, jclass jcls, jboolean boolean, jlong config) {
+SWIGEXPORT void Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configMutableStackLeftBoxFirst0(JNIEnv *jenv, jclass jcls, jboolean boolean, jlong config) {
   bool binary = (bool)boolean;
   dreal::Config *configure = (dreal::Config *) 0;
   configure = *(dreal::Config **)&config;
   configure->mutable_stack_left_box_first() = binary;
 }
 
-SWIGEXPORT void Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1mutable_1nlopt_1ftol_1rel_10(JNIEnv *jenv, jclass jcls, jdouble value, jlong config) {
+SWIGEXPORT void Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configMutableNloptFtolRel0(JNIEnv *jenv, jclass jcls, jdouble value, jlong config) {
   double val = (double)value;
   dreal::Config *configure = (dreal::Config *) 0;
   configure = *(dreal::Config **)&config;
   configure->mutable_nlopt_ftol_rel() = val;
 }
 
-SWIGEXPORT void Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1mutable_1nlopt_1ftol_1abs_10(JNIEnv *jenv, jclass jcls, jdouble value, jlong config) {
+SWIGEXPORT void Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configMutableNloptFtolAbs0(JNIEnv *jenv, jclass jcls, jdouble value, jlong config) {
   double val = (double)value;
   dreal::Config *configure = (dreal::Config *) 0;
   configure = *(dreal::Config **)&config;
   configure->mutable_nlopt_ftol_abs() = val;
 }
 
-SWIGEXPORT void Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1mutable_1nlopt_1maxeval_10(JNIEnv *jenv, jclass jcls, jint value, jlong config) {
+SWIGEXPORT void Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configMutableNloptMaxeval0(JNIEnv *jenv, jclass jcls, jint value, jlong config) {
   int val = (int)value;
   dreal::Config *configure = (dreal::Config *) 0;
   configure = *(dreal::Config **)&config;
   configure->mutable_nlopt_maxeval() = val;
 }
 
-SWIGEXPORT void Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1mutable_1nlopt_1maxtime_10(JNIEnv *jenv, jclass jcls, jdouble value, jlong config) {
+SWIGEXPORT void Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configMutableNloptMaxtime0(JNIEnv *jenv, jclass jcls, jdouble value, jlong config) {
   double val = (double)value;
   dreal::Config *configure = (dreal::Config *) 0;
   configure = *(dreal::Config **)&config;
   configure->mutable_nlopt_maxtime() = val;
 }
 
-SWIGEXPORT void Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1mutable_1random_1seed_10(JNIEnv *jenv, jclass jcls, jlong seed, jlong config) {
+SWIGEXPORT void Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configMutableRandomSeed0(JNIEnv *jenv, jclass jcls, jlong seed, jlong config) {
   uint32_t stone = (uint32_t)seed;
   dreal::Config *configure = (dreal::Config *) 0;
   configure = *(dreal::Config **)&config;
   configure->mutable_random_seed() = stone;
 }
 
-SWIGEXPORT void Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Config_1mutable_1smtlib2_1compliant_10(JNIEnv *jenv, jclass jcls, jboolean boolean, jlong config) {
+SWIGEXPORT void Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_configMutableSmtlib2Compliant0(JNIEnv *jenv, jclass jcls, jboolean boolean, jlong config) {
   bool binary = (bool)boolean;
   dreal::Config *configure = (dreal::Config *) 0;
   configure = *(dreal::Config **)&config;
   configure->mutable_smtlib2_compliant() = binary;
 }
 
-SWIGEXPORT void Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Context_1declareVariables(JNIEnv *jenv, jclass jcls, jlong cntxt, jlong f) {
+SWIGEXPORT void Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_contextDeclareVariables(JNIEnv *jenv, jclass jcls, jlong cntxt, jlong f) {
   dreal::Context *context = (dreal::Context *) 0;
   context = *(dreal::Context **)&cntxt;
   dreal::drake::symbolic::Formula *formula = (dreal::drake::symbolic::Formula *) 0;
@@ -11824,7 +11824,7 @@ SWIGEXPORT void Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Co
   }
 }
 
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Context_1CheckSat_10(JNIEnv *jenv, jclass jcls, jlong cntxt, jlong b) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_contextCheckSat0(JNIEnv *jenv, jclass jcls, jlong cntxt, jlong b) {
   jboolean jresult = 0 ;
   dreal::Box *box = (dreal::Box *) 0 ;
   box = *(dreal::Box **)&b;
@@ -11847,7 +11847,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni
 }
 
 SWIGEXPORT void JNICALL
-Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Formula_1getQuantifiedVariables(JNIEnv *jenv, jclass jcls, jlong set, jlong f) {
+Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaGetQuantifiedVariables(JNIEnv *jenv, jclass jcls, jlong set, jlong f) {
   dreal::drake::symbolic::Formula *formula = (dreal::drake::symbolic::Formula *) 0;
   formula = *(dreal::drake::symbolic::Formula **)&f;
   std::set< dreal::drake::symbolic::Variable > *s = (std::set< dreal::drake::symbolic::Variable > *) 0 ;
@@ -11858,7 +11858,7 @@ Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Formula_1getQuanti
   }
 }
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_new_1Expression_1_1SWIG_14(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_newExpressionSWIG4(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
   long arg1 ;
   dreal::drake::symbolic::Expression *result = 0 ;
@@ -11912,7 +11912,7 @@ Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Expression_1getVar
 }
 
 SWIGEXPORT void JNICALL
-Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_Formula_1getFreeVariables(JNIEnv
+Java_org_sosy_1lab_java_1smt_solvers_dreal4_drealjni_drealJNI_formulaGetFreeVariables(JNIEnv
 *jenv, jclass jcls, jlong set, jlong f) {
   dreal::drake::symbolic::Formula *formula = (dreal::drake::symbolic::Formula *) 0;
   formula = *(dreal::drake::symbolic::Formula **)&f;
