@@ -4,7 +4,7 @@
 //
 // SPDX-FileCopyrightText: 2023 Dirk Beyer <https://www.sosy-lab.org>
 //
-// SPDX-License-Identifier: Apache-2.0 OR GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 
 package org.sosy_lab.java_smt.solvers.dreal4;
 
