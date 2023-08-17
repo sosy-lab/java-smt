@@ -17,7 +17,7 @@ import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.FormulaKind;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variables;
-import org.sosy_lab.java_smt.solvers.dreal4.drealjni.dreal;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Dreal;
 
 public class DReal4QuantifiedFormulaManager
     extends AbstractQuantifiedFormulaManager<
@@ -64,13 +64,13 @@ public class DReal4QuantifiedFormulaManager
     } else {
       if (pBody.isFormula()) {
         return new DRealTerm<>(
-            dreal.forall(vars, pBody.getFormula()), pBody.getType(), FormulaKind.Forall);
+            Dreal.forall(vars, pBody.getFormula()), pBody.getType(), FormulaKind.Forall);
       } else if (pBody.isVar()) {
         Variable var = pBody.getVariable();
-        if (var.get_type() == Variable.Type.BOOLEAN) {
+        if (var.getType() == Variable.Type.BOOLEAN) {
           Formula f = new Formula(var);
-          Formula quantified = dreal.forall(vars, f);
-          return new DRealTerm<>(quantified, var.get_type(), FormulaKind.Forall);
+          Formula quantified = Dreal.forall(vars, f);
+          return new DRealTerm<>(quantified, var.getType(), FormulaKind.Forall);
         } else {
           throw new IllegalArgumentException(
               "The given Formula is a Variable and the variable is not of type Boolean.");

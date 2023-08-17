@@ -19,7 +19,7 @@ import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Config;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Expression;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.ExpressionKind;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable;
-import org.sosy_lab.java_smt.solvers.dreal4.drealjni.dreal;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Dreal;
 
 public class DReal4FormulaManager
     extends AbstractFormulaManager<DRealTerm<?, ?>, Variable.Type, Config, DRealTerm<?, ?>> {
@@ -87,7 +87,7 @@ public class DReal4FormulaManager
       Variable var;
       if (changeFromTerm.isExp()) {
         if (changeFromTerm.getExpressionKind() == ExpressionKind.Var) {
-          var = dreal.get_variable(changeFromTerm.getExpression());
+          var = Dreal.getVariable(changeFromTerm.getExpression());
         } else {
           throw new UnsupportedOperationException(
               "dReal does not support substitution on expressions.");
@@ -101,21 +101,21 @@ public class DReal4FormulaManager
       if (changeToTerm.isVar()) {
         if (changeToTerm.getType() == Variable.Type.BOOLEAN) {
           formula =
-              formula.Substitute(
+              formula.substitute(
                   var,
                   new org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula(
                       changeToTerm.getVariable()));
         } else {
-          formula = formula.Substitute(var, new Expression(changeToTerm.getVariable()));
+          formula = formula.substitute(var, new Expression(changeToTerm.getVariable()));
         }
       } else if (changeToTerm.isExp()) {
-        formula = formula.Substitute(var, changeToTerm.getExpression());
+        formula = formula.substitute(var, changeToTerm.getExpression());
       } else {
-        formula = formula.Substitute(var, changeToTerm.getFormula());
+        formula = formula.substitute(var, changeToTerm.getFormula());
       }
     }
     FormulaType<T> type = getFormulaType(pF);
     return getFormulaCreator()
-        .encapsulate(type, new DRealTerm<>(formula, f.getType(), formula.get_kind()));
+        .encapsulate(type, new DRealTerm<>(formula, f.getType(), formula.getKind()));
   }
 }

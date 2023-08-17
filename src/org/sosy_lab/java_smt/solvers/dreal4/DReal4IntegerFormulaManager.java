@@ -14,7 +14,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Expression;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.ExpressionKind;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable;
-import org.sosy_lab.java_smt.solvers.dreal4.drealjni.dreal;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Dreal;
 
 public class DReal4IntegerFormulaManager
     extends DReal4NumeralFormulaManager<IntegerFormula, IntegerFormula>
@@ -44,13 +44,13 @@ public class DReal4IntegerFormulaManager
         if (Double.parseDouble(pParam2.toString()) == 0.0) {
           throw new IllegalArgumentException("dReal does not support division by zero.");
         }
-        double dParam1 = Double.parseDouble(pParam1.getExpression().to_string());
-        double dParam2 = Double.parseDouble(pParam2.getExpression().to_string());
+        double dParam1 = Double.parseDouble(pParam1.getExpression().toString());
+        double dParam2 = Double.parseDouble(pParam2.getExpression().toString());
         int res = (int) (dParam1 / dParam2);
         return new DRealTerm<>(new Expression(res), Variable.Type.INTEGER, ExpressionKind.Constant);
       }
       return new DRealTerm<>(
-          dreal.Divide(pParam1.getExpression(), pParam2.getExpression()),
+          Dreal.divide(pParam1.getExpression(), pParam2.getExpression()),
           pParam1.getType(),
           ExpressionKind.Div);
     } else if (pParam1.isVar() && pParam2.isExp()) {
@@ -60,17 +60,17 @@ public class DReal4IntegerFormulaManager
         }
       }
       return new DRealTerm<>(
-          dreal.Divide(new Expression(pParam1.getVariable()), pParam2.getExpression()),
+          Dreal.divide(new Expression(pParam1.getVariable()), pParam2.getExpression()),
           pParam1.getType(),
           ExpressionKind.Div);
     } else if (pParam1.isExp() && pParam2.isVar()) {
       return new DRealTerm<>(
-          dreal.Divide(pParam1.getExpression(), new Expression(pParam2.getVariable())),
+          Dreal.divide(pParam1.getExpression(), new Expression(pParam2.getVariable())),
           pParam1.getType(),
           ExpressionKind.Div);
     } else if (pParam1.isVar() && pParam2.isVar()) {
       return new DRealTerm<>(
-          dreal.Divide(
+          Dreal.divide(
               new Expression(pParam1.getVariable()), new Expression(pParam2.getVariable())),
           pParam1.getType(),
           ExpressionKind.Div);

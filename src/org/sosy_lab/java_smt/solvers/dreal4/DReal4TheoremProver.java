@@ -58,7 +58,7 @@ class DReal4TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
     Preconditions.checkState(!closed);
     Preconditions.checkState(size() > 0);
     assertedFormulas.pop();
-    curCnt.Pop(1);
+    curCnt.pop(1);
   }
 
   @Override
@@ -72,10 +72,10 @@ class DReal4TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
       Preconditions.checkState(formula.getType() == Variable.Type.BOOLEAN);
       Formula f = new Formula(formula.getVariable());
       curCnt.declareVariables(f);
-      curCnt.Assert(f);
+      curCnt.assertion(f);
     } else {
       curCnt.declareVariables(formula.getFormula());
-      curCnt.Assert(formula.getFormula());
+      curCnt.assertion(formula.getFormula());
     }
     return null;
   }
@@ -84,7 +84,7 @@ class DReal4TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   public void push() throws InterruptedException {
     Preconditions.checkState(!closed);
     assertedFormulas.push(new ArrayList<>());
-    curCnt.Push(1);
+    curCnt.push(1);
   }
 
   @Override
@@ -96,7 +96,7 @@ class DReal4TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
-    boolean unsat = curCnt.CheckSat(model);
+    boolean unsat = curCnt.checkSat(model);
     return !unsat;
   }
 
@@ -134,7 +134,7 @@ class DReal4TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   public void close() {
     if (!closed) {
       assertedFormulas.clear();
-      Context.Exit();
+      Context.exit();
       closed = true;
     }
   }

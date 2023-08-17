@@ -11,7 +11,6 @@ package org.sosy_lab.java_smt.solvers.dreal4;
 import java.util.Set;
 import java.util.function.Consumer;
 import org.sosy_lab.common.ShutdownNotifier;
-import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
@@ -46,7 +45,7 @@ public class DReal4SolverContext extends AbstractSolverContext {
 
     // Create config
     Config config = new Config();
-    config.mutable_random_seed(randomSeed);
+    config.mutableRandomSeed(randomSeed);
 
     DReal4FormulaCreator creator = new DReal4FormulaCreator(config);
 
@@ -71,7 +70,7 @@ public class DReal4SolverContext extends AbstractSolverContext {
 
   @Override
   public String getVersion() {
-    return "dReal " + drealJNI.Context_version();
+    return "dReal " + DrealJNI.contextVersion();
   }
 
   @Override

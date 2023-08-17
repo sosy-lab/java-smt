@@ -13,7 +13,7 @@ import org.sosy_lab.java_smt.solvers.dreal4.drealjni.ExpressionKind;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.FormulaKind;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable;
-import org.sosy_lab.java_smt.solvers.dreal4.drealjni.dreal;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Dreal;
 
 /*
 This is a wrapper class to use the different classes of dReal to create Formulas. In dReal we
@@ -84,7 +84,7 @@ public class DRealTerm<Term, Declaration> {
   public ExpressionKind getExpressionKind() {
     if (isExp()) {
       Expression exp = (Expression) term;
-      return exp.get_kind();
+      return exp.getKind();
     } else {
       throw new IllegalArgumentException("Not an Expression.");
     }
@@ -93,7 +93,7 @@ public class DRealTerm<Term, Declaration> {
   public FormulaKind getFormulaKind() {
     if (isFormula()) {
       Formula formula = (Formula) term;
-      return formula.get_kind();
+      return formula.getKind();
     } else {
       throw new IllegalArgumentException("Not a Formula.");
     }
@@ -103,24 +103,24 @@ public class DRealTerm<Term, Declaration> {
   public String toString() {
     if (isVar()) {
       Variable var = (Variable) term;
-      return var.to_string();
+      return var.toString();
     } else if (isExp()) {
       Expression exp = (Expression) term;
-      return exp.to_string();
+      return exp.toString();
     } else {
       Formula formula = (Formula) term;
-      return formula.to_string();
+      return formula.toString();
     }
   }
 
   @Override
   public final int hashCode() {
     if (isExp()) {
-      return (int) getExpression().get_hash();
+      return (int) getExpression().getHash();
     } else if (isFormula()) {
-      return (int) getFormula().get_hash();
+      return (int) getFormula().getHash();
     } else {
-      return (int) getVariable().get_hash();
+      return (int) getVariable().getHash();
     }
   }
 
@@ -136,54 +136,54 @@ public class DRealTerm<Term, Declaration> {
     DRealTerm<?, ?> oTerm = ((DReal4Formula) o).getTerm();
     if (isVar()) {
       if (oTerm.isVar()) {
-        return getVariable().equal_to(oTerm.getVariable());
+        return getVariable().equalTo(oTerm.getVariable());
       } else if (oTerm.isExp()) {
         if (oTerm.getExpressionKind() == ExpressionKind.Var) {
-          return getVariable().equal_to(dreal.get_variable(oTerm.getExpression()));
+          return getVariable().equalTo(Dreal.getVariable(oTerm.getExpression()));
         }
       } else {
         if (oTerm.getFormulaKind() == FormulaKind.Var) {
-          return getVariable().equal_to(dreal.get_variable(oTerm.getFormula()));
+          return getVariable().equalTo(Dreal.getVariable(oTerm.getFormula()));
         }
       }
     } else if (isExp()) {
       if (getExpressionKind() == ExpressionKind.Var) {
         if (oTerm.isVar()) {
-          return oTerm.getVariable().equal_to(dreal.get_variable(getExpression()));
+          return oTerm.getVariable().equalTo(Dreal.getVariable(getExpression()));
         } else if (oTerm.isExp()) {
-          return getExpression().EqualTo(oTerm.getExpression());
+          return getExpression().equalTo(oTerm.getExpression());
         } else {
           if (oTerm.getFormulaKind() == FormulaKind.Var) {
-            return dreal
-                .get_variable(getExpression())
-                .equal_to(dreal.get_variable(oTerm.getFormula()));
+            return Dreal
+                .getVariable(getExpression())
+                .equalTo(Dreal.getVariable(oTerm.getFormula()));
           }
         }
       } else {
         if (oTerm.isExp()) {
-          return getExpression().EqualTo(oTerm.getExpression());
+          return getExpression().equalTo(oTerm.getExpression());
         }
       }
     } else {
       if (getFormulaKind() == FormulaKind.Var) {
         if (oTerm.isVar()) {
-          return oTerm.getVariable().equal_to(dreal.get_variable(getFormula()));
+          return oTerm.getVariable().equalTo(Dreal.getVariable(getFormula()));
         } else if (oTerm.isExp()) {
           if (oTerm.getExpressionKind() == ExpressionKind.Var) {
-            return dreal
-                .get_variable(getFormula())
-                .equal_to(dreal.get_variable(oTerm.getExpression()));
+            return Dreal
+                .getVariable(getFormula())
+                .equalTo(Dreal.getVariable(oTerm.getExpression()));
           }
         } else {
           if (oTerm.getFormulaKind() == FormulaKind.Var) {
-            return dreal
-                .get_variable(getFormula())
-                .equal_to(dreal.get_variable(oTerm.getFormula()));
+            return Dreal
+                .getVariable(getFormula())
+                .equalTo(Dreal.getVariable(oTerm.getFormula()));
           }
         }
       } else {
         if (oTerm.isFormula()) {
-          return getFormula().EqualTo(oTerm.getFormula());
+          return getFormula().equalTo(oTerm.getFormula());
         }
       }
     }

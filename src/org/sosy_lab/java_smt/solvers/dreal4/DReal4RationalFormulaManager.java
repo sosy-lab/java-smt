@@ -14,7 +14,7 @@ import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Expression;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.ExpressionKind;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable;
-import org.sosy_lab.java_smt.solvers.dreal4.drealjni.dreal;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Dreal;
 
 public class DReal4RationalFormulaManager
     extends DReal4NumeralFormulaManager<NumeralFormula, RationalFormula>
@@ -40,12 +40,12 @@ public class DReal4RationalFormulaManager
           throw new IllegalArgumentException("dReal does not support division by zero.");
         }
         return new DRealTerm<>(
-            dreal.Divide(pParam1.getExpression(), pParam2.getExpression()),
+            Dreal.divide(pParam1.getExpression(), pParam2.getExpression()),
             pParam1.getType(),
             ExpressionKind.Div);
       }
       return new DRealTerm<>(
-          dreal.Divide(pParam1.getExpression(), pParam2.getExpression()),
+          Dreal.divide(pParam1.getExpression(), pParam2.getExpression()),
           pParam1.getType(),
           ExpressionKind.Div);
     } else if (pParam1.isVar() && pParam2.isExp()) {
@@ -55,17 +55,17 @@ public class DReal4RationalFormulaManager
         }
       }
       return new DRealTerm<>(
-          dreal.Divide(new Expression(pParam1.getVariable()), pParam2.getExpression()),
+          Dreal.divide(new Expression(pParam1.getVariable()), pParam2.getExpression()),
           pParam1.getType(),
           ExpressionKind.Div);
     } else if (pParam1.isExp() && pParam2.isVar()) {
       return new DRealTerm<>(
-          dreal.Divide(pParam1.getExpression(), new Expression(pParam2.getVariable())),
+          Dreal.divide(pParam1.getExpression(), new Expression(pParam2.getVariable())),
           pParam1.getType(),
           ExpressionKind.Div);
     } else if (pParam1.isVar() && pParam2.isVar()) {
       return new DRealTerm<>(
-          dreal.Divide(
+          Dreal.divide(
               new Expression(pParam1.getVariable()), new Expression(pParam2.getVariable())),
           pParam1.getType(),
           ExpressionKind.Div);
