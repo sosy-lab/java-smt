@@ -8,12 +8,12 @@
 
 package org.sosy_lab.java_smt.solvers.dreal4;
 
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Dreal;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Expression;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.ExpressionKind;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.FormulaKind;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable;
-import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Dreal;
 
 /*
 This is a wrapper class to use the different classes of dReal to create Formulas. In dReal we
@@ -138,24 +138,23 @@ public class DRealTerm<Term, Declaration> {
       if (oTerm.isVar()) {
         return getVariable().equalTo(oTerm.getVariable());
       } else if (oTerm.isExp()) {
-        if (oTerm.getExpressionKind() == ExpressionKind.Var) {
+        if (oTerm.getExpressionKind() == ExpressionKind.VAR) {
           return getVariable().equalTo(Dreal.getVariable(oTerm.getExpression()));
         }
       } else {
-        if (oTerm.getFormulaKind() == FormulaKind.Var) {
+        if (oTerm.getFormulaKind() == FormulaKind.VAR) {
           return getVariable().equalTo(Dreal.getVariable(oTerm.getFormula()));
         }
       }
     } else if (isExp()) {
-      if (getExpressionKind() == ExpressionKind.Var) {
+      if (getExpressionKind() == ExpressionKind.VAR) {
         if (oTerm.isVar()) {
           return oTerm.getVariable().equalTo(Dreal.getVariable(getExpression()));
         } else if (oTerm.isExp()) {
           return getExpression().equalTo(oTerm.getExpression());
         } else {
-          if (oTerm.getFormulaKind() == FormulaKind.Var) {
-            return Dreal
-                .getVariable(getExpression())
+          if (oTerm.getFormulaKind() == FormulaKind.VAR) {
+            return Dreal.getVariable(getExpression())
                 .equalTo(Dreal.getVariable(oTerm.getFormula()));
           }
         }
@@ -165,20 +164,17 @@ public class DRealTerm<Term, Declaration> {
         }
       }
     } else {
-      if (getFormulaKind() == FormulaKind.Var) {
+      if (getFormulaKind() == FormulaKind.VAR) {
         if (oTerm.isVar()) {
           return oTerm.getVariable().equalTo(Dreal.getVariable(getFormula()));
         } else if (oTerm.isExp()) {
-          if (oTerm.getExpressionKind() == ExpressionKind.Var) {
-            return Dreal
-                .getVariable(getFormula())
+          if (oTerm.getExpressionKind() == ExpressionKind.VAR) {
+            return Dreal.getVariable(getFormula())
                 .equalTo(Dreal.getVariable(oTerm.getExpression()));
           }
         } else {
-          if (oTerm.getFormulaKind() == FormulaKind.Var) {
-            return Dreal
-                .getVariable(getFormula())
-                .equalTo(Dreal.getVariable(oTerm.getFormula()));
+          if (oTerm.getFormulaKind() == FormulaKind.VAR) {
+            return Dreal.getVariable(getFormula()).equalTo(Dreal.getVariable(oTerm.getFormula()));
           }
         }
       } else {

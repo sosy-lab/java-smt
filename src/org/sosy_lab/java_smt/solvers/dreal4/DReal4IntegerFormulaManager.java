@@ -11,10 +11,10 @@ package org.sosy_lab.java_smt.solvers.dreal4;
 import java.math.BigInteger;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Dreal;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Expression;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.ExpressionKind;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable;
-import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Dreal;
 
 public class DReal4IntegerFormulaManager
     extends DReal4NumeralFormulaManager<IntegerFormula, IntegerFormula>
@@ -39,22 +39,22 @@ public class DReal4IntegerFormulaManager
   public DRealTerm<Expression, ExpressionKind> divide(
       DRealTerm<?, ?> pParam1, DRealTerm<?, ?> pParam2) {
     if (pParam1.isExp() && pParam2.isExp()) {
-      if (pParam1.getExpressionKind() == ExpressionKind.Constant
-          && pParam2.getExpressionKind() == ExpressionKind.Constant) {
+      if (pParam1.getExpressionKind() == ExpressionKind.CONSTANT
+          && pParam2.getExpressionKind() == ExpressionKind.CONSTANT) {
         if (Double.parseDouble(pParam2.toString()) == 0.0) {
           throw new IllegalArgumentException("dReal does not support division by zero.");
         }
         double dParam1 = Double.parseDouble(pParam1.getExpression().toString());
         double dParam2 = Double.parseDouble(pParam2.getExpression().toString());
         int res = (int) (dParam1 / dParam2);
-        return new DRealTerm<>(new Expression(res), Variable.Type.INTEGER, ExpressionKind.Constant);
+        return new DRealTerm<>(new Expression(res), Variable.Type.INTEGER, ExpressionKind.CONSTANT);
       }
       return new DRealTerm<>(
           Dreal.divide(pParam1.getExpression(), pParam2.getExpression()),
           pParam1.getType(),
-          ExpressionKind.Div);
+          ExpressionKind.DIV);
     } else if (pParam1.isVar() && pParam2.isExp()) {
-      if (pParam2.getExpressionKind() == ExpressionKind.Constant) {
+      if (pParam2.getExpressionKind() == ExpressionKind.CONSTANT) {
         if (Double.parseDouble(pParam2.toString()) == 0.0) {
           throw new IllegalArgumentException("dReal does not support division by zero.");
         }
@@ -62,18 +62,18 @@ public class DReal4IntegerFormulaManager
       return new DRealTerm<>(
           Dreal.divide(new Expression(pParam1.getVariable()), pParam2.getExpression()),
           pParam1.getType(),
-          ExpressionKind.Div);
+          ExpressionKind.DIV);
     } else if (pParam1.isExp() && pParam2.isVar()) {
       return new DRealTerm<>(
           Dreal.divide(pParam1.getExpression(), new Expression(pParam2.getVariable())),
           pParam1.getType(),
-          ExpressionKind.Div);
+          ExpressionKind.DIV);
     } else if (pParam1.isVar() && pParam2.isVar()) {
       return new DRealTerm<>(
           Dreal.divide(
               new Expression(pParam1.getVariable()), new Expression(pParam2.getVariable())),
           pParam1.getType(),
-          ExpressionKind.Div);
+          ExpressionKind.DIV);
     } else {
       throw new UnsupportedOperationException("dReal does not support divide with Formulas.");
     }

@@ -21,11 +21,11 @@ import org.junit.Test;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Box;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Config;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Context;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Dreal;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Expression;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variables;
-import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Dreal;
 
 public class DReal4NativeAPITest {
 
@@ -117,7 +117,7 @@ public class DReal4NativeAPITest {
   @Test
   public void simpleAddUNSAT() {
     Expression one = Expression.one();
-    Formula f = new Formula(Dreal.equal(Dreal.Add(one, one), one));
+    Formula f = new Formula(Dreal.equal(Dreal.add(one, one), one));
     context.declareVariables(f);
     context.assertion(f);
     assertThat(context.checkSat(model)).isFalse();
@@ -127,7 +127,7 @@ public class DReal4NativeAPITest {
   public void simpleAddSAT() {
     Expression zero = Expression.zero();
     Expression one = Expression.one();
-    Formula f = new Formula(Dreal.equal(Dreal.Add(zero, one), one));
+    Formula f = new Formula(Dreal.equal(Dreal.add(zero, one), one));
     context.declareVariables(f);
     context.assertion(f);
     assertThat(context.checkSat(model)).isTrue();
@@ -137,7 +137,7 @@ public class DReal4NativeAPITest {
   public void simpleMulAddSAT() {
     Expression x = new Expression(new Variable("x"));
     Expression y = new Expression(new Variable("y"));
-    Formula assertion1 = new Formula(Dreal.equal(Dreal.Add(x, y), new Expression(4)));
+    Formula assertion1 = new Formula(Dreal.equal(Dreal.add(x, y), new Expression(4)));
     Formula assertion2 = new Formula(Dreal.equal(Dreal.multiply(x, y), new Expression(4)));
     context.declareVariables(assertion1);
     context.assertion(assertion1);
@@ -150,7 +150,7 @@ public class DReal4NativeAPITest {
   public void simpleMulAddUNSAT() {
     Expression x = new Expression(new Variable("x"));
     Expression y = new Expression(new Variable("y"));
-    Formula assertion1 = new Formula(Dreal.equal(Dreal.Add(x, y), new Expression(1)));
+    Formula assertion1 = new Formula(Dreal.equal(Dreal.add(x, y), new Expression(1)));
     Formula assertion2 = new Formula(Dreal.equal(Dreal.multiply(x, y), new Expression(1)));
     context.declareVariables(assertion1);
     context.assertion(assertion1);
@@ -168,7 +168,7 @@ public class DReal4NativeAPITest {
     Formula f = new Formula(Dreal.and(Dreal.grater(y, zero), Dreal.grater(x, zero)));
     Formula g = new Formula(Dreal.and(Dreal.less(x, eightFith), Dreal.less(y, eightFith)));
     Formula k = new Formula(Dreal.and(f, g));
-    Formula assertion = new Formula(Dreal.and(k, Dreal.equal(Dreal.Add(x, y), eightFith)));
+    Formula assertion = new Formula(Dreal.and(k, Dreal.equal(Dreal.add(x, y), eightFith)));
     context.declareVariables(assertion);
     context.assertion(assertion);
     assertThat(context.checkSat(model)).isTrue();
@@ -198,7 +198,7 @@ public class DReal4NativeAPITest {
     Expression zero = Expression.zero();
     Expression x = new Expression(new Variable("x"));
     Expression y = new Expression(new Variable("y"));
-    Formula assertion1 = new Formula(Dreal.equal(Dreal.multiply(x, y), Dreal.Add(x, y)));
+    Formula assertion1 = new Formula(Dreal.equal(Dreal.multiply(x, y), Dreal.add(x, y)));
     Formula assertion2 = new Formula(Dreal.and(Dreal.notEqual(x, zero), Dreal.equal(y, zero)));
     context.push(1);
     context.declareVariables(assertion1);
@@ -275,7 +275,7 @@ public class DReal4NativeAPITest {
     Formula f = new Formula(Dreal.equal(new Expression(x), new Expression(y)));
     List<Long> expected = Arrays.asList(x.getHash(), y.getHash());
     for (Variable var : f.getFreeVariables()) {
-        assertThat(expected).contains(var.getHash());
+      assertThat(expected).contains(var.getHash());
     }
   }
 
@@ -283,7 +283,7 @@ public class DReal4NativeAPITest {
   public void getVariablesTest() {
     Variable x = new Variable("x");
     Variable y = new Variable("y");
-    Expression exp = new Expression(Dreal.Add(new Expression(x), new Expression(y)));
+    Expression exp = new Expression(Dreal.add(new Expression(x), new Expression(y)));
     List<Long> expected = Arrays.asList(x.getHash(), y.getHash());
     for (Variable var : exp.getVariables()) {
       assertThat(expected).contains(var.getHash());

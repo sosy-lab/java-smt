@@ -17,7 +17,8 @@ import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
-import org.sosy_lab.java_smt.solvers.dreal4.drealjni.*;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Config;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.DrealJNI;
 
 public class DReal4SolverContext extends AbstractSolverContext {
 

@@ -16,10 +16,10 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Config;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Dreal;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Expression;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.ExpressionKind;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable;
-import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Dreal;
 
 public class DReal4FormulaManager
     extends AbstractFormulaManager<DRealTerm<?, ?>, Variable.Type, Config, DRealTerm<?, ?>> {
@@ -86,7 +86,7 @@ public class DReal4FormulaManager
       DRealTerm<?, ?> changeToTerm = changeTo[i];
       Variable var;
       if (changeFromTerm.isExp()) {
-        if (changeFromTerm.getExpressionKind() == ExpressionKind.Var) {
+        if (changeFromTerm.getExpressionKind() == ExpressionKind.VAR) {
           var = Dreal.getVariable(changeFromTerm.getExpression());
         } else {
           throw new UnsupportedOperationException(
