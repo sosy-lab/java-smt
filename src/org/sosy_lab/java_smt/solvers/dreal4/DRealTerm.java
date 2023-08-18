@@ -128,9 +128,9 @@ public class DRealTerm<T, D> {
   public final boolean equals(Object o) {
     if (o == this) {
       return true;
-    } else if (o instanceof DReal4Formula) {
+    } else if (o instanceof DRealTerm) {
       // equal_to only checks for the same structure
-      DRealTerm<?, ?> oTerm = ((DReal4Formula) o).getTerm();
+      DRealTerm<?, ?> oTerm = ((DRealTerm) o);
       if (isVar()) {
         if (oTerm.isVar()) {
           return getVariable().equalTo(oTerm.getVariable());
