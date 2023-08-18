@@ -130,7 +130,7 @@ public class DRealTerm<T, D> {
       return true;
     } else if (o instanceof DRealTerm) {
       // equal_to only checks for the same structure
-      DRealTerm<?, ?> oTerm = ((DRealTerm) o);
+      DRealTerm<?, ?> oTerm = ((DRealTerm<?, ?>) o);
       if (isVar()) {
         if (oTerm.isVar()) {
           return getVariable().equalTo(oTerm.getVariable());
