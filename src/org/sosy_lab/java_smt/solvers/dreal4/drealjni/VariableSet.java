@@ -59,7 +59,7 @@ public class VariableSet extends java.util.AbstractSet<Variable> {
 
   public VariableSet(java.util.Collection<? extends Variable> collection) {
     this();
-    addAll(collection);
+    var unused = addAll(collection);
   }
 
   @Override

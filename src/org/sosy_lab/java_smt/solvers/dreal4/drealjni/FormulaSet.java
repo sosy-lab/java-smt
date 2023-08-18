@@ -58,7 +58,7 @@ public class FormulaSet extends java.util.AbstractSet<Formula> {
 
   public FormulaSet(java.util.Collection<? extends Formula> collection) {
     this();
-    addAll(collection);
+    var unused = addAll(collection);
   }
 
   @Override
