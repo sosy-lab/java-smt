@@ -244,9 +244,9 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Variable.Type, C
         // constant as well (not a call to get the constant, get_constant_in_addition(Expression
         // exp))
         ExpressionDoubleMap map = Dreal.getExprToCoeffMapInAddition(term.getExpression());
-        for (Map.Entry<Expression, Double> entry : map.entrySet()) {
+        for (Expression key : map.keySet()) {
           recursiveAssignmentFinder(
-              builder, new DRealTerm<>(entry.getKey(), term.getType(), entry.getKey().getKind()));
+              builder, new DRealTerm<>(key, term.getType(), key.getKind()));
         }
       } else if (expKind == ExpressionKind.MUL) {
         // We get a map of Expression and Expression with the second Expression being the
