@@ -16,6 +16,7 @@
 
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import javax.annotation.concurrent.NotThreadSafe;
 
 @NotThreadSafe
@@ -60,10 +61,9 @@ public class VariableSet extends java.util.AbstractSet<Variable> {
     }
   }
 
-  @SuppressWarnings("unused")
   public VariableSet(java.util.Collection<? extends Variable> collection) {
     this();
-    var unused = addAll(collection);
+    addAll(collection);
   }
 
   @Override
@@ -76,6 +76,7 @@ public class VariableSet extends java.util.AbstractSet<Variable> {
     return addImpl(key);
   }
 
+  @CanIgnoreReturnValue
   @Override
   public boolean addAll(java.util.Collection<? extends Variable> collection) {
     boolean didAddElement = false;

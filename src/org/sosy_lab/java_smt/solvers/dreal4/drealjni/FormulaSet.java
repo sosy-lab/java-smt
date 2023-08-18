@@ -15,6 +15,7 @@
  * ----------------------------------------------------------------------------- */
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import javax.annotation.concurrent.NotThreadSafe;
 
 @NotThreadSafe
@@ -59,10 +60,9 @@ public class FormulaSet extends java.util.AbstractSet<Formula> {
     }
   }
 
-  @SuppressWarnings("unused")
   public FormulaSet(java.util.Collection<? extends Formula> collection) {
     this();
-    var unused = addAll(collection);
+    addAll(collection);
   }
 
   @Override
@@ -75,6 +75,7 @@ public class FormulaSet extends java.util.AbstractSet<Formula> {
     return addImpl(key);
   }
 
+  @CanIgnoreReturnValue
   @Override
   public boolean addAll(java.util.Collection<? extends Formula> collection) {
     boolean didAddElement = false;
