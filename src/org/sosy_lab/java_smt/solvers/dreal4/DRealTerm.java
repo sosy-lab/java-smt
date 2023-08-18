@@ -21,17 +21,17 @@ have Variables, Expression and Formulas. To create a Formula, Variables and Expr
 needed. Because in FormulaCreator there is only one excepted type, this wrapper class is needed,
 so that all three types are available.
  */
-public class DRealTerm<Term, Declaration> {
+public class DRealTerm<T, D> {
 
   // This is the term, so a Variable, an Expression or a Formula.
-  private final Term term;
+  private final T term;
   // Type of the Variable, Expression or Formula
   private final Variable.Type type;
   // Here the declarationKind is stored, (3 * x) the kind is multiplication. Is only needed for
   // visitor
-  private final Declaration declaration;
+  private final D declaration;
 
-  public DRealTerm(Term pTerm, Variable.Type pType, Declaration pDeclaration) {
+  public DRealTerm(T pTerm, Variable.Type pType, D pDeclaration) {
     this.term = pTerm;
     this.type = pType;
     this.declaration = pDeclaration;
@@ -77,7 +77,7 @@ public class DRealTerm<Term, Declaration> {
     return type;
   }
 
-  public Declaration getDeclaration() {
+  public D getDeclaration() {
     return declaration;
   }
 
