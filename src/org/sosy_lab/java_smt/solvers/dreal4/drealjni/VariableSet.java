@@ -161,6 +161,7 @@ public class VariableSet extends java.util.AbstractSet<Variable> {
 
     return removeImpl((Variable) object);
   }
+
   @NotThreadSafe
   protected static class Iterator {
     private transient long swigCPtr;

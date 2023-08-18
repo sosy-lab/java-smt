@@ -15,6 +15,7 @@
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
 import javax.annotation.concurrent.NotThreadSafe;
+
 @NotThreadSafe
 public class ExpressionExpressionMap extends java.util.AbstractMap<Expression, Expression> {
   private transient long swigCPtr;
@@ -162,6 +163,7 @@ public class ExpressionExpressionMap extends java.util.AbstractMap<Expression, E
         DrealJNI.newExpressionExpressionMapSWIG1(ExpressionExpressionMap.getCPtr(other), other),
         true);
   }
+
   @NotThreadSafe
   protected static class Iterator {
     private transient long swigCPtr;

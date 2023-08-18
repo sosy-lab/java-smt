@@ -162,6 +162,7 @@ public class ExpressionDoubleMap extends java.util.AbstractMap<Expression, Doubl
   public ExpressionDoubleMap(ExpressionDoubleMap other) {
     this(DrealJNI.newExpressionDoubleMapSWIG1(ExpressionDoubleMap.getCPtr(other), other), true);
   }
+
   @NotThreadSafe
   protected static class Iterator {
     private transient long swigCPtr;

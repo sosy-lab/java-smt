@@ -164,6 +164,7 @@ public class VaribaleIntUnorderedMap extends java.util.AbstractMap<Variable, Int
         DrealJNI.newVaribaleIntUnorderedMapSWIG1(VaribaleIntUnorderedMap.getCPtr(other), other),
         true);
   }
+
   @NotThreadSafe
   protected static class Iterator {
     private transient long swigCPtr;

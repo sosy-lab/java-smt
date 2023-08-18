@@ -160,6 +160,7 @@ public class FormulaSet extends java.util.AbstractSet<Formula> {
 
     return removeImpl((Formula) object);
   }
+
   @NotThreadSafe
   protected static class Iterator {
     private transient long swigCPtr;
