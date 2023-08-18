@@ -30,8 +30,9 @@ public class ExpressionExpressionMap extends java.util.AbstractMap<Expression, E
   protected static long swigRelease(ExpressionExpressionMap obj) {
     long ptr = 0;
     if (obj != null) {
-      if (!obj.swigCMemOwn)
+      if (!obj.swigCMemOwn) {
         throw new RuntimeException("Cannot release ownership as memory is not owned");
+      }
       ptr = obj.swigCPtr;
       obj.swigCMemOwn = false;
       obj.delete();
@@ -176,8 +177,9 @@ public class ExpressionExpressionMap extends java.util.AbstractMap<Expression, E
     protected static long swigRelease(Iterator obj) {
       long ptr = 0;
       if (obj != null) {
-        if (!obj.swigCMemOwn)
+        if (!obj.swigCMemOwn) {
           throw new RuntimeException("Cannot release ownership as memory is not owned");
+        }
         ptr = obj.swigCPtr;
         obj.swigCMemOwn = false;
         obj.delete();

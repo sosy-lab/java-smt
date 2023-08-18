@@ -77,8 +77,8 @@ public class Context {
     return new SwigTypePOptionalTDrealBoxT(DrealJNI.contextCheckSat(swigCPtr, this), true);
   }
 
-  public void declareVariable(Variable v, boolean isModel_variable) {
-    DrealJNI.contextDeclareVariableSWIG0(swigCPtr, this, Variable.getCPtr(v), v, isModel_variable);
+  public void declareVariable(Variable v, boolean isModelVariable) {
+    DrealJNI.contextDeclareVariableSWIG0(swigCPtr, this, Variable.getCPtr(v), v, isModelVariable);
   }
 
   public void declareVariable(Variable v) {
@@ -88,26 +88,18 @@ public class Context {
   public void declareVariable(Variable v, Expression lb, Expression ub, boolean isModelVariable) {
     DrealJNI.contextDeclareVariableSWIG2(
         swigCPtr,
-        this,
         Variable.getCPtr(v),
-        v,
         Expression.getCPtr(lb),
-        lb,
         Expression.getCPtr(ub),
-        ub,
         isModelVariable);
   }
 
   public void declareVariable(Variable v, Expression lb, Expression ub) {
     DrealJNI.contextDeclareVariableSWIG3(
         swigCPtr,
-        this,
         Variable.getCPtr(v),
-        v,
         Expression.getCPtr(lb),
-        lb,
-        Expression.getCPtr(ub),
-        ub);
+        Expression.getCPtr(ub));
   }
 
   public static void exit() {

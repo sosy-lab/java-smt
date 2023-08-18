@@ -30,7 +30,7 @@ public final class FormulaKind {
   public static final FormulaKind NOT = new FormulaKind("Not");
   public static final FormulaKind FORALL = new FormulaKind("Forall");
 
-  public final int swigValue() {
+  public int swigValue() {
     return swigValue;
   }
 
@@ -75,7 +75,7 @@ public final class FormulaKind {
   }
 
   private static FormulaKind[] swigValues = {
-    FALSE, TRUE, VAR, EQ, NEQ, GT, GEQ, LT, LEQ, AND, OR, NOT, FORALL
+    FALSE, TRUE, VAR, EQ, NEQ, GT, GEQ, LT, LEQ, AND, OR, NOT, FORALL,
   };
   private static int swigNext = 0;
   private final int swigValue;

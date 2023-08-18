@@ -859,13 +859,9 @@ public final class Dreal {
   public static boolean minimize(Expression objective, Formula constraint, Config config, Box box) {
     return DrealJNI.minimizeSWIG1(
         Expression.getCPtr(objective),
-        objective,
         Formula.getCPtr(constraint),
-        constraint,
         Config.getCPtr(config),
-        config,
-        Box.getCPtr(box),
-        box);
+        Box.getCPtr(box));
   }
 
   // self written

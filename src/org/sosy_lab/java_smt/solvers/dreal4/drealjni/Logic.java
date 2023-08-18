@@ -71,7 +71,7 @@ public final class Logic {
   }
 
   private static Logic[] swigValues = {
-    ALL, QF_LIA, QF_LIRA, QF_LRA, QF_NIA, QF_NIAT, QF_NIRA, QF_NIRAT, QF_NRA, QF_NRAT, QF_RDL
+    ALL, QF_LIA, QF_LIRA, QF_LRA, QF_NIA, QF_NIAT, QF_NIRA, QF_NIRAT, QF_NRA, QF_NRAT, QF_RDL,
   };
   private static int swigNext = 0;
   private final int swigValue;

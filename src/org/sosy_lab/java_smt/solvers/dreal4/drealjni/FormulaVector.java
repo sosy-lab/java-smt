@@ -35,8 +35,9 @@ public class FormulaVector extends java.util.AbstractList<Formula>
   protected static long swigRelease(FormulaVector obj) {
     long ptr = 0;
     if (obj != null) {
-      if (!obj.swigCMemOwn)
+      if (!obj.swigCMemOwn) {
         throw new RuntimeException("Cannot release ownership as memory is not owned");
+      }
       ptr = obj.swigCPtr;
       obj.swigCMemOwn = false;
       obj.delete();

@@ -347,7 +347,7 @@ public class Config {
     }
 
     private static SatDefaultPhase[] swigValues = {
-      FALSE, TRUE, JEROSLOW_WANG, RANDOM_INITIAL_PHASE
+      FALSE, TRUE, JEROSLOW_WANG, RANDOM_INITIAL_PHASE,
     };
 
     @SuppressWarnings("unused")

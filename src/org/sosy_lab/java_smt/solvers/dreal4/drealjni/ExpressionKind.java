@@ -112,7 +112,7 @@ public final class ExpressionKind {
     MAX,
     ITE,
     NAN,
-    UF
+    UF,
   };
   private static int swigNext = 0;
   private final int swigValue;

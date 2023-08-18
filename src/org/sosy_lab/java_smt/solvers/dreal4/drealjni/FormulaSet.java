@@ -31,8 +31,9 @@ public class FormulaSet extends java.util.AbstractSet<Formula> {
   protected static long swigRelease(FormulaSet obj) {
     long ptr = 0;
     if (obj != null) {
-      if (!obj.swigCMemOwn)
+      if (!obj.swigCMemOwn) {
         throw new RuntimeException("Cannot release ownership as memory is not owned");
+      }
       ptr = obj.swigCPtr;
       obj.swigCMemOwn = false;
       obj.delete();
@@ -74,7 +75,7 @@ public class FormulaSet extends java.util.AbstractSet<Formula> {
   public boolean addAll(java.util.Collection<? extends Formula> collection) {
     boolean didAddElement = false;
     for (java.lang.Object object : collection) {
-      didAddElement |= add((Formula) object);
+      didAddElement = add((Formula) object);
     }
 
     return didAddElement;
@@ -141,7 +142,7 @@ public class FormulaSet extends java.util.AbstractSet<Formula> {
   public boolean removeAll(java.util.Collection<?> collection) {
     boolean didRemoveElement = false;
     for (java.lang.Object object : collection) {
-      didRemoveElement |= remove(object);
+      didRemoveElement = remove(object);
     }
 
     return didRemoveElement;
@@ -172,8 +173,9 @@ public class FormulaSet extends java.util.AbstractSet<Formula> {
     protected static long swigRelease(Iterator obj) {
       long ptr = 0;
       if (obj != null) {
-        if (!obj.swigCMemOwn)
+        if (!obj.swigCMemOwn) {
           throw new RuntimeException("Cannot release ownership as memory is not owned");
+        }
         ptr = obj.swigCPtr;
         obj.swigCMemOwn = false;
         obj.delete();

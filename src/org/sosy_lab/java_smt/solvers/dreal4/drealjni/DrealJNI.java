@@ -1269,13 +1269,9 @@ public final class DrealJNI {
 
   public static native boolean minimizeSWIG1(
       long jarg1,
-      Expression jarg11,
       long jarg2,
-      Formula jarg22,
       long jarg3,
-      Config jarg33,
-      long jarg4,
-      Box jarg44);
+      long jarg4  );
 
   public static native long newContextSWIG0();
 
@@ -1297,24 +1293,16 @@ public final class DrealJNI {
 
   public static native void contextDeclareVariableSWIG2(
       long jarg1,
-      Context jarg11,
       long jarg2,
-      Variable jarg22,
       long jarg3,
-      Expression jarg33,
       long jarg4,
-      Expression jarg44,
       boolean jarg5);
 
   public static native void contextDeclareVariableSWIG3(
       long jarg1,
-      Context jarg11,
       long jarg2,
-      Variable jarg22,
       long jarg3,
-      Expression jarg33,
-      long jarg4,
-      Expression jarg44);
+      long jarg4);
 
   public static native void contextExit();
 
