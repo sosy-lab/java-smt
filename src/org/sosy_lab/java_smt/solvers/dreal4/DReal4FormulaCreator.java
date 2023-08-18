@@ -98,7 +98,9 @@ public class DReal4FormulaCreator
       return FormulaType.BooleanType;
     } else if (formula.getType() == Variable.Type.INTEGER) {
       return FormulaType.IntegerType;
-    } else return FormulaType.RationalType;
+    } else {
+      return FormulaType.RationalType;
+    }
   }
 
   @SuppressWarnings("unchecked")
