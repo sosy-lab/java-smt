@@ -1,26 +1,33 @@
-c++### Fragen:
-- Box.set_empty() funktioniert nicht, es wird nur der Wert auf False gesetzt, 
-    aber Elemente immer noch aufrufbar. Aber ist auch in dReal so....
-- Deconstructor? Wo braucht man das, aslo wo soll ich es noch implementieren, weil bisher nicht übersetzt?
-- Brauche ich Context? Oder reicht durch API call?
+<!--
+This file is part of JavaSMT,
+an API wrapper for a collection of SMT solvers:
+https://github.com/sosy-lab/java-smt
 
-### TODO:
-- Generell Box printen? Bisher keine möglichkeit Ergebnis auszugeben
+SPDX-FileCopyrightText: 2023 Dirk Beyer <https://www.sosy-lab.org>
 
-##### Config:
-- uint32_t needs to be changed to long -> per Hand und mit Exceptions
-- mutable function not working, need to be implemented as well and looked at how they work
-##### Environment:
-- Indexing has SWIGTYPE_p_double should be double -> per Hand
-- Uses intitializer_list, but not supported -> work around like in Variables?
-#### OptionValue Class:
-- AssignOperator has type SWIGTYPE, can be change to write type by hand
-##### Formula File:
-- weird error, make_conjunction() and make_disjunction() duplicates, but there are not -> do it myself
+SPDX-License-Identifier: Apache-2.0
+-->
+
+## Documentation:
+### How to build the library:
+1. First install dReal to get the Library:
+   ```
+   # Ubuntu 22.04
+    sudo apt-get install curl
+    curl -fsSL https://raw.githubusercontent.com/dreal/dreal4/master/setup/ubuntu/22.04/install.sh | sudo bash
+   ```
+2. Get all the dependencies for dReal. Use the install_prereq.sh script. 
+3. Compile dreal_wrap.cxx with:
+    ```
+    c++ -fpic -c dreal_wrap.cxx -I/usr/lib/jvm/java-1.11.0-openjdk-amd64/include/ -I/usr/lib/jvm/java-1.11.0-openjdk-amd64/include/linux -I/opt/dreal/4.21.06.2/include -I/opt/libibex/2.7.4/include -I/opt/libibex/2.7.4/include/ibex -I/opt/libibex/2.7.4/include/ibex/3rd -I/usr/include/coin -L/opt/dreal/4.21.06.2/lib -L/opt/libibex/2.7.4/lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib -ldreal -libex -lClpSolver -lClp -lCoinUtils -lbz2 -lz -llapack -lblas -lm -lnlopt
+   ``` 
+4. Create shared library with:
+    ```
+    c++ -shared dreal_wrap.o -L/opt/dreal/4.21.06.2/lib -L/opt/libibex/2.7.4/lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib -ldreal -libex -lClpSolver -lClp -lCoinUtils -lbz2 -lz -llapack -lblas -lm -lnlopt -o libdreal4.so
+   ```
+   
 
 
-
-### Documentation:
 #### SWIG:
 - create SWIG interface (file with .i) and put functions and header in that file
 - It is possible to overload ooperators in C++, therefore, it is possible to tell swig to rename the overloaded operators, so that those can be translated to java as well. For that use the ```rename``` command.
