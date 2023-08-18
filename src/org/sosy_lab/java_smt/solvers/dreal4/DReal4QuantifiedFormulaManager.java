@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.dreal4;
 
+import com.google.common.base.Preconditions;
 import java.util.List;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
@@ -41,9 +42,7 @@ public class DReal4QuantifiedFormulaManager
   @Override
   public DRealTerm<Formula, FormulaKind> mkQuantifier(
       Quantifier pQ, List<DRealTerm<?, ?>> pVars, DRealTerm<?, ?> pBody) {
-    if (pVars.isEmpty()) {
-      throw new IllegalArgumentException("Empty variable list for quantifier.");
-    }
+    Preconditions.checkArgument(!pVars.isEmpty(), "Empty variable list for quantifier.");
     // create Variables from pVars to create forall formula
     Variables vars = new Variables();
     for (DRealTerm<?, ?> term : pVars) {
