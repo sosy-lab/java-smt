@@ -12,7 +12,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.util.Collection;
-import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
@@ -245,8 +244,7 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Variable.Type, C
         // exp))
         ExpressionDoubleMap map = Dreal.getExprToCoeffMapInAddition(term.getExpression());
         for (Expression key : map.keySet()) {
-          recursiveAssignmentFinder(
-              builder, new DRealTerm<>(key, term.getType(), key.getKind()));
+          recursiveAssignmentFinder(builder, new DRealTerm<>(key, term.getType(), key.getKind()));
         }
       } else if (expKind == ExpressionKind.MUL) {
         // We get a map of Expression and Expression with the second Expression being the

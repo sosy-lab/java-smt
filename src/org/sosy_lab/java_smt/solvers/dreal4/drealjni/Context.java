@@ -96,10 +96,7 @@ public class Context {
 
   public void declareVariable(Variable v, Expression lb, Expression ub) {
     DrealJNI.contextDeclareVariableSWIG3(
-        swigCPtr,
-        Variable.getCPtr(v),
-        Expression.getCPtr(lb),
-        Expression.getCPtr(ub));
+        swigCPtr, Variable.getCPtr(v), Expression.getCPtr(lb), Expression.getCPtr(ub));
   }
 
   public static void exit() {
