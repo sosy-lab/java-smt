@@ -128,60 +128,60 @@ public class DRealTerm<T, D> {
   public final boolean equals(Object o) {
     if (o == this) {
       return true;
-    }
-    if (!(o instanceof DReal4Formula)) {
-      return false;
-    }
-    // equal_to only checks for the same structure
-    DRealTerm<?, ?> oTerm = ((DReal4Formula) o).getTerm();
-    if (isVar()) {
-      if (oTerm.isVar()) {
-        return getVariable().equalTo(oTerm.getVariable());
-      } else if (oTerm.isExp()) {
-        if (oTerm.getExpressionKind() == ExpressionKind.VAR) {
-          return getVariable().equalTo(Dreal.getVariable(oTerm.getExpression()));
-        }
-      } else {
-        if (oTerm.getFormulaKind() == FormulaKind.VAR) {
-          return getVariable().equalTo(Dreal.getVariable(oTerm.getFormula()));
-        }
-      }
-    } else if (isExp()) {
-      if (getExpressionKind() == ExpressionKind.VAR) {
+    } else if (o instanceof DReal4Formula) {
+      // equal_to only checks for the same structure
+      DRealTerm<?, ?> oTerm = ((DReal4Formula) o).getTerm();
+      if (isVar()) {
         if (oTerm.isVar()) {
-          return oTerm.getVariable().equalTo(Dreal.getVariable(getExpression()));
+          return getVariable().equalTo(oTerm.getVariable());
         } else if (oTerm.isExp()) {
-          return getExpression().equalTo(oTerm.getExpression());
+          if (oTerm.getExpressionKind() == ExpressionKind.VAR) {
+            return getVariable().equalTo(Dreal.getVariable(oTerm.getExpression()));
+          }
         } else {
           if (oTerm.getFormulaKind() == FormulaKind.VAR) {
-            return Dreal.getVariable(getExpression())
-                .equalTo(Dreal.getVariable(oTerm.getFormula()));
+            return getVariable().equalTo(Dreal.getVariable(oTerm.getFormula()));
+          }
+        }
+      } else if (isExp()) {
+        if (getExpressionKind() == ExpressionKind.VAR) {
+          if (oTerm.isVar()) {
+            return oTerm.getVariable().equalTo(Dreal.getVariable(getExpression()));
+          } else if (oTerm.isExp()) {
+            return getExpression().equalTo(oTerm.getExpression());
+          } else {
+            if (oTerm.getFormulaKind() == FormulaKind.VAR) {
+              return Dreal.getVariable(getExpression())
+                  .equalTo(Dreal.getVariable(oTerm.getFormula()));
+            }
+          }
+        } else {
+          if (oTerm.isExp()) {
+            return getExpression().equalTo(oTerm.getExpression());
           }
         }
       } else {
-        if (oTerm.isExp()) {
-          return getExpression().equalTo(oTerm.getExpression());
+        if (getFormulaKind() == FormulaKind.VAR) {
+          if (oTerm.isVar()) {
+            return oTerm.getVariable().equalTo(Dreal.getVariable(getFormula()));
+          } else if (oTerm.isExp()) {
+            if (oTerm.getExpressionKind() == ExpressionKind.VAR) {
+              return Dreal.getVariable(getFormula())
+                  .equalTo(Dreal.getVariable(oTerm.getExpression()));
+            }
+          } else {
+            if (oTerm.getFormulaKind() == FormulaKind.VAR) {
+              return Dreal.getVariable(getFormula()).equalTo(Dreal.getVariable(oTerm.getFormula()));
+            }
+          }
+        } else {
+          if (oTerm.isFormula()) {
+            return getFormula().equalTo(oTerm.getFormula());
+          }
         }
       }
     } else {
-      if (getFormulaKind() == FormulaKind.VAR) {
-        if (oTerm.isVar()) {
-          return oTerm.getVariable().equalTo(Dreal.getVariable(getFormula()));
-        } else if (oTerm.isExp()) {
-          if (oTerm.getExpressionKind() == ExpressionKind.VAR) {
-            return Dreal.getVariable(getFormula())
-                .equalTo(Dreal.getVariable(oTerm.getExpression()));
-          }
-        } else {
-          if (oTerm.getFormulaKind() == FormulaKind.VAR) {
-            return Dreal.getVariable(getFormula()).equalTo(Dreal.getVariable(oTerm.getFormula()));
-          }
-        }
-      } else {
-        if (oTerm.isFormula()) {
-          return getFormula().equalTo(oTerm.getFormula());
-        }
-      }
+      return false;
     }
     return false;
   }

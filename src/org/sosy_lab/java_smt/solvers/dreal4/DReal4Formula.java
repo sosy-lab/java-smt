@@ -27,7 +27,13 @@ abstract class DReal4Formula implements Formula {
 
   @Override
   public final boolean equals(Object o) {
-    return term.equals(o);
+    if (o == this) {
+      return true;
+    } else if (o instanceof DReal4Formula) {
+      return term.equals(((DReal4Formula) o).getTerm());
+    } else {
+      return false;
+    }
   }
 
   @Override
