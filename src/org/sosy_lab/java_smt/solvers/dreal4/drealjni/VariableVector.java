@@ -15,6 +15,9 @@
  * ----------------------------------------------------------------------------- */
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
+import com.google.common.collect.Iterables;
+import java.util.Arrays;
+
 public class VariableVector extends java.util.AbstractList<Variable>
     implements java.util.RandomAccess {
   private transient long swigCPtr;
@@ -60,17 +63,12 @@ public class VariableVector extends java.util.AbstractList<Variable>
   public VariableVector(Variable[] initialElements) {
     this();
     reserve(initialElements.length);
-
-    for (Variable element : initialElements) {
-      add(element);
-    }
+    this.addAll(Arrays.asList(initialElements));
   }
 
   public VariableVector(Iterable<Variable> initialElements) {
     this();
-    for (Variable element : initialElements) {
-      add(element);
-    }
+    Iterables.addAll(this, initialElements);
   }
 
   @Override

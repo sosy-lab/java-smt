@@ -37,9 +37,9 @@ public class DReal4RationalFormulaManager
     if (pParam1.isExp() && pParam2.isExp()) {
       if (pParam1.getExpressionKind() == ExpressionKind.CONSTANT
           && pParam2.getExpressionKind() == ExpressionKind.CONSTANT) {
-        Preconditions.checkArgument(Double.parseDouble(pParam2.toString()) != 0.0, "dReal does "
-            + "not support "
-            + "division by zero.");
+        Preconditions.checkArgument(
+            Double.parseDouble(pParam2.toString()) != 0.0,
+            "dReal does " + "not support " + "division by zero.");
         return new DRealTerm<>(
             Dreal.divide(pParam1.getExpression(), pParam2.getExpression()),
             pParam1.getType(),
@@ -51,9 +51,9 @@ public class DReal4RationalFormulaManager
           ExpressionKind.DIV);
     } else if (pParam1.isVar() && pParam2.isExp()) {
       if (pParam2.getExpressionKind() == ExpressionKind.CONSTANT) {
-        Preconditions.checkArgument(Double.parseDouble(pParam2.toString()) != 0.0, "dReal does "
-            + "not support "
-            + "division by zero.");
+        Preconditions.checkArgument(
+            Double.parseDouble(pParam2.toString()) != 0.0,
+            "dReal does " + "not support " + "division by zero.");
       }
       return new DRealTerm<>(
           Dreal.divide(new Expression(pParam1.getVariable()), pParam2.getExpression()),

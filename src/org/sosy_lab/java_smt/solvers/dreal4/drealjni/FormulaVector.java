@@ -15,6 +15,9 @@
  * ----------------------------------------------------------------------------- */
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
+import com.google.common.collect.Iterables;
+import java.util.Arrays;
+
 public class FormulaVector extends java.util.AbstractList<Formula>
     implements java.util.RandomAccess {
   private transient long swigCPtr;
@@ -60,18 +63,13 @@ public class FormulaVector extends java.util.AbstractList<Formula>
   public FormulaVector(Formula[] initialElements) {
     this();
     reserve(initialElements.length);
-
-    for (Formula element : initialElements) {
-      add(element);
-    }
+    this.addAll(Arrays.asList(initialElements));
   }
 
   @SuppressWarnings("unused")
   public FormulaVector(Iterable<Formula> initialElements) {
     this();
-    for (Formula element : initialElements) {
-      add(element);
-    }
+    Iterables.addAll(this, initialElements);
   }
 
   @Override

@@ -15,6 +15,9 @@
  * ----------------------------------------------------------------------------- */
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
+import com.google.common.collect.Iterables;
+import java.util.Arrays;
+
 public class ExpressionVector extends java.util.AbstractList<Expression>
     implements java.util.RandomAccess {
   private transient long swigCPtr;
@@ -59,17 +62,12 @@ public class ExpressionVector extends java.util.AbstractList<Expression>
   public ExpressionVector(Expression[] initialElements) {
     this();
     reserve(initialElements.length);
-
-    for (Expression element : initialElements) {
-      add(element);
-    }
+    this.addAll(Arrays.asList(initialElements));
   }
 
   public ExpressionVector(Iterable<Expression> initialElements) {
     this();
-    for (Expression element : initialElements) {
-      add(element);
-    }
+    Iterables.addAll(this, initialElements);
   }
 
   @Override

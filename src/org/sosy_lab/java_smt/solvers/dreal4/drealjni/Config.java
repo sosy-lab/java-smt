@@ -15,6 +15,8 @@
  * ----------------------------------------------------------------------------- */
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
+import com.google.common.base.Preconditions;
+
 public class Config {
   private transient long swigCPtr;
   protected transient boolean swigCMemOwn;
@@ -253,9 +255,7 @@ public class Config {
   }
 
   public void mutableRandomSeed(long seed) {
-    if (seed < 0) {
-      throw new IllegalArgumentException("Seed must be greater than zero");
-    }
+    Preconditions.checkArgument(seed >= 0, "Seed must be greater than zero");
     DrealJNI.configMutableRandomSeed0(seed, Config.getCPtr(this));
   }
 
