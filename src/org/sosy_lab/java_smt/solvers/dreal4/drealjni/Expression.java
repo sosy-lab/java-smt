@@ -135,42 +135,34 @@ public class Expression {
   }
 
   public Expression substitute(
-      SwigTypePStdUnorderedMapVariableExpressionHashValueVariable
-          exprSubst,
-      SwigTypePStdUnorderedMapVariableFormulaHashValueVariable
-          formulaSubst) {
+      SwigTypePStdUnorderedMapVariableExpressionHashValueVariable exprSubst,
+      SwigTypePStdUnorderedMapVariableFormulaHashValueVariable formulaSubst) {
     return new Expression(
         DrealJNI.expressionSubstituteSWIG1(
             swigCPtr,
             this,
-            SwigTypePStdUnorderedMapVariableExpressionHashValueVariable
-                .getCPtr(exprSubst),
-            SwigTypePStdUnorderedMapVariableFormulaHashValueVariable
-                .getCPtr(formulaSubst)),
+            SwigTypePStdUnorderedMapVariableExpressionHashValueVariable.getCPtr(exprSubst),
+            SwigTypePStdUnorderedMapVariableFormulaHashValueVariable.getCPtr(formulaSubst)),
         true);
   }
 
   public Expression substitute(
-      SwigTypePStdUnorderedMapVariableExpressionHashValueVariable
-          exprSubst) {
+      SwigTypePStdUnorderedMapVariableExpressionHashValueVariable exprSubst) {
     return new Expression(
         DrealJNI.expressionSubstituteSWIG2(
             swigCPtr,
             this,
-            SwigTypePStdUnorderedMapVariableExpressionHashValueVariable
-                .getCPtr(exprSubst)),
+            SwigTypePStdUnorderedMapVariableExpressionHashValueVariable.getCPtr(exprSubst)),
         true);
   }
 
   public Expression substitute(
-      SwigTypePStdUnorderedMapVariableFormulaHashValueVariable
-          formulaSubst) {
+      SwigTypePStdUnorderedMapVariableFormulaHashValueVariable formulaSubst) {
     return new Expression(
         DrealJNI.expressionSubstituteSWIG3(
             swigCPtr,
             this,
-            SwigTypePStdUnorderedMapVariableFormulaHashValueVariable
-                .getCPtr(formulaSubst)),
+            SwigTypePStdUnorderedMapVariableFormulaHashValueVariable.getCPtr(formulaSubst)),
         true);
   }
 

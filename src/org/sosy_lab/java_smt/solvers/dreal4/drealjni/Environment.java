@@ -83,8 +83,7 @@ public class Environment {
   }
 
   public Environment(
-      SwigTypeStdInitializerListStdUnorderedMapTVariableDoubleHashValueVariableValueType
-          init) {
+      SwigTypeStdInitializerListStdUnorderedMapTVariableDoubleHashValueVariableValueType init) {
     this(
         DrealJNI.newEnvironmentSWIG2(
             SwigTypeStdInitializerListStdUnorderedMapTVariableDoubleHashValueVariableValueType
@@ -99,36 +98,29 @@ public class Environment {
         true);
   }
 
-  public Environment(
-      SwigTypePStdUnorderedMapVariableDoubleHashValueVariable
-          m) {
+  public Environment(SwigTypePStdUnorderedMapVariableDoubleHashValueVariable m) {
     this(
         DrealJNI.newEnvironmentSWIG4(
-            SwigTypePStdUnorderedMapVariableDoubleHashValueVariable
-                .getCPtr(m)),
+            SwigTypePStdUnorderedMapVariableDoubleHashValueVariable.getCPtr(m)),
         true);
   }
 
-  public SwigTypePStdUnorderedMapVariableDoubleHashValueVariableIterator
-      begin() {
+  public SwigTypePStdUnorderedMapVariableDoubleHashValueVariableIterator begin() {
     return new SwigTypePStdUnorderedMapVariableDoubleHashValueVariableIterator(
         DrealJNI.environmentBeginSWIG0(swigCPtr, this), true);
   }
 
-  public SwigTypePStdUnorderedMapVariableDoubleHashValueVariableIterator
-      end() {
+  public SwigTypePStdUnorderedMapVariableDoubleHashValueVariableIterator end() {
     return new SwigTypePStdUnorderedMapVariableDoubleHashValueVariableIterator(
         DrealJNI.environmentEndSWIG0(swigCPtr, this), true);
   }
 
-  public SwigTypePStdUnorderedMapVariableDoubleHashValueVariableConstIterator
-      cbegin() {
+  public SwigTypePStdUnorderedMapVariableDoubleHashValueVariableConstIterator cbegin() {
     return new SwigTypePStdUnorderedMapVariableDoubleHashValueVariableConstIterator(
         DrealJNI.environmentCbegin(swigCPtr, this), true);
   }
 
-  public SwigTypePStdUnorderedMapVariableDoubleHashValueVariableConstIterator
-      cend() {
+  public SwigTypePStdUnorderedMapVariableDoubleHashValueVariableConstIterator cend() {
     return new SwigTypePStdUnorderedMapVariableDoubleHashValueVariableConstIterator(
         DrealJNI.environmentCend(swigCPtr, this), true);
   }
@@ -145,8 +137,7 @@ public class Environment {
     return DrealJNI.environmentSize(swigCPtr, this);
   }
 
-  public SwigTypePStdUnorderedMapVariableDoubleHashValueVariableIterator
-      find(Variable key) {
+  public SwigTypePStdUnorderedMapVariableDoubleHashValueVariableIterator find(Variable key) {
     return new SwigTypePStdUnorderedMapVariableDoubleHashValueVariableIterator(
         DrealJNI.environmentFindSWIG0(swigCPtr, this, Variable.getCPtr(key), key), true);
   }

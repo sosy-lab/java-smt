@@ -15,8 +15,7 @@
  * ----------------------------------------------------------------------------- */
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
-public
-class SwigTypeOptionValueStdFunctionIntBoxConstDynamicBitsetConstBoxPBox {
+public class SwigTypeOptionValueStdFunctionIntBoxConstDynamicBitsetConstBoxPBox {
   private transient long swigCPtr;
 
   protected SwigTypeOptionValueStdFunctionIntBoxConstDynamicBitsetConstBoxPBox(
@@ -29,14 +28,12 @@ class SwigTypeOptionValueStdFunctionIntBoxConstDynamicBitsetConstBoxPBox {
   }
 
   protected static long getCPtr(
-      SwigTypeOptionValueStdFunctionIntBoxConstDynamicBitsetConstBoxPBox
-          obj) {
+      SwigTypeOptionValueStdFunctionIntBoxConstDynamicBitsetConstBoxPBox obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
   protected static long swigRelease(
-      SwigTypeOptionValueStdFunctionIntBoxConstDynamicBitsetConstBoxPBox
-          obj) {
+      SwigTypeOptionValueStdFunctionIntBoxConstDynamicBitsetConstBoxPBox obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 }

@@ -39,13 +39,11 @@ public class SwigTypePStdFunctionIntBoxConstDynamicBitsetConstBoxPBox {
     swigCPtr = 0;
   }
 
-  protected static long getCPtr(
-      SwigTypePStdFunctionIntBoxConstDynamicBitsetConstBoxPBox obj) {
+  protected static long getCPtr(SwigTypePStdFunctionIntBoxConstDynamicBitsetConstBoxPBox obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
-  protected static long swigRelease(
-      SwigTypePStdFunctionIntBoxConstDynamicBitsetConstBoxPBox obj) {
+  protected static long swigRelease(SwigTypePStdFunctionIntBoxConstDynamicBitsetConstBoxPBox obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 }

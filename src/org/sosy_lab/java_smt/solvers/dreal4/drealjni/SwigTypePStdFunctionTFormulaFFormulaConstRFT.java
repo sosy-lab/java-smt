@@ -27,13 +27,11 @@ public class SwigTypePStdFunctionTFormulaFFormulaConstRFT {
     swigCPtr = 0;
   }
 
-  protected static long getCPtr(
-      SwigTypePStdFunctionTFormulaFFormulaConstRFT obj) {
+  protected static long getCPtr(SwigTypePStdFunctionTFormulaFFormulaConstRFT obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
-  protected static long swigRelease(
-      SwigTypePStdFunctionTFormulaFFormulaConstRFT obj) {
+  protected static long swigRelease(SwigTypePStdFunctionTFormulaFFormulaConstRFT obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 }

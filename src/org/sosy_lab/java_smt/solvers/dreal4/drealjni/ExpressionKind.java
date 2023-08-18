@@ -41,8 +41,7 @@ public final class ExpressionKind {
   public static final ExpressionKind MAX = new ExpressionKind("Max");
   public static final ExpressionKind ITE = new ExpressionKind("IfThenElse");
   public static final ExpressionKind NAN = new ExpressionKind("NaN");
-  public static final ExpressionKind UF =
-      new ExpressionKind("UninterpretedFunction");
+  public static final ExpressionKind UF = new ExpressionKind("UninterpretedFunction");
 
   public int swigValue() {
     return swigValue;

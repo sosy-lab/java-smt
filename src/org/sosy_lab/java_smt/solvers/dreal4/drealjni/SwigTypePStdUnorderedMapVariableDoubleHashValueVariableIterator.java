@@ -15,8 +15,7 @@
  * ----------------------------------------------------------------------------- */
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
-public
-class SwigTypePStdUnorderedMapVariableDoubleHashValueVariableIterator {
+public class SwigTypePStdUnorderedMapVariableDoubleHashValueVariableIterator {
   private transient long swigCPtr;
 
   protected SwigTypePStdUnorderedMapVariableDoubleHashValueVariableIterator(
@@ -29,14 +28,12 @@ class SwigTypePStdUnorderedMapVariableDoubleHashValueVariableIterator {
   }
 
   protected static long getCPtr(
-      SwigTypePStdUnorderedMapVariableDoubleHashValueVariableIterator
-          obj) {
+      SwigTypePStdUnorderedMapVariableDoubleHashValueVariableIterator obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
   protected static long swigRelease(
-      SwigTypePStdUnorderedMapVariableDoubleHashValueVariableIterator
-          obj) {
+      SwigTypePStdUnorderedMapVariableDoubleHashValueVariableIterator obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 }

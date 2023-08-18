@@ -116,42 +116,32 @@ public class Formula {
   }
 
   public Formula substitute(
-      SwigTypePStdUnorderedMapVariableExpressionHashValueVariable
-          exprSubst,
-      SwigTypePStdUnorderedMapVariableFormulaHashValueVariable
-          formulaSubst) {
+      SwigTypePStdUnorderedMapVariableExpressionHashValueVariable exprSubst,
+      SwigTypePStdUnorderedMapVariableFormulaHashValueVariable formulaSubst) {
     return new Formula(
         DrealJNI.formulaSubstituteSWIG2(
             swigCPtr,
             this,
-            SwigTypePStdUnorderedMapVariableExpressionHashValueVariable
-                .getCPtr(exprSubst),
-            SwigTypePStdUnorderedMapVariableFormulaHashValueVariable
-                .getCPtr(formulaSubst)),
+            SwigTypePStdUnorderedMapVariableExpressionHashValueVariable.getCPtr(exprSubst),
+            SwigTypePStdUnorderedMapVariableFormulaHashValueVariable.getCPtr(formulaSubst)),
         true);
   }
 
-  public Formula substitute(
-      SwigTypePStdUnorderedMapVariableExpressionHashValueVariable
-          exprSubst) {
+  public Formula substitute(SwigTypePStdUnorderedMapVariableExpressionHashValueVariable exprSubst) {
     return new Formula(
         DrealJNI.formulaSubstituteSWIG3(
             swigCPtr,
             this,
-            SwigTypePStdUnorderedMapVariableExpressionHashValueVariable
-                .getCPtr(exprSubst)),
+            SwigTypePStdUnorderedMapVariableExpressionHashValueVariable.getCPtr(exprSubst)),
         true);
   }
 
-  public Formula substitute(
-      SwigTypePStdUnorderedMapVariableFormulaHashValueVariable
-          formulaSubst) {
+  public Formula substitute(SwigTypePStdUnorderedMapVariableFormulaHashValueVariable formulaSubst) {
     return new Formula(
         DrealJNI.formulaSubstituteSWIG4(
             swigCPtr,
             this,
-            SwigTypePStdUnorderedMapVariableFormulaHashValueVariable
-                .getCPtr(formulaSubst)),
+            SwigTypePStdUnorderedMapVariableFormulaHashValueVariable.getCPtr(formulaSubst)),
         true);
   }
 

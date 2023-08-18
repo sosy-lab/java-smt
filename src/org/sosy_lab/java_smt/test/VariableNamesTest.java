@@ -242,6 +242,8 @@ public class VariableNamesTest extends SolverBasedTest0 {
     }
 
     if (solverToUse() == Solvers.DREAL4) {
+      // try to create a new (!) variable with a different name, the escaped previous name.
+      assertThat(createVariableWith(creator, "|" + name + "|")).isEqualTo(null);
     } else {
       // check whether SMTLIB2-dump is possible
       @SuppressWarnings("unused")

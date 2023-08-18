@@ -15,8 +15,7 @@
  * ----------------------------------------------------------------------------- */
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
-public
-class SwigTypeStdInitializerListStdUnorderedMapTVariableDoubleHashValueVariableValueType {
+public class SwigTypeStdInitializerListStdUnorderedMapTVariableDoubleHashValueVariableValueType {
   private transient long swigCPtr;
 
   protected SwigTypeStdInitializerListStdUnorderedMapTVariableDoubleHashValueVariableValueType(
@@ -29,14 +28,12 @@ class SwigTypeStdInitializerListStdUnorderedMapTVariableDoubleHashValueVariableV
   }
 
   protected static long getCPtr(
-      SwigTypeStdInitializerListStdUnorderedMapTVariableDoubleHashValueVariableValueType
-          obj) {
+      SwigTypeStdInitializerListStdUnorderedMapTVariableDoubleHashValueVariableValueType obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
   protected static long swigRelease(
-      SwigTypeStdInitializerListStdUnorderedMapTVariableDoubleHashValueVariableValueType
-          obj) {
+      SwigTypeStdInitializerListStdUnorderedMapTVariableDoubleHashValueVariableValueType obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 }

@@ -182,8 +182,7 @@ public class Config {
         DrealJNI.configBrancher(swigCPtr, this), false);
   }
 
-  public SwigTypeOptionValueStdFunctionIntBoxConstDynamicBitsetConstBoxPBox
-      mutableBrancher() {
+  public SwigTypeOptionValueStdFunctionIntBoxConstDynamicBitsetConstBoxPBox mutableBrancher() {
     return new SwigTypeOptionValueStdFunctionIntBoxConstDynamicBitsetConstBoxPBox(
         DrealJNI.configMutableBrancher(swigCPtr, this), false);
   }
@@ -347,8 +346,9 @@ public class Config {
       swigNext = this.swigValue + 1;
     }
 
-    private static SatDefaultPhase[] swigValues = {FALSE, TRUE, JEROSLOW_WANG,
-        RANDOM_INITIAL_PHASE};
+    private static SatDefaultPhase[] swigValues = {
+      FALSE, TRUE, JEROSLOW_WANG, RANDOM_INITIAL_PHASE
+    };
 
     @SuppressWarnings("unused")
     private static int swigNext = 0;

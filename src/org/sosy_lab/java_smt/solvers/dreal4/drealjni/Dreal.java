@@ -713,14 +713,12 @@ public final class Dreal {
   }
 
   public static FormulaSet map(
-      FormulaSet formulas,
-      SwigTypePStdFunctionTFormulaFFormulaConstRFT func) {
+      FormulaSet formulas, SwigTypePStdFunctionTFormulaFFormulaConstRFT func) {
     return new FormulaSet(
         DrealJNI.map(
             FormulaSet.getCPtr(formulas),
             formulas,
-            SwigTypePStdFunctionTFormulaFFormulaConstRFT
-                .getCPtr(func)),
+            SwigTypePStdFunctionTFormulaFFormulaConstRFT.getCPtr(func)),
         true);
   }
 
@@ -827,8 +825,7 @@ public final class Dreal {
   public static SwigTypePStdOstream insertOperator(
       SwigTypePStdOstream os, Config.SatDefaultPhase satDefaultPhase) {
     return new SwigTypePStdOstream(
-        DrealJNI.insertOperatorSWIG9(
-            SwigTypePStdOstream.getCPtr(os), satDefaultPhase.swigValue()),
+        DrealJNI.insertOperatorSWIG9(SwigTypePStdOstream.getCPtr(os), satDefaultPhase.swigValue()),
         false);
   }
 
