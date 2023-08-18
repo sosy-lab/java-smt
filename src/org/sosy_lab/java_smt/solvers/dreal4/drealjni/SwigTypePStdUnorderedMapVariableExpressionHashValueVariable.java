@@ -15,22 +15,28 @@
  * ----------------------------------------------------------------------------- */
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
-public class SwigTypePIbexIntervalVector {
+public
+class SwigTypePStdUnorderedMapVariableExpressionHashValueVariable {
   private transient long swigCPtr;
 
-  protected SwigTypePIbexIntervalVector(long cPtr, @SuppressWarnings("unused") boolean futureUse) {
+  protected SwigTypePStdUnorderedMapVariableExpressionHashValueVariable(
+      long cPtr, @SuppressWarnings("unused") boolean futureUse) {
     swigCPtr = cPtr;
   }
 
-  protected SwigTypePIbexIntervalVector() {
+  protected SwigTypePStdUnorderedMapVariableExpressionHashValueVariable() {
     swigCPtr = 0;
   }
 
-  protected static long getCPtr(SwigTypePIbexIntervalVector obj) {
+  protected static long getCPtr(
+      SwigTypePStdUnorderedMapVariableExpressionHashValueVariable
+          obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
-  protected static long swigRelease(SwigTypePIbexIntervalVector obj) {
+  protected static long swigRelease(
+      SwigTypePStdUnorderedMapVariableExpressionHashValueVariable
+          obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 }

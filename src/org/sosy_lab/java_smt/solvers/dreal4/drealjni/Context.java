@@ -1,22 +1,10 @@
-/*
- *  JavaSMT is an API wrapper for a collection of SMT solvers.
- *  This file is part of JavaSMT.
- *
- *  Copyright (C) 2007-2016  Dirk Beyer
- *  All rights reserved.
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
+// This file is part of JavaSMT,
+// an API wrapper for a collection of SMT solvers:
+// https://github.com/sosy-lab/java-smt
+//
+// SPDX-FileCopyrightText: 2023 Dirk Beyer <https://www.sosy-lab.org>
+//
+// SPDX-License-Identifier: Apache-2.0
 
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
@@ -44,8 +32,9 @@ public class Context {
   protected static long swigRelease(Context obj) {
     long ptr = 0;
     if (obj != null) {
-      if (!obj.swigCMemOwn)
+      if (!obj.swigCMemOwn) {
         throw new RuntimeException("Cannot release ownership as memory is not owned");
+      }
       ptr = obj.swigCPtr;
       obj.swigCMemOwn = false;
       obj.delete();
@@ -88,16 +77,15 @@ public class Context {
     return new SwigTypePOptionalTDrealBoxT(DrealJNI.contextCheckSat(swigCPtr, this), true);
   }
 
-  public void declareVariable(Variable v, boolean is_model_variable) {
-    DrealJNI.contextDeclareVariableSWIG0(
-        swigCPtr, this, Variable.getCPtr(v), v, is_model_variable);
+  public void declareVariable(Variable v, boolean isModel_variable) {
+    DrealJNI.contextDeclareVariableSWIG0(swigCPtr, this, Variable.getCPtr(v), v, isModel_variable);
   }
 
   public void declareVariable(Variable v) {
     DrealJNI.contextDeclareVariableSWIG1(swigCPtr, this, Variable.getCPtr(v), v);
   }
 
-  public void declareVariable(Variable v, Expression lb, Expression ub, boolean is_model_variable) {
+  public void declareVariable(Variable v, Expression lb, Expression ub, boolean isModelVariable) {
     DrealJNI.contextDeclareVariableSWIG2(
         swigCPtr,
         this,
@@ -107,7 +95,7 @@ public class Context {
         lb,
         Expression.getCPtr(ub),
         ub,
-        is_model_variable);
+        isModelVariable);
   }
 
   public void declareVariable(Variable v, Expression lb, Expression ub) {
@@ -131,8 +119,7 @@ public class Context {
   }
 
   public void minimize(ExpressionVector functions) {
-    DrealJNI.contextMinimizeSWIG1(
-        swigCPtr, this, ExpressionVector.getCPtr(functions), functions);
+    DrealJNI.contextMinimizeSWIG1(swigCPtr, this, ExpressionVector.getCPtr(functions), functions);
   }
 
   public void maximize(Expression f) {
@@ -172,8 +159,7 @@ public class Context {
   }
 
   public SwigTypePOptionalTStdStringT getOption(String key) {
-    return new SwigTypePOptionalTStdStringT(
-        DrealJNI.contextGetOption(swigCPtr, this, key), true);
+    return new SwigTypePOptionalTStdStringT(DrealJNI.contextGetOption(swigCPtr, this, key), true);
   }
 
   public Config config() {
@@ -197,7 +183,7 @@ public class Context {
     return new Box(DrealJNI.contextBox(swigCPtr, this), false);
   }
 
-  public Box get_model() {
+  public Box getModel() {
     return new Box(DrealJNI.contextGetModel(swigCPtr, this), false);
   }
 

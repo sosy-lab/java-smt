@@ -27,28 +27,25 @@
  * ----------------------------------------------------------------------------- */
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
-public
-class SwigTypePStdUnorderedMapTDrealDrakeSymbolicVariableDrealDrakeSymbolicFormulaDrealDdrakeHashValueTDrealDrakeSymbolicVariable {
+public class SwigTypePStdFunctionIntBoxConstDynamicBitsetConstBoxPBox {
   private transient long swigCPtr;
 
-  protected SwigTypePStdUnorderedMapTDrealDrakeSymbolicVariableDrealDrakeSymbolicFormulaDrealDdrakeHashValueTDrealDrakeSymbolicVariable(
+  protected SwigTypePStdFunctionIntBoxConstDynamicBitsetConstBoxPBox(
       long cPtr, @SuppressWarnings("unused") boolean futureUse) {
     swigCPtr = cPtr;
   }
 
-  protected SwigTypePStdUnorderedMapTDrealDrakeSymbolicVariableDrealDrakeSymbolicFormulaDrealDdrakeHashValueTDrealDrakeSymbolicVariable() {
+  protected SwigTypePStdFunctionIntBoxConstDynamicBitsetConstBoxPBox() {
     swigCPtr = 0;
   }
 
   protected static long getCPtr(
-      SwigTypePStdUnorderedMapTDrealDrakeSymbolicVariableDrealDrakeSymbolicFormulaDrealDdrakeHashValueTDrealDrakeSymbolicVariable
-          obj) {
+      SwigTypePStdFunctionIntBoxConstDynamicBitsetConstBoxPBox obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
   protected static long swigRelease(
-      SwigTypePStdUnorderedMapTDrealDrakeSymbolicVariableDrealDrakeSymbolicFormulaDrealDdrakeHashValueTDrealDrakeSymbolicVariable
-          obj) {
+      SwigTypePStdFunctionIntBoxConstDynamicBitsetConstBoxPBox obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 }

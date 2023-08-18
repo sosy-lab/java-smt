@@ -15,22 +15,28 @@
  * ----------------------------------------------------------------------------- */
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
-public class SwigTypePIbexIntervalVector {
+public
+class SwigTypeOptionValueStdFunctionIntBoxConstDynamicBitsetConstBoxPBox {
   private transient long swigCPtr;
 
-  protected SwigTypePIbexIntervalVector(long cPtr, @SuppressWarnings("unused") boolean futureUse) {
+  protected SwigTypeOptionValueStdFunctionIntBoxConstDynamicBitsetConstBoxPBox(
+      long cPtr, @SuppressWarnings("unused") boolean futureUse) {
     swigCPtr = cPtr;
   }
 
-  protected SwigTypePIbexIntervalVector() {
+  protected SwigTypeOptionValueStdFunctionIntBoxConstDynamicBitsetConstBoxPBox() {
     swigCPtr = 0;
   }
 
-  protected static long getCPtr(SwigTypePIbexIntervalVector obj) {
+  protected static long getCPtr(
+      SwigTypeOptionValueStdFunctionIntBoxConstDynamicBitsetConstBoxPBox
+          obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
-  protected static long swigRelease(SwigTypePIbexIntervalVector obj) {
+  protected static long swigRelease(
+      SwigTypeOptionValueStdFunctionIntBoxConstDynamicBitsetConstBoxPBox
+          obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 }
