@@ -254,9 +254,9 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Variable.Type, C
         // get_constant_in_multiplication
         ExpressionExpressionMap map =
             Dreal.getBaseToExponentMapInMultiplication(term.getExpression());
-        for (Map.Entry<Expression, Expression> entry : map.entrySet()) {
+        for (Expression key : map.keySet()) {
           recursiveAssignmentFinder(
-              builder, new DRealTerm<>(entry.getKey(), term.getType(), entry.getKey().getKind()));
+              builder, new DRealTerm<>(key, term.getType(), key.getKind()));
         }
       } else {
         throw new IllegalArgumentException("Failure visiting the Term " + term + ".");
