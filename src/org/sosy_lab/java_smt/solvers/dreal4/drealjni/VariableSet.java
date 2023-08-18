@@ -16,6 +16,9 @@
 
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
+import javax.annotation.concurrent.NotThreadSafe;
+
+@NotThreadSafe
 public class VariableSet extends java.util.AbstractSet<Variable> {
   private transient long swigCPtr;
   protected transient boolean swigCMemOwn;
@@ -158,7 +161,7 @@ public class VariableSet extends java.util.AbstractSet<Variable> {
 
     return removeImpl((Variable) object);
   }
-
+  @NotThreadSafe
   protected static class Iterator {
     private transient long swigCPtr;
     protected transient boolean swigCMemOwn;

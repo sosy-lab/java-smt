@@ -15,6 +15,9 @@
  * ----------------------------------------------------------------------------- */
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
+import javax.annotation.concurrent.NotThreadSafe;
+
+@NotThreadSafe
 public class FormulaSet extends java.util.AbstractSet<Formula> {
   private transient long swigCPtr;
   protected transient boolean swigCMemOwn;
@@ -157,7 +160,7 @@ public class FormulaSet extends java.util.AbstractSet<Formula> {
 
     return removeImpl((Formula) object);
   }
-
+  @NotThreadSafe
   protected static class Iterator {
     private transient long swigCPtr;
     protected transient boolean swigCMemOwn;

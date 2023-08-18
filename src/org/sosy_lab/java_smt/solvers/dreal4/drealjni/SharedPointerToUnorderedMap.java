@@ -14,6 +14,9 @@
  * ----------------------------------------------------------------------------- */
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
+import javax.annotation.concurrent.NotThreadSafe;
+
+@NotThreadSafe
 public class SharedPointerToUnorderedMap {
   private transient long swigCPtr;
   protected transient boolean swigCMemOwn;

@@ -16,7 +16,9 @@
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
 import com.google.common.base.Preconditions;
+import javax.annotation.concurrent.NotThreadSafe;
 
+@NotThreadSafe
 public class Config {
   private transient long swigCPtr;
   protected transient boolean swigCMemOwn;

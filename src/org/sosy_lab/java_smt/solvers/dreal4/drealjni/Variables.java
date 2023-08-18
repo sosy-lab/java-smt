@@ -15,7 +15,10 @@
  * ----------------------------------------------------------------------------- */
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
-@SuppressWarnings("unused")
+import javax.annotation.concurrent.NotThreadSafe;
+
+@SuppressWarnings({"unused"})
+@NotThreadSafe
 public class Variables {
   private transient long swigCPtr;
   protected transient boolean swigCMemOwn;

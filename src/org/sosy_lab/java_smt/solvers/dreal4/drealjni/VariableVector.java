@@ -17,7 +17,9 @@ package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
 import com.google.common.collect.Iterables;
 import java.util.Arrays;
+import javax.annotation.concurrent.NotThreadSafe;
 
+@NotThreadSafe
 public class VariableVector extends java.util.AbstractList<Variable>
     implements java.util.RandomAccess {
   private transient long swigCPtr;

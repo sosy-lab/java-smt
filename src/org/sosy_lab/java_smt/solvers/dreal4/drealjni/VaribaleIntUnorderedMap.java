@@ -15,6 +15,9 @@
  * ----------------------------------------------------------------------------- */
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
+import javax.annotation.concurrent.NotThreadSafe;
+
+@NotThreadSafe
 public class VaribaleIntUnorderedMap extends java.util.AbstractMap<Variable, Integer> {
   private transient long swigCPtr;
   protected transient boolean swigCMemOwn;
@@ -161,7 +164,7 @@ public class VaribaleIntUnorderedMap extends java.util.AbstractMap<Variable, Int
         DrealJNI.newVaribaleIntUnorderedMapSWIG1(VaribaleIntUnorderedMap.getCPtr(other), other),
         true);
   }
-
+  @NotThreadSafe
   protected static class Iterator {
     private transient long swigCPtr;
     protected transient boolean swigCMemOwn;
