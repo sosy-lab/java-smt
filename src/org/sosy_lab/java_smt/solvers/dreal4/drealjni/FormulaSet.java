@@ -56,6 +56,7 @@ public class FormulaSet extends java.util.AbstractSet<Formula> {
     }
   }
 
+  @SuppressWarnings("unused")
   public FormulaSet(java.util.Collection<? extends Formula> collection) {
     this();
     var unused = addAll(collection);

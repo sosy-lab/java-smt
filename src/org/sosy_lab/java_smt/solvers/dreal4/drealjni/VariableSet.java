@@ -57,6 +57,7 @@ public class VariableSet extends java.util.AbstractSet<Variable> {
     }
   }
 
+  @SuppressWarnings("unused")
   public VariableSet(java.util.Collection<? extends Variable> collection) {
     this();
     var unused = addAll(collection);
