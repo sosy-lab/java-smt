@@ -186,6 +186,11 @@ public class Formula {
     return set;
   }
 
+  /**
+   * This functions returns all the free variables in a formula.
+   *
+   * @return VariableSet set of free variables in a formula.
+   */
   public VariableSet getFreeVariables() {
     VariableSet set = new VariableSet();
     DrealJNI.formulaGetFreeVariables0(VariableSet.getCPtr(set), Formula.getCPtr(this));

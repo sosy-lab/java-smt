@@ -216,6 +216,13 @@ public class Expression {
   }
 
   // self written
+
+  /**
+   * This function is used to get all the Variables in a set. This function is called on an
+   * expression, so for example (x + y + 3) returns a set with x,y
+   *
+   * @return VariableSet a set of variables
+   */
   public VariableSet getVariables() {
     VariableSet set = new VariableSet();
     DrealJNI.getVariables(VariableSet.getCPtr(set), Expression.getCPtr(this));

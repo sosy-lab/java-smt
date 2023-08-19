@@ -179,10 +179,23 @@ public class Context {
   }
 
   // self written
+  /**
+   * checkSat is called from a context, to chek if the asserted formulas in the context are
+   * satisfiable. It does the same as checkSat(), just that it directly saves the result in the
+   * given Box.
+   *
+   * @param box Model where the result is safed
+   * @return True if the asserted formulas are satisfiable
+   */
   public boolean checkSat(Box box) {
     return DrealJNI.contextCheckSat0(Context.getCPtr(this), Box.getCPtr(box));
   }
 
+  /**
+   * This function is used to declare the variables of the formula.
+   *
+   * @param f Formula to declare the variables from
+   */
   public void declareVariables(Formula f) {
     DrealJNI.contextDeclareVariables(Context.getCPtr(this), Formula.getCPtr(f));
   }
