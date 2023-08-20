@@ -40,6 +40,7 @@ import org.sosy_lab.java_smt.api.visitors.BooleanFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
+import org.sosy_lab.java_smt.utils.BooleanLogger;
 
 @SuppressWarnings("ClassTypeParameterName")
 public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
@@ -61,6 +62,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
   @Override
   public BooleanFormula makeVariable(String pVar) {
     checkVariableName(pVar);
+    BooleanLogger.logMakeVariable(pVar);
     return wrap(makeVariableImpl(pVar));
   }
 
@@ -87,6 +89,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
   @Override
   public BooleanFormula not(BooleanFormula pBits) {
     TFormulaInfo param1 = extractInfo(pBits);
+    BooleanLogger.logNot(pBits);
     return wrap(not(param1));
   }
 
