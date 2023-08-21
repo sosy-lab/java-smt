@@ -72,6 +72,25 @@ public class ApronExamples
     cons4.setKind(Lincons1.EQ);
     Abstract1 abstract2 = new Abstract1(pManager, new Lincons1[]{cons4});
     assert abstract2.isBottom(pManager);
+
+    //Expression-Tree example, 4x+5 > 0
+    Texpr1VarNode varNode = new Texpr1VarNode("x");
+    Texpr1CstNode four = new Texpr1CstNode(new MpqScalar(4));
+    Texpr1CstNode five = new Texpr1CstNode(new MpqScalar(5));
+    Texpr1BinNode term = new Texpr1BinNode(Texpr1BinNode.OP_MUL, four, varNode);
+    Texpr1BinNode expr = new Texpr1BinNode(Texpr1BinNode.OP_ADD,term, five);
+    Tcons1 constraint = new Tcons1(environment,Tcons1.SUP,expr);
+    Tcons1[] tcons = new Tcons1[]{constraint};
+    Abstract1 abstract13 = new Abstract1(pManager,tcons);
+    assert abstract13.isBottom(pManager);
+
+    //Model example
+    Interval interval = abstract1.getBound(pManager, "x");
+    System.out.println("Whole interval: "+interval.toString());
+    Scalar lowerBound = interval.inf();
+    System.out.println("Lower bound: "+lowerBound.toString());
+    Scalar upperBound = interval.sup();
+    System.out.println("Upper bound: "+upperBound.toString());
   }
 
   public static void main(String[] args) throws ApronException {

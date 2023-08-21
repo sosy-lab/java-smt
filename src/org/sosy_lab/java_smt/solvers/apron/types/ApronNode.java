@@ -21,7 +21,6 @@
 package org.sosy_lab.java_smt.solvers.apron.types;
 
 import apron.Environment;
-import apron.MpfrScalar;
 import apron.MpqScalar;
 import apron.StringVar;
 import apron.Tcons1;
@@ -31,13 +30,9 @@ import apron.Texpr1Node;
 import apron.Texpr1UnNode;
 import apron.Texpr1VarNode;
 import apron.Var;
-import gmp.Mpq;
-import gmp.Mpz;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.solvers.apron.ApronFormulaCreator;

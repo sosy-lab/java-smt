@@ -23,7 +23,11 @@ package org.sosy_lab.java_smt.solvers.apron;
 import apron.Abstract1;
 import apron.ApronException;
 import apron.Tcons1;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterables;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -44,6 +48,8 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void> implement
 
   private Abstract1 abstract1;
   private ApronSolverContext solverContext;
+
+  private List<Collection<BooleanFormula>> assertedFormulas = new ArrayList<>();
   protected ApronTheoremProver(
       Set pSet,
       BooleanFormulaManager pBmgr,
@@ -53,11 +59,14 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void> implement
     this.solverContext  = pApronSolverContext;
     this.abstract1 = new Abstract1(pApronSolverContext.getManager(),
         pApronSolverContext.getFormulaCreator().getEnvironment());
+    this.assertedFormulas.add(new LinkedHashSet<>());
   }
 
   @Override
   public void pop() {
-
+    Preconditions.checkState(!closed);
+    Preconditions.checkState(assertedFormulas.size()>1);
+    assertedFormulas.remove(assertedFormulas.size()-1);
   }
 
   @Override
@@ -79,6 +88,7 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void> implement
       }
       newCons[consOld.length] = pConstraint.getConstraintNode();
       this.abstract1 = new Abstract1(solverContext.getManager(), newCons);
+      Iterables.getLast(assertedFormulas).add(pConstraint);
     } catch (ApronException e) {
       throw new RuntimeException(e);
     }
@@ -86,12 +96,13 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void> implement
 
   @Override
   public void push() throws InterruptedException {
-
+    Preconditions.checkState(!closed);
+    assertedFormulas.add(new LinkedHashSet<>());
   }
 
   @Override
   public int size() {
-    return 0;
+    return assertedFormulas.size()-1;
   }
 
   @Override
@@ -108,7 +119,7 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void> implement
   }
   @Override
   public Model getModel() throws SolverException {
-    return null;
+    return new ApronModel(this, solverContext.getFormulaCreator());
   }
 
   @Override

@@ -21,6 +21,7 @@
 package org.sosy_lab.java_smt.solvers.apron;
 
 import apron.Environment;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
@@ -32,7 +33,7 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
 
   private ApronFormulaCreator formulaCreator;
   protected ApronModel(
-      AbstractProver<ApronTheoremProver> pProver,
+      ApronTheoremProver pProver,
       ApronFormulaCreator creator) {
     super(pProver, creator);
     this.formulaCreator = creator;
@@ -40,11 +41,15 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
 
   @Override
   public ImmutableList<ValueAssignment> asList() {
-    return null;
+    Preconditions.checkState(!isClosed());
+    ImmutableList.Builder<ValueAssignment> out = ImmutableList.builder();
+
+    return out.build();
   }
 
   @Override
   protected @Nullable ApronNode evalImpl(ApronNode formula) {
-    return null;
+    Preconditions.checkState(!isClosed());
+    return formula;
   }
 }
