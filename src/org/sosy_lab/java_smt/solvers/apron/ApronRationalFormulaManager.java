@@ -130,7 +130,7 @@ public class ApronRationalFormulaManager extends
     ApronRatBinaryNode binaryNode = new ApronRatBinaryNode(pParam1,pParam2,
         Texpr1BinNode.OP_SUB);
     ApronConstraint constraint = new ApronConstraint(Tcons1.EQ,formulaCreator.getEnvironment(),
-        binaryNode.getNode());
+        binaryNode);
     return constraint;
   }
 
@@ -144,7 +144,7 @@ public class ApronRationalFormulaManager extends
     ApronRatBinaryNode binaryNode = new ApronRatBinaryNode(pParam1,pParam2,
         Texpr1BinNode.OP_SUB);
     ApronConstraint constraint = new ApronConstraint(Tcons1.SUP,formulaCreator.getEnvironment(),
-        binaryNode.getNode());
+        binaryNode);
     return constraint;
   }
 
@@ -153,7 +153,7 @@ public class ApronRationalFormulaManager extends
     ApronRatBinaryNode binaryNode = new ApronRatBinaryNode(pParam1,pParam2,
         Texpr1BinNode.OP_SUB);
     ApronConstraint constraint = new ApronConstraint(Tcons1.SUPEQ,formulaCreator.getEnvironment(),
-        binaryNode.getNode());
+        binaryNode);
     return constraint;
   }
 
@@ -162,7 +162,7 @@ public class ApronRationalFormulaManager extends
     ApronRatBinaryNode binaryNode = new ApronRatBinaryNode(pParam2,pParam1,
         Texpr1BinNode.OP_SUB);
     ApronConstraint constraint = new ApronConstraint(Tcons1.SUP,formulaCreator.getEnvironment(),
-        binaryNode.getNode());
+        binaryNode);
     return constraint;
   }
 
@@ -171,7 +171,7 @@ public class ApronRationalFormulaManager extends
     ApronRatBinaryNode binaryNode = new ApronRatBinaryNode(pParam2,pParam1,
         Texpr1BinNode.OP_SUB);
     ApronConstraint constraint = new ApronConstraint(Tcons1.SUPEQ,formulaCreator.getEnvironment(),
-        binaryNode.getNode());
+        binaryNode);
     return constraint;
   }
 

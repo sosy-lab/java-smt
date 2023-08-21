@@ -53,6 +53,11 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
 
   }
 
+  @Override
+  public Object convertValue(ApronNode pF) {
+    return super.convertValue(pF);
+  }
+
   public Environment getEnvironment(){
     return this.environment;
   }

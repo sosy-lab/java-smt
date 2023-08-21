@@ -24,7 +24,9 @@ import apron.Abstract1;
 import apron.ApronException;
 import apron.Tcons1;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import io.github.cvc5.Term;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -41,6 +43,7 @@ import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronConstraint;
 import org.sosy_lab.java_smt.utils.SolverUtils;
 
@@ -49,7 +52,7 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void> implement
   private Abstract1 abstract1;
   private ApronSolverContext solverContext;
 
-  private List<Collection<BooleanFormula>> assertedFormulas = new ArrayList<>();
+  private List<Collection<ApronConstraint>> assertedFormulas = new ArrayList<>();
   protected ApronTheoremProver(
       Set pSet,
       BooleanFormulaManager pBmgr,
@@ -119,7 +122,13 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void> implement
   }
   @Override
   public Model getModel() throws SolverException {
-    return new ApronModel(this, solverContext.getFormulaCreator());
+    return new ApronModel(this, solverContext.getFormulaCreator(), getAssertedExpressions());
+  }
+
+  private Collection<ApronConstraint> getAssertedExpressions(){
+    List<ApronConstraint> result = new ArrayList<>();
+    assertedFormulas.forEach(result::addAll);
+    return result;
   }
 
   @Override
@@ -142,5 +151,9 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void> implement
   @Override
   protected Evaluator getEvaluatorWithoutChecks() throws SolverException {
     return null;
+  }
+
+  public Abstract1 getAbstract1() {
+    return abstract1;
   }
 }

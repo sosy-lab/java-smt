@@ -90,6 +90,9 @@ public class ApronExamples
     Scalar lowerBound = interval.inf();
     System.out.println("Lower bound: "+lowerBound.toString());
     Scalar upperBound = interval.sup();
+    String castString = upperBound.toString();
+    int castInt = Integer.parseInt(castString);
+    System.out.println(castInt);
     System.out.println("Upper bound: "+upperBound.toString());
   }
 
