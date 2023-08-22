@@ -19,7 +19,6 @@ import io.github.cvc5.Solver;
 import io.github.cvc5.Term;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Deque;
 import java.util.List;
 import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -78,9 +77,8 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     }
 
     // formulasOfB := assertedFormulas - pFormulasOfA
-    Deque<List<Term>> caF = assertedFormulas;
     Set<Term> formulasOfB =
-        caF.stream()
+        this.assertedFormulas.stream()
             .<Term>flatMap(c -> c.stream())
             .filter(n -> !pFormulasOfA.contains(n))
             .collect(ImmutableSet.toImmutableSet());
