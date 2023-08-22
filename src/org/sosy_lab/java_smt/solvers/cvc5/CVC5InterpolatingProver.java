@@ -81,7 +81,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
         assertedFormulas.stream()
             .flatMap(c -> c.stream())
             .filter(n -> !pFormulasOfA.contains(n))
-            .collect(ImmutableSet.toImmutableSet());
+            .collect(ImmutableSet.<Term>toImmutableSet());
 
     if (formulasOfB.isEmpty()) { // Catch trivial case
       return mgr.getBooleanFormulaManager().makeBoolean(false);
@@ -184,7 +184,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
         mgr.extractVariablesAndUFs(creator.encapsulateBoolean(interpolB));
     boolean interpolSymbolMatch = true;
     for (String key : interpolantSymbols.keySet()) {
-      if (!(interpolASymbols.containsKey(key) || interpolBSymbols.containsKey(key))) {
+      if (!interpolASymbols.containsKey(key) && !interpolBSymbols.containsKey(key)) {
         interpolSymbolMatch = false;
       }
     }
