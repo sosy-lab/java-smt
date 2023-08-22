@@ -41,7 +41,9 @@ import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.FormulaType;
 public interface ApronNode extends Formula {
 
   FormulaType getType();
+
   Texpr1Node getNode();
+
   String[] getVarNames();
 
   class ApronRatCstNode implements ApronNode, RationalFormula {
@@ -49,7 +51,7 @@ public interface ApronNode extends Formula {
     private final FormulaType type = FormulaType.RATIONAL;
     private final Texpr1CstNode cstNode;
 
-    public ApronRatCstNode(BigInteger pNumerator, BigInteger pDenominator){
+    public ApronRatCstNode(BigInteger pNumerator, BigInteger pDenominator) {
       this.cstNode = new Texpr1CstNode(new MpqScalar(pNumerator.divide(pDenominator)));
     }
 
@@ -68,28 +70,31 @@ public interface ApronNode extends Formula {
     }
   }
 
-  class ApronRatVarNode implements ApronNode, RationalFormula{
+  class ApronRatVarNode implements ApronNode, RationalFormula {
 
     private final FormulaType type = FormulaType.RATIONAL;
     private final Texpr1VarNode varNode;
     private final String varName;
 
     private final ApronFormulaCreator formulaCreator;
-    public ApronRatVarNode(String pVarName, ApronFormulaCreator pFormulaCreator){
+
+    public ApronRatVarNode(String pVarName, ApronFormulaCreator pFormulaCreator) {
       this.varNode = new Texpr1VarNode(pVarName);
       this.formulaCreator = pFormulaCreator;
       this.varName = pVarName;
     }
+
     @Override
     public FormulaType getType() {
       return this.type;
     }
-    private void addVarToEnv(){
+
+    private void addVarToEnv() {
       Var[] intVars = formulaCreator.getEnvironment().getIntVars();
       Var[] realVars = formulaCreator.getEnvironment().getRealVars();
-      Var[] newRealVars = new Var[realVars.length+1];
-      int i=0;
-      for(Var var : realVars){
+      Var[] newRealVars = new Var[realVars.length + 1];
+      int i = 0;
+      for (Var var : realVars) {
         newRealVars[i] = var;
         i++;
       }
@@ -112,16 +117,17 @@ public interface ApronNode extends Formula {
     private final Texpr1UnNode unaryNode;
     private final String[] varNames;
 
-    public ApronRatUnaryNode(ApronNode param,int op ){
-      this.unaryNode = new Texpr1UnNode(op,param.getNode());
+    public ApronRatUnaryNode(ApronNode param, int op) {
+      this.unaryNode = new Texpr1UnNode(op, param.getNode());
       this.varNames = param.getVarNames();
     }
+
     @Override
     public FormulaType getType() {
       return null;
     }
 
-    public Texpr1UnNode getNode(){
+    public Texpr1UnNode getNode() {
       return this.unaryNode;
     }
 
@@ -131,27 +137,26 @@ public interface ApronNode extends Formula {
     }
   }
 
-  class ApronRatBinaryNode implements ApronNode, RationalFormula{
+  class ApronRatBinaryNode implements ApronNode, RationalFormula {
 
     private final FormulaType type = FormulaType.RATIONAL;
     private final Texpr1BinNode binaryNode;
     private final String[] varNames;
 
-    public ApronRatBinaryNode(ApronNode param1, ApronNode param2, int op){
-      this.binaryNode = new Texpr1BinNode(op,param1.getNode(),param2.getNode());
+    public ApronRatBinaryNode(ApronNode param1, ApronNode param2, int op) {
+      this.binaryNode = new Texpr1BinNode(op, param1.getNode(), param2.getNode());
       String[] varNames1 = param1.getVarNames();
       String[] varNames2 = param2.getVarNames();
-      String[] allVarNames = new String[varNames1.length+varNames2.length];
-      for(int i=0; i<varNames1.length;i++){
-        allVarNames[i] = varNames1[i];
-      }
-      int j = varNames1.length-1;
-      for(int i=0; i<varNames2.length;i++){
+      String[] allVarNames = new String[varNames1.length + varNames2.length];
+      System.arraycopy(varNames1, 0, allVarNames, 0, varNames1.length);
+      int j = varNames1.length - 1;
+      for (int i = 0; i < varNames2.length; i++) {
         allVarNames[j] = varNames1[i];
         j++;
       }
       this.varNames = allVarNames;
     }
+
     @Override
     public FormulaType getType() {
       return this.type;
@@ -173,7 +178,7 @@ public interface ApronNode extends Formula {
     private final FormulaType type = FormulaType.INTEGER;
     private final Texpr1CstNode cstNode;
 
-    public ApronIntCstNode(BigInteger pNumerator){
+    public ApronIntCstNode(BigInteger pNumerator) {
       this.cstNode = new Texpr1CstNode(new MpqScalar(pNumerator));
     }
 
@@ -192,18 +197,19 @@ public interface ApronNode extends Formula {
     }
   }
 
-  class ApronIntVarNode implements ApronNode, IntegerFormula{
+  class ApronIntVarNode implements ApronNode, IntegerFormula {
 
     private final FormulaType type = FormulaType.INTEGER;
     private final Texpr1VarNode varNode;
     private final String varName;
     private final ApronFormulaCreator formulaCreator;
 
-    public ApronIntVarNode(String pVarName, ApronFormulaCreator pFormulaCreator){
+    public ApronIntVarNode(String pVarName, ApronFormulaCreator pFormulaCreator) {
       this.varNode = new Texpr1VarNode(pVarName);
-      this.varName =pVarName;
+      this.varName = pVarName;
       this.formulaCreator = pFormulaCreator;
     }
+
     @Override
     public FormulaType getType() {
       return this.type;
@@ -213,12 +219,12 @@ public interface ApronNode extends Formula {
       return varNode;
     }
 
-    private void addVarToEnv(){
+    private void addVarToEnv() {
       Var[] intVars = formulaCreator.getEnvironment().getIntVars();
       Var[] realVars = formulaCreator.getEnvironment().getRealVars();
-      Var[] newIntVars = new Var[intVars.length+1];
-      int i=0;
-      for(Var var : intVars){
+      Var[] newIntVars = new Var[intVars.length + 1];
+      int i = 0;
+      for (Var var : intVars) {
         newIntVars[i] = var;
         i++;
       }
@@ -235,18 +241,19 @@ public interface ApronNode extends Formula {
   class ApronIntUnaryNode implements ApronNode, IntegerFormula {
     private final FormulaType type = FormulaType.INTEGER;
     private final Texpr1UnNode unaryNode;
-    private String[] varNames;
+    private final String[] varNames;
 
-    public ApronIntUnaryNode(ApronNode param,int op ){
-      this.unaryNode = new Texpr1UnNode(op,param.getNode());
+    public ApronIntUnaryNode(ApronNode param, int op) {
+      this.unaryNode = new Texpr1UnNode(op, param.getNode());
       this.varNames = param.getVarNames();
     }
+
     @Override
     public FormulaType getType() {
       return null;
     }
 
-    public Texpr1UnNode getNode(){
+    public Texpr1UnNode getNode() {
       return this.unaryNode;
     }
 
@@ -256,27 +263,26 @@ public interface ApronNode extends Formula {
     }
   }
 
-  class ApronIntBinaryNode implements ApronNode, IntegerFormula{
+  class ApronIntBinaryNode implements ApronNode, IntegerFormula {
 
     private final FormulaType type = FormulaType.INTEGER;
     private final Texpr1BinNode binaryNode;
-    private String[] varNames;
+    private final String[] varNames;
 
-    public ApronIntBinaryNode(ApronNode param1, ApronNode param2, int op){
-      this.binaryNode = new Texpr1BinNode(op,param1.getNode(),param2.getNode());
+    public ApronIntBinaryNode(ApronNode param1, ApronNode param2, int op) {
+      this.binaryNode = new Texpr1BinNode(op, param1.getNode(), param2.getNode());
       String[] varNames1 = param1.getVarNames();
       String[] varNames2 = param2.getVarNames();
-      String[] allVarNames = new String[varNames1.length+varNames2.length];
-      for(int i=0; i<varNames1.length;i++){
-        allVarNames[i] = varNames1[i];
-      }
-      int j = varNames1.length-1;
-      for(int i=0; i<varNames2.length;i++){
+      String[] allVarNames = new String[varNames1.length + varNames2.length];
+      System.arraycopy(varNames1, 0, allVarNames, 0, varNames1.length);
+      int j = varNames1.length - 1;
+      for (int i = 0; i < varNames2.length; i++) {
         allVarNames[j] = varNames1[i];
         j++;
       }
       this.varNames = allVarNames;
     }
+
     @Override
     public FormulaType getType() {
       return this.type;
@@ -295,13 +301,13 @@ public interface ApronNode extends Formula {
 
   class ApronConstraint implements ApronNode, BooleanFormula {
 
-    private Tcons1 constraintNode;
-    private Texpr1Node node;
+    private final Tcons1 constraintNode;
+    private final Texpr1Node node;
 
-    private ApronNode apronNode;
-    private String[] varNames;
+    private final ApronNode apronNode;
+    private final String[] varNames;
 
-    public ApronConstraint(int pKind, Environment pEnvironment, ApronNode pNode){
+    public ApronConstraint(int pKind, Environment pEnvironment, ApronNode pNode) {
       this.constraintNode = new Tcons1(pEnvironment, pKind, pNode.getNode());
       this.node = pNode.getNode();
       this.varNames = pNode.getVarNames();

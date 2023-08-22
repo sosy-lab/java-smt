@@ -22,14 +22,14 @@ package org.sosy_lab.java_smt.solvers.apron;
 
 import apron.Environment;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
-import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
 
 public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<ApronNode,
     ApronFormulaType, Environment, Long> {
 
-  private ApronFormulaCreator formulaCreator;
+  private final ApronFormulaCreator formulaCreator;
+
   protected ApronBooleanFormulaManager(ApronFormulaCreator pCreator) {
     super(pCreator);
     this.formulaCreator = pCreator;

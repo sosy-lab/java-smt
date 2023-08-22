@@ -28,19 +28,20 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
-import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.FormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.ApronBooleanType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.ApronIntegerType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.ApronRationalType;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.FormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronIntVarNode;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronRatVarNode;
 
-public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaType,Environment,
+public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaType, Environment,
     Long> {
 
   private Environment environment;
+
   protected ApronFormulaCreator(
       Environment pO,
       ApronBooleanType boolType,
@@ -58,7 +59,7 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
     return super.convertValue(pF);
   }
 
-  public Environment getEnvironment(){
+  public Environment getEnvironment() {
     return this.environment;
   }
 
@@ -83,16 +84,17 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
 
   @Override
   public ApronNode makeVariable(ApronFormulaType pApronFormulaType, String varName) {
-    Preconditions.checkArgument(!environment.hasVar(varName),"Variablename already exists!");
+    Preconditions.checkArgument(!environment.hasVar(varName), "Variablename already exists!");
     Preconditions.checkArgument(
-        (pApronFormulaType.getType().equals(FormulaType.INTEGER) || pApronFormulaType.getType().equals(
-            FormulaType.RATIONAL)),
+        (pApronFormulaType.getType().equals(FormulaType.INTEGER) || pApronFormulaType.getType()
+            .equals(
+                FormulaType.RATIONAL)),
         "Only Integer or rational variables allowed!");
-      if(pApronFormulaType.getType().equals(FormulaType.INTEGER)){
-        return new ApronIntVarNode(varName,this);
-      }else {
-        return new ApronRatVarNode(varName, this);
-      }
+    if (pApronFormulaType.getType().equals(FormulaType.INTEGER)) {
+      return new ApronIntVarNode(varName, this);
+    } else {
+      return new ApronRatVarNode(varName, this);
+    }
   }
 
   @Override
@@ -109,7 +111,7 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
 
   @Override
   public ApronNode callFunctionImpl(Long declaration, List<ApronNode> args) {
-    throw  new UnsupportedOperationException();
+    throw new UnsupportedOperationException();
   }
 
   @Override

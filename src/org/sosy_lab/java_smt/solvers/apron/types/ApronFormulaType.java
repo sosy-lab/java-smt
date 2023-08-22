@@ -22,38 +22,44 @@ package org.sosy_lab.java_smt.solvers.apron.types;
 
 public interface ApronFormulaType {
 
+  FormulaType getType();
+
   enum FormulaType {
     BOOLEAN,
     INTEGER,
     RATIONAL
   }
 
-  FormulaType getType();
-  class ApronIntegerType implements ApronFormulaType{
+  class ApronIntegerType implements ApronFormulaType {
 
-    public ApronIntegerType(){}
+    public ApronIntegerType() {
+    }
+
     @Override
-    public FormulaType getType(){
+    public FormulaType getType() {
       return FormulaType.INTEGER;
     }
 
   }
 
-  class ApronRationalType implements ApronFormulaType{
+  class ApronRationalType implements ApronFormulaType {
 
-    public ApronRationalType(){}
+    public ApronRationalType() {
+    }
+
     @Override
-    public FormulaType getType(){
+    public FormulaType getType() {
       return FormulaType.RATIONAL;
     }
   }
 
-  class ApronBooleanType implements ApronFormulaType{
+  class ApronBooleanType implements ApronFormulaType {
 
-    public ApronBooleanType(){
+    public ApronBooleanType() {
     }
+
     @Override
-    public FormulaType getType(){
+    public FormulaType getType() {
       return FormulaType.BOOLEAN;
     }
   }

@@ -39,28 +39,31 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.ApronBooleanType;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.ApronIntegerType;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.ApronRationalType;
 
 public class ApronSolverContext extends AbstractSolverContext {
 
-  private Manager manager;
   private final ApronFormulaCreator formulaCreator;
-  private ShutdownNotifier shutdownNotifier;
-  private Configuration config;
-  private @Nullable PathCounterTemplate logfile;
-  private LogManager logger;
-  private long randomSeed;
+  private final Manager manager;
+  private final ShutdownNotifier shutdownNotifier;
+  private final Configuration config;
+  private final @Nullable PathCounterTemplate logfile;
+  private final LogManager logger;
+  private final long randomSeed;
 
-  private ShutdownRequestListener shutdownRequestListener;
+  private final ShutdownRequestListener shutdownRequestListener;
   private boolean closed = false;
 
-  protected ApronSolverContext(ApronFormulaManager fmgr,
-                               Manager pManager,
-                               ApronFormulaCreator pFormulaCreator,
-                               ShutdownNotifier pShutdownNotifier,
-                               Configuration pConfig,
-                               PathCounterTemplate pLogfile,
-                               LogManager pLogger,
-                               long pRandomSeed) {
+  protected ApronSolverContext(
+      ApronFormulaManager fmgr,
+      Manager pManager,
+      ApronFormulaCreator pFormulaCreator,
+      ShutdownNotifier pShutdownNotifier,
+      Configuration pConfig,
+      PathCounterTemplate pLogfile,
+      LogManager pLogger,
+      long pRandomSeed) {
     super(fmgr);
     this.manager = pManager;
     this.formulaCreator = pFormulaCreator;
@@ -75,17 +78,23 @@ public class ApronSolverContext extends AbstractSolverContext {
     this.logger = pLogger;
   }
 
-  public static synchronized ApronSolverContext create(NonLinearArithmetic pNonLinearArithmetic,
-                                                       Configuration pConfiguration,
-                                                       ShutdownNotifier pShutdownNotifier,
-                                                       PathCounterTemplate logfile,
-                                                       LogManager pLogger,
-                                                       long randomSeed){
+  public static synchronized ApronSolverContext create(
+      NonLinearArithmetic pNonLinearArithmetic,
+      Configuration pConfiguration,
+      ShutdownNotifier pShutdownNotifier,
+      PathCounterTemplate logfile,
+      LogManager pLogger,
+      long randomSeed) {
 
     Environment env = new Environment();
     Manager manager = new Box();
     ApronBooleanType booleanType = new ApronBooleanType();
-    ApronFormulaCreator formulaCreator = new ApronFormulaCreator(env, booleanType, null,null,null,null);
+    ApronIntegerType integerType = new ApronIntegerType();
+    ApronRationalType rationalType = new ApronRationalType();
+    ApronFormulaCreator formulaCreator =
+        new ApronFormulaCreator(env, booleanType, integerType, rationalType,
+            null,
+            null);
     ApronUFManager ufManager = new ApronUFManager(formulaCreator);
     ApronBooleanFormulaManager booleanFormulaManager =
         new ApronBooleanFormulaManager(formulaCreator);
@@ -94,19 +103,21 @@ public class ApronSolverContext extends AbstractSolverContext {
     ApronRationalFormulaManager rationalFormulaManager =
         new ApronRationalFormulaManager(formulaCreator, pNonLinearArithmetic);
     ApronFormulaManager fmgr = new ApronFormulaManager(formulaCreator, ufManager,
-        booleanFormulaManager,integerFormulaManager,rationalFormulaManager,null,null,null,null,
-        null,null,null);
-    return new ApronSolverContext(fmgr, manager, formulaCreator, pShutdownNotifier,pConfiguration
-        ,logfile,pLogger,randomSeed);
+        booleanFormulaManager, integerFormulaManager, rationalFormulaManager, null, null, null,
+        null,
+        null, null, null);
+    return new ApronSolverContext(fmgr, manager, formulaCreator, pShutdownNotifier, pConfiguration
+        , logfile, pLogger, randomSeed);
   }
 
-  public Manager getManager(){
+  public Manager getManager() {
     return this.manager;
   }
 
-  public ApronFormulaCreator getFormulaCreator(){
+  public ApronFormulaCreator getFormulaCreator() {
     return this.formulaCreator;
   }
+
   @Override
   public String getVersion() {
     return this.manager.getVersion();
@@ -120,7 +131,7 @@ public class ApronSolverContext extends AbstractSolverContext {
   @Override
   public void close() {
     //TODO was muss hier noch passieren?
-    if(!closed){
+    if (!closed) {
       closed = true;
       logger.log(Level.FINER, "Freeing Apron Environment");
       shutdownNotifier.unregister(shutdownRequestListener);
@@ -132,13 +143,14 @@ public class ApronSolverContext extends AbstractSolverContext {
     return newApronProverEnvironment(options);
   }
 
-  private ProverEnvironment newApronProverEnvironment(Set<ProverOptions> pProverOptions){
-    try{
+  private ProverEnvironment newApronProverEnvironment(Set<ProverOptions> pProverOptions) {
+    try {
       ApronBooleanFormulaManager booleanFormulaManager =
           new ApronBooleanFormulaManager(this.formulaCreator);
-      return new ApronTheoremProver(pProverOptions,booleanFormulaManager,this.shutdownNotifier,this);
-    } catch(ApronException pApronException){
-      System.out.println(pApronException.toString());
+      return new ApronTheoremProver(pProverOptions, booleanFormulaManager, this.shutdownNotifier,
+          this);
+    } catch (ApronException pApronException) {
+      System.out.println(pApronException);
       System.exit(0);
       return null;
     }
@@ -146,7 +158,7 @@ public class ApronSolverContext extends AbstractSolverContext {
 
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(Set<ProverOptions> pSet) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   @Override

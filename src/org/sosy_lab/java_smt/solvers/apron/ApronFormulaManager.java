@@ -37,8 +37,8 @@ import org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
 
-public class ApronFormulaManager extends AbstractFormulaManager <ApronNode, ApronFormulaType,
-    Environment,Long>{
+public class ApronFormulaManager extends AbstractFormulaManager<ApronNode, ApronFormulaType,
+    Environment, Long> {
   /**
    * Builds a solver from the given theory implementations.
    *
@@ -68,8 +68,8 @@ public class ApronFormulaManager extends AbstractFormulaManager <ApronNode, Apro
       @Nullable AbstractSLFormulaManager slManager,
       @Nullable AbstractStringFormulaManager strManager,
       @Nullable AbstractEnumerationFormulaManager enumManager) {
-    super(pFormulaCreator,functionManager,booleanManager,pIntegerFormulaManager,
-        pRationalFormulaManager,null,null,null,null,null,null,null);
+    super(pFormulaCreator, functionManager, booleanManager, pIntegerFormulaManager,
+        pRationalFormulaManager, null, null, null, null, null, null, null);
   }
 
   @Override
@@ -83,8 +83,9 @@ public class ApronFormulaManager extends AbstractFormulaManager <ApronNode, Apro
   }
 
   @Override
-  public <T extends Formula > T substitute(T f,
-                                         Map<? extends Formula, ? extends Formula> fromToMapping) {
+  public <T extends Formula> T substitute(
+      T f,
+      Map<? extends Formula, ? extends Formula> fromToMapping) {
     return null;
   }
 

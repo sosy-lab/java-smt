@@ -21,7 +21,6 @@
 package org.sosy_lab.java_smt.solvers.apron;
 
 import apron.ApronException;
-import apron.DoubleScalar;
 import apron.Environment;
 import apron.Interval;
 import apron.Manager;
@@ -29,7 +28,6 @@ import apron.MpqScalar;
 import apron.Scalar;
 import apron.Tcons1;
 import apron.Texpr1BinNode;
-import apron.Var;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -37,9 +35,7 @@ import java.math.BigInteger;
 import java.util.Collection;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
-import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.FormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
@@ -50,13 +46,13 @@ import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronIntVarNode;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronRatBinaryNode;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronRatCstNode;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronRatVarNode;
-import scala.Int;
 
 public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Environment> {
 
-  private ApronFormulaCreator formulaCreator;
-  private ApronTheoremProver prover;
-  private ImmutableList<ApronConstraint> assertedExpressions;
+  private final ApronFormulaCreator formulaCreator;
+  private final ApronTheoremProver prover;
+  private final ImmutableList<ApronConstraint> assertedExpressions;
+
   protected ApronModel(
       ApronTheoremProver pProver,
       ApronFormulaCreator creator,
@@ -73,11 +69,12 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
     return generateModel();
   }
 
-  private ImmutableList<ValueAssignment> generateModel(){
+  private ImmutableList<ValueAssignment> generateModel() {
     ImmutableSet.Builder<ValueAssignment> builder = ImmutableSet.builder();
     for (ApronConstraint constraint : assertedExpressions) {
-      for(String var : constraint.getVarNames())
-      builder.add(getAssignment(constraint, var));
+      for (String var : constraint.getVarNames()) {
+        builder.add(getAssignment(constraint, var));
+      }
     }
     return builder.build().asList();
   }
@@ -97,11 +94,11 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
         MpqScalar value = (MpqScalar) interval.sup;
         int castIntValue = Integer.parseInt(value.toString());
         ApronIntCstNode valueFormula = new ApronIntCstNode(BigInteger.valueOf(castIntValue));
-        ApronIntBinaryNode binaryNode = new ApronIntBinaryNode(keyFormula,valueFormula,
+        ApronIntBinaryNode binaryNode = new ApronIntBinaryNode(keyFormula, valueFormula,
             Texpr1BinNode.OP_SUB);
-        BooleanFormula formula = new ApronConstraint(Tcons1.EQ,formulaCreator.getEnvironment(),
+        BooleanFormula formula = new ApronConstraint(Tcons1.EQ, formulaCreator.getEnvironment(),
             binaryNode);
-        return new ValueAssignment(keyFormula,valueFormula,formula,pVar,value,
+        return new ValueAssignment(keyFormula, valueFormula, formula, pVar, value,
             argumentInterpretationBuilder.build());
       } else {
         ApronNode keyFormula = new ApronRatVarNode(pVar, formulaCreator);
@@ -113,14 +110,14 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
         int castRatValue = Integer.parseInt(value.toString());
         ApronRatCstNode valueFormula = new ApronRatCstNode(BigInteger.valueOf(castRatValue),
             BigInteger.ONE);
-        ApronRatBinaryNode binaryNode = new ApronRatBinaryNode(keyFormula,valueFormula,
+        ApronRatBinaryNode binaryNode = new ApronRatBinaryNode(keyFormula, valueFormula,
             Texpr1BinNode.OP_SUB);
-        BooleanFormula formula = new ApronConstraint(Tcons1.EQ,formulaCreator.getEnvironment(),
+        BooleanFormula formula = new ApronConstraint(Tcons1.EQ, formulaCreator.getEnvironment(),
             binaryNode);
-        return new ValueAssignment(keyFormula,valueFormula,formula,pVar,value,
+        return new ValueAssignment(keyFormula, valueFormula, formula, pVar, value,
             argumentInterpretationBuilder.build());
       }
-    } catch (ApronException pApronException){
+    } catch (ApronException pApronException) {
       throw new RuntimeException(pApronException);
     }
   }

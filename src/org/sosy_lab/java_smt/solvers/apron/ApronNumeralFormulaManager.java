@@ -21,20 +21,12 @@
 package org.sosy_lab.java_smt.solvers.apron;
 
 import apron.Environment;
-import apron.Tcons1;
-import apron.Texpr1BinNode;
-import apron.Texpr1Node;
-import apron.Texpr1UnNode;
-import java.math.BigInteger;
-import java.util.HashSet;
-import java.util.List;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.FormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
-import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronConstraint;
 
 
 abstract class ApronNumeralFormulaManager<
@@ -42,7 +34,7 @@ abstract class ApronNumeralFormulaManager<
     extends AbstractNumeralFormulaManager<
     ApronNode, ApronFormulaType, Environment, ParamFormulaType, ResultFormulaType, Long> {
 
-  private ApronFormulaCreator formulaCreator;
+  private final ApronFormulaCreator formulaCreator;
 
   protected ApronNumeralFormulaManager(
       FormulaCreator<ApronNode, ApronFormulaType, Environment, Long> pCreator,

@@ -28,16 +28,16 @@ import org.sosy_lab.common.NativeLibraries;
 public class ApronNativeApiTest {
 
   @BeforeClass
-  public static void load(){
+  public static void load() {
     try {
       NativeLibraries.loadLibrary("apron");
       System.out.println("Apron-Library is loaded.");
-    } catch (UnsatisfiedLinkError e){
+    } catch (UnsatisfiedLinkError e) {
       throw new AssumptionViolatedException("Apron not availible: ", e);
     }
   }
 
   @Test
-  public void solverBackendTest(){
+  public void solverBackendTest() {
   }
 }
