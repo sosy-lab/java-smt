@@ -26,6 +26,7 @@ import apron.Texpr1UnNode;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
+import org.checkerframework.checker.units.qual.A;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
@@ -34,9 +35,9 @@ import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.ApronIntegerTy
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.FormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronConstraint;
-import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronIntBinaryNode;
-import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronIntCstNode;
-import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronIntUnaryNode;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronIntBinaryNode;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronIntCstNode;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronIntUnaryNode;
 
 public class ApronIntegerFormulaManager
     extends ApronNumeralFormulaManager<IntegerFormula, IntegerFormula> implements
@@ -105,7 +106,7 @@ public class ApronIntegerFormulaManager
 
   @Override
   protected ApronNode makeNumberImpl(String i) {
-    return null;
+    return new ApronIntCstNode(BigInteger.valueOf(Integer.parseInt(i)));
   }
 
   @Override
@@ -124,6 +125,14 @@ public class ApronIntegerFormulaManager
 
   @Override
   protected ApronNode sumImpl(List<ApronNode> operands) {
+    if(!operands.isEmpty()){
+    ApronNode first = operands.remove(0);
+    for (ApronNode operand:operands) {
+      first = new ApronIntBinaryNode(first, operand,
+          Texpr1BinNode.OP_ADD);
+    }
+    return first;
+    }
     return null;
   }
 

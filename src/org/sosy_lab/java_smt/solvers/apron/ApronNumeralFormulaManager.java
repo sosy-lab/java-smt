@@ -21,6 +21,7 @@
 package org.sosy_lab.java_smt.solvers.apron;
 
 import apron.Environment;
+import java.util.Map;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;

@@ -22,8 +22,11 @@ package org.sosy_lab.java_smt.solvers.apron;
 
 import apron.Environment;
 import com.google.common.base.Preconditions;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.annotation.Nullable;
+import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
@@ -34,13 +37,21 @@ import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.ApronIntegerTy
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.ApronRationalType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.FormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
-import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronIntVarNode;
-import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronRatVarNode;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronIntCstNode;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronIntVarNode;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronRatCstNode;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronRatVarNode;
+
 
 public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaType, Environment,
     Long> {
 
   private Environment environment;
+
+  /**
+   * @variables is a map that stores all variable-objects with their name as key;
+   */
+  private Map<String, ApronNode> variables;
 
   protected ApronFormulaCreator(
       Environment pO,
@@ -51,12 +62,20 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
       @Nullable Long regexType) {
     super(pO, boolType, pIntegerType, pRationalType, null, null);
     this.environment = pO;
-
+    this.variables = new HashMap<>();
   }
 
   @Override
-  public Object convertValue(ApronNode pF) {
-    return super.convertValue(pF);
+  public Object convertValue(ApronNode pf1) {
+    FormulaType type = pf1.getType();
+    if(pf1 instanceof ApronIntCstNode){
+      ApronIntCstNode cst = (ApronIntCstNode) pf1;
+      return cst.getValue();
+    } else if (pf1 instanceof ApronRatCstNode) {
+      ApronRatCstNode cast = (ApronRatCstNode) pf1;
+      Rational rational = Rational.of(cast.getNumerator(),cast.getDenominator());
+    }
+    return null;
   }
 
   public Environment getEnvironment() {
@@ -82,6 +101,13 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
     throw new UnsupportedOperationException("Apron does not support array operations.");
   }
 
+  /**
+   * For making a Formula (Type ApronNode) for a variable it is important to also update the
+   * @environment as it holds all variables;
+   * @param pApronFormulaType Integer or Rational?
+   * @param varName name of the variable
+   * @return object of either ApronIntVarNode (Type Integer) or ApronRatVarNode (Type Rational)
+   */
   @Override
   public ApronNode makeVariable(ApronFormulaType pApronFormulaType, String varName) {
     Preconditions.checkArgument(!environment.hasVar(varName), "Variablename already exists!");
@@ -91,21 +117,35 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
                 FormulaType.RATIONAL)),
         "Only Integer or rational variables allowed!");
     if (pApronFormulaType.getType().equals(FormulaType.INTEGER)) {
-      return new ApronIntVarNode(varName, this);
+      ApronIntVarNode varNode = new ApronIntVarNode(varName, this);
+      variables.put(varName, varNode);
+      return varNode;
     } else {
-      return new ApronRatVarNode(varName, this);
+      ApronRatVarNode varNode = new ApronRatVarNode(varName, this);
+      variables.put(varName, varNode);
+      return varNode;
     }
+  }
+
+  public Map<String, ApronNode> getVariables() {
+    return variables;
   }
 
   @Override
   public org.sosy_lab.java_smt.api.FormulaType<?> getFormulaType(ApronNode formula) {
-    return null;
+    FormulaType type = formula.getType();
+    if(type.equals(FormulaType.BOOLEAN)){
+      return org.sosy_lab.java_smt.api.FormulaType.BooleanType;
+    } else if (type.equals(FormulaType.RATIONAL)) {
+      return org.sosy_lab.java_smt.api.FormulaType.RationalType;
+    } else if (type.equals(FormulaType.INTEGER)) {
+      return org.sosy_lab.java_smt.api.FormulaType.IntegerType;
+    }
+    throw new IllegalArgumentException("Type %type not available!");
   }
 
   @Override
-  public <R> R visit(FormulaVisitor<R> visitor, Formula formula, ApronNode f) { //hinten
-    // anstellen, Frage kann man eine formel in alle kleinteile zerlegen und dann wieder
-    // zusammenbauen?
+  public <R> R visit(FormulaVisitor<R> visitor, Formula formula, ApronNode f) {
     return null;
   }
 
@@ -119,11 +159,11 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
       String pName,
       ApronFormulaType pReturnType,
       List<ApronFormulaType> pArgTypes) {
-    throw new UnsupportedOperationException("Apron does not support uninterpreted functions.");
+    return null;
   }
 
   @Override
-  protected Long getBooleanVarDeclarationImpl(ApronNode pApronFormula) { //brauche ich nicht
+  protected Long getBooleanVarDeclarationImpl(ApronNode pApronFormula) {
     return null;
   }
 }

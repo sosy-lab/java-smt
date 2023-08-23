@@ -41,6 +41,8 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronConstraint;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
+
 
 public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
     implements ProverEnvironment {
@@ -72,8 +74,15 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
   @Override
   public @Nullable Void addConstraint(BooleanFormula constraint)
       throws InterruptedException {
-    ApronConstraint apronConstraint = (ApronConstraint) constraint;
-    addConstraintException(apronConstraint);
+      /*ApronNode node = ApronFormulaManager.getTerm(constraint,
+          this.solverContext.getFormulaCreator().getEnvironment(),
+          this.solverContext.getFormulaCreator());
+      if(node instanceof ApronConstraint){
+        addConstraintException((ApronConstraint) node);
+      } else {
+        throw new IllegalArgumentException("Constraint of wrong Type!");
+      }*/
+
     return null;
   }
 
@@ -131,17 +140,17 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
-    return null;
+    throw new UnsupportedOperationException("Unsatcore not supported.");
   }
 
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(Collection assumptions)
+  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
     return Optional.empty();
   }
 
   @Override
-  public boolean isUnsatWithAssumptions(Collection assumptions)
+  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
     return false;
   }

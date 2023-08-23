@@ -21,9 +21,13 @@
 package org.sosy_lab.java_smt.solvers.apron;
 
 import apron.Environment;
+import apron.Tcons1;
+import java.math.BigInteger;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronConstraint;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronIntCstNode;
 
 public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<ApronNode,
     ApronFormulaType, Environment, Long> {
@@ -39,49 +43,57 @@ public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<Ap
   protected ApronNode makeVariableImpl(String pVar) {
     throw new UnsupportedOperationException("Apron supports only numeral variables.");
   }
-
+/**
+ * Not directly implementable, true and false is represented by a constraint that is
+ * always true (1!=0) or alway false (1==0)
+ */
   @Override
   protected ApronNode makeBooleanImpl(boolean value) {
-    return null;
+    ApronIntCstNode cst = new ApronIntCstNode(BigInteger.valueOf(1));
+    if(value){
+      return new ApronConstraint(Tcons1.SUP,formulaCreator.getEnvironment(),cst); //1!=0 --> true
+    } else {
+      return new ApronConstraint(Tcons1.EQ,formulaCreator.getEnvironment(),cst);//1==0 --> false
+    }
   }
 
   @Override
   protected ApronNode not(ApronNode pParam1) {
-    return null;
+    throw new UnsupportedOperationException("Apron does not support boolean operations.");
   }
 
   @Override
   protected ApronNode and(ApronNode pParam1, ApronNode pParam2) {
-    return null;
+    throw new UnsupportedOperationException("Apron does not support boolean operations.");
   }
 
   @Override
   protected ApronNode or(ApronNode pParam1, ApronNode pParam2) {
-    return null;
+    throw new UnsupportedOperationException("Apron does not support boolean operations.");
   }
 
   @Override
   protected ApronNode xor(ApronNode pParam1, ApronNode pParam2) {
-    return null;
+    throw new UnsupportedOperationException("Apron does not support boolean operations.");
   }
 
   @Override
   protected ApronNode equivalence(ApronNode bits1, ApronNode bits2) {
-    return null;
+    throw new UnsupportedOperationException("Apron does not support boolean operations.");
   }
 
   @Override
   protected boolean isTrue(ApronNode bits) {
-    return false;
+    throw new UnsupportedOperationException("Apron does not support boolean operations.");
   }
 
   @Override
   protected boolean isFalse(ApronNode bits) {
-    return false;
+    throw new UnsupportedOperationException("Apron does not support boolean operations.");
   }
 
   @Override
   protected ApronNode ifThenElse(ApronNode cond, ApronNode f1, ApronNode f2) {
-    return null;
+    throw new UnsupportedOperationException("Apron does not support boolean operations.");
   }
 }

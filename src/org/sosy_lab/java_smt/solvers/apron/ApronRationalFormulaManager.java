@@ -25,7 +25,9 @@ import apron.Texpr1BinNode;
 import apron.Texpr1UnNode;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
@@ -34,9 +36,11 @@ import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.ApronRationalT
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.FormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronConstraint;
-import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronRatBinaryNode;
-import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronRatCstNode;
-import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronRatUnaryNode;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronIntBinaryNode;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronRatBinaryNode;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronRatCstNode;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronRatUnaryNode;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronRatVarNode;
 
 public class ApronRationalFormulaManager extends
                                          ApronNumeralFormulaManager<NumeralFormula, RationalFormula>
@@ -84,7 +88,7 @@ public class ApronRationalFormulaManager extends
 
   @Override
   protected ApronNode makeNumberImpl(String i) {
-    return null;
+    return new ApronRatCstNode(BigInteger.valueOf(Integer.parseInt(i)), BigInteger.ONE);
   }
 
   @Override
@@ -103,8 +107,15 @@ public class ApronRationalFormulaManager extends
 
   @Override
   protected ApronNode sumImpl(List<ApronNode> operands) {
-    return null;
-  }
+    if(!operands.isEmpty()){
+      ApronNode first = operands.remove(0);
+      for (ApronNode operand:operands) {
+        first = new ApronRatBinaryNode(first, operand,
+            Texpr1BinNode.OP_ADD);
+      }
+      return first;
+    }
+    return null;  }
 
   @Override
   protected ApronNode subtract(ApronNode pParam1, ApronNode pParam2) {

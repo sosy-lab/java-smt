@@ -21,11 +21,14 @@
 package org.sosy_lab.java_smt.solvers.apron;
 
 import apron.Environment;
+import apron.Tcons1;
+import java.math.BigInteger;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractEnumerationFormulaManager;
@@ -35,7 +38,13 @@ import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractSLFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.ApronIntegerType;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.FormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronConstraint;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronIntCstNode;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronIntVarNode;
+import scala.Int;
 
 public class ApronFormulaManager extends AbstractFormulaManager<ApronNode, ApronFormulaType,
     Environment, Long> {
@@ -89,4 +98,7 @@ public class ApronFormulaManager extends AbstractFormulaManager<ApronNode, Apron
     return null;
   }
 
+  public static ApronNode getTerm(Formula pFormula){
+    return ((ApronNode) pFormula).getInstance();
+  }
 }
