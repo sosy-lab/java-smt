@@ -27,36 +27,50 @@ import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 
 public class BooleanLogger {
 
+  static String fileName = "Out.txt";
+  static String lines = "";
+
   public BooleanLogger() throws IOException {
-    this.createLogFile("Out.txt");
+    this.createLogFile(fileName);
   }
 
   private void createLogFile(String fileName) throws IOException {
-    File myObj = new File(fileName);
-    FileWriter myWriter = new FileWriter("Out.txt");
-    myWriter.write("(set-logic ALL)");
-    myWriter.close();
+    File file = new File(fileName);
+    writeToFile("(set-logic ALL)\n");
   }
 
+  public static void writeToFile(String line) throws IOException {
+    FileWriter fileWriter = new FileWriter(fileName, true);
+    fileWriter.write(line);
+    fileWriter.close();
+  }
 
-  public static String logMakeVariable(String pVar) {
+  public static void appendToFile(String line) {
+    lines = lines + line + "\n";
+  }
+
+  public static void dumpSMTLIB2() throws IOException {
+    writeToFile(lines);
+  }
+
+  public static void logMakeVariable(String pVar) {
     String out = "(declare-const " + pVar + " Bool)";
-    return out;
+    appendToFile(out);
   }
 
-  public static String logNot(BooleanFormula pBits) {
+  public static void logNot(BooleanFormula pBits) {
     String out = "(not " + pBits + ")";
-    return out;
+    appendToFile(out);
   }
 
-  public static String logOr(BooleanFormula pBits1, BooleanFormula pBits2) {
+  public static void logOr(BooleanFormula pBits1, BooleanFormula pBits2) {
     String out = "(or " + pBits1 + " " + pBits2 + ")";
-    return out;
+    appendToFile(out);
   }
 
-  public static String logAnd(BooleanFormula pBits1, BooleanFormula pBits2) {
+  public static void logAnd(BooleanFormula pBits1, BooleanFormula pBits2) {
     String out = "(and " + pBits1 + " " + pBits2 + ")";
-    return out;
+    appendToFile(out);
   }
 
 }
