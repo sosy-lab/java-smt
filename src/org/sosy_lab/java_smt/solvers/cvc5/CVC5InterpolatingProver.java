@@ -78,7 +78,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
 
     // formulasOfB := assertedFormulas - pFormulasOfA
     Set<Term> formulasOfB =
-        this.assertedFormulas.stream()
+        getAssertedFormulas().stream()
             .<Term>flatMap(c -> c.stream())
             .filter(n -> !pFormulasOfA.contains(n))
             .collect(ImmutableSet.toImmutableSet());
@@ -176,20 +176,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     Term interpolant =
         interpolationSolver.getInterpolant(interpolationSolver.mkTerm(Kind.NOT, interpolB));
 
-    ImmutableMap<String, Formula> interpolantSymbols =
-        mgr.extractVariablesAndUFs(creator.encapsulateBoolean(interpolant));
-    ImmutableMap<String, Formula> interpolASymbols =
-        mgr.extractVariablesAndUFs(creator.encapsulateBoolean(interpolA));
-    ImmutableMap<String, Formula> interpolBSymbols =
-        mgr.extractVariablesAndUFs(creator.encapsulateBoolean(interpolB));
-    boolean interpolSymbolMatch = true;
-    for (String key : interpolantSymbols.keySet()) {
-      if (!interpolASymbols.containsKey(key) && !interpolBSymbols.containsKey(key)) {
-        interpolSymbolMatch = false;
-      }
-    }
-
-    Preconditions.checkArgument(interpolSymbolMatch, "Interpolant contains Symbols not in A or B.");
+    checkCVC5Interpolation(interpolationSolver, interpolant, interpolA, interpolB);
 
     interpolationSolver.deletePointer();
 
@@ -233,5 +220,39 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
       default:
         return usingSolver.mkTerm(Kind.AND, formulas.toArray(new Term[0]));
     }
+  }
+
+  private void checkCVC5Interpolation(Solver solverP, Term interpolant, Term aTerm, Term bTerm) {
+    ImmutableMap<String, Formula> interpolantSymbols =
+        mgr.extractVariablesAndUFs(creator.encapsulateBoolean(interpolant));
+    ImmutableMap<String, Formula> interpolASymbols =
+        mgr.extractVariablesAndUFs(creator.encapsulateBoolean(aTerm));
+    ImmutableMap<String, Formula> interpolBSymbols =
+        mgr.extractVariablesAndUFs(creator.encapsulateBoolean(bTerm));
+    boolean interpolSymbolMatch = true;
+    for (String key : interpolantSymbols.keySet()) {
+      if (!interpolASymbols.containsKey(key) && !interpolBSymbols.containsKey(key)) {
+        interpolSymbolMatch = false;
+      }
+    }
+
+    Preconditions.checkArgument(interpolSymbolMatch, "Interpolant contains Symbols not in A or B.");
+
+    solverP.resetAssertions();
+
+    Term craig1 = solverP.mkTerm(Kind.IMPLIES, aTerm, interpolant);
+    Term craig2 =
+        solverP.mkTerm(
+            Kind.EQUAL, solverP.mkTerm(Kind.AND, interpolant, bTerm), solverP.mkBoolean(false));
+    solverP.assertFormula(craig1);
+    solverP.assertFormula(craig2);
+
+    Preconditions.checkArgument(
+        solverP.checkSat().isSat(), "Interpolant does not follow Craig Interpolation");
+
+    solverP.assertFormula(solverP.mkTerm(Kind.NOT, solverP.mkTerm(Kind.AND, craig1, craig2)));
+
+    Preconditions.checkArgument(
+        solverP.checkSat().isUnsat(), "Interpolant does not follow generally Craig Interpolation");
   }
 }

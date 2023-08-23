@@ -239,4 +239,8 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     Preconditions.checkState(!closed);
     return assertedFormulas.size() - 1;
   }
+
+  public Deque<List<Term>> getAssertedFormulas() {
+    return assertedFormulas;
+  }
 }
