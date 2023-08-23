@@ -40,17 +40,14 @@ public class BitwuzlaTheoremProver implements ProverEnvironment {
       long pEnv,
       ShutdownNotifier pShutdownNotifier,
       Set<ProverOptions> pOptions,
-      AtomicBoolean pIsAnyStackAlive) {
-  }
+      AtomicBoolean pIsAnyStackAlive) {}
 
   /**
    * Remove one backtracking point/level from the current stack. This removes the latest level
    * including all of its formulas, i.e., all formulas that were added for this backtracking point.
    */
   @Override
-  public void pop() {
-
-  }
+  public void pop() {}
 
   /**
    * Add a constraint to the latest backtracking point.
@@ -70,9 +67,7 @@ public class BitwuzlaTheoremProver implements ProverEnvironment {
    * via a POP-operation.
    */
   @Override
-  public void push() throws InterruptedException {
-
-  }
+  public void push() throws InterruptedException {}
 
   /**
    * Get the number of backtracking points/levels on the current stack.
@@ -86,9 +81,7 @@ public class BitwuzlaTheoremProver implements ProverEnvironment {
     return 0;
   }
 
-  /**
-   * Check whether the conjunction of all formulas on the stack is unsatisfiable.
-   */
+  /** Check whether the conjunction of all formulas on the stack is unsatisfiable. */
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
     return false;
@@ -135,11 +128,11 @@ public class BitwuzlaTheoremProver implements ProverEnvironment {
    *
    * @param assumptions Selected assumptions
    * @return Empty optional if the constraints with assumptions are satisfiable, subset of
-   * assumptions which is unsatisfiable with the original constraints otherwise.
+   *     assumptions which is unsatisfiable with the original constraints otherwise.
    */
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(Collection<BooleanFormula> assumptions)
-      throws SolverException, InterruptedException {
+  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+      Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
     return Optional.empty();
   }
 
@@ -149,9 +142,7 @@ public class BitwuzlaTheoremProver implements ProverEnvironment {
    * ignored.
    */
   @Override
-  public void close() {
-
-  }
+  public void close() {}
 
   /**
    * Get all satisfying assignments of the current environment with regard to a subset of terms, and
@@ -159,7 +150,7 @@ public class BitwuzlaTheoremProver implements ProverEnvironment {
    *
    * @param callback
    * @param important A set of (positive) variables appearing in the asserted queries. Only these
-   *                  variables will appear in the region.
+   *     variables will appear in the region.
    * @return A region representing all satisfying models of the formula.
    */
   @Override

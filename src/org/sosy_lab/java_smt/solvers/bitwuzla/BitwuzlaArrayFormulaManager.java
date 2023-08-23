@@ -28,8 +28,8 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
 
-public class BitwuzlaArrayFormulaManager extends
-                                         AbstractArrayFormulaManager<Long, Long, Long, Long> {
+public class BitwuzlaArrayFormulaManager
+    extends AbstractArrayFormulaManager<Long, Long, Long, Long> {
 
   private final long bitwuzla;
   private final Table<String, Long, Long> nameFormulaCache;
@@ -42,23 +42,22 @@ public class BitwuzlaArrayFormulaManager extends
 
   @Override
   protected Long select(Long pArray, Long pIndex) {
-    return bitwuzlaJNI.bitwuzla_mk_term2(this.bitwuzla,
-        SWIG_BitwuzlaKind.BITWUZLA_KIND_ARRAY_SELECT.swigValue()
-        , pArray, pIndex);
+    return bitwuzlaJNI.bitwuzla_mk_term2(
+        SWIG_BitwuzlaKind.BITWUZLA_KIND_ARRAY_SELECT.swigValue(), pArray, pIndex);
   }
 
   @Override
   protected Long store(Long pArray, Long pIndex, Long pValue) {
-    return bitwuzlaJNI.bitwuzla_mk_term3(this.bitwuzla,
-        SWIG_BitwuzlaKind.BITWUZLA_KIND_ARRAY_SELECT.swigValue()
-        , pArray, pIndex, pValue);
+    return bitwuzlaJNI.bitwuzla_mk_term3(
+        SWIG_BitwuzlaKind.BITWUZLA_KIND_ARRAY_STORE.swigValue(),
+        pArray,
+        pIndex,
+        pValue);
   }
 
   @Override
   protected <TI extends Formula, TE extends Formula> Long internalMakeArray(
-      String pName,
-      FormulaType<TI> pIndexType,
-      FormulaType<TE> pElementType) {
+      String pName, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
 
     final ArrayFormulaType<TI, TE> arrayFormulaType =
         FormulaType.getArrayType(pIndexType, pElementType);
@@ -68,7 +67,7 @@ public class BitwuzlaArrayFormulaManager extends
 
   @Override
   protected Long equivalence(Long pArray1, Long pArray2) {
-    return bitwuzlaJNI.bitwuzla_mk_term2(bitwuzla, BITWUZLA_KIND_EQUAL.swigValue(), pArray1, pArray2);
-
+    return bitwuzlaJNI.bitwuzla_mk_term2(
+        BITWUZLA_KIND_EQUAL.swigValue(), pArray1, pArray2);
   }
 }

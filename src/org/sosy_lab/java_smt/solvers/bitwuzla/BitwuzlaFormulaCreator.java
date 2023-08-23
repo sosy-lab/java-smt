@@ -18,12 +18,10 @@
  *  limitations under the License.
  */
 
-
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Table;
-import com.google.common.primitives.Longs;
 import java.util.List;
 import java.util.stream.LongStream;
 import org.sosy_lab.java_smt.api.Formula;
@@ -35,31 +33,31 @@ import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   protected BitwuzlaFormulaCreator(Long pBitwuzlaEnv) {
-    super(pBitwuzlaEnv, bitwuzlaJNI.bitwuzla_mk_bool_sort(pBitwuzlaEnv), null, null, null, null);
+    super(pBitwuzlaEnv, bitwuzlaJNI.bitwuzla_mk_bool_sort(), null, null, null, null);
   }
 
   @Override
   public Long getBitvectorType(int bitwidth) {
-    return bitwuzlaJNI.bitwuzla_mk_bv_sort(getEnv(), bitwidth);
+    return bitwuzlaJNI.bitwuzla_mk_bv_sort( bitwidth);
   }
 
-  // Assuming that JavaSMT FLoatingPointType follows IEEE 754, if it is in the decimal
+  // Assuming that JavaSMT FloatingPointType follows IEEE 754, if it is in the decimal
   // system instead use bitwuzla_mk_fp_value_from_real somehow or convert myself
   @Override
   public Long getFloatingPointType(FloatingPointType type) {
-    long fpSort = bitwuzlaJNI.bitwuzla_mk_fp_sort(getEnv(), type.getExponentSize(),
-        type.getMantissaSize());
+    long fpSort =
+        bitwuzlaJNI.bitwuzla_mk_fp_sort( type.getExponentSize(), type.getMantissaSize());
     return fpSort;
   }
 
   @Override
   public Long getArrayType(Long indexType, Long elementType) {
-    return bitwuzlaJNI.bitwuzla_mk_array_sort(getEnv(), indexType, elementType);
+    return bitwuzlaJNI.bitwuzla_mk_array_sort( indexType, elementType);
   }
 
   @Override
   public Long makeVariable(Long pLong, String varName) {
-    return bitwuzlaJNI.bitwuzla_mk_const(getEnv(), pLong, varName);
+    return bitwuzlaJNI.bitwuzla_mk_const( pLong, varName);
   }
 
   // TODO What about function types? BW has function Sorts. bitwuzla_sort_is_uninterpreted() in
@@ -68,10 +66,11 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
     if (bitwuzlaJNI.bitwuzla_sort_is_fp(pSort)) {
       long exponent = bitwuzlaJNI.bitwuzla_sort_fp_get_exp_size(pSort);
       long mantissa = bitwuzlaJNI.bitwuzla_sort_fp_get_sig_size(pSort);
-      return FormulaType.getFloatingPointType((int) exponent,  (int) mantissa);
+      return FormulaType.getFloatingPointType((int) exponent, (int) mantissa);
     } else if (bitwuzlaJNI.bitwuzla_sort_is_bv(pSort)) {
-      return FormulaType.getBitvectorTypeWithSize((int) bitwuzlaJNI.bitwuzla_sort_bv_get_size(pSort));
-    } else if (bitwuzlaJNI.bitwuzla_sort_is_array(pSort)){
+      return FormulaType.getBitvectorTypeWithSize(
+          (int) bitwuzlaJNI.bitwuzla_sort_bv_get_size(pSort));
+    } else if (bitwuzlaJNI.bitwuzla_sort_is_array(pSort)) {
       FormulaType<? extends Formula> domainSort =
           bitwuzlaSortToType(bitwuzlaJNI.bitwuzla_term_array_get_index_sort(pSort));
       FormulaType<? extends Formula> rangeSort =
@@ -94,25 +93,39 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
    * @param f
    * @see FormulaManager#visit
    */
+
+  // TODO: No easy way to get the abstract constructor, only the very granular FormulaKind. Maybe
+  // create hashmaps for each type of kind, and then check in which hashmap the kind is?
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula formula, Long f) {
+    SWIG_BitwuzlaKind kind = SWIG_BitwuzlaKind.swigToEnum(bitwuzlaJNI.bitwuzla_term_get_kind(f));
+    
+    if (bitwuzlaJNI.bitwuzla_term_is_const(f)){
+      
+    } else if (bitwuzlaJNI.term) {
+      
+    }
     return null;
   }
 
   @Override
   public Long callFunctionImpl(Long declaration, List<Long> args) {
-    Preconditions.checkArgument(
-        !args.isEmpty(), "Bitwuzla does not support UFs without arguments.");
-
-    long[] functionAndArgs = LongStream.concat(LongStream.of(declaration), args.stream().mapToLong(Long::longValue)).toArray();
-    return bitwuzlaJNI.bitwuzla_mk_term(getEnv(), SWIG_BitwuzlaKind.BITWUZLA_KIND_APPLY.swigValue(),
-        args.size(), functionAndArgs);
+    long[] functionAndArgs =
+        LongStream.concat(LongStream.of(declaration), args.stream().mapToLong(Long::longValue))
+            .toArray();
+    return bitwuzlaJNI.bitwuzla_mk_term(
+        SWIG_BitwuzlaKind.BITWUZLA_KIND_APPLY.swigValue(), args.size(), functionAndArgs);
   }
 
   @Override
   public Long declareUFImpl(String pName, Long pReturnType, List<Long> pArgTypes) {
-    Preconditions.checkArgument(
-        !pArgTypes.isEmpty(), "Bitwuzla does not support UFs without arguments.");
+    if (pArgTypes.isEmpty()) {
+      long zeroArityUFSort = bitwuzlaJNI.
+    } else {
+
+    }
+
+
 
     return null;
   }

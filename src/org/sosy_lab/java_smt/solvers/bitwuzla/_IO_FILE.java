@@ -28,7 +28,6 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
  * the SWIG interface file instead.
  * ----------------------------------------------------------------------------- */
 
-
 public class _IO_FILE {
   private transient long swigCPtr;
   protected transient boolean swigCMemOwn;
@@ -153,14 +152,14 @@ public class _IO_FILE {
     return bitwuzlaJNI._IO_FILE__IO_save_end_get(swigCPtr, this);
   }
 
-//  public void set_markers(SWIGTYPE_p__IO_marker value) {
-//    bitwuzlaJNI._IO_FILE__markers_set(swigCPtr, this, SWIGTYPE_p__IO_marker.getCPtr(value));
-//  }
-//
-//  public SWIGTYPE_p__IO_marker get_markers() {
-//    long cPtr = bitwuzlaJNI._IO_FILE__markers_get(swigCPtr, this);
-//    return (cPtr == 0) ? null : new SWIGTYPE_p__IO_marker(cPtr, false);
-//  }
+  //  public void set_markers(SWIGTYPE_p__IO_marker value) {
+  //    bitwuzlaJNI._IO_FILE__markers_set(swigCPtr, this, SWIGTYPE_p__IO_marker.getCPtr(value));
+  //  }
+  //
+  //  public SWIGTYPE_p__IO_marker get_markers() {
+  //    long cPtr = bitwuzlaJNI._IO_FILE__markers_get(swigCPtr, this);
+  //    return (cPtr == 0) ? null : new SWIGTYPE_p__IO_marker(cPtr, false);
+  //  }
 
   public void set_chain(_IO_FILE value) {
     bitwuzlaJNI._IO_FILE__chain_set(swigCPtr, this, _IO_FILE.getCPtr(value), value);
@@ -219,14 +218,14 @@ public class _IO_FILE {
     return bitwuzlaJNI._IO_FILE__shortbuf_get(swigCPtr, this);
   }
 
-//  public void set_lock(SWIGTYPE_p_void value) {
-//    bitwuzlaJNI._IO_FILE__lock_set(swigCPtr, this, SWIGTYPE_p_void.getCPtr(value));
-//  }
+  //  public void set_lock(SWIGTYPE_p_void value) {
+  //    bitwuzlaJNI._IO_FILE__lock_set(swigCPtr, this, SWIGTYPE_p_void.getCPtr(value));
+  //  }
 
-//  public SWIGTYPE_p_void get_lock() {
-//    long cPtr = bitwuzlaJNI._IO_FILE__lock_get(swigCPtr, this);
-//    return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
-//  }
+  //  public SWIGTYPE_p_void get_lock() {
+  //    long cPtr = bitwuzlaJNI._IO_FILE__lock_get(swigCPtr, this);
+  //    return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
+  //  }
 
   public void set_offset(long value) {
     bitwuzlaJNI._IO_FILE__offset_set(swigCPtr, this, value);
@@ -236,23 +235,24 @@ public class _IO_FILE {
     return bitwuzlaJNI._IO_FILE__offset_get(swigCPtr, this);
   }
 
-//  public void set_codecvt(SWIGTYPE_p__IO_codecvt value) {
-//    bitwuzlaJNI._IO_FILE__codecvt_set(swigCPtr, this, SWIGTYPE_p__IO_codecvt.getCPtr(value));
-//  }
-//
-//  public SWIGTYPE_p__IO_codecvt get_codecvt() {
-//    long cPtr = bitwuzlaJNI._IO_FILE__codecvt_get(swigCPtr, this);
-//    return (cPtr == 0) ? null : new SWIGTYPE_p__IO_codecvt(cPtr, false);
-//  }
-//
-//  public void set_wide_data(SWIGTYPE_p__IO_wide_data value) {
-//    bitwuzlaJNI._IO_FILE__wide_data_set(swigCPtr, this, SWIGTYPE_p__IO_wide_data.getCPtr(value));
-//  }
-//
-//  public SWIGTYPE_p__IO_wide_data get_wide_data() {
-//    long cPtr = bitwuzlaJNI._IO_FILE__wide_data_get(swigCPtr, this);
-//    return (cPtr == 0) ? null : new SWIGTYPE_p__IO_wide_data(cPtr, false);
-//  }
+  //  public void set_codecvt(SWIGTYPE_p__IO_codecvt value) {
+  //    bitwuzlaJNI._IO_FILE__codecvt_set(swigCPtr, this, SWIGTYPE_p__IO_codecvt.getCPtr(value));
+  //  }
+  //
+  //  public SWIGTYPE_p__IO_codecvt get_codecvt() {
+  //    long cPtr = bitwuzlaJNI._IO_FILE__codecvt_get(swigCPtr, this);
+  //    return (cPtr == 0) ? null : new SWIGTYPE_p__IO_codecvt(cPtr, false);
+  //  }
+  //
+  //  public void set_wide_data(SWIGTYPE_p__IO_wide_data value) {
+  //    bitwuzlaJNI._IO_FILE__wide_data_set(swigCPtr, this,
+  // SWIGTYPE_p__IO_wide_data.getCPtr(value));
+  //  }
+  //
+  //  public SWIGTYPE_p__IO_wide_data get_wide_data() {
+  //    long cPtr = bitwuzlaJNI._IO_FILE__wide_data_get(swigCPtr, this);
+  //    return (cPtr == 0) ? null : new SWIGTYPE_p__IO_wide_data(cPtr, false);
+  //  }
 
   public void set_freeres_list(_IO_FILE value) {
     bitwuzlaJNI._IO_FILE__freeres_list_set(swigCPtr, this, _IO_FILE.getCPtr(value), value);
@@ -263,14 +263,14 @@ public class _IO_FILE {
     return (cPtr == 0) ? null : new _IO_FILE(cPtr, false);
   }
 
-//  public void set_freeres_buf(SWIGTYPE_p_void value) {
-//    bitwuzlaJNI._IO_FILE__freeres_buf_set(swigCPtr, this, SWIGTYPE_p_void.getCPtr(value));
-//  }
-//
-//  public SWIGTYPE_p_void get_freeres_buf() {
-//    long cPtr = bitwuzlaJNI._IO_FILE__freeres_buf_get(swigCPtr, this);
-//    return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
-//  }
+  //  public void set_freeres_buf(SWIGTYPE_p_void value) {
+  //    bitwuzlaJNI._IO_FILE__freeres_buf_set(swigCPtr, this, SWIGTYPE_p_void.getCPtr(value));
+  //  }
+  //
+  //  public SWIGTYPE_p_void get_freeres_buf() {
+  //    long cPtr = bitwuzlaJNI._IO_FILE__freeres_buf_get(swigCPtr, this);
+  //    return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
+  //  }
 
   public void set__pad5(long value) {
     bitwuzlaJNI._IO_FILE___pad5_set(swigCPtr, this, value);
@@ -299,6 +299,4 @@ public class _IO_FILE {
   public _IO_FILE() {
     this(bitwuzlaJNI.new__IO_FILE(), true);
   }
-
 }
-
