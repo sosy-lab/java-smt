@@ -84,6 +84,7 @@ public final class ExpressionKind {
     UF,
   };
   private static int swigNext = 0;
+
   @SuppressWarnings("unused")
   private ExpressionKind() {
     throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");

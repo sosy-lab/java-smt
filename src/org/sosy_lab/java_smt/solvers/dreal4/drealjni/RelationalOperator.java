@@ -29,6 +29,7 @@ public final class RelationalOperator {
   private RelationalOperator() {
     throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
   }
+
   public static RelationalOperator.Type swigToEnum(int swigValue) {
     if (swigValue < swigValues.length
         && swigValue >= 0
