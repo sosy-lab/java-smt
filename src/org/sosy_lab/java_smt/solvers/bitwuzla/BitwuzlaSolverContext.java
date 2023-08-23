@@ -21,8 +21,13 @@
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
+import com.google.common.base.Splitter.MapSplitter;
+import com.google.common.collect.ImmutableMap;
+import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -47,7 +52,6 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
     CADICAL,
     GIMSATUL,
     KISSAT
-
   }
 
   @Options(prefix = "solver.bitwuzla")
@@ -95,7 +99,7 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
    */
   @Override
   public String getVersion() {
-    return "Bitwuzla " + bitwuzlaJNI.bitwuzla_version(creator.getEnv());
+    return "Bitwuzla " + bitwuzlaJNI.bitwuzla_version();
   }
 
   /**
@@ -134,21 +138,22 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
   }
 
   @Override
-  protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(Set<ProverOptions> pSet) {
+  protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
+      Set<ProverOptions> pSet) {
     throw new UnsupportedOperationException("Bitwuzla does not support interpolation");
   }
 
   @Override
-  protected OptimizationProverEnvironment newOptimizationProverEnvironment0(Set<ProverOptions> pSet) {
+  protected OptimizationProverEnvironment newOptimizationProverEnvironment0(
+      Set<ProverOptions> pSet) {
     // TODO: Is this true?
     throw new UnsupportedOperationException("Bitwuzla does not support optimization");
   }
 
   /**
    * Whether the solver supports solving under some given assumptions (with all corresponding
-   * features) by itself, i.e., whether {@link
-   * ProverEnvironment#isUnsatWithAssumptions(Collection)} and {@link
-   * InterpolatingProverEnvironment#isUnsatWithAssumptions(Collection)} are fully
+   * features) by itself, i.e., whether {@link ProverEnvironment#isUnsatWithAssumptions(Collection)}
+   * and {@link InterpolatingProverEnvironment#isUnsatWithAssumptions(Collection)} are fully
    * implemented.
    *
    * <p>Otherwise, i.e., if this method returns {@code false}, the solver does not need to support
@@ -165,7 +170,6 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
     return false;
   }
 
-
   /** set basic options for running Boolector. */
   private static void setOptions(
       Configuration config, PathCounterTemplate solverLogfile, long randomSeed, long bitwuzla)
@@ -174,28 +178,31 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
 
     Preconditions.checkNotNull(settings.satSolver);
     bitwuzlaJNI.bitwuzla_set_option_str(
-        bitwuzla, SWIG_BitwuzlaOption.BITWUZLA_OPT_SAT_ENGINE.swigValue(),
+        SWIG_BitwuzlaOption.BITWUZLA_OPT_SAT_ENGINE.swigValue(),
         settings.satSolver.name().toLowerCase(Locale.getDefault()));
     // Default Options to enable multiple SAT, auto cleanup on close, incremental mode
-    bitwuzlaJNI.bitwuzla_set_option(bitwuzla, SWIG_BitwuzlaOption.BITWUZLA_OPT_PRODUCE_MODELS.swigValue(), 2);
+    bitwuzlaJNI.bitwuzla_set_option(
+        bitwuzla, SWIG_BitwuzlaOption.BITWUZLA_OPT_PRODUCE_MODELS.swigValue(), 2);
     // TODO: Not available in Bitwzula?
-//    BitwuzlaJNI.bitwuzla_set_option(bitwuzla, SWIG_BitwuzlaOption.BTOR_OPT_AUTO_CLEANUP.getValue(), 1);
+    //    BitwuzlaJNI.bitwuzla_set_option(bitwuzla,
+    // SWIG_BitwuzlaOption.BTOR_OPT_AUTO_CLEANUP.getValue(), 1);
     // Incremental needed for push/pop!
-    bitwuzlaJNI.bitwuzla_set_option(bitwuzla, SWIG_BitwuzlaOption.BITWUZLA_OPT_INCREMENTAL.swigValue(), 1);
+    bitwuzlaJNI.bitwuzla_set_option(
+        bitwuzla, SWIG_BitwuzlaOption.BITWUZLA_OPT_INCREMENTAL.swigValue(), 1);
     // Sets randomseed accordingly
-    bitwuzlaJNI.bitwuzla_set_option(bitwuzla, SWIG_BitwuzlaOption.BITWUZLA_OPT_SEED.swigValue(), randomSeed);
+    bitwuzlaJNI.bitwuzla_set_option(
+        bitwuzla, SWIG_BitwuzlaOption.BITWUZLA_OPT_SEED.swigValue(), randomSeed);
     // Stop Boolector from rewriting formulas in outputs
-    bitwuzlaJNI.bitwuzla_set_option(bitwuzla, SWIG_BitwuzlaOption.BITWUZLA_OPT_RW_LEVEL.swigValue(), 0);
+    bitwuzlaJNI.bitwuzla_set_option(
+        bitwuzla, SWIG_BitwuzlaOption.BITWUZLA_OPT_RW_LEVEL.swigValue(), 0);
 
-    //setFurtherOptions(bitwuzla, settings.furtherOptions);
-// TODO: This seems to be setting a logfile. Perhaps the SWIG _IO_FILE could be used instead?
-//    if (solverLogfile != null) {
-//      String filename = solverLogfile.getFreshPath().toAbsolutePath().toString();
-//      BtorJNI.boolector_set_trapi(bitwuzla, filename);
-//    }
+    // setFurtherOptions(bitwuzla, settings.furtherOptions);
+    // TODO: This seems to be setting a logfile. Perhaps the SWIG _IO_FILE could be used instead?
+    //    if (solverLogfile != null) {
+    //      String filename = solverLogfile.getFreshPath().toAbsolutePath().toString();
+    //      BtorJNI.boolector_set_trapi(bitwuzla, filename);
+    //    }
   }
-
-
 
   /**
    * Set more options for Bitwuzla.
@@ -207,29 +214,34 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
    */
 
   // TODO: Copied from Boolector, needs to be tested.
-//  private static void setFurtherOptions(long bitwuzla, String pFurtherOptions)
-//      throws InvalidConfigurationException {
-//    MapSplitter optionSplitter =
-//        Splitter.on(',')
-//            .trimResults()
-//            .omitEmptyStrings()
-//            .withKeyValueSeparator(Splitter.on('=').limit(2).trimResults());
-//    ImmutableMap<String, String> furtherOptionsMap;
-//
-//    try {
-//      furtherOptionsMap = ImmutableMap.copyOf(optionSplitter.split(pFurtherOptions));
-//    } catch (IllegalArgumentException e) {
-//      throw new InvalidConfigurationException(
-//          "Invalid Bitwuzla option in \"" + pFurtherOptions + "\": " + e.getMessage(), e);
-//    }
-//    for (Map.Entry<String, String> option : furtherOptionsMap.entrySet()) {
-//      try {
-//        SWIG_BitwuzlaOption bwOption = BtorOption.valueOf(option.getKey());
-//        long optionValue = Long.parseLong(option.getValue());
-//        BtorJNI.boolector_set_opt(bitwuzla, btorOption.getValue(), optionValue);
-//      } catch (IllegalArgumentException e) {
-//        throw new InvalidConfigurationException(e.getMessage(), e);
-//      }
-//    }
-//  }
+  private static void setFurtherOptions(long bitwuzla, String pFurtherOptions)
+      throws InvalidConfigurationException {
+    MapSplitter optionSplitter =
+        Splitter.on(',')
+            .trimResults()
+            .omitEmptyStrings()
+            .withKeyValueSeparator(Splitter.on('=').limit(2).trimResults());
+    ImmutableMap<String, String> furtherOptionsMap;
+
+    try {
+      furtherOptionsMap = ImmutableMap.copyOf(optionSplitter.split(pFurtherOptions));
+    } catch (IllegalArgumentException e) {
+      throw new InvalidConfigurationException(
+          "Invalid Bitwuzla option in \"" + pFurtherOptions + "\": " + e.getMessage(), e);
+    }
+    for (Map.Entry<String, String> option : furtherOptionsMap.entrySet()) {
+      try {
+        Class<?> optionClass = SWIG_BitwuzlaOption.class;
+        Field optionField = optionClass.getField(option.getKey());
+        // Get the value of the public fields
+        SWIG_BitwuzlaOption value = (SWIG_BitwuzlaOption) optionField.get(null);
+        long optionValue = Long.parseLong(option.getValue());
+        bitwuzlaJNI.bitwuzla_set_option(bitwuzla, value.swigValue(), optionValue);
+      } catch (java.lang.NoSuchFieldException e) {
+        throw new InvalidConfigurationException(e.getMessage(), e);
+      } catch (IllegalAccessException pE) {
+        throw new RuntimeException("Problem with access to BitwuzlaOption Field", pE);
+      }
+    }
+  }
 }

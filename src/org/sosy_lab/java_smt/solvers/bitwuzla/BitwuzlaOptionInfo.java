@@ -28,7 +28,6 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
  * the SWIG interface file instead.
  * ----------------------------------------------------------------------------- */
 
-
 public class BitwuzlaOptionInfo {
   private transient long swigCPtr;
   protected transient boolean swigCMemOwn;
@@ -100,6 +99,4 @@ public class BitwuzlaOptionInfo {
   public BitwuzlaOptionInfo() {
     this(bitwuzlaJNI.new_BitwuzlaOptionInfo(), true);
   }
-
 }
-

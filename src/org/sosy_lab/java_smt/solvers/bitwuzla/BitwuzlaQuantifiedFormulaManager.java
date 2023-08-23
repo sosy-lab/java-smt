@@ -26,9 +26,10 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
-public class BitwuzlaQuantifiedFormulaManager extends
-                                              AbstractQuantifiedFormulaManager<Long, Long, Long, Long> {
+public class BitwuzlaQuantifiedFormulaManager
+    extends AbstractQuantifiedFormulaManager<Long, Long, Long, Long> {
   private final long bitwuzla;
+
   protected BitwuzlaQuantifiedFormulaManager(FormulaCreator<Long, Long, Long, Long> pCreator) {
     super(pCreator);
     bitwuzla = getFormulaCreator().getEnv();
@@ -42,14 +43,18 @@ public class BitwuzlaQuantifiedFormulaManager extends
 
   @Override
   public Long mkQuantifier(Quantifier q, List<Long> vars, Long body) {
-    long[] argsAndBody = LongStream.concat(vars.stream().mapToLong(Long::longValue),
-        LongStream.of(body)).toArray();
+    long[] argsAndBody =
+        LongStream.concat(vars.stream().mapToLong(Long::longValue), LongStream.of(body)).toArray();
     if (q.equals(Quantifier.FORALL)) {
-      return bitwuzlaJNI.bitwuzla_mk_term(bitwuzla,
-          SWIG_BitwuzlaKind.BITWUZLA_KIND_FORALL.swigValue(), argsAndBody.length, argsAndBody);
+      return bitwuzlaJNI.bitwuzla_mk_term(
+          SWIG_BitwuzlaKind.BITWUZLA_KIND_FORALL.swigValue(),
+          argsAndBody.length,
+          argsAndBody);
     } else {
-      return bitwuzlaJNI.bitwuzla_mk_term(bitwuzla,
-          SWIG_BitwuzlaKind.BITWUZLA_KIND_EXISTS.swigValue(), argsAndBody.length, argsAndBody);
+      return bitwuzlaJNI.bitwuzla_mk_term(
+          SWIG_BitwuzlaKind.BITWUZLA_KIND_EXISTS.swigValue(),
+          argsAndBody.length,
+          argsAndBody);
     }
   }
 }
