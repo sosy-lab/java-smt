@@ -125,7 +125,6 @@ public class OptionValueUnsignedInt {
       private final String swigName;
 
       public Kind(String swigName) {
-        ;
         this.swigName = swigName;
         this.swigValue = swigNext;
         incrementSwigNext();

@@ -16,7 +16,6 @@
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
 import javax.annotation.concurrent.NotThreadSafe;
-import org.sosy_lab.java_smt.solvers.dreal4.drealjni.OptionValueDouble.Type;
 
 @NotThreadSafe
 public class OptionValueInt {
@@ -129,7 +128,6 @@ public class OptionValueInt {
       private final String swigName;
 
       public Kind(String swigName) {
-        ;
         this.swigName = swigName;
         this.swigValue = swigNext;
         incrementSwigNext();

@@ -32,6 +32,11 @@ public final class Logic {
   };
   private static int swigNext = 0;
 
+  @SuppressWarnings("unused")
+  private Logic() {
+    throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
+  }
+
   public static Logic.LogicType swigToEnum(int swigValue) {
     if (swigValue < swigValues.length
         && swigValue >= 0
