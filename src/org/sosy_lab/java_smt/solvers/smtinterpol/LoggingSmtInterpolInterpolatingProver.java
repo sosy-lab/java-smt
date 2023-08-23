@@ -60,7 +60,7 @@ class LoggingSmtInterpolInterpolatingProver extends SmtInterpolInterpolatingProv
   }
 
   @Override
-  public void push() {
+  public void push() throws InterruptedException {
     out.println("(push 1)");
     super.push();
   }
@@ -72,7 +72,7 @@ class LoggingSmtInterpolInterpolatingProver extends SmtInterpolInterpolatingProv
   }
 
   @Override
-  public String addConstraint(BooleanFormula f) {
+  public String addConstraint(BooleanFormula f) throws InterruptedException {
     String result = super.addConstraint(f);
     out.println("(assert (! " + f + " :named " + result + "))");
     return result;

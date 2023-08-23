@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
+import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
@@ -43,8 +44,9 @@ public class SolverStackTest extends SolverBasedTest0 {
   public static List<Object[]> getAllCombinations() {
     List<Object[]> result = new ArrayList<>();
     for (Solvers solver : Solvers.values()) {
-      result.add(new Object[] {solver, false});
-      result.add(new Object[] {solver, true});
+      for (String kind : new String[] {"default", "optimize", "interpolation"}) {
+        result.add(new Object[] {solver, kind});
+      }
     }
     return result;
   }
@@ -58,15 +60,19 @@ public class SolverStackTest extends SolverBasedTest0 {
   }
 
   @Parameter(1)
-  public boolean useInterpolatingEnvironment;
+  public String kind;
 
   /** Generate a prover environment depending on the parameter above. */
   private BasicProverEnvironment<?> newEnvironmentForTest(ProverOptions... options) {
-    if (useInterpolatingEnvironment) {
-      requireInterpolation();
-      return context.newProverEnvironmentWithInterpolation(options);
-    } else {
-      return context.newProverEnvironment(options);
+    switch (kind) {
+      case "optimize":
+        requireOptimization();
+        return context.newOptimizationProverEnvironment(options);
+      case "interpolation":
+        requireInterpolation();
+        return context.newProverEnvironmentWithInterpolation(options);
+      default:
+        return context.newProverEnvironment(options);
     }
   }
 
@@ -346,15 +352,19 @@ public class SolverStackTest extends SolverBasedTest0 {
 
     BasicProverEnvironment<?> stack = newEnvironmentForTest(ProverOptions.GENERATE_MODELS);
 
+    assertEquals(0, stack.size());
     stack.push();
+    assertEquals(1, stack.size());
     BooleanFormula q1 = bmgr.makeVariable("q");
     stack.addConstraint(q1);
     assertThat(stack).isSatisfiable();
     Model m1 = stack.getModel();
     assertThat(m1).isNotEmpty();
     stack.pop();
+    assertEquals(0, stack.size());
 
     stack.push();
+    assertEquals(1, stack.size());
     BooleanFormula q2 = bmgr.makeVariable("q");
     assertThat(q2).isEqualTo(q1);
     stack.addConstraint(q1);
@@ -362,6 +372,7 @@ public class SolverStackTest extends SolverBasedTest0 {
     Model m2 = stack.getModel();
     assertThat(m2).isNotEmpty();
     stack.pop();
+    assertEquals(0, stack.size());
   }
 
   @Test
@@ -403,6 +414,7 @@ public class SolverStackTest extends SolverBasedTest0 {
     BooleanFormula a = bmgr.makeVariable("bool_a");
 
     try (BasicProverEnvironment<?> stack = newEnvironmentForTest()) {
+      assertThat(stack.size()).isEqualTo(0);
       stack.push(a);
       assertThat(stack.size()).isEqualTo(1);
       assertThat(stack).isSatisfiable();

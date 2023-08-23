@@ -22,6 +22,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_last_error_message;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_num_backtrack_points;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_pop_backtrack_point;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_push_backtrack_point;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_option_checked;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_get_arg;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_boolean_constant;
@@ -58,7 +59,6 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   private final long curConfig;
   private final long terminationTest;
   protected final Mathsat5FormulaCreator creator;
-  protected boolean closed = false;
   private final ShutdownNotifier shutdownNotifier;
 
   protected Mathsat5AbstractProver(
@@ -150,16 +150,29 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   }
 
   @Override
+  public void push() throws InterruptedException {
+    Preconditions.checkState(!closed);
+    msat_push_backtrack_point(curEnv);
+    super.push();
+  }
+
+  @Override
   public void pop() {
     Preconditions.checkState(!closed);
     closeAllEvaluators();
     msat_pop_backtrack_point(curEnv);
+    super.pop();
   }
 
   @Override
   public int size() {
     Preconditions.checkState(!closed);
-    return msat_num_backtrack_points(curEnv);
+    Preconditions.checkState(
+        msat_num_backtrack_points(curEnv) == super.size(),
+        "prover-size %s does not match stack-size %s",
+        msat_num_backtrack_points(curEnv),
+        super.size());
+    return super.size();
   }
 
   @Override
@@ -207,9 +220,12 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
       msat_destroy_env(curEnv);
       msat_free_termination_callback(terminationTest);
       msat_destroy_config(curConfig);
-      closed = true;
     }
     super.close();
+  }
+
+  protected boolean isClosed() {
+    return closed;
   }
 
   @Override
