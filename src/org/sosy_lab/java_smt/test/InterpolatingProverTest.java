@@ -987,6 +987,43 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     }
   }
 
+  @Test
+  @Ignore
+  public <T> void testTrivialInterpolation() throws InterruptedException, SolverException {
+    requireInterpolation();
+    InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
+    IntegerFormula zero = imgr.makeNumber(0);
+    IntegerFormula one = imgr.makeNumber(1);
+
+    IntegerFormula a = imgr.makeVariable("a");
+
+    // build formula: 1 = A = 0
+    BooleanFormula A = bmgr.and(imgr.equal(a, zero), imgr.equal(a, one));
+
+    T p1 = stack.push(A);
+
+    assertThat(stack).isUnsatisfiable();
+
+    BooleanFormula interpol1 = stack.getInterpolant(ImmutableList.of(p1));
+
+    stack.pop();
+
+    IntegerFormula b = imgr.makeVariable("b");
+
+    BooleanFormula B1 = bmgr.and(imgr.equal(b, zero));
+    BooleanFormula B2 = bmgr.and(imgr.lessThan(b, zero), imgr.lessThan(one, b));
+
+    T p2 = stack.push(B1);
+    stack.push(B2);
+
+    assertThat(stack).isUnsatisfiable();
+
+    BooleanFormula interpol2 = stack.getInterpolant(ImmutableList.of(p2));
+
+    assertThatFormula(interpol1).isEqualTo(bmgr.makeFalse());
+    assertThatFormula(interpol2).isEqualTo(bmgr.makeTrue());
+  }
+
   private void checkItpSequence(List<BooleanFormula> formulas, List<BooleanFormula> itps)
       throws SolverException, InterruptedException {
 

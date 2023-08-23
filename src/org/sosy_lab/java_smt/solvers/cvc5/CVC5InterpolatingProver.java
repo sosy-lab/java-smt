@@ -79,7 +79,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     // formulasOfB := assertedFormulas - pFormulasOfA
     Set<Term> formulasOfB =
         getAssertedFormulas().stream()
-            .<Term>flatMap(c -> c.stream())
+            .<Term>map(n -> creator.extractInfo(n))
             .filter(n -> !pFormulasOfA.contains(n))
             .collect(ImmutableSet.toImmutableSet());
 
