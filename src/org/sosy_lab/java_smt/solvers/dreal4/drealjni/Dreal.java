@@ -780,7 +780,8 @@ public final class Dreal {
     return RelationalOperator.swigToEnum(DrealJNI.not(op.swigValue()));
   }
 
-  public static SwigTypePStdOstream insertOperator(SwigTypePStdOstream os, RelationalOperator.Type op) {
+  public static SwigTypePStdOstream insertOperator(
+      SwigTypePStdOstream os, RelationalOperator.Type op) {
     return new SwigTypePStdOstream(
         DrealJNI.insertOperatorSWIG6(SwigTypePStdOstream.getCPtr(os), op.swigValue()), false);
   }

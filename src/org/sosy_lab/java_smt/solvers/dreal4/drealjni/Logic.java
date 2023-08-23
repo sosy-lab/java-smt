@@ -28,7 +28,7 @@ public final class Logic {
   public static final Logic.LogicType QF_NRAT = new Logic.LogicType("QF_NRAT");
   public static final Logic.LogicType QF_RDL = new Logic.LogicType("QF_RDL");
   private static Logic.LogicType[] swigValues = {
-      ALL, QF_LIA, QF_LIRA, QF_LRA, QF_NIA, QF_NIAT, QF_NIRA, QF_NIRAT, QF_NRA, QF_NRAT, QF_RDL,
+    ALL, QF_LIA, QF_LIRA, QF_LRA, QF_NIA, QF_NIAT, QF_NIRA, QF_NIRAT, QF_NRA, QF_NRAT, QF_RDL,
   };
   private static int swigNext = 0;
 
@@ -43,21 +43,24 @@ public final class Logic {
         return swigValues[i];
       }
     }
-    throw new IllegalArgumentException("No enum " + Logic.LogicType.class + " with value " + swigValue);
+    throw new IllegalArgumentException(
+        "No enum " + Logic.LogicType.class + " with value " + swigValue);
   }
-
 
   public static class LogicType {
     private final int swigValue;
     private final String swigName;
+
     public LogicType(String swigName) {
       this.swigName = swigName;
       this.swigValue = swigNext;
       incrementSwigNext();
     }
+
     private void incrementSwigNext() {
       swigNext++;
     }
+
     public int swigValue() {
       return this.swigValue;
     }
@@ -68,4 +71,3 @@ public final class Logic {
     }
   }
 }
-

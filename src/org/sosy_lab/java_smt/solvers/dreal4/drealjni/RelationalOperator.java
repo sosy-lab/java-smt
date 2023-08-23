@@ -39,6 +39,7 @@ public final class RelationalOperator {
     throw new IllegalArgumentException(
         "No enum " + RelationalOperator.Type.class + " with value " + swigValue);
   }
+
   public static class Type {
 
     private final int swigValue;

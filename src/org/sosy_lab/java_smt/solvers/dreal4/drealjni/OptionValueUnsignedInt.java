@@ -105,6 +105,7 @@ public class OptionValueUnsignedInt {
         new OptionValueUnsignedInt.Type.Kind("FROM_CODE");
     private static Type.Kind[] swigValues = {DEFAULT, FROM_FILE, FROM_COMMAND_LINE, FROM_CODE};
     private static int swigNext = 0;
+
     public static Type.Kind swigToEnum(int swigValue) {
       if (swigValue < swigValues.length
           && swigValue >= 0
@@ -118,6 +119,7 @@ public class OptionValueUnsignedInt {
       }
       throw new IllegalArgumentException("No enum " + Type.Kind.class + " with value " + swigValue);
     }
+
     public static class Kind {
       private final int swigValue;
       private final String swigName;

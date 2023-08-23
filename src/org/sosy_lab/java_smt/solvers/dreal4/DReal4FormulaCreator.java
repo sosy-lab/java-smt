@@ -677,7 +677,9 @@ public class DReal4FormulaCreator
       return new DRealTerm<>(new Variable(), pDRealTerm.getType(), pDRealTerm.getType());
     } else if (pDRealTerm.isExp()) {
       return new DRealTerm<>(
-          new Expression(), pDRealTerm.getType(), (ExpressionKind.ExpressionType) pDRealTerm.getDeclaration());
+          new Expression(),
+          pDRealTerm.getType(),
+          (ExpressionKind.ExpressionType) pDRealTerm.getDeclaration());
     } else {
       return new DRealTerm<>(
           new org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula(),

@@ -100,10 +100,12 @@ public class OptionValueInt {
 
   public static final class Type {
     public static final OptionValueInt.Type.Kind DEFAULT = new OptionValueInt.Type.Kind("DEFAULT");
-    public static final OptionValueInt.Type.Kind FROM_FILE = new OptionValueInt.Type.Kind("FROM_FILE");
+    public static final OptionValueInt.Type.Kind FROM_FILE =
+        new OptionValueInt.Type.Kind("FROM_FILE");
     public static final OptionValueInt.Type.Kind FROM_COMMAND_LINE =
         new OptionValueInt.Type.Kind("FROM_COMMAND_LINE");
-    public static final OptionValueInt.Type.Kind FROM_CODE = new OptionValueInt.Type.Kind("FROM_CODE");
+    public static final OptionValueInt.Type.Kind FROM_CODE =
+        new OptionValueInt.Type.Kind("FROM_CODE");
 
     private static Type.Kind[] swigValues = {DEFAULT, FROM_FILE, FROM_COMMAND_LINE, FROM_CODE};
     private static int swigNext = 0;

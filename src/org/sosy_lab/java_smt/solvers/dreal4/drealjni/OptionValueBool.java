@@ -99,11 +99,14 @@ public class OptionValueBool {
   }
 
   public static final class Type {
-    public static final OptionValueBool.Type.Kind DEFAULT = new OptionValueBool.Type.Kind("DEFAULT");
-    public static final OptionValueBool.Type.Kind FROM_FILE = new OptionValueBool.Type.Kind("FROM_FILE");
+    public static final OptionValueBool.Type.Kind DEFAULT =
+        new OptionValueBool.Type.Kind("DEFAULT");
+    public static final OptionValueBool.Type.Kind FROM_FILE =
+        new OptionValueBool.Type.Kind("FROM_FILE");
     public static final OptionValueBool.Type.Kind FROM_COMMAND_LINE =
         new OptionValueBool.Type.Kind("FROM_COMMAND_LINE");
-    public static final OptionValueBool.Type.Kind FROM_CODE = new OptionValueBool.Type.Kind("FROM_CODE");
+    public static final OptionValueBool.Type.Kind FROM_CODE =
+        new OptionValueBool.Type.Kind("FROM_CODE");
     private static Type.Kind[] swigValues = {DEFAULT, FROM_FILE, FROM_COMMAND_LINE, FROM_CODE};
     private static int swigNext = 0;
 
@@ -120,6 +123,7 @@ public class OptionValueBool {
       }
       throw new IllegalArgumentException("No enum " + Type.class + " with value " + swigValue);
     }
+
     public static class Kind {
       private final int swigValue;
       private final String swigName;
