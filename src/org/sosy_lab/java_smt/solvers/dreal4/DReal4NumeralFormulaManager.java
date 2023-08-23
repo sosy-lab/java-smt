@@ -27,7 +27,7 @@ public abstract class DReal4NumeralFormulaManager<
         ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
     extends AbstractNumeralFormulaManager<
         DRealTerm<?, ?>,
-        Variable.Type,
+        Variable.Type.Kind,
         Config,
         ParamFormulaType,
         ResultFormulaType,
@@ -48,19 +48,19 @@ public abstract class DReal4NumeralFormulaManager<
   }
 
   @Override
-  protected DRealTerm<Expression, ExpressionKind> makeNumberImpl(long i) {
+  protected DRealTerm<Expression, ExpressionKind.ExpressionType> makeNumberImpl(long i) {
     return new DRealTerm<>(new Expression(i), getNumeralType(), ExpressionKind.CONSTANT);
   }
 
   // makeNumberImpl with BigInteger to create a constant in an integerFormula can cause a
   // problem, because dReal can not handle BigInteger in integer formulas, only in real formulas.
   @Override
-  protected DRealTerm<Expression, ExpressionKind> makeNumberImpl(BigInteger i) {
+  protected DRealTerm<Expression, ExpressionKind.ExpressionType> makeNumberImpl(BigInteger i) {
     return makeNumberImpl(i.toString());
   }
 
   @Override
-  protected DRealTerm<Expression, ExpressionKind> makeNumberImpl(String i) {
+  protected DRealTerm<Expression, ExpressionKind.ExpressionType> makeNumberImpl(String i) {
     double d;
     if (i.contains("/")) {
       String[] rat = i.split("/", -1);
@@ -72,15 +72,16 @@ public abstract class DReal4NumeralFormulaManager<
     return new DRealTerm<>(new Expression(d), getNumeralType(), ExpressionKind.CONSTANT);
   }
 
-  protected abstract Variable.Type getNumeralType();
+  protected abstract Variable.Type.Kind getNumeralType();
 
   @Override
-  protected DRealTerm<Expression, ExpressionKind> makeNumberImpl(double pNumber) {
+  protected DRealTerm<Expression, ExpressionKind.ExpressionType> makeNumberImpl(double pNumber) {
     return new DRealTerm<>(new Expression(pNumber), getNumeralType(), ExpressionKind.CONSTANT);
   }
 
   @Override
-  protected DRealTerm<Expression, ExpressionKind> makeNumberImpl(BigDecimal pNumber) {
+  protected DRealTerm<Expression, ExpressionKind.ExpressionType> makeNumberImpl(
+      BigDecimal pNumber) {
     return makeNumberImpl(pNumber.toString());
   }
 
@@ -90,7 +91,7 @@ public abstract class DReal4NumeralFormulaManager<
   }
 
   @Override
-  protected DRealTerm<Expression, ExpressionKind> negate(DRealTerm<?, ?> pParam1) {
+  protected DRealTerm<Expression, ExpressionKind.ExpressionType> negate(DRealTerm<?, ?> pParam1) {
     // Only Expression or Variables are expected
     Preconditions.checkState(pParam1.isVar() || pParam1.isExp());
     if (pParam1.isVar()) {
@@ -107,7 +108,7 @@ public abstract class DReal4NumeralFormulaManager<
   }
 
   @Override
-  protected DRealTerm<Expression, ExpressionKind> add(
+  protected DRealTerm<Expression, ExpressionKind.ExpressionType> add(
       DRealTerm<?, ?> pParam1, DRealTerm<?, ?> pParam2) {
     if (pParam1.isExp() && pParam2.isExp()) {
       return new DRealTerm<>(
@@ -136,7 +137,7 @@ public abstract class DReal4NumeralFormulaManager<
   }
 
   @Override
-  protected DRealTerm<Expression, ExpressionKind> subtract(
+  protected DRealTerm<Expression, ExpressionKind.ExpressionType> subtract(
       DRealTerm<?, ?> pParam1, DRealTerm<?, ?> pParam2) {
     if (pParam1.isExp() && pParam2.isExp()) {
       return new DRealTerm<>(
@@ -166,7 +167,7 @@ public abstract class DReal4NumeralFormulaManager<
   }
 
   @Override
-  public DRealTerm<Expression, ExpressionKind> multiply(
+  public DRealTerm<Expression, ExpressionKind.ExpressionType> multiply(
       DRealTerm<?, ?> pParam1, DRealTerm<?, ?> pParam2) {
     if (pParam1.isExp() && pParam2.isExp()) {
       return new DRealTerm<>(
@@ -197,7 +198,7 @@ public abstract class DReal4NumeralFormulaManager<
 
   // only use Equal(Expression exp1, Expression exp2), Equal with Formulas is same as iff
   @Override
-  protected DRealTerm<Formula, FormulaKind> equal(
+  protected DRealTerm<Formula, FormulaKind.FormulaType> equal(
       DRealTerm<?, ?> pParam1, DRealTerm<?, ?> pParam2) {
     if (pParam1.isExp() && pParam2.isExp()) {
       return new DRealTerm<>(
@@ -226,7 +227,8 @@ public abstract class DReal4NumeralFormulaManager<
   }
 
   @Override
-  protected DRealTerm<Formula, FormulaKind> distinctImpl(List<DRealTerm<?, ?>> pNumbers) {
+  protected DRealTerm<Formula, FormulaKind.FormulaType> distinctImpl(
+      List<DRealTerm<?, ?>> pNumbers) {
     // dReal does not directly support this method, so we need to build the whole term
     Formula andFormula = helperFunction(pNumbers.get(1), pNumbers.get(0));
     for (int i = 2; i < pNumbers.size(); i++) {
@@ -253,7 +255,7 @@ public abstract class DReal4NumeralFormulaManager<
   }
 
   @Override
-  protected DRealTerm<Formula, FormulaKind> greaterThan(
+  protected DRealTerm<Formula, FormulaKind.FormulaType> greaterThan(
       DRealTerm<?, ?> pParam1, DRealTerm<?, ?> pParam2) {
     if (pParam1.isVar() && pParam2.isVar()) {
       return new DRealTerm<>(
@@ -283,7 +285,7 @@ public abstract class DReal4NumeralFormulaManager<
   }
 
   @Override
-  protected DRealTerm<Formula, FormulaKind> greaterOrEquals(
+  protected DRealTerm<Formula, FormulaKind.FormulaType> greaterOrEquals(
       DRealTerm<?, ?> pParam1, DRealTerm<?, ?> pParam2) {
     if (pParam1.isVar() && pParam2.isVar()) {
       return new DRealTerm<>(
@@ -313,7 +315,7 @@ public abstract class DReal4NumeralFormulaManager<
   }
 
   @Override
-  protected DRealTerm<Formula, FormulaKind> lessThan(
+  protected DRealTerm<Formula, FormulaKind.FormulaType> lessThan(
       DRealTerm<?, ?> pParam1, DRealTerm<?, ?> pParam2) {
     if (pParam1.isVar() && pParam2.isVar()) {
       return new DRealTerm<>(
@@ -342,7 +344,7 @@ public abstract class DReal4NumeralFormulaManager<
   }
 
   @Override
-  protected DRealTerm<Formula, FormulaKind> lessOrEquals(
+  protected DRealTerm<Formula, FormulaKind.FormulaType> lessOrEquals(
       DRealTerm<?, ?> pParam1, DRealTerm<?, ?> pParam2) {
     if (pParam1.isVar() && pParam2.isVar()) {
       return new DRealTerm<>(

@@ -22,10 +22,11 @@ import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variables;
 
 public class DReal4QuantifiedFormulaManager
     extends AbstractQuantifiedFormulaManager<
-        DRealTerm<?, ?>, Variable.Type, Config, DRealTerm<?, ?>> {
+        DRealTerm<?, ?>, Variable.Type.Kind, Config, DRealTerm<?, ?>> {
 
   protected DReal4QuantifiedFormulaManager(
-      FormulaCreator<DRealTerm<?, ?>, Variable.Type, Config, DRealTerm<?, ?>> pFormulaCreator) {
+      FormulaCreator<DRealTerm<?, ?>, Variable.Type.Kind, Config, DRealTerm<?, ?>>
+          pFormulaCreator) {
     super(pFormulaCreator);
   }
 
@@ -40,7 +41,7 @@ public class DReal4QuantifiedFormulaManager
   // it is not allowed to create a quantifier with a boolean Variable, because if Unsat would be
   // called, an error would be created
   @Override
-  public DRealTerm<Formula, FormulaKind> mkQuantifier(
+  public DRealTerm<Formula, FormulaKind.FormulaType> mkQuantifier(
       Quantifier pQ, List<DRealTerm<?, ?>> pVars, DRealTerm<?, ?> pBody) {
     Preconditions.checkArgument(!pVars.isEmpty(), "Empty variable list for quantifier.");
     // create Variables from pVars to create forall formula

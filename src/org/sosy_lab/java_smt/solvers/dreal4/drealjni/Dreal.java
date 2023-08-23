@@ -27,7 +27,8 @@ public final class Dreal {
         false);
   }
 
-  public static SwigTypePStdOstream insertOperator(SwigTypePStdOstream os, Variable.Type type) {
+  public static SwigTypePStdOstream insertOperator(
+      SwigTypePStdOstream os, Variable.Type.Kind type) {
     return new SwigTypePStdOstream(
         DrealJNI.insertOperatorSWIG1(SwigTypePStdOstream.getCPtr(os), type.swigValue()), false);
   }
@@ -109,7 +110,7 @@ public final class Dreal {
         false);
   }
 
-  public static boolean less(ExpressionKind k1, ExpressionKind k2) {
+  public static boolean less(ExpressionKind.ExpressionType k1, ExpressionKind.ExpressionType k2) {
     return DrealJNI.lessSWIG1(k1.swigValue(), k2.swigValue());
   }
 
@@ -468,7 +469,7 @@ public final class Dreal {
     return new Expression(DrealJNI.substractSWIG8(Variable.getCPtr(var), var), true);
   }
 
-  public static boolean less(FormulaKind k1, FormulaKind k2) {
+  public static boolean less(FormulaKind.FormulaType k1, FormulaKind.FormulaType k2) {
     return DrealJNI.lessSWIG2(k1.swigValue(), k2.swigValue());
   }
 
@@ -767,7 +768,7 @@ public final class Dreal {
     return new Formula(DrealJNI.makeDisjunction(FormulaVector.getCPtr(formulas), formulas), true);
   }
 
-  public static VariableVector createVector(String prefix, int size, Variable.Type type) {
+  public static VariableVector createVector(String prefix, int size, Variable.Type.Kind type) {
     return new VariableVector(DrealJNI.createVectorSWIG0(prefix, size, type.swigValue()), true);
   }
 
@@ -775,20 +776,20 @@ public final class Dreal {
     return new VariableVector(DrealJNI.createVectorSWIG1(prefix, size), true);
   }
 
-  public static RelationalOperator not(RelationalOperator op) {
+  public static RelationalOperator.Type not(RelationalOperator.Type op) {
     return RelationalOperator.swigToEnum(DrealJNI.not(op.swigValue()));
   }
 
-  public static SwigTypePStdOstream insertOperator(SwigTypePStdOstream os, RelationalOperator op) {
+  public static SwigTypePStdOstream insertOperator(SwigTypePStdOstream os, RelationalOperator.Type op) {
     return new SwigTypePStdOstream(
         DrealJNI.insertOperatorSWIG6(SwigTypePStdOstream.getCPtr(os), op.swigValue()), false);
   }
 
-  public static Logic parseLogic(String s) {
+  public static Logic.LogicType parseLogic(String s) {
     return Logic.swigToEnum(DrealJNI.parseLogic(s));
   }
 
-  public static SwigTypePStdOstream insertOperator(SwigTypePStdOstream os, Logic logic) {
+  public static SwigTypePStdOstream insertOperator(SwigTypePStdOstream os, Logic.LogicType logic) {
     return new SwigTypePStdOstream(
         DrealJNI.insertOperatorSWIG7(SwigTypePStdOstream.getCPtr(os), logic.swigValue()), false);
   }

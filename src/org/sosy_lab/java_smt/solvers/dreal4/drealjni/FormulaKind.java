@@ -16,68 +16,62 @@
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
 public final class FormulaKind {
-  public static final FormulaKind FALSE = new FormulaKind("False");
-  public static final FormulaKind TRUE = new FormulaKind("True");
-  public static final FormulaKind VAR = new FormulaKind("Var");
-  public static final FormulaKind EQ = new FormulaKind("Eq");
-  public static final FormulaKind NEQ = new FormulaKind("Neq");
-  public static final FormulaKind GT = new FormulaKind("Gt");
-  public static final FormulaKind GEQ = new FormulaKind("Geq");
-  public static final FormulaKind LT = new FormulaKind("Lt");
-  public static final FormulaKind LEQ = new FormulaKind("Leq");
-  public static final FormulaKind AND = new FormulaKind("And");
-  public static final FormulaKind OR = new FormulaKind("Or");
-  public static final FormulaKind NOT = new FormulaKind("Not");
-  public static final FormulaKind FORALL = new FormulaKind("Forall");
+  public static final FormulaKind.FormulaType FALSE = new FormulaKind.FormulaType("False");
+  public static final FormulaKind.FormulaType TRUE = new FormulaKind.FormulaType("True");
+  public static final FormulaKind.FormulaType VAR = new FormulaKind.FormulaType("Var");
+  public static final FormulaKind.FormulaType EQ = new FormulaKind.FormulaType("Eq");
+  public static final FormulaKind.FormulaType NEQ = new FormulaKind.FormulaType("Neq");
+  public static final FormulaKind.FormulaType GT = new FormulaKind.FormulaType("Gt");
+  public static final FormulaKind.FormulaType GEQ = new FormulaKind.FormulaType("Geq");
+  public static final FormulaKind.FormulaType LT = new FormulaKind.FormulaType("Lt");
+  public static final FormulaKind.FormulaType LEQ = new FormulaKind.FormulaType("Leq");
+  public static final FormulaKind.FormulaType AND = new FormulaKind.FormulaType("And");
+  public static final FormulaKind.FormulaType OR = new FormulaKind.FormulaType("Or");
+  public static final FormulaKind.FormulaType NOT = new FormulaKind.FormulaType("Not");
+  public static final FormulaKind.FormulaType FORALL = new FormulaKind.FormulaType("Forall");
+  private static FormulaKind.FormulaType[] swigValues = {
+    FALSE, TRUE, VAR, EQ, NEQ, GT, GEQ, LT, LEQ, AND, OR, NOT, FORALL,
+  };
+  private static int swigNext = 0;
 
-  public int swigValue() {
-    return swigValue;
-  }
-
-  @Override
-  public String toString() {
-    return swigName;
-  }
-
-  public static FormulaKind swigToEnum(int swigValue) {
+  public static FormulaKind.FormulaType swigToEnum(int swigValue) {
     if (swigValue < swigValues.length
         && swigValue >= 0
-        && swigValues[swigValue].swigValue == swigValue) {
+        && swigValues[swigValue].swigValue() == swigValue) {
       return swigValues[swigValue];
     }
     for (int i = 0; i < swigValues.length; i++) {
       {
-        if (swigValues[i].swigValue == swigValue) {
+        if (swigValues[i].swigValue() == swigValue) {
           return swigValues[i];
         }
       }
     }
-    throw new IllegalArgumentException("No enum " + FormulaKind.class + " with value " + swigValue);
+    throw new IllegalArgumentException(
+        "No enum " + FormulaKind.FormulaType.class + " with value " + swigValue);
   }
 
-  private FormulaKind(String swigName) {
-    this.swigName = swigName;
-    this.swigValue = swigNext++;
-  }
+  public static class FormulaType {
+    private final int swigValue;
+    private final String swigName;
 
-  @SuppressWarnings({"unused", "StaticAssignmentInConstructor"})
-  private FormulaKind(String swigName, int swigValue) {
-    this.swigName = swigName;
-    this.swigValue = swigValue;
-    swigNext = swigValue + 1;
-  }
+    public FormulaType(String swigName) {
+      this.swigName = swigName;
+      this.swigValue = swigNext;
+      incrementSwigNext();
+    }
 
-  @SuppressWarnings({"unused", "StaticAssignmentInConstructor"})
-  private FormulaKind(String swigName, FormulaKind swigEnum) {
-    this.swigName = swigName;
-    this.swigValue = swigEnum.swigValue;
-    swigNext = this.swigValue + 1;
-  }
+    private void incrementSwigNext() {
+      swigNext++;
+    }
 
-  private static FormulaKind[] swigValues = {
-    FALSE, TRUE, VAR, EQ, NEQ, GT, GEQ, LT, LEQ, AND, OR, NOT, FORALL,
-  };
-  private static int swigNext = 0;
-  private final int swigValue;
-  private final String swigName;
+    public int swigValue() {
+      return this.swigValue;
+    }
+
+    @Override
+    public String toString() {
+      return this.swigName;
+    }
+  }
 }

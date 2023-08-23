@@ -13,7 +13,7 @@ import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Config;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable;
 
 public class DReal4UFManager
-    extends AbstractUFManager<DRealTerm<?, ?>, DRealTerm<?, ?>, Variable.Type, Config> {
+    extends AbstractUFManager<DRealTerm<?, ?>, DRealTerm<?, ?>, Variable.Type.Kind, Config> {
 
   DReal4UFManager(DReal4FormulaCreator pCreator) {
     super(pCreator);

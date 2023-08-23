@@ -28,7 +28,7 @@ import org.sosy_lab.java_smt.solvers.dreal4.drealjni.FormulaSet;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.VariableSet;
 
-public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Variable.Type, Config> {
+public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Variable.Type.Kind, Config> {
 
   private final Box model;
   private final DReal4FormulaCreator formulaCreator;
@@ -211,7 +211,7 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Variable.Type, C
     if (term.isVar()) {
       builder.add(getAssignment(term));
     } else if (term.isExp()) {
-      ExpressionKind expKind = term.getExpressionKind();
+      ExpressionKind.ExpressionType expKind = term.getExpressionKind();
       if (expKind == ExpressionKind.CONSTANT) {
         return;
       } else if (expKind == ExpressionKind.VAR) {
@@ -259,7 +259,7 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Variable.Type, C
         throw new IllegalArgumentException("Failure visiting the Term " + term + ".");
       }
     } else {
-      FormulaKind fKind = term.getFormulaKind();
+      FormulaKind.FormulaType fKind = term.getFormulaKind();
       if (fKind == FormulaKind.VAR) {
         Variable var = Dreal.getVariable(term.getFormula());
         builder.add(getAssignment(new DRealTerm<>(var, var.getType(), var.getType())));
@@ -276,7 +276,7 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Variable.Type, C
           || fKind == FormulaKind.NEQ) {
         Expression leftChild = Dreal.getLhsExpression(term.getFormula());
         Expression rightChild = Dreal.getRhsExpression(term.getFormula());
-        Variable.Type type;
+        Variable.Type.Kind type;
         type = DReal4FormulaCreator.getTypeForExpressions(leftChild);
         // if type is null, we did not find a variable in left child, we can ignore the formula,
         // else both child could have variable

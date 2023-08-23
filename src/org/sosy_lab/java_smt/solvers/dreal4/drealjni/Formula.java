@@ -76,7 +76,7 @@ public class Formula {
     this(DrealJNI.newFormulaSWIG2(Variable.getCPtr(var), var), true);
   }
 
-  public FormulaKind getKind() {
+  public FormulaKind.FormulaType getKind() {
     return FormulaKind.swigToEnum(DrealJNI.formulaGetKind(swigCPtr, this));
   }
 

@@ -22,7 +22,7 @@ import org.sosy_lab.java_smt.solvers.dreal4.drealjni.ExpressionKind;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable;
 
 public class DReal4FormulaManager
-    extends AbstractFormulaManager<DRealTerm<?, ?>, Variable.Type, Config, DRealTerm<?, ?>> {
+    extends AbstractFormulaManager<DRealTerm<?, ?>, Variable.Type.Kind, Config, DRealTerm<?, ?>> {
 
   DReal4FormulaManager(
       DReal4FormulaCreator pFormulaCreator,

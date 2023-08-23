@@ -20,7 +20,8 @@ import org.sosy_lab.java_smt.solvers.dreal4.drealjni.FormulaKind;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable;
 
 public class DReal4BooleanFormulaManager
-    extends AbstractBooleanFormulaManager<DRealTerm<?, ?>, Variable.Type, Config, DRealTerm<?, ?>> {
+    extends AbstractBooleanFormulaManager<
+        DRealTerm<?, ?>, Variable.Type.Kind, Config, DRealTerm<?, ?>> {
 
   protected DReal4BooleanFormulaManager(DReal4FormulaCreator pCreator) {
     super(pCreator);
@@ -32,7 +33,7 @@ public class DReal4BooleanFormulaManager
   }
 
   @Override
-  protected DRealTerm<Formula, FormulaKind> makeBooleanImpl(boolean value) {
+  protected DRealTerm<Formula, FormulaKind.FormulaType> makeBooleanImpl(boolean value) {
     if (value) {
       return new DRealTerm<>(Formula.formulaTrue(), Variable.Type.BOOLEAN, FormulaKind.TRUE);
     } else {
@@ -41,7 +42,7 @@ public class DReal4BooleanFormulaManager
   }
 
   @Override
-  protected DRealTerm<Formula, FormulaKind> not(DRealTerm<?, ?> pParam1) {
+  protected DRealTerm<Formula, FormulaKind.FormulaType> not(DRealTerm<?, ?> pParam1) {
     if (pParam1.isFormula()) {
       return new DRealTerm<>(
           Dreal.not(pParam1.getFormula()), Variable.Type.BOOLEAN, FormulaKind.NOT);
@@ -56,7 +57,8 @@ public class DReal4BooleanFormulaManager
   }
 
   @Override
-  protected DRealTerm<Formula, FormulaKind> and(DRealTerm<?, ?> pParam1, DRealTerm<?, ?> pParam2) {
+  protected DRealTerm<Formula, FormulaKind.FormulaType> and(
+      DRealTerm<?, ?> pParam1, DRealTerm<?, ?> pParam2) {
     if (pParam1.isVar() && pParam2.isFormula()) {
       // Only Variables with type boolean are allowed
       Preconditions.checkState(pParam1.getType() == Variable.Type.BOOLEAN);
@@ -91,7 +93,8 @@ public class DReal4BooleanFormulaManager
   }
 
   @Override
-  protected DRealTerm<Formula, FormulaKind> andImpl(Collection<DRealTerm<?, ?>> pParams) {
+  protected DRealTerm<Formula, FormulaKind.FormulaType> andImpl(
+      Collection<DRealTerm<?, ?>> pParams) {
     Formula result = Formula.formulaTrue();
     for (DRealTerm<?, ?> formula : pParams) {
       // Only Formulas or Variables of boolean type are accepted when creating an And-Formula
@@ -114,7 +117,8 @@ public class DReal4BooleanFormulaManager
   }
 
   @Override
-  protected DRealTerm<Formula, FormulaKind> or(DRealTerm<?, ?> pParam1, DRealTerm<?, ?> pParam2) {
+  protected DRealTerm<Formula, FormulaKind.FormulaType> or(
+      DRealTerm<?, ?> pParam1, DRealTerm<?, ?> pParam2) {
     if (pParam1.isVar() && pParam2.isFormula()) {
       // Only Variables with type boolean are allowed
       Preconditions.checkState(pParam1.getType() == Variable.Type.BOOLEAN);
@@ -149,7 +153,8 @@ public class DReal4BooleanFormulaManager
   }
 
   @Override
-  protected DRealTerm<Formula, FormulaKind> orImpl(Collection<DRealTerm<?, ?>> pParams) {
+  protected DRealTerm<Formula, FormulaKind.FormulaType> orImpl(
+      Collection<DRealTerm<?, ?>> pParams) {
     Formula result = Formula.formulaFalse();
     for (DRealTerm<?, ?> formula : pParams) {
       // Only Formulas or Variables of boolean type are accepted when creating an Or-Formula
@@ -173,7 +178,8 @@ public class DReal4BooleanFormulaManager
 
   // a xor b = (not(A AND B)) AND (not(not A AND not B))
   @Override
-  protected DRealTerm<Formula, FormulaKind> xor(DRealTerm<?, ?> pParam1, DRealTerm<?, ?> pParam2) {
+  protected DRealTerm<Formula, FormulaKind.FormulaType> xor(
+      DRealTerm<?, ?> pParam1, DRealTerm<?, ?> pParam2) {
     if (pParam1.isVar() && pParam2.isFormula()) {
       // Only Variables with type boolean are allowed
       Preconditions.checkState(pParam1.getType() == Variable.Type.BOOLEAN);
@@ -220,7 +226,7 @@ public class DReal4BooleanFormulaManager
   }
 
   @Override
-  protected DRealTerm<Formula, FormulaKind> equivalence(
+  protected DRealTerm<Formula, FormulaKind.FormulaType> equivalence(
       DRealTerm<?, ?> bits1, DRealTerm<?, ?> bits2) {
     if (bits1.isVar() && bits2.isFormula()) {
       // Only Variables with type boolean are allowed

@@ -85,7 +85,7 @@ public class Expression {
     this(DrealJNI.newExpressionSWIG3(Variable.getCPtr(var), var), true);
   }
 
-  public ExpressionKind getKind() {
+  public ExpressionKind.ExpressionType getKind() {
     return ExpressionKind.swigToEnum(DrealJNI.expressionGetKind(swigCPtr, this));
   }
 

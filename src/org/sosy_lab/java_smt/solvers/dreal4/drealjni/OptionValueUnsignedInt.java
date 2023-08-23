@@ -95,25 +95,17 @@ public class OptionValueUnsignedInt {
   }
 
   public static final class Type {
-    public static final OptionValueUnsignedInt.Type DEFAULT =
-        new OptionValueUnsignedInt.Type("DEFAULT");
-    public static final OptionValueUnsignedInt.Type FROM_FILE =
-        new OptionValueUnsignedInt.Type("FROM_FILE");
-    public static final OptionValueUnsignedInt.Type FROM_COMMAND_LINE =
-        new OptionValueUnsignedInt.Type("FROM_COMMAND_LINE");
-    public static final OptionValueUnsignedInt.Type FROM_CODE =
-        new OptionValueUnsignedInt.Type("FROM_CODE");
-
-    public int swigValue() {
-      return swigValue;
-    }
-
-    @Override
-    public String toString() {
-      return swigName;
-    }
-
-    public static Type swigToEnum(int swigValue) {
+    public static final OptionValueUnsignedInt.Type.Kind DEFAULT =
+        new OptionValueUnsignedInt.Type.Kind("DEFAULT");
+    public static final OptionValueUnsignedInt.Type.Kind FROM_FILE =
+        new OptionValueUnsignedInt.Type.Kind("FROM_FILE");
+    public static final OptionValueUnsignedInt.Type.Kind FROM_COMMAND_LINE =
+        new OptionValueUnsignedInt.Type.Kind("FROM_COMMAND_LINE");
+    public static final OptionValueUnsignedInt.Type.Kind FROM_CODE =
+        new OptionValueUnsignedInt.Type.Kind("FROM_CODE");
+    private static Type.Kind[] swigValues = {DEFAULT, FROM_FILE, FROM_COMMAND_LINE, FROM_CODE};
+    private static int swigNext = 0;
+    public static Type.Kind swigToEnum(int swigValue) {
       if (swigValue < swigValues.length
           && swigValue >= 0
           && swigValues[swigValue].swigValue == swigValue) {
@@ -124,31 +116,31 @@ public class OptionValueUnsignedInt {
           return swigValues[i];
         }
       }
-      throw new IllegalArgumentException("No enum " + Type.class + " with value " + swigValue);
+      throw new IllegalArgumentException("No enum " + Type.Kind.class + " with value " + swigValue);
     }
+    public static class Kind {
+      private final int swigValue;
+      private final String swigName;
 
-    private Type(String swigName) {
-      this.swigName = swigName;
-      this.swigValue = swigNext++;
+      public Kind(String swigName) {
+        ;
+        this.swigName = swigName;
+        this.swigValue = swigNext;
+        incrementSwigNext();
+      }
+
+      private void incrementSwigNext() {
+        swigNext++;
+      }
+
+      public int swigValue() {
+        return this.swigValue;
+      }
+
+      @Override
+      public String toString() {
+        return this.swigName;
+      }
     }
-
-    @SuppressWarnings({"unused", "StaticAssignmentInConstructor"})
-    private Type(String swigName, int swigValue) {
-      this.swigName = swigName;
-      this.swigValue = swigValue;
-      swigNext = swigValue + 1;
-    }
-
-    @SuppressWarnings({"unused", "StaticAssignmentInConstructor"})
-    private Type(String swigName, Type swigEnum) {
-      this.swigName = swigName;
-      this.swigValue = swigEnum.swigValue;
-      swigNext = this.swigValue + 1;
-    }
-
-    private static Type[] swigValues = {DEFAULT, FROM_FILE, FROM_COMMAND_LINE, FROM_CODE};
-    private static int swigNext = 0;
-    private final int swigValue;
-    private final String swigName;
   }
 }

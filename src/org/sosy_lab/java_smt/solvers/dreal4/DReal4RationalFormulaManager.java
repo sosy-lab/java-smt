@@ -27,12 +27,12 @@ public class DReal4RationalFormulaManager
   }
 
   @Override
-  protected Variable.Type getNumeralType() {
+  protected Variable.Type.Kind getNumeralType() {
     return getFormulaCreator().getRationalType();
   }
 
   @Override
-  public DRealTerm<Expression, ExpressionKind> divide(
+  public DRealTerm<Expression, ExpressionKind.ExpressionType> divide(
       DRealTerm<?, ?> pParam1, DRealTerm<?, ?> pParam2) {
     if (pParam1.isExp() && pParam2.isExp()) {
       if (pParam1.getExpressionKind() == ExpressionKind.CONSTANT

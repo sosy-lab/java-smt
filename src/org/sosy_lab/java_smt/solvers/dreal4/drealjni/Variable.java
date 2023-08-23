@@ -72,7 +72,7 @@ public class Variable {
     this(DrealJNI.newVariableSWIG1(), true);
   }
 
-  public Variable(String name, Variable.Type type) {
+  public Variable(String name, Variable.Type.Kind type) {
     this(DrealJNI.newVariableSWIG2(name, type.swigValue()), true);
   }
 
@@ -80,7 +80,7 @@ public class Variable {
     this(DrealJNI.newVariableSWIG3(name), true);
   }
 
-  public Variable(String name, Variable.Type type, boolean modelVariable) {
+  public Variable(String name, Variable.Type.Kind type, boolean modelVariable) {
     this(DrealJNI.newVariableSWIG4(name, type.swigValue(), modelVariable), true);
   }
 
@@ -92,7 +92,7 @@ public class Variable {
     return DrealJNI.variableGetId(swigCPtr, this);
   }
 
-  public Variable.Type getType() {
+  public Variable.Type.Kind getType() {
     return Variable.Type.swigToEnum(DrealJNI.variableGetType(swigCPtr, this));
   }
 
@@ -118,56 +118,49 @@ public class Variable {
   }
 
   public static final class Type {
-    public static final Variable.Type CONTINUOUS = new Variable.Type("CONTINUOUS");
-    public static final Variable.Type INTEGER = new Variable.Type("INTEGER");
-    public static final Variable.Type BINARY = new Variable.Type("BINARY");
-    public static final Variable.Type BOOLEAN = new Variable.Type("BOOLEAN");
+    public static final Variable.Type.Kind CONTINUOUS = new Variable.Type.Kind("CONTINUOUS");
+    public static final Variable.Type.Kind INTEGER = new Variable.Type.Kind("INTEGER");
+    public static final Variable.Type.Kind BINARY = new Variable.Type.Kind("BINARY");
+    public static final Variable.Type.Kind BOOLEAN = new Variable.Type.Kind("BOOLEAN");
+    private static Type.Kind[] swigValues = {CONTINUOUS, INTEGER, BINARY, BOOLEAN};
+    private static int swigNext = 0;
 
-    public int swigValue() {
-      return swigValue;
-    }
-
-    @Override
-    public String toString() {
-      return swigName;
-    }
-
-    public static Type swigToEnum(int swigValue) {
+    public static Type.Kind swigToEnum(int swigValue) {
       if (swigValue < swigValues.length
           && swigValue >= 0
-          && swigValues[swigValue].swigValue == swigValue) {
+          && swigValues[swigValue].swigValue() == swigValue) {
         return swigValues[swigValue];
       }
       for (int i = 0; i < swigValues.length; i++) {
-        if (swigValues[i].swigValue == swigValue) {
+        if (swigValues[i].swigValue() == swigValue) {
           return swigValues[i];
         }
       }
-      throw new IllegalArgumentException("No enum " + Type.class + " with value " + swigValue);
+      throw new IllegalArgumentException("No enum " + Type.Kind.class + " with value " + swigValue);
     }
 
-    private Type(String swigName) {
-      this.swigName = swigName;
-      this.swigValue = swigNext++;
-    }
+    public static class Kind {
+      private final String swigName;
+      private final int swigValue;
 
-    @SuppressWarnings({"unused", "StaticAssignmentInConstructor"})
-    private Type(String swigName, int swigValue) {
-      this.swigName = swigName;
-      this.swigValue = swigValue;
-      swigNext = swigValue + 1;
-    }
+      public Kind(String swigName) {
+        this.swigName = swigName;
+        swigValue = swigNext;
+        incrementSwigNext();
+      }
 
-    @SuppressWarnings({"unused", "StaticAssignmentInConstructor"})
-    private Type(String swigName, Type swigEnum) {
-      this.swigName = swigName;
-      this.swigValue = swigEnum.swigValue;
-      swigNext = this.swigValue + 1;
-    }
+      private void incrementSwigNext() {
+        swigNext++;
+      }
 
-    private static Type[] swigValues = {CONTINUOUS, INTEGER, BINARY, BOOLEAN};
-    private static int swigNext = 0;
-    private final int swigValue;
-    private final String swigName;
+      public int swigValue() {
+        return swigValue;
+      }
+
+      @Override
+      public String toString() {
+        return swigName;
+      }
+    }
   }
 }

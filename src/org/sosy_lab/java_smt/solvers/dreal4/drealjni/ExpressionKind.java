@@ -16,77 +16,46 @@
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
 public final class ExpressionKind {
-  public static final ExpressionKind CONSTANT = new ExpressionKind("Constant");
-  public static final ExpressionKind REAL_CONSTANT = new ExpressionKind("RealConstant");
-  public static final ExpressionKind VAR = new ExpressionKind("Var");
-  public static final ExpressionKind ADD = new ExpressionKind("Add");
-  public static final ExpressionKind MUL = new ExpressionKind("Mul");
-  public static final ExpressionKind DIV = new ExpressionKind("Div");
-  public static final ExpressionKind LOG = new ExpressionKind("Log");
-  public static final ExpressionKind ABS = new ExpressionKind("Abs");
-  public static final ExpressionKind EXP = new ExpressionKind("Exp");
-  public static final ExpressionKind SQRT = new ExpressionKind("Sqrt");
-  public static final ExpressionKind POW = new ExpressionKind("Pow");
-  public static final ExpressionKind SIN = new ExpressionKind("Sin");
-  public static final ExpressionKind COS = new ExpressionKind("Cos");
-  public static final ExpressionKind TAN = new ExpressionKind("Tan");
-  public static final ExpressionKind ASIN = new ExpressionKind("Asin");
-  public static final ExpressionKind ACOS = new ExpressionKind("Acos");
-  public static final ExpressionKind ATAN = new ExpressionKind("Atan");
-  public static final ExpressionKind ATAN2 = new ExpressionKind("Atan2");
-  public static final ExpressionKind SINH = new ExpressionKind("Sinh");
-  public static final ExpressionKind COSH = new ExpressionKind("Cosh");
-  public static final ExpressionKind TANH = new ExpressionKind("Tanh");
-  public static final ExpressionKind MIN = new ExpressionKind("Min");
-  public static final ExpressionKind MAX = new ExpressionKind("Max");
-  public static final ExpressionKind ITE = new ExpressionKind("IfThenElse");
-  public static final ExpressionKind NAN = new ExpressionKind("NaN");
-  public static final ExpressionKind UF = new ExpressionKind("UninterpretedFunction");
+  public static final ExpressionKind.ExpressionType CONSTANT =
+      new ExpressionKind.ExpressionType("Constant");
+  public static final ExpressionKind.ExpressionType REAL_CONSTANT =
+      new ExpressionKind.ExpressionType("RealConstant");
+  public static final ExpressionKind.ExpressionType VAR = new ExpressionKind.ExpressionType("Var");
+  public static final ExpressionKind.ExpressionType ADD = new ExpressionKind.ExpressionType("Add");
+  public static final ExpressionKind.ExpressionType MUL = new ExpressionKind.ExpressionType("Mul");
+  public static final ExpressionKind.ExpressionType DIV = new ExpressionKind.ExpressionType("Div");
+  public static final ExpressionKind.ExpressionType LOG = new ExpressionKind.ExpressionType("Log");
+  public static final ExpressionKind.ExpressionType ABS = new ExpressionKind.ExpressionType("Abs");
+  public static final ExpressionKind.ExpressionType EXP = new ExpressionKind.ExpressionType("Exp");
+  public static final ExpressionKind.ExpressionType SQRT =
+      new ExpressionKind.ExpressionType("Sqrt");
+  public static final ExpressionKind.ExpressionType POW = new ExpressionKind.ExpressionType("Pow");
+  public static final ExpressionKind.ExpressionType SIN = new ExpressionKind.ExpressionType("Sin");
+  public static final ExpressionKind.ExpressionType COS = new ExpressionKind.ExpressionType("Cos");
+  public static final ExpressionKind.ExpressionType TAN = new ExpressionKind.ExpressionType("Tan");
+  public static final ExpressionKind.ExpressionType ASIN =
+      new ExpressionKind.ExpressionType("Asin");
+  public static final ExpressionKind.ExpressionType ACOS =
+      new ExpressionKind.ExpressionType("Acos");
+  public static final ExpressionKind.ExpressionType ATAN =
+      new ExpressionKind.ExpressionType("Atan");
+  public static final ExpressionKind.ExpressionType ATAN2 =
+      new ExpressionKind.ExpressionType("Atan2");
+  public static final ExpressionKind.ExpressionType SINH =
+      new ExpressionKind.ExpressionType("Sinh");
+  public static final ExpressionKind.ExpressionType COSH =
+      new ExpressionKind.ExpressionType("Cosh");
+  public static final ExpressionKind.ExpressionType TANH =
+      new ExpressionKind.ExpressionType("Tanh");
+  public static final ExpressionKind.ExpressionType MIN = new ExpressionKind.ExpressionType("Min");
+  public static final ExpressionKind.ExpressionType MAX = new ExpressionKind.ExpressionType("Max");
+  public static final ExpressionKind.ExpressionType ITE =
+      new ExpressionKind.ExpressionType("IfThenElse");
+  public static final ExpressionKind.ExpressionType NAN = new ExpressionKind.ExpressionType("NaN");
+  public static final ExpressionKind.ExpressionType UF =
+      new ExpressionKind.ExpressionType("UninterpretedFunction");
 
-  public int swigValue() {
-    return swigValue;
-  }
-
-  @Override
-  public String toString() {
-    return swigName;
-  }
-
-  public static ExpressionKind swigToEnum(int swigValue) {
-    if (swigValue < swigValues.length
-        && swigValue >= 0
-        && swigValues[swigValue].swigValue == swigValue) {
-      return swigValues[swigValue];
-    }
-    for (int i = 0; i < swigValues.length; i++) {
-      if (swigValues[i].swigValue == swigValue) {
-        return swigValues[i];
-      }
-    }
-    throw new IllegalArgumentException(
-        "No enum " + ExpressionKind.class + " with value " + swigValue);
-  }
-
-  private ExpressionKind(String swigName) {
-    this.swigName = swigName;
-    this.swigValue = swigNext++;
-  }
-
-  @SuppressWarnings({"unused", "StaticAssignmentInConstructor"})
-  private ExpressionKind(String swigName, int swigValue) {
-    this.swigName = swigName;
-    this.swigValue = swigValue;
-    swigNext = swigValue + 1;
-  }
-
-  @SuppressWarnings({"unused", "StaticAssignmentInConstructor"})
-  private ExpressionKind(String swigName, ExpressionKind swigEnum) {
-    this.swigName = swigName;
-    this.swigValue = swigEnum.swigValue;
-    swigNext = this.swigValue + 1;
-  }
-
-  private static ExpressionKind[] swigValues = {
+  private static ExpressionKind.ExpressionType[] swigValues = {
     CONSTANT,
     REAL_CONSTANT,
     VAR,
@@ -115,6 +84,44 @@ public final class ExpressionKind {
     UF,
   };
   private static int swigNext = 0;
-  private final int swigValue;
-  private final String swigName;
+
+  public static ExpressionKind.ExpressionType swigToEnum(int swigValue) {
+    if (swigValue < swigValues.length
+        && swigValue >= 0
+        && swigValues[swigValue].swigValue() == swigValue) {
+      return swigValues[swigValue];
+    }
+    for (int i = 0; i < swigValues.length; i++) {
+      if (swigValues[i].swigValue() == swigValue) {
+        return swigValues[i];
+      }
+    }
+    throw new IllegalArgumentException(
+        "No enum " + ExpressionKind.ExpressionType.class + " with value " + swigValue);
+  }
+
+  public static class ExpressionType {
+
+    private final int swigValue;
+    private final String swigName;
+
+    public ExpressionType(String swigName) {
+      this.swigName = swigName;
+      this.swigValue = swigNext;
+      incrementSwigNext();
+    }
+
+    private void incrementSwigNext() {
+      swigNext++;
+    }
+
+    public int swigValue() {
+      return this.swigValue;
+    }
+
+    @Override
+    public String toString() {
+      return this.swigName;
+    }
+  }
 }

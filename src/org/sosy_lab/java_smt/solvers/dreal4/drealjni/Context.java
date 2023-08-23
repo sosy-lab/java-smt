@@ -137,7 +137,7 @@ public class Context {
     DrealJNI.contextSetInterval(swigCPtr, this, Variable.getCPtr(v), v, lb, ub);
   }
 
-  public void setLogic(Logic logic) {
+  public void setLogic(Logic.LogicType logic) {
     DrealJNI.contextSetLogic(swigCPtr, this, logic.swigValue());
   }
 

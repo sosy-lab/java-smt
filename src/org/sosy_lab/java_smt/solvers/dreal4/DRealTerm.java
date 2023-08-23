@@ -26,12 +26,12 @@ public class DRealTerm<T, D> {
   // This is the term, so a Variable, an Expression or a Formula.
   private final T term;
   // Type of the Variable, Expression or Formula
-  private final Variable.Type type;
+  private final Variable.Type.Kind type;
   // Here the declarationKind is stored, (3 * x) the kind is multiplication. Is only needed for
   // visitor
   private final D declaration;
 
-  public DRealTerm(T pTerm, Variable.Type pType, D pDeclaration) {
+  public DRealTerm(T pTerm, Variable.Type.Kind pType, D pDeclaration) {
     this.term = pTerm;
     this.type = pType;
     this.declaration = pDeclaration;
@@ -73,7 +73,7 @@ public class DRealTerm<T, D> {
     }
   }
 
-  public Variable.Type getType() {
+  public Variable.Type.Kind getType() {
     return type;
   }
 
@@ -81,7 +81,7 @@ public class DRealTerm<T, D> {
     return declaration;
   }
 
-  public ExpressionKind getExpressionKind() {
+  public ExpressionKind.ExpressionType getExpressionKind() {
     if (isExp()) {
       Expression exp = (Expression) term;
       return exp.getKind();
@@ -90,7 +90,7 @@ public class DRealTerm<T, D> {
     }
   }
 
-  public FormulaKind getFormulaKind() {
+  public FormulaKind.FormulaType getFormulaKind() {
     if (isFormula()) {
       Formula formula = (Formula) term;
       return formula.getKind();

@@ -16,28 +16,23 @@
 package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 
 public final class Logic {
-  public static final Logic ALL = new Logic("ALL");
-  public static final Logic QF_LIA = new Logic("QF_LIA");
-  public static final Logic QF_LIRA = new Logic("QF_LIRA");
-  public static final Logic QF_LRA = new Logic("QF_LRA");
-  public static final Logic QF_NIA = new Logic("QF_NIA");
-  public static final Logic QF_NIAT = new Logic("QF_NIAT");
-  public static final Logic QF_NIRA = new Logic("QF_NIRA");
-  public static final Logic QF_NIRAT = new Logic("QF_NIRAT");
-  public static final Logic QF_NRA = new Logic("QF_NRA");
-  public static final Logic QF_NRAT = new Logic("QF_NRAT");
-  public static final Logic QF_RDL = new Logic("QF_RDL");
+  public static final Logic.LogicType ALL = new Logic.LogicType("ALL");
+  public static final Logic.LogicType QF_LIA = new Logic.LogicType("QF_LIA");
+  public static final Logic.LogicType QF_LIRA = new Logic.LogicType("QF_LIRA");
+  public static final Logic.LogicType QF_LRA = new Logic.LogicType("QF_LRA");
+  public static final Logic.LogicType QF_NIA = new Logic.LogicType("QF_NIA");
+  public static final Logic.LogicType QF_NIAT = new Logic.LogicType("QF_NIAT");
+  public static final Logic.LogicType QF_NIRA = new Logic.LogicType("QF_NIRA");
+  public static final Logic.LogicType QF_NIRAT = new Logic.LogicType("QF_NIRAT");
+  public static final Logic.LogicType QF_NRA = new Logic.LogicType("QF_NRA");
+  public static final Logic.LogicType QF_NRAT = new Logic.LogicType("QF_NRAT");
+  public static final Logic.LogicType QF_RDL = new Logic.LogicType("QF_RDL");
+  private static Logic.LogicType[] swigValues = {
+      ALL, QF_LIA, QF_LIRA, QF_LRA, QF_NIA, QF_NIAT, QF_NIRA, QF_NIRAT, QF_NRA, QF_NRAT, QF_RDL,
+  };
+  private static int swigNext = 0;
 
-  public int swigValue() {
-    return swigValue;
-  }
-
-  @Override
-  public String toString() {
-    return swigName;
-  }
-
-  public static Logic swigToEnum(int swigValue) {
+  public static Logic.LogicType swigToEnum(int swigValue) {
     if (swigValue < swigValues.length
         && swigValue >= 0
         && swigValues[swigValue].swigValue == swigValue) {
@@ -48,32 +43,29 @@ public final class Logic {
         return swigValues[i];
       }
     }
-    throw new IllegalArgumentException("No enum " + Logic.class + " with value " + swigValue);
+    throw new IllegalArgumentException("No enum " + Logic.LogicType.class + " with value " + swigValue);
   }
 
-  private Logic(String swigName) {
-    this.swigName = swigName;
-    this.swigValue = swigNext++;
-  }
 
-  @SuppressWarnings({"unused", "StaticAssignmentInConstructor"})
-  private Logic(String swigName, int swigValue) {
-    this.swigName = swigName;
-    this.swigValue = swigValue;
-    swigNext = swigValue + 1;
-  }
+  public static class LogicType {
+    private final int swigValue;
+    private final String swigName;
+    public LogicType(String swigName) {
+      this.swigName = swigName;
+      this.swigValue = swigNext;
+      incrementSwigNext();
+    }
+    private void incrementSwigNext() {
+      swigNext++;
+    }
+    public int swigValue() {
+      return this.swigValue;
+    }
 
-  @SuppressWarnings({"unused", "StaticAssignmentInConstructor"})
-  private Logic(String swigName, Logic swigEnum) {
-    this.swigName = swigName;
-    this.swigValue = swigEnum.swigValue;
-    swigNext = this.swigValue + 1;
+    @Override
+    public String toString() {
+      return this.swigName;
+    }
   }
-
-  private static Logic[] swigValues = {
-    ALL, QF_LIA, QF_LIRA, QF_LRA, QF_NIA, QF_NIAT, QF_NIRA, QF_NIRAT, QF_NRA, QF_NRAT, QF_RDL,
-  };
-  private static int swigNext = 0;
-  private final int swigValue;
-  private final String swigName;
 }
+

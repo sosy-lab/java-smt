@@ -27,7 +27,7 @@ public class DReal4IntegerFormulaManager
   }
 
   @Override
-  protected Variable.Type getNumeralType() {
+  protected Variable.Type.Kind getNumeralType() {
     return getFormulaCreator().getIntegerType();
   }
 
@@ -37,7 +37,7 @@ public class DReal4IntegerFormulaManager
   // variable,
   // it is not real integer division. Therefore it could result in wrong results. Use with caution.
   @Override
-  public DRealTerm<Expression, ExpressionKind> divide(
+  public DRealTerm<Expression, ExpressionKind.ExpressionType> divide(
       DRealTerm<?, ?> pParam1, DRealTerm<?, ?> pParam2) {
     if (pParam1.isExp() && pParam2.isExp()) {
       if (pParam1.getExpressionKind() == ExpressionKind.CONSTANT
@@ -97,10 +97,10 @@ public class DReal4IntegerFormulaManager
   protected DRealTerm<?, ?> modularCongruence0(
       DRealTerm<?, ?> pNumber1, DRealTerm<?, ?> pNumber2, String pModulo) {
     // ((_ divisible n) x) <==> (= x (* n (div x n)))
-    DRealTerm<Expression, ExpressionKind> mod = makeNumberImpl(pModulo);
-    DRealTerm<Expression, ExpressionKind> sub = subtract(pNumber1, pNumber2);
-    DRealTerm<Expression, ExpressionKind> div = divide(sub, mod);
-    DRealTerm<Expression, ExpressionKind> mul = multiply(mod, div);
+    DRealTerm<Expression, ExpressionKind.ExpressionType> mod = makeNumberImpl(pModulo);
+    DRealTerm<Expression, ExpressionKind.ExpressionType> sub = subtract(pNumber1, pNumber2);
+    DRealTerm<Expression, ExpressionKind.ExpressionType> div = divide(sub, mod);
+    DRealTerm<Expression, ExpressionKind.ExpressionType> mul = multiply(mod, div);
     return equal(sub, mul);
   }
 }
