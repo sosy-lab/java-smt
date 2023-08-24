@@ -22,6 +22,7 @@ import opensmt.Logic;
 import opensmt.MainSolver;
 import opensmt.PTRef;
 import opensmt.SMTConfig;
+import opensmt.SMTOption;
 import opensmt.SRef;
 import opensmt.Symbol;
 import opensmt.SymRef;
@@ -64,10 +65,16 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     assertionStack.push(new ArrayList<>()); // create initial level
   }
 
-  protected static SMTConfig getConfigInstance(int randomSeed, boolean interpolation) {
+  protected static SMTConfig getConfigInstance(int randomSeed, boolean interpolation, int algBool, int algUf, int algLra) {
     SMTConfig config = new SMTConfig();
     config.setRandomSeed(randomSeed);
     config.setInterpolation(interpolation);
+
+    if (interpolation) {
+      config.setOption(":interpolation-bool-algorithm", new SMTOption(algBool));
+      config.setOption(":interpolation-euf-algorithm", new SMTOption(algUf));
+      config.setOption(":interpolation-lra-algorithm", new SMTOption(algLra));
+    }
     return config;
   }
 

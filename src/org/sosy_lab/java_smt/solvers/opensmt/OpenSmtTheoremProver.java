@@ -22,15 +22,15 @@ class OpenSmtTheoremProver extends OpenSmtAbstractProver<Void> implements Prover
   OpenSmtTheoremProver(
       OpenSmtFormulaCreator pFormulaCreator,
       FormulaManager pMgr,
-      ShutdownNotifier pShutdownNotifier,
       int pRandom,
+      ShutdownNotifier pShutdownNotifier,
       Set<ProverOptions> pOptions) {
 
     super(
       pFormulaCreator,
       pMgr,
       pShutdownNotifier,
-      getConfigInstance(pRandom, false),
+      getConfigInstance(pRandom, false, 0, 0, 0),
       pOptions);
   }
 

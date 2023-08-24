@@ -14,6 +14,10 @@ import java.util.function.Consumer;
 import opensmt.LogicFactory;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.log.LogManager;
+import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.common.configuration.Option;
+import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.java_smt.SolverContextFactory.Logics;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
@@ -29,43 +33,64 @@ public class OpenSmtSolverContext extends AbstractSolverContext {
 
   @SuppressWarnings("unused")
   private final LogManager logger;
-
-  private final int randomSeed;
   private final ShutdownNotifier shutdownNotifier;
+  private final ExtraOptions extraOptions;
 
   private boolean closed = false;
+
+  @Options(prefix = "solver.opensmt")
+  private static class ExtraOptions {
+    @Option(secure = true, description = "Algorithm for boolean interpolation")
+    int algBool = 0;
+
+    @Option(secure = true, description = "Algorithm for UF interpolation")
+    int algUf = 0;
+
+    @Option(secure = true, description = "Algorithm for LRA interpolation")
+    int algLra = 0;
+
+    final int randomSeed;
+
+    ExtraOptions(Configuration config, int pRandomSeed)
+        throws InvalidConfigurationException {
+      config.inject(this);
+      randomSeed = pRandomSeed;
+    }
+  }
 
   private OpenSmtSolverContext(
       OpenSmtFormulaCreator pCreator,
       OpenSmtFormulaManager pManager,
-      int pRandom,
       LogManager pLogger,
-      ShutdownNotifier pShutdownNotifier) {
+      ShutdownNotifier pShutdownNotifier,
+      ExtraOptions pOptions) {
 
     super(pManager);
     creator = pCreator;
     manager = pManager;
-    randomSeed = pRandom;
     logger = pLogger;
     shutdownNotifier = pShutdownNotifier;
+    extraOptions = pOptions;
   }
 
   public static SolverContext create(
       Logics pLogic,
+      Configuration config,
       LogManager pLogger,
       ShutdownNotifier pShutdownNotifier,
       long pRandom,
       NonLinearArithmetic pNonLinearArithmetic,
-      Consumer<String> pLoader) {
+      Consumer<String> pLoader)
+    throws InvalidConfigurationException {
 
     // Make sure the native libraries are loaded
     pLoader.accept("opensmt");
     pLoader.accept("opensmtjava");
 
-    // Create a solver instance
+    // Instantiate OpenSmtFormulaCreator to open a new solver instance
     OpenSmtFormulaCreator creator = OpenSmtFormulaCreator.newCreator(pLogic);
 
-    // Create managers
+    // Create all formula managers
     OpenSmtUFManager functionTheory = new OpenSmtUFManager(creator);
     OpenSmtBooleanFormulaManager booleanTheory = new OpenSmtBooleanFormulaManager(creator);
     OpenSmtIntegerFormulaManager integerTheory =
@@ -74,10 +99,14 @@ public class OpenSmtSolverContext extends AbstractSolverContext {
         new OpenSmtRationalFormulaManager(creator, pNonLinearArithmetic);
     OpenSmtArrayFormulaManager arrayTheory = new OpenSmtArrayFormulaManager(creator);
 
+    // Build the central FormulaManager object
     OpenSmtFormulaManager manager =
         new OpenSmtFormulaManager(creator, functionTheory, booleanTheory, integerTheory, rationalTheory, arrayTheory);
 
-    return new OpenSmtSolverContext(creator, manager, (int) pRandom, pLogger, pShutdownNotifier);
+    // Split off solver options
+    ExtraOptions options = new ExtraOptions(config, (int) pRandom);
+
+    return new OpenSmtSolverContext(creator, manager, pLogger, pShutdownNotifier, options);
   }
 
   @Override
@@ -107,14 +136,14 @@ public class OpenSmtSolverContext extends AbstractSolverContext {
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<SolverContext.ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
-    return new OpenSmtTheoremProver(creator, manager, shutdownNotifier, randomSeed, options);
+    return new OpenSmtTheoremProver(creator, manager, extraOptions.randomSeed, shutdownNotifier, options);
   }
 
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<SolverContext.ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
-    return new OpenSmtInterpolatingProver(creator, manager, shutdownNotifier, randomSeed, options);
+    return new OpenSmtInterpolatingProver(creator, manager, extraOptions.randomSeed, shutdownNotifier, options, extraOptions.algBool, extraOptions.algUf, extraOptions.algLra);
   }
 
   @Override

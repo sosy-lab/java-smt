@@ -270,7 +270,7 @@ public class SolverContextFactory {
     switch (solverToCreate) {
       case OPENSMT:
         return OpenSmtSolverContext.create(
-            logicToUse, logger, shutdownNotifier, randomSeed, nonLinearArithmetic, loader);
+            logicToUse, config, logger, shutdownNotifier, randomSeed, nonLinearArithmetic, loader);
 
       case CVC4:
         return CVC4SolverContext.create(
