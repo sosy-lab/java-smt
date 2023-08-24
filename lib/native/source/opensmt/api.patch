@@ -158,7 +158,7 @@ index a3f4bb1c..9fc7ac3d 100644
          std::stack<mpq_ptr, std::vector<mpq_ptr>> pool;
      public:
 diff --git a/src/logics/ArithLogic.cc b/src/logics/ArithLogic.cc
-index 8609ef55..a1aa5240 100644
+index 8609ef55..11813348 100644
 --- a/src/logics/ArithLogic.cc
 +++ b/src/logics/ArithLogic.cc
 @@ -807,7 +807,7 @@ PTRef ArithLogic::mkMod(vec<PTRef> && args) {
@@ -179,6 +179,15 @@ index 8609ef55..a1aa5240 100644
      if (isZero(divisor)) { throw ArithDivisionByZeroException(); }
      if (isOne(divisor)) { return dividend; }
      if (isMinusOne(divisor)) { return mkNeg(dividend); }
+@@ -1177,7 +1177,7 @@ std::string ArithLogic::printTerm_(PTRef tr, bool ext, bool safe) const
+         char* tmp_str;
+         opensmt::stringToRational(tmp_str, sym_store.getName(getPterm(tr).symb()));
+         opensmt::Number v(tmp_str);
+-        if (!isNonNegNumConst(tr)) {
++        if (!isNonNegative(v)) {
+             v.negate();
+             is_neg = true;
+         }
 diff --git a/src/logics/ArithLogic.h b/src/logics/ArithLogic.h
 index 6f2669f9..fa8a7e26 100644
 --- a/src/logics/ArithLogic.h
