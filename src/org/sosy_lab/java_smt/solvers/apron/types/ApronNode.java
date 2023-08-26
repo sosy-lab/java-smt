@@ -63,6 +63,12 @@ public interface ApronNode extends Formula {
         this.denominator = pDenominator;
       }
 
+      public ApronRatCstNode(ApronRatCstNode pNode){
+        this.cstNode = pNode.getNode();
+        this.numerator = pNode.getNumerator();
+        this.denominator = pNode.getDenominator();
+      }
+
       @Override
       public FormulaType getType() {
         return this.type;
@@ -126,6 +132,21 @@ public interface ApronNode extends Formula {
         this.varName = pVarName;
         addVarToEnv();
       }
+
+      public ApronRatVarNode(ApronRatVarNode pNode){
+        this.varNode = pNode.getNode();
+        this.varName = pNode.getVarName();
+        this.formulaCreator = pNode.getFormulaCreator();
+      }
+
+      public String getVarName() {
+        return varName;
+      }
+
+      public ApronFormulaCreator getFormulaCreator() {
+        return formulaCreator;
+      }
+
       @Override
       public String toString() {
         return varNode.toString();
@@ -190,6 +211,11 @@ public interface ApronNode extends Formula {
         this.varNames = param.getVarNames();
       }
 
+      public ApronRatUnaryNode(ApronRatUnaryNode pNode){
+        this.unaryNode = pNode.getNode();
+        this.varNames = pNode.getVarNames();
+      }
+
       @Override
       public String toString() {
         return unaryNode.toString();
@@ -249,6 +275,11 @@ public interface ApronNode extends Formula {
         this.varNames = allVarNames;
       }
 
+      public ApronRatBinaryNode(ApronRatBinaryNode pNode){
+        this.binaryNode = pNode.getNode();
+        this.varNames = pNode.getVarNames();
+      }
+
       @Override
       public String toString() {
         return binaryNode.toString();
@@ -275,7 +306,7 @@ public interface ApronNode extends Formula {
       }
 
       @Override
-      public Texpr1Node getNode() {
+      public Texpr1BinNode getNode() {
         return this.binaryNode;
       }
 
@@ -298,6 +329,11 @@ public interface ApronNode extends Formula {
       public ApronIntCstNode(BigInteger pNumerator) {
         this.cstNode = new Texpr1CstNode(new MpqScalar(pNumerator));
         this.value = pNumerator;
+      }
+
+      public ApronIntCstNode(ApronIntCstNode pNode){
+        this.cstNode = pNode.getNode();
+        this.value = pNode.getValue();
       }
 
       @Override
@@ -356,6 +392,20 @@ public interface ApronNode extends Formula {
         this.varName = pVarName;
         this.formulaCreator = pFormulaCreator;
         addVarToEnv();
+      }
+
+      public ApronIntVarNode(ApronIntVarNode pNode){
+        this.varNode = pNode.getNode();
+        this.formulaCreator = pNode.getFormulaCreator();
+        this.varName = pNode.getVarName();
+      }
+
+      public String getVarName() {
+        return varName;
+      }
+
+      public ApronFormulaCreator getFormulaCreator() {
+        return formulaCreator;
       }
 
       @Override
@@ -421,6 +471,11 @@ public interface ApronNode extends Formula {
         this.varNames = param.getVarNames();
       }
 
+      public ApronIntUnaryNode(ApronIntUnaryNode pNode){
+        this.unaryNode = pNode.getNode();
+        this.varNames = pNode.getVarNames();
+      }
+
       @Override
       public String toString() {
         return unaryNode.toString();
@@ -481,6 +536,11 @@ public interface ApronNode extends Formula {
         this.varNames = allVarNames;
       }
 
+      public ApronIntBinaryNode(ApronIntBinaryNode pNode){
+        this.binaryNode = pNode.getNode();
+        this.varNames = pNode.getVarNames();
+      }
+
       @Override
       public String toString() {
         return binaryNode.toString();
@@ -508,7 +568,7 @@ public interface ApronNode extends Formula {
       }
 
       @Override
-      public Texpr1Node getNode() {
+      public Texpr1BinNode getNode() {
         return this.binaryNode;
       }
 
@@ -537,6 +597,13 @@ public interface ApronNode extends Formula {
       this.node = pNode.getNode();
       this.varNames = pNode.getVarNames();
       this.apronNode = pNode;
+    }
+
+    public ApronConstraint(ApronConstraint pConstraint){
+      this.constraintNode = pConstraint.getConstraintNode();
+      this.node = pConstraint.getNode();
+      this.apronNode = pConstraint.getApronNode();
+      this.varNames = pConstraint.getVarNames();
     }
 
     @Override

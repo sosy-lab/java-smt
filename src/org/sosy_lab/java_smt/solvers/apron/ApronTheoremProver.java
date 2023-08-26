@@ -74,14 +74,12 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
   @Override
   public @Nullable Void addConstraint(BooleanFormula constraint)
       throws InterruptedException {
-      /*ApronNode node = ApronFormulaManager.getTerm(constraint,
-          this.solverContext.getFormulaCreator().getEnvironment(),
-          this.solverContext.getFormulaCreator());
+      ApronNode node = ApronFormulaManager.getTerm(constraint);
       if(node instanceof ApronConstraint){
         addConstraintException((ApronConstraint) node);
       } else {
         throw new IllegalArgumentException("Constraint of wrong Type!");
-      }*/
+      }
 
     return null;
   }

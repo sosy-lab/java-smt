@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 import org.sosy_lab.common.rationals.Rational;
+import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
@@ -37,9 +38,15 @@ import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.ApronIntegerTy
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.ApronRationalType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.FormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronConstraint;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronIntBinaryNode;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronIntCstNode;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronIntUnaryNode;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronIntVarNode;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronRatBinaryNode;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronRatCstNode;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronRatUnaryNode;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronRatVarNode;
 
 
@@ -66,14 +73,13 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
   }
 
   @Override
-  public Object convertValue(ApronNode pf1) {
-    FormulaType type = pf1.getType();
-    if(pf1 instanceof ApronIntCstNode){
-      ApronIntCstNode cst = (ApronIntCstNode) pf1;
-      return cst.getValue();
-    } else if (pf1 instanceof ApronRatCstNode) {
-      ApronRatCstNode cast = (ApronRatCstNode) pf1;
-      Rational rational = Rational.of(cast.getNumerator(),cast.getDenominator());
+  public Object convertValue(ApronNode exprNode, ApronNode value) {
+    FormulaType type = exprNode.getType();
+    FormulaType valueType = value.getType();
+    if (valueType == FormulaType.INTEGER) {
+      return ((ApronIntCstNode) value).getValue();
+    } else if ( valueType == FormulaType.RATIONAL) {
+      return ((ApronRatCstNode) value).getDenominator().divide(((ApronRatCstNode) value).getDenominator());
     }
     return null;
   }
@@ -103,10 +109,11 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
 
   /**
    * For making a Formula (Type ApronNode) for a variable it is important to also update the
-   * @environment as it holds all variables;
+   *
    * @param pApronFormulaType Integer or Rational?
-   * @param varName name of the variable
+   * @param varName           name of the variable
    * @return object of either ApronIntVarNode (Type Integer) or ApronRatVarNode (Type Rational)
+   * @environment as it holds all variables;
    */
   @Override
   public ApronNode makeVariable(ApronFormulaType pApronFormulaType, String varName) {
@@ -134,7 +141,7 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
   @Override
   public org.sosy_lab.java_smt.api.FormulaType<?> getFormulaType(ApronNode formula) {
     FormulaType type = formula.getType();
-    if(type.equals(FormulaType.BOOLEAN)){
+    if (type.equals(FormulaType.BOOLEAN)) {
       return org.sosy_lab.java_smt.api.FormulaType.BooleanType;
     } else if (type.equals(FormulaType.RATIONAL)) {
       return org.sosy_lab.java_smt.api.FormulaType.RationalType;
@@ -165,5 +172,61 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
   @Override
   protected Long getBooleanVarDeclarationImpl(ApronNode pApronFormula) {
     return null;
+  }
+
+  @Override
+  public <T extends Formula> T encapsulate(
+      org.sosy_lab.java_smt.api.FormulaType<T> pType,
+      ApronNode pTerm) {
+    if (pType.isBooleanType()) {
+      ApronConstraint constraint = (ApronConstraint) pTerm;
+      return (T) new ApronNode.ApronConstraint(constraint);
+    } else if (pType.isIntegerType()) {
+      if (pTerm instanceof ApronIntCstNode) {
+        ApronIntCstNode node = (ApronIntCstNode) pTerm;
+        return (T) new ApronNode.ApronNumeralNode.ApronIntCstNode(node);
+      } else if (pTerm instanceof ApronIntVarNode) {
+        ApronIntVarNode node = (ApronIntVarNode) pTerm;
+        return (T) new ApronNode.ApronNumeralNode.ApronIntVarNode(node);
+      } else if (pTerm instanceof ApronIntUnaryNode) {
+        ApronIntUnaryNode node = (ApronIntUnaryNode) pTerm;
+        return (T) new ApronNode.ApronNumeralNode.ApronIntUnaryNode(node);
+      } else if (pTerm instanceof ApronIntBinaryNode) {
+        ApronIntBinaryNode node = (ApronIntBinaryNode) pTerm;
+        return (T) new ApronNode.ApronNumeralNode.ApronIntBinaryNode(node);
+      } else {
+        throw new IllegalArgumentException("Term " + pTerm + " not supported in Apron.");
+      }
+    } else if (pType.isRationalType()) {
+      if (pTerm instanceof ApronRatCstNode) {
+        ApronRatCstNode node = (ApronRatCstNode) pTerm;
+        return (T) new ApronNode.ApronNumeralNode.ApronRatCstNode(node);
+      } else if (pTerm instanceof ApronRatVarNode) {
+        ApronRatVarNode node = (ApronRatVarNode) pTerm;
+        return (T) new ApronNode.ApronNumeralNode.ApronRatVarNode(node);
+      } else if (pTerm instanceof ApronRatUnaryNode) {
+        ApronRatUnaryNode node = (ApronRatUnaryNode) pTerm;
+        return (T) new ApronNode.ApronNumeralNode.ApronRatUnaryNode(node);
+      } else if (pTerm instanceof ApronRatBinaryNode) {
+        ApronRatBinaryNode node = (ApronRatBinaryNode) pTerm;
+        return (T) new ApronNode.ApronNumeralNode.ApronRatBinaryNode(node);
+      } else {
+        throw new IllegalArgumentException("Term " + pTerm + " not supported in Apron.");
+      }
+
+    } else {
+      throw new IllegalArgumentException("Type " + pType + " not supported in Apron.");
+    }
+  }
+
+  @Override
+  public ApronNode extractInfo(Formula pT){
+    return ApronFormulaManager.getTerm(pT);
+  }
+
+  @Override
+  public BooleanFormula encapsulateBoolean(ApronNode pTerm) {
+    ApronConstraint constraint = (ApronConstraint) pTerm;
+    return new ApronConstraint(constraint);
   }
 }

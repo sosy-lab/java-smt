@@ -36,6 +36,7 @@ import java.util.Collection;
 import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.FormulaType;
@@ -102,7 +103,7 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
             Texpr1BinNode.OP_SUB);
         BooleanFormula formula = new ApronConstraint(Tcons1.EQ, formulaCreator.getEnvironment(),
             binaryNode); //is the representation x=0, if 0 is the model for x
-        return new ValueAssignment(keyFormula, valueFormula, formula, pVar, castIntValue,
+        return new ValueAssignment(keyFormula, valueFormula, formula, pVar, formulaCreator.convertValue(keyFormula,valueFormula),
             argumentInterpretationBuilder.build());
       } else {
         ApronNode keyFormula = formulaCreator.getVariables().get(varName);
@@ -118,7 +119,8 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
             Texpr1BinNode.OP_SUB);
         BooleanFormula formula = new ApronConstraint(Tcons1.EQ, formulaCreator.getEnvironment(),
             binaryNode);
-        return new ValueAssignment(keyFormula, valueFormula, formula, pVar, castRatValue,
+        return new ValueAssignment(keyFormula, valueFormula, formula, pVar,
+            formulaCreator.convertValue(keyFormula,valueFormula),
             argumentInterpretationBuilder.build());
       }
     } catch (ApronException pApronException) {
@@ -129,6 +131,28 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
   @Override
   protected @Nullable ApronNode evalImpl(ApronNode formula) {
     Preconditions.checkState(!isClosed());
-    return formula;
+    return getValue(formula);
+  }
+
+  private ApronNode getValue(ApronNode pNode) {
+    if (pNode instanceof ApronIntVarNode) {
+      ApronIntVarNode varNode = (ApronIntVarNode) pNode;
+      String varName = varNode.getVarName();
+      for (ValueAssignment assignment : model) {
+        if (varName.equals(assignment.getName())) {
+          return (ApronNode) assignment.getValueAsFormula();
+        }
+      }
+    } else if (pNode instanceof ApronRatVarNode) {
+      ApronRatVarNode varNode = (ApronRatVarNode) pNode;
+      String varName = varNode.getVarName();
+      for (ValueAssignment assignment : model) {
+        if (varName.equals(assignment.getName())) {
+          return (ApronNode) assignment.getValueAsFormula();
+        }
+      }
+
+
+    } return pNode;
   }
 }
