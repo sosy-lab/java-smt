@@ -10,35 +10,29 @@ SPDX-License-Identifier: Apache-2.0
 
 ## Documentation:
 ### How to build the library:
-1. First install dReal to get the Library:
-   ```bash
-   # Ubuntu 22.04
-    sudo apt-get install curl
-    curl -fsSL https://raw.githubusercontent.com/dreal/dreal4/master/setup/ubuntu/22.04/install.sh | sudo bash
+1. Insatll the dependecies for libibex-dev
+    ```bash
+    sudo apt-get update && apt install -y software-properties-common
+    ```
+2. install git, curl, g++, java
+    ```bash
+   sudo apt update && apt install -y git -y curl  -y g++ -y openjdk-11-jdk
+    ```
+3. install dReal and dependencies
+    ```bash
+   sudo curl -fsSL https://raw.githubusercontent.com/dreal/dreal4/master/setup/ubuntu/22.04/install.
+   sh | bash
    ```
-2. Get all the dependencies for dReal. Use the install_prereq.sh script. 
-3. Compile dreal_wrap.cxx with:
-    ```
-    c++ -fpic -c dreal_wrap.cxx -I/usr/lib/jvm/java-1.11.0-openjdk-amd64/include/ -I/usr/lib/jvm/java-1.11.0-openjdk-amd64/include/linux -I/opt/dreal/4.21.06.2/include -I/opt/libibex/2.7.4/include -I/opt/libibex/2.7.4/include/ibex -I/opt/libibex/2.7.4/include/ibex/3rd -I/usr/include/coin -L/opt/dreal/4.21.06.2/lib -L/opt/libibex/2.7.4/lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib -ldreal -libex -lClpSolver -lClp -lCoinUtils -lbz2 -lz -llapack -lblas -lm -lnlopt
-   ``` 
-4. Create shared library with:
-    ```
-    c++ -shared dreal_wrap.o -L/opt/dreal/4.21.06.2/lib -L/opt/libibex/2.7.4/lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib -ldreal -libex -lClpSolver -lClp -lCoinUtils -lbz2 -lz -llapack -lblas -lm -lnlopt -o libdreal4.so
+4. move shared libraries into the system folder
+    ```bash
+   sudo cp /opt/dreal/4.21.06.2/lib/libdreal.so /usr/lib/ &&
+   sudo cp /opt/libibex/2.7.4/lib/libibex.so /usr/lib/
    ```
-   
-    To use the just created library, you need to specifiy where to find the dependencies of ibex and 
-    dreal. Copy the libraries to a lib folder and set the Java library path to where ibex and 
-    dReal library is now located with `LD_LIBRARY_PATH=<tto_directory_with_dReal_and_ibex>`.
-    This needs to be done, because the dependecies of dREal4 are not found. (Take a look with `ldd 
-    libdreal4.so`).
-
-    Another way would be to copy the ibex and dReal library to the folder  `/usr/lib/`. If then the 
-    4th step is done with:
+5. compile the wrapper file and create the shared library
     ```
-    c++ -shared dreal_wrap.o -L/usr/lib/x86_64-linux-gnu -L/usr/lib -ldreal -libex -lClpSolver -lClp -lCoinUtils -lbz2 -lz -llapack -lblas -lm -lnlopt -o libdreal4.so
-    ```
-    dReal and Ibex should be found by the system and the dReal4 lib found the two dependencies 
-   and the java Library path does not to be set.
+   c++ -fpic -c dreal_wrap.cxx -I/usr/lib/jvm/java-1.11.0-openjdk-amd64/include/ -I/usr/lib/jvm/java-1.11.0-openjdk-amd64/include/linux -I/opt/dreal/4.21.06.2/include -I/opt/libibex/2.7.4/include -I/opt/libibex/2.7.4/include/ibex -I/opt/libibex/2.7.4/include/ibex/3rd -I/usr/include/coin -L/opt/dreal/4.21.06.2/lib -L/opt/libibex/2.7.4/lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib -ldreal -libex -lClpSolver -lClp -lCoinUtils -lbz2 -lz -llapack -lblas -lm -lnlopt
+   c++ -shared dreal_wrap.o -L/opt/dreal/4.21.06.2/lib -L/opt/libibex/2.7.4/lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib -ldreal -libex -lClpSolver -lClp -lCoinUtils -lbz2 -lz -llapack -lblas -lm -lnlopt -o libdreal4.so
+   ```
 
 ### SWIG:
 It is also possible to generate new JNI code. For that a SWIG interface needs to be created and 
