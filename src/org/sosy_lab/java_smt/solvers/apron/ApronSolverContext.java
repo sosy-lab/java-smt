@@ -151,9 +151,7 @@ public class ApronSolverContext extends AbstractSolverContext {
       return new ApronTheoremProver(pProverOptions, booleanFormulaManager, this.shutdownNotifier,
           this);
     } catch (ApronException pApronException) {
-      System.out.println(pApronException);
-      System.exit(0);
-      return null;
+      throw new RuntimeException(pApronException);
     }
   }
 
@@ -164,11 +162,11 @@ public class ApronSolverContext extends AbstractSolverContext {
 
   @Override
   protected OptimizationProverEnvironment newOptimizationProverEnvironment0(Set<ProverOptions> pSet) {
-    return null;
+    throw new UnsupportedOperationException("Optimization prover not supported by Apron.");
   }
 
   @Override
   protected boolean supportsAssumptionSolving() {
-    return false;
+    return true;
   }
 }

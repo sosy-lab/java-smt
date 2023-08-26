@@ -41,6 +41,7 @@ import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.Apro
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronRatCstNode;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronRatUnaryNode;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronRatVarNode;
+import scala.Int;
 
 public class ApronRationalFormulaManager extends
                                          ApronNumeralFormulaManager<NumeralFormula, RationalFormula>
@@ -63,12 +64,25 @@ public class ApronRationalFormulaManager extends
 
   @Override
   protected ApronNode makeNumberImpl(double pNumber) {
-    return null;
-  }
+    String str = String.valueOf(pNumber);
+    String[] numbers = str.split("\\.");
+    int num = Integer.parseInt(numbers[0]);
+    if(numbers.length>1) {
+      int den = Integer.parseInt(numbers[1]);
+      return new ApronRatCstNode(BigInteger.valueOf(num),BigInteger.valueOf(den));
+    }
+    return new ApronRatCstNode(BigInteger.valueOf(num),BigInteger.ONE);  }
 
   @Override
   protected ApronNode makeNumberImpl(BigDecimal pNumber) {
-    return null;
+    String str = pNumber.toPlainString();
+    String[] numbers = str.split("\\.");
+    int num = Integer.parseInt(numbers[0]);
+    if(numbers.length>1) {
+      int den = Integer.parseInt(numbers[1]);
+      return new ApronRatCstNode(BigInteger.valueOf(num),BigInteger.valueOf(den));
+    }
+    return new ApronRatCstNode(BigInteger.valueOf(num),BigInteger.ONE);
   }
 
 

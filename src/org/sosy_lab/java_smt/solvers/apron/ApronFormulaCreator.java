@@ -153,7 +153,7 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
 
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula formula, ApronNode f) {
-    return null;
+    throw new UnsupportedOperationException("Visit function is not supported by Apron.");
   }
 
   @Override

@@ -28,6 +28,7 @@ import java.math.BigInteger;
 import java.util.List;
 import org.checkerframework.checker.units.qual.A;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
@@ -77,7 +78,14 @@ public class ApronIntegerFormulaManager
 
   @Override
   public BooleanFormula modularCongruence(IntegerFormula number1, IntegerFormula number2, long n) {
-    return null;
+    ApronIntCstNode mod = new ApronIntCstNode(BigInteger.valueOf(n));
+    ApronIntBinaryNode x = new ApronIntBinaryNode(ApronFormulaManager.getTerm(number1), ApronFormulaManager.getTerm(number2), Texpr1BinNode.OP_SUB);
+
+    if(BigInteger.ZERO.compareTo(BigInteger.valueOf(n))<0){
+
+      return (BooleanFormula) equal(mod,(ApronNode) x);
+    }
+    return (BooleanFormula) equal((ApronNode) mod,mod);
   }
 
   @Override

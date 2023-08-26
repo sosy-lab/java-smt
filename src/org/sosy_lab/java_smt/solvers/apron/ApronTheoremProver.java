@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nullable;
+import javax.sound.midi.Soundbank;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
@@ -144,13 +145,26 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
-    return Optional.empty();
+    throw new UnsupportedOperationException("Apron does not support unsat-core.");
   }
 
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
-    return false;
+    Tcons1[] constraints =new Tcons1[assumptions.size()];
+    int i = 0;
+    for (BooleanFormula assumption:assumptions) {
+      ApronConstraint cons = (ApronConstraint) ApronFormulaManager.getTerm(assumption);
+      constraints[i] = cons.getConstraintNode();
+      i++;
+    }
+    try {
+      Abstract1 absNew = new Abstract1(solverContext.getManager(), constraints);
+      Abstract1 result = this.abstract1.joinCopy(solverContext.getManager(), absNew);
+      return result.isBottom(solverContext.getManager());
+    } catch (ApronException e){
+      throw new RuntimeException(e.toString());
+    }
   }
 
   @Override
