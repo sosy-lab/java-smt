@@ -10,25 +10,32 @@ SPDX-License-Identifier: Apache-2.0
 
 ## Documentation:
 ### How to build the library:
-1. Insatll the dependecies for libibex-dev
+1. Install the dependencies for libibex-dev
     ```bash
     sudo apt-get update && apt install -y software-properties-common
     ```
-2. install git, curl, g++, java
+2. Install git, curl, g++, java. Curl is used, because dReal will be installed and in the 
+   directory dreal, all the header files can be found. In the directory symbolic, for example,
+   will be every header file, that is used in the wrapper. If dReal is just cloned, the header 
+   files will not be in the directory dreal/symbolic, they will be in the directory 
+   third_party/com_github_robotlocomotion_drake/dreal/symbolic. For the wrapper it is easier to 
+   just import the dreal/dreal.h file with all the necassary header files and use the installed 
+   version of dReal, because C++ will find all the header files at one place.
     ```bash
    sudo apt update && apt install -y git -y curl  -y g++ -y openjdk-11-jdk
     ```
-3. install dReal and dependencies
+3. Install dReal and dependencies
     ```bash
    sudo curl -fsSL https://raw.githubusercontent.com/dreal/dreal4/master/setup/ubuntu/22.04/install.
    sh | bash
    ```
-4. move shared libraries into the system folder
+4. Move the shared libraries into the system folder. Otherwise, when creating the shared library 
+   for the JNI, it will not find libibex.so or libdreal.so.
     ```bash
    sudo cp /opt/dreal/4.21.06.2/lib/libdreal.so /usr/lib/ &&
    sudo cp /opt/libibex/2.7.4/lib/libibex.so /usr/lib/
    ```
-5. compile the wrapper file and create the shared library
+5. Compile the wrapper file and create the shared library
     ```
    c++ -fpic -c dreal_wrap.cxx -I/usr/lib/jvm/java-1.11.0-openjdk-amd64/include/ -I/usr/lib/jvm/java-1.11.0-openjdk-amd64/include/linux -I/opt/dreal/4.21.06.2/include -I/opt/libibex/2.7.4/include -I/opt/libibex/2.7.4/include/ibex -I/opt/libibex/2.7.4/include/ibex/3rd -I/usr/include/coin -L/opt/dreal/4.21.06.2/lib -L/opt/libibex/2.7.4/lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib -ldreal -libex -lClpSolver -lClp -lCoinUtils -lbz2 -lz -llapack -lblas -lm -lnlopt
    c++ -shared dreal_wrap.o -L/opt/dreal/4.21.06.2/lib -L/opt/libibex/2.7.4/lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib -ldreal -libex -lClpSolver -lClp -lCoinUtils -lbz2 -lz -llapack -lblas -lm -lnlopt -o libdreal4.so
