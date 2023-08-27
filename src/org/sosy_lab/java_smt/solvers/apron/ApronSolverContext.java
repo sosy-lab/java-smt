@@ -131,7 +131,6 @@ public class ApronSolverContext extends AbstractSolverContext {
 
   @Override
   public void close() {
-    //TODO was muss hier noch passieren?
     if (!closed) {
       closed = true;
       logger.log(Level.FINER, "Freeing Apron Environment");

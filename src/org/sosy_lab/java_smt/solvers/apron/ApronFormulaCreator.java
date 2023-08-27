@@ -76,12 +76,17 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
   public Object convertValue(ApronNode exprNode, ApronNode value) {
     FormulaType type = exprNode.getType();
     FormulaType valueType = value.getType();
-    if (valueType == FormulaType.INTEGER) {
+
+    if (valueType == FormulaType.INTEGER && value instanceof ApronIntCstNode) {
       return ((ApronIntCstNode) value).getValue();
-    } else if ( valueType == FormulaType.RATIONAL) {
+    } else if ( valueType == FormulaType.RATIONAL && value instanceof ApronRatCstNode) {
       return ((ApronRatCstNode) value).getDenominator().divide(((ApronRatCstNode) value).getDenominator());
+    } else if (value instanceof ApronIntVarNode) {
+      return ((ApronIntVarNode) value).getVarName();
+    }else if (value instanceof ApronRatVarNode) {
+      return ((ApronRatVarNode) value).getVarName();
     }
-    return null;
+    else return null;
   }
 
   public Environment getEnvironment() {
@@ -117,12 +122,14 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
    */
   @Override
   public ApronNode makeVariable(ApronFormulaType pApronFormulaType, String varName) {
-    Preconditions.checkArgument(!environment.hasVar(varName), "Variablename already exists!");
     Preconditions.checkArgument(
         (pApronFormulaType.getType().equals(FormulaType.INTEGER) || pApronFormulaType.getType()
             .equals(
                 FormulaType.RATIONAL)),
         "Only Integer or rational variables allowed!");
+    if(environment.hasVar(varName)){
+      return variables.get(varName);
+    }
     if (pApronFormulaType.getType().equals(FormulaType.INTEGER)) {
       ApronIntVarNode varNode = new ApronIntVarNode(varName, this);
       variables.put(varName, varNode);

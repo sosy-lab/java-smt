@@ -102,7 +102,13 @@ public class ApronRationalFormulaManager extends
 
   @Override
   protected ApronNode makeNumberImpl(String i) {
-    return new ApronRatCstNode(BigInteger.valueOf(Integer.parseInt(i)), BigInteger.ONE);
+    String[] numbers = i.split("/");
+    int num = Integer.parseInt(numbers[0]);
+    if(numbers.length>1) {
+      int den = Integer.parseInt(numbers[1]);
+      return new ApronRatCstNode(BigInteger.valueOf(num),BigInteger.valueOf(den));
+    }
+    return new ApronRatCstNode(BigInteger.valueOf(num),BigInteger.ONE);
   }
 
   @Override

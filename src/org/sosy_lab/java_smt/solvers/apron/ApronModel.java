@@ -20,23 +20,33 @@
 
 package org.sosy_lab.java_smt.solvers.apron;
 
+import apron.Abstract1;
 import apron.ApronException;
 import apron.Environment;
 import apron.Interval;
 import apron.Manager;
 import apron.MpqScalar;
 import apron.Scalar;
+import apron.StringVar;
 import apron.Tcons1;
+import apron.Texpr0Node;
 import apron.Texpr1BinNode;
+import apron.Texpr1Node;
+import apron.Texpr1VarNode;
+import apron.Var;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.FormulaType;
@@ -84,11 +94,7 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
   }
 
   private ValueAssignment getAssignment(ApronConstraint pFormula, String pVar) {
-    //needed: Formula keyFormula, Formula valueFormula, BooleanFormula formula (x = 3),
-    // Object value, List<?> argumentInterpretation
-    ImmutableList.Builder<Object> argumentInterpretationBuilder = ImmutableList.builder(); //TODO
-    //argumentInterpretationBuilder.add();
-    // : empty list!
+    ImmutableList.Builder<Object> argumentInterpretationBuilder = ImmutableList.builder();
     try {
       ApronConstraint constraint = pFormula;
       String varName = pVar;
@@ -97,8 +103,8 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
         Manager man = this.prover.getAbstract1().getCreationManager();
         Interval interval = this.prover.getAbstract1().getBound(man, pVar);
         MpqScalar value = (MpqScalar) interval.sup;
-        int castIntValue = Integer.parseInt(value.toString());
-        ApronIntCstNode valueFormula = new ApronIntCstNode(BigInteger.valueOf(castIntValue));
+        BigInteger big = BigInteger.valueOf(Long.parseLong(value.toString()));
+        ApronIntCstNode valueFormula = new ApronIntCstNode(big);
         ApronIntBinaryNode binaryNode = new ApronIntBinaryNode(keyFormula, valueFormula,
             Texpr1BinNode.OP_SUB);
         BooleanFormula formula = new ApronConstraint(Tcons1.EQ, formulaCreator.getEnvironment(),
@@ -112,8 +118,8 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
         Object value = interval.sup;
         //TODO: unfortunatly it is not possible to extract nominator and denominator out of an
         // Scalar; So all models show Integer Values
-        int castRatValue = Integer.parseInt(value.toString());
-        ApronRatCstNode valueFormula = new ApronRatCstNode(BigInteger.valueOf(castRatValue),
+        BigInteger big = BigInteger.valueOf(Long.parseLong(value.toString()));
+        ApronRatCstNode valueFormula = new ApronRatCstNode(big,
             BigInteger.ONE);
         ApronRatBinaryNode binaryNode = new ApronRatBinaryNode(keyFormula, valueFormula,
             Texpr1BinNode.OP_SUB);
@@ -134,7 +140,7 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
     return getValue(formula);
   }
 
-  private ApronNode getValue(ApronNode pNode) {
+  protected ApronNode getValue(ApronNode pNode) {
     if (pNode instanceof ApronIntVarNode) {
       ApronIntVarNode varNode = (ApronIntVarNode) pNode;
       String varName = varNode.getVarName();
@@ -151,8 +157,54 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
           return (ApronNode) assignment.getValueAsFormula();
         }
       }
+    }else {
+      Texpr1Node node = pNode.getNode();
+      List<String> modelVars = new ArrayList<>();
+      for (ValueAssignment assignment:model) {
+        String modelVar = assignment.getName();
+        StringVar apronVar = new StringVar(modelVar);
+        ApronNode toSub = (ApronNode) assignment.getValueAsFormula();
+        Texpr1Node toSubT = toSub.getNode();
+        //hasVar() only works for Texpr0Node
+        Texpr0Node zeroNode = node.toTexpr0Node(prover.getAbstract1().getEnvironment());
+        boolean hasVarZero =
+            zeroNode.hasDim(prover.getAbstract1().getEnvironment().dimOfVar(modelVar));
+        if(hasVarZero){
+          try {
+            Texpr1Node param1 = node.substitute(modelVar,toSubT); //substitutes every occurence of
+            // the variable with the value stored in model
+            Texpr1VarNode var = new Texpr1VarNode(modelVar);
+            Texpr1Node equation = new Texpr1BinNode(Texpr1BinNode.OP_SUB,param1,var); // param1
+            // -variable
+            Tcons1 cons = new Tcons1(formulaCreator.getEnvironment(),Tcons1.EQ,equation);
+            Tcons1[] c = new Tcons1[]{cons};
+            Abstract1 abstract1 = new Abstract1(prover.getAbstract1().getCreationManager(),c);
+            Object bound =
+                abstract1.getBound(prover.getAbstract1().getCreationManager(), modelVar).sup;
+            int value = Integer.parseInt(bound.toString());
+            return new ApronIntCstNode(BigInteger.valueOf(value));
+          } catch (ApronException e){
+            throw new RuntimeException(e);
+          }
+        }
+      }
+    }
+    return pNode;
+  }
 
+  @Override
+  public @Nullable Rational evaluate(RationalFormula f) {
+    if(f instanceof ApronRatCstNode){
+      return ((ApronRatCstNode) f).getRational();
+    } return null;
+  }
 
-    } return pNode;
+  @Override
+  public String toString() {
+    StringBuilder str = new StringBuilder();
+    for (ValueAssignment assignment:model) {
+      str.append(assignment.toString());
+    }
+    return str.toString();
   }
 }

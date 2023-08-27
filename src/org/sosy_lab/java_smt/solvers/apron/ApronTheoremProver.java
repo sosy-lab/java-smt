@@ -65,6 +65,10 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
     this.assertedFormulas.add(new LinkedHashSet<>());
   }
 
+  public List<Collection<ApronConstraint>> getAssertedFormulas() {
+    return assertedFormulas;
+  }
+
   @Override
   public void pop() {
     Preconditions.checkState(!closed);
@@ -167,12 +171,11 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
     }
   }
 
-  @Override
-  protected Evaluator getEvaluatorWithoutChecks() throws SolverException {
-    return null;
-  }
-
   public Abstract1 getAbstract1() {
     return abstract1;
   }
+
+  @Override
+  protected Evaluator getEvaluatorWithoutChecks() throws SolverException {
+    throw new UnsupportedOperationException("Apron does not support Evaluator without checks."); }
 }

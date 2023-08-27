@@ -31,6 +31,7 @@ import apron.Texpr1UnNode;
 import apron.Texpr1VarNode;
 import apron.Var;
 import java.math.BigInteger;
+import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.NumeralFormula;
@@ -57,16 +58,24 @@ public interface ApronNode extends Formula {
       private final BigInteger numerator;
       private final BigInteger denominator;
 
+      private final Rational rational;
+
       public ApronRatCstNode(BigInteger pNumerator, BigInteger pDenominator) {
         this.cstNode = new Texpr1CstNode(new MpqScalar(pNumerator.divide(pDenominator)));
         this.numerator = pNumerator;
         this.denominator = pDenominator;
+        this.rational = Rational.of(numerator,denominator);
       }
 
       public ApronRatCstNode(ApronRatCstNode pNode){
         this.cstNode = pNode.getNode();
         this.numerator = pNode.getNumerator();
         this.denominator = pNode.getDenominator();
+        this.rational = Rational.of(numerator,denominator);
+      }
+
+      public Rational getRational() {
+        return rational;
       }
 
       @Override
@@ -592,6 +601,8 @@ public interface ApronNode extends Formula {
     private final ApronNode apronNode;
     private final String[] varNames;
 
+    private boolean isTrue;
+
     public ApronConstraint(int pKind, Environment pEnvironment, ApronNode pNode) {
       this.constraintNode = new Tcons1(pEnvironment, pKind, pNode.getNode());
       this.node = pNode.getNode();
@@ -604,6 +615,15 @@ public interface ApronNode extends Formula {
       this.node = pConstraint.getNode();
       this.apronNode = pConstraint.getApronNode();
       this.varNames = pConstraint.getVarNames();
+      this.isTrue = pConstraint.isTrue();
+    }
+
+    public boolean isTrue() {
+      return isTrue;
+    }
+
+    public void setIsTrue(boolean pTrue) {
+      isTrue = pTrue;
     }
 
     @Override

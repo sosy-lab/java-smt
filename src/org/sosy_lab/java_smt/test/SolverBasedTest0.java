@@ -370,6 +370,9 @@ public abstract class SolverBasedTest0 {
             case BOOLECTOR:
               // ignore, Boolector provides no useful values
               break;
+            case APRON:
+              //ignore, Apron does not provide useful values
+              break;
             default:
               Truth.assertThat(eval).isIn(possibleExpectedFormulas);
           }
