@@ -100,12 +100,12 @@ public class Sudoku {
     LogManager logger = BasicLogManager.create(config);
     ShutdownNotifier notifier = ShutdownNotifier.createDummy();
 
+    Integer[][] grid = readGridFromStdin();
     // for (Solvers solver : Solvers.values()) {
     {
       Solvers solver = Solvers.Z3;
       try (SolverContext context =
           SolverContextFactory.createSolverContext(config, logger, notifier, solver)) {
-        Integer[][] grid = readGridFromStdin();
 
         for (SudokuSolver<?> sudoku :
             List.of(
@@ -168,12 +168,10 @@ public class Sudoku {
 
     private final SolverContext context;
     final BooleanFormulaManager bmgr;
-    final IntegerFormulaManager imgr;
 
     private SudokuSolver(SolverContext pContext) {
       context = pContext;
       bmgr = context.getFormulaManager().getBooleanFormulaManager();
-      imgr = context.getFormulaManager().getIntegerFormulaManager();
     }
 
     abstract S getSymbols();
@@ -236,8 +234,11 @@ public class Sudoku {
 
   public static class IntegerBasedSudokuSolver extends SudokuSolver<IntegerFormula[][]> {
 
+    final IntegerFormulaManager imgr;
+
     public IntegerBasedSudokuSolver(SolverContext context) {
       super(context);
+      imgr = context.getFormulaManager().getIntegerFormulaManager();
     }
 
     /** prepare symbols: one symbol for each of the 9x9 cells. */
