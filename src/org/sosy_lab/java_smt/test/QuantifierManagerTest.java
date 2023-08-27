@@ -454,6 +454,13 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   public void testLIAExistsArrayDisjunct1() throws SolverException, InterruptedException {
     // (exists x . b[x] = 0) OR  (forall x . b[x] = 1) is SAT
 
+    // Princess can not solve this test since version 2023-06-19. Bug is reported.
+    // TODO enable this test with the next update of Princess.
+    assume()
+        .withMessage("Solver %s does not solve this formula", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.PRINCESS);
+
     requireIntegers();
     BooleanFormula f =
         bmgr.or(
