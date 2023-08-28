@@ -31,6 +31,8 @@ import apron.Texpr1UnNode;
 import apron.Texpr1VarNode;
 import apron.Var;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
@@ -276,9 +278,9 @@ public interface ApronNode extends Formula {
         String[] varNames2 = param2.getVarNames();
         String[] allVarNames = new String[varNames1.length + varNames2.length];
         System.arraycopy(varNames1, 0, allVarNames, 0, varNames1.length);
-        int j = varNames1.length - 1;
+        int j = varNames1.length;
         for (int i = 0; i < varNames2.length; i++) {
-          allVarNames[j] = varNames1[i];
+          allVarNames[j] = varNames2[i];
           j++;
         }
         this.varNames = allVarNames;
@@ -345,6 +347,14 @@ public interface ApronNode extends Formula {
         this.value = pNode.getValue();
       }
 
+      public ApronIntCstNode(ApronRatCstNode ratNode){
+        this.cstNode =
+            new Texpr1CstNode(new MpqScalar(
+                BigInteger.valueOf(Long.parseLong(ratNode.getRational().toString()))));
+        this.value =
+            BigInteger.valueOf(Long.parseLong(ratNode.getRational().toString()));
+      }
+
       @Override
       public String toString() {
         return cstNode.toString();
@@ -407,6 +417,23 @@ public interface ApronNode extends Formula {
         this.varNode = pNode.getNode();
         this.formulaCreator = pNode.getFormulaCreator();
         this.varName = pNode.getVarName();
+      }
+
+      public ApronIntVarNode(ApronRatVarNode rationalNode){
+        this.varNode = new Texpr1VarNode(rationalNode.varName);
+        this.varName = rationalNode.varName;
+        this.formulaCreator = rationalNode.getFormulaCreator();
+        //deleting real variable from environment
+        Var[] intVars = formulaCreator.getEnvironment().getIntVars();
+        Var[] realVars = formulaCreator.getEnvironment().getRealVars();
+        ArrayList<Var> list = new ArrayList<>(Arrays.asList(realVars));
+        Var v = new StringVar(varName);
+        list.remove(v);
+        Var[] newRealVars = new Var[list.size()];
+        newRealVars = list.toArray(newRealVars);
+        formulaCreator.setEnvironment(new Environment(intVars, newRealVars));
+        //adding int var to Environment
+        addVarToEnv();
       }
 
       public String getVarName() {
@@ -485,6 +512,11 @@ public interface ApronNode extends Formula {
         this.varNames = pNode.getVarNames();
       }
 
+      public ApronIntUnaryNode(ApronRatUnaryNode rationalNode){
+        this.unaryNode = rationalNode.getNode();
+        this.varNames = rationalNode.getVarNames();
+      }
+
       @Override
       public String toString() {
         return unaryNode.toString();
@@ -537,9 +569,9 @@ public interface ApronNode extends Formula {
         String[] varNames2 = param2.getVarNames();
         String[] allVarNames = new String[varNames1.length + varNames2.length];
         System.arraycopy(varNames1, 0, allVarNames, 0, varNames1.length);
-        int j = varNames1.length - 1;
+        int j = varNames1.length;
         for (int i = 0; i < varNames2.length; i++) {
-          allVarNames[j] = varNames1[i];
+          allVarNames[j] = varNames2[i];
           j++;
         }
         this.varNames = allVarNames;
@@ -548,6 +580,11 @@ public interface ApronNode extends Formula {
       public ApronIntBinaryNode(ApronIntBinaryNode pNode){
         this.binaryNode = pNode.getNode();
         this.varNames = pNode.getVarNames();
+      }
+
+      public ApronIntBinaryNode(ApronRatBinaryNode rationalNode){
+        this.binaryNode = rationalNode.getNode();
+        this.varNames = rationalNode.getVarNames();
       }
 
       @Override

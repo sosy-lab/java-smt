@@ -176,7 +176,7 @@ public class ApronIntegerFormulaManager
 
   @Override
   protected ApronNode distinctImpl(List pNumbers) {
-    return null;
+    throw new UnsupportedOperationException("Apron does not support distinctImpl()");
   }
 
   @Override

@@ -95,10 +95,13 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
       Tcons1[] newCons = new Tcons1[consOld.length + 1];
       int i = 0;
       for (Tcons1 c : consOld) {
+        c.extendEnvironment(solverContext.getFormulaCreator().getEnvironment());
         newCons[i] = c;
         i++;
       }
       newCons[consOld.length] = pConstraint.getConstraintNode();
+      this.abstract1.changeEnvironment(solverContext.getManager(),
+          solverContext.getFormulaCreator().getEnvironment(),true);
       this.abstract1 = new Abstract1(solverContext.getManager(), newCons);
       Iterables.getLast(assertedFormulas).add(pConstraint);
     } catch (ApronException e) {
@@ -149,7 +152,7 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException("Apron does not support unsat-core.");
+    throw new NullPointerException();
   }
 
   @Override

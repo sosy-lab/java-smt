@@ -172,7 +172,7 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
 
   @Override
   public ApronNode callFunctionImpl(Long declaration, List<ApronNode> args) {
-    throw new UnsupportedOperationException();
+    throw new UnsupportedOperationException("Apron does not support callFunctionImpl().");
   }
 
   @Override

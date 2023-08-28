@@ -23,20 +23,28 @@ package org.sosy_lab.java_smt.solvers.apron;
 import apron.Tcons1;
 import apron.Texpr1BinNode;
 import apron.Texpr1UnNode;
+import com.google.common.base.Preconditions;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadPoolExecutor.AbortPolicy;
+import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.ApronIntegerType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.ApronRationalType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.FormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronConstraint;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronIntBinaryNode;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronIntCstNode;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronIntUnaryNode;
+import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronIntVarNode;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronRatBinaryNode;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronRatCstNode;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronRatUnaryNode;
@@ -64,14 +72,9 @@ public class ApronRationalFormulaManager extends
 
   @Override
   protected ApronNode makeNumberImpl(double pNumber) {
-    String str = String.valueOf(pNumber);
-    String[] numbers = str.split("\\.");
-    int num = Integer.parseInt(numbers[0]);
-    if(numbers.length>1) {
-      int den = Integer.parseInt(numbers[1]);
-      return new ApronRatCstNode(BigInteger.valueOf(num),BigInteger.valueOf(den));
-    }
-    return new ApronRatCstNode(BigInteger.valueOf(num),BigInteger.ONE);  }
+    BigDecimal dec = BigDecimal.valueOf(pNumber);
+    Rational rat = Rational.ofBigDecimal(dec);
+    return new ApronRatCstNode(rat.getNum(),rat.getDen());  }
 
   @Override
   protected ApronNode makeNumberImpl(BigDecimal pNumber) {
@@ -102,6 +105,8 @@ public class ApronRationalFormulaManager extends
 
   @Override
   protected ApronNode makeNumberImpl(String i) {
+    Preconditions.checkArgument(!(i.contains(".") || i.contains(",")),
+        "Rational number has to be written like 2/5.");
     String[] numbers = i.split("/");
     int num = Integer.parseInt(numbers[0]);
     if(numbers.length>1) {
@@ -169,7 +174,7 @@ public class ApronRationalFormulaManager extends
 
   @Override
   protected ApronNode distinctImpl(List pNumbers) {
-    return null;
+    throw new UnsupportedOperationException("Apron does not support distinctImpl()");
   }
 
   @Override
@@ -206,6 +211,32 @@ public class ApronRationalFormulaManager extends
     ApronConstraint constraint = new ApronConstraint(Tcons1.SUPEQ, formulaCreator.getEnvironment(),
         binaryNode);
     return constraint;
+  }
+
+  @Override
+  protected ApronNode floor(ApronNode pTerm) {
+    return toInteger(pTerm);
+  }
+
+  private ApronNode toInteger(ApronNode pNumeralNode){
+  FormulaType pType = pNumeralNode.getType();
+  if (pType.equals(FormulaType.RATIONAL)) {
+      if (pNumeralNode instanceof ApronRatCstNode) {
+        ApronRatCstNode node = (ApronRatCstNode) pNumeralNode;
+        return new ApronNode.ApronNumeralNode.ApronIntCstNode(node);
+      } else if (pNumeralNode instanceof ApronRatVarNode) {
+        ApronRatVarNode node = (ApronRatVarNode) pNumeralNode;
+        return new ApronNode.ApronNumeralNode.ApronIntVarNode(node);
+      } else if (pNumeralNode instanceof ApronRatUnaryNode) {
+        ApronRatUnaryNode node = (ApronRatUnaryNode) pNumeralNode;
+        return new ApronNode.ApronNumeralNode.ApronRatUnaryNode(node);
+      } else if (pNumeralNode instanceof ApronRatBinaryNode) {
+        ApronRatBinaryNode node = (ApronRatBinaryNode) pNumeralNode;
+        return new ApronNode.ApronNumeralNode.ApronRatBinaryNode(node);
+      }
+  }
+    throw new IllegalArgumentException("Parameter must be rational ApronNode.");
+
   }
 
 }
