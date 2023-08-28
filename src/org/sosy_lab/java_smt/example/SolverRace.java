@@ -99,7 +99,6 @@ public class SolverRace {
   }
 
   private SolverRace() {}
-  ;
 
   private static void thread(Run runnable) {
     final ExecutorService runningThread = Executors.newSingleThreadExecutor();
