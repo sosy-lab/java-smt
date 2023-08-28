@@ -21,7 +21,6 @@
 package org.sosy_lab.java_smt.example;
 
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assertWithMessage;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.CVC4;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.CVC5;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.DREAL4;
@@ -121,9 +120,8 @@ public class SolverRace {
     } finally {
       runningThread.shutdownNow();
     }
-    assertWithMessage("Test failed with exception(s): %s", exceptionsList)
-        .that(exceptionsList.isEmpty())
-        .isTrue();
+    assertThat(exceptionsList)
+        .isEmpty();
   }
 
   /** just a small lambda-compatible interface. */
