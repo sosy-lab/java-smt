@@ -98,6 +98,8 @@ public class SolverRace {
     System.exit(0);
   }
 
+  private SolverRace() {};
+
   private static void thread(Run runnable) {
     final ExecutorService runningThread = Executors.newSingleThreadExecutor();
     final List<Throwable> exceptionsList = Collections.synchronizedList(new ArrayList<>());
