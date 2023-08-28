@@ -20,7 +20,7 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
-import static org.sosy_lab.java_smt.solvers.bitwuzla.SWIG_BitwuzlaKind.BITWUZLA_KIND_EQUAL;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_EQUAL;
 
 import com.google.common.collect.Table;
 import org.sosy_lab.java_smt.api.Formula;
@@ -43,16 +43,13 @@ public class BitwuzlaArrayFormulaManager
   @Override
   protected Long select(Long pArray, Long pIndex) {
     return bitwuzlaJNI.bitwuzla_mk_term2(
-        SWIG_BitwuzlaKind.BITWUZLA_KIND_ARRAY_SELECT.swigValue(), pArray, pIndex);
+        BitwuzlaKind.BITWUZLA_KIND_ARRAY_SELECT.swigValue(), pArray, pIndex);
   }
 
   @Override
   protected Long store(Long pArray, Long pIndex, Long pValue) {
     return bitwuzlaJNI.bitwuzla_mk_term3(
-        SWIG_BitwuzlaKind.BITWUZLA_KIND_ARRAY_STORE.swigValue(),
-        pArray,
-        pIndex,
-        pValue);
+        BitwuzlaKind.BITWUZLA_KIND_ARRAY_STORE.swigValue(), pArray, pIndex, pValue);
   }
 
   @Override
@@ -67,7 +64,6 @@ public class BitwuzlaArrayFormulaManager
 
   @Override
   protected Long equivalence(Long pArray1, Long pArray2) {
-    return bitwuzlaJNI.bitwuzla_mk_term2(
-        BITWUZLA_KIND_EQUAL.swigValue(), pArray1, pArray2);
+    return bitwuzlaJNI.bitwuzla_mk_term2(BITWUZLA_KIND_EQUAL.swigValue(), pArray1, pArray2);
   }
 }

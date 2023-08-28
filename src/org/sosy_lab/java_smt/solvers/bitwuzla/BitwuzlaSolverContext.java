@@ -139,7 +139,7 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
 
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
-      Set<ProverOptions> pSet) {
+      Set<ProverOptions> pF) {
     throw new UnsupportedOperationException("Bitwuzla does not support interpolation");
   }
 
@@ -166,37 +166,37 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
    */
   @Override
   protected boolean supportsAssumptionSolving() {
-    // TODO: Should probably be true
-    return false;
+    return true;
   }
 
-  /** set basic options for running Boolector. */
   private static void setOptions(
       Configuration config, PathCounterTemplate solverLogfile, long randomSeed, long bitwuzla)
       throws InvalidConfigurationException {
     BitwuzlaSettings settings = new BitwuzlaSettings(config);
 
     Preconditions.checkNotNull(settings.satSolver);
-    bitwuzlaJNI.bitwuzla_set_option_str(
-        SWIG_BitwuzlaOption.BITWUZLA_OPT_SAT_ENGINE.swigValue(),
+
+    long options = bitwuzlaJNI.bitwuzla_options_new();
+
+    bitwuzlaJNI.bitwuzla_set_option_mode(
+        options,
+        BitwuzlaOption.BITWUZLA_OPT_SAT_SOLVER.swigValue(),
         settings.satSolver.name().toLowerCase(Locale.getDefault()));
     // Default Options to enable multiple SAT, auto cleanup on close, incremental mode
     bitwuzlaJNI.bitwuzla_set_option(
-        bitwuzla, SWIG_BitwuzlaOption.BITWUZLA_OPT_PRODUCE_MODELS.swigValue(), 2);
+        options, BitwuzlaOption.BITWUZLA_OPT_PRODUCE_MODELS.swigValue(), 2);
     // TODO: Not available in Bitwzula?
     //    BitwuzlaJNI.bitwuzla_set_option(bitwuzla,
     // SWIG_BitwuzlaOption.BTOR_OPT_AUTO_CLEANUP.getValue(), 1);
-    // Incremental needed for push/pop!
-    bitwuzlaJNI.bitwuzla_set_option(
-        bitwuzla, SWIG_BitwuzlaOption.BITWUZLA_OPT_INCREMENTAL.swigValue(), 1);
+    // Incremental is always enabled.
     // Sets randomseed accordingly
     bitwuzlaJNI.bitwuzla_set_option(
-        bitwuzla, SWIG_BitwuzlaOption.BITWUZLA_OPT_SEED.swigValue(), randomSeed);
-    // Stop Boolector from rewriting formulas in outputs
+        options, BitwuzlaOption.BITWUZLA_OPT_SEED.swigValue(), randomSeed);
+    // Stop Bitwuzla from rewriting formulas in outputs
     bitwuzlaJNI.bitwuzla_set_option(
-        bitwuzla, SWIG_BitwuzlaOption.BITWUZLA_OPT_RW_LEVEL.swigValue(), 0);
+        options, BitwuzlaOption.BITWUZLA_OPT_REWRITE_LEVEL.swigValue(), 0);
 
-    // setFurtherOptions(bitwuzla, settings.furtherOptions);
+    setFurtherOptions(bitwuzla, settings.furtherOptions);
     // TODO: This seems to be setting a logfile. Perhaps the SWIG _IO_FILE could be used instead?
     //    if (solverLogfile != null) {
     //      String filename = solverLogfile.getFreshPath().toAbsolutePath().toString();
@@ -231,10 +231,10 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
     }
     for (Map.Entry<String, String> option : furtherOptionsMap.entrySet()) {
       try {
-        Class<?> optionClass = SWIG_BitwuzlaOption.class;
+        Class<?> optionClass = BitwuzlaOption.class;
         Field optionField = optionClass.getField(option.getKey());
         // Get the value of the public fields
-        SWIG_BitwuzlaOption value = (SWIG_BitwuzlaOption) optionField.get(null);
+        BitwuzlaOption value = (BitwuzlaOption) optionField.get(null);
         long optionValue = Long.parseLong(option.getValue());
         bitwuzlaJNI.bitwuzla_set_option(bitwuzla, value.swigValue(), optionValue);
       } catch (java.lang.NoSuchFieldException e) {

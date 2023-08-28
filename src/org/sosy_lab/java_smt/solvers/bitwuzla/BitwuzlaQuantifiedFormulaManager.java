@@ -47,14 +47,10 @@ public class BitwuzlaQuantifiedFormulaManager
         LongStream.concat(vars.stream().mapToLong(Long::longValue), LongStream.of(body)).toArray();
     if (q.equals(Quantifier.FORALL)) {
       return bitwuzlaJNI.bitwuzla_mk_term(
-          SWIG_BitwuzlaKind.BITWUZLA_KIND_FORALL.swigValue(),
-          argsAndBody.length,
-          argsAndBody);
+          BitwuzlaKind.BITWUZLA_KIND_FORALL.swigValue(), argsAndBody.length, argsAndBody);
     } else {
       return bitwuzlaJNI.bitwuzla_mk_term(
-          SWIG_BitwuzlaKind.BITWUZLA_KIND_EXISTS.swigValue(),
-          argsAndBody.length,
-          argsAndBody);
+          BitwuzlaKind.BITWUZLA_KIND_EXISTS.swigValue(), argsAndBody.length, argsAndBody);
     }
   }
 }
