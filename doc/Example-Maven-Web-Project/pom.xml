@@ -71,7 +71,7 @@ SPDX-License-Identifier: Apache-2.0
     <project.dependency.relativepath>dependency</project.dependency.relativepath>
     <project.dependency.path>${project.build.directory}/${project.dependency.relativepath}</project.dependency.path>
 
-    <javasmt.version>4.0.2</javasmt.version>
+    <javasmt.version>4.0.3</javasmt.version>
     <boolector.version>3.2.2-g1a89c229</boolector.version>
     <cvc4.version>1.8-prerelease-2020-06-24-g7825d8f28</cvc4.version>
     <cvc5.version>1.0.5-g4cb2ab9eb</cvc5.version>
@@ -237,7 +237,7 @@ SPDX-License-Identifier: Apache-2.0
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.13.1</version>
+      <version>4.13.2</version>
       <scope>test</scope>
     </dependency>
 
