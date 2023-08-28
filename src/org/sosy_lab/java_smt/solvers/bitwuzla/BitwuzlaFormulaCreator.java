@@ -20,14 +20,15 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Table;
+import java.math.BigInteger;
 import java.util.List;
-import java.util.stream.LongStream;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
+import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
+import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
@@ -98,41 +99,52 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
   // create hashmaps for each type of kind, and then check in which hashmap the kind is?
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula formula, Long f) {
-    SWIG_BitwuzlaKind kind = SWIG_BitwuzlaKind.swigToEnum(bitwuzlaJNI.bitwuzla_term_get_kind(f));
-    
+
     if (bitwuzlaJNI.bitwuzla_term_is_const(f)){
-      
-    } else if (bitwuzlaJNI.term) {
-      
+      visitor.visitConstant(f, bitwuzlaJNI.bitwuzla_get_value());
+      if(bitwuzlaJNI.bitwuzla_term_is_bool(f)){
+        String value = bitwuzlaJNI.bitwuzla_get_value()
+        visitor.visitConstant(f, new BigInteger(value))
+      }
+    } else if (bitwuzlaJNI.bitwuzla_term_is_var(f)) {
+      bj.var
+      visitor.visitBoundVariable(f, )
+    } else if (bitwuzlaJNI.bitwuzla_term_is_fun(f)) {
+      visitor.visitFunction()
+    } else {
+      BitwuzlaKind kind = BitwuzlaKind.swigToEnum(bitwuzlaJNI.bitwuzla_term_get_kind(f));
+      if (kind == BitwuzlaKind.BITWUZLA_KIND_EXISTS || kind == BitwuzlaKind.BITWUZLA_KIND_FORALL){
+        Quantifier forall = Quantifier.FORALL;
+        visitor.visitQuantifier(f)
+      }
+      String name = kind.toString();
     }
     return null;
   }
 
   @Override
   public Long callFunctionImpl(Long declaration, List<Long> args) {
-    long[] functionAndArgs =
-        LongStream.concat(LongStream.of(declaration), args.stream().mapToLong(Long::longValue))
-            .toArray();
-    return bitwuzlaJNI.bitwuzla_mk_term(
-        SWIG_BitwuzlaKind.BITWUZLA_KIND_APPLY.swigValue(), args.size(), functionAndArgs);
+//    long[] functionAndArgs =
+//        LongStream.concat(LongStream.of(declaration), args.stream().mapToLong(Long::longValue))
+//            .toArray();
+//    return bitwuzlaJNI.bitwuzla_mk_term(
+//        SWIG_BitwuzlaKind.BITWUZLA_KIND_APPLY.swigValue(), args.size(), functionAndArgs);
+
+    return bitwuzlaJNI.bitwuzla_mk_term(declaration.intValue(), args.size(),
+        args.stream().mapToLong(Long::longValue).toArray());
   }
 
   @Override
   public Long declareUFImpl(String pName, Long pReturnType, List<Long> pArgTypes) {
-    if (pArgTypes.isEmpty()) {
-      long zeroArityUFSort = bitwuzlaJNI.
-    } else {
-
-    }
-
-
-
-    return null;
+    long functionSort = bitwuzlaJNI.bitwuzla_mk_fun_sort(pArgTypes.size(),
+        pArgTypes.stream().mapToLong(Long::longValue).toArray(), pReturnType);
+    return bitwuzlaJNI.bitwuzla_mk_const(functionSort, pName);
   }
 
   @Override
   protected Long getBooleanVarDeclarationImpl(Long pLong) {
-    return null;
+    long boolSort = bitwuzlaJNI.bitwuzla_mk_bool_sort();
+    return
   }
 
   public Table<String, Long, Long> getCache() {

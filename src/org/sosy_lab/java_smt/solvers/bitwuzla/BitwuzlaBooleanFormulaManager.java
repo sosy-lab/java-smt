@@ -49,32 +49,30 @@ public class BitwuzlaBooleanFormulaManager
 
   @Override
   protected Long not(Long pParam1) {
-    return bitwuzlaJNI.bitwuzla_mk_term1(
-        SWIG_BitwuzlaKind.BITWUZLA_KIND_NOT.swigValue(), pParam1);
+    return bitwuzlaJNI.bitwuzla_mk_term1(BitwuzlaKind.BITWUZLA_KIND_NOT.swigValue(), pParam1);
   }
 
   @Override
   protected Long and(Long pParam1, Long pParam2) {
     return bitwuzlaJNI.bitwuzla_mk_term2(
-        SWIG_BitwuzlaKind.BITWUZLA_KIND_AND.swigValue(), pParam1, pParam2);
+        BitwuzlaKind.BITWUZLA_KIND_AND.swigValue(), pParam1, pParam2);
   }
 
   @Override
   protected Long or(Long pParam1, Long pParam2) {
     return bitwuzlaJNI.bitwuzla_mk_term2(
-        SWIG_BitwuzlaKind.BITWUZLA_KIND_OR.swigValue(), pParam1, pParam2);
+        BitwuzlaKind.BITWUZLA_KIND_OR.swigValue(), pParam1, pParam2);
   }
 
   @Override
   protected Long xor(Long pParam1, Long pParam2) {
     return bitwuzlaJNI.bitwuzla_mk_term2(
-        SWIG_BitwuzlaKind.BITWUZLA_KIND_XOR.swigValue(), pParam1, pParam2);
+        BitwuzlaKind.BITWUZLA_KIND_XOR.swigValue(), pParam1, pParam2);
   }
 
   @Override
   protected Long equivalence(Long bits1, Long bits2) {
-    return bitwuzlaJNI.bitwuzla_mk_term2(
-        SWIG_BitwuzlaKind.BITWUZLA_KIND_IFF.swigValue(), bits1, bits2);
+    return bitwuzlaJNI.bitwuzla_mk_term2(BitwuzlaKind.BITWUZLA_KIND_IFF.swigValue(), bits1, bits2);
   }
 
   @Override
@@ -89,7 +87,6 @@ public class BitwuzlaBooleanFormulaManager
 
   @Override
   protected Long ifThenElse(Long cond, Long f1, Long f2) {
-    return bitwuzlaJNI.bitwuzla_mk_term2(
-        SWIG_BitwuzlaKind.BITWUZLA_KIND_ITE.swigValue(), f1, f2);
+    return bitwuzlaJNI.bitwuzla_mk_term2(BitwuzlaKind.BITWUZLA_KIND_ITE.swigValue(), f1, f2);
   }
 }

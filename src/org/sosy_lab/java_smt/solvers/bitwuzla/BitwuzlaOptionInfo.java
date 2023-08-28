@@ -56,12 +56,12 @@ public class BitwuzlaOptionInfo {
     }
   }
 
-  public void setOpt(SWIG_BitwuzlaOption value) {
+  public void setOpt(BitwuzlaOption value) {
     bitwuzlaJNI.BitwuzlaOptionInfo_opt_set(swigCPtr, this, value.swigValue());
   }
 
-  public SWIG_BitwuzlaOption getOpt() {
-    return SWIG_BitwuzlaOption.swigToEnum(bitwuzlaJNI.BitwuzlaOptionInfo_opt_get(swigCPtr, this));
+  public BitwuzlaOption getOpt() {
+    return BitwuzlaOption.swigToEnum(bitwuzlaJNI.BitwuzlaOptionInfo_opt_get(swigCPtr, this));
   }
 
   public void setShrt(String value) {

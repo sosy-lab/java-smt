@@ -20,6 +20,7 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
+import com.google.common.base.Preconditions;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -28,26 +29,52 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 
-public class BitwuzlaTheoremProver implements ProverEnvironment {
-  public BitwuzlaTheoremProver(
+public class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements ProverEnvironment {
+  /** Bitwuzla does not support multiple solver stacks. */
+  private final AtomicBoolean isAnyStackAlive;
+
+  private final long pEnv;
+  private final BitwuzlaFormulaManager manager;
+  private final BitwuzlaFormulaCreator creator;
+  protected boolean wasLastSatCheckSat = false; // and stack is not changed
+
+  public BitwuzlaTheoremProver (
       BitwuzlaFormulaManager pManager,
       BitwuzlaFormulaCreator pCreator,
       long pEnv,
       ShutdownNotifier pShutdownNotifier,
       Set<ProverOptions> pOptions,
-      AtomicBoolean pIsAnyStackAlive) {}
+      AtomicBoolean pIsAnyStackAlive) {
+    super(pOptions, pManager.getBooleanFormulaManager(), pShutdownNotifier);
+    this.manager = pManager;
+    this.creator = pCreator;
+    this.pEnv = pEnv;
+
+    isAnyStackAlive = pIsAnyStackAlive;
+    // avoid dual stack usage
+    Preconditions.checkState(
+        !isAnyStackAlive.getAndSet(true),
+        "Boolector does not support the usage of multiple "
+            + "solver stacks at the same time. Please close any existing solver stack.");
+  }
 
   /**
    * Remove one backtracking point/level from the current stack. This removes the latest level
    * including all of its formulas, i.e., all formulas that were added for this backtracking point.
    */
   @Override
-  public void pop() {}
+  public void pop() {
+    Preconditions.checkState(!closed);
+    Preconditions.checkState(size() > 0);
+    bitwuzlaJNI.bitwuzla_pop(pEnv, 1);
+  }
 
   /**
    * Add a constraint to the latest backtracking point.
@@ -56,6 +83,14 @@ public class BitwuzlaTheoremProver implements ProverEnvironment {
    */
   @Override
   public @Nullable Void addConstraint(BooleanFormula constraint) throws InterruptedException {
+    Preconditions.checkState(!closed);
+    wasLastSatCheckSat = false;
+    super.addConstraint(constraint);
+    constraint.
+    Term exp = creator.extractInfo(pF);
+    if (incremental) {
+      solver.assertFormula(exp);
+    }
     return null;
   }
 
@@ -67,23 +102,26 @@ public class BitwuzlaTheoremProver implements ProverEnvironment {
    * via a POP-operation.
    */
   @Override
-  public void push() throws InterruptedException {}
-
-  /**
-   * Get the number of backtracking points/levels on the current stack.
-   *
-   * <p>Caution: This is the number of PUSH-operations, and not necessarily equal to the number of
-   * asserted formulas. On any level there can be an arbitrary number of asserted formulas. Even
-   * with size of 0, formulas can already be asserted (at bottom level).
-   */
-  @Override
-  public int size() {
-    return 0;
+  public void push() throws InterruptedException {
+    Preconditions.checkState(!closed);
+    super.push();
+    bitwuzlaJNI.bitwuzla_push(pEnv, 1);
   }
 
   /** Check whether the conjunction of all formulas on the stack is unsatisfiable. */
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
+    Preconditions.checkState(!closed);
+    wasLastSatCheckSat = false;
+    final int result = bitwuzlaJNI.bitwuzla_check_sat(pEnv);
+    if (result == BitwuzlaResult.BITWUZLA_SAT.swigValue()){
+      wasLastSatCheckSat = true;
+      return false;
+    } else if (result == BitwuzlaResult.BITWUZLA_UNSAT.swigValue()) {
+      return true;
+    } else if (result == BitwuzlaResult.BITWUZLA_UNKNOWN.swigValue()) {
+      throw new SolverException("Bitwuzla returned Unknown.");
+    }
     return false;
   }
 
@@ -96,7 +134,7 @@ public class BitwuzlaTheoremProver implements ProverEnvironment {
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
-    return false;
+    return
   }
 
   /**
@@ -110,6 +148,10 @@ public class BitwuzlaTheoremProver implements ProverEnvironment {
    */
   @Override
   public Model getModel() throws SolverException {
+    Preconditions.checkState(!closed);
+    Preconditions.checkState(wasLastSatCheckSat, NO_MODEL_HELP);
+    checkGenerateModels();
+
     return null;
   }
 
@@ -156,6 +198,21 @@ public class BitwuzlaTheoremProver implements ProverEnvironment {
   @Override
   public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
+    return null;
+  }
+
+  /**
+   * Get an evaluator instance for model evaluation without executing checks for prover options.
+   *
+   * <p>This method allows model evaluation without explicitly enabling the prover-option {@link
+   * ProverOptions#GENERATE_MODELS}. We only use this method internally, when we know about a valid
+   * solver state. The returned evaluator does not have caching or any direct optimization for user
+   * interaction.
+   *
+   * @throws SolverException if model can not be constructed.
+   */
+  @Override
+  protected Evaluator getEvaluatorWithoutChecks() throws SolverException {
     return null;
   }
 }
