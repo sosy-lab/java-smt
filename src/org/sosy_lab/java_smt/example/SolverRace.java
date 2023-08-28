@@ -20,7 +20,6 @@
 
 package org.sosy_lab.java_smt.example;
 
-import static com.google.common.truth.Truth.assertThat;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.CVC4;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.CVC5;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.DREAL4;
@@ -29,6 +28,7 @@ import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.SMTINTERPOL;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.YICES2;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.Z3;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -66,7 +66,7 @@ public class SolverRace {
   // the maximum difficulty of the generated formulas
   private static final int MAX_DIFFICULTY = 100;
   // the maximum time of a thread in seconds
-  private static final int MAX_TIME = 300;
+  private static final int MAX_TIME = 5;
 
   public static void main(String[] args) throws Exception {
     for (Solvers solver : SOLVERS_WITH_RATIONALS) {
@@ -88,7 +88,7 @@ public class SolverRace {
                 HardFormulaRationalGenerator gen = new HardFormulaRationalGenerator(rfmgr, bfmgr);
                 BooleanFormula threadFormula = gen.generate(finalI);
                 prover.push(threadFormula);
-                assertThat(prover.isUnsat()).isTrue();
+                Preconditions.checkState(prover.isUnsat());
                 System.out.print("+");
               }
             }
@@ -98,7 +98,8 @@ public class SolverRace {
     System.exit(0);
   }
 
-  private SolverRace() {};
+  private SolverRace() {}
+  ;
 
   private static void thread(Run runnable) {
     final ExecutorService runningThread = Executors.newSingleThreadExecutor();
@@ -122,7 +123,7 @@ public class SolverRace {
     } finally {
       runningThread.shutdownNow();
     }
-    assertThat(exceptionsList).isEmpty();
+    Preconditions.checkState(exceptionsList.isEmpty());
   }
 
   /** just a small lambda-compatible interface. */
