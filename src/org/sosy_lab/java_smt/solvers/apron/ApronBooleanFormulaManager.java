@@ -49,17 +49,7 @@ public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<Ap
  */
   @Override
   protected ApronNode makeBooleanImpl(boolean value) {
-    ApronIntCstNode cst = new ApronIntCstNode(BigInteger.valueOf(1));
-    if(value){
-      ApronConstraint t = new ApronConstraint(Tcons1.SUP,formulaCreator.getEnvironment(),cst); //1
-      // !=0 --> true
-      t.setIsTrue(true);
-      return t;
-    } else {
-      ApronConstraint f = new ApronConstraint(Tcons1.EQ,formulaCreator.getEnvironment(),cst);//1==0 --> false
-      f.setIsTrue(false);
-      return f;
-    }
+    throw new UnsupportedOperationException("Apron does not support makeBooleanImpl().");
   }
 
   @Override

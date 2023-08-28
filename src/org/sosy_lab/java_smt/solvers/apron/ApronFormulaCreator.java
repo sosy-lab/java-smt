@@ -22,6 +22,7 @@ package org.sosy_lab.java_smt.solvers.apron;
 
 import apron.Environment;
 import com.google.common.base.Preconditions;
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,7 +81,13 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
     if (valueType == FormulaType.INTEGER && value instanceof ApronIntCstNode) {
       return ((ApronIntCstNode) value).getValue();
     } else if ( valueType == FormulaType.RATIONAL && value instanceof ApronRatCstNode) {
-      return ((ApronRatCstNode) value).getDenominator().divide(((ApronRatCstNode) value).getDenominator());
+      BigInteger num = ((ApronRatCstNode) value).getNumerator();
+      BigInteger den = ((ApronRatCstNode) value).getDenominator();
+      Rational div = Rational.of(num, den);
+      if(den.equals(BigInteger.ONE)){
+        return num;
+      }
+      return div;
     } else if (value instanceof ApronIntVarNode) {
       return ((ApronIntVarNode) value).getVarName();
     }else if (value instanceof ApronRatVarNode) {

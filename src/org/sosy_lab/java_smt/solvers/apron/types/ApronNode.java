@@ -61,7 +61,7 @@ public interface ApronNode extends Formula {
       private final Rational rational;
 
       public ApronRatCstNode(BigInteger pNumerator, BigInteger pDenominator) {
-        this.cstNode = new Texpr1CstNode(new MpqScalar(pNumerator.divide(pDenominator)));
+        this.cstNode = new Texpr1CstNode(new MpqScalar(pNumerator,pDenominator));
         this.numerator = pNumerator;
         this.denominator = pDenominator;
         this.rational = Rational.of(numerator,denominator);

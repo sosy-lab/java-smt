@@ -98,7 +98,7 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
     try {
       ApronConstraint constraint = pFormula;
       String varName = pVar;
-      if (pFormula.getApronNode().getType().equals(FormulaType.INTEGER)) {
+      if (formulaCreator.getEnvironment().isInt(pVar)) {
         ApronNode keyFormula = formulaCreator.getVariables().get(varName);
         Manager man = this.prover.getAbstract1().getCreationManager();
         Interval interval = this.prover.getAbstract1().getBound(man, pVar);
@@ -118,15 +118,23 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
         Object value = interval.sup;
         //TODO: unfortunatly it is not possible to extract nominator and denominator out of an
         // Scalar; So all models show Integer Values
-        BigInteger big = BigInteger.valueOf(Long.parseLong(value.toString()));
-        ApronRatCstNode valueFormula = new ApronRatCstNode(big,
-            BigInteger.ONE);
+        String strValue = value.toString();
+        String[] numbers = strValue.split("/");
+        BigInteger nominator = BigInteger.valueOf(Long.parseLong(numbers[0]));
+        ApronRatCstNode valueFormula;
+        if(numbers.length >1){
+          BigInteger denominator = BigInteger.valueOf(Long.parseLong(numbers[1]));
+          valueFormula = new ApronRatCstNode(nominator,denominator);
+        } else {
+          valueFormula = new ApronRatCstNode(nominator, BigInteger.ONE);
+        }
         ApronRatBinaryNode binaryNode = new ApronRatBinaryNode(keyFormula, valueFormula,
             Texpr1BinNode.OP_SUB);
         BooleanFormula formula = new ApronConstraint(Tcons1.EQ, formulaCreator.getEnvironment(),
             binaryNode);
+        Object node = formulaCreator.convertValue(keyFormula,valueFormula);
         return new ValueAssignment(keyFormula, valueFormula, formula, pVar,
-            formulaCreator.convertValue(keyFormula,valueFormula),
+            node,
             argumentInterpretationBuilder.build());
       }
     } catch (ApronException pApronException) {
@@ -157,7 +165,8 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
           return (ApronNode) assignment.getValueAsFormula();
         }
       }
-    }else {
+    }
+    else {
       Texpr1Node node = pNode.getNode();
       List<String> modelVars = new ArrayList<>();
       for (ValueAssignment assignment:model) {
@@ -192,19 +201,11 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
     return pNode;
   }
 
-  @Override
+/*  @Override
   public @Nullable Rational evaluate(RationalFormula f) {
     if(f instanceof ApronRatCstNode){
       return ((ApronRatCstNode) f).getRational();
     } return null;
-  }
+  }*/
 
-  @Override
-  public String toString() {
-    StringBuilder str = new StringBuilder();
-    for (ValueAssignment assignment:model) {
-      str.append(assignment.toString());
-    }
-    return str.toString();
-  }
 }
