@@ -120,8 +120,7 @@ public class SolverRace {
     } finally {
       runningThread.shutdownNow();
     }
-    assertThat(exceptionsList)
-        .isEmpty();
+    assertThat(exceptionsList).isEmpty();
   }
 
   /** just a small lambda-compatible interface. */
