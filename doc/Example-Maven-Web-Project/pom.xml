@@ -243,9 +243,9 @@ SPDX-License-Identifier: Apache-2.0
 
     <!-- This example is a web-application using javax.servlet. -->
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-      <version>3.0.1</version>
+        <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <version>6.0.0</version>
     </dependency>
   </dependencies>
 
