@@ -98,26 +98,33 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
     try {
       ApronConstraint constraint = pFormula;
       String varName = pVar;
+      //check if the variable is of type integer
       if (formulaCreator.getEnvironment().isInt(pVar)) {
         ApronNode keyFormula = formulaCreator.getVariables().get(varName);
         Manager man = this.prover.getAbstract1().getCreationManager();
+        //shows the interval for all values the variable can take
         Interval interval = this.prover.getAbstract1().getBound(man, pVar);
+        //gives the lower bound of the interval
         MpqScalar value = (MpqScalar) interval.sup;
         BigInteger big = BigInteger.valueOf(Long.parseLong(value.toString()));
+        //valueFormula refers to the lower bound
         ApronIntCstNode valueFormula = new ApronIntCstNode(big);
+        //creates a formula of the form: key - lower bound
         ApronIntBinaryNode binaryNode = new ApronIntBinaryNode(keyFormula, valueFormula,
             Texpr1BinNode.OP_SUB);
+        //creates a constraint of the form key - lower bound = 0 (Apron format of key = lower bound)
         BooleanFormula formula = new ApronConstraint(Tcons1.EQ, formulaCreator.getEnvironment(),
-            binaryNode); //is the representation x=0, if 0 is the model for x
+            binaryNode);
         return new ValueAssignment(keyFormula, valueFormula, formula, pVar, formulaCreator.convertValue(keyFormula,valueFormula),
             argumentInterpretationBuilder.build());
       } else {
         ApronNode keyFormula = formulaCreator.getVariables().get(varName);
         Manager man = this.prover.getAbstract1().getCreationManager();
+        //shows the interval for all values the variable can take
         Interval interval = this.prover.getAbstract1().getBound(man, pVar);
+        //gives the lower bound of the interval
         Object value = interval.sup;
-        //TODO: unfortunatly it is not possible to extract nominator and denominator out of an
-        // Scalar; So all models show Integer Values
+        //translates the value into nominator and denominator
         String strValue = value.toString();
         String[] numbers = strValue.split("/");
         BigInteger nominator = BigInteger.valueOf(Long.parseLong(numbers[0]));
@@ -125,11 +132,13 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
         if(numbers.length >1){
           BigInteger denominator = BigInteger.valueOf(Long.parseLong(numbers[1]));
           valueFormula = new ApronRatCstNode(nominator,denominator);
-        } else {
+        } else { //if the value is an integer
           valueFormula = new ApronRatCstNode(nominator, BigInteger.ONE);
         }
+        //creates a formula of the form: key - lower bound
         ApronRatBinaryNode binaryNode = new ApronRatBinaryNode(keyFormula, valueFormula,
             Texpr1BinNode.OP_SUB);
+        //creates a constraint of the form key - lower bound = 0 (Apron format of key = lower bound)
         BooleanFormula formula = new ApronConstraint(Tcons1.EQ, formulaCreator.getEnvironment(),
             binaryNode);
         Object node = formulaCreator.convertValue(keyFormula,valueFormula);
@@ -148,6 +157,11 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
     return getValue(formula);
   }
 
+  /**
+   * method for extracting the model value for a variable or more complex formula
+   * @param pNode formula to get a model for
+   * @return model value
+   */
   protected ApronNode getValue(ApronNode pNode) {
     if (pNode instanceof ApronIntVarNode) {
       ApronIntVarNode varNode = (ApronIntVarNode) pNode;
@@ -166,7 +180,7 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
         }
       }
     }
-    else {
+    else { //for more complex formulas
       Texpr1Node node = pNode.getNode();
       List<String> modelVars = new ArrayList<>();
       for (ValueAssignment assignment:model) {
@@ -180,18 +194,30 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
             zeroNode.hasDim(prover.getAbstract1().getEnvironment().dimOfVar(modelVar));
         if(hasVarZero){
           try {
-            Texpr1Node param1 = node.substitute(modelVar,toSubT); //substitutes every occurence of
-            // the variable with the value stored in model
+            //substitutes every occurence of the variable with the value stored in model
+            Texpr1Node param1 = node.substitute(modelVar,toSubT);
             Texpr1VarNode var = new Texpr1VarNode(modelVar);
-            Texpr1Node equation = new Texpr1BinNode(Texpr1BinNode.OP_SUB,param1,var); // param1
-            // -variable
+            // param1 - var
+            Texpr1Node equation = new Texpr1BinNode(Texpr1BinNode.OP_SUB,param1,var);
+            //param1 - var = 0 --> var = param1
             Tcons1 cons = new Tcons1(formulaCreator.getEnvironment(),Tcons1.EQ,equation);
             Tcons1[] c = new Tcons1[]{cons};
             Abstract1 abstract1 = new Abstract1(prover.getAbstract1().getCreationManager(),c);
+            //getting the lower bound of the interval which refers to all values the variable can
+            // take
             Object bound =
                 abstract1.getBound(prover.getAbstract1().getCreationManager(), modelVar).sup;
-            int value = Integer.parseInt(bound.toString());
-            return new ApronIntCstNode(BigInteger.valueOf(value));
+            String strValue = bound.toString();
+            String[] numbers = strValue.split("/");
+            BigInteger nominator = BigInteger.valueOf(Long.parseLong(numbers[0]));
+            ApronRatCstNode valueFormula;
+            if(numbers.length >1){ //for rational lower bounds
+              BigInteger denominator = BigInteger.valueOf(Long.parseLong(numbers[1]));
+              valueFormula = new ApronRatCstNode(nominator,denominator);
+            } else { //if the value is an integer
+              valueFormula = new ApronRatCstNode(nominator, BigInteger.ONE);
+            }
+            return valueFormula;
           } catch (ApronException e){
             throw new RuntimeException(e);
           }
@@ -200,12 +226,4 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
     }
     return pNode;
   }
-
-/*  @Override
-  public @Nullable Rational evaluate(RationalFormula f) {
-    if(f instanceof ApronRatCstNode){
-      return ((ApronRatCstNode) f).getRational();
-    } return null;
-  }*/
-
 }

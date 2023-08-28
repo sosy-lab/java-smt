@@ -84,6 +84,7 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
       BigInteger num = ((ApronRatCstNode) value).getNumerator();
       BigInteger den = ((ApronRatCstNode) value).getDenominator();
       Rational div = Rational.of(num, den);
+      //for integer values
       if(den.equals(BigInteger.ONE)){
         return num;
       }
@@ -121,7 +122,7 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
 
   /**
    * For making a Formula (Type ApronNode) for a variable it is important to also update the
-   *
+   *environment!
    * @param pApronFormulaType Integer or Rational?
    * @param varName           name of the variable
    * @return object of either ApronIntVarNode (Type Integer) or ApronRatVarNode (Type Rational)

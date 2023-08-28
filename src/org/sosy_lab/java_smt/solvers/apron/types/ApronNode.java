@@ -43,12 +43,22 @@ import org.sosy_lab.java_smt.solvers.apron.ApronFormulaCreator;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.FormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronRatCstNode;
 
+/**
+ * This is a wrapper for formulas from the Apron-library. All numeral formulas refer to instances of
+ * Texpr1Node; All BooleanFormulas refer to Tcons1; The wrapper is needed to implement methods that
+ * are needed for the JavaSMT-binding but are not provided by the Apron-library.
+ */
 public interface ApronNode extends Formula {
 
   FormulaType getType();
 
   Texpr1Node getNode();
 
+  /**
+   * this array is needed for getting all variable names; it is not possible to extract the name
+   * of a variable used in an Texpr1Node; that is the reason why the names are tracked additionally
+   * @return String-array with all variables that are used in the created formulas
+   */
   String[] getVarNames();
   ApronNode getInstance();
   interface ApronNumeralNode extends ApronNode, NumeralFormula{
@@ -185,6 +195,10 @@ public interface ApronNode extends Formula {
         return this.type;
       }
 
+      /**
+       * this method is needed to add the variable to the @Environment; the @Environment holdas
+       * all variables in two separated arrays, one for Integers and one for Rationals
+       */
       private void addVarToEnv() {
         Var[] intVars = formulaCreator.getEnvironment().getIntVars();
         Var[] realVars = formulaCreator.getEnvironment().getRealVars();
@@ -274,6 +288,7 @@ public interface ApronNode extends Formula {
 
       public ApronRatBinaryNode(ApronNode param1, ApronNode param2, int op) {
         this.binaryNode = new Texpr1BinNode(op, param1.getNode(), param2.getNode());
+        //adding the variablenames of both parameters to @varNames
         String[] varNames1 = param1.getVarNames();
         String[] varNames2 = param2.getVarNames();
         String[] allVarNames = new String[varNames1.length + varNames2.length];
@@ -347,6 +362,10 @@ public interface ApronNode extends Formula {
         this.value = pNode.getValue();
       }
 
+      /**
+       * constructor for transforming a rational constant to an integer constant
+       * @param ratNode constant formula to transform
+       */
       public ApronIntCstNode(ApronRatCstNode ratNode){
         this.cstNode =
             new Texpr1CstNode(new MpqScalar(
@@ -419,6 +438,10 @@ public interface ApronNode extends Formula {
         this.varName = pNode.getVarName();
       }
 
+      /**
+       * constructor for converting a rational variable to an integer variable
+       * @param rationalNode variable formula that should be transformed
+       */
       public ApronIntVarNode(ApronRatVarNode rationalNode){
         this.varNode = new Texpr1VarNode(rationalNode.varName);
         this.varName = rationalNode.varName;
@@ -474,6 +497,10 @@ public interface ApronNode extends Formula {
         return varNode;
       }
 
+      /**
+       * this method is needed to add the variable to the @Environment; the @Environment holdas
+       * all variables in two separated arrays, one for Integers and one for Rationals
+       */
       private void addVarToEnv() {
         Var[] intVars = formulaCreator.getEnvironment().getIntVars();
         Var[] realVars = formulaCreator.getEnvironment().getRealVars();
@@ -512,6 +539,10 @@ public interface ApronNode extends Formula {
         this.varNames = pNode.getVarNames();
       }
 
+      /**
+       * constructor for transforming a rational formula to an integer formula
+       * @param rationalNode formula to transform
+       */
       public ApronIntUnaryNode(ApronRatUnaryNode rationalNode){
         this.unaryNode = rationalNode.getNode();
         this.varNames = rationalNode.getVarNames();
@@ -565,6 +596,7 @@ public interface ApronNode extends Formula {
 
       public ApronIntBinaryNode(ApronNode param1, ApronNode param2, int op) {
         this.binaryNode = new Texpr1BinNode(op, param1.getNode(), param2.getNode());
+        //adding the variablenames of both parameters to @varNames
         String[] varNames1 = param1.getVarNames();
         String[] varNames2 = param2.getVarNames();
         String[] allVarNames = new String[varNames1.length + varNames2.length];
@@ -582,6 +614,10 @@ public interface ApronNode extends Formula {
         this.varNames = pNode.getVarNames();
       }
 
+      /**
+       * constructor for transforming a rational binary formula to an integer one
+       * @param rationalNode formula to transform
+       */
       public ApronIntBinaryNode(ApronRatBinaryNode rationalNode){
         this.binaryNode = rationalNode.getNode();
         this.varNames = rationalNode.getVarNames();
@@ -638,8 +674,6 @@ public interface ApronNode extends Formula {
     private final ApronNode apronNode;
     private final String[] varNames;
 
-    private boolean isTrue;
-
     public ApronConstraint(int pKind, Environment pEnvironment, ApronNode pNode) {
       this.constraintNode = new Tcons1(pEnvironment, pKind, pNode.getNode());
       this.node = pNode.getNode();
@@ -652,15 +686,6 @@ public interface ApronNode extends Formula {
       this.node = pConstraint.getNode();
       this.apronNode = pConstraint.getApronNode();
       this.varNames = pConstraint.getVarNames();
-      this.isTrue = pConstraint.isTrue();
-    }
-
-    public boolean isTrue() {
-      return isTrue;
-    }
-
-    public void setIsTrue(boolean pTrue) {
-      isTrue = pTrue;
     }
 
     @Override
@@ -689,6 +714,9 @@ public interface ApronNode extends Formula {
       return FormulaType.BOOLEAN;
     }
 
+    /**
+     * @return the left side of the equation; ex.: 2x + 3 < 0 --> 2x + 3
+     */
     @Override
     public Texpr1Node getNode() {
       return this.node;

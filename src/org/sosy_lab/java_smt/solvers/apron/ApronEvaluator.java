@@ -20,7 +20,6 @@
 
 package org.sosy_lab.java_smt.solvers.apron;
 
-import apron.Environment;
 import java.util.Collection;
 import java.util.List;
 import org.checkerframework.checker.nullness.qual.Nullable;

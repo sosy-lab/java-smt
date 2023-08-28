@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nullable;
-import javax.sound.midi.Soundbank;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
@@ -155,6 +154,14 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
     throw new NullPointerException();
   }
 
+  /**
+   * with the help of the join() method form the Apron-library one can build a new abstract1
+   * object with additional constraints
+   * @param assumptions A list of literals.
+   * @return if the prover is satisfiable with some additional assumptions
+   * @throws SolverException
+   * @throws InterruptedException
+   */
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {

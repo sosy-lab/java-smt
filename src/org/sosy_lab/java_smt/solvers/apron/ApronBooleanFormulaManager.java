@@ -43,10 +43,7 @@ public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<Ap
   protected ApronNode makeVariableImpl(String pVar) {
     throw new UnsupportedOperationException("Apron supports only numeral variables.");
   }
-/**
- * Not directly implementable, true and false is represented by a constraint that is
- * always true (1!=0) or alway false (1==0)
- */
+
   @Override
   protected ApronNode makeBooleanImpl(boolean value) {
     throw new UnsupportedOperationException("Apron does not support makeBooleanImpl().");

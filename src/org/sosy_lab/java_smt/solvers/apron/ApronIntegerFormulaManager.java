@@ -73,7 +73,7 @@ public class ApronIntegerFormulaManager
       IntegerFormula number1,
       IntegerFormula number2,
       BigInteger n) {
-    return null;
+    return modularCongruence(number1,number2,Long.parseLong(String.valueOf(n)));
   }
 
   @Override
