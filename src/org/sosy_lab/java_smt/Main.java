@@ -20,13 +20,10 @@ package org.sosy_lab.java_smt;/*
 
 import org.sosy_lab.common.*;
 import org.sosy_lab.common.configuration.*;
-import org.sosy_lab.java_smt.*;
 import org.sosy_lab.java_smt.api.*;
 import org.sosy_lab.common.log.*;
 import java.io.*;
-import java.util.Arrays;
-import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
-import org.sosy_lab.java_smt.utils.BooleanLogger;
+import org.sosy_lab.java_smt.utils.Generator;
 
 public class Main {
   public static void main(String[] args)
@@ -34,7 +31,7 @@ public class Main {
     Configuration config = Configuration.fromCmdLineArguments(args);
     LogManager logger = BasicLogManager.create(config);
     ShutdownManager shutdown = ShutdownManager.create();
-    BooleanLogger log = new BooleanLogger();
+    Generator generator = new Generator();
     SolverContext context = SolverContextFactory.createSolverContext(
         config, logger, shutdown.getNotifier(), SolverContextFactory.Solvers.PRINCESS);
     FormulaManager fmgr = context.getFormulaManager();
@@ -44,7 +41,7 @@ public class Main {
     BooleanFormula p = bmgr.makeVariable("p");
 
     BooleanFormula constraint = bmgr.or(p, bmgr.not(p));
-    BooleanLogger.dumpSMTLIB2();
+    Generator.dumpSMTLIB2();
     try (ProverEnvironment prover =
              context.newProverEnvironment(SolverContext.ProverOptions.GENERATE_MODELS)) {
       prover.addConstraint(constraint);

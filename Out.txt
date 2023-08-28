@@ -1,0 +1,3 @@
+(set-logic ALL)
+(declare-const p Bool)
+(not p)

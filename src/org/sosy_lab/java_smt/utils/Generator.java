@@ -19,58 +19,49 @@
  */
 
 package org.sosy_lab.java_smt.utils;
-import java.io.File;  // Import the File class
+
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 
-public class BooleanLogger {
+public class Generator {
 
   static String fileName = "Out.txt";
-  static String lines = "";
+  static StringBuilder lines = new StringBuilder();
 
-  public BooleanLogger() throws IOException {
-    this.createLogFile(fileName);
-  }
-
-  private void createLogFile(String fileName) throws IOException {
-    File file = new File(fileName);
-    writeToFile("(set-logic ALL)\n");
+  public Generator() throws IOException {
+    this.lines.append("(set-logic ALL)\n");
   }
 
   public static void writeToFile(String line) throws IOException {
+    File file = new File(fileName);
     FileWriter fileWriter = new FileWriter(fileName, true);
     fileWriter.write(line);
     fileWriter.close();
   }
 
-  public static void appendToFile(String line) {
-    lines = lines + line + "\n";
-  }
-
   public static void dumpSMTLIB2() throws IOException {
-    writeToFile(lines);
+    writeToFile(String.valueOf(lines));
   }
 
   public static void logMakeVariable(String pVar) {
-    String out = "(declare-const " + pVar + " Bool)";
-    appendToFile(out);
+    String out = "(declare-const " + pVar + " Bool)\n";
+    lines.append(out);
   }
 
   public static void logNot(BooleanFormula pBits) {
-    String out = "(not " + pBits + ")";
-    appendToFile(out);
+    String out = "(not " + pBits + ")\n";
+    lines.append(out);
   }
 
   public static void logOr(BooleanFormula pBits1, BooleanFormula pBits2) {
-    String out = "(or " + pBits1 + " " + pBits2 + ")";
-    appendToFile(out);
+    String out = "(or " + pBits1 + " " + pBits2 + ")\n";
+    lines.append(out);
   }
 
   public static void logAnd(BooleanFormula pBits1, BooleanFormula pBits2) {
-    String out = "(and " + pBits1 + " " + pBits2 + ")";
-    appendToFile(out);
+    String out = "(and " + pBits1 + " " + pBits2 + ")\n";
+    lines.append(out);
   }
-
 }
