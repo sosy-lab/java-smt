@@ -35,6 +35,7 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
+import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaFormula.BitwuzlaBooleanFormula;
 
 public class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements ProverEnvironment {
   /** Bitwuzla does not support multiple solver stacks. */
@@ -86,11 +87,7 @@ public class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implem
     Preconditions.checkState(!closed);
     wasLastSatCheckSat = false;
     super.addConstraint(constraint);
-    constraint.
-    Term exp = creator.extractInfo(pF);
-    if (incremental) {
-      solver.assertFormula(exp);
-    }
+    bitwuzlaJNI.bitwuzla_assert(pEnv, ((BitwuzlaBooleanFormula) constraint).getTerm());
     return null;
   }
 
@@ -107,6 +104,16 @@ public class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implem
     super.push();
     bitwuzlaJNI.bitwuzla_push(pEnv, 1);
   }
+  private boolean readSATResult(int resultValue) throws SolverException {
+    if (resultValue == BitwuzlaResult.BITWUZLA_SAT.swigValue()){
+      wasLastSatCheckSat = true;
+      return false;
+    } else if (resultValue == BitwuzlaResult.BITWUZLA_UNSAT.swigValue()) {
+      return true;
+    } else{
+      throw new SolverException("Bitwuzla returned Unknown.");
+    }
+  }
 
   /** Check whether the conjunction of all formulas on the stack is unsatisfiable. */
   @Override
@@ -114,15 +121,7 @@ public class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implem
     Preconditions.checkState(!closed);
     wasLastSatCheckSat = false;
     final int result = bitwuzlaJNI.bitwuzla_check_sat(pEnv);
-    if (result == BitwuzlaResult.BITWUZLA_SAT.swigValue()){
-      wasLastSatCheckSat = true;
-      return false;
-    } else if (result == BitwuzlaResult.BITWUZLA_UNSAT.swigValue()) {
-      return true;
-    } else if (result == BitwuzlaResult.BITWUZLA_UNKNOWN.swigValue()) {
-      throw new SolverException("Bitwuzla returned Unknown.");
-    }
-    return false;
+    return readSATResult(result);
   }
 
   /**
@@ -134,7 +133,15 @@ public class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implem
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
-    return
+    int size = assumptions.size();
+    long[] bitwuzlaAssumptions = new long[size];
+    BooleanFormula[] inputAssumptions = assumptions.toArray(new BooleanFormula[0]);
+    for (int i = 0; i < size; i++) {
+      bitwuzlaAssumptions[i] = ((BitwuzlaBooleanFormula) inputAssumptions[i]).getTerm();
+    }
+    bitwuzlaJNI.bitwuzla_check_sat_assuming(pEnv, size, bitwuzlaAssumptions);
+    final int result = bitwuzlaJNI.bitwuzla_check_sat(pEnv);
+    return readSATResult(result);
   }
 
   /**

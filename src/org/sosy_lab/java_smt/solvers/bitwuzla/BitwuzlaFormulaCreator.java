@@ -100,25 +100,25 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula formula, Long f) {
 
-    if (bitwuzlaJNI.bitwuzla_term_is_const(f)){
-      visitor.visitConstant(f, bitwuzlaJNI.bitwuzla_get_value());
-      if(bitwuzlaJNI.bitwuzla_term_is_bool(f)){
-        String value = bitwuzlaJNI.bitwuzla_get_value()
-        visitor.visitConstant(f, new BigInteger(value))
-      }
-    } else if (bitwuzlaJNI.bitwuzla_term_is_var(f)) {
-      bj.var
-      visitor.visitBoundVariable(f, )
-    } else if (bitwuzlaJNI.bitwuzla_term_is_fun(f)) {
-      visitor.visitFunction()
-    } else {
-      BitwuzlaKind kind = BitwuzlaKind.swigToEnum(bitwuzlaJNI.bitwuzla_term_get_kind(f));
-      if (kind == BitwuzlaKind.BITWUZLA_KIND_EXISTS || kind == BitwuzlaKind.BITWUZLA_KIND_FORALL){
-        Quantifier forall = Quantifier.FORALL;
-        visitor.visitQuantifier(f)
-      }
-      String name = kind.toString();
-    }
+//    if (bitwuzlaJNI.bitwuzla_term_is_const(f)){
+//      visitor.visitConstant(f, bitwuzlaJNI.bitwuzla_get_value());
+//      if(bitwuzlaJNI.bitwuzla_term_is_bool(f)){
+//        String value = bitwuzlaJNI.bitwuzla_get_value()
+//        visitor.visitConstant(f, new BigInteger(value))
+//      }
+//    } else if (bitwuzlaJNI.bitwuzla_term_is_var(f)) {
+//      bj.var
+//      visitor.visitBoundVariable(f, )
+//    } else if (bitwuzlaJNI.bitwuzla_term_is_fun(f)) {
+//      visitor.visitFunction()
+//    } else {
+//      BitwuzlaKind kind = BitwuzlaKind.swigToEnum(bitwuzlaJNI.bitwuzla_term_get_kind(f));
+//      if (kind == BitwuzlaKind.BITWUZLA_KIND_EXISTS || kind == BitwuzlaKind.BITWUZLA_KIND_FORALL){
+//        Quantifier forall = Quantifier.FORALL;
+//        visitor.visitQuantifier(f)
+//      }
+//      String name = kind.toString();
+//    }
     return null;
   }
 
@@ -144,7 +144,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
   @Override
   protected Long getBooleanVarDeclarationImpl(Long pLong) {
     long boolSort = bitwuzlaJNI.bitwuzla_mk_bool_sort();
-    return
+    return null;
   }
 
   public Table<String, Long, Long> getCache() {

@@ -10,8 +10,8 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
-
 final class BitwuzlaFormulaManager extends AbstractFormulaManager<Long, Long, Long, Long> {
 
   BitwuzlaFormulaManager(
@@ -67,5 +67,9 @@ final class BitwuzlaFormulaManager extends AbstractFormulaManager<Long, Long, Lo
   @Override
   public Appender dumpFormula(Long t) {
     return null;
+  }
+
+  static long getBitwuzlaTerm(Formula pT) {
+    return ((BitwuzlaFormula) pT).getTerm();
   }
 }
