@@ -37,10 +37,13 @@ import apron.Var;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.rationals.Rational;
@@ -96,59 +99,71 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
   private ValueAssignment getAssignment(ApronConstraint pFormula, String pVar) {
     ImmutableList.Builder<Object> argumentInterpretationBuilder = ImmutableList.builder();
     try {
-      ApronConstraint constraint = pFormula;
-      String varName = pVar;
       //check if the variable is of type integer
       if (formulaCreator.getEnvironment().isInt(pVar)) {
-        ApronNode keyFormula = formulaCreator.getVariables().get(varName);
-        Manager man = this.prover.getAbstract1().getCreationManager();
-        //shows the interval for all values the variable can take
-        Interval interval = this.prover.getAbstract1().getBound(man, pVar);
-        //gives the lower bound of the interval
-        MpqScalar value = (MpqScalar) interval.sup;
-        BigInteger big = BigInteger.valueOf(Long.parseLong(value.toString()));
-        //valueFormula refers to the lower bound
-        ApronIntCstNode valueFormula = new ApronIntCstNode(big);
-        //creates a formula of the form: key - lower bound
-        ApronIntBinaryNode binaryNode = new ApronIntBinaryNode(keyFormula, valueFormula,
-            Texpr1BinNode.OP_SUB);
-        //creates a constraint of the form key - lower bound = 0 (Apron format of key = lower bound)
-        BooleanFormula formula = new ApronConstraint(Tcons1.EQ, formulaCreator.getEnvironment(),
-            binaryNode);
-        return new ValueAssignment(keyFormula, valueFormula, formula, pVar, formulaCreator.convertValue(keyFormula,valueFormula),
-            argumentInterpretationBuilder.build());
+        return getIntAssignment(pFormula,pVar);
       } else {
-        ApronNode keyFormula = formulaCreator.getVariables().get(varName);
-        Manager man = this.prover.getAbstract1().getCreationManager();
-        //shows the interval for all values the variable can take
-        Interval interval = this.prover.getAbstract1().getBound(man, pVar);
-        //gives the lower bound of the interval
-        Object value = interval.sup;
-        //translates the value into nominator and denominator
-        String strValue = value.toString();
-        String[] numbers = strValue.split("/");
-        BigInteger nominator = BigInteger.valueOf(Long.parseLong(numbers[0]));
-        ApronRatCstNode valueFormula;
-        if(numbers.length >1){
-          BigInteger denominator = BigInteger.valueOf(Long.parseLong(numbers[1]));
-          valueFormula = new ApronRatCstNode(nominator,denominator);
-        } else { //if the value is an integer
-          valueFormula = new ApronRatCstNode(nominator, BigInteger.ONE);
-        }
-        //creates a formula of the form: key - lower bound
-        ApronRatBinaryNode binaryNode = new ApronRatBinaryNode(keyFormula, valueFormula,
-            Texpr1BinNode.OP_SUB);
-        //creates a constraint of the form key - lower bound = 0 (Apron format of key = lower bound)
-        BooleanFormula formula = new ApronConstraint(Tcons1.EQ, formulaCreator.getEnvironment(),
-            binaryNode);
-        Object node = formulaCreator.convertValue(keyFormula,valueFormula);
-        return new ValueAssignment(keyFormula, valueFormula, formula, pVar,
-            node,
-            argumentInterpretationBuilder.build());
+        return getRatAssignment(pFormula, pVar);
       }
     } catch (ApronException pApronException) {
       throw new RuntimeException(pApronException);
     }
+  }
+
+  private ValueAssignment getIntAssignment(ApronConstraint pFormula, String pVar)
+      throws ApronException {
+    ImmutableList.Builder<Object> argumentInterpretationBuilder = ImmutableList.builder();
+    ApronNode keyFormula = formulaCreator.getVariables().get(pVar);
+    Manager man = this.prover.getAbstract1().getCreationManager();
+    //shows the interval for all values the variable can take
+    Interval interval = this.prover.getAbstract1().getBound(man, pVar);
+    //gives the lower bound of the interval
+    MpqScalar value = (MpqScalar) interval.sup;
+    BigInteger big = new BigInteger(value.toString());
+    //valueFormula refers to the lower bound
+    ApronIntCstNode valueFormula = new ApronIntCstNode(big);
+    //creates a formula of the form: key - lower bound
+    ApronIntBinaryNode binaryNode = new ApronIntBinaryNode(keyFormula, valueFormula,
+        Texpr1BinNode.OP_SUB);
+    //creates a constraint of the form key - lower bound = 0 (Apron format of key = lower bound)
+    Map<ApronNode, Integer> map = new HashMap<>();
+    map.put(binaryNode,Tcons1.EQ);
+    BooleanFormula formula = new ApronConstraint(formulaCreator.getEnvironment(), map);
+    return new ValueAssignment(keyFormula, valueFormula, formula, pVar, formulaCreator.convertValue(keyFormula,valueFormula),
+        argumentInterpretationBuilder.build());
+  }
+
+  private ValueAssignment getRatAssignment(ApronConstraint pFormula, String pVar)
+      throws ApronException {
+    ImmutableList.Builder<Object> argumentInterpretationBuilder = ImmutableList.builder();
+    ApronNode keyFormula = formulaCreator.getVariables().get(pVar);
+    Manager man = this.prover.getAbstract1().getCreationManager();
+    //shows the interval for all values the variable can take
+    Interval interval = this.prover.getAbstract1().getBound(man, pVar);
+    //gives the lower bound of the interval
+    Object value = interval.sup;
+    //translates the value into nominator and denominator
+    String strValue = value.toString();
+    String[] numbers = strValue.split("/");
+    BigInteger nominator = new BigInteger(numbers[0]);
+    ApronRatCstNode valueFormula;
+    if(numbers.length >1){
+      BigInteger denominator = new BigInteger(numbers[1]);
+      valueFormula = new ApronRatCstNode(nominator,denominator);
+    } else { //if the value is an integer
+      valueFormula = new ApronRatCstNode(nominator, BigInteger.ONE);
+    }
+    //creates a formula of the form: key - lower bound
+    ApronRatBinaryNode binaryNode = new ApronRatBinaryNode(keyFormula, valueFormula,
+        Texpr1BinNode.OP_SUB);
+    //creates a constraint of the form key - lower bound = 0 (Apron format of key = lower bound)
+    Map<ApronNode, Integer> map = new HashMap<>();
+    map.put(binaryNode,Tcons1.EQ);
+    BooleanFormula formula = new ApronConstraint(formulaCreator.getEnvironment(), map);
+    Object node = formulaCreator.convertValue(keyFormula,valueFormula);
+    return new ValueAssignment(keyFormula, valueFormula, formula, pVar,
+        node,
+        argumentInterpretationBuilder.build());
   }
 
   @Override
@@ -181,46 +196,51 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
       }
     }
     else { //for more complex formulas
-      Texpr1Node node = pNode.getNode();
-      List<String> modelVars = new ArrayList<>();
-      for (ValueAssignment assignment:model) {
-        String modelVar = assignment.getName();
-        StringVar apronVar = new StringVar(modelVar);
-        ApronNode toSub = (ApronNode) assignment.getValueAsFormula();
-        Texpr1Node toSubT = toSub.getNode();
-        //hasVar() only works for Texpr0Node
-        Texpr0Node zeroNode = node.toTexpr0Node(prover.getAbstract1().getEnvironment());
-        boolean hasVarZero =
-            zeroNode.hasDim(prover.getAbstract1().getEnvironment().dimOfVar(modelVar));
-        if(hasVarZero){
-          try {
-            //substitutes every occurence of the variable with the value stored in model
-            Texpr1Node param1 = node.substitute(modelVar,toSubT);
-            Texpr1VarNode var = new Texpr1VarNode(modelVar);
-            // param1 - var
-            Texpr1Node equation = new Texpr1BinNode(Texpr1BinNode.OP_SUB,param1,var);
-            //param1 - var = 0 --> var = param1
-            Tcons1 cons = new Tcons1(formulaCreator.getEnvironment(),Tcons1.EQ,equation);
-            Tcons1[] c = new Tcons1[]{cons};
-            Abstract1 abstract1 = new Abstract1(prover.getAbstract1().getCreationManager(),c);
-            //getting the lower bound of the interval which refers to all values the variable can
-            // take
-            Object bound =
-                abstract1.getBound(prover.getAbstract1().getCreationManager(), modelVar).sup;
-            String strValue = bound.toString();
-            String[] numbers = strValue.split("/");
-            BigInteger nominator = BigInteger.valueOf(Long.parseLong(numbers[0]));
-            ApronRatCstNode valueFormula;
-            if(numbers.length >1){ //for rational lower bounds
-              BigInteger denominator = BigInteger.valueOf(Long.parseLong(numbers[1]));
-              valueFormula = new ApronRatCstNode(nominator,denominator);
-            } else { //if the value is an integer
-              valueFormula = new ApronRatCstNode(nominator, BigInteger.ONE);
-            }
-            return valueFormula;
-          } catch (ApronException e){
-            throw new RuntimeException(e);
+      return getComplexValue(pNode);
+    }
+    return pNode;
+  }
+
+  private ApronNode getComplexValue(ApronNode pNode){
+    Texpr1Node node = pNode.getNode();
+    List<String> modelVars = new ArrayList<>();
+    for (ValueAssignment assignment:model) {
+      String modelVar = assignment.getName();
+      StringVar apronVar = new StringVar(modelVar);
+      ApronNode toSub = (ApronNode) assignment.getValueAsFormula();
+      Texpr1Node toSubT = toSub.getNode();
+      //hasVar() only works for Texpr0Node
+      Texpr0Node zeroNode = node.toTexpr0Node(prover.getAbstract1().getEnvironment());
+      boolean hasVarZero =
+          zeroNode.hasDim(prover.getAbstract1().getEnvironment().dimOfVar(modelVar));
+      if(hasVarZero){
+        try {
+          //substitutes every occurence of the variable with the value stored in model
+          Texpr1Node param1 = node.substitute(modelVar,toSubT);
+          Texpr1VarNode var = new Texpr1VarNode(modelVar);
+          // param1 - var
+          Texpr1Node equation = new Texpr1BinNode(Texpr1BinNode.OP_SUB,param1,var);
+          //param1 - var = 0 --> var = param1
+          Tcons1 cons = new Tcons1(formulaCreator.getEnvironment(),Tcons1.EQ,equation);
+          Tcons1[] c = new Tcons1[]{cons};
+          Abstract1 abstract1 = new Abstract1(prover.getAbstract1().getCreationManager(),c);
+          //getting the lower bound of the interval which refers to all values the variable can
+          // take
+          Object bound =
+              abstract1.getBound(prover.getAbstract1().getCreationManager(), modelVar).sup;
+          String strValue = bound.toString();
+          String[] numbers = strValue.split("/");
+          BigInteger nominator = new BigInteger(numbers[0]);
+          ApronRatCstNode valueFormula;
+          if(numbers.length >1){ //for rational lower bounds
+            BigInteger denominator = new BigInteger(numbers[1]);
+            valueFormula = new ApronRatCstNode(nominator,denominator);
+          } else { //if the value is an integer
+            valueFormula = new ApronRatCstNode(nominator, BigInteger.ONE);
           }
+          return valueFormula;
+        } catch (ApronException e){
+          throw new RuntimeException(e);
         }
       }
     }

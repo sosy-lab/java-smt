@@ -33,15 +33,18 @@ import apron.Var;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import org.checkerframework.checker.units.qual.A;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.NumeralFormula;
-import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.solvers.apron.ApronFormulaCreator;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.FormulaType;
-import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronRatCstNode;
 
 /**
  * This is a wrapper for formulas from the Apron-library. All numeral formulas refer to instances of
@@ -59,7 +62,7 @@ public interface ApronNode extends Formula {
    * of a variable used in an Texpr1Node; that is the reason why the names are tracked additionally
    * @return String-array with all variables that are used in the created formulas
    */
-  String[] getVarNames();
+  Set<String> getVarNames();
   ApronNode getInstance();
   interface ApronNumeralNode extends ApronNode, NumeralFormula{
     class ApronRatCstNode
@@ -100,8 +103,8 @@ public interface ApronNode extends Formula {
       }
 
       @Override
-      public String[] getVarNames() {
-        return new String[0];
+      public Set<String> getVarNames() {
+        return new HashSet<>();
       }
 
       public BigInteger getDenominator() {
@@ -217,8 +220,10 @@ public interface ApronNode extends Formula {
       }
 
       @Override
-      public String[] getVarNames() {
-        return new String[]{varName};
+      public Set<String> getVarNames() {
+        Set<String> vars = new HashSet<>();
+        vars.add(this.varName);
+        return vars;
       }
       @Override
       public ApronNode getInstance() {
@@ -229,7 +234,7 @@ public interface ApronNode extends Formula {
     class ApronRatUnaryNode implements RationalFormula, ApronNode {
       private final FormulaType type = FormulaType.RATIONAL;
       private final Texpr1UnNode unaryNode;
-      private final String[] varNames;
+      private final Set<String> varNames;
 
       public ApronRatUnaryNode(ApronNode param, int op) {
         this.unaryNode = new Texpr1UnNode(op, param.getNode());
@@ -271,7 +276,7 @@ public interface ApronNode extends Formula {
       }
 
       @Override
-      public String[] getVarNames() {
+      public Set<String> getVarNames() {
         return varNames;
       }
       @Override
@@ -284,21 +289,14 @@ public interface ApronNode extends Formula {
 
       private final FormulaType type = FormulaType.RATIONAL;
       private final Texpr1BinNode binaryNode;
-      private final String[] varNames;
+      private final Set<String> varNames;
 
       public ApronRatBinaryNode(ApronNode param1, ApronNode param2, int op) {
         this.binaryNode = new Texpr1BinNode(op, param1.getNode(), param2.getNode());
-        //adding the variablenames of both parameters to @varNames
-        String[] varNames1 = param1.getVarNames();
-        String[] varNames2 = param2.getVarNames();
-        String[] allVarNames = new String[varNames1.length + varNames2.length];
-        System.arraycopy(varNames1, 0, allVarNames, 0, varNames1.length);
-        int j = varNames1.length;
-        for (int i = 0; i < varNames2.length; i++) {
-          allVarNames[j] = varNames2[i];
-          j++;
-        }
-        this.varNames = allVarNames;
+        this.varNames = new HashSet<>();
+        //adding the variable names of both parameters to @varNames
+        this.varNames.addAll(param1.getVarNames());
+        this.varNames.addAll(param2.getVarNames());
       }
 
       public ApronRatBinaryNode(ApronRatBinaryNode pNode){
@@ -337,7 +335,7 @@ public interface ApronNode extends Formula {
       }
 
       @Override
-      public String[] getVarNames() {
+      public Set<String> getVarNames() {
         return varNames;
       }
       @Override
@@ -405,8 +403,8 @@ public interface ApronNode extends Formula {
       }
 
       @Override
-      public String[] getVarNames() {
-        return new String[0];
+      public Set<String> getVarNames() {
+        return new HashSet<>();
       }
 
       public BigInteger getValue() {
@@ -515,8 +513,10 @@ public interface ApronNode extends Formula {
       }
 
       @Override
-      public String[] getVarNames() {
-        return new String[]{varName};
+      public Set<String > getVarNames() {
+        Set<String> vars = new HashSet<>();
+        vars.add(this.varName);
+        return vars;
       }
       @Override
       public ApronNode getInstance() {
@@ -527,7 +527,7 @@ public interface ApronNode extends Formula {
     class ApronIntUnaryNode implements IntegerFormula, ApronNode {
       private final FormulaType type = FormulaType.INTEGER;
       private final Texpr1UnNode unaryNode;
-      private final String[] varNames;
+      private final Set<String> varNames;
 
       public ApronIntUnaryNode(ApronNode param, int op) {
         this.unaryNode = new Texpr1UnNode(op, param.getNode());
@@ -579,7 +579,7 @@ public interface ApronNode extends Formula {
       }
 
       @Override
-      public String[] getVarNames() {
+      public Set<String> getVarNames() {
         return varNames;
       }
       @Override
@@ -592,21 +592,14 @@ public interface ApronNode extends Formula {
 
       private final FormulaType type = FormulaType.INTEGER;
       private final Texpr1BinNode binaryNode;
-      private final String[] varNames;
+      private final Set<String> varNames;
 
       public ApronIntBinaryNode(ApronNode param1, ApronNode param2, int op) {
         this.binaryNode = new Texpr1BinNode(op, param1.getNode(), param2.getNode());
         //adding the variablenames of both parameters to @varNames
-        String[] varNames1 = param1.getVarNames();
-        String[] varNames2 = param2.getVarNames();
-        String[] allVarNames = new String[varNames1.length + varNames2.length];
-        System.arraycopy(varNames1, 0, allVarNames, 0, varNames1.length);
-        int j = varNames1.length;
-        for (int i = 0; i < varNames2.length; i++) {
-          allVarNames[j] = varNames2[i];
-          j++;
-        }
-        this.varNames = allVarNames;
+        this.varNames = new HashSet<>();
+        varNames.addAll(param1.getVarNames());
+        varNames.addAll(param2.getVarNames());
       }
 
       public ApronIntBinaryNode(ApronIntBinaryNode pNode){
@@ -655,7 +648,7 @@ public interface ApronNode extends Formula {
       }
 
       @Override
-      public String[] getVarNames() {
+      public Set<String> getVarNames() {
         return varNames;
       }
       @Override
@@ -668,29 +661,52 @@ public interface ApronNode extends Formula {
 
   class ApronConstraint implements BooleanFormula, ApronNode {
 
-    private final Tcons1 constraintNode;
-    private final Texpr1Node node;
+    private final Map<Tcons1, Texpr1Node> constraintNodes;
+    private final List<ApronNode> apronNodes;
+    private final Set<String> varNames;
 
-    private final ApronNode apronNode;
-    private final String[] varNames;
-
-    public ApronConstraint(int pKind, Environment pEnvironment, ApronNode pNode) {
-      this.constraintNode = new Tcons1(pEnvironment, pKind, pNode.getNode());
-      this.node = pNode.getNode();
-      this.varNames = pNode.getVarNames();
-      this.apronNode = pNode;
+    public ApronConstraint(Environment pEnvironment, Map<ApronNode, Integer> pConstraints) {
+      this.constraintNodes = new HashMap<>();
+      this.varNames = new HashSet<>();
+      this.apronNodes = new ArrayList<>();
+      for (Map.Entry<ApronNode, Integer> entry:pConstraints.entrySet()) {
+        ApronNode key = entry.getKey();
+        Integer kind = entry.getValue();
+        Tcons1 tcons1 = new Tcons1(pEnvironment, kind, key.getNode());
+        this.constraintNodes.put(tcons1,key.getNode());
+        this.varNames.addAll(key.getVarNames());
+        this.apronNodes.add(key);
+      }
     }
 
     public ApronConstraint(ApronConstraint pConstraint){
-      this.constraintNode = pConstraint.getConstraintNode();
-      this.node = pConstraint.getNode();
-      this.apronNode = pConstraint.getApronNode();
+      this.constraintNodes = pConstraint.getConstraintNodes();
+      this.apronNodes = pConstraint.getApronNodes();
       this.varNames = pConstraint.getVarNames();
+    }
+
+    public ApronConstraint(List<ApronConstraint> pConstraints){
+      this.constraintNodes = new HashMap<>();
+      this.varNames = new HashSet<>();
+      this.apronNodes = new ArrayList<>();
+      for (ApronConstraint c:pConstraints) {
+        constraintNodes.putAll(c.getConstraintNodes());
+        varNames.addAll(c.getVarNames());
+        apronNodes.addAll(c.getApronNodes());
+      }
+    }
+
+    public List<ApronNode> getApronNodes() {
+      return apronNodes;
     }
 
     @Override
     public String toString() {
-      return constraintNode.toString();
+      String str = "";
+      for (Map.Entry<Tcons1,Texpr1Node> node :this.constraintNodes.entrySet()) {
+        str = str+node.getKey().toString()+"\n";
+      }
+      return str;
     }
 
     @Override
@@ -706,7 +722,7 @@ public interface ApronNode extends Formula {
 
     @Override
     public int hashCode() {
-      return this.constraintNode.hashCode();
+      return this.constraintNodes.hashCode();
     }
 
     @Override
@@ -719,21 +735,20 @@ public interface ApronNode extends Formula {
      */
     @Override
     public Texpr1Node getNode() {
-      return this.node;
+      throw new RuntimeException("For ApronConstraints, pleas use getConstraintNodes() or "
+          + "getApronNodes()"
+          + ".");
     }
 
-    public Tcons1 getConstraintNode() {
-      return constraintNode;
+    public Map<Tcons1, Texpr1Node> getConstraintNodes() {
+      return this.constraintNodes;
     }
 
     @Override
-    public String[] getVarNames() {
+    public Set<String> getVarNames() {
       return varNames;
     }
 
-    public ApronNode getApronNode() {
-      return apronNode;
-    }
     @Override
     public ApronNode getInstance() {
       return this;

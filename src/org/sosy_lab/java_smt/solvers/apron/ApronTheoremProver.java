@@ -23,12 +23,15 @@ package org.sosy_lab.java_smt.solvers.apron;
 import apron.Abstract1;
 import apron.ApronException;
 import apron.Tcons1;
+import apron.Texpr0Node;
+import apron.Texpr1Node;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nullable;
@@ -90,19 +93,21 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
 
   private void addConstraintException(ApronConstraint pConstraint) {
     try {
-      Tcons1[] consOld = abstract1.toTcons(solverContext.getManager());
-      Tcons1[] newCons = new Tcons1[consOld.length + 1];
-      int i = 0;
-      for (Tcons1 c : consOld) {
-        c.extendEnvironment(solverContext.getFormulaCreator().getEnvironment());
-        newCons[i] = c;
-        i++;
+      for (Map.Entry<Tcons1, Texpr1Node> cons:pConstraint.getConstraintNodes().entrySet()) {
+        Tcons1[] consOld = abstract1.toTcons(solverContext.getManager());
+        Tcons1[] newCons = new Tcons1[consOld.length + 1];
+        int i = 0;
+        for (Tcons1 c : consOld) {
+          c.extendEnvironment(solverContext.getFormulaCreator().getEnvironment());
+          newCons[i] = c;
+          i++;
+        }
+        newCons[consOld.length] = cons.getKey();
+        this.abstract1.changeEnvironment(solverContext.getManager(),
+            solverContext.getFormulaCreator().getEnvironment(),true);
+        this.abstract1 = new Abstract1(solverContext.getManager(), newCons);
+        Iterables.getLast(assertedFormulas).add(pConstraint);
       }
-      newCons[consOld.length] = pConstraint.getConstraintNode();
-      this.abstract1.changeEnvironment(solverContext.getManager(),
-          solverContext.getFormulaCreator().getEnvironment(),true);
-      this.abstract1 = new Abstract1(solverContext.getManager(), newCons);
-      Iterables.getLast(assertedFormulas).add(pConstraint);
     } catch (ApronException e) {
       throw new RuntimeException(e);
     }
@@ -165,15 +170,16 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
-    Tcons1[] constraints =new Tcons1[assumptions.size()];
-    int i = 0;
+    ArrayList<Tcons1> constraints = new ArrayList<>();
     for (BooleanFormula assumption:assumptions) {
       ApronConstraint cons = (ApronConstraint) ApronFormulaManager.getTerm(assumption);
-      constraints[i] = cons.getConstraintNode();
-      i++;
+      for(Map.Entry<Tcons1, Texpr1Node> entry: cons.getConstraintNodes().entrySet()){
+        constraints.add(entry.getKey());
+      }
     }
+    Tcons1[] tcons1s = constraints.toArray(new Tcons1[constraints.size()]);
     try {
-      Abstract1 absNew = new Abstract1(solverContext.getManager(), constraints);
+      Abstract1 absNew = new Abstract1(solverContext.getManager(), tcons1s);
       Abstract1 result = this.abstract1.joinCopy(solverContext.getManager(), absNew);
       return result.isBottom(solverContext.getManager());
     } catch (ApronException e){

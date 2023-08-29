@@ -23,6 +23,9 @@ package org.sosy_lab.java_smt.solvers.apron;
 import apron.Environment;
 import apron.Tcons1;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Map;
+import org.checkerframework.checker.units.qual.A;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
@@ -56,8 +59,14 @@ public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<Ap
 
   @Override
   protected ApronNode and(ApronNode pParam1, ApronNode pParam2) {
-    throw new UnsupportedOperationException("Apron does not support boolean operations.");
+    ApronConstraint cons1 = (ApronConstraint) pParam1;
+    ApronConstraint cons2 = (ApronConstraint) pParam2;
+    ArrayList<ApronConstraint> constraints = new ArrayList<>();
+    constraints.add(cons1);
+    constraints.add(cons2);
+    return new ApronConstraint(constraints);
   }
+
 
   @Override
   protected ApronNode or(ApronNode pParam1, ApronNode pParam2) {

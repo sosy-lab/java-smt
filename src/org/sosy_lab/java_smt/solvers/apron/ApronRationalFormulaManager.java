@@ -69,7 +69,10 @@ public class ApronRationalFormulaManager extends
   protected FormulaType getNumeralType() {
     return FormulaType.RATIONAL;
   }
-
+  @Override
+  protected ApronNode makeVariableImpl(String i) {
+    return formulaCreator.makeVariable(rationalType, i);
+  }
   @Override
   protected ApronNode makeNumberImpl(double pNumber) {
     BigDecimal dec = BigDecimal.valueOf(pNumber);
@@ -78,22 +81,9 @@ public class ApronRationalFormulaManager extends
 
   @Override
   protected ApronNode makeNumberImpl(BigDecimal pNumber) {
-    String str = pNumber.toPlainString();
-    String[] numbers = str.split("\\.");
-    int num = Integer.parseInt(numbers[0]);
-    if(numbers.length>1) {
-      int den = Integer.parseInt(numbers[1]);
-      return new ApronRatCstNode(BigInteger.valueOf(num),BigInteger.valueOf(den));
-    }
-    return new ApronRatCstNode(BigInteger.valueOf(num),BigInteger.ONE);
+    Rational rat = Rational.ofBigDecimal(pNumber);
+    return new ApronRatCstNode(rat.getNum(),rat.getDen());
   }
-
-
-  @Override
-  protected ApronNode makeVariableImpl(String i) {
-    return formulaCreator.makeVariable(rationalType, i);
-  }
-
   protected ApronNode makeNumberImpl(long i) {
     return new ApronRatCstNode(BigInteger.valueOf(i), BigInteger.ONE);
   }
@@ -108,12 +98,12 @@ public class ApronRationalFormulaManager extends
     Preconditions.checkArgument(!(i.contains(".") || i.contains(",")),
         "Rational number has to be written like 2/5.");
     String[] numbers = i.split("/");
-    int num = Integer.parseInt(numbers[0]);
+    BigInteger num = new BigInteger(numbers[0]);
     if(numbers.length>1) {
-      int den = Integer.parseInt(numbers[1]);
-      return new ApronRatCstNode(BigInteger.valueOf(num),BigInteger.valueOf(den));
+      BigInteger den = new BigInteger(numbers[1]);
+      return new ApronRatCstNode(num,den);
     }
-    return new ApronRatCstNode(BigInteger.valueOf(num),BigInteger.ONE);
+    return new ApronRatCstNode(num,BigInteger.ONE);
   }
 
   @Override
@@ -167,8 +157,9 @@ public class ApronRationalFormulaManager extends
   protected ApronNode equal(ApronNode pParam1, ApronNode pParam2) {
     ApronRatBinaryNode binaryNode = new ApronRatBinaryNode(pParam1, pParam2,
         Texpr1BinNode.OP_SUB);
-    ApronConstraint constraint = new ApronConstraint(Tcons1.EQ, formulaCreator.getEnvironment(),
-        binaryNode);
+    Map<ApronNode, Integer> map = new HashMap<>();
+    map.put(binaryNode,Tcons1.EQ);
+    ApronConstraint constraint = new ApronConstraint(formulaCreator.getEnvironment(), map);
     return constraint;
   }
 
@@ -181,8 +172,9 @@ public class ApronRationalFormulaManager extends
   protected ApronNode greaterThan(ApronNode pParam1, ApronNode pParam2) {
     ApronRatBinaryNode binaryNode = new ApronRatBinaryNode(pParam1, pParam2,
         Texpr1BinNode.OP_SUB);
-    ApronConstraint constraint = new ApronConstraint(Tcons1.SUP, formulaCreator.getEnvironment(),
-        binaryNode);
+    Map<ApronNode, Integer> map = new HashMap<>();
+    map.put(binaryNode,Tcons1.SUP);
+    ApronConstraint constraint = new ApronConstraint(formulaCreator.getEnvironment(), map);
     return constraint;
   }
 
@@ -190,8 +182,9 @@ public class ApronRationalFormulaManager extends
   protected ApronNode greaterOrEquals(ApronNode pParam1, ApronNode pParam2) {
     ApronRatBinaryNode binaryNode = new ApronRatBinaryNode(pParam1, pParam2,
         Texpr1BinNode.OP_SUB);
-    ApronConstraint constraint = new ApronConstraint(Tcons1.SUPEQ, formulaCreator.getEnvironment(),
-        binaryNode);
+    Map<ApronNode, Integer> map = new HashMap<>();
+    map.put(binaryNode,Tcons1.SUPEQ);
+    ApronConstraint constraint = new ApronConstraint(formulaCreator.getEnvironment(), map);
     return constraint;
   }
 
@@ -199,8 +192,9 @@ public class ApronRationalFormulaManager extends
   protected ApronNode lessThan(ApronNode pParam1, ApronNode pParam2) {
     ApronRatBinaryNode binaryNode = new ApronRatBinaryNode(pParam2, pParam1,
         Texpr1BinNode.OP_SUB);
-    ApronConstraint constraint = new ApronConstraint(Tcons1.SUP, formulaCreator.getEnvironment(),
-        binaryNode);
+    Map<ApronNode, Integer> map = new HashMap<>();
+    map.put(binaryNode,Tcons1.SUP);
+    ApronConstraint constraint = new ApronConstraint(formulaCreator.getEnvironment(), map);
     return constraint;
   }
 
@@ -208,8 +202,9 @@ public class ApronRationalFormulaManager extends
   protected ApronNode lessOrEquals(ApronNode pParam1, ApronNode pParam2) {
     ApronRatBinaryNode binaryNode = new ApronRatBinaryNode(pParam2, pParam1,
         Texpr1BinNode.OP_SUB);
-    ApronConstraint constraint = new ApronConstraint(Tcons1.SUPEQ, formulaCreator.getEnvironment(),
-        binaryNode);
+    Map<ApronNode, Integer> map = new HashMap<>();
+    map.put(binaryNode,Tcons1.SUPEQ);
+    ApronConstraint constraint = new ApronConstraint(formulaCreator.getEnvironment(), map);
     return constraint;
   }
 
