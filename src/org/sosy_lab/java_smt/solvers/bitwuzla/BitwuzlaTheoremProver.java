@@ -20,7 +20,12 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_unsat_core;
+
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Collections2;
+import io.github.cvc5.Term;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -35,6 +40,7 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
+import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaFormula.BitwuzlaBooleanFormula;
 
 public class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements ProverEnvironment {
@@ -111,7 +117,7 @@ public class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implem
     } else if (resultValue == BitwuzlaResult.BITWUZLA_UNSAT.swigValue()) {
       return true;
     } else{
-      throw new SolverException("Bitwuzla returned Unknown.");
+      throw new SolverException("Bitwuzla returned UNKNOWN.");
     }
   }
 
@@ -139,8 +145,7 @@ public class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implem
     for (int i = 0; i < size; i++) {
       bitwuzlaAssumptions[i] = ((BitwuzlaBooleanFormula) inputAssumptions[i]).getTerm();
     }
-    bitwuzlaJNI.bitwuzla_check_sat_assuming(pEnv, size, bitwuzlaAssumptions);
-    final int result = bitwuzlaJNI.bitwuzla_check_sat(pEnv);
+    final int result = bitwuzlaJNI.bitwuzla_check_sat_assuming(pEnv, size, bitwuzlaAssumptions);
     return readSATResult(result);
   }
 
@@ -158,8 +163,20 @@ public class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implem
     Preconditions.checkState(!closed);
     Preconditions.checkState(wasLastSatCheckSat, NO_MODEL_HELP);
     checkGenerateModels();
+    return new CachingModel(getEvaluatorWithoutChecks());
+  }
 
-    return null;
+  private List<BooleanFormula> getUnsatCore0() {
+    long[] size = new long[1];
+    return encapsulate(bitwuzlaJNI.bitwuzla_get_unsat_core(pEnv, size), size[0]);
+  }
+
+  private List<BooleanFormula> encapsulate(long pTermsArray, long size) {
+    List<BooleanFormula> result = new ArrayList<>((int) size);
+    for (int i = 0; i < size; i++) {
+      result.add(creator.encapsulateBoolean(bitwuzlaJNI.BitwuzlaTermArray_getitem(pTermsArray, i)));
+    }
+    return result;
   }
 
   /**
@@ -168,7 +185,10 @@ public class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implem
    */
   @Override
   public List<BooleanFormula> getUnsatCore() {
-    return null;
+    Preconditions.checkState(!closed);
+    checkGenerateUnsatCores();
+    Preconditions.checkState(!wasLastSatCheckSat);
+    return getUnsatCore0();
   }
 
   /**
@@ -182,7 +202,11 @@ public class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implem
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
-    return Optional.empty();
+    Preconditions.checkState(!closed);
+    checkGenerateUnsatCores();
+    Preconditions.checkState(!wasLastSatCheckSat);
+    boolean sat = !isUnsatWithAssumptions(assumptions);
+    return sat ? Optional.empty() : Optional.of(getUnsatCore0());
   }
 
   /**
@@ -191,22 +215,28 @@ public class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implem
    * ignored.
    */
   @Override
-  public void close() {}
-
-  /**
-   * Get all satisfying assignments of the current environment with regard to a subset of terms, and
-   * create a region representing all those models.
-   *
-   * @param callback
-   * @param important A set of (positive) variables appearing in the asserted queries. Only these
-   *     variables will appear in the region.
-   * @return A region representing all satisfying models of the formula.
-   */
-  @Override
-  public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
-      throws InterruptedException, SolverException {
-    return null;
+  public void close() {
+    if (!closed) {
+      bitwuzlaJNI.bitwuzla_delete(pEnv);
+      Preconditions.checkState(isAnyStackAlive.getAndSet(false));
+    }
+    super.close();
   }
+
+//  /**
+//   * Get all satisfying assignments of the current environment with regard to a subset of terms, and
+//   * create a region representing all those models.
+//   *
+//   * @param callback
+//   * @param important A set of (positive) variables appearing in the asserted queries. Only these
+//   *     variables will appear in the region.
+//   * @return A region representing all satisfying models of the formula.
+//   */
+//  @Override
+//  public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
+//      throws InterruptedException, SolverException {
+//    return null;
+//  }
 
   /**
    * Get an evaluator instance for model evaluation without executing checks for prover options.
@@ -219,7 +249,8 @@ public class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implem
    * @throws SolverException if model can not be constructed.
    */
   @Override
-  protected Evaluator getEvaluatorWithoutChecks() throws SolverException {
-    return null;
+  protected BitwuzlaModel getEvaluatorWithoutChecks() throws SolverException {
+    return new BitwuzlaModel(
+        pEnv, this, creator, Collections2.transform(getAssertedFormulas(), creator::extractInfo));
   }
 }

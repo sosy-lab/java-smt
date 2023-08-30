@@ -23,6 +23,8 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
 import com.google.common.collect.Table;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.stream.LongStream;
+import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -31,6 +33,8 @@ import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
+import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaFormula.BitwuzlaBooleanFormula;
+import org.sosy_lab.java_smt.solvers.yices2.Yices2Formula.Yices2BooleanFormula;
 
 public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   protected BitwuzlaFormulaCreator(Long pBitwuzlaEnv) {
@@ -124,14 +128,14 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
 
   @Override
   public Long callFunctionImpl(Long declaration, List<Long> args) {
-//    long[] functionAndArgs =
-//        LongStream.concat(LongStream.of(declaration), args.stream().mapToLong(Long::longValue))
-//            .toArray();
-//    return bitwuzlaJNI.bitwuzla_mk_term(
-//        SWIG_BitwuzlaKind.BITWUZLA_KIND_APPLY.swigValue(), args.size(), functionAndArgs);
+    long[] functionAndArgs =
+        LongStream.concat(LongStream.of(declaration), args.stream().mapToLong(Long::longValue))
+            .toArray();
+    return bitwuzlaJNI.bitwuzla_mk_term(
+        BitwuzlaKind.BITWUZLA_KIND_APPLY.swigValue(), args.size(), functionAndArgs);
 
-    return bitwuzlaJNI.bitwuzla_mk_term(declaration.intValue(), args.size(),
-        args.stream().mapToLong(Long::longValue).toArray());
+//    return bitwuzlaJNI.bitwuzla_mk_term(declaration.intValue(), args.size(),
+//        args.stream().mapToLong(Long::longValue).toArray());
   }
 
   @Override
@@ -145,6 +149,17 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
   protected Long getBooleanVarDeclarationImpl(Long pLong) {
     long boolSort = bitwuzlaJNI.bitwuzla_mk_bool_sort();
     return null;
+  }
+
+  @Override
+  public Long extractInfo(Formula pT) {
+    return BitwuzlaFormulaManager.getBitwuzlaTerm(pT);
+  }
+
+  @Override
+  public BooleanFormula encapsulateBoolean(Long pTerm) {
+    assert getFormulaType(pTerm).isBooleanType();
+    return new BitwuzlaBooleanFormula(pTerm);
   }
 
   public Table<String, Long, Long> getCache() {
