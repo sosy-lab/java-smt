@@ -71,7 +71,7 @@ public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<Ap
 
   @Override
   protected ApronNode not(ApronNode pParam1) {
-    throw new UnsupportedOperationException("Apron does not support boolean operations.");
+    throw new UnsupportedOperationException("Apron does not support not() operations.");
   }
 
   @Override
@@ -86,17 +86,17 @@ public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<Ap
 
   @Override
   protected ApronNode or(ApronNode pParam1, ApronNode pParam2) {
-    throw new UnsupportedOperationException("Apron does not support boolean operations.");
+    throw new UnsupportedOperationException("Apron does not support or() operations.");
   }
 
   @Override
   protected ApronNode xor(ApronNode pParam1, ApronNode pParam2) {
-    throw new UnsupportedOperationException("Apron does not support boolean operations.");
+    throw new UnsupportedOperationException("Apron does not support xor() operations.");
   }
 
   @Override
   protected ApronNode equivalence(ApronNode bits1, ApronNode bits2) {
-    throw new UnsupportedOperationException("Apron does not support boolean operations.");
+    throw new UnsupportedOperationException("Apron does not support equivalence() operations.");
   }
 
   @Override
@@ -125,6 +125,6 @@ public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<Ap
 
   @Override
   protected ApronNode ifThenElse(ApronNode cond, ApronNode f1, ApronNode f2) {
-    throw new UnsupportedOperationException("Apron does not support boolean operations.");
+    throw new UnsupportedOperationException("Apron does not support ifThenElse() operations.");
   }
 }

@@ -79,7 +79,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       FormulaType.getArrayType(IntegerType, IntegerType);
 
   private static final ImmutableList<Solvers> SOLVERS_WITH_PARTIAL_MODEL =
-      ImmutableList.of(Solvers.Z3, Solvers.PRINCESS);
+      ImmutableList.of(Solvers.Z3, Solvers.PRINCESS, Solvers.APRON);
 
   @Before
   public void setup() {
