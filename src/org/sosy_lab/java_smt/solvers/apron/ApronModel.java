@@ -172,6 +172,7 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
     return getValue(formula);
   }
 
+
   /**
    * method for extracting the model value for a variable or more complex formula
    * @param pNode formula to get a model for
@@ -186,6 +187,8 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
           return (ApronNode) assignment.getValueAsFormula();
         }
       }
+      //if variable is not jet limited, return 1
+      return new ApronIntCstNode(BigInteger.ONE);
     } else if (pNode instanceof ApronRatVarNode) {
       ApronRatVarNode varNode = (ApronRatVarNode) pNode;
       String varName = varNode.getVarName();
@@ -194,11 +197,14 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
           return (ApronNode) assignment.getValueAsFormula();
         }
       }
+      //if variable is not jet limited, return 1
+      return new ApronRatCstNode(BigInteger.ONE, BigInteger.ONE);
+    } else if(pNode instanceof ApronConstraint){
+      return (ApronConstraint) pNode;
     }
     else { //for more complex formulas
       return getComplexValue(pNode);
     }
-    return pNode;
   }
 
   private ApronNode getComplexValue(ApronNode pNode){

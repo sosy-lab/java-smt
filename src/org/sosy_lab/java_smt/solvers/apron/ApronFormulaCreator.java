@@ -20,7 +20,12 @@
 
 package org.sosy_lab.java_smt.solvers.apron;
 
+import apron.Abstract1;
+import apron.ApronException;
 import apron.Environment;
+import apron.Manager;
+import apron.Tcons1;
+import apron.Texpr1Node;
 import com.google.common.base.Preconditions;
 import java.math.BigInteger;
 import java.util.HashMap;
@@ -61,7 +66,10 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
    */
   private Map<String, ApronNode> variables;
 
+  private Manager manager;
+
   protected ApronFormulaCreator(
+      Manager pManager,
       Environment pO,
       ApronBooleanType boolType,
       ApronIntegerType pIntegerType,
@@ -71,6 +79,7 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
     super(pO, boolType, pIntegerType, pRationalType, null, null);
     this.environment = pO;
     this.variables = new HashMap<>();
+    this.manager = pManager;
   }
 
   @Override
@@ -93,8 +102,21 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
       return ((ApronIntVarNode) value).getVarName();
     }else if (value instanceof ApronRatVarNode) {
       return ((ApronRatVarNode) value).getVarName();
-    }
-    else return null;
+    } else if (value instanceof ApronConstraint) {
+      try {
+        ApronConstraint constraint = (ApronConstraint) value;
+        Map<Tcons1, Texpr1Node> map = constraint.getConstraintNodes();
+        Tcons1[] tcons1s = map.keySet().toArray(new Tcons1[map.size()]);
+        Abstract1 helper = new Abstract1(this.manager, tcons1s);
+        return !(helper.isBottom(this.manager));
+      } catch (ApronException pException){
+        throw  new RuntimeException(pException);
+      }
+    } else return null;
+  }
+
+  public Manager getManager() {
+    return manager;
   }
 
   public Environment getEnvironment() {

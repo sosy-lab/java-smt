@@ -67,6 +67,10 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
     this.assertedFormulas.add(new LinkedHashSet<>());
   }
 
+  public ApronSolverContext getSolverContext() {
+    return solverContext;
+  }
+
   public List<Collection<ApronConstraint>> getAssertedFormulas() {
     return assertedFormulas;
   }

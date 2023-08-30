@@ -685,12 +685,15 @@ public interface ApronNode extends Formula {
       this.varNames = pConstraint.getVarNames();
     }
 
-    public ApronConstraint(List<ApronConstraint> pConstraints){
+    public ApronConstraint(List<ApronConstraint> pConstraints, Environment pEnvironment){
       this.constraintNodes = new HashMap<>();
       this.varNames = new HashSet<>();
       this.apronNodes = new ArrayList<>();
       for (ApronConstraint c:pConstraints) {
-        constraintNodes.putAll(c.getConstraintNodes());
+        for(Map.Entry<Tcons1, Texpr1Node> entry: c.getConstraintNodes().entrySet()){
+          Tcons1 tcons1 = entry.getKey().extendEnvironmentCopy(pEnvironment);
+          constraintNodes.put(tcons1, entry.getValue());
+        }
         varNames.addAll(c.getVarNames());
         apronNodes.addAll(c.getApronNodes());
       }

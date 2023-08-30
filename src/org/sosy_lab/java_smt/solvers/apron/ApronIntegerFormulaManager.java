@@ -22,9 +22,11 @@ package org.sosy_lab.java_smt.solvers.apron;
 
 import apron.Tcons1;
 import apron.Texpr1BinNode;
+import apron.Texpr1Node;
 import apron.Texpr1UnNode;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -172,8 +174,17 @@ public class ApronIntegerFormulaManager
   }
 
   @Override
-  protected ApronNode distinctImpl(List pNumbers) {
-    throw new UnsupportedOperationException("Apron does not support distinctImpl()");
+  protected ApronNode distinctImpl(List<ApronNode> pNumbers) {
+  List<ApronConstraint> constraints = new ArrayList<>();
+  for(int i = 0; i<pNumbers.size();i++){
+    for(int j =0; j<i; j++){
+      ApronNode apronNode = new ApronIntBinaryNode(pNumbers.get(i), pNumbers.get(j),Texpr1BinNode.OP_SUB);
+      Map<ApronNode, Integer> map = new HashMap<>();
+      map.put(apronNode,Tcons1.DISEQ);
+      ApronConstraint constraint = new ApronConstraint(formulaCreator.getEnvironment(),map);
+    }
+  }
+  return new ApronConstraint(constraints, formulaCreator.getEnvironment());
   }
 
   @Override
