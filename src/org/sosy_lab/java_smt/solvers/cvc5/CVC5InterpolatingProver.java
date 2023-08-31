@@ -230,7 +230,6 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
    * @param aTerm the phi+ Term in Craig Interpolation
    * @param bTerm the phi- Term in Craig Interpolation (before negation for CVC5-Interpolation)
    */
-
   private void checkCVC5Interpolation(Solver solverP, Term interpolant, Term aTerm, Term bTerm) {
     ImmutableMap<String, Formula> interpolantSymbols =
         mgr.extractVariablesAndUFs(creator.encapsulateBoolean(interpolant));
@@ -254,11 +253,10 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
 
     // build both Craig Interpolation Formulas with generated interpolant and given Formulas
     Term craig1 = solverP.mkTerm(Kind.IMPLIES, aTerm, interpolant);
+    // needs to be UNSAT, hence the equals False
     Term craig2 =
         solverP.mkTerm(
-            Kind.EQUAL,
-            solverP.mkTerm(Kind.AND, interpolant, bTerm),
-            solverP.mkBoolean(false));// needs to be UNSAT, hence the equals False
+            Kind.EQUAL, solverP.mkTerm(Kind.AND, interpolant, bTerm), solverP.mkBoolean(false));
     solverP.assertFormula(craig1);
     solverP.assertFormula(craig2);
 
@@ -269,7 +267,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     // negate the Formula for generality
     solverP.assertFormula(solverP.mkTerm(Kind.NOT, solverP.mkTerm(Kind.AND, craig1, craig2)));
 
-    assert solverP.checkSat()
-        .isUnsat() : "Interpolant does not follow generally Craig Interpolation";
+    assert solverP.checkSat().isUnsat()
+        : "Interpolant does not follow generally Craig Interpolation";
   }
 }
