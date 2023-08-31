@@ -288,7 +288,7 @@ public abstract class SolverBasedTest0 {
     assume()
         .withMessage("Solver %s does not support parsing formulae", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2, Solvers.CVC5);
+        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2, Solvers.CVC5, Solvers.APRON);
   }
 
   protected void requireModel() {
@@ -302,14 +302,14 @@ public abstract class SolverBasedTest0 {
     assume()
         .withMessage("Solver %s does not support formula visitor", solverToUse())
         .that(solverToUse())
-        .isNotEqualTo(Solvers.BOOLECTOR);
+        .isNoneOf(Solvers.BOOLECTOR, Solvers.APRON);
   }
 
   protected void requireUnsatCore() {
     assume()
         .withMessage("Solver %s does not support unsat core generation", solverToUse())
         .that(solverToUse())
-        .isNotEqualTo(Solvers.BOOLECTOR);
+        .isNoneOf(Solvers.BOOLECTOR, Solvers.APRON);
   }
 
   /**

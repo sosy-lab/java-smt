@@ -98,6 +98,9 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
   private void addConstraintException(ApronConstraint pConstraint) {
     try {
       for (Map.Entry<Tcons1, Texpr1Node> cons:pConstraint.getConstraintNodes().entrySet()) {
+        if(!(cons.getKey().isIntervalLinear())){
+          throw new UnsupportedOperationException("Non-linear constraints can not be added.");
+        }
         Tcons1[] consOld = abstract1.toTcons(solverContext.getManager());
         Tcons1[] newCons = new Tcons1[consOld.length + 1];
         int i = 0;
@@ -108,7 +111,7 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
         }
         newCons[consOld.length] = cons.getKey();
         this.abstract1.changeEnvironment(solverContext.getManager(),
-            solverContext.getFormulaCreator().getEnvironment(),true);
+            solverContext.getFormulaCreator().getEnvironment(),false);
         this.abstract1 = new Abstract1(solverContext.getManager(), newCons);
         Iterables.getLast(assertedFormulas).add(pConstraint);
       }

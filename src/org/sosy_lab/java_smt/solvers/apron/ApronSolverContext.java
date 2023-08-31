@@ -25,6 +25,7 @@ import apron.Box;
 import apron.Environment;
 import apron.Manager;
 import apron.Polka;
+import apron.PolkaEq;
 import java.util.Set;
 import java.util.logging.Level;
 import javax.annotation.Nullable;
@@ -88,7 +89,7 @@ public class ApronSolverContext extends AbstractSolverContext {
       long randomSeed) {
 
     Environment env = new Environment();
-    Manager manager = new Polka(true);
+    Manager manager = new Polka(false);
     ApronBooleanType booleanType = new ApronBooleanType();
     ApronIntegerType integerType = new ApronIntegerType();
     ApronRationalType rationalType = new ApronRationalType();

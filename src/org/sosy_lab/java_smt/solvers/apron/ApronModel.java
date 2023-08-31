@@ -118,8 +118,13 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
     //shows the interval for all values the variable can take
     Interval interval = this.prover.getAbstract1().getBound(man, pVar);
     //gives the lower bound of the interval
+    BigInteger big;
     MpqScalar value = (MpqScalar) interval.sup;
-    BigInteger big = new BigInteger(value.toString());
+    if(value.isInfty()==1){
+      big = new BigInteger((interval.inf).toString());
+    } else {
+      big = new BigInteger(interval.sup.toString());
+    }
     //valueFormula refers to the lower bound
     ApronIntCstNode valueFormula = new ApronIntCstNode(big);
     //creates a formula of the form: key - lower bound

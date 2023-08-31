@@ -84,6 +84,7 @@ public class SolverContextFactoryTest {
             .withMessage(
                 "Solver %s is not yet supported in the operating system %s", solverToUse(), OS);
     switch (solverToUse()) {
+      case APRON:
       case SMTINTERPOL:
       case PRINCESS:
         // any operating system is allowed, Java is already available.

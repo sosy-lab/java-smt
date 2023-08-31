@@ -367,9 +367,9 @@ public interface ApronNode extends Formula {
       public ApronIntCstNode(ApronRatCstNode ratNode){
         this.cstNode =
             new Texpr1CstNode(new MpqScalar(
-                BigInteger.valueOf(Long.parseLong(ratNode.getRational().toString()))));
+                BigInteger.valueOf(Double.valueOf(Math.floor(ratNode.getRational().doubleValue())).longValue())));
         this.value =
-            BigInteger.valueOf(Long.parseLong(ratNode.getRational().toString()));
+            BigInteger.valueOf(Double.valueOf(Math.floor(ratNode.getRational().doubleValue())).longValue());
       }
 
       @Override

@@ -174,6 +174,7 @@ public class ApronRationalFormulaManager extends
         Map<ApronNode, Integer> map = new HashMap<>();
         map.put(apronNode,Tcons1.DISEQ);
         ApronConstraint constraint = new ApronConstraint(formulaCreator.getEnvironment(),map);
+        constraints.add(constraint);
       }
     }
     return new ApronConstraint(constraints, formulaCreator.getEnvironment());

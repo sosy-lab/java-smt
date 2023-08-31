@@ -35,6 +35,7 @@ import apron.Tcons1;
 import apron.Texpr1BinNode;
 import apron.Texpr1CstNode;
 import apron.Texpr1VarNode;
+import com.google.common.base.Preconditions;
 
 /**
  * Simple examples about the Apron Library. Inspired by
@@ -84,6 +85,7 @@ public class ApronExamples {
 
     //Expression-Tree example, 4x+5 > 0
     Texpr1VarNode varNode = new Texpr1VarNode("x");
+    Texpr1VarNode varNode2 = new Texpr1VarNode("x");
     Texpr1CstNode four = new Texpr1CstNode(new MpqScalar(4));
     Texpr1CstNode five = new Texpr1CstNode(new MpqScalar(5));
     Texpr1BinNode term = new Texpr1BinNode(Texpr1BinNode.OP_MUL, four, varNode);

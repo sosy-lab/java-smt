@@ -96,14 +96,15 @@ public class ApronIntegerFormulaManager
 
   @Override
   public BooleanFormula modularCongruence(IntegerFormula number1, IntegerFormula number2, long n) {
-    ApronIntCstNode mod = new ApronIntCstNode(BigInteger.valueOf(n));
+    // x = (nN * (x - n))
+    ApronIntCstNode nN = new ApronIntCstNode(BigInteger.valueOf(n));
     ApronIntBinaryNode x = new ApronIntBinaryNode(ApronFormulaManager.getTerm(number1), ApronFormulaManager.getTerm(number2), Texpr1BinNode.OP_SUB);
-
-    if(BigInteger.ZERO.compareTo(BigInteger.valueOf(n))<0){
-
-      return (BooleanFormula) equal(mod,(ApronNode) x);
-    }
-    return (BooleanFormula) equal((ApronNode) mod,mod);
+    ApronIntBinaryNode div = new ApronIntBinaryNode(x,nN,Texpr1BinNode.OP_DIV);
+    ApronIntBinaryNode mul = new ApronIntBinaryNode(nN, div, Texpr1BinNode.OP_MUL);
+    ApronIntBinaryNode left = new ApronIntBinaryNode(x,mul,Texpr1BinNode.OP_SUB);
+    Map<ApronNode, Integer> map = new HashMap<>();
+    map.put(left,Tcons1.EQ);
+    return new ApronNode.ApronConstraint(formulaCreator.getEnvironment(),map);
   }
 
   @Override
@@ -182,6 +183,7 @@ public class ApronIntegerFormulaManager
       Map<ApronNode, Integer> map = new HashMap<>();
       map.put(apronNode,Tcons1.DISEQ);
       ApronConstraint constraint = new ApronConstraint(formulaCreator.getEnvironment(),map);
+      constraints.add(constraint);
     }
   }
   return new ApronConstraint(constraints, formulaCreator.getEnvironment());
