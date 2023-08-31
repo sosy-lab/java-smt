@@ -247,12 +247,13 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     solverP.assertFormula(craig1);
     solverP.assertFormula(craig2);
 
-    Preconditions.checkArgument(
-        solverP.checkSat().isSat(), "Interpolant does not follow Craig Interpolation");
+    assert solverP.checkSat().isSat() : "Interpolant does not follow Craig Interpolation";
+
+    solverP.resetAssertions();
 
     solverP.assertFormula(solverP.mkTerm(Kind.NOT, solverP.mkTerm(Kind.AND, craig1, craig2)));
 
-    Preconditions.checkArgument(
-        solverP.checkSat().isUnsat(), "Interpolant does not follow generally Craig Interpolation");
+    assert solverP.checkSat().isUnsat()
+        : "Interpolant does not follow generally Craig Interpolation";
   }
 }
