@@ -239,7 +239,7 @@ public class BitwuzlaFloatingPointManager
 
   @Override
   protected Long equalWithFPSemantics(Long pParam1, Long pParam2) {
-    return bitwuzlaJNI.bitwuzla_mk_term2(BITWUZLA_KIND_FP_EQ.swigValue(), pParam1, pParam2);
+    return bitwuzlaJNI.bitwuzla_mk_term2(BITWUZLA_KIND_FP_EQUAL.swigValue(), pParam1, pParam2);
   }
 
   @Override
