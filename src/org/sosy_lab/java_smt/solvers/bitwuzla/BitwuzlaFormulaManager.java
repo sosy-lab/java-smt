@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
+import java.io.File;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
@@ -61,6 +62,78 @@ final class BitwuzlaFormulaManager extends AbstractFormulaManager<Long, Long, Lo
    */
   @Override
   public BooleanFormula parse(String s) throws IllegalArgumentException {
+    long options = bitwuzlaJNI.bitwuzla_options_new();
+
+    // WORKING EXAMPLE -------------------------------
+    // long pInfile = bitwuzlaJNI.fopen("/home/koli/bitwuzla/examples/smt2/quickstart.smt2", "r");
+    // long pInfile = bitwuzlaJNI.fopen("examples/smt2/quickstart.smt2", "r");
+
+    // _IO_FILE infile = new _IO_FILE(pInfile, false);
+
+    // long parser = bitwuzlaJNI.bitwuzla_parser_new(options, "../smt2/quickstart.smt2", _IO_FILE.getCPtr(infile), infile, "smt2");
+
+    // ------------------------------------------------
+
+    long pInfile = bitwuzlaJNI.fopen("tempParserFile", "w+");
+
+    String inpuString = "(set-logic QF_ABV)\r\n" + //
+        "(set-option :produce-models true)\r\n" + //
+        "(declare-const x (_ BitVec 8))\r\n" + //
+        "(declare-const y (_ BitVec 8))\r\n" + //
+        "(declare-fun f ((_ BitVec 8) (_ BitVec 4)) (_ BitVec 8))\r\n" + //
+        "(declare-const a (Array (_ BitVec 8) (_ BitVec 8)))\r\n" + //
+        "(assert\r\n" + //
+        "    (distinct\r\n" + //
+        "        ((_ extract 3 0) (bvsdiv x (_ bv2 8)))\r\n" + //
+        "        ((_ extract 3 0) (bvashr y (_ bv1 8)))))\r\n" + //
+        "(assert (= (f x ((_ extract 6 3) x)) y))\r\n" + //
+        "(assert (= (select a x) y))\r\n" + //
+        "(check-sat)\r\n" + //
+        "(get-model)\r\n" + //
+        "(get-value (x y f a (bvmul x x)))\r\n" + //
+        "(exit)\r\n";
+
+    _IO_FILE infile = new _IO_FILE(pInfile, true);
+
+    bitwuzlaJNI.fputs(inpuString, _IO_FILE.getCPtr(infile), infile);
+
+    // Not sure why this needs to be done, but Bitwuzla can only access the file in r or r+ mode
+    bitwuzlaJNI.fclose(_IO_FILE.getCPtr(infile), infile);
+    pInfile = bitwuzlaJNI.fopen("tempParserFile", "r");
+    infile = new _IO_FILE(pInfile, true);
+
+    long parser =
+        bitwuzlaJNI.bitwuzla_parser_new(options, "tempParserFile", _IO_FILE.getCPtr(infile), infile,
+            "smt2");
+
+
+    // Boolean must be false, again not sure why
+    String err_msg = bitwuzlaJNI.bitwuzla_parser_parse(parser, false);
+    assert (err_msg == null);
+
+    long[] size = new long[1];
+    long assertions =
+        bitwuzlaJNI.bitwuzla_get_assertions(bitwuzlaJNI.bitwuzla_parser_get_bitwuzla(parser), size);
+
+    System.out.println("Assertions:");
+    System.out.println("{");
+    for (int i = 0; i < size[0]; ++i) {
+      System.out.println(bitwuzlaJNI.bitwuzla_term_to_string(
+          bitwuzlaJNI.BitwuzlaTermArray_getitem(assertions, i)));
+    }
+    System.out.println("}");
+
+    // Deleting infile is probably safer than the C function. Can't do both.
+    // bitwuzlaJNI.fclose(_IO_FILE.getCPtr(infile), infile);
+
+    infile.delete();
+
+    // File needs to be deleted from Java-side
+    File toDelete = new File("tempParserFile");
+    toDelete.delete();
+
+    bitwuzlaJNI.bitwuzla_parser_delete(parser);
+    bitwuzlaJNI.bitwuzla_options_delete(options);
     return null;
   }
 
