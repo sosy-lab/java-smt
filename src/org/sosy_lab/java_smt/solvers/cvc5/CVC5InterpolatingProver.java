@@ -222,6 +222,15 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     }
   }
 
+  /**
+   * Checks, whether the returned interpolant indeed satisfies Craig-Interpolation and Symbol Usage.
+   *
+   * @param solverP the Solver to use to check for SAT and UNSAT
+   * @param interpolant the given Interpolant for aTerm and bTerm after Craig Interpolation
+   * @param aTerm the phi+ Term in Craig Interpolation
+   * @param bTerm the phi- Term in Craig Interpolation (before negation for CVC5-Interpolation)
+   */
+
   private void checkCVC5Interpolation(Solver solverP, Term interpolant, Term aTerm, Term bTerm) {
     ImmutableMap<String, Formula> interpolantSymbols =
         mgr.extractVariablesAndUFs(creator.encapsulateBoolean(interpolant));
@@ -229,6 +238,8 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
         mgr.extractVariablesAndUFs(creator.encapsulateBoolean(aTerm));
     ImmutableMap<String, Formula> interpolBSymbols =
         mgr.extractVariablesAndUFs(creator.encapsulateBoolean(bTerm));
+
+    // checks that every Symbol of the interpolant appears either in term A or term B
     boolean interpolSymbolMatch = true;
     for (String key : interpolantSymbols.keySet()) {
       if (!interpolASymbols.containsKey(key) && !interpolBSymbols.containsKey(key)) {
@@ -238,12 +249,16 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
 
     Preconditions.checkArgument(interpolSymbolMatch, "Interpolant contains Symbols not in A or B.");
 
+    // we are reusing the InterpolationSolver instance, so we must reset it
     solverP.resetAssertions();
 
+    // build both Craig Interpolation Formulas with generated interpolant and given Formulas
     Term craig1 = solverP.mkTerm(Kind.IMPLIES, aTerm, interpolant);
     Term craig2 =
         solverP.mkTerm(
-            Kind.EQUAL, solverP.mkTerm(Kind.AND, interpolant, bTerm), solverP.mkBoolean(false));
+            Kind.EQUAL,
+            solverP.mkTerm(Kind.AND, interpolant, bTerm),
+            solverP.mkBoolean(false));// needs to be UNSAT, hence the equals False
     solverP.assertFormula(craig1);
     solverP.assertFormula(craig2);
 
@@ -251,9 +266,10 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
 
     solverP.resetAssertions();
 
+    // negate the Formula for generality
     solverP.assertFormula(solverP.mkTerm(Kind.NOT, solverP.mkTerm(Kind.AND, craig1, craig2)));
 
-    assert solverP.checkSat().isUnsat()
-        : "Interpolant does not follow generally Craig Interpolation";
+    assert solverP.checkSat()
+        .isUnsat() : "Interpolant does not follow generally Craig Interpolation";
   }
 }
