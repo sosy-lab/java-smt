@@ -253,21 +253,14 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
 
     // build both Craig Interpolation Formulas with generated interpolant and given Formulas
     Term craig1 = solverP.mkTerm(Kind.IMPLIES, aTerm, interpolant);
-    // needs to be UNSAT, hence the equals False
-    Term craig2 =
-        solverP.mkTerm(
-            Kind.EQUAL, solverP.mkTerm(Kind.AND, interpolant, bTerm), solverP.mkBoolean(false));
-    solverP.assertFormula(craig1);
-    solverP.assertFormula(craig2);
+    Term craig2 = solverP.mkTerm(Kind.AND, interpolant, bTerm);
 
+    solverP.assertFormula(craig1);
     assert solverP.checkSat().isSat() : "Interpolant does not follow Craig Interpolation";
 
     solverP.resetAssertions();
 
-    // negate the Formula for generality
-    solverP.assertFormula(solverP.mkTerm(Kind.NOT, solverP.mkTerm(Kind.AND, craig1, craig2)));
-
-    assert solverP.checkSat().isUnsat()
-        : "Interpolant does not follow generally Craig Interpolation";
+    solverP.assertFormula(craig2);
+    assert solverP.checkSat().isUnsat() : "Interpolant does not follow Craig Interpolation";
   }
 }
