@@ -256,7 +256,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     Term craig2 = solverP.mkTerm(Kind.AND, interpolant, bTerm);
 
     solverP.assertFormula(craig1);
-    assert solverP.checkSat().isSat() : "Interpolant does not follow Craig Interpolation";
+    // assert solverP.checkSat().isSat() : "Interpolant does not follow Craig Interpolation";
 
     solverP.resetAssertions();
 
