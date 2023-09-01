@@ -119,9 +119,14 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
     Interval interval = this.prover.getAbstract1().getBound(man, pVar);
     //gives the lower bound of the interval
     BigInteger big;
-    MpqScalar value = (MpqScalar) interval.sup;
-    if(value.isInfty()==1){
-      big = new BigInteger((interval.inf).toString());
+    MpqScalar upperBound = (MpqScalar) interval.sup;
+    MpqScalar lowerBound = (MpqScalar) interval.inf;
+    //is the upper bound +infinity?
+    if(upperBound.isInfty()==1){
+      //is the lower bound -infinity?
+      if(lowerBound.isInfty() == -1){
+        big = BigInteger.ZERO;
+      } else big = new BigInteger((interval.inf).toString());
     } else {
       big = new BigInteger(interval.sup.toString());
     }
@@ -145,10 +150,21 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
     Manager man = this.prover.getAbstract1().getCreationManager();
     //shows the interval for all values the variable can take
     Interval interval = this.prover.getAbstract1().getBound(man, pVar);
-    //gives the lower bound of the interval
+    //gives the upper bound of the interval
     Object value = interval.sup;
+    String strValue;
+    MpqScalar upperBound = (MpqScalar) interval.sup;
+    MpqScalar lowerBound = (MpqScalar) interval.inf;
+    //is the upper bound +infinity?
+    if(upperBound.isInfty()==1){
+      //is the lower bound -infinity?
+      if(lowerBound.isInfty() == -1){
+        strValue = "0";
+      } else strValue = lowerBound.toString();
+    } else {
+      strValue = upperBound.toString();
+    }
     //translates the value into nominator and denominator
-    String strValue = value.toString();
     String[] numbers = strValue.split("/");
     BigInteger nominator = new BigInteger(numbers[0]);
     ApronRatCstNode valueFormula;
@@ -184,6 +200,15 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
    * @return model value
    */
   protected ApronNode getValue(ApronNode pNode) {
+    Environment currentEnvironment = this.formulaCreator.getEnvironment();
+    //ensuring that the abstract element has all current variables
+    try {
+      this.prover.getAbstract1().changeEnvironment(this.prover.getSolverContext().getManager(),
+          currentEnvironment,false);
+    } catch (ApronException apronException){
+      throw new RuntimeException(apronException);
+    }
+
     if (pNode instanceof ApronIntVarNode) {
       ApronIntVarNode varNode = (ApronIntVarNode) pNode;
       String varName = varNode.getVarName();
