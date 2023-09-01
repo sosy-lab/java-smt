@@ -96,10 +96,10 @@ public class ApronIntegerFormulaManager
 
   @Override
   public BooleanFormula modularCongruence(IntegerFormula number1, IntegerFormula number2, long n) {
-    // x = (nN * (x - n))
+    //(= x (* n (div x n))); div = x/n; x = number1 - number2
     ApronIntCstNode nN = new ApronIntCstNode(BigInteger.valueOf(n));
     ApronIntBinaryNode x = new ApronIntBinaryNode(ApronFormulaManager.getTerm(number1), ApronFormulaManager.getTerm(number2), Texpr1BinNode.OP_SUB);
-    ApronIntBinaryNode div = new ApronIntBinaryNode(x,nN,Texpr1BinNode.OP_DIV);
+    ApronIntBinaryNode div = new ApronIntBinaryNode(x,nN,Texpr1BinNode.OP_SUB);
     ApronIntBinaryNode mul = new ApronIntBinaryNode(nN, div, Texpr1BinNode.OP_MUL);
     ApronIntBinaryNode left = new ApronIntBinaryNode(x,mul,Texpr1BinNode.OP_SUB);
     Map<ApronNode, Integer> map = new HashMap<>();

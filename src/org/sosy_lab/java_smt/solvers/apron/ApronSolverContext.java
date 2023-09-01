@@ -48,14 +48,14 @@ public class ApronSolverContext extends AbstractSolverContext {
 
   private final ApronFormulaCreator formulaCreator;
   private final Manager manager;
-  private final ShutdownNotifier shutdownNotifier;
   private final Configuration config;
   private final @Nullable PathCounterTemplate logfile;
   private final LogManager logger;
   private final long randomSeed;
 
-  private final ShutdownRequestListener shutdownRequestListener;
   private boolean closed = false;
+
+  private ShutdownNotifier shutdownNotifier;
 
   protected ApronSolverContext(
       ApronFormulaManager fmgr,
@@ -69,15 +69,11 @@ public class ApronSolverContext extends AbstractSolverContext {
     super(fmgr);
     this.manager = pManager;
     this.formulaCreator = pFormulaCreator;
-    this.shutdownNotifier = pShutdownNotifier;
-    this.shutdownRequestListener = reason -> {
-
-    };
-    shutdownNotifier.register(shutdownRequestListener);
     this.config = pConfig;
     this.logfile = pLogfile;
     this.randomSeed = pRandomSeed;
     this.logger = pLogger;
+    this.shutdownNotifier = pShutdownNotifier;
   }
 
   public static synchronized ApronSolverContext create(
@@ -87,7 +83,6 @@ public class ApronSolverContext extends AbstractSolverContext {
       PathCounterTemplate logfile,
       LogManager pLogger,
       long randomSeed) {
-
     Environment env = new Environment();
     Manager manager = new Polka(false);
     ApronBooleanType booleanType = new ApronBooleanType();
@@ -135,7 +130,6 @@ public class ApronSolverContext extends AbstractSolverContext {
     if (!closed) {
       closed = true;
       logger.log(Level.FINER, "Freeing Apron Environment");
-      shutdownNotifier.unregister(shutdownRequestListener);
     }
   }
 
