@@ -12,9 +12,7 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.FluentIterable;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import io.github.cvc5.CVC5ApiException;
 import io.github.cvc5.Kind;
@@ -37,6 +35,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
   private final FormulaManager mgr;
   private final Set<ProverOptions> solverOptions;
   private final int seed;
+  private final CVC5BooleanFormulaManager bmgr;
 
   CVC5InterpolatingProver(
       CVC5FormulaCreator pFormulaCreator,
@@ -48,6 +47,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     mgr = pMgr;
     solverOptions = pOptions;
     seed = randomSeed;
+    bmgr = (CVC5BooleanFormulaManager) mgr.getBooleanFormulaManager();
   }
 
   /**
@@ -89,41 +89,27 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
       return mgr.getBooleanFormulaManager().makeBoolean(false);
     }
 
-    // fit the Input to work with getCVC5Interpolation
-
-    ImmutableList<Collection<Term>> formAAsList = ImmutableList.of(pFormulasOfA);
-    ImmutableList<Collection<Term>> formBAsList = ImmutableList.of(formulasOfB);
-
-    Term itp = getCVC5Interpolation(formAAsList, formBAsList);
-
+    Term itp = getCVC5Interpolation(pFormulasOfA, formulasOfB);
     return creator.encapsulateBoolean(itp);
   }
 
   @Override
-  public List<BooleanFormula> getSeqInterpolants(
-      List<? extends Collection<Term>> partitionedFormulas)
+  public List<BooleanFormula> getSeqInterpolants(List<? extends Collection<Term>> partitions)
       throws SolverException, InterruptedException {
     Preconditions.checkArgument(
-        !partitionedFormulas.isEmpty(), "at least one partition should be available.");
+        !partitions.isEmpty(), "at least one partition should be available.");
 
+    final int n = partitions.size();
     final List<BooleanFormula> itps = new ArrayList<>();
-
-    if (partitionedFormulas.size() == 1) {
-      return itps;
+    Term previousItp = solver.mkTrue();
+    for (int i = 1; i < n; i++) {
+      Collection<Term> formulasA =
+          FluentIterable.from(partitions.get(i - 1)).append(previousItp).toSet();
+      Collection<Term> formulasB = FluentIterable.concat(partitions.subList(i, n)).toSet();
+      Term itp = getCVC5Interpolation(formulasA, formulasB);
+      itps.add(creator.encapsulateBoolean(itp));
+      previousItp = itp;
     }
-    itps.add(
-        getInterpolant(ImmutableList.copyOf(Iterables.concat(partitionedFormulas.subList(0, 1)))));
-    Integer n = partitionedFormulas.size();
-    for (int i = 2; i < n; i++) {
-      Term preInterpol = creator.extractInfo(itps.get(i - 2));
-      Term currFormulaInterpol =
-          getCVC5Interpolation(
-              ImmutableList.of(ImmutableSet.of(preInterpol), partitionedFormulas.get(i - 1)),
-              ImmutableList.of(
-                  ImmutableList.copyOf(Iterables.concat(partitionedFormulas.subList(i, n)))));
-      itps.add(creator.encapsulateBoolean(currFormulaInterpol));
-    }
-
     return itps;
   }
 
@@ -156,53 +142,30 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
    * <p>Hence, CVC5's Interpolation produces an equivalent Interpolation to Craig Interpolation, if
    * B is negated during CVC5 Interpolation.
    *
-   * @param pFormAAsList current Set of Assertions A
-   * @param pFormBAsList Formulas to Interpolate B
+   * @param formulasA current Set of Assertions A
+   * @param formulasB Formulas to Interpolate B
    * @return Interpolation of the Interpolation Pair following the definition of
    *     Craig-Interpolation.
    */
-  private Term getCVC5Interpolation(
-      ImmutableList<Collection<Term>> pFormAAsList, ImmutableList<Collection<Term>> pFormBAsList) {
+  private Term getCVC5Interpolation(Collection<Term> formulasA, Collection<Term> formulasB) {
+    Term phiPlus = bmgr.andImpl(formulasA);
+    Term phiMinus = bmgr.andImpl(formulasB);
 
     // Uses a separate Solver instance to leave the original solver-context unmodified
-    Solver interpolationSolver = new Solver();
-    setSolverOptions(seed, solverOptions, interpolationSolver);
+    Solver itpSolver = new Solver();
+    setSolverOptions(seed, solverOptions, itpSolver);
 
-    Term interpolA = buildConjunctionOfFormulasOverList(pFormAAsList, interpolationSolver);
-    Term interpolB = buildConjunctionOfFormulasOverList(pFormBAsList, interpolationSolver);
     Term interpolant;
     try {
-      interpolationSolver.assertFormula(interpolA);
-      interpolant =
-          interpolationSolver.getInterpolant(interpolationSolver.mkTerm(Kind.NOT, interpolB));
+      itpSolver.assertFormula(phiPlus);
+      interpolant = itpSolver.getInterpolant(itpSolver.mkTerm(Kind.NOT, phiMinus));
     } finally {
-      interpolationSolver.deletePointer();
+      itpSolver.deletePointer();
     }
 
     // TODO optimize and make this check optional, as soon as it works reliable.
-    checkInterpolationCriteria(interpolant, interpolA, interpolB);
+    checkInterpolationCriteria(interpolant, phiPlus, phiMinus);
     return interpolant;
-  }
-
-  /**
-   * Turns a List of Collections of Formulas to a Single Conjunction of the Formulas e.g.:
-   * [[A,B],[C]] -> A/\B/\C.
-   *
-   * @param formulasList List of Collections of formulas
-   * @param usingSolver the CVC5 Solver Instance to use
-   * @return concatenated Formulas with AND as CVC5 Term
-   */
-  private Term buildConjunctionOfFormulasOverList(
-      ImmutableList<Collection<Term>> formulasList, Solver usingSolver) {
-    Set<Term> formulas = FluentIterable.concat(formulasList).toSet();
-    switch (formulas.size()) {
-      case 0:
-        return usingSolver.mkBoolean(true);
-      case 1:
-        return Iterables.getOnlyElement(formulas);
-      default:
-        return usingSolver.mkTerm(Kind.AND, formulas.toArray(new Term[0]));
-    }
   }
 
   /**
