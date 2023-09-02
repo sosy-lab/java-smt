@@ -84,7 +84,14 @@ public class BitwuzlaFloatingPointManager
   @Override
   protected Long makeNumberAndRound(
       String pN, FloatingPointType pType, Long pFloatingPointRoundingMode) {
-    return null;
+    long pUnrounded = makeVariableImpl(pN, pType);
+    long e = bitwuzlaJNI.bitwuzla_term_fp_get_exp_size(pUnrounded);
+    long s = bitwuzlaJNI.bitwuzla_term_fp_get_sig_size(pUnrounded);
+    long pRounded = bitwuzlaJNI.bitwuzla_mk_term2_indexed2(BITWUZLA_KIND_FP_TO_FP_FROM_FP.swigValue(),
+        pFloatingPointRoundingMode,
+        pUnrounded
+        , e, s);
+    return pRounded;
   }
 
   @Override

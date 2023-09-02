@@ -30,6 +30,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -37,6 +39,7 @@ import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
@@ -46,11 +49,8 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
 
   enum SatSolver {
     LINGELING,
-    PICOSAT,
-    MINISAT,
     CMS,
     CADICAL,
-    GIMSATUL,
     KISSAT
   }
 
@@ -63,10 +63,9 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
     @Option(
         secure = true,
         description =
-            // TODO:
-            "Further options for Boolector in addition to the default options. "
+            "Further options for Bitwuzla in addition to the default options. "
                 + "Format:  \"Optionname=value\" with ’,’ to seperate options. "
-                + "Optionname and value can be found in BtorOption or Boolector C Api."
+                + "Optionname and value can be found in BtorOption or Bitwuzla C Api."
                 + "Example: \"BTOR_OPT_MODEL_GEN=2,BTOR_OPT_INCREMENTAL=1\".")
     private String furtherOptions = "";
 
@@ -89,6 +88,52 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
     manager = pManager;
     creator = pCreator;
     shutdownNotifier = pShutdownNotifier;
+  }
+
+  public static BitwuzlaSolverContext create(
+      Configuration config,
+      ShutdownNotifier pShutdownNotifier,
+      @Nullable PathCounterTemplate solverLogfile,
+      long randomSeed,
+      FloatingPointRoundingMode pFloatingPointRoundingMode,
+      Consumer<String> pLoader)
+      throws InvalidConfigurationException {
+    pLoader.accept("bitwuzla");
+    BitwuzlaSettings settings = new BitwuzlaSettings(config);
+
+    long pOptions = bitwuzlaJNI.bitwuzla_options_new();
+
+    Preconditions.checkNotNull(settings.satSolver);
+    bitwuzlaJNI.bitwuzla_set_option_mode(
+        pOptions,
+        BitwuzlaOption.BITWUZLA_OPT_SAT_SOLVER.swigValue(),
+        settings.satSolver.name().toLowerCase(Locale.getDefault()));
+    bitwuzlaJNI.bitwuzla_set_option(pOptions, BitwuzlaOption.BITWUZLA_OPT_PRODUCE_MODELS.swigValue()
+        , 2);
+    bitwuzlaJNI.bitwuzla_set_option(pOptions, BitwuzlaOption.BITWUZLA_OPT_SEED.swigValue(), randomSeed);
+    // Stop Bitwuzla from rewriting formulas in outputs
+    bitwuzlaJNI.bitwuzla_set_option(pOptions, BitwuzlaOption.BITWUZLA_OPT_REWRITE_LEVEL.swigValue(), 0);
+
+    setFurtherOptions(pOptions, settings.furtherOptions);
+
+    final long bitwuzla = bitwuzlaJNI.bitwuzla_new(pOptions);
+
+    BitwuzlaFormulaCreator creator = new BitwuzlaFormulaCreator(bitwuzla);
+    BitwuzlaUFManager functionTheory = new BitwuzlaUFManager(creator);
+    BitwuzlaBooleanFormulaManager booleanTheory = new BitwuzlaBooleanFormulaManager(creator);
+    BitwuzlaBitvectorFormulaManager bitvectorTheory =
+        new BitwuzlaBitvectorFormulaManager(creator, booleanTheory);
+    BitwuzlaQuantifiedFormulaManager quantifierTheory =
+        new BitwuzlaQuantifiedFormulaManager(creator);
+    BitwuzlaFloatingPointManager floatingPointTheory = new BitwuzlaFloatingPointManager(creator,
+        pFloatingPointRoundingMode);
+    BitwuzlaArrayFormulaManager arrayTheory = new BitwuzlaArrayFormulaManager(creator);
+    BitwuzlaFormulaManager manager =
+        new BitwuzlaFormulaManager(
+            creator, functionTheory, booleanTheory, bitvectorTheory, quantifierTheory,
+           floatingPointTheory, arrayTheory);
+
+    return new BitwuzlaSolverContext(manager, creator, pShutdownNotifier);
   }
 
   /**
@@ -207,14 +252,14 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
   /**
    * Set more options for Bitwuzla.
    *
-   * @param bitwuzla solver instance.
+   * @param pOptions options pointer
    * @param pFurtherOptions String to be parsed with options to be set.
    * @throws InvalidConfigurationException signals that the format of the option string is wrong or
    *     an invalid option is used.
    */
 
   // TODO: Copied from Boolector, needs to be tested.
-  private static void setFurtherOptions(long bitwuzla, String pFurtherOptions)
+  private static void setFurtherOptions(long pOptions, String pFurtherOptions)
       throws InvalidConfigurationException {
     MapSplitter optionSplitter =
         Splitter.on(',')
@@ -235,8 +280,12 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
         Field optionField = optionClass.getField(option.getKey());
         // Get the value of the public fields
         BitwuzlaOption value = (BitwuzlaOption) optionField.get(null);
-        long optionValue = Long.parseLong(option.getValue());
-        bitwuzlaJNI.bitwuzla_set_option(bitwuzla, value.swigValue(), optionValue);
+        if (bitwuzlaJNI.bitwuzla_option_is_numeric(pOptions, value.swigValue())){
+          long optionValue = Long.parseLong(option.getValue());
+          bitwuzlaJNI.bitwuzla_set_option(pOptions, value.swigValue(), optionValue);
+        } else {
+          bitwuzlaJNI.bitwuzla_set_option_mode(pOptions, value.swigValue(), option.getValue());
+        }
       } catch (java.lang.NoSuchFieldException e) {
         throw new InvalidConfigurationException(e.getMessage(), e);
       } catch (IllegalAccessException pE) {
