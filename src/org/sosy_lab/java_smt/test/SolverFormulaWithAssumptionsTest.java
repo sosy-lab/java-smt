@@ -17,9 +17,9 @@ import com.google.common.collect.Lists;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
@@ -54,10 +54,14 @@ public class SolverFormulaWithAssumptionsTest
 
   @Test
   @SuppressWarnings("CheckReturnValue")
-  @Ignore
   public <T> void basicAssumptionsTest()
       throws SolverException, InterruptedException, InvalidConfigurationException {
     requireInterpolation();
+
+    assume()
+        .withMessage("Solver %s runs into timeout on this test", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC5);
 
     IntegerFormula v1 = imgr.makeVariable("v1");
     IntegerFormula v2 = imgr.makeVariable("v2");

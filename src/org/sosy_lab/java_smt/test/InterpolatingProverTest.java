@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import java.util.List;
 import java.util.Set;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -45,8 +44,12 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
   @Test
   @SuppressWarnings("CheckReturnValue")
-  @Ignore
   public <T> void simpleInterpolation() throws SolverException, InterruptedException {
+    assume()
+        .withMessage("Solver %s runs into timeout on this test", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC5);
+
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       IntegerFormula x = imgr.makeVariable("x");
       IntegerFormula y = imgr.makeVariable("y");
@@ -168,6 +171,11 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   public <T> void binaryBVInterpolation1() throws SolverException, InterruptedException {
     requireBitvectors();
 
+    assume()
+        .withMessage("Solver %s runs into timeout on this test", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC5);
+
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
     int i = index.getFreshId();
@@ -225,6 +233,11 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   public <T> void sequentialInterpolation() throws SolverException, InterruptedException {
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     requireIntegers();
+
+    assume()
+        .withMessage("Solver %s runs into timeout on this test", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC5);
 
     int i = index.getFreshId();
 
@@ -352,6 +365,12 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   @Test
   public <T> void sequentialBVInterpolation() throws SolverException, InterruptedException {
     requireBitvectors();
+
+    assume()
+        .withMessage("Solver %s runs into timeout on this test", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC5);
+
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
     int i = index.getFreshId();
@@ -921,10 +940,14 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   }
 
   @Test
-  @Ignore
   public <T> void bigSeqInterpolationTest() throws InterruptedException, SolverException {
     requireBitvectors();
     requireInterpolation();
+
+    assume()
+        .withMessage("Solver %s runs into timeout on this test", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC5);
 
     int bvWidth = 32;
     BitvectorFormula bv0 = bvmgr.makeBitvector(bvWidth, 0);
