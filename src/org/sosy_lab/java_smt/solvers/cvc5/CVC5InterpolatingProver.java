@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.cvc5;
 
 import static com.google.common.base.Preconditions.checkState;
+import static org.sosy_lab.common.collect.Collections3.transformedImmutableSetCopy;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.FluentIterable;
@@ -75,7 +76,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     checkState(!closed);
 
     final Set<Term> assertedFormulas =
-        FluentIterable.from(getAssertedFormulas()).transform(creator::extractInfo).toSet();
+        transformedImmutableSetCopy(getAssertedFormulas(), creator::extractInfo);
     final Set<Term> formulasOfA = ImmutableSet.copyOf(pFormulasOfA);
     final Set<Term> formulasOfB = Sets.difference(assertedFormulas, formulasOfA);
 
@@ -181,30 +182,30 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
         Sets.difference(interpolantSymbols, intersection));
 
     // build and check both Craig interpolation formulas with the generated interpolant.
-    Solver solver = new Solver();
+    Solver validationSolver = new Solver();
     // interpolation option is not required for validation
-    super.setSolverOptions(seed, solverOptions, solver);
+    super.setSolverOptions(seed, solverOptions, validationSolver);
     try {
-      solver.push();
-      solver.assertFormula(solver.mkTerm(Kind.IMPLIES, phiPlus, interpolant));
+      validationSolver.push();
+      validationSolver.assertFormula(validationSolver.mkTerm(Kind.IMPLIES, phiPlus, interpolant));
       checkState(
-          solver.checkSat().isSat(),
+          validationSolver.checkSat().isSat(),
           "Invalid Craig interpolation: phi+ does not imply the interpolant.");
-      solver.pop();
+      validationSolver.pop();
 
-      solver.push();
-      solver.assertFormula(solver.mkTerm(Kind.AND, interpolant, phiMinus));
+      validationSolver.push();
+      validationSolver.assertFormula(validationSolver.mkTerm(Kind.AND, interpolant, phiMinus));
       checkState(
-          solver.checkSat().isUnsat(),
+          validationSolver.checkSat().isUnsat(),
           "Invalid Craig interpolation: interpolant does not contradict phi-.");
-      solver.pop();
+      validationSolver.pop();
 
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
           "Failure when validating interpolant '" + interpolant + "'.", e);
 
     } finally {
-      solver.deletePointer();
+      validationSolver.deletePointer();
     }
   }
 }
