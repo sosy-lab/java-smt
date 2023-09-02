@@ -74,22 +74,12 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
       throws SolverException, InterruptedException {
     checkState(!closed);
 
-    if (pFormulasOfA.isEmpty()) { // Catch trivial case
-      return mgr.getBooleanFormulaManager().makeBoolean(true);
-    }
+    final Set<Term> assertedFormulas =
+        FluentIterable.from(getAssertedFormulas()).transform(creator::extractInfo).toSet();
+    final Set<Term> formulasOfA = ImmutableSet.copyOf(pFormulasOfA);
+    final Set<Term> formulasOfB = Sets.difference(assertedFormulas, formulasOfA);
 
-    // formulasOfB := assertedFormulas - pFormulasOfA
-    Set<Term> formulasOfB =
-        getAssertedFormulas().stream()
-            .<Term>map(n -> creator.extractInfo(n))
-            .filter(n -> !pFormulasOfA.contains(n))
-            .collect(ImmutableSet.toImmutableSet());
-
-    if (formulasOfB.isEmpty()) { // Catch trivial case
-      return mgr.getBooleanFormulaManager().makeBoolean(false);
-    }
-
-    Term itp = getCVC5Interpolation(pFormulasOfA, formulasOfB);
+    Term itp = getCVC5Interpolation(formulasOfA, formulasOfB);
     return creator.encapsulateBoolean(itp);
   }
 
