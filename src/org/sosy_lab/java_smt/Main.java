@@ -28,12 +28,14 @@ import org.sosy_lab.java_smt.utils.Generator;
 public class Main {
   public static void main(String[] args)
       throws InvalidConfigurationException, InterruptedException, IOException, SolverException {
-    Configuration config = Configuration.fromCmdLineArguments(args);
+    String[] cmdLineArguments = new String[1];
+    cmdLineArguments[0] = "--solver.generateSMTLIB2=true";
+    Configuration config = Configuration.fromCmdLineArguments(cmdLineArguments);
     LogManager logger = BasicLogManager.create(config);
     ShutdownManager shutdown = ShutdownManager.create();
-    Generator generator = new Generator();
-    SolverContext context = SolverContextFactory.createSolverContext(
-        config, logger, shutdown.getNotifier(), SolverContextFactory.Solvers.PRINCESS);
+
+    SolverContext context =
+        SolverContextFactory.createSolverContext(config, logger, shutdown.getNotifier(), SolverContextFactory.Solvers.PRINCESS);
     FormulaManager fmgr = context.getFormulaManager();
     BooleanFormulaManager bmgr = fmgr.getBooleanFormulaManager();
     //IntegerFormulaManager imgr = fmgr.getIntegerFormulaManager();

@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -37,6 +38,7 @@ import org.sosy_lab.java_smt.solvers.princess.PrincessSolverContext;
 import org.sosy_lab.java_smt.solvers.smtinterpol.SmtInterpolSolverContext;
 import org.sosy_lab.java_smt.solvers.yices2.Yices2SolverContext;
 import org.sosy_lab.java_smt.solvers.z3.Z3SolverContext;
+import org.sosy_lab.java_smt.utils.Generator;
 
 /**
  * Factory class for loading and generating solver contexts. Generates a {@link SolverContext}
@@ -105,10 +107,14 @@ public class SolverContextFactory {
               + "This affects only the theories of integer and rational arithmetic.")
   private NonLinearArithmetic nonLinearArithmetic = NonLinearArithmetic.USE;
 
+  @Option(secure = true, description = "test.")
+  private boolean generateSMTLIB2 = false;
+
   private final LogManager logger;
   private final ShutdownNotifier shutdownNotifier;
   private final Configuration config;
   private final Consumer<String> loader;
+
 
   /**
    * This constructor uses the default JavaSMT loader for accessing native libraries.
@@ -221,6 +227,13 @@ public class SolverContextFactory {
     if (collectStatistics) {
       // statistics need to be the most outer wrapping layer.
       context = new StatisticsSolverContext(context);
+    }
+    if (generateSMTLIB2) {
+      try {
+        Generator generator = new Generator();
+      } catch (IOException pE) {
+        throw new RuntimeException(pE);
+      }
     }
     return context;
   }
