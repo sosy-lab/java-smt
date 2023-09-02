@@ -209,18 +209,18 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
    * Checks, whether the returned interpolant indeed satisfies Craig-Interpolation and Symbol Usage.
    *
    * @param interpolant the given Interpolant for aTerm and bTerm after Craig Interpolation
-   * @param aTerm the phi+ Term in Craig Interpolation
-   * @param bTerm the phi- Term in Craig Interpolation (before negation for CVC5-Interpolation)
+   * @param phiPlus the phi+ Term in Craig Interpolation
+   * @param phiMinus the phi- Term in Craig Interpolation (before negation for CVC5-Interpolation)
    */
-  private void checkInterpolationCriteria(Term interpolant, Term aTerm, Term bTerm) {
+  private void checkInterpolationCriteria(Term interpolant, Term phiPlus, Term phiMinus) {
 
     // checks that every Symbol of the interpolant appears either in term A or term B
     Set<String> interpolantSymbols =
         mgr.extractVariablesAndUFs(creator.encapsulateBoolean(interpolant)).keySet();
     Set<String> interpolASymbols =
-        mgr.extractVariablesAndUFs(creator.encapsulateBoolean(aTerm)).keySet();
+        mgr.extractVariablesAndUFs(creator.encapsulateBoolean(phiPlus)).keySet();
     Set<String> interpolBSymbols =
-        mgr.extractVariablesAndUFs(creator.encapsulateBoolean(bTerm)).keySet();
+        mgr.extractVariablesAndUFs(creator.encapsulateBoolean(phiMinus)).keySet();
     Set<String> intersection = Sets.intersection(interpolASymbols, interpolBSymbols);
     checkState(
         intersection.containsAll(interpolantSymbols),
@@ -233,14 +233,14 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     super.setSolverOptions(seed, solverOptions, solver);
     try {
       solver.push();
-      solver.assertFormula(solver.mkTerm(Kind.IMPLIES, aTerm, interpolant));
+      solver.assertFormula(solver.mkTerm(Kind.IMPLIES, phiPlus, interpolant));
       checkState(
           solver.checkSat().isSat(),
           "Invalid Craig interpolation: phi+ does not imply the interpolant.");
       solver.pop();
 
       solver.push();
-      solver.assertFormula(solver.mkTerm(Kind.AND, interpolant, bTerm));
+      solver.assertFormula(solver.mkTerm(Kind.AND, interpolant, phiMinus));
       checkState(
           solver.checkSat().isUnsat(),
           "Invalid Craig interpolation: interpolant does not contradict phi-.");
