@@ -8,12 +8,15 @@
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
+import static com.google.common.base.Preconditions.checkState;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
+import io.github.cvc5.CVC5ApiException;
 import io.github.cvc5.Kind;
 import io.github.cvc5.Solver;
 import io.github.cvc5.Term;
@@ -23,7 +26,6 @@ import java.util.List;
 import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
@@ -39,7 +41,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
   CVC5InterpolatingProver(
       CVC5FormulaCreator pFormulaCreator,
       ShutdownNotifier pShutdownNotifier,
-      @SuppressWarnings("unused") int randomSeed,
+      int randomSeed,
       Set<ProverOptions> pOptions,
       FormulaManager pMgr) {
     super(pFormulaCreator, pShutdownNotifier, randomSeed, pOptions, pMgr);
@@ -60,17 +62,17 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
 
   @Override
   public Term addConstraint(BooleanFormula pConstraint) throws InterruptedException {
-    Preconditions.checkState(!closed);
+    checkState(!closed);
     Term t = creator.extractInfo(pConstraint);
 
     super.addConstraint(pConstraint);
-    return t; // t is not returned in the Abstract Class
+    return t; // t is not wrapped in the Abstract Class
   }
 
   @Override
   public BooleanFormula getInterpolant(Collection<Term> pFormulasOfA)
       throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
+    checkState(!closed);
 
     if (pFormulasOfA.isEmpty()) { // Catch trivial case
       return mgr.getBooleanFormulaManager().makeBoolean(true);
@@ -164,22 +166,21 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
 
     // Uses a separate Solver instance to leave the original solver-context unmodified
     Solver interpolationSolver = new Solver();
-
     setSolverOptions(seed, solverOptions, interpolationSolver);
 
     Term interpolA = buildConjunctionOfFormulasOverList(pFormAAsList, interpolationSolver);
-
     Term interpolB = buildConjunctionOfFormulasOverList(pFormBAsList, interpolationSolver);
+    Term interpolant;
+    try {
+      interpolationSolver.assertFormula(interpolA);
+      interpolant =
+          interpolationSolver.getInterpolant(interpolationSolver.mkTerm(Kind.NOT, interpolB));
+    } finally {
+      interpolationSolver.deletePointer();
+    }
 
-    interpolationSolver.assertFormula(interpolA);
-
-    Term interpolant =
-        interpolationSolver.getInterpolant(interpolationSolver.mkTerm(Kind.NOT, interpolB));
-
-    checkCVC5Interpolation(interpolationSolver, interpolant, interpolA, interpolB);
-
-    interpolationSolver.deletePointer();
-
+    // TODO optimize and make this check optional, as soon as it works reliable.
+    checkInterpolationCriteria(interpolant, interpolA, interpolB);
     return interpolant;
   }
 
@@ -187,31 +188,13 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
    * Turns a List of Collections of Formulas to a Single Conjunction of the Formulas e.g.:
    * [[A,B],[C]] -> A/\B/\C.
    *
-   * @param setOfFormulasToConcat List of Collections of formulas
+   * @param formulasList List of Collections of formulas
    * @param usingSolver the CVC5 Solver Instance to use
    * @return concatenated Formulas with AND as CVC5 Term
    */
   private Term buildConjunctionOfFormulasOverList(
-      ImmutableList<Collection<Term>> setOfFormulasToConcat, Solver usingSolver) {
-    Term concatTerm =
-        buildConjunctionOfFormulas(
-            FluentIterable.concat(setOfFormulasToConcat).toSet(), usingSolver);
-
-    return concatTerm;
-  }
-
-  /**
-   * Turns a collection of Formulas to a Single Conjunction of the Formulas e.g.: [A,B,C] ->
-   * A/\B/\C.
-   *
-   * @param formulas collection of formulas
-   * @param usingSolver the CVC5 Solver Instance to use
-   * @return concatenated Formulas with AND as CVC5 Term
-   */
-  private Term buildConjunctionOfFormulas(Collection<Term> formulas, Solver usingSolver) {
-    Preconditions.checkState(!closed);
-    Preconditions.checkArgument(!formulas.isEmpty());
-
+      ImmutableList<Collection<Term>> formulasList, Solver usingSolver) {
+    Set<Term> formulas = FluentIterable.concat(formulasList).toSet();
     switch (formulas.size()) {
       case 0:
         return usingSolver.mkBoolean(true);
@@ -225,42 +208,50 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
   /**
    * Checks, whether the returned interpolant indeed satisfies Craig-Interpolation and Symbol Usage.
    *
-   * @param solverP the Solver to use to check for SAT and UNSAT
    * @param interpolant the given Interpolant for aTerm and bTerm after Craig Interpolation
    * @param aTerm the phi+ Term in Craig Interpolation
    * @param bTerm the phi- Term in Craig Interpolation (before negation for CVC5-Interpolation)
    */
-  private void checkCVC5Interpolation(Solver solverP, Term interpolant, Term aTerm, Term bTerm) {
-    ImmutableMap<String, Formula> interpolantSymbols =
-        mgr.extractVariablesAndUFs(creator.encapsulateBoolean(interpolant));
-    ImmutableMap<String, Formula> interpolASymbols =
-        mgr.extractVariablesAndUFs(creator.encapsulateBoolean(aTerm));
-    ImmutableMap<String, Formula> interpolBSymbols =
-        mgr.extractVariablesAndUFs(creator.encapsulateBoolean(bTerm));
+  private void checkInterpolationCriteria(Term interpolant, Term aTerm, Term bTerm) {
 
     // checks that every Symbol of the interpolant appears either in term A or term B
-    boolean interpolSymbolMatch = true;
-    for (String key : interpolantSymbols.keySet()) {
-      if (!interpolASymbols.containsKey(key) && !interpolBSymbols.containsKey(key)) {
-        interpolSymbolMatch = false;
-      }
+    Set<String> interpolantSymbols =
+        mgr.extractVariablesAndUFs(creator.encapsulateBoolean(interpolant)).keySet();
+    Set<String> interpolASymbols =
+        mgr.extractVariablesAndUFs(creator.encapsulateBoolean(aTerm)).keySet();
+    Set<String> interpolBSymbols =
+        mgr.extractVariablesAndUFs(creator.encapsulateBoolean(bTerm)).keySet();
+    Set<String> intersection = Sets.intersection(interpolASymbols, interpolBSymbols);
+    checkState(
+        intersection.containsAll(interpolantSymbols),
+        "Interpolant contains symbols %s that are not part of both input formulas.",
+        Sets.difference(interpolantSymbols, intersection));
+
+    // build and check both Craig interpolation formulas with the generated interpolant.
+    Solver solver = new Solver();
+    // interpolation option is not required for validation
+    super.setSolverOptions(seed, solverOptions, solver);
+    try {
+      solver.push();
+      solver.assertFormula(solver.mkTerm(Kind.IMPLIES, aTerm, interpolant));
+      checkState(
+          solver.checkSat().isSat(),
+          "Invalid Craig interpolation: phi+ does not imply the interpolant.");
+      solver.pop();
+
+      solver.push();
+      solver.assertFormula(solver.mkTerm(Kind.AND, interpolant, bTerm));
+      checkState(
+          solver.checkSat().isUnsat(),
+          "Invalid Craig interpolation: interpolant does not contradict phi-.");
+      solver.pop();
+
+    } catch (CVC5ApiException e) {
+      throw new IllegalArgumentException(
+          "Failure when validating interpolant '" + interpolant + "'.", e);
+
+    } finally {
+      solver.deletePointer();
     }
-
-    Preconditions.checkArgument(interpolSymbolMatch, "Interpolant contains Symbols not in A or B.");
-
-    // we are reusing the InterpolationSolver instance, so we must reset it
-    solverP.resetAssertions();
-
-    // build both Craig Interpolation Formulas with generated interpolant and given Formulas
-    Term craig1 = solverP.mkTerm(Kind.IMPLIES, aTerm, interpolant);
-    Term craig2 = solverP.mkTerm(Kind.AND, interpolant, bTerm);
-
-    solverP.assertFormula(craig1);
-    // assert solverP.checkSat().isSat() : "Interpolant does not follow Craig Interpolation";
-
-    solverP.resetAssertions();
-
-    solverP.assertFormula(craig2);
-    assert solverP.checkSat().isUnsat() : "Interpolant does not follow Craig Interpolation";
   }
 }
