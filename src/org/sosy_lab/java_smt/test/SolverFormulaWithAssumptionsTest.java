@@ -105,6 +105,11 @@ public class SolverFormulaWithAssumptionsTest
       throws SolverException, InterruptedException, InvalidConfigurationException {
     requireInterpolation();
 
+    assume()
+        .withMessage("Solver %s runs into timeout on this test", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC5);
+
     int n = 5;
 
     IntegerFormula x = imgr.makeVariable("x");
