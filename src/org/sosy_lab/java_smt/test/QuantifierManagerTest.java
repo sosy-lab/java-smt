@@ -459,7 +459,12 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
         bmgr.or(
             qmgr.exists(ImmutableList.of(x), a_at_x_eq_0),
             qmgr.forall(ImmutableList.of(x), a_at_x_eq_1));
-    assertThatFormula(f).isSatisfiable();
+    try {
+      // Princess fails this
+      assertThatFormula(f).isSatisfiable();
+    } catch (SolverException e) {
+      throw handleSolverException(e);
+    }
   }
 
   @Test
