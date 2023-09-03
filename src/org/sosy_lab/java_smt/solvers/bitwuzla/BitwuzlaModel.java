@@ -1,9 +1,15 @@
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_eq;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_term_name;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_value_as_term;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
@@ -88,9 +94,25 @@ public class BitwuzlaModel extends AbstractModel<Long, Long, Long> {
   public ImmutableList<ValueAssignment> asList() {
     Preconditions.checkState(!isClosed());
     // Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
-    ImmutableSet.Builder<String> variablesBuilder = ImmutableSet.builder();
+    ImmutableSet.Builder<ValueAssignment> variablesBuilder = ImmutableSet.builder();
+
+    for (long term : assertedTerms) {
+      variablesBuilder.add(getSimpleAssignment(term));
+    }
 
     return null;
+  }
+
+  private ValueAssignment getSimpleAssignment(long pTerm) {
+    List<Object> argumentInterpretation = new ArrayList<>();
+    long pValueTerm = bitwuzlaJNI.bitwuzla_get_value(pBitwuzla, pTerm);
+    return new ValueAssignment(
+        creator.encapsulateWithTypeOf(pTerm),
+        creator.encapsulateWithTypeOf(pValueTerm),
+        creator.encapsulateBoolean(bitwuzlaJNI.bitwuzla_mk_term2(BitwuzlaKind.BITWUZLA_KIND_EQUAL.swigValue(), pTerm, pValueTerm)),
+        bitwuzlaJNI.bitwuzla_term_get_symbol(pTerm),
+        creator.convertValue(pTerm, pValueTerm),
+        argumentInterpretation);
   }
 
   /**
