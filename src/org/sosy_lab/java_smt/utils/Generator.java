@@ -31,7 +31,7 @@ public class Generator {
   static StringBuilder lines = new StringBuilder();
 
   public Generator() throws IOException {
-    this.lines.append("(set-logic ALL)\n");
+    lines.append("(set-logic ALL)\n");
   }
 
   public static void writeToFile(String line) throws IOException {
@@ -45,23 +45,32 @@ public class Generator {
     writeToFile(String.valueOf(lines));
   }
 
+  public static String checkNot(BooleanFormula pBits) {
+    String Operand = pBits.toString();
+    if (Operand.startsWith("!")) {
+      return ("(not " + Operand.substring(1) + ")");
+    } else{
+      return Operand;
+    }
+  }
+
   public static void logMakeVariable(String pVar) {
     String out = "(declare-const " + pVar + " Bool)\n";
     lines.append(out);
   }
 
-  public static void logNot(BooleanFormula pBits) {
-    String out = "(not " + pBits + ")\n";
-    lines.append(out);
-  }
-
   public static void logOr(BooleanFormula pBits1, BooleanFormula pBits2) {
-    String out = "(or " + pBits1 + " " + pBits2 + ")\n";
+    String out = "(or " + checkNot(pBits1) + " " + checkNot(pBits2) + ")\n";
     lines.append(out);
   }
 
   public static void logAnd(BooleanFormula pBits1, BooleanFormula pBits2) {
     String out = "(and " + pBits1 + " " + pBits2 + ")\n";
+    lines.append(out);
+  }
+
+  public static void logXor(BooleanFormula pBits1, BooleanFormula pBits2) {
+    String out = "(xor " + pBits1 + " " + pBits2 + ")\n";
     lines.append(out);
   }
 }

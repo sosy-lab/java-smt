@@ -115,9 +115,9 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
   /** Simple BooleanFormula implementation. */
   static final class BooleanFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo>
       implements BooleanFormula {
-    BooleanFormulaImpl(TFormulaInfo pT) {
-      super(pT);
+    BooleanFormulaImpl(TFormulaInfo pT) {super(pT);
     }
+
   }
 
   /** Simple IntegerFormula implementation. */

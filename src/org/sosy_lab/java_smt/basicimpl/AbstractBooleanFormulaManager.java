@@ -89,7 +89,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
   @Override
   public BooleanFormula not(BooleanFormula pBits) {
     TFormulaInfo param1 = extractInfo(pBits);
-    Generator.logNot(pBits);
+    //Generator.logNot(pBits);
     return wrap(not(param1));
   }
 
@@ -99,7 +99,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
   public BooleanFormula and(BooleanFormula pBits1, BooleanFormula pBits2) {
     TFormulaInfo param1 = extractInfo(pBits1);
     TFormulaInfo param2 = extractInfo(pBits2);
-
+    Generator.logAnd(pBits1, pBits2);
     return wrap(and(param1, param2));
   }
 
@@ -153,7 +153,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
   public BooleanFormula or(BooleanFormula pBits1, BooleanFormula pBits2) {
     TFormulaInfo param1 = extractInfo(pBits1);
     TFormulaInfo param2 = extractInfo(pBits2);
-
+    Generator.logOr(pBits1, pBits2);
     return wrap(or(param1, param2));
   }
 

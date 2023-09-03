@@ -33,7 +33,6 @@ public class Main {
     Configuration config = Configuration.fromCmdLineArguments(cmdLineArguments);
     LogManager logger = BasicLogManager.create(config);
     ShutdownManager shutdown = ShutdownManager.create();
-
     SolverContext context =
         SolverContextFactory.createSolverContext(config, logger, shutdown.getNotifier(), SolverContextFactory.Solvers.PRINCESS);
     FormulaManager fmgr = context.getFormulaManager();
