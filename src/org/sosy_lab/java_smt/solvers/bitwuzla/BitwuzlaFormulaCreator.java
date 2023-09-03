@@ -73,16 +73,16 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
   }
 
   @Override
-  public Long makeVariable(Long pLong, String varName) {
-    Long maybeFormula = formulaCache.get(varName, pLong);
+  public Long makeVariable(Long pSort, String varName) {
+    Long maybeFormula = formulaCache.get(varName, pSort);
     if (maybeFormula != null) {
       return maybeFormula;
     }
     if (formulaCache.containsRow(varName)) {
       throw new IllegalArgumentException("Symbol already used: " + varName);
     }
-    long newVar = bitwuzlaJNI.bitwuzla_mk_const( pLong, varName);
-    formulaCache.put(varName, pLong, newVar);
+    long newVar = bitwuzlaJNI.bitwuzla_mk_const( pSort, varName);
+    formulaCache.put(varName, pSort, newVar);
     return newVar;
   }
 

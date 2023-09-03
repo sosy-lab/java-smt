@@ -80,7 +80,6 @@ public class BitwuzlaFloatingPointManager
     return getFormulaCreator().getFloatingPointType(pType);
   }
 
-  // TODO
   @Override
   protected Long makeNumberAndRound(
       String pN, FloatingPointType pType, Long pFloatingPointRoundingMode) {
@@ -139,7 +138,6 @@ public class BitwuzlaFloatingPointManager
     }
   }
 
-  // TODO, see notes
   @Override
   protected Long castFromImpl(
       Long pNumber, boolean pSigned, FloatingPointType pTargetType, Long pRoundingMode) {

@@ -191,7 +191,6 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
   @Override
   protected OptimizationProverEnvironment newOptimizationProverEnvironment0(
       Set<ProverOptions> pSet) {
-    // TODO: Is this true?
     throw new UnsupportedOperationException("Bitwuzla does not support optimization");
   }
 
@@ -214,41 +213,6 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
     return true;
   }
 
-  private static void setOptions(
-      Configuration config, PathCounterTemplate solverLogfile, long randomSeed, long bitwuzla)
-      throws InvalidConfigurationException {
-    BitwuzlaSettings settings = new BitwuzlaSettings(config);
-
-    Preconditions.checkNotNull(settings.satSolver);
-
-    long options = bitwuzlaJNI.bitwuzla_options_new();
-
-    bitwuzlaJNI.bitwuzla_set_option_mode(
-        options,
-        BitwuzlaOption.BITWUZLA_OPT_SAT_SOLVER.swigValue(),
-        settings.satSolver.name().toLowerCase(Locale.getDefault()));
-    // Default Options to enable multiple SAT, auto cleanup on close, incremental mode
-    bitwuzlaJNI.bitwuzla_set_option(
-        options, BitwuzlaOption.BITWUZLA_OPT_PRODUCE_MODELS.swigValue(), 2);
-    // TODO: Not available in Bitwzula?
-    //    BitwuzlaJNI.bitwuzla_set_option(bitwuzla,
-    // SWIG_BitwuzlaOption.BTOR_OPT_AUTO_CLEANUP.getValue(), 1);
-    // Incremental is always enabled.
-    // Sets randomseed accordingly
-    bitwuzlaJNI.bitwuzla_set_option(
-        options, BitwuzlaOption.BITWUZLA_OPT_SEED.swigValue(), randomSeed);
-    // Stop Bitwuzla from rewriting formulas in outputs
-    bitwuzlaJNI.bitwuzla_set_option(
-        options, BitwuzlaOption.BITWUZLA_OPT_REWRITE_LEVEL.swigValue(), 0);
-
-    setFurtherOptions(bitwuzla, settings.furtherOptions);
-    // TODO: This seems to be setting a logfile. Perhaps the SWIG _IO_FILE could be used instead?
-    //    if (solverLogfile != null) {
-    //      String filename = solverLogfile.getFreshPath().toAbsolutePath().toString();
-    //      BtorJNI.boolector_set_trapi(bitwuzla, filename);
-    //    }
-  }
-
   /**
    * Set more options for Bitwuzla.
    *
@@ -258,7 +222,6 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
    *     an invalid option is used.
    */
 
-  // TODO: Copied from Boolector, needs to be tested.
   private static void setFurtherOptions(long pOptions, String pFurtherOptions)
       throws InvalidConfigurationException {
     MapSplitter optionSplitter =
