@@ -53,6 +53,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
   protected AbstractBooleanFormulaManager(
       FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pCreator) {
     super(pCreator);
+
   }
 
   private BooleanFormula wrap(TFormulaInfo formulaInfo) {
@@ -62,8 +63,9 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
   @Override
   public BooleanFormula makeVariable(String pVar) {
     checkVariableName(pVar);
-    Generator.logMakeVariable(pVar);
-    return wrap(makeVariableImpl(pVar));
+    var result = wrap(makeVariableImpl(pVar));
+    Generator.logMakeVariable(result, pVar);
+    return result;
   }
 
   protected abstract TFormulaInfo makeVariableImpl(String pVar);
@@ -89,8 +91,9 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
   @Override
   public BooleanFormula not(BooleanFormula pBits) {
     TFormulaInfo param1 = extractInfo(pBits);
-    //Generator.logNot(pBits);
-    return wrap(not(param1));
+    var result = wrap(not(param1));
+    Generator.logNot(result, pBits);
+    return result;
   }
 
   protected abstract TFormulaInfo not(TFormulaInfo pParam1);
@@ -153,8 +156,9 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
   public BooleanFormula or(BooleanFormula pBits1, BooleanFormula pBits2) {
     TFormulaInfo param1 = extractInfo(pBits1);
     TFormulaInfo param2 = extractInfo(pBits2);
-    Generator.logOr(pBits1, pBits2);
-    return wrap(or(param1, param2));
+    var result = wrap(or(param1, param2));
+    Generator.logOr(result, pBits1, pBits2);
+    return result;
   }
 
   @Override

@@ -20,9 +20,11 @@ package org.sosy_lab.java_smt;/*
 
 import org.sosy_lab.common.*;
 import org.sosy_lab.common.configuration.*;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.*;
 import org.sosy_lab.common.log.*;
 import java.io.*;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.utils.Generator;
 
 public class Main {
@@ -34,15 +36,21 @@ public class Main {
     LogManager logger = BasicLogManager.create(config);
     ShutdownManager shutdown = ShutdownManager.create();
     SolverContext context =
-        SolverContextFactory.createSolverContext(config, logger, shutdown.getNotifier(), SolverContextFactory.Solvers.PRINCESS);
+        SolverContextFactory.createSolverContext(config, logger, shutdown.getNotifier(),
+            Solvers.PRINCESS);
     FormulaManager fmgr = context.getFormulaManager();
     BooleanFormulaManager bmgr = fmgr.getBooleanFormulaManager();
     //IntegerFormulaManager imgr = fmgr.getIntegerFormulaManager();
 
     BooleanFormula p = bmgr.makeVariable("p");
+    //(declare-const p Bool)
+    BooleanFormula q = bmgr.makeVariable("q");
+    BooleanFormula t = bmgr.makeVariable("t");
 
-    BooleanFormula constraint = bmgr.or(p, bmgr.not(p));
-    Generator.dumpSMTLIB2();
+    BooleanFormula constraint = bmgr.not(bmgr.or(q, bmgr.not(bmgr.not(bmgr.or(p, bmgr.not(q))))));
+    //(not p)
+
+    Generator.dumpSMTLIB2(constraint);
     try (ProverEnvironment prover =
              context.newProverEnvironment(SolverContext.ProverOptions.GENERATE_MODELS)) {
       prover.addConstraint(constraint);
