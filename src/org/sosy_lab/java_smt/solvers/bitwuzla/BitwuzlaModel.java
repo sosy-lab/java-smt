@@ -1,8 +1,5 @@
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_eq;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_term_name;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_value_as_term;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -12,14 +9,13 @@ import java.util.Collection;
 import java.util.List;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
-import org.sosy_lab.java_smt.basicimpl.AbstractProver;
-import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 public class BitwuzlaModel extends AbstractModel<Long, Long, Long> {
   private final long pBitwuzla;
   private final BitwuzlaTheoremProver prover;
   private final BitwuzlaFormulaCreator creator;
   private final ImmutableList<Long> assertedTerms;
+
   protected BitwuzlaModel(
       long pBitwuzla,
       BitwuzlaTheoremProver prover,
@@ -31,11 +27,13 @@ public class BitwuzlaModel extends AbstractModel<Long, Long, Long> {
     this.creator = creator;
     this.assertedTerms = ImmutableList.copyOf(assertedTerms);
   }
-  private void printModel(){
+
+  private void printModel() {
     System.out.println("(");
     for (int i = 0; i < assertedTerms.size(); ++i) {
       long sort = bitwuzlaJNI.bitwuzla_term_get_sort(assertedTerms.get(i));
-      System.out.print("  (define-fun " + bitwuzlaJNI.bitwuzla_term_get_symbol(assertedTerms.get(i)) + " (");
+      System.out.print(
+          "  (define-fun " + bitwuzlaJNI.bitwuzla_term_get_symbol(assertedTerms.get(i)) + " (");
       if (bitwuzlaJNI.bitwuzla_sort_is_fun(sort)) {
         long value = bitwuzlaJNI.bitwuzla_get_value(pBitwuzla, assertedTerms.get(i));
         long[] size = new long[1];
@@ -43,18 +41,18 @@ public class BitwuzlaModel extends AbstractModel<Long, Long, Long> {
         assert size[0] == 2;
         int j = 0;
         while (bitwuzlaJNI.bitwuzla_term_get_kind(
-            bitwuzlaJNI.BitwuzlaTermArray_getitem(children, 1))
+                bitwuzlaJNI.BitwuzlaTermArray_getitem(children, 1))
             == BitwuzlaKind.BITWUZLA_KIND_LAMBDA.swigValue()) {
           assert bitwuzlaJNI.bitwuzla_term_is_var(
               bitwuzlaJNI.BitwuzlaTermArray_getitem(children, 0));
           System.out.print(
               (j > 0 ? " " : "")
                   + bitwuzlaJNI.bitwuzla_term_to_string(
-                  bitwuzlaJNI.BitwuzlaTermArray_getitem(children, 0))
+                      bitwuzlaJNI.BitwuzlaTermArray_getitem(children, 0))
                   + " "
                   + bitwuzlaJNI.bitwuzla_sort_to_string(
-                  bitwuzlaJNI.bitwuzla_term_get_sort(
-                      bitwuzlaJNI.BitwuzlaTermArray_getitem(children, 0)))
+                      bitwuzlaJNI.bitwuzla_term_get_sort(
+                          bitwuzlaJNI.BitwuzlaTermArray_getitem(children, 0)))
                   + " ");
           value = bitwuzlaJNI.BitwuzlaTermArray_getitem(children, 1);
           children = bitwuzlaJNI.bitwuzla_term_get_children(value, size);
@@ -64,11 +62,11 @@ public class BitwuzlaModel extends AbstractModel<Long, Long, Long> {
         System.out.print(
             (j > 0 ? " " : "")
                 + bitwuzlaJNI.bitwuzla_term_to_string(
-                bitwuzlaJNI.BitwuzlaTermArray_getitem(children, 0))
+                    bitwuzlaJNI.BitwuzlaTermArray_getitem(children, 0))
                 + " "
                 + bitwuzlaJNI.bitwuzla_sort_to_string(
-                bitwuzlaJNI.bitwuzla_term_get_sort(
-                    bitwuzlaJNI.BitwuzlaTermArray_getitem(children, 0)))
+                    bitwuzlaJNI.bitwuzla_term_get_sort(
+                        bitwuzlaJNI.BitwuzlaTermArray_getitem(children, 0)))
                 + ") ");
         System.out.print(
             bitwuzlaJNI.bitwuzla_sort_to_string(bitwuzlaJNI.bitwuzla_sort_fun_get_codomain(sort))
@@ -82,14 +80,13 @@ public class BitwuzlaModel extends AbstractModel<Long, Long, Long> {
                 + bitwuzlaJNI.bitwuzla_sort_to_string(sort)
                 + " "
                 + bitwuzlaJNI.bitwuzla_term_to_string(
-                bitwuzlaJNI.bitwuzla_get_value(pBitwuzla, assertedTerms.get(i))));
+                    bitwuzlaJNI.bitwuzla_get_value(pBitwuzla, assertedTerms.get(i))));
       }
     }
     System.out.println(")");
   }
-  /**
-   * Build a list of assignments that stays valid after closing the model.
-   */
+
+  /** Build a list of assignments that stays valid after closing the model. */
   @Override
   public ImmutableList<ValueAssignment> asList() {
     Preconditions.checkState(!isClosed());
@@ -109,7 +106,9 @@ public class BitwuzlaModel extends AbstractModel<Long, Long, Long> {
     return new ValueAssignment(
         creator.encapsulateWithTypeOf(pTerm),
         creator.encapsulateWithTypeOf(pValueTerm),
-        creator.encapsulateBoolean(bitwuzlaJNI.bitwuzla_mk_term2(BitwuzlaKind.BITWUZLA_KIND_EQUAL.swigValue(), pTerm, pValueTerm)),
+        creator.encapsulateBoolean(
+            bitwuzlaJNI.bitwuzla_mk_term2(
+                BitwuzlaKind.BITWUZLA_KIND_EQUAL.swigValue(), pTerm, pValueTerm)),
         bitwuzlaJNI.bitwuzla_term_get_symbol(pTerm),
         creator.convertValue(pTerm, pValueTerm),
         argumentInterpretation);

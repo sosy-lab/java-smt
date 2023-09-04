@@ -8,29 +8,16 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_APP_TERM;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvtype_size;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_child;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_constructor;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_to_string;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_children;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_is_bitvector;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_num_children;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_of_term;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_to_string;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Locale;
 import java.util.Map;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
-import org.sosy_lab.common.Appenders.AbstractAppender;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
-import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaFormula.BitwuzlaBooleanFormula;
 
 final class BitwuzlaFormulaManager extends AbstractFormulaManager<Long, Long, Long, Long> {
 
@@ -101,9 +88,7 @@ final class BitwuzlaFormulaManager extends AbstractFormulaManager<Long, Long, Lo
     //        "(get-value (x y f a (bvmul x x)))\r\n" + //
     //        "(exit)\r\n";
 
-
     long pInfile = bitwuzlaJNI.fopen("tempParserFile", "w+");
-
 
     _IO_FILE infile = new _IO_FILE(pInfile, true);
 
@@ -115,9 +100,8 @@ final class BitwuzlaFormulaManager extends AbstractFormulaManager<Long, Long, Lo
     infile = new _IO_FILE(pInfile, true);
 
     long parser =
-        bitwuzlaJNI.bitwuzla_parser_new(options, "tempParserFile", _IO_FILE.getCPtr(infile), infile,
-            "smt2");
-
+        bitwuzlaJNI.bitwuzla_parser_new(
+            options, "tempParserFile", _IO_FILE.getCPtr(infile), infile, "smt2");
 
     // Boolean must be false
     String err_msg = bitwuzlaJNI.bitwuzla_parser_parse(parser, false);
@@ -133,13 +117,13 @@ final class BitwuzlaFormulaManager extends AbstractFormulaManager<Long, Long, Lo
 
     long assertion = bitwuzlaJNI.BitwuzlaTermArray_getitem(pAssertionArray, 0);
 
-//    System.out.println("Assertions:");
-//    System.out.print("{");
-//    for (int i = 0; i < size[0]; ++i) {
-//      System.out.println(bitwuzlaJNI.bitwuzla_term_to_string(
-//          bitwuzlaJNI.BitwuzlaTermArray_getitem(assertions, i)));
-//    }
-//    System.out.print("}");
+    //    System.out.println("Assertions:");
+    //    System.out.print("{");
+    //    for (int i = 0; i < size[0]; ++i) {
+    //      System.out.println(bitwuzlaJNI.bitwuzla_term_to_string(
+    //          bitwuzlaJNI.BitwuzlaTermArray_getitem(assertions, i)));
+    //    }
+    //    System.out.print("}");
 
     // Deleting infile is probably safer than the C function. Can't do both.
     // bitwuzlaJNI.fclose(_IO_FILE.getCPtr(infile), infile);
@@ -170,34 +154,40 @@ final class BitwuzlaFormulaManager extends AbstractFormulaManager<Long, Long, Lo
           final long currentTerm = ((BitwuzlaFormula) entry.getValue()).getTerm();
           final long currentType = bitwuzlaJNI.bitwuzla_term_get_sort(currentTerm);
 
-
-          if (bitwuzlaJNI.bitwuzla_term_is_fun(currentTerm)){
+          if (bitwuzlaJNI.bitwuzla_term_is_fun(currentTerm)) {
             long[] pDomainSize = new long[1];
-            long pArrayDomainTypes = bitwuzlaJNI.bitwuzla_term_fun_get_domain_sorts(currentTerm,
-                pDomainSize);
+            long pArrayDomainTypes =
+                bitwuzlaJNI.bitwuzla_term_fun_get_domain_sorts(currentTerm, pDomainSize);
             long numberOfArgs = pDomainSize[0];
 
             out.append("(declare-fun ");
             out.append(entry.getKey());
             out.append(" (");
-            for (int i = 0; i<numberOfArgs; i++) {
-              out.append(bitwuzlaJNI.bitwuzla_sort_to_string(bitwuzlaJNI.BitwuzlaSortArray_getitem(pArrayDomainTypes, i)));
+            for (int i = 0; i < numberOfArgs; i++) {
+              out.append(
+                  bitwuzlaJNI.bitwuzla_sort_to_string(
+                      bitwuzlaJNI.BitwuzlaSortArray_getitem(pArrayDomainTypes, i)));
               out.append(" ");
             }
             out.append(") ");
-            out.append(bitwuzlaJNI.bitwuzla_sort_to_string(bitwuzlaJNI.bitwuzla_term_fun_get_codomain_sort(currentTerm)));
+            out.append(
+                bitwuzlaJNI.bitwuzla_sort_to_string(
+                    bitwuzlaJNI.bitwuzla_term_fun_get_codomain_sort(currentTerm)));
             out.append(")\n");
           } else {
             out.append("(declare-const ");
             out.append(entry.getKey());
             out.append(" ");
-            out.append(bitwuzlaJNI.bitwuzla_sort_to_string(bitwuzlaJNI.bitwuzla_term_get_sort(currentTerm)));
+            out.append(
+                bitwuzlaJNI.bitwuzla_sort_to_string(
+                    bitwuzlaJNI.bitwuzla_term_get_sort(currentTerm)));
             out.append(")\n");
           }
-        out.append("(assert ").append(bitwuzlaJNI.bitwuzla_term_to_string(pTerm)).append(")");
+          out.append("(assert ").append(bitwuzlaJNI.bitwuzla_term_to_string(pTerm)).append(")");
+        }
       }
+      ;
     };
-  };
   }
 
   static long getBitwuzlaTerm(Formula pT) {
