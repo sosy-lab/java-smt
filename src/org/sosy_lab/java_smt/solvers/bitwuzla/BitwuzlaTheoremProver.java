@@ -20,11 +20,9 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_unsat_core;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
-import io.github.cvc5.Term;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -34,7 +32,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
@@ -43,7 +40,8 @@ import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaFormula.BitwuzlaBooleanFormula;
 
-public class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements ProverEnvironment {
+public class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void>
+    implements ProverEnvironment {
   /** Bitwuzla does not support multiple solver stacks. */
   private final AtomicBoolean isAnyStackAlive;
 
@@ -52,7 +50,7 @@ public class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implem
   private final BitwuzlaFormulaCreator creator;
   protected boolean wasLastSatCheckSat = false; // and stack is not changed
 
-  public BitwuzlaTheoremProver (
+  public BitwuzlaTheoremProver(
       BitwuzlaFormulaManager pManager,
       BitwuzlaFormulaCreator pCreator,
       long pEnv,
@@ -110,13 +108,14 @@ public class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implem
     super.push();
     bitwuzlaJNI.bitwuzla_push(pEnv, 1);
   }
+
   private boolean readSATResult(int resultValue) throws SolverException {
-    if (resultValue == BitwuzlaResult.BITWUZLA_SAT.swigValue()){
+    if (resultValue == BitwuzlaResult.BITWUZLA_SAT.swigValue()) {
       wasLastSatCheckSat = true;
       return false;
     } else if (resultValue == BitwuzlaResult.BITWUZLA_UNSAT.swigValue()) {
       return true;
-    } else{
+    } else {
       throw new SolverException("Bitwuzla returned UNKNOWN.");
     }
   }
@@ -223,20 +222,22 @@ public class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implem
     super.close();
   }
 
-//  /**
-//   * Get all satisfying assignments of the current environment with regard to a subset of terms, and
-//   * create a region representing all those models.
-//   *
-//   * @param callback
-//   * @param important A set of (positive) variables appearing in the asserted queries. Only these
-//   *     variables will appear in the region.
-//   * @return A region representing all satisfying models of the formula.
-//   */
-//  @Override
-//  public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
-//      throws InterruptedException, SolverException {
-//    return null;
-//  }
+  //  /**
+  //   * Get all satisfying assignments of the current environment with regard to a subset of terms,
+  // and
+  //   * create a region representing all those models.
+  //   *
+  //   * @param callback
+  //   * @param important A set of (positive) variables appearing in the asserted queries. Only
+  // these
+  //   *     variables will appear in the region.
+  //   * @return A region representing all satisfying models of the formula.
+  //   */
+  //  @Override
+  //  public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
+  //      throws InterruptedException, SolverException {
+  //    return null;
+  //  }
 
   /**
    * Get an evaluator instance for model evaluation without executing checks for prover options.

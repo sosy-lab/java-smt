@@ -54,17 +54,19 @@ public class BitwuzlaNativeApiTest {
     long x = bitwuzlaJNI.bitwuzla_mk_const(sortbv8, "x");
     long f = bitwuzlaJNI.bitwuzla_mk_const(sortfun, "f");
 
-    long term = bitwuzlaJNI.bitwuzla_mk_term3(
-        BitwuzlaKind.BITWUZLA_KIND_APPLY.swigValue(),
-        f,
-        x,
-        bitwuzlaJNI.bitwuzla_mk_term1_indexed2(
-            BitwuzlaKind.BITWUZLA_KIND_BV_EXTRACT.swigValue(), x, 6, 3));
+    long term =
+        bitwuzlaJNI.bitwuzla_mk_term3(
+            BitwuzlaKind.BITWUZLA_KIND_APPLY.swigValue(),
+            f,
+            x,
+            bitwuzlaJNI.bitwuzla_mk_term1_indexed2(
+                BitwuzlaKind.BITWUZLA_KIND_BV_EXTRACT.swigValue(), x, 6, 3));
 
     long resultSort = bitwuzlaJNI.bitwuzla_term_get_sort(term);
 
     assert bitwuzlaJNI.bitwuzla_sort_is_equal(sortbv8, resultSort);
   }
+
   @Test
   public void quickstartExample() {
     // First, create a Bitwuzla options instance.

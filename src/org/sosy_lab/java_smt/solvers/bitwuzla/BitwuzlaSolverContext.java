@@ -108,11 +108,13 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
         pOptions,
         BitwuzlaOption.BITWUZLA_OPT_SAT_SOLVER.swigValue(),
         settings.satSolver.name().toLowerCase(Locale.getDefault()));
-    bitwuzlaJNI.bitwuzla_set_option(pOptions, BitwuzlaOption.BITWUZLA_OPT_PRODUCE_MODELS.swigValue()
-        , 2);
-    bitwuzlaJNI.bitwuzla_set_option(pOptions, BitwuzlaOption.BITWUZLA_OPT_SEED.swigValue(), randomSeed);
+    bitwuzlaJNI.bitwuzla_set_option(
+        pOptions, BitwuzlaOption.BITWUZLA_OPT_PRODUCE_MODELS.swigValue(), 2);
+    bitwuzlaJNI.bitwuzla_set_option(
+        pOptions, BitwuzlaOption.BITWUZLA_OPT_SEED.swigValue(), randomSeed);
     // Stop Bitwuzla from rewriting formulas in outputs
-    bitwuzlaJNI.bitwuzla_set_option(pOptions, BitwuzlaOption.BITWUZLA_OPT_REWRITE_LEVEL.swigValue(), 0);
+    bitwuzlaJNI.bitwuzla_set_option(
+        pOptions, BitwuzlaOption.BITWUZLA_OPT_REWRITE_LEVEL.swigValue(), 0);
 
     setFurtherOptions(pOptions, settings.furtherOptions);
 
@@ -125,13 +127,18 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
         new BitwuzlaBitvectorFormulaManager(creator, booleanTheory);
     BitwuzlaQuantifiedFormulaManager quantifierTheory =
         new BitwuzlaQuantifiedFormulaManager(creator);
-    BitwuzlaFloatingPointManager floatingPointTheory = new BitwuzlaFloatingPointManager(creator,
-        pFloatingPointRoundingMode);
+    BitwuzlaFloatingPointManager floatingPointTheory =
+        new BitwuzlaFloatingPointManager(creator, pFloatingPointRoundingMode);
     BitwuzlaArrayFormulaManager arrayTheory = new BitwuzlaArrayFormulaManager(creator);
     BitwuzlaFormulaManager manager =
         new BitwuzlaFormulaManager(
-            creator, functionTheory, booleanTheory, bitvectorTheory, quantifierTheory,
-           floatingPointTheory, arrayTheory);
+            creator,
+            functionTheory,
+            booleanTheory,
+            bitvectorTheory,
+            quantifierTheory,
+            floatingPointTheory,
+            arrayTheory);
 
     return new BitwuzlaSolverContext(manager, creator, pShutdownNotifier);
   }
@@ -221,7 +228,6 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
    * @throws InvalidConfigurationException signals that the format of the option string is wrong or
    *     an invalid option is used.
    */
-
   private static void setFurtherOptions(long pOptions, String pFurtherOptions)
       throws InvalidConfigurationException {
     MapSplitter optionSplitter =
@@ -243,7 +249,7 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
         Field optionField = optionClass.getField(option.getKey());
         // Get the value of the public fields
         BitwuzlaOption value = (BitwuzlaOption) optionField.get(null);
-        if (bitwuzlaJNI.bitwuzla_option_is_numeric(pOptions, value.swigValue())){
+        if (bitwuzlaJNI.bitwuzla_option_is_numeric(pOptions, value.swigValue())) {
           long optionValue = Long.parseLong(option.getValue());
           bitwuzlaJNI.bitwuzla_set_option(pOptions, value.swigValue(), optionValue);
         } else {

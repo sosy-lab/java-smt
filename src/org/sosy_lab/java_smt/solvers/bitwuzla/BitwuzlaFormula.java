@@ -1,22 +1,23 @@
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import com.google.errorprone.annotations.Immutable;
-import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 
 @Immutable
 abstract class BitwuzlaFormula implements Formula {
   private final long bitwuzlaTerm;
 
-  BitwuzlaFormula(long term){
+  BitwuzlaFormula(long term) {
     bitwuzlaTerm = term;
   }
+
   final long getTerm() {
     return bitwuzlaTerm;
   }
@@ -52,9 +53,7 @@ abstract class BitwuzlaFormula implements Formula {
     return bitwuzlaTerm == ((BitwuzlaFormula) other).getTerm();
   }
 
-  /**
-   * returns a valid hashCode satisfying the constraints given by {@link #equals}.
-   */
+  /** returns a valid hashCode satisfying the constraints given by {@link #equals}. */
   @Override
   public int hashCode() {
     // In this case, the long returned by the JNI is not a pointer, but the value itself.
@@ -63,8 +62,8 @@ abstract class BitwuzlaFormula implements Formula {
 
   @Immutable
   @SuppressWarnings("ClassTypeParameterName")
-  static final class BitwuzlaArrayFormula<TI extends Formula, TE extends Formula> extends BitwuzlaFormula
-      implements ArrayFormula<TI, TE> {
+  static final class BitwuzlaArrayFormula<TI extends Formula, TE extends Formula>
+      extends BitwuzlaFormula implements ArrayFormula<TI, TE> {
 
     private final FormulaType<TI> indexType;
     private final FormulaType<TE> elementType;
@@ -92,7 +91,8 @@ abstract class BitwuzlaFormula implements Formula {
   }
 
   @Immutable
-  static final class BitwuzlaFloatingPointFormula extends BitwuzlaFormula implements FloatingPointFormula {
+  static final class BitwuzlaFloatingPointFormula extends BitwuzlaFormula
+      implements FloatingPointFormula {
     BitwuzlaFloatingPointFormula(long pTerm) {
       super(pTerm);
     }
@@ -112,5 +112,4 @@ abstract class BitwuzlaFormula implements Formula {
       super(pTerm);
     }
   }
-
 }
