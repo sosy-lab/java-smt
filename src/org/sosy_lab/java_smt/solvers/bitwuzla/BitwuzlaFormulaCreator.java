@@ -25,6 +25,7 @@ import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.*;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+import io.github.cvc5.Kind;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -484,11 +485,22 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
     return uf;
   }
 
-  // TODO: What to do with the input?
   @Override
   protected Long getBooleanVarDeclarationImpl(Long pLong) {
-    long boolSort = bitwuzlaJNI.bitwuzla_mk_bool_sort();
-    return null;
+    long kind = bitwuzlaJNI.bitwuzla_term_get_kind(pLong);
+
+    // CONSTANTS are "variables" and Kind.VARIABLES are bound variables in for example quantifiers
+    assert kind == BitwuzlaKind.BITWUZLA_KIND_APPLY.swigValue()
+        || kind == BITWUZLA_KIND_CONSTANT.swigValue() :
+        bitwuzlaJNI.bitwuzla_term_to_string(kind);
+    if (kind == BitwuzlaKind.BITWUZLA_KIND_APPLY.swigValue()) {
+      long[] size = new long[1];
+      long pChildren = bitwuzlaJNI.bitwuzla_term_get_children(pLong, size);
+      // Returns pointer to Uninterpreted Function used in Apply
+      return bitwuzlaJNI.BitwuzlaTermArray_getitem(pChildren, 0);
+    } else {
+      return pLong;
+    }
   }
 
   @Override
