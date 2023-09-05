@@ -20,7 +20,6 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import java.util.ArrayList;
