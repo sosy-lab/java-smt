@@ -48,12 +48,13 @@ public class Main {
     BooleanFormula t = bmgr.makeVariable("t");
 
     BooleanFormula constraint = bmgr.not(bmgr.or(q, bmgr.not(bmgr.not(bmgr.or(p, bmgr.not(q))))));
+    BooleanFormula constraint2 = bmgr.or(t, bmgr.not(q));
     //(not p)
 
-    Generator.dumpSMTLIB2(constraint);
     try (ProverEnvironment prover =
              context.newProverEnvironment(SolverContext.ProverOptions.GENERATE_MODELS)) {
       prover.addConstraint(constraint);
+      //prover.addConstraint(constraint2);
       boolean isUnsat = prover.isUnsat();
       if (!isUnsat) {
         Model model = prover.getModel();

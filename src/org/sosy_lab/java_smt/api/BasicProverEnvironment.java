@@ -11,11 +11,13 @@ package org.sosy_lab.java_smt.api;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
+import org.sosy_lab.java_smt.utils.Generator;
 
 /**
  * Super interface for {@link ProverEnvironment} and {@link InterpolatingProverEnvironment} that

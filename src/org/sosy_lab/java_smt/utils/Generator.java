@@ -52,7 +52,7 @@ public class Generator {
 
   public static void writeToFile(String line) throws IOException {
     File file = new File(fileName);
-    FileWriter fileWriter = new FileWriter(fileName, true);
+    FileWriter fileWriter = new FileWriter(fileName);
     fileWriter.write(line);
     fileWriter.close();
   }
@@ -79,17 +79,19 @@ public class Generator {
     }
   }
 
-  public static void dumpSMTLIB2(Object constraint) throws IOException {
+  public static void logAddConstraint(Object constraint) {
     String result = evaluateRecursive(constraint);
     List<String> uniqueRegisteredValues =
         registeredVariables.stream().distinct().collect(Collectors.toList());
     for (String variable:uniqueRegisteredValues) {
-      writeToFile("(declare-const " + variable + " Bool)\n");
+      lines.append("(declare-const " + variable + " Bool)\n");
     }
-    writeToFile(result);
+    lines.append(result);
   }
 
-
+  public static void dumpSMTLIB2() throws IOException {
+    writeToFile(String.valueOf(lines));
+  }
 
   public static String saveResult(List<Object> inputParams) {
 
