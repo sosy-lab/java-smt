@@ -22,6 +22,7 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.*;
 
+import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
@@ -120,8 +121,12 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
     long numberOfArgs = sizeOutput[0];
 
     if (kind.equals(BITWUZLA_KIND_CONST_ARRAY)) {
-      throw new UnsupportedOperationException(
-          "Visitor currently does not support visiting " + kind.toString());
+      long pArraySort = bitwuzlaJNI.bitwuzla_term_array_get_element_sort(f);
+      if (bitwuzlaJNI.bitwuzla_sort_is_bv(pArraySort)) {
+        functionKind = FunctionDeclarationKind.BV_CONCAT;
+      } else {
+        functionKind = FunctionDeclarationKind.OTHER;
+      }
     } else if (kind.equals(BITWUZLA_KIND_VARIABLE)) {
       visitor.visitBoundVariable(formula, 0);
     } else if (kind.equals(BITWUZLA_KIND_AND)) {
@@ -392,10 +397,11 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
     }
     if (functionArgs.isEmpty()) {
       for (int i = 0; i < numberOfArgs; i++) {
-        long currentTerm = bitwuzlaJNI.BitwuzlaTermArray_getitem(pfunctionArgs, i);
-        FormulaType<? extends Formula> currentType = bitwuzlaSortToType(currentTerm);
+        long pCurrentTerm = bitwuzlaJNI.BitwuzlaTermArray_getitem(pfunctionArgs, i);
+        long pCurrentSort = bitwuzlaJNI.bitwuzla_term_get_sort(pCurrentTerm);
+        FormulaType<? extends Formula> currentType = bitwuzlaSortToType(pCurrentSort);
         argTypes.add(currentType);
-        functionArgs.add(encapsulate(currentType, currentTerm));
+        functionArgs.add(encapsulate(currentType, pCurrentTerm));
       }
     }
 
@@ -450,24 +456,19 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
   public <R> R visit(FormulaVisitor<R> visitor, Formula formula, Long f)
       throws UnsupportedOperationException {
     BitwuzlaKind kind = BitwuzlaKind.swigToEnum(bitwuzlaJNI.bitwuzla_term_get_kind(f));
-    //    if (bitwuzlaJNI.bitwuzla_term_is_fun(f) || bitwuzlaJNI.bitwuzla_term_is_uninterpreted(f))
-    // {
-    //      visitor.visitFunction();
-    //    } else
     if (bitwuzlaJNI.bitwuzla_term_is_bv_value(f)) {
-      visitor.visitConstant(
+      return visitor.visitConstant(
           formula, new BigInteger(bitwuzlaJNI.bitwuzla_term_value_get_str(f, 10)));
     } else if (bitwuzlaJNI.bitwuzla_term_is_fp_value(f)) {
-      visitor.visitConstant(formula, parseIEEEbinaryFP(f));
+      return visitor.visitConstant(formula, parseIEEEbinaryFP(f));
     } else if (bitwuzlaJNI.bitwuzla_term_is_array(f)) {
       String name = bitwuzlaJNI.bitwuzla_term_get_symbol(f);
-      visitor.visitFreeVariable(formula, name);
+      return visitor.visitFreeVariable(formula, name);
     } else if (bitwuzlaJNI.bitwuzla_term_is_var(f)) {
-      visitor.visitBoundVariable(formula, 0);
+      return visitor.visitBoundVariable(formula, 0);
     } else {
-      visitKind(visitor, formula, f);
+      return visitKind(visitor, formula, f);
     }
-    return null;
   }
 
   @Override
