@@ -25,23 +25,26 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 
 public class Generator {
 
   static String fileName = "Out.txt";
   static StringBuilder lines = new StringBuilder();
-  //Liste von Ergebnissen auf Eingabeparametern mit executed functions
+
+  /** List of Triples which contain:
+   * an object (output of used method)
+   * a list of objects (input of used method)
+   * a function which takes a list of objects and returns a String
+   */
   static List<Triple<Object, List<Object>, Function<List<Object>, String>>> executedAggregator =
-      new ArrayList<Triple<Object, List<Object>, Function<List<Object>, String>>>();
+      new ArrayList<>();
 
-  private static List<String> registeredVariables = new ArrayList();
-
+  private static final List<String> registeredVariables = new ArrayList<>();
 
   public Generator() throws IOException {
     lines.append("(set-logic ALL)\n");
@@ -54,34 +57,33 @@ public class Generator {
     fileWriter.close();
   }
 
-  public static String evaluateRecursive(Object constraint) throws IOException {
-    var methodToEvaluate = executedAggregator
+  public static String evaluateRecursive(Object constraint) {
+    Triple<Object, List<Object>, Function<List<Object>, String>> methodToEvaluate = executedAggregator
         .stream()
         .filter(x -> x.getFirst().equals(constraint))
         .findFirst()
         .orElse(null);
 
     if (constraint instanceof String) {
-      var result = (String) constraint;
+      String result = (String) constraint;
       registeredVariables.add(result);
       return result;
     } else {
       List<Object> evaluatedInputs = new ArrayList<>();
-      for (var value:methodToEvaluate.getSecond()) {
-        var evaluatedInput = evaluateRecursive(value);
+      for (Object value: Objects.requireNonNull(methodToEvaluate).getSecond()) {
+        String evaluatedInput = evaluateRecursive(value);
         evaluatedInputs.add(evaluatedInput);
       }
-      var result = methodToEvaluate.getThird().apply(evaluatedInputs);
+      String result = methodToEvaluate.getThird().apply(evaluatedInputs);
       return result;
     }
-
   }
 
   public static void dumpSMTLIB2(Object constraint) throws IOException {
-    var result = evaluateRecursive(constraint);
+    String result = evaluateRecursive(constraint);
     List<String> uniqueRegisteredValues =
         registeredVariables.stream().distinct().collect(Collectors.toList());
-    for (var variable:uniqueRegisteredValues) {
+    for (String variable:uniqueRegisteredValues) {
       writeToFile("(declare-const " + variable + " Bool)\n");
     }
     writeToFile(result);
@@ -97,40 +99,35 @@ public class Generator {
   //List<Triple<Object, List<Object>, Function<List<Object>, String>>>
   public static void logMakeVariable(Object result, String pVar) {
     String out = "(declare-const " + pVar + " Bool)\n";
-    lines.append(out);
-    List<Object> temp = new ArrayList<>();
-    temp.add(pVar);
-    Function<List<Object>, String> saveResult = inputParams -> (String) inputParams.get(0);
-    executedAggregator.add(new Triple<Object, List<Object>, Function<List<Object>, String>>(result, temp, saveResult));
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(pVar);
+    Function<List<Object>, String> saveResult = inPlaceInputParams -> (String) inPlaceInputParams.get(0);
+    executedAggregator.add(new Triple<>(result, inputParams, saveResult));
   }
 
   public static void logNot(Object result, BooleanFormula pBits) {
     String out = "(not " + pBits + ")\n";
-    lines.append(out);
-    List<Object> temp = new ArrayList<>();
-    temp.add(pBits);
-    Function<List<Object>, String> saveResult = inputParams -> "(not " + (String) inputParams.get(0) + ")";
-    executedAggregator.add(new Triple<Object, List<Object>, Function<List<Object>, String>>(result, temp, saveResult));
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(pBits);
+    Function<List<Object>, String> saveResult = inPlaceInputParams -> "(not " + inPlaceInputParams.get(0) + ")";
+    executedAggregator.add(new Triple<>(result, inputParams, saveResult));
   }
 
   public static void logOr(Object result, BooleanFormula pBits1, BooleanFormula pBits2) {
     String out = "(or " + pBits1 + " " + pBits2 + ")\n";
-    lines.append(out);
-    List<Object> temp = new ArrayList<>();
-    temp.add(pBits1);
-    temp.add(pBits2);
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(pBits1);
+    inputParams.add(pBits2);
     Function<List<Object>, String> saveResult =
-        inputParams -> "(or " + (String) inputParams.get(0) + " " + (String) inputParams.get(1) + ")";
-    executedAggregator.add(new Triple<Object, List<Object>, Function<List<Object>, String>>(result, temp, saveResult));
+        inPlaceInputParams -> "(or " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    executedAggregator.add(new Triple<>(result, inputParams, saveResult));
   }
 
   public static void logAnd(BooleanFormula pBits1, BooleanFormula pBits2) {
     String out = "(assert (and " + pBits1 + " " + pBits2 + "))\n";
-    lines.append(out);
   }
 
   public static void logXor(BooleanFormula pBits1, BooleanFormula pBits2) {
     String out = "(assert (xor " + pBits1 + " " + pBits2 + "))\n";
-    lines.append(out);
   }
 }
