@@ -2,3 +2,5 @@
 (declare-const q Bool)
 (declare-const p Bool)
 (not (or q (or p (not q))))
+(declare-const t Bool)
+(or t (not q))

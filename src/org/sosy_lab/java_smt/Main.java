@@ -43,18 +43,16 @@ public class Main {
     //IntegerFormulaManager imgr = fmgr.getIntegerFormulaManager();
 
     BooleanFormula p = bmgr.makeVariable("p");
-    //(declare-const p Bool)
     BooleanFormula q = bmgr.makeVariable("q");
     BooleanFormula t = bmgr.makeVariable("t");
 
     BooleanFormula constraint = bmgr.not(bmgr.or(q, bmgr.not(bmgr.not(bmgr.or(p, bmgr.not(q))))));
     BooleanFormula constraint2 = bmgr.or(t, bmgr.not(q));
-    //(not p)
 
     try (ProverEnvironment prover =
              context.newProverEnvironment(SolverContext.ProverOptions.GENERATE_MODELS)) {
       prover.addConstraint(constraint);
-      //prover.addConstraint(constraint2);
+      prover.addConstraint(constraint2);
       boolean isUnsat = prover.isUnsat();
       if (!isUnsat) {
         Model model = prover.getModel();

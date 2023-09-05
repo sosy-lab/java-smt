@@ -84,9 +84,14 @@ public class Generator {
     List<String> uniqueRegisteredValues =
         registeredVariables.stream().distinct().collect(Collectors.toList());
     for (String variable:uniqueRegisteredValues) {
-      lines.append("(declare-const " + variable + " Bool)\n");
+      String newEntry = "(declare-const " + variable + " Bool)\n";
+      if (lines.indexOf(newEntry) == -1) {
+        lines.append(newEntry);
+      } else {
+      }
+
     }
-    lines.append(result);
+    lines.append(result + "\n");
   }
 
   public static void dumpSMTLIB2() throws IOException {
