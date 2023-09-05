@@ -38,7 +38,7 @@ public class BitwuzlaQuantifiedFormulaManager
   @Override
   protected Long eliminateQuantifiers(Long pExtractInfo)
       throws SolverException, InterruptedException {
-    return null;
+    throw new UnsupportedOperationException("Bitwuzla does not support eliminating Quantifiers.");
   }
 
   @Override

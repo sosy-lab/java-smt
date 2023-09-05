@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;

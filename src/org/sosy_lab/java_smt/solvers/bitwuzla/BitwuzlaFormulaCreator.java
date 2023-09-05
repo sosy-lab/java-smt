@@ -25,7 +25,6 @@ import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.*;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
-import io.github.cvc5.Kind;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -143,20 +142,38 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
       functionKind = FunctionDeclarationKind.XOR;
     } else if (kind.equals(BITWUZLA_KIND_ITE)) {
       functionKind = FunctionDeclarationKind.ITE;
-    } else if (kind.equals(BITWUZLA_KIND_EXISTS)) {
-      List<Formula> empty = new ArrayList<>();
-      visitor.visitQuantifier(
-          (BooleanFormula) formula,
-          Quantifier.EXISTS,
-          empty,
-          encapsulateBoolean(bitwuzlaJNI.BitwuzlaTermArray_getitem(pfunctionArgs, 1)));
-    } else if (kind.equals(BITWUZLA_KIND_FORALL)) {
-      List<Formula> empty = new ArrayList<>();
-      visitor.visitQuantifier(
-          (BooleanFormula) formula,
-          Quantifier.FORALL,
-          empty,
-          encapsulateBoolean(bitwuzlaJNI.BitwuzlaTermArray_getitem(pfunctionArgs, 1)));
+    } else if (kind.equals(BITWUZLA_KIND_EXISTS) || kind.equals(BITWUZLA_KIND_FORALL)) {
+      long[] pSize = new long[1];
+      long pChildren = bitwuzlaJNI.bitwuzla_term_get_children(f, pSize);
+      long size = pSize[0];
+      // QUANTIFIER: replace bound variable with free variable for visitation
+      assert size == 2;
+      long bodyUnSub = bitwuzlaJNI.BitwuzlaTermArray_getitem(pChildren, 1);
+      List<Formula> freeVars = new ArrayList<>();
+      // Only unpacking one level of quantifier at a time, which always only tracks one bound var.
+      long[] boundVar = {bitwuzlaJNI.BitwuzlaTermArray_getitem(pChildren, 0)};
+      String name = bitwuzlaJNI.bitwuzla_term_get_symbol(boundVar[0]);
+      assert name != null;
+      long sort = bitwuzlaJNI.bitwuzla_term_get_sort(boundVar[0]);
+
+      // Why get from cache?
+      // long freeVar = Preconditions.checkNotNull(formulaCache.get(name, sort));
+      long[] freeVar = {bitwuzlaJNI.bitwuzla_mk_const(sort, name)};
+
+      long bodySubbed =
+          bitwuzlaJNI.bitwuzla_substitute_term(getEnv(), bodyUnSub, 1, boundVar, freeVar);
+
+      BooleanFormula fBody = encapsulateBoolean(bodySubbed);
+      Quantifier quant = kind.equals(BITWUZLA_KIND_EXISTS) ? Quantifier.EXISTS : Quantifier.FORALL;
+      return visitor.visitQuantifier((BooleanFormula) formula, quant, freeVars, fBody);
+
+      //    } else if (kind.equals(BITWUZLA_KIND_FORALL)) {
+      //      List<Formula> empty = new ArrayList<>();
+      //      visitor.visitQuantifier(
+      //          (BooleanFormula) formula,
+      //          Quantifier.FORALL,
+      //          empty,
+      //          encapsulateBoolean(bitwuzlaJNI.BitwuzlaTermArray_getitem(pfunctionArgs, 1)));
     } else if (kind.equals(BITWUZLA_KIND_APPLY)) {
       // TODO Maybe use something different?
       throw new UnsupportedOperationException(
@@ -447,10 +464,8 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
       visitor.visitFreeVariable(formula, name);
     } else if (bitwuzlaJNI.bitwuzla_term_is_var(f)) {
       visitor.visitBoundVariable(formula, 0);
-    } else if (bitwuzlaJNI.bitwuzla_term_is_uninterpreted(f)) {
-      // visitor.visitFunction()
     } else {
-      String name = kind.toString();
+      visitKind(visitor, formula, f);
     }
     return null;
   }
@@ -491,8 +506,8 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
 
     // CONSTANTS are "variables" and Kind.VARIABLES are bound variables in for example quantifiers
     assert kind == BitwuzlaKind.BITWUZLA_KIND_APPLY.swigValue()
-        || kind == BITWUZLA_KIND_CONSTANT.swigValue() :
-        bitwuzlaJNI.bitwuzla_term_to_string(kind);
+            || kind == BITWUZLA_KIND_CONSTANT.swigValue()
+        : bitwuzlaJNI.bitwuzla_term_to_string(kind);
     if (kind == BitwuzlaKind.BITWUZLA_KIND_APPLY.swigValue()) {
       long[] size = new long[1];
       long pChildren = bitwuzlaJNI.bitwuzla_term_get_children(pLong, size);

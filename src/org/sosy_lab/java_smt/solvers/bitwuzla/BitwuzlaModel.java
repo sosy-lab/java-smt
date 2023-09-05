@@ -1,6 +1,5 @@
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -122,6 +121,6 @@ public class BitwuzlaModel extends AbstractModel<Long, Long, Long> {
    */
   @Override
   protected @Nullable Long evalImpl(Long formula) {
-    return null;
+    return bitwuzlaJNI.bitwuzla_get_value(pBitwuzla, formula);
   }
 }
