@@ -95,7 +95,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     Term previousItp = solver.mkTrue();
     for (int i = 1; i < n; i++) {
       Collection<Term> formulasA =
-          FluentIterable.from(partitions.get(i - 1)).append(previousItp).toSet();
+          ImmutableSet.<Term>builder().addAll(partitions.get(i - 1)).add(previousItp).build();
       Collection<Term> formulasB = FluentIterable.concat(partitions.subList(i, n)).toSet();
       Term itp = getCVC5Interpolation(formulasA, formulasB);
       itps.add(creator.encapsulateBoolean(itp));
