@@ -284,6 +284,55 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     checkItpSequence(ImmutableList.of(B, C, D, A, A, A, D), itps6);
   }
 
+  @Test
+  public <T> void sequentialInterpolationIsNotRepeatedIndividualInterpolation()
+      throws SolverException, InterruptedException {
+    InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
+    requireIntegers();
+
+    IntegerFormula zero = imgr.makeNumber(0);
+    IntegerFormula one = imgr.makeNumber(1);
+    IntegerFormula thousand = imgr.makeNumber(1000);
+
+    IntegerFormula i3 = imgr.makeVariable("i3");
+    IntegerFormula i4 = imgr.makeVariable("i4");
+
+    BooleanFormula A = imgr.equal(i3, zero);
+    BooleanFormula B = bmgr.and(imgr.lessThan(i3, thousand), imgr.equal(i4, imgr.add(i3, one)));
+    BooleanFormula C = imgr.greaterThan(i4, thousand);
+
+    T TA = stack.push(A);
+    T TB = stack.push(B);
+    T TC = stack.push(C);
+
+    assertThat(stack).isUnsatisfiable();
+
+    List<BooleanFormula> itpSeq = stack.getSeqInterpolants0(ImmutableList.of(TA, TB, TC));
+
+    BooleanFormula itp1 = stack.getInterpolant(ImmutableList.of(TA));
+    BooleanFormula itp2 = stack.getInterpolant(ImmutableList.of(TA, TB));
+
+    stack.close();
+
+    // sequential interpolation should always work as expected
+    checkItpSequence(ImmutableList.of(A, B, C), itpSeq);
+
+    if (solverToUse() == Solvers.CVC5) {
+      assertThatFormula(A).implies(itp1);
+      assertThatFormula(bmgr.and(A, B)).implies(itp2);
+      assertThatFormula(bmgr.and(itp1, B, C)).isUnsatisfiable();
+      assertThatFormula(bmgr.and(itp2, C)).isUnsatisfiable();
+
+      // this is a counterexample for sequential interpolation via individual interpolants:
+      assertThatFormula(bmgr.not(bmgr.implication(bmgr.and(itp1, B), itp2))).isSatisfiable();
+
+    } else {
+      // other solvers satisfy this condition,
+      // because they internally use the same proof for all interpolation queries
+      checkItpSequence(ImmutableList.of(A, B, C), List.of(itp1, itp2));
+    }
+  }
+
   @Test(expected = IllegalArgumentException.class)
   @SuppressWarnings("CheckReturnValue")
   public <T> void sequentialInterpolationWithoutPartition()
