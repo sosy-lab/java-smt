@@ -22,7 +22,6 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.*;
 
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
@@ -85,8 +84,6 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
     return newVar;
   }
 
-  // TODO What about function types? BW has function Sorts. bitwuzla_sort_is_uninterpreted() in
-  //  doc, but not in bitwuzla.h for the C API?
   public FormulaType<? extends Formula> bitwuzlaSortToType(Long pSort) {
     if (bitwuzlaJNI.bitwuzla_sort_is_fp(pSort)) {
       long exponent = bitwuzlaJNI.bitwuzla_sort_fp_get_exp_size(pSort);
@@ -101,6 +98,8 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
       FormulaType<? extends Formula> rangeSort =
           bitwuzlaSortToType(bitwuzlaJNI.bitwuzla_term_array_get_index_sort(pSort));
       return FormulaType.getArrayType(domainSort, rangeSort);
+    } else if (bitwuzlaJNI.bitwuzla_sort_is_rm(pSort)) {
+      return FormulaType.FloatingPointRoundingModeType;
     } else {
       throw new UnsupportedOperationException("Unsupported Formulatype.");
     }
@@ -181,12 +180,10 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
       //          encapsulateBoolean(bitwuzlaJNI.BitwuzlaTermArray_getitem(pfunctionArgs, 1)));
     } else if (kind.equals(BITWUZLA_KIND_APPLY)) {
       // TODO Maybe use something different?
-      throw new UnsupportedOperationException(
-          "Visitor currently does not support visiting " + kind.toString());
+      functionKind = FunctionDeclarationKind.OTHER;
     } else if (kind.equals(BITWUZLA_KIND_LAMBDA)) {
       // TODO Maybe use something different?
-      throw new UnsupportedOperationException(
-          "Visitor currently does not support visiting " + kind.toString());
+      functionKind = FunctionDeclarationKind.OTHER;
     } else if (kind.equals(BITWUZLA_KIND_ARRAY_SELECT)) {
       functionKind = FunctionDeclarationKind.SELECT;
     } else if (kind.equals(BITWUZLA_KIND_ARRAY_STORE)) {
@@ -198,54 +195,40 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
     } else if (kind.equals(BITWUZLA_KIND_BV_ASHR)) {
       functionKind = FunctionDeclarationKind.BV_ASHR;
     } else if (kind.equals(BITWUZLA_KIND_BV_COMP)) {
-      throw new UnsupportedOperationException(
-          "Visitor currently does not support visiting " + kind.toString());
+      functionKind = FunctionDeclarationKind.OTHER;
     } else if (kind.equals(BITWUZLA_KIND_BV_CONCAT)) {
       functionKind = FunctionDeclarationKind.BV_CONCAT;
     } else if (kind.equals(BITWUZLA_KIND_BV_DEC)) {
-      throw new UnsupportedOperationException(
-          "Visitor currently does not support visiting " + kind.toString());
+      functionKind = FunctionDeclarationKind.OTHER;
     } else if (kind.equals(BITWUZLA_KIND_BV_INC)) {
-      throw new UnsupportedOperationException(
-          "Visitor currently does not support visiting " + kind.toString());
+      functionKind = FunctionDeclarationKind.OTHER;
     } else if (kind.equals(BITWUZLA_KIND_BV_MUL)) {
-      throw new UnsupportedOperationException(
-          "Visitor currently does not support visiting " + kind.toString());
+      functionKind = FunctionDeclarationKind.OTHER;
     } else if (kind.equals(BITWUZLA_KIND_BV_NAND)) {
-      functionKind = FunctionDeclarationKind.BV_NOT;
-      throw new UnsupportedOperationException(
-          "Visitor currently does not support visiting " + kind.toString());
+      // Maybe turn into NOT and AND function?
+      functionKind = FunctionDeclarationKind.OTHER;
     } else if (kind.equals(BITWUZLA_KIND_BV_NEG)) {
-      throw new UnsupportedOperationException(
-          "Visitor currently does not support visiting " + kind.toString());
+      functionKind = FunctionDeclarationKind.OTHER;
     } else if (kind.equals(BITWUZLA_KIND_BV_NOR)) {
-      throw new UnsupportedOperationException(
-          "Visitor currently does not support visiting " + kind.toString());
+      functionKind = FunctionDeclarationKind.OTHER;
     } else if (kind.equals(BITWUZLA_KIND_BV_NOT)) {
       functionKind = FunctionDeclarationKind.BV_NOT;
     } else if (kind.equals(BITWUZLA_KIND_BV_OR)) {
       functionKind = FunctionDeclarationKind.BV_OR;
     } else if (kind.equals(BITWUZLA_KIND_BV_REDAND)) {
-      throw new UnsupportedOperationException(
-          "Visitor currently does not support visiting " + kind.toString());
+      functionKind = FunctionDeclarationKind.OTHER;
     } else if (kind.equals(BITWUZLA_KIND_BV_REDOR)) {
-      throw new UnsupportedOperationException(
-          "Visitor currently does not support visiting " + kind.toString());
+      functionKind = FunctionDeclarationKind.OTHER;
     } else if (kind.equals(BITWUZLA_KIND_BV_REDXOR)) {
-      throw new UnsupportedOperationException(
-          "Visitor currently does not support visiting " + kind.toString());
+      functionKind = FunctionDeclarationKind.OTHER;
     } else if (kind.equals(BITWUZLA_KIND_BV_ROL)) {
-      throw new UnsupportedOperationException(
-          "Visitor currently does not support visiting " + kind.toString());
+      functionKind = FunctionDeclarationKind.OTHER;
     } else if (kind.equals(BITWUZLA_KIND_BV_ROR)) {
-      throw new UnsupportedOperationException(
-          "Visitor currently does not support visiting " + kind.toString());
+      functionKind = FunctionDeclarationKind.OTHER;
     } else if (kind.equals(BITWUZLA_KIND_BV_SADD_OVERFLOW)) {
-      throw new UnsupportedOperationException(
-          "Visitor currently does not support visiting " + kind.toString());
+      functionKind = FunctionDeclarationKind.OTHER;
     } else if (kind.equals(BITWUZLA_KIND_BV_SDIV_OVERFLOW)) {
-      throw new UnsupportedOperationException(
-          "Visitor currently does not support visiting " + kind.toString());
+      functionKind = FunctionDeclarationKind.OTHER;
     } else if (kind.equals(BITWUZLA_KIND_BV_SDIV)) {
       functionKind = FunctionDeclarationKind.BV_SDIV;
     } else if (kind.equals(BITWUZLA_KIND_BV_SGE)) {
@@ -255,29 +238,23 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
     } else if (kind.equals(BITWUZLA_KIND_BV_SHL)) {
       functionKind = FunctionDeclarationKind.BV_SHL;
     } else if (kind.equals(BITWUZLA_KIND_BV_SHR)) {
-      throw new UnsupportedOperationException(
-          "Visitor currently does not support visiting " + kind.toString());
+      functionKind = FunctionDeclarationKind.OTHER;
     } else if (kind.equals(BITWUZLA_KIND_BV_SLE)) {
       functionKind = FunctionDeclarationKind.BV_SLE;
     } else if (kind.equals(BITWUZLA_KIND_BV_SLT)) {
       functionKind = FunctionDeclarationKind.BV_SLT;
     } else if (kind.equals(BITWUZLA_KIND_BV_SMOD)) {
-      throw new UnsupportedOperationException(
-          "Visitor currently does not support visiting " + kind.toString());
+      functionKind = FunctionDeclarationKind.OTHER;
     } else if (kind.equals(BITWUZLA_KIND_BV_SMUL_OVERFLOW)) {
-      throw new UnsupportedOperationException(
-          "Visitor currently does not support visiting " + kind.toString());
+      functionKind = FunctionDeclarationKind.OTHER;
     } else if (kind.equals(BITWUZLA_KIND_BV_SREM)) {
-      throw new UnsupportedOperationException(
-          "Visitor currently does not support visiting " + kind.toString());
+      functionKind = FunctionDeclarationKind.OTHER;
     } else if (kind.equals(BITWUZLA_KIND_BV_SSUB_OVERFLOW)) {
-      throw new UnsupportedOperationException(
-          "Visitor currently does not support visiting " + kind.toString());
+      functionKind = FunctionDeclarationKind.OTHER;
     } else if (kind.equals(BITWUZLA_KIND_BV_SUB)) {
       functionKind = FunctionDeclarationKind.BV_SUB;
     } else if (kind.equals(BITWUZLA_KIND_BV_UADD_OVERFLOW)) {
-      throw new UnsupportedOperationException(
-          "Visitor currently does not support visiting " + kind.toString());
+      functionKind = FunctionDeclarationKind.OTHER;
     } else if (kind.equals(BITWUZLA_KIND_BV_UDIV)) {
       functionKind = FunctionDeclarationKind.BV_UDIV;
     } else if (kind.equals(BITWUZLA_KIND_BV_UGE)) {
@@ -289,28 +266,22 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
     } else if (kind.equals(BITWUZLA_KIND_BV_ULT)) {
       functionKind = FunctionDeclarationKind.BV_ULT;
     } else if (kind.equals(BITWUZLA_KIND_BV_UMUL_OVERFLOW)) {
-      throw new UnsupportedOperationException(
-          "Visitor currently does not support visiting " + kind.toString());
+      functionKind = FunctionDeclarationKind.OTHER;
     } else if (kind.equals(BITWUZLA_KIND_BV_UREM)) {
       functionKind = FunctionDeclarationKind.BV_UREM;
     } else if (kind.equals(BITWUZLA_KIND_BV_USUB_OVERFLOW)) {
     } else if (kind.equals(BITWUZLA_KIND_BV_XNOR)) {
-      throw new UnsupportedOperationException(
-          "Visitor currently does not support visiting " + kind.toString());
+      functionKind = FunctionDeclarationKind.OTHER;
     } else if (kind.equals(BITWUZLA_KIND_BV_XOR)) {
-      throw new UnsupportedOperationException(
-          "Visitor currently does not support visiting " + kind.toString());
+      functionKind = FunctionDeclarationKind.OTHER;
     } else if (kind.equals(BITWUZLA_KIND_BV_EXTRACT)) {
       functionKind = FunctionDeclarationKind.BV_EXTRACT;
     } else if (kind.equals(BITWUZLA_KIND_BV_REPEAT)) {
-      throw new UnsupportedOperationException(
-          "Visitor currently does not support visiting " + kind.toString());
+      functionKind = FunctionDeclarationKind.OTHER;
     } else if (kind.equals(BITWUZLA_KIND_BV_ROLI)) {
-      throw new UnsupportedOperationException(
-          "Visitor currently does not support visiting " + kind.toString());
+      functionKind = FunctionDeclarationKind.OTHER;
     } else if (kind.equals(BITWUZLA_KIND_BV_RORI)) {
-      throw new UnsupportedOperationException(
-          "Visitor currently does not support visiting " + kind.toString());
+      functionKind = FunctionDeclarationKind.OTHER;
     } else if (kind.equals(BITWUZLA_KIND_BV_SIGN_EXTEND)) {
       functionKind = FunctionDeclarationKind.BV_SIGN_EXTENSION;
     } else if (kind.equals(BITWUZLA_KIND_BV_ZERO_EXTEND)) {
@@ -324,8 +295,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
     } else if (kind.equals(BITWUZLA_KIND_FP_EQUAL)) {
       functionKind = FunctionDeclarationKind.FP_EQ;
     } else if (kind.equals(BITWUZLA_KIND_FP_FMA)) {
-      throw new UnsupportedOperationException(
-          "Visitor currently does not support visiting " + kind.toString());
+      functionKind = FunctionDeclarationKind.OTHER;
     } else if (kind.equals(BITWUZLA_KIND_FP_FP)) {
     } else if (kind.equals(BITWUZLA_KIND_FP_GEQ)) {
       functionKind = FunctionDeclarationKind.FP_GE;
@@ -340,8 +310,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
     } else if (kind.equals(BITWUZLA_KIND_FP_IS_NORMAL)) {
       functionKind = FunctionDeclarationKind.FP_IS_NORMAL;
     } else if (kind.equals(BITWUZLA_KIND_FP_IS_POS)) {
-      throw new UnsupportedOperationException(
-          "Visitor currently does not support visiting " + kind.toString());
+      functionKind = FunctionDeclarationKind.OTHER;
     } else if (kind.equals(BITWUZLA_KIND_FP_IS_SUBNORMAL)) {
       functionKind = FunctionDeclarationKind.FP_IS_SUBNORMAL;
     } else if (kind.equals(BITWUZLA_KIND_FP_IS_ZERO)) {
@@ -359,8 +328,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
     } else if (kind.equals(BITWUZLA_KIND_FP_NEG)) {
       functionKind = FunctionDeclarationKind.FP_IS_NEGATIVE;
     } else if (kind.equals(BITWUZLA_KIND_FP_REM)) {
-      throw new UnsupportedOperationException(
-          "Visitor currently does not support visiting " + kind.toString());
+      functionKind = FunctionDeclarationKind.OTHER;
     } else if (kind.equals(BITWUZLA_KIND_FP_RTI)) {
       functionKind = FunctionDeclarationKind.FP_ROUND_TO_INTEGRAL;
     } else if (kind.equals(BITWUZLA_KIND_FP_SQRT)) {
@@ -368,23 +336,19 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
     } else if (kind.equals(BITWUZLA_KIND_FP_SUB)) {
       functionKind = FunctionDeclarationKind.FP_SUB;
     } else if (kind.equals(BITWUZLA_KIND_FP_TO_FP_FROM_BV)) {
-      throw new UnsupportedOperationException(
-          "Visitor currently does not support visiting " + kind.toString());
+      functionKind = FunctionDeclarationKind.OTHER;
     } else if (kind.equals(BITWUZLA_KIND_FP_TO_FP_FROM_FP)) {
       functionKind = FunctionDeclarationKind.FP_CASTTO_FP;
     } else if (kind.equals(BITWUZLA_KIND_FP_TO_FP_FROM_SBV)) {
-      throw new UnsupportedOperationException(
-          "Visitor currently does not support visiting " + kind.toString());
+      functionKind = FunctionDeclarationKind.OTHER;
     } else if (kind.equals(BITWUZLA_KIND_FP_TO_FP_FROM_UBV)) {
-      throw new UnsupportedOperationException(
-          "Visitor currently does not support visiting " + kind.toString());
+      functionKind = FunctionDeclarationKind.OTHER;
     } else if (kind.equals(BITWUZLA_KIND_FP_TO_SBV)) {
       functionKind = FunctionDeclarationKind.FP_CASTTO_SBV;
     } else if (kind.equals(BITWUZLA_KIND_FP_TO_UBV)) {
       functionKind = FunctionDeclarationKind.FP_CASTTO_UBV;
     } else if (kind.equals(BITWUZLA_KIND_NUM_KINDS)) {
-      throw new UnsupportedOperationException(
-          "Visitor currently does not support visiting " + kind.toString());
+      functionKind = FunctionDeclarationKind.OTHER;
     } else {
       throw new UnsupportedOperationException(
           "Visitor currently does not support visiting " + kind.toString());
@@ -461,7 +425,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
           formula, new BigInteger(bitwuzlaJNI.bitwuzla_term_value_get_str(f, 10)));
     } else if (bitwuzlaJNI.bitwuzla_term_is_fp_value(f)) {
       return visitor.visitConstant(formula, parseIEEEbinaryFP(f));
-    } else if (bitwuzlaJNI.bitwuzla_term_is_array(f)) {
+    } else if (bitwuzlaJNI.bitwuzla_term_is_const(f)) {
       String name = bitwuzlaJNI.bitwuzla_term_get_symbol(f);
       return visitor.visitFreeVariable(formula, name);
     } else if (bitwuzlaJNI.bitwuzla_term_is_var(f)) {

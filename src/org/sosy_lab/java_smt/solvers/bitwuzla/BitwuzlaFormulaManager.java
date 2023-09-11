@@ -69,24 +69,6 @@ final class BitwuzlaFormulaManager extends AbstractFormulaManager<Long, Long, Lo
   public BooleanFormula parse(String s) throws IllegalArgumentException {
     long options = bitwuzlaJNI.bitwuzla_options_new();
 
-    // Needs to be formatted like a file. Example:
-    //    String inpuString = "(set-logic QF_ABV)\r\n" + //
-    //        "(set-option :produce-models true)\r\n" + //
-    //        "(declare-const x (_ BitVec 8))\r\n" + //
-    //        "(declare-const y (_ BitVec 8))\r\n" + //
-    //        "(declare-fun f ((_ BitVec 8) (_ BitVec 4)) (_ BitVec 8))\r\n" + //
-    //        "(declare-const a (Array (_ BitVec 8) (_ BitVec 8)))\r\n" + //
-    //        "(assert\r\n" + //
-    //        "    (distinct\r\n" + //
-    //        "        ((_ extract 3 0) (bvsdiv x (_ bv2 8)))\r\n" + //
-    //        "        ((_ extract 3 0) (bvashr y (_ bv1 8)))))\r\n" + //
-    //        "(assert (= (f x ((_ extract 6 3) x)) y))\r\n" + //
-    //        "(assert (= (select a x) y))\r\n" + //
-    //        "(check-sat)\r\n" + //
-    //        "(get-model)\r\n" + //
-    //        "(get-value (x y f a (bvmul x x)))\r\n" + //
-    //        "(exit)\r\n";
-
     long pInfile = bitwuzlaJNI.fopen("tempParserFile", "w+");
 
     _IO_FILE infile = new _IO_FILE(pInfile, true);

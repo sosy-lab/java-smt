@@ -27,7 +27,7 @@ public class BitwuzlaModel extends AbstractModel<Long, Long, Long> {
     this.assertedTerms = ImmutableList.copyOf(assertedTerms);
   }
 
-  private void printModel() {
+  public void printModel() {
     System.out.println("(");
     for (int i = 0; i < assertedTerms.size(); ++i) {
       long sort = bitwuzlaJNI.bitwuzla_term_get_sort(assertedTerms.get(i));
@@ -94,9 +94,9 @@ public class BitwuzlaModel extends AbstractModel<Long, Long, Long> {
 
     for (long term : assertedTerms) {
       variablesBuilder.add(getSimpleAssignment(term));
-    }
+    } // More complex builder needed for function applications?
 
-    return null;
+    return variablesBuilder.build().asList();
   }
 
   private ValueAssignment getSimpleAssignment(long pTerm) {

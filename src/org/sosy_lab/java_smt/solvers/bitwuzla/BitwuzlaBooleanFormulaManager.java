@@ -77,12 +77,12 @@ public class BitwuzlaBooleanFormulaManager
 
   @Override
   protected boolean isTrue(Long bits) {
-    return false;
+    return bitwuzlaJNI.bitwuzla_term_is_true(bits);
   }
 
   @Override
   protected boolean isFalse(Long bits) {
-    return false;
+    return !bitwuzlaJNI.bitwuzla_term_is_true(bits);
   }
 
   @Override
