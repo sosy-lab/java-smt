@@ -65,7 +65,7 @@ public class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void>
     // avoid dual stack usage
     Preconditions.checkState(
         !isAnyStackAlive.getAndSet(true),
-        "Boolector does not support the usage of multiple "
+        "Bitwuzla does not support the usage of multiple "
             + "solver stacks at the same time. Please close any existing solver stack.");
   }
 
