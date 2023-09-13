@@ -100,6 +100,7 @@
 //%ignore LogicFactory;
 
 %newobject LogicFactory::getInstance(Logic_t);
+%newobject LogicFactory::getLAInstance(Logic_t);
 %newobject LogicFactory::getLRAInstance();
 %newobject LogicFactory::getLIAInstance();
 %newobject LogicFactory::getLogicAll();

@@ -363,22 +363,35 @@ index 73513cd1..888f970c 100644
  
      SSymRef       getSortSymIndexed()              const { return sym_IndexedSort; }
 diff --git a/src/logics/LogicFactory.cc b/src/logics/LogicFactory.cc
-index ceedd296..ff55f971 100644
+index ceedd296..7e07010d 100644
 --- a/src/logics/LogicFactory.cc
 +++ b/src/logics/LogicFactory.cc
-@@ -83,3 +83,4 @@ ArithLogic * opensmt::LogicFactory::getLRAInstance() { return new ArithLogic(Log
+@@ -79,7 +79,9 @@ Logic * opensmt::LogicFactory::getInstance(Logic_t logicType) {
+     return l;
+ }
  
+-ArithLogic * opensmt::LogicFactory::getLRAInstance() { return new ArithLogic(Logic_t::QF_LRA); }
++ArithLogic * opensmt::LogicFactory::getLAInstance(Logic_t logicType) { return dynamic_cast<ArithLogic*>(getInstance(logicType)); }
+ 
++ArithLogic * opensmt::LogicFactory::getLRAInstance() { return new ArithLogic(Logic_t::QF_LRA); }
  ArithLogic * opensmt::LogicFactory::getLIAInstance() { return new ArithLogic(Logic_t::QF_LIA); }
  
 +ArithLogic * opensmt::LogicFactory::getLogicAll() { return new ArithLogic(Logic_t::QF_AUFLIRA); }
 diff --git a/src/logics/LogicFactory.h b/src/logics/LogicFactory.h
-index 65b039e9..6e65ce70 100644
+index 65b039e9..120446d3 100644
 --- a/src/logics/LogicFactory.h
 +++ b/src/logics/LogicFactory.h
-@@ -172,6 +172,7 @@ public:
-     static Logic * getInstance(Logic_t);
+@@ -169,9 +169,13 @@ std::string getStringFromLogic(const Logic_t logic);
+ 
+ class LogicFactory {
+ public:
+-    static Logic * getInstance(Logic_t);
++    static Logic *  getInstance(Logic_t);
++    static ArithLogic * getLAInstance(Logic_t);
++
      static ArithLogic * getLRAInstance();
      static ArithLogic * getLIAInstance();
++
 +    static ArithLogic * getLogicAll();
  };
  }

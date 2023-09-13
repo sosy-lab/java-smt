@@ -58,12 +58,30 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, Sy
     switch (logicType) {
       case CORE:
         return new OpenSmtFormulaCreator(logicType, LogicFactory.getInstance(Logic_t.QF_BOOL));
+      case QF_AX:
+        return new OpenSmtFormulaCreator(logicType, LogicFactory.getInstance(Logic_t.QF_AX));
       case QF_UF:
         return new OpenSmtFormulaCreator(logicType, LogicFactory.getInstance(Logic_t.QF_UF));
+      case QF_IDL:
+        return new OpenSmtFormulaCreator(logicType, LogicFactory.getLAInstance(Logic_t.QF_IDL));
+      case QF_RDL:
+        return new OpenSmtFormulaCreator(logicType, LogicFactory.getLAInstance(Logic_t.QF_RDL));
       case QF_LIA:
-        return new OpenSmtFormulaCreator(logicType, LogicFactory.getLIAInstance());
+        return new OpenSmtFormulaCreator(logicType, LogicFactory.getLAInstance(Logic_t.QF_LIA));
       case QF_LRA:
-        return new OpenSmtFormulaCreator(logicType, LogicFactory.getLRAInstance());
+        return new OpenSmtFormulaCreator(logicType, LogicFactory.getLAInstance(Logic_t.QF_LRA));
+      case QF_ALIA:
+        return new OpenSmtFormulaCreator(logicType, LogicFactory.getLAInstance(Logic_t.QF_ALIA));
+      case QF_ALRA:
+        return new OpenSmtFormulaCreator(logicType, LogicFactory.getLAInstance(Logic_t.QF_ALRA));
+      case QF_UFLIA:
+        return new OpenSmtFormulaCreator(logicType, LogicFactory.getLAInstance(Logic_t.QF_UFLIA));
+      case QF_UFLRA:
+        return new OpenSmtFormulaCreator(logicType, LogicFactory.getLAInstance(Logic_t.QF_UFLRA));
+      case QF_AUFLIA:
+        return new OpenSmtFormulaCreator(logicType, LogicFactory.getLAInstance(Logic_t.QF_AUFLIA));
+      case QF_AUFLRA:
+        return new OpenSmtFormulaCreator(logicType, LogicFactory.getLAInstance(Logic_t.QF_AUFLRA));
       default:
         return new OpenSmtFormulaCreator(Logics.ALL, LogicFactory.getLogicAll());
     }
