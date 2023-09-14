@@ -241,7 +241,9 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
   public final BooleanFormula implication(BooleanFormula pBits1, BooleanFormula pBits2) {
     TFormulaInfo param1 = extractInfo(pBits1);
     TFormulaInfo param2 = extractInfo(pBits2);
-    return wrap(implication(param1, param2));
+    BooleanFormula result = wrap(implication(param1, param2));
+    Generator.logImplication(result, pBits1, pBits2);
+    return result;
   }
 
   protected TFormulaInfo implication(TFormulaInfo bits1, TFormulaInfo bits2) {
@@ -283,7 +285,9 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
         f2,
         t2);
     TFormulaInfo result = ifThenElse(extractInfo(pBits), extractInfo(f1), extractInfo(f2));
-    return getFormulaCreator().encapsulate(t1, result);
+    var finalResult = getFormulaCreator().encapsulate(t1, result);
+    Generator.logIfThenElse(finalResult, pBits, f1, f2);
+    return finalResult;
   }
 
   protected abstract TFormulaInfo ifThenElse(TFormulaInfo cond, TFormulaInfo f1, TFormulaInfo f2);

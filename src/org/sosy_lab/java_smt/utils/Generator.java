@@ -135,6 +135,8 @@ public class Generator {
     executedAggregator.add(new Triple<>(result, inputParams, saveResult));
   }
 
+  //TODO: logOr with Collections
+
   public static void logAnd(Object result, BooleanFormula pBits1, BooleanFormula pBits2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pBits1);
@@ -143,6 +145,8 @@ public class Generator {
         inPlaceInputParams -> "(and " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     executedAggregator.add(new Triple<>(result, inputParams, saveResult));
   }
+
+  //TODO: logAnd with Collections
 
   public static void logXor(Object result,BooleanFormula pBits1, BooleanFormula pBits2) {
     List<Object> inputParams = new ArrayList<>();
@@ -159,6 +163,29 @@ public class Generator {
     inputParams.add(pBits2);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    executedAggregator.add(new Triple<>(result, inputParams, saveResult));
+  }
+
+  public static void logImplication(Object result,BooleanFormula pBits1, BooleanFormula pBits2) {
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(pBits1);
+    inputParams.add(pBits2);
+    Function<List<Object>, String> saveResult =
+        inPlaceInputParams -> "(=> " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    executedAggregator.add(new Triple<>(result, inputParams, saveResult));
+  }
+
+  //TODO: logIsTrue
+
+  //TODO: logIsFalse
+
+  public static void logIfThenElse(Object result, BooleanFormula pBits1, Object f1, Object f2) {
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(pBits1);
+    inputParams.add(f1);
+    inputParams.add(f2);
+    Function<List<Object>, String> saveResult =
+        inPlaceInputParams -> "(ite " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + " " + inPlaceInputParams.get(2) + ")" ;
     executedAggregator.add(new Triple<>(result, inputParams, saveResult));
   }
 }
