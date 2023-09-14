@@ -75,7 +75,9 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
     if (trueFormula == null) {
       trueFormula = wrap(makeBooleanImpl(true));
     }
-    return trueFormula;
+    BooleanFormula result = trueFormula;
+    Generator.logMakeTrue(result, "true");
+    return result;
   }
 
   @Override
@@ -83,7 +85,9 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
     if (falseFormula == null) {
       falseFormula = wrap(makeBooleanImpl(false));
     }
-    return falseFormula;
+    BooleanFormula result = falseFormula;
+    Generator.logMakeFalse(result, "false");
+    return result;
   }
 
   protected abstract TFormulaInfo makeBooleanImpl(boolean value);

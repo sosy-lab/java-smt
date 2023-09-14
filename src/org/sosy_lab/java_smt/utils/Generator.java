@@ -84,10 +84,12 @@ public class Generator {
     List<String> uniqueRegisteredValues =
         registeredVariables.stream().distinct().collect(Collectors.toList());
     for (String variable:uniqueRegisteredValues) {
-      String newEntry = "(declare-const " + variable + " Bool)\n";
-      if (lines.indexOf(newEntry) == -1) {
-        lines.append(newEntry);
-      } else {
+      if (variable != "true" && variable != "false") {
+        String newEntry = "(declare-const " + variable + " Bool)\n";
+        if (lines.indexOf(newEntry) == -1) {
+          lines.append(newEntry);
+        } else {
+        }
       }
     }
     String SMTLIB2Result = "(assert " + result + ")\n";
@@ -107,16 +109,25 @@ public class Generator {
 
   //List<Triple<Object, List<Object>, Function<List<Object>, String>>>
   public static void logMakeVariable(Object result, String pVar) {
-    String out = "(declare-const " + pVar + " Bool)\n";
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pVar);
     Function<List<Object>, String> saveResult = inPlaceInputParams -> (String) inPlaceInputParams.get(0);
     executedAggregator.add(new Triple<>(result, inputParams, saveResult));
   }
 
-  //TODO: logMakeTrue
+  public static void logMakeTrue(Object result, String pVar) {
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(pVar);
+    Function<List<Object>, String> saveResult = inPlaceInputParams -> (String) inPlaceInputParams.get(0);
+    executedAggregator.add(new Triple<>(result, inputParams, saveResult));
+  }
 
-  //TODO: logMakeFalse
+  public static void logMakeFalse(Object result, String pVar) {
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(pVar);
+    Function<List<Object>, String> saveResult = inPlaceInputParams -> (String) inPlaceInputParams.get(0);
+    executedAggregator.add(new Triple<>(result, inputParams, saveResult));
+  }
 
   public static void logNot(Object result, BooleanFormula pBits) {
     String out = "(not " + pBits + ")\n";
@@ -157,7 +168,7 @@ public class Generator {
     executedAggregator.add(new Triple<>(result, inputParams, saveResult));
   }
 
-  public static void logEquivalence(Object result,BooleanFormula pBits1, BooleanFormula pBits2) {
+  public static void logEquivalence(Object result, BooleanFormula pBits1, BooleanFormula pBits2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pBits1);
     inputParams.add(pBits2);

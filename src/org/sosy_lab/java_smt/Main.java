@@ -48,8 +48,8 @@ public class Main {
 
     BooleanFormula constraint = bmgr.not(bmgr.and(q, bmgr.xor(bmgr.not(bmgr.or(p, bmgr.not(p)))
      , p)));
-    BooleanFormula constraint1 = bmgr.equivalence(t, q);
-    BooleanFormula constraint2 = bmgr.implication(t, bmgr.not(q));
+    BooleanFormula constraint1 = bmgr.equivalence(bmgr.makeTrue(), q);
+    BooleanFormula constraint2 = bmgr.implication(bmgr.makeFalse(), bmgr.not(q));
     BooleanFormula constraint3 = bmgr.ifThenElse(p, q, t);
 
     try (ProverEnvironment prover =
