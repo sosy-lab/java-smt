@@ -46,13 +46,16 @@ public class Main {
     BooleanFormula q = bmgr.makeVariable("q");
     BooleanFormula t = bmgr.makeVariable("t");
 
-    BooleanFormula constraint = bmgr.not(bmgr.or(q, bmgr.not(bmgr.not(bmgr.or(p, bmgr.not(q))))));
-    BooleanFormula constraint2 = bmgr.or(t, bmgr.not(q));
+    //BooleanFormula constraint = bmgr.not(bmgr.and(q, bmgr.xor(bmgr.not(bmgr.or(p, bmgr.not(p)))
+    // , p)));
+    BooleanFormula constraint1 = bmgr.equivalence(t, q);
+    //BooleanFormula constraint2 = bmgr.or(t, bmgr.not(q));
 
     try (ProverEnvironment prover =
              context.newProverEnvironment(SolverContext.ProverOptions.GENERATE_MODELS)) {
-      prover.addConstraint(constraint);
-      prover.addConstraint(constraint2);
+      //prover.addConstraint(constraint);
+      prover.addConstraint(constraint1);
+      //prover.addConstraint(constraint2);
       boolean isUnsat = prover.isUnsat();
       if (!isUnsat) {
         Model model = prover.getModel();

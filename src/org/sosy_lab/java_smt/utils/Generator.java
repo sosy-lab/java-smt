@@ -89,12 +89,14 @@ public class Generator {
         lines.append(newEntry);
       } else {
       }
-
     }
-    lines.append(result + "\n");
+    String SMTLIB2Result = "(assert " + result + ")\n";
+    lines.append(SMTLIB2Result);
   }
 
   public static void dumpSMTLIB2() throws IOException {
+    String endSMTLIB2 = "(check-sat)\n(exit)";
+    lines.append(endSMTLIB2);
     writeToFile(String.valueOf(lines));
   }
 
@@ -112,6 +114,10 @@ public class Generator {
     executedAggregator.add(new Triple<>(result, inputParams, saveResult));
   }
 
+  //TODO: logMakeTrue
+
+  //TODO: logMakeFalse
+
   public static void logNot(Object result, BooleanFormula pBits) {
     String out = "(not " + pBits + ")\n";
     List<Object> inputParams = new ArrayList<>();
@@ -121,7 +127,6 @@ public class Generator {
   }
 
   public static void logOr(Object result, BooleanFormula pBits1, BooleanFormula pBits2) {
-    String out = "(or " + pBits1 + " " + pBits2 + ")\n";
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pBits1);
     inputParams.add(pBits2);
@@ -130,11 +135,30 @@ public class Generator {
     executedAggregator.add(new Triple<>(result, inputParams, saveResult));
   }
 
-  public static void logAnd(BooleanFormula pBits1, BooleanFormula pBits2) {
-    String out = "(assert (and " + pBits1 + " " + pBits2 + "))\n";
+  public static void logAnd(Object result, BooleanFormula pBits1, BooleanFormula pBits2) {
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(pBits1);
+    inputParams.add(pBits2);
+    Function<List<Object>, String> saveResult =
+        inPlaceInputParams -> "(and " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    executedAggregator.add(new Triple<>(result, inputParams, saveResult));
   }
 
-  public static void logXor(BooleanFormula pBits1, BooleanFormula pBits2) {
-    String out = "(assert (xor " + pBits1 + " " + pBits2 + "))\n";
+  public static void logXor(Object result,BooleanFormula pBits1, BooleanFormula pBits2) {
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(pBits1);
+    inputParams.add(pBits2);
+    Function<List<Object>, String> saveResult =
+        inPlaceInputParams -> "(xor " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    executedAggregator.add(new Triple<>(result, inputParams, saveResult));
+  }
+
+  public static void logEquivalence(Object result,BooleanFormula pBits1, BooleanFormula pBits2) {
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(pBits1);
+    inputParams.add(pBits2);
+    Function<List<Object>, String> saveResult =
+        inPlaceInputParams -> "(= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    executedAggregator.add(new Triple<>(result, inputParams, saveResult));
   }
 }
