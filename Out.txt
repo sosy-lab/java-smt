@@ -1,4 +1,4 @@
-(set-logic ALL)
+(set-logic QF_UF)
 (declare-const q Bool)
 (declare-const p Bool)
 (assert (not (and q (xor (not (or p (not p))) p))))
@@ -7,6 +7,6 @@
 (declare-const t Bool)
 (assert (ite p q t))
 (assert false)
-(assert false)
+(assert (and p q t))
 (check-sat)
 (exit)

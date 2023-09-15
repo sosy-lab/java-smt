@@ -57,11 +57,11 @@ public class Main {
     BooleanFormula constraint4 = bmgr.makeFalse();
 
     List<BooleanFormula> test = new ArrayList<>();
-
-    BooleanFormula finalConstraint = bmgr.or(test);
     test.add(p);
     test.add(q);
     test.add(t);
+
+    BooleanFormula finalConstraint = bmgr.and(test);
 
     try (ProverEnvironment prover =
              context.newProverEnvironment(SolverContext.ProverOptions.GENERATE_MODELS)) {

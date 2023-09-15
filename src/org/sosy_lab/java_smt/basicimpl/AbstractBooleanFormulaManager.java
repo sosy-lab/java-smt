@@ -117,14 +117,22 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
   public BooleanFormula and(Collection<BooleanFormula> pBits) {
     switch (pBits.size()) {
       case 0:
-        return makeTrue();
+        BooleanFormula result0 = makeTrue();
+        Generator.logMakeTrue(result0, "true");
+        return result0;
       case 1:
-        return pBits.iterator().next();
+        BooleanFormula result1 = pBits.iterator().next();
+        Generator.logAnd(result1, pBits);
+        return result1;
       case 2:
         Iterator<BooleanFormula> it = pBits.iterator();
-        return and(it.next(), it.next());
+        BooleanFormula result2 = and(it.next(), it.next());
+        Generator.logAnd(result2, pBits);
+        return result2;
       default:
-        return wrap(andImpl(Collections2.transform(pBits, this::extractInfo)));
+        BooleanFormula result = wrap(andImpl(Collections2.transform(pBits, this::extractInfo)));
+        Generator.logAnd(result, pBits);
+        return result;
     }
   }
 
@@ -200,9 +208,9 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
         return result2;
       default:
         Iterator<BooleanFormula> pit = pBits.iterator();
-          BooleanFormula resultd = (wrap(orImpl(Collections2.transform(pBits, this::extractInfo))));
-          Generator.logOr(resultd, pBits);
-        return resultd;
+          BooleanFormula result = (wrap(orImpl(Collections2.transform(pBits, this::extractInfo))));
+          Generator.logOr(result, pBits);
+        return result;
     }
   }
 

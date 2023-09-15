@@ -172,7 +172,21 @@ public class Generator {
     executedAggregator.add(new Triple<>(result, inputParams, saveResult));
   }
 
-  //TODO: logAnd with Collections
+  public static void logAnd(Object result, Collection<BooleanFormula> pBits1) {
+    StringBuilder out = new StringBuilder();
+    out.append("(and ");
+    List<Object> inputParams = new ArrayList<>();
+    Iterator<BooleanFormula> it = pBits1.iterator();
+    for (int i = 0; i < pBits1.size(); i++) {
+      inputParams.add(it.next());
+    }
+    Function<List<Object>, String> saveResult =
+        inPlaceInputParams -> {
+          inPlaceInputParams.forEach((c) -> {out.append(c); out.append(" ");}); return String.valueOf(
+              out.deleteCharAt(out.length()-1).append(")"));};
+
+    executedAggregator.add(new Triple<>(result, inputParams, saveResult));
+  }
 
   public static void logXor(Object result,BooleanFormula pBits1, BooleanFormula pBits2) {
     List<Object> inputParams = new ArrayList<>();
