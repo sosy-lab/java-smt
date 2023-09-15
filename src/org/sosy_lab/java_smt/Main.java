@@ -18,6 +18,8 @@ package org.sosy_lab.java_smt;/*
  *  limitations under the License.
  */
 
+import java.util.ArrayList;
+import java.util.List;
 import org.sosy_lab.common.*;
 import org.sosy_lab.common.configuration.*;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -45,12 +47,21 @@ public class Main {
     BooleanFormula p = bmgr.makeVariable("p");
     BooleanFormula q = bmgr.makeVariable("q");
     BooleanFormula t = bmgr.makeVariable("t");
+    BooleanFormula s = bmgr.makeVariable("s");
 
     BooleanFormula constraint = bmgr.not(bmgr.and(q, bmgr.xor(bmgr.not(bmgr.or(p, bmgr.not(p)))
      , p)));
     BooleanFormula constraint1 = bmgr.equivalence(bmgr.makeTrue(), q);
-    BooleanFormula constraint2 = bmgr.implication(bmgr.makeFalse(), bmgr.not(q));
+    BooleanFormula constraint2 = bmgr.implication(p, bmgr.not(q));
     BooleanFormula constraint3 = bmgr.ifThenElse(p, q, t);
+    BooleanFormula constraint4 = bmgr.makeFalse();
+
+    List<BooleanFormula> test = new ArrayList<>();
+
+    BooleanFormula finalConstraint = bmgr.or(test);
+    test.add(p);
+    test.add(q);
+    test.add(t);
 
     try (ProverEnvironment prover =
              context.newProverEnvironment(SolverContext.ProverOptions.GENERATE_MODELS)) {
@@ -58,6 +69,9 @@ public class Main {
       prover.addConstraint(constraint1);
       prover.addConstraint(constraint2);
       prover.addConstraint(constraint3);
+      prover.addConstraint(constraint4);
+      prover.addConstraint(finalConstraint);
+
       boolean isUnsat = prover.isUnsat();
       if (!isUnsat) {
         Model model = prover.getModel();

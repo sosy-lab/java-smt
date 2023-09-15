@@ -186,14 +186,23 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
   public BooleanFormula or(Collection<BooleanFormula> pBits) {
     switch (pBits.size()) {
       case 0:
-        return makeFalse();
+        BooleanFormula result0 =  makeFalse();
+        Generator.logMakeFalse(result0, "false");
+        return result0;
       case 1:
-        return pBits.iterator().next();
+        BooleanFormula result1 =  pBits.iterator().next();
+        Generator.logOr(result1, pBits);
+        return result1;
       case 2:
         Iterator<BooleanFormula> it = pBits.iterator();
-        return or(it.next(), it.next());
+        BooleanFormula result2 = or(it.next(), it.next());
+        Generator.logOr(result2, pBits);
+        return result2;
       default:
-        return wrap(orImpl(Collections2.transform(pBits, this::extractInfo)));
+        Iterator<BooleanFormula> pit = pBits.iterator();
+          BooleanFormula resultd = (wrap(orImpl(Collections2.transform(pBits, this::extractInfo))));
+          Generator.logOr(resultd, pBits);
+        return resultd;
     }
   }
 

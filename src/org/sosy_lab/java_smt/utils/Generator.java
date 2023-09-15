@@ -25,6 +25,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
@@ -84,7 +86,7 @@ public class Generator {
     List<String> uniqueRegisteredValues =
         registeredVariables.stream().distinct().collect(Collectors.toList());
     for (String variable:uniqueRegisteredValues) {
-      if (variable != "true" && variable != "false") {
+      if (! variable.equals("true") && ! variable.equals("false")) {
         String newEntry = "(declare-const " + variable + " Bool)\n";
         if (lines.indexOf(newEntry) == -1) {
           lines.append(newEntry);
@@ -130,7 +132,6 @@ public class Generator {
   }
 
   public static void logNot(Object result, BooleanFormula pBits) {
-    String out = "(not " + pBits + ")\n";
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pBits);
     Function<List<Object>, String> saveResult = inPlaceInputParams -> "(not " + inPlaceInputParams.get(0) + ")";
@@ -146,7 +147,21 @@ public class Generator {
     executedAggregator.add(new Triple<>(result, inputParams, saveResult));
   }
 
-  //TODO: logOr with Collections
+  public static void logOr(Object result, Collection<BooleanFormula> pBits1) {
+    StringBuilder out = new StringBuilder();
+    out.append("(or ");
+    List<Object> inputParams = new ArrayList<>();
+    Iterator<BooleanFormula> it = pBits1.iterator();
+    for (int i = 0; i < pBits1.size(); i++) {
+      inputParams.add(it.next());
+    }
+    Function<List<Object>, String> saveResult =
+        inPlaceInputParams -> {
+          inPlaceInputParams.forEach((c) -> {out.append(c); out.append(" ");}); return String.valueOf(
+            out.deleteCharAt(out.length()-1).append(")"));};
+
+    executedAggregator.add(new Triple<>(result, inputParams, saveResult));
+  }
 
   public static void logAnd(Object result, BooleanFormula pBits1, BooleanFormula pBits2) {
     List<Object> inputParams = new ArrayList<>();
@@ -186,9 +201,9 @@ public class Generator {
     executedAggregator.add(new Triple<>(result, inputParams, saveResult));
   }
 
-  //TODO: logIsTrue
+  //TODO: logIsTrue (not necessary?)
 
-  //TODO: logIsFalse
+  //TODO: logIsFalse (not necessary?)
 
   public static void logIfThenElse(Object result, BooleanFormula pBits1, Object f1, Object f2) {
     List<Object> inputParams = new ArrayList<>();
