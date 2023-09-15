@@ -20,6 +20,7 @@ package org.sosy_lab.java_smt;/*
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collector;
 import org.sosy_lab.common.*;
 import org.sosy_lab.common.configuration.*;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -27,7 +28,6 @@ import org.sosy_lab.java_smt.api.*;
 import org.sosy_lab.common.log.*;
 import java.io.*;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.java_smt.utils.Generator;
 
 public class Main {
   public static void main(String[] args)
@@ -42,40 +42,22 @@ public class Main {
             Solvers.PRINCESS);
     FormulaManager fmgr = context.getFormulaManager();
     BooleanFormulaManager bmgr = fmgr.getBooleanFormulaManager();
-    //IntegerFormulaManager imgr = fmgr.getIntegerFormulaManager();
+    IntegerFormulaManager imgr = fmgr.getIntegerFormulaManager();
 
-    BooleanFormula p = bmgr.makeVariable("p");
-    BooleanFormula q = bmgr.makeVariable("q");
-    BooleanFormula t = bmgr.makeVariable("t");
-    BooleanFormula s = bmgr.makeVariable("s");
-
-    BooleanFormula constraint = bmgr.not(bmgr.and(q, bmgr.xor(bmgr.not(bmgr.or(p, bmgr.not(p)))
-     , p)));
-    BooleanFormula constraint1 = bmgr.equivalence(bmgr.makeTrue(), q);
-    BooleanFormula constraint2 = bmgr.implication(p, bmgr.not(q));
-    BooleanFormula constraint3 = bmgr.ifThenElse(p, q, t);
-    BooleanFormula constraint4 = bmgr.makeFalse();
-
-    List<BooleanFormula> test = new ArrayList<>();
-    test.add(p);
-    test.add(q);
-    test.add(t);
-
-    BooleanFormula finalConstraint = bmgr.and(test);
+    IntegerFormula one = imgr.makeNumber(1);
+    IntegerFormula two = imgr.makeNumber(2);
+    IntegerFormula x = imgr.makeVariable("x");
+    BooleanFormula constraint = imgr.equal (x, imgr.add(one, two));
 
     try (ProverEnvironment prover =
              context.newProverEnvironment(SolverContext.ProverOptions.GENERATE_MODELS)) {
       prover.addConstraint(constraint);
-      prover.addConstraint(constraint1);
-      prover.addConstraint(constraint2);
-      prover.addConstraint(constraint3);
-      prover.addConstraint(constraint4);
-      prover.addConstraint(finalConstraint);
+
 
       boolean isUnsat = prover.isUnsat();
       if (!isUnsat) {
         Model model = prover.getModel();
-        Boolean value = model.evaluate(p);
+        //Boolean value = model.evaluate(p);
         //System.out.println("constraint is " + isUnsat + " and p = " + value);
       }
     } catch (SolverException e) {

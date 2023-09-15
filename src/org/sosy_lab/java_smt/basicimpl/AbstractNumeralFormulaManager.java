@@ -24,6 +24,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormulaManager;
+import org.sosy_lab.java_smt.utils.Generator;
 
 /**
  * Similar to the other Abstract*FormulaManager classes in this package, this class serves as a
@@ -90,7 +91,9 @@ public abstract class AbstractNumeralFormulaManager<
 
   @Override
   public ResultFormulaType makeNumber(long i) {
-    return wrap(makeNumberImpl(i));
+    ResultFormulaType result = wrap(makeNumberImpl(i));
+    Generator.logMakeFalse(result, String.valueOf(i));
+    return result;
   }
 
   protected abstract TFormulaInfo makeNumberImpl(long i);
@@ -172,7 +175,9 @@ public abstract class AbstractNumeralFormulaManager<
   @Override
   public ResultFormulaType makeVariable(String pVar) {
     checkVariableName(pVar);
-    return wrap(makeVariableImpl(pVar));
+    ResultFormulaType result = wrap(makeVariableImpl(pVar));
+    Generator.logMakeIntVariable(result, pVar);
+    return result;
   }
 
   protected abstract TFormulaInfo makeVariableImpl(String i);
@@ -189,8 +194,9 @@ public abstract class AbstractNumeralFormulaManager<
   public ResultFormulaType add(ParamFormulaType pNumber1, ParamFormulaType pNumber2) {
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
-
-    return wrap(add(param1, param2));
+    ResultFormulaType result = wrap(add(param1, param2));
+    Generator.logAdd(result, pNumber1, pNumber2);
+    return result;
   }
 
   protected abstract TFormulaInfo add(TFormulaInfo pParam1, TFormulaInfo pParam2);
@@ -366,8 +372,9 @@ public abstract class AbstractNumeralFormulaManager<
   public BooleanFormula equal(ParamFormulaType pNumber1, ParamFormulaType pNumber2) {
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
-
-    return wrapBool(equal(param1, param2));
+    BooleanFormula result = wrapBool(equal(param1, param2));
+    Generator.logEqual(result, pNumber1, pNumber2);
+    return result;
   }
 
   protected abstract TFormulaInfo equal(TFormulaInfo pParam1, TFormulaInfo pParam2);

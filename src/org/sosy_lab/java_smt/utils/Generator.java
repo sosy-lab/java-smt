@@ -30,8 +30,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula;
 
 public class Generator {
 
@@ -59,6 +62,15 @@ public class Generator {
     fileWriter.close();
   }
 
+  public static boolean onlyDigits(String str) {
+    String regex = "[0-9]+";
+    Pattern p = Pattern.compile(regex);
+
+    Matcher m = p.matcher(str);
+
+    return m.matches();
+  }
+
   public static String evaluateRecursive(Object constraint) {
     Triple<Object, List<Object>, Function<List<Object>, String>> methodToEvaluate = executedAggregator
         .stream()
@@ -68,7 +80,10 @@ public class Generator {
 
     if (constraint instanceof String) {
       String result = (String) constraint;
-      registeredVariables.add(result);
+      if (! onlyDigits(result)) {
+        registeredVariables.add(result);
+      }
+
       return result;
     } else {
       List<Object> evaluatedInputs = new ArrayList<>();
@@ -228,4 +243,39 @@ public class Generator {
         inPlaceInputParams -> "(ite " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + " " + inPlaceInputParams.get(2) + ")" ;
     executedAggregator.add(new Triple<>(result, inputParams, saveResult));
   }
+
+  /** NumeralFormularManager **/
+
+  public static void logMakeNumber(Object result, String pVar) {
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(pVar);
+    Function<List<Object>, String> saveResult = inPlaceInputParams -> (String) inPlaceInputParams.get(0);
+    executedAggregator.add(new Triple<>(result, inputParams, saveResult));
+  }
+
+  public static void logMakeIntVariable(Object result, String pVar) {
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(pVar);
+    Function<List<Object>, String> saveResult = inPlaceInputParams -> (String) inPlaceInputParams.get(0);
+    executedAggregator.add(new Triple<>(result, inputParams, saveResult));
+  }
+
+  public static void logAdd(Object result, NumeralFormula pNumber1, NumeralFormula pNumber2) {
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(pNumber1);
+    inputParams.add(pNumber2);
+    Function<List<Object>, String> saveResult =
+        inPlaceInputParams -> "(+ " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    executedAggregator.add(new Triple<>(result, inputParams, saveResult));
+  }
+
+  public static void logEqual(Object result, NumeralFormula pNumber1, NumeralFormula pNumber2) {
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(pNumber1);
+    inputParams.add(pNumber2);
+    Function<List<Object>, String> saveResult =
+        inPlaceInputParams -> "(= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    executedAggregator.add(new Triple<>(result, inputParams, saveResult));
+  }
+
 }
