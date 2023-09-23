@@ -1,4 +1,4 @@
-(set-logic ALL)
+(set-logic QF_LIA)
 (declare-const x Bool)
 (assert (= x (+ 1 2)))
 (check-sat)

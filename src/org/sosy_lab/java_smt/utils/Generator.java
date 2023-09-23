@@ -20,7 +20,6 @@
 
 package org.sosy_lab.java_smt.utils;
 
-import de.uni_freiburg.informatik.ultimate.smtinterpol.theory.epr.util.Triple;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -46,13 +45,13 @@ public class Generator {
    * a list of objects (input of used method)
    * a function which takes a list of objects and returns a String
    */
-  static List<Triple<Object, List<Object>, Function<List<Object>, String>>> executedAggregator =
+  static List<RecursiveString> executedAggregator =
       new ArrayList<>();
 
   private static final List<String> registeredVariables = new ArrayList<>();
 
   public Generator() throws IOException {
-    lines.append("(set-logic ALL)\n");
+    lines.append("(set-logic QF_LIA)\n");
   }
 
   public static void writeToFile(String line) throws IOException {
@@ -72,9 +71,9 @@ public class Generator {
   }
 
   public static String evaluateRecursive(Object constraint) {
-    Triple<Object, List<Object>, Function<List<Object>, String>> methodToEvaluate = executedAggregator
+    RecursiveString methodToEvaluate = executedAggregator
         .stream()
-        .filter(x -> x.getFirst().equals(constraint))
+        .filter(x -> x.getResult().equals(constraint))
         .findFirst()
         .orElse(null);
 
@@ -83,15 +82,14 @@ public class Generator {
       if (! onlyDigits(result)) {
         registeredVariables.add(result);
       }
-
       return result;
     } else {
       List<Object> evaluatedInputs = new ArrayList<>();
-      for (Object value: Objects.requireNonNull(methodToEvaluate).getSecond()) {
+      for (Object value: Objects.requireNonNull(methodToEvaluate).getInputParams()) {
         String evaluatedInput = evaluateRecursive(value);
         evaluatedInputs.add(evaluatedInput);
       }
-      String result = methodToEvaluate.getThird().apply(evaluatedInputs);
+      String result = methodToEvaluate.getSaveResult().apply(evaluatedInputs);
       return result;
     }
   }
@@ -129,28 +127,28 @@ public class Generator {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pVar);
     Function<List<Object>, String> saveResult = inPlaceInputParams -> (String) inPlaceInputParams.get(0);
-    executedAggregator.add(new Triple<>(result, inputParams, saveResult));
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult));
   }
 
   public static void logMakeTrue(Object result, String pVar) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pVar);
     Function<List<Object>, String> saveResult = inPlaceInputParams -> (String) inPlaceInputParams.get(0);
-    executedAggregator.add(new Triple<>(result, inputParams, saveResult));
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult));
   }
 
   public static void logMakeFalse(Object result, String pVar) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pVar);
     Function<List<Object>, String> saveResult = inPlaceInputParams -> (String) inPlaceInputParams.get(0);
-    executedAggregator.add(new Triple<>(result, inputParams, saveResult));
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult));
   }
 
   public static void logNot(Object result, BooleanFormula pBits) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pBits);
     Function<List<Object>, String> saveResult = inPlaceInputParams -> "(not " + inPlaceInputParams.get(0) + ")";
-    executedAggregator.add(new Triple<>(result, inputParams, saveResult));
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult));
   }
 
   public static void logOr(Object result, BooleanFormula pBits1, BooleanFormula pBits2) {
@@ -159,7 +157,7 @@ public class Generator {
     inputParams.add(pBits2);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(or " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    executedAggregator.add(new Triple<>(result, inputParams, saveResult));
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult));
   }
 
   public static void logOr(Object result, Collection<BooleanFormula> pBits1) {
@@ -175,7 +173,7 @@ public class Generator {
           inPlaceInputParams.forEach((c) -> {out.append(c); out.append(" ");}); return String.valueOf(
             out.deleteCharAt(out.length()-1).append(")"));};
 
-    executedAggregator.add(new Triple<>(result, inputParams, saveResult));
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult));
   }
 
   public static void logAnd(Object result, BooleanFormula pBits1, BooleanFormula pBits2) {
@@ -184,7 +182,7 @@ public class Generator {
     inputParams.add(pBits2);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(and " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    executedAggregator.add(new Triple<>(result, inputParams, saveResult));
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult));
   }
 
   public static void logAnd(Object result, Collection<BooleanFormula> pBits1) {
@@ -200,7 +198,7 @@ public class Generator {
           inPlaceInputParams.forEach((c) -> {out.append(c); out.append(" ");}); return String.valueOf(
               out.deleteCharAt(out.length()-1).append(")"));};
 
-    executedAggregator.add(new Triple<>(result, inputParams, saveResult));
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult));
   }
 
   public static void logXor(Object result,BooleanFormula pBits1, BooleanFormula pBits2) {
@@ -209,7 +207,7 @@ public class Generator {
     inputParams.add(pBits2);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(xor " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    executedAggregator.add(new Triple<>(result, inputParams, saveResult));
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult));
   }
 
   public static void logEquivalence(Object result, BooleanFormula pBits1, BooleanFormula pBits2) {
@@ -218,7 +216,7 @@ public class Generator {
     inputParams.add(pBits2);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    executedAggregator.add(new Triple<>(result, inputParams, saveResult));
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult));
   }
 
   public static void logImplication(Object result,BooleanFormula pBits1, BooleanFormula pBits2) {
@@ -227,7 +225,7 @@ public class Generator {
     inputParams.add(pBits2);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(=> " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    executedAggregator.add(new Triple<>(result, inputParams, saveResult));
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult));
   }
 
   //TODO: logIsTrue (not necessary?)
@@ -241,7 +239,7 @@ public class Generator {
     inputParams.add(f2);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(ite " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + " " + inPlaceInputParams.get(2) + ")" ;
-    executedAggregator.add(new Triple<>(result, inputParams, saveResult));
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult));
   }
 
   /** NumeralFormularManager **/
@@ -250,14 +248,14 @@ public class Generator {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pVar);
     Function<List<Object>, String> saveResult = inPlaceInputParams -> (String) inPlaceInputParams.get(0);
-    executedAggregator.add(new Triple<>(result, inputParams, saveResult));
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult));
   }
 
   public static void logMakeIntVariable(Object result, String pVar) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pVar);
     Function<List<Object>, String> saveResult = inPlaceInputParams -> (String) inPlaceInputParams.get(0);
-    executedAggregator.add(new Triple<>(result, inputParams, saveResult));
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult));
   }
 
   public static void logAdd(Object result, NumeralFormula pNumber1, NumeralFormula pNumber2) {
@@ -266,7 +264,7 @@ public class Generator {
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(+ " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    executedAggregator.add(new Triple<>(result, inputParams, saveResult));
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult));
   }
 
   public static void logEqual(Object result, NumeralFormula pNumber1, NumeralFormula pNumber2) {
@@ -275,7 +273,7 @@ public class Generator {
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    executedAggregator.add(new Triple<>(result, inputParams, saveResult));
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult));
   }
 
 }
