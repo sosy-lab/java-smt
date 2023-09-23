@@ -18,11 +18,11 @@ package org.sosy_lab.java_smt;/*
  *  limitations under the License.
  */
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collector;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import org.sosy_lab.common.*;
 import org.sosy_lab.common.configuration.*;
+import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.*;
 import org.sosy_lab.common.log.*;
@@ -44,8 +44,10 @@ public class Main {
     BooleanFormulaManager bmgr = fmgr.getBooleanFormulaManager();
     IntegerFormulaManager imgr = fmgr.getIntegerFormulaManager();
 
+    BigDecimal zwei = BigDecimal.valueOf(2.0);
+
     IntegerFormula one = imgr.makeNumber(1);
-    IntegerFormula two = imgr.makeNumber(2);
+    IntegerFormula two = imgr.makeNumber(zwei);
     IntegerFormula x = imgr.makeVariable("x");
     BooleanFormula constraint = imgr.equal (x, imgr.add(one, two));
 

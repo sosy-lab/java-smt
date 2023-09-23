@@ -92,7 +92,7 @@ public abstract class AbstractNumeralFormulaManager<
   @Override
   public ResultFormulaType makeNumber(long i) {
     ResultFormulaType result = wrap(makeNumberImpl(i));
-    Generator.logMakeFalse(result, String.valueOf(i));
+    Generator.logMakeNumber(result, String.valueOf(i));
     return result;
   }
 
@@ -100,21 +100,27 @@ public abstract class AbstractNumeralFormulaManager<
 
   @Override
   public ResultFormulaType makeNumber(BigInteger i) {
-    return wrap(makeNumberImpl(i));
+    ResultFormulaType result = wrap(makeNumberImpl(i));
+    Generator.logMakeNumber(result, String.valueOf(i));
+    return result;
   }
 
   protected abstract TFormulaInfo makeNumberImpl(BigInteger i);
 
   @Override
   public ResultFormulaType makeNumber(String i) {
-    return wrap(makeNumberImpl(i));
+    ResultFormulaType result = wrap(makeNumberImpl(i));
+    Generator.logMakeNumber(result, i);
+    return result;
   }
 
   protected abstract TFormulaInfo makeNumberImpl(String i);
 
   @Override
   public ResultFormulaType makeNumber(Rational pRational) {
-    return wrap(makeNumberImpl(pRational));
+    ResultFormulaType result = wrap(makeNumberImpl(pRational));
+    Generator.logMakeNumber(result, String.valueOf(pRational));
+    return result;
   }
 
   protected TFormulaInfo makeNumberImpl(Rational pRational) {
@@ -123,6 +129,8 @@ public abstract class AbstractNumeralFormulaManager<
 
   @Override
   public ResultFormulaType makeNumber(double pNumber) {
+    ResultFormulaType result = wrap(makeNumberImpl(pNumber));
+    Generator.logMakeNumber(result, String.valueOf(pNumber));
     return wrap(makeNumberImpl(pNumber));
   }
 
@@ -130,6 +138,8 @@ public abstract class AbstractNumeralFormulaManager<
 
   @Override
   public ResultFormulaType makeNumber(BigDecimal pNumber) {
+    ResultFormulaType result = wrap(makeNumberImpl(pNumber));
+    Generator.logMakeNumber(result, String.valueOf(pNumber));
     return wrap(makeNumberImpl(pNumber));
   }
 

@@ -40,18 +40,13 @@ public class Generator {
   static String fileName = "Out.txt";
   static StringBuilder lines = new StringBuilder();
 
-  /** List of Triples which contain:
-   * an object (output of used method)
-   * a list of objects (input of used method)
-   * a function which takes a list of objects and returns a String
-   */
   static List<RecursiveString> executedAggregator =
       new ArrayList<>();
 
   private static final List<String> registeredVariables = new ArrayList<>();
 
   public Generator() throws IOException {
-    lines.append("(set-logic QF_LIA)\n");
+    lines.append("(set-logic AUFLIRA)\n");
   }
 
   public static void writeToFile(String line) throws IOException {
@@ -62,7 +57,7 @@ public class Generator {
   }
 
   public static boolean onlyDigits(String str) {
-    String regex = "[0-9]+";
+    String regex = "[0-9 | . | ,]+";
     Pattern p = Pattern.compile(regex);
 
     Matcher m = p.matcher(str);
