@@ -41,11 +41,12 @@ public class _IO_FILE {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
-  @SuppressWarnings("deprecation")
+  @SuppressWarnings({"deprecation", "Finalize"})
   protected void finalize() {
     delete();
   }
 
+  @SuppressWarnings("UnsafeFinalization")
   public synchronized void delete() {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {

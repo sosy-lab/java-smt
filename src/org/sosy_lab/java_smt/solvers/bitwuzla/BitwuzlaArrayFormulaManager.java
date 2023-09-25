@@ -31,13 +31,13 @@ import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
 public class BitwuzlaArrayFormulaManager
     extends AbstractArrayFormulaManager<Long, Long, Long, Long> {
 
-  private final long bitwuzla;
-  private final Table<String, Long, Long> nameFormulaCache;
+  // private final long bitwuzla;
+  //private final Table<String, Long, Long> formulaCache;
 
   protected BitwuzlaArrayFormulaManager(BitwuzlaFormulaCreator pCreator) {
     super(pCreator);
-    this.bitwuzla = pCreator.getEnv();
-    this.nameFormulaCache = pCreator.getCache();
+    // this.bitwuzla = pCreator.getEnv();
+    //this.formulaCache = pCreator.getCache();
   }
 
   @Override
@@ -56,10 +56,21 @@ public class BitwuzlaArrayFormulaManager
   protected <TI extends Formula, TE extends Formula> Long internalMakeArray(
       String pName, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
 
+// Maybe use FormulaCache if tests fail
+//    Long maybeFormula = formulaCache.get(pName, pIndexType);
+//    if (maybeFormula != null) {
+//      return maybeFormula;
+//    }
+//    if (formulaCache.containsRow(pName)) {
+//      throw new IllegalArgumentException("Symbol already used: " + pName);
+//    }
+
     final ArrayFormulaType<TI, TE> arrayFormulaType =
         FormulaType.getArrayType(pIndexType, pElementType);
     final long bitwuzlaArrayType = toSolverType(arrayFormulaType);
-    return getFormulaCreator().makeVariable(bitwuzlaArrayType, pName);
+    long newVar = getFormulaCreator().makeVariable(bitwuzlaArrayType, pName);
+    //formulaCache.put(pName, pIndexType, newVar);
+    return newVar;
   }
 
   @Override

@@ -45,6 +45,8 @@ public class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void>
   private final AtomicBoolean isAnyStackAlive;
 
   private final long pEnv;
+
+  @SuppressWarnings("unused")
   private final BitwuzlaFormulaManager manager;
   private final BitwuzlaFormulaCreator creator;
   protected boolean wasLastSatCheckSat = false; // and stack is not changed
@@ -80,11 +82,6 @@ public class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void>
     bitwuzlaJNI.bitwuzla_pop(pEnv, 1);
   }
 
-  /**
-   * Add a constraint to the latest backtracking point.
-   *
-   * @param constraint
-   */
   @Override
   public @Nullable Void addConstraint(BooleanFormula constraint) throws InterruptedException {
     Preconditions.checkState(!closed);

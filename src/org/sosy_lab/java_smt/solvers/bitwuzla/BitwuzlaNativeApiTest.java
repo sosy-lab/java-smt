@@ -1,5 +1,8 @@
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.After;
 import org.junit.AssumptionViolatedException;
 import org.junit.Before;
@@ -64,7 +67,7 @@ public class BitwuzlaNativeApiTest {
 
     long resultSort = bitwuzlaJNI.bitwuzla_term_get_sort(term);
 
-    assert bitwuzlaJNI.bitwuzla_sort_is_equal(sortbv8, resultSort);
+    assertTrue(bitwuzlaJNI.bitwuzla_sort_is_equal(sortbv8, resultSort));
   }
 
   @Test
@@ -170,13 +173,13 @@ public class BitwuzlaNativeApiTest {
         long value = bitwuzlaJNI.bitwuzla_get_value(bitwuzla, decls[i]);
         long[] size = new long[1];
         long children = bitwuzlaJNI.bitwuzla_term_get_children(value, size);
-        assert size[0] == 2;
+        assertEquals(2, size[0]);
         int j = 0;
         while (bitwuzlaJNI.bitwuzla_term_get_kind(
                 bitwuzlaJNI.BitwuzlaTermArray_getitem(children, 1))
             == BitwuzlaKind.BITWUZLA_KIND_LAMBDA.swigValue()) {
-          assert bitwuzlaJNI.bitwuzla_term_is_var(
-              bitwuzlaJNI.BitwuzlaTermArray_getitem(children, 0));
+          assertTrue(bitwuzlaJNI.bitwuzla_term_is_var(
+              bitwuzlaJNI.BitwuzlaTermArray_getitem(children, 0)));
           System.out.print(
               (j > 0 ? " " : "")
                   + bitwuzlaJNI.bitwuzla_term_to_string(
@@ -190,7 +193,8 @@ public class BitwuzlaNativeApiTest {
           children = bitwuzlaJNI.bitwuzla_term_get_children(value, size);
           j += 1;
         }
-        assert bitwuzlaJNI.bitwuzla_term_is_var(bitwuzlaJNI.BitwuzlaTermArray_getitem(children, 0));
+        assertTrue(bitwuzlaJNI.bitwuzla_term_is_var(bitwuzlaJNI.BitwuzlaTermArray_getitem(children,
+            0)));
         System.out.print(
             (j > 0 ? " " : "")
                 + bitwuzlaJNI.bitwuzla_term_to_string(

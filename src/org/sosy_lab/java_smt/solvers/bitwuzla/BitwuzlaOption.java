@@ -96,6 +96,7 @@ public final class BitwuzlaOption {
     return swigValue;
   }
 
+  @Override
   public String toString() {
     return swigName;
   }
@@ -115,12 +116,14 @@ public final class BitwuzlaOption {
     this.swigValue = swigNext++;
   }
 
+  @SuppressWarnings({"unused", "StaticAssignmentInConstructor"})
   private BitwuzlaOption(String swigName, int swigValue) {
     this.swigName = swigName;
     this.swigValue = swigValue;
     swigNext = swigValue + 1;
   }
 
+  @SuppressWarnings({"StaticAssignmentInConstructor", "unused"})
   private BitwuzlaOption(String swigName, BitwuzlaOption swigEnum) {
     this.swigName = swigName;
     this.swigValue = swigEnum.swigValue;
