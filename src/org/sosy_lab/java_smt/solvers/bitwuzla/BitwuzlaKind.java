@@ -183,6 +183,7 @@ public final class BitwuzlaKind {
     return swigValue;
   }
 
+  @Override
   public String toString() {
     return swigName;
   }
@@ -202,17 +203,18 @@ public final class BitwuzlaKind {
     this.swigValue = swigNext++;
   }
 
+  @SuppressWarnings("StaticAssignmentInConstructor")
   private BitwuzlaKind(String swigName, int swigValue) {
     this.swigName = swigName;
     this.swigValue = swigValue;
     swigNext = swigValue + 1;
   }
 
-  private BitwuzlaKind(String swigName, BitwuzlaKind swigEnum) {
-    this.swigName = swigName;
-    this.swigValue = swigEnum.swigValue;
-    swigNext = this.swigValue + 1;
-  }
+//  private BitwuzlaKind(String swigName, BitwuzlaKind swigEnum) {
+//    this.swigName = swigName;
+//    this.swigValue = swigEnum.swigValue;
+//    swigNext = this.swigValue + 1;
+//  }
 
   private static BitwuzlaKind[] swigValues = {
     BITWUZLA_KIND_CONSTANT,
