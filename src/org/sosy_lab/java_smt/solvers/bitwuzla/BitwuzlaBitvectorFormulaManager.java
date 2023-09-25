@@ -27,13 +27,13 @@ import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 public class BitwuzlaBitvectorFormulaManager
     extends AbstractBitvectorFormulaManager<Long, Long, Long, Long> {
-  private final long bitwuzla;
+  // private final long bitwuzla;
 
   protected BitwuzlaBitvectorFormulaManager(
       FormulaCreator<Long, Long, Long, Long> pCreator,
       AbstractBooleanFormulaManager<Long, Long, Long, Long> pBmgr) {
     super(pCreator, pBmgr);
-    this.bitwuzla = pCreator.getEnv();
+    // this.bitwuzla = pCreator.getEnv();
   }
 
   @Override

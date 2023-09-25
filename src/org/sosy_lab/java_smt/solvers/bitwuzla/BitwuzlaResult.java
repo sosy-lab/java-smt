@@ -20,6 +20,7 @@ public final class BitwuzlaResult {
     return swigValue;
   }
 
+  @Override
   public String toString() {
     return swigName;
   }
@@ -34,17 +35,20 @@ public final class BitwuzlaResult {
         "No enum " + BitwuzlaResult.class + " with value " + swigValue);
   }
 
+  @SuppressWarnings("unused")
   private BitwuzlaResult(String swigName) {
     this.swigName = swigName;
     this.swigValue = swigNext++;
   }
 
+  @SuppressWarnings("StaticAssignmentInConstructor")
   private BitwuzlaResult(String swigName, int swigValue) {
     this.swigName = swigName;
     this.swigValue = swigValue;
     swigNext = swigValue + 1;
   }
 
+  @SuppressWarnings({"unused", "StaticAssignmentInConstructor"})
   private BitwuzlaResult(String swigName, BitwuzlaResult swigEnum) {
     this.swigName = swigName;
     this.swigValue = swigEnum.swigValue;

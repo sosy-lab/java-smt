@@ -43,28 +43,6 @@ final class BitwuzlaFormulaManager extends AbstractFormulaManager<Long, Long, Lo
         null);
   }
 
-  /**
-   * Parse a boolean formula given as a String in an SMTLIB file format. We expect exactly one
-   * assertion to be contained in the query.
-   *
-   * <p>Example: <code>(declare-fun x () Int)(assert (= 0 x))</code>
-   *
-   * <p>It depends on the used SMT solver whether the given query must be self-contained and include
-   * declarations for all used symbols or not, and also whether the query is allowed to contain
-   * symbols with equal name, but different type/sort than existing symbols. The safest way is to
-   * always declare all used symbols and to avoid conflicting types for them.
-   *
-   * <p>The behavior of the SMT solver is undefined if commands are provided in the SMTLIB-based
-   * String that are different from declarations or an assertion, such as <code>push/pop</code> or
-   * <code>set-info</code>. Most solvers just ignore those commands.
-   *
-   * <p>Variables that are defined, but not used in the assertion, might be ignored by the SMT
-   * solver and they might not be available for later usage.
-   *
-   * @param s
-   * @return A single formula from the assertion in the internal representation.
-   * @throws IllegalArgumentException If the string cannot be parsed.
-   */
   @Override
   public BooleanFormula parse(String s) throws IllegalArgumentException {
     long options = bitwuzlaJNI.bitwuzla_options_new();
@@ -133,7 +111,6 @@ final class BitwuzlaFormulaManager extends AbstractFormulaManager<Long, Long, Lo
             extractVariablesAndUFs(getFormulaCreator().encapsulateWithTypeOf(pTerm));
         for (Map.Entry<String, Formula> entry : varsAndUFs.entrySet()) {
           final long currentTerm = ((BitwuzlaFormula) entry.getValue()).getTerm();
-          final long currentType = bitwuzlaJNI.bitwuzla_term_get_sort(currentTerm);
 
           if (bitwuzlaJNI.bitwuzla_term_is_fun(currentTerm)) {
             long[] pDomainSize = new long[1];

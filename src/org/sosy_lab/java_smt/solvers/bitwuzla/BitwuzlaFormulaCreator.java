@@ -410,16 +410,9 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
     //    double result = calculateDecimal(mySplit[3], mySplit[2], mySplit[1]);
   }
 
-  /**
-   * @param visitor
-   * @param formula
-   * @param f
-   * @see FormulaManager#visit
-   */
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula formula, Long f)
       throws UnsupportedOperationException {
-    BitwuzlaKind kind = BitwuzlaKind.swigToEnum(bitwuzlaJNI.bitwuzla_term_get_kind(f));
     if (bitwuzlaJNI.bitwuzla_term_is_bv_value(f)) {
       return visitor.visitConstant(
           formula, new BigInteger(bitwuzlaJNI.bitwuzla_term_value_get_str(f, 10)));

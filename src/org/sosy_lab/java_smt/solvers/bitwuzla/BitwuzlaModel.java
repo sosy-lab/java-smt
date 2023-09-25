@@ -11,19 +11,20 @@ import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 
 public class BitwuzlaModel extends AbstractModel<Long, Long, Long> {
   private final long pBitwuzla;
+  @SuppressWarnings("unused")
   private final BitwuzlaTheoremProver prover;
-  private final BitwuzlaFormulaCreator creator;
+  private final BitwuzlaFormulaCreator bitwuzlaCreator;
   private final ImmutableList<Long> assertedTerms;
 
   protected BitwuzlaModel(
       long pBitwuzla,
       BitwuzlaTheoremProver prover,
-      BitwuzlaFormulaCreator creator,
+      BitwuzlaFormulaCreator bitwuzlaCreator,
       Collection<Long> assertedTerms) {
-    super(prover, creator);
+    super(prover, bitwuzlaCreator);
     this.pBitwuzla = pBitwuzla;
     this.prover = prover;
-    this.creator = creator;
+    this.bitwuzlaCreator = bitwuzlaCreator;
     this.assertedTerms = ImmutableList.copyOf(assertedTerms);
   }
 
@@ -103,22 +104,16 @@ public class BitwuzlaModel extends AbstractModel<Long, Long, Long> {
     List<Object> argumentInterpretation = new ArrayList<>();
     long pValueTerm = bitwuzlaJNI.bitwuzla_get_value(pBitwuzla, pTerm);
     return new ValueAssignment(
-        creator.encapsulateWithTypeOf(pTerm),
-        creator.encapsulateWithTypeOf(pValueTerm),
-        creator.encapsulateBoolean(
+        bitwuzlaCreator.encapsulateWithTypeOf(pTerm),
+        bitwuzlaCreator.encapsulateWithTypeOf(pValueTerm),
+        bitwuzlaCreator.encapsulateBoolean(
             bitwuzlaJNI.bitwuzla_mk_term2(
                 BitwuzlaKind.BITWUZLA_KIND_EQUAL.swigValue(), pTerm, pValueTerm)),
         bitwuzlaJNI.bitwuzla_term_get_symbol(pTerm),
-        creator.convertValue(pTerm, pValueTerm),
+        bitwuzlaCreator.convertValue(pTerm, pValueTerm),
         argumentInterpretation);
   }
 
-  /**
-   * Simplify the given formula and replace all symbols with their model values. If a symbol is not
-   * set in the model and evaluation aborts, return <code>null</code>.
-   *
-   * @param formula
-   */
   @Override
   protected @Nullable Long evalImpl(Long formula) {
     return bitwuzlaJNI.bitwuzla_get_value(pBitwuzla, formula);
