@@ -405,7 +405,7 @@ SPDX-License-Identifier: Apache-2.0
             numbers from the ivy repository. The script will append the git revision.
         </fail>
 
-        <!-- get a nive version -->
+        <!-- get a naive version -->
         <exec executable="git" dir="${boolector.path}" outputproperty="boolector.revision" failonerror="true">
             <arg value="show"/>
             <arg value="-s"/>
@@ -652,6 +652,110 @@ SPDX-License-Identifier: Apache-2.0
                 to make the new version publicly available.</echo>
         </sequential>
     </target>
+
+    <!-- SECTION: Publishing Bitwuzla {{{1
+         ==================================================================
+    -->
+    <target name="package-bitwuzla" depends="">
+        <!-- Copy Bitwuzla repository to the root folder along with the version postfix. -->
+        <fail unless="bitwuzla.path">
+            Please specify the path to Bitwuzla with the flag -Dbitwuzla.path=/path/to/bitwuzla.
+            The path has to point to the root Bitwuzla folder, i.e.,
+            a checkout of the official git repositoy from 'https://github.com/bitwuzla/bitwuzla'.
+            Note that shell substitutions do not work and a full absolute path has to be specified.
+        </fail>
+        <fail unless="bitwuzla.customRev">
+            Please specify a custom revision with the flag -Dbitwuzla.customRev=XXX.
+            The custom revision has to be unique amongst the already known version
+            numbers from the ivy repository. The script will append the git revision.
+        </fail>
+
+        <!-- get a naive version -->
+        <exec executable="git" dir="${bitwuzla.path}" outputproperty="bitwuzla.revision" failonerror="true">
+            <arg value="show"/>
+            <arg value="-s"/>
+            <arg value="--format=%h"/>
+        </exec>
+        <property name="bitwuzla.version" value="${bitwuzla.customRev}-g${bitwuzla.revision}"/>
+        <echo message="Building Bitwuzla in version '${bitwuzla.version}'"/>
+
+        <!-- add JNI wrapper before compiling Bitwuzla -->
+        <copy file="lib/native/source/libbitwuzla/bitwuzla_wrap.c"
+              tofile="${bitwuzla.path}/src/bitwuzla_wrap.c"/>
+<!--        <copy file="lib/native/source/libbitwuzla/include_interface_and_jni.patch" tofile="${bitwuzla.path}/src/include_interface_and_jni.patch"/>-->
+<!--        <exec executable="git" dir="${bitwuzla.path}" failonerror="true">-->
+<!--            <arg value="apply"/>-->
+<!--            <arg value="src/include_interface_and_jni.patch"/>-->
+<!--        </exec>-->
+
+<!--         build Bitwuzla-->
+<!--        <exec executable="./contrib/setup-picosat.sh"    dir="${bitwuzla.path}" failonerror="true"/>-->
+<!--        <exec executable="./contrib/setup-minisat.sh"    dir="${bitwuzla.path}" failonerror="true"/>-->
+<!--        <exec executable="./contrib/setup-cms.sh"    	 dir="${bitwuzla.path}" failonerror="true"/>-->
+<!--        <exec executable="./contrib/setup-lingeling.sh"  dir="${bitwuzla.path}" failonerror="true"/>-->
+<!--        <exec executable="./contrib/setup-cadical.sh"    dir="${bitwuzla.path}" failonerror="true"/>-->
+<!--        <exec executable="./contrib/setup-btor2tools.sh" dir="${bitwuzla.path}" failonerror="true"/>-->
+<!--        <exec executable="./configure.sh" dir="${bitwuzla.path}" failonerror="true">-->
+<!--            <arg value="-fno-strict-aliasing"/>-->
+<!--            <arg value="-fpic"/>-->
+<!--            <arg value="&#45;&#45;shared"/>-->
+<!--        </exec>-->
+<!--        <exec executable="make" dir="${bitwuzla.path}/build/" failonerror="true">-->
+<!--            <arg value="-j4" />-->
+<!--        </exec>-->
+
+        <exec executable="./configure.py"       dir="${bitwuzla.path}" failonerror="true">
+            <arg value="--shared"/>
+        </exec>
+        <exec executable="ninja"       dir="${bitwuzla.path/build/}" failonerror="true">
+            <arg value="install"/>
+        </exec>
+
+        <!-- remove unneeded symbols -->
+<!--        <exec executable="strip" dir="${bitwuzla.path}/deps/install/lib/" failonerror="true">-->
+<!--            <arg value="libpicosat.so" />-->
+<!--        </exec>-->
+<!--        <exec executable="strip" dir="${bitwuzla.path}/deps/install/lib/" failonerror="true">-->
+<!--            <arg value="libminisat.so" />-->
+<!--        </exec>-->
+<!--        <exec executable="strip" dir="${bitwuzla.path}/build/lib/" failonerror="true">-->
+<!--            <arg value="libbitwuzla.so" />-->
+<!--        </exec>-->
+
+        <!-- fix RPATH and library dependencies -->
+<!--        <exec executable="patchelf" dir="${bitwuzla.path}/build/lib/" failonerror="true">-->
+<!--            <arg value="&#45;&#45;set-rpath"/><arg value="$ORIGIN"/>-->
+<!--            <arg value="&#45;&#45;replace-needed"/><arg value="libminisat.so.2"/><arg value="libminisat.so"/>-->
+<!--            <arg value="libbitwuzla.so"/>-->
+<!--        </exec>-->
+
+        <!-- copy library files into directory to be published for IVY -->
+<!--        <copy file="${bitwuzla.path}/deps/install/lib/libminisat.so" tofile="libminisat-${bitwuzla.version}.so"/>-->
+<!--        <copy file="${bitwuzla.path}/deps/install/lib/libpicosat.so" tofile="libpicosat-${bitwuzla.version}.so"/>-->
+        <copy file="${bitwuzla.path}/build/lib/libbitwuzla.so"      tofile="libbitwuzla-${bitwuzla.version}.so"/>
+    </target>
+
+    <target name="publish-bitwuzla" depends="package-bitwuzla, load-ivy"
+            description="Publish Bitwuzla binaries to Ivy repository.">
+
+        <ivy:resolve conf="solver-bitwuzla" file="solvers_ivy_conf/ivy_bitwuzla.xml" />
+        <available property="ivy.hasrepository" file="repository/${ivy.organisation}/${ivy.module}" />
+        <fail unless="ivy.hasrepository"
+              message="Cannot publish without 'repository' dir, please run 'svn co https://svn.sosy-lab.org/software/ivy/repository/${ivy.organisation}/${ivy.module} repository/${ivy.organisation}/${ivy.module}'." />
+
+        <ivy:publish
+                pubrevision="${bitwuzla.version}"
+                resolver="Sosy-Lab-Publish"
+                artifactspattern="[artifact]-[revision].[ext]"
+                status="release"
+        />
+        <echo>
+            You now want to run
+            svn add repository/${ivy.organisation}/${ivy.module}/*-${bitwuzla.version}*
+            svn ci repository/${ivy.organisation}/${ivy.module} -m"publish version ${bitwuzla.version} of Bitwuzla Solver"
+            to make the new version publicly available.</echo>
+    </target>
+
     <!-- }}} -->
 
     <macrodef name="checkPathOption">
