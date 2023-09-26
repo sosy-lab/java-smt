@@ -42,6 +42,7 @@ import apron.Texpr1BinNode;
 import apron.Texpr1CstNode;
 import apron.Texpr1VarNode;
 import com.google.common.base.Preconditions;
+import org.checkerframework.checker.units.qual.A;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.internal.AssumptionViolatedException;
@@ -73,6 +74,22 @@ public class ApronNativeApiTest {
     Tcons1 constraint = new Tcons1(environment,Tcons1.DISEQ,leftArg);
     Abstract1 abstract1 = new Abstract1(manager, new Tcons1[]{xIsZero,yIsZero,constraint});
     Preconditions.checkArgument(abstract1.isBottom(manager));
+  }
+
+  /**
+   * Test that gives an example of how a domain simplifies constraints
+   * @throws ApronException
+   */
+  @Test
+  public void addConstraintsTest() throws ApronException {
+    // x+x = 0 and x = 0 is added as only one constraints
+    Texpr1VarNode x = new Texpr1VarNode("x");
+    Texpr1BinNode add = new Texpr1BinNode(Texpr1BinNode.OP_ADD, x, x);
+    Environment environment = new Environment(new String[]{"x"},new String[]{});
+    Tcons1 isZero = new Tcons1(environment, Tcons1.EQ, add);
+    Tcons1 xisZero = new Tcons1(environment, Tcons1.EQ, x);
+    Abstract1 abstract1 = new Abstract1(manager, new Tcons1[]{isZero, xisZero});
+    Preconditions.checkArgument(abstract1.toTcons(manager).length == 1);
   }
 
 }
