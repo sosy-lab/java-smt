@@ -52,6 +52,7 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
 
   @Test
   public void testConjunctionCollector() {
+    requireNonNumeralVariables();
     List<BooleanFormula> terms =
         ImmutableList.of(
             bmgr.makeVariable("a"),
@@ -66,6 +67,7 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
 
   @Test
   public void testDisjunctionCollector() {
+    requireNonNumeralVariables();
     List<BooleanFormula> terms =
         ImmutableList.of(
             bmgr.makeVariable("a"),
@@ -88,6 +90,7 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
 
   @Test
   public void testConjunctionArgsExtraction() throws SolverException, InterruptedException {
+    requireNonNumeralVariables();
     requireIntegers();
     BooleanFormula input =
         bmgr.and(bmgr.makeVariable("a"), imgr.equal(imgr.makeNumber(1), imgr.makeVariable("x")));
@@ -101,6 +104,7 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
   @Test
   public void testConjunctionArgsExtractionRecursive()
       throws SolverException, InterruptedException {
+    requireNonNumeralVariables();
     BooleanFormula input;
     ImmutableSet<BooleanFormula> comparisonSet;
     if (imgr != null) {
@@ -166,6 +170,7 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
 
   @Test
   public void testDisjunctionArgsExtraction() throws SolverException, InterruptedException {
+    requireNonNumeralVariables();
     BooleanFormula input;
     ImmutableSet<BooleanFormula> comparisonSet;
     if (imgr != null) {
@@ -194,6 +199,7 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
   @Test
   public void testDisjunctionArgsExtractionRecursive()
       throws SolverException, InterruptedException {
+    requireNonNumeralVariables();
     BooleanFormula input;
     ImmutableSet<BooleanFormula> comparisonSet;
     if (imgr != null) {
@@ -251,6 +257,7 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
 
   @Test
   public void simplificationTest() {
+    requireNonNumeralVariables();
     // Boolector and CVC5 fail this as it either simplifies to much, or nothing
     // TODO: maybe this is just a matter of options, check!
     assume()
@@ -305,6 +312,7 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
 
   @Test
   public void simpleImplicationTest() throws InterruptedException, SolverException {
+    requireNonNumeralVariables();
     BooleanFormula x = bmgr.makeVariable("x");
     BooleanFormula y = bmgr.makeVariable("y");
     BooleanFormula z = bmgr.makeVariable("z");

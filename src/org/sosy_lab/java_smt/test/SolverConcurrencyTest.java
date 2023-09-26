@@ -147,7 +147,7 @@ public class SolverConcurrencyTest {
     assume()
         .withMessage("Solver does not support bitvectors")
         .that(solver)
-        .isNoneOf(Solvers.SMTINTERPOL, Solvers.YICES2);
+        .isNoneOf(Solvers.SMTINTERPOL, Solvers.YICES2, Solvers.APRON);
   }
 
   private void requireOptimization() {
@@ -160,7 +160,15 @@ public class SolverConcurrencyTest {
             Solvers.PRINCESS,
             Solvers.CVC4,
             Solvers.CVC5,
-            Solvers.YICES2);
+            Solvers.YICES2,
+            Solvers.APRON);
+  }
+
+  protected void requireNonNumeralVariables(){
+    assume()
+        .withMessage("Solver %s does not support non-numeral variables", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.APRON);
   }
 
   /**
@@ -170,6 +178,7 @@ public class SolverConcurrencyTest {
   @Test
   public void testIntConcurrencyWithConcurrentContext() {
     requireIntegers();
+    requireNonNumeralVariables();
     assertConcurrency(
         "testIntConcurrencyWithConcurrentContext",
         () -> {
@@ -223,6 +232,7 @@ public class SolverConcurrencyTest {
   public void testFormulaTranslationWithConcurrentContexts()
       throws InvalidConfigurationException, InterruptedException, SolverException {
     requireIntegers();
+    requireNonNumeralVariables();
     // CVC4 does not support parsing and therefore no translation.
     // Princess has a wierd bug
     // TODO: Look into the Princess problem
@@ -278,7 +288,7 @@ public class SolverConcurrencyTest {
   @Test
   public void testIntConcurrencyWithoutConcurrentContext() throws InvalidConfigurationException {
     requireIntegers();
-
+    requireNonNumeralVariables();
     assume()
         .withMessage("Solver does not support concurrency without concurrent context.")
         .that(solver)
@@ -348,6 +358,7 @@ public class SolverConcurrencyTest {
   @Test
   public void testConcurrentStack() throws InvalidConfigurationException, InterruptedException {
     requireConcurrentMultipleStackSupport();
+    requireNonNumeralVariables();
     SolverContext context = initSolver();
     FormulaManager mgr = context.getFormulaManager();
     IntegerFormulaManager imgr = mgr.getIntegerFormulaManager();
@@ -435,6 +446,7 @@ public class SolverConcurrencyTest {
   @Test
   public void continuousRunningThreadFormulaTransferTranslateTest() {
     requireIntegers();
+    requireNonNumeralVariables();
     // CVC4 does not support parsing and therefore no translation.
     // Princess has a wierd bug
     // TODO: Look into the Princess problem

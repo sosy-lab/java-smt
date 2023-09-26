@@ -312,6 +312,70 @@ public abstract class SolverBasedTest0 {
         .isNoneOf(Solvers.BOOLECTOR, Solvers.APRON);
   }
 
+  protected void requireNonNumeralVariables(){
+    assume()
+        .withMessage("Solver %s does not support non-numeral variables", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.APRON);
+  }
+
+  protected void requireDumpFormula(){
+    assume()
+        .withMessage("Solver %s does not support dumpFormula() method", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.APRON);
+  }
+
+  protected void requireNot(){
+    assume()
+        .withMessage("Solver %s does not support not()-operations", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.APRON);
+  }
+
+  protected void requireOr(){
+    assume()
+        .withMessage("Solver %s does not support or()-operations", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.APRON);
+  }
+
+  protected void requireXOr(){
+    assume()
+        .withMessage("Solver %s does not support xor()-operations", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.APRON);
+  }
+
+  protected void requireNonLinearModulo(){
+    assume()
+        .withMessage("Solver %s does not support variables as denumerator in modulo operations",
+            solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.APRON);
+  }
+
+  protected void requireCallFunctionImpl(){
+    assume()
+        .withMessage("Solver %s does not support callFunctionImpl()", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.APRON);
+  }
+
+  protected void requireUninterpretedFunctions(){
+    assume()
+        .withMessage("Solver %s does not support uninterpreted functions", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.APRON);
+  }
+
+  protected void requireVisit(){
+    assume()
+        .withMessage("Solver %s does not support visit()-method", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.APRON);
+  }
+
   /**
    * Use this for checking assertions about BooleanFormulas with Truth: <code>
    * assertThatFormula(formula).is...()</code>.

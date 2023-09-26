@@ -92,4 +92,9 @@ public class ApronNativeApiTest {
     Preconditions.checkArgument(abstract1.toTcons(manager).length == 1);
   }
 
+  @Test
+  public void hasVarTest(){
+    //TODO!!!!!!!!!!!!!
+  }
+
 }

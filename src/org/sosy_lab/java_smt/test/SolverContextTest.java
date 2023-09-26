@@ -27,6 +27,7 @@ public class SolverContextTest extends SolverBasedTest0.ParameterizedSolverBased
 
   @Test
   public void testFormulaAccessAfterClose() {
+    requireNonNumeralVariables();
     BooleanFormula term = bmgr.makeVariable("variable");
     BooleanFormula term2 = bmgr.makeVariable("variable");
     BooleanFormula term3 = bmgr.makeVariable("test");

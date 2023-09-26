@@ -82,6 +82,7 @@ public class NumeralFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
   public void testSubTypes() {
     requireIntegers();
     requireRationals();
+    requireUninterpretedFunctions();
     IntegerFormula a = imgr.makeVariable("a");
     RationalFormula r = rmgr.makeVariable("r");
     List<FormulaType<?>> argTypes =

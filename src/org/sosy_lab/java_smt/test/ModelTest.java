@@ -79,7 +79,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       FormulaType.getArrayType(IntegerType, IntegerType);
 
   private static final ImmutableList<Solvers> SOLVERS_WITH_PARTIAL_MODEL =
-      ImmutableList.of(Solvers.Z3, Solvers.PRINCESS, Solvers.APRON);
+      ImmutableList.of(Solvers.Z3, Solvers.PRINCESS);
 
   @Before
   public void setup() {
@@ -116,6 +116,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void testGetSmallIntegers() throws SolverException, InterruptedException {
     requireIntegers();
+    requireNot();
     testModelGetters(
         imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(10)),
         imgr.makeVariable("x"),
@@ -126,6 +127,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void testGetNegativeIntegers() throws SolverException, InterruptedException {
     requireIntegers();
+    requireNot();
     testModelGetters(
         imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(-10)),
         imgr.makeVariable("x"),
@@ -136,6 +138,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void testGetLargeIntegers() throws SolverException, InterruptedException {
     requireIntegers();
+    requireNot();
     BigInteger large = new BigInteger("1000000000000000000000000000000000000000");
     testModelGetters(
         imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(large)),
@@ -183,6 +186,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   /** Test that different names are no problem for Bools in the model. */
   @Test
   public void testGetBooleans() throws SolverException, InterruptedException {
+    requireNonNumeralVariables();
     // Some names are specificly chosen to test the Boolector model
     for (String name : VARIABLE_NAMES) {
       testModelGetters(bmgr.makeVariable(name), bmgr.makeBoolean(true), true, name);
@@ -208,6 +212,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void testGetInts() throws SolverException, InterruptedException {
     requireIntegers();
+    requireNot();
     for (String name : VARIABLE_NAMES) {
       testModelGetters(
           imgr.equal(imgr.makeVariable(name), imgr.makeNumber(1)),
@@ -243,6 +248,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void testGetIntUfs() throws SolverException, InterruptedException {
     requireIntegers();
+    requireUninterpretedFunctions();
     // Some names are specificly chosen to test the Boolector model
     // Use 1 instead of 0 or max bv value, as solvers tend to use 0, min or max as default
     for (String ufName : VARIABLE_NAMES) {
@@ -265,6 +271,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
   public void testGetUFs() throws SolverException, InterruptedException {
+    requireUninterpretedFunctions();
     // Boolector does not support integers
     if (imgr != null) {
       IntegerFormula x =
@@ -299,6 +306,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void testGetUFsWithMultipleAssignments() throws SolverException, InterruptedException {
     requireIntegers();
+    requireUninterpretedFunctions();
 
     List<BooleanFormula> constraints = new ArrayList<>();
     int num = 4;
@@ -334,6 +342,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
   public void testGetUFwithMoreParams() throws Exception {
+    requireUninterpretedFunctions();
     // Boolector does not support integers
     if (imgr != null) {
       IntegerFormula x =
@@ -356,6 +365,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void testGetMultipleUFsWithInts() throws Exception {
     requireIntegers();
+    requireUninterpretedFunctions();
     IntegerFormula arg1 = imgr.makeVariable("arg1");
     IntegerFormula arg2 = imgr.makeVariable("arg2");
     FunctionDeclaration<IntegerFormula> declaration =
@@ -862,6 +872,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
   public void testEvaluatingConstants() throws SolverException, InterruptedException {
+    requireNonNumeralVariables();
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(bmgr.makeVariable("b"));
       assertThat(prover.isUnsat()).isFalse();
@@ -892,6 +903,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
   public void testEvaluatingConstantsWithOperation() throws SolverException, InterruptedException {
+    requireNonNumeralVariables();
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(bmgr.makeVariable("b"));
       assertThat(prover.isUnsat()).isFalse();
@@ -2329,6 +2341,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
   public void testGetBooleans1() throws SolverException, InterruptedException {
+    requireNonNumeralVariables();
     evaluateInModel(bmgr.makeVariable("x"), bmgr.makeBoolean(true), true);
     evaluateInModel(bmgr.makeVariable("x"), bmgr.makeBoolean(false), false);
     evaluateInModel(
@@ -2345,6 +2358,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   // TODO CVC5 crashes on making the first boolean symbol when using timeout ???.
   public void testDeeplyNestedFormulaLIA() throws SolverException, InterruptedException {
     requireIntegers();
+    requireNonNumeralVariables();
 
     testDeeplyNestedFormula(
         depth -> imgr.makeVariable("i_" + depth),

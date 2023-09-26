@@ -33,6 +33,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
 
   @Test
   public void testEmptySubstitution() throws SolverException, InterruptedException {
+    requireUninterpretedFunctions();
     // Boolector does not support substitution
     assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     assume().withMessage("Princess fails").that(solver).isNotEqualTo(Solvers.PRINCESS);
@@ -54,6 +55,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
 
   @Test
   public void testNoSubstitution() throws SolverException, InterruptedException {
+    requireUninterpretedFunctions();
     // Boolector does not support substitution
     assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     assume().withMessage("Princess fails").that(solver).isNotEqualTo(Solvers.PRINCESS);
@@ -81,6 +83,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
 
   @Test
   public void testSubstitution() throws SolverException, InterruptedException {
+    requireNonNumeralVariables();
     // Boolector does not support substitution
     assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     BooleanFormula input =
@@ -103,6 +106,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
 
   @Test
   public void testSubstitutionTwice() throws SolverException, InterruptedException {
+    requireNonNumeralVariables();
     // Boolector does not support substitution
     assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     BooleanFormula input =
@@ -127,6 +131,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
 
   @Test
   public void formulaEqualsAndHashCode() {
+    requireUninterpretedFunctions();
     // Solvers without integers (Boolector) get their own test below
     assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     FunctionDeclaration<IntegerFormula> fb = fmgr.declareUF("f_b", IntegerType, IntegerType);
@@ -226,6 +231,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
 
   @Test
   public void variableNameExtractorTest() {
+    requireOr();
     // Since Boolector does not support integers we use bitvectors
     if (imgr != null) {
       BooleanFormula constr =
@@ -258,6 +264,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
 
   @Test
   public void ufNameExtractorTest() {
+    requireUninterpretedFunctions();
     // Since Boolector does not support integers we use bitvectors for constraints
     if (imgr != null) {
       BooleanFormula constraint =
@@ -292,6 +299,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
   @Test
   public void simplifyIntTest() throws SolverException, InterruptedException {
     requireIntegers();
+    requireNot();
     // x=1 && y=x+2 && z=y+3 --> simplified: x=1 && y=3 && z=6
     IntegerFormula num1 = imgr.makeNumber(1);
     IntegerFormula num2 = imgr.makeNumber(2);

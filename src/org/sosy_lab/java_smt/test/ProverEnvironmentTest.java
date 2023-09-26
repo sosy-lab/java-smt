@@ -12,6 +12,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth8.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
+import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.APRON;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.BOOLECTOR;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.CVC4;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.CVC5;
@@ -38,6 +39,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
   @Test
   public void assumptionsTest() throws SolverException, InterruptedException {
+    requireNonNumeralVariables();
     BooleanFormula b = bmgr.makeVariable("b");
     BooleanFormula c = bmgr.makeVariable("c");
 
@@ -53,6 +55,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
   @Test
   public void assumptionsWithModelTest() throws SolverException, InterruptedException {
+    requireNonNumeralVariables();
     assume()
         .withMessage("MathSAT can't construct models for SAT check with assumptions")
         .that(solver)
@@ -75,8 +78,8 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
   @Test
   public void unsatCoreTest() throws SolverException, InterruptedException {
-    // Boolector does not support unsat core
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
+    // Boolector and Apron do not support unsat core
+    requireUnsatCore();
     try (BasicProverEnvironment<?> pe = context.newProverEnvironment(GENERATE_UNSAT_CORE)) {
       unsatCoreTest0(pe);
     }
@@ -138,7 +141,8 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
         .withMessage(
             "Solver %s does not support unsat core generation over assumptions", solverToUse())
         .that(solverToUse())
-        .isNoneOf(PRINCESS, BOOLECTOR, CVC4, CVC5);
+        .isNoneOf(PRINCESS, BOOLECTOR, CVC4, CVC5,APRON);
+    requireNonNumeralVariables();
     try (ProverEnvironment pe =
         context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       pe.push();

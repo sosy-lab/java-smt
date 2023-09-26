@@ -21,6 +21,7 @@
 package org.sosy_lab.java_smt.solvers.apron;
 
 import apron.Tcons1;
+import apron.Texpr0Node;
 import apron.Texpr1BinNode;
 import apron.Texpr1Node;
 import apron.Texpr1UnNode;
@@ -30,6 +31,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.checkerframework.checker.units.qual.A;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -112,6 +114,14 @@ public class ApronIntegerFormulaManager
   public IntegerFormula modulo(IntegerFormula numerator, IntegerFormula denumerator) {
     ApronNode node1 = (ApronNode) numerator;
     ApronNode node2 = (ApronNode) denumerator;
+    Set<String> vars = formulaCreator.getVariables().keySet();
+    //Somehow hasVar() only works for level0 of Apron (example in ApronNativeApiTest)
+    Texpr0Node zeroNode = node2.getNode().toTexpr0Node(formulaCreator.getEnvironment());
+    for(String var : vars){
+      if(zeroNode.hasDim(formulaCreator.getEnvironment().dimOfVar(var))){
+        throw new UnsupportedOperationException("Denumerator must not contain variables!");
+      }
+    }
     ApronIntBinaryNode result = new ApronIntBinaryNode(node1, node2,
         Texpr1BinNode.OP_MOD);
     return result;

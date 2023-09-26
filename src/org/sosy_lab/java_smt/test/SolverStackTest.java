@@ -89,6 +89,7 @@ public class SolverStackTest extends SolverBasedTest0 {
 
   @Test
   public void simpleStackTestBool() throws SolverException, InterruptedException {
+    requireNonNumeralVariables();
     BasicProverEnvironment<?> stack = newEnvironmentForTest();
 
     int i = index.getFreshId();
@@ -146,7 +147,7 @@ public class SolverStackTest extends SolverBasedTest0 {
   @Test
   public void singleStackTestInteger() throws SolverException, InterruptedException {
     requireIntegers();
-
+    requireUnsatCore();
     BasicProverEnvironment<?> env = newEnvironmentForTest();
     simpleStackTestNum(imgr, env);
   }
@@ -255,6 +256,7 @@ public class SolverStackTest extends SolverBasedTest0 {
 
   @Test
   public void largeStackUsageTest() throws InterruptedException, SolverException {
+    requireNonNumeralVariables();
     BasicProverEnvironment<?> stack = newEnvironmentForTest();
     for (int i = 0; i < 20; i++) {
       assertThat(stack.size()).isEqualTo(i);
@@ -270,6 +272,7 @@ public class SolverStackTest extends SolverBasedTest0 {
 
   @Test
   public void largerStackUsageTest() throws InterruptedException, SolverException {
+    requireNonNumeralVariables();
     assume()
         .withMessage("Solver does not support larger stacks yet")
         .that(solver)
@@ -343,7 +346,7 @@ public class SolverStackTest extends SolverBasedTest0 {
   @Test
   public void symbolsOnStackTest() throws InterruptedException, SolverException {
     requireModel();
-
+    requireNonNumeralVariables();
     BasicProverEnvironment<?> stack = newEnvironmentForTest(ProverOptions.GENERATE_MODELS);
 
     stack.push();
@@ -366,6 +369,7 @@ public class SolverStackTest extends SolverBasedTest0 {
 
   @Test
   public void constraintTestBool1() throws SolverException, InterruptedException {
+    requireNonNumeralVariables();
     BooleanFormula a = bmgr.makeVariable("bool_a");
 
     try (BasicProverEnvironment<?> stack = newEnvironmentForTest()) {
@@ -383,6 +387,7 @@ public class SolverStackTest extends SolverBasedTest0 {
 
   @Test
   public void constraintTestBool2() throws SolverException, InterruptedException {
+    requireNonNumeralVariables();
     BooleanFormula a = bmgr.makeVariable("bool_a");
 
     try (BasicProverEnvironment<?> stack = newEnvironmentForTest()) {
@@ -400,6 +405,7 @@ public class SolverStackTest extends SolverBasedTest0 {
 
   @Test
   public void constraintTestBool3() throws SolverException, InterruptedException {
+    requireNonNumeralVariables();
     BooleanFormula a = bmgr.makeVariable("bool_a");
 
     try (BasicProverEnvironment<?> stack = newEnvironmentForTest()) {
@@ -416,6 +422,7 @@ public class SolverStackTest extends SolverBasedTest0 {
 
   @Test
   public void constraintTestBool4() throws SolverException, InterruptedException {
+    requireNonNumeralVariables();
     BasicProverEnvironment<?> stack = newEnvironmentForTest();
     stack.addConstraint(bmgr.makeVariable("bool_a"));
     assertThat(stack).isSatisfiable();
@@ -433,6 +440,7 @@ public class SolverStackTest extends SolverBasedTest0 {
   @Test
   public void dualStackTest() throws SolverException, InterruptedException {
     requireMultipleStackSupport();
+    requireNonNumeralVariables();
 
     BooleanFormula a = bmgr.makeVariable("bool_a");
     BooleanFormula not = bmgr.not(a);
@@ -463,6 +471,7 @@ public class SolverStackTest extends SolverBasedTest0 {
   @Test
   public void dualStackTest2() throws SolverException, InterruptedException {
     requireMultipleStackSupport();
+    requireNonNumeralVariables();
 
     BooleanFormula a = bmgr.makeVariable("bool_a");
     BooleanFormula not = bmgr.not(a);
@@ -490,6 +499,7 @@ public class SolverStackTest extends SolverBasedTest0 {
   @Test
   public void multiStackTest() throws SolverException, InterruptedException {
     requireMultipleStackSupport();
+    requireNonNumeralVariables();
     int limit = 10;
 
     BooleanFormula a = bmgr.makeVariable("bool_a");
@@ -551,6 +561,7 @@ public class SolverStackTest extends SolverBasedTest0 {
    */
   @Test
   public void dualStackGlobalDeclarations() throws SolverException, InterruptedException {
+    requireNonNumeralVariables();
     // Create non-empty stack
     BasicProverEnvironment<?> stack1 = newEnvironmentForTest();
     stack1.push(bmgr.makeVariable("bool_a"));
@@ -631,6 +642,7 @@ public class SolverStackTest extends SolverBasedTest0 {
   @Test
   public void modelForSatFormulaWithUF() throws SolverException, InterruptedException {
     requireIntegers();
+    requireUninterpretedFunctions();
     try (BasicProverEnvironment<?> stack = newEnvironmentForTest(ProverOptions.GENERATE_MODELS)) {
       IntegerFormula zero = imgr.makeNumber(0);
       IntegerFormula varA = imgr.makeVariable("a");

@@ -34,6 +34,7 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0.ParameterizedSol
 
   @Before
   public void setupFormulas() {
+    requireNot();
     if (imgr != null) {
       simpleFormula = imgr.equal(imgr.makeVariable("a"), imgr.makeNumber(1));
       contradiction =
@@ -66,6 +67,7 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0.ParameterizedSol
 
   @Test
   public void testIsSatisfiableNo() {
+    requireUnsatCore();
     assume()
         .withMessage("Solver does not support unsat core generation in a usable way")
         .that(solverToUse())

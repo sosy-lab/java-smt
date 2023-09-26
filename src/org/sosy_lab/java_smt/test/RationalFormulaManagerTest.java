@@ -47,6 +47,7 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
   @Test
   public void intToIntTest() throws SolverException, InterruptedException {
     requireIntegers();
+    requireNot();
     for (double v : SOME_DOUBLES) {
       IntegerFormula i = imgr.makeNumber((int) Math.floor(v));
       assertThat(mgr.getFormulaType(i)).isEqualTo(FormulaType.IntegerType);
@@ -58,6 +59,7 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
   @Test
   public void intToIntWithRmgrTest() throws SolverException, InterruptedException {
     requireRationals();
+    requireNot();
     for (double v : SOME_DOUBLES) {
       IntegerFormula i = imgr.makeNumber((int) Math.floor(v));
       assertThat(mgr.getFormulaType(i)).isEqualTo(FormulaType.IntegerType);
@@ -102,6 +104,7 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
   @Test
   public void visitFloorTest() {
     requireRationals();
+    requireVisit();
     IntegerFormula f = rmgr.floor(rmgr.makeVariable("v"));
     assertThat(mgr.extractVariables(f)).hasSize(1);
     FunctionCollector collector = new FunctionCollector();

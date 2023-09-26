@@ -106,8 +106,8 @@ public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<Ap
       Map<Tcons1, Texpr1Node> map = constraint.getConstraintNodes();
       Tcons1[] tcons1s = map.keySet().toArray(new Tcons1[map.size()]);
       Abstract1 helper = new Abstract1(this.formulaCreator.getManager(), tcons1s);
-      boolean isTrue = helper.isBottom(this.formulaCreator.getManager());
-      return !isTrue;
+      boolean isBottom = helper.isBottom(this.formulaCreator.getManager());
+      return !isBottom;
     } catch (ApronException pException){
       throw  new RuntimeException(pException);
     }   }

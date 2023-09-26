@@ -112,7 +112,7 @@ public class SolverAllSatTest extends SolverBasedTest0 {
   @Test
   public void allSatTest_unsat() throws SolverException, InterruptedException {
     requireIntegers();
-
+    requireNonNumeralVariables();
     IntegerFormula a = imgr.makeVariable("i");
     IntegerFormula n1 = imgr.makeNumber(1);
     IntegerFormula n2 = imgr.makeNumber(2);
@@ -145,7 +145,7 @@ public class SolverAllSatTest extends SolverBasedTest0 {
   @Test
   public void allSatTest_xor() throws SolverException, InterruptedException {
     requireIntegers();
-
+    requireNonNumeralVariables();
     IntegerFormula a = imgr.makeVariable("i");
     IntegerFormula n1 = imgr.makeNumber(1);
     IntegerFormula n2 = imgr.makeNumber(2);
@@ -174,6 +174,7 @@ public class SolverAllSatTest extends SolverBasedTest0 {
 
   @Test
   public void allSatTest_nondetValue() throws SolverException, InterruptedException {
+    requireNonNumeralVariables();
     BooleanFormula v1 = bmgr.makeVariable("b1");
     BooleanFormula v2 = bmgr.makeVariable("b2");
 

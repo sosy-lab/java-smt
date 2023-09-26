@@ -32,6 +32,7 @@ public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   @Test
   public void testDeclareAndCallUFWithInt() throws SolverException, InterruptedException {
     requireIntegers();
+    requireUninterpretedFunctions();
 
     IntegerFormula x = imgr.makeVariable("x");
     IntegerFormula value = imgr.makeNumber(1234);
@@ -57,6 +58,7 @@ public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   @Test
   public void testDeclareAndCallUFWithRational() throws SolverException, InterruptedException {
     requireRationals();
+    requireUninterpretedFunctions();
 
     RationalFormula x = rmgr.makeVariable("x");
     RationalFormula value = rmgr.makeNumber(0.5);
@@ -84,6 +86,7 @@ public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
       throws SolverException, InterruptedException {
     requireIntegers();
     requireRationals();
+    requireUninterpretedFunctions();
 
     IntegerFormula x = imgr.makeVariable("x");
     IntegerFormula value = imgr.makeNumber(1234);
@@ -127,6 +130,7 @@ public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   public void testDeclareAndCallUFWithIncompatibleTypesIntVsRational() {
     requireIntegers();
     requireRationals();
+    requireUninterpretedFunctions();
 
     for (String name : VALID_NAMES) {
       FunctionDeclaration<?> declaration =
@@ -147,6 +151,7 @@ public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   @Test
   public void testDeclareAndCallUFWithIncompatibleTypesIntVsBool() {
     requireIntegers();
+    requireUninterpretedFunctions();
 
     for (String name : VALID_NAMES) {
       FunctionDeclaration<?> declaration =
@@ -160,6 +165,7 @@ public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   public void testDeclareAndCallUFWithIncompatibleTypesBoolVsInt() {
     requireIntegers();
     requireBooleanArgument();
+    requireUninterpretedFunctions();
 
     for (String name : VALID_NAMES) {
       FunctionDeclaration<?> declaration =
@@ -292,6 +298,7 @@ public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   @Test
   public void testDeclareAndCallUFWithTypedArgs() {
     requireBooleanArgument();
+    requireUninterpretedFunctions();
     createAndCallUF("fooBool1", FormulaType.BooleanType, bmgr.makeTrue());
     createAndCallUF("fooBool2", FormulaType.BooleanType, bmgr.makeTrue(), bmgr.makeTrue());
     createAndCallUF(
@@ -316,6 +323,7 @@ public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   @Test
   public void testDeclareAndCallUFWithRationalArgs() {
     requireRationals();
+    requireUninterpretedFunctions();
     createAndCallUF("fooRat1", FormulaType.RationalType, rmgr.makeNumber(2.5));
     createAndCallUF("fooRat2", FormulaType.IntegerType, rmgr.makeNumber(1.5), rmgr.makeNumber(2.5));
     requireBooleanArgument();
