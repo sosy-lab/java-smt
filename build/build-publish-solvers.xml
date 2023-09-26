@@ -664,6 +664,11 @@ SPDX-License-Identifier: Apache-2.0
             a checkout of the official git repositoy from 'https://github.com/bitwuzla/bitwuzla'.
             Note that shell substitutions do not work and a full absolute path has to be specified.
         </fail>
+        <echo>
+            The path is ECHO echo </echo>
+        <echo>
+            The path is ${bitwuzla.path}</echo>
+
         <fail unless="bitwuzla.customRev">
             Please specify a custom revision with the flag -Dbitwuzla.customRev=XXX.
             The custom revision has to be unique amongst the already known version
@@ -707,9 +712,10 @@ SPDX-License-Identifier: Apache-2.0
         <exec executable="./configure.py"       dir="${bitwuzla.path}" failonerror="true">
             <arg value="--shared"/>
         </exec>
-        <exec executable="ninja"       dir="${bitwuzla.path/build/}" failonerror="true">
+        <exec executable="ninja"       dir="${bitwuzla.path}/build/" failonerror="true">
             <arg value="install"/>
         </exec>
+
 
         <!-- remove unneeded symbols -->
 <!--        <exec executable="strip" dir="${bitwuzla.path}/deps/install/lib/" failonerror="true">-->
@@ -732,7 +738,8 @@ SPDX-License-Identifier: Apache-2.0
         <!-- copy library files into directory to be published for IVY -->
 <!--        <copy file="${bitwuzla.path}/deps/install/lib/libminisat.so" tofile="libminisat-${bitwuzla.version}.so"/>-->
 <!--        <copy file="${bitwuzla.path}/deps/install/lib/libpicosat.so" tofile="libpicosat-${bitwuzla.version}.so"/>-->
-        <copy file="${bitwuzla.path}/build/lib/libbitwuzla.so"      tofile="libbitwuzla-${bitwuzla.version}.so"/>
+        <copy file="${bitwuzla.path}/build/src/libbitwuzla.so"
+              tofile="libbitwuzla-${bitwuzla.version}.so"/>
     </target>
 
     <target name="publish-bitwuzla" depends="package-bitwuzla, load-ivy"
