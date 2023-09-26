@@ -113,6 +113,11 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
         this.abstract1.changeEnvironment(solverContext.getManager(),
             solverContext.getFormulaCreator().getEnvironment(),false);
         this.abstract1 = new Abstract1(solverContext.getManager(), newCons);
+        //Sometimes constraints are not added to the domain (example: ApronNativeApiTest
+        // .distinctTest()); In this case the program should fail for not causing unsound models
+        if(this.abstract1.toTcons(solverContext.getManager()).length != newCons.length){
+          throw new UnsupportedOperationException("Apron did not add the constraint "+pConstraint+"!");
+        }
         Iterables.getLast(assertedFormulas).add(pConstraint);
       }
     } catch (ApronException e) {

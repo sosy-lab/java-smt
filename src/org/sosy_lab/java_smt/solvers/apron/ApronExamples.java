@@ -22,6 +22,7 @@ package org.sosy_lab.java_smt.solvers.apron;
 
 import apron.Abstract1;
 import apron.ApronException;
+import apron.Box;
 import apron.Environment;
 import apron.Interval;
 import apron.Lincons1;
@@ -30,10 +31,12 @@ import apron.Linterm1;
 import apron.Manager;
 import apron.MpqScalar;
 import apron.Polka;
+import apron.PolkaEq;
 import apron.Scalar;
 import apron.Tcons1;
 import apron.Texpr1BinNode;
 import apron.Texpr1CstNode;
+import apron.Texpr1Node;
 import apron.Texpr1VarNode;
 import com.google.common.base.Preconditions;
 
@@ -42,6 +45,7 @@ import com.google.common.base.Preconditions;
  * <a href="https://github.com/antoinemine/apron/blob/master/examples/example1.c">...</a>
  */
 public class ApronExamples {
+
   private static void testBox(Manager pManager) throws ApronException {
     String[] intVars = {"x"};
     String[] realVars = {"y"};
@@ -103,9 +107,29 @@ public class ApronExamples {
     int castInt = Integer.parseInt(castString);
   }
 
+  public static void testIntegerRounding(Manager pManager){
+    Texpr1CstNode eight = new Texpr1CstNode(new MpqScalar(8));
+    Texpr1CstNode three = new Texpr1CstNode(new MpqScalar(3));
+    Texpr1BinNode div = new Texpr1BinNode(Texpr1BinNode.OP_DIV, Texpr1Node.RTYPE_INT,
+        Texpr1Node.RDIR_NEAREST,eight,three);
+  }
+  public static void distinctTest(Manager manager) throws ApronException {
+    //x,y = 0 and x != y
+    Texpr1VarNode x = new Texpr1VarNode("x");
+    Texpr1VarNode y = new Texpr1VarNode("y");
+    Texpr1BinNode leftArg = new Texpr1BinNode(Texpr1BinNode.OP_SUB, x,y);
+    Environment environment = new Environment(new String[]{"x","y"},new String[]{});
+    Tcons1 xIsZero = new Tcons1(environment, Tcons1.EQ,x);
+    Tcons1 yIsZero = new Tcons1(environment, Tcons1.EQ,y);
+    Tcons1 constraint = new Tcons1(environment,Tcons1.DISEQ,leftArg);
+    Abstract1 abstract1 = new Abstract1(manager, new Tcons1[]{xIsZero,yIsZero,constraint});
+
+    //Preconditions.checkArgument(abstract1.isBottom(manager));
+  }
+
   public static void main(String[] args) throws ApronException {
     Manager manager = new Polka(false);
-    testBox(manager);
+    distinctTest(manager);
   }
 }
 

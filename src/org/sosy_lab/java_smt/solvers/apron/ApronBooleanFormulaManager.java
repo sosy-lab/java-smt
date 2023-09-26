@@ -106,6 +106,11 @@ public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<Ap
       Map<Tcons1, Texpr1Node> map = constraint.getConstraintNodes();
       Tcons1[] tcons1s = map.keySet().toArray(new Tcons1[map.size()]);
       Abstract1 helper = new Abstract1(this.formulaCreator.getManager(), tcons1s);
+      //Sometimes constraints are not added to the domain (example: ApronNativeApiTest
+      // .distinctTest()); In this case the program should fail for not causing unsound models
+      if (helper.toTcons(this.formulaCreator.getManager()).length != tcons1s.length){
+        throw new UnsupportedOperationException("Apron did not add all given constraints!");
+      }
       boolean isTrue = helper.isBottom(this.formulaCreator.getManager());
       return !isTrue;
     } catch (ApronException pException){
@@ -119,6 +124,11 @@ public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<Ap
       Map<Tcons1, Texpr1Node> map = constraint.getConstraintNodes();
       Tcons1[] tcons1s = map.keySet().toArray(new Tcons1[map.size()]);
       Abstract1 helper = new Abstract1(this.formulaCreator.getManager(), tcons1s);
+      //Sometimes constraints are not added to the domain (example: ApronNativeApiTest
+      // .distinctTest()); In this case the program should fail for not causing unsound models
+      if (helper.toTcons(this.formulaCreator.getManager()).length != tcons1s.length){
+        throw new UnsupportedOperationException("Apron did not add all given constraints!");
+      }
       return (helper.isBottom(this.formulaCreator.getManager()));
     } catch (ApronException pException){
       throw  new RuntimeException(pException);

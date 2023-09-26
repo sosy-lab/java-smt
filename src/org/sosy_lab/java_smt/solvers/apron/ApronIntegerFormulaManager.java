@@ -96,7 +96,8 @@ public class ApronIntegerFormulaManager
 
   @Override
   public BooleanFormula modularCongruence(IntegerFormula number1, IntegerFormula number2, long n) {
-    //(= x (* n (div x n))); div = x/n; x = number1 - number2
+    //(= x (* n (div x n))); div = x/n; x = number1 - number2 Frage ist, ob num1 mod num2 = n ist
+    // Test mit 8 und 3 : 8-3 = 2 * (8-3)/2 --> hier entsteht ein fehler
     ApronIntCstNode nN = new ApronIntCstNode(BigInteger.valueOf(n));
     ApronIntBinaryNode x = new ApronIntBinaryNode(ApronFormulaManager.getTerm(number1), ApronFormulaManager.getTerm(number2), Texpr1BinNode.OP_SUB);
     ApronIntBinaryNode div = new ApronIntBinaryNode(x,nN,Texpr1BinNode.OP_SUB);
