@@ -91,7 +91,9 @@ final class BitwuzlaFormulaManager extends AbstractFormulaManager<Long, Long, Lo
 
     // File needs to be deleted from Java-side
     File toDelete = new File("tempParserFile");
-    toDelete.delete();
+    if (!toDelete.delete()){
+      throw new RuntimeException("Temporary parsing file could not be deleted.");
+    }
 
     bitwuzlaJNI.bitwuzla_parser_delete(parser);
     bitwuzlaJNI.bitwuzla_options_delete(options);
@@ -144,7 +146,6 @@ final class BitwuzlaFormulaManager extends AbstractFormulaManager<Long, Long, Lo
           out.append("(assert ").append(bitwuzlaJNI.bitwuzla_term_to_string(pTerm)).append(")");
         }
       }
-      ;
     };
   }
 

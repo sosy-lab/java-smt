@@ -736,10 +736,29 @@ SPDX-License-Identifier: Apache-2.0
 <!--        </exec>-->
 
         <!-- copy library files into directory to be published for IVY -->
-<!--        <copy file="${bitwuzla.path}/deps/install/lib/libminisat.so" tofile="libminisat-${bitwuzla.version}.so"/>-->
-<!--        <copy file="${bitwuzla.path}/deps/install/lib/libpicosat.so" tofile="libpicosat-${bitwuzla.version}.so"/>-->
-        <copy file="${bitwuzla.path}/build/src/libbitwuzla.so"
-              tofile="libbitwuzla-${bitwuzla.version}.so"/>
+        <copy file="/lib/x86_64-linux-gnu/libgmp.so.10" tofile="libgmp.so.10"/>
+        <copy file="${bitwuzla.path}/build/src/lib/libbitwuzlabb.so" tofile="libbitwuzla.so"/>
+
+        <copy file="${bitwuzla.path}/build/src/lib/libbitwuzlabv.so" tofile="libbitwuzlabv.so"/>
+        <copy file="${bitwuzla.path}/build/src/lib/libbitwuzlals.so" tofile="libbitwuzlals.so"/>
+
+        <copy file="/lib/x86_64-linux-gnu/libgcc_s.so.1" tofile="libgcc_s.so.1"/>
+        <copy file="/lib/x86_64-linux-gnu/libc.so.6" tofile="libc.so.6"/>
+        <copy file="${bitwuzla.path}/build/src/lib/libbitwuzlabb.so" tofile="libbitwuzlabb.so"/>
+
+        <copy file="${bitwuzla.path}/build/src/libbitwuzla.so.0"
+              tofile="libbitwuzla.so"/>
+
+        <copy file="${bitwuzla.path}/include/bitwuzla/c/bitwuzla.h"
+              tofile="bitwuzla.h"/>
+        <copy file="${bitwuzla.path}/include/bitwuzla/c/parser.h"
+              tofile="parser.h"/>
+        <copy file="${bitwuzla.path}/include/bitwuzla/enums.h"
+              tofile="enums.h"/>
+        <copy file="${bitwuzla.path}/include/bitwuzla/option.h"
+              tofile="option.h"/>
+        <copy file="${bitwuzla.path}/src/api/c/bitwuzla.cpp"
+              tofile="bitwuzla.cpp"/>
     </target>
 
     <target name="publish-bitwuzla" depends="package-bitwuzla, load-ivy"

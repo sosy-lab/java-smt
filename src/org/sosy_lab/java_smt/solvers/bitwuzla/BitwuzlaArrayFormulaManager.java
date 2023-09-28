@@ -22,7 +22,6 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_EQUAL;
 
-import com.google.common.collect.Table;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
@@ -32,12 +31,12 @@ public class BitwuzlaArrayFormulaManager
     extends AbstractArrayFormulaManager<Long, Long, Long, Long> {
 
   // private final long bitwuzla;
-  //private final Table<String, Long, Long> formulaCache;
+  // private final Table<String, Long, Long> formulaCache;
 
   protected BitwuzlaArrayFormulaManager(BitwuzlaFormulaCreator pCreator) {
     super(pCreator);
     // this.bitwuzla = pCreator.getEnv();
-    //this.formulaCache = pCreator.getCache();
+    // this.formulaCache = pCreator.getCache();
   }
 
   @Override
@@ -56,20 +55,20 @@ public class BitwuzlaArrayFormulaManager
   protected <TI extends Formula, TE extends Formula> Long internalMakeArray(
       String pName, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
 
-// Maybe use FormulaCache if tests fail
-//    Long maybeFormula = formulaCache.get(pName, pIndexType);
-//    if (maybeFormula != null) {
-//      return maybeFormula;
-//    }
-//    if (formulaCache.containsRow(pName)) {
-//      throw new IllegalArgumentException("Symbol already used: " + pName);
-//    }
+    // Maybe use FormulaCache if tests fail
+    //    Long maybeFormula = formulaCache.get(pName, pIndexType);
+    //    if (maybeFormula != null) {
+    //      return maybeFormula;
+    //    }
+    //    if (formulaCache.containsRow(pName)) {
+    //      throw new IllegalArgumentException("Symbol already used: " + pName);
+    //    }
 
     final ArrayFormulaType<TI, TE> arrayFormulaType =
         FormulaType.getArrayType(pIndexType, pElementType);
     final long bitwuzlaArrayType = toSolverType(arrayFormulaType);
     long newVar = getFormulaCreator().makeVariable(bitwuzlaArrayType, pName);
-    //formulaCache.put(pName, pIndexType, newVar);
+    // formulaCache.put(pName, pIndexType, newVar);
     return newVar;
   }
 

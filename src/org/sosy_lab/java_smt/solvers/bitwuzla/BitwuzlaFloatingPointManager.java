@@ -30,14 +30,14 @@ import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 public class BitwuzlaFloatingPointManager
     extends AbstractFloatingPointFormulaManager<Long, Long, Long, Long> {
-  //private final long bitwuzla;
+  // private final long bitwuzla;
   private final long roundingMode;
 
   protected BitwuzlaFloatingPointManager(
       FormulaCreator<Long, Long, Long, Long> pCreator,
       FloatingPointRoundingMode pFloatingPointRoundingMode) {
     super(pCreator);
-    //bitwuzla = pCreator.getEnv();
+    // bitwuzla = pCreator.getEnv();
     roundingMode = getRoundingModeImpl(pFloatingPointRoundingMode);
   }
 
@@ -182,8 +182,8 @@ public class BitwuzlaFloatingPointManager
   // just not supported by Bitwuzla?
   @Override
   protected Long toIeeeBitvectorImpl(Long pNumber) {
-    int roundingMode = bitwuzlaJNI.bitwuzla_term_value_get_rm(pNumber);
-    long pRoundingMode = bitwuzlaJNI.bitwuzla_mk_rm_value(roundingMode);
+    long pRoundingMode =
+        bitwuzlaJNI.bitwuzla_mk_rm_value(bitwuzlaJNI.bitwuzla_term_value_get_rm(pNumber));
     long inputBits =
         bitwuzlaJNI.bitwuzla_sort_fp_get_exp_size(pNumber)
             + bitwuzlaJNI.bitwuzla_sort_fp_get_sig_size(pNumber);

@@ -35,7 +35,6 @@ import java.util.Optional;
 import java.util.stream.LongStream;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
@@ -109,7 +108,8 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
     BitwuzlaKind kind = BitwuzlaKind.swigToEnum(bitwuzlaJNI.bitwuzla_term_get_kind(f));
 
     // filled later, except for some special function applications
-    String functionName = null;
+    @SuppressWarnings("unused")
+    String functionName;
     List<Formula> functionArgs = new ArrayList<>();
     List<FormulaType<?>> argTypes = new ArrayList<>();
 
@@ -356,9 +356,8 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
 
     assert (functionKind != null);
 
-    if (functionName == null) {
-      functionName = functionKind.toString();
-    }
+    functionName = functionKind.toString();
+
     if (functionArgs.isEmpty()) {
       for (int i = 0; i < numberOfArgs; i++) {
         long pCurrentTerm = bitwuzlaJNI.BitwuzlaTermArray_getitem(pfunctionArgs, i);

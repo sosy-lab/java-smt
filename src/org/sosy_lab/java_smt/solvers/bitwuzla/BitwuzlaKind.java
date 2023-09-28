@@ -179,7 +179,7 @@ public final class BitwuzlaKind {
   public static final BitwuzlaKind BITWUZLA_KIND_NUM_KINDS =
       new BitwuzlaKind("BITWUZLA_KIND_NUM_KINDS");
 
-  public final int swigValue() {
+  public int swigValue() {
     return swigValue;
   }
 
@@ -210,11 +210,11 @@ public final class BitwuzlaKind {
     swigNext = swigValue + 1;
   }
 
-//  private BitwuzlaKind(String swigName, BitwuzlaKind swigEnum) {
-//    this.swigName = swigName;
-//    this.swigValue = swigEnum.swigValue;
-//    swigNext = this.swigValue + 1;
-//  }
+  //  private BitwuzlaKind(String swigName, BitwuzlaKind swigEnum) {
+  //    this.swigName = swigName;
+  //    this.swigValue = swigEnum.swigValue;
+  //    swigNext = this.swigValue + 1;
+  //  }
 
   private static BitwuzlaKind[] swigValues = {
     BITWUZLA_KIND_CONSTANT,
