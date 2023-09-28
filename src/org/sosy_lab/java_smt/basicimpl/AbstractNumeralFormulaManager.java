@@ -195,6 +195,8 @@ public abstract class AbstractNumeralFormulaManager<
   @Override
   public ResultFormulaType negate(ParamFormulaType pNumber) {
     TFormulaInfo param1 = extractInfo(pNumber);
+    ResultFormulaType result = wrap(negate(param1));
+    Generator.logNegate(result, pNumber);
     return wrap(negate(param1));
   }
 

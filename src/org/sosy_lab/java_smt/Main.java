@@ -49,11 +49,17 @@ public class Main {
     IntegerFormula one = imgr.makeNumber(1);
     IntegerFormula two = imgr.makeNumber(zwei);
     IntegerFormula x = imgr.makeVariable("x");
-    BooleanFormula constraint = imgr.equal (x, imgr.add(one, two));
+    BooleanFormula y = bmgr.makeVariable("y");
+    BooleanFormula z = bmgr.makeVariable("z");
+    BooleanFormula res = bmgr.makeVariable("res");
+
+    BooleanFormula constraint = imgr.equal (x, imgr.add(one, imgr.negate(two)));
+    BooleanFormula constraint2 = bmgr.equivalence(res, bmgr.and(y,z));
 
     try (ProverEnvironment prover =
              context.newProverEnvironment(SolverContext.ProverOptions.GENERATE_MODELS)) {
       prover.addConstraint(constraint);
+      prover.addConstraint(constraint2);
 
 
       boolean isUnsat = prover.isUnsat();

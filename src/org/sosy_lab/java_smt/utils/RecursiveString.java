@@ -29,17 +29,28 @@ public class RecursiveString {
   List<Object> inputParams;
   Function<List<Object>, String> saveResult;
 
+  String variableType;
+
   public RecursiveString(
       Object pResult,
       List<Object> pInputParams,
-      Function<List<Object>, String> pSaveResult) {
+      Function<List<Object>, String> pSaveResult, String pVariableType) {
     result = pResult;
     inputParams = pInputParams;
     saveResult = pSaveResult;
+    variableType = pVariableType;
   }
 
   public Object getResult() {
     return result;
+  }
+
+  public String getVariableType() {
+    return variableType;
+  }
+
+  public void setVariableType(String pVariableType) {
+    variableType = pVariableType;
   }
 
   public void setResult(Object pResult) {

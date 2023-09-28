@@ -37,13 +37,13 @@ import org.sosy_lab.java_smt.api.NumeralFormula;
 
 public class Generator {
 
-  static String fileName = "Out.txt";
+  static String fileName = "Out.smt2";
   static StringBuilder lines = new StringBuilder();
 
   static List<RecursiveString> executedAggregator =
       new ArrayList<>();
 
-  private static final List<String> registeredVariables = new ArrayList<>();
+  private static final List<RecursiveString> registeredVariables = new ArrayList<>();
 
   public Generator() throws IOException {
     lines.append("(set-logic AUFLIRA)\n");
@@ -56,27 +56,18 @@ public class Generator {
     fileWriter.close();
   }
 
-  public static boolean onlyDigits(String str) {
-    String regex = "[0-9 | . | ,]+";
-    Pattern p = Pattern.compile(regex);
-
-    Matcher m = p.matcher(str);
-
-    return m.matches();
-  }
-
   public static String evaluateRecursive(Object constraint) {
     RecursiveString methodToEvaluate = executedAggregator
         .stream()
         .filter(x -> x.getResult().equals(constraint))
         .findFirst()
         .orElse(null);
+    if (methodToEvaluate != null && ! methodToEvaluate.variableType.equals("Direct")) {
+      registeredVariables.add(methodToEvaluate);
+    }
 
     if (constraint instanceof String) {
       String result = (String) constraint;
-      if (! onlyDigits(result)) {
-        registeredVariables.add(result);
-      }
       return result;
     } else {
       List<Object> evaluatedInputs = new ArrayList<>();
@@ -91,11 +82,18 @@ public class Generator {
 
   public static void logAddConstraint(Object constraint) {
     String result = evaluateRecursive(constraint);
-    List<String> uniqueRegisteredValues =
+    List<RecursiveString> uniqueRegisteredValues =
         registeredVariables.stream().distinct().collect(Collectors.toList());
-    for (String variable:uniqueRegisteredValues) {
-      if (! variable.equals("true") && ! variable.equals("false")) {
-        String newEntry = "(declare-const " + variable + " Bool)\n";
+    for (RecursiveString variable:uniqueRegisteredValues) {
+      if (variable.variableType.equals("Bool")) {
+        String newEntry = "(declare-const " + variable.result + " Bool)\n";
+        if (lines.indexOf(newEntry) == -1) {
+          lines.append(newEntry);
+        } else {
+        }
+      }
+      if (variable.variableType.equals("Int")) {
+        String newEntry = "(declare-const " + variable.result + " Int)\n";
         if (lines.indexOf(newEntry) == -1) {
           lines.append(newEntry);
         } else {
@@ -107,7 +105,7 @@ public class Generator {
   }
 
   public static void dumpSMTLIB2() throws IOException {
-    String endSMTLIB2 = "(check-sat)\n(exit)";
+    String endSMTLIB2 = "(check-sat)\n(get-value (res))\n(get-value (x))\n(exit)";
     lines.append(endSMTLIB2);
     writeToFile(String.valueOf(lines));
   }
@@ -122,28 +120,28 @@ public class Generator {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pVar);
     Function<List<Object>, String> saveResult = inPlaceInputParams -> (String) inPlaceInputParams.get(0);
-    executedAggregator.add(new RecursiveString(result, inputParams, saveResult));
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Bool"));
   }
 
   public static void logMakeTrue(Object result, String pVar) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pVar);
     Function<List<Object>, String> saveResult = inPlaceInputParams -> (String) inPlaceInputParams.get(0);
-    executedAggregator.add(new RecursiveString(result, inputParams, saveResult));
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Direct"));
   }
 
   public static void logMakeFalse(Object result, String pVar) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pVar);
     Function<List<Object>, String> saveResult = inPlaceInputParams -> (String) inPlaceInputParams.get(0);
-    executedAggregator.add(new RecursiveString(result, inputParams, saveResult));
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Direct"));
   }
 
   public static void logNot(Object result, BooleanFormula pBits) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pBits);
     Function<List<Object>, String> saveResult = inPlaceInputParams -> "(not " + inPlaceInputParams.get(0) + ")";
-    executedAggregator.add(new RecursiveString(result, inputParams, saveResult));
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   public static void logOr(Object result, BooleanFormula pBits1, BooleanFormula pBits2) {
@@ -152,7 +150,7 @@ public class Generator {
     inputParams.add(pBits2);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(or " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    executedAggregator.add(new RecursiveString(result, inputParams, saveResult));
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   public static void logOr(Object result, Collection<BooleanFormula> pBits1) {
@@ -168,7 +166,7 @@ public class Generator {
           inPlaceInputParams.forEach((c) -> {out.append(c); out.append(" ");}); return String.valueOf(
             out.deleteCharAt(out.length()-1).append(")"));};
 
-    executedAggregator.add(new RecursiveString(result, inputParams, saveResult));
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   public static void logAnd(Object result, BooleanFormula pBits1, BooleanFormula pBits2) {
@@ -177,7 +175,7 @@ public class Generator {
     inputParams.add(pBits2);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(and " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    executedAggregator.add(new RecursiveString(result, inputParams, saveResult));
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   public static void logAnd(Object result, Collection<BooleanFormula> pBits1) {
@@ -193,7 +191,7 @@ public class Generator {
           inPlaceInputParams.forEach((c) -> {out.append(c); out.append(" ");}); return String.valueOf(
               out.deleteCharAt(out.length()-1).append(")"));};
 
-    executedAggregator.add(new RecursiveString(result, inputParams, saveResult));
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   public static void logXor(Object result,BooleanFormula pBits1, BooleanFormula pBits2) {
@@ -202,7 +200,7 @@ public class Generator {
     inputParams.add(pBits2);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(xor " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    executedAggregator.add(new RecursiveString(result, inputParams, saveResult));
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   public static void logEquivalence(Object result, BooleanFormula pBits1, BooleanFormula pBits2) {
@@ -211,7 +209,7 @@ public class Generator {
     inputParams.add(pBits2);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    executedAggregator.add(new RecursiveString(result, inputParams, saveResult));
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   public static void logImplication(Object result,BooleanFormula pBits1, BooleanFormula pBits2) {
@@ -220,7 +218,7 @@ public class Generator {
     inputParams.add(pBits2);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(=> " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    executedAggregator.add(new RecursiveString(result, inputParams, saveResult));
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   //TODO: logIsTrue (not necessary?)
@@ -234,7 +232,7 @@ public class Generator {
     inputParams.add(f2);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(ite " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + " " + inPlaceInputParams.get(2) + ")" ;
-    executedAggregator.add(new RecursiveString(result, inputParams, saveResult));
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   /** NumeralFormularManager **/
@@ -243,14 +241,14 @@ public class Generator {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pVar);
     Function<List<Object>, String> saveResult = inPlaceInputParams -> (String) inPlaceInputParams.get(0);
-    executedAggregator.add(new RecursiveString(result, inputParams, saveResult));
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Direct"));
   }
 
   public static void logMakeIntVariable(Object result, String pVar) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pVar);
     Function<List<Object>, String> saveResult = inPlaceInputParams -> (String) inPlaceInputParams.get(0);
-    executedAggregator.add(new RecursiveString(result, inputParams, saveResult));
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Int"));
   }
 
   public static void logAdd(Object result, NumeralFormula pNumber1, NumeralFormula pNumber2) {
@@ -259,7 +257,7 @@ public class Generator {
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(+ " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    executedAggregator.add(new RecursiveString(result, inputParams, saveResult));
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   public static void logEqual(Object result, NumeralFormula pNumber1, NumeralFormula pNumber2) {
@@ -268,7 +266,15 @@ public class Generator {
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    executedAggregator.add(new RecursiveString(result, inputParams, saveResult));
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+  }
+
+  public static void logNegate(Object result, NumeralFormula pBits) {
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(pBits);
+    Function<List<Object>, String> saveResult =
+        inPlaceInputParams -> "(- " + inPlaceInputParams.get(0) + ")";
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
 }
