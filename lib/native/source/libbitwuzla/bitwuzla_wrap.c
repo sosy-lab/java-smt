@@ -846,32 +846,12 @@ typedef union {
   char __wchb[4];
 } __mbstate_t___value;
 
-typedef struct {
-  uint64_t cur;
-  
-  uint64_t dflt;
-  
-  uint64_t min;
-  
-  uint64_t max;
-} _numeric;
-
-typedef struct {
-  const char *cur;
-  
-  const char *dflt;
-  
-  size_t num_modes;
-  
-  char **modes;
-} _mode;
-
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_new_1BitwuzlaTermArray(JNIEnv *jenv, jclass jcls, jint jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_new_1BitwuzlaTermArray(JNIEnv *jenv, jclass jcls, jint jarg1) {
   jlong jresult = 0 ;
   int arg1 ;
   BitwuzlaTerm *result = 0 ;
@@ -885,7 +865,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_new_1BitwuzlaTermArray(JNIEnv *jenv, j
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_delete_1BitwuzlaTermArray(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_delete_1BitwuzlaTermArray(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   BitwuzlaTerm *arg1 = (BitwuzlaTerm *) 0 ;
   
   (void)jenv;
@@ -895,7 +875,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_delete_1BitwuzlaTermArray(JNIEnv *jenv,
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_BitwuzlaTermArray_1getitem(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_BitwuzlaTermArray_1getitem(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
   jlong jresult = 0 ;
   BitwuzlaTerm *arg1 = (BitwuzlaTerm *) 0 ;
   int arg2 ;
@@ -911,7 +891,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_BitwuzlaTermArray_1getitem(JNIEnv *jen
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_BitwuzlaTermArray_1setitem(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jlong jarg3) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_BitwuzlaTermArray_1setitem(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jlong jarg3) {
   BitwuzlaTerm *arg1 = (BitwuzlaTerm *) 0 ;
   int arg2 ;
   BitwuzlaTerm arg3 ;
@@ -925,7 +905,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_BitwuzlaTermArray_1setitem(JNIEnv *jenv
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_new_1BitwuzlaSortArray(JNIEnv *jenv, jclass jcls, jint jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_new_1BitwuzlaSortArray(JNIEnv *jenv, jclass jcls, jint jarg1) {
   jlong jresult = 0 ;
   int arg1 ;
   BitwuzlaSort *result = 0 ;
@@ -939,7 +919,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_new_1BitwuzlaSortArray(JNIEnv *jenv, j
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_delete_1BitwuzlaSortArray(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_delete_1BitwuzlaSortArray(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   BitwuzlaSort *arg1 = (BitwuzlaSort *) 0 ;
   
   (void)jenv;
@@ -949,7 +929,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_delete_1BitwuzlaSortArray(JNIEnv *jenv,
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_BitwuzlaSortArray_1getitem(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_BitwuzlaSortArray_1getitem(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
   jlong jresult = 0 ;
   BitwuzlaSort *arg1 = (BitwuzlaSort *) 0 ;
   int arg2 ;
@@ -965,7 +945,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_BitwuzlaSortArray_1getitem(JNIEnv *jen
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_BitwuzlaSortArray_1setitem(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jlong jarg3) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_BitwuzlaSortArray_1setitem(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jlong jarg3) {
   BitwuzlaSort *arg1 = (BitwuzlaSort *) 0 ;
   int arg2 ;
   BitwuzlaSort arg3 ;
@@ -979,7 +959,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_BitwuzlaSortArray_1setitem(JNIEnv *jenv
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_new_1uint64_1tArray(JNIEnv *jenv, jclass jcls, jint jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_new_1uint64_1tArray(JNIEnv *jenv, jclass jcls, jint jarg1) {
   jlong jresult = 0 ;
   int arg1 ;
   uint64_t *result = 0 ;
@@ -993,7 +973,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_new_1uint64_1tArray(JNIEnv *jenv, jcla
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_delete_1uint64_1tArray(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_delete_1uint64_1tArray(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   uint64_t *arg1 = (uint64_t *) 0 ;
   
   (void)jenv;
@@ -1003,7 +983,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_delete_1uint64_1tArray(JNIEnv *jenv, jc
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_uint64_1tArray_1getitem(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_uint64_1tArray_1getitem(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
   jlong jresult = 0 ;
   uint64_t *arg1 = (uint64_t *) 0 ;
   int arg2 ;
@@ -1019,7 +999,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_uint64_1tArray_1getitem(JNIEnv *jenv, 
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_uint64_1tArray_1setitem(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jlong jarg3) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_uint64_1tArray_1setitem(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jlong jarg3) {
   uint64_t *arg1 = (uint64_t *) 0 ;
   int arg2 ;
   uint64_t arg3 ;
@@ -1033,7 +1013,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_uint64_1tArray_1setitem(JNIEnv *jenv, j
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_true_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_true_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1045,7 +1025,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_true_1get(JNIEnv *jenv, jclass jcls) {
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_false_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_false_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1057,7 +1037,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_false_1get(JNIEnv *jenv, jclass jcls) {
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1bool_1true_1false_1are_1defined_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1bool_1true_1false_1are_1defined_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1069,7 +1049,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1bool_1true_1false_1are_1defined_1ge
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1STDIO_1H_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1STDIO_1H_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1081,7 +1061,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1STDIO_1H_1get(JNIEnv *jenv, jclass jc
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1FEATURES_1H_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1FEATURES_1H_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1093,7 +1073,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1FEATURES_1H_1get(JNIEnv *jenv, jclass
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1DEFAULT_1SOURCE_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1DEFAULT_1SOURCE_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1105,7 +1085,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1DEFAULT_1SOURCE_1get(JNIEnv *jenv, jc
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1GLIBC_1USE_1ISOC2X_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1GLIBC_1USE_1ISOC2X_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1117,7 +1097,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1GLIBC_1USE_1ISOC2X_1get(JNIEnv *jen
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1USE_1POSIX_1IMPLICITLY_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1USE_1POSIX_1IMPLICITLY_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1129,7 +1109,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1USE_1POSIX_1IMPLICITLY_1get(JNIEnv 
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1POSIX_1SOURCE_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1POSIX_1SOURCE_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1141,7 +1121,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1POSIX_1SOURCE_1get(JNIEnv *jenv, jcla
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1POSIX_1C_1SOURCE_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1POSIX_1C_1SOURCE_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   long result;
   
@@ -1153,7 +1133,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1POSIX_1C_1SOURCE_1get(JNIEnv *jenv, j
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1USE_1POSIX_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1USE_1POSIX_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1165,7 +1145,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1USE_1POSIX_1get(JNIEnv *jenv, jclas
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1USE_1POSIX2_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1USE_1POSIX2_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1177,7 +1157,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1USE_1POSIX2_1get(JNIEnv *jenv, jcla
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1USE_1POSIX199309_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1USE_1POSIX199309_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1189,7 +1169,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1USE_1POSIX199309_1get(JNIEnv *jenv,
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1USE_1POSIX199506_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1USE_1POSIX199506_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1201,7 +1181,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1USE_1POSIX199506_1get(JNIEnv *jenv,
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1USE_1XOPEN2K_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1USE_1XOPEN2K_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1213,7 +1193,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1USE_1XOPEN2K_1get(JNIEnv *jenv, jcl
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1USE_1ISOC95_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1USE_1ISOC95_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1225,7 +1205,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1USE_1ISOC95_1get(JNIEnv *jenv, jcla
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1USE_1ISOC99_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1USE_1ISOC99_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1237,7 +1217,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1USE_1ISOC99_1get(JNIEnv *jenv, jcla
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1USE_1XOPEN2K8_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1USE_1XOPEN2K8_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1249,7 +1229,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1USE_1XOPEN2K8_1get(JNIEnv *jenv, jc
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1ATFILE_1SOURCE_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1ATFILE_1SOURCE_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1261,7 +1241,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1ATFILE_1SOURCE_1get(JNIEnv *jenv, jcl
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1WORDSIZE_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1WORDSIZE_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1273,7 +1253,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1WORDSIZE_1get(JNIEnv *jenv, jclass 
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1WORDSIZE32_1SIZE_1ULONG_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1WORDSIZE32_1SIZE_1ULONG_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1285,7 +1265,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1WORDSIZE32_1SIZE_1ULONG_1get(JNIEnv
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1WORDSIZE32_1PTRDIFF_1LONG_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1WORDSIZE32_1PTRDIFF_1LONG_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1297,7 +1277,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1WORDSIZE32_1PTRDIFF_1LONG_1get(JNIE
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1WORDSIZE_1TIME64_1COMPAT32_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1WORDSIZE_1TIME64_1COMPAT32_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1309,7 +1289,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1WORDSIZE_1TIME64_1COMPAT32_1get(JNI
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1TIMESIZE_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1TIMESIZE_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1321,7 +1301,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1TIMESIZE_1get(JNIEnv *jenv, jclass 
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1USE_1MISC_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1USE_1MISC_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1333,7 +1313,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1USE_1MISC_1get(JNIEnv *jenv, jclass
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1USE_1ATFILE_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1USE_1ATFILE_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1345,7 +1325,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1USE_1ATFILE_1get(JNIEnv *jenv, jcla
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1USE_1FORTIFY_1LEVEL_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1USE_1FORTIFY_1LEVEL_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1357,7 +1337,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1USE_1FORTIFY_1LEVEL_1get(JNIEnv *je
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1GLIBC_1USE_1DEPRECATED_1GETS_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1GLIBC_1USE_1DEPRECATED_1GETS_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1369,7 +1349,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1GLIBC_1USE_1DEPRECATED_1GETS_1get(J
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1GLIBC_1USE_1DEPRECATED_1SCANF_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1GLIBC_1USE_1DEPRECATED_1SCANF_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1381,7 +1361,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1GLIBC_1USE_1DEPRECATED_1SCANF_1get(
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1STDC_1PREDEF_1H_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1STDC_1PREDEF_1H_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1393,7 +1373,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1STDC_1PREDEF_1H_1get(JNIEnv *jenv, jc
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1STDC_1IEC_1559_1_1_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1STDC_1IEC_1559_1_1_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1405,7 +1385,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1STDC_1IEC_1559_1_1_1get(JNIEnv *jen
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1STDC_1IEC_160559_1BFP_1_1_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1STDC_1IEC_160559_1BFP_1_1_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   long result;
   
@@ -1417,7 +1397,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1STDC_1IEC_160559_1BFP_1_1_1get(JNIE
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1STDC_1IEC_1559_1COMPLEX_1_1_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1STDC_1IEC_1559_1COMPLEX_1_1_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1429,7 +1409,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1STDC_1IEC_1559_1COMPLEX_1_1_1get(JN
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1STDC_1IEC_160559_1COMPLEX_1_1_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1STDC_1IEC_160559_1COMPLEX_1_1_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   long result;
   
@@ -1441,7 +1421,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1STDC_1IEC_160559_1COMPLEX_1_1_1get(
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1STDC_1ISO_110646_1_1_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1STDC_1ISO_110646_1_1_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   long result;
   
@@ -1453,7 +1433,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1STDC_1ISO_110646_1_1_1get(JNIEnv *j
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1GNU_1LIBRARY_1_1_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1GNU_1LIBRARY_1_1_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1465,7 +1445,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1GNU_1LIBRARY_1_1_1get(JNIEnv *jenv,
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1GLIBC_1_1_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1GLIBC_1_1_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1477,7 +1457,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1GLIBC_1_1_1get(JNIEnv *jenv, jclass
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1GLIBC_1MINOR_1_1_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1GLIBC_1MINOR_1_1_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1489,7 +1469,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1GLIBC_1MINOR_1_1_1get(JNIEnv *jenv,
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1SYS_1CDEFS_1H_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1SYS_1CDEFS_1H_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1501,7 +1481,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1SYS_1CDEFS_1H_1get(JNIEnv *jenv, jcla
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1glibc_1c99_1flexarr_1available_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1glibc_1c99_1flexarr_1available_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1513,7 +1493,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1glibc_1c99_1flexarr_1available_1get
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1LDOUBLE_1REDIRECTS_1TO_1FLOAT128_1ABI_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1LDOUBLE_1REDIRECTS_1TO_1FLOAT128_1ABI_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1525,7 +1505,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1LDOUBLE_1REDIRECTS_1TO_1FLOAT128_1A
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1HAVE_1GENERIC_1SELECTION_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1HAVE_1GENERIC_1SELECTION_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1537,7 +1517,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1HAVE_1GENERIC_1SELECTION_1get(JNIEn
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1GLIBC_1USE_1LIB_1EXT2_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1GLIBC_1USE_1LIB_1EXT2_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1549,7 +1529,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1GLIBC_1USE_1LIB_1EXT2_1get(JNIEnv *
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1GLIBC_1USE_1IEC_160559_1BFP_1EXT_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1GLIBC_1USE_1IEC_160559_1BFP_1EXT_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1561,7 +1541,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1GLIBC_1USE_1IEC_160559_1BFP_1EXT_1g
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1GLIBC_1USE_1IEC_160559_1BFP_1EXT_1C2X_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1GLIBC_1USE_1IEC_160559_1BFP_1EXT_1C2X_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1573,7 +1553,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1GLIBC_1USE_1IEC_160559_1BFP_1EXT_1C
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1GLIBC_1USE_1IEC_160559_1EXT_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1GLIBC_1USE_1IEC_160559_1EXT_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1585,7 +1565,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1GLIBC_1USE_1IEC_160559_1EXT_1get(JN
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1GLIBC_1USE_1IEC_160559_1FUNCS_1EXT_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1GLIBC_1USE_1IEC_160559_1FUNCS_1EXT_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1597,7 +1577,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1GLIBC_1USE_1IEC_160559_1FUNCS_1EXT_
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1GLIBC_1USE_1IEC_160559_1FUNCS_1EXT_1C2X_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1GLIBC_1USE_1IEC_160559_1FUNCS_1EXT_1C2X_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1609,7 +1589,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1GLIBC_1USE_1IEC_160559_1FUNCS_1EXT_
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1GLIBC_1USE_1IEC_160559_1TYPES_1EXT_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1GLIBC_1USE_1IEC_160559_1TYPES_1EXT_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1621,7 +1601,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1GLIBC_1USE_1IEC_160559_1TYPES_1EXT_
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1BITS_1TYPES_1H_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1BITS_1TYPES_1H_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1633,7 +1613,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1BITS_1TYPES_1H_1get(JNIEnv *jenv, jcl
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1BITS_1TYPESIZES_1H_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1BITS_1TYPESIZES_1H_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1645,7 +1625,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1BITS_1TYPESIZES_1H_1get(JNIEnv *jenv,
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1RLIM_1T_1MATCHES_1RLIM64_1T_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1RLIM_1T_1MATCHES_1RLIM64_1T_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1657,7 +1637,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1RLIM_1T_1MATCHES_1RLIM64_1T_1get(JN
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1STATFS_1MATCHES_1STATFS64_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1STATFS_1MATCHES_1STATFS64_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1669,7 +1649,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1STATFS_1MATCHES_1STATFS64_1get(JNIE
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1KERNEL_1OLD_1TIMEVAL_1MATCHES_1TIMEVAL64_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1KERNEL_1OLD_1TIMEVAL_1MATCHES_1TIMEVAL64_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1681,7 +1661,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1KERNEL_1OLD_1TIMEVAL_1MATCHES_1TIME
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1FD_1SETSIZE_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1FD_1SETSIZE_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1693,7 +1673,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1FD_1SETSIZE_1get(JNIEnv *jenv, jcla
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1BITS_1TIME64_1H_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1BITS_1TIME64_1H_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1705,7 +1685,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1BITS_1TIME64_1H_1get(JNIEnv *jenv, jc
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1_1fsid_1t_1_1_1val_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jintArray jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1fsid_1t_1_1_1val_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jintArray jarg2) {
   __fsid_t *arg1 = (__fsid_t *) 0 ;
   int *arg2 ;
   jint *jarr2 ;
@@ -1729,7 +1709,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1_1fsid_1t_1_1_1val_1set(JNIEnv *jenv,
 }
 
 
-SWIGEXPORT jintArray JNICALL Java_bitwuzlaJNI__1_1fsid_1t_1_1_1val_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jintArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1fsid_1t_1_1_1val_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jintArray jresult = 0 ;
   __fsid_t *arg1 = (__fsid_t *) 0 ;
   int *result = 0 ;
@@ -1744,7 +1724,7 @@ SWIGEXPORT jintArray JNICALL Java_bitwuzlaJNI__1_1fsid_1t_1_1_1val_1get(JNIEnv *
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_new_1_1_1fsid_1t(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_new_1_1_1fsid_1t(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   __fsid_t *result = 0 ;
   
@@ -1756,7 +1736,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_new_1_1_1fsid_1t(JNIEnv *jenv, jclass 
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_delete_1_1_1fsid_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_delete_1_1_1fsid_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   __fsid_t *arg1 = (__fsid_t *) 0 ;
   
   (void)jenv;
@@ -1766,7 +1746,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_delete_1_1_1fsid_1t(JNIEnv *jenv, jclas
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1_1_1_1fpos_1t_1defined_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1_1_1_1fpos_1t_1defined_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1778,7 +1758,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1_1_1_1fpos_1t_1defined_1get(JNIEnv 
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1_1_1mbstate_1t_1defined_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1_1_1mbstate_1t_1defined_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -1790,7 +1770,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1_1_1mbstate_1t_1defined_1get(JNIEnv
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1_1mbstate_1t_1_1_1count_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1mbstate_1t_1_1_1count_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   __mbstate_t *arg1 = (__mbstate_t *) 0 ;
   int arg2 ;
   
@@ -1803,7 +1783,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1_1mbstate_1t_1_1_1count_1set(JNIEnv *
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1mbstate_1t_1_1_1count_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1mbstate_1t_1_1_1count_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   __mbstate_t *arg1 = (__mbstate_t *) 0 ;
   int result;
@@ -1818,7 +1798,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1mbstate_1t_1_1_1count_1get(JNIEnv *
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI__1_1mbstate_1t_1_1_1value_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1mbstate_1t_1_1_1value_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   __mbstate_t *arg1 = (__mbstate_t *) 0 ;
   __mbstate_t___value *result = 0 ;
@@ -1833,7 +1813,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI__1_1mbstate_1t_1_1_1value_1get(JNIEnv 
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_new_1_1_1mbstate_1t(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_new_1_1_1mbstate_1t(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   __mbstate_t *result = 0 ;
   
@@ -1845,7 +1825,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_new_1_1_1mbstate_1t(JNIEnv *jenv, jcla
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_delete_1_1_1mbstate_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_delete_1_1_1mbstate_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   __mbstate_t *arg1 = (__mbstate_t *) 0 ;
   
   (void)jenv;
@@ -1855,7 +1835,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_delete_1_1_1mbstate_1t(JNIEnv *jenv, jc
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1_1mbstate_1t_1_1_1value_1_1_1wch_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1mbstate_1t_1_1_1value_1_1_1wch_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   __mbstate_t___value *arg1 = (__mbstate_t___value *) 0 ;
   unsigned int arg2 ;
   
@@ -1868,7 +1848,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1_1mbstate_1t_1_1_1value_1_1_1wch_1set
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI__1_1mbstate_1t_1_1_1value_1_1_1wch_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1mbstate_1t_1_1_1value_1_1_1wch_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   __mbstate_t___value *arg1 = (__mbstate_t___value *) 0 ;
   unsigned int result;
@@ -1883,7 +1863,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI__1_1mbstate_1t_1_1_1value_1_1_1wch_1ge
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1_1mbstate_1t_1_1_1value_1_1_1wchb_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1mbstate_1t_1_1_1value_1_1_1wchb_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   __mbstate_t___value *arg1 = (__mbstate_t___value *) 0 ;
   char *arg2 ;
   
@@ -1909,7 +1889,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1_1mbstate_1t_1_1_1value_1_1_1wchb_1se
 }
 
 
-SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI__1_1mbstate_1t_1_1_1value_1_1_1wchb_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1mbstate_1t_1_1_1value_1_1_1wchb_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jstring jresult = 0 ;
   __mbstate_t___value *arg1 = (__mbstate_t___value *) 0 ;
   char *result = 0 ;
@@ -1924,7 +1904,7 @@ SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI__1_1mbstate_1t_1_1_1value_1_1_1wchb_
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_new_1_1_1mbstate_1t_1_1_1value(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_new_1_1_1mbstate_1t_1_1_1value(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   __mbstate_t___value *result = 0 ;
   
@@ -1936,7 +1916,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_new_1_1_1mbstate_1t_1_1_1value(JNIEnv 
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_delete_1_1_1mbstate_1t_1_1_1value(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_delete_1_1_1mbstate_1t_1_1_1value(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   __mbstate_t___value *arg1 = (__mbstate_t___value *) 0 ;
   
   (void)jenv;
@@ -1946,7 +1926,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_delete_1_1_1mbstate_1t_1_1_1value(JNIEn
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1_1fpos_1t_1_1_1pos_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1fpos_1t_1_1_1pos_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   struct _G_fpos_t *arg1 = (struct _G_fpos_t *) 0 ;
   __off_t arg2 ;
   
@@ -1959,7 +1939,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1_1fpos_1t_1_1_1pos_1set(JNIEnv *jenv,
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1fpos_1t_1_1_1pos_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1fpos_1t_1_1_1pos_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   struct _G_fpos_t *arg1 = (struct _G_fpos_t *) 0 ;
   __off_t result;
@@ -1974,7 +1954,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1fpos_1t_1_1_1pos_1get(JNIEnv *jenv,
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1_1fpos_1t_1_1_1state_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1fpos_1t_1_1_1state_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   struct _G_fpos_t *arg1 = (struct _G_fpos_t *) 0 ;
   __mbstate_t *arg2 = (__mbstate_t *) 0 ;
   
@@ -1988,7 +1968,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1_1fpos_1t_1_1_1state_1set(JNIEnv *jen
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI__1_1fpos_1t_1_1_1state_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1fpos_1t_1_1_1state_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   struct _G_fpos_t *arg1 = (struct _G_fpos_t *) 0 ;
   __mbstate_t *result = 0 ;
@@ -2003,7 +1983,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI__1_1fpos_1t_1_1_1state_1get(JNIEnv *je
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_new_1_1_1fpos_1t(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_new_1_1_1fpos_1t(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   struct _G_fpos_t *result = 0 ;
   
@@ -2015,7 +1995,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_new_1_1_1fpos_1t(JNIEnv *jenv, jclass 
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_delete_1_1_1fpos_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_delete_1_1_1fpos_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   struct _G_fpos_t *arg1 = (struct _G_fpos_t *) 0 ;
   
   (void)jenv;
@@ -2025,7 +2005,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_delete_1_1_1fpos_1t(JNIEnv *jenv, jclas
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1_1_1_1fpos64_1t_1defined_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1_1_1_1fpos64_1t_1defined_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -2037,7 +2017,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1_1_1_1fpos64_1t_1defined_1get(JNIEn
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1_1fpos64_1t_1_1_1pos_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1fpos64_1t_1_1_1pos_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   struct _G_fpos64_t *arg1 = (struct _G_fpos64_t *) 0 ;
   __off64_t arg2 ;
   
@@ -2050,7 +2030,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1_1fpos64_1t_1_1_1pos_1set(JNIEnv *jen
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI__1_1fpos64_1t_1_1_1pos_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1fpos64_1t_1_1_1pos_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   struct _G_fpos64_t *arg1 = (struct _G_fpos64_t *) 0 ;
   __off64_t result;
@@ -2065,7 +2045,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI__1_1fpos64_1t_1_1_1pos_1get(JNIEnv *je
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1_1fpos64_1t_1_1_1state_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1fpos64_1t_1_1_1state_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   struct _G_fpos64_t *arg1 = (struct _G_fpos64_t *) 0 ;
   __mbstate_t *arg2 = (__mbstate_t *) 0 ;
   
@@ -2079,7 +2059,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1_1fpos64_1t_1_1_1state_1set(JNIEnv *j
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI__1_1fpos64_1t_1_1_1state_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1fpos64_1t_1_1_1state_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   struct _G_fpos64_t *arg1 = (struct _G_fpos64_t *) 0 ;
   __mbstate_t *result = 0 ;
@@ -2094,7 +2074,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI__1_1fpos64_1t_1_1_1state_1get(JNIEnv *
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_new_1_1_1fpos64_1t(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_new_1_1_1fpos64_1t(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   struct _G_fpos64_t *result = 0 ;
   
@@ -2106,7 +2086,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_new_1_1_1fpos64_1t(JNIEnv *jenv, jclas
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_delete_1_1_1fpos64_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_delete_1_1_1fpos64_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   struct _G_fpos64_t *arg1 = (struct _G_fpos64_t *) 0 ;
   
   (void)jenv;
@@ -2116,7 +2096,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_delete_1_1_1fpos64_1t(JNIEnv *jenv, jcl
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1_1_1FILE_1defined_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1_1_1FILE_1defined_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -2128,7 +2108,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1_1_1FILE_1defined_1get(JNIEnv *jenv
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1FILE_1defined_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1FILE_1defined_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -2140,7 +2120,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1FILE_1defined_1get(JNIEnv *jenv, jc
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1struct_1FILE_1defined_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1struct_1FILE_1defined_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -2152,7 +2132,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1struct_1FILE_1defined_1get(JNIEnv *
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1flags_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1flags_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   int arg2 ;
   
@@ -2165,7 +2145,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1flags_1set(JNIEnv *jenv, 
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1flags_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1flags_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   int result;
@@ -2180,7 +2160,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1flags_1get(JNIEnv *jenv, 
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1read_1ptr_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1IO_1read_1ptr_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   char *arg2 = (char *) 0 ;
   
@@ -2206,7 +2186,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1read_1ptr_1set(JNIEnv
 }
 
 
-SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1read_1ptr_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1IO_1read_1ptr_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jstring jresult = 0 ;
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   char *result = 0 ;
@@ -2221,7 +2201,7 @@ SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1read_1ptr_1get(JNI
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1read_1end_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1IO_1read_1end_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   char *arg2 = (char *) 0 ;
   
@@ -2247,7 +2227,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1read_1end_1set(JNIEnv
 }
 
 
-SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1read_1end_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1IO_1read_1end_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jstring jresult = 0 ;
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   char *result = 0 ;
@@ -2262,7 +2242,7 @@ SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1read_1end_1get(JNI
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1read_1base_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1IO_1read_1base_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   char *arg2 = (char *) 0 ;
   
@@ -2288,7 +2268,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1read_1base_1set(JNIEn
 }
 
 
-SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1read_1base_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1IO_1read_1base_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jstring jresult = 0 ;
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   char *result = 0 ;
@@ -2303,7 +2283,7 @@ SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1read_1base_1get(JN
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1write_1base_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1IO_1write_1base_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   char *arg2 = (char *) 0 ;
   
@@ -2329,7 +2309,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1write_1base_1set(JNIE
 }
 
 
-SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1write_1base_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1IO_1write_1base_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jstring jresult = 0 ;
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   char *result = 0 ;
@@ -2344,7 +2324,7 @@ SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1write_1base_1get(J
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1write_1ptr_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1IO_1write_1ptr_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   char *arg2 = (char *) 0 ;
   
@@ -2370,7 +2350,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1write_1ptr_1set(JNIEn
 }
 
 
-SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1write_1ptr_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1IO_1write_1ptr_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jstring jresult = 0 ;
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   char *result = 0 ;
@@ -2385,7 +2365,7 @@ SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1write_1ptr_1get(JN
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1write_1end_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1IO_1write_1end_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   char *arg2 = (char *) 0 ;
   
@@ -2411,7 +2391,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1write_1end_1set(JNIEn
 }
 
 
-SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1write_1end_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1IO_1write_1end_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jstring jresult = 0 ;
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   char *result = 0 ;
@@ -2426,7 +2406,7 @@ SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1write_1end_1get(JN
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1buf_1base_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1IO_1buf_1base_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   char *arg2 = (char *) 0 ;
   
@@ -2452,7 +2432,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1buf_1base_1set(JNIEnv
 }
 
 
-SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1buf_1base_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1IO_1buf_1base_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jstring jresult = 0 ;
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   char *result = 0 ;
@@ -2467,7 +2447,7 @@ SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1buf_1base_1get(JNI
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1buf_1end_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1IO_1buf_1end_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   char *arg2 = (char *) 0 ;
   
@@ -2493,7 +2473,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1buf_1end_1set(JNIEnv 
 }
 
 
-SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1buf_1end_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1IO_1buf_1end_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jstring jresult = 0 ;
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   char *result = 0 ;
@@ -2508,7 +2488,7 @@ SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1buf_1end_1get(JNIE
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1save_1base_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1IO_1save_1base_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   char *arg2 = (char *) 0 ;
   
@@ -2534,7 +2514,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1save_1base_1set(JNIEn
 }
 
 
-SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1save_1base_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1IO_1save_1base_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jstring jresult = 0 ;
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   char *result = 0 ;
@@ -2549,7 +2529,7 @@ SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1save_1base_1get(JN
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1backup_1base_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1IO_1backup_1base_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   char *arg2 = (char *) 0 ;
   
@@ -2575,7 +2555,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1backup_1base_1set(JNI
 }
 
 
-SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1backup_1base_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1IO_1backup_1base_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jstring jresult = 0 ;
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   char *result = 0 ;
@@ -2590,7 +2570,7 @@ SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1backup_1base_1get(
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1save_1end_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1IO_1save_1end_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   char *arg2 = (char *) 0 ;
   
@@ -2616,7 +2596,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1save_1end_1set(JNIEnv
 }
 
 
-SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1save_1end_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1IO_1save_1end_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jstring jresult = 0 ;
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   char *result = 0 ;
@@ -2631,7 +2611,7 @@ SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1IO_1save_1end_1get(JNI
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1markers_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1markers_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   struct _IO_marker *arg2 = (struct _IO_marker *) 0 ;
   
@@ -2644,7 +2624,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1markers_1set(JNIEnv *jenv
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1markers_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1markers_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   struct _IO_marker *result = 0 ;
@@ -2659,7 +2639,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1markers_1get(JNIEnv *jen
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1chain_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1chain_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   struct _IO_FILE *arg2 = (struct _IO_FILE *) 0 ;
   
@@ -2673,7 +2653,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1chain_1set(JNIEnv *jenv, 
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1chain_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1chain_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   struct _IO_FILE *result = 0 ;
@@ -2688,7 +2668,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1chain_1get(JNIEnv *jenv,
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1fileno_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1fileno_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   int arg2 ;
   
@@ -2701,7 +2681,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1fileno_1set(JNIEnv *jenv,
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1fileno_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1fileno_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   int result;
@@ -2716,7 +2696,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1fileno_1get(JNIEnv *jenv,
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1flags2_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1flags2_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   int arg2 ;
   
@@ -2729,7 +2709,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1flags2_1set(JNIEnv *jenv,
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1flags2_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1flags2_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   int result;
@@ -2744,7 +2724,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1flags2_1get(JNIEnv *jenv,
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1old_1offset_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1old_1offset_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   __off_t arg2 ;
   
@@ -2757,7 +2737,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1old_1offset_1set(JNIEnv *
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1old_1offset_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1old_1offset_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   __off_t result;
@@ -2772,7 +2752,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1old_1offset_1get(JNIEnv *
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1cur_1column_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1cur_1column_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   unsigned short arg2 ;
   
@@ -2785,7 +2765,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1cur_1column_1set(JNIEnv *
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1cur_1column_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1cur_1column_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   unsigned short result;
@@ -2800,7 +2780,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1cur_1column_1get(JNIEnv *
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1vtable_1offset_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jbyte jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1vtable_1offset_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jbyte jarg2) {
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   signed char arg2 ;
   
@@ -2813,7 +2793,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1vtable_1offset_1set(JNIEn
 }
 
 
-SWIGEXPORT jbyte JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1vtable_1offset_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jbyte JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1vtable_1offset_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jbyte jresult = 0 ;
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   signed char result;
@@ -2828,7 +2808,7 @@ SWIGEXPORT jbyte JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1vtable_1offset_1get(JNIE
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1shortbuf_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1shortbuf_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   char *arg2 ;
   
@@ -2854,7 +2834,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1shortbuf_1set(JNIEnv *jen
 }
 
 
-SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1shortbuf_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1shortbuf_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jstring jresult = 0 ;
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   char *result = 0 ;
@@ -2869,7 +2849,7 @@ SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1shortbuf_1get(JNIEnv *
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1lock_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1lock_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   _IO_lock_t *arg2 = (_IO_lock_t *) 0 ;
   
@@ -2882,7 +2862,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1lock_1set(JNIEnv *jenv, j
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1lock_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1lock_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   _IO_lock_t *result = 0 ;
@@ -2897,7 +2877,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1lock_1get(JNIEnv *jenv, 
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1offset_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1offset_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   __off64_t arg2 ;
   
@@ -2910,7 +2890,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1offset_1set(JNIEnv *jenv,
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1offset_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1offset_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   __off64_t result;
@@ -2925,7 +2905,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1offset_1get(JNIEnv *jenv
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1codecvt_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1codecvt_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   struct _IO_codecvt *arg2 = (struct _IO_codecvt *) 0 ;
   
@@ -2938,7 +2918,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1codecvt_1set(JNIEnv *jenv
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1codecvt_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1codecvt_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   struct _IO_codecvt *result = 0 ;
@@ -2953,7 +2933,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1codecvt_1get(JNIEnv *jen
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1wide_1data_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1wide_1data_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   struct _IO_wide_data *arg2 = (struct _IO_wide_data *) 0 ;
   
@@ -2966,7 +2946,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1wide_1data_1set(JNIEnv *j
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1wide_1data_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1wide_1data_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   struct _IO_wide_data *result = 0 ;
@@ -2981,7 +2961,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1wide_1data_1get(JNIEnv *
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1freeres_1list_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1freeres_1list_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   struct _IO_FILE *arg2 = (struct _IO_FILE *) 0 ;
   
@@ -2995,7 +2975,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1freeres_1list_1set(JNIEnv
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1freeres_1list_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1freeres_1list_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   struct _IO_FILE *result = 0 ;
@@ -3010,7 +2990,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1freeres_1list_1get(JNIEn
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1freeres_1buf_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1freeres_1buf_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   void *arg2 = (void *) 0 ;
   
@@ -3023,7 +3003,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1freeres_1buf_1set(JNIEnv 
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1freeres_1buf_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1freeres_1buf_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   void *result = 0 ;
@@ -3038,7 +3018,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1freeres_1buf_1get(JNIEnv
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1_1pad5_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1_1pad5_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   size_t arg2 ;
   
@@ -3051,7 +3031,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1_1pad5_1set(JNIEnv *jenv,
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1_1pad5_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1_1pad5_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   size_t result;
@@ -3066,7 +3046,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1_1pad5_1get(JNIEnv *jenv
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1mode_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1mode_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   int arg2 ;
   
@@ -3079,7 +3059,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1mode_1set(JNIEnv *jenv, j
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1mode_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1mode_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   int result;
@@ -3094,7 +3074,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1mode_1get(JNIEnv *jenv, j
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1unused2_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1unused2_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   char *arg2 ;
   
@@ -3120,7 +3100,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1unused2_1set(JNIEnv *jenv
 }
 
 
-SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1unused2_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1unused2_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jstring jresult = 0 ;
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   char *result = 0 ;
@@ -3135,7 +3115,7 @@ SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI__1IO_1FILE_1_1unused2_1get(JNIEnv *j
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_new_1_1IO_1FILE(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_new_1_1IO_1FILE(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   struct _IO_FILE *result = 0 ;
   
@@ -3147,7 +3127,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_new_1_1IO_1FILE(JNIEnv *jenv, jclass j
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_delete_1_1IO_1FILE(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_delete_1_1IO_1FILE(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   
   (void)jenv;
@@ -3157,7 +3137,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_delete_1_1IO_1FILE(JNIEnv *jenv, jclass
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1IO_1EOF_1SEEN_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1EOF_1SEEN_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -3169,7 +3149,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1IO_1EOF_1SEEN_1get(JNIEnv *jenv, jcla
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1IO_1ERR_1SEEN_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1ERR_1SEEN_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -3181,7 +3161,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1IO_1ERR_1SEEN_1get(JNIEnv *jenv, jcla
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1IO_1USER_1LOCK_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1USER_1LOCK_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -3193,7 +3173,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1IO_1USER_1LOCK_1get(JNIEnv *jenv, jcl
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1IOFBF_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IOFBF_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -3205,7 +3185,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1IOFBF_1get(JNIEnv *jenv, jclass jcls)
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1IOLBF_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IOLBF_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -3217,7 +3197,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1IOLBF_1get(JNIEnv *jenv, jclass jcls)
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1IONBF_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IONBF_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -3229,7 +3209,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1IONBF_1get(JNIEnv *jenv, jclass jcls)
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_BUFSIZ_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_BUFSIZ_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -3241,7 +3221,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_BUFSIZ_1get(JNIEnv *jenv, jclass jcls) 
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_EOF_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_EOF_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -3253,7 +3233,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_EOF_1get(JNIEnv *jenv, jclass jcls) {
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_SEEK_1SET_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_SEEK_1SET_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -3265,7 +3245,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_SEEK_1SET_1get(JNIEnv *jenv, jclass jcl
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_SEEK_1CUR_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_SEEK_1CUR_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -3277,7 +3257,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_SEEK_1CUR_1get(JNIEnv *jenv, jclass jcl
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_SEEK_1END_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_SEEK_1END_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -3289,7 +3269,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_SEEK_1END_1get(JNIEnv *jenv, jclass jcl
 }
 
 
-SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_P_1tmpdir_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_P_1tmpdir_1get(JNIEnv *jenv, jclass jcls) {
   jstring jresult = 0 ;
   char *result = 0 ;
   
@@ -3301,7 +3281,7 @@ SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_P_1tmpdir_1get(JNIEnv *jenv, jclass 
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1BITS_1STDIO_1LIM_1H_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1BITS_1STDIO_1LIM_1H_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -3313,7 +3293,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1BITS_1STDIO_1LIM_1H_1get(JNIEnv *jenv
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_L_1tmpnam_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_L_1tmpnam_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -3325,7 +3305,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_L_1tmpnam_1get(JNIEnv *jenv, jclass jcl
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_TMP_1MAX_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_TMP_1MAX_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -3337,7 +3317,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_TMP_1MAX_1get(JNIEnv *jenv, jclass jcls
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_FILENAME_1MAX_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_FILENAME_1MAX_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -3349,7 +3329,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_FILENAME_1MAX_1get(JNIEnv *jenv, jclass
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_L_1ctermid_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_L_1ctermid_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -3361,7 +3341,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_L_1ctermid_1get(JNIEnv *jenv, jclass jc
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_FOPEN_1MAX_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_FOPEN_1MAX_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -3373,7 +3353,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_FOPEN_1MAX_1get(JNIEnv *jenv, jclass jc
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_stdin_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_stdin_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   FILE *arg1 = (FILE *) 0 ;
   
   (void)jenv;
@@ -3384,7 +3364,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_stdin_1set(JNIEnv *jenv, jclass jcls, j
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_stdin_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_stdin_1get(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   FILE *result = 0 ;
   
@@ -3396,7 +3376,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_stdin_1get(JNIEnv *jenv, jclass jcls) 
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_stdout_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_stdout_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   FILE *arg1 = (FILE *) 0 ;
   
   (void)jenv;
@@ -3407,7 +3387,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_stdout_1set(JNIEnv *jenv, jclass jcls, 
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_stdout_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_stdout_1get(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   FILE *result = 0 ;
   
@@ -3419,7 +3399,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_stdout_1get(JNIEnv *jenv, jclass jcls)
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_stderr_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_stderr_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   FILE *arg1 = (FILE *) 0 ;
   
   (void)jenv;
@@ -3430,7 +3410,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_stderr_1set(JNIEnv *jenv, jclass jcls, 
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_stderr_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_stderr_1get(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   FILE *result = 0 ;
   
@@ -3442,7 +3422,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_stderr_1get(JNIEnv *jenv, jclass jcls)
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_remove(JNIEnv *jenv, jclass jcls, jstring jarg1) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_remove(JNIEnv *jenv, jclass jcls, jstring jarg1) {
   jint jresult = 0 ;
   char *arg1 = (char *) 0 ;
   int result;
@@ -3461,7 +3441,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_remove(JNIEnv *jenv, jclass jcls, jstri
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_rename(JNIEnv *jenv, jclass jcls, jstring jarg1, jstring jarg2) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_rename(JNIEnv *jenv, jclass jcls, jstring jarg1, jstring jarg2) {
   jint jresult = 0 ;
   char *arg1 = (char *) 0 ;
   char *arg2 = (char *) 0 ;
@@ -3487,7 +3467,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_rename(JNIEnv *jenv, jclass jcls, jstri
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_renameat(JNIEnv *jenv, jclass jcls, jint jarg1, jstring jarg2, jint jarg3, jstring jarg4) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_renameat(JNIEnv *jenv, jclass jcls, jint jarg1, jstring jarg2, jint jarg3, jstring jarg4) {
   jint jresult = 0 ;
   int arg1 ;
   char *arg2 = (char *) 0 ;
@@ -3517,7 +3497,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_renameat(JNIEnv *jenv, jclass jcls, jin
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_fclose(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_fclose(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   FILE *arg1 = (FILE *) 0 ;
   int result;
@@ -3532,7 +3512,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_fclose(JNIEnv *jenv, jclass jcls, jlong
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_tmpfile(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_tmpfile(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   FILE *result = 0 ;
   
@@ -3544,7 +3524,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_tmpfile(JNIEnv *jenv, jclass jcls) {
 }
 
 
-SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_tmpnam(JNIEnv *jenv, jclass jcls, jstring jarg1) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_tmpnam(JNIEnv *jenv, jclass jcls, jstring jarg1) {
   jstring jresult = 0 ;
   char *arg1 ;
   char *result = 0 ;
@@ -3564,7 +3544,7 @@ SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_tmpnam(JNIEnv *jenv, jclass jcls, js
 }
 
 
-SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_tmpnam_1r(JNIEnv *jenv, jclass jcls, jstring jarg1) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_tmpnam_1r(JNIEnv *jenv, jclass jcls, jstring jarg1) {
   jstring jresult = 0 ;
   char *arg1 ;
   char *result = 0 ;
@@ -3584,7 +3564,7 @@ SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_tmpnam_1r(JNIEnv *jenv, jclass jcls,
 }
 
 
-SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_tempnam(JNIEnv *jenv, jclass jcls, jstring jarg1, jstring jarg2) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_tempnam(JNIEnv *jenv, jclass jcls, jstring jarg1, jstring jarg2) {
   jstring jresult = 0 ;
   char *arg1 = (char *) 0 ;
   char *arg2 = (char *) 0 ;
@@ -3610,7 +3590,7 @@ SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_tempnam(JNIEnv *jenv, jclass jcls, j
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_fflush(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_fflush(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   FILE *arg1 = (FILE *) 0 ;
   int result;
@@ -3625,7 +3605,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_fflush(JNIEnv *jenv, jclass jcls, jlong
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_fflush_1unlocked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_fflush_1unlocked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   FILE *arg1 = (FILE *) 0 ;
   int result;
@@ -3640,7 +3620,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_fflush_1unlocked(JNIEnv *jenv, jclass j
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_fopen(JNIEnv *jenv, jclass jcls, jstring jarg1, jstring jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_fopen(JNIEnv *jenv, jclass jcls, jstring jarg1, jstring jarg2) {
   jlong jresult = 0 ;
   char *arg1 = (char *) 0 ;
   char *arg2 = (char *) 0 ;
@@ -3666,7 +3646,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_fopen(JNIEnv *jenv, jclass jcls, jstri
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_freopen(JNIEnv *jenv, jclass jcls, jstring jarg1, jstring jarg2, jlong jarg3, jobject jarg3_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_freopen(JNIEnv *jenv, jclass jcls, jstring jarg1, jstring jarg2, jlong jarg3, jobject jarg3_) {
   jlong jresult = 0 ;
   char *arg1 = (char *) 0 ;
   char *arg2 = (char *) 0 ;
@@ -3695,7 +3675,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_freopen(JNIEnv *jenv, jclass jcls, jst
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_fdopen(JNIEnv *jenv, jclass jcls, jint jarg1, jstring jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_fdopen(JNIEnv *jenv, jclass jcls, jint jarg1, jstring jarg2) {
   jlong jresult = 0 ;
   int arg1 ;
   char *arg2 = (char *) 0 ;
@@ -3716,7 +3696,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_fdopen(JNIEnv *jenv, jclass jcls, jint
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_fmemopen(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jstring jarg3) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_fmemopen(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jstring jarg3) {
   jlong jresult = 0 ;
   void *arg1 = (void *) 0 ;
   size_t arg2 ;
@@ -3739,7 +3719,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_fmemopen(JNIEnv *jenv, jclass jcls, jl
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_open_1memstream(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_open_1memstream(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
   jlong jresult = 0 ;
   char **arg1 = (char **) 0 ;
   size_t *arg2 = (size_t *) 0 ;
@@ -3755,7 +3735,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_open_1memstream(JNIEnv *jenv, jclass j
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_setbuf(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_setbuf(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   FILE *arg1 = (FILE *) 0 ;
   char *arg2 = (char *) 0 ;
   
@@ -3773,7 +3753,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_setbuf(JNIEnv *jenv, jclass jcls, jlong
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_setvbuf(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jint jarg3, jlong jarg4) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_setvbuf(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jint jarg3, jlong jarg4) {
   jint jresult = 0 ;
   FILE *arg1 = (FILE *) 0 ;
   char *arg2 = (char *) 0 ;
@@ -3799,7 +3779,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_setvbuf(JNIEnv *jenv, jclass jcls, jlon
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_setbuffer(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jlong jarg3) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_setbuffer(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jlong jarg3) {
   FILE *arg1 = (FILE *) 0 ;
   char *arg2 = (char *) 0 ;
   size_t arg3 ;
@@ -3819,7 +3799,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_setbuffer(JNIEnv *jenv, jclass jcls, jl
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_setlinebuf(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_setlinebuf(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   FILE *arg1 = (FILE *) 0 ;
   
   (void)jenv;
@@ -3830,7 +3810,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_setlinebuf(JNIEnv *jenv, jclass jcls, j
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_fprintf(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_fprintf(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   jint jresult = 0 ;
   FILE *arg1 = (FILE *) 0 ;
   char *arg2 = (char *) 0 ;
@@ -3853,7 +3833,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_fprintf(JNIEnv *jenv, jclass jcls, jlon
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_printf(JNIEnv *jenv, jclass jcls, jstring jarg1) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_printf(JNIEnv *jenv, jclass jcls, jstring jarg1) {
   jint jresult = 0 ;
   char *arg1 = (char *) 0 ;
   void *arg2 = 0 ;
@@ -3873,7 +3853,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_printf(JNIEnv *jenv, jclass jcls, jstri
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_sprintf(JNIEnv *jenv, jclass jcls, jstring jarg1, jstring jarg2) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_sprintf(JNIEnv *jenv, jclass jcls, jstring jarg1, jstring jarg2) {
   jint jresult = 0 ;
   char *arg1 = (char *) 0 ;
   char *arg2 = (char *) 0 ;
@@ -3900,7 +3880,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_sprintf(JNIEnv *jenv, jclass jcls, jstr
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_fgetc(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_fgetc(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   FILE *arg1 = (FILE *) 0 ;
   int result;
@@ -3915,7 +3895,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_fgetc(JNIEnv *jenv, jclass jcls, jlong 
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_getc(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_getc(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   FILE *arg1 = (FILE *) 0 ;
   int result;
@@ -3930,7 +3910,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_getc(JNIEnv *jenv, jclass jcls, jlong j
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_getchar(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_getchar(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -3942,7 +3922,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_getchar(JNIEnv *jenv, jclass jcls) {
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_getc_1unlocked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_getc_1unlocked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   FILE *arg1 = (FILE *) 0 ;
   int result;
@@ -3957,7 +3937,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_getc_1unlocked(JNIEnv *jenv, jclass jcl
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_getchar_1unlocked(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_getchar_1unlocked(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -3969,7 +3949,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_getchar_1unlocked(JNIEnv *jenv, jclass 
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_fgetc_1unlocked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_fgetc_1unlocked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   FILE *arg1 = (FILE *) 0 ;
   int result;
@@ -3984,7 +3964,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_fgetc_1unlocked(JNIEnv *jenv, jclass jc
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_fputc(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_fputc(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jobject jarg2_) {
   jint jresult = 0 ;
   int arg1 ;
   FILE *arg2 = (FILE *) 0 ;
@@ -4001,7 +3981,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_fputc(JNIEnv *jenv, jclass jcls, jint j
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_putc(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_putc(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jobject jarg2_) {
   jint jresult = 0 ;
   int arg1 ;
   FILE *arg2 = (FILE *) 0 ;
@@ -4018,7 +3998,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_putc(JNIEnv *jenv, jclass jcls, jint ja
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_putchar(JNIEnv *jenv, jclass jcls, jint jarg1) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_putchar(JNIEnv *jenv, jclass jcls, jint jarg1) {
   jint jresult = 0 ;
   int arg1 ;
   int result;
@@ -4032,7 +4012,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_putchar(JNIEnv *jenv, jclass jcls, jint
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_fputc_1unlocked(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_fputc_1unlocked(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jobject jarg2_) {
   jint jresult = 0 ;
   int arg1 ;
   FILE *arg2 = (FILE *) 0 ;
@@ -4049,7 +4029,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_fputc_1unlocked(JNIEnv *jenv, jclass jc
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_putc_1unlocked(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_putc_1unlocked(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jobject jarg2_) {
   jint jresult = 0 ;
   int arg1 ;
   FILE *arg2 = (FILE *) 0 ;
@@ -4066,7 +4046,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_putc_1unlocked(JNIEnv *jenv, jclass jcl
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_putchar_1unlocked(JNIEnv *jenv, jclass jcls, jint jarg1) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_putchar_1unlocked(JNIEnv *jenv, jclass jcls, jint jarg1) {
   jint jresult = 0 ;
   int arg1 ;
   int result;
@@ -4080,7 +4060,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_putchar_1unlocked(JNIEnv *jenv, jclass 
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_getw(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_getw(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   FILE *arg1 = (FILE *) 0 ;
   int result;
@@ -4095,7 +4075,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_getw(JNIEnv *jenv, jclass jcls, jlong j
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_putw(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_putw(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jobject jarg2_) {
   jint jresult = 0 ;
   int arg1 ;
   FILE *arg2 = (FILE *) 0 ;
@@ -4112,7 +4092,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_putw(JNIEnv *jenv, jclass jcls, jint ja
 }
 
 
-SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_fgets(JNIEnv *jenv, jclass jcls, jstring jarg1, jint jarg2, jlong jarg3, jobject jarg3_) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_fgets(JNIEnv *jenv, jclass jcls, jstring jarg1, jint jarg2, jlong jarg3, jobject jarg3_) {
   jstring jresult = 0 ;
   char *arg1 = (char *) 0 ;
   int arg2 ;
@@ -4136,7 +4116,7 @@ SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_fgets(JNIEnv *jenv, jclass jcls, jst
 }
 
 
-SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_gets(JNIEnv *jenv, jclass jcls, jstring jarg1) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_gets(JNIEnv *jenv, jclass jcls, jstring jarg1) {
   jstring jresult = 0 ;
   char *arg1 = (char *) 0 ;
   char *result = 0 ;
@@ -4155,7 +4135,7 @@ SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_gets(JNIEnv *jenv, jclass jcls, jstr
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1getdelim(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jint jarg3, jlong jarg4, jobject jarg4_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1getdelim(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jint jarg3, jlong jarg4, jobject jarg4_) {
   jint jresult = 0 ;
   char **arg1 = (char **) 0 ;
   size_t *arg2 = (size_t *) 0 ;
@@ -4176,7 +4156,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1getdelim(JNIEnv *jenv, jclass jcls,
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_getdelim(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jint jarg3, jlong jarg4, jobject jarg4_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_getdelim(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jint jarg3, jlong jarg4, jobject jarg4_) {
   jint jresult = 0 ;
   char **arg1 = (char **) 0 ;
   size_t *arg2 = (size_t *) 0 ;
@@ -4197,7 +4177,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_getdelim(JNIEnv *jenv, jclass jcls, jlo
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_getline(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3, jobject jarg3_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_getline(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3, jobject jarg3_) {
   jint jresult = 0 ;
   char **arg1 = (char **) 0 ;
   size_t *arg2 = (size_t *) 0 ;
@@ -4216,7 +4196,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_getline(JNIEnv *jenv, jclass jcls, jlon
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_fputs(JNIEnv *jenv, jclass jcls, jstring jarg1, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_fputs(JNIEnv *jenv, jclass jcls, jstring jarg1, jlong jarg2, jobject jarg2_) {
   jint jresult = 0 ;
   char *arg1 = (char *) 0 ;
   FILE *arg2 = (FILE *) 0 ;
@@ -4238,7 +4218,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_fputs(JNIEnv *jenv, jclass jcls, jstrin
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_puts(JNIEnv *jenv, jclass jcls, jstring jarg1) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_puts(JNIEnv *jenv, jclass jcls, jstring jarg1) {
   jint jresult = 0 ;
   char *arg1 = (char *) 0 ;
   int result;
@@ -4257,7 +4237,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_puts(JNIEnv *jenv, jclass jcls, jstring
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_ungetc(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_ungetc(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jobject jarg2_) {
   jint jresult = 0 ;
   int arg1 ;
   FILE *arg2 = (FILE *) 0 ;
@@ -4274,7 +4254,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_ungetc(JNIEnv *jenv, jclass jcls, jint 
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_fread(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3, jlong jarg4, jobject jarg4_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_fread(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3, jlong jarg4, jobject jarg4_) {
   jlong jresult = 0 ;
   void *arg1 = (void *) 0 ;
   size_t arg2 ;
@@ -4295,7 +4275,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_fread(JNIEnv *jenv, jclass jcls, jlong
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_fwrite(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3, jlong jarg4, jobject jarg4_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_fwrite(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3, jlong jarg4, jobject jarg4_) {
   jlong jresult = 0 ;
   void *arg1 = (void *) 0 ;
   size_t arg2 ;
@@ -4316,7 +4296,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_fwrite(JNIEnv *jenv, jclass jcls, jlon
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_fread_1unlocked(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3, jlong jarg4, jobject jarg4_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_fread_1unlocked(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3, jlong jarg4, jobject jarg4_) {
   jlong jresult = 0 ;
   void *arg1 = (void *) 0 ;
   size_t arg2 ;
@@ -4337,7 +4317,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_fread_1unlocked(JNIEnv *jenv, jclass j
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_fwrite_1unlocked(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3, jlong jarg4, jobject jarg4_) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_fwrite_1unlocked(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3, jlong jarg4, jobject jarg4_) {
   jlong jresult = 0 ;
   void *arg1 = (void *) 0 ;
   size_t arg2 ;
@@ -4358,7 +4338,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_fwrite_1unlocked(JNIEnv *jenv, jclass 
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_fseek(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_fseek(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3) {
   jint jresult = 0 ;
   FILE *arg1 = (FILE *) 0 ;
   long arg2 ;
@@ -4377,7 +4357,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_fseek(JNIEnv *jenv, jclass jcls, jlong 
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_ftell(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_ftell(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   FILE *arg1 = (FILE *) 0 ;
   long result;
@@ -4392,7 +4372,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_ftell(JNIEnv *jenv, jclass jcls, jlong 
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_rewind(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_rewind(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   FILE *arg1 = (FILE *) 0 ;
   
   (void)jenv;
@@ -4403,7 +4383,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_rewind(JNIEnv *jenv, jclass jcls, jlong
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_fseeko(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_fseeko(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3) {
   jint jresult = 0 ;
   FILE *arg1 = (FILE *) 0 ;
   __off_t arg2 ;
@@ -4422,7 +4402,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_fseeko(JNIEnv *jenv, jclass jcls, jlong
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_ftello(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_ftello(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   FILE *arg1 = (FILE *) 0 ;
   __off_t result;
@@ -4437,7 +4417,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_ftello(JNIEnv *jenv, jclass jcls, jlong
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_fgetpos(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_fgetpos(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jint jresult = 0 ;
   FILE *arg1 = (FILE *) 0 ;
   fpos_t *arg2 = (fpos_t *) 0 ;
@@ -4455,7 +4435,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_fgetpos(JNIEnv *jenv, jclass jcls, jlon
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_fsetpos(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_fsetpos(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jint jresult = 0 ;
   FILE *arg1 = (FILE *) 0 ;
   fpos_t *arg2 = (fpos_t *) 0 ;
@@ -4473,7 +4453,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_fsetpos(JNIEnv *jenv, jclass jcls, jlon
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_clearerr(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_clearerr(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   FILE *arg1 = (FILE *) 0 ;
   
   (void)jenv;
@@ -4484,7 +4464,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_clearerr(JNIEnv *jenv, jclass jcls, jlo
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_feof(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_feof(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   FILE *arg1 = (FILE *) 0 ;
   int result;
@@ -4499,7 +4479,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_feof(JNIEnv *jenv, jclass jcls, jlong j
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_ferror(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_ferror(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   FILE *arg1 = (FILE *) 0 ;
   int result;
@@ -4514,7 +4494,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_ferror(JNIEnv *jenv, jclass jcls, jlong
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_clearerr_1unlocked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_clearerr_1unlocked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   FILE *arg1 = (FILE *) 0 ;
   
   (void)jenv;
@@ -4525,7 +4505,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_clearerr_1unlocked(JNIEnv *jenv, jclass
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_feof_1unlocked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_feof_1unlocked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   FILE *arg1 = (FILE *) 0 ;
   int result;
@@ -4540,7 +4520,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_feof_1unlocked(JNIEnv *jenv, jclass jcl
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_ferror_1unlocked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_ferror_1unlocked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   FILE *arg1 = (FILE *) 0 ;
   int result;
@@ -4555,7 +4535,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_ferror_1unlocked(JNIEnv *jenv, jclass j
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_perror(JNIEnv *jenv, jclass jcls, jstring jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_perror(JNIEnv *jenv, jclass jcls, jstring jarg1) {
   char *arg1 = (char *) 0 ;
   
   (void)jenv;
@@ -4570,7 +4550,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_perror(JNIEnv *jenv, jclass jcls, jstri
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_fileno(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_fileno(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   FILE *arg1 = (FILE *) 0 ;
   int result;
@@ -4585,7 +4565,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_fileno(JNIEnv *jenv, jclass jcls, jlong
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_fileno_1unlocked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_fileno_1unlocked(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   FILE *arg1 = (FILE *) 0 ;
   int result;
@@ -4600,7 +4580,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_fileno_1unlocked(JNIEnv *jenv, jclass j
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_pclose(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_pclose(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   FILE *arg1 = (FILE *) 0 ;
   int result;
@@ -4615,7 +4595,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_pclose(JNIEnv *jenv, jclass jcls, jlong
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_popen(JNIEnv *jenv, jclass jcls, jstring jarg1, jstring jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_popen(JNIEnv *jenv, jclass jcls, jstring jarg1, jstring jarg2) {
   jlong jresult = 0 ;
   char *arg1 = (char *) 0 ;
   char *arg2 = (char *) 0 ;
@@ -4641,7 +4621,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_popen(JNIEnv *jenv, jclass jcls, jstri
 }
 
 
-SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_ctermid(JNIEnv *jenv, jclass jcls, jstring jarg1) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_ctermid(JNIEnv *jenv, jclass jcls, jstring jarg1) {
   jstring jresult = 0 ;
   char *arg1 = (char *) 0 ;
   char *result = 0 ;
@@ -4660,7 +4640,7 @@ SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_ctermid(JNIEnv *jenv, jclass jcls, j
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_flockfile(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_flockfile(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   FILE *arg1 = (FILE *) 0 ;
   
   (void)jenv;
@@ -4671,7 +4651,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_flockfile(JNIEnv *jenv, jclass jcls, jl
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_ftrylockfile(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_ftrylockfile(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   FILE *arg1 = (FILE *) 0 ;
   int result;
@@ -4686,7 +4666,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_ftrylockfile(JNIEnv *jenv, jclass jcls,
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_funlockfile(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_funlockfile(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   FILE *arg1 = (FILE *) 0 ;
   
   (void)jenv;
@@ -4697,7 +4677,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_funlockfile(JNIEnv *jenv, jclass jcls, 
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1uflow(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1uflow(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   FILE *arg1 = (FILE *) 0 ;
   int result;
@@ -4712,7 +4692,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1uflow(JNIEnv *jenv, jclass jcls, jl
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1overflow(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1overflow(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   jint jresult = 0 ;
   FILE *arg1 = (FILE *) 0 ;
   int arg2 ;
@@ -4729,7 +4709,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI__1_1overflow(JNIEnv *jenv, jclass jcls,
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_BITWUZLA_1SAT_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_BITWUZLA_1SAT_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   enum BitwuzlaResult result;
   
@@ -4741,7 +4721,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_BITWUZLA_1SAT_1get(JNIEnv *jenv, jclass
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_BITWUZLA_1UNSAT_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_BITWUZLA_1UNSAT_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   enum BitwuzlaResult result;
   
@@ -4753,7 +4733,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_BITWUZLA_1UNSAT_1get(JNIEnv *jenv, jcla
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_BITWUZLA_1UNKNOWN_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_BITWUZLA_1UNKNOWN_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   enum BitwuzlaResult result;
   
@@ -4765,7 +4745,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_BITWUZLA_1UNKNOWN_1get(JNIEnv *jenv, jc
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_BITWUZLA_1RM_1RNE_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_BITWUZLA_1RM_1RNE_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   enum BitwuzlaRoundingMode result;
   
@@ -4777,7 +4757,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_BITWUZLA_1RM_1RNE_1get(JNIEnv *jenv, jc
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_BITWUZLA_1RM_1RNA_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_BITWUZLA_1RM_1RNA_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   enum BitwuzlaRoundingMode result;
   
@@ -4789,7 +4769,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_BITWUZLA_1RM_1RNA_1get(JNIEnv *jenv, jc
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_BITWUZLA_1RM_1RTN_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_BITWUZLA_1RM_1RTN_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   enum BitwuzlaRoundingMode result;
   
@@ -4801,7 +4781,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_BITWUZLA_1RM_1RTN_1get(JNIEnv *jenv, jc
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_BITWUZLA_1RM_1RTP_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_BITWUZLA_1RM_1RTP_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   enum BitwuzlaRoundingMode result;
   
@@ -4813,7 +4793,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_BITWUZLA_1RM_1RTP_1get(JNIEnv *jenv, jc
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_BITWUZLA_1RM_1RTZ_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_BITWUZLA_1RM_1RTZ_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   enum BitwuzlaRoundingMode result;
   
@@ -4825,7 +4805,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_BITWUZLA_1RM_1RTZ_1get(JNIEnv *jenv, jc
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_BITWUZLA_1RM_1MAX_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_BITWUZLA_1RM_1MAX_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   enum BitwuzlaRoundingMode result;
   
@@ -4837,7 +4817,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_BITWUZLA_1RM_1MAX_1get(JNIEnv *jenv, jc
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_BITWUZLA_1KIND_1CONSTANT_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_BITWUZLA_1KIND_1CONSTANT_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   enum BitwuzlaKind result;
   
@@ -4849,7 +4829,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_BITWUZLA_1KIND_1CONSTANT_1get(JNIEnv *j
 }
 
 
-SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_bitwuzla_1copyright(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1copyright(JNIEnv *jenv, jclass jcls) {
   jstring jresult = 0 ;
   char *result = 0 ;
   
@@ -4861,7 +4841,7 @@ SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_bitwuzla_1copyright(JNIEnv *jenv, jc
 }
 
 
-SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_bitwuzla_1version(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1version(JNIEnv *jenv, jclass jcls) {
   jstring jresult = 0 ;
   char *result = 0 ;
   
@@ -4873,7 +4853,7 @@ SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_bitwuzla_1version(JNIEnv *jenv, jcla
 }
 
 
-SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_bitwuzla_1git_1id(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1git_1id(JNIEnv *jenv, jclass jcls) {
   jstring jresult = 0 ;
   char *result = 0 ;
   
@@ -4885,7 +4865,7 @@ SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_bitwuzla_1git_1id(JNIEnv *jenv, jcla
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_BitwuzlaOptionInfo_1opt_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_BitwuzlaOptionInfo_1opt_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   struct BitwuzlaOptionInfo *arg1 = (struct BitwuzlaOptionInfo *) 0 ;
   BitwuzlaOption arg2 ;
   
@@ -4898,7 +4878,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_BitwuzlaOptionInfo_1opt_1set(JNIEnv *je
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_BitwuzlaOptionInfo_1opt_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_BitwuzlaOptionInfo_1opt_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   struct BitwuzlaOptionInfo *arg1 = (struct BitwuzlaOptionInfo *) 0 ;
   BitwuzlaOption result;
@@ -4913,7 +4893,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_BitwuzlaOptionInfo_1opt_1get(JNIEnv *je
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_BitwuzlaOptionInfo_1shrt_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_BitwuzlaOptionInfo_1shrt_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   struct BitwuzlaOptionInfo *arg1 = (struct BitwuzlaOptionInfo *) 0 ;
   char *arg2 = (char *) 0 ;
   
@@ -4938,7 +4918,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_BitwuzlaOptionInfo_1shrt_1set(JNIEnv *j
 }
 
 
-SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_BitwuzlaOptionInfo_1shrt_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_BitwuzlaOptionInfo_1shrt_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jstring jresult = 0 ;
   struct BitwuzlaOptionInfo *arg1 = (struct BitwuzlaOptionInfo *) 0 ;
   char *result = 0 ;
@@ -4953,7 +4933,7 @@ SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_BitwuzlaOptionInfo_1shrt_1get(JNIEnv
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_BitwuzlaOptionInfo_1lng_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_BitwuzlaOptionInfo_1lng_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   struct BitwuzlaOptionInfo *arg1 = (struct BitwuzlaOptionInfo *) 0 ;
   char *arg2 = (char *) 0 ;
   
@@ -4978,7 +4958,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_BitwuzlaOptionInfo_1lng_1set(JNIEnv *je
 }
 
 
-SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_BitwuzlaOptionInfo_1lng_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_BitwuzlaOptionInfo_1lng_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jstring jresult = 0 ;
   struct BitwuzlaOptionInfo *arg1 = (struct BitwuzlaOptionInfo *) 0 ;
   char *result = 0 ;
@@ -4993,7 +4973,7 @@ SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_BitwuzlaOptionInfo_1lng_1get(JNIEnv 
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_BitwuzlaOptionInfo_1desc_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_BitwuzlaOptionInfo_1description_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   struct BitwuzlaOptionInfo *arg1 = (struct BitwuzlaOptionInfo *) 0 ;
   char *arg2 = (char *) 0 ;
   
@@ -5008,17 +4988,17 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_BitwuzlaOptionInfo_1desc_1set(JNIEnv *j
   }
   {
     if (arg2) {
-      arg1->desc = (char const *) malloc(strlen((const char *)arg2)+1);
-      strcpy((char *)arg1->desc, (const char *)arg2);
+      arg1->description = (char const *) malloc(strlen((const char *)arg2)+1);
+      strcpy((char *)arg1->description, (const char *)arg2);
     } else {
-      arg1->desc = 0;
+      arg1->description = 0;
     }
   }
   if (arg2) (*jenv)->ReleaseStringUTFChars(jenv, jarg2, (const char *)arg2);
 }
 
 
-SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_BitwuzlaOptionInfo_1desc_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_BitwuzlaOptionInfo_1description_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jstring jresult = 0 ;
   struct BitwuzlaOptionInfo *arg1 = (struct BitwuzlaOptionInfo *) 0 ;
   char *result = 0 ;
@@ -5027,13 +5007,13 @@ SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_BitwuzlaOptionInfo_1desc_1get(JNIEnv
   (void)jcls;
   (void)jarg1_;
   arg1 = *(struct BitwuzlaOptionInfo **)&jarg1; 
-  result = (char *) ((arg1)->desc);
+  result = (char *) ((arg1)->description);
   if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_BitwuzlaOptionInfo_1is_1numeric_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jboolean jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_BitwuzlaOptionInfo_1is_1numeric_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jboolean jarg2) {
   struct BitwuzlaOptionInfo *arg1 = (struct BitwuzlaOptionInfo *) 0 ;
   _Bool arg2 ;
   
@@ -5048,7 +5028,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_BitwuzlaOptionInfo_1is_1numeric_1set(JN
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_BitwuzlaOptionInfo_1is_1numeric_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_BitwuzlaOptionInfo_1is_1numeric_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   struct BitwuzlaOptionInfo *arg1 = (struct BitwuzlaOptionInfo *) 0 ;
   _Bool result;
@@ -5065,37 +5045,65 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_BitwuzlaOptionInfo_1is_1numeric_1ge
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_BitwuzlaOptionInfo_1numeric_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_BitwuzlaOptionInfo_1numeric_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  struct BitwuzlaOptionInfo *arg1 = (struct BitwuzlaOptionInfo *) 0 ;
+  struct NumericValue *arg2 = (struct NumericValue *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(struct BitwuzlaOptionInfo **)&jarg1; 
+  arg2 = *(struct NumericValue **)&jarg2; 
+  if (arg1) (arg1)->numeric = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_BitwuzlaOptionInfo_1numeric_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   struct BitwuzlaOptionInfo *arg1 = (struct BitwuzlaOptionInfo *) 0 ;
-  _numeric *result = 0 ;
+  struct NumericValue *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(struct BitwuzlaOptionInfo **)&jarg1; 
-  result = (_numeric *)& ((arg1)->numeric);
-  *(_numeric **)&jresult = result; 
+  result = (struct NumericValue *)& ((arg1)->numeric);
+  *(struct NumericValue **)&jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_BitwuzlaOptionInfo_1mode_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_BitwuzlaOptionInfo_1mode_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  struct BitwuzlaOptionInfo *arg1 = (struct BitwuzlaOptionInfo *) 0 ;
+  struct ModeValue *arg2 = (struct ModeValue *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(struct BitwuzlaOptionInfo **)&jarg1; 
+  arg2 = *(struct ModeValue **)&jarg2; 
+  if (arg1) (arg1)->mode = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_BitwuzlaOptionInfo_1mode_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   struct BitwuzlaOptionInfo *arg1 = (struct BitwuzlaOptionInfo *) 0 ;
-  _mode *result = 0 ;
+  struct ModeValue *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(struct BitwuzlaOptionInfo **)&jarg1; 
-  result = (_mode *)& ((arg1)->mode);
-  *(_mode **)&jresult = result; 
+  result = (struct ModeValue *)& ((arg1)->mode);
+  *(struct ModeValue **)&jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_new_1BitwuzlaOptionInfo(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_new_1BitwuzlaOptionInfo(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   struct BitwuzlaOptionInfo *result = 0 ;
   
@@ -5107,7 +5115,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_new_1BitwuzlaOptionInfo(JNIEnv *jenv, 
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_delete_1BitwuzlaOptionInfo(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_delete_1BitwuzlaOptionInfo(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   struct BitwuzlaOptionInfo *arg1 = (struct BitwuzlaOptionInfo *) 0 ;
   
   (void)jenv;
@@ -5117,7 +5125,299 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_delete_1BitwuzlaOptionInfo(JNIEnv *jenv
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1options_1new(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_NumericValue_1cur_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  struct NumericValue *arg1 = (struct NumericValue *) 0 ;
+  uint64_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(struct NumericValue **)&jarg1; 
+  arg2 = (uint64_t)jarg2; 
+  if (arg1) (arg1)->cur = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_NumericValue_1cur_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  struct NumericValue *arg1 = (struct NumericValue *) 0 ;
+  uint64_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(struct NumericValue **)&jarg1; 
+  result = (uint64_t) ((arg1)->cur);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_NumericValue_1dflt_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  struct NumericValue *arg1 = (struct NumericValue *) 0 ;
+  uint64_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(struct NumericValue **)&jarg1; 
+  arg2 = (uint64_t)jarg2; 
+  if (arg1) (arg1)->dflt = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_NumericValue_1dflt_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  struct NumericValue *arg1 = (struct NumericValue *) 0 ;
+  uint64_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(struct NumericValue **)&jarg1; 
+  result = (uint64_t) ((arg1)->dflt);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_NumericValue_1min_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  struct NumericValue *arg1 = (struct NumericValue *) 0 ;
+  uint64_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(struct NumericValue **)&jarg1; 
+  arg2 = (uint64_t)jarg2; 
+  if (arg1) (arg1)->min = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_NumericValue_1min_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  struct NumericValue *arg1 = (struct NumericValue *) 0 ;
+  uint64_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(struct NumericValue **)&jarg1; 
+  result = (uint64_t) ((arg1)->min);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_NumericValue_1max_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  struct NumericValue *arg1 = (struct NumericValue *) 0 ;
+  uint64_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(struct NumericValue **)&jarg1; 
+  arg2 = (uint64_t)jarg2; 
+  if (arg1) (arg1)->max = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_NumericValue_1max_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  struct NumericValue *arg1 = (struct NumericValue *) 0 ;
+  uint64_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(struct NumericValue **)&jarg1; 
+  result = (uint64_t) ((arg1)->max);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_new_1NumericValue(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  struct NumericValue *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (struct NumericValue *)calloc(1, sizeof(struct NumericValue));
+  *(struct NumericValue **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_delete_1NumericValue(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  struct NumericValue *arg1 = (struct NumericValue *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(struct NumericValue **)&jarg1; 
+  free((char *) arg1);
+}
+
+
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_ModeValue_1cur_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+  struct ModeValue *arg1 = (struct ModeValue *) 0 ;
+  char *arg2 = (char *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(struct ModeValue **)&jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg2, 0);
+    if (!arg2) return ;
+  }
+  {
+    if (arg2) {
+      arg1->cur = (char const *) malloc(strlen((const char *)arg2)+1);
+      strcpy((char *)arg1->cur, (const char *)arg2);
+    } else {
+      arg1->cur = 0;
+    }
+  }
+  if (arg2) (*jenv)->ReleaseStringUTFChars(jenv, jarg2, (const char *)arg2);
+}
+
+
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_ModeValue_1cur_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  struct ModeValue *arg1 = (struct ModeValue *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(struct ModeValue **)&jarg1; 
+  result = (char *) ((arg1)->cur);
+  if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_ModeValue_1dflt_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+  struct ModeValue *arg1 = (struct ModeValue *) 0 ;
+  char *arg2 = (char *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(struct ModeValue **)&jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg2, 0);
+    if (!arg2) return ;
+  }
+  {
+    if (arg2) {
+      arg1->dflt = (char const *) malloc(strlen((const char *)arg2)+1);
+      strcpy((char *)arg1->dflt, (const char *)arg2);
+    } else {
+      arg1->dflt = 0;
+    }
+  }
+  if (arg2) (*jenv)->ReleaseStringUTFChars(jenv, jarg2, (const char *)arg2);
+}
+
+
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_ModeValue_1dflt_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  struct ModeValue *arg1 = (struct ModeValue *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(struct ModeValue **)&jarg1; 
+  result = (char *) ((arg1)->dflt);
+  if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_ModeValue_1num_1modes_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  struct ModeValue *arg1 = (struct ModeValue *) 0 ;
+  size_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(struct ModeValue **)&jarg1; 
+  arg2 = (size_t)jarg2; 
+  if (arg1) (arg1)->num_modes = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_ModeValue_1num_1modes_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  struct ModeValue *arg1 = (struct ModeValue *) 0 ;
+  size_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(struct ModeValue **)&jarg1; 
+  result = (size_t) ((arg1)->num_modes);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_ModeValue_1modes_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  struct ModeValue *arg1 = (struct ModeValue *) 0 ;
+  char **arg2 = (char **) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(struct ModeValue **)&jarg1; 
+  arg2 = *(char ***)&jarg2; 
+  if (arg1) (arg1)->modes = (char const **)arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_ModeValue_1modes_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  struct ModeValue *arg1 = (struct ModeValue *) 0 ;
+  char **result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(struct ModeValue **)&jarg1; 
+  result = (char **) ((arg1)->modes);
+  *(char ***)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_new_1ModeValue(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  struct ModeValue *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (struct ModeValue *)calloc(1, sizeof(struct ModeValue));
+  *(struct ModeValue **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_delete_1ModeValue(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  struct ModeValue *arg1 = (struct ModeValue *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(struct ModeValue **)&jarg1; 
+  free((char *) arg1);
+}
+
+
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1options_1new(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   BitwuzlaOptions *result = 0 ;
   
@@ -5129,7 +5429,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1options_1new(JNIEnv *jenv, j
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_bitwuzla_1options_1delete(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1options_1delete(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   BitwuzlaOptions *arg1 = (BitwuzlaOptions *) 0 ;
   
   (void)jenv;
@@ -5139,7 +5439,30 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_bitwuzla_1options_1delete(JNIEnv *jenv,
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1option_1is_1numeric(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1option_1is_1valid(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
+  jboolean jresult = 0 ;
+  BitwuzlaOptions *arg1 = (BitwuzlaOptions *) 0 ;
+  char *arg2 = (char *) 0 ;
+  _Bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(BitwuzlaOptions **)&jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg2, 0);
+    if (!arg2) return 0;
+  }
+  result = bitwuzla_option_is_valid(arg1,(char const *)arg2);
+  {
+    jresult = (result ? JNI_TRUE : JNI_FALSE);
+  }
+  if (arg2) (*jenv)->ReleaseStringUTFChars(jenv, jarg2, (const char *)arg2);
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1option_1is_1numeric(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
   jboolean jresult = 0 ;
   BitwuzlaOptions *arg1 = (BitwuzlaOptions *) 0 ;
   BitwuzlaOption arg2 ;
@@ -5157,7 +5480,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1option_1is_1numeric(JNIEn
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1option_1is_1mode(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1option_1is_1mode(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
   jboolean jresult = 0 ;
   BitwuzlaOptions *arg1 = (BitwuzlaOptions *) 0 ;
   BitwuzlaOption arg2 ;
@@ -5175,7 +5498,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1option_1is_1mode(JNIEnv *
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_bitwuzla_1set_1option(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jlong jarg3) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1set_1option(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jlong jarg3) {
   BitwuzlaOptions *arg1 = (BitwuzlaOptions *) 0 ;
   BitwuzlaOption arg2 ;
   uint64_t arg3 ;
@@ -5189,7 +5512,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_bitwuzla_1set_1option(JNIEnv *jenv, jcl
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_bitwuzla_1set_1option_1mode(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jstring jarg3) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1set_1option_1mode(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jstring jarg3) {
   BitwuzlaOptions *arg1 = (BitwuzlaOptions *) 0 ;
   BitwuzlaOption arg2 ;
   char *arg3 = (char *) 0 ;
@@ -5208,7 +5531,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_bitwuzla_1set_1option_1mode(JNIEnv *jen
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1get_1option(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1get_1option(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
   jlong jresult = 0 ;
   BitwuzlaOptions *arg1 = (BitwuzlaOptions *) 0 ;
   BitwuzlaOption arg2 ;
@@ -5224,7 +5547,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1get_1option(JNIEnv *jenv, jc
 }
 
 
-SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_bitwuzla_1get_1option_1mode(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1get_1option_1mode(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
   jstring jresult = 0 ;
   BitwuzlaOptions *arg1 = (BitwuzlaOptions *) 0 ;
   BitwuzlaOption arg2 ;
@@ -5240,7 +5563,7 @@ SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_bitwuzla_1get_1option_1mode(JNIEnv *
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_bitwuzla_1get_1option_1info(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jlong jarg3, jobject jarg3_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1get_1option_1info(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jlong jarg3, jobject jarg3_) {
   BitwuzlaOptions *arg1 = (BitwuzlaOptions *) 0 ;
   BitwuzlaOption arg2 ;
   BitwuzlaOptionInfo *arg3 = (BitwuzlaOptionInfo *) 0 ;
@@ -5255,7 +5578,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_bitwuzla_1get_1option_1info(JNIEnv *jen
 }
 
 
-SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_bitwuzla_1result_1to_1string(JNIEnv *jenv, jclass jcls, jint jarg1) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1result_1to_1string(JNIEnv *jenv, jclass jcls, jint jarg1) {
   jstring jresult = 0 ;
   BitwuzlaResult arg1 ;
   char *result = 0 ;
@@ -5269,7 +5592,7 @@ SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_bitwuzla_1result_1to_1string(JNIEnv 
 }
 
 
-SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_bitwuzla_1rm_1to_1string(JNIEnv *jenv, jclass jcls, jint jarg1) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1rm_1to_1string(JNIEnv *jenv, jclass jcls, jint jarg1) {
   jstring jresult = 0 ;
   BitwuzlaRoundingMode arg1 ;
   char *result = 0 ;
@@ -5283,7 +5606,7 @@ SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_bitwuzla_1rm_1to_1string(JNIEnv *jen
 }
 
 
-SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_bitwuzla_1kind_1to_1string(JNIEnv *jenv, jclass jcls, jint jarg1) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1kind_1to_1string(JNIEnv *jenv, jclass jcls, jint jarg1) {
   jstring jresult = 0 ;
   BitwuzlaKind arg1 ;
   char *result = 0 ;
@@ -5297,7 +5620,7 @@ SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_bitwuzla_1kind_1to_1string(JNIEnv *j
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1sort_1hash(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1sort_1hash(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
   BitwuzlaSort arg1 ;
   size_t result;
@@ -5311,7 +5634,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1sort_1hash(JNIEnv *jenv, jcl
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1sort_1bv_1get_1size(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1sort_1bv_1get_1size(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
   BitwuzlaSort arg1 ;
   uint64_t result;
@@ -5325,7 +5648,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1sort_1bv_1get_1size(JNIEnv *
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1sort_1fp_1get_1exp_1size(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1sort_1fp_1get_1exp_1size(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
   BitwuzlaSort arg1 ;
   uint64_t result;
@@ -5339,7 +5662,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1sort_1fp_1get_1exp_1size(JNI
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1sort_1fp_1get_1sig_1size(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1sort_1fp_1get_1sig_1size(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
   BitwuzlaSort arg1 ;
   uint64_t result;
@@ -5353,7 +5676,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1sort_1fp_1get_1sig_1size(JNI
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1sort_1array_1get_1index(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1sort_1array_1get_1index(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
   BitwuzlaSort arg1 ;
   BitwuzlaSort result;
@@ -5367,7 +5690,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1sort_1array_1get_1index(JNIE
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1sort_1array_1get_1element(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1sort_1array_1get_1element(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
   BitwuzlaSort arg1 ;
   BitwuzlaSort result;
@@ -5381,7 +5704,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1sort_1array_1get_1element(JN
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1sort_1fun_1get_1domain_1sorts(JNIEnv *jenv, jclass jcls, jlong jarg1, jlongArray jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1sort_1fun_1get_1domain_1sorts(JNIEnv *jenv, jclass jcls, jlong jarg1, jlongArray jarg2) {
   jlong jresult = 0 ;
   BitwuzlaSort arg1 ;
   size_t *arg2 = (size_t *) 0 ;
@@ -5414,7 +5737,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1sort_1fun_1get_1domain_1sort
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1sort_1fun_1get_1codomain(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1sort_1fun_1get_1codomain(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
   BitwuzlaSort arg1 ;
   BitwuzlaSort result;
@@ -5428,7 +5751,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1sort_1fun_1get_1codomain(JNI
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1sort_1fun_1get_1arity(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1sort_1fun_1get_1arity(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
   BitwuzlaSort arg1 ;
   uint64_t result;
@@ -5442,7 +5765,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1sort_1fun_1get_1arity(JNIEnv
 }
 
 
-SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_bitwuzla_1sort_1get_1uninterpreted_1symbol(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1sort_1get_1uninterpreted_1symbol(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jstring jresult = 0 ;
   BitwuzlaSort arg1 ;
   char *result = 0 ;
@@ -5456,7 +5779,7 @@ SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_bitwuzla_1sort_1get_1uninterpreted_1
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1sort_1is_1equal(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1sort_1is_1equal(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
   jboolean jresult = 0 ;
   BitwuzlaSort arg1 ;
   BitwuzlaSort arg2 ;
@@ -5474,7 +5797,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1sort_1is_1equal(JNIEnv *j
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1sort_1is_1array(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1sort_1is_1array(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jboolean jresult = 0 ;
   BitwuzlaSort arg1 ;
   _Bool result;
@@ -5490,7 +5813,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1sort_1is_1array(JNIEnv *j
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1sort_1is_1bool(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1sort_1is_1bool(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jboolean jresult = 0 ;
   BitwuzlaSort arg1 ;
   _Bool result;
@@ -5506,7 +5829,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1sort_1is_1bool(JNIEnv *je
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1sort_1is_1bv(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1sort_1is_1bv(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jboolean jresult = 0 ;
   BitwuzlaSort arg1 ;
   _Bool result;
@@ -5522,7 +5845,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1sort_1is_1bv(JNIEnv *jenv
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1sort_1is_1fp(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1sort_1is_1fp(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jboolean jresult = 0 ;
   BitwuzlaSort arg1 ;
   _Bool result;
@@ -5538,7 +5861,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1sort_1is_1fp(JNIEnv *jenv
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1sort_1is_1fun(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1sort_1is_1fun(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jboolean jresult = 0 ;
   BitwuzlaSort arg1 ;
   _Bool result;
@@ -5554,7 +5877,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1sort_1is_1fun(JNIEnv *jen
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1sort_1is_1rm(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1sort_1is_1rm(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jboolean jresult = 0 ;
   BitwuzlaSort arg1 ;
   _Bool result;
@@ -5570,7 +5893,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1sort_1is_1rm(JNIEnv *jenv
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1sort_1is_1uninterpreted(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1sort_1is_1uninterpreted(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jboolean jresult = 0 ;
   BitwuzlaSort arg1 ;
   _Bool result;
@@ -5586,7 +5909,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1sort_1is_1uninterpreted(J
 }
 
 
-SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_bitwuzla_1sort_1to_1string(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1sort_1to_1string(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jstring jresult = 0 ;
   BitwuzlaSort arg1 ;
   char *result = 0 ;
@@ -5600,7 +5923,7 @@ SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_bitwuzla_1sort_1to_1string(JNIEnv *j
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_bitwuzla_1sort_1print(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1sort_1print(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jobject jarg2_) {
   BitwuzlaSort arg1 ;
   FILE *arg2 = (FILE *) 0 ;
   
@@ -5613,7 +5936,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_bitwuzla_1sort_1print(JNIEnv *jenv, jcl
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1hash(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1hash(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
   BitwuzlaTerm arg1 ;
   size_t result;
@@ -5627,7 +5950,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1hash(JNIEnv *jenv, jcl
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1get_1kind(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1get_1kind(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jint jresult = 0 ;
   BitwuzlaTerm arg1 ;
   BitwuzlaKind result;
@@ -5641,7 +5964,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1get_1kind(JNIEnv *jenv,
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1get_1children(JNIEnv *jenv, jclass jcls, jlong jarg1, jlongArray jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1get_1children(JNIEnv *jenv, jclass jcls, jlong jarg1, jlongArray jarg2) {
   jlong jresult = 0 ;
   BitwuzlaTerm arg1 ;
   size_t *arg2 = (size_t *) 0 ;
@@ -5674,7 +5997,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1get_1children(JNIEnv *
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1get_1indices(JNIEnv *jenv, jclass jcls, jlong jarg1, jlongArray jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1get_1indices(JNIEnv *jenv, jclass jcls, jlong jarg1, jlongArray jarg2) {
   jlong jresult = 0 ;
   BitwuzlaTerm arg1 ;
   size_t *arg2 = (size_t *) 0 ;
@@ -5707,7 +6030,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1get_1indices(JNIEnv *j
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1indexed(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1is_1indexed(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jboolean jresult = 0 ;
   BitwuzlaTerm arg1 ;
   _Bool result;
@@ -5723,7 +6046,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1indexed(JNIEnv 
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1get_1sort(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1get_1sort(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
   BitwuzlaTerm arg1 ;
   BitwuzlaSort result;
@@ -5737,7 +6060,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1get_1sort(JNIEnv *jenv
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1array_1get_1index_1sort(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1array_1get_1index_1sort(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
   BitwuzlaTerm arg1 ;
   BitwuzlaSort result;
@@ -5751,7 +6074,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1array_1get_1index_1sor
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1array_1get_1element_1sort(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1array_1get_1element_1sort(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
   BitwuzlaTerm arg1 ;
   BitwuzlaSort result;
@@ -5765,7 +6088,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1array_1get_1element_1s
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1fun_1get_1domain_1sorts(JNIEnv *jenv, jclass jcls, jlong jarg1, jlongArray jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1fun_1get_1domain_1sorts(JNIEnv *jenv, jclass jcls, jlong jarg1, jlongArray jarg2) {
   jlong jresult = 0 ;
   BitwuzlaTerm arg1 ;
   size_t *arg2 = (size_t *) 0 ;
@@ -5798,7 +6121,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1fun_1get_1domain_1sort
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1fun_1get_1codomain_1sort(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1fun_1get_1codomain_1sort(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
   BitwuzlaTerm arg1 ;
   BitwuzlaSort result;
@@ -5812,7 +6135,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1fun_1get_1codomain_1so
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1bv_1get_1size(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1bv_1get_1size(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
   BitwuzlaTerm arg1 ;
   uint64_t result;
@@ -5826,7 +6149,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1bv_1get_1size(JNIEnv *
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1fp_1get_1exp_1size(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1fp_1get_1exp_1size(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
   BitwuzlaTerm arg1 ;
   uint64_t result;
@@ -5840,7 +6163,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1fp_1get_1exp_1size(JNI
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1fp_1get_1sig_1size(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1fp_1get_1sig_1size(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
   BitwuzlaTerm arg1 ;
   uint64_t result;
@@ -5854,7 +6177,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1fp_1get_1sig_1size(JNI
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1fun_1get_1arity(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1fun_1get_1arity(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
   BitwuzlaTerm arg1 ;
   uint64_t result;
@@ -5868,7 +6191,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1fun_1get_1arity(JNIEnv
 }
 
 
-SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1get_1symbol(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1get_1symbol(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jstring jresult = 0 ;
   BitwuzlaTerm arg1 ;
   char *result = 0 ;
@@ -5882,7 +6205,7 @@ SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1get_1symbol(JNIEnv *
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1equal_1sort(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1is_1equal_1sort(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
   jboolean jresult = 0 ;
   BitwuzlaTerm arg1 ;
   BitwuzlaTerm arg2 ;
@@ -5900,7 +6223,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1equal_1sort(JNI
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1array(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1is_1array(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jboolean jresult = 0 ;
   BitwuzlaTerm arg1 ;
   _Bool result;
@@ -5916,7 +6239,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1array(JNIEnv *j
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1const(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1is_1const(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jboolean jresult = 0 ;
   BitwuzlaTerm arg1 ;
   _Bool result;
@@ -5932,7 +6255,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1const(JNIEnv *j
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1fun(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1is_1fun(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jboolean jresult = 0 ;
   BitwuzlaTerm arg1 ;
   _Bool result;
@@ -5948,7 +6271,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1fun(JNIEnv *jen
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1var(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1is_1var(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jboolean jresult = 0 ;
   BitwuzlaTerm arg1 ;
   _Bool result;
@@ -5964,7 +6287,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1var(JNIEnv *jen
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1value(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1is_1value(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jboolean jresult = 0 ;
   BitwuzlaTerm arg1 ;
   _Bool result;
@@ -5980,7 +6303,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1value(JNIEnv *j
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1bv_1value(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1is_1bv_1value(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jboolean jresult = 0 ;
   BitwuzlaTerm arg1 ;
   _Bool result;
@@ -5996,7 +6319,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1bv_1value(JNIEn
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1fp_1value(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1is_1fp_1value(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jboolean jresult = 0 ;
   BitwuzlaTerm arg1 ;
   _Bool result;
@@ -6012,7 +6335,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1fp_1value(JNIEn
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1rm_1value(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1is_1rm_1value(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jboolean jresult = 0 ;
   BitwuzlaTerm arg1 ;
   _Bool result;
@@ -6028,7 +6351,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1rm_1value(JNIEn
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1bool(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1is_1bool(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jboolean jresult = 0 ;
   BitwuzlaTerm arg1 ;
   _Bool result;
@@ -6044,7 +6367,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1bool(JNIEnv *je
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1bv(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1is_1bv(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jboolean jresult = 0 ;
   BitwuzlaTerm arg1 ;
   _Bool result;
@@ -6060,7 +6383,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1bv(JNIEnv *jenv
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1fp(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1is_1fp(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jboolean jresult = 0 ;
   BitwuzlaTerm arg1 ;
   _Bool result;
@@ -6076,7 +6399,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1fp(JNIEnv *jenv
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1rm(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1is_1rm(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jboolean jresult = 0 ;
   BitwuzlaTerm arg1 ;
   _Bool result;
@@ -6092,7 +6415,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1rm(JNIEnv *jenv
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1uninterpreted(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1is_1uninterpreted(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jboolean jresult = 0 ;
   BitwuzlaTerm arg1 ;
   _Bool result;
@@ -6108,7 +6431,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1uninterpreted(J
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1true(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1is_1true(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jboolean jresult = 0 ;
   BitwuzlaTerm arg1 ;
   _Bool result;
@@ -6124,7 +6447,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1true(JNIEnv *je
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1false(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1is_1false(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jboolean jresult = 0 ;
   BitwuzlaTerm arg1 ;
   _Bool result;
@@ -6140,7 +6463,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1false(JNIEnv *j
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1bv_1value_1zero(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1is_1bv_1value_1zero(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jboolean jresult = 0 ;
   BitwuzlaTerm arg1 ;
   _Bool result;
@@ -6156,7 +6479,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1bv_1value_1zero
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1bv_1value_1one(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1is_1bv_1value_1one(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jboolean jresult = 0 ;
   BitwuzlaTerm arg1 ;
   _Bool result;
@@ -6172,7 +6495,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1bv_1value_1one(
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1bv_1value_1ones(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1is_1bv_1value_1ones(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jboolean jresult = 0 ;
   BitwuzlaTerm arg1 ;
   _Bool result;
@@ -6188,7 +6511,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1bv_1value_1ones
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1bv_1value_1min_1signed(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1is_1bv_1value_1min_1signed(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jboolean jresult = 0 ;
   BitwuzlaTerm arg1 ;
   _Bool result;
@@ -6204,7 +6527,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1bv_1value_1min_
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1bv_1value_1max_1signed(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1is_1bv_1value_1max_1signed(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jboolean jresult = 0 ;
   BitwuzlaTerm arg1 ;
   _Bool result;
@@ -6220,7 +6543,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1bv_1value_1max_
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1fp_1value_1pos_1zero(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1is_1fp_1value_1pos_1zero(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jboolean jresult = 0 ;
   BitwuzlaTerm arg1 ;
   _Bool result;
@@ -6236,7 +6559,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1fp_1value_1pos_
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1fp_1value_1neg_1zero(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1is_1fp_1value_1neg_1zero(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jboolean jresult = 0 ;
   BitwuzlaTerm arg1 ;
   _Bool result;
@@ -6252,7 +6575,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1fp_1value_1neg_
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1fp_1value_1pos_1inf(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1is_1fp_1value_1pos_1inf(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jboolean jresult = 0 ;
   BitwuzlaTerm arg1 ;
   _Bool result;
@@ -6268,7 +6591,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1fp_1value_1pos_
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1fp_1value_1neg_1inf(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1is_1fp_1value_1neg_1inf(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jboolean jresult = 0 ;
   BitwuzlaTerm arg1 ;
   _Bool result;
@@ -6284,7 +6607,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1fp_1value_1neg_
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1fp_1value_1nan(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1is_1fp_1value_1nan(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jboolean jresult = 0 ;
   BitwuzlaTerm arg1 ;
   _Bool result;
@@ -6300,7 +6623,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1fp_1value_1nan(
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1rm_1value_1rna(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1is_1rm_1value_1rna(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jboolean jresult = 0 ;
   BitwuzlaTerm arg1 ;
   _Bool result;
@@ -6316,7 +6639,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1rm_1value_1rna(
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1rm_1value_1rne(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1is_1rm_1value_1rne(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jboolean jresult = 0 ;
   BitwuzlaTerm arg1 ;
   _Bool result;
@@ -6332,7 +6655,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1rm_1value_1rne(
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1rm_1value_1rtn(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1is_1rm_1value_1rtn(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jboolean jresult = 0 ;
   BitwuzlaTerm arg1 ;
   _Bool result;
@@ -6348,7 +6671,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1rm_1value_1rtn(
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1rm_1value_1rtp(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1is_1rm_1value_1rtp(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jboolean jresult = 0 ;
   BitwuzlaTerm arg1 ;
   _Bool result;
@@ -6364,7 +6687,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1rm_1value_1rtp(
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1rm_1value_1rtz(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1is_1rm_1value_1rtz(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jboolean jresult = 0 ;
   BitwuzlaTerm arg1 ;
   _Bool result;
@@ -6380,7 +6703,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1is_1rm_1value_1rtz(
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1value_1get_1bool(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1value_1get_1bool(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jboolean jresult = 0 ;
   BitwuzlaTerm arg1 ;
   _Bool result;
@@ -6396,7 +6719,21 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1value_1get_1bool(JN
 }
 
 
-SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1value_1get_1str(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1value_1get_1str(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jstring jresult = 0 ;
+  BitwuzlaTerm arg1 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (BitwuzlaTerm)jarg1; 
+  result = (char *)bitwuzla_term_value_get_str(arg1);
+  if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1value_1get_1str_1fmt(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
   jstring jresult = 0 ;
   BitwuzlaTerm arg1 ;
   uint8_t arg2 ;
@@ -6406,13 +6743,13 @@ SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1value_1get_1str(JNIE
   (void)jcls;
   arg1 = (BitwuzlaTerm)jarg1; 
   arg2 = (uint8_t)jarg2; 
-  result = (char *)bitwuzla_term_value_get_str(arg1,arg2);
+  result = (char *)bitwuzla_term_value_get_str_fmt(arg1,arg2);
   if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1value_1get_1fp_1ieee(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3, jlong jarg4, jint jarg5) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1value_1get_1fp_1ieee(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3, jlong jarg4, jint jarg5) {
   BitwuzlaTerm arg1 ;
   char **arg2 = (char **) 0 ;
   char **arg3 = (char **) 0 ;
@@ -6430,7 +6767,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1value_1get_1fp_1ieee(JN
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1value_1get_1rm(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1value_1get_1rm(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jint jresult = 0 ;
   BitwuzlaTerm arg1 ;
   BitwuzlaRoundingMode result;
@@ -6444,7 +6781,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1value_1get_1rm(JNIEnv *
 }
 
 
-SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1to_1string(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1to_1string(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jstring jresult = 0 ;
   BitwuzlaTerm arg1 ;
   char *result = 0 ;
@@ -6458,7 +6795,23 @@ SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1to_1string(JNIEnv *j
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1print(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1to_1string_1fmt(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
+  jstring jresult = 0 ;
+  BitwuzlaTerm arg1 ;
+  uint8_t arg2 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (BitwuzlaTerm)jarg1; 
+  arg2 = (uint8_t)jarg2; 
+  result = (char *)bitwuzla_term_to_string_fmt(arg1,arg2);
+  if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1print(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jobject jarg2_) {
   BitwuzlaTerm arg1 ;
   FILE *arg2 = (FILE *) 0 ;
   
@@ -6471,7 +6824,22 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_bitwuzla_1term_1print(JNIEnv *jenv, jcl
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1new(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1print_1fmt(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jobject jarg2_, jint jarg3) {
+  BitwuzlaTerm arg1 ;
+  FILE *arg2 = (FILE *) 0 ;
+  uint8_t arg3 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg2_;
+  arg1 = (BitwuzlaTerm)jarg1; 
+  arg2 = *(FILE **)&jarg2; 
+  arg3 = (uint8_t)jarg3; 
+  bitwuzla_term_print_fmt(arg1,arg2,arg3);
+}
+
+
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1new(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
   BitwuzlaOptions *arg1 = (BitwuzlaOptions *) 0 ;
   Bitwuzla *result = 0 ;
@@ -6485,7 +6853,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1new(JNIEnv *jenv, jclass jcl
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_bitwuzla_1delete(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1delete(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   Bitwuzla *arg1 = (Bitwuzla *) 0 ;
   
   (void)jenv;
@@ -6495,7 +6863,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_bitwuzla_1delete(JNIEnv *jenv, jclass j
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_bitwuzla_1set_1termination_1callback(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1set_1termination_1callback(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3) {
   Bitwuzla *arg1 = (Bitwuzla *) 0 ;
   int32_t (*arg2)(void *) = (int32_t (*)(void *)) 0 ;
   void *arg3 = (void *) 0 ;
@@ -6509,7 +6877,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_bitwuzla_1set_1termination_1callback(JN
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1get_1termination_1callback_1state(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1get_1termination_1callback_1state(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
   Bitwuzla *arg1 = (Bitwuzla *) 0 ;
   void *result = 0 ;
@@ -6523,7 +6891,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1get_1termination_1callback_1
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_bitwuzla_1set_1abort_1callback(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1set_1abort_1callback(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   void (*arg1)(char const *) = (void (*)(char const *)) 0 ;
   
   (void)jenv;
@@ -6533,7 +6901,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_bitwuzla_1set_1abort_1callback(JNIEnv *
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_bitwuzla_1push(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1push(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
   Bitwuzla *arg1 = (Bitwuzla *) 0 ;
   uint64_t arg2 ;
   
@@ -6545,7 +6913,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_bitwuzla_1push(JNIEnv *jenv, jclass jcl
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_bitwuzla_1pop(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1pop(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
   Bitwuzla *arg1 = (Bitwuzla *) 0 ;
   uint64_t arg2 ;
   
@@ -6557,7 +6925,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_bitwuzla_1pop(JNIEnv *jenv, jclass jcls
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_bitwuzla_1assert(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1assert(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
   Bitwuzla *arg1 = (Bitwuzla *) 0 ;
   BitwuzlaTerm arg2 ;
   
@@ -6569,7 +6937,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_bitwuzla_1assert(JNIEnv *jenv, jclass j
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1get_1assertions(JNIEnv *jenv, jclass jcls, jlong jarg1, jlongArray jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1get_1assertions(JNIEnv *jenv, jclass jcls, jlong jarg1, jlongArray jarg2) {
   jlong jresult = 0 ;
   Bitwuzla *arg1 = (Bitwuzla *) 0 ;
   size_t *arg2 = (size_t *) 0 ;
@@ -6602,7 +6970,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1get_1assertions(JNIEnv *jenv
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1is_1unsat_1assumption(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1is_1unsat_1assumption(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
   jboolean jresult = 0 ;
   Bitwuzla *arg1 = (Bitwuzla *) 0 ;
   BitwuzlaTerm arg2 ;
@@ -6620,7 +6988,7 @@ SWIGEXPORT jboolean JNICALL Java_bitwuzlaJNI_bitwuzla_1is_1unsat_1assumption(JNI
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1get_1unsat_1assumptions(JNIEnv *jenv, jclass jcls, jlong jarg1, jlongArray jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1get_1unsat_1assumptions(JNIEnv *jenv, jclass jcls, jlong jarg1, jlongArray jarg2) {
   jlong jresult = 0 ;
   Bitwuzla *arg1 = (Bitwuzla *) 0 ;
   size_t *arg2 = (size_t *) 0 ;
@@ -6653,7 +7021,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1get_1unsat_1assumptions(JNIE
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1get_1unsat_1core(JNIEnv *jenv, jclass jcls, jlong jarg1, jlongArray jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1get_1unsat_1core(JNIEnv *jenv, jclass jcls, jlong jarg1, jlongArray jarg2) {
   jlong jresult = 0 ;
   Bitwuzla *arg1 = (Bitwuzla *) 0 ;
   size_t *arg2 = (size_t *) 0 ;
@@ -6686,7 +7054,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1get_1unsat_1core(JNIEnv *jen
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_bitwuzla_1simplify(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1simplify(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   Bitwuzla *arg1 = (Bitwuzla *) 0 ;
   
   (void)jenv;
@@ -6696,7 +7064,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_bitwuzla_1simplify(JNIEnv *jenv, jclass
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_bitwuzla_1check_1sat(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1check_1sat(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jint jresult = 0 ;
   Bitwuzla *arg1 = (Bitwuzla *) 0 ;
   BitwuzlaResult result;
@@ -6710,7 +7078,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_bitwuzla_1check_1sat(JNIEnv *jenv, jcla
 }
 
 
-SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_bitwuzla_1check_1sat_1assuming(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlongArray jarg3) {
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1check_1sat_1assuming(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlongArray jarg3) {
   jint jresult = 0 ;
   Bitwuzla *arg1 = (Bitwuzla *) 0 ;
   uint32_t arg2 ;
@@ -6731,7 +7099,7 @@ SWIGEXPORT jint JNICALL Java_bitwuzlaJNI_bitwuzla_1check_1sat_1assuming(JNIEnv *
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1get_1value(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1get_1value(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
   jlong jresult = 0 ;
   Bitwuzla *arg1 = (Bitwuzla *) 0 ;
   BitwuzlaTerm arg2 ;
@@ -6747,10 +7115,11 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1get_1value(JNIEnv *jenv, jcl
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_bitwuzla_1print_1formula(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jlong jarg3, jobject jarg3_) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1print_1formula(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jlong jarg3, jobject jarg3_, jint jarg4) {
   Bitwuzla *arg1 = (Bitwuzla *) 0 ;
   char *arg2 = (char *) 0 ;
   FILE *arg3 = (FILE *) 0 ;
+  uint8_t arg4 ;
   
   (void)jenv;
   (void)jcls;
@@ -6762,12 +7131,13 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_bitwuzla_1print_1formula(JNIEnv *jenv, 
     if (!arg2) return ;
   }
   arg3 = *(FILE **)&jarg3; 
-  bitwuzla_print_formula(arg1,(char const *)arg2,arg3);
+  arg4 = (uint8_t)jarg4; 
+  bitwuzla_print_formula(arg1,(char const *)arg2,arg3,arg4);
   if (arg2) (*jenv)->ReleaseStringUTFChars(jenv, jarg2, (const char *)arg2);
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_bitwuzla_1get_1statistics(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3, jlongArray jarg4) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1get_1statistics(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3, jlongArray jarg4) {
   Bitwuzla *arg1 = (Bitwuzla *) 0 ;
   char ***arg2 = (char ***) 0 ;
   char ***arg3 = (char ***) 0 ;
@@ -6800,7 +7170,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_bitwuzla_1get_1statistics(JNIEnv *jenv,
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1array_1sort(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1mk_1array_1sort(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
   jlong jresult = 0 ;
   BitwuzlaSort arg1 ;
   BitwuzlaSort arg2 ;
@@ -6816,7 +7186,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1array_1sort(JNIEnv *jenv
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1bool_1sort(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1mk_1bool_1sort(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   BitwuzlaSort result;
   
@@ -6828,7 +7198,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1bool_1sort(JNIEnv *jenv,
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1bv_1sort(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1mk_1bv_1sort(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
   uint64_t arg1 ;
   BitwuzlaSort result;
@@ -6842,7 +7212,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1bv_1sort(JNIEnv *jenv, j
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1fp_1sort(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1mk_1fp_1sort(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
   jlong jresult = 0 ;
   uint64_t arg1 ;
   uint64_t arg2 ;
@@ -6858,7 +7228,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1fp_1sort(JNIEnv *jenv, j
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1fun_1sort(JNIEnv *jenv, jclass jcls, jlong jarg1, jlongArray jarg2, jlong jarg3) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1mk_1fun_1sort(JNIEnv *jenv, jclass jcls, jlong jarg1, jlongArray jarg2, jlong jarg3) {
   jlong jresult = 0 ;
   uint64_t arg1 ;
   BitwuzlaSort *arg2 ;
@@ -6879,7 +7249,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1fun_1sort(JNIEnv *jenv, 
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1rm_1sort(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1mk_1rm_1sort(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   BitwuzlaSort result;
   
@@ -6891,7 +7261,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1rm_1sort(JNIEnv *jenv, j
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1uninterpreted_1sort(JNIEnv *jenv, jclass jcls, jstring jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1mk_1uninterpreted_1sort(JNIEnv *jenv, jclass jcls, jstring jarg1) {
   jlong jresult = 0 ;
   char *arg1 = (char *) 0 ;
   BitwuzlaSort result;
@@ -6910,7 +7280,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1uninterpreted_1sort(JNIE
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1true(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1mk_1true(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   BitwuzlaTerm result;
   
@@ -6922,7 +7292,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1true(JNIEnv *jenv, jclas
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1false(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1mk_1false(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   BitwuzlaTerm result;
   
@@ -6934,7 +7304,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1false(JNIEnv *jenv, jcla
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1bv_1zero(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1mk_1bv_1zero(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
   BitwuzlaSort arg1 ;
   BitwuzlaTerm result;
@@ -6948,7 +7318,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1bv_1zero(JNIEnv *jenv, j
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1bv_1one(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1mk_1bv_1one(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
   BitwuzlaSort arg1 ;
   BitwuzlaTerm result;
@@ -6962,7 +7332,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1bv_1one(JNIEnv *jenv, jc
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1bv_1ones(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1mk_1bv_1ones(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
   BitwuzlaSort arg1 ;
   BitwuzlaTerm result;
@@ -6976,7 +7346,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1bv_1ones(JNIEnv *jenv, j
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1bv_1min_1signed(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1mk_1bv_1min_1signed(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
   BitwuzlaSort arg1 ;
   BitwuzlaTerm result;
@@ -6990,7 +7360,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1bv_1min_1signed(JNIEnv *
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1bv_1max_1signed(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1mk_1bv_1max_1signed(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
   BitwuzlaSort arg1 ;
   BitwuzlaTerm result;
@@ -7004,7 +7374,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1bv_1max_1signed(JNIEnv *
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1fp_1pos_1zero(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1mk_1fp_1pos_1zero(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
   BitwuzlaSort arg1 ;
   BitwuzlaTerm result;
@@ -7018,7 +7388,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1fp_1pos_1zero(JNIEnv *je
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1fp_1neg_1zero(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1mk_1fp_1neg_1zero(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
   BitwuzlaSort arg1 ;
   BitwuzlaTerm result;
@@ -7032,7 +7402,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1fp_1neg_1zero(JNIEnv *je
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1fp_1pos_1inf(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1mk_1fp_1pos_1inf(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
   BitwuzlaSort arg1 ;
   BitwuzlaTerm result;
@@ -7046,7 +7416,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1fp_1pos_1inf(JNIEnv *jen
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1fp_1neg_1inf(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1mk_1fp_1neg_1inf(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
   BitwuzlaSort arg1 ;
   BitwuzlaTerm result;
@@ -7060,7 +7430,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1fp_1neg_1inf(JNIEnv *jen
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1fp_1nan(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1mk_1fp_1nan(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
   BitwuzlaSort arg1 ;
   BitwuzlaTerm result;
@@ -7074,7 +7444,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1fp_1nan(JNIEnv *jenv, jc
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1bv_1value(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jint jarg3) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1mk_1bv_1value(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jint jarg3) {
   jlong jresult = 0 ;
   BitwuzlaSort arg1 ;
   char *arg2 = (char *) 0 ;
@@ -7097,7 +7467,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1bv_1value(JNIEnv *jenv, 
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1bv_1value_1uint64(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1mk_1bv_1value_1uint64(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
   jlong jresult = 0 ;
   BitwuzlaSort arg1 ;
   uint64_t arg2 ;
@@ -7113,7 +7483,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1bv_1value_1uint64(JNIEnv
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1bv_1value_1int64(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1mk_1bv_1value_1int64(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
   jlong jresult = 0 ;
   BitwuzlaSort arg1 ;
   int64_t arg2 ;
@@ -7129,7 +7499,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1bv_1value_1int64(JNIEnv 
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1fp_1value(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1mk_1fp_1value(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3) {
   jlong jresult = 0 ;
   BitwuzlaTerm arg1 ;
   BitwuzlaTerm arg2 ;
@@ -7147,7 +7517,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1fp_1value(JNIEnv *jenv, 
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1fp_1from_1real(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jstring jarg3) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1mk_1fp_1from_1real(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jstring jarg3) {
   jlong jresult = 0 ;
   BitwuzlaSort arg1 ;
   BitwuzlaTerm arg2 ;
@@ -7170,7 +7540,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1fp_1from_1real(JNIEnv *j
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1fp_1from_1rational(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jstring jarg3, jstring jarg4) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1mk_1fp_1from_1rational(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jstring jarg3, jstring jarg4) {
   jlong jresult = 0 ;
   BitwuzlaSort arg1 ;
   BitwuzlaTerm arg2 ;
@@ -7200,7 +7570,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1fp_1from_1rational(JNIEn
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1rm_1value(JNIEnv *jenv, jclass jcls, jint jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1mk_1rm_1value(JNIEnv *jenv, jclass jcls, jint jarg1) {
   jlong jresult = 0 ;
   BitwuzlaRoundingMode arg1 ;
   BitwuzlaTerm result;
@@ -7214,7 +7584,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1rm_1value(JNIEnv *jenv, 
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1term1(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1mk_1term1(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2) {
   jlong jresult = 0 ;
   BitwuzlaKind arg1 ;
   BitwuzlaTerm arg2 ;
@@ -7230,7 +7600,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1term1(JNIEnv *jenv, jcla
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1term2(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jlong jarg3) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1mk_1term2(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jlong jarg3) {
   jlong jresult = 0 ;
   BitwuzlaKind arg1 ;
   BitwuzlaTerm arg2 ;
@@ -7248,7 +7618,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1term2(JNIEnv *jenv, jcla
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1term3(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jlong jarg3, jlong jarg4) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1mk_1term3(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jlong jarg3, jlong jarg4) {
   jlong jresult = 0 ;
   BitwuzlaKind arg1 ;
   BitwuzlaTerm arg2 ;
@@ -7268,7 +7638,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1term3(JNIEnv *jenv, jcla
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1term(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jlongArray jarg3) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1mk_1term(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jlongArray jarg3) {
   jlong jresult = 0 ;
   BitwuzlaKind arg1 ;
   uint32_t arg2 ;
@@ -7289,7 +7659,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1term(JNIEnv *jenv, jclas
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1term1_1indexed1(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jlong jarg3) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1mk_1term1_1indexed1(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jlong jarg3) {
   jlong jresult = 0 ;
   BitwuzlaKind arg1 ;
   BitwuzlaTerm arg2 ;
@@ -7307,7 +7677,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1term1_1indexed1(JNIEnv *
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1term1_1indexed2(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jlong jarg3, jlong jarg4) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1mk_1term1_1indexed2(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jlong jarg3, jlong jarg4) {
   jlong jresult = 0 ;
   BitwuzlaKind arg1 ;
   BitwuzlaTerm arg2 ;
@@ -7327,7 +7697,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1term1_1indexed2(JNIEnv *
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1term2_1indexed1(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jlong jarg3, jlong jarg4) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1mk_1term2_1indexed1(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jlong jarg3, jlong jarg4) {
   jlong jresult = 0 ;
   BitwuzlaKind arg1 ;
   BitwuzlaTerm arg2 ;
@@ -7347,7 +7717,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1term2_1indexed1(JNIEnv *
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1term2_1indexed2(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jlong jarg3, jlong jarg4, jlong jarg5) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1mk_1term2_1indexed2(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jlong jarg3, jlong jarg4, jlong jarg5) {
   jlong jresult = 0 ;
   BitwuzlaKind arg1 ;
   BitwuzlaTerm arg2 ;
@@ -7369,7 +7739,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1term2_1indexed2(JNIEnv *
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1term_1indexed(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jlongArray jarg3, jlong jarg4, jlongArray jarg5) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1mk_1term_1indexed(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jlongArray jarg3, jlong jarg4, jlongArray jarg5) {
   jlong jresult = 0 ;
   BitwuzlaKind arg1 ;
   uint32_t arg2 ;
@@ -7397,7 +7767,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1term_1indexed(JNIEnv *je
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1const(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1mk_1const(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
   jlong jresult = 0 ;
   BitwuzlaSort arg1 ;
   char *arg2 = (char *) 0 ;
@@ -7418,7 +7788,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1const(JNIEnv *jenv, jcla
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1const_1array(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1mk_1const_1array(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
   jlong jresult = 0 ;
   BitwuzlaSort arg1 ;
   BitwuzlaTerm arg2 ;
@@ -7434,7 +7804,7 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1const_1array(JNIEnv *jen
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1var(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1mk_1var(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
   jlong jresult = 0 ;
   BitwuzlaSort arg1 ;
   char *arg2 = (char *) 0 ;
@@ -7455,69 +7825,67 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1mk_1var(JNIEnv *jenv, jclass
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1substitute_1term(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3, jlongArray jarg4, jlongArray jarg5) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1substitute_1term(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlongArray jarg3, jlongArray jarg4) {
   jlong jresult = 0 ;
-  Bitwuzla *arg1 = (Bitwuzla *) 0 ;
-  BitwuzlaTerm arg2 ;
-  size_t arg3 ;
+  BitwuzlaTerm arg1 ;
+  size_t arg2 ;
+  BitwuzlaTerm *arg3 ;
   BitwuzlaTerm *arg4 ;
-  BitwuzlaTerm *arg5 ;
+  jlong *jarr3 ;
   jlong *jarr4 ;
-  jlong *jarr5 ;
   BitwuzlaTerm result;
   
   (void)jenv;
   (void)jcls;
-  arg1 = *(Bitwuzla **)&jarg1; 
-  arg2 = (BitwuzlaTerm)jarg2; 
-  arg3 = (size_t)jarg3; 
+  arg1 = (BitwuzlaTerm)jarg1; 
+  arg2 = (size_t)jarg2; 
+  if (!SWIG_JavaArrayInUlong(jenv, &jarr3, (unsigned long **)&arg3, jarg3)) return 0; 
   if (!SWIG_JavaArrayInUlong(jenv, &jarr4, (unsigned long **)&arg4, jarg4)) return 0; 
-  if (!SWIG_JavaArrayInUlong(jenv, &jarr5, (unsigned long **)&arg5, jarg5)) return 0; 
-  result = (BitwuzlaTerm)bitwuzla_substitute_term(arg1,arg2,arg3,arg4,arg5);
+  result = (BitwuzlaTerm)bitwuzla_substitute_term(arg1,arg2,arg3,arg4);
   jresult = (jlong)result; 
+  SWIG_JavaArrayArgoutUlong(jenv, jarr3, (unsigned long *)arg3, jarg3); 
   SWIG_JavaArrayArgoutUlong(jenv, jarr4, (unsigned long *)arg4, jarg4); 
-  SWIG_JavaArrayArgoutUlong(jenv, jarr5, (unsigned long *)arg5, jarg5); 
+  free(arg3); 
   free(arg4); 
-  free(arg5); 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_bitwuzla_1substitute_1terms(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlongArray jarg3, jlong jarg4, jlongArray jarg5, jlongArray jarg6) {
-  Bitwuzla *arg1 = (Bitwuzla *) 0 ;
-  size_t arg2 ;
-  BitwuzlaTerm *arg3 ;
-  size_t arg4 ;
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1substitute_1terms(JNIEnv *jenv, jclass jcls, jlong jarg1, jlongArray jarg2, jlong jarg3, jlongArray jarg4, jlongArray jarg5) {
+  size_t arg1 ;
+  BitwuzlaTerm *arg2 ;
+  size_t arg3 ;
+  BitwuzlaTerm *arg4 ;
   BitwuzlaTerm *arg5 ;
-  BitwuzlaTerm *arg6 ;
-  jlong *jarr3 ;
+  jlong *jarr2 ;
+  jlong *jarr4 ;
   jlong *jarr5 ;
-  jlong *jarr6 ;
   
   (void)jenv;
   (void)jcls;
-  arg1 = *(Bitwuzla **)&jarg1; 
-  arg2 = (size_t)jarg2; 
-  if (!SWIG_JavaArrayInUlong(jenv, &jarr3, (unsigned long **)&arg3, jarg3)) return ; 
-  arg4 = (size_t)jarg4; 
+  arg1 = (size_t)jarg1; 
+  if (!SWIG_JavaArrayInUlong(jenv, &jarr2, (unsigned long **)&arg2, jarg2)) return ; 
+  arg3 = (size_t)jarg3; 
+  if (!SWIG_JavaArrayInUlong(jenv, &jarr4, (unsigned long **)&arg4, jarg4)) return ; 
   if (!SWIG_JavaArrayInUlong(jenv, &jarr5, (unsigned long **)&arg5, jarg5)) return ; 
-  if (!SWIG_JavaArrayInUlong(jenv, &jarr6, (unsigned long **)&arg6, jarg6)) return ; 
-  bitwuzla_substitute_terms(arg1,arg2,arg3,arg4,arg5,arg6);
-  SWIG_JavaArrayArgoutUlong(jenv, jarr3, (unsigned long *)arg3, jarg3); 
+  bitwuzla_substitute_terms(arg1,arg2,arg3,arg4,arg5);
+  SWIG_JavaArrayArgoutUlong(jenv, jarr2, (unsigned long *)arg2, jarg2); 
+  SWIG_JavaArrayArgoutUlong(jenv, jarr4, (unsigned long *)arg4, jarg4); 
   SWIG_JavaArrayArgoutUlong(jenv, jarr5, (unsigned long *)arg5, jarg5); 
-  SWIG_JavaArrayArgoutUlong(jenv, jarr6, (unsigned long *)arg6, jarg6); 
-  free(arg3); 
+  free(arg2); 
+  free(arg4); 
   free(arg5); 
-  free(arg6); 
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1parser_1new(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jlong jarg3, jobject jarg3_, jstring jarg4) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1parser_1new(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jlong jarg3, jobject jarg3_, jstring jarg4, jint jarg5, jstring jarg6) {
   jlong jresult = 0 ;
   BitwuzlaOptions *arg1 = (BitwuzlaOptions *) 0 ;
   char *arg2 = (char *) 0 ;
   FILE *arg3 = (FILE *) 0 ;
   char *arg4 = (char *) 0 ;
+  uint8_t arg5 ;
+  char *arg6 = (char *) 0 ;
   BitwuzlaParser *result = 0 ;
   
   (void)jenv;
@@ -7535,15 +7903,22 @@ SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1parser_1new(JNIEnv *jenv, jc
     arg4 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg4, 0);
     if (!arg4) return 0;
   }
-  result = (BitwuzlaParser *)bitwuzla_parser_new(arg1,(char const *)arg2,arg3,(char const *)arg4);
+  arg5 = (uint8_t)jarg5; 
+  arg6 = 0;
+  if (jarg6) {
+    arg6 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg6, 0);
+    if (!arg6) return 0;
+  }
+  result = (BitwuzlaParser *)bitwuzla_parser_new(arg1,(char const *)arg2,arg3,(char const *)arg4,arg5,(char const *)arg6);
   *(BitwuzlaParser **)&jresult = result; 
   if (arg2) (*jenv)->ReleaseStringUTFChars(jenv, jarg2, (const char *)arg2);
   if (arg4) (*jenv)->ReleaseStringUTFChars(jenv, jarg4, (const char *)arg4);
+  if (arg6) (*jenv)->ReleaseStringUTFChars(jenv, jarg6, (const char *)arg6);
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_bitwuzlaJNI_bitwuzla_1parser_1delete(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1parser_1delete(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   BitwuzlaParser *arg1 = (BitwuzlaParser *) 0 ;
   
   (void)jenv;
@@ -7553,7 +7928,7 @@ SWIGEXPORT void JNICALL Java_bitwuzlaJNI_bitwuzla_1parser_1delete(JNIEnv *jenv, 
 }
 
 
-SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_bitwuzla_1parser_1parse(JNIEnv *jenv, jclass jcls, jlong jarg1, jboolean jarg2) {
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1parser_1parse(JNIEnv *jenv, jclass jcls, jlong jarg1, jboolean jarg2) {
   jstring jresult = 0 ;
   BitwuzlaParser *arg1 = (BitwuzlaParser *) 0 ;
   _Bool arg2 ;
@@ -7571,7 +7946,7 @@ SWIGEXPORT jstring JNICALL Java_bitwuzlaJNI_bitwuzla_1parser_1parse(JNIEnv *jenv
 }
 
 
-SWIGEXPORT jlong JNICALL Java_bitwuzlaJNI_bitwuzla_1parser_1get_1bitwuzla(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1parser_1get_1bitwuzla(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
   BitwuzlaParser *arg1 = (BitwuzlaParser *) 0 ;
   Bitwuzla *result = 0 ;
