@@ -39,8 +39,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaFormula.BitwuzlaBooleanFormula;
 
-class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void>
-    implements ProverEnvironment {
+class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements ProverEnvironment {
   /** Bitwuzla does not support multiple solver stacks. */
   private final AtomicBoolean isAnyStackAlive;
 

@@ -278,10 +278,10 @@ public class BitwuzlaNativeApiTest {
     bitwuzlaJNI.bitwuzla_delete(bitwuzlaInstance);
     bitwuzlaJNI.bitwuzla_options_delete(options);
   }
-    @Test
+
+  @Test
   public void boolType() {
     long pBoolType = bitwuzlaJNI.bitwuzla_mk_bool_sort();
     assertTrue(bitwuzlaJNI.bitwuzla_sort_is_bool(pBoolType));
   }
-
 }

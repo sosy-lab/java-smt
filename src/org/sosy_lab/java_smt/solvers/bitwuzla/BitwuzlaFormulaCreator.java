@@ -99,7 +99,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
       return FormulaType.getArrayType(domainSort, rangeSort);
     } else if (bitwuzlaJNI.bitwuzla_sort_is_rm(pSort)) {
       return FormulaType.FloatingPointRoundingModeType;
-    } else if (bitwuzlaJNI.bitwuzla_sort_is_bool(pSort)){
+    } else if (bitwuzlaJNI.bitwuzla_sort_is_bool(pSort)) {
       return FormulaType.BooleanType;
     } else {
       throw new UnsupportedOperationException("Unsupported Formulatype.");
@@ -166,8 +166,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
       // long freeVar = Preconditions.checkNotNull(formulaCache.get(name, sort));
       long[] freeVar = {bitwuzlaJNI.bitwuzla_mk_const(sort, name)};
 
-      long bodySubbed =
-          bitwuzlaJNI.bitwuzla_substitute_term(bodyUnSub, 1, boundVar, freeVar);
+      long bodySubbed = bitwuzlaJNI.bitwuzla_substitute_term(bodyUnSub, 1, boundVar, freeVar);
 
       BooleanFormula fBody = encapsulateBoolean(bodySubbed);
       Quantifier quant = kind.equals(BITWUZLA_KIND_EXISTS) ? Quantifier.EXISTS : Quantifier.FORALL;

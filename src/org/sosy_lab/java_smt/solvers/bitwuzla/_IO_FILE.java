@@ -21,11 +21,6 @@ public class _IO_FILE {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
-  @SuppressWarnings("deprecation")
-  protected void finalize() {
-    delete();
-  }
-
   public synchronized void delete() {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
@@ -189,7 +184,6 @@ public class _IO_FILE {
     return bitwuzlaJNI._IO_FILE__shortbuf_get(swigCPtr, this);
   }
 
- 
   public void set__pad5(long value) {
     bitwuzlaJNI._IO_FILE___pad5_set(swigCPtr, this, value);
   }
@@ -217,5 +211,4 @@ public class _IO_FILE {
   public _IO_FILE() {
     this(bitwuzlaJNI.new__IO_FILE(), true);
   }
-
 }
