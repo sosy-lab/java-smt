@@ -84,7 +84,7 @@ public class BitwuzlaNativeApiTest {
     bitwuzlaJNI.bitwuzla_set_option_mode(
         options, BitwuzlaOption.BITWUZLA_OPT_SAT_SOLVER.swigValue(), "cadical");
     // Then, create a Bitwuzla instance.
-    long bitwuzla = bitwuzlaJNI.bitwuzla_new(options);
+    long bitwuzlaInstance = bitwuzlaJNI.bitwuzla_new(options);
 
     // Create bit-vector sorts of size 4 and 8.
     long sortbv4 = bitwuzlaJNI.bitwuzla_mk_bv_sort(4);
@@ -125,13 +125,13 @@ public class BitwuzlaNativeApiTest {
     //         ((_ extract 3 0) (bvsdiv x (_ bv2 8)))
     //         ((_ extract 3 0) (bvashr y (_ bv1 8)))))
     bitwuzlaJNI.bitwuzla_assert(
-        bitwuzla,
+        bitwuzlaInstance,
         bitwuzlaJNI.bitwuzla_mk_term2(
             BitwuzlaKind.BITWUZLA_KIND_DISTINCT.swigValue(), sdive, ashre));
 
     // (assert (= (f x ((_ extract 6 3) x)) y))
     bitwuzlaJNI.bitwuzla_assert(
-        bitwuzla,
+        bitwuzlaInstance,
         bitwuzlaJNI.bitwuzla_mk_term2(
             BitwuzlaKind.BITWUZLA_KIND_EQUAL.swigValue(),
             bitwuzlaJNI.bitwuzla_mk_term3(
@@ -144,7 +144,7 @@ public class BitwuzlaNativeApiTest {
 
     // (assert (= (select a x) y))
     bitwuzlaJNI.bitwuzla_assert(
-        bitwuzla,
+        bitwuzlaInstance,
         bitwuzlaJNI.bitwuzla_mk_term2(
             BitwuzlaKind.BITWUZLA_KIND_EQUAL.swigValue(),
             bitwuzlaJNI.bitwuzla_mk_term2(
@@ -152,7 +152,7 @@ public class BitwuzlaNativeApiTest {
             y));
 
     // (check-sat)
-    long result = bitwuzlaJNI.bitwuzla_check_sat(bitwuzla);
+    long result = bitwuzlaJNI.bitwuzla_check_sat(bitwuzlaInstance);
 
     System.out.println("Expect: sat");
     System.out.println(
@@ -170,7 +170,7 @@ public class BitwuzlaNativeApiTest {
       long sort = bitwuzlaJNI.bitwuzla_term_get_sort(decls[i]);
       System.out.print("  (define-fun " + bitwuzlaJNI.bitwuzla_term_get_symbol(decls[i]) + " (");
       if (bitwuzlaJNI.bitwuzla_sort_is_fun(sort)) {
-        long value = bitwuzlaJNI.bitwuzla_get_value(bitwuzla, decls[i]);
+        long value = bitwuzlaJNI.bitwuzla_get_value(bitwuzlaInstance, decls[i]);
         long[] size = new long[1];
         long children = bitwuzlaJNI.bitwuzla_term_get_children(value, size);
         assertEquals(2, size[0]);
@@ -178,8 +178,8 @@ public class BitwuzlaNativeApiTest {
         while (bitwuzlaJNI.bitwuzla_term_get_kind(
                 bitwuzlaJNI.BitwuzlaTermArray_getitem(children, 1))
             == BitwuzlaKind.BITWUZLA_KIND_LAMBDA.swigValue()) {
-          assertTrue(bitwuzlaJNI.bitwuzla_term_is_var(
-              bitwuzlaJNI.BitwuzlaTermArray_getitem(children, 0)));
+          assertTrue(
+              bitwuzlaJNI.bitwuzla_term_is_var(bitwuzlaJNI.BitwuzlaTermArray_getitem(children, 0)));
           System.out.print(
               (j > 0 ? " " : "")
                   + bitwuzlaJNI.bitwuzla_term_to_string(
@@ -193,8 +193,8 @@ public class BitwuzlaNativeApiTest {
           children = bitwuzlaJNI.bitwuzla_term_get_children(value, size);
           j += 1;
         }
-        assertTrue(bitwuzlaJNI.bitwuzla_term_is_var(bitwuzlaJNI.BitwuzlaTermArray_getitem(children,
-            0)));
+        assertTrue(
+            bitwuzlaJNI.bitwuzla_term_is_var(bitwuzlaJNI.BitwuzlaTermArray_getitem(children, 0)));
         System.out.print(
             (j > 0 ? " " : "")
                 + bitwuzlaJNI.bitwuzla_term_to_string(
@@ -216,7 +216,7 @@ public class BitwuzlaNativeApiTest {
                 + bitwuzlaJNI.bitwuzla_sort_to_string(sort)
                 + " "
                 + bitwuzlaJNI.bitwuzla_term_to_string(
-                    bitwuzlaJNI.bitwuzla_get_value(bitwuzla, decls[i])));
+                    bitwuzlaJNI.bitwuzla_get_value(bitwuzlaInstance, decls[i])));
       }
     }
     System.out.println(")");
@@ -231,11 +231,11 @@ public class BitwuzlaNativeApiTest {
     System.out.println(
         "value of x: "
             + bitwuzlaJNI.bitwuzla_term_value_get_str(
-                bitwuzlaJNI.bitwuzla_get_value(bitwuzla, x), 2));
+                bitwuzlaJNI.bitwuzla_get_value(bitwuzlaInstance, x), 2));
     System.out.println(
         "value of y: "
             + bitwuzlaJNI.bitwuzla_term_value_get_str(
-                bitwuzlaJNI.bitwuzla_get_value(bitwuzla, y), 2));
+                bitwuzlaJNI.bitwuzla_get_value(bitwuzlaInstance, y), 2));
     System.out.println();
 
     // f and a, on the other hand, are a function and array term, respectively.
@@ -245,10 +245,10 @@ public class BitwuzlaNativeApiTest {
     // via bitwuzlaJNI.bitwuzla_term_to_string().
     System.out.println("to_string representation of value of f:");
     System.out.println(
-        bitwuzlaJNI.bitwuzla_term_to_string(bitwuzlaJNI.bitwuzla_get_value(bitwuzla, f)));
+        bitwuzlaJNI.bitwuzla_term_to_string(bitwuzlaJNI.bitwuzla_get_value(bitwuzlaInstance, f)));
     System.out.println("to_string representation of value of a:");
     System.out.println(
-        bitwuzlaJNI.bitwuzla_term_to_string(bitwuzlaJNI.bitwuzla_get_value(bitwuzla, a)));
+        bitwuzlaJNI.bitwuzla_term_to_string(bitwuzlaJNI.bitwuzla_get_value(bitwuzlaInstance, a)));
     System.out.println();
 
     // Note that the assignment string of bit-vector terms is given as the
@@ -257,23 +257,25 @@ public class BitwuzlaNativeApiTest {
     // (in binary number format).
     System.out.println(
         "to_string representation of value of x: "
-            + bitwuzlaJNI.bitwuzla_term_to_string(bitwuzlaJNI.bitwuzla_get_value(bitwuzla, x)));
+            + bitwuzlaJNI.bitwuzla_term_to_string(
+                bitwuzlaJNI.bitwuzla_get_value(bitwuzlaInstance, x)));
     System.out.println(
         "to_string representation of value of y: "
-            + bitwuzlaJNI.bitwuzla_term_to_string(bitwuzlaJNI.bitwuzla_get_value(bitwuzla, y)));
+            + bitwuzlaJNI.bitwuzla_term_to_string(
+                bitwuzlaJNI.bitwuzla_get_value(bitwuzlaInstance, y)));
     System.out.println();
 
     // Query value of bit-vector term that does not occur in the input formula
     long v =
         bitwuzlaJNI.bitwuzla_get_value(
-            bitwuzla,
+            bitwuzlaInstance,
             bitwuzlaJNI.bitwuzla_mk_term2(BitwuzlaKind.BITWUZLA_KIND_BV_MUL.swigValue(), x, x));
     System.out.println(
         "value of v = x * x: "
             + bitwuzlaJNI.bitwuzla_term_value_get_str(
-                bitwuzlaJNI.bitwuzla_get_value(bitwuzla, v), 2));
+                bitwuzlaJNI.bitwuzla_get_value(bitwuzlaInstance, v), 2));
 
-    bitwuzlaJNI.bitwuzla_delete(bitwuzla);
+    bitwuzlaJNI.bitwuzla_delete(bitwuzlaInstance);
     bitwuzlaJNI.bitwuzla_options_delete(options);
   }
 }

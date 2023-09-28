@@ -39,7 +39,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaFormula.BitwuzlaBooleanFormula;
 
-public class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void>
+class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void>
     implements ProverEnvironment {
   /** Bitwuzla does not support multiple solver stacks. */
   private final AtomicBoolean isAnyStackAlive;
@@ -48,10 +48,11 @@ public class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void>
 
   @SuppressWarnings("unused")
   private final BitwuzlaFormulaManager manager;
+
   private final BitwuzlaFormulaCreator creator;
   protected boolean wasLastSatCheckSat = false; // and stack is not changed
 
-  public BitwuzlaTheoremProver(
+  protected BitwuzlaTheoremProver(
       BitwuzlaFormulaManager pManager,
       BitwuzlaFormulaCreator pCreator,
       long pEnv,
@@ -158,7 +159,8 @@ public class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void>
     Preconditions.checkState(!closed);
     Preconditions.checkState(wasLastSatCheckSat, NO_MODEL_HELP);
     checkGenerateModels();
-    return new CachingModel(getEvaluatorWithoutChecks());
+    Model result = new CachingModel(getEvaluatorWithoutChecks());
+    return result;
   }
 
   private List<BooleanFormula> getUnsatCore0() {
@@ -235,18 +237,8 @@ public class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void>
   //    return null;
   //  }
 
-  /**
-   * Get an evaluator instance for model evaluation without executing checks for prover options.
-   *
-   * <p>This method allows model evaluation without explicitly enabling the prover-option {@link
-   * ProverOptions#GENERATE_MODELS}. We only use this method internally, when we know about a valid
-   * solver state. The returned evaluator does not have caching or any direct optimization for user
-   * interaction.
-   *
-   * @throws SolverException if model can not be constructed.
-   */
   @Override
-  protected BitwuzlaModel getEvaluatorWithoutChecks() throws SolverException {
+  protected BitwuzlaModel getEvaluatorWithoutChecks() {
     return new BitwuzlaModel(
         pEnv, this, creator, Collections2.transform(getAssertedFormulas(), creator::extractInfo));
   }

@@ -90,6 +90,7 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
     shutdownNotifier = pShutdownNotifier;
   }
 
+  @SuppressWarnings("unused")
   public static BitwuzlaSolverContext create(
       Configuration config,
       ShutdownNotifier pShutdownNotifier,

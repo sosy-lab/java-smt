@@ -285,8 +285,8 @@ public class SolverContextFactory {
         return BoolectorSolverContext.create(config, shutdownNotifier, logfile, randomSeed, loader);
 
       case BITWUZLA:
-        return BitwuzlaSolverContext.create(config, shutdownNotifier, logfile, randomSeed,
-            floatingPointRoundingMode, loader);
+        return BitwuzlaSolverContext.create(
+            config, shutdownNotifier, logfile, randomSeed, floatingPointRoundingMode, loader);
 
       default:
         throw new AssertionError("no solver selected");

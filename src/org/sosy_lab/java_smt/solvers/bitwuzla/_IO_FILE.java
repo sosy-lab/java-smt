@@ -41,6 +41,7 @@ public class _IO_FILE {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
+  @Override
   @SuppressWarnings({"deprecation", "Finalize"})
   protected void finalize() {
     delete();

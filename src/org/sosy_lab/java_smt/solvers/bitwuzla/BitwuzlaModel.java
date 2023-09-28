@@ -9,10 +9,12 @@ import java.util.List;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 
-public class BitwuzlaModel extends AbstractModel<Long, Long, Long> {
+class BitwuzlaModel extends AbstractModel<Long, Long, Long> {
   private final long pBitwuzla;
+
   @SuppressWarnings("unused")
   private final BitwuzlaTheoremProver prover;
+
   private final BitwuzlaFormulaCreator bitwuzlaCreator;
   private final ImmutableList<Long> assertedTerms;
 
