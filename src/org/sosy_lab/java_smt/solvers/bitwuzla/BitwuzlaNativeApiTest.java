@@ -16,7 +16,7 @@ public class BitwuzlaNativeApiTest {
   @BeforeClass
   public static void load() {
     try {
-      NativeLibraries.loadLibrary("bitwuzla");
+      NativeLibraries.loadLibrary("bitwuzlaJNI");
     } catch (UnsatisfiedLinkError e) {
       throw new AssumptionViolatedException("Bitwuzla is not available", e);
     }
@@ -30,13 +30,13 @@ public class BitwuzlaNativeApiTest {
 
   @After
   public void freeEnvironment() {
-    NativeLibraries.loadLibrary("bitwuzla");
+    NativeLibraries.loadLibrary("bitwuzlaJNI");
     bitwuzlaJNI.bitwuzla_delete(bitwuzla);
   }
 
   //  @Test
   //  public void functionWithNoArguments() {
-  //    NativeLibraries.loadLibrary("bitwuzla");
+  //    NativeLibraries.loadLibrary("bitwuzlaJNI");
   //    long bool_sort = bitwuzlaJNI.bitwuzla_mk_bool_sort();
   //    long a = bitwuzlaJNI.bitwuzla_mk_var(bool_sort, "a");
   //
@@ -231,11 +231,11 @@ public class BitwuzlaNativeApiTest {
     System.out.println(
         "value of x: "
             + bitwuzlaJNI.bitwuzla_term_value_get_str(
-                bitwuzlaJNI.bitwuzla_get_value(bitwuzlaInstance, x), 2));
+                bitwuzlaJNI.bitwuzla_get_value(bitwuzlaInstance, x)));
     System.out.println(
         "value of y: "
             + bitwuzlaJNI.bitwuzla_term_value_get_str(
-                bitwuzlaJNI.bitwuzla_get_value(bitwuzlaInstance, y), 2));
+                bitwuzlaJNI.bitwuzla_get_value(bitwuzlaInstance, y)));
     System.out.println();
 
     // f and a, on the other hand, are a function and array term, respectively.
@@ -273,9 +273,15 @@ public class BitwuzlaNativeApiTest {
     System.out.println(
         "value of v = x * x: "
             + bitwuzlaJNI.bitwuzla_term_value_get_str(
-                bitwuzlaJNI.bitwuzla_get_value(bitwuzlaInstance, v), 2));
+                bitwuzlaJNI.bitwuzla_get_value(bitwuzlaInstance, v)));
 
     bitwuzlaJNI.bitwuzla_delete(bitwuzlaInstance);
     bitwuzlaJNI.bitwuzla_options_delete(options);
   }
+    @Test
+  public void boolType() {
+    long pBoolType = bitwuzlaJNI.bitwuzla_mk_bool_sort();
+    assertTrue(bitwuzlaJNI.bitwuzla_sort_is_bool(pBoolType));
+  }
+
 }

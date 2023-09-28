@@ -99,6 +99,8 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
       return FormulaType.getArrayType(domainSort, rangeSort);
     } else if (bitwuzlaJNI.bitwuzla_sort_is_rm(pSort)) {
       return FormulaType.FloatingPointRoundingModeType;
+    } else if (bitwuzlaJNI.bitwuzla_sort_is_bool(pSort)){
+      return FormulaType.BooleanType;
     } else {
       throw new UnsupportedOperationException("Unsupported Formulatype.");
     }
@@ -165,7 +167,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
       long[] freeVar = {bitwuzlaJNI.bitwuzla_mk_const(sort, name)};
 
       long bodySubbed =
-          bitwuzlaJNI.bitwuzla_substitute_term(getEnv(), bodyUnSub, 1, boundVar, freeVar);
+          bitwuzlaJNI.bitwuzla_substitute_term(bodyUnSub, 1, boundVar, freeVar);
 
       BooleanFormula fBody = encapsulateBoolean(bodySubbed);
       Quantifier quant = kind.equals(BITWUZLA_KIND_EXISTS) ? Quantifier.EXISTS : Quantifier.FORALL;
@@ -390,7 +392,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
   private BigDecimal parseIEEEbinaryFP(long pTerm) {
     // The Bitwuzla string for FPs is always in binary, regardless of the second argument.
 
-    String fp = bitwuzlaJNI.bitwuzla_term_value_get_str(pTerm, 2);
+    String fp = bitwuzlaJNI.bitwuzla_term_value_get_str(pTerm);
 
     if (fp.length() == 32) {
       float result = Float.intBitsToFloat(Integer.parseUnsignedInt(fp, 2));
@@ -414,7 +416,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
       throws UnsupportedOperationException {
     if (bitwuzlaJNI.bitwuzla_term_is_bv_value(f)) {
       return visitor.visitConstant(
-          formula, new BigInteger(bitwuzlaJNI.bitwuzla_term_value_get_str(f, 10)));
+          formula, new BigInteger(bitwuzlaJNI.bitwuzla_term_value_get_str(f)));
     } else if (bitwuzlaJNI.bitwuzla_term_is_fp_value(f)) {
       return visitor.visitConstant(formula, parseIEEEbinaryFP(f));
     } else if (bitwuzlaJNI.bitwuzla_term_is_const(f)) {
