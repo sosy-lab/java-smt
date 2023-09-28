@@ -21,11 +21,6 @@ public class BitwuzlaOptionInfo {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
-  @SuppressWarnings("deprecation")
-  protected void finalize() {
-    delete();
-  }
-
   public synchronized void delete() {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
@@ -89,5 +84,4 @@ public class BitwuzlaOptionInfo {
   public BitwuzlaOptionInfo() {
     this(bitwuzlaJNI.new_BitwuzlaOptionInfo(), true);
   }
-
 }

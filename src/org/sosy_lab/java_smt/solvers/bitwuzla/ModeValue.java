@@ -21,11 +21,6 @@ public class ModeValue {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
-  @SuppressWarnings("deprecation")
-  protected void finalize() {
-    delete();
-  }
-
   public synchronized void delete() {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
@@ -60,9 +55,7 @@ public class ModeValue {
     return bitwuzlaJNI.ModeValue_num_modes_get(swigCPtr, this);
   }
 
-
   public ModeValue() {
     this(bitwuzlaJNI.new_ModeValue(), true);
   }
-
 }

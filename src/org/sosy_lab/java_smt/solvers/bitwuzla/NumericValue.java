@@ -21,11 +21,6 @@ public class NumericValue {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
-  @SuppressWarnings("deprecation")
-  protected void finalize() {
-    delete();
-  }
-
   public synchronized void delete() {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
@@ -71,5 +66,4 @@ public class NumericValue {
   public NumericValue() {
     this(bitwuzlaJNI.new_NumericValue(), true);
   }
-
 }

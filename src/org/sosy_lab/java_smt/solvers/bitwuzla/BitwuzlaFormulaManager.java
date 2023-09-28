@@ -60,7 +60,13 @@ final class BitwuzlaFormulaManager extends AbstractFormulaManager<Long, Long, Lo
 
     long parser =
         bitwuzlaJNI.bitwuzla_parser_new(
-            options, "tempParserFile", _IO_FILE.getCPtr(infile), infile, "smt2", 2, "tempParserFile");
+            options,
+            "tempParserFile",
+            _IO_FILE.getCPtr(infile),
+            infile,
+            "smt2",
+            2,
+            "tempParserFile");
 
     // Boolean must be false
     String err_msg = bitwuzlaJNI.bitwuzla_parser_parse(parser, false);
@@ -91,7 +97,7 @@ final class BitwuzlaFormulaManager extends AbstractFormulaManager<Long, Long, Lo
 
     // File needs to be deleted from Java-side
     File toDelete = new File("tempParserFile");
-    if (!toDelete.delete()){
+    if (!toDelete.delete()) {
       throw new RuntimeException("Temporary parsing file could not be deleted.");
     }
 
