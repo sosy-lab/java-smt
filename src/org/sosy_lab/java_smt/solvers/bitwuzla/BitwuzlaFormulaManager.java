@@ -60,7 +60,7 @@ final class BitwuzlaFormulaManager extends AbstractFormulaManager<Long, Long, Lo
 
     long parser =
         bitwuzlaJNI.bitwuzla_parser_new(
-            options, "tempParserFile", _IO_FILE.getCPtr(infile), infile, "smt2");
+            options, "tempParserFile", _IO_FILE.getCPtr(infile), infile, "smt2", 2, "tempParserFile");
 
     // Boolean must be false
     String err_msg = bitwuzlaJNI.bitwuzla_parser_parse(parser, false);

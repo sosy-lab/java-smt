@@ -99,7 +99,7 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
       FloatingPointRoundingMode pFloatingPointRoundingMode,
       Consumer<String> pLoader)
       throws InvalidConfigurationException {
-    pLoader.accept("bitwuzla");
+    pLoader.accept("bitwuzlaJNI");
     BitwuzlaSettings settings = new BitwuzlaSettings(config);
 
     long pOptions = bitwuzlaJNI.bitwuzla_options_new();
