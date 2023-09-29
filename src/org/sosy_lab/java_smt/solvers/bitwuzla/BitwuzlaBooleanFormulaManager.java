@@ -57,8 +57,8 @@ public class BitwuzlaBooleanFormulaManager
 
     if (bitwuzlaJNI.bitwuzla_term_get_kind(pParam1) == BitwuzlaKind.BITWUZLA_KIND_NOT.swigValue()) {
       long[] size = new long[1];
-      long pChildren = bitwuzlaJNI.bitwuzla_term_get_children(pParam1, size);
-      return bitwuzlaJNI.BitwuzlaTermArray_getitem(pChildren, 0);
+      long[] pChildren = bitwuzlaJNI.bitwuzla_term_get_children(pParam1, size);
+      return pChildren[0];
     }
     return bitwuzlaJNI.bitwuzla_mk_term1(BitwuzlaKind.BITWUZLA_KIND_NOT.swigValue(), pParam1);
   }
