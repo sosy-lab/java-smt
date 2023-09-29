@@ -444,27 +444,6 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
     return bitwuzlaSortToType(pType);
   }
 
-  //  @SuppressWarnings("unchecked")
-  //  @Override
-  //  public <T extends Formula> FormulaType<T> getFormulaType(T pFormula) {
-  //    if (pFormula instanceof BitvectorFormula) {
-  //      long sort = bitwuzlaJNI.bitwuzla_term_get_sort(extractInfo(pFormula));
-  //      checkArgument(
-  //          bitwuzlaJNI.bitwuzla_sort_is_bv(sort),
-  //          "BitvectorFormula with type missmatch: %s",
-  //          pFormula);
-  //      return (FormulaType<T>)
-  //          FormulaType.getBitvectorTypeWithSize(
-  //              Math.toIntExact(bitwuzlaJNI.bitwuzla_term_bv_get_size(extractInfo(pFormula))));
-  //    } else if (pFormula instanceof ArrayFormula<?, ?>) {
-  //      FormulaType<T> arrayIndexType = getArrayFormulaIndexType((ArrayFormula<T, T>) pFormula);
-  //      FormulaType<T> arrayElementType = getArrayFormulaElementType((ArrayFormula<T, T>)
-  // pFormula);
-  //      return (FormulaType<T>) FormulaType.getArrayType(arrayIndexType, arrayElementType);
-  //    }
-  //    return super.getFormulaType(pFormula);
-  //  }
-
   private BigDecimal parseIEEEbinaryFP(long pTerm) {
     // The Bitwuzla string for FPs is always in binary, regardless of the second argument.
 
@@ -586,13 +565,22 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
 
   @Override
   public Object convertValue(Long term) {
-    //    String value;
+    String value;
     long sort = bitwuzlaJNI.bitwuzla_term_get_sort(term);
-    if (bitwuzlaJNI.bitwuzla_sort_is_fun(sort)) {
-
-    } else {
-
+    if (bitwuzlaJNI.bitwuzla_term_is_const(term)) {
+      return null;
     }
+    if (bitwuzlaJNI.bitwuzla_sort_is_fun(sort)) {
+      // TODO: this is wrong
+      throw new AssertionError("Error: Unknown sort and term");
+    } else {
+      value = bitwuzlaJNI.bitwuzla_term_to_string(term);
+      if (value.contains("#b")) {
+        // Bitvectors in Bitwuzla start with a #b
+        return new BigInteger(value.substring(2), 2);
+      }
+    }
+
     throw new AssertionError("Error: Unknown sort and term");
   }
 }
