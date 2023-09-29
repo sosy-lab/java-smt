@@ -30,7 +30,6 @@ public class BitwuzlaNativeApiTest {
 
   @After
   public void freeEnvironment() {
-    NativeLibraries.loadLibrary("bitwuzlaJNI");
     bitwuzlaJNI.bitwuzla_delete(bitwuzla);
   }
 
@@ -97,7 +96,6 @@ public class BitwuzlaNativeApiTest {
 
     // Create two bit-vector constants of that sort.
     long x = bitwuzlaJNI.bitwuzla_mk_const(sortbv8, "x");
-    System.out.println("This is the result of x: " + x);
     long y = bitwuzlaJNI.bitwuzla_mk_const(sortbv8, "y");
     long f = bitwuzlaJNI.bitwuzla_mk_const(sortfun, "f");
     long a = bitwuzlaJNI.bitwuzla_mk_const(sortarr, "a");
@@ -153,13 +151,7 @@ public class BitwuzlaNativeApiTest {
 
     // (check-sat)
     long result = bitwuzlaJNI.bitwuzla_check_sat(bitwuzlaInstance);
-
-    System.out.println("Expect: sat");
-    System.out.println(
-        "Bitwuzla: "
-            + (result == BitwuzlaResult.BITWUZLA_SAT.swigValue()
-                ? "sat"
-                : (result == BitwuzlaResult.BITWUZLA_UNSAT.swigValue() ? "unsat" : "unknown")));
+    assertEquals(result, BitwuzlaResult.BITWUZLA_SAT.swigValue());
 
     // Print model in SMT-LIBv2 format.
     System.out.println("Model:");
