@@ -119,10 +119,9 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
     if (bitwuzlaJNI.bitwuzla_sort_is_fp(pSort)) {
       long exponent = bitwuzlaJNI.bitwuzla_sort_fp_get_exp_size(pSort);
       long mantissa = bitwuzlaJNI.bitwuzla_sort_fp_get_sig_size(pSort);
-      return  FormulaType.getFloatingPointType((int) exponent,
-          (int) mantissa);
+      return FormulaType.getFloatingPointType((int) exponent, (int) mantissa);
     } else if (bitwuzlaJNI.bitwuzla_sort_is_bv(pSort)) {
-      return  FormulaType.getBitvectorTypeWithSize(
+      return FormulaType.getBitvectorTypeWithSize(
           (int) bitwuzlaJNI.bitwuzla_sort_bv_get_size(pSort));
     } else if (bitwuzlaJNI.bitwuzla_sort_is_array(pSort)) {
       FormulaType<?> domainSort =
@@ -161,7 +160,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
       } else {
         functionKind = FunctionDeclarationKind.OTHER;
       }
-    }  else if (kind.equals(BITWUZLA_KIND_VALUE)) {
+    } else if (kind.equals(BITWUZLA_KIND_VALUE)) {
       functionKind = FunctionDeclarationKind.VAR;
     } else if (kind.equals(BITWUZLA_KIND_VARIABLE)) {
       visitor.visitBoundVariable(formula, 0);
@@ -445,25 +444,26 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
     return bitwuzlaSortToType(pType);
   }
 
-//  @SuppressWarnings("unchecked")
-//  @Override
-//  public <T extends Formula> FormulaType<T> getFormulaType(T pFormula) {
-//    if (pFormula instanceof BitvectorFormula) {
-//      long sort = bitwuzlaJNI.bitwuzla_term_get_sort(extractInfo(pFormula));
-//      checkArgument(
-//          bitwuzlaJNI.bitwuzla_sort_is_bv(sort),
-//          "BitvectorFormula with type missmatch: %s",
-//          pFormula);
-//      return (FormulaType<T>)
-//          FormulaType.getBitvectorTypeWithSize(
-//              Math.toIntExact(bitwuzlaJNI.bitwuzla_term_bv_get_size(extractInfo(pFormula))));
-//    } else if (pFormula instanceof ArrayFormula<?, ?>) {
-//      FormulaType<T> arrayIndexType = getArrayFormulaIndexType((ArrayFormula<T, T>) pFormula);
-//      FormulaType<T> arrayElementType = getArrayFormulaElementType((ArrayFormula<T, T>) pFormula);
-//      return (FormulaType<T>) FormulaType.getArrayType(arrayIndexType, arrayElementType);
-//    }
-//    return super.getFormulaType(pFormula);
-//  }
+  //  @SuppressWarnings("unchecked")
+  //  @Override
+  //  public <T extends Formula> FormulaType<T> getFormulaType(T pFormula) {
+  //    if (pFormula instanceof BitvectorFormula) {
+  //      long sort = bitwuzlaJNI.bitwuzla_term_get_sort(extractInfo(pFormula));
+  //      checkArgument(
+  //          bitwuzlaJNI.bitwuzla_sort_is_bv(sort),
+  //          "BitvectorFormula with type missmatch: %s",
+  //          pFormula);
+  //      return (FormulaType<T>)
+  //          FormulaType.getBitvectorTypeWithSize(
+  //              Math.toIntExact(bitwuzlaJNI.bitwuzla_term_bv_get_size(extractInfo(pFormula))));
+  //    } else if (pFormula instanceof ArrayFormula<?, ?>) {
+  //      FormulaType<T> arrayIndexType = getArrayFormulaIndexType((ArrayFormula<T, T>) pFormula);
+  //      FormulaType<T> arrayElementType = getArrayFormulaElementType((ArrayFormula<T, T>)
+  // pFormula);
+  //      return (FormulaType<T>) FormulaType.getArrayType(arrayIndexType, arrayElementType);
+  //    }
+  //    return super.getFormulaType(pFormula);
+  //  }
 
   private BigDecimal parseIEEEbinaryFP(long pTerm) {
     // The Bitwuzla string for FPs is always in binary, regardless of the second argument.
