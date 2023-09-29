@@ -20,6 +20,7 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.*;
 
 import com.google.common.base.Preconditions;
@@ -33,6 +34,8 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.LongStream;
+import org.sosy_lab.java_smt.api.ArrayFormula;
+import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -380,6 +383,26 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
         formula,
         functionArgs,
         FunctionDeclarationImpl.of(functionName, functionKind, argTypes, getFormulaType(f), kind));
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <T extends Formula> FormulaType<T> getFormulaType(T pFormula) {
+    if (pFormula instanceof BitvectorFormula) {
+      long sort = bitwuzlaJNI.bitwuzla_term_get_sort(extractInfo(pFormula));
+      checkArgument(
+          bitwuzlaJNI.bitwuzla_sort_is_bv(sort),
+          "BitvectorFormula with type missmatch: %s",
+          pFormula);
+      return (FormulaType<T>)
+          FormulaType.getBitvectorTypeWithSize(
+              Math.toIntExact(bitwuzlaJNI.bitwuzla_sort_bv_get_size(extractInfo(pFormula))));
+    } else if (pFormula instanceof ArrayFormula<?, ?>) {
+      FormulaType<T> arrayIndexType = getArrayFormulaIndexType((ArrayFormula<T, T>) pFormula);
+      FormulaType<T> arrayElementType = getArrayFormulaElementType((ArrayFormula<T, T>) pFormula);
+      return (FormulaType<T>) FormulaType.getArrayType(arrayIndexType, arrayElementType);
+    }
+    return super.getFormulaType(pFormula);
   }
 
   @Override
