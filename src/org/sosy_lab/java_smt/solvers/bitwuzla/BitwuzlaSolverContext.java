@@ -47,18 +47,18 @@ import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 
 public final class BitwuzlaSolverContext extends AbstractSolverContext {
 
-  enum SatSolver {
-    LINGELING,
-    CMS,
-    CADICAL,
-    KISSAT
-  }
-
   @Options(prefix = "solver.bitwuzla")
-  private static class BitwuzlaSettings {
+  public static class BitwuzlaSettings {
+
+    enum SatSolver {
+      LINGELING,
+      CMS,
+      CADICAL,
+      KISSAT
+    }
 
     @Option(secure = true, description = "The SAT solver used by Bitwuzla.")
-    private BitwuzlaSolverContext.SatSolver satSolver = BitwuzlaSolverContext.SatSolver.CADICAL;
+    private SatSolver satSolver = SatSolver.CADICAL;
 
     @Option(
         secure = true,
@@ -69,6 +69,14 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
                 + "Example: \"BTOR_OPT_MODEL_GEN=2,BTOR_OPT_INCREMENTAL=1\".")
     private String furtherOptions = "";
 
+    protected SatSolver getSatSolver() {
+      return satSolver;
+    }
+
+    protected String getFurtherOptions() {
+      return furtherOptions;
+    }
+
     BitwuzlaSettings(Configuration config) throws InvalidConfigurationException {
       config.inject(this);
     }
@@ -77,17 +85,26 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
   private final BitwuzlaFormulaManager manager;
   private final BitwuzlaFormulaCreator creator;
   private final ShutdownNotifier shutdownNotifier;
+
+  private final BitwuzlaSettings settings;
+
+  private final long randomSeed;
+
   private boolean closed = false;
   private final AtomicBoolean isAnyStackAlive = new AtomicBoolean(false);
 
   BitwuzlaSolverContext(
       BitwuzlaFormulaManager pManager,
       BitwuzlaFormulaCreator pCreator,
-      ShutdownNotifier pShutdownNotifier) {
+      ShutdownNotifier pShutdownNotifier,
+      long pRandomSeed,
+      BitwuzlaSettings pSettings) {
     super(pManager);
     manager = pManager;
     creator = pCreator;
     shutdownNotifier = pShutdownNotifier;
+    randomSeed = pRandomSeed;
+    settings = pSettings;
   }
 
   @SuppressWarnings("unused")
@@ -100,26 +117,9 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
       Consumer<String> pLoader)
       throws InvalidConfigurationException {
     pLoader.accept("bitwuzlaJNI");
+
     BitwuzlaSettings settings = new BitwuzlaSettings(config);
-
-    long pOptions = bitwuzlaJNI.bitwuzla_options_new();
-
-    Preconditions.checkNotNull(settings.satSolver);
-    bitwuzlaJNI.bitwuzla_set_option_mode(
-        pOptions,
-        BitwuzlaOption.BITWUZLA_OPT_SAT_SOLVER.swigValue(),
-        settings.satSolver.name().toLowerCase(Locale.getDefault()));
-    bitwuzlaJNI.bitwuzla_set_option(
-        pOptions, BitwuzlaOption.BITWUZLA_OPT_PRODUCE_MODELS.swigValue(), 2);
-    bitwuzlaJNI.bitwuzla_set_option(
-        pOptions, BitwuzlaOption.BITWUZLA_OPT_SEED.swigValue(), randomSeed);
-    // Stop Bitwuzla from rewriting formulas in outputs
-    bitwuzlaJNI.bitwuzla_set_option(
-        pOptions, BitwuzlaOption.BITWUZLA_OPT_REWRITE_LEVEL.swigValue(), 0);
-
-    setFurtherOptions(pOptions, settings.furtherOptions);
-
-    final long bitwuzla = bitwuzlaJNI.bitwuzla_new(pOptions);
+    final long bitwuzla = createEnvironmentBasedOnOptions(settings, randomSeed);
 
     BitwuzlaFormulaCreator creator = new BitwuzlaFormulaCreator(bitwuzla);
     BitwuzlaUFManager functionTheory = new BitwuzlaUFManager(creator);
@@ -141,7 +141,29 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
             floatingPointTheory,
             arrayTheory);
 
-    return new BitwuzlaSolverContext(manager, creator, pShutdownNotifier);
+    return new BitwuzlaSolverContext(manager, creator, pShutdownNotifier, randomSeed, settings);
+  }
+
+  private static long createEnvironmentBasedOnOptions(BitwuzlaSettings settings, long randomSeed)
+      throws InvalidConfigurationException {
+    long options = bitwuzlaJNI.bitwuzla_options_new();
+
+    Preconditions.checkNotNull(settings.getSatSolver());
+    bitwuzlaJNI.bitwuzla_set_option_mode(
+        options,
+        BitwuzlaOption.BITWUZLA_OPT_SAT_SOLVER.swigValue(),
+        settings.getSatSolver().name().toLowerCase(Locale.getDefault()));
+    bitwuzlaJNI.bitwuzla_set_option(
+        options, BitwuzlaOption.BITWUZLA_OPT_PRODUCE_MODELS.swigValue(), 2);
+    bitwuzlaJNI.bitwuzla_set_option(
+        options, BitwuzlaOption.BITWUZLA_OPT_SEED.swigValue(), randomSeed);
+    // Stop Bitwuzla from rewriting formulas in outputs
+    bitwuzlaJNI.bitwuzla_set_option(
+        options, BitwuzlaOption.BITWUZLA_OPT_REWRITE_LEVEL.swigValue(), 0);
+
+    setFurtherOptions(options, settings.getFurtherOptions());
+
+    return bitwuzlaJNI.bitwuzla_new(options);
   }
 
   /**
@@ -186,8 +208,9 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
+
     return new BitwuzlaTheoremProver(
-        manager, creator, creator.getEnv(), shutdownNotifier, options, isAnyStackAlive);
+        manager, creator, shutdownNotifier, options, settings, randomSeed, isAnyStackAlive);
   }
 
   @Override
