@@ -20,6 +20,7 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
+import io.github.cvc5.Kind;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
@@ -49,17 +50,50 @@ public class BitwuzlaBooleanFormulaManager
 
   @Override
   protected Long not(Long pParam1) {
+    if (isTrue(pParam1)) {
+      return pFalse;
+    } else if (isFalse(pParam1)) {
+      return pTrue;
+    }
+
+    if (bitwuzlaJNI.bitwuzla_term_get_kind(pParam1) == BitwuzlaKind.BITWUZLA_KIND_NOT.swigValue()) {
+      long[] size = new long[1];
+      long pChildren = bitwuzlaJNI.bitwuzla_term_get_children(pParam1, size);
+      return bitwuzlaJNI.BitwuzlaTermArray_getitem(pChildren, 0);
+    }
     return bitwuzlaJNI.bitwuzla_mk_term1(BitwuzlaKind.BITWUZLA_KIND_NOT.swigValue(), pParam1);
   }
 
   @Override
   protected Long and(Long pParam1, Long pParam2) {
+    if (isTrue(pParam1)) {
+      return pParam2;
+    } else if (isTrue(pParam2)) {
+      return pParam1;
+    } else if (isFalse(pParam1)) {
+      return pFalse;
+    } else if (isFalse(pParam2)) {
+      return pFalse;
+    } else if (pParam1.equals(pParam2)) {
+      return pParam1;
+    }
     return bitwuzlaJNI.bitwuzla_mk_term2(
         BitwuzlaKind.BITWUZLA_KIND_AND.swigValue(), pParam1, pParam2);
   }
 
   @Override
   protected Long or(Long pParam1, Long pParam2) {
+    if (isTrue(pParam1)) {
+      return pTrue;
+    } else if (isTrue(pParam2)) {
+      return pTrue;
+    } else if (isFalse(pParam1)) {
+      return pParam2;
+    } else if (isFalse(pParam2)) {
+      return pParam1;
+    } else if (pParam1.equals(pParam2)) {
+      return pParam1;
+    }
     return bitwuzlaJNI.bitwuzla_mk_term2(
         BitwuzlaKind.BITWUZLA_KIND_OR.swigValue(), pParam1, pParam2);
   }
@@ -82,11 +116,22 @@ public class BitwuzlaBooleanFormulaManager
 
   @Override
   protected boolean isFalse(Long bits) {
-    return !bitwuzlaJNI.bitwuzla_term_is_true(bits);
+    return bitwuzlaJNI.bitwuzla_term_is_false(bits);
   }
 
   @Override
-  protected Long ifThenElse(Long cond, Long f1, Long f2) {
-    return bitwuzlaJNI.bitwuzla_mk_term2(BitwuzlaKind.BITWUZLA_KIND_ITE.swigValue(), f1, f2);
+  protected Long ifThenElse(Long pCond, Long pF1, Long pF2) {
+    if (isTrue(pCond)) {
+      return pF1;
+    } else if (isFalse(pCond)) {
+      return pF2;
+    } else if (pF1.equals(pF2)) {
+      return pF1;
+    } else if (isTrue(pF1) && isFalse(pF2)) {
+      return pCond;
+    } else if (isFalse(pF1) && isTrue(pF2)) {
+      return not(pCond);
+    }
+    return bitwuzlaJNI.bitwuzla_mk_term2(BitwuzlaKind.BITWUZLA_KIND_ITE.swigValue(), pF1, pF2);
   }
 }

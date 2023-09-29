@@ -10,8 +10,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sosy_lab.common.NativeLibraries;
 
+import com.google.common.truth.Truth;
+
 public class BitwuzlaNativeApiTest {
-  private long bitwuzla;
+  private long DefaultBitwuzla;
 
   @BeforeClass
   public static void load() {
@@ -25,13 +27,12 @@ public class BitwuzlaNativeApiTest {
   @Before
   public void createEnvironment() {
     long options = bitwuzlaJNI.bitwuzla_options_new();
-    bitwuzla = bitwuzlaJNI.bitwuzla_new(options);
+    DefaultBitwuzla = bitwuzlaJNI.bitwuzla_new(options);
   }
 
   @After
   public void freeEnvironment() {
-    NativeLibraries.loadLibrary("bitwuzlaJNI");
-    bitwuzlaJNI.bitwuzla_delete(bitwuzla);
+    bitwuzlaJNI.bitwuzla_delete(DefaultBitwuzla);
   }
 
   //  @Test
@@ -283,5 +284,22 @@ public class BitwuzlaNativeApiTest {
   public void boolType() {
     long pBoolType = bitwuzlaJNI.bitwuzla_mk_bool_sort();
     assertTrue(bitwuzlaJNI.bitwuzla_sort_is_bool(pBoolType));
+  }
+
+  @Test
+  public void isFalse() {
+    long pBoolType = bitwuzlaJNI.bitwuzla_mk_bool_sort();
+    long var1 = bitwuzlaJNI.bitwuzla_mk_const(pBoolType, "var1");
+    long var2 = bitwuzlaJNI.bitwuzla_mk_const(pBoolType, "var2");
+
+    Truth.assertThat(bitwuzlaJNI.bitwuzla_term_is_false(var1)).isFalse();
+    Truth.assertThat(bitwuzlaJNI.bitwuzla_term_is_true(var1)).isFalse();
+        Truth.assertThat(bitwuzlaJNI.bitwuzla_term_is_false(var2)).isFalse();
+    Truth.assertThat(bitwuzlaJNI.bitwuzla_term_is_true(var2)).isFalse();
+  }
+
+    @Test
+  public void currentVersion() {
+    System.out.println("The Current Version is: " + bitwuzlaJNI.bitwuzla_version());
   }
 }
