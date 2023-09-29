@@ -39,43 +39,35 @@ class BitwuzlaModel extends AbstractModel<Long, Long, Long> {
       if (bitwuzlaJNI.bitwuzla_sort_is_fun(sort)) {
         long value = bitwuzlaJNI.bitwuzla_get_value(pBitwuzla, assertedTerms.get(i));
         long[] size = new long[1];
-        long children = bitwuzlaJNI.bitwuzla_term_get_children(value, size);
+        long[] children = bitwuzlaJNI.bitwuzla_term_get_children(value, size);
         assert size[0] == 2;
         int j = 0;
-        while (bitwuzlaJNI.bitwuzla_term_get_kind(
-                bitwuzlaJNI.BitwuzlaTermArray_getitem(children, 1))
+        while (bitwuzlaJNI.bitwuzla_term_get_kind(children[1])
             == BitwuzlaKind.BITWUZLA_KIND_LAMBDA.swigValue()) {
-          assert bitwuzlaJNI.bitwuzla_term_is_var(
-              bitwuzlaJNI.BitwuzlaTermArray_getitem(children, 0));
+          assert bitwuzlaJNI.bitwuzla_term_is_var(children[0]);
           System.out.print(
               (j > 0 ? " " : "")
-                  + bitwuzlaJNI.bitwuzla_term_to_string(
-                      bitwuzlaJNI.BitwuzlaTermArray_getitem(children, 0))
+                  + bitwuzlaJNI.bitwuzla_term_to_string(children[0])
                   + " "
                   + bitwuzlaJNI.bitwuzla_sort_to_string(
-                      bitwuzlaJNI.bitwuzla_term_get_sort(
-                          bitwuzlaJNI.BitwuzlaTermArray_getitem(children, 0)))
+                      bitwuzlaJNI.bitwuzla_term_get_sort(children[0]))
                   + " ");
-          value = bitwuzlaJNI.BitwuzlaTermArray_getitem(children, 1);
+          value = children[1];
           children = bitwuzlaJNI.bitwuzla_term_get_children(value, size);
           j += 1;
         }
-        assert bitwuzlaJNI.bitwuzla_term_is_var(bitwuzlaJNI.BitwuzlaTermArray_getitem(children, 0));
+        assert bitwuzlaJNI.bitwuzla_term_is_var(children[0]);
         System.out.print(
             (j > 0 ? " " : "")
-                + bitwuzlaJNI.bitwuzla_term_to_string(
-                    bitwuzlaJNI.BitwuzlaTermArray_getitem(children, 0))
+                + bitwuzlaJNI.bitwuzla_term_to_string(children[0])
                 + " "
                 + bitwuzlaJNI.bitwuzla_sort_to_string(
-                    bitwuzlaJNI.bitwuzla_term_get_sort(
-                        bitwuzlaJNI.BitwuzlaTermArray_getitem(children, 0)))
+                    bitwuzlaJNI.bitwuzla_term_get_sort(children[0]))
                 + ") ");
         System.out.print(
             bitwuzlaJNI.bitwuzla_sort_to_string(bitwuzlaJNI.bitwuzla_sort_fun_get_codomain(sort))
                 + " ");
-        System.out.println(
-            bitwuzlaJNI.bitwuzla_term_to_string(
-                bitwuzlaJNI.BitwuzlaTermArray_getitem(children, 1)));
+        System.out.println(bitwuzlaJNI.bitwuzla_term_to_string(children[1]));
       } else {
         System.out.println(
             ") "

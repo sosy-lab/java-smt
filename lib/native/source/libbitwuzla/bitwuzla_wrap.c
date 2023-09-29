@@ -5963,13 +5963,13 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJN
   return jresult;
 }
 
-
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1get_1children(JNIEnv *jenv, jclass jcls, jlong jarg1, jlongArray jarg2) {
+// BitwuzlaTerm* terms = bitwuzla_term_get_children(value, size_t* sizePtr);
+// We don't really need arg2 in Java(SMT), as the return array has a size in Java. But we need it here to create the array with that correct size!
+SWIGEXPORT jlongArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1get_1children(JNIEnv *jenv, jclass jcls, jlong jarg1, jlongArray jarg2) {
   jlong jresult = 0 ;
   BitwuzlaTerm arg1 ;
   size_t *arg2 = (size_t *) 0 ;
   size_t temp2 ;
-  BitwuzlaTerm *result = 0 ;
   
   (void)jenv;
   (void)jcls;
@@ -5986,14 +5986,24 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJ
     temp2 = (size_t)0;
     arg2 = &temp2; 
   }
-  result = (BitwuzlaTerm *)bitwuzla_term_get_children(arg1,arg2);
-  *(BitwuzlaTerm **)&jresult = result; 
+  long unsigned int * result = bitwuzla_term_get_children(arg1,arg2);
+  *(BitwuzlaTerm **)&jresult = result;
   {
     jlong jvalue = (jlong)temp2;
     (*jenv)->SetLongArrayRegion(jenv, jarg2, 0, 1, &jvalue);
   }
+
+  jlongArray ret = (jobjectArray)(*jenv)->NewLongArray(jenv, *arg2);
+  if (ret == 0) {
+    return NULL;
+  }
+  long long int tmp[*arg2];
+  for (int i = 0; i < *arg2; i++) {
+    tmp[i] = (long long int) result[i];
+  }
+  (*jenv)->SetLongArrayRegion(jenv, ret, 0, *arg2, tmp);
   
-  return jresult;
+  return ret;
 }
 
 

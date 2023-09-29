@@ -737,7 +737,7 @@ public class bitwuzlaJNI {
 
   public static final native int bitwuzla_term_get_kind(long jarg1);
 
-  public static final native long bitwuzla_term_get_children(long jarg1, long[] jarg2);
+  public static final native long[] bitwuzla_term_get_children(long jarg1, long[] jarg2);
 
   public static final native long bitwuzla_term_get_indices(long jarg1, long[] jarg2);
 
@@ -845,9 +845,9 @@ public class bitwuzlaJNI {
   public static final native void bitwuzla_term_print_fmt(
       long jarg1, long jarg2, _IO_FILE jarg2_, int jarg3);
 
-  public static final native long bitwuzla_new(long jarg1);
+  public static final native long bitwuzla_new(long options);
 
-  public static final native void bitwuzla_delete(long jarg1);
+  public static final native void bitwuzla_delete(long env);
 
   public static final native void bitwuzla_set_termination_callback(
       long jarg1, long jarg2, long jarg3);
@@ -856,11 +856,11 @@ public class bitwuzlaJNI {
 
   public static final native void bitwuzla_set_abort_callback(long jarg1);
 
-  public static final native void bitwuzla_push(long jarg1, long jarg2);
+  public static final native void bitwuzla_push(long env, long numOfLevels);
 
-  public static final native void bitwuzla_pop(long jarg1, long jarg2);
+  public static final native void bitwuzla_pop(long env, long numOfLevel);
 
-  public static final native void bitwuzla_assert(long jarg1, long jarg2);
+  public static final native void bitwuzla_assert(long env, long jarg2);
 
   public static final native long bitwuzla_get_assertions(long jarg1, long[] jarg2);
 
@@ -868,15 +868,15 @@ public class bitwuzlaJNI {
 
   public static final native long bitwuzla_get_unsat_assumptions(long jarg1, long[] jarg2);
 
-  public static final native long bitwuzla_get_unsat_core(long jarg1, long[] jarg2);
+  public static final native long bitwuzla_get_unsat_core(long env, long[] jarg2);
 
   public static final native void bitwuzla_simplify(long jarg1);
 
-  public static final native int bitwuzla_check_sat(long jarg1);
+  public static final native int bitwuzla_check_sat(long env);
 
   public static final native int bitwuzla_check_sat_assuming(long jarg1, long jarg2, long[] jarg3);
 
-  public static final native long bitwuzla_get_value(long jarg1, long jarg2);
+  public static final native long bitwuzla_get_value(long env, long term);
 
   public static final native void bitwuzla_print_formula(
       long jarg1, String jarg2, long jarg3, _IO_FILE jarg3_, int jarg4);
@@ -884,19 +884,19 @@ public class bitwuzlaJNI {
   public static final native void bitwuzla_get_statistics(
       long jarg1, long jarg2, long jarg3, long[] jarg4);
 
-  public static final native long bitwuzla_mk_array_sort(long jarg1, long jarg2);
+  public static final native long bitwuzla_mk_array_sort(long index, long element);
 
   public static final native long bitwuzla_mk_bool_sort();
 
-  public static final native long bitwuzla_mk_bv_sort(long jarg1);
+  public static final native long bitwuzla_mk_bv_sort(long width);
 
-  public static final native long bitwuzla_mk_fp_sort(long jarg1, long jarg2);
+  public static final native long bitwuzla_mk_fp_sort(long exponent, long significant);
 
-  public static final native long bitwuzla_mk_fun_sort(long jarg1, long[] jarg2, long jarg3);
+  public static final native long bitwuzla_mk_fun_sort(long arity, long[] domain, long codomain);
 
   public static final native long bitwuzla_mk_rm_sort();
 
-  public static final native long bitwuzla_mk_uninterpreted_sort(String jarg1);
+  public static final native long bitwuzla_mk_uninterpreted_sort(String symbol);
 
   public static final native long bitwuzla_mk_true();
 
