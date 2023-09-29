@@ -43,7 +43,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   /** Bitwuzla does not support multiple solver stacks. */
   private final AtomicBoolean isAnyStackAlive;
 
-  private final long pEnv;
+  private final long env;
 
   @SuppressWarnings("unused")
   private final BitwuzlaFormulaManager manager;
@@ -59,9 +59,9 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
       Set<ProverOptions> pOptions,
       AtomicBoolean pIsAnyStackAlive) {
     super(pOptions, pManager.getBooleanFormulaManager(), pShutdownNotifier);
-    this.manager = pManager;
-    this.creator = pCreator;
-    this.pEnv = pEnv;
+    manager = pManager;
+    creator = pCreator;
+    env = pEnv;
 
     isAnyStackAlive = pIsAnyStackAlive;
     // avoid dual stack usage
@@ -79,7 +79,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   public void pop() {
     Preconditions.checkState(!closed);
     Preconditions.checkState(size() > 0);
-    bitwuzlaJNI.bitwuzla_pop(pEnv, 1);
+    bitwuzlaJNI.bitwuzla_pop(env, 1);
   }
 
   @Override
@@ -87,7 +87,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
     Preconditions.checkState(!closed);
     wasLastSatCheckSat = false;
     super.addConstraint(constraint);
-    bitwuzlaJNI.bitwuzla_assert(pEnv, ((BitwuzlaBooleanFormula) constraint).getTerm());
+    bitwuzlaJNI.bitwuzla_assert(env, ((BitwuzlaBooleanFormula) constraint).getTerm());
     return null;
   }
 
@@ -102,7 +102,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   public void push() throws InterruptedException {
     Preconditions.checkState(!closed);
     super.push();
-    bitwuzlaJNI.bitwuzla_push(pEnv, 1);
+    bitwuzlaJNI.bitwuzla_push(env, 1);
   }
 
   private boolean readSATResult(int resultValue) throws SolverException {
@@ -121,7 +121,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   public boolean isUnsat() throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     wasLastSatCheckSat = false;
-    final int result = bitwuzlaJNI.bitwuzla_check_sat(pEnv);
+    final int result = bitwuzlaJNI.bitwuzla_check_sat(env);
     return readSATResult(result);
   }
 
@@ -140,7 +140,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
     for (int i = 0; i < size; i++) {
       bitwuzlaAssumptions[i] = ((BitwuzlaBooleanFormula) inputAssumptions[i]).getTerm();
     }
-    final int result = bitwuzlaJNI.bitwuzla_check_sat_assuming(pEnv, size, bitwuzlaAssumptions);
+    final int result = bitwuzlaJNI.bitwuzla_check_sat_assuming(env, size, bitwuzlaAssumptions);
     return readSATResult(result);
   }
 
@@ -164,7 +164,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
 
   private List<BooleanFormula> getUnsatCore0() {
     long[] size = new long[1];
-    return encapsulate(bitwuzlaJNI.bitwuzla_get_unsat_core(pEnv, size), size[0]);
+    return encapsulate(bitwuzlaJNI.bitwuzla_get_unsat_core(env, size), size[0]);
   }
 
   private List<BooleanFormula> encapsulate(long pTermsArray, long size) {
@@ -213,8 +213,9 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   @Override
   public void close() {
     if (!closed) {
-      bitwuzlaJNI.bitwuzla_delete(pEnv);
+      bitwuzlaJNI.bitwuzla_delete(env);
       Preconditions.checkState(isAnyStackAlive.getAndSet(false));
+      closed = true;
     }
     super.close();
   }
@@ -239,6 +240,6 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   @Override
   protected BitwuzlaModel getEvaluatorWithoutChecks() {
     return new BitwuzlaModel(
-        pEnv, this, creator, Collections2.transform(getAssertedFormulas(), creator::extractInfo));
+        env, this, creator, Collections2.transform(getAssertedFormulas(), creator::extractInfo));
   }
 }
