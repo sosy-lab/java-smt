@@ -25,6 +25,7 @@ import com.google.common.collect.Collections2;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -38,6 +39,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaFormula.BitwuzlaBooleanFormula;
+import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaSolverContext.BitwuzlaSettings;
 
 class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements ProverEnvironment {
   /** Bitwuzla does not support multiple solver stacks. */
@@ -54,14 +56,16 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   protected BitwuzlaTheoremProver(
       BitwuzlaFormulaManager pManager,
       BitwuzlaFormulaCreator pCreator,
-      long pEnv,
       ShutdownNotifier pShutdownNotifier,
       Set<ProverOptions> pOptions,
+      BitwuzlaSettings pSettings,
+      long pRandomSeed,
       AtomicBoolean pIsAnyStackAlive) {
     super(pOptions, pManager.getBooleanFormulaManager(), pShutdownNotifier);
     manager = pManager;
     creator = pCreator;
-    env = pEnv;
+    // Bitwuzla guarantees that Terms and Sorts are shared
+    env = createEnvironment(pOptions, pSettings, pRandomSeed);
 
     isAnyStackAlive = pIsAnyStackAlive;
     // avoid dual stack usage
@@ -69,6 +73,34 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
         !isAnyStackAlive.getAndSet(true),
         "Bitwuzla does not support the usage of multiple "
             + "solver stacks at the same time. Please close any existing solver stack.");
+  }
+
+  private long createEnvironment(
+      Set<ProverOptions> pFurtherOptions, BitwuzlaSettings pSettings, long pRandomSeed) {
+    // TODO: set further options
+    long options = bitwuzlaJNI.bitwuzla_options_new();
+
+    if (pFurtherOptions.contains(ProverOptions.GENERATE_MODELS)) {
+      bitwuzlaJNI.bitwuzla_set_option(
+          options, BitwuzlaOption.BITWUZLA_OPT_PRODUCE_MODELS.swigValue(), 2);
+    }
+    // TODO: termination callback
+    // bitwuzlaJNI.bitwuzla_set_termination_callback();
+
+    Preconditions.checkNotNull(pSettings.getSatSolver());
+    bitwuzlaJNI.bitwuzla_set_option_mode(
+        options,
+        BitwuzlaOption.BITWUZLA_OPT_SAT_SOLVER.swigValue(),
+        pSettings.getSatSolver().name().toLowerCase(Locale.getDefault()));
+    bitwuzlaJNI.bitwuzla_set_option(
+        options, BitwuzlaOption.BITWUZLA_OPT_SEED.swigValue(), pRandomSeed);
+    // Stop Bitwuzla from rewriting formulas in outputs
+    bitwuzlaJNI.bitwuzla_set_option(
+        options, BitwuzlaOption.BITWUZLA_OPT_REWRITE_LEVEL.swigValue(), 0);
+
+    // setFurtherOptions(pOptions, settings.getFurtherOptions());
+
+    return bitwuzlaJNI.bitwuzla_new(options);
   }
 
   /**
