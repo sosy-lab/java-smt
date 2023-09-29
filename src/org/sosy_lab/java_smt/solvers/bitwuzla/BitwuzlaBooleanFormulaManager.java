@@ -20,7 +20,6 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
-import io.github.cvc5.Kind;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
