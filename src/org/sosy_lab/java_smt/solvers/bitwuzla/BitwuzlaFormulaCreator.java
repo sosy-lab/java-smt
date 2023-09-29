@@ -79,6 +79,20 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
   }
 
   @Override
+  @SuppressWarnings("MethodTypeParameterName")
+  protected <TI extends Formula, TE extends Formula> FormulaType<TE> getArrayFormulaElementType(
+      ArrayFormula<TI, TE> pArray) {
+    return ((BitwuzlaArrayFormula<TI, TE>) pArray).getElementType();
+  }
+
+  @Override
+  @SuppressWarnings("MethodTypeParameterName")
+  protected <TI extends Formula, TE extends Formula> FormulaType<TI> getArrayFormulaIndexType(
+      ArrayFormula<TI, TE> pArray) {
+    return ((BitwuzlaArrayFormula<TI, TE>) pArray).getIndexType();
+  }
+
+  @Override
   public Long getArrayType(Long indexType, Long elementType) {
     return bitwuzlaJNI.bitwuzla_mk_array_sort(indexType, elementType);
   }
@@ -125,9 +139,9 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
           (int) bitwuzlaJNI.bitwuzla_sort_bv_get_size(pSort));
     } else if (bitwuzlaJNI.bitwuzla_sort_is_array(pSort)) {
       FormulaType<?> domainSort =
-          bitwuzlaSortToType(bitwuzlaJNI.bitwuzla_term_array_get_index_sort(pSort));
+          bitwuzlaSortToType(bitwuzlaJNI.bitwuzla_sort_array_get_element(pSort));
       FormulaType<?> rangeSort =
-          bitwuzlaSortToType(bitwuzlaJNI.bitwuzla_term_array_get_index_sort(pSort));
+          bitwuzlaSortToType(bitwuzlaJNI.bitwuzla_sort_array_get_index(pSort));
       return FormulaType.getArrayType(domainSort, rangeSort);
     } else if (bitwuzlaJNI.bitwuzla_sort_is_rm(pSort)) {
       return FormulaType.FloatingPointRoundingModeType;
@@ -440,7 +454,6 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
   @Override
   public FormulaType<?> getFormulaType(Long formula) {
     long pType = bitwuzlaJNI.bitwuzla_term_get_sort(formula);
-
     return bitwuzlaSortToType(pType);
   }
 
