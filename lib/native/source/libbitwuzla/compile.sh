@@ -62,6 +62,9 @@ echo "Compiling the C wrapper code and creating the \"$OUT_FILE\" library..."
 # This will compile the JNI wrapper part, given the JNI and the Bitwuzla header/dependency files
 gcc $JNI_HEADERS -I$BWZL_SRC_DIR -I$BWZL_LIB_DIR -I$BWZL_BUILD_SRC_DIR -I$BWZL_BUILD_LIB_DIR -I$BWZL_INCLUDE_DIR -I$BWZL_INCLUDE_C_DIR $SRC_FILE -fPIC -c
 
+# Link
+gcc -shared bitwuzla_wrap.o -L$BWZL_BUILD_SRC_DIR -lbitwuzla -Wl,-rpath,$BWZL_BUILD_SRC_DIR -o libbitwuzlaJNI.so
+
 # TODO: improve compiliation process (strict mode), strip lib, check if we can compile static libs and include them
 
 echo "Compilation Done"
