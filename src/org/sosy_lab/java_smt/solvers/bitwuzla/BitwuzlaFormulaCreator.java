@@ -151,7 +151,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
     // filled directly when handling the function application
     FunctionDeclarationKind functionKind = null;
     long[] sizeOutput = new long[1];
-    long pfunctionArgs = bitwuzlaJNI.bitwuzla_term_get_children(f, sizeOutput);
+    long[] pfunctionArgs = bitwuzlaJNI.bitwuzla_term_get_children(f, sizeOutput);
     long numberOfArgs = sizeOutput[0];
 
     if (kind.equals(BITWUZLA_KIND_CONST_ARRAY)) {
@@ -185,14 +185,15 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
       functionKind = FunctionDeclarationKind.ITE;
     } else if (kind.equals(BITWUZLA_KIND_EXISTS) || kind.equals(BITWUZLA_KIND_FORALL)) {
       long[] pSize = new long[1];
-      long pChildren = bitwuzlaJNI.bitwuzla_term_get_children(f, pSize);
+      long[] pChildren = bitwuzlaJNI.bitwuzla_term_get_children(f, pSize);
       long size = pSize[0];
       // QUANTIFIER: replace bound variable with free variable for visitation
       assert size == 2;
-      long bodyUnSub = bitwuzlaJNI.BitwuzlaTermArray_getitem(pChildren, 1);
+      assert pChildren.length == 2;
+      long bodyUnSub = pChildren[1];
       List<Formula> freeVars = new ArrayList<>();
       // Only unpacking one level of quantifier at a time, which always only tracks one bound var.
-      long[] boundVar = {bitwuzlaJNI.BitwuzlaTermArray_getitem(pChildren, 0)};
+      long[] boundVar = {pChildren[0]};
       String name = bitwuzlaJNI.bitwuzla_term_get_symbol(boundVar[0]);
       assert name != null;
       long sort = bitwuzlaJNI.bitwuzla_term_get_sort(boundVar[0]);
@@ -396,7 +397,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
 
     if (functionArgs.isEmpty()) {
       for (int i = 0; i < numberOfArgs; i++) {
-        long pCurrentTerm = bitwuzlaJNI.BitwuzlaTermArray_getitem(pfunctionArgs, i);
+        long pCurrentTerm = pfunctionArgs[i];
         long pCurrentSort = bitwuzlaJNI.bitwuzla_term_get_sort(pCurrentTerm);
         FormulaType<? extends Formula> currentType = bitwuzlaSortToType(pCurrentSort);
         argTypes.add(currentType);
@@ -544,9 +545,9 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
         : bitwuzlaJNI.bitwuzla_term_to_string(kind);
     if (kind == BitwuzlaKind.BITWUZLA_KIND_APPLY.swigValue()) {
       long[] size = new long[1];
-      long pChildren = bitwuzlaJNI.bitwuzla_term_get_children(pLong, size);
+      long[] pChildren = bitwuzlaJNI.bitwuzla_term_get_children(pLong, size);
       // Returns pointer to Uninterpreted Function used in Apply
-      return bitwuzlaJNI.BitwuzlaTermArray_getitem(pChildren, 0);
+      return pChildren[0];
     } else {
       return pLong;
     }
@@ -581,5 +582,17 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
       return Optional.of(entrySetIter.next().getValue());
     }
     return Optional.empty();
+  }
+
+  @Override
+  public Object convertValue(Long term) {
+    //    String value;
+    long sort = bitwuzlaJNI.bitwuzla_term_get_sort(term);
+    if (bitwuzlaJNI.bitwuzla_sort_is_fun(sort)) {
+
+    } else {
+
+    }
+    throw new AssertionError("Error: Unknown sort and term");
   }
 }
