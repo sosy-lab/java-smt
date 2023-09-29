@@ -26,6 +26,7 @@ import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.*;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+import io.github.cvc5.Term;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ import java.util.stream.LongStream;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
@@ -45,7 +47,10 @@ import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
+import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaFormula.BitwuzlaArrayFormula;
+import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaFormula.BitwuzlaBitvectorFormula;
 import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaFormula.BitwuzlaBooleanFormula;
+import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaFormula.BitwuzlaFloatingPointFormula;
 
 public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   private final Table<String, Long, Long> formulaCache = HashBasedTable.create();
@@ -59,6 +64,13 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
     return bitwuzlaJNI.bitwuzla_mk_bv_sort(bitwidth);
   }
 
+  @Override
+  public BitvectorFormula encapsulateBitvector(Long pTerm) {
+    assert getFormulaType(pTerm).isBitvectorType()
+        : "Unexpected formula type for BV formula: " + getFormulaType(pTerm);
+    return new BitwuzlaBitvectorFormula(pTerm);
+  }
+
   // Assuming that JavaSMT FloatingPointType follows IEEE 754, if it is in the decimal
   // system instead use bitwuzla_mk_fp_value_from_real somehow or convert myself
   @Override
@@ -70,6 +82,23 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
   @Override
   public Long getArrayType(Long indexType, Long elementType) {
     return bitwuzlaJNI.bitwuzla_mk_array_sort(indexType, elementType);
+  }
+
+  @Override
+  protected FloatingPointFormula encapsulateFloatingPoint(Long pTerm) {
+    assert getFormulaType(pTerm).isFloatingPointType()
+        : String.format("%s is no FP, but %s (%s)", pTerm, bitwuzlaJNI.bitwuzla_term_get_sort(pTerm),
+        getFormulaType(pTerm));
+    return new BitwuzlaFloatingPointFormula(pTerm);
+  }
+
+  @Override
+  @SuppressWarnings("MethodTypeParameterName")
+  protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> encapsulateArray(
+      Long pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
+    assert getFormulaType(pTerm).isArrayType()
+        : "Unexpected formula type for array formula: " + getFormulaType(pTerm);
+    return new BitwuzlaArrayFormula<>(pTerm, pIndexType, pElementType);
   }
 
   @Override
@@ -386,6 +415,26 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
         formula,
         functionArgs,
         FunctionDeclarationImpl.of(functionName, functionKind, argTypes, getFormulaType(f), kind));
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <T extends Formula> FormulaType<T> getFormulaType(T pFormula) {
+    if (pFormula instanceof BitvectorFormula) {
+      long sort = bitwuzlaJNI.bitwuzla_term_get_sort(extractInfo(pFormula));
+      checkArgument(
+          bitwuzlaJNI.bitwuzla_sort_is_bv(sort),
+          "BitvectorFormula with type missmatch: %s",
+          pFormula);
+      return (FormulaType<T>)
+          FormulaType.getBitvectorTypeWithSize(
+              Math.toIntExact(bitwuzlaJNI.bitwuzla_sort_bv_get_size(sort)));
+    } else if (pFormula instanceof ArrayFormula<?, ?>) {
+      FormulaType<T> arrayIndexType = getArrayFormulaIndexType((ArrayFormula<T, T>) pFormula);
+      FormulaType<T> arrayElementType = getArrayFormulaElementType((ArrayFormula<T, T>) pFormula);
+      return (FormulaType<T>) FormulaType.getArrayType(arrayIndexType, arrayElementType);
+    }
+    return super.getFormulaType(pFormula);
   }
 
   @Override

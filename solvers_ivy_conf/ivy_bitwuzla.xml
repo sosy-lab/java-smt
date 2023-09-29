@@ -27,7 +27,12 @@ SPDX-License-Identifier: Apache-2.0
     </configurations>
 
     <publications defaultconf="solver-bitwuzla">
-        <artifact name="libbitwuzla" conf="solver-bitwuzla" type="shared-object" ext="so"/>
+        <artifact name="libbitwuzla"    conf="solver-bitwuzla" type="shared-object" ext="so"/>
+        <artifact name="libbitwuzlaJNI" conf="solver-bitwuzla" type="shared-object" ext="so"/>
+        <artifact name="libbitwuzlabb"  conf="solver-bitwuzla" type="shared-object" ext="so"/>
+        <artifact name="libbitwuzlabv"  conf="solver-bitwuzla" type="shared-object" ext="so"/>
+        <artifact name="libbitwuzlals"  conf="solver-bitwuzla" type="shared-object" ext="so"/>
+        <artifact name="libgmp"         conf="solver-bitwuzla" type="shared-object" ext="so"/>
     </publications>
 
     <dependencies></dependencies>
