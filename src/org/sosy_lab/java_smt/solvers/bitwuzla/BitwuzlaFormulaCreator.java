@@ -86,8 +86,9 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
   @Override
   protected FloatingPointFormula encapsulateFloatingPoint(Long pTerm) {
     assert getFormulaType(pTerm).isFloatingPointType()
-        : String.format("%s is no FP, but %s (%s)", pTerm, bitwuzlaJNI.bitwuzla_term_get_sort(pTerm),
-        getFormulaType(pTerm));
+        : String.format(
+            "%s is no FP, but %s (%s)",
+            pTerm, bitwuzlaJNI.bitwuzla_term_get_sort(pTerm), getFormulaType(pTerm));
     return new BitwuzlaFloatingPointFormula(pTerm);
   }
 
