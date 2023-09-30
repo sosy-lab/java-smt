@@ -20,9 +20,11 @@
 
 package org.sosy_lab.java_smt.utils;
 
+import com.google.common.base.Preconditions;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.Normalizer.Form;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -33,7 +35,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.NumeralFormula;
+import org.sosy_lab.java_smt.basicimpl.AbstractFormula;
 
 public class Generator {
 
@@ -57,6 +61,8 @@ public class Generator {
   }
 
   public static String evaluateRecursive(Object constraint) {
+
+
     RecursiveString methodToEvaluate = executedAggregator
         .stream()
         .filter(x -> x.getResult().equals(constraint))
@@ -80,7 +86,7 @@ public class Generator {
     }
   }
 
-  public static void logAddConstraint(Object constraint) {
+  public static void logAddConstraint(BooleanFormula constraint) {
     String result = evaluateRecursive(constraint);
     List<RecursiveString> uniqueRegisteredValues =
         registeredVariables.stream().distinct().collect(Collectors.toList());
@@ -185,6 +191,7 @@ public class Generator {
     Iterator<BooleanFormula> it = pBits1.iterator();
     for (int i = 0; i < pBits1.size(); i++) {
       inputParams.add(it.next());
+      System.out.println(inputParams);
     }
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> {
@@ -251,7 +258,7 @@ public class Generator {
     executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Int"));
   }
 
-  public static void logAdd(Object result, NumeralFormula pNumber1, NumeralFormula pNumber2) {
+  public static void logAdd(Object result, Object pNumber1, Object pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -276,5 +283,21 @@ public class Generator {
         inPlaceInputParams -> "(- " + inPlaceInputParams.get(0) + ")";
     executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
+
+  public static void logSum(Object result, List operands) {
+    StringBuilder out = new StringBuilder();
+    out.append("(+ ");
+    List<Object> inputParams = new ArrayList<>();
+    for (int i = 0; i < operands.size(); i++) {
+      inputParams.add(operands.get(i).toString());
+      System.out.println(inputParams);
+    }
+    Function<List<Object>, String> saveResult =
+        inPlaceInputParams -> {
+          inPlaceInputParams.forEach((c) -> {out.append(c); out.append(" ");}); return String.valueOf(
+              out.deleteCharAt(out.length()-1).append(")"));};
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+  }
+
 
 }

@@ -72,4 +72,14 @@ public class RecursiveString {
   public void setSaveResult(Function<List<Object>, String> pSaveResult) {
     saveResult = pSaveResult;
   }
+
+  @Override
+  public String toString() {
+    return "RecursiveString{" +
+        "result=" + result +
+        ", inputParams=" + inputParams +
+        ", saveResult=" + saveResult +
+        ", variableType='" + variableType + '\'' +
+        '}';
+  }
 }

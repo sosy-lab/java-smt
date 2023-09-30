@@ -32,7 +32,7 @@ import org.sosy_lab.java_smt.api.StringFormula;
  */
 @Immutable(containerOf = "TFormulaInfo")
 @SuppressWarnings("ClassTypeParameterName")
-abstract class AbstractFormula<TFormulaInfo> implements Formula {
+public abstract class AbstractFormula<TFormulaInfo> implements Formula {
 
   private final TFormulaInfo formulaInfo;
 
@@ -52,7 +52,7 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
     return formulaInfo == otherFormulaInfo || formulaInfo.equals(otherFormulaInfo);
   }
 
-  final TFormulaInfo getFormulaInfo() {
+  public final TFormulaInfo getFormulaInfo() {
     return formulaInfo;
   }
 

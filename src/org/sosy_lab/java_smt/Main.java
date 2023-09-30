@@ -20,6 +20,8 @@ package org.sosy_lab.java_smt;/*
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 import org.sosy_lab.common.*;
 import org.sosy_lab.common.configuration.*;
 import org.sosy_lab.common.rationals.Rational;
@@ -44,22 +46,34 @@ public class Main {
     BooleanFormulaManager bmgr = fmgr.getBooleanFormulaManager();
     IntegerFormulaManager imgr = fmgr.getIntegerFormulaManager();
 
-    BigDecimal zwei = BigDecimal.valueOf(2.0);
 
     IntegerFormula one = imgr.makeNumber(1);
-    IntegerFormula two = imgr.makeNumber(zwei);
+    IntegerFormula two = imgr.makeNumber(2);
+    IntegerFormula three = imgr.makeNumber(3);
+    IntegerFormula four = imgr.makeNumber(4);
+
+    List<IntegerFormula> testAdd = new ArrayList<IntegerFormula>();
+    testAdd.add(two);
+    testAdd.add(three);BooleanFormula a = bmgr.makeVariable("a");
+    testAdd.add(four);
+
     IntegerFormula x = imgr.makeVariable("x");
     BooleanFormula y = bmgr.makeVariable("y");
     BooleanFormula z = bmgr.makeVariable("z");
+    BooleanFormula c = bmgr.makeVariable("c");
+    BooleanFormula b = bmgr.makeVariable("b");
     BooleanFormula res = bmgr.makeVariable("res");
 
-    BooleanFormula constraint = imgr.equal (x, imgr.add(one, imgr.negate(two)));
-    BooleanFormula constraint2 = bmgr.equivalence(res, bmgr.and(y,z));
+    //BooleanFormula constraint = imgr.equal (x, imgr.add(one, imgr.negate(two)));
+    BooleanFormula constraint2 = bmgr.equivalence(res, bmgr.and(y,z, a, b));
+    IntegerFormula d = imgr.sum(testAdd);
+    BooleanFormula constraint3 = imgr.equal(x, d);
 
     try (ProverEnvironment prover =
              context.newProverEnvironment(SolverContext.ProverOptions.GENERATE_MODELS)) {
-      prover.addConstraint(constraint);
+      //prover.addConstraint(constraint);
       prover.addConstraint(constraint2);
+      prover.addConstraint(constraint3);
 
 
       boolean isUnsat = prover.isUnsat();
