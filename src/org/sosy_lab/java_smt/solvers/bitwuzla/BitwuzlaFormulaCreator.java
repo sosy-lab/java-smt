@@ -40,6 +40,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
@@ -50,6 +51,7 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaFormula.BitwuzlaArrayFormu
 import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaFormula.BitwuzlaBitvectorFormula;
 import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaFormula.BitwuzlaBooleanFormula;
 import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaFormula.BitwuzlaFloatingPointFormula;
+import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaFormula.BitwuzlaFloatingPointRoundingModeFormula;
 
 public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   private final Table<String, Long, Long> formulaCache = HashBasedTable.create();
@@ -433,6 +435,29 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
 
   @SuppressWarnings("unchecked")
   @Override
+  public <T extends Formula> T encapsulate(FormulaType<T> pType, Long pTerm) {
+    assert pType.equals(getFormulaType(pTerm))
+            || (pType.equals(FormulaType.RationalType)
+                && getFormulaType(pTerm).equals(FormulaType.IntegerType))
+        : String.format(
+            "Trying to encapsulate formula of type %s as %s", getFormulaType(pTerm), pType);
+    if (pType.isBooleanType()) {
+      return (T) new BitwuzlaBooleanFormula(pTerm);
+    } else if (pType.isArrayType()) {
+      ArrayFormulaType<?, ?> arrFt = (ArrayFormulaType<?, ?>) pType;
+      return (T) new BitwuzlaArrayFormula<>(pTerm, arrFt.getIndexType(), arrFt.getElementType());
+    } else if (pType.isBitvectorType()) {
+      return (T) new BitwuzlaBitvectorFormula(pTerm);
+    } else if (pType.isFloatingPointType()) {
+      return (T) new BitwuzlaFloatingPointFormula(pTerm);
+    } else if (pType.isFloatingPointRoundingModeType()) {
+      return (T) new BitwuzlaFloatingPointRoundingModeFormula(pTerm);
+    }
+    throw new IllegalArgumentException("Cannot create formulas of type " + pType + " in Bitwuzla");
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
   public <T extends Formula> FormulaType<T> getFormulaType(T pFormula) {
     if (pFormula instanceof BitvectorFormula) {
       long sort = bitwuzlaJNI.bitwuzla_term_get_sort(extractInfo(pFormula));
@@ -591,6 +616,10 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
       if (value.contains("#b")) {
         // Bitvectors in Bitwuzla start with a #b
         return new BigInteger(value.substring(2), 2);
+      } else if (value.equals("true")) {
+        return true;
+      } else if (value.equals("false")) {
+        return false;
       }
     }
 

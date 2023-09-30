@@ -88,7 +88,7 @@ class BitwuzlaModel extends AbstractModel<Long, Long, Long> {
     ImmutableSet.Builder<ValueAssignment> variablesBuilder = ImmutableSet.builder();
 
     for (long term : assertedTerms) {
-      if (bitwuzlaJNI.bitwuzla_term_get_symbol(term) != null){
+      if (bitwuzlaJNI.bitwuzla_term_get_symbol(term) != null) {
         variablesBuilder.add(getSimpleAssignment(term));
       }
     } // More complex builder needed for function applications?
