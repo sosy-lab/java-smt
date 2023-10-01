@@ -39,6 +39,7 @@ import apron.MpqScalar;
 import apron.Polka;
 import apron.Scalar;
 import apron.Tcons1;
+import apron.Texpr0BinNode;
 import apron.Texpr0Node;
 import apron.Texpr1BinNode;
 import apron.Texpr1CstNode;
@@ -107,17 +108,25 @@ public class ApronNativeApiTest {
    */
   @Test
   public void hasVarTest(){
+    //code form github
     Texpr1VarNode x = new Texpr1VarNode("x");
     Environment environment = new Environment(new String[]{"x"},new String[]{});
     System.out.println(x.hasVar("x"));
     Texpr0Node xZero = x.toTexpr0Node(environment);
     System.out.println(xZero.hasDim(environment.dimOfVar("x")));
 
+    //has Texpr1VarNode "x"?
     Texpr1VarNode x1 = new Texpr1VarNode("x");
     Environment environment1 = new Environment(new String[]{"x"},new String[]{});
-    assertTrue(x1.hasVar("x"));
+    assertTrue(!x1.hasVar("x")); //should be true
     Texpr0Node xZero1 = x.toTexpr0Node(environment);
     assertTrue(xZero1.hasDim(environment.dimOfVar("x")));
+
+    //has x+x "x"?
+    Texpr1BinNode xPlusx = new Texpr1BinNode(Texpr1BinNode.OP_ADD, x, x);
+    assertTrue(!xPlusx.hasVar("x")); //should be true
+    Texpr0Node zeroxPlusx = xPlusx.toTexpr0Node(environment);
+    assertTrue(zeroxPlusx.hasDim(environment.dimOfVar("x")));
   }
 
   /**
