@@ -24,6 +24,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
@@ -117,10 +118,12 @@ public class ApronNativeApiTest {
 
     //has Texpr1VarNode "x"?
     Texpr1VarNode x1 = new Texpr1VarNode("x");
-    Environment environment1 = new Environment(new String[]{"x"},new String[]{});
+    Environment environment1 = new Environment(new String[]{"x"},new String[]{"y"});
     assertTrue(!x1.hasVar("x")); //should be true
-    Texpr0Node xZero1 = x.toTexpr0Node(environment);
-    assertTrue(xZero1.hasDim(environment.dimOfVar("x")));
+    assertFalse(x1.hasVar("y"));
+    Texpr0Node xZero1 = x.toTexpr0Node(environment1);
+    assertTrue(xZero1.hasDim(environment1.dimOfVar("x")));
+    assertFalse(xZero1.hasDim(environment1.dimOfVar("y")));
 
     //has x+x "x"?
     Texpr1BinNode xPlusx = new Texpr1BinNode(Texpr1BinNode.OP_ADD, x, x);
