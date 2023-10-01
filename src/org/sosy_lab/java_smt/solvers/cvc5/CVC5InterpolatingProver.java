@@ -136,9 +136,9 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
    *   <li>psi only contains symbols from phi- and phi+ (3Craig).
    * </ol>
    *
-   * We can transform CVC5 interpolation to Craig interpolation by negating the formula B, i.e., the
-   * CVC5 interpolant for input (A, B) represents a Craig interpolant for input (A, not B). Here is
-   * a proof for this:
+   * <p>We can transform CVC5 interpolation to Craig interpolation by negating the formula B, i.e.,
+   * the CVC5 interpolant for input (A, B) represents a Craig interpolant for input (A, not B). Here
+   * is a proof for this:
    *
    * <ol>
    *   <li>(1CVC5) <=> (1Craig): holds, due to substitution of A with phi- and I with psi.
