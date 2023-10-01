@@ -116,30 +116,48 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
   }
 
   /**
-   * Interpolates a Tuple of Interpolants according to Craig-Interpolation using CVC5-Interpolation.
+   * This method computes Craig interpolants for a pair of formulas using CVC5-Interpolation.
    *
-   * <p>CVC5's getInterpolant: There is a Model, such that the Interpolant I, with A -> I = True
-   * (1CVC5) and I -> B = True (2CVC5).
+   * <p>CVC5's interpolation returns an interpolant I for two input formulas A and B, such that the
+   * following holds:
    *
-   * <p>Craig Interpolation: There is a Model, such that the Interpolant psi, with phi- -> psi =
-   * True (1Craig), not(psi /\ phi+) = True (2Craig).
+   * <ol>
+   *   <li>(A -> I) is valid (1CVC5),
+   *   <li>(I -> B) is valid (2CVC5), and
+   *   <li>I only contains symbols from A and B (3CVC5).
+   * </ol>
    *
-   * <p>With A/phi- current set of assertions and B/phi+ Formulas to interpolate.
+   * <p>Craig interpolation returns an interpolant psi for two input formulas phi- and phi+, such
+   * that the following holds:
    *
-   * <p>CVC5 -> Craig Interpolation:
+   * <ol>
+   *   <li>(phi- -> psi) is valid (1Craig),
+   *   <li>(psi && phi+) is unsatisfiable (2Craig), and
+   *   <li>psi only contains symbols from phi- and phi+ (3Craig).
+   * </ol>
    *
-   * <p>(1CVC5) <=> (1Craig) due to subst of A with phi- and reflexivity.
+   * We can transform CVC5 interpolation to Craig interpolation by negating the formula B, i.e., the
+   * CVC5 interpolant for input (A, B) represents a Craig interpolant for input (A, not B). Here is
+   * a proof for this:
    *
-   * <p>(2CVC5) <=> I -> B = True <=> (not I) \/ B = True <=> not (I /\ (not B)) = True <=> (2Craig)
-   * due to subst of (not B) with phi+ and reflexivity.
+   * <ol>
+   *   <li>(1CVC5) <=> (1Craig): holds, due to substitution of A with phi- and I with psi.
+   *   <li>(2CVC5) <=> (I -> B) is valid <=> ((not I) || B) is valid <=> (not (I && (not B))) is
+   *       valid <=> (I && (not B)) is unsatisfiable <=> (2Craig) holds, due to substitution of I
+   *       with psi and (not B) with phi+.
+   *   <li>(3CVC5) <=> (3Craig): holds, negation does not change symbols.
+   * </ol>
    *
-   * <p>Hence, CVC5's Interpolation produces an equivalent Interpolation to Craig Interpolation, if
-   * B is negated during CVC5 Interpolation.
+   * <p>Hence, CVC5's interpolation produces an equivalent interpolation result to Craig
+   * interpolation, if the input B is negated.
    *
-   * @param formulasA current Set of Assertions A
-   * @param formulasB Formulas to Interpolate B
-   * @return Interpolation of the Interpolation Pair following the definition of
-   *     Craig-Interpolation.
+   * <p>Please note, that this method will use a different proof for each call, and thus, a sequence
+   * of interpolation queries will most likely not produce sequential Craig interpolants on its own.
+   * Therefore, the caller has to use constraints based on previously computed interpolants.
+   *
+   * @param formulasA formulas for psi- of the interpolation query
+   * @param formulasB formulas for psi+ of the interpolation (will be negated internally)
+   * @return interpolation result following the definition of Craig interpolation.
    */
   private Term getCVC5Interpolation(Collection<Term> formulasA, Collection<Term> formulasB) {
     Term phiPlus = bmgr.andImpl(formulasA);
