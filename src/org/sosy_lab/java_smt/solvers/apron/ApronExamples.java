@@ -127,6 +127,10 @@ public class ApronExamples {
     //Preconditions.checkArgument(abstract1.isBottom(manager));
   }
 
+  public static void testModulo(){
+
+  }
+
   public static void main(String[] args) throws ApronException {
     Manager manager = new Polka(false);
     distinctTest(manager);

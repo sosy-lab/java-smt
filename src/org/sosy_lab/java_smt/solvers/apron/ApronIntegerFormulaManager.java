@@ -100,14 +100,21 @@ public class ApronIntegerFormulaManager
   public BooleanFormula modularCongruence(IntegerFormula number1, IntegerFormula number2, long n) {
     //(= x (* n (div x n))); div = x/n; x = number1 - number2 Frage ist, ob num1 mod num2 = n ist
     // Test mit 8 und 3 : 8-3 = 2 * (8-3)/2 --> hier entsteht ein fehler
-    ApronIntCstNode nN = new ApronIntCstNode(BigInteger.valueOf(n));
-    ApronIntBinaryNode x = new ApronIntBinaryNode(ApronFormulaManager.getTerm(number1), ApronFormulaManager.getTerm(number2), Texpr1BinNode.OP_SUB);
-    ApronIntBinaryNode div = new ApronIntBinaryNode(x,nN,Texpr1BinNode.OP_SUB);
-    ApronIntBinaryNode mul = new ApronIntBinaryNode(nN, div, Texpr1BinNode.OP_MUL);
-    ApronIntBinaryNode left = new ApronIntBinaryNode(x,mul,Texpr1BinNode.OP_SUB);
+    if(n>0) {
+      ApronIntCstNode nN = new ApronIntCstNode(BigInteger.valueOf(n));
+      ApronIntBinaryNode x = new ApronIntBinaryNode(ApronFormulaManager.getTerm(number1),
+          ApronFormulaManager.getTerm(number2), Texpr1BinNode.OP_SUB);
+      ApronIntBinaryNode div = new ApronIntBinaryNode(x, nN, Texpr1BinNode.OP_DIV);
+      ApronIntBinaryNode mul = new ApronIntBinaryNode(nN, div, Texpr1BinNode.OP_MUL);
+      ApronIntBinaryNode left = new ApronIntBinaryNode(x, mul, Texpr1BinNode.OP_SUB);
+      Map<ApronNode, Integer> map = new HashMap<>();
+      map.put(left, Tcons1.EQ);
+      return new ApronNode.ApronConstraint(formulaCreator.getEnvironment(), map);
+    }
+    ApronIntCstNode zero = new ApronIntCstNode(BigInteger.ZERO);
     Map<ApronNode, Integer> map = new HashMap<>();
-    map.put(left,Tcons1.EQ);
-    return new ApronNode.ApronConstraint(formulaCreator.getEnvironment(),map);
+    map.put(zero, Tcons1.EQ); // 0=0 for true
+    return new ApronConstraint(formulaCreator.getEnvironment(),map);
   }
 
   @Override

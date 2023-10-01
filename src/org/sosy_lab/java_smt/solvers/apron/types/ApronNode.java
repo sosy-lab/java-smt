@@ -532,12 +532,15 @@ public interface ApronNode extends Formula {
       private final Set<String> varNames;
 
       public ApronIntUnaryNode(ApronNode param, int op) {
-        this.unaryNode = new Texpr1UnNode(op, Texpr1Node.RTYPE_INT, Texpr1Node.RDIR_ZERO,param.getNode());
+        this.unaryNode = new Texpr1UnNode(op, Texpr1Node.RTYPE_INT, Texpr1Node.RDIR_DOWN,
+            param.getNode());
         this.varNames = param.getVarNames();
       }
 
       public ApronIntUnaryNode(ApronIntUnaryNode pNode){
         this.unaryNode = pNode.getNode();
+        this.unaryNode.setRoundingType(Texpr1Node.RTYPE_INT);
+        this.unaryNode.setRoundingDirection(Texpr1Node.RDIR_DOWN);
         this.varNames = pNode.getVarNames();
       }
 
@@ -547,6 +550,8 @@ public interface ApronNode extends Formula {
        */
       public ApronIntUnaryNode(ApronRatUnaryNode rationalNode){
         this.unaryNode = rationalNode.getNode();
+        this.unaryNode.setRoundingType(Texpr1Node.RTYPE_INT);
+        this.unaryNode.setRoundingDirection(Texpr1Node.RDIR_DOWN);
         this.varNames = rationalNode.getVarNames();
       }
 
@@ -597,7 +602,8 @@ public interface ApronNode extends Formula {
       private final Set<String> varNames;
 
       public ApronIntBinaryNode(ApronNode param1, ApronNode param2, int op) {
-        this.binaryNode = new Texpr1BinNode(op, Texpr1Node.RTYPE_INT, Texpr1Node.RDIR_ZERO,param1.getNode(), param2.getNode());
+        this.binaryNode = new Texpr1BinNode(op, Texpr1Node.RTYPE_INT, Texpr1Node.RDIR_DOWN,
+            param1.getNode(), param2.getNode());
         //adding the variablenames of both parameters to @varNames
         this.varNames = new HashSet<>();
         varNames.addAll(param1.getVarNames());
@@ -606,6 +612,8 @@ public interface ApronNode extends Formula {
 
       public ApronIntBinaryNode(ApronIntBinaryNode pNode){
         this.binaryNode = pNode.getNode();
+        this.binaryNode.setRoundingType(Texpr1Node.RTYPE_INT);
+        this.binaryNode.setRoundingDirection(Texpr1Node.RDIR_DOWN);
         this.varNames = pNode.getVarNames();
       }
 
@@ -615,6 +623,8 @@ public interface ApronNode extends Formula {
        */
       public ApronIntBinaryNode(ApronRatBinaryNode rationalNode){
         this.binaryNode = rationalNode.getNode();
+        this.binaryNode.setRoundingType(Texpr1Node.RTYPE_INT);
+        this.binaryNode.setRoundingDirection(Texpr1Node.RDIR_DOWN);
         this.varNames = rationalNode.getVarNames();
       }
 
