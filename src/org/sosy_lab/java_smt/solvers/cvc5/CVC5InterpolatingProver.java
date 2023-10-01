@@ -37,18 +37,21 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
   private final Set<ProverOptions> solverOptions;
   private final int seed;
   private final CVC5BooleanFormulaManager bmgr;
+  private final boolean validateInterpolants;
 
   CVC5InterpolatingProver(
       CVC5FormulaCreator pFormulaCreator,
       ShutdownNotifier pShutdownNotifier,
       int randomSeed,
       Set<ProverOptions> pOptions,
-      FormulaManager pMgr) {
+      FormulaManager pMgr,
+      boolean pValidateInterpolants) {
     super(pFormulaCreator, pShutdownNotifier, randomSeed, pOptions, pMgr);
     mgr = pMgr;
     solverOptions = pOptions;
     seed = randomSeed;
     bmgr = (CVC5BooleanFormulaManager) mgr.getBooleanFormulaManager();
+    validateInterpolants = pValidateInterpolants;
   }
 
   /**
@@ -154,8 +157,10 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
       itpSolver.deletePointer();
     }
 
-    // TODO optimize and make this check optional, as soon as it works reliable.
-    checkInterpolationCriteria(interpolant, phiPlus, phiMinus);
+    if (validateInterpolants) {
+      checkInterpolationCriteria(interpolant, phiPlus, phiMinus);
+    }
+
     return interpolant;
   }
 
