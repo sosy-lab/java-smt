@@ -150,7 +150,7 @@ public class ApronNativeApiTest {
         Texpr1Node.RTYPE_INT, Texpr1Node.RDIR_DOWN,four, mul);
     Tcons1 eq = new Tcons1(environment, Tcons1.EQ, sub);
     Abstract1 abstract1 = new Abstract1(manager, new Tcons1[]{eq});
-    assertTrue(!abstract1.isBottom(manager));
+    assertFalse(abstract1.isBottom(manager));
 
     // 1 = 2*(1/2)
     Texpr1CstNode one = new Texpr1CstNode(new MpqScalar(1));
@@ -177,6 +177,40 @@ public class ApronNativeApiTest {
     Tcons1 eq3 = new Tcons1(environment, Tcons1.EQ, sub2);
     Abstract1 abstract3 = new Abstract1(manager, new Tcons1[]{eq3,eqXisOne});
     assertTrue(abstract2.isBottom(manager));
+
+    // a = 10 and b = 5 and a-b = 7*((a-b)/7)
+    Environment environment1 = new Environment(new String[]{"a", "b"},new String[]{});
+    Texpr1VarNode a = new Texpr1VarNode("a");
+    Texpr1VarNode b = new Texpr1VarNode("b");
+    Texpr1CstNode ten = new Texpr1CstNode(new MpqScalar(10));
+    Texpr1CstNode five = new Texpr1CstNode(new MpqScalar(5));
+    Texpr1CstNode seven = new Texpr1CstNode(new MpqScalar(7));
+    //a=10
+    Texpr1BinNode aMin10 = new Texpr1BinNode(Texpr1BinNode.OP_SUB, Texpr1Node.RTYPE_INT,
+        Texpr1Node.RDIR_DOWN, a, ten);
+    Tcons1 aIsTen = new Tcons1(environment1, Tcons1.EQ,aMin10);
+    //b=5
+    Texpr1BinNode bMin5 = new Texpr1BinNode(Texpr1BinNode.OP_SUB, Texpr1Node.RTYPE_INT,
+        Texpr1Node.RDIR_DOWN, b, five);
+    Tcons1 bIsFive = new Tcons1(environment1, Tcons1.EQ,bMin5);
+    //a-b
+    Texpr1BinNode aMinb = new Texpr1BinNode(Texpr1BinNode.OP_SUB, Texpr1Node.RTYPE_INT,
+        Texpr1Node.RDIR_DOWN, a,b);
+    //(a-b)/7
+    Texpr1BinNode div7 = new Texpr1BinNode(Texpr1BinNode.OP_DIV, Texpr1Node.RTYPE_INT,
+        Texpr1Node.RDIR_DOWN,aMinb,seven);
+    //7*((a-b)/7)
+    Texpr1BinNode mul7 = new Texpr1BinNode(Texpr1BinNode.OP_MUL, Texpr1Node.RTYPE_INT,
+        Texpr1Node.RDIR_DOWN, seven, div7);
+    //(a-b)-(7*((a-b)/7)))
+    Texpr1BinNode all = new Texpr1BinNode(Texpr1BinNode.OP_SUB, Texpr1Node.RTYPE_INT,
+        Texpr1Node.RDIR_DOWN, aMinb, mul7);
+    //(a-b)-(7*((a-b)/7))) = 0
+    Tcons1 eq1 = new Tcons1(environment1, Tcons1.EQ, all);
+    Abstract1 abstract11 = new Abstract1(manager, new Tcons1[]{aIsTen, bIsFive, eq1});
+    assertTrue(!abstract11.isBottom(manager));
+
+
   }
 
 }
