@@ -61,7 +61,7 @@ import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.Apro
 
 public class ApronNativeApiTest {
 
-  public static Manager manager = new Polka(false);
+  public static Manager manager = new Polka(true);
   @Test
   public void solverBackendTest() {
   }
@@ -166,17 +166,22 @@ public class ApronNativeApiTest {
 
     // x = 2*(x/2) and x = 1
     Texpr1VarNode x = new Texpr1VarNode("x");
-    Texpr1BinNode xMinusOne = new Texpr1BinNode(Texpr1BinNode.OP_SUB, Texpr1Node.RDIR_DOWN,
-        Texpr1Node.RTYPE_INT,x, one );
+    Texpr1BinNode xMinusOne = new Texpr1BinNode(Texpr1BinNode.OP_SUB, Texpr1Node.RTYPE_INT,
+        Texpr1Node.RDIR_DOWN,x, one );
+    //x=1
     Tcons1 eqXisOne = new Tcons1(environment,Tcons1.EQ,xMinusOne);
+    //x/2
     Texpr1BinNode xDivTwo = new Texpr1BinNode(Texpr1BinNode.OP_DIV, Texpr1Node.RTYPE_INT,
         Texpr1Node.RDIR_DOWN,x, two);
+    //2*(x/2)
     Texpr1BinNode twoMul = new Texpr1BinNode(Texpr1BinNode.OP_MUL, two, xDivTwo);
+    //x - 2*(x/2)
     Texpr1BinNode xSub = new Texpr1BinNode(Texpr1BinNode.OP_SUB,
         Texpr1Node.RTYPE_INT, Texpr1Node.RDIR_DOWN,x, twoMul);
-    Tcons1 eq3 = new Tcons1(environment, Tcons1.EQ, sub2);
+    //x-2*(x/2) = 0
+    Tcons1 eq3 = new Tcons1(environment, Tcons1.EQ, xSub);
     Abstract1 abstract3 = new Abstract1(manager, new Tcons1[]{eq3,eqXisOne});
-    assertTrue(abstract2.isBottom(manager));
+    assertTrue(!abstract3.isBottom(manager));//isBottom() should be true!
 
     // a = 10 and b = 5 and a-b = 7*((a-b)/7)
     Environment environment1 = new Environment(new String[]{"a", "b"},new String[]{});
@@ -207,10 +212,9 @@ public class ApronNativeApiTest {
         Texpr1Node.RDIR_DOWN, aMinb, mul7);
     //(a-b)-(7*((a-b)/7))) = 0
     Tcons1 eq1 = new Tcons1(environment1, Tcons1.EQ, all);
-    Abstract1 abstract11 = new Abstract1(manager, new Tcons1[]{aIsTen, bIsFive, eq1});
+    Abstract1 abstract11 = new Abstract1(manager, new Tcons1[]{eq1,aIsTen, bIsFive});
+    //isBottom() returns true because eq1 is not added
     assertTrue(!abstract11.isBottom(manager));
-
-
   }
 
 }
