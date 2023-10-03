@@ -628,6 +628,13 @@ public class SolverStackTest extends SolverBasedTest0 {
 
   @Test
   public void modelForSatFormulaWithLargeValue() throws SolverException, InterruptedException {
+    assume()
+        .withMessage(
+            "This number is to big for integers in dReal, BigIntegers are not supported,"
+                + " only in rationals.")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.DREAL4);
+
     requireIntegers();
     try (BasicProverEnvironment<?> stack = newEnvironmentForTest(ProverOptions.GENERATE_MODELS)) {
       BigInteger val = BigInteger.TEN.pow(1000);
@@ -642,6 +649,7 @@ public class SolverStackTest extends SolverBasedTest0 {
 
   @Test
   public void modelForSatFormulaWithUF() throws SolverException, InterruptedException {
+    requireUF();
     requireIntegers();
     try (BasicProverEnvironment<?> stack = newEnvironmentForTest(ProverOptions.GENERATE_MODELS)) {
       IntegerFormula zero = imgr.makeNumber(0);

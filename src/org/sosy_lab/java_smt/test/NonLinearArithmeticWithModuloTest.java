@@ -57,12 +57,16 @@ public class NonLinearArithmeticWithModuloTest extends SolverBasedTest0 {
         .setOption("solver.nonLinearArithmetic", nonLinearArithmetic.name());
   }
 
+  // dReal does not support modulo and UF's, so if APPROXIMATE_FALLBACK/ALWAYS is tested, in
+  // dReal USE is still used, because UF's are not supported and therefore and
+  // UnsupportedOperationException is thrown caused by modulo operation call
   private IntegerFormula handleExpectedException(Supplier<IntegerFormula> supplier) {
     try {
       return supplier.get();
     } catch (UnsupportedOperationException e) {
-      if (nonLinearArithmetic == NonLinearArithmetic.USE
-          && NonLinearArithmeticTest.SOLVER_WITHOUT_NONLINEAR_ARITHMETIC.contains(solver)) {
+      if ((nonLinearArithmetic == NonLinearArithmetic.USE
+              && NonLinearArithmeticTest.SOLVER_WITHOUT_NONLINEAR_ARITHMETIC.contains(solver))
+          || solverToUse() == Solvers.DREAL4) {
         throw new AssumptionViolatedException(
             "Expected UnsupportedOperationException was thrown correctly");
       }

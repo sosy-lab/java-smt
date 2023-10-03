@@ -241,9 +241,16 @@ public class VariableNamesTest extends SolverBasedTest0 {
       assertThatFormula(eq.apply(var, var2)).isSatisfiableAndHasModel(1);
     }
 
-    // check whether SMTLIB2-dump is possible
-    @SuppressWarnings("unused")
-    String dump = mgr.dumpFormula(eq.apply(var, var)).toString();
+    if (solverToUse() == Solvers.DREAL4) {
+      if (allowInvalidNames()) {
+        // try to create a new (!) variable with a different name, the escaped previous name.
+        assertThat(createVariableWith(creator, "|" + name + "|")).isEqualTo(null);
+      }
+    } else {
+      // check whether SMTLIB2-dump is possible
+      @SuppressWarnings("unused")
+      String dump = mgr.dumpFormula(eq.apply(var, var)).toString();
+    }
 
     if (allowInvalidNames()) {
       // try to create a new (!) variable with a different name, the escaped previous name.
@@ -331,6 +338,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
 
   @Test
   public void testNameUF1Bool() throws SolverException, InterruptedException {
+    requireUF();
     requireIntegers();
     for (String name : NAMES) {
       testName0(
@@ -343,6 +351,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
 
   @Test
   public void testNameUF1Int() throws SolverException, InterruptedException {
+    requireUF();
     requireIntegers();
     for (String name : NAMES) {
       testName0(
@@ -366,6 +375,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
 
   @Test
   public void testNameUF2Bool() throws SolverException, InterruptedException {
+    requireUF();
     requireIntegers();
     IntegerFormula zero = imgr.makeNumber(0);
     for (String name : NAMES) {
@@ -376,6 +386,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
 
   @Test
   public void testNameUF2Int() throws SolverException, InterruptedException {
+    requireUF();
     requireIntegers();
     IntegerFormula zero = imgr.makeNumber(0);
     for (String name : NAMES) {
@@ -396,7 +407,13 @@ public class VariableNamesTest extends SolverBasedTest0 {
       }
       IntegerFormula zero = imgr.makeNumber(0);
       BooleanFormula eq = imgr.equal(var, zero);
-      BooleanFormula exists = qmgr.exists(var, eq);
+      BooleanFormula exists;
+      if (solverToUse() == Solvers.DREAL4) {
+        // exist not available in dReal
+        exists = qmgr.forall(var, eq);
+      } else {
+        exists = qmgr.exists(var, eq);
+      }
       BooleanFormula query = bmgr.and(bmgr.not(eq), exists);
 
       // (var != 0) & (EX var: (var == 0))
@@ -441,6 +458,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
 
   @Test
   public void testNameInNestedQuantification() {
+    requireExistQuantifier();
     requireQuantifiers();
     requireIntegers();
 
@@ -456,7 +474,6 @@ public class VariableNamesTest extends SolverBasedTest0 {
       IntegerFormula zero = imgr.makeNumber(0);
 
       // (v1 == 0) & (EX v2: ((v2 == v1) & (EX v3: ((v3 == v2) & (EX v4: (v4 == v3))))
-
       BooleanFormula eq01 = imgr.equal(zero, var1);
       BooleanFormula eq12 = imgr.equal(var1, var2);
       BooleanFormula eq23 = imgr.equal(var2, var3);
@@ -555,6 +572,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
 
   @Test
   public void testBoolVariableDump() {
+    requireDumping();
     for (String name : getAllNames()) {
       BooleanFormula var = createVariableWith(bmgr::makeVariable, name);
       if (var != null) {
@@ -566,6 +584,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
 
   @Test
   public void testEqBoolVariableDump() {
+    requireDumping();
     for (String name : getAllNames()) {
       BooleanFormula var = createVariableWith(bmgr::makeVariable, name);
       if (var != null) {

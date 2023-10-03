@@ -37,6 +37,7 @@ public class UfEliminationTest extends SolverBasedTest0.ParameterizedSolverBased
   @Before
   public void setUp() {
     ackermannization = SolverUtils.ufElimination(mgr);
+    requireUF();
   }
 
   @Test
