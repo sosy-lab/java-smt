@@ -42,8 +42,6 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaFormula.BitwuzlaBooleanFor
 import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaSolverContext.BitwuzlaSettings;
 
 class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements ProverEnvironment {
-  /** Bitwuzla does not support multiple solver stacks. */
-  private final AtomicBoolean isAnyStackAlive;
 
   private final long env;
 
@@ -66,13 +64,6 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
     creator = pCreator;
     // Bitwuzla guarantees that Terms and Sorts are shared
     env = createEnvironment(pOptions, pSettings, pRandomSeed);
-
-    isAnyStackAlive = pIsAnyStackAlive;
-    // avoid dual stack usage
-    Preconditions.checkState(
-        !isAnyStackAlive.getAndSet(true),
-        "Bitwuzla does not support the usage of multiple "
-            + "solver stacks at the same time. Please close any existing solver stack.");
   }
 
   private long createEnvironment(
@@ -112,6 +103,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
     Preconditions.checkState(!closed);
     Preconditions.checkState(size() > 0);
     bitwuzlaJNI.bitwuzla_pop(env, 1);
+    super.pop();
   }
 
   @Override
@@ -246,7 +238,6 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   public void close() {
     if (!closed) {
       bitwuzlaJNI.bitwuzla_delete(env);
-      Preconditions.checkState(isAnyStackAlive.getAndSet(false));
       closed = true;
     }
     super.close();

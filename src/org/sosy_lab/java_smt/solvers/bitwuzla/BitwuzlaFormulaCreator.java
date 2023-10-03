@@ -507,9 +507,8 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula formula, Long f)
       throws UnsupportedOperationException {
-     if (termIsConstant(f)) {
-      return visitor.visitConstant(
-          formula, convertValue(f));
+    if (termIsConstant(f)) {
+      return visitor.visitConstant(formula, convertValue(f));
     } else if (bitwuzlaJNI.bitwuzla_term_is_fp_value(f)) {
       return visitor.visitConstant(formula, parseIEEEbinaryFP(f));
     } else if (bitwuzlaJNI.bitwuzla_term_is_const(f)) {
@@ -523,8 +522,8 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
   }
 
   private boolean termIsConstant(long term) {
-    return BITWUZLA_KIND_VALUE.swigValue() ==
-        bitwuzlaJNI.bitwuzla_term_get_kind(term) && !bitwuzlaJNI.bitwuzla_term_is_rm(term);
+    return BITWUZLA_KIND_VALUE.swigValue() == bitwuzlaJNI.bitwuzla_term_get_kind(term)
+        && !bitwuzlaJNI.bitwuzla_term_is_rm(term);
   }
 
   @Override
@@ -628,7 +627,9 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
       }
     }
 
-    throw new AssertionError("Error: Could not convert term to value; Unknown sort and term. "
-        + "Value: " + bitwuzlaJNI.bitwuzla_term_to_string(term));
+    throw new AssertionError(
+        "Error: Could not convert term to value; Unknown sort and term. "
+            + "Value: "
+            + bitwuzlaJNI.bitwuzla_term_to_string(term));
   }
 }
