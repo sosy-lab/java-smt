@@ -151,6 +151,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   public void testGetSmallIntegralRationals() throws SolverException, InterruptedException {
     requireIntegers();
     requireRationals();
+    requireNot();
     testModelGetters(
         rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(1)),
         rmgr.makeVariable("x"),
@@ -162,6 +163,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   public void testGetLargeIntegralRationals() throws SolverException, InterruptedException {
     requireIntegers();
     requireRationals();
+    requireNot();
     BigInteger large = new BigInteger("1000000000000000000000000000000000000000");
     testModelGetters(
         rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(large)),
@@ -174,6 +176,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   public void testGetRationals() throws SolverException, InterruptedException {
     requireIntegers();
     requireRationals();
+    requireNot();
     for (String name : VARIABLE_NAMES) {
       testModelGetters(
           rmgr.equal(rmgr.makeVariable(name), rmgr.makeNumber(Rational.ofString("1/3"))),

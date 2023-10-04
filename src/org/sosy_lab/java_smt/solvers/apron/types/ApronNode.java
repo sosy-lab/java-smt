@@ -238,7 +238,7 @@ public interface ApronNode extends Formula {
       private final Set<String> varNames;
 
       public ApronRatUnaryNode(ApronNode param, int op) {
-        this.unaryNode = new Texpr1UnNode(op, Texpr1Node.RTYPE_INT, Texpr1Node.RDIR_ZERO,
+        this.unaryNode = new Texpr1UnNode(op,
             param.getNode());
         this.varNames = param.getVarNames();
       }
@@ -294,7 +294,7 @@ public interface ApronNode extends Formula {
       private final Set<String> varNames;
 
       public ApronRatBinaryNode(ApronNode param1, ApronNode param2, int op) {
-        this.binaryNode = new Texpr1BinNode(op, Texpr1Node.RTYPE_INT, Texpr1Node.RDIR_ZERO,param1.getNode(), param2.getNode());
+        this.binaryNode = new Texpr1BinNode(op,param1.getNode(), param2.getNode());
         this.varNames = new HashSet<>();
         //adding the variable names of both parameters to @varNames
         this.varNames.addAll(param1.getVarNames());

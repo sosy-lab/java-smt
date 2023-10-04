@@ -121,6 +121,10 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
     BigInteger big;
     MpqScalar upperBound = (MpqScalar) interval.sup;
     MpqScalar lowerBound = (MpqScalar) interval.inf;
+    //Test if abstract1-object is Bottom
+    if(interval.isBottom()){
+      throw new RuntimeException("There is no model because the assertion stack is UNSAT.");
+    }
     //is the upper bound +infinity?
     if(upperBound.isInfty()==1){
       //is the lower bound -infinity?

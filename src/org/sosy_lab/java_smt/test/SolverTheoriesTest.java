@@ -479,6 +479,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   @Test
   public void intTest4_ModularCongruence() throws SolverException, InterruptedException {
     requireIntegers();
+    requireNot();
     IntegerFormula a = imgr.makeVariable("int_a");
     IntegerFormula b = imgr.makeVariable("int_b");
     IntegerFormula c = imgr.makeVariable("int_c");
@@ -524,6 +525,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   public void intTest4_ModularCongruence_NegativeNumbers()
       throws SolverException, InterruptedException {
     requireIntegers();
+    requireNot();
     IntegerFormula a = imgr.makeVariable("int_a");
     IntegerFormula b = imgr.makeVariable("int_b");
     IntegerFormula c = imgr.makeVariable("int_c");

@@ -42,6 +42,7 @@ public class UfEliminationTest extends SolverBasedTest0.ParameterizedSolverBased
   @Test
   public void simpleTest() throws SolverException, InterruptedException {
     requireIntegers();
+    requireUninterpretedFunctions();
 
     // f := uf(v1, v3) XOR uf(v2, v4)
     IntegerFormula variable1 = imgr.makeVariable("variable1");
@@ -74,6 +75,7 @@ public class UfEliminationTest extends SolverBasedTest0.ParameterizedSolverBased
   @Test
   public void nestedUfs() throws SolverException, InterruptedException {
     requireIntegers();
+    requireUninterpretedFunctions();
 
     // f := uf2(uf1(v1, v2), v3) XOR uf2(uf1(v2, v1), v4)
     IntegerFormula variable1 = imgr.makeVariable("variable1");
@@ -111,6 +113,7 @@ public class UfEliminationTest extends SolverBasedTest0.ParameterizedSolverBased
   @Test
   public void nestedUfs2() throws SolverException, InterruptedException {
     requireIntegers();
+    requireUninterpretedFunctions();
 
     // f := uf2(uf1(v1, uf2(v3, v6)), v3) < uf2(uf1(v2, uf2(v4, v5)), v4)
     IntegerFormula variable1 = imgr.makeVariable("variable1");
@@ -155,6 +158,7 @@ public class UfEliminationTest extends SolverBasedTest0.ParameterizedSolverBased
   @Test
   public void nestedUfs3() throws SolverException, InterruptedException {
     requireIntegers();
+    requireUninterpretedFunctions();
 
     // f := uf(v1) < uf(v2)
     IntegerFormula variable1 = imgr.makeVariable("variable1");
@@ -184,6 +188,7 @@ public class UfEliminationTest extends SolverBasedTest0.ParameterizedSolverBased
   public void twoFormulasTest() throws SolverException, InterruptedException {
     // See FormulaManagerTest.testEmptySubstitution(), FormulaManagerTest.testNoSubstitution()
     requireIntegers();
+    requireUninterpretedFunctions();
     assume().withMessage("Princess fails").that(solver).isNotEqualTo(Solvers.PRINCESS);
 
     // f := uf(v1, v3) XOR uf(v2, v4)
@@ -248,6 +253,7 @@ public class UfEliminationTest extends SolverBasedTest0.ParameterizedSolverBased
   @Test
   public void substitutionTest() throws SolverException, InterruptedException {
     requireIntegers();
+    requireUninterpretedFunctions();
 
     // f := uf(v1, v3) \/ NOT(uf(v2, v4)))
     IntegerFormula variable1 = imgr.makeVariable("variable1");

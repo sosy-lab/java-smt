@@ -302,6 +302,10 @@ public class SolverStackTest extends SolverBasedTest0 {
 
   @Test
   public void stackTestUnsat() throws InterruptedException, SolverException {
+    assume()
+        .withMessage("Solver does not support this test")
+        .that(solver)
+        .isNotEqualTo(Solvers.APRON);
     BasicProverEnvironment<?> stack = newEnvironmentForTest(ProverOptions.GENERATE_MODELS);
     assertThat(stack).isSatisfiable();
     stack.push();
@@ -320,6 +324,10 @@ public class SolverStackTest extends SolverBasedTest0 {
 
   @Test
   public void stackTestUnsat2() throws InterruptedException, SolverException {
+    assume()
+        .withMessage("Solver does not support this test")
+        .that(solver)
+        .isNotEqualTo(Solvers.APRON);
     BasicProverEnvironment<?> stack = newEnvironmentForTest(ProverOptions.GENERATE_MODELS);
     assertThat(stack).isSatisfiable();
     stack.push();
@@ -671,6 +679,7 @@ public class SolverStackTest extends SolverBasedTest0 {
   @Test
   @SuppressWarnings("resource")
   public void multiCloseTest() throws SolverException, InterruptedException {
+    requireNonNumeralVariables();
     BasicProverEnvironment<?> stack = newEnvironmentForTest(ProverOptions.GENERATE_MODELS);
     try {
       // do something on the stack

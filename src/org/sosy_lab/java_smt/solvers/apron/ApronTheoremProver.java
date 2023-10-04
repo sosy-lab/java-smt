@@ -26,6 +26,7 @@ import apron.Tcons1;
 import apron.Texpr0Node;
 import apron.Texpr1Node;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,6 +41,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.Model;
+import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
@@ -76,6 +78,12 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
   }
 
   @Override
+  public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
+    Preconditions.checkState(!closed);
+    return super.getModelAssignments();
+  }
+
+  @Override
   public void pop() {
     Preconditions.checkState(!closed);
     Preconditions.checkState(assertedFormulas.size() > 1);
@@ -85,7 +93,8 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
   @Override
   public @Nullable Void addConstraint(BooleanFormula constraint)
       throws InterruptedException {
-      ApronNode node = ApronFormulaManager.getTerm(constraint);
+    Preconditions.checkState(!closed);
+    ApronNode node = ApronFormulaManager.getTerm(constraint);
       if(node instanceof ApronConstraint){
         addConstraintException((ApronConstraint) node);
       } else {
@@ -125,11 +134,13 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
 
   @Override
   public int size() {
+    Preconditions.checkState(!closed);
     return assertedFormulas.size() - 1;
   }
 
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
+    Preconditions.checkState(!closed);
     return isUnsatApron();
   }
 
@@ -143,6 +154,7 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
 
   @Override
   public Model getModel() throws SolverException {
+    Preconditions.checkState(!closed);
     return new ApronModel(this, solverContext.getFormulaCreator(), getAssertedExpressions());
   }
 
@@ -174,6 +186,7 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
+    Preconditions.checkState(!closed);
     ArrayList<Tcons1> constraints = new ArrayList<>();
     for (BooleanFormula assumption:assumptions) {
       ApronConstraint cons = (ApronConstraint) ApronFormulaManager.getTerm(assumption);
@@ -198,4 +211,13 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
   @Override
   protected Evaluator getEvaluatorWithoutChecks() throws SolverException {
     throw new UnsupportedOperationException("Apron does not support Evaluator without checks."); }
+
+  @Override
+  public void close() {
+    if(!closed){
+      assertedFormulas.clear();
+      closed = true;
+    }
+    super.close();
+  }
 }
