@@ -18,6 +18,7 @@ import java.util.EnumSet;
 import org.junit.Before;
 import org.junit.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -176,8 +177,18 @@ public class SolverFormulaIODeclarationsTest
 
   @Test
   public void parseDeclareConflictBeforeQueryTest() {
+    requireIntegers();
     @SuppressWarnings("unused")
     IntegerFormula var = imgr.makeVariable("x");
+    String query = "(declare-fun x () Bool)(assert (= 0 x))";
+    assertThrows(IllegalArgumentException.class, () -> mgr.parse(query));
+  }
+
+  @Test
+  public void parseDeclareConflictBeforeBvQueryTest() {
+    requireBitvectors();
+    @SuppressWarnings("unused")
+    BitvectorFormula var = bvmgr.makeVariable(8, "x");
     String query = "(declare-fun x () Bool)(assert (= 0 x))";
     assertThrows(IllegalArgumentException.class, () -> mgr.parse(query));
   }
@@ -187,8 +198,11 @@ public class SolverFormulaIODeclarationsTest
     String query = "(declare-fun x () Bool)(assert x)";
     BooleanFormula formula = mgr.parse(query);
     Truth.assertThat(mgr.extractVariables(formula).values()).hasSize(1);
-    if (!EnumSet.of(Solvers.PRINCESS, Solvers.Z3).contains(solverToUse())) {
+    if (!EnumSet.of(Solvers.PRINCESS, Solvers.Z3, Solvers.BITWUZLA).contains(solverToUse())) {
       assertThrows(IllegalArgumentException.class, () -> imgr.makeVariable("x"));
+    } else if (EnumSet.of(Solvers.BITWUZLA).contains(solverToUse())) {
+      Truth.assertThat(mgr.extractVariables(formula).values())
+          .doesNotContain(bvmgr.makeVariable(32, "x"));
     } else {
       Truth.assertThat(mgr.extractVariables(formula).values())
           .doesNotContain(imgr.makeVariable("x"));
