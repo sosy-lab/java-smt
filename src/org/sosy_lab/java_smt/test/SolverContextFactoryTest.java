@@ -89,6 +89,7 @@ public class SolverContextFactoryTest {
         // any operating system is allowed, Java is already available.
         return;
       case BOOLECTOR:
+      case BITWUZLA:
       case CVC4:
       case CVC5:
       case YICES2:
