@@ -140,7 +140,7 @@ public class SolverConcurrencyTest {
     assume()
         .withMessage("Solver does not support integers")
         .that(solver)
-        .isNoneOf(Solvers.BOOLECTOR, Solvers.YICES2);
+        .isNoneOf(Solvers.BOOLECTOR, Solvers.YICES2, Solvers.BITWUZLA);
   }
 
   private void requireBitvectors() {
@@ -160,7 +160,8 @@ public class SolverConcurrencyTest {
             Solvers.PRINCESS,
             Solvers.CVC4,
             Solvers.CVC5,
-            Solvers.YICES2);
+            Solvers.YICES2,
+            Solvers.BITWUZLA);
   }
 
   /**
@@ -307,7 +308,7 @@ public class SolverConcurrencyTest {
     assume()
         .withMessage("Solver does not support concurrency without concurrent context.")
         .that(solver)
-        .isNotEqualTo(Solvers.CVC5);
+        .isNoneOf(Solvers.CVC5, Solvers.BITWUZLA);
 
     ConcurrentLinkedQueue<SolverContext> contextList = new ConcurrentLinkedQueue<>();
     // Initialize contexts before using them in the threads
@@ -347,6 +348,7 @@ public class SolverConcurrencyTest {
    */
   @Test
   public void testConcurrentStack() throws InvalidConfigurationException, InterruptedException {
+    requireIntegers();
     requireConcurrentMultipleStackSupport();
     SolverContext context = initSolver();
     FormulaManager mgr = context.getFormulaManager();
