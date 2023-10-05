@@ -21,7 +21,6 @@
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import java.util.List;
-import java.util.stream.LongStream;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
@@ -41,6 +40,10 @@ public class BitwuzlaQuantifiedFormulaManager
 
   @Override
   public Long mkQuantifier(Quantifier q, List<Long> vars, Long body) {
+    // While substitution is possible, it changes existing formulas! We don't want this and ask
+    // the devs for a new method that returns a new term with the substitution applied.
+    throw new UnsupportedOperationException("Bitwuzla does not support Quantifiers in JavaSMT.");
+    /*
     long[] argsAndBody =
         LongStream.concat(vars.stream().mapToLong(Long::longValue), LongStream.of(body)).toArray();
     if (q.equals(Quantifier.FORALL)) {
@@ -50,5 +53,6 @@ public class BitwuzlaQuantifiedFormulaManager
       return bitwuzlaJNI.bitwuzla_mk_term(
           BitwuzlaKind.BITWUZLA_KIND_EXISTS.swigValue(), argsAndBody.length, argsAndBody);
     }
+    */
   }
 }
