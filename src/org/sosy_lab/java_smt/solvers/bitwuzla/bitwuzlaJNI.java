@@ -969,7 +969,11 @@ public class bitwuzlaJNI {
       long jarg1, long jarg2, long[] jarg3, long[] jarg4);
 
   public static final native void bitwuzla_substitute_terms(
-      long jarg1, long[] jarg2, long jarg3, long[] jarg4, long[] jarg5);
+      long sizeOfTermsToSubstituteIn,
+      long[] termsToSubstituteIn,
+      long sizeOfSubstitutionMap,
+      long[] mapKeys,
+      long[] mapValues);
 
   public static final native long bitwuzla_parser_new(
       long jarg1, String jarg2, long jarg3, _IO_FILE jarg3_, String jarg4, int jarg5, String jarg6);
@@ -979,4 +983,6 @@ public class bitwuzlaJNI {
   public static final native String bitwuzla_parser_parse(long jarg1, boolean jarg2);
 
   public static final native long bitwuzla_parser_get_bitwuzla(long jarg1);
+
+  public static final native long parse(String jarg);
 }
