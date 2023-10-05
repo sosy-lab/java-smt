@@ -23,20 +23,16 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.*;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Table;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -156,10 +152,10 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
       // return FormulaType.FloatingPointRoundingModeType;
     }
 
-      throw new UnsupportedOperationException("Could not find the JavaSMT type for sort" + bitwuzlaJNI.bitwuzla_sort_to_string(pSort)
-      + "."
-      );
-
+    throw new UnsupportedOperationException(
+        "Could not find the JavaSMT type for sort"
+            + bitwuzlaJNI.bitwuzla_sort_to_string(pSort)
+            + ".");
   }
 
   private FunctionDeclarationKind getDeclarationKind(Long term) {
@@ -296,9 +292,8 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
     } else if (kind.equals(BITWUZLA_KIND_FP_TO_UBV)) {
       return FunctionDeclarationKind.FP_CASTTO_UBV;
     }
-      throw new UnsupportedOperationException(
-          "Can not discern formula kind " + kind.toString());
-    }
+    throw new UnsupportedOperationException("Can not discern formula kind " + kind.toString());
+  }
 
   @SuppressWarnings("unchecked")
   @Override
@@ -383,29 +378,29 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
     } else if (bitwuzlaJNI.bitwuzla_term_is_var(f)) {
       return visitor.visitBoundVariable(formula, 0);
     } else if (kind.equals(BITWUZLA_KIND_EXISTS) || kind.equals(BITWUZLA_KIND_FORALL)) {
-        long[] pSize = new long[1];
-        long[] pChildren = bitwuzlaJNI.bitwuzla_term_get_children(f, pSize);
-        long size = pSize[0];
-        // QUANTIFIER: replace bound variable with free variable for visitation
-        assert size == 2;
-        assert pChildren.length == 2;
-        long bodyUnSub = pChildren[1];
-        List<Formula> freeVars = new ArrayList<>();
-        // Only unpacking one level of quantifier at a time, which always only tracks one bound var.
-        long[] boundVar = {pChildren[0]};
-        String name = bitwuzlaJNI.bitwuzla_term_get_symbol(boundVar[0]);
-        assert name != null;
-        long sort = bitwuzlaJNI.bitwuzla_term_get_sort(boundVar[0]);
+      long[] pSize = new long[1];
+      long[] pChildren = bitwuzlaJNI.bitwuzla_term_get_children(f, pSize);
+      long size = pSize[0];
+      // QUANTIFIER: replace bound variable with free variable for visitation
+      assert size == 2;
+      assert pChildren.length == 2;
+      long bodyUnSub = pChildren[1];
+      List<Formula> freeVars = new ArrayList<>();
+      // Only unpacking one level of quantifier at a time, which always only tracks one bound var.
+      long[] boundVar = {pChildren[0]};
+      String name = bitwuzlaJNI.bitwuzla_term_get_symbol(boundVar[0]);
+      assert name != null;
+      long sort = bitwuzlaJNI.bitwuzla_term_get_sort(boundVar[0]);
 
-        // Why get from cache?
-        // long freeVar = Preconditions.checkNotNull(formulaCache.get(name, sort));
-        long[] freeVar = {bitwuzlaJNI.bitwuzla_mk_const(sort, name)};
+      // Why get from cache?
+      // long freeVar = Preconditions.checkNotNull(formulaCache.get(name, sort));
+      long[] freeVar = {bitwuzlaJNI.bitwuzla_mk_const(sort, name)};
 
-        long bodySubbed = bitwuzlaJNI.bitwuzla_substitute_term(bodyUnSub, 1, boundVar, freeVar);
+      long bodySubbed = bitwuzlaJNI.bitwuzla_substitute_term(bodyUnSub, 1, boundVar, freeVar);
 
-        BooleanFormula fBody = encapsulateBoolean(bodySubbed);
-        Quantifier quant = kind.equals(BITWUZLA_KIND_EXISTS) ? Quantifier.EXISTS : Quantifier.FORALL;
-        return visitor.visitQuantifier((BooleanFormula) formula, quant, freeVars, fBody);
+      BooleanFormula fBody = encapsulateBoolean(bodySubbed);
+      Quantifier quant = kind.equals(BITWUZLA_KIND_EXISTS) ? Quantifier.EXISTS : Quantifier.FORALL;
+      return visitor.visitQuantifier((BooleanFormula) formula, quant, freeVars, fBody);
     } else {
       long[] args = bitwuzlaJNI.bitwuzla_term_get_children(f, new long[1]);
       ImmutableList.Builder<Formula> arguments = ImmutableList.builder();
@@ -427,15 +422,17 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
         argumentTypes.add(type);
       }
 
-      return visitor.visitFunction(formula, arguments.build(),
-          FunctionDeclarationImpl.of(name, getDeclarationKind(f), argumentTypes.build(),
-              getFormulaType(f), decl));
+      return visitor.visitFunction(
+          formula,
+          arguments.build(),
+          FunctionDeclarationImpl.of(
+              name, getDeclarationKind(f), argumentTypes.build(), getFormulaType(f), decl));
     }
   }
 
   private boolean termIsConstant(long term) {
     return BITWUZLA_KIND_VALUE.swigValue() == bitwuzlaJNI.bitwuzla_term_get_kind(term);
-        // && !bitwuzlaJNI.bitwuzla_term_is_rm(term);
+    // && !bitwuzlaJNI.bitwuzla_term_is_rm(term);
   }
 
   @Override

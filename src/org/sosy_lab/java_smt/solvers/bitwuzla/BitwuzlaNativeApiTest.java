@@ -1,6 +1,8 @@
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import com.google.common.truth.Truth;
@@ -486,5 +488,116 @@ public class BitwuzlaNativeApiTest {
     assertEquals("(fp #b0 #b10000 #b1000000000)", aValue);
     assertEquals("(fp #b0 #b01111 #b0000000000)", bitwuzlaJNI.bitwuzla_term_to_string(one));
     assertEquals("(fp #b0 #b10000 #b0000000000)", bitwuzlaJNI.bitwuzla_term_to_string(two));
+  }
+
+  @Test
+  public void testTypes() {
+    // A constant (BITWUZLA_KIND_CONSTANT) is both, a variable and a constant value
+    // However a value is also a BITWUZLA_KIND_VALUE, while a variable is not
+    long fpSort = bitwuzlaJNI.bitwuzla_mk_fp_sort(5, 11);
+    long rm = bitwuzlaJNI.bitwuzla_mk_rm_value(bitwuzlaJNI.BITWUZLA_RM_RNE_get());
+    long a = bitwuzlaJNI.bitwuzla_mk_const(fpSort, "a");
+    long one = bitwuzlaJNI.bitwuzla_mk_fp_from_real(fpSort, rm, "1");
+    long two = bitwuzlaJNI.bitwuzla_mk_fp_from_real(fpSort, rm, "2");
+
+    long boolSort = bitwuzlaJNI.bitwuzla_mk_bool_sort();
+    long res = bitwuzlaJNI.bitwuzla_mk_const(boolSort, "res");
+    long bvSort8 = bitwuzlaJNI.bitwuzla_mk_bv_sort(8);
+    long arg1 = bitwuzlaJNI.bitwuzla_mk_const(bvSort8, "arg1");
+    long arg2 = bitwuzlaJNI.bitwuzla_mk_bv_value_uint64(bvSort8, 11);
+    long[] domain = {bvSort8, bvSort8};
+    long sortFun = bitwuzlaJNI.bitwuzla_mk_fun_sort(2, domain, boolSort);
+
+    // (applied) UFs have 1 + arity children, the UF decl (in this case foo), then the arguments
+    // in order. Applied UFs are also no "fun", but can only be discerned by KIND
+    // The decl has no children, but you can get domain and codomain with API calls
+    long foo = bitwuzlaJNI.bitwuzla_mk_const(sortFun, "foo");
+    long appliedFoo =
+        bitwuzlaJNI.bitwuzla_mk_term3(
+            BitwuzlaKind.BITWUZLA_KIND_APPLY.swigValue(), foo, arg1, arg2);
+    assertFalse(bitwuzlaJNI.bitwuzla_term_is_fun(appliedFoo));
+    assertTrue(bitwuzlaJNI.bitwuzla_term_is_bool(appliedFoo));
+    assertTrue(bitwuzlaJNI.bitwuzla_sort_is_bool(bitwuzlaJNI.bitwuzla_term_get_sort(appliedFoo)));
+    assertEquals(null, bitwuzlaJNI.bitwuzla_term_get_symbol(appliedFoo));
+    assertEquals("foo", bitwuzlaJNI.bitwuzla_term_get_symbol(foo));
+    long[] appliedFooChildren = bitwuzlaJNI.bitwuzla_term_get_children(appliedFoo, new long[1]);
+    assertEquals(foo, appliedFooChildren[0]);
+    assertEquals(arg1, appliedFooChildren[1]);
+    assertEquals(arg2, appliedFooChildren[2]);
+    assertEquals(
+        0, bitwuzlaJNI.bitwuzla_term_get_children(appliedFooChildren[0], new long[1]).length);
+    assertEquals(
+        BitwuzlaKind.BITWUZLA_KIND_APPLY.swigValue(),
+        bitwuzlaJNI.bitwuzla_term_get_kind(appliedFoo));
+    assertEquals(
+        BitwuzlaKind.BITWUZLA_KIND_CONSTANT.swigValue(), bitwuzlaJNI.bitwuzla_term_get_kind(foo));
+
+    long add =
+        bitwuzlaJNI.bitwuzla_mk_term3(BitwuzlaKind.BITWUZLA_KIND_FP_ADD.swigValue(), rm, two, one);
+    long eq = bitwuzlaJNI.bitwuzla_mk_term2(BitwuzlaKind.BITWUZLA_KIND_EQUAL.swigValue(), add, a);
+    long neg = bitwuzlaJNI.bitwuzla_mk_term1(BitwuzlaKind.BITWUZLA_KIND_NOT.swigValue(), eq);
+
+    /*
+        System.out.println(Arrays.toString(bitwuzlaJNI.bitwuzla_term_get_children(add, new long[1])));
+        System.out.println(bitwuzlaJNI.bitwuzla_kind_to_string(bitwuzlaJNI.bitwuzla_term_get_kind(add)));
+        System.out.println(Arrays.toString(bitwuzlaJNI.bitwuzla_term_get_children(eq, new long[1])));
+        System.out.println(bitwuzlaJNI.bitwuzla_kind_to_string(bitwuzlaJNI.bitwuzla_term_get_kind(eq)));
+        System.out.println(Arrays.toString(bitwuzlaJNI.bitwuzla_term_get_children(neg, new long[1])));
+        System.out.println(bitwuzlaJNI.bitwuzla_kind_to_string(bitwuzlaJNI.bitwuzla_term_get_kind(neg)));
+    */
+
+    // Non-UF functions consist of a KIND and arguments.
+    // You can get the KIND w bitwuzla_term_get_kind() and the arguments in the correct order w
+    // bitwuzla_term_get_children()
+    assertFalse(bitwuzlaJNI.bitwuzla_term_is_fun(appliedFoo));
+    assertFalse(bitwuzlaJNI.bitwuzla_term_is_fun(add));
+    assertFalse(bitwuzlaJNI.bitwuzla_term_is_fun(eq));
+    assertFalse(bitwuzlaJNI.bitwuzla_term_is_fun(neg));
+
+    assertTrue(bitwuzlaJNI.bitwuzla_term_is_rm(rm));
+
+    long aSort = bitwuzlaJNI.bitwuzla_term_get_sort(a);
+    assertFalse(bitwuzlaJNI.bitwuzla_term_is_bv_value(a));
+    assertTrue(bitwuzlaJNI.bitwuzla_sort_is_fp(aSort));
+    assertFalse(bitwuzlaJNI.bitwuzla_term_is_const(aSort));
+    assertTrue(bitwuzlaJNI.bitwuzla_term_is_fp(a));
+    assertFalse(bitwuzlaJNI.bitwuzla_term_is_var(a));
+    assertFalse(bitwuzlaJNI.bitwuzla_term_is_value(a));
+    assertNotEquals(
+        BitwuzlaKind.BITWUZLA_KIND_VALUE.swigValue(), bitwuzlaJNI.bitwuzla_term_get_kind(a));
+    assertNotEquals(
+        BitwuzlaKind.BITWUZLA_KIND_VARIABLE.swigValue(), bitwuzlaJNI.bitwuzla_term_get_kind(a));
+    assertEquals(
+        BitwuzlaKind.BITWUZLA_KIND_CONSTANT.swigValue(), bitwuzlaJNI.bitwuzla_term_get_kind(a));
+
+    assertFalse(bitwuzlaJNI.bitwuzla_sort_is_fun(aSort));
+    assertTrue(bitwuzlaJNI.bitwuzla_sort_is_fp(aSort));
+    assertFalse(bitwuzlaJNI.bitwuzla_sort_is_rm(aSort));
+    assertFalse(bitwuzlaJNI.bitwuzla_sort_is_bool(aSort));
+    assertFalse(bitwuzlaJNI.bitwuzla_sort_is_bv(aSort));
+    assertFalse(bitwuzlaJNI.bitwuzla_sort_is_array(aSort));
+
+    assertEquals("a", bitwuzlaJNI.bitwuzla_term_to_string(a));
+
+    long oneSort = bitwuzlaJNI.bitwuzla_term_get_sort(one);
+    assertEquals(
+        BitwuzlaKind.BITWUZLA_KIND_VALUE.swigValue(), bitwuzlaJNI.bitwuzla_term_get_kind(one));
+    assertNotEquals(
+        BitwuzlaKind.BITWUZLA_KIND_VARIABLE.swigValue(), bitwuzlaJNI.bitwuzla_term_get_kind(one));
+    assertNotEquals(
+        BitwuzlaKind.BITWUZLA_KIND_CONSTANT.swigValue(), bitwuzlaJNI.bitwuzla_term_get_kind(one));
+    assertFalse(bitwuzlaJNI.bitwuzla_term_is_bv_value(one));
+    assertTrue(bitwuzlaJNI.bitwuzla_sort_is_fp(oneSort));
+    assertFalse(bitwuzlaJNI.bitwuzla_term_is_const(oneSort));
+    assertTrue(bitwuzlaJNI.bitwuzla_term_is_fp(one));
+    assertFalse(bitwuzlaJNI.bitwuzla_term_is_var(one));
+    assertFalse(bitwuzlaJNI.bitwuzla_sort_is_fun(oneSort));
+    assertTrue(bitwuzlaJNI.bitwuzla_sort_is_fp(oneSort));
+    assertFalse(bitwuzlaJNI.bitwuzla_sort_is_rm(oneSort));
+    assertFalse(bitwuzlaJNI.bitwuzla_sort_is_bool(oneSort));
+    assertFalse(bitwuzlaJNI.bitwuzla_sort_is_bv(oneSort));
+    assertFalse(bitwuzlaJNI.bitwuzla_sort_is_array(oneSort));
+
+    assertEquals("(fp #b0 #b01111 #b0000000000)", bitwuzlaJNI.bitwuzla_term_to_string(one));
   }
 }
