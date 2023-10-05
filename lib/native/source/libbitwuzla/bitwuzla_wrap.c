@@ -154,6 +154,8 @@
 #include <jni.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
+#include <assert.h>
 
 
 /* Support for throwing Java exceptions */
@@ -7966,6 +7968,55 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJ
   arg1 = *(BitwuzlaParser **)&jarg1; 
   result = (Bitwuzla *)bitwuzla_parser_get_bitwuzla(arg1);
   *(Bitwuzla **)&jresult = result; 
+  return jresult;
+}
+
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_parse(JNIEnv *jenv, jclass jcls, jstring jarg1) {
+
+  char *arg1 = (char *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+ 
+  if (jarg1) {
+    arg1 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg1, 0);
+    if (!arg1) return 0;
+  }
+  
+  BitwuzlaOptions* options = bitwuzla_options_new();
+
+  FILE* file = fopen("tmp_file.smt2", "w+");
+
+  assert(file != 0);
+
+  fputs(arg1, file);
+  fclose(file);
+  file = fopen("tmp_file.smt2", "r");
+
+  BitwuzlaParser* parser = bitwuzla_parser_new(
+      options, "tmp_file.smt2", file, "smt2", 2, "<stdout>");
+
+  // Now parse the input file.
+  const char* err_msg = bitwuzla_parser_parse(parser, false);
+  // We expect no error to occur.
+  assert(err_msg == NULL);
+
+  // Now we retrieve the set of asserted formulas and print them.
+  size_t size;
+  BitwuzlaTerm* assertions =
+      bitwuzla_get_assertions(bitwuzla_parser_get_bitwuzla(parser), &size);
+
+  // assert(size == 1);
+  printf("size: %ld", size);
+  assert(assertions != 0);
+
+  jlong jresult = (jlong) assertions[0];
+
+  bitwuzla_parser_delete(parser);
+  bitwuzla_options_delete(options);
+
+  fclose(file);
+  remove("tmp_file.smt2");
   return jresult;
 }
 
