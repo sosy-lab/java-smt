@@ -422,6 +422,13 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
         argumentTypes.add(type);
       }
 
+      if (name == null) {
+        name = bitwuzlaJNI.bitwuzla_kind_to_string(bitwuzlaJNI.bitwuzla_term_get_kind(f));
+      }
+      if (decl == null) {
+        decl = (long) bitwuzlaJNI.bitwuzla_term_get_kind(f);
+      }
+
       return visitor.visitFunction(
           formula,
           arguments.build(),
@@ -432,7 +439,6 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
 
   private boolean termIsConstant(long term) {
     return BITWUZLA_KIND_VALUE.swigValue() == bitwuzlaJNI.bitwuzla_term_get_kind(term);
-    // && !bitwuzlaJNI.bitwuzla_term_is_rm(term);
   }
 
   @Override
