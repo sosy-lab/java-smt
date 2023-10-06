@@ -17,10 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import opensmt.Logic;
-import opensmt.MainSolver;
 import opensmt.Model;
 import opensmt.PTRef;
-import opensmt.Sort;
 import opensmt.SRef;
 import opensmt.SymRef;
 import opensmt.Symbol;
@@ -44,7 +42,6 @@ public class OpenSmtModel extends AbstractModel<PTRef, SRef, Logic> {
     osmtLogic = pCreator.getEnv();
     osmtModel = pProver.getOsmtSolver().getModel();
 
-    
     Map<String, PTRef> userDeclarations = new HashMap<>();
     for (PTRef asserted : pAssertedTerms) {
       userDeclarations.putAll(creator.extractVariablesAndUFs(asserted, true));
@@ -62,7 +59,8 @@ public class OpenSmtModel extends AbstractModel<PTRef, SRef, Logic> {
       if (osmtLogic.isArraySort(sort)) {
         // INFO: Disable model generation if arrays are used
         // https://github.com/usi-verification-and-security/opensmt/issues/630
-        throw new UnsupportedOperationException("OpenSMT does not support model generation when arrays are used");
+        throw new UnsupportedOperationException(
+            "OpenSMT does not support model generation when arrays are used");
       }
 
       if (numArgs == 0) {
@@ -71,12 +69,12 @@ public class OpenSmtModel extends AbstractModel<PTRef, SRef, Logic> {
 
         builder.add(
             new ValueAssignment(
-                  pCreator.encapsulate(key),
-                  pCreator.encapsulate(value),
-                  pCreator.encapsulateBoolean(osmtLogic.mkEq(key, value)),
-                  osmtLogic.getSymName(ref),
-                  pCreator.convertValue(value),
-                  new ArrayList<>()));
+                pCreator.encapsulate(key),
+                pCreator.encapsulate(value),
+                pCreator.encapsulateBoolean(osmtLogic.mkEq(key, value)),
+                osmtLogic.getSymName(ref),
+                pCreator.convertValue(value),
+                new ArrayList<>()));
       } else {
         TemplateFunction tf = osmtModel.getDefinition(ref);
 
@@ -88,14 +86,14 @@ public class OpenSmtModel extends AbstractModel<PTRef, SRef, Logic> {
 
           builder.add(
               new ValueAssignment(
-                    pCreator.encapsulate(key),
-                    pCreator.encapsulate(value),
-                    pCreator.encapsulateBoolean(osmtLogic.mkEq(key, value)),
-                    osmtLogic.getSymName(ref),
-                    pCreator.convertValue(value),
-                    args.stream()
-                        .map((val) -> pCreator.convertValue(val))
-                        .collect(Collectors.toList())));
+                  pCreator.encapsulate(key),
+                  pCreator.encapsulate(value),
+                  pCreator.encapsulateBoolean(osmtLogic.mkEq(key, value)),
+                  osmtLogic.getSymName(ref),
+                  pCreator.convertValue(value),
+                  args.stream()
+                      .map((val) -> pCreator.convertValue(val))
+                      .collect(Collectors.toList())));
         }
       }
     }
@@ -114,22 +112,27 @@ public class OpenSmtModel extends AbstractModel<PTRef, SRef, Logic> {
       if (osmtLogic.isArraySort(sort)) {
         // INFO: Disable model generation if arrays are used
         // https://github.com/usi-verification-and-security/opensmt/issues/630
-        throw new UnsupportedOperationException("OpenSMT does not support model generation when arrays are used");
+        throw new UnsupportedOperationException(
+            "OpenSMT does not support model generation when arrays are used");
       }
     }
     return osmtModel.evaluate(f);
   }
 
-  /** OpenSMT represents uninterpreted functions as nested ite statements.<p>
-    * For example:
-    * <pre>
-    * (define-fun g ((x1 Int) (x2 Int)) Int
-    *   (ite (= 5 x1) (ite (= 3 x2) 2 (ite (= 1 x2) 2 0)) 0))
-    * </pre>
-    * We use unfold() to extract an array of value tuples from such a definition.
-    */
-  private ArrayList<ArrayList<PTRef>> unfold(int numArgs, PTRef body) {
-    ArrayList<ArrayList<PTRef>> unwrapped = new ArrayList<>();
+  /**
+   * OpenSMT represents uninterpreted functions as nested ite statements.
+   *
+   * <p>For example:
+   *
+   * <pre>
+   * (define-fun g ((x1 Int) (x2 Int)) Int
+   *   (ite (= 5 x1) (ite (= 3 x2) 2 (ite (= 1 x2) 2 0)) 0))
+   * </pre>
+   *
+   * <p>We use unfold() to extract an array of value tuples from such a definition.
+   */
+  private List<List<PTRef>> unfold(int numArgs, PTRef body) {
+    List<List<PTRef>> unwrapped = new ArrayList<>();
 
     if (osmtLogic.isIte(body)) {
       PTRef sub0 = osmtLogic.getPterm(body).at(0);
@@ -141,8 +144,8 @@ public class OpenSmtModel extends AbstractModel<PTRef, SRef, Logic> {
 
       PTRef value = osmtLogic.isVar(sub00) ? sub01 : sub00;
 
-      for (ArrayList<PTRef> nested : unfold(numArgs - 1, sub1)) {
-        ArrayList<PTRef> prefixed = new ArrayList<>();
+      for (List<PTRef> nested : unfold(numArgs - 1, sub1)) {
+        List<PTRef> prefixed = new ArrayList<>();
         prefixed.add(value);
         prefixed.addAll(nested);
 
@@ -152,7 +155,7 @@ public class OpenSmtModel extends AbstractModel<PTRef, SRef, Logic> {
     }
 
     if (numArgs == 0) {
-      ArrayList<PTRef> value = new ArrayList<>();
+      List<PTRef> value = new ArrayList<>();
       value.add(body);
 
       unwrapped.add(value);

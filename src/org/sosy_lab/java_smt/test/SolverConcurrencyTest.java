@@ -129,7 +129,7 @@ public class SolverConcurrencyTest {
         .isNoneOf(
             Solvers.SMTINTERPOL,
             Solvers.BOOLECTOR,
-            Solvers.OPENSMT,  // INFO: OpenSMT does not support concurrent stacks
+            Solvers.OPENSMT, // INFO: OpenSMT does not support concurrent stacks
             Solvers.MATHSAT5,
             Solvers.Z3,
             Solvers.PRINCESS,
@@ -462,11 +462,11 @@ public class SolverConcurrencyTest {
         return formula;
       }
     }
-      
+
     // This is fine! We might access this more than once at a time,
     // but that gives only access to the bucket, which is threadsafe.
     AtomicReferenceArray<BlockingQueue<ContextAndFormula>> bucketQueue =
-      new AtomicReferenceArray<>(NUMBER_OF_THREADS);
+        new AtomicReferenceArray<>(NUMBER_OF_THREADS);
 
     // Init as many buckets as there are threads; each bucket generates an initial formula (such
     // that
@@ -495,17 +495,17 @@ public class SolverConcurrencyTest {
           BooleanFormulaManager bmgr = mgr.getBooleanFormulaManager();
           HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
           BooleanFormula threadFormula =
-            gen.generate(INTEGER_FORMULA_GEN.getOrDefault(solver, 9) - id);
+              gen.generate(INTEGER_FORMULA_GEN.getOrDefault(solver, 9) - id);
           try (BasicProverEnvironment<?> stack = context.newProverEnvironment()) {
             // Repeat till the bucket counter reaches itself again
             while (nextBucket != id) {
               stack.push(threadFormula);
-    
+
               assertWithMessage(
-                  "Test continuousRunningThreadFormulaTransferTranslateTest() "
-                      + "failed isUnsat() in thread with id: "
-                      + id
-                      + ".")
+                      "Test continuousRunningThreadFormulaTransferTranslateTest() "
+                          + "failed isUnsat() in thread with id: "
+                          + id
+                          + ".")
                   .that(stack.isUnsat())
                   .isTrue();
 
@@ -515,9 +515,9 @@ public class SolverConcurrencyTest {
               // Translate the formula into its own context and start solving
               ContextAndFormula newFormulaAndContext = ownBucket.take();
               threadFormula =
-                mgr.translateFrom(
-                    newFormulaAndContext.getFormula(),
-                    newFormulaAndContext.getContext().getFormulaManager());
+                  mgr.translateFrom(
+                      newFormulaAndContext.getFormula(),
+                      newFormulaAndContext.getContext().getFormulaManager());
 
               nextBucket = (nextBucket + 1) % NUMBER_OF_THREADS;
             }

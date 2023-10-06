@@ -106,7 +106,7 @@ public class UFManagerTest extends SolverBasedTest0 {
         .withMessage("Solver %s does not support mixed integer-real artihmetic ", solverToUse())
         .that(solver)
         .isNotEqualTo(Solvers.OPENSMT);
-   
+
     requireIntegers();
     requireRationals();
 

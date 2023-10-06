@@ -13,11 +13,11 @@ import java.util.Set;
 import java.util.function.Consumer;
 import opensmt.LogicFactory;
 import org.sosy_lab.common.ShutdownNotifier;
-import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
+import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Logics;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
@@ -33,6 +33,7 @@ public class OpenSmtSolverContext extends AbstractSolverContext {
 
   @SuppressWarnings("unused")
   private final LogManager logger;
+
   private final ShutdownNotifier shutdownNotifier;
   private final ExtraOptions extraOptions;
 
@@ -51,8 +52,7 @@ public class OpenSmtSolverContext extends AbstractSolverContext {
 
     final int randomSeed;
 
-    ExtraOptions(Configuration config, int pRandomSeed)
-        throws InvalidConfigurationException {
+    ExtraOptions(Configuration config, int pRandomSeed) throws InvalidConfigurationException {
       config.inject(this);
       randomSeed = pRandomSeed;
     }
@@ -81,7 +81,7 @@ public class OpenSmtSolverContext extends AbstractSolverContext {
       long pRandom,
       NonLinearArithmetic pNonLinearArithmetic,
       Consumer<String> pLoader)
-    throws InvalidConfigurationException {
+      throws InvalidConfigurationException {
 
     // Make sure the native libraries are loaded
     pLoader.accept("opensmt");
@@ -101,7 +101,8 @@ public class OpenSmtSolverContext extends AbstractSolverContext {
 
     // Build the central FormulaManager object
     OpenSmtFormulaManager manager =
-        new OpenSmtFormulaManager(creator, functionTheory, booleanTheory, integerTheory, rationalTheory, arrayTheory);
+        new OpenSmtFormulaManager(
+            creator, functionTheory, booleanTheory, integerTheory, rationalTheory, arrayTheory);
 
     // Split off solver options
     ExtraOptions options = new ExtraOptions(config, (int) pRandom);
@@ -136,14 +137,23 @@ public class OpenSmtSolverContext extends AbstractSolverContext {
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<SolverContext.ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
-    return new OpenSmtTheoremProver(creator, manager, extraOptions.randomSeed, shutdownNotifier, options);
+    return new OpenSmtTheoremProver(
+        creator, manager, extraOptions.randomSeed, shutdownNotifier, options);
   }
 
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<SolverContext.ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
-    return new OpenSmtInterpolatingProver(creator, manager, extraOptions.randomSeed, shutdownNotifier, options, extraOptions.algBool, extraOptions.algUf, extraOptions.algLra);
+    return new OpenSmtInterpolatingProver(
+        creator,
+        manager,
+        extraOptions.randomSeed,
+        shutdownNotifier,
+        options,
+        extraOptions.algBool,
+        extraOptions.algUf,
+        extraOptions.algLra);
   }
 
   @Override

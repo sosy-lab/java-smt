@@ -24,14 +24,14 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
-import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.SolverContextFactory.Logics;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.IntegerFormulaManager;
-import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaManager;
+import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
+import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
@@ -165,14 +165,16 @@ public class SolverStackTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void singleStackTestRational() throws SolverException, InterruptedException, InvalidConfigurationException {
+  public void singleStackTestRational()
+      throws SolverException, InterruptedException, InvalidConfigurationException {
     requireRationals();
     SolverContext context = initSolver("solver.logic", "QF_LRA");
 
     FormulaManager mgr = context.getFormulaManager();
     RationalFormulaManager rmgr = mgr.getRationalFormulaManager();
 
-    try (BasicProverEnvironment<?> env = context.newProverEnvironmentWithInterpolation(ProverOptions.GENERATE_MODELS)) {
+    try (BasicProverEnvironment<?> env =
+        context.newProverEnvironmentWithInterpolation(ProverOptions.GENERATE_MODELS)) {
       simpleStackTestNum(rmgr, env);
     }
 
@@ -649,7 +651,8 @@ public class SolverStackTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void modelForSatFormulaWithUF() throws SolverException, InterruptedException, InvalidConfigurationException {
+  public void modelForSatFormulaWithUF()
+      throws SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
 
     SolverContext context = initSolver("solver.logic", "ALL");
@@ -658,7 +661,8 @@ public class SolverStackTest extends SolverBasedTest0 {
     IntegerFormulaManager imgr = mgr.getIntegerFormulaManager();
     UFManager fmgr = mgr.getUFManager();
 
-    try (BasicProverEnvironment<?> stack = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+    try (BasicProverEnvironment<?> stack =
+        context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       IntegerFormula zero = imgr.makeNumber(0);
       IntegerFormula varA = imgr.makeVariable("a");
       IntegerFormula varB = imgr.makeVariable("b");

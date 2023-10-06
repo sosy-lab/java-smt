@@ -252,7 +252,6 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
                 handleExpectedException(() -> nmgr.divide(nmgr.makeNumber(2 * 3), a))));
 
     assertThatFormula(f).isSatisfiable();
-    
   }
 
   @Test

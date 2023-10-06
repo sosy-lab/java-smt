@@ -11,7 +11,6 @@ package org.sosy_lab.java_smt.solvers.opensmt;
 import static com.google.common.truth.Truth.assertThat;
 
 import java.util.Arrays;
-import opensmt.SMTOption;
 import opensmt.ArithLogic;
 import opensmt.InterpolationContext;
 import opensmt.ItpAlgorithm;
@@ -23,6 +22,7 @@ import opensmt.Model;
 import opensmt.OpenSmt;
 import opensmt.PTRef;
 import opensmt.SMTConfig;
+import opensmt.SMTOption;
 import opensmt.SRef;
 import opensmt.SymRef;
 import opensmt.TemplateFunction;
@@ -373,7 +373,7 @@ public class OpenSmtNativeAPITest {
   public void testAbort() {
     OpenSmt osmt = new OpenSmt(opensmt_logic.qf_lia, "opensmt-test", false);
     ArithLogic logic = osmt.getLIALogic();
-    
+
     // Declare variables
     PTRef varA = logic.mkIntVar("a");
     PTRef varC = logic.mkIntVar("c");
@@ -391,7 +391,7 @@ public class OpenSmtNativeAPITest {
     mainSolver.push(f1);
 
     mainSolver.stop();
-    
+
     sstat r = mainSolver.check();
     assertThat(r).isEqualTo(sstat.Undef());
   }
@@ -410,7 +410,10 @@ public class OpenSmtNativeAPITest {
     // This test fails intermittently, so i needs to be chosen large enough
     for (int i = 0; i < 1000; i++) {
       String pp = logic.pp(nil);
-      assertThat(pp).isEqualTo("\u0000"); // The String returned in the failed case is just \u0000 - without the `|` characters
+      assertThat(pp)
+          .isEqualTo(
+              "\u0000"); // The String returned in the failed case is just \u0000 - without the `|`
+      // characters
 
       /* Note:
        * I patched OpenSMT to fix the issue and logic.pp(nil) should now always

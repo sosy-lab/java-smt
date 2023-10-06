@@ -25,10 +25,9 @@ import opensmt.PTRef;
 import opensmt.SMTConfig;
 import opensmt.SMTOption;
 import opensmt.SRef;
-import opensmt.Symbol;
 import opensmt.SymRef;
+import opensmt.Symbol;
 import opensmt.sstat;
-import opensmt.VectorPTRef;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -60,13 +59,16 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
 
     creator = pFormulaCreator;
 
-    osmtConfig = pConfig; // BUGFIX: We need to store the SMTConfig reference to make sure the underlying C++ object does not get garbage collected
+    // BUGFIX: We need to store the SMTConfig reference to make sure the underlying C++ object does
+    // not get garbage collected
+    osmtConfig = pConfig;
     osmtSolver = new MainSolver(creator.getEnv(), pConfig, "JavaSmt");
 
     assertionStack.push(new ArrayList<>()); // create initial level
   }
 
-  protected static SMTConfig getConfigInstance(int randomSeed, boolean interpolation, int algBool, int algUf, int algLra) {
+  protected static SMTConfig getConfigInstance(
+      int randomSeed, boolean interpolation, int algBool, int algUf, int algLra) {
     SMTConfig config = new SMTConfig();
     config.setRandomSeed(randomSeed);
     config.setInterpolation(interpolation);
@@ -100,10 +102,9 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     osmtSolver.pop();
   }
 
-
   @Nullable
   protected abstract T addConstraintImpl(PTRef f) throws InterruptedException;
-  
+
   @Override
   @Nullable
   public T addConstraint(BooleanFormula pF) throws InterruptedException {
@@ -190,8 +191,7 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     }
 
     if (usesIntegers && usesReals) {
-      throw new SolverException(
-          "OpenSMT does not support mixed integer-real arithmetics");
+      throw new SolverException("OpenSMT does not support mixed integer-real arithmetics");
     }
 
     List<String> errors = new ArrayList<>();
@@ -211,7 +211,7 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     if (errors.size() > 0) {
       throw new SolverException(
           "Assertions use features that are not supported by the selected logic "
-          + errors.toString());
+              + errors.toString());
     }
   }
 

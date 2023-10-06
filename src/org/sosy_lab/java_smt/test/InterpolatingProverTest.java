@@ -79,10 +79,11 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
        * https://github.com/usi-verification-and-security/opensmt/issues/638
        */
       IntegerFormula z = solverToUse() == Solvers.OPENSMT ? x : imgr.makeVariable("z");
-      
+
       BooleanFormula f1 = imgr.equal(y, imgr.multiply(imgr.makeNumber(2), x));
-      BooleanFormula f2 = imgr.equal(y, imgr.add(imgr.makeNumber(1), imgr.multiply(z, imgr.makeNumber(2))));
-      
+      BooleanFormula f2 =
+          imgr.equal(y, imgr.add(imgr.makeNumber(1), imgr.multiply(z, imgr.makeNumber(2))));
+
       prover.push(f1);
       T id2 = prover.push(f2);
       boolean check = prover.isUnsat();
@@ -107,7 +108,8 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
       IntegerFormula z = solverToUse() == Solvers.OPENSMT ? x : imgr.makeVariable("z");
 
       BooleanFormula f1 = imgr.equal(y, imgr.multiply(imgr.makeNumber(2), x));
-      BooleanFormula f2 = imgr.equal(y, imgr.add(imgr.makeNumber(1), imgr.multiply(z, imgr.makeNumber(2))));
+      BooleanFormula f2 =
+          imgr.equal(y, imgr.add(imgr.makeNumber(1), imgr.multiply(z, imgr.makeNumber(2))));
       T id1 = prover.push(f1);
       T id2 = prover.push(f2);
       assertThat(prover.isUnsat()).isTrue();
@@ -286,12 +288,15 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
     List<BooleanFormula> itps1 = stack.getSeqInterpolants0(ImmutableList.of(TA, TB, TC, TD));
     List<BooleanFormula> itps2 = stack.getSeqInterpolants0(ImmutableList.of(TD, TC, TB, TA));
     List<BooleanFormula> itps3 = stack.getSeqInterpolants0(ImmutableList.of(TA, TC, TB, TD));
-    List<BooleanFormula> itps4 = stack.getSeqInterpolants(
-        Lists.transform(ImmutableList.of(TA, TA, TA, TB, TC, TD, TD), ImmutableSet::of));
-    List<BooleanFormula> itps5 = stack.getSeqInterpolants(
-        Lists.transform(ImmutableList.of(TA, TA, TB, TC, TD, TA, TD), ImmutableSet::of));
-    List<BooleanFormula> itps6 = stack.getSeqInterpolants(
-        Lists.transform(ImmutableList.of(TB, TC, TD, TA, TA, TA, TD), ImmutableSet::of));
+    List<BooleanFormula> itps4 =
+        stack.getSeqInterpolants(
+            Lists.transform(ImmutableList.of(TA, TA, TA, TB, TC, TD, TD), ImmutableSet::of));
+    List<BooleanFormula> itps5 =
+        stack.getSeqInterpolants(
+            Lists.transform(ImmutableList.of(TA, TA, TB, TC, TD, TA, TD), ImmutableSet::of));
+    List<BooleanFormula> itps6 =
+        stack.getSeqInterpolants(
+            Lists.transform(ImmutableList.of(TB, TC, TD, TA, TA, TA, TD), ImmutableSet::of));
 
     stack.close();
 
@@ -305,7 +310,8 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
 
   @Test(expected = IllegalArgumentException.class)
   @SuppressWarnings("CheckReturnValue")
-  public <T> void sequentialInterpolationWithoutPartition() throws SolverException, InterruptedException {
+  public <T> void sequentialInterpolationWithoutPartition()
+      throws SolverException, InterruptedException {
     requireIntegers();
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 

@@ -25,7 +25,6 @@ import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
-import org.sosy_lab.java_smt.SolverContextFactory.Logics;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.Formula;
@@ -60,7 +59,7 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
   private static final String DEFAULT_MODEL_STRING = "";
 
   private static int problemSize;
-  
+
   @Parameters(name = "{0}")
   public static Object[] getAllSolvers() {
     return Solvers.values();
@@ -82,7 +81,7 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
     }
     return builder;
   }
-  
+
   private void evaluateInModel(
       BooleanFormula constraint,
       Formula formula,
@@ -234,7 +233,7 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
       }
     }
   }
-  
+
   @Test
   public void testEvaluatorGeneration() throws SolverException, InterruptedException {
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
@@ -251,7 +250,7 @@ public class ModelEvaluationTest extends SolverBasedTest0 {
       }
     }
   }
-  
+
   @NonNull
   private List<BooleanFormula> getConstraints() {
     List<BooleanFormula> constraints = new ArrayList<>();

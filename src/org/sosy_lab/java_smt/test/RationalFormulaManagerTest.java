@@ -8,9 +8,9 @@
 
 package org.sosy_lab.java_smt.test;
 
-import static com.google.common.truth.TruthJUnit.assume;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assert_;
+import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.collect.Iterables;
 import java.util.HashSet;
@@ -51,7 +51,7 @@ public class RationalFormulaManagerTest extends SolverBasedTest0 {
   protected Solvers solverToUse() {
     return solver;
   }
-  
+
   @Test
   public void rationalToIntTest() throws SolverException, InterruptedException {
     requireRationals();

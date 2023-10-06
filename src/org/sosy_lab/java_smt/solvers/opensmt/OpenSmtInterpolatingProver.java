@@ -17,7 +17,6 @@ import opensmt.PTRef;
 import opensmt.VectorInt;
 import opensmt.VectorPTRef;
 import opensmt.VectorVectorInt;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -38,11 +37,11 @@ class OpenSmtInterpolatingProver extends OpenSmtAbstractProver<Integer>
       int pAlgLra) {
 
     super(
-      pFormulaCreator,
-      pMgr,
-      pShutdownNotifier,
-      getConfigInstance(pRandom, true, pAlgBool, pAlgUf, pAlgLra),
-      pOptions);
+        pFormulaCreator,
+        pMgr,
+        pShutdownNotifier,
+        getConfigInstance(pRandom, true, pAlgBool, pAlgUf, pAlgLra),
+        pOptions);
   }
 
   @Override

@@ -12,7 +12,6 @@ import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.test.BooleanFormulaSubject.assertUsing;
 
 import com.google.common.collect.Lists;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.After;
@@ -170,7 +169,7 @@ public class TranslateFormulaTest {
     BooleanFormula translatedInput = managerTo.translateFrom(inputFrom, managerFrom);
     BooleanFormula translatedReverseInput = managerFrom.translateFrom(translatedInput, managerTo);
 
-    assertUsing(from).that(inputFrom).isEquivalentTo(translatedReverseInput); 
+    assertUsing(from).that(inputFrom).isEquivalentTo(translatedReverseInput);
   }
 
   private BooleanFormula createTestFormula(FormulaManager mgr) {

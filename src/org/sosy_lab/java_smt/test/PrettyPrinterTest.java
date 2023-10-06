@@ -76,7 +76,7 @@ public class PrettyPrinterTest extends SolverBasedTest0 {
                 + ")";
         break;
       case OPENSMT:
-        expected = 
+        expected =
             "(and\n"
                 + "  (= (select arr x) (foo 3))\n"
                 + "  (not\n"
@@ -172,7 +172,7 @@ public class PrettyPrinterTest extends SolverBasedTest0 {
                 + ")";
         break;
       default:
-        expected = 
+        expected =
             "(and\n"
                 + "  (=\n"
                 + "    (select\n"
@@ -368,7 +368,8 @@ public class PrettyPrinterTest extends SolverBasedTest0 {
                 + "  7 [label=\"*\", shape=\"circle\", style=\"filled\", fillcolor=\"white\"];\n"
                 + "  7 -> 8 [label=\"0\"];\n"
                 + "  7 -> 9 [label=\"1\"];\n"
-                + "  9 [label=\"xx\", shape=\"rectangle\", style=\"filled\", fillcolor=\"white\"];\n"
+                + "  9 [label=\"xx\", shape=\"rectangle\", style=\"filled\","
+                + " fillcolor=\"white\"];\n"
                 + "  8 [label=\"-1\", shape=\"rectangle\", style=\"filled\", fillcolor=\"grey\"];\n"
                 + "  6 [label=\"x\", shape=\"rectangle\", style=\"filled\", fillcolor=\"white\"];\n"
                 + "  4 [label=\"0\", shape=\"rectangle\", style=\"filled\", fillcolor=\"grey\"];\n"
@@ -378,7 +379,8 @@ public class PrettyPrinterTest extends SolverBasedTest0 {
                 + "  11 [label=\"foo\", shape=\"circle\", style=\"filled\", fillcolor=\"white\"];\n"
                 + "  11 -> 12 [label=\"0\"];\n"
                 + "  12 [label=\"3\", shape=\"rectangle\", style=\"filled\", fillcolor=\"grey\"];\n"
-                + "  10 [label=\"select\", shape=\"circle\", style=\"filled\", fillcolor=\"white\"];\n"
+                + "  10 [label=\"select\", shape=\"circle\", style=\"filled\","
+                + " fillcolor=\"white\"];\n"
                 + "  10 -> 13 [label=\"0\"];\n"
                 + "  10 -> 6 [label=\"1\"];\n"
                 + "  13 [label=\"arr\", shape=\"rectangle\", style=\"filled\","

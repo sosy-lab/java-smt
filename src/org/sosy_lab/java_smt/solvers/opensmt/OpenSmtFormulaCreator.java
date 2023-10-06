@@ -10,8 +10,8 @@ package org.sosy_lab.java_smt.solvers.opensmt;
 
 import com.google.common.collect.ImmutableList;
 import java.math.BigInteger;
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 import opensmt.ArithLogic;
 import opensmt.Logic;
 import opensmt.LogicFactory;
@@ -41,7 +41,7 @@ import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtFormula.OpenSmtRationalFormu
 public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, SymRef> {
 
   private Logics logicToUse;
-  
+
   private OpenSmtFormulaCreator(Logics logicType, Logic logic) {
     super(
         logic,
@@ -50,7 +50,7 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, Sy
         (logic instanceof ArithLogic) ? ((ArithLogic) logic).getSort_real() : null,
         null,
         null);
-    
+
     logicToUse = logicType;
   }
 
@@ -89,62 +89,58 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, Sy
 
   boolean hasArrays() {
     List<Logics> supported =
-      Arrays.asList(
-        Logics.QF_AX,
-        Logics.QF_ALIA,
-        Logics.QF_ALRA,
-        Logics.QF_AUFLIA,
-        Logics.QF_AUFLRA,
-        Logics.ALL);
-    
+        Arrays.asList(
+            Logics.QF_AX,
+            Logics.QF_ALIA,
+            Logics.QF_ALRA,
+            Logics.QF_AUFLIA,
+            Logics.QF_AUFLRA,
+            Logics.ALL);
+
     return supported.contains(logicToUse);
   }
 
   boolean hasUFs() {
     List<Logics> supported =
-      Arrays.asList(
-        Logics.QF_UF,
-        Logics.QF_UFLIA,
-        Logics.QF_UFLRA,
-        Logics.QF_AUFLIA,
-        Logics.QF_AUFLRA,
-        Logics.ALL);
+        Arrays.asList(
+            Logics.QF_UF,
+            Logics.QF_UFLIA,
+            Logics.QF_UFLRA,
+            Logics.QF_AUFLIA,
+            Logics.QF_AUFLRA,
+            Logics.ALL);
 
     return supported.contains(logicToUse);
   }
 
   boolean hasIntegers() {
     List<Logics> supported =
-      Arrays.asList(
-        Logics.QF_IDL,
-        Logics.QF_LIA,
-        Logics.QF_ALIA,
-        Logics.QF_UFLIA,
-        Logics.QF_AUFLIA,
-        Logics.ALL);
+        Arrays.asList(
+            Logics.QF_IDL,
+            Logics.QF_LIA,
+            Logics.QF_ALIA,
+            Logics.QF_UFLIA,
+            Logics.QF_AUFLIA,
+            Logics.ALL);
 
     return supported.contains(logicToUse);
   }
 
   boolean hasReals() {
     List<Logics> supported =
-      Arrays.asList(
-        Logics.QF_RDL,
-        Logics.QF_LRA,
-        Logics.QF_ALRA,
-        Logics.QF_UFLRA,
-        Logics.QF_AUFLRA,
-        Logics.ALL);
+        Arrays.asList(
+            Logics.QF_RDL,
+            Logics.QF_LRA,
+            Logics.QF_ALRA,
+            Logics.QF_UFLRA,
+            Logics.QF_AUFLRA,
+            Logics.ALL);
 
     return supported.contains(logicToUse);
   }
 
   boolean hasInterpolation() {
-    List<Logics> supported =
-      Arrays.asList(
-        Logics.QF_UF,
-        Logics.QF_LIA,
-        Logics.QF_LRA);
+    List<Logics> supported = Arrays.asList(Logics.QF_UF, Logics.QF_LIA, Logics.QF_LRA);
 
     return supported.contains(logicToUse);
   }
@@ -299,15 +295,15 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, Sy
     Logic logic = getEnv();
     /*
     AND
-    IFF        If and only if.
-    IMPLIES    Implication between two boolean formulas.
-    ITE        If-then-else operator.
+    IFF      If and only if.
+    IMPLIES  Implication between two boolean formulas.
+    ITE      If-then-else operator.
     NOT
     OR
     SELECT
-    STORE 	Store and select on arrays.
-    UF 	        Uninterpreted function.
-    XOR 	Exclusive OR over two formulas.
+    STORE    Store and select on arrays.
+    UF       Uninterpreted function.
+    XOR      Exclusive OR over two formulas.
     */
 
     if (logic.isAnd(f)) {
@@ -349,7 +345,7 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, Sy
     EQ         Equality over integers and rationals.
     GT         Greater-than over integers and rationals.
     GTE        Greater-than-or-equal over integers and rationals.
-    LT 	       Less-than over integers and rationals.
+    LT         Less-than over integers and rationals.
     LTE        Less-than-or-equal over integers and rationals.
     MODULO     Modulo operator over integers.
     MUL        Multiplication over integers and rationals.
@@ -433,7 +429,7 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, Sy
     // FIXME: Handle abstract values for arrays?
 
     String varName = logic.getSymName(logic.getSymRef(f));
-    
+
     ImmutableList.Builder<Formula> argTerms = ImmutableList.builder();
     ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
 
@@ -450,9 +446,9 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, Sy
     for (int i = 0; i < pterm.size(); i++) {
       PTRef sub = pterm.at(i);
       argTerms.add(encapsulate(sub));
-      argTypes.add(getFormulaType(sub));       
+      argTypes.add(getFormulaType(sub));
     }
-    
+
     return visitor.visitFunction(
         formula,
         argTerms.build(),
