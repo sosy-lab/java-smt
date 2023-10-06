@@ -14,6 +14,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -157,9 +158,11 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
   private void checkCompatability() throws SolverException {
 
     Logic osmtLogic = creator.getEnv();
-    PTRef asserted = osmtLogic.mkAnd(new VectorPTRef(getAssertedFormulas()));
 
-    Map<String, PTRef> userDeclarations = creator.extractVariablesAndUFs(asserted, true);
+    Map<String, PTRef> userDeclarations = new HashMap<>();
+    for (PTRef asserted : getAssertedFormulas()) {
+      userDeclarations.putAll(creator.extractVariablesAndUFs(asserted, true));
+    }
 
     boolean usesUFs = false;
     boolean usesIntegers = false;

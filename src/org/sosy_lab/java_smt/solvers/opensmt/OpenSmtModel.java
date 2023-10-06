@@ -12,6 +12,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -43,8 +44,11 @@ public class OpenSmtModel extends AbstractModel<PTRef, SRef, Logic> {
     osmtLogic = pCreator.getEnv();
     osmtModel = pProver.getOsmtSolver().getModel();
 
-    PTRef asserted = osmtLogic.mkAnd(new VectorPTRef(pAssertedTerms));
-    Map<String, PTRef> userDeclarations = creator.extractVariablesAndUFs(asserted, true);
+    
+    Map<String, PTRef> userDeclarations = new HashMap<>();
+    for (PTRef asserted : pAssertedTerms) {
+      userDeclarations.putAll(creator.extractVariablesAndUFs(asserted, true));
+    }
 
     ImmutableList.Builder<ValueAssignment> builder = ImmutableList.builder();
 
