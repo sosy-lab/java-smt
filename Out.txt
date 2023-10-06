@@ -1,8 +1,0 @@
-(set-logic AUFLIRA)
-(declare-const x Int)
-(assert (= x (+ 1 (- 2.0))))
-(declare-const y Bool)
-(declare-const z Bool)
-(assert (and y z))
-(check-sat)
-(exit)

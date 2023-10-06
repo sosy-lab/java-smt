@@ -66,8 +66,8 @@ public class Main {
 
     //BooleanFormula constraint = imgr.equal (x, imgr.add(one, imgr.negate(two)));
     BooleanFormula constraint2 = bmgr.equivalence(res, bmgr.and(y,z, a, b));
-    IntegerFormula d = imgr.sum(testAdd);
-    BooleanFormula constraint3 = imgr.equal(x, d);
+    IntegerFormula d = imgr.subtract(two, three);
+    BooleanFormula constraint3 = imgr.modularCongruence(three, two, 4);
 
     try (ProverEnvironment prover =
              context.newProverEnvironment(SolverContext.ProverOptions.GENERATE_MODELS)) {

@@ -20,24 +20,19 @@
 
 package org.sosy_lab.java_smt.utils;
 
-import com.google.common.base.Preconditions;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.Normalizer.Form;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.NumeralFormula;
-import org.sosy_lab.java_smt.basicimpl.AbstractFormula;
+
 
 public class Generator {
 
@@ -191,7 +186,6 @@ public class Generator {
     Iterator<BooleanFormula> it = pBits1.iterator();
     for (int i = 0; i < pBits1.size(); i++) {
       inputParams.add(it.next());
-      System.out.println(inputParams);
     }
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> {
@@ -288,14 +282,51 @@ public class Generator {
     StringBuilder out = new StringBuilder();
     out.append("(+ ");
     List<Object> inputParams = new ArrayList<>();
-    for (int i = 0; i < operands.size(); i++) {
-      inputParams.add(operands.get(i).toString());
-      System.out.println(inputParams);
+    for (Object pOperand : operands) {
+      inputParams.add(pOperand.toString());
     }
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> {
           inPlaceInputParams.forEach((c) -> {out.append(c); out.append(" ");}); return String.valueOf(
               out.deleteCharAt(out.length()-1).append(")"));};
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+  }
+
+  public static void logSubtract(Object result, Object pNumber1, Object pNumber2) {
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(pNumber1);
+    inputParams.add(pNumber2);
+    Function<List<Object>, String> saveResult =
+        inPlaceInputParams -> "(- " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+  }
+
+  public static void logDivide(Object result, Object pNumber1, Object pNumber2) {
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(pNumber1);
+    inputParams.add(pNumber2);
+    Function<List<Object>, String> saveResult =
+        inPlaceInputParams -> "(div " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+  }
+
+  public static void logModulo(Object result, Object pNumber1, Object pNumber2) {
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(pNumber1);
+    inputParams.add(pNumber2);
+    Function<List<Object>, String> saveResult =
+        inPlaceInputParams -> "(mod " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+  }
+
+  public static void logModularCongruence(Object result, Object pNumber1, Object pNumber2,
+                                          long pModulo) {
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(pNumber1);
+    inputParams.add(pNumber2);
+    inputParams.add(Long.toString(pModulo));
+    Function<List<Object>, String> saveResult =
+        inPlaceInputParams -> "(= (mod " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(2) + ") (mod " + inPlaceInputParams.get(1) + " " + inPlaceInputParams.get(2) + "))";
     executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 

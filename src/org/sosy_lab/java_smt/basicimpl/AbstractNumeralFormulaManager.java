@@ -232,8 +232,9 @@ public abstract class AbstractNumeralFormulaManager<
   public ResultFormulaType subtract(ParamFormulaType pNumber1, ParamFormulaType pNumber2) {
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
-
-    return wrap(subtract(param1, param2));
+    ResultFormulaType result = wrap(subtract(param1, param2));
+    Generator.logSubtract(result, pNumber1, pNumber2);
+    return result;
   }
 
   protected abstract TFormulaInfo subtract(TFormulaInfo pParam1, TFormulaInfo pParam2);
@@ -261,6 +262,7 @@ public abstract class AbstractNumeralFormulaManager<
         }
       }
     }
+    Generator.logDivide(wrap(result), pNumber1, pNumber2);
     return wrap(result);
   }
 
@@ -293,6 +295,7 @@ public abstract class AbstractNumeralFormulaManager<
         }
       }
     }
+    Generator.logModulo(wrap(result), pNumber1, pNumber2);
     return wrap(result);
   }
 
@@ -312,8 +315,9 @@ public abstract class AbstractNumeralFormulaManager<
     Preconditions.checkArgument(pModulo > 0, "modular congruence needs a positive modulo.");
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
-
-    return wrapBool(modularCongruence(param1, param2, pModulo));
+    BooleanFormula result = wrapBool(modularCongruence(param1, param2, pModulo));
+    Generator.logModularCongruence(result, pNumber1, pNumber2, pModulo);
+    return result;
   }
 
   public BooleanFormula modularCongruence(
