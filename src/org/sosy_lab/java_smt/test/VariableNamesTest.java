@@ -182,7 +182,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
             .addAll(UNSUPPORTED_NAMES)
             .build();
     return Lists.transform(
-        Lists.cartesianProduct(Arrays.asList(Solvers.OPENSMT), allNames), List::toArray);
+        Lists.cartesianProduct(Arrays.asList(Solvers.values()), allNames), List::toArray);
   }
 
   @Parameter(0)

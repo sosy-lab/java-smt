@@ -38,7 +38,7 @@ public class SolverAllSatTest extends SolverBasedTest0 {
   @Parameters(name = "solver {0} with prover {1}")
   public static Iterable<Object[]> getAllSolvers() {
     List<Object[]> junitParams = new ArrayList<>();
-    for (Solvers solver : new Solvers[] {Solvers.OPENSMT}) {
+    for (Solvers solver : Solvers.values()) {
       junitParams.add(new Object[] {solver, "normal"});
       junitParams.add(new Object[] {solver, "itp"});
       junitParams.add(new Object[] {solver, "opt"});

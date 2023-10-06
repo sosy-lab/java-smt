@@ -49,7 +49,7 @@ public class SolverStackTest extends SolverBasedTest0 {
   @Parameters(name = "{0} (interpolation={1}}")
   public static List<Object[]> getAllCombinations() {
     List<Object[]> result = new ArrayList<>();
-    for (Solvers solver : new Solvers[] {Solvers.OPENSMT}) {
+    for (Solvers solver : Solvers.values()) {
       result.add(new Object[] {solver, false});
       result.add(new Object[] {solver, true});
     }

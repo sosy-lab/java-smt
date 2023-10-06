@@ -41,7 +41,7 @@ public class SolverTacticsTest extends SolverBasedTest0 {
 
   @Parameters(name = "{0}")
   public static Object[] getAllSolvers() {
-    return new Object[] {Solvers.OPENSMT};
+    return Solvers.values();
   }
 
   @Parameter public Solvers solver;

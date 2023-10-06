@@ -24,7 +24,7 @@ public class VariableNamesInvalidTest extends SolverBasedTest0 {
 
   @Parameters(name = "{0}")
   public static Object[] getSolvers() {
-    return new Object[] {Solvers.OPENSMT};
+    return Solvers.values();
   }
 
   @Parameter(0)

@@ -37,7 +37,7 @@ public class TimeoutTest extends SolverBasedTest0 {
   @Parameters(name = "{0} with delay {1}")
   public static List<Object[]> getAllSolvers() {
     List<Object[]> lst = new ArrayList<>();
-    for (Solvers solver : new Solvers[] {Solvers.OPENSMT}) {
+    for (Solvers solver : Solvers.values()) {
       for (int delay : DELAYS) {
         lst.add(new Object[] {solver, delay});
       }

@@ -41,7 +41,7 @@ public class InterpolatingProverTest extends SolverBasedTest0 {
 
   @Parameters(name = "{0}")
   public static Solvers[] getAllCombinations() {
-    return new Solvers[] {Solvers.OPENSMT};
+    return Solvers.values();
   }
 
   @Parameter(0)
