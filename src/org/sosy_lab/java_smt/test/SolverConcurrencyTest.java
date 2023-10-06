@@ -172,7 +172,7 @@ public class SolverConcurrencyTest {
    * concurrently).
    */
   @Test
-    public void testIntConcurrencyWithConcurrentContext() {
+  public void testIntConcurrencyWithConcurrentContext() {
     requireIntegers();
     assertConcurrency(
         "testIntConcurrencyWithConcurrentContext",
@@ -215,7 +215,7 @@ public class SolverConcurrencyTest {
         .withMessage("Solver does not support translation of formulas")
         .that(solver)
         .isNoneOf(Solvers.CVC4, Solvers.PRINCESS, Solvers.CVC5);
-  
+    /** Helperclass to pack a SolverContext together with a Formula */
     class ContextAndFormula {
       private final SolverContext context;
       private final BooleanFormula formula;
@@ -409,7 +409,6 @@ public class SolverConcurrencyTest {
    * @param context used context for the test-thread (Do not reuse contexts unless you know what you
    *     are doing!)
    */
-  @SuppressWarnings("unused")
   private void intConcurrencyTest(SolverContext context)
       throws SolverException, InterruptedException {
     FormulaManager mgr = context.getFormulaManager();

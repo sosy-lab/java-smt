@@ -56,13 +56,7 @@ public class TranslateFormulaTest {
   @Parameters(name = "{index}: {0} --> {1}")
   public static List<Object[]> getSolverCombinations() {
     List<Solvers> solvers = Arrays.asList(Solvers.values());
-    List<Object[]> fromTo = new ArrayList<>();
-    for (List<Solvers> entry : Lists.cartesianProduct(solvers, solvers)) {
-      if (entry.contains(Solvers.OPENSMT)) {
-        fromTo.add(entry.toArray());
-      }
-    }
-    return fromTo;
+    return Lists.transform(Lists.cartesianProduct(solvers, solvers), List::toArray);
   }
 
   @Before
@@ -96,7 +90,6 @@ public class TranslateFormulaTest {
     }
   }
 
-  @SuppressWarnings("unused")
   private void requireParserTo() {
     assume()
         .withMessage("Solver %s does not support parsing formulae", translateTo)
@@ -104,7 +97,6 @@ public class TranslateFormulaTest {
         .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2, Solvers.CVC5);
   }
 
-  @SuppressWarnings("unused")
   private void requireParserFrom() {
     assume()
         .withMessage("Solver %s does not support parsing formulae", translateFrom)
@@ -112,7 +104,6 @@ public class TranslateFormulaTest {
         .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2, Solvers.CVC5);
   }
 
-  @SuppressWarnings("unused")
   private void requireIntegers() {
     assume()
         .withMessage("Solver %s does not support integer theory", translateFrom)

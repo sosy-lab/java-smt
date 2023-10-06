@@ -96,7 +96,6 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
         .setOption("solver.nonLinearArithmetic", nonLinearArithmetic.name());
   }
 
-  @SuppressWarnings("unused")
   private T handleExpectedException(Supplier<T> supplier) {
     try {
       return supplier.get();
@@ -110,7 +109,6 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
     }
   }
 
-  @SuppressWarnings("unused")
   private void assertExpectedUnsatifiabilityForNonLinearArithmetic(BooleanFormula f)
       throws SolverException, InterruptedException {
     if (nonLinearArithmetic == NonLinearArithmetic.USE

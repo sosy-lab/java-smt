@@ -1219,7 +1219,7 @@ public class ModelTest extends SolverBasedTest0 {
         ImmutableList.of(BigInteger.valueOf(5)));
   }
 
-  @Test /*(expected = IllegalArgumentException.class)*/
+  @Test(expected = IllegalArgumentException.class)
   @SuppressWarnings("CheckReturnValue")
   public void testGetArrays4invalid() throws SolverException, InterruptedException {
     requireParser();

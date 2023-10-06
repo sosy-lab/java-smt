@@ -398,7 +398,7 @@ public class SolverTheoriesTest extends SolverBasedTest0 {
     }
 
     // TODO negative case is disabled, because we would need the option
-    // solver.solver.useNonLinearIntegerArithmetic=true.    // XAlloc.h
+    // solver.solver.useNonLinearIntegerArithmetic=true.
 
   }
 
