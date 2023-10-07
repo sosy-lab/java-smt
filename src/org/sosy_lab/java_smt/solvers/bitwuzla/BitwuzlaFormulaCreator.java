@@ -23,6 +23,7 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.*;
 
+import com.google.common.base.Splitter;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Table;
@@ -33,6 +34,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -76,7 +78,8 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
   // system instead use bitwuzla_mk_fp_value_from_real somehow or convert myself
   @Override
   public Long getFloatingPointType(FloatingPointType type) {
-    long fpSort = bitwuzlaJNI.bitwuzla_mk_fp_sort(type.getExponentSize(), type.getMantissaSize());
+    long fpSort =
+        bitwuzlaJNI.bitwuzla_mk_fp_sort(type.getExponentSize(), type.getMantissaSize() + 1);
     return fpSort;
   }
 
@@ -135,7 +138,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
     // UFs play by different rules. For them, we need to extract the domain
     if (bitwuzlaJNI.bitwuzla_sort_is_fp(pSort)) {
       long exponent = bitwuzlaJNI.bitwuzla_sort_fp_get_exp_size(pSort);
-      long mantissa = bitwuzlaJNI.bitwuzla_sort_fp_get_sig_size(pSort);
+      long mantissa = bitwuzlaJNI.bitwuzla_sort_fp_get_sig_size(pSort) - 1;
       return FormulaType.getFloatingPointType((int) exponent, (int) mantissa);
     } else if (bitwuzlaJNI.bitwuzla_sort_is_bv(pSort)) {
       return FormulaType.getBitvectorTypeWithSize(
@@ -149,7 +152,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
     } else if (bitwuzlaJNI.bitwuzla_sort_is_bool(pSort)) {
       return FormulaType.BooleanType;
     } else if (bitwuzlaJNI.bitwuzla_sort_is_rm(pSort)) {
-      // return FormulaType.FloatingPointRoundingModeType;
+      return FormulaType.FloatingPointRoundingModeType;
     }
 
     throw new UnsupportedOperationException(
@@ -319,8 +322,8 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
   @SuppressWarnings("unchecked")
   @Override
   public <T extends Formula> FormulaType<T> getFormulaType(T pFormula) {
+    long sort = bitwuzlaJNI.bitwuzla_term_get_sort(extractInfo(pFormula));
     if (pFormula instanceof BitvectorFormula) {
-      long sort = bitwuzlaJNI.bitwuzla_term_get_sort(extractInfo(pFormula));
       checkArgument(
           bitwuzlaJNI.bitwuzla_sort_is_bv(sort),
           "BitvectorFormula with type missmatch: %s",
@@ -332,6 +335,19 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
       FormulaType<T> arrayIndexType = getArrayFormulaIndexType((ArrayFormula<T, T>) pFormula);
       FormulaType<T> arrayElementType = getArrayFormulaElementType((ArrayFormula<T, T>) pFormula);
       return (FormulaType<T>) FormulaType.getArrayType(arrayIndexType, arrayElementType);
+    } else if (pFormula instanceof FloatingPointFormula) {
+      if (!bitwuzlaJNI.bitwuzla_sort_is_fp(sort)) {
+        throw new IllegalArgumentException(
+            "FloatingPointFormula with actual type "
+                + bitwuzlaJNI.bitwuzla_sort_to_string(sort)
+                + ": "
+                + pFormula);
+      }
+      int exp = (int) bitwuzlaJNI.bitwuzla_sort_fp_get_exp_size(sort);
+      int man = (int) bitwuzlaJNI.bitwuzla_sort_fp_get_sig_size(sort) - 1;
+      return (FormulaType<T>) FormulaType.getFloatingPointType(exp, man);
+    } else if (bitwuzlaJNI.bitwuzla_sort_is_rm(sort)) {
+      return (FormulaType<T>) FormulaType.FloatingPointRoundingModeType;
     }
     return super.getFormulaType(pFormula);
   }
@@ -529,13 +545,17 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
       throw new AssertionError("Error: Unknown sort and term");
     } else {
       value = bitwuzlaJNI.bitwuzla_term_to_string(term);
-      if (value.contains("#b")) {
+      if (value.startsWith("#b")) {
         // Bitvectors in Bitwuzla start with a #b
         return new BigInteger(value.substring(2), 2);
       } else if (value.equals("true")) {
         return true;
       } else if (value.equals("false")) {
         return false;
+      } else if (value.startsWith("(fp")) {
+        return bigDecimalFromIEEE754FP(term);
+      } else if (bitwuzlaJNI.bitwuzla_sort_is_rm(sort)) {
+        return value;
       }
     }
 
@@ -543,5 +563,55 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
         "Error: Could not convert term to value; Unknown sort and term. "
             + "Value: "
             + bitwuzlaJNI.bitwuzla_term_to_string(term));
+  }
+
+  private BigDecimal bigDecimalFromIEEE754FP(long term) {
+    // This is basically impossible to get right in Java.... wait for the methof of the devs
+    String value = bitwuzlaJNI.bitwuzla_term_to_string(term);
+    // FP of the form: (fp #bx #bxxxx #bxxxxxxxxxx)
+    // With x being bitvectors (Signed, exp, mantissa)
+    // Strip the (fp and the trailing )
+    value = value.substring(3, value.length() - 1);
+    // Split by _#b, recieve the 3 BVs
+    List<String> values =
+        Splitter.on("#b").splitToList(value.trim()).stream()
+            .filter(n -> !n.isEmpty())
+            .map(n -> n.trim())
+            .collect(Collectors.toList());
+    int exp = new BigInteger(values.get(1), 2).intValueExact();
+    int normalizedExp = exp - ((int) Math.pow(2, (values.get(1).length() - 1))) - 1;
+    int man0 = new BigInteger(values.get(2), 2).intValueExact();
+    int signBit = new BigInteger(values.get(0), 2).intValueExact();
+    if (exp == 0 && man0 == 0) {
+      // Special IEEE 754 case for 0
+      if (signBit == 1) {
+        // -0.0
+
+      }
+      return BigDecimal.ZERO;
+    }
+    // Now build the value
+    BigDecimal sign = BigDecimal.valueOf(-1).pow(signBit);
+    BigDecimal twoPowNormExp = BigDecimal.valueOf(2).pow(normalizedExp);
+    // First remove trailing 0s from mantissa
+    String mantissaString = values.get(2);
+    for (int i = mantissaString.length() - 1; i < 0; i--) {
+      char ch = mantissaString.charAt(i);
+      if (ch != 0) {
+        break;
+      }
+      // It is probably better to handle this as a char array
+      mantissaString = mantissaString.substring(0, mantissaString.length() - 1);
+    }
+    // Build mantissa magnitude
+    BigDecimal mant = BigDecimal.ZERO;
+    for (int i = 0; i < mantissaString.length(); i++) {
+      char bit = mantissaString.charAt(i);
+      if (bit == '1') {
+        mant = mant.add(BigDecimal.valueOf(2).pow(-(i + 1)));
+      }
+    }
+    mant = mant.add(BigDecimal.ONE);
+    return sign.multiply(twoPowNormExp).multiply(mant);
   }
 }
