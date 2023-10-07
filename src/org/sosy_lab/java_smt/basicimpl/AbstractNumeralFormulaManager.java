@@ -413,8 +413,9 @@ public abstract class AbstractNumeralFormulaManager<
   public BooleanFormula greaterThan(ParamFormulaType pNumber1, ParamFormulaType pNumber2) {
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
-
-    return wrapBool(greaterThan(param1, param2));
+    BooleanFormula result = wrapBool(greaterThan(param1, param2));
+    Generator.logGreaterThan(result, pNumber1, pNumber2);
+    return result;
   }
 
   protected abstract TFormulaInfo greaterThan(TFormulaInfo pParam1, TFormulaInfo pParam2);
@@ -423,8 +424,9 @@ public abstract class AbstractNumeralFormulaManager<
   public BooleanFormula greaterOrEquals(ParamFormulaType pNumber1, ParamFormulaType pNumber2) {
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
-
-    return wrapBool(greaterOrEquals(param1, param2));
+    BooleanFormula result = wrapBool(greaterOrEquals(param1, param2));
+    Generator.logGreaterOrEquals(result, pNumber1, pNumber2);
+    return result;
   }
 
   protected abstract TFormulaInfo greaterOrEquals(TFormulaInfo pParam1, TFormulaInfo pParam2);
@@ -433,8 +435,9 @@ public abstract class AbstractNumeralFormulaManager<
   public BooleanFormula lessThan(ParamFormulaType pNumber1, ParamFormulaType pNumber2) {
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
-
-    return wrapBool(lessThan(param1, param2));
+    BooleanFormula result = wrapBool(lessThan(param1, param2));
+    Generator.logLessThan(result, pNumber1, pNumber2);
+    return result;
   }
 
   protected abstract TFormulaInfo lessThan(TFormulaInfo pParam1, TFormulaInfo pParam2);
@@ -443,8 +446,9 @@ public abstract class AbstractNumeralFormulaManager<
   public BooleanFormula lessOrEquals(ParamFormulaType pNumber1, ParamFormulaType pNumber2) {
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
-
-    return wrapBool(lessOrEquals(param1, param2));
+    BooleanFormula result = wrapBool(lessOrEquals(param1, param2));
+    Generator.logLessOrEquals(result, pNumber1, pNumber2);
+    return result;
   }
 
   protected abstract TFormulaInfo lessOrEquals(TFormulaInfo pParam1, TFormulaInfo pParam2);
@@ -452,9 +456,15 @@ public abstract class AbstractNumeralFormulaManager<
   @Override
   public IntegerFormula floor(ParamFormulaType number) {
     if (getFormulaCreator().getFormulaType(number) == FormulaType.IntegerType) {
-      return (IntegerFormula) number;
+      IntegerFormula result = (IntegerFormula) number;
+
+      Generator.logFloor(result, number);
+      return result;
     } else {
-      return getFormulaCreator().encapsulate(FormulaType.IntegerType, floor(extractInfo(number)));
+      IntegerFormula result = getFormulaCreator().encapsulate(FormulaType.IntegerType,
+          floor(extractInfo(number)));
+      Generator.logFloor(result, number);
+      return result;
     }
   }
 

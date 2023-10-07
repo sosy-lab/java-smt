@@ -22,6 +22,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.utils.Generator;
 
 @SuppressWarnings("ClassTypeParameterName")
 public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
@@ -56,7 +57,8 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
   @Override
   public BitvectorFormula makeBitvector(int length, IntegerFormula pI) {
     TFormulaInfo param1 = extractInfo(pI);
-    return wrap(makeBitvectorImpl(length, param1));
+    BitvectorFormula result = wrap(makeBitvectorImpl(length, param1));
+    return result;
   }
 
   protected abstract TFormulaInfo makeBitvectorImpl(int length, TFormulaInfo pParam1);
@@ -142,8 +144,9 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     checkSameSize(pNumber1, pNumber2, "compare");
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
-
-    return wrapBool(equal(param1, param2));
+    BooleanFormula result = wrapBool(equal(param1, param2));
+    Generator.logBVEqual(result, pNumber1, pNumber2);
+    return result;
   }
 
   protected abstract TFormulaInfo equal(TFormulaInfo pParam1, TFormulaInfo pParam2);
@@ -243,7 +246,9 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
 
   @Override
   public BitvectorFormula makeBitvector(int pLength, long i) {
-    return wrap(makeBitvectorImpl(pLength, i));
+    BitvectorFormula result = wrap(makeBitvectorImpl(pLength, i));
+    Generator.logMakeBitVector(result, pLength, i);
+    return result;
   }
 
   protected TFormulaInfo makeBitvectorImpl(int pLength, long pI) {

@@ -20,22 +20,25 @@
 
 package org.sosy_lab.java_smt.utils;
 
+import static java.lang.Long.parseLong;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.basicimpl.AbstractFormula;
 
 
 public class Generator {
@@ -60,7 +63,6 @@ public class Generator {
   }
 
   public static String evaluateRecursive(Object constraint) {
-
     RecursiveString methodToEvaluate = executedAggregator
         .stream()
         .filter(x -> x.getResult().equals(constraint))
@@ -109,7 +111,7 @@ public class Generator {
   }
 
   public static void dumpSMTLIB2() throws IOException {
-    String endSMTLIB2 = "(check-sat)\n(get-value (res))\n(get-value (x))\n(exit)";
+    String endSMTLIB2 = "(check-sat)\n(get-value (x))\n(exit)";
     lines.append(endSMTLIB2);
     writeToFile(String.valueOf(lines));
   }
@@ -243,7 +245,12 @@ public class Generator {
 
   public static void logMakeNumber(Object result, String pVar) {
     List<Object> inputParams = new ArrayList<>();
-    inputParams.add(pVar);
+    if (result instanceof IntegerFormula) {
+      String checkedVar = String.valueOf(result);
+      inputParams.add(checkedVar);
+    } else {
+      inputParams.add(pVar);
+    }
     Function<List<Object>, String> saveResult = inPlaceInputParams -> (String) inPlaceInputParams.get(0);
     executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Direct"));
   }
@@ -354,7 +361,7 @@ public class Generator {
   }
 
   public static void logDistinct(Object result, List operands) {
-    Set<Object> test = new HashSet<>(operands);
+    HashSet test = new HashSet<>(operands);
     List<Object> inputParams = new ArrayList<>();
     if (test.size() == operands.size()) {
       inputParams.add("true");
@@ -364,6 +371,70 @@ public class Generator {
     Function<List<Object>, String> saveResult = inPlaceInputParams -> (String) inPlaceInputParams.get(0);
     executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Direct"));
   }
+
+  public static void logGreaterThan(Object result, Object pNumber1, Object pNumber2) {
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(pNumber1);
+    inputParams.add(pNumber2);
+    Function<List<Object>, String> saveResult =
+        inPlaceInputParams -> "(> " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+  }
+
+  public static void logGreaterOrEquals(Object result, Object pNumber1, Object pNumber2) {
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(pNumber1);
+    inputParams.add(pNumber2);
+    Function<List<Object>, String> saveResult =
+        inPlaceInputParams -> "(>= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+  }
+
+  public static void logLessThan(Object result, Object pNumber1, Object pNumber2) {
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(pNumber1);
+    inputParams.add(pNumber2);
+    Function<List<Object>, String> saveResult =
+        inPlaceInputParams -> "(< " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+  }
+
+  public static void logLessOrEquals(Object result, Object pNumber1, Object pNumber2) {
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(pNumber1);
+    inputParams.add(pNumber2);
+    Function<List<Object>, String> saveResult =
+        inPlaceInputParams -> "(<= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+  }
+
+  public static void logFloor(Object result, Object number) {
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(number);
+    Function<List<Object>, String> saveResult =
+        inPlaceInputParams -> "(to_int " + inPlaceInputParams.get(0) + ")";
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+  }
+
+  public static void logMakeBitVector(Object result, int length, long i) {
+      List<Object> inputParams = new ArrayList<>();
+      inputParams.add(Long.toString(length));
+      inputParams.add(Long.toString(i));
+      Function<List<Object>, String> saveResult =
+          inPlaceInputParams -> "#b" + Long.toBinaryString(parseLong((String)inPlaceInputParams.get(1)));
+      executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+  }
+  public static void logBVEqual(Object result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(pNumber1);
+    inputParams.add(pNumber2);
+    Function<List<Object>, String> saveResult =
+        inPlaceInputParams -> "(bvult " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+  }
+
+
+
 
 
 }

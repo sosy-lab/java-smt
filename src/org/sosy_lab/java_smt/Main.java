@@ -20,6 +20,7 @@ package org.sosy_lab.java_smt;/*
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.Inet4Address;
 import java.util.ArrayList;
 import java.util.List;
 import org.sosy_lab.common.*;
@@ -30,6 +31,7 @@ import org.sosy_lab.java_smt.api.*;
 import org.sosy_lab.common.log.*;
 import java.io.*;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 
 public class Main {
   public static void main(String[] args)
@@ -45,35 +47,19 @@ public class Main {
     FormulaManager fmgr = context.getFormulaManager();
     BooleanFormulaManager bmgr = fmgr.getBooleanFormulaManager();
     IntegerFormulaManager imgr = fmgr.getIntegerFormulaManager();
+    BitvectorFormulaManager bimgr = fmgr.getBitvectorFormulaManager();
 
+    BitvectorFormula a = bimgr.makeBitvector(6, 5);
+    BitvectorFormula b = bimgr.makeBitvector(6, 004);
+    BooleanFormula constraint = bimgr.equal(a, b);
 
-    IntegerFormula one = imgr.makeNumber(1);
-    IntegerFormula two = imgr.makeNumber(2);
-    IntegerFormula three = imgr.makeNumber(3);
-    IntegerFormula four = imgr.makeNumber(4);
-
-    List<IntegerFormula> testAdd = new ArrayList<IntegerFormula>();
-    testAdd.add(two);
-    testAdd.add(three);BooleanFormula a = bmgr.makeVariable("a");
-    testAdd.add(four);
-
-    IntegerFormula x = imgr.makeVariable("x");
-    BooleanFormula y = bmgr.makeVariable("y");
-    BooleanFormula z = bmgr.makeVariable("z");
-    BooleanFormula c = bmgr.makeVariable("c");
-    BooleanFormula b = bmgr.makeVariable("b");
-    BooleanFormula res = bmgr.makeVariable("res");
-
-    //BooleanFormula constraint = imgr.equal (x, imgr.add(one, imgr.negate(two)));
-    BooleanFormula constraint2 = imgr.distinct(testAdd);
-    IntegerFormula d = imgr.multiply(two, three);
-    BooleanFormula constraint3 = imgr.equal(x, d);
+    System.out.println(a);
+    System.out.println(b);
+    System.out.println(constraint);
 
     try (ProverEnvironment prover =
              context.newProverEnvironment(SolverContext.ProverOptions.GENERATE_MODELS)) {
-      //prover.addConstraint(constraint);
-      prover.addConstraint(constraint2);
-      //prover.addConstraint(constraint3);
+      prover.addConstraint(constraint);
 
 
       boolean isUnsat = prover.isUnsat();
