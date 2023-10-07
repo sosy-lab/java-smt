@@ -65,15 +65,15 @@ public class Main {
     BooleanFormula res = bmgr.makeVariable("res");
 
     //BooleanFormula constraint = imgr.equal (x, imgr.add(one, imgr.negate(two)));
-    BooleanFormula constraint2 = bmgr.equivalence(res, bmgr.and(y,z, a, b));
-    IntegerFormula d = imgr.subtract(two, three);
-    BooleanFormula constraint3 = imgr.modularCongruence(three, two, 4);
+    BooleanFormula constraint2 = imgr.distinct(testAdd);
+    IntegerFormula d = imgr.multiply(two, three);
+    BooleanFormula constraint3 = imgr.equal(x, d);
 
     try (ProverEnvironment prover =
              context.newProverEnvironment(SolverContext.ProverOptions.GENERATE_MODELS)) {
       //prover.addConstraint(constraint);
       prover.addConstraint(constraint2);
-      prover.addConstraint(constraint3);
+      //prover.addConstraint(constraint3);
 
 
       boolean isUnsat = prover.isUnsat();

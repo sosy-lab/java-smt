@@ -23,11 +23,15 @@ package org.sosy_lab.java_smt.utils;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -56,7 +60,6 @@ public class Generator {
   }
 
   public static String evaluateRecursive(Object constraint) {
-
 
     RecursiveString methodToEvaluate = executedAggregator
         .stream()
@@ -328,6 +331,38 @@ public class Generator {
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(= (mod " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(2) + ") (mod " + inPlaceInputParams.get(1) + " " + inPlaceInputParams.get(2) + "))";
     executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+  }
+
+  public static void logModularCongruence(Object result, Object pNumber1, Object pNumber2,
+                                          BigInteger pModulo) {
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(pNumber1);
+    inputParams.add(pNumber2);
+    inputParams.add(pModulo.toString());
+    Function<List<Object>, String> saveResult =
+        inPlaceInputParams -> "(= (mod " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(2) + ") (mod " + inPlaceInputParams.get(1) + " " + inPlaceInputParams.get(2) + "))";
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+  }
+
+  public static void logMultiply(Object result, Object pNumber1, Object pNumber2) {
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(pNumber1);
+    inputParams.add(pNumber2);
+    Function<List<Object>, String> saveResult =
+        inPlaceInputParams -> "(* " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+  }
+
+  public static void logDistinct(Object result, List operands) {
+    Set<Object> test = new HashSet<>(operands);
+    List<Object> inputParams = new ArrayList<>();
+    if (test.size() == operands.size()) {
+      inputParams.add("true");
+    } else {
+      inputParams.add("false");
+    }
+    Function<List<Object>, String> saveResult = inPlaceInputParams -> (String) inPlaceInputParams.get(0);
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Direct"));
   }
 
 

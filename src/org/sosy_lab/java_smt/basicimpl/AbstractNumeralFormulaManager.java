@@ -327,7 +327,9 @@ public abstract class AbstractNumeralFormulaManager<
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
 
-    return wrapBool(modularCongruence(param1, param2, pModulo));
+    BooleanFormula result = wrapBool(modularCongruence(param1, param2, pModulo));
+    Generator.logModularCongruence(result, pNumber1, pNumber2, pModulo);
+    return result;
   }
 
   /**
@@ -372,6 +374,7 @@ public abstract class AbstractNumeralFormulaManager<
         }
       }
     }
+    Generator.logMultiply(wrap(result), pNumber1, pNumber2);
     return wrap(result);
   }
 
@@ -399,7 +402,9 @@ public abstract class AbstractNumeralFormulaManager<
 
   @Override
   public BooleanFormula distinct(List<ParamFormulaType> pNumbers) {
-    return wrapBool(distinctImpl(Lists.transform(pNumbers, this::extractInfo)));
+    BooleanFormula result =  wrapBool(distinctImpl(Lists.transform(pNumbers, this::extractInfo)));
+    Generator.logDistinct(result, pNumbers);
+    return result;
   }
 
   protected abstract TFormulaInfo distinctImpl(List<TFormulaInfo> pNumbers);
