@@ -73,7 +73,7 @@ public class BitwuzlaFloatingPointManager
 
   @Override
   protected Long makeNumberImpl(double n, FloatingPointType type, Long pFloatingPointRoundingMode) {
-    return makeNumberImpl(Double.toString(n), type, pFloatingPointRoundingMode);
+    return makeNumberImpl(String.format("%f", n), type, pFloatingPointRoundingMode);
   }
 
   private long mkFpaSort(FloatingPointType pType) {
@@ -83,17 +83,7 @@ public class BitwuzlaFloatingPointManager
   @Override
   protected Long makeNumberAndRound(
       String pN, FloatingPointType pType, Long pFloatingPointRoundingMode) {
-    long pUnrounded = makeVariableImpl(pN, pType);
-    long e = bitwuzlaJNI.bitwuzla_term_fp_get_exp_size(pUnrounded);
-    long s = bitwuzlaJNI.bitwuzla_term_fp_get_sig_size(pUnrounded);
-    long pRounded =
-        bitwuzlaJNI.bitwuzla_mk_term2_indexed2(
-            BITWUZLA_KIND_FP_TO_FP_FROM_FP.swigValue(),
-            pFloatingPointRoundingMode,
-            pUnrounded,
-            e,
-            s);
-    return pRounded;
+    return bitwuzlaJNI.bitwuzla_mk_fp_from_real(mkFpaSort(pType), pFloatingPointRoundingMode, pN);
   }
 
   @Override
@@ -126,7 +116,7 @@ public class BitwuzlaFloatingPointManager
           pRoundingMode,
           pNumber,
           targetType.getExponentSize(),
-          targetType.getMantissaSize());
+          targetType.getMantissaSize() + 1);
     } else if (pTargetType.isBitvectorType()) {
       FormulaType.BitvectorType targetType = (FormulaType.BitvectorType) pTargetType;
       if (pSigned) {
@@ -178,8 +168,6 @@ public class BitwuzlaFloatingPointManager
         pTargetType.getMantissaSize() + 1);
   }
 
-  // TODO Should this be to unsigned or signed BV? Is the Roundingmode correct? Is this perhaps
-  // just not supported by Bitwuzla?
   @Override
   protected Long toIeeeBitvectorImpl(Long pNumber) {
     long pRoundingMode =
@@ -302,7 +290,7 @@ public class BitwuzlaFloatingPointManager
 
   @Override
   protected Long round(Long pFormula, FloatingPointRoundingMode pRoundingMode) {
-    return bitwuzlaJNI.bitwuzla_mk_term2(
-        BITWUZLA_KIND_FP_IS_NAN.swigValue(), getRoundingModeImpl(pRoundingMode), pFormula);
+    // But we could round to sBV and uBV
+    throw new UnsupportedOperationException("Bitwuzla can not round to int.");
   }
 }
