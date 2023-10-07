@@ -29,7 +29,6 @@ import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -91,7 +90,6 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
   private final long randomSeed;
 
   private boolean closed = false;
-  private final AtomicBoolean isAnyStackAlive = new AtomicBoolean(false);
 
   BitwuzlaSolverContext(
       BitwuzlaFormulaManager pManager,
@@ -210,7 +208,7 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
     Preconditions.checkState(!closed, "solver context is already closed");
 
     return new BitwuzlaTheoremProver(
-        manager, creator, shutdownNotifier, options, settings, randomSeed, isAnyStackAlive);
+        manager, creator, shutdownNotifier, options, settings, randomSeed);
   }
 
   @Override

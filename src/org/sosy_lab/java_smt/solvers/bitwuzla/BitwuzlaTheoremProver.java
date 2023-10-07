@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -57,8 +56,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
       ShutdownNotifier pShutdownNotifier,
       Set<ProverOptions> pOptions,
       BitwuzlaSettings pSettings,
-      long pRandomSeed,
-      AtomicBoolean pIsAnyStackAlive) {
+      long pRandomSeed) {
     super(pOptions, pManager.getBooleanFormulaManager(), pShutdownNotifier);
     manager = pManager;
     creator = pCreator;
@@ -74,6 +72,16 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
     if (pFurtherOptions.contains(ProverOptions.GENERATE_MODELS)) {
       bitwuzlaJNI.bitwuzla_set_option(
           options, BitwuzlaOption.BITWUZLA_OPT_PRODUCE_MODELS.swigValue(), 2);
+    }
+
+    if (pFurtherOptions.contains(ProverOptions.GENERATE_UNSAT_CORE)) {
+      bitwuzlaJNI.bitwuzla_set_option(
+          options, BitwuzlaOption.BITWUZLA_OPT_PRODUCE_UNSAT_CORES.swigValue(), 2);
+    }
+
+    if (pFurtherOptions.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
+      bitwuzlaJNI.bitwuzla_set_option(
+          options, BitwuzlaOption.BITWUZLA_OPT_PRODUCE_UNSAT_ASSUMPTIONS.swigValue(), 2);
     }
     // TODO: termination callback
     // bitwuzlaJNI.bitwuzla_set_termination_callback();
@@ -243,26 +251,13 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
     super.close();
   }
 
-  //  /**
-  //   * Get all satisfying assignments of the current environment with regard to a subset of terms,
-  // and
-  //   * create a region representing all those models.
-  //   *
-  //   * @param callback
-  //   * @param important A set of (positive) variables appearing in the asserted queries. Only
-  // these
-  //   *     variables will appear in the region.
-  //   * @return A region representing all satisfying models of the formula.
-  //   */
-  //  @Override
-  //  public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
-  //      throws InterruptedException, SolverException {
-  //    return null;
-  //  }
-
   @Override
   protected BitwuzlaModel getEvaluatorWithoutChecks() {
     return new BitwuzlaModel(
         env, this, creator, Collections2.transform(getAssertedFormulas(), creator::extractInfo));
+  }
+
+  public boolean isClosed() {
+    return closed;
   }
 }
