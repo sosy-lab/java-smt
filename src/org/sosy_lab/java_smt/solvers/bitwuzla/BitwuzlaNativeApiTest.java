@@ -10,6 +10,7 @@ import org.junit.After;
 import org.junit.AssumptionViolatedException;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.sosy_lab.common.NativeLibraries;
 
@@ -293,7 +294,7 @@ public class BitwuzlaNativeApiTest {
   }
 
   @Test
-  public void testBvArrayModel() {
+  public void testBvArrayModelStore() {
     long bvSort4 = bitwuzlaJNI.bitwuzla_mk_bv_sort(4);
     long bvSort8 = bitwuzlaJNI.bitwuzla_mk_bv_sort(8);
     long sortArr = bitwuzlaJNI.bitwuzla_mk_array_sort(bvSort4, bvSort8);
@@ -337,13 +338,17 @@ public class BitwuzlaNativeApiTest {
     assertEquals("#b0001", bitwuzlaJNI.bitwuzla_term_to_string(one));
     assertEquals("#b0000", bitwuzlaJNI.bitwuzla_term_to_string(zero));
 
+    assertTrue(bitwuzlaJNI.bitwuzla_term_is_array(arrWVarAt1));
+    assertTrue(bitwuzlaJNI.bitwuzla_term_is_array(arr));
+
     // Getting the model of the array prints the SMTLIB2 representation
-    String arrWVarAt1Value =
-        bitwuzlaJNI.bitwuzla_term_to_string(bitwuzlaJNI.bitwuzla_get_value(bitwuzla, arrWVarAt1));
+    long valueArrWVarAt1 = bitwuzlaJNI.bitwuzla_get_value(bitwuzla, arrWVarAt1);
+    // The value of an STORE expression is not really helpful, see string below
+    String arrWVarAt1ValueString = bitwuzlaJNI.bitwuzla_term_to_string(valueArrWVarAt1);
     assertEquals(
         "(store (store ((as const (Array (_ BitVec 4) (_ BitVec 8))) #b00000000) #b0000 #b00001011)"
             + " #b0001 #b00001011)",
-        arrWVarAt1Value);
+        arrWVarAt1ValueString);
 
     // We can access the children of the arrays
     long[] sizeArr = new long[1];
@@ -365,6 +370,56 @@ public class BitwuzlaNativeApiTest {
     long[] children3 = bitwuzlaJNI.bitwuzla_term_get_children(arr, sizeArr);
     assertEquals(0, children3.length);
     assertEquals(0, sizeArr[0]);
+  }
+
+  @Test
+  public void testBvArrayModelSelect() {
+    long bvSort4 = bitwuzlaJNI.bitwuzla_mk_bv_sort(4);
+    long bvSort8 = bitwuzlaJNI.bitwuzla_mk_bv_sort(8);
+    long sortArr = bitwuzlaJNI.bitwuzla_mk_array_sort(bvSort4, bvSort8);
+
+    long eleven = bitwuzlaJNI.bitwuzla_mk_bv_value_uint64(bvSort8, 11);
+    long zero = bitwuzlaJNI.bitwuzla_mk_bv_zero(bvSort4);
+    long one = bitwuzlaJNI.bitwuzla_mk_bv_one(bvSort4);
+
+    long arr = bitwuzlaJNI.bitwuzla_mk_const(sortArr, "arr");
+
+    // Array arr[0] == (store arr[1] 11))[1]
+    long selectArrAtZero =
+        bitwuzlaJNI.bitwuzla_mk_term2(
+            BitwuzlaKind.BITWUZLA_KIND_ARRAY_SELECT.swigValue(), arr, zero);
+    long arrWElevenAt1 =
+        bitwuzlaJNI.bitwuzla_mk_term3(
+            BitwuzlaKind.BITWUZLA_KIND_ARRAY_STORE.swigValue(), arr, one, eleven);
+    long selectArrWElevenAtOne =
+        bitwuzlaJNI.bitwuzla_mk_term2(
+            BitwuzlaKind.BITWUZLA_KIND_ARRAY_SELECT.swigValue(), arrWElevenAt1, one);
+    long eq =
+        bitwuzlaJNI.bitwuzla_mk_term2(
+            BitwuzlaKind.BITWUZLA_KIND_EQUAL.swigValue(), selectArrAtZero, selectArrWElevenAtOne);
+
+    bitwuzlaJNI.bitwuzla_assert(bitwuzla, eq);
+    long res = bitwuzlaJNI.bitwuzla_check_sat(bitwuzla);
+    assertEquals(res, BitwuzlaResult.BITWUZLA_SAT.swigValue());
+
+    String arrAtZeroString = bitwuzlaJNI.bitwuzla_term_get_symbol(selectArrAtZero);
+    assertEquals(null, arrAtZeroString);
+    // Get model value arr[0] as String
+    String arrAtZeroValueString =
+        bitwuzlaJNI.bitwuzla_term_value_get_str(
+            bitwuzlaJNI.bitwuzla_get_value(bitwuzla, selectArrAtZero));
+    // 00001011 == 11
+    assertEquals("00001011", arrAtZeroValueString);
+
+    // Arrays w 2 children are structured in the following way:
+    // {starting array, index} in "we select index from array"
+    // Just declared (empty) arrays return an empty children array
+    long[] children = bitwuzlaJNI.bitwuzla_term_get_children(selectArrAtZero, new long[1]);
+    assertEquals(2, children.length);
+    assertEquals(arr, children[0]);
+    String arrSymbol = bitwuzlaJNI.bitwuzla_term_get_symbol(children[0]);
+    assertEquals("arr", arrSymbol);
+    assertEquals(zero, children[1]);
   }
 
   @Test
@@ -468,7 +523,8 @@ public class BitwuzlaNativeApiTest {
     long rm = bitwuzlaJNI.bitwuzla_mk_rm_value(bitwuzlaJNI.BITWUZLA_RM_RNE_get());
     long a = bitwuzlaJNI.bitwuzla_mk_const(fpSort, "a");
     long one = bitwuzlaJNI.bitwuzla_mk_fp_from_real(fpSort, rm, "1");
-    long two = bitwuzlaJNI.bitwuzla_mk_fp_from_real(fpSort, rm, "2");
+    // Rational with 0 (or only 0s) as the second argument crashes Bitwuzla!
+    long two = bitwuzlaJNI.bitwuzla_mk_fp_from_rational(fpSort, rm, "2", "1");
 
     // 1 + 2 = a
     long add =
@@ -501,7 +557,7 @@ public class BitwuzlaNativeApiTest {
     long two = bitwuzlaJNI.bitwuzla_mk_fp_from_real(fpSort, rm, "2");
 
     long boolSort = bitwuzlaJNI.bitwuzla_mk_bool_sort();
-    long res = bitwuzlaJNI.bitwuzla_mk_const(boolSort, "res");
+    //    long res = bitwuzlaJNI.bitwuzla_mk_const(boolSort, "res");
     long bvSort8 = bitwuzlaJNI.bitwuzla_mk_bv_sort(8);
     long arg1 = bitwuzlaJNI.bitwuzla_mk_const(bvSort8, "arg1");
     long arg2 = bitwuzlaJNI.bitwuzla_mk_bv_value_uint64(bvSort8, 11);
@@ -537,14 +593,12 @@ public class BitwuzlaNativeApiTest {
     long eq = bitwuzlaJNI.bitwuzla_mk_term2(BitwuzlaKind.BITWUZLA_KIND_EQUAL.swigValue(), add, a);
     long neg = bitwuzlaJNI.bitwuzla_mk_term1(BitwuzlaKind.BITWUZLA_KIND_NOT.swigValue(), eq);
 
-    /*
-        System.out.println(Arrays.toString(bitwuzlaJNI.bitwuzla_term_get_children(add, new long[1])));
-        System.out.println(bitwuzlaJNI.bitwuzla_kind_to_string(bitwuzlaJNI.bitwuzla_term_get_kind(add)));
-        System.out.println(Arrays.toString(bitwuzlaJNI.bitwuzla_term_get_children(eq, new long[1])));
-        System.out.println(bitwuzlaJNI.bitwuzla_kind_to_string(bitwuzlaJNI.bitwuzla_term_get_kind(eq)));
-        System.out.println(Arrays.toString(bitwuzlaJNI.bitwuzla_term_get_children(neg, new long[1])));
-        System.out.println(bitwuzlaJNI.bitwuzla_kind_to_string(bitwuzlaJNI.bitwuzla_term_get_kind(neg)));
-    */
+    // The type of add is fp (a bv add would be bv)
+    assertTrue(bitwuzlaJNI.bitwuzla_term_is_fp(add));
+    // eq is bool
+    assertTrue(bitwuzlaJNI.bitwuzla_term_is_bool(eq));
+    // neg is also bool
+    assertTrue(bitwuzlaJNI.bitwuzla_term_is_bool(neg));
 
     // Non-UF functions consist of a KIND and arguments.
     // You can get the KIND w bitwuzla_term_get_kind() and the arguments in the correct order w
@@ -599,5 +653,44 @@ public class BitwuzlaNativeApiTest {
     assertFalse(bitwuzlaJNI.bitwuzla_sort_is_array(oneSort));
 
     assertEquals("(fp #b0 #b01111 #b0000000000)", bitwuzlaJNI.bitwuzla_term_to_string(one));
+  }
+
+  // Todo:
+  @Ignore
+  @Test
+  public void testExists() {
+    // EXISTS x, y . x = z AND y = z implies x = y
+    long bvSort8 = bitwuzlaJNI.bitwuzla_mk_bv_sort(8);
+    long x = bitwuzlaJNI.bitwuzla_mk_const(bvSort8, "x");
+    long y = bitwuzlaJNI.bitwuzla_mk_const(bvSort8, "y");
+    long z = bitwuzlaJNI.bitwuzla_mk_const(bvSort8, "z");
+
+    long xEqZ = bitwuzlaJNI.bitwuzla_mk_term2(BitwuzlaKind.BITWUZLA_KIND_EQUAL.swigValue(), x, z);
+    long yEqZ = bitwuzlaJNI.bitwuzla_mk_term2(BitwuzlaKind.BITWUZLA_KIND_EQUAL.swigValue(), y, z);
+    long xEqY = bitwuzlaJNI.bitwuzla_mk_term2(BitwuzlaKind.BITWUZLA_KIND_EQUAL.swigValue(), x, y);
+    long formula =
+        bitwuzlaJNI.bitwuzla_mk_term2(
+            BitwuzlaKind.BITWUZLA_KIND_IMPLIES.swigValue(),
+            bitwuzlaJNI.bitwuzla_mk_term2(BitwuzlaKind.BITWUZLA_KIND_AND.swigValue(), xEqZ, yEqZ),
+            xEqY);
+
+    // Substitute the free vars with bound vars
+    long xB = bitwuzlaJNI.bitwuzla_mk_var(bvSort8, "x");
+    long yB = bitwuzlaJNI.bitwuzla_mk_var(bvSort8, "y");
+    // Substitution does not return a new term, but modifies the existing!
+    bitwuzlaJNI.bitwuzla_substitute_terms(
+        1, new long[] {formula}, 2, new long[] {x, y}, new long[] {xB, yB});
+    // Build quantifier
+    long[] argsAndBody = {xB, yB, formula};
+    long ex =
+        bitwuzlaJNI.bitwuzla_mk_term(
+            BitwuzlaKind.BITWUZLA_KIND_FORALL.swigValue(), argsAndBody.length, argsAndBody);
+
+    // Check SAT
+    bitwuzlaJNI.bitwuzla_assert(bitwuzla, ex);
+    long res = bitwuzlaJNI.bitwuzla_check_sat(bitwuzla);
+    assertEquals(res, BitwuzlaResult.BITWUZLA_UNSAT.swigValue());
+
+    // Model
   }
 }
