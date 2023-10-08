@@ -217,7 +217,7 @@ index fc9dbfb7..943a466d 100644
  public:
      static std::string nextFreeArgumentName() { return std::string(template_arg_prefix) + std::to_string(template_arg_counter++); }
 diff --git a/src/logics/Logic.cc b/src/logics/Logic.cc
-index b90430c2..1161b068 100644
+index b90430c2..c4b34fc4 100644
 --- a/src/logics/Logic.cc
 +++ b/src/logics/Logic.cc
 @@ -15,6 +15,7 @@
@@ -237,23 +237,70 @@ index b90430c2..1161b068 100644
  
  const char* Logic::tk_true     = "true";
  const char* Logic::tk_false    = "false";
-@@ -130,12 +131,13 @@ bool Logic::hasQuotableChars(std::string const & name) const
-         0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-         0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-         0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-+        0, 0, 0, 0, 0, 0
-     };
+@@ -97,46 +98,28 @@ bool Logic::isReservedWord(std::string const & name) const {
+ }
  
+ //
+-// Escape the symbol name if it contains a prohibited character from the
+-// list defined by the quotable[] table below
++// Escape the symbol name if it contains a prohibited character.
+ //
+ bool Logic::hasQuotableChars(std::string const & name) const
+ {
+-    // Entry is 1 if the corresponding ascii character requires quoting
+-    const bool quotable[256] =
+-    {
+-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-        0, 0, 1, 0, 1, 1, 0, 0, 0, 1, // <space>, ", #, $, '
+-        1, 1, 0, 0, 1, 0, 0, 0, 0, 0, // (, ), <,>
+-        0, 0, 0, 0, 0, 0, 0, 0, 1, 1, // :, ;
+-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-        0, 1, 0, 1, 0, 0, 1, 0, 0, 0, // [, \, ], `
+-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-        0, 0, 0, 1, 0, 1, 0, 0, 0, 0, // {, }
+-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-    };
+-
      if (name.front() == '|' and name.back() == '|') return false; // Already quoted
  
--    for (auto c : name) {
+     for (auto c : name) {
 -        if (quotable[(int)c])
-+    for (unsigned char c : name) {
-+        if (quotable[c])
-             return true;
+-            return true;
++        switch (c) {
++            case ' ':
++            case '"':
++            case '#':
++            case '$':
++            case '\'':
++            case ':':
++            case ';':
++            case '[':
++            case '\\':
++            case ']':
++            case '{':
++            case '}':
++                return true;
++        }
      }
      return false;
-@@ -150,7 +152,7 @@ std::string Logic::disambiguateName(std::string const & protectedName, SRef sort
+ }
+@@ -150,7 +133,7 @@ std::string Logic::disambiguateName(std::string const & protectedName, SRef sort
          return protectedName;
      }
  
@@ -262,7 +309,7 @@ index b90430c2..1161b068 100644
      auto name = isQuoted(protectedName) ?
              std::string_view(protectedName.data()+1, protectedName.size()-2) : std::string_view(protectedName);
  
-@@ -391,7 +393,7 @@ Logic::getDefaultValue(const PTRef tr) const
+@@ -391,7 +374,7 @@ Logic::getDefaultValue(const PTRef tr) const
  
  PTRef
  Logic::getDefaultValuePTRef(const SRef sref) const {
@@ -271,7 +318,7 @@ index b90430c2..1161b068 100644
      else {
          return defaultValueForSort[sref];
  
-@@ -758,6 +760,18 @@ PTRef Logic::mkBoolVar(const char* name)
+@@ -758,6 +741,18 @@ PTRef Logic::mkBoolVar(const char* name)
      return mkFun(sr, {});
  }
  
@@ -290,7 +337,7 @@ index b90430c2..1161b068 100644
  void Logic::instantiateFunctions(SRef sr)
  {
      // Equality
-@@ -841,12 +855,10 @@ PTRef Logic::insertTerm(SymRef sym, vec<PTRef>&& terms)
+@@ -841,12 +836,10 @@ PTRef Logic::insertTerm(SymRef sym, vec<PTRef>&& terms)
          assert(terms.size() == 0);
          return mkFun(sym, std::move(terms));
      }
@@ -307,7 +354,7 @@ index b90430c2..1161b068 100644
      return mkUninterpFun(sym, std::move(terms));
  }
  
-@@ -1346,14 +1358,14 @@ void Logic::dumpWithLets(std::ostream & dump_out, PTRef formula) const {
+@@ -1346,14 +1339,14 @@ void Logic::dumpWithLets(std::ostream & dump_out, PTRef formula) const {
          if (term.size() > 0) dump_out << ")";
  
          // Closes binding
@@ -324,7 +371,7 @@ index b90430c2..1161b068 100644
  
      // Close all lets
      for (unsigned n = 1; n <= num_lets; n++) dump_out << ")";
-@@ -1488,6 +1500,9 @@ Logic::collectStats(PTRef root, int& n_of_conn, int& n_of_eq, int& n_of_uf, int&
+@@ -1488,6 +1481,9 @@ Logic::collectStats(PTRef root, int& n_of_conn, int& n_of_eq, int& n_of_uf, int&
  
  PTRef Logic::conjoinExtras(PTRef root) { return root; }
  
