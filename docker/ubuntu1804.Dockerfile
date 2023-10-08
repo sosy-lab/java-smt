@@ -31,20 +31,22 @@ RUN apt-get update \
         flex \
         bison \
         libpcre2-dev  \
-        lzip \
- && wget http://prdownloads.sourceforge.net/swig/swig-4.1.1.tar.gz \
+        lzip
+WORKDIR /dependencies
+RUN wget http://prdownloads.sourceforge.net/swig/swig-4.1.1.tar.gz \
  && tar xf swig-4.1.1.tar.gz \
  && cd swig-4.1.1 \
  && ./configure \
- && make \
+ && make -j4 \
  && make install \
- && cd .. \
- && wget https://gmplib.org/download/gmp/gmp-6.2.1.tar.lz \
+ && cd --
+RUN wget https://gmplib.org/download/gmp/gmp-6.2.1.tar.lz \
  && tar xf gmp-6.2.1.tar.lz \
  && cd gmp-6.2.1 \
  && ./configure --enable-cxx --with-pic --disable-shared --enable-fat \
- && make \
- && make install
+ && make -j4 \
+ && make install \
+ && cd --
 
 # Add the user "developer" with UID:1000, GID:1000, home at /developer.
 # This allows to map the docker-internal user to the local user 1000:1000 outside of the container.
