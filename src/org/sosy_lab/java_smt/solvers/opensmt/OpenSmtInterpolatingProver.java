@@ -11,8 +11,10 @@ package org.sosy_lab.java_smt.solvers.opensmt;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.List;
 import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -29,6 +31,11 @@ import org.sosy_lab.java_smt.solvers.opensmt.api.VectorVectorInt;
 class OpenSmtInterpolatingProver extends OpenSmtAbstractProver<Integer>
     implements InterpolatingProverEnvironment<Integer> {
 
+  // OpenSMT internally tracks all asserted formulas in one array and identifies them by index.
+  // The index starts with 1.
+  // We track the number of tracked formulas per level as reference point.
+  private final Deque<Integer> trackedConstraints = new ArrayDeque<>();
+
   OpenSmtInterpolatingProver(
       OpenSmtFormulaCreator pFormulaCreator,
       FormulaManager pMgr,
@@ -41,12 +48,27 @@ class OpenSmtInterpolatingProver extends OpenSmtAbstractProver<Integer>
         pShutdownNotifier,
         getConfigInstance(pSolverOptions, true),
         pOptions);
+    trackedConstraints.push(0); // initialize first level
   }
 
   @Override
   public Integer addConstraintImpl(PTRef f) throws InterruptedException {
     osmtSolver.insertFormula(f);
-    return getAssertedFormulas().size();
+    Integer newId = trackedConstraints.pop() + 1;
+    trackedConstraints.push(newId);
+    return newId;
+  }
+
+  @Override
+  public void push() throws InterruptedException {
+    super.push();
+    trackedConstraints.push(trackedConstraints.peek());
+  }
+
+  @Override
+  public void pop() {
+    trackedConstraints.pop();
+    super.pop();
   }
 
   @Override
