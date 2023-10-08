@@ -2,9 +2,22 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2023 Dirk Beyer <https://www.sosy-lab.org>
 //
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: Apache-2.0 OR MIT
+
+/**
+ * This file provides the SWIG definition for generating Java code and native bindings for the
+ * OpenSMT API.
+ *
+ * This SWIG definition file only provide the required methods, i.e., a manually selected subset
+ * of the full OpenSMT API, to minimize the interaction layer. If further methods are required, we
+ * can extend this file. Several utility methods help to avoid low-level C/C++ structures from
+ * Java code.
+ *
+ * See {build/build-publish-solver.xml} for the SWIG command and further steps towards getting a
+ * static library of OpenSMT.
+ */
 
 %module OsmtNative
 %{
