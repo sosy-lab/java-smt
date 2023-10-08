@@ -16,6 +16,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.EnumerationFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
@@ -149,6 +150,13 @@ abstract class Z3Formula implements Formula {
   @Immutable
   static final class Z3RegexFormula extends Z3Formula implements RegexFormula {
     Z3RegexFormula(long z3context, long z3expr) {
+      super(z3context, z3expr);
+    }
+  }
+
+  @Immutable
+  static final class Z3EnumerationFormula extends Z3Formula implements EnumerationFormula {
+    Z3EnumerationFormula(long z3context, long z3expr) {
       super(z3context, z3expr);
     }
   }

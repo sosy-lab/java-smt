@@ -16,10 +16,6 @@ import com.google.common.truth.Truth;
 import java.util.List;
 import org.junit.AssumptionViolatedException;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -28,21 +24,7 @@ import org.sosy_lab.java_smt.api.SolverException;
  * Uses bitvector theory if there is no integer theory available. Notice: Boolector does not support
  * bitvectors length 1.
  */
-@RunWith(Parameterized.class)
-public class BooleanFormulaManagerTest extends SolverBasedTest0 {
-
-  @Parameters(name = "{0}")
-  public static Object[] getAllSolvers() {
-    return Solvers.values();
-  }
-
-  @Parameter(0)
-  public Solvers solver;
-
-  @Override
-  protected Solvers solverToUse() {
-    return solver;
-  }
+public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
   public void testVariableNamedTrue() throws SolverException, InterruptedException {
@@ -329,5 +311,88 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0 {
 
     BooleanFormula f = bmgr.and(bmgr.equivalence(x, y), bmgr.equivalence(x, z));
     assertThatFormula(f).implies(bmgr.equivalence(y, z));
+  }
+
+  @Test
+  public void simplifiedNot() {
+    BooleanFormula fTrue = bmgr.makeTrue();
+    BooleanFormula fFalse = bmgr.makeFalse();
+    BooleanFormula var1 = bmgr.makeVariable("var1");
+    BooleanFormula var2 = bmgr.makeVariable("var2");
+    BooleanFormula var3 = bmgr.makeVariable("var3");
+    BooleanFormula var4 = bmgr.makeVariable("var4");
+
+    // simple tests
+    Truth.assertThat(bmgr.not(fTrue)).isEqualTo(fFalse);
+    Truth.assertThat(bmgr.not(fFalse)).isEqualTo(fTrue);
+
+    // one nesting level
+    Truth.assertThat(bmgr.not(bmgr.not(var1))).isEqualTo(var1);
+
+    // more nesting
+    BooleanFormula f = bmgr.and(bmgr.or(var1, bmgr.not(var2), var3), bmgr.not(var4));
+    Truth.assertThat(bmgr.not(bmgr.not(f))).isEqualTo(f);
+  }
+
+  @Test
+  public void simplifiedAnd() {
+    BooleanFormula fTrue = bmgr.makeTrue();
+    BooleanFormula fFalse = bmgr.makeFalse();
+    BooleanFormula var1 = bmgr.makeVariable("var1");
+    BooleanFormula var2 = bmgr.makeVariable("var2");
+
+    Truth.assertThat(bmgr.and(fTrue, fTrue)).isEqualTo(fTrue);
+    Truth.assertThat(bmgr.and(fFalse)).isEqualTo(fFalse);
+    Truth.assertThat(bmgr.and(fTrue, fFalse)).isEqualTo(fFalse);
+    Truth.assertThat(bmgr.and(fTrue, var1)).isEqualTo(var1);
+    Truth.assertThat(bmgr.and(fFalse, var1)).isEqualTo(fFalse);
+    Truth.assertThat(bmgr.and(var1, var1)).isEqualTo(var1);
+
+    Truth.assertThat(bmgr.and(fTrue, fTrue, fTrue, fTrue)).isEqualTo(fTrue);
+    Truth.assertThat(bmgr.and(fTrue, fFalse, fTrue)).isEqualTo(fFalse);
+    Truth.assertThat(bmgr.and(fTrue, fTrue, fTrue, fFalse)).isEqualTo(fFalse);
+    Truth.assertThat(bmgr.and(fTrue, fTrue, fTrue, var1)).isEqualTo(var1);
+    Truth.assertThat(bmgr.and(fTrue, fFalse, fTrue, var1)).isEqualTo(fFalse);
+    Truth.assertThat(bmgr.and(fTrue, var1, fTrue, var1)).isEqualTo(var1);
+    Truth.assertThat(bmgr.and(fTrue, var1, var2, fTrue, var1)).isEqualTo(bmgr.and(var1, var2));
+  }
+
+  @Test
+  public void simplifiedOr() {
+    BooleanFormula fTrue = bmgr.makeTrue();
+    BooleanFormula fFalse = bmgr.makeFalse();
+    BooleanFormula var1 = bmgr.makeVariable("var1");
+    BooleanFormula var2 = bmgr.makeVariable("var2");
+
+    Truth.assertThat(bmgr.or(fTrue, fTrue)).isEqualTo(fTrue);
+    Truth.assertThat(bmgr.or(fFalse)).isEqualTo(fFalse);
+    Truth.assertThat(bmgr.or(fTrue, fFalse)).isEqualTo(fTrue);
+    Truth.assertThat(bmgr.or(fTrue, var1)).isEqualTo(fTrue);
+    Truth.assertThat(bmgr.or(fFalse, var1)).isEqualTo(var1);
+    Truth.assertThat(bmgr.or(var1, var1)).isEqualTo(var1);
+
+    Truth.assertThat(bmgr.or(fFalse, fTrue, fFalse, fTrue)).isEqualTo(fTrue);
+    Truth.assertThat(bmgr.or(fFalse, fFalse, fFalse)).isEqualTo(fFalse);
+    Truth.assertThat(bmgr.or(fFalse, fTrue, fFalse, fFalse)).isEqualTo(fTrue);
+    Truth.assertThat(bmgr.or(fFalse, fTrue, fFalse, var1)).isEqualTo(fTrue);
+    Truth.assertThat(bmgr.or(fFalse, fFalse, fFalse, var1)).isEqualTo(var1);
+    Truth.assertThat(bmgr.or(fFalse, var1, fFalse, var1)).isEqualTo(var1);
+    Truth.assertThat(bmgr.or(fFalse, var1, var2, fFalse, var1)).isEqualTo(bmgr.or(var1, var2));
+  }
+
+  @Test
+  public void simplifiedIfThenElse() {
+    BooleanFormula fTrue = bmgr.makeTrue();
+    BooleanFormula fFalse = bmgr.makeFalse();
+    BooleanFormula var1 = bmgr.makeVariable("var1");
+    BooleanFormula var2 = bmgr.makeVariable("var2");
+
+    Truth.assertThat(bmgr.ifThenElse(fTrue, var1, var2)).isEqualTo(var1);
+    Truth.assertThat(bmgr.ifThenElse(fFalse, var1, var2)).isEqualTo(var2);
+    Truth.assertThat(bmgr.ifThenElse(var1, var2, var2)).isEqualTo(var2);
+    Truth.assertThat(bmgr.ifThenElse(var1, fTrue, fTrue)).isEqualTo(fTrue);
+    Truth.assertThat(bmgr.ifThenElse(var1, fFalse, fFalse)).isEqualTo(fFalse);
+    Truth.assertThat(bmgr.ifThenElse(var1, fTrue, fFalse)).isEqualTo(var1);
+    Truth.assertThat(bmgr.ifThenElse(var1, fFalse, fTrue)).isEqualTo(bmgr.not(var1));
   }
 }

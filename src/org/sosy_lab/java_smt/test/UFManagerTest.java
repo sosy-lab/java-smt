@@ -15,10 +15,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.truth.Truth;
 import java.util.List;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -29,23 +25,9 @@ import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.visitors.ExpectedFormulaVisitor;
 
-@RunWith(Parameterized.class)
-public class UFManagerTest extends SolverBasedTest0 {
+public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   private static final ImmutableList<String> VALID_NAMES = ImmutableList.of("Func", "(Func)");
-
-  @Parameters(name = "{0}")
-  public static Object[] getAllSolvers() {
-    return Solvers.values();
-  }
-
-  @Parameter(0)
-  public Solvers solver;
-
-  @Override
-  protected Solvers solverToUse() {
-    return solver;
-  }
 
   @Test
   public void testDeclareAndCallUFWithInt() throws SolverException, InterruptedException {

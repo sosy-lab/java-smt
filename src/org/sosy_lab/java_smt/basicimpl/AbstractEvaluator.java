@@ -15,6 +15,7 @@ import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.EnumerationFormula;
 import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
@@ -72,6 +73,13 @@ public abstract class AbstractEvaluator<TFormulaInfo, TType, TEnv> implements Ev
   @Nullable
   @Override
   public final String evaluate(StringFormula f) {
+    Preconditions.checkState(!isClosed());
+    return (String) evaluateImpl(creator.extractInfo(f));
+  }
+
+  @Nullable
+  @Override
+  public final String evaluate(EnumerationFormula f) {
     Preconditions.checkState(!isClosed());
     return (String) evaluateImpl(creator.extractInfo(f));
   }

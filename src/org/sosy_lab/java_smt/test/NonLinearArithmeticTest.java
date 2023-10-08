@@ -50,7 +50,7 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
           Solvers.OPENSMT);
 
   @Parameters(name = "{0} {1} {2}")
-  public static Iterable<Object[]> getAllSolvers() {
+  public static Iterable<Object[]> getAllSolversAndTheories() {
     return Lists.cartesianProduct(
             Arrays.asList(Solvers.values()),
             ImmutableList.of(FormulaType.IntegerType, FormulaType.RationalType),

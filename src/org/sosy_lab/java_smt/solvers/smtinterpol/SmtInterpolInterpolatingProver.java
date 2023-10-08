@@ -12,7 +12,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import de.uni_freiburg.informatik.ultimate.logic.Annotation;
+import com.google.common.collect.Sets;
 import de.uni_freiburg.informatik.ultimate.logic.SMTLIBException;
 import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
@@ -26,7 +26,7 @@ import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
-class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String, String>
+class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String>
     implements InterpolatingProverEnvironment<String> {
 
   SmtInterpolInterpolatingProver(
@@ -38,24 +38,8 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String, S
   }
 
   @Override
-  public void pop() {
-    Preconditions.checkState(!closed);
-    for (String removed : assertedFormulas.peek()) {
-      annotatedTerms.remove(removed);
-    }
-    super.pop();
-  }
-
-  @Override
-  public String addConstraint(BooleanFormula f) {
-    Preconditions.checkState(!closed);
-    String termName = generateTermName();
-    Term t = mgr.extractInfo(f);
-    Term annotatedTerm = env.annotate(t, new Annotation(":named", termName));
-    env.assertTerm(annotatedTerm);
-    assertedFormulas.peek().add(termName);
-    annotatedTerms.put(termName, t);
-    return termName;
+  public String addConstraint(BooleanFormula constraint) throws InterruptedException {
+    return super.addConstraint0(constraint);
   }
 
   @Override
@@ -67,17 +51,14 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String, S
     // so we need to check them explicitly
     if (pTermNamesOfA.isEmpty()) {
       return mgr.getBooleanFormulaManager().makeBoolean(true);
-    } else if (pTermNamesOfA.containsAll(annotatedTerms.keySet())) {
+    } else if (pTermNamesOfA.containsAll(annotatedTerms.peek().keySet())) {
       return mgr.getBooleanFormulaManager().makeBoolean(false);
     }
 
     Set<String> termNamesOfA = ImmutableSet.copyOf(pTermNamesOfA);
 
     // calc difference: termNamesOfB := assertedFormulas - termNamesOfA
-    Set<String> termNamesOfB =
-        annotatedTerms.keySet().stream()
-            .filter(n -> !termNamesOfA.contains(n))
-            .collect(ImmutableSet.toImmutableSet());
+    Set<String> termNamesOfB = Sets.difference(annotatedTerms.peek().keySet(), termNamesOfA);
 
     // build 2 groups:  (and A1 A2 A3...) , (and B1 B2 B3...)
     return Iterables.getOnlyElement(
@@ -131,10 +112,5 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String, S
       return env.term(Iterables.getOnlyElement(termNames));
     }
     return env.term("and", termNames.stream().map(env::term).toArray(Term[]::new));
-  }
-
-  @Override
-  protected Collection<Term> getAssertedTerms() {
-    return annotatedTerms.values();
   }
 }

@@ -42,6 +42,7 @@ import org.sosy_lab.common.time.Timer;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.EnumerationFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.Formula;
@@ -58,6 +59,7 @@ import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
 import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3ArrayFormula;
 import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3BitvectorFormula;
 import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3BooleanFormula;
+import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3EnumerationFormula;
 import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3FloatingPointFormula;
 import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3IntegerFormula;
@@ -96,6 +98,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   private static final ImmutableSet<String> Z3_INTERRUPT_ERRORS =
       ImmutableSet.of(
           "canceled", // Z3::src/util/common_msgs.cpp
+          "push canceled", // src/smt/smt_context.cpp
+          "interrupted from keyboard", // Z3: src/solver/check_sat_result.cpp
           "Proof error!",
           "interrupted", // Z3::src/solver/check_sat_result.cpp
           "maximization suspended" // Z3::src/opt/opt_solver.cpp
@@ -151,6 +155,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     long z3context = getEnv();
     long symbol = Native.mkStringSymbol(z3context, varName);
     long var = Native.mkConst(z3context, symbol, type);
+    Native.incRef(z3context, var);
     symbolsToDeclarations.put(varName, Native.getAppDecl(z3context, var));
     return var;
   }
@@ -196,6 +201,14 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       case Z3_RE_SORT:
         return FormulaType.RegexType;
       case Z3_DATATYPE_SORT:
+        int n = Native.getDatatypeSortNumConstructors(z3context, pSort);
+        ImmutableSet.Builder<String> elements = ImmutableSet.builder();
+        for (int i = 0; i < n; i++) {
+          long decl = Native.getDatatypeSortConstructor(z3context, pSort, i);
+          elements.add(symbolToString(Native.getDeclName(z3context, decl)));
+        }
+        return FormulaType.getEnumerationType(
+            Native.sortToString(z3context, pSort), elements.build());
       case Z3_RELATION_SORT:
       case Z3_FINITE_DOMAIN_SORT:
       case Z3_SEQ_SORT:
@@ -286,6 +299,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
           storePhantomReference(
               new Z3ArrayFormula<>(getEnv(), pTerm, arrFt.getIndexType(), arrFt.getElementType()),
               pTerm);
+    } else if (pType.isEnumerationType()) {
+      return (T) storePhantomReference(new Z3EnumerationFormula(getEnv(), pTerm), pTerm);
     }
 
     throw new IllegalArgumentException("Cannot create formulas of type " + pType + " in Z3");
@@ -332,6 +347,17 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
             Native.sortToString(getEnv(), Native.getSort(getEnv(), pTerm)));
     cleanupReferences();
     return storePhantomReference(new Z3RegexFormula(getEnv(), pTerm), pTerm);
+  }
+
+  @Override
+  protected EnumerationFormula encapsulateEnumeration(Long pTerm) {
+    assert getFormulaType(pTerm).isEnumerationType()
+        : String.format(
+            "Term %s has unexpected type %s.",
+            Native.astToString(getEnv(), pTerm),
+            Native.sortToString(getEnv(), Native.getSort(getEnv(), pTerm)));
+    cleanupReferences();
+    return storePhantomReference(new Z3EnumerationFormula(getEnv(), pTerm), pTerm);
   }
 
   @Override
@@ -413,6 +439,10 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
           } else if (declKind == Z3_decl_kind.Z3_OP_UNINTERPRETED.toInt()
               || declKind == Z3_decl_kind.Z3_OP_INTERNAL.toInt()) {
             return visitor.visitFreeVariable(formula, getAppName(f));
+
+            // enumeration constant
+          } else if (declKind == Z3_decl_kind.Z3_OP_DT_CONSTRUCTOR.toInt()) {
+            return visitor.visitConstant(formula, convertValue(f));
           } // else: fall-through with a function application
         }
 
@@ -479,8 +509,11 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   }
 
   private FunctionDeclarationKind getDeclarationKind(long f) {
-    assert Native.getArity(environment, Native.getAppDecl(environment, f)) > 0
-        : "Variables should be handled in other branch.";
+    final int arity = Native.getArity(environment, Native.getAppDecl(environment, f));
+    assert arity > 0
+        : String.format(
+            "Unexpected arity '%s' for formula '%s' for handling a function application.",
+            arity, Native.astToString(environment, f));
     if (getAppName(f).equals("div0")) {
       // Z3 segfaults in getDeclKind for this term (cf. https://github.com/Z3Prover/z3/issues/669)
       return FunctionDeclarationKind.OTHER;
@@ -739,8 +772,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     return Native.isNumeralAst(environment, value)
         || Native.isAlgebraicNumber(environment, value)
         || Native.isString(environment, value)
-        || isOP(environment, value, Z3_decl_kind.Z3_OP_TRUE.toInt())
-        || isOP(environment, value, Z3_decl_kind.Z3_OP_FALSE.toInt());
+        || isOP(environment, value, Z3_decl_kind.Z3_OP_TRUE)
+        || isOP(environment, value, Z3_decl_kind.Z3_OP_FALSE);
   }
 
   /**
@@ -765,7 +798,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     try {
       FormulaType<?> type = getFormulaType(value);
       if (type.isBooleanType()) {
-        return isOP(environment, value, Z3_decl_kind.Z3_OP_TRUE.toInt());
+        return isOP(environment, value, Z3_decl_kind.Z3_OP_TRUE);
       } else if (type.isIntegerType()) {
         return new BigInteger(Native.getNumeralString(environment, value));
       } else if (type.isRationalType()) {
@@ -776,9 +809,10 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       } else if (type.isBitvectorType()) {
         return new BigInteger(Native.getNumeralString(environment, value));
       } else if (type.isFloatingPointType()) {
-
         // Converting to Rational first.
         return convertValue(Native.simplify(environment, Native.mkFpaToReal(environment, value)));
+      } else if (type.isEnumerationType()) {
+        return Native.astToString(environment, value);
       } else {
 
         // Explicitly crash on unknown type.
@@ -811,13 +845,13 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   }
 
   /** returns, if the function of the expression is the given operation. */
-  static boolean isOP(long z3context, long expr, int op) {
+  static boolean isOP(long z3context, long expr, Z3_decl_kind op) {
     if (!Native.isApp(z3context, expr)) {
       return false;
     }
 
     long decl = Native.getAppDecl(z3context, expr);
-    return Native.getDeclKind(z3context, decl) == op;
+    return Native.getDeclKind(z3context, decl) == op.toInt();
   }
 
   /**

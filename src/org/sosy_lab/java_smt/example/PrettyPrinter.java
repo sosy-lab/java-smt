@@ -16,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Level;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
@@ -63,7 +64,7 @@ public class PrettyPrinter {
       if (arg.startsWith("-solver=")) {
         solver = Solvers.valueOf(arg.substring(8));
       } else if (arg.startsWith("-type=")) {
-        type = Type.valueOf(arg.substring(6).toUpperCase());
+        type = Type.valueOf(arg.substring(6).toUpperCase(Locale.getDefault()));
       } else if (path == null) {
         path = Path.of(arg);
       } else {

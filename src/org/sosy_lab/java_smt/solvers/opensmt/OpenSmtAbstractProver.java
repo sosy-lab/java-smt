@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.opensmt;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -124,7 +125,9 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     Preconditions.checkState(!closed);
     checkGenerateModels();
 
-    Model model = new OpenSmtModel(this, creator, getAssertedFormulas());
+    Model model =
+        new OpenSmtModel(
+            this, creator, Collections2.transform(getAssertedFormulas(), creator::extractInfo));
     return registerEvaluator(model);
   }
 
@@ -161,7 +164,7 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     Logic osmtLogic = creator.getEnv();
 
     Map<String, PTRef> userDeclarations = new HashMap<>();
-    for (PTRef asserted : getAssertedFormulas()) {
+    for (PTRef asserted : Collections2.transform(getAssertedFormulas(), creator::extractInfo)) {
       userDeclarations.putAll(creator.extractVariablesAndUFs(asserted, true));
     }
 
@@ -254,12 +257,6 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
     throw new UnsupportedOperationException("OpenSMT does not support unsat core.");
-  }
-
-  protected Collection<PTRef> getAssertedFormulas() {
-    List<PTRef> result = new ArrayList<>();
-    assertionStack.forEach(result::addAll);
-    return result;
   }
 
   @Override

@@ -109,7 +109,7 @@ Example:
 ant publish-cvc5 -Dcvc5.path=../CVC5 -Dcvc5.customRev=1.0.1
 ```
 During the build process, our script automatically appends the git-revision after the version.
-Finally follow the instructions shown in the message at the end.
+Finally, follow the instructions shown in the message at the end.
 
 
 ### Publishing OpenSMT

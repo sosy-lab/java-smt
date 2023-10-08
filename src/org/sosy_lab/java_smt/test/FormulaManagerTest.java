@@ -20,40 +20,20 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Map;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 
-@RunWith(Parameterized.class)
-public class FormulaManagerTest extends SolverBasedTest0 {
-
-  @Parameters(name = "{0}")
-  public static Object[] getAllSolvers() {
-    return Solvers.values();
-  }
-
-  @Parameter(0)
-  public Solvers solver;
-
-  @Override
-  protected Solvers solverToUse() {
-    return solver;
-  }
+public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
   public void testEmptySubstitution() throws SolverException, InterruptedException {
-    // Boolector does not support substitution
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
+    requireSubstitution();
     assume().withMessage("Princess fails").that(solver).isNotEqualTo(Solvers.PRINCESS);
 
     IntegerFormula variable1 = imgr.makeVariable("variable1");
@@ -73,8 +53,7 @@ public class FormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testNoSubstitution() throws SolverException, InterruptedException {
-    // Boolector does not support substitution
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
+    requireSubstitution();
     assume().withMessage("Princess fails").that(solver).isNotEqualTo(Solvers.PRINCESS);
 
     IntegerFormula variable1 = imgr.makeVariable("variable1");
@@ -100,8 +79,8 @@ public class FormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testSubstitution() throws SolverException, InterruptedException {
-    // Boolector does not support substitution
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
+    requireSubstitution();
+
     BooleanFormula input =
         bmgr.or(
             bmgr.and(bmgr.makeVariable("a"), bmgr.makeVariable("b")),
@@ -122,8 +101,8 @@ public class FormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testSubstitutionTwice() throws SolverException, InterruptedException {
-    // Boolector does not support substitution
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
+    requireSubstitution();
+
     BooleanFormula input =
         bmgr.or(
             bmgr.and(bmgr.makeVariable("a"), bmgr.makeVariable("b")),
@@ -142,6 +121,52 @@ public class FormulaManagerTest extends SolverBasedTest0 {
 
     BooleanFormula out2 = mgr.substitute(out, substitution);
     assertThatFormula(out2).isEquivalentTo(out);
+  }
+
+  @Test
+  public void testSubstitutionMultipleInstances() throws SolverException, InterruptedException {
+    requireSubstitution();
+    requireIntegers();
+
+    IntegerFormula a = imgr.makeVariable("a");
+    IntegerFormula b = imgr.makeVariable("b");
+    IntegerFormula num12 = imgr.makeNumber(12);
+    BooleanFormula input = imgr.lessThan(num12, imgr.add(imgr.add(imgr.add(a, a), a), b));
+
+    ImmutableMap<IntegerFormula, IntegerFormula> substitution = ImmutableMap.of(a, b);
+    BooleanFormula out = mgr.substitute(input, substitution);
+    assertThatFormula(out)
+        .isEquivalentTo(imgr.lessThan(num12, imgr.add(imgr.add(imgr.add(b, b), b), b)));
+
+    BooleanFormula out2 = mgr.substitute(out, substitution);
+    assertThatFormula(out2).isEquivalentTo(out);
+  }
+
+  @Test
+  public void testSubstitutionSelfReference() throws SolverException, InterruptedException {
+    requireSubstitution();
+    requireIntegers();
+
+    IntegerFormula a = imgr.makeVariable("a");
+    IntegerFormula num1 = imgr.makeNumber(1);
+    IntegerFormula incremented = imgr.add(a, num1);
+    BooleanFormula input = imgr.lessThan(num1, a);
+
+    ImmutableMap<IntegerFormula, IntegerFormula> substitution = ImmutableMap.of(a, incremented);
+    BooleanFormula out1 = mgr.substitute(input, substitution);
+    assertThatFormula(out1).isEquivalentTo(imgr.lessThan(num1, imgr.add(a, num1)));
+
+    BooleanFormula out2 = mgr.substitute(out1, substitution);
+    assertThatFormula(out2).isEquivalentTo(imgr.lessThan(num1, imgr.add(imgr.add(a, num1), num1)));
+
+    BooleanFormula out3 = mgr.substitute(out2, substitution);
+    assertThatFormula(out3)
+        .isEquivalentTo(imgr.lessThan(num1, imgr.add(imgr.add(imgr.add(a, num1), num1), num1)));
+
+    BooleanFormula out4 = mgr.substitute(out3, substitution);
+    assertThatFormula(out4)
+        .isEquivalentTo(
+            imgr.lessThan(num1, imgr.add(imgr.add(imgr.add(imgr.add(a, num1), num1), num1), num1)));
   }
 
   @Test
@@ -332,7 +357,7 @@ public class FormulaManagerTest extends SolverBasedTest0 {
     requireArrays();
     // exists arr : (arr[0]=5 && x=arr[0]) --> simplified: x=5
     ArrayFormula<IntegerFormula, IntegerFormula> arr =
-        amgr.makeArray("arr", new ArrayFormulaType<>(IntegerType, IntegerType));
+        amgr.makeArray("arr", FormulaType.getArrayType(IntegerType, IntegerType));
     IntegerFormula index = imgr.makeNumber(0);
     IntegerFormula value = imgr.makeNumber(5);
     IntegerFormula x = imgr.makeVariable("x");

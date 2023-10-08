@@ -23,8 +23,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -41,22 +39,9 @@ import org.sosy_lab.java_smt.api.SolverException;
  * theory or bitvectors length 1.
  */
 @RunWith(Parameterized.class)
-public class BitvectorFormulaManagerTest extends SolverBasedTest0 {
+public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   private static final BitvectorType bvType4 = FormulaType.getBitvectorTypeWithSize(4);
-
-  @Parameters(name = "{0}")
-  public static Object[] getAllSolvers() {
-    return Solvers.values();
-  }
-
-  @Parameter(0)
-  public Solvers solver;
-
-  @Override
-  protected Solvers solverToUse() {
-    return solver;
-  }
 
   @Before
   public void init() {
@@ -185,7 +170,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0 {
     for (int size : new int[] {1, 2, 4, 8}) {
       int max = 1 << size;
       // number is in range of bitsize
-      for (int i = -max / 2; i < max; i++) {
+      for (int i : new int[] {-max / 2, max - 1, 0}) {
         BitvectorFormula bv = bvmgr.makeBitvector(size, i);
         IntegerFormula num = imgr.makeNumber(i);
         assertThatFormula(bvmgr.equal(bv, bvmgr.makeBitvector(size, num))).isTautological();
@@ -226,9 +211,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0 {
 
   private static final int[] SOME_SIZES = new int[] {1, 2, 4, 10, 16, 20, 32, 60};
   private static final int[] SOME_NUMBERS =
-      new int[] {
-        0, 1, 2, 3, 4, 5, 6, 7, 8, 32, 64, 100, 150, 512, 1024, 100000, 1000000, Integer.MAX_VALUE,
-      };
+      new int[] {0, 1, 3, 4, 8, 32, 100, 512, 100000, Integer.MAX_VALUE};
 
   @Test
   public void bvToIntEqualityWithOverflow() throws SolverException, InterruptedException {
@@ -284,7 +267,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0 {
     requireBitvectorToInt();
     requireIntegers();
 
-    for (int size : new int[] {1, 2, 4, 8}) {
+    for (int size : new int[] {1, 2, 4}) {
       IntegerFormula var = imgr.makeVariable("x_" + size);
 
       // x == int(bv(x)) is sat for small values

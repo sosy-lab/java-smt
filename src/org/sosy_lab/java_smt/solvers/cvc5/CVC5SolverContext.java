@@ -14,6 +14,10 @@ import io.github.cvc5.Solver;
 import java.util.Set;
 import java.util.function.Consumer;
 import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.common.configuration.Option;
+import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
@@ -26,24 +30,40 @@ import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 
 public final class CVC5SolverContext extends AbstractSolverContext {
 
+  @Options(prefix = "solver.cvc5")
+  private static class CVC5Settings {
+
+    @Option(
+        secure = true,
+        description = "apply additional validation checks for interpolation results")
+    private boolean validateInterpolants = false;
+
+    private CVC5Settings(Configuration config) throws InvalidConfigurationException {
+      config.inject(this);
+    }
+  }
+
   // creator is final, except after closing, then null.
   private CVC5FormulaCreator creator;
   private final Solver solver;
   private final ShutdownNotifier shutdownNotifier;
   private final int randomSeed;
+  private final CVC5Settings settings;
   private boolean closed = false;
 
   private CVC5SolverContext(
       CVC5FormulaCreator pCreator,
-      CVC5FormulaManager manager,
+      CVC5FormulaManager pManager,
       ShutdownNotifier pShutdownNotifier,
       Solver pSolver,
-      int pRandomSeed) {
-    super(manager);
+      int pRandomSeed,
+      CVC5Settings pSettings) {
+    super(pManager);
     creator = pCreator;
     shutdownNotifier = pShutdownNotifier;
     randomSeed = pRandomSeed;
     solver = pSolver;
+    settings = pSettings;
   }
 
   @VisibleForTesting
@@ -58,11 +78,15 @@ public final class CVC5SolverContext extends AbstractSolverContext {
   @SuppressWarnings({"unused", "resource"})
   public static SolverContext create(
       LogManager pLogger,
+      Configuration pConfig,
       ShutdownNotifier pShutdownNotifier,
       int randomSeed,
       NonLinearArithmetic pNonLinearArithmetic,
       FloatingPointRoundingMode pFloatingPointRoundingMode,
-      Consumer<String> pLoader) {
+      Consumer<String> pLoader)
+      throws InvalidConfigurationException {
+
+    CVC5Settings settings = new CVC5Settings(pConfig);
 
     loadLibrary(pLoader);
 
@@ -89,6 +113,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
     CVC5ArrayFormulaManager arrayTheory = new CVC5ArrayFormulaManager(pCreator);
     CVC5SLFormulaManager slTheory = new CVC5SLFormulaManager(pCreator);
     CVC5StringFormulaManager strTheory = new CVC5StringFormulaManager(pCreator);
+    CVC5EnumerationFormulaManager enumTheory = new CVC5EnumerationFormulaManager(pCreator);
     CVC5FormulaManager manager =
         new CVC5FormulaManager(
             pCreator,
@@ -101,9 +126,11 @@ public final class CVC5SolverContext extends AbstractSolverContext {
             qfTheory,
             arrayTheory,
             slTheory,
-            strTheory);
+            strTheory,
+            enumTheory);
 
-    return new CVC5SolverContext(pCreator, manager, pShutdownNotifier, newSolver, randomSeed);
+    return new CVC5SolverContext(
+        pCreator, manager, pShutdownNotifier, newSolver, randomSeed, settings);
   }
 
   /** Set common options for a CVC5 solver. */
@@ -130,7 +157,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
   public String getVersion() {
     String version = solver.getInfo("version");
     if (version.startsWith("\"") && version.endsWith("\"")) {
-      version = version.substring(1, version.length() - 2);
+      version = version.substring(1, version.length() - 1);
     }
     return "CVC5 " + version;
   }
@@ -139,6 +166,9 @@ public final class CVC5SolverContext extends AbstractSolverContext {
   public void close() {
     if (creator != null) {
       closed = true;
+      solver.deletePointer();
+      // Don't use Context.deletePointers(); as it deletes statically information from all
+      // existing contexts, not only this one!
       creator = null;
     }
   }
@@ -163,7 +193,14 @@ public final class CVC5SolverContext extends AbstractSolverContext {
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> pOptions) {
-    throw new UnsupportedOperationException("CVC5 does not support Craig interpolation.");
+    Preconditions.checkState(!closed, "solver context is already closed");
+    return new CVC5InterpolatingProver(
+        creator,
+        shutdownNotifier,
+        randomSeed,
+        pOptions,
+        getFormulaManager(),
+        settings.validateInterpolants);
   }
 
   @Override

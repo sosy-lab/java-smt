@@ -173,6 +173,7 @@ public class SolverOverviewTable {
     addIfAvailable(theories, mgr::getArrayFormulaManager, "Array");
     addIfAvailable(theories, mgr::getQuantifiedFormulaManager, "Quantifier");
     addIfAvailable(theories, mgr::getUFManager, "UF");
+    addIfAvailable(theories, mgr::getEnumerationFormulaManager, "Enumeration");
     addIfAvailable(theories, mgr::getSLFormulaManager, "Seperation-Logic");
     addIfAvailable(theories, mgr::getStringFormulaManager, "String");
 
@@ -244,7 +245,7 @@ public class SolverOverviewTable {
     private static final int MIN_NUM_OF_LINES = 4;
     private static final int SOLVER_COLUMN_WIDTH = 11;
     private static final int VERSION_COLUMN_WIDTH = 38;
-    private static final int THEORIES_COLUMN_WIDTH = 30;
+    private static final int THEORIES_COLUMN_WIDTH = 40;
     private static final int FEATURES_COLUMN_WIDTH = 30;
 
     private static final String INFO_COLUMN =

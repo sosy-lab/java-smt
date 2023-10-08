@@ -254,6 +254,8 @@ class Mathsat5NativeApi {
   public static native long msat_get_function_type(
       long e, long[] paramTypes, int size, long returnType);
 
+  public static native long msat_get_enum_type(long e, String name, int size, String[] elements);
+
   public static native boolean msat_is_bool_type(long e, long t);
 
   public static native boolean msat_is_rational_type(long e, long t);
@@ -273,6 +275,10 @@ class Mathsat5NativeApi {
   public static native int msat_get_fp_type_mant_width(long e, long t);
 
   public static native boolean msat_is_fp_roundingmode_type(long e, long t);
+
+  public static native boolean msat_is_enum_type(long e, long t);
+
+  public static native long[] msat_get_enum_constants(long e, long t);
 
   public static native boolean msat_type_equals(long t1, long t2);
 
@@ -690,6 +696,7 @@ class Mathsat5NativeApi {
   public static native String msat_decl_get_name(long d);
 
   public static native String msat_term_repr(long t);
+
   /*
    * Parsing and writing formulas.
    */
@@ -721,6 +728,7 @@ class Mathsat5NativeApi {
   public static native void msat_reset_env(long e);
 
   public static native void msat_assert_formula(long e, long formula);
+
   // public static native int msat_add_preferred_for_branching(long e, long termBoolvar);
   // public static native int msat_clear_preferred_for_branching(long e)
   private static native int msat_solve(long e) throws InterruptedException;

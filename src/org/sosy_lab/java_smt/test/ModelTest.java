@@ -28,10 +28,6 @@ import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.ArrayFormula;
@@ -53,8 +49,7 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 /** Test that values from models are appropriately parsed. */
-@RunWith(Parameterized.class)
-public class ModelTest extends SolverBasedTest0 {
+public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   // A list of variables to test that model variable names are correctly applied
   private static final ImmutableList<String> VARIABLE_NAMES =
@@ -85,18 +80,6 @@ public class ModelTest extends SolverBasedTest0 {
 
   private static final ImmutableList<Solvers> SOLVERS_WITH_PARTIAL_MODEL =
       ImmutableList.of(Solvers.Z3, Solvers.PRINCESS);
-
-  @Parameters(name = "{0}")
-  public static Object[] getAllSolvers() {
-    return Solvers.values();
-  }
-
-  @Parameter public Solvers solver;
-
-  @Override
-  protected Solvers solverToUse() {
-    return solver;
-  }
 
   @Override
   protected void requireArrays() {
@@ -2263,14 +2246,6 @@ public class ModelTest extends SolverBasedTest0 {
   @Test
   @SuppressWarnings("resource")
   public void modelAfterSolverCloseTest() throws SolverException, InterruptedException {
-    // INFO: OpenSmt does not allow access to the model after the solver was closed
-    assume()
-        .withMessage(
-            "Solver %s does not allow access to the model after the solver was closed",
-            solverToUse())
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.OPENSMT);
-
     ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS);
     if (imgr != null) {
       prover.push(imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1)));

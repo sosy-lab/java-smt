@@ -12,6 +12,7 @@ import com.google.errorprone.annotations.Immutable;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.EnumerationFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
@@ -116,6 +117,14 @@ abstract class Mathsat5Formula implements Formula {
   @Immutable
   static final class Mathsat5BooleanFormula extends Mathsat5Formula implements BooleanFormula {
     Mathsat5BooleanFormula(long pTerm) {
+      super(pTerm);
+    }
+  }
+
+  @Immutable
+  static final class Mathsat5EnumerationFormula extends Mathsat5Formula
+      implements EnumerationFormula {
+    Mathsat5EnumerationFormula(long pTerm) {
       super(pTerm);
     }
   }

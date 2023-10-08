@@ -71,11 +71,11 @@ import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import scala.Tuple2;
 import scala.Tuple4;
 import scala.collection.immutable.Seq;
+import scala.collection.immutable.Set$;
 
 /**
  * This is a Wrapper around Princess. This Wrapper allows to set a logfile for all Smt-Queries
@@ -131,7 +131,7 @@ class PrincessEnvironment {
    */
   private final SimpleAPI api;
 
-  private final List<PrincessAbstractProver<?, ?>> registeredProvers = new ArrayList<>();
+  private final List<PrincessAbstractProver<?>> registeredProvers = new ArrayList<>();
 
   PrincessEnvironment(
       Configuration config,
@@ -153,7 +153,7 @@ class PrincessEnvironment {
    * This method returns a new prover, that is registered in this environment. All variables are
    * shared in all registered APIs.
    */
-  PrincessAbstractProver<?, ?> getNewProver(
+  PrincessAbstractProver<?> getNewProver(
       boolean useForInterpolation,
       PrincessFormulaManager mgr,
       PrincessFormulaCreator creator,
@@ -167,7 +167,7 @@ class PrincessEnvironment {
     sortedVariablesCache.values().forEach(newApi::addConstant);
     functionsCache.values().forEach(newApi::addFunction);
 
-    PrincessAbstractProver<?, ?> prover;
+    PrincessAbstractProver<?> prover;
     if (useForInterpolation) {
       prover = new PrincessInterpolatingProver(mgr, creator, newApi, shutdownNotifier, pOptions);
     } else {
@@ -215,7 +215,8 @@ class PrincessEnvironment {
             directory, // dumpDirectory
             SimpleAPI.apply$default$8(), // tightFunctionScopes
             SimpleAPI.apply$default$9(), // genTotalityAxioms
-            new scala.Some<>(randomSeed) // randomSeed
+            new scala.Some<>(randomSeed), // randomSeed
+            Set$.MODULE$.empty() // empty Set<LOG_FLAG>, no internal logging
             );
 
     if (constructProofs) { // needed for interpolation and unsat cores
@@ -233,7 +234,7 @@ class PrincessEnvironment {
     return minAtomsForAbbreviation;
   }
 
-  void unregisterStack(PrincessAbstractProver<?, ?> stack) {
+  void unregisterStack(PrincessAbstractProver<?> stack) {
     Preconditions.checkState(
         registeredProvers.contains(stack), "cannot unregister stack, it is not registered");
     registeredProvers.remove(stack);
@@ -241,7 +242,7 @@ class PrincessEnvironment {
 
   /** unregister and close all stacks. */
   void close() {
-    for (PrincessAbstractProver<?, ?> prover : ImmutableList.copyOf(registeredProvers)) {
+    for (PrincessAbstractProver<?> prover : ImmutableList.copyOf(registeredProvers)) {
       prover.close();
     }
     api.shutDown();
@@ -536,7 +537,7 @@ class PrincessEnvironment {
       Sort elementSort = ((ExtArray.ArraySort) sort).theory().objSort();
       assert indexSorts.iterator().size() == 1 : "unexpected index type in Array type:" + sort;
       // assert indexSorts.size() == 1; // TODO Eclipse does not like simpler code.
-      return new ArrayFormulaType<>(
+      return FormulaType.getArrayType(
           getFormulaTypeFromSort(indexSorts.iterator().next()), // get single index-sort
           getFormulaTypeFromSort(elementSort));
     } else if (sort instanceof MultipleValueBool$) {
@@ -621,19 +622,19 @@ class PrincessEnvironment {
   }
 
   private void addSymbol(IFormula symbol) {
-    for (PrincessAbstractProver<?, ?> prover : registeredProvers) {
+    for (PrincessAbstractProver<?> prover : registeredProvers) {
       prover.addSymbol(symbol);
     }
   }
 
   private void addSymbol(ITerm symbol) {
-    for (PrincessAbstractProver<?, ?> prover : registeredProvers) {
+    for (PrincessAbstractProver<?> prover : registeredProvers) {
       prover.addSymbol(symbol);
     }
   }
 
   private void addFunction(IFunction funcDecl) {
-    for (PrincessAbstractProver<?, ?> prover : registeredProvers) {
+    for (PrincessAbstractProver<?> prover : registeredProvers) {
       prover.addSymbol(funcDecl);
     }
   }

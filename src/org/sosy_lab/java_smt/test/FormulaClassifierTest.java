@@ -13,15 +13,10 @@ import static com.google.common.truth.TruthJUnit.assume;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.example.FormulaClassifier;
 
-@RunWith(Parameterized.class)
-public class FormulaClassifierTest extends SolverBasedTest0 {
+public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   private FormulaClassifier classifier;
 
@@ -37,18 +32,6 @@ public class FormulaClassifierTest extends SolverBasedTest0 {
 
   private static final String BVS =
       "(declare-fun bv () (_ BitVec 4))" + "(declare-fun bv2 () (_ BitVec 4))";
-
-  @Parameters(name = "{0}")
-  public static Object[] getAllSolvers() {
-    return Solvers.values();
-  }
-
-  @Parameter public Solvers solver;
-
-  @Override
-  protected Solvers solverToUse() {
-    return solver;
-  }
 
   @Before
   public void init() {

@@ -5,7 +5,7 @@ This file is part of JavaSMT,
 an API wrapper for a collection of SMT solvers:
 https://github.com/sosy-lab/java-smt
 
-SPDX-FileCopyrightText: 2022 Dirk Beyer <https://www.sosy-lab.org>
+SPDX-FileCopyrightText: 2023 Dirk Beyer <https://www.sosy-lab.org>
 
 SPDX-License-Identifier: Apache-2.0
 -->
@@ -16,7 +16,7 @@ SPDX-License-Identifier: Apache-2.0
 
   <groupId>org.sosy_lab.java_smt_example</groupId>
   <artifactId>java-smt-maven-example</artifactId>
-  <version>1.7</version>
+  <version>1.8</version>
   <name>java-smt-maven-example</name>
   <description>Example Maven project to show how to use JavaSMT with native solver libraries.</description>
   <url>https://github.com/sosy-lab/java-smt</url>
@@ -69,14 +69,14 @@ SPDX-License-Identifier: Apache-2.0
     <project.dependency.relativepath>dependency</project.dependency.relativepath>
     <project.dependency.path>${project.build.directory}/${project.dependency.relativepath}</project.dependency.path>
 
-    <javasmt.version>3.14.2</javasmt.version>
+    <javasmt.version>4.0.3</javasmt.version>
     <boolector.version>3.2.2-g1a89c229</boolector.version>
     <cvc4.version>1.8-prerelease-2020-06-24-g7825d8f28</cvc4.version>
-    <cvc5.version>1.0.1-g8c2b8db17</cvc5.version>
-    <mathsat.version>5.6.8</mathsat.version>
-    <javasmt-yices.version>3.12.0</javasmt-yices.version>
+    <cvc5.version>1.0.5-g4cb2ab9eb</cvc5.version>
+    <mathsat.version>5.6.10</mathsat.version>
+    <javasmt-yices.version>4.0.1</javasmt-yices.version>
     <yices.version>2.6.2-396-g194350c1</yices.version>
-    <z3.version>4.10.1</z3.version>
+    <z3.version>4.12.2</z3.version>
   </properties>
 
   <dependencies>
@@ -235,7 +235,7 @@ SPDX-License-Identifier: Apache-2.0
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.13.1</version>
+      <version>4.13.2</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

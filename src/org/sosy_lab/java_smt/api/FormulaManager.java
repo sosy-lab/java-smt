@@ -87,6 +87,13 @@ public interface FormulaManager {
   StringFormulaManager getStringFormulaManager();
 
   /**
+   * Returns the Enumeration Theory, e.g., also known as 'limited domain'.
+   *
+   * @throws UnsupportedOperationException If the theory is not supported by the solver.
+   */
+  EnumerationFormulaManager getEnumerationFormulaManager();
+
+  /**
    * Create variable of the type equal to {@code formulaType}.
    *
    * @param formulaType the type of the variable.

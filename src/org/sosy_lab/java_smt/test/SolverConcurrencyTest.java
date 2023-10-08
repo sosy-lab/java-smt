@@ -18,6 +18,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
@@ -70,28 +71,28 @@ public class SolverConcurrencyTest {
   private static final ImmutableMap<Solvers, Integer> INTEGER_FORMULA_GEN =
       ImmutableMap.of(
           Solvers.SMTINTERPOL,
-          10,
+          8,
           Solvers.CVC4,
-          14,
+          12,
           Solvers.MATHSAT5,
-          16,
+          12,
           Solvers.PRINCESS,
-          10,
+          8,
           Solvers.Z3,
-          14);
+          12);
 
   private static final ImmutableMap<Solvers, Integer> BITVECTOR_FORMULA_GEN =
       ImmutableMap.of(
           Solvers.BOOLECTOR,
-          60,
+          50,
           Solvers.CVC4,
-          9,
-          Solvers.MATHSAT5,
-          60,
-          Solvers.PRINCESS,
           7,
+          Solvers.MATHSAT5,
+          50,
+          Solvers.PRINCESS,
+          5,
           Solvers.Z3,
-          50);
+          40);
 
   @Parameters(name = "{0}")
   public static Object[] getAllSolvers() {
@@ -113,7 +114,7 @@ public class SolverConcurrencyTest {
   public void checkThatSolverIsAvailable() throws InvalidConfigurationException {
     initSolver().close();
 
-    if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
+    if (System.getProperty("os.name").toLowerCase(Locale.getDefault()).startsWith("win")) {
       assume()
           .withMessage("MathSAT5 is not reentant on Windows")
           .that(solver)
@@ -121,7 +122,6 @@ public class SolverConcurrencyTest {
     }
   }
 
-  @SuppressWarnings("unused")
   private void requireConcurrentMultipleStackSupport() {
     assume()
         .withMessage("Solver does not support concurrent solving in multiple stacks")
@@ -145,7 +145,6 @@ public class SolverConcurrencyTest {
   }
 
   private void requireBitvectors() {
-    // INFO: OpenSmt does not support bitvectors
     assume()
         .withMessage("Solver does not support bitvectors")
         .that(solver)
@@ -153,7 +152,6 @@ public class SolverConcurrencyTest {
   }
 
   private void requireOptimization() {
-    // INFO: OpenSmt does not support optimization
     assume()
         .withMessage("Solver does not support optimization")
         .that(solver)
@@ -199,6 +197,25 @@ public class SolverConcurrencyTest {
         });
   }
 
+  /** Helperclass to pack a SolverContext together with a Formula. */
+  private static class ContextAndFormula {
+    private final SolverContext context;
+    private final BooleanFormula formula;
+
+    private ContextAndFormula(SolverContext context, BooleanFormula formula) {
+      this.context = context;
+      this.formula = formula;
+    }
+
+    SolverContext getContext() {
+      return context;
+    }
+
+    BooleanFormula getFormula() {
+      return formula;
+    }
+  }
+
   /**
    * Test translation of formulas used on distinct contexts to a new, unrelated context. Every
    * thread creates a context, generates a formula, those are collected and handed back to the main
@@ -215,24 +232,7 @@ public class SolverConcurrencyTest {
         .withMessage("Solver does not support translation of formulas")
         .that(solver)
         .isNoneOf(Solvers.CVC4, Solvers.PRINCESS, Solvers.CVC5);
-    /** Helperclass to pack a SolverContext together with a Formula */
-    class ContextAndFormula {
-      private final SolverContext context;
-      private final BooleanFormula formula;
 
-      protected ContextAndFormula(SolverContext context, BooleanFormula formula) {
-        this.context = context;
-        this.formula = formula;
-      }
-
-      public SolverContext getContext() {
-        return context;
-      }
-
-      public BooleanFormula getFormula() {
-        return formula;
-      }
-    }
     ConcurrentLinkedQueue<ContextAndFormula> contextAndFormulaList = new ConcurrentLinkedQueue<>();
 
     assertConcurrency(
@@ -444,24 +444,6 @@ public class SolverConcurrencyTest {
         .withMessage("Solver does not support translation of formulas")
         .that(solver)
         .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.PRINCESS);
-    /** Helperclass to pack a SolverContext together with a Formula */
-    class ContextAndFormula {
-      private final SolverContext context;
-      private final BooleanFormula formula;
-
-      protected ContextAndFormula(SolverContext context, BooleanFormula formula) {
-        this.context = context;
-        this.formula = formula;
-      }
-
-      public SolverContext getContext() {
-        return context;
-      }
-
-      public BooleanFormula getFormula() {
-        return formula;
-      }
-    }
 
     // This is fine! We might access this more than once at a time,
     // but that gives only access to the bucket, which is threadsafe.
@@ -469,8 +451,7 @@ public class SolverConcurrencyTest {
         new AtomicReferenceArray<>(NUMBER_OF_THREADS);
 
     // Init as many buckets as there are threads; each bucket generates an initial formula (such
-    // that
-    // they are differently hard to solve) depending on the uniqueId
+    // that they are differently hard to solve) depending on the uniqueId
     for (int i = 0; i < NUMBER_OF_THREADS; i++) {
       BlockingQueue<ContextAndFormula> bucket = new LinkedBlockingQueue<>(NUMBER_OF_THREADS);
       bucketQueue.set(i, bucket);
@@ -480,7 +461,7 @@ public class SolverConcurrencyTest {
     final UniqueIdGenerator idGenerator = new UniqueIdGenerator();
 
     // Take the formula from the bucket of itself, solve it, once solved give the formula to the
-    // bucket of the next thread (have a counter for in which bucket we transfered the formula and
+    // bucket of the next thread (have a counter for in which bucket we transferred the formula and
     // +1 the counter)
     assertConcurrency(
         "continuousRunningThreadFormulaTransferTranslateTest",

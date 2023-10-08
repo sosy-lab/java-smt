@@ -34,7 +34,19 @@ class OpenSmtFormulaManager extends AbstractFormulaManager<PTRef, SRef, Logic, S
       OpenSmtIntegerFormulaManager pIfmgr,
       OpenSmtRationalFormulaManager pRfmgr,
       OpenSmtArrayFormulaManager pAfmgr) {
-    super(pFormulaCreator, pFfmgr, pBfmgr, pIfmgr, pRfmgr, null, null, null, pAfmgr, null, null);
+    super(
+        pFormulaCreator,
+        pFfmgr,
+        pBfmgr,
+        pIfmgr,
+        pRfmgr,
+        null,
+        null,
+        null,
+        pAfmgr,
+        null,
+        null,
+        null);
 
     creator = pFormulaCreator;
     osmtLogic = pFormulaCreator.getEnv();

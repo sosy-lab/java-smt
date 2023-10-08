@@ -35,6 +35,7 @@ final class BoolectorFormulaManager extends AbstractFormulaManager<Long, Long, L
         pQuantifierManager,
         pArrayManager,
         null,
+        null,
         null);
   }
 

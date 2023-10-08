@@ -522,10 +522,12 @@ SPDX-License-Identifier: Apache-2.0
         </exec>
         <exec executable="patchelf" dir="./" failonerror="true">
             <arg value="--set-rpath"/><arg value="$ORIGIN"/>
+            <arg value="--replace-needed"/><arg value="libcvc5.so.1"/><arg value="libcvc5.so"/>
             <arg value="libcvc5jni-${cvc5.version}.so"/>
         </exec>
         <exec executable="patchelf" dir="./" failonerror="true">
             <arg value="--set-rpath"/><arg value="$ORIGIN"/>
+            <arg value="--replace-needed"/><arg value="libcvc5.so.1"/><arg value="libcvc5.so"/>
             <arg value="libcvc5parser-${cvc5.version}.so"/>
         </exec>
         <!-- patchelf finds two dependencies and needs to be called twice for libpolyxx.so -->

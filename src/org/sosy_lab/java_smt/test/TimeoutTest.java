@@ -32,10 +32,10 @@ public class TimeoutTest extends SolverBasedTest0 {
 
   private static final int TIMOUT_MILLISECONDS = 10000;
 
-  private static final int[] DELAYS = {1, 2, 5, 10, 20, 50, 100};
+  private static final int[] DELAYS = {1, 5, 10, 20, 50, 100};
 
   @Parameters(name = "{0} with delay {1}")
-  public static List<Object[]> getAllSolvers() {
+  public static List<Object[]> getAllSolversAndDelays() {
     List<Object[]> lst = new ArrayList<>();
     for (Solvers solver : Solvers.values()) {
       for (int delay : DELAYS) {

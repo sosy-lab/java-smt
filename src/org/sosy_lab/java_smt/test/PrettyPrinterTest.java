@@ -12,16 +12,10 @@ import static com.google.common.truth.Truth.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
-import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.utils.PrettyPrinter;
 import org.sosy_lab.java_smt.utils.PrettyPrinter.PrinterOption;
 
-@RunWith(Parameterized.class)
-public class PrettyPrinterTest extends SolverBasedTest0 {
+public class PrettyPrinterTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   private PrettyPrinter pp;
 
@@ -36,18 +30,6 @@ public class PrettyPrinterTest extends SolverBasedTest0 {
           + "(declare-fun bar (Real) Real)";
 
   private static final String QUERY_1 = "(assert (and (= (select arr x) (foo 3)) (< x xx)))";
-
-  @Parameters(name = "{0}")
-  public static Object[] getAllSolvers() {
-    return Solvers.values();
-  }
-
-  @Parameter public Solvers solver;
-
-  @Override
-  protected Solvers solverToUse() {
-    return solver;
-  }
 
   @Before
   public void init() {

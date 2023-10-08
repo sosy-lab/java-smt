@@ -10,6 +10,8 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import com.google.common.collect.Lists;
+import java.util.List;
 import org.junit.Test;
 
 /** inherits many tests from {@link VariableNamesTest}. */
@@ -21,21 +23,23 @@ public class VariableNamesEscaperTest extends VariableNamesTest {
   }
 
   @Override
-  String getVarname() {
-    return mgr.escape(super.getVarname());
+  protected List<String> getAllNames() {
+    return Lists.transform(super.getAllNames(), mgr::escape);
   }
 
   @Test
   public void testEscapeUnescape() {
-    String var = super.getVarname();
-    assertThat(mgr.unescape(mgr.escape(var))).isEqualTo(var);
-    assertThat(mgr.unescape(mgr.unescape(mgr.escape(mgr.escape(var))))).isEqualTo(var);
+    for (String var : getAllNames()) {
+      assertThat(mgr.unescape(mgr.escape(var))).isEqualTo(var);
+      assertThat(mgr.unescape(mgr.unescape(mgr.escape(mgr.escape(var))))).isEqualTo(var);
+    }
   }
 
   @Test
   public void testDoubleEscapeUnescape() {
-    String var = getVarname();
-    assertThat(mgr.unescape(mgr.escape(var))).isEqualTo(var);
-    assertThat(mgr.unescape(mgr.unescape(mgr.escape(mgr.escape(var))))).isEqualTo(var);
+    for (String var : getAllNames()) {
+      assertThat(mgr.unescape(mgr.escape(var))).isEqualTo(var);
+      assertThat(mgr.unescape(mgr.unescape(mgr.escape(mgr.escape(var))))).isEqualTo(var);
+    }
   }
 }

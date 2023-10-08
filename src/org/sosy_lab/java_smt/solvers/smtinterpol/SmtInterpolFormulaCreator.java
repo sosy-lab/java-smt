@@ -29,7 +29,6 @@ import java.util.List;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
@@ -64,7 +63,7 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
     } else if (pSort == getBoolType()) {
       return FormulaType.BooleanType;
     } else if (pSort.isArraySort()) {
-      return new FormulaType.ArrayFormulaType<>(
+      return FormulaType.getArrayType(
           getFormulaTypeOfSort(pSort.getArguments()[0]),
           getFormulaTypeOfSort(pSort.getArguments()[1]));
     } else {
@@ -79,7 +78,7 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
       final FormulaType<?> arrayIndexType = getArrayFormulaIndexType((ArrayFormula<?, ?>) pFormula);
       final FormulaType<?> arrayElementType =
           getArrayFormulaElementType((ArrayFormula<?, ?>) pFormula);
-      return (FormulaType<T>) new ArrayFormulaType<>(arrayIndexType, arrayElementType);
+      return (FormulaType<T>) FormulaType.getArrayType(arrayIndexType, arrayElementType);
     }
 
     return super.getFormulaType(pFormula);

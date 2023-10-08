@@ -12,10 +12,16 @@ import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.test.BooleanFormulaSubject.assertUsing;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
+import com.google.common.truth.Truth;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Collection;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
@@ -30,12 +36,21 @@ import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
+import org.sosy_lab.java_smt.api.EnumerationFormulaManager;
 import org.sosy_lab.java_smt.api.FloatingPointFormulaManager;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
+import org.sosy_lab.java_smt.api.Model;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
+import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
+import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.StringFormulaManager;
 import org.sosy_lab.java_smt.api.UFManager;
 
@@ -87,6 +102,7 @@ public abstract class SolverBasedTest0 {
   protected @Nullable ArrayFormulaManager amgr;
   protected @Nullable FloatingPointFormulaManager fpmgr;
   protected @Nullable StringFormulaManager smgr;
+  protected @Nullable EnumerationFormulaManager emgr;
   protected ShutdownManager shutdownManager = ShutdownManager.create();
 
   protected ShutdownNotifier shutdownNotifierToUse() {
@@ -163,6 +179,11 @@ public abstract class SolverBasedTest0 {
       smgr = mgr.getStringFormulaManager();
     } catch (UnsupportedOperationException e) {
       smgr = null;
+    }
+    try {
+      emgr = mgr.getEnumerationFormulaManager();
+    } catch (UnsupportedOperationException e) {
+      emgr = null;
     }
   }
 
@@ -278,6 +299,14 @@ public abstract class SolverBasedTest0 {
         .isNotNull();
   }
 
+  /** Skip test if the solver does not support enumeration theory. */
+  protected final void requireEnumeration() {
+    assume()
+        .withMessage("Solver %s does not support the theory of enumerations", solverToUse())
+        .that(emgr)
+        .isNotNull();
+  }
+
   /** Skip test if the solver does not support optimization. */
   protected final void requireOptimization() {
     try {
@@ -329,6 +358,13 @@ public abstract class SolverBasedTest0 {
         .isNoneOf(Solvers.BOOLECTOR, Solvers.OPENSMT);
   }
 
+  protected void requireSubstitution() {
+    assume()
+        .withMessage("Solver %s does not support formula substitution", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BOOLECTOR);
+  }
+
   /**
    * Use this for checking assertions about BooleanFormulas with Truth: <code>
    * assertThatFormula(formula).is...()</code>.
@@ -346,5 +382,69 @@ public abstract class SolverBasedTest0 {
    */
   protected final ProverEnvironmentSubject assertThatEnvironment(BasicProverEnvironment<?> prover) {
     return assertThat(prover);
+  }
+
+  protected void evaluateInModel(
+      BooleanFormula constraint,
+      Formula formula,
+      Collection<Object> possibleExpectedValues,
+      Collection<Formula> possibleExpectedFormulas)
+      throws SolverException, InterruptedException {
+
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(constraint);
+      assertThat(prover).isSatisfiable();
+
+      try (Model m = prover.getModel()) {
+        if (formula instanceof BooleanFormula) {
+          Truth.assertThat(m.evaluate((BooleanFormula) formula)).isIn(possibleExpectedValues);
+          Truth.assertThat(m.evaluate(formula)).isIn(possibleExpectedValues);
+        } else if (formula instanceof IntegerFormula) {
+          Truth.assertThat(m.evaluate((IntegerFormula) formula)).isIn(possibleExpectedValues);
+          Truth.assertThat(m.evaluate(formula)).isIn(possibleExpectedValues);
+        } else if (formula instanceof RationalFormula) {
+          Truth.assertThat(m.evaluate((RationalFormula) formula)).isIn(possibleExpectedValues);
+          // assertThat(m.evaluate(formula)).isIn(possibleExpectedValues);
+        } else if (formula instanceof StringFormula) {
+          Truth.assertThat(m.evaluate((StringFormula) formula)).isIn(possibleExpectedValues);
+          Truth.assertThat(m.evaluate(formula)).isIn(possibleExpectedValues);
+        } else {
+          Truth.assertThat(m.evaluate(formula)).isIn(possibleExpectedValues);
+        }
+
+        // let's try to check evaluations. Actually the whole method is based on some default values
+        // in the solvers, because we do not use constraints for the evaluated formulas.
+        Formula eval = m.eval(formula);
+        if (eval != null) {
+          switch (solverToUse()) {
+            case Z3:
+              // ignore, Z3 provides arbitrary values
+              break;
+            case BOOLECTOR:
+              // ignore, Boolector provides no useful values
+              break;
+            default:
+              Truth.assertThat(eval).isIn(possibleExpectedFormulas);
+          }
+        }
+      }
+    }
+  }
+
+  @RunWith(Parameterized.class)
+  public abstract static class ParameterizedSolverBasedTest0 extends SolverBasedTest0 {
+
+    @Parameters(name = "{0}")
+    public static Object[] getAllSolvers() {
+      return Solvers.values();
+    }
+
+    @Parameter(0)
+    public Solvers solver;
+
+    @Override
+    protected Solvers solverToUse() {
+      return solver;
+    }
   }
 }

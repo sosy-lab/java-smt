@@ -26,6 +26,9 @@ import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
+import org.sosy_lab.java_smt.api.EnumerationFormula;
+import org.sosy_lab.java_smt.api.EnumerationFormulaManager;
+import org.sosy_lab.java_smt.api.FormulaType.EnumerationFormulaType;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
@@ -37,8 +40,21 @@ import org.sosy_lab.java_smt.api.SolverException;
 /**
  * This program parses user-given Sudoku and solves it with an SMT solver.
  *
- * <p>This program is just an example and clearly SMT is not the best solution for solving Sudoku.
- * There might be other algorithms out there that are better suited for solving Sudoku.
+ * <p>This program is just an example and provides several distinct strategies for encoding the
+ * Sudoku problem as SMT. Clearly SMT is not the best solution for solving Sudoku. There might be
+ * other algorithms out there that are specialized and better suited for solving Sudoku.
+ *
+ * <p>Our strategies:
+ *
+ * <ul>
+ *   <li>Integer-based: We encode all values as integer formulas for a range from 1 to 9. Straight
+ *       forward, simple to understand, but slow.
+ *   <li>Enumeration-based: We encode all values as enumeration formulas for enumeration values from
+ *       ONE to NINE. Reasonable fast (up to 10x faster than integer-based strategy).
+ *   <li>Boolean-based: We use one more dimension to encode values for the 2D-grid and a
+ *       one-hot-encoding. Fastest SMT-based solution, because it is purely based on SAT, and no
+ *       additional SMT theory is applied.
+ * </ul>
  *
  * <p>The more numbers are available in a Sudoku, the easier it can be solved. A completely empty
  * Sudoku will cause the longest runtime in the solver, because it will guess a lot of values.
@@ -84,24 +100,33 @@ public class Sudoku {
     LogManager logger = BasicLogManager.create(config);
     ShutdownNotifier notifier = ShutdownNotifier.createDummy();
 
+    Integer[][] grid = readGridFromStdin();
     // for (Solvers solver : Solvers.values()) {
     {
-      Solvers solver = Solvers.MATHSAT5;
+      Solvers solver = Solvers.Z3;
       try (SolverContext context =
           SolverContextFactory.createSolverContext(config, logger, notifier, solver)) {
-        Integer[][] grid = readGridFromStdin();
 
-        SudokuSolver<?> sudoku = new IntegerBasedSudokuSolver(context);
-        // SudokuSolver<?> sudoku2 = new BooleanBasedSudokuSolver(context);
-        Integer[][] solution = sudoku.solve(grid);
+        for (SudokuSolver<?> sudoku :
+            List.of(
+                new IntegerBasedSudokuSolver(context),
+                new EnumerationBasedSudokuSolver(context),
+                new BooleanBasedSudokuSolver(context))) {
+          long start = System.currentTimeMillis();
 
-        if (solution == UNSOLVABLE_SUDOKU) {
-          System.out.println("Sudoku has no solution.");
-        } else {
-          System.out.println("Sudoku has a solution:");
-          for (Integer[] line : solution) {
-            System.out.println(Joiner.on("").join(line));
+          Integer[][] solution = sudoku.solve(grid);
+          if (solution == UNSOLVABLE_SUDOKU) {
+            System.out.println("Sudoku has no solution.");
+          } else {
+            System.out.println("Sudoku has a solution:");
+            for (Integer[] line : solution) {
+              System.out.println(Joiner.on("").join(line));
+            }
           }
+
+          long end = System.currentTimeMillis();
+          System.out.println("    Used strategy: " + sudoku.getClass().getSimpleName());
+          System.out.println("    Time to solve: " + (end - start) + " ms");
         }
       } catch (InvalidConfigurationException | UnsatisfiedLinkError e) {
 
@@ -143,23 +168,32 @@ public class Sudoku {
 
     private final SolverContext context;
     final BooleanFormulaManager bmgr;
-    final IntegerFormulaManager imgr;
 
     private SudokuSolver(SolverContext pContext) {
       context = pContext;
       bmgr = context.getFormulaManager().getBooleanFormulaManager();
-      if (context.getSolverName() != Solvers.BOOLECTOR) {
-        imgr = context.getFormulaManager().getIntegerFormulaManager();
-      } else {
-        imgr = null;
-      }
     }
 
     abstract S getSymbols();
 
     abstract List<BooleanFormula> getRules(S symbols);
 
-    abstract List<BooleanFormula> getAssignments(S symbols, Integer[][] grid);
+    /** convert the user-given values into constraints for the solver. */
+    private List<BooleanFormula> getAssignments(S symbols, Integer[][] grid) {
+      final List<BooleanFormula> assignments = new ArrayList<>();
+      for (int row = 0; row < SIZE; row++) {
+        for (int col = 0; col < SIZE; col++) {
+          Integer value = grid[row][col];
+          if (value != null) {
+            assignments.add(getAssignment(symbols, row, col, value));
+          }
+        }
+      }
+      return assignments;
+    }
+
+    /** convert one user-given value at given coordinate into a constraint for the solver. */
+    abstract BooleanFormula getAssignment(S symbols, int row, int col, Integer value);
 
     abstract Integer getValue(S symbols, Model model, int row, int col);
 
@@ -200,8 +234,11 @@ public class Sudoku {
 
   public static class IntegerBasedSudokuSolver extends SudokuSolver<IntegerFormula[][]> {
 
+    final IntegerFormulaManager imgr;
+
     public IntegerBasedSudokuSolver(SolverContext context) {
       super(context);
+      imgr = context.getFormulaManager().getIntegerFormulaManager();
     }
 
     /** prepare symbols: one symbol for each of the 9x9 cells. */
@@ -210,7 +247,7 @@ public class Sudoku {
       final IntegerFormula[][] symbols = new IntegerFormula[SIZE][SIZE];
       for (int row = 0; row < SIZE; row++) {
         for (int col = 0; col < SIZE; col++) {
-          symbols[row][col] = imgr.makeVariable("x_" + row + "_" + col);
+          symbols[row][col] = imgr.makeVariable("xi_" + row + "_" + col);
         }
       }
       return symbols;
@@ -271,19 +308,9 @@ public class Sudoku {
       return rules;
     }
 
-    /** convert the user-given values into constraints for the solver. */
     @Override
-    List<BooleanFormula> getAssignments(IntegerFormula[][] symbols, Integer[][] grid) {
-      final List<BooleanFormula> assignments = new ArrayList<>();
-      for (int row = 0; row < SIZE; row++) {
-        for (int col = 0; col < SIZE; col++) {
-          Integer value = grid[row][col];
-          if (value != null) {
-            assignments.add(imgr.equal(symbols[row][col], imgr.makeNumber(value)));
-          }
-        }
-      }
-      return assignments;
+    BooleanFormula getAssignment(IntegerFormula[][] symbols, int row, int col, Integer value) {
+      return imgr.equal(symbols[row][col], imgr.makeNumber(value));
     }
 
     @Override
@@ -305,7 +332,7 @@ public class Sudoku {
       for (int row = 0; row < SIZE; row++) {
         for (int col = 0; col < SIZE; col++) {
           for (int value = 0; value < SIZE; value++) {
-            symbols[row][col][value] = bmgr.makeVariable("x_" + row + "_" + col + "_" + value);
+            symbols[row][col][value] = bmgr.makeVariable("xb_" + row + "_" + col + "_" + value);
           }
         }
       }
@@ -380,19 +407,9 @@ public class Sudoku {
       return bmgr.and(oneHot);
     }
 
-    /** convert the user-given values into constraints for the solver. */
     @Override
-    List<BooleanFormula> getAssignments(BooleanFormula[][][] symbols, Integer[][] grid) {
-      final List<BooleanFormula> assignments = new ArrayList<>();
-      for (int row = 0; row < SIZE; row++) {
-        for (int col = 0; col < SIZE; col++) {
-          Integer value = grid[row][col];
-          if (value != null) {
-            assignments.add(symbols[row][col][value - 1]); // off-by-one!
-          }
-        }
-      }
-      return assignments;
+    BooleanFormula getAssignment(BooleanFormula[][][] symbols, int row, int col, Integer value) {
+      return symbols[row][col][value - 1]; // off-by-one!
     }
 
     @Override
@@ -400,6 +417,110 @@ public class Sudoku {
       for (int value = 0; value < SIZE; value++) {
         if (model.evaluate(symbols[row][col][value])) {
           return value + 1; // off-by-one!
+        }
+      }
+      return null;
+    }
+  }
+
+  public static class EnumerationBasedSudokuSolver extends SudokuSolver<EnumerationFormula[][]> {
+
+    private final EnumerationFormulaManager emgr;
+    private final EnumerationFormulaType type;
+    private static final String[] VALUES = {
+      "ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE",
+    };
+
+    public EnumerationBasedSudokuSolver(SolverContext context) {
+      super(context);
+      emgr = context.getFormulaManager().getEnumerationFormulaManager();
+      type = emgr.declareEnumeration("VALUES", VALUES);
+    }
+
+    /** prepare symbols: one symbol for each of the 9x9 cells. */
+    @Override
+    EnumerationFormula[][] getSymbols() {
+      final EnumerationFormula[][] symbols = new EnumerationFormula[SIZE][SIZE];
+      for (int row = 0; row < SIZE; row++) {
+        for (int col = 0; col < SIZE; col++) {
+          symbols[row][col] = emgr.makeVariable("xe_" + row + "_" + col, type);
+        }
+      }
+      return symbols;
+    }
+
+    /**
+     * build the default Sudoku constraints:
+     * <li>each symbol has a value from 1 to 9.
+     * <li>each column, each row, and each 3x3 block contains 9 distinct integer values.
+     */
+    @Override
+    List<BooleanFormula> getRules(EnumerationFormula[][] symbols) {
+      final List<BooleanFormula> rules = new ArrayList<>();
+
+      // each symbol has a value from 1 to 9
+      // -> solved implicitly by using enum-type
+
+      // row constraints: distinct numbers in all rows
+      for (int row = 0; row < SIZE; row++) {
+        List<EnumerationFormula> lst = new ArrayList<>();
+        for (int col = 0; col < SIZE; col++) {
+          lst.add(symbols[row][col]);
+        }
+        rules.add(distinct(lst));
+      }
+
+      // column constraints: distinct numbers in all columns
+      for (int col = 0; col < SIZE; col++) {
+        List<EnumerationFormula> lst = new ArrayList<>();
+        for (int row = 0; row < SIZE; row++) {
+          lst.add(symbols[row][col]);
+        }
+        rules.add(distinct(lst));
+      }
+
+      // block constraints: distinct numbers in all 3x3 blocks
+      for (int rowB = 0; rowB < SIZE; rowB += BLOCKSIZE) {
+        for (int colB = 0; colB < SIZE; colB += BLOCKSIZE) {
+          List<EnumerationFormula> lst = new ArrayList<>();
+          for (int row = rowB; row < rowB + BLOCKSIZE; row++) {
+            for (int col = colB; col < colB + BLOCKSIZE; col++) {
+              lst.add(symbols[row][col]);
+            }
+          }
+          rules.add(distinct(lst));
+        }
+      }
+
+      return rules;
+    }
+
+    private BooleanFormula distinct(List<EnumerationFormula> lst) {
+      if (lst.size() <= 1) {
+        return bmgr.makeTrue();
+      } else {
+        List<BooleanFormula> pairings = new ArrayList<>();
+        for (int i = 0; i < lst.size(); i++) {
+          for (int j = 0; j < i; j++) {
+            pairings.add(bmgr.not(emgr.equivalence(lst.get(i), lst.get(j))));
+          }
+        }
+        return bmgr.and(pairings);
+      }
+    }
+
+    @Override
+    BooleanFormula getAssignment(EnumerationFormula[][] symbols, int row, int col, Integer value) {
+      // index-shift required
+      return emgr.equivalence(symbols[row][col], emgr.makeConstant(VALUES[value - 1], type));
+    }
+
+    @Override
+    Integer getValue(EnumerationFormula[][] symbols, Model model, int row, int col) {
+      String value = model.evaluate(symbols[row][col]);
+      for (int i = 0; i < VALUES.length; i++) {
+        if (VALUES[i].equals(value)) {
+          return i + 1; // index-shift required
         }
       }
       return null;

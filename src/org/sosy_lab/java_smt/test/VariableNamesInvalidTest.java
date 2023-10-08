@@ -10,30 +10,11 @@ package org.sosy_lab.java_smt.test;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
-import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 
-@RunWith(Parameterized.class)
 @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE")
-public class VariableNamesInvalidTest extends SolverBasedTest0 {
-
-  @Parameters(name = "{0}")
-  public static Object[] getSolvers() {
-    return Solvers.values();
-  }
-
-  @Parameter(0)
-  public Solvers solver;
-
-  @Override
-  protected Solvers solverToUse() {
-    return solver;
-  }
+public class VariableNamesInvalidTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   // currently the only invalid String is the empty String
 
