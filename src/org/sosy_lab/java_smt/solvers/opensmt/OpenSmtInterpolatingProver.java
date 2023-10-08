@@ -20,6 +20,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
+import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtSolverContext.OpenSMTOptions;
 import org.sosy_lab.java_smt.solvers.opensmt.api.PTRef;
 import org.sosy_lab.java_smt.solvers.opensmt.api.VectorInt;
 import org.sosy_lab.java_smt.solvers.opensmt.api.VectorPTRef;
@@ -31,18 +32,14 @@ class OpenSmtInterpolatingProver extends OpenSmtAbstractProver<Integer>
   OpenSmtInterpolatingProver(
       OpenSmtFormulaCreator pFormulaCreator,
       FormulaManager pMgr,
-      int pRandom,
       ShutdownNotifier pShutdownNotifier,
       Set<ProverOptions> pOptions,
-      int pAlgBool,
-      int pAlgUf,
-      int pAlgLra) {
-
+      OpenSMTOptions pSolverOptions) {
     super(
         pFormulaCreator,
         pMgr,
         pShutdownNotifier,
-        getConfigInstance(pRandom, true, pAlgBool, pAlgUf, pAlgLra),
+        getConfigInstance(pSolverOptions, true),
         pOptions);
   }
 

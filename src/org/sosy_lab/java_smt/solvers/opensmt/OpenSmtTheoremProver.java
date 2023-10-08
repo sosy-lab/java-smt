@@ -13,6 +13,7 @@ import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
+import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtSolverContext.OpenSMTOptions;
 import org.sosy_lab.java_smt.solvers.opensmt.api.PTRef;
 
 class OpenSmtTheoremProver extends OpenSmtAbstractProver<Void> implements ProverEnvironment {
@@ -20,15 +21,14 @@ class OpenSmtTheoremProver extends OpenSmtAbstractProver<Void> implements Prover
   OpenSmtTheoremProver(
       OpenSmtFormulaCreator pFormulaCreator,
       FormulaManager pMgr,
-      int pRandom,
       ShutdownNotifier pShutdownNotifier,
-      Set<ProverOptions> pOptions) {
-
+      Set<ProverOptions> pOptions,
+      OpenSMTOptions pSolverOptions) {
     super(
         pFormulaCreator,
         pMgr,
         pShutdownNotifier,
-        getConfigInstance(pRandom, false, 0, 0, 0),
+        getConfigInstance(pSolverOptions, false),
         pOptions);
   }
 

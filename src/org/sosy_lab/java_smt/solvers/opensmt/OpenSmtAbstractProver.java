@@ -29,6 +29,7 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.basicimpl.ShutdownHook;
+import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtSolverContext.OpenSMTOptions;
 import org.sosy_lab.java_smt.solvers.opensmt.api.Logic;
 import org.sosy_lab.java_smt.solvers.opensmt.api.MainSolver;
 import org.sosy_lab.java_smt.solvers.opensmt.api.PTRef;
@@ -64,15 +65,14 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
   }
 
   protected static SMTConfig getConfigInstance(
-      int randomSeed, boolean interpolation, int algBool, int algUf, int algLra) {
+      OpenSMTOptions pSolverOptions, boolean interpolation) {
     SMTConfig config = new SMTConfig();
-    config.setRandomSeed(randomSeed);
+    config.setRandomSeed(pSolverOptions.randomSeed);
     config.setInterpolation(interpolation);
-
     if (interpolation) {
-      config.setOption(":interpolation-bool-algorithm", new SMTOption(algBool));
-      config.setOption(":interpolation-euf-algorithm", new SMTOption(algUf));
-      config.setOption(":interpolation-lra-algorithm", new SMTOption(algLra));
+      config.setOption(":interpolation-bool-algorithm", new SMTOption(pSolverOptions.algBool));
+      config.setOption(":interpolation-euf-algorithm", new SMTOption(pSolverOptions.algUf));
+      config.setOption(":interpolation-lra-algorithm", new SMTOption(pSolverOptions.algLra));
     }
     return config;
   }

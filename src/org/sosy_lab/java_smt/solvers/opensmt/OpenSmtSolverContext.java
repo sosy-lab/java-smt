@@ -35,12 +35,13 @@ public class OpenSmtSolverContext extends AbstractSolverContext {
   private final LogManager logger;
 
   private final ShutdownNotifier shutdownNotifier;
-  private final ExtraOptions extraOptions;
+  private final OpenSMTOptions solverOptions;
 
   private boolean closed = false;
 
   @Options(prefix = "solver.opensmt")
-  private static class ExtraOptions {
+  static class OpenSMTOptions {
+
     @Option(secure = true, description = "Algorithm for boolean interpolation")
     int algBool = 0;
 
@@ -52,7 +53,7 @@ public class OpenSmtSolverContext extends AbstractSolverContext {
 
     final int randomSeed;
 
-    ExtraOptions(Configuration config, int pRandomSeed) throws InvalidConfigurationException {
+    OpenSMTOptions(Configuration config, int pRandomSeed) throws InvalidConfigurationException {
       config.inject(this);
       randomSeed = pRandomSeed;
     }
@@ -63,14 +64,14 @@ public class OpenSmtSolverContext extends AbstractSolverContext {
       OpenSmtFormulaManager pManager,
       LogManager pLogger,
       ShutdownNotifier pShutdownNotifier,
-      ExtraOptions pOptions) {
+      OpenSMTOptions pSolverOptions) {
 
     super(pManager);
     creator = pCreator;
     manager = pManager;
     logger = pLogger;
     shutdownNotifier = pShutdownNotifier;
-    extraOptions = pOptions;
+    solverOptions = pSolverOptions;
   }
 
   public static SolverContext create(
@@ -105,9 +106,9 @@ public class OpenSmtSolverContext extends AbstractSolverContext {
             creator, functionTheory, booleanTheory, integerTheory, rationalTheory, arrayTheory);
 
     // Split off solver options
-    ExtraOptions options = new ExtraOptions(config, (int) pRandom);
+    OpenSMTOptions solverOptions = new OpenSMTOptions(config, (int) pRandom);
 
-    return new OpenSmtSolverContext(creator, manager, pLogger, pShutdownNotifier, options);
+    return new OpenSmtSolverContext(creator, manager, pLogger, pShutdownNotifier, solverOptions);
   }
 
   @Override
@@ -135,25 +136,19 @@ public class OpenSmtSolverContext extends AbstractSolverContext {
   }
 
   @Override
-  protected ProverEnvironment newProverEnvironment0(Set<SolverContext.ProverOptions> options) {
+  protected ProverEnvironment newProverEnvironment0(
+      Set<SolverContext.ProverOptions> pProverOptions) {
     Preconditions.checkState(!closed, "solver context is already closed");
     return new OpenSmtTheoremProver(
-        creator, manager, extraOptions.randomSeed, shutdownNotifier, options);
+        creator, manager, shutdownNotifier, pProverOptions, solverOptions);
   }
 
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
-      Set<SolverContext.ProverOptions> options) {
+      Set<SolverContext.ProverOptions> pProverOptions) {
     Preconditions.checkState(!closed, "solver context is already closed");
     return new OpenSmtInterpolatingProver(
-        creator,
-        manager,
-        extraOptions.randomSeed,
-        shutdownNotifier,
-        options,
-        extraOptions.algBool,
-        extraOptions.algUf,
-        extraOptions.algLra);
+        creator, manager, shutdownNotifier, pProverOptions, solverOptions);
   }
 
   @Override
