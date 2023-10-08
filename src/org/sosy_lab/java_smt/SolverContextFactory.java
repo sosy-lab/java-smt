@@ -236,9 +236,7 @@ public class SolverContextFactory {
   @SuppressWarnings("resource") // returns unclosed context object
   public SolverContext generateContext(Solvers solverToCreate, Logics logicToUse)
       throws InvalidConfigurationException {
-    if (logicToUse == null) {
-      throw new NullPointerException();
-    }
+    checkNotNull(logicToUse, "Logic for SMT is missing.");
 
     SolverContext context;
     try {

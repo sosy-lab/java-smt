@@ -8,7 +8,9 @@
 
 package org.sosy_lab.java_smt.solvers.opensmt;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -52,7 +54,7 @@ class OpenSmtInterpolatingProver extends OpenSmtAbstractProver<Integer>
 
   @Override
   public BooleanFormula getInterpolant(Collection<Integer> formulasOfA) {
-    Preconditions.checkState(!closed);
+    checkState(!closed);
     return creator.encapsulateBoolean(
         osmtSolver.getInterpolationContext().getSingleInterpolant(new VectorInt(formulasOfA)));
   }
@@ -60,11 +62,8 @@ class OpenSmtInterpolatingProver extends OpenSmtAbstractProver<Integer>
   @Override
   public List<BooleanFormula> getSeqInterpolants(
       List<? extends Collection<Integer>> partitionedFormulas) {
-    Preconditions.checkState(!closed);
-
-    if (partitionedFormulas.size() == 0) {
-      throw new IllegalArgumentException("Interpolation sequence must have length of at least 1");
-    }
+    checkState(!closed);
+    checkArgument(!partitionedFormulas.isEmpty(), "Interpolation sequence must not be empty");
 
     VectorVectorInt partitions = new VectorVectorInt();
     for (int i = 1; i < partitionedFormulas.size(); i++) {

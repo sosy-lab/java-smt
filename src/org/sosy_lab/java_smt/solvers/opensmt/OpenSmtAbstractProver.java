@@ -208,7 +208,7 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
       errors.add("arrays");
     }
 
-    if (errors.size() > 0) {
+    if (!errors.isEmpty()) {
       throw new SolverException(
           "Assertions use features that are not supported by the selected logic " + errors);
     }

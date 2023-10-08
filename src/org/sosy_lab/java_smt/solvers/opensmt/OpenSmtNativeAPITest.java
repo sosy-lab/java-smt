@@ -10,8 +10,8 @@ package org.sosy_lab.java_smt.solvers.opensmt;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import com.google.common.collect.ImmutableList;
 import java.util.Arrays;
-import java.util.List;
 import org.junit.Test;
 import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.java_smt.solvers.opensmt.api.ArithLogic;
@@ -464,7 +464,7 @@ public class OpenSmtNativeAPITest {
     System.out.println(check1);
 
     InterpolationContext context = mainSolver.getInterpolationContext();
-    VectorInt mask = new VectorInt(List.of(0));
+    VectorInt mask = new VectorInt(ImmutableList.of(0));
     PTRef interpol = context.getSingleInterpolant(mask);
     System.out.println(logic.pp(interpol));
 
