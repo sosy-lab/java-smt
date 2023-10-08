@@ -19,15 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import opensmt.Logic;
-import opensmt.MainSolver;
-import opensmt.PTRef;
-import opensmt.SMTConfig;
-import opensmt.SMTOption;
-import opensmt.SRef;
-import opensmt.SymRef;
-import opensmt.Symbol;
-import opensmt.sstat;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -39,6 +30,15 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.basicimpl.ShutdownHook;
+import org.sosy_lab.java_smt.solvers.opensmt.api.Logic;
+import org.sosy_lab.java_smt.solvers.opensmt.api.MainSolver;
+import org.sosy_lab.java_smt.solvers.opensmt.api.PTRef;
+import org.sosy_lab.java_smt.solvers.opensmt.api.SMTConfig;
+import org.sosy_lab.java_smt.solvers.opensmt.api.SMTOption;
+import org.sosy_lab.java_smt.solvers.opensmt.api.SRef;
+import org.sosy_lab.java_smt.solvers.opensmt.api.SymRef;
+import org.sosy_lab.java_smt.solvers.opensmt.api.Symbol;
+import org.sosy_lab.java_smt.solvers.opensmt.api.sstat;
 
 public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<T> {
 

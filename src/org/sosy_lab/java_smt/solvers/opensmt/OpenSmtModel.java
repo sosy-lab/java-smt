@@ -16,15 +16,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import opensmt.Logic;
-import opensmt.Model;
-import opensmt.PTRef;
-import opensmt.SRef;
-import opensmt.SymRef;
-import opensmt.Symbol;
-import opensmt.TemplateFunction;
-import opensmt.VectorPTRef;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
+import org.sosy_lab.java_smt.solvers.opensmt.api.Logic;
+import org.sosy_lab.java_smt.solvers.opensmt.api.Model;
+import org.sosy_lab.java_smt.solvers.opensmt.api.PTRef;
+import org.sosy_lab.java_smt.solvers.opensmt.api.SRef;
+import org.sosy_lab.java_smt.solvers.opensmt.api.SymRef;
+import org.sosy_lab.java_smt.solvers.opensmt.api.Symbol;
+import org.sosy_lab.java_smt.solvers.opensmt.api.TemplateFunction;
+import org.sosy_lab.java_smt.solvers.opensmt.api.VectorPTRef;
 
 public class OpenSmtModel extends AbstractModel<PTRef, SRef, Logic> {
 

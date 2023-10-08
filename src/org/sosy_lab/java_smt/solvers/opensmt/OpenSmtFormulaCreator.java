@@ -12,16 +12,6 @@ import com.google.common.collect.ImmutableList;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
-import opensmt.ArithLogic;
-import opensmt.Logic;
-import opensmt.LogicFactory;
-import opensmt.Logic_t;
-import opensmt.PTRef;
-import opensmt.Pterm;
-import opensmt.SRef;
-import opensmt.SymRef;
-import opensmt.VectorPTRef;
-import opensmt.VectorSRef;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.SolverContextFactory.Logics;
 import org.sosy_lab.java_smt.api.ArrayFormula;
@@ -37,6 +27,16 @@ import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtFormula.OpenSmtArrayFormula;
 import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtFormula.OpenSmtBooleanFormula;
 import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtFormula.OpenSmtIntegerFormula;
 import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtFormula.OpenSmtRationalFormula;
+import org.sosy_lab.java_smt.solvers.opensmt.api.ArithLogic;
+import org.sosy_lab.java_smt.solvers.opensmt.api.Logic;
+import org.sosy_lab.java_smt.solvers.opensmt.api.LogicFactory;
+import org.sosy_lab.java_smt.solvers.opensmt.api.Logic_t;
+import org.sosy_lab.java_smt.solvers.opensmt.api.PTRef;
+import org.sosy_lab.java_smt.solvers.opensmt.api.Pterm;
+import org.sosy_lab.java_smt.solvers.opensmt.api.SRef;
+import org.sosy_lab.java_smt.solvers.opensmt.api.SymRef;
+import org.sosy_lab.java_smt.solvers.opensmt.api.VectorPTRef;
+import org.sosy_lab.java_smt.solvers.opensmt.api.VectorSRef;
 
 public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, SymRef> {
 

@@ -10,14 +10,14 @@ package org.sosy_lab.java_smt.solvers.opensmt;
 
 import java.math.BigInteger;
 import java.util.List;
-import opensmt.ArithLogic;
-import opensmt.Logic;
-import opensmt.PTRef;
-import opensmt.SRef;
-import opensmt.SymRef;
-import opensmt.VectorPTRef;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager;
+import org.sosy_lab.java_smt.solvers.opensmt.api.ArithLogic;
+import org.sosy_lab.java_smt.solvers.opensmt.api.Logic;
+import org.sosy_lab.java_smt.solvers.opensmt.api.PTRef;
+import org.sosy_lab.java_smt.solvers.opensmt.api.SRef;
+import org.sosy_lab.java_smt.solvers.opensmt.api.SymRef;
+import org.sosy_lab.java_smt.solvers.opensmt.api.VectorPTRef;
 
 @SuppressWarnings("ClassTypeParameterName")
 abstract class OpenSmtNumeralFormulaManager<

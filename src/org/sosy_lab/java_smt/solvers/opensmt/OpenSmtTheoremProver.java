@@ -9,11 +9,11 @@
 package org.sosy_lab.java_smt.solvers.opensmt;
 
 import java.util.Set;
-import opensmt.PTRef;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
+import org.sosy_lab.java_smt.solvers.opensmt.api.PTRef;
 
 class OpenSmtTheoremProver extends OpenSmtAbstractProver<Void> implements ProverEnvironment {
 

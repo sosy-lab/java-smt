@@ -8,14 +8,14 @@
 
 package org.sosy_lab.java_smt.solvers.opensmt;
 
-import opensmt.Logic;
-import opensmt.PTRef;
-import opensmt.SRef;
-import opensmt.SymRef;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
+import org.sosy_lab.java_smt.solvers.opensmt.api.Logic;
+import org.sosy_lab.java_smt.solvers.opensmt.api.PTRef;
+import org.sosy_lab.java_smt.solvers.opensmt.api.SRef;
+import org.sosy_lab.java_smt.solvers.opensmt.api.SymRef;
 
 public class OpenSmtArrayFormulaManager
     extends AbstractArrayFormulaManager<PTRef, SRef, Logic, SymRef> {

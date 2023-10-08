@@ -11,7 +11,6 @@ package org.sosy_lab.java_smt.solvers.opensmt;
 import com.google.common.base.Preconditions;
 import java.util.Set;
 import java.util.function.Consumer;
-import opensmt.LogicFactory;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -26,6 +25,7 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
+import org.sosy_lab.java_smt.solvers.opensmt.api.LogicFactory;
 
 public class OpenSmtSolverContext extends AbstractSolverContext {
   private final OpenSmtFormulaCreator creator;

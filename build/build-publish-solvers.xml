@@ -30,7 +30,7 @@ SPDX-License-Identifier: Apache-2.0
             The custom revision has to be unique amongst the already known version
             numbers from the ivy repository. The script will append the git revision.
         </fail>
-        
+
         <!-- Get a naive version -->
         <exec executable="git" dir="${opensmt.path}" outputproperty="opensmt.revision" failonerror="true">
             <arg value="show"/>
@@ -44,7 +44,7 @@ SPDX-License-Identifier: Apache-2.0
         <property name="path.build"   value="${opensmt.path}/build"/>
         <property name="path.install" value="${opensmt.path}/install"/>
         <property name="path.source"  value="${user.dir}/lib/native/source/opensmt"/>
-        
+
         <mkdir dir="${path.build}"/>
         <mkdir dir="${path.install}"/>
 
@@ -56,21 +56,21 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="apply"/>
             <arg value="${path.source}/api.patch"/>
         </exec>
-        
+
         <!-- Build OpenSMT -->
         <exec executable="cmake" dir="${path.build}" failonerror="true">
             <arg value="-DCMAKE_INSTALL_PREFIX:PATH=${path.install}"/>
             <arg value="-DFORCE_STATIC_GMP=ON"/>
             <arg value=".."/>
         </exec>
-        
+
         <exec executable="make" dir="${path.build}" failonerror="true">
             <arg value="install"/>
         </exec>
-        
+
         <!-- Copy swig file to the install directory -->
         <copy file="${path.source}/opensmt.i" toFile="${path.install}/opensmt.i"/>
-        
+
         <!-- Dump ${opensmt.version} to a file so that we can use it from swig -->
         <echo file="${path.install}/Version.h">#define VERSION "${opensmt.version}"</echo>
 
@@ -82,14 +82,14 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="-c++"/>
             <arg value="-werror"/>
             <arg value="-package"/>
-            <arg value="opensmt"/>
+            <arg value="org.sosy_lab.java_smt.solvers.opensmt.api"/>
             <arg value="-outdir"/>
             <arg value="java/opensmt"/>
             <arg value="-o"/>
             <arg value="opensmt-wrap.cpp"/>
             <arg value="opensmt.i"/>
         </exec>
-        
+
         <!-- Copy (only!) the required java files to the source tree. This should make sure that compilation fails
              if the OpenSMT interface changed, but the swig header wasn't updated  -->
         <copy todir="${path.source}/src/opensmt">
@@ -127,16 +127,16 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- Package swig generated source code -->
         <jar destfile="opensmt-${opensmt.version}-sources.jar" basedir="${path.source}/src"/>
-        
+
         <!-- Generate and package javadoc documentation -->
         <mkdir dir="${path.source}/doc"/>
         <javadoc sourcepath="${path.source}/src" destdir="${path.source}/doc"/>
         <jar destfile="opensmt-${opensmt.version}-javadoc.jar" basedir="${path.source}/doc"/>
         <delete dir="${path.source}/doc"/>
-        
+
         <!-- Copy the lib to the root directory for later packaging-->
         <copy file="${path.install}/lib/libopensmt.so" toFile="libopensmt-${opensmt.version}.so"/>
-        
+
         <!-- Compile the wrapper and move the object file the source tree -->
         <exec executable="gcc" dir="${path.install}" failonerror="true">
             <arg value="-fPIC"/>
@@ -162,7 +162,7 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="-l:libgmp.a"/>
         </exec>
         <delete file="libopensmt.so"/>
-        
+
         <!-- Compile java proxies and create jar file -->
         <mkdir dir="${path.source}/bin"/>
         <javac srcdir="${path.source}/src/" destdir="${path.source}/bin/" includeantruntime="false">
@@ -174,7 +174,7 @@ SPDX-License-Identifier: Apache-2.0
 
     <target name="publish-opensmt" depends="package-opensmt, load-ivy"
         description="Publish OpenSMT binaries to Ivy repository.">
-        
+
         <ivy:resolve conf="solver-opensmt" file="solvers_ivy_conf/ivy_opensmt.xml" />
         <available property="ivy.hasrepository" file="repository/${ivy.organisation}/${ivy.module}" />
         <fail unless="ivy.hasrepository"
@@ -430,7 +430,7 @@ SPDX-License-Identifier: Apache-2.0
           - 'fPIC' for position-independent code, required for shared libraries.
           The full cmdline for building CVC5 is (note the double-dashes!):
             ./configure.sh production - -java-bindings - -auto-download - -statistics - -prefix=$WORKSPACE/cvc5-main/build/install -DVAR=fPIC
-          Theoretically CVC5s performance should be improveable by using -best (uses the best 
+          Theoretically CVC5s performance should be improveable by using -best (uses the best
           known general performance/dependencies) but this can not be combined with auto-download.
     -->
     <!-- SECTION: Publishing CVC5

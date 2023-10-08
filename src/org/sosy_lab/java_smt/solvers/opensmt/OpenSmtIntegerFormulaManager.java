@@ -10,10 +10,10 @@ package org.sosy_lab.java_smt.solvers.opensmt;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import opensmt.PTRef;
-import opensmt.SRef;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.solvers.opensmt.api.PTRef;
+import org.sosy_lab.java_smt.solvers.opensmt.api.SRef;
 
 class OpenSmtIntegerFormulaManager
     extends OpenSmtNumeralFormulaManager<IntegerFormula, IntegerFormula>

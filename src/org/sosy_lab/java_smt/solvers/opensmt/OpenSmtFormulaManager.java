@@ -11,16 +11,16 @@ package org.sosy_lab.java_smt.solvers.opensmt;
 import java.io.IOException;
 import java.util.Map;
 import java.util.stream.Collectors;
-import opensmt.Logic;
-import opensmt.PTRef;
-import opensmt.SRef;
-import opensmt.SymRef;
-import opensmt.Symbol;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
+import org.sosy_lab.java_smt.solvers.opensmt.api.Logic;
+import org.sosy_lab.java_smt.solvers.opensmt.api.PTRef;
+import org.sosy_lab.java_smt.solvers.opensmt.api.SRef;
+import org.sosy_lab.java_smt.solvers.opensmt.api.SymRef;
+import org.sosy_lab.java_smt.solvers.opensmt.api.Symbol;
 
 class OpenSmtFormulaManager extends AbstractFormulaManager<PTRef, SRef, Logic, SymRef> {
   private final OpenSmtFormulaCreator creator;

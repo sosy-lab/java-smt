@@ -13,15 +13,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import opensmt.PTRef;
-import opensmt.VectorInt;
-import opensmt.VectorPTRef;
-import opensmt.VectorVectorInt;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
+import org.sosy_lab.java_smt.solvers.opensmt.api.PTRef;
+import org.sosy_lab.java_smt.solvers.opensmt.api.VectorInt;
+import org.sosy_lab.java_smt.solvers.opensmt.api.VectorPTRef;
+import org.sosy_lab.java_smt.solvers.opensmt.api.VectorVectorInt;
 
 class OpenSmtInterpolatingProver extends OpenSmtAbstractProver<Integer>
     implements InterpolatingProverEnvironment<Integer> {

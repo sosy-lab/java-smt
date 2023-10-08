@@ -8,11 +8,11 @@
 
 package org.sosy_lab.java_smt.solvers.opensmt;
 
-import opensmt.Logic;
-import opensmt.PTRef;
-import opensmt.SRef;
-import opensmt.SymRef;
 import org.sosy_lab.java_smt.basicimpl.AbstractUFManager;
+import org.sosy_lab.java_smt.solvers.opensmt.api.Logic;
+import org.sosy_lab.java_smt.solvers.opensmt.api.PTRef;
+import org.sosy_lab.java_smt.solvers.opensmt.api.SRef;
+import org.sosy_lab.java_smt.solvers.opensmt.api.SymRef;
 
 class OpenSmtUFManager extends AbstractUFManager<PTRef, SymRef, SRef, Logic> {
 

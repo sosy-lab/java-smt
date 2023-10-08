@@ -11,28 +11,28 @@ package org.sosy_lab.java_smt.solvers.opensmt;
 import static com.google.common.truth.Truth.assertThat;
 
 import java.util.Arrays;
-import opensmt.ArithLogic;
-import opensmt.InterpolationContext;
-import opensmt.ItpAlgorithm;
-import opensmt.Logic;
-import opensmt.LogicFactory;
-import opensmt.Logic_t;
-import opensmt.MainSolver;
-import opensmt.Model;
-import opensmt.OpenSmt;
-import opensmt.PTRef;
-import opensmt.SMTConfig;
-import opensmt.SMTOption;
-import opensmt.SRef;
-import opensmt.SymRef;
-import opensmt.TemplateFunction;
-import opensmt.VectorInt;
-import opensmt.VectorPTRef;
-import opensmt.VectorSRef;
-import opensmt.opensmt_logic;
-import opensmt.sstat;
 import org.junit.Test;
 import org.sosy_lab.common.NativeLibraries;
+import org.sosy_lab.java_smt.solvers.opensmt.api.ArithLogic;
+import org.sosy_lab.java_smt.solvers.opensmt.api.InterpolationContext;
+import org.sosy_lab.java_smt.solvers.opensmt.api.ItpAlgorithm;
+import org.sosy_lab.java_smt.solvers.opensmt.api.Logic;
+import org.sosy_lab.java_smt.solvers.opensmt.api.LogicFactory;
+import org.sosy_lab.java_smt.solvers.opensmt.api.Logic_t;
+import org.sosy_lab.java_smt.solvers.opensmt.api.MainSolver;
+import org.sosy_lab.java_smt.solvers.opensmt.api.Model;
+import org.sosy_lab.java_smt.solvers.opensmt.api.OpenSmt;
+import org.sosy_lab.java_smt.solvers.opensmt.api.PTRef;
+import org.sosy_lab.java_smt.solvers.opensmt.api.SMTConfig;
+import org.sosy_lab.java_smt.solvers.opensmt.api.SMTOption;
+import org.sosy_lab.java_smt.solvers.opensmt.api.SRef;
+import org.sosy_lab.java_smt.solvers.opensmt.api.SymRef;
+import org.sosy_lab.java_smt.solvers.opensmt.api.TemplateFunction;
+import org.sosy_lab.java_smt.solvers.opensmt.api.VectorInt;
+import org.sosy_lab.java_smt.solvers.opensmt.api.VectorPTRef;
+import org.sosy_lab.java_smt.solvers.opensmt.api.VectorSRef;
+import org.sosy_lab.java_smt.solvers.opensmt.api.opensmt_logic;
+import org.sosy_lab.java_smt.solvers.opensmt.api.sstat;
 
 public class OpenSmtNativeAPITest {
   static {

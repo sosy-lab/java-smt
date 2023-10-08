@@ -10,14 +10,14 @@ package org.sosy_lab.java_smt.solvers.opensmt;
 
 import com.google.errorprone.annotations.Immutable;
 import java.util.Objects;
-import opensmt.Logic;
-import opensmt.PTRef;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
+import org.sosy_lab.java_smt.solvers.opensmt.api.Logic;
+import org.sosy_lab.java_smt.solvers.opensmt.api.PTRef;
 
 @Immutable
 public class OpenSmtFormula implements Formula {
