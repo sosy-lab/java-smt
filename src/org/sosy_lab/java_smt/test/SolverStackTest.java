@@ -24,7 +24,10 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.common.UniqueIdGenerator;
+import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Logics;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
@@ -174,17 +177,14 @@ public class SolverStackTest extends SolverBasedTest0 {
   public void singleStackTestRational()
       throws SolverException, InterruptedException, InvalidConfigurationException {
     requireRationals();
-    SolverContext context = initSolver("solver.logic", "QF_LRA");
-
-    FormulaManager mgr = context.getFormulaManager();
-    RationalFormulaManager rmgr = mgr.getRationalFormulaManager();
-
-    try (BasicProverEnvironment<?> env =
-        context.newProverEnvironmentWithInterpolation(ProverOptions.GENERATE_MODELS)) {
-      simpleStackTestNum(rmgr, env);
+    try (SolverContext localContext = initSolver("solver.logic", "QF_LRA")) {
+      FormulaManager localMgr = localContext.getFormulaManager();
+      RationalFormulaManager localRmgr = localMgr.getRationalFormulaManager();
+      try (BasicProverEnvironment<?> env =
+          localContext.newProverEnvironmentWithInterpolation(ProverOptions.GENERATE_MODELS)) {
+        simpleStackTestNum(localRmgr, env);
+      }
     }
-
-    context.close();
   }
 
   private <X extends NumeralFormula, Y extends X> void simpleStackTestNum(
@@ -667,38 +667,36 @@ public class SolverStackTest extends SolverBasedTest0 {
       throws SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
 
-    SolverContext context = initSolver("solver.logic", "ALL");
+    try (SolverContext localContext = initSolver("solver.logic", "ALL")) {
 
-    FormulaManager mgr = context.getFormulaManager();
-    IntegerFormulaManager imgr = mgr.getIntegerFormulaManager();
-    UFManager fmgr = mgr.getUFManager();
+      FormulaManager localMgr = localContext.getFormulaManager();
+      IntegerFormulaManager licalImgr = localMgr.getIntegerFormulaManager();
+      UFManager localFmgr = localMgr.getUFManager();
 
-    try (BasicProverEnvironment<?> stack =
-        context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
-      IntegerFormula zero = imgr.makeNumber(0);
-      IntegerFormula varA = imgr.makeVariable("a");
-      IntegerFormula varB = imgr.makeVariable("b");
-      stack.push(imgr.equal(varA, zero));
-      stack.push(imgr.equal(varB, zero));
-      FunctionDeclaration<IntegerFormula> uf =
-          fmgr.declareUF("uf", FormulaType.IntegerType, FormulaType.IntegerType);
-      stack.push(imgr.equal(fmgr.callUF(uf, varA), zero));
-      stack.push(imgr.equal(fmgr.callUF(uf, varB), zero));
-      assertThat(stack).isSatisfiable();
+      try (BasicProverEnvironment<?> stack =
+          localContext.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+        IntegerFormula zero = licalImgr.makeNumber(0);
+        IntegerFormula varA = licalImgr.makeVariable("a");
+        IntegerFormula varB = licalImgr.makeVariable("b");
+        stack.push(licalImgr.equal(varA, zero));
+        stack.push(licalImgr.equal(varB, zero));
+        FunctionDeclaration<IntegerFormula> uf =
+            localFmgr.declareUF("uf", FormulaType.IntegerType, FormulaType.IntegerType);
+        stack.push(licalImgr.equal(localFmgr.callUF(uf, varB), zero));
+        assertThat(stack).isSatisfiable();
 
-      Model model = stack.getModel();
+        Model model = stack.getModel();
 
-      // actual type of object is not defined, thus do string matching:
-      assertThat(model.evaluate(varA)).isEqualTo(BigInteger.ZERO);
-      assertThat(model.evaluate(varB)).isEqualTo(BigInteger.ZERO);
+        // actual type of object is not defined, thus do string matching:
+        assertThat(model.evaluate(varA)).isEqualTo(BigInteger.ZERO);
+        assertThat(model.evaluate(varB)).isEqualTo(BigInteger.ZERO);
 
-      requireUfValuesInModel();
+        requireUfValuesInModel();
 
-      assertThat(model.evaluate(fmgr.callUF(uf, imgr.makeNumber(BigDecimal.ZERO))))
-          .isEqualTo(BigInteger.ZERO);
+        assertThat(model.evaluate(localFmgr.callUF(uf, licalImgr.makeNumber(BigDecimal.ZERO))))
+            .isEqualTo(BigInteger.ZERO);
+      }
     }
-
-    context.close();
   }
 
   @Test
@@ -721,6 +719,33 @@ public class SolverStackTest extends SolverBasedTest0 {
         assertThrows(IllegalStateException.class, stack::push);
         assertThrows(IllegalStateException.class, stack::pop);
       }
+    }
+  }
+
+  /**
+   * Creates and returns a completely new SolverContext for the currently used solver (We need this
+   * to get more than one Context in 1 method in a controlled way).
+   *
+   * @param additionalOptions a list of pairs (key, value) for creating a new solver context.
+   * @return new and unique SolverContext for current solver (Parameter(0))
+   */
+  private SolverContext initSolver(String... additionalOptions)
+      throws InvalidConfigurationException {
+    try {
+      ConfigurationBuilder options =
+          Configuration.builder().setOption("solver.solver", solverToUse().toString());
+      for (int i = 0; i < additionalOptions.length; i += 2) {
+        options.setOption(additionalOptions[i], additionalOptions[i + 1]);
+      }
+      return new SolverContextFactory(options.build(), logger, shutdownNotifierToUse())
+          .generateContext();
+    } catch (InvalidConfigurationException e) {
+      assume()
+          .withMessage(e.getMessage())
+          .that(e)
+          .hasCauseThat()
+          .isNotInstanceOf(UnsatisfiedLinkError.class);
+      throw e;
     }
   }
 }
