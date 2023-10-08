@@ -1,19 +1,20 @@
 diff --git a/src/api/Interpret.cc b/src/api/Interpret.cc
-index 0c778b9f..4ea1a612 100644
+index 0c778b9f..418da7d8 100644
 --- a/src/api/Interpret.cc
 +++ b/src/api/Interpret.cc
-@@ -43,6 +43,10 @@ Interpret::~Interpret() {
+@@ -43,6 +43,11 @@ Interpret::~Interpret() {
      for (int i = 0; i < term_names.size(); ++i) {
          free(term_names[i]);
      }
 +
++    // if the logic is given in the constructor and was not set via string-input, we cleanup the reference
 +    if (!ownsLogic) {
 +        logic.release();
 +    }
  }
  
  PTRef
-@@ -1067,11 +1071,13 @@ void Interpret::comment_formatted(const char* fmt_str, ...) const {
+@@ -1067,11 +1072,13 @@ void Interpret::comment_formatted(const char* fmt_str, ...) const {
  
  
  void Interpret::notify_formatted(bool error, const char* fmt_str, ...) {
@@ -28,7 +29,7 @@ index 0c778b9f..4ea1a612 100644
  
      va_start(ap, fmt_str);
      while (true) {
-@@ -1080,25 +1086,31 @@ void Interpret::notify_formatted(bool error, const char* fmt_str, ...) {
+@@ -1080,25 +1087,31 @@ void Interpret::notify_formatted(bool error, const char* fmt_str, ...) {
              switch (*fmt_str++) {
              case 's':
                  t = va_arg(ap, char *);
@@ -67,7 +68,7 @@ index 0c778b9f..4ea1a612 100644
  
  void Interpret::notify_success() {
 diff --git a/src/api/Interpret.h b/src/api/Interpret.h
-index e43b7691..1747d215 100644
+index e43b7691..a28a659d 100644
 --- a/src/api/Interpret.h
 +++ b/src/api/Interpret.h
 @@ -135,6 +135,7 @@ class Interpret {
@@ -78,13 +79,14 @@ index e43b7691..1747d215 100644
  
      // Named terms for getting variable values
      MapWithKeys<const char*,PTRef,StringHash,Equal<const char*>> nameToTerm;
-@@ -189,8 +190,19 @@ class Interpret {
+@@ -189,8 +190,20 @@ class Interpret {
      Interpret(SMTConfig & c)
          : config     (c)
          , f_exit     (false)
 +        , ownsLogic  (true)
          { }
  
++    /** This constructor reuses the existing logic from caller context. */
 +    Interpret(SMTConfig & c, Logic & l)
 +        : config     (c)
 +        , f_exit     (false)
@@ -189,7 +191,7 @@ index 8609ef55..11813348 100644
              is_neg = true;
          }
 diff --git a/src/logics/ArithLogic.h b/src/logics/ArithLogic.h
-index 6f2669f9..fa8a7e26 100644
+index 6f2669f9..50a623a9 100644
 --- a/src/logics/ArithLogic.h
 +++ b/src/logics/ArithLogic.h
 @@ -4,7 +4,7 @@
@@ -201,13 +203,6 @@ index 6f2669f9..fa8a7e26 100644
  {
      std::string msg;
  public:
-@@ -417,4 +417,4 @@ public:
-     bool operator ()  (PTRef x_, PTRef y_) const;
- 
- };
--#endif
-\ No newline at end of file
-+#endif
 diff --git a/src/logics/FunctionTools.h b/src/logics/FunctionTools.h
 index fc9dbfb7..943a466d 100644
 --- a/src/logics/FunctionTools.h
@@ -363,39 +358,30 @@ index 73513cd1..888f970c 100644
  
      SSymRef       getSortSymIndexed()              const { return sym_IndexedSort; }
 diff --git a/src/logics/LogicFactory.cc b/src/logics/LogicFactory.cc
-index ceedd296..7e07010d 100644
+index ceedd296..2c1dfc0d 100644
 --- a/src/logics/LogicFactory.cc
 +++ b/src/logics/LogicFactory.cc
-@@ -79,7 +79,9 @@ Logic * opensmt::LogicFactory::getInstance(Logic_t logicType) {
+@@ -79,6 +79,8 @@ Logic * opensmt::LogicFactory::getInstance(Logic_t logicType) {
      return l;
  }
  
--ArithLogic * opensmt::LogicFactory::getLRAInstance() { return new ArithLogic(Logic_t::QF_LRA); }
 +ArithLogic * opensmt::LogicFactory::getLAInstance(Logic_t logicType) { return dynamic_cast<ArithLogic*>(getInstance(logicType)); }
++
+ ArithLogic * opensmt::LogicFactory::getLRAInstance() { return new ArithLogic(Logic_t::QF_LRA); }
  
-+ArithLogic * opensmt::LogicFactory::getLRAInstance() { return new ArithLogic(Logic_t::QF_LRA); }
  ArithLogic * opensmt::LogicFactory::getLIAInstance() { return new ArithLogic(Logic_t::QF_LIA); }
- 
-+ArithLogic * opensmt::LogicFactory::getLogicAll() { return new ArithLogic(Logic_t::QF_AUFLIRA); }
 diff --git a/src/logics/LogicFactory.h b/src/logics/LogicFactory.h
-index 65b039e9..120446d3 100644
+index 65b039e9..44b06b0d 100644
 --- a/src/logics/LogicFactory.h
 +++ b/src/logics/LogicFactory.h
-@@ -169,9 +169,13 @@ std::string getStringFromLogic(const Logic_t logic);
- 
+@@ -170,6 +170,7 @@ std::string getStringFromLogic(const Logic_t logic);
  class LogicFactory {
  public:
--    static Logic * getInstance(Logic_t);
-+    static Logic *  getInstance(Logic_t);
+     static Logic * getInstance(Logic_t);
 +    static ArithLogic * getLAInstance(Logic_t);
-+
      static ArithLogic * getLRAInstance();
      static ArithLogic * getLIAInstance();
-+
-+    static ArithLogic * getLogicAll();
  };
- }
- #endif //OPENSMT_LOGICFACTORY_H
 diff --git a/src/logics/Theory.h b/src/logics/Theory.h
 index ef231407..0799d499 100644
 --- a/src/logics/Theory.h
@@ -409,18 +395,6 @@ index ef231407..0799d499 100644
  
  // No global variable for storing the push frame id.  I decided to
  // implement this as my own memory allocation.  There's no free though
-diff --git a/src/models/Model.cc b/src/models/Model.cc
-index 1ab10b07..2f182d05 100644
---- a/src/models/Model.cc
-+++ b/src/models/Model.cc
-@@ -114,4 +114,5 @@ TemplateFunction Model::getDefinition(SymRef sr) const {
-         }
-         return TemplateFunction(symName, formalArgs, logic.getSym(sr).rsort(), logic.getDefaultValuePTRef(logic.getSym(sr).rsort()));
-     }
--}
-\ No newline at end of file
-+
-+}
 diff --git a/src/sorts/SSort.h b/src/sorts/SSort.h
 index 990da3b0..14922397 100644
 --- a/src/sorts/SSort.h

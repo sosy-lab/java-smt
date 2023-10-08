@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2023 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -40,7 +40,7 @@ import org.sosy_lab.java_smt.solvers.opensmt.api.VectorSRef;
 
 public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, SymRef> {
 
-  private Logics logicToUse;
+  private final Logics logicToUse;
 
   private OpenSmtFormulaCreator(Logics logicType, Logic logic) {
     super(
@@ -54,36 +54,42 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, Sy
     logicToUse = logicType;
   }
 
-  public static OpenSmtFormulaCreator newCreator(Logics logicType) {
+  public static OpenSmtFormulaCreator create(Logics logicType) {
+    return new OpenSmtFormulaCreator(logicType, createLogic(logicType));
+  }
+
+  private static Logic createLogic(Logics logicType) {
     switch (logicType) {
       case CORE:
-        return new OpenSmtFormulaCreator(logicType, LogicFactory.getInstance(Logic_t.QF_BOOL));
+        return LogicFactory.getInstance(Logic_t.QF_BOOL);
       case QF_AX:
-        return new OpenSmtFormulaCreator(logicType, LogicFactory.getInstance(Logic_t.QF_AX));
+        return LogicFactory.getInstance(Logic_t.QF_AX);
       case QF_UF:
-        return new OpenSmtFormulaCreator(logicType, LogicFactory.getInstance(Logic_t.QF_UF));
+        return LogicFactory.getInstance(Logic_t.QF_UF);
       case QF_IDL:
-        return new OpenSmtFormulaCreator(logicType, LogicFactory.getLAInstance(Logic_t.QF_IDL));
+        return LogicFactory.getLAInstance(Logic_t.QF_IDL);
       case QF_RDL:
-        return new OpenSmtFormulaCreator(logicType, LogicFactory.getLAInstance(Logic_t.QF_RDL));
+        return LogicFactory.getLAInstance(Logic_t.QF_RDL);
       case QF_LIA:
-        return new OpenSmtFormulaCreator(logicType, LogicFactory.getLAInstance(Logic_t.QF_LIA));
+        return LogicFactory.getLAInstance(Logic_t.QF_LIA);
       case QF_LRA:
-        return new OpenSmtFormulaCreator(logicType, LogicFactory.getLAInstance(Logic_t.QF_LRA));
+        return LogicFactory.getLAInstance(Logic_t.QF_LRA);
       case QF_ALIA:
-        return new OpenSmtFormulaCreator(logicType, LogicFactory.getLAInstance(Logic_t.QF_ALIA));
+        return LogicFactory.getLAInstance(Logic_t.QF_ALIA);
       case QF_ALRA:
-        return new OpenSmtFormulaCreator(logicType, LogicFactory.getLAInstance(Logic_t.QF_ALRA));
+        return LogicFactory.getLAInstance(Logic_t.QF_ALRA);
       case QF_UFLIA:
-        return new OpenSmtFormulaCreator(logicType, LogicFactory.getLAInstance(Logic_t.QF_UFLIA));
+        return LogicFactory.getLAInstance(Logic_t.QF_UFLIA);
       case QF_UFLRA:
-        return new OpenSmtFormulaCreator(logicType, LogicFactory.getLAInstance(Logic_t.QF_UFLRA));
+        return LogicFactory.getLAInstance(Logic_t.QF_UFLRA);
       case QF_AUFLIA:
-        return new OpenSmtFormulaCreator(logicType, LogicFactory.getLAInstance(Logic_t.QF_AUFLIA));
+        return LogicFactory.getLAInstance(Logic_t.QF_AUFLIA);
       case QF_AUFLRA:
-        return new OpenSmtFormulaCreator(logicType, LogicFactory.getLAInstance(Logic_t.QF_AUFLRA));
+        return LogicFactory.getLAInstance(Logic_t.QF_AUFLRA);
+      case ALL:
+        return LogicFactory.getLAInstance(Logic_t.QF_AUFLIRA);
       default:
-        return new OpenSmtFormulaCreator(Logics.ALL, LogicFactory.getLogicAll());
+        throw new AssertionError("no logic available");
     }
   }
 
@@ -308,32 +314,23 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, Sy
 
     if (logic.isAnd(f)) {
       return FunctionDeclarationKind.AND;
-    }
-    if (logic.isIff(f)) {
+    } else if (logic.isIff(f)) {
       return FunctionDeclarationKind.IFF;
-    }
-    if (logic.isImplies(f)) {
+    } else if (logic.isImplies(f)) {
       return FunctionDeclarationKind.IMPLIES;
-    }
-    if (logic.isIte(f)) {
+    } else if (logic.isIte(f)) {
       return FunctionDeclarationKind.ITE;
-    }
-    if (logic.isNot(f)) {
+    } else if (logic.isNot(f)) {
       return FunctionDeclarationKind.NOT;
-    }
-    if (logic.isOr(f)) {
+    } else if (logic.isOr(f)) {
       return FunctionDeclarationKind.OR;
-    }
-    if (logic.isArraySelect(f)) {
+    } else if (logic.isArraySelect(f)) {
       return FunctionDeclarationKind.SELECT;
-    }
-    if (logic.isArrayStore(f)) {
+    } else if (logic.isArrayStore(f)) {
       return FunctionDeclarationKind.STORE;
-    }
-    if (logic.isUF(f)) {
+    } else if (logic.isUF(f)) {
       return FunctionDeclarationKind.UF;
-    }
-    if (logic.isXor(f)) {
+    } else if (logic.isXor(f)) {
       return FunctionDeclarationKind.XOR;
     }
 
@@ -355,38 +352,27 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, Sy
 
     if (alogic.isPlus(f)) {
       return FunctionDeclarationKind.ADD;
-    }
-    if (alogic.isDisequality(f)) {
+    } else if (alogic.isDisequality(f)) {
       return FunctionDeclarationKind.DISTINCT;
-    }
-    if (alogic.isDiv(f)) {
+    } else if (alogic.isDiv(f)) {
       return FunctionDeclarationKind.DIV;
-    }
-    if (alogic.isEquality(f)) {
+    } else if (alogic.isEquality(f)) {
       return FunctionDeclarationKind.EQ;
-    }
-    if (alogic.isGeq(f)) {
+    } else if (alogic.isGeq(f)) {
       return FunctionDeclarationKind.GT;
-    }
-    if (alogic.isGt(f)) {
+    } else if (alogic.isGt(f)) {
       return FunctionDeclarationKind.GTE;
-    }
-    if (alogic.isLeq(f)) {
+    } else if (alogic.isLeq(f)) {
       return FunctionDeclarationKind.LT;
-    }
-    if (alogic.isLt(f)) {
+    } else if (alogic.isLt(f)) {
       return FunctionDeclarationKind.LTE;
-    }
-    if (alogic.isMod(f)) {
+    } else if (alogic.isMod(f)) {
       return FunctionDeclarationKind.MODULO;
-    }
-    if (alogic.isTimes(f)) {
+    } else if (alogic.isTimes(f)) {
       return FunctionDeclarationKind.MUL;
-    }
-    if (alogic.isMinus(f)) {
+    } else if (alogic.isMinus(f)) {
       return FunctionDeclarationKind.SUB;
-    }
-    if (alogic.isNeg(f)) {
+    } else if (alogic.isNeg(f)) {
       return FunctionDeclarationKind.UMINUS;
     }
 

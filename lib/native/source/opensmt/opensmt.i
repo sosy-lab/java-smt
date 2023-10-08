@@ -57,12 +57,12 @@
     jclass exceptionType = jenv->FindClass("java/lang/UnsupportedOperationException");
     jenv->ThrowNew(exceptionType, e.what());
     return $null;
-  } 
+  }
   catch(OutOfMemoryException& e) {
     jclass exceptionType = jenv->FindClass("java/lang/OutOfMemoryError");
     jenv->ThrowNew(exceptionType, "");
     return $null;
-  } 
+  }
   catch(...) {
     jclass exceptionType = jenv->FindClass("java/lang/RuntimeException");
     jenv->ThrowNew(exceptionType, "");
@@ -116,7 +116,6 @@
 %newobject LogicFactory::getLAInstance(Logic_t);
 %newobject LogicFactory::getLRAInstance();
 %newobject LogicFactory::getLIAInstance();
-%newobject LogicFactory::getLogicAll();
 
 %extend opensmt::LogicFactory {
   static std::string getVersion() {
@@ -134,7 +133,7 @@
 
 %ignore SMTOption::SMTOption(ASTNode const & n);
 %ignore SMTOption::getValue() const;
-   
+
 %ignore SpType;
 %ignore SpPref;
 %ignore SpFormat;
@@ -151,23 +150,23 @@
   static ItpAlgorithm getBoolMcmillan() {
     return itp_alg_mcmillan;
     }
-  
+
   static ItpAlgorithm getBoolPudlak() {
     return itp_alg_pudlak;
     }
-  
+
   static ItpAlgorithm getBoolMcmillanp() {
     return itp_alg_mcmillanp;
     }
-  
+
   static ItpAlgorithm getBoolPs() {
     return itp_alg_ps;
     }
-  
+
   static ItpAlgorithm getBoolPsw() {
     return itp_alg_psw;
     }
-  
+
   static ItpAlgorithm getBoolPss() {
     return itp_alg_pss;
     }
@@ -180,11 +179,11 @@
   static ItpAlgorithm getEufStrong() {
     return itp_euf_alg_strong;
   }
-  
+
   static ItpAlgorithm getEufWeak() {
     return itp_euf_alg_weak;
   }
-  
+
   static ItpAlgorithm getEufRandom() {
     return itp_euf_alg_random;
   }
@@ -199,23 +198,23 @@
   static ItpAlgorithm getLraStrong() {
     return itp_lra_alg_strong;
   }
-  
+
   static ItpAlgorithm getLraWeak() {
     return itp_lra_alg_weak;
   }
-  
+
   static ItpAlgorithm getLraFactor() {
     return itp_lra_alg_factor;
   }
-  
+
   static ItpAlgorithm getLraDecomposingStrong() {
     return itp_lra_alg_decomposing_strong;
   }
-  
+
   static ItpAlgorithm getLraDecomposingWeak() {
     return itp_lra_alg_decomposing_weak;
   }
-  
+
   static const char* getLraFactor0() {
     return itp_lra_factor_0;
   }
@@ -547,7 +546,7 @@
     }
     return false;
   }
-  
+
   public int hashCode() {
     return Long.hashCode(this.getX());
   }
@@ -585,25 +584,15 @@
 %ignore Pterm::begin () const;
 %ignore Pterm::end () const;
 %extend Pterm {
-  /* FIXME: Crashes ModelEvaluationTest
-  
+  %newobject getArgs;
   std::vector<PTRef> getArgs() {
     std::vector<PTRef> args;
     for(auto i=0; i<$self->size(); i++)
-      args.push_back($self->operator[](i));
-    return args;
-  }
-  */
-
-  // FIXME: Works, but has memory leak?    
-  std::vector<PTRef>* getArgs() {
-    std::vector<PTRef>* args = new std::vector<PTRef>();
-    for(auto i=0; i<$self->size(); i++)
-      args->push_back($self->operator[](i));
+      args.emplace_back($self->operator[](i));
     return args;
   }
 
-  // FIXME: Workaround
+  // Workaround to provide access to the i-th arg.
   PTRef at(int i) {
     return $self->operator[](i);
   }
@@ -632,7 +621,7 @@
     }
     return false;
   }
-  
+
   public int hashCode() {
     return Long.hashCode(this.getX());
   }
@@ -666,7 +655,7 @@
     }
     return false;
   }
-  
+
   public int hashCode() {
     return Long.hashCode(this.getX());
   }
@@ -713,7 +702,7 @@
     }
     return false;
   }
-  
+
   public int hashCode() {
     return Long.hashCode(this.getX());
   }
@@ -762,7 +751,7 @@
 %ignore FunctionSignature;
 
 %ignore TemplateFunction::TemplateFunction (const std::string &name, const vec< PTRef > &args_, SRef ret_sort, PTRef tr_body);
-%ignore TemplateFunction::TemplateFunction (FunctionSignature &&signature, PTRef body); 
+%ignore TemplateFunction::TemplateFunction (FunctionSignature &&signature, PTRef body);
 %ignore TemplateFunction::TemplateFunction (const TemplateFunction &other);
 %ignore TemplateFunction::TemplateFunction (TemplateFunction &&other);
 %ignore TemplateFunction::operator= (TemplateFunction &&);
@@ -771,7 +760,7 @@
   TemplateFunction(const std::string &name, const std::vector< PTRef > &args_, SRef ret_sort, PTRef tr_body) {
     return new TemplateFunction(name, vec(args_), ret_sort, tr_body);
   }
-  
+
   %newobject getArgs;
   std::vector<PTRef> getArgs() {
     std::vector<PTRef> res;
@@ -792,7 +781,7 @@
 %ignore Logic::tk_anon;
 %ignore Logic::tk_uf_not;
 %ignore Logic::tk_not;
-%ignore Logic::tk_equals; 
+%ignore Logic::tk_equals;
 %ignore Logic::tk_implies;
 %ignore Logic::tk_and;
 %ignore Logic::tk_or;
@@ -812,7 +801,7 @@
 %ignore Logic::hasUFs () const;
 %ignore Logic::hasIntegers () const;
 %ignore Logic::hasReals () const;
-//%ignore Logic::getSortRef (PTRef tr) const; 
+//%ignore Logic::getSortRef (PTRef tr) const;
 %ignore Logic::getSortRef (SymRef sr) const;
 //%ignore Logic::printSort (SRef s) const;
 //%ignore Logic::getSortSize (SRef s) const;
@@ -827,7 +816,7 @@
   PTRef mkStore(PTRef array, PTRef index, PTRef value) {
     return $self->mkStore({array, index, value});
   }
-  
+
   PTRef mkSelect(PTRef array, PTRef index) {
     return $self->mkSelect({array, index});
   }
@@ -897,7 +886,7 @@
   PTRef mkDistinct(std::vector<PTRef> const &args) {
     return $self->mkDistinct(vec(args));
   }
-  
+
   PTRef mkDistinct(PTRef a, PTRef b) {
     std::vector<PTRef> args;
     args.emplace_back(a);
@@ -907,7 +896,7 @@
  }
 //%ignore Logic::mkVar (SRef, const char *, bool isInterpreted=false);
 %ignore Logic::mkUniqueAbstractValue (SRef);
-%ignore Logic::mkConst (const char *); 
+%ignore Logic::mkConst (const char *);
 //%ignore Logic::mkConst (SRef, const char *);
 %ignore Logic::declareFun (std::string const &fname, SRef rsort, vec< SRef > const &args, SymbolConfig const &symbolConfig);
 %ignore Logic::declareFun (std::string const &fname, SRef rsort, vec< SRef > const &args);
@@ -930,7 +919,7 @@
 %ignore Logic::declareFun_Pairwise (std::string const &s, SRef rsort, vec< SRef > const &args);
 %ignore Logic::instantiateFunctions (SRef);
 %ignore Logic::instantiateArrayFunctions (SRef);
-%ignore Logic::hasSortSymbol (SortSymbol const &); 
+%ignore Logic::hasSortSymbol (SortSymbol const &);
 %ignore Logic::peekSortSymbol (SortSymbol const &, SSymRef &);
 %ignore Logic::declareSortSymbol (SortSymbol symbol);
 %ignore Logic::getSort (SSymRef, vec< SRef > &&args);
@@ -987,7 +976,7 @@
 //%ignore Logic::isConstant (PTRef tr) const;
 %ignore Logic::yieldsSortUninterpreted (PTRef tr) const;
 %ignore Logic::isUFSort (const SRef sr) const;
-%ignore Logic::appearsInUF (PTRef tr) const; 
+%ignore Logic::appearsInUF (PTRef tr) const;
 %ignore Logic::setAppearsInUF (PTRef tr);
 %ignore Logic::getNestedBoolRoots (PTRef tr) const;
 %ignore Logic::isVar (SymRef sr) const;
@@ -1018,7 +1007,7 @@
 //%ignore Logic::isFalse (PTRef tr) const;
 %ignore Logic::isIff (SymRef sr) const;
 //%ignore Logic::isIff (PTRef tr) const;
-//%ignore Logic::hasSortBool (PTRef tr) const; 
+//%ignore Logic::hasSortBool (PTRef tr) const;
 %ignore Logic::hasSortBool (SymRef sr) const;
 %ignore Logic::hasEquality (vec< PTRef > &args);
 %ignore Logic::resolveTerm (const char *s, vec< PTRef > &&args, SRef sortRef=SRef_Undef, SymbolMatcher symbolMatcher=SymbolMatcher::Any);
@@ -1044,10 +1033,10 @@
 %ignore Logic::printTerm_ (PTRef tr, bool l, bool s) const;
 %ignore Logic::printTerm (PTRef tr) const;
 %ignore Logic::printTerm (PTRef tr, bool l, bool s) const;
-//%ignore Logic::pp (PTRef tr) const; 
+//%ignore Logic::pp (PTRef tr) const;
 %ignore Logic::printSym (SymRef sr) const;
 %ignore Logic::termSort (vec< PTRef > &v) const;
-%ignore Logic::purify (PTRef r, PTRef &p, lbool &sgn) const; 
+%ignore Logic::purify (PTRef r, PTRef &p, lbool &sgn) const;
 %ignore Logic::collectStats (PTRef, int &n_of_conn, int &n_of_eq, int &n_of_uf, int &n_of_if);
 %ignore Logic::typeCheck (SymRef sym, vec< PTRef > const &args, std::string &why) const;
 %ignore Logic::verbose () const;
@@ -1058,7 +1047,7 @@
 %ignore LANonLinearException;
 %ignore ArithDivisionByZeroException;
 
-%ignore ArithLogic::propFormulasAppearingInUF; 
+%ignore ArithLogic::propFormulasAppearingInUF;
 %ignore ArithLogic::tk_val_uf_default;
 %ignore ArithLogic::tk_val_bool_default;
 %ignore ArithLogic::tk_true;
@@ -1093,7 +1082,7 @@
   PTRef mkIntConst(const std::string& c) {
     return $self->mkIntConst(FastRational(c.c_str()));
   }
-  
+
   PTRef mkRealConst(const std::string& c) {
     return $self->mkRealConst(FastRational(c.c_str()));
   }
@@ -1127,7 +1116,7 @@
   }
  }
 %ignore ArithLogic::isUFEquality (PTRef tr) const override;
-%ignore ArithLogic::isAtom (PTRef tr) const override; 
+%ignore ArithLogic::isAtom (PTRef tr) const override;
 %ignore ArithLogic::getDefaultValue (PTRef tr) const override;
 %ignore ArithLogic::getDefaultValuePTRef (SRef sref) const override;
 %ignore ArithLogic::get_sym_Int_TIMES () const;
@@ -1148,7 +1137,7 @@
 %ignore ArithLogic::get_sym_Int_LT () const;
 %ignore ArithLogic::get_sym_Real_LT () const;
 %ignore ArithLogic::get_sym_Int_GT () const;
-%ignore ArithLogic::get_sym_Real_GT () const; 
+%ignore ArithLogic::get_sym_Real_GT () const;
 %ignore ArithLogic::get_sym_Int_EQ () const;
 %ignore ArithLogic::get_sym_Real_EQ () const;
 %ignore ArithLogic::get_Sym_Int_ZERO () const;
@@ -1190,7 +1179,7 @@
 %ignore ArithLogic::isIntTimes (SymRef sr) const;
 %ignore ArithLogic::isRealTimes (SymRef sr) const;
 %ignore ArithLogic::isRealDiv (PTRef tr) const;
-%ignore ArithLogic::isRealDiv (SymRef sr) const; 
+%ignore ArithLogic::isRealDiv (SymRef sr) const;
 %ignore ArithLogic::isIntDiv (PTRef tr) const;
 %ignore ArithLogic::isIntDiv (SymRef sr) const;
 %extend ArithLogic {
@@ -1226,7 +1215,7 @@
 //%ignore ArithLogic::isGeq (PTRef tr) const;
 %ignore ArithLogic::isIntGeq (PTRef tr) const;
 %ignore ArithLogic::isRealGeq (PTRef tr) const;
-%ignore ArithLogic::isIntGeq (SymRef sr) const; 
+%ignore ArithLogic::isIntGeq (SymRef sr) const;
 %ignore ArithLogic::isRealGeq (SymRef sr) const;
 %ignore ArithLogic::isGt (SymRef sr) const;
 //%ignore ArithLogic::isGt (PTRef tr) const;
@@ -1239,7 +1228,7 @@
 %ignore ArithLogic::isNumVarLike (SymRef sr) const;
 %ignore ArithLogic::isNumVarLike (PTRef tr) const;
 %ignore ArithLogic::isZero (SymRef sr) const;
-%ignore ArithLogic::isZero (PTRef tr) const; 
+%ignore ArithLogic::isZero (PTRef tr) const;
 %ignore ArithLogic::isIntZero (PTRef tr) const;
 %ignore ArithLogic::isRealZero (PTRef tr) const;
 %ignore ArithLogic::isIntZero (SymRef sr) const;
@@ -1291,7 +1280,7 @@
 %ignore ArithLogic::mkGeq (vec< PTRef > const &args);
 // PTRef 	mkGeq (PTRef arg1, PTRef arg2)
 %ignore ArithLogic::mkLt (vec< PTRef > const &args);
-// PTRef 	mkLt (PTRef arg1, PTRef arg2) 
+// PTRef 	mkLt (PTRef arg1, PTRef arg2)
 %ignore ArithLogic::mkGt (vec< PTRef > const &args);
 // PTRef 	mkGt (PTRef arg1, PTRef arg2)
 %ignore ArithLogic::isLinearTerm (PTRef tr) const;
@@ -1301,11 +1290,11 @@
 %ignore ArithLogic::normalizeMul (PTRef mul);
 %ignore ArithLogic::sumToNormalizedInequality (PTRef sum);
 %ignore ArithLogic::sumToNormalizedEquality (PTRef sum);
-%ignore ArithLogic::arithmeticElimination (vec< PTRef > const &top_level_arith, SubstMap &substitutions); 
+%ignore ArithLogic::arithmeticElimination (vec< PTRef > const &top_level_arith, SubstMap &substitutions);
 %ignore ArithLogic::retrieveSubstitutions (vec< PtAsgn > const &facts) override;
 %ignore ArithLogic::termSort (vec< PTRef > &v) const override;
 %ignore ArithLogic::removeAuxVars (PTRef) override;
-%ignore ArithLogic::printTerm_ (PTRef tr, bool ext, bool s) const override; 
+%ignore ArithLogic::printTerm_ (PTRef tr, bool ext, bool s) const override;
 %ignore ArithLogic::getConstantFromLeq (PTRef);
 %ignore ArithLogic::getTermFromLeq (PTRef);
 %ignore ArithLogic::leqToConstantAndTerm (PTRef);
@@ -1387,9 +1376,9 @@
 
 %include "include/opensmt/MainSolver.h"
 
-%ignore Model::Model (Logic &logic, Evaluation basicEval, SymbolDefinition symbolDef); 
+%ignore Model::Model (Logic &logic, Evaluation basicEval, SymbolDefinition symbolDef);
 %ignore Model::Model (Logic &logic, Evaluation basicEval);
-  
+
 //%ignore Model::getDefinition (SymRef) const;
 %ignore Model::getFormalArgBaseNameForSymbol (const Logic &logic, SymRef sr, const std::string &formalArgDefaultPrefix);
 

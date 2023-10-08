@@ -403,7 +403,7 @@ public class OpenSmtNativeAPITest {
    */
   @Test
   public void testNulString() {
-    Logic logic = LogicFactory.getLogicAll();
+    Logic logic = LogicFactory.getLAInstance(Logic_t.QF_AUFLIRA);
 
     // Any String containing \u0000 should work here
     PTRef nil = logic.mkBoolVar("\u0000");

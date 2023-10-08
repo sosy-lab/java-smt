@@ -88,7 +88,7 @@ public class OpenSmtSolverContext extends AbstractSolverContext {
     pLoader.accept("opensmtjava");
 
     // Instantiate OpenSmtFormulaCreator to open a new solver instance
-    OpenSmtFormulaCreator creator = OpenSmtFormulaCreator.newCreator(pLogic);
+    OpenSmtFormulaCreator creator = OpenSmtFormulaCreator.create(pLogic);
 
     // Create all formula managers
     OpenSmtUFManager functionTheory = new OpenSmtUFManager(creator);
