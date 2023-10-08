@@ -111,30 +111,22 @@ ant publish-cvc5 -Dcvc5.path=../CVC5 -Dcvc5.customRev=1.0.1
 During the build process, our script automatically appends the git-revision after the version.
 Finally follow the instructions shown in the message at the end.
 
+
 ### Publishing OpenSMT
-Download [OpenSMT](https://github.com/usi-verification-and-security/opensmt) using git and make sure its in the same directory as your copy of JavaSMT. Then create a link to this directory and run the Docker container to build the binaries.
+
+We prefer/need to compile our own OpenSMT2 binaries and Java bindings.
+For simple usage, we provide a Docker definition/environment under `/docker`,
+in which the following command can be run.
+
+Download [OpenSMT](https://github.com/usi-verification-and-security/opensmt) using Git into a 
+file of your choice. The following command patches the OpenSMT2 API, generates Java bindings 
+with SWIG, builds the library, and packages it. 
+
 ```
-cd ~
-mkdir workspace
-cd workspace
-
-svn co https://svn.sosy-lab.org/software/ivy ivy
-
-git clone git@github.com:usi-verification-and-security/opensmt.git
-git clone --branch add_opensmt2 git@github.com:daniel-raffler/java-smt.git
-
-cd java-smt
-echo "ivy.repo.url=file:///workspace/ivy/repository" > build.properties
-ln -s ../ivy/repository repository
-mkdir -p repository/org.sosy_lab/javasmt-solver-opensmt
-
-cd docker
-./buildUbuntu1804.sh
-./runUbuntu1804.sh
-
-ant publish-opensmt -Dopensmt.path=/workspace/opensmt -Dopensmt.customRev=2.5.2-5
+ant publish-opensmt -Dopensmt.path=/workspace/opensmt -Dopensmt.customRev=2.5.2
 ```
 Then upload the binaries to the Ivy repository using SVN as described in the message on the screen.
+
 
 ### Publishing Boolector
 
