@@ -11,10 +11,8 @@ package org.sosy_lab.java_smt.solvers.opensmt;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +44,6 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
   protected final OpenSmtFormulaCreator creator;
   protected final MainSolver osmtSolver;
   protected final SMTConfig osmtConfig;
-  protected final Deque<List<PTRef>> assertionStack = new ArrayDeque<>();
 
   private boolean changedSinceLastSatQuery = false;
 
@@ -64,8 +61,6 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     // not get garbage collected
     osmtConfig = pConfig;
     osmtSolver = new MainSolver(creator.getEnv(), pConfig, "JavaSmt");
-
-    assertionStack.push(new ArrayList<>()); // create initial level
   }
 
   protected static SMTConfig getConfigInstance(
@@ -87,10 +82,10 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
   }
 
   @Override
-  public void push() {
+  public void push() throws InterruptedException {
     Preconditions.checkState(!closed);
     setChanged();
-    assertionStack.push(new ArrayList<>());
+    super.push();
     osmtSolver.push();
   }
 
@@ -99,8 +94,8 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     Preconditions.checkState(!closed);
     setChanged();
     Preconditions.checkState(size() > 0, "Tried to pop from an empty solver stack");
-    assertionStack.pop();
     osmtSolver.pop();
+    super.pop();
   }
 
   @Nullable
@@ -111,12 +106,9 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
   public T addConstraint(BooleanFormula pF) throws InterruptedException {
     Preconditions.checkState(!closed);
     setChanged();
-
+    super.addConstraint(pF);
     PTRef f = creator.extractInfo(pF);
-    T label = addConstraintImpl(f);
-
-    assertionStack.peek().add(f);
-    return label;
+    return addConstraintImpl(f);
   }
 
   @SuppressWarnings("resource")
@@ -262,16 +254,8 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
   @Override
   public void close() {
     if (!closed) {
-      closed = true;
-      assertionStack.clear();
       osmtSolver.delete();
     }
     super.close();
-  }
-
-  @Override
-  public int size() {
-    Preconditions.checkState(!closed);
-    return assertionStack.size() - 1;
   }
 }
