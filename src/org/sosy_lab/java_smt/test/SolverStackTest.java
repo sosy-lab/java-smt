@@ -184,7 +184,7 @@ public class SolverStackTest extends SolverBasedTest0 {
       simpleStackTestNum(rmgr, env);
     }
 
-    closeSolver(context);
+    context.close();
   }
 
   private <X extends NumeralFormula, Y extends X> void simpleStackTestNum(
@@ -698,7 +698,7 @@ public class SolverStackTest extends SolverBasedTest0 {
           .isEqualTo(BigInteger.ZERO);
     }
 
-    closeSolver(context);
+    context.close();
   }
 
   @Test

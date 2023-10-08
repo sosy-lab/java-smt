@@ -61,7 +61,8 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
       IntegerFormula x = imgr.makeVariable("x");
       IntegerFormula y = imgr.makeVariable("y");
       /* INFO: Due to limitations in OpenSMT we need to use a simpler formular for this solver
-       * Setting z=x means that the original formula `2x ≠ 1+2z`simplifies to `0 ≠ 1`, which is trivially true
+       * Setting z=x means that the original formula `2x ≠ 1+2z`simplifies to `0 ≠ 1`,
+       * which is trivially true.
        *
        * https://github.com/usi-verification-and-security/opensmt/issues/638
        */
@@ -88,7 +89,8 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
       IntegerFormula x = imgr.makeVariable("x");
       IntegerFormula y = imgr.makeVariable("y");
       /* INFO: Due to limitations in OpenSMT we need to use a simpler formular for this solver
-       * Setting z=x means that the original formula `2x ≠ 1+2z`simplifies to `0 ≠ 1`, which is trivially true
+       * Setting z=x means that the original formula `2x ≠ 1+2z`simplifies to `0 ≠ 1`,
+       * which is trivially true.
        *
        * https://github.com/usi-verification-and-security/opensmt/issues/638
        */

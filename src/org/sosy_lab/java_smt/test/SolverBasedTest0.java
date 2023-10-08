@@ -209,12 +209,8 @@ public abstract class SolverBasedTest0 {
       for (int i = 0; i < additionalOptions.length; i += 2) {
         options.setOption(additionalOptions[i], additionalOptions[i + 1]);
       }
-      Configuration config = options.build();
-      LogManager logger = LogManager.createTestLogManager();
-      ShutdownNotifier shutdownNotifier = ShutdownManager.create().getNotifier();
-
-      SolverContextFactory factory = new SolverContextFactory(config, logger, shutdownNotifier);
-      return factory.generateContext();
+      return new SolverContextFactory(options.build(), logger, shutdownNotifierToUse())
+          .generateContext();
     } catch (InvalidConfigurationException e) {
       assume()
           .withMessage(e.getMessage())
@@ -222,12 +218,6 @@ public abstract class SolverBasedTest0 {
           .hasCauseThat()
           .isNotInstanceOf(UnsatisfiedLinkError.class);
       throw e;
-    }
-  }
-
-  protected void closeSolver(SolverContext context) {
-    if (context != null) {
-      context.close();
     }
   }
 
