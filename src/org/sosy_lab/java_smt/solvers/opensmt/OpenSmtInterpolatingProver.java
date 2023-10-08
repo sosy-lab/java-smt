@@ -32,7 +32,7 @@ class OpenSmtInterpolatingProver extends OpenSmtAbstractProver<Integer>
     implements InterpolatingProverEnvironment<Integer> {
 
   // OpenSMT internally tracks all asserted formulas in one array and identifies them by index.
-  // The index starts with 1.
+  // The index starts with 0.
   // We track the number of tracked formulas per level as reference point.
   private final Deque<Integer> trackedConstraints = new ArrayDeque<>();
 
@@ -54,9 +54,9 @@ class OpenSmtInterpolatingProver extends OpenSmtAbstractProver<Integer>
   @Override
   public Integer addConstraintImpl(PTRef f) throws InterruptedException {
     osmtSolver.insertFormula(f);
-    Integer newId = trackedConstraints.pop() + 1;
-    trackedConstraints.push(newId);
-    return newId;
+    Integer id = trackedConstraints.pop();
+    trackedConstraints.push(id + 1);
+    return id;
   }
 
   @Override
