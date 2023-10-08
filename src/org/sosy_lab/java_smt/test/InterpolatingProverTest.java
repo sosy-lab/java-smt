@@ -88,7 +88,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       IntegerFormula x = imgr.makeVariable("x");
       IntegerFormula y = imgr.makeVariable("y");
-      /* INFO: Due to limitations in OpenSMT we need to use a simpler formular for this solver
+      /* INFO: Due to limitations in OpenSMT we need to use a simpler formula for this solver
        * Setting z=x means that the original formula `2x ≠ 1+2z`simplifies to `0 ≠ 1`,
        * which is trivially true.
        *
@@ -158,10 +158,11 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   }
 
   @Test
-  public <T> void binaryInterpolation1() throws SolverException, InterruptedException {
+  public <T> void binaryInterpolationWithConstantFalse()
+      throws SolverException, InterruptedException {
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
-    // build formula:  1 = A = B = C = 0
+    // build formula:  [false, false]
     BooleanFormula A = bmgr.makeBoolean(false);
     BooleanFormula B = bmgr.makeBoolean(false);
 
@@ -177,17 +178,10 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
     stack.close();
 
-    // special cases: start and end of sequence might need special handling in the solver
-    assertThat(bmgr.makeBoolean(true)).isEqualTo(itp0);
-    assertThat(bmgr.makeBoolean(false)).isEqualTo(itpAB);
-
-    // want to see non-determinism in all solvers? try this:
-    // System.out.println(solver + ": " + itpA);
-
-    // we check here the stricter properties for sequential interpolants,
-    // but this simple example should work for all solvers
-    checkItpSequence(ImmutableList.of(A, B), ImmutableList.of(itpA));
-    checkItpSequence(ImmutableList.of(B, A), ImmutableList.of(itpB));
+    assertThat(itp0).isEqualTo(bmgr.makeBoolean(true));
+    assertThat(itpA).isEqualTo(bmgr.makeBoolean(false));
+    assertThat(itpB).isEqualTo(bmgr.makeBoolean(false));
+    assertThat(itpAB).isEqualTo(bmgr.makeBoolean(false));
   }
 
   @Test
