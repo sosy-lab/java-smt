@@ -8,9 +8,10 @@
 
 package org.sosy_lab.java_smt.solvers.opensmt;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import java.io.IOException;
 import java.util.Map;
-import java.util.stream.Collectors;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -63,18 +64,15 @@ class OpenSmtFormulaManager extends AbstractFormulaManager<PTRef, SRef, Logic, S
           SymRef ref = osmtLogic.getSymRef(term);
           Symbol sym = osmtLogic.getSym(ref);
 
-          out.append(
-              "(declare-fun "
-                  + osmtLogic.protectName(ref)
-                  + " ("
-                  + sym.getArgs().stream()
-                      .map((atype) -> osmtLogic.printSort(atype))
-                      .collect(Collectors.joining(" "))
-                  + ") "
-                  + osmtLogic.printSort(sym.rsort())
-                  + ")\n");
+          out.append("(declare-fun ")
+              .append(osmtLogic.protectName(ref))
+              .append(" (")
+              .append(Joiner.on(' ').join(Lists.transform(sym.getArgs(), osmtLogic::printSort)))
+              .append(") ")
+              .append(osmtLogic.printSort(sym.rsort()))
+              .append(")\n");
         }
-        out.append("(assert " + osmtLogic.dumpWithLets(f) + ')');
+        out.append("(assert ").append(osmtLogic.dumpWithLets(f)).append(String.valueOf(')'));
       }
     };
   }

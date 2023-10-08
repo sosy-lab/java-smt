@@ -10,12 +10,12 @@ package org.sosy_lab.java_smt.solvers.opensmt;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 import org.sosy_lab.java_smt.solvers.opensmt.api.Logic;
 import org.sosy_lab.java_smt.solvers.opensmt.api.Model;
@@ -91,9 +91,7 @@ public class OpenSmtModel extends AbstractModel<PTRef, SRef, Logic> {
                   pCreator.encapsulateBoolean(osmtLogic.mkEq(key, value)),
                   osmtLogic.getSymName(ref),
                   pCreator.convertValue(value),
-                  args.stream()
-                      .map((val) -> pCreator.convertValue(val))
-                      .collect(Collectors.toList())));
+                  Lists.transform(args, pCreator::convertValue)));
         }
       }
     }

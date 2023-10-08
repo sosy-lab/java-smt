@@ -112,7 +112,7 @@ public class OpenSmtSolverContext extends AbstractSolverContext {
 
   @Override
   public void close() {
-    if (creator != null) {
+    if (!closed) {
       closed = true;
       creator.getEnv().delete();
     }
