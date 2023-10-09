@@ -30,6 +30,8 @@ public class BitwuzlaNativeApiTest {
   public void createEnvironment() {
     long options = bitwuzlaJNI.bitwuzla_options_new();
     bitwuzlaJNI.bitwuzla_set_option(
+        options, BitwuzlaOption.BITWUZLA_OPT_REWRITE_LEVEL.swigValue(), 0);
+    bitwuzlaJNI.bitwuzla_set_option(
         options, BitwuzlaOption.BITWUZLA_OPT_PRODUCE_MODELS.swigValue(), 1);
     // Cadical is always the default solver, but this shows how to set the option
     bitwuzlaJNI.bitwuzla_set_option_mode(
@@ -692,5 +694,53 @@ public class BitwuzlaNativeApiTest {
     assertEquals(res, BitwuzlaResult.BITWUZLA_UNSAT.swigValue());
 
     // Model
+  }
+
+  @Test
+  public void parserTest() {
+    long boolSort = bitwuzlaJNI.bitwuzla_mk_bool_sort();
+    long x = bitwuzlaJNI.bitwuzla_mk_const(boolSort, "x");
+    long y = bitwuzlaJNI.bitwuzla_mk_const(boolSort, "y");
+    long xOrY = bitwuzlaJNI.bitwuzla_mk_term2(BitwuzlaKind.BITWUZLA_KIND_OR.swigValue(), x, y);
+    bitwuzlaJNI.bitwuzla_push(bitwuzla, 1);
+    bitwuzlaJNI.bitwuzla_assert(bitwuzla, xOrY);
+
+    String dump = bitwuzlaJNI.dump_assertions_smt2(bitwuzla, 10);
+    // check-sat and exit messes with the parse, in that suddenly sat is checked and the formulas
+    // are rewritten and then returned in a different form, independent of options
+    if (dump.contains("(check-sat)\n")) {
+      dump = dump.replace("(check-sat)", "");
+    }
+    if (dump.contains("(exit)")) {
+      dump = dump.replace("(exit)", "");
+    }
+
+    bitwuzlaJNI.bitwuzla_pop(bitwuzla, 1);
+
+    long[] terms = bitwuzlaJNI.parse(dump);
+
+    bitwuzlaJNI.bitwuzla_push(bitwuzla, 1);
+    bitwuzlaJNI.bitwuzla_assert(bitwuzla, terms[0]);
+    String newDump = bitwuzlaJNI.dump_assertions_smt2(bitwuzla, 10);
+    if (newDump.contains("(check-sat)\n")) {
+      newDump = newDump.replace("(check-sat)", "");
+    }
+    if (newDump.contains("(exit)")) {
+      newDump = newDump.replace("(exit)", "");
+    }
+    assertEquals(dump, newDump);
+  }
+
+  @Ignore
+  @Test
+  public void parserFailTest() {
+    // valid
+    String input = "(declare-const a Bool)\n(declare-const b Bool)\n(assert (or a b))";
+    long[] terms = bitwuzlaJNI.parse(input);
+    assertNotEquals(terms, null);
+    // invalid/fails
+    String badInput = "(declare-const a Bool)\n(assert (or a b))";
+    terms = bitwuzlaJNI.parse(badInput);
+    assertNotEquals(terms, null);
   }
 }
