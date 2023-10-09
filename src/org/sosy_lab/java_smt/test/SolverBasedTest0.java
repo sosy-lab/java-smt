@@ -300,6 +300,14 @@ public abstract class SolverBasedTest0 {
         .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2, Solvers.CVC5);
   }
 
+  protected void requireArrayModel() {
+    // INFO: OpenSmt does not support model generation for array
+    assume()
+        .withMessage("Solver %s does not support model generation for arrays", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.OPENSMT);
+  }
+
   protected void requireModel() {
     /*assume()
     .withMessage("Solver %s does not support model generation in a usable way", solverToUse())
