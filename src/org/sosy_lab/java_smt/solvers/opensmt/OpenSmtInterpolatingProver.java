@@ -67,8 +67,8 @@ class OpenSmtInterpolatingProver extends OpenSmtAbstractProver<Integer>
 
   @Override
   public void pop() {
-    trackedConstraints.pop();
     super.pop();
+    trackedConstraints.pop();
   }
 
   @Override
