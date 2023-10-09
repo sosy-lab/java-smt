@@ -217,4 +217,25 @@ public class ApronNativeApiTest {
     assertTrue(!abstract11.isBottom(manager));
   }
 
+  @Test
+  public void example() throws ApronException {
+    Manager pManager = new Polka(false);
+    String[] intVars = {"x"};
+    String[] realVars = {"y"};
+
+    Environment environment = new Environment(intVars, realVars);
+    //x <= 2 and x >= -3
+    //x <= 2 --> -x+2 >= 0
+    Lincons1 cons1 = new Lincons1(environment);
+    cons1.setCoeff("x", new MpqScalar(-1));
+    cons1.setCst(new MpqScalar(+2));
+    cons1.setKind(Lincons1.SUPEQ);
+    //x >= - 3 --> x+3 >= 0
+    Lincons1 cons2 = new Lincons1(environment);
+    cons2.setCoeff("x", new MpqScalar(1));
+    cons2.setCst(new MpqScalar(+3));
+    cons2.setKind(Lincons1.SUPEQ);
+    Abstract1 abstract1 = new Abstract1(pManager, new Lincons1[]{cons1, cons2});
+  }
+
 }

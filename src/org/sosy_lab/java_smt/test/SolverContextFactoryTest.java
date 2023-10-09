@@ -69,7 +69,7 @@ public class SolverContextFactoryTest {
     assume()
         .withMessage("Solver %s requires to load a native library", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.SMTINTERPOL, Solvers.PRINCESS);
+        .isNoneOf(Solvers.SMTINTERPOL, Solvers.PRINCESS, Solvers.APRON);
   }
 
   /**

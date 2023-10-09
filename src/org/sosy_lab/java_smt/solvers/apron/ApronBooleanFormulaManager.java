@@ -41,6 +41,9 @@ import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronConstraint;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronIntCstNode;
 import scala.Int;
 
+/**
+ * Apron only supports and-operations by stacking constraints. Boolean type variables do not exist.
+ */
 public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<ApronNode,
     ApronFormulaType, Environment, Long> {
 
@@ -56,17 +59,21 @@ public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<Ap
     throw new UnsupportedOperationException("Apron supports only numeral variables.");
   }
 
+  /**
+   * True is symbolized by 1=1, false by 1!=1
+   * @param value boolean value to implement
+   * @return ApronConstraint of the form 1=1 (true) or 1!=1 (false)
+   */
   @Override
   protected ApronNode makeBooleanImpl(boolean value) {
-    ApronIntCstNode apronNode = new ApronIntCstNode(BigInteger.ONE);
+    ApronIntCstNode one = new ApronIntCstNode(BigInteger.ONE);
     Map<ApronNode, Integer> map = new HashMap<>();
     if (value){
-      map.put(apronNode, Tcons1.DISEQ);
-      return new ApronConstraint(formulaCreator.getEnvironment(),map);
+      map.put(one, Tcons1.EQ);
     } else{
-      map.put(apronNode, Tcons1.EQ);
-      return new ApronConstraint(formulaCreator.getEnvironment(),map);
+      map.put(one, Tcons1.DISEQ);
     }
+    return new ApronConstraint(formulaCreator.getEnvironment(),map);
   }
 
   @Override
@@ -74,6 +81,12 @@ public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<Ap
     throw new UnsupportedOperationException("Apron does not support not() operations.");
   }
 
+  /**
+   * the and() method is implemented by stacking two constraints
+   * @param pParam1 ApronConstraint 1
+   * @param pParam2 ApronConstraint 2
+   * @return new ApronConstraint which combines the two input constraints
+   */
   @Override
   protected ApronNode and(ApronNode pParam1, ApronNode pParam2) {
     ApronConstraint cons1 = (ApronConstraint) pParam1;
@@ -99,6 +112,12 @@ public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<Ap
     throw new UnsupportedOperationException("Apron does not support equivalence() operations.");
   }
 
+  /**
+   * For checking whether a BooleanFormula is true, Apron needs an Abstract1 object with the
+   * formula as input. Then one can check, if the Abstract1 object is bottom (for false).
+   * @param bits ApronConstraint to check
+   * @return !isBottom()
+   */
   @Override
   protected boolean isTrue(ApronNode bits) {
     try {
@@ -112,6 +131,12 @@ public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<Ap
       throw  new RuntimeException(pException);
     }   }
 
+  /**
+   * For checking whether a BooleanFormula is false, Apron needs an Abstract1 object with the
+   * formula as input. Then one can check, if the Abstract1 object is bottom (for false).
+   * @param bits ApronConstraint to check
+   * @return isBottom()
+   */
   @Override
   protected boolean isFalse(ApronNode bits) {
     try {

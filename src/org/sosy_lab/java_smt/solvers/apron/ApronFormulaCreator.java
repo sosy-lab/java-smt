@@ -82,11 +82,18 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
     this.manager = pManager;
   }
 
+  /**
+   * Method for extracting the value of a formula
+   * @param exprNode an additional formula where the type can be received from.
+   * @param value the formula to be converted.
+   * @return for constants (actual value), variables (String names) and constraints (Boolean value)
+   */
   @Override
   public Object convertValue(ApronNode exprNode, ApronNode value) {
     FormulaType type = exprNode.getType();
     FormulaType valueType = value.getType();
 
+    //constants
     if (valueType == FormulaType.INTEGER && value instanceof ApronIntCstNode) {
       return ((ApronIntCstNode) value).getValue();
     } else if ( valueType == FormulaType.RATIONAL && value instanceof ApronRatCstNode) {
@@ -98,11 +105,15 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
         return num;
       }
       return div;
-    } else if (value instanceof ApronIntVarNode) {
+    }
+    //variables
+    else if (value instanceof ApronIntVarNode) {
       return ((ApronIntVarNode) value).getVarName();
     }else if (value instanceof ApronRatVarNode) {
       return ((ApronRatVarNode) value).getVarName();
-    } else if (value instanceof ApronConstraint) {
+    }
+    //constraints
+    else if (value instanceof ApronConstraint) {
       try {
         ApronConstraint constraint = (ApronConstraint) value;
         Map<Tcons1, Texpr1Node> map = constraint.getConstraintNodes();

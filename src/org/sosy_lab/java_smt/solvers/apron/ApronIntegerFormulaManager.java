@@ -118,15 +118,15 @@ public class ApronIntegerFormulaManager
   }
 
   @Override
-  public IntegerFormula modulo(IntegerFormula numerator, IntegerFormula denumerator) {
+  public IntegerFormula modulo(IntegerFormula numerator, IntegerFormula denominator) {
     ApronNode node1 = (ApronNode) numerator;
-    ApronNode node2 = (ApronNode) denumerator;
+    ApronNode node2 = (ApronNode) denominator;
     Set<String> vars = formulaCreator.getVariables().keySet();
     //Somehow hasVar() only works for level0 of Apron (example in ApronNativeApiTest)
     Texpr0Node zeroNode = node2.getNode().toTexpr0Node(formulaCreator.getEnvironment());
     for(String var : vars){
       if(zeroNode.hasDim(formulaCreator.getEnvironment().dimOfVar(var))){
-        throw new UnsupportedOperationException("Denumerator must not contain variables!");
+        throw new UnsupportedOperationException("Denominator must not contain variables!");
       }
     }
     ApronIntBinaryNode result = new ApronIntBinaryNode(node1, node2,

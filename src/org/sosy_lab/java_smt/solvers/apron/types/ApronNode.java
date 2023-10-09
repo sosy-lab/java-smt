@@ -47,7 +47,8 @@ import org.sosy_lab.java_smt.solvers.apron.ApronFormulaCreator;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.FormulaType;
 
 /**
- * This is a wrapper for formulas from the Apron-library. All numeral formulas refer to instances of
+ * This is a wrapper for formulas from the Apron-library. All numeral formulas refer to
+ * Apron-library instances of
  * Texpr1Node; All BooleanFormulas refer to Tcons1; The wrapper is needed to implement methods that
  * are needed for the JavaSMT-binding but are not provided by the Apron-library.
  */
@@ -58,13 +59,17 @@ public interface ApronNode extends Formula {
   Texpr1Node getNode();
 
   /**
-   * this array is needed for getting all variable names; it is not possible to extract the name
+   * this array is needed for getting all variable names; it is not possible to directly extract
+   * the name
    * of a variable used in an Texpr1Node; that is the reason why the names are tracked additionally
    * @return String-array with all variables that are used in the created formulas
    */
   Set<String> getVarNames();
   ApronNode getInstance();
   interface ApronNumeralNode extends ApronNode, NumeralFormula{
+    /**
+     * This class wraps all rational constants, defined by numerator and denominator
+     */
     class ApronRatCstNode
         implements RationalFormula, ApronNumeralNode {
 
@@ -143,6 +148,9 @@ public interface ApronNode extends Formula {
       }
     }
 
+    /**
+     * This class wraps variables for rational values
+     */
     class ApronRatVarNode implements RationalFormula, ApronNode {
 
       private final FormulaType type = FormulaType.RATIONAL;
@@ -232,6 +240,9 @@ public interface ApronNode extends Formula {
       }
     }
 
+    /**
+     * This class wraps terms with unary arithmetic operators for rational values (ex. -x)
+     */
     class ApronRatUnaryNode implements RationalFormula, ApronNode {
       private final FormulaType type = FormulaType.RATIONAL;
       private final Texpr1UnNode unaryNode;
@@ -287,6 +298,9 @@ public interface ApronNode extends Formula {
       }
     }
 
+    /**
+     * This class wraps terms with binary arithmetic operators for rational values (ex. a+4.5)
+     */
     class ApronRatBinaryNode implements RationalFormula, ApronNode {
 
       private final FormulaType type = FormulaType.RATIONAL;
@@ -346,6 +360,9 @@ public interface ApronNode extends Formula {
       }
     }
 
+    /**
+     * This class wraps integer constants, defined by their BigInteger value.
+     */
     class ApronIntCstNode implements IntegerFormula, ApronNode {
 
       private final FormulaType type = FormulaType.INTEGER;
@@ -418,6 +435,9 @@ public interface ApronNode extends Formula {
       }
     }
 
+    /**
+     * This class wraps variables for integer values.
+     */
     class ApronIntVarNode implements IntegerFormula, ApronNode {
 
       private final FormulaType type = FormulaType.INTEGER;
@@ -526,6 +546,9 @@ public interface ApronNode extends Formula {
       }
     }
 
+    /**
+     * This class wraps terms with unary arithmetic operators for integer values (ex. -x)
+     */
     class ApronIntUnaryNode implements IntegerFormula, ApronNode {
       private final FormulaType type = FormulaType.INTEGER;
       private final Texpr1UnNode unaryNode;
@@ -595,6 +618,9 @@ public interface ApronNode extends Formula {
       }
     }
 
+    /**
+     * This class wraps terms with unary arithmetic operators for integer values (ex. x+3)
+     */
     class ApronIntBinaryNode implements IntegerFormula, ApronNode {
 
       private final FormulaType type = FormulaType.INTEGER;
@@ -670,13 +696,24 @@ public interface ApronNode extends Formula {
     }
   }
 
-
+  /**
+   * This class wraps boolean formulas defined by a node and a boolean operator =,!=, >, >=. All
+   * boolean formulas in Apron are syntactically like </Texpr1Node> </operaot> 0; a constraint is
+   * defined by a map of Texpr1Nodes and a operation. The reason for the map is, that Apron does
+   * not have an extra and-operation. Stacking constraints ia a way to implement this for JavaSMT.
+   */
   class ApronConstraint implements BooleanFormula, ApronNode {
 
     private final Map<Tcons1, Texpr1Node> constraintNodes;
     private final List<ApronNode> apronNodes;
     private final Set<String> varNames;
 
+    /**
+     *Constructor for building a constraint form a map of nodes and Tcons1-operations (ex.: [
+     * (a+1), Tcons1.EQ] -> (a+1) = 0)
+     * @param pEnvironment environment of all existing variables
+     * @param pConstraints map of nodes and boolean operators
+     */
     public ApronConstraint(Environment pEnvironment, Map<ApronNode, Integer> pConstraints) {
       this.constraintNodes = new HashMap<>();
       this.varNames = new HashSet<>();
@@ -697,6 +734,11 @@ public interface ApronNode extends Formula {
       this.varNames = pConstraint.getVarNames();
     }
 
+    /**
+     * Constructor for building a new constraint out of a list of constraints
+     * @param pConstraints list of constraints to build a new constraint
+     * @param pEnvironment environment of all existing variables
+     */
     public ApronConstraint(List<ApronConstraint> pConstraints, Environment pEnvironment){
       this.constraintNodes = new HashMap<>();
       this.varNames = new HashSet<>();
@@ -746,6 +788,8 @@ public interface ApronNode extends Formula {
     }
 
     /**
+     * As constraints can consist of multiple constraints, it is not logical to return just one
+     * constraint
      * @return the left side of the equation; ex.: 2x + 3 < 0 --> 2x + 3
      */
     @Override
