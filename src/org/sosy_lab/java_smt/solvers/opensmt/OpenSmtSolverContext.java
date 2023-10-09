@@ -17,7 +17,6 @@ import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.java_smt.SolverContextFactory.Logics;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
@@ -39,8 +38,33 @@ public class OpenSmtSolverContext extends AbstractSolverContext {
 
   private boolean closed = false;
 
+  public enum Logics {
+    CORE,
+
+    QF_AX,
+    QF_UF,
+    QF_IDL,
+    QF_RDL,
+    QF_LIA,
+    QF_LRA,
+
+    QF_ALIA,
+    QF_ALRA,
+
+    QF_UFLIA,
+    QF_UFLRA,
+
+    QF_AUFLIA,
+    QF_AUFLRA,
+
+    ALL
+  }
+
   @Options(prefix = "solver.opensmt")
   static class OpenSMTOptions {
+
+    @Option(secure = true, description = "SMT-LIB2 name of the logic to be used by the solver.")
+    Logics logic = Logics.ALL;
 
     @Option(secure = true, description = "Algorithm for boolean interpolation")
     int algBool = 0;
@@ -75,7 +99,6 @@ public class OpenSmtSolverContext extends AbstractSolverContext {
   }
 
   public static SolverContext create(
-      Logics pLogic,
       Configuration config,
       LogManager pLogger,
       ShutdownNotifier pShutdownNotifier,
@@ -88,8 +111,10 @@ public class OpenSmtSolverContext extends AbstractSolverContext {
     pLoader.accept("opensmt");
     pLoader.accept("opensmtjava");
 
+    OpenSMTOptions solverOptions = new OpenSMTOptions(config, (int) pRandom);
+
     // Instantiate OpenSmtFormulaCreator to open a new solver instance
-    OpenSmtFormulaCreator creator = OpenSmtFormulaCreator.create(pLogic);
+    OpenSmtFormulaCreator creator = OpenSmtFormulaCreator.create(solverOptions.logic);
 
     // Create all formula managers
     OpenSmtUFManager functionTheory = new OpenSmtUFManager(creator);
@@ -104,9 +129,6 @@ public class OpenSmtSolverContext extends AbstractSolverContext {
     OpenSmtFormulaManager manager =
         new OpenSmtFormulaManager(
             creator, functionTheory, booleanTheory, integerTheory, rationalTheory, arrayTheory);
-
-    // Split off solver options
-    OpenSMTOptions solverOptions = new OpenSMTOptions(config, (int) pRandom);
 
     return new OpenSmtSolverContext(creator, manager, pLogger, pShutdownNotifier, solverOptions);
   }

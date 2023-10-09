@@ -60,28 +60,6 @@ public class SolverContextFactory {
     YICES2
   }
 
-  public enum Logics {
-    CORE,
-
-    QF_AX,
-    QF_UF,
-    QF_IDL,
-    QF_RDL,
-    QF_LIA,
-    QF_LRA,
-
-    QF_ALIA,
-    QF_ALRA,
-
-    QF_UFLIA,
-    QF_UFLRA,
-
-    QF_AUFLIA,
-    QF_AUFLRA,
-
-    ALL
-  }
-
   @Option(secure = true, description = "Export solver queries in SmtLib format into a file.")
   private boolean logAllQueries = false;
 
@@ -102,9 +80,6 @@ public class SolverContextFactory {
 
   @Option(secure = true, description = "Which SMT solver to use.")
   private Solvers solver = Solvers.SMTINTERPOL;
-
-  @Option(secure = true, description = "Logic to be used by the solver.")
-  private Logics logic = Logics.ALL;
 
   @Option(secure = true, description = "Log solver actions, this may be slow!")
   private boolean useLogger = false;
@@ -156,7 +131,7 @@ public class SolverContextFactory {
    * @param pConfig The configuration to be used when instantiating JavaSMT and the solvers. By
    *     default, the configuration specifies the solver to use via the option <code>
    *     solver.solver=...</code>. This option can be overridden when calling the method {@link
-   *     #generateContext(Solvers, Logics)}.
+   *     #generateContext(Solvers)}.
    * @param pLogger The processing of log messages from SMT solvers (or their bindings) is handled
    *     via this LogManager.
    * @param pShutdownNotifier This central instance allows to request the termination of all
@@ -219,28 +194,18 @@ public class SolverContextFactory {
     return generateContext(solver);
   }
 
-  public SolverContext generateContext(Logics logicToUse) throws InvalidConfigurationException {
-    return generateContext(solver, logicToUse);
-  }
-
   /**
    * Create new context with solver name supplied.
    *
    * @see #generateContext()
    */
+  @SuppressWarnings("resource") // returns unclosed context object
   public SolverContext generateContext(Solvers solverToCreate)
       throws InvalidConfigurationException {
-    return generateContext(solverToCreate, logic);
-  }
-
-  @SuppressWarnings("resource") // returns unclosed context object
-  public SolverContext generateContext(Solvers solverToCreate, Logics logicToUse)
-      throws InvalidConfigurationException {
-    checkNotNull(logicToUse, "Logic for SMT is missing.");
 
     SolverContext context;
     try {
-      context = generateContext0(solverToCreate, logicToUse);
+      context = generateContext0(solverToCreate);
     } catch (UnsatisfiedLinkError | NoClassDefFoundError e) {
       throw new InvalidConfigurationException(
           String.format(
@@ -263,12 +228,12 @@ public class SolverContextFactory {
     return context;
   }
 
-  private SolverContext generateContext0(Solvers solverToCreate, Logics logicToUse)
+  private SolverContext generateContext0(Solvers solverToCreate)
       throws InvalidConfigurationException {
     switch (solverToCreate) {
       case OPENSMT:
         return OpenSmtSolverContext.create(
-            logicToUse, config, logger, shutdownNotifier, randomSeed, nonLinearArithmetic, loader);
+            config, logger, shutdownNotifier, randomSeed, nonLinearArithmetic, loader);
 
       case CVC4:
         return CVC4SolverContext.create(

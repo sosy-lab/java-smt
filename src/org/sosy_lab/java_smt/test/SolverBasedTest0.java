@@ -29,7 +29,6 @@ import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory;
-import org.sosy_lab.java_smt.SolverContextFactory.Logics;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.ArrayFormulaManager;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
@@ -53,6 +52,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.StringFormulaManager;
 import org.sosy_lab.java_smt.api.UFManager;
+import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtSolverContext.Logics;
 
 /**
  * Abstract base class with helpful utilities for writing tests that use an SMT solver. It
@@ -122,7 +122,9 @@ public abstract class SolverBasedTest0 {
   }
 
   protected ConfigurationBuilder createTestConfigBuilder() {
-    return Configuration.builder().setOption("solver.solver", solverToUse().toString());
+    return Configuration.builder()
+        .setOption("solver.solver", solverToUse().toString())
+        .setOption("solver.opensmt.logic", logicToUse().toString());
   }
 
   @Before
@@ -131,7 +133,7 @@ public abstract class SolverBasedTest0 {
 
     factory = new SolverContextFactory(config, logger, shutdownNotifierToUse());
     try {
-      context = factory.generateContext(logicToUse());
+      context = factory.generateContext();
     } catch (InvalidConfigurationException e) {
       assume()
           .withMessage(e.getMessage())

@@ -11,7 +11,6 @@ package org.sosy_lab.java_smt.solvers.opensmt;
 import com.google.common.base.Preconditions;
 import org.sosy_lab.java_smt.basicimpl.AbstractEvaluator;
 import org.sosy_lab.java_smt.solvers.opensmt.api.Logic;
-import org.sosy_lab.java_smt.solvers.opensmt.api.MainSolver;
 import org.sosy_lab.java_smt.solvers.opensmt.api.Model;
 import org.sosy_lab.java_smt.solvers.opensmt.api.PTRef;
 import org.sosy_lab.java_smt.solvers.opensmt.api.SRef;

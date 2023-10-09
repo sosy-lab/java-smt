@@ -29,7 +29,6 @@ import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory;
-import org.sosy_lab.java_smt.SolverContextFactory.Logics;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -46,6 +45,7 @@ import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.UFManager;
+import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtSolverContext.Logics;
 
 @RunWith(Parameterized.class)
 @SuppressWarnings("resource")
@@ -179,7 +179,7 @@ public class SolverStackTest extends SolverBasedTest0 {
   public void singleStackTestRational()
       throws SolverException, InterruptedException, InvalidConfigurationException {
     requireRationals();
-    try (SolverContext localContext = initSolver("solver.logic", Logics.QF_LRA.name())) {
+    try (SolverContext localContext = initSolver("solver.opensmt.logic", Logics.QF_LRA.name())) {
       FormulaManager localMgr = localContext.getFormulaManager();
       RationalFormulaManager localRmgr = localMgr.getRationalFormulaManager();
       BasicProverEnvironment<?> env = newEnvironmentForTest(localContext);
