@@ -45,7 +45,6 @@ import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.ApronRationalT
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.FormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronConstraint;
-import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronIntBinaryNode;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronIntCstNode;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronIntUnaryNode;
@@ -84,8 +83,9 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
 
   /**
    * Method for extracting the value of a formula
+   *
    * @param exprNode an additional formula where the type can be received from.
-   * @param value the formula to be converted.
+   * @param value    the formula to be converted.
    * @return for constants (actual value), variables (String names) and constraints (Boolean value)
    */
   @Override
@@ -96,12 +96,12 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
     //constants
     if (valueType == FormulaType.INTEGER && value instanceof ApronIntCstNode) {
       return ((ApronIntCstNode) value).getValue();
-    } else if ( valueType == FormulaType.RATIONAL && value instanceof ApronRatCstNode) {
+    } else if (valueType == FormulaType.RATIONAL && value instanceof ApronRatCstNode) {
       BigInteger num = ((ApronRatCstNode) value).getNumerator();
       BigInteger den = ((ApronRatCstNode) value).getDenominator();
       Rational div = Rational.of(num, den);
       //for integer values
-      if(den.equals(BigInteger.ONE)){
+      if (den.equals(BigInteger.ONE)) {
         return num;
       }
       return div;
@@ -109,7 +109,7 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
     //variables
     else if (value instanceof ApronIntVarNode) {
       return ((ApronIntVarNode) value).getVarName();
-    }else if (value instanceof ApronRatVarNode) {
+    } else if (value instanceof ApronRatVarNode) {
       return ((ApronRatVarNode) value).getVarName();
     }
     //constraints
@@ -120,10 +120,12 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
         Tcons1[] tcons1s = map.keySet().toArray(new Tcons1[map.size()]);
         Abstract1 helper = new Abstract1(this.manager, tcons1s);
         return !(helper.isBottom(this.manager));
-      } catch (ApronException pException){
-        throw  new RuntimeException(pException);
+      } catch (ApronException pException) {
+        throw new RuntimeException(pException);
       }
-    } else return null;
+    } else {
+      return null;
+    }
   }
 
   public Manager getManager() {
@@ -155,7 +157,8 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
 
   /**
    * For making a Formula (Type ApronNode) for a variable it is important to also update the
-   *environment!
+   * environment!
+   *
    * @param pApronFormulaType Integer or Rational?
    * @param varName           name of the variable
    * @return object of either ApronIntVarNode (Type Integer) or ApronRatVarNode (Type Rational)
@@ -168,7 +171,7 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
             .equals(
                 FormulaType.RATIONAL)),
         "Only Integer or rational variables allowed!");
-    if(environment.hasVar(varName)){
+    if (environment.hasVar(varName)) {
       return variables.get(varName);
     }
     if (pApronFormulaType.getType().equals(FormulaType.INTEGER)) {
@@ -268,7 +271,7 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
   }
 
   @Override
-  public ApronNode extractInfo(Formula pT){
+  public ApronNode extractInfo(Formula pT) {
     return ApronFormulaManager.getTerm(pT);
   }
 

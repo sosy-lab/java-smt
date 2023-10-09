@@ -23,23 +23,17 @@ package org.sosy_lab.java_smt.solvers.apron;
 import apron.Abstract1;
 import apron.ApronException;
 import apron.Environment;
-import apron.MpqScalar;
 import apron.Tcons1;
-import apron.Texpr1CstNode;
 import apron.Texpr1Node;
-import java.awt.TextComponent;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import org.checkerframework.checker.units.qual.A;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronConstraint;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronIntCstNode;
-import scala.Int;
 
 /**
  * Apron only supports and-operations by stacking constraints. Boolean type variables do not exist.
@@ -61,6 +55,7 @@ public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<Ap
 
   /**
    * True is symbolized by 1=1, false by 1!=1
+   *
    * @param value boolean value to implement
    * @return ApronConstraint of the form 1=1 (true) or 1!=1 (false)
    */
@@ -68,12 +63,12 @@ public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<Ap
   protected ApronNode makeBooleanImpl(boolean value) {
     ApronIntCstNode one = new ApronIntCstNode(BigInteger.ONE);
     Map<ApronNode, Integer> map = new HashMap<>();
-    if (value){
+    if (value) {
       map.put(one, Tcons1.EQ);
-    } else{
+    } else {
       map.put(one, Tcons1.DISEQ);
     }
-    return new ApronConstraint(formulaCreator.getEnvironment(),map);
+    return new ApronConstraint(formulaCreator.getEnvironment(), map);
   }
 
   @Override
@@ -83,6 +78,7 @@ public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<Ap
 
   /**
    * the and() method is implemented by stacking two constraints
+   *
    * @param pParam1 ApronConstraint 1
    * @param pParam2 ApronConstraint 2
    * @return new ApronConstraint which combines the two input constraints
@@ -115,6 +111,7 @@ public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<Ap
   /**
    * For checking whether a BooleanFormula is true, Apron needs an Abstract1 object with the
    * formula as input. Then one can check, if the Abstract1 object is bottom (for false).
+   *
    * @param bits ApronConstraint to check
    * @return !isBottom()
    */
@@ -127,13 +124,15 @@ public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<Ap
       Abstract1 helper = new Abstract1(this.formulaCreator.getManager(), tcons1s);
       boolean isBottom = helper.isBottom(this.formulaCreator.getManager());
       return !isBottom;
-    } catch (ApronException pException){
-      throw  new RuntimeException(pException);
-    }   }
+    } catch (ApronException pException) {
+      throw new RuntimeException(pException);
+    }
+  }
 
   /**
    * For checking whether a BooleanFormula is false, Apron needs an Abstract1 object with the
    * formula as input. Then one can check, if the Abstract1 object is bottom (for false).
+   *
    * @param bits ApronConstraint to check
    * @return isBottom()
    */
@@ -145,9 +144,10 @@ public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<Ap
       Tcons1[] tcons1s = map.keySet().toArray(new Tcons1[map.size()]);
       Abstract1 helper = new Abstract1(this.formulaCreator.getManager(), tcons1s);
       return (helper.isBottom(this.formulaCreator.getManager()));
-    } catch (ApronException pException){
-      throw  new RuntimeException(pException);
-    }  }
+    } catch (ApronException pException) {
+      throw new RuntimeException(pException);
+    }
+  }
 
   @Override
   protected ApronNode ifThenElse(ApronNode cond, ApronNode f1, ApronNode f2) {

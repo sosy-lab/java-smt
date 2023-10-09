@@ -21,19 +21,11 @@
 package org.sosy_lab.java_smt.solvers.apron;
 
 import apron.Environment;
-import apron.Tcons1;
-import apron.Texpr1CstNode;
-import apron.Texpr1Node;
-import com.google.common.base.Preconditions;
-import io.github.cvc5.Term;
-import java.math.BigInteger;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.checkerframework.checker.units.qual.A;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractEnumerationFormulaManager;
@@ -43,20 +35,13 @@ import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractSLFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
-import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.ApronIntegerType;
-import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.FormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
-import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronConstraint;
-import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronIntCstNode;
-import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronIntVarNode;
-import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronRatUnaryNode;
-import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronRatVarNode;
-import scala.Int;
 
 public class ApronFormulaManager extends AbstractFormulaManager<ApronNode, ApronFormulaType,
     Environment, Long> {
 
   private ApronFormulaCreator formulaCreator;
+
   /**
    * Builds a solver from the given theory implementations.
    *
@@ -88,9 +73,12 @@ public class ApronFormulaManager extends AbstractFormulaManager<ApronNode, Apron
       @Nullable AbstractEnumerationFormulaManager enumManager) {
     super(pFormulaCreator, functionManager, booleanManager, pIntegerFormulaManager,
         pRationalFormulaManager, null, null, null, null, null, null, null);
-  this.formulaCreator = pFormulaCreator;
+    this.formulaCreator = pFormulaCreator;
   }
 
+  public static ApronNode getTerm(Formula pFormula) {
+    return ((ApronNode) pFormula).getInstance();
+  }
 
   @Override
   public BooleanFormula parse(String s) throws IllegalArgumentException {
@@ -106,11 +94,6 @@ public class ApronFormulaManager extends AbstractFormulaManager<ApronNode, Apron
   public <T extends Formula> T substitute(
       T f,
       Map<? extends Formula, ? extends Formula> fromToMapping) {
-    throw new  UnsupportedOperationException("Apron does not support substitute().");
-  }
-
-
-  public static ApronNode getTerm(Formula pFormula){
-    return ((ApronNode) pFormula).getInstance();
+    throw new UnsupportedOperationException("Apron does not support substitute().");
   }
 }

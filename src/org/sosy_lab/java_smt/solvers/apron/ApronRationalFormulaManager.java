@@ -30,27 +30,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ThreadPoolExecutor.AbortPolicy;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
-import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.ApronIntegerType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.ApronRationalType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.FormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronConstraint;
-import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode;
-import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronIntBinaryNode;
-import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronIntCstNode;
-import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronIntUnaryNode;
-import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronIntVarNode;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronRatBinaryNode;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronRatCstNode;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronRatUnaryNode;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronRatVarNode;
-import scala.Int;
 
 public class ApronRationalFormulaManager extends
                                          ApronNumeralFormulaManager<NumeralFormula, RationalFormula>
@@ -70,21 +62,25 @@ public class ApronRationalFormulaManager extends
   protected FormulaType getNumeralType() {
     return FormulaType.RATIONAL;
   }
+
   @Override
   protected ApronNode makeVariableImpl(String i) {
     return formulaCreator.makeVariable(rationalType, i);
   }
+
   @Override
   protected ApronNode makeNumberImpl(double pNumber) {
     BigDecimal dec = BigDecimal.valueOf(pNumber);
     Rational rat = Rational.ofBigDecimal(dec);
-    return new ApronRatCstNode(rat.getNum(),rat.getDen());  }
+    return new ApronRatCstNode(rat.getNum(), rat.getDen());
+  }
 
   @Override
   protected ApronNode makeNumberImpl(BigDecimal pNumber) {
     Rational rat = Rational.ofBigDecimal(pNumber);
-    return new ApronRatCstNode(rat.getNum(),rat.getDen());
+    return new ApronRatCstNode(rat.getNum(), rat.getDen());
   }
+
   protected ApronNode makeNumberImpl(long i) {
     return new ApronRatCstNode(BigInteger.valueOf(i), BigInteger.ONE);
   }
@@ -100,11 +96,11 @@ public class ApronRationalFormulaManager extends
         "Rational number has to be written like 2/5.");
     String[] numbers = i.split("/");
     BigInteger num = new BigInteger(numbers[0]);
-    if(numbers.length>1) {
+    if (numbers.length > 1) {
       BigInteger den = new BigInteger(numbers[1]);
-      return new ApronRatCstNode(num,den);
+      return new ApronRatCstNode(num, den);
     }
-    return new ApronRatCstNode(num,BigInteger.ONE);
+    return new ApronRatCstNode(num, BigInteger.ONE);
   }
 
   @Override
@@ -123,15 +119,16 @@ public class ApronRationalFormulaManager extends
 
   @Override
   protected ApronNode sumImpl(List<ApronNode> operands) {
-    if(!operands.isEmpty()){
+    if (!operands.isEmpty()) {
       ApronNode first = operands.remove(0);
-      for (ApronNode operand:operands) {
+      for (ApronNode operand : operands) {
         first = new ApronRatBinaryNode(first, operand,
             Texpr1BinNode.OP_ADD);
       }
       return first;
     }
-    return null;  }
+    return null;
+  }
 
   @Override
   protected ApronNode subtract(ApronNode pParam1, ApronNode pParam2) {
@@ -159,7 +156,7 @@ public class ApronRationalFormulaManager extends
     ApronRatBinaryNode binaryNode = new ApronRatBinaryNode(pParam1, pParam2,
         Texpr1BinNode.OP_SUB);
     Map<ApronNode, Integer> map = new HashMap<>();
-    map.put(binaryNode,Tcons1.EQ);
+    map.put(binaryNode, Tcons1.EQ);
     ApronConstraint constraint = new ApronConstraint(formulaCreator.getEnvironment(), map);
     return constraint;
   }
@@ -167,13 +164,13 @@ public class ApronRationalFormulaManager extends
   @Override
   protected ApronNode distinctImpl(List<ApronNode> pNumbers) {
     List<ApronConstraint> constraints = new ArrayList<>();
-    for(int i = 0; i<pNumbers.size();i++){
-      for(int j =0; j<i; j++){
+    for (int i = 0; i < pNumbers.size(); i++) {
+      for (int j = 0; j < i; j++) {
         ApronNode apronNode = new ApronRatBinaryNode(pNumbers.get(i), pNumbers.get(j),
             Texpr1BinNode.OP_SUB);
         Map<ApronNode, Integer> map = new HashMap<>();
-        map.put(apronNode,Tcons1.DISEQ);
-        ApronConstraint constraint = new ApronConstraint(formulaCreator.getEnvironment(),map);
+        map.put(apronNode, Tcons1.DISEQ);
+        ApronConstraint constraint = new ApronConstraint(formulaCreator.getEnvironment(), map);
         constraints.add(constraint);
       }
     }
@@ -185,7 +182,7 @@ public class ApronRationalFormulaManager extends
     ApronRatBinaryNode binaryNode = new ApronRatBinaryNode(pParam1, pParam2,
         Texpr1BinNode.OP_SUB);
     Map<ApronNode, Integer> map = new HashMap<>();
-    map.put(binaryNode,Tcons1.SUP);
+    map.put(binaryNode, Tcons1.SUP);
     ApronConstraint constraint = new ApronConstraint(formulaCreator.getEnvironment(), map);
     return constraint;
   }
@@ -195,7 +192,7 @@ public class ApronRationalFormulaManager extends
     ApronRatBinaryNode binaryNode = new ApronRatBinaryNode(pParam1, pParam2,
         Texpr1BinNode.OP_SUB);
     Map<ApronNode, Integer> map = new HashMap<>();
-    map.put(binaryNode,Tcons1.SUPEQ);
+    map.put(binaryNode, Tcons1.SUPEQ);
     ApronConstraint constraint = new ApronConstraint(formulaCreator.getEnvironment(), map);
     return constraint;
   }
@@ -205,7 +202,7 @@ public class ApronRationalFormulaManager extends
     ApronRatBinaryNode binaryNode = new ApronRatBinaryNode(pParam2, pParam1,
         Texpr1BinNode.OP_SUB);
     Map<ApronNode, Integer> map = new HashMap<>();
-    map.put(binaryNode,Tcons1.SUP);
+    map.put(binaryNode, Tcons1.SUP);
     ApronConstraint constraint = new ApronConstraint(formulaCreator.getEnvironment(), map);
     return constraint;
   }
@@ -215,7 +212,7 @@ public class ApronRationalFormulaManager extends
     ApronRatBinaryNode binaryNode = new ApronRatBinaryNode(pParam2, pParam1,
         Texpr1BinNode.OP_SUB);
     Map<ApronNode, Integer> map = new HashMap<>();
-    map.put(binaryNode,Tcons1.SUPEQ);
+    map.put(binaryNode, Tcons1.SUPEQ);
     ApronConstraint constraint = new ApronConstraint(formulaCreator.getEnvironment(), map);
     return constraint;
   }
@@ -225,9 +222,9 @@ public class ApronRationalFormulaManager extends
     return toInteger(pTerm);
   }
 
-  private ApronNode toInteger(ApronNode pNumeralNode){
-  FormulaType pType = pNumeralNode.getType();
-  if (pType.equals(FormulaType.RATIONAL)) {
+  private ApronNode toInteger(ApronNode pNumeralNode) {
+    FormulaType pType = pNumeralNode.getType();
+    if (pType.equals(FormulaType.RATIONAL)) {
       if (pNumeralNode instanceof ApronRatCstNode) {
         ApronRatCstNode node = (ApronRatCstNode) pNumeralNode;
         return new ApronNode.ApronNumeralNode.ApronIntCstNode(node);
@@ -241,7 +238,7 @@ public class ApronRationalFormulaManager extends
         ApronRatBinaryNode node = (ApronRatBinaryNode) pNumeralNode;
         return new ApronNode.ApronNumeralNode.ApronRatBinaryNode(node);
       }
-  }
+    }
     throw new IllegalArgumentException("Parameter must be rational ApronNode.");
 
   }

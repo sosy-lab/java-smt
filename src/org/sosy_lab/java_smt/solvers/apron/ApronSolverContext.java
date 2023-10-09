@@ -21,16 +21,13 @@
 package org.sosy_lab.java_smt.solvers.apron;
 
 import apron.ApronException;
-import apron.Box;
 import apron.Environment;
 import apron.Manager;
 import apron.Polka;
-import apron.PolkaEq;
 import java.util.Set;
 import java.util.logging.Level;
 import javax.annotation.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
-import org.sosy_lab.common.ShutdownNotifier.ShutdownRequestListener;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
@@ -89,7 +86,7 @@ public class ApronSolverContext extends AbstractSolverContext {
     ApronIntegerType integerType = new ApronIntegerType();
     ApronRationalType rationalType = new ApronRationalType();
     ApronFormulaCreator formulaCreator =
-        new ApronFormulaCreator(manager,env, booleanType, integerType, rationalType,
+        new ApronFormulaCreator(manager, env, booleanType, integerType, rationalType,
             null,
             null);
     ApronUFManager ufManager = new ApronUFManager(formulaCreator);

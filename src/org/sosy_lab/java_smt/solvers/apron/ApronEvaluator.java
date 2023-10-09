@@ -36,9 +36,10 @@ public class ApronEvaluator extends AbstractEvaluator<ApronNode, ApronFormulaTyp
   private final List<Collection<ApronConstraint>> assertedFormulas;
 
   private final ApronTheoremProver theoremProver;
+
   protected ApronEvaluator(
       AbstractProver<?> pProver,
-      FormulaCreator<ApronNode,ApronFormulaType, ApronModel, Long> creator) {
+      FormulaCreator<ApronNode, ApronFormulaType, ApronModel, Long> creator) {
     super(pProver, creator);
     ApronTheoremProver prover = (ApronTheoremProver) pProver;
     this.assertedFormulas = prover.getAssertedFormulas();
@@ -50,7 +51,7 @@ public class ApronEvaluator extends AbstractEvaluator<ApronNode, ApronFormulaTyp
     try {
       ApronModel apronModel = (ApronModel) theoremProver.getModel();
       return apronModel.getValue(formula);
-    }catch (SolverException e){
+    } catch (SolverException e) {
       throw new RuntimeException(e);
     }
   }

@@ -20,48 +20,29 @@
 
 package org.sosy_lab.java_smt.solvers.apron;
 
-import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assert_;
-import static com.google.common.truth.TruthJUnit.assume;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import apron.Abstract1;
 import apron.ApronException;
 import apron.Environment;
-import apron.Interval;
 import apron.Lincons1;
-import apron.Linexpr1;
-import apron.Linterm1;
 import apron.Manager;
 import apron.MpqScalar;
 import apron.Polka;
-import apron.Scalar;
 import apron.Tcons1;
-import apron.Texpr0BinNode;
 import apron.Texpr0Node;
 import apron.Texpr1BinNode;
 import apron.Texpr1CstNode;
 import apron.Texpr1Node;
 import apron.Texpr1VarNode;
 import com.google.common.base.Preconditions;
-import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.Map;
-import org.checkerframework.checker.units.qual.A;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.internal.AssumptionViolatedException;
-import org.sosy_lab.common.NativeLibraries;
-import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
-import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronIntBinaryNode;
-import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronIntCstNode;
 
 public class ApronNativeApiTest {
 
   public static Manager manager = new Polka(true);
+
   @Test
   public void solverBackendTest() {
   }
@@ -71,6 +52,7 @@ public class ApronNativeApiTest {
    * constraints that should be unsat;
    * This behavior is not unintended, because some domains can not represent exact disjunctions
    * like != (https://github.com/antoinemine/apron/issues/92)
+   *
    * @throws ApronException
    */
   @Test
@@ -78,18 +60,19 @@ public class ApronNativeApiTest {
     //x,y = 1 and x!=y
     Texpr1VarNode x = new Texpr1VarNode("x");
     Texpr1VarNode y = new Texpr1VarNode("y");
-    Texpr1BinNode leftArg = new Texpr1BinNode(Texpr1BinNode.OP_SUB, x,y);
-    Environment environment = new Environment(new String[]{"x","y"},new String[]{});
-    Tcons1 xIsZero = new Tcons1(environment, Tcons1.EQ,x);
-    Tcons1 yIsZero = new Tcons1(environment, Tcons1.EQ,y);
-    Tcons1 constraint = new Tcons1(environment,Tcons1.DISEQ,leftArg);
-    Abstract1 abstract1 = new Abstract1(manager, new Tcons1[]{xIsZero,yIsZero,constraint});
+    Texpr1BinNode leftArg = new Texpr1BinNode(Texpr1BinNode.OP_SUB, x, y);
+    Environment environment = new Environment(new String[]{"x", "y"}, new String[]{});
+    Tcons1 xIsZero = new Tcons1(environment, Tcons1.EQ, x);
+    Tcons1 yIsZero = new Tcons1(environment, Tcons1.EQ, y);
+    Tcons1 constraint = new Tcons1(environment, Tcons1.DISEQ, leftArg);
+    Abstract1 abstract1 = new Abstract1(manager, new Tcons1[]{xIsZero, yIsZero, constraint});
     Preconditions.checkArgument(!abstract1.isBottom(manager)); //should return isBottom == true,
     // but doesn't!!!
   }
 
   /**
    * Test that gives an example of how a domain simplifies constraints
+   *
    * @throws ApronException
    */
   @Test
@@ -97,7 +80,7 @@ public class ApronNativeApiTest {
     // x+x = 0 and x = 0 is added as only one constraints
     Texpr1VarNode x = new Texpr1VarNode("x");
     Texpr1BinNode add = new Texpr1BinNode(Texpr1BinNode.OP_ADD, x, x);
-    Environment environment = new Environment(new String[]{"x"},new String[]{});
+    Environment environment = new Environment(new String[]{"x"}, new String[]{});
     Tcons1 isZero = new Tcons1(environment, Tcons1.EQ, add);
     Tcons1 xisZero = new Tcons1(environment, Tcons1.EQ, x);
     Abstract1 abstract1 = new Abstract1(manager, new Tcons1[]{isZero, xisZero});
@@ -105,20 +88,20 @@ public class ApronNativeApiTest {
   }
 
   /**
-   *Somehow the hasVar() method does only work for nodes of level 0
+   * Somehow the hasVar() method does only work for nodes of level 0
    */
   @Test
-  public void hasVarTest(){
+  public void hasVarTest() {
     //code form github
     Texpr1VarNode x = new Texpr1VarNode("x");
-    Environment environment = new Environment(new String[]{"x"},new String[]{});
+    Environment environment = new Environment(new String[]{"x"}, new String[]{});
     System.out.println(x.hasVar("x"));
     Texpr0Node xZero = x.toTexpr0Node(environment);
     System.out.println(xZero.hasDim(environment.dimOfVar("x")));
 
     //has Texpr1VarNode "x"?
     Texpr1VarNode x1 = new Texpr1VarNode("x");
-    Environment environment1 = new Environment(new String[]{"x"},new String[]{"y"});
+    Environment environment1 = new Environment(new String[]{"x"}, new String[]{"y"});
     assertTrue(!x1.hasVar("x")); //should be true
     assertFalse(x1.hasVar("y"));
     Texpr0Node xZero1 = x.toTexpr0Node(environment1);
@@ -135,19 +118,20 @@ public class ApronNativeApiTest {
   /**
    * For having the correct behaviour for Integer nodes one has to specify the rounding type
    * (Integer) and rounding direction; otherwise the nodes will be handled as rational-type nodes
+   *
    * @throws ApronException
    */
   @Test
   public void integerRoundingTest() throws ApronException {
     // 4 = 4 * 4/3
-    Environment environment = new Environment(new String[]{"x"},new String[]{});
+    Environment environment = new Environment(new String[]{"x"}, new String[]{});
     Texpr1CstNode four = new Texpr1CstNode(new MpqScalar(4));
     Texpr1CstNode three = new Texpr1CstNode(new MpqScalar(3));
     Texpr1BinNode div = new Texpr1BinNode(Texpr1BinNode.OP_DIV, Texpr1Node.RTYPE_INT,
-        Texpr1Node.RDIR_DOWN,four, three);
+        Texpr1Node.RDIR_DOWN, four, three);
     Texpr1BinNode mul = new Texpr1BinNode(Texpr1BinNode.OP_MUL, four, div);
     Texpr1BinNode sub = new Texpr1BinNode(Texpr1BinNode.OP_SUB,
-        Texpr1Node.RTYPE_INT, Texpr1Node.RDIR_DOWN,four, mul);
+        Texpr1Node.RTYPE_INT, Texpr1Node.RDIR_DOWN, four, mul);
     Tcons1 eq = new Tcons1(environment, Tcons1.EQ, sub);
     Abstract1 abstract1 = new Abstract1(manager, new Tcons1[]{eq});
     assertFalse(abstract1.isBottom(manager));
@@ -156,10 +140,10 @@ public class ApronNativeApiTest {
     Texpr1CstNode one = new Texpr1CstNode(new MpqScalar(1));
     Texpr1CstNode two = new Texpr1CstNode(new MpqScalar(2));
     Texpr1BinNode half = new Texpr1BinNode(Texpr1BinNode.OP_DIV, Texpr1Node.RTYPE_INT,
-        Texpr1Node.RDIR_DOWN,one, two);
+        Texpr1Node.RDIR_DOWN, one, two);
     Texpr1BinNode mul2 = new Texpr1BinNode(Texpr1BinNode.OP_MUL, two, half);
     Texpr1BinNode sub2 = new Texpr1BinNode(Texpr1BinNode.OP_SUB,
-        Texpr1Node.RTYPE_INT, Texpr1Node.RDIR_DOWN,one, mul2);
+        Texpr1Node.RTYPE_INT, Texpr1Node.RDIR_DOWN, one, mul2);
     Tcons1 eq2 = new Tcons1(environment, Tcons1.EQ, sub2);
     Abstract1 abstract2 = new Abstract1(manager, new Tcons1[]{eq2});
     assertTrue(abstract2.isBottom(manager));
@@ -167,24 +151,24 @@ public class ApronNativeApiTest {
     // x = 2*(x/2) and x = 1
     Texpr1VarNode x = new Texpr1VarNode("x");
     Texpr1BinNode xMinusOne = new Texpr1BinNode(Texpr1BinNode.OP_SUB, Texpr1Node.RTYPE_INT,
-        Texpr1Node.RDIR_DOWN,x, one );
+        Texpr1Node.RDIR_DOWN, x, one);
     //x=1
-    Tcons1 eqXisOne = new Tcons1(environment,Tcons1.EQ,xMinusOne);
+    Tcons1 eqXisOne = new Tcons1(environment, Tcons1.EQ, xMinusOne);
     //x/2
     Texpr1BinNode xDivTwo = new Texpr1BinNode(Texpr1BinNode.OP_DIV, Texpr1Node.RTYPE_INT,
-        Texpr1Node.RDIR_DOWN,x, two);
+        Texpr1Node.RDIR_DOWN, x, two);
     //2*(x/2)
     Texpr1BinNode twoMul = new Texpr1BinNode(Texpr1BinNode.OP_MUL, two, xDivTwo);
     //x - 2*(x/2)
     Texpr1BinNode xSub = new Texpr1BinNode(Texpr1BinNode.OP_SUB,
-        Texpr1Node.RTYPE_INT, Texpr1Node.RDIR_DOWN,x, twoMul);
+        Texpr1Node.RTYPE_INT, Texpr1Node.RDIR_DOWN, x, twoMul);
     //x-2*(x/2) = 0
     Tcons1 eq3 = new Tcons1(environment, Tcons1.EQ, xSub);
-    Abstract1 abstract3 = new Abstract1(manager, new Tcons1[]{eq3,eqXisOne});
+    Abstract1 abstract3 = new Abstract1(manager, new Tcons1[]{eq3, eqXisOne});
     assertTrue(!abstract3.isBottom(manager));//isBottom() should be true!
 
     // a = 10 and b = 5 and a-b = 7*((a-b)/7)
-    Environment environment1 = new Environment(new String[]{"a", "b"},new String[]{});
+    Environment environment1 = new Environment(new String[]{"a", "b"}, new String[]{});
     Texpr1VarNode a = new Texpr1VarNode("a");
     Texpr1VarNode b = new Texpr1VarNode("b");
     Texpr1CstNode ten = new Texpr1CstNode(new MpqScalar(10));
@@ -193,17 +177,17 @@ public class ApronNativeApiTest {
     //a=10
     Texpr1BinNode aMin10 = new Texpr1BinNode(Texpr1BinNode.OP_SUB, Texpr1Node.RTYPE_INT,
         Texpr1Node.RDIR_DOWN, a, ten);
-    Tcons1 aIsTen = new Tcons1(environment1, Tcons1.EQ,aMin10);
+    Tcons1 aIsTen = new Tcons1(environment1, Tcons1.EQ, aMin10);
     //b=5
     Texpr1BinNode bMin5 = new Texpr1BinNode(Texpr1BinNode.OP_SUB, Texpr1Node.RTYPE_INT,
         Texpr1Node.RDIR_DOWN, b, five);
-    Tcons1 bIsFive = new Tcons1(environment1, Tcons1.EQ,bMin5);
+    Tcons1 bIsFive = new Tcons1(environment1, Tcons1.EQ, bMin5);
     //a-b
     Texpr1BinNode aMinb = new Texpr1BinNode(Texpr1BinNode.OP_SUB, Texpr1Node.RTYPE_INT,
-        Texpr1Node.RDIR_DOWN, a,b);
+        Texpr1Node.RDIR_DOWN, a, b);
     //(a-b)/7
     Texpr1BinNode div7 = new Texpr1BinNode(Texpr1BinNode.OP_DIV, Texpr1Node.RTYPE_INT,
-        Texpr1Node.RDIR_DOWN,aMinb,seven);
+        Texpr1Node.RDIR_DOWN, aMinb, seven);
     //7*((a-b)/7)
     Texpr1BinNode mul7 = new Texpr1BinNode(Texpr1BinNode.OP_MUL, Texpr1Node.RTYPE_INT,
         Texpr1Node.RDIR_DOWN, seven, div7);
@@ -212,7 +196,7 @@ public class ApronNativeApiTest {
         Texpr1Node.RDIR_DOWN, aMinb, mul7);
     //(a-b)-(7*((a-b)/7))) = 0
     Tcons1 eq1 = new Tcons1(environment1, Tcons1.EQ, all);
-    Abstract1 abstract11 = new Abstract1(manager, new Tcons1[]{eq1,aIsTen, bIsFive});
+    Abstract1 abstract11 = new Abstract1(manager, new Tcons1[]{eq1, aIsTen, bIsFive});
     //isBottom() returns true because eq1 is not added
     assertTrue(!abstract11.isBottom(manager));
   }

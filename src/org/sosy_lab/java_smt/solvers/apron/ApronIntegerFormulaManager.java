@@ -23,7 +23,6 @@ package org.sosy_lab.java_smt.solvers.apron;
 import apron.Tcons1;
 import apron.Texpr0Node;
 import apron.Texpr1BinNode;
-import apron.Texpr1Node;
 import apron.Texpr1UnNode;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -32,9 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.checkerframework.checker.units.qual.A;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
@@ -64,17 +61,21 @@ public class ApronIntegerFormulaManager
   protected FormulaType getNumeralType() {
     return FormulaType.INTEGER;
   }
+
   @Override
   protected ApronNode makeVariableImpl(String i) {
     return this.formulaCreator.makeVariable(integerType, i);
   }
+
   protected ApronNode makeNumberImpl(double pNumber) {
     return new ApronIntCstNode(BigDecimal.valueOf(pNumber).toBigInteger());
   }
+
   @Override
   protected ApronNode makeNumberImpl(BigDecimal pNumber) {
     return new ApronIntCstNode(pNumber.toBigInteger());
   }
+
   protected ApronNode makeNumberImpl(long i) {
     return new ApronIntCstNode(BigInteger.valueOf(i));
   }
@@ -88,19 +89,20 @@ public class ApronIntegerFormulaManager
   protected ApronNode makeNumberImpl(String i) {
     return new ApronIntCstNode(new BigInteger(i));
   }
+
   @Override
   public BooleanFormula modularCongruence(
       IntegerFormula number1,
       IntegerFormula number2,
       BigInteger n) {
-    return modularCongruence(number1,number2,Long.parseLong(String.valueOf(n)));
+    return modularCongruence(number1, number2, Long.parseLong(String.valueOf(n)));
   }
 
   @Override
   public BooleanFormula modularCongruence(IntegerFormula number1, IntegerFormula number2, long n) {
     //(= x (* n (div x n))); div = x/n; x = number1 - number2 Frage ist, ob num1 mod num2 = n ist
     // Test mit 8 und 3 : 8-3 = 2 * (8-3)/2 --> hier entsteht ein fehler
-    if(n>0) {
+    if (n > 0) {
       ApronIntCstNode nN = new ApronIntCstNode(BigInteger.valueOf(n));
       ApronIntBinaryNode x = new ApronIntBinaryNode(ApronFormulaManager.getTerm(number1),
           ApronFormulaManager.getTerm(number2), Texpr1BinNode.OP_SUB);
@@ -114,7 +116,7 @@ public class ApronIntegerFormulaManager
     ApronIntCstNode zero = new ApronIntCstNode(BigInteger.ZERO);
     Map<ApronNode, Integer> map = new HashMap<>();
     map.put(zero, Tcons1.EQ); // 0=0 for true
-    return new ApronConstraint(formulaCreator.getEnvironment(),map);
+    return new ApronConstraint(formulaCreator.getEnvironment(), map);
   }
 
   @Override
@@ -124,8 +126,8 @@ public class ApronIntegerFormulaManager
     Set<String> vars = formulaCreator.getVariables().keySet();
     //Somehow hasVar() only works for level0 of Apron (example in ApronNativeApiTest)
     Texpr0Node zeroNode = node2.getNode().toTexpr0Node(formulaCreator.getEnvironment());
-    for(String var : vars){
-      if(zeroNode.hasDim(formulaCreator.getEnvironment().dimOfVar(var))){
+    for (String var : vars) {
+      if (zeroNode.hasDim(formulaCreator.getEnvironment().dimOfVar(var))) {
         throw new UnsupportedOperationException("Denominator must not contain variables!");
       }
     }
@@ -150,13 +152,13 @@ public class ApronIntegerFormulaManager
 
   @Override
   protected ApronNode sumImpl(List<ApronNode> operands) {
-    if(!operands.isEmpty()){
-    ApronNode first = operands.remove(0);
-    for (ApronNode operand:operands) {
-      first = new ApronIntBinaryNode(first, operand,
-          Texpr1BinNode.OP_ADD);
-    }
-    return first;
+    if (!operands.isEmpty()) {
+      ApronNode first = operands.remove(0);
+      for (ApronNode operand : operands) {
+        first = new ApronIntBinaryNode(first, operand,
+            Texpr1BinNode.OP_ADD);
+      }
+      return first;
     }
     return null;
   }
@@ -187,24 +189,25 @@ public class ApronIntegerFormulaManager
     ApronIntBinaryNode binaryNode = new ApronIntBinaryNode(pParam1, pParam2,
         Texpr1BinNode.OP_SUB);
     Map<ApronNode, Integer> map = new HashMap<>();
-    map.put(binaryNode,Tcons1.EQ);
+    map.put(binaryNode, Tcons1.EQ);
     ApronConstraint constraint = new ApronConstraint(formulaCreator.getEnvironment(), map);
     return constraint;
   }
 
   @Override
   protected ApronNode distinctImpl(List<ApronNode> pNumbers) {
-  List<ApronConstraint> constraints = new ArrayList<>();
-  for(int i = 0; i<pNumbers.size();i++){
-    for(int j =0; j<i; j++){
-      ApronNode apronNode = new ApronIntBinaryNode(pNumbers.get(i), pNumbers.get(j),Texpr1BinNode.OP_SUB);
-      Map<ApronNode, Integer> map = new HashMap<>();
-      map.put(apronNode,Tcons1.DISEQ);
-      ApronConstraint constraint = new ApronConstraint(formulaCreator.getEnvironment(),map);
-      constraints.add(constraint);
+    List<ApronConstraint> constraints = new ArrayList<>();
+    for (int i = 0; i < pNumbers.size(); i++) {
+      for (int j = 0; j < i; j++) {
+        ApronNode apronNode =
+            new ApronIntBinaryNode(pNumbers.get(i), pNumbers.get(j), Texpr1BinNode.OP_SUB);
+        Map<ApronNode, Integer> map = new HashMap<>();
+        map.put(apronNode, Tcons1.DISEQ);
+        ApronConstraint constraint = new ApronConstraint(formulaCreator.getEnvironment(), map);
+        constraints.add(constraint);
+      }
     }
-  }
-  return new ApronConstraint(constraints, formulaCreator.getEnvironment());
+    return new ApronConstraint(constraints, formulaCreator.getEnvironment());
   }
 
   @Override
@@ -212,7 +215,7 @@ public class ApronIntegerFormulaManager
     ApronIntBinaryNode binaryNode = new ApronIntBinaryNode(pParam1, pParam2,
         Texpr1BinNode.OP_SUB);
     Map<ApronNode, Integer> map = new HashMap<>();
-    map.put(binaryNode,Tcons1.SUP);
+    map.put(binaryNode, Tcons1.SUP);
     ApronConstraint constraint = new ApronConstraint(formulaCreator.getEnvironment(), map);
     return constraint;
   }
@@ -222,7 +225,7 @@ public class ApronIntegerFormulaManager
     ApronIntBinaryNode binaryNode = new ApronIntBinaryNode(pParam1, pParam2,
         Texpr1BinNode.OP_SUB);
     Map<ApronNode, Integer> map = new HashMap<>();
-    map.put(binaryNode,Tcons1.SUPEQ);
+    map.put(binaryNode, Tcons1.SUPEQ);
     ApronConstraint constraint = new ApronConstraint(formulaCreator.getEnvironment(), map);
     return constraint;
   }
@@ -232,7 +235,7 @@ public class ApronIntegerFormulaManager
     ApronIntBinaryNode binaryNode = new ApronIntBinaryNode(pParam2, pParam1,
         Texpr1BinNode.OP_SUB);
     Map<ApronNode, Integer> map = new HashMap<>();
-    map.put(binaryNode,Tcons1.SUP);
+    map.put(binaryNode, Tcons1.SUP);
     ApronConstraint constraint = new ApronConstraint(formulaCreator.getEnvironment(), map);
     return constraint;
   }
@@ -242,7 +245,7 @@ public class ApronIntegerFormulaManager
     ApronIntBinaryNode binaryNode = new ApronIntBinaryNode(pParam2, pParam1,
         Texpr1BinNode.OP_SUB);
     Map<ApronNode, Integer> map = new HashMap<>();
-    map.put(binaryNode,Tcons1.SUPEQ);
+    map.put(binaryNode, Tcons1.SUPEQ);
     ApronConstraint constraint = new ApronConstraint(formulaCreator.getEnvironment(), map);
     return constraint;
   }
