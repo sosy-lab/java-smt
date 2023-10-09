@@ -484,8 +484,6 @@ public class bitwuzlaJNI {
 
   public static final native String fgets(String jarg1, int jarg2, long jarg3, _IO_FILE jarg3_);
 
-  public static final native String gets(String jarg1);
-
   public static final native int __getdelim(
       long jarg1, long jarg2, int jarg3, long jarg4, _IO_FILE jarg4_);
 
@@ -984,5 +982,47 @@ public class bitwuzlaJNI {
 
   public static final native long bitwuzla_parser_get_bitwuzla(long jarg1);
 
-  public static final native long parse(String jarg);
+  // This returns the assertions of the input String as formulas individually
+  public static final native long[] parse(String jarg);
+
+  /**
+   * Dumps the SMT2 String representation of a entered Bitwuzla term.
+   *
+   * @param term Bitwuzla term.
+   * @param baseOfValueInterpretation base of the values to be printed. I.e. 2, 10 or 16.
+   * @return String of the term.
+   */
+  public static final native String dump_formula_smt2(long term, int baseOfValueInterpretation);
+
+  /**
+   * Prints the assertion stack of the entered Bitwuzla environment.
+   *
+   * @param env a Bitwuzla environment where the assertion stack should be printed.
+   * @param baseOfValueInterpretation base of the values to be printed. I.e. 2, 10 or 16.
+   * @return String of the terms on the assertion stack.
+   */
+  public static final native String dump_assertions_smt2(long env, int baseOfValueInterpretation);
+
+  /**
+   * Sets termination callback to chosen implementation of a method.
+   *
+   * @param env instance
+   * @param terminationCallback TerminationCallback method
+   * @return address to helper struct. Call method boolector_free_termination with it to free its
+   *     ressources after termination!
+   */
+  protected static native long set_termination(long env, TerminationCallback terminationCallback);
+
+  /**
+   * Frees resources of the termination callback function. Call ONLY after termination has occured
+   * with the return value of set_termination of its instance!
+   *
+   * @param helper address to helper struct used in termination callback.
+   */
+  protected static native void free_termination(long helper);
+
+  /** This is used to get the methodID for the JNI call to the termination callback method. */
+  interface TerminationCallback {
+    boolean shouldTerminate() throws InterruptedException;
+  }
 }
