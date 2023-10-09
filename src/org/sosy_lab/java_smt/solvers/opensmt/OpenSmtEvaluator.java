@@ -18,13 +18,11 @@ import org.sosy_lab.java_smt.solvers.opensmt.api.SRef;
 
 public class OpenSmtEvaluator extends AbstractEvaluator<PTRef, SRef, Logic> {
 
-  private final MainSolver osmtSolver;
   private final Model osmtModel;
 
   OpenSmtEvaluator(OpenSmtAbstractProver<?> pProver, OpenSmtFormulaCreator pCreator) {
     super(pProver, pCreator);
-    osmtSolver = pProver.getOsmtSolver();
-    osmtModel = osmtSolver.getModel();
+    osmtModel = pProver.getOsmtSolver().getModel();
   }
 
   @Override
