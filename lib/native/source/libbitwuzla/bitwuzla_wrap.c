@@ -156,6 +156,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <assert.h>
+#include <unistd.h>
 
 
 /* Support for throwing Java exceptions */
@@ -177,6 +178,11 @@ typedef struct {
   const char *java_exception;
 } SWIG_JavaExceptions_t;
 
+struct callback_info {
+    JNIEnv *jenv;
+    jmethodID callback_method;
+    jobject obj;
+};
 
 static void SWIGUNUSED SWIG_JavaThrowException(JNIEnv *jenv, SWIG_JavaExceptionCodes code, const char *msg) {
   jclass excep;
@@ -269,7 +275,6 @@ static jdoubleArray SWIG_JavaArrayOutDouble (JNIEnv *jenv, double *result, jsize
 
 
 #else
-
 
 /* signed char[] support */
 static int SWIG_JavaArrayInSchar (JNIEnv *jenv, jbyte **jarr, signed char **carr, jbyteArray input) {
@@ -4117,26 +4122,6 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzl
   return jresult;
 }
 
-
-SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_gets(JNIEnv *jenv, jclass jcls, jstring jarg1) {
-  jstring jresult = 0 ;
-  char *arg1 = (char *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = 0;
-  if (jarg1) {
-    arg1 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg1, 0);
-    if (!arg1) return 0;
-  }
-  result = (char *)gets(arg1);
-  if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
-  if (arg1) (*jenv)->ReleaseStringUTFChars(jenv, jarg1, (const char *)arg1);
-  return jresult;
-}
-
-
 SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1_1getdelim(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jint jarg3, jlong jarg4, jobject jarg4_) {
   jint jresult = 0 ;
   char **arg1 = (char **) 0 ;
@@ -7971,53 +7956,364 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJ
   return jresult;
 }
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_parse(JNIEnv *jenv, jclass jcls, jstring jarg1) {
+//Used for checking JavaSMT TerminationCallback boolean to determine if Bitwuzla should temrinate
+static int32_t java_termination_callback(void *user_data) {
+    struct callback_info *helper = (struct callback_info *) user_data;
+    JNIEnv *jenv = helper->jenv;
 
+    if (helper->obj == NULL) {
+        SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Illegal termination callback object");
+        return 1;
+    }
+
+    jboolean result = (*jenv)->CallBooleanMethod(jenv, helper->obj, helper->callback_method);
+
+    if ((*jenv)->ExceptionCheck(jenv)) {
+        return 1;    //This is for safety reasons here as one could use shutdownIfNecessary() as callback method in theory (not advised)
+    }
+
+    return (int32_t)(result != JNI_FALSE);
+}
+
+//Takes String and appends it to valid path for temporary files
+//Make sure that filename is compliant with the used temp file method
+//Returns NULL in case of NULL filename (so make sure you dont enter NULL!)
+char *addTemppathToFilename(char *filename) {
+
+  if (!filename) {
+    return NULL;
+  }
+
+  char *dir = getenv("TMPDIR");
+  if (dir == NULL || strlen(dir) == 0) {
+    dir = "/tmp/";
+  }
+
+  int dirLength = (int)strlen(dir);
+  int filenameLength = (int)strlen(filename);
+  int completeNameLength = dirLength + filenameLength + 2;  //+2 because we may need 1 additional for '/'
+  char *tempfileName = (char *)malloc(completeNameLength);
+  if (!tempfileName) {
+    return NULL;
+  }
+  strcpy(tempfileName, dir);
+  if (dir[dirLength - 1] != '/') {
+    strcat(tempfileName, "/");
+  }
+  strcat(tempfileName, filename);
+
+  return tempfileName;
+}
+
+/** Open a temporary file for reading and writing and return the file-pointer.
+ * The file will be cleaned up when closed.
+ * On error, we report an Exception to JNIEnv and return NULL. */
+FILE* openTempFile(JNIEnv *jenv) {
+  char *tempfileName = addTemppathToFilename("bitwuzla_temp_XXXXXX");
+  if (tempfileName == NULL) {
+    perror("ERROR CREATING TEMPORARY FILE FOR BITWUZLA");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "FileName may not be NULL");
+    return NULL;
+  }
+  int fileDesrc = mkstemp(tempfileName);
+  if (fileDesrc == -1) {
+    free(tempfileName);
+    perror("ERROR CREATING TEMPORARY FILE FOR BITWUZLA");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "FileDescriptor may not be NULL");
+    return NULL;
+  }
+  FILE *file = fdopen(fileDesrc, "w+");
+  unlink(tempfileName);
+  free(tempfileName);
+  if (file == NULL) {
+    perror("ERROR: COULDNT DUMP NODE BECAUSE IT COULDNT CREATE A DUMP FILE");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "File may not be NULL");
+    return NULL;
+  }
+  return file;
+}
+
+SWIGEXPORT jlongArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_parse(JNIEnv *jenv, jclass jcls, jstring jarg1) {
   char *arg1 = (char *) 0 ;
   
   (void)jenv;
   (void)jcls;
- 
+
   if (jarg1) {
     arg1 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg1, 0);
-    if (!arg1) return 0;
+    if (!arg1) {
+      printf("Failure transforming a Java String to a C String.");
+      return 0;
+    }
   }
-  
-  BitwuzlaOptions* options = bitwuzla_options_new();
 
-  FILE* file = fopen("tmp_file.smt2", "w+");
+  BitwuzlaOptions* options = bitwuzla_options_new();
+  bitwuzla_set_option(options, BITWUZLA_OPT_PRODUCE_UNSAT_CORES, 1);
+  bitwuzla_set_option(options, BITWUZLA_OPT_REWRITE_LEVEL, 0);
+  bitwuzla_set_option(options, BITWUZLA_OPT_PRODUCE_MODELS, 2);
+
+  // Bitwuzla forces us to do this as it does not accept any other flag besides r and r+
+  const char * filename = "notATmpFile.smt2";
+  FILE* file = fopen(filename, "w+");
+
+  if (file == 0) {
+    printf("Failure creating a file for parsing.");
+    bitwuzla_options_delete(options);
+    fclose(file);
+    remove(filename);
+    return 0;
+  }
+
+  fputs(arg1, file);
+  fclose(file);
+  file = fopen(filename, "r");
+
+  if (file == 0) {
+    printf("Failure creating a file for parsing.");
+    bitwuzla_options_delete(options);
+    fclose(file);
+    remove(filename);
+    return 0;
+  }
+  /*
+  FILE *file = openTempFile(jenv);
+  if (!file) {
+    return 0;
+  }
 
   assert(file != 0);
 
   fputs(arg1, file);
-  fclose(file);
-  file = fopen("tmp_file.smt2", "r");
+
+  // Bitwuzla wants the file pointer and the name
+  int MAXSIZE = 0xFFFF;
+  char proclnk[0xFFFF];
+  char filename[0xFFFF];
+  int fno;
+  ssize_t r;
+  fno = fileno(file);
+  sprintf(proclnk, "/proc/self/fd/%d", fno);
+  r = readlink(proclnk, filename, MAXSIZE);
+  if (r < 0) {
+    printf("Failed to find filename when parsing: failed to readlink\n");
+    return 0;
+  }
+  filename[r] = '\0';
+  */
+
 
   BitwuzlaParser* parser = bitwuzla_parser_new(
-      options, "tmp_file.smt2", file, "smt2", 2, "<stdout>");
+      options, filename, file, "smt2", 10, "<stdout>");
 
-  // Now parse the input file.
-  const char* err_msg = bitwuzla_parser_parse(parser, false);
+  // Now parse the input file. true == parse only, no SAT check.
+  const char* err_msg = bitwuzla_parser_parse(parser, true);
+
   // We expect no error to occur.
-  assert(err_msg == NULL);
+  if (err_msg != 0) {
+    printf("Failure in parsing: parser did not parse with bitwuzla_parser_parse() with error: %s.", err_msg);
+    bitwuzla_parser_delete(parser);
+    bitwuzla_options_delete(options);
+    fclose(file);
+    remove(filename);
+    return 0;
+  }
 
   // Now we retrieve the set of asserted formulas and print them.
   size_t size;
   BitwuzlaTerm* assertions =
       bitwuzla_get_assertions(bitwuzla_parser_get_bitwuzla(parser), &size);
 
-  // assert(size == 1);
-  printf("size: %ld", size);
-  assert(assertions != 0);
+  if (size < 1 || assertions == 0) {
+    printf("Failure in parsing: no term returned.");
+    bitwuzla_parser_delete(parser);
+    bitwuzla_options_delete(options);
+    fclose(file);
+    remove(filename);
+    return 0;
 
-  jlong jresult = (jlong) assertions[0];
+  }
 
+  // cleanup
   bitwuzla_parser_delete(parser);
   bitwuzla_options_delete(options);
 
   fclose(file);
-  remove("tmp_file.smt2");
+  remove(filename);
+
+  // Make jlongarray
+  jlongArray ret = (jobjectArray)(*jenv)->NewLongArray(jenv, size);
+  if (ret == 0) {
+    return NULL;
+  }
+  // tmp array with correct type
+  long long int tmp[size];
+  for (int i = 0; i < size; i++) {
+    tmp[i] = (long long int) assertions[i];
+  }
+  // copy to jlongarray
+  (*jenv)->SetLongArrayRegion(jenv, ret, 0, size, tmp);
+  
+  return ret;
+}
+
+/** Read all content from the given file pointer and store it in a Java String.
+ * We assume the file pointer to be open and do not close it.
+ * On error, we report an exception to JNIEnv and return NULL. */
+jstring copyFileContentToString(JNIEnv *jenv, FILE *file) {
+
+  // flush any buffered data.
+  if (fflush(file) != 0) {
+    perror("ERROR: COULDNT FLUSH DUMP FILE");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "File could not be flushed");
+    return NULL;
+  }
+
+  // get file size
+  if (fseek(file, 0, SEEK_SET) != 0) {
+    perror("ERROR SEEKING FILE BEGINNING");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "Could not determine the beginning of the used file");
+    return NULL;
+  }
+  if (fseek(file, 0, SEEK_END) != 0) {
+    perror("ERROR SEEKING FILE LENGTH");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "Could not determine the end of the used file");
+    return NULL;
+  }
+  long fileLength = ftell(file);
+  if (fseek(file, 0, SEEK_SET) != 0) {
+    perror("ERROR SEEKING FILE BEGINNING");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "Could not determine the beginning of the used file");
+    return NULL;
+  }
+  if (fileLength <= 0) {
+    perror("ERROR READING FILE LENGTH");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "File length may not be NULL");
+    return NULL;
+  }
+
+  // get file content
+  char *buffer = (char *)malloc((fileLength + 1) * sizeof(char));
+  if (!buffer) {
+    perror("ERROR READING FILE INTO BUFFER");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "Buffer may not be NULL");
+    return NULL;
+  }
+  size_t readLength = fread(buffer, 1, fileLength, file);
+  if ((unsigned long)fileLength != readLength) {
+    free(buffer);
+    perror("ERROR READING FILE INTO BUFFER");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "Could not read the whole length of the file into the buffer");
+    return 0;
+  }
+  buffer[fileLength] = '\0';
+  jstring jresult = (*jenv)->NewStringUTF(jenv, (const char *)buffer);
+  free(buffer);
+
   return jresult;
+}
+
+// dump_formula_smt2(long termToPrint, int baseRepresentation)
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_dump_1formula_1smt2(JNIEnv *jenv, jclass jcls, jlong jterm, jint jbase) {
+  BitwuzlaTerm term = (BitwuzlaTerm) jterm;
+  uint8_t base = (uint8_t)jbase;
+  
+  (void)jenv;
+  (void)jcls;
+
+  FILE *file = openTempFile(jenv);
+  if (!file) {
+    return NULL;
+  }
+
+  bitwuzla_term_print_fmt(term, file, base);
+
+  // read
+  jstring jresult = copyFileContentToString(jenv, file);
+
+  // cleanup
+  fclose(file);
+
+  return jresult;
+}
+
+// dump_assertions_smt2(long bitwuzlaEnv, int baseRepresentation)
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_dump_1assertions_1smt2(JNIEnv *jenv, jclass jcls, jlong env, jint base) {
+  Bitwuzla *arg1 = (Bitwuzla *) 0 ;
+  uint8_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(Bitwuzla **)&env; 
+  
+  arg2 = (uint8_t)base; 
+
+
+  FILE *file = openTempFile(jenv);
+  if (!file) {
+    return NULL;
+  }
+
+  bitwuzla_print_formula(arg1, "smt2" , file, arg2);
+
+  // read
+  jstring jresult = copyFileContentToString(jenv, file);
+
+  // cleanup
+  fclose(file);
+
+  return jresult;
+}
+
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_set_1termination(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg2) {
+  Bitwuzla *arg1 = (Bitwuzla *) 0 ;
+
+  (void)jenv;
+  (void)jcls;
+
+  arg1 = *(Bitwuzla **)&jarg1; 
+
+  jclass cls = (*jenv)->FindClass(jenv, "org/sosy_lab/java_smt/solvers/bitwuzla/bitwuzlaJNI$TerminationCallback");
+  if (cls == NULL) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Class for Bitwuzlas set_termination() may not be NULL");
+    return 0;
+  }
+
+  jmethodID methodID = (*jenv)->GetMethodID(jenv, cls, "shouldTerminate", "()Z");
+  if (methodID == NULL) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "MethodID in Bitwuzlas set_termination() may not be NULL");
+    return 0;
+  }
+
+  if (jarg2 == NULL) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "TerminationCallback of Bitwuzlas set_termination() may not be NULL");
+    return 0;
+  }
+
+  struct callback_info *helper = malloc(sizeof(struct callback_info));
+  helper->jenv = jenv;
+  helper->callback_method = methodID;
+  helper->obj = (*jenv)->NewGlobalRef(jenv, jarg2);
+
+  bitwuzla_set_termination_callback(arg1, &java_termination_callback, helper);
+
+  //Returns address to helper to be freed after termination has been called. See method boolector_free_termination
+  return (jlong)helper;
+}
+
+
+// Call this with the return value of the method boolector_set_termination to free ressources
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_free_1termination(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  (void)jcls;
+
+  struct callback_info *helper = (struct callback_info *)(long)jarg1;
+  if (helper == NULL) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "TerminationCallback of Bitwuzlas free_termination() may not be NULL");
+    return;
+  }
+
+  (*jenv)->DeleteGlobalRef(jenv, helper->obj);
+  helper->obj = NULL;
+  free(helper);
 }
 
 
