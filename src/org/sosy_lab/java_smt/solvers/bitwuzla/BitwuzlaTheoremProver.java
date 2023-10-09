@@ -39,6 +39,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaFormula.BitwuzlaBooleanFormula;
 import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaSolverContext.BitwuzlaSettings;
+import org.sosy_lab.java_smt.solvers.bitwuzla.bitwuzlaJNI.TerminationCallback;
 
 class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements ProverEnvironment {
 
@@ -49,6 +50,9 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
 
   private final BitwuzlaFormulaCreator creator;
   protected boolean wasLastSatCheckSat = false; // and stack is not changed
+
+  private final TerminationCallback terminationCallback;
+  private final long terminationCallbackHelper;
 
   protected BitwuzlaTheoremProver(
       BitwuzlaFormulaManager pManager,
@@ -62,6 +66,8 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
     creator = pCreator;
     // Bitwuzla guarantees that Terms and Sorts are shared
     env = createEnvironment(pOptions, pSettings, pRandomSeed);
+    terminationCallback = shutdownNotifier::shouldShutdown;
+    terminationCallbackHelper = addTerminationCallback();
   }
 
   private long createEnvironment(
@@ -245,6 +251,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   @Override
   public void close() {
     if (!closed) {
+      bitwuzlaJNI.free_termination(terminationCallbackHelper);
       bitwuzlaJNI.bitwuzla_delete(env);
       closed = true;
     }
@@ -259,5 +266,10 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
 
   public boolean isClosed() {
     return closed;
+  }
+
+  private long addTerminationCallback() {
+    Preconditions.checkState(!closed, "solver context is already closed");
+    return bitwuzlaJNI.set_termination(env, terminationCallback);
   }
 }
