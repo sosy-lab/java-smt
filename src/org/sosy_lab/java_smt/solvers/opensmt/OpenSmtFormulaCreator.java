@@ -86,7 +86,7 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, Sy
         return LogicFactory.getLAInstance(Logic_t.QF_AUFLIA);
       case QF_AUFLRA:
         return LogicFactory.getLAInstance(Logic_t.QF_AUFLRA);
-      case ALL:
+      case QF_AUFLIRA:
         return LogicFactory.getLAInstance(Logic_t.QF_AUFLIRA);
       default:
         throw new AssertionError("no logic available");
@@ -101,7 +101,7 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, Sy
             Logics.QF_ALRA,
             Logics.QF_AUFLIA,
             Logics.QF_AUFLRA,
-            Logics.ALL);
+            Logics.QF_AUFLIRA);
 
     return supported.contains(logicToUse);
   }
@@ -114,7 +114,7 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, Sy
             Logics.QF_UFLRA,
             Logics.QF_AUFLIA,
             Logics.QF_AUFLRA,
-            Logics.ALL);
+            Logics.QF_AUFLIRA);
 
     return supported.contains(logicToUse);
   }
@@ -127,7 +127,7 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, Sy
             Logics.QF_ALIA,
             Logics.QF_UFLIA,
             Logics.QF_AUFLIA,
-            Logics.ALL);
+            Logics.QF_AUFLIRA);
 
     return supported.contains(logicToUse);
   }
@@ -140,7 +140,7 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, Sy
             Logics.QF_ALRA,
             Logics.QF_UFLRA,
             Logics.QF_AUFLRA,
-            Logics.ALL);
+            Logics.QF_AUFLIRA);
 
     return supported.contains(logicToUse);
   }

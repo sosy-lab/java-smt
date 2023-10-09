@@ -57,14 +57,14 @@ public class OpenSmtSolverContext extends AbstractSolverContext {
     QF_AUFLIA,
     QF_AUFLRA,
 
-    ALL
+    QF_AUFLIRA
   }
 
   @Options(prefix = "solver.opensmt")
   static class OpenSMTOptions {
 
     @Option(secure = true, description = "SMT-LIB2 name of the logic to be used by the solver.")
-    Logics logic = Logics.ALL;
+    Logics logic = Logics.QF_AUFLIRA;
 
     @Option(secure = true, description = "Algorithm for boolean interpolation")
     int algBool = 0;

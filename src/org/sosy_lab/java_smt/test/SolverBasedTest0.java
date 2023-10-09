@@ -117,14 +117,18 @@ public abstract class SolverBasedTest0 {
     return Solvers.SMTINTERPOL;
   }
 
+  /** This method is only called, if OpenSMT is called. OpenSMT needs to know the logic upfront. */
   protected Logics logicToUse() {
-    return Logics.ALL;
+    return Logics.QF_AUFLIRA;
   }
 
   protected ConfigurationBuilder createTestConfigBuilder() {
-    return Configuration.builder()
-        .setOption("solver.solver", solverToUse().toString())
-        .setOption("solver.opensmt.logic", logicToUse().toString());
+    ConfigurationBuilder newConfig =
+        Configuration.builder().setOption("solver.solver", solverToUse().toString());
+    if (solverToUse() == Solvers.OPENSMT) {
+      newConfig.setOption("solver.opensmt.logic", logicToUse().toString());
+    }
+    return newConfig;
   }
 
   @Before

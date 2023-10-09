@@ -669,7 +669,7 @@ public class SolverStackTest extends SolverBasedTest0 {
       throws SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
 
-    try (SolverContext localContext = initSolver("solver.logic", Logics.ALL.name())) {
+    try (SolverContext localContext = initSolver("solver.logic", Logics.QF_AUFLIRA.name())) {
 
       FormulaManager localMgr = localContext.getFormulaManager();
       IntegerFormulaManager localImgr = localMgr.getIntegerFormulaManager();
