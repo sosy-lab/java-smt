@@ -12,11 +12,12 @@ import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 
-public class SolverStackTest extends SolverStackTest0 {
+public class SolverStackOptimizationTest extends SolverStackTest0 {
 
   @Override
   protected BasicProverEnvironment<?> newEnvironmentForTest(
       SolverContext pContext, ProverOptions... options) {
-    return pContext.newProverEnvironment(options);
+    requireOptimization();
+    return pContext.newOptimizationProverEnvironment(options);
   }
 }
