@@ -9,12 +9,10 @@
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import java.io.IOException;
-import java.util.Map;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 
 final class BitwuzlaFormulaManager extends AbstractFormulaManager<Long, Long, Long, Long> {
@@ -44,56 +42,50 @@ final class BitwuzlaFormulaManager extends AbstractFormulaManager<Long, Long, Lo
 
   @Override
   public BooleanFormula parse(String s) throws IllegalArgumentException {
-    Long term = bitwuzlaJNI.parse(s);
-    assert term != null;
-    assert bitwuzlaJNI.bitwuzla_term_is_bool(term);
-    return super.getFormulaCreator().encapsulateBoolean(term);
+    if (s.contains("(check-sat)")) {
+      s = s.replace("(check-sat)", "");
+    }
+    if (s.contains("(exit)")) {
+      s = s.replace("(exit)", "");
+    }
+    long[] terms = bitwuzlaJNI.parse(s);
+    assert terms != null;
+    // AND all the terms
+    Long retForm;
+    if (terms.length > 1) {
+      retForm =
+          bitwuzlaJNI.bitwuzla_mk_term(
+              BitwuzlaKind.BITWUZLA_KIND_AND.swigValue(), terms.length, terms);
+    } else {
+      retForm = terms[0];
+    }
+    assert bitwuzlaJNI.bitwuzla_term_is_bool(retForm);
+    return super.getFormulaCreator().encapsulateBoolean(retForm);
   }
 
   @Override
   public Appender dumpFormula(Long pTerm) {
-    assert getFormulaCreator().getFormulaType(pTerm) == FormulaType.BooleanType
-        : "Only BooleanFormulas may be dumped";
+    // There are 2 ways of SMT2 printing in Bitwuzla, bitwuzla_term_print() and
+    // bitwuzla_term_print_fmt(), which print a single formula, and bitwuzla_print_formula(),
+    // which prints the complete assertion stack of the bitwuzla instance given to the function.
+    // Only bitwuzla_print_formula() gives us the proper SMT2 format, with (check-sat) etc.
+    // Note: bitwuzla_print_formula() is wrapped in dump_assertions_smt2()
     return new Appenders.AbstractAppender() {
-
       @Override
       public void appendTo(Appendable out) throws IOException {
-        Map<String, Formula> varsAndUFs =
-            extractVariablesAndUFs(getFormulaCreator().encapsulateWithTypeOf(pTerm));
-        for (Map.Entry<String, Formula> entry : varsAndUFs.entrySet()) {
-          final long currentTerm = ((BitwuzlaFormula) entry.getValue()).getTerm();
-
-          if (bitwuzlaJNI.bitwuzla_term_is_fun(currentTerm)) {
-            long[] pDomainSize = new long[1];
-            long pArrayDomainTypes =
-                bitwuzlaJNI.bitwuzla_term_fun_get_domain_sorts(currentTerm, pDomainSize);
-            long numberOfArgs = pDomainSize[0];
-
-            out.append("(declare-fun ");
-            out.append(entry.getKey());
-            out.append(" (");
-            for (int i = 0; i < numberOfArgs; i++) {
-              out.append(
-                  bitwuzlaJNI.bitwuzla_sort_to_string(
-                      bitwuzlaJNI.BitwuzlaSortArray_getitem(pArrayDomainTypes, i)));
-              out.append(" ");
-            }
-            out.append(") ");
-            out.append(
-                bitwuzlaJNI.bitwuzla_sort_to_string(
-                    bitwuzlaJNI.bitwuzla_term_fun_get_codomain_sort(currentTerm)));
-            out.append(")\n");
-          } else {
-            out.append("(declare-const ");
-            out.append(entry.getKey());
-            out.append(" ");
-            out.append(
-                bitwuzlaJNI.bitwuzla_sort_to_string(
-                    bitwuzlaJNI.bitwuzla_term_get_sort(currentTerm)));
-            out.append(")\n");
-          }
-          out.append("(assert ").append(bitwuzlaJNI.bitwuzla_term_to_string(pTerm)).append(")");
+        long printCtx = getFormulaCreator().getEnv();
+        bitwuzlaJNI.bitwuzla_push(printCtx, 1);
+        bitwuzlaJNI.bitwuzla_assert(printCtx, pTerm);
+        String dump = bitwuzlaJNI.dump_assertions_smt2(printCtx, 10);
+        bitwuzlaJNI.bitwuzla_pop(printCtx, 1);
+        // Bitwuzla prints (check-sat)\n(exit)\n in the end. We remove that.
+        if (dump.contains("(check-sat)\n")) {
+          dump = dump.replace("(check-sat)", "");
         }
+        if (dump.contains("(exit)")) {
+          dump = dump.replace("(exit)", "");
+        }
+        out.append(dump);
       }
     };
   }
