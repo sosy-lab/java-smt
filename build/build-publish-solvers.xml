@@ -92,7 +92,7 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- Copy (only!) the required java files to the source tree. This should make sure that compilation fails
              if the OpenSMT interface changed, but the swig header wasn't updated  -->
-        <copy todir="${path.source}/src/opensmt">
+        <copy todir="${path.source}/src/org/sosy_lab/java_smt/solvers/opensmt/api">
             <fileset dir="${path.install}/java/opensmt">
                 <include name="ArithLogic.java"/>
                 <include name="InterpolationContext.java"/>
@@ -166,7 +166,7 @@ SPDX-License-Identifier: Apache-2.0
         <!-- Compile java proxies and create jar file -->
         <mkdir dir="${path.source}/bin"/>
         <javac srcdir="${path.source}/src/" destdir="${path.source}/bin/" includeantruntime="false">
-            <include name="opensmt/*.java"/>
+            <include name="org/sosy_lab/java_smt/solvers/opensmt/api/*.java"/>
         </javac>
         <jar destfile="opensmt-${opensmt.version}.jar" basedir="${path.source}/bin"/>
         <delete dir="${path.source}/bin"/>
