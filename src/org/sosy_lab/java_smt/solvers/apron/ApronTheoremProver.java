@@ -56,7 +56,6 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
   private final ApronSolverContext solverContext;
 
   private final List<Collection<ApronConstraint>> assertedFormulas = new ArrayList<>();
-
   protected ApronTheoremProver(
       Set pSet,
       BooleanFormulaManager pBmgr,
@@ -73,6 +72,8 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
     return solverContext;
   }
 
+
+
   public List<Collection<ApronConstraint>> getAssertedFormulas() {
     return assertedFormulas;
   }
@@ -80,6 +81,7 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
   @Override
   public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
     Preconditions.checkState(!closed);
+    checkGenerateModels();
     return super.getModelAssignments();
   }
 
@@ -155,6 +157,7 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
   @Override
   public Model getModel() throws SolverException {
     Preconditions.checkState(!closed);
+    checkGenerateModels();
     return new ApronModel(this, solverContext.getFormulaCreator(), getAssertedExpressions());
   }
 
