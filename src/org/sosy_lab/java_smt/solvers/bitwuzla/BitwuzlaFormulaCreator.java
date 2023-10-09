@@ -126,8 +126,8 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
     if (maybeFormula != null) {
       return maybeFormula;
     }
-    if (formulaCache.containsRow(varName)) {
-      throw new IllegalArgumentException("Symbol already used: " + varName);
+    if (formulaCache.containsRow(varName) && formulaCache.containsColumn(pSort)) {
+      return formulaCache.get(varName, pSort);
     }
     long newVar = bitwuzlaJNI.bitwuzla_mk_const(pSort, varName);
     formulaCache.put(varName, pSort, newVar);
@@ -468,6 +468,11 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
 
   @Override
   public Long declareUFImpl(String name, Long pReturnType, List<Long> pArgTypes) {
+    if (pArgTypes.size() == 0) {
+      // Bitwuzla does not support UFs with no args, so we make a variable
+      // TODO: implement
+      throw new UnsupportedOperationException("Bitwuzla does not support 0 arity UFs.");
+    }
     long functionSort =
         bitwuzlaJNI.bitwuzla_mk_fun_sort(
             pArgTypes.size(), pArgTypes.stream().mapToLong(Long::longValue).toArray(), pReturnType);
@@ -476,8 +481,8 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
     if (maybeFormula != null) {
       return maybeFormula;
     }
-    if (formulaCache.containsRow(name)) {
-      throw new IllegalArgumentException("Symbol already used: " + name);
+    if (formulaCache.containsRow(name) && formulaCache.containsColumn(functionSort)) {
+      return formulaCache.get(name, functionSort);
     }
     long uf = bitwuzlaJNI.bitwuzla_mk_const(functionSort, name);
     formulaCache.put(name, functionSort, uf);
