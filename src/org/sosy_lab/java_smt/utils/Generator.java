@@ -416,14 +416,34 @@ public class Generator {
     executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
+  /** BitvectorFormulaManager
+   */
   public static void logMakeBitVector(Object result, int length, long i) {
       List<Object> inputParams = new ArrayList<>();
       inputParams.add(Long.toString(length));
       inputParams.add(Long.toString(i));
       Function<List<Object>, String> saveResult =
-          inPlaceInputParams -> "#b" + Long.toBinaryString(parseLong((String)inPlaceInputParams.get(1)));
+        inPlaceInputParamsString -> {
+          String formatString = "%0" + (length) + "d";
+          int binaryNumber =
+              Integer.valueOf(Long.toBinaryString(parseLong((String)inPlaceInputParamsString.get(1))));
+          return "#b" + String.format(formatString, binaryNumber);};
       executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
+
+  public static void logMakeBitVector(BitvectorFormula result, int length, IntegerFormula pI) {
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(Long.toString(length));
+    inputParams.add(pI.toString());
+    Function<List<Object>, String> saveResult =
+        inPlaceInputParamsString -> {
+          String formatString = "%0" + (length) + "d";
+          int binaryNumber =
+              Integer.valueOf(Long.toBinaryString(parseLong((String)inPlaceInputParamsString.get(1))));
+          return "#b" + String.format(formatString, binaryNumber);};
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+  }
+
   public static void logBVEqual(Object result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
@@ -433,8 +453,14 @@ public class Generator {
     executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
+  //TODO LogToIntegerFormula
 
-
-
+  public static void logBVNegate(Object result, BitvectorFormula pNumber) {
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(pNumber);
+    Function<List<Object>, String> saveResult =
+        inPlaceInputParams -> "(bvneg " + inPlaceInputParams.get(0) + ")";
+    executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+  }
 
 }

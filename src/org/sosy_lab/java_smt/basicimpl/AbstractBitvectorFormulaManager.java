@@ -58,6 +58,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
   public BitvectorFormula makeBitvector(int length, IntegerFormula pI) {
     TFormulaInfo param1 = extractInfo(pI);
     BitvectorFormula result = wrap(makeBitvectorImpl(length, param1));
+    Generator.logMakeBitVector(result, length, pI);
     return result;
   }
 
@@ -75,7 +76,9 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
   @Override
   public BitvectorFormula negate(BitvectorFormula pNumber) {
     TFormulaInfo param1 = extractInfo(pNumber);
-    return wrap(negate(param1));
+    BitvectorFormula result = wrap(negate(param1));
+    Generator.logBVNegate(result, pNumber);
+    return result;
   }
 
   protected abstract TFormulaInfo negate(TFormulaInfo pParam1);

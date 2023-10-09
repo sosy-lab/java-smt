@@ -50,12 +50,9 @@ public class Main {
     BitvectorFormulaManager bimgr = fmgr.getBitvectorFormulaManager();
 
     BitvectorFormula a = bimgr.makeBitvector(6, 5);
-    BitvectorFormula b = bimgr.makeBitvector(6, 004);
+    BitvectorFormula b = bimgr.makeBitvector(6, 3);
+    //BitvectorFormula test = bimgr.negate(b);
     BooleanFormula constraint = bimgr.equal(a, b);
-
-    System.out.println(a);
-    System.out.println(b);
-    System.out.println(constraint);
 
     try (ProverEnvironment prover =
              context.newProverEnvironment(SolverContext.ProverOptions.GENERATE_MODELS)) {
@@ -63,10 +60,11 @@ public class Main {
 
 
       boolean isUnsat = prover.isUnsat();
+      System.out.println("constraint is " + isUnsat + " and p = ");
       if (!isUnsat) {
         Model model = prover.getModel();
         //Boolean value = model.evaluate(p);
-        //System.out.println("constraint is " + isUnsat + " and p = " + value);
+
       }
     } catch (SolverException e) {
       throw new RuntimeException(e);
