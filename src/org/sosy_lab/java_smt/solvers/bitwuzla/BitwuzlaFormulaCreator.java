@@ -427,7 +427,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Bit
         long argument = args[i];
         if (kind == BITWUZLA_KIND_APPLY && i == 0) {
           // UFs carry the decl in the first child and the decl has the name
-          decl = new BitwuzlaDeclaration(argument, true);
+          decl = new BitwuzlaDeclaration(argument, false);
           name = bitwuzlaJNI.bitwuzla_term_get_symbol(argument);
           continue;
         }
@@ -481,19 +481,18 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Bit
           indices);
     }
 
-    assert declaration.isKind();
-    long declKind = declaration.getKind();
-    if (BitwuzlaKind.swigToEnum((int) declKind) == BITWUZLA_KIND_CONSTANT
-        && bitwuzlaJNI.bitwuzla_term_is_fun(declKind)) {
+    if (!declaration.isKind() && bitwuzlaJNI.bitwuzla_term_is_fun(declaration.getTerm())) {
       long[] functionAndArgs =
-          LongStream.concat(LongStream.of(declKind), args.stream().mapToLong(Long::longValue))
+          LongStream.concat(
+                  LongStream.of(declaration.getTerm()), args.stream().mapToLong(Long::longValue))
               .toArray();
       return bitwuzlaJNI.bitwuzla_mk_term(
           BitwuzlaKind.BITWUZLA_KIND_APPLY.swigValue(), functionAndArgs.length, functionAndArgs);
     }
-    if (BitwuzlaKind.swigToEnum((int) declKind) == BITWUZLA_KIND_BV_NOR) {
-      System.out.println();
-    }
+
+    assert declaration.isKind();
+    long declKind = declaration.getKind();
+
     return bitwuzlaJNI.bitwuzla_mk_term(
         (int) declKind, args.size(), args.stream().mapToLong(Long::longValue).toArray());
   }
@@ -511,12 +510,12 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Bit
 
     Long maybeFormula = formulaCache.get(name, functionSort);
     if (maybeFormula != null) {
-      return new BitwuzlaDeclaration(maybeFormula, true);
+      return new BitwuzlaDeclaration(maybeFormula, false);
     }
 
     long uf = bitwuzlaJNI.bitwuzla_mk_const(functionSort, name);
     formulaCache.put(name, functionSort, uf);
-    return new BitwuzlaDeclaration(uf, true);
+    return new BitwuzlaDeclaration(uf, false);
   }
 
   @Override
@@ -531,7 +530,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Bit
       long[] size = new long[1];
       long[] pChildren = bitwuzlaJNI.bitwuzla_term_get_children(pLong, size);
       // Returns pointer to Uninterpreted Function used in Apply
-      return new BitwuzlaDeclaration(pChildren[0], true);
+      return new BitwuzlaDeclaration(pChildren[0], false);
     } else {
       return new BitwuzlaDeclaration(pLong, true);
     }
