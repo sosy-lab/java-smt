@@ -126,6 +126,8 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
   public void varWithSpaceDumpTest() {
     // Boolector will fail this anyway since bools are bitvecs for btor
     TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
+    // TODO: this is temporary! Check back after we reported it and its fixed
+    TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BITWUZLA);
     BooleanFormula a = bmgr.makeVariable("main a");
     BooleanFormula b = bmgr.makeVariable("b");
     BooleanFormula c1 = bmgr.xor(a, b);
