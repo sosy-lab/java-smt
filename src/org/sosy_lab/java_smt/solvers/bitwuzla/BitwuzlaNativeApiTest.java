@@ -660,6 +660,32 @@ public class BitwuzlaNativeApiTest {
     assertEquals("(fp #b0 #b01111 #b0000000000)", bitwuzlaJNI.bitwuzla_term_to_string(one));
   }
 
+  /*
+   * This serves as a testbed for indexed terms
+   */
+  @Test
+  public void testExtend() {
+    long bvSort8 = bitwuzlaJNI.bitwuzla_mk_bv_sort(8);
+    long bvSort10 = bitwuzlaJNI.bitwuzla_mk_bv_sort(10);
+    long x = bitwuzlaJNI.bitwuzla_mk_const(bvSort8, "x");
+    long y = bitwuzlaJNI.bitwuzla_mk_const(bvSort10, "y");
+    long xExt =
+        bitwuzlaJNI.bitwuzla_mk_term1_indexed1(BitwuzlaKind.BITWUZLA_KIND_BV_SIGN_EXTEND.swigValue(), x, 2);
+    long xExtEqY = bitwuzlaJNI.bitwuzla_mk_term2(BitwuzlaKind.BITWUZLA_KIND_EQUAL.swigValue(), xExt,
+        y);
+    bitwuzlaJNI.bitwuzla_assert(bitwuzla, xExtEqY);
+    long res = bitwuzlaJNI.bitwuzla_check_sat(bitwuzla);
+    assertEquals(res, BitwuzlaResult.BITWUZLA_SAT.swigValue());
+
+    long[] children = bitwuzlaJNI.bitwuzla_term_get_children(xExt, new long[1]);
+    assertEquals(1, children.length);
+    System.out.println(bitwuzlaJNI.bitwuzla_term_is_indexed(xExt));
+    long[] len = new long[1];
+    long[] indices = bitwuzlaJNI.bitwuzla_term_get_indices(xExt, len);
+    assertEquals(1, indices.length);
+    assertEquals(2, indices[0]);
+  }
+
   // Todo:
   @Ignore
   @Test
