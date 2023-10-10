@@ -578,6 +578,8 @@ public class BitwuzlaNativeApiTest {
     assertTrue(bitwuzlaJNI.bitwuzla_sort_is_bool(bitwuzlaJNI.bitwuzla_term_get_sort(appliedFoo)));
     assertEquals(null, bitwuzlaJNI.bitwuzla_term_get_symbol(appliedFoo));
     assertEquals("foo", bitwuzlaJNI.bitwuzla_term_get_symbol(foo));
+    assertTrue(bitwuzlaJNI.bitwuzla_term_is_const(foo));
+    assertTrue(bitwuzlaJNI.bitwuzla_term_is_fun(foo));
     long[] appliedFooChildren = bitwuzlaJNI.bitwuzla_term_get_children(appliedFoo, new long[1]);
     assertEquals(foo, appliedFooChildren[0]);
     assertEquals(arg1, appliedFooChildren[1]);
@@ -601,6 +603,7 @@ public class BitwuzlaNativeApiTest {
     assertTrue(bitwuzlaJNI.bitwuzla_term_is_bool(eq));
     // neg is also bool
     assertTrue(bitwuzlaJNI.bitwuzla_term_is_bool(neg));
+    assertFalse(bitwuzlaJNI.bitwuzla_term_is_fun(neg));
 
     // Non-UF functions consist of a KIND and arguments.
     // You can get the KIND w bitwuzla_term_get_kind() and the arguments in the correct order w
