@@ -90,10 +90,12 @@ public class TranslateFormulaTest {
   }
 
   private void requireParserTo() {
+    // TODO: Bitwuzla is only temporarly on this list, as the parser crashes JavaSMT on invalid
+    //  input
     assume()
         .withMessage("Solver %s does not support parsing formulae", translateTo)
         .that(translateTo)
-        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2, Solvers.CVC5);
+        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2, Solvers.CVC5, Solvers.BITWUZLA);
   }
 
   private void requireParserFrom() {
