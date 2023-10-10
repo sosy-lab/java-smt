@@ -131,6 +131,7 @@ public class BitwuzlaBooleanFormulaManager
     } else if (isFalse(pF1) && isTrue(pF2)) {
       return not(pCond);
     }
-    return bitwuzlaJNI.bitwuzla_mk_term2(BitwuzlaKind.BITWUZLA_KIND_ITE.swigValue(), pF1, pF2);
+    return bitwuzlaJNI.bitwuzla_mk_term3(
+        BitwuzlaKind.BITWUZLA_KIND_ITE.swigValue(), pCond, pF1, pF2);
   }
 }
