@@ -15,7 +15,8 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 
-final class BitwuzlaFormulaManager extends AbstractFormulaManager<Long, Long, Long, Long> {
+final class BitwuzlaFormulaManager
+    extends AbstractFormulaManager<Long, Long, Long, BitwuzlaDeclaration> {
 
   BitwuzlaFormulaManager(
       BitwuzlaFormulaCreator pFormulaCreator,

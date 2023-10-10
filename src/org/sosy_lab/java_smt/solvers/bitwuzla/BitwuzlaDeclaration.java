@@ -20,11 +20,30 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
-import org.sosy_lab.java_smt.basicimpl.AbstractUFManager;
-import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
+// Declarations sometimes need the info of a Term, but mostly those of Kinds.
+// We can not discern between the two however, hence this wrapper
+public class BitwuzlaDeclaration {
+  private final Long decl;
 
-public class BitwuzlaUFManager extends AbstractUFManager<Long, BitwuzlaDeclaration, Long, Long> {
-  protected BitwuzlaUFManager(FormulaCreator<Long, Long, Long, BitwuzlaDeclaration> pCreator) {
-    super(pCreator);
+  // If isKind, decl == KIND; else decl == term
+  private final boolean isKind;
+
+  BitwuzlaDeclaration(long pDecl, boolean pIsKind) {
+    decl = pDecl;
+    isKind = pIsKind;
+  }
+
+  public boolean isKind() {
+    return isKind;
+  }
+
+  public long getTerm() {
+    assert !isKind;
+    return decl;
+  }
+
+  public int getKind() {
+    assert isKind;
+    return decl.intValue();
   }
 }

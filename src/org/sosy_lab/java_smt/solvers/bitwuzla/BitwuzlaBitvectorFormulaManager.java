@@ -26,11 +26,11 @@ import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 public class BitwuzlaBitvectorFormulaManager
-    extends AbstractBitvectorFormulaManager<Long, Long, Long, Long> {
+    extends AbstractBitvectorFormulaManager<Long, Long, Long, BitwuzlaDeclaration> {
 
   protected BitwuzlaBitvectorFormulaManager(
-      FormulaCreator<Long, Long, Long, Long> pCreator,
-      AbstractBooleanFormulaManager<Long, Long, Long, Long> pBmgr) {
+      FormulaCreator<Long, Long, Long, BitwuzlaDeclaration> pCreator,
+      AbstractBooleanFormulaManager<Long, Long, Long, BitwuzlaDeclaration> pBmgr) {
     super(pCreator, pBmgr);
   }
 
