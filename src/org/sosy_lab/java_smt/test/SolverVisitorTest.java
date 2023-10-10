@@ -582,6 +582,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
 
   @Test
   public void booleanIdVisitWithAtoms() {
+    requireIntegers();
     IntegerFormula n12 = imgr.makeNumber(12);
     IntegerFormula a = imgr.makeVariable("a");
     IntegerFormula b = imgr.makeVariable("b");
@@ -985,6 +986,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
 
   @Test
   public void extractionTest1() {
+    requireIntegers();
     IntegerFormula v = imgr.makeVariable("v");
     BooleanFormula q = fmgr.declareAndCallUF("q", FormulaType.BooleanType, v);
     Map<String, Formula> mapping = mgr.extractVariablesAndUFs(q);
@@ -995,6 +997,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
 
   @Test
   public void extractionTest2() {
+    requireIntegers();
     // the same as above, but with nullary UF.
     IntegerFormula v = fmgr.declareAndCallUF("v", FormulaType.IntegerType);
     BooleanFormula q = fmgr.declareAndCallUF("q", FormulaType.BooleanType, v);
