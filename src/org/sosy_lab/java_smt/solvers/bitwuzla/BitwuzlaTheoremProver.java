@@ -143,12 +143,15 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
     bitwuzlaJNI.bitwuzla_push(env, 1);
   }
 
-  private boolean readSATResult(int resultValue) throws SolverException {
+  private boolean readSATResult(int resultValue) throws SolverException, InterruptedException {
     if (resultValue == BitwuzlaResult.BITWUZLA_SAT.swigValue()) {
       wasLastSatCheckSat = true;
       return false;
     } else if (resultValue == BitwuzlaResult.BITWUZLA_UNSAT.swigValue()) {
       return true;
+    } else if (resultValue == BitwuzlaResult.BITWUZLA_UNKNOWN.swigValue()
+        && terminationCallback.shouldTerminate()) {
+      throw new InterruptedException("Bitwuzla interrupted.");
     } else {
       throw new SolverException("Bitwuzla returned UNKNOWN.");
     }
