@@ -670,9 +670,10 @@ public class BitwuzlaNativeApiTest {
     long x = bitwuzlaJNI.bitwuzla_mk_const(bvSort8, "x");
     long y = bitwuzlaJNI.bitwuzla_mk_const(bvSort10, "y");
     long xExt =
-        bitwuzlaJNI.bitwuzla_mk_term1_indexed1(BitwuzlaKind.BITWUZLA_KIND_BV_SIGN_EXTEND.swigValue(), x, 2);
-    long xExtEqY = bitwuzlaJNI.bitwuzla_mk_term2(BitwuzlaKind.BITWUZLA_KIND_EQUAL.swigValue(), xExt,
-        y);
+        bitwuzlaJNI.bitwuzla_mk_term1_indexed1(
+            BitwuzlaKind.BITWUZLA_KIND_BV_SIGN_EXTEND.swigValue(), x, 2);
+    long xExtEqY =
+        bitwuzlaJNI.bitwuzla_mk_term2(BitwuzlaKind.BITWUZLA_KIND_EQUAL.swigValue(), xExt, y);
     bitwuzlaJNI.bitwuzla_assert(bitwuzla, xExtEqY);
     long res = bitwuzlaJNI.bitwuzla_check_sat(bitwuzla);
     assertEquals(res, BitwuzlaResult.BITWUZLA_SAT.swigValue());

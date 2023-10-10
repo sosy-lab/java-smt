@@ -26,9 +26,10 @@ import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 public class BitwuzlaQuantifiedFormulaManager
-    extends AbstractQuantifiedFormulaManager<Long, Long, Long, Long> {
+    extends AbstractQuantifiedFormulaManager<Long, Long, Long, BitwuzlaDeclaration> {
 
-  protected BitwuzlaQuantifiedFormulaManager(FormulaCreator<Long, Long, Long, Long> pCreator) {
+  protected BitwuzlaQuantifiedFormulaManager(
+      FormulaCreator<Long, Long, Long, BitwuzlaDeclaration> pCreator) {
     super(pCreator);
   }
 

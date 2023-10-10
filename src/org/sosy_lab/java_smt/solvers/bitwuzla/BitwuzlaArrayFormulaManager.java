@@ -28,15 +28,10 @@ import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
 
 public class BitwuzlaArrayFormulaManager
-    extends AbstractArrayFormulaManager<Long, Long, Long, Long> {
-
-  // private final long bitwuzla;
-  // private final Table<String, Long, Long> formulaCache;
+    extends AbstractArrayFormulaManager<Long, Long, Long, BitwuzlaDeclaration> {
 
   protected BitwuzlaArrayFormulaManager(BitwuzlaFormulaCreator pCreator) {
     super(pCreator);
-    // this.bitwuzla = pCreator.getEnv();
-    // this.formulaCache = pCreator.getCache();
   }
 
   @Override

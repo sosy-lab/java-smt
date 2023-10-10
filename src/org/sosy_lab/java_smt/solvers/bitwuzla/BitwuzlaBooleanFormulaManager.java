@@ -24,12 +24,13 @@ import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 public class BitwuzlaBooleanFormulaManager
-    extends AbstractBooleanFormulaManager<Long, Long, Long, Long> {
+    extends AbstractBooleanFormulaManager<Long, Long, Long, BitwuzlaDeclaration> {
   // private final long bitwuzla;
   private final long pTrue;
   private final long pFalse;
 
-  protected BitwuzlaBooleanFormulaManager(FormulaCreator<Long, Long, Long, Long> pCreator) {
+  protected BitwuzlaBooleanFormulaManager(
+      FormulaCreator<Long, Long, Long, BitwuzlaDeclaration> pCreator) {
     super(pCreator);
     // bitwuzla = getFormulaCreator().getEnv();
     pTrue = bitwuzlaJNI.bitwuzla_mk_true();
