@@ -20,6 +20,8 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
+import java.util.Objects;
+
 // Declarations sometimes need the info of a Term, but mostly those of Kinds.
 // We can not discern between the two however, hence this wrapper
 public class BitwuzlaDeclaration {
@@ -45,5 +47,25 @@ public class BitwuzlaDeclaration {
   public int getKind() {
     assert isKind;
     return decl.intValue();
+  }
+
+  @Override
+  public boolean equals(Object any) {
+    if (any == this) {
+      return true;
+    }
+    if (any instanceof BitwuzlaDeclaration) {
+      BitwuzlaDeclaration otherDecl = (BitwuzlaDeclaration) any;
+      if (this.isKind == otherDecl.isKind && Objects.equals(this.decl, otherDecl.decl)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    // Might be errorprone as term and kind might have the same hashcode but not be equal
+    return decl != null ? decl.hashCode() : 0;
   }
 }
