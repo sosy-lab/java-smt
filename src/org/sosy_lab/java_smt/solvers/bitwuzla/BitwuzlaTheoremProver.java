@@ -75,7 +75,8 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
     // TODO: set further options
     long options = bitwuzlaJNI.bitwuzla_options_new();
 
-    if (pFurtherOptions.contains(ProverOptions.GENERATE_MODELS) || pFurtherOptions.contains(ProverOptions.GENERATE_ALL_SAT)) {
+    if (pFurtherOptions.contains(ProverOptions.GENERATE_MODELS)
+        || pFurtherOptions.contains(ProverOptions.GENERATE_ALL_SAT)) {
       bitwuzlaJNI.bitwuzla_set_option(
           options, BitwuzlaOption.BITWUZLA_OPT_PRODUCE_MODELS.swigValue(), 2);
     }
