@@ -97,7 +97,7 @@ public class TimeoutTest extends SolverBasedTest0 {
   }
 
   @Test(timeout = TIMOUT_MILLISECONDS)
-  public void testProverTimeoutBvFullEnvironmentInRunnable() throws InterruptedException {
+  public void testProverTimeoutBvFullEnvironmentInRunnable() {
     requireBitvectors();
     TruthJUnit.assume()
         .withMessage(solverToUse() + " does not support interruption")
@@ -164,7 +164,7 @@ public class TimeoutTest extends SolverBasedTest0 {
   }
 
   @SuppressWarnings("CheckReturnValue")
-  private void testProverTimeoutWithFullEnvironmentInThread() throws InterruptedException {
+  private void testProverTimeoutWithFullEnvironmentInThread() {
 
     Thread t =
         new Thread(
