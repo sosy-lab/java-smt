@@ -105,6 +105,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
   private void unsatCoreTest0(BasicProverEnvironment<?> pe)
       throws InterruptedException, SolverException {
+    requireIntegers();
     pe.push();
     pe.addConstraint(imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1)));
     pe.addConstraint(imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(2)));
@@ -133,6 +134,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
   @Test
   public void unsatCoreWithAssumptionsTest() throws SolverException, InterruptedException {
+    requireIntegers();
     assume()
         .withMessage(
             "Solver %s does not support unsat core generation over assumptions", solverToUse())
