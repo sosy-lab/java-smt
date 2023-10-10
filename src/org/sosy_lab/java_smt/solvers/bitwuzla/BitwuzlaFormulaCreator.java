@@ -294,8 +294,10 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
       return FunctionDeclarationKind.FP_CASTTO_SBV;
     } else if (kind.equals(BITWUZLA_KIND_FP_TO_UBV)) {
       return FunctionDeclarationKind.FP_CASTTO_UBV;
+    } else if (kind.equals(BITWUZLA_KIND_BV_XOR)) {
+      return FunctionDeclarationKind.BV_XOR;
     }
-    throw new UnsupportedOperationException("Can not discern formula kind " + kind.toString());
+    throw new UnsupportedOperationException("Can not discern formula kind " + kind);
   }
 
   @SuppressWarnings("unchecked")
