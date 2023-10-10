@@ -459,11 +459,19 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Lon
 
   @Override
   public Long callFunctionImpl(Long declaration, List<Long> args) {
-    long[] functionAndArgs =
-        LongStream.concat(LongStream.of(declaration), args.stream().mapToLong(Long::longValue))
-            .toArray();
+    // For UFs the declaration needs to be a const wrapping of the function sort
+    // For all other functions it needs to be the kind
+    if (bitwuzlaJNI.bitwuzla_term_is_const(declaration)
+        && bitwuzlaJNI.bitwuzla_term_is_fun(declaration)) {
+      long[] functionAndArgs =
+          LongStream.concat(LongStream.of(declaration), args.stream().mapToLong(Long::longValue))
+              .toArray();
+      return bitwuzlaJNI.bitwuzla_mk_term(
+          BitwuzlaKind.BITWUZLA_KIND_APPLY.swigValue(), functionAndArgs.length, functionAndArgs);
+    }
+
     return bitwuzlaJNI.bitwuzla_mk_term(
-        BitwuzlaKind.BITWUZLA_KIND_APPLY.swigValue(), functionAndArgs.length, functionAndArgs);
+        declaration.intValue(), args.size(), args.stream().mapToLong(Long::longValue).toArray());
   }
 
   @Override
