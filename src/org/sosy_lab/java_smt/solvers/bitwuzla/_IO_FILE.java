@@ -176,10 +176,6 @@ public class _IO_FILE {
     return bitwuzlaJNI._IO_FILE__vtable_offset_get(swigCPtr, this);
   }
 
-  public void set_shortbuf(String value) {
-    // bitwuzlaJNI._IO_FILE__shortbuf_set(swigCPtr, this, value);
-  }
-
   public String get_shortbuf() {
     return bitwuzlaJNI._IO_FILE__shortbuf_get(swigCPtr, this);
   }
