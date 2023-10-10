@@ -27,13 +27,11 @@ import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 public class BitwuzlaBitvectorFormulaManager
     extends AbstractBitvectorFormulaManager<Long, Long, Long, Long> {
-  // private final long bitwuzla;
 
   protected BitwuzlaBitvectorFormulaManager(
       FormulaCreator<Long, Long, Long, Long> pCreator,
       AbstractBooleanFormulaManager<Long, Long, Long, Long> pBmgr) {
     super(pCreator, pBmgr);
-    // this.bitwuzla = pCreator.getEnv();
   }
 
   @Override
@@ -85,9 +83,10 @@ public class BitwuzlaBitvectorFormulaManager
   protected Long modulo(Long pParam1, Long pParam2, boolean signed) {
     if (signed) {
       return bitwuzlaJNI.bitwuzla_mk_term2(
-          BitwuzlaKind.BITWUZLA_KIND_BV_SMOD.swigValue(), pParam1, pParam2);
+          BitwuzlaKind.BITWUZLA_KIND_BV_SREM.swigValue(), pParam1, pParam2);
     } else {
-      throw new UnsupportedOperationException("Unsigned modulo is not supported.");
+      return bitwuzlaJNI.bitwuzla_mk_term2(
+          BitwuzlaKind.BITWUZLA_KIND_BV_UREM.swigValue(), pParam1, pParam2);
     }
   }
 
@@ -190,7 +189,7 @@ public class BitwuzlaBitvectorFormulaManager
   @Override
   protected Long shiftLeft(Long pNumber, Long toShift) {
     return bitwuzlaJNI.bitwuzla_mk_term2(
-        BitwuzlaKind.BITWUZLA_KIND_BV_SHR.swigValue(), pNumber, toShift);
+        BitwuzlaKind.BITWUZLA_KIND_BV_SHL.swigValue(), pNumber, toShift);
   }
 
   @Override
