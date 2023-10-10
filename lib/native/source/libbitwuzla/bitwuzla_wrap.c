@@ -218,7 +218,7 @@ static void SWIGUNUSED SWIG_JavaThrowException(JNIEnv *jenv, SWIG_JavaExceptionC
 
 #if defined(SWIG_NOINCLUDE) || defined(SWIG_NOARRAYS)
 
-
+/*
 static int SWIG_JavaArrayInSchar (JNIEnv *jenv, jbyte **jarr, signed char **carr, jbyteArray input);
 static void SWIG_JavaArrayArgoutSchar (JNIEnv *jenv, jbyte *jarr, signed char *carr, jbyteArray input);
 static jbyteArray SWIG_JavaArrayOutSchar (JNIEnv *jenv, signed char *result, jsize sz);
@@ -239,11 +239,6 @@ static void SWIG_JavaArrayArgoutUshort (JNIEnv *jenv, jint *jarr, unsigned short
 static jintArray SWIG_JavaArrayOutUshort (JNIEnv *jenv, unsigned short *result, jsize sz);
 
 
-static int SWIG_JavaArrayInInt (JNIEnv *jenv, jint **jarr, int **carr, jintArray input);
-static void SWIG_JavaArrayArgoutInt (JNIEnv *jenv, jint *jarr, int *carr, jintArray input);
-static jintArray SWIG_JavaArrayOutInt (JNIEnv *jenv, int *result, jsize sz);
-
-
 static int SWIG_JavaArrayInUint (JNIEnv *jenv, jlong **jarr, unsigned int **carr, jlongArray input);
 static void SWIG_JavaArrayArgoutUint (JNIEnv *jenv, jlong *jarr, unsigned int *carr, jlongArray input);
 static jlongArray SWIG_JavaArrayOutUint (JNIEnv *jenv, unsigned int *result, jsize sz);
@@ -252,11 +247,6 @@ static jlongArray SWIG_JavaArrayOutUint (JNIEnv *jenv, unsigned int *result, jsi
 static int SWIG_JavaArrayInLong (JNIEnv *jenv, jint **jarr, long **carr, jintArray input);
 static void SWIG_JavaArrayArgoutLong (JNIEnv *jenv, jint *jarr, long *carr, jintArray input);
 static jintArray SWIG_JavaArrayOutLong (JNIEnv *jenv, long *result, jsize sz);
-
-
-static int SWIG_JavaArrayInUlong (JNIEnv *jenv, jlong **jarr, unsigned long **carr, jlongArray input);
-static void SWIG_JavaArrayArgoutUlong (JNIEnv *jenv, jlong *jarr, unsigned long *carr, jlongArray input);
-static jlongArray SWIG_JavaArrayOutUlong (JNIEnv *jenv, unsigned long *result, jsize sz);
 
 
 static int SWIG_JavaArrayInLonglong (JNIEnv *jenv, jlong **jarr, jlong **carr, jlongArray input);
@@ -271,12 +261,19 @@ static jfloatArray SWIG_JavaArrayOutFloat (JNIEnv *jenv, float *result, jsize sz
 
 static int SWIG_JavaArrayInDouble (JNIEnv *jenv, jdouble **jarr, double **carr, jdoubleArray input);
 static void SWIG_JavaArrayArgoutDouble (JNIEnv *jenv, jdouble *jarr, double *carr, jdoubleArray input);
-static jdoubleArray SWIG_JavaArrayOutDouble (JNIEnv *jenv, double *result, jsize sz);
+*/
 
+static int SWIG_JavaArrayInInt (JNIEnv *jenv, jint **jarr, int **carr, jintArray input);
+static void SWIG_JavaArrayArgoutInt (JNIEnv *jenv, jint *jarr, int *carr, jintArray input);
+static jintArray SWIG_JavaArrayOutInt (JNIEnv *jenv, int *result, jsize sz);
+
+static int SWIG_JavaArrayInUlong (JNIEnv *jenv, jlong **jarr, unsigned long **carr, jlongArray input);
+static void SWIG_JavaArrayArgoutUlong (JNIEnv *jenv, jlong *jarr, unsigned long *carr, jlongArray input);
+static jlongArray SWIG_JavaArrayOutUlong (JNIEnv *jenv, unsigned long *result, jsize sz);
 
 #else
 
-/* signed char[] support */
+/* signed char[] support *//*
 static int SWIG_JavaArrayInSchar (JNIEnv *jenv, jbyte **jarr, signed char **carr, jbyteArray input) {
   int i;
   jsize sz;
@@ -320,9 +317,9 @@ static jbyteArray SWIG_JavaArrayOutSchar (JNIEnv *jenv, signed char *result, jsi
   (*jenv)->ReleaseByteArrayElements(jenv, jresult, arr, 0);
   return jresult;
 }
+*/
 
-
-/* unsigned char[] support */
+/* unsigned char[] support *//*
 static int SWIG_JavaArrayInUchar (JNIEnv *jenv, jshort **jarr, unsigned char **carr, jshortArray input) {
   int i;
   jsize sz;
@@ -366,9 +363,9 @@ static jshortArray SWIG_JavaArrayOutUchar (JNIEnv *jenv, unsigned char *result, 
   (*jenv)->ReleaseShortArrayElements(jenv, jresult, arr, 0);
   return jresult;
 }
+*/
 
-
-/* short[] support */
+/* short[] support *//*
 static int SWIG_JavaArrayInShort (JNIEnv *jenv, jshort **jarr, short **carr, jshortArray input) {
   int i;
   jsize sz;
@@ -412,9 +409,9 @@ static jshortArray SWIG_JavaArrayOutShort (JNIEnv *jenv, short *result, jsize sz
   (*jenv)->ReleaseShortArrayElements(jenv, jresult, arr, 0);
   return jresult;
 }
+*/
 
-
-/* unsigned short[] support */
+/* unsigned short[] support */ /*
 static int SWIG_JavaArrayInUshort (JNIEnv *jenv, jint **jarr, unsigned short **carr, jintArray input) {
   int i;
   jsize sz;
@@ -458,7 +455,7 @@ static jintArray SWIG_JavaArrayOutUshort (JNIEnv *jenv, unsigned short *result, 
   (*jenv)->ReleaseIntArrayElements(jenv, jresult, arr, 0);
   return jresult;
 }
-
+*/
 
 /* int[] support */
 static int SWIG_JavaArrayInInt (JNIEnv *jenv, jint **jarr, int **carr, jintArray input) {
@@ -506,7 +503,7 @@ static jintArray SWIG_JavaArrayOutInt (JNIEnv *jenv, int *result, jsize sz) {
 }
 
 
-/* unsigned int[] support */
+/* unsigned int[] support */ /*
 static int SWIG_JavaArrayInUint (JNIEnv *jenv, jlong **jarr, unsigned int **carr, jlongArray input) {
   int i;
   jsize sz;
@@ -550,9 +547,9 @@ static jlongArray SWIG_JavaArrayOutUint (JNIEnv *jenv, unsigned int *result, jsi
   (*jenv)->ReleaseLongArrayElements(jenv, jresult, arr, 0);
   return jresult;
 }
+*/
 
-
-/* long[] support */
+/* long[] support */ /*
 static int SWIG_JavaArrayInLong (JNIEnv *jenv, jint **jarr, long **carr, jintArray input) {
   int i;
   jsize sz;
@@ -596,7 +593,7 @@ static jintArray SWIG_JavaArrayOutLong (JNIEnv *jenv, long *result, jsize sz) {
   (*jenv)->ReleaseIntArrayElements(jenv, jresult, arr, 0);
   return jresult;
 }
-
+*/
 
 /* unsigned long[] support */
 static int SWIG_JavaArrayInUlong (JNIEnv *jenv, jlong **jarr, unsigned long **carr, jlongArray input) {
@@ -644,7 +641,7 @@ static jlongArray SWIG_JavaArrayOutUlong (JNIEnv *jenv, unsigned long *result, j
 }
 
 
-/* jlong[] support */
+/* jlong[] support */ /*
 static int SWIG_JavaArrayInLonglong (JNIEnv *jenv, jlong **jarr, jlong **carr, jlongArray input) {
   int i;
   jsize sz;
@@ -688,9 +685,9 @@ static jlongArray SWIG_JavaArrayOutLonglong (JNIEnv *jenv, jlong *result, jsize 
   (*jenv)->ReleaseLongArrayElements(jenv, jresult, arr, 0);
   return jresult;
 }
+*/
 
-
-/* float[] support */
+/* float[] support */ /*
 static int SWIG_JavaArrayInFloat (JNIEnv *jenv, jfloat **jarr, float **carr, jfloatArray input) {
   int i;
   jsize sz;
@@ -734,9 +731,9 @@ static jfloatArray SWIG_JavaArrayOutFloat (JNIEnv *jenv, float *result, jsize sz
   (*jenv)->ReleaseFloatArrayElements(jenv, jresult, arr, 0);
   return jresult;
 }
+*/
 
-
-/* double[] support */
+/* double[] support */ /*
 static int SWIG_JavaArrayInDouble (JNIEnv *jenv, jdouble **jarr, double **carr, jdoubleArray input) {
   int i;
   jsize sz;
@@ -765,22 +762,7 @@ static void SWIG_JavaArrayArgoutDouble (JNIEnv *jenv, jdouble *jarr, double *car
     jarr[i] = (jdouble)carr[i];
   (*jenv)->ReleaseDoubleArrayElements(jenv, input, jarr, 0);
 }
-
-static jdoubleArray SWIG_JavaArrayOutDouble (JNIEnv *jenv, double *result, jsize sz) {
-  jdouble *arr;
-  int i;
-  jdoubleArray jresult = (*jenv)->NewDoubleArray(jenv, sz);
-  if (!jresult)
-    return NULL;
-  arr = (*jenv)->GetDoubleArrayElements(jenv, jresult, 0);
-  if (!arr)
-    return NULL;
-  for (i=0; i<sz; i++)
-    arr[i] = (jdouble)result[i];
-  (*jenv)->ReleaseDoubleArrayElements(jenv, jresult, arr, 0);
-  return jresult;
-}
-
+*/
 
 #endif
 
@@ -2814,7 +2796,7 @@ SWIGEXPORT jbyte JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJ
   return jresult;
 }
 
-
+/* Disables due to bugs
 SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1shortbuf_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   struct _IO_FILE *arg1 = (struct _IO_FILE *) 0 ;
   char *arg2 ;
@@ -2839,7 +2821,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJN
   
   if (arg2) (*jenv)->ReleaseStringUTFChars(jenv, jarg2, (const char *)arg2);
 }
-
+*/
 
 SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI__1IO_1FILE_1_1shortbuf_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jstring jresult = 0 ;
@@ -5953,7 +5935,6 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJN
 // BitwuzlaTerm* terms = bitwuzla_term_get_children(value, size_t* sizePtr);
 // We don't really need arg2 in Java(SMT), as the return array has a size in Java. But we need it here to create the array with that correct size!
 SWIGEXPORT jlongArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1get_1children(JNIEnv *jenv, jclass jcls, jlong jarg1, jlongArray jarg2) {
-  jlong jresult = 0 ;
   BitwuzlaTerm arg1 ;
   size_t *arg2 = (size_t *) 0 ;
   size_t temp2 ;
@@ -5974,7 +5955,7 @@ SWIGEXPORT jlongArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitw
     arg2 = &temp2; 
   }
   long unsigned int * result = bitwuzla_term_get_children(arg1,arg2);
-  *(BitwuzlaTerm **)&jresult = result;
+
   {
     jlong jvalue = (jlong)temp2;
     (*jenv)->SetLongArrayRegion(jenv, jarg2, 0, 1, &jvalue);
@@ -5994,8 +5975,7 @@ SWIGEXPORT jlongArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitw
 }
 
 
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1get_1indices(JNIEnv *jenv, jclass jcls, jlong jarg1, jlongArray jarg2) {
-  jlong jresult = 0 ;
+SWIGEXPORT jlongArray JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJNI_bitwuzla_1term_1get_1indices(JNIEnv *jenv, jclass jcls, jlong jarg1, jlongArray jarg2) {
   BitwuzlaTerm arg1 ;
   size_t *arg2 = (size_t *) 0 ;
   size_t temp2 ;
@@ -6017,13 +5997,26 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_bitwuzlaJ
     arg2 = &temp2; 
   }
   result = (uint64_t *)bitwuzla_term_get_indices(arg1,arg2);
-  *(uint64_t **)&jresult = result; 
+
   {
     jlong jvalue = (jlong)temp2;
     (*jenv)->SetLongArrayRegion(jenv, jarg2, 0, 1, &jvalue);
   }
+
+  jlongArray ret = (jobjectArray)(*jenv)->NewLongArray(jenv, *arg2);
+  if (ret == 0) {
+    printf("Error when creating returning jlongArray.");
+    return 0;
+  }
+
+  long long int tmp[*arg2];
+  for (int i = 0; i < *arg2; i++) {
+    tmp[i] = (long long int) *result;
+    result++;
+  }
+  (*jenv)->SetLongArrayRegion(jenv, ret, 0, *arg2, tmp);
   
-  return jresult;
+  return ret;
 }
 
 

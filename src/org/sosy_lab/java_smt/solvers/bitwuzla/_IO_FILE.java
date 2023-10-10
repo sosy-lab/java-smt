@@ -177,7 +177,7 @@ public class _IO_FILE {
   }
 
   public void set_shortbuf(String value) {
-    bitwuzlaJNI._IO_FILE__shortbuf_set(swigCPtr, this, value);
+    // bitwuzlaJNI._IO_FILE__shortbuf_set(swigCPtr, this, value);
   }
 
   public String get_shortbuf() {

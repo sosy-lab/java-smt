@@ -244,7 +244,8 @@ public class bitwuzlaJNI {
 
   public static final native byte _IO_FILE__vtable_offset_get(long jarg1, _IO_FILE jarg1_);
 
-  public static final native void _IO_FILE__shortbuf_set(long jarg1, _IO_FILE jarg1_, String jarg2);
+  // public static final native void _IO_FILE__shortbuf_set(long jarg1, _IO_FILE jarg1_, String
+  // jarg2);
 
   public static final native String _IO_FILE__shortbuf_get(long jarg1, _IO_FILE jarg1_);
 
@@ -737,7 +738,7 @@ public class bitwuzlaJNI {
 
   public static final native long[] bitwuzla_term_get_children(long jarg1, long[] jarg2);
 
-  public static final native long bitwuzla_term_get_indices(long jarg1, long[] jarg2);
+  public static final native long[] bitwuzla_term_get_indices(long jarg1, long[] jarg2);
 
   public static final native boolean bitwuzla_term_is_indexed(long jarg1);
 
