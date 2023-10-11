@@ -22,7 +22,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.java_smt.utils.Generator;
+import org.sosy_lab.java_smt.utils.BitvectorGenerator;
 
 @SuppressWarnings("ClassTypeParameterName")
 public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
@@ -58,7 +58,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
   public BitvectorFormula makeBitvector(int length, IntegerFormula pI) {
     TFormulaInfo param1 = extractInfo(pI);
     BitvectorFormula result = wrap(makeBitvectorImpl(length, param1));
-    Generator.logMakeBitVector(result, length, pI);
+    BitvectorGenerator.logMakeBitVector(result, length, pI);
     return result;
   }
 
@@ -77,7 +77,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
   public BitvectorFormula negate(BitvectorFormula pNumber) {
     TFormulaInfo param1 = extractInfo(pNumber);
     BitvectorFormula result = wrap(negate(param1));
-    Generator.logBVNegate(result, pNumber);
+    BitvectorGenerator.logBVNegate(result, pNumber);
     return result;
   }
 
@@ -88,8 +88,9 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     checkSameSize(pNumber1, pNumber2, "add");
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
-
-    return wrap(add(param1, param2));
+    BitvectorFormula result = wrap(add(param1, param2));
+    BitvectorGenerator.logBVAdd(result, pNumber1, pNumber2);
+    return result;
   }
 
   protected abstract TFormulaInfo add(TFormulaInfo pParam1, TFormulaInfo pParam2);
@@ -99,8 +100,9 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     checkSameSize(pNumber1, pNumber2, "subtract");
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
-
-    return wrap(subtract(param1, param2));
+    BitvectorFormula result = wrap(subtract(param1, param2));
+    BitvectorGenerator.logBVSub(result, pNumber1, pNumber2);
+    return result;
   }
 
   protected abstract TFormulaInfo subtract(TFormulaInfo pParam1, TFormulaInfo pParam2);
@@ -148,7 +150,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
     BooleanFormula result = wrapBool(equal(param1, param2));
-    Generator.logBVEqual(result, pNumber1, pNumber2);
+    BitvectorGenerator.logBVEqual(result, pNumber1, pNumber2);
     return result;
   }
 
@@ -250,7 +252,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
   @Override
   public BitvectorFormula makeBitvector(int pLength, long i) {
     BitvectorFormula result = wrap(makeBitvectorImpl(pLength, i));
-    Generator.logMakeBitVector(result, pLength, i);
+    BitvectorGenerator.logMakeBitVector(result, pLength, i);
     return result;
   }
 

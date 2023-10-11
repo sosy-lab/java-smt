@@ -40,7 +40,7 @@ import org.sosy_lab.java_smt.api.visitors.BooleanFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
-import org.sosy_lab.java_smt.utils.Generator;
+import org.sosy_lab.java_smt.utils.BooleanGenerator;
 
 @SuppressWarnings("ClassTypeParameterName")
 public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
@@ -64,7 +64,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
   public BooleanFormula makeVariable(String pVar) {
     checkVariableName(pVar);
     BooleanFormula result = wrap(makeVariableImpl(pVar));
-    Generator.logMakeVariable(result, pVar);
+    BooleanGenerator.logMakeVariable(result, pVar);
     return result;
   }
 
@@ -76,7 +76,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
       trueFormula = wrap(makeBooleanImpl(true));
     }
     BooleanFormula result = trueFormula;
-    Generator.logMakeTrue(result, "true");
+    BooleanGenerator.logMakeTrue(result, "true");
     return result;
   }
 
@@ -86,7 +86,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
       falseFormula = wrap(makeBooleanImpl(false));
     }
     BooleanFormula result = falseFormula;
-    Generator.logMakeFalse(result, "false");
+    BooleanGenerator.logMakeFalse(result, "false");
     return result;
   }
 
@@ -96,7 +96,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
   public BooleanFormula not(BooleanFormula pBits) {
     TFormulaInfo param1 = extractInfo(pBits);
     BooleanFormula result = wrap(not(param1));
-    Generator.logNot(result, pBits);
+    BooleanGenerator.logNot(result, pBits);
     return result;
   }
 
@@ -107,7 +107,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
     TFormulaInfo param1 = extractInfo(pBits1);
     TFormulaInfo param2 = extractInfo(pBits2);
     BooleanFormula result = wrap(and(param1, param2));
-    Generator.logAnd(result, pBits1, pBits2);
+    BooleanGenerator.logAnd(result, pBits1, pBits2);
     return result;
   }
 
@@ -118,20 +118,20 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
     switch (pBits.size()) {
       case 0:
         BooleanFormula result0 = makeTrue();
-        Generator.logMakeTrue(result0, "true");
+        BooleanGenerator.logMakeTrue(result0, "true");
         return result0;
       case 1:
         BooleanFormula result1 = pBits.iterator().next();
-        Generator.logAnd(result1, pBits);
+        BooleanGenerator.logAnd(result1, pBits);
         return result1;
       case 2:
         Iterator<BooleanFormula> it = pBits.iterator();
         BooleanFormula result2 = and(it.next(), it.next());
-        Generator.logAnd(result2, pBits);
+        BooleanGenerator.logAnd(result2, pBits);
         return result2;
       default:
         BooleanFormula result = wrap(andImpl(Collections2.transform(pBits, this::extractInfo)));
-        Generator.logAnd(result, pBits);
+        BooleanGenerator.logAnd(result, pBits);
         return result;
     }
   }
@@ -170,7 +170,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
     TFormulaInfo param1 = extractInfo(pBits1);
     TFormulaInfo param2 = extractInfo(pBits2);
     BooleanFormula result = wrap(or(param1, param2));
-    Generator.logOr(result, pBits1, pBits2);
+    BooleanGenerator.logOr(result, pBits1, pBits2);
     return result;
   }
 
@@ -186,7 +186,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
     TFormulaInfo param1 = extractInfo(pBits1);
     TFormulaInfo param2 = extractInfo(pBits2);
     BooleanFormula result = wrap(xor(param1, param2));
-    Generator.logXor(result, pBits1, pBits2);
+    BooleanGenerator.logXor(result, pBits1, pBits2);
     return result;
   }
 
@@ -195,21 +195,21 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
     switch (pBits.size()) {
       case 0:
         BooleanFormula result0 =  makeFalse();
-        Generator.logMakeFalse(result0, "false");
+        BooleanGenerator.logMakeFalse(result0, "false");
         return result0;
       case 1:
         BooleanFormula result1 =  pBits.iterator().next();
-        Generator.logOr(result1, pBits);
+        BooleanGenerator.logOr(result1, pBits);
         return result1;
       case 2:
         Iterator<BooleanFormula> it = pBits.iterator();
         BooleanFormula result2 = or(it.next(), it.next());
-        Generator.logOr(result2, pBits);
+        BooleanGenerator.logOr(result2, pBits);
         return result2;
       default:
         Iterator<BooleanFormula> pit = pBits.iterator();
           BooleanFormula result = (wrap(orImpl(Collections2.transform(pBits, this::extractInfo))));
-          Generator.logOr(result, pBits);
+        BooleanGenerator.logOr(result, pBits);
         return result;
     }
   }
@@ -252,7 +252,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
     TFormulaInfo param1 = extractInfo(pBits1);
     TFormulaInfo param2 = extractInfo(pBits2);
     BooleanFormula result = wrap(equivalence(param1, param2));
-    Generator.logEquivalence(result, pBits1, pBits2);
+    BooleanGenerator.logEquivalence(result, pBits1, pBits2);
     return result;
   }
 
@@ -263,7 +263,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
     TFormulaInfo param1 = extractInfo(pBits1);
     TFormulaInfo param2 = extractInfo(pBits2);
     BooleanFormula result = wrap(implication(param1, param2));
-    Generator.logImplication(result, pBits1, pBits2);
+    BooleanGenerator.logImplication(result, pBits1, pBits2);
     return result;
   }
 
@@ -307,7 +307,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
         t2);
     TFormulaInfo result = ifThenElse(extractInfo(pBits), extractInfo(f1), extractInfo(f2));
     var finalResult = getFormulaCreator().encapsulate(t1, result);
-    Generator.logIfThenElse(finalResult, pBits, f1, f2);
+    BooleanGenerator.logIfThenElse(finalResult, pBits, f1, f2);
     return finalResult;
   }
 

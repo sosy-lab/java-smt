@@ -50,8 +50,8 @@ public class Main {
     BitvectorFormulaManager bimgr = fmgr.getBitvectorFormulaManager();
 
     BitvectorFormula a = bimgr.makeBitvector(6, 5);
-    BitvectorFormula b = bimgr.makeBitvector(6, 3);
-    //BitvectorFormula test = bimgr.negate(b);
+    BitvectorFormula b = bimgr.makeBitvector(6, 5);
+
     BooleanFormula constraint = bimgr.equal(a, b);
 
     try (ProverEnvironment prover =

@@ -1,5 +1,5 @@
 (set-logic AUFLIRA)
-(assert (bvult #b000101 #b000011))
+(assert (bvult (bvsdiv #b000100 #b000100) (bvsdiv #b100101 #b111110)))
 (check-sat)
 (get-value (x))
 (exit)
