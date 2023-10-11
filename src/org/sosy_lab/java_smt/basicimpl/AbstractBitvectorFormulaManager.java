@@ -23,6 +23,8 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.utils.BitvectorGenerator;
+import org.sosy_lab.java_smt.utils.BooleanGenerator;
+import org.sosy_lab.java_smt.utils.NumeralGenerator;
 
 @SuppressWarnings("ClassTypeParameterName")
 public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
@@ -349,8 +351,13 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
       BitvectorFormula pNumber, BitvectorFormula toShift, boolean signed) {
     TFormulaInfo param1 = extractInfo(pNumber);
     TFormulaInfo param2 = extractInfo(toShift);
-
-    return wrap(shiftRight(param1, param2, signed));
+    BitvectorFormula result = wrap(shiftRight(param1, param2, signed));
+    if (signed) {
+      BitvectorGenerator.logBVSShiftRight(result, pNumber, toShift);
+    } else {
+      BitvectorGenerator.logBVUShiftRight(result, pNumber, toShift);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo shiftRight(
@@ -360,8 +367,9 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
   public BitvectorFormula shiftLeft(BitvectorFormula pNumber, BitvectorFormula toShift) {
     TFormulaInfo param1 = extractInfo(pNumber);
     TFormulaInfo param2 = extractInfo(toShift);
-
-    return wrap(shiftLeft(param1, param2));
+    BitvectorFormula result = wrap(shiftLeft(param1, param2));
+    BitvectorGenerator.logBVShiftLeft(result, pNumber, toShift);
+    return result;
   }
 
   protected abstract TFormulaInfo shiftLeft(TFormulaInfo pExtract, TFormulaInfo pExtract2);
@@ -370,8 +378,9 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
   public final BitvectorFormula concat(BitvectorFormula pNumber, BitvectorFormula pAppend) {
     TFormulaInfo param1 = extractInfo(pNumber);
     TFormulaInfo param2 = extractInfo(pAppend);
-
-    return wrap(concat(param1, param2));
+    BitvectorFormula result = wrap(concat(param1, param2));
+    BitvectorGenerator.logConcat(result, pNumber, pAppend);
+    return result;
   }
 
   protected abstract TFormulaInfo concat(TFormulaInfo number, TFormulaInfo pAppend);
@@ -382,7 +391,9 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     checkArgument(0 <= pLsb, "index out of bounds (negative index %s)", pLsb);
     checkArgument(pLsb <= pMsb, "invalid range (lsb %s larger than msb %s)", pLsb, pMsb);
     checkArgument(pMsb < bitsize, "index out of bounds (index %s beyond length %s)", pMsb, bitsize);
-    return wrap(extract(extractInfo(pNumber), pMsb, pLsb));
+    BitvectorFormula result = wrap(extract(extractInfo(pNumber), pMsb, pLsb));
+    BitvectorGenerator.logExtract(result, pNumber, pMsb, pLsb);
+    return result;
   }
 
   protected abstract TFormulaInfo extract(TFormulaInfo pNumber, int pMsb, int pLsb);
@@ -391,7 +402,13 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
   public final BitvectorFormula extend(
       BitvectorFormula pNumber, int pExtensionBits, boolean pSigned) {
     checkArgument(0 <= pExtensionBits, "can not extend a negative number of bits");
-    return wrap(extend(extractInfo(pNumber), pExtensionBits, pSigned));
+    BitvectorFormula result = wrap(extend(extractInfo(pNumber), pExtensionBits, pSigned));
+    if (pSigned) {
+      BitvectorGenerator.logSExtend(result, pNumber, pExtensionBits);
+    } else {
+      BitvectorGenerator.logUExtend(result, pNumber, pExtensionBits);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo extend(TFormulaInfo pNumber, int pExtensionBits, boolean pSigned);
@@ -399,18 +416,24 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
   @Override
   public int getLength(BitvectorFormula pNumber) {
     FormulaType<BitvectorFormula> type = getFormulaCreator().getFormulaType(pNumber);
-    return ((FormulaType.BitvectorType) type).getSize();
+    int result = ((FormulaType.BitvectorType) type).getSize();
+    NumeralGenerator.logMakeNumber(result, String.valueOf(result));
+    return result;
   }
 
   @Override
   public final BooleanFormula distinct(List<BitvectorFormula> pBits) {
     // optimization
     if (pBits.size() <= 1) {
+      BooleanGenerator.logMakeTrue(bmgr.makeTrue(), "true");
       return bmgr.makeTrue();
     } else if (pBits.size() > 1L << getLength(pBits.iterator().next())) {
+      BooleanGenerator.logMakeFalse(bmgr.makeFalse(), "false");
       return bmgr.makeFalse();
     } else {
-      return wrapBool(distinctImpl(Lists.transform(pBits, this::extractInfo)));
+      BooleanFormula result = wrapBool(distinctImpl(Lists.transform(pBits, this::extractInfo)));
+      BitvectorGenerator.logBVDistinct(result, pBits);
+      return result;
     }
   }
 

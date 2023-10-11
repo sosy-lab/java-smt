@@ -24,6 +24,7 @@ import static java.lang.Long.parseLong;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.function.Function;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -303,5 +304,89 @@ public class BitvectorGenerator {
     newEntry.setBitVecLength(pLength);
     Generator.executedAggregator.add(newEntry);
   }
+
+  public static void logBVSShiftRight(BitvectorFormula result, BitvectorFormula pNumber,
+                              BitvectorFormula toShift) {
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(pNumber);
+    inputParams.add(toShift);
+    Function<List<Object>, String> saveResult =
+        inPlaceInputParams -> "(bvashr " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+  }
+
+  public static void logBVUShiftRight(BitvectorFormula result, BitvectorFormula pNumber,
+                                      BitvectorFormula toShift) {
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(pNumber);
+    inputParams.add(toShift);
+    Function<List<Object>, String> saveResult =
+        inPlaceInputParams -> "(bvlshr " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+  }
+
+  public static void logBVShiftLeft(BitvectorFormula result, BitvectorFormula pNumber,
+                                      BitvectorFormula toShift) {
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(pNumber);
+    inputParams.add(toShift);
+    Function<List<Object>, String> saveResult =
+        inPlaceInputParams -> "(bvshl " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+  }
+
+  public static void logConcat(BitvectorFormula result, BitvectorFormula pNumber,
+                                    BitvectorFormula append) {
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(pNumber);
+    inputParams.add(append);
+    Function<List<Object>, String> saveResult =
+        inPlaceInputParams -> "(concat " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+  }
+  public static void logExtract(BitvectorFormula result, BitvectorFormula pNumber,
+                                int pMsb, int pLsb) {
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(pNumber);
+    inputParams.add(String.valueOf(pMsb));
+    inputParams.add(String.valueOf(pLsb));
+    Function<List<Object>, String> saveResult =
+        inPlaceInputParams -> "((_ extract " + inPlaceInputParams.get(1) + " " + inPlaceInputParams.get(2) +
+            ") " + inPlaceInputParams.get(0) +  ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+  }
+
+  public static void logUExtend(BitvectorFormula result, BitvectorFormula pNumber,
+                                int pExtensionBits) {
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(pNumber);
+    inputParams.add(String.valueOf(pExtensionBits));
+    Function<List<Object>, String> saveResult =
+        inPlaceInputParams -> "((_ zero_extend " + inPlaceInputParams.get(1) + ") " + inPlaceInputParams.get(0) +  ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+  }
+
+  public static void logSExtend(BitvectorFormula result, BitvectorFormula pNumber,
+                                int pExtensionBits) {
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(pNumber);
+    inputParams.add(String.valueOf(pExtensionBits));
+    Function<List<Object>, String> saveResult =
+        inPlaceInputParams -> "((_ sign_extend " + inPlaceInputParams.get(1) + ") " + inPlaceInputParams.get(0) +  ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+  }
+
+  public static void logBVDistinct(Object result, List<BitvectorFormula> operands) {
+    HashSet<BitvectorFormula> test = new HashSet<>(operands);
+    List<Object> inputParams = new ArrayList<>();
+    if (test.size() == operands.size()) {
+      inputParams.add("true");
+    } else {
+      inputParams.add("false");
+    }
+    Function<List<Object>, String> saveResult = inPlaceInputParams -> (String) inPlaceInputParams.get(0);
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Direct"));
+  }
+
 
 }

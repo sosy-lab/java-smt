@@ -1,6 +1,6 @@
 (set-logic AUFLIRA)
-(declare-const g (_ BitVec 6))
-(assert (bvsge (bvand #b000101 (bvnot g)) (bvurem #b000101 #b000010)))
+(declare-const x (_ BitVec 6))
+(assert (= (bvult (bvand #b000101 (bvnot x)) (bvurem (bvashr #b000101 (concat ((_ sign_extend 1) #b10) #b100)) #b011110)) (bvult (bvurem (bvashr #b000101 (concat ((_ sign_extend 1) #b10) #b100)) #b011110) (bvand #b000101 (bvnot x)))))
 (check-sat)
 (get-value (x))
 (exit)
