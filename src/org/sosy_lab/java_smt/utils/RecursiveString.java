@@ -28,8 +28,8 @@ public class RecursiveString {
   Object result;
   List<Object> inputParams;
   Function<List<Object>, String> saveResult;
-
   String variableType;
+  int bitVecLength;
 
   public RecursiveString(
       Object pResult,
@@ -43,6 +43,14 @@ public class RecursiveString {
 
   public Object getResult() {
     return result;
+  }
+
+  public int getBitVecLength() {
+    return bitVecLength;
+  }
+
+  public void setBitVecLength(int pBitVecLength) {
+    bitVecLength = pBitVecLength;
   }
 
   public String getVariableType() {

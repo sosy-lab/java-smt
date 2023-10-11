@@ -113,8 +113,13 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     checkSameSize(pNumber1, pNumber2, "divide");
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
-
-    return wrap(divide(param1, param2, signed));
+    BitvectorFormula result = wrap(divide(param1, param2, signed));
+    if (signed) {
+      BitvectorGenerator.logBVSDivide(result, pNumber1, pNumber2);
+    } else {
+      BitvectorGenerator.logBVUDivide(result, pNumber1, pNumber2);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo divide(
@@ -126,8 +131,13 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     checkSameSize(pNumber1, pNumber2, "modulo");
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
-
-    return wrap(modulo(param1, param2, signed));
+    BitvectorFormula result = wrap(modulo(param1, param2, signed));
+    if (signed) {
+      BitvectorGenerator.logBVSModulo(result, pNumber1, pNumber2);
+    } else {
+      BitvectorGenerator.logBVUModulo(result, pNumber1, pNumber2);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo modulo(
@@ -138,8 +148,9 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     checkSameSize(pNumber1, pNumber2, "modulo");
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
-
-    return wrap(multiply(param1, param2));
+    BitvectorFormula result = wrap(multiply(param1, param2));
+    BitvectorGenerator.logBVMultiply(result, pNumber1, pNumber2);
+    return result;
   }
 
   protected abstract TFormulaInfo multiply(TFormulaInfo pParam1, TFormulaInfo pParam2);
@@ -162,8 +173,13 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     checkSameSize(pNumber1, pNumber2, "compare");
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
-
-    return wrapBool(greaterThan(param1, param2, signed));
+    BooleanFormula result = wrapBool(greaterThan(param1, param2, signed));
+    if (signed) {
+      BitvectorGenerator.logBVSGreaterThan(result, pNumber1, pNumber2);
+    } else {
+      BitvectorGenerator.logBVUGreaterThan(result, pNumber1, pNumber2);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo greaterThan(
@@ -175,8 +191,13 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     checkSameSize(pNumber1, pNumber2, "compare");
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
-
-    return wrapBool(greaterOrEquals(param1, param2, signed));
+    BooleanFormula result = wrapBool(greaterOrEquals(param1, param2, signed));
+    if (signed) {
+      BitvectorGenerator.logBVSGreaterOrEqual(result, pNumber1, pNumber2);
+    } else {
+      BitvectorGenerator.logBVUGreaterOrEqual(result, pNumber1, pNumber2);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo greaterOrEquals(
@@ -188,8 +209,13 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     checkSameSize(pNumber1, pNumber2, "compare");
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
-
-    return wrapBool(lessThan(param1, param2, signed));
+    BooleanFormula result = wrapBool(lessThan(param1, param2, signed));
+    if (signed) {
+      BitvectorGenerator.logBVSLessThan(result, pNumber1, pNumber2);
+    } else {
+      BitvectorGenerator.logBVULessThan(result, pNumber1, pNumber2);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo lessThan(
@@ -201,8 +227,13 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     checkSameSize(pNumber1, pNumber2, "compare");
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
-
-    return wrapBool(lessOrEquals(param1, param2, signed));
+    BooleanFormula result = wrapBool(lessOrEquals(param1, param2, signed));
+    if (signed) {
+      BitvectorGenerator.logBVSLessOrEqual(result, pNumber1, pNumber2);
+    } else {
+      BitvectorGenerator.logBVULessOrEqual(result, pNumber1, pNumber2);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo lessOrEquals(
@@ -211,7 +242,9 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
   @Override
   public BitvectorFormula not(BitvectorFormula pBits) {
     TFormulaInfo param1 = extractInfo(pBits);
-    return wrap(not(param1));
+    BitvectorFormula result = wrap(not(param1));
+    BitvectorGenerator.logBVNot(result, pBits);
+    return result;
   }
 
   protected abstract TFormulaInfo not(TFormulaInfo pParam1);
@@ -221,8 +254,9 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     checkSameSize(pBits1, pBits2, "combine");
     TFormulaInfo param1 = extractInfo(pBits1);
     TFormulaInfo param2 = extractInfo(pBits2);
-
-    return wrap(and(param1, param2));
+    BitvectorFormula result = wrap(and(param1, param2));
+    BitvectorGenerator.logBVAnd(result, pBits1, pBits2);
+    return result;
   }
 
   protected abstract TFormulaInfo and(TFormulaInfo pParam1, TFormulaInfo pParam2);
@@ -232,8 +266,9 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     checkSameSize(pBits1, pBits2, "combine");
     TFormulaInfo param1 = extractInfo(pBits1);
     TFormulaInfo param2 = extractInfo(pBits2);
-
-    return wrap(or(param1, param2));
+    BitvectorFormula result = wrap(or(param1, param2));
+    BitvectorGenerator.logBVOr(result, pBits1, pBits2);
+    return result;
   }
 
   protected abstract TFormulaInfo or(TFormulaInfo pParam1, TFormulaInfo pParam2);
@@ -243,8 +278,9 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     checkSameSize(pBits1, pBits2, "combine");
     TFormulaInfo param1 = extractInfo(pBits1);
     TFormulaInfo param2 = extractInfo(pBits2);
-
-    return wrap(xor(param1, param2));
+    BitvectorFormula result = wrap(xor(param1, param2));
+    BitvectorGenerator.logBVXor(result, pBits1, pBits2);
+    return result;
   }
 
   protected abstract TFormulaInfo xor(TFormulaInfo pParam1, TFormulaInfo pParam2);
@@ -262,7 +298,9 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
 
   @Override
   public BitvectorFormula makeBitvector(int pLength, BigInteger i) {
-    return wrap(makeBitvectorImpl(pLength, i));
+    BitvectorFormula result = wrap(makeBitvectorImpl(pLength, i));
+    BitvectorGenerator.logMakeBitVector(result, pLength, i);
+    return result;
   }
 
   protected abstract TFormulaInfo makeBitvectorImpl(int pLength, BigInteger pI);
@@ -288,13 +326,17 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
 
   @Override
   public BitvectorFormula makeVariable(BitvectorType type, String pVar) {
-    return makeVariable(type.getSize(), pVar);
+    BitvectorFormula result = makeVariable(type.getSize(), pVar);
+    BitvectorGenerator.logMakeBitVecVariable(result, type, pVar);
+    return result;
   }
 
   @Override
   public BitvectorFormula makeVariable(int pLength, String pVar) {
     checkVariableName(pVar);
-    return wrap(makeVariableImpl(pLength, pVar));
+    BitvectorFormula result = wrap(makeVariableImpl(pLength, pVar));
+    BitvectorGenerator.logMakeBitVecVariable(result, pLength, pVar);
+    return result;
   }
 
   protected abstract TFormulaInfo makeVariableImpl(int pLength, String pVar);

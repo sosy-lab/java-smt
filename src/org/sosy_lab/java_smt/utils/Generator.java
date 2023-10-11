@@ -80,7 +80,7 @@ public class Generator {
     String result = evaluateRecursive(constraint);
     List<RecursiveString> uniqueRegisteredValues =
         registeredVariables.stream().distinct().collect(Collectors.toList());
-    for (RecursiveString variable:uniqueRegisteredValues) {
+    for (RecursiveString variable : uniqueRegisteredValues) {
       if (variable.variableType.equals("Bool")) {
         String newEntry = "(declare-const " + variable.result + " Bool)\n";
         if (lines.indexOf(newEntry) == -1) {
@@ -95,9 +95,17 @@ public class Generator {
         } else {
         }
       }
+      if (variable.variableType.equals("BitVec")) {
+        String newEntry =
+            "(declare-const " + variable.result + " (_ BitVec " + variable.bitVecLength + "))\n";
+        if (lines.indexOf(newEntry) == -1) {
+          lines.append(newEntry);
+        } else {
+        }
+      }
     }
-    String SMTLIB2Result = "(assert " + result + ")\n";
-    lines.append(SMTLIB2Result);
+      String SMTLIB2Result = "(assert " + result + ")\n";
+      lines.append(SMTLIB2Result);
   }
 
   public static void dumpSMTLIB2() throws IOException {

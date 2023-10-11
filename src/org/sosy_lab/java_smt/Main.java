@@ -30,6 +30,7 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.*;
 import org.sosy_lab.common.log.*;
 import java.io.*;
+import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 
@@ -50,9 +51,15 @@ public class Main {
     BitvectorFormulaManager bimgr = fmgr.getBitvectorFormulaManager();
 
     BitvectorFormula a = bimgr.makeBitvector(6, 5);
-    BitvectorFormula b = bimgr.makeBitvector(6, 5);
+    BitvectorFormula b = bimgr.makeBitvector(6, 2);
+    BitvectorFormula c = bimgr.makeVariable(6, "g");
 
-    BooleanFormula constraint = bimgr.equal(a, b);
+    BooleanFormula constraint = bimgr.greaterOrEquals(bimgr.and(a, bimgr.not(c)),
+        bimgr.modulo(a
+            , b,
+            false)
+        , true);
+    System.out.println(fmgr.dumpFormula(constraint));
 
     try (ProverEnvironment prover =
              context.newProverEnvironment(SolverContext.ProverOptions.GENERATE_MODELS)) {
@@ -63,7 +70,8 @@ public class Main {
       System.out.println("constraint is " + isUnsat + " and p = ");
       if (!isUnsat) {
         Model model = prover.getModel();
-        //Boolean value = model.evaluate(p);
+        BigInteger value = model.evaluate(c);
+        System.out.println(value);
 
       }
     } catch (SolverException e) {
