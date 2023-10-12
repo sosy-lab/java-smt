@@ -469,6 +469,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   @Test
   public void intTest4_ModularCongruence_Simple() throws SolverException, InterruptedException {
     requireIntegers();
+    requirePrecision();
     final IntegerFormula x = imgr.makeVariable("x");
     final BooleanFormula f1 = imgr.modularCongruence(x, imgr.makeNumber(0), 2);
     final BooleanFormula f2 = imgr.equal(x, imgr.makeNumber(1));
@@ -549,6 +550,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   @Test
   public void testHardCongruence() throws SolverException, InterruptedException {
     requireIntegers();
+    requirePrecision();
     IntegerFormula a = imgr.makeVariable("a");
     IntegerFormula b = imgr.makeVariable("b");
     IntegerFormula c = imgr.makeVariable("c");
@@ -855,6 +857,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   @Test
   public void nonLinearMultiplication() throws SolverException, InterruptedException {
     requireIntegers();
+    requirePrecision();
     IntegerFormula i2 = imgr.makeNumber(2);
     IntegerFormula i3 = imgr.makeNumber(3);
     IntegerFormula i4 = imgr.makeNumber(4);
@@ -979,6 +982,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   @Test
   public void multiplicationFactors() throws SolverException, InterruptedException {
     requireIntegers();
+    requirePrecision();
     IntegerFormula i37 = imgr.makeNumber(37);
     IntegerFormula i1 = imgr.makeNumber(1);
     IntegerFormula x = imgr.makeVariable("x");
@@ -1005,6 +1009,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   @Test
   public void multiplicationCubic() throws SolverException, InterruptedException {
     requireIntegers();
+    requirePrecision();
     IntegerFormula i125 = imgr.makeNumber(125);
     IntegerFormula i27 = imgr.makeNumber(27);
     IntegerFormula i5 = imgr.makeNumber(5);
@@ -1044,6 +1049,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   @Test
   public void nonLinearDivision() throws SolverException, InterruptedException {
     requireIntegers();
+    requirePrecision();
     IntegerFormula i2 = imgr.makeNumber(2);
     IntegerFormula i3 = imgr.makeNumber(3);
     IntegerFormula i4 = imgr.makeNumber(4);
@@ -1077,6 +1083,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   @Test
   public void integerDivisionRounding() throws SolverException, InterruptedException {
     requireIntegers();
+    requirePrecision();
     IntegerFormula varSeven = imgr.makeVariable("a");
     IntegerFormula varEight = imgr.makeVariable("b");
 

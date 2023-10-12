@@ -155,7 +155,7 @@ public class SolverStackTest extends SolverBasedTest0 {
   @Test
   public void singleStackTestRational() throws SolverException, InterruptedException {
     requireRationals();
-
+    requirePrecision();
     BasicProverEnvironment<?> env = newEnvironmentForTest();
     simpleStackTestNum(rmgr, env);
   }

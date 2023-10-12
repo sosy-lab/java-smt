@@ -70,6 +70,7 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
     this.prover = pProver;
     this.assertedExpressions = ImmutableList.copyOf(pAssertedExpressions);
     this.model = generateModel();
+
   }
 
   @Override
@@ -210,7 +211,8 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
     } catch (ApronException apronException) {
       throw new RuntimeException(apronException);
     }
-
+    //for the case that the model is empty, return 0 for any variable
+    ApronIntCstNode nullValue = new ApronIntCstNode(BigInteger.ZERO);
     if (pNode instanceof ApronIntVarNode) {
       ApronIntVarNode varNode = (ApronIntVarNode) pNode;
       String varName = varNode.getVarName();
@@ -219,6 +221,7 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
           return (ApronNode) assignment.getValueAsFormula();
         }
       }
+      return nullValue;
     } else if (pNode instanceof ApronRatVarNode) {
       ApronRatVarNode varNode = (ApronRatVarNode) pNode;
       String varName = varNode.getVarName();
@@ -227,12 +230,12 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
           return (ApronNode) assignment.getValueAsFormula();
         }
       }
+      return nullValue;
     } else if (pNode instanceof ApronConstraint) {
       return (ApronConstraint) pNode;
     } else { //for more complex formulas
       return getComplexValue(pNode);
     }
-    return null;
   }
 
   private ApronNode getComplexValue(ApronNode pNode) {

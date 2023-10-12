@@ -101,6 +101,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
   public void testOnlyTrue() throws SolverException, InterruptedException {
+    requireUnsatCore();
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(bmgr.makeTrue());
       assertThat(prover).isSatisfiable();
@@ -775,6 +776,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
   public void testNonExistantSymbol() throws SolverException, InterruptedException {
+    requireUnsatCore();
     if (imgr != null) {
       try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
         prover.push(bmgr.makeBoolean(true));

@@ -64,9 +64,11 @@ public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<Ap
     ApronIntCstNode one = new ApronIntCstNode(BigInteger.ONE);
     Map<ApronNode, Integer> map = new HashMap<>();
     if (value) {
-      map.put(one, Tcons1.EQ);
-    } else {
+      //1 != 0
       map.put(one, Tcons1.DISEQ);
+    } else {
+      //1 = 0
+      map.put(one, Tcons1.EQ);
     }
     return new ApronConstraint(formulaCreator.getEnvironment(), map);
   }

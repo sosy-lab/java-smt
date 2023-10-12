@@ -197,6 +197,15 @@ public abstract class SolverBasedTest0 {
         .isNotNull();
   }
 
+  protected final void requirePrecision(){
+    assume()
+        .withMessage(
+            "Solver %s gives non-precise solutions due to over-approximation",
+            solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.APRON);
+  }
+
   /** Skip test if the solver does not support rationals. */
   protected final void requireRationals() {
     assume()
