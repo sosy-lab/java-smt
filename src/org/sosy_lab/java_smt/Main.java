@@ -50,6 +50,8 @@ public class Main {
     IntegerFormulaManager imgr = fmgr.getIntegerFormulaManager();
     BitvectorFormulaManager bimgr = fmgr.getBitvectorFormulaManager();
 
+    List<BitvectorFormula> testdistinct = new ArrayList<>();
+
     BitvectorFormula a = bimgr.makeBitvector(6, 5);
     BitvectorFormula b = bimgr.makeBitvector(6, 30);
     BitvectorFormula x = bimgr.makeVariable(bimgr.getLength(b), "x");
@@ -57,8 +59,12 @@ public class Main {
     BitvectorFormula f = bimgr.makeBitvector(3, 4);
     BitvectorFormula g = bimgr.extend(d, 1, true);
 
-    BooleanFormula constraint = bimgr.equal(bimgr.and(a, bimgr.not(x)),
-        bimgr.modulo(bimgr.shiftRight(a, bimgr.concat(g, f), true), b,false));
+    testdistinct.add(a);
+    testdistinct.add(b);
+    testdistinct.add(x);
+    testdistinct.add(g);
+
+    BooleanFormula constraint = bimgr.distinct(testdistinct);
 
     //System.out.println(fmgr.dumpFormula(constraint));
 

@@ -78,7 +78,7 @@ public class BitvectorGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(= (bvult " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ") (bvult " + inPlaceInputParams.get(1) + " " + inPlaceInputParams.get(0) + "))";
+        inPlaceInputParams -> "(bvxnor " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) +")";
     Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
@@ -376,16 +376,9 @@ public class BitvectorGenerator {
     Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
-  public static void logBVDistinct(Object result, List<BitvectorFormula> operands) {
-    HashSet<BitvectorFormula> test = new HashSet<>(operands);
-    List<Object> inputParams = new ArrayList<>();
-    if (test.size() == operands.size()) {
-      inputParams.add("true");
-    } else {
-      inputParams.add("false");
-    }
-    Function<List<Object>, String> saveResult = inPlaceInputParams -> (String) inPlaceInputParams.get(0);
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Direct"));
+  public static void logBVDistinct(Object result, List<BitvectorFormula> operands) throws IllegalArgumentException {
+    throw new IllegalArgumentException("distinct operation is not available for bitvectors in "
+        + "SMT-LIB2");
   }
 
 
