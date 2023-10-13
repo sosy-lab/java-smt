@@ -30,6 +30,7 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.*;
 import org.sosy_lab.common.log.*;
 import java.io.*;
+import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
@@ -49,22 +50,22 @@ public class Main {
     BooleanFormulaManager bmgr = fmgr.getBooleanFormulaManager();
     IntegerFormulaManager imgr = fmgr.getIntegerFormulaManager();
     BitvectorFormulaManager bimgr = fmgr.getBitvectorFormulaManager();
+    ArrayFormulaManager amgr = fmgr.getArrayFormulaManager();
 
-    List<BitvectorFormula> testdistinct = new ArrayList<>();
+    ArrayFormula d = amgr.makeArray("d", FormulaType.IntegerType, FormulaType.IntegerType);
+    ArrayFormula y = amgr.makeArray("y", FormulaType.IntegerType, FormulaType.IntegerType);
 
-    BitvectorFormula a = bimgr.makeBitvector(6, 5);
-    BitvectorFormula b = bimgr.makeBitvector(6, 30);
-    BitvectorFormula x = bimgr.makeVariable(bimgr.getLength(b), "x");
-    BitvectorFormula d = bimgr.makeBitvector(2, 2);
-    BitvectorFormula f = bimgr.makeBitvector(3, 4);
-    BitvectorFormula g = bimgr.extend(d, 1, true);
+    BitvectorFormula z = bimgr.makeVariable(3, "z");
+    BitvectorFormula a = bimgr.makeVariable(3, "a");
 
-    testdistinct.add(a);
-    testdistinct.add(b);
-    testdistinct.add(x);
-    testdistinct.add(g);
+    IntegerFormula b = imgr.makeVariable("b");
+    IntegerFormula c = imgr.makeNumber(3);
+    IntegerFormula x = imgr.makeVariable("x");
+    IntegerFormula f = imgr.makeNumber(5);
 
-    BooleanFormula constraint = bimgr.distinct(testdistinct);
+    System.out.println(amgr.store(y, f, c));
+
+    BooleanFormula constraint = amgr.equivalence(y, d);
 
     //System.out.println(fmgr.dumpFormula(constraint));
 
@@ -77,7 +78,7 @@ public class Main {
       System.out.println("constraint is " + isUnsat + " and p = ");
       if (!isUnsat) {
         Model model = prover.getModel();
-        BigInteger value = model.evaluate(x);
+        Object value = model.evaluate(y);
         System.out.println(value);
 
       }

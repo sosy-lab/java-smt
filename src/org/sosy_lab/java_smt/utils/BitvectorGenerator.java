@@ -78,7 +78,7 @@ public class BitvectorGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(bvxnor " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) +")";
+        inPlaceInputParams -> "(= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) +")";
     Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 

@@ -71,7 +71,7 @@ public class Generator {
         String evaluatedInput = evaluateRecursive(value);
         evaluatedInputs.add(evaluatedInput);
       }
-      String result = methodToEvaluate.getSaveResult().apply(evaluatedInputs);
+      String result = (String) methodToEvaluate.getSaveResult().apply(evaluatedInputs);
       return result;
     }
   }
@@ -98,6 +98,16 @@ public class Generator {
       if (variable.variableType.equals("BitVec")) {
         String newEntry =
             "(declare-const " + variable.result + " (_ BitVec " + variable.bitVecLength + "))\n";
+        if (lines.indexOf(newEntry) == -1) {
+          lines.append(newEntry);
+        } else {
+        }
+      }
+      if (variable.variableType.equals("Array")) {
+        String newEntry =
+            "(declare-const " + variable.result + " (Array " + variable.ArrayIndexType + " "
+                + variable.ArrayValueType + "))"
+                + "\n";
         if (lines.indexOf(newEntry) == -1) {
           lines.append(newEntry);
         } else {

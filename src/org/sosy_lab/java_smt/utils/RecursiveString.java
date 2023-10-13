@@ -22,14 +22,20 @@ package org.sosy_lab.java_smt.utils;
 
 import java.util.List;
 import java.util.function.Function;
+import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaType;
 
-public class RecursiveString {
+public class RecursiveString <TI extends Formula, TE extends Formula> {
 
   Object result;
   List<Object> inputParams;
   Function<List<Object>, String> saveResult;
   String variableType;
   int bitVecLength;
+
+  String ArrayIndexType;
+  String ArrayValueType;
+
 
   public RecursiveString(
       Object pResult,
@@ -81,6 +87,14 @@ public class RecursiveString {
     saveResult = pSaveResult;
   }
 
+  public void setArrayIndexType(String pArrayIndexType) {
+    ArrayIndexType = pArrayIndexType;
+  }
+
+  public void setArrayValueType(String pArrayValueType) {
+    ArrayValueType = pArrayValueType;
+  }
+
   @Override
   public String toString() {
     return "RecursiveString{" +
@@ -88,6 +102,9 @@ public class RecursiveString {
         ", inputParams=" + inputParams +
         ", saveResult=" + saveResult +
         ", variableType='" + variableType + '\'' +
+        ", bitVecLength=" + bitVecLength +
+        ", ArrayIndexType=" + ArrayIndexType +
+        ", ArrayValueType=" + ArrayValueType +
         '}';
   }
 }

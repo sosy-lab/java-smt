@@ -30,7 +30,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
 public class NumeralGenerator {
 
-  public static void logMakeNumber(Object result, String pVar) {
+  public static void logMakeMakeNumber(Object result, String pVar) {
     List<Object> inputParams = new ArrayList<>();
     if (result instanceof IntegerFormula) {
       String checkedVar = String.valueOf(result);
@@ -149,15 +149,17 @@ public class NumeralGenerator {
   }
 
   public static void logDistinct(Object result, List operands) {
-    HashSet test = new HashSet<>(operands);
+    StringBuilder out = new StringBuilder();
+    out.append("(distinct ");
     List<Object> inputParams = new ArrayList<>();
-    if (test.size() == operands.size()) {
-      inputParams.add("true");
-    } else {
-      inputParams.add("false");
+    for (Object pOperand : operands) {
+      inputParams.add(pOperand.toString());
     }
-    Function<List<Object>, String> saveResult = inPlaceInputParams -> (String) inPlaceInputParams.get(0);
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Direct"));
+    Function<List<Object>, String> saveResult =
+        inPlaceInputParams -> {
+          inPlaceInputParams.forEach((c) -> {out.append(c); out.append(" ");}); return String.valueOf(
+              out.deleteCharAt(out.length()-1).append(")"));};
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   public static void logGreaterThan(Object result, Object pNumber1, Object pNumber2) {
