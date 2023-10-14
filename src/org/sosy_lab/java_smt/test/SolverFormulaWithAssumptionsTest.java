@@ -25,7 +25,7 @@ import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtSolverContext.Logics;
+import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
 public class SolverFormulaWithAssumptionsTest
     extends SolverBasedTest0.ParameterizedSolverBasedTest0 {

@@ -187,27 +187,35 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
       }
     }
 
+    checkCompatibilityWithLogic(usesUFs, usesIntegers, usesReals, usesArrays);
+  }
+
+  protected void checkCompatibilityWithLogic(
+      boolean usesUFs, boolean usesIntegers, boolean usesReals, boolean usesArrays)
+      throws SolverException {
     if (usesIntegers && usesReals) {
       throw new SolverException("OpenSMT does not support mixed integer-real arithmetics.");
     }
 
     List<String> errors = new ArrayList<>();
-    if (usesUFs && !creator.hasUFs()) {
-      errors.add("uninterpreted functions");
+    if (usesUFs && !creator.getLogic().doesLogicSupportUFs()) {
+      errors.add("uninterpreted function");
     }
-    if (usesIntegers && !creator.hasIntegers()) {
-      errors.add("integers");
+    if (usesIntegers && !creator.getLogic().doesLogicSupportIntegers()) {
+      errors.add("integer");
     }
-    if (usesReals && !creator.hasReals()) {
-      errors.add("reals");
+    if (usesReals && !creator.getLogic().doesLogicSupportReals()) {
+      errors.add("real");
     }
-    if (usesArrays && !creator.hasArrays()) {
-      errors.add("arrays");
+    if (usesArrays && !creator.getLogic().doesLogicSupportArrays()) {
+      errors.add("array");
     }
 
     if (!errors.isEmpty()) {
       throw new SolverException(
-          "Assertions use features that are not supported by the selected logic " + errors);
+          String.format(
+              "Assertions use features %s that are not supported " + "by the specified logic %s.",
+              errors, creator.getLogic()));
     }
   }
 

@@ -10,7 +10,7 @@ package org.sosy_lab.java_smt.test;
 
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.basicimpl.withAssumptionsWrapper.InterpolatingProverWithAssumptionsWrapper;
-import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtSolverContext.Logics;
+import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
 public class InterpolatingProverWithAssumptionsWrapperTest
     extends SolverFormulaWithAssumptionsTest {

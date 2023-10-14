@@ -52,7 +52,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.StringFormulaManager;
 import org.sosy_lab.java_smt.api.UFManager;
-import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtSolverContext.Logics;
+import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
 /**
  * Abstract base class with helpful utilities for writing tests that use an SMT solver. It

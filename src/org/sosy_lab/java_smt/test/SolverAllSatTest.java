@@ -30,7 +30,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtSolverContext.Logics;
+import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
 @RunWith(Parameterized.class)
 public class SolverAllSatTest extends SolverBasedTest0 {

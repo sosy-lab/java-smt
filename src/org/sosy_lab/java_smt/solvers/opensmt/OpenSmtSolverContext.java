@@ -38,28 +38,6 @@ public class OpenSmtSolverContext extends AbstractSolverContext {
 
   private boolean closed = false;
 
-  public enum Logics {
-    CORE,
-
-    QF_AX,
-    QF_UF,
-    QF_IDL,
-    QF_RDL,
-    QF_LIA,
-    QF_LRA,
-
-    QF_ALIA,
-    QF_ALRA,
-
-    QF_UFLIA,
-    QF_UFLRA,
-
-    QF_AUFLIA,
-    QF_AUFLRA,
-
-    QF_AUFLIRA
-  }
-
   @Options(prefix = "solver.opensmt")
   static class OpenSMTOptions {
 

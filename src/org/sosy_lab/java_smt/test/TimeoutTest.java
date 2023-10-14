@@ -24,7 +24,7 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Tactic;
-import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtSolverContext.Logics;
+import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
 /** Check that timeout is handled gracefully. */
 @RunWith(Parameterized.class)

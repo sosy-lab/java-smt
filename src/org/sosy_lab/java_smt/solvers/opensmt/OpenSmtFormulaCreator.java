@@ -10,7 +10,6 @@ package org.sosy_lab.java_smt.solvers.opensmt;
 
 import com.google.common.collect.ImmutableList;
 import java.math.BigInteger;
-import java.util.Arrays;
 import java.util.List;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.ArrayFormula;
@@ -26,7 +25,6 @@ import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtFormula.OpenSmtArrayFormula;
 import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtFormula.OpenSmtBooleanFormula;
 import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtFormula.OpenSmtIntegerFormula;
 import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtFormula.OpenSmtRationalFormula;
-import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtSolverContext.Logics;
 import org.sosy_lab.java_smt.solvers.opensmt.api.ArithLogic;
 import org.sosy_lab.java_smt.solvers.opensmt.api.Logic;
 import org.sosy_lab.java_smt.solvers.opensmt.api.LogicFactory;
@@ -93,62 +91,8 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, Sy
     }
   }
 
-  boolean hasArrays() {
-    List<Logics> supported =
-        Arrays.asList(
-            Logics.QF_AX,
-            Logics.QF_ALIA,
-            Logics.QF_ALRA,
-            Logics.QF_AUFLIA,
-            Logics.QF_AUFLRA,
-            Logics.QF_AUFLIRA);
-
-    return supported.contains(logicToUse);
-  }
-
-  boolean hasUFs() {
-    List<Logics> supported =
-        Arrays.asList(
-            Logics.QF_UF,
-            Logics.QF_UFLIA,
-            Logics.QF_UFLRA,
-            Logics.QF_AUFLIA,
-            Logics.QF_AUFLRA,
-            Logics.QF_AUFLIRA);
-
-    return supported.contains(logicToUse);
-  }
-
-  boolean hasIntegers() {
-    List<Logics> supported =
-        Arrays.asList(
-            Logics.QF_IDL,
-            Logics.QF_LIA,
-            Logics.QF_ALIA,
-            Logics.QF_UFLIA,
-            Logics.QF_AUFLIA,
-            Logics.QF_AUFLIRA);
-
-    return supported.contains(logicToUse);
-  }
-
-  boolean hasReals() {
-    List<Logics> supported =
-        Arrays.asList(
-            Logics.QF_RDL,
-            Logics.QF_LRA,
-            Logics.QF_ALRA,
-            Logics.QF_UFLRA,
-            Logics.QF_AUFLRA,
-            Logics.QF_AUFLIRA);
-
-    return supported.contains(logicToUse);
-  }
-
-  boolean hasInterpolation() {
-    List<Logics> supported = Arrays.asList(Logics.QF_UF, Logics.QF_LIA, Logics.QF_LRA);
-
-    return supported.contains(logicToUse);
+  Logics getLogic() {
+    return logicToUse;
   }
 
   @Override
