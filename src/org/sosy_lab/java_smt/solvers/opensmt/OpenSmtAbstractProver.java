@@ -231,14 +231,16 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     sstat result;
     try (ShutdownHook listener = new ShutdownHook(shutdownNotifier, osmtSolver::stop)) {
       shutdownNotifier.shutdownIfNecessary();
-      result = osmtSolver.check();
+      try {
+        result = osmtSolver.check();
+      } catch (Exception e) {
+        throw new SolverException("OpenSMT crashed while checking satisfiability.", e);
+      }
       shutdownNotifier.shutdownIfNecessary();
-    } catch (Exception e) {
-      throw new SolverException("checkSat returned with exception", e);
     }
 
     if (result.equals(sstat.Error())) {
-      throw new SolverException("OpenSMT crashed while checking satisfiablity");
+      throw new SolverException("OpenSMT crashed while checking satisfiability.");
     } else if (result.equals(sstat.Undef())) {
       throw new InterruptedException();
     } else {
