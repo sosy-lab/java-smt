@@ -51,7 +51,7 @@ public class ModelEvaluationTest extends SolverBasedTest0.ParameterizedSolverBas
 
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() {
-    problemSize = (solver == Solvers.PRINCESS) ? 10 : 100;
+    problemSize = solverToUse() == Solvers.PRINCESS ? 10 : 100; // Princess is too slow.
     ConfigurationBuilder builder = super.createTestConfigBuilder();
     if (solverToUse() == Solvers.MATHSAT5) {
       builder.setOption("solver.mathsat5.furtherOptions", "model_generation=true");
@@ -170,10 +170,6 @@ public class ModelEvaluationTest extends SolverBasedTest0.ParameterizedSolverBas
       prover.push(bmgr.and(getConstraints()));
       for (int i = 0; i < problemSize; i++) {
         assertThat(prover).isSatisfiable();
-        /* FIXME: For some reason getEvaluator() seems to call the default implementation from
-         *        the interface, which will then use getModel(). This makes the test identical to
-         *        testModelGeneration
-         */
         try (Evaluator m = prover.getEvaluator()) {
           prover.push(getNewConstraints(i, m));
         }

@@ -377,15 +377,13 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   @Test
   public <T> void sequentialInterpolationWithOnePartition()
       throws SolverException, InterruptedException {
-    InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
-
     requireIntegers();
 
+    InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     int i = index.getFreshId();
 
     IntegerFormula zero = imgr.makeNumber(0);
     IntegerFormula one = imgr.makeNumber(1);
-
     IntegerFormula a = imgr.makeVariable("a" + i);
 
     // build formula:  1 = A = 0
@@ -407,15 +405,13 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   @Test
   public <T> void sequentialInterpolationWithFewPartitions()
       throws SolverException, InterruptedException {
-    InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
-
     requireIntegers();
 
+    InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     int i = index.getFreshId();
 
     IntegerFormula zero = imgr.makeNumber(0);
     IntegerFormula one = imgr.makeNumber(1);
-
     IntegerFormula a = imgr.makeVariable("a" + i);
 
     // build formula:  1 = A = 0

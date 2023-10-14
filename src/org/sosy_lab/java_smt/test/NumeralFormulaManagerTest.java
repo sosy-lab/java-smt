@@ -9,7 +9,7 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assert_;
+import static org.junit.Assert.assertThrows;
 
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
@@ -70,19 +70,17 @@ public class NumeralFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
   }
 
   @SuppressWarnings("CheckReturnValue")
-  @Test(expected = Exception.class)
+  @Test
   public void failOnInvalidStringInteger() {
     requireIntegers();
-    imgr.makeNumber("a");
-    assert_().fail();
+    assertThrows(Exception.class, () -> imgr.makeNumber("a"));
   }
 
   @SuppressWarnings("CheckReturnValue")
-  @Test(expected = Exception.class)
+  @Test
   public void failOnInvalidStringRational() {
     requireIntegers();
-    rmgr.makeNumber("a");
-    assert_().fail();
+    assertThrows(Exception.class, () -> rmgr.makeNumber("a"));
   }
 
   @SuppressWarnings("CheckReturnValue")
