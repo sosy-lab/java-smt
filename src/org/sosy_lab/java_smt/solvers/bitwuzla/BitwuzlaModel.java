@@ -67,9 +67,9 @@ class BitwuzlaModel extends AbstractModel<Long, Long, Long> {
 
       } else if (bitwuzlaJNI.bitwuzla_term_is_fp(term)
           && bitwuzlaJNI.bitwuzla_term_is_const(term)) {
-        // We can't eval FP at the moment
-        throw new UnsupportedOperationException(
-            "Floating-Points are currently not supported in " + "the Bitwuzla model.");
+        // We can't eval FP properly at the moment, we just return whatever the solver gives us
+        // (BV representation of the FP)
+        variablesBuilder.add(getSimpleAssignment(term));
 
       } else if (bitwuzlaJNI.bitwuzla_term_is_array(term)
           && bitwuzlaJNI.bitwuzla_term_is_const(term)) {
