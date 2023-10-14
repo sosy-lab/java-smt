@@ -22,6 +22,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
+import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtSolverContext.OpenSMTOptions;
 import org.sosy_lab.java_smt.solvers.opensmt.api.PTRef;
 import org.sosy_lab.java_smt.solvers.opensmt.api.VectorInt;
@@ -106,5 +107,18 @@ class OpenSmtInterpolatingProver extends OpenSmtAbstractProver<Integer>
   public List<BooleanFormula> getTreeInterpolants(
       List<? extends Collection<Integer>> partitionedFormulas, int[] startOfSubTree) {
     throw new UnsupportedOperationException("OpenSMT does not support tree interpolants");
+  }
+
+  @Override
+  protected void checkCompatibilityWithLogic(
+      boolean usesUFs, boolean usesIntegers, boolean usesReals, boolean usesArrays)
+      throws SolverException {
+    super.checkCompatibilityWithLogic(usesUFs, usesIntegers, usesReals, usesArrays);
+    if (!creator.getLogic().doesLogicSupportInterpolation()) {
+      throw new SolverException(
+          String.format(
+              "OpenSMT does not support interpolation for the specified logic %s.",
+              creator.getLogic()));
+    }
   }
 }
