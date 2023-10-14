@@ -150,9 +150,11 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     return super.getModelAssignments();
   }
 
-  /** Make sure that the assertions only use features supported by the selected sublogic. */
-  private void checkCompatability() throws SolverException {
-
+  /**
+   * Make sure that the assertions only use features supported by the selected logic. Otherwise,
+   * OpenSMT will fail on checking satisfiability without further information.
+   */
+  private void checkCompatibility() throws SolverException {
     Logic osmtLogic = creator.getEnv();
 
     Map<String, PTRef> userDeclarations = new HashMap<>();
@@ -186,7 +188,7 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     }
 
     if (usesIntegers && usesReals) {
-      throw new SolverException("OpenSMT does not support mixed integer-real arithmetics");
+      throw new SolverException("OpenSMT does not support mixed integer-real arithmetics.");
     }
 
     List<String> errors = new ArrayList<>();
@@ -210,27 +212,29 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
   }
 
   @Override
-  @SuppressWarnings("try")
+  @SuppressWarnings("try") // ShutdownHook is never referenced, and this is correct.
   public boolean isUnsat() throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
-    checkCompatability();
+    checkCompatibility();
 
     closeAllEvaluators();
     changedSinceLastSatQuery = false;
 
+    sstat result;
     try (ShutdownHook listener = new ShutdownHook(shutdownNotifier, osmtSolver::stop)) {
       shutdownNotifier.shutdownIfNecessary();
-      sstat r = osmtSolver.check();
+      result = osmtSolver.check();
       shutdownNotifier.shutdownIfNecessary();
+    } catch (Exception e) {
+      throw new SolverException("checkSat returned with exception", e);
+    }
 
-      if (r.equals(sstat.Error())) {
-        throw new SolverException("OpenSMT crashed while checking satisfiablity");
-      }
-      if (r.equals(sstat.Undef())) {
-        throw new InterruptedException();
-      }
-
-      return r.equals(sstat.False());
+    if (result.equals(sstat.Error())) {
+      throw new SolverException("OpenSMT crashed while checking satisfiablity");
+    } else if (result.equals(sstat.Undef())) {
+      throw new InterruptedException();
+    } else {
+      return result.equals(sstat.False());
     }
   }
 
