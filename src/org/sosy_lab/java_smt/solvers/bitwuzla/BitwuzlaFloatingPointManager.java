@@ -290,7 +290,7 @@ public class BitwuzlaFloatingPointManager
 
   @Override
   protected Long round(Long pFormula, FloatingPointRoundingMode pRoundingMode) {
-    // But we could round to sBV and uBV
-    throw new UnsupportedOperationException("Bitwuzla can not round to int.");
+    long rm = getRoundingModeImpl(pRoundingMode);
+    return bitwuzlaJNI.bitwuzla_mk_term2(BITWUZLA_KIND_FP_RTI.swigValue(), rm, pFormula);
   }
 }
