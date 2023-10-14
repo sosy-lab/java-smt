@@ -165,23 +165,32 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     // build formula:  [false, false]
     BooleanFormula A = bmgr.makeBoolean(false);
     BooleanFormula B = bmgr.makeBoolean(false);
+    BooleanFormula C = bmgr.makeBoolean(false);
 
     T TA = stack.push(A);
     T TB = stack.push(B);
+    T TC = stack.push(C);
 
     assertThat(stack).isUnsatisfiable();
 
-    BooleanFormula itp0 = stack.getInterpolant(ImmutableList.of());
-    BooleanFormula itpA = stack.getInterpolant(ImmutableList.of(TA));
-    BooleanFormula itpB = stack.getInterpolant(ImmutableList.of(TA));
-    BooleanFormula itpAB = stack.getInterpolant(ImmutableList.of(TA, TB));
+    assertThat(stack.getInterpolant(ImmutableList.of())).isEqualTo(bmgr.makeBoolean(true));
+    // some interpolant needs to be FALSE, however, it can be at arbitrary position.
+    assertThat(
+            ImmutableList.of(
+                stack.getInterpolant(ImmutableList.of(TA)),
+                stack.getInterpolant(ImmutableList.of(TB)),
+                stack.getInterpolant(ImmutableList.of(TC))))
+        .contains(bmgr.makeBoolean(false));
+    assertThat(
+            ImmutableList.of(
+                stack.getInterpolant(ImmutableList.of(TA, TB)),
+                stack.getInterpolant(ImmutableList.of(TB, TC)),
+                stack.getInterpolant(ImmutableList.of(TC, TA))))
+        .contains(bmgr.makeBoolean(false));
+    assertThat(stack.getInterpolant(ImmutableList.of(TA, TB, TC)))
+        .isEqualTo(bmgr.makeBoolean(false));
 
     stack.close();
-
-    assertThat(itp0).isEqualTo(bmgr.makeBoolean(true));
-    assertThat(itpA).isEqualTo(bmgr.makeBoolean(false));
-    assertThat(itpB).isEqualTo(bmgr.makeBoolean(false));
-    assertThat(itpAB).isEqualTo(bmgr.makeBoolean(false));
   }
 
   @Test
