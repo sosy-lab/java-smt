@@ -152,9 +152,10 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
 
   /**
    * Make sure that the assertions only use features supported by the selected logic. Otherwise,
-   * OpenSMT will fail on checking satisfiability without further information.
+   * OpenSMT will fail on checking satisfiability without further information, if the selected logic
+   * is required for solving process.
    */
-  private void checkCompatibility() throws SolverException {
+  private String getReasonFromSolverFeatures() {
     Logic osmtLogic = creator.getEnv();
 
     Map<String, PTRef> userDeclarations = new HashMap<>();
@@ -187,14 +188,13 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
       }
     }
 
-    checkCompatibilityWithLogic(usesUFs, usesIntegers, usesReals, usesArrays);
+    return getReasonFromSolverFeatures(usesUFs, usesIntegers, usesReals, usesArrays);
   }
 
-  protected void checkCompatibilityWithLogic(
-      boolean usesUFs, boolean usesIntegers, boolean usesReals, boolean usesArrays)
-      throws SolverException {
+  protected String getReasonFromSolverFeatures(
+      boolean usesUFs, boolean usesIntegers, boolean usesReals, boolean usesArrays) {
     if (usesIntegers && usesReals) {
-      throw new SolverException("OpenSMT does not support mixed integer-real arithmetics.");
+      return "OpenSMT does not support mixed integer-real arithmetics.";
     }
 
     List<String> errors = new ArrayList<>();
@@ -211,11 +211,12 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
       errors.add("array");
     }
 
-    if (!errors.isEmpty()) {
-      throw new SolverException(
-          String.format(
-              "Assertions use features %s that are not supported " + "by the specified logic %s.",
-              errors, creator.getLogic()));
+    if (errors.isEmpty()) {
+      return "Unknown reason.";
+    } else {
+      return String.format(
+          "Assertions use features %s that are not supported " + "by the specified logic %s.",
+          errors, creator.getLogic());
     }
   }
 
@@ -223,8 +224,6 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
   @SuppressWarnings("try") // ShutdownHook is never referenced, and this is correct.
   public boolean isUnsat() throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
-    checkCompatibility();
-
     closeAllEvaluators();
     changedSinceLastSatQuery = false;
 
@@ -234,7 +233,20 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
       try {
         result = osmtSolver.check();
       } catch (Exception e) {
-        throw new SolverException("OpenSMT crashed while checking satisfiability.", e);
+        if (e.getMessage().isEmpty()) {
+          // OpenSMT does not support all combinations of theories/logics and crashes on
+          // unsupported formula instances. We try to provide hints for the crash.
+          // Support for logics/features is checked lazily, i.e., only in case of an exception,
+          // such that the solver can simplify and try to reason about a query as far as possible.
+          // In several cases, the complex logics are not required for reasoning
+          // and OpenSMT succeeds with solving a query.
+          String reason = String.format(" Most likely reason: %s", getReasonFromSolverFeatures());
+          throw new SolverException(
+              String.format(
+                  "OpenSMT crashed while checking satisfiability. Most likely reason: %s", reason));
+        } else {
+          throw new SolverException("OpenSMT crashed while checking satisfiability.", e);
+        }
       }
       shutdownNotifier.shutdownIfNecessary();
     }
