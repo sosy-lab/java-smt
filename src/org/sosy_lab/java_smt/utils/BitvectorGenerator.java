@@ -24,7 +24,6 @@ import static java.lang.Long.parseLong;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.function.Function;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -35,27 +34,29 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 public class BitvectorGenerator {
 
   public static void logMakeBitVector(Object result, int length, long i) {
+    System.out.println(i);
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(Long.toString(length));
     inputParams.add(Long.toString(i));
     Function<List<Object>, String> saveResult =
         inPlaceInputParamsString -> {
           String formatString = "%0" + (length) + "d";
-          int binaryNumber =
-              Integer.parseInt(Long.toBinaryString(parseLong((String)inPlaceInputParamsString.get(1))));
+          long binaryNumber =
+              Long.parseLong(Long.toBinaryString(parseLong((String)inPlaceInputParamsString.get(1))));
           return "#b" + String.format(formatString, binaryNumber);};
     Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   public static void logMakeBitVector(Object result, int length, BigInteger i) {
+    System.out.println(i);
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(Long.toString(length));
     inputParams.add(i.toString());
     Function<List<Object>, String> saveResult =
         inPlaceInputParamsString -> {
           String formatString = "%0" + (length) + "d";
-          int binaryNumber =
-              Integer.parseInt(Long.toBinaryString(parseLong((String)inPlaceInputParamsString.get(1))));
+          BigInteger binaryNumber =
+           new BigInteger(Long.toBinaryString(parseLong((String)inPlaceInputParamsString.get(1))));
           return "#b" + String.format(formatString, binaryNumber);};
     Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }

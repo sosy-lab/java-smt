@@ -21,6 +21,7 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.StringFormula;
+import org.sosy_lab.java_smt.utils.Generator;
 
 @SuppressWarnings("ClassTypeParameterName")
 public abstract class AbstractEvaluator<TFormulaInfo, TType, TEnv> implements Evaluator {
@@ -41,6 +42,7 @@ public abstract class AbstractEvaluator<TFormulaInfo, TType, TEnv> implements Ev
   public final <T extends Formula> T eval(T f) {
     Preconditions.checkState(!isClosed());
     TFormulaInfo evaluation = evalImpl(creator.extractInfo(f));
+    Generator.lines.append("(get-value (" + f + "))\n");
     return evaluation == null ? null : (T) creator.encapsulateWithTypeOf(evaluation);
   }
 
@@ -48,6 +50,7 @@ public abstract class AbstractEvaluator<TFormulaInfo, TType, TEnv> implements Ev
   @Override
   public final BigInteger evaluate(IntegerFormula f) {
     Preconditions.checkState(!isClosed());
+    Generator.lines.append("(get-value (" + f + "))\n");
     return (BigInteger) evaluateImpl(creator.extractInfo(f));
   }
 
@@ -55,6 +58,7 @@ public abstract class AbstractEvaluator<TFormulaInfo, TType, TEnv> implements Ev
   @Override
   public Rational evaluate(RationalFormula f) {
     Object value = evaluateImpl(creator.extractInfo(f));
+    Generator.lines.append("(get-value (" + f + "))\n");
     if (value instanceof BigInteger) {
       // We simplified the value internally. Here, we need to convert it back to Rational.
       return Rational.ofBigInteger((BigInteger) value);
@@ -67,6 +71,7 @@ public abstract class AbstractEvaluator<TFormulaInfo, TType, TEnv> implements Ev
   @Override
   public final Boolean evaluate(BooleanFormula f) {
     Preconditions.checkState(!isClosed());
+    Generator.lines.append("(get-value (" + f + "))\n");
     return (Boolean) evaluateImpl(creator.extractInfo(f));
   }
 
@@ -88,6 +93,7 @@ public abstract class AbstractEvaluator<TFormulaInfo, TType, TEnv> implements Ev
   @Override
   public final BigInteger evaluate(BitvectorFormula f) {
     Preconditions.checkState(!isClosed());
+    Generator.lines.append("(get-value (" + f + "))\n");
     return (BigInteger) evaluateImpl(creator.extractInfo(f));
   }
 
@@ -98,6 +104,7 @@ public abstract class AbstractEvaluator<TFormulaInfo, TType, TEnv> implements Ev
     Preconditions.checkArgument(
         !(f instanceof ArrayFormula),
         "cannot compute a simple constant evaluation for an array-formula");
+    Generator.lines.append("(get-value (" + f + "))\n");
     return evaluateImpl(creator.extractInfo(f));
   }
 

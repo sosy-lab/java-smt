@@ -290,7 +290,8 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
   @Override
   public BitvectorFormula makeBitvector(int pLength, long i) {
     BitvectorFormula result = wrap(makeBitvectorImpl(pLength, i));
-    BitvectorGenerator.logMakeBitVector(result, pLength, i);
+    BitvectorGenerator.logMakeBitVector(result, pLength, transformValueToRange(pLength,
+        BigInteger.valueOf(i)));
     return result;
   }
 
@@ -301,7 +302,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
   @Override
   public BitvectorFormula makeBitvector(int pLength, BigInteger i) {
     BitvectorFormula result = wrap(makeBitvectorImpl(pLength, i));
-    BitvectorGenerator.logMakeBitVector(result, pLength, i);
+    BitvectorGenerator.logMakeBitVector(result, pLength, transformValueToRange(pLength, i));
     return result;
   }
 

@@ -79,7 +79,9 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
     checkVariableName(name);
     List<FormulaType<?>> argTypes = Lists.transform(pArgs, getFormulaCreator()::getFormulaType);
     FunctionDeclaration<T> func = declareUF(name, pReturnType, argTypes);
-    return callUF(func, pArgs);
+    T result = callUF(func, pArgs);
+    UFGenerator.logCallFun((Object) result, func, (Formula) pArgs);
+    return result;
   }
 
   @Override

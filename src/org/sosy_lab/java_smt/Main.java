@@ -18,22 +18,16 @@ package org.sosy_lab.java_smt;/*
  *  limitations under the License.
  */
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.net.Inet4Address;
+import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.List;
 import org.sosy_lab.common.*;
 import org.sosy_lab.common.configuration.*;
-import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.*;
 import org.sosy_lab.common.log.*;
 import java.io.*;
-import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
-import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
-import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
+import org.sosy_lab.java_smt.utils.Generator;
 
 public class Main {
   public static void main(String[] args)
@@ -50,31 +44,27 @@ public class Main {
     BooleanFormulaManager bmgr = fmgr.getBooleanFormulaManager();
     IntegerFormulaManager imgr = fmgr.getIntegerFormulaManager();
     BitvectorFormulaManager bimgr = fmgr.getBitvectorFormulaManager();
-    ArrayFormulaManager amgr = fmgr.getArrayFormulaManager();
-    UFManager umgr = fmgr.getUFManager();
+    UFManager umgr =  fmgr.getUFManager();
+
+    BitvectorFormula a = bimgr.makeBitvector(3, 5);
+    BitvectorFormula b = bimgr.makeBitvector(3, -2);
+    BitvectorFormula c = bimgr.makeVariable(3, "c");
 
 
-    IntegerFormula a = imgr.makeNumber(5);
-    IntegerFormula x = imgr.makeVariable("x");
-    FunctionDeclaration y = umgr.declareUF("y", FormulaType.IntegerType, FormulaType.IntegerType);
-
-    BooleanFormula constraint = imgr.equal((IntegerFormula) umgr.callUF(y, x), a);
-
-    //System.out.println(fmgr.dumpFormula(constraint));
+    BooleanFormula constraint = bimgr.equal(c, bimgr.add(a, b));
 
     try (ProverEnvironment prover =
              context.newProverEnvironment(SolverContext.ProverOptions.GENERATE_MODELS)) {
       prover.addConstraint(constraint);
 
-
       boolean isUnsat = prover.isUnsat();
-      System.out.println("constraint is " + isUnsat + " and p = ");
       if (!isUnsat) {
         Model model = prover.getModel();
-        //Object value = model.evaluate(y);
-        //System.out.println(value);
+        Object value = model.evaluate(c);
+        System.out.println(value);
 
       }
+      Generator.dumpSMTLIB2();
     } catch (SolverException e) {
       throw new RuntimeException(e);
     }

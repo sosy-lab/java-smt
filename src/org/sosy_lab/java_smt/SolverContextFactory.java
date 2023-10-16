@@ -108,7 +108,7 @@ public class SolverContextFactory {
   private NonLinearArithmetic nonLinearArithmetic = NonLinearArithmetic.USE;
 
   @Option(secure = true, description = "test.")
-  private boolean generateSMTLIB2 = false;
+  private boolean generateSMTLIB2 = true;
 
   private final LogManager logger;
   private final ShutdownNotifier shutdownNotifier;

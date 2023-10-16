@@ -63,12 +63,9 @@ public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironme
 
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
+    Generator.lines.append("(check-sat)\n");
     clearAssumptions();
-    try {
-      Generator.dumpSMTLIB2();
-    } catch (IOException pE) {
-      throw new RuntimeException(pE);
-    }
+
     return delegate.isUnsat();
   }
 

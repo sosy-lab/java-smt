@@ -34,7 +34,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 public class Generator {
 
   static String fileName = "Out.smt2";
-  static StringBuilder lines = new StringBuilder();
+  public static StringBuilder lines = new StringBuilder();
 
   static List<RecursiveString> executedAggregator =
       new ArrayList<>();
@@ -139,7 +139,7 @@ public class Generator {
   }
 
   public static void dumpSMTLIB2() throws IOException {
-    String endSMTLIB2 = "(check-sat)\n(get-value (x))\n(exit)";
+    String endSMTLIB2 = "(exit)";
     lines.append(endSMTLIB2);
     writeToFile(String.valueOf(lines));
   }
