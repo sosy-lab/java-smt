@@ -30,7 +30,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
 public class NumeralGenerator {
 
-  public static void logMakeMakeNumber(Object result, String pVar) {
+  public static void logMakeNumber(Object result, String pVar) {
     List<Object> inputParams = new ArrayList<>();
     if (result instanceof IntegerFormula) {
       String checkedVar = String.valueOf(result);

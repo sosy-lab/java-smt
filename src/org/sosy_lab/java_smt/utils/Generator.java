@@ -80,6 +80,7 @@ public class Generator {
     String result = evaluateRecursive(constraint);
     List<RecursiveString> uniqueRegisteredValues =
         registeredVariables.stream().distinct().collect(Collectors.toList());
+    String command = "(assert ";
     for (RecursiveString variable : uniqueRegisteredValues) {
       if (variable.variableType.equals("Bool")) {
         String newEntry = "(declare-const " + variable.result + " Bool)\n";
@@ -113,9 +114,28 @@ public class Generator {
         } else {
         }
       }
+      if (variable.variableType.equals("UFSort")) {
+        System.out.println(variable.result);
+        String newEntry =
+            "(declare-sort " + variable.result + " 0)\n";
+        if (lines.indexOf(newEntry) == -1) {
+          lines.append(newEntry);
+        } else {
+        }
+      }
+      if (variable.variableType.equals("UFFun")) {
+        System.out.println(variable.result);
+        String newEntry =
+            "(declare-fun " + variable.UFName + " " + variable.UFInputType + " " + variable.UFOutputType + ")"
+                + "\n";
+        if (lines.indexOf(newEntry) == -1) {
+          lines.append(newEntry);
+        } else {
+        }
+      }
     }
-      String SMTLIB2Result = "(assert " + result + ")\n";
-      lines.append(SMTLIB2Result);
+    String SMTLIB2Result = command + result + ")\n";
+    lines.append(SMTLIB2Result);
   }
 
   public static void dumpSMTLIB2() throws IOException {

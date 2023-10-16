@@ -18,6 +18,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.UFManager;
+import org.sosy_lab.java_smt.utils.UFGenerator;
 
 /**
  * This class simplifies the implementation of the FunctionFormulaManager by converting the types to
@@ -53,18 +54,23 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
   public <T extends Formula> FunctionDeclaration<T> declareUF(
       String pName, FormulaType<T> pReturnType, FormulaType<?>... pArgs) {
     checkVariableName(pName);
-    return declareUF(pName, pReturnType, Arrays.asList(pArgs));
+    FunctionDeclaration result = declareUF(pName, pReturnType, Arrays.asList(pArgs));
+    UFGenerator.logMakeFun(result, pName, pReturnType, pArgs);
+    return result;
   }
 
   @Override
   public <T extends Formula> T callUF(FunctionDeclaration<T> funcType, Formula... args) {
-    return formulaCreator.callFunction(funcType, Arrays.asList(args));
+    T result = formulaCreator.callFunction(funcType, Arrays.asList(args));
+    UFGenerator.logCallFun(result, funcType, args);
+    return result;
   }
 
   @Override
   public final <T extends Formula> T callUF(
       FunctionDeclaration<T> pFunc, List<? extends Formula> pArgs) {
-    return formulaCreator.callFunction(pFunc, pArgs);
+    T result = formulaCreator.callFunction(pFunc, pArgs);
+    return result;
   }
 
   @Override

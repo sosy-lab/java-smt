@@ -32,7 +32,9 @@ public class RecursiveString <TI extends Formula, TE extends Formula> {
   Function<List<Object>, String> saveResult;
   String variableType;
   int bitVecLength;
-
+  String UFName;
+  String UFInputType;
+  String UFOutputType;
   String ArrayIndexType;
   String ArrayValueType;
 
@@ -93,6 +95,38 @@ public class RecursiveString <TI extends Formula, TE extends Formula> {
 
   public void setArrayValueType(String pArrayValueType) {
     ArrayValueType = pArrayValueType;
+  }
+
+  public String getUFName() {
+    return UFName;
+  }
+
+  public void setUFName(String pUFName) {
+    UFName = pUFName;
+  }
+
+  public String getArrayIndexType() {
+    return ArrayIndexType;
+  }
+
+  public String getArrayValueType() {
+    return ArrayValueType;
+  }
+
+  public String getUFInputType() {
+    return UFInputType;
+  }
+
+  public void setUFInputType(String pUFInputType) {
+    UFInputType = pUFInputType;
+  }
+
+  public String getUFOutputType() {
+    return UFOutputType;
+  }
+
+  public void setUFOutputType(String pUFOutputType) {
+    UFOutputType = pUFOutputType;
   }
 
   @Override

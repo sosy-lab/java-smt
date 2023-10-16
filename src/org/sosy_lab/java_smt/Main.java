@@ -51,21 +51,14 @@ public class Main {
     IntegerFormulaManager imgr = fmgr.getIntegerFormulaManager();
     BitvectorFormulaManager bimgr = fmgr.getBitvectorFormulaManager();
     ArrayFormulaManager amgr = fmgr.getArrayFormulaManager();
+    UFManager umgr = fmgr.getUFManager();
 
-    ArrayFormula d = amgr.makeArray("d", FormulaType.IntegerType, FormulaType.IntegerType);
-    ArrayFormula y = amgr.makeArray("y", FormulaType.IntegerType, FormulaType.IntegerType);
 
-    BitvectorFormula z = bimgr.makeVariable(3, "z");
-    BitvectorFormula a = bimgr.makeVariable(3, "a");
-
-    IntegerFormula b = imgr.makeVariable("b");
-    IntegerFormula c = imgr.makeNumber(3);
+    IntegerFormula a = imgr.makeNumber(5);
     IntegerFormula x = imgr.makeVariable("x");
-    IntegerFormula f = imgr.makeNumber(5);
+    FunctionDeclaration y = umgr.declareUF("y", FormulaType.IntegerType, FormulaType.IntegerType);
 
-    System.out.println(amgr.store(y, f, c));
-
-    BooleanFormula constraint = amgr.equivalence(y, d);
+    BooleanFormula constraint = imgr.equal((IntegerFormula) umgr.callUF(y, x), a);
 
     //System.out.println(fmgr.dumpFormula(constraint));
 
@@ -78,8 +71,8 @@ public class Main {
       System.out.println("constraint is " + isUnsat + " and p = ");
       if (!isUnsat) {
         Model model = prover.getModel();
-        Object value = model.evaluate(y);
-        System.out.println(value);
+        //Object value = model.evaluate(y);
+        //System.out.println(value);
 
       }
     } catch (SolverException e) {

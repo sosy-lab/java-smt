@@ -31,8 +31,7 @@ public class ArrayGenerator {
 
   public static <
       TE extends Formula,
-      FTE extends FormulaType<TE>> String checkArrayElementSort(FTE pElementType) throws IllegalArgumentException {
-    String result = "";
+      FTE extends FormulaType<TE>> String checkArrayElementSort(FTE pElementType) {
     if (pElementType.isIntegerType()) {
       return  "Int";
     } else if (pElementType.isBooleanType()) {
@@ -45,8 +44,7 @@ public class ArrayGenerator {
 
   public static <
       TI extends Formula,
-      FTI extends FormulaType<TI>> String checkArrayIndexSort(FTI pIndexType) throws IllegalArgumentException {
-    String result = "";
+      FTI extends FormulaType<TI>> String checkArrayIndexSort(FTI pIndexType) {
     if (pIndexType.isIntegerType()) {
       return  "Int";
     } else if (pIndexType.isBooleanType()) {
