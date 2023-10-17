@@ -18,6 +18,8 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 @SuppressWarnings({"unused", "checkstyle:methodname", "checkstyle:parametername"})
 public class BitwuzlaJNI {
+  private BitwuzlaJNI() {}
+
   public static final native long new_BitwuzlaTermArray(int jarg1);
 
   public static final native void delete_BitwuzlaTermArray(long jarg1);
