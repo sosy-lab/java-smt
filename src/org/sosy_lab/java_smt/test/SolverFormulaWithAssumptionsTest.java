@@ -25,9 +25,16 @@ import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
 public class SolverFormulaWithAssumptionsTest
     extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+
+  // INFO: OpenSmt only support interpolation for QF_LIA, QF_LRA and QF_UF
+  @Override
+  protected Logics logicToUse() {
+    return Logics.QF_LIA;
+  }
 
   /**
    * Generate a prover environment depending on the parameter above. Can be overridden to

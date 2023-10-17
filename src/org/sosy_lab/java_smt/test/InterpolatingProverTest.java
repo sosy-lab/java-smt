@@ -28,10 +28,17 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
 /** This class contains some simple Junit-tests to check the interpolation-API of our solvers. */
 @SuppressWarnings({"resource", "LocalVariableName"})
 public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+
+  // INFO: OpenSmt only support interpolation for QF_LIA, QF_LRA and QF_UF
+  @Override
+  protected Logics logicToUse() {
+    return Logics.QF_LIA;
+  }
 
   /** Generate a prover environment depending on the parameter above. */
   @SuppressWarnings("unchecked")
@@ -53,13 +60,22 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       IntegerFormula x = imgr.makeVariable("x");
       IntegerFormula y = imgr.makeVariable("y");
-      IntegerFormula z = imgr.makeVariable("z");
+      /* INFO: Due to limitations in OpenSMT we need to use a simpler formular for this solver
+       * Setting z=x means that the original formula `2x ≠ 1+2z`simplifies to `0 ≠ 1`,
+       * which is trivially true.
+       *
+       * https://github.com/usi-verification-and-security/opensmt/issues/638
+       */
+      IntegerFormula z = solverToUse() == Solvers.OPENSMT ? x : imgr.makeVariable("z");
+
       BooleanFormula f1 = imgr.equal(y, imgr.multiply(imgr.makeNumber(2), x));
       BooleanFormula f2 =
           imgr.equal(y, imgr.add(imgr.makeNumber(1), imgr.multiply(z, imgr.makeNumber(2))));
+
       prover.push(f1);
       T id2 = prover.push(f2);
       boolean check = prover.isUnsat();
+
       assertWithMessage("formulas must be contradicting").that(check).isTrue();
       prover.getInterpolant(ImmutableList.of(id2));
       // we actually only check for a successful execution here, the result is irrelevant.
@@ -72,7 +88,14 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       IntegerFormula x = imgr.makeVariable("x");
       IntegerFormula y = imgr.makeVariable("y");
-      IntegerFormula z = imgr.makeVariable("z");
+      /* INFO: Due to limitations in OpenSMT we need to use a simpler formula for this solver
+       * Setting z=x means that the original formula `2x ≠ 1+2z`simplifies to `0 ≠ 1`,
+       * which is trivially true.
+       *
+       * https://github.com/usi-verification-and-security/opensmt/issues/638
+       */
+      IntegerFormula z = solverToUse() == Solvers.OPENSMT ? x : imgr.makeVariable("z");
+
       BooleanFormula f1 = imgr.equal(y, imgr.multiply(imgr.makeNumber(2), x));
       BooleanFormula f2 =
           imgr.equal(y, imgr.add(imgr.makeNumber(1), imgr.multiply(z, imgr.makeNumber(2))));
@@ -135,36 +158,39 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   }
 
   @Test
-  public <T> void binaryInterpolation1() throws SolverException, InterruptedException {
+  public <T> void binaryInterpolationWithConstantFalse()
+      throws SolverException, InterruptedException {
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
-    // build formula:  1 = A = B = C = 0
+    // build formula:  [false, false]
     BooleanFormula A = bmgr.makeBoolean(false);
     BooleanFormula B = bmgr.makeBoolean(false);
+    BooleanFormula C = bmgr.makeBoolean(false);
 
     T TA = stack.push(A);
     T TB = stack.push(B);
+    T TC = stack.push(C);
 
     assertThat(stack).isUnsatisfiable();
 
-    BooleanFormula itp0 = stack.getInterpolant(ImmutableList.of());
-    BooleanFormula itpA = stack.getInterpolant(ImmutableList.of(TA));
-    BooleanFormula itpB = stack.getInterpolant(ImmutableList.of(TA));
-    BooleanFormula itpAB = stack.getInterpolant(ImmutableList.of(TA, TB));
+    assertThat(stack.getInterpolant(ImmutableList.of())).isEqualTo(bmgr.makeBoolean(true));
+    // some interpolant needs to be FALSE, however, it can be at arbitrary position.
+    assertThat(
+            ImmutableList.of(
+                stack.getInterpolant(ImmutableList.of(TA)),
+                stack.getInterpolant(ImmutableList.of(TB)),
+                stack.getInterpolant(ImmutableList.of(TC))))
+        .contains(bmgr.makeBoolean(false));
+    assertThat(
+            ImmutableList.of(
+                stack.getInterpolant(ImmutableList.of(TA, TB)),
+                stack.getInterpolant(ImmutableList.of(TB, TC)),
+                stack.getInterpolant(ImmutableList.of(TC, TA))))
+        .contains(bmgr.makeBoolean(false));
+    assertThat(stack.getInterpolant(ImmutableList.of(TA, TB, TC)))
+        .isEqualTo(bmgr.makeBoolean(false));
 
     stack.close();
-
-    // special cases: start and end of sequence might need special handling in the solver
-    assertThat(bmgr.makeBoolean(true)).isEqualTo(itp0);
-    assertThat(bmgr.makeBoolean(false)).isEqualTo(itpAB);
-
-    // want to see non-determinism in all solvers? try this:
-    // System.out.println(solver + ": " + itpA);
-
-    // we check here the stricter properties for sequential interpolants,
-    // but this simple example should work for all solvers
-    checkItpSequence(ImmutableList.of(A, B), ImmutableList.of(itpA));
-    checkItpSequence(ImmutableList.of(B, A), ImmutableList.of(itpB));
   }
 
   @Test
@@ -351,14 +377,13 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   @Test
   public <T> void sequentialInterpolationWithOnePartition()
       throws SolverException, InterruptedException {
-    InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     requireIntegers();
 
+    InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     int i = index.getFreshId();
 
     IntegerFormula zero = imgr.makeNumber(0);
     IntegerFormula one = imgr.makeNumber(1);
-
     IntegerFormula a = imgr.makeVariable("a" + i);
 
     // build formula:  1 = A = 0
@@ -380,14 +405,13 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   @Test
   public <T> void sequentialInterpolationWithFewPartitions()
       throws SolverException, InterruptedException {
-    InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     requireIntegers();
 
+    InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     int i = index.getFreshId();
 
     IntegerFormula zero = imgr.makeNumber(0);
     IntegerFormula one = imgr.makeNumber(1);
-
     IntegerFormula a = imgr.makeVariable("a" + i);
 
     // build formula:  1 = A = 0
@@ -567,6 +591,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   private <T> void testTreeInterpolants1(
       BooleanFormula pA, BooleanFormula pB, BooleanFormula pC, BooleanFormula pD, BooleanFormula pE)
       throws SolverException, InterruptedException {
+
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
     T TA = stack.push(pA);
@@ -599,6 +624,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   private <T> void testTreeInterpolants2(
       BooleanFormula pA, BooleanFormula pB, BooleanFormula pC, BooleanFormula pD, BooleanFormula pE)
       throws SolverException, InterruptedException {
+
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
     T TA = stack.push(pA);

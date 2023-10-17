@@ -26,6 +26,7 @@ SPDX-License-Identifier: Apache-2.0
         runtime-cvc4,
         runtime-cvc5,
         runtime-mathsat,
+        runtime-opensmt,
         runtime-optimathsat,
         runtime-princess,
         runtime-smtinterpol,
@@ -63,7 +64,7 @@ SPDX-License-Identifier: Apache-2.0
     <import file="build/build-publish.xml"/>
     <import file="build/build-publish-solvers.xml"/>
     <import file="build/build-maven-publish.xml"/>
-
+    
     <path id="classpath">
         <pathelement location="${class.dir}"/>
         <fileset dir="${ivy.lib.dir}" includes="runtime-*/*.jar test/*.jar build/annotations.jar build/auto-value-annotations.jar build/error_prone_annotations.jar"/>
@@ -74,13 +75,13 @@ SPDX-License-Identifier: Apache-2.0
         <fileset dir="${ivy.lib.dir}" includes="build/*.jar runtime/common.jar"/>
     </path>
 
-
     <!-- Main targets -->
 
     <target name="clean" description="Clean">
         <delete includeEmptyDirs="true">
             <fileset dir="." includes="${class.dir}/** ${ivy.module}-*.jar ivy-*.xml *.so *.dll *.dylib *.jar"/>
             <fileset dir="lib/native/source/libmathsat5j" includes="*.so *.dll *.o"/>
+            <fileset dir="lib/native/source/opensmt" includes="src/**/*.java src/opensmt src opensmt-wrap.o"/>
         </delete>
     </target>
 
@@ -90,7 +91,7 @@ SPDX-License-Identifier: Apache-2.0
 
     <target name="tests" depends="unit-tests-coverage" description="Run all tests"/>
 
-    <target name="publish" depends="tests, dist, publish-artifacts" description="Publish current version of JavaSMT to Ivy repository" />
+    <target name="publish" depends="dist, publish-artifacts" description="Publish current version of JavaSMT to Ivy repository" />
 
     <target name="documentation" depends="collect-options, javadoc" description="Build documentation"/>
 

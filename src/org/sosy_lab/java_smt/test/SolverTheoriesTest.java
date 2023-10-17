@@ -296,6 +296,11 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
             IllegalArgumentException.class,
             () -> assertThatFormula(buildDivision(num10, num0, num10)).isSatisfiable());
         break;
+      case OPENSMT: // INFO: OpenSMT does not allow division by zero
+        assertThrows(
+            UnsupportedOperationException.class,
+            () -> assertThatFormula(buildDivision(num10, num0, num10)).isSatisfiable());
+        break;
       default:
         // division-by-zero results in an arbitrary result
         assertDivision(false, num0, num0, num0);
@@ -316,6 +321,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
             IllegalArgumentException.class,
             () -> assertThatFormula(buildModulo(num10, num0, num10)).isSatisfiable());
         break;
+      case OPENSMT: // INFO
       case MATHSAT5: // modulo not supported
         assertThrows(UnsupportedOperationException.class, () -> buildModulo(num10, num0, num10));
         break;
@@ -355,6 +361,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
     BooleanFormula aEqNeg10 = imgr.equal(a, numNeg10);
 
     switch (solverToUse()) {
+      case OPENSMT: // INFO: OpenSmt does not allow nonlinear terms
       case SMTINTERPOL:
       case YICES2:
         assertThrows(UnsupportedOperationException.class, () -> buildDivision(a, b, num5));
@@ -374,6 +381,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
 
     // TODO negative case is disabled, because we would need the option
     // solver.solver.useNonLinearIntegerArithmetic=true.
+
   }
 
   @Test
@@ -745,6 +753,10 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
         break;
       case PRINCESS:
         assertThat(_b_at_i_plus_1.toString()).isEqualTo("select(b, (i + 1))");
+        break;
+      case OPENSMT:
+        // INFO: OpenSmt changes the order of the terms in the sum
+        assertThat(_b_at_i_plus_1.toString()).isEqualTo("(select b (+ 1 i))");
         break;
       default:
         assertThat(_b_at_i_plus_1.toString())
@@ -1177,9 +1189,15 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
           Solvers.CVC4,
           Solvers.BOOLECTOR,
           Solvers.YICES2,
-          Solvers.CVC5);
+          Solvers.CVC5,
+          Solvers.OPENSMT);
   private static final ImmutableSet<Solvers> VAR_AND_UF_TRACKING_SOLVERS =
-      ImmutableSet.of(Solvers.SMTINTERPOL, Solvers.MATHSAT5, Solvers.BOOLECTOR, Solvers.YICES2);
+      ImmutableSet.of(
+          Solvers.SMTINTERPOL,
+          Solvers.MATHSAT5,
+          Solvers.BOOLECTOR,
+          Solvers.YICES2,
+          Solvers.OPENSMT);
 
   @Test
   @SuppressWarnings("CheckReturnValue")
