@@ -91,7 +91,7 @@ If something specific is missing, please [look for or file an issue](https://git
 | [CVC4](https://cvc4.github.io/) | :heavy_check_mark: | :heavy_check_mark: |
 | [CVC5](https://cvc4.github.io/) | :question: | |
 | [MathSAT5](http://mathsat.fbk.eu/) | :heavy_check_mark: |  |
-| [OpenSMT]([https://cvc4.github.io/](https://verify.inf.usi.ch/opensmt) | :question: | |
+| [OpenSMT](https://verify.inf.usi.ch/opensmt) | :question: | |
 | [OptiMathSAT](http://optimathsat.disi.unitn.it/) | :heavy_check_mark: |  |
 | [Princess](http://www.philipp.ruemmer.org/princess.shtml) | :heavy_check_mark: |  |
 | [SMTInterpol](https://ultimate.informatik.uni-freiburg.de/smtinterpol/) | :heavy_check_mark: |  |
