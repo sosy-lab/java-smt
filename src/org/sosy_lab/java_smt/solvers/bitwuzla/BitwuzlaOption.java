@@ -99,9 +99,14 @@ public final class BitwuzlaOption {
   public static BitwuzlaOption swigToEnum(int swigValue) {
     if (swigValue < swigValues.length
         && swigValue >= 0
-        && swigValues[swigValue].swigValue == swigValue) {return swigValues[swigValue]; }
+        && swigValues[swigValue].swigValue == swigValue) {
+      return swigValues[swigValue];
+    }
     for (int i = 0; i < swigValues.length; i++) {
-      if (swigValues[i].swigValue == swigValue) {return swigValues[i];}}
+      if (swigValues[i].swigValue == swigValue) {
+        return swigValues[i];
+      }
+    }
     throw new IllegalArgumentException(
         "No enum " + BitwuzlaOption.class + " with value " + swigValue);
   }

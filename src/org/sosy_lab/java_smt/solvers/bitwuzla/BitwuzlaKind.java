@@ -170,9 +170,14 @@ public final class BitwuzlaKind {
   public static BitwuzlaKind swigToEnum(int swigValue) {
     if (swigValue < swigValues.length
         && swigValue >= 0
-        && swigValues[swigValue].swigValue == swigValue) {return swigValues[swigValue];}
-    for (int i = 0; i < swigValues.length; i++){
-      if (swigValues[i].swigValue == swigValue) {return swigValues[i];}}
+        && swigValues[swigValue].swigValue == swigValue) {
+      return swigValues[swigValue];
+    }
+    for (int i = 0; i < swigValues.length; i++) {
+      if (swigValues[i].swigValue == swigValue) {
+        return swigValues[i];
+      }
+    }
     throw new IllegalArgumentException(
         "No enum " + BitwuzlaKind.class + " with value " + swigValue);
   }
