@@ -12,6 +12,8 @@ import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.collect.ImmutableList;
 import java.util.Arrays;
+import org.junit.AssumptionViolatedException;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.java_smt.solvers.opensmt.api.ArithLogic;
@@ -36,9 +38,15 @@ import org.sosy_lab.java_smt.solvers.opensmt.api.opensmt_logic;
 import org.sosy_lab.java_smt.solvers.opensmt.api.sstat;
 
 public class OpenSmtNativeAPITest {
-  static {
-    NativeLibraries.loadLibrary("opensmt");
-    NativeLibraries.loadLibrary("opensmtjava");
+
+  @BeforeClass
+  public static void load() {
+    try {
+      NativeLibraries.loadLibrary("opensmt");
+      NativeLibraries.loadLibrary("opensmtjava");
+    } catch (UnsatisfiedLinkError e) {
+      throw new AssumptionViolatedException("OpenSMT is not available", e);
+    }
   }
 
   /** Return free variables. */
