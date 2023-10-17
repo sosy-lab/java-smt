@@ -170,13 +170,13 @@ public class BitwuzlaFloatingPointManager
 
   @Override
   protected Long toIeeeBitvectorImpl(Long pNumber) {
-    long pRoundingMode =
-        BitwuzlaJNI.bitwuzla_mk_rm_value(BitwuzlaJNI.bitwuzla_term_value_get_rm(pNumber));
+    long rm = BitwuzlaJNI.bitwuzla_mk_rm_value(BitwuzlaJNI.BITWUZLA_RM_RTZ_get());
     long inputBits =
-        BitwuzlaJNI.bitwuzla_sort_fp_get_exp_size(pNumber)
-            + BitwuzlaJNI.bitwuzla_sort_fp_get_sig_size(pNumber);
+        BitwuzlaJNI.bitwuzla_term_fp_get_exp_size(pNumber)
+            + BitwuzlaJNI.bitwuzla_term_fp_get_sig_size(pNumber);
+    // This is most likely wrong/inprecise!
     return BitwuzlaJNI.bitwuzla_mk_term2_indexed1(
-        BITWUZLA_KIND_FP_TO_SBV.swigValue(), pRoundingMode, pNumber, inputBits);
+        BITWUZLA_KIND_FP_TO_SBV.swigValue(), rm, pNumber, inputBits);
   }
 
   @Override
