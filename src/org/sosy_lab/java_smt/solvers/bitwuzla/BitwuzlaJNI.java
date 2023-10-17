@@ -166,138 +166,6 @@ public class BitwuzlaJNI {
 
   public static final native int __struct_FILE_defined_get();
 
-  public static final native void _IO_FILE__flags_set(long jarg1, _IO_FILE jarg1_, int jarg2);
-
-  public static final native int _IO_FILE__flags_get(long jarg1, _IO_FILE jarg1_);
-
-  public static final native void _IO_FILE__IO_read_ptr_set(
-      long jarg1, _IO_FILE jarg1_, String jarg2);
-
-  public static final native String _IO_FILE__IO_read_ptr_get(long jarg1, _IO_FILE jarg1_);
-
-  public static final native void _IO_FILE__IO_read_end_set(
-      long jarg1, _IO_FILE jarg1_, String jarg2);
-
-  public static final native String _IO_FILE__IO_read_end_get(long jarg1, _IO_FILE jarg1_);
-
-  public static final native void _IO_FILE__IO_read_base_set(
-      long jarg1, _IO_FILE jarg1_, String jarg2);
-
-  public static final native String _IO_FILE__IO_read_base_get(long jarg1, _IO_FILE jarg1_);
-
-  public static final native void _IO_FILE__IO_write_base_set(
-      long jarg1, _IO_FILE jarg1_, String jarg2);
-
-  public static final native String _IO_FILE__IO_write_base_get(long jarg1, _IO_FILE jarg1_);
-
-  public static final native void _IO_FILE__IO_write_ptr_set(
-      long jarg1, _IO_FILE jarg1_, String jarg2);
-
-  public static final native String _IO_FILE__IO_write_ptr_get(long jarg1, _IO_FILE jarg1_);
-
-  public static final native void _IO_FILE__IO_write_end_set(
-      long jarg1, _IO_FILE jarg1_, String jarg2);
-
-  public static final native String _IO_FILE__IO_write_end_get(long jarg1, _IO_FILE jarg1_);
-
-  public static final native void _IO_FILE__IO_buf_base_set(
-      long jarg1, _IO_FILE jarg1_, String jarg2);
-
-  public static final native String _IO_FILE__IO_buf_base_get(long jarg1, _IO_FILE jarg1_);
-
-  public static final native void _IO_FILE__IO_buf_end_set(
-      long jarg1, _IO_FILE jarg1_, String jarg2);
-
-  public static final native String _IO_FILE__IO_buf_end_get(long jarg1, _IO_FILE jarg1_);
-
-  public static final native void _IO_FILE__IO_save_base_set(
-      long jarg1, _IO_FILE jarg1_, String jarg2);
-
-  public static final native String _IO_FILE__IO_save_base_get(long jarg1, _IO_FILE jarg1_);
-
-  public static final native void _IO_FILE__IO_backup_base_set(
-      long jarg1, _IO_FILE jarg1_, String jarg2);
-
-  public static final native String _IO_FILE__IO_backup_base_get(long jarg1, _IO_FILE jarg1_);
-
-  public static final native void _IO_FILE__IO_save_end_set(
-      long jarg1, _IO_FILE jarg1_, String jarg2);
-
-  public static final native String _IO_FILE__IO_save_end_get(long jarg1, _IO_FILE jarg1_);
-
-  public static final native void _IO_FILE__markers_set(long jarg1, _IO_FILE jarg1_, long jarg2);
-
-  public static final native long _IO_FILE__markers_get(long jarg1, _IO_FILE jarg1_);
-
-  public static final native void _IO_FILE__chain_set(
-      long jarg1, _IO_FILE jarg1_, long jarg2, _IO_FILE jarg2_);
-
-  public static final native long _IO_FILE__chain_get(long jarg1, _IO_FILE jarg1_);
-
-  public static final native void _IO_FILE__fileno_set(long jarg1, _IO_FILE jarg1_, int jarg2);
-
-  public static final native int _IO_FILE__fileno_get(long jarg1, _IO_FILE jarg1_);
-
-  public static final native void _IO_FILE__flags2_set(long jarg1, _IO_FILE jarg1_, int jarg2);
-
-  public static final native int _IO_FILE__flags2_get(long jarg1, _IO_FILE jarg1_);
-
-  public static final native void _IO_FILE__old_offset_set(long jarg1, _IO_FILE jarg1_, int jarg2);
-
-  public static final native int _IO_FILE__old_offset_get(long jarg1, _IO_FILE jarg1_);
-
-  public static final native void _IO_FILE__cur_column_set(long jarg1, _IO_FILE jarg1_, int jarg2);
-
-  public static final native int _IO_FILE__cur_column_get(long jarg1, _IO_FILE jarg1_);
-
-  public static final native void _IO_FILE__vtable_offset_set(
-      long jarg1, _IO_FILE jarg1_, byte jarg2);
-
-  public static final native byte _IO_FILE__vtable_offset_get(long jarg1, _IO_FILE jarg1_);
-
-  // public static final native void _IO_FILE__shortbuf_set(long jarg1, _IO_FILE jarg1_, String
-  // jarg2);
-
-  public static final native String _IO_FILE__shortbuf_get(long jarg1, _IO_FILE jarg1_);
-
-  public static final native void _IO_FILE__lock_set(long jarg1, _IO_FILE jarg1_, long jarg2);
-
-  public static final native long _IO_FILE__lock_get(long jarg1, _IO_FILE jarg1_);
-
-  public static final native void _IO_FILE__offset_set(long jarg1, _IO_FILE jarg1_, long jarg2);
-
-  public static final native long _IO_FILE__offset_get(long jarg1, _IO_FILE jarg1_);
-
-  public static final native void _IO_FILE__codecvt_set(long jarg1, _IO_FILE jarg1_, long jarg2);
-
-  public static final native long _IO_FILE__codecvt_get(long jarg1, _IO_FILE jarg1_);
-
-  public static final native void _IO_FILE__wide_data_set(long jarg1, _IO_FILE jarg1_, long jarg2);
-
-  public static final native long _IO_FILE__wide_data_get(long jarg1, _IO_FILE jarg1_);
-
-  public static final native void _IO_FILE__freeres_list_set(
-      long jarg1, _IO_FILE jarg1_, long jarg2, _IO_FILE jarg2_);
-
-  public static final native long _IO_FILE__freeres_list_get(long jarg1, _IO_FILE jarg1_);
-
-  public static final native void _IO_FILE__freeres_buf_set(
-      long jarg1, _IO_FILE jarg1_, long jarg2);
-
-  public static final native long _IO_FILE__freeres_buf_get(long jarg1, _IO_FILE jarg1_);
-
-  public static final native void _IO_FILE___pad5_set(long jarg1, _IO_FILE jarg1_, long jarg2);
-
-  public static final native long _IO_FILE___pad5_get(long jarg1, _IO_FILE jarg1_);
-
-  public static final native void _IO_FILE__mode_set(long jarg1, _IO_FILE jarg1_, int jarg2);
-
-  public static final native int _IO_FILE__mode_get(long jarg1, _IO_FILE jarg1_);
-
-  public static final native void _IO_FILE__unused2_set(long jarg1, _IO_FILE jarg1_, String jarg2);
-
-  public static final native String _IO_FILE__unused2_get(long jarg1, _IO_FILE jarg1_);
-
   public static final native long new__IO_FILE();
 
   public static final native void delete__IO_FILE(long jarg1);
@@ -338,15 +206,9 @@ public class BitwuzlaJNI {
 
   public static final native int FOPEN_MAX_get();
 
-  public static final native void stdin_set(long jarg1, _IO_FILE jarg1_);
-
   public static final native long stdin_get();
 
-  public static final native void stdout_set(long jarg1, _IO_FILE jarg1_);
-
   public static final native long stdout_get();
-
-  public static final native void stderr_set(long jarg1, _IO_FILE jarg1_);
 
   public static final native long stderr_get();
 
@@ -356,8 +218,6 @@ public class BitwuzlaJNI {
 
   public static final native int renameat(int jarg1, String jarg2, int jarg3, String jarg4);
 
-  public static final native int fclose(long jarg1, _IO_FILE jarg1_);
-
   public static final native long tmpfile();
 
   public static final native String tmpnam(String jarg1);
@@ -366,13 +226,7 @@ public class BitwuzlaJNI {
 
   public static final native String tempnam(String jarg1, String jarg2);
 
-  public static final native int fflush(long jarg1, _IO_FILE jarg1_);
-
-  public static final native int fflush_unlocked(long jarg1, _IO_FILE jarg1_);
-
   public static final native long fopen(String jarg1, String jarg2);
-
-  public static final native long freopen(String jarg1, String jarg2, long jarg3, _IO_FILE jarg3_);
 
   public static final native long fdopen(int jarg1, String jarg2);
 
@@ -380,22 +234,9 @@ public class BitwuzlaJNI {
 
   public static final native long open_memstream(long jarg1, long jarg2);
 
-  public static final native void setbuf(long jarg1, _IO_FILE jarg1_, String jarg2);
-
-  public static final native int setvbuf(
-      long jarg1, _IO_FILE jarg1_, String jarg2, int jarg3, long jarg4);
-
-  public static final native void setbuffer(long jarg1, _IO_FILE jarg1_, String jarg2, long jarg3);
-
-  public static final native void setlinebuf(long jarg1, _IO_FILE jarg1_);
-
-  public static final native int fprintf(long jarg1, _IO_FILE jarg1_, String jarg2);
-
   public static final native int printf(String jarg1);
 
   public static final native int sprintf(String jarg1, String jarg2);
-
-  public static final native int vfprintf(long jarg1, _IO_FILE jarg1_, String jarg2, long jarg3);
 
   public static final native int vprintf(String jarg1, long jarg2);
 
@@ -408,8 +249,6 @@ public class BitwuzlaJNI {
   public static final native int vdprintf(int jarg1, String jarg2, long jarg3);
 
   public static final native int dprintf(int jarg1, String jarg2);
-
-  public static final native int fscanf(long jarg1, _IO_FILE jarg1_, String jarg2);
 
   public static final native int scanf(String jarg1);
 
@@ -447,122 +286,33 @@ public class BitwuzlaJNI {
 
   public static final native int __HAVE_FLOATN_NOT_TYPEDEF_get();
 
-  public static final native int __isoc99_fscanf(long jarg1, _IO_FILE jarg1_, String jarg2);
-
   public static final native int __isoc99_scanf(String jarg1);
 
   public static final native int __isoc99_sscanf(String jarg1, String jarg2);
-
-  public static final native int vfscanf(long jarg1, _IO_FILE jarg1_, String jarg2, long jarg3);
 
   public static final native int vscanf(String jarg1, long jarg2);
 
   public static final native int vsscanf(String jarg1, String jarg2, long jarg3);
 
-  public static final native int __isoc99_vfscanf(
-      long jarg1, _IO_FILE jarg1_, String jarg2, long jarg3);
-
   public static final native int __isoc99_vscanf(String jarg1, long jarg2);
 
   public static final native int __isoc99_vsscanf(String jarg1, String jarg2, long jarg3);
 
-  public static final native int fgetc(long jarg1, _IO_FILE jarg1_);
-
-  public static final native int getc(long jarg1, _IO_FILE jarg1_);
-
   public static final native int getchar();
-
-  public static final native int getc_unlocked(long jarg1, _IO_FILE jarg1_);
 
   public static final native int getchar_unlocked();
 
-  public static final native int fgetc_unlocked(long jarg1, _IO_FILE jarg1_);
-
-  public static final native int fputc(int jarg1, long jarg2, _IO_FILE jarg2_);
-
-  public static final native int putc(int jarg1, long jarg2, _IO_FILE jarg2_);
-
   public static final native int putchar(int jarg1);
-
-  public static final native int fputc_unlocked(int jarg1, long jarg2, _IO_FILE jarg2_);
-
-  public static final native int putc_unlocked(int jarg1, long jarg2, _IO_FILE jarg2_);
 
   public static final native int putchar_unlocked(int jarg1);
 
-  public static final native int getw(long jarg1, _IO_FILE jarg1_);
-
-  public static final native int putw(int jarg1, long jarg2, _IO_FILE jarg2_);
-
-  public static final native String fgets(String jarg1, int jarg2, long jarg3, _IO_FILE jarg3_);
-
-  public static final native int __getdelim(
-      long jarg1, long jarg2, int jarg3, long jarg4, _IO_FILE jarg4_);
-
-  public static final native int getdelim(
-      long jarg1, long jarg2, int jarg3, long jarg4, _IO_FILE jarg4_);
-
-  public static final native int getline(long jarg1, long jarg2, long jarg3, _IO_FILE jarg3_);
-
-  public static final native int fputs(String jarg1, long jarg2, _IO_FILE jarg2_);
-
   public static final native int puts(String jarg1);
 
-  public static final native int ungetc(int jarg1, long jarg2, _IO_FILE jarg2_);
-
-  public static final native long fread(
-      long jarg1, long jarg2, long jarg3, long jarg4, _IO_FILE jarg4_);
-
-  public static final native long fwrite(
-      long jarg1, long jarg2, long jarg3, long jarg4, _IO_FILE jarg4_);
-
-  public static final native long fread_unlocked(
-      long jarg1, long jarg2, long jarg3, long jarg4, _IO_FILE jarg4_);
-
-  public static final native long fwrite_unlocked(
-      long jarg1, long jarg2, long jarg3, long jarg4, _IO_FILE jarg4_);
-
-  public static final native int fseek(long jarg1, _IO_FILE jarg1_, int jarg2, int jarg3);
-
-  public static final native int ftell(long jarg1, _IO_FILE jarg1_);
-
-  public static final native void rewind(long jarg1, _IO_FILE jarg1_);
-
-  public static final native int fseeko(long jarg1, _IO_FILE jarg1_, int jarg2, int jarg3);
-
-  public static final native int ftello(long jarg1, _IO_FILE jarg1_);
-
-  public static final native int feof(long jarg1, _IO_FILE jarg1_);
-
-  public static final native int ferror(long jarg1, _IO_FILE jarg1_);
-
-  public static final native void clearerr_unlocked(long jarg1, _IO_FILE jarg1_);
-
-  public static final native int feof_unlocked(long jarg1, _IO_FILE jarg1_);
-
-  public static final native int ferror_unlocked(long jarg1, _IO_FILE jarg1_);
-
   public static final native void perror(String jarg1);
-
-  public static final native int fileno(long jarg1, _IO_FILE jarg1_);
-
-  public static final native int fileno_unlocked(long jarg1, _IO_FILE jarg1_);
-
-  public static final native int pclose(long jarg1, _IO_FILE jarg1_);
 
   public static final native long popen(String jarg1, String jarg2);
 
   public static final native String ctermid(String jarg1);
-
-  public static final native void flockfile(long jarg1, _IO_FILE jarg1_);
-
-  public static final native int ftrylockfile(long jarg1, _IO_FILE jarg1_);
-
-  public static final native void funlockfile(long jarg1, _IO_FILE jarg1_);
-
-  public static final native int __uflow(long jarg1, _IO_FILE jarg1_);
-
-  public static final native int __overflow(long jarg1, _IO_FILE jarg1_, int jarg2);
 
   public static final native int BITWUZLA_SAT_get();
 
@@ -722,8 +472,6 @@ public class BitwuzlaJNI {
 
   public static final native String bitwuzla_sort_to_string(long jarg1);
 
-  public static final native void bitwuzla_sort_print(long jarg1, long jarg2, _IO_FILE jarg2_);
-
   public static final native long bitwuzla_term_hash(long jarg1);
 
   public static final native int bitwuzla_term_get_kind(long jarg1);
@@ -831,11 +579,6 @@ public class BitwuzlaJNI {
 
   public static final native String bitwuzla_term_to_string_fmt(long jarg1, int jarg2);
 
-  public static final native void bitwuzla_term_print(long jarg1, long jarg2, _IO_FILE jarg2_);
-
-  public static final native void bitwuzla_term_print_fmt(
-      long jarg1, long jarg2, _IO_FILE jarg2_, int jarg3);
-
   public static final native long bitwuzla_new(long options);
 
   public static final native void bitwuzla_delete(long env);
@@ -868,9 +611,6 @@ public class BitwuzlaJNI {
   public static final native int bitwuzla_check_sat_assuming(long jarg1, long jarg2, long[] jarg3);
 
   public static final native long bitwuzla_get_value(long env, long term);
-
-  public static final native void bitwuzla_print_formula(
-      long jarg1, String jarg2, long jarg3, _IO_FILE jarg3_, int jarg4);
 
   public static final native void bitwuzla_get_statistics(
       long jarg1, long jarg2, long jarg3, long[] jarg4);
@@ -965,9 +705,6 @@ public class BitwuzlaJNI {
       long sizeOfSubstitutionMap,
       long[] mapKeys,
       long[] mapValues);
-
-  public static final native long bitwuzla_parser_new(
-      long jarg1, String jarg2, long jarg3, _IO_FILE jarg3_, String jarg4, int jarg5, String jarg6);
 
   public static final native void bitwuzla_parser_delete(long jarg1);
 
