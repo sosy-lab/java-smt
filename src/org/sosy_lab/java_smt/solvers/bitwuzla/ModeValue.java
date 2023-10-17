@@ -25,37 +25,37 @@ public class ModeValue {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        bitwuzlaJNI.delete_ModeValue(swigCPtr);
+        BitwuzlaJNI.delete_ModeValue(swigCPtr);
       }
       swigCPtr = 0;
     }
   }
 
   public void setCur(String value) {
-    bitwuzlaJNI.ModeValue_cur_set(swigCPtr, this, value);
+    BitwuzlaJNI.ModeValue_cur_set(swigCPtr, this, value);
   }
 
   public String getCur() {
-    return bitwuzlaJNI.ModeValue_cur_get(swigCPtr, this);
+    return BitwuzlaJNI.ModeValue_cur_get(swigCPtr, this);
   }
 
   public void setDflt(String value) {
-    bitwuzlaJNI.ModeValue_dflt_set(swigCPtr, this, value);
+    BitwuzlaJNI.ModeValue_dflt_set(swigCPtr, this, value);
   }
 
   public String getDflt() {
-    return bitwuzlaJNI.ModeValue_dflt_get(swigCPtr, this);
+    return BitwuzlaJNI.ModeValue_dflt_get(swigCPtr, this);
   }
 
   public void setNum_modes(long value) {
-    bitwuzlaJNI.ModeValue_num_modes_set(swigCPtr, this, value);
+    BitwuzlaJNI.ModeValue_num_modes_set(swigCPtr, this, value);
   }
 
   public long getNum_modes() {
-    return bitwuzlaJNI.ModeValue_num_modes_get(swigCPtr, this);
+    return BitwuzlaJNI.ModeValue_num_modes_get(swigCPtr, this);
   }
 
   public ModeValue() {
-    this(bitwuzlaJNI.new_ModeValue(), true);
+    this(BitwuzlaJNI.new_ModeValue(), true);
   }
 }

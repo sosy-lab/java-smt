@@ -144,24 +144,24 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
 
   private static long createEnvironmentBasedOnOptions(BitwuzlaSettings settings, long randomSeed)
       throws InvalidConfigurationException {
-    long options = bitwuzlaJNI.bitwuzla_options_new();
+    long options = BitwuzlaJNI.bitwuzla_options_new();
 
     Preconditions.checkNotNull(settings.getSatSolver());
-    bitwuzlaJNI.bitwuzla_set_option_mode(
+    BitwuzlaJNI.bitwuzla_set_option_mode(
         options,
         BitwuzlaOption.BITWUZLA_OPT_SAT_SOLVER.swigValue(),
         settings.getSatSolver().name().toLowerCase(Locale.getDefault()));
-    bitwuzlaJNI.bitwuzla_set_option(
+    BitwuzlaJNI.bitwuzla_set_option(
         options, BitwuzlaOption.BITWUZLA_OPT_PRODUCE_MODELS.swigValue(), 2);
-    bitwuzlaJNI.bitwuzla_set_option(
+    BitwuzlaJNI.bitwuzla_set_option(
         options, BitwuzlaOption.BITWUZLA_OPT_SEED.swigValue(), randomSeed);
     // Stop Bitwuzla from rewriting formulas in outputs
-    bitwuzlaJNI.bitwuzla_set_option(
+    BitwuzlaJNI.bitwuzla_set_option(
         options, BitwuzlaOption.BITWUZLA_OPT_REWRITE_LEVEL.swigValue(), 0);
 
     setFurtherOptions(options, settings.getFurtherOptions());
 
-    return bitwuzlaJNI.bitwuzla_new(options);
+    return BitwuzlaJNI.bitwuzla_new(options);
   }
 
   /**
@@ -172,7 +172,7 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
    */
   @Override
   public String getVersion() {
-    return "Bitwuzla " + bitwuzlaJNI.bitwuzla_version();
+    return "Bitwuzla " + BitwuzlaJNI.bitwuzla_version();
   }
 
   /**
@@ -199,7 +199,7 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
   public void close() {
     if (!closed) {
       closed = true;
-      bitwuzlaJNI.bitwuzla_delete(creator.getEnv());
+      BitwuzlaJNI.bitwuzla_delete(creator.getEnv());
     }
   }
 
@@ -271,11 +271,11 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
         Field optionField = optionClass.getField(option.getKey());
         // Get the value of the public fields
         BitwuzlaOption value = (BitwuzlaOption) optionField.get(null);
-        if (bitwuzlaJNI.bitwuzla_option_is_numeric(pOptions, value.swigValue())) {
+        if (BitwuzlaJNI.bitwuzla_option_is_numeric(pOptions, value.swigValue())) {
           long optionValue = Long.parseLong(option.getValue());
-          bitwuzlaJNI.bitwuzla_set_option(pOptions, value.swigValue(), optionValue);
+          BitwuzlaJNI.bitwuzla_set_option(pOptions, value.swigValue(), optionValue);
         } else {
-          bitwuzlaJNI.bitwuzla_set_option_mode(pOptions, value.swigValue(), option.getValue());
+          BitwuzlaJNI.bitwuzla_set_option_mode(pOptions, value.swigValue(), option.getValue());
         }
       } catch (java.lang.NoSuchFieldException e) {
         throw new InvalidConfigurationException(e.getMessage(), e);

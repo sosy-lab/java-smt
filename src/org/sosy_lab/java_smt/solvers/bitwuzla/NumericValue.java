@@ -25,45 +25,45 @@ public class NumericValue {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        bitwuzlaJNI.delete_NumericValue(swigCPtr);
+        BitwuzlaJNI.delete_NumericValue(swigCPtr);
       }
       swigCPtr = 0;
     }
   }
 
   public void setCur(long value) {
-    bitwuzlaJNI.NumericValue_cur_set(swigCPtr, this, value);
+    BitwuzlaJNI.NumericValue_cur_set(swigCPtr, this, value);
   }
 
   public long getCur() {
-    return bitwuzlaJNI.NumericValue_cur_get(swigCPtr, this);
+    return BitwuzlaJNI.NumericValue_cur_get(swigCPtr, this);
   }
 
   public void setDflt(long value) {
-    bitwuzlaJNI.NumericValue_dflt_set(swigCPtr, this, value);
+    BitwuzlaJNI.NumericValue_dflt_set(swigCPtr, this, value);
   }
 
   public long getDflt() {
-    return bitwuzlaJNI.NumericValue_dflt_get(swigCPtr, this);
+    return BitwuzlaJNI.NumericValue_dflt_get(swigCPtr, this);
   }
 
   public void setMin(long value) {
-    bitwuzlaJNI.NumericValue_min_set(swigCPtr, this, value);
+    BitwuzlaJNI.NumericValue_min_set(swigCPtr, this, value);
   }
 
   public long getMin() {
-    return bitwuzlaJNI.NumericValue_min_get(swigCPtr, this);
+    return BitwuzlaJNI.NumericValue_min_get(swigCPtr, this);
   }
 
   public void setMax(long value) {
-    bitwuzlaJNI.NumericValue_max_set(swigCPtr, this, value);
+    BitwuzlaJNI.NumericValue_max_set(swigCPtr, this, value);
   }
 
   public long getMax() {
-    return bitwuzlaJNI.NumericValue_max_get(swigCPtr, this);
+    return BitwuzlaJNI.NumericValue_max_get(swigCPtr, this);
   }
 
   public NumericValue() {
-    this(bitwuzlaJNI.new_NumericValue(), true);
+    this(BitwuzlaJNI.new_NumericValue(), true);
   }
 }
