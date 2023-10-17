@@ -164,13 +164,9 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
-    int size = assumptions.size();
-    long[] bitwuzlaAssumptions = new long[size];
-    BooleanFormula[] inputAssumptions = assumptions.toArray(BooleanFormula[]::new);
-    for (int i = 0; i < size; i++) {
-      bitwuzlaAssumptions[i] = ((BitwuzlaBooleanFormula) inputAssumptions[i]).getTerm();
-    }
-    final int result = BitwuzlaJNI.bitwuzla_check_sat_assuming(env, size, bitwuzlaAssumptions);
+    long[] ass =
+        assumptions.stream().mapToLong(a -> ((BitwuzlaBooleanFormula) a).getTerm()).toArray();
+    final int result = BitwuzlaJNI.bitwuzla_check_sat_assuming(env, assumptions.size(), ass);
     return readSATResult(result);
   }
 
