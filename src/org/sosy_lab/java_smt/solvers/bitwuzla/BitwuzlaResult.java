@@ -9,12 +9,18 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
  * ----------------------------------------------------------------------------- */
 
 public final class BitwuzlaResult {
+
+  private static int swigNext = 0;
+  private final int swigValue;
+  private final String swigName;
   public static final BitwuzlaResult BITWUZLA_SAT =
-      new BitwuzlaResult("BITWUZLA_SAT", BitwuzlaJNI.BITWUZLA_SAT_get());
+      BitwuzlaResult.of("BITWUZLA_SAT", BitwuzlaJNI.BITWUZLA_SAT_get());
   public static final BitwuzlaResult BITWUZLA_UNSAT =
-      new BitwuzlaResult("BITWUZLA_UNSAT", BitwuzlaJNI.BITWUZLA_UNSAT_get());
+      BitwuzlaResult.of("BITWUZLA_UNSAT", BitwuzlaJNI.BITWUZLA_UNSAT_get());
   public static final BitwuzlaResult BITWUZLA_UNKNOWN =
-      new BitwuzlaResult("BITWUZLA_UNKNOWN", BitwuzlaJNI.BITWUZLA_UNKNOWN_get());
+      BitwuzlaResult.of("BITWUZLA_UNKNOWN", BitwuzlaJNI.BITWUZLA_UNKNOWN_get());
+
+  private static BitwuzlaResult[] swigValues = {BITWUZLA_SAT, BITWUZLA_UNSAT, BITWUZLA_UNKNOWN};
 
   public final int swigValue() {
     return swigValue;
@@ -41,22 +47,14 @@ public final class BitwuzlaResult {
     this.swigValue = swigNext++;
   }
 
-  @SuppressWarnings("StaticAssignmentInConstructor")
   private BitwuzlaResult(String swigName, int swigValue) {
     this.swigName = swigName;
     this.swigValue = swigValue;
-    swigNext = swigValue + 1;
   }
 
-  @SuppressWarnings({"unused", "StaticAssignmentInConstructor"})
-  private BitwuzlaResult(String swigName, BitwuzlaResult swigEnum) {
-    this.swigName = swigName;
-    this.swigValue = swigEnum.swigValue;
-    swigNext = this.swigValue + 1;
+  private static BitwuzlaResult of(String swigName, int swigValue) {
+    BitwuzlaResult res = new BitwuzlaResult(swigName, swigValue);
+    BitwuzlaResult.swigNext = res.swigValue + 1;
+    return res;
   }
-
-  private static BitwuzlaResult[] swigValues = {BITWUZLA_SAT, BITWUZLA_UNSAT, BITWUZLA_UNKNOWN};
-  private static int swigNext = 0;
-  private final int swigValue;
-  private final String swigName;
 }

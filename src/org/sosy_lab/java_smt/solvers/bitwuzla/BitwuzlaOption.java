@@ -9,6 +9,10 @@
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 public final class BitwuzlaOption {
+
+  private static int swigNext = 0;
+  private final int swigValue;
+  private final String swigName;
   public static final BitwuzlaOption BITWUZLA_OPT_LOGLEVEL =
       new BitwuzlaOption("BITWUZLA_OPT_LOGLEVEL");
   public static final BitwuzlaOption BITWUZLA_OPT_PRODUCE_MODELS =
@@ -148,7 +152,4 @@ public final class BitwuzlaOption {
     BITWUZLA_OPT_DBG_CHECK_UNSAT_CORE,
     BITWUZLA_OPT_NUM_OPTS
   };
-  private static int swigNext = 0;
-  private final int swigValue;
-  private final String swigName;
 }
