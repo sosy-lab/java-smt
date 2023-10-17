@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import com.google.common.truth.Truth;
+import java.util.Arrays;
 import org.junit.After;
 import org.junit.AssumptionViolatedException;
 import org.junit.Before;
@@ -546,6 +547,73 @@ public class BitwuzlaNativeApiTest {
     assertEquals("(fp #b0 #b10000 #b1000000000)", aValue);
     assertEquals("(fp #b0 #b01111 #b0000000000)", BitwuzlaJNI.bitwuzla_term_to_string(one));
     assertEquals("(fp #b0 #b10000 #b0000000000)", BitwuzlaJNI.bitwuzla_term_to_string(two));
+  }
+
+  @Test
+  public void testFpToBv() {
+    // A constant (BITWUZLA_KIND_CONSTANT) is both, a variable and a constant value
+    // However a value is also a BITWUZLA_KIND_VALUE, while a variable is not
+    long fpSort = BitwuzlaJNI.bitwuzla_mk_fp_sort(5, 11);
+    long rm = BitwuzlaJNI.bitwuzla_mk_rm_value(BitwuzlaJNI.BITWUZLA_RM_RTZ_get());
+    long a = BitwuzlaJNI.bitwuzla_mk_const(fpSort, "a");
+    long one = BitwuzlaJNI.bitwuzla_mk_fp_from_real(fpSort, rm, "-1");
+    long two = BitwuzlaJNI.bitwuzla_mk_fp_from_real(fpSort, rm, "2");
+
+    long bvOne =
+        BitwuzlaJNI.bitwuzla_mk_term2_indexed1(BitwuzlaKind.BITWUZLA_KIND_FP_TO_SBV.swigValue(),
+            rm, one, 11+5);
+    long bvTwo =
+        BitwuzlaJNI.bitwuzla_mk_term2_indexed1(BitwuzlaKind.BITWUZLA_KIND_FP_TO_SBV.swigValue(),
+            rm, two, 11+5);
+    long add =
+        BitwuzlaJNI.bitwuzla_mk_term3(BitwuzlaKind.BITWUZLA_KIND_FP_ADD.swigValue(), rm, two, one);
+    long eq = BitwuzlaJNI.bitwuzla_mk_term2(BitwuzlaKind.BITWUZLA_KIND_EQUAL.swigValue(), add, a);
+
+    long bvA =
+        BitwuzlaJNI.bitwuzla_mk_term2_indexed1(BitwuzlaKind.BITWUZLA_KIND_FP_TO_SBV.swigValue(),
+            rm, a, 11+5);
+    long bvAdd =
+        BitwuzlaJNI.bitwuzla_mk_term2(BitwuzlaKind.BITWUZLA_KIND_BV_ADD.swigValue(), bvOne, bvTwo);
+    long eqBv = BitwuzlaJNI.bitwuzla_mk_term2(BitwuzlaKind.BITWUZLA_KIND_EQUAL.swigValue(), bvAdd,
+        bvA);
+
+    BitwuzlaJNI.bitwuzla_assert(bitwuzla, eq);
+    BitwuzlaJNI.bitwuzla_assert(bitwuzla, eqBv);
+    long res = BitwuzlaJNI.bitwuzla_check_sat(bitwuzla);
+    assertEquals(res, BitwuzlaResult.BITWUZLA_SAT.swigValue());
+
+
+    String bvAString = BitwuzlaJNI.bitwuzla_term_to_string(
+        BitwuzlaJNI.bitwuzla_get_value(bitwuzla, bvA));
+
+    assertEquals("#b0000000000000001", bvAString);
+    assertEquals("#b1111111111111111", BitwuzlaJNI.bitwuzla_term_to_string(
+        BitwuzlaJNI.bitwuzla_get_value(bitwuzla, bvOne)));
+    assertEquals("#b0000000000000010", BitwuzlaJNI.bitwuzla_term_to_string(
+        BitwuzlaJNI.bitwuzla_get_value(bitwuzla, bvTwo)));
+    // Now test -0.9 to 0 and 0.9 to 0
+    long nearlyMin1 = BitwuzlaJNI.bitwuzla_mk_fp_from_real(fpSort, rm, "-0.9");
+    long nearly1 = BitwuzlaJNI.bitwuzla_mk_fp_from_real(fpSort, rm, "0.9");
+    long bvnearlyMin1 =
+        BitwuzlaJNI.bitwuzla_mk_term2_indexed1(BitwuzlaKind.BITWUZLA_KIND_FP_TO_SBV.swigValue(),
+            rm, nearlyMin1, 11+5);
+    long bvnearly1 =
+        BitwuzlaJNI.bitwuzla_mk_term2_indexed1(BitwuzlaKind.BITWUZLA_KIND_FP_TO_SBV.swigValue(),
+            rm, nearly1, 11+5);
+    long b = BitwuzlaJNI.bitwuzla_mk_const(BitwuzlaJNI.bitwuzla_mk_bv_sort(11+5), "b");
+    long bvAdd2 =
+        BitwuzlaJNI.bitwuzla_mk_term2(BitwuzlaKind.BITWUZLA_KIND_BV_ADD.swigValue(), bvnearlyMin1, bvnearly1);
+    long eqBv2 = BitwuzlaJNI.bitwuzla_mk_term2(BitwuzlaKind.BITWUZLA_KIND_EQUAL.swigValue(), bvAdd2,
+        b);
+
+    BitwuzlaJNI.bitwuzla_assert(bitwuzla, eqBv2);
+    res = BitwuzlaJNI.bitwuzla_check_sat(bitwuzla);
+    assertEquals(res, BitwuzlaResult.BITWUZLA_SAT.swigValue());
+
+    assertEquals("#b0000000000000000", BitwuzlaJNI.bitwuzla_term_to_string(
+        BitwuzlaJNI.bitwuzla_get_value(bitwuzla, bvnearlyMin1)));
+    assertEquals("#b0000000000000000", BitwuzlaJNI.bitwuzla_term_to_string(
+        BitwuzlaJNI.bitwuzla_get_value(bitwuzla, bvnearly1)));
   }
 
   @Test
