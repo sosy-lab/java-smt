@@ -178,7 +178,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
       throws SolverException, InterruptedException {
     int size = assumptions.size();
     long[] bitwuzlaAssumptions = new long[size];
-    BooleanFormula[] inputAssumptions = assumptions.toArray(new BooleanFormula[0]);
+    BooleanFormula[] inputAssumptions = assumptions.toArray(BooleanFormula[]::new);
     for (int i = 0; i < size; i++) {
       bitwuzlaAssumptions[i] = ((BitwuzlaBooleanFormula) inputAssumptions[i]).getTerm();
     }

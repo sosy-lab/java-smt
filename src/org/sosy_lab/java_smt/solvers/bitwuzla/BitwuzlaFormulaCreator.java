@@ -563,7 +563,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Bit
 
   @Override
   public BitwuzlaDeclaration declareUFImpl(String name, Long pReturnType, List<Long> pArgTypes) {
-    if (pArgTypes.size() == 0) {
+    if (pArgTypes.isEmpty()) {
       // Bitwuzla does not support UFs with no args, so we make a variable
       // TODO: implement
       throw new UnsupportedOperationException("Bitwuzla does not support 0 arity UFs.");
