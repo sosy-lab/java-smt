@@ -87,7 +87,7 @@ public final class BitwuzlaOption {
   public static final BitwuzlaOption BITWUZLA_OPT_NUM_OPTS =
       new BitwuzlaOption("BITWUZLA_OPT_NUM_OPTS");
 
-  public final int swigValue() {
+  public int swigValue() {
     return swigValue;
   }
 
@@ -99,9 +99,9 @@ public final class BitwuzlaOption {
   public static BitwuzlaOption swigToEnum(int swigValue) {
     if (swigValue < swigValues.length
         && swigValue >= 0
-        && swigValues[swigValue].swigValue == swigValue) return swigValues[swigValue];
-    for (int i = 0; i < swigValues.length; i++)
-      if (swigValues[i].swigValue == swigValue) return swigValues[i];
+        && swigValues[swigValue].swigValue == swigValue) {return swigValues[swigValue]; }
+    for (int i = 0; i < swigValues.length; i++) {
+      if (swigValues[i].swigValue == swigValue) {return swigValues[i];}}
     throw new IllegalArgumentException(
         "No enum " + BitwuzlaOption.class + " with value " + swigValue);
   }
@@ -150,6 +150,6 @@ public final class BitwuzlaOption {
     BITWUZLA_OPT_DBG_PP_NODE_THRESH,
     BITWUZLA_OPT_DBG_CHECK_MODEL,
     BITWUZLA_OPT_DBG_CHECK_UNSAT_CORE,
-    BITWUZLA_OPT_NUM_OPTS
+    BITWUZLA_OPT_NUM_OPTS,
   };
 }

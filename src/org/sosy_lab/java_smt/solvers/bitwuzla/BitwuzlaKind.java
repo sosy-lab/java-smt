@@ -158,7 +158,7 @@ public final class BitwuzlaKind {
   public static final BitwuzlaKind BITWUZLA_KIND_NUM_KINDS =
       BitwuzlaKind.of("BITWUZLA_KIND_NUM_KINDS");
 
-  public final int swigValue() {
+  public int swigValue() {
     return swigValue;
   }
 
@@ -170,9 +170,9 @@ public final class BitwuzlaKind {
   public static BitwuzlaKind swigToEnum(int swigValue) {
     if (swigValue < swigValues.length
         && swigValue >= 0
-        && swigValues[swigValue].swigValue == swigValue) return swigValues[swigValue];
-    for (int i = 0; i < swigValues.length; i++)
-      if (swigValues[i].swigValue == swigValue) return swigValues[i];
+        && swigValues[swigValue].swigValue == swigValue) {return swigValues[swigValue];}
+    for (int i = 0; i < swigValues.length; i++){
+      if (swigValues[i].swigValue == swigValue) {return swigValues[i];}}
     throw new IllegalArgumentException(
         "No enum " + BitwuzlaKind.class + " with value " + swigValue);
   }
@@ -299,6 +299,6 @@ public final class BitwuzlaKind {
     BITWUZLA_KIND_FP_TO_FP_FROM_UBV,
     BITWUZLA_KIND_FP_TO_SBV,
     BITWUZLA_KIND_FP_TO_UBV,
-    BITWUZLA_KIND_NUM_KINDS
+    BITWUZLA_KIND_NUM_KINDS,
   };
 }

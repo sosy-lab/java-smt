@@ -22,7 +22,7 @@ public final class BitwuzlaResult {
 
   private static BitwuzlaResult[] swigValues = {BITWUZLA_SAT, BITWUZLA_UNSAT, BITWUZLA_UNKNOWN};
 
-  public final int swigValue() {
+  public int swigValue() {
     return swigValue;
   }
 
@@ -34,9 +34,12 @@ public final class BitwuzlaResult {
   public static BitwuzlaResult swigToEnum(int swigValue) {
     if (swigValue < swigValues.length
         && swigValue >= 0
-        && swigValues[swigValue].swigValue == swigValue) return swigValues[swigValue];
-    for (int i = 0; i < swigValues.length; i++)
-      if (swigValues[i].swigValue == swigValue) return swigValues[i];
+        && swigValues[swigValue].swigValue == swigValue) {return swigValues[swigValue];}
+    for (int i = 0; i < swigValues.length; i++) {
+      if (swigValues[i].swigValue == swigValue) {
+        return swigValues[i];
+      }
+    }
     throw new IllegalArgumentException(
         "No enum " + BitwuzlaResult.class + " with value " + swigValue);
   }
