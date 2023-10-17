@@ -47,23 +47,13 @@ public class BitwuzlaArrayFormulaManager
   }
 
   @Override
+  @SuppressWarnings("MethodTypeParameterName")
   protected <TI extends Formula, TE extends Formula> Long internalMakeArray(
       String pName, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
-
-    // Maybe use FormulaCache if tests fail
-    //    Long maybeFormula = formulaCache.get(pName, pIndexType);
-    //    if (maybeFormula != null) {
-    //      return maybeFormula;
-    //    }
-    //    if (formulaCache.containsRow(pName)) {
-    //      throw new IllegalArgumentException("Symbol already used: " + pName);
-    //    }
-
     final ArrayFormulaType<TI, TE> arrayFormulaType =
         FormulaType.getArrayType(pIndexType, pElementType);
     final long bitwuzlaArrayType = toSolverType(arrayFormulaType);
     long newVar = getFormulaCreator().makeVariable(bitwuzlaArrayType, pName);
-    // formulaCache.put(pName, pIndexType, newVar);
     return newVar;
   }
 
