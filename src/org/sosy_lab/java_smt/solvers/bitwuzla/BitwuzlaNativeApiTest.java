@@ -6,7 +6,6 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import com.google.common.truth.Truth;
-import java.util.Arrays;
 import org.junit.After;
 import org.junit.AssumptionViolatedException;
 import org.junit.Before;
