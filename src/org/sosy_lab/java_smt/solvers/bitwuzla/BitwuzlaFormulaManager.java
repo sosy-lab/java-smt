@@ -49,18 +49,18 @@ final class BitwuzlaFormulaManager
     if (s.contains("(exit)")) {
       s = s.replace("(exit)", "");
     }
-    long[] terms = bitwuzlaJNI.parse(s);
+    long[] terms = BitwuzlaJNI.parse(s);
     assert terms != null;
     // AND all the terms
     Long retForm;
     if (terms.length > 1) {
       retForm =
-          bitwuzlaJNI.bitwuzla_mk_term(
+          BitwuzlaJNI.bitwuzla_mk_term(
               BitwuzlaKind.BITWUZLA_KIND_AND.swigValue(), terms.length, terms);
     } else {
       retForm = terms[0];
     }
-    assert bitwuzlaJNI.bitwuzla_term_is_bool(retForm);
+    assert BitwuzlaJNI.bitwuzla_term_is_bool(retForm);
     return super.getFormulaCreator().encapsulateBoolean(retForm);
   }
 
@@ -75,10 +75,10 @@ final class BitwuzlaFormulaManager
       @Override
       public void appendTo(Appendable out) throws IOException {
         long printCtx = getFormulaCreator().getEnv();
-        bitwuzlaJNI.bitwuzla_push(printCtx, 1);
-        bitwuzlaJNI.bitwuzla_assert(printCtx, pTerm);
-        String dump = bitwuzlaJNI.dump_assertions_smt2(printCtx, 10);
-        bitwuzlaJNI.bitwuzla_pop(printCtx, 1);
+        BitwuzlaJNI.bitwuzla_push(printCtx, 1);
+        BitwuzlaJNI.bitwuzla_assert(printCtx, pTerm);
+        String dump = BitwuzlaJNI.dump_assertions_smt2(printCtx, 10);
+        BitwuzlaJNI.bitwuzla_pop(printCtx, 1);
         // Bitwuzla prints (check-sat)\n(exit)\n in the end. We remove that.
         if (dump.contains("(check-sat)\n")) {
           dump = dump.replace("(check-sat)", "");

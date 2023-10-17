@@ -42,8 +42,8 @@ public class BitwuzlaBitvectorFormulaManager
   @Override
   protected Long makeBitvectorImpl(int length, BigInteger pI) {
     pI = transformValueToRange(length, pI);
-    long sort = bitwuzlaJNI.bitwuzla_mk_bv_sort(length);
-    return bitwuzlaJNI.bitwuzla_mk_bv_value(sort, pI.toString(), 10);
+    long sort = BitwuzlaJNI.bitwuzla_mk_bv_sort(length);
+    return BitwuzlaJNI.bitwuzla_mk_bv_value(sort, pI.toString(), 10);
   }
 
   @Override
@@ -53,28 +53,28 @@ public class BitwuzlaBitvectorFormulaManager
 
   @Override
   protected Long negate(Long pParam1) {
-    return bitwuzlaJNI.bitwuzla_mk_term1(BitwuzlaKind.BITWUZLA_KIND_BV_NOT.swigValue(), pParam1);
+    return BitwuzlaJNI.bitwuzla_mk_term1(BitwuzlaKind.BITWUZLA_KIND_BV_NOT.swigValue(), pParam1);
   }
 
   @Override
   protected Long add(Long pParam1, Long pParam2) {
-    return bitwuzlaJNI.bitwuzla_mk_term2(
+    return BitwuzlaJNI.bitwuzla_mk_term2(
         BitwuzlaKind.BITWUZLA_KIND_BV_ADD.swigValue(), pParam1, pParam2);
   }
 
   @Override
   protected Long subtract(Long pParam1, Long pParam2) {
-    return bitwuzlaJNI.bitwuzla_mk_term2(
+    return BitwuzlaJNI.bitwuzla_mk_term2(
         BitwuzlaKind.BITWUZLA_KIND_BV_SUB.swigValue(), pParam1, pParam2);
   }
 
   @Override
   protected Long divide(Long pParam1, Long pParam2, boolean signed) {
     if (signed) {
-      return bitwuzlaJNI.bitwuzla_mk_term2(
+      return BitwuzlaJNI.bitwuzla_mk_term2(
           BitwuzlaKind.BITWUZLA_KIND_BV_SDIV.swigValue(), pParam1, pParam2);
     } else {
-      return bitwuzlaJNI.bitwuzla_mk_term2(
+      return BitwuzlaJNI.bitwuzla_mk_term2(
           BitwuzlaKind.BITWUZLA_KIND_BV_UDIV.swigValue(), pParam1, pParam2);
     }
   }
@@ -82,33 +82,33 @@ public class BitwuzlaBitvectorFormulaManager
   @Override
   protected Long modulo(Long pParam1, Long pParam2, boolean signed) {
     if (signed) {
-      return bitwuzlaJNI.bitwuzla_mk_term2(
+      return BitwuzlaJNI.bitwuzla_mk_term2(
           BitwuzlaKind.BITWUZLA_KIND_BV_SREM.swigValue(), pParam1, pParam2);
     } else {
-      return bitwuzlaJNI.bitwuzla_mk_term2(
+      return BitwuzlaJNI.bitwuzla_mk_term2(
           BitwuzlaKind.BITWUZLA_KIND_BV_UREM.swigValue(), pParam1, pParam2);
     }
   }
 
   @Override
   protected Long multiply(Long pParam1, Long pParam2) {
-    return bitwuzlaJNI.bitwuzla_mk_term2(
+    return BitwuzlaJNI.bitwuzla_mk_term2(
         BitwuzlaKind.BITWUZLA_KIND_BV_MUL.swigValue(), pParam1, pParam2);
   }
 
   @Override
   protected Long equal(Long pParam1, Long pParam2) {
-    return bitwuzlaJNI.bitwuzla_mk_term2(
+    return BitwuzlaJNI.bitwuzla_mk_term2(
         BitwuzlaKind.BITWUZLA_KIND_EQUAL.swigValue(), pParam1, pParam2);
   }
 
   @Override
   protected Long greaterThan(Long pParam1, Long pParam2, boolean signed) {
     if (signed) {
-      return bitwuzlaJNI.bitwuzla_mk_term2(
+      return BitwuzlaJNI.bitwuzla_mk_term2(
           BitwuzlaKind.BITWUZLA_KIND_BV_SGT.swigValue(), pParam1, pParam2);
     } else {
-      return bitwuzlaJNI.bitwuzla_mk_term2(
+      return BitwuzlaJNI.bitwuzla_mk_term2(
           BitwuzlaKind.BITWUZLA_KIND_BV_UGT.swigValue(), pParam1, pParam2);
     }
   }
@@ -116,10 +116,10 @@ public class BitwuzlaBitvectorFormulaManager
   @Override
   protected Long greaterOrEquals(Long pParam1, Long pParam2, boolean signed) {
     if (signed) {
-      return bitwuzlaJNI.bitwuzla_mk_term2(
+      return BitwuzlaJNI.bitwuzla_mk_term2(
           BitwuzlaKind.BITWUZLA_KIND_BV_SGE.swigValue(), pParam1, pParam2);
     } else {
-      return bitwuzlaJNI.bitwuzla_mk_term2(
+      return BitwuzlaJNI.bitwuzla_mk_term2(
           BitwuzlaKind.BITWUZLA_KIND_BV_UGE.swigValue(), pParam1, pParam2);
     }
   }
@@ -127,10 +127,10 @@ public class BitwuzlaBitvectorFormulaManager
   @Override
   protected Long lessThan(Long pParam1, Long pParam2, boolean signed) {
     if (signed) {
-      return bitwuzlaJNI.bitwuzla_mk_term2(
+      return BitwuzlaJNI.bitwuzla_mk_term2(
           BitwuzlaKind.BITWUZLA_KIND_BV_SLT.swigValue(), pParam1, pParam2);
     } else {
-      return bitwuzlaJNI.bitwuzla_mk_term2(
+      return BitwuzlaJNI.bitwuzla_mk_term2(
           BitwuzlaKind.BITWUZLA_KIND_BV_ULT.swigValue(), pParam1, pParam2);
     }
   }
@@ -138,79 +138,79 @@ public class BitwuzlaBitvectorFormulaManager
   @Override
   protected Long lessOrEquals(Long pParam1, Long pParam2, boolean signed) {
     if (signed) {
-      return bitwuzlaJNI.bitwuzla_mk_term2(
+      return BitwuzlaJNI.bitwuzla_mk_term2(
           BitwuzlaKind.BITWUZLA_KIND_BV_SLE.swigValue(), pParam1, pParam2);
     } else {
-      return bitwuzlaJNI.bitwuzla_mk_term2(
+      return BitwuzlaJNI.bitwuzla_mk_term2(
           BitwuzlaKind.BITWUZLA_KIND_BV_ULE.swigValue(), pParam1, pParam2);
     }
   }
 
   @Override
   protected Long not(Long pParam1) {
-    return bitwuzlaJNI.bitwuzla_mk_term1(BitwuzlaKind.BITWUZLA_KIND_BV_NOT.swigValue(), pParam1);
+    return BitwuzlaJNI.bitwuzla_mk_term1(BitwuzlaKind.BITWUZLA_KIND_BV_NOT.swigValue(), pParam1);
   }
 
   @Override
   protected Long and(Long pParam1, Long pParam2) {
-    return bitwuzlaJNI.bitwuzla_mk_term2(
+    return BitwuzlaJNI.bitwuzla_mk_term2(
         BitwuzlaKind.BITWUZLA_KIND_BV_AND.swigValue(), pParam1, pParam2);
   }
 
   @Override
   protected Long or(Long pParam1, Long pParam2) {
-    return bitwuzlaJNI.bitwuzla_mk_term2(
+    return BitwuzlaJNI.bitwuzla_mk_term2(
         BitwuzlaKind.BITWUZLA_KIND_BV_OR.swigValue(), pParam1, pParam2);
   }
 
   @Override
   protected Long xor(Long pParam1, Long pParam2) {
-    return bitwuzlaJNI.bitwuzla_mk_term2(
+    return BitwuzlaJNI.bitwuzla_mk_term2(
         BitwuzlaKind.BITWUZLA_KIND_BV_XOR.swigValue(), pParam1, pParam2);
   }
 
   @Override
   protected Long makeVariableImpl(int pLength, String pVar) {
-    long sort = bitwuzlaJNI.bitwuzla_mk_bv_sort(pLength);
+    long sort = BitwuzlaJNI.bitwuzla_mk_bv_sort(pLength);
     return getFormulaCreator().makeVariable(sort, pVar);
   }
 
   @Override
   protected Long shiftRight(Long pNumber, Long toShift, boolean signed) {
     if (signed) {
-      return bitwuzlaJNI.bitwuzla_mk_term2(
+      return BitwuzlaJNI.bitwuzla_mk_term2(
           BitwuzlaKind.BITWUZLA_KIND_BV_ASHR.swigValue(), pNumber, toShift);
     } else {
-      return bitwuzlaJNI.bitwuzla_mk_term2(
+      return BitwuzlaJNI.bitwuzla_mk_term2(
           BitwuzlaKind.BITWUZLA_KIND_BV_SHR.swigValue(), pNumber, toShift);
     }
   }
 
   @Override
   protected Long shiftLeft(Long pNumber, Long toShift) {
-    return bitwuzlaJNI.bitwuzla_mk_term2(
+    return BitwuzlaJNI.bitwuzla_mk_term2(
         BitwuzlaKind.BITWUZLA_KIND_BV_SHL.swigValue(), pNumber, toShift);
   }
 
   @Override
   protected Long concat(Long number, Long pAppend) {
-    return bitwuzlaJNI.bitwuzla_mk_term2(
+    return BitwuzlaJNI.bitwuzla_mk_term2(
         BitwuzlaKind.BITWUZLA_KIND_BV_CONCAT.swigValue(), number, pAppend);
   }
 
   @Override
   protected Long extract(Long pNumber, int pMsb, int pLsb) {
-    return bitwuzlaJNI.bitwuzla_mk_term1_indexed2(
+    return BitwuzlaJNI.bitwuzla_mk_term1_indexed2(
         BitwuzlaKind.BITWUZLA_KIND_BV_EXTRACT.swigValue(), pNumber, pMsb, pLsb);
   }
 
   @Override
   protected Long extend(Long pNumber, int pExtensionBits, boolean pSigned) {
     if (pSigned) {
-      return bitwuzlaJNI.bitwuzla_mk_term1_indexed1(
+      return BitwuzlaJNI.bitwuzla_mk_term1_indexed1(
           BitwuzlaKind.BITWUZLA_KIND_BV_SIGN_EXTEND.swigValue(), pNumber, pExtensionBits);
     } else {
-      return bitwuzlaJNI.bitwuzla_mk_term1_indexed1(
+      return BitwuzlaJNI.bitwuzla_mk_term1_indexed1(
           BitwuzlaKind.BITWUZLA_KIND_BV_ZERO_EXTEND.swigValue(), pNumber, pExtensionBits);
     }
   }

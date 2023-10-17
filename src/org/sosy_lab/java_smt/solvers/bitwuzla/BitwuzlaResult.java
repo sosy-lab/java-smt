@@ -10,11 +10,11 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 public final class BitwuzlaResult {
   public static final BitwuzlaResult BITWUZLA_SAT =
-      new BitwuzlaResult("BITWUZLA_SAT", bitwuzlaJNI.BITWUZLA_SAT_get());
+      new BitwuzlaResult("BITWUZLA_SAT", BitwuzlaJNI.BITWUZLA_SAT_get());
   public static final BitwuzlaResult BITWUZLA_UNSAT =
-      new BitwuzlaResult("BITWUZLA_UNSAT", bitwuzlaJNI.BITWUZLA_UNSAT_get());
+      new BitwuzlaResult("BITWUZLA_UNSAT", BitwuzlaJNI.BITWUZLA_UNSAT_get());
   public static final BitwuzlaResult BITWUZLA_UNKNOWN =
-      new BitwuzlaResult("BITWUZLA_UNKNOWN", bitwuzlaJNI.BITWUZLA_UNKNOWN_get());
+      new BitwuzlaResult("BITWUZLA_UNKNOWN", BitwuzlaJNI.BITWUZLA_UNKNOWN_get());
 
   public final int swigValue() {
     return swigValue;

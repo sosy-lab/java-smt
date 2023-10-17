@@ -10,7 +10,7 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 public final class BitwuzlaKind {
   public static final BitwuzlaKind BITWUZLA_KIND_CONSTANT =
-      new BitwuzlaKind("BITWUZLA_KIND_CONSTANT", bitwuzlaJNI.BITWUZLA_KIND_CONSTANT_get());
+      new BitwuzlaKind("BITWUZLA_KIND_CONSTANT", BitwuzlaJNI.BITWUZLA_KIND_CONSTANT_get());
   public static final BitwuzlaKind BITWUZLA_KIND_CONST_ARRAY =
       new BitwuzlaKind("BITWUZLA_KIND_CONST_ARRAY");
   public static final BitwuzlaKind BITWUZLA_KIND_VALUE = new BitwuzlaKind("BITWUZLA_KIND_VALUE");

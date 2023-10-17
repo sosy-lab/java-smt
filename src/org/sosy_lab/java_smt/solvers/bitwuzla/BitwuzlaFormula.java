@@ -31,7 +31,7 @@ abstract class BitwuzlaFormula implements Formula {
    */
   @Override
   public String toString() {
-    return bitwuzlaJNI.bitwuzla_term_to_string(this.bitwuzlaTerm);
+    return BitwuzlaJNI.bitwuzla_term_to_string(this.bitwuzlaTerm);
   }
 
   /**
@@ -57,7 +57,7 @@ abstract class BitwuzlaFormula implements Formula {
   @Override
   public int hashCode() {
     // In this case, the long returned by the JNI is not a pointer, but the value itself.
-    return (int) bitwuzlaJNI.bitwuzla_term_hash(bitwuzlaTerm);
+    return (int) BitwuzlaJNI.bitwuzla_term_hash(bitwuzlaTerm);
   }
 
   @Immutable
