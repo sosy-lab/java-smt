@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.ArrayFormula;
@@ -71,7 +72,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
   // private static final Pattern FLOATING_POINT_PATTERN = Pattern.compile("^\\(fp #b(?<sign>\\d)
   // #b(?<exp>\\d+) #b(?<mant>\\d+)$");
 
-  private final Map<String, Term> variablesCache = new HashMap<>();
+  private final static Map<String, Map<Sort, Term>> variablesCache = new HashMap<>();
   private final Map<String, Term> functionsCache = new HashMap<>();
   private final Solver solver;
 
@@ -88,15 +89,25 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
 
   @Override
   public Term makeVariable(Sort sort, String name) {
-    checkSymbol(name);
-    Term exp = variablesCache.computeIfAbsent(name, n -> solver.mkConst(sort, name));
-    Preconditions.checkArgument(
-        sort.equals(exp.getSort()),
-        "symbol name %s with sort %s already in use for different sort %s",
-        name,
-        sort,
-        exp.getSort());
-    return exp;
+    Map<Sort, Term> varOcc = variablesCache.get(name);
+    if (varOcc == null) {
+      Term newVar = solver.mkConst(sort, name);
+      Map<Sort, Term> newVarSortTerm = new HashMap<>();
+      newVarSortTerm.put(sort, newVar);
+      variablesCache.put(name, newVarSortTerm);
+      return newVar;
+    }
+
+    Set<Sort> varTypes = varOcc.keySet();
+    for (Sort varTyp : varTypes) {
+      if (varTyp.equals(sort)) {
+        return varOcc.get(varTyp);
+      }
+    }
+    Term newVar = solver.mkConst(sort, name);
+    varOcc.put(sort, newVar);
+    variablesCache.replace(name, varOcc);
+    return newVar;
   }
 
   /**
@@ -391,7 +402,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
         // BOUND vars are used for all vars that are bound to a quantifier in CVC5.
         // We resubstitute them back to the original free.
         // CVC5 doesn't give you the de-brujin index
-        Term originalVar = variablesCache.get(dequote(formula.toString()));
+        Term originalVar = accessVariablesCache(formula.toString(), sort);
         return visitor.visitBoundVariable(encapsulate(originalVar), 0);
 
       } else if (f.getKind() == Kind.FORALL || f.getKind() == Kind.EXISTS) {
@@ -401,7 +412,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
         List<Formula> freeVars = new ArrayList<>();
         for (Term boundVar : f.getChild(0)) { // unpack grand-children of f.
           String name = getName(boundVar);
-          Term freeVar = Preconditions.checkNotNull(variablesCache.get(name));
+          Term freeVar = Preconditions.checkNotNull(accessVariablesCache(name, boundVar.getSort()));
           body = body.substitute(boundVar, freeVar);
           freeVars.add(encapsulate(freeVar));
         }
@@ -828,5 +839,18 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
               value, valueType, type),
           e);
     }
+  }
+
+  private Term accessVariablesCache(String name, Sort type) {
+    Map<Sort, Term> currVarOcc = variablesCache.get(name);
+    if (currVarOcc == null) {
+      return null;
+    }
+    for (Sort varType : currVarOcc.keySet()) {// with get: only null gets returned
+      if (varType.equals(type)) {
+        return currVarOcc.get(varType);
+      }
+    }
+    return null;
   }
 }

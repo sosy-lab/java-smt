@@ -1176,8 +1176,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
           Solvers.MATHSAT5,
           Solvers.CVC4,
           Solvers.BOOLECTOR,
-          Solvers.YICES2,
-          Solvers.CVC5);
+          Solvers.YICES2);
   private static final ImmutableSet<Solvers> VAR_AND_UF_TRACKING_SOLVERS =
       ImmutableSet.of(Solvers.SMTINTERPOL, Solvers.MATHSAT5, Solvers.BOOLECTOR, Solvers.YICES2);
 
