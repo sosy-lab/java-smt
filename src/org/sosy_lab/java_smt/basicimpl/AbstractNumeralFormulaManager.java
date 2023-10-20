@@ -24,7 +24,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormulaManager;
-import org.sosy_lab.java_smt.utils.NumeralGenerator;
+import org.sosy_lab.java_smt.utils.Generators.NumeralGenerator;
 
 /**
  * Similar to the other Abstract*FormulaManager classes in this package, this class serves as a

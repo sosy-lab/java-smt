@@ -18,15 +18,12 @@
  *  limitations under the License.
  */
 
-package org.sosy_lab.java_smt.utils;
+package org.sosy_lab.java_smt.utils.Generators;
 
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
-import org.sosy_lab.java_smt.api.ArrayFormula;
-import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;

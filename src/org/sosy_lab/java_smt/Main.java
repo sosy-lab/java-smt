@@ -18,56 +18,26 @@ package org.sosy_lab.java_smt;/*
  *  limitations under the License.
  */
 
-import com.google.common.collect.ImmutableList;
-import java.util.ArrayList;
-import java.util.List;
-import org.sosy_lab.common.*;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
 import org.sosy_lab.common.configuration.*;
-import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.*;
-import org.sosy_lab.common.log.*;
 import java.io.*;
-import org.sosy_lab.java_smt.utils.Generator;
+import org.sosy_lab.java_smt.utils.Parsers.*;
+import org.sosy_lab.java_smt.utils.Parsers.smtlibv2Parser.StartContext;
 
 public class Main {
   public static void main(String[] args)
       throws InvalidConfigurationException, InterruptedException, IOException, SolverException {
-    String[] cmdLineArguments = new String[1];
-    cmdLineArguments[0] = "--solver.generateSMTLIB2=true";
-    Configuration config = Configuration.fromCmdLineArguments(cmdLineArguments);
-    LogManager logger = BasicLogManager.create(config);
-    ShutdownManager shutdown = ShutdownManager.create();
-    SolverContext context =
-        SolverContextFactory.createSolverContext(config, logger, shutdown.getNotifier(),
-            Solvers.PRINCESS);
-    FormulaManager fmgr = context.getFormulaManager();
-    BooleanFormulaManager bmgr = fmgr.getBooleanFormulaManager();
-    IntegerFormulaManager imgr = fmgr.getIntegerFormulaManager();
-    BitvectorFormulaManager bimgr = fmgr.getBitvectorFormulaManager();
-    UFManager umgr =  fmgr.getUFManager();
 
-    BitvectorFormula a = bimgr.makeBitvector(3, 5);
-    BitvectorFormula b = bimgr.makeBitvector(3, -2);
-    BitvectorFormula c = bimgr.makeVariable(3, "c");
+    smtlibv2Lexer lexer = new smtlibv2Lexer(CharStreams.fromString("(declare-const p Bool)\n"
+        + "(assert (and p (or p (and p p))))"));
+    smtlibv2Parser parser = new smtlibv2Parser(new CommonTokenStream(lexer));
 
+    StartContext tree = parser.start();
+    Visitor visitor = new Visitor();
+    visitor.visit(tree);
 
-    BooleanFormula constraint = bimgr.equal(c, bimgr.add(a, b));
-
-    try (ProverEnvironment prover =
-             context.newProverEnvironment(SolverContext.ProverOptions.GENERATE_MODELS)) {
-      prover.addConstraint(constraint);
-
-      boolean isUnsat = prover.isUnsat();
-      if (!isUnsat) {
-        Model model = prover.getModel();
-        Object value = model.evaluate(c);
-        System.out.println(value);
-
-      }
-      Generator.dumpSMTLIB2();
-    } catch (SolverException e) {
-      throw new RuntimeException(e);
-    }
 
   }
 }

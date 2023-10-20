@@ -1,6 +1,3 @@
 (set-logic AUFLIRA)
-(declare-const c (_ BitVec 3))
-(assert (= c (bvadd #b101 #b110)))
 (check-sat)
-(get-value (c))
 (exit)

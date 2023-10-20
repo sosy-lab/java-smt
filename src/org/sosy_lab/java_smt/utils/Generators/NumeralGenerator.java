@@ -18,11 +18,10 @@
  *  limitations under the License.
  */
 
-package org.sosy_lab.java_smt.utils;
+package org.sosy_lab.java_smt.utils.Generators;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.function.Function;
 import org.sosy_lab.java_smt.api.NumeralFormula;

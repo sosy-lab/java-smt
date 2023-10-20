@@ -1,19 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<!--
-This file is part of JavaSMT,
-an API wrapper for a collection of SMT solvers:
-https://github.com/sosy-lab/java-smt
-
-SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
-
-SPDX-License-Identifier: Apache-2.0
--->
-
 <project version="4">
   <component name="CompilerConfiguration">
-    <option name="DEFAULT_COMPILER" value="Javac" />
-    <resourceExtensions />
+    <excludeFromCompile>
+      <directory url="file://$PROJECT_DIR$/../Julian_Thome/TestSMTLIB2Grammar/src/main/resources/archetype-resources" includeSubdirectories="true" />
+    </excludeFromCompile>
     <wildcardResourcePatterns>
       <entry name="!?*.java" />
       <entry name="!?*.form" />
@@ -25,9 +15,15 @@ SPDX-License-Identifier: Apache-2.0
       <entry name="!?*.clj" />
     </wildcardResourcePatterns>
     <annotationProcessing>
-      <profile default="true" name="Default" enabled="false">
-        <processorPath useClasspath="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="smtlibv2-grammar" target="1.8" />
+      <module name="Test_Grammar" target="16" />
+    </bytecodeTargetLevel>
   </component>
 </project>

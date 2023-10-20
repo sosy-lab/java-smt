@@ -18,7 +18,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.UFManager;
-import org.sosy_lab.java_smt.utils.UFGenerator;
+import org.sosy_lab.java_smt.utils.Generators.UFGenerator;
 
 /**
  * This class simplifies the implementation of the FunctionFormulaManager by converting the types to

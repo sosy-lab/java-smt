@@ -15,7 +15,6 @@ import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -26,7 +25,7 @@ import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
-import org.sosy_lab.java_smt.utils.Generator;
+import org.sosy_lab.java_smt.utils.Generators.Generator;
 
 public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 

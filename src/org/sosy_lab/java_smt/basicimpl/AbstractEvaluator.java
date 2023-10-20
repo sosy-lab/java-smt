@@ -21,7 +21,7 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.StringFormula;
-import org.sosy_lab.java_smt.utils.Generator;
+import org.sosy_lab.java_smt.utils.Generators.Generator;
 
 @SuppressWarnings("ClassTypeParameterName")
 public abstract class AbstractEvaluator<TFormulaInfo, TType, TEnv> implements Evaluator {

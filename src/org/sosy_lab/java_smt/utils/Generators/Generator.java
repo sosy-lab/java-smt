@@ -18,7 +18,7 @@
  *  limitations under the License.
  */
 
-package org.sosy_lab.java_smt.utils;
+package org.sosy_lab.java_smt.utils.Generators;
 
 
 import java.io.File;
@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 

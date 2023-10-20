@@ -16,8 +16,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
-import org.sosy_lab.java_smt.utils.ArrayGenerator;
-import org.sosy_lab.java_smt.utils.Generator;
+import org.sosy_lab.java_smt.utils.Generators.ArrayGenerator;
 
 @SuppressWarnings({"ClassTypeParameterName", "MethodTypeParameterName"})
 public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>

@@ -22,9 +22,9 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.java_smt.utils.BitvectorGenerator;
-import org.sosy_lab.java_smt.utils.BooleanGenerator;
-import org.sosy_lab.java_smt.utils.NumeralGenerator;
+import org.sosy_lab.java_smt.utils.Generators.BitvectorGenerator;
+import org.sosy_lab.java_smt.utils.Generators.BooleanGenerator;
+import org.sosy_lab.java_smt.utils.Generators.NumeralGenerator;
 
 @SuppressWarnings("ClassTypeParameterName")
 public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>

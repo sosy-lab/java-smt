@@ -40,7 +40,7 @@ import org.sosy_lab.java_smt.api.visitors.BooleanFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
-import org.sosy_lab.java_smt.utils.BooleanGenerator;
+import org.sosy_lab.java_smt.utils.Generators.BooleanGenerator;
 
 @SuppressWarnings("ClassTypeParameterName")
 public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>

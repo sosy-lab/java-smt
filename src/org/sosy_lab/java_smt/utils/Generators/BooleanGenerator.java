@@ -18,7 +18,7 @@
  *  limitations under the License.
  */
 
-package org.sosy_lab.java_smt.utils;
+package org.sosy_lab.java_smt.utils.Generators;
 
 import java.util.ArrayList;
 import java.util.Collection;
