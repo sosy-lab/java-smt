@@ -20,12 +20,14 @@
 
 package org.sosy_lab.java_smt.utils.Parsers;
 
+import org.sosy_lab.java_smt.api.BooleanFormula;
+
 public class ParserFormula {
 
   String type;
-  Object javaSmt;
+  BooleanFormula javaSmt;
 
-  public ParserFormula(String pType, Object pJavaSmt) {
+  public ParserFormula(String pType, BooleanFormula pJavaSmt) {
     type = pType;
     javaSmt = pJavaSmt;
   }
@@ -42,7 +44,7 @@ public class ParserFormula {
     return javaSmt;
   }
 
-  public void setJavaSmt(Object pJavaSmt) {
+  public void setJavaSmt(BooleanFormula pJavaSmt) {
     javaSmt = pJavaSmt;
   }
 }

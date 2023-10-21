@@ -8,15 +8,53 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
  */
 public interface smtlibv2Listener extends ParseTreeListener {
 	/**
-	 * Enter a parse tree produced by {@link smtlibv2Parser#start}.
+	 * Enter a parse tree produced by the {@code start_logic}
+	 * labeled alternative in {@link smtlibv2Parser#start}.
 	 * @param ctx the parse tree
 	 */
-	void enterStart(smtlibv2Parser.StartContext ctx);
+	void enterStart_logic(smtlibv2Parser.Start_logicContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link smtlibv2Parser#start}.
+	 * Exit a parse tree produced by the {@code start_logic}
+	 * labeled alternative in {@link smtlibv2Parser#start}.
 	 * @param ctx the parse tree
 	 */
-	void exitStart(smtlibv2Parser.StartContext ctx);
+	void exitStart_logic(smtlibv2Parser.Start_logicContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code start_theory}
+	 * labeled alternative in {@link smtlibv2Parser#start}.
+	 * @param ctx the parse tree
+	 */
+	void enterStart_theory(smtlibv2Parser.Start_theoryContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code start_theory}
+	 * labeled alternative in {@link smtlibv2Parser#start}.
+	 * @param ctx the parse tree
+	 */
+	void exitStart_theory(smtlibv2Parser.Start_theoryContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code start_script}
+	 * labeled alternative in {@link smtlibv2Parser#start}.
+	 * @param ctx the parse tree
+	 */
+	void enterStart_script(smtlibv2Parser.Start_scriptContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code start_script}
+	 * labeled alternative in {@link smtlibv2Parser#start}.
+	 * @param ctx the parse tree
+	 */
+	void exitStart_script(smtlibv2Parser.Start_scriptContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code start_gen_resp}
+	 * labeled alternative in {@link smtlibv2Parser#start}.
+	 * @param ctx the parse tree
+	 */
+	void enterStart_gen_resp(smtlibv2Parser.Start_gen_respContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code start_gen_resp}
+	 * labeled alternative in {@link smtlibv2Parser#start}.
+	 * @param ctx the parse tree
+	 */
+	void exitStart_gen_resp(smtlibv2Parser.Start_gen_respContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link smtlibv2Parser#generalReservedWord}.
 	 * @param ctx the parse tree
@@ -28,15 +66,29 @@ public interface smtlibv2Listener extends ParseTreeListener {
 	 */
 	void exitGeneralReservedWord(smtlibv2Parser.GeneralReservedWordContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link smtlibv2Parser#simpleSymbol}.
+	 * Enter a parse tree produced by the {@code simp_pre_symb}
+	 * labeled alternative in {@link smtlibv2Parser#simpleSymbol}.
 	 * @param ctx the parse tree
 	 */
-	void enterSimpleSymbol(smtlibv2Parser.SimpleSymbolContext ctx);
+	void enterSimp_pre_symb(smtlibv2Parser.Simp_pre_symbContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link smtlibv2Parser#simpleSymbol}.
+	 * Exit a parse tree produced by the {@code simp_pre_symb}
+	 * labeled alternative in {@link smtlibv2Parser#simpleSymbol}.
 	 * @param ctx the parse tree
 	 */
-	void exitSimpleSymbol(smtlibv2Parser.SimpleSymbolContext ctx);
+	void exitSimp_pre_symb(smtlibv2Parser.Simp_pre_symbContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code simp_undef_symb}
+	 * labeled alternative in {@link smtlibv2Parser#simpleSymbol}.
+	 * @param ctx the parse tree
+	 */
+	void enterSimp_undef_symb(smtlibv2Parser.Simp_undef_symbContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code simp_undef_symb}
+	 * labeled alternative in {@link smtlibv2Parser#simpleSymbol}.
+	 * @param ctx the parse tree
+	 */
+	void exitSimp_undef_symb(smtlibv2Parser.Simp_undef_symbContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link smtlibv2Parser#quotedSymbol}.
 	 * @param ctx the parse tree
@@ -68,15 +120,29 @@ public interface smtlibv2Listener extends ParseTreeListener {
 	 */
 	void exitPredefKeyword(smtlibv2Parser.PredefKeywordContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link smtlibv2Parser#symbol}.
+	 * Enter a parse tree produced by the {@code simpsymb}
+	 * labeled alternative in {@link smtlibv2Parser#symbol}.
 	 * @param ctx the parse tree
 	 */
-	void enterSymbol(smtlibv2Parser.SymbolContext ctx);
+	void enterSimpsymb(smtlibv2Parser.SimpsymbContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link smtlibv2Parser#symbol}.
+	 * Exit a parse tree produced by the {@code simpsymb}
+	 * labeled alternative in {@link smtlibv2Parser#symbol}.
 	 * @param ctx the parse tree
 	 */
-	void exitSymbol(smtlibv2Parser.SymbolContext ctx);
+	void exitSimpsymb(smtlibv2Parser.SimpsymbContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code quotsymb}
+	 * labeled alternative in {@link smtlibv2Parser#symbol}.
+	 * @param ctx the parse tree
+	 */
+	void enterQuotsymb(smtlibv2Parser.QuotsymbContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code quotsymb}
+	 * labeled alternative in {@link smtlibv2Parser#symbol}.
+	 * @param ctx the parse tree
+	 */
+	void exitQuotsymb(smtlibv2Parser.QuotsymbContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link smtlibv2Parser#numeral}.
 	 * @param ctx the parse tree
@@ -128,95 +194,293 @@ public interface smtlibv2Listener extends ParseTreeListener {
 	 */
 	void exitString(smtlibv2Parser.StringContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link smtlibv2Parser#keyword}.
+	 * Enter a parse tree produced by the {@code pre_key}
+	 * labeled alternative in {@link smtlibv2Parser#keyword}.
 	 * @param ctx the parse tree
 	 */
-	void enterKeyword(smtlibv2Parser.KeywordContext ctx);
+	void enterPre_key(smtlibv2Parser.Pre_keyContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link smtlibv2Parser#keyword}.
+	 * Exit a parse tree produced by the {@code pre_key}
+	 * labeled alternative in {@link smtlibv2Parser#keyword}.
 	 * @param ctx the parse tree
 	 */
-	void exitKeyword(smtlibv2Parser.KeywordContext ctx);
+	void exitPre_key(smtlibv2Parser.Pre_keyContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link smtlibv2Parser#spec_constant}.
+	 * Enter a parse tree produced by the {@code key_simsymb}
+	 * labeled alternative in {@link smtlibv2Parser#keyword}.
 	 * @param ctx the parse tree
 	 */
-	void enterSpec_constant(smtlibv2Parser.Spec_constantContext ctx);
+	void enterKey_simsymb(smtlibv2Parser.Key_simsymbContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link smtlibv2Parser#spec_constant}.
+	 * Exit a parse tree produced by the {@code key_simsymb}
+	 * labeled alternative in {@link smtlibv2Parser#keyword}.
 	 * @param ctx the parse tree
 	 */
-	void exitSpec_constant(smtlibv2Parser.Spec_constantContext ctx);
+	void exitKey_simsymb(smtlibv2Parser.Key_simsymbContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link smtlibv2Parser#s_expr}.
+	 * Enter a parse tree produced by the {@code spec_constant_num}
+	 * labeled alternative in {@link smtlibv2Parser#spec_constant}.
 	 * @param ctx the parse tree
 	 */
-	void enterS_expr(smtlibv2Parser.S_exprContext ctx);
+	void enterSpec_constant_num(smtlibv2Parser.Spec_constant_numContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link smtlibv2Parser#s_expr}.
+	 * Exit a parse tree produced by the {@code spec_constant_num}
+	 * labeled alternative in {@link smtlibv2Parser#spec_constant}.
 	 * @param ctx the parse tree
 	 */
-	void exitS_expr(smtlibv2Parser.S_exprContext ctx);
+	void exitSpec_constant_num(smtlibv2Parser.Spec_constant_numContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link smtlibv2Parser#index}.
+	 * Enter a parse tree produced by the {@code spec_constant_dec}
+	 * labeled alternative in {@link smtlibv2Parser#spec_constant}.
 	 * @param ctx the parse tree
 	 */
-	void enterIndex(smtlibv2Parser.IndexContext ctx);
+	void enterSpec_constant_dec(smtlibv2Parser.Spec_constant_decContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link smtlibv2Parser#index}.
+	 * Exit a parse tree produced by the {@code spec_constant_dec}
+	 * labeled alternative in {@link smtlibv2Parser#spec_constant}.
 	 * @param ctx the parse tree
 	 */
-	void exitIndex(smtlibv2Parser.IndexContext ctx);
+	void exitSpec_constant_dec(smtlibv2Parser.Spec_constant_decContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link smtlibv2Parser#identifier}.
+	 * Enter a parse tree produced by the {@code spec_constant_hex}
+	 * labeled alternative in {@link smtlibv2Parser#spec_constant}.
 	 * @param ctx the parse tree
 	 */
-	void enterIdentifier(smtlibv2Parser.IdentifierContext ctx);
+	void enterSpec_constant_hex(smtlibv2Parser.Spec_constant_hexContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link smtlibv2Parser#identifier}.
+	 * Exit a parse tree produced by the {@code spec_constant_hex}
+	 * labeled alternative in {@link smtlibv2Parser#spec_constant}.
 	 * @param ctx the parse tree
 	 */
-	void exitIdentifier(smtlibv2Parser.IdentifierContext ctx);
+	void exitSpec_constant_hex(smtlibv2Parser.Spec_constant_hexContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link smtlibv2Parser#attribute_value}.
+	 * Enter a parse tree produced by the {@code spec_constant_bin}
+	 * labeled alternative in {@link smtlibv2Parser#spec_constant}.
 	 * @param ctx the parse tree
 	 */
-	void enterAttribute_value(smtlibv2Parser.Attribute_valueContext ctx);
+	void enterSpec_constant_bin(smtlibv2Parser.Spec_constant_binContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link smtlibv2Parser#attribute_value}.
+	 * Exit a parse tree produced by the {@code spec_constant_bin}
+	 * labeled alternative in {@link smtlibv2Parser#spec_constant}.
 	 * @param ctx the parse tree
 	 */
-	void exitAttribute_value(smtlibv2Parser.Attribute_valueContext ctx);
+	void exitSpec_constant_bin(smtlibv2Parser.Spec_constant_binContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link smtlibv2Parser#attribute}.
+	 * Enter a parse tree produced by the {@code spec_constant_string}
+	 * labeled alternative in {@link smtlibv2Parser#spec_constant}.
 	 * @param ctx the parse tree
 	 */
-	void enterAttribute(smtlibv2Parser.AttributeContext ctx);
+	void enterSpec_constant_string(smtlibv2Parser.Spec_constant_stringContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link smtlibv2Parser#attribute}.
+	 * Exit a parse tree produced by the {@code spec_constant_string}
+	 * labeled alternative in {@link smtlibv2Parser#spec_constant}.
 	 * @param ctx the parse tree
 	 */
-	void exitAttribute(smtlibv2Parser.AttributeContext ctx);
+	void exitSpec_constant_string(smtlibv2Parser.Spec_constant_stringContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link smtlibv2Parser#sort}.
+	 * Enter a parse tree produced by the {@code s_expr_spec}
+	 * labeled alternative in {@link smtlibv2Parser#s_expr}.
 	 * @param ctx the parse tree
 	 */
-	void enterSort(smtlibv2Parser.SortContext ctx);
+	void enterS_expr_spec(smtlibv2Parser.S_expr_specContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link smtlibv2Parser#sort}.
+	 * Exit a parse tree produced by the {@code s_expr_spec}
+	 * labeled alternative in {@link smtlibv2Parser#s_expr}.
 	 * @param ctx the parse tree
 	 */
-	void exitSort(smtlibv2Parser.SortContext ctx);
+	void exitS_expr_spec(smtlibv2Parser.S_expr_specContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link smtlibv2Parser#qual_identifer}.
+	 * Enter a parse tree produced by the {@code s_expr_symb}
+	 * labeled alternative in {@link smtlibv2Parser#s_expr}.
 	 * @param ctx the parse tree
 	 */
-	void enterQual_identifer(smtlibv2Parser.Qual_identiferContext ctx);
+	void enterS_expr_symb(smtlibv2Parser.S_expr_symbContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link smtlibv2Parser#qual_identifer}.
+	 * Exit a parse tree produced by the {@code s_expr_symb}
+	 * labeled alternative in {@link smtlibv2Parser#s_expr}.
 	 * @param ctx the parse tree
 	 */
-	void exitQual_identifer(smtlibv2Parser.Qual_identiferContext ctx);
+	void exitS_expr_symb(smtlibv2Parser.S_expr_symbContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code s_expr_key}
+	 * labeled alternative in {@link smtlibv2Parser#s_expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterS_expr_key(smtlibv2Parser.S_expr_keyContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code s_expr_key}
+	 * labeled alternative in {@link smtlibv2Parser#s_expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitS_expr_key(smtlibv2Parser.S_expr_keyContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code multi_s_expr}
+	 * labeled alternative in {@link smtlibv2Parser#s_expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterMulti_s_expr(smtlibv2Parser.Multi_s_exprContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code multi_s_expr}
+	 * labeled alternative in {@link smtlibv2Parser#s_expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitMulti_s_expr(smtlibv2Parser.Multi_s_exprContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code idx_num}
+	 * labeled alternative in {@link smtlibv2Parser#index}.
+	 * @param ctx the parse tree
+	 */
+	void enterIdx_num(smtlibv2Parser.Idx_numContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code idx_num}
+	 * labeled alternative in {@link smtlibv2Parser#index}.
+	 * @param ctx the parse tree
+	 */
+	void exitIdx_num(smtlibv2Parser.Idx_numContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code idx_symb}
+	 * labeled alternative in {@link smtlibv2Parser#index}.
+	 * @param ctx the parse tree
+	 */
+	void enterIdx_symb(smtlibv2Parser.Idx_symbContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code idx_symb}
+	 * labeled alternative in {@link smtlibv2Parser#index}.
+	 * @param ctx the parse tree
+	 */
+	void exitIdx_symb(smtlibv2Parser.Idx_symbContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code id_symb}
+	 * labeled alternative in {@link smtlibv2Parser#identifier}.
+	 * @param ctx the parse tree
+	 */
+	void enterId_symb(smtlibv2Parser.Id_symbContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code id_symb}
+	 * labeled alternative in {@link smtlibv2Parser#identifier}.
+	 * @param ctx the parse tree
+	 */
+	void exitId_symb(smtlibv2Parser.Id_symbContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code id_symb_idx}
+	 * labeled alternative in {@link smtlibv2Parser#identifier}.
+	 * @param ctx the parse tree
+	 */
+	void enterId_symb_idx(smtlibv2Parser.Id_symb_idxContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code id_symb_idx}
+	 * labeled alternative in {@link smtlibv2Parser#identifier}.
+	 * @param ctx the parse tree
+	 */
+	void exitId_symb_idx(smtlibv2Parser.Id_symb_idxContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code attr_spec}
+	 * labeled alternative in {@link smtlibv2Parser#attribute_value}.
+	 * @param ctx the parse tree
+	 */
+	void enterAttr_spec(smtlibv2Parser.Attr_specContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code attr_spec}
+	 * labeled alternative in {@link smtlibv2Parser#attribute_value}.
+	 * @param ctx the parse tree
+	 */
+	void exitAttr_spec(smtlibv2Parser.Attr_specContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code attr_symb}
+	 * labeled alternative in {@link smtlibv2Parser#attribute_value}.
+	 * @param ctx the parse tree
+	 */
+	void enterAttr_symb(smtlibv2Parser.Attr_symbContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code attr_symb}
+	 * labeled alternative in {@link smtlibv2Parser#attribute_value}.
+	 * @param ctx the parse tree
+	 */
+	void exitAttr_symb(smtlibv2Parser.Attr_symbContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code attr_s_expr}
+	 * labeled alternative in {@link smtlibv2Parser#attribute_value}.
+	 * @param ctx the parse tree
+	 */
+	void enterAttr_s_expr(smtlibv2Parser.Attr_s_exprContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code attr_s_expr}
+	 * labeled alternative in {@link smtlibv2Parser#attribute_value}.
+	 * @param ctx the parse tree
+	 */
+	void exitAttr_s_expr(smtlibv2Parser.Attr_s_exprContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code attr_key}
+	 * labeled alternative in {@link smtlibv2Parser#attribute}.
+	 * @param ctx the parse tree
+	 */
+	void enterAttr_key(smtlibv2Parser.Attr_keyContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code attr_key}
+	 * labeled alternative in {@link smtlibv2Parser#attribute}.
+	 * @param ctx the parse tree
+	 */
+	void exitAttr_key(smtlibv2Parser.Attr_keyContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code attr_key_attr}
+	 * labeled alternative in {@link smtlibv2Parser#attribute}.
+	 * @param ctx the parse tree
+	 */
+	void enterAttr_key_attr(smtlibv2Parser.Attr_key_attrContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code attr_key_attr}
+	 * labeled alternative in {@link smtlibv2Parser#attribute}.
+	 * @param ctx the parse tree
+	 */
+	void exitAttr_key_attr(smtlibv2Parser.Attr_key_attrContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code sort_id}
+	 * labeled alternative in {@link smtlibv2Parser#sort}.
+	 * @param ctx the parse tree
+	 */
+	void enterSort_id(smtlibv2Parser.Sort_idContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code sort_id}
+	 * labeled alternative in {@link smtlibv2Parser#sort}.
+	 * @param ctx the parse tree
+	 */
+	void exitSort_id(smtlibv2Parser.Sort_idContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code multisort}
+	 * labeled alternative in {@link smtlibv2Parser#sort}.
+	 * @param ctx the parse tree
+	 */
+	void enterMultisort(smtlibv2Parser.MultisortContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code multisort}
+	 * labeled alternative in {@link smtlibv2Parser#sort}.
+	 * @param ctx the parse tree
+	 */
+	void exitMultisort(smtlibv2Parser.MultisortContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code qual_id}
+	 * labeled alternative in {@link smtlibv2Parser#qual_identifer}.
+	 * @param ctx the parse tree
+	 */
+	void enterQual_id(smtlibv2Parser.Qual_idContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code qual_id}
+	 * labeled alternative in {@link smtlibv2Parser#qual_identifer}.
+	 * @param ctx the parse tree
+	 */
+	void exitQual_id(smtlibv2Parser.Qual_idContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code qual_id_sort}
+	 * labeled alternative in {@link smtlibv2Parser#qual_identifer}.
+	 * @param ctx the parse tree
+	 */
+	void enterQual_id_sort(smtlibv2Parser.Qual_id_sortContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code qual_id_sort}
+	 * labeled alternative in {@link smtlibv2Parser#qual_identifer}.
+	 * @param ctx the parse tree
+	 */
+	void exitQual_id_sort(smtlibv2Parser.Qual_id_sortContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link smtlibv2Parser#var_binding}.
 	 * @param ctx the parse tree
@@ -238,15 +502,29 @@ public interface smtlibv2Listener extends ParseTreeListener {
 	 */
 	void exitSorted_var(smtlibv2Parser.Sorted_varContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link smtlibv2Parser#pattern}.
+	 * Enter a parse tree produced by the {@code pattern_symb}
+	 * labeled alternative in {@link smtlibv2Parser#pattern}.
 	 * @param ctx the parse tree
 	 */
-	void enterPattern(smtlibv2Parser.PatternContext ctx);
+	void enterPattern_symb(smtlibv2Parser.Pattern_symbContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link smtlibv2Parser#pattern}.
+	 * Exit a parse tree produced by the {@code pattern_symb}
+	 * labeled alternative in {@link smtlibv2Parser#pattern}.
 	 * @param ctx the parse tree
 	 */
-	void exitPattern(smtlibv2Parser.PatternContext ctx);
+	void exitPattern_symb(smtlibv2Parser.Pattern_symbContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code pattern_multisymb}
+	 * labeled alternative in {@link smtlibv2Parser#pattern}.
+	 * @param ctx the parse tree
+	 */
+	void enterPattern_multisymb(smtlibv2Parser.Pattern_multisymbContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code pattern_multisymb}
+	 * labeled alternative in {@link smtlibv2Parser#pattern}.
+	 * @param ctx the parse tree
+	 */
+	void exitPattern_multisymb(smtlibv2Parser.Pattern_multisymbContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link smtlibv2Parser#match_case}.
 	 * @param ctx the parse tree
@@ -258,15 +536,101 @@ public interface smtlibv2Listener extends ParseTreeListener {
 	 */
 	void exitMatch_case(smtlibv2Parser.Match_caseContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link smtlibv2Parser#term}.
+	 * Enter a parse tree produced by the {@code term_spec_const}
+	 * labeled alternative in {@link smtlibv2Parser#term}.
 	 * @param ctx the parse tree
 	 */
-	void enterTerm(smtlibv2Parser.TermContext ctx);
+	void enterTerm_spec_const(smtlibv2Parser.Term_spec_constContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link smtlibv2Parser#term}.
+	 * Exit a parse tree produced by the {@code term_spec_const}
+	 * labeled alternative in {@link smtlibv2Parser#term}.
 	 * @param ctx the parse tree
 	 */
-	void exitTerm(smtlibv2Parser.TermContext ctx);
+	void exitTerm_spec_const(smtlibv2Parser.Term_spec_constContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code term_qual_id}
+	 * labeled alternative in {@link smtlibv2Parser#term}.
+	 * @param ctx the parse tree
+	 */
+	void enterTerm_qual_id(smtlibv2Parser.Term_qual_idContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code term_qual_id}
+	 * labeled alternative in {@link smtlibv2Parser#term}.
+	 * @param ctx the parse tree
+	 */
+	void exitTerm_qual_id(smtlibv2Parser.Term_qual_idContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code multiterm}
+	 * labeled alternative in {@link smtlibv2Parser#term}.
+	 * @param ctx the parse tree
+	 */
+	void enterMultiterm(smtlibv2Parser.MultitermContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code multiterm}
+	 * labeled alternative in {@link smtlibv2Parser#term}.
+	 * @param ctx the parse tree
+	 */
+	void exitMultiterm(smtlibv2Parser.MultitermContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code term_let}
+	 * labeled alternative in {@link smtlibv2Parser#term}.
+	 * @param ctx the parse tree
+	 */
+	void enterTerm_let(smtlibv2Parser.Term_letContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code term_let}
+	 * labeled alternative in {@link smtlibv2Parser#term}.
+	 * @param ctx the parse tree
+	 */
+	void exitTerm_let(smtlibv2Parser.Term_letContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code term_forall}
+	 * labeled alternative in {@link smtlibv2Parser#term}.
+	 * @param ctx the parse tree
+	 */
+	void enterTerm_forall(smtlibv2Parser.Term_forallContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code term_forall}
+	 * labeled alternative in {@link smtlibv2Parser#term}.
+	 * @param ctx the parse tree
+	 */
+	void exitTerm_forall(smtlibv2Parser.Term_forallContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code term_exists}
+	 * labeled alternative in {@link smtlibv2Parser#term}.
+	 * @param ctx the parse tree
+	 */
+	void enterTerm_exists(smtlibv2Parser.Term_existsContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code term_exists}
+	 * labeled alternative in {@link smtlibv2Parser#term}.
+	 * @param ctx the parse tree
+	 */
+	void exitTerm_exists(smtlibv2Parser.Term_existsContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code term_match}
+	 * labeled alternative in {@link smtlibv2Parser#term}.
+	 * @param ctx the parse tree
+	 */
+	void enterTerm_match(smtlibv2Parser.Term_matchContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code term_match}
+	 * labeled alternative in {@link smtlibv2Parser#term}.
+	 * @param ctx the parse tree
+	 */
+	void exitTerm_match(smtlibv2Parser.Term_matchContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code term_exclam}
+	 * labeled alternative in {@link smtlibv2Parser#term}.
+	 * @param ctx the parse tree
+	 */
+	void enterTerm_exclam(smtlibv2Parser.Term_exclamContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code term_exclam}
+	 * labeled alternative in {@link smtlibv2Parser#term}.
+	 * @param ctx the parse tree
+	 */
+	void exitTerm_exclam(smtlibv2Parser.Term_exclamContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link smtlibv2Parser#sort_symbol_decl}.
 	 * @param ctx the parse tree
@@ -288,35 +652,161 @@ public interface smtlibv2Listener extends ParseTreeListener {
 	 */
 	void exitMeta_spec_constant(smtlibv2Parser.Meta_spec_constantContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link smtlibv2Parser#fun_symbol_decl}.
+	 * Enter a parse tree produced by the {@code fun_symb_spec}
+	 * labeled alternative in {@link smtlibv2Parser#fun_symbol_decl}.
 	 * @param ctx the parse tree
 	 */
-	void enterFun_symbol_decl(smtlibv2Parser.Fun_symbol_declContext ctx);
+	void enterFun_symb_spec(smtlibv2Parser.Fun_symb_specContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link smtlibv2Parser#fun_symbol_decl}.
+	 * Exit a parse tree produced by the {@code fun_symb_spec}
+	 * labeled alternative in {@link smtlibv2Parser#fun_symbol_decl}.
 	 * @param ctx the parse tree
 	 */
-	void exitFun_symbol_decl(smtlibv2Parser.Fun_symbol_declContext ctx);
+	void exitFun_symb_spec(smtlibv2Parser.Fun_symb_specContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link smtlibv2Parser#par_fun_symbol_decl}.
+	 * Enter a parse tree produced by the {@code fun_symb_meta}
+	 * labeled alternative in {@link smtlibv2Parser#fun_symbol_decl}.
 	 * @param ctx the parse tree
 	 */
-	void enterPar_fun_symbol_decl(smtlibv2Parser.Par_fun_symbol_declContext ctx);
+	void enterFun_symb_meta(smtlibv2Parser.Fun_symb_metaContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link smtlibv2Parser#par_fun_symbol_decl}.
+	 * Exit a parse tree produced by the {@code fun_symb_meta}
+	 * labeled alternative in {@link smtlibv2Parser#fun_symbol_decl}.
 	 * @param ctx the parse tree
 	 */
-	void exitPar_fun_symbol_decl(smtlibv2Parser.Par_fun_symbol_declContext ctx);
+	void exitFun_symb_meta(smtlibv2Parser.Fun_symb_metaContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link smtlibv2Parser#theory_attribute}.
+	 * Enter a parse tree produced by the {@code fun_symb_id}
+	 * labeled alternative in {@link smtlibv2Parser#fun_symbol_decl}.
 	 * @param ctx the parse tree
 	 */
-	void enterTheory_attribute(smtlibv2Parser.Theory_attributeContext ctx);
+	void enterFun_symb_id(smtlibv2Parser.Fun_symb_idContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link smtlibv2Parser#theory_attribute}.
+	 * Exit a parse tree produced by the {@code fun_symb_id}
+	 * labeled alternative in {@link smtlibv2Parser#fun_symbol_decl}.
 	 * @param ctx the parse tree
 	 */
-	void exitTheory_attribute(smtlibv2Parser.Theory_attributeContext ctx);
+	void exitFun_symb_id(smtlibv2Parser.Fun_symb_idContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code par_fun_symb}
+	 * labeled alternative in {@link smtlibv2Parser#par_fun_symbol_decl}.
+	 * @param ctx the parse tree
+	 */
+	void enterPar_fun_symb(smtlibv2Parser.Par_fun_symbContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code par_fun_symb}
+	 * labeled alternative in {@link smtlibv2Parser#par_fun_symbol_decl}.
+	 * @param ctx the parse tree
+	 */
+	void exitPar_fun_symb(smtlibv2Parser.Par_fun_symbContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code par_fun_multi_symb}
+	 * labeled alternative in {@link smtlibv2Parser#par_fun_symbol_decl}.
+	 * @param ctx the parse tree
+	 */
+	void enterPar_fun_multi_symb(smtlibv2Parser.Par_fun_multi_symbContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code par_fun_multi_symb}
+	 * labeled alternative in {@link smtlibv2Parser#par_fun_symbol_decl}.
+	 * @param ctx the parse tree
+	 */
+	void exitPar_fun_multi_symb(smtlibv2Parser.Par_fun_multi_symbContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code theory_sort}
+	 * labeled alternative in {@link smtlibv2Parser#theory_attribute}.
+	 * @param ctx the parse tree
+	 */
+	void enterTheory_sort(smtlibv2Parser.Theory_sortContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code theory_sort}
+	 * labeled alternative in {@link smtlibv2Parser#theory_attribute}.
+	 * @param ctx the parse tree
+	 */
+	void exitTheory_sort(smtlibv2Parser.Theory_sortContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code theory_fun}
+	 * labeled alternative in {@link smtlibv2Parser#theory_attribute}.
+	 * @param ctx the parse tree
+	 */
+	void enterTheory_fun(smtlibv2Parser.Theory_funContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code theory_fun}
+	 * labeled alternative in {@link smtlibv2Parser#theory_attribute}.
+	 * @param ctx the parse tree
+	 */
+	void exitTheory_fun(smtlibv2Parser.Theory_funContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code theory_sort_descr}
+	 * labeled alternative in {@link smtlibv2Parser#theory_attribute}.
+	 * @param ctx the parse tree
+	 */
+	void enterTheory_sort_descr(smtlibv2Parser.Theory_sort_descrContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code theory_sort_descr}
+	 * labeled alternative in {@link smtlibv2Parser#theory_attribute}.
+	 * @param ctx the parse tree
+	 */
+	void exitTheory_sort_descr(smtlibv2Parser.Theory_sort_descrContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code theory_fun_descr}
+	 * labeled alternative in {@link smtlibv2Parser#theory_attribute}.
+	 * @param ctx the parse tree
+	 */
+	void enterTheory_fun_descr(smtlibv2Parser.Theory_fun_descrContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code theory_fun_descr}
+	 * labeled alternative in {@link smtlibv2Parser#theory_attribute}.
+	 * @param ctx the parse tree
+	 */
+	void exitTheory_fun_descr(smtlibv2Parser.Theory_fun_descrContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code theory_def}
+	 * labeled alternative in {@link smtlibv2Parser#theory_attribute}.
+	 * @param ctx the parse tree
+	 */
+	void enterTheory_def(smtlibv2Parser.Theory_defContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code theory_def}
+	 * labeled alternative in {@link smtlibv2Parser#theory_attribute}.
+	 * @param ctx the parse tree
+	 */
+	void exitTheory_def(smtlibv2Parser.Theory_defContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code theory_val}
+	 * labeled alternative in {@link smtlibv2Parser#theory_attribute}.
+	 * @param ctx the parse tree
+	 */
+	void enterTheory_val(smtlibv2Parser.Theory_valContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code theory_val}
+	 * labeled alternative in {@link smtlibv2Parser#theory_attribute}.
+	 * @param ctx the parse tree
+	 */
+	void exitTheory_val(smtlibv2Parser.Theory_valContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code theory_notes}
+	 * labeled alternative in {@link smtlibv2Parser#theory_attribute}.
+	 * @param ctx the parse tree
+	 */
+	void enterTheory_notes(smtlibv2Parser.Theory_notesContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code theory_notes}
+	 * labeled alternative in {@link smtlibv2Parser#theory_attribute}.
+	 * @param ctx the parse tree
+	 */
+	void exitTheory_notes(smtlibv2Parser.Theory_notesContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code theory_attr}
+	 * labeled alternative in {@link smtlibv2Parser#theory_attribute}.
+	 * @param ctx the parse tree
+	 */
+	void enterTheory_attr(smtlibv2Parser.Theory_attrContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code theory_attr}
+	 * labeled alternative in {@link smtlibv2Parser#theory_attribute}.
+	 * @param ctx the parse tree
+	 */
+	void exitTheory_attr(smtlibv2Parser.Theory_attrContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link smtlibv2Parser#theory_decl}.
 	 * @param ctx the parse tree
@@ -328,15 +818,77 @@ public interface smtlibv2Listener extends ParseTreeListener {
 	 */
 	void exitTheory_decl(smtlibv2Parser.Theory_declContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link smtlibv2Parser#logic_attribue}.
+	 * Enter a parse tree produced by the {@code logic_theory}
+	 * labeled alternative in {@link smtlibv2Parser#logic_attribue}.
 	 * @param ctx the parse tree
 	 */
-	void enterLogic_attribue(smtlibv2Parser.Logic_attribueContext ctx);
+	void enterLogic_theory(smtlibv2Parser.Logic_theoryContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link smtlibv2Parser#logic_attribue}.
+	 * Exit a parse tree produced by the {@code logic_theory}
+	 * labeled alternative in {@link smtlibv2Parser#logic_attribue}.
 	 * @param ctx the parse tree
 	 */
-	void exitLogic_attribue(smtlibv2Parser.Logic_attribueContext ctx);
+	void exitLogic_theory(smtlibv2Parser.Logic_theoryContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code logic_language}
+	 * labeled alternative in {@link smtlibv2Parser#logic_attribue}.
+	 * @param ctx the parse tree
+	 */
+	void enterLogic_language(smtlibv2Parser.Logic_languageContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code logic_language}
+	 * labeled alternative in {@link smtlibv2Parser#logic_attribue}.
+	 * @param ctx the parse tree
+	 */
+	void exitLogic_language(smtlibv2Parser.Logic_languageContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code logic_ext}
+	 * labeled alternative in {@link smtlibv2Parser#logic_attribue}.
+	 * @param ctx the parse tree
+	 */
+	void enterLogic_ext(smtlibv2Parser.Logic_extContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code logic_ext}
+	 * labeled alternative in {@link smtlibv2Parser#logic_attribue}.
+	 * @param ctx the parse tree
+	 */
+	void exitLogic_ext(smtlibv2Parser.Logic_extContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code logic_val}
+	 * labeled alternative in {@link smtlibv2Parser#logic_attribue}.
+	 * @param ctx the parse tree
+	 */
+	void enterLogic_val(smtlibv2Parser.Logic_valContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code logic_val}
+	 * labeled alternative in {@link smtlibv2Parser#logic_attribue}.
+	 * @param ctx the parse tree
+	 */
+	void exitLogic_val(smtlibv2Parser.Logic_valContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code logic_notes}
+	 * labeled alternative in {@link smtlibv2Parser#logic_attribue}.
+	 * @param ctx the parse tree
+	 */
+	void enterLogic_notes(smtlibv2Parser.Logic_notesContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code logic_notes}
+	 * labeled alternative in {@link smtlibv2Parser#logic_attribue}.
+	 * @param ctx the parse tree
+	 */
+	void exitLogic_notes(smtlibv2Parser.Logic_notesContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code logic_attr}
+	 * labeled alternative in {@link smtlibv2Parser#logic_attribue}.
+	 * @param ctx the parse tree
+	 */
+	void enterLogic_attr(smtlibv2Parser.Logic_attrContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code logic_attr}
+	 * labeled alternative in {@link smtlibv2Parser#logic_attribue}.
+	 * @param ctx the parse tree
+	 */
+	void exitLogic_attr(smtlibv2Parser.Logic_attrContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link smtlibv2Parser#logic}.
 	 * @param ctx the parse tree
@@ -378,15 +930,29 @@ public interface smtlibv2Listener extends ParseTreeListener {
 	 */
 	void exitConstructor_dec(smtlibv2Parser.Constructor_decContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link smtlibv2Parser#datatype_dec}.
+	 * Enter a parse tree produced by the {@code data_constr}
+	 * labeled alternative in {@link smtlibv2Parser#datatype_dec}.
 	 * @param ctx the parse tree
 	 */
-	void enterDatatype_dec(smtlibv2Parser.Datatype_decContext ctx);
+	void enterData_constr(smtlibv2Parser.Data_constrContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link smtlibv2Parser#datatype_dec}.
+	 * Exit a parse tree produced by the {@code data_constr}
+	 * labeled alternative in {@link smtlibv2Parser#datatype_dec}.
 	 * @param ctx the parse tree
 	 */
-	void exitDatatype_dec(smtlibv2Parser.Datatype_decContext ctx);
+	void exitData_constr(smtlibv2Parser.Data_constrContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code data_multisymb}
+	 * labeled alternative in {@link smtlibv2Parser#datatype_dec}.
+	 * @param ctx the parse tree
+	 */
+	void enterData_multisymb(smtlibv2Parser.Data_multisymbContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code data_multisymb}
+	 * labeled alternative in {@link smtlibv2Parser#datatype_dec}.
+	 * @param ctx the parse tree
+	 */
+	void exitData_multisymb(smtlibv2Parser.Data_multisymbContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link smtlibv2Parser#function_dec}.
 	 * @param ctx the parse tree
@@ -408,15 +974,29 @@ public interface smtlibv2Listener extends ParseTreeListener {
 	 */
 	void exitFunction_def(smtlibv2Parser.Function_defContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link smtlibv2Parser#prop_literal}.
+	 * Enter a parse tree produced by the {@code prop_symb}
+	 * labeled alternative in {@link smtlibv2Parser#prop_literal}.
 	 * @param ctx the parse tree
 	 */
-	void enterProp_literal(smtlibv2Parser.Prop_literalContext ctx);
+	void enterProp_symb(smtlibv2Parser.Prop_symbContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link smtlibv2Parser#prop_literal}.
+	 * Exit a parse tree produced by the {@code prop_symb}
+	 * labeled alternative in {@link smtlibv2Parser#prop_literal}.
 	 * @param ctx the parse tree
 	 */
-	void exitProp_literal(smtlibv2Parser.Prop_literalContext ctx);
+	void exitProp_symb(smtlibv2Parser.Prop_symbContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code prop_not}
+	 * labeled alternative in {@link smtlibv2Parser#prop_literal}.
+	 * @param ctx the parse tree
+	 */
+	void enterProp_not(smtlibv2Parser.Prop_notContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code prop_not}
+	 * labeled alternative in {@link smtlibv2Parser#prop_literal}.
+	 * @param ctx the parse tree
+	 */
+	void exitProp_not(smtlibv2Parser.Prop_notContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link smtlibv2Parser#script}.
 	 * @param ctx the parse tree
@@ -728,15 +1308,365 @@ public interface smtlibv2Listener extends ParseTreeListener {
 	 */
 	void exitCmd_setOption(smtlibv2Parser.Cmd_setOptionContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link smtlibv2Parser#command}.
+	 * Enter a parse tree produced by the {@code assert}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
 	 * @param ctx the parse tree
 	 */
-	void enterCommand(smtlibv2Parser.CommandContext ctx);
+	void enterAssert(smtlibv2Parser.AssertContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link smtlibv2Parser#command}.
+	 * Exit a parse tree produced by the {@code assert}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
 	 * @param ctx the parse tree
 	 */
-	void exitCommand(smtlibv2Parser.CommandContext ctx);
+	void exitAssert(smtlibv2Parser.AssertContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code check}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void enterCheck(smtlibv2Parser.CheckContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code check}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void exitCheck(smtlibv2Parser.CheckContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code check_assume}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void enterCheck_assume(smtlibv2Parser.Check_assumeContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code check_assume}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void exitCheck_assume(smtlibv2Parser.Check_assumeContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code decl_const}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void enterDecl_const(smtlibv2Parser.Decl_constContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code decl_const}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void exitDecl_const(smtlibv2Parser.Decl_constContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code decl_data}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void enterDecl_data(smtlibv2Parser.Decl_dataContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code decl_data}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void exitDecl_data(smtlibv2Parser.Decl_dataContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code decl_datas}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void enterDecl_datas(smtlibv2Parser.Decl_datasContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code decl_datas}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void exitDecl_datas(smtlibv2Parser.Decl_datasContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code decl_fun}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void enterDecl_fun(smtlibv2Parser.Decl_funContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code decl_fun}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void exitDecl_fun(smtlibv2Parser.Decl_funContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code decl_sort}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void enterDecl_sort(smtlibv2Parser.Decl_sortContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code decl_sort}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void exitDecl_sort(smtlibv2Parser.Decl_sortContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code def_fun}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void enterDef_fun(smtlibv2Parser.Def_funContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code def_fun}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void exitDef_fun(smtlibv2Parser.Def_funContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code def_fun_rec}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void enterDef_fun_rec(smtlibv2Parser.Def_fun_recContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code def_fun_rec}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void exitDef_fun_rec(smtlibv2Parser.Def_fun_recContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code def_funs_rec}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void enterDef_funs_rec(smtlibv2Parser.Def_funs_recContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code def_funs_rec}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void exitDef_funs_rec(smtlibv2Parser.Def_funs_recContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code def_sort}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void enterDef_sort(smtlibv2Parser.Def_sortContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code def_sort}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void exitDef_sort(smtlibv2Parser.Def_sortContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code echo}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void enterEcho(smtlibv2Parser.EchoContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code echo}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void exitEcho(smtlibv2Parser.EchoContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code exit}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void enterExit(smtlibv2Parser.ExitContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code exit}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void exitExit(smtlibv2Parser.ExitContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code get_assert}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void enterGet_assert(smtlibv2Parser.Get_assertContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code get_assert}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void exitGet_assert(smtlibv2Parser.Get_assertContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code get_assign}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void enterGet_assign(smtlibv2Parser.Get_assignContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code get_assign}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void exitGet_assign(smtlibv2Parser.Get_assignContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code get_info}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void enterGet_info(smtlibv2Parser.Get_infoContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code get_info}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void exitGet_info(smtlibv2Parser.Get_infoContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code get_model}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void enterGet_model(smtlibv2Parser.Get_modelContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code get_model}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void exitGet_model(smtlibv2Parser.Get_modelContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code get_option}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void enterGet_option(smtlibv2Parser.Get_optionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code get_option}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void exitGet_option(smtlibv2Parser.Get_optionContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code get_proof}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void enterGet_proof(smtlibv2Parser.Get_proofContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code get_proof}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void exitGet_proof(smtlibv2Parser.Get_proofContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code get_unsat_assume}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void enterGet_unsat_assume(smtlibv2Parser.Get_unsat_assumeContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code get_unsat_assume}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void exitGet_unsat_assume(smtlibv2Parser.Get_unsat_assumeContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code get_unsat_core}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void enterGet_unsat_core(smtlibv2Parser.Get_unsat_coreContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code get_unsat_core}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void exitGet_unsat_core(smtlibv2Parser.Get_unsat_coreContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code get_val}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void enterGet_val(smtlibv2Parser.Get_valContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code get_val}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void exitGet_val(smtlibv2Parser.Get_valContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code pop}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void enterPop(smtlibv2Parser.PopContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code pop}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void exitPop(smtlibv2Parser.PopContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code push}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void enterPush(smtlibv2Parser.PushContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code push}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void exitPush(smtlibv2Parser.PushContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code reset}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void enterReset(smtlibv2Parser.ResetContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code reset}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void exitReset(smtlibv2Parser.ResetContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code reset_assert}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void enterReset_assert(smtlibv2Parser.Reset_assertContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code reset_assert}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void exitReset_assert(smtlibv2Parser.Reset_assertContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code setInfo}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void enterSetInfo(smtlibv2Parser.SetInfoContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code setInfo}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void exitSetInfo(smtlibv2Parser.SetInfoContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code set_logic}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void enterSet_logic(smtlibv2Parser.Set_logicContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code set_logic}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void exitSet_logic(smtlibv2Parser.Set_logicContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code set_option}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void enterSet_option(smtlibv2Parser.Set_optionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code set_option}
+	 * labeled alternative in {@link smtlibv2Parser#command}.
+	 * @param ctx the parse tree
+	 */
+	void exitSet_option(smtlibv2Parser.Set_optionContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link smtlibv2Parser#b_value}.
 	 * @param ctx the parse tree
@@ -748,25 +1678,281 @@ public interface smtlibv2Listener extends ParseTreeListener {
 	 */
 	void exitB_value(smtlibv2Parser.B_valueContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link smtlibv2Parser#option}.
+	 * Enter a parse tree produced by the {@code diagnose}
+	 * labeled alternative in {@link smtlibv2Parser#option}.
 	 * @param ctx the parse tree
 	 */
-	void enterOption(smtlibv2Parser.OptionContext ctx);
+	void enterDiagnose(smtlibv2Parser.DiagnoseContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link smtlibv2Parser#option}.
+	 * Exit a parse tree produced by the {@code diagnose}
+	 * labeled alternative in {@link smtlibv2Parser#option}.
 	 * @param ctx the parse tree
 	 */
-	void exitOption(smtlibv2Parser.OptionContext ctx);
+	void exitDiagnose(smtlibv2Parser.DiagnoseContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link smtlibv2Parser#info_flag}.
+	 * Enter a parse tree produced by the {@code global}
+	 * labeled alternative in {@link smtlibv2Parser#option}.
 	 * @param ctx the parse tree
 	 */
-	void enterInfo_flag(smtlibv2Parser.Info_flagContext ctx);
+	void enterGlobal(smtlibv2Parser.GlobalContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link smtlibv2Parser#info_flag}.
+	 * Exit a parse tree produced by the {@code global}
+	 * labeled alternative in {@link smtlibv2Parser#option}.
 	 * @param ctx the parse tree
 	 */
-	void exitInfo_flag(smtlibv2Parser.Info_flagContext ctx);
+	void exitGlobal(smtlibv2Parser.GlobalContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code interactive}
+	 * labeled alternative in {@link smtlibv2Parser#option}.
+	 * @param ctx the parse tree
+	 */
+	void enterInteractive(smtlibv2Parser.InteractiveContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code interactive}
+	 * labeled alternative in {@link smtlibv2Parser#option}.
+	 * @param ctx the parse tree
+	 */
+	void exitInteractive(smtlibv2Parser.InteractiveContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code print_succ}
+	 * labeled alternative in {@link smtlibv2Parser#option}.
+	 * @param ctx the parse tree
+	 */
+	void enterPrint_succ(smtlibv2Parser.Print_succContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code print_succ}
+	 * labeled alternative in {@link smtlibv2Parser#option}.
+	 * @param ctx the parse tree
+	 */
+	void exitPrint_succ(smtlibv2Parser.Print_succContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code prod_assert}
+	 * labeled alternative in {@link smtlibv2Parser#option}.
+	 * @param ctx the parse tree
+	 */
+	void enterProd_assert(smtlibv2Parser.Prod_assertContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code prod_assert}
+	 * labeled alternative in {@link smtlibv2Parser#option}.
+	 * @param ctx the parse tree
+	 */
+	void exitProd_assert(smtlibv2Parser.Prod_assertContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code prod_assign}
+	 * labeled alternative in {@link smtlibv2Parser#option}.
+	 * @param ctx the parse tree
+	 */
+	void enterProd_assign(smtlibv2Parser.Prod_assignContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code prod_assign}
+	 * labeled alternative in {@link smtlibv2Parser#option}.
+	 * @param ctx the parse tree
+	 */
+	void exitProd_assign(smtlibv2Parser.Prod_assignContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code prod_mod}
+	 * labeled alternative in {@link smtlibv2Parser#option}.
+	 * @param ctx the parse tree
+	 */
+	void enterProd_mod(smtlibv2Parser.Prod_modContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code prod_mod}
+	 * labeled alternative in {@link smtlibv2Parser#option}.
+	 * @param ctx the parse tree
+	 */
+	void exitProd_mod(smtlibv2Parser.Prod_modContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code prod_proofs}
+	 * labeled alternative in {@link smtlibv2Parser#option}.
+	 * @param ctx the parse tree
+	 */
+	void enterProd_proofs(smtlibv2Parser.Prod_proofsContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code prod_proofs}
+	 * labeled alternative in {@link smtlibv2Parser#option}.
+	 * @param ctx the parse tree
+	 */
+	void exitProd_proofs(smtlibv2Parser.Prod_proofsContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code prod_unsat_assume}
+	 * labeled alternative in {@link smtlibv2Parser#option}.
+	 * @param ctx the parse tree
+	 */
+	void enterProd_unsat_assume(smtlibv2Parser.Prod_unsat_assumeContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code prod_unsat_assume}
+	 * labeled alternative in {@link smtlibv2Parser#option}.
+	 * @param ctx the parse tree
+	 */
+	void exitProd_unsat_assume(smtlibv2Parser.Prod_unsat_assumeContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code prod_unsat_core}
+	 * labeled alternative in {@link smtlibv2Parser#option}.
+	 * @param ctx the parse tree
+	 */
+	void enterProd_unsat_core(smtlibv2Parser.Prod_unsat_coreContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code prod_unsat_core}
+	 * labeled alternative in {@link smtlibv2Parser#option}.
+	 * @param ctx the parse tree
+	 */
+	void exitProd_unsat_core(smtlibv2Parser.Prod_unsat_coreContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code rand_seed}
+	 * labeled alternative in {@link smtlibv2Parser#option}.
+	 * @param ctx the parse tree
+	 */
+	void enterRand_seed(smtlibv2Parser.Rand_seedContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code rand_seed}
+	 * labeled alternative in {@link smtlibv2Parser#option}.
+	 * @param ctx the parse tree
+	 */
+	void exitRand_seed(smtlibv2Parser.Rand_seedContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code reg_out}
+	 * labeled alternative in {@link smtlibv2Parser#option}.
+	 * @param ctx the parse tree
+	 */
+	void enterReg_out(smtlibv2Parser.Reg_outContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code reg_out}
+	 * labeled alternative in {@link smtlibv2Parser#option}.
+	 * @param ctx the parse tree
+	 */
+	void exitReg_out(smtlibv2Parser.Reg_outContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code repro}
+	 * labeled alternative in {@link smtlibv2Parser#option}.
+	 * @param ctx the parse tree
+	 */
+	void enterRepro(smtlibv2Parser.ReproContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code repro}
+	 * labeled alternative in {@link smtlibv2Parser#option}.
+	 * @param ctx the parse tree
+	 */
+	void exitRepro(smtlibv2Parser.ReproContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code verbose}
+	 * labeled alternative in {@link smtlibv2Parser#option}.
+	 * @param ctx the parse tree
+	 */
+	void enterVerbose(smtlibv2Parser.VerboseContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code verbose}
+	 * labeled alternative in {@link smtlibv2Parser#option}.
+	 * @param ctx the parse tree
+	 */
+	void exitVerbose(smtlibv2Parser.VerboseContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code opt_attr}
+	 * labeled alternative in {@link smtlibv2Parser#option}.
+	 * @param ctx the parse tree
+	 */
+	void enterOpt_attr(smtlibv2Parser.Opt_attrContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code opt_attr}
+	 * labeled alternative in {@link smtlibv2Parser#option}.
+	 * @param ctx the parse tree
+	 */
+	void exitOpt_attr(smtlibv2Parser.Opt_attrContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code all_stat}
+	 * labeled alternative in {@link smtlibv2Parser#info_flag}.
+	 * @param ctx the parse tree
+	 */
+	void enterAll_stat(smtlibv2Parser.All_statContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code all_stat}
+	 * labeled alternative in {@link smtlibv2Parser#info_flag}.
+	 * @param ctx the parse tree
+	 */
+	void exitAll_stat(smtlibv2Parser.All_statContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code assert_stack}
+	 * labeled alternative in {@link smtlibv2Parser#info_flag}.
+	 * @param ctx the parse tree
+	 */
+	void enterAssert_stack(smtlibv2Parser.Assert_stackContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code assert_stack}
+	 * labeled alternative in {@link smtlibv2Parser#info_flag}.
+	 * @param ctx the parse tree
+	 */
+	void exitAssert_stack(smtlibv2Parser.Assert_stackContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code authors}
+	 * labeled alternative in {@link smtlibv2Parser#info_flag}.
+	 * @param ctx the parse tree
+	 */
+	void enterAuthors(smtlibv2Parser.AuthorsContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code authors}
+	 * labeled alternative in {@link smtlibv2Parser#info_flag}.
+	 * @param ctx the parse tree
+	 */
+	void exitAuthors(smtlibv2Parser.AuthorsContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code error}
+	 * labeled alternative in {@link smtlibv2Parser#info_flag}.
+	 * @param ctx the parse tree
+	 */
+	void enterError(smtlibv2Parser.ErrorContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code error}
+	 * labeled alternative in {@link smtlibv2Parser#info_flag}.
+	 * @param ctx the parse tree
+	 */
+	void exitError(smtlibv2Parser.ErrorContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code name}
+	 * labeled alternative in {@link smtlibv2Parser#info_flag}.
+	 * @param ctx the parse tree
+	 */
+	void enterName(smtlibv2Parser.NameContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code name}
+	 * labeled alternative in {@link smtlibv2Parser#info_flag}.
+	 * @param ctx the parse tree
+	 */
+	void exitName(smtlibv2Parser.NameContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code r_unknown}
+	 * labeled alternative in {@link smtlibv2Parser#info_flag}.
+	 * @param ctx the parse tree
+	 */
+	void enterR_unknown(smtlibv2Parser.R_unknownContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code r_unknown}
+	 * labeled alternative in {@link smtlibv2Parser#info_flag}.
+	 * @param ctx the parse tree
+	 */
+	void exitR_unknown(smtlibv2Parser.R_unknownContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code version}
+	 * labeled alternative in {@link smtlibv2Parser#info_flag}.
+	 * @param ctx the parse tree
+	 */
+	void enterVersion(smtlibv2Parser.VersionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code version}
+	 * labeled alternative in {@link smtlibv2Parser#info_flag}.
+	 * @param ctx the parse tree
+	 */
+	void exitVersion(smtlibv2Parser.VersionContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code info_key}
+	 * labeled alternative in {@link smtlibv2Parser#info_flag}.
+	 * @param ctx the parse tree
+	 */
+	void enterInfo_key(smtlibv2Parser.Info_keyContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code info_key}
+	 * labeled alternative in {@link smtlibv2Parser#info_flag}.
+	 * @param ctx the parse tree
+	 */
+	void exitInfo_key(smtlibv2Parser.Info_keyContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link smtlibv2Parser#error_behaviour}.
 	 * @param ctx the parse tree
@@ -778,35 +1964,161 @@ public interface smtlibv2Listener extends ParseTreeListener {
 	 */
 	void exitError_behaviour(smtlibv2Parser.Error_behaviourContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link smtlibv2Parser#reason_unknown}.
+	 * Enter a parse tree produced by the {@code memout}
+	 * labeled alternative in {@link smtlibv2Parser#reason_unknown}.
 	 * @param ctx the parse tree
 	 */
-	void enterReason_unknown(smtlibv2Parser.Reason_unknownContext ctx);
+	void enterMemout(smtlibv2Parser.MemoutContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link smtlibv2Parser#reason_unknown}.
+	 * Exit a parse tree produced by the {@code memout}
+	 * labeled alternative in {@link smtlibv2Parser#reason_unknown}.
 	 * @param ctx the parse tree
 	 */
-	void exitReason_unknown(smtlibv2Parser.Reason_unknownContext ctx);
+	void exitMemout(smtlibv2Parser.MemoutContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link smtlibv2Parser#model_response}.
+	 * Enter a parse tree produced by the {@code incomp}
+	 * labeled alternative in {@link smtlibv2Parser#reason_unknown}.
 	 * @param ctx the parse tree
 	 */
-	void enterModel_response(smtlibv2Parser.Model_responseContext ctx);
+	void enterIncomp(smtlibv2Parser.IncompContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link smtlibv2Parser#model_response}.
+	 * Exit a parse tree produced by the {@code incomp}
+	 * labeled alternative in {@link smtlibv2Parser#reason_unknown}.
 	 * @param ctx the parse tree
 	 */
-	void exitModel_response(smtlibv2Parser.Model_responseContext ctx);
+	void exitIncomp(smtlibv2Parser.IncompContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link smtlibv2Parser#info_response}.
+	 * Enter a parse tree produced by the {@code r_unnown_s_expr}
+	 * labeled alternative in {@link smtlibv2Parser#reason_unknown}.
 	 * @param ctx the parse tree
 	 */
-	void enterInfo_response(smtlibv2Parser.Info_responseContext ctx);
+	void enterR_unnown_s_expr(smtlibv2Parser.R_unnown_s_exprContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link smtlibv2Parser#info_response}.
+	 * Exit a parse tree produced by the {@code r_unnown_s_expr}
+	 * labeled alternative in {@link smtlibv2Parser#reason_unknown}.
 	 * @param ctx the parse tree
 	 */
-	void exitInfo_response(smtlibv2Parser.Info_responseContext ctx);
+	void exitR_unnown_s_expr(smtlibv2Parser.R_unnown_s_exprContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code resp_def_fun}
+	 * labeled alternative in {@link smtlibv2Parser#model_response}.
+	 * @param ctx the parse tree
+	 */
+	void enterResp_def_fun(smtlibv2Parser.Resp_def_funContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code resp_def_fun}
+	 * labeled alternative in {@link smtlibv2Parser#model_response}.
+	 * @param ctx the parse tree
+	 */
+	void exitResp_def_fun(smtlibv2Parser.Resp_def_funContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code resp_def_fun_rec}
+	 * labeled alternative in {@link smtlibv2Parser#model_response}.
+	 * @param ctx the parse tree
+	 */
+	void enterResp_def_fun_rec(smtlibv2Parser.Resp_def_fun_recContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code resp_def_fun_rec}
+	 * labeled alternative in {@link smtlibv2Parser#model_response}.
+	 * @param ctx the parse tree
+	 */
+	void exitResp_def_fun_rec(smtlibv2Parser.Resp_def_fun_recContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code resp_def_funs_rec}
+	 * labeled alternative in {@link smtlibv2Parser#model_response}.
+	 * @param ctx the parse tree
+	 */
+	void enterResp_def_funs_rec(smtlibv2Parser.Resp_def_funs_recContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code resp_def_funs_rec}
+	 * labeled alternative in {@link smtlibv2Parser#model_response}.
+	 * @param ctx the parse tree
+	 */
+	void exitResp_def_funs_rec(smtlibv2Parser.Resp_def_funs_recContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code info_assert_stack}
+	 * labeled alternative in {@link smtlibv2Parser#info_response}.
+	 * @param ctx the parse tree
+	 */
+	void enterInfo_assert_stack(smtlibv2Parser.Info_assert_stackContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code info_assert_stack}
+	 * labeled alternative in {@link smtlibv2Parser#info_response}.
+	 * @param ctx the parse tree
+	 */
+	void exitInfo_assert_stack(smtlibv2Parser.Info_assert_stackContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code info_authors}
+	 * labeled alternative in {@link smtlibv2Parser#info_response}.
+	 * @param ctx the parse tree
+	 */
+	void enterInfo_authors(smtlibv2Parser.Info_authorsContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code info_authors}
+	 * labeled alternative in {@link smtlibv2Parser#info_response}.
+	 * @param ctx the parse tree
+	 */
+	void exitInfo_authors(smtlibv2Parser.Info_authorsContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code info_error}
+	 * labeled alternative in {@link smtlibv2Parser#info_response}.
+	 * @param ctx the parse tree
+	 */
+	void enterInfo_error(smtlibv2Parser.Info_errorContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code info_error}
+	 * labeled alternative in {@link smtlibv2Parser#info_response}.
+	 * @param ctx the parse tree
+	 */
+	void exitInfo_error(smtlibv2Parser.Info_errorContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code info_name}
+	 * labeled alternative in {@link smtlibv2Parser#info_response}.
+	 * @param ctx the parse tree
+	 */
+	void enterInfo_name(smtlibv2Parser.Info_nameContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code info_name}
+	 * labeled alternative in {@link smtlibv2Parser#info_response}.
+	 * @param ctx the parse tree
+	 */
+	void exitInfo_name(smtlibv2Parser.Info_nameContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code info_r_unknown}
+	 * labeled alternative in {@link smtlibv2Parser#info_response}.
+	 * @param ctx the parse tree
+	 */
+	void enterInfo_r_unknown(smtlibv2Parser.Info_r_unknownContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code info_r_unknown}
+	 * labeled alternative in {@link smtlibv2Parser#info_response}.
+	 * @param ctx the parse tree
+	 */
+	void exitInfo_r_unknown(smtlibv2Parser.Info_r_unknownContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code info_version}
+	 * labeled alternative in {@link smtlibv2Parser#info_response}.
+	 * @param ctx the parse tree
+	 */
+	void enterInfo_version(smtlibv2Parser.Info_versionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code info_version}
+	 * labeled alternative in {@link smtlibv2Parser#info_response}.
+	 * @param ctx the parse tree
+	 */
+	void exitInfo_version(smtlibv2Parser.Info_versionContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code info_attr}
+	 * labeled alternative in {@link smtlibv2Parser#info_response}.
+	 * @param ctx the parse tree
+	 */
+	void enterInfo_attr(smtlibv2Parser.Info_attrContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code info_attr}
+	 * labeled alternative in {@link smtlibv2Parser#info_response}.
+	 * @param ctx the parse tree
+	 */
+	void exitInfo_attr(smtlibv2Parser.Info_attrContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link smtlibv2Parser#valuation_pair}.
 	 * @param ctx the parse tree
@@ -878,15 +2190,29 @@ public interface smtlibv2Listener extends ParseTreeListener {
 	 */
 	void exitGet_info_response(smtlibv2Parser.Get_info_responseContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link smtlibv2Parser#get_model_response}.
+	 * Enter a parse tree produced by the {@code rs_model}
+	 * labeled alternative in {@link smtlibv2Parser#get_model_response}.
 	 * @param ctx the parse tree
 	 */
-	void enterGet_model_response(smtlibv2Parser.Get_model_responseContext ctx);
+	void enterRs_model(smtlibv2Parser.Rs_modelContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link smtlibv2Parser#get_model_response}.
+	 * Exit a parse tree produced by the {@code rs_model}
+	 * labeled alternative in {@link smtlibv2Parser#get_model_response}.
 	 * @param ctx the parse tree
 	 */
-	void exitGet_model_response(smtlibv2Parser.Get_model_responseContext ctx);
+	void exitRs_model(smtlibv2Parser.Rs_modelContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code model_resp}
+	 * labeled alternative in {@link smtlibv2Parser#get_model_response}.
+	 * @param ctx the parse tree
+	 */
+	void enterModel_resp(smtlibv2Parser.Model_respContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code model_resp}
+	 * labeled alternative in {@link smtlibv2Parser#get_model_response}.
+	 * @param ctx the parse tree
+	 */
+	void exitModel_resp(smtlibv2Parser.Model_respContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link smtlibv2Parser#get_option_response}.
 	 * @param ctx the parse tree
@@ -938,23 +2264,183 @@ public interface smtlibv2Listener extends ParseTreeListener {
 	 */
 	void exitGet_value_response(smtlibv2Parser.Get_value_responseContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link smtlibv2Parser#specific_success_response}.
+	 * Enter a parse tree produced by the {@code resp_check_sat}
+	 * labeled alternative in {@link smtlibv2Parser#specific_success_response}.
 	 * @param ctx the parse tree
 	 */
-	void enterSpecific_success_response(smtlibv2Parser.Specific_success_responseContext ctx);
+	void enterResp_check_sat(smtlibv2Parser.Resp_check_satContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link smtlibv2Parser#specific_success_response}.
+	 * Exit a parse tree produced by the {@code resp_check_sat}
+	 * labeled alternative in {@link smtlibv2Parser#specific_success_response}.
 	 * @param ctx the parse tree
 	 */
-	void exitSpecific_success_response(smtlibv2Parser.Specific_success_responseContext ctx);
+	void exitResp_check_sat(smtlibv2Parser.Resp_check_satContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link smtlibv2Parser#general_response}.
+	 * Enter a parse tree produced by the {@code resp_echo}
+	 * labeled alternative in {@link smtlibv2Parser#specific_success_response}.
 	 * @param ctx the parse tree
 	 */
-	void enterGeneral_response(smtlibv2Parser.General_responseContext ctx);
+	void enterResp_echo(smtlibv2Parser.Resp_echoContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link smtlibv2Parser#general_response}.
+	 * Exit a parse tree produced by the {@code resp_echo}
+	 * labeled alternative in {@link smtlibv2Parser#specific_success_response}.
 	 * @param ctx the parse tree
 	 */
-	void exitGeneral_response(smtlibv2Parser.General_responseContext ctx);
+	void exitResp_echo(smtlibv2Parser.Resp_echoContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code resp_get_assert}
+	 * labeled alternative in {@link smtlibv2Parser#specific_success_response}.
+	 * @param ctx the parse tree
+	 */
+	void enterResp_get_assert(smtlibv2Parser.Resp_get_assertContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code resp_get_assert}
+	 * labeled alternative in {@link smtlibv2Parser#specific_success_response}.
+	 * @param ctx the parse tree
+	 */
+	void exitResp_get_assert(smtlibv2Parser.Resp_get_assertContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code resp_gett_assign}
+	 * labeled alternative in {@link smtlibv2Parser#specific_success_response}.
+	 * @param ctx the parse tree
+	 */
+	void enterResp_gett_assign(smtlibv2Parser.Resp_gett_assignContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code resp_gett_assign}
+	 * labeled alternative in {@link smtlibv2Parser#specific_success_response}.
+	 * @param ctx the parse tree
+	 */
+	void exitResp_gett_assign(smtlibv2Parser.Resp_gett_assignContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code resp_get_info}
+	 * labeled alternative in {@link smtlibv2Parser#specific_success_response}.
+	 * @param ctx the parse tree
+	 */
+	void enterResp_get_info(smtlibv2Parser.Resp_get_infoContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code resp_get_info}
+	 * labeled alternative in {@link smtlibv2Parser#specific_success_response}.
+	 * @param ctx the parse tree
+	 */
+	void exitResp_get_info(smtlibv2Parser.Resp_get_infoContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code resp_get_model}
+	 * labeled alternative in {@link smtlibv2Parser#specific_success_response}.
+	 * @param ctx the parse tree
+	 */
+	void enterResp_get_model(smtlibv2Parser.Resp_get_modelContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code resp_get_model}
+	 * labeled alternative in {@link smtlibv2Parser#specific_success_response}.
+	 * @param ctx the parse tree
+	 */
+	void exitResp_get_model(smtlibv2Parser.Resp_get_modelContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code resp_option}
+	 * labeled alternative in {@link smtlibv2Parser#specific_success_response}.
+	 * @param ctx the parse tree
+	 */
+	void enterResp_option(smtlibv2Parser.Resp_optionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code resp_option}
+	 * labeled alternative in {@link smtlibv2Parser#specific_success_response}.
+	 * @param ctx the parse tree
+	 */
+	void exitResp_option(smtlibv2Parser.Resp_optionContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code resp_proof}
+	 * labeled alternative in {@link smtlibv2Parser#specific_success_response}.
+	 * @param ctx the parse tree
+	 */
+	void enterResp_proof(smtlibv2Parser.Resp_proofContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code resp_proof}
+	 * labeled alternative in {@link smtlibv2Parser#specific_success_response}.
+	 * @param ctx the parse tree
+	 */
+	void exitResp_proof(smtlibv2Parser.Resp_proofContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code resp_unsat_assume}
+	 * labeled alternative in {@link smtlibv2Parser#specific_success_response}.
+	 * @param ctx the parse tree
+	 */
+	void enterResp_unsat_assume(smtlibv2Parser.Resp_unsat_assumeContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code resp_unsat_assume}
+	 * labeled alternative in {@link smtlibv2Parser#specific_success_response}.
+	 * @param ctx the parse tree
+	 */
+	void exitResp_unsat_assume(smtlibv2Parser.Resp_unsat_assumeContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code resp_unsat_core}
+	 * labeled alternative in {@link smtlibv2Parser#specific_success_response}.
+	 * @param ctx the parse tree
+	 */
+	void enterResp_unsat_core(smtlibv2Parser.Resp_unsat_coreContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code resp_unsat_core}
+	 * labeled alternative in {@link smtlibv2Parser#specific_success_response}.
+	 * @param ctx the parse tree
+	 */
+	void exitResp_unsat_core(smtlibv2Parser.Resp_unsat_coreContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code resp_value}
+	 * labeled alternative in {@link smtlibv2Parser#specific_success_response}.
+	 * @param ctx the parse tree
+	 */
+	void enterResp_value(smtlibv2Parser.Resp_valueContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code resp_value}
+	 * labeled alternative in {@link smtlibv2Parser#specific_success_response}.
+	 * @param ctx the parse tree
+	 */
+	void exitResp_value(smtlibv2Parser.Resp_valueContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code resp_success}
+	 * labeled alternative in {@link smtlibv2Parser#general_response}.
+	 * @param ctx the parse tree
+	 */
+	void enterResp_success(smtlibv2Parser.Resp_successContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code resp_success}
+	 * labeled alternative in {@link smtlibv2Parser#general_response}.
+	 * @param ctx the parse tree
+	 */
+	void exitResp_success(smtlibv2Parser.Resp_successContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code resp_spec_successs}
+	 * labeled alternative in {@link smtlibv2Parser#general_response}.
+	 * @param ctx the parse tree
+	 */
+	void enterResp_spec_successs(smtlibv2Parser.Resp_spec_successsContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code resp_spec_successs}
+	 * labeled alternative in {@link smtlibv2Parser#general_response}.
+	 * @param ctx the parse tree
+	 */
+	void exitResp_spec_successs(smtlibv2Parser.Resp_spec_successsContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code resp_unsupported}
+	 * labeled alternative in {@link smtlibv2Parser#general_response}.
+	 * @param ctx the parse tree
+	 */
+	void enterResp_unsupported(smtlibv2Parser.Resp_unsupportedContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code resp_unsupported}
+	 * labeled alternative in {@link smtlibv2Parser#general_response}.
+	 * @param ctx the parse tree
+	 */
+	void exitResp_unsupported(smtlibv2Parser.Resp_unsupportedContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code resp_error}
+	 * labeled alternative in {@link smtlibv2Parser#general_response}.
+	 * @param ctx the parse tree
+	 */
+	void enterResp_error(smtlibv2Parser.Resp_errorContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code resp_error}
+	 * labeled alternative in {@link smtlibv2Parser#general_response}.
+	 * @param ctx the parse tree
+	 */
+	void exitResp_error(smtlibv2Parser.Resp_errorContext ctx);
 }

@@ -486,10 +486,10 @@ UndefinedSymbol:
 // Starting rule(s)
 
 start
-    : logic EOF
-    | theory_decl EOF
-    | script EOF
-    | general_response EOF
+    : logic EOF                                       #start_logic
+    | theory_decl EOF                                 #start_theory
+    | script EOF                                      #start_script
+    | general_response EOF                            #start_gen_resp
     ;
 
 generalReservedWord
@@ -511,8 +511,8 @@ generalReservedWord
 
 
 simpleSymbol
-    : predefSymbol
-    | UndefinedSymbol
+    : predefSymbol                                          #simp_pre_symb
+    | UndefinedSymbol                                       #simp_undef_symb
     ;
 
 quotedSymbol
@@ -585,8 +585,8 @@ predefKeyword
 
 
 symbol
-    : simpleSymbol
-    | quotedSymbol
+    : simpleSymbol                                                  #simpsymb
+    | quotedSymbol                                                  #quotsymb
     ;
 
 numeral
@@ -610,66 +610,66 @@ string
     ;
 
 keyword
-    : predefKeyword
-    | Colon simpleSymbol
+    : predefKeyword                                                   #pre_key
+    | Colon simpleSymbol                                              #key_simsymb
     ;
 
 // S-expression
 
 spec_constant
-    : numeral
-    | decimal
-    | hexadecimal
-    | binary
-    | string
+    : numeral                                                         #spec_constant_num
+    | decimal                                                         #spec_constant_dec
+    | hexadecimal                                                     #spec_constant_hex
+    | binary                                                          #spec_constant_bin
+    | string                                                          #spec_constant_string
     ;
 
 
 s_expr
-    : spec_constant
-    | symbol
-    | keyword
-    | ParOpen s_expr* ParClose
+    : spec_constant                                                   #s_expr_spec
+    | symbol                                                          #s_expr_symb
+    | keyword                                                         #s_expr_key
+    | ParOpen s_expr* ParClose                                        #multi_s_expr
     ;
 
 // Identifiers
 
 index
-    : numeral
-    | symbol
+    : numeral                                                         #idx_num
+    | symbol                                                          #idx_symb
     ;
 
 identifier
-    : symbol
-    | ParOpen GRW_Underscore symbol index+ ParClose
+    : symbol                                                          #id_symb
+    | ParOpen GRW_Underscore symbol index+ ParClose                   #id_symb_idx
     ;
 
 // Attributes
 
 attribute_value
-    : spec_constant
-    | symbol
-    | ParOpen s_expr* ParClose
+    : spec_constant                                                   #attr_spec
+    | symbol                                                          #attr_symb
+    | ParOpen s_expr* ParClose                                        #attr_s_expr
     ;
 
 attribute
-    : keyword
-    | keyword attribute_value
+    : keyword                                                         #attr_key
+    | keyword attribute_value                                         #attr_key_attr
     ;
 
 // Sorts
 
 sort
-    : identifier
-    | ParOpen identifier sort+ ParClose
+    : identifier                                                      #sort_id
+    | ParOpen identifier sort+ ParClose                               #multisort
     ;
 
 
 // Terms and Formulas
 
 qual_identifer
-    : identifier
-    | ParOpen GRW_As identifier sort ParClose
+    : identifier                                                      #qual_id
+    | ParOpen GRW_As identifier sort ParClose                         #qual_id_sort
     ;
 
 var_binding
@@ -681,8 +681,8 @@ sorted_var
     ;
 
 pattern
-    : symbol
-    | ParOpen symbol symbol+ ParClose
+    : symbol                                                          #pattern_symb
+    | ParOpen symbol symbol+ ParClose                                 #pattern_multisymb
     ;
 
 match_case
@@ -690,14 +690,14 @@ match_case
     ;
 
 term
-    : spec_constant
-    | qual_identifer
-    | ParOpen qual_identifer term+ ParClose
-    | ParOpen GRW_Let ParOpen var_binding+ ParClose term ParClose
-    | ParOpen GRW_Forall ParOpen sorted_var+ ParClose term ParClose
-    | ParOpen GRW_Exists ParOpen sorted_var+ ParClose term ParClose
-    | ParOpen GRW_Match term ParOpen match_case+ ParClose ParClose
-    | ParOpen GRW_Exclamation term attribute+ ParClose
+    : spec_constant                                                   #term_spec_const
+    | qual_identifer                                                  #term_qual_id
+    | ParOpen qual_identifer term+ ParClose                           #multiterm
+    | ParOpen GRW_Let ParOpen var_binding+ ParClose term ParClose     #term_let
+    | ParOpen GRW_Forall ParOpen sorted_var+ ParClose term ParClose   #term_forall
+    | ParOpen GRW_Exists ParOpen sorted_var+ ParClose term ParClose   #term_exists
+    | ParOpen GRW_Match term ParOpen match_case+ ParClose ParClose    #term_match
+    | ParOpen GRW_Exclamation term attribute+ ParClose                #term_exclam
     ;
 
 
@@ -713,26 +713,26 @@ meta_spec_constant
     ;
 
 fun_symbol_decl
-    : ParOpen spec_constant sort attribute* ParClose
-    | ParOpen meta_spec_constant sort attribute* ParClose
-    | ParOpen identifier sort+ attribute* ParClose
+    : ParOpen spec_constant sort attribute* ParClose                      #fun_symb_spec
+    | ParOpen meta_spec_constant sort attribute* ParClose                 #fun_symb_meta
+    | ParOpen identifier sort+ attribute* ParClose                        #fun_symb_id
     ;
 
 par_fun_symbol_decl
-    : fun_symbol_decl
+    : fun_symbol_decl                                                     #par_fun_symb
     | ParOpen GRW_Par ParOpen symbol+ ParClose ParOpen identifier sort+
-    attribute* ParClose ParClose
+    attribute* ParClose ParClose                                          #par_fun_multi_symb
     ;
 
 theory_attribute
-    : PK_Sorts ParOpen sort_symbol_decl+ ParClose
-    | PK_Funs ParOpen par_fun_symbol_decl+ ParClose
-    | PK_SortsDescription string
-    | PK_FunsDescription string
-    | PK_Definition string
-    | PK_Values string
-    | PK_Notes string
-    | attribute
+    : PK_Sorts ParOpen sort_symbol_decl+ ParClose                         #theory_sort
+    | PK_Funs ParOpen par_fun_symbol_decl+ ParClose                       #theory_fun
+    | PK_SortsDescription string                                          #theory_sort_descr
+    | PK_FunsDescription string                                           #theory_fun_descr
+    | PK_Definition string                                                #theory_def
+    | PK_Values string                                                    #theory_val
+    | PK_Notes string                                                     #theory_notes
+    | attribute                                                           #theory_attr
     ;
 
 theory_decl
@@ -743,12 +743,12 @@ theory_decl
 // Logic Declarations
 
 logic_attribue
-    : PK_Theories ParOpen symbol+ ParClose
-    | PK_Language string
-    | PK_Extension string
-    | PK_Values string
-    | PK_Notes string
-    | attribute
+    : PK_Theories ParOpen symbol+ ParClose                                #logic_theory
+    | PK_Language string                                                  #logic_language
+    | PK_Extension string                                                 #logic_ext
+    | PK_Values string                                                    #logic_val
+    | PK_Notes string                                                     #logic_notes
+    | attribute                                                           #logic_attr
     ;
 
 logic
@@ -771,9 +771,9 @@ constructor_dec
     ;
 
 datatype_dec
-    : ParOpen constructor_dec+ ParClose
+    : ParOpen constructor_dec+ ParClose                                         #data_constr
     | ParOpen GRW_Par ParOpen symbol+ ParClose ParOpen constructor_dec+
-    ParClose ParClose
+    ParClose ParClose                                                           #data_multisymb
     ;
 
 function_dec
@@ -785,8 +785,8 @@ function_def
     ;
 
 prop_literal
-    : symbol
-    | ParOpen PS_Not symbol ParClose
+    : symbol                                                                    #prop_symb
+    | ParOpen PS_Not symbol ParClose                                            #prop_not
     ;
 
 
@@ -917,36 +917,36 @@ cmd_setOption
     ;
 
 command
-    : ParOpen cmd_assert ParClose
-    | ParOpen cmd_checkSat ParClose
-    | ParOpen cmd_checkSatAssuming ParClose
-    | ParOpen cmd_declareConst ParClose
-    | ParOpen cmd_declareDatatype ParClose
-    | ParOpen cmd_declareDatatypes ParClose
-    | ParOpen cmd_declareFun ParClose
-    | ParOpen cmd_declareSort ParClose
-    | ParOpen cmd_defineFun ParClose
-    | ParOpen cmd_defineFunRec ParClose
-    | ParOpen cmd_defineFunsRec ParClose
-    | ParOpen cmd_defineSort ParClose
-    | ParOpen cmd_echo ParClose
-    | ParOpen cmd_exit ParClose
-    | ParOpen cmd_getAssertions ParClose
-    | ParOpen cmd_getAssignment ParClose
-    | ParOpen cmd_getInfo ParClose
-    | ParOpen cmd_getModel ParClose
-    | ParOpen cmd_getOption ParClose
-    | ParOpen cmd_getProof ParClose
-    | ParOpen cmd_getUnsatAssumptions ParClose
-    | ParOpen cmd_getUnsatCore ParClose
-    | ParOpen cmd_getValue ParClose
-    | ParOpen cmd_pop ParClose
-    | ParOpen cmd_push ParClose
-    | ParOpen cmd_reset ParClose
-    | ParOpen cmd_resetAssertions ParClose
-    | ParOpen cmd_setInfo ParClose
-    | ParOpen cmd_setLogic ParClose
-    | ParOpen cmd_setOption ParClose
+    : ParOpen cmd_assert ParClose                           #assert
+    | ParOpen cmd_checkSat ParClose                         #check
+    | ParOpen cmd_checkSatAssuming ParClose                 #check_assume
+    | ParOpen cmd_declareConst ParClose                     #decl_const
+    | ParOpen cmd_declareDatatype ParClose                  #decl_data
+    | ParOpen cmd_declareDatatypes ParClose                 #decl_datas
+    | ParOpen cmd_declareFun ParClose                       #decl_fun
+    | ParOpen cmd_declareSort ParClose                      #decl_sort
+    | ParOpen cmd_defineFun ParClose                        #def_fun
+    | ParOpen cmd_defineFunRec ParClose                     #def_fun_rec
+    | ParOpen cmd_defineFunsRec ParClose                    #def_funs_rec
+    | ParOpen cmd_defineSort ParClose                       #def_sort
+    | ParOpen cmd_echo ParClose                             #echo
+    | ParOpen cmd_exit ParClose                             #exit
+    | ParOpen cmd_getAssertions ParClose                    #get_assert
+    | ParOpen cmd_getAssignment ParClose                    #get_assign
+    | ParOpen cmd_getInfo ParClose                          #get_info
+    | ParOpen cmd_getModel ParClose                         #get_model
+    | ParOpen cmd_getOption ParClose                        #get_option
+    | ParOpen cmd_getProof ParClose                         #get_proof
+    | ParOpen cmd_getUnsatAssumptions ParClose              #get_unsat_assume
+    | ParOpen cmd_getUnsatCore ParClose                     #get_unsat_core
+    | ParOpen cmd_getValue ParClose                         #get_val
+    | ParOpen cmd_pop ParClose                              #pop
+    | ParOpen cmd_push ParClose                             #push
+    | ParOpen cmd_reset ParClose                            #reset
+    | ParOpen cmd_resetAssertions ParClose                  #reset_assert
+    | ParOpen cmd_setInfo ParClose                          #setInfo
+    | ParOpen cmd_setLogic ParClose                         #set_logic
+    | ParOpen cmd_setOption ParClose                        #set_option
     ;
 
 
@@ -956,32 +956,32 @@ b_value
     ;
 
 option
-    : PK_DiagnosticOutputChannel string
-    | PK_GlobalDeclarations b_value
-    | PK_InteractiveMode b_value
-    | PK_PrintSuccess b_value
-    | PK_ProduceAssertions b_value
-    | PK_ProduceAssignments b_value
-    | PK_ProduceModels b_value
-    | PK_ProduceProofs b_value
-    | PK_ProduceUnsatAssumptions b_value
-    | PK_ProduceUnsatCores b_value
-    | PK_RandomSeed numeral
-    | PK_RegularOutputChannel string
-    | PK_ReproducibleResourceLimit numeral
-    | PK_Verbosity numeral
-    | attribute
+    : PK_DiagnosticOutputChannel string             #diagnose
+    | PK_GlobalDeclarations b_value                 #global
+    | PK_InteractiveMode b_value                    #interactive
+    | PK_PrintSuccess b_value                       #print_succ
+    | PK_ProduceAssertions b_value                  #prod_assert
+    | PK_ProduceAssignments b_value                 #prod_assign
+    | PK_ProduceModels b_value                      #prod_mod
+    | PK_ProduceProofs b_value                      #prod_proofs
+    | PK_ProduceUnsatAssumptions b_value            #prod_unsat_assume
+    | PK_ProduceUnsatCores b_value                  #prod_unsat_core
+    | PK_RandomSeed numeral                         #rand_seed
+    | PK_RegularOutputChannel string                #reg_out
+    | PK_ReproducibleResourceLimit numeral          #repro
+    | PK_Verbosity numeral                          #verbose
+    | attribute                                     #opt_attr
     ;
 
 info_flag
-    : PK_AllStatistics
-    | PK_AssertionStackLevels
-    | PK_Authors
-    | PK_ErrorBehaviour
-    | PK_Name
-    | PK_ReasonUnknown
-    | PK_Version
-    | keyword
+    : PK_AllStatistics                              #all_stat
+    | PK_AssertionStackLevels                       #assert_stack
+    | PK_Authors                                    #authors
+    | PK_ErrorBehaviour                             #error
+    | PK_Name                                       #name
+    | PK_ReasonUnknown                              #r_unknown
+    | PK_Version                                    #version
+    | keyword                                       #info_key
     ;
 
 // responses
@@ -992,25 +992,25 @@ error_behaviour
     ;
 
 reason_unknown
-    : PS_Memout
-    | PS_Incomplete
-    | s_expr
+    : PS_Memout                                   #memout
+    | PS_Incomplete                               #incomp
+    | s_expr                                      #r_unnown_s_expr
     ;
 
 model_response
-    : ParOpen cmd_defineFun ParClose
-    | ParOpen cmd_defineFunRec ParClose
-    | ParOpen cmd_defineFunsRec ParClose
+    : ParOpen cmd_defineFun ParClose              #resp_def_fun
+    | ParOpen cmd_defineFunRec ParClose           #resp_def_fun_rec
+    | ParOpen cmd_defineFunsRec ParClose          #resp_def_funs_rec
     ;
 
 info_response
-    : PK_AssertionStackLevels numeral
-    | PK_Authors string
-    | PK_ErrorBehaviour error_behaviour
-    | PK_Name string
-    | PK_ReasonUnknown reason_unknown
-    | PK_Version string
-    | attribute
+    : PK_AssertionStackLevels numeral             #info_assert_stack
+    | PK_Authors string                           #info_authors
+    | PK_ErrorBehaviour error_behaviour           #info_error
+    | PK_Name string                              #info_name
+    | PK_ReasonUnknown reason_unknown             #info_r_unknown
+    | PK_Version string                           #info_version
+    | attribute                                   #info_attr
     ;
 
 valuation_pair
@@ -1044,8 +1044,8 @@ get_info_response
     ;
 
 get_model_response
-    : ParOpen RS_Model model_response* ParClose
-    | ParOpen model_response* ParClose
+    : ParOpen RS_Model model_response* ParClose       #rs_model
+    | ParOpen model_response* ParClose                #model_resp
     ;
 
 get_option_response
@@ -1069,24 +1069,24 @@ get_value_response
     ;
 
 specific_success_response
-    : check_sat_response
-    | echo_response
-    | get_assertions_response
-    | get_assignment_response
-    | get_info_response
-    | get_model_response
-    | get_option_response
-    | get_proof_response
-    | get_unsat_assump_response
-    | get_unsat_core_response
-    | get_value_response
+    : check_sat_response                      #resp_check_sat
+    | echo_response                           #resp_echo
+    | get_assertions_response                 #resp_get_assert
+    | get_assignment_response                 #resp_gett_assign
+    | get_info_response                       #resp_get_info
+    | get_model_response                      #resp_get_model
+    | get_option_response                     #resp_option
+    | get_proof_response                      #resp_proof
+    | get_unsat_assump_response               #resp_unsat_assume
+    | get_unsat_core_response                 #resp_unsat_core
+    | get_value_response                      #resp_value
     ;
 
 general_response
-    : PS_Success
-    | specific_success_response
-    | PS_Unsupported
-    | ParOpen PS_Error string ParClose
+    : PS_Success                              #resp_success
+    | specific_success_response               #resp_spec_successs
+    | PS_Unsupported                          #resp_unsupported
+    | ParOpen PS_Error string ParClose        #resp_error
     ;
 
 

@@ -1,7 +1,9 @@
 package org.sosy_lab.java_smt.utils.Parsers;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
@@ -29,6 +31,7 @@ import org.sosy_lab.java_smt.api.UFManager;
 public class Visitor extends smtlibv2BaseVisitor<Object> {
 
   HashMap<String, ParserFormula> variables = new HashMap<String, ParserFormula>();
+  List<Object> constraints = new ArrayList();
   Configuration config = Configuration.defaultConfiguration();
   LogManager logger = BasicLogManager.create(config);
   ShutdownManager shutdown = ShutdownManager.create();
@@ -45,17 +48,21 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
   public Visitor() throws InvalidConfigurationException {
   }
 
-  @Override public Object visitStart(smtlibv2Parser.StartContext ctx) {
+  @Override public Object visitStart_logic(smtlibv2Parser.Start_logicContext ctx) { return visitChildren(ctx); }
 
+  @Override public Object visitStart_theory(smtlibv2Parser.Start_theoryContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitStart_script(smtlibv2Parser.Start_scriptContext ctx) {
     return visitChildren(ctx);
   }
 
+  @Override public Object visitStart_gen_resp(smtlibv2Parser.Start_gen_respContext ctx) { return visitChildren(ctx); }
+
   @Override public Object visitGeneralReservedWord(smtlibv2Parser.GeneralReservedWordContext ctx) { return visitChildren(ctx); }
 
-  @Override public Object visitSimpleSymbol(smtlibv2Parser.SimpleSymbolContext ctx) {
+  @Override public Object visitSimp_pre_symb(smtlibv2Parser.Simp_pre_symbContext ctx) { return visitChildren(ctx); }
 
-    return ctx.children.get(0);
-  }
+  @Override public Object visitSimp_undef_symb(smtlibv2Parser.Simp_undef_symbContext ctx) { return visitChildren(ctx); }
 
   @Override public Object visitQuotedSymbol(smtlibv2Parser.QuotedSymbolContext ctx) { return visitChildren(ctx); }
 
@@ -63,10 +70,9 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
 
   @Override public Object visitPredefKeyword(smtlibv2Parser.PredefKeywordContext ctx) { return visitChildren(ctx); }
 
-  @Override public Object visitSymbol(smtlibv2Parser.SymbolContext ctx) {
+  @Override public Object visitSimpsymb(smtlibv2Parser.SimpsymbContext ctx) { return visitChildren(ctx); }
 
-    return visitChildren(ctx);
-  }
+  @Override public Object visitQuotsymb(smtlibv2Parser.QuotsymbContext ctx) { return visitChildren(ctx); }
 
   @Override public Object visitNumeral(smtlibv2Parser.NumeralContext ctx) { return visitChildren(ctx); }
 
@@ -78,64 +84,162 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
 
   @Override public Object visitString(smtlibv2Parser.StringContext ctx) { return visitChildren(ctx); }
 
-  @Override public Object visitKeyword(smtlibv2Parser.KeywordContext ctx) { return visitChildren(ctx); }
+  @Override public Object visitPre_key(smtlibv2Parser.Pre_keyContext ctx) { return visitChildren(ctx); }
 
-  @Override public Object visitSpec_constant(smtlibv2Parser.Spec_constantContext ctx) { return visitChildren(ctx); }
+  @Override public Object visitKey_simsymb(smtlibv2Parser.Key_simsymbContext ctx) { return visitChildren(ctx); }
 
-  @Override public Object visitS_expr(smtlibv2Parser.S_exprContext ctx) { return visitChildren(ctx); }
+  @Override public Object visitSpec_constant_num(smtlibv2Parser.Spec_constant_numContext ctx) { return visitChildren(ctx); }
 
-  @Override public Object visitIndex(smtlibv2Parser.IndexContext ctx) { return visitChildren(ctx); }
+  @Override public Object visitSpec_constant_dec(smtlibv2Parser.Spec_constant_decContext ctx) { return visitChildren(ctx); }
 
-  @Override public Object visitIdentifier(smtlibv2Parser.IdentifierContext ctx) {
-    return visitChildren(ctx); }
+  @Override public Object visitSpec_constant_hex(smtlibv2Parser.Spec_constant_hexContext ctx) { return visitChildren(ctx); }
 
-  @Override public Object visitAttribute_value(smtlibv2Parser.Attribute_valueContext ctx) { return visitChildren(ctx); }
+  @Override public Object visitSpec_constant_bin(smtlibv2Parser.Spec_constant_binContext ctx) { return visitChildren(ctx); }
 
-  @Override public Object visitAttribute(smtlibv2Parser.AttributeContext ctx) { return visitChildren(ctx); }
+  @Override public Object visitSpec_constant_string(smtlibv2Parser.Spec_constant_stringContext ctx) { return visitChildren(ctx); }
 
-  @Override public Object visitSort(smtlibv2Parser.SortContext ctx) { return visitChildren(ctx); }
+  @Override public Object visitS_expr_spec(smtlibv2Parser.S_expr_specContext ctx) { return visitChildren(ctx); }
 
-  @Override public Object visitQual_identifer(smtlibv2Parser.Qual_identiferContext ctx) { return visitChildren(ctx); }
+  @Override public Object visitS_expr_symb(smtlibv2Parser.S_expr_symbContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitS_expr_key(smtlibv2Parser.S_expr_keyContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitMulti_s_expr(smtlibv2Parser.Multi_s_exprContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitIdx_num(smtlibv2Parser.Idx_numContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitIdx_symb(smtlibv2Parser.Idx_symbContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitId_symb(smtlibv2Parser.Id_symbContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitId_symb_idx(smtlibv2Parser.Id_symb_idxContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitAttr_spec(smtlibv2Parser.Attr_specContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitAttr_symb(smtlibv2Parser.Attr_symbContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitAttr_s_expr(smtlibv2Parser.Attr_s_exprContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitAttr_key(smtlibv2Parser.Attr_keyContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitAttr_key_attr(smtlibv2Parser.Attr_key_attrContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitSort_id(smtlibv2Parser.Sort_idContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitMultisort(smtlibv2Parser.MultisortContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitQual_id(smtlibv2Parser.Qual_idContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitQual_id_sort(smtlibv2Parser.Qual_id_sortContext ctx) { return visitChildren(ctx); }
 
   @Override public Object visitVar_binding(smtlibv2Parser.Var_bindingContext ctx) { return visitChildren(ctx); }
 
   @Override public Object visitSorted_var(smtlibv2Parser.Sorted_varContext ctx) { return visitChildren(ctx); }
 
-  @Override public Object visitPattern(smtlibv2Parser.PatternContext ctx) { return visitChildren(ctx); }
+  @Override public Object visitPattern_symb(smtlibv2Parser.Pattern_symbContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitPattern_multisymb(smtlibv2Parser.Pattern_multisymbContext ctx) { return visitChildren(ctx); }
 
   @Override public Object visitMatch_case(smtlibv2Parser.Match_caseContext ctx) { return visitChildren(ctx); }
 
-  @Override public Object visitTerm(smtlibv2Parser.TermContext ctx) {
-    String bla = ctx.getText();
-    System.out.println(ctx + " " + ctx.getText());
-    System.out.println();
-    String operator = ctx.qual_identifer().getText();
-    // if and
-    // PLAN: bmgr.and(recursive -> bmgr);
+  @Override public Object visitTerm_spec_const(smtlibv2Parser.Term_spec_constContext ctx) { return visitChildren(ctx); }
 
-    List<String> operands = new ArrayList<>();
-    for (int i = 0; i < ctx.term().size(); i++) {
-      operands.add(ctx.term(i).getText());
-      }
-    //System.out.println(operator);
-    //System.out.println(operands);
-    //return bmgr.and(visitChildren((RuleNode)visitTerm(ctx)),visitChildren((RuleNode)visitTerm(ctx)));
-    return visitChildren(ctx);
+
+  @Override public BooleanFormula visitTerm_qual_id(smtlibv2Parser.Term_qual_idContext ctx) {
+    // TODO: Error handling
+    String operand = ctx.getText();
+    if (variables.containsKey(operand)) {
+      return variables.get(ctx.getText()).javaSmt;
+    } else {
+      System.out.println(operand + " not in hashmap!");
+      return null;
+    }
+
+    // hit leaf node, return operand
   }
+
+  int temp = 0;
+
+  @Override public Object visitMultiterm(smtlibv2Parser.MultitermContext ctx) {
+    String operator = ctx.qual_identifer().getText();
+    System.out.println(operator + " " + temp);
+    Collection<BooleanFormula> operands = new ArrayList();
+
+    for (int i = 0; i < ctx.term().size(); ++i) {
+      BooleanFormula operand = (BooleanFormula) visit(ctx.term(i));
+      // do not add multi term to list of operands
+      if (operand != null) {
+        operands.add(operand);
+      }
+    }
+
+    switch(operator) {
+      case "and":
+          return bmgr.and(operands);
+      case "or":
+        return bmgr.or(operands);
+      case "xor":
+        if (operands.size() != 2)
+          break;
+        Iterator<BooleanFormula> it = operands.iterator();
+        return bmgr.xor(it.next(), it.next());
+    }
+    return null;
+  }
+
+  @Override public Object visitTerm_let(smtlibv2Parser.Term_letContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitTerm_forall(smtlibv2Parser.Term_forallContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitTerm_exists(smtlibv2Parser.Term_existsContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitTerm_match(smtlibv2Parser.Term_matchContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitTerm_exclam(smtlibv2Parser.Term_exclamContext ctx) { return visitChildren(ctx); }
 
   @Override public Object visitSort_symbol_decl(smtlibv2Parser.Sort_symbol_declContext ctx) { return visitChildren(ctx); }
 
   @Override public Object visitMeta_spec_constant(smtlibv2Parser.Meta_spec_constantContext ctx) { return visitChildren(ctx); }
 
-  @Override public Object visitFun_symbol_decl(smtlibv2Parser.Fun_symbol_declContext ctx) { return visitChildren(ctx); }
+  @Override public Object visitFun_symb_spec(smtlibv2Parser.Fun_symb_specContext ctx) { return visitChildren(ctx); }
 
-  @Override public Object visitPar_fun_symbol_decl(smtlibv2Parser.Par_fun_symbol_declContext ctx) { return visitChildren(ctx); }
+  @Override public Object visitFun_symb_meta(smtlibv2Parser.Fun_symb_metaContext ctx) { return visitChildren(ctx); }
 
-  @Override public Object visitTheory_attribute(smtlibv2Parser.Theory_attributeContext ctx) { return visitChildren(ctx); }
+  @Override public Object visitFun_symb_id(smtlibv2Parser.Fun_symb_idContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitPar_fun_symb(smtlibv2Parser.Par_fun_symbContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitPar_fun_multi_symb(smtlibv2Parser.Par_fun_multi_symbContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitTheory_sort(smtlibv2Parser.Theory_sortContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitTheory_fun(smtlibv2Parser.Theory_funContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitTheory_sort_descr(smtlibv2Parser.Theory_sort_descrContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitTheory_fun_descr(smtlibv2Parser.Theory_fun_descrContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitTheory_def(smtlibv2Parser.Theory_defContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitTheory_val(smtlibv2Parser.Theory_valContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitTheory_notes(smtlibv2Parser.Theory_notesContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitTheory_attr(smtlibv2Parser.Theory_attrContext ctx) { return visitChildren(ctx); }
 
   @Override public Object visitTheory_decl(smtlibv2Parser.Theory_declContext ctx) { return visitChildren(ctx); }
 
-  @Override public Object visitLogic_attribue(smtlibv2Parser.Logic_attribueContext ctx) { return visitChildren(ctx); }
+  @Override public Object visitLogic_theory(smtlibv2Parser.Logic_theoryContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitLogic_language(smtlibv2Parser.Logic_languageContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitLogic_ext(smtlibv2Parser.Logic_extContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitLogic_val(smtlibv2Parser.Logic_valContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitLogic_notes(smtlibv2Parser.Logic_notesContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitLogic_attr(smtlibv2Parser.Logic_attrContext ctx) { return visitChildren(ctx); }
 
   @Override public Object visitLogic(smtlibv2Parser.LogicContext ctx) { return visitChildren(ctx); }
 
@@ -145,19 +249,25 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
 
   @Override public Object visitConstructor_dec(smtlibv2Parser.Constructor_decContext ctx) { return visitChildren(ctx); }
 
-  @Override public Object visitDatatype_dec(smtlibv2Parser.Datatype_decContext ctx) { return visitChildren(ctx); }
+  @Override public Object visitData_constr(smtlibv2Parser.Data_constrContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitData_multisymb(smtlibv2Parser.Data_multisymbContext ctx) { return visitChildren(ctx); }
 
   @Override public Object visitFunction_dec(smtlibv2Parser.Function_decContext ctx) { return visitChildren(ctx); }
 
   @Override public Object visitFunction_def(smtlibv2Parser.Function_defContext ctx) { return visitChildren(ctx); }
 
-  @Override public Object visitProp_literal(smtlibv2Parser.Prop_literalContext ctx) { return visitChildren(ctx); }
+  @Override public Object visitProp_symb(smtlibv2Parser.Prop_symbContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitProp_not(smtlibv2Parser.Prop_notContext ctx) { return visitChildren(ctx); }
 
   @Override public Object visitScript(smtlibv2Parser.ScriptContext ctx) { return visitChildren(ctx); }
 
   @Override public Object visitCmd_assert(smtlibv2Parser.Cmd_assertContext ctx) {
-
-    return visitChildren(ctx);
+    Object result = visitChildren(ctx);
+    constraints.add(result);
+    System.out.println(constraints);
+    return result;
   }
 
   @Override public Object visitCmd_checkSat(smtlibv2Parser.Cmd_checkSatContext ctx) { return visitChildren(ctx); }
@@ -174,6 +284,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     } else {
       variables.put((variable), new ParserFormula("UF", bmgr.makeVariable(variable)));
     }
+    //System.out.println(variables);
     return visitChildren(ctx);
   }
 
@@ -182,6 +293,8 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
   @Override public Object visitCmd_declareDatatypes(smtlibv2Parser.Cmd_declareDatatypesContext ctx) { return visitChildren(ctx); }
 
   @Override public Object visitCmd_declareFun(smtlibv2Parser.Cmd_declareFunContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitCmd_declareSort(smtlibv2Parser.Cmd_declareSortContext ctx) { return visitChildren(ctx); }
 
   @Override public Object visitCmd_defineFun(smtlibv2Parser.Cmd_defineFunContext ctx) { return visitChildren(ctx); }
 
@@ -227,23 +340,141 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
 
   @Override public Object visitCmd_setOption(smtlibv2Parser.Cmd_setOptionContext ctx) { return visitChildren(ctx); }
 
-  @Override public Object visitCommand(smtlibv2Parser.CommandContext ctx) {
-    return visitChildren(ctx);
-  }
+  @Override public Object visitAssert(smtlibv2Parser.AssertContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitCheck(smtlibv2Parser.CheckContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitCheck_assume(smtlibv2Parser.Check_assumeContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitDecl_const(smtlibv2Parser.Decl_constContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitDecl_data(smtlibv2Parser.Decl_dataContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitDecl_datas(smtlibv2Parser.Decl_datasContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitDecl_fun(smtlibv2Parser.Decl_funContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitDecl_sort(smtlibv2Parser.Decl_sortContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitDef_fun(smtlibv2Parser.Def_funContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitDef_fun_rec(smtlibv2Parser.Def_fun_recContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitDef_funs_rec(smtlibv2Parser.Def_funs_recContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitDef_sort(smtlibv2Parser.Def_sortContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitEcho(smtlibv2Parser.EchoContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitExit(smtlibv2Parser.ExitContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitGet_assert(smtlibv2Parser.Get_assertContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitGet_assign(smtlibv2Parser.Get_assignContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitGet_info(smtlibv2Parser.Get_infoContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitGet_model(smtlibv2Parser.Get_modelContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitGet_option(smtlibv2Parser.Get_optionContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitGet_proof(smtlibv2Parser.Get_proofContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitGet_unsat_assume(smtlibv2Parser.Get_unsat_assumeContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitGet_unsat_core(smtlibv2Parser.Get_unsat_coreContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitGet_val(smtlibv2Parser.Get_valContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitPop(smtlibv2Parser.PopContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitPush(smtlibv2Parser.PushContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitReset(smtlibv2Parser.ResetContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitReset_assert(smtlibv2Parser.Reset_assertContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitSetInfo(smtlibv2Parser.SetInfoContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitSet_logic(smtlibv2Parser.Set_logicContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitSet_option(smtlibv2Parser.Set_optionContext ctx) { return visitChildren(ctx); }
 
   @Override public Object visitB_value(smtlibv2Parser.B_valueContext ctx) { return visitChildren(ctx); }
 
-  @Override public Object visitOption(smtlibv2Parser.OptionContext ctx) { return visitChildren(ctx); }
+  @Override public Object visitDiagnose(smtlibv2Parser.DiagnoseContext ctx) { return visitChildren(ctx); }
 
-  @Override public Object visitInfo_flag(smtlibv2Parser.Info_flagContext ctx) { return visitChildren(ctx); }
+  @Override public Object visitGlobal(smtlibv2Parser.GlobalContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitInteractive(smtlibv2Parser.InteractiveContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitPrint_succ(smtlibv2Parser.Print_succContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitProd_assert(smtlibv2Parser.Prod_assertContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitProd_assign(smtlibv2Parser.Prod_assignContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitProd_mod(smtlibv2Parser.Prod_modContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitProd_proofs(smtlibv2Parser.Prod_proofsContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitProd_unsat_assume(smtlibv2Parser.Prod_unsat_assumeContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitProd_unsat_core(smtlibv2Parser.Prod_unsat_coreContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitRand_seed(smtlibv2Parser.Rand_seedContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitReg_out(smtlibv2Parser.Reg_outContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitRepro(smtlibv2Parser.ReproContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitVerbose(smtlibv2Parser.VerboseContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitOpt_attr(smtlibv2Parser.Opt_attrContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitAll_stat(smtlibv2Parser.All_statContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitAssert_stack(smtlibv2Parser.Assert_stackContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitAuthors(smtlibv2Parser.AuthorsContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitError(smtlibv2Parser.ErrorContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitName(smtlibv2Parser.NameContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitR_unknown(smtlibv2Parser.R_unknownContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitVersion(smtlibv2Parser.VersionContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitInfo_key(smtlibv2Parser.Info_keyContext ctx) { return visitChildren(ctx); }
 
   @Override public Object visitError_behaviour(smtlibv2Parser.Error_behaviourContext ctx) { return visitChildren(ctx); }
 
-  @Override public Object visitReason_unknown(smtlibv2Parser.Reason_unknownContext ctx) { return visitChildren(ctx); }
+  @Override public Object visitMemout(smtlibv2Parser.MemoutContext ctx) { return visitChildren(ctx); }
 
-  @Override public Object visitModel_response(smtlibv2Parser.Model_responseContext ctx) { return visitChildren(ctx); }
+  @Override public Object visitIncomp(smtlibv2Parser.IncompContext ctx) { return visitChildren(ctx); }
 
-  @Override public Object visitInfo_response(smtlibv2Parser.Info_responseContext ctx) { return visitChildren(ctx); }
+  @Override public Object visitR_unnown_s_expr(smtlibv2Parser.R_unnown_s_exprContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitResp_def_fun(smtlibv2Parser.Resp_def_funContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitResp_def_fun_rec(smtlibv2Parser.Resp_def_fun_recContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitResp_def_funs_rec(smtlibv2Parser.Resp_def_funs_recContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitInfo_assert_stack(smtlibv2Parser.Info_assert_stackContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitInfo_authors(smtlibv2Parser.Info_authorsContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitInfo_error(smtlibv2Parser.Info_errorContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitInfo_name(smtlibv2Parser.Info_nameContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitInfo_r_unknown(smtlibv2Parser.Info_r_unknownContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitInfo_version(smtlibv2Parser.Info_versionContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitInfo_attr(smtlibv2Parser.Info_attrContext ctx) { return visitChildren(ctx); }
 
   @Override public Object visitValuation_pair(smtlibv2Parser.Valuation_pairContext ctx) { return visitChildren(ctx); }
 
@@ -259,7 +490,9 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
 
   @Override public Object visitGet_info_response(smtlibv2Parser.Get_info_responseContext ctx) { return visitChildren(ctx); }
 
-  @Override public Object visitGet_model_response(smtlibv2Parser.Get_model_responseContext ctx) { return visitChildren(ctx); }
+  @Override public Object visitRs_model(smtlibv2Parser.Rs_modelContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitModel_resp(smtlibv2Parser.Model_respContext ctx) { return visitChildren(ctx); }
 
   @Override public Object visitGet_option_response(smtlibv2Parser.Get_option_responseContext ctx) { return visitChildren(ctx); }
 
@@ -271,7 +504,33 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
 
   @Override public Object visitGet_value_response(smtlibv2Parser.Get_value_responseContext ctx) { return visitChildren(ctx); }
 
-  @Override public Object visitSpecific_success_response(smtlibv2Parser.Specific_success_responseContext ctx) { return visitChildren(ctx); }
+  @Override public Object visitResp_check_sat(smtlibv2Parser.Resp_check_satContext ctx) { return visitChildren(ctx); }
 
-  @Override public Object visitGeneral_response(smtlibv2Parser.General_responseContext ctx) { return visitChildren(ctx); }
+  @Override public Object visitResp_echo(smtlibv2Parser.Resp_echoContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitResp_get_assert(smtlibv2Parser.Resp_get_assertContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitResp_gett_assign(smtlibv2Parser.Resp_gett_assignContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitResp_get_info(smtlibv2Parser.Resp_get_infoContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitResp_get_model(smtlibv2Parser.Resp_get_modelContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitResp_option(smtlibv2Parser.Resp_optionContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitResp_proof(smtlibv2Parser.Resp_proofContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitResp_unsat_assume(smtlibv2Parser.Resp_unsat_assumeContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitResp_unsat_core(smtlibv2Parser.Resp_unsat_coreContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitResp_value(smtlibv2Parser.Resp_valueContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitResp_success(smtlibv2Parser.Resp_successContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitResp_spec_successs(smtlibv2Parser.Resp_spec_successsContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitResp_unsupported(smtlibv2Parser.Resp_unsupportedContext ctx) { return visitChildren(ctx); }
+
+  @Override public Object visitResp_error(smtlibv2Parser.Resp_errorContext ctx) { return visitChildren(ctx); }
 }
