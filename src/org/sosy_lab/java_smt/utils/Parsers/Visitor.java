@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Pattern;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -142,47 +143,81 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
 
   @Override public Object visitMatch_case(smtlibv2Parser.Match_caseContext ctx) { return visitChildren(ctx); }
 
-  @Override public Object visitTerm_spec_const(smtlibv2Parser.Term_spec_constContext ctx) { return visitChildren(ctx); }
 
+  public boolean isNumeric(String strNum) {
+    return Pattern.compile("\\d+").matcher(strNum).matches();
+  }
 
-  @Override public BooleanFormula visitTerm_qual_id(smtlibv2Parser.Term_qual_idContext ctx) {
-    // TODO: Error handling
+  @Override public Object visitTerm_spec_const(smtlibv2Parser.Term_spec_constContext ctx) {
     String operand = ctx.getText();
     if (variables.containsKey(operand)) {
-      return variables.get(ctx.getText()).javaSmt;
+      return variables.get(operand);
+    } else if (isNumeric(operand)) {
+      variables.put(operand, new ParserFormula("Int", imgr.makeNumber(operand)));
+      return variables.get(operand);
     } else {
       System.out.println(operand + " not in hashmap!");
       return null;
     }
-
-    // hit leaf node, return operand
   }
 
-  int temp = 0;
+  @Override public ParserFormula visitTerm_qual_id(smtlibv2Parser.Term_qual_idContext ctx) {
+    // TODO: Error handling
+    String operand = ctx.getText();
+    if (variables.containsKey(operand)) {
+      return variables.get(operand);
+    } else {
+      System.out.println(operand + " not in hashmap!");
+      return null;
+    }
+  }
 
   @Override public Object visitMultiterm(smtlibv2Parser.MultitermContext ctx) {
     String operator = ctx.qual_identifer().getText();
-    System.out.println(operator + " " + temp);
-    Collection<BooleanFormula> operands = new ArrayList();
+    Collection<BooleanFormula> boolOperands = new ArrayList();
+    List<IntegerFormula> intOperands = new ArrayList<>();
 
     for (int i = 0; i < ctx.term().size(); ++i) {
-      BooleanFormula operand = (BooleanFormula) visit(ctx.term(i));
+      Object operand = visit(ctx.term(i));
       // do not add multi term to list of operands
       if (operand != null) {
-        operands.add(operand);
+        if (operand instanceof BooleanFormula) {
+          boolOperands.add((BooleanFormula) operand);
+        }
+        if (operand instanceof IntegerFormula) {
+          intOperands.add((IntegerFormula) operand);
+        } else if (operand instanceof ParserFormula) {
+          if (((ParserFormula) operand).type.equals("Bool")) {
+            boolOperands.add((BooleanFormula) ((ParserFormula) operand).javaSmt);
+          }
+          if (((ParserFormula) operand).type.equals("Int")) {
+            intOperands.add((IntegerFormula) ((ParserFormula) operand).javaSmt);
+          }
+        }
       }
     }
 
     switch(operator) {
       case "and":
-          return bmgr.and(operands);
+          return bmgr.and(boolOperands);
       case "or":
-        return bmgr.or(operands);
+        return bmgr.or(boolOperands);
       case "xor":
-        if (operands.size() != 2)
+        if (boolOperands.size() != 2)
           break;
-        Iterator<BooleanFormula> it = operands.iterator();
+        Iterator<BooleanFormula> it = boolOperands.iterator();
         return bmgr.xor(it.next(), it.next());
+      case "+":
+        return imgr.sum(intOperands);
+      case "=":
+        if (intOperands.size() > 0) {
+          return imgr.equal(intOperands.get(0), intOperands.get(1));
+        }
+        if (boolOperands.size() > 0) {
+          Iterator<BooleanFormula> eIt = boolOperands.iterator();
+          return bmgr.equivalence(eIt.next(), eIt.next());
+        }
+
     }
     return null;
   }
@@ -280,9 +315,9 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     if (sort.equals("Bool")) {
       variables.put(variable, new ParserFormula("Bool", bmgr.makeVariable(variable)));
     } else if (sort.equals("Int")) {
-      variables.put((variable), new ParserFormula("Int", bmgr.and(bmgr.makeVariable("p"))));
+      variables.put((variable), new ParserFormula("Int", imgr.makeVariable(variable)));
     } else {
-      variables.put((variable), new ParserFormula("UF", bmgr.makeVariable(variable)));
+
     }
     //System.out.println(variables);
     return visitChildren(ctx);
