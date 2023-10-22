@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -25,8 +26,14 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
+import org.sosy_lab.java_smt.api.Model;
+import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
+import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.UFManager;
 
 
@@ -34,28 +41,37 @@ import org.sosy_lab.java_smt.api.UFManager;
 public class Visitor extends smtlibv2BaseVisitor<Object> {
 
   HashMap<String, ParserFormula> variables = new HashMap<String, ParserFormula>();
-  List<Object> constraints = new ArrayList();
+  List<BooleanFormula> constraints = new ArrayList();
   Configuration config = Configuration.defaultConfiguration();
   LogManager logger = BasicLogManager.create(config);
   ShutdownManager shutdown = ShutdownManager.create();
   SolverContext context =
       SolverContextFactory.createSolverContext(config, logger, shutdown.getNotifier(),
-          Solvers.PRINCESS);
+          Solvers.SMTINTERPOL);
   FormulaManager fmgr = context.getFormulaManager();
   BooleanFormulaManager bmgr = fmgr.getBooleanFormulaManager();
   IntegerFormulaManager imgr = fmgr.getIntegerFormulaManager();
-  BitvectorFormulaManager bimgr = fmgr.getBitvectorFormulaManager();
+  RationalFormulaManager rmgr = fmgr.getRationalFormulaManager();
+  //BitvectorFormulaManager bimgr = fmgr.getBitvectorFormulaManager();
   ArrayFormulaManager amgr = fmgr.getArrayFormulaManager();
   UFManager umgr = fmgr.getUFManager();
 
-  public Visitor() throws InvalidConfigurationException {
+
+
+
+  public Visitor() throws InvalidConfigurationException, SolverException, InterruptedException {
   }
 
-  @Override public Object visitStart_logic(smtlibv2Parser.Start_logicContext ctx) { return visitChildren(ctx); }
+  @Override public Object visitStart_logic(smtlibv2Parser.Start_logicContext ctx) {
+
+    return visitChildren(ctx);
+  }
 
   @Override public Object visitStart_theory(smtlibv2Parser.Start_theoryContext ctx) { return visitChildren(ctx); }
 
   @Override public Object visitStart_script(smtlibv2Parser.Start_scriptContext ctx) {
+    BooleanFormula constraint = bmgr.and(constraints);
+
     return visitChildren(ctx);
   }
 
@@ -210,39 +226,40 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
       throws IOException {
     String operand = ctx.getText();
     if (variables.containsKey(operand)) {
-      return variables.get(operand);
-    } else if (getNumericType(operand).equals("Integer")) {
+      return variables.get(operand).javaSmt;
+    } else if (getNumericType(operand).equals("Integer") | getNumericType(operand).equals("Long")) {
       variables.put(operand, new ParserFormula("Int", imgr.makeNumber(operand)));
-      return variables.get(operand);
-    } else if (getNumericType(operand).equals("Long")) {
-      variables.put(operand, new ParserFormula("Int", imgr.makeNumber(operand)));
-      return variables.get(operand);
-    }else {
+      return variables.get(operand).javaSmt;
+    } else if (getNumericType(operand).equals("Double") | getNumericType(operand).equals("Float")) {
+      variables.put(operand, new ParserFormula("Real", rmgr.makeNumber(operand)));
+      return variables.get(operand).javaSmt;
+    }
+
+    else {
       throw new IOException("Operand " + operand + " is unknown.");
     }
   }
 
-  @Override public ParserFormula visitTerm_qual_id(smtlibv2Parser.Term_qual_idContext ctx)
+  @Override public Object visitTerm_qual_id(smtlibv2Parser.Term_qual_idContext ctx)
       throws IOException {
     // TODO: Error handling
     String operand = ctx.getText();
     if (variables.containsKey(operand)) {
-      return variables.get(operand);
+      return variables.get(operand).javaSmt;
     } else if (operand.equals("false")) {
       variables.put(operand, new ParserFormula("Bool", bmgr.makeFalse()));
-      return variables.get(operand);
+      return variables.get(operand).javaSmt;
     } else if (operand.equals("true")) {
       variables.put(operand, new ParserFormula("Bool", bmgr.makeTrue()));
-      return variables.get(operand);
+      return variables.get(operand).javaSmt;
     }else {
       throw new IOException("Operand " + operand + " is unknown.");
     }
   }
 
-  @Override public Object visitMultiterm(smtlibv2Parser.MultitermContext ctx) throws IOException {
-    String operator = ctx.qual_identifer().getText();
-    Collection<BooleanFormula> boolOperands = new ArrayList<>();
-    List<IntegerFormula> intOperands = new ArrayList<>();
+  public void getOperands(smtlibv2Parser.MultitermContext ctx,
+                          Collection<BooleanFormula> boolOperands,
+                          List<NumeralFormula> numeralOperands) throws IOException {
 
     for (int i = 0; i < ctx.term().size(); ++i) {
       Object operand = visit(ctx.term(i));
@@ -251,22 +268,24 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
         if (operand instanceof BooleanFormula) {
           boolOperands.add((BooleanFormula) operand);
         }
-        if (operand instanceof IntegerFormula) {
-          intOperands.add((IntegerFormula) operand);
-        } else if (operand instanceof ParserFormula) {
-          if (((ParserFormula) operand).type.equals("Bool")) {
-            boolOperands.add((BooleanFormula) ((ParserFormula) operand).javaSmt);
-          }
-          if (((ParserFormula) operand).type.equals("Int")) {
-            intOperands.add((IntegerFormula) ((ParserFormula) operand).javaSmt);
-          }
+        if (operand instanceof NumeralFormula) {
+          numeralOperands.add((NumeralFormula) operand);
         }
       }
     }
+  }
+
+  @Override public Object visitMultiterm(smtlibv2Parser.MultitermContext ctx) throws IOException {
+    String operator = ctx.qual_identifer().getText();
+    Collection<BooleanFormula> boolOperands = new ArrayList<>();
+    List<NumeralFormula> numeralOperands = new ArrayList<>();
+
+    getOperands(ctx, boolOperands, numeralOperands);
+
     switch(operator) {
       //boolean operators
       case "and":
-          return bmgr.and(boolOperands);
+        return bmgr.and(boolOperands);
       case "or":
         return bmgr.or(boolOperands);
       case "xor":
@@ -291,27 +310,169 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
         }
         //numeral operators
       case "+":
-        return imgr.sum(intOperands);
+        if (!numeralOperands.isEmpty()) {
+          if (numeralOperands.stream().anyMatch(c -> c instanceof RationalFormula)) {
+            return rmgr.sum(numeralOperands);
+          } else {
+            List<IntegerFormula> integerOperands = numeralOperands
+                .stream()
+                .map(e -> (IntegerFormula) e)
+                .collect(Collectors.toList());
+            return imgr.sum(integerOperands);
+          }
+        }
       case "-":
-        if (intOperands.size() == 1) {
-          return imgr.negate(intOperands.get(0));
-        } else if (intOperands.size() == 2) {
-          return imgr.subtract(intOperands.get(0), intOperands.get(1));
-        } else {
-          break;
+        if (!numeralOperands.isEmpty()) {
+          if (numeralOperands.size() == 2) {
+            if (numeralOperands.stream().anyMatch(c -> c instanceof RationalFormula)) {
+              return rmgr.subtract(numeralOperands.get(0), numeralOperands.get(1));
+            } else {
+              List<IntegerFormula> integerOperands = numeralOperands
+                  .stream()
+                  .map(e -> (IntegerFormula) e)
+                  .collect(Collectors.toList());
+              return imgr.subtract(integerOperands.get(0), integerOperands.get(1));
+            }
+          } else if (numeralOperands.size() == 1) {
+            if (numeralOperands.stream().anyMatch(c -> c instanceof RationalFormula)) {
+              return rmgr.negate(numeralOperands.get(0));
+            } else {
+              List<IntegerFormula> integerOperands = numeralOperands
+                  .stream()
+                  .map(e -> (IntegerFormula) e)
+                  .collect(Collectors.toList());
+              return imgr.negate(integerOperands.get(0));
+            }
+          }
+        }
+      case "div":
+        if (numeralOperands.size() == 2) {
+          if (numeralOperands.stream().anyMatch(c -> c instanceof RationalFormula)) {
+            return rmgr.divide(numeralOperands.get(0), numeralOperands.get(1));
+          } else {
+            List<IntegerFormula> integerOperands = numeralOperands
+                .stream()
+                .map(e -> (IntegerFormula) e)
+                .collect(Collectors.toList());
+            return imgr.divide(integerOperands.get(0), integerOperands.get(1));
+          }
+        }
+      case "mod":
+        if (numeralOperands.size() == 2) {
+          if (numeralOperands.stream().anyMatch(c -> c instanceof RationalFormula)) {
+            return new IOException("Modulo is only available for Int. ");
+          } else {
+            List<IntegerFormula> integerOperands = numeralOperands
+                .stream()
+                .map(e -> (IntegerFormula) e)
+                .collect(Collectors.toList());
+            return imgr.modulo(integerOperands.get(0), integerOperands.get(1));
+          }
+        }
+      case "*":
+        if (numeralOperands.size() == 2) {
+          if (numeralOperands.stream().anyMatch(c -> c instanceof RationalFormula)) {
+            return rmgr.multiply(numeralOperands.get(0), numeralOperands.get(1));
+          } else {
+            List<IntegerFormula> integerOperands = numeralOperands
+                .stream()
+                .map(e -> (IntegerFormula) e)
+                .collect(Collectors.toList());
+            return imgr.multiply(integerOperands.get(0), integerOperands.get(1));
+          }
+        }
+      case "distinct":
+        if (!numeralOperands.isEmpty()) {
+          if (numeralOperands.stream().anyMatch(c -> c instanceof RationalFormula)) {
+            return rmgr.distinct(numeralOperands);
+          } else {
+            List<IntegerFormula> integerOperands = numeralOperands
+                .stream()
+                .map(e -> (IntegerFormula) e)
+                .collect(Collectors.toList());
+            return imgr.distinct(integerOperands);
+          }
+        }
+      case ">":
+        if (numeralOperands.size() == 2) {
+          if (numeralOperands.stream().anyMatch(c -> c instanceof RationalFormula)) {
+            return rmgr.greaterThan(numeralOperands.get(0), numeralOperands.get(1));
+          } else {
+            List<IntegerFormula> integerOperands = numeralOperands
+                .stream()
+                .map(e -> (IntegerFormula) e)
+                .collect(Collectors.toList());
+            return imgr.greaterThan(integerOperands.get(0), integerOperands.get(1));
+          }
+        }
+      case ">=":
+        if (numeralOperands.size() == 2) {
+          if (numeralOperands.stream().anyMatch(c -> c instanceof RationalFormula)) {
+            return rmgr.greaterOrEquals(numeralOperands.get(0), numeralOperands.get(1));
+          } else {
+            List<IntegerFormula> integerOperands = numeralOperands
+                .stream()
+                .map(e -> (IntegerFormula) e)
+                .collect(Collectors.toList());
+            return imgr.greaterOrEquals(integerOperands.get(0), integerOperands.get(1));
+          }
+        }
+      case "<":
+        if (numeralOperands.size() == 2) {
+          if (numeralOperands.stream().anyMatch(c -> c instanceof RationalFormula)) {
+            return rmgr.lessThan(numeralOperands.get(0), numeralOperands.get(1));
+          } else {
+            List<IntegerFormula> integerOperands = numeralOperands
+                .stream()
+                .map(e -> (IntegerFormula) e)
+                .collect(Collectors.toList());
+            return imgr.lessThan(integerOperands.get(0), integerOperands.get(1));
+          }
+        }
+      case "<=":
+        if (numeralOperands.size() == 2) {
+          if (numeralOperands.stream().anyMatch(c -> c instanceof RationalFormula)) {
+            return rmgr.lessOrEquals(numeralOperands.get(0), numeralOperands.get(1));
+          } else {
+            List<IntegerFormula> integerOperands = numeralOperands
+                .stream()
+                .map(e -> (IntegerFormula) e)
+                .collect(Collectors.toList());
+            return imgr.lessOrEquals(integerOperands.get(0), integerOperands.get(1));
+          }
+        }
+      case "to_int":
+        if (numeralOperands.size() == 1) {
+          if (numeralOperands.stream().anyMatch(c -> c instanceof RationalFormula)) {
+            return rmgr.floor(numeralOperands.get(0));
+          } else {
+            List<IntegerFormula> integerOperands = numeralOperands
+                .stream()
+                .map(e -> (IntegerFormula) e)
+                .collect(Collectors.toList());
+            return imgr.floor(integerOperands.get(0));
+          }
         }
 
         //overloaded operators
       case "=":
-        if (!intOperands.isEmpty()) {
-          return imgr.equal(intOperands.get(0), intOperands.get(1));
+        if (numeralOperands.size() == 2) {
+          if (numeralOperands.stream().anyMatch(c -> c instanceof RationalFormula)) {
+            return rmgr.equal(numeralOperands.get(0), numeralOperands.get(1));
+          } else {
+            List<IntegerFormula> integerOperands = numeralOperands
+                .stream()
+                .map(e -> (IntegerFormula) e)
+                .collect(Collectors.toList());
+            return imgr.equal(integerOperands.get(0), integerOperands.get(1));
+          }
         }
-        if (!boolOperands.isEmpty()) {
+        if (boolOperands.size() == 2) {
           Iterator<BooleanFormula> eIt = boolOperands.iterator();
           return bmgr.equivalence(eIt.next(), eIt.next());
         }
       default:
-        throw new IOException("Operator " + operator + " is not known.");
+        throw new IOException("Operator " + operator + " is not supported for this operand type.");
 
     }
     return null;
@@ -395,7 +556,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
 
   @Override public Object visitCmd_assert(smtlibv2Parser.Cmd_assertContext ctx) {
     Object result = visitChildren(ctx);
-    constraints.add(result);
+    constraints.add((BooleanFormula) result);
     System.out.println(constraints);
     return result;
   }
@@ -411,6 +572,8 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
       variables.put(variable, new ParserFormula("Bool", bmgr.makeVariable(variable)));
     } else if (sort.equals("Int")) {
       variables.put((variable), new ParserFormula("Int", imgr.makeVariable(variable)));
+    } else if (sort.equals("Real")){
+      variables.put((variable), new ParserFormula("Real", rmgr.makeVariable(variable)));
     } else {
 
     }

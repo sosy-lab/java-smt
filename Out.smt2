@@ -1,3 +1,6 @@
 (set-logic AUFLIRA)
+(declare-const x Int)
+(assert (= (- 1 (- 2)) x))
 (check-sat)
+(get-value (x))
 (exit)
