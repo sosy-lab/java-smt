@@ -20,6 +20,7 @@
 
 // Generated from /home/janel/Desktop/Studium/Semester_6/Bachelorarbeit/nochmalneu/src/org/sosy_lab/java_smt/utils/Parsers/smtlibv2.g4 by ANTLR 4.13.1
 package org.sosy_lab.java_smt.utils.Parsers;
+import java.io.IOException;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
@@ -2707,7 +2708,13 @@ public class smtlibv2Parser extends Parser {
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof smtlibv2Visitor ) return ((smtlibv2Visitor<? extends T>)visitor).visitMultiterm(this);
+			if ( visitor instanceof smtlibv2Visitor ) {
+				try {
+					return ((smtlibv2Visitor<? extends T>)visitor).visitMultiterm(this);
+				} catch (IOException pE) {
+					throw new RuntimeException(pE);
+				}
+			}
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -2762,7 +2769,13 @@ public class smtlibv2Parser extends Parser {
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof smtlibv2Visitor ) return ((smtlibv2Visitor<? extends T>)visitor).visitTerm_qual_id(this);
+			if ( visitor instanceof smtlibv2Visitor ) {
+				try {
+					return ((smtlibv2Visitor<? extends T>)visitor).visitTerm_qual_id(this);
+				} catch (IOException pE) {
+					throw new RuntimeException(pE);
+				}
+			}
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -2782,7 +2795,13 @@ public class smtlibv2Parser extends Parser {
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof smtlibv2Visitor ) return ((smtlibv2Visitor<? extends T>)visitor).visitTerm_spec_const(this);
+			if ( visitor instanceof smtlibv2Visitor ) {
+				try {
+					return ((smtlibv2Visitor<? extends T>)visitor).visitTerm_spec_const(this);
+				} catch (IOException pE) {
+					throw new RuntimeException(pE);
+				}
+			}
 			else return visitor.visitChildren(this);
 		}
 	}

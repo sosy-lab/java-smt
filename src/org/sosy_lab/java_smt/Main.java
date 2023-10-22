@@ -33,8 +33,8 @@ public class Main {
     smtlibv2Lexer lexer = new smtlibv2Lexer(CharStreams.fromString("(declare-const a Bool)\n"
         + "(declare-const b Bool)\n(declare-const c Bool)\n(declare-const d Bool)\n(declare-const"
         + " x Int)\n(declare-const y Bool)\n"
-        + "(assert (and a (or b (xor c d))))\n"
-        + "(assert (= (+ 1 2) x))"));
+        + "(assert (and a (or b (and (ite a c d)))))\n"
+        + "(assert (= (- 1 (- 2)) x))"));
     smtlibv2Parser parser = new smtlibv2Parser(new CommonTokenStream(lexer));
 
     StartContext tree = parser.start();

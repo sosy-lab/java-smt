@@ -1,5 +1,26 @@
+/*
+ *  JavaSMT is an API wrapper for a collection of SMT solvers.
+ *  This file is part of JavaSMT.
+ *
+ *  Copyright (C) 2007-2016  Dirk Beyer
+ *  All rights reserved.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 // Generated from /home/janel/Desktop/Studium/Semester_6/Bachelorarbeit/nochmalneu/src/org/sosy_lab/java_smt/utils/Parsers/smtlibv2.g4 by ANTLR 4.13.1
 package org.sosy_lab.java_smt.utils.Parsers;
+import java.io.IOException;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 /**
@@ -326,21 +347,21 @@ public interface smtlibv2Visitor<T> extends ParseTreeVisitor<T> {
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitTerm_spec_const(smtlibv2Parser.Term_spec_constContext ctx);
+	T visitTerm_spec_const(smtlibv2Parser.Term_spec_constContext ctx) throws IOException;
 	/**
 	 * Visit a parse tree produced by the {@code term_qual_id}
 	 * labeled alternative in {@link smtlibv2Parser#term}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitTerm_qual_id(smtlibv2Parser.Term_qual_idContext ctx);
+	T visitTerm_qual_id(smtlibv2Parser.Term_qual_idContext ctx) throws IOException;
 	/**
 	 * Visit a parse tree produced by the {@code multiterm}
 	 * labeled alternative in {@link smtlibv2Parser#term}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitMultiterm(smtlibv2Parser.MultitermContext ctx);
+	T visitMultiterm(smtlibv2Parser.MultitermContext ctx) throws IOException;
 	/**
 	 * Visit a parse tree produced by the {@code term_let}
 	 * labeled alternative in {@link smtlibv2Parser#term}.

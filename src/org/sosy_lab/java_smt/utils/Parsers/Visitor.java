@@ -1,4 +1,6 @@
 package org.sosy_lab.java_smt.utils.Parsers;
+import java.io.IOException;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -144,37 +146,102 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
   @Override public Object visitMatch_case(smtlibv2Parser.Match_caseContext ctx) { return visitChildren(ctx); }
 
 
-  public boolean isNumeric(String strNum) {
-    return Pattern.compile("\\d+").matcher(strNum).matches();
+  public static boolean isInteger(String strNum) {
+    try {
+      Integer d = Integer.parseInt(strNum);
+    } catch (NumberFormatException nfe) {
+      return false;
+    }
+    return true;
   }
 
-  @Override public Object visitTerm_spec_const(smtlibv2Parser.Term_spec_constContext ctx) {
-    String operand = ctx.getText();
-    if (variables.containsKey(operand)) {
-      return variables.get(operand);
-    } else if (isNumeric(operand)) {
-      variables.put(operand, new ParserFormula("Int", imgr.makeNumber(operand)));
-      return variables.get(operand);
+  public static boolean isFloat(String strNum) {
+    try {
+      Float d = Float.parseFloat(strNum);
+    } catch (NumberFormatException nfe) {
+      return false;
+    }
+    return true;
+  }
+  public static boolean isDouble(String strNum) {
+    try {
+      double d = Double.parseDouble(strNum);
+    } catch (NumberFormatException nfe) {
+      return false;
+    }
+    return true;
+  }
+
+  public static boolean isLong(String strNum) {
+    try {
+      Long d = Long.parseLong(strNum);
+    } catch (NumberFormatException nfe) {
+      return false;
+    }
+    return true;
+  }
+
+  public static boolean isBigInteger(String strNum) {
+    try {
+      BigInteger d = new BigInteger(strNum);
+    } catch (NumberFormatException nfe) {
+      return false;
+    }
+    return true;
+  }
+
+  public static String getNumericType(String strNum) {
+    if (isInteger(strNum)) {
+      return "Integer";
+    } else if (isLong(strNum)) {
+      return "Long";
+    } else if (isDouble(strNum)) {
+      return "Double";
+    } else if (isBigInteger(strNum)) {
+      return "BigInteger";
+    } else if (isFloat(strNum)) {
+      return "Float";
     } else {
-      System.out.println(operand + " not in hashmap!");
-      return null;
+      return "other";
     }
   }
 
-  @Override public ParserFormula visitTerm_qual_id(smtlibv2Parser.Term_qual_idContext ctx) {
+  @Override public Object visitTerm_spec_const(smtlibv2Parser.Term_spec_constContext ctx)
+      throws IOException {
+    String operand = ctx.getText();
+    if (variables.containsKey(operand)) {
+      return variables.get(operand);
+    } else if (getNumericType(operand).equals("Integer")) {
+      variables.put(operand, new ParserFormula("Int", imgr.makeNumber(operand)));
+      return variables.get(operand);
+    } else if (getNumericType(operand).equals("Long")) {
+      variables.put(operand, new ParserFormula("Int", imgr.makeNumber(operand)));
+      return variables.get(operand);
+    }else {
+      throw new IOException("Operand " + operand + " is unknown.");
+    }
+  }
+
+  @Override public ParserFormula visitTerm_qual_id(smtlibv2Parser.Term_qual_idContext ctx)
+      throws IOException {
     // TODO: Error handling
     String operand = ctx.getText();
     if (variables.containsKey(operand)) {
       return variables.get(operand);
-    } else {
-      System.out.println(operand + " not in hashmap!");
-      return null;
+    } else if (operand.equals("false")) {
+      variables.put(operand, new ParserFormula("Bool", bmgr.makeFalse()));
+      return variables.get(operand);
+    } else if (operand.equals("true")) {
+      variables.put(operand, new ParserFormula("Bool", bmgr.makeTrue()));
+      return variables.get(operand);
+    }else {
+      throw new IOException("Operand " + operand + " is unknown.");
     }
   }
 
-  @Override public Object visitMultiterm(smtlibv2Parser.MultitermContext ctx) {
+  @Override public Object visitMultiterm(smtlibv2Parser.MultitermContext ctx) throws IOException {
     String operator = ctx.qual_identifer().getText();
-    Collection<BooleanFormula> boolOperands = new ArrayList();
+    Collection<BooleanFormula> boolOperands = new ArrayList<>();
     List<IntegerFormula> intOperands = new ArrayList<>();
 
     for (int i = 0; i < ctx.term().size(); ++i) {
@@ -196,8 +263,8 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
         }
       }
     }
-
     switch(operator) {
+      //boolean operators
       case "and":
           return bmgr.and(boolOperands);
       case "or":
@@ -207,16 +274,44 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
           break;
         Iterator<BooleanFormula> it = boolOperands.iterator();
         return bmgr.xor(it.next(), it.next());
+      case "not":
+        if (boolOperands.size() != 1)
+          break;
+        Iterator<BooleanFormula> nIt = boolOperands.iterator();
+        return bmgr.not(nIt.next());
+      case "=>":
+        if (!boolOperands.isEmpty()) {
+          Iterator<BooleanFormula> iIt = boolOperands.iterator();
+          return bmgr.implication(iIt.next(), iIt.next());
+        }
+      case "ite":
+        if (!boolOperands.isEmpty()) {
+          Iterator<BooleanFormula> ifIt = boolOperands.iterator();
+          return bmgr.ifThenElse(ifIt.next(), ifIt.next(), ifIt.next());
+        }
+        //numeral operators
       case "+":
         return imgr.sum(intOperands);
+      case "-":
+        if (intOperands.size() == 1) {
+          return imgr.negate(intOperands.get(0));
+        } else if (intOperands.size() == 2) {
+          return imgr.subtract(intOperands.get(0), intOperands.get(1));
+        } else {
+          break;
+        }
+
+        //overloaded operators
       case "=":
-        if (intOperands.size() > 0) {
+        if (!intOperands.isEmpty()) {
           return imgr.equal(intOperands.get(0), intOperands.get(1));
         }
-        if (boolOperands.size() > 0) {
+        if (!boolOperands.isEmpty()) {
           Iterator<BooleanFormula> eIt = boolOperands.iterator();
           return bmgr.equivalence(eIt.next(), eIt.next());
         }
+      default:
+        throw new IOException("Operator " + operator + " is not known.");
 
     }
     return null;
