@@ -30,11 +30,11 @@ public class Main {
   public static void main(String[] args)
       throws InvalidConfigurationException, InterruptedException, IOException, SolverException {
 
-    smtlibv2Lexer lexer = new smtlibv2Lexer(CharStreams.fromString("(declare-const a (_ BitVec 8))\n"
-        + "(declare-const b (_ BitVec 8))\n"
-        + "(declare-const c Int)\n"
-        + "(assert (= b (bvadd a (_ bv20 8))))\n"
-        + "(assert (= c (bv2int b)))"));
+    smtlibv2Lexer lexer = new smtlibv2Lexer(CharStreams.fromString("(declare-const b (Array Int "
+        + "Int)"
+        + ")\n"
+        + "(declare-const a (Array Int Real))\n"
+        + "(assert (= a b))\n"));
     smtlibv2Parser parser = new smtlibv2Parser(new CommonTokenStream(lexer));
 
     StartContext tree = parser.start();

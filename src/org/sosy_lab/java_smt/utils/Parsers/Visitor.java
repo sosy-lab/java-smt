@@ -1,18 +1,12 @@
 package org.sosy_lab.java_smt.utils.Parsers;
-import com.google.common.collect.testing.OneSizeGenerator;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.RuleNode;
-import org.antlr.v4.runtime.tree.TerminalNode;
 import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -20,18 +14,18 @@ import org.sosy_lab.common.log.BasicLogManager;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.ArrayFormulaManager;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.FormulaManager;
+import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
-import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
-import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -162,7 +156,14 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     return visitChildren(ctx);
   }
 
-  @Override public Object visitMultisort(smtlibv2Parser.MultisortContext ctx) { return visitChildren(ctx); }
+  @Override public List<String> visitMultisort(smtlibv2Parser.MultisortContext ctx) {
+    List<String> sorts = new ArrayList<>();
+    sorts.add(ctx.identifier().getText());
+    for (int i = 0; i < ctx.sort().size(); i++) {
+      sorts.add(ctx.sort(i).getText());
+    }
+    return sorts;
+  }
 
   @Override public Object visitQual_id(smtlibv2Parser.Qual_idContext ctx) { return visitChildren(ctx); }
 
@@ -293,7 +294,8 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
   public void getOperands(smtlibv2Parser.MultitermContext ctx,
                           Collection<BooleanFormula> boolOperands,
                           List<NumeralFormula> numeralOperands,
-                          List<BitvectorFormula> bitvecOperands) throws IOException {
+                          List<BitvectorFormula> bitvecOperands,
+                          List<ArrayFormula> arrayOperands) throws IOException {
 
     for (int i = 0; i < ctx.term().size(); ++i) {
       Object operand = visit(ctx.term(i));
@@ -308,6 +310,9 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
         if (operand instanceof BitvectorFormula) {
           bitvecOperands.add((BitvectorFormula) operand);
         }
+        if (operand instanceof ArrayFormula) {
+          arrayOperands.add((ArrayFormula) operand);
+        }
       }
     }
   }
@@ -320,8 +325,9 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     Collection<BooleanFormula> boolOperands = new ArrayList<>();
     List<NumeralFormula> numeralOperands = new ArrayList<>();
     List<BitvectorFormula> bitvecOperands = new ArrayList<>();
+    List<ArrayFormula> arrayOperands = new ArrayList<>();
 
-    getOperands(ctx, boolOperands, numeralOperands, bitvecOperands);
+    getOperands(ctx, boolOperands, numeralOperands, bitvecOperands, arrayOperands);
 
     switch(operator) {
       //boolean operators
@@ -676,6 +682,9 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
       case "repeat":
         throw new IOException(operator + " is not available in JavaSMT");
 
+        //array operators
+
+
         //overloaded operators
       case "=":
         if (numeralOperands.size() == 2) {
@@ -692,6 +701,9 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
         }
         if (bitvecOperands.size() == 2) {
           return bimgr.equal(bitvecOperands.get(0), bitvecOperands.get(1));
+        }
+        if (arrayOperands.size() == 2) {
+          return amgr.equivalence(arrayOperands.get(0), arrayOperands.get(1));
         }
       default:
         throw new IOException("Operator " + operator + " is not supported for operands type.");
@@ -814,6 +826,31 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
           throw new IOException("BitVec declaration needs to be of form (_ BitVec Int)");
         }
 
+      }
+    } else if (sort.equals("Array")) {
+      if (sorts.size() == 3) {
+        String index = sorts.get(1);
+        String elements = sorts.get(2);
+        if (index.equals("Int")) {
+          FormulaType<IntegerFormula> idx = FormulaType.IntegerType;
+        } else if (index.equals("Bool")) {
+          FormulaType<BooleanFormula> idx = FormulaType.BooleanType;
+        } else if (index.equals("Real")) {
+          FormulaType<RationalFormula> elem = FormulaType.RationalType;
+        }else {
+          throw new IOException(index + " is not a supported array index sort");
+        }
+        if (elements.equals("Int")) {
+          FormulaType<IntegerFormula> elem = FormulaType.IntegerType;
+        } else if (elements.equals("Bool")) {
+          FormulaType<BooleanFormula> elem = FormulaType.BooleanType;
+        } else if (elements.equals("Real")) {
+          FormulaType<RationalFormula> elem = FormulaType.RationalType;
+        } else {
+          throw new IOException(elements + " is not a supported array index sort");
+        }
+        variables.put((variable), new ParserFormula("Array", amgr.makeArray(variable,
+            FormulaType.IntegerType, FormulaType.IntegerType)));
       }
     }
     //System.out.println(variables);

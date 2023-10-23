@@ -36,8 +36,10 @@ public class ArrayGenerator {
       return  "Int";
     } else if (pElementType.isBooleanType()) {
       return "Bool";
+    } else if (pElementType.isRationalType()) {
+      return "Real";
     } else {
-      return pElementType + "is not available yet in ArrayGenerator as "
+      return pElementType + "is not available in ArrayGenerator as "
           + "values for Arrays";
     }
   }
@@ -49,6 +51,8 @@ public class ArrayGenerator {
       return  "Int";
     } else if (pIndexType.isBooleanType()) {
       return "Bool";
+    } else if (pIndexType.isRationalType()) {
+      return "Real";
     } else {
       return pIndexType + "is not available yet in ArrayGenerator as "
           + "index for Arrays";
