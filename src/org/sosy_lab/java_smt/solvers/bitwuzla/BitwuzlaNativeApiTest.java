@@ -11,6 +11,8 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
 import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.truth.Truth;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.After;
 import org.junit.AssumptionViolatedException;
 import org.junit.Before;
@@ -18,6 +20,7 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.sosy_lab.common.NativeLibraries;
+import org.sosy_lab.java_smt.api.SolverContext;
 
 public class BitwuzlaNativeApiTest {
   private long bitwuzla;
@@ -286,6 +289,40 @@ public class BitwuzlaNativeApiTest {
     long pBoolType = BitwuzlaJNI.bitwuzla_mk_bool_sort();
     assertThat(BitwuzlaJNI.bitwuzla_sort_is_bool(pBoolType)).isTrue();
   }
+
+  // Bitwuzla fails this critically!
+  @Ignore
+  @Test
+  public void repeatedTermCreationInMultipleSolversTest() {
+    List<Long> bitwuzlaInstances = new ArrayList<>();
+    // We don't want to garbage collect the old Bitwuzla envs
+    bitwuzlaInstances.add(bitwuzla);
+    BitwuzlaJNI.bitwuzla_mk_true();
+    BitwuzlaJNI.bitwuzla_mk_false();
+    createEnvironment();
+    bitwuzlaInstances.add(bitwuzla);
+    long tru1 = BitwuzlaJNI.bitwuzla_mk_true();
+    long tru12 = BitwuzlaJNI.bitwuzla_mk_true();
+    BitwuzlaJNI.bitwuzla_term_is_true(tru1);
+    BitwuzlaJNI.bitwuzla_term_is_true(tru12);
+    createEnvironment();
+    bitwuzlaInstances.add(bitwuzla);
+    long tru3 = BitwuzlaJNI.bitwuzla_mk_true();
+    long fls3 = BitwuzlaJNI.bitwuzla_mk_false();
+    createEnvironment();
+    bitwuzlaInstances.add(bitwuzla);
+    long tru4 = BitwuzlaJNI.bitwuzla_mk_true();
+    long tru42 = BitwuzlaJNI.bitwuzla_mk_true();
+    BitwuzlaJNI.bitwuzla_term_is_true(tru4);
+    BitwuzlaJNI.bitwuzla_term_is_true(tru42);
+
+    new Thread(() -> {
+      BitwuzlaJNI.bitwuzla_term_is_true(tru1);
+      BitwuzlaJNI.bitwuzla_term_is_true(tru12);
+    }).start();
+  }
+
+
 
   @Test
   public void isFalse() {
