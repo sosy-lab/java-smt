@@ -79,11 +79,22 @@ public class BitvectorGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) +")";
+        inPlaceInputParams -> "(= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
-  //TODO LogToIntegerFormula
+  public static void logSToIntegerFormula(Object result, BitvectorFormula pI) {
+    throw new IllegalArgumentException("distinct operation is not available for bitvectors in "
+        + "SMT-LIB2");
+  }
+
+  public static void logUToIntegerFormula(Object result, BitvectorFormula pI) {
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(pI);
+    Function<List<Object>, String> saveResult =
+        inPlaceInputParams -> "(bv2int " + inPlaceInputParams.get(0) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+  }
 
   public static void logBVNegate(Object result, BitvectorFormula pNumber) {
     List<Object> inputParams = new ArrayList<>();

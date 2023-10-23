@@ -651,7 +651,7 @@ public class smtlibv2BaseVisitor<T> extends AbstractParseTreeVisitor<T> implemen
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public T visitCmd_assert(smtlibv2Parser.Cmd_assertContext ctx)
-            throws IOException { return visitChildren(ctx); }
+			throws IOException { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -673,7 +673,7 @@ public class smtlibv2BaseVisitor<T> extends AbstractParseTreeVisitor<T> implemen
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public T visitCmd_declareConst(smtlibv2Parser.Cmd_declareConstContext ctx)
-            throws IOException { return visitChildren(ctx); }
+			throws IOException { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *

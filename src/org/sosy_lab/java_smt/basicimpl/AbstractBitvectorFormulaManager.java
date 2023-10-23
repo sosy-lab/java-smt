@@ -69,8 +69,14 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
   @Override
   public IntegerFormula toIntegerFormula(BitvectorFormula pI, boolean signed) {
     TFormulaInfo param1 = extractInfo(pI);
-    return getFormulaCreator()
+    IntegerFormula result = getFormulaCreator()
         .encapsulate(FormulaType.IntegerType, toIntegerFormulaImpl(param1, signed));
+    if (signed) {
+      BitvectorGenerator.logSToIntegerFormula(result, pI);
+    } else {
+      BitvectorGenerator.logUToIntegerFormula(result, pI);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo toIntegerFormulaImpl(TFormulaInfo pI, boolean signed);

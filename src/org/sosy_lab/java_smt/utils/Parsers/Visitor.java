@@ -114,7 +114,10 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
 
   @Override public Object visitSpec_constant_hex(smtlibv2Parser.Spec_constant_hexContext ctx) { return visitChildren(ctx); }
 
-  @Override public Object visitSpec_constant_bin(smtlibv2Parser.Spec_constant_binContext ctx) { return visitChildren(ctx); }
+  @Override public String visitSpec_constant_bin(smtlibv2Parser.Spec_constant_binContext ctx) {
+    String binary = ctx.getText();
+    return binary;
+  }
 
   @Override public Object visitSpec_constant_string(smtlibv2Parser.Spec_constant_stringContext ctx) { return visitChildren(ctx); }
 
@@ -250,9 +253,17 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     } else if (getNumericType(operand).equals("Double") | getNumericType(operand).equals("Float")) {
       variables.put(operand, new ParserFormula("Real", rmgr.makeNumber(operand)));
       return variables.get(operand).javaSmt;
-    }
-
-    else {
+    } else if (operand.startsWith("#b")) {
+      String binVal = operand.split("b")[1];
+      int index = binVal.length();
+      int value = Integer.parseInt(binVal, 2);
+      return bimgr.makeBitvector(index, value);
+    } else if (operand.startsWith("#x")) {
+      String hexVal = operand.split("x")[1];
+      int index = Integer.toBinaryString(Integer.parseInt(hexVal, 16)).length();
+      int value = Integer.parseInt(hexVal, 16);
+      return bimgr.makeBitvector(index, value);
+    } else {
       throw new IOException("Operand " + operand + " is unknown.");
     }
   }
@@ -270,7 +281,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     } else if (operand.equals("true")) {
       variables.put(operand, new ParserFormula("Bool", bmgr.makeTrue()));
       return variables.get(operand).javaSmt;
-    } else if (! bitVec.isEmpty()) {
+    } else if (!bitVec.isEmpty()) {
       BigInteger value = new BigInteger(bitVec.get(0).split("v")[1]);
       int index = Integer.parseInt(bitVec.get(1));
       return bimgr.makeBitvector(index, value);
@@ -304,6 +315,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
   @Override public Object visitMultiterm(smtlibv2Parser.MultitermContext ctx) throws IOException {
     //String operator = ctx.qual_identifer().getText();
     List<String> operators = (List<String>) visit(ctx.qual_identifer());
+    //String binary = (String) visit(ctx.b);
     String operator = operators.get(0);
     Collection<BooleanFormula> boolOperands = new ArrayList<>();
     List<NumeralFormula> numeralOperands = new ArrayList<>();
@@ -568,10 +580,10 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
           throw new IOException(operator + " takes two bitvector operands as input. ");
         }
       case "bvnot":
-        if (bitvecOperands.size() == 2) {
+        if (bitvecOperands.size() == 1) {
           return bimgr.not(bitvecOperands.get(0));
         } else {
-          throw new IOException(operator + " takes two bitvector operands as input. ");
+          throw new IOException(operator + " takes one bitvector operands as input. ");
         }
       case "bvand":
         if (bitvecOperands.size() == 2) {
@@ -652,6 +664,17 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
         } else {
           throw new IOException(operator + " takes one bitvector and two integers as input. ");
         }
+      case "bv2int":
+        if (bitvecOperands.size() == 1) {
+          return bimgr.toIntegerFormula(bitvecOperands.get(0), false);
+        } else {
+          throw new IOException(operator + " takes one bitvector operands as input. ");
+        }
+      case "int2bv":
+      case "rotate_left":
+      case "rotate_right":
+      case "repeat":
+        throw new IOException(operator + " is not available in JavaSMT");
 
         //overloaded operators
       case "=":
