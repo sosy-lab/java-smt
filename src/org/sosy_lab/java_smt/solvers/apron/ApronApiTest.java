@@ -29,7 +29,6 @@ import apron.Environment;
 import apron.Lincons1;
 import apron.Manager;
 import apron.MpqScalar;
-import apron.Octagon;
 import apron.Polka;
 import apron.PolkaEq;
 import apron.Tcons1;
@@ -41,7 +40,7 @@ import apron.Texpr1VarNode;
 import com.google.common.base.Preconditions;
 import org.junit.Test;
 
-public class ApronNativeApiTest {
+public class ApronApiTest {
 
   public static Manager manager = new PolkaEq();
 
@@ -71,6 +70,7 @@ public class ApronNativeApiTest {
     cons2.setCst(new MpqScalar(+3));
     cons2.setKind(Lincons1.SUPEQ);
     Abstract1 abstract1 = new Abstract1(pManager, new Lincons1[]{cons1, cons2});
+    assertFalse("The domain is not UNSAT.", abstract1.isBottom(pManager));
   }
 
   /**
