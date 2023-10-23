@@ -34,6 +34,7 @@ import org.sosy_lab.java_smt.solvers.boolector.BoolectorSolverContext;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4SolverContext;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5SolverContext;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5SolverContext;
+import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtSolverContext;
 import org.sosy_lab.java_smt.solvers.princess.PrincessSolverContext;
 import org.sosy_lab.java_smt.solvers.smtinterpol.SmtInterpolSolverContext;
 import org.sosy_lab.java_smt.solvers.yices2.Yices2SolverContext;
@@ -49,6 +50,7 @@ import org.sosy_lab.java_smt.solvers.z3.Z3SolverContext;
 public class SolverContextFactory {
 
   public enum Solvers {
+    OPENSMT,
     MATHSAT5,
     SMTINTERPOL,
     Z3,
@@ -202,6 +204,7 @@ public class SolverContextFactory {
   @SuppressWarnings("resource") // returns unclosed context object
   public SolverContext generateContext(Solvers solverToCreate)
       throws InvalidConfigurationException {
+
     SolverContext context;
     try {
       context = generateContext0(solverToCreate);
@@ -230,6 +233,10 @@ public class SolverContextFactory {
   private SolverContext generateContext0(Solvers solverToCreate)
       throws InvalidConfigurationException {
     switch (solverToCreate) {
+      case OPENSMT:
+        return OpenSmtSolverContext.create(
+            config, logger, shutdownNotifier, randomSeed, nonLinearArithmetic, loader);
+
       case CVC4:
         return CVC4SolverContext.create(
             logger,
@@ -242,6 +249,7 @@ public class SolverContextFactory {
       case CVC5:
         return CVC5SolverContext.create(
             logger,
+            config,
             shutdownNotifier,
             (int) randomSeed,
             nonLinearArithmetic,
