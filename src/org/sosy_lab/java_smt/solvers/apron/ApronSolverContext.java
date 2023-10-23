@@ -81,7 +81,7 @@ public class ApronSolverContext extends AbstractSolverContext {
       LogManager pLogger,
       long randomSeed) {
     Environment env = new Environment();
-    Manager manager = new Polka(false);
+    Manager manager = new Polka(true);
     ApronBooleanType booleanType = new ApronBooleanType();
     ApronIntegerType integerType = new ApronIntegerType();
     ApronRationalType rationalType = new ApronRationalType();

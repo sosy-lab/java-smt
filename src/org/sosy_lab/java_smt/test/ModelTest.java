@@ -2283,6 +2283,10 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @SuppressWarnings("resource")
   @Test(expected = IllegalStateException.class)
   public void testGenerateModelsOption() throws SolverException, InterruptedException {
+    assume()
+        .withMessage("The Apron solver can not execute this test.")
+        .that(solver)
+        .isNotSameInstanceAs(Solvers.APRON);
     try (ProverEnvironment prover = context.newProverEnvironment()) { // no option
       assertThat(prover).isSatisfiable();
       prover.getModel();
@@ -2292,6 +2296,10 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test(expected = IllegalStateException.class)
   public void testGenerateModelsOption2() throws SolverException, InterruptedException {
+    assume()
+        .withMessage("The Apron solver can not execute this test.")
+        .that(solver)
+        .isNotSameInstanceAs(Solvers.APRON);
     try (ProverEnvironment prover = context.newProverEnvironment()) { // no option
       assertThat(prover).isSatisfiable();
       prover.getModelAssignments();

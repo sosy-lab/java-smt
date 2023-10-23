@@ -29,7 +29,9 @@ import apron.Environment;
 import apron.Lincons1;
 import apron.Manager;
 import apron.MpqScalar;
+import apron.Octagon;
 import apron.Polka;
+import apron.PolkaEq;
 import apron.Tcons1;
 import apron.Texpr0Node;
 import apron.Texpr1BinNode;
@@ -41,7 +43,7 @@ import org.junit.Test;
 
 public class ApronNativeApiTest {
 
-  public static Manager manager = new Polka(true);
+  public static Manager manager = new PolkaEq();
 
   @Test
   public void solverBackendTest() {

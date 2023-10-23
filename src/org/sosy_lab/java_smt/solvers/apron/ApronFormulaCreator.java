@@ -162,7 +162,6 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
    * @param pApronFormulaType Integer or Rational?
    * @param varName           name of the variable
    * @return object of either ApronIntVarNode (Type Integer) or ApronRatVarNode (Type Rational)
-   * @environment as it holds all variables;
    */
   @Override
   public ApronNode makeVariable(ApronFormulaType pApronFormulaType, String varName) {

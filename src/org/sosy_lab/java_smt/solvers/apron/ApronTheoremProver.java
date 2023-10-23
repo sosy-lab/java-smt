@@ -71,7 +71,6 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
     return solverContext;
   }
 
-
   public List<Collection<ApronConstraint>> getAssertedFormulas() {
     return assertedFormulas;
   }

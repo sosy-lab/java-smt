@@ -20,8 +20,10 @@
 
 package org.sosy_lab.java_smt.solvers.apron.types;
 
+import apron.Coeff;
 import apron.Environment;
 import apron.MpqScalar;
+import apron.Scalar;
 import apron.StringVar;
 import apron.Tcons1;
 import apron.Texpr1BinNode;
@@ -30,6 +32,7 @@ import apron.Texpr1Node;
 import apron.Texpr1UnNode;
 import apron.Texpr1VarNode;
 import apron.Var;
+import com.google.common.base.Preconditions;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,12 +40,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.Set;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.solvers.apron.ApronFormulaCreator;
+import org.sosy_lab.java_smt.solvers.apron.ApronFormulaManager;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.FormulaType;
 
 /**
@@ -94,6 +99,22 @@ public interface ApronNode extends Formula {
         this.cstNode = pNode.getNode();
         this.numerator = pNode.getNumerator();
         this.denominator = pNode.getDenominator();
+        this.rational = Rational.of(numerator, denominator);
+      }
+
+      public ApronRatCstNode(Texpr1CstNode pNode){
+        this.cstNode = pNode;
+        Coeff coeff = pNode.getConstant();
+        Scalar scalar = coeff.inf();
+        String string = scalar.toString();
+        String[] strings = string.split("/");
+        if (strings.length == 1){
+          this.numerator = BigInteger.valueOf(Long.parseLong(strings[0]));
+          this.denominator = BigInteger.ONE;
+        }else {
+          this.numerator = BigInteger.valueOf(Long.parseLong(strings[1]));
+          this.denominator = BigInteger.valueOf(Long.parseLong(strings[1]));
+        }
         this.rational = Rational.of(numerator, denominator);
       }
 
@@ -153,7 +174,7 @@ public interface ApronNode extends Formula {
     /**
      * This class wraps variables for rational values
      */
-    class ApronRatVarNode implements RationalFormula, ApronNode {
+    class ApronRatVarNode implements RationalFormula, ApronNumeralNode {
 
       private final FormulaType type = FormulaType.RATIONAL;
       private final Texpr1VarNode varNode;
@@ -172,6 +193,13 @@ public interface ApronNode extends Formula {
         this.varNode = pNode.getNode();
         this.varName = pNode.getVarName();
         this.formulaCreator = pNode.getFormulaCreator();
+      }
+
+      public ApronRatVarNode(Texpr1VarNode pNode, ApronFormulaCreator pFormulaCreator){
+        Preconditions.checkState(pFormulaCreator.getEnvironment().hasVar(pNode.toString()));
+        this.varNode = pNode;
+        this.formulaCreator = pFormulaCreator;
+        this.varName = pNode.toString();
       }
 
       public String getVarName() {
@@ -210,7 +238,7 @@ public interface ApronNode extends Formula {
       }
 
       /**
-       * this method is needed to add the variable to the @Environment; the @Environment holdas
+       * this method is needed to add the variable to the @Environment; the @Environment holds
        * all variables in two separated arrays, one for Integers and one for Rationals
        */
       private void addVarToEnv() {
@@ -246,7 +274,7 @@ public interface ApronNode extends Formula {
     /**
      * This class wraps terms with unary arithmetic operators for rational values (ex. -x)
      */
-    class ApronRatUnaryNode implements RationalFormula, ApronNode {
+    class ApronRatUnaryNode implements RationalFormula, ApronNumeralNode {
       private final FormulaType type = FormulaType.RATIONAL;
       private final Texpr1UnNode unaryNode;
       private final Set<String> varNames;
@@ -260,6 +288,16 @@ public interface ApronNode extends Formula {
       public ApronRatUnaryNode(ApronRatUnaryNode pNode) {
         this.unaryNode = pNode.getNode();
         this.varNames = pNode.getVarNames();
+      }
+
+      public ApronRatUnaryNode(Texpr1UnNode pNode){
+        this.unaryNode = pNode;
+        Var[] stringVars = pNode.getVars();
+        Set<String> varNames = new HashSet<>();
+        for(Var var:stringVars){
+          varNames.add(var.toString());
+        }
+        this.varNames = varNames;
       }
 
       @Override
@@ -306,7 +344,7 @@ public interface ApronNode extends Formula {
     /**
      * This class wraps terms with binary arithmetic operators for rational values (ex. a+4.5)
      */
-    class ApronRatBinaryNode implements RationalFormula, ApronNode {
+    class ApronRatBinaryNode implements RationalFormula, ApronNumeralNode {
 
       private final FormulaType type = FormulaType.RATIONAL;
       private final Texpr1BinNode binaryNode;
@@ -323,6 +361,16 @@ public interface ApronNode extends Formula {
       public ApronRatBinaryNode(ApronRatBinaryNode pNode) {
         this.binaryNode = pNode.getNode();
         this.varNames = pNode.getVarNames();
+      }
+
+      public ApronRatBinaryNode(Texpr1BinNode pNode){
+        this.binaryNode = pNode;
+        Var[] stringVars = pNode.getVars();
+        Set<String> varNames = new HashSet<>();
+        for(Var var:stringVars){
+          varNames.add(var.toString());
+        }
+        this.varNames = varNames;
       }
 
       @Override
@@ -370,7 +418,7 @@ public interface ApronNode extends Formula {
     /**
      * This class wraps integer constants, defined by their BigInteger value.
      */
-    class ApronIntCstNode implements IntegerFormula, ApronNode {
+    class ApronIntCstNode implements IntegerFormula, ApronNumeralNode {
 
       private final FormulaType type = FormulaType.INTEGER;
       private final Texpr1CstNode cstNode;
@@ -450,7 +498,7 @@ public interface ApronNode extends Formula {
     /**
      * This class wraps variables for integer values.
      */
-    class ApronIntVarNode implements IntegerFormula, ApronNode {
+    class ApronIntVarNode implements IntegerFormula, ApronNumeralNode {
 
       private final FormulaType type = FormulaType.INTEGER;
       private final Texpr1VarNode varNode;
@@ -564,7 +612,7 @@ public interface ApronNode extends Formula {
     /**
      * This class wraps terms with unary arithmetic operators for integer values (ex. -x)
      */
-    class ApronIntUnaryNode implements IntegerFormula, ApronNode {
+    class ApronIntUnaryNode implements IntegerFormula, ApronNumeralNode {
       private final FormulaType type = FormulaType.INTEGER;
       private final Texpr1UnNode unaryNode;
       private final Set<String> varNames;
@@ -639,7 +687,7 @@ public interface ApronNode extends Formula {
     /**
      * This class wraps terms with unary arithmetic operators for integer values (ex. x+3)
      */
-    class ApronIntBinaryNode implements IntegerFormula, ApronNode {
+    class ApronIntBinaryNode implements IntegerFormula, ApronNumeralNode {
 
       private final FormulaType type = FormulaType.INTEGER;
       private final Texpr1BinNode binaryNode;
@@ -720,7 +768,7 @@ public interface ApronNode extends Formula {
   /**
    * This class wraps boolean formulas defined by a node and a boolean operator =,!=, >, >=. All
    * boolean formulas in Apron are syntactically like </Texpr1Node> </operaot> 0; a constraint is
-   * defined by a map of Texpr1Nodes and a operation. The reason for the map is, that Apron does
+   * defined by a map of Texpr1Nodes and an operation. The reason for the map is, that Apron does
    * not have an extra and-operation. Stacking constraints ia a way to implement this for JavaSMT.
    */
   class ApronConstraint implements BooleanFormula, ApronNode {
