@@ -51,7 +51,7 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- The normal dependencies with all solvers included, except those unter GPL. -->
         <conf name="runtime-without-gpl"
-              extends="runtime-mathsat,runtime-opensmt,runtime-optimathsat,runtime-smtinterpol,runtime-princess,runtime-z3,runtime-cvc4,runtime-cvc5,runtime-boolector,runtime-bitwuzla""
+              extends="runtime-mathsat,runtime-opensmt,runtime-optimathsat,runtime-smtinterpol,runtime-princess,runtime-z3,runtime-cvc4,runtime-cvc5,runtime-boolector,runtime-bitwuzla"
               description="all solvers included, except those unter GPL"/>
 
         <!-- Dependencies needed for building or running tests. -->
