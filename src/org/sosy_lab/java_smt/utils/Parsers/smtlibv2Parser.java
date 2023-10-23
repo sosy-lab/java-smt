@@ -5083,7 +5083,13 @@ public class smtlibv2Parser extends Parser {
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof smtlibv2Visitor ) return ((smtlibv2Visitor<? extends T>)visitor).visitCmd_assert(this);
+			if ( visitor instanceof smtlibv2Visitor ) {
+				try {
+					return ((smtlibv2Visitor<? extends T>)visitor).visitCmd_assert(this);
+				} catch (IOException pE) {
+					throw new RuntimeException(pE);
+				}
+			}
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -5247,7 +5253,13 @@ public class smtlibv2Parser extends Parser {
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof smtlibv2Visitor ) return ((smtlibv2Visitor<? extends T>)visitor).visitCmd_declareConst(this);
+			if ( visitor instanceof smtlibv2Visitor ) {
+				try {
+					return ((smtlibv2Visitor<? extends T>)visitor).visitCmd_declareConst(this);
+				} catch (IOException pE) {
+					throw new RuntimeException(pE);
+				}
+			}
 			else return visitor.visitChildren(this);
 		}
 	}

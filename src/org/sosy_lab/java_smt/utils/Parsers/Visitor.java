@@ -1,4 +1,5 @@
 package org.sosy_lab.java_smt.utils.Parsers;
+import com.google.common.collect.testing.OneSizeGenerator;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -47,12 +48,12 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
   ShutdownManager shutdown = ShutdownManager.create();
   SolverContext context =
       SolverContextFactory.createSolverContext(config, logger, shutdown.getNotifier(),
-          Solvers.SMTINTERPOL);
+          Solvers.MATHSAT5);
   FormulaManager fmgr = context.getFormulaManager();
   BooleanFormulaManager bmgr = fmgr.getBooleanFormulaManager();
   IntegerFormulaManager imgr = fmgr.getIntegerFormulaManager();
   RationalFormulaManager rmgr = fmgr.getRationalFormulaManager();
-  //BitvectorFormulaManager bimgr = fmgr.getBitvectorFormulaManager();
+  BitvectorFormulaManager bimgr = fmgr.getBitvectorFormulaManager();
   ArrayFormulaManager amgr = fmgr.getArrayFormulaManager();
   UFManager umgr = fmgr.getUFManager();
 
@@ -129,9 +130,20 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
 
   @Override public Object visitIdx_symb(smtlibv2Parser.Idx_symbContext ctx) { return visitChildren(ctx); }
 
-  @Override public Object visitId_symb(smtlibv2Parser.Id_symbContext ctx) { return visitChildren(ctx); }
+  @Override public List<String> visitId_symb(smtlibv2Parser.Id_symbContext ctx) {
+    List<String> sort = new ArrayList<>();
+    sort.add(ctx.getText());
+    return sort;
+  }
 
-  @Override public Object visitId_symb_idx(smtlibv2Parser.Id_symb_idxContext ctx) { return visitChildren(ctx); }
+  @Override public List<String> visitId_symb_idx(smtlibv2Parser.Id_symb_idxContext ctx) {
+    List<String> sort = new ArrayList<>();
+    sort.add(ctx.symbol().getText());
+    for (int i = 0; i < ctx.index().size(); i++) {
+      sort.add(ctx.index(i).getText());
+    }
+    return sort;
+  }
 
   @Override public Object visitAttr_spec(smtlibv2Parser.Attr_specContext ctx) { return visitChildren(ctx); }
 
@@ -143,13 +155,18 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
 
   @Override public Object visitAttr_key_attr(smtlibv2Parser.Attr_key_attrContext ctx) { return visitChildren(ctx); }
 
-  @Override public Object visitSort_id(smtlibv2Parser.Sort_idContext ctx) { return visitChildren(ctx); }
+  @Override public Object visitSort_id(smtlibv2Parser.Sort_idContext ctx) {
+    return visitChildren(ctx);
+  }
 
   @Override public Object visitMultisort(smtlibv2Parser.MultisortContext ctx) { return visitChildren(ctx); }
 
   @Override public Object visitQual_id(smtlibv2Parser.Qual_idContext ctx) { return visitChildren(ctx); }
 
-  @Override public Object visitQual_id_sort(smtlibv2Parser.Qual_id_sortContext ctx) { return visitChildren(ctx); }
+  @Override public Object visitQual_id_sort(smtlibv2Parser.Qual_id_sortContext ctx) {
+
+    return visitChildren(ctx);
+  }
 
   @Override public Object visitVar_binding(smtlibv2Parser.Var_bindingContext ctx) { return visitChildren(ctx); }
 
@@ -244,6 +261,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
       throws IOException {
     // TODO: Error handling
     String operand = ctx.getText();
+    List<String> bitVec = (List<String>) visitChildren(ctx);
     if (variables.containsKey(operand)) {
       return variables.get(operand).javaSmt;
     } else if (operand.equals("false")) {
@@ -252,14 +270,19 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     } else if (operand.equals("true")) {
       variables.put(operand, new ParserFormula("Bool", bmgr.makeTrue()));
       return variables.get(operand).javaSmt;
-    }else {
+    } else if (! bitVec.isEmpty()) {
+      BigInteger value = new BigInteger(bitVec.get(0).split("v")[1]);
+      int index = Integer.parseInt(bitVec.get(1));
+      return bimgr.makeBitvector(index, value);
+    } else {
       throw new IOException("Operand " + operand + " is unknown.");
     }
   }
 
   public void getOperands(smtlibv2Parser.MultitermContext ctx,
                           Collection<BooleanFormula> boolOperands,
-                          List<NumeralFormula> numeralOperands) throws IOException {
+                          List<NumeralFormula> numeralOperands,
+                          List<BitvectorFormula> bitvecOperands) throws IOException {
 
     for (int i = 0; i < ctx.term().size(); ++i) {
       Object operand = visit(ctx.term(i));
@@ -271,16 +294,22 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
         if (operand instanceof NumeralFormula) {
           numeralOperands.add((NumeralFormula) operand);
         }
+        if (operand instanceof BitvectorFormula) {
+          bitvecOperands.add((BitvectorFormula) operand);
+        }
       }
     }
   }
 
   @Override public Object visitMultiterm(smtlibv2Parser.MultitermContext ctx) throws IOException {
-    String operator = ctx.qual_identifer().getText();
+    //String operator = ctx.qual_identifer().getText();
+    List<String> operators = (List<String>) visit(ctx.qual_identifer());
+    String operator = operators.get(0);
     Collection<BooleanFormula> boolOperands = new ArrayList<>();
     List<NumeralFormula> numeralOperands = new ArrayList<>();
+    List<BitvectorFormula> bitvecOperands = new ArrayList<>();
 
-    getOperands(ctx, boolOperands, numeralOperands);
+    getOperands(ctx, boolOperands, numeralOperands, bitvecOperands);
 
     switch(operator) {
       //boolean operators
@@ -314,12 +343,11 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
           if (numeralOperands.stream().anyMatch(c -> c instanceof RationalFormula)) {
             return rmgr.sum(numeralOperands);
           } else {
-            List<IntegerFormula> integerOperands = numeralOperands
-                .stream()
-                .map(e -> (IntegerFormula) e)
-                .collect(Collectors.toList());
+            List<IntegerFormula> integerOperands = numeralOperands.stream().map(e -> (IntegerFormula) e).collect(Collectors.toList());
             return imgr.sum(integerOperands);
           }
+        } else {
+          throw new IOException(operator + " takes at least one numeral operand as input. ");
         }
       case "-":
         if (!numeralOperands.isEmpty()) {
@@ -327,131 +355,302 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
             if (numeralOperands.stream().anyMatch(c -> c instanceof RationalFormula)) {
               return rmgr.subtract(numeralOperands.get(0), numeralOperands.get(1));
             } else {
-              List<IntegerFormula> integerOperands = numeralOperands
-                  .stream()
-                  .map(e -> (IntegerFormula) e)
-                  .collect(Collectors.toList());
+              List<IntegerFormula> integerOperands = numeralOperands.stream().map(e -> (IntegerFormula) e).collect(Collectors.toList());
               return imgr.subtract(integerOperands.get(0), integerOperands.get(1));
             }
           } else if (numeralOperands.size() == 1) {
             if (numeralOperands.stream().anyMatch(c -> c instanceof RationalFormula)) {
               return rmgr.negate(numeralOperands.get(0));
             } else {
-              List<IntegerFormula> integerOperands = numeralOperands
-                  .stream()
-                  .map(e -> (IntegerFormula) e)
-                  .collect(Collectors.toList());
+              List<IntegerFormula> integerOperands = numeralOperands.stream().map(e -> (IntegerFormula) e).collect(Collectors.toList());
               return imgr.negate(integerOperands.get(0));
             }
           }
+        } else {
+          throw new IOException(operator + " takes either one or two numeral operands as input. ");
         }
       case "div":
         if (numeralOperands.size() == 2) {
           if (numeralOperands.stream().anyMatch(c -> c instanceof RationalFormula)) {
             return rmgr.divide(numeralOperands.get(0), numeralOperands.get(1));
           } else {
-            List<IntegerFormula> integerOperands = numeralOperands
-                .stream()
-                .map(e -> (IntegerFormula) e)
-                .collect(Collectors.toList());
+            List<IntegerFormula> integerOperands = numeralOperands.stream().map(e -> (IntegerFormula) e).collect(Collectors.toList());
             return imgr.divide(integerOperands.get(0), integerOperands.get(1));
           }
+        } else {
+          throw new IOException(operator + " takes two numeral operands as input. ");
         }
       case "mod":
         if (numeralOperands.size() == 2) {
           if (numeralOperands.stream().anyMatch(c -> c instanceof RationalFormula)) {
             return new IOException("Modulo is only available for Int. ");
           } else {
-            List<IntegerFormula> integerOperands = numeralOperands
-                .stream()
-                .map(e -> (IntegerFormula) e)
-                .collect(Collectors.toList());
+            List<IntegerFormula> integerOperands = numeralOperands.stream().map(e -> (IntegerFormula) e).collect(Collectors.toList());
             return imgr.modulo(integerOperands.get(0), integerOperands.get(1));
           }
+        } else {
+          throw new IOException(operator + " takes two integer operands as input. ");
         }
       case "*":
         if (numeralOperands.size() == 2) {
           if (numeralOperands.stream().anyMatch(c -> c instanceof RationalFormula)) {
             return rmgr.multiply(numeralOperands.get(0), numeralOperands.get(1));
           } else {
-            List<IntegerFormula> integerOperands = numeralOperands
-                .stream()
-                .map(e -> (IntegerFormula) e)
-                .collect(Collectors.toList());
+            List<IntegerFormula> integerOperands = numeralOperands.stream().map(e -> (IntegerFormula) e).collect(Collectors.toList());
             return imgr.multiply(integerOperands.get(0), integerOperands.get(1));
           }
+        } else {
+          throw new IOException(operator + " takes two numeral operands as input. ");
         }
       case "distinct":
         if (!numeralOperands.isEmpty()) {
           if (numeralOperands.stream().anyMatch(c -> c instanceof RationalFormula)) {
             return rmgr.distinct(numeralOperands);
           } else {
-            List<IntegerFormula> integerOperands = numeralOperands
-                .stream()
-                .map(e -> (IntegerFormula) e)
-                .collect(Collectors.toList());
+            List<IntegerFormula> integerOperands = numeralOperands.stream().map(e -> (IntegerFormula) e).collect(Collectors.toList());
             return imgr.distinct(integerOperands);
           }
+        } else {
+          throw new IOException(operator + " takes two numeral operands as input. ");
         }
       case ">":
         if (numeralOperands.size() == 2) {
           if (numeralOperands.stream().anyMatch(c -> c instanceof RationalFormula)) {
             return rmgr.greaterThan(numeralOperands.get(0), numeralOperands.get(1));
           } else {
-            List<IntegerFormula> integerOperands = numeralOperands
-                .stream()
-                .map(e -> (IntegerFormula) e)
-                .collect(Collectors.toList());
+            List<IntegerFormula> integerOperands = numeralOperands.stream().map(e -> (IntegerFormula) e).collect(Collectors.toList());
             return imgr.greaterThan(integerOperands.get(0), integerOperands.get(1));
           }
+        } else {
+          throw new IOException(operator + " takes two numeral operands as input. ");
         }
       case ">=":
         if (numeralOperands.size() == 2) {
           if (numeralOperands.stream().anyMatch(c -> c instanceof RationalFormula)) {
             return rmgr.greaterOrEquals(numeralOperands.get(0), numeralOperands.get(1));
           } else {
-            List<IntegerFormula> integerOperands = numeralOperands
-                .stream()
-                .map(e -> (IntegerFormula) e)
-                .collect(Collectors.toList());
+            List<IntegerFormula> integerOperands = numeralOperands.stream().map(e -> (IntegerFormula) e).collect(Collectors.toList());
             return imgr.greaterOrEquals(integerOperands.get(0), integerOperands.get(1));
           }
+        } else {
+          throw new IOException(operator + " takes two numeral operands as input. ");
         }
       case "<":
         if (numeralOperands.size() == 2) {
           if (numeralOperands.stream().anyMatch(c -> c instanceof RationalFormula)) {
             return rmgr.lessThan(numeralOperands.get(0), numeralOperands.get(1));
           } else {
-            List<IntegerFormula> integerOperands = numeralOperands
-                .stream()
-                .map(e -> (IntegerFormula) e)
-                .collect(Collectors.toList());
+            List<IntegerFormula> integerOperands = numeralOperands.stream().map(e -> (IntegerFormula) e).collect(Collectors.toList());
             return imgr.lessThan(integerOperands.get(0), integerOperands.get(1));
           }
+        } else {
+          throw new IOException(operator + " takes two numeral operands as input. ");
         }
       case "<=":
         if (numeralOperands.size() == 2) {
           if (numeralOperands.stream().anyMatch(c -> c instanceof RationalFormula)) {
             return rmgr.lessOrEquals(numeralOperands.get(0), numeralOperands.get(1));
           } else {
-            List<IntegerFormula> integerOperands = numeralOperands
-                .stream()
-                .map(e -> (IntegerFormula) e)
-                .collect(Collectors.toList());
+            List<IntegerFormula> integerOperands = numeralOperands.stream().map(e -> (IntegerFormula) e).collect(Collectors.toList());
             return imgr.lessOrEquals(integerOperands.get(0), integerOperands.get(1));
           }
+        } else {
+          throw new IOException(operator + " takes two numeral operands as input. ");
         }
+
       case "to_int":
         if (numeralOperands.size() == 1) {
           if (numeralOperands.stream().anyMatch(c -> c instanceof RationalFormula)) {
             return rmgr.floor(numeralOperands.get(0));
           } else {
-            List<IntegerFormula> integerOperands = numeralOperands
-                .stream()
-                .map(e -> (IntegerFormula) e)
-                .collect(Collectors.toList());
+            List<IntegerFormula> integerOperands = numeralOperands.stream().map(e -> (IntegerFormula) e).collect(Collectors.toList());
             return imgr.floor(integerOperands.get(0));
           }
+        } else {
+          throw new IOException(operator + " takes one rational operand as input. ");
+        }
+
+        //BitVec operators
+      case "bvneg":
+        if (bitvecOperands.size() == 1) {
+          return bimgr.negate(bitvecOperands.get(0));
+        } else {
+          throw new IOException(operator + " takes one bitvector operand as input. ");
+        }
+      case "bvadd":
+        if (bitvecOperands.size() == 2) {
+          return bimgr.add(bitvecOperands.get(0), bitvecOperands.get(1));
+        } else {
+          throw new IOException(operator + " takes two bitvector operands as input. ");
+        }
+      case "bvsub":
+        if (bitvecOperands.size() == 2) {
+          return bimgr.subtract(bitvecOperands.get(0), bitvecOperands.get(1));
+        } else {
+          throw new IOException(operator + " takes two bitvector operands as input. ");
+        }
+      case "bvsdiv":
+        if (bitvecOperands.size() == 2) {
+          return bimgr.divide(bitvecOperands.get(0), bitvecOperands.get(1), true);
+        } else {
+          throw new IOException(operator + " takes two bitvector operands as input. ");
+        }
+      case "bvudiv":
+        if (bitvecOperands.size() == 2) {
+          return bimgr.divide(bitvecOperands.get(0), bitvecOperands.get(1), false);
+        } else {
+          throw new IOException(operator + " takes two bitvector operands as input. ");
+        }
+      case "bvsrem":
+        if (bitvecOperands.size() == 2) {
+          return bimgr.modulo(bitvecOperands.get(0), bitvecOperands.get(1), true);
+        } else {
+          throw new IOException(operator + " takes two bitvector operands as input. ");
+        }
+      case "bvurem":
+        if (bitvecOperands.size() == 2) {
+          return bimgr.modulo(bitvecOperands.get(0), bitvecOperands.get(1), false);
+        } else {
+          throw new IOException(operator + " takes two bitvector operands as input. ");
+        }
+      case "bvmul":
+        if (bitvecOperands.size() == 2) {
+          return bimgr.multiply(bitvecOperands.get(0), bitvecOperands.get(1));
+        } else {
+          throw new IOException(operator + " takes two bitvector operands as input. ");
+        }
+      case "bvsgt":
+        if (bitvecOperands.size() == 2) {
+          return bimgr.greaterThan(bitvecOperands.get(0), bitvecOperands.get(1), true);
+        } else {
+          throw new IOException(operator + " takes two bitvector operands as input. ");
+        }
+      case "bvugt":
+        if (bitvecOperands.size() == 2) {
+          return bimgr.greaterThan(bitvecOperands.get(0), bitvecOperands.get(1), false);
+        } else {
+          throw new IOException(operator + " takes two bitvector operands as input. ");
+        }
+      case "bvsge":
+        if (bitvecOperands.size() == 2) {
+          return bimgr.greaterOrEquals(bitvecOperands.get(0), bitvecOperands.get(1), true);
+        } else {
+          throw new IOException(operator + " takes two bitvector operands as input. ");
+        }
+      case "bvuge":
+        if (bitvecOperands.size() == 2) {
+          return bimgr.greaterOrEquals(bitvecOperands.get(0), bitvecOperands.get(1), false);
+        } else {
+          throw new IOException(operator + " takes two bitvector operands as input. ");
+        }
+      case "bvslt":
+        if (bitvecOperands.size() == 2) {
+          return bimgr.lessThan(bitvecOperands.get(0), bitvecOperands.get(1), true);
+        } else {
+          throw new IOException(operator + " takes two bitvector operands as input. ");
+        }
+      case "bvult":
+        if (bitvecOperands.size() == 2) {
+          return bimgr.lessThan(bitvecOperands.get(0), bitvecOperands.get(1), false);
+        } else {
+          throw new IOException(operator + " takes two bitvector operands as input. ");
+        }
+      case "bvsle":
+        if (bitvecOperands.size() == 2) {
+          return bimgr.lessOrEquals(bitvecOperands.get(0), bitvecOperands.get(1), true);
+        } else {
+          throw new IOException(operator + " takes two bitvector operands as input. ");
+        }
+      case "bvule":
+        if (bitvecOperands.size() == 2) {
+          return bimgr.lessOrEquals(bitvecOperands.get(0), bitvecOperands.get(1), false);
+        } else {
+          throw new IOException(operator + " takes two bitvector operands as input. ");
+        }
+      case "bvnot":
+        if (bitvecOperands.size() == 2) {
+          return bimgr.not(bitvecOperands.get(0));
+        } else {
+          throw new IOException(operator + " takes two bitvector operands as input. ");
+        }
+      case "bvand":
+        if (bitvecOperands.size() == 2) {
+          return bimgr.and(bitvecOperands.get(0), bitvecOperands.get(1));
+        } else {
+          throw new IOException(operator + " takes two bitvector operands as input. ");
+        }
+      case "bvor":
+        if (bitvecOperands.size() == 2) {
+          return bimgr.or(bitvecOperands.get(0), bitvecOperands.get(1));
+        } else {
+          throw new IOException(operator + " takes two bitvector operands as input. ");
+        }
+      case "bvxor":
+        if (bitvecOperands.size() == 2) {
+          return bimgr.xor(bitvecOperands.get(0), bitvecOperands.get(1));
+        } else {
+          throw new IOException(operator + " takes two bitvector operands as input. ");
+        }
+      case "bvashr":
+        if (bitvecOperands.size() == 2) {
+          return bimgr.shiftRight(bitvecOperands.get(0), bitvecOperands.get(1), true);
+        } else {
+          throw new IOException(operator + " takes two bitvector operands as input. ");
+        }
+      case "bvlshr":
+        if (bitvecOperands.size() == 2) {
+          return bimgr.shiftRight(bitvecOperands.get(0), bitvecOperands.get(1), false);
+        } else {
+          throw new IOException(operator + " takes two bitvector operands as input. ");
+        }
+      case "bvshl":
+        if (bitvecOperands.size() == 2) {
+          return bimgr.shiftLeft(bitvecOperands.get(0), bitvecOperands.get(1));
+        } else {
+          throw new IOException(operator + " takes two bitvector operands as input. ");
+        }
+      case "concat":
+        if (bitvecOperands.size() == 2) {
+          return bimgr.concat(bitvecOperands.get(0), bitvecOperands.get(1));
+        } else {
+          throw new IOException(operator + " takes two bitvector operands as input. ");
+        }
+      case "extract":
+        if (bitvecOperands.size() == 1) {
+          if (operators.size() == 3 && isInteger(operators.get(2)) && isInteger(operators.get(1))) {
+            int left = Integer.parseInt(operators.get(2));
+            int right = Integer.parseInt(operators.get(1));
+            return bimgr.extract(bitvecOperands.get(0), left, right);
+          } else {
+            throw new IOException(operator + " takes one bitvector and two integers as "
+                + "input. ");
+          }
+        } else {
+          throw new IOException(operator + " takes one bitvector and two integers as input. ");
+        }
+      case "zero_extend":
+        if (bitvecOperands.size() == 1) {
+          if (operators.size() == 2 && isInteger(operators.get(1))) {
+            int extension = Integer.parseInt(operators.get(1));
+            return bimgr.extend(bitvecOperands.get(0), extension, false);
+          } else {
+            throw new IOException(operator + " takes one bitvector and one as "
+                + "input. ");
+          }
+        } else {
+          throw new IOException(operator + " takes one bitvector and two integers as input. ");
+        }
+      case "sign_extend":
+        if (bitvecOperands.size() == 1) {
+          if (operators.size() == 2 && isInteger(operators.get(1))) {
+            int extension = Integer.parseInt(operators.get(1));
+            return bimgr.extend(bitvecOperands.get(0), extension, true);
+          } else {
+            throw new IOException(operator + " takes one bitvector and one as "
+                + "input. ");
+          }
+        } else {
+          throw new IOException(operator + " takes one bitvector and two integers as input. ");
         }
 
         //overloaded operators
@@ -460,10 +659,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
           if (numeralOperands.stream().anyMatch(c -> c instanceof RationalFormula)) {
             return rmgr.equal(numeralOperands.get(0), numeralOperands.get(1));
           } else {
-            List<IntegerFormula> integerOperands = numeralOperands
-                .stream()
-                .map(e -> (IntegerFormula) e)
-                .collect(Collectors.toList());
+            List<IntegerFormula> integerOperands = numeralOperands.stream().map(e -> (IntegerFormula) e).collect(Collectors.toList());
             return imgr.equal(integerOperands.get(0), integerOperands.get(1));
           }
         }
@@ -471,8 +667,11 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
           Iterator<BooleanFormula> eIt = boolOperands.iterator();
           return bmgr.equivalence(eIt.next(), eIt.next());
         }
+        if (bitvecOperands.size() == 2) {
+          return bimgr.equal(bitvecOperands.get(0), bitvecOperands.get(1));
+        }
       default:
-        throw new IOException("Operator " + operator + " is not supported for this operand type.");
+        throw new IOException("Operator " + operator + " is not supported for operands type.");
 
     }
     return null;
@@ -554,28 +753,45 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
 
   @Override public Object visitScript(smtlibv2Parser.ScriptContext ctx) { return visitChildren(ctx); }
 
-  @Override public Object visitCmd_assert(smtlibv2Parser.Cmd_assertContext ctx) {
+  @Override public Object visitCmd_assert(smtlibv2Parser.Cmd_assertContext ctx) throws IOException {
     Object result = visitChildren(ctx);
-    constraints.add((BooleanFormula) result);
-    System.out.println(constraints);
-    return result;
+    try {
+      result = (BooleanFormula) result;
+      constraints.add((BooleanFormula) result);
+      System.out.println(constraints);
+      return result;
+    } catch (Exception pE) {
+      throw new IOException("constraints need to be of Boolean type");
+    }
   }
 
   @Override public Object visitCmd_checkSat(smtlibv2Parser.Cmd_checkSatContext ctx) { return visitChildren(ctx); }
 
   @Override public Object visitCmd_checkSatAssuming(smtlibv2Parser.Cmd_checkSatAssumingContext ctx) { return visitChildren(ctx); }
 
-  @Override public Object visitCmd_declareConst(smtlibv2Parser.Cmd_declareConstContext ctx) {
+  @Override public Object visitCmd_declareConst(smtlibv2Parser.Cmd_declareConstContext ctx)
+      throws IOException {
     String variable = ctx.symbol().getText();
-    String sort = ctx.sort().getText();
+    List<String> sorts = (List<String>) visit(ctx.sort());
+    String sort = sorts.get(0);
     if (sort.equals("Bool")) {
       variables.put(variable, new ParserFormula("Bool", bmgr.makeVariable(variable)));
     } else if (sort.equals("Int")) {
       variables.put((variable), new ParserFormula("Int", imgr.makeVariable(variable)));
     } else if (sort.equals("Real")){
       variables.put((variable), new ParserFormula("Real", rmgr.makeVariable(variable)));
-    } else {
+    } else if (sort.equals("BitVec")) {
+      if (sorts.size() == 2) {
+        String index = sorts.get(1);
+        if (isInteger(index)) {
+          variables.put(variable, new ParserFormula("BitVec", bimgr.makeVariable(
+              Integer.parseInt(index),
+              variable)));
+        } else {
+          throw new IOException("BitVec declaration needs to be of form (_ BitVec Int)");
+        }
 
+      }
     }
     //System.out.println(variables);
     return visitChildren(ctx);

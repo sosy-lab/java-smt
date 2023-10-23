@@ -623,7 +623,7 @@ public interface smtlibv2Visitor<T> extends ParseTreeVisitor<T> {
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitCmd_assert(smtlibv2Parser.Cmd_assertContext ctx);
+	T visitCmd_assert(smtlibv2Parser.Cmd_assertContext ctx) throws IOException;
 	/**
 	 * Visit a parse tree produced by {@link smtlibv2Parser#cmd_checkSat}.
 	 * @param ctx the parse tree
@@ -641,7 +641,7 @@ public interface smtlibv2Visitor<T> extends ParseTreeVisitor<T> {
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitCmd_declareConst(smtlibv2Parser.Cmd_declareConstContext ctx);
+	T visitCmd_declareConst(smtlibv2Parser.Cmd_declareConstContext ctx) throws IOException;
 	/**
 	 * Visit a parse tree produced by {@link smtlibv2Parser#cmd_declareDatatype}.
 	 * @param ctx the parse tree
