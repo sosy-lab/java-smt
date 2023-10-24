@@ -23,6 +23,7 @@ import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
@@ -309,6 +310,11 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     List<String> operators = (List<String>) visit(ctx.qual_identifer());
     //String binary = (String) visit(ctx.b);
     String operator = operators.get(0);
+    Object ufOperator = null;
+    if (variables.containsKey(operator)) {
+      ufOperator = variables.get(operator).javaSmt;
+      operator = "UF";
+    }
 
     List<Formula> operands = new ArrayList<>();
 
@@ -916,6 +922,14 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
           throw new IOException(operator + " takes one array and one index as input. ");
         }
 
+        //UF
+      case "UF":
+        try {
+          return umgr.callUF((FunctionDeclaration<? extends Formula>) ufOperator, operands);
+        } catch (Exception e) {
+          throw new IOException(operator + " takes one array and one index as input. ");
+        }
+
         //overloaded operators
       case "=":
         if (operands.size() == 2) {
@@ -1028,7 +1042,6 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
   @Override public Object visitCmd_assert(smtlibv2Parser.Cmd_assertContext ctx) throws IOException {
     Object result = visitChildren(ctx);
     try {
-      result = (BooleanFormula) result;
       constraints.add((BooleanFormula) result);
       System.out.println(constraints);
       return result;
@@ -1090,15 +1103,50 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
             FormulaType.IntegerType, FormulaType.IntegerType)));
       }
     }
-    //System.out.println(variables);
     return visitChildren(ctx);
   }
 
-  @Override public Object visitCmd_declareDatatype(smtlibv2Parser.Cmd_declareDatatypeContext ctx) { return visitChildren(ctx); }
+  @Override public Object visitCmd_declareDatatype(smtlibv2Parser.Cmd_declareDatatypeContext ctx) {
+
+    return visitChildren(ctx);
+  }
 
   @Override public Object visitCmd_declareDatatypes(smtlibv2Parser.Cmd_declareDatatypesContext ctx) { return visitChildren(ctx); }
 
-  @Override public Object visitCmd_declareFun(smtlibv2Parser.Cmd_declareFunContext ctx) { return visitChildren(ctx); }
+  public static FormulaType<?> mapSort(String sorts) throws IOException {
+
+      if (sorts.equals("Int")) {
+        return FormulaType.IntegerType;
+      } else if (sorts.equals("Bool")) {
+        return FormulaType.BooleanType;
+      } else if (sorts.equals("Real")) {
+          return FormulaType.RationalType;
+      } else {
+        throw new IOException("JavaSMT supports only Int, Real and Bool for UF.");
+      }
+    }
+
+  @Override public Object visitCmd_declareFun(smtlibv2Parser.Cmd_declareFunContext ctx) {
+    String variable = ctx.symbol().getText();
+    List<String> sorts = new ArrayList<>();
+    for (int i = 0; i < ctx.sort().size(); i++) {
+      sorts.add(ctx.sort(i).getText());
+    }
+    List<FormulaType<?>> javaSorts =
+        sorts.stream().map(e -> {
+          try {
+            return mapSort(e);
+          } catch (IOException pE) {
+            throw new RuntimeException(pE);
+          }
+        }).collect(Collectors.toList());
+
+    FormulaType<?> returnVal = javaSorts.get(javaSorts.size()-1);
+    javaSorts.remove(javaSorts.size() - 1);
+    variables.put(variable, new ParserFormula(variable, umgr.declareUF("UF", returnVal,
+        javaSorts)));
+    return visitChildren(ctx);
+  }
 
   @Override public Object visitCmd_declareSort(smtlibv2Parser.Cmd_declareSortContext ctx) { return visitChildren(ctx); }
 
