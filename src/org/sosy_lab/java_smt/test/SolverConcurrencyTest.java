@@ -129,6 +129,7 @@ public class SolverConcurrencyTest {
         .isNoneOf(
             Solvers.SMTINTERPOL,
             Solvers.BOOLECTOR,
+            Solvers.OPENSMT, // INFO: OpenSMT does not support concurrent stacks
             Solvers.MATHSAT5,
             Solvers.Z3,
             Solvers.PRINCESS,
@@ -147,7 +148,7 @@ public class SolverConcurrencyTest {
     assume()
         .withMessage("Solver does not support bitvectors")
         .that(solver)
-        .isNoneOf(Solvers.SMTINTERPOL, Solvers.YICES2);
+        .isNoneOf(Solvers.SMTINTERPOL, Solvers.YICES2, Solvers.OPENSMT);
   }
 
   private void requireOptimization() {
@@ -160,7 +161,8 @@ public class SolverConcurrencyTest {
             Solvers.PRINCESS,
             Solvers.CVC4,
             Solvers.CVC5,
-            Solvers.YICES2);
+            Solvers.YICES2,
+            Solvers.OPENSMT);
   }
 
   /**

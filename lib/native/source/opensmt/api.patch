@@ -1,0 +1,558 @@
+diff --git a/src/api/Interpret.cc b/src/api/Interpret.cc
+index 0c778b9f..418da7d8 100644
+--- a/src/api/Interpret.cc
++++ b/src/api/Interpret.cc
+@@ -43,6 +43,11 @@ Interpret::~Interpret() {
+     for (int i = 0; i < term_names.size(); ++i) {
+         free(term_names[i]);
+     }
++
++    // if the logic is given in the constructor and was not set via string-input, we cleanup the reference
++    if (!ownsLogic) {
++        logic.release();
++    }
+ }
+ 
+ PTRef
+@@ -1067,11 +1072,13 @@ void Interpret::comment_formatted(const char* fmt_str, ...) const {
+ 
+ 
+ void Interpret::notify_formatted(bool error, const char* fmt_str, ...) {
++    std::stringstream out;
++
+     va_list ap;
+     int d;
+     char c1, *t;
+     if (error)
+-        std::cout << "(error \"";
++        out << "(error \"";
+ 
+     va_start(ap, fmt_str);
+     while (true) {
+@@ -1080,25 +1087,31 @@ void Interpret::notify_formatted(bool error, const char* fmt_str, ...) {
+             switch (*fmt_str++) {
+             case 's':
+                 t = va_arg(ap, char *);
+-                std::cout << t;
++                out << t;
+                 break;
+             case 'd':
+                 d = va_arg(ap, int);
+-                std::cout << d;
++                out << d;
+                 break;
+             case '%':
+-                std::cout << '%';
++                out << '%';
+                 break;
+             }
+         }
+         else if (c1 != '\0')
+-            std::cout << c1;
++            out << c1;
+         else break;
+     }
+     va_end(ap);
++
+     if (error)
+-        std::cout << "\")" << '\n';
+-    std::cout << std::endl;
++        out << "\")" << '\n';
++    out << std::endl;
++
++    if (error)
++      throw new OsmtApiException(out.str());
++
++    std::cout << out.str();
+ }
+ 
+ void Interpret::notify_success() {
+diff --git a/src/api/Interpret.h b/src/api/Interpret.h
+index e43b7691..a28a659d 100644
+--- a/src/api/Interpret.h
++++ b/src/api/Interpret.h
+@@ -135,6 +135,7 @@ class Interpret {
+     std::unique_ptr<MainSolver> main_solver;
+ 
+     bool            f_exit;
++    bool            ownsLogic;
+ 
+     // Named terms for getting variable values
+     MapWithKeys<const char*,PTRef,StringHash,Equal<const char*>> nameToTerm;
+@@ -189,8 +190,20 @@ class Interpret {
+     Interpret(SMTConfig & c)
+         : config     (c)
+         , f_exit     (false)
++        , ownsLogic  (true)
+         { }
+ 
++    /** This constructor reuses the existing logic from caller context. */
++    Interpret(SMTConfig & c, Logic & l)
++        : config     (c)
++        , f_exit     (false)
++        , ownsLogic  (false)
++        {
++          logic.reset(&l);
++          main_solver = createMainSolver(l.getName().c_str());
++          main_solver->initialize();
++        }
++
+     ~Interpret();
+ 
+     int interpFile(FILE* in);
+diff --git a/src/api/MainSolver.cc b/src/api/MainSolver.cc
+index 49874f9d..b7a6208c 100644
+--- a/src/api/MainSolver.cc
++++ b/src/api/MainSolver.cc
+@@ -203,6 +203,7 @@ PTRef MainSolver::rewriteMaxArity(PTRef root)
+ }
+ 
+ std::unique_ptr<Model> MainSolver::getModel() {
++    if (status != s_True) { throw OsmtApiException("Model cannot be created if solver is not in SAT state"); }
+ 
+     ModelBuilder modelBuilder {logic};
+     ts.solver.fillBooleanVars(modelBuilder);
+diff --git a/src/common/FastRational.cc b/src/common/FastRational.cc
+index 8ccc5a51..2af7bfbf 100644
+--- a/src/common/FastRational.cc
++++ b/src/common/FastRational.cc
+@@ -11,18 +11,22 @@ Copyright (c) 2008, 2009 Centre national de la recherche scientifique (CNRS)
+ mpq_ptr FastRational::mpqPool::alloc()
+ {
+     mpq_ptr r;
++    cs.lock();
+     if (!pool.empty()) {
+         r = pool.top();
+         pool.pop();
+     } else {
+         r = store.emplace().get_mpq_t();
+     }
++    cs.unlock();
+     return r;
+ }
+ 
+ void FastRational::mpqPool::release(mpq_ptr ptr)
+ {
++    cs.lock();
+     pool.push(ptr);
++    cs.unlock();
+ }
+ 
+ FastRational::FastRational( const char * s, const int base )
+diff --git a/src/common/FastRational.h b/src/common/FastRational.h
+index a3f4bb1c..9fc7ac3d 100644
+--- a/src/common/FastRational.h
++++ b/src/common/FastRational.h
+@@ -13,6 +13,7 @@ Copyright (c) 2008, 2009 Centre national de la recherche scientifique (CNRS)
+ #include "Vec.h"
+ #include <stack>
+ #include <vector>
++#include <mutex>
+ 
+ typedef int32_t  word;
+ typedef uint32_t uword;
+@@ -71,6 +72,7 @@ class FastRational
+ {
+     class mpqPool
+     {
++        std::mutex cs; // We use a mutex to make the pool thread-safe
+         std::stack<mpq_class> store; // uses deque as storage to avoid realloc
+         std::stack<mpq_ptr, std::vector<mpq_ptr>> pool;
+     public:
+diff --git a/src/logics/ArithLogic.cc b/src/logics/ArithLogic.cc
+index 8609ef55..11813348 100644
+--- a/src/logics/ArithLogic.cc
++++ b/src/logics/ArithLogic.cc
+@@ -807,7 +807,7 @@ PTRef ArithLogic::mkMod(vec<PTRef> && args) {
+     PTRef dividend = args[0];
+     PTRef divisor = args[1];
+ 
+-    if (not isNumConst(divisor)) { throw OsmtApiException("Divisor must be constant in linear logic"); }
++    if (not isNumConst(divisor)) { throw LANonLinearException("Divisor must be constant in linear logic"); }
+     if (isZero(divisor)) { throw ArithDivisionByZeroException(); }
+     if (isOne(divisor) or isMinusOne(divisor)) { return getTerm_IntZero(); }
+     if (isConstant(dividend)) {
+@@ -829,7 +829,7 @@ PTRef ArithLogic::mkIntDiv(vec<PTRef> && args) {
+     assert(args.size() == 2);
+     PTRef dividend = args[0];
+     PTRef divisor = args[1];
+-    if (not isConstant(divisor) and not isConstant(dividend)) { throw LANonLinearException("Divisor or dividend must be constant in linear logic"); }
++    if (not isConstant(divisor)) { throw LANonLinearException("Divisor or dividend must be constant in linear logic"); }
+     if (isZero(divisor)) { throw ArithDivisionByZeroException(); }
+     if (isOne(divisor)) { return dividend; }
+     if (isMinusOne(divisor)) { return mkNeg(dividend); }
+@@ -1177,7 +1177,7 @@ std::string ArithLogic::printTerm_(PTRef tr, bool ext, bool safe) const
+         char* tmp_str;
+         opensmt::stringToRational(tmp_str, sym_store.getName(getPterm(tr).symb()));
+         opensmt::Number v(tmp_str);
+-        if (!isNonNegNumConst(tr)) {
++        if (!isNonNegative(v)) {
+             v.negate();
+             is_neg = true;
+         }
+diff --git a/src/logics/ArithLogic.h b/src/logics/ArithLogic.h
+index 6f2669f9..50a623a9 100644
+--- a/src/logics/ArithLogic.h
++++ b/src/logics/ArithLogic.h
+@@ -4,7 +4,7 @@
+ #include "Number.h"
+ #include <numeric>
+ 
+-class LANonLinearException : std::runtime_error
++class LANonLinearException : public std::runtime_error
+ {
+     std::string msg;
+ public:
+diff --git a/src/logics/FunctionTools.h b/src/logics/FunctionTools.h
+index fc9dbfb7..943a466d 100644
+--- a/src/logics/FunctionTools.h
++++ b/src/logics/FunctionTools.h
+@@ -33,7 +33,7 @@ class TemplateFunction {
+     FunctionSignature signature;
+     PTRef tr_body;
+ 
+-    inline static std::string_view constexpr template_arg_prefix = ".arg";
++    inline static constexpr std::string_view template_arg_prefix = ".arg";
+     inline static std::size_t template_arg_counter = 0;
+ public:
+     static std::string nextFreeArgumentName() { return std::string(template_arg_prefix) + std::to_string(template_arg_counter++); }
+diff --git a/src/logics/Logic.cc b/src/logics/Logic.cc
+index b90430c2..c4b34fc4 100644
+--- a/src/logics/Logic.cc
++++ b/src/logics/Logic.cc
+@@ -15,6 +15,7 @@
+ #include "Substitutor.h"
+ #include "smt2tokens.h"
+ #include "IteHandler.h"
++#include "Interpret.h"
+ 
+ #include <iostream>
+ #include <map>
+@@ -32,7 +33,7 @@ const char* Logic::e_argnum_mismatch = "incorrect number of arguments";
+ const char* Logic::e_bad_constant    = "incorrect constant for logic";
+ 
+ const char* Logic::tk_val_uf_default   = "UFDefault";
+-const char* Logic::tk_val_bool_default = "true";
++const char* Logic::tk_val_bool_default = "false";
+ 
+ const char* Logic::tk_true     = "true";
+ const char* Logic::tk_false    = "false";
+@@ -97,46 +98,28 @@ bool Logic::isReservedWord(std::string const & name) const {
+ }
+ 
+ //
+-// Escape the symbol name if it contains a prohibited character from the
+-// list defined by the quotable[] table below
++// Escape the symbol name if it contains a prohibited character.
+ //
+ bool Logic::hasQuotableChars(std::string const & name) const
+ {
+-    // Entry is 1 if the corresponding ascii character requires quoting
+-    const bool quotable[256] =
+-    {
+-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-        0, 0, 1, 0, 1, 1, 0, 0, 0, 1, // <space>, ", #, $, '
+-        1, 1, 0, 0, 1, 0, 0, 0, 0, 0, // (, ), <,>
+-        0, 0, 0, 0, 0, 0, 0, 0, 1, 1, // :, ;
+-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-        0, 1, 0, 1, 0, 0, 1, 0, 0, 0, // [, \, ], `
+-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-        0, 0, 0, 1, 0, 1, 0, 0, 0, 0, // {, }
+-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-    };
+-
+     if (name.front() == '|' and name.back() == '|') return false; // Already quoted
+ 
+     for (auto c : name) {
+-        if (quotable[(int)c])
+-            return true;
++        switch (c) {
++            case ' ':
++            case '"':
++            case '#':
++            case '$':
++            case '\'':
++            case ':':
++            case ';':
++            case '[':
++            case '\\':
++            case ']':
++            case '{':
++            case '}':
++                return true;
++        }
+     }
+     return false;
+ }
+@@ -150,7 +133,7 @@ std::string Logic::disambiguateName(std::string const & protectedName, SRef sort
+         return protectedName;
+     }
+ 
+-    auto isQuoted = [](std::string const &s) { return s.size() > 3 and *s.begin() == '|' and *(s.end()-1) == '|'; };
++    auto isQuoted = [](std::string const &s) { return s.size() > 2 and *s.begin() == '|' and *(s.end()-1) == '|'; };
+     auto name = isQuoted(protectedName) ?
+             std::string_view(protectedName.data()+1, protectedName.size()-2) : std::string_view(protectedName);
+ 
+@@ -391,7 +374,7 @@ Logic::getDefaultValue(const PTRef tr) const
+ 
+ PTRef
+ Logic::getDefaultValuePTRef(const SRef sref) const {
+-    if (sref == sort_BOOL) { return term_TRUE; }
++    if (sref == sort_BOOL) { return term_FALSE; }
+     else {
+         return defaultValueForSort[sref];
+ 
+@@ -758,6 +741,18 @@ PTRef Logic::mkBoolVar(const char* name)
+     return mkFun(sr, {});
+ }
+ 
++PTRef Logic::parseFormula(std::string input) {
++    SMTConfig config = SMTConfig();
++    Interpret repl = Interpret(config, *this);
++
++    int rval = repl.interpFile(input.data());
++    if (rval != 0) {
++      throw OsmtApiException("Failed to parse input formula");
++    }
++
++    return repl.getParsedFormula();
++}
++
+ void Logic::instantiateFunctions(SRef sr)
+ {
+     // Equality
+@@ -841,12 +836,10 @@ PTRef Logic::insertTerm(SymRef sym, vec<PTRef>&& terms)
+         assert(terms.size() == 0);
+         return mkFun(sym, std::move(terms));
+     }
+-    if (hasArrays()) {
+-        if (isArrayStore(sym))
+-            return mkStore(std::move(terms));
+-        if (isArraySelect(sym))
+-            return mkSelect(std::move(terms));
+-    }
++    if (isArrayStore(sym))
++      return mkStore(std::move(terms));
++    if (isArraySelect(sym))
++      return mkSelect(std::move(terms));
+     return mkUninterpFun(sym, std::move(terms));
+ }
+ 
+@@ -1346,14 +1339,14 @@ void Logic::dumpWithLets(std::ostream & dump_out, PTRef formula) const {
+         if (term.size() > 0) dump_out << ")";
+ 
+         // Closes binding
+-        dump_out << "))\n";
++        dump_out << ")) ";
+         // Keep track of number of lets to close
+         num_lets++;
+ 
+         assert(enode_to_def.find(e) == enode_to_def.end());
+         enode_to_def[e] = std::move(definition);
+     }
+-    dump_out << '\n' << enode_to_def[formula] << '\n';
++    dump_out << enode_to_def[formula];
+ 
+     // Close all lets
+     for (unsigned n = 1; n <= num_lets; n++) dump_out << ")";
+@@ -1488,6 +1481,9 @@ Logic::collectStats(PTRef root, int& n_of_conn, int& n_of_eq, int& n_of_uf, int&
+ 
+ PTRef Logic::conjoinExtras(PTRef root) { return root; }
+ 
++Sort const&       Logic::getSortDefinition (SRef s)     const { return sort_store[s]; }
++SortSymbol const& Logic::getSortSymbol     (SSymRef ss) const { return sort_store[ss]; }
++
+ // Fetching sorts
+ SRef        Logic::getSortRef    (const PTRef tr)        const { return getSortRef(getPterm(tr).symb()); }
+ SRef        Logic::getSortRef    (const SymRef sr)       const { return getSym(sr).rsort(); }
+diff --git a/src/logics/Logic.h b/src/logics/Logic.h
+index 73513cd1..888f970c 100644
+--- a/src/logics/Logic.h
++++ b/src/logics/Logic.h
+@@ -144,6 +144,9 @@ class Logic {
+     void        markConstant  (SymId sid);
+ 
+   public:
++    const Sort&       getSortDefinition (SRef s)     const;
++    const SortSymbol& getSortSymbol     (SSymRef ss) const;
++
+     SRef                getSortRef (PTRef tr)  const;
+     SRef                getSortRef (SymRef sr) const;
+     std::string         printSort  (SRef s)    const;
+@@ -275,6 +278,8 @@ public:
+     void dumpWithLets(std::ostream & out, PTRef formula) const;
+     std::string dumpWithLets(PTRef formula) const;
+ 
++    PTRef parseFormula(std::string input);
++
+     PTRef instantiateFunctionTemplate(TemplateFunction const & tmplt, vec<PTRef> const & args);
+ 
+     SSymRef       getSortSymIndexed()              const { return sym_IndexedSort; }
+diff --git a/src/logics/LogicFactory.cc b/src/logics/LogicFactory.cc
+index ceedd296..2c1dfc0d 100644
+--- a/src/logics/LogicFactory.cc
++++ b/src/logics/LogicFactory.cc
+@@ -79,6 +79,8 @@ Logic * opensmt::LogicFactory::getInstance(Logic_t logicType) {
+     return l;
+ }
+ 
++ArithLogic * opensmt::LogicFactory::getLAInstance(Logic_t logicType) { return dynamic_cast<ArithLogic*>(getInstance(logicType)); }
++
+ ArithLogic * opensmt::LogicFactory::getLRAInstance() { return new ArithLogic(Logic_t::QF_LRA); }
+ 
+ ArithLogic * opensmt::LogicFactory::getLIAInstance() { return new ArithLogic(Logic_t::QF_LIA); }
+diff --git a/src/logics/LogicFactory.h b/src/logics/LogicFactory.h
+index 65b039e9..44b06b0d 100644
+--- a/src/logics/LogicFactory.h
++++ b/src/logics/LogicFactory.h
+@@ -170,6 +170,7 @@ std::string getStringFromLogic(const Logic_t logic);
+ class LogicFactory {
+ public:
+     static Logic * getInstance(Logic_t);
++    static ArithLogic * getLAInstance(Logic_t);
+     static ArithLogic * getLRAInstance();
+     static ArithLogic * getLIAInstance();
+ };
+diff --git a/src/logics/Theory.h b/src/logics/Theory.h
+index ef231407..0799d499 100644
+--- a/src/logics/Theory.h
++++ b/src/logics/Theory.h
+@@ -102,7 +102,7 @@ struct PFRef {
+     inline friend bool operator== (const PFRef& a1, const PFRef& a2) { return a1.x == a2.x; };
+ };
+ 
+-const static struct PFRef PFRef_Undef = {INT32_MAX};
++static const struct PFRef PFRef_Undef = {INT32_MAX};
+ 
+ // No global variable for storing the push frame id.  I decided to
+ // implement this as my own memory allocation.  There's no free though
+diff --git a/src/sorts/SSort.h b/src/sorts/SSort.h
+index 990da3b0..14922397 100644
+--- a/src/sorts/SSort.h
++++ b/src/sorts/SSort.h
+@@ -40,7 +40,7 @@ struct SSymRef {
+     inline friend bool operator!= (SSymRef a1, SSymRef a2) {return a1.x != a2.x; }
+ };
+ 
+-const static struct SSymRef SSymRef_Undef = {INT32_MAX};
++static const struct SSymRef SSymRef_Undef = {INT32_MAX};
+ 
+ struct SSymRefHash {
+     uint32_t operator () (SSymRef s) const {
+@@ -66,8 +66,8 @@ struct SRef {
+     inline friend bool operator!= (SRef a1, SRef a2) {return a1.x != a2.x; }
+ };
+ 
+-const static struct SRef SRef_Undef = {INT32_MAX};
+-const static struct SRef SRef_Nil   = {INT32_MAX-1};
++static const struct SRef SRef_Undef = {INT32_MAX};
++static const struct SRef SRef_Nil   = {INT32_MAX-1};
+ 
+ struct SRefHash {
+     uint32_t operator () (const SRef& s) const {
+diff --git a/src/symbols/SymRef.h b/src/symbols/SymRef.h
+index 693d332f..315cee13 100644
+--- a/src/symbols/SymRef.h
++++ b/src/symbols/SymRef.h
+@@ -35,17 +35,19 @@ struct SymRef {
+     inline friend bool operator!= (const SymRef& a1, const SymRef& a2) {return a1.x != a2.x; }
+ };
+ 
+-const static struct SymRef SymRef_Undef = {INT32_MAX};
+-const static struct SymRef SymRef_Nil   = {INT32_MAX-1};
++static const struct SymRef SymRef_Undef = {INT32_MAX};
++static const struct SymRef SymRef_Nil   = {INT32_MAX-1};
+ 
+ struct SymRefHash {
+     uint32_t operator () (const SymRef& s) const {
+         return (uint32_t)s.x; }
+ };
+ 
++/*
+ template <>
+ struct Equal<const SymRef> {
+     bool operator() (const SymRef& s1, const SymRef& s2) { return s1 == s2; }
+ };
++*/
+ 
+ #endif //OPENSMT_SYMREF_H
+diff --git a/src/symbols/SymStore.cc b/src/symbols/SymStore.cc
+index 9b2c3241..a2b06c2d 100644
+--- a/src/symbols/SymStore.cc
++++ b/src/symbols/SymStore.cc
+@@ -27,6 +27,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ #include "string.h"
+ #include "SymStore.h"
+ #include "Symbol.h"
++#include "OsmtApiException.h"
+ 
+ const char* SymStore::e_duplicate_symbol = "Symbol Store: symbol already exists";
+ const int   SymStore::symstore_buf_offs_idx = 1;
+@@ -55,7 +56,12 @@ SymRef SymStore::newSymb(const char * fname, SRef rsort, vec<SRef> const & args,
+                 }
+             }
+         }
++        if (!symConfig.isInterpreted) {
++          // Only builtin functions like "=" or "+" should be polymorphic
++          throw OsmtApiException("Symbol `" + std::string(fname) + "` has conflicting definitions");
++        }
+     }
++
+     bool newsym = (symrefs == nullptr);
+     SymRef tr = ta.alloc(rsort, args, symConfig);
+     SymId id = symbols.size();
+diff --git a/src/symbols/Symbol.h b/src/symbols/Symbol.h
+index e795bd56..4b6f6018 100644
+--- a/src/symbols/Symbol.h
++++ b/src/symbols/Symbol.h
+@@ -48,20 +48,20 @@ struct SymbolConfig {
+ };
+ 
+ namespace SymConf {
+-    constexpr auto Default = SymbolConfig{false, false, false, SymbolProperty::None};
+-    constexpr auto Interpreted = SymbolConfig{true, false, false, SymbolProperty::None};
+-    constexpr auto LeftAssoc = SymbolConfig{false, false, false, SymbolProperty::LeftAssoc};
+-    constexpr auto RightAssoc = SymbolConfig{false, false, false, SymbolProperty::RightAssoc};
+-    constexpr auto Chainable = SymbolConfig{false, false, false, SymbolProperty::Chainable};
+-    constexpr auto Pairwise = SymbolConfig{false, false, false, SymbolProperty::Pairwise};
+-    constexpr auto NoScopingLeftAssoc = SymbolConfig{true, false, true, SymbolProperty::LeftAssoc};
+-    constexpr auto NoScopingRightAssoc = SymbolConfig{true, false, true, SymbolProperty::RightAssoc};
+-    constexpr auto NoScopingPairwise = SymbolConfig{true, false, true, SymbolProperty::Pairwise};
+-    constexpr auto NoScopingChainable = SymbolConfig{true, false, true, SymbolProperty::Chainable};
+-    constexpr auto NoScoping = SymbolConfig{true, false, true, SymbolProperty::None};
+-    constexpr auto CommutativeNoScopingLeftAssoc = SymbolConfig{true, true, true, SymbolProperty::LeftAssoc};
+-    constexpr auto CommutativeNoScopingChainable = SymbolConfig{true, true, true, SymbolProperty::Chainable};
+-    constexpr auto CommutativeNoScopingPairwise = SymbolConfig{true, true, true, SymbolProperty::Pairwise};
++    constexpr SymbolConfig Default = SymbolConfig{false, false, false, SymbolProperty::None};
++    constexpr SymbolConfig Interpreted = SymbolConfig{true, false, false, SymbolProperty::None};
++    constexpr SymbolConfig LeftAssoc = SymbolConfig{false, false, false, SymbolProperty::LeftAssoc};
++    constexpr SymbolConfig RightAssoc = SymbolConfig{false, false, false, SymbolProperty::RightAssoc};
++    constexpr SymbolConfig Chainable = SymbolConfig{false, false, false, SymbolProperty::Chainable};
++    constexpr SymbolConfig Pairwise = SymbolConfig{false, false, false, SymbolProperty::Pairwise};
++    constexpr SymbolConfig NoScopingLeftAssoc = SymbolConfig{true, false, true, SymbolProperty::LeftAssoc};
++    constexpr SymbolConfig NoScopingRightAssoc = SymbolConfig{true, false, true, SymbolProperty::RightAssoc};
++    constexpr SymbolConfig NoScopingPairwise = SymbolConfig{true, false, true, SymbolProperty::Pairwise};
++    constexpr SymbolConfig NoScopingChainable = SymbolConfig{true, false, true, SymbolProperty::Chainable};
++    constexpr SymbolConfig NoScoping = SymbolConfig{true, false, true, SymbolProperty::None};
++    constexpr SymbolConfig CommutativeNoScopingLeftAssoc = SymbolConfig{true, true, true, SymbolProperty::LeftAssoc};
++    constexpr SymbolConfig CommutativeNoScopingChainable = SymbolConfig{true, true, true, SymbolProperty::Chainable};
++    constexpr SymbolConfig CommutativeNoScopingPairwise = SymbolConfig{true, true, true, SymbolProperty::Pairwise};
+ }
+ 
+ enum class SymbolMatcher : char {

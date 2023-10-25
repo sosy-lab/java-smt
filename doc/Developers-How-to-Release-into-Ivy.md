@@ -112,6 +112,22 @@ During the build process, our script automatically appends the git-revision afte
 Finally, follow the instructions shown in the message at the end.
 
 
+### Publishing OpenSMT
+
+We prefer/need to compile our own OpenSMT2 binaries and Java bindings.
+For simple usage, we provide a Docker definition/environment under `/docker`,
+in which the following command can be run.
+
+Download [OpenSMT](https://github.com/usi-verification-and-security/opensmt) using Git into a 
+file of your choice. The following command patches the OpenSMT2 API, generates Java bindings 
+with SWIG, builds the library, and packages it. 
+
+```
+ant publish-opensmt -Dopensmt.path=/workspace/opensmt -Dopensmt.customRev=2.5.2
+```
+Then upload the binaries to the Ivy repository using SVN as described in the message on the screen.
+
+
 ### Publishing Boolector
 
 We prefer to use our own Boolector binaries and Java bindings.
