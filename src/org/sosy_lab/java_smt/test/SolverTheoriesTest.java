@@ -1175,6 +1175,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
           Solvers.SMTINTERPOL,
           Solvers.MATHSAT5,
           Solvers.CVC4,
+          Solvers.CVC5,
           Solvers.BOOLECTOR,
           Solvers.YICES2);
   private static final ImmutableSet<Solvers> VAR_AND_UF_TRACKING_SOLVERS =

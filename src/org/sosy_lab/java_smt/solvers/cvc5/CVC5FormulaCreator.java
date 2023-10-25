@@ -14,10 +14,12 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Table;
 import io.github.cvc5.CVC5ApiException;
 import io.github.cvc5.Datatype;
 import io.github.cvc5.DatatypeConstructor;
@@ -28,13 +30,13 @@ import io.github.cvc5.Solver;
 import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
 import io.github.cvc5.Triplet;
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.ArrayFormula;
@@ -72,7 +74,9 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
   // private static final Pattern FLOATING_POINT_PATTERN = Pattern.compile("^\\(fp #b(?<sign>\\d)
   // #b(?<exp>\\d+) #b(?<mant>\\d+)$");
 
-  private final static Map<String, Map<Sort, Term>> variablesCache = new HashMap<>();
+  // <Name, Sort.toString, Term> because CVC5 returns distinct pointers for types, while the
+  // String representation is equal (and they are equal)
+  private final Table<String, String, Term> variablesCache = HashBasedTable.create();
   private final Map<String, Term> functionsCache = new HashMap<>();
   private final Solver solver;
 
@@ -89,24 +93,31 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
 
   @Override
   public Term makeVariable(Sort sort, String name) {
-    Map<Sort, Term> varOcc = variablesCache.get(name);
-    if (varOcc == null) {
-      Term newVar = solver.mkConst(sort, name);
-      Map<Sort, Term> newVarSortTerm = new HashMap<>();
-      newVarSortTerm.put(sort, newVar);
-      variablesCache.put(name, newVarSortTerm);
-      return newVar;
+    Term existingVar = variablesCache.get(name, sort.toString());
+    if (existingVar != null) {
+      return existingVar;
     }
-
-    Set<Sort> varTypes = varOcc.keySet();
-    for (Sort varTyp : varTypes) {
-      if (varTyp.equals(sort)) {
-        return varOcc.get(varTyp);
-      }
+    if (variablesCache.containsRow(name)) {
+      throw new IllegalArgumentException(
+          "Symbol "
+              + name
+              + " requested with type "
+              + sort
+              + ", but "
+              + "already "
+              + "used "
+              + "with "
+              + "type "
+              + variablesCache
+                  .rowMap()
+                  .get(name)
+                  .entrySet()
+                  .toArray((java.util.Map.Entry[]) Array.newInstance(java.util.Map.Entry.class, 0))[
+                  0]
+                  .getKey());
     }
     Term newVar = solver.mkConst(sort, name);
-    varOcc.put(sort, newVar);
-    variablesCache.replace(name, varOcc);
+    variablesCache.put(name, sort.toString(), newVar);
     return newVar;
   }
 
@@ -841,16 +852,27 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
     }
   }
 
-  private Term accessVariablesCache(String name, Sort type) {
-    Map<Sort, Term> currVarOcc = variablesCache.get(name);
-    if (currVarOcc == null) {
-      return null;
+  private Term accessVariablesCache(String name, Sort sort) {
+    Term existingVar = variablesCache.get(name, sort.toString());
+    if (existingVar == null) {
+      throw new IllegalArgumentException(
+          "Symbol "
+              + name
+              + " requested with type "
+              + sort
+              + ", but "
+              + "already "
+              + "used "
+              + "with "
+              + "type"
+              + variablesCache
+                  .rowMap()
+                  .get(name)
+                  .entrySet()
+                  .toArray((java.util.Map.Entry[]) Array.newInstance(java.util.Map.Entry.class, 0))[
+                  0]
+                  .getKey());
     }
-    for (Sort varType : currVarOcc.keySet()) {// with get: only null gets returned
-      if (varType.equals(type)) {
-        return currVarOcc.get(varType);
-      }
-    }
-    return null;
+    return existingVar;
   }
 }
