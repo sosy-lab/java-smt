@@ -71,14 +71,16 @@ public class OpenSmtNativeAPITest {
     MainSolver solver = new MainSolver(logic, config, "opensmt-verifier");
 
     // Check A ⊨ I
-    solver.push(logic.mkNot(logic.mkImpl(partA, interpol)));
+    solver.push();
+    solver.insertFormula(logic.mkNot(logic.mkImpl(partA, interpol)));
     if (!solver.check().equals(sstat.False())) {
       return false;
     }
     solver.pop();
 
     // Check I ⊨ ¬B
-    solver.push(logic.mkNot(logic.mkImpl(interpol, logic.mkNot(partB))));
+    solver.push();
+    solver.insertFormula(logic.mkNot(logic.mkImpl(interpol, logic.mkNot(partB))));
     if (!solver.check().equals(sstat.False())) {
       return false;
     }
@@ -103,7 +105,8 @@ public class OpenSmtNativeAPITest {
 
     SMTConfig config = new SMTConfig();
     MainSolver mainSolver = new MainSolver(logic, config, "JavaSmt");
-    mainSolver.push(f);
+    mainSolver.push();
+    mainSolver.insertFormula(f);
 
     sstat r = mainSolver.check();
     assertThat(r).isEqualTo(sstat.True());
@@ -127,7 +130,8 @@ public class OpenSmtNativeAPITest {
     PTRef f = logic.mkAnd(varA, notA);
 
     MainSolver mainSolver = osmt.getMainSolver();
-    mainSolver.push(f);
+    mainSolver.push();
+    mainSolver.insertFormula(f);
 
     sstat r = mainSolver.check();
     assertThat(r).isEqualTo(sstat.False());
@@ -170,8 +174,10 @@ public class OpenSmtNativeAPITest {
     PTRef f1 = logic.mkDistinct(dist);
 
     MainSolver mainSolver = osmt.getMainSolver();
-    mainSolver.push(f0);
-    mainSolver.push(f1);
+    mainSolver.push();
+    mainSolver.insertFormula(f0);
+    mainSolver.push();
+    mainSolver.insertFormula(f1);
 
     sstat r = mainSolver.check();
     assertThat(r).isEqualTo(sstat.False());
@@ -200,8 +206,10 @@ public class OpenSmtNativeAPITest {
     PTRef f1 = logic.mkDistinct(dist);
 
     MainSolver mainSolver = osmt.getMainSolver();
-    mainSolver.push(f0);
-    mainSolver.push(f1);
+    mainSolver.push();
+    mainSolver.insertFormula(f0);
+    mainSolver.push();
+    mainSolver.insertFormula(f1);
 
     sstat r = mainSolver.check();
     assertThat(r).isEqualTo(sstat.False());
@@ -233,8 +241,10 @@ public class OpenSmtNativeAPITest {
     PTRef f1 = logic.mkGeq(varC, const0);
 
     MainSolver mainSolver = osmt.getMainSolver();
-    mainSolver.push(f0);
-    mainSolver.push(f1);
+    mainSolver.push();
+    mainSolver.insertFormula(f0);
+    mainSolver.push();
+    mainSolver.insertFormula(f1);
 
     sstat r = mainSolver.check();
     assertThat(r).isEqualTo(sstat.True());
@@ -257,8 +267,10 @@ public class OpenSmtNativeAPITest {
     PTRef f1 = logic.mkGt(varC, varA);
 
     MainSolver solver = osmt.getMainSolver();
-    solver.push(f0);
-    solver.push(f1);
+    solver.push();
+    solver.insertFormula(f0);
+    solver.push();
+    solver.insertFormula(f1);
 
     sstat r = solver.check();
     assertThat(r).isEqualTo(sstat.False());
@@ -313,7 +325,8 @@ public class OpenSmtNativeAPITest {
 
     // Prove that the equations hold for all models
     MainSolver solver = osmt.getMainSolver();
-    solver.push(f);
+    solver.push();
+    solver.insertFormula(f);
 
     sstat r = solver.check();
     assertThat(r).isEqualTo(sstat.False());
@@ -372,7 +385,8 @@ public class OpenSmtNativeAPITest {
     PTRef f = logic.mkNot(logic.mkEq(app1, varA));
 
     MainSolver solver = osmt.getMainSolver();
-    solver.push(f);
+    solver.push();
+    solver.insertFormula(f);
 
     sstat r = solver.check();
     assertThat(r).isEqualTo(sstat.False());
@@ -396,8 +410,10 @@ public class OpenSmtNativeAPITest {
     PTRef f1 = logic.mkGeq(varC, const0);
 
     MainSolver mainSolver = osmt.getMainSolver();
-    mainSolver.push(f0);
-    mainSolver.push(f1);
+    mainSolver.push();
+    mainSolver.insertFormula(f0);
+    mainSolver.push();
+    mainSolver.insertFormula(f1);
 
     mainSolver.stop();
 
@@ -465,8 +481,10 @@ public class OpenSmtNativeAPITest {
     config.setOption(":produce-interpolants", new SMTOption(1));
 
     MainSolver mainSolver = new MainSolver(logic, config, "JavaSmt");
-    mainSolver.push(formulaA);
-    mainSolver.push(formulaB);
+    mainSolver.push();
+    mainSolver.insertFormula(formulaA);
+    mainSolver.push();
+    mainSolver.insertFormula(formulaB);
 
     sstat check1 = mainSolver.check();
     System.out.println(check1);
