@@ -159,15 +159,6 @@ index b90430c2..c4b34fc4 100644
  
  #include <iostream>
  #include <map>
-@@ -32,7 +33,7 @@ const char* Logic::e_argnum_mismatch = "incorrect number of arguments";
- const char* Logic::e_bad_constant    = "incorrect constant for logic";
- 
- const char* Logic::tk_val_uf_default   = "UFDefault";
--const char* Logic::tk_val_bool_default = "true";
-+const char* Logic::tk_val_bool_default = "false";
- 
- const char* Logic::tk_true     = "true";
- const char* Logic::tk_false    = "false";
 @@ -97,46 +98,28 @@ bool Logic::isReservedWord(std::string const & name) const {
  }
  
@@ -231,15 +222,6 @@ index b90430c2..c4b34fc4 100644
      }
      return false;
  }
-@@ -391,7 +374,7 @@ Logic::getDefaultValue(const PTRef tr) const
- 
- PTRef
- Logic::getDefaultValuePTRef(const SRef sref) const {
--    if (sref == sort_BOOL) { return term_TRUE; }
-+    if (sref == sort_BOOL) { return term_FALSE; }
-     else {
-         return defaultValueForSort[sref];
- 
 @@ -758,6 +741,18 @@ PTRef Logic::mkBoolVar(const char* name)
      return mkFun(sr, {});
  }
