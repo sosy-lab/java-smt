@@ -465,44 +465,4 @@ public class OpenSmtNativeAPITest {
        */
     }
   }
-
-  @Test
-  public void testExample() {
-    ArithLogic logic = LogicFactory.getLIAInstance();
-
-    PTRef varA = logic.mkIntVar("a");
-    PTRef varB = logic.mkIntVar("b");
-    PTRef varC = logic.mkIntVar("c");
-
-    PTRef formulaA = logic.mkAnd(logic.mkLt(varA, varB), logic.mkLt(varC, varA));
-    PTRef formulaB = logic.mkLt(varB, varC);
-
-    SMTConfig config = new SMTConfig();
-    config.setOption(":produce-interpolants", new SMTOption(1));
-
-    MainSolver mainSolver = new MainSolver(logic, config, "JavaSmt");
-    mainSolver.push();
-    mainSolver.insertFormula(formulaA);
-    mainSolver.push();
-    mainSolver.insertFormula(formulaB);
-
-    sstat check1 = mainSolver.check();
-    System.out.println(check1);
-
-    InterpolationContext context = mainSolver.getInterpolationContext();
-    VectorInt mask = new VectorInt(ImmutableList.of(0));
-    PTRef interpol = context.getSingleInterpolant(mask);
-    System.out.println(logic.pp(interpol));
-
-    mainSolver.pop();
-
-    sstat check2 = mainSolver.check();
-    System.out.println(check2);
-
-    Model model = mainSolver.getModel();
-    for (PTRef var : Arrays.asList(varA, varB, varC)) {
-      PTRef val = model.evaluate(var);
-      System.out.println(logic.pp(val));
-    }
-  }
 }
