@@ -258,23 +258,6 @@ index b90430c2..c4b34fc4 100644
      return mkUninterpFun(sym, std::move(terms));
  }
  
-@@ -1346,14 +1339,14 @@ void Logic::dumpWithLets(std::ostream & dump_out, PTRef formula) const {
-         if (term.size() > 0) dump_out << ")";
- 
-         // Closes binding
--        dump_out << "))\n";
-+        dump_out << ")) ";
-         // Keep track of number of lets to close
-         num_lets++;
- 
-         assert(enode_to_def.find(e) == enode_to_def.end());
-         enode_to_def[e] = std::move(definition);
-     }
--    dump_out << '\n' << enode_to_def[formula] << '\n';
-+    dump_out << enode_to_def[formula];
- 
-     // Close all lets
-     for (unsigned n = 1; n <= num_lets; n++) dump_out << ")";
 @@ -1488,6 +1481,9 @@ Logic::collectStats(PTRef root, int& n_of_conn, int& n_of_eq, int& n_of_uf, int&
  
  PTRef Logic::conjoinExtras(PTRef root) { return root; }
