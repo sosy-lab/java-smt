@@ -30,8 +30,8 @@ public class BitwuzlaQuantifiedFormulaManager
   @Override
   public Long mkQuantifier(Quantifier q, List<Long> vars, Long body) {
     if (vars.isEmpty()) {
-      throw new IllegalArgumentException("The list of bound variables for a quantifier may not be"
-          + " empty.");
+      throw new IllegalArgumentException(
+          "The list of bound variables for a quantifier may not be" + " empty.");
     }
     long[] origVars = new long[vars.size()];
     long[] substVars = new long[vars.size()];
@@ -51,12 +51,14 @@ public class BitwuzlaQuantifiedFormulaManager
     for (int i = 0; i < vars.size(); i++) {
       argsAndBody[0] = substVars[i];
       if (q.equals(Quantifier.FORALL)) {
-        currentFormula = BitwuzlaJNI.bitwuzla_mk_term(
-            BitwuzlaKind.BITWUZLA_KIND_FORALL.swigValue(), argsAndBody.length, argsAndBody);
+        currentFormula =
+            BitwuzlaJNI.bitwuzla_mk_term(
+                BitwuzlaKind.BITWUZLA_KIND_FORALL.swigValue(), argsAndBody.length, argsAndBody);
 
       } else {
-        currentFormula = BitwuzlaJNI.bitwuzla_mk_term(
-            BitwuzlaKind.BITWUZLA_KIND_EXISTS.swigValue(), argsAndBody.length, argsAndBody);
+        currentFormula =
+            BitwuzlaJNI.bitwuzla_mk_term(
+                BitwuzlaKind.BITWUZLA_KIND_EXISTS.swigValue(), argsAndBody.length, argsAndBody);
       }
       argsAndBody[1] = currentFormula;
     }

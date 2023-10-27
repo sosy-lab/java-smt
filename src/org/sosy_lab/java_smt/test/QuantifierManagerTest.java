@@ -805,7 +805,10 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
         .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
         .that(solverToUse())
         .isNoneOf(Solvers.CVC5, Solvers.BOOLECTOR, Solvers.PRINCESS);
-    assume().withMessage("Bitwuzla does not support quantifier elimination.").that(solverToUse()).isNotEqualTo(Solvers.BITWUZLA);
+    assume()
+        .withMessage("Bitwuzla does not support quantifier elimination.")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BITWUZLA);
 
     int width = 2;
     BitvectorFormula xx = bvmgr.makeVariable(width, "x_bv");
@@ -828,7 +831,10 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   @Test
   public void checkBVQuantifierElimination() throws InterruptedException, SolverException {
     requireBitvectors();
-    assume().withMessage("Bitwuzla does not support quantifier elimination.").that(solverToUse()).isNotEqualTo(Solvers.BITWUZLA);
+    assume()
+        .withMessage("Bitwuzla does not support quantifier elimination.")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BITWUZLA);
 
     // build formula: exists y : bv[2]. x * y = 1
     // quantifier-free equivalent: x = 1 | x = 3
@@ -853,7 +859,10 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   @Test
   public void checkBVQuantifierElimination2() throws InterruptedException, SolverException {
     requireBitvectors();
-    assume().withMessage("Bitwuzla does not support quantifier elimination.").that(solverToUse()).isNotEqualTo(Solvers.BITWUZLA);
+    assume()
+        .withMessage("Bitwuzla does not support quantifier elimination.")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BITWUZLA);
 
     // build formula: exists a2 : (and (= a2 #x00000006)
     //                                 (= b2 #x00000006)
