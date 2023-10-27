@@ -29,26 +29,37 @@ public class BitwuzlaQuantifiedFormulaManager
 
   @Override
   public Long mkQuantifier(Quantifier q, List<Long> vars, Long body) {
+    if (vars.isEmpty()) {
+      throw new IllegalArgumentException("The list of bound variables for a quantifier may not be"
+          + " empty.");
+    }
     long[] origVars = new long[vars.size()];
     long[] substVars = new long[vars.size()];
-    long[] argsAndBody = new long[vars.size() + 1];
+
     for (int i = 0; i < vars.size(); i++) {
       long var = vars.get(i);
       origVars[i] = var;
       // Create/Use bound vars
       long boundCopy = ((BitwuzlaFormulaCreator) formulaCreator).makeBoundVariable(var);
       substVars[i] = boundCopy;
-      argsAndBody[i + 1] = boundCopy;
     }
     long substBody = BitwuzlaJNI.bitwuzla_substitute_term(body, vars.size(), origVars, substVars);
 
-    argsAndBody[0] = substBody;
-    if (q.equals(Quantifier.FORALL)) {
-      return BitwuzlaJNI.bitwuzla_mk_term(
-          BitwuzlaKind.BITWUZLA_KIND_FORALL.swigValue(), argsAndBody.length, argsAndBody);
-    } else {
-      return BitwuzlaJNI.bitwuzla_mk_term(
-          BitwuzlaKind.BITWUZLA_KIND_EXISTS.swigValue(), argsAndBody.length, argsAndBody);
+    long[] argsAndBody = new long[2];
+    argsAndBody[1] = substBody;
+    long currentFormula = substBody;
+    for (int i = 0; i < vars.size(); i++) {
+      argsAndBody[0] = substVars[i];
+      if (q.equals(Quantifier.FORALL)) {
+        currentFormula = BitwuzlaJNI.bitwuzla_mk_term(
+            BitwuzlaKind.BITWUZLA_KIND_FORALL.swigValue(), argsAndBody.length, argsAndBody);
+
+      } else {
+        currentFormula = BitwuzlaJNI.bitwuzla_mk_term(
+            BitwuzlaKind.BITWUZLA_KIND_EXISTS.swigValue(), argsAndBody.length, argsAndBody);
+      }
+      argsAndBody[1] = currentFormula;
     }
+    return currentFormula;
   }
 }
