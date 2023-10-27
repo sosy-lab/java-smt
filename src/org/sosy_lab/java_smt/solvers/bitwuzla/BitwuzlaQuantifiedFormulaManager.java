@@ -29,19 +29,26 @@ public class BitwuzlaQuantifiedFormulaManager
 
   @Override
   public Long mkQuantifier(Quantifier q, List<Long> vars, Long body) {
-    // While substitution is possible, it changes existing formulas! We don't want this and ask
-    // the devs for a new method that returns a new term with the substitution applied.
-    throw new UnsupportedOperationException("Bitwuzla does not support Quantifiers in JavaSMT.");
-    /*
-    long[] argsAndBody =
-        LongStream.concat(vars.stream().mapToLong(Long::longValue), LongStream.of(body)).toArray();
+    long[] origVars = new long[vars.size()];
+    long[] substVars = new long[vars.size()];
+    long[] argsAndBody = new long[vars.size() + 1];
+    for (int i = 0; i < vars.size(); i++) {
+      long var = vars.get(i);
+      origVars[i] = var;
+      // Create/Use bound vars
+      long boundCopy = ((BitwuzlaFormulaCreator) formulaCreator).makeBoundVariable(var);
+      substVars[i] = boundCopy;
+      argsAndBody[i + 1] = boundCopy;
+    }
+    long substBody = BitwuzlaJNI.bitwuzla_substitute_term(body, vars.size(), origVars, substVars);
+
+    argsAndBody[0] = substBody;
     if (q.equals(Quantifier.FORALL)) {
-      return bitwuzlaJNI.bitwuzla_mk_term(
+      return BitwuzlaJNI.bitwuzla_mk_term(
           BitwuzlaKind.BITWUZLA_KIND_FORALL.swigValue(), argsAndBody.length, argsAndBody);
     } else {
-      return bitwuzlaJNI.bitwuzla_mk_term(
+      return BitwuzlaJNI.bitwuzla_mk_term(
           BitwuzlaKind.BITWUZLA_KIND_EXISTS.swigValue(), argsAndBody.length, argsAndBody);
     }
-    */
   }
 }

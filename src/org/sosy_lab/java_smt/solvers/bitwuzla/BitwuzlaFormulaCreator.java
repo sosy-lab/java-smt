@@ -112,6 +112,8 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaFormula.BitwuzlaFloatingPo
 public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, BitwuzlaDeclaration> {
   private final Table<String, Long, Long> formulaCache = HashBasedTable.create();
 
+  // private final Table<String, Long, Long> boundFormulaCache = HashBasedTable.create();
+
   protected BitwuzlaFormulaCreator(Long pBitwuzlaEnv) {
     super(pBitwuzlaEnv, BitwuzlaJNI.bitwuzla_mk_bool_sort(), null, null, null, null);
   }
@@ -183,6 +185,20 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Bit
 
     long newVar = BitwuzlaJNI.bitwuzla_mk_const(pSort, varName);
     formulaCache.put(varName, pSort, newVar);
+    return newVar;
+  }
+
+  public long makeBoundVariable(long var) {
+    String name = BitwuzlaJNI.bitwuzla_term_get_symbol(var);
+    Long sort = BitwuzlaJNI.bitwuzla_term_get_sort(var);
+    // TODO: do we need a bound cache?
+    // Long maybeVar = boundFormulaCache.get(name, sort);
+    // if (maybeVar != null) {
+    // return maybeVar;
+    // }
+
+    long newVar = BitwuzlaJNI.bitwuzla_mk_var(sort, name);
+    // boundFormulaCache.put(name, sort, newVar);
     return newVar;
   }
 
@@ -438,35 +454,47 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Bit
     BitwuzlaKind kind = BitwuzlaKind.swigToEnum(BitwuzlaJNI.bitwuzla_term_get_kind(f));
     if (termIsConstant(f)) {
       return visitor.visitConstant(formula, convertValue(f));
+
     } else if (BitwuzlaJNI.bitwuzla_term_is_fp_value(f)) {
       return visitor.visitConstant(formula, parseIEEEbinaryFP(f));
+
     } else if (BitwuzlaJNI.bitwuzla_term_is_const(f)) {
       String name = BitwuzlaJNI.bitwuzla_term_get_symbol(f);
       return visitor.visitFreeVariable(formula, name);
+
     } else if (BitwuzlaJNI.bitwuzla_term_is_var(f)) {
-      return visitor.visitBoundVariable(formula, 0);
+      String name = BitwuzlaJNI.bitwuzla_term_get_symbol(f);
+      long sort = BitwuzlaJNI.bitwuzla_term_get_sort(f);
+      long originalVar = formulaCache.get(name, sort);
+      return visitor.visitBoundVariable(encapsulate(getFormulaType(originalVar), originalVar), 0);
+
     } else if (kind.equals(BITWUZLA_KIND_EXISTS) || kind.equals(BITWUZLA_KIND_FORALL)) {
-      long[] pSize = new long[1];
-      long[] pChildren = BitwuzlaJNI.bitwuzla_term_get_children(f, pSize);
-      long size = pSize[0];
+      long[] children = BitwuzlaJNI.bitwuzla_term_get_children(f, new long[1]);
       // QUANTIFIER: replace bound variable with free variable for visitation
-      assert size == 2;
-      assert pChildren.length == 2;
-      long bodyUnSub = pChildren[1];
-      List<Formula> freeVars = new ArrayList<>();
-      // Only unpacking one level of quantifier at a time, which always only tracks one bound var.
-      long[] boundVar = {pChildren[0]};
-      String name = BitwuzlaJNI.bitwuzla_term_get_symbol(boundVar[0]);
-      assert name != null;
-      long sort = BitwuzlaJNI.bitwuzla_term_get_sort(boundVar[0]);
+      int size = children.length;
+      assert children.length == 2;
+      long bodyUnSub = children[size - 1];
+      List<Formula> freeEncVars = new ArrayList<>();
+      // The first length - 2 elements are bound vars, and the last element is the body
+      long[] boundVars = new long[size - 1];
+      long[] freeVars = new long[size - 1];
+      for (int i = 0; i < size - 1; i++) {
+        long boundVar = children[i];
+        boundVars[i] = boundVar;
+        String name = BitwuzlaJNI.bitwuzla_term_get_symbol(boundVar);
+        assert name != null;
+        long sort = BitwuzlaJNI.bitwuzla_term_get_sort(boundVar);
+        long freeVar = formulaCache.get(name, sort);
+        freeVars[i] = freeVar;
+        freeEncVars.add(encapsulate(getFormulaType(freeVar), freeVar));
+      }
 
-      long[] freeVar = {BitwuzlaJNI.bitwuzla_mk_const(sort, name)};
+      long bodySubbed = BitwuzlaJNI.bitwuzla_substitute_term(bodyUnSub, 1, boundVars, freeVars);
 
-      long bodySubbed = BitwuzlaJNI.bitwuzla_substitute_term(bodyUnSub, 1, boundVar, freeVar);
-
-      BooleanFormula fBody = encapsulateBoolean(bodySubbed);
       Quantifier quant = kind.equals(BITWUZLA_KIND_EXISTS) ? Quantifier.EXISTS : Quantifier.FORALL;
-      return visitor.visitQuantifier((BooleanFormula) formula, quant, freeVars, fBody);
+      return visitor.visitQuantifier(
+          (BooleanFormula) formula, quant, freeEncVars, encapsulateBoolean(bodySubbed));
+
     } else {
       long[] args = BitwuzlaJNI.bitwuzla_term_get_children(f, new long[1]);
       ImmutableList.Builder<Formula> arguments = ImmutableList.builder();
