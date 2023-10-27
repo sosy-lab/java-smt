@@ -964,6 +964,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   public void testTransformationInsideQuantifiersWithFalse()
       throws SolverException, InterruptedException {
     requireQuantifiers();
+    requireIntegers();
     List<IntegerFormula> quantifiedVars = ImmutableList.of(imgr.makeVariable("x"));
     BooleanFormula body = bmgr.makeFalse();
     BooleanFormula f = qmgr.exists(quantifiedVars, body);
@@ -976,6 +977,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   public void testTransformationInsideQuantifiersWithVariable()
       throws SolverException, InterruptedException {
     requireQuantifiers();
+    requireIntegers();
     List<IntegerFormula> quantifiedVars = ImmutableList.of(imgr.makeVariable("x"));
     BooleanFormula body = bmgr.makeVariable("b");
     BooleanFormula f = qmgr.exists(quantifiedVars, body);
