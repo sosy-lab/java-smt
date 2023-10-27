@@ -11,8 +11,6 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
 import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.truth.Truth;
-import java.util.ArrayList;
-import java.util.List;
 import org.junit.After;
 import org.junit.AssumptionViolatedException;
 import org.junit.Before;
@@ -20,7 +18,6 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.sosy_lab.common.NativeLibraries;
-import org.sosy_lab.java_smt.api.SolverContext;
 
 public class BitwuzlaNativeApiTest {
   private long bitwuzla;
@@ -294,35 +291,18 @@ public class BitwuzlaNativeApiTest {
   @Ignore
   @Test
   public void repeatedTermCreationInMultipleSolversTest() {
-    List<Long> bitwuzlaInstances = new ArrayList<>();
-    // We don't want to garbage collect the old Bitwuzla envs
-    bitwuzlaInstances.add(bitwuzla);
-    BitwuzlaJNI.bitwuzla_mk_true();
-    BitwuzlaJNI.bitwuzla_mk_false();
-    createEnvironment();
-    bitwuzlaInstances.add(bitwuzla);
     long tru1 = BitwuzlaJNI.bitwuzla_mk_true();
     long tru12 = BitwuzlaJNI.bitwuzla_mk_true();
-    BitwuzlaJNI.bitwuzla_term_is_true(tru1);
-    BitwuzlaJNI.bitwuzla_term_is_true(tru12);
-    createEnvironment();
-    bitwuzlaInstances.add(bitwuzla);
-    long tru3 = BitwuzlaJNI.bitwuzla_mk_true();
-    long fls3 = BitwuzlaJNI.bitwuzla_mk_false();
-    createEnvironment();
-    bitwuzlaInstances.add(bitwuzla);
-    long tru4 = BitwuzlaJNI.bitwuzla_mk_true();
-    long tru42 = BitwuzlaJNI.bitwuzla_mk_true();
-    BitwuzlaJNI.bitwuzla_term_is_true(tru4);
-    BitwuzlaJNI.bitwuzla_term_is_true(tru42);
+    assertThat(BitwuzlaJNI.bitwuzla_term_is_true(tru1)).isTrue();
+    assertThat(BitwuzlaJNI.bitwuzla_term_is_true(tru12)).isTrue();
 
-    new Thread(() -> {
-      BitwuzlaJNI.bitwuzla_term_is_true(tru1);
-      BitwuzlaJNI.bitwuzla_term_is_true(tru12);
-    }).start();
+    new Thread(
+            () -> {
+              assertThat(BitwuzlaJNI.bitwuzla_term_is_true(tru1)).isTrue();
+              assertThat(BitwuzlaJNI.bitwuzla_term_is_true(tru12)).isTrue();
+            })
+        .start();
   }
-
-
 
   @Test
   public void isFalse() {
@@ -863,24 +843,47 @@ public class BitwuzlaNativeApiTest {
     // Model
   }
 
+  private static final String SMT2DUMP =
+      "(declare-fun a () Bool)\n"
+          + "(declare-fun b () Bool)\n"
+          + "(declare-fun d () Bool)\n"
+          + "(declare-fun e () Bool)\n"
+          + "(define-fun .def_9 () Bool (= a b))\n"
+          + "(define-fun .def_10 () Bool (not .def_9))\n"
+          + "(define-fun .def_13 () Bool (and .def_10 d))\n"
+          + "(define-fun .def_14 () Bool (or e .def_13))\n"
+          + "(assert .def_14)";
+
+  // Bitwuzla currently REWRITES terms when parsing
+  @Ignore
+  @Test
+  public void parserTest2() {
+    long[] terms = BitwuzlaJNI.parse(SMT2DUMP);
+    BitwuzlaJNI.bitwuzla_push(bitwuzla, 1);
+    BitwuzlaJNI.bitwuzla_assert(bitwuzla, terms[0]);
+    String newDump = BitwuzlaJNI.dump_assertions_smt2(bitwuzla, 10);
+    if (newDump.contains("(check-sat)")) {
+      newDump = newDump.replace("(check-sat)", "");
+    }
+    if (newDump.contains("(exit)")) {
+      newDump = newDump.replace("(exit)", "");
+    }
+    assertThat(newDump).isEqualTo(SMT2DUMP);
+  }
+
   @Test
   public void parserTest() {
     long boolSort = BitwuzlaJNI.bitwuzla_mk_bool_sort();
     long x = BitwuzlaJNI.bitwuzla_mk_const(boolSort, "x");
     long y = BitwuzlaJNI.bitwuzla_mk_const(boolSort, "y");
-    long xOrY = BitwuzlaJNI.bitwuzla_mk_term2(BitwuzlaKind.BITWUZLA_KIND_OR.swigValue(), x, y);
+    long xOrY = BitwuzlaJNI.bitwuzla_mk_term2(BitwuzlaKind.BITWUZLA_KIND_XOR.swigValue(), x, y);
     BitwuzlaJNI.bitwuzla_push(bitwuzla, 1);
     BitwuzlaJNI.bitwuzla_assert(bitwuzla, xOrY);
 
     String dump = BitwuzlaJNI.dump_assertions_smt2(bitwuzla, 10);
+    System.out.println(dump);
     // check-sat and exit messes with the parse, in that suddenly sat is checked and the formulas
     // are rewritten and then returned in a different form, independent of options
-    if (dump.contains("(check-sat)\n")) {
-      dump = dump.replace("(check-sat)", "");
-    }
-    if (dump.contains("(exit)")) {
-      dump = dump.replace("(exit)", "");
-    }
 
     BitwuzlaJNI.bitwuzla_pop(bitwuzla, 1);
 
@@ -889,12 +892,6 @@ public class BitwuzlaNativeApiTest {
     BitwuzlaJNI.bitwuzla_push(bitwuzla, 1);
     BitwuzlaJNI.bitwuzla_assert(bitwuzla, terms[0]);
     String newDump = BitwuzlaJNI.dump_assertions_smt2(bitwuzla, 10);
-    if (newDump.contains("(check-sat)\n")) {
-      newDump = newDump.replace("(check-sat)", "");
-    }
-    if (newDump.contains("(exit)")) {
-      newDump = newDump.replace("(exit)", "");
-    }
     assertThat(newDump).isEqualTo(dump);
   }
 
