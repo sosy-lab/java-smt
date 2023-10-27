@@ -199,15 +199,16 @@ public class SolverConcurrencyTest {
   }
 
   /**
-   * Create 1 context and all managers + some basic formulas (e.g. true, false).
-   * Then, test basic checks (isFalse(), isTrue()) und usage of these managers in a different
-   * thread. This failed for a solver in the past, even when all other tests in this class worked!
+   * Create 1 context and all managers + some basic formulas (e.g. true, false). Then, test basic
+   * checks (isFalse(), isTrue()) und usage of these managers in a different thread. This failed for
+   * a solver in the past, even when all other tests in this class worked!
    */
   @Test
   public void testConcurrencyWithConcurrentManagers() throws InvalidConfigurationException {
     assume()
-        .withMessage("Solver does not support usage of managers in threads distinct to the "
-            + "creating thread")
+        .withMessage(
+            "Solver does not support usage of managers in threads distinct to the "
+                + "creating thread")
         .that(solver)
         .isNotEqualTo(Solvers.BITWUZLA);
 
@@ -233,16 +234,15 @@ public class SolverConcurrencyTest {
           ContextAndFormula[] ctxAndFormulas =
               contextAndFormulaList.toArray(new ContextAndFormula[0]);
           SolverContext threadContext = ctxAndFormulas[0].getContext();
-          FormulaManager threadMgr = context.getFormulaManager();
-          BooleanFormulaManager threadBmgr = mgr.getBooleanFormulaManager();
-          BooleanFormula threadTrue= ctxAndFormulas[0].getFormula();
-          BooleanFormula threadFalse= ctxAndFormulas[1].getFormula();
-          BooleanFormula threadTrueFormula= ctxAndFormulas[2].getFormula();
+          FormulaManager threadMgr = threadContext.getFormulaManager();
+          BooleanFormulaManager threadBmgr = threadMgr.getBooleanFormulaManager();
+          BooleanFormula threadTrue = ctxAndFormulas[0].getFormula();
+          BooleanFormula threadFalse = ctxAndFormulas[1].getFormula();
+          BooleanFormula threadTrueFormula = ctxAndFormulas[2].getFormula();
           BooleanFormula threadFalseFormula = ctxAndFormulas[3].getFormula();
 
-          checkBooleanFormulas(bmgr, threadTrue, threadFalse, threadTrueFormula,
-              threadFalseFormula);
-
+          checkBooleanFormulas(
+              threadBmgr, threadTrue, threadFalse, threadTrueFormula, threadFalseFormula);
         });
   }
 
