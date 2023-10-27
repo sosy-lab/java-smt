@@ -239,12 +239,6 @@ public abstract class SolverBasedTest0 {
         .withMessage("Solver %s does not support quantifiers", solverToUse())
         .that(qmgr)
         .isNotNull();
-
-    // TODO: remove when substitution is fixed and we can use quantifiers
-    assume()
-        .withMessage("Bitwuzla temporarly does not support quantifiers.")
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.BITWUZLA);
   }
 
   /** Skip test if the solver does not support arrays. */
