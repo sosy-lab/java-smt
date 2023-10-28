@@ -261,7 +261,7 @@ Binary
     ;
 
 HexDecimal
-    : '#x' HexDigit HexDigit HexDigit HexDigit
+    : '#x' HexDigit+
     ;
 
 Decimal

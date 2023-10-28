@@ -17,11 +17,15 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Appender;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.api.ArrayFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.EnumerationFormulaManager;
@@ -36,12 +40,16 @@ import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.SLFormulaManager;
+import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.StringFormulaManager;
 import org.sosy_lab.java_smt.api.Tactic;
 import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 import org.sosy_lab.java_smt.basicimpl.tactics.NNFVisitor;
+import org.sosy_lab.java_smt.utils.Parsers.Visitor;
+import org.sosy_lab.java_smt.utils.Parsers.smtlibv2Lexer;
+import org.sosy_lab.java_smt.utils.Parsers.smtlibv2Parser;
 import org.sosy_lab.java_smt.utils.SolverUtils;
 
 /**
@@ -169,9 +177,22 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
                 && quantifiedManager.getFormulaCreator() != formulaCreator),
         "The creator instances must match across the managers!");
   }
-
   public final FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> getFormulaCreator() {
     return formulaCreator;
+  }
+
+
+  @Override
+  public BooleanFormula universalParse(String pString)
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    smtlibv2Lexer lexer = new smtlibv2Lexer(CharStreams.fromFileName(pString));
+    smtlibv2Parser parser = new smtlibv2Parser(new CommonTokenStream(lexer));
+    Visitor visitor = new Visitor(this.booleanManager, this.integerManager, this.rationalManager,
+        this.bitvectorManager, this.arrayManager, this.functionManager);
+    visitor.visit(parser.start());
+    List<BooleanFormula> constraints = visitor.getConstraints();
+
+    return this.booleanManager.and(constraints);
   }
 
   @Override

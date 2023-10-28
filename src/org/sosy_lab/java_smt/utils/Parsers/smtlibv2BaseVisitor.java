@@ -694,7 +694,8 @@ public class smtlibv2BaseVisitor<T> extends AbstractParseTreeVisitor<T> implemen
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitCmd_declareFun(smtlibv2Parser.Cmd_declareFunContext ctx) { return visitChildren(ctx); }
+	@Override public T visitCmd_declareFun(smtlibv2Parser.Cmd_declareFunContext ctx)
+			throws IOException { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *

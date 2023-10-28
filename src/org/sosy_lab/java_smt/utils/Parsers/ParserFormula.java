@@ -20,12 +20,19 @@
 
 package org.sosy_lab.java_smt.utils.Parsers;
 
+import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaType;
 
 public class ParserFormula {
 
   String type;
   Object javaSmt;
+
+   FormulaType returnType;
+
+   List<FormulaType<?>> inputParams;
 
   public ParserFormula(String pType, Object pJavaSmt) {
     type = pType;
@@ -46,5 +53,20 @@ public class ParserFormula {
 
   public void setJavaSmt(Object pJavaSmt) {
     javaSmt = pJavaSmt;
+  }
+
+  public FormulaType getReturnType() {
+    return returnType;
+  }
+  public void setReturnType(FormulaType pReturnType) {
+    returnType = pReturnType;
+  }
+
+  public List<FormulaType<?>> getInputParams() {
+    return inputParams;
+  }
+
+  public void setInputParams(List<FormulaType<?>> pInputParams) {
+    inputParams = pInputParams;
   }
 }

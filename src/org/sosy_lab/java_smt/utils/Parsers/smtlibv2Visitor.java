@@ -659,7 +659,7 @@ public interface smtlibv2Visitor<T> extends ParseTreeVisitor<T> {
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitCmd_declareFun(smtlibv2Parser.Cmd_declareFunContext ctx);
+	T visitCmd_declareFun(smtlibv2Parser.Cmd_declareFunContext ctx) throws IOException;
 	/**
 	 * Visit a parse tree produced by {@link smtlibv2Parser#cmd_declareSort}.
 	 * @param ctx the parse tree

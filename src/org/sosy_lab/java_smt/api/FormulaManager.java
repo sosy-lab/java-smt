@@ -10,15 +10,21 @@ package org.sosy_lab.java_smt.api;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import org.sosy_lab.common.Appender;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
+import org.sosy_lab.java_smt.utils.Parsers.Visitor;
 
 /** FormulaManager class contains all operations which can be performed on formulas. */
 public interface FormulaManager {
+
+  BooleanFormula universalParse(String pString)
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException;
 
   /**
    * Returns the Integer-Theory. Because most SAT-solvers support automatic casting between Integer-
@@ -27,6 +33,7 @@ public interface FormulaManager {
    *
    * @throws UnsupportedOperationException If the theory is not supported by the solver.
    */
+
   IntegerFormulaManager getIntegerFormulaManager();
 
   /**
