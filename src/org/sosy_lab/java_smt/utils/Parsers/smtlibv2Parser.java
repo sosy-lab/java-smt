@@ -4836,7 +4836,13 @@ public class smtlibv2Parser extends Parser {
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof smtlibv2Visitor ) return ((smtlibv2Visitor<? extends T>)visitor).visitFunction_def(this);
+			if ( visitor instanceof smtlibv2Visitor ) {
+				try {
+					return ((smtlibv2Visitor<? extends T>)visitor).visitFunction_def(this);
+				} catch (IOException pE) {
+					throw new RuntimeException(pE);
+				}
+			}
 			else return visitor.visitChildren(this);
 		}
 	}

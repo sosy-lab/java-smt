@@ -13,6 +13,8 @@ import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariab
 import com.google.common.collect.Lists;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
@@ -80,7 +82,6 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
     List<FormulaType<?>> argTypes = Lists.transform(pArgs, getFormulaCreator()::getFormulaType);
     FunctionDeclaration<T> func = declareUF(name, pReturnType, argTypes);
     T result = callUF(func, pArgs);
-    UFGenerator.logCallFun((Object) result, func, (Formula) pArgs);
     return result;
   }
 
@@ -90,4 +91,6 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
     checkVariableName(name);
     return declareAndCallUF(name, pReturnType, Arrays.asList(pArgs));
   }
+
+
 }

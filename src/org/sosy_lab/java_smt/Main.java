@@ -20,6 +20,8 @@ package org.sosy_lab.java_smt;/*
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.sosy_lab.common.ShutdownManager;
@@ -34,7 +36,7 @@ import org.sosy_lab.java_smt.utils.Parsers.*;
 public class Main {
   public static void main(String[] args)
       throws InvalidConfigurationException, InterruptedException, IOException, SolverException {
-    String fileName = "smtquery.053.smt2";
+    String fileName = "smtquery.017.smt2";
 
     String smtlib2 = Files.readString(Path.of(fileName));
 
@@ -58,17 +60,41 @@ public class Main {
     ArrayFormulaManager amgr = fmgr.getArrayFormulaManager();
     UFManager umgr = fmgr.getUFManager();
 
-    BooleanFormula test = fmgr.parse( "(declare-fun |id#1@1| () (_ BitVec 32))\n"
-        + "(assert (bvslt (_ bv10 32) |id#1@1|))\n"
-        + "(check-sat)\n"
-        + "(exit)\n"
+    BooleanFormula test = fmgr.parse( "(set-logic AUFLIRA)\n"
+        + "(declare-fun |id#2@1| () (_ BitVec 32))\n"
+        + "(declare-fun |id#0@1| () (_ BitVec 32))\n"
+        + "(define-fun .10 () (_ BitVec 32) (_ bv10 32))\n"
+        + "(define-fun .20 () (_ BitVec 32) |id#2@1|)\n"
+        + "(define-fun .22 () Bool (bvslt .10 .20))\n"
+        + "(define-fun .23 () Bool (not .22))\n"
+        + "(define-fun .29 () (_ BitVec 1) (_ bv1 1))\n"
+        + "(define-fun .30 () (_ BitVec 1) ((_ extract 31 31) .20))\n"
+        + "(define-fun .31 () Bool (= .30 .29))\n"
+        + "(define-fun .52 () Bool (not .31))\n"
+        + "(define-fun .55 () (_ BitVec 32) |id#0@1|)\n"
+        + "(define-fun .56 () Bool (bvslt .10 .55))\n"
+        + "(define-fun .62 () Bool (not .56))\n"
+        + "(define-fun .68 () (_ BitVec 1) ((_ extract 31 31) .55))\n"
+        + "(define-fun .69 () Bool (= .68 .29))\n"
+        + "(define-fun .89 () Bool (not .69))\n"
+        + "(define-fun .92 () Bool (= .20 .55))\n"
+        + "(define-fun .94 () Bool (and .52 .89))\n"
+        + "(define-fun .101 () Bool (not .92))\n"
+        + "(define-fun .103 () Bool (and .62 .94))\n"
+        + "(define-fun .104 () Bool (and .101 .103))\n"
+        + "(define-fun .105 () Bool (and .23 .104))\n"
+        + "(assert .105)\n"
+
     );
-// {id#1@1 -> mod_cast(0, 4294967295, 2147483647)}
+
+
     BooleanFormula constraint = fmgr.universalParse(fileName);
 
     try (ProverEnvironment prover =
              context.newProverEnvironment(SolverContext.ProverOptions.GENERATE_MODELS)) {
       prover.addConstraint(constraint);
+
+      //{id#0@1 -> mod_cast(0, 4294967295, 10), id#2@1 -> mod_cast(0, 4294967295, 9)}
 
       boolean isUnsat = prover.isUnsat();
       if (isUnsat) {

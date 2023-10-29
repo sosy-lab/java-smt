@@ -113,4 +113,6 @@ public class UFGenerator <TFormulaInfo, TFunctionDecl, TType, TEnv> {
     newEntry.setUFOutputType(checkUFOutputType(funcType.getType()));
     Generator.executedAggregator.add(newEntry);
   }
+
+  //TODO: logDeclareAndCallUF
 }

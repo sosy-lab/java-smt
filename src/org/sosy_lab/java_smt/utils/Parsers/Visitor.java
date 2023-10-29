@@ -276,6 +276,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
   @Override public Object visitTerm_qual_id(smtlibv2Parser.Term_qual_idContext ctx)
       throws IOException {
     // TODO: Error handling
+
     String operand = ctx.getText();
     if (operand.startsWith("|")) {
       operand = operand.split("\\|")[1];
@@ -1053,7 +1054,40 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
 
   @Override public Object visitFunction_dec(smtlibv2Parser.Function_decContext ctx) { return visitChildren(ctx); }
 
-  @Override public Object visitFunction_def(smtlibv2Parser.Function_defContext ctx) { return visitChildren(ctx); }
+  @Override public Object visitFunction_def(smtlibv2Parser.Function_defContext ctx)
+      throws IOException {
+    String variable = ctx.symbol().getText();
+    if (variable.startsWith("|")) {
+      variable = variable.split("\\|")[1];
+      variable = variable.split("\\|")[0];
+    }
+    List<String> declaration = new ArrayList<>();
+    List<FormulaType<?>> javaSorts = new ArrayList<>();
+    String returnType = ctx.getChild(ctx.getChildCount() - 1).getText();
+    for (int i = 0; i < ctx.getChildCount(); i++) {
+      declaration.add(ctx.getChild(i).getText());
+    }
+    String name;
+    String sort;
+      for (int i = 0; i < ctx.sorted_var().size(); i++) {
+        name = ctx.sorted_var(i).symbol().getText();
+        sort = ctx.sorted_var(i).sort().getText();
+        variables.put(name, new ParserFormula(sort, mapSort(sort)));
+      }
+        String returnVal = ctx.sort().getText();
+        Formula input = (Formula) visit(ctx.term());
+
+        ParserFormula temp =
+            new ParserFormula("UF", umgr.declareAndCallUF(variable, mapSort(returnVal), input));
+        temp.setReturnType(mapSort(returnVal));
+        //TODO: get rid of dummy
+        List<FormulaType<?>> dummy = new ArrayList<>();
+        dummy.add(FormulaType.IntegerType);
+        temp.setInputParams(dummy);
+        variables.put(variable, temp);
+
+    return visitChildren(ctx);
+  }
 
   @Override public Object visitProp_symb(smtlibv2Parser.Prop_symbContext ctx) { return visitChildren(ctx); }
 
