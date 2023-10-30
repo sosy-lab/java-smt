@@ -159,70 +159,7 @@ index b90430c2..c4b34fc4 100644
  
  #include <iostream>
  #include <map>
-@@ -97,46 +98,28 @@ bool Logic::isReservedWord(std::string const & name) const {
- }
- 
- //
--// Escape the symbol name if it contains a prohibited character from the
--// list defined by the quotable[] table below
-+// Escape the symbol name if it contains a prohibited character.
- //
- bool Logic::hasQuotableChars(std::string const & name) const
- {
--    // Entry is 1 if the corresponding ascii character requires quoting
--    const bool quotable[256] =
--    {
--        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
--        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
--        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
--        0, 0, 1, 0, 1, 1, 0, 0, 0, 1, // <space>, ", #, $, '
--        1, 1, 0, 0, 1, 0, 0, 0, 0, 0, // (, ), <,>
--        0, 0, 0, 0, 0, 0, 0, 0, 1, 1, // :, ;
--        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
--        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
--        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
--        0, 1, 0, 1, 0, 0, 1, 0, 0, 0, // [, \, ], `
--        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
--        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
--        0, 0, 0, 1, 0, 1, 0, 0, 0, 0, // {, }
--        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
--        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
--        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
--        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
--        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
--        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
--        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
--        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
--        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
--        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
--        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
--        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
--    };
--
-     if (name.front() == '|' and name.back() == '|') return false; // Already quoted
- 
-     for (auto c : name) {
--        if (quotable[(int)c])
--            return true;
-+        switch (c) {
-+            case ' ':
-+            case '"':
-+            case '#':
-+            case '$':
-+            case '\'':
-+            case ':':
-+            case ';':
-+            case '[':
-+            case '\\':
-+            case ']':
-+            case '{':
-+            case '}':
-+                return true;
-+        }
-     }
-     return false;
- }
-@@ -758,6 +741,18 @@ PTRef Logic::mkBoolVar(const char* name)
+@@ -724,6 +725,18 @@ PTRef Logic::mkBoolVar(const char* name)
      return mkFun(sr, {});
  }
  
@@ -241,7 +178,7 @@ index b90430c2..c4b34fc4 100644
  void Logic::instantiateFunctions(SRef sr)
  {
      // Equality
-@@ -841,12 +836,10 @@ PTRef Logic::insertTerm(SymRef sym, vec<PTRef>&& terms)
+@@ -807,12 +820,10 @@ PTRef Logic::insertTerm(SymRef sym, vec<PTRef>&& terms)
          assert(terms.size() == 0);
          return mkFun(sym, std::move(terms));
      }
@@ -258,7 +195,7 @@ index b90430c2..c4b34fc4 100644
      return mkUninterpFun(sym, std::move(terms));
  }
  
-@@ -1488,6 +1481,9 @@ Logic::collectStats(PTRef root, int& n_of_conn, int& n_of_eq, int& n_of_uf, int&
+@@ -1455,6 +1466,9 @@ Logic::collectStats(PTRef root, int& n_of_conn, int& n_of_eq, int& n_of_uf, int&
  
  PTRef Logic::conjoinExtras(PTRef root) { return root; }
  

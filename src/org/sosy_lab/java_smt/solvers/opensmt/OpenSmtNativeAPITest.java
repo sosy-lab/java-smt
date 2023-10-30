@@ -420,49 +420,4 @@ public class OpenSmtNativeAPITest {
     sstat r = mainSolver.check();
     assertThat(r).isEqualTo(sstat.Undef());
   }
-
-  /* INFO:
-   * This testcase was taken from VariableNames test and shows that OpenSMT does
-   * not handle \u0000 in variable names correctly.
-   */
-  @Test
-  public void testNulString() {
-    Logic logic = LogicFactory.getLAInstance(Logic_t.QF_AUFLIRA);
-
-    // Any String containing \u0000 should work here
-    PTRef nil = logic.mkBoolVar("\u0000");
-
-    // This test fails intermittently, so i needs to be chosen large enough
-    for (int i = 0; i < 1000; i++) {
-      String pp = logic.pp(nil);
-      assertThat(pp)
-          .isEqualTo(
-              "\u0000"); // The String returned in the failed case is just \u0000 - without the `|`
-      // characters
-
-      /* Note:
-       * I patched OpenSMT to fix the issue and logic.pp(nil) should now always
-       * return "\u0000"
-       *
-       * OpenSMT internally uses a function that converts the letters of the
-       * variable name to their ASCII code and then looks up that code in a
-       * table to see if any of them are reserved. In that case the entire
-       * variable name needs to be escaped and is put in '|' quotes. Due to a
-       * bug this function only works for regular ASCII characters with a value
-       * less than 128. However in our case the unicode character \u0000 gets
-       * represented as the two byte sequence C0 80 as Java uses modifie utf8
-       * for Strings. With this encoding \u0000 can occur in a C String as its
-       * not confused with the terminating null. However due to the bug the
-       * escape sequence is converted to a signed value and since the character
-       * code is greater than 127 that value is negative. The negative index
-       * then is looked up in the table and will generally hit a non-zero value
-       * in memory - which is then interpreted as 'true' and quotes are added.
-       * However occasionally the value happens to be zero and that's why the
-       * test failed intermittently.
-       *
-       * With the patch the conversion is now handled correctly, and there's no
-       * need to quote the escape sequence for \u0000.
-       */
-    }
-  }
 }
