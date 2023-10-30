@@ -70,27 +70,6 @@
   }
 }
 
-%rename(OpenSmt) Opensmt;
-%ignore Opensmt::Opensmt (opensmt_logic _logic, const char *name);
-%ignore Opensmt::Opensmt (opensmt_logic _logic, const char *name, std::unique_ptr< SMTConfig > config);
-%ignore Opensmt::getCUFLogic ();
-%ignore Opensmt::getSolver ();
-%extend Opensmt {
-  %newobject Opensmt;
-  Opensmt(opensmt_logic _logic, const char* name, bool prodInterpolants=false) {
-    auto config = std::make_unique<SMTConfig>();
-    const char* msg;
-    bool ok = config->setOption(SMTConfig::o_produce_inter, SMTOption(prodInterpolants), msg);
-    if (!ok) {
-      throw std::runtime_error(msg);
-    } else {
-      return new Opensmt(_logic, name, std::move(config));
-    }
-  }
- }
-
-%include "include/opensmt/Opensmt.h"
-
 %ignore Arithmetic_t;
 
 %ignore ArithProperty;
