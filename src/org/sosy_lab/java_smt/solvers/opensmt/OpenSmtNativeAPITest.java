@@ -16,7 +16,6 @@ import org.junit.Test;
 import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.java_smt.solvers.opensmt.api.ArithLogic;
 import org.sosy_lab.java_smt.solvers.opensmt.api.InterpolationContext;
-import org.sosy_lab.java_smt.solvers.opensmt.api.ItpAlgorithm;
 import org.sosy_lab.java_smt.solvers.opensmt.api.Logic;
 import org.sosy_lab.java_smt.solvers.opensmt.api.LogicFactory;
 import org.sosy_lab.java_smt.solvers.opensmt.api.Logic_t;
@@ -24,6 +23,7 @@ import org.sosy_lab.java_smt.solvers.opensmt.api.MainSolver;
 import org.sosy_lab.java_smt.solvers.opensmt.api.Model;
 import org.sosy_lab.java_smt.solvers.opensmt.api.PTRef;
 import org.sosy_lab.java_smt.solvers.opensmt.api.SMTConfig;
+import org.sosy_lab.java_smt.solvers.opensmt.api.SMTOption;
 import org.sosy_lab.java_smt.solvers.opensmt.api.SRef;
 import org.sosy_lab.java_smt.solvers.opensmt.api.SymRef;
 import org.sosy_lab.java_smt.solvers.opensmt.api.TemplateFunction;
@@ -203,7 +203,7 @@ public class OpenSmtNativeAPITest {
     PTRef f1 = logic.mkDistinct(dist);
 
     SMTConfig config = new SMTConfig();
-    config.setInterpolation(true);
+    config.setOption(":produce-interpolants", new SMTOption(true));
     MainSolver mainSolver = new MainSolver(logic, config, "opensmt-test");
 
     mainSolver.push();
@@ -267,7 +267,7 @@ public class OpenSmtNativeAPITest {
     PTRef f1 = logic.mkGt(varC, varA);
 
     SMTConfig config = new SMTConfig();
-    config.setInterpolation(true);
+    config.setOption(":produce-interpolants", new SMTOption(true));
     MainSolver solver = new MainSolver(logic, config, "opensmt-test");
 
     solver.push();
@@ -286,8 +286,8 @@ public class OpenSmtNativeAPITest {
     PTRef interpol = context.getSingleInterpolant(mask);
     assertThat(verifyInterpolant(logic, f0, f1, interpol)).isTrue();
 
-    // Switch interpolation algorithm
-    config.setLRAInterpolationAlgorithm(ItpAlgorithm.getLraDecomposingWeak());
+    // Switch interpolation algorithm to 'LraDecompositionWeak'
+    config.setOption(":interpolation-lra-algorithm", new SMTOption(5));
 
     // Verify second interpolant
     PTRef interpolDweak = context.getSingleInterpolant(mask);

@@ -112,12 +112,18 @@
 
 %ignore SMTOption::SMTOption(ASTNode const & n);
 %ignore SMTOption::getValue() const;
+%extend SMTOption {
+  %newobject SMTOption;
+  SMTOption(bool b) {
+    return new SMTOption(b);
+  }
+ }
 
 %ignore SpType;
 %ignore SpPref;
 %ignore SpFormat;
 
-%ignore ItpAlgorithm::operator==(const ItpAlgorithm& o) const;
+%ignore ItpAlgorithm;
 
 %ignore itp_alg_mcmillan;
 %ignore itp_alg_pudlak;
@@ -125,79 +131,16 @@
 %ignore itp_alg_ps;
 %ignore itp_alg_psw;
 %ignore itp_alg_pss;
-%extend ItpAlgorithm {
-  static ItpAlgorithm getBoolMcmillan() {
-    return itp_alg_mcmillan;
-    }
-
-  static ItpAlgorithm getBoolPudlak() {
-    return itp_alg_pudlak;
-    }
-
-  static ItpAlgorithm getBoolMcmillanp() {
-    return itp_alg_mcmillanp;
-    }
-
-  static ItpAlgorithm getBoolPs() {
-    return itp_alg_ps;
-    }
-
-  static ItpAlgorithm getBoolPsw() {
-    return itp_alg_psw;
-    }
-
-  static ItpAlgorithm getBoolPss() {
-    return itp_alg_pss;
-    }
- }
 
 %ignore itp_euf_alg_strong;
 %ignore itp_euf_alg_weak;
 %ignore itp_euf_alg_random;
-%extend ItpAlgorithm {
-  static ItpAlgorithm getEufStrong() {
-    return itp_euf_alg_strong;
-  }
-
-  static ItpAlgorithm getEufWeak() {
-    return itp_euf_alg_weak;
-  }
-
-  static ItpAlgorithm getEufRandom() {
-    return itp_euf_alg_random;
-  }
- }
 
 %ignore itp_lra_alg_strong;
 %ignore itp_lra_alg_weak;
 %ignore itp_lra_alg_factor;
 %ignore itp_lra_alg_decomposing_strong;
 %ignore itp_lra_alg_decomposing_weak;
-%extend ItpAlgorithm {
-  static ItpAlgorithm getLraStrong() {
-    return itp_lra_alg_strong;
-  }
-
-  static ItpAlgorithm getLraWeak() {
-    return itp_lra_alg_weak;
-  }
-
-  static ItpAlgorithm getLraFactor() {
-    return itp_lra_alg_factor;
-  }
-
-  static ItpAlgorithm getLraDecomposingStrong() {
-    return itp_lra_alg_decomposing_strong;
-  }
-
-  static ItpAlgorithm getLraDecomposingWeak() {
-    return itp_lra_alg_decomposing_weak;
-  }
-
-  static const char* getLraFactor0() {
-    return itp_lra_factor_0;
-  }
- }
 
 %ignore itp_lra_factor_0;
 
@@ -256,9 +199,9 @@
 %ignore SMTConfig::getStatsOut ();
 %ignore SMTConfig::getRegularOut ();
 %ignore SMTConfig::getDiagnosticOut ();
-//%ignore SMTConfig::getRandomSeed () const;
+%ignore SMTConfig::getRandomSeed () const;
 %ignore SMTConfig::setProduceModels ();
-//%ignore SMTConfig::setRandomSeed (int seed);
+%ignore SMTConfig::setRandomSeed (int seed);
 %ignore SMTConfig::setUsedForInitiliazation ();
 %ignore SMTConfig::produceProof ();
 %ignore SMTConfig::setTimeQueries ();
@@ -271,6 +214,13 @@
 %ignore SMTConfig::getEUFInterpolationAlgorithm () const;
 %ignore SMTConfig::getLRAInterpolationAlgorithm () const;
 %ignore SMTConfig::getLRAStrengthFactor () const;
+%ignore SMTConfig::getBooleanInterpolationAlgorithm () const;
+%ignore SMTConfig::getEUFInterpolationAlgorithm () const;
+%ignore SMTConfig::getLRAInterpolationAlgorithm () const;
+%ignore SMTConfig::setBooleanInterpolationAlgorithm(ItpAlgorithm i);
+%ignore SMTConfig::setEUFInterpolationAlgorithm(ItpAlgorithm i);
+%ignore SMTConfig::setLRAInterpolationAlgorithm(ItpAlgorithm i);
+%ignore SMTConfig::setLRAStrengthFactor(const char *factor);
 %ignore SMTConfig::getInstanceName () const;
 %ignore SMTConfig::setRegularOutputChannel (const char *attr);
 %ignore SMTConfig::setDiagnosticOutputChannel (const char *attr);
@@ -493,14 +443,6 @@
   void setOption(const char* option, SMTOption& value) {
     const char* msg;
     bool ok = $self->setOption(option, value, msg);
-    if (!ok) {
-      throw std::runtime_error(msg);
-    }
-  }
-
-  void setInterpolation (bool enable) {
-    const char* msg;
-    bool ok = $self->setOption(SMTConfig::o_produce_inter, SMTOption(enable), msg);
     if (!ok) {
       throw std::runtime_error(msg);
     }

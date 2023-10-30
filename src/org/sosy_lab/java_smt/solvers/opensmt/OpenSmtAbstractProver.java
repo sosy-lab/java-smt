@@ -67,8 +67,8 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
   protected static SMTConfig getConfigInstance(
       OpenSMTOptions pSolverOptions, boolean interpolation) {
     SMTConfig config = new SMTConfig();
-    config.setRandomSeed(pSolverOptions.randomSeed);
-    config.setInterpolation(interpolation);
+    config.setOption(":random-seed", new SMTOption(pSolverOptions.randomSeed));
+    config.setOption(":produce-interpolants", new SMTOption(interpolation));
     if (interpolation) {
       config.setOption(":interpolation-bool-algorithm", new SMTOption(pSolverOptions.algBool));
       config.setOption(":interpolation-euf-algorithm", new SMTOption(pSolverOptions.algUf));
