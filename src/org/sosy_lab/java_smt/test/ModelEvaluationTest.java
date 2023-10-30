@@ -133,8 +133,12 @@ public class ModelEvaluationTest extends SolverBasedTest0.ParameterizedSolverBas
 
   @Test
   public void testGetBooleansEvaluation() throws SolverException, InterruptedException {
-    // NOTE: Default value for boolean in OpenSMT is 'true'.
-    boolean defaultValue = solverToUse() == Solvers.OPENSMT ? true : DEFAULT_MODEL_BOOLEAN;
+    final boolean defaultValue;
+    if (solverToUse() == Solvers.OPENSMT) {
+      defaultValue = true; // Default value for boolean in OpenSMT is 'true'.
+    } else {
+      defaultValue = DEFAULT_MODEL_BOOLEAN;
+    }
 
     evaluateInModel(
         bmgr.makeVariable("x"),
