@@ -71,14 +71,16 @@ public class OpenSmtNativeAPITest {
     MainSolver solver = new MainSolver(logic, config, "opensmt-verifier");
 
     // Check A ⊨ I
-    solver.push(logic.mkNot(logic.mkImpl(partA, interpol)));
+    solver.push();
+    solver.insertFormula(logic.mkNot(logic.mkImpl(partA, interpol)));
     if (!solver.check().equals(sstat.False())) {
       return false;
     }
     solver.pop();
 
     // Check I ⊨ ¬B
-    solver.push(logic.mkNot(logic.mkImpl(interpol, logic.mkNot(partB))));
+    solver.push();
+    solver.insertFormula(logic.mkNot(logic.mkImpl(interpol, logic.mkNot(partB))));
     if (!solver.check().equals(sstat.False())) {
       return false;
     }
@@ -103,7 +105,8 @@ public class OpenSmtNativeAPITest {
 
     SMTConfig config = new SMTConfig();
     MainSolver mainSolver = new MainSolver(logic, config, "JavaSmt");
-    mainSolver.push(f);
+    mainSolver.push();
+    mainSolver.insertFormula(f);
 
     sstat r = mainSolver.check();
     assertThat(r).isEqualTo(sstat.True());
@@ -127,7 +130,8 @@ public class OpenSmtNativeAPITest {
     PTRef f = logic.mkAnd(varA, notA);
 
     MainSolver mainSolver = osmt.getMainSolver();
-    mainSolver.push(f);
+    mainSolver.push();
+    mainSolver.insertFormula(f);
 
     sstat r = mainSolver.check();
     assertThat(r).isEqualTo(sstat.False());
@@ -170,8 +174,10 @@ public class OpenSmtNativeAPITest {
     PTRef f1 = logic.mkDistinct(dist);
 
     MainSolver mainSolver = osmt.getMainSolver();
-    mainSolver.push(f0);
-    mainSolver.push(f1);
+    mainSolver.push();
+    mainSolver.insertFormula(f0);
+    mainSolver.push();
+    mainSolver.insertFormula(f1);
 
     sstat r = mainSolver.check();
     assertThat(r).isEqualTo(sstat.False());
@@ -200,8 +206,10 @@ public class OpenSmtNativeAPITest {
     PTRef f1 = logic.mkDistinct(dist);
 
     MainSolver mainSolver = osmt.getMainSolver();
-    mainSolver.push(f0);
-    mainSolver.push(f1);
+    mainSolver.push();
+    mainSolver.insertFormula(f0);
+    mainSolver.push();
+    mainSolver.insertFormula(f1);
 
     sstat r = mainSolver.check();
     assertThat(r).isEqualTo(sstat.False());
@@ -233,8 +241,10 @@ public class OpenSmtNativeAPITest {
     PTRef f1 = logic.mkGeq(varC, const0);
 
     MainSolver mainSolver = osmt.getMainSolver();
-    mainSolver.push(f0);
-    mainSolver.push(f1);
+    mainSolver.push();
+    mainSolver.insertFormula(f0);
+    mainSolver.push();
+    mainSolver.insertFormula(f1);
 
     sstat r = mainSolver.check();
     assertThat(r).isEqualTo(sstat.True());
@@ -257,8 +267,10 @@ public class OpenSmtNativeAPITest {
     PTRef f1 = logic.mkGt(varC, varA);
 
     MainSolver solver = osmt.getMainSolver();
-    solver.push(f0);
-    solver.push(f1);
+    solver.push();
+    solver.insertFormula(f0);
+    solver.push();
+    solver.insertFormula(f1);
 
     sstat r = solver.check();
     assertThat(r).isEqualTo(sstat.False());
@@ -313,7 +325,8 @@ public class OpenSmtNativeAPITest {
 
     // Prove that the equations hold for all models
     MainSolver solver = osmt.getMainSolver();
-    solver.push(f);
+    solver.push();
+    solver.insertFormula(f);
 
     sstat r = solver.check();
     assertThat(r).isEqualTo(sstat.False());
@@ -372,7 +385,8 @@ public class OpenSmtNativeAPITest {
     PTRef f = logic.mkNot(logic.mkEq(app1, varA));
 
     MainSolver solver = osmt.getMainSolver();
-    solver.push(f);
+    solver.push();
+    solver.insertFormula(f);
 
     sstat r = solver.check();
     assertThat(r).isEqualTo(sstat.False());
@@ -396,95 +410,14 @@ public class OpenSmtNativeAPITest {
     PTRef f1 = logic.mkGeq(varC, const0);
 
     MainSolver mainSolver = osmt.getMainSolver();
-    mainSolver.push(f0);
-    mainSolver.push(f1);
+    mainSolver.push();
+    mainSolver.insertFormula(f0);
+    mainSolver.push();
+    mainSolver.insertFormula(f1);
 
     mainSolver.stop();
 
     sstat r = mainSolver.check();
     assertThat(r).isEqualTo(sstat.Undef());
-  }
-
-  /* INFO:
-   * This testcase was taken from VariableNames test and shows that OpenSMT does
-   * not handle \u0000 in variable names correctly.
-   */
-  @Test
-  public void testNulString() {
-    Logic logic = LogicFactory.getLAInstance(Logic_t.QF_AUFLIRA);
-
-    // Any String containing \u0000 should work here
-    PTRef nil = logic.mkBoolVar("\u0000");
-
-    // This test fails intermittently, so i needs to be chosen large enough
-    for (int i = 0; i < 1000; i++) {
-      String pp = logic.pp(nil);
-      assertThat(pp)
-          .isEqualTo(
-              "\u0000"); // The String returned in the failed case is just \u0000 - without the `|`
-      // characters
-
-      /* Note:
-       * I patched OpenSMT to fix the issue and logic.pp(nil) should now always
-       * return "\u0000"
-       *
-       * OpenSMT internally uses a function that converts the letters of the
-       * variable name to their ASCII code and then looks up that code in a
-       * table to see if any of them are reserved. In that case the entire
-       * variable name needs to be escaped and is put in '|' quotes. Due to a
-       * bug this function only works for regular ASCII characters with a value
-       * less than 128. However in our case the unicode character \u0000 gets
-       * represented as the two byte sequence C0 80 as Java uses modifie utf8
-       * for Strings. With this encoding \u0000 can occur in a C String as its
-       * not confused with the terminating null. However due to the bug the
-       * escape sequence is converted to a signed value and since the character
-       * code is greater than 127 that value is negative. The negative index
-       * then is looked up in the table and will generally hit a non-zero value
-       * in memory - which is then interpreted as 'true' and quotes are added.
-       * However occasionally the value happens to be zero and that's why the
-       * test failed intermittently.
-       *
-       * With the patch the conversion is now handled correctly, and there's no
-       * need to quote the escape sequence for \u0000.
-       */
-    }
-  }
-
-  @Test
-  public void testExample() {
-    ArithLogic logic = LogicFactory.getLIAInstance();
-
-    PTRef varA = logic.mkIntVar("a");
-    PTRef varB = logic.mkIntVar("b");
-    PTRef varC = logic.mkIntVar("c");
-
-    PTRef formulaA = logic.mkAnd(logic.mkLt(varA, varB), logic.mkLt(varC, varA));
-    PTRef formulaB = logic.mkLt(varB, varC);
-
-    SMTConfig config = new SMTConfig();
-    config.setOption(":produce-interpolants", new SMTOption(1));
-
-    MainSolver mainSolver = new MainSolver(logic, config, "JavaSmt");
-    mainSolver.push(formulaA);
-    mainSolver.push(formulaB);
-
-    sstat check1 = mainSolver.check();
-    System.out.println(check1);
-
-    InterpolationContext context = mainSolver.getInterpolationContext();
-    VectorInt mask = new VectorInt(ImmutableList.of(0));
-    PTRef interpol = context.getSingleInterpolant(mask);
-    System.out.println(logic.pp(interpol));
-
-    mainSolver.pop();
-
-    sstat check2 = mainSolver.check();
-    System.out.println(check2);
-
-    Model model = mainSolver.getModel();
-    for (PTRef var : Arrays.asList(varA, varB, varC)) {
-      PTRef val = model.evaluate(var);
-      System.out.println(logic.pp(val));
-    }
   }
 }

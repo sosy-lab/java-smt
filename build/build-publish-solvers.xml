@@ -48,11 +48,8 @@ SPDX-License-Identifier: Apache-2.0
         <mkdir dir="${path.build}"/>
         <mkdir dir="${path.install}"/>
 
-        <!-- Patch OpenSMT to avoid swig errors and add some required features
-             * Change some 'const static struct' declarations to 'static const struct' declarations
-             * Add supoort for parsing formulas
-             * Add interface to access sort definitions -->
-        <exec executable="git" dir="${opensmt.path}" failonerror="false">
+        <!-- Patch OpenSMT to avoid swig errors and add some required features -->
+        <exec executable="git" dir="${opensmt.path}" failonerror="true">
             <arg value="apply"/>
             <arg value="${path.source}/api.patch"/>
         </exec>
@@ -68,6 +65,13 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="install"/>
         </exec>
 
+        <!-- Revert the patch -->
+        <exec executable="git" dir="${opensmt.path}" failonerror="true">
+            <arg value="apply"/>
+            <arg value="-R"/>
+            <arg value="${path.source}/api.patch"/>
+        </exec>
+
         <!-- Copy swig file to the install directory -->
         <copy file="${path.source}/opensmt.i" toFile="${path.install}/opensmt.i"/>
 
@@ -75,7 +79,6 @@ SPDX-License-Identifier: Apache-2.0
         <echo file="${path.install}/Version.h">#define VERSION "${opensmt.version}"</echo>
 
         <!-- Run swig to generate java proxies and the jni wrapper -->
-
         <mkdir dir="${path.install}/java/opensmt"/>
         <exec executable="swig" dir="${path.install}" failonerror="true">
             <arg value="-java"/>

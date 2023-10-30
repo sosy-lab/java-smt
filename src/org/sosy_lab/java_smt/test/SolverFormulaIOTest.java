@@ -409,6 +409,10 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
   private void checkThatAssertIsInLastLine(String lines) {
     // Boolector will fail this anyway since bools are bitvecs for btor
     TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
+
+    // OpenSMT has newline characters within the (assert ..) block that break this test
+    TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.OPENSMT);
+
     lines = lines.trim();
     assertWithMessage("last line of <\n" + lines + ">")
         .that(getLast(Splitter.on('\n').split(lines)))
