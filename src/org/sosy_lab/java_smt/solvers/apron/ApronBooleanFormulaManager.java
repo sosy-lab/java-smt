@@ -29,6 +29,8 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
@@ -42,6 +44,7 @@ public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<Ap
     ApronFormulaType, Environment, Long> {
 
   private final ApronFormulaCreator formulaCreator;
+  private final Logger logger = Logger.getLogger("BooleanFormula logger");
 
   protected ApronBooleanFormulaManager(ApronFormulaCreator pCreator) {
     super(pCreator);
@@ -125,7 +128,14 @@ public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<Ap
       Tcons1[] tcons1s = map.keySet().toArray(new Tcons1[map.size()]);
       Abstract1 helper = new Abstract1(this.formulaCreator.getManager(), tcons1s);
       boolean isBottom = helper.isBottom(this.formulaCreator.getManager());
-      return !isBottom;
+      if(isBottom){
+        return false;
+      }else {
+        logger.setLevel(Level.WARNING);
+        logger.warning("Apron can only guarantee for clear results for UNSAT! SAT can "
+            + "also mean UNKNOWN!");
+        return true;
+      }
     } catch (ApronException pException) {
       throw new RuntimeException(pException);
     }
@@ -145,7 +155,15 @@ public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<Ap
       Map<Tcons1, Texpr1Node> map = constraint.getConstraintNodes();
       Tcons1[] tcons1s = map.keySet().toArray(new Tcons1[map.size()]);
       Abstract1 helper = new Abstract1(this.formulaCreator.getManager(), tcons1s);
-      return (helper.isBottom(this.formulaCreator.getManager()));
+      Boolean isBottom = helper.isBottom(this.formulaCreator.getManager());
+      if (isBottom){
+        return true;
+      } else {
+        logger.setLevel(Level.WARNING);
+        logger.warning("Apron can only guarantee for clear results for UNSAT! SAT can "
+            + "also mean UNKNOWN!");
+        return false;
+      }
     } catch (ApronException pException) {
       throw new RuntimeException(pException);
     }

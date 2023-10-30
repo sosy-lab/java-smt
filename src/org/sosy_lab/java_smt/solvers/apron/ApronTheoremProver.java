@@ -34,6 +34,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -46,6 +48,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronConstraint;
+import org.sosy_lab.java_smt.utils.SolverUtils;
 
 
 public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
@@ -54,6 +57,8 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
   private final ApronSolverContext solverContext;
   private final List<Collection<ApronConstraint>> assertedFormulas = new ArrayList<>();
   private Abstract1 abstract1;
+  private final Logger logger = Logger.getLogger("TheoremProver logger");
+
 
   protected ApronTheoremProver(
       Set pSet,
@@ -144,7 +149,14 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
 
   private boolean isUnsatApron() {
     try {
-      return abstract1.isBottom(solverContext.getManager());
+      if(abstract1.isBottom(solverContext.getManager())){
+        return true;
+      }else{
+        logger.setLevel(Level.WARNING);
+        logger.warning("Apron can only guarantee for clear results for UNSAT! SAT can "
+            + "also mean UNKNOWN!");
+        return false;
+      }
     } catch (ApronException pApronException) {
       throw new RuntimeException(pApronException);
     }
