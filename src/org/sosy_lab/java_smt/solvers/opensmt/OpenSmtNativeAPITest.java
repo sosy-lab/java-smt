@@ -10,8 +10,6 @@ package org.sosy_lab.java_smt.solvers.opensmt;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import com.google.common.collect.ImmutableList;
-import java.util.Arrays;
 import org.junit.AssumptionViolatedException;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -27,7 +25,6 @@ import org.sosy_lab.java_smt.solvers.opensmt.api.Model;
 import org.sosy_lab.java_smt.solvers.opensmt.api.OpenSmt;
 import org.sosy_lab.java_smt.solvers.opensmt.api.PTRef;
 import org.sosy_lab.java_smt.solvers.opensmt.api.SMTConfig;
-import org.sosy_lab.java_smt.solvers.opensmt.api.SMTOption;
 import org.sosy_lab.java_smt.solvers.opensmt.api.SRef;
 import org.sosy_lab.java_smt.solvers.opensmt.api.SymRef;
 import org.sosy_lab.java_smt.solvers.opensmt.api.TemplateFunction;
