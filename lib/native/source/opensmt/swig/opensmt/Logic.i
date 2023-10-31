@@ -34,37 +34,30 @@
 %ignore Logic::hasUFs () const;
 %ignore Logic::hasIntegers () const;
 %ignore Logic::hasReals () const;
-//%ignore Logic::getSortRef (PTRef tr) const;
 %ignore Logic::getSortRef (SymRef sr) const;
-//%ignore Logic::printSort (SRef s) const;
-//%ignore Logic::getSortSize (SRef s) const;
-//%ignore Logic::getArraySort(SRef domain, SRef codomain);
-//%ignore Logic::isArraySort (SRef sref) const;
 %ignore Logic::hasArrays () const;
 %ignore Logic::isArrayStore (SymRef) const;
 %ignore Logic::isArraySelect (SymRef) const;
 %ignore Logic::mkStore (vec< PTRef > &&);
-%ignore Logic::mkSelect (vec< PTRef > &&);
 %extend Logic {
   PTRef mkStore(PTRef array, PTRef index, PTRef value) {
     return $self->mkStore({array, index, value});
   }
-
+ }
+%ignore Logic::mkSelect (vec< PTRef > &&);
+%extend Logic {
   PTRef mkSelect(PTRef array, PTRef index) {
     return $self->mkSelect({array, index});
   }
  }
+%ignore Logic::protectName (SymRef sr) const;
 %ignore Logic::getUniqueArgSort (SymRef sr) const;
 %ignore Logic::getUniqueArgSort (PTRef tr) const;
-//%ignore Logic::getSym (const SymRef s) const;
 %ignore Logic::getSym (const PTRef tr) const;
-//%ignore Logic::getSymRef (const PTRef tr) const;
 %ignore Logic::getSymName (const PTRef tr) const;
-//%ignore Logic::getSymName (const SymRef s) const;
 %ignore Logic::symNameToRef (const char *s);
 %ignore Logic::hasSym (const char *s) const;
 %ignore Logic::commutes (const SymRef s) const;
-//%ignore Logic::getPterm (const PTRef tr);
 %ignore Logic::getPterm (const PTRef tr) const;
 %ignore Logic::getPtermIter ();
 %ignore Logic::getTermMarks (PTId maxTermId) const;
@@ -106,7 +99,6 @@
  }
 %ignore Logic::mkNot (vec< PTRef > &&);
 %ignore Logic::mkIte (vec< PTRef > &&);
-// %ignore Logic::mkIte (PTRef c, PTRef t, PTRef e);
 %ignore Logic::mkEq (vec< PTRef > &&args);
 %ignore Logic::mkEq (vec< PTRef > const &args);
 %extend Logic {
@@ -127,10 +119,8 @@
     return $self->mkDistinct(args);
   }
  }
-//%ignore Logic::mkVar (SRef, const char *, bool isInterpreted=false);
 %ignore Logic::mkUniqueAbstractValue (SRef);
 %ignore Logic::mkConst (const char *);
-//%ignore Logic::mkConst (SRef, const char *);
 %ignore Logic::declareFun (std::string const &fname, SRef rsort, vec< SRef > const &args, SymbolConfig const &symbolConfig);
 %ignore Logic::declareFun (std::string const &fname, SRef rsort, vec< SRef > const &args);
 %extend Logic {
@@ -153,14 +143,13 @@
 %ignore Logic::instantiateFunctions (SRef);
 %ignore Logic::instantiateArrayFunctions (SRef);
 %ignore Logic::hasSortSymbol (SortSymbol const &);
-%ignore Logic::peekSortSymbol (SortSymbol const &, SSymRef &);
+%ignore Logic::peekSortSymbol (SortSymbol const &, SSymRef &) const;
 %ignore Logic::declareSortSymbol (SortSymbol symbol);
 %ignore Logic::getSort (SSymRef, vec< SRef > &&args);
 %ignore Logic::dumpHeaderToFile (std::ostream &dump_out) const;
 %ignore Logic::dumpFormulaToFile (std::ostream &dump_out, PTRef formula, bool negate=false, bool toassert=true) const;
 %ignore Logic::dumpChecksatToFile (std::ostream &dump_out) const;
 %ignore Logic::dumpWithLets (std::ostream &out, PTRef formula) const;
-//%ignore Logic::dumpWithLets (PTRef formula) const;
 %ignore Logic::instantiateFunctionTemplate (TemplateFunction const &tmplt, vec< PTRef > const &args);
 %extend Logic {
   PTRef instantiateFunctionTemplate (TemplateFunction const &tmplt, std::vector< PTRef > const &args) {
@@ -179,7 +168,6 @@
 %ignore Logic::getSym_implies () const;
 %ignore Logic::getSym_distinct () const;
 %ignore Logic::getSym_uf_not () const;
-//%ignore Logic::getSort_bool () const;
 %extend Logic {
   bool isSortBool (SRef sort) {
     SRef sortBool = $self->getSort_bool();
@@ -187,13 +175,10 @@
   }
  }
 %ignore Logic::isEquality (SymRef tr) const;
-//%ignore Logic::isEquality (PTRef tr) const;
 %ignore Logic::isUFEquality (PTRef tr) const;
 %ignore Logic::isTheoryEquality (PTRef tr) const;
 %ignore Logic::isDisequality (SymRef tr) const;
-//%ignore Logic::isDisequality (PTRef tr) const;
 %ignore Logic::isIte (SymRef tr) const;
-//%ignore Logic::isIte (PTRef tr) const;
 %ignore Logic::isNonBoolIte (SymRef sr) const;
 %ignore Logic::isNonBoolIte (PTRef tr) const;
 %ignore Logic::isTheorySymbol (SymRef tr) const;
@@ -206,42 +191,31 @@
 %ignore Logic::isBuiltinConstant (const PTRef tr) const;
 %ignore Logic::isBuiltinFunction (const SymRef sr) const;
 %ignore Logic::isConstant (const SymRef sr) const;
-//%ignore Logic::isConstant (PTRef tr) const;
 %ignore Logic::yieldsSortUninterpreted (PTRef tr) const;
 %ignore Logic::isUFSort (const SRef sr) const;
 %ignore Logic::appearsInUF (PTRef tr) const;
 %ignore Logic::setAppearsInUF (PTRef tr);
 %ignore Logic::getNestedBoolRoots (PTRef tr) const;
 %ignore Logic::isVar (SymRef sr) const;
-//%ignore Logic::isVar (PTRef tr) const;
 %ignore Logic::isVarOrIte (SymRef sr) const;
 %ignore Logic::isVarOrIte (PTRef tr) const;
 %ignore Logic::isAtom (PTRef tr) const;
 %ignore Logic::isBoolAtom (PTRef tr) const;
 %ignore Logic::isInterpreted (SymRef sr) const;
 %ignore Logic::isUP (PTRef) const;
-//%ignore Logic::isUF (PTRef) const;
 %ignore Logic::isUF (SymRef) const;
 %ignore Logic::isIF (PTRef) const;
 %ignore Logic::isIF (SymRef) const;
-//%ignore Logic::isAnd (PTRef tr) const;
 %ignore Logic::isAnd (SymRef sr) const;
-//%ignore Logic::isOr (PTRef tr) const;
 %ignore Logic::isOr (SymRef sr) const;
-//%ignore Logic::isNot (PTRef tr) const;
 %ignore Logic::isNot (SymRef sr) const;
 %ignore Logic::isXor (SymRef sr) const;
-//%ignore Logic::isXor (PTRef tr) const;
 %ignore Logic::isImplies (SymRef sr) const;
-//%ignore Logic::isImplies (PTRef tr) const;
 %ignore Logic::isTrue (SymRef sr) const;
-//%ignore Logic::isTrue (PTRef tr) const;
 %ignore Logic::isFalse (SymRef sr) const;
-//%ignore Logic::isFalse (PTRef tr) const;
 %ignore Logic::isIff (SymRef sr) const;
-//%ignore Logic::isIff (PTRef tr) const;
-//%ignore Logic::hasSortBool (PTRef tr) const;
 %ignore Logic::hasSortBool (SymRef sr) const;
+%ignore Logic::hasSortBool (PTRef tr) const;
 %ignore Logic::hasEquality (vec< PTRef > &args);
 %ignore Logic::resolveTerm (const char *s, vec< PTRef > &&args, SRef sortRef=SRef_Undef, SymbolMatcher symbolMatcher=SymbolMatcher::Any);
 %ignore Logic::insertTerm (SymRef sym, vec< PTRef > &&args);
@@ -262,11 +236,9 @@
 %ignore Logic::isAmbiguousUninterpretedNullarySymbolName (std::string_view name) const;
 %ignore Logic::protectName (std::string const &name, bool isInterpreted) const;
 %ignore Logic::disambiguateName (std::string const &protectedName, SRef retSort, bool isNullary, bool isInterpreted) const;
-//%ignore Logic::protectName (SymRef sr) const;
 %ignore Logic::printTerm_ (PTRef tr, bool l, bool s) const;
 %ignore Logic::printTerm (PTRef tr) const;
 %ignore Logic::printTerm (PTRef tr, bool l, bool s) const;
-//%ignore Logic::pp (PTRef tr) const;
 %ignore Logic::printSym (SymRef sr) const;
 %ignore Logic::termSort (vec< PTRef > &v) const;
 %ignore Logic::purify (PTRef r, PTRef &p, lbool &sgn) const;

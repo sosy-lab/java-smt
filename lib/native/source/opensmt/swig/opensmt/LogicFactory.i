@@ -19,18 +19,16 @@
 
 %ignore LogicProperty;
 
-//%ignore Logic_t;
-
 %ignore QFLogicToProperties;
 %ignore getLogicFromString(const std::string & name);
 %ignore getStringFromLogic(const Logic_t logic);
 
-//%ignore LogicFactory;
+%ignore opensmt::LogicFactory::LogicFactory();
 
-%newobject LogicFactory::getInstance(Logic_t);
-%newobject LogicFactory::getLAInstance(Logic_t);
-%newobject LogicFactory::getLRAInstance();
-%newobject LogicFactory::getLIAInstance();
+%newobject opensmt::LogicFactory::getInstance(Logic_t);
+%newobject opensmt::LogicFactory::getLAInstance(Logic_t);
+%newobject opensmt::LogicFactory::getLRAInstance();
+%newobject opensmt::LogicFactory::getLIAInstance();
 
 %extend opensmt::LogicFactory {
   static std::string getVersion() {

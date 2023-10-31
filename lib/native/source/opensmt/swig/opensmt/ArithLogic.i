@@ -26,44 +26,40 @@
 %ignore ArithLogic::tk_distinct;
 %ignore ArithLogic::tk_ite;
 %ignore ArithLogic::tk_indexed;
+
 %ignore ArithLogic::s_sort_bool;
 %ignore ArithLogic::s_ite_prefix;
 %ignore ArithLogic::s_framev_prefix;
 %ignore ArithLogic::s_abstract_value_prefix;
+
 %ignore ArithLogic::ArithLogic (opensmt::Logic_t type);
 %ignore ArithLogic::isBuiltinFunction (SymRef sr) const override;
+%ignore ArithLogic::isIntMinusOne (PTRef tr) const;
+%ignore ArithLogic::isMinusOne (PTRef tr) const;
+%ignore ArithLogic::isRealMinusOne (PTRef tr) const;
 %ignore ArithLogic::insertTerm (SymRef sym, vec< PTRef > &&terms) override;
-//%ignore ArithLogic::getSort_real () const;
-//%ignore ArithLogic::getSort_int () const;
 %ignore ArithLogic::mkConst (const char *name) override;
-//%ignore ArithLogic::mkConst (SRef s, const char *name) override;
 %ignore ArithLogic::mkConst (SRef s, const std::string &name);
 %ignore ArithLogic::mkConst (SRef s, opensmt::Number const &c);
 %ignore ArithLogic::mkIntConst (opensmt::Number const &c);
-%ignore ArithLogic::mkRealConst (opensmt::Number const &c);
 %extend ArithLogic {
   PTRef mkIntConst(const std::string& c) {
     return $self->mkIntConst(FastRational(c.c_str()));
   }
-
+ }
+%ignore ArithLogic::mkRealConst (opensmt::Number const &c);
+%extend ArithLogic {
   PTRef mkRealConst(const std::string& c) {
     return $self->mkRealConst(FastRational(c.c_str()));
   }
  }
-//%ignore ArithLogic::mkIntVar (const char *name);
-//%ignore ArithLogic::mkRealVar (const char *name);
 %ignore ArithLogic::isBuiltinSort (SRef sr) const override;
 %ignore ArithLogic::isBuiltinSortSym (SSymRef ssr) const override;
 %ignore ArithLogic::isBuiltinConstant (SymRef sr) const override;
 %ignore ArithLogic::isNumConst (SymRef sr) const;
-//%ignore ArithLogic::isNumConst (PTRef tr) const;
 %ignore ArithLogic::isIntConst (SymRef sr) const;
-//%ignore ArithLogic::isIntConst (PTRef tr) const;
 %ignore ArithLogic::isRealConst (SymRef sr) const;
-//%ignore ArithLogic::isRealConst (PTRef tr) const;
 %ignore ArithLogic::isNonNegNumConst (PTRef tr) const;
-//%ignore ArithLogic::isSortInt (SRef sr) const;
-//%ignore ArithLogic::isSortReal (SRef sr) const;
 %ignore ArithLogic::isSortNum (SRef sr) const;
 %ignore ArithLogic::yieldsSortInt (SymRef sr) const;
 %ignore ArithLogic::yieldsSortInt (PTRef tr) const;
@@ -114,7 +110,6 @@
 %ignore ArithLogic::checkHasReals () const;
 %ignore ArithLogic::checkHasIntegers () const;
 %ignore ArithLogic::isPlus (SymRef sr) const;
-//%ignore ArithLogic::isPlus (PTRef tr) const;
 %ignore ArithLogic::isIntPlus (PTRef tr) const;
 %ignore ArithLogic::isRealPlus (PTRef tr) const;
 %ignore ArithLogic::isIntPlus (SymRef sr) const;
@@ -130,13 +125,11 @@
 %ignore ArithLogic::isIntMinus (SymRef sr) const;
 %ignore ArithLogic::isRealMinus (SymRef sr) const;
 %ignore ArithLogic::isNeg (SymRef sr) const;
-//%ignore ArithLogic::isNeg (PTRef tr) const;
 %ignore ArithLogic::isIntNeg (PTRef tr) const;
 %ignore ArithLogic::isRealNeg (PTRef tr) const;
 %ignore ArithLogic::isIntNeg (SymRef sr) const;
 %ignore ArithLogic::isRealNeg (SymRef sr) const;
 %ignore ArithLogic::isTimes (SymRef sr) const;
-//%ignore ArithLogic::isTimes (PTRef tr) const;
 %ignore ArithLogic::isIntTimes (PTRef tr) const;
 %ignore ArithLogic::isRealTimes (PTRef tr) const;
 %ignore ArithLogic::isIntTimes (SymRef sr) const;
@@ -163,25 +156,21 @@
 %ignore ArithLogic::isIntEq (SymRef sr) const;
 %ignore ArithLogic::isRealEq (SymRef sr) const;
 %ignore ArithLogic::isLeq (SymRef sr) const;
-//%ignore ArithLogic::isLeq (PTRef tr) const;
 %ignore ArithLogic::isIntLeq (PTRef tr) const;
 %ignore ArithLogic::isRealLeq (PTRef tr) const;
 %ignore ArithLogic::isIntLeq (SymRef sr) const;
 %ignore ArithLogic::isRealLeq (SymRef sr) const;
 %ignore ArithLogic::isLt (SymRef sr) const;
-//%ignore ArithLogic::isLt (PTRef tr) const;
 %ignore ArithLogic::isIntLt (PTRef tr) const;
 %ignore ArithLogic::isRealLt (PTRef tr) const;
 %ignore ArithLogic::isIntLt (SymRef sr) const;
 %ignore ArithLogic::isRealLt (SymRef sr) const;
 %ignore ArithLogic::isGeq (SymRef sr) const;
-//%ignore ArithLogic::isGeq (PTRef tr) const;
 %ignore ArithLogic::isIntGeq (PTRef tr) const;
 %ignore ArithLogic::isRealGeq (PTRef tr) const;
 %ignore ArithLogic::isIntGeq (SymRef sr) const;
 %ignore ArithLogic::isRealGeq (SymRef sr) const;
 %ignore ArithLogic::isGt (SymRef sr) const;
-//%ignore ArithLogic::isGt (PTRef tr) const;
 %ignore ArithLogic::isIntGt (PTRef tr) const;
 %ignore ArithLogic::isRealGt (PTRef tr) const;
 %ignore ArithLogic::isIntGt (SymRef sr) const;
@@ -202,12 +191,6 @@
 %ignore ArithLogic::isIntOne (SymRef sr) const;
 %ignore ArithLogic::isRealOne (SymRef sr) const;
 %ignore ArithLogic::isNumTerm (PTRef tr) const;
-//%ignore ArithLogic::getTerm_IntZero () const;
-//%ignore ArithLogic::getTerm_RealZero () const;
-//%ignore ArithLogic::getTerm_IntOne () const;
-//%ignore ArithLogic::getTerm_RealOne () const;
-//%ignore ArithLogic::getTerm_IntMinusOne () const;
-//%ignore ArithLogic::getTerm_RealMinusOne () const;
 %ignore ArithLogic::checkSortInt (PTRef tr);
 %ignore ArithLogic::checkSortReal (PTRef tr);
 %ignore ArithLogic::checkSortInt (vec< PTRef > const &args);
@@ -218,34 +201,23 @@
 %ignore ArithLogic::getZeroForSort (SRef sort) const;
 %ignore ArithLogic::getOneForSort (SRef sort) const;
 %ignore ArithLogic::getMinusOneForSort (SRef sort) const;
-// PTRef 	mkNeg (PTRef tr)
 %ignore ArithLogic::mkMinus (vec< PTRef > &&);
-// PTRef 	mkMinus (PTRef a1, PTRef a2)
 %ignore ArithLogic::mkMinus (vec< PTRef > const &args);
 %ignore ArithLogic::mkPlus (vec< PTRef > &&);
-// PTRef 	mkPlus (PTRef p1, PTRef p2)
 %ignore ArithLogic::mkPlus (vec< PTRef > const &args);
 %ignore ArithLogic::mkPlus (std::vector< PTRef > const &args);
 %ignore ArithLogic::mkTimes (vec< PTRef > &&args);
-// PTRef 	mkTimes (PTRef p1, PTRef p2)
 %ignore ArithLogic::mkTimes (vec< PTRef > const &args);
 %ignore ArithLogic::mkTimes (std::vector< PTRef > const &args);
 %ignore ArithLogic::mkIntDiv (vec< PTRef > &&args);
-// PTRef 	mkIntDiv (PTRef nom, PTRef den)
 %ignore ArithLogic::mkIntDiv (vec< PTRef > const &args);
 %ignore ArithLogic::mkRealDiv (vec< PTRef > &&args);
-// mkRealDiv (PTRef nom, PTRef den)
 %ignore ArithLogic::mkRealDiv (vec< PTRef > const &args);
 %ignore ArithLogic::mkMod (vec< PTRef > &&args);
-// PTRef 	mkMod (PTRef first, PTRef second)
 %ignore ArithLogic::mkLeq (vec< PTRef > const &args);
-// PTRef 	mkLeq (PTRef arg1, PTRef arg2)
 %ignore ArithLogic::mkGeq (vec< PTRef > const &args);
-// PTRef 	mkGeq (PTRef arg1, PTRef arg2)
 %ignore ArithLogic::mkLt (vec< PTRef > const &args);
-// PTRef 	mkLt (PTRef arg1, PTRef arg2)
 %ignore ArithLogic::mkGt (vec< PTRef > const &args);
-// PTRef 	mkGt (PTRef arg1, PTRef arg2)
 %ignore ArithLogic::isLinearTerm (PTRef tr) const;
 %ignore ArithLogic::isLinearFactor (PTRef tr) const;
 %ignore ArithLogic::getConstantAndFactors (PTRef sum) const;

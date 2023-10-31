@@ -6,11 +6,11 @@
 //
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
+%ignore sstat::sstat();
 %ignore sstat::sstat(lbool l);
+%ignore sstat::sstat(int v);
 %ignore sstat::operator==(sstat s) const;
 %ignore sstat::operator!=(sstat s) const;
-// %ignore sstat::getValue() const;
-%ignore toSstat(int);
 %extend sstat {
   /* FIXME: This whole class should probably be an enum */
   static sstat True()  { return s_True; }
@@ -18,6 +18,8 @@
   static sstat Undef() { return s_Undef; }
   static sstat Error() { return s_Error; }
  }
+
+%ignore toSstat(int);
 
 %typemap(javacode) sstat %{
   public boolean equals(Object object) {
@@ -54,7 +56,6 @@
 %ignore s_Undef;
 %ignore s_Error;
 
-//%ignore MainSolver::MainSolver (Logic &logic, SMTConfig &conf, std::string name);
 %ignore MainSolver::MainSolver(std::unique_ptr<Theory>, std::unique_ptr<TermMapper>, std::unique_ptr<THandler>, std::unique_ptr<SimpSMTSolver>, Logic&, SMTConfig&, std::string);
 %ignore MainSolver::getConfig();
 %ignore MainSolver::getSMTSolver();
@@ -64,18 +65,13 @@
 %ignore MainSolver::getTheory();
 %ignore MainSolver::getTheory() const;
 %ignore MainSolver::getPartitionManager();
-//%ignore MainSolver::push(PTRef);
-//%ignore MainSolver::push();
 %ignore MainSolver::insertFormula(PTRef, char**);
-//%ignore MainSolver::insertFormula(PTRef);;
 %ignore MainSolver::initialize();
 %ignore MainSolver::simplifyFormulas();
 %ignore MainSolver::printFramesAsQuery() const;
 %ignore MainSolver::solverEmpty() const;
 %ignore MainSolver::writeSolverState_smtlib2(const char*, char**) const;
 %ignore MainSolver::getTermValue(PTRef) const;
-//%ignore MainSolver::stop();
 %ignore MainSolver::createTheory(Logic&, SMTConfig&);
-// %ignore MainSolver::getInterpolationContext ();
 
 %include "include/opensmt/MainSolver.h"

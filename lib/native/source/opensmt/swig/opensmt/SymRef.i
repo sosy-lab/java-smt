@@ -6,7 +6,9 @@
 //
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
+%ignore SymRef::SymRef();
 %ignore SymRef::operator=(uint32_t v);
+
 %ignore operator== (const SymRef& a1, const SymRef& a2);
 %ignore operator!= (const SymRef& a1, const SymRef& a2);
 

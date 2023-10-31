@@ -10,9 +10,7 @@
 %ignore PTLHash;
 %ignore PTId;
 
-//%ignore Pterm::size () const;
 %ignore Pterm::operator[] (int i) const;
-//%ignore Pterm::symb () const;
 %ignore Pterm::has_extra () const;
 %ignore Pterm::reloced () const;
 %ignore Pterm::relocation () const;
@@ -36,6 +34,7 @@
 %ignore Pterm::begin () const;
 %ignore Pterm::end () const;
 %extend Pterm {
+  // FIXME: Causes intermittent crashes in OpenSmtFormulaCreator.visit
   %newobject getArgs;
   std::vector<PTRef> getArgs() {
     std::vector<PTRef> args;
@@ -44,11 +43,12 @@
     return args;
   }
 
-  // Workaround to provide access to the i-th arg.
   PTRef at(int i) {
     return $self->operator[](i);
   }
 }
+
+%ignore ptermSort(Pterm&);
 
 %ignore PtPair;
 %ignore PtChild;

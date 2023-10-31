@@ -6,8 +6,9 @@
 //
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
-//%ignore SSymRef;
+%ignore SSymRef::SSymRef();
 %ignore SSymRef::operator= (uint32_t v);
+
 %ignore operator== (SSymRef a1, SSymRef a2);
 %ignore operator!= (SSymRef a1, SSymRef a2);
 
@@ -28,17 +29,26 @@
   }
 %}
 
-//%ignore SortSymbol;
 %ignore SortSymbol::SortSymbol (std::string name_, unsigned int arity);
 %ignore SortSymbol::SortSymbol (std::string name_, unsigned int arity, unsigned int flags);
 %ignore SortSymbol::SortSymbol (SortSymbol &&);
 %ignore SortSymbol::SortSymbol (SortSymbol const &);
-//%ignore SortSymbol::isInternal () const;
-//%ignore SortSymbol::name;
-//%ignore SortSymbol::arity;
+%ignore SortSymbol::INTERNAL;
+%ignore SortSymbol::arity;
+%extend SortSymbol {
+  unsigned int getArity() {
+    return $self->arity;
+  }
+ }
+%ignore SortSymbol::name;
+%extend SortSymbol {
+  std::string getName() {
+    return $self->name;
+  }
+ }
 %ignore SortSymbol::flags;
 
-//$ignore SRef;
+%ignore SRef::SRef();
 %ignore SRef::operator= (uint32_t v);
 %ignore operator== (SRef a1, SRef a2);
 %ignore operator!= (SRef a1, SRef a2);
@@ -62,11 +72,8 @@
   }
 %}
 
-//%ignore Sort;
 %ignore Sort::Sort (SSymRef symRef_, sortid_t uniq_id_, vec< SRef > const &rest);
 %ignore Sort::getId () const;
-//%ignore Sort::getSymRef () const;
-//%ignore Sort::getSize () const;
 %ignore Sort::operator[] (uint32_t index) const;
 %extend Sort {
   %newobject getArgs;

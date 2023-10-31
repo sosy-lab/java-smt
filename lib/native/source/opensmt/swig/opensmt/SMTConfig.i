@@ -12,14 +12,15 @@
 %ignore ConfValue;
 %ignore Info;
 
+%ignore SMTOption::SMTOption();
 %ignore SMTOption::SMTOption(ASTNode const & n);
-%ignore SMTOption::getValue() const;
 %extend SMTOption {
   %newobject SMTOption;
   SMTOption(bool b) {
     return new SMTOption(b);
   }
  }
+%ignore SMTOption::getValue() const;
 
 %ignore SpType;
 %ignore SpPref;
@@ -350,4 +351,5 @@
     }
   }
  }
+
 %include "include/opensmt/SMTConfig.h"
