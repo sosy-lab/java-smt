@@ -164,6 +164,7 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="-l:libgmp.a"/>
         </exec>
         <delete file="libopensmt.so"/>
+        <delete file="lib/native/source/opensmt/opensmt-wrap.o"/>
 
         <!-- Compile java proxies and create jar file -->
         <mkdir dir="${path.source}/bin"/>
@@ -172,6 +173,7 @@ SPDX-License-Identifier: Apache-2.0
         </javac>
         <jar destfile="opensmt-${opensmt.version}.jar" basedir="${path.source}/bin"/>
         <delete dir="${path.source}/bin"/>
+        <delete dir="lib/native/source/opensmt/src"/>
     </target>
 
     <target name="publish-opensmt" depends="package-opensmt, load-ivy"
