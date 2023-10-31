@@ -49,7 +49,7 @@ SPDX-License-Identifier: Apache-2.0
         <mkdir dir="${path.install}"/>
 
         <!-- Patch OpenSMT to avoid swig errors and add some required features -->
-        <exec executable="git" dir="${opensmt.path}" failonerror="true">
+        <exec executable="git" dir="${opensmt.path}" failonerror="false">
             <arg value="apply"/>
             <arg value="${path.source}/api.patch"/>
         </exec>
@@ -72,8 +72,10 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="${path.source}/api.patch"/>
         </exec>
 
-        <!-- Copy swig file to the install directory -->
-        <copy file="${path.source}/opensmt.i" toFile="${path.install}/opensmt.i"/>
+        <!-- Copy swig files to the install directory -->
+        <copy todir="${path.install}" >  
+          <fileset dir="${path.source}" includes="**"/>  
+        </copy> 
 
         <!-- Dump ${opensmt.version} to a file so that we can use it from swig -->
         <echo file="${path.install}/Version.h">#define VERSION "${opensmt.version}"</echo>
@@ -90,7 +92,7 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="java/opensmt"/>
             <arg value="-o"/>
             <arg value="opensmt-wrap.cpp"/>
-            <arg value="opensmt.i"/>
+            <arg value="swig/opensmt.i"/>
         </exec>
 
         <!-- Copy (only!) the required java files to the source tree. This should make sure that compilation fails
@@ -99,7 +101,6 @@ SPDX-License-Identifier: Apache-2.0
             <fileset dir="${path.install}/java/opensmt">
                 <include name="ArithLogic.java"/>
                 <include name="InterpolationContext.java"/>
-                <include name="ItpAlgorithm.java"/>
                 <include name="Logic.java"/>
                 <include name="LogicFactory.java"/>
                 <include name="Logic_t.java"/>
