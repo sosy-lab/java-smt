@@ -54,16 +54,21 @@ public class Main {
     //IntegerFormulaManager imgr = fmgr.getIntegerFormulaManager();
     //BitvectorFormulaManager bimgr = fmgr.getBitvectorFormulaManager();
     UFManager umgr =  fmgr.getUFManager();
+    BooleanFormula term1 = bmgr.and(bmgr.makeBoolean(true), bmgr.makeVariable("a"));
+    BooleanFormula term2 = bmgr.and(term1, bmgr.makeVariable("e"), bmgr.makeTrue());
+    BooleanFormula term3 = bmgr.or(bmgr.makeVariable("b"), bmgr.makeFalse());
+    BooleanFormula term4 = bmgr.or(term3, term2, term1, bmgr.makeVariable("f"));
+    BooleanFormula term5 = bmgr.implication(term2, term1);
+    BooleanFormula term6 = bmgr.xor(bmgr.makeVariable("c"), bmgr.makeVariable("d"));
+    BooleanFormula term7 = bmgr.equivalence(term3, term4);
 
-    BooleanFormula actualFormula = bmgr.makeVariable("a");
-    BooleanFormula bla = bmgr.makeVariable("b");
-    BooleanFormula constraint = bmgr.and(actualFormula, bla);
+    BooleanFormula result = bmgr.ifThenElse(term5, term6, term7);
 
 
 
     try (ProverEnvironment prover =
              context.newProverEnvironment(SolverContext.ProverOptions.GENERATE_MODELS)) {
-      prover.addConstraint(constraint);
+      prover.addConstraint(result);
 
       boolean isUnsat = prover.isUnsat();
       if (!isUnsat) {

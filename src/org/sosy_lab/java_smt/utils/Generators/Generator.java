@@ -36,9 +36,9 @@ public class Generator {
   static String fileName = "Out.smt2";
   public static StringBuilder lines = new StringBuilder();
 
-  static List<RecursiveString> executedAggregator = new ArrayList<>();
+  public static List<RecursiveString<?,?>> executedAggregator = new ArrayList<>();
 
-  public static List<RecursiveString> registeredVariables = new ArrayList<>();
+  public static List<RecursiveString<?,?>> registeredVariables = new ArrayList<>();
 
   public static void writeToFile(String line) throws IOException {
     File file = new File(fileName);
@@ -48,7 +48,7 @@ public class Generator {
   }
 
   public static String evaluateRecursive(Object constraint) {
-    RecursiveString methodToEvaluate = executedAggregator
+    RecursiveString<?,?> methodToEvaluate = executedAggregator
         .stream()
         .filter(x -> x.getResult().equals(constraint))
         .findFirst()
@@ -66,17 +66,17 @@ public class Generator {
         String evaluatedInput = evaluateRecursive(value);
         evaluatedInputs.add(evaluatedInput);
       }
-      String result = (String) methodToEvaluate.getSaveResult().apply(evaluatedInputs);
+      String result = methodToEvaluate.getSaveResult().apply(evaluatedInputs);
       return result;
     }
   }
 
   public static void logAddConstraint(BooleanFormula constraint) {
     String result = evaluateRecursive(constraint);
-    List<RecursiveString> uniqueRegisteredValues =
+    List<RecursiveString<?,?>> uniqueRegisteredValues =
         registeredVariables.stream().distinct().collect(Collectors.toList());
     String command = "(assert ";
-    for (RecursiveString variable : uniqueRegisteredValues) {
+    for (RecursiveString<?,?> variable : uniqueRegisteredValues) {
       if (variable.variableType.equals("Bool")) {
         String newEntry = "(declare-const " + variable.inputParams.get(0) + " Bool)\n";
         if (lines.indexOf(newEntry) == -1) {

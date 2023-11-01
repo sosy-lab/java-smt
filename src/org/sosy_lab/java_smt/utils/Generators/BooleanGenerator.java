@@ -33,28 +33,29 @@ public class BooleanGenerator {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pVar);
     Function<List<Object>, String> saveResult = inPlaceInputParams -> (String) inPlaceInputParams.get(0);
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Bool"));
+    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Bool"));
   }
 
   public static void logMakeTrue(Object result, String pVar) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pVar);
     Function<List<Object>, String> saveResult = inPlaceInputParams -> (String) inPlaceInputParams.get(0);
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Direct"));
+    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Direct"));
   }
 
   public static void logMakeFalse(Object result, String pVar) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pVar);
     Function<List<Object>, String> saveResult = inPlaceInputParams -> (String) inPlaceInputParams.get(0);
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Direct"));
+    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult,
+        "Direct"));
   }
 
   public static void logNot(Object result, BooleanFormula pBits) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pBits);
     Function<List<Object>, String> saveResult = inPlaceInputParams -> "(not " + inPlaceInputParams.get(0) + ")";
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
 
   public static void logOr(Object result, BooleanFormula pBits1, BooleanFormula pBits2) {
@@ -133,10 +134,6 @@ public class BooleanGenerator {
         inPlaceInputParams -> "(=> " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
-
-  //TODO: logIsTrue (not necessary?)
-
-  //TODO: logIsFalse (not necessary?)
 
   public static void logIfThenElse(Object result, BooleanFormula pBits1, Object f1, Object f2) {
     List<Object> inputParams = new ArrayList<>();

@@ -20,45 +20,197 @@
 
 package org.sosy_lab.java_smt.test;
 
-import java.io.IOException;
 import org.junit.*;
-import org.sosy_lab.common.ShutdownManager;
-import org.sosy_lab.common.configuration.Configuration;
-import org.sosy_lab.common.log.BasicLogManager;
-import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.java_smt.SolverContextFactory;
-import org.sosy_lab.java_smt.api.BooleanFormulaManager;
-import org.sosy_lab.java_smt.api.FormulaManager;
-import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.java_smt.api.ProverEnvironment;
-import org.sosy_lab.java_smt.api.SolverContext;
-import org.sosy_lab.java_smt.utils.Generators.BooleanGenerator;
 import org.sosy_lab.java_smt.utils.Generators.Generator;
-import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.SolverException;
 
 
 public class BooleanGeneratorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0  {
 
-  private static int i = 0;
+  public void clearGenerator() {
+    Generator.lines.delete(0, Generator.lines.length());
+    Generator.registeredVariables.clear();
+    Generator.executedAggregator.clear();
+  }
   @Test
   public void testMakeVariable() {
-    try (ProverEnvironment prover =
-             context.newProverEnvironment(SolverContext.ProverOptions.GENERATE_MODELS)) {
-      Generator.lines.delete(0, Generator.lines.length());
-      Generator.registeredVariables.clear();
-      BooleanFormula a = bmgr.makeVariable("a" + i);
+      clearGenerator();
+      BooleanFormula a = bmgr.makeVariable("a");
       Generator.logAddConstraint(a);
       String actualResult = String.valueOf(Generator.lines);
 
-      String expectedResult = String.format("(declare-const a%1$s Bool)\n"
-          + "(assert a%1$s)\n", String.valueOf(i));
-      Generator.dumpSMTLIB2();
+      String expectedResult = "(declare-const a Bool)\n"
+          + "(assert a)\n";
       Assert.assertEquals(expectedResult, actualResult);
-      i++;
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
   }
+
+  @Test
+  public void testMakeTrue() {
+    clearGenerator();
+    BooleanFormula a = bmgr.makeTrue();
+    Generator.logAddConstraint(a);
+    String actualResult = String.valueOf(Generator.lines);
+
+    String expectedResult = "(assert true)\n";
+    Assert.assertEquals(expectedResult, actualResult);
+  }
+
+  @Test
+  public void testMakeFalse() {
+    clearGenerator();
+    BooleanFormula a = bmgr.makeFalse();
+    Generator.logAddConstraint(a);
+    String actualResult = String.valueOf(Generator.lines);
+
+    String expectedResult = "(assert false)\n";
+    Assert.assertEquals(expectedResult, actualResult);
+  }
+  @Test
+  public void testNot() {
+    clearGenerator();
+    BooleanFormula a = bmgr.not(bmgr.makeVariable("a"));
+    Generator.logAddConstraint(a);
+    String actualResult = String.valueOf(Generator.lines);
+
+    String expectedResult = "(declare-const a Bool)\n"
+        + "(assert (not a))\n";
+    Assert.assertEquals(expectedResult, actualResult);
+  }
+
+  @Test
+  public void testBinaryOr() {
+    clearGenerator();
+    BooleanFormula result = bmgr.or(bmgr.makeVariable("a"), bmgr.makeVariable("b"));
+    Generator.logAddConstraint(result);
+    String actualResult = String.valueOf(Generator.lines);
+
+    String expectedResult = "(declare-const a Bool)\n"
+        + "(declare-const b Bool)\n"
+        + "(assert (or a b))\n";
+    Assert.assertEquals(expectedResult, actualResult);
+  }
+
+  @Test
+  public void testCollectionOr() {
+    clearGenerator();
+    BooleanFormula result = bmgr.or(bmgr.makeVariable("a"), bmgr.makeVariable("b"),
+        bmgr.makeVariable("c"));
+    Generator.logAddConstraint(result);
+    String actualResult = String.valueOf(Generator.lines);
+
+    String expectedResult = "(declare-const a Bool)\n"
+        + "(declare-const b Bool)\n"
+        + "(declare-const c Bool)\n"
+        + "(assert (or a b c))\n";
+    Assert.assertEquals(expectedResult, actualResult);
+  }
+
+  @Test
+  public void testBinaryAnd() {
+    clearGenerator();
+    BooleanFormula result = bmgr.and(bmgr.makeVariable("a"), bmgr.makeVariable("b"));
+    Generator.logAddConstraint(result);
+    String actualResult = String.valueOf(Generator.lines);
+
+    String expectedResult = "(declare-const a Bool)\n"
+        + "(declare-const b Bool)\n"
+        + "(assert (and a b))\n";
+    Assert.assertEquals(expectedResult, actualResult);
+  }
+
+  @Test
+  public void testCollectionAnd() {
+    clearGenerator();
+    BooleanFormula result = bmgr.and(bmgr.makeVariable("a"), bmgr.makeVariable("b"),
+        bmgr.makeVariable("c"));
+    Generator.logAddConstraint(result);
+    String actualResult = String.valueOf(Generator.lines);
+
+    String expectedResult = "(declare-const a Bool)\n"
+        + "(declare-const b Bool)\n"
+        + "(declare-const c Bool)\n"
+        + "(assert (and a b c))\n";
+    Assert.assertEquals(expectedResult, actualResult);
+  }
+
+  @Test
+  public void testXor() {
+    clearGenerator();
+    BooleanFormula result = bmgr.xor(bmgr.makeVariable("a"), bmgr.makeVariable("b"));
+    Generator.logAddConstraint(result);
+    String actualResult = String.valueOf(Generator.lines);
+
+    String expectedResult = "(declare-const a Bool)\n"
+        + "(declare-const b Bool)\n"
+        + "(assert (xor a b))\n";
+    Assert.assertEquals(expectedResult, actualResult);
+  }
+
+  @Test
+  public void testEquivalence() {
+    clearGenerator();
+    BooleanFormula result = bmgr.equivalence(bmgr.makeVariable("a"), bmgr.makeVariable("b"));
+    Generator.logAddConstraint(result);
+    String actualResult = String.valueOf(Generator.lines);
+
+    String expectedResult = "(declare-const a Bool)\n"
+        + "(declare-const b Bool)\n"
+        + "(assert (= a b))\n";
+    Assert.assertEquals(expectedResult, actualResult);
+  }
+  @Test
+  public void testImplication() {
+    clearGenerator();
+    BooleanFormula result = bmgr.implication(bmgr.makeVariable("a"), bmgr.makeVariable("b"));
+    Generator.logAddConstraint(result);
+    String actualResult = String.valueOf(Generator.lines);
+
+    String expectedResult = "(declare-const a Bool)\n"
+        + "(declare-const b Bool)\n"
+        + "(assert (=> a b))\n";
+    Assert.assertEquals(expectedResult, actualResult);
+  }
+
+  @Test
+  public void testIfThenElse() {
+    clearGenerator();
+    BooleanFormula result = bmgr.ifThenElse(bmgr.makeVariable("a"), bmgr.makeVariable("b"),
+        bmgr.makeVariable("c"));
+    Generator.logAddConstraint(result);
+    String actualResult = String.valueOf(Generator.lines);
+
+    String expectedResult = "(declare-const a Bool)\n"
+        + "(declare-const b Bool)\n"
+        + "(declare-const c Bool)\n"
+        + "(assert (ite a b c))\n";
+    Assert.assertEquals(expectedResult, actualResult);
+  }
+
+  @Test
+  public void testNestedTerms() {
+    clearGenerator();
+    BooleanFormula term1 = bmgr.and(bmgr.makeBoolean(true), bmgr.makeVariable("a"));
+    BooleanFormula term2 = bmgr.and(term1, bmgr.makeVariable("e"), bmgr.makeTrue());
+    BooleanFormula term3 = bmgr.or(bmgr.makeVariable("b"), bmgr.makeFalse());
+    BooleanFormula term4 = bmgr.or(term3, term2, term1, bmgr.makeVariable("f"));
+    BooleanFormula term5 = bmgr.implication(term2, term1);
+    BooleanFormula term6 = bmgr.xor(bmgr.makeVariable("c"), bmgr.makeVariable("d"));
+    BooleanFormula term7 = bmgr.equivalence(term3, term4);
+
+    BooleanFormula result = bmgr.ifThenElse(term5, term6, term7);
+    Generator.logAddConstraint(result);
+    String actualResult = String.valueOf(Generator.lines);
+
+    String expectedResult = "(declare-const a Bool)\n"
+        + "(declare-const e Bool)\n"
+        + "(declare-const c Bool)\n"
+        + "(declare-const d Bool)\n"
+        + "(declare-const b Bool)\n"
+        + "(declare-const f Bool)\n"
+        + "(assert (ite (=> (and a e true) a) (xor c d) (= b (or b (and a e true)a e true) a f))"
+        + "))\n";
+    Assert.assertEquals(expectedResult, actualResult);
+  }
+
+
 }
