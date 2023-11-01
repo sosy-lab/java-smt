@@ -33,6 +33,7 @@ import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.*;
 import java.io.*;
+import org.sosy_lab.java_smt.utils.Generators.BooleanGenerator;
 import org.sosy_lab.java_smt.utils.Generators.Generator;
 import org.sosy_lab.java_smt.utils.Generators.UniversalModel;
 import org.sosy_lab.java_smt.utils.Parsers.*;
@@ -47,20 +48,22 @@ public class Main {
     ShutdownManager shutdown = ShutdownManager.create();
     SolverContext context =
         SolverContextFactory.createSolverContext(config, logger, shutdown.getNotifier(),
-            Solvers.MATHSAT5);
+            Solvers.BOOLECTOR);
     FormulaManager fmgr = context.getFormulaManager();
     BooleanFormulaManager bmgr = fmgr.getBooleanFormulaManager();
-    IntegerFormulaManager imgr = fmgr.getIntegerFormulaManager();
-    BitvectorFormulaManager bimgr = fmgr.getBitvectorFormulaManager();
+    //IntegerFormulaManager imgr = fmgr.getIntegerFormulaManager();
+    //BitvectorFormulaManager bimgr = fmgr.getBitvectorFormulaManager();
     UFManager umgr =  fmgr.getUFManager();
 
     BooleanFormula actualFormula = bmgr.makeVariable("a");
+    BooleanFormula bla = bmgr.makeVariable("b");
+    BooleanFormula constraint = bmgr.and(actualFormula, bla);
 
 
 
     try (ProverEnvironment prover =
              context.newProverEnvironment(SolverContext.ProverOptions.GENERATE_MODELS)) {
-      prover.addConstraint(actualFormula);
+      prover.addConstraint(constraint);
 
       boolean isUnsat = prover.isUnsat();
       if (!isUnsat) {

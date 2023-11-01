@@ -20,6 +20,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.UFManager;
+import org.sosy_lab.java_smt.utils.Generators.Generator;
 import org.sosy_lab.java_smt.utils.Generators.UFGenerator;
 
 /**
@@ -57,14 +58,18 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
       String pName, FormulaType<T> pReturnType, FormulaType<?>... pArgs) {
     checkVariableName(pName);
     FunctionDeclaration result = declareUF(pName, pReturnType, Arrays.asList(pArgs));
-    UFGenerator.logMakeFun(result, pName, pReturnType, pArgs);
+    if (Generator.isLoggingEnabled) {
+      UFGenerator.logMakeFun(result, pName, pReturnType, pArgs);
+    }
     return result;
   }
 
   @Override
   public <T extends Formula> T callUF(FunctionDeclaration<T> funcType, Formula... args) {
     T result = formulaCreator.callFunction(funcType, Arrays.asList(args));
-    UFGenerator.logCallFun(result, funcType, args);
+    if (Generator.isLoggingEnabled) {
+      UFGenerator.logCallFun(result, funcType, args);
+    }
     return result;
   }
 

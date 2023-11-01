@@ -17,6 +17,7 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.utils.Generators.ArrayGenerator;
+import org.sosy_lab.java_smt.utils.Generators.Generator;
 
 @SuppressWarnings({"ClassTypeParameterName", "MethodTypeParameterName"})
 public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
@@ -41,7 +42,9 @@ public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFu
 
     final TFormulaInfo term = select(extractInfo(pArray), extractInfo(pIndex));
     TE result = (TE) getFormulaCreator().encapsulate(elementType, term);
-    ArrayGenerator.logSelect(result, pArray, pIndex);
+    if (Generator.isLoggingEnabled) {
+      ArrayGenerator.logSelect(result, pArray, pIndex);
+    }
     return result;
   }
 
@@ -56,7 +59,9 @@ public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFu
 
     final TFormulaInfo term = store(extractInfo(pArray), extractInfo(pIndex), extractInfo(pValue));
     ArrayFormula result = getFormulaCreator().encapsulateArray(term, indexType, elementType);
-    ArrayGenerator.logStore(result, pArray, pIndex, pValue);
+    if (Generator.isLoggingEnabled) {
+      ArrayGenerator.logStore(result, pArray, pIndex, pValue);
+    }
     return result;
   }
 
@@ -79,7 +84,9 @@ public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFu
     checkVariableName(pName);
     final TFormulaInfo namedArrayFormula = internalMakeArray(pName, pIndexType, pElementType);
     ArrayFormula result = getFormulaCreator().encapsulateArray(namedArrayFormula, pIndexType, pElementType);
-    ArrayGenerator.logMakeArray(result, pName, pIndexType, pElementType);
+    if (Generator.isLoggingEnabled) {
+      ArrayGenerator.logMakeArray(result, pName, pIndexType, pElementType);
+    }
     return result;
   }
 
@@ -101,7 +108,9 @@ public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFu
       ArrayFormula<TI, TE> pArray1, ArrayFormula<TI, TE> pArray2) {
     BooleanFormula result = getFormulaCreator()
         .encapsulateBoolean(equivalence(extractInfo(pArray1), extractInfo(pArray2)));
-    ArrayGenerator.logArrayEquivalence(result, pArray1, pArray2);
+    if (Generator.isLoggingEnabled) {
+      ArrayGenerator.logArrayEquivalence(result, pArray1, pArray2);
+    }
     return result;
   }
 

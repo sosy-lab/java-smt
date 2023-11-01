@@ -24,6 +24,7 @@ import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.utils.Generators.BitvectorGenerator;
 import org.sosy_lab.java_smt.utils.Generators.BooleanGenerator;
+import org.sosy_lab.java_smt.utils.Generators.Generator;
 import org.sosy_lab.java_smt.utils.Generators.NumeralGenerator;
 
 @SuppressWarnings("ClassTypeParameterName")
@@ -60,7 +61,9 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
   public BitvectorFormula makeBitvector(int length, IntegerFormula pI) {
     TFormulaInfo param1 = extractInfo(pI);
     BitvectorFormula result = wrap(makeBitvectorImpl(length, param1));
-    BitvectorGenerator.logMakeBitVector(result, length, pI);
+    if (Generator.isLoggingEnabled) {
+      BitvectorGenerator.logMakeBitVector(result, length, pI);
+    }
     return result;
   }
 
@@ -71,10 +74,12 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     TFormulaInfo param1 = extractInfo(pI);
     IntegerFormula result = getFormulaCreator()
         .encapsulate(FormulaType.IntegerType, toIntegerFormulaImpl(param1, signed));
-    if (signed) {
-      BitvectorGenerator.logSToIntegerFormula(result, pI);
-    } else {
-      BitvectorGenerator.logUToIntegerFormula(result, pI);
+    if (Generator.isLoggingEnabled) {
+      if (signed) {
+        BitvectorGenerator.logSToIntegerFormula(result, pI);
+      } else {
+        BitvectorGenerator.logUToIntegerFormula(result, pI);
+      }
     }
     return result;
   }
@@ -85,7 +90,9 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
   public BitvectorFormula negate(BitvectorFormula pNumber) {
     TFormulaInfo param1 = extractInfo(pNumber);
     BitvectorFormula result = wrap(negate(param1));
-    BitvectorGenerator.logBVNegate(result, pNumber);
+    if (Generator.isLoggingEnabled) {
+      BitvectorGenerator.logBVNegate(result, pNumber);
+    }
     return result;
   }
 
@@ -97,7 +104,9 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
     BitvectorFormula result = wrap(add(param1, param2));
-    BitvectorGenerator.logBVAdd(result, pNumber1, pNumber2);
+    if (Generator.isLoggingEnabled) {
+      BitvectorGenerator.logBVAdd(result, pNumber1, pNumber2);
+    }
     return result;
   }
 
@@ -109,7 +118,9 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
     BitvectorFormula result = wrap(subtract(param1, param2));
-    BitvectorGenerator.logBVSub(result, pNumber1, pNumber2);
+    if (Generator.isLoggingEnabled) {
+      BitvectorGenerator.logBVSub(result, pNumber1, pNumber2);
+    }
     return result;
   }
 
@@ -122,10 +133,12 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
     BitvectorFormula result = wrap(divide(param1, param2, signed));
-    if (signed) {
-      BitvectorGenerator.logBVSDivide(result, pNumber1, pNumber2);
-    } else {
-      BitvectorGenerator.logBVUDivide(result, pNumber1, pNumber2);
+    if (Generator.isLoggingEnabled) {
+      if (signed) {
+        BitvectorGenerator.logBVSDivide(result, pNumber1, pNumber2);
+      } else {
+        BitvectorGenerator.logBVUDivide(result, pNumber1, pNumber2);
+      }
     }
     return result;
   }
@@ -140,10 +153,12 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
     BitvectorFormula result = wrap(modulo(param1, param2, signed));
-    if (signed) {
-      BitvectorGenerator.logBVSModulo(result, pNumber1, pNumber2);
-    } else {
-      BitvectorGenerator.logBVUModulo(result, pNumber1, pNumber2);
+    if (Generator.isLoggingEnabled) {
+      if (signed) {
+        BitvectorGenerator.logBVSModulo(result, pNumber1, pNumber2);
+      } else {
+        BitvectorGenerator.logBVUModulo(result, pNumber1, pNumber2);
+      }
     }
     return result;
   }
@@ -157,7 +172,9 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
     BitvectorFormula result = wrap(multiply(param1, param2));
-    BitvectorGenerator.logBVMultiply(result, pNumber1, pNumber2);
+    if (Generator.isLoggingEnabled) {
+      BitvectorGenerator.logBVMultiply(result, pNumber1, pNumber2);
+    }
     return result;
   }
 
@@ -169,7 +186,9 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
     BooleanFormula result = wrapBool(equal(param1, param2));
-    BitvectorGenerator.logBVEqual(result, pNumber1, pNumber2);
+    if (Generator.isLoggingEnabled) {
+      BitvectorGenerator.logBVEqual(result, pNumber1, pNumber2);
+    }
     return result;
   }
 
@@ -182,10 +201,12 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
     BooleanFormula result = wrapBool(greaterThan(param1, param2, signed));
-    if (signed) {
-      BitvectorGenerator.logBVSGreaterThan(result, pNumber1, pNumber2);
-    } else {
-      BitvectorGenerator.logBVUGreaterThan(result, pNumber1, pNumber2);
+    if (Generator.isLoggingEnabled) {
+      if (signed) {
+        BitvectorGenerator.logBVSGreaterThan(result, pNumber1, pNumber2);
+      } else {
+        BitvectorGenerator.logBVUGreaterThan(result, pNumber1, pNumber2);
+      }
     }
     return result;
   }
@@ -200,10 +221,12 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
     BooleanFormula result = wrapBool(greaterOrEquals(param1, param2, signed));
-    if (signed) {
-      BitvectorGenerator.logBVSGreaterOrEqual(result, pNumber1, pNumber2);
-    } else {
-      BitvectorGenerator.logBVUGreaterOrEqual(result, pNumber1, pNumber2);
+    if (Generator.isLoggingEnabled) {
+      if (signed) {
+        BitvectorGenerator.logBVSGreaterOrEqual(result, pNumber1, pNumber2);
+      } else {
+        BitvectorGenerator.logBVUGreaterOrEqual(result, pNumber1, pNumber2);
+      }
     }
     return result;
   }
@@ -218,10 +241,12 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
     BooleanFormula result = wrapBool(lessThan(param1, param2, signed));
-    if (signed) {
-      BitvectorGenerator.logBVSLessThan(result, pNumber1, pNumber2);
-    } else {
-      BitvectorGenerator.logBVULessThan(result, pNumber1, pNumber2);
+    if (Generator.isLoggingEnabled) {
+      if (signed) {
+        BitvectorGenerator.logBVSLessThan(result, pNumber1, pNumber2);
+      } else {
+        BitvectorGenerator.logBVULessThan(result, pNumber1, pNumber2);
+      }
     }
     return result;
   }
@@ -236,10 +261,12 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
     BooleanFormula result = wrapBool(lessOrEquals(param1, param2, signed));
-    if (signed) {
-      BitvectorGenerator.logBVSLessOrEqual(result, pNumber1, pNumber2);
-    } else {
-      BitvectorGenerator.logBVULessOrEqual(result, pNumber1, pNumber2);
+    if (Generator.isLoggingEnabled) {
+      if (signed) {
+        BitvectorGenerator.logBVSLessOrEqual(result, pNumber1, pNumber2);
+      } else {
+        BitvectorGenerator.logBVULessOrEqual(result, pNumber1, pNumber2);
+      }
     }
     return result;
   }
@@ -251,7 +278,9 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
   public BitvectorFormula not(BitvectorFormula pBits) {
     TFormulaInfo param1 = extractInfo(pBits);
     BitvectorFormula result = wrap(not(param1));
-    BitvectorGenerator.logBVNot(result, pBits);
+    if (Generator.isLoggingEnabled) {
+      BitvectorGenerator.logBVNot(result, pBits);
+    }
     return result;
   }
 
@@ -263,7 +292,9 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     TFormulaInfo param1 = extractInfo(pBits1);
     TFormulaInfo param2 = extractInfo(pBits2);
     BitvectorFormula result = wrap(and(param1, param2));
-    BitvectorGenerator.logBVAnd(result, pBits1, pBits2);
+    if (Generator.isLoggingEnabled) {
+      BitvectorGenerator.logBVAnd(result, pBits1, pBits2);
+    }
     return result;
   }
 
@@ -275,7 +306,9 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     TFormulaInfo param1 = extractInfo(pBits1);
     TFormulaInfo param2 = extractInfo(pBits2);
     BitvectorFormula result = wrap(or(param1, param2));
-    BitvectorGenerator.logBVOr(result, pBits1, pBits2);
+    if (Generator.isLoggingEnabled) {
+      BitvectorGenerator.logBVOr(result, pBits1, pBits2);
+    }
     return result;
   }
 
@@ -287,7 +320,9 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     TFormulaInfo param1 = extractInfo(pBits1);
     TFormulaInfo param2 = extractInfo(pBits2);
     BitvectorFormula result = wrap(xor(param1, param2));
-    BitvectorGenerator.logBVXor(result, pBits1, pBits2);
+    if (Generator.isLoggingEnabled) {
+      BitvectorGenerator.logBVXor(result, pBits1, pBits2);
+    }
     return result;
   }
 
@@ -296,8 +331,10 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
   @Override
   public BitvectorFormula makeBitvector(int pLength, long i) {
     BitvectorFormula result = wrap(makeBitvectorImpl(pLength, i));
-    BitvectorGenerator.logMakeBitVector(result, pLength, transformValueToRange(pLength,
-        BigInteger.valueOf(i)));
+    if (Generator.isLoggingEnabled) {
+      BitvectorGenerator.logMakeBitVector(result, pLength, transformValueToRange(pLength,
+          BigInteger.valueOf(i)));
+    }
     return result;
   }
 
@@ -308,7 +345,9 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
   @Override
   public BitvectorFormula makeBitvector(int pLength, BigInteger i) {
     BitvectorFormula result = wrap(makeBitvectorImpl(pLength, i));
-    BitvectorGenerator.logMakeBitVector(result, pLength, transformValueToRange(pLength, i));
+    if (Generator.isLoggingEnabled) {
+      BitvectorGenerator.logMakeBitVector(result, pLength, transformValueToRange(pLength, i));
+    }
     return result;
   }
 
@@ -336,7 +375,9 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
   @Override
   public BitvectorFormula makeVariable(BitvectorType type, String pVar) {
     BitvectorFormula result = makeVariable(type.getSize(), pVar);
-    BitvectorGenerator.logMakeBitVecVariable(result, type, pVar);
+    if (Generator.isLoggingEnabled) {
+      BitvectorGenerator.logMakeBitVecVariable(result, type, pVar);
+    }
     return result;
   }
 
@@ -344,7 +385,9 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
   public BitvectorFormula makeVariable(int pLength, String pVar) {
     checkVariableName(pVar);
     BitvectorFormula result = wrap(makeVariableImpl(pLength, pVar));
-    BitvectorGenerator.logMakeBitVecVariable(result, pLength, pVar);
+    if (Generator.isLoggingEnabled) {
+      BitvectorGenerator.logMakeBitVecVariable(result, pLength, pVar);
+    }
     return result;
   }
 
@@ -359,10 +402,12 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     TFormulaInfo param1 = extractInfo(pNumber);
     TFormulaInfo param2 = extractInfo(toShift);
     BitvectorFormula result = wrap(shiftRight(param1, param2, signed));
-    if (signed) {
-      BitvectorGenerator.logBVSShiftRight(result, pNumber, toShift);
-    } else {
-      BitvectorGenerator.logBVUShiftRight(result, pNumber, toShift);
+    if (Generator.isLoggingEnabled) {
+      if (signed) {
+        BitvectorGenerator.logBVSShiftRight(result, pNumber, toShift);
+      } else {
+        BitvectorGenerator.logBVUShiftRight(result, pNumber, toShift);
+      }
     }
     return result;
   }
@@ -375,7 +420,9 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     TFormulaInfo param1 = extractInfo(pNumber);
     TFormulaInfo param2 = extractInfo(toShift);
     BitvectorFormula result = wrap(shiftLeft(param1, param2));
-    BitvectorGenerator.logBVShiftLeft(result, pNumber, toShift);
+    if (Generator.isLoggingEnabled) {
+      BitvectorGenerator.logBVShiftLeft(result, pNumber, toShift);
+    }
     return result;
   }
 
@@ -386,7 +433,9 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     TFormulaInfo param1 = extractInfo(pNumber);
     TFormulaInfo param2 = extractInfo(pAppend);
     BitvectorFormula result = wrap(concat(param1, param2));
-    BitvectorGenerator.logConcat(result, pNumber, pAppend);
+    if (Generator.isLoggingEnabled) {
+      BitvectorGenerator.logConcat(result, pNumber, pAppend);
+    }
     return result;
   }
 
@@ -399,7 +448,9 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     checkArgument(pLsb <= pMsb, "invalid range (lsb %s larger than msb %s)", pLsb, pMsb);
     checkArgument(pMsb < bitsize, "index out of bounds (index %s beyond length %s)", pMsb, bitsize);
     BitvectorFormula result = wrap(extract(extractInfo(pNumber), pMsb, pLsb));
-    BitvectorGenerator.logExtract(result, pNumber, pMsb, pLsb);
+    if (Generator.isLoggingEnabled) {
+      BitvectorGenerator.logExtract(result, pNumber, pMsb, pLsb);
+    }
     return result;
   }
 
@@ -410,10 +461,12 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
       BitvectorFormula pNumber, int pExtensionBits, boolean pSigned) {
     checkArgument(0 <= pExtensionBits, "can not extend a negative number of bits");
     BitvectorFormula result = wrap(extend(extractInfo(pNumber), pExtensionBits, pSigned));
-    if (pSigned) {
-      BitvectorGenerator.logSExtend(result, pNumber, pExtensionBits);
-    } else {
-      BitvectorGenerator.logUExtend(result, pNumber, pExtensionBits);
+    if (Generator.isLoggingEnabled) {
+      if (pSigned) {
+        BitvectorGenerator.logSExtend(result, pNumber, pExtensionBits);
+      } else {
+        BitvectorGenerator.logUExtend(result, pNumber, pExtensionBits);
+      }
     }
     return result;
   }
@@ -424,7 +477,9 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
   public int getLength(BitvectorFormula pNumber) {
     FormulaType<BitvectorFormula> type = getFormulaCreator().getFormulaType(pNumber);
     int result = ((FormulaType.BitvectorType) type).getSize();
-    NumeralGenerator.logMakeNumber(result, String.valueOf(result));
+    if (Generator.isLoggingEnabled) {
+      NumeralGenerator.logMakeNumber(result, String.valueOf(result));
+    }
     return result;
   }
 
@@ -432,14 +487,20 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
   public final BooleanFormula distinct(List<BitvectorFormula> pBits) {
     // optimization
     if (pBits.size() <= 1) {
-      BooleanGenerator.logMakeTrue(bmgr.makeTrue(), "true");
+      if (Generator.isLoggingEnabled) {
+        BooleanGenerator.logMakeTrue(bmgr.makeTrue(), "true");
+      }
       return bmgr.makeTrue();
     } else if (pBits.size() > 1L << getLength(pBits.iterator().next())) {
-      BooleanGenerator.logMakeFalse(bmgr.makeFalse(), "false");
+      if (Generator.isLoggingEnabled) {
+        BooleanGenerator.logMakeFalse(bmgr.makeFalse(), "false");
+      }
       return bmgr.makeFalse();
     } else {
       BooleanFormula result = wrapBool(distinctImpl(Lists.transform(pBits, this::extractInfo)));
-      BitvectorGenerator.logBVDistinct(result, pBits);
+      if (Generator.isLoggingEnabled) {
+        BitvectorGenerator.logBVDistinct(result, pBits);
+      }
       return result;
     }
   }

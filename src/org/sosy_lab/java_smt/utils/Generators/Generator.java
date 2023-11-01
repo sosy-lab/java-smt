@@ -38,7 +38,7 @@ public class Generator {
 
   static List<RecursiveString> executedAggregator = new ArrayList<>();
 
-  private static List<RecursiveString> registeredVariables = new ArrayList<>();
+  public static List<RecursiveString> registeredVariables = new ArrayList<>();
 
   public static void writeToFile(String line) throws IOException {
     File file = new File(fileName);
@@ -78,14 +78,14 @@ public class Generator {
     String command = "(assert ";
     for (RecursiveString variable : uniqueRegisteredValues) {
       if (variable.variableType.equals("Bool")) {
-        String newEntry = "(declare-const " + variable.result + " Bool)\n";
+        String newEntry = "(declare-const " + variable.inputParams.get(0) + " Bool)\n";
         if (lines.indexOf(newEntry) == -1) {
           lines.append(newEntry);
         } else {
         }
       }
       if (variable.variableType.equals("Int")) {
-        String newEntry = "(declare-const " + variable.result + " Int)\n";
+        String newEntry = "(declare-const " + variable.inputParams.get(0) + " Int)\n";
         if (lines.indexOf(newEntry) == -1) {
           lines.append(newEntry);
         } else {
@@ -93,7 +93,7 @@ public class Generator {
       }
       if (variable.variableType.equals("BitVec")) {
         String newEntry =
-            "(declare-const " + variable.result + " (_ BitVec " + variable.bitVecLength + "))\n";
+            "(declare-const " + variable.inputParams.get(1) + " (_ BitVec " + variable.bitVecLength + "))\n";
         if (lines.indexOf(newEntry) == -1) {
           lines.append(newEntry);
         } else {
@@ -101,7 +101,7 @@ public class Generator {
       }
       if (variable.variableType.equals("Array")) {
         String newEntry =
-            "(declare-const " + variable.result + " (Array " + variable.ArrayIndexType + " "
+            "(declare-const " + variable.inputParams.get(0) + " (Array " + variable.ArrayIndexType + " "
                 + variable.ArrayValueType + "))"
                 + "\n";
         if (lines.indexOf(newEntry) == -1) {

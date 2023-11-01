@@ -47,6 +47,7 @@ public class BooleanGeneratorTest extends SolverBasedTest0.ParameterizedSolverBa
     try (ProverEnvironment prover =
              context.newProverEnvironment(SolverContext.ProverOptions.GENERATE_MODELS)) {
       Generator.lines.delete(0, Generator.lines.length());
+      Generator.registeredVariables.clear();
       BooleanFormula a = bmgr.makeVariable("a" + i);
       Generator.logAddConstraint(a);
       String actualResult = String.valueOf(Generator.lines);
