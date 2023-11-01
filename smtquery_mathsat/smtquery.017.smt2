@@ -21,3 +21,5 @@
 (define-fun .104 () Bool (and .101 .103))
 (define-fun .105 () Bool (and .23 .104))
 (assert .105)
+(check-sat)
+(get-model)

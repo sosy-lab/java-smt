@@ -142,6 +142,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
     Preconditions.checkState(!closed);
     Preconditions.checkState(wasLastSatCheckSat, NO_MODEL_HELP);
     checkGenerateModels();
+    //System.out.println(new CachingModel(getEvaluatorWithoutChecks()));
     return new CachingModel(getEvaluatorWithoutChecks());
   }
 

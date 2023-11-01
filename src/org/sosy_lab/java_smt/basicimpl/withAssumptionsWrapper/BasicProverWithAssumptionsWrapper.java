@@ -46,6 +46,7 @@ public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironme
   @Override
   public T addConstraint(BooleanFormula constraint) throws InterruptedException {
     clearAssumptions();
+    Generator.logAddConstraint(constraint);
     return delegate.addConstraint(constraint);
   }
 

@@ -228,12 +228,9 @@ public class SolverContextFactory {
       // statistics need to be the most outer wrapping layer.
       context = new StatisticsSolverContext(context);
     }
-    if (generateSMTLIB2) {
-      try {
-        Generator generator = new Generator();
-      } catch (IOException pE) {
-        throw new RuntimeException(pE);
-      }
+    if (generateSMTLIB2 || ! generateSMTLIB2) {
+      Generator.isLoggingEnabled = true;
+
     }
     return context;
   }

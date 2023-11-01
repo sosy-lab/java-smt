@@ -41,6 +41,7 @@ import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 import org.sosy_lab.java_smt.utils.Generators.BooleanGenerator;
+import org.sosy_lab.java_smt.utils.Generators.Generator;
 
 @SuppressWarnings("ClassTypeParameterName")
 public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
@@ -64,7 +65,9 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
   public BooleanFormula makeVariable(String pVar) {
     checkVariableName(pVar);
     BooleanFormula result = wrap(makeVariableImpl(pVar));
-    BooleanGenerator.logMakeVariable(result, pVar);
+    if (Generator.isLoggingEnabled) {
+      BooleanGenerator.logMakeVariable(result, pVar);
+    }
     return result;
   }
 

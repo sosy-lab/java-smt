@@ -328,7 +328,8 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
 
     List<Formula> operands = new ArrayList<>();
     getOperands(ctx, operands);
-
+    //System.out.println(operands);
+    //System.out.println(operator);
     switch (operator) {
       //boolean operators
       case "and":
@@ -1061,12 +1062,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
       variable = variable.split("\\|")[1];
       variable = variable.split("\\|")[0];
     }
-    List<String> declaration = new ArrayList<>();
-    List<FormulaType<?>> javaSorts = new ArrayList<>();
-    String returnType = ctx.getChild(ctx.getChildCount() - 1).getText();
-    for (int i = 0; i < ctx.getChildCount(); i++) {
-      declaration.add(ctx.getChild(i).getText());
-    }
+
     String name;
     String sort;
       for (int i = 0; i < ctx.sorted_var().size(); i++) {
@@ -1074,17 +1070,9 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
         sort = ctx.sorted_var(i).sort().getText();
         variables.put(name, new ParserFormula(sort, mapSort(sort)));
       }
-        String returnVal = ctx.sort().getText();
         Formula input = (Formula) visit(ctx.term());
 
-        ParserFormula temp =
-            new ParserFormula("UF", umgr.declareAndCallUF(variable, mapSort(returnVal), input));
-        temp.setReturnType(mapSort(returnVal));
-        //TODO: get rid of dummy
-        List<FormulaType<?>> dummy = new ArrayList<>();
-        dummy.add(FormulaType.IntegerType);
-        temp.setInputParams(dummy);
-        variables.put(variable, temp);
+        variables.put(variable, new ParserFormula("def-fun", input));
 
     return visitChildren(ctx);
   }

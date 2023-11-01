@@ -31,18 +31,14 @@ import java.util.stream.Collectors;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 
 public class Generator {
-
+  private Generator() {}
+  public static boolean isLoggingEnabled = false;
   static String fileName = "Out.smt2";
   public static StringBuilder lines = new StringBuilder();
 
-  static List<RecursiveString> executedAggregator =
-      new ArrayList<>();
+  static List<RecursiveString> executedAggregator = new ArrayList<>();
 
-  private static final List<RecursiveString> registeredVariables = new ArrayList<>();
-
-  public Generator() throws IOException {
-    lines.append("(set-logic AUFLIRA)\n");
-  }
+  private static List<RecursiveString> registeredVariables = new ArrayList<>();
 
   public static void writeToFile(String line) throws IOException {
     File file = new File(fileName);
@@ -114,7 +110,6 @@ public class Generator {
         }
       }
       if (variable.variableType.equals("UFSort")) {
-        System.out.println(variable.result);
         String newEntry =
             "(declare-sort " + variable.result + " 0)\n";
         if (lines.indexOf(newEntry) == -1) {
@@ -141,6 +136,7 @@ public class Generator {
     String endSMTLIB2 = "(exit)";
     lines.append(endSMTLIB2);
     writeToFile(String.valueOf(lines));
+    lines.delete(0, lines.length()-1);
   }
 
 }

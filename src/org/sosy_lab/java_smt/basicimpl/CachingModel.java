@@ -30,6 +30,7 @@ public class CachingModel implements Model {
 
   public CachingModel(Model pDelegate) {
     delegate = Preconditions.checkNotNull(pDelegate);
+    System.out.println(pDelegate);
   }
 
   @Override
