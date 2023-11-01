@@ -1093,32 +1093,23 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     IntegerFormula one = imgr.makeNumber(1);
 
     IntegerFormula a = imgr.makeVariable("a");
-
-    // build formula: 1 = A = 0
-    BooleanFormula A = bmgr.and(imgr.equal(a, zero), imgr.equal(a, one));
-
-    T p1 = stack.push(A);
-
-    assertThat(stack).isUnsatisfiable();
-
-    BooleanFormula interpol1 = stack.getInterpolant(ImmutableList.of(p1));
-
-    assertThatFormula(interpol1).isEqualTo(bmgr.makeFalse());
-
-    stack.pop();
-
     IntegerFormula b = imgr.makeVariable("b");
 
+    // build formula "1 = A = 0", then check interpolant
+    BooleanFormula A = bmgr.and(imgr.equal(a, zero), imgr.equal(a, one));
+    T p1 = stack.push(A);
+    assertThat(stack).isUnsatisfiable();
+    BooleanFormula interpol1 = stack.getInterpolant(ImmutableList.of(p1));
+    assertThatFormula(interpol1).isEqualTo(bmgr.makeFalse());
+    stack.pop();
+
+    // build formulas "a < 0" and "b < 0 && 1 < b", then check interpolant
     BooleanFormula B1 = imgr.lessThan(a, zero);
     BooleanFormula B2 = bmgr.and(imgr.lessThan(b, zero), imgr.lessThan(one, b));
-
     T p2 = stack.push(B1);
     stack.push(B2);
-
     assertThat(stack).isUnsatisfiable();
-
     BooleanFormula interpol2 = stack.getInterpolant(ImmutableList.of(p2));
-
     assertThatFormula(interpol2).isEqualTo(bmgr.makeTrue());
   }
 
