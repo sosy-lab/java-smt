@@ -60,15 +60,15 @@ class OpenSmtInterpolatingProver extends OpenSmtAbstractProver<Integer>
   }
 
   @Override
-  public void push() throws InterruptedException {
-    super.push();
+  protected void pushImpl() {
+    super.pushImpl();
     trackedConstraints.push(trackedConstraints.peek());
   }
 
   @Override
-  public void pop() {
-    super.pop();
+  protected void popImpl() {
     trackedConstraints.pop();
+    super.popImpl();
   }
 
   @Override

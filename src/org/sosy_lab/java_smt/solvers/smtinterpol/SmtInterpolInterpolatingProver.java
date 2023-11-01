@@ -38,7 +38,7 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String>
   }
 
   @Override
-  public String addConstraint(BooleanFormula constraint) throws InterruptedException {
+  protected String addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
     return super.addConstraint0(constraint);
   }
 

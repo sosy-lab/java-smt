@@ -49,7 +49,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
   }
 
   @Override
-  public Integer addConstraint(BooleanFormula constraint) throws InterruptedException {
+  protected Integer addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
     return addConstraint0(constraint);
   }
 

@@ -82,20 +82,15 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
   }
 
   @Override
-  public void push() throws InterruptedException {
-    Preconditions.checkState(!closed);
+  protected void pushImpl() {
     setChanged();
-    super.push();
     osmtSolver.push();
   }
 
   @Override
-  public void pop() {
-    Preconditions.checkState(!closed);
+  protected void popImpl() {
     setChanged();
-    Preconditions.checkState(size() > 0, "Tried to pop from an empty solver stack");
     osmtSolver.pop();
-    super.pop();
   }
 
   @Nullable
@@ -103,10 +98,8 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
 
   @Override
   @Nullable
-  public T addConstraint(BooleanFormula pF) throws InterruptedException {
-    Preconditions.checkState(!closed);
+  protected T addConstraintImpl(BooleanFormula pF) throws InterruptedException {
     setChanged();
-    super.addConstraint(pF);
     PTRef f = creator.extractInfo(pF);
     return addConstraintImpl(f);
   }

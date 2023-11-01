@@ -76,25 +76,20 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   }
 
   @Override
-  public void push() throws InterruptedException {
-    checkState(!closed);
-    super.push();
+  protected void pushImpl() {
     annotatedTerms.add(annotatedTerms.peek());
     env.push(1);
   }
 
   @Override
-  public void pop() {
-    checkState(!closed);
+  protected void popImpl() {
     env.pop(1);
     annotatedTerms.pop();
-    super.pop();
   }
 
   @CanIgnoreReturnValue
   protected String addConstraint0(BooleanFormula constraint) throws InterruptedException {
     Preconditions.checkState(!closed);
-    super.addConstraint(constraint);
 
     // create a term-name, used for unsat-core or interpolation, otherwise there is no overhead.
     String termName = generateTermName();

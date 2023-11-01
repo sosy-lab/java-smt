@@ -65,11 +65,11 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
   }
 
   @Override
-  public Term addConstraint(BooleanFormula pConstraint) throws InterruptedException {
+  protected Term addConstraintImpl(BooleanFormula pConstraint) throws InterruptedException {
     checkState(!closed);
     Term t = creator.extractInfo(pConstraint);
 
-    super.addConstraint(pConstraint);
+    super.addConstraintImpl(pConstraint);
     return t; // t is not wrapped in the Abstract Class
   }
 

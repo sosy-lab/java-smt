@@ -85,19 +85,17 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   }
 
   @Override
-  public void pop() {
-    Preconditions.checkState(!closed);
-    if (size() <= stackSizeToUnsat) { // constraintStack and Yices stack have same level.
+  protected void popImpl() {
+    if (size() < stackSizeToUnsat) { // constraintStack and Yices stack have same level.
       yices_pop(curEnv);
       // Reset stackSizeToUnsat to bring the stack into a pushable state if it was UNSAT before.
       stackSizeToUnsat = Integer.MAX_VALUE;
     }
-    super.pop();
   }
 
   @Override
-  public @Nullable Void addConstraint(BooleanFormula pConstraint) throws InterruptedException {
-    super.addConstraint(pConstraint);
+  protected @Nullable Void addConstraintImpl(BooleanFormula pConstraint)
+      throws InterruptedException {
     if (!generateUnsatCores) { // unsat core does not work with incremental mode
       int constraint = creator.extractInfo(pConstraint);
       yices_assert_formula(curEnv, constraint);
@@ -106,10 +104,8 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   }
 
   @Override
-  public void push() throws InterruptedException {
-    Preconditions.checkState(!closed);
-    super.push();
-    if (size() <= stackSizeToUnsat && yices_context_status(curEnv) != YICES_STATUS_UNSAT) {
+  protected void pushImpl() throws InterruptedException {
+    if (size() < stackSizeToUnsat && yices_context_status(curEnv) != YICES_STATUS_UNSAT) {
       // Ensure that constraintStack and Yices stack are on the same level
       // and Context is not UNSAT from assertions since last push.
       yices_push(curEnv);

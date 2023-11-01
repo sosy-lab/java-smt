@@ -83,25 +83,33 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public void push() throws InterruptedException {
+  public final void push() throws InterruptedException {
     checkState(!closed);
+    pushImpl();
     assertedFormulas.add(new LinkedHashSet<>());
   }
 
+  protected abstract void pushImpl() throws InterruptedException;
+
   @Override
-  public void pop() {
+  public final void pop() {
     checkState(!closed);
     checkState(assertedFormulas.size() > 1, "initial level must remain until close");
     assertedFormulas.remove(assertedFormulas.size() - 1); // remove last
+    popImpl();
   }
+
+  protected abstract void popImpl();
 
   @Override
   @CanIgnoreReturnValue
-  public @Nullable T addConstraint(BooleanFormula constraint) throws InterruptedException {
+  public final @Nullable T addConstraint(BooleanFormula constraint) throws InterruptedException {
     checkState(!closed);
     Iterables.getLast(assertedFormulas).add(constraint);
-    return null;
+    return addConstraintImpl(constraint);
   }
+
+  protected abstract T addConstraintImpl(BooleanFormula constraint) throws InterruptedException;
 
   protected ImmutableSet<BooleanFormula> getAssertedFormulas() {
     return FluentIterable.concat(assertedFormulas).toSet();

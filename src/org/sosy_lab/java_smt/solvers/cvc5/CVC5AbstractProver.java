@@ -80,10 +80,8 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   @Override
-  public void push() throws InterruptedException {
-    Preconditions.checkState(!closed);
+  protected void pushImpl() throws InterruptedException {
     setChanged();
-    super.push();
     if (incremental) {
       try {
         solver.push();
@@ -95,8 +93,7 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   @Override
-  public void pop() {
-    Preconditions.checkState(!closed);
+  protected void popImpl() {
     setChanged();
     if (incremental) {
       try {
@@ -106,14 +103,12 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
             "You tried to use pop() on an CVC5 assertion stack illegally.", e);
       }
     }
-    super.pop();
   }
 
   @Override
-  public @Nullable T addConstraint(BooleanFormula pF) throws InterruptedException {
+  protected @Nullable T addConstraintImpl(BooleanFormula pF) throws InterruptedException {
     Preconditions.checkState(!closed);
     setChanged();
-    super.addConstraint(pF);
     Term exp = creator.extractInfo(pF);
     if (incremental) {
       solver.assertFormula(exp);
