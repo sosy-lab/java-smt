@@ -91,7 +91,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   }
 
   @CanIgnoreReturnValue
-  protected int addConstraint0(BooleanFormula constraint) throws InterruptedException {
+  protected int addConstraint0(BooleanFormula constraint) {
     Preconditions.checkState(!closed);
     wasLastSatCheckSat = false;
 

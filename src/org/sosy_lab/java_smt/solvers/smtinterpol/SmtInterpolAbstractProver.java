@@ -88,7 +88,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   }
 
   @CanIgnoreReturnValue
-  protected String addConstraint0(BooleanFormula constraint) throws InterruptedException {
+  protected String addConstraint0(BooleanFormula constraint) {
     Preconditions.checkState(!closed);
 
     // create a term-name, used for unsat-core or interpolation, otherwise there is no overhead.

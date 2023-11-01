@@ -110,7 +110,8 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     return t;
   }
 
-  protected abstract @Nullable T addConstraintImpl(BooleanFormula constraint) throws InterruptedException;
+  protected abstract @Nullable T addConstraintImpl(BooleanFormula constraint)
+      throws InterruptedException;
 
   protected ImmutableSet<BooleanFormula> getAssertedFormulas() {
     ImmutableSet.Builder<BooleanFormula> builder = ImmutableSet.builder();
