@@ -102,7 +102,6 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
       throws InterruptedException {
     checkState(!closed);
     Iterables.getLast(assertedFormulas).add(constraint);
-    Generator.logAddConstraint(constraint);
     return null;
   }
 
