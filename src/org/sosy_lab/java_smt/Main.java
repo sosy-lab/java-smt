@@ -17,6 +17,9 @@ package org.sosy_lab.java_smt;/*
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.configuration.*;
 import org.sosy_lab.common.log.BasicLogManager;
@@ -40,7 +43,7 @@ public class Main {
     ShutdownManager shutdown = ShutdownManager.create();
     SolverContext context =
         SolverContextFactory.createSolverContext(config, logger, shutdown.getNotifier(),
-            Solvers.CVC5);
+            Solvers.Z3);
     FormulaManager fmgr = context.getFormulaManager();
     BooleanFormulaManager bmgr = fmgr.getBooleanFormulaManager();
     IntegerFormulaManager imgr = fmgr.getIntegerFormulaManager();
@@ -48,10 +51,14 @@ public class Main {
     RationalFormulaManager rmgr = fmgr.getRationalFormulaManager();
     UFManager umgr =  fmgr.getUFManager();
 
-    RationalFormula a = rmgr.makeNumber(-1);
+    RationalFormula a = Objects.requireNonNull(rmgr).makeNumber(-1);
     RationalFormula c = rmgr.makeNumber("3.4");
     RationalFormula e = rmgr.makeNumber(2147483.647);
-    BooleanFormula constraint = rmgr.equal(a, rmgr.add(c, e));
+    List<NumeralFormula> d = new ArrayList<>();
+    d.add(a); d.add(c); d.add(e);
+
+    BooleanFormula constraint = rmgr.distinct(d);
+
     System.out.println(constraint);
 
     try (ProverEnvironment prover =

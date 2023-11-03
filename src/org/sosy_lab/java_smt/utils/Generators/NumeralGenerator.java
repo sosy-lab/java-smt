@@ -20,23 +20,28 @@
 
 package org.sosy_lab.java_smt.utils.Generators;
 
+import static java.lang.Math.abs;
+
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
-import org.sosy_lab.java_smt.basicimpl.AbstractFormula;
+
 
 public class NumeralGenerator {
 
   public static void logMakeNumber(Object result, String pVar) {
-    if (result instanceof IntegerFormula && Integer.parseInt(pVar) < 0) {
-      throw new UnsupportedOperationException("SMTLIB2 does not support negative integers");
-    }
     List<Object> inputParams = new ArrayList<>();
-    if (result instanceof NumeralFormula) {
+    if (result instanceof IntegerFormula && Integer.parseInt(pVar) < 0) {
+      String absVar = String.valueOf(abs(Integer.parseInt(pVar)));
+      inputParams.add(absVar);
+      Function<List<Object>, String> saveResult =
+          inPlaceInputParams -> "(- " + inPlaceInputParams.get(0) + ")";
+      Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult,
+          "Direct"));
+    } else if (result instanceof NumeralFormula) {
       String checkedVar = String.valueOf(result);
       inputParams.add(checkedVar);
     } else {
@@ -88,15 +93,16 @@ public class NumeralGenerator {
     Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
 
-  public static void logSum(Object result, List operands) {
-    StringBuilder out = new StringBuilder();
-    out.append("(+ ");
+  public static void logSum(Object result, List<?> operands) {
+
     List<Object> inputParams = new ArrayList<>();
     for (Object pOperand : operands) {
       inputParams.add(pOperand.toString());
     }
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> {
+          StringBuilder out = new StringBuilder();
+          out.append("(+ ");
           inPlaceInputParams.forEach((c) -> {out.append(c); out.append(" ");}); return String.valueOf(
               out.deleteCharAt(out.length()-1).append(")"));};
     Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
@@ -131,24 +137,12 @@ public class NumeralGenerator {
 
   public static void logModularCongruence(Object result, Object pNumber1, Object pNumber2,
                                           long pModulo) {
-    List<Object> inputParams = new ArrayList<>();
-    inputParams.add(pNumber1);
-    inputParams.add(pNumber2);
-    inputParams.add(Long.toString(pModulo));
-    Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(= (mod " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(2) + ") (mod " + inPlaceInputParams.get(1) + " " + inPlaceInputParams.get(2) + "))";
-    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
+    throw new UnsupportedOperationException("Modular Congruence is not available in SMTLIB2. ");
   }
 
   public static void logModularCongruence(Object result, Object pNumber1, Object pNumber2,
                                           BigInteger pModulo) {
-    List<Object> inputParams = new ArrayList<>();
-    inputParams.add(pNumber1);
-    inputParams.add(pNumber2);
-    inputParams.add(pModulo.toString());
-    Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(= (mod " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(2) + ") (mod " + inPlaceInputParams.get(1) + " " + inPlaceInputParams.get(2) + "))";
-    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
+    throw new UnsupportedOperationException("Modular Congruence is not available in SMTLIB2. ");
   }
 
   public static void logMultiply(Object result, Object pNumber1, Object pNumber2) {
@@ -160,15 +154,15 @@ public class NumeralGenerator {
     Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
 
-  public static void logDistinct(Object result, List operands) {
-    StringBuilder out = new StringBuilder();
-    out.append("(distinct ");
+  public static void logDistinct(Object result, List<?> operands) {
     List<Object> inputParams = new ArrayList<>();
     for (Object pOperand : operands) {
       inputParams.add(pOperand.toString());
     }
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> {
+          StringBuilder out = new StringBuilder();
+          out.append("(distinct ");
           inPlaceInputParams.forEach((c) -> {out.append(c); out.append(" ");}); return String.valueOf(
               out.deleteCharAt(out.length()-1).append(")"));};
     Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
