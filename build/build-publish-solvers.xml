@@ -49,7 +49,7 @@ SPDX-License-Identifier: Apache-2.0
         <mkdir dir="${path.install}"/>
 
         <!-- Patch OpenSMT to avoid swig errors and add some required features -->
-        <exec executable="git" dir="${opensmt.path}" failonerror="false">
+        <exec executable="git" dir="${opensmt.path}" failonerror="true">
             <arg value="apply"/>
             <arg value="${path.source}/api.patch"/>
         </exec>
