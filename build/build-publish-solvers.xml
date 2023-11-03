@@ -73,9 +73,9 @@ SPDX-License-Identifier: Apache-2.0
         </exec>
 
         <!-- Copy swig files to the install directory -->
-        <copy todir="${path.install}" >  
-          <fileset dir="${path.source}" includes="**"/>  
-        </copy> 
+        <copy todir="${path.install}" >
+          <fileset dir="${path.source}" includes="**"/>
+        </copy>
 
         <!-- Dump ${opensmt.version} to a file so that we can use it from swig -->
         <echo file="${path.install}/Version.h">#define VERSION "${opensmt.version}"</echo>
