@@ -50,7 +50,6 @@
     return $self->mkSelect({array, index});
   }
  }
-%ignore Logic::protectName (SymRef sr) const;
 %ignore Logic::getUniqueArgSort (SymRef sr) const;
 %ignore Logic::getUniqueArgSort (PTRef tr) const;
 %ignore Logic::getSym (const PTRef tr) const;
