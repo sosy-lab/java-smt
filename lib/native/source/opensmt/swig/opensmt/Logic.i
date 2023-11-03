@@ -6,6 +6,38 @@
 //
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
+// Override the exception handler for Logic.parse()
+// Any error thrown here should be recast as an IllegalArgumentException
+
+%exception Logic::parseFormula {
+  try { $action }
+  catch(ArithDivisionByZeroException& e) {
+    jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
+    jenv->ThrowNew(exceptionType, e.what());
+    return $null;
+  }
+  catch(LANonLinearException& e) {
+    jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
+    jenv->ThrowNew(exceptionType, e.what());
+    return $null;
+  }
+  catch(OsmtApiException& e) {
+    jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
+    jenv->ThrowNew(exceptionType, e.what());
+    return $null;
+  }
+  catch(OutOfMemoryException& e) {
+    jclass exceptionType = jenv->FindClass("java/lang/OutOfMemoryError");
+    jenv->ThrowNew(exceptionType, "");
+    return $null;
+  }
+  catch(...) {
+    jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
+    jenv->ThrowNew(exceptionType, "");
+    return $null;
+  }
+}
+
 %ignore Logic::propFormulasAppearingInUF;
 %ignore Logic::tk_val_uf_default;
 %ignore Logic::tk_val_bool_default;
