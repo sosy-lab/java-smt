@@ -122,7 +122,7 @@ public class BooleanGeneratorTest extends SolverBasedTest0.ParameterizedSolverBa
   public void testCollectionAnd() {
     clearGenerator();
     BooleanFormula result = bmgr.and(bmgr.makeVariable("a"), bmgr.makeVariable("b"),
-        bmgr.makeVariable("c"));
+        bmgr.makeVariable("c"), bmgr.makeVariable("d"));
     Generator.logAddConstraint(result);
     String actualResult = String.valueOf(Generator.lines);
 
@@ -191,6 +191,7 @@ public class BooleanGeneratorTest extends SolverBasedTest0.ParameterizedSolverBa
     clearGenerator();
     BooleanFormula term1 = bmgr.and(bmgr.makeBoolean(true), bmgr.makeVariable("a"));
     BooleanFormula term2 = bmgr.and(term1, bmgr.makeVariable("e"), bmgr.makeTrue());
+    BooleanFormula term8 = bmgr.and(term1, term2, bmgr.makeVariable("x"));
     BooleanFormula term3 = bmgr.or(bmgr.makeVariable("b"), bmgr.makeFalse());
     BooleanFormula term4 = bmgr.or(term3, term2, term1, bmgr.makeVariable("f"));
     BooleanFormula term5 = bmgr.implication(term2, term1);
@@ -198,7 +199,7 @@ public class BooleanGeneratorTest extends SolverBasedTest0.ParameterizedSolverBa
     BooleanFormula term7 = bmgr.equivalence(term3, term4);
 
     BooleanFormula result = bmgr.ifThenElse(term5, term6, term7);
-    Generator.logAddConstraint(result);
+    Generator.logAddConstraint(term8);
     String actualResult = String.valueOf(Generator.lines);
 
     String expectedResult = "(declare-const a Bool)\n"

@@ -24,6 +24,7 @@ import ap.parser.IExpression;
 import ap.types.Sort;
 import com.google.common.collect.ImmutableList;
 import javax.annotation.Nullable;
+import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
@@ -37,6 +38,8 @@ public class UniversalModel extends AbstractModel {
 
   @Override
   public ImmutableList<ValueAssignment> asList() {
+    formulaManager.getBooleanFormulaManager().equivalence()
+
     return null;
   }
 

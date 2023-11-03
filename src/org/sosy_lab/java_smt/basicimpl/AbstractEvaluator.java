@@ -18,6 +18,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.EnumerationFormula;
 import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.StringFormula;
@@ -28,12 +29,14 @@ public abstract class AbstractEvaluator<TFormulaInfo, TType, TEnv> implements Ev
 
   private final AbstractProver<?> prover;
   protected final FormulaCreator<TFormulaInfo, TType, TEnv, ?> creator;
+  protected final AbstractFormulaManager<TFormulaInfo, TType, TEnv, ?> formulaManager;
   private boolean closed = false;
 
   protected AbstractEvaluator(
-      AbstractProver<?> pProver, FormulaCreator<TFormulaInfo, TType, TEnv, ?> creator) {
+      AbstractProver<?> pProver, AbstractFormulaManager<TFormulaInfo, TType, TEnv, ?> pFormulaManager) {
     this.prover = pProver;
-    this.creator = creator;
+    this.creator = pFormulaManager.getFormulaCreator();
+    this.formulaManager = pFormulaManager;
   }
 
   @SuppressWarnings("unchecked")

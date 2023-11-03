@@ -48,7 +48,7 @@ public class Main {
     ShutdownManager shutdown = ShutdownManager.create();
     SolverContext context =
         SolverContextFactory.createSolverContext(config, logger, shutdown.getNotifier(),
-            Solvers.BOOLECTOR);
+            Solvers.PRINCESS);
     FormulaManager fmgr = context.getFormulaManager();
     BooleanFormulaManager bmgr = fmgr.getBooleanFormulaManager();
     //IntegerFormulaManager imgr = fmgr.getIntegerFormulaManager();
@@ -65,16 +65,22 @@ public class Main {
     BooleanFormula result = bmgr.ifThenElse(term5, term6, term7);
 
 
-
     try (ProverEnvironment prover =
              context.newProverEnvironment(SolverContext.ProverOptions.GENERATE_MODELS)) {
-      prover.addConstraint(result);
+      //prover.addConstraint(result);
+      //prover.addConstraint(fmgr.universalParse("smtquery.002.smt2"));
+      prover.addConstraint(fmgr.parse("(declare-fun |id#2@1| () (_ BitVec 32))\n"
+          + "(assert (and (bvsle |id#2@1| #x0000000a) (bvslt |id#2@1| #x00000000)))\n"
+          + "(check-sat)"));
+
+      //{id#2@1 -> mod_cast(0, 4294967295, 2147483648)}
+      //{id#2@1 -> mod_cast(0, 4294967295, 2147483648)}
 
       boolean isUnsat = prover.isUnsat();
       if (!isUnsat) {
         Model model = prover.getModel();
         //Object value = model.evaluate(expectedFormula);
-        //System.out.println(value);
+        System.out.println(model);
 
       }
       Generator.dumpSMTLIB2();

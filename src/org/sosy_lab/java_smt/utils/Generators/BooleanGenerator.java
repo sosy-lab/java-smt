@@ -95,11 +95,7 @@ public class BooleanGenerator {
   public static void logAnd(Object result, Collection<BooleanFormula> pBits1) {
     StringBuilder out = new StringBuilder();
     out.append("(and ");
-    List<Object> inputParams = new ArrayList<>();
-    Iterator<BooleanFormula> it = pBits1.iterator();
-    for (int i = 0; i < pBits1.size(); i++) {
-      inputParams.add(it.next());
-    }
+    List<Object> inputParams = new ArrayList<>(pBits1);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> {
           inPlaceInputParams.forEach((c) -> {out.append(c); out.append(" ");}); return String.valueOf(
