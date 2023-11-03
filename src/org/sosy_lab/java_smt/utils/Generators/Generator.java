@@ -81,14 +81,18 @@ public class Generator {
         String newEntry = "(declare-const " + variable.inputParams.get(0) + " Bool)\n";
         if (lines.indexOf(newEntry) == -1) {
           lines.append(newEntry);
-        } else {
         }
       }
       if (variable.variableType.equals("Int")) {
         String newEntry = "(declare-const " + variable.inputParams.get(0) + " Int)\n";
         if (lines.indexOf(newEntry) == -1) {
           lines.append(newEntry);
-        } else {
+        }
+      }
+      if (variable.variableType.equals("Real")) {
+        String newEntry = "(declare-const " + variable.inputParams.get(0) + " Real)\n";
+        if (lines.indexOf(newEntry) == -1) {
+          lines.append(newEntry);
         }
       }
       if (variable.variableType.equals("BitVec")) {

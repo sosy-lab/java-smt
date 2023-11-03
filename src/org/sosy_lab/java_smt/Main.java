@@ -17,15 +17,6 @@ package org.sosy_lab.java_smt;/*
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
-import ap.Prover;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import javax.script.ScriptEngine;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
 import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.configuration.*;
 import org.sosy_lab.common.log.BasicLogManager;
@@ -33,7 +24,8 @@ import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.*;
 import java.io.*;
-import org.sosy_lab.java_smt.utils.Generators.BooleanGenerator;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.utils.Generators.Generator;
 import org.sosy_lab.java_smt.utils.Generators.UniversalModel;
 import org.sosy_lab.java_smt.utils.Parsers.*;
@@ -48,30 +40,27 @@ public class Main {
     ShutdownManager shutdown = ShutdownManager.create();
     SolverContext context =
         SolverContextFactory.createSolverContext(config, logger, shutdown.getNotifier(),
-            Solvers.PRINCESS);
+            Solvers.CVC5);
     FormulaManager fmgr = context.getFormulaManager();
     BooleanFormulaManager bmgr = fmgr.getBooleanFormulaManager();
-    //IntegerFormulaManager imgr = fmgr.getIntegerFormulaManager();
+    IntegerFormulaManager imgr = fmgr.getIntegerFormulaManager();
     //BitvectorFormulaManager bimgr = fmgr.getBitvectorFormulaManager();
+    RationalFormulaManager rmgr = fmgr.getRationalFormulaManager();
     UFManager umgr =  fmgr.getUFManager();
-    BooleanFormula term1 = bmgr.and(bmgr.makeBoolean(true), bmgr.makeVariable("a"));
-    BooleanFormula term2 = bmgr.and(term1, bmgr.makeVariable("e"), bmgr.makeTrue());
-    BooleanFormula term3 = bmgr.or(bmgr.makeVariable("b"), bmgr.makeFalse());
-    BooleanFormula term4 = bmgr.or(term3, term2, term1, bmgr.makeVariable("f"));
-    BooleanFormula term5 = bmgr.implication(term2, term1);
-    BooleanFormula term6 = bmgr.xor(bmgr.makeVariable("c"), bmgr.makeVariable("d"));
-    BooleanFormula term7 = bmgr.equivalence(term3, term4);
 
-    BooleanFormula result = bmgr.ifThenElse(term5, term6, term7);
-
+    RationalFormula a = rmgr.makeNumber(-1);
+    RationalFormula c = rmgr.makeNumber("3.4");
+    RationalFormula e = rmgr.makeNumber(2147483.647);
+    BooleanFormula constraint = rmgr.equal(a, rmgr.add(c, e));
+    System.out.println(constraint);
 
     try (ProverEnvironment prover =
              context.newProverEnvironment(SolverContext.ProverOptions.GENERATE_MODELS)) {
-      //prover.addConstraint(result);
+      prover.addConstraint(constraint);
       //prover.addConstraint(fmgr.universalParse("smtquery.002.smt2"));
-      prover.addConstraint(fmgr.parse("(declare-fun |id#2@1| () (_ BitVec 32))\n"
-          + "(assert (and (bvsle |id#2@1| #x0000000a) (bvslt |id#2@1| #x00000000)))\n"
-          + "(check-sat)"));
+      //prover.addConstraint(fmgr.parse("(declare-fun |id#2@1| () (_ BitVec 32))\n"
+      //    + "(assert (and (bvsle |id#2@1| #x0000000a) (bvslt |id#2@1| #x00000000)))\n"
+      //    + "(check-sat)"));
 
       //{id#2@1 -> mod_cast(0, 4294967295, 2147483648)}
       //{id#2@1 -> mod_cast(0, 4294967295, 2147483648)}
@@ -80,12 +69,12 @@ public class Main {
       if (!isUnsat) {
         Model model = prover.getModel();
         //Object value = model.evaluate(expectedFormula);
-        System.out.println(model);
+        System.out.println(model.getClass());
 
       }
       Generator.dumpSMTLIB2();
-    } catch (SolverException e) {
-      throw new RuntimeException(e);
+    } catch (SolverException v) {
+      throw new RuntimeException(v);
     }
   }
 }
