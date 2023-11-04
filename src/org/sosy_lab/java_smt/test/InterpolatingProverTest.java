@@ -1134,7 +1134,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     }
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "unused"})
   @Test
   public <T> void testInvalidToken() throws InterruptedException, SolverException {
     requireInterpolation();
