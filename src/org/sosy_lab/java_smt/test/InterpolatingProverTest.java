@@ -13,11 +13,13 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
 import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import org.junit.Test;
@@ -28,6 +30,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.solvers.cvc5.CVC5BooleanFormulaManager;
 import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
 /** This class contains some simple Junit-tests to check the interpolation-API of our solvers. */
@@ -1129,5 +1132,51 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
       assertThatFormula(bmgr.and(getLast(itps), getLast(formulas)))
           .implies(bmgr.makeBoolean(false));
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  @Test
+  public <T> void testInvalidToken() throws InterruptedException, SolverException {
+    requireInterpolation();
+    InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
+
+    // create and push formulas and solve them
+    IntegerFormula zero = imgr.makeNumber(0);
+    IntegerFormula one = imgr.makeNumber(1);
+    IntegerFormula a = imgr.makeVariable("a");
+    T p1 = stack.push(imgr.lessThan(a, zero));
+    T p2 = stack.push(imgr.lessThan(one, a));
+    assertThat(stack).isUnsatisfiable();
+
+    // try to solve with a null-token
+    List<T> lst = new ArrayList<>();
+    lst.add(null);
+    assertThrows(IllegalArgumentException.class, () -> stack.getInterpolant(lst));
+
+    // create an invalid interpolation token
+    final Object p3;
+    switch (solverToUse()) {
+      case CVC5:
+        p3 = ((CVC5BooleanFormulaManager) bmgr).makeVariableImpl("c");
+        break;
+      case MATHSAT5:
+        p3 = 12345;
+        break;
+      case OPENSMT:
+        p3 = 12347;
+        break;
+      case PRINCESS:
+        p3 = 12349;
+        break;
+      case SMTINTERPOL:
+        p3 = "some string";
+        break;
+      default:
+        p3 = null; // unexpected solver for interpolation
+    }
+
+    // and try to solve with the token
+    assertThrows(
+        IllegalArgumentException.class, () -> stack.getInterpolant(ImmutableList.of((T) p3)));
   }
 }
