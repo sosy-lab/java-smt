@@ -43,27 +43,30 @@ public class Main {
     ShutdownManager shutdown = ShutdownManager.create();
     SolverContext context =
         SolverContextFactory.createSolverContext(config, logger, shutdown.getNotifier(),
-            Solvers.Z3);
+            Solvers.PRINCESS);
     FormulaManager fmgr = context.getFormulaManager();
     BooleanFormulaManager bmgr = fmgr.getBooleanFormulaManager();
     IntegerFormulaManager imgr = fmgr.getIntegerFormulaManager();
-    //BitvectorFormulaManager bimgr = fmgr.getBitvectorFormulaManager();
-    RationalFormulaManager rmgr = fmgr.getRationalFormulaManager();
+    BitvectorFormulaManager bvmgr = fmgr.getBitvectorFormulaManager();
+    //RationalFormulaManager rmgr = fmgr.getRationalFormulaManager();
     UFManager umgr =  fmgr.getUFManager();
 
-    RationalFormula a = Objects.requireNonNull(rmgr).makeNumber(-1);
-    RationalFormula c = rmgr.makeNumber("3.4");
-    RationalFormula e = rmgr.makeNumber(2147483.647);
-    List<NumeralFormula> d = new ArrayList<>();
-    d.add(a); d.add(c); d.add(e);
-
-    BooleanFormula constraint = rmgr.distinct(d);
-
-    System.out.println(constraint);
+    BitvectorFormula a = bvmgr.makeVariable(32, "a");
+    BitvectorFormula b = bvmgr.makeVariable(32, "b");
+    BitvectorFormula c = bvmgr.makeVariable(FormulaType.getBitvectorTypeWithSize(5), "c");
+    BitvectorFormula d = bvmgr.makeVariable(FormulaType.getBitvectorTypeWithSize(5), "d");
+    BitvectorFormula e = bvmgr.makeVariable(214748366, "e");
+    BitvectorFormula f = bvmgr.makeVariable(214748366, "f");
+    BooleanFormula constraint1 = bvmgr.equal(a, b);
+    BooleanFormula constraint2 = bvmgr.equal(c, d);
+    BooleanFormula constraint3 = bvmgr.equal(e, f);
 
     try (ProverEnvironment prover =
              context.newProverEnvironment(SolverContext.ProverOptions.GENERATE_MODELS)) {
-      prover.addConstraint(constraint);
+      prover.addConstraint(constraint1);
+      prover.addConstraint(constraint1);
+      prover.addConstraint(constraint1);
+
       //prover.addConstraint(fmgr.universalParse("smtquery.002.smt2"));
       //prover.addConstraint(fmgr.parse("(declare-fun |id#2@1| () (_ BitVec 32))\n"
       //    + "(assert (and (bvsle |id#2@1| #x0000000a) (bvslt |id#2@1| #x00000000)))\n"

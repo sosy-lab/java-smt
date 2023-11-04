@@ -1,3 +1,3 @@
-(assert (distinct (- 1.0) (/ 17.0 5.0) (/ 2147483647.0 1000.0)))
+(assert (= (to_int (- 1.0)) (- (to_int 3.4) (to_int 2147483.647))))
 (check-sat)
 (exit)

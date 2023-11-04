@@ -25,14 +25,16 @@ import java.util.List;
 import java.util.Objects;
 import org.junit.Assert;
 import org.junit.Test;
+import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.utils.Generators.Generator;
 
 
-public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0  {
+public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0  {
 
   /** Integer and Rationals not supported by BOOLECTOR
    *  Rationals not supported by PRINCESS
@@ -45,12 +47,21 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
     Generator.executedAggregator.clear();
   }
   @Test
-  public void testMakeVariableInteger() {
-      clearGenerator();
-      IntegerFormula a = imgr.makeVariable("a");
-      IntegerFormula b = imgr.makeVariable("b");
-      BooleanFormula constraint = imgr.equal(a, b);
-      Generator.logAddConstraint(constraint);
+  public void testMakeVariable() {
+    clearGenerator();
+    BitvectorFormula a = bvmgr.makeVariable(32, "a");
+    BitvectorFormula b = bvmgr.makeVariable(32, "b");
+    BitvectorFormula c = bvmgr.makeVariable(FormulaType.getBitvectorTypeWithSize(5), "c");
+    BitvectorFormula d = bvmgr.makeVariable(FormulaType.getBitvectorTypeWithSize(5), "d");
+    BitvectorFormula e = bvmgr.makeVariable(2147483647, "e");
+    BitvectorFormula f = bvmgr.makeVariable(2147483647, "f");
+    BooleanFormula constraint1 = bvmgr.equal(a, b);
+    BooleanFormula constraint2 = bvmgr.equal(c, d);
+    BooleanFormula constraint3 = bvmgr.equal(e, f);
+    Generator.logAddConstraint(constraint1);
+    Generator.logAddConstraint(constraint2);
+    Generator.logAddConstraint(constraint3);
+
       String actualResult = String.valueOf(Generator.lines);
 
       String expectedResult = "(declare-const a Int)\n"
@@ -59,20 +70,6 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
       Assert.assertEquals(expectedResult, actualResult);
   }
 
-  @Test
-  public void testMakeVariableRational() {
-    clearGenerator();
-    NumeralFormula a = Objects.requireNonNull(rmgr).makeVariable("a");
-    NumeralFormula b = rmgr.makeVariable("b");
-    BooleanFormula constraint = rmgr.equal(a, b);
-    Generator.logAddConstraint(constraint);
-    String actualResult = String.valueOf(Generator.lines);
-
-    String expectedResult = "(declare-const a Real)\n"
-        + "(declare-const b Real)\n"
-        + "(assert (= a b))\n";
-    Assert.assertEquals(expectedResult, actualResult);
-  }
 
   @Test
   public void testIntegerMakeNumberEqualsAndAdd() {

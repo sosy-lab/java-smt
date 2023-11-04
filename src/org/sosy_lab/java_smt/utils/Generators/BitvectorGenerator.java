@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.function.Function;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
@@ -44,7 +45,7 @@ public class BitvectorGenerator {
           long binaryNumber =
               Long.parseLong(Long.toBinaryString(parseLong((String)inPlaceInputParamsString.get(1))));
           return "#b" + String.format(formatString, binaryNumber);};
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
 
   public static void logMakeBitVector(Object result, int length, BigInteger i) {
@@ -58,7 +59,7 @@ public class BitvectorGenerator {
           BigInteger binaryNumber =
            new BigInteger(Long.toBinaryString(parseLong((String)inPlaceInputParamsString.get(1))));
           return "#b" + String.format(formatString, binaryNumber);};
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
 
   public static void logMakeBitVector(BitvectorFormula result, int length, IntegerFormula pI) {
@@ -71,7 +72,31 @@ public class BitvectorGenerator {
           int binaryNumber =
               Integer.parseInt(Long.toBinaryString(parseLong((String)inPlaceInputParamsString.get(1))));
           return "#b" + String.format(formatString, binaryNumber);};
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
+  }
+
+  public static void logMakeBitVecVariable(BitvectorFormula result, BitvectorType pType,
+                                           String pVar) {
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(pVar);
+    Function<List<Object>, String> saveResult = inPlaceInputParams -> (String) inPlaceInputParams.get(0);
+    RecursiveString<Formula, Formula>
+        newEntry = new RecursiveString<>(result, inputParams, saveResult, "BitVec");
+    newEntry.setBitVecLength(pType.getSize());
+    System.out.println(pType.getSize());
+    Generator.executedAggregator.add(newEntry);
+  }
+
+  public static void logMakeBitVecVariable(BitvectorFormula result, int pLength,
+                                           String pVar) {
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(pVar);
+    Function<List<Object>, String> saveResult = inPlaceInputParams -> (String) inPlaceInputParams.get(0);
+    RecursiveString<Formula, Formula>
+        newEntry = new RecursiveString<>(result, inputParams, saveResult,
+        "BitVec");
+    newEntry.setBitVecLength(pLength);
+    Generator.executedAggregator.add(newEntry);
   }
 
   public static void logBVEqual(Object result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
@@ -80,7 +105,7 @@ public class BitvectorGenerator {
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
 
   public static void logSToIntegerFormula(Object result, BitvectorFormula pI) {
@@ -93,7 +118,7 @@ public class BitvectorGenerator {
     inputParams.add(pI);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(bv2int " + inPlaceInputParams.get(0) + ")";
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
 
   public static void logBVNegate(Object result, BitvectorFormula pNumber) {
@@ -101,7 +126,7 @@ public class BitvectorGenerator {
     inputParams.add(pNumber);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(bvneg " + inPlaceInputParams.get(0) + ")";
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
 
   public static void logBVAdd(BitvectorFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
@@ -110,7 +135,7 @@ public class BitvectorGenerator {
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(bvadd " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
 
   public static void logBVSub(BitvectorFormula result, BitvectorFormula pNumber1,
@@ -120,7 +145,7 @@ public class BitvectorGenerator {
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(bvsub " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
 
   public static void logBVSDivide(BitvectorFormula result, BitvectorFormula pNumber1,
@@ -130,7 +155,7 @@ public class BitvectorGenerator {
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(bvsdiv " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
 
   public static void logBVUDivide(BitvectorFormula result, BitvectorFormula pNumber1,
@@ -140,7 +165,7 @@ public class BitvectorGenerator {
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(bvudiv " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
 
   public static void logBVSModulo(BitvectorFormula result, BitvectorFormula pNumber1,
@@ -150,7 +175,7 @@ public class BitvectorGenerator {
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(bvsrem " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
 
   public static void logBVUModulo(BitvectorFormula result, BitvectorFormula pNumber1,
@@ -160,7 +185,7 @@ public class BitvectorGenerator {
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(bvurem " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
 
   public static void logBVMultiply(BitvectorFormula result, BitvectorFormula pNumber1,
@@ -170,7 +195,7 @@ public class BitvectorGenerator {
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(bvmul " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
 
   public static void logBVUGreaterThan(
@@ -181,7 +206,7 @@ public class BitvectorGenerator {
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(bvugt " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
   public static void logBVSGreaterThan(
       BooleanFormula result, BitvectorFormula pNumber1,
@@ -191,7 +216,7 @@ public class BitvectorGenerator {
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(bvsgt " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
 
   public static void logBVUGreaterOrEqual(
@@ -202,7 +227,7 @@ public class BitvectorGenerator {
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(bvuge " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
   public static void logBVSGreaterOrEqual(
       BooleanFormula result, BitvectorFormula pNumber1,
@@ -212,7 +237,7 @@ public class BitvectorGenerator {
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(bvsge " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
 
   public static void logBVULessThan(
@@ -223,7 +248,7 @@ public class BitvectorGenerator {
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(bvult " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
   public static void logBVSLessThan(
       BooleanFormula result, BitvectorFormula pNumber1,
@@ -233,7 +258,7 @@ public class BitvectorGenerator {
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(bvslt " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
 
   public static void logBVULessOrEqual(
@@ -244,7 +269,7 @@ public class BitvectorGenerator {
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(bvule " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
   public static void logBVSLessOrEqual(
       BooleanFormula result, BitvectorFormula pNumber1,
@@ -254,7 +279,7 @@ public class BitvectorGenerator {
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(bvsle " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
 
   public static void logBVNot(Object result, BitvectorFormula pNumber) {
@@ -262,7 +287,7 @@ public class BitvectorGenerator {
     inputParams.add(pNumber);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(bvnot " + inPlaceInputParams.get(0) + ")";
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
 
   public static void logBVAnd(BitvectorFormula result, BitvectorFormula pNumber1,
@@ -272,7 +297,7 @@ public class BitvectorGenerator {
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(bvand " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
 
   public static void logBVOr(BitvectorFormula result, BitvectorFormula pNumber1,
@@ -282,7 +307,7 @@ public class BitvectorGenerator {
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(bvor " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
 
   public static void logBVXor(BitvectorFormula result, BitvectorFormula pNumber1,
@@ -292,30 +317,10 @@ public class BitvectorGenerator {
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(bvxor " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
 
   //TODO: transformValueToRange?
-
-  public static void logMakeBitVecVariable(BitvectorFormula result, BitvectorType pType,
-                                         String pVar) {
-    List<Object> inputParams = new ArrayList<>();
-    inputParams.add(pVar);
-    Function<List<Object>, String> saveResult = inPlaceInputParams -> (String) inPlaceInputParams.get(0);
-    RecursiveString newEntry = new RecursiveString(result, inputParams, saveResult, "BitVec");
-    newEntry.setBitVecLength(pType.getSize());
-    Generator.executedAggregator.add(newEntry);
-  }
-
-  public static void logMakeBitVecVariable(BitvectorFormula result, int pLength,
-                                           String pVar) {
-    List<Object> inputParams = new ArrayList<>();
-    inputParams.add(pVar);
-    Function<List<Object>, String> saveResult = inPlaceInputParams -> (String) inPlaceInputParams.get(0);
-    RecursiveString newEntry = new RecursiveString(result, inputParams, saveResult, "BitVec");
-    newEntry.setBitVecLength(pLength);
-    Generator.executedAggregator.add(newEntry);
-  }
 
   public static void logBVSShiftRight(BitvectorFormula result, BitvectorFormula pNumber,
                               BitvectorFormula toShift) {
@@ -324,7 +329,7 @@ public class BitvectorGenerator {
     inputParams.add(toShift);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(bvashr " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
 
   public static void logBVUShiftRight(BitvectorFormula result, BitvectorFormula pNumber,
@@ -334,7 +339,7 @@ public class BitvectorGenerator {
     inputParams.add(toShift);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(bvlshr " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
 
   public static void logBVShiftLeft(BitvectorFormula result, BitvectorFormula pNumber,
@@ -344,7 +349,7 @@ public class BitvectorGenerator {
     inputParams.add(toShift);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(bvshl " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
 
   public static void logConcat(BitvectorFormula result, BitvectorFormula pNumber,
@@ -354,7 +359,7 @@ public class BitvectorGenerator {
     inputParams.add(append);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(concat " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
   public static void logExtract(BitvectorFormula result, BitvectorFormula pNumber,
                                 int pMsb, int pLsb) {
@@ -365,7 +370,7 @@ public class BitvectorGenerator {
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "((_ extract " + inPlaceInputParams.get(1) + " " + inPlaceInputParams.get(2) +
             ") " + inPlaceInputParams.get(0) +  ")";
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
 
   public static void logUExtend(BitvectorFormula result, BitvectorFormula pNumber,
@@ -375,7 +380,7 @@ public class BitvectorGenerator {
     inputParams.add(String.valueOf(pExtensionBits));
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "((_ zero_extend " + inPlaceInputParams.get(1) + ") " + inPlaceInputParams.get(0) +  ")";
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
 
   public static void logSExtend(BitvectorFormula result, BitvectorFormula pNumber,
@@ -385,7 +390,7 @@ public class BitvectorGenerator {
     inputParams.add(String.valueOf(pExtensionBits));
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "((_ sign_extend " + inPlaceInputParams.get(1) + ") " + inPlaceInputParams.get(0) +  ")";
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
 
   public static void logBVDistinct(Object result, List<BitvectorFormula> operands) throws IllegalArgumentException {
