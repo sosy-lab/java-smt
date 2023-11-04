@@ -121,6 +121,14 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     return builder.build();
   }
 
+  protected ImmutableSet<T> getAssertedConstraintIds() {
+    ImmutableSet.Builder<T> builder = ImmutableSet.builder();
+    for (Map<BooleanFormula, T> level : assertedFormulas) {
+      builder.addAll(level.values());
+    }
+    return builder.build();
+  }
+
   /**
    * This method registers the Evaluator to be cleaned up before the next change on the prover
    * stack.

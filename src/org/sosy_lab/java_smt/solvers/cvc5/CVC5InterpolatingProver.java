@@ -8,10 +8,10 @@
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 import static org.sosy_lab.common.collect.Collections3.transformedImmutableSetCopy;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
@@ -77,6 +77,9 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
   public BooleanFormula getInterpolant(Collection<Term> pFormulasOfA)
       throws SolverException, InterruptedException {
     checkState(!closed);
+    checkArgument(
+        getAssertedConstraintIds().containsAll(pFormulasOfA),
+        "interpolation can only be done over previously asserted formulas.");
 
     final Set<Term> assertedFormulas =
         transformedImmutableSetCopy(getAssertedFormulas(), creator::extractInfo);
@@ -90,8 +93,11 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
   @Override
   public List<BooleanFormula> getSeqInterpolants(List<? extends Collection<Term>> partitions)
       throws SolverException, InterruptedException {
-    Preconditions.checkArgument(
-        !partitions.isEmpty(), "at least one partition should be available.");
+    checkArgument(!partitions.isEmpty(), "at least one partition should be available.");
+    final ImmutableSet<Term> assertedConstraintIds = getAssertedConstraintIds();
+    checkArgument(
+        partitions.stream().allMatch(assertedConstraintIds::containsAll),
+        "interpolation can only be done over previously asserted formulas.");
 
     final int n = partitions.size();
     final List<BooleanFormula> itps = new ArrayList<>();
