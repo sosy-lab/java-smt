@@ -20,25 +20,22 @@
 
 package org.sosy_lab.java_smt.test;
 
-import java.util.ArrayList;
-import java.util.List;
+
 import java.util.Objects;
 import org.junit.Assert;
 import org.junit.Test;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.api.NumeralFormula;
-import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.utils.Generators.Generator;
 
 
-public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0  {
+public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
-  /** Integer and Rationals not supported by BOOLECTOR
-   *  Rationals not supported by PRINCESS
-   *  Z3 runs only when executed separately from other solvers
+  /**
+   * Integer and Rationals not supported by BOOLECTOR
+   * Rationals not supported by PRINCESS
+   * Z3 runs only when executed separately from other solvers
    */
 
   public void clearGenerator() {
@@ -46,508 +43,381 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
     Generator.registeredVariables.clear();
     Generator.executedAggregator.clear();
   }
+
   @Test
   public void testMakeVariable() {
+    requireBitvectors();
     clearGenerator();
-    BitvectorFormula a = bvmgr.makeVariable(32, "a");
+    BitvectorFormula a = Objects.requireNonNull(bvmgr).makeVariable(32, "a");
     BitvectorFormula b = bvmgr.makeVariable(32, "b");
     BitvectorFormula c = bvmgr.makeVariable(FormulaType.getBitvectorTypeWithSize(5), "c");
     BitvectorFormula d = bvmgr.makeVariable(FormulaType.getBitvectorTypeWithSize(5), "d");
-    BitvectorFormula e = bvmgr.makeVariable(2147483647, "e");
-    BitvectorFormula f = bvmgr.makeVariable(2147483647, "f");
-    BooleanFormula constraint1 = bvmgr.equal(a, b);
+    BooleanFormula constraint1 = bvmgr.equal(a, bvmgr.add(a, b));
     BooleanFormula constraint2 = bvmgr.equal(c, d);
+
+    Generator.logAddConstraint(constraint1);
+    Generator.logAddConstraint(constraint2);
+
+    /*
+     avoid such high numbers with Boolector and Princess
+    BitvectorFormula e = bvmgr.makeVariable(214748366, "e");
+    BitvectorFormula f = bvmgr.makeVariable(214748366, "f");
     BooleanFormula constraint3 = bvmgr.equal(e, f);
+    Generator.logAddConstraint(constraint3);
+    */
+
+    String actualResult = String.valueOf(Generator.lines);
+
+    String expectedResult =
+        "(declare-const a (_ BitVec 32))\n"
+            + "(declare-const b (_ BitVec 32))\n"
+            + "(assert (= a (bvadd a b)))\n"
+            + "(declare-const c (_ BitVec 5))\n"
+            + "(declare-const d (_ BitVec 5))\n"
+            + "(assert (= c d))\n";
+    // + "(declare-const e (_ BitVec 214748366))\n"
+    // + "(declare-const f (_ BitVec 214748366))\n"
+    // + "(assert (= e f))\n";
+
+    Assert.assertEquals(actualResult, expectedResult);
+    }
+
+  @Test
+  public void testMakeBitVector() {
+    // Not working for Boolector and Yices because of the use of IntegerFormulas,
+    requireBitvectors();
+    clearGenerator();
+
+    BitvectorFormula c = Objects.requireNonNull(bvmgr).makeBitvector(12, -10);
+    BitvectorFormula d = bvmgr.makeBitvector(12, 20);
+    BitvectorFormula a = bvmgr.makeBitvector(5, imgr.makeNumber(10));
+    BitvectorFormula b = bvmgr.makeBitvector(5, imgr.makeNumber(10));
+    BitvectorFormula e = Objects.requireNonNull(bvmgr).makeBitvector(100, 263255254);
+    BitvectorFormula f = bvmgr.makeBitvector(100, 263255258);
+    BooleanFormula constraint1 = bvmgr.equal(c, d);
+    BooleanFormula constraint2 = bvmgr.equal(a, b);
+    BooleanFormula constraint3 = bvmgr.equal(e, f);
+
     Generator.logAddConstraint(constraint1);
     Generator.logAddConstraint(constraint2);
     Generator.logAddConstraint(constraint3);
 
-      String actualResult = String.valueOf(Generator.lines);
-
-      String expectedResult = "(declare-const a Int)\n"
-          + "(declare-const b Int)\n"
-          + "(assert (= a b))\n";
-      Assert.assertEquals(expectedResult, actualResult);
-  }
-
-
-  @Test
-  public void testIntegerMakeNumberEqualsAndAdd() {
-    clearGenerator();
-    IntegerFormula a = imgr.makeNumber(1);
-    IntegerFormula b = imgr.makeNumber(-5);
-    IntegerFormula c = imgr.makeNumber("3");
-    IntegerFormula e = imgr.makeNumber(2147483647);
-
-    BooleanFormula constraint = imgr.equal(a, imgr.add(b, imgr.add(c, e)));
-    Generator.logAddConstraint(constraint);
     String actualResult = String.valueOf(Generator.lines);
 
-    String expectedResult = "(assert (= 1 (+ (- 5) (+ 3 2147483647))))\n";
+    String expectedResultMathsat5 = "(assert (= #b111111110110 #b000000010100))\n"
+        + "(assert (= #b01010 #b01010))\n"
+        + "(assert (= #b111111110110 #b000000010100))\n";
+    String expectedResultOthers = "(assert (= #b111111110110 #b000000010100))\n"
+        + "(assert (= #b01010 #b01010))\n"
+        + "(assert (= #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011011010))\n";
+    Assert.assertTrue(expectedResultMathsat5.equals(actualResult) || expectedResultOthers.equals(actualResult));
+  }
+  @Test
+  public void testAdd() {
+    // Not working for Boolector and Yices because of the use of IntegerFormulas,
+    requireBitvectors();
+    clearGenerator();
+
+    BitvectorFormula c = Objects.requireNonNull(bvmgr).makeBitvector(12, -10);
+    BitvectorFormula d = bvmgr.makeBitvector(12, 20);
+    BitvectorFormula a = bvmgr.makeBitvector(5, imgr.makeNumber(10));
+    BitvectorFormula b = bvmgr.makeBitvector(5, imgr.makeNumber(0));
+    BitvectorFormula e = Objects.requireNonNull(bvmgr).makeBitvector(100, 263255254);
+    BitvectorFormula f = bvmgr.makeBitvector(100, 263255258);
+    BooleanFormula constraint1 = bvmgr.equal(c, bvmgr.add(c, d));
+    BooleanFormula constraint2 = bvmgr.equal(a, bvmgr.add(a, b));
+    BooleanFormula constraint3 = bvmgr.equal(e, bvmgr.add(e, f));
+
+    Generator.logAddConstraint(constraint1);
+    Generator.logAddConstraint(constraint2);
+    Generator.logAddConstraint(constraint3);
+
+    String actualResult = String.valueOf(Generator.lines);
+
+    String expectedResultMathsat5 = "(assert (= #b111111110110 (bvadd #b111111110110 #b000000010100)))\n"
+        + "(assert (= #b01010 #b01010))\n"
+        + "(assert (= #b111111110110 (bvadd #b111111110110 #b000000010100)))\n";
+    String expectedResultOthers = "(assert (= #b111111110110 (bvadd #b111111110110 #b000000010100)))\n"
+        + "(assert (= #b01010 (bvadd #b01010 #b00000)))\n"
+        + "(assert (= "
+        +
+        "#b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 (bvadd #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011011010)))\n";
+    Assert.assertTrue(expectedResultMathsat5.equals(actualResult) || expectedResultOthers.equals(actualResult));
+  }
+
+  @Test
+  public void testNegate() {
+    requireBitvectors();
+    clearGenerator();
+
+    BitvectorFormula c = Objects.requireNonNull(bvmgr).makeBitvector(12, -10);
+    BitvectorFormula d = bvmgr.makeBitvector(12, 20);
+    BitvectorFormula e = Objects.requireNonNull(bvmgr).makeBitvector(100, 263255254);
+    BitvectorFormula f = bvmgr.makeBitvector(100, 0);
+    BooleanFormula constraint1 = bvmgr.equal(bvmgr.negate(c), bvmgr.add(bvmgr.negate(c),
+        bvmgr.negate(d)));
+    BooleanFormula constraint3 = bvmgr.equal(bvmgr.negate(e), bvmgr.add(bvmgr.negate(e),
+        bvmgr.negate(f)));
+
+    Generator.logAddConstraint(constraint1);
+    Generator.logAddConstraint(constraint3);
+
+    String actualResult = String.valueOf(Generator.lines);
+
+    String expectedResultMathsat5 = "(assert (= (bvneg #b111111110110) #b111111110110))\n"
+        + "(assert (= (bvneg #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110) (bvneg #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110)))\n";
+    String expectedResultOthers = "(assert (= (bvneg #b111111110110) (bvadd (bvneg #b111111110110) (bvneg #b000000010100))))\n"
+        + "(assert (= (bvneg #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110) (bvadd (bvneg #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110) (bvneg #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000))))\n";
+    Assert.assertTrue(expectedResultMathsat5.equals(actualResult) || expectedResultOthers.equals(actualResult));
+  }
+
+  @Test
+  public void testSubtract() {
+    requireBitvectors();
+    clearGenerator();
+
+    BitvectorFormula c = Objects.requireNonNull(bvmgr).makeBitvector(12, -10);
+    BitvectorFormula d = bvmgr.makeBitvector(12, 20);
+    BitvectorFormula e = bvmgr.makeBitvector(100, 263255254);
+    BitvectorFormula f = bvmgr.makeBitvector(100, 0);
+    BooleanFormula constraint1 = bvmgr.equal(c, bvmgr.subtract(c, d));
+    BooleanFormula constraint3 = bvmgr.equal(e, bvmgr.subtract(e, f));
+
+    Generator.logAddConstraint(constraint1);
+    Generator.logAddConstraint(constraint3);
+
+    String actualResult = String.valueOf(Generator.lines);
+
+    String expectedResultMathsat5 = "(assert (= #b111111110110 (bvsub #b111111110110 #b000000010100)))\n"
+        + "(assert (= #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110))\n";
+    String expectedResultOthers = "(assert (= #b111111110110 (bvsub #b111111110110 #b000000010100)))\n"
+        + "(assert (= #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 (bvsub #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
+    Assert.assertTrue(expectedResultMathsat5.equals(actualResult) || expectedResultOthers.equals(actualResult));
+  }
+
+  @Test
+  public void testDivide() {
+    //Does not work for CVC4 due to "BigInteger argument out of bounds"
+    requireBitvectors();
+    clearGenerator();
+
+    BitvectorFormula c = Objects.requireNonNull(bvmgr).makeBitvector(12, -10);
+    BitvectorFormula d = bvmgr.makeBitvector(12, 20);
+    BitvectorFormula e = bvmgr.makeBitvector(100, 263255254);
+    BitvectorFormula f = bvmgr.makeBitvector(100, 0);
+    BooleanFormula constraint1 = bvmgr.equal(c, bvmgr.divide(c, d, true));
+    BooleanFormula constraint3 = bvmgr.equal(e, bvmgr.divide(e, f, false));
+
+    Generator.logAddConstraint(constraint1);
+    Generator.logAddConstraint(constraint3);
+
+    String actualResult = String.valueOf(Generator.lines);
+
+    String expectedResultOthers = "(assert (= #b111111110110 (bvsdiv #b111111110110 "
+        + "#b000000010100)))\n"
+        + "(assert (= #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 (bvudiv #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
+    String expectedResultYices = "(assert (= #b111111110110 (bvsdiv #b111111110110 "
+        + "#b000000010100)))\n"
+        + "(assert (= #b111111110110 (bvsdiv #b111111110110 #b000000010100)))\n";
+    Assert.assertTrue(expectedResultYices.equals(actualResult) || expectedResultOthers.equals(actualResult));
+  }
+
+  @Test
+  public void testModulo() {
+    //Does not work for CVC4 due to "BigInteger argument out of bounds"
+    requireBitvectors();
+    clearGenerator();
+
+    BitvectorFormula c = Objects.requireNonNull(bvmgr).makeBitvector(12, -10);
+    BitvectorFormula d = bvmgr.makeBitvector(12, 20);
+    BitvectorFormula e = bvmgr.makeBitvector(100, 263255254);
+    BitvectorFormula f = bvmgr.makeBitvector(100, 0);
+    BooleanFormula constraint1 = bvmgr.equal(c, bvmgr.modulo(c, d, true));
+    BooleanFormula constraint3 = bvmgr.equal(e, bvmgr.modulo(e, f, false));
+
+    Generator.logAddConstraint(constraint1);
+    Generator.logAddConstraint(constraint3);
+
+    String actualResult = String.valueOf(Generator.lines);
+
+    String expectedResultOthers = "(assert (= #b111111110110 (bvsrem #b111111110110 #b000000010100)))\n"
+        + "(assert (= #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 (bvurem #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
+    String expectedResultYices = "(assert (= #b111111110110 #b111111110110))\n"
+        + "(assert (= #b111111110110 #b111111110110))\n";
+    String expectedResultMathsat5 = "(assert (= #b111111110110 #b111111110110))\n"
+        + "(assert (= #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 (bvurem #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
+    Assert.assertTrue(expectedResultYices.equals(actualResult) || expectedResultOthers.equals(actualResult) || expectedResultMathsat5.equals(actualResult));
+  }
+
+  @Test
+  public void testMultiply() {
+    //Does not work for CVC4 due to "BigInteger argument out of bounds"
+    requireBitvectors();
+    clearGenerator();
+
+    BitvectorFormula c = Objects.requireNonNull(bvmgr).makeBitvector(12, -10);
+    BitvectorFormula d = bvmgr.makeBitvector(12, 20);
+    BitvectorFormula e = bvmgr.makeBitvector(100, 263255254);
+    BitvectorFormula f = bvmgr.makeBitvector(100, 0);
+    BooleanFormula constraint1 = bvmgr.equal(c, bvmgr.multiply(c, d));
+    BooleanFormula constraint3 = bvmgr.equal(e, bvmgr.multiply(e, f));
+
+    Generator.logAddConstraint(constraint1);
+    Generator.logAddConstraint(constraint3);
+
+    String actualResult = String.valueOf(Generator.lines);
+
+    String expectedResultOthers = "(assert (= #b111111110110 (bvmul #b111111110110 "
+        + "#b000000010100)))\n"
+        + "(assert (= "
+        +
+        "#b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 (bvmul #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
+    String expectedResultYices = "(assert (= #b111111110110 #b111111110110))\n"
+        + "(assert (= #b111111110110 #b111111110110))\n";
+    String expectedResultMathsat5 = "(assert (= #b111111110110 (bvmul #b111111110110 #b000000010100)))\n"
+        + "(assert (= #b111111110110 (bvmul #b111111110110 #b000000010100)))\n";
+    Assert.assertTrue(expectedResultYices.equals(actualResult) || expectedResultOthers.equals(actualResult) || expectedResultMathsat5.equals(actualResult));
+  }
+
+  @Test
+  public void testGreaterThan() {
+    requireBitvectors();
+    clearGenerator();
+
+    BitvectorFormula c = Objects.requireNonNull(bvmgr).makeBitvector(12, -10);
+    BitvectorFormula d = bvmgr.makeBitvector(12, 20);
+    BitvectorFormula e = bvmgr.makeBitvector(100, 263255254);
+    BitvectorFormula f = bvmgr.makeBitvector(100, 0);
+    BooleanFormula constraint1 = bvmgr.greaterThan(c, d, true);
+    BooleanFormula constraint3 = bvmgr.greaterThan(e, f, false);
+
+    Generator.logAddConstraint(constraint1);
+    Generator.logAddConstraint(constraint3);
+
+    String actualResult = String.valueOf(Generator.lines);
+
+    String expectedResult = "(assert (bvsgt #b111111110110 #b000000010100))\n"
+        + "(assert (bvugt #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000))\n";
     Assert.assertEquals(expectedResult, actualResult);
   }
 
   @Test
-  public void testRationalsMakeNumberEqualsAndAdd() {
+  public void testGreaterOrEqual() {
+    requireBitvectors();
     clearGenerator();
-    RationalFormula a = Objects.requireNonNull(rmgr).makeNumber(-1);
-    RationalFormula c = rmgr.makeNumber("3.4");
-    RationalFormula e = rmgr.makeNumber(2147483.647);
-    BooleanFormula constraint = rmgr.equal(a, rmgr.add(c, e));
-    Generator.logAddConstraint(constraint);
+
+    BitvectorFormula c = Objects.requireNonNull(bvmgr).makeBitvector(12, -10);
+    BitvectorFormula d = bvmgr.makeBitvector(12, 20);
+    BitvectorFormula e = bvmgr.makeBitvector(100, 263255254);
+    BitvectorFormula f = bvmgr.makeBitvector(100, 0);
+    BooleanFormula constraint1 = bvmgr.greaterOrEquals(c, d, true);
+    BooleanFormula constraint3 = bvmgr.greaterOrEquals(e, f, false);
+
+    Generator.logAddConstraint(constraint1);
+    Generator.logAddConstraint(constraint3);
+
     String actualResult = String.valueOf(Generator.lines);
 
-    String expectedResultMathsat5 = "(assert (= -1 (+ 17/5 2147483647/1000)))\n";
-    String expectedResultSMTInterpol = "(assert (= (- 1.0) (+ 3.4 2147483.647)))\n";
-    String expectedResultCVC4 = "(assert (= (- 1) (+ (/ 17 5) (/ 2147483647 1000))))\n";
-    String expectedResultCVC5 = "(assert (= (- 1.0) (+ (/ 17 5) (/ 2147483647 1000))))\n";
-    String expectedResultZ3 = "(assert (= (- 1.0) (+ (/ 17.0 5.0) (/ 2147483647.0 1000.0))))\n";
-
-    Assert.assertTrue(actualResult.equals(expectedResultMathsat5) || actualResult.equals(expectedResultSMTInterpol) || actualResult.equals(expectedResultCVC4) || actualResult.equals(expectedResultCVC5) || actualResult.equals(expectedResultZ3));
-  }
-
-  @Test
-  public void testIntegerSubtract() {
-    clearGenerator();
-    IntegerFormula a = imgr.makeNumber(1);
-    IntegerFormula b = imgr.makeNumber(-5);
-    IntegerFormula c = imgr.makeNumber("3");
-    IntegerFormula e = imgr.makeNumber(2147483647);
-
-    BooleanFormula constraint = imgr.equal(a, imgr.subtract(b, imgr.subtract(c, e)));
-    Generator.logAddConstraint(constraint);
-    String actualResult = String.valueOf(Generator.lines);
-
-    String expectedResult = "(assert (= 1 (- (- 5) (- 3 2147483647))))\n";
+    String expectedResult = "(assert (bvsge #b111111110110 #b000000010100))\n"
+        + "(assert (bvuge "
+        + "#b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000))\n";
     Assert.assertEquals(expectedResult, actualResult);
   }
 
   @Test
-  public void testRationalSubtract() {
+  public void testLessThan() {
+    requireBitvectors();
     clearGenerator();
-    RationalFormula a = Objects.requireNonNull(rmgr).makeNumber(-1);
-    RationalFormula c = rmgr.makeNumber("3.4");
-    RationalFormula e = rmgr.makeNumber(2147483.647);
-    BooleanFormula constraint = rmgr.equal(a, rmgr.subtract(c, e));
-    Generator.logAddConstraint(constraint);
+
+    BitvectorFormula c = Objects.requireNonNull(bvmgr).makeBitvector(12, -10);
+    BitvectorFormula d = bvmgr.makeBitvector(12, 20);
+    BitvectorFormula e = bvmgr.makeBitvector(100, 263255254);
+    BitvectorFormula f = bvmgr.makeBitvector(100, 0);
+    BooleanFormula constraint1 = bvmgr.lessThan(c, d, true);
+    BooleanFormula constraint3 = bvmgr.lessThan(e, f, false);
+
+    Generator.logAddConstraint(constraint1);
+    Generator.logAddConstraint(constraint3);
+
     String actualResult = String.valueOf(Generator.lines);
 
-    String expectedResultMathsat5 = "(assert (= -1 (- 17/5 2147483647/1000)))\n";
-    String expectedResultSMTInterpol = "(assert (= (- 1.0) (- 3.4 2147483.647)))\n";
-    String expectedResultCVC4 = "(assert (= (- 1) (- (/ 17 5) (/ 2147483647 1000))))\n";
-    String expectedResultCVC5 = "(assert (= (- 1.0) (- (/ 17 5) (/ 2147483647 1000))))\n";
-    String expectedResultZ3 = "(assert (= (- 1.0) (- (/ 17.0 5.0) (/ 2147483647.0 1000.0))))\n";
-
-    Assert.assertTrue(actualResult.equals(expectedResultMathsat5) || actualResult.equals(expectedResultSMTInterpol) || actualResult.equals(expectedResultCVC4) || actualResult.equals(expectedResultCVC5) || actualResult.equals(expectedResultZ3));
-  }
-
-  @Test
-  public void testIntegerNegate() {
-    clearGenerator();
-    IntegerFormula a = imgr.makeNumber(1);
-    IntegerFormula b = imgr.makeNumber(-5);
-    IntegerFormula c = imgr.makeNumber("3");
-    IntegerFormula e = imgr.makeNumber(2147483647);
-    BooleanFormula constraint = imgr.equal(imgr.subtract(imgr.negate(b), imgr.negate(a)),
-        imgr.subtract(imgr.negate(c),
-        imgr.negate(e)));
-    Generator.logAddConstraint(constraint);
-    String actualResult = String.valueOf(Generator.lines);
-
-    String expectedResult = "(assert (= (- (- (- 5)) (- 1)) (- (- 3) (- 2147483647))))\n";
+    String expectedResult = "(assert (bvslt #b111111110110 #b000000010100))\n"
+        + "(assert (bvult "
+        + "#b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000))\n";
     Assert.assertEquals(expectedResult, actualResult);
   }
 
   @Test
-  public void testRationalNegate() {
+  public void testLessOrEqual() {
+    requireBitvectors();
     clearGenerator();
-    RationalFormula a = Objects.requireNonNull(rmgr).makeNumber(-1);
-    RationalFormula c = rmgr.makeNumber("3.4");
-    RationalFormula e = rmgr.makeNumber(2147483.647);
-    BooleanFormula constraint = rmgr.equal(rmgr.negate(a), rmgr.subtract(rmgr.negate(c),
-        rmgr.negate(e)));
-    Generator.logAddConstraint(constraint);
+
+    BitvectorFormula c = Objects.requireNonNull(bvmgr).makeBitvector(12, -10);
+    BitvectorFormula d = bvmgr.makeBitvector(12, 20);
+    BitvectorFormula e = bvmgr.makeBitvector(100, 263255254);
+    BitvectorFormula f = bvmgr.makeBitvector(100, 0);
+    BooleanFormula constraint1 = bvmgr.lessOrEquals(c, d, true);
+    BooleanFormula constraint3 = bvmgr.lessOrEquals(e, f, false);
+
+    Generator.logAddConstraint(constraint1);
+    Generator.logAddConstraint(constraint3);
+
     String actualResult = String.valueOf(Generator.lines);
 
-    String expectedResultMathsat5 = "(assert (= (- -1) (- (- 17/5) (- 2147483647/1000))))\n";
-    String expectedResultSMTInterpol = "(assert (= (- (- 1.0)) (- (- 3.4) (- 2147483.647))))\n";
-    String expectedResultCVC4 = "(assert (= (- (- 1)) (- (- (/ 17 5)) (- (/ 2147483647 1000)))))\n";
-    String expectedResultCVC5 = "(assert (= (- (- 1.0)) (- (- (/ 17 5)) (- (/ 2147483647 1000)))))\n";
-    String expectedResultZ3 = "(assert (= (- (- 1.0)) (- (- (/ 17.0 5.0)) (- (/ 2147483647.0 1000.0)))))\n";
-
-    Assert.assertTrue(actualResult.equals(expectedResultMathsat5) || actualResult.equals(expectedResultSMTInterpol) || actualResult.equals(expectedResultCVC4) || actualResult.equals(expectedResultCVC5) || actualResult.equals(expectedResultZ3));
-  }
-
-  @Test
-  public void testIntegerSum() {
-    clearGenerator();
-    IntegerFormula a = imgr.makeNumber(1);
-    IntegerFormula b = imgr.makeNumber(-5);
-    IntegerFormula c = imgr.makeNumber("3");
-    IntegerFormula e = imgr.makeNumber(2147483647);
-    List<IntegerFormula> d = new ArrayList<>();
-    d.add(a); d.add(b); d.add(c); d.add(e);
-
-    BooleanFormula constraint = imgr.equal(e, imgr.sum(d));
-    Generator.logAddConstraint(constraint);
-    String actualResult = String.valueOf(Generator.lines);
-
-    String expectedResultMathsat5 = "(assert (= 2147483647 (+ 1 -5 3 2147483647)))\n";
-    String expectedResultOthers = "(assert (= 2147483647 (+ 1 (- 5) 3 2147483647)))\n";
-
-    Assert.assertTrue(actualResult.equals(expectedResultMathsat5) || actualResult.equals
-    (expectedResultOthers));
-  }
-
-  @Test
-  public void testRationalSum() {
-    clearGenerator();
-    RationalFormula a = Objects.requireNonNull(rmgr).makeNumber(-1);
-    RationalFormula c = rmgr.makeNumber("3.4");
-    RationalFormula e = rmgr.makeNumber(2147483.647);
-    List<NumeralFormula> d = new ArrayList<>();
-    d.add(a); d.add(c); d.add(e);
-
-    BooleanFormula constraint = rmgr.equal(a, rmgr.sum(d));
-    Generator.logAddConstraint(constraint);
-    String actualResult = String.valueOf(Generator.lines);
-
-    String expectedResultMathsat5 = "(assert (= -1 (+ -1 17/5 2147483647/1000)))\n";
-    String expectedResultSMTInterpol = "(assert (= (- 1.0) (+ (- 1.0) 3.4 2147483.647)))\n";
-    String expectedResultCVC4 = "(assert (= (- 1) (+ (- 1) (/ 17 5) (/ 2147483647 1000))))\n";
-    String expectedResultCVC5 = "(assert (= (- 1.0) (+ (- 1.0) (/ 17 5) (/ 2147483647 1000))))\n";
-    String expectedResultZ3 = "(assert (= (- 1.0) (+ (- 1.0) (/ 17.0 5.0) (/ 2147483647.0 1000.0))))\n";
-
-    Assert.assertTrue(actualResult.equals(expectedResultMathsat5) || actualResult.equals(expectedResultSMTInterpol) || actualResult.equals(expectedResultCVC4) || actualResult.equals(expectedResultCVC5) || actualResult.equals(expectedResultZ3));
-  }
-
-  @Test
-  public void testIntegerDivide() {
-    clearGenerator();
-    IntegerFormula a = imgr.makeNumber(1);
-    IntegerFormula b = imgr.makeNumber(-5);
-    IntegerFormula c = imgr.makeNumber("3");
-    IntegerFormula e = imgr.makeNumber(2147483647);
-
-    BooleanFormula constraint = imgr.equal(a, imgr.divide(b, imgr.divide(c, e)));
-    Generator.logAddConstraint(constraint);
-    String actualResult = String.valueOf(Generator.lines);
-
-    String expectedResult = "(assert (= 1 (div (- 5) (div 3 2147483647))))\n";
+    String expectedResult = "(assert (bvsle #b111111110110 #b000000010100))\n"
+        + "(assert (bvule "
+        + "#b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000))\n";
     Assert.assertEquals(expectedResult, actualResult);
   }
 
   @Test
-  public void testRationalDivide() {
+  public void testNot() {
+    requireBitvectors();
     clearGenerator();
-    RationalFormula a = Objects.requireNonNull(rmgr).makeNumber(-1);
-    RationalFormula c = rmgr.makeNumber("3.4");
-    RationalFormula e = rmgr.makeNumber(2147483.647);
-    BooleanFormula constraint = rmgr.equal(a, rmgr.divide(c, e));
-    Generator.logAddConstraint(constraint);
+
+    BitvectorFormula c = Objects.requireNonNull(bvmgr).makeBitvector(12, -10);
+    BitvectorFormula d = bvmgr.makeBitvector(12, 20);
+    BitvectorFormula e = Objects.requireNonNull(bvmgr).makeBitvector(100, 263255254);
+    BitvectorFormula f = bvmgr.makeBitvector(100, 0);
+    BooleanFormula constraint1 = bvmgr.equal(bvmgr.not(c), bvmgr.not(d));
+    BooleanFormula constraint3 = bvmgr.equal(bvmgr.not(e), bvmgr.not(f));
+
+    Generator.logAddConstraint(constraint1);
+    Generator.logAddConstraint(constraint3);
+
     String actualResult = String.valueOf(Generator.lines);
 
-    String expectedResultMathsat5 = "(assert (= -1 (div 17/5 2147483647/1000)))\n";
-    String expectedResultSMTInterpol = "(assert (= (- 1.0) (div 3.4 2147483.647)))\n";
-    String expectedResultCVC4 = "(assert (= (- 1) (div (/ 17 5) (/ 2147483647 1000))))\n";
-    String expectedResultCVC5 = "(assert (= (- 1.0) (div (/ 17 5) (/ 2147483647 1000))))\n";
-    String expectedResultZ3 = "(assert (= (- 1.0) (div (/ 17.0 5.0) (/ 2147483647.0 1000.0))))\n";
-
-    Assert.assertTrue(actualResult.equals(expectedResultMathsat5) || actualResult.equals(expectedResultSMTInterpol) || actualResult.equals(expectedResultCVC4) || actualResult.equals(expectedResultCVC5) || actualResult.equals(expectedResultZ3));
-  }
-
-  /** not available for Mathsat
-   *
-   */
-  @Test
-  public void testIntegerModulo() {
-    clearGenerator();
-    IntegerFormula a = imgr.makeNumber(1);
-    IntegerFormula b = imgr.makeNumber(-5);
-    IntegerFormula c = imgr.makeNumber("3");
-    IntegerFormula e = imgr.makeNumber(2147483647);
-
-    BooleanFormula constraint = imgr.equal(a, imgr.modulo(b, imgr.modulo(c, e)));
-    Generator.logAddConstraint(constraint);
-    String actualResult = String.valueOf(Generator.lines);
-
-    String expectedResultOthers = "(assert (= 1 (mod (- 5) (mod 3 2147483647))))\n";
-    String expectedResultYices = "(assert (= 1 1))\n";
-    Assert.assertTrue(actualResult.equals(expectedResultOthers) || actualResult.equals(expectedResultYices));
-  }
-  @Test
-  public void testIntegerMultiply() {
-    clearGenerator();
-    IntegerFormula a = imgr.makeNumber(1);
-    IntegerFormula b = imgr.makeNumber(-5);
-    IntegerFormula c = imgr.makeNumber("3");
-    IntegerFormula e = imgr.makeNumber(2147483647);
-
-    BooleanFormula constraint = imgr.equal(a, imgr.multiply(b, imgr.multiply(c, e)));
-    Generator.logAddConstraint(constraint);
-    String actualResult = String.valueOf(Generator.lines);
-
-    String expectedResult = "(assert (= 1 (* (- 5) (* 3 2147483647))))\n";
-    Assert.assertEquals(expectedResult, actualResult);
+    String expectedResultMathsat5 = "(assert (= (bvnot #b111111110110) (bvnot #b000000010100)))\n"
+        + "(assert (= (bvnot #b111111110110) (bvnot #b000000010100)))\n";
+    String expectedResultOthers = "(assert (= (bvnot #b111111110110) (bvnot #b000000010100)))\n"
+        + "(assert (= (bvnot #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110) (bvnot #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
+    Assert.assertTrue(expectedResultMathsat5.equals(actualResult) || expectedResultOthers.equals(actualResult));
   }
 
   @Test
-  public void testRationalMultiply() {
+  public void testAnd() {
+    requireBitvectors();
     clearGenerator();
-    RationalFormula a = Objects.requireNonNull(rmgr).makeNumber(-1);
-    RationalFormula c = rmgr.makeNumber("3.4");
-    RationalFormula e = rmgr.makeNumber(2147483.647);
-    BooleanFormula constraint = rmgr.equal(a, rmgr.multiply(c, e));
-    Generator.logAddConstraint(constraint);
+
+    BitvectorFormula c = Objects.requireNonNull(bvmgr).makeBitvector(12, -10);
+    BitvectorFormula d = bvmgr.makeBitvector(12, 20);
+    BitvectorFormula e = Objects.requireNonNull(bvmgr).makeBitvector(100, 263255254);
+    BitvectorFormula f = bvmgr.makeBitvector(100, 0);
+    BooleanFormula constraint1 = bvmgr.equal(c, bvmgr.and(c, d));
+    BooleanFormula constraint3 = bvmgr.equal(e, bvmgr.and(e, f));
+
+    Generator.logAddConstraint(constraint1);
+    Generator.logAddConstraint(constraint3);
+
     String actualResult = String.valueOf(Generator.lines);
 
-    String expectedResultMathsat5 = "(assert (= -1 (* 17/5 2147483647/1000)))\n";
-    String expectedResultSMTInterpol = "(assert (= (- 1.0) (* 3.4 2147483.647)))\n";
-    String expectedResultCVC4 = "(assert (= (- 1) (* (/ 17 5) (/ 2147483647 1000))))\n";
-    String expectedResultCVC5 = "(assert (= (- 1.0) (* (/ 17 5) (/ 2147483647 1000))))\n";
-    String expectedResultZ3 = "(assert (= (- 1.0) (* (/ 17.0 5.0) (/ 2147483647.0 1000.0))))\n";
-
-    Assert.assertTrue(actualResult.equals(expectedResultMathsat5) || actualResult.equals(expectedResultSMTInterpol) || actualResult.equals(expectedResultCVC4) || actualResult.equals(expectedResultCVC5) || actualResult.equals(expectedResultZ3));
+    String expectedResultMathsat5 = "(assert (= (bvnot #b111111110110) (bvnot #b000000010100)))\n"
+        + "(assert (= (bvnot #b111111110110) (bvnot #b000000010100)))\n";
+    String expectedResultOthers = "(assert (= #b111111110110 #b000000010100))\n"
+        + "(assert (= #b111111110110 #b000000010100))\n";
+    String expectedResultZ3 = "(assert (= #b111111110110 (bvand #b111111110110 #b000000010100)))\n"
+        + "(assert (= #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 (bvand #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
+    Assert.assertTrue(expectedResultMathsat5.equals(actualResult) || expectedResultOthers.equals(actualResult) || expectedResultZ3.equals(actualResult));
   }
 
-  @Test
-  public void testIntegerDistinct() {
-    clearGenerator();
-    IntegerFormula a = imgr.makeNumber(1);
-    IntegerFormula b = imgr.makeNumber(-5);
-    IntegerFormula c = imgr.makeNumber("3");
-    IntegerFormula e = imgr.makeNumber(2147483647);
-    List<IntegerFormula> d = new ArrayList<>();
-    d.add(a); d.add(b); d.add(c); d.add(e);
-
-    BooleanFormula constraint = imgr.distinct(d);
-    Generator.logAddConstraint(constraint);
-    String actualResult = String.valueOf(Generator.lines);
-
-    String expectedResultMathsat5 = "(assert (distinct 1 -5 3 2147483647))\n";
-    String expectedResultOthers = "(assert (distinct 1 (- 5) 3 2147483647))\n";
-
-    Assert.assertTrue(actualResult.equals(expectedResultMathsat5) || actualResult.equals
-        (expectedResultOthers));
   }
-
-  @Test
-  public void testRationalDistinct() {
-    clearGenerator();
-    RationalFormula a = Objects.requireNonNull(rmgr).makeNumber(-1);
-    RationalFormula c = rmgr.makeNumber("3.4");
-    RationalFormula e = rmgr.makeNumber(2147483.647);
-    List<NumeralFormula> d = new ArrayList<>();
-    d.add(a); d.add(c); d.add(e);
-
-    BooleanFormula constraint = rmgr.distinct(d);
-    Generator.logAddConstraint(constraint);
-    String actualResult = String.valueOf(Generator.lines);
-
-    String expectedResultMathsat5 = "(assert (distinct -1 17/5 2147483647/1000))\n";
-    String expectedResultSMTInterpol = "(assert (distinct (- 1.0) 3.4 2147483.647))\n";
-    String expectedResultCVC4 = "(assert (distinct (- 1) (/ 17 5) (/ 2147483647 1000)))\n";
-    String expectedResultCVC5 = "(assert (distinct (- 1.0) (/ 17 5) (/ 2147483647 1000)))\n";
-    String expectedResultZ3 = "(assert (distinct (- 1.0) (/ 17.0 5.0) (/ 2147483647.0 1000.0)))\n";
-
-    Assert.assertTrue(actualResult.equals(expectedResultMathsat5) || actualResult.equals(expectedResultSMTInterpol) || actualResult.equals(expectedResultCVC4) || actualResult.equals(expectedResultCVC5) || actualResult.equals(expectedResultZ3));
-  }
-
-  @Test
-  public void testIntegerGreaterThan() {
-    clearGenerator();
-    IntegerFormula a = imgr.makeNumber(1);
-    IntegerFormula b = imgr.makeNumber(-5);
-    IntegerFormula c = imgr.makeNumber("3");
-    IntegerFormula e = imgr.makeNumber(2147483647);
-
-    BooleanFormula constraint = bmgr.and(imgr.greaterThan(a, b), imgr.greaterThan(c, e));
-    Generator.logAddConstraint(constraint);
-    String actualResult = String.valueOf(Generator.lines);
-
-    String expectedResultMathsat5 = "(assert (> 3 2147483647))\n";
-    String expectedResultOthers = "(assert (and (> 1 (- 5)) (> 3 2147483647)))\n";
-    Assert.assertTrue(actualResult.equals(expectedResultMathsat5) || actualResult.equals(expectedResultOthers));
-
-  }
-
-  @Test
-  public void testRationalGreaterThan() {
-    clearGenerator();
-    RationalFormula a = Objects.requireNonNull(rmgr).makeNumber(-1);
-    RationalFormula c = rmgr.makeNumber("3.4");
-    RationalFormula e = rmgr.makeNumber(2147483.647);
-
-    BooleanFormula constraint = bmgr.and(rmgr.greaterThan(a, c), rmgr.greaterThan(c, e));
-    Generator.logAddConstraint(constraint);
-    String actualResult = String.valueOf(Generator.lines);
-
-    String expectedResultMathsat5 = "(assert (> -1 17/5))\n";
-    String expectedResultSMTInterpol = "(assert (and (> (- 1.0) 3.4) (> 3.4 2147483.647)))\n";
-    String expectedResultCVC4 = "(assert (and (> (- 1) (/ 17 5)) (> (/ 17 5) (/ 2147483647 1000))))\n";
-    String expectedResultCVC5 = "(assert (and (> (- 1.0) (/ 17 5)) (> (/ 17 5) (/ 2147483647 1000))))\n";
-    String expectedResultZ3 = "(assert (and (> (- 1.0) (/ 17.0 5.0)) (> (/ 17.0 5.0) (/ "
-        + "2147483647.0 1000.0))))\n";
-
-    Assert.assertTrue(actualResult.equals(expectedResultMathsat5) || actualResult.equals(expectedResultSMTInterpol) || actualResult.equals(expectedResultCVC4) || actualResult.equals(expectedResultCVC5) || actualResult.equals(expectedResultZ3));
-  }
-
-  @Test
-  public void testIntegerGreaterOrEquals() {
-    clearGenerator();
-    IntegerFormula a = imgr.makeNumber(1);
-    IntegerFormula b = imgr.makeNumber(-5);
-    IntegerFormula c = imgr.makeNumber("3");
-    IntegerFormula e = imgr.makeNumber(2147483647);
-
-    BooleanFormula constraint = bmgr.and(imgr.greaterOrEquals(a, b), imgr.greaterOrEquals(c, e));
-    Generator.logAddConstraint(constraint);
-    String actualResult = String.valueOf(Generator.lines);
-
-    String expectedResultMathsat5 = "(assert (>= 3 2147483647))\n";
-    String expectedResultOthers = "(assert (and (>= 1 (- 5)) (>= 3 2147483647)))\n";
-    Assert.assertTrue(actualResult.equals(expectedResultMathsat5) || actualResult.equals(expectedResultOthers));
-  }
-
-  @Test
-  public void testRationalGreaterOrEquals() {
-    clearGenerator();
-    RationalFormula a = Objects.requireNonNull(rmgr).makeNumber(-1);
-    RationalFormula c = rmgr.makeNumber("3.4");
-    RationalFormula e = rmgr.makeNumber(2147483.647);
-
-    BooleanFormula constraint = bmgr.and(rmgr.greaterOrEquals(a, c), rmgr.greaterOrEquals(c, e));
-    Generator.logAddConstraint(constraint);
-    String actualResult = String.valueOf(Generator.lines);
-
-    String expectedResultMathsat5 = "(assert (>= -1 17/5))\n";
-    String expectedResultSMTInterpol = "(assert (and (>= (- 1.0) 3.4) (>= 3.4 2147483.647)))\n";
-    String expectedResultCVC4 = "(assert (and (>= (- 1) (/ 17 5)) (>= (/ 17 5) (/ 2147483647 1000)"
-        + ")))\n";
-    String expectedResultCVC5 = "(assert (and (>= (- 1.0) (/ 17 5)) (>= (/ 17 5) (/ 2147483647 "
-        + "1000))))\n";
-    String expectedResultZ3 = "(assert (and (>= (- 1.0) (/ 17.0 5.0)) (>= (/ 17.0 5.0) (/ "
-        + "2147483647.0 1000.0))))\n";
-
-    Assert.assertTrue(actualResult.equals(expectedResultMathsat5) || actualResult.equals(expectedResultSMTInterpol) || actualResult.equals(expectedResultCVC4) || actualResult.equals(expectedResultCVC5) || actualResult.equals(expectedResultZ3));
-  }
-
-  @Test
-  public void testIntegerLessThan() {
-    clearGenerator();
-    IntegerFormula a = imgr.makeNumber(1);
-    IntegerFormula b = imgr.makeNumber(-5);
-    IntegerFormula c = imgr.makeNumber("3");
-    IntegerFormula e = imgr.makeNumber(2147483647);
-
-    BooleanFormula constraint = bmgr.and(imgr.lessThan(a, b), imgr.lessThan(c, e));
-    Generator.logAddConstraint(constraint);
-    String actualResult = String.valueOf(Generator.lines);
-
-    String expectedResultMathsat5 = "(assert (< 1 (- 5)))\n";
-    String expectedResultOthers = "(assert (and (< 1 (- 5)) (< 3 2147483647)))\n";
-    Assert.assertTrue(actualResult.equals(expectedResultMathsat5) || actualResult.equals(expectedResultOthers));
-  }
-
-  @Test
-  public void testRationalLessThan() {
-    clearGenerator();
-    RationalFormula a = Objects.requireNonNull(rmgr).makeNumber(-1);
-    RationalFormula c = rmgr.makeNumber("3.4");
-    RationalFormula e = rmgr.makeNumber(2147483.647);
-
-    BooleanFormula constraint = bmgr.and(rmgr.lessThan(a, c), rmgr.lessThan(c, e));
-    Generator.logAddConstraint(constraint);
-    String actualResult = String.valueOf(Generator.lines);
-
-    String expectedResultMathsat5 = "(assert (< -1 17/5))\n";
-    String expectedResultSMTInterpol = "(assert (and (< (- 1.0) 3.4) (< 3.4 2147483.647)))\n";
-    String expectedResultCVC4 = "(assert (and (< (- 1) (/ 17 5)) (< (/ 17 5) (/ 2147483647 1000)"
-        + ")))\n";
-    String expectedResultCVC5 = "(assert (and (< (- 1.0) (/ 17 5)) (< (/ 17 5) (/ 2147483647 "
-        + "1000))))\n";
-    String expectedResultZ3 = "(assert (and (< (- 1.0) (/ 17.0 5.0)) (< (/ 17.0 5.0) (/ "
-        + "2147483647.0 1000.0))))\n";
-
-    Assert.assertTrue(actualResult.equals(expectedResultMathsat5) || actualResult.equals(expectedResultSMTInterpol) || actualResult.equals(expectedResultCVC4) || actualResult.equals(expectedResultCVC5) || actualResult.equals(expectedResultZ3));
-  }
-
-  @Test
-  public void testIntegerLessOrEqual() {
-    clearGenerator();
-    IntegerFormula a = imgr.makeNumber(1);
-    IntegerFormula b = imgr.makeNumber(-5);
-    IntegerFormula c = imgr.makeNumber("3");
-    IntegerFormula e = imgr.makeNumber(2147483647);
-
-    BooleanFormula constraint = bmgr.and(imgr.lessOrEquals(a, b), imgr.lessOrEquals(c, e));
-    Generator.logAddConstraint(constraint);
-    String actualResult = String.valueOf(Generator.lines);
-
-    String expectedResultMathsat5 = "(assert (<= 1 (- 5)))\n";
-    String expectedResultOthers = "(assert (and (<= 1 (- 5)) (<= 3 2147483647)))\n";
-    Assert.assertTrue(actualResult.equals(expectedResultMathsat5) || actualResult.equals(expectedResultOthers));
-  }
-
-  @Test
-  public void testRationalLessOrEqual() {
-    clearGenerator();
-    RationalFormula a = Objects.requireNonNull(rmgr).makeNumber(-1);
-    RationalFormula c = rmgr.makeNumber("3.4");
-    RationalFormula e = rmgr.makeNumber(2147483.647);
-
-    BooleanFormula constraint = bmgr.and(rmgr.lessOrEquals(a, c), rmgr.lessOrEquals(c, e));
-    Generator.logAddConstraint(constraint);
-    String actualResult = String.valueOf(Generator.lines);
-
-    String expectedResultMathsat5 = "(assert (<= -1 17/5))\n";
-    String expectedResultSMTInterpol = "(assert (and (<= (- 1.0) 3.4) (<= 3.4 2147483.647)))\n";
-    String expectedResultCVC4 = "(assert (and (<= (- 1) (/ 17 5)) (<= (/ 17 5) (/ 2147483647 1000)"
-        + ")))\n";
-    String expectedResultCVC5 = "(assert (and (<= (- 1.0) (/ 17 5)) (<= (/ 17 5) (/ 2147483647 "
-        + "1000))))\n";
-    String expectedResultZ3 = "(assert (and (<= (- 1.0) (/ 17.0 5.0)) (<= (/ 17.0 5.0) (/ "
-        + "2147483647.0 1000.0))))\n";
-
-    Assert.assertTrue(actualResult.equals(expectedResultMathsat5) || actualResult.equals(expectedResultSMTInterpol) || actualResult.equals(expectedResultCVC4) || actualResult.equals(expectedResultCVC5) || actualResult.equals(expectedResultZ3));
-  }
-
-  @Test
-  public void testIntegerFloor() {
-    clearGenerator();
-    IntegerFormula a = imgr.makeNumber(1);
-    IntegerFormula b = imgr.makeNumber(-5);
-    IntegerFormula c = imgr.makeNumber("3");
-    IntegerFormula e = imgr.makeNumber(2147483647);
-    BooleanFormula constraint = imgr.equal(imgr.subtract(imgr.floor(b), imgr.floor(a)),
-        imgr.subtract(imgr.floor(c),
-            imgr.floor(e)));
-    Generator.logAddConstraint(constraint);
-    String actualResult = String.valueOf(Generator.lines);
-
-    String expectedResult = "(assert (= (- (- 5) 1) (- 3 2147483647)))\n";
-    Assert.assertEquals(expectedResult, actualResult);
-  }
-
-  @Test
-  public void testRationalFloor() {
-    clearGenerator();
-    RationalFormula a = Objects.requireNonNull(rmgr).makeNumber(-1);
-    RationalFormula c = rmgr.makeNumber("3.4");
-    RationalFormula e = rmgr.makeNumber(2147483.647);
-    BooleanFormula constraint = imgr.equal(rmgr.floor(a), imgr.subtract(rmgr.floor(c),
-        rmgr.floor(e)));
-    Generator.logAddConstraint(constraint);
-    String actualResult = String.valueOf(Generator.lines);
-
-    String expectedResultMathsat5 = "(assert (= -1 (- (to_int 17/5) (to_int 2147483647/1000))))\n";
-    String expectedResultSMTInterpol = "(assert (= (to_int (- 1.0)) (- (to_int 3.4) (to_int 2147483.647))))\n";
-    String expectedResultCVC4 = "(assert (= (to_int (- 1)) (- (to_int (/ 17 5)) (to_int (/ "
-        + "2147483647 1000)))))\n";
-    String expectedResultCVC5 = "(assert (= (to_int (- 1.0)) (- (to_int (/ 17 5)) (to_int (/ 2147483647 1000)))))\n";
-    String expectedResultZ3 = "(assert (= (to_int (- 1.0)) (- (to_int (/ 17.0 5.0)) (to_int (/ 2147483647.0 1000.0)))))\n";
-
-    Assert.assertTrue(actualResult.equals(expectedResultMathsat5) || actualResult.equals(expectedResultSMTInterpol) || actualResult.equals(expectedResultCVC4) || actualResult.equals(expectedResultCVC5) || actualResult.equals(expectedResultZ3));
-  }
-
-}

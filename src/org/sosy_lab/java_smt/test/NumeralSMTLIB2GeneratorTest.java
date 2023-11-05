@@ -46,6 +46,7 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
   }
   @Test
   public void testMakeVariableInteger() {
+    requireIntegers();
       clearGenerator();
       IntegerFormula a = imgr.makeVariable("a");
       IntegerFormula b = imgr.makeVariable("b");
@@ -61,6 +62,7 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void testMakeVariableRational() {
+    requireRationals();
     clearGenerator();
     NumeralFormula a = Objects.requireNonNull(rmgr).makeVariable("a");
     NumeralFormula b = rmgr.makeVariable("b");
@@ -76,6 +78,7 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void testIntegerMakeNumberEqualsAndAdd() {
+    requireIntegers();
     clearGenerator();
     IntegerFormula a = imgr.makeNumber(1);
     IntegerFormula b = imgr.makeNumber(-5);
@@ -92,6 +95,7 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void testRationalsMakeNumberEqualsAndAdd() {
+    requireRationals();
     clearGenerator();
     RationalFormula a = Objects.requireNonNull(rmgr).makeNumber(-1);
     RationalFormula c = rmgr.makeNumber("3.4");
@@ -111,6 +115,7 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void testIntegerSubtract() {
+    requireIntegers();
     clearGenerator();
     IntegerFormula a = imgr.makeNumber(1);
     IntegerFormula b = imgr.makeNumber(-5);
@@ -127,6 +132,7 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void testRationalSubtract() {
+    requireRationals();
     clearGenerator();
     RationalFormula a = Objects.requireNonNull(rmgr).makeNumber(-1);
     RationalFormula c = rmgr.makeNumber("3.4");
@@ -146,6 +152,7 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void testIntegerNegate() {
+    requireIntegers();
     clearGenerator();
     IntegerFormula a = imgr.makeNumber(1);
     IntegerFormula b = imgr.makeNumber(-5);
@@ -163,6 +170,7 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void testRationalNegate() {
+    requireRationals();
     clearGenerator();
     RationalFormula a = Objects.requireNonNull(rmgr).makeNumber(-1);
     RationalFormula c = rmgr.makeNumber("3.4");
@@ -183,6 +191,7 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void testIntegerSum() {
+    requireIntegers();
     clearGenerator();
     IntegerFormula a = imgr.makeNumber(1);
     IntegerFormula b = imgr.makeNumber(-5);
@@ -204,6 +213,7 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void testRationalSum() {
+    requireRationals();
     clearGenerator();
     RationalFormula a = Objects.requireNonNull(rmgr).makeNumber(-1);
     RationalFormula c = rmgr.makeNumber("3.4");
@@ -226,6 +236,7 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void testIntegerDivide() {
+    requireIntegers();
     clearGenerator();
     IntegerFormula a = imgr.makeNumber(1);
     IntegerFormula b = imgr.makeNumber(-5);
@@ -242,6 +253,7 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void testRationalDivide() {
+    requireRationals();
     clearGenerator();
     RationalFormula a = Objects.requireNonNull(rmgr).makeNumber(-1);
     RationalFormula c = rmgr.makeNumber("3.4");
@@ -264,6 +276,7 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
    */
   @Test
   public void testIntegerModulo() {
+    requireIntegers();
     clearGenerator();
     IntegerFormula a = imgr.makeNumber(1);
     IntegerFormula b = imgr.makeNumber(-5);
@@ -280,6 +293,7 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
   }
   @Test
   public void testIntegerMultiply() {
+    requireIntegers();
     clearGenerator();
     IntegerFormula a = imgr.makeNumber(1);
     IntegerFormula b = imgr.makeNumber(-5);
@@ -296,6 +310,7 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void testRationalMultiply() {
+    requireRationals();
     clearGenerator();
     RationalFormula a = Objects.requireNonNull(rmgr).makeNumber(-1);
     RationalFormula c = rmgr.makeNumber("3.4");
@@ -315,6 +330,7 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void testIntegerDistinct() {
+    requireIntegers();
     clearGenerator();
     IntegerFormula a = imgr.makeNumber(1);
     IntegerFormula b = imgr.makeNumber(-5);
@@ -336,6 +352,7 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void testRationalDistinct() {
+    requireRationals();
     clearGenerator();
     RationalFormula a = Objects.requireNonNull(rmgr).makeNumber(-1);
     RationalFormula c = rmgr.makeNumber("3.4");
@@ -358,6 +375,7 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void testIntegerGreaterThan() {
+    requireIntegers();
     clearGenerator();
     IntegerFormula a = imgr.makeNumber(1);
     IntegerFormula b = imgr.makeNumber(-5);
@@ -376,6 +394,7 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void testRationalGreaterThan() {
+    requireRationals();
     clearGenerator();
     RationalFormula a = Objects.requireNonNull(rmgr).makeNumber(-1);
     RationalFormula c = rmgr.makeNumber("3.4");
@@ -397,6 +416,7 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void testIntegerGreaterOrEquals() {
+    requireIntegers();
     clearGenerator();
     IntegerFormula a = imgr.makeNumber(1);
     IntegerFormula b = imgr.makeNumber(-5);
@@ -414,6 +434,7 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void testRationalGreaterOrEquals() {
+    requireRationals();
     clearGenerator();
     RationalFormula a = Objects.requireNonNull(rmgr).makeNumber(-1);
     RationalFormula c = rmgr.makeNumber("3.4");
@@ -437,6 +458,7 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void testIntegerLessThan() {
+    requireIntegers();
     clearGenerator();
     IntegerFormula a = imgr.makeNumber(1);
     IntegerFormula b = imgr.makeNumber(-5);
@@ -454,6 +476,7 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void testRationalLessThan() {
+    requireRationals();
     clearGenerator();
     RationalFormula a = Objects.requireNonNull(rmgr).makeNumber(-1);
     RationalFormula c = rmgr.makeNumber("3.4");
@@ -477,6 +500,7 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void testIntegerLessOrEqual() {
+    requireIntegers();
     clearGenerator();
     IntegerFormula a = imgr.makeNumber(1);
     IntegerFormula b = imgr.makeNumber(-5);
@@ -494,6 +518,7 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void testRationalLessOrEqual() {
+    requireRationals();
     clearGenerator();
     RationalFormula a = Objects.requireNonNull(rmgr).makeNumber(-1);
     RationalFormula c = rmgr.makeNumber("3.4");
@@ -517,6 +542,7 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void testIntegerFloor() {
+    requireIntegers();
     clearGenerator();
     IntegerFormula a = imgr.makeNumber(1);
     IntegerFormula b = imgr.makeNumber(-5);
@@ -534,6 +560,7 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void testRationalFloor() {
+    requireRationals();
     clearGenerator();
     RationalFormula a = Objects.requireNonNull(rmgr).makeNumber(-1);
     RationalFormula c = rmgr.makeNumber("3.4");

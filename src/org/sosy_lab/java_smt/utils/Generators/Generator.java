@@ -97,7 +97,7 @@ public class Generator {
       }
       if (variable.variableType.equals("BitVec")) {
         String newEntry =
-            "(declare-const " + variable.inputParams.get(1) + " (_ BitVec " + variable.bitVecLength + "))\n";
+            "(declare-const " + variable.inputParams.get(0) + " (_ BitVec " + variable.bitVecLength + "))\n";
         if (lines.indexOf(newEntry) == -1) {
           lines.append(newEntry);
         } else {

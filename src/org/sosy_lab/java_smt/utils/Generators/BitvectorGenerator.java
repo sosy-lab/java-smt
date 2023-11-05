@@ -109,16 +109,15 @@ public class BitvectorGenerator {
   }
 
   public static void logSToIntegerFormula(Object result, BitvectorFormula pI) {
-    throw new IllegalArgumentException("distinct operation is not available for bitvectors in "
+    throw new IllegalArgumentException("toIntegerFormula operation is not available for "
+        + "bitvectors in "
         + "SMT-LIB2");
   }
 
   public static void logUToIntegerFormula(Object result, BitvectorFormula pI) {
-    List<Object> inputParams = new ArrayList<>();
-    inputParams.add(pI);
-    Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(bv2int " + inPlaceInputParams.get(0) + ")";
-    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
+    throw new IllegalArgumentException("toIntegerFormula operation is not available for "
+        + "bitvectors in "
+        + "SMT-LIB2");
   }
 
   public static void logBVNegate(Object result, BitvectorFormula pNumber) {

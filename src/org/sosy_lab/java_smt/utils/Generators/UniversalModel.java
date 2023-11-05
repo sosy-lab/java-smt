@@ -22,18 +22,20 @@ package org.sosy_lab.java_smt.utils.Generators;
 
 import com.google.common.collect.ImmutableList;
 import javax.annotation.Nullable;
+import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 public class UniversalModel extends AbstractModel {
-  public UniversalModel(AbstractProver prover, FormulaCreator creator) {
-    super(prover, creator);
+  public UniversalModel(AbstractProver prover, AbstractFormulaManager pFormulaManager) {
+    super(prover, pFormulaManager);
   }
 
   @Override
   public ImmutableList<ValueAssignment> asList() {
+    BooleanFormula reg = formulaManager.getBooleanFormulaManager().makeFalse();
 
 
     return null;

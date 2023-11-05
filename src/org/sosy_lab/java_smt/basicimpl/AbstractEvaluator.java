@@ -29,12 +29,14 @@ public abstract class AbstractEvaluator<TFormulaInfo, TType, TEnv> implements Ev
 
   private final AbstractProver<?> prover;
   protected final FormulaCreator<TFormulaInfo, TType, TEnv, ?> creator;
+  protected final AbstractFormulaManager <TFormulaInfo, TType, TEnv, ?> formulaManager;
   private boolean closed = false;
 
   protected AbstractEvaluator(
-      AbstractProver<?> pProver, FormulaCreator<TFormulaInfo, TType, TEnv, ?> pCreator) {
+      AbstractProver<?> pProver, AbstractFormulaManager<TFormulaInfo, TType, TEnv, ?> pFormulaManager) {
     this.prover = pProver;
-    this.creator = pCreator;
+    this.formulaManager = pFormulaManager;
+    this.creator = pFormulaManager.getFormulaCreator();
   }
 
   @SuppressWarnings("unchecked")

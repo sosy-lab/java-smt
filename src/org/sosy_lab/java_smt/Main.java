@@ -43,7 +43,7 @@ public class Main {
     ShutdownManager shutdown = ShutdownManager.create();
     SolverContext context =
         SolverContextFactory.createSolverContext(config, logger, shutdown.getNotifier(),
-            Solvers.PRINCESS);
+            Solvers.Z3);
     FormulaManager fmgr = context.getFormulaManager();
     BooleanFormulaManager bmgr = fmgr.getBooleanFormulaManager();
     IntegerFormulaManager imgr = fmgr.getIntegerFormulaManager();
@@ -51,21 +51,17 @@ public class Main {
     //RationalFormulaManager rmgr = fmgr.getRationalFormulaManager();
     UFManager umgr =  fmgr.getUFManager();
 
-    BitvectorFormula a = bvmgr.makeVariable(32, "a");
-    BitvectorFormula b = bvmgr.makeVariable(32, "b");
-    BitvectorFormula c = bvmgr.makeVariable(FormulaType.getBitvectorTypeWithSize(5), "c");
-    BitvectorFormula d = bvmgr.makeVariable(FormulaType.getBitvectorTypeWithSize(5), "d");
-    BitvectorFormula e = bvmgr.makeVariable(214748366, "e");
-    BitvectorFormula f = bvmgr.makeVariable(214748366, "f");
-    BooleanFormula constraint1 = bvmgr.equal(a, b);
-    BooleanFormula constraint2 = bvmgr.equal(c, d);
-    BooleanFormula constraint3 = bvmgr.equal(e, f);
+    BitvectorFormula c = Objects.requireNonNull(bvmgr).makeBitvector(12, -10);
+    BitvectorFormula d = bvmgr.makeBitvector(12, 20);
+    BitvectorFormula e = Objects.requireNonNull(bvmgr).makeBitvector(100, 263255254);
+    BitvectorFormula f = bvmgr.makeBitvector(100, 0);
+    BooleanFormula constraint1 = bvmgr.equal(c, bvmgr.and(c, d));
+    BooleanFormula constraint3 = bvmgr.equal(e, bvmgr.and(e, f));
 
     try (ProverEnvironment prover =
              context.newProverEnvironment(SolverContext.ProverOptions.GENERATE_MODELS)) {
       prover.addConstraint(constraint1);
-      prover.addConstraint(constraint1);
-      prover.addConstraint(constraint1);
+      prover.addConstraint(constraint3);
 
       //prover.addConstraint(fmgr.universalParse("smtquery.002.smt2"));
       //prover.addConstraint(fmgr.parse("(declare-fun |id#2@1| () (_ BitVec 32))\n"
@@ -79,7 +75,7 @@ public class Main {
       if (!isUnsat) {
         Model model = prover.getModel();
         //Object value = model.evaluate(expectedFormula);
-        System.out.println(model.getClass());
+        System.out.println(model);
 
       }
       Generator.dumpSMTLIB2();
