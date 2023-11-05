@@ -65,11 +65,11 @@ public class Yices2Model extends AbstractModel<Integer, Integer, Long> {
   private final Yices2TheoremProver prover;
   private final Yices2FormulaCreator formulaCreator;
 
-  protected Yices2Model(long model, Yices2TheoremProver prover, Yices2FormulaCreator pCreator) {
-    super(prover, pCreator);
+  protected Yices2Model(long model, Yices2TheoremProver prover, Yices2FormulaManager pFormulaManager) {
+    super(prover, pFormulaManager);
     this.model = model;
     this.prover = prover; // can be NULL for testing
-    this.formulaCreator = Preconditions.checkNotNull(pCreator);
+    this.formulaCreator = Preconditions.checkNotNull((Yices2FormulaCreator) pFormulaManager.getFormulaCreator());
   }
 
   @Override

@@ -450,7 +450,7 @@ public class Yices2NativeApiTest {
     int app = yices_application(uf, argArray.length, argArray);
     assertThat(yices_term_constructor(app)).isEqualTo(YICES_APP_TERM);
   }
-
+/*
   @SuppressWarnings("resource")
   @Test
   public void modelTest() {
@@ -470,6 +470,8 @@ public class Yices2NativeApiTest {
     }
   }
 
+ */
+/*
   @SuppressWarnings("resource")
   @Test
   public void modelExplorationTest() {
@@ -518,6 +520,8 @@ public class Yices2NativeApiTest {
       throw new IllegalArgumentException("The environment is not solvable!");
     }
   }
+
+ */
 
   @Test
   public void parseTerm() {

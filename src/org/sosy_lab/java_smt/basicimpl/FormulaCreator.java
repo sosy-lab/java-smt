@@ -214,7 +214,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
   }
 
   @SuppressWarnings("unchecked")
-  protected TFormulaInfo extractInfo(Formula pT) {
+  public TFormulaInfo extractInfo(Formula pT) {
     if (pT instanceof AbstractFormula) {
       return ((AbstractFormula<TFormulaInfo>) pT).getFormulaInfo();
     }

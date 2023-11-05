@@ -99,6 +99,8 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
   private final ShutdownNotifier shutdownNotifier;
   private final TerminationCallback terminationTest;
   private final Mathsat5FormulaCreator creator;
+
+  private final Mathsat5FormulaManager formulaManager;
   private boolean closed = false;
 
   private static boolean loaded = false;
@@ -121,6 +123,7 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
     this.randomSeed = randomSeed;
     this.shutdownNotifier = shutdownNotifier;
     this.creator = creator;
+    this.formulaManager = manager;
 
     terminationTest =
         () -> {
@@ -263,21 +266,21 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
-    return new Mathsat5TheoremProver(this, shutdownNotifier, creator, options);
+    return new Mathsat5TheoremProver(this, shutdownNotifier, formulaManager, options);
   }
 
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
-    return new Mathsat5InterpolatingProver(this, shutdownNotifier, creator, options);
+    return new Mathsat5InterpolatingProver(this, shutdownNotifier, formulaManager, options);
   }
 
   @Override
   public OptimizationProverEnvironment newOptimizationProverEnvironment0(
       Set<ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
-    return new Mathsat5OptimizationProver(this, shutdownNotifier, creator, options);
+    return new Mathsat5OptimizationProver(this, shutdownNotifier, formulaManager, options);
   }
 
   @Override

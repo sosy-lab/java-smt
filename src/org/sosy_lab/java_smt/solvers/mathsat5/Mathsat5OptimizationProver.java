@@ -58,9 +58,9 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
   Mathsat5OptimizationProver(
       Mathsat5SolverContext pMgr,
       ShutdownNotifier pShutdownNotifier,
-      Mathsat5FormulaCreator creator,
+      Mathsat5FormulaManager pFormulaManager,
       Set<ProverOptions> options) {
-    super(pMgr, options, creator, pShutdownNotifier);
+    super(pMgr, options, pFormulaManager, pShutdownNotifier);
   }
 
   @Override

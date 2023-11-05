@@ -35,11 +35,11 @@ class SmtInterpolModel extends AbstractModel<Term, Sort, Script> {
   SmtInterpolModel(
       AbstractProver<?> pProver,
       Model pModel,
-      FormulaCreator<Term, Sort, Script, ?> pCreator,
+      SmtInterpolFormulaManager pFormulaManager,
       Collection<Term> pAssertedTerms) {
-    super(pProver, pCreator);
+    super(pProver, pFormulaManager);
     model = pModel;
-    env = pCreator.getEnv();
+    env = pFormulaManager.getFormulaCreator().getEnv();
     assertedTerms = ImmutableList.copyOf(pAssertedTerms);
   }
 

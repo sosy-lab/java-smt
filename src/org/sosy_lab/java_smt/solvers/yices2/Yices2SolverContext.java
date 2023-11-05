@@ -32,16 +32,18 @@ public class Yices2SolverContext extends AbstractSolverContext {
   private final BooleanFormulaManager bfmgr;
   private final ShutdownNotifier shutdownManager;
 
+  private static Yices2FormulaManager formulaManager;
   private static int numLoadedInstances = 0;
   private boolean closed = false;
 
   public Yices2SolverContext(
       FormulaManager pFmgr,
-      Yices2FormulaCreator creator,
+      Yices2FormulaManager pFormulaManager,
       BooleanFormulaManager pBfmgr,
       ShutdownNotifier pShutdownManager) {
     super(pFmgr);
-    this.creator = creator;
+    formulaManager = pFormulaManager;
+    this.creator = (Yices2FormulaCreator) pFormulaManager.getFormulaCreator();
     bfmgr = pBfmgr;
     shutdownManager = pShutdownManager;
   }
@@ -75,7 +77,7 @@ public class Yices2SolverContext extends AbstractSolverContext {
     Yices2FormulaManager manager =
         new Yices2FormulaManager(
             creator, functionTheory, booleanTheory, integerTheory, rationalTheory, bitvectorTheory);
-    return new Yices2SolverContext(manager, creator, booleanTheory, pShutdownManager);
+    return new Yices2SolverContext(manager, manager, booleanTheory, pShutdownManager);
   }
 
   @Override
@@ -104,7 +106,7 @@ public class Yices2SolverContext extends AbstractSolverContext {
 
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> pOptions) {
-    return new Yices2TheoremProver(creator, pOptions, bfmgr, shutdownManager);
+    return new Yices2TheoremProver(formulaManager, pOptions, bfmgr, shutdownManager);
   }
 
   @Override

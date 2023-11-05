@@ -18,8 +18,8 @@ public class CVC5Evaluator extends AbstractEvaluator<Term, Sort, Solver> {
 
   private final Solver solver;
 
-  CVC5Evaluator(CVC5AbstractProver<?> pProver, CVC5FormulaCreator pCreator) {
-    super(pProver, pCreator);
+  CVC5Evaluator(CVC5AbstractProver<?> pProver, CVC5FormulaManager pFormulaManager) {
+    super(pProver, pFormulaManager);
     solver = pProver.solver;
   }
 

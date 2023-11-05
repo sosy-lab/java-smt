@@ -19,11 +19,11 @@ class CVC5TheoremProver extends CVC5AbstractProver<Void>
     implements ProverEnvironment, BasicProverEnvironment<Void> {
 
   protected CVC5TheoremProver(
-      CVC5FormulaCreator pFormulaCreator,
+      CVC5FormulaManager pFormulaManager,
       ShutdownNotifier pShutdownNotifier,
       @SuppressWarnings("unused") int randomSeed,
       Set<ProverOptions> pOptions,
       FormulaManager pMgr) {
-    super(pFormulaCreator, pShutdownNotifier, randomSeed, pOptions, pMgr);
+    super(pFormulaManager, pShutdownNotifier, randomSeed, pOptions, pMgr);
   }
 }

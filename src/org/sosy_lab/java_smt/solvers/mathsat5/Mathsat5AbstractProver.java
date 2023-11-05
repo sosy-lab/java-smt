@@ -58,17 +58,17 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   protected final long curEnv;
   private final long curConfig;
   private final long terminationTest;
-  protected final Mathsat5FormulaCreator creator;
+  protected final Mathsat5FormulaManager formulaManager;
   private final ShutdownNotifier shutdownNotifier;
 
   protected Mathsat5AbstractProver(
       Mathsat5SolverContext pContext,
       Set<ProverOptions> pOptions,
-      Mathsat5FormulaCreator pCreator,
+      Mathsat5FormulaManager pFormulaManager,
       ShutdownNotifier pShutdownNotifier) {
     super(pOptions);
     context = pContext;
-    creator = pCreator;
+    formulaManager = pFormulaManager;
     curConfig = buildConfig(pOptions);
     curEnv = context.createEnvironment(curConfig);
     terminationTest = context.addTerminationTest(curEnv);
@@ -130,7 +130,8 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   public Model getModel() throws SolverException {
     Preconditions.checkState(!closed);
     checkGenerateModels();
-    return new CachingModel(new Mathsat5Model(getMsatModel(), creator, this));
+    return new CachingModel(new Mathsat5Model(getMsatModel(),
+        formulaManager, this));
   }
 
   /**
@@ -146,7 +147,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   public Evaluator getEvaluator() {
     Preconditions.checkState(!closed);
     checkGenerateModels();
-    return registerEvaluator(new Mathsat5Evaluator(this, creator, curEnv));
+    return registerEvaluator(new Mathsat5Evaluator(this, formulaManager, curEnv));
   }
 
   @Override
@@ -200,7 +201,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   private List<BooleanFormula> encapsulate(long[] terms) {
     List<BooleanFormula> result = new ArrayList<>(terms.length);
     for (long t : terms) {
-      result.add(creator.encapsulateBoolean(t));
+      result.add(formulaManager.getFormulaCreator().encapsulateBoolean(t));
     }
     return result;
   }
@@ -270,7 +271,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
       shutdownNotifier.shutdownIfNecessary();
       clientCallback.apply(
           Collections.unmodifiableList(
-              Lists.transform(Longs.asList(model), creator::encapsulateBoolean)));
+              Lists.transform(Longs.asList(model), ((Mathsat5FormulaCreator) formulaManager.getFormulaCreator())::encapsulateBoolean)));
     }
   }
 }

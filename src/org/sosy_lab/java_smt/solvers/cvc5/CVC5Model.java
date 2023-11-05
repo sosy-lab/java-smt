@@ -20,6 +20,7 @@ import java.util.Collection;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
+import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 
 public class CVC5Model extends AbstractModel<Term, Sort, Solver> {
@@ -27,6 +28,7 @@ public class CVC5Model extends AbstractModel<Term, Sort, Solver> {
   private final ImmutableList<ValueAssignment> model;
   private final Solver solver;
   private final ImmutableList<Term> assertedExpressions;
+  private final CVC5FormulaManager formulaManager;
 
   @SuppressWarnings("unused")
   private final FormulaManager mgr;
@@ -34,11 +36,12 @@ public class CVC5Model extends AbstractModel<Term, Sort, Solver> {
   CVC5Model(
       CVC5AbstractProver<?> pProver,
       FormulaManager pMgr,
-      CVC5FormulaCreator pCreator,
+      CVC5FormulaManager pFormulaManager,
       Collection<Term> pAssertedExpressions) {
-    super(pProver, pCreator);
+    super(pProver, pFormulaManager);
     solver = pProver.solver;
     mgr = pMgr;
+    formulaManager = pFormulaManager;
     assertedExpressions = ImmutableList.copyOf(pAssertedExpressions);
 
     // We need to generate and save this at construction time as CVC4 has no functionality to give a

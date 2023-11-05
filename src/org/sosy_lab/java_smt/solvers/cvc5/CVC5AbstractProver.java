@@ -34,7 +34,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   private final FormulaManager mgr;
-  protected final CVC5FormulaCreator creator;
+  protected final CVC5FormulaManager formulaManager;
   protected final Solver solver;
   private boolean changedSinceLastSatQuery = false;
 
@@ -42,7 +42,7 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   protected final boolean incremental;
 
   protected CVC5AbstractProver(
-      CVC5FormulaCreator pFormulaCreator,
+      CVC5FormulaManager pFormulaManager,
       ShutdownNotifier pShutdownNotifier,
       @SuppressWarnings("unused") int randomSeed,
       Set<ProverOptions> pOptions,
@@ -50,7 +50,7 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     super(pOptions, pMgr.getBooleanFormulaManager(), pShutdownNotifier);
 
     mgr = pMgr;
-    creator = pFormulaCreator;
+    formulaManager = pFormulaManager;
     incremental = !enableSL;
     solver = new Solver();
 
@@ -114,7 +114,7 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     Preconditions.checkState(!closed);
     setChanged();
     super.addConstraint(pF);
-    Term exp = creator.extractInfo(pF);
+    Term exp = (formulaManager.getFormulaCreator()).extractInfo(pF);
     if (incremental) {
       solver.assertFormula(exp);
     }
@@ -133,8 +133,8 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
         new CVC5Model(
             this,
             mgr,
-            creator,
-            Collections2.transform(getAssertedFormulas(), creator::extractInfo)));
+            formulaManager,
+            Collections2.transform(getAssertedFormulas(), (formulaManager.getFormulaCreator())::extractInfo)));
   }
 
   @Override
@@ -147,7 +147,7 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   @SuppressWarnings("resource")
   @Override
   protected Evaluator getEvaluatorWithoutChecks() {
-    return registerEvaluator(new CVC5Evaluator(this, creator));
+    return registerEvaluator(new CVC5Evaluator(this, (CVC5FormulaManager) mgr));
   }
 
   protected void setChanged() {
@@ -171,7 +171,7 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     closeAllEvaluators();
     changedSinceLastSatQuery = false;
     if (!incremental) {
-      getAssertedFormulas().forEach(f -> solver.assertFormula(creator.extractInfo(f)));
+      getAssertedFormulas().forEach(f -> solver.assertFormula((formulaManager.getFormulaCreator()).extractInfo(f)));
     }
 
     /* Shutdown currently not possible in CVC5. */
@@ -199,7 +199,7 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     Preconditions.checkState(!changedSinceLastSatQuery);
     List<BooleanFormula> converted = new ArrayList<>();
     for (Term aCore : solver.getUnsatCore()) {
-      converted.add(creator.encapsulateBoolean(aCore));
+      converted.add(formulaManager.getFormulaCreator().encapsulateBoolean(aCore));
     }
     return converted;
   }

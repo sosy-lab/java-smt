@@ -48,9 +48,9 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
   PrincessModel(
       AbstractProver<?> pProver,
       PartialModel partialModel,
-      FormulaCreator<IExpression, Sort, PrincessEnvironment, ?> creator,
+      PrincessFormulaManager pFormulaManager,
       SimpleAPI pApi) {
-    super(pProver, creator);
+    super(pProver, pFormulaManager);
     this.model = partialModel;
     this.api = pApi;
   }

@@ -140,7 +140,7 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   @Override
   protected BoolectorModel getEvaluatorWithoutChecks() {
     return new BoolectorModel(
-        btor, creator, this, Collections2.transform(getAssertedFormulas(), creator::extractInfo));
+        btor, manager, this, Collections2.transform(getAssertedFormulas(), creator::extractInfo));
   }
 
   @Override

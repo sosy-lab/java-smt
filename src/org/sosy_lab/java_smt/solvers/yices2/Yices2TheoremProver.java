@@ -59,7 +59,7 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
 
   private static final int DEFAULT_PARAMS = 0; // use default setting in the solver
 
-  protected final Yices2FormulaCreator creator;
+  protected final Yices2FormulaManager formulaManager;
   protected final long curEnv;
   protected final long curCfg;
 
@@ -67,17 +67,20 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   // Therefore, we need to keep track of all added constraints beyond that stack-level.
   private int stackSizeToUnsat = Integer.MAX_VALUE;
 
+  private final Yices2FormulaCreator creator;
+
   protected Yices2TheoremProver(
-      Yices2FormulaCreator creator,
+      Yices2FormulaManager pFormulaManager,
       Set<ProverOptions> pOptions,
       BooleanFormulaManager pBmgr,
       ShutdownNotifier pShutdownNotifier) {
     super(pOptions, pBmgr, pShutdownNotifier);
-    this.creator = creator;
+    this.formulaManager = pFormulaManager;
     curCfg = yices_new_config();
     yices_set_config(curCfg, "solver-type", "dpllt");
     yices_set_config(curCfg, "mode", "push-pop");
     curEnv = yices_new_context(curCfg);
+    creator = (Yices2FormulaCreator) pFormulaManager.getFormulaCreator();
   }
 
   boolean isClosed() {
@@ -164,7 +167,7 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
 
   @Override
   protected Yices2Model getEvaluatorWithoutChecks() {
-    return new Yices2Model(yices_get_model(curEnv, 1), this, creator);
+    return new Yices2Model(yices_get_model(curEnv, 1), this, formulaManager);
   }
 
   private List<BooleanFormula> encapsulate(int[] terms) {
