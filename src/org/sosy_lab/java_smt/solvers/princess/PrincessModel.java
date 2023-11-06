@@ -76,6 +76,7 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
         assignments.addAll(getAssignments(entry.getKey(), entry.getValue(), arrays));
       }
     }
+    System.out.println(assignments.build().asList());
     return assignments.build().asList();
   }
 

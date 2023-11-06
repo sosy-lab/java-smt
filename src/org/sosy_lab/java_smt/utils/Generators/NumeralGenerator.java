@@ -54,7 +54,6 @@ public class NumeralGenerator {
 
   public static void logMakeIntVariable(Object result, String pVar) {
     String varType;
-    System.out.println(result.getClass());
     if (result instanceof IntegerFormula) {
       varType = "Int";
     } else {

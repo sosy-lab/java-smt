@@ -17,7 +17,9 @@ package org.sosy_lab.java_smt;/*
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+import java.net.Inet4Address;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import org.sosy_lab.common.ShutdownManager;
@@ -29,6 +31,8 @@ import org.sosy_lab.java_smt.api.*;
 import java.io.*;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
+import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
+import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 import org.sosy_lab.java_smt.utils.Generators.Generator;
 import org.sosy_lab.java_smt.utils.Generators.UniversalModel;
 import org.sosy_lab.java_smt.utils.Parsers.*;
@@ -44,41 +48,37 @@ public class Main {
     SolverContext context =
         SolverContextFactory.createSolverContext(config, logger, shutdown.getNotifier(),
             Solvers.Z3);
-    FormulaManager fmgr = context.getFormulaManager();
+    AbstractFormulaManager fmgr = (AbstractFormulaManager) context.getFormulaManager();
     BooleanFormulaManager bmgr = fmgr.getBooleanFormulaManager();
     IntegerFormulaManager imgr = fmgr.getIntegerFormulaManager();
     BitvectorFormulaManager bvmgr = fmgr.getBitvectorFormulaManager();
     //RationalFormulaManager rmgr = fmgr.getRationalFormulaManager();
     UFManager umgr =  fmgr.getUFManager();
 
-    BitvectorFormula c = Objects.requireNonNull(bvmgr).makeBitvector(12, -10);
-    BitvectorFormula d = bvmgr.makeBitvector(12, 20);
-    BitvectorFormula e = Objects.requireNonNull(bvmgr).makeBitvector(100, 263255254);
-    BitvectorFormula f = bvmgr.makeBitvector(100, 0);
-    BooleanFormula constraint1 = bvmgr.equal(c, bvmgr.and(c, d));
-    BooleanFormula constraint3 = bvmgr.equal(e, bvmgr.and(e, f));
+    //BooleanFormula constraint = fmgr.universalParse("/home/janel/Desktop/Studium/Semester_6"
+    //    + "/Bachelorarbeit/nochmalneu/smtquery.z3/smtquery.022.smt2");
+
+    BooleanFormula constraint = umgr.declareAndCallUF("test", FormulaType.BooleanType,
+        bvmgr.makeVariable(32, "hans"));
 
     try (ProverEnvironment prover =
              context.newProverEnvironment(SolverContext.ProverOptions.GENERATE_MODELS)) {
-      prover.addConstraint(constraint1);
-      prover.addConstraint(constraint3);
+      prover.addConstraint(constraint);
 
-      //prover.addConstraint(fmgr.universalParse("smtquery.002.smt2"));
-      //prover.addConstraint(fmgr.parse("(declare-fun |id#2@1| () (_ BitVec 32))\n"
-      //    + "(assert (and (bvsle |id#2@1| #x0000000a) (bvslt |id#2@1| #x00000000)))\n"
-      //    + "(check-sat)"));
-
-      //{id#2@1 -> mod_cast(0, 4294967295, 2147483648)}
-      //{id#2@1 -> mod_cast(0, 4294967295, 2147483648)}
+      Generator.dumpSMTLIB2();
+      UniversalModel bla = new UniversalModel(prover , fmgr);
+      //System.out.println(bla.getModel());
 
       boolean isUnsat = prover.isUnsat();
+
       if (!isUnsat) {
         Model model = prover.getModel();
-        //Object value = model.evaluate(expectedFormula);
         System.out.println(model);
+        //Object value = model.evaluate(expectedFormula);
 
       }
-      Generator.dumpSMTLIB2();
+
+
     } catch (SolverException v) {
       throw new RuntimeException(v);
     }

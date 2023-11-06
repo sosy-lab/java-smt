@@ -24,6 +24,7 @@ import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
@@ -61,51 +62,32 @@ public class UFGenerator <TFormulaInfo, TFunctionDecl, TType, TEnv> {
     }
   }
 
-  public static void logMakeSort(Object result, String pName) {
-    List<Object> inputParams = new ArrayList<>();
-    inputParams.add(pName);
-    Function<List<Object>, String> saveResult = inPlaceInputParams -> (String) inPlaceInputParams.get(0);
-    RecursiveString newEntry = new RecursiveString(result, inputParams, saveResult, "UFSort");
-    Generator.executedAggregator.add(newEntry);
-  }
   public static <T extends Formula> void logMakeFun(Object result,
-      String pName, FormulaType<T> pReturnType, FormulaType<?>... pArgs) {
-    List<Object> inputParams = new ArrayList<>();
-    inputParams.add(pName);
-    inputParams.add(pReturnType);
-    inputParams.add(pArgs);
-    Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(declare-fun " + inPlaceInputParams.get(0) + " ("  + inPlaceInputParams.get(1) + ")" + inPlaceInputParams.get(2) + ")";
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
-  }
-
-  public static <T extends Formula> void logDeclareUF(Object result,
       String pName, FormulaType<T> pReturnType, List<FormulaType<?>> pArgTypes) {
     List<Object> inputParams = new ArrayList<>();
+
     inputParams.add(pName);
     inputParams.add(pReturnType);
     inputParams.add(pArgTypes);
-    Function<List<Object>, String> saveResult = inPlaceInputParams -> (String) inPlaceInputParams.get(0);
-    RecursiveString newEntry = new RecursiveString(result, inputParams, saveResult, "Skip");
-    Generator.executedAggregator.add(newEntry);
+    Function<List<Object>, String> saveResult =
+        inPlaceInputParams -> "(declare-fun " + inPlaceInputParams.get(0) + " ("  + inPlaceInputParams.get(1) + ")" + inPlaceInputParams.get(2) + ")";
+    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
 
+
   public static <T extends Formula> void logCallFun(Object result,
-                                                    FunctionDeclaration<T> funcType, Formula... args) {
+                                                    FunctionDeclaration<T> funcType, List<? extends Formula> pArgs) {
     StringBuilder out = new StringBuilder();
-    out.append("(" + funcType.getName() + " ");
+    out.append(funcType.getName());
     List<Object> inputParams = new ArrayList<>();
-    for (Object pOperand : args) {
-      inputParams.add(pOperand);
-    }
+    inputParams.addAll(pArgs);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> {
           inPlaceInputParams.forEach((c) -> {
             out.append(c);
             out.append(" ");
           });
-          return String.valueOf(
-              out.deleteCharAt(out.length() - 1).append(")"));
+          return String.valueOf(out);
         };
     RecursiveString newEntry = new RecursiveString(result, inputParams, saveResult, "UFFun");
     newEntry.setUFName(funcType.getName());
@@ -114,5 +96,5 @@ public class UFGenerator <TFormulaInfo, TFunctionDecl, TType, TEnv> {
     Generator.executedAggregator.add(newEntry);
   }
 
-  //TODO: logDeclareAndCallUF
+
 }

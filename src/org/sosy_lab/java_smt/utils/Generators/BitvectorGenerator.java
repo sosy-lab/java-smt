@@ -35,7 +35,6 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 public class BitvectorGenerator {
 
   public static void logMakeBitVector(Object result, int length, long i) {
-    System.out.println(i);
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(Long.toString(length));
     inputParams.add(Long.toString(i));
@@ -49,7 +48,6 @@ public class BitvectorGenerator {
   }
 
   public static void logMakeBitVector(Object result, int length, BigInteger i) {
-    System.out.println(i);
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(Long.toString(length));
     inputParams.add(i.toString());
@@ -83,7 +81,6 @@ public class BitvectorGenerator {
     RecursiveString<Formula, Formula>
         newEntry = new RecursiveString<>(result, inputParams, saveResult, "BitVec");
     newEntry.setBitVecLength(pType.getSize());
-    System.out.println(pType.getSize());
     Generator.executedAggregator.add(newEntry);
   }
 

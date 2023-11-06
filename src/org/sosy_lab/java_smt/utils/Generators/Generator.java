@@ -40,7 +40,7 @@ public class Generator {
 
   public static List<RecursiveString<?,?>> registeredVariables = new ArrayList<>();
 
-  public static void writeToFile(String line) throws IOException {
+  public static void writeToFile(String line, String fileName) throws IOException {
     File file = new File(fileName);
     FileWriter fileWriter = new FileWriter(fileName);
     fileWriter.write(line);
@@ -122,7 +122,6 @@ public class Generator {
         }
       }
       if (variable.variableType.equals("UFFun")) {
-        System.out.println(variable.result);
         String newEntry =
             "(declare-fun " + variable.UFName + " " + variable.UFInputType + " " + variable.UFOutputType + ")"
                 + "\n";
@@ -137,9 +136,9 @@ public class Generator {
   }
 
   public static void dumpSMTLIB2() throws IOException {
-    String endSMTLIB2 = "(exit)";
+    String endSMTLIB2 = "(check-sat)\n(get-model)\n(exit)";
     lines.append(endSMTLIB2);
-    writeToFile(String.valueOf(lines));
+    writeToFile(String.valueOf(lines), fileName);
     lines.delete(0, lines.length()-1);
   }
 

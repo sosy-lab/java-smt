@@ -11,14 +11,17 @@ package org.sosy_lab.java_smt.basicimpl;
 import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
 
 import com.google.common.collect.Lists;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.UFManager;
 import org.sosy_lab.java_smt.utils.Generators.Generator;
 import org.sosy_lab.java_smt.utils.Generators.UFGenerator;
@@ -44,13 +47,20 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
   public final <T extends Formula> FunctionDeclaration<T> declareUF(
       String pName, FormulaType<T> pReturnType, List<FormulaType<?>> pArgTypes) {
     checkVariableName(pName);
+    if (pName.contains("PIPE")) {
+      pName = pName.replaceAll("PIPE", "\\|");
+    }
     List<TType> argTypes = Lists.transform(pArgTypes, this::toSolverType);
-    return FunctionDeclarationImpl.of(
+    FunctionDeclaration result = FunctionDeclarationImpl.of(
         pName,
         FunctionDeclarationKind.UF,
         pArgTypes,
         pReturnType,
         formulaCreator.declareUFImpl(pName, toSolverType(pReturnType), argTypes));
+    if (Generator.isLoggingEnabled) {
+      UFGenerator.logMakeFun(result, pName, pReturnType, pArgTypes);
+    }
+    return result;
   }
 
   @Override
@@ -58,18 +68,12 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
       String pName, FormulaType<T> pReturnType, FormulaType<?>... pArgs) {
     checkVariableName(pName);
     FunctionDeclaration result = declareUF(pName, pReturnType, Arrays.asList(pArgs));
-    if (Generator.isLoggingEnabled) {
-      UFGenerator.logMakeFun(result, pName, pReturnType, pArgs);
-    }
     return result;
   }
 
   @Override
   public <T extends Formula> T callUF(FunctionDeclaration<T> funcType, Formula... args) {
     T result = formulaCreator.callFunction(funcType, Arrays.asList(args));
-    if (Generator.isLoggingEnabled) {
-      UFGenerator.logCallFun(result, funcType, args);
-    }
     return result;
   }
 
@@ -77,6 +81,9 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
   public final <T extends Formula> T callUF(
       FunctionDeclaration<T> pFunc, List<? extends Formula> pArgs) {
     T result = formulaCreator.callFunction(pFunc, pArgs);
+    if (Generator.isLoggingEnabled) {
+      UFGenerator.logCallFun(result, pFunc, pArgs);
+    }
     return result;
   }
 
@@ -84,17 +91,45 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
   public <T extends Formula> T declareAndCallUF(
       String name, FormulaType<T> pReturnType, List<Formula> pArgs) {
     checkVariableName(name);
+    if (name.contains("PIPE")) {
+      name = name.replaceAll("PIPE", "\\|");
+    }
     List<FormulaType<?>> argTypes = Lists.transform(pArgs, getFormulaCreator()::getFormulaType);
     FunctionDeclaration<T> func = declareUF(name, pReturnType, argTypes);
     T result = callUF(func, pArgs);
+    if (Generator.isLoggingEnabled) {
+      UFGenerator.logCallFun(result, declareUF(name, pReturnType, convertInput(pArgs)), pArgs);
+    }
     return result;
+  }
+
+
+  public List<FormulaType<?>> convertInput(List<Formula> pArgs) {
+    List<FormulaType<?>> types = new ArrayList<>();
+
+    for (Formula a : pArgs) {
+      if (a instanceof BooleanFormula) {
+        types.add(FormulaType.BooleanType);
+      } else if (a instanceof IntegerFormula) {
+        types.add(FormulaType.IntegerType);
+      } else if (a instanceof RationalFormula) {
+        types.add(FormulaType.RationalType);
+      } else if (a instanceof BitvectorFormula) {
+
+        types.add(FormulaType.getBitvectorTypeWithSize(32));
+      } else {
+        throw new IllegalArgumentException(a + "is not available for UF yet");
+      }
+    }
+    return types;
   }
 
   @Override
   public <T extends Formula> T declareAndCallUF(
       String name, FormulaType<T> pReturnType, Formula... pArgs) {
     checkVariableName(name);
-    return declareAndCallUF(name, pReturnType, Arrays.asList(pArgs));
+    T result = declareAndCallUF(name, pReturnType, Arrays.asList(pArgs));
+    return result;
   }
 
 

@@ -21,24 +21,137 @@
 package org.sosy_lab.java_smt.utils.Generators;
 
 import com.google.common.collect.ImmutableList;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import javax.annotation.Nullable;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.java_smt.api.ArrayFormulaManager;
+import org.sosy_lab.java_smt.api.BasicProverEnvironment;
+import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.BooleanFormulaManager;
+import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaManager;
+import org.sosy_lab.java_smt.api.IntegerFormulaManager;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.api.RationalFormulaManager;
+import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.UFManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
-import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
+import org.sosy_lab.java_smt.basicimpl.withAssumptionsWrapper.ProverWithAssumptionsWrapper;
+import org.sosy_lab.java_smt.utils.Parsers.ModelVisitor;
+import org.sosy_lab.java_smt.utils.Parsers.Visitor;
+import org.sosy_lab.java_smt.utils.Parsers.smtlibv2Lexer;
+import org.sosy_lab.java_smt.utils.Parsers.smtlibv2Parser;
+import scala.Enumeration.Val;
 
 public class UniversalModel extends AbstractModel {
-  public UniversalModel(AbstractProver prover, AbstractFormulaManager pFormulaManager) {
-    super(prover, pFormulaManager);
+
+  private final String path = "/home/janel/Desktop/Studium/Semester_6/Bachelorarbeit"
+      + "/nochmalneu/";
+
+  AbstractFormulaManager<Formula, Formula, Formula, ?> formulaManager;
+  private final BooleanFormulaManager bmgr;
+  private final IntegerFormulaManager imgr;
+  //private final RationalFormulaManager rmgr;
+  //private final BitvectorFormulaManager bvmgr;
+  //private final ArrayFormulaManager amgr;
+  private final UFManager umgr;
+
+  private List<ValueAssignment> assignments;
+  private ImmutableList<ValueAssignment> finalList;
+  private boolean isUnsat;
+
+
+
+  public UniversalModel(
+      ProverEnvironment prover,
+      AbstractFormulaManager<Formula, Formula, Formula, ?> pFormulaManager) {
+    super( null, pFormulaManager);
+    formulaManager = pFormulaManager;
+    bmgr = formulaManager.getBooleanFormulaManager();
+    imgr = formulaManager.getIntegerFormulaManager();
+    //rmgr = Objects.requireNonNull(formulaManager.getRationalFormulaManager());
+    //bvmgr = formulaManager.getBitvectorFormulaManager();
+    //amgr = Objects.requireNonNull(formulaManager.getArrayFormulaManager());
+    umgr = formulaManager.getUFManager();
+    assignments = new ArrayList<>();
+
+  }
+
+  public ImmutableList<ValueAssignment> listToImmutable(List<ValueAssignment> pList) {
+    ImmutableList<ValueAssignment> immutableList = ImmutableList.copyOf(pList);
+    return immutableList;
+  }
+
+  public String getOutput() throws IOException {
+    StringBuilder output = new StringBuilder();
+
+    Process process = new ProcessBuilder("/home/janel/Desktop/Studium/Semester_6/Bachelorarbeit"
+        + "/Princess/princess-bin-2023-06-19/princess",
+        "+incremental", (path + "Out.smt2")).start();
+    InputStream is = process.getInputStream();
+    InputStreamReader isr = new InputStreamReader(is);
+    BufferedReader br = new BufferedReader(isr);
+    String lines;
+    while ((lines = br.readLine()) != null) {
+      output.append(lines).append("\n");
+    }
+    if (String.valueOf(output).startsWith("un")) {
+      isUnsat = true;
+      output.delete(0, 5);
+    } else {
+      isUnsat = false;
+      output.delete(0, 3);
+    }
+    Generator.writeToFile(String.valueOf(output), (path + "Model.smt2"));
+    return String.valueOf(output);
+  }
+
+  public List<ValueAssignment> parseModel(String pString)
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    smtlibv2Lexer lexer = new smtlibv2Lexer(CharStreams.fromFileName(pString));
+    smtlibv2Parser parser = new smtlibv2Parser(new CommonTokenStream(lexer));
+    ModelVisitor visitor = new ModelVisitor(bmgr, imgr, null, null, null, umgr);
+    visitor.visit(parser.start());
+    List<ValueAssignment> assignments = visitor.getAssignments();
+
+    return assignments;
+  }
+
+  public List<ValueAssignment> getAssignments()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    getOutput();
+    List<ValueAssignment> assignments = parseModel(path + "Model.smt2");
+
+    finalList = listToImmutable(assignments);
+
+
+    return assignments;
   }
 
   @Override
   public ImmutableList<ValueAssignment> asList() {
-    BooleanFormula reg = formulaManager.getBooleanFormulaManager().makeFalse();
 
+    return finalList;
+  }
 
-    return null;
+  public ImmutableList<ValueAssignment> getModel()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    //getOutput();
+    getAssignments();
+    return finalList;
   }
 
   @Nullable
@@ -46,4 +159,12 @@ public class UniversalModel extends AbstractModel {
   protected Object evalImpl(Object formula) {
     return null;
   }
+
+  @Override
+  public String toString() {
+    return "UniversalModel{" +
+        "formulaManager=" + formulaManager +
+        '}';
+  }
 }
+
