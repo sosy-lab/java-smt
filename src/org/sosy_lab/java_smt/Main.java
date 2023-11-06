@@ -47,7 +47,7 @@ public class Main {
     ShutdownManager shutdown = ShutdownManager.create();
     SolverContext context =
         SolverContextFactory.createSolverContext(config, logger, shutdown.getNotifier(),
-            Solvers.Z3);
+            Solvers.PRINCESS);
     AbstractFormulaManager fmgr = (AbstractFormulaManager) context.getFormulaManager();
     BooleanFormulaManager bmgr = fmgr.getBooleanFormulaManager();
     IntegerFormulaManager imgr = fmgr.getIntegerFormulaManager();
@@ -55,11 +55,8 @@ public class Main {
     //RationalFormulaManager rmgr = fmgr.getRationalFormulaManager();
     UFManager umgr =  fmgr.getUFManager();
 
-    //BooleanFormula constraint = fmgr.universalParse("/home/janel/Desktop/Studium/Semester_6"
-    //    + "/Bachelorarbeit/nochmalneu/smtquery.z3/smtquery.022.smt2");
-
-    BooleanFormula constraint = umgr.declareAndCallUF("test", FormulaType.BooleanType,
-        bvmgr.makeVariable(32, "hans"));
+    BooleanFormula constraint = fmgr.universalParse("/home/janel/Desktop/Studium/Semester_6"
+        + "/Bachelorarbeit/nochmalneu/smtquery.z3/smtquery.001.smt2");
 
     try (ProverEnvironment prover =
              context.newProverEnvironment(SolverContext.ProverOptions.GENERATE_MODELS)) {

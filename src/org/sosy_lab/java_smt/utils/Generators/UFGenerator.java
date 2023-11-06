@@ -24,9 +24,11 @@ import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 
 public class UFGenerator <TFormulaInfo, TFunctionDecl, TType, TEnv> {
@@ -37,7 +39,7 @@ public class UFGenerator <TFormulaInfo, TFunctionDecl, TType, TEnv> {
       if (arg.isArrayType()) {
         inputArgs.append("Array");
       } else if (arg.isBitvectorType()) {
-        inputArgs.append("BitVec");
+        inputArgs.append("(_ BitVec " + ((FormulaType.BitvectorType) arg).getSize() + ")");
       } else if (arg.isBooleanType()) {
         inputArgs.append("Bool");
       } else if (arg.isIntegerType()) {
@@ -52,7 +54,7 @@ public class UFGenerator <TFormulaInfo, TFunctionDecl, TType, TEnv> {
     if (out.isArrayType()) {
       return "Array";
     } else if (out.isBitvectorType()) {
-      return "BitVec";
+      return "(_ BitVec " + ((FormulaType.BitvectorType) out).getSize() + ")";
     } else if (out.isBooleanType()) {
       return "Bool";
     } else if (out.isIntegerType()) {
@@ -77,16 +79,22 @@ public class UFGenerator <TFormulaInfo, TFunctionDecl, TType, TEnv> {
 
   public static <T extends Formula> void logCallFun(Object result,
                                                     FunctionDeclaration<T> funcType, List<? extends Formula> pArgs) {
-    StringBuilder out = new StringBuilder();
-    out.append(funcType.getName());
+
     List<Object> inputParams = new ArrayList<>();
     inputParams.addAll(pArgs);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> {
+          StringBuilder out = new StringBuilder();
+          out.append(funcType.getName() + " ");
           inPlaceInputParams.forEach((c) -> {
             out.append(c);
             out.append(" ");
           });
+          out.deleteCharAt(out.length()-1);
+          if (inPlaceInputParams.size() > 0) {
+            out.insert(0, "(");
+            out.append(")");
+          }
           return String.valueOf(out);
         };
     RecursiveString newEntry = new RecursiveString(result, inputParams, saveResult, "UFFun");

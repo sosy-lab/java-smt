@@ -17,12 +17,16 @@ import java.util.List;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.UFManager;
+import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
+import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.utils.Generators.Generator;
 import org.sosy_lab.java_smt.utils.Generators.UFGenerator;
 
@@ -98,31 +102,13 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
     FunctionDeclaration<T> func = declareUF(name, pReturnType, argTypes);
     T result = callUF(func, pArgs);
     if (Generator.isLoggingEnabled) {
-      UFGenerator.logCallFun(result, declareUF(name, pReturnType, convertInput(pArgs)), pArgs);
+      UFGenerator.logCallFun(result, declareUF(name, pReturnType, argTypes), pArgs);
     }
     return result;
   }
 
 
-  public List<FormulaType<?>> convertInput(List<Formula> pArgs) {
-    List<FormulaType<?>> types = new ArrayList<>();
 
-    for (Formula a : pArgs) {
-      if (a instanceof BooleanFormula) {
-        types.add(FormulaType.BooleanType);
-      } else if (a instanceof IntegerFormula) {
-        types.add(FormulaType.IntegerType);
-      } else if (a instanceof RationalFormula) {
-        types.add(FormulaType.RationalType);
-      } else if (a instanceof BitvectorFormula) {
-
-        types.add(FormulaType.getBitvectorTypeWithSize(32));
-      } else {
-        throw new IllegalArgumentException(a + "is not available for UF yet");
-      }
-    }
-    return types;
-  }
 
   @Override
   public <T extends Formula> T declareAndCallUF(
