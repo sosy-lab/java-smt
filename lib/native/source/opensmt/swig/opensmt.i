@@ -43,17 +43,7 @@
 
 %exception {
   try { $action }
-  catch(ArithDivisionByZeroException& e) {
-    jclass exceptionType = jenv->FindClass("java/lang/UnsupportedOperationException");
-    jenv->ThrowNew(exceptionType, e.what());
-    return $null;
-  }
-  catch(LANonLinearException& e) {
-    jclass exceptionType = jenv->FindClass("java/lang/UnsupportedOperationException");
-    jenv->ThrowNew(exceptionType, e.what());
-    return $null;
-  }
-  catch(OsmtApiException& e) {
+  catch(std::exception& e) {
     jclass exceptionType = jenv->FindClass("java/lang/UnsupportedOperationException");
     jenv->ThrowNew(exceptionType, e.what());
     return $null;

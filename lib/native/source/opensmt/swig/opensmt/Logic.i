@@ -9,19 +9,10 @@
 // Override the exception handler for Logic.parse()
 // Any error thrown here should be recast as an IllegalArgumentException
 
+
 %exception Logic::parseFormula {
   try { $action }
-  catch(ArithDivisionByZeroException& e) {
-    jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
-    jenv->ThrowNew(exceptionType, e.what());
-    return $null;
-  }
-  catch(LANonLinearException& e) {
-    jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
-    jenv->ThrowNew(exceptionType, e.what());
-    return $null;
-  }
-  catch(OsmtApiException& e) {
+  catch(std::exception& e) {
     jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
     jenv->ThrowNew(exceptionType, e.what());
     return $null;
