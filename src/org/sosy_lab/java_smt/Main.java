@@ -55,8 +55,11 @@ public class Main {
     //RationalFormulaManager rmgr = fmgr.getRationalFormulaManager();
     UFManager umgr =  fmgr.getUFManager();
 
-    BooleanFormula constraint = fmgr.universalParse("/home/janel/Desktop/Studium/Semester_6"
-        + "/Bachelorarbeit/nochmalneu/smtquery.z3/smtquery.001.smt2");
+    //BooleanFormula constraint = fmgr.universalParse("/home/janel/Desktop/Studium/Semester_6"
+    //    + "/Bachelorarbeit/nochmalneu/smtquery.z3/smtquery.019.smt2");
+
+    BooleanFormula constraint = umgr.declareAndCallUF("annalena", FormulaType.BooleanType,
+        bvmgr.makeVariable(5, "test"));
 
     try (ProverEnvironment prover =
              context.newProverEnvironment(SolverContext.ProverOptions.GENERATE_MODELS)) {
@@ -64,7 +67,7 @@ public class Main {
 
       Generator.dumpSMTLIB2();
       UniversalModel bla = new UniversalModel(prover , fmgr);
-      //System.out.println(bla.getModel());
+      System.out.println(bla.getModel());
 
       boolean isUnsat = prover.isUnsat();
 

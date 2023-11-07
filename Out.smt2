@@ -1,5 +1,6 @@
-(declare-fun |id#2@1| () (_ BitVec 32))
-(assert (bvsle |id#2@1| #b00000000000000000000000000001010))
+(declare-fun annalena ((_ BitVec 5)) Bool)
+(declare-const test (_ BitVec 5))
+(assert (annalena test))
 (check-sat)
 (get-model)
 (exit)

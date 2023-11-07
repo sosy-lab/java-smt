@@ -187,7 +187,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     smtlibv2Lexer lexer = new smtlibv2Lexer(CharStreams.fromFileName(pString));
     smtlibv2Parser parser = new smtlibv2Parser(new CommonTokenStream(lexer));
-    Visitor visitor = new Visitor(this.booleanManager, this.integerManager, this.rationalManager,
+    Visitor visitor = new Visitor(this, this.booleanManager, this.integerManager,
+        this.rationalManager,
         this.bitvectorManager, this.arrayManager, this.functionManager);
     visitor.visit(parser.start());
     List<BooleanFormula> constraints = visitor.getConstraints();

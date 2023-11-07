@@ -65,7 +65,7 @@ public class UniversalModel extends AbstractModel {
   private final BooleanFormulaManager bmgr;
   private final IntegerFormulaManager imgr;
   //private final RationalFormulaManager rmgr;
-  //private final BitvectorFormulaManager bvmgr;
+  private final BitvectorFormulaManager bvmgr;
   //private final ArrayFormulaManager amgr;
   private final UFManager umgr;
 
@@ -83,7 +83,7 @@ public class UniversalModel extends AbstractModel {
     bmgr = formulaManager.getBooleanFormulaManager();
     imgr = formulaManager.getIntegerFormulaManager();
     //rmgr = Objects.requireNonNull(formulaManager.getRationalFormulaManager());
-    //bvmgr = formulaManager.getBitvectorFormulaManager();
+    bvmgr = formulaManager.getBitvectorFormulaManager();
     //amgr = Objects.requireNonNull(formulaManager.getArrayFormulaManager());
     umgr = formulaManager.getUFManager();
     assignments = new ArrayList<>();
@@ -123,18 +123,20 @@ public class UniversalModel extends AbstractModel {
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     smtlibv2Lexer lexer = new smtlibv2Lexer(CharStreams.fromFileName(pString));
     smtlibv2Parser parser = new smtlibv2Parser(new CommonTokenStream(lexer));
-    ModelVisitor visitor = new ModelVisitor(bmgr, imgr, null, null, null, umgr);
+    Visitor visitor = new Visitor(formulaManager, bmgr, imgr, null, bvmgr, null, umgr);
     visitor.visit(parser.start());
-    List<ValueAssignment> assignments = visitor.getAssignments();
-
+    assignments = visitor.getAssignments();
     return assignments;
   }
 
   public List<ValueAssignment> getAssignments()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     getOutput();
-    List<ValueAssignment> assignments = parseModel(path + "Model.smt2");
-
+    if (! isUnsat) {
+      assignments = parseModel(path + "Model.smt2");
+    } else {
+      throw new SolverException("Formula has to be sat in order to retrieve a model.");
+    }
     finalList = listToImmutable(assignments);
 
 
@@ -149,7 +151,7 @@ public class UniversalModel extends AbstractModel {
 
   public ImmutableList<ValueAssignment> getModel()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    //getOutput();
+    getOutput();
     getAssignments();
     return finalList;
   }

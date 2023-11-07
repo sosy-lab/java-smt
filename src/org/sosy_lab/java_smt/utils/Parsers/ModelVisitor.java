@@ -48,6 +48,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.UFManager;
+import org.sosy_lab.java_smt.utils.Generators.Tuple;
 
 public class ModelVisitor extends smtlibv2BaseVisitor<Object> {
   HashMap<String, ParserFormula> variables = new HashMap<>();
@@ -306,8 +307,7 @@ public class ModelVisitor extends smtlibv2BaseVisitor<Object> {
 
     String operand = ctx.getText();
     if (operand.startsWith("|")) {
-      operand = operand.split("\\|")[1];
-      operand = operand.split("\\|")[0];
+      operand = operand.replaceAll("\\|", "PIPE");
     }
     List<String> bitVec = (List<String>) visitChildren(ctx);
     if (variables.containsKey(operand)) {
@@ -332,7 +332,7 @@ public class ModelVisitor extends smtlibv2BaseVisitor<Object> {
 
   public void getOperands(smtlibv2Parser.MultitermContext ctx,
                           List<Formula> operands) {
-
+    int x = ctx.term().size();
     for (int i = 0; i < ctx.term().size(); ++i) {
       Object operand = visit(ctx.term(i));
       // do not add multi term to list of operands
@@ -409,7 +409,7 @@ public class ModelVisitor extends smtlibv2BaseVisitor<Object> {
           }
         }
       case "ite":
-        if (operands.size() != 2) {
+        if (operands.size() != 3) {
           throw new IOException(operator + " takes two boolean operands as input.");
         } else {
           try {
@@ -1084,60 +1084,63 @@ public class ModelVisitor extends smtlibv2BaseVisitor<Object> {
 
   @Override public Object visitFunction_def(smtlibv2Parser.Function_defContext ctx)
       throws IOException {
-    /*
+
     String variable = ctx.symbol().getText();
     if (variable.startsWith("|")) {
-      variable = variable.split("\\|")[1];
-      variable = variable.split("\\|")[0];
-    }
-
-    String name;
-    String sort;
-    for (int i = 0; i < ctx.sorted_var().size(); i++) {
-      name = ctx.sorted_var(i).symbol().getText();
-      sort = ctx.sorted_var(i).sort().getText();
-      variables.put(name, new ParserFormula(sort, mapSort(sort)));
-    }
-    String outSort = ctx.sort().getText();
-    Formula input = (Formula) visit(ctx.term());
-    variables.put(variable, new ParserFormula("def-fun", input));
-
-    //Model.ValueAssignment assignment = new ValueAssignment()
-
-    return visitChildren(ctx);
-     */
-    String variable = ctx.symbol().getText();
-    if (variable.startsWith("|")) {
-      variable = variable.split("\\|")[1];
-      variable = variable.split("\\|")[0];
+      variable = variable.replaceAll("\\|", "PIPE");
     }
     List<String> declaration = new ArrayList<>();
-    List<FormulaType<?>> javaSorts = new ArrayList<>();
+    List<Formula> javaSorts = new ArrayList<>();
 
     String returnType = ctx.sort().getText();
     for (int i = 0; i < ctx.getChildCount(); i++) {
       declaration.add(ctx.getChild(i).getText());
     }
 
-    List<String> inputParams = new ArrayList<>();
-    if (ctx.getChildCount() > 4 && ! ctx.getChild(3).getText().equals(")")) {
-      inputParams = declaration.subList(3, ctx.getChildCount() - 2);
-      javaSorts = inputParams.stream().map(e -> {
-        try {
-          return mapSort(e);
-        } catch (IOException pE) {
-          throw new RuntimeException(pE);
-        }
-      }).collect(Collectors.toList());
+    List<Tuple> inputParams = new ArrayList<>();
+    if (ctx.getChildCount() > 4 && ! ctx.getChild(2).getText().equals(")")) {
+      for (int i = 0; i < ctx.sorted_var().size(); i++) {
+        String name = ctx.sorted_var(i).symbol().getText();
+        String value = ctx.sorted_var(i).sort().getText();
+        inputParams.add(new Tuple(name, value));
+      }
     }
-    Formula input = (Formula) visit(ctx.term());
+    javaSorts = inputParams.stream().map(e -> {
+      try {
+        return mapSort(e);
+      } catch (IOException pE) {
+        throw new RuntimeException(pE);
+      }
+    }).collect(Collectors.toList());
 
-    Formula key = mapKey(returnType, variable);
+    String name;
+    String sort;
+    for (int i = 0; i < ctx.sorted_var().size(); i++) {
+      name = ctx.sorted_var(i).symbol().getText();
+      sort = ctx.sorted_var(i).sort().getText();
+      variables.put(name, new ParserFormula(sort, mapKey(sort, name)));
+    }
+
+    Formula input = (Formula) visit(ctx.term());
+    variables.put(variable, new ParserFormula("def-fun", input));
+
+    Formula key;
+    if (! inputParams.isEmpty()) {
+      key = umgr.declareAndCallUF(variable, mapFunctionType(returnType), javaSorts);
+    } else {
+      key = mapKey(returnType, variable);
+    }
     Formula value = input;
-    String valueString = ctx.term().getText();
+    String keyString = key.toString();
+    if (variable.startsWith("PIPE")) {
+      keyString = variable.replaceAll("PIPE", "\\|");
+    } else {
+      keyString = variable;
+    }
+    String valueString = value.toString();
 
     Model.ValueAssignment assignment = new ValueAssignment(key, value, mapEquivalence(key, value)
-        , variable, valueString, new ArrayList<>());
+        , keyString, valueString, new ArrayList<>());
     assignments.add(assignment);
     return visitChildren(ctx);
   }
@@ -1175,6 +1178,28 @@ public class ModelVisitor extends smtlibv2BaseVisitor<Object> {
         return Objects.requireNonNull(rmgr).makeVariable(name);
       case "BitVec":
         return Objects.requireNonNull(bimgr).makeVariable(Integer.parseInt(bvSize), name);
+      default:
+        throw new IOException("JavaSMT supports only Int, Real, BitVec and Bool for UF.");
+    }
+  }
+
+  public FormulaType<?> mapFunctionType(String functionType) throws IOException {
+    String bvSize = "";
+    if (functionType.startsWith("(_BitVec")) {
+      bvSize = functionType.split("_BitVec")[1];
+      bvSize = bvSize.split("\\)")[0];
+      functionType = "BitVec";
+    }
+
+    switch (functionType) {
+      case "Int":
+        return FormulaType.IntegerType;
+      case "Bool":
+        return FormulaType.BooleanType;
+      case "Real":
+        return FormulaType.RationalType;
+      case "BitVec":
+        return FormulaType.getBitvectorTypeWithSize(Integer.parseInt(bvSize));
       default:
         throw new IOException("JavaSMT supports only Int, Real, BitVec and Bool for UF.");
     }
@@ -1300,7 +1325,9 @@ public class ModelVisitor extends smtlibv2BaseVisitor<Object> {
 
   @Override public Object visitCmd_declareDatatypes(smtlibv2Parser.Cmd_declareDatatypesContext ctx) { return visitChildren(ctx); }
 
-  public static FormulaType<?> mapSort(String sorts) throws IOException {
+  public Formula mapSort(Tuple pTuple) throws IOException {
+    String sorts = pTuple.getType();
+    String name = pTuple.getName();
     String bvSize = "";
     if (sorts.startsWith("(_BitVec")) {
       bvSize = sorts.split("_BitVec")[1];
@@ -1310,13 +1337,13 @@ public class ModelVisitor extends smtlibv2BaseVisitor<Object> {
 
     switch (sorts) {
       case "Int":
-        return FormulaType.IntegerType;
+        return Objects.requireNonNull(imgr).makeVariable(name);
       case "Bool":
-        return FormulaType.BooleanType;
+        return Objects.requireNonNull(bmgr).makeVariable(name);
       case "Real":
-        return FormulaType.RationalType;
+        return Objects.requireNonNull(rmgr).makeVariable(name);
       case "BitVec":
-        return FormulaType.BitvectorType.getBitvectorTypeWithSize(Integer.parseInt(bvSize));
+        return Objects.requireNonNull(bimgr).makeVariable(Integer.parseInt(bvSize), name);
       default:
         throw new IOException("JavaSMT supports only Int, Real, BitVec and Bool for UF.");
     }
@@ -1324,10 +1351,10 @@ public class ModelVisitor extends smtlibv2BaseVisitor<Object> {
 
   @Override public Object visitCmd_declareFun(smtlibv2Parser.Cmd_declareFunContext ctx)
       throws IOException {
+    /*
     String variable = ctx.symbol().getText();
     if (variable.startsWith("|")) {
-      variable = variable.split("\\|")[1];
-      variable = variable.split("\\|")[0];
+      variable = variable.replaceAll("\\|", "PIPE");
     }
     List<String> declaration = new ArrayList<>();
     List<FormulaType<?>> javaSorts = new ArrayList<>();
@@ -1353,8 +1380,10 @@ public class ModelVisitor extends smtlibv2BaseVisitor<Object> {
     temp.setReturnType(mapSort(returnType));
     temp.setInputParams(javaSorts);
     variables.put(variable, temp);
-
+*/
     return visitChildren(ctx);
+
+
   }
 
   @Override public Object visitCmd_declareSort(smtlibv2Parser.Cmd_declareSortContext ctx) { return visitChildren(ctx); }

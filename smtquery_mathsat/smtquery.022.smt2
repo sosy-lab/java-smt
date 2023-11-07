@@ -134,7 +134,6 @@
 (set-option :config "theory.na.nta_sat_mode=1")
 (set-option :config "theory.na.nta_eager=true")
 
-(push 1)
 (declare-fun |id#2@1| () (_ BitVec 32))
 (declare-fun |id#0@1| () (_ BitVec 32))
 (define-fun .10 () (_ BitVec 32) (_ bv10 32))
@@ -167,14 +166,4 @@
 (define-fun .166 () Bool (and .121 .165))
 (assert .166)
 (check-sat)
-(push 1)
-(declare-fun __A () Bool)
-(define-fun .8 () (_ BitVec 32) (_ bv0 32))
-(define-fun .9 () Bool __A)
-(define-fun .18 () Bool (not .9))
-(define-fun .64 () Bool (= .55 .8))
-(define-fun .65 () Bool (not .64))
-(define-fun .66 () Bool (or .18 .65))
-(assert .66)
-(check-sat-assuming (.9 ))
-(pop 1)
+
