@@ -659,13 +659,13 @@ SPDX-License-Identifier: Apache-2.0
     <target name="package-apron" depends="">
         <!-- Copy Apron repository to the root folder along with the version postfix. -->
         <fail unless="apron.path">
-            Please specify the path to Boolector with the flag -Dapron.path=/path/to/apron.
+            Please specify the path to Apron with the flag -Dapron.path=/path/to/apron.
             The path has to point to the root Apron folder, i.e.,
             a checkout of the official git repositoy from 'https://github.com/antoinemine/apron'.
             Note that shell substitutions do not work and a full absolute path has to be specified.
         </fail>
         <fail unless="apron.customRev">
-            Please specify a custom revision with the flag -Dboolector.customRev=XXX.
+            Please specify a custom revision with the flag -Dapron.customRev=XXX.
             The custom revision has to be unique amongst the already known version
             numbers from the ivy repository. The script will append the git revision.
         </fail>
@@ -681,7 +681,7 @@ SPDX-License-Identifier: Apache-2.0
         <echo message="Building Apron in version '${apron.version}'"/>
 
         <!-- build Apron -->
-        <exec executable="./configure" dir="${boolector.path}" failonerror="true">
+        <exec executable="./configure" dir="${apron.path}" failonerror="true">
             <arg value="--no-cxx"/>
             <arg value="--no-ocaml"/>
             <arg value="--prefix"/>
@@ -689,7 +689,7 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="--no-ocaml-plugins"/>
             <arg value="--no-ocamlfind"/>
         </exec>
-        <exec executable="make" dir="${boolector.path}/build/" failonerror="true">
+        <exec executable="make" dir="${apron.path}/build/" failonerror="true">
         </exec>
 
         <!-- fix RPATH and library dependencies -->
