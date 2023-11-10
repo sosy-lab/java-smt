@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.delegate.synchronize;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableMap;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -60,7 +61,7 @@ class SynchronizedBasicProverEnvironment<T> implements BasicProverEnvironment<T>
   }
 
   @Override
-  public boolean isUnsat() throws SolverException, InterruptedException {
+  public boolean isUnsat() throws SolverException, InterruptedException, IOException {
     synchronized (sync) {
       return delegate.isUnsat();
     }
@@ -68,7 +69,7 @@ class SynchronizedBasicProverEnvironment<T> implements BasicProverEnvironment<T>
 
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     synchronized (sync) {
       return delegate.isUnsatWithAssumptions(pAssumptions);
     }
@@ -91,7 +92,8 @@ class SynchronizedBasicProverEnvironment<T> implements BasicProverEnvironment<T>
 
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
-      Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
+      Collection<BooleanFormula> pAssumptions)
+      throws SolverException, InterruptedException, IOException {
     synchronized (sync) {
       return delegate.unsatCoreOverAssumptions(pAssumptions);
     }
@@ -120,7 +122,7 @@ class SynchronizedBasicProverEnvironment<T> implements BasicProverEnvironment<T>
 
   @Override
   public <R> R allSat(AllSatCallback<R> pCallback, List<BooleanFormula> pImportant)
-      throws InterruptedException, SolverException {
+      throws InterruptedException, SolverException, IOException {
     synchronized (sync) {
       return delegate.allSat(pCallback, pImportant);
     }

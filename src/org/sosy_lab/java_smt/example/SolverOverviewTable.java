@@ -15,6 +15,7 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -40,7 +41,7 @@ import org.sosy_lab.java_smt.api.SolverException;
  */
 public class SolverOverviewTable {
 
-  public static void main(String[] args) throws SolverException, InterruptedException {
+  public static void main(String[] args) throws SolverException, InterruptedException, IOException {
 
     final List<SolverInfo> infos = new ArrayList<>();
     for (Solvers s : Solvers.values()) {
@@ -63,7 +64,7 @@ public class SolverOverviewTable {
    * @return Information about the solver you entered or NULL if the solver is not available.
    */
   public @Nullable SolverInfo getSolverInformation(Solvers solver)
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
 
     Configuration config = Configuration.defaultConfiguration();
     LogManager logger = LogManager.createNullLogManager();
@@ -93,7 +94,7 @@ public class SolverOverviewTable {
    */
   @SuppressWarnings({"CheckReturnValue", "resource"})
   private List<String> getFeatures(SolverContext context)
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     List<String> features = new ArrayList<>();
 
     // Optimization: Will throw UnsupportedOperationException in creation of prover if not

@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.basicimpl.withAssumptionsWrapper;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -61,7 +62,7 @@ public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironme
   }
 
   @Override
-  public boolean isUnsat() throws SolverException, InterruptedException {
+  public boolean isUnsat() throws SolverException, InterruptedException, IOException {
     Generator.lines.append("(check-sat)\n");
     clearAssumptions();
 
@@ -70,7 +71,7 @@ public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironme
 
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     clearAssumptions();
     solverAssumptionsAsFormula.addAll(assumptions);
     for (BooleanFormula formula : assumptions) {
@@ -99,7 +100,7 @@ public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironme
 
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
-      Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
+      Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException, IOException {
     clearAssumptions();
     return delegate.unsatCoreOverAssumptions(pAssumptions);
     //    if (isUnsatWithAssumptions(pAssumptions)) {
@@ -127,7 +128,7 @@ public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironme
 
   @Override
   public <R> R allSat(AllSatCallback<R> pCallback, List<BooleanFormula> pImportant)
-      throws InterruptedException, SolverException {
+      throws InterruptedException, SolverException, IOException {
     clearAssumptions();
     return delegate.allSat(pCallback, pImportant);
   }

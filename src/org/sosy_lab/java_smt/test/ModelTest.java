@@ -96,11 +96,13 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       }
 
       assertThat(prover.getModelAssignments()).isEmpty();
+    } catch (IOException pE) {
+      throw new RuntimeException(pE);
     }
   }
 
   @Test
-  public void testOnlyTrue() throws SolverException, InterruptedException {
+  public void testOnlyTrue() throws SolverException, InterruptedException, IOException {
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(bmgr.makeTrue());
       assertThat(prover).isSatisfiable();
@@ -114,7 +116,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testGetSmallIntegers() throws SolverException, InterruptedException {
+  public void testGetSmallIntegers() throws SolverException, InterruptedException, IOException {
     requireIntegers();
     testModelGetters(
         imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(10)),
@@ -124,7 +126,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testGetNegativeIntegers() throws SolverException, InterruptedException {
+  public void testGetNegativeIntegers() throws SolverException, InterruptedException, IOException {
     requireIntegers();
     testModelGetters(
         imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(-10)),
@@ -134,7 +136,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testGetLargeIntegers() throws SolverException, InterruptedException {
+  public void testGetLargeIntegers() throws SolverException, InterruptedException, IOException {
     requireIntegers();
     BigInteger large = new BigInteger("1000000000000000000000000000000000000000");
     testModelGetters(
@@ -145,7 +147,8 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testGetSmallIntegralRationals() throws SolverException, InterruptedException {
+  public void testGetSmallIntegralRationals()
+      throws SolverException, InterruptedException, IOException {
     requireIntegers();
     requireRationals();
     testModelGetters(
@@ -156,7 +159,8 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testGetLargeIntegralRationals() throws SolverException, InterruptedException {
+  public void testGetLargeIntegralRationals()
+      throws SolverException, InterruptedException, IOException {
     requireIntegers();
     requireRationals();
     BigInteger large = new BigInteger("1000000000000000000000000000000000000000");
@@ -168,7 +172,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testGetRationals() throws SolverException, InterruptedException {
+  public void testGetRationals() throws SolverException, InterruptedException, IOException {
     requireIntegers();
     requireRationals();
     for (String name : VARIABLE_NAMES) {
@@ -182,7 +186,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   /** Test that different names are no problem for Bools in the model. */
   @Test
-  public void testGetBooleans() throws SolverException, InterruptedException {
+  public void testGetBooleans() throws SolverException, InterruptedException, IOException {
     // Some names are specificly chosen to test the Boolector model
     for (String name : VARIABLE_NAMES) {
       testModelGetters(bmgr.makeVariable(name), bmgr.makeBoolean(true), true, name);
@@ -191,7 +195,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   /** Test that different names are no problem for Bitvectors in the model. */
   @Test
-  public void testGetBvs() throws SolverException, InterruptedException {
+  public void testGetBvs() throws SolverException, InterruptedException, IOException {
     requireBitvectors();
     // Some names are specificly chosen to test the Boolector model
     // Use 1 instead of 0 or max bv value, as solvers tend to use 0, min or max as default
@@ -206,7 +210,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   /** Test that different names are no problem for Integers in the model. */
   @Test
-  public void testGetInts() throws SolverException, InterruptedException {
+  public void testGetInts() throws SolverException, InterruptedException, IOException {
     requireIntegers();
     for (String name : VARIABLE_NAMES) {
       testModelGetters(
@@ -219,7 +223,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   /** Test that different names are no problem for Bv UFs in the model. */
   @Test
-  public void testGetBvUfs() throws SolverException, InterruptedException {
+  public void testGetBvUfs() throws SolverException, InterruptedException, IOException {
     requireBitvectors();
     // Some names are specificly chosen to test the Boolector model
     // Use 1 instead of 0 or max bv value, as solvers tend to use 0, min or max as default
@@ -241,7 +245,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   /** Test that different names are no problem for int UFs in the model. */
   @Test
-  public void testGetIntUfs() throws SolverException, InterruptedException {
+  public void testGetIntUfs() throws SolverException, InterruptedException, IOException {
     requireIntegers();
     // Some names are specificly chosen to test the Boolector model
     // Use 1 instead of 0 or max bv value, as solvers tend to use 0, min or max as default
@@ -264,7 +268,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testGetUFs() throws SolverException, InterruptedException {
+  public void testGetUFs() throws SolverException, InterruptedException, IOException {
     // Boolector does not support integers
     if (imgr != null) {
       IntegerFormula x =
@@ -297,7 +301,8 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testGetUFsWithMultipleAssignments() throws SolverException, InterruptedException {
+  public void testGetUFsWithMultipleAssignments()
+      throws SolverException, InterruptedException, IOException {
     requireIntegers();
 
     List<BooleanFormula> constraints = new ArrayList<>();
@@ -571,7 +576,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   // var = 1 & Exists boundVar . (boundVar = 0 & var = f(boundVar))
   @Test
-  public void testQuantifiedUF() throws SolverException, InterruptedException {
+  public void testQuantifiedUF() throws SolverException, InterruptedException, IOException {
     requireQuantifiers();
     requireIntegers();
 
@@ -676,11 +681,13 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         }
         assertThat(m).contains(expectedValueAssignment);
       }
+    } catch (IOException pE) {
+      throw new RuntimeException(pE);
     }
   }
 
   @Test
-  public void testGetBitvectors() throws SolverException, InterruptedException {
+  public void testGetBitvectors() throws SolverException, InterruptedException, IOException {
     requireBitvectors();
     if (solver == Solvers.BOOLECTOR) {
       // Boolector uses bitvecs length 1 as bools
@@ -699,7 +706,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testGetString() throws SolverException, InterruptedException {
+  public void testGetString() throws SolverException, InterruptedException, IOException {
     requireStrings();
     for (String word : new String[] {"", "a", "abc", "1", "123", "-abc", "\"test\"", "\""}) {
       testModelGetters(
@@ -711,7 +718,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testGetModelAssignments() throws SolverException, InterruptedException {
+  public void testGetModelAssignments() throws SolverException, InterruptedException, IOException {
     if (imgr != null) {
       testModelIterator(
           bmgr.and(
@@ -726,7 +733,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testEmptyStackModel() throws SolverException, InterruptedException {
+  public void testEmptyStackModel() throws SolverException, InterruptedException, IOException {
     if (imgr != null) {
       try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
         assertThat(prover).isSatisfiable();
@@ -775,6 +782,8 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
             assertThat(m.evaluate(imgr.makeVariable("y"))).isNotNull();
           }
         }
+      } catch (IOException pE) {
+        throw new RuntimeException(pE);
       }
     } else {
       try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
@@ -789,12 +798,14 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
             assertThat(m.evaluate(bvmgr.makeVariable(8, "y"))).isNotNull();
           }
         }
+      } catch (IOException pE) {
+        throw new RuntimeException(pE);
       }
     }
   }
 
   @Test
-  public void testPartialModels() throws SolverException, InterruptedException {
+  public void testPartialModels() throws SolverException, InterruptedException, IOException {
     assume()
         .withMessage("As of now, only Z3 and Princess support partial models")
         .that(solver)
@@ -838,11 +849,13 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
           // min; as a result it returns 64
         }
       }
+    } catch (IOException pE) {
+      throw new RuntimeException(pE);
     }
   }
 
   @Test
-  public void testPartialModelsUF() throws SolverException, InterruptedException {
+  public void testPartialModelsUF() throws SolverException, InterruptedException, IOException {
     assume()
         .withMessage("As of now, only Z3 supports partial model evaluation")
         .that(solver)
@@ -861,7 +874,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testEvaluatingConstants() throws SolverException, InterruptedException {
+  public void testEvaluatingConstants() throws SolverException, InterruptedException, IOException {
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(bmgr.makeVariable("b"));
       assertThat(prover.isUnsat()).isFalse();
@@ -891,7 +904,8 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testEvaluatingConstantsWithOperation() throws SolverException, InterruptedException {
+  public void testEvaluatingConstantsWithOperation()
+      throws SolverException, InterruptedException, IOException {
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(bmgr.makeVariable("b"));
       assertThat(prover.isUnsat()).isFalse();
@@ -929,7 +943,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testNonVariableValues() throws SolverException, InterruptedException {
+  public void testNonVariableValues() throws SolverException, InterruptedException, IOException {
     requireArrays();
     requireIntegers();
 
@@ -983,7 +997,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testNonVariableValues2() throws SolverException, InterruptedException {
+  public void testNonVariableValues2() throws SolverException, InterruptedException, IOException {
     requireArrays();
     requireIntegers();
 
@@ -1037,7 +1051,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testGetIntArrays() throws SolverException, InterruptedException {
+  public void testGetIntArrays() throws SolverException, InterruptedException, IOException {
     requireArrays();
     requireIntegers();
     ArrayFormula<IntegerFormula, IntegerFormula> array =
@@ -1073,7 +1087,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testGetArrays2() throws SolverException, InterruptedException {
+  public void testGetArrays2() throws SolverException, InterruptedException, IOException {
     requireParser();
     requireArrays();
     requireBitvectors();
@@ -1103,7 +1117,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testGetArrays6() throws SolverException, InterruptedException {
+  public void testGetArrays6() throws SolverException, InterruptedException, IOException {
     requireArrays();
     requireParser();
     BooleanFormula f =
@@ -1128,7 +1142,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testGetArrays3() throws SolverException, InterruptedException {
+  public void testGetArrays3() throws SolverException, InterruptedException, IOException {
     requireParser();
     requireArrays();
     assume()
@@ -1168,7 +1182,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testGetArrays4() throws SolverException, InterruptedException {
+  public void testGetArrays4() throws SolverException, InterruptedException, IOException {
     requireParser();
     requireArrays();
 
@@ -1195,7 +1209,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test(expected = IllegalArgumentException.class)
   @SuppressWarnings("CheckReturnValue")
-  public void testGetArrays4invalid() throws SolverException, InterruptedException {
+  public void testGetArrays4invalid() throws SolverException, InterruptedException, IOException {
     requireParser();
     requireArrays();
 
@@ -1220,7 +1234,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testGetArrays5() throws SolverException, InterruptedException {
+  public void testGetArrays5() throws SolverException, InterruptedException, IOException {
     requireParser();
     requireArrays();
 
@@ -1246,7 +1260,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testGetArrays5b() throws SolverException, InterruptedException {
+  public void testGetArrays5b() throws SolverException, InterruptedException, IOException {
     requireParser();
     requireArrays();
 
@@ -1300,7 +1314,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testGetArrays5c() throws SolverException, InterruptedException {
+  public void testGetArrays5c() throws SolverException, InterruptedException, IOException {
     requireParser();
     requireArrays();
 
@@ -1335,7 +1349,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testGetArrays5d() throws SolverException, InterruptedException {
+  public void testGetArrays5d() throws SolverException, InterruptedException, IOException {
     requireParser();
     requireArrays();
 
@@ -1370,7 +1384,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testGetArrays5e() throws SolverException, InterruptedException {
+  public void testGetArrays5e() throws SolverException, InterruptedException, IOException {
     requireParser();
     requireArrays();
 
@@ -1405,7 +1419,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testGetArrays5f() throws SolverException, InterruptedException {
+  public void testGetArrays5f() throws SolverException, InterruptedException, IOException {
     requireParser();
     requireArrays();
 
@@ -1442,7 +1456,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testGetArrays7() throws SolverException, InterruptedException {
+  public void testGetArrays7() throws SolverException, InterruptedException, IOException {
     requireArrays();
     requireIntegers();
 
@@ -1476,7 +1490,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testGetArrays8() throws SolverException, InterruptedException {
+  public void testGetArrays8() throws SolverException, InterruptedException, IOException {
     requireArrays();
     requireIntegers();
 
@@ -1522,7 +1536,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testGetArrays9() throws SolverException, InterruptedException {
+  public void testGetArrays9() throws SolverException, InterruptedException, IOException {
     requireArrays();
     requireIntegers();
 
@@ -1575,7 +1589,8 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     }
   }
 
-  private void testModelIterator(BooleanFormula f) throws SolverException, InterruptedException {
+  private void testModelIterator(BooleanFormula f)
+      throws SolverException, InterruptedException, IOException {
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(f);
 
@@ -1592,7 +1607,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   private void testModelGetters(
       BooleanFormula constraint, Formula variable, Object expectedValue, String varName)
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     testModelGetters(constraint, variable, expectedValue, varName, false);
   }
 
@@ -1602,7 +1617,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       Object expectedValue,
       String varName,
       boolean isArray)
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     testModelGetters(constraint, variable, expectedValue, varName, isArray, ImmutableList.of());
   }
 
@@ -1617,7 +1632,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       String varName,
       boolean isArray,
       @Nullable List<Object> ufArgs)
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
 
     List<BooleanFormula> modelAssignments = new ArrayList<>();
 
@@ -1685,7 +1700,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
    */
   private void checkModelAssignmentsValid(
       BooleanFormula constraint, List<BooleanFormula> pModelAssignments)
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     // This can't work in Boolector with ufs as it always crashes with:
     // [btorslvfun] add_function_inequality_constraints: equality over non-array lambdas not
     // supported yet
@@ -1697,7 +1712,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void ufTest() throws SolverException, InterruptedException {
+  public void ufTest() throws SolverException, InterruptedException, IOException {
     requireQuantifiers();
     requireBitvectors();
     // only Z3 fulfills these requirements
@@ -1742,7 +1757,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @SuppressWarnings("resource")
   private void checkModelIteration(BooleanFormula f, boolean useOptProver)
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     ImmutableList<ValueAssignment> assignments;
     try (BasicProverEnvironment<?> prover =
         useOptProver
@@ -1813,7 +1828,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void quantifierTestShort() throws SolverException, InterruptedException {
+  public void quantifierTestShort() throws SolverException, InterruptedException, IOException {
     requireQuantifiers();
     requireIntegers();
 
@@ -2108,7 +2123,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
           + "(assert (= a (select A #x00000000)))";
 
   @Test
-  public void arrayTest1() throws SolverException, InterruptedException {
+  public void arrayTest1() throws SolverException, InterruptedException, IOException {
     requireParser();
     requireArrays();
 
@@ -2121,7 +2136,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void arrayTest2() throws SolverException, InterruptedException {
+  public void arrayTest2() throws SolverException, InterruptedException, IOException {
     requireParser();
     requireArrays();
     requireOptimization();
@@ -2160,7 +2175,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
           + "))";
 
   @Test
-  public void arrayTest3() throws SolverException, InterruptedException {
+  public void arrayTest3() throws SolverException, InterruptedException, IOException {
     requireParser();
     requireArrays();
 
@@ -2169,7 +2184,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void arrayTest4() throws SolverException, InterruptedException {
+  public void arrayTest4() throws SolverException, InterruptedException, IOException {
     requireParser();
     requireArrays();
     requireBitvectors();
@@ -2202,7 +2217,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
   @SuppressWarnings("resource")
-  public void multiCloseTest() throws SolverException, InterruptedException {
+  public void multiCloseTest() throws SolverException, InterruptedException, IOException {
     Formula x;
     BooleanFormula eq;
     if (imgr != null) {
@@ -2236,7 +2251,8 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
   @SuppressWarnings("resource")
-  public void modelAfterSolverCloseTest() throws SolverException, InterruptedException {
+  public void modelAfterSolverCloseTest() throws SolverException, InterruptedException,
+                                                 IOException {
     ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS);
     if (imgr != null) {
       prover.push(imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1)));
@@ -2265,7 +2281,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @SuppressWarnings("resource")
   @Test(expected = IllegalStateException.class)
-  public void testGenerateModelsOption() throws SolverException, InterruptedException {
+  public void testGenerateModelsOption() throws SolverException, InterruptedException, IOException {
     try (ProverEnvironment prover = context.newProverEnvironment()) { // no option
       assertThat(prover).isSatisfiable();
       prover.getModel();
@@ -2274,7 +2290,8 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test(expected = IllegalStateException.class)
-  public void testGenerateModelsOption2() throws SolverException, InterruptedException {
+  public void testGenerateModelsOption2() throws SolverException, InterruptedException,
+                                                 IOException {
     try (ProverEnvironment prover = context.newProverEnvironment()) { // no option
       assertThat(prover).isSatisfiable();
       prover.getModelAssignments();
@@ -2283,7 +2300,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testGetSmallIntegers1() throws SolverException, InterruptedException {
+  public void testGetSmallIntegers1() throws SolverException, InterruptedException, IOException {
     requireIntegers();
     evaluateInModel(
         imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(10)),
@@ -2292,7 +2309,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testGetSmallIntegers2() throws SolverException, InterruptedException {
+  public void testGetSmallIntegers2() throws SolverException, InterruptedException, IOException {
     requireIntegers();
     evaluateInModel(
         imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(10)),
@@ -2301,7 +2318,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testGetNegativeIntegers1() throws SolverException, InterruptedException {
+  public void testGetNegativeIntegers1() throws SolverException, InterruptedException, IOException {
     requireIntegers();
     evaluateInModel(
         imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(-10)),
@@ -2310,7 +2327,8 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testGetSmallIntegralRationals1() throws SolverException, InterruptedException {
+  public void testGetSmallIntegralRationals1()
+      throws SolverException, InterruptedException, IOException {
     requireRationals();
     evaluateInModel(
         rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(1)),
@@ -2319,7 +2337,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testGetRationals1() throws SolverException, InterruptedException {
+  public void testGetRationals1() throws SolverException, InterruptedException, IOException {
     requireRationals();
     evaluateInModel(
         rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(Rational.ofString("1/3"))),
@@ -2328,7 +2346,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testGetBooleans1() throws SolverException, InterruptedException {
+  public void testGetBooleans1() throws SolverException, InterruptedException, IOException {
     evaluateInModel(bmgr.makeVariable("x"), bmgr.makeBoolean(true), true);
     evaluateInModel(bmgr.makeVariable("x"), bmgr.makeBoolean(false), false);
     evaluateInModel(
@@ -2343,7 +2361,8 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test // (timeout = 10_000)
   // TODO CVC5 crashes on making the first boolean symbol when using timeout ???.
-  public void testDeeplyNestedFormulaLIA() throws SolverException, InterruptedException {
+  public void testDeeplyNestedFormulaLIA() throws SolverException, InterruptedException,
+                                                  IOException {
     requireIntegers();
 
     testDeeplyNestedFormula(
@@ -2354,7 +2373,8 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test // (timeout = 10_000)
   // TODO CVC5 crashes on making the first boolean symbol when using timeout ???.
-  public void testDeeplyNestedFormulaBV() throws SolverException, InterruptedException {
+  public void testDeeplyNestedFormulaBV() throws SolverException, InterruptedException,
+                                                 IOException {
     requireBitvectors();
 
     testDeeplyNestedFormula(
@@ -2372,7 +2392,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       Function<Integer, T> makeVar,
       Function<T, BooleanFormula> makeEqZero,
       Function<T, BooleanFormula> makeEqOne)
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     // Warning: do never call "toString" on this formula!
     BooleanFormula f = bmgr.makeVariable("basis");
 
@@ -2389,7 +2409,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   private void evaluateInModel(BooleanFormula constraint, Formula variable, Object expectedValue)
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
 
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(constraint);

@@ -11,12 +11,14 @@ package org.sosy_lab.java_smt.test;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.Lists;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.Test;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -60,7 +62,8 @@ public class ModelEvaluationTest extends SolverBasedTest0.ParameterizedSolverBas
   }
 
   @Test
-  public void testGetSmallIntegersEvaluation1() throws SolverException, InterruptedException {
+  public void testGetSmallIntegersEvaluation1()
+      throws SolverException, InterruptedException, IOException {
     requireIntegers();
     evaluateInModel(
         imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(10)),
@@ -70,7 +73,8 @@ public class ModelEvaluationTest extends SolverBasedTest0.ParameterizedSolverBas
   }
 
   @Test
-  public void testGetSmallIntegersEvaluation2() throws SolverException, InterruptedException {
+  public void testGetSmallIntegersEvaluation2()
+      throws SolverException, InterruptedException, IOException {
     requireIntegers();
     evaluateInModel(
         imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(10)),
@@ -80,7 +84,8 @@ public class ModelEvaluationTest extends SolverBasedTest0.ParameterizedSolverBas
   }
 
   @Test
-  public void testGetNegativeIntegersEvaluation() throws SolverException, InterruptedException {
+  public void testGetNegativeIntegersEvaluation()
+      throws SolverException, InterruptedException, IOException {
     requireIntegers();
     evaluateInModel(
         imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(-10)),
@@ -91,7 +96,7 @@ public class ModelEvaluationTest extends SolverBasedTest0.ParameterizedSolverBas
 
   @Test
   public void testGetSmallIntegralRationalsEvaluation1()
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     requireRationals();
     evaluateInModel(
         rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(1)),
@@ -102,7 +107,7 @@ public class ModelEvaluationTest extends SolverBasedTest0.ParameterizedSolverBas
 
   @Test
   public void testGetSmallIntegralRationalsEvaluation2()
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     requireRationals();
     evaluateInModel(
         rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(1)),
@@ -112,7 +117,8 @@ public class ModelEvaluationTest extends SolverBasedTest0.ParameterizedSolverBas
   }
 
   @Test
-  public void testGetRationalsEvaluation() throws SolverException, InterruptedException {
+  public void testGetRationalsEvaluation() throws SolverException, InterruptedException,
+                                                  IOException {
     requireRationals();
     evaluateInModel(
         rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(Rational.ofString("1/3"))),
@@ -132,7 +138,8 @@ public class ModelEvaluationTest extends SolverBasedTest0.ParameterizedSolverBas
   }
 
   @Test
-  public void testGetBooleansEvaluation() throws SolverException, InterruptedException {
+  public void testGetBooleansEvaluation() throws SolverException, InterruptedException,
+                                                 IOException {
     evaluateInModel(
         bmgr.makeVariable("x"),
         bmgr.makeVariable("y"),
@@ -141,7 +148,7 @@ public class ModelEvaluationTest extends SolverBasedTest0.ParameterizedSolverBas
   }
 
   @Test
-  public void testGetStringsEvaluation() throws SolverException, InterruptedException {
+  public void testGetStringsEvaluation() throws SolverException, InterruptedException, IOException {
     requireStrings();
     evaluateInModel(
         smgr.equal(smgr.makeVariable("x"), smgr.makeString("hello")),
@@ -151,7 +158,8 @@ public class ModelEvaluationTest extends SolverBasedTest0.ParameterizedSolverBas
   }
 
   @Test
-  public void testModelGeneration() throws SolverException, InterruptedException {
+  public void testModelGeneration()
+      throws SolverException, InterruptedException, IOException, InvalidConfigurationException {
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(bmgr.and(getConstraints()));
       for (int i = 0; i < problemSize; i++) {
@@ -164,7 +172,8 @@ public class ModelEvaluationTest extends SolverBasedTest0.ParameterizedSolverBas
   }
 
   @Test
-  public void testEvaluatorGeneration() throws SolverException, InterruptedException {
+  public void testEvaluatorGeneration()
+      throws SolverException, InterruptedException, InvalidConfigurationException {
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(bmgr.and(getConstraints()));
 
@@ -174,6 +183,8 @@ public class ModelEvaluationTest extends SolverBasedTest0.ParameterizedSolverBas
           prover.push(getNewConstraints(i, m));
         }
       }
+    } catch (IOException pE) {
+      throw new RuntimeException(pE);
     }
   }
 

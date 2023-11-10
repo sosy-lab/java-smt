@@ -17,6 +17,7 @@ import com.google.common.truth.FailureMetadata;
 import com.google.common.truth.StandardSubjectBuilder;
 import com.google.common.truth.Subject;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.IOException;
 import java.util.List;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -63,7 +64,7 @@ public final class ProverEnvironmentSubject extends Subject {
    * Check that the subject stack is unsatisfiable. Will show a model (satisfying assignment) on
    * failure.
    */
-  public void isUnsatisfiable() throws SolverException, InterruptedException {
+  public void isUnsatisfiable() throws SolverException, InterruptedException, IOException {
     if (stackUnderTest.isUnsat()) {
       return; // success
     }
@@ -79,7 +80,7 @@ public final class ProverEnvironmentSubject extends Subject {
   }
 
   /** Check that the subject stack is satisfiable. Will show an unsat core on failure. */
-  public void isSatisfiable() throws SolverException, InterruptedException {
+  public void isSatisfiable() throws SolverException, InterruptedException, IOException {
     if (!stackUnderTest.isUnsat()) {
       return; // success
     }

@@ -15,6 +15,7 @@ import static org.junit.Assert.assertThrows;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -106,7 +107,8 @@ public class EnumerationFormulaManagerTest extends SolverBasedTest0.Parameterize
   }
 
   @Test
-  public void testTooManyDistinctValues() throws SolverException, InterruptedException {
+  public void testTooManyDistinctValues() throws SolverException, InterruptedException,
+                                                 IOException {
     EnumerationFormulaType colorType = emgr.declareEnumeration("ColorA", "Blue", "White");
     EnumerationFormula color1 = emgr.makeVariable("first", colorType);
     EnumerationFormula color2 = emgr.makeVariable("second", colorType);
@@ -127,7 +129,7 @@ public class EnumerationFormulaManagerTest extends SolverBasedTest0.Parameterize
   }
 
   @Test
-  public void testConstants() throws SolverException, InterruptedException {
+  public void testConstants() throws SolverException, InterruptedException, IOException {
     EnumerationFormulaType colorType = emgr.declareEnumeration("ColorB", "Blue", "White");
     EnumerationFormula blue = emgr.makeConstant("Blue", colorType);
     EnumerationFormula white = emgr.makeConstant("White", colorType);
@@ -227,7 +229,7 @@ public class EnumerationFormulaManagerTest extends SolverBasedTest0.Parameterize
   }
 
   @Test
-  public void testModel() throws SolverException, InterruptedException {
+  public void testModel() throws SolverException, InterruptedException, IOException {
     EnumerationFormulaType colorType = emgr.declareEnumeration("ColorM", "Blue", "White");
     EnumerationFormula blue = emgr.makeConstant("Blue", colorType);
     EnumerationFormula white = emgr.makeConstant("White", colorType);

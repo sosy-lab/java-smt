@@ -14,6 +14,7 @@ import static org.junit.Assert.assertThrows;
 
 import com.google.common.collect.ImmutableList;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import org.junit.Before;
@@ -77,35 +78,35 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   // Utility methods
 
   private void assertEqual(IntegerFormula num1, IntegerFormula num2)
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     assertThatFormula(imgr.equal(num1, num2)).isTautological();
   }
 
   private void assertDistinct(IntegerFormula num1, IntegerFormula num2)
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     assertThatFormula(imgr.distinct(List.of(num1, num2))).isTautological();
   }
 
   private void assertEqual(StringFormula str1, StringFormula str2)
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     assertThatFormula(smgr.equal(str1, str2)).isTautological();
   }
 
   private void assertDistinct(StringFormula str1, StringFormula str2)
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     assertThatFormula(smgr.equal(str1, str2)).isUnsatisfiable();
   }
 
   // Tests
 
   @Test
-  public void testRegexAll() throws SolverException, InterruptedException {
+  public void testRegexAll() throws SolverException, InterruptedException, IOException {
     RegexFormula regex = smgr.all();
     assertThatFormula(smgr.in(hello, regex)).isSatisfiable();
   }
 
   @Test
-  public void testRegexAll3() throws SolverException, InterruptedException {
+  public void testRegexAll3() throws SolverException, InterruptedException, IOException {
     // This is not ALL_CHAR! This matches ".*" literally!
     RegexFormula regex = smgr.makeRegex(".*");
     assertThatFormula(smgr.in(hello, regex)).isUnsatisfiable();
@@ -113,7 +114,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testRegexAllChar() throws SolverException, InterruptedException {
+  public void testRegexAllChar() throws SolverException, InterruptedException, IOException {
     RegexFormula regexAllChar = smgr.allChar();
 
     assertThatFormula(smgr.in(smgr.makeString("a"), regexAllChar)).isSatisfiable();
@@ -129,7 +130,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testRegexAllCharUnicode() throws SolverException, InterruptedException {
+  public void testRegexAllCharUnicode() throws SolverException, InterruptedException, IOException {
     RegexFormula regexAllChar = smgr.allChar();
 
     // Single characters.
@@ -155,25 +156,25 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testStringRegex2() throws SolverException, InterruptedException {
+  public void testStringRegex2() throws SolverException, InterruptedException, IOException {
     RegexFormula regex = smgr.concat(smgr.closure(a2z), smgr.makeRegex("ll"), smgr.closure(a2z));
     assertThatFormula(smgr.in(hello, regex)).isSatisfiable();
   }
 
   @Test
-  public void testStringRegex3() throws SolverException, InterruptedException {
+  public void testStringRegex3() throws SolverException, InterruptedException, IOException {
     RegexFormula regex = smgr.makeRegex(".*ll.*");
     assertThatFormula(smgr.in(hello, regex)).isUnsatisfiable();
   }
 
   @Test
-  public void testEmptyRegex() throws SolverException, InterruptedException {
+  public void testEmptyRegex() throws SolverException, InterruptedException, IOException {
     RegexFormula regex = smgr.none();
     assertThatFormula(smgr.in(hello, regex)).isUnsatisfiable();
   }
 
   @Test
-  public void testRegexUnion() throws SolverException, InterruptedException {
+  public void testRegexUnion() throws SolverException, InterruptedException, IOException {
     RegexFormula regex = smgr.union(smgr.makeRegex("a"), smgr.makeRegex("b"));
     assertThatFormula(smgr.in(smgr.makeString("a"), regex)).isSatisfiable();
     assertThatFormula(smgr.in(smgr.makeString("b"), regex)).isSatisfiable();
@@ -181,7 +182,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testRegexIntersection() throws SolverException, InterruptedException {
+  public void testRegexIntersection() throws SolverException, InterruptedException, IOException {
     RegexFormula regex = smgr.intersection(smgr.makeRegex("a"), smgr.makeRegex("b"));
     StringFormula variable = smgr.makeVariable("var");
     assertThatFormula(smgr.in(variable, regex)).isUnsatisfiable();
@@ -195,7 +196,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testRegexDifference() throws SolverException, InterruptedException {
+  public void testRegexDifference() throws SolverException, InterruptedException, IOException {
     RegexFormula regex =
         smgr.difference(smgr.union(smgr.makeRegex("a"), smgr.makeRegex("b")), smgr.makeRegex("b"));
     assertThatFormula(smgr.in(smgr.makeString("a"), regex)).isSatisfiable();
@@ -203,7 +204,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testStringConcat() throws SolverException, InterruptedException {
+  public void testStringConcat() throws SolverException, InterruptedException, IOException {
     StringFormula str1 = smgr.makeString("hello");
     StringFormula str2 = smgr.makeString("world");
     StringFormula concat = smgr.concat(str1, str2);
@@ -213,7 +214,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testStringConcatEmpty() throws SolverException, InterruptedException {
+  public void testStringConcatEmpty() throws SolverException, InterruptedException, IOException {
     StringFormula empty = smgr.makeString("");
 
     assertEqual(empty, smgr.concat(ImmutableList.of()));
@@ -223,7 +224,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testStringPrefixSuffixConcat() throws SolverException, InterruptedException {
+  public void testStringPrefixSuffixConcat()
+      throws SolverException, InterruptedException, IOException {
     // check whether "prefix + suffix == concat"
     StringFormula prefix = smgr.makeVariable("prefix");
     StringFormula suffix = smgr.makeVariable("suffix");
@@ -239,7 +241,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testStringPrefixSuffix() throws SolverException, InterruptedException {
+  public void testStringPrefixSuffix() throws SolverException, InterruptedException, IOException {
     // check whether "prefix == suffix iff equal length"
     StringFormula prefix = smgr.makeVariable("prefix");
     StringFormula suffix = smgr.makeVariable("suffix");
@@ -257,7 +259,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testStringToIntConversion() throws SolverException, InterruptedException {
+  public void testStringToIntConversion() throws SolverException, InterruptedException,
+                                                 IOException {
     IntegerFormula ten = imgr.makeNumber(10);
     StringFormula zeroStr = smgr.makeString("0");
 
@@ -281,7 +284,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testStringToIntConversionCornerCases() throws SolverException, InterruptedException {
+  public void testStringToIntConversionCornerCases()
+      throws SolverException, InterruptedException, IOException {
     assertEqual(imgr.makeNumber(-1), smgr.toIntegerFormula(smgr.makeString("-1")));
     assertEqual(imgr.makeNumber(-1), smgr.toIntegerFormula(smgr.makeString("-12")));
     assertEqual(imgr.makeNumber(-1), smgr.toIntegerFormula(smgr.makeString("-123")));
@@ -304,7 +308,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testIntToStringConversionCornerCases() throws SolverException, InterruptedException {
+  public void testIntToStringConversionCornerCases()
+      throws SolverException, InterruptedException, IOException {
     assertEqual(smgr.makeString("123"), smgr.toStringFormula(imgr.makeNumber(123)));
     assertEqual(smgr.makeString("1"), smgr.toStringFormula(imgr.makeNumber(1)));
     assertEqual(smgr.makeString("0"), smgr.toStringFormula(imgr.makeNumber(0)));
@@ -315,7 +320,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testStringLength() throws SolverException, InterruptedException {
+  public void testStringLength() throws SolverException, InterruptedException, IOException {
     assertEqual(imgr.makeNumber(0), smgr.length(smgr.makeString("")));
     assertEqual(imgr.makeNumber(1), smgr.length(smgr.makeString("a")));
     assertEqual(imgr.makeNumber(2), smgr.length(smgr.makeString("aa")));
@@ -328,7 +333,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testStringLengthWithVariable() throws SolverException, InterruptedException {
+  public void testStringLengthWithVariable()
+      throws SolverException, InterruptedException, IOException {
     StringFormula var = smgr.makeVariable("var");
 
     assertThatFormula(imgr.equal(imgr.makeNumber(0), smgr.length(var)))
@@ -366,7 +372,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testStringLengthPositiv() throws SolverException, InterruptedException {
+  public void testStringLengthPositiv() throws SolverException, InterruptedException, IOException {
     assertThatFormula(imgr.lessOrEquals(imgr.makeNumber(0), smgr.length(smgr.makeVariable("x"))))
         .isTautological();
     assertThatFormula(imgr.greaterThan(imgr.makeNumber(0), smgr.length(smgr.makeVariable("x"))))
@@ -374,7 +380,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testStringCompare() throws SolverException, InterruptedException {
+  public void testStringCompare() throws SolverException, InterruptedException, IOException {
     assume()
         .withMessage("Solver is quite slow for this example")
         .that(solverToUse())
@@ -393,7 +399,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
   /** Test const Strings = String variables + prefix and suffix constraints. */
   @Test
-  public void testConstStringEqStringVar() throws SolverException, InterruptedException {
+  public void testConstStringEqStringVar() throws SolverException, InterruptedException,
+                                                  IOException {
     String string1 = "";
     String string2 = "a";
     String string3 = "ab";
@@ -479,7 +486,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
   /** Test String variables with negative length (UNSAT). */
   @Test
-  public void testStringVariableLengthNegative() throws SolverException, InterruptedException {
+  public void testStringVariableLengthNegative()
+      throws SolverException, InterruptedException, IOException {
     StringFormula stringVariable1 = smgr.makeVariable("zeroLength");
     StringFormula stringVariable2 = smgr.makeVariable("negLength");
 
@@ -511,7 +519,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
    */
   @Test
   public void testStringLengthInequalityNegativeRange()
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     StringFormula stringVariable = smgr.makeVariable("stringVariable");
     IntegerFormula stringVariableLength = smgr.length(stringVariable);
     IntegerFormula minusTenThousand = imgr.makeNumber(-10000);
@@ -564,7 +572,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
    */
   @Test
   public void testStringLengthInequalityPositiveRange()
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     StringFormula stringVariable = smgr.makeVariable("stringVariable");
     IntegerFormula stringVariableLength = smgr.length(stringVariable);
     IntegerFormula three = imgr.makeNumber(3);
@@ -601,7 +609,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   /** Test simple String lexicographic ordering (< <= > >=) for constant Strings. */
   @Test
   public void testSimpleConstStringLexicographicOrdering()
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     List<String> words = ImmutableList.sortedCopyOf(WORDS);
 
     for (int i = 1; i < words.size(); i++) {
@@ -622,7 +630,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   /** Test simple String lexicographic ordering (< <= > >=) for String variables. */
   @Test
   public void testSimpleStringVariableLexicographicOrdering()
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     StringFormula a = smgr.makeString("a");
     StringFormula b = smgr.makeString("b");
     StringFormula ab = smgr.makeString("ab");
@@ -688,7 +696,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
   /** Takeaway: invalid positions always refer to the empty string! */
   @Test
-  public void testCharAtWithConstString() throws SolverException, InterruptedException {
+  public void testCharAtWithConstString() throws SolverException, InterruptedException,
+                                                 IOException {
     StringFormula empty = smgr.makeString("");
     StringFormula a = smgr.makeString("a");
     StringFormula b = smgr.makeString("b");
@@ -719,7 +728,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
    * <p>SMTLIB2 uses an escape sequence for the numerals of the sort: {1234}.
    */
   @Test
-  public void testCharAtWithSpecialCharacters() throws SolverException, InterruptedException {
+  public void testCharAtWithSpecialCharacters()
+      throws SolverException, InterruptedException, IOException {
     assume()
         .withMessage("Solver %s does only support 2 byte unicode", solverToUse())
         .that(solverToUse())
@@ -790,7 +800,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
    * supports those.
    */
   @Test
-  public void testCharAtWithSpecialCharacters2Byte() throws SolverException, InterruptedException {
+  public void testCharAtWithSpecialCharacters2Byte()
+      throws SolverException, InterruptedException, IOException {
 
     StringFormula num7 = smgr.makeString("7");
     StringFormula u = smgr.makeString("u");
@@ -844,7 +855,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testCharAtWithStringVariable() throws SolverException, InterruptedException {
+  public void testCharAtWithStringVariable()
+      throws SolverException, InterruptedException, IOException {
     StringFormula a = smgr.makeString("a");
     StringFormula b = smgr.makeString("b");
     StringFormula ab = smgr.makeString("ab");
@@ -905,7 +917,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testConstStringContains() throws SolverException, InterruptedException {
+  public void testConstStringContains() throws SolverException, InterruptedException, IOException {
     StringFormula empty = smgr.makeString("");
     StringFormula a = smgr.makeString("a");
     StringFormula aUppercase = smgr.makeString("A");
@@ -950,7 +962,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testStringVariableContains() throws SolverException, InterruptedException {
+  public void testStringVariableContains() throws SolverException, InterruptedException,
+                                                  IOException {
     StringFormula var1 = smgr.makeVariable("var1");
     StringFormula var2 = smgr.makeVariable("var2");
 
@@ -993,7 +1006,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testStringContainsOtherVariable() throws SolverException, InterruptedException {
+  public void testStringContainsOtherVariable()
+      throws SolverException, InterruptedException, IOException {
     assume()
         .withMessage("Solver %s runs endlessly on this task", solverToUse())
         .that(solverToUse())
@@ -1014,7 +1028,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testConstStringIndexOf() throws SolverException, InterruptedException {
+  public void testConstStringIndexOf() throws SolverException, InterruptedException, IOException {
     StringFormula empty = smgr.makeString("");
     StringFormula a = smgr.makeString("a");
     StringFormula aUppercase = smgr.makeString("A");
@@ -1061,7 +1075,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testStringVariableIndexOf() throws SolverException, InterruptedException {
+  public void testStringVariableIndexOf() throws SolverException, InterruptedException,
+                                                 IOException {
     StringFormula var1 = smgr.makeVariable("var1");
     StringFormula var2 = smgr.makeVariable("var2");
     IntegerFormula intVar = imgr.makeVariable("intVar");
@@ -1118,7 +1133,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testStringIndexOfWithSubStrings() throws SolverException, InterruptedException {
+  public void testStringIndexOfWithSubStrings()
+      throws SolverException, InterruptedException, IOException {
     assume()
         .withMessage("Solver %s runs endlessly on this task", solverToUse())
         .that(solverToUse())
@@ -1140,7 +1156,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testStringPrefixImpliesPrefixIndexOf() throws SolverException, InterruptedException {
+  public void testStringPrefixImpliesPrefixIndexOf()
+      throws SolverException, InterruptedException, IOException {
     assume()
         .withMessage("Solver %s runs endlessly on this task", solverToUse())
         .that(solverToUse())
@@ -1164,7 +1181,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testConstStringSubStrings() throws SolverException, InterruptedException {
+  public void testConstStringSubStrings() throws SolverException, InterruptedException,
+                                                 IOException {
     StringFormula empty = smgr.makeString("");
     StringFormula a = smgr.makeString("a");
     StringFormula aUppercase = smgr.makeString("A");
@@ -1193,7 +1211,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testConstStringAllPossibleSubStrings() throws SolverException, InterruptedException {
+  public void testConstStringAllPossibleSubStrings()
+      throws SolverException, InterruptedException, IOException {
     for (String wordString : WORDS) {
       StringFormula word = smgr.makeString(wordString);
 
@@ -1213,7 +1232,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testStringSubstringOutOfBounds() throws SolverException, InterruptedException {
+  public void testStringSubstringOutOfBounds()
+      throws SolverException, InterruptedException, IOException {
     StringFormula bbbbbb = smgr.makeString("bbbbbb");
     StringFormula b = smgr.makeString("b");
     StringFormula abbbbbb = smgr.makeString("abbbbbb");
@@ -1230,7 +1250,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testStringVariablesSubstring() throws SolverException, InterruptedException {
+  public void testStringVariablesSubstring()
+      throws SolverException, InterruptedException, IOException {
     StringFormula var1 = smgr.makeVariable("var1");
     StringFormula var2 = smgr.makeVariable("var2");
     IntegerFormula intVar1 = imgr.makeVariable("intVar1");
@@ -1266,7 +1287,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testConstStringReplace() throws SolverException, InterruptedException {
+  public void testConstStringReplace() throws SolverException, InterruptedException, IOException {
     for (int i = 0; i < WORDS.size(); i++) {
       for (int j = 2; j < WORDS.size(); j++) {
         String word1 = WORDS.get(j - 1);
@@ -1285,7 +1306,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   // Neither CVC4 nor Z3 can solve this!
   @Ignore
   @Test
-  public void testStringVariableReplacePrefix() throws SolverException, InterruptedException {
+  public void testStringVariableReplacePrefix()
+      throws SolverException, InterruptedException, IOException {
     StringFormula var1 = smgr.makeVariable("var1");
     StringFormula var2 = smgr.makeVariable("var2");
     StringFormula var3 = smgr.makeVariable("var3");
@@ -1310,7 +1332,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testStringVariableReplaceSubstring() throws SolverException, InterruptedException {
+  public void testStringVariableReplaceSubstring()
+      throws SolverException, InterruptedException, IOException {
     // I couldn't find stronger constraints in the implication that don't run endlessly.....
     StringFormula original = smgr.makeVariable("original");
     StringFormula prefix = smgr.makeVariable("prefix");
@@ -1406,7 +1429,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testStringVariableReplaceMiddle() throws SolverException, InterruptedException {
+  public void testStringVariableReplaceMiddle()
+      throws SolverException, InterruptedException, IOException {
     // TODO: either rework that this terminates, or remove
     assume()
         .withMessage("Solver %s runs endlessly on this task.", solverToUse())
@@ -1458,7 +1482,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testStringVariableReplaceFront() throws SolverException, InterruptedException {
+  public void testStringVariableReplaceFront()
+      throws SolverException, InterruptedException, IOException {
     assume()
         .withMessage("Solver %s runs endlessly on this task.", solverToUse())
         .that(solverToUse())
@@ -1492,7 +1517,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testConstStringReplaceAll() throws SolverException, InterruptedException {
+  public void testConstStringReplaceAll() throws SolverException, InterruptedException,
+                                                 IOException {
     assume()
         .withMessage("Solver %s does not support replaceAll()", solverToUse())
         .that(solverToUse())
@@ -1519,7 +1545,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
    */
   @Test
   public void testStringVariableReplaceAllConcatedString()
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     assume()
         .withMessage("Solver %s does not support replaceAll()", solverToUse())
         .that(solverToUse())
@@ -1553,7 +1579,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testStringVariableReplaceAllSubstring() throws SolverException, InterruptedException {
+  public void testStringVariableReplaceAllSubstring()
+      throws SolverException, InterruptedException, IOException {
     assume()
         .withMessage("Solver %s does not support replaceAll()", solverToUse())
         .that(solverToUse())
@@ -1594,7 +1621,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testStringConcatWUnicode() throws SolverException, InterruptedException {
+  public void testStringConcatWUnicode() throws SolverException, InterruptedException, IOException {
     StringFormula backslash = smgr.makeString("\\");
     StringFormula u = smgr.makeString("u");
     StringFormula curlyOpen = smgr.makeString("\\u{7B}");

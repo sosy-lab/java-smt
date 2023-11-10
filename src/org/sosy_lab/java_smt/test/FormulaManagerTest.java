@@ -16,6 +16,7 @@ import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.testing.EqualsTester;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Map;
@@ -32,7 +33,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
-  public void testEmptySubstitution() throws SolverException, InterruptedException {
+  public void testEmptySubstitution() throws SolverException, InterruptedException, IOException {
     requireSubstitution();
     assume().withMessage("Princess fails").that(solver).isNotEqualTo(Solvers.PRINCESS);
 
@@ -52,7 +53,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void testNoSubstitution() throws SolverException, InterruptedException {
+  public void testNoSubstitution() throws SolverException, InterruptedException, IOException {
     requireSubstitution();
     assume().withMessage("Princess fails").that(solver).isNotEqualTo(Solvers.PRINCESS);
 
@@ -78,7 +79,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void testSubstitution() throws SolverException, InterruptedException {
+  public void testSubstitution() throws SolverException, InterruptedException, IOException {
     requireSubstitution();
 
     BooleanFormula input =
@@ -100,7 +101,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void testSubstitutionTwice() throws SolverException, InterruptedException {
+  public void testSubstitutionTwice() throws SolverException, InterruptedException, IOException {
     requireSubstitution();
 
     BooleanFormula input =
@@ -124,7 +125,8 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void testSubstitutionMultipleInstances() throws SolverException, InterruptedException {
+  public void testSubstitutionMultipleInstances()
+      throws SolverException, InterruptedException, IOException {
     requireSubstitution();
     requireIntegers();
 
@@ -143,7 +145,8 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void testSubstitutionSelfReference() throws SolverException, InterruptedException {
+  public void testSubstitutionSelfReference()
+      throws SolverException, InterruptedException, IOException {
     requireSubstitution();
     requireIntegers();
 
@@ -334,7 +337,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void simplifyIntTest() throws SolverException, InterruptedException {
+  public void simplifyIntTest() throws SolverException, InterruptedException, IOException {
     requireIntegers();
     // x=1 && y=x+2 && z=y+3 --> simplified: x=1 && y=3 && z=6
     IntegerFormula num1 = imgr.makeNumber(1);
@@ -352,7 +355,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void simplifyArrayTest() throws SolverException, InterruptedException {
+  public void simplifyArrayTest() throws SolverException, InterruptedException, IOException {
     requireIntegers();
     requireArrays();
     // exists arr : (arr[0]=5 && x=arr[0]) --> simplified: x=5

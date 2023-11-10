@@ -205,7 +205,8 @@ public class Sudoku {
      * </code> if Sudoku cannot be solved.
      */
     @Nullable
-    public Integer[][] solve(Integer[][] grid) throws InterruptedException, SolverException {
+    public Integer[][] solve(Integer[][] grid)
+        throws InterruptedException, SolverException, IOException {
       S symbols = getSymbols();
       List<BooleanFormula> rules = getRules(symbols);
       List<BooleanFormula> assignments = getAssignments(symbols, grid);

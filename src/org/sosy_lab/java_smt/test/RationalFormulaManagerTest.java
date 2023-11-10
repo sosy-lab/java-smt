@@ -12,6 +12,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assert_;
 
 import com.google.common.collect.Iterables;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -33,7 +34,7 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
       };
 
   @Test
-  public void rationalToIntTest() throws SolverException, InterruptedException {
+  public void rationalToIntTest() throws SolverException, InterruptedException, IOException {
     requireRationals();
     for (double v : SOME_DOUBLES) {
       IntegerFormula i = imgr.makeNumber((int) Math.floor(v));
@@ -45,7 +46,7 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
   }
 
   @Test
-  public void intToIntTest() throws SolverException, InterruptedException {
+  public void intToIntTest() throws SolverException, InterruptedException, IOException {
     requireIntegers();
     for (double v : SOME_DOUBLES) {
       IntegerFormula i = imgr.makeNumber((int) Math.floor(v));
@@ -56,7 +57,7 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
   }
 
   @Test
-  public void intToIntWithRmgrTest() throws SolverException, InterruptedException {
+  public void intToIntWithRmgrTest() throws SolverException, InterruptedException, IOException {
     requireRationals();
     for (double v : SOME_DOUBLES) {
       IntegerFormula i = imgr.makeNumber((int) Math.floor(v));
@@ -67,7 +68,8 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
   }
 
   @Test
-  public void floorIsLessOrEqualsValueTest() throws SolverException, InterruptedException {
+  public void floorIsLessOrEqualsValueTest()
+      throws SolverException, InterruptedException, IOException {
     requireRationals();
     requireQuantifiers();
     RationalFormula v = rmgr.makeVariable("v");
@@ -75,7 +77,8 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
   }
 
   @Test
-  public void floorIsGreaterThanValueTest() throws SolverException, InterruptedException {
+  public void floorIsGreaterThanValueTest()
+      throws SolverException, InterruptedException, IOException {
     requireRationals();
     requireQuantifiers();
     RationalFormula v = rmgr.makeVariable("v");
@@ -83,7 +86,8 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
   }
 
   @Test
-  public void forallFloorIsLessOrEqualsValueTest() throws SolverException, InterruptedException {
+  public void forallFloorIsLessOrEqualsValueTest()
+      throws SolverException, InterruptedException, IOException {
     requireRationals();
     requireQuantifiers();
     RationalFormula v = rmgr.makeVariable("v");
@@ -91,7 +95,8 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
   }
 
   @Test
-  public void forallFloorIsLessThanValueTest() throws SolverException, InterruptedException {
+  public void forallFloorIsLessThanValueTest()
+      throws SolverException, InterruptedException, IOException {
     requireRationals();
     requireQuantifiers();
     RationalFormula v = rmgr.makeVariable("v");

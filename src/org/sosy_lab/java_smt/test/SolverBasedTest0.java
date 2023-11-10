@@ -14,6 +14,7 @@ import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.truth.Truth;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.IOException;
 import java.util.Collection;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.After;
@@ -344,7 +345,7 @@ public abstract class SolverBasedTest0 {
       Formula formula,
       Collection<Object> possibleExpectedValues,
       Collection<Formula> possibleExpectedFormulas)
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
 
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(constraint);

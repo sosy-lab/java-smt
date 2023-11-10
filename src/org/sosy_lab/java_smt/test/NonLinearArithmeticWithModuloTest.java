@@ -12,6 +12,7 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
@@ -71,7 +72,7 @@ public class NonLinearArithmeticWithModuloTest extends SolverBasedTest0 {
   }
 
   private void assertExpectedUnsatifiabilityForNonLinearArithmetic(BooleanFormula f)
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     if (nonLinearArithmetic == NonLinearArithmetic.USE
         || (nonLinearArithmetic == NonLinearArithmetic.APPROXIMATE_FALLBACK
             && !NonLinearArithmeticTest.SOLVER_WITHOUT_NONLINEAR_ARITHMETIC.contains(solver))) {
@@ -82,7 +83,7 @@ public class NonLinearArithmeticWithModuloTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testModuloConstant() throws SolverException, InterruptedException {
+  public void testModuloConstant() throws SolverException, InterruptedException, IOException {
     requireIntegers();
     IntegerFormula a = imgr.makeVariable("a");
 
@@ -97,7 +98,8 @@ public class NonLinearArithmeticWithModuloTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testModuloConstantUnsatisfiable() throws SolverException, InterruptedException {
+  public void testModuloConstantUnsatisfiable()
+      throws SolverException, InterruptedException, IOException {
     requireIntegers();
     IntegerFormula a = imgr.makeVariable("a");
 
@@ -119,7 +121,7 @@ public class NonLinearArithmeticWithModuloTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testModulo() throws SolverException, InterruptedException {
+  public void testModulo() throws SolverException, InterruptedException, IOException {
     requireIntegers();
     IntegerFormula a = imgr.makeVariable("a");
 
@@ -134,7 +136,7 @@ public class NonLinearArithmeticWithModuloTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testModuloUnsatisfiable() throws SolverException, InterruptedException {
+  public void testModuloUnsatisfiable() throws SolverException, InterruptedException, IOException {
     requireIntegers();
     IntegerFormula a = imgr.makeVariable("a");
 

@@ -54,6 +54,7 @@ public class SolverContextFactory {
     SMTINTERPOL,
     Z3,
     PRINCESS,
+    PRINCESS_BINARY,
     BOOLECTOR,
     CVC4,
     CVC5,
@@ -109,6 +110,7 @@ public class SolverContextFactory {
 
   @Option(secure = true, description = "test.")
   private boolean generateSMTLIB2;
+  private boolean parseFromFile;
 
   private final LogManager logger;
   private final ShutdownNotifier shutdownNotifier;
@@ -285,6 +287,12 @@ public class SolverContextFactory {
       case PRINCESS:
         return PrincessSolverContext.create(
             config, shutdownNotifier, logfile, (int) randomSeed, nonLinearArithmetic);
+      case PRINCESS_BINARY:
+        return PrincessSolverContext.create(
+            Configuration.builder().copyFrom(config).setOption("parseFromFile", "true").build(),
+            shutdownNotifier, logfile,
+            (int) randomSeed,
+            nonLinearArithmetic);
 
       case YICES2:
         return Yices2SolverContext.create(nonLinearArithmetic, shutdownNotifier, loader);

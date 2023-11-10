@@ -18,6 +18,7 @@ import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import org.junit.Test;
@@ -44,7 +45,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
   @Test
   @SuppressWarnings("CheckReturnValue")
-  public <T> void simpleInterpolation() throws SolverException, InterruptedException {
+  public <T> void simpleInterpolation() throws SolverException, InterruptedException, IOException {
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       IntegerFormula x = imgr.makeVariable("x");
       IntegerFormula y = imgr.makeVariable("y");
@@ -63,7 +64,8 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
   @Test
   @SuppressWarnings("unchecked")
-  public <T> void emptyInterpolationGroup() throws SolverException, InterruptedException {
+  public <T> void emptyInterpolationGroup()
+      throws SolverException, InterruptedException, IOException {
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       IntegerFormula x = imgr.makeVariable("x");
       IntegerFormula y = imgr.makeVariable("y");
@@ -83,7 +85,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   }
 
   @Test
-  public <T> void binaryInterpolation() throws SolverException, InterruptedException {
+  public <T> void binaryInterpolation() throws SolverException, InterruptedException, IOException {
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
     int i = index.getFreshId();
@@ -130,7 +132,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   }
 
   @Test
-  public <T> void binaryInterpolation1() throws SolverException, InterruptedException {
+  public <T> void binaryInterpolation1() throws SolverException, InterruptedException, IOException {
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
     // build formula:  1 = A = B = C = 0
@@ -163,7 +165,8 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   }
 
   @Test
-  public <T> void binaryBVInterpolation1() throws SolverException, InterruptedException {
+  public <T> void binaryBVInterpolation1() throws SolverException, InterruptedException,
+                                                  IOException {
     requireBitvectors();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
@@ -220,7 +223,8 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   }
 
   @Test
-  public <T> void sequentialInterpolation() throws SolverException, InterruptedException {
+  public <T> void sequentialInterpolation()
+      throws SolverException, InterruptedException, IOException {
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     requireIntegers();
 
@@ -272,7 +276,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   @Test(expected = IllegalArgumentException.class)
   @SuppressWarnings("CheckReturnValue")
   public <T> void sequentialInterpolationWithoutPartition()
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     requireIntegers();
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
@@ -286,7 +290,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
   @Test
   public <T> void sequentialInterpolationWithOnePartition()
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     requireIntegers();
 
@@ -315,7 +319,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   @SuppressWarnings("unchecked")
   @Test
   public <T> void sequentialInterpolationWithFewPartitions()
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     requireIntegers();
 
@@ -348,7 +352,8 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   }
 
   @Test
-  public <T> void sequentialBVInterpolation() throws SolverException, InterruptedException {
+  public <T> void sequentialBVInterpolation()
+      throws SolverException, InterruptedException, IOException {
     requireBitvectors();
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
@@ -396,7 +401,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   }
 
   @Test
-  public void treeInterpolation() throws SolverException, InterruptedException {
+  public void treeInterpolation() throws SolverException, InterruptedException, IOException {
 
     requireTreeItp();
 
@@ -462,7 +467,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
   private <T> void testTreeInterpolants0(
       BooleanFormula pA, BooleanFormula pB, BooleanFormula pC, BooleanFormula pD, BooleanFormula pE)
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
@@ -496,7 +501,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
   private <T> void testTreeInterpolants1(
       BooleanFormula pA, BooleanFormula pB, BooleanFormula pC, BooleanFormula pD, BooleanFormula pE)
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
     T TA = stack.push(pA);
@@ -528,7 +533,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
   private <T> void testTreeInterpolants2(
       BooleanFormula pA, BooleanFormula pB, BooleanFormula pC, BooleanFormula pD, BooleanFormula pE)
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
     T TA = stack.push(pA);
@@ -564,7 +569,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   }
 
   @Test
-  public <T> void treeInterpolation2() throws SolverException, InterruptedException {
+  public <T> void treeInterpolation2() throws SolverException, InterruptedException, IOException {
 
     requireTreeItp();
 
@@ -623,7 +628,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
   @SuppressWarnings("unchecked")
   @Test
-  public <T> void treeInterpolation3() throws SolverException, InterruptedException {
+  public <T> void treeInterpolation3() throws SolverException, InterruptedException, IOException {
 
     requireTreeItp();
 
@@ -679,7 +684,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   }
 
   @Test
-  public <T> void treeInterpolation4() throws SolverException, InterruptedException {
+  public <T> void treeInterpolation4() throws SolverException, InterruptedException, IOException {
 
     requireTreeItp();
 
@@ -726,7 +731,8 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   }
 
   @Test
-  public <T> void treeInterpolationForSequence() throws SolverException, InterruptedException {
+  public <T> void treeInterpolationForSequence()
+      throws SolverException, InterruptedException, IOException {
 
     requireTreeItp();
 
@@ -751,7 +757,8 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   }
 
   @Test
-  public <T> void treeInterpolationBranching() throws SolverException, InterruptedException {
+  public <T> void treeInterpolationBranching()
+      throws SolverException, InterruptedException, IOException {
 
     requireTreeItp();
 
@@ -792,7 +799,8 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
   @Test(expected = IllegalArgumentException.class)
   @SuppressWarnings({"unchecked", "varargs", "CheckReturnValue"})
-  public <T> void treeInterpolationMalFormed1() throws SolverException, InterruptedException {
+  public <T> void treeInterpolationMalFormed1()
+      throws SolverException, InterruptedException, IOException {
 
     requireTreeItp();
 
@@ -806,7 +814,8 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
   @Test(expected = IllegalArgumentException.class)
   @SuppressWarnings({"unchecked", "varargs", "CheckReturnValue"})
-  public <T> void treeInterpolationMalFormed2() throws SolverException, InterruptedException {
+  public <T> void treeInterpolationMalFormed2()
+      throws SolverException, InterruptedException, IOException {
 
     requireTreeItp();
 
@@ -820,7 +829,8 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
   @Test(expected = IllegalArgumentException.class)
   @SuppressWarnings({"unchecked", "varargs", "CheckReturnValue"})
-  public <T> void treeInterpolationMalFormed3() throws SolverException, InterruptedException {
+  public <T> void treeInterpolationMalFormed3()
+      throws SolverException, InterruptedException, IOException {
 
     requireTreeItp();
 
@@ -834,7 +844,8 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
   @Test(expected = IllegalArgumentException.class)
   @SuppressWarnings("CheckReturnValue")
-  public <T> void treeInterpolationMalFormed4() throws SolverException, InterruptedException {
+  public <T> void treeInterpolationMalFormed4()
+      throws SolverException, InterruptedException, IOException {
 
     requireTreeItp();
 
@@ -848,7 +859,8 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
   @Test(expected = IllegalArgumentException.class)
   @SuppressWarnings("CheckReturnValue")
-  public <T> void treeInterpolationMalFormed5() throws SolverException, InterruptedException {
+  public <T> void treeInterpolationMalFormed5()
+      throws SolverException, InterruptedException, IOException {
 
     requireTreeItp();
 
@@ -862,7 +874,8 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
   @Test(expected = IllegalArgumentException.class)
   @SuppressWarnings("CheckReturnValue")
-  public <T> void treeInterpolationMalFormed6() throws SolverException, InterruptedException {
+  public <T> void treeInterpolationMalFormed6()
+      throws SolverException, InterruptedException, IOException {
 
     requireTreeItp();
 
@@ -876,7 +889,8 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
   @Test(expected = IllegalArgumentException.class)
   @SuppressWarnings("CheckReturnValue")
-  public <T> void treeInterpolationWithoutPartition() throws SolverException, InterruptedException {
+  public <T> void treeInterpolationWithoutPartition()
+      throws SolverException, InterruptedException, IOException {
     requireTreeItp();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
@@ -890,7 +904,8 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   }
 
   @Test
-  public <T> void treeInterpolationWithOnePartition() throws SolverException, InterruptedException {
+  public <T> void treeInterpolationWithOnePartition()
+      throws SolverException, InterruptedException, IOException {
     requireTreeItp();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
@@ -919,7 +934,8 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   }
 
   @Test
-  public <T> void bigSeqInterpolationTest() throws InterruptedException, SolverException {
+  public <T> void bigSeqInterpolationTest()
+      throws InterruptedException, SolverException, IOException {
     requireBitvectors();
     requireInterpolation();
 
@@ -985,7 +1001,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   }
 
   private void checkItpSequence(List<BooleanFormula> formulas, List<BooleanFormula> itps)
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
 
     assertWithMessage(
             "there should be N-1 interpolants for N formulas, but we got %s for %s", itps, formulas)

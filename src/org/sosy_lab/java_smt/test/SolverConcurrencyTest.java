@@ -14,6 +14,7 @@ import static com.google.common.truth.Truth8.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.collect.ImmutableMap;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -221,7 +222,7 @@ public class SolverConcurrencyTest {
    */
   @Test
   public void testFormulaTranslationWithConcurrentContexts()
-      throws InvalidConfigurationException, InterruptedException, SolverException {
+      throws InvalidConfigurationException, InterruptedException, SolverException, IOException {
     requireIntegers();
     // CVC4 does not support parsing and therefore no translation.
     // Princess has a wierd bug
@@ -382,7 +383,7 @@ public class SolverConcurrencyTest {
    * @param context used context for the test-thread (Do not reuse contexts!)
    */
   private void bvConcurrencyTest(SolverContext context)
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     FormulaManager mgr = context.getFormulaManager();
     BitvectorFormulaManager bvmgr = mgr.getBitvectorFormulaManager();
     BooleanFormulaManager bmgr = mgr.getBooleanFormulaManager();
@@ -408,7 +409,7 @@ public class SolverConcurrencyTest {
    *     are doing!)
    */
   private void intConcurrencyTest(SolverContext context)
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     FormulaManager mgr = context.getFormulaManager();
     IntegerFormulaManager imgr = mgr.getIntegerFormulaManager();
     BooleanFormulaManager bmgr = mgr.getBooleanFormulaManager();
@@ -636,6 +637,7 @@ public class SolverConcurrencyTest {
 
   /** just a small lambda-compatible interface. */
   private interface Run {
-    void run() throws SolverException, InterruptedException, InvalidConfigurationException;
+    void run()
+        throws SolverException, InterruptedException, InvalidConfigurationException, IOException;
   }
 }

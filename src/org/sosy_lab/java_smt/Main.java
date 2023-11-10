@@ -17,11 +17,7 @@ package org.sosy_lab.java_smt;/*
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-import java.net.Inet4Address;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
+
 import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.configuration.*;
 import org.sosy_lab.common.log.BasicLogManager;
@@ -29,13 +25,8 @@ import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.*;
 import java.io.*;
-import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
-import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
-import org.sosy_lab.java_smt.basicimpl.AbstractProver;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.utils.Generators.Generator;
-import org.sosy_lab.java_smt.utils.Generators.UniversalModel;
-import org.sosy_lab.java_smt.utils.Parsers.*;
 
 public class Main {
   public static void main(String[] args)
@@ -47,33 +38,33 @@ public class Main {
     ShutdownManager shutdown = ShutdownManager.create();
     SolverContext context =
         SolverContextFactory.createSolverContext(config, logger, shutdown.getNotifier(),
-            Solvers.PRINCESS);
-    AbstractFormulaManager fmgr = (AbstractFormulaManager) context.getFormulaManager();
+            Solvers.PRINCESS_BINARY);
+    FormulaManager fmgr = context.getFormulaManager();
     BooleanFormulaManager bmgr = fmgr.getBooleanFormulaManager();
     IntegerFormulaManager imgr = fmgr.getIntegerFormulaManager();
     BitvectorFormulaManager bvmgr = fmgr.getBitvectorFormulaManager();
     //RationalFormulaManager rmgr = fmgr.getRationalFormulaManager();
     UFManager umgr =  fmgr.getUFManager();
 
-    BooleanFormula constraint = fmgr.universalParse("/home/janel/Desktop/Studium/Semester_6"
-        + "/Bachelorarbeit/nochmalneu/smtquery_mathsat/smtquery.022.smt2");
-    System.out.println(constraint);
+    //BooleanFormula constraint = fmgr.universalParse("/home/janel/Desktop/Studium/Semester_6"
+     //   + "/Bachelorarbeit/nochmalneu/smtquery_mathsat/smtquery.022.smt2");
 
+    BooleanFormula constraint = bmgr.makeVariable("a");
 
     try (ProverEnvironment prover =
-             context.newProverEnvironment(SolverContext.ProverOptions.GENERATE_MODELS)) {
+             context.newProverEnvironment(SolverContext.ProverOptions.GENERATE_MODELS,
+                 ProverOptions.USE_BINARY)) {
       prover.addConstraint(constraint);
 
       Generator.dumpSMTLIB2();
-      UniversalModel bla = new UniversalModel(prover , fmgr);
-      System.out.println(bla.getModel());
 
       boolean isUnsat = prover.isUnsat();
 
       if (!isUnsat) {
         Model model = prover.getModel();
         System.out.println(model);
-        //Object value = model.evaluate(expectedFormula);
+        Object value = model.evaluate(constraint);
+        System.out.println(value);
 
       }
 

@@ -17,6 +17,7 @@ import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
@@ -84,7 +85,7 @@ public class FloatingPointFormulaManagerTest
   }
 
   @Test
-  public void negative() throws SolverException, InterruptedException {
+  public void negative() throws SolverException, InterruptedException, IOException {
     for (double d : new double[] {-1, -2, -0.0, Double.NEGATIVE_INFINITY}) {
       FloatingPointFormula formula = fpmgr.makeNumber(d, singlePrecType);
       assertThatFormula(fpmgr.isNegative(formula)).isTautological();
@@ -101,7 +102,7 @@ public class FloatingPointFormulaManagerTest
   }
 
   @Test
-  public void parser() throws SolverException, InterruptedException {
+  public void parser() throws SolverException, InterruptedException, IOException {
     for (String s : new String[] {"-1", "-Infinity", "-0", "-0.0", "-0.000"}) {
       FloatingPointFormula formula = fpmgr.makeNumber(s, singlePrecType);
       assertThatFormula(fpmgr.isNegative(formula)).isTautological();
@@ -130,7 +131,7 @@ public class FloatingPointFormulaManagerTest
   }
 
   @Test
-  public void negativeZeroDivision() throws SolverException, InterruptedException {
+  public void negativeZeroDivision() throws SolverException, InterruptedException, IOException {
     BooleanFormula formula =
         fpmgr.equalWithFPSemantics(
             fpmgr.divide(
@@ -141,17 +142,17 @@ public class FloatingPointFormulaManagerTest
   }
 
   @Test
-  public void nanEqualNanIsUnsat() throws SolverException, InterruptedException {
+  public void nanEqualNanIsUnsat() throws SolverException, InterruptedException, IOException {
     assertThatFormula(fpmgr.equalWithFPSemantics(nan, nan)).isUnsatisfiable();
   }
 
   @Test
-  public void nanAssignedNanIsTrue() throws SolverException, InterruptedException {
+  public void nanAssignedNanIsTrue() throws SolverException, InterruptedException, IOException {
     assertThatFormula(fpmgr.assignment(nan, nan)).isTautological();
   }
 
   @Test
-  public void infinityOrdering() throws SolverException, InterruptedException {
+  public void infinityOrdering() throws SolverException, InterruptedException, IOException {
     BooleanFormula order1 = fpmgr.greaterThan(posInf, zero);
     BooleanFormula order2 = fpmgr.greaterThan(zero, negInf);
     BooleanFormula order3 = fpmgr.greaterThan(posInf, negInf);
@@ -170,7 +171,7 @@ public class FloatingPointFormulaManagerTest
   }
 
   @Test
-  public void infinityVariableOrdering() throws SolverException, InterruptedException {
+  public void infinityVariableOrdering() throws SolverException, InterruptedException, IOException {
     FloatingPointFormula var = fpmgr.makeVariable("x", singlePrecType);
     BooleanFormula varIsNan = fpmgr.isNaN(var);
 
@@ -181,7 +182,7 @@ public class FloatingPointFormulaManagerTest
   }
 
   @Test
-  public void sqrt() throws SolverException, InterruptedException {
+  public void sqrt() throws SolverException, InterruptedException, IOException {
     for (double d : new double[] {0.25, 1, 2, 4, 9, 15, 1234, 1000000}) {
       assertThatFormula(
               fpmgr.equalWithFPSemantics(
@@ -199,7 +200,7 @@ public class FloatingPointFormulaManagerTest
   }
 
   @Test
-  public void specialValueFunctions() throws SolverException, InterruptedException {
+  public void specialValueFunctions() throws SolverException, InterruptedException, IOException {
     assertThatFormula(fpmgr.isInfinity(posInf)).isTautological();
     assertThatFormula(fpmgr.isNormal(posInf)).isUnsatisfiable();
     assertThatFormula(fpmgr.isSubnormal(posInf)).isUnsatisfiable();
@@ -228,7 +229,7 @@ public class FloatingPointFormulaManagerTest
   }
 
   @Test
-  public void specialDoubles() throws SolverException, InterruptedException {
+  public void specialDoubles() throws SolverException, InterruptedException, IOException {
     assertThatFormula(fpmgr.assignment(fpmgr.makeNumber(Double.NaN, singlePrecType), nan))
         .isTautological();
     assertThatFormula(
@@ -240,7 +241,7 @@ public class FloatingPointFormulaManagerTest
   }
 
   private void checkEqualityOfNumberConstantsFor(double value, FloatingPointType type)
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     FloatingPointFormula doubleNumber = fpmgr.makeNumber(value, type);
     FloatingPointFormula stringNumber = fpmgr.makeNumber(Double.toString(value), type);
     FloatingPointFormula bigDecimalNumber = fpmgr.makeNumber(BigDecimal.valueOf(value), type);
@@ -256,7 +257,7 @@ public class FloatingPointFormulaManagerTest
 
   @Test
   @SuppressWarnings("FloatingPointLiteralPrecision")
-  public void numberConstants() throws SolverException, InterruptedException {
+  public void numberConstants() throws SolverException, InterruptedException, IOException {
     checkEqualityOfNumberConstantsFor(1.0, singlePrecType);
     checkEqualityOfNumberConstantsFor(-5.877471754111438E-39, singlePrecType);
     checkEqualityOfNumberConstantsFor(-5.877471754111438E-39, doublePrecType);
@@ -342,7 +343,7 @@ public class FloatingPointFormulaManagerTest
   }
 
   @Test
-  public void numberConstantsNearInf() throws SolverException, InterruptedException {
+  public void numberConstantsNearInf() throws SolverException, InterruptedException, IOException {
     checkNearInf(4, 4, 252); // 2**(2**(4-1)) - max(0,2**(2**(4-1)-2-4))
     checkNearInf(5, 4, 254); // 2**(2**(4-1)) - max(0,2**(2**(4-1)-2-5))
     checkNearInf(6, 4, 255); // 2**(2**(4-1)) - max(0,2**(2**(4-1)-2-6))
@@ -368,7 +369,7 @@ public class FloatingPointFormulaManagerTest
   }
 
   private void checkNearInf(int mantissa, int exponent, long value)
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     FloatingPointType type = FormulaType.getFloatingPointType(exponent, mantissa);
     FloatingPointFormula fp1 = fpmgr.makeNumber(BigDecimal.valueOf(value), type);
     assertThatFormula(fpmgr.isInfinity(fp1)).isTautological();
@@ -377,7 +378,8 @@ public class FloatingPointFormulaManagerTest
   }
 
   @Test
-  public void numberConstantsNearMinusInf() throws SolverException, InterruptedException {
+  public void numberConstantsNearMinusInf()
+      throws SolverException, InterruptedException, IOException {
     checkNearMinusInf(4, 4, -252);
     checkNearMinusInf(5, 4, -254);
     checkNearMinusInf(6, 4, -255);
@@ -403,7 +405,7 @@ public class FloatingPointFormulaManagerTest
   }
 
   private void checkNearMinusInf(int mantissa, int exponent, long value)
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     FloatingPointType type = FormulaType.getFloatingPointType(exponent, mantissa);
     FloatingPointFormula fp1 = fpmgr.makeNumber(BigDecimal.valueOf(value), type);
     assertThatFormula(fpmgr.isInfinity(fp1)).isTautological();
@@ -413,7 +415,7 @@ public class FloatingPointFormulaManagerTest
 
   @Test
   @SuppressWarnings("FloatingPointLiteralPrecision")
-  public void cast() throws SolverException, InterruptedException {
+  public void cast() throws SolverException, InterruptedException, IOException {
     FloatingPointFormula doublePrecNumber = fpmgr.makeNumber(1.5, doublePrecType);
     FloatingPointFormula singlePrecNumber = fpmgr.makeNumber(1.5, singlePrecType);
 
@@ -435,7 +437,7 @@ public class FloatingPointFormulaManagerTest
   }
 
   @Test
-  public void bvToFpSinglePrec() throws SolverException, InterruptedException {
+  public void bvToFpSinglePrec() throws SolverException, InterruptedException, IOException {
     requireBitvectors();
     for (int i : SINGLE_PREC_INTS) {
       bvToFp(i, singlePrecType);
@@ -443,14 +445,15 @@ public class FloatingPointFormulaManagerTest
   }
 
   @Test
-  public void bvToFpDoublePrec() throws SolverException, InterruptedException {
+  public void bvToFpDoublePrec() throws SolverException, InterruptedException, IOException {
     requireBitvectors();
     for (int i : SINGLE_PREC_INTS) {
       bvToFp(i, doublePrecType);
     }
   }
 
-  private void bvToFp(int i, FloatingPointType prec) throws SolverException, InterruptedException {
+  private void bvToFp(int i, FloatingPointType prec)
+      throws SolverException, InterruptedException, IOException {
     BitvectorFormula bv = bvmgr.makeBitvector(32, i);
     FloatingPointFormula fp = fpmgr.makeNumber(i, prec);
 
@@ -464,7 +467,7 @@ public class FloatingPointFormulaManagerTest
   /** check whether rounded input is equal to result with rounding-mode. */
   private void round0(
       double value, double toZero, double pos, double neg, double tiesEven, double tiesAway)
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     FloatingPointFormula f = fpmgr.makeNumber(value, singlePrecType);
 
     // check types
@@ -506,12 +509,12 @@ public class FloatingPointFormulaManagerTest
   }
 
   private void assertEquals(FloatingPointFormula f1, FloatingPointFormula f2)
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     assertThatFormula(fpmgr.equalWithFPSemantics(f1, f2)).isTautological();
   }
 
   @Test
-  public void round() throws SolverException, InterruptedException {
+  public void round() throws SolverException, InterruptedException, IOException {
 
     // constants
     round0(0, 0, 0, 0, 0, 0);
@@ -540,7 +543,7 @@ public class FloatingPointFormulaManagerTest
   }
 
   @Test
-  public void bvToFpMinusOne() throws SolverException, InterruptedException {
+  public void bvToFpMinusOne() throws SolverException, InterruptedException, IOException {
     requireBitvectors();
 
     BitvectorFormula bvOne = bvmgr.makeBitvector(32, -1);
@@ -557,7 +560,8 @@ public class FloatingPointFormulaManagerTest
   }
 
   @Test
-  public void fpToBvSimpleNumbersSinglePrec() throws SolverException, InterruptedException {
+  public void fpToBvSimpleNumbersSinglePrec()
+      throws SolverException, InterruptedException, IOException {
     requireBitvectors();
     for (int i : SINGLE_PREC_INTS) {
       fpToBv(i, singlePrecType);
@@ -565,7 +569,8 @@ public class FloatingPointFormulaManagerTest
   }
 
   @Test
-  public void fpToBvSimpleNegativeNumbersSinglePrec() throws SolverException, InterruptedException {
+  public void fpToBvSimpleNegativeNumbersSinglePrec()
+      throws SolverException, InterruptedException, IOException {
     requireBitvectors();
     for (int i : SINGLE_PREC_INTS) {
       fpToBv(-i, singlePrecType);
@@ -573,7 +578,8 @@ public class FloatingPointFormulaManagerTest
   }
 
   @Test
-  public void fpToBvSimpleNumbersDoublePrec() throws SolverException, InterruptedException {
+  public void fpToBvSimpleNumbersDoublePrec()
+      throws SolverException, InterruptedException, IOException {
     requireBitvectors();
     for (int i : SINGLE_PREC_INTS) {
       fpToBv(i, doublePrecType);
@@ -581,14 +587,16 @@ public class FloatingPointFormulaManagerTest
   }
 
   @Test
-  public void fpToBvSimpleNegativeNumbersDoublePrec() throws SolverException, InterruptedException {
+  public void fpToBvSimpleNegativeNumbersDoublePrec()
+      throws SolverException, InterruptedException, IOException {
     requireBitvectors();
     for (int i : SINGLE_PREC_INTS) {
       fpToBv(-i, doublePrecType);
     }
   }
 
-  private void fpToBv(int i, FloatingPointType prec) throws SolverException, InterruptedException {
+  private void fpToBv(int i, FloatingPointType prec)
+      throws SolverException, InterruptedException, IOException {
     BitvectorFormula bv = bvmgr.makeBitvector(prec.getTotalSize(), i);
     FloatingPointFormula fp = fpmgr.makeNumber(i, prec);
 
@@ -598,7 +606,7 @@ public class FloatingPointFormulaManagerTest
   }
 
   @Test
-  public void rationalToFpOne() throws SolverException, InterruptedException {
+  public void rationalToFpOne() throws SolverException, InterruptedException, IOException {
     requireRationals();
 
     NumeralFormula ratOne = rmgr.makeNumber(1);
@@ -612,7 +620,7 @@ public class FloatingPointFormulaManagerTest
   }
 
   @Test
-  public void rationalToFpMinusOne() throws SolverException, InterruptedException {
+  public void rationalToFpMinusOne() throws SolverException, InterruptedException, IOException {
     requireBitvectors();
 
     NumeralFormula ratOne = rmgr.makeNumber(-1);
@@ -626,7 +634,7 @@ public class FloatingPointFormulaManagerTest
   }
 
   @Test
-  public void fpToRationalOne() throws SolverException, InterruptedException {
+  public void fpToRationalOne() throws SolverException, InterruptedException, IOException {
     requireRationals();
 
     NumeralFormula ratOne = rmgr.makeNumber(1);
@@ -638,7 +646,7 @@ public class FloatingPointFormulaManagerTest
   }
 
   @Test
-  public void fpToRationalMinusOne() throws SolverException, InterruptedException {
+  public void fpToRationalMinusOne() throws SolverException, InterruptedException, IOException {
     requireRationals();
 
     NumeralFormula ratOne = rmgr.makeNumber(-1);
@@ -690,7 +698,7 @@ public class FloatingPointFormulaManagerTest
   }
 
   @Test
-  public void fpIeeeConversion() throws SolverException, InterruptedException {
+  public void fpIeeeConversion() throws SolverException, InterruptedException, IOException {
     assume()
         .withMessage("FP-to-BV conversion not available for CVC4 and CVC5")
         .that(solverToUse())
@@ -704,7 +712,7 @@ public class FloatingPointFormulaManagerTest
   }
 
   @Test
-  public void ieeeFpConversion() throws SolverException, InterruptedException {
+  public void ieeeFpConversion() throws SolverException, InterruptedException, IOException {
     assume()
         .withMessage("FP-to-BV conversion not available for CVC4 and CVC5")
         .that(solverToUse())
@@ -717,7 +725,7 @@ public class FloatingPointFormulaManagerTest
   }
 
   @Test
-  public void checkIeeeFpConversion32() throws SolverException, InterruptedException {
+  public void checkIeeeFpConversion32() throws SolverException, InterruptedException, IOException {
     for (float f : getListOfFloats()) {
       checkFP(
           singlePrecType,
@@ -727,7 +735,7 @@ public class FloatingPointFormulaManagerTest
   }
 
   @Test
-  public void checkIeeeFpConversion64() throws SolverException, InterruptedException {
+  public void checkIeeeFpConversion64() throws SolverException, InterruptedException, IOException {
     for (double d : getListOfDoubles()) {
       checkFP(
           doublePrecType,
@@ -795,7 +803,7 @@ public class FloatingPointFormulaManagerTest
   }
 
   private void checkFP(FloatingPointType type, BitvectorFormula bv, FloatingPointFormula flt)
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     assume()
         .withMessage("FP-to-BV conversion not available for CVC4 and CVC5")
         .that(solverToUse())
@@ -815,7 +823,7 @@ public class FloatingPointFormulaManagerTest
   }
 
   @Test
-  public void fpModelValue() throws SolverException, InterruptedException {
+  public void fpModelValue() throws SolverException, InterruptedException, IOException {
     FloatingPointFormula zeroVar = fpmgr.makeVariable("zero", singlePrecType);
     BooleanFormula zeroEq = fpmgr.assignment(zeroVar, zero);
 
@@ -888,7 +896,7 @@ public class FloatingPointFormulaManagerTest
 
   @Test
   @SuppressWarnings({"unchecked", "resource"})
-  public void fpInterpolation() throws SolverException, InterruptedException {
+  public void fpInterpolation() throws SolverException, InterruptedException, IOException {
     requireInterpolation();
     assume()
         .withMessage("MathSAT5 does not support floating-point interpolation")

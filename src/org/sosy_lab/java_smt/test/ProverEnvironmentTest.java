@@ -22,6 +22,7 @@ import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNS
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import org.junit.Test;
@@ -36,7 +37,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
-  public void assumptionsTest() throws SolverException, InterruptedException {
+  public void assumptionsTest() throws SolverException, InterruptedException, IOException {
     BooleanFormula b = bmgr.makeVariable("b");
     BooleanFormula c = bmgr.makeVariable("c");
 
@@ -69,6 +70,8 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       try (Model m = pe.getModel()) {
         assertThat(m.evaluate(c)).isTrue();
       }
+    } catch (IOException pE) {
+      throw new RuntimeException(pE);
     }
   }
 
@@ -78,11 +81,14 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
     assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     try (BasicProverEnvironment<?> pe = context.newProverEnvironment(GENERATE_UNSAT_CORE)) {
       unsatCoreTest0(pe);
+    } catch (IOException pE) {
+      throw new RuntimeException(pE);
     }
   }
 
   @Test
-  public void unsatCoreTestForInterpolation() throws SolverException, InterruptedException {
+  public void unsatCoreTestForInterpolation()
+      throws SolverException, InterruptedException, IOException {
     requireInterpolation();
     try (BasicProverEnvironment<?> pe =
         context.newProverEnvironmentWithInterpolation(GENERATE_UNSAT_CORE)) {
@@ -100,11 +106,13 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
     try (BasicProverEnvironment<?> pe =
         context.newOptimizationProverEnvironment(GENERATE_UNSAT_CORE)) {
       unsatCoreTest0(pe);
+    } catch (IOException pE) {
+      throw new RuntimeException(pE);
     }
   }
 
   private void unsatCoreTest0(BasicProverEnvironment<?> pe)
-      throws InterruptedException, SolverException {
+      throws InterruptedException, SolverException, IOException {
     pe.push();
     pe.addConstraint(imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1)));
     pe.addConstraint(imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(2)));
@@ -132,7 +140,8 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void unsatCoreWithAssumptionsTest() throws SolverException, InterruptedException {
+  public void unsatCoreWithAssumptionsTest()
+      throws SolverException, InterruptedException, IOException {
     assume()
         .withMessage(
             "Solver %s does not support unsat core generation over assumptions", solverToUse())

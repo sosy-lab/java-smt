@@ -35,6 +35,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   private final boolean generateUnsatCoresOverAssumptions;
   protected final boolean enableSL;
   protected boolean closed = false;
+  protected boolean useBinary;
 
   private final Set<Evaluator> evaluators = new LinkedHashSet<>();
 
@@ -50,6 +51,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     generateUnsatCoresOverAssumptions =
         pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS);
     enableSL = pOptions.contains(ProverOptions.ENABLE_SEPARATION_LOGIC);
+    useBinary = pOptions.contains(ProverOptions.USE_BINARY);
 
     assertedFormulas.add(new LinkedHashSet<>());
   }

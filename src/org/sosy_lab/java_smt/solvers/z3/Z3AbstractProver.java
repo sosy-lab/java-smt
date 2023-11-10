@@ -191,7 +191,8 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
 
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
-      Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
+      Collection<BooleanFormula> assumptions)
+      throws SolverException, InterruptedException, IOException {
     checkGenerateUnsatCoresOverAssumptions();
     if (!isUnsatWithAssumptions(assumptions)) {
       return Optional.empty();
@@ -264,7 +265,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
 
   @Override
   public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
-      throws InterruptedException, SolverException {
+      throws InterruptedException, SolverException, IOException {
     try {
       return super.allSat(callback, important);
     } catch (Z3Exception e) {

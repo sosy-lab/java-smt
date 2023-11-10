@@ -14,6 +14,7 @@ import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 
 import com.google.common.truth.Truth;
+import java.io.IOException;
 import java.util.EnumSet;
 import org.junit.Before;
 import org.junit.Test;
@@ -246,7 +247,7 @@ public class SolverFormulaIODeclarationsTest
   }
 
   @Test
-  public void parseAbbreviation() throws SolverException, InterruptedException {
+  public void parseAbbreviation() throws SolverException, InterruptedException, IOException {
     requireBitvectors();
 
     String query =

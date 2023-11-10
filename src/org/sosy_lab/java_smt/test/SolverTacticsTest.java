@@ -15,6 +15,7 @@ import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.truth.TruthJUnit;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +36,7 @@ import org.sosy_lab.java_smt.api.visitors.BooleanFormulaVisitor;
 public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
-  public void nnfTacticDefaultTest1() throws SolverException, InterruptedException {
+  public void nnfTacticDefaultTest1() throws SolverException, InterruptedException, IOException {
     requireVisitor();
 
     BooleanFormula a = bmgr.makeVariable("a");
@@ -50,7 +51,7 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void nnfTacticDefaultTest2() throws SolverException, InterruptedException {
+  public void nnfTacticDefaultTest2() throws SolverException, InterruptedException, IOException {
     requireVisitor();
 
     BooleanFormula a = bmgr.makeVariable("a");
@@ -66,7 +67,7 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void cnfTacticDefaultTest1() throws SolverException, InterruptedException {
+  public void cnfTacticDefaultTest1() throws SolverException, InterruptedException, IOException {
     TruthJUnit.assume().that(solver).isEqualTo(Solvers.Z3);
     BooleanFormula a = bmgr.makeVariable("a");
     BooleanFormula b = bmgr.makeVariable("b");
@@ -87,7 +88,7 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void cnfTacticDefaultTest2() throws SolverException, InterruptedException {
+  public void cnfTacticDefaultTest2() throws SolverException, InterruptedException, IOException {
     TruthJUnit.assume().that(solver).isEqualTo(Solvers.Z3);
     BooleanFormula a = bmgr.makeVariable("a");
     BooleanFormula b = bmgr.makeVariable("b");
@@ -110,7 +111,7 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void cnfTacticDefaultTest3() throws SolverException, InterruptedException {
+  public void cnfTacticDefaultTest3() throws SolverException, InterruptedException, IOException {
     TruthJUnit.assume().that(solver).isEqualTo(Solvers.Z3);
     BooleanFormula x = bmgr.makeVariable("x");
     BooleanFormula y = bmgr.makeVariable("y");
@@ -132,7 +133,7 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void ufEliminationSimpleTest() throws SolverException, InterruptedException {
+  public void ufEliminationSimpleTest() throws SolverException, InterruptedException, IOException {
     requireIntegers();
     // f := uf(v1, v3) XOR uf(v2, v4)
     IntegerFormula variable1 = imgr.makeVariable("variable1");
@@ -163,7 +164,8 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void ufEliminationNestedUfsTest() throws SolverException, InterruptedException {
+  public void ufEliminationNestedUfsTest() throws SolverException, InterruptedException,
+                                                  IOException {
     requireIntegers();
     // f :=uf2(uf1(v1, v2), v3) XOR uf2(uf1(v2, v1), v4)
     IntegerFormula variable1 = imgr.makeVariable("variable1");

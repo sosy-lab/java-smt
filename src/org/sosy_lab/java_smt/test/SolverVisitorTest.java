@@ -13,6 +13,7 @@ import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.truth.Truth;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -152,7 +153,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void bitvectorIdVisit() throws SolverException, InterruptedException {
+  public void bitvectorIdVisit() throws SolverException, InterruptedException, IOException {
     requireBitvectors();
     BitvectorType bv8 = FormulaType.getBitvectorTypeWithSize(8);
     BitvectorFormula x = bvmgr.makeVariable(bv8, "x");
@@ -214,7 +215,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void bitvectorIdVisit2() throws SolverException, InterruptedException {
+  public void bitvectorIdVisit2() throws SolverException, InterruptedException, IOException {
     requireBitvectors();
     BitvectorFormula n = bvmgr.makeBitvector(8, 13);
 
@@ -373,7 +374,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void bvVisit() throws SolverException, InterruptedException {
+  public void bvVisit() throws SolverException, InterruptedException, IOException {
     requireBitvectors();
     BitvectorFormula x = bvmgr.makeVariable(5, "x");
 
@@ -475,7 +476,8 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void stringInBooleanFormulaIdVisit() throws SolverException, InterruptedException {
+  public void stringInBooleanFormulaIdVisit()
+      throws SolverException, InterruptedException, IOException {
     requireStrings();
     StringFormula x = smgr.makeVariable("xVariable");
     StringFormula y = smgr.makeVariable("yVariable");
@@ -501,7 +503,8 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void stringInStringFormulaVisit() throws SolverException, InterruptedException {
+  public void stringInStringFormulaVisit() throws SolverException, InterruptedException,
+                                                  IOException {
     requireStrings();
     StringFormula x = smgr.makeVariable("xVariable");
     StringFormula y = smgr.makeVariable("yVariable");
@@ -553,7 +556,8 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void stringInIntegerFormulaVisit() throws SolverException, InterruptedException {
+  public void stringInIntegerFormulaVisit()
+      throws SolverException, InterruptedException, IOException {
     requireStrings();
     StringFormula x = smgr.makeVariable("xVariable");
     StringFormula y = smgr.makeVariable("yVariable");
@@ -943,7 +947,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
 
   @Test
   public void testTransformationInsideQuantifiersWithTrue()
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     requireQuantifiers();
     List<IntegerFormula> quantifiedVars = ImmutableList.of(imgr.makeVariable("x"));
     BooleanFormula body = bmgr.makeTrue();
@@ -955,7 +959,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
 
   @Test
   public void testTransformationInsideQuantifiersWithFalse()
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     requireQuantifiers();
     List<IntegerFormula> quantifiedVars = ImmutableList.of(imgr.makeVariable("x"));
     BooleanFormula body = bmgr.makeFalse();
@@ -967,7 +971,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
 
   @Test
   public void testTransformationInsideQuantifiersWithVariable()
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     requireQuantifiers();
     List<IntegerFormula> quantifiedVars = ImmutableList.of(imgr.makeVariable("x"));
     BooleanFormula body = bmgr.makeVariable("b");
@@ -1025,7 +1029,8 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
       };
 
   @Test
-  public void visitBooleanOperationWithMoreArgsTest() throws SolverException, InterruptedException {
+  public void visitBooleanOperationWithMoreArgsTest()
+      throws SolverException, InterruptedException, IOException {
     BooleanFormula u = bmgr.makeVariable("u");
     BooleanFormula v = bmgr.makeVariable("v");
     BooleanFormula w = bmgr.makeVariable("w");
@@ -1041,7 +1046,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
 
   @Test
   public void visitArithmeticOperationWithMoreArgsTest()
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     requireIntegers();
     requireParser();
 

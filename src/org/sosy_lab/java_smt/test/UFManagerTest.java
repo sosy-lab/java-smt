@@ -13,6 +13,7 @@ import static org.junit.Assert.assertThrows;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.truth.Truth;
+import java.io.IOException;
 import java.util.List;
 import org.junit.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -30,7 +31,8 @@ public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   private static final ImmutableList<String> VALID_NAMES = ImmutableList.of("Func", "(Func)");
 
   @Test
-  public void testDeclareAndCallUFWithInt() throws SolverException, InterruptedException {
+  public void testDeclareAndCallUFWithInt()
+      throws SolverException, InterruptedException, IOException {
     requireIntegers();
 
     IntegerFormula x = imgr.makeVariable("x");
@@ -55,7 +57,8 @@ public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   }
 
   @Test
-  public void testDeclareAndCallUFWithRational() throws SolverException, InterruptedException {
+  public void testDeclareAndCallUFWithRational()
+      throws SolverException, InterruptedException, IOException {
     requireRationals();
 
     RationalFormula x = rmgr.makeVariable("x");
@@ -81,7 +84,7 @@ public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
 
   @Test
   public void testDeclareAndCallUFWithIntAndRational()
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     requireIntegers();
     requireRationals();
 

@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.example;
 
 import com.google.common.collect.ImmutableList;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -57,7 +58,7 @@ public class HoudiniApp {
   private final SolverContext context;
 
   public static void main(String... args)
-      throws InvalidConfigurationException, SolverException, InterruptedException {
+      throws InvalidConfigurationException, SolverException, InterruptedException, IOException {
     Configuration config = Configuration.defaultConfiguration();
     LogManager logger = BasicLogManager.create(config);
     ShutdownNotifier notifier = ShutdownNotifier.createDummy();
@@ -134,7 +135,7 @@ public class HoudiniApp {
    * the transition.
    */
   public List<BooleanFormula> houdini(List<BooleanFormula> lemmas, BooleanFormula transition)
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     List<BooleanFormula> annotated = new ArrayList<>();
     List<BooleanFormula> annotatedPrimes = new ArrayList<>();
     Map<Integer, BooleanFormula> indexed = new HashMap<>();

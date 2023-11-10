@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.example;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -37,7 +38,7 @@ public class Interpolation {
   }
 
   public static void main(String... args)
-      throws InvalidConfigurationException, SolverException, InterruptedException {
+      throws InvalidConfigurationException, SolverException, InterruptedException, IOException {
 
     // set up a basic environment
     Configuration config = Configuration.defaultConfiguration();
@@ -99,7 +100,7 @@ public class Interpolation {
    */
   private static <T> void interpolateExample(
       InterpolatingProverEnvironment<T> prover, IntegerFormulaManager imgr, LogManager logger)
-      throws InterruptedException, SolverException {
+      throws InterruptedException, SolverException, IOException {
 
     // create some variables.
     IntegerFormula x = imgr.makeVariable("x");
@@ -173,7 +174,7 @@ public class Interpolation {
    */
   private static <T> void interpolateProgramTrace(
       InterpolatingProverEnvironment<T> prover, IntegerFormulaManager imgr, LogManager logger)
-      throws InterruptedException, SolverException {
+      throws InterruptedException, SolverException, IOException {
 
     // create some variables.
     // primed variable needed for 'self-assignments', alternatively use SSA-indices.

@@ -19,6 +19,7 @@ import com.google.common.truth.StandardSubjectBuilder;
 import com.google.common.truth.Subject;
 import com.google.common.truth.Truth;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -70,7 +71,7 @@ public final class BooleanFormulaSubject extends Subject {
   }
 
   private void checkIsUnsat(final BooleanFormula subject, final Fact expected)
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
 
       prover.push(subject);
@@ -94,7 +95,7 @@ public final class BooleanFormulaSubject extends Subject {
   /**
    * Check that the subject is unsatisfiable. Will show a model (satisfying assignment) on failure.
    */
-  public void isUnsatisfiable() throws SolverException, InterruptedException {
+  public void isUnsatisfiable() throws SolverException, InterruptedException, IOException {
     if (context.getFormulaManager().getBooleanFormulaManager().isTrue(formulaUnderTest)) {
       failWithoutActual(
           Fact.fact("expected to be", "unsatisfiable"),
@@ -106,7 +107,7 @@ public final class BooleanFormulaSubject extends Subject {
   }
 
   /** Check that the subject is satisfiable. Will show an unsat core on failure. */
-  public void isSatisfiable() throws SolverException, InterruptedException {
+  public void isSatisfiable() throws SolverException, InterruptedException, IOException {
     final BooleanFormulaManager bmgr = context.getFormulaManager().getBooleanFormulaManager();
     if (bmgr.isFalse(formulaUnderTest)) {
       failWithoutActual(
@@ -131,7 +132,8 @@ public final class BooleanFormulaSubject extends Subject {
    * <p>Will show an unsat core on failure.
    */
   @SuppressWarnings({"unused", "resource"})
-  void isSatisfiableAndHasModel(int maxSizeOfModel) throws SolverException, InterruptedException {
+  void isSatisfiableAndHasModel(int maxSizeOfModel)
+      throws SolverException, InterruptedException, IOException {
     final BooleanFormulaManager bmgr = context.getFormulaManager().getBooleanFormulaManager();
     if (bmgr.isFalse(formulaUnderTest)) {
       failWithoutActual(
@@ -161,7 +163,7 @@ public final class BooleanFormulaSubject extends Subject {
   }
 
   private void reportUnsatCoreForUnexpectedUnsatisfiableFormula()
-      throws InterruptedException, SolverException, AssertionError {
+      throws InterruptedException, SolverException, AssertionError, IOException {
     try (ProverEnvironment prover =
         context.newProverEnvironment(ProverOptions.GENERATE_UNSAT_CORE)) {
       // Try to report unsat core for failure message if the solver supports it.
@@ -199,7 +201,7 @@ public final class BooleanFormulaSubject extends Subject {
    * satisfiability of the subject and unsatisfiability of the negated subject in two steps to
    * improve error messages.
    */
-  public void isTautological() throws SolverException, InterruptedException {
+  public void isTautological() throws SolverException, InterruptedException, IOException {
     if (context.getFormulaManager().getBooleanFormulaManager().isFalse(formulaUnderTest)) {
       failWithoutActual(
           Fact.fact("expected to be", "tautological"),
@@ -216,7 +218,7 @@ public final class BooleanFormulaSubject extends Subject {
    * always holds. Will show a counterexample on failure.
    */
   public void isEquivalentTo(final BooleanFormula expected)
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     if (formulaUnderTest.equals(expected)) {
       return;
     }
@@ -228,7 +230,7 @@ public final class BooleanFormulaSubject extends Subject {
   }
 
   public void isEquisatisfiableTo(BooleanFormula other)
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     BooleanFormulaManager bfmgr = context.getFormulaManager().getBooleanFormulaManager();
     checkIsUnsat(
         bfmgr.and(formulaUnderTest, bfmgr.not(other)),
@@ -239,7 +241,8 @@ public final class BooleanFormulaSubject extends Subject {
    * Check that the subject implies a given formula, i.e. {@code subject => expected} always holds.
    * Will show a counterexample on failure.
    */
-  public void implies(final BooleanFormula expected) throws SolverException, InterruptedException {
+  public void implies(final BooleanFormula expected)
+      throws SolverException, InterruptedException, IOException {
     if (formulaUnderTest.equals(expected)) {
       return;
     }

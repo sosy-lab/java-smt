@@ -14,6 +14,7 @@ import static com.google.common.truth.TruthJUnit.assume;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +37,7 @@ public class SolverFormulaWithAssumptionsTest
    */
   @SuppressWarnings({"unchecked", "rawtypes", "CheckReturnValue"})
   protected <T> InterpolatingProverEnvironment<T> newEnvironmentForTest()
-      throws InvalidConfigurationException, SolverException, InterruptedException {
+      throws InvalidConfigurationException, SolverException, InterruptedException, IOException {
 
     // check if we support assumption-solving
     try (InterpolatingProverEnvironment<?> env = context.newProverEnvironmentWithInterpolation()) {
@@ -54,7 +55,7 @@ public class SolverFormulaWithAssumptionsTest
   @Test
   @SuppressWarnings("CheckReturnValue")
   public <T> void basicAssumptionsTest()
-      throws SolverException, InterruptedException, InvalidConfigurationException {
+      throws SolverException, InterruptedException, InvalidConfigurationException, IOException {
     requireInterpolation();
 
     IntegerFormula v1 = imgr.makeVariable("v1");
@@ -96,7 +97,7 @@ public class SolverFormulaWithAssumptionsTest
   @Test
   @SuppressWarnings("CheckReturnValue")
   public <T> void assumptionsTest()
-      throws SolverException, InterruptedException, InvalidConfigurationException {
+      throws SolverException, InterruptedException, InvalidConfigurationException, IOException {
     requireInterpolation();
 
     int n = 5;
@@ -157,7 +158,7 @@ public class SolverFormulaWithAssumptionsTest
 
   @Test
   @SuppressWarnings("CheckReturnValue")
-  public void assumptionsTest1() throws SolverException, InterruptedException {
+  public void assumptionsTest1() throws SolverException, InterruptedException, IOException {
     /*
     (declare-fun A () Bool)
     (push 1)

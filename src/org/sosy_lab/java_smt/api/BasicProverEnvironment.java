@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.api;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -67,7 +68,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
   int size();
 
   /** Check whether the conjunction of all formulas on the stack is unsatisfiable. */
-  boolean isUnsat() throws SolverException, InterruptedException;
+  boolean isUnsat() throws SolverException, InterruptedException, IOException;
 
   /**
    * Check whether the conjunction of all formulas on the stack together with the list of
@@ -76,7 +77,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * @param assumptions A list of literals.
    */
   boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
-      throws SolverException, InterruptedException;
+      throws SolverException, InterruptedException, IOException;
 
   /**
    * Get a satisfying assignment. This method should be called only immediately after an {@link
@@ -128,7 +129,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    *     assumptions which is unsatisfiable with the original constraints otherwise.
    */
   Optional<List<BooleanFormula>> unsatCoreOverAssumptions(Collection<BooleanFormula> assumptions)
-      throws SolverException, InterruptedException;
+      throws SolverException, InterruptedException, IOException;
 
   /**
    * Get statistics for a concrete ProverEnvironment in a solver. The returned mapping is intended
@@ -166,7 +167,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * @return A region representing all satisfying models of the formula.
    */
   <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
-      throws InterruptedException, SolverException;
+      throws InterruptedException, SolverException, IOException;
 
   /**
    * Interface for the {@link #allSat} callback.

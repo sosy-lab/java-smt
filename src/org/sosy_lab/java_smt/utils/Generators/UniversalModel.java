@@ -20,6 +20,7 @@
 
 package org.sosy_lab.java_smt.utils.Generators;
 
+import ap.parser.IExpression;
 import com.google.common.collect.ImmutableList;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -27,6 +28,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -137,11 +139,11 @@ public class UniversalModel extends AbstractModel {
     return finalList;
   }
 
-  public ImmutableList<ValueAssignment> getModel()
+  public UniversalModel getModel()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     getOutput();
     getAssignments();
-    return finalList;
+    return this;
   }
 
   @Nullable
@@ -152,9 +154,15 @@ public class UniversalModel extends AbstractModel {
 
   @Override
   public String toString() {
-    return "UniversalModel{" +
-        "formulaManager=" + formulaManager +
-        '}';
+    return finalList.toString();
+  }
+
+  public boolean isUnsat() {
+    return isUnsat;
+  }
+
+  public void setUnsat(boolean pUnsat) {
+    isUnsat = pUnsat;
   }
 }
 

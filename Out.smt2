@@ -1,6 +1,5 @@
-(declare-fun |id#2@1| () (_ BitVec 32))
-(declare-fun |id#0@1| () (_ BitVec 32))
-(assert (and (= |id#2@1| #b00000000000000000000000000001010) (and (not (bvslt #b00000000000000000000000000001010 |id#2@1|)) (and (not (= |id#2@1| |id#0@1|)) (and (not (= |id#2@1| (bvadd #b11111111111111111111111111111110 |id#0@1|))) (and (not (bvslt #b00000000000000000000000000001010 |id#0@1|)) (and (and (not (= ((_ extract 31 31) |id#2@1|) #b1)) (not (= ((_ extract 31 31) |id#0@1|) #b1))) (= |id#2@1| #b00000000000000000000000000001010))))))))
+(declare-const a Bool)
+(assert a)
 (check-sat)
 (get-model)
 (exit)

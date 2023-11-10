@@ -13,6 +13,7 @@ import static com.google.common.truth.TruthJUnit.assume;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.truth.Truth;
+import java.io.IOException;
 import java.util.List;
 import org.junit.AssumptionViolatedException;
 import org.junit.Test;
@@ -27,7 +28,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
-  public void testVariableNamedTrue() throws SolverException, InterruptedException {
+  public void testVariableNamedTrue() throws SolverException, InterruptedException, IOException {
     BooleanFormula var;
     try {
       var = bmgr.makeVariable("true");
@@ -39,7 +40,7 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void testVariableNamedFalse() throws SolverException, InterruptedException {
+  public void testVariableNamedFalse() throws SolverException, InterruptedException, IOException {
     BooleanFormula var;
     try {
       var = bmgr.makeVariable("false");
@@ -79,7 +80,8 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void testConjunctionArgsExtractionEmpty() throws SolverException, InterruptedException {
+  public void testConjunctionArgsExtractionEmpty()
+      throws SolverException, InterruptedException, IOException {
     requireVisitor();
     BooleanFormula input = bmgr.makeBoolean(true);
     Truth.assertThat(bmgr.toConjunctionArgs(input, false)).isEmpty();
@@ -87,7 +89,8 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void testConjunctionArgsExtraction() throws SolverException, InterruptedException {
+  public void testConjunctionArgsExtraction()
+      throws SolverException, InterruptedException, IOException {
     requireIntegers();
     BooleanFormula input =
         bmgr.and(bmgr.makeVariable("a"), imgr.equal(imgr.makeNumber(1), imgr.makeVariable("x")));
@@ -100,7 +103,7 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
 
   @Test
   public void testConjunctionArgsExtractionRecursive()
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     BooleanFormula input;
     ImmutableSet<BooleanFormula> comparisonSet;
     if (imgr != null) {
@@ -157,7 +160,8 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void testDisjunctionArgsExtractionEmpty() throws SolverException, InterruptedException {
+  public void testDisjunctionArgsExtractionEmpty()
+      throws SolverException, InterruptedException, IOException {
     requireVisitor();
     BooleanFormula input = bmgr.makeBoolean(false);
     Truth.assertThat(bmgr.toDisjunctionArgs(input, false)).isEmpty();
@@ -165,7 +169,8 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void testDisjunctionArgsExtraction() throws SolverException, InterruptedException {
+  public void testDisjunctionArgsExtraction()
+      throws SolverException, InterruptedException, IOException {
     BooleanFormula input;
     ImmutableSet<BooleanFormula> comparisonSet;
     if (imgr != null) {
@@ -193,7 +198,7 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
 
   @Test
   public void testDisjunctionArgsExtractionRecursive()
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     BooleanFormula input;
     ImmutableSet<BooleanFormula> comparisonSet;
     if (imgr != null) {
@@ -304,7 +309,7 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void simpleImplicationTest() throws InterruptedException, SolverException {
+  public void simpleImplicationTest() throws InterruptedException, SolverException, IOException {
     BooleanFormula x = bmgr.makeVariable("x");
     BooleanFormula y = bmgr.makeVariable("y");
     BooleanFormula z = bmgr.makeVariable("z");

@@ -17,6 +17,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.truth.Truth;
+import java.io.IOException;
 import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,7 +41,7 @@ public class UfEliminationTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void simpleTest() throws SolverException, InterruptedException {
+  public void simpleTest() throws SolverException, InterruptedException, IOException {
     requireIntegers();
 
     // f := uf(v1, v3) XOR uf(v2, v4)
@@ -72,7 +73,7 @@ public class UfEliminationTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void nestedUfs() throws SolverException, InterruptedException {
+  public void nestedUfs() throws SolverException, InterruptedException, IOException {
     requireIntegers();
 
     // f := uf2(uf1(v1, v2), v3) XOR uf2(uf1(v2, v1), v4)
@@ -109,7 +110,7 @@ public class UfEliminationTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void nestedUfs2() throws SolverException, InterruptedException {
+  public void nestedUfs2() throws SolverException, InterruptedException, IOException {
     requireIntegers();
 
     // f := uf2(uf1(v1, uf2(v3, v6)), v3) < uf2(uf1(v2, uf2(v4, v5)), v4)
@@ -153,7 +154,7 @@ public class UfEliminationTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void nestedUfs3() throws SolverException, InterruptedException {
+  public void nestedUfs3() throws SolverException, InterruptedException, IOException {
     requireIntegers();
 
     // f := uf(v1) < uf(v2)
@@ -181,7 +182,7 @@ public class UfEliminationTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void twoFormulasTest() throws SolverException, InterruptedException {
+  public void twoFormulasTest() throws SolverException, InterruptedException, IOException {
     // See FormulaManagerTest.testEmptySubstitution(), FormulaManagerTest.testNoSubstitution()
     requireIntegers();
     assume().withMessage("Princess fails").that(solver).isNotEqualTo(Solvers.PRINCESS);
@@ -246,7 +247,7 @@ public class UfEliminationTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void substitutionTest() throws SolverException, InterruptedException {
+  public void substitutionTest() throws SolverException, InterruptedException, IOException {
     requireIntegers();
 
     // f := uf(v1, v3) \/ NOT(uf(v2, v4)))
