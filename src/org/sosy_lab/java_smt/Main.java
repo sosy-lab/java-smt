@@ -55,11 +55,10 @@ public class Main {
     //RationalFormulaManager rmgr = fmgr.getRationalFormulaManager();
     UFManager umgr =  fmgr.getUFManager();
 
-    //BooleanFormula constraint = fmgr.universalParse("/home/janel/Desktop/Studium/Semester_6"
-    //    + "/Bachelorarbeit/nochmalneu/smtquery.z3/smtquery.019.smt2");
+    BooleanFormula constraint = fmgr.universalParse("/home/janel/Desktop/Studium/Semester_6"
+        + "/Bachelorarbeit/nochmalneu/smtquery_mathsat/smtquery.022.smt2");
+    System.out.println(constraint);
 
-    BooleanFormula constraint = umgr.declareAndCallUF("annalena", FormulaType.BooleanType,
-        bvmgr.makeVariable(5, "test"));
 
     try (ProverEnvironment prover =
              context.newProverEnvironment(SolverContext.ProverOptions.GENERATE_MODELS)) {

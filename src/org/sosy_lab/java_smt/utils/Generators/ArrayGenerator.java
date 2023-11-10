@@ -103,7 +103,7 @@ public class ArrayGenerator {
     inputParams.add(pIndex);
     inputParams.add(pValue);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(store " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + inPlaceInputParams.get(2) +")";
+        inPlaceInputParams -> "(store " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + " " + inPlaceInputParams.get(2) +")";
     Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 

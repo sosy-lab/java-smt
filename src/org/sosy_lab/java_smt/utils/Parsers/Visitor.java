@@ -969,7 +969,10 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
       case "=":
         if (operands.size() == 2) {
           try {
-            if (operands.stream().anyMatch(c -> c instanceof RationalFormula)) {
+            if (operands.stream().anyMatch(c -> c instanceof ArrayFormula)){
+              return Objects.requireNonNull(amgr).equivalence((ArrayFormula<Formula, Formula>) operands.get(0),
+                  (ArrayFormula<Formula, Formula>) operands.get(1));
+            } else if (operands.stream().anyMatch(c -> c instanceof RationalFormula)) {
               if (operands.stream().anyMatch(c -> variables.containsKey(c)))
               return Objects.requireNonNull(rmgr).equal((NumeralFormula) operands.get(0),
                   (NumeralFormula) operands.get(1));
@@ -983,9 +986,6 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
               BooleanFormula result = Objects.requireNonNull(bimgr).equal((BitvectorFormula) operands.get(0),
                   (BitvectorFormula) operands.get(1));
               return result;
-            } else if (operands.stream().anyMatch(c -> c instanceof ArrayFormula)){
-              return Objects.requireNonNull(amgr).equivalence((ArrayFormula<Formula, Formula>) operands.get(0),
-                  (ArrayFormula<Formula, Formula>) operands.get(1));
             }
 
           } catch (Exception e) {
