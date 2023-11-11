@@ -229,7 +229,7 @@ Afterwards you need to update the version number in `solvers_ivy_conf/ivy_javasm
 
 Info: There is a small cyclic dependency: JavaSMT itself depends on the Java components of Yices2.
 
-As long as no API was changed and compilation suceeds, simply execute `ant publish-artifacts-yices2`.
+As long as no API was changed and compilation succeeds, simply execute `ant publish-artifacts-yices2`.
 
 If the API was changed, we need to break the dependency cycle for the publication and revert this later:
 edit `lib/ivy.xml` and replace the dependency towards `javasmt-yices2` with the dependency towards `javasmt-solver-yices2`
