@@ -3,7 +3,9 @@ package org.sosy_lab.java_smt.utils.Parsers;
 import com.google.common.collect.Lists;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.text.Normalizer.Form;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -57,6 +59,8 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
   public List<ValueAssignment> getAssignments() {
     return assignments;
   }
+
+  public boolean isModel = false;
 
   public Visitor(
       FormulaManager fmgr, BooleanFormulaManager bmgr,
@@ -184,8 +188,17 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
   @Override public Object visitQual_id(smtlibv2Parser.Qual_idContext ctx) { return visitChildren(ctx); }
 
   @Override public Object visitQual_id_sort(smtlibv2Parser.Qual_id_sortContext ctx) {
+    if (ctx.identifier().getText().equals("const")) {
 
-    return visitChildren(ctx);
+    }
+    List sorts = new ArrayList<>();
+    sorts.add(ctx.identifier().getText());
+    List<String> temp = (List<String>) visit(ctx.sort());
+    for (int i = 0; i < temp.size(); i++) {
+      sorts.add(temp.get(i));
+    }
+
+    return sorts;
   }
 
   @Override public Object visitVar_binding(smtlibv2Parser.Var_bindingContext ctx) { return visitChildren(ctx); }
@@ -955,7 +968,17 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
         } else {
           throw new IOException(operator + " takes one array and one index as input. ");
         }
-
+      case "const":
+        if (isModel) {
+          variables.put("temp", new ParserFormula("Array", Objects.requireNonNull(amgr).makeArray(
+              "(as const (" + operators.get(1) + " " + operators.get(2) + " " + operators.get(3) +
+                  ") " + operands.get(0) + ")",
+              getArrayTypes(operators.get(2)),
+              getArrayTypes(operators.get(3)))));
+          return variables.get("temp").javaSmt;
+        } else {
+          throw  new IOException("\"as const\" is not supported by JavaSMT");
+        }
         //UF
       case "UF":
         try {
@@ -1078,9 +1101,13 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     List<Formula> inputParams = new ArrayList<>();
     if (ctx.getChildCount() > 4 && ! ctx.getChild(2).getText().equals(")")) {
       for (int i = 0; i < ctx.sorted_var().size(); i++) {
+        List<String> temp = new ArrayList<>();
         String name = ctx.sorted_var(i).symbol().getText();
         String value = ctx.sorted_var(i).sort().getText();
-        inputParams.add(mapKey(value, name));
+        for (int j = 0; i < ctx.sorted_var(j).getChildCount()-1; j++) {
+          temp.add(ctx.sorted_var(j).getChild(j).getText());
+        }
+        inputParams.add(mapKey(temp, name));
       }
     }
     javaSorts = inputParams.stream().map(e -> {
@@ -1093,23 +1120,34 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     for (int i = 0; i < ctx.sorted_var().size(); i++) {
       name = ctx.sorted_var(i).symbol().getText();
       sort = ctx.sorted_var(i).sort().getText();
-      variables.put(name, new ParserFormula(sort, mapKey(sort, name)));
+      variables.put(name, new ParserFormula(sort, mapKey(Collections.singletonList(sort), name)));
     }
 
-    Formula input = (Formula) visit(ctx.term());
-    String returnType = ctx.sort().getText();
+
+    List<String> returnTypes = new ArrayList<>();
+    for (int i = 0; i < ctx.sort().getChildCount(); i++) {
+      if (ctx.sort().getChild(i).getChildCount() > 1) {
+
+      }
+      returnTypes.add(ctx.sort().getChild(i).getText());
+      System.out.println("marker");
+    }
+
     Formula key;
-    Formula value = input;
 
     if (! inputParams.isEmpty()) {
-      ParserFormula temp = new ParserFormula("UF", umgr.declareUF(variable, mapSort(returnType), javaSorts));
-      temp.setReturnType(mapSort(returnType));
+      ParserFormula temp = new ParserFormula("UF", umgr.declareUF(variable, mapSort(returnTypes),
+          javaSorts));
+      temp.setReturnType(mapSort(returnTypes));
       temp.setInputParams(javaSorts);
       variables.put(variable, temp);
       key = umgr.callUF((FunctionDeclaration<? extends Formula>) variables.get(variable).javaSmt, inputParams);
     } else {
-      key = mapKey(returnType, variable);
+      key = mapKey(returnTypes, variable);
     }
+
+    Formula input = (Formula) visit(ctx.term());
+    Formula value = input;
     variables.put(variable, new ParserFormula("def-fun", input));
 
     String keyString = key.toString();
@@ -1124,6 +1162,19 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
 
 
     return visitChildren(ctx);
+  }
+
+  public List<FormulaType<?>> getReturnTypes(List<String> pReturnTypes,
+                                       smtlibv2Parser.Function_defContext ctx) {
+
+    for (int i = 0; i < ctx.sort().getChildCount(); i++) {
+      if (ctx.sort().getChild(i).getChildCount() > 1) {
+
+      }
+      pReturnTypes.add(ctx.sort().getChild(i).getText());
+      System.out.println("marker");
+    }
+    return null;
   }
 
 
@@ -1180,65 +1231,46 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
         if (sorts.size() == 3) {
           String index = sorts.get(1);
           String elements = sorts.get(2);
-          String bvSize = "";
-          if (index.startsWith("(_BitVec")) {
-            bvSize = index.split("_BitVec")[1];
-            bvSize = bvSize.split("\\)")[0];
-            index = "BitVec";
-          }
-          if (elements.startsWith("(_BitVec")) {
-            bvSize = elements.split("_BitVec")[1];
-            bvSize = bvSize.split("\\)")[0];
-            elements = "BitVec";
-          }
-          switch (index) {
-            case "Int": {
-              FormulaType<IntegerFormula> idx = FormulaType.IntegerType;
-              break;
-            }
-            case "Bool": {
-              FormulaType<BooleanFormula> idx = FormulaType.BooleanType;
-              break;
-            }
-            case "Real": {
-              FormulaType<RationalFormula> idx = FormulaType.RationalType;
-              break;
-            }
-            case "BitVec": {
-              FormulaType<BitvectorFormula> idx =
-                  FormulaType.BitvectorType.getBitvectorTypeWithSize(Integer.parseInt(bvSize));
-              break;
-            }
-            default:
-              throw new IOException(index + " is not a supported array index sort");
-          }
-          switch (elements) {
-            case "Int": {
-              FormulaType<IntegerFormula> elem = FormulaType.IntegerType;
-              break;
-            }
-            case "Bool": {
-              FormulaType<BooleanFormula> elem = FormulaType.BooleanType;
-              break;
-            }
-            case "Real": {
-              FormulaType<RationalFormula> elem = FormulaType.RationalType;
-              break;
-            }
-            case "BitVec": {
-              FormulaType<BitvectorFormula> elem =
-                  FormulaType.BitvectorType.getBitvectorTypeWithSize(Integer.parseInt(bvSize));
-              break;
-            }
-            default:
-              throw new IOException(elements + " is not a supported array element sort");
-          }
+
           variables.put((variable), new ParserFormula("Array", Objects.requireNonNull(amgr).makeArray(variable,
-              FormulaType.IntegerType, FormulaType.IntegerType)));
+              getArrayTypes(index), getArrayTypes(elements))));
         }
         break;
     }
     return visitChildren(ctx);
+  }
+
+  public static FormulaType<?> getArrayTypes(String type) throws IOException {
+    String bvSize = "";
+    FormulaType<?> formulaType;
+    if (type.startsWith("(_BitVec")) {
+      bvSize = type.split("_BitVec")[1];
+      bvSize = bvSize.split("\\)")[0];
+      type = "BitVec";
+    }
+
+    switch (type) {
+      case "Int": {
+        formulaType = FormulaType.IntegerType;
+        break;
+      }
+      case "Bool": {
+        formulaType = FormulaType.BooleanType;
+        break;
+      }
+      case "Real": {
+        formulaType = FormulaType.RationalType;
+        break;
+      }
+      case "BitVec": {
+        formulaType =
+            FormulaType.BitvectorType.getBitvectorTypeWithSize(Integer.parseInt(bvSize));
+        break;
+      }
+      default:
+        throw new IOException(type + " is not a supported array index sort");
+    }
+    return formulaType;
   }
 
   @Override public Object visitCmd_declareDatatype(smtlibv2Parser.Cmd_declareDatatypeContext ctx) {
@@ -1248,15 +1280,27 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
 
   @Override public Object visitCmd_declareDatatypes(smtlibv2Parser.Cmd_declareDatatypesContext ctx) { return visitChildren(ctx); }
 
-  public Formula mapKey(String type, String name) throws IOException {
+  public Formula mapKey(List<String> sorts, String name) throws IOException {
     String bvSize = "";
-    if (type.startsWith("(_BitVec")) {
-      bvSize = type.split("_BitVec")[1];
+    String sort = "";
+    String idx = "";
+    String elem = "";
+    if (sorts.get(0).startsWith("(_")) {
+      bvSize = sorts.get(0).split("\\(_BitVec")[1];
       bvSize = bvSize.split("\\)")[0];
-      type = "BitVec";
+      sort = "BitVec";
+    } else if (sorts.size() > 1) {
+
+      if (sorts.get(1).startsWith("Array")) {
+        idx = sorts.get(2);
+        elem = sorts.get(3);
+        sort = "Array";
+      }
+    } else {
+      sort = sorts.get(0);
     }
 
-    switch (type) {
+    switch (sort) {
       case "Int":
         return Objects.requireNonNull(imgr).makeVariable(name);
       case "Bool":
@@ -1265,20 +1309,35 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
         return Objects.requireNonNull(rmgr).makeVariable(name);
       case "BitVec":
         return Objects.requireNonNull(bimgr).makeVariable(Integer.parseInt(bvSize), name);
+      case "Array":
+        return Objects.requireNonNull(amgr).makeArray(name, getArrayTypes(idx),
+            getArrayTypes(elem));
       default:
-        throw new IOException("JavaSMT supports only Int, Real, BitVec and Bool for UF.");
+        throw new IOException("JavaSMT suppoooorts only Int, Real, BitVec and Bool for UF.");
     }
   }
 
-  public static FormulaType<?> mapSort(String sorts) throws IOException {
+  public static FormulaType<?> mapSort(List<String> sorts) throws IOException {
     String bvSize = "";
-    if (sorts.startsWith("(_BitVec")) {
-      bvSize = sorts.split("_BitVec")[1];
+    String sort = "";
+    String idx = "";
+    String elem = "";
+    if (sorts.get(0).startsWith("(_")) {
+      bvSize = sorts.get(0).split("\\(_BitVec")[1];
       bvSize = bvSize.split("\\)")[0];
-      sorts = "BitVec";
+      sort = "BitVec";
+    } else if (sorts.size() > 1) {
+
+      if (sorts.get(0).startsWith("Array")) {
+        idx = sorts.get(1);
+        elem = sorts.get(2);
+        sort = "Array";
+      }
+    } else {
+      sort = sorts.get(0);
     }
 
-    switch (sorts) {
+    switch (sort) {
       case "Int":
         return FormulaType.IntegerType;
       case "Bool":
@@ -1287,8 +1346,10 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
         return FormulaType.RationalType;
       case "BitVec":
         return FormulaType.BitvectorType.getBitvectorTypeWithSize(Integer.parseInt(bvSize));
+      case "Array":
+        return FormulaType.getArrayType(getArrayTypes(idx), getArrayTypes(elem));
       default:
-        throw new IOException("JavaSMT supports only Int, Real, BitVec and Bool for UF.");
+        throw new IOException("JavaSMT supports oooonly Int, Real, BitVec and Bool for UF.");
     }
     }
 
@@ -1312,7 +1373,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
       case "BitVec":
         return Objects.requireNonNull(bimgr).makeVariable(Integer.parseInt(bvSize), name);
       default:
-        throw new IOException("JavaSMT supports only Int, Real, BitVec and Bool for UF.");
+        throw new IOException("JavaSMT supports oooonly Int, Real, BitVec and Bool for UF.");
     }
   }
 
@@ -1350,16 +1411,17 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
       inputParams = declaration.subList(3, ctx.getChildCount() - 2);
       javaSorts = inputParams.stream().map(e -> {
         try {
-          return mapSort(e);
+          return mapSort(Collections.singletonList(e));
         } catch (IOException pE) {
           throw new RuntimeException(pE);
         }
       }).collect(Collectors.toList());
     }
 
-    ParserFormula temp = new ParserFormula("UF", umgr.declareUF(variable, mapSort(returnType),
+    ParserFormula temp = new ParserFormula("UF", umgr.declareUF(variable,
+        mapSort(Collections.singletonList(returnType)),
         javaSorts));
-    temp.setReturnType(mapSort(returnType));
+    temp.setReturnType(mapSort(Collections.singletonList(returnType)));
     temp.setInputParams(javaSorts);
     variables.put(variable, temp);
 
@@ -1586,7 +1648,9 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
 
   @Override public Object visitResp_get_info(smtlibv2Parser.Resp_get_infoContext ctx) { return visitChildren(ctx); }
 
-  @Override public Object visitResp_get_model(smtlibv2Parser.Resp_get_modelContext ctx) { return visitChildren(ctx); }
+  @Override public Object visitResp_get_model(smtlibv2Parser.Resp_get_modelContext ctx) {
+    isModel = true;
+    return visitChildren(ctx); }
 
   @Override public Object visitResp_option(smtlibv2Parser.Resp_optionContext ctx) { return visitChildren(ctx); }
 

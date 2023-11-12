@@ -106,7 +106,8 @@ class StatisticsFormulaManager implements FormulaManager {
   }
 
   @Override
-  public <T extends Formula> T makeVariable(FormulaType<T> pFormulaType, String pName) {
+  public <T extends Formula> T makeVariable(FormulaType<T> pFormulaType, String pName)
+      throws IOException {
     return delegate.makeVariable(pFormulaType, pName);
   }
 
@@ -153,7 +154,7 @@ class StatisticsFormulaManager implements FormulaManager {
 
   @Override
   public BooleanFormula applyTactic(BooleanFormula pInput, Tactic pTactic)
-      throws InterruptedException {
+      throws InterruptedException, IOException {
     return delegate.applyTactic(pInput, pTactic);
   }
 
@@ -163,34 +164,35 @@ class StatisticsFormulaManager implements FormulaManager {
   }
 
   @Override
-  public <R> R visit(Formula pF, FormulaVisitor<R> pFormulaVisitor) {
+  public <R> R visit(Formula pF, FormulaVisitor<R> pFormulaVisitor) throws IOException {
     return delegate.visit(pF, pFormulaVisitor);
   }
 
   @Override
-  public void visitRecursively(Formula pF, FormulaVisitor<TraversalProcess> pFormulaVisitor) {
+  public void visitRecursively(Formula pF, FormulaVisitor<TraversalProcess> pFormulaVisitor)
+      throws IOException {
     delegate.visitRecursively(pF, pFormulaVisitor);
   }
 
   @Override
   public <T extends Formula> T transformRecursively(
-      T pF, FormulaTransformationVisitor pFormulaVisitor) {
+      T pF, FormulaTransformationVisitor pFormulaVisitor) throws IOException {
     return delegate.transformRecursively(pF, pFormulaVisitor);
   }
 
   @Override
-  public ImmutableMap<String, Formula> extractVariables(Formula pF) {
+  public ImmutableMap<String, Formula> extractVariables(Formula pF) throws IOException {
     return delegate.extractVariables(pF);
   }
 
   @Override
-  public ImmutableMap<String, Formula> extractVariablesAndUFs(Formula pF) {
+  public ImmutableMap<String, Formula> extractVariablesAndUFs(Formula pF) throws IOException {
     return delegate.extractVariablesAndUFs(pF);
   }
 
   @Override
   public <T extends Formula> T substitute(
-      T pF, Map<? extends Formula, ? extends Formula> pFromToMapping) {
+      T pF, Map<? extends Formula, ? extends Formula> pFromToMapping) throws IOException {
     return delegate.substitute(pF, pFromToMapping);
   }
 

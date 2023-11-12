@@ -66,7 +66,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   private BooleanFormula bv_forall_x_a_at_x_eq_0;
 
   @Before
-  public void setUpLIA() {
+  public void setUpLIA() throws IOException {
     requireIntegers();
     requireArrays();
     requireQuantifiers();
@@ -81,7 +81,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Before
-  public void setUpBV() {
+  public void setUpBV() throws IOException {
     requireBitvectors();
     requireArrays();
     requireQuantifiers();
@@ -673,7 +673,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testQELight() throws InterruptedException {
+  public void testQELight() throws InterruptedException, IOException {
     requireIntegers();
     assume().that(solverToUse()).isEqualTo(Solvers.Z3);
     // exists y : (y=4 && x=y+3) --> simplified: x=7
@@ -688,7 +688,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testIntrospectionForall() {
+  public void testIntrospectionForall() throws IOException {
     requireIntegers();
     BooleanFormula forall = qmgr.forall(ImmutableList.of(x), a_at_x_eq_0);
 
@@ -720,7 +720,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testIntrospectionExists() {
+  public void testIntrospectionExists() throws IOException {
     requireIntegers();
     BooleanFormula exists = qmgr.exists(ImmutableList.of(x), a_at_x_eq_0);
     final AtomicBoolean isQuantifier = new AtomicBoolean(false);

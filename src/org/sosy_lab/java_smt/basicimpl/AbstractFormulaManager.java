@@ -304,7 +304,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   }
 
   @Override
-  public BooleanFormula applyTactic(BooleanFormula f, Tactic tactic) throws InterruptedException {
+  public BooleanFormula applyTactic(BooleanFormula f, Tactic tactic)
+      throws InterruptedException, IOException {
     switch (tactic) {
       case ACKERMANNIZATION:
         return applyUFEImpl(f);
@@ -324,7 +325,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    *
    * @throws InterruptedException Can be thrown by the native code.
    */
-  protected BooleanFormula applyUFEImpl(BooleanFormula pF) throws InterruptedException {
+  protected BooleanFormula applyUFEImpl(BooleanFormula pF) throws InterruptedException,
+                                                                  IOException {
     return SolverUtils.ufElimination(this).eliminateUfs(pF);
   }
 
@@ -360,7 +362,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    *
    * @throws InterruptedException Can be thrown by the native code.
    */
-  protected BooleanFormula applyNNFImpl(BooleanFormula input) throws InterruptedException {
+  protected BooleanFormula applyNNFImpl(BooleanFormula input)
+      throws InterruptedException, IOException {
     return getBooleanFormulaManager().transformRecursively(input, new NNFVisitor(this));
   }
 
@@ -381,18 +384,19 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   }
 
   @Override
-  public <R> R visit(Formula input, FormulaVisitor<R> visitor) {
+  public <R> R visit(Formula input, FormulaVisitor<R> visitor) throws IOException {
     return formulaCreator.visit(input, visitor);
   }
 
   @Override
-  public void visitRecursively(Formula pF, FormulaVisitor<TraversalProcess> pFormulaVisitor) {
+  public void visitRecursively(Formula pF, FormulaVisitor<TraversalProcess> pFormulaVisitor)
+      throws IOException {
     formulaCreator.visitRecursively(pFormulaVisitor, pF);
   }
 
   @Override
   public <T extends Formula> T transformRecursively(
-      T f, FormulaTransformationVisitor pFormulaVisitor) {
+      T f, FormulaTransformationVisitor pFormulaVisitor) throws IOException {
     return formulaCreator.transformRecursively(pFormulaVisitor, f);
   }
 
@@ -402,7 +406,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    * @param f The input formula
    */
   @Override
-  public ImmutableMap<String, Formula> extractVariables(Formula f) {
+  public ImmutableMap<String, Formula> extractVariables(Formula f) throws IOException {
     ImmutableMap.Builder<String, Formula> found = ImmutableMap.builder();
     formulaCreator.extractVariablesAndUFs(f, false, found::put);
     return found.buildOrThrow(); // visitation should not visit any symbol twice
@@ -414,7 +418,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    * @param f The input formula
    */
   @Override
-  public ImmutableMap<String, Formula> extractVariablesAndUFs(Formula f) {
+  public ImmutableMap<String, Formula> extractVariablesAndUFs(Formula f) throws IOException {
     ImmutableMap.Builder<String, Formula> found = ImmutableMap.builder();
     formulaCreator.extractVariablesAndUFs(f, true, found::put);
     // We can find duplicate keys with different values, like UFs with distinct parameters.
@@ -431,7 +435,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   }
 
   @Override
-  public <T extends Formula> T makeVariable(FormulaType<T> formulaType, String name) {
+  public <T extends Formula> T makeVariable(FormulaType<T> formulaType, String name)
+      throws IOException {
     checkVariableName(name);
     Formula t;
     if (formulaType.isBooleanType()) {
@@ -478,7 +483,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
 
   @Override
   public <T extends Formula> T substitute(
-      final T pF, final Map<? extends Formula, ? extends Formula> pFromToMapping) {
+      final T pF, final Map<? extends Formula, ? extends Formula> pFromToMapping)
+      throws IOException {
     return transformRecursively(
         pF,
         new FormulaTransformationVisitor(this) {

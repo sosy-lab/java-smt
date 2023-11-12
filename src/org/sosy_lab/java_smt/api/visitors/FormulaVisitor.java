@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.api.visitors;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
@@ -32,7 +33,7 @@ public interface FormulaVisitor<R> {
    * @param f Formula representing the variable.
    * @param name Variable name.
    */
-  R visitFreeVariable(Formula f, String name);
+  R visitFreeVariable(Formula f, String name) throws IOException;
 
   /**
    * Visit a variable bound by a quantifier. The variable can have any sort (both boolean and
@@ -65,7 +66,8 @@ public interface FormulaVisitor<R> {
    *     FormulaManager#makeApplication} to construct a new instance of the same function with
    *     different arguments.
    */
-  R visitFunction(Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration);
+  R visitFunction(Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration)
+      throws IOException;
 
   /**
    * Visit a quantified node.
@@ -78,5 +80,6 @@ public interface FormulaVisitor<R> {
    * @param body Body of the quantifier.
    */
   R visitQuantifier(
-      BooleanFormula f, Quantifier quantifier, List<Formula> boundVariables, BooleanFormula body);
+      BooleanFormula f, Quantifier quantifier, List<Formula> boundVariables, BooleanFormula body)
+      throws IOException;
 }

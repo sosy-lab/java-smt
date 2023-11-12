@@ -103,7 +103,9 @@ public class FormulaClassifier {
 
       // classify the formulas
       FormulaClassifier fc = new FormulaClassifier(context);
-      formulas.forEach(fc::visit);
+      for (BooleanFormula formula : formulas) {
+        fc.visit(formula);
+      }
       System.out.println(fc + ", checked formulas: " + formulas.size());
 
     } catch (InvalidConfigurationException | UnsatisfiedLinkError e) {
@@ -126,7 +128,7 @@ public class FormulaClassifier {
     mgr = context.getFormulaManager();
   }
 
-  public void visit(BooleanFormula f) {
+  public void visit(BooleanFormula f) throws IOException {
     // first split formula into atoms to avoid repeated analysis of common subtrees.
     AtomCollector atomCollector = new AtomCollector();
     mgr.getBooleanFormulaManager().visitRecursively(f, atomCollector);
@@ -267,7 +269,8 @@ public class FormulaClassifier {
 
     @Override
     public Integer visitFunction(
-        Formula pF, List<Formula> args, FunctionDeclaration<?> pFunctionDeclaration) {
+        Formula pF, List<Formula> args, FunctionDeclaration<?> pFunctionDeclaration)
+        throws IOException {
       if (pFunctionDeclaration.getKind() == FunctionDeclarationKind.UF) {
         hasUFs = true;
       }
@@ -325,7 +328,7 @@ public class FormulaClassifier {
         BooleanFormula pF,
         Quantifier pQuantifier,
         List<Formula> pBoundVariables,
-        BooleanFormula pBody) {
+        BooleanFormula pBody) throws IOException {
       hasQuantifiers = true;
       checkType(pF);
       return mgr.visit(pBody, this);

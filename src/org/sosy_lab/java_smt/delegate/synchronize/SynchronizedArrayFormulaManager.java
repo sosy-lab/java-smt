@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.delegate.synchronize;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.io.IOException;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.ArrayFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -51,7 +52,8 @@ class SynchronizedArrayFormulaManager implements ArrayFormulaManager {
           TE extends Formula,
           FTI extends FormulaType<TI>,
           FTE extends FormulaType<TE>>
-      ArrayFormula<TI, TE> makeArray(String pName, FTI pIndexType, FTE pElementType) {
+      ArrayFormula<TI, TE> makeArray(String pName, FTI pIndexType, FTE pElementType)
+      throws IOException {
     synchronized (sync) {
       return delegate.makeArray(pName, pIndexType, pElementType);
     }
@@ -59,7 +61,7 @@ class SynchronizedArrayFormulaManager implements ArrayFormulaManager {
 
   @Override
   public <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> makeArray(
-      String pName, ArrayFormulaType<TI, TE> pType) {
+      String pName, ArrayFormulaType<TI, TE> pType) throws IOException {
     synchronized (sync) {
       return delegate.makeArray(pName, pType);
     }

@@ -1640,7 +1640,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testVisitorForStringConstants() {
+  public void testVisitorForStringConstants() throws IOException {
     BooleanFormula eq =
         bmgr.and(
             smgr.equal(smgr.makeString("x"), smgr.makeString("xx")),
@@ -1652,7 +1652,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testVisitorForRegexConstants() {
+  public void testVisitorForRegexConstants() throws IOException {
     RegexFormula concat = smgr.concat(smgr.makeRegex("x"), smgr.makeRegex("xx"));
     Map<String, Formula> freeVars = mgr.extractVariables(concat);
     assertThat(freeVars).isEmpty();
@@ -1661,7 +1661,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testVisitorForStringSymbols() {
+  public void testVisitorForStringSymbols() throws IOException {
     BooleanFormula eq = smgr.equal(smgr.makeVariable("x"), smgr.makeString("xx"));
     Map<String, Formula> freeVars = mgr.extractVariables(eq);
     assertThat(freeVars).containsExactly("x", smgr.makeVariable("x"));
@@ -1670,7 +1670,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testVisitorForRegexSymbols() {
+  public void testVisitorForRegexSymbols() throws IOException {
     BooleanFormula in = smgr.in(smgr.makeVariable("x"), smgr.makeRegex("xx"));
     Map<String, Formula> freeVars = mgr.extractVariables(in);
     assertThat(freeVars).containsExactly("x", smgr.makeVariable("x"));

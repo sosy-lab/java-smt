@@ -32,35 +32,35 @@ public class SolverFormulaIODeclarationsTest
   }
 
   @Test
-  public void parseDeclareInQueryTest1() {
+  public void parseDeclareInQueryTest1() throws IOException {
     String query = "(declare-fun var () Bool)(assert var)";
     BooleanFormula formula = mgr.parse(query);
     Truth.assertThat(mgr.extractVariables(formula)).hasSize(1);
   }
 
   @Test
-  public void parseDeclareInQueryTest2() {
+  public void parseDeclareInQueryTest2() throws IOException {
     String query = "(declare-fun x () Int)(assert (= 0 x))";
     BooleanFormula formula = mgr.parse(query);
     Truth.assertThat(mgr.extractVariables(formula)).hasSize(1);
   }
 
   @Test
-  public void parseDeclareInQueryTest3() {
+  public void parseDeclareInQueryTest3() throws IOException {
     String query = "(declare-fun foo (Int Int) Bool)(assert (foo 1 2))";
     BooleanFormula formula = mgr.parse(query);
     Truth.assertThat(mgr.extractVariablesAndUFs(formula)).hasSize(1);
   }
 
   @Test
-  public void parseDeclareInQueryTest4() {
+  public void parseDeclareInQueryTest4() throws IOException {
     String query = "(declare-fun x () Int)(declare-fun foo (Int Int) Bool)(assert (foo x 2))";
     BooleanFormula formula = mgr.parse(query);
     Truth.assertThat(mgr.extractVariablesAndUFs(formula)).hasSize(2);
   }
 
   @Test
-  public void parseDeclareAfterQueryTest1() {
+  public void parseDeclareAfterQueryTest1() throws IOException {
     String query = "(declare-fun var () Bool)(assert var)";
     BooleanFormula formula = mgr.parse(query);
     BooleanFormula var = bmgr.makeVariable("var");
@@ -68,7 +68,7 @@ public class SolverFormulaIODeclarationsTest
   }
 
   @Test
-  public void parseDeclareAfterQueryTest2() {
+  public void parseDeclareAfterQueryTest2() throws IOException {
     String query = "(declare-fun x () Int)(assert (= 0 x))";
     BooleanFormula formula = mgr.parse(query);
     IntegerFormula var = imgr.makeVariable("x");
@@ -76,7 +76,7 @@ public class SolverFormulaIODeclarationsTest
   }
 
   @Test
-  public void parseDeclareAfterQueryTest3() {
+  public void parseDeclareAfterQueryTest3() throws IOException {
     String query = "(declare-fun foo (Int Int) Bool)(assert (foo 1 2))";
     BooleanFormula formula = mgr.parse(query);
     BooleanFormula calledFoo =
@@ -85,7 +85,7 @@ public class SolverFormulaIODeclarationsTest
   }
 
   @Test
-  public void parseDeclareAfterQueryTest4() {
+  public void parseDeclareAfterQueryTest4() throws IOException {
     String query = "(declare-fun x () Int)(declare-fun foo (Int Int) Bool)(assert (foo 1 x))";
     BooleanFormula formula = mgr.parse(query);
     IntegerFormula var = imgr.makeVariable("x");
@@ -118,7 +118,7 @@ public class SolverFormulaIODeclarationsTest
   }
 
   @Test
-  public void parseDeclareBeforeTest() {
+  public void parseDeclareBeforeTest() throws IOException {
     String query = "(assert var)";
     BooleanFormula var = bmgr.makeVariable("var");
     BooleanFormula formula = mgr.parse(query);
@@ -126,7 +126,7 @@ public class SolverFormulaIODeclarationsTest
   }
 
   @Test
-  public void parseDeclareRedundantTest1() {
+  public void parseDeclareRedundantTest1() throws IOException {
     IntegerFormula var = imgr.makeVariable("x");
     String query = "(declare-fun x () Int)(declare-fun x () Int)(assert (= 0 x))";
     if (EnumSet.of(Solvers.PRINCESS, Solvers.Z3).contains(solverToUse())) {
@@ -139,7 +139,7 @@ public class SolverFormulaIODeclarationsTest
   }
 
   @Test
-  public void parseDeclareRedundantTest2() {
+  public void parseDeclareRedundantTest2() throws IOException {
     IntegerFormula var =
         fmgr.declareAndCallUF("foo", IntegerType, imgr.makeNumber(1), imgr.makeNumber(2));
     String query =
@@ -184,7 +184,7 @@ public class SolverFormulaIODeclarationsTest
   }
 
   @Test
-  public void parseDeclareConflictAfterQueryTest() {
+  public void parseDeclareConflictAfterQueryTest() throws IOException {
     String query = "(declare-fun x () Bool)(assert x)";
     BooleanFormula formula = mgr.parse(query);
     Truth.assertThat(mgr.extractVariables(formula).values()).hasSize(1);
@@ -197,7 +197,7 @@ public class SolverFormulaIODeclarationsTest
   }
 
   @Test
-  public void parseDeclareOnceNotTwiceTest1() {
+  public void parseDeclareOnceNotTwiceTest1() throws IOException {
     String query1 = "(declare-fun x () Bool)(assert x)";
     String query2 = "(assert (not x))";
     BooleanFormula formula1 = mgr.parse(query1);
@@ -208,7 +208,7 @@ public class SolverFormulaIODeclarationsTest
   }
 
   @Test
-  public void parseTwiceTest1() {
+  public void parseTwiceTest1() throws IOException {
     String query1 = "(declare-fun x () Bool)(assert x)";
     String query2 = "(declare-fun x () Bool)(assert x)";
     BooleanFormula formula1 = mgr.parse(query1);
@@ -219,7 +219,7 @@ public class SolverFormulaIODeclarationsTest
   }
 
   @Test
-  public void parseDeclareOnceNotTwiceTest2() {
+  public void parseDeclareOnceNotTwiceTest2() throws IOException {
     String query1 =
         "(declare-fun x () Bool)(declare-fun foo (Int Int) Bool)(assert (= (foo 1 2) x))";
     String query2 = "(assert (and (not x) (foo 3 4)))";
@@ -232,7 +232,7 @@ public class SolverFormulaIODeclarationsTest
   }
 
   @Test
-  public void parseDeclareOnceNotTwiceTest3() {
+  public void parseDeclareOnceNotTwiceTest3() throws IOException {
     String query1 = "(declare-fun x () Bool)(declare-fun y () Bool)(assert x)";
     String query2 = "(assert y)";
     BooleanFormula formula1 = mgr.parse(query1);

@@ -19,7 +19,6 @@ import ap.parser.IFormula;
 import ap.parser.IFunction;
 import ap.parser.ITerm;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.io.IOException;
 import java.util.ArrayDeque;
@@ -27,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -35,9 +35,7 @@ import org.sosy_lab.common.collect.PathCopyingPersistentTreeMap;
 import org.sosy_lab.common.collect.PersistentMap;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.Model;
-import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
@@ -60,7 +58,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   private final PrincessFormulaCreator creator;
   protected boolean wasLastSatCheckSat = false; // and stack is not changed
   
-  private UniversalModel binaryModel; 
+  private final UniversalModel binaryModel;
 
 
   protected PrincessAbstractProver(
@@ -76,6 +74,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
 
     trackingStack.push(new Level());
     partitions.push(PathCopyingPersistentTreeMap.of());
+    binaryModel = new UniversalModel(this, (AbstractFormulaManager) mgr);
   }
 
   /**
@@ -87,12 +86,8 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
     Preconditions.checkState(!closed);
     wasLastSatCheckSat = false;
     if (useBinary) {
-      binaryModel = new UniversalModel(null, (AbstractFormulaManager) mgr);
       binaryModel.getOutput();
-      if (binaryModel.isUnsat()) {
-        return true;
-      } else
-        return false;
+      return binaryModel.isUnsat();
     } else {
       final Value result = api.checkSat(true);
       if (result.equals(SimpleAPI.ProverStatus$.MODULE$.Sat())) {
@@ -155,17 +150,12 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
     super.pop();
   }
 
-  @SuppressWarnings("resource")
   @Override
   public Model getModel() throws SolverException {
     if (useBinary) {
       try {
         return binaryModel.getModel();
-      } catch (IOException pE) {
-        throw new RuntimeException(pE);
-      } catch (InterruptedException pE) {
-        throw new RuntimeException(pE);
-      } catch (InvalidConfigurationException pE) {
+      } catch (IOException | InterruptedException | InvalidConfigurationException pE) {
         throw new RuntimeException(pE);
       }
     } else {
@@ -209,7 +199,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
     final List<BooleanFormula> result = new ArrayList<>();
     final Set<Object> core = asJava(api.getUnsatCore());
     for (Object partitionId : core) {
-      result.add(partitions.peek().get(partitionId));
+      result.add(Objects.requireNonNull(partitions.peek()).get(partitionId));
     }
     return result;
   }

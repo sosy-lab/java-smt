@@ -20,42 +20,51 @@
 
 package org.sosy_lab.java_smt.utils.Generators;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 
 public class ArrayGenerator {
 
   public static <
       TE extends Formula,
-      FTE extends FormulaType<TE>> String checkArrayElementSort(FTE pElementType) {
+      FTE extends FormulaType<TE>> String checkArrayElementSort(FTE pElementType)
+      throws IOException {
     if (pElementType.isIntegerType()) {
       return  "Int";
     } else if (pElementType.isBooleanType()) {
       return "Bool";
     } else if (pElementType.isRationalType()) {
       return "Real";
-    } else {
-      return pElementType + "is not available in ArrayGenerator as "
-          + "values for Arrays";
+    } else if (pElementType.isArrayType()) {
+      return "(Array " + checkArrayIndexSort(((ArrayFormulaType) pElementType).getIndexType()) +
+          " " + checkArrayElementSort(((ArrayFormulaType) pElementType).getElementType()) + ")";
+    }else {
+      throw new IOException(pElementType + "is not available yet in ArrayGenerator as "
+          + "index for Arrays");
     }
   }
 
   public static <
       TI extends Formula,
-      FTI extends FormulaType<TI>> String checkArrayIndexSort(FTI pIndexType) {
+      FTI extends FormulaType<TI>> String checkArrayIndexSort(FTI pIndexType) throws IOException {
     if (pIndexType.isIntegerType()) {
       return  "Int";
     } else if (pIndexType.isBooleanType()) {
       return "Bool";
     } else if (pIndexType.isRationalType()) {
       return "Real";
+    } else if (pIndexType.isArrayType()) {
+      return "(Array " + checkArrayIndexSort(((ArrayFormulaType) pIndexType).getIndexType()) +
+          " " + checkArrayElementSort(((ArrayFormulaType) pIndexType).getElementType()) + ")";
     } else {
-      return pIndexType + "is not available yet in ArrayGenerator as "
-          + "index for Arrays";
+      throw new IOException(pIndexType + "is not available yet in ArrayGenerator as "
+          + "index for Arrays");
     }
   }
 
@@ -64,7 +73,8 @@ public class ArrayGenerator {
       TE extends Formula,
       FTI extends FormulaType<TI>,
       FTE extends FormulaType<TE>> void logMakeArray(ArrayFormula result,
-                                                                           String pName, FTI pIndexType, FTE pElementType) {
+                                                                           String pName, FTI pIndexType, FTE pElementType)
+      throws IOException {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pName);
     Function<List<Object>, String> saveResult = inPlaceInputParams -> (String) inPlaceInputParams.get(0);

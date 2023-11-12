@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.delegate.statistics;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collector;
@@ -138,32 +139,36 @@ class StatisticsBooleanFormulaManager implements BooleanFormulaManager {
   }
 
   @Override
-  public <R> R visit(BooleanFormula pFormula, BooleanFormulaVisitor<R> pVisitor) {
+  public <R> R visit(BooleanFormula pFormula, BooleanFormulaVisitor<R> pVisitor)
+      throws IOException {
     stats.visits.getAndIncrement();
     return delegate.visit(pFormula, pVisitor);
   }
 
   @Override
   public void visitRecursively(
-      BooleanFormula pF, BooleanFormulaVisitor<TraversalProcess> pRFormulaVisitor) {
+      BooleanFormula pF, BooleanFormulaVisitor<TraversalProcess> pRFormulaVisitor)
+      throws IOException {
     stats.visits.getAndIncrement();
     delegate.visitRecursively(pF, pRFormulaVisitor);
   }
 
   @Override
   public BooleanFormula transformRecursively(
-      BooleanFormula pF, BooleanFormulaTransformationVisitor pVisitor) {
+      BooleanFormula pF, BooleanFormulaTransformationVisitor pVisitor) throws IOException {
     stats.visits.getAndIncrement();
     return delegate.transformRecursively(pF, pVisitor);
   }
 
   @Override
-  public Set<BooleanFormula> toConjunctionArgs(BooleanFormula pF, boolean pFlatten) {
+  public Set<BooleanFormula> toConjunctionArgs(BooleanFormula pF, boolean pFlatten)
+      throws IOException {
     return delegate.toConjunctionArgs(pF, pFlatten);
   }
 
   @Override
-  public Set<BooleanFormula> toDisjunctionArgs(BooleanFormula pF, boolean pFlatten) {
+  public Set<BooleanFormula> toDisjunctionArgs(BooleanFormula pF, boolean pFlatten)
+      throws IOException {
     return delegate.toDisjunctionArgs(pF, pFlatten);
   }
 }

@@ -23,6 +23,7 @@ import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.logic.Theory;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -184,7 +185,7 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
   }
 
   @Override
-  public <R> R visit(FormulaVisitor<R> visitor, Formula f, final Term input) {
+  public <R> R visit(FormulaVisitor<R> visitor, Formula f, final Term input) throws IOException {
     checkArgument(
         input.getTheory().equals(environment.getTheory()),
         "Given term belongs to a different instance of SMTInterpol: %s",

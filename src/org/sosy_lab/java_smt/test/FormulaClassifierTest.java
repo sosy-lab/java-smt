@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 
+import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -39,7 +40,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void test_AUFLIA() {
+  public void test_AUFLIA() throws IOException {
     requireParser();
     requireQuantifiers(); // TODO SMTInterpol fails when parsing this
     String query = VARS + "(assert (exists ((z Int)) (= (select arr x) (foo z))))";
@@ -48,7 +49,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void test_QF_AUFLIA() {
+  public void test_QF_AUFLIA() throws IOException {
     requireParser();
     String query = VARS + "(assert (= (select arr x) (foo 0)))";
     classifier.visit(mgr.parse(query));
@@ -56,7 +57,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void test_QF_AUFLIRA() {
+  public void test_QF_AUFLIRA() throws IOException {
     requireParser();
     requireRationals();
     String query = VARS + "(assert (= (select arr x) (bar (/ 1 2))))";
@@ -65,7 +66,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void test_QF_AUFNIRA() {
+  public void test_QF_AUFNIRA() throws IOException {
     requireParser();
     requireRationals();
     String query = VARS + "(assert (= (select arr (* x x)) (bar (/ 1 2))))";
@@ -74,7 +75,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void test_LIA() {
+  public void test_LIA() throws IOException {
     requireParser();
     requireQuantifiers();
     String query = VARS + "(assert (exists ((z Int)) (= (+ x 1) 0)))";
@@ -83,7 +84,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void test_LRA() {
+  public void test_LRA() throws IOException {
     requireParser();
     requireQuantifiers();
     requireRationals();
@@ -93,7 +94,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void test_ABV() {
+  public void test_ABV() throws IOException {
     requireParser();
     assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     requireQuantifiers();
@@ -106,7 +107,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void test_QF_AUFBV() {
+  public void test_QF_AUFBV() throws IOException {
     requireParser();
     requireBitvectors();
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
@@ -116,7 +117,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void test_QF_BV() {
+  public void test_QF_BV() throws IOException {
     requireParser();
     requireBitvectors();
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
@@ -126,7 +127,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void test_QF_LIA() {
+  public void test_QF_LIA() throws IOException {
     requireParser();
     String query = VARS + "(assert (< xx (* x 2)))";
     classifier.visit(mgr.parse(query));
@@ -134,7 +135,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void test_QF_LRA() {
+  public void test_QF_LRA() throws IOException {
     requireParser();
     String query = VARS + "(assert (< yy y))";
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
@@ -143,7 +144,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void test_QF_NIA() {
+  public void test_QF_NIA() throws IOException {
     requireParser();
     String query = VARS + "(assert (< xx (* x x)))";
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
@@ -152,7 +153,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void test_QF_NRA() {
+  public void test_QF_NRA() throws IOException {
     requireParser();
     String query = VARS + "(assert (< yy (* y y)))";
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
@@ -161,7 +162,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void test_QF_UF() {
+  public void test_QF_UF() throws IOException {
     requireParser();
     String query = VARS + "(assert (= (foo x) x))";
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
@@ -170,7 +171,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void test_QF_UFBV() {
+  public void test_QF_UFBV() throws IOException {
     requireParser();
     requireBitvectors();
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
@@ -180,7 +181,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void test_QF_UFLIA() {
+  public void test_QF_UFLIA() throws IOException {
     requireParser();
     String query = VARS + "(assert (< xx (+ x (foo x))))";
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
@@ -189,7 +190,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void test_QF_UFLRA() {
+  public void test_QF_UFLRA() throws IOException {
     requireParser();
     String query = VARS + "(assert (< yy (bar y)))";
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
@@ -198,7 +199,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void test_QF_UFNRA() {
+  public void test_QF_UFNRA() throws IOException {
     requireParser();
     String query = VARS + "(assert (< (* y yy) (bar y)))";
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
@@ -207,7 +208,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void test_UFLRA() {
+  public void test_UFLRA() throws IOException {
     requireParser();
     requireQuantifiers();
     String query = VARS + "(assert (exists ((zz Real)) (< (+ y yy) (bar y))))";
@@ -217,7 +218,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void test_UFNRA() {
+  public void test_UFNRA() throws IOException {
     requireParser();
     requireQuantifiers(); // TODO SMTInterpol fails when parsing this
     String query = VARS + "(assert (exists ((zz Real)) (< (* y yy) (bar y))))";
@@ -227,7 +228,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void test_QF_FP() {
+  public void test_QF_FP() throws IOException {
     requireParser();
     requireFloats();
     String query = VARS + "(declare-fun a () Float32) (assert (fp.eq a (fp.add RNE a a)))";
@@ -236,7 +237,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void test_FP() {
+  public void test_FP() throws IOException {
     requireParser();
     requireFloats();
     requireQuantifiers();

@@ -204,7 +204,7 @@ public class EnumerationFormulaManagerTest extends SolverBasedTest0.Parameterize
   }
 
   @Test
-  public void testVisitor() {
+  public void testVisitor() throws IOException {
     requireVisitor();
 
     EnumerationFormulaType colorType = emgr.declareEnumeration("ColorC", "Blue", "White");

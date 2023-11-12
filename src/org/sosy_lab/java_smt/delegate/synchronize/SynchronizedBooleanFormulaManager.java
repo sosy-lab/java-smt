@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.delegate.synchronize;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collector;
@@ -162,7 +163,8 @@ class SynchronizedBooleanFormulaManager implements BooleanFormulaManager {
   }
 
   @Override
-  public <R> R visit(BooleanFormula pFormula, BooleanFormulaVisitor<R> pVisitor) {
+  public <R> R visit(BooleanFormula pFormula, BooleanFormulaVisitor<R> pVisitor)
+      throws IOException {
     synchronized (sync) {
       return delegate.visit(pFormula, pVisitor);
     }
@@ -170,7 +172,8 @@ class SynchronizedBooleanFormulaManager implements BooleanFormulaManager {
 
   @Override
   public void visitRecursively(
-      BooleanFormula pF, BooleanFormulaVisitor<TraversalProcess> pRFormulaVisitor) {
+      BooleanFormula pF, BooleanFormulaVisitor<TraversalProcess> pRFormulaVisitor)
+      throws IOException {
     synchronized (sync) {
       delegate.visitRecursively(pF, pRFormulaVisitor);
     }
@@ -178,21 +181,23 @@ class SynchronizedBooleanFormulaManager implements BooleanFormulaManager {
 
   @Override
   public BooleanFormula transformRecursively(
-      BooleanFormula pF, BooleanFormulaTransformationVisitor pVisitor) {
+      BooleanFormula pF, BooleanFormulaTransformationVisitor pVisitor) throws IOException {
     synchronized (sync) {
       return delegate.transformRecursively(pF, pVisitor);
     }
   }
 
   @Override
-  public Set<BooleanFormula> toConjunctionArgs(BooleanFormula pF, boolean pFlatten) {
+  public Set<BooleanFormula> toConjunctionArgs(BooleanFormula pF, boolean pFlatten)
+      throws IOException {
     synchronized (sync) {
       return delegate.toConjunctionArgs(pF, pFlatten);
     }
   }
 
   @Override
-  public Set<BooleanFormula> toDisjunctionArgs(BooleanFormula pF, boolean pFlatten) {
+  public Set<BooleanFormula> toDisjunctionArgs(BooleanFormula pF, boolean pFlatten)
+      throws IOException {
     synchronized (sync) {
       return delegate.toDisjunctionArgs(pF, pFlatten);
     }

@@ -60,7 +60,8 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
 
     @Override
     public Formula visitFunction(
-        Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
+        Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration)
+        throws IOException {
       found.add(functionDeclaration.getKind());
       Truth.assert_()
           .withMessage(
@@ -87,7 +88,8 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
 
     @Override
     public Formula visitFunction(
-        Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
+        Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration)
+        throws IOException {
       found.add(functionDeclaration.getKind());
       Truth.assert_()
           .withMessage(
@@ -130,7 +132,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void booleanIdVisit() {
+  public void booleanIdVisit() throws IOException {
     BooleanFormula t = bmgr.makeBoolean(true);
     BooleanFormula f = bmgr.makeBoolean(false);
     BooleanFormula x = bmgr.makeVariable("x");
@@ -233,7 +235,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void integerConstantVisit() {
+  public void integerConstantVisit() throws IOException {
     requireIntegers();
     for (long n :
         new long[] {
@@ -247,7 +249,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void rationalConstantVisit() {
+  public void rationalConstantVisit() throws IOException {
     requireRationals();
     for (long n :
         new long[] {
@@ -270,7 +272,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void bitvectorConstantVisit() {
+  public void bitvectorConstantVisit() throws IOException {
     requireBitvectors();
 
     // check small bitsize
@@ -301,7 +303,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void floatIdVisit() {
+  public void floatIdVisit() throws IOException {
     requireFloats();
     FloatingPointType fp = FormulaType.getSinglePrecisionFloatingPointType();
     FloatingPointFormula x = fpmgr.makeVariable("x", fp);
@@ -331,7 +333,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void floatMoreVisit() {
+  public void floatMoreVisit() throws IOException {
     requireFloats();
     requireBitvectors();
     FloatingPointType fp = FormulaType.getSinglePrecisionFloatingPointType();
@@ -387,7 +389,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void bvVisitFunctionArgs() {
+  public void bvVisitFunctionArgs() throws IOException {
     requireBitvectors();
     BitvectorFormula x = bvmgr.makeVariable(5, "x");
     BitvectorFormula y = bvmgr.makeVariable(5, "y");
@@ -532,7 +534,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void stringInRegexFormulaVisit() {
+  public void stringInRegexFormulaVisit() throws IOException {
     requireStrings();
     RegexFormula r = smgr.makeRegex("regex1");
     RegexFormula s = smgr.makeRegex("regex2");
@@ -573,7 +575,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     }
   }
 
-  private void checkKind(Formula f, FunctionDeclarationKind expected) {
+  private void checkKind(Formula f, FunctionDeclarationKind expected) throws IOException {
     FunctionDeclarationVisitorNoOther visitor = new FunctionDeclarationVisitorNoOther();
     mgr.visit(f, visitor);
     Truth.assert_()
@@ -585,7 +587,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void booleanIdVisitWithAtoms() {
+  public void booleanIdVisitWithAtoms() throws IOException {
     IntegerFormula n12 = imgr.makeNumber(12);
     IntegerFormula a = imgr.makeVariable("a");
     IntegerFormula b = imgr.makeVariable("b");
@@ -608,7 +610,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
    * variables.
    */
   @Test
-  public void testFormulaVisitor() {
+  public void testFormulaVisitor() throws IOException {
     IntegerFormula x = imgr.makeVariable("x");
     IntegerFormula y = imgr.makeVariable("y");
     IntegerFormula z = imgr.makeVariable("z");
@@ -696,7 +698,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void testIntegerFormulaQuantifierSymbolsExtraction() {
+  public void testIntegerFormulaQuantifierSymbolsExtraction() throws IOException {
     requireQuantifiers();
     requireIntegers();
 
@@ -776,7 +778,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void testVisitingTrue() {
+  public void testVisitingTrue() throws IOException {
 
     // Check that "true" is correctly treated as a constant.
     BooleanFormula t = bmgr.makeBoolean(true);
@@ -801,7 +803,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void testCorrectFunctionNames() {
+  public void testCorrectFunctionNames() throws IOException {
     BooleanFormula a = bmgr.makeVariable("a");
     BooleanFormula b = bmgr.makeVariable("b");
     BooleanFormula ab = bmgr.and(a, b);
@@ -849,7 +851,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
             f,
             new FormulaTransformationVisitor(mgr) {
               @Override
-              public Formula visitFreeVariable(Formula formula, String name) {
+              public Formula visitFreeVariable(Formula formula, String name) throws IOException {
                 return mgr.makeVariable(mgr.getFormulaType(formula), name + "'");
               }
             });
@@ -869,7 +871,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
             f,
             new FormulaTransformationVisitor(mgr) {
               @Override
-              public Formula visitFreeVariable(Formula formula, String name) {
+              public Formula visitFreeVariable(Formula formula, String name) throws IOException {
                 return mgr.makeVariable(mgr.getFormulaType(formula), name + "'");
               }
             });
@@ -878,7 +880,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void booleanRecursiveTraversalTest() {
+  public void booleanRecursiveTraversalTest() throws IOException {
     BooleanFormula f =
         bmgr.or(
             bmgr.and(bmgr.makeVariable("x"), bmgr.makeVariable("y")),
@@ -908,7 +910,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void testTransformationInsideQuantifiers() {
+  public void testTransformationInsideQuantifiers() throws IOException {
     requireQuantifiers();
     // TODO Maybe rewrite using quantified integer variable to allow testing with Princess
     assume()
@@ -982,7 +984,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void extractionTest1() {
+  public void extractionTest1() throws IOException {
     IntegerFormula v = imgr.makeVariable("v");
     BooleanFormula q = fmgr.declareAndCallUF("q", FormulaType.BooleanType, v);
     Map<String, Formula> mapping = mgr.extractVariablesAndUFs(q);
@@ -992,7 +994,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void extractionTest2() {
+  public void extractionTest2() throws IOException {
     // the same as above, but with nullary UF.
     IntegerFormula v = fmgr.declareAndCallUF("v", FormulaType.IntegerType);
     BooleanFormula q = fmgr.declareAndCallUF("q", FormulaType.BooleanType, v);
@@ -1069,7 +1071,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void extractionArguments() {
+  public void extractionArguments() throws IOException {
     requireIntegers();
 
     // Create the variables and uf
@@ -1111,7 +1113,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void extractionDeclarations() {
+  public void extractionDeclarations() throws IOException {
     requireIntegers();
 
     // Create the variables and uf

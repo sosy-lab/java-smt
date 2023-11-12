@@ -346,7 +346,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
   }
 
   @Test
-  public void bvIntArray() {
+  public void bvIntArray() throws IOException {
     requireArrays();
     assume()
         .withMessage("Solver %s does not support arrays with integer index", solverToUse())
@@ -364,7 +364,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
   }
 
   @Test
-  public void bvBvArray() {
+  public void bvBvArray() throws IOException {
     requireArrays();
 
     BitvectorFormula bv = bvmgr.makeBitvector(4, 3);

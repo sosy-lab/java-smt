@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;
 import org.sosy_lab.java_smt.utils.PrettyPrinter;
@@ -37,7 +38,7 @@ public class PrettyPrinterTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void testPrettyPrintOnlyBoolean() {
+  public void testPrettyPrintOnlyBoolean() throws IOException {
     requireParser();
     String expected;
     switch (solverToUse()) {
@@ -68,7 +69,7 @@ public class PrettyPrinterTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void testPrettyPrintAll() {
+  public void testPrettyPrintAll() throws IOException {
     requireParser();
     String expected;
     switch (solverToUse()) {
@@ -141,7 +142,7 @@ public class PrettyPrinterTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void testDotOnlyBoolean() {
+  public void testDotOnlyBoolean() throws IOException {
     requireParser();
     String expected;
     switch (solverToUse()) {
@@ -203,7 +204,7 @@ public class PrettyPrinterTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void testDotAll() {
+  public void testDotAll() throws IOException {
     requireParser();
     String expected;
     switch (solverToUse()) {

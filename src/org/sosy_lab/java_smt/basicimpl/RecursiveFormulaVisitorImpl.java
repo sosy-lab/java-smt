@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.basicimpl;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
+import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashSet;
@@ -60,7 +61,7 @@ final class RecursiveFormulaVisitorImpl implements FormulaVisitor<TraversalProce
   }
 
   @Override
-  public TraversalProcess visitFreeVariable(Formula pF, String pName) {
+  public TraversalProcess visitFreeVariable(Formula pF, String pName) throws IOException {
     return delegate.visitFreeVariable(pF, pName);
   }
 
@@ -76,7 +77,8 @@ final class RecursiveFormulaVisitorImpl implements FormulaVisitor<TraversalProce
 
   @Override
   public TraversalProcess visitFunction(
-      Formula pF, List<Formula> pArgs, FunctionDeclaration<?> pFunctionDeclaration) {
+      Formula pF, List<Formula> pArgs, FunctionDeclaration<?> pFunctionDeclaration)
+      throws IOException {
     TraversalProcess result = delegate.visitFunction(pF, pArgs, pFunctionDeclaration);
     addToQueueIfNecessary(result, pArgs);
     return result;
@@ -84,7 +86,8 @@ final class RecursiveFormulaVisitorImpl implements FormulaVisitor<TraversalProce
 
   @Override
   public TraversalProcess visitQuantifier(
-      BooleanFormula pF, Quantifier pQuantifier, List<Formula> boundVars, BooleanFormula pBody) {
+      BooleanFormula pF, Quantifier pQuantifier, List<Formula> boundVars, BooleanFormula pBody)
+      throws IOException {
     TraversalProcess result = delegate.visitQuantifier(pF, pQuantifier, boundVars, pBody);
     addToQueueIfNecessary(result, ImmutableList.of(pBody));
     return result;

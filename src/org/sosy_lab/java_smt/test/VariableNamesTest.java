@@ -21,6 +21,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import org.junit.Test;
@@ -306,7 +307,13 @@ public class VariableNamesTest extends SolverBasedTest0 {
     requireIntegers();
     requireArrays();
     for (String name : getAllNames()) {
-      testName0(name, s -> amgr.makeArray(s, IntegerType, IntegerType), amgr::equivalence, false);
+      testName0(name, s -> {
+        try {
+          return amgr.makeArray(s, IntegerType, IntegerType);
+        } catch (IOException pE) {
+          throw new RuntimeException(pE);
+        }
+      }, amgr::equivalence, false);
     }
   }
 
@@ -320,10 +327,16 @@ public class VariableNamesTest extends SolverBasedTest0 {
       testName0(
           name,
           s ->
-              amgr.makeArray(
+          {
+            try {
+              return Objects.requireNonNull(amgr).makeArray(
                   s,
                   FormulaType.getBitvectorTypeWithSize(2),
-                  FormulaType.getBitvectorTypeWithSize(2)),
+                  FormulaType.getBitvectorTypeWithSize(2));
+            } catch (IOException pE) {
+              throw new RuntimeException(pE);
+            }
+          },
           amgr::equivalence,
           false);
     }
@@ -384,7 +397,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testNameInQuantification() {
+  public void testNameInQuantification() throws IOException {
     requireQuantifiers();
     requireIntegers();
 
@@ -418,7 +431,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
                 BooleanFormula pF,
                 Quantifier pQuantifier,
                 List<Formula> pBoundVariables,
-                BooleanFormula pBody) {
+                BooleanFormula pBody) throws IOException {
               if (solverToUse() != Solvers.PRINCESS) {
                 // TODO Princess does not (yet) return quantified variables.
                 assertThat(pBoundVariables).hasSize(1);
@@ -440,7 +453,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testNameInNestedQuantification() {
+  public void testNameInNestedQuantification() throws IOException {
     requireQuantifiers();
     requireIntegers();
 
@@ -504,7 +517,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
                 BooleanFormula pF,
                 Quantifier pQuantifier,
                 List<Formula> pBoundVariables,
-                BooleanFormula pBody) {
+                BooleanFormula pBody) throws IOException {
               if (solverToUse() != Solvers.PRINCESS) {
                 // TODO Princess does not return quantified variables.
                 assertThat(pBoundVariables).hasSize(1);
@@ -527,7 +540,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testBoolVariableNameInVisitor() {
+  public void testBoolVariableNameInVisitor() throws IOException {
     requireVisitor();
 
     for (String name : getAllNames()) {
@@ -613,7 +626,13 @@ public class VariableNamesTest extends SolverBasedTest0 {
     requireArrays();
     requireIntegers();
     for (String name : getAllNames()) {
-      createVariableWith(v -> amgr.makeArray(v, IntegerType, IntegerType), name);
+      createVariableWith(v -> {
+        try {
+          return Objects.requireNonNull(amgr).makeArray(v, IntegerType, IntegerType);
+        } catch (IOException pE) {
+          throw new RuntimeException(pE);
+        }
+      }, name);
     }
   }
 
@@ -626,10 +645,16 @@ public class VariableNamesTest extends SolverBasedTest0 {
     for (String name : getAllNames()) {
       createVariableWith(
           v ->
-              amgr.makeArray(
+          {
+            try {
+              return Objects.requireNonNull(amgr).makeArray(
                   v,
                   FormulaType.getBitvectorTypeWithSize(2),
-                  FormulaType.getBitvectorTypeWithSize(2)),
+                  FormulaType.getBitvectorTypeWithSize(2));
+            } catch (IOException pE) {
+              throw new RuntimeException(pE);
+            }
+          },
           name);
     }
   }

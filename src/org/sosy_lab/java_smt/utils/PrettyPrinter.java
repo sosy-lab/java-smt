@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.utils;
 
 import com.google.common.collect.ImmutableSet;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -45,7 +46,7 @@ public class PrettyPrinter {
    * processing, we refer to {@link FormulaManager#dumpFormula} that provides machine-readable
    * SMTLIB2.
    */
-  public String formulaToString(Formula f, PrinterOption... options) {
+  public String formulaToString(Formula f, PrinterOption... options) throws IOException {
     StringBuilder str = new StringBuilder();
     fmgr.visit(f, new PrettyPrintVisitor(fmgr, str, ImmutableSet.copyOf(options)));
     return str.toString();
@@ -61,7 +62,7 @@ public class PrettyPrinter {
    * further processing, we refer to {@link FormulaManager#dumpFormula} that provides
    * machine-readable SMTLIB2.
    */
-  public String formulaToDot(Formula f, PrinterOption... options) {
+  public String formulaToDot(Formula f, PrinterOption... options) throws IOException {
     DotVisitor plotter = new DotVisitor(ImmutableSet.copyOf(options));
     fmgr.visitRecursively(f, plotter);
     return plotter.toString();
@@ -153,7 +154,8 @@ public class PrettyPrinter {
 
     @Override
     public Void visitFunction(
-        Formula pF, List<Formula> pArgs, FunctionDeclaration<?> pFunctionDeclaration) {
+        Formula pF, List<Formula> pArgs, FunctionDeclaration<?> pFunctionDeclaration)
+        throws IOException {
       newline();
       out.append("(").append(pFunctionDeclaration.getName());
 

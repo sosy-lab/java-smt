@@ -250,7 +250,8 @@ class PrincessEnvironment {
     Preconditions.checkState(registeredProvers.isEmpty());
   }
 
-  public List<? extends IExpression> parseStringToTerms(String s, PrincessFormulaCreator creator) {
+  public List<? extends IExpression> parseStringToTerms(String s, PrincessFormulaCreator creator)
+      throws IOException {
 
     Tuple4<
             Seq<IFormula>,
@@ -421,7 +422,7 @@ class PrincessEnvironment {
           final Set<IExpression> allVars,
           final Map<String, IExpression> symbols,
           final Map<String, IFunApp> ufs,
-          final Map<String, IExpression> abbrevs) {
+          final Map<String, IExpression> abbrevs) throws IOException {
         final Deque<IExpression> waitlistSymbols = new ArrayDeque<>(allVars);
         final Set<String> seenSymbols = new HashSet<>();
         while (!waitlistSymbols.isEmpty()) {
@@ -455,7 +456,8 @@ class PrincessEnvironment {
        * contains each used abbreviation exactly once. Abbreviations with no dependencies come
        * first, more complex ones later.
        */
-      private Iterable<String> getOrderedAbbreviations(Map<String, IExpression> usedAbbrevs) {
+      private Iterable<String> getOrderedAbbreviations(Map<String, IExpression> usedAbbrevs)
+          throws IOException {
         ArrayDeque<String> waitlist = new ArrayDeque<>(usedAbbrevs.keySet());
         Set<String> orderedAbbreviations = new LinkedHashSet<>();
         while (!waitlist.isEmpty()) {
@@ -483,7 +485,7 @@ class PrincessEnvironment {
         return abbrevMap.containsKey(symbol);
       }
 
-      private Set<IExpression> getVariablesFromAbbreviation(IExpression var) {
+      private Set<IExpression> getVariablesFromAbbreviation(IExpression var) throws IOException {
         return ImmutableSet.copyOf(
             creator.extractVariablesAndUFs(abbrevMap.get(var), true).values());
       }

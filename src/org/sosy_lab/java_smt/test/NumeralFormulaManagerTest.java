@@ -80,7 +80,7 @@ public class NumeralFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
 
   @SuppressWarnings("CheckReturnValue")
   @Test
-  public void testSubTypes() {
+  public void testSubTypes() throws IOException {
     requireIntegers();
     requireRationals();
     IntegerFormula a = imgr.makeVariable("a");

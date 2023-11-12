@@ -105,7 +105,7 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
   }
 
   @Test
-  public void visitFloorTest() {
+  public void visitFloorTest() throws IOException {
     requireRationals();
     IntegerFormula f = rmgr.floor(rmgr.makeVariable("v"));
     assertThat(mgr.extractVariables(f)).hasSize(1);

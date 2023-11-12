@@ -113,6 +113,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.primitives.Longs;
 import com.google.common.primitives.UnsignedInteger;
 import com.google.common.primitives.UnsignedLong;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -321,7 +322,7 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   }
 
   @Override
-  public <R> R visit(FormulaVisitor<R> visitor, Formula formula, final Long f) {
+  public <R> R visit(FormulaVisitor<R> visitor, Formula formula, final Long f) throws IOException {
     int arity = msat_term_arity(f);
     if (msat_term_is_number(environment, f)) {
       return visitor.visitConstant(formula, convertValue(f, f));

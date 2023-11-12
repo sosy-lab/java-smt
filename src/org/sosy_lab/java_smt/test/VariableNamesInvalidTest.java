@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.test;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.IOException;
 import org.junit.Test;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -53,7 +54,7 @@ public class VariableNamesInvalidTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testInvalidIntArrayVariable() {
+  public void testInvalidIntArrayVariable() throws IOException {
     requireIntegers();
     requireArrays();
     @SuppressWarnings("unused")
@@ -61,7 +62,7 @@ public class VariableNamesInvalidTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testInvalidBvArrayVariable() {
+  public void testInvalidBvArrayVariable() throws IOException {
     requireBitvectors();
     requireArrays();
     @SuppressWarnings("unused")

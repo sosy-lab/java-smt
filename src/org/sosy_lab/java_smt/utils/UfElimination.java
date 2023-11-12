@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Streams;
 import com.google.errorprone.annotations.CheckReturnValue;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -123,7 +124,7 @@ public class UfElimination {
    * @param f the {@link Formula} to remove all Ufs from
    * @return the new {@link Formula} and the substitution done during transformation
    */
-  public BooleanFormula eliminateUfs(BooleanFormula f) {
+  public BooleanFormula eliminateUfs(BooleanFormula f) throws IOException {
     Result result = eliminateUfs(f, Result.empty(fmgr));
     return fmgr.getBooleanFormulaManager().and(result.getFormula(), result.getConstraints());
   }
@@ -136,7 +137,7 @@ public class UfElimination {
    * @param pOtherResult result of eliminating Ufs in another {@link BooleanFormula}
    * @return the {@link Result} of the Ackermannization
    */
-  public Result eliminateUfs(BooleanFormula pF, Result pOtherResult) {
+  public Result eliminateUfs(BooleanFormula pF, Result pOtherResult) throws IOException {
     checkArgument(!isQuantified(pF));
     BooleanFormula f;
     if (!pOtherResult.getSubstitution().isEmpty()) {
@@ -188,7 +189,13 @@ public class UfElimination {
     // substitute all UFs in the additional constraints,
     // required if UFs are arguments of UFs, e.g. uf(uf(1, 2), 2)
     for (int i = 0; i < depth; i++) {
-      extraConstraints.replaceAll(c -> fmgr.substitute(c, substitutions));
+      extraConstraints.replaceAll(c -> {
+        try {
+          return fmgr.substitute(c, substitutions);
+        } catch (IOException pE) {
+          throw new RuntimeException(pE);
+        }
+      });
     }
 
     Map<Formula, Formula> otherSubstitution =
@@ -240,7 +247,7 @@ public class UfElimination {
     return t;
   }
 
-  private boolean isQuantified(Formula f) {
+  private boolean isQuantified(Formula f) throws IOException {
     AtomicBoolean result = new AtomicBoolean();
     fmgr.visitRecursively(
         f,
@@ -265,7 +272,7 @@ public class UfElimination {
     return result.get();
   }
 
-  private int getNestingDepthOfUfs(Formula pFormula) {
+  private int getNestingDepthOfUfs(Formula pFormula) throws IOException {
     return fmgr.visit(
         pFormula,
         new DefaultFormulaVisitor<>() {
@@ -278,7 +285,13 @@ public class UfElimination {
           @Override
           public Integer visitFunction(
               Formula pF, List<Formula> pArgs, FunctionDeclaration<?> pFunctionDeclaration) {
-            int depthOfArgs = pArgs.stream().mapToInt(f -> fmgr.visit(f, this)).max().orElse(0);
+            int depthOfArgs = pArgs.stream().mapToInt(f -> {
+              try {
+                return fmgr.visit(f, this);
+              } catch (IOException pE) {
+                throw new RuntimeException(pE);
+              }
+            }).max().orElse(0);
 
             // count only UFs
             if (pFunctionDeclaration.getKind() == FunctionDeclarationKind.UF) {
@@ -293,14 +306,14 @@ public class UfElimination {
               BooleanFormula pF,
               QuantifiedFormulaManager.Quantifier pQ,
               List<Formula> pBoundVariables,
-              BooleanFormula pBody) {
+              BooleanFormula pBody) throws IOException {
             return fmgr.visit(pBody, this);
           }
         });
   }
 
   private Multimap<FunctionDeclaration<?>, UninterpretedFunctionApplication> findUFs(
-      Formula pFormula) {
+      Formula pFormula) throws IOException {
     Multimap<FunctionDeclaration<?>, UninterpretedFunctionApplication> ufs = HashMultimap.create();
 
     fmgr.visitRecursively(
@@ -314,7 +327,7 @@ public class UfElimination {
 
           @Override
           public TraversalProcess visitFunction(
-              Formula f, List<Formula> args, FunctionDeclaration<?> decl) {
+              Formula f, List<Formula> args, FunctionDeclaration<?> decl) throws IOException {
             if (decl.getKind() == FunctionDeclarationKind.UF) {
               Formula substitution = freshUfReplaceVariable(decl.getType());
               ufs.put(decl, UninterpretedFunctionApplication.create(f, args, substitution));
@@ -326,7 +339,7 @@ public class UfElimination {
     return ufs;
   }
 
-  private Formula freshUfReplaceVariable(FormulaType<?> pType) {
+  private Formula freshUfReplaceVariable(FormulaType<?> pType) throws IOException {
     return fmgr.makeVariable(pType, prefix + UNIQUE_ID_GENERATOR.getFreshId());
   }
 

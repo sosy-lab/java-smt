@@ -118,13 +118,13 @@ public class HoudiniApp {
   }
 
   /** traverse the formula and replace all symbols in the formula with their primed version. */
-  private BooleanFormula prime(BooleanFormula input) {
+  private BooleanFormula prime(BooleanFormula input) throws IOException {
     return fmgr.transformRecursively(
         input,
         new FormulaTransformationVisitor(fmgr) {
 
           @Override
-          public Formula visitFreeVariable(Formula f, String name) {
+          public Formula visitFreeVariable(Formula f, String name) throws IOException {
             return fmgr.makeVariable(fmgr.getFormulaType(f), name + "'");
           }
         });

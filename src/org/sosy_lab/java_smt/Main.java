@@ -25,6 +25,7 @@ import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.*;
 import java.io.*;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.utils.Generators.Generator;
 
@@ -42,20 +43,26 @@ public class Main {
     FormulaManager fmgr = context.getFormulaManager();
     BooleanFormulaManager bmgr = fmgr.getBooleanFormulaManager();
     IntegerFormulaManager imgr = fmgr.getIntegerFormulaManager();
-    BitvectorFormulaManager bvmgr = fmgr.getBitvectorFormulaManager();
+    //BitvectorFormulaManager bvmgr = fmgr.getBitvectorFormulaManager();
+    ArrayFormulaManager amgr = fmgr.getArrayFormulaManager();
     //RationalFormulaManager rmgr = fmgr.getRationalFormulaManager();
     UFManager umgr =  fmgr.getUFManager();
 
     //BooleanFormula constraint = fmgr.universalParse("/home/janel/Desktop/Studium/Semester_6"
-     //   + "/Bachelorarbeit/nochmalneu/smtquery_mathsat/smtquery.022.smt2");
+    //    + "/Bachelorarbeit/nochmalneu/array.smt2");
 
-    BooleanFormula constraint = bmgr.makeVariable("a");
+    ArrayFormula test = amgr.makeArray("test", FormulaType.getArrayType(FormulaType.IntegerType,
+        FormulaType.IntegerType), FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.IntegerType));
+    ArrayFormula x = (ArrayFormula) amgr.select(test, amgr.makeArray("bla", FormulaType.IntegerType,
+        FormulaType.IntegerType));
+    IntegerFormula y = (IntegerFormula) amgr.select(x, imgr.makeNumber(3));
+    BooleanFormula constraint = imgr.equal(imgr.makeVariable("hi"), y);
 
+    System.out.println(constraint);
     try (ProverEnvironment prover =
              context.newProverEnvironment(SolverContext.ProverOptions.GENERATE_MODELS,
                  ProverOptions.USE_BINARY)) {
       prover.addConstraint(constraint);
-
       Generator.dumpSMTLIB2();
 
       boolean isUnsat = prover.isUnsat();
@@ -63,11 +70,7 @@ public class Main {
       if (!isUnsat) {
         Model model = prover.getModel();
         System.out.println(model);
-        Object value = model.evaluate(constraint);
-        System.out.println(value);
-
       }
-
 
     } catch (SolverException v) {
       throw new RuntimeException(v);

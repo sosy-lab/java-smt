@@ -272,7 +272,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void variableNameExtractorTest() {
+  public void variableNameExtractorTest() throws IOException {
     // Since Boolector does not support integers we use bitvectors
     if (imgr != null) {
       BooleanFormula constr =
@@ -304,7 +304,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void ufNameExtractorTest() {
+  public void ufNameExtractorTest() throws IOException {
     // Since Boolector does not support integers we use bitvectors for constraints
     if (imgr != null) {
       BooleanFormula constraint =

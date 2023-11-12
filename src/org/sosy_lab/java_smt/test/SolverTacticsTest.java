@@ -222,6 +222,8 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
       mgr.applyTactic(f, Tactic.ACKERMANNIZATION);
       assert_().fail();
     } catch (IllegalArgumentException expected) {
+    } catch (IOException pE) {
+      throw new RuntimeException(pE);
     }
   }
 
@@ -237,7 +239,7 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
       bfmgr = pFmgr.getBooleanFormulaManager();
     }
 
-    Void visit(BooleanFormula f) {
+    Void visit(BooleanFormula f) throws IOException {
       // TODO rewrite using RecursiveBooleanFormulaVisitor should make this class easier
       return bfmgr.visit(f, this);
     }
@@ -267,7 +269,11 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
     @Override
     public Void visitNot(BooleanFormula pOperand) {
       started = true;
-      return visit(pOperand);
+      try {
+        return visit(pOperand);
+      } catch (IOException pE) {
+        throw new RuntimeException(pE);
+      }
     }
 
     @Override
@@ -278,14 +284,26 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
       } else {
         containsMoreAnd = true;
       }
-      pOperands.forEach(this::visit);
+      for (BooleanFormula pOperand : pOperands) {
+        try {
+          visit(pOperand);
+        } catch (IOException pE) {
+          throw new RuntimeException(pE);
+        }
+      }
       return null;
     }
 
     @Override
     public Void visitOr(List<BooleanFormula> pOperands) {
       if (started) {
-        pOperands.forEach(this::visit);
+        for (BooleanFormula pOperand : pOperands) {
+          try {
+            visit(pOperand);
+          } catch (IOException pE) {
+            throw new RuntimeException(pE);
+          }
+        }
       }
       return null;
     }
@@ -299,8 +317,16 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
     @Override
     public Void visitEquivalence(BooleanFormula pOperand1, BooleanFormula pOperand2) {
       if (started) {
-        visit(pOperand1);
-        visit(pOperand2);
+        try {
+          visit(pOperand1);
+        } catch (IOException pE) {
+          throw new RuntimeException(pE);
+        }
+        try {
+          visit(pOperand2);
+        } catch (IOException pE) {
+          throw new RuntimeException(pE);
+        }
       }
       return null;
     }
@@ -308,8 +334,16 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
     @Override
     public Void visitImplication(BooleanFormula pOperand1, BooleanFormula pOperand2) {
       if (started) {
-        visit(pOperand1);
-        visit(pOperand2);
+        try {
+          visit(pOperand1);
+        } catch (IOException pE) {
+          throw new RuntimeException(pE);
+        }
+        try {
+          visit(pOperand2);
+        } catch (IOException pE) {
+          throw new RuntimeException(pE);
+        }
       }
       return null;
     }
@@ -318,9 +352,21 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
     public Void visitIfThenElse(
         BooleanFormula pCondition, BooleanFormula pThenFormula, BooleanFormula pElseFormula) {
       if (started) {
-        visit(pCondition);
-        visit(pThenFormula);
-        visit(pElseFormula);
+        try {
+          visit(pCondition);
+        } catch (IOException pE) {
+          throw new RuntimeException(pE);
+        }
+        try {
+          visit(pThenFormula);
+        } catch (IOException pE) {
+          throw new RuntimeException(pE);
+        }
+        try {
+          visit(pElseFormula);
+        } catch (IOException pE) {
+          throw new RuntimeException(pE);
+        }
       }
       return null;
     }
@@ -332,7 +378,11 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
         List<Formula> boundVars,
         BooleanFormula pBody) {
       if (started) {
-        visit(pBody);
+        try {
+          visit(pBody);
+        } catch (IOException pE) {
+          throw new RuntimeException(pE);
+        }
       }
       return null;
     }
@@ -351,7 +401,11 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
 
     Void visit(BooleanFormula f) {
       // TODO rewrite using RecursiveBooleanFormulaVisitor should make this class easier
-      return bfmgr.visit(f, this);
+      try {
+        return bfmgr.visit(f, this);
+      } catch (IOException pE) {
+        throw new RuntimeException(pE);
+      }
     }
 
     public boolean isInNNF() {

@@ -16,6 +16,7 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Collection;
@@ -339,20 +340,21 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
   protected abstract TFormulaInfo ifThenElse(TFormulaInfo cond, TFormulaInfo f1, TFormulaInfo f2);
 
   @Override
-  public <R> R visit(BooleanFormula pFormula, BooleanFormulaVisitor<R> visitor) {
+  public <R> R visit(BooleanFormula pFormula, BooleanFormulaVisitor<R> visitor) throws IOException {
     return formulaCreator.visit(pFormula, new DelegatingFormulaVisitor<>(visitor));
   }
 
   @Override
   public void visitRecursively(
-      BooleanFormula pF, BooleanFormulaVisitor<TraversalProcess> pFormulaVisitor) {
+      BooleanFormula pF, BooleanFormulaVisitor<TraversalProcess> pFormulaVisitor)
+      throws IOException {
     formulaCreator.visitRecursively(
         new DelegatingFormulaVisitor<>(pFormulaVisitor), pF, p -> p instanceof BooleanFormula);
   }
 
   @Override
   public BooleanFormula transformRecursively(
-      BooleanFormula f, BooleanFormulaTransformationVisitor pVisitor) {
+      BooleanFormula f, BooleanFormulaTransformationVisitor pVisitor) throws IOException {
     return formulaCreator.transformRecursively(
         new DelegatingFormulaVisitor<>(pVisitor), f, p -> p instanceof BooleanFormula);
   }
@@ -478,7 +480,8 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
   }
 
   @Override
-  public Set<BooleanFormula> toConjunctionArgs(BooleanFormula f, boolean flatten) {
+  public Set<BooleanFormula> toConjunctionArgs(BooleanFormula f, boolean flatten)
+      throws IOException {
     if (flatten) {
       return asFuncRecursive(f, conjunctionFinder);
     }
@@ -486,7 +489,8 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
   }
 
   @Override
-  public Set<BooleanFormula> toDisjunctionArgs(BooleanFormula f, boolean flatten) {
+  public Set<BooleanFormula> toDisjunctionArgs(BooleanFormula f, boolean flatten)
+      throws IOException {
     if (flatten) {
       return asFuncRecursive(f, disjunctionFinder);
     }
@@ -503,7 +507,13 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
 
     while (!toProcess.isEmpty()) {
       BooleanFormula s = toProcess.pop();
-      Set<BooleanFormula> out = cache.computeIfAbsent(s, ss -> formulaCreator.visit(ss, visitor));
+      Set<BooleanFormula> out = cache.computeIfAbsent(s, ss -> {
+        try {
+          return formulaCreator.visit(ss, visitor);
+        } catch (IOException pE) {
+          throw new RuntimeException(pE);
+        }
+      });
       if (out.size() == 1 && s.equals(out.iterator().next())) {
         output.add(s);
       }

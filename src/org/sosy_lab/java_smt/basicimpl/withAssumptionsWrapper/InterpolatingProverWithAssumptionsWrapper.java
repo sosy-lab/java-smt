@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.basicimpl.withAssumptionsWrapper;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -47,8 +48,12 @@ public class InterpolatingProverWithAssumptionsWrapper<T>
 
     // remove assumption variables from the rawInterpolant if necessary
     if (!solverAssumptionsAsFormula.isEmpty()) {
-      interpolant =
-          bmgr.transformRecursively(interpolant, new RemoveAssumptionsFromFormulaVisitor());
+      try {
+        interpolant =
+            bmgr.transformRecursively(interpolant, new RemoveAssumptionsFromFormulaVisitor());
+      } catch (IOException pE) {
+        throw new RuntimeException(pE);
+      }
     }
 
     return interpolant;
@@ -97,17 +102,21 @@ public class InterpolatingProverWithAssumptionsWrapper<T>
       if (decl.getKind() == FunctionDeclarationKind.VAR) {
         String varName = decl.getName();
         // TODO is it sound to replace a variable with TRUE?
-        if (solverAssumptionsContainsVar(varName)) {
-          return bmgr.makeBoolean(true);
-        } else {
-          return bmgr.makeVariable(varName);
+        try {
+          if (solverAssumptionsContainsVar(varName)) {
+            return bmgr.makeBoolean(true);
+          } else {
+            return bmgr.makeVariable(varName);
+          }
+        } catch (IOException pE) {
+          throw new RuntimeException(pE);
         }
       } else {
         return atom;
       }
     }
 
-    private boolean solverAssumptionsContainsVar(String variableName) {
+    private boolean solverAssumptionsContainsVar(String variableName) throws IOException {
       for (BooleanFormula solverVar : solverAssumptionsAsFormula) {
         if (fmgr.extractVariables(solverVar).containsKey(variableName)) {
           return true;

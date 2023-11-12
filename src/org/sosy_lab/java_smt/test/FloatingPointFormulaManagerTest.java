@@ -658,7 +658,7 @@ public class FloatingPointFormulaManagerTest
   }
 
   @Test
-  public void fpTraversal() {
+  public void fpTraversal() throws IOException {
     assertThat(mgr.extractVariables(zero)).isEmpty();
     assertThat(mgr.extractVariablesAndUFs(zero)).isEmpty();
 
@@ -677,7 +677,7 @@ public class FloatingPointFormulaManagerTest
   }
 
   @Test
-  public void fpTraversalWithRoundingMode() {
+  public void fpTraversalWithRoundingMode() throws IOException {
     FloatingPointFormula two = fpmgr.makeNumber(2.0, singlePrecType);
     FloatingPointFormula var = fpmgr.makeVariable("x", singlePrecType);
     FloatingPointFormula mult = fpmgr.multiply(two, var);

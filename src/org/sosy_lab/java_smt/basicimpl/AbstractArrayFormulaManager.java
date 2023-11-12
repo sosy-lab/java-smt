@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.basicimpl;
 
 import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
 
+import java.io.IOException;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.ArrayFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -70,7 +71,7 @@ public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFu
 
   @Override
   public <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> makeArray(
-      String pName, ArrayFormulaType<TI, TE> type) {
+      String pName, ArrayFormulaType<TI, TE> type) throws IOException {
     return makeArray(pName, type.getIndexType(), type.getElementType());
   }
 
@@ -80,7 +81,8 @@ public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFu
           TE extends Formula,
           FTI extends FormulaType<TI>,
           FTE extends FormulaType<TE>>
-      ArrayFormula<TI, TE> makeArray(String pName, FTI pIndexType, FTE pElementType) {
+      ArrayFormula<TI, TE> makeArray(String pName, FTI pIndexType, FTE pElementType)
+      throws IOException {
     checkVariableName(pName);
     final TFormulaInfo namedArrayFormula = internalMakeArray(pName, pIndexType, pElementType);
     ArrayFormula result = getFormulaCreator().encapsulateArray(namedArrayFormula, pIndexType, pElementType);

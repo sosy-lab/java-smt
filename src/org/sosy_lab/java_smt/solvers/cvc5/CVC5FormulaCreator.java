@@ -28,6 +28,7 @@ import io.github.cvc5.Solver;
 import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
 import io.github.cvc5.Triplet;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -356,7 +357,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
   }
 
   @Override
-  public <R> R visit(FormulaVisitor<R> visitor, Formula formula, final Term f) {
+  public <R> R visit(FormulaVisitor<R> visitor, Formula formula, final Term f) throws IOException {
     checkState(!f.isNull());
     Sort sort = f.getSort();
     try {

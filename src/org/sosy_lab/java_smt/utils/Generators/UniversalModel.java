@@ -20,7 +20,6 @@
 
 package org.sosy_lab.java_smt.utils.Generators;
 
-import ap.parser.IExpression;
 import com.google.common.collect.ImmutableList;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -28,20 +27,20 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.java_smt.api.ArrayFormulaManager;
 import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
-import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.UFManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
+import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 import org.sosy_lab.java_smt.utils.Parsers.Visitor;
 import org.sosy_lab.java_smt.utils.Parsers.smtlibv2Lexer;
 import org.sosy_lab.java_smt.utils.Parsers.smtlibv2Parser;
@@ -56,7 +55,7 @@ public class UniversalModel extends AbstractModel {
   private final IntegerFormulaManager imgr;
   //private final RationalFormulaManager rmgr;
   private final BitvectorFormulaManager bvmgr;
-  //private final ArrayFormulaManager amgr;
+  private final ArrayFormulaManager amgr;
   private final UFManager umgr;
 
   private List<ValueAssignment> assignments;
@@ -66,15 +65,15 @@ public class UniversalModel extends AbstractModel {
 
 
   public UniversalModel(
-      ProverEnvironment prover,
+      AbstractProver<?> prover,
       AbstractFormulaManager<Formula, Formula, Formula, ?> pFormulaManager) {
-    super( null, pFormulaManager);
+    super( prover, pFormulaManager);
     formulaManager = pFormulaManager;
     bmgr = formulaManager.getBooleanFormulaManager();
     imgr = formulaManager.getIntegerFormulaManager();
     //rmgr = Objects.requireNonNull(formulaManager.getRationalFormulaManager());
     bvmgr = formulaManager.getBitvectorFormulaManager();
-    //amgr = Objects.requireNonNull(formulaManager.getArrayFormulaManager());
+    amgr = formulaManager.getArrayFormulaManager();
     umgr = formulaManager.getUFManager();
     assignments = new ArrayList<>();
 
@@ -110,17 +109,17 @@ public class UniversalModel extends AbstractModel {
   }
 
   public List<ValueAssignment> parseModel(String pString)
-      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+      throws IOException {
     smtlibv2Lexer lexer = new smtlibv2Lexer(CharStreams.fromFileName(pString));
     smtlibv2Parser parser = new smtlibv2Parser(new CommonTokenStream(lexer));
-    Visitor visitor = new Visitor(formulaManager, bmgr, imgr, null, bvmgr, null, umgr);
+    Visitor visitor = new Visitor(formulaManager, bmgr, imgr, null, bvmgr, amgr, umgr);
     visitor.visit(parser.start());
     assignments = visitor.getAssignments();
     return assignments;
   }
 
   public List<ValueAssignment> getAssignments()
-      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+      throws IOException, SolverException {
     getOutput();
     if (! isUnsat) {
       assignments = parseModel(path + "Model.smt2");
@@ -148,7 +147,7 @@ public class UniversalModel extends AbstractModel {
 
   @Nullable
   @Override
-  protected Object evalImpl(Object formula) {
+  protected Formula evalImpl(Object formula) {
     return null;
   }
 

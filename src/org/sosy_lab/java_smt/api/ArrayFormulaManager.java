@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.api;
 
+import java.io.IOException;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 
 /**
@@ -51,7 +52,8 @@ public interface ArrayFormulaManager {
    * @return Formula that represents the array
    */
   <TI extends Formula, TE extends Formula, FTI extends FormulaType<TI>, FTE extends FormulaType<TE>>
-      ArrayFormula<TI, TE> makeArray(String pName, FTI pIndexType, FTE pElementType);
+      ArrayFormula<TI, TE> makeArray(String pName, FTI pIndexType, FTE pElementType)
+      throws IOException;
 
   /**
    * Declare a new array.
@@ -59,7 +61,7 @@ public interface ArrayFormulaManager {
    * @param pName The name of the array variable
    */
   <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> makeArray(
-      String pName, ArrayFormulaType<TI, TE> type);
+      String pName, ArrayFormulaType<TI, TE> type) throws IOException;
 
   /** Make a {@link BooleanFormula} that represents the equality of two {@link ArrayFormula}. */
   <TI extends Formula, TE extends Formula> BooleanFormula equivalence(

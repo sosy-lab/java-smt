@@ -257,7 +257,7 @@ public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   }
 
   @Test
-  public void testDeclareAndCallUFWithBv() {
+  public void testDeclareAndCallUFWithBv() throws IOException {
     requireBitvectors();
     for (String name : VALID_NAMES) {
       Formula f =
@@ -293,7 +293,7 @@ public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   }
 
   @Test
-  public void testDeclareAndCallUFWithTypedArgs() {
+  public void testDeclareAndCallUFWithTypedArgs() throws IOException {
     requireBooleanArgument();
     createAndCallUF("fooBool1", FormulaType.BooleanType, bmgr.makeTrue());
     createAndCallUF("fooBool2", FormulaType.BooleanType, bmgr.makeTrue(), bmgr.makeTrue());
@@ -317,7 +317,7 @@ public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   }
 
   @Test
-  public void testDeclareAndCallUFWithRationalArgs() {
+  public void testDeclareAndCallUFWithRationalArgs() throws IOException {
     requireRationals();
     createAndCallUF("fooRat1", FormulaType.RationalType, rmgr.makeNumber(2.5));
     createAndCallUF("fooRat2", FormulaType.IntegerType, rmgr.makeNumber(1.5), rmgr.makeNumber(2.5));
@@ -331,7 +331,7 @@ public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   }
 
   @Test
-  public void testDeclareAndCallUFWithBVArgs() {
+  public void testDeclareAndCallUFWithBVArgs() throws IOException {
     requireBitvectors();
     createAndCallUF("fooBV1", FormulaType.getBitvectorTypeWithSize(5), bvmgr.makeBitvector(3, 3L));
     requireBooleanArgument();
@@ -358,7 +358,7 @@ public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
 
   /** utility method: create an UF from given arguments and return type and calls it. */
   private void createAndCallUF(
-      String name, FormulaType<? extends Formula> retType, Formula... args) {
+      String name, FormulaType<? extends Formula> retType, Formula... args) throws IOException {
     Formula f = fmgr.declareAndCallUF(name, retType, args);
     FunctionDeclaration<?> declaration = getDeclaration(f);
     Truth.assertThat(declaration.getName()).isEqualTo(name);
@@ -366,7 +366,7 @@ public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
     Truth.assertThat(f2).isEqualTo(f);
   }
 
-  private FunctionDeclaration<?> getDeclaration(Formula pFormula) {
+  private FunctionDeclaration<?> getDeclaration(Formula pFormula) throws IOException {
     assume()
         .withMessage("Solver %s does not support visiters", solverToUse())
         .that(solver)
@@ -382,7 +382,7 @@ public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
         });
   }
 
-  private List<Formula> getArguments(Formula pFormula) {
+  private List<Formula> getArguments(Formula pFormula) throws IOException {
     assume()
         .withMessage("Solver %s does not support visiters", solverToUse())
         .that(solver)

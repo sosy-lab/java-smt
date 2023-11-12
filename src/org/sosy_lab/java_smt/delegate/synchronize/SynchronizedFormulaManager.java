@@ -130,7 +130,8 @@ class SynchronizedFormulaManager implements FormulaManager {
   }
 
   @Override
-  public <T extends Formula> T makeVariable(FormulaType<T> pFormulaType, String pName) {
+  public <T extends Formula> T makeVariable(FormulaType<T> pFormulaType, String pName)
+      throws IOException {
     synchronized (sync) {
       return delegate.makeVariable(pFormulaType, pName);
     }
@@ -190,7 +191,7 @@ class SynchronizedFormulaManager implements FormulaManager {
 
   @Override
   public BooleanFormula applyTactic(BooleanFormula pInput, Tactic pTactic)
-      throws InterruptedException {
+      throws InterruptedException, IOException {
     synchronized (sync) {
       return delegate.applyTactic(pInput, pTactic);
     }
@@ -204,14 +205,15 @@ class SynchronizedFormulaManager implements FormulaManager {
   }
 
   @Override
-  public <R> R visit(Formula pF, FormulaVisitor<R> pFormulaVisitor) {
+  public <R> R visit(Formula pF, FormulaVisitor<R> pFormulaVisitor) throws IOException {
     synchronized (sync) {
       return delegate.visit(pF, pFormulaVisitor);
     }
   }
 
   @Override
-  public void visitRecursively(Formula pF, FormulaVisitor<TraversalProcess> pFormulaVisitor) {
+  public void visitRecursively(Formula pF, FormulaVisitor<TraversalProcess> pFormulaVisitor)
+      throws IOException {
     synchronized (sync) {
       delegate.visitRecursively(pF, pFormulaVisitor);
     }
@@ -219,21 +221,21 @@ class SynchronizedFormulaManager implements FormulaManager {
 
   @Override
   public <T extends Formula> T transformRecursively(
-      T pF, FormulaTransformationVisitor pFormulaVisitor) {
+      T pF, FormulaTransformationVisitor pFormulaVisitor) throws IOException {
     synchronized (sync) {
       return delegate.transformRecursively(pF, pFormulaVisitor);
     }
   }
 
   @Override
-  public ImmutableMap<String, Formula> extractVariables(Formula pF) {
+  public ImmutableMap<String, Formula> extractVariables(Formula pF) throws IOException {
     synchronized (sync) {
       return delegate.extractVariables(pF);
     }
   }
 
   @Override
-  public ImmutableMap<String, Formula> extractVariablesAndUFs(Formula pF) {
+  public ImmutableMap<String, Formula> extractVariablesAndUFs(Formula pF) throws IOException {
     synchronized (sync) {
       return delegate.extractVariablesAndUFs(pF);
     }
@@ -241,7 +243,7 @@ class SynchronizedFormulaManager implements FormulaManager {
 
   @Override
   public <T extends Formula> T substitute(
-      T pF, Map<? extends Formula, ? extends Formula> pFromToMapping) {
+      T pF, Map<? extends Formula, ? extends Formula> pFromToMapping) throws IOException {
     synchronized (sync) {
       return delegate.substitute(pF, pFromToMapping);
     }

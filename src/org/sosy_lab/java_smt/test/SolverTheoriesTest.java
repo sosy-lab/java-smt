@@ -718,7 +718,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void testGetFormulaType() {
+  public void testGetFormulaType() throws IOException {
     requireIntegers();
     BooleanFormula _boolVar = bmgr.makeVariable("boolVar");
     assertThat(mgr.getFormulaType(_boolVar)).isEqualTo(FormulaType.BooleanType);
@@ -733,7 +733,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void testMakeIntArray() {
+  public void testMakeIntArray() throws IOException {
     requireArrays();
     requireIntegers();
 
@@ -760,7 +760,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void testMakeBitVectorArray() {
+  public void testMakeBitVectorArray() throws IOException {
     requireArrays();
     requireBitvectors();
 
@@ -795,7 +795,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void testNestedRationalArray() {
+  public void testNestedRationalArray() throws IOException {
     requireArrays();
     requireRationals();
     requireIntegers();
@@ -820,7 +820,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void testNestedBitVectorArray() {
+  public void testNestedBitVectorArray() throws IOException {
     requireArrays();
     requireBitvectors();
     requireIntegers();

@@ -15,6 +15,7 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Table;
 import com.google.common.primitives.Longs;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -207,7 +208,7 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
   // Btor only has bitvec arrays and ufs with bitvecs and arrays of bitvecs
   // (and quantifier with bitvecs only)
   @SuppressWarnings("unused")
-  private <R> R visit1(FormulaVisitor<R> visitor, Formula formula, Long f) {
+  private <R> R visit1(FormulaVisitor<R> visitor, Formula formula, Long f) throws IOException {
     if (BtorJNI.boolector_is_const(getEnv(), f)) {
       // Handles all constants (bitvec, bool)
       String bits = BtorJNI.boolector_get_bits(getEnv(), f);
