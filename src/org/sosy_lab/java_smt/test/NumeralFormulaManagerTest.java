@@ -9,17 +9,12 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assert_;
+import static org.junit.Assert.assertThrows;
 
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
-import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -29,21 +24,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 
-@RunWith(Parameterized.class)
-public class NumeralFormulaManagerTest extends SolverBasedTest0 {
-
-  @Parameters(name = "{0}")
-  public static Object[] getAllSolvers() {
-    return Solvers.values();
-  }
-
-  @Parameter(0)
-  public Solvers solver;
-
-  @Override
-  protected Solvers solverToUse() {
-    return solver;
-  }
+public class NumeralFormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
   public void distinctTest() throws SolverException, InterruptedException {
@@ -89,11 +70,17 @@ public class NumeralFormulaManagerTest extends SolverBasedTest0 {
   }
 
   @SuppressWarnings("CheckReturnValue")
-  @Test(expected = Exception.class)
-  public void failOnInvalidString() {
+  @Test
+  public void failOnInvalidStringInteger() {
     requireIntegers();
-    imgr.makeNumber("a");
-    assert_().fail();
+    assertThrows(Exception.class, () -> imgr.makeNumber("a"));
+  }
+
+  @SuppressWarnings("CheckReturnValue")
+  @Test
+  public void failOnInvalidStringRational() {
+    requireIntegers();
+    assertThrows(Exception.class, () -> rmgr.makeNumber("a"));
   }
 
   @SuppressWarnings("CheckReturnValue")

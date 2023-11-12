@@ -31,7 +31,9 @@ import org.sosy_lab.java_smt.delegate.statistics.StatisticsSolverContext;
 import org.sosy_lab.java_smt.delegate.synchronize.SynchronizedSolverContext;
 import org.sosy_lab.java_smt.solvers.boolector.BoolectorSolverContext;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4SolverContext;
+import org.sosy_lab.java_smt.solvers.cvc5.CVC5SolverContext;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5SolverContext;
+import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtSolverContext;
 import org.sosy_lab.java_smt.solvers.princess.PrincessSolverContext;
 import org.sosy_lab.java_smt.solvers.smtinterpol.SmtInterpolSolverContext;
 import org.sosy_lab.java_smt.solvers.yices2.Yices2SolverContext;
@@ -47,12 +49,14 @@ import org.sosy_lab.java_smt.solvers.z3.Z3SolverContext;
 public class SolverContextFactory {
 
   public enum Solvers {
+    OPENSMT,
     MATHSAT5,
     SMTINTERPOL,
     Z3,
     PRINCESS,
     BOOLECTOR,
     CVC4,
+    CVC5,
     YICES2
   }
 
@@ -198,15 +202,15 @@ public class SolverContextFactory {
   @SuppressWarnings("resource") // returns unclosed context object
   public SolverContext generateContext(Solvers solverToCreate)
       throws InvalidConfigurationException {
+
     SolverContext context;
     try {
       context = generateContext0(solverToCreate);
     } catch (UnsatisfiedLinkError | NoClassDefFoundError e) {
       throw new InvalidConfigurationException(
           String.format(
-              "The SMT solver %s is not available on this machine because of missing libraries "
-                  + "(%s). "
-                  + "You may experiment with SMTInterpol by setting solver.solver=SMTInterpol.",
+              "The SMT solver %s is not available on this machine because of missing libraries"
+                  + " (%s).",
               solverToCreate, e.getMessage()),
           e);
     }
@@ -227,9 +231,23 @@ public class SolverContextFactory {
   private SolverContext generateContext0(Solvers solverToCreate)
       throws InvalidConfigurationException {
     switch (solverToCreate) {
+      case OPENSMT:
+        return OpenSmtSolverContext.create(
+            config, logger, shutdownNotifier, randomSeed, nonLinearArithmetic, loader);
+
       case CVC4:
         return CVC4SolverContext.create(
             logger,
+            shutdownNotifier,
+            (int) randomSeed,
+            nonLinearArithmetic,
+            floatingPointRoundingMode,
+            loader);
+
+      case CVC5:
+        return CVC5SolverContext.create(
+            logger,
+            config,
             shutdownNotifier,
             (int) randomSeed,
             nonLinearArithmetic,
@@ -270,8 +288,7 @@ public class SolverContextFactory {
         return Yices2SolverContext.create(nonLinearArithmetic, shutdownNotifier, loader);
 
       case BOOLECTOR:
-        return BoolectorSolverContext.create(
-            config, shutdownNotifier, logfile, (int) randomSeed, loader);
+        return BoolectorSolverContext.create(config, shutdownNotifier, logfile, randomSeed, loader);
 
       default:
         throw new AssertionError("no solver selected");

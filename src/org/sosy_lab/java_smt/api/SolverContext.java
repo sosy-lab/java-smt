@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.api;
 
+import com.google.common.collect.ImmutableMap;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 
 /**
@@ -98,6 +99,23 @@ public interface SolverContext extends AutoCloseable {
    * <p>This is an uppercase String matching the enum identifier from {@link Solvers}
    */
   Solvers getSolverName();
+
+  /**
+   * Get statistics for a complete solver context. The returned mapping is intended to provide the
+   * solver-internal statistics. The keys can differ between individual solvers.
+   *
+   * <p>Calling the statistics several times for the same context returns accumulated number, i.e.,
+   * we currently do not provide any possibility to reset the statistics.
+   *
+   * <p>We do not guarantee any specific key to be present, as this depends on the used solver. We
+   * might even return an empty mapping if the solver does not support calling this method or is in
+   * an invalid state.
+   *
+   * @see ProverEnvironment#getStatistics()
+   */
+  default ImmutableMap<String, String> getStatistics() {
+    return ImmutableMap.of();
+  }
 
   /**
    * Close the solver context.

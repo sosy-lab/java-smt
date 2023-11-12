@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.cvc4;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -288,35 +289,36 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   }
 
   private static String getName(Expr e) {
-    Preconditions.checkState(!e.isNull());
+    checkState(!e.isNull());
     if (!e.isConst() && !e.isVariable()) {
       e = e.getOperator();
     }
     return dequote(e.toString());
   }
 
-  /** Variable names can be wrapped with "|". This function removes those chars. */
-  private static String dequote(String s) {
-    int l = s.length();
-    if (s.charAt(0) == '|' && s.charAt(l - 1) == '|') {
-      return s.substring(1, l - 1);
-    }
-    return s;
-  }
-
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula formula, final Expr f) {
-    Preconditions.checkState(!f.isNull());
+    checkState(!f.isNull());
     Type type = f.getType();
 
     if (f.isConst()) {
       if (type.isBoolean()) {
         return visitor.visitConstant(formula, f.getConstBoolean());
-      } else if (type.isInteger() || type.isReal()) {
-        return visitor.visitConstant(formula, f.getConstRational());
+      } else if (type.isInteger()) {
+        Rational rationalValue = f.getConstRational();
+        Preconditions.checkState("1".equals(rationalValue.getDenominator().toString()));
+        return visitor.visitConstant(
+            formula, new BigInteger(rationalValue.getNumerator().toString()));
+      } else if (type.isReal()) {
+        Rational rationalValue = f.getConstRational();
+        return visitor.visitConstant(
+            formula,
+            org.sosy_lab.common.rationals.Rational.of(
+                new BigInteger(rationalValue.getNumerator().toString()),
+                new BigInteger(rationalValue.getDenominator().toString())));
       } else if (type.isBitVector()) {
-        // TODO is this correct?
-        return visitor.visitConstant(formula, f.getConstBitVector().getValue());
+        return visitor.visitConstant(
+            formula, new BigInteger(f.getConstBitVector().getValue().toString(10)));
       } else if (type.isFloatingPoint()) {
         // TODO is this correct?
         return visitor.visitConstant(formula, f.getConstFloatingPoint());
@@ -360,7 +362,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       // These are all treated like operators, so we can get the declaration by f.getOperator()!
       List<Formula> args = ImmutableList.copyOf(Iterables.transform(f, this::encapsulate));
       List<FormulaType<?>> argsTypes = new ArrayList<>();
-      Expr operator = f.getOperator();
+      Expr operator = normalize(f.getOperator());
       if (operator.getType().isFunction()) {
         vectorType argTypes = new FunctionType(operator.getType()).getArgTypes();
         for (int i = 0; i < argTypes.size(); i++) {
@@ -372,7 +374,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
         }
       }
 
-      Preconditions.checkState(args.size() == argsTypes.size());
+      checkState(args.size() == argsTypes.size());
 
       // TODO some operations (BV_SIGN_EXTEND, BV_ZERO_EXTEND, maybe more) encode information as
       // part of the operator itself, thus the arity is one too small and there might be no
@@ -382,8 +384,24 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           formula,
           args,
           FunctionDeclarationImpl.of(
-              getName(f), getDeclarationKind(f), argsTypes, getFormulaType(f), f.getOperator()));
+              getName(f), getDeclarationKind(f), argsTypes, getFormulaType(f), operator));
     }
+  }
+
+  /** CVC4 returns new objects when querying operators for UFs. The new operator */
+  private Expr normalize(Expr operator) {
+    Expr function = functionsCache.get(getName(operator));
+    if (function != null) {
+      checkState(
+          function.getId().equals(operator.getId()),
+          "operator '%s' with ID %s differs from existing function '%s' with ID '%s'.",
+          operator,
+          operator.getId(),
+          function,
+          function.getId());
+      return function;
+    }
+    return operator;
   }
 
   // see src/theory/*/kinds in CVC4 sources for description of the different CVC4 kinds ;)
@@ -401,6 +419,8 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           .put(Kind.PLUS, FunctionDeclarationKind.ADD)
           .put(Kind.MULT, FunctionDeclarationKind.MUL)
           .put(Kind.MINUS, FunctionDeclarationKind.SUB)
+          .put(Kind.INTS_DIVISION, FunctionDeclarationKind.DIV)
+          .put(Kind.INTS_MODULUS, FunctionDeclarationKind.MODULO)
           .put(Kind.DIVISION, FunctionDeclarationKind.DIV)
           .put(Kind.LT, FunctionDeclarationKind.LT)
           .put(Kind.LEQ, FunctionDeclarationKind.LTE)
@@ -424,6 +444,9 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           .put(Kind.BITVECTOR_SDIV, FunctionDeclarationKind.BV_SDIV)
           .put(Kind.BITVECTOR_UDIV, FunctionDeclarationKind.BV_UDIV)
           .put(Kind.BITVECTOR_SREM, FunctionDeclarationKind.BV_SREM)
+          .put(Kind.BITVECTOR_SHL, FunctionDeclarationKind.BV_SHL)
+          .put(Kind.BITVECTOR_ASHR, FunctionDeclarationKind.BV_ASHR)
+          .put(Kind.BITVECTOR_LSHR, FunctionDeclarationKind.BV_LSHR)
           // TODO: find out where Kind.BITVECTOR_SMOD fits in here
           .put(Kind.BITVECTOR_UREM, FunctionDeclarationKind.BV_UREM)
           .put(Kind.BITVECTOR_NOT, FunctionDeclarationKind.BV_NOT)
@@ -450,6 +473,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           .put(Kind.FLOATINGPOINT_MAX, FunctionDeclarationKind.FP_MAX)
           .put(Kind.FLOATINGPOINT_MIN, FunctionDeclarationKind.FP_MIN)
           .put(Kind.FLOATINGPOINT_SQRT, FunctionDeclarationKind.FP_SQRT)
+          .put(Kind.FLOATINGPOINT_NEG, FunctionDeclarationKind.FP_NEG)
           .put(Kind.FLOATINGPOINT_PLUS, FunctionDeclarationKind.FP_ADD)
           .put(Kind.FLOATINGPOINT_SUB, FunctionDeclarationKind.FP_SUB)
           .put(Kind.FLOATINGPOINT_MULT, FunctionDeclarationKind.FP_MUL)
@@ -486,7 +510,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           .put(Kind.REGEXP_INTER, FunctionDeclarationKind.RE_INTERSECT)
           .put(Kind.REGEXP_COMPLEMENT, FunctionDeclarationKind.RE_COMPLEMENT)
           .put(Kind.REGEXP_DIFF, FunctionDeclarationKind.RE_DIFFERENCE)
-          .build();
+          .buildOrThrow();
 
   private FunctionDeclarationKind getDeclarationKind(Expr f) {
     Kind kind = f.getKind();
@@ -552,9 +576,11 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
 
     } else if (valueType.isReal() && type.isReal()) {
       Rational rat = value.getConstRational();
-      return org.sosy_lab.common.rationals.Rational.of(
-          new BigInteger(rat.getNumerator().toString()),
-          new BigInteger(rat.getDenominator().toString()));
+      org.sosy_lab.common.rationals.Rational ratValue =
+          org.sosy_lab.common.rationals.Rational.of(
+              new BigInteger(rat.getNumerator().toString()),
+              new BigInteger(rat.getDenominator().toString()));
+      return ratValue.isIntegral() ? ratValue.getNum() : ratValue;
 
     } else if (valueType.isBitVector()) {
       Integer bv = value.getConstBitVector().getValue();

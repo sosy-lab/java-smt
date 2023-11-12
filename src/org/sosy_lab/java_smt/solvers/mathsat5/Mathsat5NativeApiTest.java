@@ -13,12 +13,19 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_asse
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_check_sat;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_config;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_env;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_arity;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_name;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_config;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_model_iterator;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_from_smtlib2;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_enum_constants;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_enum_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_integer_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_model;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_model_value;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_rational_type;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_is_enum_type;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_is_integer_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_asin;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_eq;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_equal;
@@ -29,6 +36,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_pi;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_pow;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_sin;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_term;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_times;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_variable;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_model_create_iterator;
@@ -39,7 +47,9 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_push
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_option_checked;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_get_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_pi;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_repr;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_type_equals;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_type_repr;
 
 import org.junit.AssumptionViolatedException;
 import org.junit.Before;
@@ -335,11 +345,11 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
           + "(define-fun v18750 () Bool (and v6142 v18749))"
           + "(assert v18750)";
 
-  // TODO The next method crashes with MathSAT5 version 5.6.4
+  // The next method crashed with MathSAT5 version 5.6.4
   // (NullPointer during iterator creation).
-  // The bug is reported, we need to check this with the next release.
-  @Ignore
-  public void modelIteratorCrash()
+  // The bug was reported and fixed with the next release.
+  @Test
+  public void modelIteratorTest()
       throws IllegalStateException, InterruptedException, SolverException {
 
     long parsedFormula = msat_from_smtlib2(env, QUERY);
@@ -433,7 +443,6 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
   @Test
   public void linearArithmeticModelTest()
       throws IllegalStateException, InterruptedException, SolverException {
-    System.out.println(LIA_QUERY);
     long parsed = msat_from_smtlib2(env, LIA_QUERY);
     msat_assert_formula(env, parsed);
     boolean isSat = msat_check_sat(env);
@@ -453,5 +462,68 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
       // System.out.println(k + " := " + v);
     }
     msat_destroy_model_iterator(iter);
+  }
+
+  @Test
+  public void evaluationWithoutModelTest()
+      throws IllegalStateException, InterruptedException, SolverException {
+    long x = msat_make_variable(env, "x", msat_get_integer_type(env));
+    long num = msat_make_number(env, "10");
+
+    msat_push_backtrack_point(env);
+    msat_assert_formula(env, msat_make_equal(env, x, num));
+    assertThat(msat_check_sat(env)).isTrue();
+
+    boolean isSat = msat_check_sat(env);
+    assertThat(isSat).isTrue();
+
+    long value = msat_get_model_value(env, x);
+    assertThat(msat_term_repr(value)).isEqualTo("10");
+  }
+
+  @Test
+  public void enumTypeTest() throws SolverException, InterruptedException {
+    String[] colors = {"blue", "red", "green"};
+
+    // create enum type
+    long colorType = msat_get_enum_type(env, "Color", 3, colors);
+    assertThat(msat_type_repr(colorType)).isEqualTo("Color");
+
+    // check type
+    assertThat(msat_is_enum_type(env, colorType)).isTrue();
+    assertThat(msat_is_enum_type(env, msat_get_integer_type(env))).isFalse();
+    assertThat(msat_is_integer_type(env, colorType)).isFalse();
+
+    // check constants
+    long[] constantDecls = msat_get_enum_constants(env, colorType);
+    assertThat(constantDecls.length).isEqualTo(3);
+    for (int i = 0; i < colors.length; i++) {
+      assertThat(msat_decl_get_name(constantDecls[i])).isEqualTo(colors[i]);
+      assertThat(msat_decl_get_arity(constantDecls[i])).isEqualTo(0);
+      assertThat(msat_term_get_type(msat_make_term(env, constantDecls[i], new long[] {})))
+          .isEqualTo(colorType);
+    }
+
+    // check a simple assertion
+    var = msat_make_variable(env, "varColor", colorType);
+    long blue = msat_make_term(env, constantDecls[0], new long[] {});
+    long red = msat_make_term(env, constantDecls[1], new long[] {});
+    long green = msat_make_term(env, constantDecls[2], new long[] {});
+
+    // check 1
+    msat_push_backtrack_point(env);
+    msat_assert_formula(env, msat_make_equal(env, blue, var));
+    assertThat(msat_check_sat(env)).isTrue();
+    msat_pop_backtrack_point(env);
+
+    // chck 2
+    msat_push_backtrack_point(env);
+    msat_assert_formula(env, msat_make_not(env, msat_make_equal(env, blue, var)));
+    assertThat(msat_check_sat(env)).isTrue();
+    msat_assert_formula(env, msat_make_not(env, msat_make_equal(env, red, var)));
+    assertThat(msat_check_sat(env)).isTrue();
+    msat_assert_formula(env, msat_make_not(env, msat_make_equal(env, green, var)));
+    assertThat(msat_check_sat(env)).isFalse();
+    msat_pop_backtrack_point(env);
   }
 }

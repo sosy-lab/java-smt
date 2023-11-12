@@ -46,7 +46,7 @@ there are scripts for publishing available at the root of the [Ivy Repository](h
 We prefer to use the official Z3 binaries,
 please build from source only if necessary (e.g., in case of an important bugfix).
 
-To publish Z3, download the **Ubuntu 16.04**, **Windows**, and **OSX** binary
+To publish Z3, download the **Ubuntu**, **Windows**, and **OSX** binary
 and the sources (for JavaDoc) for the [latest release](https://github.com/Z3Prover/z3/releases) and unzip them.
 In the unpacked sources directory, prepare Java sources via `python scripts/mk_make.py --java`.
 For simpler handling, we then copy the files from the three `bin` directories together into one directory,
@@ -59,7 +59,25 @@ ant publish-z3 -Dz3.path=$Z3_DIR/bin -Dz3.version=$Z3_VERSION
 ```
 Finally follow the instructions shown in the message at the end.
 
-#### Optional
+#### Optional (from source for Linux target with older GLIBC)
+This step is for the following use case:
+Newer releases of Z3 depend on newer versions of GLIBC (>=v2.35),
+so we want to compile the Linux release on our own and then combine it with the provided libraries for Windows and MacOS.
+We follow the steps from above, download and unpack the given zip archives for all platforms, except the Linux release (where the GLIBC is too new).
+For simple usage, we provide a Docker definition/environment under `/docker` (based on Ubuntu 18.04 with GLIBC 2.27),
+in which the following build command can be run in the unpacked source directory:
+```
+python3 scripts/mk_make.py --java && cd build && make -j 2
+```
+Afterwards copy the native libraries for Linux (`libz3.so` and `libz3java.so`) from the directory `./build` into `./bin`.
+Then perform as written above with adding the additional pre-compiled binaries for other operating systems,
+and publish the directory `./bin` with an ant command like the one from above:
+```
+ant publish-z3 -Dz3.path=$Z3_DIR/bin -Dz3.version=$Z3_VERSION-glibc_2.27
+```
+
+
+#### Optional (outdated: from source for Linux target)
 To publish Z3 from source, [download it](https://github.com/Z3Prover/z3) and build
 it with the following command in its directory on a 64bit Ubuntu 16.04 system:
 ```
@@ -74,22 +92,40 @@ ant publish-z3 -Dz3.path=$Z3_DIR/build
 Finally follow the instructions shown in the message at the end.
 
 
-### Publishing CVC4
+### Publishing CVC5 (previously CVC4)
 
-We prefer to use our own CVC4 binaries and Java bindings.
+We prefer to compile our own CVC5 binaries and Java bindings.
+For simple usage, we provide a Docker definition/environment under `/docker`,
+in which the following command can be run.
 
-To publish CVC4, checkout the [CVC4 repository](https://github.com/kfriedberger/CVC4).
+To publish CVC5, checkout the [CVC5 repository](https://github.com/cvc5/cvc5).
 Then execute the following command in the JavaSMT directory,
-where `$CVC4_DIR` is the path to the CVC4 directory
-and `$CVC4_VERSION` is the version number:
+where `$CVC5_DIR` is the path to the CVC5 directory and `$CVC5_VERSION` is the version number:
 ```
-ant publish-cvc4 -Dcvc4.path=$CVC4_DIR -Dcvc4.customRev=$CVC4_VERSION
+ant publish-cvc5 -Dcvc5.path=$CVC5_DIR -Dcvc5.customRev=$CVC5_VERSION
 ```
 Example:
 ```
-ant publish-cvc4 -Dcvc4.path=../CVC4 -Dcvc4.customRev=1.8-prerelease-2019-10-05
+ant publish-cvc5 -Dcvc5.path=../CVC5 -Dcvc5.customRev=1.0.1
 ```
-Finally follow the instructions shown in the message at the end.
+During the build process, our script automatically appends the git-revision after the version.
+Finally, follow the instructions shown in the message at the end.
+
+
+### Publishing OpenSMT
+
+We prefer/need to compile our own OpenSMT2 binaries and Java bindings.
+For simple usage, we provide a Docker definition/environment under `/docker`,
+in which the following command can be run.
+
+Download [OpenSMT](https://github.com/usi-verification-and-security/opensmt) using Git into a 
+file of your choice. The following command patches the OpenSMT2 API, generates Java bindings 
+with SWIG, builds the library, and packages it. 
+
+```
+ant publish-opensmt -Dopensmt.path=/workspace/opensmt -Dopensmt.customRev=2.5.2
+```
+Then upload the binaries to the Ivy repository using SVN as described in the message on the screen.
 
 
 ### Publishing Boolector
@@ -122,6 +158,8 @@ but in the normal system environment, where some testing can be applied by the d
 
 We publish MathSAT for both Linux and Windows systems at once.
 The build process can fully be done on a Linux system.
+We prefer to use the Docker container based on Ubuntu 18.04 for compiling the dependencies and assembling the libraries,
+because GMP and MPIR might cause problems with newer versions of GCC and MinGW during compilation.
 
 For publishing MathSAT5, you need to use a Linux machine with at least GCC 7.5.0 and x86_64-w64-mingw32-gcc 7.3.
 First, [download the (reentrant!) Linux and Windows64 binary release](http://mathsat.fbk.eu/download.html) in the same version, unpack them,
@@ -141,12 +179,12 @@ and `$MATHSAT_VERSION` is the version number of MathSAT (all-in-one, runtime: le
 Concrete example (`$WD` is a working directory where all dependencies are located):
 ```
   ant publish-mathsat \
-      -Dmathsat.path=$WD/mathsat-5.6.4-linux-x86_64-reentrant \
+      -Dmathsat.path=$WD/mathsat-5.6.7-linux-x86_64-reentrant \
       -Dgmp.path=$WD/gmp-6.1.2 \
-      -Dmathsat-windows.path=$WD/mathsat-5.6.4-win64-msvc \
+      -Dmathsat-windows.path=$WD/mathsat-5.6.7-win64-msvc \
       -Dmpir-windows.path=$WD/mpir-2.7.2-win \
       -Djdk-windows.path=$WD/jdk-11 \
-      -Dmathsat.version=5.6.4-debug
+      -Dmathsat.version=5.6.7
 ```
 Finally follow the instructions shown in the message at the end.
 
@@ -191,12 +229,12 @@ Afterwards you need to update the version number in `solvers_ivy_conf/ivy_javasm
 
 Info: There is a small cyclic dependency: JavaSMT itself depends on the Java components of Yices2.
 
-As long as no API was changed and compilation suceeds, simply execute `ant publish-artifacts-yices2`.
+As long as no API was changed and compilation succeeds, simply execute `ant publish-artifacts-yices2`.
 
 If the API was changed, we need to break the dependency cycle for the publication and revert this later:
 edit `lib/ivy.xml` and replace the dependency towards `javasmt-yices2` with the dependency towards `javasmt-solver-yices2`
 (the line can be copied from `solvers_ivy_conf/ivy_javasmt_yices2.xml`).
-Then run `ant publish-artifact-yices2`.
+Then run `ant publish-artifacts-yices2`.
 We still need to figure out how to avoid the warning about a dirty repository in that case, e.g. by a temporary commit.
 
 [Ivy Repository]: http://www.sosy-lab.org/ivy/org.sosy_lab/

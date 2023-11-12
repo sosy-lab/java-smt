@@ -21,22 +21,21 @@ import java.util.Collection;
 import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
+import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 
-public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
+public class CVC4Model extends AbstractModel<Expr, Type, ExprManager> {
 
   private final ImmutableList<ValueAssignment> model;
   private final SmtEngine smtEngine;
   private final ImmutableList<Expr> assertedExpressions;
   private final CVC4TheoremProver prover;
-  protected boolean closed = false;
 
   CVC4Model(
       CVC4TheoremProver pProver,
       CVC4FormulaCreator pCreator,
       SmtEngine pSmtEngine,
       Collection<Expr> pAssertedExpressions) {
-    super(pCreator);
+    super(pProver, pCreator);
     smtEngine = pSmtEngine;
     prover = pProver;
     assertedExpressions = ImmutableList.copyOf(pAssertedExpressions);
@@ -49,7 +48,10 @@ public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
 
   @Override
   public Expr evalImpl(Expr f) {
-    Preconditions.checkState(!closed);
+    // This method looks like a violation of the constraint above: the SMT engine can be changed
+    // before querying this method. However, the prover guarantees to close the model before this
+    // can happen.
+    Preconditions.checkState(!isClosed());
     return getValue(f);
   }
 
@@ -69,6 +71,7 @@ public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
     return builder.build().asList();
   }
 
+  // TODO this method is highly recursive and should be rewritten with a proper visitor
   private void recursiveAssignmentFinder(ImmutableSet.Builder<ValueAssignment> builder, Expr expr) {
     if (expr.isConst() || expr.isNull()) {
       // We don't care about consts.
@@ -113,13 +116,7 @@ public class CVC4Model extends CachingAbstractModel<Expr, Type, ExprManager> {
   }
 
   @Override
-  public void close() {
-    prover.unregisterModel(this);
-    closed = true;
-  }
-
-  @Override
-  protected ImmutableList<ValueAssignment> toList() {
+  public ImmutableList<ValueAssignment> asList() {
     return model;
   }
 }

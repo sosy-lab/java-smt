@@ -59,7 +59,6 @@ import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
@@ -287,7 +286,7 @@ class PrincessFormulaCreator
       final FormulaType<?> arrayIndexType = getArrayFormulaIndexType((ArrayFormula<?, ?>) pFormula);
       final FormulaType<?> arrayElementType =
           getArrayFormulaElementType((ArrayFormula<?, ?>) pFormula);
-      return (FormulaType<T>) new ArrayFormulaType<>(arrayIndexType, arrayElementType);
+      return (FormulaType<T>) FormulaType.getArrayType(arrayIndexType, arrayElementType);
     }
 
     return super.getFormulaType(pFormula);
@@ -420,6 +419,12 @@ class PrincessFormulaCreator
 
         // this is really a Boolean formula, visit the lhs of the equation
         return visit(visitor, f, ((IIntFormula) input).t());
+
+      } else if (kind == FunctionDeclarationKind.OTHER
+          && input instanceof IFunApp
+          && ((IFunApp) input).fun() == ModuloArithmetic.mod_cast()
+          && ((IFunApp) input).apply(2) instanceof IIntLit) {
+        return visitor.visitConstant(f, convertValue(input));
 
       } else {
 

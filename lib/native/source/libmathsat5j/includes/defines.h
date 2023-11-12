@@ -95,6 +95,27 @@ typedef void jvoid; // for symmetry to jint, jlong etc.
       } \
  }
 
+#define STRING_ARRAY_ARG(num) \
+  const char ** m_arg##num; \
+  size_t i; \
+  { \
+    size_t sz = (size_t)((*jenv)->GetArrayLength(jenv, arg##num)); \
+    m_arg##num = (const char **)malloc(sizeof(const char *) * sz); \
+    if (m_arg##num == NULL) { \
+      throwException(jenv, "java/lang/OutOfMemoryError", "Cannot allocate native memory for calling Mathsat"); \
+      goto out##num##a; \
+    } \
+    \
+    for (i = 0; i < sz; ++i) { \
+      jstring jstr = (jstring)((*jenv)->GetObjectArrayElement(jenv, arg##num, i)); \
+      m_arg##num[i] = (char *)(*jenv)->GetStringUTFChars(jenv, jstr, NULL); \
+      if (m_arg##num[i] == NULL) { \
+        throwException(jenv, "java/lang/IllegalArgumentException", "Null passed to MathSAT"); \
+        goto out##num##b; \
+      } \
+    } \
+  }
+
 #define MPZ_ARG(num) \
   mpz_t m_arg##num; \
   char *tmp_str = (char *)(*jenv)->GetStringUTFChars(jenv, arg##num, NULL);\
@@ -158,6 +179,15 @@ typedef void jvoid; // for symmetry to jint, jlong etc.
   (*jenv)->ReleaseStringUTFChars(jenv, arg##num, m_arg##num); \
   out##num:
 
+#define FREE_STRING_ARRAY_ARG(num) \
+  out##num##b: \
+  for (; i > 0; i--) { \
+    jstring jstr = (jstring)((*jenv)->GetObjectArrayElement(jenv, arg##num, i - 1)); \
+    (*jenv)->ReleaseStringUTFChars(jenv, jstr, m_arg##num[i - 1]); \
+  } \
+  free(m_arg##num); \
+  out##num##a:
+
 #define FREE_MPZ_ARG(num) \
   mpz_clear(m_arg##num);
 
@@ -212,18 +242,22 @@ typedef void jvoid; // for symmetry to jint, jlong etc.
   } \
   PLAIN_STRING_RETURN
 
-#define CONST_STRING_RETURN \
-  if (retval == NULL) { \
-    const char *msg = msat_last_error_message(m_arg1); \
-    throwException(jenv, "java/lang/IllegalArgumentException", msg); \
-    return NULL; \
-  } \
+#define PLAIN_CONST_STRING_RETURN \
   jstring jretval = NULL; \
   if (!(*jenv)->ExceptionCheck(jenv)) { \
     jretval = (*jenv)->NewStringUTF(jenv, retval); \
   } \
   return jretval; \
 }
+
+#define CONST_STRING_RETURN \
+  if (retval == NULL) { \
+    const char *msg = msat_last_error_message(m_arg1); \
+    throwException(jenv, "java/lang/IllegalArgumentException", msg); \
+    return NULL; \
+  } \
+  PLAIN_CONST_STRING_RETURN
+
 
 #define FAILURE_CODE_RETURN \
   if (retval != 0) { \

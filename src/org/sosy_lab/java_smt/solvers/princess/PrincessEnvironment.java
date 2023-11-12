@@ -8,11 +8,10 @@
 
 package org.sosy_lab.java_smt.solvers.princess;
 
+import static scala.collection.JavaConverters.asJava;
 import static scala.collection.JavaConverters.collectionAsScalaIterableConverter;
-import static scala.collection.JavaConverters.mapAsJavaMap;
-import static scala.collection.JavaConverters.seqAsJavaList;
 
-import ap.SimpleAPI;
+import ap.api.SimpleAPI;
 import ap.parser.BooleanCompactifier;
 import ap.parser.Environment.EnvironmentException;
 import ap.parser.IAtom;
@@ -22,9 +21,7 @@ import ap.parser.IFormula;
 import ap.parser.IFunApp;
 import ap.parser.IFunction;
 import ap.parser.IIntFormula;
-import ap.parser.IPlus;
 import ap.parser.ITerm;
-import ap.parser.ITimes;
 import ap.parser.Parser2InputAbsy.TranslationException;
 import ap.parser.PartialEvaluator;
 import ap.parser.SMTLineariser;
@@ -33,10 +30,8 @@ import ap.parser.SMTParser2InputAbsy.SMTType;
 import ap.terfor.ConstantTerm;
 import ap.terfor.preds.Predicate;
 import ap.theories.ExtArray;
-import ap.theories.ExtArray.ArraySort;
 import ap.theories.bitvectors.ModuloArithmetic;
-import ap.theories.rationals.Rationals$;
-import ap.theories.strings.StringTheory;
+import ap.theories.rationals.Fractions.FractionSort$;
 import ap.types.Sort;
 import ap.types.Sort$;
 import ap.types.Sort.MultipleValueBool$;
@@ -76,14 +71,11 @@ import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
-import ostrich.OFlags;
-import ostrich.OFlags.LengthOptions$;
-import ostrich.OstrichStringTheory;
 import scala.Tuple2;
 import scala.Tuple4;
-import scala.collection.Seq;
+import scala.collection.immutable.Seq;
+import scala.collection.immutable.Set$;
 
 /**
  * This is a Wrapper around Princess. This Wrapper allows to set a logfile for all Smt-Queries
@@ -109,17 +101,6 @@ class PrincessEnvironment {
 
   public static final Sort BOOL_SORT = Sort$.MODULE$.Bool();
   public static final Sort INTEGER_SORT = Sort.Integer$.MODULE$;
-  public static final Sort NAT_SORT = Sort.Nat$.MODULE$;
-
-  static final StringTheory stringTheory =
-      new OstrichStringTheory(
-          toSeq(new ArrayList<>()),
-          new OFlags(false, false, LengthOptions$.MODULE$.Auto(), false, false));
-  public static final Sort STRING_SORT = stringTheory.StringSort();
-  public static final Sort REGEX_SORT = stringTheory.RegexSort();
-
-  static Rationals$ rationalTheory = Rationals$.MODULE$;
-  public static final Sort FRACTION_SORT = rationalTheory.dom();
 
   @Option(secure = true, description = "log all queries as Princess-specific Scala code")
   private boolean logAllQueriesAsScala = false;
@@ -150,7 +131,7 @@ class PrincessEnvironment {
    */
   private final SimpleAPI api;
 
-  private final List<PrincessAbstractProver<?, ?>> registeredProvers = new ArrayList<>();
+  private final List<PrincessAbstractProver<?>> registeredProvers = new ArrayList<>();
 
   PrincessEnvironment(
       Configuration config,
@@ -172,7 +153,7 @@ class PrincessEnvironment {
    * This method returns a new prover, that is registered in this environment. All variables are
    * shared in all registered APIs.
    */
-  PrincessAbstractProver<?, ?> getNewProver(
+  PrincessAbstractProver<?> getNewProver(
       boolean useForInterpolation,
       PrincessFormulaManager mgr,
       PrincessFormulaCreator creator,
@@ -186,7 +167,7 @@ class PrincessEnvironment {
     sortedVariablesCache.values().forEach(newApi::addConstant);
     functionsCache.values().forEach(newApi::addFunction);
 
-    PrincessAbstractProver<?, ?> prover;
+    PrincessAbstractProver<?> prover;
     if (useForInterpolation) {
       prover = new PrincessInterpolatingProver(mgr, creator, newApi, shutdownNotifier, pOptions);
     } else {
@@ -234,7 +215,8 @@ class PrincessEnvironment {
             directory, // dumpDirectory
             SimpleAPI.apply$default$8(), // tightFunctionScopes
             SimpleAPI.apply$default$9(), // genTotalityAxioms
-            new scala.Some<>(randomSeed) // randomSeed
+            new scala.Some<>(randomSeed), // randomSeed
+            Set$.MODULE$.empty() // empty Set<LOG_FLAG>, no internal logging
             );
 
     if (constructProofs) { // needed for interpolation and unsat cores
@@ -252,14 +234,15 @@ class PrincessEnvironment {
     return minAtomsForAbbreviation;
   }
 
-  void unregisterStack(PrincessAbstractProver<?, ?> stack) {
-    assert registeredProvers.contains(stack) : "cannot unregister stack, it is not registered";
+  void unregisterStack(PrincessAbstractProver<?> stack) {
+    Preconditions.checkState(
+        registeredProvers.contains(stack), "cannot unregister stack, it is not registered");
     registeredProvers.remove(stack);
   }
 
   /** unregister and close all stacks. */
   void close() {
-    for (PrincessAbstractProver<?, ?> prover : ImmutableList.copyOf(registeredProvers)) {
+    for (PrincessAbstractProver<?> prover : ImmutableList.copyOf(registeredProvers)) {
       prover.close();
     }
     api.shutDown();
@@ -270,7 +253,7 @@ class PrincessEnvironment {
   public List<? extends IExpression> parseStringToTerms(String s, PrincessFormulaCreator creator) {
 
     Tuple4<
-            scala.collection.Seq<IFormula>,
+            Seq<IFormula>,
             scala.collection.immutable.Map<IFunction, SMTFunctionType>,
             scala.collection.immutable.Map<ConstantTerm, SMTType>,
             scala.collection.immutable.Map<Predicate, SMTFunctionType>>
@@ -282,7 +265,7 @@ class PrincessEnvironment {
       throw new IllegalArgumentException(nested);
     }
 
-    final List<IFormula> formulas = seqAsJavaList(parserResult._1());
+    final List<IFormula> formulas = asJava(parserResult._1());
 
     ImmutableSet.Builder<IExpression> declaredFunctions = ImmutableSet.builder();
     for (IExpression f : formulas) {
@@ -314,7 +297,7 @@ class PrincessEnvironment {
   /* EnvironmentException is not unused, but the Java compiler does not like Scala. */
   @SuppressWarnings("unused")
   private Tuple4<
-          scala.collection.Seq<IFormula>,
+          Seq<IFormula>,
           scala.collection.immutable.Map<IFunction, SMTFunctionType>,
           scala.collection.immutable.Map<ConstantTerm, SMTType>,
           scala.collection.immutable.Map<Predicate, SMTFunctionType>>
@@ -331,6 +314,7 @@ class PrincessEnvironment {
    * Exception at run time.
    */
   @SuppressWarnings("unchecked")
+  @SuppressFBWarnings("THROWS_METHOD_THROWS_CLAUSE_THROWABLE")
   private static <E extends Throwable> void throwCheckedAsUnchecked(Throwable e) throws E {
     throw (E) e;
   }
@@ -352,7 +336,7 @@ class PrincessEnvironment {
     Tuple2<IExpression, scala.collection.immutable.Map<IExpression, IExpression>> tuple =
         api.abbrevSharedExpressionsWithMap(formula, 1);
     final IExpression lettedFormula = tuple._1();
-    final Map<IExpression, IExpression> abbrevMap = mapAsJavaMap(tuple._2());
+    final Map<IExpression, IExpression> abbrevMap = asJava(tuple._2());
 
     return new Appenders.AbstractAppender() {
 
@@ -398,8 +382,7 @@ class PrincessEnvironment {
         for (Entry<String, IFunApp> function : ufs.entrySet()) {
           List<String> argSorts =
               Lists.transform(
-                  seqAsJavaList(function.getValue().args()),
-                  a -> getFormulaType(a).toSMTLIBString());
+                  asJava(function.getValue().args()), a -> getFormulaType(a).toSMTLIBString());
           out.append(
               String.format(
                   "(declare-fun %s (%s) %s)%n",
@@ -522,27 +505,18 @@ class PrincessEnvironment {
     throw new IllegalArgumentException("The given parameter is no variable or function");
   }
 
-  static FormulaType<?> getFormulaType(final IExpression pFormula) {
+  static FormulaType<?> getFormulaType(IExpression pFormula) {
     if (pFormula instanceof IFormula) {
       return FormulaType.BooleanType;
     } else if (pFormula instanceof ITerm) {
-      ITerm formula = (ITerm) pFormula;
-      if (pFormula instanceof ITimes) {
-        // coeff is always INT, lets check the subterm.
-        formula = ((ITimes) formula).subterm();
-      } else if (pFormula instanceof IPlus) {
-        return mergeFormulaTypes(
-            getFormulaType(((IPlus) pFormula).t1()), getFormulaType(((IPlus) pFormula).t2()));
-      }
-      final Sort sort = Sort$.MODULE$.sortOf(formula);
+      final Sort sort = Sort$.MODULE$.sortOf((ITerm) pFormula);
       try {
         return getFormulaTypeFromSort(sort);
       } catch (IllegalArgumentException e) {
         // add more info about the formula, then rethrow
         throw new IllegalArgumentException(
             String.format(
-                "Unknown formula type '%s' of sort '%s' for formula '%s'.",
-                pFormula.getClass(), sort.toString(), pFormula),
+                "Unknown formula type '%s' for formula '%s'.", pFormula.getClass(), pFormula),
             e);
       }
     }
@@ -573,20 +547,16 @@ class PrincessEnvironment {
   private static FormulaType<?> getFormulaTypeFromSort(final Sort sort) {
     if (sort == PrincessEnvironment.BOOL_SORT) {
       return FormulaType.BooleanType;
-    } else if (sort == PrincessEnvironment.INTEGER_SORT || sort == PrincessEnvironment.NAT_SORT) {
+    } else if (sort == PrincessEnvironment.INTEGER_SORT) {
       return FormulaType.IntegerType;
-    } else if (sort == PrincessEnvironment.FRACTION_SORT) {
+    } else if (sort instanceof FractionSort$) {
       return FormulaType.RationalType;
-    } else if (sort == PrincessEnvironment.STRING_SORT) {
-      return FormulaType.StringType;
-    } else if (sort == PrincessEnvironment.REGEX_SORT) {
-      return FormulaType.RegexType;
     } else if (sort instanceof ExtArray.ArraySort) {
-      Seq<Sort> indexSorts = ((ArraySort) sort).theory().indexSorts();
+      Seq<Sort> indexSorts = ((ExtArray.ArraySort) sort).theory().indexSorts();
       Sort elementSort = ((ExtArray.ArraySort) sort).theory().objSort();
       assert indexSorts.iterator().size() == 1 : "unexpected index type in Array type:" + sort;
       // assert indexSorts.size() == 1; // TODO Eclipse does not like simpler code.
-      return new ArrayFormulaType<>(
+      return FormulaType.getArrayType(
           getFormulaTypeFromSort(indexSorts.iterator().next()), // get single index-sort
           getFormulaTypeFromSort(elementSort));
     } else if (sort instanceof MultipleValueBool$) {
@@ -671,19 +641,19 @@ class PrincessEnvironment {
   }
 
   private void addSymbol(IFormula symbol) {
-    for (PrincessAbstractProver<?, ?> prover : registeredProvers) {
+    for (PrincessAbstractProver<?> prover : registeredProvers) {
       prover.addSymbol(symbol);
     }
   }
 
   private void addSymbol(ITerm symbol) {
-    for (PrincessAbstractProver<?, ?> prover : registeredProvers) {
+    for (PrincessAbstractProver<?> prover : registeredProvers) {
       prover.addSymbol(symbol);
     }
   }
 
   private void addFunction(IFunction funcDecl) {
-    for (PrincessAbstractProver<?, ?> prover : registeredProvers) {
+    for (PrincessAbstractProver<?> prover : registeredProvers) {
       prover.addSymbol(funcDecl);
     }
   }

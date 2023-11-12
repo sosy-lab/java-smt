@@ -75,22 +75,30 @@ public class UfElimination {
       ufs = checkNotNull(pUfs);
     }
 
-    /** @return the new {@link Formula} without UFs */
+    /**
+     * @return the new {@link Formula} without UFs
+     */
     public BooleanFormula getFormula() {
       return formula;
     }
 
-    /** @return the constraints enforcing the functional consistency. */
+    /**
+     * @return the constraints enforcing the functional consistency.
+     */
     public BooleanFormula getConstraints() {
       return constraints;
     }
 
-    /** @return the substitution used to replace UFs */
+    /**
+     * @return the substitution used to replace UFs
+     */
     public Map<Formula, Formula> getSubstitution() {
       return substitutions;
     }
 
-    /** @return all eliminated application of Ufs */
+    /**
+     * @return all eliminated application of Ufs
+     */
     Multimap<FunctionDeclaration<?>, UninterpretedFunctionApplication> getUfs() {
       return ufs;
     }
@@ -174,7 +182,7 @@ public class UfElimination {
     }
 
     // Get rid of UFs.
-    ImmutableMap<Formula, Formula> substitutions = substitutionsBuilder.build();
+    ImmutableMap<Formula, Formula> substitutions = substitutionsBuilder.buildOrThrow();
     BooleanFormula formulaWithoutUFs = fmgr.substitute(f, substitutions);
 
     // substitute all UFs in the additional constraints,
@@ -186,7 +194,7 @@ public class UfElimination {
     Map<Formula, Formula> otherSubstitution =
         difference(pOtherResult.getSubstitution(), substitutions).entriesOnlyOnLeft();
     substitutionsBuilder.putAll(otherSubstitution);
-    ImmutableMap<Formula, Formula> allSubstitutions = substitutionsBuilder.build();
+    ImmutableMap<Formula, Formula> allSubstitutions = substitutionsBuilder.buildOrThrow();
     BooleanFormula constraints = bfmgr.and(extraConstraints);
     return new Result(
         formulaWithoutUFs, constraints, allSubstitutions, ImmutableListMultimap.copyOf(ufs));

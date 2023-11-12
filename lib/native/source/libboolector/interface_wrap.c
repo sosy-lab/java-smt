@@ -3932,6 +3932,70 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
   free(helper);
 }
 
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1print_1stats_1helper(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  Btor *arg1 = (Btor *) 0 ;
+
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(Btor **)&jarg1;
+
+  // Save the stdout 
+  int saved_stdout = dup(1);
+
+  // Create a tempfile
+  char *tempfileName = addTemppathToFilename("boolector_temp_XXXXXX");
+
+  if (tempfileName == NULL) {
+    perror("ERROR CREATING TEMPORARY FILE FOR BOOLECTOR_HELP_DUMP_NODE_SMT2");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "FileName may not be NULL");
+    return NULL;
+  }
+
+  int fileDesrc = mkstemp(tempfileName);
+
+  if (fileDesrc == -1) {
+    free(tempfileName);
+    perror("ERROR CREATING TEMPORARY FILE FOR BOOLECTOR_HELP_DUMP_NODE_SMT2");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "FileDescriptor may not be NULL");
+    return NULL;
+  }
+
+  FILE *file = fdopen(fileDesrc, "w+");
+
+  // Make sure that the file is deleted once the function ends
+  unlink(tempfileName);
+  free(tempfileName);
+
+  if (file == NULL) {
+    perror("ERROR: COULDNT DUMP NODE BECAUSE IT COULDNT CREATE A DUMP FILE");
+    SWIG_JavaThrowException(jenv, SWIG_JavaIOException, "File may not be NULL");
+    return NULL;
+  }
+
+  // Flush the stdout and switch it to the file
+  fflush(stdout);
+  int dup2ret = dup2(fileDesrc, 1);
+
+  if (dup2ret == -1) {
+    fclose(file);
+    dup2(saved_stdout, 1);
+    close(saved_stdout);
+    return NULL;
+  }
+
+  // Use the print stats method that prints to the stdout and flush to make sure its in the file
+  boolector_print_stats(arg1);
+
+  fflush(stdout);
+  // Transform the file into a string and return the stdout back and close everything
+  jstring jresult = copyFileContentToString(jenv, file);
+  fclose(file);
+  dup2(saved_stdout, 1);
+  close(saved_stdout);
+
+  return jresult;
+}
+
 #ifdef __cplusplus
 }
 #endif

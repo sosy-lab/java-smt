@@ -8,12 +8,59 @@
 
 FROM ubuntu:bionic
 
+# Install basic packages for building several solvers
 RUN apt-get update \
  && apt-get install -y \
         wget curl git \
         build-essential cmake patchelf \
         openjdk-11-jdk ant maven \
-        mingw-w64 zlib1g-dev
+        mingw-w64 zlib1g-dev m4
+
+# CVC5 requires some dependencies
+RUN apt-get update \
+ && apt-get install -y \
+        python3 python3-toml python3-pyparsing flex libssl-dev \
+ && wget https://github.com/Kitware/CMake/releases/download/v3.26.3/cmake-3.26.3.tar.gz \
+ && tar -zxvf cmake-3.26.3.tar.gz \
+ && cd cmake-3.26.3 \
+ && ./bootstrap \
+ && make \
+ && make install
+
+# set default locale
+RUN apt-get update \
+ && apt-get install -y \
+        locales locales-all
+ENV LC_ALL en_US.UTF-8
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US.UTF-8
+
+# OpenSMT requires swig, gmp, flex and bison
+# - swig needs to built manually to get version 4.1 for unique_ptr support
+# - libpcre2-dev is a dependency of swig
+# - gmp needs to be recompiled to generate PIC code
+# - lzip is required to unpack the gmp tar ball
+RUN apt-get update \
+ && apt-get install -y \
+        flex \
+        bison \
+        libpcre2-dev  \
+        lzip
+WORKDIR /dependencies
+RUN wget http://prdownloads.sourceforge.net/swig/swig-4.1.1.tar.gz \
+ && tar xf swig-4.1.1.tar.gz \
+ && cd swig-4.1.1 \
+ && ./configure \
+ && make -j4 \
+ && make install \
+ && cd --
+RUN wget https://gmplib.org/download/gmp/gmp-6.2.1.tar.lz \
+ && tar xf gmp-6.2.1.tar.lz \
+ && cd gmp-6.2.1 \
+ && ./configure --enable-cxx --with-pic --disable-shared --enable-fat \
+ && make -j4 \
+ && make install \
+ && cd --
 
 # Add the user "developer" with UID:1000, GID:1000, home at /developer.
 # This allows to map the docker-internal user to the local user 1000:1000 outside of the container.

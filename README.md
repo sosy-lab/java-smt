@@ -60,8 +60,10 @@ Currently JavaSMT supports several SMT solvers (see [Getting Started](doc/Gettin
 | --- |:---:|:---:|:---:|:--- |
 | [Boolector](https://boolector.github.io/) | :heavy_check_mark: |  |  | a fast solver for bitvector logic, misses formula introspection |
 | [CVC4](https://cvc4.github.io/) | :heavy_check_mark: |  |  |  |
+| [CVC5](https://cvc5.github.io/) | :heavy_check_mark: |  |  | new! |
 | [MathSAT5](http://mathsat.fbk.eu/) | :heavy_check_mark: | :heavy_check_mark: |  |  |
-| [OptiMathSAT](http://optimathsat.disi.unitn.it/) | :heavy_check_mark: |  |  | same as MathSAT5, but with support for optimization |
+| [OpenSMT](https://verify.inf.usi.ch/opensmt) | :heavy_check_mark: |  |  | new! |
+| [OptiMathSAT](http://optimathsat.disi.unitn.it/) | :heavy_check_mark: |  |  | based on MathSAT5, with support for optimization |
 | [Princess](http://www.philipp.ruemmer.org/princess.shtml) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | Java-based SMT solver |
 | [SMTInterpol](https://ultimate.informatik.uni-freiburg.de/smtinterpol/) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | Java-based SMT solver |
 | [Yices2](https://yices.csl.sri.com/) | :heavy_check_mark: | [soon](https://github.com/sosy-lab/java-smt/pull/215) |  |  |
@@ -83,12 +85,25 @@ We aim for supporting more important features, more SMT solvers, and more system
 If something specific is missing, please [look for or file an issue](https://github.com/sosy-lab/java-smt/issues).
 
 #### Multithreading Support
-The solvers Z3 (w and w/o Optimization), SMTInterpol, Princess, MathSAT5, Boolector and CVC4 support multithreading,
-provided that different threads use different contexts,
-and _all_ operations on a single context are performed from a single thread.
-Interruption using [ShutdownNotifier][] may be used to interrupt a
+| SMT Solver | Concurrent context usage¹ | Concurrent prover usage² |
+| --- |:---:|:---:|
+| [Boolector](https://boolector.github.io/) | :heavy_check_mark: |  |
+| [CVC4](https://cvc4.github.io/) | :heavy_check_mark: | :heavy_check_mark: |
+| [CVC5](https://cvc4.github.io/) | :question: | |
+| [MathSAT5](http://mathsat.fbk.eu/) | :heavy_check_mark: |  |
+| [OpenSMT](https://verify.inf.usi.ch/opensmt) | :question: | |
+| [OptiMathSAT](http://optimathsat.disi.unitn.it/) | :heavy_check_mark: |  |
+| [Princess](http://www.philipp.ruemmer.org/princess.shtml) | :heavy_check_mark: |  |
+| [SMTInterpol](https://ultimate.informatik.uni-freiburg.de/smtinterpol/) | :heavy_check_mark: |  |
+| [Yices2](https://yices.csl.sri.com/) |  |  |
+| [Z3](https://github.com/Z3Prover/z3) | :heavy_check_mark: |  |
+
+Interruption using a [ShutdownNotifier][] may be used to interrupt a
 a solver from any thread.
-CVC4 supports multithreading on a single context with multiple stacks(=provers).
+Formulas are translatable in between contexts/provers/threads using _FormulaManager.translateFrom()_.
+
+¹ Multiple contexts, but all operations on each context only from a single thread.
+² Multiple provers on one or more contexts, with each prover using its own thread.
 
 #### Garbage Collection in Native Solvers
 JavaSMT exposes an API for performing garbage collection on solvers
@@ -145,7 +160,7 @@ try (SolverContext context = SolverContextFactory.createSolverContext(
  - Project maintainers: [Karlheinz Friedberger][] and [Philipp Wendler][]
  - Former project maintainer: [George Karpenkov][]
  - Initial codebase, many design decisions: [Philipp Wendler][]
- - Contributions: Daniel Baier, [Thomas Stieglmaier][] and several others.
+ - Contributions: [Daniel Baier][], [Thomas Stieglmaier][] and several others.
 
 [ConfigurationOptions]: https://sosy-lab.github.io/java-smt/ConfigurationOptions.txt
 [Manual Installation]: doc/Getting-started.md#manual-installation
@@ -155,5 +170,6 @@ try (SolverContext context = SolverContextFactory.createSolverContext(
 [Philipp Wendler]: https://www.philippwendler.de/
 [Thomas Stieglmaier]: https://stieglmaier.me/
 [Karlheinz Friedberger]: https://www.sosy-lab.org/people/friedberger
+[Daniel Baier]: https://www.sosy-lab.org/people/baier
 [Ivy repository]: https://www.sosy-lab.org/ivy
 [Maven repository]: https://mvnrepository.com/artifact/org.sosy-lab/java-smt

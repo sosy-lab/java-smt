@@ -172,26 +172,35 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   protected abstract TFormulaInfo makeNaNImpl(FormulaType.FloatingPointType pType);
 
   @Override
-  public <T extends Formula> T castTo(FloatingPointFormula pNumber, FormulaType<T> pTargetType) {
+  public <T extends Formula> T castTo(
+      FloatingPointFormula pNumber, boolean pSigned, FormulaType<T> pTargetType) {
     return getFormulaCreator()
         .encapsulate(
-            pTargetType, castToImpl(extractInfo(pNumber), pTargetType, getDefaultRoundingMode()));
+            pTargetType,
+            castToImpl(extractInfo(pNumber), pSigned, pTargetType, getDefaultRoundingMode()));
   }
 
   @Override
   public <T extends Formula> T castTo(
       FloatingPointFormula number,
+      boolean pSigned,
       FormulaType<T> targetType,
       FloatingPointRoundingMode pFloatingPointRoundingMode) {
     return getFormulaCreator()
         .encapsulate(
             targetType,
             castToImpl(
-                extractInfo(number), targetType, getRoundingMode(pFloatingPointRoundingMode)));
+                extractInfo(number),
+                pSigned,
+                targetType,
+                getRoundingMode(pFloatingPointRoundingMode)));
   }
 
   protected abstract TFormulaInfo castToImpl(
-      TFormulaInfo pNumber, FormulaType<?> pTargetType, TFormulaInfo pRoundingMode);
+      TFormulaInfo pNumber,
+      boolean pSigned,
+      FormulaType<?> pTargetType,
+      TFormulaInfo pRoundingMode);
 
   @Override
   public FloatingPointFormula castFrom(

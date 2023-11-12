@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.basicimpl.withAssumptionsWrapper;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -48,9 +49,14 @@ public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironme
   }
 
   @Override
-  public void push() {
+  public void push() throws InterruptedException {
     clearAssumptions();
     delegate.push();
+  }
+
+  @Override
+  public int size() {
+    return delegate.size();
   }
 
   @Override
@@ -102,8 +108,18 @@ public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironme
   }
 
   @Override
+  public ImmutableMap<String, String> getStatistics() {
+    return delegate.getStatistics();
+  }
+
+  @Override
   public void close() {
     delegate.close();
+  }
+
+  @Override
+  public String toString() {
+    return delegate.toString();
   }
 
   @Override

@@ -20,10 +20,20 @@
 lib/native/source/libz3j/org_sosy_lab_solver_z3_Z3NativeApi.c
 lib/native/source/*/*.so
 lib/native/source/*/*.o
+lib/native/source/**/*.java
 lib/native/*/*.asc
 
 doc/Example-Maven-Project/target*
 doc/Example-Maven-Web-Project/target*
+doc/Example-Gradle-Project/.gradle
+doc/Example-Gradle-Project/.settings
+doc/Example-Gradle-Project/.project
+doc/Example-Gradle-Project/dependencies
+doc/Example-Gradle-Project/build
+doc/Example-Gradle-Project-Kotlin/.gradle
+doc/Example-Gradle-Project-Kotlin/.settings
+doc/Example-Gradle-Project-Kotlin/.project
+doc/Example-Gradle-Project-Kotlin/build
 
 solvers_maven_conf/*.asc
 
@@ -45,8 +55,7 @@ solvers_maven_conf/*.asc
 /Javadoc-z3
 /gh-pages
 
-.idea/workspace.xml
-.idea/uiDesigner.xml
+.idea/
 
 /*.so
 /*.dll

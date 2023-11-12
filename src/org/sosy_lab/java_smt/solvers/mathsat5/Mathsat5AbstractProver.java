@@ -16,18 +16,26 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_crea
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_config;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_env;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_free_termination_callback;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_search_stats;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_unsat_assumptions;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_unsat_core;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_last_error_message;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_num_backtrack_points;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_pop_backtrack_point;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_push_backtrack_point;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_option_checked;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_get_arg;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_boolean_constant;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_not;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.google.common.primitives.Longs;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,10 +43,12 @@ import java.util.Optional;
 import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Evaluator;
+import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
-import org.sosy_lab.java_smt.basicimpl.LongArrayBackedList;
+import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.AllSatModelCallback;
 
 /** Common base class for {@link Mathsat5TheoremProver} and {@link Mathsat5InterpolatingProver}. */
@@ -49,7 +59,6 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   private final long curConfig;
   private final long terminationTest;
   protected final Mathsat5FormulaCreator creator;
-  protected boolean closed = false;
   private final ShutdownNotifier shutdownNotifier;
 
   protected Mathsat5AbstractProver(
@@ -116,23 +125,50 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
     }
   }
 
+  @SuppressWarnings("resource")
   @Override
-  public Mathsat5Model getModel() throws SolverException {
+  public Model getModel() throws SolverException {
     Preconditions.checkState(!closed);
     checkGenerateModels();
-    return new Mathsat5Model(getMsatModel(), creator, this);
+    return new CachingModel(new Mathsat5Model(getMsatModel(), creator, this));
   }
 
-  /** @throws SolverException if an expected MathSAT failure occurs */
+  /**
+   * @throws SolverException if an expected MathSAT failure occurs
+   */
   protected long getMsatModel() throws SolverException {
     checkGenerateModels();
     return Mathsat5NativeApi.msat_get_model(curEnv);
   }
 
+  @SuppressWarnings("resource")
   @Override
-  public void pop() {
+  public Evaluator getEvaluator() {
     Preconditions.checkState(!closed);
+    checkGenerateModels();
+    return registerEvaluator(new Mathsat5Evaluator(this, creator, curEnv));
+  }
+
+  @Override
+  protected void pushImpl() throws InterruptedException {
+    msat_push_backtrack_point(curEnv);
+  }
+
+  @Override
+  protected void popImpl() {
+    closeAllEvaluators();
     msat_pop_backtrack_point(curEnv);
+  }
+
+  @Override
+  public int size() {
+    Preconditions.checkState(!closed);
+    Preconditions.checkState(
+        msat_num_backtrack_points(curEnv) == super.size(),
+        "prover-size %s does not match stack-size %s",
+        msat_num_backtrack_points(curEnv),
+        super.size());
+    return super.size();
   }
 
   @Override
@@ -147,6 +183,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
     Preconditions.checkNotNull(assumptions);
+    closeAllEvaluators();
 
     if (!isUnsatWithAssumptions(assumptions)) {
       return Optional.empty();
@@ -165,13 +202,26 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   }
 
   @Override
+  public ImmutableMap<String, String> getStatistics() {
+    // Mathsat sigsevs if you try to get statistics for closed environments
+    Preconditions.checkState(!closed);
+    final String stats = msat_get_search_stats(curEnv);
+    return ImmutableMap.copyOf(
+        Splitter.on("\n").trimResults().omitEmptyStrings().withKeyValueSeparator(" ").split(stats));
+  }
+
+  @Override
   public void close() {
     if (!closed) {
       msat_destroy_env(curEnv);
       msat_free_termination_callback(terminationTest);
       msat_destroy_config(curConfig);
-      closed = true;
     }
+    super.close();
+  }
+
+  protected boolean isClosed() {
+    return closed;
   }
 
   @Override
@@ -179,6 +229,8 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
       throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
     checkGenerateAllSat();
+    closeAllEvaluators();
+
     long[] imp = new long[important.size()];
     int i = 0;
     for (BooleanFormula impF : important) {
@@ -213,12 +265,8 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
     public void callback(long[] model) throws InterruptedException {
       shutdownNotifier.shutdownIfNecessary();
       clientCallback.apply(
-          new LongArrayBackedList<>(model) {
-            @Override
-            protected BooleanFormula convert(long pE) {
-              return creator.encapsulateBoolean(pE);
-            }
-          });
+          Collections.unmodifiableList(
+              Lists.transform(Longs.asList(model), creator::encapsulateBoolean)));
     }
   }
 }

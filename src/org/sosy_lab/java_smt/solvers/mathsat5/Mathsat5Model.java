@@ -30,28 +30,27 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
+import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 
-class Mathsat5Model extends CachingAbstractModel<Long, Long, Long> {
+class Mathsat5Model extends AbstractModel<Long, Long, Long> {
 
   private final long model;
   private final Mathsat5FormulaCreator formulaCreator;
-  private boolean closed = false;
 
   /** for detecting closed environments, Exception is better than SegFault. */
   private final Mathsat5AbstractProver<?> prover;
 
   Mathsat5Model(long model, Mathsat5FormulaCreator creator, Mathsat5AbstractProver<?> pProver) {
-    super(creator);
+    super(pProver, creator);
     this.model = model;
     formulaCreator = creator;
     prover = pProver;
   }
 
   @Override
-  protected ImmutableList<ValueAssignment> toList() {
-    Preconditions.checkState(!closed);
-    Preconditions.checkState(!prover.closed, "cannot use model after prover is closed");
+  public ImmutableList<ValueAssignment> asList() {
+    Preconditions.checkState(!isClosed());
+    Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
     ImmutableList.Builder<ValueAssignment> assignments = ImmutableList.builder();
 
     long modelIterator = msat_model_create_iterator(model);
@@ -128,16 +127,16 @@ class Mathsat5Model extends CachingAbstractModel<Long, Long, Long> {
 
   @Override
   public void close() {
-    if (!closed) {
+    if (!isClosed()) {
       msat_destroy_model(model);
-      closed = true;
     }
+    super.close();
   }
 
   @Override
   protected Long evalImpl(Long formula) {
-    Preconditions.checkState(!closed);
-    Preconditions.checkState(!prover.closed, "cannot use model after prover is closed");
+    Preconditions.checkState(!isClosed());
+    Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
     return msat_model_eval(model, formula);
   }
 }

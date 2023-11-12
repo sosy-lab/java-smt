@@ -29,6 +29,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.EnumerationFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
@@ -48,6 +49,7 @@ import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormula.ArrayFormulaImpl;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormula.BitvectorFormulaImpl;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormula.BooleanFormulaImpl;
+import org.sosy_lab.java_smt.basicimpl.AbstractFormula.EnumerationFormulaImpl;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormula.FloatingPointFormulaImpl;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormula.FloatingPointRoundingModeFormulaImpl;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormula.IntegerFormulaImpl;
@@ -170,6 +172,11 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
     return new RegexFormulaImpl<>(pTerm);
   }
 
+  protected EnumerationFormula encapsulateEnumeration(TFormulaInfo pTerm) {
+    assert getFormulaType(pTerm).isEnumerationType();
+    return new EnumerationFormulaImpl<>(pTerm);
+  }
+
   public Formula encapsulateWithTypeOf(TFormulaInfo pTerm) {
     return encapsulate(getFormulaType(pTerm), pTerm);
   }
@@ -199,6 +206,8 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
     } else if (pType.isArrayType()) {
       ArrayFormulaType<?, ?> arrayType = (ArrayFormulaType<?, ?>) pType;
       return (T) encapsulateArray(pTerm, arrayType.getIndexType(), arrayType.getElementType());
+    } else if (pType.isEnumerationType()) {
+      return (T) new EnumerationFormulaImpl<>(pTerm);
     }
     throw new IllegalArgumentException(
         "Cannot create formulas of type " + pType + " in the Solver!");
@@ -249,6 +258,10 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
       throw new UnsupportedOperationException(
           "SMT solvers with support for bitvectors "
               + "need to overwrite FormulaCreator.getFormulaType()");
+    } else if (formula instanceof EnumerationFormula) {
+      throw new UnsupportedOperationException(
+          "SMT solvers with support for enumerations need to overwrite FormulaCreator"
+              + ".getFormulaType()");
     } else {
       throw new IllegalArgumentException("Formula with unexpected type " + formula.getClass());
     }
@@ -257,21 +270,33 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
 
   public abstract FormulaType<?> getFormulaType(TFormulaInfo formula);
 
+  /**
+   * @see org.sosy_lab.java_smt.api.FormulaManager#visit
+   */
   @CanIgnoreReturnValue
   public <R> R visit(Formula input, FormulaVisitor<R> visitor) {
     return visit(visitor, input, extractInfo(input));
   }
 
+  /**
+   * @see org.sosy_lab.java_smt.api.FormulaManager#visit
+   */
   public abstract <R> R visit(FormulaVisitor<R> visitor, Formula formula, TFormulaInfo f);
 
   protected List<TFormulaInfo> extractInfo(List<? extends Formula> input) {
     return Lists.transform(input, this::extractInfo);
   }
 
+  /**
+   * @see org.sosy_lab.java_smt.api.FormulaManager#visitRecursively
+   */
   public void visitRecursively(FormulaVisitor<TraversalProcess> pFormulaVisitor, Formula pF) {
     visitRecursively(pFormulaVisitor, pF, t -> true);
   }
 
+  /**
+   * @see org.sosy_lab.java_smt.api.FormulaManager#visitRecursively
+   */
   public void visitRecursively(
       FormulaVisitor<TraversalProcess> pFormulaVisitor,
       Formula pF,
@@ -437,17 +462,46 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
   public final <T extends Formula> T callFunction(
       FunctionDeclaration<T> declaration, List<? extends Formula> args) {
     checkArgument(
-        args.size() == declaration.getArgumentTypes().size(),
+        args.size() >= declaration.getArgumentTypes().size(),
         "function application '%s' requires %s arguments, but received %s arguments",
         declaration,
         declaration.getArgumentTypes().size(),
         args.size());
+
+    for (int i = 0; i < args.size(); i++) {
+      // For chainable functions like EQ, DISTINCT, ADD, LESS, LESS_EQUAL, ..., with a variable
+      // number of arguments, we repeat the last argument-type several times.
+      int index = Math.min(i, declaration.getArgumentTypes().size() - 1);
+      checkArgument(
+          isCompatible(getFormulaType(args.get(i)), declaration.getArgumentTypes().get(index)),
+          "function application '%s' requires argument types %s, but received argument types %s",
+          declaration,
+          declaration.getArgumentTypes(),
+          Lists.transform(args, this::getFormulaType));
+    }
 
     return encapsulate(
         declaration.getType(),
         callFunctionImpl(
             ((FunctionDeclarationImpl<T, TFuncDecl>) declaration).getSolverDeclaration(),
             extractInfo(args)));
+  }
+
+  /**
+   * This function checks whether the used type of the function argument is compatible with the
+   * declared type in the function declaration.
+   *
+   * <p>Identical types are always compatible, a subtype like INT to supertype RATIONAL is also
+   * compatible. A solver-specific wrapper can override this method if it does an explicit
+   * transformation between (some) types, e.g., from BV to BOOLEAN or from BOOLEAN to INT.
+   */
+  protected boolean isCompatible(FormulaType<?> usedType, FormulaType<?> declaredType) {
+    // INT is a subtype of RATIONAL
+    if (usedType.isIntegerType() && declaredType.isRationalType()) {
+      return true;
+    }
+
+    return usedType.equals(declaredType);
   }
 
   public abstract TFormulaInfo callFunctionImpl(TFuncDecl declaration, List<TFormulaInfo> args);
@@ -462,7 +516,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
 
   /**
    * Convert the formula into a Java object as far as possible, i.e., try to match a primitive or
-   * simple type like Boolean, BigInteger, or Rational.
+   * simple type like Boolean, BigInteger, Rational, or String.
    *
    * <p>If the formula is not a simple constant expression, we simply return <code>null</code>.
    *
@@ -478,12 +532,21 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
    * Convert the formula into a Java object as far as possible, i.e., try to match a primitive or
    * simple type.
    *
-   * @param pAdditionalF an additonal formula where the type can be received from.
+   * @param pAdditionalF an additional formula where the type can be received from.
    * @param pF the formula to be converted.
    */
   // only some solvers require the additional (first) parameter, other solvers ignore it.
   public Object convertValue(
       @SuppressWarnings("unused") TFormulaInfo pAdditionalF, TFormulaInfo pF) {
     return convertValue(pF);
+  }
+
+  /** Variable names (symbols) can be wrapped with "|". This function removes those chars. */
+  protected static String dequote(String s) {
+    int l = s.length();
+    if (s.charAt(0) == '|' && s.charAt(l - 1) == '|') {
+      return s.substring(1, l - 1);
+    }
+    return s;
   }
 }

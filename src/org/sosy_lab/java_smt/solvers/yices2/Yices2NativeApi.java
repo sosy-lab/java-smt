@@ -612,6 +612,7 @@ public class Yices2NativeApi {
   // TODO can return up to UINT32_MAX ?
   /** Returns an array in the form [term,power]. */
   public static native int[] yices_product_component(int t, int i);
+
   /*
    * SAT Checking
    */
@@ -621,7 +622,9 @@ public class Yices2NativeApi {
 
   public static native void yices_assert_formulas(long ctx, int size, int[] formulas);
 
-  /** @param params Set to 0 for default search parameters. */
+  /**
+   * @param params Set to 0 for default search parameters.
+   */
   public static native int yices_check_context(long ctx, long params);
 
   public static native void yices_stop_search(long ctx);
@@ -634,20 +637,26 @@ public class Yices2NativeApi {
 
   public static native void yices_pop(long ctx);
 
-  /** @param params Set to 0 for default search parameters. */
+  /**
+   * @param params Set to 0 for default search parameters.
+   */
   public static native int yices_check_context_with_assumptions(
       long ctx, long params, int size, int[] terms);
 
   public static native int[] yices_get_unsat_core(long ctx);
 
-  /** @param params Set to 0 for default search parameters. */
+  /**
+   * @param params Set to 0 for default search parameters.
+   */
   public static boolean yices_check_sat(long ctx, long params, ShutdownNotifier shutdownNotifier)
       throws IllegalStateException, InterruptedException {
     return satCheckWithShutdownNotifier(
         () -> yices_check_context(ctx, params), ctx, shutdownNotifier);
   }
 
-  /** @param params Set to 0 for default search parameters. */
+  /**
+   * @param params Set to 0 for default search parameters.
+   */
   public static boolean yices_check_sat_with_assumptions(
       long ctx, long params, int size, int[] assumptions, ShutdownNotifier shutdownNotifier)
       throws InterruptedException {
@@ -793,7 +802,9 @@ public class Yices2NativeApi {
     return var;
   }
 
-  /** @return int 1 if the Yices2-lib is compiled thread-safe and 0 otherwise */
+  /**
+   * @return int 1 if the Yices2-lib is compiled thread-safe and 0 otherwise
+   */
   public static native int yices_is_thread_safe();
 
   /** The function first checks whether f is satisifiable or unsatisfiable. */
@@ -806,12 +817,18 @@ public class Yices2NativeApi {
   public static native int yices_check_formulas(
       int[] terms, int n, String logic, long model, String delegate);
 
-  /** @return int 1 if delegate(SAT-Solver) available for use, 0 otherwise */
+  /**
+   * @return int 1 if delegate(SAT-Solver) available for use, 0 otherwise
+   */
   public static native int yices_has_delegate(String delegate);
 
-  /** @return type of a function node */
+  /**
+   * @return type of a function node
+   */
   public static native int yices_val_function_type(long model, int id, int tag);
 
-  /** @return term_vector (NOT int with error code) that is supported. Empty if error! */
+  /**
+   * @return term_vector (NOT int with error code) that is supported. Empty if error!
+   */
   public static native int[] yices_model_term_support(long model, int term);
 }

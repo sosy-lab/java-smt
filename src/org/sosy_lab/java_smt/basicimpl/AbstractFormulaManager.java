@@ -18,13 +18,13 @@ import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.java_smt.api.ArrayFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.EnumerationFormulaManager;
 import org.sosy_lab.java_smt.api.FloatingPointFormulaManager;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -75,7 +75,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    */
   @VisibleForTesting
   public static final ImmutableSet<String> SMTLIB2_KEYWORDS =
-      ImmutableSet.of("true", "false", "and", "or", "select", "store", "xor", "distinct");
+      ImmutableSet.of("true", "false", "and", "or", "select", "store", "xor", "distinct", "let");
 
   /**
    * Avoid using escape characters of SMT-LIB2 as part of names for symbols.
@@ -92,7 +92,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    * Counterparts can be any unique string. For optimization, we could even use plain chars. */
   @VisibleForTesting
   public static final ImmutableBiMap<Character, String> DISALLOWED_CHARACTER_REPLACEMENT =
-      ImmutableBiMap.<Character, String>builder().put('|', "pipe").put('\\', "backslash").build();
+      ImmutableBiMap.of('|', "pipe", '\\', "backslash");
 
   private static final char ESCAPE = '$'; // just some allowed symbol, can be any char
 
@@ -121,6 +121,9 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   private final @Nullable AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
       strManager;
 
+  private final @Nullable AbstractEnumerationFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
+      enumManager;
+
   private final FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> formulaCreator;
 
   /** Builds a solver from the given theory implementations. */
@@ -139,7 +142,9 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
           quantifiedManager,
       @Nullable AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> arrayManager,
       @Nullable AbstractSLFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> slManager,
-      @Nullable AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> strManager) {
+      @Nullable AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> strManager,
+      @Nullable AbstractEnumerationFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
+          enumManager) {
 
     this.arrayManager = arrayManager;
     this.quantifiedManager = quantifiedManager;
@@ -151,6 +156,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     this.floatingPointManager = floatingPointManager;
     this.slManager = slManager;
     this.strManager = strManager;
+    this.enumManager = enumManager;
     this.formulaCreator = pFormulaCreator;
 
     checkArgument(
@@ -158,7 +164,9 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
             && functionManager.getFormulaCreator() == formulaCreator
             && !(bitvectorManager != null && bitvectorManager.getFormulaCreator() != formulaCreator)
             && !(floatingPointManager != null
-                && floatingPointManager.getFormulaCreator() != formulaCreator),
+                && floatingPointManager.getFormulaCreator() != formulaCreator)
+            && !(quantifiedManager != null
+                && quantifiedManager.getFormulaCreator() != formulaCreator),
         "The creator instances must match across the managers!");
   }
 
@@ -213,7 +221,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   @Override
   public SLFormulaManager getSLFormulaManager() {
     if (slManager == null) {
-      throw new UnsupportedOperationException("Solver does not support seperation logic theory");
+      throw new UnsupportedOperationException("Solver does not support separation logic theory");
     }
     return slManager;
   }
@@ -241,6 +249,14 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
       throw new UnsupportedOperationException("Solver does not support string theory");
     }
     return strManager;
+  }
+
+  @Override
+  public EnumerationFormulaManager getEnumerationFormulaManager() {
+    if (enumManager == null) {
+      throw new UnsupportedOperationException("Solver does not support enumeration theory");
+    }
+    return enumManager;
   }
 
   public abstract Appender dumpFormula(TFormulaInfo t);
@@ -364,10 +380,10 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    * @param f The input formula
    */
   @Override
-  public Map<String, Formula> extractVariables(Formula f) {
+  public ImmutableMap<String, Formula> extractVariables(Formula f) {
     ImmutableMap.Builder<String, Formula> found = ImmutableMap.builder();
     formulaCreator.extractVariablesAndUFs(f, false, found::put);
-    return found.build();
+    return found.buildOrThrow(); // visitation should not visit any symbol twice
   }
 
   /**
@@ -376,12 +392,12 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    * @param f The input formula
    */
   @Override
-  public Map<String, Formula> extractVariablesAndUFs(Formula f) {
-    // Need LinkedHashMap because we can find duplicate keys with different values,
-    // and ImmutableMap.Builder rejects them.
-    Map<String, Formula> found = new LinkedHashMap<>();
+  public ImmutableMap<String, Formula> extractVariablesAndUFs(Formula f) {
+    ImmutableMap.Builder<String, Formula> found = ImmutableMap.builder();
     formulaCreator.extractVariablesAndUFs(f, true, found::put);
-    return ImmutableMap.copyOf(found);
+    // We can find duplicate keys with different values, like UFs with distinct parameters.
+    // In such a case, we use only one appearance (the last one).
+    return found.buildKeepingLast();
   }
 
   @Override

@@ -13,6 +13,7 @@ import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.base.StandardSystemProperty;
 import com.google.common.truth.StandardSubjectBuilder;
+import java.util.Locale;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,7 +37,7 @@ import org.sosy_lab.java_smt.api.SolverContext;
 public class SolverContextFactoryTest {
 
   private static final String OS =
-      StandardSystemProperty.OS_NAME.value().toLowerCase().replace(" ", "");
+      StandardSystemProperty.OS_NAME.value().toLowerCase(Locale.getDefault()).replace(" ", "");
   private static final boolean IS_WINDOWS = OS.startsWith("windows");
   private static final boolean IS_MAC = OS.startsWith("macos");
   private static final boolean IS_LINUX = OS.startsWith("linux");
@@ -89,6 +90,8 @@ public class SolverContextFactoryTest {
         return;
       case BOOLECTOR:
       case CVC4:
+      case CVC5:
+      case OPENSMT:
       case YICES2:
         assume.that(IS_LINUX).isTrue();
         return;

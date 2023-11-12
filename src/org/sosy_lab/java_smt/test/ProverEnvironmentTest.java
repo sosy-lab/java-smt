@@ -12,11 +12,10 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth8.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
-import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.BOOLECTOR;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.CVC4;
+import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.CVC5;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.MATHSAT5;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.PRINCESS;
-import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.Z3;
 import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE;
 import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
@@ -25,11 +24,6 @@ import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.Optional;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
-import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
@@ -37,21 +31,7 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
-@RunWith(Parameterized.class)
-public class ProverEnvironmentTest extends SolverBasedTest0 {
-
-  @Parameters(name = "{0}")
-  public static Solvers[] getAllSolvers() {
-    return Solvers.values();
-  }
-
-  @Parameter(0)
-  public Solvers solver;
-
-  @Override
-  protected Solvers solverToUse() {
-    return solver;
-  }
+public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
   public void assumptionsTest() throws SolverException, InterruptedException {
@@ -92,8 +72,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
 
   @Test
   public void unsatCoreTest() throws SolverException, InterruptedException {
-    // Boolector does not support unsat core
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
+    requireUnsatCore();
     try (BasicProverEnvironment<?> pe = context.newProverEnvironment(GENERATE_UNSAT_CORE)) {
       unsatCoreTest0(pe);
     }
@@ -101,6 +80,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
 
   @Test
   public void unsatCoreTestForInterpolation() throws SolverException, InterruptedException {
+    requireUnsatCore();
     requireInterpolation();
     try (BasicProverEnvironment<?> pe =
         context.newProverEnvironmentWithInterpolation(GENERATE_UNSAT_CORE)) {
@@ -110,11 +90,8 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
 
   @Test
   public void unsatCoreTestForOptimizationProver() throws SolverException, InterruptedException {
+    requireUnsatCore();
     requireOptimization();
-
-    // Z3 and Boolector do not implement unsat core for optimization
-    assume().that(solverToUse()).isNoneOf(Z3, BOOLECTOR);
-
     try (BasicProverEnvironment<?> pe =
         context.newOptimizationProverEnvironment(GENERATE_UNSAT_CORE)) {
       unsatCoreTest0(pe);
@@ -137,11 +114,12 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
 
   @Test
   public void unsatCoreWithAssumptionsNullTest() {
+    requireUnsatCore();
     assume()
         .withMessage(
             "Solver %s does not support unsat core generation over assumptions", solverToUse())
         .that(solverToUse())
-        .isNoneOf(PRINCESS, BOOLECTOR, CVC4);
+        .isNoneOf(PRINCESS, CVC4, CVC5);
 
     try (ProverEnvironment pe =
         context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
@@ -151,11 +129,12 @@ public class ProverEnvironmentTest extends SolverBasedTest0 {
 
   @Test
   public void unsatCoreWithAssumptionsTest() throws SolverException, InterruptedException {
+    requireUnsatCore();
     assume()
         .withMessage(
             "Solver %s does not support unsat core generation over assumptions", solverToUse())
         .that(solverToUse())
-        .isNoneOf(PRINCESS, BOOLECTOR, CVC4);
+        .isNoneOf(PRINCESS, CVC4, CVC5);
     try (ProverEnvironment pe =
         context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       pe.push();

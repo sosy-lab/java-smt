@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.delegate.synchronize;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -66,8 +67,15 @@ class SynchronizedBasicProverEnvironmentWithContext<T> implements BasicProverEnv
   }
 
   @Override
-  public void push() {
+  public void push() throws InterruptedException {
     delegate.push();
+  }
+
+  @Override
+  public int size() {
+    synchronized (sync) {
+      return delegate.size();
+    }
   }
 
   @Override
@@ -107,9 +115,23 @@ class SynchronizedBasicProverEnvironmentWithContext<T> implements BasicProverEnv
   }
 
   @Override
+  public ImmutableMap<String, String> getStatistics() {
+    synchronized (sync) {
+      return delegate.getStatistics();
+    }
+  }
+
+  @Override
   public void close() {
     synchronized (sync) {
       delegate.close();
+    }
+  }
+
+  @Override
+  public String toString() {
+    synchronized (sync) {
+      return delegate.toString();
     }
   }
 

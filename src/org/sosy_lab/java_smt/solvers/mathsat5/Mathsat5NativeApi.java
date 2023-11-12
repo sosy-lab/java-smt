@@ -106,27 +106,28 @@ class Mathsat5NativeApi {
   public static final int MSAT_TAG_FP_ROUND_TO_INT = 57; // < FP round to integer
   public static final int MSAT_TAG_FP_FROM_SBV = 58; // < FP conversion from a signed BV
   public static final int MSAT_TAG_FP_FROM_UBV = 59; // < FP conversion from an unsigned BV
-  public static final int MSAT_TAG_FP_TO_BV = 60; // < FP conversion to BV
-  public static final int MSAT_TAG_FP_AS_IEEEBV = 61; // < FP as IEEE BV (access to the bits)
-  public static final int MSAT_TAG_FP_ISNAN = 62; // < FP check for NaN
-  public static final int MSAT_TAG_FP_ISINF = 63; // < FP check for infinity
-  public static final int MSAT_TAG_FP_ISZERO = 64; // < FP check for zero
-  public static final int MSAT_TAG_FP_ISSUBNORMAL = 65; // < FP check for subnormal
-  public static final int MSAT_TAG_FP_ISNORMAL = 66; // < FP check for normal
-  public static final int MSAT_TAG_FP_ISNEG = 67; // < FP check for negative
-  public static final int MSAT_TAG_FP_ISPOS = 68; // < FP check for positive
-  public static final int MSAT_TAG_FP_FROM_IEEEBV = 69; // < FP conversion from IEEE BV
-  public static final int MSAT_TAG_INT_FROM_UBV = 70; // < Unsigned BV -> INT conversion
-  public static final int MSAT_TAG_INT_FROM_SBV = 71; // < Signed BV -> INT conversion
-  public static final int MSAT_TAG_INT_TO_BV = 72; // < INT -> BV conversion
-  public static final int MSAT_TAG_PI = 73; // Pi constant
-  public static final int MSAT_TAG_EXP = 74; // Exponential function
-  public static final int MSAT_TAG_SIN = 75; // Sine function
-  public static final int MSAT_TAG_LOG = 76; // Natural logarithm function
-  public static final int MSAT_TAG_POW = 77;
-  public static final int MSAT_TAG_ASIN = 78;
-  public static final int MSAT_TAG_FORALL = 79;
-  public static final int MSAT_TAG_EXISTS = 80;
+  public static final int MSAT_TAG_FP_TO_SBV = 60; // < FP conversion to BV
+  public static final int MSAT_TAG_FP_TO_UBV = 61; // < FP conversion to BV
+  public static final int MSAT_TAG_FP_AS_IEEEBV = 62; // < FP as IEEE BV (access to the bits)
+  public static final int MSAT_TAG_FP_ISNAN = 63; // < FP check for NaN
+  public static final int MSAT_TAG_FP_ISINF = 64; // < FP check for infinity
+  public static final int MSAT_TAG_FP_ISZERO = 65; // < FP check for zero
+  public static final int MSAT_TAG_FP_ISSUBNORMAL = 66; // < FP check for subnormal
+  public static final int MSAT_TAG_FP_ISNORMAL = 67; // < FP check for normal
+  public static final int MSAT_TAG_FP_ISNEG = 68; // < FP check for negative
+  public static final int MSAT_TAG_FP_ISPOS = 69; // < FP check for positive
+  public static final int MSAT_TAG_FP_FROM_IEEEBV = 70; // < FP conversion from IEEE BV
+  public static final int MSAT_TAG_INT_FROM_UBV = 71; // < Unsigned BV -> INT conversion
+  public static final int MSAT_TAG_INT_FROM_SBV = 72; // < Signed BV -> INT conversion
+  public static final int MSAT_TAG_INT_TO_BV = 73; // < INT -> BV conversion
+  public static final int MSAT_TAG_PI = 74; // Pi constant
+  public static final int MSAT_TAG_EXP = 75; // Exponential function
+  public static final int MSAT_TAG_SIN = 76; // Sine function
+  public static final int MSAT_TAG_LOG = 77; // Natural logarithm function
+  public static final int MSAT_TAG_POW = 78;
+  public static final int MSAT_TAG_ASIN = 79;
+  public static final int MSAT_TAG_FORALL = 80;
+  public static final int MSAT_TAG_EXISTS = 81;
 
   interface AllSatModelCallback {
 
@@ -253,6 +254,8 @@ class Mathsat5NativeApi {
   public static native long msat_get_function_type(
       long e, long[] paramTypes, int size, long returnType);
 
+  public static native long msat_get_enum_type(long e, String name, int size, String[] elements);
+
   public static native boolean msat_is_bool_type(long e, long t);
 
   public static native boolean msat_is_rational_type(long e, long t);
@@ -272,6 +275,10 @@ class Mathsat5NativeApi {
   public static native int msat_get_fp_type_mant_width(long e, long t);
 
   public static native boolean msat_is_fp_roundingmode_type(long e, long t);
+
+  public static native boolean msat_is_enum_type(long e, long t);
+
+  public static native long[] msat_get_enum_constants(long e, long t);
 
   public static native boolean msat_type_equals(long t1, long t2);
 
@@ -459,7 +466,9 @@ class Mathsat5NativeApi {
   public static native long msat_make_fp_cast(
       long e, long exp_w, long mant_w, long rounding, long t);
 
-  public static native long msat_make_fp_to_bv(long e, long width, long rounding, long t);
+  public static native long msat_make_fp_to_sbv(long e, long width, long rounding, long t);
+
+  public static native long msat_make_fp_to_ubv(long e, long width, long rounding, long t);
 
   public static native long msat_make_fp_from_sbv(
       long e, long exp_w, long mant_w, long rounding, long t);
@@ -687,6 +696,7 @@ class Mathsat5NativeApi {
   public static native String msat_decl_get_name(long d);
 
   public static native String msat_term_repr(long t);
+
   /*
    * Parsing and writing formulas.
    */
@@ -712,10 +722,13 @@ class Mathsat5NativeApi {
   public static native void msat_push_backtrack_point(long e);
 
   public static native void msat_pop_backtrack_point(long e);
-  // public static native int msat_num_backtrack_points(long e)
+
+  public static native int msat_num_backtrack_points(long e);
+
   public static native void msat_reset_env(long e);
 
   public static native void msat_assert_formula(long e, long formula);
+
   // public static native int msat_add_preferred_for_branching(long e, long termBoolvar);
   // public static native int msat_clear_preferred_for_branching(long e)
   private static native int msat_solve(long e) throws InterruptedException;
@@ -783,6 +796,8 @@ class Mathsat5NativeApi {
   public static native void msat_free_termination_callback(long t);
 
   public static native String msat_get_version();
+
+  public static native String msat_get_version_id();
 
   public static native String msat_last_error_message(long e);
 
@@ -856,6 +871,14 @@ class Mathsat5NativeApi {
    * soft-clause. \param upper The MaxSMT sum onto which the weight contribution is added.
    */
   public static native void msat_assert_soft_formula(long e, long term, long weight, String id);
+
+  /**
+   * Returns general search statistics.
+   *
+   * @param e msat_env The environment in which to operate.
+   * @return A string which provides some search statistics information on the search.
+   */
+  public static native String msat_get_search_stats(long e);
 
   /*
    * OptiMathSAT - objective stack iterator

@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.delegate.synchronize;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -134,6 +135,13 @@ public class SynchronizedSolverContext implements SolverContext {
   public Solvers getSolverName() {
     synchronized (sync) {
       return delegate.getSolverName();
+    }
+  }
+
+  @Override
+  public ImmutableMap<String, String> getStatistics() {
+    synchronized (sync) {
+      return delegate.getStatistics();
     }
   }
 

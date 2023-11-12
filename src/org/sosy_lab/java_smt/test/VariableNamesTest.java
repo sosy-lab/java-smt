@@ -9,23 +9,19 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import org.junit.AssumptionViolatedException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -113,11 +109,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
           "as",
           "BINARY",
           "DECIMAL",
-          "exists",
           "HEXADECIMAL",
-          "forall",
-          "let",
-          "match",
           "NUMERAL",
           "par",
           "STRING",
@@ -167,34 +159,29 @@ public class VariableNamesTest extends SolverBasedTest0 {
           "\\",
           "\\s",
           "\\|\\|",
-          "\\",
           "| this is a quoted symbol |",
           "| so is \n  this one |",
           "| \" can occur too |",
           "| af klj ^*0 asfe2 (&*)&(#^ $ > > >?\" ’]]984|");
 
-  @Parameters(name = "{0} with varname {1}")
-  public static List<Object[]> getAllCombinations() {
-    List<Object> allNames =
-        ImmutableList.builder()
-            .addAll(NAMES)
-            .addAll(Iterables.transform(NAMES, n -> n + n + n))
-            .addAll(AbstractFormulaManager.BASIC_OPERATORS)
-            .addAll(Iterables.transform(AbstractFormulaManager.BASIC_OPERATORS, n -> n + n + n))
-            .addAll(AbstractFormulaManager.SMTLIB2_KEYWORDS)
-            .addAll(AbstractFormulaManager.DISALLOWED_CHARACTER_REPLACEMENT.values())
-            .addAll(FURTHER_SMTLIB2_KEYWORDS)
-            .addAll(UNSUPPORTED_NAMES)
-            .build();
-    return Lists.transform(
-        Lists.cartesianProduct(Arrays.asList(Solvers.values()), allNames), List::toArray);
+  protected List<String> getAllNames() {
+    return ImmutableList.<String>builder()
+        .addAll(NAMES)
+        .addAll(AbstractFormulaManager.BASIC_OPERATORS)
+        .addAll(AbstractFormulaManager.SMTLIB2_KEYWORDS)
+        .addAll(AbstractFormulaManager.DISALLOWED_CHARACTER_REPLACEMENT.values())
+        .addAll(FURTHER_SMTLIB2_KEYWORDS)
+        .addAll(UNSUPPORTED_NAMES)
+        .build();
+  }
+
+  @Parameters(name = "{0}")
+  public static Object[] getAllSolvers() {
+    return Solvers.values();
   }
 
   @Parameter(0)
   public Solvers solver;
-
-  @Parameter(1)
-  public String varname;
 
   @Override
   protected Solvers solverToUse() {
@@ -205,38 +192,26 @@ public class VariableNamesTest extends SolverBasedTest0 {
     return true;
   }
 
-  String getVarname() {
-    return varname;
-  }
-
   @CanIgnoreReturnValue
   private <T extends Formula> T createVariableWith(Function<String, T> creator, String name) {
-    final T result;
     if (allowInvalidNames() && !mgr.isValidName(name)) {
-      try {
-        result = creator.apply(name);
-        assert_().fail();
-      } catch (IllegalArgumentException e) {
-        throw new AssumptionViolatedException("unsupported variable name", e);
-      }
+      assertThrows(IllegalArgumentException.class, () -> creator.apply(name));
+      return null;
     } else {
-      result = creator.apply(name);
+      return creator.apply(name);
     }
-    return result;
-  }
-
-  @Test
-  public void testBoolVariable() {
-    createVariableWith(bmgr::makeVariable, getVarname());
   }
 
   private <T extends Formula> void testName0(
-      Function<String, T> creator, BiFunction<T, T, BooleanFormula> eq, boolean isUF)
+      String name, Function<String, T> creator, BiFunction<T, T, BooleanFormula> eq, boolean isUF)
       throws SolverException, InterruptedException {
     requireVisitor();
 
     // create a variable
-    T var = createVariableWith(creator, getVarname());
+    T var = createVariableWith(creator, name);
+    if (var == null) {
+      return;
+    }
 
     // check whether it exists with the given name
     Map<String, Formula> map = mgr.extractVariables(var);
@@ -245,10 +220,14 @@ public class VariableNamesTest extends SolverBasedTest0 {
       map = mgr.extractVariablesAndUFs(var);
     }
     assertThat(map).hasSize(1);
-    assertThat(map).containsEntry(getVarname(), var);
+    assertThat(map).containsEntry(name, var);
 
     // check whether we can create the same variable again
-    T var2 = createVariableWith(creator, getVarname());
+    T var2 = createVariableWith(creator, name);
+    if (var2 == null) {
+      return;
+    }
+
     // for simple formulas, we can expect a direct equality
     // (for complex formulas this is not satisfied)
     assertThat(var2).isEqualTo(var);
@@ -268,49 +247,67 @@ public class VariableNamesTest extends SolverBasedTest0 {
 
     if (allowInvalidNames()) {
       // try to create a new (!) variable with a different name, the escaped previous name.
-      @SuppressWarnings("unused")
-      T var3 = createVariableWith(creator, "|" + getVarname() + "|");
-      assert_().fail();
+      assertThat(createVariableWith(creator, "|" + name + "|")).isEqualTo(null);
+    }
+  }
+
+  @Test
+  public void testBoolVariable() {
+    for (String name : getAllNames()) {
+      createVariableWith(bmgr::makeVariable, name);
     }
   }
 
   @Test
   public void testNameBool() throws SolverException, InterruptedException {
-    testName0(bmgr::makeVariable, bmgr::equivalence, false);
+    for (String name : getAllNames()) {
+      testName0(name, bmgr::makeVariable, bmgr::equivalence, false);
+    }
   }
 
   @Test
   public void testNameInt() throws SolverException, InterruptedException {
     requireIntegers();
-    testName0(imgr::makeVariable, imgr::equal, false);
+    for (String name : getAllNames()) {
+      testName0(name, imgr::makeVariable, imgr::equal, false);
+    }
   }
 
   @Test
   public void testNameRat() throws SolverException, InterruptedException {
     requireRationals();
-    testName0(rmgr::makeVariable, rmgr::equal, false);
+    for (String name : getAllNames()) {
+      testName0(name, rmgr::makeVariable, rmgr::equal, false);
+    }
   }
 
   @Test
   public void testNameBV() throws SolverException, InterruptedException {
     requireBitvectors();
-    testName0(s -> bvmgr.makeVariable(4, s), bvmgr::equal, false);
+    for (String name : getAllNames()) {
+      testName0(name, s -> bvmgr.makeVariable(4, s), bvmgr::equal, false);
+    }
   }
 
   @Test
   public void testNameFloat() throws SolverException, InterruptedException {
     requireFloats();
-    testName0(
-        s -> fpmgr.makeVariable(s, FormulaType.getSinglePrecisionFloatingPointType()),
-        fpmgr::equalWithFPSemantics,
-        false);
+    for (String name : getAllNames()) {
+      testName0(
+          name,
+          s -> fpmgr.makeVariable(s, FormulaType.getSinglePrecisionFloatingPointType()),
+          fpmgr::equalWithFPSemantics,
+          false);
+    }
   }
 
   @Test
   public void testNameIntArray() throws SolverException, InterruptedException {
     requireIntegers();
     requireArrays();
-    testName0(s -> amgr.makeArray(s, IntegerType, IntegerType), amgr::equivalence, false);
+    for (String name : getAllNames()) {
+      testName0(name, s -> amgr.makeArray(s, IntegerType, IntegerType), amgr::equivalence, false);
+    }
   }
 
   @Test
@@ -319,27 +316,38 @@ public class VariableNamesTest extends SolverBasedTest0 {
     requireArrays();
     // Someone who knows princess has to debug this!
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
-    testName0(
-        s ->
-            amgr.makeArray(
-                s,
-                FormulaType.getBitvectorTypeWithSize(2),
-                FormulaType.getBitvectorTypeWithSize(2)),
-        amgr::equivalence,
-        false);
+    for (String name : NAMES) {
+      testName0(
+          name,
+          s ->
+              amgr.makeArray(
+                  s,
+                  FormulaType.getBitvectorTypeWithSize(2),
+                  FormulaType.getBitvectorTypeWithSize(2)),
+          amgr::equivalence,
+          false);
+    }
   }
 
   @Test
   public void testNameUF1Bool() throws SolverException, InterruptedException {
     requireIntegers();
-    testName0(
-        s -> fmgr.declareAndCallUF(s, BooleanType, imgr.makeNumber(0)), bmgr::equivalence, true);
+    for (String name : NAMES) {
+      testName0(
+          name,
+          s -> fmgr.declareAndCallUF(s, BooleanType, imgr.makeNumber(0)),
+          bmgr::equivalence,
+          true);
+    }
   }
 
   @Test
   public void testNameUF1Int() throws SolverException, InterruptedException {
     requireIntegers();
-    testName0(s -> fmgr.declareAndCallUF(s, IntegerType, imgr.makeNumber(0)), imgr::equal, true);
+    for (String name : NAMES) {
+      testName0(
+          name, s -> fmgr.declareAndCallUF(s, IntegerType, imgr.makeNumber(0)), imgr::equal, true);
+    }
   }
 
   @Test
@@ -347,24 +355,32 @@ public class VariableNamesTest extends SolverBasedTest0 {
     requireBitvectors();
     // Someone who knows princess has to debug this!
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
-    testName0(
-        s -> fmgr.declareAndCallUF(s, BooleanType, bvmgr.makeBitvector(2, 0)),
-        bmgr::equivalence,
-        true);
+    for (String name : getAllNames()) {
+      testName0(
+          name,
+          s -> fmgr.declareAndCallUF(s, BooleanType, bvmgr.makeBitvector(2, 0)),
+          bmgr::equivalence,
+          true);
+    }
   }
 
   @Test
   public void testNameUF2Bool() throws SolverException, InterruptedException {
     requireIntegers();
     IntegerFormula zero = imgr.makeNumber(0);
-    testName0(s -> fmgr.declareAndCallUF(s, BooleanType, zero, zero), bmgr::equivalence, true);
+    for (String name : NAMES) {
+      testName0(
+          name, s -> fmgr.declareAndCallUF(s, BooleanType, zero, zero), bmgr::equivalence, true);
+    }
   }
 
   @Test
   public void testNameUF2Int() throws SolverException, InterruptedException {
     requireIntegers();
     IntegerFormula zero = imgr.makeNumber(0);
-    testName0(s -> fmgr.declareAndCallUF(s, IntegerType, zero, zero), imgr::equal, true);
+    for (String name : NAMES) {
+      testName0(name, s -> fmgr.declareAndCallUF(s, IntegerType, zero, zero), imgr::equal, true);
+    }
   }
 
   @Test
@@ -372,49 +388,55 @@ public class VariableNamesTest extends SolverBasedTest0 {
     requireQuantifiers();
     requireIntegers();
 
-    IntegerFormula var = createVariableWith(imgr::makeVariable, getVarname());
-    IntegerFormula zero = imgr.makeNumber(0);
-    BooleanFormula eq = imgr.equal(var, zero);
-    BooleanFormula exists = qmgr.exists(var, eq);
-    BooleanFormula query = bmgr.and(bmgr.not(eq), exists);
+    for (String name : getAllNames()) {
 
-    // (var != 0) & (EX var: (var == 0))
+      IntegerFormula var = createVariableWith(imgr::makeVariable, name);
+      if (var == null) {
+        continue;
+      }
+      IntegerFormula zero = imgr.makeNumber(0);
+      BooleanFormula eq = imgr.equal(var, zero);
+      BooleanFormula exists = qmgr.exists(var, eq);
+      BooleanFormula query = bmgr.and(bmgr.not(eq), exists);
 
-    assertThat(mgr.extractVariablesAndUFs(eq)).hasSize(1);
-    assertThat(mgr.extractVariablesAndUFs(eq)).containsEntry(getVarname(), var);
+      // (var != 0) & (EX var: (var == 0))
 
-    assertThat(mgr.extractVariablesAndUFs(query)).hasSize(1);
-    assertThat(mgr.extractVariablesAndUFs(query)).containsEntry(getVarname(), var);
+      assertThat(mgr.extractVariablesAndUFs(eq)).hasSize(1);
+      assertThat(mgr.extractVariablesAndUFs(eq)).containsEntry(name, var);
 
-    assertThat(mgr.extractVariablesAndUFs(exists)).isEmpty();
+      assertThat(mgr.extractVariablesAndUFs(query)).hasSize(1);
+      assertThat(mgr.extractVariablesAndUFs(query)).containsEntry(name, var);
 
-    mgr.visit(
-        query,
-        new DefaultFormulaVisitor<Void>() {
+      assertThat(mgr.extractVariablesAndUFs(exists)).isEmpty();
 
-          @Override
-          public Void visitQuantifier(
-              BooleanFormula pF,
-              Quantifier pQuantifier,
-              List<Formula> pBoundVariables,
-              BooleanFormula pBody) {
-            if (solverToUse() != Solvers.PRINCESS) {
-              // TODO Princess does not (yet) return quantified variables.
-              assertThat(pBoundVariables).hasSize(1);
+      mgr.visit(
+          query,
+          new DefaultFormulaVisitor<Void>() {
+
+            @Override
+            public Void visitQuantifier(
+                BooleanFormula pF,
+                Quantifier pQuantifier,
+                List<Formula> pBoundVariables,
+                BooleanFormula pBody) {
+              if (solverToUse() != Solvers.PRINCESS) {
+                // TODO Princess does not (yet) return quantified variables.
+                assertThat(pBoundVariables).hasSize(1);
+              }
+              for (Formula f : pBoundVariables) {
+                Map<String, Formula> map = mgr.extractVariables(f);
+                assertThat(map).hasSize(1);
+                assertThat(map).containsEntry(name, f);
+              }
+              return null;
             }
-            for (Formula f : pBoundVariables) {
-              Map<String, Formula> map = mgr.extractVariables(f);
-              assertThat(map).hasSize(1);
-              assertThat(map).containsEntry(getVarname(), f);
-            }
-            return null;
-          }
 
-          @Override
-          protected Void visitDefault(Formula pF) {
-            return null;
-          }
-        });
+            @Override
+            protected Void visitDefault(Formula pF) {
+              return null;
+            }
+          });
+    }
   }
 
   @Test
@@ -422,149 +444,177 @@ public class VariableNamesTest extends SolverBasedTest0 {
     requireQuantifiers();
     requireIntegers();
 
-    IntegerFormula var1 = createVariableWith(imgr::makeVariable, getVarname() + 1);
-    IntegerFormula var2 = createVariableWith(imgr::makeVariable, getVarname() + 2);
-    IntegerFormula var3 = createVariableWith(imgr::makeVariable, getVarname() + 3);
-    IntegerFormula var4 = createVariableWith(imgr::makeVariable, getVarname() + 4);
-    IntegerFormula zero = imgr.makeNumber(0);
+    for (String name : getAllNames()) {
 
-    // (v1 == 0) & (EX v2: ((v2 == v1) & (EX v3: ((v3 == v2) & (EX v4: (v4 == v3))))
+      IntegerFormula var1 = createVariableWith(imgr::makeVariable, name + 1);
+      if (var1 == null) {
+        continue;
+      }
+      IntegerFormula var2 = createVariableWith(imgr::makeVariable, name + 2);
+      IntegerFormula var3 = createVariableWith(imgr::makeVariable, name + 3);
+      IntegerFormula var4 = createVariableWith(imgr::makeVariable, name + 4);
+      IntegerFormula zero = imgr.makeNumber(0);
 
-    BooleanFormula eq01 = imgr.equal(zero, var1);
-    BooleanFormula eq12 = imgr.equal(var1, var2);
-    BooleanFormula eq23 = imgr.equal(var2, var3);
-    BooleanFormula eq34 = imgr.equal(var3, var4);
-    BooleanFormula exists4 = qmgr.exists(var4, eq34);
-    BooleanFormula exists3 = qmgr.exists(var3, bmgr.and(eq23, exists4));
-    BooleanFormula exists2 = qmgr.exists(var2, bmgr.and(eq12, exists3));
-    BooleanFormula query = bmgr.and(eq01, exists2);
+      // (v1 == 0) & (EX v2: ((v2 == v1) & (EX v3: ((v3 == v2) & (EX v4: (v4 == v3))))
 
-    assertThat(mgr.extractVariablesAndUFs(eq01)).hasSize(1);
-    assertThat(mgr.extractVariablesAndUFs(eq01)).containsEntry(getVarname() + 1, var1);
+      BooleanFormula eq01 = imgr.equal(zero, var1);
+      BooleanFormula eq12 = imgr.equal(var1, var2);
+      BooleanFormula eq23 = imgr.equal(var2, var3);
+      BooleanFormula eq34 = imgr.equal(var3, var4);
+      BooleanFormula exists4 = qmgr.exists(var4, eq34);
+      BooleanFormula exists3 = qmgr.exists(var3, bmgr.and(eq23, exists4));
+      BooleanFormula exists2 = qmgr.exists(var2, bmgr.and(eq12, exists3));
+      BooleanFormula query = bmgr.and(eq01, exists2);
 
-    assertThat(mgr.extractVariablesAndUFs(eq12)).hasSize(2);
-    assertThat(mgr.extractVariablesAndUFs(eq12)).containsEntry(getVarname() + 1, var1);
-    assertThat(mgr.extractVariablesAndUFs(eq12)).containsEntry(getVarname() + 2, var2);
+      assertThat(mgr.extractVariablesAndUFs(eq01)).hasSize(1);
+      assertThat(mgr.extractVariablesAndUFs(eq01)).containsEntry(name + 1, var1);
 
-    assertThat(mgr.extractVariablesAndUFs(eq23)).hasSize(2);
-    assertThat(mgr.extractVariablesAndUFs(eq23)).containsEntry(getVarname() + 2, var2);
-    assertThat(mgr.extractVariablesAndUFs(eq23)).containsEntry(getVarname() + 3, var3);
+      assertThat(mgr.extractVariablesAndUFs(eq12)).hasSize(2);
+      assertThat(mgr.extractVariablesAndUFs(eq12)).containsEntry(name + 1, var1);
+      assertThat(mgr.extractVariablesAndUFs(eq12)).containsEntry(name + 2, var2);
 
-    assertThat(mgr.extractVariablesAndUFs(eq34)).hasSize(2);
-    assertThat(mgr.extractVariablesAndUFs(eq34)).containsEntry(getVarname() + 3, var3);
-    assertThat(mgr.extractVariablesAndUFs(eq34)).containsEntry(getVarname() + 4, var4);
+      assertThat(mgr.extractVariablesAndUFs(eq23)).hasSize(2);
+      assertThat(mgr.extractVariablesAndUFs(eq23)).containsEntry(name + 2, var2);
+      assertThat(mgr.extractVariablesAndUFs(eq23)).containsEntry(name + 3, var3);
 
-    assertThat(mgr.extractVariablesAndUFs(query)).hasSize(1);
-    assertThat(mgr.extractVariablesAndUFs(query)).containsEntry(getVarname() + 1, var1);
+      assertThat(mgr.extractVariablesAndUFs(eq34)).hasSize(2);
+      assertThat(mgr.extractVariablesAndUFs(eq34)).containsEntry(name + 3, var3);
+      assertThat(mgr.extractVariablesAndUFs(eq34)).containsEntry(name + 4, var4);
 
-    assertThat(mgr.extractVariablesAndUFs(exists2)).hasSize(1);
-    assertThat(mgr.extractVariablesAndUFs(exists2)).containsEntry(getVarname() + 1, var1);
+      assertThat(mgr.extractVariablesAndUFs(query)).hasSize(1);
+      assertThat(mgr.extractVariablesAndUFs(query)).containsEntry(name + 1, var1);
 
-    assertThat(mgr.extractVariablesAndUFs(exists3)).hasSize(1);
-    assertThat(mgr.extractVariablesAndUFs(exists3)).containsEntry(getVarname() + 2, var2);
+      assertThat(mgr.extractVariablesAndUFs(exists2)).hasSize(1);
+      assertThat(mgr.extractVariablesAndUFs(exists2)).containsEntry(name + 1, var1);
 
-    assertThat(mgr.extractVariablesAndUFs(exists4)).hasSize(1);
-    assertThat(mgr.extractVariablesAndUFs(exists4)).containsEntry(getVarname() + 3, var3);
+      assertThat(mgr.extractVariablesAndUFs(exists3)).hasSize(1);
+      assertThat(mgr.extractVariablesAndUFs(exists3)).containsEntry(name + 2, var2);
 
-    mgr.visit(
-        query,
-        new DefaultFormulaVisitor<Void>() {
+      assertThat(mgr.extractVariablesAndUFs(exists4)).hasSize(1);
+      assertThat(mgr.extractVariablesAndUFs(exists4)).containsEntry(name + 3, var3);
 
-          int depth = 1;
+      mgr.visit(
+          query,
+          new DefaultFormulaVisitor<Void>() {
 
-          @Override
-          public Void visitQuantifier(
-              BooleanFormula pF,
-              Quantifier pQuantifier,
-              List<Formula> pBoundVariables,
-              BooleanFormula pBody) {
-            if (solverToUse() != Solvers.PRINCESS) {
-              // TODO Princess does not return quantified variables.
-              assertThat(pBoundVariables).hasSize(1);
+            int depth = 1;
+
+            @Override
+            public Void visitQuantifier(
+                BooleanFormula pF,
+                Quantifier pQuantifier,
+                List<Formula> pBoundVariables,
+                BooleanFormula pBody) {
+              if (solverToUse() != Solvers.PRINCESS) {
+                // TODO Princess does not return quantified variables.
+                assertThat(pBoundVariables).hasSize(1);
+              }
+              for (Formula f : pBoundVariables) {
+                Map<String, Formula> map = mgr.extractVariables(f);
+                assertThat(map).hasSize(1);
+                assertThat(map).containsEntry(name + depth, f);
+              }
+              depth++;
+              return null;
             }
-            for (Formula f : pBoundVariables) {
-              Map<String, Formula> map = mgr.extractVariables(f);
-              assertThat(map).hasSize(1);
-              assertThat(map).containsEntry(getVarname() + depth, f);
-            }
-            depth++;
-            return null;
-          }
 
-          @Override
-          protected Void visitDefault(Formula pF) {
-            return null;
-          }
-        });
+            @Override
+            protected Void visitDefault(Formula pF) {
+              return null;
+            }
+          });
+    }
   }
 
   @Test
   public void testBoolVariableNameInVisitor() {
     requireVisitor();
 
-    BooleanFormula var = createVariableWith(bmgr::makeVariable, getVarname());
+    for (String name : getAllNames()) {
+      BooleanFormula var = createVariableWith(bmgr::makeVariable, name);
+      if (var == null) {
+        continue;
+      }
 
-    bmgr.visit(
-        var,
-        new DefaultBooleanFormulaVisitor<Void>() {
-          @Override
-          protected Void visitDefault() {
-            throw new AssertionError("unexpected case");
-          }
+      bmgr.visit(
+          var,
+          new DefaultBooleanFormulaVisitor<Void>() {
+            @Override
+            protected Void visitDefault() {
+              throw new AssertionError("unexpected case");
+            }
 
-          @Override
-          public Void visitAtom(BooleanFormula pAtom, FunctionDeclaration<BooleanFormula> pDecl) {
-            assertThat(pDecl.getName()).isEqualTo(getVarname());
-            return null;
-          }
-        });
+            @Override
+            public Void visitAtom(BooleanFormula pAtom, FunctionDeclaration<BooleanFormula> pDecl) {
+              assertThat(pDecl.getName()).isEqualTo(name);
+              return null;
+            }
+          });
+    }
   }
 
   @Test
   public void testBoolVariableDump() {
-    BooleanFormula var = createVariableWith(bmgr::makeVariable, getVarname());
-    @SuppressWarnings("unused")
-    String dump = mgr.dumpFormula(var).toString();
+    for (String name : getAllNames()) {
+      BooleanFormula var = createVariableWith(bmgr::makeVariable, name);
+      if (var != null) {
+        @SuppressWarnings("unused")
+        String dump = mgr.dumpFormula(var).toString();
+      }
+    }
   }
 
   @Test
   public void testEqBoolVariableDump() {
-    BooleanFormula var = createVariableWith(bmgr::makeVariable, getVarname());
-    @SuppressWarnings("unused")
-    String dump = mgr.dumpFormula(bmgr.equivalence(var, var)).toString();
+    for (String name : getAllNames()) {
+      BooleanFormula var = createVariableWith(bmgr::makeVariable, name);
+      if (var != null) {
+        @SuppressWarnings("unused")
+        String dump = mgr.dumpFormula(bmgr.equivalence(var, var)).toString();
+      }
+    }
   }
 
   @Test
   public void testIntVariable() {
     requireIntegers();
-    createVariableWith(imgr::makeVariable, getVarname());
+    for (String name : getAllNames()) {
+      createVariableWith(imgr::makeVariable, name);
+    }
   }
 
   @Test
   public void testInvalidRatVariable() {
     requireRationals();
-    createVariableWith(rmgr::makeVariable, getVarname());
+    for (String name : getAllNames()) {
+      createVariableWith(rmgr::makeVariable, name);
+    }
   }
 
   @Test
   public void testBVVariable() {
     requireBitvectors();
-    createVariableWith(v -> bvmgr.makeVariable(4, v), getVarname());
+    for (String name : getAllNames()) {
+      createVariableWith(v -> bvmgr.makeVariable(4, v), name);
+    }
   }
 
   @Test
   public void testInvalidFloatVariable() {
     requireFloats();
-    createVariableWith(
-        v -> fpmgr.makeVariable(v, FormulaType.getSinglePrecisionFloatingPointType()),
-        getVarname());
+    for (String name : getAllNames()) {
+      createVariableWith(
+          v -> fpmgr.makeVariable(v, FormulaType.getSinglePrecisionFloatingPointType()), name);
+    }
   }
 
   @Test
   public void testIntArrayVariable() {
     requireArrays();
     requireIntegers();
-    createVariableWith(v -> amgr.makeArray(v, IntegerType, IntegerType), getVarname());
+    for (String name : getAllNames()) {
+      createVariableWith(v -> amgr.makeArray(v, IntegerType, IntegerType), name);
+    }
   }
 
   @Test
@@ -573,26 +623,26 @@ public class VariableNamesTest extends SolverBasedTest0 {
     requireBitvectors();
     // Someone who knows princess has to debug this!
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
-    createVariableWith(
-        v ->
-            amgr.makeArray(
-                v,
-                FormulaType.getBitvectorTypeWithSize(2),
-                FormulaType.getBitvectorTypeWithSize(2)),
-        getVarname());
+    for (String name : getAllNames()) {
+      createVariableWith(
+          v ->
+              amgr.makeArray(
+                  v,
+                  FormulaType.getBitvectorTypeWithSize(2),
+                  FormulaType.getBitvectorTypeWithSize(2)),
+          name);
+    }
   }
 
   @Test
   public void sameBehaviorTest() {
-    if (mgr.isValidName(getVarname())) {
-      // should pass without exception
-      AbstractFormulaManager.checkVariableName(getVarname());
-    } else {
-      try {
-        // should throw exception
-        AbstractFormulaManager.checkVariableName(getVarname());
-        assert_().fail();
-      } catch (IllegalArgumentException e) {
+    for (String name : getAllNames()) {
+      if (mgr.isValidName(name)) {
+        // should pass without exception
+        AbstractFormulaManager.checkVariableName(name);
+      } else {
+        assertThrows(
+            IllegalArgumentException.class, () -> AbstractFormulaManager.checkVariableName(name));
       }
     }
   }

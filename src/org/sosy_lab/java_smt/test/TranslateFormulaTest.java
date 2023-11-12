@@ -93,14 +93,14 @@ public class TranslateFormulaTest {
     assume()
         .withMessage("Solver %s does not support parsing formulae", translateTo)
         .that(translateTo)
-        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2);
+        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2, Solvers.CVC5);
   }
 
   private void requireParserFrom() {
     assume()
         .withMessage("Solver %s does not support parsing formulae", translateFrom)
         .that(translateFrom)
-        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2);
+        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2, Solvers.CVC5);
   }
 
   private void requireIntegers() {
@@ -133,13 +133,29 @@ public class TranslateFormulaTest {
   }
 
   @Test
-  public void testTranslatingSelf() throws SolverException, InterruptedException {
+  public void testTranslatingForIContextIdentity() throws SolverException, InterruptedException {
     assume().that(translateTo).isEqualTo(translateFrom);
     FormulaManager manager = managerFrom;
 
     BooleanFormula inputFrom = createTestFormula(manager);
     BooleanFormula inputTo = createTestFormula(manager);
     BooleanFormula translatedInput = manager.translateFrom(inputFrom, manager);
+
+    assertUsing(to).that(inputTo).isEquivalentTo(translatedInput);
+  }
+
+  @Test
+  public void testTranslatingForContextSibling() throws SolverException, InterruptedException {
+    assume().that(translateTo).isEqualTo(translateFrom);
+
+    assume()
+        .withMessage("Solver does not support shared terms or dump/parse")
+        .that(translateTo)
+        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.YICES2);
+
+    BooleanFormula inputFrom = createTestFormula(managerFrom);
+    BooleanFormula inputTo = createTestFormula(managerTo);
+    BooleanFormula translatedInput = managerTo.translateFrom(inputFrom, managerFrom);
 
     assertUsing(to).that(inputTo).isEquivalentTo(translatedInput);
   }

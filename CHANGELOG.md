@@ -3,12 +3,98 @@ This file is part of JavaSMT,
 an API wrapper for a collection of SMT solvers:
 https://github.com/sosy-lab/java-smt
 
-SPDX-FileCopyrightText: 2021 Dirk Beyer <https://www.sosy-lab.org>
+SPDX-FileCopyrightText: 2022 Dirk Beyer <https://www.sosy-lab.org>
 
 SPDX-License-Identifier: Apache-2.0
 -->
 
 # JavaSMT ChangeLog
+
+## JavaSMT 4.1.0
+
+This release brings support for the SMT solver OpenSMT (version 2.5.2).
+
+## JavaSMT 4.0.3
+
+This release contains updates for several dependencies.
+
+## JavaSMT 4.0.2
+
+This patch release improves documentation and updates the dependency for our Yices2 component.
+We skip version 4.0.1 which was internally used for releasing the Yices2 component.
+
+## JavaSMT 4.0.0
+
+This major release comes with several updated solvers and dependencies,
+a new (potentially faster) evaluator for models,
+and support for the theory of enumerations (domains of fixed size).
+
+### Breaking changes:
+ - The push-method in ProverEnvironments can throw InterruptedExceptions.
+ - Model evalation supports enumeration theory.
+ - Direct construction ArrayFormulaType was replaced with a static building method.
+
+### Updated solvers:
+ - MathSAT 5.6.10
+ - Z3 4.12.2
+ - CVC5 1.0.5
+
+## JavaSMT 3.14.3
+
+This patch release updates SMTInterpol to version 2.5-1242-g5c50fb6d.
+
+## JavaSMT 3.14.2
+
+This patch release brings small bugfixes for String theory.
+We also include the brand-new bindings for the solver CVC5.
+
+## JavaSMT 3.14.1
+
+This patch release brings small bugfixes and improved documentation for formula visitation.
+
+## JavaSMT 3.14.0
+
+This minor release comes a new method 'allChar' in String theory
+and brings with a smaller bugfix for formula visitation.
+
+## JavaSMT 3.13.3
+
+This patch release comes with a smaller bugfix for String-theory formulas in Z3.
+
+## JavaSMT 3.13.2
+
+This patch release comes with some updated solvers and some smaller bugfixes.
+
+### Updated solvers:
+ - JavaSMT 2.5-1147-g108647d8
+ - Z3 4.10.1
+
+## JavaSMT 3.13.1
+
+This patch release contains with several smaller fixes for the integration of SMTInterpol and Princess.
+
+## JavaSMT 3.13.0
+
+This release comes with several bugfixes, e.g.,
+we improved DIV and MOD operations in Integer theory.
+
+### Updated solvers:
+ - MathSAT 5.6.8
+ - Princess 2022-07-01
+ - Z3 4.8.17
+
+### Breaking change:
+The public API for FloatingPointManager was changed to support conversion
+of FloatingPoint to signed and unsigned Bitvectors.
+
+## JavaSMT 3.12.0
+
+This release comes with an initial support for String theory for SMT solvers like Z3 and CVC4.
+Now, JavaSMT provides statistics on the solving process, depending on the used SMT solver.
+And we include several bugfixes and internal cleanup.
+
+### Breaking change:
+The public API was enriched with new methods to retrieve a StringFormulaManager and statistics.
 
 ## JavaSMT 3.11.0
 

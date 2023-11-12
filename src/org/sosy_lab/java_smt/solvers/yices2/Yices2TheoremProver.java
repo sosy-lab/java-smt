@@ -25,14 +25,12 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_set_con
 
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Deque;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -42,6 +40,7 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
+import org.sosy_lab.java_smt.basicimpl.CachingModel;
 
 /**
  * Info about the option {@link ProverOptions#GENERATE_UNSAT_CORE}: Yices provides the unsat core
@@ -64,8 +63,8 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   protected final long curEnv;
   protected final long curCfg;
 
-  private final Deque<Set<Integer>> constraintStack = new ArrayDeque<>();
-
+  // Yices does not allow to PUSH when the stack is UNSAT.
+  // Therefore, we need to keep track of all added constraints beyond that stack-level.
   private int stackSizeToUnsat = Integer.MAX_VALUE;
 
   protected Yices2TheoremProver(
@@ -79,7 +78,6 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
     yices_set_config(curCfg, "solver-type", "dpllt");
     yices_set_config(curCfg, "mode", "push-pop");
     curEnv = yices_new_context(curCfg);
-    constraintStack.push(new LinkedHashSet<>()); // initial level
   }
 
   boolean isClosed() {
@@ -87,42 +85,35 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   }
 
   @Override
-  public void pop() {
-    Preconditions.checkState(!closed);
-    if (constraintStack.size() <= stackSizeToUnsat) { // constraintStack and Yices stack have same
-      // level.
+  protected void popImpl() {
+    if (size() < stackSizeToUnsat) { // constraintStack and Yices stack have same level.
       yices_pop(curEnv);
-      stackSizeToUnsat = Integer.MAX_VALUE; // Reset stackSizeToUnsat as this pop() will bring the
-      // stack into a pushable state if it was UNSAT before.
+      // Reset stackSizeToUnsat to bring the stack into a pushable state if it was UNSAT before.
+      stackSizeToUnsat = Integer.MAX_VALUE;
     }
-    constraintStack.pop(); // Always pop constraintStack since it can get bigger than Yices stack.
   }
 
   @Override
-  public @Nullable Void addConstraint(BooleanFormula pConstraint) throws InterruptedException {
-    int constraint = creator.extractInfo(pConstraint);
+  protected @Nullable Void addConstraintImpl(BooleanFormula pConstraint)
+      throws InterruptedException {
     if (!generateUnsatCores) { // unsat core does not work with incremental mode
+      int constraint = creator.extractInfo(pConstraint);
       yices_assert_formula(curEnv, constraint);
     }
-    constraintStack.peek().add(constraint);
     return null;
   }
 
   @Override
-  public void push() {
-    Preconditions.checkState(!closed);
-    if (constraintStack.size() <= stackSizeToUnsat
-        && yices_context_status(curEnv) != YICES_STATUS_UNSAT) {
-      // Ensure that constraintStack and Yices stack are on the same level and Context is not UNSAT
-      // from assertions since last push.
+  protected void pushImpl() throws InterruptedException {
+    if (size() < stackSizeToUnsat && yices_context_status(curEnv) != YICES_STATUS_UNSAT) {
+      // Ensure that constraintStack and Yices stack are on the same level
+      // and Context is not UNSAT from assertions since last push.
       yices_push(curEnv);
     } else if (stackSizeToUnsat == Integer.MAX_VALUE) {
-      stackSizeToUnsat = constraintStack.size(); // if previous check fails and stackSizeToUnsat is
-      // not already set, set it to the current stack
-      // size before pushing.
+      // if previous check fails and stackSizeToUnsat is
+      // not already set, set it to the current stack-size before pushing.
+      stackSizeToUnsat = size();
     }
-    constraintStack.push(new LinkedHashSet<>()); // Always push to ensure proper representation of
-    // push actions, even if Yices did not push.
   }
 
   @Override
@@ -137,7 +128,7 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
     } else {
       unsat = !yices_check_sat(curEnv, DEFAULT_PARAMS, shutdownNotifier);
       if (unsat && stackSizeToUnsat == Integer.MAX_VALUE) {
-        stackSizeToUnsat = constraintStack.size();
+        stackSizeToUnsat = size();
         // If sat check is UNSAT and stackSizeToUnsat waS not already set,
         // set to current constraintStack size.
       }
@@ -146,9 +137,8 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   }
 
   private int[] getAllConstraints() {
-    Set<Integer> allConstraints = new LinkedHashSet<>();
-    constraintStack.forEach(allConstraints::addAll);
-    return Ints.toArray(allConstraints);
+    return Ints.toArray(
+        getAssertedFormulas().stream().map(creator::extractInfo).collect(Collectors.toSet()));
   }
 
   @Override
@@ -160,11 +150,17 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
         curEnv, DEFAULT_PARAMS, pAssumptions.size(), uncapsulate(pAssumptions), shutdownNotifier);
   }
 
+  @SuppressWarnings("resource")
   @Override
   public Model getModel() throws SolverException {
     Preconditions.checkState(!closed);
     checkGenerateModels();
-    return getModelWithoutChecks();
+    return new CachingModel(getEvaluatorWithoutChecks());
+  }
+
+  @Override
+  protected Yices2Model getEvaluatorWithoutChecks() {
+    return new Yices2Model(yices_get_model(curEnv, 1), this, creator);
   }
 
   private List<BooleanFormula> encapsulate(int[] terms) {
@@ -209,13 +205,8 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
     if (!closed) {
       yices_free_context(curEnv);
       yices_free_config(curCfg);
-      constraintStack.clear();
-      closed = true;
+      stackSizeToUnsat = Integer.MAX_VALUE;
     }
-  }
-
-  @Override
-  protected Model getModelWithoutChecks() {
-    return new Yices2Model(yices_get_model(curEnv, 1), this, creator);
+    super.close();
   }
 }

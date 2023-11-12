@@ -55,7 +55,9 @@ public interface BooleanFormulaManager {
    */
   BooleanFormula equivalence(BooleanFormula formula1, BooleanFormula formula2);
 
-  /** @return {@code formula1 => formula2}. */
+  /**
+   * @return {@code formula1 => formula2}.
+   */
   BooleanFormula implication(BooleanFormula formula1, BooleanFormula formula2);
 
   /**
@@ -101,10 +103,14 @@ public interface BooleanFormulaManager {
    */
   BooleanFormula and(BooleanFormula bits1, BooleanFormula bits2);
 
-  /** @see #and(BooleanFormula, BooleanFormula) */
+  /**
+   * @see #and(BooleanFormula, BooleanFormula)
+   */
   BooleanFormula and(Collection<BooleanFormula> bits);
 
-  /** @see #and(BooleanFormula, BooleanFormula) */
+  /**
+   * @see #and(BooleanFormula, BooleanFormula)
+   */
   BooleanFormula and(BooleanFormula... bits);
 
   /** Return a stream {@link Collector} that creates a conjunction of all elements in the stream. */
@@ -119,10 +125,14 @@ public interface BooleanFormulaManager {
    */
   BooleanFormula or(BooleanFormula bits1, BooleanFormula bits2);
 
-  /** @see #or(BooleanFormula, BooleanFormula) */
+  /**
+   * @see #or(BooleanFormula, BooleanFormula)
+   */
   BooleanFormula or(Collection<BooleanFormula> bits);
 
-  /** @see #or(BooleanFormula, BooleanFormula) */
+  /**
+   * @see #or(BooleanFormula, BooleanFormula)
+   */
   BooleanFormula or(BooleanFormula... bits);
 
   /** Return a stream {@link Collector} that creates a disjunction of all elements in the stream. */

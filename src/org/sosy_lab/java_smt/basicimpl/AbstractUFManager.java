@@ -39,6 +39,7 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
   @Override
   public final <T extends Formula> FunctionDeclaration<T> declareUF(
       String pName, FormulaType<T> pReturnType, List<FormulaType<?>> pArgTypes) {
+    checkVariableName(pName);
     List<TType> argTypes = Lists.transform(pArgTypes, this::toSolverType);
     return FunctionDeclarationImpl.of(
         pName,
@@ -51,7 +52,7 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
   @Override
   public <T extends Formula> FunctionDeclaration<T> declareUF(
       String pName, FormulaType<T> pReturnType, FormulaType<?>... pArgs) {
-
+    checkVariableName(pName);
     return declareUF(pName, pReturnType, Arrays.asList(pArgs));
   }
 

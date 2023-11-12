@@ -16,10 +16,6 @@ import com.google.common.collect.Range;
 import java.math.BigInteger;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -31,21 +27,7 @@ import org.sosy_lab.java_smt.api.OptimizationProverEnvironment.OptStatus;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
-@RunWith(Parameterized.class)
-public class OptimizationTest extends SolverBasedTest0 {
-
-  @Parameters(name = "{0}")
-  public static Object[] getAllSolvers() {
-    return Solvers.values();
-  }
-
-  @Parameter(0)
-  public Solvers solver;
-
-  @Override
-  protected Solvers solverToUse() {
-    return solver;
-  }
+public class OptimizationTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() {
@@ -129,9 +111,21 @@ public class OptimizationTest extends SolverBasedTest0 {
     }
   }
 
-  @Test
+  @Test(timeout = 20_000)
   public void testSwitchingObjectives() throws SolverException, InterruptedException {
     requireRationals();
+
+    if (solverToUse() == Solvers.MATHSAT5) {
+      // see https://github.com/sosy-lab/java-smt/issues/233
+      assume()
+          .withMessage("OptiMathSAT 1.7.2 has a bug with switching objectives")
+          .that(context.getVersion())
+          .doesNotContain("MathSAT5 version 1.7.2");
+      assume()
+          .withMessage("OptiMathSAT 1.7.3 has a bug with switching objectives")
+          .that(context.getVersion())
+          .doesNotContain("MathSAT5 version 1.7.3");
+    }
 
     try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
       RationalFormula x = rmgr.makeVariable("x");

@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.cvc4;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import edu.stanford.CVC4.Expr;
 import edu.stanford.CVC4.ExprManager;
@@ -16,11 +17,8 @@ import edu.stanford.CVC4.ExprManagerMapCollection;
 import edu.stanford.CVC4.Result;
 import edu.stanford.CVC4.SExpr;
 import edu.stanford.CVC4.SmtEngine;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Deque;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -29,6 +27,7 @@ import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
+import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
@@ -42,15 +41,6 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   private final CVC4FormulaCreator creator;
   SmtEngine smtEngine; // final except for SL theory
   private boolean changedSinceLastSatQuery = false;
-
-  /** Tracks formulas on the stack, needed for model generation. */
-  protected final Deque<List<Expr>> assertedFormulas = new ArrayDeque<>();
-
-  /**
-   * Tracks provided models to inform them when the SmtEngine is closed. We can no longer access
-   * model evaluation after closing the SmtEngine.
-   */
-  private final Set<CVC4Model> models = new LinkedHashSet<>();
 
   /**
    * The local exprManager allows to set options per Prover (and not globally). See <a
@@ -78,7 +68,6 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     creator = pFormulaCreator;
     smtEngine = new SmtEngine(exprManager);
     incremental = !enableSL;
-    assertedFormulas.push(new ArrayList<>()); // create initial level
 
     setOptions(randomSeed, pOptions);
   }
@@ -118,61 +107,65 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   }
 
   @Override
-  public void push() {
-    Preconditions.checkState(!closed);
+  protected void pushImpl() throws InterruptedException {
     setChanged();
-    assertedFormulas.push(new ArrayList<>());
     if (incremental) {
       smtEngine.push();
     }
   }
 
   @Override
-  public void pop() {
-    Preconditions.checkState(!closed);
+  protected void popImpl() {
     setChanged();
-    assertedFormulas.pop();
-    Preconditions.checkState(!assertedFormulas.isEmpty(), "initial level must remain until close");
     if (incremental) {
       smtEngine.pop();
     }
   }
 
   @Override
-  public @Nullable Void addConstraint(BooleanFormula pF) throws InterruptedException {
+  protected @Nullable Void addConstraintImpl(BooleanFormula pF) throws InterruptedException {
     Preconditions.checkState(!closed);
     setChanged();
     Expr exp = creator.extractInfo(pF);
-    assertedFormulas.peek().add(exp);
     if (incremental) {
       smtEngine.assertFormula(importExpr(exp));
     }
     return null;
   }
 
+  @SuppressWarnings("resource")
   @Override
   public CVC4Model getModel() {
     Preconditions.checkState(!closed);
+    Preconditions.checkState(!changedSinceLastSatQuery);
     checkGenerateModels();
-    return getModelWithoutChecks();
+    // special case for CVC4: Models are not permanent and need to be closed
+    // before any change is applied to the prover stack. So, we register the Model as Evaluator.
+    return registerEvaluator(
+        new CVC4Model(
+            this,
+            creator,
+            smtEngine,
+            Collections2.transform(getAssertedFormulas(), creator::extractInfo)));
   }
 
   @Override
-  protected CVC4Model getModelWithoutChecks() {
-    Preconditions.checkState(!changedSinceLastSatQuery);
-    CVC4Model model = new CVC4Model(this, creator, smtEngine, getAssertedExpressions());
-    models.add(model);
-    return model;
+  public Evaluator getEvaluator() {
+    Preconditions.checkState(!closed);
+    checkGenerateModels();
+    return getEvaluatorWithoutChecks();
   }
 
-  void unregisterModel(CVC4Model model) {
-    models.remove(model);
+  @SuppressWarnings("resource")
+  @Override
+  protected Evaluator getEvaluatorWithoutChecks() {
+    return registerEvaluator(new CVC4Evaluator(this, creator, smtEngine));
   }
 
   private void setChanged() {
+    closeAllEvaluators();
     if (!changedSinceLastSatQuery) {
       changedSinceLastSatQuery = true;
-      closeAllModels();
       if (!incremental) {
         // create a new clean smtEngine
         smtEngine = new SmtEngine(exprManager);
@@ -180,37 +173,21 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     }
   }
 
-  /**
-   * whenever the SmtEngine changes, we need to invalidate all models.
-   *
-   * <p>See for details <a href="https://github.com/CVC4/CVC4/issues/2648">Issue 2648</a> .
-   */
-  private void closeAllModels() {
-    for (CVC4Model model : ImmutableList.copyOf(models)) {
-      model.close();
-    }
-    Preconditions.checkState(models.isEmpty(), "all models should be closed");
-  }
-
   @Override
   public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
     Preconditions.checkState(!closed);
     Preconditions.checkState(!changedSinceLastSatQuery);
-    try (CVC4Model model = getModel()) {
-      return model.toList();
-    }
+    return super.getModelAssignments();
   }
 
   @Override
   @SuppressWarnings("try")
   public boolean isUnsat() throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
-    closeAllModels();
+    closeAllEvaluators();
     changedSinceLastSatQuery = false;
     if (!incremental) {
-      for (Expr expr : getAssertedExpressions()) {
-        smtEngine.assertFormula(importExpr(expr));
-      }
+      getAssertedFormulas().forEach(f -> smtEngine.assertFormula(creator.extractInfo(f)));
     }
 
     Result result;
@@ -263,21 +240,13 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     throw new UnsupportedOperationException();
   }
 
-  protected Collection<Expr> getAssertedExpressions() {
-    List<Expr> result = new ArrayList<>();
-    assertedFormulas.forEach(result::addAll);
-    return result;
-  }
-
   @Override
   public void close() {
     if (!closed) {
-      closeAllModels();
-      assertedFormulas.clear();
       exportMapping.delete();
       // smtEngine.delete();
       exprManager.delete();
-      closed = true;
     }
+    super.close();
   }
 }

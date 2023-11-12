@@ -8,20 +8,20 @@
 
 package org.sosy_lab.java_smt.test;
 
+import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.assertThrows;
 
 import com.google.common.collect.ImmutableList;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Map;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -29,8 +29,7 @@ import org.sosy_lab.java_smt.api.StringFormula;
 
 @SuppressWarnings("ConstantConditions")
 @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE", justification = "test code")
-@RunWith(Parameterized.class)
-public class StringFormulaManagerTest extends SolverBasedTest0 {
+public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   private static final ImmutableList<String> WORDS =
       ImmutableList.of(
@@ -67,18 +66,6 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
 
   private StringFormula hello;
   private RegexFormula a2z;
-
-  @Parameters(name = "{0}")
-  public static Object[] getAllSolvers() {
-    return Solvers.values();
-  }
-
-  @Parameter public Solvers solverUnderTest;
-
-  @Override
-  protected Solvers solverToUse() {
-    return solverUnderTest;
-  }
 
   @Before
   public void setup() {
@@ -126,6 +113,48 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
   }
 
   @Test
+  public void testRegexAllChar() throws SolverException, InterruptedException {
+    RegexFormula regexAllChar = smgr.allChar();
+
+    assertThatFormula(smgr.in(smgr.makeString("a"), regexAllChar)).isSatisfiable();
+    assertThatFormula(smgr.in(smgr.makeString("ab"), regexAllChar)).isUnsatisfiable();
+    assertThatFormula(smgr.in(smgr.makeString(""), regexAllChar)).isUnsatisfiable();
+    assertThatFormula(smgr.in(smgr.makeString("ab"), smgr.times(regexAllChar, 2))).isSatisfiable();
+    assertThatFormula(
+            smgr.in(smgr.makeVariable("x"), smgr.intersection(smgr.range('9', 'a'), regexAllChar)))
+        .isSatisfiable();
+
+    RegexFormula regexDot = smgr.makeRegex(".");
+    assertThatFormula(smgr.in(smgr.makeString("a"), regexDot)).isUnsatisfiable();
+  }
+
+  @Test
+  public void testRegexAllCharUnicode() throws SolverException, InterruptedException {
+    RegexFormula regexAllChar = smgr.allChar();
+
+    // Single characters.
+    assertThatFormula(smgr.in(smgr.makeString("\\u0394"), regexAllChar)).isSatisfiable();
+    assertThatFormula(smgr.in(smgr.makeString("\\u{1fa6a}"), regexAllChar)).isSatisfiable();
+
+    // Combining characters are not matched as one character.
+    assertThatFormula(smgr.in(smgr.makeString("a\\u0336"), regexAllChar)).isUnsatisfiable();
+    assertThatFormula(smgr.in(smgr.makeString("\\n"), regexAllChar)).isUnsatisfiable();
+
+    if (ImmutableList.of(Solvers.CVC4, Solvers.CVC5).contains(solverToUse())) {
+      // CVC4 and CVC5 do not support Unicode characters.
+      assertThrows(Exception.class, () -> smgr.range('a', 'Δ'));
+    } else {
+      // Z3 and other solvers support Unicode characters in the theory of strings.
+      assertThatFormula(
+              smgr.in(smgr.makeVariable("x"), smgr.union(smgr.range('a', 'Δ'), regexAllChar)))
+          .isSatisfiable();
+      // Combining characters are not matched as one character.
+      // Non-ascii non-printable characters should use the codepoint representation
+      assertThatFormula(smgr.in(smgr.makeString("Δ"), regexAllChar)).isUnsatisfiable();
+    }
+  }
+
+  @Test
   public void testStringRegex2() throws SolverException, InterruptedException {
     RegexFormula regex = smgr.concat(smgr.closure(a2z), smgr.makeRegex("ll"), smgr.closure(a2z));
     assertThatFormula(smgr.in(hello, regex)).isSatisfiable();
@@ -141,6 +170,36 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
   public void testEmptyRegex() throws SolverException, InterruptedException {
     RegexFormula regex = smgr.none();
     assertThatFormula(smgr.in(hello, regex)).isUnsatisfiable();
+  }
+
+  @Test
+  public void testRegexUnion() throws SolverException, InterruptedException {
+    RegexFormula regex = smgr.union(smgr.makeRegex("a"), smgr.makeRegex("b"));
+    assertThatFormula(smgr.in(smgr.makeString("a"), regex)).isSatisfiable();
+    assertThatFormula(smgr.in(smgr.makeString("b"), regex)).isSatisfiable();
+    assertThatFormula(smgr.in(smgr.makeString("c"), regex)).isUnsatisfiable();
+  }
+
+  @Test
+  public void testRegexIntersection() throws SolverException, InterruptedException {
+    RegexFormula regex = smgr.intersection(smgr.makeRegex("a"), smgr.makeRegex("b"));
+    StringFormula variable = smgr.makeVariable("var");
+    assertThatFormula(smgr.in(variable, regex)).isUnsatisfiable();
+
+    regex =
+        smgr.intersection(
+            smgr.union(smgr.makeRegex("a"), smgr.makeRegex("b")),
+            smgr.union(smgr.makeRegex("b"), smgr.makeRegex("c")));
+    assertThatFormula(smgr.in(smgr.makeString("a"), regex)).isUnsatisfiable();
+    assertThatFormula(smgr.in(smgr.makeString("b"), regex)).isSatisfiable();
+  }
+
+  @Test
+  public void testRegexDifference() throws SolverException, InterruptedException {
+    RegexFormula regex =
+        smgr.difference(smgr.union(smgr.makeRegex("a"), smgr.makeRegex("b")), smgr.makeRegex("b"));
+    assertThatFormula(smgr.in(smgr.makeString("a"), regex)).isSatisfiable();
+    assertThatFormula(smgr.in(smgr.makeString("b"), regex)).isUnsatisfiable();
   }
 
   @Test
@@ -316,6 +375,14 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
 
   @Test
   public void testStringCompare() throws SolverException, InterruptedException {
+    assume()
+        .withMessage("Solver is quite slow for this example")
+        .that(solverToUse())
+        .isNoneOf(Solvers.Z3, Solvers.CVC5);
+    // TODO regression:
+    // - the Z3 library was able to solve this in v4.11.2, but no longer in v4.12.1-glibc_2.27.
+    // - CVC5 was able to solve this in v1.0.2, but no longer in v1.0.5
+
     StringFormula var1 = smgr.makeVariable("0");
     StringFormula var2 = smgr.makeVariable("1");
     assertThatFormula(bmgr.and(smgr.lessOrEquals(var1, var2), smgr.greaterOrEquals(var1, var2)))
@@ -724,6 +791,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
    */
   @Test
   public void testCharAtWithSpecialCharacters2Byte() throws SolverException, InterruptedException {
+
     StringFormula num7 = smgr.makeString("7");
     StringFormula u = smgr.makeString("u");
     StringFormula curlyOpen2BUnicode = smgr.makeString("\\u{7B}");
@@ -1352,12 +1420,12 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
     StringFormula middle = smgr.makeVariable("middle");
     StringFormula end = smgr.makeVariable("end");
 
-    // If beginning + middle + end (length of each > 0) get concated (in original), replacing
+    // If beginning + middle + end (length of each > 0) get concatenated (in original), replacing
     // beginning/middle/end
     // with replacement (result = replaces; replacement > 0 and != the replaced) results in a
     // string that is equal to the concat of the 2 remaining start strings and the replaced one
     // replaced
-    // This is tested with 2 different implications, 1 that only checks wheter or not the
+    // This is tested with 2 different implications, 1 that only checks whether or not the
     // replacement is contained in the string and not in the original and vice verse for the
     // replaced String
     BooleanFormula formula =
@@ -1376,6 +1444,11 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
             bmgr.and(
                 bmgr.not(smgr.equal(original, replaced)), smgr.contains(replaced, replacement)));
 
+    assume()
+        .withMessage("Solver %s returns the initial formula.", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC5);
+
     // Same as above, but with concat instead of contains
     assertThatFormula(formula)
         .implies(
@@ -1389,7 +1462,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
     assume()
         .withMessage("Solver %s runs endlessly on this task.", solverToUse())
         .that(solverToUse())
-        .isNotEqualTo(Solvers.Z3);
+        .isNoneOf(Solvers.Z3, Solvers.CVC5);
 
     StringFormula var1 = smgr.makeVariable("var1");
     StringFormula var2 = smgr.makeVariable("var2");
@@ -1537,5 +1610,44 @@ public class StringFormulaManagerTest extends SolverBasedTest0 {
   @Test
   public void testStringSimpleRegex() {
     // TODO
+  }
+
+  @Test
+  public void testVisitorForStringConstants() {
+    BooleanFormula eq =
+        bmgr.and(
+            smgr.equal(smgr.makeString("x"), smgr.makeString("xx")),
+            smgr.lessThan(smgr.makeString("y"), smgr.makeString("yy")));
+    Map<String, Formula> freeVars = mgr.extractVariables(eq);
+    assertThat(freeVars).isEmpty();
+    Map<String, Formula> freeVarsAndUfs = mgr.extractVariablesAndUFs(eq);
+    assertThat(freeVarsAndUfs).isEmpty();
+  }
+
+  @Test
+  public void testVisitorForRegexConstants() {
+    RegexFormula concat = smgr.concat(smgr.makeRegex("x"), smgr.makeRegex("xx"));
+    Map<String, Formula> freeVars = mgr.extractVariables(concat);
+    assertThat(freeVars).isEmpty();
+    Map<String, Formula> freeVarsAndUfs = mgr.extractVariablesAndUFs(concat);
+    assertThat(freeVarsAndUfs).isEmpty();
+  }
+
+  @Test
+  public void testVisitorForStringSymbols() {
+    BooleanFormula eq = smgr.equal(smgr.makeVariable("x"), smgr.makeString("xx"));
+    Map<String, Formula> freeVars = mgr.extractVariables(eq);
+    assertThat(freeVars).containsExactly("x", smgr.makeVariable("x"));
+    Map<String, Formula> freeVarsAndUfs = mgr.extractVariablesAndUFs(eq);
+    assertThat(freeVarsAndUfs).containsExactly("x", smgr.makeVariable("x"));
+  }
+
+  @Test
+  public void testVisitorForRegexSymbols() {
+    BooleanFormula in = smgr.in(smgr.makeVariable("x"), smgr.makeRegex("xx"));
+    Map<String, Formula> freeVars = mgr.extractVariables(in);
+    assertThat(freeVars).containsExactly("x", smgr.makeVariable("x"));
+    Map<String, Formula> freeVarsAndUfs = mgr.extractVariablesAndUFs(in);
+    assertThat(freeVarsAndUfs).containsExactly("x", smgr.makeVariable("x"));
   }
 }

@@ -290,13 +290,33 @@ SPDX-License-Identifier: Apache-2.0
           <root url="jar://$MODULE_DIR$/lib/java/runtime-z3/com.microsoft.z3.jar!/" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/java-contrib/com.microsoft.z3-sources.jar!/" />
+        </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/java/runtime-cvc4/CVC4.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-cvc5/cvc5.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-opensmt/opensmt.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

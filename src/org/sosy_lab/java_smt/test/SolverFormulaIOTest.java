@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.test;
 
+import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.getLast;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
@@ -18,12 +19,9 @@ import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multiset;
 import com.google.common.truth.TruthJUnit;
+import java.util.List;
 import java.util.function.Supplier;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -32,9 +30,8 @@ import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 
-@RunWith(Parameterized.class)
 @SuppressWarnings("checkstyle:linelength")
-public class SolverFormulaIOTest extends SolverBasedTest0 {
+public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   private static final String MATHSAT_DUMP1 =
       "(set-info :source |printed by MathSAT|)\n"
           + "(declare-fun a () Bool)\n"
@@ -99,19 +96,6 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
           + "(declare-fun u () Bool)\n"
           + "(assert  (let (($x35 (and (xor q (= (+ a b) c)) (>= a b)))) (let (($x9 (= a b))) (and"
           + " (and (or $x35 u) q) (and $x9 $x35)))))";
-
-  @Parameters(name = "{0}")
-  public static Object[] getAllSolvers() {
-    return Solvers.values();
-  }
-
-  @Parameter(0)
-  public Solvers solver;
-
-  @Override
-  protected Solvers solverToUse() {
-    return solver;
-  }
 
   @Test
   public void varDumpTest() {
@@ -319,7 +303,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
         .withMessage(
             "Solver %s does not remove redundant sub formulae from formula dump.", solverToUse())
         .that(solverToUse())
-        .isNotEqualTo(Solvers.YICES2);
+        .isNoneOf(Solvers.YICES2, Solvers.CVC5);
 
     assume()
         .withMessage(
@@ -424,13 +408,23 @@ public class SolverFormulaIOTest extends SolverBasedTest0 {
     assertWithMessage("duplicate function declarations").that(funDeclares).isEmpty();
   }
 
-  private void checkThatAssertIsInLastLine(String lines) {
+  private void checkThatAssertIsInLastLine(String dump) {
     // Boolector will fail this anyway since bools are bitvecs for btor
     TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
-    lines = lines.trim();
-    assertWithMessage("last line of <\n" + lines + ">")
-        .that(getLast(Splitter.on('\n').split(lines)))
+
+    List<String> lines = Splitter.on('\n').splitToList(dump.trim());
+    String lineUnderTest = getLast(lines);
+
+    if (solver == Solvers.OPENSMT) {
+      // OpenSMT prints assertions over several lines, so lets find the last SMT-LIB command by
+      // heuristic: the last line starting with a plain bracket.
+      lineUnderTest = getLast(filter(lines, line -> line.startsWith("(")));
+    }
+
+    assertWithMessage("last line(s) of <\n" + dump + ">")
+        .that(lineUnderTest)
         .startsWith("(assert ");
+    assertWithMessage("last line(s) of <\n" + dump + ">").that(getLast(lines)).endsWith(")");
   }
 
   @SuppressWarnings("CheckReturnValue")

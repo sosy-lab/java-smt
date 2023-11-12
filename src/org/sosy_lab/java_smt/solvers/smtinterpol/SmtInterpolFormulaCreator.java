@@ -23,11 +23,12 @@ import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.logic.Theory;
+import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
@@ -62,7 +63,7 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
     } else if (pSort == getBoolType()) {
       return FormulaType.BooleanType;
     } else if (pSort.isArraySort()) {
-      return new FormulaType.ArrayFormulaType<>(
+      return FormulaType.getArrayType(
           getFormulaTypeOfSort(pSort.getArguments()[0]),
           getFormulaTypeOfSort(pSort.getArguments()[1]));
     } else {
@@ -77,7 +78,7 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
       final FormulaType<?> arrayIndexType = getArrayFormulaIndexType((ArrayFormula<?, ?>) pFormula);
       final FormulaType<?> arrayElementType =
           getArrayFormulaElementType((ArrayFormula<?, ?>) pFormula);
-      return (FormulaType<T>) new ArrayFormulaType<>(arrayIndexType, arrayElementType);
+      return (FormulaType<T>) FormulaType.getArrayType(arrayIndexType, arrayElementType);
     }
 
     return super.getFormulaType(pFormula);
@@ -164,22 +165,17 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
        * and currently we do not support bitvectors for SmtInterpol.
        */
       Rational rationalValue = (Rational) ((ConstantTerm) value).getValue();
-      org.sosy_lab.common.rationals.Rational out =
+      org.sosy_lab.common.rationals.Rational ratValue =
           org.sosy_lab.common.rationals.Rational.of(
               rationalValue.numerator(), rationalValue.denominator());
-      if (getFormulaTypeOfSort(value.getSort()).isIntegerType()) {
-        assert out.isIntegral();
-        return out.getNum();
-      } else {
-        return out;
-      }
+      return ratValue.isIntegral() ? ratValue.getNum() : ratValue;
     } else {
       throw new IllegalArgumentException("Unexpected value: " + value);
     }
   }
 
   /** ApplicationTerms can be wrapped with "|". This function removes those chars. */
-  private String dequote(String s) {
+  public static String dequote(String s) {
     int l = s.length();
     if (s.charAt(0) == '|' && s.charAt(l - 1) == '|') {
       return s.substring(1, l - 1);
@@ -199,7 +195,8 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
       Object interpolValue = ((ConstantTerm) input).getValue();
       if (interpolValue instanceof Rational) {
         Rational rat = (Rational) interpolValue;
-        if (input.getSort().getName().equals("Int") && rat.isIntegral()) {
+        if ((input.getSort().getName().equals("Int") && rat.isIntegral())
+            || BigInteger.ONE.equals(rat.denominator())) {
           outValue = rat.numerator();
         } else {
           outValue = org.sosy_lab.common.rationals.Rational.of(rat.numerator(), rat.denominator());
@@ -321,8 +318,10 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
       case "-":
         return FunctionDeclarationKind.SUB;
       case "/":
+      case "div":
         return FunctionDeclarationKind.DIV;
       case "%":
+      case "mod":
         return FunctionDeclarationKind.MODULO;
       case "<":
         return FunctionDeclarationKind.LT;
@@ -334,6 +333,8 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
         return FunctionDeclarationKind.GTE;
       case "to_int":
         return FunctionDeclarationKind.FLOOR;
+      case "to_real":
+        return FunctionDeclarationKind.TO_REAL;
       default:
         // TODO: other declaration kinds!
         return FunctionDeclarationKind.OTHER;
@@ -348,7 +349,22 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
 
   @Override
   public Term callFunctionImpl(FunctionSymbol declaration, List<Term> args) {
-    return environment.term(declaration.getName(), args.toArray(new Term[0]));
+
+    // add an explicit cast from INT to RATIONAL if needed
+    final List<Term> castedArgs = new ArrayList<>();
+    for (int i = 0; i < args.size(); i++) {
+      // for chainable functions like EQ, DISTINCT, ADD, we repeat the last argument-type
+      int index = Math.min(i, declaration.getParameterSorts().length - 1);
+      Term arg = args.get(i);
+      Sort argSort = arg.getSort();
+      Sort paramSort = declaration.getParameterSorts()[index];
+      if (getRationalType() == paramSort && getIntegerType() == argSort) {
+        arg = environment.term("to_real", arg);
+      }
+      castedArgs.add(arg);
+    }
+
+    return environment.term(declaration.getName(), castedArgs.toArray(new Term[0]));
   }
 
   @Override

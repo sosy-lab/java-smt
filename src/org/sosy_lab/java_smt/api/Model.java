@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2022 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -11,90 +11,44 @@ package org.sosy_lab.java_smt.api;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import java.math.BigInteger;
-import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Objects;
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
-import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 
-/** A model returned from the satisfiable solver environment. */
-public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
-
-  /**
-   * Evaluate a given formula substituting the values from the model and return it as formula.
-   *
-   * <p>If a value is not relevant to the satisfiability result, the solver can choose either to
-   * insert an arbitrary value (e.g., the value <code>0</code> for the matching type) or just return
-   * <code>null</code>.
-   *
-   * <p>The formula does not need to be a variable, we also allow complex expression. The solver
-   * will replace all symbols from the formula with their model values and then simplify the formula
-   * into a simple formula, e.g., consisting only of a numeral expression.
-   *
-   * @param formula Input formula to be evaluated.
-   * @return evaluation of the given formula or <code>null</code> if the solver does not provide a
-   *     better evaluation.
-   */
-  @Nullable <T extends Formula> T eval(T formula);
-
-  /**
-   * Evaluate a given formula substituting the values from the model.
-   *
-   * <p>If a value is not relevant to the satisfiability result, the model can choose either an
-   * arbitrary value (e.g., the value <code>0</code> for the matching type) or just return <code>
-   * null</code>.
-   *
-   * <p>The formula does not need to be a variable, we also allow complex expression.
-   *
-   * @param f Input formula
-   * @return Either of: - Number (Rational/Double/BigInteger/Long/Integer) - Boolean - String
-   * @throws IllegalArgumentException if a formula has unexpected type, e.g. Array.
-   */
-  @Nullable Object evaluate(Formula f);
-
-  /**
-   * Type-safe evaluation for integer formulas.
-   *
-   * <p>The formula does not need to be a variable, we also allow complex expression.
-   */
-  @Nullable BigInteger evaluate(IntegerFormula f);
-
-  /**
-   * Type-safe evaluation for rational formulas.
-   *
-   * <p>The formula does not need to be a variable, we also allow complex expression.
-   */
-  @Nullable Rational evaluate(RationalFormula f);
-
-  /**
-   * Type-safe evaluation for boolean formulas.
-   *
-   * <p>The formula does not need to be a variable, we also allow complex expression.
-   */
-  @Nullable Boolean evaluate(BooleanFormula f);
-
-  /**
-   * Type-safe evaluation for bitvector formulas.
-   *
-   * <p>The formula does not need to be a variable, we also allow complex expression.
-   */
-  @Nullable BigInteger evaluate(BitvectorFormula f);
-
-  /**
-   * Type-safe evaluation for string formulas.
-   *
-   * <p>The formula does not need to be a variable, we also allow complex expression.
-   */
-  @Nullable String evaluate(StringFormula f);
+/**
+ * This class provides a model with concrete evaluations for symbols and formulas from the
+ * satisfiable solver environment.
+ *
+ * <p>This class is an extensions of {@link Evaluator} and provides more features:
+ *
+ * <ul>
+ *   <li>a listing of model assignments, i.e., the user can iterate over all available symbols and
+ *       their assignments,
+ *   <li>a guaranteed availability even after applying any operation on the original prover stack, i
+ *       .e., the model instance stays constant and remains valid for one given satisfiable prover
+ *       environment.
+ * </ul>
+ */
+public interface Model extends Evaluator, Iterable<ValueAssignment>, AutoCloseable {
 
   /**
    * Iterate over all values present in the model. Note that iterating multiple times may be
    * inefficient for some solvers, it is recommended to use {@link
    * BasicProverEnvironment#getModelAssignments()} instead in this case.
+   *
+   * <p>The iteration includes value assignments for...
+   *
+   * <ul>
+   *   <li>all relevant free variables of simple type. If a variable is irrelevant for
+   *       satisfiability, it can be <code>null</code> or missing in the iteration.
+   *   <li>(nested) arrays with all accesses. If an array access is applied within a quantified
+   *       context, some value assignments can be missing in the iteration. Please use a direct
+   *       evaluation query to get the evaluation in such a case.
+   *   <li>uninterpreted functions with all applications. If an uninterpreted function is applied
+   *       within a quantified context, some value assignments can be missing in the iteration.
+   *       Please use a direct evaluation query to get the evaluation in such a case.
+   * </ul>
    */
   @Override
   default Iterator<ValueAssignment> iterator() {
@@ -104,7 +58,16 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
   /** Build a list of assignments that stays valid after closing the model. */
   ImmutableList<ValueAssignment> asList();
 
-  /** Pretty-printing of the model values. */
+  /**
+   * Pretty-printing of the model values.
+   *
+   * <p>Please only use this method for debugging and not for retrieving relevant information about
+   * the model. The returned model representation is not intended for further usage like parsing,
+   * because we do not guarantee any specific format, e.g., for arrays and uninterpreted functions,
+   * and we allow the SMT solver to include arbitrary additional information about the current
+   * solver state, e.g., any available symbol in the solver, even from other provers, and temporary
+   * internal symbols.
+   */
   @Override
   String toString();
 
@@ -168,7 +131,7 @@ public interface Model extends Iterable<ValueAssignment>, AutoCloseable {
         BooleanFormula formula,
         String name,
         Object value,
-        Collection<?> argumentInterpretation) {
+        List<?> argumentInterpretation) {
 
       this.keyFormula = Preconditions.checkNotNull(keyFormula);
       this.valueFormula = Preconditions.checkNotNull(valueFormula);

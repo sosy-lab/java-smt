@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.princess;
 
+import ap.api.SimpleAPI;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -21,8 +22,6 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
-import org.sosy_lab.java_smt.basicimpl.reusableStack.ReusableStackInterpolatingProver;
-import org.sosy_lab.java_smt.basicimpl.reusableStack.ReusableStackTheoremProver;
 
 public final class PrincessSolverContext extends AbstractSolverContext {
 
@@ -80,17 +79,15 @@ public final class PrincessSolverContext extends AbstractSolverContext {
       throw new UnsupportedOperationException(
           "Princess does not support unsat core generation with assumptions yet");
     }
-    return new ReusableStackTheoremProver(
-        (PrincessTheoremProver) creator.getEnv().getNewProver(false, manager, creator, options));
+    return (PrincessTheoremProver) creator.getEnv().getNewProver(false, manager, creator, options);
   }
 
   @SuppressWarnings("resource")
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> options) {
-    return new ReusableStackInterpolatingProver<>(
-        (PrincessInterpolatingProver)
-            creator.getEnv().getNewProver(true, manager, creator, options));
+    return (PrincessInterpolatingProver)
+        creator.getEnv().getNewProver(true, manager, creator, options);
   }
 
   @Override
@@ -101,7 +98,7 @@ public final class PrincessSolverContext extends AbstractSolverContext {
 
   @Override
   public String getVersion() {
-    return "Princess " + ap.SimpleAPI.version();
+    return "Princess " + SimpleAPI.version();
   }
 
   @Override

@@ -42,6 +42,7 @@ import org.sosy_lab.common.time.Timer;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.EnumerationFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.Formula;
@@ -58,6 +59,7 @@ import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
 import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3ArrayFormula;
 import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3BitvectorFormula;
 import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3BooleanFormula;
+import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3EnumerationFormula;
 import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3FloatingPointFormula;
 import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3IntegerFormula;
@@ -90,12 +92,14 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
               Z3_decl_kind.Z3_OP_FPA_RM_TOWARD_NEGATIVE.toInt(),
               FloatingPointRoundingMode.TOWARD_NEGATIVE)
           .put(Z3_decl_kind.Z3_OP_FPA_RM_TOWARD_ZERO.toInt(), FloatingPointRoundingMode.TOWARD_ZERO)
-          .build();
+          .buildOrThrow();
 
   // Set of error messages that might occur if Z3 is interrupted.
   private static final ImmutableSet<String> Z3_INTERRUPT_ERRORS =
       ImmutableSet.of(
           "canceled", // Z3::src/util/common_msgs.cpp
+          "push canceled", // src/smt/smt_context.cpp
+          "interrupted from keyboard", // Z3: src/solver/check_sat_result.cpp
           "Proof error!",
           "interrupted", // Z3::src/solver/check_sat_result.cpp
           "maximization suspended" // Z3::src/opt/opt_solver.cpp
@@ -151,6 +155,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     long z3context = getEnv();
     long symbol = Native.mkStringSymbol(z3context, varName);
     long var = Native.mkConst(z3context, symbol, type);
+    Native.incRef(z3context, var);
     symbolsToDeclarations.put(varName, Native.getAppDecl(z3context, var));
     return var;
   }
@@ -196,6 +201,14 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       case Z3_RE_SORT:
         return FormulaType.RegexType;
       case Z3_DATATYPE_SORT:
+        int n = Native.getDatatypeSortNumConstructors(z3context, pSort);
+        ImmutableSet.Builder<String> elements = ImmutableSet.builder();
+        for (int i = 0; i < n; i++) {
+          long decl = Native.getDatatypeSortConstructor(z3context, pSort, i);
+          elements.add(symbolToString(Native.getDeclName(z3context, decl)));
+        }
+        return FormulaType.getEnumerationType(
+            Native.sortToString(z3context, pSort), elements.build());
       case Z3_RELATION_SORT:
       case Z3_FINITE_DOMAIN_SORT:
       case Z3_SEQ_SORT:
@@ -286,6 +299,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
           storePhantomReference(
               new Z3ArrayFormula<>(getEnv(), pTerm, arrFt.getIndexType(), arrFt.getElementType()),
               pTerm);
+    } else if (pType.isEnumerationType()) {
+      return (T) storePhantomReference(new Z3EnumerationFormula(getEnv(), pTerm), pTerm);
     }
 
     throw new IllegalArgumentException("Cannot create formulas of type " + pType + " in Z3");
@@ -332,6 +347,17 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
             Native.sortToString(getEnv(), Native.getSort(getEnv(), pTerm)));
     cleanupReferences();
     return storePhantomReference(new Z3RegexFormula(getEnv(), pTerm), pTerm);
+  }
+
+  @Override
+  protected EnumerationFormula encapsulateEnumeration(Long pTerm) {
+    assert getFormulaType(pTerm).isEnumerationType()
+        : String.format(
+            "Term %s has unexpected type %s.",
+            Native.astToString(getEnv(), pTerm),
+            Native.sortToString(getEnv(), Native.getSort(getEnv(), pTerm)));
+    cleanupReferences();
+    return storePhantomReference(new Z3EnumerationFormula(getEnv(), pTerm), pTerm);
   }
 
   @Override
@@ -397,19 +423,30 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
           if (value != null) {
             return visitor.visitConstant(formula, value);
 
+            // Rounding mode
           } else if (declKind == Z3_decl_kind.Z3_OP_FPA_NUM.toInt()
               || Native.getSortKind(environment, Native.getSort(environment, f))
                   == Z3_sort_kind.Z3_ROUNDING_MODE_SORT.toInt()) {
             return visitor.visitConstant(formula, convertValue(f));
 
-          } else {
+            // string constant
+          } else if (declKind == Z3_decl_kind.Z3_OP_INTERNAL.toInt()
+              && Native.getSortKind(environment, Native.getSort(environment, f))
+                  == Z3_sort_kind.Z3_SEQ_SORT.toInt()) {
+            return visitor.visitConstant(formula, convertValue(f));
 
-            // Has to be a variable otherwise.
-            // TODO: assert that.
+            // Free variable
+          } else if (declKind == Z3_decl_kind.Z3_OP_UNINTERPRETED.toInt()
+              || declKind == Z3_decl_kind.Z3_OP_INTERNAL.toInt()) {
             return visitor.visitFreeVariable(formula, getAppName(f));
-          }
+
+            // enumeration constant
+          } else if (declKind == Z3_decl_kind.Z3_OP_DT_CONSTRUCTOR.toInt()) {
+            return visitor.visitConstant(formula, convertValue(f));
+          } // else: fall-through with a function application
         }
 
+        // Function application with zero or more parameters
         ImmutableList.Builder<Formula> args = ImmutableList.builder();
         ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
         for (int i = 0; i < arity; i++) {
@@ -472,8 +509,11 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   }
 
   private FunctionDeclarationKind getDeclarationKind(long f) {
-    assert Native.getArity(environment, Native.getAppDecl(environment, f)) > 0
-        : "Variables should be handled in other branch.";
+    final int arity = Native.getArity(environment, Native.getAppDecl(environment, f));
+    assert arity > 0
+        : String.format(
+            "Unexpected arity '%s' for formula '%s' for handling a function application.",
+            arity, Native.astToString(environment, f));
     if (getAppName(f).equals("div0")) {
       // Z3 segfaults in getDeclKind for this term (cf. https://github.com/Z3Prover/z3/issues/669)
       return FunctionDeclarationKind.OTHER;
@@ -510,6 +550,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.MODULO;
       case Z3_OP_TO_INT:
         return FunctionDeclarationKind.FLOOR;
+      case Z3_OP_TO_REAL:
+        return FunctionDeclarationKind.TO_REAL;
 
       case Z3_OP_UNINTERPRETED:
         return FunctionDeclarationKind.UF;
@@ -643,6 +685,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.BV_UCASTTO_FP;
       case Z3_OP_FPA_TO_SBV:
         return FunctionDeclarationKind.FP_CASTTO_SBV;
+      case Z3_OP_FPA_TO_UBV:
+        return FunctionDeclarationKind.FP_CASTTO_UBV;
       case Z3_OP_FPA_TO_IEEE_BV:
         return FunctionDeclarationKind.FP_AS_IEEEBV;
       case Z3_OP_FPA_TO_FP:
@@ -728,14 +772,14 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     return Native.isNumeralAst(environment, value)
         || Native.isAlgebraicNumber(environment, value)
         || Native.isString(environment, value)
-        || isOP(environment, value, Z3_decl_kind.Z3_OP_TRUE.toInt())
-        || isOP(environment, value, Z3_decl_kind.Z3_OP_FALSE.toInt());
+        || isOP(environment, value, Z3_decl_kind.Z3_OP_TRUE)
+        || isOP(environment, value, Z3_decl_kind.Z3_OP_FALSE);
   }
 
   /**
    * @param value Z3_ast representing a constant value.
    * @return {@link BigInteger} or {@link Double} or {@link Rational} or {@link Boolean} or {@link
-   *     FloatingPointRoundingMode}.
+   *     FloatingPointRoundingMode} or {@link String}.
    */
   @Override
   public Object convertValue(Long value) {
@@ -754,19 +798,21 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     try {
       FormulaType<?> type = getFormulaType(value);
       if (type.isBooleanType()) {
-        return isOP(environment, value, Z3_decl_kind.Z3_OP_TRUE.toInt());
+        return isOP(environment, value, Z3_decl_kind.Z3_OP_TRUE);
       } else if (type.isIntegerType()) {
         return new BigInteger(Native.getNumeralString(environment, value));
       } else if (type.isRationalType()) {
-        return Rational.ofString(Native.getNumeralString(environment, value));
+        Rational ratValue = Rational.ofString(Native.getNumeralString(environment, value));
+        return ratValue.isIntegral() ? ratValue.getNum() : ratValue;
       } else if (type.isStringType()) {
         return Native.getString(environment, value);
       } else if (type.isBitvectorType()) {
         return new BigInteger(Native.getNumeralString(environment, value));
       } else if (type.isFloatingPointType()) {
-
         // Converting to Rational first.
         return convertValue(Native.simplify(environment, Native.mkFpaToReal(environment, value)));
+      } else if (type.isEnumerationType()) {
+        return Native.astToString(environment, value);
       } else {
 
         // Explicitly crash on unknown type.
@@ -799,13 +845,13 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   }
 
   /** returns, if the function of the expression is the given operation. */
-  static boolean isOP(long z3context, long expr, int op) {
+  static boolean isOP(long z3context, long expr, Z3_decl_kind op) {
     if (!Native.isApp(z3context, expr)) {
       return false;
     }
 
     long decl = Native.getAppDecl(z3context, expr);
-    return Native.getDeclKind(z3context, decl) == op;
+    return Native.getDeclKind(z3context, decl) == op.toInt();
   }
 
   /**
@@ -818,11 +864,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       throws InterruptedException, SolverException {
     long overallResult = pF;
     for (String tactic : pTactics) {
-      long tacticResult = applyTactic(z3context, overallResult, tactic);
-      if (overallResult != pF) {
-        Native.applyResultDecRef(z3context, overallResult);
-      }
-      overallResult = tacticResult;
+      overallResult = applyTactic(z3context, overallResult, tactic);
     }
     return overallResult;
   }
@@ -850,12 +892,10 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     } catch (Z3Exception exp) {
       throw handleZ3Exception(exp);
     }
-    Native.applyResultIncRef(z3context, result);
 
     try {
       return applyResultToAST(z3context, result);
     } finally {
-      Native.applyResultDecRef(z3context, result);
       Native.goalDecRef(z3context, goal);
       Native.tacticDecRef(z3context, tacticObject);
     }
@@ -864,43 +904,24 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   private long applyResultToAST(long z3context, long applyResult) {
     int subgoalsCount = Native.applyResultGetNumSubgoals(z3context, applyResult);
     long[] goalFormulas = new long[subgoalsCount];
-
     for (int i = 0; i < subgoalsCount; i++) {
       long subgoal = Native.applyResultGetSubgoal(z3context, applyResult, i);
-      Native.goalIncRef(z3context, subgoal);
-      long subgoalAst = goalToAST(z3context, subgoal);
-      Native.incRef(z3context, subgoalAst);
-      goalFormulas[i] = subgoalAst;
-      Native.goalDecRef(z3context, subgoal);
+      goalFormulas[i] = goalToAST(z3context, subgoal);
     }
-    try {
-      return goalFormulas.length == 1
-          ? goalFormulas[0]
-          : Native.mkOr(z3context, goalFormulas.length, goalFormulas);
-    } finally {
-      for (int i = 0; i < subgoalsCount; i++) {
-        Native.decRef(z3context, goalFormulas[i]);
-      }
-    }
+    return goalFormulas.length == 1
+        ? goalFormulas[0]
+        : Native.mkOr(z3context, goalFormulas.length, goalFormulas);
   }
 
   private long goalToAST(long z3context, long goal) {
     int subgoalFormulasCount = Native.goalSize(z3context, goal);
     long[] subgoalFormulas = new long[subgoalFormulasCount];
     for (int k = 0; k < subgoalFormulasCount; k++) {
-      long f = Native.goalFormula(z3context, goal, k);
-      Native.incRef(z3context, f);
-      subgoalFormulas[k] = f;
+      subgoalFormulas[k] = Native.goalFormula(z3context, goal, k);
     }
-    try {
-      return subgoalFormulas.length == 1
-          ? subgoalFormulas[0]
-          : Native.mkAnd(z3context, subgoalFormulas.length, subgoalFormulas);
-    } finally {
-      for (int k = 0; k < subgoalFormulasCount; k++) {
-        Native.decRef(z3context, subgoalFormulas[k]);
-      }
-    }
+    return subgoalFormulas.length == 1
+        ? subgoalFormulas[0]
+        : Native.mkAnd(z3context, subgoalFormulas.length, subgoalFormulas);
   }
 
   /** Closing the context. */

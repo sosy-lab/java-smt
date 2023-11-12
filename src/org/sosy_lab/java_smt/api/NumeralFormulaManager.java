@@ -66,7 +66,18 @@ public interface NumeralFormulaManager<
 
   ResultFormulaType subtract(ParamFormulaType number1, ParamFormulaType number2);
 
-  ResultFormulaType divide(ParamFormulaType number1, ParamFormulaType number2);
+  /**
+   * Create a formula representing the division of two operands.
+   *
+   * <p>If the denumerator evaluates to zero (division-by-zero), either directly as value or
+   * indirectly via an additional constraint, then the solver is allowed to choose an arbitrary
+   * value for the result of the division (cf. SMTLIB standard for the division operator in Ints or
+   * Reals theory).
+   *
+   * <p>Note: Some solvers, e.g., Yices2, abort with an exception when exploring a division-by-zero
+   * during the SAT-check. This is not compliant to the SMTLIB standard, but sadly happens.
+   */
+  ResultFormulaType divide(ParamFormulaType numerator, ParamFormulaType denumerator);
 
   ResultFormulaType multiply(ParamFormulaType number1, ParamFormulaType number2);
 
@@ -74,7 +85,7 @@ public interface NumeralFormulaManager<
 
   BooleanFormula equal(ParamFormulaType number1, ParamFormulaType number2);
 
-  /** all given numbers are pairwise unequal. */
+  /** All given numbers are pairwise unequal. */
   BooleanFormula distinct(List<ParamFormulaType> pNumbers);
 
   BooleanFormula greaterThan(ParamFormulaType number1, ParamFormulaType number2);
@@ -89,7 +100,7 @@ public interface NumeralFormulaManager<
    * The {@code floor} operation returns the nearest integer formula that is less or equal to the
    * given argument formula.
    *
-   * <p>For rational formulae, SMTlib2 denotes this operation as {@code to_int}.
+   * <p>For rational formulas, SMTlib2 denotes this operation as {@code to_int}.
    */
   IntegerFormula floor(ParamFormulaType formula);
 }

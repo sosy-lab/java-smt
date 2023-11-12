@@ -210,7 +210,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
 
   @Override
   public BitvectorFormula and(BitvectorFormula pBits1, BitvectorFormula pBits2) {
-    assert getLength(pBits1) == getLength(pBits2);
+    checkSameSize(pBits1, pBits2, "combine");
     TFormulaInfo param1 = extractInfo(pBits1);
     TFormulaInfo param2 = extractInfo(pBits2);
 
@@ -221,7 +221,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
 
   @Override
   public BitvectorFormula or(BitvectorFormula pBits1, BitvectorFormula pBits2) {
-    assert getLength(pBits1) == getLength(pBits2);
+    checkSameSize(pBits1, pBits2, "combine");
     TFormulaInfo param1 = extractInfo(pBits1);
     TFormulaInfo param2 = extractInfo(pBits2);
 
@@ -232,7 +232,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
 
   @Override
   public BitvectorFormula xor(BitvectorFormula pBits1, BitvectorFormula pBits2) {
-    assert getLength(pBits1) == getLength(pBits2);
+    checkSameSize(pBits1, pBits2, "combine");
     TFormulaInfo param1 = extractInfo(pBits1);
     TFormulaInfo param2 = extractInfo(pBits2);
 
@@ -325,22 +325,21 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
   protected abstract TFormulaInfo concat(TFormulaInfo number, TFormulaInfo pAppend);
 
   @Override
-  public final BitvectorFormula extract(
-      BitvectorFormula pNumber, int pMsb, int pLsb, boolean pSigned) {
-    TFormulaInfo param = extractInfo(pNumber);
-
-    return wrap(extract(param, pMsb, pLsb, pSigned));
+  public final BitvectorFormula extract(BitvectorFormula pNumber, int pMsb, int pLsb) {
+    final int bitsize = getLength(pNumber);
+    checkArgument(0 <= pLsb, "index out of bounds (negative index %s)", pLsb);
+    checkArgument(pLsb <= pMsb, "invalid range (lsb %s larger than msb %s)", pLsb, pMsb);
+    checkArgument(pMsb < bitsize, "index out of bounds (index %s beyond length %s)", pMsb, bitsize);
+    return wrap(extract(extractInfo(pNumber), pMsb, pLsb));
   }
 
-  protected abstract TFormulaInfo extract(
-      TFormulaInfo pNumber, int pMsb, int pLsb, boolean pSigned);
+  protected abstract TFormulaInfo extract(TFormulaInfo pNumber, int pMsb, int pLsb);
 
   @Override
   public final BitvectorFormula extend(
       BitvectorFormula pNumber, int pExtensionBits, boolean pSigned) {
-    TFormulaInfo param = extractInfo(pNumber);
-
-    return wrap(extend(param, pExtensionBits, pSigned));
+    checkArgument(0 <= pExtensionBits, "can not extend a negative number of bits");
+    return wrap(extend(extractInfo(pNumber), pExtensionBits, pSigned));
   }
 
   protected abstract TFormulaInfo extend(TFormulaInfo pNumber, int pExtensionBits, boolean pSigned);

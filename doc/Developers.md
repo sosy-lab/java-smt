@@ -25,7 +25,7 @@ on the staged files in order to format them, or `ant format-source` in order to
 format the entire project.
 
 Additionally, refer to the CPAchecker
-[style guide](https://github.com/sosy-lab/cpachecker/blob/trunk/doc/StyleGuide.txt)
+[style guide](https://github.com/sosy-lab/cpachecker/blob/trunk/doc/StyleGuide.md)
 for more information.
 
 

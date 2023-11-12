@@ -132,6 +132,11 @@ class Z3StringFormulaManager extends AbstractStringFormulaManager<Long, Long, Lo
   }
 
   @Override
+  protected Long allCharImpl() {
+    return Native.mkReAllchar(z3context, formulaCreator.getRegexType());
+  }
+
+  @Override
   protected Long range(Long start, Long end) {
     return Native.mkReRange(z3context, start, end);
   }

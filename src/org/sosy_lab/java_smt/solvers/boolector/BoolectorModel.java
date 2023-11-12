@@ -18,11 +18,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.sosy_lab.java_smt.basicimpl.AbstractModel.CachingAbstractModel;
+import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 
-class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
+class BoolectorModel extends AbstractModel<Long, Long, Long> {
 
-  // TODO: The rest of the keywords any maybe make this a map for O(1) access
   private static final ImmutableSet<String> SMT_KEYWORDS =
       ImmutableSet.of(
           "let",
@@ -46,11 +45,7 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
           "as",
           "BINARY",
           "DECIMAL",
-          "exists",
           "HEXADECIMAL",
-          "forall",
-          "let",
-          "match",
           "NUMERAL",
           "par",
           "STRING",
@@ -87,8 +82,6 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
   private final long btor;
   private final BoolectorAbstractProver<?> prover;
   private final BoolectorFormulaCreator bfCreator;
-  private boolean closed = false;
-
   private final ImmutableList<Long> assertedTerms;
 
   BoolectorModel(
@@ -96,7 +89,7 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
       BoolectorFormulaCreator creator,
       BoolectorAbstractProver<?> pProver,
       Collection<Long> assertedTerms) {
-    super(creator);
+    super(pProver, creator);
     this.bfCreator = creator;
     this.btor = btor;
     this.prover = pProver;
@@ -105,11 +98,10 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
 
   @Override
   public void close() {
-    if (!closed) {
-      // Technically boolector has no model,
-      // but you could release all bindings.
-      closed = true;
+    if (!isClosed()) {
+      // TODO Technically Boolector has no model, but you could release all bindings.
     }
+    super.close();
   }
 
   /* (non-Javadoc)
@@ -135,8 +127,8 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
   * we have to strip this if it occurs
   */
   @Override
-  protected ImmutableList<ValueAssignment> toList() {
-    Preconditions.checkState(!closed);
+  public ImmutableList<ValueAssignment> asList() {
+    Preconditions.checkState(!isClosed());
     Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
     // Use String instead of the node (long) as we need the name again later!
     ImmutableSet.Builder<String> variablesBuilder = ImmutableSet.builder();
@@ -193,7 +185,7 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
   }
 
   private ImmutableList<ValueAssignment> toList1(Set<String> variables) {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
     ImmutableList.Builder<ValueAssignment> assignmentBuilder = ImmutableList.builder();
     for (String name : variables) {
@@ -286,7 +278,7 @@ class BoolectorModel extends CachingAbstractModel<Long, Long, Long> {
 
   @Override
   protected Long evalImpl(Long pFormula) {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     return pFormula;
   }
 }

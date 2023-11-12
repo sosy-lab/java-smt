@@ -13,6 +13,7 @@ import static com.google.common.truth.Truth.assertThat;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.util.Arrays;
+import java.util.Locale;
 import org.junit.After;
 import org.junit.AssumptionViolatedException;
 import org.junit.Before;
@@ -68,14 +69,16 @@ public class BoolectorNativeApiTest {
           .put("BTOR_OPT_BETA_REDUCE", "BTOR_OPT_BETA_REDUCE")
           .put("BTOR_OPT_DUMP_DIMACS", "BTOR_OPT_PRINT_DIMACS")
           .put("BTOR_OPT_SIMP_NORM_ADDS", "BTOR_OPT_SIMP_NORMAMLIZE_ADDERS")
-          .build();
+          .buildOrThrow();
 
   @Test
   public void optionNameTest() {
     // check whether our enum is identical to Boolector's internal enum
     for (BtorOption option : BtorOption.values()) {
       String optName = BtorJNI.boolector_get_opt_lng(btor, option.getValue());
-      String converted = "BTOR_OPT_" + optName.replace("-", "_").replace(":", "_").toUpperCase();
+      String converted =
+          "BTOR_OPT_"
+              + optName.replace("-", "_").replace(":", "_").toUpperCase(Locale.getDefault());
       assertThat(option.name()).isEqualTo(ALLOWED_DIFFS.getOrDefault(converted, converted));
     }
   }
@@ -85,7 +88,7 @@ public class BoolectorNativeApiTest {
     // check whether all sat solvers are available
     for (SatSolver satSolver : SatSolver.values()) {
       long btor1 = BtorJNI.boolector_new();
-      BtorJNI.boolector_set_sat_solver(btor1, satSolver.name().toLowerCase());
+      BtorJNI.boolector_set_sat_solver(btor1, satSolver.name().toLowerCase(Locale.getDefault()));
       long newVar = BtorJNI.boolector_var(btor1, BtorJNI.boolector_bool_sort(btor1), "x");
       BtorJNI.boolector_assert(btor1, newVar);
       int result = BtorJNI.boolector_sat(btor1);

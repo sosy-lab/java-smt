@@ -10,6 +10,8 @@ package org.sosy_lab.java_smt.delegate.statistics;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableMap;
+import java.util.Map;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
@@ -60,6 +62,16 @@ public class StatisticsSolverContext implements SolverContext {
   @Override
   public Solvers getSolverName() {
     return delegate.getSolverName();
+  }
+
+  @Override
+  public ImmutableMap<String, String> getStatistics() {
+    ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+    builder.putAll(delegate.getStatistics());
+    for (Map.Entry<String, Object> entry : getSolverStatistics().asMap().entrySet()) {
+      builder.put(entry.getKey(), entry.getValue().toString());
+    }
+    return builder.buildOrThrow();
   }
 
   @Override

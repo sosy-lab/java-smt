@@ -18,10 +18,6 @@ import com.google.common.truth.ExpectFailure.SimpleSubjectBuilderCallback;
 import com.google.common.truth.SimpleSubjectBuilder;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -30,20 +26,7 @@ import org.sosy_lab.java_smt.api.SolverException;
  * Uses bitvector theory if there is no integer theory available. Notice: Boolector does not support
  * bitvectors length 1.
  */
-@RunWith(Parameterized.class)
-public class BooleanFormulaSubjectTest extends SolverBasedTest0 {
-
-  @Parameters(name = "{0}")
-  public static Object[] getAllSolvers() {
-    return Solvers.values();
-  }
-
-  @Parameter public Solvers solver;
-
-  @Override
-  protected Solvers solverToUse() {
-    return solver;
-  }
+public class BooleanFormulaSubjectTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   private BooleanFormula simpleFormula;
   private BooleanFormula contradiction;
@@ -83,10 +66,11 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0 {
 
   @Test
   public void testIsSatisfiableNo() {
+    // INFO: OpenSMT does not support unsat core
     assume()
         .withMessage("Solver does not support unsat core generation in a usable way")
         .that(solverToUse())
-        .isNotEqualTo(Solvers.BOOLECTOR);
+        .isNoneOf(Solvers.BOOLECTOR, Solvers.OPENSMT);
 
     AssertionError failure =
         expectFailure(whenTesting -> whenTesting.that(contradiction).isSatisfiable());
@@ -180,10 +164,10 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testIsEquisatisfiableoNo() {
+  public void testIsEquisatisfiableToNo() {
     BooleanFormula simpleFormula2;
     if (imgr != null) {
-      simpleFormula2 = imgr.equal(imgr.makeVariable("a"), imgr.makeVariable("2"));
+      simpleFormula2 = imgr.equal(imgr.makeVariable("a"), imgr.makeNumber("2"));
     } else {
       simpleFormula2 = bvmgr.equal(bvmgr.makeVariable(2, "a"), bvmgr.makeVariable(2, "2"));
     }

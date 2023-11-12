@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.api;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.List;
 import java.util.Map;
@@ -84,6 +85,13 @@ public interface FormulaManager {
    * @throws UnsupportedOperationException If the theory is not supported by the solver.
    */
   StringFormulaManager getStringFormulaManager();
+
+  /**
+   * Returns the Enumeration Theory, e.g., also known as 'limited domain'.
+   *
+   * @throws UnsupportedOperationException If the theory is not supported by the solver.
+   */
+  EnumerationFormulaManager getEnumerationFormulaManager();
 
   /**
    * Create variable of the type equal to {@code formulaType}.
@@ -193,6 +201,10 @@ public interface FormulaManager {
    *
    * <p>Furthermore, this method also guarantees that every equal part of the formula is visited
    * only once. Thus, it can be used to traverse DAG-like formulas efficiently.
+   *
+   * <p>The traversal is done in PRE-ORDER manner with regard to caching identical subtrees, i.e., a
+   * parent will be visited BEFORE its children. The unmodified child-formulas are passed as
+   * argument to the parent's visitation.
    */
   void visitRecursively(Formula f, FormulaVisitor<TraversalProcess> rFormulaVisitor);
 
@@ -205,6 +217,10 @@ public interface FormulaManager {
    * <p>Furthermore, this method also guarantees that every equal part of the formula is visited
    * only once. Thus, it can be used to traverse DAG-like formulas efficiently.
    *
+   * <p>The traversal is done in POST-ORDER manner with regard to caching identical subtrees, i.e.,
+   * a parent will be visited AFTER its children. The result of the child-visitation is passed as
+   * argument to the parent's visitation.
+   *
    * @param pFormulaVisitor Transformation described by the user.
    */
   <T extends Formula> T transformRecursively(T f, FormulaTransformationVisitor pFormulaVisitor);
@@ -215,7 +231,7 @@ public interface FormulaManager {
    * @param f The input formula
    * @return Map from variable names to the corresponding formulas.
    */
-  Map<String, Formula> extractVariables(Formula f);
+  ImmutableMap<String, Formula> extractVariables(Formula f);
 
   /**
    * Extract the names of all free variables and UFs in a formula.
@@ -224,7 +240,7 @@ public interface FormulaManager {
    * @return Map from variable names to the corresponding formulas. If an UF occurs multiple times
    *     in the input formula, an arbitrary instance of an application of this UF is in the map.
    */
-  Map<String, Formula> extractVariablesAndUFs(Formula f);
+  ImmutableMap<String, Formula> extractVariablesAndUFs(Formula f);
 
   /**
    * Substitute every occurrence of any item from {@code changeFrom} in formula {@code f} to the

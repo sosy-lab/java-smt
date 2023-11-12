@@ -8,10 +8,13 @@
 
 package org.sosy_lab.java_smt.api;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.Immutable;
 import java.util.List;
+import java.util.Set;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 
@@ -67,6 +70,10 @@ public abstract class FormulaType<T extends Formula> {
   }
 
   public boolean isRegexType() {
+    return false;
+  }
+
+  public boolean isEnumerationType() {
     return false;
   }
 
@@ -299,7 +306,7 @@ public abstract class FormulaType<T extends Formula> {
     private final FormulaType<TE> elementType;
     private final FormulaType<TI> indexType;
 
-    public ArrayFormulaType(FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
+    private ArrayFormulaType(FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
       this.indexType = Preconditions.checkNotNull(pIndexType);
       this.elementType = Preconditions.checkNotNull(pElementType);
     }
@@ -324,11 +331,7 @@ public abstract class FormulaType<T extends Formula> {
 
     @Override
     public int hashCode() {
-      final int prime = 31;
-      int result = 1;
-      result = prime * result + elementType.hashCode();
-      result = prime * result + indexType.hashCode();
-      return result;
+      return 31 * elementType.hashCode() + indexType.hashCode();
     }
 
     @Override
@@ -336,19 +339,75 @@ public abstract class FormulaType<T extends Formula> {
       if (this == obj) {
         return true;
       }
-
       if (!(obj instanceof ArrayFormulaType)) {
         return false;
       }
-
       ArrayFormulaType<?, ?> other = (ArrayFormulaType<?, ?>) obj;
-
       return elementType.equals(other.elementType) && indexType.equals(other.indexType);
     }
 
     @Override
     public String toSMTLIBString() {
       return "(Array " + indexType.toSMTLIBString() + " " + elementType.toSMTLIBString() + ")";
+    }
+  }
+
+  public static EnumerationFormulaType getEnumerationType(String pName, Set<String> pElements) {
+    return new EnumerationFormulaType(pName, pElements);
+  }
+
+  public static final class EnumerationFormulaType extends FormulaType<EnumerationFormula> {
+
+    private final String name;
+    private final ImmutableSet<String> elements;
+
+    private EnumerationFormulaType(String pName, Set<String> pElements) {
+      this.name = Preconditions.checkNotNull(pName);
+      this.elements = ImmutableSet.copyOf(pElements);
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public ImmutableSet<String> getElements() {
+      return elements;
+    }
+
+    public int getCardinality() {
+      return elements.size();
+    }
+
+    @Override
+    public boolean isEnumerationType() {
+      return true;
+    }
+
+    @Override
+    public String toString() {
+      return String.format("%s (%s)", name, Joiner.on(", ").join(elements));
+    }
+
+    @Override
+    public int hashCode() {
+      return 31 * name.hashCode() + elements.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj) {
+        return true;
+      }
+      if (!(obj instanceof EnumerationFormulaType)) {
+        return false;
+      }
+      EnumerationFormulaType other = (EnumerationFormulaType) obj;
+      return name.equals(other.name) && elements.equals(other.elements);
+    }
+
+    @Override
+    public String toSMTLIBString() {
+      return "(" + this + ")";
     }
   }
 
@@ -371,7 +430,7 @@ public abstract class FormulaType<T extends Formula> {
         }
       };
 
-  public static final FormulaType<BooleanFormula> RegexType =
+  public static final FormulaType<RegexFormula> RegexType =
       new FormulaType<>() {
 
         @Override
@@ -416,6 +475,12 @@ public abstract class FormulaType<T extends Formula> {
       // Bitvector<32>
       return FormulaType.getBitvectorTypeWithSize(
           Integer.parseInt(t.substring(10, t.length() - 1)));
+    } else if (t.matches(".*\\(.*\\)")) {
+      // Color (Red, Green, Blue)
+      String name = t.substring(0, t.indexOf("(") - 1);
+      String elementsStr = t.substring(t.indexOf("(") + 1, t.length() - 1);
+      Set<String> elements = ImmutableSet.copyOf(Splitter.on(", ").split(elementsStr));
+      return new EnumerationFormulaType(name, elements);
     } else {
       throw new AssertionError("unknown type:" + t);
     }

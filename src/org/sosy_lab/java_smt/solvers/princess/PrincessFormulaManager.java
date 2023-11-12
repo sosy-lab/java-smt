@@ -8,11 +8,11 @@
 
 package org.sosy_lab.java_smt.solvers.princess;
 
-import static com.google.common.collect.Iterables.getOnlyElement;
-
 import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.types.Sort;
+import com.google.common.base.Preconditions;
+import java.util.List;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -46,6 +46,8 @@ final class PrincessFormulaManager
         pQuantifierManager,
         pArrayManager,
         null,
+        null,
+        null);
         pStringManager);
     creator = pCreator;
   }
@@ -56,8 +58,12 @@ final class PrincessFormulaManager
 
   @Override
   public BooleanFormula parse(String pS) throws IllegalArgumentException {
-    return encapsulateBooleanFormula(
-        getOnlyElement(getEnvironment().parseStringToTerms(pS, creator)));
+    List<? extends IExpression> formulas = getEnvironment().parseStringToTerms(pS, creator);
+    Preconditions.checkState(
+        formulas.size() == 1,
+        "parsing expects exactly one asserted term, but got %s terms",
+        formulas.size());
+    return encapsulateBooleanFormula(formulas.get(0));
   }
 
   @Override

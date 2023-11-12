@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -35,14 +36,21 @@ import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearAr
 @RunWith(Parameterized.class)
 public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBasedTest0 {
 
-  // Boolector, CVC4, SMTInterpol and MathSAT5 do not fully support non-linear arithmetic
+  // Boolector, CVC4, SMTInterpol, MathSAT5 and OpenSMT do not fully support non-linear arithmetic
   // (though SMTInterpol and MathSAT5 support some parts)
+
+  // INFO: OpenSmt does not suport nonlinear arithmetic
   static final ImmutableSet<Solvers> SOLVER_WITHOUT_NONLINEAR_ARITHMETIC =
       ImmutableSet.of(
-          Solvers.SMTINTERPOL, Solvers.MATHSAT5, Solvers.BOOLECTOR, Solvers.CVC4, Solvers.YICES2);
+          Solvers.SMTINTERPOL,
+          Solvers.MATHSAT5,
+          Solvers.BOOLECTOR,
+          Solvers.CVC4,
+          Solvers.YICES2,
+          Solvers.OPENSMT);
 
   @Parameters(name = "{0} {1} {2}")
-  public static Iterable<Object[]> getAllSolvers() {
+  public static Iterable<Object[]> getAllSolversAndTheories() {
     return Lists.cartesianProduct(
             Arrays.asList(Solvers.values()),
             ImmutableList.of(FormulaType.IntegerType, FormulaType.RationalType),
@@ -187,6 +195,26 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
             nmgr.equal(nmgr.makeNumber(2 * 3), a),
             nmgr.equal(nmgr.divide(a, nmgr.makeNumber(3)), nmgr.makeNumber(2)),
             nmgr.equal(nmgr.divide(a, nmgr.makeNumber(2)), nmgr.makeNumber(3)));
+
+    assertThatFormula(f).isSatisfiable();
+  }
+
+  @Test
+  public void testDivisionByZero() throws SolverException, InterruptedException {
+    // INFO: OpenSmt does not allow division by zero
+    assume()
+        .withMessage("Solver %s does not support division by zero", solverToUse())
+        .that(solverToUse())
+        .isNoneOf(Solvers.YICES2, Solvers.OPENSMT);
+
+    T a = nmgr.makeVariable("a");
+    T b = nmgr.makeVariable("b");
+    T zero = nmgr.makeNumber(0);
+
+    BooleanFormula f =
+        bmgr.and(
+            nmgr.equal(nmgr.divide(a, zero), nmgr.makeNumber(2)),
+            nmgr.equal(nmgr.divide(b, zero), nmgr.makeNumber(4)));
 
     assertThatFormula(f).isSatisfiable();
   }

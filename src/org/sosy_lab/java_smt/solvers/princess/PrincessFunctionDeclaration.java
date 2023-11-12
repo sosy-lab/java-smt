@@ -53,7 +53,7 @@ abstract class PrincessFunctionDeclaration {
 
     @Override
     public boolean equals(Object o) {
-      if (o instanceof AbstractDeclaration<?>) {
+      if (!(o instanceof AbstractDeclaration<?>)) {
         return false;
       }
       AbstractDeclaration<?> other = (AbstractDeclaration<?>) o;

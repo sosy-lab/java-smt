@@ -12,16 +12,10 @@ import static com.google.common.truth.Truth.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
-import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.utils.PrettyPrinter;
 import org.sosy_lab.java_smt.utils.PrettyPrinter.PrinterOption;
 
-@RunWith(Parameterized.class)
-public class PrettyPrinterTest extends SolverBasedTest0 {
+public class PrettyPrinterTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   private PrettyPrinter pp;
 
@@ -36,18 +30,6 @@ public class PrettyPrinterTest extends SolverBasedTest0 {
           + "(declare-fun bar (Real) Real)";
 
   private static final String QUERY_1 = "(assert (and (= (select arr x) (foo 3)) (< x xx)))";
-
-  @Parameters(name = "{0}")
-  public static Object[] getAllSolvers() {
-    return Solvers.values();
-  }
-
-  @Parameter public Solvers solver;
-
-  @Override
-  protected Solvers solverToUse() {
-    return solver;
-  }
 
   @Before
   public void init() {
@@ -73,6 +55,15 @@ public class PrettyPrinterTest extends SolverBasedTest0 {
             "(And\n"
                 + "  (= (select arr x) (foo 3))\n"
                 + "  (GeqZero (+ (+ xx (* -1 x)) -1))\n"
+                + ")";
+        break;
+      case OPENSMT:
+        expected =
+            "(and\n"
+                + "  (= (select arr x) (foo 3))\n"
+                + "  (not\n"
+                + "    (<= 0 (+ x (* -1 xx)))\n"
+                + "  )\n"
                 + ")";
         break;
       default:
@@ -136,6 +127,32 @@ public class PrettyPrinterTest extends SolverBasedTest0 {
                 + "  )\n"
                 + ")";
         break;
+      case OPENSMT:
+        expected =
+            "(and\n"
+                + "  (=\n"
+                + "    (select\n"
+                + "      arr\n"
+                + "      x\n"
+                + "    )\n"
+                + "    (foo\n"
+                + "      3\n"
+                + "    )\n"
+                + "  )\n"
+                + "  (not\n"
+                + "    (<=\n"
+                + "      0\n"
+                + "      (+\n"
+                + "        x\n"
+                + "        (*\n"
+                + "          -1\n"
+                + "          xx\n"
+                + "        )\n"
+                + "      )\n"
+                + "    )\n"
+                + "  )\n"
+                + ")";
+        break;
       default:
         expected =
             "(and\n"
@@ -194,6 +211,24 @@ public class PrettyPrinterTest extends SolverBasedTest0 {
                 + "    2 [label=\"(((xx + -1 * x) + -1) >= 0)\", shape=\"rectangle\","
                 + " style=\"filled\", fillcolor=\"white\"];\n"
                 + "    1 [label=\"(select(arr, x) = foo(3))\", shape=\"rectangle\","
+                + " style=\"filled\", fillcolor=\"white\"];\n"
+                + "  }\n"
+                + "}";
+        break;
+      case OPENSMT:
+        expected =
+            "digraph SMT {\n"
+                + "  rankdir=LR\n"
+                + "  0 [label=\"and\", shape=\"circle\", style=\"filled\","
+                + " fillcolor=\"lightblue\"];\n"
+                + "  0 -> 1 [label=\"\"];\n"
+                + "  0 -> 2 [label=\"\"];\n"
+                + "  2 [label=\"not\", shape=\"circle\", style=\"filled\", fillcolor=\"orange\"];\n"
+                + "  2 -> 3 [label=\"\"];\n"
+                + "  { rank=same;\n"
+                + "    3 [label=\"(<= 0 (+ x (* -1 xx)))\", shape=\"rectangle\", style=\"filled\","
+                + " fillcolor=\"white\"];\n"
+                + "    1 [label=\"(= (select arr x) (foo 3))\", shape=\"rectangle\","
                 + " style=\"filled\", fillcolor=\"white\"];\n"
                 + "  }\n"
                 + "}";
@@ -293,6 +328,44 @@ public class PrettyPrinterTest extends SolverBasedTest0 {
                 + "  9 -> 12 [label=\"0\"];\n"
                 + "  9 -> 8 [label=\"1\"];\n"
                 + "  12 [label=\"arr\", shape=\"rectangle\", style=\"filled\","
+                + " fillcolor=\"white\"];\n"
+                + "}";
+        break;
+      case OPENSMT:
+        expected =
+            "digraph SMT {\n"
+                + "  rankdir=LR\n"
+                + "  0 [label=\"and\", shape=\"circle\", style=\"filled\","
+                + " fillcolor=\"lightblue\"];\n"
+                + "  0 -> 1 [label=\"\"];\n"
+                + "  0 -> 2 [label=\"\"];\n"
+                + "  2 [label=\"not\", shape=\"circle\", style=\"filled\", fillcolor=\"orange\"];\n"
+                + "  2 -> 3 [label=\"\"];\n"
+                + "  3 [label=\"<=\", shape=\"circle\", style=\"filled\", fillcolor=\"white\"];\n"
+                + "  3 -> 4 [label=\"0\"];\n"
+                + "  3 -> 5 [label=\"1\"];\n"
+                + "  5 [label=\"+\", shape=\"circle\", style=\"filled\", fillcolor=\"white\"];\n"
+                + "  5 -> 6 [label=\"0\"];\n"
+                + "  5 -> 7 [label=\"1\"];\n"
+                + "  7 [label=\"*\", shape=\"circle\", style=\"filled\", fillcolor=\"white\"];\n"
+                + "  7 -> 8 [label=\"0\"];\n"
+                + "  7 -> 9 [label=\"1\"];\n"
+                + "  9 [label=\"xx\", shape=\"rectangle\", style=\"filled\","
+                + " fillcolor=\"white\"];\n"
+                + "  8 [label=\"-1\", shape=\"rectangle\", style=\"filled\", fillcolor=\"grey\"];\n"
+                + "  6 [label=\"x\", shape=\"rectangle\", style=\"filled\", fillcolor=\"white\"];\n"
+                + "  4 [label=\"0\", shape=\"rectangle\", style=\"filled\", fillcolor=\"grey\"];\n"
+                + "  1 [label=\"=\", shape=\"circle\", style=\"filled\", fillcolor=\"white\"];\n"
+                + "  1 -> 10 [label=\"0\"];\n"
+                + "  1 -> 11 [label=\"1\"];\n"
+                + "  11 [label=\"foo\", shape=\"circle\", style=\"filled\", fillcolor=\"white\"];\n"
+                + "  11 -> 12 [label=\"0\"];\n"
+                + "  12 [label=\"3\", shape=\"rectangle\", style=\"filled\", fillcolor=\"grey\"];\n"
+                + "  10 [label=\"select\", shape=\"circle\", style=\"filled\","
+                + " fillcolor=\"white\"];\n"
+                + "  10 -> 13 [label=\"0\"];\n"
+                + "  10 -> 6 [label=\"1\"];\n"
+                + "  13 [label=\"arr\", shape=\"rectangle\", style=\"filled\","
                 + " fillcolor=\"white\"];\n"
                 + "}";
         break;

@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.solvers.yices2;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_and2;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_false;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_iff;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_implies;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_ite;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_not;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_or2;
@@ -50,6 +51,7 @@ public class Yices2BooleanFormulaManager
   protected Integer and(Integer pParam1, Integer pParam2) {
     return yices_and2(pParam1, pParam2);
   }
+
   // Causes BooleanFormulaManagerTest/testConjunctionCollector to fail.
   // @Override
   // protected Integer andImpl(Collection<Integer> pParams) {
@@ -75,6 +77,11 @@ public class Yices2BooleanFormulaManager
   @Override
   protected Integer equivalence(Integer pBits1, Integer pBits2) {
     return yices_iff(pBits1, pBits2);
+  }
+
+  @Override
+  protected Integer implication(Integer bits1, Integer bits2) {
+    return yices_implies(bits1, bits2);
   }
 
   @Override

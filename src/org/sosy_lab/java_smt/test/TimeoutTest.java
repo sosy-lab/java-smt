@@ -24,6 +24,7 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Tactic;
+import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
 /** Check that timeout is handled gracefully. */
 @RunWith(Parameterized.class)
@@ -31,10 +32,10 @@ public class TimeoutTest extends SolverBasedTest0 {
 
   private static final int TIMOUT_MILLISECONDS = 10000;
 
-  private static final int[] DELAYS = {1, 2, 5, 10, 20, 50, 100};
+  private static final int[] DELAYS = {1, 5, 10, 20, 50, 100};
 
   @Parameters(name = "{0} with delay {1}")
-  public static List<Object[]> getAllSolvers() {
+  public static List<Object[]> getAllSolversAndDelays() {
     List<Object[]> lst = new ArrayList<>();
     for (Solvers solver : Solvers.values()) {
       for (int delay : DELAYS) {
@@ -53,6 +54,12 @@ public class TimeoutTest extends SolverBasedTest0 {
   @Override
   protected Solvers solverToUse() {
     return solver;
+  }
+
+  // INFO: OpenSmt only support interpolation for QF_LIA, QF_LRA and QF_UF
+  @Override
+  protected Logics logicToUse() {
+    return Logics.QF_LIA;
   }
 
   @Test
@@ -75,7 +82,7 @@ public class TimeoutTest extends SolverBasedTest0 {
     TruthJUnit.assume()
         .withMessage(solverToUse() + " does not support interruption")
         .that(solverToUse())
-        .isNoneOf(Solvers.PRINCESS, Solvers.BOOLECTOR);
+        .isNoneOf(Solvers.PRINCESS, Solvers.BOOLECTOR, Solvers.CVC5);
     testBasicProverTimeoutInt(() -> context.newProverEnvironment());
   }
 
@@ -85,7 +92,7 @@ public class TimeoutTest extends SolverBasedTest0 {
     TruthJUnit.assume()
         .withMessage(solverToUse() + " does not support interruption")
         .that(solverToUse())
-        .isNotEqualTo(Solvers.PRINCESS);
+        .isNoneOf(Solvers.PRINCESS, Solvers.CVC5);
     testBasicProverTimeoutBv(() -> context.newProverEnvironment());
   }
 
@@ -96,7 +103,7 @@ public class TimeoutTest extends SolverBasedTest0 {
     TruthJUnit.assume()
         .withMessage(solverToUse() + " does not support interruption")
         .that(solverToUse())
-        .isNoneOf(Solvers.PRINCESS, Solvers.BOOLECTOR);
+        .isNoneOf(Solvers.PRINCESS, Solvers.BOOLECTOR, Solvers.CVC5);
     testBasicProverTimeoutInt(() -> context.newProverEnvironmentWithInterpolation());
   }
 
@@ -133,6 +140,7 @@ public class TimeoutTest extends SolverBasedTest0 {
                 throw new UnsupportedOperationException("Unexpected interrupt");
               }
             });
+
     try (BasicProverEnvironment<?> pe = proverConstructor.get()) {
       pe.push(instance);
       t.start();

@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.delegate.statistics;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,7 @@ import org.sosy_lab.java_smt.api.ArrayFormulaManager;
 import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
+import org.sosy_lab.java_smt.api.EnumerationFormulaManager;
 import org.sosy_lab.java_smt.api.FloatingPointFormulaManager;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -97,6 +99,11 @@ class StatisticsFormulaManager implements FormulaManager {
   }
 
   @Override
+  public EnumerationFormulaManager getEnumerationFormulaManager() {
+    return new StatisticsEnumerationFormulaManager(delegate.getEnumerationFormulaManager(), stats);
+  }
+
+  @Override
   public <T extends Formula> T makeVariable(FormulaType<T> pFormulaType, String pName) {
     return delegate.makeVariable(pFormulaType, pName);
   }
@@ -163,12 +170,12 @@ class StatisticsFormulaManager implements FormulaManager {
   }
 
   @Override
-  public Map<String, Formula> extractVariables(Formula pF) {
+  public ImmutableMap<String, Formula> extractVariables(Formula pF) {
     return delegate.extractVariables(pF);
   }
 
   @Override
-  public Map<String, Formula> extractVariablesAndUFs(Formula pF) {
+  public ImmutableMap<String, Formula> extractVariablesAndUFs(Formula pF) {
     return delegate.extractVariablesAndUFs(pF);
   }
 

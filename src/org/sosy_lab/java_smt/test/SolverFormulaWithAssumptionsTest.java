@@ -18,10 +18,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -29,21 +25,15 @@ import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
-@RunWith(Parameterized.class)
-public class SolverFormulaWithAssumptionsTest extends SolverBasedTest0 {
+public class SolverFormulaWithAssumptionsTest
+    extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
-  @Parameters(name = "{0}")
-  public static Object[] getAllSolvers() {
-    return Solvers.values();
-  }
-
-  @Parameter(0)
-  public Solvers solver;
-
+  // INFO: OpenSmt only support interpolation for QF_LIA, QF_LRA and QF_UF
   @Override
-  protected Solvers solverToUse() {
-    return solver;
+  protected Logics logicToUse() {
+    return Logics.QF_LIA;
   }
 
   /**
@@ -74,6 +64,11 @@ public class SolverFormulaWithAssumptionsTest extends SolverBasedTest0 {
   public <T> void basicAssumptionsTest()
       throws SolverException, InterruptedException, InvalidConfigurationException {
     requireInterpolation();
+
+    assume()
+        .withMessage("Solver %s runs into timeout on this test", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC5);
 
     IntegerFormula v1 = imgr.makeVariable("v1");
     IntegerFormula v2 = imgr.makeVariable("v2");
@@ -116,6 +111,11 @@ public class SolverFormulaWithAssumptionsTest extends SolverBasedTest0 {
   public <T> void assumptionsTest()
       throws SolverException, InterruptedException, InvalidConfigurationException {
     requireInterpolation();
+
+    assume()
+        .withMessage("Solver %s runs into timeout on this test", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC5);
 
     int n = 5;
 

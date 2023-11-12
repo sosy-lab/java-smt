@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+This file is part of JavaSMT,
+an API wrapper for a collection of SMT solvers:
+https://github.com/sosy-lab/java-smt
+
+SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<ivy-module version="2.0"
+    xmlns:e="http://ant.apache.org/ivy/extra"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+    <info organisation="org.sosy_lab" module="javasmt-solver-cvc5">
+      <license name="Modified BSD License" url="https://github.com/cvc5/cvc5/blob/master/COPYING"/>
+        <description>
+            CVC5 solver and JavaSMT JNI wrapper.
+            CVC5 is provided under a modified BSD License.
+        </description>
+    </info>
+
+    <configurations>
+        <conf name="solver-cvc5" />
+    </configurations>
+
+    <publications defaultconf="solver-cvc5">
+        <artifact name="libcvc5jni"    conf="solver-cvc5" type="shared-object" ext="so"/>
+        <artifact name="libcvc5"       conf="solver-cvc5" type="shared-object" ext="so"/>
+        <artifact name="libcvc5parser" conf="solver-cvc5" type="shared-object" ext="so"/>
+        <artifact name="libpolyxx"     conf="solver-cvc5" type="shared-object" ext="so"/>
+        <artifact name="libpoly"       conf="solver-cvc5" type="shared-object" ext="so"/>
+        <artifact name="cvc5"          conf="solver-cvc5" />
+    </publications>
+
+    <dependencies></dependencies>
+
+</ivy-module>

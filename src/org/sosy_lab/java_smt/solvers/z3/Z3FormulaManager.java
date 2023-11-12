@@ -41,7 +41,8 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
       Z3FloatingPointFormulaManager pFloatingPointManager,
       Z3QuantifiedFormulaManager pQuantifiedManager,
       Z3ArrayFormulaManager pArrayManager,
-      Z3StringFormulaManager pStringManager) {
+      Z3StringFormulaManager pStringManager,
+      Z3EnumerationFormulaManager pEnumerationManager) {
     super(
         pFormulaCreator,
         pFunctionManager,
@@ -53,7 +54,8 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
         pQuantifiedManager,
         pArrayManager,
         null,
-        pStringManager);
+        pStringManager,
+        pEnumerationManager);
     formulaCreator = pFormulaCreator;
   }
 
@@ -61,7 +63,7 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
   public BooleanFormula parse(String str) throws IllegalArgumentException {
 
     // Z3 does not access the existing symbols on its own,
-    // but requires all symbols as part of the query and does
+    // but requires all symbols as part of the query.
     // Thus, we track the used symbols on our own and give them to the parser call, if required.
     // Later, we collect all symbols from the parsed query and
     // define them again to have them tracked.
@@ -96,7 +98,8 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
         // get the missing symbol and restart the parsing with them
         Pattern pattern =
             Pattern.compile(
-                "\\(error \"line \\d+ column \\d+: unknown (?:function\\/)?constant (.*)\"\\)\\n");
+                "\\(error \"line \\d+ column \\d+: unknown constant"
+                    + " (?<name>.*?)\\s?(?<sorts>\\(.*\\))?\\s?\\\"\\)\\n");
         Matcher matcher = pattern.matcher(nested.getMessage());
         if (matcher.matches()) {
           String missingSymbol = matcher.group(1);
@@ -113,7 +116,8 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
 
     Preconditions.checkState(e != 0, "parsing aborted");
     final int size = Native.astVectorSize(env, e);
-    Preconditions.checkState(size == 1, "parsing expects exactly one asserted term.");
+    Preconditions.checkState(
+        size == 1, "parsing expects exactly one asserted term, but got %s terms", size);
     final long term = Native.astVectorGet(env, e, 0);
 
     // last step: all parsed symbols need to be declared again to have them tracked in the creator.

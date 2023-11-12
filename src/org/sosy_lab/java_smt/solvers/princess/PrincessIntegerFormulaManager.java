@@ -83,12 +83,12 @@ class PrincessIntegerFormulaManager
 
   @Override
   public IExpression divide(IExpression pNumber1, IExpression pNumber2) {
-    return GroebnerMultiplication.eDiv((ITerm) pNumber1, (ITerm) pNumber2);
+    return GroebnerMultiplication.eDivWithSpecialZero((ITerm) pNumber1, (ITerm) pNumber2);
   }
 
   @Override
   public IExpression modulo(IExpression pNumber1, IExpression pNumber2) {
-    return GroebnerMultiplication.eMod((ITerm) pNumber1, (ITerm) pNumber2);
+    return GroebnerMultiplication.eModWithSpecialZero((ITerm) pNumber1, (ITerm) pNumber2);
   }
 
   @Override

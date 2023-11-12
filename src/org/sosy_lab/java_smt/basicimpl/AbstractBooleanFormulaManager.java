@@ -15,6 +15,7 @@ import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariab
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Collection;
@@ -131,7 +132,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
    */
   protected TFormulaInfo andImpl(Collection<TFormulaInfo> pParams) {
     TFormulaInfo result = makeBooleanImpl(true);
-    for (TFormulaInfo formula : pParams) {
+    for (TFormulaInfo formula : ImmutableSet.copyOf(pParams)) {
       if (isFalse(formula)) {
         return formula;
       }
@@ -141,8 +142,8 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
   }
 
   @Override
-  public Collector<BooleanFormula, ?, BooleanFormula> toConjunction() {
-    return Collectors.reducing(makeTrue(), this::and);
+  public final Collector<BooleanFormula, ?, BooleanFormula> toConjunction() {
+    return Collectors.collectingAndThen(Collectors.toList(), this::and);
   }
 
   @Override
@@ -193,7 +194,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
    */
   protected TFormulaInfo orImpl(Collection<TFormulaInfo> pParams) {
     TFormulaInfo result = makeBooleanImpl(false);
-    for (TFormulaInfo formula : pParams) {
+    for (TFormulaInfo formula : ImmutableSet.copyOf(pParams)) {
       if (isTrue(formula)) {
         return formula;
       }
@@ -203,8 +204,8 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
   }
 
   @Override
-  public Collector<BooleanFormula, ?, BooleanFormula> toDisjunction() {
-    return Collectors.reducing(makeFalse(), this::or);
+  public final Collector<BooleanFormula, ?, BooleanFormula> toDisjunction() {
+    return Collectors.collectingAndThen(Collectors.toList(), this::or);
   }
 
   protected abstract TFormulaInfo xor(TFormulaInfo pParam1, TFormulaInfo pParam2);
@@ -333,6 +334,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
     }
 
     private List<BooleanFormula> getBoolArgs(List<Formula> args) {
+      checkState(Iterables.all(args, arg -> arg instanceof BooleanFormula));
       @SuppressWarnings("unchecked")
       List<BooleanFormula> out = (List<BooleanFormula>) (List<?>) args;
       return out;
@@ -343,7 +345,6 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
         Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
       switch (functionDeclaration.getKind()) {
         case AND:
-          checkState(args.iterator().next() instanceof BooleanFormula);
           R out = delegate.visitAnd(getBoolArgs(args));
           return out;
         case NOT:
@@ -353,7 +354,6 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
           checkArgument(arg instanceof BooleanFormula);
           return delegate.visitNot((BooleanFormula) arg);
         case OR:
-          checkState(args.iterator().next() instanceof BooleanFormula);
           R out2 = delegate.visitOr(getBoolArgs(args));
           return out2;
         case IFF:

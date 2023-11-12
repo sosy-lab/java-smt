@@ -59,7 +59,8 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_ROUND_TO_INT;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_SQRT;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_SUB;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_TO_BV;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_TO_SBV;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_TO_UBV;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_IFF;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_ITE;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_LEQ;
@@ -78,6 +79,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_bool_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_bv_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_bv_type_size;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_enum_constants;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_fp_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_fp_type_exp_width;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_fp_type_mant_width;
@@ -87,6 +89,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_is_array_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_is_bool_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_is_bv_type;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_is_enum_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_is_fp_roundingmode_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_is_fp_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_is_integer_type;
@@ -106,6 +109,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_type_repr;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.primitives.Longs;
 import com.google.common.primitives.UnsignedInteger;
 import com.google.common.primitives.UnsignedLong;
@@ -117,6 +121,7 @@ import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.EnumerationFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -129,6 +134,7 @@ import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5Formula.Mathsat5ArrayFormula;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5Formula.Mathsat5BitvectorFormula;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5Formula.Mathsat5BooleanFormula;
+import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5Formula.Mathsat5EnumerationFormula;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5Formula.Mathsat5FloatingPointFormula;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5Formula.Mathsat5FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5Formula.Mathsat5IntegerFormula;
@@ -164,28 +170,24 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   @Override
   public <T extends Formula> FormulaType<T> getFormulaType(T pFormula) {
     long env = getEnv();
+    long type = msat_term_get_type(extractInfo(pFormula));
     if (pFormula instanceof BitvectorFormula) {
-      long type = msat_term_get_type(extractInfo(pFormula));
       if (!msat_is_bv_type(env, type)) {
         throw new IllegalArgumentException(
             "BitvectorFormula with actual type " + msat_type_repr(type) + ": " + pFormula);
       }
-      return (FormulaType<T>)
-          FormulaType.getBitvectorTypeWithSize(msat_get_bv_type_size(env, type));
+      return (FormulaType<T>) getFormulaTypeFromTermType(type);
 
     } else if (pFormula instanceof FloatingPointFormula) {
-      long type = msat_term_get_type(extractInfo(pFormula));
       if (!msat_is_fp_type(env, type)) {
         throw new IllegalArgumentException(
             "FloatingPointFormula with actual type " + msat_type_repr(type) + ": " + pFormula);
       }
-      return (FormulaType<T>)
-          FormulaType.getFloatingPointType(
-              msat_get_fp_type_exp_width(env, type), msat_get_fp_type_mant_width(env, type));
+      return (FormulaType<T>) getFormulaTypeFromTermType(type);
     } else if (pFormula instanceof ArrayFormula<?, ?>) {
-      FormulaType<T> arrayIndexType = getArrayFormulaIndexType((ArrayFormula<T, T>) pFormula);
-      FormulaType<T> arrayElementType = getArrayFormulaElementType((ArrayFormula<T, T>) pFormula);
-      return (FormulaType<T>) FormulaType.getArrayType(arrayIndexType, arrayElementType);
+      return (FormulaType<T>) getFormulaTypeFromTermType(type);
+    } else if (pFormula instanceof EnumerationFormula) {
+      return (FormulaType<T>) getFormulaTypeFromTermType(type);
     }
     return super.getFormulaType(pFormula);
   }
@@ -216,8 +218,16 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       long elementType = msat_get_array_element_type(env, type);
       return FormulaType.getArrayType(
           getFormulaTypeFromTermType(indexType), getFormulaTypeFromTermType(elementType));
+    } else if (msat_is_enum_type(env, type)) {
+      String enumName = msat_type_repr(type);
+      ImmutableSet.Builder<String> elements = ImmutableSet.builder();
+      for (long constantDecl : msat_get_enum_constants(env, type)) {
+        elements.add(msat_decl_get_name(constantDecl));
+      }
+      return FormulaType.getEnumerationType(enumName, elements.build());
+    } else {
+      throw new IllegalArgumentException("Unknown formula type " + msat_type_repr(type));
     }
-    throw new IllegalArgumentException("Unknown formula type " + msat_type_repr(type));
   }
 
   @Override
@@ -253,6 +263,8 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       return (T) new Mathsat5FloatingPointFormula(pTerm);
     } else if (pType.isFloatingPointRoundingModeType()) {
       return (T) new Mathsat5FloatingPointRoundingModeFormula(pTerm);
+    } else if (pType.isEnumerationType()) {
+      return (T) new Mathsat5EnumerationFormula(pTerm);
     }
     throw new IllegalArgumentException("Cannot create formulas of type " + pType + " in MathSAT");
   }
@@ -281,6 +293,12 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       Long pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
     assert getFormulaType(pTerm).equals(FormulaType.getArrayType(pIndexType, pElementType));
     return new Mathsat5ArrayFormula<>(pTerm, pIndexType, pElementType);
+  }
+
+  @Override
+  protected EnumerationFormula encapsulateEnumeration(Long pTerm) {
+    assert getFormulaType(pTerm).isEnumerationType();
+    return new Mathsat5EnumerationFormula(pTerm);
   }
 
   @Override
@@ -313,6 +331,10 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       return visitor.visitConstant(formula, false);
     } else if (msat_term_is_constant(environment, f)) {
       return visitor.visitFreeVariable(formula, msat_term_repr(f));
+    } else if (msat_is_enum_type(environment, msat_term_get_type(f))) {
+      assert !msat_term_is_constant(environment, f) : "Enumeration constants are no variables";
+      assert arity == 0 : "Enumeration constants have no parameters";
+      return visitor.visitConstant(formula, msat_term_repr(f));
     } else {
 
       final long declaration = msat_term_get_decl(f);
@@ -464,8 +486,10 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.BV_SCASTTO_FP;
       case MSAT_TAG_FP_FROM_UBV:
         return FunctionDeclarationKind.BV_UCASTTO_FP;
-      case MSAT_TAG_FP_TO_BV:
+      case MSAT_TAG_FP_TO_SBV:
         return FunctionDeclarationKind.FP_CASTTO_SBV;
+      case MSAT_TAG_FP_TO_UBV:
+        return FunctionDeclarationKind.FP_CASTTO_UBV;
       case MSAT_TAG_FP_AS_IEEEBV:
         return FunctionDeclarationKind.FP_AS_IEEEBV;
       case MSAT_TAG_FP_CAST:
@@ -515,13 +539,16 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     if (type.isBooleanType()) {
       return msat_term_is_true(getEnv(), term);
     } else if (type.isRationalType()) {
-      return Rational.ofString(repr);
+      Rational ratValue = Rational.ofString(repr);
+      return ratValue.isIntegral() ? ratValue.getNum() : ratValue;
     } else if (type.isIntegerType()) {
       return new BigInteger(repr);
     } else if (type.isBitvectorType()) {
       return parseBitvector(repr);
     } else if (type.isFloatingPointType()) {
       return parseFloatingPoint(repr);
+    } else if (type.isEnumerationType()) {
+      return repr;
     } else {
 
       throw new IllegalArgumentException("Unexpected type: " + type);
