@@ -684,8 +684,8 @@ SPDX-License-Identifier: Apache-2.0
         <exec executable="./configure" dir="${apron.path}" failonerror="true">
             <arg value="--no-cxx"/>
             <arg value="--no-ocaml"/>
+            <arg value="--no-ppl"/>
             <arg value="--prefix"/>
-            <arg value="~/git/apron/build"/>
             <arg value="--no-ocaml-plugins"/>
             <arg value="--no-ocamlfind"/>
         </exec>
