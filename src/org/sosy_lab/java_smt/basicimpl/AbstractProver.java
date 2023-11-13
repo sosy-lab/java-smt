@@ -89,6 +89,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   public void push() throws InterruptedException {
     checkState(!closed);
     assertedFormulas.add(new LinkedHashSet<>());
+    Generator.logPush();
   }
 
   @Override
@@ -96,6 +97,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     checkState(!closed);
     checkState(assertedFormulas.size() > 1, "initial level must remain until close");
     assertedFormulas.remove(assertedFormulas.size() - 1); // remove last
+    Generator.logPop();
   }
 
   @Override

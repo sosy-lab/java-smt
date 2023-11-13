@@ -44,6 +44,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
+import org.sosy_lab.java_smt.utils.Generators.Generator;
 
 @SuppressWarnings("ClassTypeParameterName")
 abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
@@ -108,6 +109,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
 
   @Override
   public boolean isUnsat() throws InterruptedException {
+    Generator.lines.append("(check-sat)\n");
     checkState(!closed);
 
     // We actually terminate SmtInterpol during the analysis

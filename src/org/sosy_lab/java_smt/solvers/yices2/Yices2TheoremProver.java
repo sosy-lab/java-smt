@@ -41,6 +41,7 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
+import org.sosy_lab.java_smt.utils.Generators.Generator;
 
 /**
  * Info about the option {@link ProverOptions#GENERATE_UNSAT_CORE}: Yices provides the unsat core
@@ -125,6 +126,7 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
 
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
+    Generator.lines.append("(check-sat)\n");
     Preconditions.checkState(!closed);
     boolean unsat;
     if (generateUnsatCores) { // unsat core does not work with incremental mode

@@ -1,5 +1,6 @@
-(declare-const a Bool)
-(assert (= a (= (+ 1 2) (- (+ 1 2) 4))))
+(declare-const a1 (Array Int Int))
+(declare-const a2 (Array Int Int))
+(assert (= a1 a2))
 (check-sat)
 (get-model)
 (exit)

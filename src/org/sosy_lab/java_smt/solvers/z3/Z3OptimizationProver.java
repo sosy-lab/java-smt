@@ -29,6 +29,7 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.utils.Generators.Generator;
 
 class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProverEnvironment {
 
@@ -135,6 +136,7 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
 
   @Override
   public boolean isUnsat() throws Z3SolverException, InterruptedException {
+    Generator.lines.append("(check-sat)\n");
     Preconditions.checkState(!closed);
     logSolverStack();
     return check() == OptStatus.UNSAT;

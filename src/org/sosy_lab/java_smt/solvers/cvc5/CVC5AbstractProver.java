@@ -30,6 +30,7 @@ import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
+import org.sosy_lab.java_smt.utils.Generators.Generator;
 
 public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
@@ -167,6 +168,7 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   @Override
   @SuppressWarnings("try")
   public boolean isUnsat() throws InterruptedException, SolverException {
+    Generator.lines.append("(check-sat)\n");
     Preconditions.checkState(!closed);
     closeAllEvaluators();
     changedSinceLastSatQuery = false;

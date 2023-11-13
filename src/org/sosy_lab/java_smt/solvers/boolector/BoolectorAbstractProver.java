@@ -24,6 +24,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import org.sosy_lab.java_smt.solvers.boolector.BtorJNI.TerminationCallback;
+import org.sosy_lab.java_smt.utils.Generators.Generator;
 
 abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
 
@@ -82,6 +83,7 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
    */
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
+    Generator.lines.append("(check-sat)\n");
     Preconditions.checkState(!closed);
     wasLastSatCheckSat = false;
     final int result = BtorJNI.boolector_sat(btor);

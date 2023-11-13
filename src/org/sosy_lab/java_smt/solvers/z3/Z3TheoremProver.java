@@ -23,6 +23,7 @@ import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
+import org.sosy_lab.java_smt.utils.Generators.Generator;
 
 class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
 
@@ -82,6 +83,7 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
 
   @Override
   public boolean isUnsat() throws Z3SolverException, InterruptedException {
+    Generator.lines.append("(check-sat)\n");
     Preconditions.checkState(!closed);
     logSolverStack();
     int result;

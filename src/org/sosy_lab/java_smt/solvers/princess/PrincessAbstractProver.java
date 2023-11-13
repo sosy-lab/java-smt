@@ -41,6 +41,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
+import org.sosy_lab.java_smt.utils.Generators.Generator;
 import org.sosy_lab.java_smt.utils.Generators.UniversalModel;
 import scala.Enumeration.Value;
 
@@ -83,6 +84,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
    */
   @Override
   public boolean isUnsat() throws SolverException, IOException {
+    Generator.lines.append("(check-sat)\n");
     Preconditions.checkState(!closed);
     wasLastSatCheckSat = false;
     if (useBinary) {

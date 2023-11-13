@@ -1,2 +1,5 @@
 
-(error "no model available")
+sat
+(model
+  (define-fun a () Bool false)
+)

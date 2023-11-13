@@ -50,6 +50,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.AllSatModelCallback;
+import org.sosy_lab.java_smt.utils.Generators.Generator;
 
 /** Common base class for {@link Mathsat5TheoremProver} and {@link Mathsat5InterpolatingProver}. */
 abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
@@ -99,6 +100,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
 
   @Override
   public boolean isUnsat() throws InterruptedException, SolverException {
+    Generator.lines.append("(check-sat)\n");
     Preconditions.checkState(!closed);
     return !msat_check_sat(curEnv);
   }

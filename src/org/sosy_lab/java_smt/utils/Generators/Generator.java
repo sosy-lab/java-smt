@@ -135,6 +135,14 @@ public class Generator {
     lines.append(SMTLIB2Result);
   }
 
+  public static void logPop() {
+    lines.append("(pop 1)\n");
+  }
+
+  public static void logPush() {
+    lines.append("(push 1)\n");
+  }
+
   public static void dumpSMTLIB2() throws IOException {
     String endSMTLIB2 = "(check-sat)\n(get-model)\n(exit)";
     lines.append(endSMTLIB2);

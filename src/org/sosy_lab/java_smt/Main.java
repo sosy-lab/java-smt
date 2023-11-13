@@ -18,16 +18,31 @@ package org.sosy_lab.java_smt;/*
  *  limitations under the License.
  */
 
+import java.io.IOException;
 import java.util.Objects;
 import org.sosy_lab.common.ShutdownManager;
-import org.sosy_lab.common.configuration.*;
+import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.log.BasicLogManager;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
-import org.sosy_lab.java_smt.api.*;
-import java.io.*;
+import org.sosy_lab.java_smt.api.ArrayFormula;
+import org.sosy_lab.java_smt.api.ArrayFormulaManager;
+import org.sosy_lab.java_smt.api.BitvectorFormula;
+import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
+import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.BooleanFormulaManager;
+import org.sosy_lab.java_smt.api.FormulaManager;
+import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.IntegerFormulaManager;
+import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
+import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
+import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.UFManager;
 import org.sosy_lab.java_smt.utils.Generators.Generator;
 
 public class Main {
@@ -40,7 +55,7 @@ public class Main {
     ShutdownManager shutdown = ShutdownManager.create();
     SolverContext context =
         SolverContextFactory.createSolverContext(config, logger, shutdown.getNotifier(),
-            Solvers.MATHSAT5);
+            Solvers.Z3);
     FormulaManager fmgr = context.getFormulaManager();
     BooleanFormulaManager bmgr = fmgr.getBooleanFormulaManager();
     IntegerFormulaManager imgr = fmgr.getIntegerFormulaManager();
@@ -48,17 +63,23 @@ public class Main {
     ArrayFormulaManager amgr = fmgr.getArrayFormulaManager();
     UFManager umgr =  fmgr.getUFManager();
 
-    BooleanFormula constraint = fmgr.universalParse("/home/janel/Desktop/Studium/Semester_6"
-        + "/Bachelorarbeit/nochmalneu/array.smt2");
-    System.out.println(constraint);
+    ArrayFormula<IntegerFormula, IntegerFormula> a1 = Objects.requireNonNull(amgr)
+        .makeArray("a1", FormulaType.IntegerType,
+            FormulaType.IntegerType);
+    ArrayFormula<IntegerFormula, IntegerFormula> a2 = Objects.requireNonNull(amgr)
+        .makeArray("a2", FormulaType.IntegerType,
+            FormulaType.IntegerType);
+
+    ArrayFormula<IntegerFormula, IntegerFormula> term1 = amgr.store(a1, imgr.makeNumber(3), imgr.makeNumber(2));
+    BooleanFormula constraint = amgr.equivalence(a1, a2);
 
 
     try (ProverEnvironment prover =
              context.newProverEnvironment(SolverContext.ProverOptions.GENERATE_MODELS,
                  ProverOptions.USE_BINARY)) {
       prover.addConstraint(constraint);
-      Generator.dumpSMTLIB2();
 
+      Generator.dumpSMTLIB2();
       boolean isUnsat = prover.isUnsat();
 
       if (!isUnsat) {

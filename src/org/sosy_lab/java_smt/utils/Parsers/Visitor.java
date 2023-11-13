@@ -120,12 +120,10 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     return sorts;
   }
 
-
   @Override public Object visitVar_binding(smtlibv2Parser.Var_bindingContext ctx) {
     String name = ctx.symbol().getText();
     Formula formula = (Formula) visit(ctx.term());
     letVariables.put(name, new ParserFormula(name, formula));
-    System.out.println("marker");
     return visitChildren(ctx);
   }
 
@@ -272,8 +270,6 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
 
     List<Formula> operands = new ArrayList<>();
     getOperands(ctx, operands);
-    //System.out.println(operands);
-    //System.out.println(operator);
     switch (operator) {
       //boolean operators
       case "and":
@@ -1357,5 +1353,5 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
   @Override public Object visitResp_get_model(smtlibv2Parser.Resp_get_modelContext ctx) {
     isModel = true;
     return visitChildren(ctx); }
-  
+
 }
