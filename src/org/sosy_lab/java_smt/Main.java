@@ -48,18 +48,9 @@ public class Main {
     ArrayFormulaManager amgr = fmgr.getArrayFormulaManager();
     UFManager umgr =  fmgr.getUFManager();
 
-    BitvectorFormula a = Objects.requireNonNull(bvmgr).makeVariable(5, "a");
-    BitvectorFormula b = bvmgr.makeVariable(5, "b");
-    BitvectorFormula c = bvmgr.makeBitvector(5, -10);
-    BitvectorFormula f = bvmgr.makeBitvector(5, 0);
-    BitvectorFormula term1 = bvmgr.add(a, b);
-    BitvectorFormula term2 = bvmgr.divide(c, f, true);
-    BitvectorFormula term3 = bvmgr.modulo(a, c, true);
-    BitvectorFormula term4 = bvmgr.xor(b, f);
-    BitvectorFormula term5 = bvmgr.subtract(term1, term2);
-    BitvectorFormula term6 = bvmgr.and(term5, term3);
-    BitvectorFormula term7 = bvmgr.shiftLeft(term6, term4);
-    BooleanFormula constraint = bvmgr.equal(a, term7);
+    BooleanFormula constraint = fmgr.universalParse("/home/janel/Desktop/Studium/Semester_6"
+        + "/Bachelorarbeit/nochmalneu/array.smt2");
+    System.out.println(constraint);
 
 
     try (ProverEnvironment prover =

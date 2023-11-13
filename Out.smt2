@@ -1,6 +1,5 @@
-(declare-const a (_ BitVec 5))
-(declare-const b (_ BitVec 5))
-(assert (= a (bvshl (bvand (bvsub (bvadd a b) (bvsdiv #b10110 #b00000)) (bvsrem a #b10110)) b)))
+(declare-const a Bool)
+(assert (= a (= (+ 1 2) (- (+ 1 2) 4))))
 (check-sat)
 (get-model)
 (exit)
