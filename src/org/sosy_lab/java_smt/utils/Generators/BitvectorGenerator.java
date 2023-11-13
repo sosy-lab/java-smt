@@ -318,8 +318,6 @@ public class BitvectorGenerator {
     Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
 
-  //TODO: transformValueToRange?
-
   public static void logBVSShiftRight(BitvectorFormula result, BitvectorFormula pNumber,
                               BitvectorFormula toShift) {
     List<Object> inputParams = new ArrayList<>();

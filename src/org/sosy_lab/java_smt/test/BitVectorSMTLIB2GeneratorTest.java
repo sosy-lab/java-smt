@@ -85,9 +85,10 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
     }
 
   @Test
-  public void testMakeBitVector() {
-    // Not working for Boolector and Yices because of the use of IntegerFormulas,
+  public void testMakeBitVectorWithIntegerFormulas() {
+    //not working for Yices due to lacking support of BitVectorFormula from IntegerFormula
     requireBitvectors();
+    requireIntegers();
     clearGenerator();
 
     BitvectorFormula c = Objects.requireNonNull(bvmgr).makeBitvector(12, -10);
@@ -114,16 +115,46 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
         + "(assert (= #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011011010))\n";
     Assert.assertTrue(expectedResultMathsat5.equals(actualResult) || expectedResultOthers.equals(actualResult));
   }
+
   @Test
-  public void testAdd() {
-    // Not working for Boolector and Yices because of the use of IntegerFormulas,
+  public void testMakeBitVectorWithoutIntegerFormulas() {
     requireBitvectors();
     clearGenerator();
 
     BitvectorFormula c = Objects.requireNonNull(bvmgr).makeBitvector(12, -10);
     BitvectorFormula d = bvmgr.makeBitvector(12, 20);
-    BitvectorFormula a = bvmgr.makeBitvector(5, imgr.makeNumber(10));
-    BitvectorFormula b = bvmgr.makeBitvector(5, imgr.makeNumber(0));
+    BitvectorFormula a = bvmgr.makeBitvector(5, 10);
+    BitvectorFormula b = bvmgr.makeBitvector(5, 10);
+    BitvectorFormula e = Objects.requireNonNull(bvmgr).makeBitvector(100, 263255254);
+    BitvectorFormula f = bvmgr.makeBitvector(100, 263255258);
+    BooleanFormula constraint1 = bvmgr.equal(c, d);
+    BooleanFormula constraint2 = bvmgr.equal(a, b);
+    BooleanFormula constraint3 = bvmgr.equal(e, f);
+
+    Generator.logAddConstraint(constraint1);
+    Generator.logAddConstraint(constraint2);
+    Generator.logAddConstraint(constraint3);
+
+    String actualResult = String.valueOf(Generator.lines);
+
+    String expectedResultMathsat5 = "(assert (= #b111111110110 #b000000010100))\n"
+        + "(assert (= #b01010 #b01010))\n"
+        + "(assert (= #b111111110110 #b000000010100))\n";
+    String expectedResultOthers = "(assert (= #b111111110110 #b000000010100))\n"
+        + "(assert (= #b01010 #b01010))\n"
+        + "(assert (= #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011011010))\n";
+    Assert.assertTrue(expectedResultMathsat5.equals(actualResult) || expectedResultOthers.equals(actualResult));
+  }
+
+  @Test
+  public void testAdd() {
+    requireBitvectors();
+    clearGenerator();
+
+    BitvectorFormula c = Objects.requireNonNull(bvmgr).makeBitvector(12, -10);
+    BitvectorFormula d = bvmgr.makeBitvector(12, 20);
+    BitvectorFormula a = bvmgr.makeBitvector(5, 10);
+    BitvectorFormula b = bvmgr.makeBitvector(5, 0);
     BitvectorFormula e = Objects.requireNonNull(bvmgr).makeBitvector(100, 263255254);
     BitvectorFormula f = bvmgr.makeBitvector(100, 263255258);
     BooleanFormula constraint1 = bvmgr.equal(c, bvmgr.add(c, d));
@@ -401,25 +432,257 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
     requireBitvectors();
     clearGenerator();
 
+    BitvectorFormula a = Objects.requireNonNull(bvmgr).makeVariable(12, "a");
+    BitvectorFormula b = bvmgr.makeVariable(100, "b");
     BitvectorFormula c = Objects.requireNonNull(bvmgr).makeBitvector(12, -10);
     BitvectorFormula d = bvmgr.makeBitvector(12, 20);
     BitvectorFormula e = Objects.requireNonNull(bvmgr).makeBitvector(100, 263255254);
     BitvectorFormula f = bvmgr.makeBitvector(100, 0);
-    BooleanFormula constraint1 = bvmgr.equal(c, bvmgr.and(c, d));
-    BooleanFormula constraint3 = bvmgr.equal(e, bvmgr.and(e, f));
+    BooleanFormula constraint1 = bvmgr.equal(a, bvmgr.and(c, d));
+    BooleanFormula constraint3 = bvmgr.equal(b, bvmgr.and(e, f));
 
     Generator.logAddConstraint(constraint1);
     Generator.logAddConstraint(constraint3);
 
     String actualResult = String.valueOf(Generator.lines);
 
-    String expectedResultMathsat5 = "(assert (= (bvnot #b111111110110) (bvnot #b000000010100)))\n"
-        + "(assert (= (bvnot #b111111110110) (bvnot #b000000010100)))\n";
-    String expectedResultOthers = "(assert (= #b111111110110 #b000000010100))\n"
-        + "(assert (= #b111111110110 #b000000010100))\n";
-    String expectedResultZ3 = "(assert (= #b111111110110 (bvand #b111111110110 #b000000010100)))\n"
-        + "(assert (= #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 (bvand #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
-    Assert.assertTrue(expectedResultMathsat5.equals(actualResult) || expectedResultOthers.equals(actualResult) || expectedResultZ3.equals(actualResult));
+    String expectedResultMathsat5 = "(declare-const a (_ BitVec 12))\n"
+        + "(assert (= a #b000000010100))\n"
+        + "(declare-const b (_ BitVec 100))\n"
+        + "(assert (= b #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000))\n";
+    String expectedResultZ3 = "(declare-const a (_ BitVec 12))\n"
+        + "(assert (= a (bvand #b111111110110 #b000000010100)))\n"
+        + "(declare-const b (_ BitVec 100))\n"
+        + "(assert (= b (bvand #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
+    Assert.assertTrue(expectedResultMathsat5.equals(actualResult) || expectedResultZ3.equals(actualResult));
   }
+
+  @Test
+  public void testOr() {
+    requireBitvectors();
+    clearGenerator();
+
+    BitvectorFormula a = Objects.requireNonNull(bvmgr).makeVariable(12, "a");
+    BitvectorFormula b = bvmgr.makeVariable(100, "b");
+    BitvectorFormula c = Objects.requireNonNull(bvmgr).makeBitvector(12, -10);
+    BitvectorFormula d = bvmgr.makeBitvector(12, 20);
+    BitvectorFormula e = Objects.requireNonNull(bvmgr).makeBitvector(100, 263255254);
+    BitvectorFormula f = bvmgr.makeBitvector(100, 0);
+    BooleanFormula constraint1 = bvmgr.equal(a, bvmgr.or(c, d));
+    BooleanFormula constraint3 = bvmgr.equal(b, bvmgr.or(e, f));
+
+    Generator.logAddConstraint(constraint1);
+    Generator.logAddConstraint(constraint3);
+
+    String actualResult = String.valueOf(Generator.lines);
+
+    String expectedResultMathsat5 = "(declare-const a (_ BitVec 12))\n"
+        + "(assert (= a #b111111110110))\n"
+        + "(declare-const b (_ BitVec 100))\n"
+        + "(assert (= b #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110))\n";
+    String expectedResultZ3 = "(declare-const a (_ BitVec 12))\n"
+        + "(assert (= a (bvor #b111111110110 #b000000010100)))\n"
+        + "(declare-const b (_ BitVec 100))\n"
+        + "(assert (= b (bvor #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
+    Assert.assertTrue(expectedResultMathsat5.equals(actualResult) || expectedResultZ3.equals(actualResult));
+  }
+
+  @Test
+  public void testXor() {
+    requireBitvectors();
+    clearGenerator();
+
+    BitvectorFormula a = Objects.requireNonNull(bvmgr).makeVariable(12, "a");
+    BitvectorFormula b = bvmgr.makeVariable(100, "b");
+    BitvectorFormula c = Objects.requireNonNull(bvmgr).makeBitvector(12, -10);
+    BitvectorFormula d = bvmgr.makeBitvector(12, 20);
+    BitvectorFormula e = Objects.requireNonNull(bvmgr).makeBitvector(100, 263255254);
+    BitvectorFormula f = bvmgr.makeBitvector(100, 0);
+    BooleanFormula constraint1 = bvmgr.equal(a, bvmgr.xor(c, d));
+    BooleanFormula constraint3 = bvmgr.equal(b, bvmgr.xor(e, f));
+
+    Generator.logAddConstraint(constraint1);
+    Generator.logAddConstraint(constraint3);
+
+    String actualResult = String.valueOf(Generator.lines);
+
+    String expectedResultMathsat5 = "(declare-const a (_ BitVec 12))\n"
+        + "(assert (= a (bvxor #b111111110110 #b000000010100)))\n"
+        + "(declare-const b (_ BitVec 100))\n"
+        + "(assert (= b #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110))\n";
+    String expectedResultZ3 = "(declare-const a (_ BitVec 12))\n"
+        + "(assert (= a (bvxor #b111111110110 #b000000010100)))\n"
+        + "(declare-const b (_ BitVec 100))\n"
+        + "(assert (= b (bvxor #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
+    Assert.assertTrue(expectedResultMathsat5.equals(actualResult) || expectedResultZ3.equals(actualResult));
+  }
+
+  @Test
+  public void testShiftRight() {
+    requireBitvectors();
+    clearGenerator();
+
+    BitvectorFormula a = Objects.requireNonNull(bvmgr).makeVariable(12, "a");
+    BitvectorFormula b = bvmgr.makeVariable(100, "b");
+    BitvectorFormula c = Objects.requireNonNull(bvmgr).makeBitvector(12, -10);
+    BitvectorFormula d = bvmgr.makeBitvector(12, 20);
+    BitvectorFormula e = Objects.requireNonNull(bvmgr).makeBitvector(100, 263255254);
+    BitvectorFormula f = bvmgr.makeBitvector(100, 0);
+    BooleanFormula constraint1 = bvmgr.equal(a, bvmgr.shiftRight(c, d, true));
+    BooleanFormula constraint3 = bvmgr.equal(b, bvmgr.shiftRight(e, f, false));
+
+    Generator.logAddConstraint(constraint1);
+    Generator.logAddConstraint(constraint3);
+
+    String actualResult = String.valueOf(Generator.lines);
+
+    String expectedResultMathsat5 = "(declare-const a (_ BitVec 12))\n"
+        + "(assert (= a (bvashr #b111111110110 #b000000010100)))\n"
+        + "(declare-const b (_ BitVec 100))\n"
+        + "(assert (= b #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110))\n";
+    String expectedResultZ3 = "(declare-const a (_ BitVec 12))\n"
+        + "(assert (= a (bvashr #b111111110110 #b000000010100)))\n"
+        + "(declare-const b (_ BitVec 100))\n"
+        + "(assert (= b (bvlshr #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
+    Assert.assertTrue(expectedResultMathsat5.equals(actualResult) || expectedResultZ3.equals(actualResult));
+  }
+
+  @Test
+  public void testShiftLeft() {
+    requireBitvectors();
+    clearGenerator();
+
+    BitvectorFormula a = Objects.requireNonNull(bvmgr).makeVariable(12, "a");
+    BitvectorFormula b = bvmgr.makeVariable(100, "b");
+    BitvectorFormula c = Objects.requireNonNull(bvmgr).makeBitvector(12, -10);
+    BitvectorFormula d = bvmgr.makeBitvector(12, 20);
+    BitvectorFormula e = Objects.requireNonNull(bvmgr).makeBitvector(100, 263255254);
+    BitvectorFormula f = bvmgr.makeBitvector(100, 0);
+    BooleanFormula constraint1 = bvmgr.equal(a, bvmgr.shiftLeft(c, d));
+    BooleanFormula constraint3 = bvmgr.equal(b, bvmgr.shiftLeft(e, f));
+
+    Generator.logAddConstraint(constraint1);
+    Generator.logAddConstraint(constraint3);
+
+    String actualResult = String.valueOf(Generator.lines);
+
+    String expectedResultOthers = "(declare-const a (_ BitVec 12))\n"
+        + "(assert (= a (bvshl #b111111110110 #b000000010100)))\n"
+        + "(declare-const b (_ BitVec 100))\n"
+        + "(assert (= b (bvshl #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
+    String expectedResultMathsat5 = "(declare-const a (_ BitVec 12))\n"
+        + "(assert (= a (bvshl #b111111110110 #b000000010100)))\n"
+        + "(declare-const b (_ BitVec 100))\n"
+        + "(assert (= b #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110))\n";
+    Assert.assertTrue(expectedResultOthers.equals(actualResult) || expectedResultMathsat5.equals(actualResult));
+  }
+
+  @Test
+  public void testConcat() {
+    requireBitvectors();
+    clearGenerator();
+
+    BitvectorFormula a = Objects.requireNonNull(bvmgr).makeVariable(24, "a");
+    BitvectorFormula b = bvmgr.makeVariable(200, "b");
+    BitvectorFormula c = bvmgr.makeBitvector(12, -10);
+    BitvectorFormula d = bvmgr.makeBitvector(12, 20);
+    BitvectorFormula e = bvmgr.makeBitvector(100, 263255254);
+    BitvectorFormula f = bvmgr.makeBitvector(100, 0);
+    BooleanFormula constraint1 = bvmgr.equal(a, bvmgr.concat(c, d));
+    BooleanFormula constraint3 = bvmgr.equal(b, bvmgr.concat(e, f));
+
+    Generator.logAddConstraint(constraint1);
+    Generator.logAddConstraint(constraint3);
+
+    String actualResult = String.valueOf(Generator.lines);
+
+    String expectedResultMathsat5 = "(declare-const a (_ BitVec 24))\n"
+        + "(assert (= a (concat #b111111110110 #b000000010100)))\n"
+        + "(declare-const b (_ BitVec 200))\n"
+        + "(assert (= b (concat #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
+    Assert.assertEquals(expectedResultMathsat5, actualResult);
+  }
+
+  @Test
+  public void testExtract() {
+    requireBitvectors();
+    clearGenerator();
+
+    BitvectorFormula a = Objects.requireNonNull(bvmgr).makeVariable(6, "a");
+    BitvectorFormula b = bvmgr.makeVariable(50, "b");
+    BitvectorFormula c = bvmgr.makeBitvector(12, -10);
+    BitvectorFormula f = bvmgr.makeBitvector(100, 0);
+    BooleanFormula constraint1 = bvmgr.equal(a, bvmgr.extract(c, 11, 6));
+    BooleanFormula constraint3 = bvmgr.equal(b, bvmgr.extract(f, 99, 50));
+
+    Generator.logAddConstraint(constraint1);
+    Generator.logAddConstraint(constraint3);
+
+    String actualResult = String.valueOf(Generator.lines);
+
+    String expectedResultMathsat5 = "(declare-const a (_ BitVec 6))\n"
+        + "(assert (= a ((_ extract 11 6) #b111111110110)))\n"
+        + "(declare-const b (_ BitVec 50))\n"
+        + "(assert (= b ((_ extract 99 50) #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
+    Assert.assertEquals(expectedResultMathsat5, actualResult);
+  }
+
+  @Test
+  public void testExtend() {
+    requireBitvectors();
+    clearGenerator();
+
+    BitvectorFormula a = Objects.requireNonNull(bvmgr).makeVariable(18, "a");
+    BitvectorFormula b = bvmgr.makeVariable(150, "b");
+    BitvectorFormula c = bvmgr.makeBitvector(12, -10);
+    BitvectorFormula f = bvmgr.makeBitvector(100, 0);
+    BooleanFormula constraint1 = bvmgr.equal(a, bvmgr.extend(c, 6, true));
+    BooleanFormula constraint3 = bvmgr.equal(b, bvmgr.extend(f, 50, false));
+
+    Generator.logAddConstraint(constraint1);
+    Generator.logAddConstraint(constraint3);
+
+    String actualResult = String.valueOf(Generator.lines);
+
+    String expectedResultMathsat5 = "(declare-const a (_ BitVec 18))\n"
+        + "(assert (= a ((_ sign_extend 6) #b111111110110)))\n"
+        + "(declare-const b (_ BitVec 150))\n"
+        + "(assert (= b ((_ zero_extend 50) #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
+    Assert.assertEquals(expectedResultMathsat5, actualResult);
+  }
+
+  @Test
+  public void testNested() {
+    requireBitvectors();
+    clearGenerator();
+
+    BitvectorFormula a = Objects.requireNonNull(bvmgr).makeVariable(5, "a");
+    BitvectorFormula b = bvmgr.makeVariable(5, "b");
+    BitvectorFormula c = bvmgr.makeBitvector(5, -10);
+    BitvectorFormula f = bvmgr.makeBitvector(5, 0);
+    BitvectorFormula term1 = bvmgr.add(a, b);
+    BitvectorFormula term2 = bvmgr.divide(c, f, true);
+    BitvectorFormula term3 = bvmgr.modulo(a, c, true);
+    BitvectorFormula term4 = bvmgr.xor(b, f);
+    BitvectorFormula term5 = bvmgr.subtract(term1, term2);
+    BitvectorFormula term6 = bvmgr.and(term5, term3);
+    BitvectorFormula term7 = bvmgr.shiftLeft(term6, term4);
+    BooleanFormula constraint = bvmgr.equal(a, term7);
+
+    Generator.logAddConstraint(constraint);
+
+    String actualResult = String.valueOf(Generator.lines);
+
+    String expectedResultOthers = "(declare-const a (_ BitVec 5))\n"
+        + "(declare-const b (_ BitVec 5))\n"
+        + "(assert (= a (bvshl (bvand (bvsub (bvadd a b) (bvsdiv #b10110 #b00000)) (bvsrem a #b10110)) (bvxor b #b00000))))\n";
+    String expectedResultMathsat5 = "(declare-const a (_ BitVec 5))\n"
+        + "(declare-const b (_ BitVec 5))\n"
+        + "(assert (= a (bvshl (bvand (bvsub (bvadd a b) (bvsdiv #b10110 #b00000)) (bvsrem a "
+        + "#b10110)) b)))\n";
+    Assert.assertTrue(expectedResultOthers.equals(actualResult) || expectedResultMathsat5.equals(actualResult));
+  }
+
+
 
   }
