@@ -105,14 +105,16 @@ public class BitvectorGenerator {
     Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
 
-  public static void logSToIntegerFormula(Object result, BitvectorFormula pI) {
-    throw new IllegalArgumentException("toIntegerFormula operation is not available for "
+  public static void logSToIntegerFormula(Object result, BitvectorFormula pI)
+      throws GeneratorException {
+    throw new GeneratorException("toIntegerFormula operation is not available for "
         + "bitvectors in "
         + "SMT-LIB2");
   }
 
-  public static void logUToIntegerFormula(Object result, BitvectorFormula pI) {
-    throw new IllegalArgumentException("toIntegerFormula operation is not available for "
+  public static void logUToIntegerFormula(Object result, BitvectorFormula pI)
+      throws GeneratorException {
+    throw new GeneratorException("toIntegerFormula operation is not available for "
         + "bitvectors in "
         + "SMT-LIB2");
   }
@@ -389,8 +391,9 @@ public class BitvectorGenerator {
     Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
 
-  public static void logBVDistinct(Object result, List<BitvectorFormula> operands) throws IllegalArgumentException {
-    throw new IllegalArgumentException("distinct operation is not available for bitvectors in "
+  public static void logBVDistinct(Object result, List<BitvectorFormula> operands)
+      throws GeneratorException {
+    throw new GeneratorException("distinct operation is not available for bitvectors in "
         + "SMT-LIB2");
   }
 

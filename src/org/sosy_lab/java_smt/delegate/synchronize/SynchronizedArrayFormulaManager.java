@@ -52,8 +52,7 @@ class SynchronizedArrayFormulaManager implements ArrayFormulaManager {
           TE extends Formula,
           FTI extends FormulaType<TI>,
           FTE extends FormulaType<TE>>
-      ArrayFormula<TI, TE> makeArray(String pName, FTI pIndexType, FTE pElementType)
-      throws IOException {
+      ArrayFormula<TI, TE> makeArray(String pName, FTI pIndexType, FTE pElementType) {
     synchronized (sync) {
       return delegate.makeArray(pName, pIndexType, pElementType);
     }
@@ -61,7 +60,7 @@ class SynchronizedArrayFormulaManager implements ArrayFormulaManager {
 
   @Override
   public <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> makeArray(
-      String pName, ArrayFormulaType<TI, TE> pType) throws IOException {
+      String pName, ArrayFormulaType<TI, TE> pType) {
     synchronized (sync) {
       return delegate.makeArray(pName, pType);
     }

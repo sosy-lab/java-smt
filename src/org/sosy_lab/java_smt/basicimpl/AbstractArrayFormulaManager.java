@@ -19,6 +19,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.utils.Generators.ArrayGenerator;
 import org.sosy_lab.java_smt.utils.Generators.Generator;
+import org.sosy_lab.java_smt.utils.Generators.GeneratorException;
 
 @SuppressWarnings({"ClassTypeParameterName", "MethodTypeParameterName"})
 public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
@@ -71,7 +72,7 @@ public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFu
 
   @Override
   public <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> makeArray(
-      String pName, ArrayFormulaType<TI, TE> type) throws IOException {
+      String pName, ArrayFormulaType<TI, TE> type) throws GeneratorException {
     return makeArray(pName, type.getIndexType(), type.getElementType());
   }
 
@@ -82,7 +83,7 @@ public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFu
           FTI extends FormulaType<TI>,
           FTE extends FormulaType<TE>>
       ArrayFormula<TI, TE> makeArray(String pName, FTI pIndexType, FTE pElementType)
-      throws IOException {
+      throws GeneratorException {
     checkVariableName(pName);
     final TFormulaInfo namedArrayFormula = internalMakeArray(pName, pIndexType, pElementType);
     ArrayFormula result = getFormulaCreator().encapsulateArray(namedArrayFormula, pIndexType, pElementType);

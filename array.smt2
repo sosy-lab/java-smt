@@ -1,13 +1,7 @@
-(define-sort A () (Array Int Int Int))
-(define-fun bag-union ((x A) (y A)) A
-  ((_ map (+ (Int Int) Int)) x y))
-(declare-const s1 A)
-(declare-const s2 A)
-(declare-const s3 A)
-(assert (= s3 (bag-union s1 s2)))
-(assert (= (select s1 0 0) 5))
-(assert (= (select s2 0 0) 3))
-(assert (= (select s2 1 2) 4))
+(declare-const all1 (Array Int Int))
+(declare-const a Int)
+(declare-const i Int)
+(assert (= all1 ((as const (Array Int Int)) 1)))
+(assert (= a (select all1 i)))
 (check-sat)
 (get-model)
-

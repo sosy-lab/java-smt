@@ -1,5 +1,5 @@
-(declare-const hi Int)
-(declare-const test (Array (Array Int Int) (Array Int Int)))
+(declare-const hi (_ BitVec 5))
+(declare-const test (Array (Array Int Int) (Array Int (_ BitVec 5))))
 (declare-const bla (Array Int Int))
 (assert (= hi (select (select test bla) 3)))
 (check-sat)

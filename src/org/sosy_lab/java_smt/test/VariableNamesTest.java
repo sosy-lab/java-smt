@@ -308,11 +308,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
     requireArrays();
     for (String name : getAllNames()) {
       testName0(name, s -> {
-        try {
           return amgr.makeArray(s, IntegerType, IntegerType);
-        } catch (IOException pE) {
-          throw new RuntimeException(pE);
-        }
       }, amgr::equivalence, false);
     }
   }
@@ -328,14 +324,10 @@ public class VariableNamesTest extends SolverBasedTest0 {
           name,
           s ->
           {
-            try {
               return Objects.requireNonNull(amgr).makeArray(
                   s,
                   FormulaType.getBitvectorTypeWithSize(2),
                   FormulaType.getBitvectorTypeWithSize(2));
-            } catch (IOException pE) {
-              throw new RuntimeException(pE);
-            }
           },
           amgr::equivalence,
           false);
@@ -627,11 +619,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
     requireIntegers();
     for (String name : getAllNames()) {
       createVariableWith(v -> {
-        try {
           return Objects.requireNonNull(amgr).makeArray(v, IntegerType, IntegerType);
-        } catch (IOException pE) {
-          throw new RuntimeException(pE);
-        }
       }, name);
     }
   }
@@ -646,14 +634,10 @@ public class VariableNamesTest extends SolverBasedTest0 {
       createVariableWith(
           v ->
           {
-            try {
               return Objects.requireNonNull(amgr).makeArray(
                   v,
                   FormulaType.getBitvectorTypeWithSize(2),
                   FormulaType.getBitvectorTypeWithSize(2));
-            } catch (IOException pE) {
-              throw new RuntimeException(pE);
-            }
           },
           name);
     }

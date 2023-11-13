@@ -119,12 +119,12 @@ public class UniversalModel extends AbstractModel {
   }
 
   public List<ValueAssignment> getAssignments()
-      throws IOException, SolverException {
+      throws IOException, ModelException {
     getOutput();
     if (! isUnsat) {
       assignments = parseModel(path + "Model.smt2");
     } else {
-      throw new SolverException("Formula has to be sat in order to retrieve a model.");
+      throw new ModelException("Formula has to be sat in order to retrieve a model.");
     }
     finalList = listToImmutable(assignments);
 
@@ -139,7 +139,8 @@ public class UniversalModel extends AbstractModel {
   }
 
   public UniversalModel getModel()
-      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException,
+             ModelException {
     getOutput();
     getAssignments();
     return this;
@@ -153,7 +154,13 @@ public class UniversalModel extends AbstractModel {
 
   @Override
   public String toString() {
-    return finalList.toString();
+    StringBuilder out = new StringBuilder();
+    for (int i = 0; i < finalList.size(); i++) {
+      out.append(finalList.get(i));
+      out.append("\n");
+    }
+
+    return String.valueOf(out);
   }
 
   public boolean isUnsat() {

@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.api;
 
 import java.io.IOException;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
+import org.sosy_lab.java_smt.utils.Generators.GeneratorException;
 
 /**
  * This interface represents the theory of (arbitrarily nested) arrays. (as defined in the SMTLIB2
@@ -52,8 +53,7 @@ public interface ArrayFormulaManager {
    * @return Formula that represents the array
    */
   <TI extends Formula, TE extends Formula, FTI extends FormulaType<TI>, FTE extends FormulaType<TE>>
-      ArrayFormula<TI, TE> makeArray(String pName, FTI pIndexType, FTE pElementType)
-      throws IOException;
+      ArrayFormula<TI, TE> makeArray(String pName, FTI pIndexType, FTE pElementType);
 
   /**
    * Declare a new array.
@@ -61,7 +61,7 @@ public interface ArrayFormulaManager {
    * @param pName The name of the array variable
    */
   <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> makeArray(
-      String pName, ArrayFormulaType<TI, TE> type) throws IOException;
+      String pName, ArrayFormulaType<TI, TE> type);
 
   /** Make a {@link BooleanFormula} that represents the equality of two {@link ArrayFormula}. */
   <TI extends Formula, TE extends Formula> BooleanFormula equivalence(

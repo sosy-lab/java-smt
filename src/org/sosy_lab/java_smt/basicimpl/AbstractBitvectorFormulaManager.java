@@ -25,6 +25,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.utils.Generators.BitvectorGenerator;
 import org.sosy_lab.java_smt.utils.Generators.BooleanGenerator;
 import org.sosy_lab.java_smt.utils.Generators.Generator;
+import org.sosy_lab.java_smt.utils.Generators.GeneratorException;
 import org.sosy_lab.java_smt.utils.Generators.NumeralGenerator;
 
 @SuppressWarnings("ClassTypeParameterName")
@@ -70,7 +71,8 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
   protected abstract TFormulaInfo makeBitvectorImpl(int length, TFormulaInfo pParam1);
 
   @Override
-  public IntegerFormula toIntegerFormula(BitvectorFormula pI, boolean signed) {
+  public IntegerFormula toIntegerFormula(BitvectorFormula pI, boolean signed)
+      throws GeneratorException {
     TFormulaInfo param1 = extractInfo(pI);
     IntegerFormula result = getFormulaCreator()
         .encapsulate(FormulaType.IntegerType, toIntegerFormulaImpl(param1, signed));
@@ -484,7 +486,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
   }
 
   @Override
-  public final BooleanFormula distinct(List<BitvectorFormula> pBits) {
+  public final BooleanFormula distinct(List<BitvectorFormula> pBits) throws GeneratorException {
     // optimization
     if (pBits.size() <= 1) {
       if (Generator.isLoggingEnabled) {

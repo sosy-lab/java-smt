@@ -135,13 +135,13 @@ public class NumeralGenerator {
   }
 
   public static void logModularCongruence(Object result, Object pNumber1, Object pNumber2,
-                                          long pModulo) {
-    throw new UnsupportedOperationException("Modular Congruence is not available in SMTLIB2. ");
+                                          long pModulo) throws GeneratorException {
+    throw new GeneratorException("Modular Congruence is not available in SMTLIB2. ");
   }
 
   public static void logModularCongruence(Object result, Object pNumber1, Object pNumber2,
                                           BigInteger pModulo) {
-    throw new UnsupportedOperationException("Modular Congruence is not available in SMTLIB2. ");
+    throw new GeneratorException("Modular Congruence is not available in SMTLIB2. ");
   }
 
   public static void logMultiply(Object result, Object pNumber1, Object pNumber2) {

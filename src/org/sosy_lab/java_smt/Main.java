@@ -43,22 +43,14 @@ public class Main {
     FormulaManager fmgr = context.getFormulaManager();
     BooleanFormulaManager bmgr = fmgr.getBooleanFormulaManager();
     IntegerFormulaManager imgr = fmgr.getIntegerFormulaManager();
-    //BitvectorFormulaManager bvmgr = fmgr.getBitvectorFormulaManager();
+    BitvectorFormulaManager bvmgr = fmgr.getBitvectorFormulaManager();
     ArrayFormulaManager amgr = fmgr.getArrayFormulaManager();
-    //RationalFormulaManager rmgr = fmgr.getRationalFormulaManager();
     UFManager umgr =  fmgr.getUFManager();
 
-    //BooleanFormula constraint = fmgr.universalParse("/home/janel/Desktop/Studium/Semester_6"
-    //    + "/Bachelorarbeit/nochmalneu/array.smt2");
+    BooleanFormula constraint = fmgr.universalParse("/home/janel/Desktop/Studium/Semester_6"
+        + "/Bachelorarbeit/nochmalneu/array.smt2");
 
-    ArrayFormula test = amgr.makeArray("test", FormulaType.getArrayType(FormulaType.IntegerType,
-        FormulaType.IntegerType), FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.IntegerType));
-    ArrayFormula x = (ArrayFormula) amgr.select(test, amgr.makeArray("bla", FormulaType.IntegerType,
-        FormulaType.IntegerType));
-    IntegerFormula y = (IntegerFormula) amgr.select(x, imgr.makeNumber(3));
-    BooleanFormula constraint = imgr.equal(imgr.makeVariable("hi"), y);
 
-    System.out.println(constraint);
     try (ProverEnvironment prover =
              context.newProverEnvironment(SolverContext.ProverOptions.GENERATE_MODELS,
                  ProverOptions.USE_BINARY)) {
@@ -76,4 +68,5 @@ public class Main {
       throw new RuntimeException(v);
     }
   }
+
 }

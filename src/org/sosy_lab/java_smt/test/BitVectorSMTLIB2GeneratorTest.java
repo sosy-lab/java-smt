@@ -21,6 +21,8 @@
 package org.sosy_lab.java_smt.test;
 
 
+import static com.google.common.truth.Truth.assertThat;
+
 import java.util.Objects;
 import org.junit.Assert;
 import org.junit.Test;
@@ -79,7 +81,7 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
     // + "(declare-const f (_ BitVec 214748366))\n"
     // + "(assert (= e f))\n";
 
-    Assert.assertEquals(actualResult, expectedResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
     }
 
   @Test

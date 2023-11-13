@@ -25,6 +25,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormulaManager;
 import org.sosy_lab.java_smt.utils.Generators.Generator;
+import org.sosy_lab.java_smt.utils.Generators.GeneratorException;
 import org.sosy_lab.java_smt.utils.Generators.NumeralGenerator;
 
 /**
@@ -338,7 +339,8 @@ public abstract class AbstractNumeralFormulaManager<
   }
 
   public BooleanFormula modularCongruence(
-      ParamFormulaType pNumber1, ParamFormulaType pNumber2, long pModulo) {
+      ParamFormulaType pNumber1, ParamFormulaType pNumber2, long pModulo)
+      throws GeneratorException {
     Preconditions.checkArgument(pModulo > 0, "modular congruence needs a positive modulo.");
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
@@ -350,7 +352,8 @@ public abstract class AbstractNumeralFormulaManager<
   }
 
   public BooleanFormula modularCongruence(
-      ParamFormulaType pNumber1, ParamFormulaType pNumber2, BigInteger pModulo) {
+      ParamFormulaType pNumber1, ParamFormulaType pNumber2, BigInteger pModulo)
+      throws GeneratorException {
     Preconditions.checkArgument(
         pModulo.signum() > 0, "modular congruence needs a positive modulo.");
     TFormulaInfo param1 = extractInfo(pNumber1);

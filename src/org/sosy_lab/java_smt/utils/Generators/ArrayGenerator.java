@@ -20,7 +20,6 @@
 
 package org.sosy_lab.java_smt.utils.Generators;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -28,42 +27,48 @@ import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
+
 
 public class ArrayGenerator {
 
   public static <
       TE extends Formula,
-      FTE extends FormulaType<TE>> String checkArrayElementSort(FTE pElementType)
-      throws IOException {
+      FTE extends FormulaType<TE>> String checkArrayElementSort(FTE pElementType) {
     if (pElementType.isIntegerType()) {
       return  "Int";
     } else if (pElementType.isBooleanType()) {
       return "Bool";
     } else if (pElementType.isRationalType()) {
       return "Real";
+    } else if (pElementType.isBitvectorType()) {
+      return "(_ BitVec " + ((BitvectorType) pElementType).getSize() + ")";
     } else if (pElementType.isArrayType()) {
-      return "(Array " + checkArrayIndexSort(((ArrayFormulaType) pElementType).getIndexType()) +
-          " " + checkArrayElementSort(((ArrayFormulaType) pElementType).getElementType()) + ")";
+      return "(Array " + checkArrayIndexSort(((ArrayFormulaType<?,?>) pElementType).getIndexType()) +
+          " " + checkArrayElementSort(((ArrayFormulaType<?,?>) pElementType).getElementType()) +
+          ")";
     }else {
-      throw new IOException(pElementType + "is not available yet in ArrayGenerator as "
+      throw new GeneratorException(pElementType + "is not available yet in ArrayGenerator as "
           + "index for Arrays");
     }
   }
 
   public static <
       TI extends Formula,
-      FTI extends FormulaType<TI>> String checkArrayIndexSort(FTI pIndexType) throws IOException {
+      FTI extends FormulaType<TI>> String checkArrayIndexSort(FTI pIndexType) {
     if (pIndexType.isIntegerType()) {
       return  "Int";
     } else if (pIndexType.isBooleanType()) {
       return "Bool";
     } else if (pIndexType.isRationalType()) {
       return "Real";
+    } else if (pIndexType.isBitvectorType()) {
+      return "(_ BitVec " + ((BitvectorType) pIndexType).getSize() + ")";
     } else if (pIndexType.isArrayType()) {
-      return "(Array " + checkArrayIndexSort(((ArrayFormulaType) pIndexType).getIndexType()) +
-          " " + checkArrayElementSort(((ArrayFormulaType) pIndexType).getElementType()) + ")";
+      return "(Array " + checkArrayIndexSort(((ArrayFormulaType<?,?>) pIndexType).getIndexType()) +
+          " " + checkArrayElementSort(((ArrayFormulaType<?,?>) pIndexType).getElementType()) + ")";
     } else {
-      throw new IOException(pIndexType + "is not available yet in ArrayGenerator as "
+      throw new GeneratorException(pIndexType + "is not available yet in ArrayGenerator as "
           + "index for Arrays");
     }
   }
@@ -72,13 +77,13 @@ public class ArrayGenerator {
       TI extends Formula,
       TE extends Formula,
       FTI extends FormulaType<TI>,
-      FTE extends FormulaType<TE>> void logMakeArray(ArrayFormula result,
-                                                                           String pName, FTI pIndexType, FTE pElementType)
-      throws IOException {
+      FTE extends FormulaType<TE>> void logMakeArray(ArrayFormula<?,?> result,
+                                                                           String pName, FTI pIndexType, FTE pElementType) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pName);
     Function<List<Object>, String> saveResult = inPlaceInputParams -> (String) inPlaceInputParams.get(0);
-    RecursiveString newEntry = new RecursiveString(result, inputParams, saveResult, "Array");
+    RecursiveString<Formula, Formula>
+        newEntry = new RecursiveString<>(result, inputParams, saveResult, "Array");
     newEntry.setArrayIndexType(checkArrayIndexSort(pIndexType));
     newEntry.setArrayValueType(checkArrayElementSort(pElementType));
     Generator.executedAggregator.add(newEntry);
@@ -92,7 +97,7 @@ public class ArrayGenerator {
     inputParams.add(pArray2);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) +")";
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
 
   public static <TI extends Formula, TE extends Formula> void logSelect(Object result,
@@ -103,7 +108,7 @@ public class ArrayGenerator {
     inputParams.add(pIndex);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(select " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) +")";
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
 
   public static <TI extends Formula, TE extends Formula> void logStore(
@@ -114,10 +119,7 @@ public class ArrayGenerator {
     inputParams.add(pValue);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(store " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + " " + inPlaceInputParams.get(2) +")";
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
-
-  //TODO: getElementType?
-  //TODO: getIndexType?
 
 }
