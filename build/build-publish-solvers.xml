@@ -686,22 +686,6 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="--replace-needed"/><arg value="libgmp.so.10"/><arg value="libgmp.so"/>
             <arg value="--replace-needed"/><arg value="libm.so.6"/><arg value="libm.so"/>
             <arg value="--replace-needed"/><arg value="libmpfr.so.6"/><arg value="libmpfr.so"/>
-            <arg value="apron.jar"/>
-        </exec>
-        <exec executable="patchelf" dir="${apron.path}" failonerror="true">
-            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
-            <arg value="--replace-needed"/><arg value="libc.so.6"/><arg value="libc.so"/>
-            <arg value="--replace-needed"/><arg value="libgmp.so.10"/><arg value="libgmp.so"/>
-            <arg value="--replace-needed"/><arg value="libm.so.6"/><arg value="libm.so"/>
-            <arg value="--replace-needed"/><arg value="libmpfr.so.6"/><arg value="libmpfr.so"/>
-            <arg value="gmp.jar"/>
-        </exec>
-        <exec executable="patchelf" dir="${apron.path}" failonerror="true">
-            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
-            <arg value="--replace-needed"/><arg value="libc.so.6"/><arg value="libc.so"/>
-            <arg value="--replace-needed"/><arg value="libgmp.so.10"/><arg value="libgmp.so"/>
-            <arg value="--replace-needed"/><arg value="libm.so.6"/><arg value="libm.so"/>
-            <arg value="--replace-needed"/><arg value="libmpfr.so.6"/><arg value="libmpfr.so"/>
             <arg value="libapron.so"/>
         </exec>
         <exec executable="patchelf" dir="${apron.path}" failonerror="true">
