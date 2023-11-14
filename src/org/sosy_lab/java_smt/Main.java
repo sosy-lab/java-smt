@@ -58,7 +58,7 @@ public class Main {
     ShutdownManager shutdown = ShutdownManager.create();
     SolverContext context =
         SolverContextFactory.createSolverContext(config, logger, shutdown.getNotifier(),
-            Solvers.Z3);
+            Solvers.PRINCESS_BINARY);
     FormulaManager fmgr = context.getFormulaManager();
     BooleanFormulaManager bmgr = fmgr.getBooleanFormulaManager();
     IntegerFormulaManager imgr = fmgr.getIntegerFormulaManager();
@@ -66,14 +66,14 @@ public class Main {
     ArrayFormulaManager amgr = fmgr.getArrayFormulaManager();
     UFManager umgr =  fmgr.getUFManager();
 
-    FunctionDeclaration<BooleanFormula>
-        a = umgr.declareUF("a", FormulaType.BooleanType, FormulaType.BooleanType);
-    FunctionDeclaration<BooleanFormula> b = umgr.declareUF("b", FormulaType.BooleanType,
-        FormulaType.BooleanType);
-    BooleanFormula c = umgr.callUF(a, bmgr.makeFalse());
-    BooleanFormula d = umgr.callUF(b, bmgr.makeTrue());
+    String a = "(declare-const a1 (Array Int Int))\n"
+        + "(declare-const a2 (Array Int Int))\n"
+        + "(assert (= a1 a2))\n"
+        + "(declare-const c1 (Array (Array Int Int) (Array (Array Int Int) (Array Int Int))))\n"
+        + "(declare-const c2 (Array (Array Int Int) (Array (Array Int Int) (Array Int Int))))\n"
+        + "(assert (= c1 c2))\n";
 
-    BooleanFormula constraint = bmgr.equivalence(c, d);
+    BooleanFormula constraint = fmgr.universalParseFromString(a);
 
     try (ProverEnvironment prover =
              context.newProverEnvironment(SolverContext.ProverOptions.GENERATE_MODELS,
