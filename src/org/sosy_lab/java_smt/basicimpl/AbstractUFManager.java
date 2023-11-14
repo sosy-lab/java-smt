@@ -78,6 +78,9 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
   @Override
   public <T extends Formula> T callUF(FunctionDeclaration<T> funcType, Formula... args) {
     T result = formulaCreator.callFunction(funcType, Arrays.asList(args));
+    if (Generator.isLoggingEnabled) {
+      UFGenerator.logCallFun(result, funcType, args);
+    }
     return result;
   }
 

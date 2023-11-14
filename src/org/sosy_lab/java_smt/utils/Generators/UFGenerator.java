@@ -22,12 +22,12 @@ package org.sosy_lab.java_smt.utils.Generators;
 
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
-import org.sosy_lab.java_smt.api.BitvectorFormula;
-import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 
@@ -35,32 +35,40 @@ public class UFGenerator <TFormulaInfo, TFunctionDecl, TType, TEnv> {
 
   public static String checkUFInputType(ImmutableList<FormulaType<?>> args) {
     StringBuilder inputArgs = new StringBuilder("(");
-    for (FormulaType arg : args) {
+    for (FormulaType<?> arg : args) {
       if (arg.isArrayType()) {
-        inputArgs.append("Array");
+        inputArgs.append("(Array ")
+            .append(checkUFOutputType(((ArrayFormulaType<?, ?>) arg).getIndexType())).append(" ")
+            .append(checkUFOutputType(((ArrayFormulaType<?, ?>) arg).getElementType())).append(")");
       } else if (arg.isBitvectorType()) {
-        inputArgs.append("(_ BitVec " + ((FormulaType.BitvectorType) arg).getSize() + ")");
+        inputArgs.append("(_ BitVec ").append(((BitvectorType) arg).getSize()).append(")");
       } else if (arg.isBooleanType()) {
         inputArgs.append("Bool");
       } else if (arg.isIntegerType()) {
         inputArgs.append("Int");
+      } else if (arg.isRationalType()) {
+        inputArgs.append("Real");
+      } else {
+        throw new GeneratorException(arg + " is not a known sort. ");
       }
     }
     inputArgs.append(")");
     return String.valueOf(inputArgs);
   }
 
-  public static String checkUFOutputType(FormulaType out) {
+  public static String checkUFOutputType(FormulaType<?> out) {
     if (out.isArrayType()) {
-      return "Array";
+      return "(Array " + checkUFOutputType(((ArrayFormulaType<?, ?>) out).getIndexType()) + " " + checkUFOutputType(((ArrayFormulaType<?, ?>) out).getElementType()) + ")";
     } else if (out.isBitvectorType()) {
       return "(_ BitVec " + ((FormulaType.BitvectorType) out).getSize() + ")";
     } else if (out.isBooleanType()) {
       return "Bool";
     } else if (out.isIntegerType()) {
       return "Int";
+    } else if (out.isRationalType()) {
+      return "Real";
     } else {
-      return "Type not available yet";
+      throw new GeneratorException(out + " is not a known sort. ");
     }
   }
 
@@ -80,24 +88,52 @@ public class UFGenerator <TFormulaInfo, TFunctionDecl, TType, TEnv> {
   public static <T extends Formula> void logCallFun(Object result,
                                                     FunctionDeclaration<T> funcType, List<? extends Formula> pArgs) {
 
-    List<Object> inputParams = new ArrayList<>();
-    inputParams.addAll(pArgs);
+    List<Object> inputParams = new ArrayList<>(pArgs);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> {
           StringBuilder out = new StringBuilder();
-          out.append(funcType.getName() + " ");
+          out.append(funcType.getName()).append(" ");
           inPlaceInputParams.forEach((c) -> {
             out.append(c);
             out.append(" ");
           });
           out.deleteCharAt(out.length()-1);
-          if (inPlaceInputParams.size() > 0) {
+          if (!inPlaceInputParams.isEmpty()) {
             out.insert(0, "(");
             out.append(")");
           }
           return String.valueOf(out);
         };
-    RecursiveString newEntry = new RecursiveString(result, inputParams, saveResult, "UFFun");
+    RecursiveString<Formula, Formula> newEntry = new RecursiveString<>(result, inputParams,
+        saveResult,
+        "UFFun");
+    newEntry.setUFName(funcType.getName());
+    newEntry.setUFInputType(checkUFInputType(funcType.getArgumentTypes()));
+    newEntry.setUFOutputType(checkUFOutputType(funcType.getType()));
+    Generator.executedAggregator.add(newEntry);
+  }
+
+  public static <T extends Formula> void logCallFun(Object result,
+                                                    FunctionDeclaration<T> funcType, Formula... args) {
+
+    List<Object> inputParams = new ArrayList<>(Arrays.asList(args));
+    Function<List<Object>, String> saveResult =
+        inPlaceInputParams -> {
+          StringBuilder out = new StringBuilder();
+          out.append(funcType.getName()).append(" ");
+          inPlaceInputParams.forEach((c) -> {
+            out.append(c);
+            out.append(" ");
+          });
+          out.deleteCharAt(out.length()-1);
+          if (!inPlaceInputParams.isEmpty()) {
+            out.insert(0, "(");
+            out.append(")");
+          }
+          return String.valueOf(out);
+        };
+    RecursiveString<Formula, Formula> newEntry = new RecursiveString<>(result, inputParams,
+        saveResult, "UFFun");
     newEntry.setUFName(funcType.getName());
     newEntry.setUFInputType(checkUFInputType(funcType.getArgumentTypes()));
     newEntry.setUFOutputType(checkUFOutputType(funcType.getType()));

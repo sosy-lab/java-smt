@@ -19,6 +19,7 @@ package org.sosy_lab.java_smt;/*
  */
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Objects;
 import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.configuration.Configuration;
@@ -32,8 +33,10 @@ import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
@@ -63,16 +66,14 @@ public class Main {
     ArrayFormulaManager amgr = fmgr.getArrayFormulaManager();
     UFManager umgr =  fmgr.getUFManager();
 
-    ArrayFormula<IntegerFormula, IntegerFormula> a1 = Objects.requireNonNull(amgr)
-        .makeArray("a1", FormulaType.IntegerType,
-            FormulaType.IntegerType);
-    ArrayFormula<IntegerFormula, IntegerFormula> a2 = Objects.requireNonNull(amgr)
-        .makeArray("a2", FormulaType.IntegerType,
-            FormulaType.IntegerType);
+    FunctionDeclaration<BooleanFormula>
+        a = umgr.declareUF("a", FormulaType.BooleanType, FormulaType.BooleanType);
+    FunctionDeclaration<BooleanFormula> b = umgr.declareUF("b", FormulaType.BooleanType,
+        FormulaType.BooleanType);
+    BooleanFormula c = umgr.callUF(a, bmgr.makeFalse());
+    BooleanFormula d = umgr.callUF(b, bmgr.makeTrue());
 
-    ArrayFormula<IntegerFormula, IntegerFormula> term1 = amgr.store(a1, imgr.makeNumber(3), imgr.makeNumber(2));
-    BooleanFormula constraint = amgr.equivalence(a1, a2);
-
+    BooleanFormula constraint = bmgr.equivalence(c, d);
 
     try (ProverEnvironment prover =
              context.newProverEnvironment(SolverContext.ProverOptions.GENERATE_MODELS,
