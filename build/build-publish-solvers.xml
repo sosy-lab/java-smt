@@ -669,10 +669,23 @@ SPDX-License-Identifier: Apache-2.0
             The custom revision has to be unique amongst the already known version
             numbers from the ivy repository. The script will append the git revision.
         </fail>
+        <!-- get a nive version -->
+        <exec executable="git" dir="${apron.path}/apron" outputproperty="apron.revision"
+              failonerror="true">
+            <arg value="show"/>
+            <arg value="-s"/>
+            <arg value="--format=%h"/>
+        </exec>
+        <property name="apron.version" value="${apron.customRev}-g${apron.revision}"/>
+        <echo message="Building Apron in version '${apron.version}'"/>
 
         <!-- fix RPATH and library dependencies -->
         <exec executable="patchelf" dir="${apron.path}" failonerror="true">
             <arg value="--set-rpath"/><arg value="$ORIGIN"/>
+            <arg value="--replace-needed"/><arg value="libc.so.6"/><arg value="libc.so"/>
+            <arg value="--replace-needed"/><arg value="libgmp.so.10"/><arg value="libgmp.so"/>
+            <arg value="--replace-needed"/><arg value="libm.so.6"/><arg value="libm.so"/>
+            <arg value="--replace-needed"/><arg value="libmpfr.so.6"/><arg value="libmpfr.so"/>
             <arg value="apron.jar"/>
         </exec>
         <exec executable="patchelf" dir="${apron.path}" failonerror="true">
@@ -689,7 +702,79 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="--replace-needed"/><arg value="libgmp.so.10"/><arg value="libgmp.so"/>
             <arg value="--replace-needed"/><arg value="libm.so.6"/><arg value="libm.so"/>
             <arg value="--replace-needed"/><arg value="libmpfr.so.6"/><arg value="libmpfr.so"/>
-            <arg value=".jar"/>
+            <arg value="libapron.so"/>
+        </exec>
+        <exec executable="patchelf" dir="${apron.path}" failonerror="true">
+            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
+            <arg value="--replace-needed"/><arg value="libc.so.6"/><arg value="libc.so"/>
+            <arg value="--replace-needed"/><arg value="libgmp.so.10"/><arg value="libgmp.so"/>
+            <arg value="--replace-needed"/><arg value="libm.so.6"/><arg value="libm.so"/>
+            <arg value="--replace-needed"/><arg value="libmpfr.so.6"/><arg value="libmpfr.so"/>
+            <arg value="libboxD.so"/>
+        </exec>
+        <exec executable="patchelf" dir="${apron.path}" failonerror="true">
+            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
+            <arg value="--replace-needed"/><arg value="libc.so.6"/><arg value="libc.so"/>
+            <arg value="--replace-needed"/><arg value="libgmp.so.10"/><arg value="libgmp.so"/>
+            <arg value="--replace-needed"/><arg value="libm.so.6"/><arg value="libm.so"/>
+            <arg value="--replace-needed"/><arg value="libmpfr.so.6"/><arg value="libmpfr.so"/>
+            <arg value="libc.so"/>
+        </exec>
+        <exec executable="patchelf" dir="${apron.path}" failonerror="true">
+            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
+            <arg value="--replace-needed"/><arg value="libc.so.6"/><arg value="libc.so"/>
+            <arg value="--replace-needed"/><arg value="libgmp.so.10"/><arg value="libgmp.so"/>
+            <arg value="--replace-needed"/><arg value="libm.so.6"/><arg value="libm.so"/>
+            <arg value="--replace-needed"/><arg value="libmpfr.so.6"/><arg value="libmpfr.so"/>
+            <arg value="libgmp.so"/>
+        </exec>
+        <exec executable="patchelf" dir="${apron.path}" failonerror="true">
+            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
+            <arg value="--replace-needed"/><arg value="libc.so.6"/><arg value="libc.so"/>
+            <arg value="--replace-needed"/><arg value="libgmp.so.10"/><arg value="libgmp.so"/>
+            <arg value="--replace-needed"/><arg value="libm.so.6"/><arg value="libm.so"/>
+            <arg value="--replace-needed"/><arg value="libmpfr.so.6"/><arg value="libmpfr.so"/>
+            <arg value="libjapron.so"/>
+        </exec>
+        <exec executable="patchelf" dir="${apron.path}" failonerror="true">
+            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
+            <arg value="--replace-needed"/><arg value="libc.so.6"/><arg value="libc.so"/>
+            <arg value="--replace-needed"/><arg value="libgmp.so.10"/><arg value="libgmp.so"/>
+            <arg value="--replace-needed"/><arg value="libm.so.6"/><arg value="libm.so"/>
+            <arg value="--replace-needed"/><arg value="libmpfr.so.6"/><arg value="libmpfr.so"/>
+            <arg value="libjgmp.so"/>
+        </exec>
+        <exec executable="patchelf" dir="${apron.path}" failonerror="true">
+            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
+            <arg value="--replace-needed"/><arg value="libc.so.6"/><arg value="libc.so"/>
+            <arg value="--replace-needed"/><arg value="libgmp.so.10"/><arg value="libgmp.so"/>
+            <arg value="--replace-needed"/><arg value="libm.so.6"/><arg value="libm.so"/>
+            <arg value="--replace-needed"/><arg value="libmpfr.so.6"/><arg value="libmpfr.so"/>
+            <arg value="libm.so"/>
+        </exec>
+        <exec executable="patchelf" dir="${apron.path}" failonerror="true">
+            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
+            <arg value="--replace-needed"/><arg value="libc.so.6"/><arg value="libc.so"/>
+            <arg value="--replace-needed"/><arg value="libgmp.so.10"/><arg value="libgmp.so"/>
+            <arg value="--replace-needed"/><arg value="libm.so.6"/><arg value="libm.so"/>
+            <arg value="--replace-needed"/><arg value="libmpfr.so.6"/><arg value="libmpfr.so"/>
+            <arg value="libmpfr.so"/>
+        </exec>
+        <exec executable="patchelf" dir="${apron.path}" failonerror="true">
+            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
+            <arg value="--replace-needed"/><arg value="libc.so.6"/><arg value="libc.so"/>
+            <arg value="--replace-needed"/><arg value="libgmp.so.10"/><arg value="libgmp.so"/>
+            <arg value="--replace-needed"/><arg value="libm.so.6"/><arg value="libm.so"/>
+            <arg value="--replace-needed"/><arg value="libmpfr.so.6"/><arg value="libmpfr.so"/>
+            <arg value="liboctD.so"/>
+        </exec>
+        <exec executable="patchelf" dir="${apron.path}" failonerror="true">
+            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
+            <arg value="--replace-needed"/><arg value="libc.so.6"/><arg value="libc.so"/>
+            <arg value="--replace-needed"/><arg value="libgmp.so.10"/><arg value="libgmp.so"/>
+            <arg value="--replace-needed"/><arg value="libm.so.6"/><arg value="libm.so"/>
+            <arg value="--replace-needed"/><arg value="libmpfr.so.6"/><arg value="libmpfr.so"/>
+            <arg value="libpolkaMPQ.so"/>
         </exec>
 
         <!-- copy library files into directory to be published for IVY -->
