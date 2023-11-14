@@ -118,6 +118,16 @@ public class UniversalModel extends AbstractModel {
     return assignments;
   }
 
+  public List<ValueAssignment> parseModelFromString(String pString)
+      throws IOException {
+    smtlibv2Lexer lexer = new smtlibv2Lexer(CharStreams.fromString(pString));
+    smtlibv2Parser parser = new smtlibv2Parser(new CommonTokenStream(lexer));
+    Visitor visitor = new Visitor(formulaManager, bmgr, imgr, null, bvmgr, amgr, umgr);
+    visitor.visit(parser.start());
+    assignments = visitor.getAssignments();
+    return assignments;
+  }
+
   public List<ValueAssignment> getAssignments()
       throws IOException, ModelException {
     getOutput();

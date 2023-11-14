@@ -176,6 +176,12 @@ class SynchronizedFormulaManager implements FormulaManager {
   }
 
   @Override
+  public BooleanFormula universalParseFromString(String pString)
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    return delegate.universalParseFromString(pString);
+  }
+
+  @Override
   public Appender dumpFormula(BooleanFormula pT) {
     return new Appenders.AbstractAppender() {
       @Override

@@ -26,6 +26,9 @@ public interface FormulaManager {
   BooleanFormula universalParse(String pString)
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException;
 
+  BooleanFormula universalParseFromString(String pString)
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException;
+
   /**
    * Returns the Integer-Theory. Because most SAT-solvers support automatic casting between Integer-
    * and Rational-Theory, the Integer- and the RationalFormulaManager both return the same Formulas

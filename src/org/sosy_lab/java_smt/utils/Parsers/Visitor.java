@@ -32,9 +32,9 @@ import org.sosy_lab.java_smt.api.UFManager;
 @SuppressWarnings({"CheckReturnValue", "unchecked"})
 public class Visitor extends smtlibv2BaseVisitor<Object> {
 
-  HashMap<String, ParserFormula> variables = new HashMap<>();
-  HashMap<String, ParserFormula> letVariables = new HashMap<>();
-  List<BooleanFormula> constraints = new ArrayList<>();
+  public static HashMap<String, ParserFormula> variables = new HashMap<>();
+  public static HashMap<String, ParserFormula> letVariables = new HashMap<>();
+  public static List<BooleanFormula> constraints = new ArrayList<>();
   private final FormulaManager fmgr;
   private final BooleanFormulaManager bmgr;
   private final @Nullable IntegerFormulaManager imgr;

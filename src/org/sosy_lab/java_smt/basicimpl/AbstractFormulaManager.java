@@ -196,6 +196,19 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     return this.booleanManager.and(constraints);
   }
 
+  public BooleanFormula universalParseFromString(String pString)
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    smtlibv2Lexer lexer = new smtlibv2Lexer(CharStreams.fromString(pString));
+    smtlibv2Parser parser = new smtlibv2Parser(new CommonTokenStream(lexer));
+    Visitor visitor = new Visitor(this, this.booleanManager, this.integerManager,
+        this.rationalManager,
+        this.bitvectorManager, this.arrayManager, this.functionManager);
+    visitor.visit(parser.start());
+    List<BooleanFormula> constraints = visitor.getConstraints();
+
+    return this.booleanManager.and(constraints);
+  }
+
   @Override
   public IntegerFormulaManager getIntegerFormulaManager() {
     if (integerManager == null) {
