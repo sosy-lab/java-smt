@@ -685,10 +685,10 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="libjgmp.so"/>
             <arg value="liboctD.so"/>
             <arg value="libpolkaMPQ.so"/>
-            <arg value="libc.so"/>
-            <arg value="libgmp.so"/>
-            <arg value="libm.so"/>
-            <arg value="libmpfr.so"/>
+            <arg value="libc.so.6"/>
+            <arg value="libgmp.so.10"/>
+            <arg value="libm.so.6"/>
+            <arg value="libmpfr.so.6"/>
         </exec>
 
         <!-- copy library files into directory to be published for IVY -->
