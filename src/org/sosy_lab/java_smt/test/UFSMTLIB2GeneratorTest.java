@@ -191,4 +191,122 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
+  @Test
+  public void testDeclareAndCallUFBoolean() {
+    clearGenerator();
+    BooleanFormula a = fmgr.declareAndCallUF("a", FormulaType.BooleanType, bmgr.makeFalse());
+    BooleanFormula b = fmgr.declareAndCallUF("b", FormulaType.BooleanType);
+
+    BooleanFormula constraint = bmgr.equivalence(a, b);
+
+    Generator.logAddConstraint(constraint);
+
+    String actualResult = String.valueOf(Generator.lines);
+
+    String expectedResult = "(declare-fun a (Bool) Bool)\n"
+        + "(declare-fun b () Bool)\n"
+        + "(assert (= (a false) b))\n";
+
+    assertThat(actualResult).isEqualTo(expectedResult);
+  }
+
+  @Test
+  public void testDeclareAndCallUFInteger() {
+    requireIntegers();
+    clearGenerator();
+    IntegerFormula
+        a = fmgr.declareAndCallUF("a", FormulaType.IntegerType, imgr.makeNumber(4));
+    IntegerFormula b = fmgr.declareAndCallUF("b", FormulaType.IntegerType);
+
+    BooleanFormula constraint = imgr.equal(a, b);
+
+    Generator.logAddConstraint(constraint);
+
+    String actualResult = String.valueOf(Generator.lines);
+
+    String expectedResult = "(declare-fun a (Int) Int)\n"
+        + "(declare-fun b () Int)\n"
+        + "(assert (= (a 4) b))\n";
+
+    assertThat(actualResult).isEqualTo(expectedResult);
+  }
+
+  @Test
+  public void testDeclareAndCallUFRational() {
+    requireRationals();
+    clearGenerator();
+    RationalFormula
+        a = fmgr.declareAndCallUF("a", FormulaType.RationalType, Objects.requireNonNull(rmgr).makeNumber(4));
+    RationalFormula b = fmgr.declareAndCallUF("b", FormulaType.RationalType);
+
+    BooleanFormula constraint = rmgr.equal(a, b);
+
+    Generator.logAddConstraint(constraint);
+
+    String actualResult = String.valueOf(Generator.lines);
+
+    String expectedResult = "(declare-fun a (Real) Real)\n"
+        + "(declare-fun b () Real)\n"
+        + "(assert (= (a 4) b))\n";
+
+    String expectedResultSMTInterpol = "(declare-fun a (Real) Real)\n"
+        + "(declare-fun b () Real)\n"
+        + "(assert (= (a 4.0) b))\n";
+
+    Assert.assertTrue(actualResult.equals(expectedResult) || actualResult.equals(expectedResultSMTInterpol));
+  }
+
+  @Test
+  public void testDeclareAndCallUFBitvectors() {
+    requireBitvectors();
+    clearGenerator();
+    BitvectorFormula
+        a = fmgr.declareAndCallUF("a", FormulaType.getBitvectorTypeWithSize(4),
+        Objects.requireNonNull(bvmgr).makeBitvector(4, 2));
+    BitvectorFormula b = fmgr.declareAndCallUF("b", FormulaType.getBitvectorTypeWithSize(4),
+        new ArrayList<>());
+
+    BooleanFormula constraint = bvmgr.equal(a, b);
+
+    Generator.logAddConstraint(constraint);
+
+    String actualResult = String.valueOf(Generator.lines);
+
+    String expectedResult = "(declare-fun a ((_ BitVec 4)) (_ BitVec 4))\n"
+        + "(declare-fun b () (_ BitVec 4))\n"
+        + "(assert (= (a #b0010) b))\n";
+
+    assertThat(actualResult).isEqualTo(expectedResult);
+  }
+
+  @Test
+  public void testDeclareAndCallUFArrays() {
+    requireArrays();
+    requireIntegers();
+    clearGenerator();
+    ArrayFormula<IntegerFormula, IntegerFormula>
+        a = fmgr.declareAndCallUF("a", FormulaType.getArrayType(FormulaType.IntegerType,
+            FormulaType.IntegerType),
+        Objects.requireNonNull(amgr)
+            .makeArray("test", FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.IntegerType),
+                FormulaType.IntegerType));
+    ArrayFormula<IntegerFormula, IntegerFormula> b = fmgr.declareAndCallUF("b",
+        FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.IntegerType));
+
+    BooleanFormula constraint = fmgr.declareAndCallUF("constr", FormulaType.BooleanType
+        , a, b);
+
+    Generator.logAddConstraint(constraint);
+
+    String actualResult = String.valueOf(Generator.lines);
+
+    String expectedResult = "(declare-fun constr ((Array Int Int)(Array Int Int)) Bool)\n"
+        + "(declare-fun a ((Array (Array Int Int) Int)) (Array Int Int))\n"
+        + "(declare-const test (Array (Array Int Int) Int))\n"
+        + "(declare-fun b () (Array Int Int))\n"
+        + "(assert (constr (a test) b))\n";
+
+    assertThat(actualResult).isEqualTo(expectedResult);
+  }
+
 }

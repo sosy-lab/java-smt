@@ -34,8 +34,7 @@ import org.sosy_lab.java_smt.utils.Generators.Generator;
 
 public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0  {
 
-  /** Integer and Rationals not supported by BOOLECTOR
-   *  Rationals not supported by PRINCESS
+  /**
    *  Z3 runs only when executed separately from other solvers
    */
 
