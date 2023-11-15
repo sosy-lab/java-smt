@@ -104,9 +104,14 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
   }
 
   @Override public FormulaType.ArrayFormulaType<?,?> visitMultisort(smtlibv2Parser.MultisortContext ctx) {
-    FormulaType<?> idx = (FormulaType<?>) visit(ctx.sort(0));
-    FormulaType<?> elem = (FormulaType<?>) visit(ctx.sort(1));
-    FormulaType.ArrayFormulaType<?,?> result = FormulaType.getArrayType(idx, elem);
+    FormulaType.ArrayFormulaType<?, ?> result;
+    if (ctx.identifier().getText().equals("Array")) {
+      FormulaType<?> idx = (FormulaType<?>) visit(ctx.sort(0));
+      FormulaType<?> elem = (FormulaType<?>) visit(ctx.sort(1));
+      result = FormulaType.getArrayType(idx, elem);
+    } else {
+      throw new ParserException(ctx.identifier().getText() + " is not a known sort. ");
+    }
 
     return result;
   }

@@ -95,9 +95,21 @@ public class ArraySMTLIB2ParserTest extends SolverBasedTest0.ParameterizedSolver
     }
 
   @Test
-  public void testMakeArrayRationals() {
+  public void testMakeArrayRationals()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireArrays();
     requireRationals();
+    clearVisitor();
+
+    String a = "(declare-const a1 (Array Real Real))\n"
+        + "(declare-const a2 (Array Real Real))\n"
+        + "(assert (= a1 a2))\n"
+        + "(declare-const c1 (Array (Array Real Real) (Array (Array Real Real) (Array Real Real))))\n"
+        + "(declare-const c2 (Array (Array Real Real) (Array (Array Real Real) (Array Real Real))))\n"
+        + "(assert (= c1 c2))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(a);
+
     ArrayFormula<RationalFormula, RationalFormula> a1 = Objects.requireNonNull(amgr)
         .makeArray("a1", FormulaType.RationalType,
             FormulaType.RationalType);
@@ -119,27 +131,28 @@ public class ArraySMTLIB2ParserTest extends SolverBasedTest0.ParameterizedSolver
                 FormulaType.getArrayType(FormulaType.RationalType,
                     FormulaType.RationalType))));
 
-    BooleanFormula constraint1 = amgr.equivalence(a1, a2);
-    BooleanFormula constraint3 = amgr.equivalence(c1, c2);
+    BooleanFormula constraint = bmgr.and(amgr.equivalence(a1, a2), amgr.equivalence(c1, c2));
 
-    Generator.logAddConstraint(constraint1);
-    Generator.logAddConstraint(constraint3);
-
-    String actualResult = String.valueOf(Generator.lines);
-
-    String expectedResult = "(declare-const a1 (Array Real Real))\n"
-        + "(declare-const a2 (Array Real Real))\n"
-        + "(assert (= a1 a2))\n"
-        + "(declare-const c1 (Array (Array Real Real) (Array (Array Real Real) (Array Real Real))))\n"
-        + "(declare-const c2 (Array (Array Real Real) (Array (Array Real Real) (Array Real Real))))\n"
-        + "(assert (= c1 c2))\n";
+    BooleanFormula expectedResult = constraint;
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
-  public void testMakeArrayBooleans() {
+  public void testMakeArrayBooleans()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireArrays();
+    requireRationals();
+    clearVisitor();
+
+    String a = "(declare-const a1 (Array Bool Bool))\n"
+        + "(declare-const a2 (Array Bool Bool))\n"
+        + "(assert (= a1 a2))\n"
+        + "(declare-const c1 (Array (Array Bool Bool) (Array (Array Bool Bool) (Array Bool Bool))))\n"
+        + "(declare-const c2 (Array (Array Bool Bool) (Array (Array Bool Bool) (Array Bool Bool))))\n"
+        + "(assert (= c1 c2))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(a);
 
     ArrayFormula<BooleanFormula, BooleanFormula> a1 = Objects.requireNonNull(amgr)
         .makeArray("a1", FormulaType.BooleanType,
@@ -162,28 +175,29 @@ public class ArraySMTLIB2ParserTest extends SolverBasedTest0.ParameterizedSolver
                 FormulaType.getArrayType(FormulaType.BooleanType,
                     FormulaType.BooleanType))));
 
-    BooleanFormula constraint1 = amgr.equivalence(a1, a2);
-    BooleanFormula constraint3 = amgr.equivalence(c1, c2);
+    BooleanFormula constraint = bmgr.and(amgr.equivalence(a1, a2), amgr.equivalence(c1, c2));
 
-    Generator.logAddConstraint(constraint1);
-    Generator.logAddConstraint(constraint3);
-
-    String actualResult = String.valueOf(Generator.lines);
-
-    String expectedResult = "(declare-const a1 (Array Bool Bool))\n"
-        + "(declare-const a2 (Array Bool Bool))\n"
-        + "(assert (= a1 a2))\n"
-        + "(declare-const c1 (Array (Array Bool Bool) (Array (Array Bool Bool) (Array Bool Bool))))\n"
-        + "(declare-const c2 (Array (Array Bool Bool) (Array (Array Bool Bool) (Array Bool Bool))))\n"
-        + "(assert (= c1 c2))\n";
+    BooleanFormula expectedResult = constraint;
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
-  public void testMakeArrayBitvectors() {
+  public void testMakeArrayBitvectors()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireArrays();
     requireBitvectors();
+    clearVisitor();
+
+    String a = "(declare-const a1 (Array (_ BitVec 3) (_ BitVec 3)))\n"
+        + "(declare-const a2 (Array (_ BitVec 3) (_ BitVec 3)))\n"
+        + "(assert (= a1 a2))\n"
+        + "(declare-const c1 (Array (Array (_ BitVec 3) (_ BitVec 3)) (Array (Array (_ BitVec 3) (_ BitVec 3)) (Array (_ BitVec 3) (_ BitVec 3)))))\n"
+        + "(declare-const c2 (Array (Array (_ BitVec 3) (_ BitVec 3)) (Array (Array (_ BitVec 3) (_ BitVec 3)) (Array (_ BitVec 3) (_ BitVec 3)))))\n"
+        + "(assert (= c1 c2))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(a);
+
     ArrayFormula<BitvectorFormula, BitvectorFormula> a1 = Objects.requireNonNull(amgr)
         .makeArray("a1", FormulaType.getBitvectorTypeWithSize(3),
             FormulaType.getBitvectorTypeWithSize(3));
@@ -205,30 +219,34 @@ public class ArraySMTLIB2ParserTest extends SolverBasedTest0.ParameterizedSolver
                 FormulaType.getArrayType(FormulaType.getBitvectorTypeWithSize(3),
                     FormulaType.getBitvectorTypeWithSize(3)))));
 
-    BooleanFormula constraint1 = amgr.equivalence(a1, a2);
-    BooleanFormula constraint3 = amgr.equivalence(c1, c2);
+    BooleanFormula constraint = bmgr.and(amgr.equivalence(a1, a2), amgr.equivalence(c1, c2));
 
-    Generator.logAddConstraint(constraint1);
-    Generator.logAddConstraint(constraint3);
-
-    String actualResult = String.valueOf(Generator.lines);
-
-    String expectedResult = "(declare-const a1 (Array (_ BitVec 3) (_ BitVec 3)))\n"
-        + "(declare-const a2 (Array (_ BitVec 3) (_ BitVec 3)))\n"
-        + "(assert (= a1 a2))\n"
-        + "(declare-const c1 (Array (Array (_ BitVec 3) (_ BitVec 3)) (Array (Array (_ BitVec 3) (_ BitVec 3)) (Array (_ BitVec 3) (_ BitVec 3)))))\n"
-        + "(declare-const c2 (Array (Array (_ BitVec 3) (_ BitVec 3)) (Array (Array (_ BitVec 3) (_ BitVec 3)) (Array (_ BitVec 3) (_ BitVec 3)))))\n"
-        + "(assert (= c1 c2))\n";
+    BooleanFormula expectedResult = constraint;
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
-  public void testMakeArrayMixed() {
+  public void testMakeMixed()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireArrays();
     requireBitvectors();
     requireRationals();
     requireIntegers();
+    clearVisitor();
+
+    String a = "(declare-const a1 (Array Int Real))\n"
+        + "(declare-const a2 (Array Int Real))\n"
+        + "(assert (= a1 a2))\n"
+        + "(declare-const b1 (Array (_ BitVec 3) Bool))\n"
+        + "(declare-const b2 (Array (_ BitVec 3) Bool))\n"
+        + "(assert (= b1 b2))\n"
+        + "(declare-const c1 (Array (Array Int Int) (Array (Array Bool Bool) (Array Int (_ BitVec 3)))))\n"
+        + "(declare-const c2 (Array (Array Int Int) (Array (Array Bool Bool) (Array Int (_ BitVec 3)))))\n"
+        + "(assert (= c1 c2))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(a);
+
     ArrayFormula<IntegerFormula, RationalFormula> a1 = Objects.requireNonNull(amgr)
         .makeArray("a1", FormulaType.IntegerType,
             FormulaType.RationalType);
@@ -254,33 +272,26 @@ public class ArraySMTLIB2ParserTest extends SolverBasedTest0.ParameterizedSolver
                 FormulaType.getArrayType(FormulaType.IntegerType,
                     FormulaType.getBitvectorTypeWithSize(3)))));
 
-    BooleanFormula constraint1 = amgr.equivalence(a1, a2);
-    BooleanFormula constraint2 = amgr.equivalence(b1, b2);
-    BooleanFormula constraint3 = amgr.equivalence(c1, c2);
+    BooleanFormula constraint = bmgr.and(amgr.equivalence(a1, a2), amgr.equivalence(b1, b2),
+        amgr.equivalence(c1, c2));
 
-    Generator.logAddConstraint(constraint1);
-    Generator.logAddConstraint(constraint2);
-    Generator.logAddConstraint(constraint3);
-
-    String actualResult = String.valueOf(Generator.lines);
-
-    String expectedResult = "(declare-const a1 (Array Int Real))\n"
-        + "(declare-const a2 (Array Int Real))\n"
-        + "(assert (= a1 a2))\n"
-        + "(declare-const b1 (Array (_ BitVec 3) Bool))\n"
-        + "(declare-const b2 (Array (_ BitVec 3) Bool))\n"
-        + "(assert (= b1 b2))\n"
-        + "(declare-const c1 (Array (Array Int Int) (Array (Array Bool Bool) (Array Int (_ BitVec 3)))))\n"
-        + "(declare-const c2 (Array (Array Int Int) (Array (Array Bool Bool) (Array Int (_ BitVec 3)))))\n"
-        + "(assert (= c1 c2))\n";
+    BooleanFormula expectedResult = constraint;
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
-  public void testStore() {
+  public void testStore()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireArrays();
     requireIntegers();
+    clearVisitor();
+
+    String a = "(declare-const a1 (Array Int Int))\n"
+        + "(assert (= a1 (store a1 3 2)))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(a);
+
     ArrayFormula<IntegerFormula, IntegerFormula> a1 = Objects.requireNonNull(amgr)
         .makeArray("a1", FormulaType.IntegerType,
             FormulaType.IntegerType);
@@ -288,37 +299,33 @@ public class ArraySMTLIB2ParserTest extends SolverBasedTest0.ParameterizedSolver
     ArrayFormula<IntegerFormula, IntegerFormula> term1 = amgr.store(a1, imgr.makeNumber(3), imgr.makeNumber(2));
     BooleanFormula constraint = amgr.equivalence(a1, term1);
 
-    Generator.logAddConstraint(constraint);
-
-    String actualResult = String.valueOf(Generator.lines);
-
-    String expectedResult = "(declare-const a1 (Array Int Int))\n"
-        + "(assert (= a1 (store a1 3 2)))\n";
+    BooleanFormula expectedResult = constraint;
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
-  public void testSelect() {
+  public void testSelect()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireArrays();
     requireIntegers();
+    clearVisitor();
+
+    String a = "(declare-const a1 (Array Int Int))\n"
+        + "(assert (= (select a1 2) 5))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(a);
+
     ArrayFormula<IntegerFormula, IntegerFormula> a1 = Objects.requireNonNull(amgr)
         .makeArray("a1", FormulaType.IntegerType,
-            FormulaType.IntegerType);
-    ArrayFormula<IntegerFormula, IntegerFormula> a2 = Objects.requireNonNull(amgr)
-        .makeArray("a2", FormulaType.IntegerType,
             FormulaType.IntegerType);
 
     IntegerFormula term1 = amgr.select(a1, imgr.makeNumber(2));
     BooleanFormula constraint = imgr.equal(term1, imgr.makeNumber(5));
 
-    Generator.logAddConstraint(constraint);
-
-    String actualResult = String.valueOf(Generator.lines);
-
-    String expectedResult = "(declare-const a1 (Array Int Int))\n"
-        + "(assert (= (select a1 2) 5))\n";
+    BooleanFormula expectedResult = constraint;
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
+  
 }
