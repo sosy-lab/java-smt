@@ -45,11 +45,6 @@
         <artifact name="libboxD" conf="solver-apron" type="shared-object" ext="so"/>
         <artifact name="liboctD" conf="solver-apron" type="shared-object" ext="so"/>
         <artifact name="libpolkaMPQ" conf="solver-apron" type="shared-object" ext="so"/>
-        <artifact name="libc" conf="solver-apron" type="shared-object" ext="so"/>
-        <artifact name="libm" conf="solver-apron" type="shared-object" ext="so"/>
-        <artifact name="libmpfr" conf="solver-apron" type="shared-object" ext="so"/>
-        <artifact name="libgmp" conf="solver-apron" type="shared-object" ext="so"/>
-
     </publications>
 
     <dependencies></dependencies>
