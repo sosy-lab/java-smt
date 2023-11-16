@@ -275,7 +275,6 @@ public interface ApronNode extends Formula {
      * This class wraps terms with unary arithmetic operators for rational values (ex. -x)
      */
     class ApronRatUnaryNode implements RationalFormula, ApronNumeralNode {
-      private final FormulaType type = FormulaType.RATIONAL;
       private final Texpr1UnNode unaryNode;
       private final Set<String> varNames;
 
@@ -616,7 +615,6 @@ public interface ApronNode extends Formula {
      * This class wraps terms with unary arithmetic operators for integer values (ex. -x)
      */
     class ApronIntUnaryNode implements IntegerFormula, ApronNumeralNode {
-      private final FormulaType type = FormulaType.INTEGER;
       private final Texpr1UnNode unaryNode;
       private final Set<String> varNames;
 

@@ -55,10 +55,8 @@ public class ApronSolverContext extends AbstractSolverContext {
       Manager pManager,
       ApronFormulaCreator pFormulaCreator,
       ShutdownNotifier pShutdownNotifier,
-      Configuration pConfig,
       @Nullable PathCounterTemplate pLogfile,
-      LogManager pLogger,
-      long pRandomSeed) {
+      LogManager pLogger) {
     super(fmgr);
     this.manager = pManager;
     this.formulaCreator = pFormulaCreator;
@@ -72,8 +70,7 @@ public class ApronSolverContext extends AbstractSolverContext {
       Configuration pConfiguration,
       ShutdownNotifier pShutdownNotifier,
       PathCounterTemplate logfile,
-      LogManager pLogger,
-      long randomSeed) {
+      LogManager pLogger) {
     Environment env = new Environment();
     Manager manager = new Polka(true);
     ApronBooleanType booleanType = new ApronBooleanType();
@@ -92,8 +89,8 @@ public class ApronSolverContext extends AbstractSolverContext {
         new ApronRationalFormulaManager(formulaCreator, pNonLinearArithmetic);
     ApronFormulaManager fmgr = new ApronFormulaManager(formulaCreator, ufManager,
         booleanFormulaManager, integerFormulaManager, rationalFormulaManager);
-    return new ApronSolverContext(fmgr, manager, formulaCreator, pShutdownNotifier, pConfiguration
-        , logfile, pLogger, randomSeed);
+    return new ApronSolverContext(fmgr, manager, formulaCreator, pShutdownNotifier
+        , logfile, pLogger);
   }
 
   public Manager getManager() {

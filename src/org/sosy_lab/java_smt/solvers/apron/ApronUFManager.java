@@ -25,7 +25,7 @@ import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 public class ApronUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv> extends
                                                                       AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv> {
-  protected <TFuncDecl> ApronUFManager(FormulaCreator<TFormulaInfo, TType, TEnv, TFunctionDecl> pCreator) {
+  protected ApronUFManager(FormulaCreator<TFormulaInfo, TType, TEnv, TFunctionDecl> pCreator) {
     super(pCreator);
   }
 

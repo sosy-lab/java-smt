@@ -26,7 +26,6 @@ import apron.Environment;
 import apron.Interval;
 import apron.Manager;
 import apron.MpqScalar;
-import apron.StringVar;
 import apron.Tcons1;
 import apron.Texpr0Node;
 import apron.Texpr1BinNode;
@@ -92,7 +91,6 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
   }
 
   private ValueAssignment getAssignment(String pVar) {
-    ImmutableList.Builder<Object> argumentInterpretationBuilder = ImmutableList.builder();
     try {
       //check if the variable is of type integer
       if (formulaCreator.getEnvironment().isInt(pVar)) {
@@ -153,7 +151,6 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
     //shows the interval for all values the variable can take
     Interval interval = this.prover.getAbstract1().getBound(man, pVar);
     //gives the upper bound of the interval
-    Object value = interval.sup;
     String strValue;
     MpqScalar upperBound = (MpqScalar) interval.sup;
     MpqScalar lowerBound = (MpqScalar) interval.inf;
@@ -238,7 +235,6 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
     Texpr1VarNode resultVar = new Texpr1VarNode(resultName);
     for (ValueAssignment assignment : model) {
       String modelVar = assignment.getName();
-      StringVar apronVar = new StringVar(modelVar);
       ApronNode toSub = (ApronNode) assignment.getValueAsFormula();
       Texpr1Node toSubT = toSub.getNode();
       //hasVar() only works for Texpr0Node
@@ -281,7 +277,7 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
         }
         return valueFormula;
       } catch (ApronException e) {
-        new RuntimeException(e);
+        throw new RuntimeException(e);
       }
     }
     //if the nodeToEvaluate has still variables, that can not be substituted, the node is returned
@@ -294,7 +290,6 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
         return new ApronRatBinaryNode((Texpr1BinNode) nodeToEvaluate);
       }
     }
-    return pNode;
   }
 
   private ApronNode getIntVarValue(ApronIntVarNode varNode) {

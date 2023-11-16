@@ -32,8 +32,6 @@ import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
 public class ApronFormulaManager extends AbstractFormulaManager<ApronNode, ApronFormulaType,
     Environment, Long> {
 
-  private final ApronFormulaCreator formulaCreator;
-
   protected ApronFormulaManager(
       ApronFormulaCreator pFormulaCreator,
       ApronUFManager functionManager,
@@ -42,7 +40,6 @@ public class ApronFormulaManager extends AbstractFormulaManager<ApronNode, Apron
       ApronRationalFormulaManager pRationalFormulaManager) {
     super(pFormulaCreator, functionManager, booleanManager, pIntegerFormulaManager,
         pRationalFormulaManager, null, null, null, null, null, null, null);
-    this.formulaCreator = pFormulaCreator;
   }
 
   public static ApronNode getTerm(Formula pFormula) {
