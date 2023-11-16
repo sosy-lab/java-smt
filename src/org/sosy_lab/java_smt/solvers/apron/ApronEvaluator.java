@@ -44,13 +44,14 @@ public class ApronEvaluator extends AbstractEvaluator<ApronNode, ApronFormulaTyp
   @Override
   protected @Nullable ApronNode evalImpl(ApronNode formula) {
     try {
-      Preconditions.checkState(!isClosed());
-      Preconditions.checkState(!theoremProver.getClosed());
       ApronModel apronModel = (ApronModel) theoremProver.getModel();
       return apronModel.getValue(formula);
     } catch (SolverException e) {
-      theoremProver.close();
       throw new RuntimeException(e);
     }
+  }
+
+  public void close(){
+    this.theoremProver.close();
   }
 }
