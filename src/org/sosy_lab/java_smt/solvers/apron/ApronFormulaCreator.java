@@ -221,6 +221,7 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public <T extends Formula> T encapsulate(
       org.sosy_lab.java_smt.api.FormulaType<T> pType,
       ApronNode pTerm) {
