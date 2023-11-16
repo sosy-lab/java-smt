@@ -72,9 +72,7 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
       Environment pO,
       ApronBooleanType boolType,
       ApronIntegerType pIntegerType,
-      ApronRationalType pRationalType,
-      @Nullable Long stringType,
-      @Nullable Long regexType) {
+      ApronRationalType pRationalType) {
     super(pO, boolType, pIntegerType, pRationalType, null, null);
     this.formulaEnvironment = pO;
     this.variables = new HashMap<>();
@@ -90,7 +88,6 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
    */
   @Override
   public Object convertValue(ApronNode exprNode, ApronNode value) {
-    FormulaType type = exprNode.getType();
     FormulaType valueType = value.getType();
 
     //constants

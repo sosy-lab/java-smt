@@ -77,9 +77,7 @@ public class ApronSolverContext extends AbstractSolverContext {
     ApronIntegerType integerType = new ApronIntegerType();
     ApronRationalType rationalType = new ApronRationalType();
     ApronFormulaCreator formulaCreator =
-        new ApronFormulaCreator(manager, env, booleanType, integerType, rationalType,
-            null,
-            null);
+        new ApronFormulaCreator(manager, env, booleanType, integerType, rationalType);
     ApronUFManager ufManager = new ApronUFManager(formulaCreator);
     ApronBooleanFormulaManager booleanFormulaManager =
         new ApronBooleanFormulaManager(formulaCreator);
