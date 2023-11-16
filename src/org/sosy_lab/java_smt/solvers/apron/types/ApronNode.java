@@ -33,6 +33,7 @@ import apron.Texpr1UnNode;
 import apron.Texpr1VarNode;
 import apron.Var;
 import com.google.common.base.Preconditions;
+import com.google.errorprone.annotations.Immutable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,6 +55,7 @@ import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.FormulaType;
  * Texpr1Node; All BooleanFormulas refer to Tcons1; The wrapper is needed to implement methods that
  * are needed for the JavaSMT-binding but are not provided by the Apron-library.
  */
+@Immutable
 public interface ApronNode extends Formula {
 
   FormulaType getType();
@@ -71,10 +73,12 @@ public interface ApronNode extends Formula {
 
   ApronNode getInstance();
 
+  @Immutable
   interface ApronNumeralNode extends ApronNode, NumeralFormula {
     /**
      * This class wraps all rational constants, defined by numerator and denominator
      */
+    @Immutable
     class ApronRatCstNode
         implements RationalFormula, ApronNumeralNode {
 
@@ -173,6 +177,7 @@ public interface ApronNode extends Formula {
     /**
      * This class wraps variables for rational values
      */
+    @Immutable
     class ApronRatVarNode implements RationalFormula, ApronNumeralNode {
 
       private final FormulaType type = FormulaType.RATIONAL;
@@ -274,6 +279,7 @@ public interface ApronNode extends Formula {
     /**
      * This class wraps terms with unary arithmetic operators for rational values (ex. -x)
      */
+    @Immutable
     class ApronRatUnaryNode implements RationalFormula, ApronNumeralNode {
       private final Texpr1UnNode unaryNode;
       private final Set<String> varNames;
@@ -344,6 +350,7 @@ public interface ApronNode extends Formula {
     /**
      * This class wraps terms with binary arithmetic operators for rational values (ex. a+4.5)
      */
+    @Immutable
     class ApronRatBinaryNode implements RationalFormula, ApronNumeralNode {
 
       private final FormulaType type = FormulaType.RATIONAL;
@@ -418,6 +425,7 @@ public interface ApronNode extends Formula {
     /**
      * This class wraps integer constants, defined by their BigInteger value.
      */
+    @Immutable
     class ApronIntCstNode implements IntegerFormula, ApronNumeralNode {
 
       private final FormulaType type = FormulaType.INTEGER;
@@ -499,6 +507,7 @@ public interface ApronNode extends Formula {
     /**
      * This class wraps variables for integer values.
      */
+    @Immutable
     class ApronIntVarNode implements IntegerFormula, ApronNumeralNode {
 
       private final FormulaType type = FormulaType.INTEGER;
@@ -614,6 +623,7 @@ public interface ApronNode extends Formula {
     /**
      * This class wraps terms with unary arithmetic operators for integer values (ex. -x)
      */
+    @Immutable
     class ApronIntUnaryNode implements IntegerFormula, ApronNumeralNode {
       private final Texpr1UnNode unaryNode;
       private final Set<String> varNames;
@@ -689,6 +699,7 @@ public interface ApronNode extends Formula {
     /**
      * This class wraps terms with unary arithmetic operators for integer values (ex. x+3)
      */
+    @Immutable
     class ApronIntBinaryNode implements IntegerFormula, ApronNumeralNode {
 
       private final FormulaType type = FormulaType.INTEGER;
@@ -773,6 +784,7 @@ public interface ApronNode extends Formula {
    * defined by a map of Texpr1Nodes and an operation. The reason for the map is, that Apron does
    * not have an extra and-operation. Stacking constraints ia a way to implement this for JavaSMT.
    */
+  @Immutable
   class ApronConstraint implements BooleanFormula, ApronNode {
 
     private final Map<Tcons1, Texpr1Node> constraintNodes;
