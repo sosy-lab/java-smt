@@ -28,7 +28,6 @@ import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
-import scala.concurrent.impl.FutureConvertersImpl.P;
 
 public class ApronEvaluator extends AbstractEvaluator<ApronNode, ApronFormulaType, ApronModel> {
 
