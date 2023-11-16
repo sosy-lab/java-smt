@@ -67,7 +67,6 @@ public class ApronSolverContext extends AbstractSolverContext {
 
   public static synchronized ApronSolverContext create(
       NonLinearArithmetic pNonLinearArithmetic,
-      Configuration pConfiguration,
       ShutdownNotifier pShutdownNotifier,
       PathCounterTemplate logfile,
       LogManager pLogger) {
