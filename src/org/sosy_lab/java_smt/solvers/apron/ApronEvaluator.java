@@ -28,6 +28,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
+import scala.concurrent.impl.FutureConvertersImpl.P;
 
 public class ApronEvaluator extends AbstractEvaluator<ApronNode, ApronFormulaType, ApronModel> {
 
@@ -45,6 +46,7 @@ public class ApronEvaluator extends AbstractEvaluator<ApronNode, ApronFormulaTyp
   protected @Nullable ApronNode evalImpl(ApronNode formula) {
     try {
       Preconditions.checkState(!isClosed());
+      Preconditions.checkState(!theoremProver.getClosed());
       ApronModel apronModel = (ApronModel) theoremProver.getModel();
       return apronModel.getValue(formula);
     } catch (SolverException e) {
