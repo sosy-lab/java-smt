@@ -40,14 +40,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.Set;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.solvers.apron.ApronFormulaCreator;
-import org.sosy_lab.java_smt.solvers.apron.ApronFormulaManager;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.FormulaType;
 
 /**
@@ -127,6 +125,7 @@ public interface ApronNode extends Formula {
         return this.type;
       }
 
+      @Override
       public Texpr1CstNode getNode() {
         return cstNode;
       }
@@ -254,6 +253,7 @@ public interface ApronNode extends Formula {
         formulaCreator.setEnvironment(new Environment(intVars, newRealVars));
       }
 
+      @Override
       public Texpr1VarNode getNode() {
         return varNode;
       }
@@ -326,6 +326,7 @@ public interface ApronNode extends Formula {
         return null;
       }
 
+      @Override
       public Texpr1UnNode getNode() {
         return this.unaryNode;
       }
@@ -476,6 +477,7 @@ public interface ApronNode extends Formula {
         return this.type;
       }
 
+      @Override
       public Texpr1CstNode getNode() {
         return cstNode;
       }
@@ -575,6 +577,7 @@ public interface ApronNode extends Formula {
         return this.type;
       }
 
+      @Override
       public Texpr1VarNode getNode() {
         return varNode;
       }
@@ -669,6 +672,7 @@ public interface ApronNode extends Formula {
         return null;
       }
 
+      @Override
       public Texpr1UnNode getNode() {
         return this.unaryNode;
       }

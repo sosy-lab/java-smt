@@ -33,8 +33,6 @@ import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronConstraint;
 
 public class ApronEvaluator extends AbstractEvaluator<ApronNode, ApronFormulaType, ApronModel> {
 
-  private final List<Collection<ApronConstraint>> assertedFormulas;
-
   private final ApronTheoremProver theoremProver;
 
   protected ApronEvaluator(
@@ -42,7 +40,6 @@ public class ApronEvaluator extends AbstractEvaluator<ApronNode, ApronFormulaTyp
       FormulaCreator<ApronNode, ApronFormulaType, ApronModel, Long> creator) {
     super(pProver, creator);
     ApronTheoremProver prover = (ApronTheoremProver) pProver;
-    this.assertedFormulas = prover.getAssertedFormulas();
     this.theoremProver = prover;
   }
 

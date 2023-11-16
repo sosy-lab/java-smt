@@ -42,35 +42,12 @@ public class ApronFormulaManager extends AbstractFormulaManager<ApronNode, Apron
 
   private ApronFormulaCreator formulaCreator;
 
-  /**
-   * Builds a solver from the given theory implementations.
-   *
-   * @param pFormulaCreator
-   * @param functionManager
-   * @param booleanManager
-   * @param pIntegerFormulaManager
-   * @param pRationalFormulaManager
-   * @param bitvectorManager
-   * @param floatingPointManager
-   * @param quantifiedManager
-   * @param arrayManager
-   * @param slManager
-   * @param strManager
-   * @param enumManager
-   */
   protected ApronFormulaManager(
       ApronFormulaCreator pFormulaCreator,
       ApronUFManager functionManager,
       ApronBooleanFormulaManager booleanManager,
       ApronIntegerFormulaManager pIntegerFormulaManager,
-      ApronRationalFormulaManager pRationalFormulaManager,
-      @Nullable AbstractBitvectorFormulaManager bitvectorManager,
-      @Nullable AbstractFloatingPointFormulaManager floatingPointManager,
-      @Nullable AbstractQuantifiedFormulaManager quantifiedManager,
-      @Nullable AbstractArrayFormulaManager arrayManager,
-      @Nullable AbstractSLFormulaManager slManager,
-      @Nullable AbstractStringFormulaManager strManager,
-      @Nullable AbstractEnumerationFormulaManager enumManager) {
+      ApronRationalFormulaManager pRationalFormulaManager) {
     super(pFormulaCreator, functionManager, booleanManager, pIntegerFormulaManager,
         pRationalFormulaManager, null, null, null, null, null, null, null);
     this.formulaCreator = pFormulaCreator;

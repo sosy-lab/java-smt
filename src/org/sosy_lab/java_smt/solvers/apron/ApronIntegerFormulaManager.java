@@ -67,6 +67,7 @@ public class ApronIntegerFormulaManager
     return this.formulaCreator.makeVariable(integerType, i);
   }
 
+  @Override
   protected ApronNode makeNumberImpl(double pNumber) {
     return new ApronIntCstNode(BigDecimal.valueOf(pNumber).toBigInteger());
   }
@@ -76,6 +77,7 @@ public class ApronIntegerFormulaManager
     return new ApronIntCstNode(pNumber.toBigInteger());
   }
 
+  @Override
   protected ApronNode makeNumberImpl(long i) {
     return new ApronIntCstNode(BigInteger.valueOf(i));
   }

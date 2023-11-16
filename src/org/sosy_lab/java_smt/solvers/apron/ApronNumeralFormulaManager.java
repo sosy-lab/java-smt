@@ -44,6 +44,7 @@ abstract class ApronNumeralFormulaManager<
   }
 
 
+  @Override
   protected boolean isNumeral(ApronNode val) {
     FormulaType type = val.getType();
     return !type.equals(FormulaType.BOOLEAN);

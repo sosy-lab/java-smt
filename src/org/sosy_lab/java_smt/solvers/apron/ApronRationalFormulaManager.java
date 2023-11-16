@@ -81,6 +81,7 @@ public class ApronRationalFormulaManager extends
     return new ApronRatCstNode(rat.getNum(), rat.getDen());
   }
 
+  @Override
   protected ApronNode makeNumberImpl(long i) {
     return new ApronRatCstNode(BigInteger.valueOf(i), BigInteger.ONE);
   }

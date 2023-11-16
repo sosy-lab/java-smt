@@ -49,7 +49,7 @@ public class ApronApiTest {
   }
 
   /**Simple Example that shows how to build constraints in Apron
-   * @throws ApronException
+   * @throws ApronException throws Exception
    */
   @Test
   public void example() throws ApronException {
@@ -79,7 +79,7 @@ public class ApronApiTest {
    * This behavior is not unintended, because some domains can not represent exact disjunctions
    * like != (https://github.com/antoinemine/apron/issues/92)
    *
-   * @throws ApronException
+   * @throws ApronException throws exception
    */
   @Test
   public void distinctTest() throws ApronException {
@@ -99,7 +99,7 @@ public class ApronApiTest {
   /**
    * Test that gives an example of how a domain simplifies constraints
    *
-   * @throws ApronException
+   * @throws ApronException throws exception
    */
   @Test
   public void addConstraintsTest() throws ApronException {

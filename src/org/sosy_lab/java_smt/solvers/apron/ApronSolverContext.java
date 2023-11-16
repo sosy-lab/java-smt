@@ -45,14 +45,11 @@ public class ApronSolverContext extends AbstractSolverContext {
 
   private final ApronFormulaCreator formulaCreator;
   private final Manager manager;
-  private final Configuration config;
   private final @Nullable PathCounterTemplate logfile;
   private final LogManager logger;
-  private final long randomSeed;
-
   private boolean closed = false;
 
-  private ShutdownNotifier shutdownNotifier;
+  private final ShutdownNotifier shutdownNotifier;
 
   protected ApronSolverContext(
       ApronFormulaManager fmgr,
@@ -60,15 +57,13 @@ public class ApronSolverContext extends AbstractSolverContext {
       ApronFormulaCreator pFormulaCreator,
       ShutdownNotifier pShutdownNotifier,
       Configuration pConfig,
-      PathCounterTemplate pLogfile,
+      @Nullable PathCounterTemplate pLogfile,
       LogManager pLogger,
       long pRandomSeed) {
     super(fmgr);
     this.manager = pManager;
     this.formulaCreator = pFormulaCreator;
-    this.config = pConfig;
     this.logfile = pLogfile;
-    this.randomSeed = pRandomSeed;
     this.logger = pLogger;
     this.shutdownNotifier = pShutdownNotifier;
   }
@@ -97,9 +92,7 @@ public class ApronSolverContext extends AbstractSolverContext {
     ApronRationalFormulaManager rationalFormulaManager =
         new ApronRationalFormulaManager(formulaCreator, pNonLinearArithmetic);
     ApronFormulaManager fmgr = new ApronFormulaManager(formulaCreator, ufManager,
-        booleanFormulaManager, integerFormulaManager, rationalFormulaManager, null, null, null,
-        null,
-        null, null, null);
+        booleanFormulaManager, integerFormulaManager, rationalFormulaManager);
     return new ApronSolverContext(fmgr, manager, formulaCreator, pShutdownNotifier, pConfiguration
         , logfile, pLogger, randomSeed);
   }

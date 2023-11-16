@@ -44,12 +44,11 @@ import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronConstraint;
-import org.sosy_lab.java_smt.utils.SolverUtils;
-
 
 public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
     implements ProverEnvironment {
@@ -61,7 +60,7 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
 
 
   protected ApronTheoremProver(
-      Set pSet,
+      Set<ProverOptions> pSet,
       BooleanFormulaManager pBmgr,
       ShutdownNotifier pShutdownNotifier,
       ApronSolverContext pApronSolverContext) throws ApronException {
@@ -191,8 +190,8 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
    *
    * @param assumptions A list of literals.
    * @return if the prover is satisfiable with some additional assumptions
-   * @throws SolverException
-   * @throws InterruptedException
+   * @throws SolverException throws exception
+   * @throws InterruptedException throws exception
    */
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
