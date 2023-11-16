@@ -28,7 +28,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import javax.annotation.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
-import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;

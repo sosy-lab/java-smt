@@ -49,6 +49,7 @@ public class ApronEvaluator extends AbstractEvaluator<ApronNode, ApronFormulaTyp
       ApronModel apronModel = (ApronModel) theoremProver.getModel();
       return apronModel.getValue(formula);
     } catch (SolverException e) {
+      theoremProver.close();
       throw new RuntimeException(e);
     }
   }
