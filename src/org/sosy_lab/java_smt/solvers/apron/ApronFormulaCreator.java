@@ -63,9 +63,9 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
   /**
    * @variables is a map that stores all variable-objects with their name as key;
    */
-  private Map<String, ApronNode> variables;
+  private final Map<String, ApronNode> variables;
 
-  private Manager manager;
+  private final Manager manager;
 
   protected ApronFormulaCreator(
       Manager pManager,

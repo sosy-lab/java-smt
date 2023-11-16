@@ -55,8 +55,8 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
 
   private final ApronSolverContext solverContext;
   private final List<Collection<ApronConstraint>> assertedFormulas = new ArrayList<>();
-  private Abstract1 abstract1;
   private final Logger logger = Logger.getLogger("TheoremProver logger");
+  private Abstract1 abstract1;
 
 
   protected ApronTheoremProver(
@@ -148,9 +148,9 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
 
   private boolean isUnsatApron() {
     try {
-      if(abstract1.isBottom(solverContext.getManager())){
+      if (abstract1.isBottom(solverContext.getManager())) {
         return true;
-      }else{
+      } else {
         logger.setLevel(Level.WARNING);
         logger.warning("Apron can only guarantee for clear results for UNSAT! SAT can "
             + "also mean UNKNOWN!");
@@ -190,7 +190,7 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
    *
    * @param assumptions A list of literals.
    * @return if the prover is satisfiable with some additional assumptions
-   * @throws SolverException throws exception
+   * @throws SolverException      throws exception
    * @throws InterruptedException throws exception
    */
   @Override

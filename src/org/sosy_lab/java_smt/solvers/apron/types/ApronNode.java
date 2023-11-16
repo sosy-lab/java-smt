@@ -100,16 +100,16 @@ public interface ApronNode extends Formula {
         this.rational = Rational.of(numerator, denominator);
       }
 
-      public ApronRatCstNode(Texpr1CstNode pNode){
+      public ApronRatCstNode(Texpr1CstNode pNode) {
         this.cstNode = pNode;
         Coeff coeff = pNode.getConstant();
         Scalar scalar = coeff.inf();
         String string = scalar.toString();
         String[] strings = string.split("/");
-        if (strings.length == 1){
+        if (strings.length == 1) {
           this.numerator = BigInteger.valueOf(Long.parseLong(strings[0]));
           this.denominator = BigInteger.ONE;
-        }else {
+        } else {
           this.numerator = BigInteger.valueOf(Long.parseLong(strings[1]));
           this.denominator = BigInteger.valueOf(Long.parseLong(strings[1]));
         }
@@ -194,7 +194,7 @@ public interface ApronNode extends Formula {
         this.formulaCreator = pNode.getFormulaCreator();
       }
 
-      public ApronRatVarNode(Texpr1VarNode pNode, ApronFormulaCreator pFormulaCreator){
+      public ApronRatVarNode(Texpr1VarNode pNode, ApronFormulaCreator pFormulaCreator) {
         Preconditions.checkState(pFormulaCreator.getEnvironment().hasVar(pNode.toString()));
         this.varNode = pNode;
         this.formulaCreator = pFormulaCreator;
@@ -290,11 +290,11 @@ public interface ApronNode extends Formula {
         this.varNames = pNode.getVarNames();
       }
 
-      public ApronRatUnaryNode(Texpr1UnNode pNode){
+      public ApronRatUnaryNode(Texpr1UnNode pNode) {
         this.unaryNode = pNode;
         Var[] stringVars = pNode.getVars();
         Set<String> varNames = new HashSet<>();
-        for(Var var:stringVars){
+        for (Var var : stringVars) {
           varNames.add(var.toString());
         }
         this.varNames = varNames;
@@ -364,11 +364,11 @@ public interface ApronNode extends Formula {
         this.varNames = pNode.getVarNames();
       }
 
-      public ApronRatBinaryNode(Texpr1BinNode pNode){
+      public ApronRatBinaryNode(Texpr1BinNode pNode) {
         this.binaryNode = pNode;
         Var[] stringVars = pNode.getVars();
         Set<String> varNames = new HashSet<>();
-        for(Var var:stringVars){
+        for (Var var : stringVars) {
           varNames.add(var.toString());
         }
         this.varNames = varNames;

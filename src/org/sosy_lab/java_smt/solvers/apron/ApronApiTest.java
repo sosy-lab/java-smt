@@ -20,6 +20,7 @@
 
 package org.sosy_lab.java_smt.solvers.apron;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -48,7 +49,9 @@ public class ApronApiTest {
   public void solverBackendTest() {
   }
 
-  /**Simple Example that shows how to build constraints in Apron
+  /**
+   * Simple Example that shows how to build constraints in Apron
+   *
    * @throws ApronException throws Exception
    */
   @Test
@@ -110,7 +113,7 @@ public class ApronApiTest {
     Tcons1 isZero = new Tcons1(environment, Tcons1.EQ, add);
     Tcons1 xisZero = new Tcons1(environment, Tcons1.EQ, x);
     Abstract1 abstract1 = new Abstract1(manager, new Tcons1[]{isZero, xisZero});
-    assertTrue(abstract1.toTcons(manager).length == 1);
+    assertEquals(1, abstract1.toTcons(manager).length);
   }
 
   /**
@@ -128,7 +131,7 @@ public class ApronApiTest {
     //has Texpr1VarNode "x"?
     Texpr1VarNode x1 = new Texpr1VarNode("x");
     Environment environment1 = new Environment(new String[]{"x"}, new String[]{"y"});
-    assertTrue(!x1.hasVar("x")); //should be true
+    assertFalse(x1.hasVar("x")); //should be true
     assertFalse(x1.hasVar("y"));
     Texpr0Node xZero1 = x.toTexpr0Node(environment1);
     assertTrue(xZero1.hasDim(environment1.dimOfVar("x")));
@@ -136,7 +139,7 @@ public class ApronApiTest {
 
     //has x+x "x"?
     Texpr1BinNode xPlusx = new Texpr1BinNode(Texpr1BinNode.OP_ADD, x, x);
-    assertTrue(!xPlusx.hasVar("x")); //should be true
+    assertFalse(xPlusx.hasVar("x")); //should be true
     Texpr0Node zeroxPlusx = xPlusx.toTexpr0Node(environment);
     assertTrue(zeroxPlusx.hasDim(environment.dimOfVar("x")));
   }
@@ -145,7 +148,7 @@ public class ApronApiTest {
    * For having the correct behaviour for Integer nodes one has to specify the rounding type
    * (Integer) and rounding direction; otherwise the nodes will be handled as rational-type nodes
    *
-   * @throws ApronException
+   * @throws ApronException throws exception
    */
   @Test
   public void integerRoundingTest() throws ApronException {
@@ -191,7 +194,7 @@ public class ApronApiTest {
     //x-2*(x/2) = 0
     Tcons1 eq3 = new Tcons1(environment, Tcons1.EQ, xSub);
     Abstract1 abstract3 = new Abstract1(manager, new Tcons1[]{eq3, eqXisOne});
-    assertTrue(!abstract3.isBottom(manager));//isBottom() should be true!
+    assertFalse(abstract3.isBottom(manager));//isBottom() should be true!
 
     // a = 10 and b = 5 and a-b = 7*((a-b)/7)
     Environment environment1 = new Environment(new String[]{"a", "b"}, new String[]{});
@@ -224,7 +227,7 @@ public class ApronApiTest {
     Tcons1 eq1 = new Tcons1(environment1, Tcons1.EQ, all);
     Abstract1 abstract11 = new Abstract1(manager, new Tcons1[]{eq1, aIsTen, bIsFive});
     //isBottom() returns true because eq1 is not added
-    assertTrue(!abstract11.isBottom(manager));
+    assertFalse(abstract11.isBottom(manager));
   }
 
 }

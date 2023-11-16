@@ -47,9 +47,8 @@ public class ApronSolverContext extends AbstractSolverContext {
   private final Manager manager;
   private final @Nullable PathCounterTemplate logfile;
   private final LogManager logger;
-  private boolean closed = false;
-
   private final ShutdownNotifier shutdownNotifier;
+  private boolean closed = false;
 
   protected ApronSolverContext(
       ApronFormulaManager fmgr,

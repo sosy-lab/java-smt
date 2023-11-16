@@ -20,8 +20,6 @@
 
 package org.sosy_lab.java_smt.solvers.apron;
 
-import java.util.Collection;
-import java.util.List;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractEvaluator;
@@ -29,7 +27,6 @@ import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
-import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronConstraint;
 
 public class ApronEvaluator extends AbstractEvaluator<ApronNode, ApronFormulaType, ApronModel> {
 

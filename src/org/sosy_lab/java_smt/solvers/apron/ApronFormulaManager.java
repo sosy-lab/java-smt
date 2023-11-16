@@ -22,25 +22,17 @@ package org.sosy_lab.java_smt.solvers.apron;
 
 import apron.Environment;
 import java.util.Map;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
-import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
-import org.sosy_lab.java_smt.basicimpl.AbstractEnumerationFormulaManager;
-import org.sosy_lab.java_smt.basicimpl.AbstractFloatingPointFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
-import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
-import org.sosy_lab.java_smt.basicimpl.AbstractSLFormulaManager;
-import org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
 
 public class ApronFormulaManager extends AbstractFormulaManager<ApronNode, ApronFormulaType,
     Environment, Long> {
 
-  private ApronFormulaCreator formulaCreator;
+  private final ApronFormulaCreator formulaCreator;
 
   protected ApronFormulaManager(
       ApronFormulaCreator pFormulaCreator,

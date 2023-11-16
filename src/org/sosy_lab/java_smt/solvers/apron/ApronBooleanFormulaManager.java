@@ -128,9 +128,9 @@ public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<Ap
       Tcons1[] tcons1s = map.keySet().toArray(new Tcons1[map.size()]);
       Abstract1 helper = new Abstract1(this.formulaCreator.getManager(), tcons1s);
       boolean isBottom = helper.isBottom(this.formulaCreator.getManager());
-      if(isBottom){
+      if (isBottom) {
         return false;
-      }else {
+      } else {
         logger.setLevel(Level.WARNING);
         logger.warning("Apron can only guarantee for clear results for UNSAT! SAT can "
             + "also mean UNKNOWN!");
@@ -156,7 +156,7 @@ public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<Ap
       Tcons1[] tcons1s = map.keySet().toArray(new Tcons1[map.size()]);
       Abstract1 helper = new Abstract1(this.formulaCreator.getManager(), tcons1s);
       Boolean isBottom = helper.isBottom(this.formulaCreator.getManager());
-      if (isBottom){
+      if (isBottom) {
         return true;
       } else {
         logger.setLevel(Level.WARNING);
