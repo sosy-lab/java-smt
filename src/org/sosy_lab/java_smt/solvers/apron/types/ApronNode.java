@@ -33,7 +33,6 @@ import apron.Texpr1UnNode;
 import apron.Texpr1VarNode;
 import apron.Var;
 import com.google.common.base.Preconditions;
-import com.google.errorprone.annotations.Immutable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;

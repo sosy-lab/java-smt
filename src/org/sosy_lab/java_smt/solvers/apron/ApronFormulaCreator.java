@@ -220,6 +220,9 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
     return null;
   }
 
+  //SuppressWarning of unchecked is used here because the unchecked warning was because of
+  // unchecked class cast, but as all formulas are instances of ApronNode and ApronNode inherits
+  // from Formula, the Class Cast is correct here
   @Override
   @SuppressWarnings("unchecked")
   public <T extends Formula> T encapsulate(
