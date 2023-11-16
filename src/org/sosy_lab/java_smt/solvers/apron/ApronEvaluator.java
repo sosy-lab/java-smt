@@ -20,7 +20,6 @@
 
 package org.sosy_lab.java_smt.solvers.apron;
 
-import com.google.common.base.Preconditions;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractEvaluator;
@@ -51,6 +50,7 @@ public class ApronEvaluator extends AbstractEvaluator<ApronNode, ApronFormulaTyp
     }
   }
 
+  @Override
   public void close(){
     this.theoremProver.close();
   }
