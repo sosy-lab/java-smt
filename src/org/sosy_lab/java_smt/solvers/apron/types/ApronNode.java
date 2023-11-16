@@ -33,7 +33,6 @@ import apron.Texpr1UnNode;
 import apron.Texpr1VarNode;
 import apron.Var;
 import com.google.common.base.Preconditions;
-import com.google.errorprone.annotations.Immutable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -174,7 +173,6 @@ public interface ApronNode extends Formula {
     /**
      * This class wraps variables for rational values
      */
-    @Immutable
     class ApronRatVarNode implements RationalFormula, ApronNumeralNode {
 
       private final FormulaType type = FormulaType.RATIONAL;
@@ -276,7 +274,6 @@ public interface ApronNode extends Formula {
     /**
      * This class wraps terms with unary arithmetic operators for rational values (ex. -x)
      */
-    @Immutable
     class ApronRatUnaryNode implements RationalFormula, ApronNumeralNode {
       private final Texpr1UnNode unaryNode;
       private final Set<String> varNames;

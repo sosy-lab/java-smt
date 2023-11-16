@@ -225,7 +225,6 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
       org.sosy_lab.java_smt.api.FormulaType<T> pType,
       ApronNode pTerm) {
     if (pType.isBooleanType()) {
-      Preconditions.checkState(pTerm instanceof ApronConstraint);
       ApronConstraint constraint = (ApronConstraint) pTerm;
       return (T) new ApronNode.ApronConstraint(constraint);
     } else if (pType.isIntegerType()) {
