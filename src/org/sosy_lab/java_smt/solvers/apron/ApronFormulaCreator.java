@@ -58,7 +58,7 @@ import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.Apro
 public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaType, Environment,
     Long> {
 
-  private Environment environment;
+  private Environment formulaEnvironment;
 
   /**
    * @variables is a map that stores all variable-objects with their name as key;
@@ -76,7 +76,7 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
       @Nullable Long stringType,
       @Nullable Long regexType) {
     super(pO, boolType, pIntegerType, pRationalType, null, null);
-    this.environment = pO;
+    this.formulaEnvironment = pO;
     this.variables = new HashMap<>();
     this.manager = pManager;
   }
@@ -132,12 +132,12 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
     return manager;
   }
 
-  public Environment getEnvironment() {
-    return this.environment;
+  public Environment getFormulaEnvironment() {
+    return this.formulaEnvironment;
   }
 
-  public void setEnvironment(Environment pEnvironment) {
-    environment = pEnvironment;
+  public void setFormulaEnvironment(Environment pFormulaEnvironment) {
+    formulaEnvironment = pFormulaEnvironment;
   }
 
   @Override
@@ -170,7 +170,7 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
             .equals(
                 FormulaType.RATIONAL)),
         "Only Integer or rational variables allowed!");
-    if (environment.hasVar(varName)) {
+    if (formulaEnvironment.hasVar(varName)) {
       return variables.get(varName);
     }
     if (pApronFormulaType.getType().equals(FormulaType.INTEGER)) {

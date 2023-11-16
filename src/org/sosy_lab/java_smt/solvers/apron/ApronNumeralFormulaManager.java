@@ -34,13 +34,13 @@ abstract class ApronNumeralFormulaManager<
     extends AbstractNumeralFormulaManager<
     ApronNode, ApronFormulaType, Environment, ParamFormulaType, ResultFormulaType, Long> {
 
-  private final ApronFormulaCreator formulaCreator;
+  private final ApronFormulaCreator apronFormulaCreator;
 
   protected ApronNumeralFormulaManager(
       FormulaCreator<ApronNode, ApronFormulaType, Environment, Long> pCreator,
       NonLinearArithmetic pNonLinearArithmetic) {
     super(pCreator, pNonLinearArithmetic);
-    this.formulaCreator = (ApronFormulaCreator) pCreator;
+    this.apronFormulaCreator = (ApronFormulaCreator) pCreator;
   }
 
 

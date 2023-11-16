@@ -113,12 +113,12 @@ public class ApronIntegerFormulaManager
       ApronIntBinaryNode left = new ApronIntBinaryNode(x, mul, Texpr1BinNode.OP_SUB);
       Map<ApronNode, Integer> map = new HashMap<>();
       map.put(left, Tcons1.EQ);
-      return new ApronNode.ApronConstraint(formulaCreator.getEnvironment(), map);
+      return new ApronNode.ApronConstraint(formulaCreator.getFormulaEnvironment(), map);
     }
     ApronIntCstNode zero = new ApronIntCstNode(BigInteger.ZERO);
     Map<ApronNode, Integer> map = new HashMap<>();
     map.put(zero, Tcons1.EQ); // 0=0 for true
-    return new ApronConstraint(formulaCreator.getEnvironment(), map);
+    return new ApronConstraint(formulaCreator.getFormulaEnvironment(), map);
   }
 
   @Override
@@ -127,9 +127,9 @@ public class ApronIntegerFormulaManager
     ApronNode node2 = (ApronNode) denominator;
     Set<String> vars = formulaCreator.getVariables().keySet();
     //Somehow hasVar() only works for level0 of Apron (example in ApronNativeApiTest)
-    Texpr0Node zeroNode = node2.getNode().toTexpr0Node(formulaCreator.getEnvironment());
+    Texpr0Node zeroNode = node2.getNode().toTexpr0Node(formulaCreator.getFormulaEnvironment());
     for (String var : vars) {
-      if (zeroNode.hasDim(formulaCreator.getEnvironment().dimOfVar(var))) {
+      if (zeroNode.hasDim(formulaCreator.getFormulaEnvironment().dimOfVar(var))) {
         throw new UnsupportedOperationException("Denominator must not contain variables!");
       }
     }
@@ -192,7 +192,7 @@ public class ApronIntegerFormulaManager
         Texpr1BinNode.OP_SUB);
     Map<ApronNode, Integer> map = new HashMap<>();
     map.put(binaryNode, Tcons1.EQ);
-    ApronConstraint constraint = new ApronConstraint(formulaCreator.getEnvironment(), map);
+    ApronConstraint constraint = new ApronConstraint(formulaCreator.getFormulaEnvironment(), map);
     return constraint;
   }
 
@@ -205,11 +205,11 @@ public class ApronIntegerFormulaManager
             new ApronIntBinaryNode(pNumbers.get(i), pNumbers.get(j), Texpr1BinNode.OP_SUB);
         Map<ApronNode, Integer> map = new HashMap<>();
         map.put(apronNode, Tcons1.DISEQ);
-        ApronConstraint constraint = new ApronConstraint(formulaCreator.getEnvironment(), map);
+        ApronConstraint constraint = new ApronConstraint(formulaCreator.getFormulaEnvironment(), map);
         constraints.add(constraint);
       }
     }
-    return new ApronConstraint(constraints, formulaCreator.getEnvironment());
+    return new ApronConstraint(constraints, formulaCreator.getFormulaEnvironment());
   }
 
   @Override
@@ -218,7 +218,7 @@ public class ApronIntegerFormulaManager
         Texpr1BinNode.OP_SUB);
     Map<ApronNode, Integer> map = new HashMap<>();
     map.put(binaryNode, Tcons1.SUP);
-    ApronConstraint constraint = new ApronConstraint(formulaCreator.getEnvironment(), map);
+    ApronConstraint constraint = new ApronConstraint(formulaCreator.getFormulaEnvironment(), map);
     return constraint;
   }
 
@@ -228,7 +228,7 @@ public class ApronIntegerFormulaManager
         Texpr1BinNode.OP_SUB);
     Map<ApronNode, Integer> map = new HashMap<>();
     map.put(binaryNode, Tcons1.SUPEQ);
-    ApronConstraint constraint = new ApronConstraint(formulaCreator.getEnvironment(), map);
+    ApronConstraint constraint = new ApronConstraint(formulaCreator.getFormulaEnvironment(), map);
     return constraint;
   }
 
@@ -238,7 +238,7 @@ public class ApronIntegerFormulaManager
         Texpr1BinNode.OP_SUB);
     Map<ApronNode, Integer> map = new HashMap<>();
     map.put(binaryNode, Tcons1.SUP);
-    ApronConstraint constraint = new ApronConstraint(formulaCreator.getEnvironment(), map);
+    ApronConstraint constraint = new ApronConstraint(formulaCreator.getFormulaEnvironment(), map);
     return constraint;
   }
 
@@ -248,7 +248,7 @@ public class ApronIntegerFormulaManager
         Texpr1BinNode.OP_SUB);
     Map<ApronNode, Integer> map = new HashMap<>();
     map.put(binaryNode, Tcons1.SUPEQ);
-    ApronConstraint constraint = new ApronConstraint(formulaCreator.getEnvironment(), map);
+    ApronConstraint constraint = new ApronConstraint(formulaCreator.getFormulaEnvironment(), map);
     return constraint;
   }
 }

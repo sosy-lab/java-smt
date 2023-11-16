@@ -43,12 +43,12 @@ import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.Apro
 public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<ApronNode,
     ApronFormulaType, Environment, Long> {
 
-  private final ApronFormulaCreator formulaCreator;
+  private final ApronFormulaCreator apronFormulaCreator;
   private final Logger logger = Logger.getLogger("BooleanFormula logger");
 
   protected ApronBooleanFormulaManager(ApronFormulaCreator pCreator) {
     super(pCreator);
-    this.formulaCreator = pCreator;
+    this.apronFormulaCreator = pCreator;
   }
 
   @Override
@@ -73,7 +73,7 @@ public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<Ap
       //1 = 0
       map.put(one, Tcons1.EQ);
     }
-    return new ApronConstraint(formulaCreator.getEnvironment(), map);
+    return new ApronConstraint(apronFormulaCreator.getFormulaEnvironment(), map);
   }
 
   @Override
@@ -95,7 +95,7 @@ public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<Ap
     ArrayList<ApronConstraint> constraints = new ArrayList<>();
     constraints.add(cons1);
     constraints.add(cons2);
-    return new ApronConstraint(constraints, formulaCreator.getEnvironment());
+    return new ApronConstraint(constraints, apronFormulaCreator.getFormulaEnvironment());
   }
 
   @Override
@@ -126,8 +126,8 @@ public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<Ap
       ApronConstraint constraint = (ApronConstraint) bits;
       Map<Tcons1, Texpr1Node> map = constraint.getConstraintNodes();
       Tcons1[] tcons1s = map.keySet().toArray(new Tcons1[map.size()]);
-      Abstract1 helper = new Abstract1(this.formulaCreator.getManager(), tcons1s);
-      boolean isBottom = helper.isBottom(this.formulaCreator.getManager());
+      Abstract1 helper = new Abstract1(this.apronFormulaCreator.getManager(), tcons1s);
+      boolean isBottom = helper.isBottom(this.apronFormulaCreator.getManager());
       if (isBottom) {
         return false;
       } else {
@@ -154,8 +154,8 @@ public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<Ap
       ApronConstraint constraint = (ApronConstraint) bits;
       Map<Tcons1, Texpr1Node> map = constraint.getConstraintNodes();
       Tcons1[] tcons1s = map.keySet().toArray(new Tcons1[map.size()]);
-      Abstract1 helper = new Abstract1(this.formulaCreator.getManager(), tcons1s);
-      Boolean isBottom = helper.isBottom(this.formulaCreator.getManager());
+      Abstract1 helper = new Abstract1(this.apronFormulaCreator.getManager(), tcons1s);
+      Boolean isBottom = helper.isBottom(this.apronFormulaCreator.getManager());
       if (isBottom) {
         return true;
       } else {

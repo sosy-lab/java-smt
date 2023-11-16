@@ -195,7 +195,7 @@ public interface ApronNode extends Formula {
       }
 
       public ApronRatVarNode(Texpr1VarNode pNode, ApronFormulaCreator pFormulaCreator) {
-        Preconditions.checkState(pFormulaCreator.getEnvironment().hasVar(pNode.toString()));
+        Preconditions.checkState(pFormulaCreator.getFormulaEnvironment().hasVar(pNode.toString()));
         this.varNode = pNode;
         this.formulaCreator = pFormulaCreator;
         this.varName = pNode.toString();
@@ -241,8 +241,8 @@ public interface ApronNode extends Formula {
        * all variables in two separated arrays, one for Integers and one for Rationals
        */
       private void addVarToEnv() {
-        Var[] intVars = formulaCreator.getEnvironment().getIntVars();
-        Var[] realVars = formulaCreator.getEnvironment().getRealVars();
+        Var[] intVars = formulaCreator.getFormulaEnvironment().getIntVars();
+        Var[] realVars = formulaCreator.getFormulaEnvironment().getRealVars();
         Var[] newRealVars = new Var[realVars.length + 1];
         int i = 0;
         for (Var var : realVars) {
@@ -250,7 +250,7 @@ public interface ApronNode extends Formula {
           i++;
         }
         newRealVars[realVars.length] = new StringVar(this.varName);
-        formulaCreator.setEnvironment(new Environment(intVars, newRealVars));
+        formulaCreator.setFormulaEnvironment(new Environment(intVars, newRealVars));
       }
 
       @Override
@@ -292,11 +292,11 @@ public interface ApronNode extends Formula {
       public ApronRatUnaryNode(Texpr1UnNode pNode) {
         this.unaryNode = pNode;
         Var[] stringVars = pNode.getVars();
-        Set<String> varNames = new HashSet<>();
+        Set<String> variableNames = new HashSet<>();
         for (Var var : stringVars) {
-          varNames.add(var.toString());
+          variableNames.add(var.toString());
         }
-        this.varNames = varNames;
+        this.varNames = variableNames;
       }
 
       @Override
@@ -366,11 +366,11 @@ public interface ApronNode extends Formula {
       public ApronRatBinaryNode(Texpr1BinNode pNode) {
         this.binaryNode = pNode;
         Var[] stringVars = pNode.getVars();
-        Set<String> varNames = new HashSet<>();
+        Set<String> variableNames = new HashSet<>();
         for (Var var : stringVars) {
-          varNames.add(var.toString());
+          variableNames.add(var.toString());
         }
-        this.varNames = varNames;
+        this.varNames = variableNames;
       }
 
       @Override
@@ -529,14 +529,14 @@ public interface ApronNode extends Formula {
         this.varName = rationalNode.varName;
         this.formulaCreator = rationalNode.getFormulaCreator();
         //deleting real variable from environment
-        Var[] intVars = formulaCreator.getEnvironment().getIntVars();
-        Var[] realVars = formulaCreator.getEnvironment().getRealVars();
+        Var[] intVars = formulaCreator.getFormulaEnvironment().getIntVars();
+        Var[] realVars = formulaCreator.getFormulaEnvironment().getRealVars();
         ArrayList<Var> list = new ArrayList<>(Arrays.asList(realVars));
         Var v = new StringVar(varName);
         list.remove(v);
         Var[] newRealVars = new Var[list.size()];
         newRealVars = list.toArray(newRealVars);
-        formulaCreator.setEnvironment(new Environment(intVars, newRealVars));
+        formulaCreator.setFormulaEnvironment(new Environment(intVars, newRealVars));
         //adding int var to Environment
         addVarToEnv();
       }
@@ -586,8 +586,8 @@ public interface ApronNode extends Formula {
        * all variables in two separated arrays, one for Integers and one for Rationals
        */
       private void addVarToEnv() {
-        Var[] intVars = formulaCreator.getEnvironment().getIntVars();
-        Var[] realVars = formulaCreator.getEnvironment().getRealVars();
+        Var[] intVars = formulaCreator.getFormulaEnvironment().getIntVars();
+        Var[] realVars = formulaCreator.getFormulaEnvironment().getRealVars();
         Var[] newIntVars = new Var[intVars.length + 1];
         int i = 0;
         for (Var var : intVars) {
@@ -595,7 +595,7 @@ public interface ApronNode extends Formula {
           i++;
         }
         newIntVars[intVars.length] = new StringVar(this.varName);
-        formulaCreator.setEnvironment(new Environment(newIntVars, realVars));
+        formulaCreator.setFormulaEnvironment(new Environment(newIntVars, realVars));
       }
 
       @Override

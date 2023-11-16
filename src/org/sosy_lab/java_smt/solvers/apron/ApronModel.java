@@ -93,7 +93,7 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
   private ValueAssignment getAssignment(String pVar) {
     try {
       //check if the variable is of type integer
-      if (formulaCreator.getEnvironment().isInt(pVar)) {
+      if (formulaCreator.getFormulaEnvironment().isInt(pVar)) {
         return getIntAssignment(pVar);
       } else {
         return getRatAssignment(pVar);
@@ -137,7 +137,7 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
     //creates a constraint of the form key - lower bound = 0 (Apron format of key = lower bound)
     Map<ApronNode, Integer> map = new HashMap<>();
     map.put(binaryNode, Tcons1.EQ);
-    BooleanFormula formula = new ApronConstraint(formulaCreator.getEnvironment(), map);
+    BooleanFormula formula = new ApronConstraint(formulaCreator.getFormulaEnvironment(), map);
     return new ValueAssignment(keyFormula, valueFormula, formula, pVar,
         formulaCreator.convertValue(keyFormula, valueFormula),
         argumentInterpretationBuilder.build());
@@ -181,7 +181,7 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
     //creates a constraint of the form key - lower bound = 0 (Apron format of key = lower bound)
     Map<ApronNode, Integer> map = new HashMap<>();
     map.put(binaryNode, Tcons1.EQ);
-    BooleanFormula formula = new ApronConstraint(formulaCreator.getEnvironment(), map);
+    BooleanFormula formula = new ApronConstraint(formulaCreator.getFormulaEnvironment(), map);
     Object node = formulaCreator.convertValue(keyFormula, valueFormula);
     return new ValueAssignment(keyFormula, valueFormula, formula, pVar,
         node,
@@ -207,7 +207,7 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
       return booleanFormulaManager.makeBooleanImpl(booleanFormulaManager.isTrue(pNode));
     } else {
       Texpr1Node texpr1Node = pNode.getNode();
-      Texpr0Node texpr0Node = texpr1Node.toTexpr0Node(formulaCreator.getEnvironment());
+      Texpr0Node texpr0Node = texpr1Node.toTexpr0Node(formulaCreator.getFormulaEnvironment());
       if (texpr0Node.getDims().length == 0) {
         //if a node has noc variables, return node
         return pNode;

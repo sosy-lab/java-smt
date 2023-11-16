@@ -67,7 +67,7 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
     super(pSet, pBmgr, pShutdownNotifier);
     this.solverContext = pApronSolverContext;
     this.abstract1 = new Abstract1(pApronSolverContext.getManager(),
-        pApronSolverContext.getFormulaCreator().getEnvironment());
+        pApronSolverContext.getFormulaCreator().getFormulaEnvironment());
     this.assertedFormulas.add(new LinkedHashSet<>());
   }
 
@@ -113,13 +113,13 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
         Tcons1[] newCons = new Tcons1[consOld.length + 1];
         int i = 0;
         for (Tcons1 c : consOld) {
-          c.extendEnvironment(solverContext.getFormulaCreator().getEnvironment());
+          c.extendEnvironment(solverContext.getFormulaCreator().getFormulaEnvironment());
           newCons[i] = c;
           i++;
         }
         newCons[consOld.length] = cons.getKey();
         this.abstract1.changeEnvironment(solverContext.getManager(),
-            solverContext.getFormulaCreator().getEnvironment(), false);
+            solverContext.getFormulaCreator().getFormulaEnvironment(), false);
         this.abstract1 = new Abstract1(solverContext.getManager(), newCons);
         Iterables.getLast(assertedFormulas).add(pConstraint);
       }
