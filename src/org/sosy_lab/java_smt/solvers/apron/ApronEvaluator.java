@@ -31,19 +31,22 @@ import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
 public class ApronEvaluator extends AbstractEvaluator<ApronNode, ApronFormulaType, ApronModel> {
 
   private final ApronTheoremProver theoremProver;
+  private ApronModel apronModel;
 
   protected ApronEvaluator(
       AbstractProver<?> pProver,
-      FormulaCreator<ApronNode, ApronFormulaType, ApronModel, Long> creator) {
+      FormulaCreator<ApronNode, ApronFormulaType, ApronModel, Long> creator)
+      throws SolverException {
     super(pProver, creator);
     ApronTheoremProver prover = (ApronTheoremProver) pProver;
     this.theoremProver = prover;
+    this.apronModel = (ApronModel) theoremProver.getModel();
   }
 
   @Override
   protected @Nullable ApronNode evalImpl(ApronNode formula) {
     try {
-      ApronModel apronModel = (ApronModel) theoremProver.getModel();
+      this.apronModel = (ApronModel) theoremProver.getModel();
       return apronModel.getValue(formula);
     } catch (SolverException e) {
       throw new RuntimeException(e);
@@ -53,5 +56,6 @@ public class ApronEvaluator extends AbstractEvaluator<ApronNode, ApronFormulaTyp
   @Override
   public void close(){
     this.theoremProver.close();
+    this.apronModel.close();
   }
 }
