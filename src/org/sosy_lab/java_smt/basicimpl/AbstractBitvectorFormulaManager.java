@@ -77,11 +77,9 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     IntegerFormula result = getFormulaCreator()
         .encapsulate(FormulaType.IntegerType, toIntegerFormulaImpl(param1, signed));
     if (Generator.isLoggingEnabled) {
-      if (signed) {
-        BitvectorGenerator.logSToIntegerFormula(result, pI);
-      } else {
-        BitvectorGenerator.logUToIntegerFormula(result, pI);
-      }
+      throw new GeneratorException("\"toIntegerFormula operation is not available for \"\n"
+          + "        + \"bitvectors in \"\n"
+          + "        + \"SMT-LIB2\"");
     }
     return result;
   }
@@ -501,7 +499,8 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     } else {
       BooleanFormula result = wrapBool(distinctImpl(Lists.transform(pBits, this::extractInfo)));
       if (Generator.isLoggingEnabled) {
-        BitvectorGenerator.logBVDistinct(result, pBits);
+        throw new GeneratorException("distinct operation is not available for bitvectors in "
+            + "SMT-LIB2");
       }
       return result;
     }

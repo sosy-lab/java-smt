@@ -1,0 +1,16 @@
+(declare-const s (Seq Int))
+(declare-const t0 (Seq Int))
+(declare-const t1 (Seq Int))
+(declare-const t2 (Seq Int))
+(declare-const t3 (Seq Int))
+(declare-const t4 (Seq Int))
+
+(assert (= s (seq.++ (seq.unit 0) (seq.unit 1) (seq.unit 2))))
+(assert (= t0 (seq.extract s 1 1)))
+(assert (= t1 (seq.extract s 1 5)))
+(assert (= t2 (seq.extract s 3 5)))
+(assert (= t3 (seq.extract s (- 1) 1)))
+(assert (= t4 (seq.extract s 1 (- 1))))
+
+(check-sat)
+(get-model)

@@ -1,0 +1,15 @@
+#!/bin/sh
+
+if [ $(uname) = "Linux" ]; then
+    pathCmd="readlink -f"
+elif [ $(uname) = "Darwin" ]; then
+    pathCmd="stat -f %N"
+else
+    pathCmd="realpath"
+fi
+
+BASEDIR=`dirname $($pathCmd $0)`
+
+export CLASSPATH=$CLASSPATH:$BASEDIR/dist/princess-all.jar
+
+exec java -Xss20000k -Xmx1500m -noverify ap.CmdlMain "$@"

@@ -225,8 +225,8 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
         BooleanGenerator.logOr(result2, pBits);
         return result2;
       default:
-        Iterator<BooleanFormula> pit = pBits.iterator();
-          BooleanFormula result = (wrap(orImpl(Collections2.transform(pBits, this::extractInfo))));
+
+          BooleanFormula result = wrap(orImpl(Collections2.transform(pBits, this::extractInfo)));
         if (Generator.isLoggingEnabled) {
           BooleanGenerator.logOr(result, pBits);
         }

@@ -20,37 +20,40 @@
 
 package org.sosy_lab.java_smt.utils.Generators;
 
+import ap.parser.IExpression;
+import ap.types.Sort;
 import com.google.common.collect.ImmutableList;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.api.ArrayFormulaManager;
 import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
-import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.UFManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
+import org.sosy_lab.java_smt.solvers.princess.PrincessEnvironment;
 import org.sosy_lab.java_smt.utils.Parsers.Visitor;
 import org.sosy_lab.java_smt.utils.Parsers.smtlibv2Lexer;
 import org.sosy_lab.java_smt.utils.Parsers.smtlibv2Parser;
 
-public class UniversalModel extends AbstractModel {
+public class UniversalModel extends AbstractModel<IExpression, Sort, PrincessEnvironment> {
 
   private final String path = "/home/janel/Desktop/Studium/Semester_6/Bachelorarbeit"
       + "/nochmalneu/";
 
-  AbstractFormulaManager<Formula, Formula, Formula, ?> formulaManager;
+  AbstractFormulaManager<IExpression, Sort, PrincessEnvironment, ?> fmgr;
   private final BooleanFormulaManager bmgr;
   private final IntegerFormulaManager imgr;
   //private final RationalFormulaManager rmgr;
@@ -66,9 +69,9 @@ public class UniversalModel extends AbstractModel {
 
   public UniversalModel(
       AbstractProver<?> prover,
-      AbstractFormulaManager<Formula, Formula, Formula, ?> pFormulaManager) {
+      AbstractFormulaManager<IExpression, Sort, PrincessEnvironment, ?> pFormulaManager) {
     super( prover, pFormulaManager);
-    formulaManager = pFormulaManager;
+    fmgr = pFormulaManager;
     bmgr = formulaManager.getBooleanFormulaManager();
     imgr = formulaManager.getIntegerFormulaManager();
     //rmgr = Objects.requireNonNull(formulaManager.getRationalFormulaManager());
@@ -79,6 +82,11 @@ public class UniversalModel extends AbstractModel {
 
   }
 
+  @Override
+  protected @Nullable IExpression evalImpl(IExpression formula) {
+    return null;
+  }
+
   public ImmutableList<ValueAssignment> listToImmutable(List<ValueAssignment> pList) {
     ImmutableList<ValueAssignment> immutableList = ImmutableList.copyOf(pList);
     return immutableList;
@@ -87,11 +95,12 @@ public class UniversalModel extends AbstractModel {
   public String getOutput() throws IOException {
     StringBuilder output = new StringBuilder();
 
-    Process process = new ProcessBuilder("/home/janel/Desktop/Studium/Semester_6/Bachelorarbeit"
-        + "/Princess/princess-bin-2023-06-19/princess",
-        "+incremental", (path + "Out.smt2")).start();
+    String fileName = "/lib/native/source/princess/princess-bin-2023-06-19/./princess";
+    String filePath = System.getProperty("user.dir");
+    Process process =
+        new ProcessBuilder(filePath + fileName, "+incremental", (path + "Out.smt2")).start();
     InputStream is = process.getInputStream();
-    InputStreamReader isr = new InputStreamReader(is);
+    InputStreamReader isr = new InputStreamReader(is, Charset.defaultCharset());
     BufferedReader br = new BufferedReader(isr);
     String lines;
     while ((lines = br.readLine()) != null) {
@@ -118,11 +127,10 @@ public class UniversalModel extends AbstractModel {
     return assignments;
   }
 
-  public List<ValueAssignment> parseModelFromString(String pString)
-      throws IOException {
+  public List<ValueAssignment> parseModelFromString(String pString) {
     smtlibv2Lexer lexer = new smtlibv2Lexer(CharStreams.fromString(pString));
     smtlibv2Parser parser = new smtlibv2Parser(new CommonTokenStream(lexer));
-    Visitor visitor = new Visitor(formulaManager, bmgr, imgr, null, bvmgr, amgr, umgr);
+    Visitor visitor = new Visitor(fmgr, bmgr, imgr, null, bvmgr, amgr, umgr);
     visitor.visit(parser.start());
     assignments = visitor.getAssignments();
     return assignments;
@@ -154,12 +162,6 @@ public class UniversalModel extends AbstractModel {
     getOutput();
     getAssignments();
     return this;
-  }
-
-  @Nullable
-  @Override
-  protected Formula evalImpl(Object formula) {
-    return null;
   }
 
   @Override

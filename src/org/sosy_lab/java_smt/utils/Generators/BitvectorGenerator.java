@@ -40,7 +40,7 @@ public class BitvectorGenerator {
     inputParams.add(Long.toString(i));
     Function<List<Object>, String> saveResult =
         inPlaceInputParamsString -> {
-          String formatString = "%0" + (length) + "d";
+          String formatString = "%0" + length + "d";
           long binaryNumber =
               Long.parseLong(Long.toBinaryString(parseLong((String)inPlaceInputParamsString.get(1))));
           return "#b" + String.format(formatString, binaryNumber);};
@@ -53,7 +53,7 @@ public class BitvectorGenerator {
     inputParams.add(i.toString());
     Function<List<Object>, String> saveResult =
         inPlaceInputParamsString -> {
-          String formatString = "%0" + (length) + "d";
+          String formatString = "%0" + length + "d";
           BigInteger binaryNumber =
            new BigInteger(Long.toBinaryString(parseLong((String)inPlaceInputParamsString.get(1))));
           return "#b" + String.format(formatString, binaryNumber);};
@@ -66,7 +66,7 @@ public class BitvectorGenerator {
     inputParams.add(pI.toString());
     Function<List<Object>, String> saveResult =
         inPlaceInputParamsString -> {
-          String formatString = "%0" + (length) + "d";
+          String formatString = "%0" + length + "d";
           int binaryNumber =
               Integer.parseInt(Long.toBinaryString(parseLong((String)inPlaceInputParamsString.get(1))));
           return "#b" + String.format(formatString, binaryNumber);};
@@ -105,19 +105,6 @@ public class BitvectorGenerator {
     Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
 
-  public static void logSToIntegerFormula(Object result, BitvectorFormula pI)
-      throws GeneratorException {
-    throw new GeneratorException("toIntegerFormula operation is not available for "
-        + "bitvectors in "
-        + "SMT-LIB2");
-  }
-
-  public static void logUToIntegerFormula(Object result, BitvectorFormula pI)
-      throws GeneratorException {
-    throw new GeneratorException("toIntegerFormula operation is not available for "
-        + "bitvectors in "
-        + "SMT-LIB2");
-  }
 
   public static void logBVNegate(Object result, BitvectorFormula pNumber) {
     List<Object> inputParams = new ArrayList<>();
@@ -388,12 +375,5 @@ public class BitvectorGenerator {
         inPlaceInputParams -> "((_ sign_extend " + inPlaceInputParams.get(1) + ") " + inPlaceInputParams.get(0) +  ")";
     Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
-
-  public static void logBVDistinct(Object result, List<BitvectorFormula> operands)
-      throws GeneratorException {
-    throw new GeneratorException("distinct operation is not available for bitvectors in "
-        + "SMT-LIB2");
-  }
-
 
 }

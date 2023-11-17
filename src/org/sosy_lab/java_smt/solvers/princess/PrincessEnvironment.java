@@ -83,7 +83,7 @@ import scala.collection.immutable.Set$;
  * for all stacks.
  */
 @Options(prefix = "solver.princess")
-class PrincessEnvironment {
+public class PrincessEnvironment {
 
   @Option(
       secure = true,

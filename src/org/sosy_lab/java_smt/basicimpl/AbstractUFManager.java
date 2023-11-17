@@ -11,22 +11,13 @@ package org.sosy_lab.java_smt.basicimpl;
 import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
 
 import com.google.common.collect.Lists;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.sosy_lab.java_smt.api.BitvectorFormula;
-import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
-import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.UFManager;
-import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
-import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.utils.Generators.Generator;
 import org.sosy_lab.java_smt.utils.Generators.UFGenerator;
 
@@ -52,10 +43,10 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
       String pName, FormulaType<T> pReturnType, List<FormulaType<?>> pArgTypes) {
     checkVariableName(pName);
     if (pName.contains("PIPE")) {
-      pName = pName.replaceAll("PIPE", "\\|");
+      pName = pName.replaceAll("PIPE", "|");
     }
     List<TType> argTypes = Lists.transform(pArgTypes, this::toSolverType);
-    FunctionDeclaration result = FunctionDeclarationImpl.of(
+    FunctionDeclaration<T> result = FunctionDeclarationImpl.of(
         pName,
         FunctionDeclarationKind.UF,
         pArgTypes,
@@ -71,7 +62,7 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
   public <T extends Formula> FunctionDeclaration<T> declareUF(
       String pName, FormulaType<T> pReturnType, FormulaType<?>... pArgs) {
     checkVariableName(pName);
-    FunctionDeclaration result = declareUF(pName, pReturnType, Arrays.asList(pArgs));
+    FunctionDeclaration<T> result = declareUF(pName, pReturnType, Arrays.asList(pArgs));
     return result;
   }
 
@@ -99,7 +90,7 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
       String name, FormulaType<T> pReturnType, List<Formula> pArgs) {
     checkVariableName(name);
     if (name.contains("PIPE")) {
-      name = name.replaceAll("PIPE", "\\|");
+      name = name.replaceAll("PIPE", "|");
     }
     List<FormulaType<?>> argTypes = Lists.transform(pArgs, getFormulaCreator()::getFormulaType);
     FunctionDeclaration<T> func = declareUF(name, pReturnType, argTypes);

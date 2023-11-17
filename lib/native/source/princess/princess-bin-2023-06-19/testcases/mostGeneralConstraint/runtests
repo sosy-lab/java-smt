@@ -1,0 +1,15 @@
+#!/bin/sh
+
+PRI=../../princess
+
+
+TESTS="bitvectorArith3.pri bitvectorArith4.pri omegaBug.pri splitting.pri \
+       bv0.pri"
+
+$PRI "$@" $TESTS 2>&1 | grep -v "^[(!zOc]"
+
+# Testcase where we check the output precisely
+
+TESTS="closingConstraintBug.pri shift4.pri"
+
+$PRI "$@" $TESTS

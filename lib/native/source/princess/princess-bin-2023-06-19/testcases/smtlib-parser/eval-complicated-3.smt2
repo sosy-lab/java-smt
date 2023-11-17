@@ -1,0 +1,10 @@
+(set-logic LRA)
+
+(declare-fun x () Real)
+(assert (= x (/ 1 3)))
+(check-sat)
+(get-value (x (/ x 2) (* x x)))
+(declare-fun y () Real)
+(assert (= y (+ x 1)))
+(check-sat)
+(get-value (x y (* x y)))

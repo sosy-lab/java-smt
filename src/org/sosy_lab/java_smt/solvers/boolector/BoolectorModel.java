@@ -83,7 +83,7 @@ class BoolectorModel extends AbstractModel<Long, Long, Long> {
   private final BoolectorAbstractProver<?> prover;
   private final BoolectorFormulaCreator bfCreator;
 
-  private final BoolectorFormulaManager formulaManager;
+
   private final ImmutableList<Long> assertedTerms;
 
   BoolectorModel(
@@ -92,7 +92,6 @@ class BoolectorModel extends AbstractModel<Long, Long, Long> {
       BoolectorAbstractProver<?> pProver,
       Collection<Long> assertedTerms) {
     super(pProver, pFormulaManager);
-    this.formulaManager = pFormulaManager;
     this.bfCreator = (BoolectorFormulaCreator) pFormulaManager.getFormulaCreator();
     this.btor = btor;
     this.prover = pProver;

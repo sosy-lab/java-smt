@@ -1,0 +1,45 @@
+#!/bin/sh
+
+# test the SMT-LIB parser
+
+PRI=../../princess
+
+TESTS="bignum_quant.smt2 \
+       int_incompleteness1.smt2 int_incompleteness2.smt2 \
+       int_incompleteness3.smt2 \
+       init-1.smt2 MULTIPLIER_2.msat.smt2 \
+       ite.smt2 ite2.smt2 ite3.smt2 \
+       for_in_term.smt2 for_in_term2.smt2 \
+       let.smt2 let2.smt2 let3.smt2 \
+       divmod.smt2 \
+       patternBug.smt2 correct-eq.smt2 \
+       define-fun.smt2 define-fun2.smt2 define-fun3.smt2 define-fun4.smt2 \
+       define-fun-interpolation.smt2 \
+       seconds.smt2 \
+       quotes.smt2 extensions.smt2 boolean-quant.smt2 \
+       define-fun-bug.smt2 define-fun-bug2.smt2 define-fun-bug3.smt2 \
+       distinctBug.smt2 \
+       reductionBug.smt2 epsilon.smt2 \
+       define-fun-rec.smt2 define-fun-recs.smt2 bv0.smt2 bv1.smt2 bv1b.smt2 \
+       bitops1.smt2 division_by_zero0.smt2 bvmul.smt2 \
+       modelConstructionBug2.smt2 conjunct-eliminator-bug.smt2 \
+       eagerMatchBug.smt2 index-error.smt2 division_by_zero1.smt2"
+
+$PRI "$@" $TESTS
+
+TESTS="multiple-check-sat.smt2 simple-joogie.smt2 \
+       named-interpolation.smt2 LockingExample.bpl.smt2 \
+       let3.smt2 BugBooleanFunction.smt2 Typedef-safe.bpl.smt2 \
+       missingLazyMatch.smt2 4BitCounterStruct-safe.c.smt2 \
+       interpolant-typing-bug.smt2 modelConstructionBug.smt2 \
+       incremental-interpolants.smt2 eval-exhaustive.smt2 \
+       unsat-core.smt2 define-fun-recs2.smt2 \
+       define-fun-bug2.smt2 define-fun-bug3.smt2 \
+       run_00007.trace.Alloc_large__008268.smt2 bench_586.smt2 \
+       incremental-bug.smt2 simplify.smt2 simplify2.smt2 simplify3.smt2 \
+       division_by_zero2.smt2 eval-complicated-1.smt2 eval-complicated-2.smt2 \
+       eval-complicated-3.smt2"
+
+$PRI "$@" +incremental $TESTS
+
+$PRI "$@" +boolFunsAsPreds changing_truth_value_unsafe_garbage.c.smt2

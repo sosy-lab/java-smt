@@ -1,0 +1,30 @@
+#!/bin/sh
+
+# test the TPTP parser
+
+PRI=../../princess
+
+TESTS="ARI120=1.p ARI496=1.p ARI595=1.p ARI616=1.p ARI620=1.p \
+       ARI526=1.p ARI522=1.p \
+       GEG021=1.p PUZ133=2.p SYN050-1.p \
+       SYO561_1.p SYO563+1.p SYO563+2.p let-tests.p \
+       quotes.p multiple-conjectures.p \
+       finite-domains-2.p finite-domains-3.p"
+
+$PRI "$@" $TESTS
+
+TESTS="PUZ001+1.p PHI009+1.p"
+
+$PRI "$@" -clausifier=simple +boolFunsAsPreds $TESTS
+
+$PRI "$@" +unsatCore unsat-core.p
+$PRI "$@" +printProof unsat-core.p
+
+$PRI "$@" -realRatSaturationRounds=1 -assert ARI495\=1.p
+
+# not provable
+$PRI "$@" -timeout=3000 finite-domains-1.p
+
+# check that -genTotalityAxioms is handled correctly
+$PRI "$@" -genTotalityAxioms SYN455+1-simp.p
+

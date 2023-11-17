@@ -19,33 +19,19 @@ package org.sosy_lab.java_smt;/*
  */
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Objects;
 import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.log.BasicLogManager;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
-import org.sosy_lab.java_smt.api.ArrayFormula;
-import org.sosy_lab.java_smt.api.ArrayFormulaManager;
-import org.sosy_lab.java_smt.api.BitvectorFormula;
-import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.BooleanFormulaManager;
-import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
-import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.api.FunctionDeclaration;
-import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.Model;
-import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.api.UFManager;
 import org.sosy_lab.java_smt.utils.Generators.Generator;
 
 public class Main {
@@ -60,11 +46,7 @@ public class Main {
         SolverContextFactory.createSolverContext(config, logger, shutdown.getNotifier(),
             Solvers.PRINCESS_BINARY);
     FormulaManager fmgr = context.getFormulaManager();
-    BooleanFormulaManager bmgr = fmgr.getBooleanFormulaManager();
-    IntegerFormulaManager imgr = fmgr.getIntegerFormulaManager();
-    BitvectorFormulaManager bvmgr = fmgr.getBitvectorFormulaManager();
-    ArrayFormulaManager amgr = fmgr.getArrayFormulaManager();
-    UFManager umgr =  fmgr.getUFManager();
+
 
     String a = "(declare-const a1 (Array Int Int))\n"
         + "(declare-const a2 (Array Int Int))\n"

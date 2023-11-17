@@ -1,0 +1,42 @@
+
+(declare-datatypes ((Tree 0) (TreeList 0)) (
+   ((node (data Int) (children TreeList)))
+   ((nil) (cons (head Tree) (tail TreeList)))))
+
+(define-fun leaf ((x Int)) Tree (node x nil))
+
+(declare-fun x () Tree)
+(declare-fun y () Int)
+(declare-fun y2 () Int)
+(declare-fun y3 () Int)
+(declare-fun z () Tree)
+
+(push 1)
+(assert (= x (node 1 (cons z nil))))
+(check-sat)
+(assert (= z (leaf 42)))
+(check-sat)
+(get-value ((data (head (children x)))))
+(push 1)
+(assert (< (data (head (children x))) 0))
+(check-sat)
+(pop 1)
+(push 1)
+(assert (= x (node y (cons (leaf y2) (cons (leaf y3) nil)))))
+(check-sat)
+(pop 1)
+(push 1)
+(assert (= x (node y (cons (leaf y2) nil))))
+(check-sat)
+(get-value (y2))
+(pop 1)
+(pop 1)
+
+(set-option :produce-interpolants true)
+
+(push 1)
+(assert (! (= x (node 1 (cons (leaf y) (cons (leaf y2) nil)))) :named left))
+(assert (! (= x (node 1 (cons (leaf y) nil))) :named right))
+(check-sat)
+(get-interpolants left right)
+(pop 1)

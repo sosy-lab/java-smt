@@ -1,0 +1,33 @@
+#!/bin/sh
+
+# Some examples that need special settings
+
+PRI=../../princess
+
+$PRI "$@" -simplifyConstraints=lemmas -posUnitResolution functions2b.pri
+$PRI "$@" -posUnitResolution -assert tarskiGeometry2.pri
+$PRI "$@" -timeout=30000 -clausifier=none +posUnitResolution group0.pri
+$PRI "$@" -timeout=30000 +posUnitResolution -constructProofs=always counterExampleBug.pri
+$PRI "$@" -timeout=30000 -constructProofs=always omega_problem__031.smt.pri
+$PRI "$@" -generateTriggers=total -genTotalityAxioms +reverseFunctionalityPropagation -tightFunctionScopes ricart-agrawala7.smt2
+$PRI "$@" -timeout=30000 -model proofBug.pri
+$PRI "$@" -timeout=15000 multiplication3.pri
+$PRI "$@" -generateTriggers=total -timeout=60000 vstte-problem-2-vc.pri
+$PRI "$@" -timeout=30000 -generateTriggers=all +mostGeneralConstraint soldiers.pri
+$PRI "$@" -timeout=30000 +triggersInConjecture -genTotalityAxioms -tightFunctionScopes -clausifier=none +boolFunsAsPreds -triggerStrategy=allMaximal +ignoreQuantifiers -generateTriggers=all GEO212+3-complete.p
+$PRI "$@" -timeout=10000 -constructProofs=always diamonds.16.3.i.a.u.smt2
+$PRI "$@" -timeout=30000 +incremental -assert abbrev-interpolation.smt2
+$PRI "$@" -timeout=45000 -generateTriggers=all adt-size3b.pri
+$PRI "$@" -timeout=15000 adt-large.pri
+$PRI "$@" -timeout=30000 bv-interpolation-7.pri
+$PRI "$@" +ignoreQuantifiers boolean-triggers.smt2
+$PRI "$@" -timeout=30000 -constructProofs=always 10-40.smt2
+$PRI "$@" -timeout=30000 simplify26.pri
+$PRI "$@" -timeout=30000 -generateTriggers=all multiplication.pri
+$PRI "$@" -timeout=10000 conjunctElimBug.smt2
+
+# this will time out
+$PRI "$@" +incremental -timeout=3000 sort-unsoundness.smt2
+
+# this should result in GaveUp, not a countermodel
+$PRI "$@" -assert -model +genTotalityAxioms -constructProofs=always -generateTriggers=all SYN455+1.p

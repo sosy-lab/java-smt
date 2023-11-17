@@ -134,16 +134,6 @@ public class NumeralGenerator {
     Generator.executedAggregator.add(new RecursiveString<>(result, inputParams, saveResult, "Skip"));
   }
 
-  public static void logModularCongruence(Object result, Object pNumber1, Object pNumber2,
-                                          long pModulo) throws GeneratorException {
-    throw new GeneratorException("Modular Congruence is not available in SMTLIB2. ");
-  }
-
-  public static void logModularCongruence(Object result, Object pNumber1, Object pNumber2,
-                                          BigInteger pModulo) {
-    throw new GeneratorException("Modular Congruence is not available in SMTLIB2. ");
-  }
-
   public static void logMultiply(Object result, Object pNumber1, Object pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);

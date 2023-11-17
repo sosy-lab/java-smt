@@ -28,11 +28,10 @@ import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 
 public class Yices2SolverContext extends AbstractSolverContext {
 
-  private final Yices2FormulaCreator creator;
   private final BooleanFormulaManager bfmgr;
   private final ShutdownNotifier shutdownManager;
 
-  private static Yices2FormulaManager formulaManager;
+  private Yices2FormulaManager formulaManager;
   private static int numLoadedInstances = 0;
   private boolean closed = false;
 
@@ -43,7 +42,6 @@ public class Yices2SolverContext extends AbstractSolverContext {
       ShutdownNotifier pShutdownManager) {
     super(pFmgr);
     formulaManager = pFormulaManager;
-    this.creator = (Yices2FormulaCreator) pFormulaManager.getFormulaCreator();
     bfmgr = pBfmgr;
     shutdownManager = pShutdownManager;
   }

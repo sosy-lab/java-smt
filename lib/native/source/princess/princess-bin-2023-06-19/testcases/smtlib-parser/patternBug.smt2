@@ -1,0 +1,7 @@
+(set-logic AUFLIA)
+(declare-fun h (Int Int) Int)
+(assert (forall ((?y Int)) (! (= (h ?y (h ?y ?y)) ?y)
+            :pattern ((h ?y (h ?y 10))) )))
+(assert (= (h 10 (h 10 10)) 11))
+(check-sat)
+(exit)

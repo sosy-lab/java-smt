@@ -28,7 +28,6 @@ public class CVC5Model extends AbstractModel<Term, Sort, Solver> {
   private final ImmutableList<ValueAssignment> model;
   private final Solver solver;
   private final ImmutableList<Term> assertedExpressions;
-  private final CVC5FormulaManager formulaManager;
 
   @SuppressWarnings("unused")
   private final FormulaManager mgr;
@@ -41,7 +40,6 @@ public class CVC5Model extends AbstractModel<Term, Sort, Solver> {
     super(pProver, pFormulaManager);
     solver = pProver.solver;
     mgr = pMgr;
-    formulaManager = pFormulaManager;
     assertedExpressions = ImmutableList.copyOf(pAssertedExpressions);
 
     // We need to generate and save this at construction time as CVC4 has no functionality to give a

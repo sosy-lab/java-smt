@@ -1,0 +1,12 @@
+#!/bin/sh
+
+PRI=../../princess
+
+TESTS="simple2.smt2 simple2b.smt2 simple3.smt2 simple4.smt2 simple5.smt2 \
+       simple6.smt2 swap_invalid_t1_np_nf_ai_00002_006.cvc.smt2"
+
+$PRI "$@" $TESTS
+
+TESTS="simple.smt2"
+
+$PRI "$@" +incremental $TESTS

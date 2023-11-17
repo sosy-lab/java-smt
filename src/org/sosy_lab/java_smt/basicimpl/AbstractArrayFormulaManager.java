@@ -10,7 +10,6 @@ package org.sosy_lab.java_smt.basicimpl;
 
 import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
 
-import java.io.IOException;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.ArrayFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -60,7 +59,7 @@ public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFu
     final FormulaType<TE> elementType = getFormulaCreator().getArrayFormulaElementType(pArray);
 
     final TFormulaInfo term = store(extractInfo(pArray), extractInfo(pIndex), extractInfo(pValue));
-    ArrayFormula result = getFormulaCreator().encapsulateArray(term, indexType, elementType);
+    ArrayFormula<TI,TE> result = getFormulaCreator().encapsulateArray(term, indexType, elementType);
     if (Generator.isLoggingEnabled) {
       ArrayGenerator.logStore(result, pArray, pIndex, pValue);
     }
@@ -86,7 +85,9 @@ public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFu
       throws GeneratorException {
     checkVariableName(pName);
     final TFormulaInfo namedArrayFormula = internalMakeArray(pName, pIndexType, pElementType);
-    ArrayFormula result = getFormulaCreator().encapsulateArray(namedArrayFormula, pIndexType, pElementType);
+    ArrayFormula<TI, TE> result = getFormulaCreator().encapsulateArray(namedArrayFormula,
+        pIndexType,
+        pElementType);
     if (Generator.isLoggingEnabled) {
       ArrayGenerator.logMakeArray(result, pName, pIndexType, pElementType);
     }

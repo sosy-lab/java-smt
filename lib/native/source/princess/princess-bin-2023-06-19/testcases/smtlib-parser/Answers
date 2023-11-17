@@ -1,0 +1,568 @@
+Loading bignum_quant.smt2 ...
+Warning: exit is only supported in incremental mode (option +incremental), ignoring it
+Preprocessing ...
+Proving ...
+
+unsat
+
+Loading int_incompleteness1.smt2 ...
+Warning: exit is only supported in incremental mode (option +incremental), ignoring it
+Preprocessing ...
+Constructing countermodel ...
+
+unsat
+
+Loading int_incompleteness2.smt2 ...
+Warning: exit is only supported in incremental mode (option +incremental), ignoring it
+Preprocessing ...
+Constructing countermodel ...
+
+unsat
+
+Loading int_incompleteness3.smt2 ...
+Warning: exit is only supported in incremental mode (option +incremental), ignoring it
+Preprocessing ...
+Constructing countermodel ...
+
+unsat
+
+Loading init-1.smt2 ...
+Warning: exit is only supported in incremental mode (option +incremental), ignoring it
+Preprocessing ...
+Constructing countermodel ...
+
+unsat
+
+Loading MULTIPLIER_2.msat.smt2 ...
+Warning: exit is only supported in incremental mode (option +incremental), ignoring it
+Preprocessing ...
+Constructing countermodel ...
+
+unsat
+
+Loading ite.smt2 ...
+Preprocessing ...
+Proving ...
+
+unsat
+
+Loading ite2.smt2 ...
+Preprocessing ...
+Constructing countermodel ...
+
+unsat
+
+Loading ite3.smt2 ...
+Preprocessing ...
+Proving ...
+
+unsat
+
+Loading for_in_term.smt2 ...
+Preprocessing ...
+Proving ...
+
+unsat
+
+Loading for_in_term2.smt2 ...
+Preprocessing ...
+Constructing countermodel ...
+
+unsat
+
+Loading let.smt2 ...
+Preprocessing ...
+Proving ...
+
+unsat
+
+Loading let2.smt2 ...
+Preprocessing ...
+Proving ...
+
+unsat
+
+Loading let3.smt2 ...
+Preprocessing ...
+Constructing countermodel ...
+
+sat
+(model
+  (define-fun ?v_6_77 () Int 5)
+  (define-fun ?v_5_76 () Int 4)
+  (define-fun ?v_4_75 () Int 3)
+  (define-fun ?v_3_74 () Int 2)
+  (define-fun ?v_2_73 () Int 0)
+  (define-fun ?v_75_52 () Int 19)
+  (define-fun ?v_15_32 () Int 18)
+  (define-fun ?v_14_28 () Int 17)
+  (define-fun ?v_13_24 () Int 10)
+  (define-fun ?v_12_20 () Int 16)
+  (define-fun ?v_11_16 () Int 15)
+  (define-fun ?v_10_12 () Int 14)
+  (define-fun ?v_9_8 () Int 13)
+  (define-fun ?v_8_4 () Int 12)
+  (define-fun ?v_7_2 () Int 11)
+  (define-fun ?v_0_1 () Int (- 2))
+  (define-fun ?v_1_0 () Int 1)
+  (define-fun x () Int 10)
+  (define-fun fmt1 () Int 0)
+  (define-fun fmt0 () Int 0)
+  (define-fun format ((x!0 Int)) Int (ite (= x!0 0) 11 (ite (= x!0 1) 12 (ite (= x!0 2) 13 (ite (= x!0 3) 14 (ite (= x!0 4) 15 (ite (= x!0 5) 16 (ite (= x!0 6) 10 (ite (= x!0 7) 17 (ite (= x!0 8) 18 (ite (= x!0 9) 19 0)))))))))))
+  (define-fun ?v_66_27 ((x!0 Int)) Bool (ite (= x!0 0) true true))
+)
+
+Loading divmod.smt2 ...
+Preprocessing ...
+Constructing countermodel ...
+
+unsat
+
+Loading patternBug.smt2 ...
+Warning: exit is only supported in incremental mode (option +incremental), ignoring it
+Preprocessing ...
+Proving ...
+
+unsat
+
+Loading correct-eq.smt2 ...
+Warning: exit is only supported in incremental mode (option +incremental), ignoring it
+Preprocessing ...
+Constructing countermodel ...
+
+unsat
+
+Loading define-fun.smt2 ...
+Preprocessing ...
+Constructing countermodel ...
+
+unsat
+
+Loading define-fun2.smt2 ...
+Preprocessing ...
+Proving ...
+
+unsat
+
+Loading define-fun3.smt2 ...
+Preprocessing ...
+Constructing countermodel ...
+
+unsat
+
+Loading define-fun4.smt2 ...
+Warning: get-model is only supported in incremental mode (option +incremental), ignoring it
+Preprocessing ...
+Constructing countermodel ...
+
+sat
+(model
+  (define-fun y () Int 43)
+  (define-fun f ((x!0 Int)) Int (ite (= x!0 42) 44 0))
+  (define-fun inc ((x!0 Int)) Int (ite (= x!0 43) 44 0))
+)
+
+Loading define-fun-interpolation.smt2 ...
+Preprocessing ...
+Constructing countermodel ...
+Found proof (size 2), simplifying (2), interpolating ...
+
+unsat
+(
+  (<= 0 (+ (- 1) (+ d c)))
+)
+
+Loading seconds.smt2 ...
+Warning: exit is only supported in incremental mode (option +incremental), ignoring it
+Preprocessing ...
+Proving ...
+
+sat
+
+Loading quotes.smt2 ...
+Warning: exit is only supported in incremental mode (option +incremental), ignoring it
+Preprocessing ...
+Constructing countermodel ...
+
+unsat
+
+Loading extensions.smt2 ...
+Warning: interpreting "~" as unary minus, like in SMT-LIB 1
+Warning: exit is only supported in incremental mode (option +incremental), ignoring it
+Preprocessing ...
+Constructing countermodel ...
+
+unsat
+
+Loading boolean-quant.smt2 ...
+Preprocessing ...
+Proving ...
+
+unsat
+
+Loading define-fun-bug.smt2 ...
+Warning: exit is only supported in incremental mode (option +incremental), ignoring it
+Preprocessing ...
+Constructing countermodel ...
+
+unsat
+
+Loading define-fun-bug2.smt2 ...
+Preprocessing ...
+Constructing countermodel ...
+
+unsat
+
+Loading define-fun-bug3.smt2 ...
+Preprocessing ...
+Constructing countermodel ...
+
+unsat
+
+Loading distinctBug.smt2 ...
+Preprocessing ...
+Constructing countermodel ...
+
+unsat
+
+Loading reductionBug.smt2 ...
+Preprocessing ...
+Constructing countermodel ...
+
+sat
+(model
+  (define-fun c_gcd_~y2 () Int 1)
+  (define-fun c_gcd_~y1 () Int 3)
+  (define-fun |c_gcd_#in~y2| () Int 0)
+  (define-fun |c_gcd_#in~y1| () Int 0)
+)
+
+Loading epsilon.smt2 ...
+Preprocessing ...
+Constructing countermodel ...
+
+unsat
+
+Loading define-fun-rec.smt2 ...
+Warning: assuming that recursive function square is partial
+Preprocessing ...
+Constructing countermodel ...
+
+unsat
+
+Loading define-fun-recs.smt2 ...
+Warning: assuming that recursive function f1 is partial
+Warning: assuming that recursive function f2 is partial
+Preprocessing ...
+Constructing countermodel ...
+
+unsat
+
+Loading bv0.smt2 ...
+Warning: exit is only supported in incremental mode (option +incremental), ignoring it
+Preprocessing ...
+Constructing countermodel ...
+
+unsat
+
+Loading bv1.smt2 ...
+Preprocessing ...
+Constructing countermodel ...
+
+sat
+(model
+  (define-fun e () (_ BitVec 16) (_ bv1999 16))
+  (define-fun d () (_ BitVec 8) (_ bv207 8))
+  (define-fun c () (_ BitVec 8) (_ bv7 8))
+)
+
+Loading bv1b.smt2 ...
+Preprocessing ...
+Constructing countermodel ...
+
+sat
+(model
+  (define-fun e () (_ BitVec 16) (_ bv1999 16))
+  (define-fun d () (_ BitVec 8) (_ bv207 8))
+  (define-fun c () (_ BitVec 8) (_ bv7 8))
+)
+
+Loading bitops1.smt2 ...
+Warning: exit is only supported in incremental mode (option +incremental), ignoring it
+Preprocessing ...
+Constructing countermodel ...
+
+unsat
+
+Loading division_by_zero0.smt2 ...
+Warning: exit is only supported in incremental mode (option +incremental), ignoring it
+Preprocessing ...
+Constructing countermodel ...
+
+unsat
+
+Loading bvmul.smt2 ...
+Preprocessing ...
+Constructing countermodel ...
+
+sat
+(model
+  (define-fun y1 () (_ BitVec 32) (_ bv2147488282 32))
+  (define-fun x1 () (_ BitVec 32) (_ bv2147488281 32))
+  (define-fun x0 () (_ BitVec 32) (_ bv46341 32))
+)
+
+Loading modelConstructionBug2.smt2 ...
+Warning: get-model is only supported in incremental mode (option +incremental), ignoring it
+Preprocessing ...
+Constructing countermodel ...
+
+sat
+(model
+  (define-fun o () Obj (WrappedInt 42))
+  (define-fun p1 () Int 45)
+  (define-fun h2 () Heap (Heap 46 (store ((as const (Array Int Obj)) (WrappedInt 0)) 45 (WrappedInt 42))))
+  (define-fun h1 () Heap (Heap 45 (store ((as const (Array Int Obj)) (WrappedInt 0)) 45 (WrappedInt 1))))
+)
+
+Loading conjunct-eliminator-bug.smt2 ...
+Preprocessing ...
+Constructing countermodel ...
+
+unsat
+
+Loading eagerMatchBug.smt2 ...
+Warning: echo is only supported in incremental mode (option +incremental), ignoring it
+Preprocessing ...
+Proving ...
+
+unsat
+
+Loading index-error.smt2 ...
+Syntax Error, trying to recover and continue parse...
+(error "Runaway block, probably due to mismatched parentheses")
+Loading division_by_zero1.smt2 ...
+Warning: exit is only supported in incremental mode (option +incremental), ignoring it
+Preprocessing ...
+Constructing countermodel ...
+
+sat
+(model
+  (define-fun a () Int 0)
+)
+
+Loading multiple-check-sat.smt2 ...
+unsat
+unsat
+Loading simple-joogie.smt2 ...
+sat
+((Block3538_bwd true))
+unsat
+Loading named-interpolation.smt2 ...
+unsat
+""
+"01:"
+((<= 0 (+ 100 (* (- 1) x_1)))
+(<= 0 (+ 111 (* (- 1) xm1)))
+(<= 0 (+ 111 (* (- 1) xm1)))
+(<= 0 (+ 101 (+ (* (- 1) res4) (+ x2 (* (- 1) xm1)))))
+(<= 0 (+ 101 (* (- 1) resm5)))
+(<= 0 (+ 101 (* (- 1) xm6)))
+(or (<= 0 (+ (- 1) (+ x7 (* (- 1) xm6)))) (and (= x7 101) (<= 0 (+ 101 (* (- 1) xm6)))))
+(or (<= 0 (+ (- 1) (+ x7 (* (- 1) xm6)))) (and (= res9 91) (= x7 xm6)))
+(= resm10 91)
+(= res11 91))
+""
+"02:"
+((<= 0 (+ 101 (* (- 1) resm5)))
+(<= 0 (+ 101 (* (- 1) xm6)))
+(= resm10 91))
+""
+"03:"
+((<= 0 (+ 101 (* (- 1) resm5)))
+(or (<= 0 (+ (- 1) (+ xm6 (* (- 1) resm5)))) (and (= resm10 91) (= xm6 resm5)))
+(<= 0 (+ (- 1) (+ xm6 (* (- 1) resm5)))))
+""
+"04 (tree interpolants):"
+((<= 0 (+ 100 (* (- 1) x_1)))
+(<= 0 (+ 111 (* (- 1) xm1)))
+true
+(<= 0 (+ (- 10) (+ (* (- 1) res4) x2)))
+(<= 0 (+ 101 (* (- 1) resm5)))
+(<= 0 (+ 101 (* (- 1) xm6)))
+(<= 0 (+ (- 101) x7))
+(or (<= 0 (+ (- 102) x7)) (and (= res9 91) (= x7 101)))
+(= resm10 91)
+(= res11 91))
+Loading LockingExample.bpl.smt2 ...
+"begin unification"
+sat
+"end unification"
+"starting trace check"
+unsat
+unsat
+unsat
+unsat
+unsat
+unsat
+unsat
+unsat
+unsat
+(true
+true
+(= lockingEx_auld_2 lockingEx_new_-1)
+false
+false)
+"finished trace check"
+Loading let3.smt2 ...
+sat
+Loading BugBooleanFunction.smt2 ...
+unsat
+unsat
+unsat
+unsat
+((and (= proc_x_0 7) (myFunc 7)))
+unsat
+((and proc_x_0_2 (myFunc2 true)))
+unsat
+((and (= proc_x_0 7) (select ar 7)))
+Warning: arrays over finite domains are not fully supported yet
+unsat
+((and (select ar true) proc_x_0_2))
+unsat
+((and (select ar false) (not proc_x_0_2)))
+Loading Typedef-safe.bpl.smt2 ...
+success
+success
+success
+success
+success
+success
+success
+success
+Loading missingLazyMatch.smt2 ...
+unknown
+Loading 4BitCounterStruct-safe.c.smt2 ...
+unsat
+((= |#offset~STRUCT#?zero~INT?one~INT?two~INT?three~INT#~three| 12)
+(= |#offset~STRUCT#?zero~INT?one~INT?two~INT?three~INT#~three| 12)
+(= |#offset~STRUCT#?zero~INT?one~INT?two~INT?three~INT#~three| 12)
+(= |#offset~STRUCT#?zero~INT?one~INT?two~INT?three~INT#~three| 12)
+(= |#offset~STRUCT#?zero~INT?one~INT?two~INT?three~INT#~three| 12)
+(= |#offset~STRUCT#?zero~INT?one~INT?two~INT?three~INT#~three| 12)
+(= (+ |main_#t~malloc0.offset_5| |#offset~STRUCT#?zero~INT?one~INT?two~INT?three~INT#~three|) 12)
+(= (+ main_~fb~1.offset_6 |#offset~STRUCT#?zero~INT?one~INT?two~INT?three~INT#~three|) 12)
+(= (+ main_~fb~1.offset_6 |#offset~STRUCT#?zero~INT?one~INT?two~INT?three~INT#~three|) 12)
+(= (+ main_~fb~1.offset_6 |#offset~STRUCT#?zero~INT?one~INT?two~INT?three~INT#~three|) 12)
+(= (+ main_~fb~1.offset_6 |#offset~STRUCT#?zero~INT?one~INT?two~INT?three~INT#~three|) 12)
+(= (select (select |#memory_int_10| main_~fb~1.base_6) (+ main_~fb~1.offset_6 |#offset~STRUCT#?zero~INT?one~INT?two~INT?three~INT#~three|)) 0)
+(= (select (select |#memory_int_10| main_~fb~1.base_6) (+ main_~fb~1.offset_6 |#offset~STRUCT#?zero~INT?one~INT?two~INT?three~INT#~three|)) 0)
+(= |main_#t~mem5_12| 0)
+false
+false
+false)
+Loading interpolant-typing-bug.smt2 ...
+unsat
+Warning: not all asserted formulas are mentioned in interpolant specification, putting remaining formulas in the last/root partition
+((and (not (= test_fun_~x_ref~2.base_-1 test_fun_~c~2.base_-1)) (<= 0 (+ (* (- 1) (select (select |#memory_int_-1| test_fun_~x_ref~2.base_-1) test_fun_~x_ref~2.offset_-1)) (+ (select (select |#memory_int_-1| test_fun_~y_ref~2.base_-1) test_fun_~y_ref~2.offset_-1) oldRank0_-1))))
+(and (not (= test_fun_~x_ref~2.base_-1 test_fun_~c~2.base_-1)) (<= 0 (+ (* (- 1) (select (select |#memory_int_-1| test_fun_~x_ref~2.base_-1) test_fun_~x_ref~2.offset_-1)) (+ (select (select |#memory_int_-1| test_fun_~y_ref~2.base_-1) test_fun_~y_ref~2.offset_-1) oldRank0_-1))))
+(and (not (= test_fun_~x_ref~2.base_-1 test_fun_~c~2.base_-1)) (<= 0 (+ (* (- 1) (select (select |#memory_int_-1| test_fun_~x_ref~2.base_-1) test_fun_~x_ref~2.offset_-1)) (+ (select (select |#memory_int_-1| test_fun_~y_ref~2.base_-1) test_fun_~y_ref~2.offset_-1) oldRank0_-1))))
+(and (not (= test_fun_~x_ref~2.base_-1 test_fun_~c~2.base_-1)) (and (<= 0 (+ (select (select |#memory_int_-1| test_fun_~y_ref~2.base_-1) test_fun_~y_ref~2.offset_-1) (+ (* (- 1) |test_fun_#t~mem12_3|) oldRank0_-1))) (or (not (= test_fun_~x_ref~2.base_-1 test_fun_~y_ref~2.base_-1)) (= (select |#memory_int_-1| test_fun_~x_ref~2.base_-1) (select |#memory_int_-1| test_fun_~y_ref~2.base_-1)))))
+(and (not (= test_fun_~x_ref~2.base_-1 test_fun_~c~2.base_-1)) (and (and (= (select (select |#memory_int_-1| test_fun_~y_ref~2.base_-1) test_fun_~y_ref~2.offset_-1) |test_fun_#t~mem13_4|) (<= 0 (+ |test_fun_#t~mem13_4| (+ (* (- 1) |test_fun_#t~mem12_3|) oldRank0_-1)))) (and (or (not (= test_fun_~y_ref~2.base_-1 test_fun_~c~2.base_-1)) (= (select (select |#memory_int_-1| test_fun_~c~2.base_-1) test_fun_~y_ref~2.offset_-1) |test_fun_#t~mem13_4|)) (or (not (= test_fun_~x_ref~2.base_-1 test_fun_~y_ref~2.base_-1)) (= (select (select |#memory_int_-1| test_fun_~x_ref~2.base_-1) test_fun_~y_ref~2.offset_-1) |test_fun_#t~mem13_4|)))))
+(and (not (= test_fun_~x_ref~2.base_-1 test_fun_~c~2.base_-1)) (and (<= 0 (+ (- 1) oldRank0_-1)) (and (or (not (= test_fun_~y_ref~2.base_-1 test_fun_~c~2.base_-1)) (= (select (select |#memory_int_-1| test_fun_~c~2.base_-1) test_fun_~y_ref~2.offset_-1) (select (select |#memory_int_-1| test_fun_~y_ref~2.base_-1) test_fun_~y_ref~2.offset_-1))) (or (not (= test_fun_~x_ref~2.base_-1 test_fun_~y_ref~2.base_-1)) (= (select (select |#memory_int_-1| test_fun_~x_ref~2.base_-1) test_fun_~y_ref~2.offset_-1) (select (select |#memory_int_-1| test_fun_~y_ref~2.base_-1) test_fun_~y_ref~2.offset_-1))))))
+(and (and (not (= test_fun_~x_ref~2.base_-1 test_fun_~c~2.base_-1)) (<= 0 (+ (- 1) oldRank0_-1))) (and (and (= (select (select |#memory_int_-1| test_fun_~y_ref~2.base_-1) test_fun_~y_ref~2.offset_-1) |test_fun_#t~mem15_6|) (or (not (= test_fun_~y_ref~2.base_-1 test_fun_~c~2.base_-1)) (= (select (select |#memory_int_-1| test_fun_~c~2.base_-1) test_fun_~y_ref~2.offset_-1) |test_fun_#t~mem15_6|))) (or (not (= test_fun_~x_ref~2.base_-1 test_fun_~y_ref~2.base_-1)) (= (select (select |#memory_int_-1| test_fun_~x_ref~2.base_-1) test_fun_~y_ref~2.offset_-1) |test_fun_#t~mem15_6|))))
+(and (and (not (= test_fun_~x_ref~2.base_-1 test_fun_~c~2.base_-1)) (<= 0 (+ (- 1) oldRank0_-1))) (and (or (<= 0 (+ (- 1) (+ (select (select |#memory_int_7| test_fun_~y_ref~2.base_-1) test_fun_~y_ref~2.offset_-1) (+ (* (- 1) (select (select |#memory_int_7| test_fun_~x_ref~2.base_-1) test_fun_~x_ref~2.offset_-1)) oldRank0_-1)))) (and (= (select |#memory_int_7| test_fun_~y_ref~2.base_-1) (select |#memory_int_7| test_fun_~x_ref~2.base_-1)) (= test_fun_~x_ref~2.offset_-1 test_fun_~y_ref~2.offset_-1))) (or (not (= test_fun_~y_ref~2.base_-1 test_fun_~c~2.base_-1)) (and (<= 0 (+ (- 1) (+ (select (select |#memory_int_7| test_fun_~c~2.base_-1) test_fun_~y_ref~2.offset_-1) (+ (* (- 1) (select (select |#memory_int_7| test_fun_~x_ref~2.base_-1) test_fun_~x_ref~2.offset_-1)) oldRank0_-1)))) (<= 0 (+ (- 1) (+ (* (- 1) (select (select |#memory_int_7| test_fun_~x_ref~2.base_-1) test_fun_~x_ref~2.offset_-1)) (+ (select (select |#memory_int_7| test_fun_~c~2.base_-1) test_fun_~y_ref~2.offset_-1) oldRank0_-1))))))))
+(and (and (not (= test_fun_~x_ref~2.base_-1 test_fun_~c~2.base_-1)) (<= 0 (+ (- 1) oldRank0_-1))) (and (or (<= 0 (+ (- 1) (+ (select (select |#memory_int_7| test_fun_~y_ref~2.base_-1) test_fun_~y_ref~2.offset_-1) (+ (* (- 1) (select (select |#memory_int_7| test_fun_~x_ref~2.base_-1) test_fun_~x_ref~2.offset_-1)) oldRank0_-1)))) (and (= (select |#memory_int_7| test_fun_~y_ref~2.base_-1) (select |#memory_int_7| test_fun_~x_ref~2.base_-1)) (= test_fun_~x_ref~2.offset_-1 test_fun_~y_ref~2.offset_-1))) (or (not (= test_fun_~y_ref~2.base_-1 test_fun_~c~2.base_-1)) (and (= (select (select |#memory_int_7| test_fun_~c~2.base_-1) test_fun_~c~2.offset_-1) |test_fun_#t~mem18_8|) (and (<= 0 (+ (- 1) (+ (select (select |#memory_int_7| test_fun_~c~2.base_-1) test_fun_~y_ref~2.offset_-1) (+ (* (- 1) (select (select |#memory_int_7| test_fun_~x_ref~2.base_-1) test_fun_~x_ref~2.offset_-1)) oldRank0_-1)))) (or (not (= test_fun_~c~2.offset_-1 test_fun_~y_ref~2.offset_-1)) (<= 0 (+ (- 1) (+ (* (- 1) (select (select |#memory_int_7| test_fun_~x_ref~2.base_-1) test_fun_~x_ref~2.offset_-1)) (+ |test_fun_#t~mem18_8| oldRank0_-1)))))))))))
+Loading modelConstructionBug.smt2 ...
+unsat
+sat
+((PRED0 true))
+unsat
+unsat
+sat
+((PRED1 true))
+unsat
+unsat
+sat
+((PRED1 false))
+unsat
+sat
+((PRED0 true))
+unsat
+unsat
+sat
+((PRED1 true))
+((PRED3 true))
+((PRED4 false))
+((PRED5 true))
+sat
+((PRED1 true))
+((PRED3 true))
+((PRED4 true))
+Loading incremental-interpolants.smt2 ...
+sat
+unsat
+Loading eval-exhaustive.smt2 ...
+sat
+((PRED2 true))
+(((not PRED2) false))
+Loading unsat-core.smt2 ...
+unsat
+(NQS QR RS)
+Loading define-fun-recs2.smt2 ...
+Warning: assuming that recursive function f1 is partial
+Warning: assuming that recursive function f2 is partial
+sat
+((c 22))
+Loading define-fun-bug2.smt2 ...
+unsat
+Loading define-fun-bug3.smt2 ...
+unsat
+Loading run_00007.trace.Alloc_large__008268.smt2 ...
+unsat
+Loading bench_586.smt2 ...
+unsat
+Loading incremental-bug.smt2 ...
+sat
+sat
+(((or (not (<= 0 (+ c13 (- 1)))) (<= 0 (+ c5 (- 1)))) true))
+sat
+(((or (not (<= 0 (+ c13 (- 1)))) (<= 0 (+ c5 (- 1)))) true))
+Loading simplify.smt2 ...
+(= (* 7 z) (* 5 y))
+(and (<= 0 (+ (* (- 7) lo) (* 5 hi))) (and (and (and (or (or (<= 0 (+ 20 (+ (* 7 lo) (* (- 5) hi)))) (<= 0 (+ (- 28) (+ (* (- 7) lo) (* 5 hi))))) (or (or (or (exists ((var0 Int)) (= (+ (* 5 var0) lo) 2)) (exists ((var0 Int)) (= (+ (* 5 var0) lo) (- 2)))) (exists ((var0 Int)) (= (+ (* 5 var0) lo) (- 1)))) (exists ((var0 Int)) (= lo (* (- 5) var0))))) (or (or (<= 0 (+ 13 (+ (* 7 lo) (* (- 5) hi)))) (<= 0 (+ (- 21) (+ (* (- 7) lo) (* 5 hi))))) (or (or (exists ((var0 Int)) (= (+ (* 5 var0) lo) (- 2))) (exists ((var0 Int)) (= (+ (* 5 var0) lo) (- 1)))) (exists ((var0 Int)) (= lo (* (- 5) var0)))))) (or (or (<= 0 (+ 6 (+ (* 7 lo) (* (- 5) hi)))) (<= 0 (+ (- 14) (+ (* (- 7) lo) (* 5 hi))))) (or (exists ((var0 Int)) (= (+ (* 5 var0) lo) (- 1))) (exists ((var0 Int)) (= lo (* (- 5) var0)))))) (or (<= 0 (+ (- 7) (+ (* (- 7) lo) (* 5 hi)))) (exists ((var0 Int)) (= lo (* (- 5) var0))))))
+Loading simplify2.smt2 ...
+(or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (= x (_ bv125 7)) (= x (_ bv123 7))) (= x (_ bv121 7))) (= x (_ bv119 7))) (= x (_ bv117 7))) (= x (_ bv115 7))) (= x (_ bv113 7))) (= x (_ bv111 7))) (= x (_ bv109 7))) (= x (_ bv107 7))) (= x (_ bv105 7))) (= x (_ bv103 7))) (= x (_ bv101 7))) (= x (_ bv99 7))) (= x (_ bv97 7))) (= x (_ bv95 7))) (= x (_ bv93 7))) (= x (_ bv91 7))) (= x (_ bv89 7))) (= x (_ bv87 7))) (= x (_ bv85 7))) (= x (_ bv83 7))) (= x (_ bv81 7))) (= x (_ bv79 7))) (= x (_ bv77 7))) (= x (_ bv75 7))) (= x (_ bv73 7))) (= x (_ bv71 7))) (= x (_ bv69 7))) (= x (_ bv67 7))) (= x (_ bv65 7))) (= x (_ bv63 7))) (= x (_ bv61 7))) (= x (_ bv59 7))) (= x (_ bv57 7))) (= x (_ bv55 7))) (= x (_ bv53 7))) (= x (_ bv51 7))) (= x (_ bv49 7))) (= x (_ bv47 7))) (= x (_ bv45 7))) (= x (_ bv43 7))) (= x (_ bv41 7))) (= x (_ bv39 7))) (= x (_ bv37 7))) (= x (_ bv35 7))) (= x (_ bv33 7))) (= x (_ bv31 7))) (= x (_ bv29 7))) (= x (_ bv27 7))) (= x (_ bv25 7))) (= x (_ bv23 7))) (= x (_ bv21 7))) (= x (_ bv19 7))) (= x (_ bv17 7))) (= x (_ bv15 7))) (= x (_ bv13 7))) (= x (_ bv11 7))) (= x (_ bv9 7))) (= x (_ bv7 7))) (= x (_ bv5 7))) (= x (_ bv3 7))) (= x (_ bv1 7))) (bvule (_ bv127 7) x))
+Loading simplify3.smt2 ...
+(exists ((var0 (Array Int Bool))) (and (select var0 k) (and (not (= v i)) (not (select var0 v)))))
+(= i k)
+(not (= (select b k) v))
+(or (not (= iOuter kOuter)) (and (not (= v 7)) (= iInner kInner)))
+Loading division_by_zero2.smt2 ...
+sat
+(model
+  (define-fun a () Int 5)
+)
+(= (div a 0) 4)
+Loading eval-complicated-1.smt2 ...
+sat
+(model
+  (define-fun x () Int 12)
+)
+((x 12) ((mod x (- 5)) 2) ((div x (- 5)) (- 2)))
+Loading eval-complicated-2.smt2 ...
+sat
+((x 0) (y 0) ((+ x y 1) 1))
+sat
+((x 1) (y 0) ((+ x y 1) 2))
+Loading eval-complicated-3.smt2 ...
+sat
+((x (/ 1 3)) ((/ x 2) (/ 1 6)) ((* x x) (/ 1 9)))
+sat
+((x (/ 1 3)) (y (/ 4 3)) ((* x y) (/ 4 9)))
+Loading changing_truth_value_unsafe_garbage.c.smt2 ...
+Preprocessing ...
+Proving ...
+
+sat
+

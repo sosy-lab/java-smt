@@ -110,7 +110,6 @@ public class SolverContextFactory {
 
   @Option(secure = true, description = "test.")
   private boolean generateSMTLIB2;
-  private boolean parseFromFile;
 
   private final LogManager logger;
   private final ShutdownNotifier shutdownNotifier;

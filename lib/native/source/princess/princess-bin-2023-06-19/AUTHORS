@@ -1,0 +1,33 @@
+Main author:
+
+Philipp Ruemmer <ph_r@gmx.net>
+http://www.philipp.ruemmer.org
+
+
+The Craig interpolation procedure was contributed by:
+
+Angelo Brillout <angelo.brillout@gmail.com>
+
+
+The solver for non-linear integer arithmetic was contributed by:
+
+Peter Backeman <peter@backeman.se>
+http://www.es.mdh.se/staff/4393-Peter__Backeman
+
+
+The TPTP parser was contributed by:
+
+Peter Baumgartner <Peter.Baumgartner@data61.csiro.au>
+http://users.cecs.anu.edu.au/~baumgart/
+
+
+The Heap theory solver was contributed by:
+
+Zafer Esen <zafer.esen@it.uu.se>
+https://katalog.uu.se/empinfo/?id=N18-2424
+
+
+Various bugfixes by:
+
+Amanda Stjerna <amanda.stjerna@it.uu.se>
+https://amandastjerna.se

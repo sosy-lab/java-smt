@@ -167,6 +167,7 @@ class SynchronizedFormulaManager implements FormulaManager {
     }
   }
 
+  @Override
   public BooleanFormula universalParse(String pS)
       throws IllegalArgumentException, IOException, SolverException, InterruptedException,
              InvalidConfigurationException {

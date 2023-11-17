@@ -1,0 +1,880 @@
+
+SimpleAPITest
+
+-- Declaration of symbols
+Sat
+
+-- Adding some assertions (uses methods from IExpression._)
+Sat
+Partial model: {c1 -> 100, c0 -> 115, p1 -> true, p0 -> true}
+
+-- Querying the model
+r = true
+r & !s = false
+v = true
+
+-- Scoping (locally add assertions, declare symbols, etc)
+Unsat
+Sat
+
+-- Shorter notation via importing
+Sat
+Sat
+
+-- Nesting scopes and use of quantifiers
+Unsat
+
+-- Declaring functions
+Sat
+f(z) - f(x) = -1
+(f(x) === f(z)) = false
+Partial model: {c4 -> 20, c3 -> 10, c2 -> 0, c1 -> 100, c0 -> 115, f(20) -> 21, f(0) -> 22, p1 -> true, p0 -> true}
+In model: f(z) - f(x) = Some(-1)
+          f(17) = None
+          (f(x) >= -5) = Some(true)
+Unsat
+
+-- Generating different models for the same formula
+  p1  	  p2  	  p3
+------------------------
+  -	  true	  true
+  true	  true	  false
+
+-- Incremental solving
+  p1  	  p2  	  p3
+------------------------
+  true	  true	  false
+  true	  true	  true
+  false	  true	  true
+
+-- Validity mode
+Sat
+x = 6
+2*x = 12
+Valid
+
+-- Theory of simple arrays (deprecated)
+Sat
+select(a, 1) = 1
+select(a, 10) = 11
+Unsat
+Valid
+Unsat
+
+-- Theory of extensional arrays
+Sat
+select(a, 1) = 1
+select(a, 10) = 3
+In partial model: select(a, 1) = Some(1)
+In partial model: select(a, 10) = Some(3)
+Unsat
+Valid
+Inconclusive
+
+-- Non-trivial quantifiers
+Invalid
+Valid
+
+-- Quantifiers, functions, and triggers
+Sat
+b = -2
+Unsat
+Sat
+b = -5
+b = -4
+b = -3
+b = -2
+
+-- Boolean functions and triggers
+Sat
+Partial model: {c2 -> 5, c1 -> 100, c0 -> 115, r(5, 1) -> true, r(1, 5) -> true, p1 -> true, p0 -> true}
+Valid
+
+-- Evaluation with Boolean variables
+p = q & p = 0 & (q != 0 | r != 0)
+Sat
+Some(true)
+
+-- Existential constants
+Valid
+X = 1
+X + Y = 1
+Y = 0
+Valid
+X = 10
+Model: {X2 -> 10}
+
+-- Quantifier elimination
+Valid
+Equivalent qf constraint: X >= 4
+Valid
+Equivalent qf constraint: X = 42 | X = 3
+Valid
+Equivalent qf constraint: X = 42 | X = 3 | (X = 100 & Y >= 100)
+
+-- Simplification, projection
+Project 5 < x & x < 2*y existentially to y: y >= 4
+Project x > y | x < 0 universally to x: -1 >= x
+Simplify ex(x => 5 < x & x < 2*y) to: y >= 4
+Project x ==> y universally to y: y
+Project x === True existentially to empty set: true
+
+-- Asynchronous interface
+true
+true
+Sat
+
+-- Asynchronous interface, timeouts
+true
+true
+Sat
+
+-- Asynchronous interface, busy waiting
+true
+Sat
+
+-- Stopping computations
+expected result
+
+-- Stopping computation after a while
+expected result
+Wait for 30ms ...
+Sat
+
+-- Interpolation
+Unsat
+Vector(c >= 0, d >= 1)
+Vector(d - c >= 1, d >= 1)
+
+-- Interpolation with functions
+Unsat
+Vector(c != 3 | f(3) = 5, f(3) = 5)
+Vector(c != 3)
+
+-- Interpolation with simple arrays (deprecated)
+Unsat
+Vector(select(b, 0) = 1)
+
+-- Interpolation with extensional arrays
+Unsat
+Vector(select(b, 0) != 2)
+
+-- Generating a larger amount of constraints
+Sat
+c100 = 100
+Valid
+
+-- Generating a larger amount of constraints (2)
+Sat
+x500 = 124750
+Valid
+
+SimpleAPITest2
+
+-- Declaration of symbols
+Sat
+
+-- Adding some assertions (uses methods from TerForConvenience._)
+Sat
+Unsat
+Sat
+
+SimpleAPITest3
+Invalid
+Valid
+
+SimpleAPITest4
+Sat
+Sat
+
+SimpleAPITest5
+Starting ...
+T/O
+Valid
+
+SimpleAPITest6
+Sat
+Unsat
+Sat
+x = 10, k = 0
+Sat
+x = 15, k = 25
+
+SimpleAPITest7
+Sat
+Sat
+Some(3)
+
+SimpleAPITest8
+Sat
+Sat
+
+SimpleAPITest9
+Sat
+Valid
+Unsat
+Sat
+Sat
+Unsat
+
+SimpleAPITest10
+Sat
+Sat
+
+SimpleAPITest11
+Inconclusive
+0
+
+SimpleAPITest12
+\exists int v0; x * v0 >= 1
+\exists int v0; x - v0 * _0 >= 1
+
+SimpleAPITest13
+Running
+Unknown
+Running
+Unsat
+
+TestRat
+Rat_int(0)
+Rat_int(1)
+
+-- Test 1
+Rat_frac(1, 12)
+Sat
+{x -> Rat_frac(1, 12), Rat_denom -> 12}
+
+-- Test 2
+Sat
+{y -> Rat_frac(-99, 10), x -> Rat_frac(0, 1), Rat_denom -> 10}
+
+-- Test 3
+Sat
+{x -> Rat_frac(3, 5), Rat_denom -> 5}
+Sat
+{y -> Rat_frac(5, 3), x -> Rat_frac(3, 5), Rat_denom -> 15}
+
+-- Test 4
+Valid
+
+-- Test 5
+Invalid
+{y -> Rat_frac(-3, 2), x -> Rat_frac(-3, 2), Rat_denom -> 2}
+
+-- Test 6
+Sat
+{x -> Rat_frac(-4, 3), Rat_denom -> 9}
+Rat_frac(-4, 3)
+
+-- Test 7
+Sat
+{y -> Rat_frac(1, 2), x -> Rat_frac(5, 1), Rat_denom -> 2}
+
+-- Test 8
+Sat
+{y -> Rat_frac(1, 2), x -> Rat_frac(5, 1), Rat_denom -> 2}
+
+-- Test 9
+Sat
+{y -> Rat_frac(-1, 1), x -> Rat_frac(-11, 1), Rat_denom -> 1}
+
+TestExtArray
+
+-- Test 1
+Some term: store(ar, x, 42)
+Sat
+Unsat
+
+-- Test 2
+Sat
+ar = store(const(2), 1, 1)
+ar2 = const(2)
+m.evalToTerm(ar): Some(store(const(2), 1, 1))
+m.evalToTerm(select(ar, 0)): Some(2)
+m.evalToTerm(select(store(const(0), 1, 2), 1)): Some(2)
+m.evalToTerm(select(store(const(0), 1, 2), 2)): Some(0)
+
+SimpleAPIModelTest
+
+-- Declaration of symbols
+Sat
+
+-- Adding some assertions (uses methods from IExpression._)
+Sat
+Partial model: {c1 -> 100, c0 -> 115, p1 -> true, p0 -> true}
+
+-- Querying the model
+r = true
+r & !s = false
+v = true
+
+-- Scoping (locally add assertions, declare symbols, etc)
+Unsat
+Sat
+c = 115
+Sat
+x = 0
+Sat
+c = 115
+Sat
+x = 0
+Sat
+c = 115
+Sat
+u() = true
+Sat
+
+SimpleAPICompleteModelTest
+
+-- Declaration of symbols
+Sat
+
+-- Adding some assertions (uses methods from IExpression._)
+Sat
+Partial model: {c1 -> 100, c0 -> 115, p1 -> true, p0 -> true}
+
+-- Querying the model
+r = true
+r & !s = false
+v = true
+
+-- Scoping and extraction of complete models
+Unsat
+Sat
+c = 115
+Sat
+x = 0
+2*x = 0
+
+-- Scoping and extraction of complete models (2)
+Sat
+c = 115
+Sat
+x = 0
+
+-- Scoping and extraction of complete models (3)
+Sat
+c = 115
+Sat
+u() = false
+!u() = true
+Inconclusive
+w(42) = true
+w(-10) = false
+(w(42) <=> w(-10)) = false
+all(x => (x <= -10 ===> w(x))) = false
+all(x => (x <= -10 ===> w(x))) = false
+(w(42) <=> w(-10)) = false
+w(42) = true
+w(-10) = false
+
+-- Scoping and extraction of complete models (4)
+Sat
+c = 115
+Sat
+!u() = true
+u() = false
+Sat
+
+-- Evaluation with rationals
+Sat
+x = 1
+x = Rat_frac(1, 1)
+y = Rat_frac(0, 1)
+x/2 = Rat_frac(1, 2)
+x = Rat_frac(1, 1)
+
+interpolation-bug.scala
+0: Unsat
+1: Vector(rootjthen_fwd, false)
+
+scope-bug.scala
+0: Sat
+1: Sat
+2: Sat
+3: Sat
+4: 1
+5: 3
+6: 2
+7: Sat
+8: Unsat
+10b: Sat
+11: 1
+12: 3
+13: -5
+
+incrementality-bug.scala
+59: Sat
+72: 0
+73: Invalid
+
+getConstraint-bug.scala
+39: Valid
+40: true
+
+TheoryTest.scala
+Sat
+List((Vector(0, 1),2), (Vector(1, 2),3))
+Sat
+List((Vector(0, 2),1), (Vector(0, 1),2), (Vector(1, 2),3))
+Unsat
+Valid
+
+TheoryTest2.scala
+Unsat
+Inconclusive
+{c -> 3, b -> 2, a -> 1, mul(2, 1) -> 3, mul(1, 2) -> 3}
+Unsat
+Unsat
+
+TheoryTest3.scala
+Unsat
+
+TypeTests.scala
+Starting
+\exists int v0, v1; v1 = x + v0
+Sat
+\exists nat v0; v0 = x
+Sat
+\forall nat v0; x = v0
+Unsat
+\exists nat v0; x = y + v0 <-> x >= y
+Valid
+\exists int[0, 9] v0; v0 - x >= 1
+\exists int[0, 9] v0; v0 - x >= 1
+8 >= x
+Valid
+Unsat
+x1 = x2
+Unsat
+Valid
+Valid
+14 >= X & X >= 11
+Sat
+10
+Unsat
+Unsat
+Unsat
+Finished
+
+nonlinear.scala
+0: Sat
+{c1 -> 1, c0 -> 4}
+1: Sat
+{c1 -> 3, c0 -> 3}
+2: Unsat
+3: Invalid
+{c0 -> -1}
+4: Valid
+5: Valid
+
+nonlinearInterpolation.scala
+Unsat
+Vector(!((-3 + c1) = 0))
+
+division.scala
+0: Sat
+{c0 -> 8}
+1: Sat
+{c0 -> 7}
+2: Invalid
+{c0 -> -4}
+3: Invalid
+{c1 -> 2, c0 -> 1}
+4: Valid
+
+deadlock.scala
+starting
+Sat
+getting model ...
+{}
+finished
+
+exception.scala
+starting
+x
+{}
+y
+finished
+
+incremental.scala
+starting
+Sat
+{z -> 3, y -> -1, x -> 0, a -> false}
+Sat
+{z -> 5, y -> 1, x -> 2, a -> true}
+Sat
+Sat
+{z -> 5, y -> 1, x -> 2, a -> true}
+finished
+
+divmodprint.scala
+starting
+(div x 5)
+(div x (- 5))
+(div (* (- 1) x) 5)
+(div (* (- 1) x) (- 5))
+(mod x 5)
+(mod x (- 5))
+(mod (* (- 1) x) 5)
+(mod (* (- 1) x) (- 5))
+(_eps ((var0 Int)) (and (<= 0 var0) (or (= var0 x) (= (* (- 1) var0) x))))
+finished
+
+ADTTest.scala
+Vector(nil)
+Sat
+{c2 -> 44, c1 -> 43, c0 -> 42, list_depth(cons(43, nil)) -> 48, list_depth(nil) -> 47, list_depth(cons(42, cons(43, nil))) -> 49, list_ctor(cons(43, nil)) -> 1, list_ctor(nil) -> 0, list_ctor(cons(42, cons(43, nil))) -> 1, tail(cons(43, nil)) -> nil, tail(cons(42, cons(43, nil))) -> cons(43, nil), head(cons(43, nil)) -> 43, head(cons(42, cons(43, nil))) -> 42, cons(43, nil) -> cons(43, nil), cons(42, cons(43, nil)) -> cons(42, cons(43, nil)), nil -> nil}
+Unsat
+Unsat
+Valid
+Valid
+Unsat
+Valid
+Valid
+Unsat
+Valid
+Invalid
+
+ADTTest2.scala
+Unsat
+Vector(!(list_ctor(x) = 0))
+Unsat
+Vector(!(head(x) = 0))
+Unsat
+Vector((head(x) = 42))
+Unsat
+Vector((head(x) = 42), !(head(a) = 43))
+Valid
+Vector((nil = x), (y = x))
+Valid
+Vector((cons(1, cons(2, nil)) = x), (y = x))
+
+ADTTest3.scala
+Vector(red, nil)
+Test 1
+Sat
+{c2 -> 3, c1 -> 2, c0 -> 0, colour_list_depth(cons(green, nil)) -> 7, colour_list_depth(nil) -> 6, colour_list_depth(cons(red, cons(green, nil))) -> 8, colour_list_ctor(cons(green, nil)) -> 1, colour_list_ctor(nil) -> 0, colour_list_ctor(cons(red, cons(green, nil))) -> 1, tail(cons(green, nil)) -> nil, tail(cons(red, cons(green, nil))) -> cons(green, nil), head(cons(green, nil)) -> green, head(cons(red, cons(green, nil))) -> red, cons(green, nil) -> cons(green, nil), cons(red, cons(green, nil)) -> cons(red, cons(green, nil)), nil -> nil}
+Test 2
+Unsat
+Test 3
+Unsat
+Test 4
+Valid
+Test 5
+Valid
+Test 10
+Unsat
+Test 11
+Valid
+Test 12
+Invalid
+{c5 -> green}
+2
+Some(green)
+Test 13
+Valid
+Test 14
+Valid
+Test 15
+Invalid
+Test 15b
+Valid
+Test 16
+Valid
+Test 17
+Unsat
+Test 18
+Sat
+Some(green)
+Some(cons(green, nil))
+Unsat
+Test 19
+Sat
+green
+cons(green, nil)
+Unsat
+Sat
+Some(green)
+Some(cons(green, nil))
+Test 20
+Sat
+Some(nil)
+Some(cons(blue, nil))
+None
+Test 21
+Sat
+Some(green)
+Some(blue)
+Some(green)
+None
+Test 30
+Valid
+Invalid
+Vector(red, nil)
+Test 1
+Sat
+{c2 -> 6, c1 -> 0, c0 -> 0, colour_list_size(cons(red, nil)) -> 3, colour_list_size(nil) -> 1, colour_list_size(cons(red, cons(red, nil))) -> 5, colour_list_ctor(cons(red, nil)) -> 1, colour_list_ctor(nil) -> 0, colour_list_ctor(cons(red, cons(red, nil))) -> 1, tail(cons(red, nil)) -> nil, tail(cons(red, cons(red, nil))) -> cons(red, nil), head(cons(red, nil)) -> red, head(cons(red, cons(red, nil))) -> red, cons(red, cons(red, nil)) -> cons(red, cons(red, nil)), cons(red, nil) -> cons(red, nil), nil -> nil}
+Test 2
+Unsat
+Test 3
+Unsat
+Test 4
+Valid
+Test 5
+Valid
+Test 10
+Unsat
+Test 11
+Valid
+Test 12
+Invalid
+{c5 -> green}
+2
+Some(green)
+Test 13
+Valid
+Test 14
+Valid
+Test 15
+Invalid
+Test 15b
+Valid
+Test 16
+Valid
+Test 17
+Unsat
+Test 18
+Sat
+Some(green)
+Some(cons(green, nil))
+Unsat
+Test 19
+Sat
+green
+cons(green, nil)
+Unsat
+Sat
+Some(green)
+Some(cons(green, nil))
+Test 20
+Sat
+Some(nil)
+Some(cons(blue, nil))
+None
+Test 21
+Sat
+Some(green)
+Some(blue)
+Some(blue)
+None
+Test 30
+Valid
+Invalid
+
+ADTTest4.scala
+Test 1
+Sat
+cons(red, cons(red, nil))
+Sat
+cons(red, cons(green, cons(green, cons(green, cons(red, cons(red, nil))))))
+Unsat
+Test 2
+Sat
+Some(cons(red, cons(red, nil)))
+Some(false)
+Some(true)
+Some(red)
+Some(red)
+Some(red)
+Some(7)
+
+ADTTest5.scala
+Test 1
+Sat
+tuple(const(0))
+Sat
+tuple(const(0))
+tuple(const(0))
+Test 2
+Sat
+tuple(store(const(0), 0, 1))
+tuple(const(0))
+Test 3
+Sat
+tuple(store(const(13), 1, 11))
+tuple(const(0))
+
+pred-simplify.scala
+starting
+c = 4 & !p
+p | c = 4
+finished
+
+empty-stack-bug.scala
+Sat
+0
+
+variable-names-bug.scala
+0: Sat
+
+TestModuloArithmetic.scala
+Test 1
+Sat
+{b2 -> mod_cast(0, 255, 0), b1 -> mod_cast(0, 255, 13)}
+b1 = mod_cast(0, 255, 13)
+Test 2
+Sat
+{w2 -> mod_cast(0, 4294967295, 0), w1 -> mod_cast(0, 4294967295, 13)}
+Test 3
+Sat
+h1 = mod_cast(0, 65535, 11007)
+Unsat
+Test 4
+Valid
+Test 5
+Valid
+Test 6
+Valid
+Test 7
+Unsat
+Vector((x = mod_cast(0, 1, 1)), (y = mod_cast(0, 1, 1)))
+Test 8
+\exists bv[2] v0; bv_mul(2, x, v0) = 1.\as[bv[2]]
+x = 1.\as[bv[2]] | x.\as[int] >= 3
+Valid
+Test 9
+Unsat
+Vector((130 + a.\as[int]).\as[bv[8]] = b & (b.\as[int] - a.\as[int] >= 130 | a.\as[int] - b.\as[int] >= 126 | a.\as[int] >= 254), b.\as[int] >= 130, b.\as[int] >= c.\as[int])
+Test 10
+(b != 0.\as[bv[8]] | a != 255.\as[bv[8]]) & (a != 255.\as[bv[8]] | b.\as[int] >= 245 | 0 >= b.\as[int]) & (b.\as[int] - a.\as[int] >= 2 | 244 >= b.\as[int])
+
+TreeInterpolation.scala
+Unsat
+List(1, 3, 5, 10, 20, 40)
+false
+   (d = 0)
+      ((-1 + b) = 0)
+      ((1 + (d + -1 * c)) = 0)
+   ((-5 + e) = 0)
+
+TestFrame.scala
+Sat
+Unsat
+Sat
+Inconclusive
+Unsat
+x - y >= 2
+
+dnfTest.scala
+List((P1 != 0), (P0 != 0), (P4 = 0), (P3 = 0), (P2 = 0), (P30 + -1*P31 = 0 & P28 + -1*P29 = 0 & P26 + -1*P27 = 0 & P24 + -1*P25 = 0 & P22 + -1*P23 = 0 & P20 + -1*P21 = 0 & P18 + -1*P19 = 0 & P16 + -1*P17 = 0 & P15 = 0 & P8 = 0 & P9 = 0 & P10 = 0 & P11 = 0 & P6 = 0 & P7 = 0 & P5 = 0 & P14 != 0 & P13 != 0 & P12 != 0), (P30 + -1*P31 = 0 & P28 + -1*P29 = 0 & P26 + -1*P27 = 0 & P24 + -1*P25 = 0 & P22 + -1*P23 = 0 & P20 + -1*P21 = 0 & P18 + -1*P19 = 0 & P16 + -1*P17 = 0 & P15 = 0 & P8 = 0 & P9 = 0 & P10 = 0 & P7 = 0 & P5 = 0 & P14 != 0 & P13 != 0 & P12 != 0 & P11 != 0 & P6 != 0), (P30 + -1*P31 = 0 & P28 + -1*P29 = 0 & P26 + -1*P27 = 0 & P24 + -1*P25 = 0 & P22 + -1*P23 = 0 & P20 + -1*P21 = 0 & P18 + -1*P19 = 0 & P16 + -1*P17 = 0 & P15 = 0 & P8 = 0 & P9 = 0 & P11 = 0 & P6 = 0 & P5 = 0 & P14 != 0 & P13 != 0 & P12 != 0 & P10 != 0 & P7 != 0), (P30 + -1*P31 = 0 & P28 + -1*P29 = 0 & P26 + -1*P27 = 0 & P24 + -1*P25 = 0 & P22 + -1*P23 = 0 & P20 + -1*P21 = 0 & P18 + -1*P19 = 0 & P16 + -1*P17 = 0 & P15 = 0 & P8 = 0 & P9 = 0 & P5 = 0 & P14 != 0 & P13 != 0 & P12 != 0 & P10 != 0 & P11 != 0 & P6 != 0 & P7 != 0), (P30 + -1*P31 = 0 & P28 + -1*P29 = 0 & P26 + -1*P27 = 0 & P24 + -1*P25 = 0 & P22 + -1*P23 = 0 & P20 + -1*P21 = 0 & P18 + -1*P19 = 0 & P16 + -1*P17 = 0 & P15 = 0 & P8 = 0 & P10 = 0 & P11 = 0 & P6 = 0 & P7 = 0 & P14 != 0 & P13 != 0 & P12 != 0 & P9 != 0 & P5 != 0), (P30 + -1*P31 = 0 & P28 + -1*P29 = 0 & P26 + -1*P27 = 0 & P24 + -1*P25 = 0 & P22 + -1*P23 = 0 & P20 + -1*P21 = 0 & P18 + -1*P19 = 0 & P16 + -1*P17 = 0 & P15 = 0 & P8 = 0 & P11 = 0 & P6 = 0 & P14 != 0 & P13 != 0 & P12 != 0 & P9 != 0 & P10 != 0 & P7 != 0 & P5 != 0), (P6 != 0 & P7 != 0 & P5 != 0), (P30 + -1*P31 = 0 & P28 + -1*P29 = 0 & P26 + -1*P27 = 0 & P24 + -1*P25 = 0 & P22 + -1*P23 = 0 & P20 + -1*P21 = 0 & P18 + -1*P19 = 0 & P16 + -1*P17 = 0 & P15 = 0 & P8 = 0 & P10 = 0 & P14 != 0 & P13 != 0 & P12 != 0 & P9 != 0 & P11 != 0 & P6 != 0 & P5 != 0))
+
+dnfTest2.scala
+ArrayBuffer(((60 + -1 * x) >= 0), ((x + -62) >= 0))
+
+dnfTest3.scala
+((P32 != 0 & P7 - 2 >= 100000) | (P7 - 2 < 100000 & P32 = 0)) & (P18 != 0 | P19 = 0) & (P19 != 0 | (P19 = 0 & P33 = 0)) & (P19 != 0 | 0 < P2) & (P19 != 0 | P5 = app0) & (P19 != 0 | (P1 >= 0 & 256 - P1 >= 1 & P27 = 256*P0 + P1 & P26 = P1)) & (P19 != 0 | P28 = P27) & (P19 != 0 | P29 = P2 + P7 - 2) & (P19 != 0 | P31 = P3) & (P19 != 0 | (P23 != 0 & P26 != 10) | (P26 = 10 & P23 = 0)) & (P21 != 0 | (P19 = 0 & P21 = 0)) & (P21 != 0 | 0 < P4) & (P21 != 0 | P24 = app1) & (P21 != 0 | P25 = P4 + P7 - 2) & (P21 != 0 | P6 = P20) & (P21 != 0 | P20 = P24) & (P21 = 0 | (P18 = 0 & P19 = 0)) & (P18 != 0 | P19 != 0 | P23 != 0) & (P18 != 0 | P19 != 0 | P6 = P17) & (P18 != 0 | P19 != 0 | P17 = P22) & (P19 != 0 | P21 != 0 | P23 = 0) & (P19 != 0 | P32 = 0 | P33 != 0) & (P19 != 0 | 0 >= P2 | 0 < P29) & (P21 != 0 | 0 >= P4 | 0 < P25) & store(P30, P29, P28) = app0 & store(P22, P25, 20) = app1
+ArrayBuffer((((((((((((((((((((((!(((P7 + -2) + -100000) >= 0) & (P33 = 0)) & !(-1 * P2 >= 0)) & (P5 = app0)) & (P1 >= 0)) & (((256 + -1 * P1) + -1) >= 0)) & (P27 = (256 * P0 + P1))) & (P26 = P1)) & (P28 = P27)) & (P29 = (P2 + (P7 + -2)))) & (P31 = P3)) & !(P26 = 10)) & (P18 = 0)) & (P19 = 0)) & !(P23 = 0)) & (P6 = P17)) & (P17 = P22)) & (P32 = 0)) & !(-1 * P29 >= 0)) & !(P21 = 0)) & (store(P30, P29, P28) = app0)) & (store(P22, P25, 20) = app1)), (((((((((((((((((((((((!(((P7 + -2) + -100000) >= 0) & (P33 = 0)) & !(-1 * P2 >= 0)) & (P5 = app0)) & (P27 = (256 * P0 + P1))) & (P26 = P1)) & (P28 = P27)) & (P29 = (P2 + (P7 + -2)))) & (P31 = P3)) & (P26 = 10)) & (P19 = 0)) & !(-1 * P4 >= 0)) & (P24 = app1)) & (P25 = (P4 + (P7 + -2)))) & (P6 = P20)) & (P20 = P24)) & (P21 = 0)) & !(P18 = 0)) & (P23 = 0)) & (P32 = 0)) & !(-1 * P29 >= 0)) & !(-1 * P25 >= 0)) & (store(P30, P29, P28) = app0)) & (store(P22, P25, 20) = app1)))
+
+TestStrings.scala
+Sat
+x = str_cons(mod_cast(0, 255, 97), str_cons(mod_cast(0, 255, 98), str_cons(mod_cast(0, 255, 99), str_empty)))
+x = "abc"
+Sat
+y = str_empty
+z = str_cons(mod_cast(0, 255, 97), str_cons(mod_cast(0, 255, 98), str_cons(mod_cast(0, 255, 99), str_cons(mod_cast(0, 255, 120), str_cons(mod_cast(0, 255, 121), str_cons(mod_cast(0, 255, 122), str_empty))))))
+z = "abcxyz"
+Sat
+y = str_cons(mod_cast(0, 255, 122), str_empty)
+z = str_cons(mod_cast(0, 255, 97), str_cons(mod_cast(0, 255, 98), str_cons(mod_cast(0, 255, 99), str_cons(mod_cast(0, 255, 122), str_cons(mod_cast(0, 255, 120), str_cons(mod_cast(0, 255, 121), str_cons(mod_cast(0, 255, 122), str_empty)))))))
+z = "abczxyz"
+Unsat
+Sat
+x = str_cons(mod_cast(0, 255, 0), str_cons(mod_cast(0, 255, 0), str_empty))
+y = str_cons(mod_cast(0, 255, 0), str_cons(mod_cast(0, 255, 0), str_cons(mod_cast(0, 255, 0), str_cons(mod_cast(0, 255, 0), str_cons(mod_cast(0, 255, 0), str_empty)))))
+Valid
+
+TestBVEval.scala
+Sat
+1: Some(3)
+2: Some(true)
+3: Some(3)
+4: Some(mod_cast(0, 15, 3))
+5: Some(3)
+6: mod_cast(0, 15, 3)
+7: 3
+8: Some(4)
+9: Some(6)
+10: Some(4)
+11: mod_cast(0, 15, 4)
+12: 4
+Sat
+13: Some(mod_cast(0, 15, 3))
+14: Some(3)
+15: mod_cast(0, 15, 3)
+16: 3
+Sat
+17: Some(mod_cast(0, 15, 3))
+18: Some(3)
+19: mod_cast(0, 15, 3)
+20: 3
+21: Some(mod_cast(0, 15, 3))
+22: Some(3)
+23: mod_cast(0, 15, 3)
+24: 3
+25: Some(true)
+26: true
+27: 1
+28: y.\as[int] >= 2
+29: false
+
+simplifier-bug.scala
+true
+true
+false
+false
+true
+true
+false
+false
+
+ManyEqvs.scala
+Sat
+
+project-bug.scala
+true
+
+printBooleanTerm.scala
+true
+false
+(not true)
+(not false)
+true
+false
+(not true)
+(not false)
+
+SimplePrint.scala
+(1 >= 0)
+(<= 0 1)
+
+TestFunctionRange.scala
+Valid
+
+ArrayQuantifiers.scala
+Sat
+Inconclusive
+Unsat
+
+readSMTLIB.scala
+x - y >= 1 & y - 50 >= 1
+Sat
+Unsat
+x - y >= 1 & y - 50 >= 1
+Sat
+Unsat
+x - y >= 1 & y - 50 >= 1
+
+ExtArrayCrash.scala
+Warning: arrays over finite domains are not fully supported yet
+Unsat

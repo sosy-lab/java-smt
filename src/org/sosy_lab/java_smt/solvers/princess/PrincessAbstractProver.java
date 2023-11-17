@@ -38,7 +38,6 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import org.sosy_lab.java_smt.utils.Generators.Generator;
@@ -75,7 +74,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
 
     trackingStack.push(new Level());
     partitions.push(PathCopyingPersistentTreeMap.of());
-    binaryModel = new UniversalModel(this, (AbstractFormulaManager) mgr);
+    binaryModel = new UniversalModel(this,  mgr);
   }
 
   /**

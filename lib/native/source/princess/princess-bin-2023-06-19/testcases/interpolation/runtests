@@ -1,0 +1,82 @@
+#!/bin/sh
+
+PRI=../../princess
+
+TESTS="columnRed.pri cryptarithm.pri \
+       eqProof2.pri eqProof3.pri eqProof4.pri eqProof5.pri \
+       eqProof6.pri eqProof.pri \
+       surprising.pri \
+       inEqProof0.pri inEqProof1.pri inEqProof2.pri \
+       inEqProof3.pri inEqProof.pri \
+       int_incompleteness2.pri int_incompleteness3.pri \
+       pidgeon.pri pidgeonSimplified.pri pidgeonSuperSimplified.pri \
+       prog.pri \
+       prop0.pri prop1.pri prop2.pri prop3.pri prop4.pri prop5.pri \
+       queen2-1.pri queen3-1.pri \
+       super_queen2-1.pri super_queen3-1.pri \
+       cav-ex4b.pri quan.pri ring_2exp10_3vars_2ite_unsat.pri \
+       arrays0.pri constOrderBug.pri strange_concurrency.pri \
+       wrongInterpolant3.pri omegaBug.pri splitEq.pri \
+       incorrectPredInterpolant.pri certificateBug.pri \
+       missingOmegaSupport.pri bignum_lia1.pri \
+       linear-combination-bug.pri div-right-bug.pri \
+       tree.pri axiom-instantiation-bug.pri \
+       nonlin.pri adt-interpolation.pri adt-interpolation2.pri \
+       bool-interpolation.pri \
+       bv-interpolation-1.pri bv-interpolation-2.pri bv-interpolation-3.smt2 \
+       bv-interpolation-4.smt2 bv-interpolation-5.pri bv-interpolation-6.smt2 \
+       bv-interpolation-8.pri sorts.pri quadraticInEq6-interpolation.pri"
+
+#       super_queen4-1.pri super_queen5-1.pri super_queen6-1.pri super_queen7-1.pri \
+
+$PRI "$@" $TESTS
+
+# Some examples that need special settings.
+
+# Examples where -genTotalityAxioms is needed
+
+TESTS="function-bug.smt2 function-bug2.smt2"
+
+$PRI "$@" -genTotalityAxioms $TESTS
+
+# +incremental mode
+
+TESTS="pred-unify-bug.smt2 rule60_list2.c_false-unreach-call_1.cil.c.smt2 \
+       function-bug3.smt2 simplifier.smt2 smtTyping.smt2 matchCheckBug.smt2 \
+       treeInterpolation1.smt2 enum-interpolation.smt2 assertion-problem.smt2"
+
+$PRI "$@" +incremental $TESTS
+
+# Testing some large examples for which we have to switch off assertions
+
+TESTS="prp-2-17.pri prp-3-18.pri \
+       adt-interpolation-unfold.pri adt-interpolation-unfold2.pri \
+       adt-interpolation-unfold3.pri"
+
+$PRI "$@" -assert $TESTS
+
+# Testing some large examples for which we have to switch off assertions
+
+TESTS="treeInterpolation2.smt2"
+
+$PRI "$@" +incremental -assert $TESTS
+
+# We switch off quantifier elimination in interpolants for those
+# examples, as well as assertions (because just checking that
+# the interpolants are correct takes too long)
+
+TESTS="surprising25.pri bignum_lia1.pri"
+
+$PRI "$@" -elimInterpolantQuants -simplifyProofs -assert $TESTS
+
+# Testing proof simplification
+
+$PRI "$@" +simplifyProofs -constructProofs=always ring_2exp10_3vars_0ite_unsat.pri | grep -v "^Certificate" | grep -v "^Assumed"
+
+# We switch off quantifier elimination in interpolants for those
+# examples, because we want to verify that we do not get any quantifiers
+# in any case
+
+TESTS="bv-interpolation-9.pri"
+
+$PRI "$@" -elimInterpolantQuants $TESTS

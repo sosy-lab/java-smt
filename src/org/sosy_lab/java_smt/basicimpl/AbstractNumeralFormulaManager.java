@@ -346,7 +346,7 @@ public abstract class AbstractNumeralFormulaManager<
     TFormulaInfo param2 = extractInfo(pNumber2);
     BooleanFormula result = wrapBool(modularCongruence(param1, param2, pModulo));
     if (Generator.isLoggingEnabled) {
-      NumeralGenerator.logModularCongruence(result, pNumber1, pNumber2, pModulo);
+      throw new GeneratorException("Modular Congruence is not available in SMTLIB2. ");
     }
     return result;
   }
@@ -361,7 +361,7 @@ public abstract class AbstractNumeralFormulaManager<
 
     BooleanFormula result = wrapBool(modularCongruence(param1, param2, pModulo));
     if (Generator.isLoggingEnabled) {
-      NumeralGenerator.logModularCongruence(result, pNumber1, pNumber2, pModulo);
+      throw new GeneratorException("Modular Congruence is not available in SMTLIB2. ");
     }
     return result;
   }

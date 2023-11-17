@@ -1,0 +1,89 @@
+#!/bin/sh
+
+# tests only runnable with unit resolution and clausification
+
+PRI=../../princess
+
+TESTS="existential.pri \
+       bvsdiv.smt2 \
+       bvsdiv2.smt2 \
+       bvsdiv3.smt2 \
+       bvsdiv5.smt2 \
+       bvsdiv6.smt2 \
+       bvsdiv6b.smt2 \
+       bvsdiv6c.smt2 \
+       bvsdiv7.smt2 \
+       bvsmod.smt2 \
+       bvsmod3.smt2 \
+       bvsrem.smt2 \
+       bvsrem2.smt2 \
+       bvshl1.smt2 \
+       bvshl2.smt2 \
+       bvshl3.smt2 \
+       bvshl4.smt2 \
+       shift2.pri \
+       shift3.pri \
+       shift5.pri \
+       shift6.pri \
+       shift7.pri \
+       shift8.pri \
+       shift9.pri \
+       shift10.pri \
+       shift11.pri \
+       shift12.pri \
+       shift12b.pri \
+       shift12c.pri \
+       shift13.pri \
+       shift14.smt2 \
+       bench_977.smt2 \
+       bench_977b.smt2 \
+       bench_977c.smt2 \
+       bench_977d.smt2 \
+       bench_977e.smt2 \
+       rewriting_cycle.pri \
+       nested_casts.pri \
+       Primes_true-unreach-call.c_2207.smt2 \
+       simple-extracts.pri \
+       simple-concat.pri \
+       simple-concat2.pri \
+       bv-ops.pri \
+       bv-ops2.pri \
+       bv-ops3.pri \
+       bv-ops3b.pri \
+       bv-ops4.pri \
+       bv-ops5.pri \
+       bitops-1.smt2 \
+       bitops.smt2 \
+       bitops1.smt2 \
+       concatcore.smt2 \
+       concat.smt2 \
+       concore.smt2 \
+       ext_con_004_001_0016.smt2 \
+       extractcore.smt2 \
+       intcore.smt2 \
+       intsplitcore.smt2 \
+       mycore.smt2 \
+       smallcore.smt2 \
+       smallercore.smt2 \
+       splitcore.smt2 \
+       split-diseq.smt2 \
+       example13.pri \
+       example13.smt2 \
+       bvcomp.smt2 \
+       problem_24.smt2 \
+       large_shift.smt2 \
+       bvashr.smt2 \
+       bvashr2.smt2 \
+       arith-extracts.pri \
+       bvsrem-bug.smt2 \
+       reducer-bug.smt2"
+
+$PRI "$@" $TESTS
+
+$PRI "$@" +printProof bv-ops3c.pri
+
+TESTS="bvsdiv6.smt2 \
+       bvsrem2.smt2"
+
+$PRI "$@" -constructProofs=always $TESTS
+

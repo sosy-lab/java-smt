@@ -1,0 +1,62 @@
+#!/bin/sh
+
+# NB: the following tests will only work with Scala 2.11,
+# since the bundled Princess jars are compiled with this
+# version
+
+unset CLASSPATH
+
+rm -f *.class
+
+OPTIONS="-language:implicitConversions,postfixOps,reflectiveCalls -cp `pwd`/../../dist/princess.jar"
+RUNOPTIONS="-cp `pwd`/../../dist/princess.jar:."
+
+export JAVA_OPTS="-Xss20000k -Xmx1500m"
+
+TESTS="SimpleAPITest SimpleAPITest2 SimpleAPITest3 SimpleAPITest4 \
+       SimpleAPITest5 SimpleAPITest6 SimpleAPITest7 SimpleAPITest8 \
+       SimpleAPITest9 SimpleAPITest10 SimpleAPITest11 SimpleAPITest12 \
+       SimpleAPITest13 \
+       TestRat TestExtArray SimpleAPIModelTest SimpleAPICompleteModelTest"
+
+for testname in $TESTS; do
+  echo
+  echo $testname
+  scalac $OPTIONS $testname.scala
+  scala $RUNOPTIONS $testname
+done
+
+TESTS="interpolation-bug.scala scope-bug.scala incrementality-bug.scala \
+       getConstraint-bug.scala TheoryTest.scala TheoryTest2.scala \
+       TheoryTest3.scala TypeTests.scala nonlinear.scala \
+       nonlinearInterpolation.scala division.scala \
+       deadlock.scala exception.scala incremental.scala \
+       divmodprint.scala \
+       ADTTest.scala ADTTest2.scala ADTTest3.scala ADTTest4.scala \
+       ADTTest5.scala \
+       pred-simplify.scala empty-stack-bug.scala variable-names-bug.scala \
+       TestModuloArithmetic.scala TreeInterpolation.scala TestFrame.scala \
+       dnfTest.scala dnfTest2.scala dnfTest3.scala \
+       TestStrings.scala TestBVEval.scala \
+       simplifier-bug.scala ManyEqvs.scala project-bug.scala \
+       printBooleanTerm.scala SimplePrint.scala TestFunctionRange.scala \
+       ArrayQuantifiers.scala"
+
+for testname in $TESTS; do
+  echo
+  echo $testname
+  scala $OPTIONS $testname
+done
+
+# Test cases that are use the SMT-LIB parser, which needs additional libraries
+
+OPTIONS="-language:implicitConversions,postfixOps,reflectiveCalls -cp `pwd`/../../dist/princess.jar:`pwd`/../../dist/java-cup-11a.jar:`pwd`/../../dist/smt-parser.jar"
+
+TESTS="readSMTLIB.scala ExtArrayCrash.scala"
+
+for testname in $TESTS; do
+  echo
+  echo $testname
+  scala $OPTIONS $testname
+done
+

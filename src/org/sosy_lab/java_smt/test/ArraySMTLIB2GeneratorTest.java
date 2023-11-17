@@ -308,9 +308,7 @@ public class ArraySMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSol
     ArrayFormula<IntegerFormula, IntegerFormula> a1 = Objects.requireNonNull(amgr)
         .makeArray("a1", FormulaType.IntegerType,
             FormulaType.IntegerType);
-    ArrayFormula<IntegerFormula, IntegerFormula> a2 = Objects.requireNonNull(amgr)
-        .makeArray("a2", FormulaType.IntegerType,
-            FormulaType.IntegerType);
+
 
     IntegerFormula term1 = amgr.select(a1, imgr.makeNumber(2));
     BooleanFormula constraint = imgr.equal(term1, imgr.makeNumber(5));

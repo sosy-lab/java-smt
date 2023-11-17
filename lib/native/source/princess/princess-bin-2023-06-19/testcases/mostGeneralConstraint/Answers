@@ -1,0 +1,76 @@
+Loading bitvectorArith3.pri ...
+Preprocessing ...
+Proving ...
+
+VALID
+
+Under the most-general constraint:
+
+Concrete witness:
+
+Loading bitvectorArith4.pri ...
+Preprocessing ...
+Proving ...
+
+VALID
+
+Under the most-general constraint:
+
+Concrete witness:
+
+Loading omegaBug.pri ...
+Preprocessing ...
+Proving ...
+
+VALID
+
+Under the most-general constraint:
+
+Concrete witness:
+
+Loading splitting.pri ...
+Preprocessing ...
+Proving ...
+
+VALID
+
+Under the most-general constraint:
+
+Concrete witness:
+
+Loading bv0.pri ...
+Preprocessing ...
+Eliminating quantifiers ...
+
+VALID
+
+Equivalent constraint:
+a = 0.\as[bv[3]]
+
+Concrete witness:
+a = 0.\as[bv[3]]
+
+Loading closingConstraintBug.pri ...
+Preprocessing ...
+Proving ...
+
+VALID
+
+Under the most-general constraint:
+I1 >= 8 | 0 >= I1 | (I1 = 1 & O1 != 0) | (O1 != I1 & I1 >= 2)
+
+Concrete witness:
+I1 = 8
+
+Loading shift4.pri ...
+Preprocessing ...
+Eliminating quantifiers ...
+
+VALID
+
+Equivalent constraint:
+(b != 2.\as[bv[32]] | a = 3221225497.\as[bv[32]] | a = 2147483673.\as[bv[32]] | a = 1073741849.\as[bv[32]] | a = 25.\as[bv[32]]) & (b != 1.\as[bv[32]] | a = 2147483698.\as[bv[32]] | a = 50.\as[bv[32]]) & (b = 2.\as[bv[32]] | b = 1.\as[bv[32]])
+
+Concrete witness:
+b = 2.\as[bv[32]] & a = 3221225497.\as[bv[32]]
+

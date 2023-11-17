@@ -1,5 +1,7 @@
 package org.sosy_lab.java_smt.utils.Parsers;
 
+import com.google.common.base.Splitter;
+import com.google.common.collect.Iterables;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,8 +30,6 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.UFManager;
-import org.sosy_lab.java_smt.utils.Generators.Generator;
-import org.sosy_lab.java_smt.utils.Generators.Tuple;
 import scala.Tuple2;
 
 
@@ -78,10 +78,6 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
 
   }
 
-  @Override public Object visitStart_script(smtlibv2Parser.Start_scriptContext ctx) {
-    BooleanFormula constraint = bmgr.and(constraints);
-    return visitChildren(ctx);
-  }
 
   @Override public String visitSpec_constant_bin(smtlibv2Parser.Spec_constant_binContext ctx) {
     String binary = ctx.getText();
@@ -120,10 +116,9 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     String type = ctx.getText();
 
     String bvSize = "";
-    FormulaType<?> formulaType;
     if (type.startsWith("(_BitVec")) {
-      bvSize = type.split("_BitVec")[1];
-      bvSize = bvSize.split("\\)")[0];
+      bvSize = Iterables.get(Splitter.on("_BitVec").split(type), 1);
+      bvSize = Iterables.get(Splitter.on(')').split(bvSize), 0);
       type = "BitVec";
     }
 
@@ -157,7 +152,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
 
   public static boolean isInteger(String strNum) {
     try {
-      Integer d = Integer.parseInt(strNum);
+      Integer.parseInt(strNum);
     } catch (NumberFormatException nfe) {
       return false;
     }
@@ -166,7 +161,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
 
   public static boolean isFloat(String strNum) {
     try {
-      Float d = Float.parseFloat(strNum);
+      Float.parseFloat(strNum);
     } catch (NumberFormatException nfe) {
       return false;
     }
@@ -174,7 +169,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
   }
   public static boolean isDouble(String strNum) {
     try {
-      double d = Double.parseDouble(strNum);
+      Double.parseDouble(strNum);
     } catch (NumberFormatException nfe) {
       return false;
     }
@@ -183,7 +178,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
 
   public static boolean isLong(String strNum) {
     try {
-      Long d = Long.parseLong(strNum);
+      Long.parseLong(strNum);
     } catch (NumberFormatException nfe) {
       return false;
     }
@@ -192,7 +187,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
 
   public static boolean isBigInteger(String strNum) {
     try {
-      BigInteger d = new BigInteger(strNum);
+      new BigInteger(strNum);
     } catch (NumberFormatException nfe) {
       return false;
     }
@@ -219,19 +214,19 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     String operand = ctx.getText();
     if (variables.containsKey(operand)) {
       return variables.get(operand).javaSmt;
-    } else if (getNumericType(operand).equals("Integer") | getNumericType(operand).equals("Long")) {
+    } else if (getNumericType(operand).equals("Integer") || getNumericType(operand).equals("Long")) {
       variables.put(operand, new ParserFormula("Int", Objects.requireNonNull(imgr).makeNumber(operand)));
       return variables.get(operand).javaSmt;
-    } else if (getNumericType(operand).equals("Double") | getNumericType(operand).equals("Float")) {
+    } else if (getNumericType(operand).equals("Double") || getNumericType(operand).equals("Float")) {
       variables.put(operand, new ParserFormula("Real", Objects.requireNonNull(rmgr).makeNumber(operand)));
       return variables.get(operand).javaSmt;
     } else if (operand.startsWith("#b")) {
-      String binVal = operand.split("b")[1];
+      String binVal = Iterables.get(Splitter.on('b').split(operand), 1);
       int index = binVal.length();
       int value = Integer.parseInt(binVal, 2);
       return Objects.requireNonNull(bimgr).makeBitvector(index, value);
     } else if (operand.startsWith("#x")) {
-      String hexVal = operand.split("x")[1];
+      String hexVal = Iterables.get(Splitter.on('x').split(operand), 1);
       int index = (hexVal.length()*4);
       BigInteger value = new BigInteger(hexVal, 16);
       return Objects.requireNonNull(bimgr).makeBitvector(index, value);
@@ -265,7 +260,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
       variables.put(operand, new ParserFormula("Bool", bmgr.makeTrue()));
       return variables.get(operand).javaSmt;
     } else if (!bitVec.isEmpty()) {
-      BigInteger value = new BigInteger(bitVec.get(0).split("v")[1]);
+      BigInteger value = new BigInteger(Iterables.get(Splitter.on('v').split(bitVec.get(0)), 1));
       int index = Integer.parseInt(bitVec.get(1));
       return Objects.requireNonNull(bimgr).makeBitvector(index, value);
     } else {
@@ -295,8 +290,8 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
       operators = (List<String>) identifier;
       operator = Objects.requireNonNull(operators).get(0);
     } else if (identifier instanceof Tuple2) {
-      operator = (String) ((Tuple2) identifier)._1;
-      sort = (FormulaType<?>) ((Tuple2) identifier)._2;
+      operator = ((Tuple2<String, FormulaType<?>>) identifier)._1;
+      sort = ((Tuple2<String, FormulaType<?>>) identifier)._2;
     }
 
     //String binary = (String) visit(ctx.b);
@@ -397,11 +392,13 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
             if (operands.stream().anyMatch(c -> c instanceof RationalFormula)) {
               List<NumeralFormula> numeralOperands =
                   operands.stream().map(e -> (RationalFormula) e).collect(Collectors.toList());
-              return Objects.requireNonNull(rmgr).subtract(numeralOperands.get(0), numeralOperands.get(1));
+              return Objects.requireNonNull(rmgr)
+                  .subtract(numeralOperands.get(0), numeralOperands.get(1));
             } else {
               List<IntegerFormula> integerOperands =
                   operands.stream().map(e -> (IntegerFormula) e).collect(Collectors.toList());
-              return Objects.requireNonNull(imgr).subtract(integerOperands.get(0), integerOperands.get(1));
+              return Objects.requireNonNull(imgr)
+                  .subtract(integerOperands.get(0), integerOperands.get(1));
             }
           } catch (Exception e) {
             throw new ParserException("Operands for " + operator + "need to be of numeral type");
@@ -421,7 +418,8 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
             throw new ParserException("Operands for " + operator + "need to be of numeral type");
           }
         } else {
-          throw new ParserException(operator + " takes either one or two numeral operands as input. ");
+          throw new ParserException(
+              operator + " takes either one or two numeral operands as input. ");
         }
       case "div":
         if (operands.size() == 2) {
@@ -429,11 +427,13 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
             if (operands.stream().anyMatch(c -> c instanceof RationalFormula)) {
               List<NumeralFormula> numeralOperands =
                   operands.stream().map(e -> (RationalFormula) e).collect(Collectors.toList());
-              return Objects.requireNonNull(rmgr).divide(numeralOperands.get(0), numeralOperands.get(1));
+              return Objects.requireNonNull(rmgr)
+                  .divide(numeralOperands.get(0), numeralOperands.get(1));
             } else {
               List<IntegerFormula> integerOperands =
                   operands.stream().map(e -> (IntegerFormula) e).collect(Collectors.toList());
-              return Objects.requireNonNull(imgr).divide(integerOperands.get(0), integerOperands.get(1));
+              return Objects.requireNonNull(imgr)
+                  .divide(integerOperands.get(0), integerOperands.get(1));
             }
           } catch (Exception e) {
             throw new ParserException("Operands for " + operator + "need to be of numeral type");
@@ -449,7 +449,8 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
             } else {
               List<IntegerFormula> integerOperands =
                   operands.stream().map(e -> (IntegerFormula) e).collect(Collectors.toList());
-              return Objects.requireNonNull(imgr).modulo(integerOperands.get(0), integerOperands.get(1));
+              return Objects.requireNonNull(imgr)
+                  .modulo(integerOperands.get(0), integerOperands.get(1));
             }
           } catch (Exception e) {
             throw new ParserException("Operands for " + operator + "need to be of integer type");
@@ -463,11 +464,13 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
             if (operands.stream().anyMatch(c -> c instanceof RationalFormula)) {
               List<NumeralFormula> numeralOperands =
                   operands.stream().map(e -> (RationalFormula) e).collect(Collectors.toList());
-              return Objects.requireNonNull(rmgr).multiply(numeralOperands.get(0), numeralOperands.get(1));
+              return Objects.requireNonNull(rmgr)
+                  .multiply(numeralOperands.get(0), numeralOperands.get(1));
             } else {
               List<IntegerFormula> integerOperands =
                   operands.stream().map(e -> (IntegerFormula) e).collect(Collectors.toList());
-              return Objects.requireNonNull(imgr).multiply(integerOperands.get(0), integerOperands.get(1));
+              return Objects.requireNonNull(imgr)
+                  .multiply(integerOperands.get(0), integerOperands.get(1));
             }
           } catch (Exception e) {
             throw new ParserException("Operands for " + operator + "need to be of numeral type");
@@ -539,11 +542,13 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
             if (operands.stream().anyMatch(c -> c instanceof RationalFormula)) {
               List<NumeralFormula> numeralOperands =
                   operands.stream().map(e -> (RationalFormula) e).collect(Collectors.toList());
-              return Objects.requireNonNull(rmgr).lessThan(numeralOperands.get(0), numeralOperands.get(1));
+              return Objects.requireNonNull(rmgr)
+                  .lessThan(numeralOperands.get(0), numeralOperands.get(1));
             } else {
               List<IntegerFormula> integerOperands =
                   operands.stream().map(e -> (IntegerFormula) e).collect(Collectors.toList());
-              return Objects.requireNonNull(imgr).lessThan(integerOperands.get(0), integerOperands.get(1));
+              return Objects.requireNonNull(imgr)
+                  .lessThan(integerOperands.get(0), integerOperands.get(1));
             }
           } catch (Exception e) {
             throw new ParserException("Operands for " + operator + "need to be of numeral type");
@@ -850,46 +855,58 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
         }
       case "extract":
         if (operands.size() == 1) {
-          if (operators.size() == 3 && isInteger(operators.get(2)) && isInteger(operators.get(1))) {
+          if (Objects.requireNonNull(operators).size() == 3 && isInteger(operators.get(2))
+              && isInteger(operators.get(1))) {
             int left = Integer.parseInt(operators.get(2));
             int right = Integer.parseInt(operators.get(1));
             try {
               return Objects.requireNonNull(bimgr).extract((BitvectorFormula) operands.get(0),
                   left, right);
             } catch (Exception e) {
-              throw new ParserException("Operands for " + operator + "need to be of bitvector type");
+              throw new ParserException(
+                  "Operands for " + operator + "need to be of bitvector type");
             }
           } else {
-            throw new ParserException(operator + " takes one bitvector and two integers as input. ");
+            throw new ParserException(
+                operator + " takes one bitvector and two integers as input. ");
           }
+        } else {
+          throw new ParserException(operator + " takes one bitvector and two integers as "
+              + "input.");
         }
       case "zero_extend":
         if (operands.size() == 1) {
-          if (operators.size() == 2 && isInteger(operators.get(1))) {
+          if (Objects.requireNonNull(operators).size() == 2 && isInteger(operators.get(1))) {
             int extension = Integer.parseInt(operators.get(1));
             try {
               return Objects.requireNonNull(bimgr).extend((BitvectorFormula) operands.get(0),
                   extension, true);
             } catch (Exception e) {
-              throw new ParserException("Operands for " + operator + "need to be of bitvector type");
+              throw new ParserException(
+                  "Operands for " + operator + "need to be of bitvector type");
             }
           } else {
             throw new ParserException(operator + " takes one bitvector and one integer as input. ");
           }
+        } else {
+          throw new ParserException(operator + " takes one bitvector and one integer as input.");
         }
       case "sign_extend":
         if (operands.size() == 1) {
-          if (operators.size() == 2 && isInteger(operators.get(1))) {
+          if (Objects.requireNonNull(operators).size() == 2 && isInteger(operators.get(1))) {
             int extension = Integer.parseInt(operators.get(1));
             try {
               return Objects.requireNonNull(bimgr).extend((BitvectorFormula) operands.get(0),
                   extension, false);
             } catch (Exception e) {
-              throw new ParserException("Operands for " + operator + "need to be of bitvector type");
+              throw new ParserException(
+                  "Operands for " + operator + "need to be of bitvector type");
             }
           } else {
             throw new ParserException(operator + " takes one bitvector and one integer as input. ");
           }
+        } else {
+          throw new ParserException(operator + " takes one bitvector and one integer as input.");
         }
       case "bv2int":
         if (operands.size() != 1) {
@@ -911,26 +928,32 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
         //array operators
       case "select":
         if (operands.size() == 2) {
-          return Objects.requireNonNull(amgr).select((ArrayFormula<Formula, Formula>) operands.get(0),
-              operands.get(1));
+          return Objects.requireNonNull(amgr)
+              .select((ArrayFormula<Formula, Formula>) operands.get(0),
+                  operands.get(1));
         } else {
           throw new ParserException(operator + " takes one array and one index as input. ");
         }
       case "store":
         if (operands.size() == 3) {
           return Objects.requireNonNull(amgr)
-              .store((ArrayFormula<Formula, Formula>) operands.get(0), operands.get(1), operands.get(2));
+              .store((ArrayFormula<Formula, Formula>) operands.get(0), operands.get(1),
+                  operands.get(2));
         } else {
           throw new ParserException(operator + " takes one array and one index as input. ");
         }
       case "const":
         if (isModel) {
           variables.put("temp", new ParserFormula("Array", Objects.requireNonNull(amgr).makeArray(
-              "(as const (Array " + getArrayStrings(((FormulaType.ArrayFormulaType) sort).getIndexType()) + " " + getArrayStrings(((FormulaType.ArrayFormulaType) sort).getElementType()) +
-                  ") " + operands.get(0) + ")", (FormulaType.ArrayFormulaType) sort)));
+              "(as const (Array " + getArrayStrings(
+                  ((FormulaType.ArrayFormulaType<?, ?>) Objects.requireNonNull(
+                      sort)).getIndexType()) + " " + getArrayStrings(
+                  ((FormulaType.ArrayFormulaType<?
+                      , ?>) sort).getElementType()) +
+                  ") " + operands.get(0) + ")", (FormulaType.ArrayFormulaType<?, ?>) sort)));
           return variables.get("temp").javaSmt;
         } else {
-          throw  new ParserException("\"as const\" is not supported by JavaSMT");
+          throw new ParserException("\"as const\" is not supported by JavaSMT");
         }
         //UF
       case "UF":
@@ -945,12 +968,14 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
       case "=":
         if (operands.size() == 2) {
           try {
-            if (operands.stream().anyMatch(c -> c instanceof ArrayFormula)){
-              return Objects.requireNonNull(amgr).equivalence((ArrayFormula<Formula, Formula>) operands.get(0),
-                  (ArrayFormula<Formula, Formula>) operands.get(1));
+            if (operands.stream().anyMatch(c -> c instanceof ArrayFormula)) {
+              return Objects.requireNonNull(amgr)
+                  .equivalence((ArrayFormula<Formula, Formula>) operands.get(0),
+                      (ArrayFormula<Formula, Formula>) operands.get(1));
             } else if (operands.stream().anyMatch(c -> c instanceof RationalFormula)) {
               //if (operands.stream().anyMatch(c -> variables.containsKey(c)))
-                return Objects.requireNonNull(rmgr).equal((NumeralFormula) operands.get(0), (NumeralFormula) operands.get(1));
+              return Objects.requireNonNull(rmgr)
+                  .equal((NumeralFormula) operands.get(0), (NumeralFormula) operands.get(1));
             } else if (operands.stream().anyMatch(c -> c instanceof IntegerFormula)) {
               return Objects.requireNonNull(imgr).equal((IntegerFormula) operands.get(0),
                   (IntegerFormula) operands.get(1));
@@ -958,19 +983,23 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
               return bmgr.equivalence((BooleanFormula) operands.get(0),
                   (BooleanFormula) operands.get(1));
             } else if (operands.stream().anyMatch(c -> c instanceof BitvectorFormula)) {
-              BooleanFormula result = Objects.requireNonNull(bimgr).equal((BitvectorFormula) operands.get(0),
-                  (BitvectorFormula) operands.get(1));
+              BooleanFormula result =
+                  Objects.requireNonNull(bimgr).equal((BitvectorFormula) operands.get(0),
+                      (BitvectorFormula) operands.get(1));
               return result;
+            } else {
+              throw new ParserException("Operands for " + operator + "need to be of the same type" + operands);
             }
 
           } catch (Exception e) {
-            throw new ParserException("Operands for " + operator + "need to be of the same type" + operands);
+            throw new ParserException(
+                "Operands for " + operator + "need to be of the same type" + operands);
           }
         } else {
           throw new ParserException(operator + " takes two equal types of operands as input. ");
         }
-          default:
-            throw new ParserException("Operator " + operator + " is not supported for operands type.");
+        default:
+          throw new ParserException("Operator " + operator + " is not supported for operands type.");
 
     }
   }
@@ -1052,9 +1081,6 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     }
     javaSorts = inputParams.stream().map(fmgr::getFormulaType).collect(Collectors.toList());
 
-    String name;
-    String sort;
-
     FormulaType<?> returnTypes = (FormulaType<?>) visit(ctx.sort());
 
     Formula key;
@@ -1085,10 +1111,6 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     return visitChildren(ctx);
   }
 
-  @Override public Object visitSorted_var(smtlibv2Parser.Sorted_varContext ctx) {
-    return visitChildren(ctx);
-  }
-
   @Override public Object visitCmd_assert(smtlibv2Parser.Cmd_assertContext ctx) {
     Object result = visitChildren(ctx);
     try {
@@ -1106,18 +1128,18 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     if (sorts.isBooleanType()) {
       variables.put(variable, new ParserFormula("Bool", bmgr.makeVariable(variable)));
     } else if (sorts.isIntegerType()) {
-      variables.put((variable), new ParserFormula("Int", Objects.requireNonNull(imgr).makeVariable(variable)));
+      variables.put(variable, new ParserFormula("Int", Objects.requireNonNull(imgr).makeVariable(variable)));
     } else if (sorts.isRationalType()) {
-      variables.put((variable), new ParserFormula("Real", Objects.requireNonNull(rmgr).makeVariable(variable)));
+      variables.put(variable, new ParserFormula("Real", Objects.requireNonNull(rmgr).makeVariable(variable)));
     } else if (sorts.isBitvectorType()) {
-      variables.put((variable), new ParserFormula("BitVec",
-          (Objects.requireNonNull(bimgr).makeVariable(((FormulaType.BitvectorType) sorts).getSize(),
-              variable))));
+      variables.put(variable, new ParserFormula("BitVec",
+          Objects.requireNonNull(bimgr).makeVariable(((FormulaType.BitvectorType) sorts).getSize(),
+              variable)));
     } else if (sorts.isArrayType()) {
-      variables.put((variable), new ParserFormula("BitVec",
-          (Objects.requireNonNull(amgr).makeArray(variable,
+      variables.put(variable, new ParserFormula("BitVec",
+          Objects.requireNonNull(amgr).makeArray(variable,
               ((FormulaType.ArrayFormulaType<?,?>) sorts).getIndexType(),
-              ((FormulaType.ArrayFormulaType<?,?>) sorts).getElementType()))));
+              ((FormulaType.ArrayFormulaType<?,?>) sorts).getElementType())));
 
     }
     return visitChildren(ctx);
@@ -1135,7 +1157,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     } else if (type.isBitvectorType()) {
       return "(_ BitVec " + ((BitvectorType) type).getSize() + ")";
     } else if (type.isArrayType()) {
-      return "(Array " + getArrayStrings(((FormulaType.ArrayFormulaType) type).getIndexType()) + " " +  getArrayStrings(((FormulaType.ArrayFormulaType) type).getElementType());
+      return "(Array " + getArrayStrings(((FormulaType.ArrayFormulaType<?,?>) type).getIndexType()) + " " +  getArrayStrings(((FormulaType.ArrayFormulaType<?,?>) type).getElementType());
     } else {
       throw new ParserException(type + " is not a known Sort.");
     }
@@ -1164,17 +1186,13 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
   public static FormulaType<?> mapSort(List<String> sorts) {
     String bvSize = "";
     String sort = "";
-    String idx = "";
-    String elem = "";
     if (sorts.get(0).startsWith("(_")) {
-      bvSize = sorts.get(0).split("\\(_BitVec")[1];
-      bvSize = bvSize.split("\\)")[0];
+      bvSize = Iterables.get(Splitter.on("(_BitVec").split(sorts.get(0)), 1);
+      bvSize = Iterables.get(Splitter.on(')').split(bvSize), 0);
       sort = "BitVec";
     } else if (sorts.size() > 1) {
 
       if (sorts.get(0).startsWith("Array")) {
-        idx = sorts.get(1);
-        elem = sorts.get(2);
         sort = "Array";
       }
     } else {

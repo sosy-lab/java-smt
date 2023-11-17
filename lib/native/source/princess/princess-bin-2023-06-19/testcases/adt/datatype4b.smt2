@@ -1,0 +1,61 @@
+(set-option :produce-models true)
+
+(declare-datatypes () (
+  (Term 
+    (int (iv Int)) 
+    (list (lv TList)) 
+    (tuple (tv TList)) 
+    (fn (fv Int))) 
+  (TList 
+    (nil) 
+    (cons (th Term) (tail TList))) 
+))
+
+(define-funs-rec 
+  ((f0 ((t Term)) Bool) 
+    (f1 ((l TList)) Bool) 
+    (f2 ((t Term)) Bool)) 
+  ((and (is-int t) (>= (iv t) 1)) 
+    (or (is-nil l) (and (is-cons l) (f0 (th l)) (f1 (tail l)))) 
+    (and (is-list t) (f1 (lv t))))
+)
+
+(declare-const x1 Term)
+(declare-const x2 Term)
+(declare-const x3 Term)
+(declare-const x4 Term)
+(declare-const x5 Term)
+(declare-const x67 Term)
+(declare-const x7 Term)
+(declare-const x8 Term)
+(declare-const x9 Term)
+(declare-const x10 Term)
+(declare-const x11 Term)
+
+(assert (<= (_size x1) 10)) ; added to make sure exploration terminates
+
+(assert (f2 x1))
+(assert (not (= (list nil) x1)))
+(assert (and (is-list x1) (is-cons (lv x1))))
+(assert (and (is-list x1) (is-cons (lv x1)) (= x2 (th (lv x1)))))
+(assert (and (is-list x1) (is-cons (lv x1)) (= x3 (list (tail (lv x1))))))
+(assert (not (= (int 42) x2)))
+(assert (and (is-list (list nil)) (= x4 (list (cons x2 (lv (list nil)))))))
+(assert (not (= (list nil) x3)))
+(assert (and (is-list x3) (is-cons (lv x3))))
+(assert (and (is-list x3) (is-cons (lv x3)) (= x5 (th (lv x3)))))
+(assert (and (is-list x3) (is-cons (lv x3)) (= x67 (list (tail (lv x3))))))
+(assert (not (= (int 42) x5)))
+(assert (and (is-list x4) (= x7 (list (cons x5 (lv x4))))))
+(assert (not (= (list nil) x67)))
+(assert (and (is-list x67) (is-cons (lv x67))))
+(assert (and (is-list x67) (is-cons (lv x67)) (= x8 (th (lv x67)))))
+(assert (and (is-list x67) (is-cons (lv x67)) (= x9 (list (tail (lv x67))))))
+(assert (= (int 42) x8))
+(assert (and (is-list x7) (is-cons (lv x7))))
+(assert (and (is-list x7) (is-cons (lv x7)) (= x10 (th (lv x7)))))
+(assert (and (is-list x7) (is-cons (lv x7)) (= x11 (list (tail (lv x7))))))
+(assert (= (int 17) x10))
+
+(check-sat)
+(get-model)

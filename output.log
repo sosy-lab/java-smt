@@ -1,0 +1,74 @@
+Buildfile: /home/janel/Desktop/Studium/Semester_6/Bachelorarbeit/nochmalneu/build.xml
+
+determine-version:
+
+init:
+     [echo] Building JavaSMT Solver Library 96a9db21-dirty
+
+bootstrap-ivy:
+
+load-ivy:
+
+update-contrib:
+
+bootstrap-ivy:
+
+load-ivy:
+
+install-contrib:
+[ivy:resolve] :: Apache Ivy 2.5.1 - 20221101102211 :: https://ant.apache.org/ivy/ ::
+[ivy:resolve] :: loading settings :: file = /home/janel/Desktop/Studium/Semester_6/Bachelorarbeit/nochmalneu/build/ivysettings.xml
+[ivy:retrieve] :: retrieving :: org.sosy_lab#java-smt [sync]
+[ivy:retrieve] 	confs: [contrib]
+[ivy:retrieve] 	0 artifacts copied, 16 already retrieved (0kB/10ms)
+
+resolve-dependencies:
+     [echo] Downloading and installing dependencies with Ivy...
+[ivy:resolve] :: Apache Ivy 2.5.1 - 20221101102211 :: https://ant.apache.org/ivy/ ::
+[ivy:resolve] :: loading settings :: file = /home/janel/Desktop/Studium/Semester_6/Bachelorarbeit/nochmalneu/build/ivysettings.xml
+[ivy:retrieve] :: retrieving :: org.sosy_lab#java-smt [sync]
+[ivy:retrieve] 	confs: [build, core, runtime-boolector, runtime-cvc4, runtime-cvc5, runtime-mathsat, runtime-optimathsat, runtime-princess, runtime-smtinterpol, runtime-yices2, runtime-z3, test, format-source, checkstyle, spotbugs]
+[ivy:retrieve] 	0 artifacts copied, 263 already retrieved (0kB/65ms)
+
+build-dependencies:
+
+build-project:
+   [depend] Deleted 13 out of date files in 1 seconds
+    [javac] Compiling 13 source files to /home/janel/Desktop/Studium/Semester_6/Bachelorarbeit/nochmalneu/bin
+    [javac] /home/janel/Desktop/Studium/Semester_6/Bachelorarbeit/nochmalneu/src/org/sosy_lab/java_smt/solvers/princess/PrincessAbstractProver.java:78: warning: [unchecked] unchecked method invocation: constructor <init> in class PrincessBinaryModel is applied to given types
+    [javac]     binaryModel = new PrincessBinaryModel(this, (AbstractFormulaManager) mgr);
+    [javac]                   ^
+    [javac]   required: AbstractProver<?>,AbstractFormulaManager<Formula,Formula,Formula,?>
+    [javac]   found:    PrincessAbstractProver<E>,AbstractFormulaManager
+    [javac]   where E is a type-variable:
+    [javac]     E extends Object declared in class PrincessAbstractProver
+    [javac] /home/janel/Desktop/Studium/Semester_6/Bachelorarbeit/nochmalneu/src/org/sosy_lab/java_smt/solvers/princess/PrincessAbstractProver.java:78: warning: [unchecked] unchecked conversion
+    [javac]     binaryModel = new PrincessBinaryModel(this, (AbstractFormulaManager) mgr);
+    [javac]                                                 ^
+    [javac]   required: AbstractFormulaManager<Formula,Formula,Formula,?>
+    [javac]   found:    AbstractFormulaManager
+    [javac] error: warnings found and -Werror specified
+    [javac] /home/janel/Desktop/Studium/Semester_6/Bachelorarbeit/nochmalneu/src/org/sosy_lab/java_smt/utils/Models/PrincessBinaryModel.java:50: warning: [rawtypes] found raw type: AbstractModel
+    [javac] public class PrincessBinaryModel extends AbstractModel {
+    [javac]                                          ^
+    [javac]   missing type arguments for generic class AbstractModel<TFormulaInfo,TType,TEnv>
+    [javac]   where TFormulaInfo,TType,TEnv are type-variables:
+    [javac]     TFormulaInfo extends Object declared in class AbstractModel
+    [javac]     TType extends Object declared in class AbstractModel
+    [javac]     TEnv extends Object declared in class AbstractModel
+    [javac] /home/janel/Desktop/Studium/Semester_6/Bachelorarbeit/nochmalneu/src/org/sosy_lab/java_smt/utils/Models/PrincessBinaryModel.java:50: warning: [unchecked] <T#1>eval(T#1) in AbstractEvaluator implements <T#2>eval(T#2) in Evaluator
+    [javac] public class PrincessBinaryModel extends AbstractModel {
+    [javac]        ^
+    [javac]   return type requires unchecked conversion from Formula to T#2
+    [javac]   where T#1,T#2 are type-variables:
+    [javac]     T#1 extends Formula declared in method <T#1>eval(T#1)
+    [javac]     T#2 extends Formula declared in method <T#2>eval(T#2)
+    [javac] /home/janel/Desktop/Studium/Semester_6/Bachelorarbeit/nochmalneu/src/org/sosy_lab/java_smt/utils/Models/PrincessBinaryModel.java:72: warning: [unchecked] unchecked call to AbstractModel(AbstractProver<?>,AbstractFormulaManager<TFormulaInfo,TType,TEnv,?>) as a member of the raw type AbstractModel
+    [javac]     super( prover, pFormulaManager);
+    [javac]          ^
+    [javac]   where TFormulaInfo,TType,TEnv are type-variables:
+    [javac]     TFormulaInfo extends Object declared in class AbstractModel
+    [javac]     TType extends Object declared in class AbstractModel
+    [javac]     TEnv extends Object declared in class AbstractModel
+    [javac] 1 error
+    [javac] 5 warnings

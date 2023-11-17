@@ -1,0 +1,36 @@
+#!/bin/sh
+
+# Tests for werePrincess, the daemon interface created
+# to more easily interface the Wolverine model checker
+
+PRI=../../werePrincess
+
+(
+  cat wolverInterface0.pri
+  echo interpolate.
+  cat wolverInterface1.pri
+  echo interpolate.
+  cat wolverInterface2.pri
+  echo interpolate.
+  cat wolverInterface3.pri
+  echo interpolate.
+  cat wolverInterface4.pri
+  echo interpolate.
+  cat wolverInterface5.pri
+  echo interpolate.
+  cat wolverInterface6.pri
+  echo interpolate.
+  cat wolverInterface7.pri
+  echo checkValidity.
+  cat wolverInterface8.pri
+  echo checkValidity.
+  cat wolverInterface9.pri
+  echo checkValidity.
+  cat wolverInterface10.pri
+  echo checkValidity.
+  cat wolverInterface11.pri
+  echo interpolate.
+  cat wolverInterface12.pri
+  echo interpolate.
+  echo quit.
+) | $PRI

@@ -1,0 +1,36 @@
+#!/bin/sh
+
+PRI=../../princess
+
+TESTS="simple-cycle.smt2 \
+       simple-cycle2.smt2 \
+       simple-cycle3.smt2 \
+       concat-1.smt2 \
+       concat-2.smt2 \
+       transducer1.smt2 \
+       transducer1b.smt2 \
+       adt.smt2 \
+       escape.smt2 \
+       escape2.smt2 \
+       escape3.smt2 \
+       escape4.smt2 \
+       escape5.smt2 \
+       head.smt2 \
+       regex.smt2 \
+       chars.smt2 \
+       single-quoted.smt2 \
+       single-quoted2.smt2 \
+       completeness.smt2"
+
+$PRI "$@" $TESTS
+
+TESTS="escape.smt2 \
+       escape2.smt2 \
+       escape3.smt2 \
+       escape4.smt2 \
+       escape5.smt2"
+
+$PRI "$@" +stringEscapes $TESTS
+
+# disabling assertions for the next test case, which otherwise takes very long
+$PRI "$@" -assert concat-3.smt2

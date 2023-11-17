@@ -21,9 +21,11 @@
 package org.sosy_lab.java_smt.utils.Generators;
 
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -41,11 +43,17 @@ public class Generator {
   public static List<RecursiveString<?,?>> registeredVariables = new ArrayList<>();
 
   public static void writeToFile(String line, String fileName) throws IOException {
-    File file = new File(fileName);
-    FileWriter fileWriter = new FileWriter(fileName);
-    fileWriter.write(line);
-    fileWriter.close();
-  }
+    Writer fileWriter = Files.newBufferedWriter(Paths.get(fileName),
+        Charset.defaultCharset());
+    try {
+      fileWriter.write(line);
+      fileWriter.flush();
+      fileWriter.close();
+    } catch (GeneratorException e) {
+      throw new GeneratorException("Could not write to file");
+    }
+    }
+
 
   public static String evaluateRecursive(Object constraint) {
     RecursiveString<?,?> methodToEvaluate = executedAggregator
@@ -148,6 +156,7 @@ public class Generator {
     lines.append(endSMTLIB2);
     writeToFile(String.valueOf(lines), fileName);
     lines.delete(0, lines.length()-1);
+
   }
 
 }

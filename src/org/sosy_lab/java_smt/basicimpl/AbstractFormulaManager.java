@@ -21,11 +21,11 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Appender;
-import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.api.ArrayFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.EnumerationFormulaManager;
@@ -40,7 +40,6 @@ import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.SLFormulaManager;
-import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.StringFormulaManager;
 import org.sosy_lab.java_smt.api.Tactic;
 import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
@@ -184,7 +183,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
 
   @Override
   public BooleanFormula universalParse(String pString)
-      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+      throws IOException {
     smtlibv2Lexer lexer = new smtlibv2Lexer(CharStreams.fromFileName(pString));
     smtlibv2Parser parser = new smtlibv2Parser(new CommonTokenStream(lexer));
     Visitor visitor = new Visitor(this, this.booleanManager, this.integerManager,
@@ -196,8 +195,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     return this.booleanManager.and(constraints);
   }
 
-  public BooleanFormula universalParseFromString(String pString)
-      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+  @Override
+  public BooleanFormula universalParseFromString(String pString) {
     smtlibv2Lexer lexer = new smtlibv2Lexer(CharStreams.fromString(pString));
     smtlibv2Parser parser = new smtlibv2Parser(new CommonTokenStream(lexer));
     Visitor visitor = new Visitor(this, this.booleanManager, this.integerManager,
@@ -336,10 +335,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   /**
    * Eliminate UFs from the given input formula.
    *
-   * @throws InterruptedException Can be thrown by the native code.
    */
-  protected BooleanFormula applyUFEImpl(BooleanFormula pF) throws InterruptedException,
-                                                                  IOException {
+  protected BooleanFormula applyUFEImpl(BooleanFormula pF) throws IOException {
     return SolverUtils.ufElimination(this).eliminateUfs(pF);
   }
 
@@ -482,7 +479,6 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public <T extends Formula> T makeApplication(
       FunctionDeclaration<T> declaration, List<? extends Formula> args) {
     return formulaCreator.callFunction(declaration, args);
@@ -510,20 +506,13 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
           public Formula visitFunction(
               Formula f, List<Formula> newArgs, FunctionDeclaration<?> functionDeclaration) {
             Formula out = pFromToMapping.get(f);
-            if (out == null) {
-              return makeApplication(functionDeclaration, newArgs);
-            } else {
-              return out;
-            }
+            return Objects.requireNonNullElseGet(out,
+                () -> makeApplication(functionDeclaration, newArgs));
           }
 
           private Formula replace(Formula f) {
             Formula out = pFromToMapping.get(f);
-            if (out == null) {
-              return f;
-            } else {
-              return out;
-            }
+            return Objects.requireNonNullElse(out, f);
           }
         });
   }
@@ -545,10 +534,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     if (SMTLIB2_KEYWORDS.contains(pVar)) {
       return false;
     }
-    if (DISALLOWED_CHARACTERS.matchesAnyOf(pVar)) {
-      return false;
-    }
-    return true;
+    return !DISALLOWED_CHARACTERS.matchesAnyOf(pVar);
   }
 
   /**
