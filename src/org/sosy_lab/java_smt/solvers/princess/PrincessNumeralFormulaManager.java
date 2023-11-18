@@ -8,7 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.princess;
 
-import static scala.collection.JavaConverters.iterableAsScalaIterable;
+import static scala.collection.JavaConverters.asScala;
 
 import ap.parser.IExpression;
 import ap.parser.IFormula;
@@ -57,7 +57,7 @@ abstract class PrincessNumeralFormulaManager<
 
   @Override
   protected IExpression distinctImpl(List<IExpression> pNumbers) {
-    return IExpression.distinct(iterableAsScalaIterable(Iterables.filter(pNumbers, ITerm.class)));
+    return IExpression.distinct(asScala(Iterables.filter(pNumbers, ITerm.class)));
   }
 
   @Override

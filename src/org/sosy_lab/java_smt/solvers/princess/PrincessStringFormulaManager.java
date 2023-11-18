@@ -22,7 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager;
-import scala.collection.Seq;
+import scala.collection.immutable.Seq;
 
 public class PrincessStringFormulaManager
     extends AbstractStringFormulaManager<
@@ -33,7 +33,7 @@ public class PrincessStringFormulaManager
   }
 
   static Seq<ITerm> toSeq(List<IExpression> exprs) {
-    ArrayList<ITerm> result = new ArrayList<ITerm>();
+    ArrayList<ITerm> result = new ArrayList<>();
     for (IExpression expr : exprs) result.add((ITerm) expr);
     return PrincessEnvironment.toSeq(result);
   }
@@ -154,6 +154,11 @@ public class PrincessStringFormulaManager
   @Override
   protected ITerm allImpl() {
     return new IFunApp(PrincessEnvironment.stringTheory.re_all(), toSeq());
+  }
+
+  @Override
+  protected IExpression allCharImpl() {
+    return new IFunApp(PrincessEnvironment.stringTheory.re_allchar(), toSeq());
   }
 
   @Override

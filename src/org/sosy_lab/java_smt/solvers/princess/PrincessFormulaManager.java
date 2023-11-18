@@ -46,9 +46,8 @@ final class PrincessFormulaManager
         pQuantifierManager,
         pArrayManager,
         null,
-        null,
+        pStringManager,
         null);
-        pStringManager);
     creator = pCreator;
   }
 

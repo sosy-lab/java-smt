@@ -21,7 +21,9 @@ import ap.parser.IFormula;
 import ap.parser.IFunApp;
 import ap.parser.IFunction;
 import ap.parser.IIntFormula;
+import ap.parser.IPlus;
 import ap.parser.ITerm;
+import ap.parser.ITimes;
 import ap.parser.Parser2InputAbsy.TranslationException;
 import ap.parser.PartialEvaluator;
 import ap.parser.SMTLineariser;
@@ -30,8 +32,10 @@ import ap.parser.SMTParser2InputAbsy.SMTType;
 import ap.terfor.ConstantTerm;
 import ap.terfor.preds.Predicate;
 import ap.theories.ExtArray;
+import ap.theories.ExtArray.ArraySort;
 import ap.theories.bitvectors.ModuloArithmetic;
-import ap.theories.rationals.Fractions.FractionSort$;
+import ap.theories.rationals.Rationals$;
+import ap.theories.strings.StringTheory;
 import ap.types.Sort;
 import ap.types.Sort$;
 import ap.types.Sort.MultipleValueBool$;
@@ -72,6 +76,8 @@ import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
+import ostrich.OFlags;
+import ostrich.OstrichStringTheory;
 import scala.Tuple2;
 import scala.Tuple4;
 import scala.collection.immutable.Seq;
@@ -101,6 +107,29 @@ class PrincessEnvironment {
 
   public static final Sort BOOL_SORT = Sort$.MODULE$.Bool();
   public static final Sort INTEGER_SORT = Sort.Integer$.MODULE$;
+  public static final Sort NAT_SORT = Sort.Nat$.MODULE$;
+
+  static final StringTheory stringTheory =
+      new OstrichStringTheory(
+          toSeq(new ArrayList<>()),
+          new OFlags(
+              OFlags.$lessinit$greater$default$1(),
+              OFlags.$lessinit$greater$default$2(),
+              OFlags.$lessinit$greater$default$3(),
+              OFlags.$lessinit$greater$default$4(),
+              OFlags.$lessinit$greater$default$5(),
+              OFlags.$lessinit$greater$default$6(),
+              OFlags.$lessinit$greater$default$7(),
+              OFlags.$lessinit$greater$default$8(),
+              OFlags.$lessinit$greater$default$9(),
+              OFlags.$lessinit$greater$default$10(),
+              OFlags.$lessinit$greater$default$11(),
+              OFlags.$lessinit$greater$default$12()));
+  public static final Sort STRING_SORT = stringTheory.StringSort();
+  public static final Sort REGEX_SORT = stringTheory.RegexSort();
+
+  static Rationals$ rationalTheory = Rationals$.MODULE$;
+  public static final Sort FRACTION_SORT = rationalTheory.dom();
 
   @Option(secure = true, description = "log all queries as Princess-specific Scala code")
   private boolean logAllQueriesAsScala = false;
@@ -509,14 +538,23 @@ class PrincessEnvironment {
     if (pFormula instanceof IFormula) {
       return FormulaType.BooleanType;
     } else if (pFormula instanceof ITerm) {
-      final Sort sort = Sort$.MODULE$.sortOf((ITerm) pFormula);
+      ITerm formula = (ITerm) pFormula;
+      if (pFormula instanceof ITimes) {
+        // coeff is always INT, lets check the subterm.
+        formula = ((ITimes) formula).subterm();
+      } else if (pFormula instanceof IPlus) {
+        return mergeFormulaTypes(
+            getFormulaType(((IPlus) pFormula).t1()), getFormulaType(((IPlus) pFormula).t2()));
+      }
+      final Sort sort = Sort$.MODULE$.sortOf(formula);
       try {
         return getFormulaTypeFromSort(sort);
       } catch (IllegalArgumentException e) {
         // add more info about the formula, then rethrow
         throw new IllegalArgumentException(
             String.format(
-                "Unknown formula type '%s' for formula '%s'.", pFormula.getClass(), pFormula),
+                "Unknown formula type '%s' of sort '%s' for formula '%s'.",
+                pFormula.getClass(), sort.toString(), pFormula),
             e);
       }
     }
@@ -547,12 +585,16 @@ class PrincessEnvironment {
   private static FormulaType<?> getFormulaTypeFromSort(final Sort sort) {
     if (sort == PrincessEnvironment.BOOL_SORT) {
       return FormulaType.BooleanType;
-    } else if (sort == PrincessEnvironment.INTEGER_SORT) {
+    } else if (sort == PrincessEnvironment.INTEGER_SORT || sort == PrincessEnvironment.NAT_SORT) {
       return FormulaType.IntegerType;
-    } else if (sort instanceof FractionSort$) {
+    } else if (sort == PrincessEnvironment.FRACTION_SORT) {
       return FormulaType.RationalType;
+    } else if (sort == PrincessEnvironment.STRING_SORT) {
+      return FormulaType.StringType;
+    } else if (sort == PrincessEnvironment.REGEX_SORT) {
+      return FormulaType.RegexType;
     } else if (sort instanceof ExtArray.ArraySort) {
-      Seq<Sort> indexSorts = ((ExtArray.ArraySort) sort).theory().indexSorts();
+      Seq<Sort> indexSorts = ((ArraySort) sort).theory().indexSorts();
       Sort elementSort = ((ExtArray.ArraySort) sort).theory().objSort();
       assert indexSorts.iterator().size() == 1 : "unexpected index type in Array type:" + sort;
       // assert indexSorts.size() == 1; // TODO Eclipse does not like simpler code.
