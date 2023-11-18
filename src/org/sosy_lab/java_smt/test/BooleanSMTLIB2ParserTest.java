@@ -26,7 +26,7 @@ import org.junit.Test;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.utils.Parsers.Visitor;
+import org.sosy_lab.java_smt.basicimpl.Visitor;
 
 
 public class BooleanSMTLIB2ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0  {

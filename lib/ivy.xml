@@ -173,6 +173,7 @@ SPDX-License-Identifier: Apache-2.0
         <dependency org="org.codehaus.mojo" name="animal-sniffer-annotations" rev="1.18" conf="core->default;"/>
         <dependency org="org.antlr" name="antlr4-runtime" rev="4.13.1" conf="core->default;"/>
 
+
         <!-- Guava has a dependency on error_prone_annotations without a revision number, need an override. -->
         <override org="com.google.errorprone" module="error_prone_annotations" rev="2.4.0"/>
 

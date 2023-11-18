@@ -50,9 +50,11 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.AllSatModelCallback;
-import org.sosy_lab.java_smt.utils.Generators.Generator;
+import org.sosy_lab.java_smt.basicimpl.Generator;
 
-/** Common base class for {@link Mathsat5TheoremProver} and {@link Mathsat5InterpolatingProver}. */
+/**
+ * Common base class for {@link Mathsat5TheoremProver} and {@link Mathsat5InterpolatingProver}.
+ */
 abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
 
   protected final Mathsat5SolverContext context;
@@ -95,7 +97,9 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
     return cfg;
   }
 
-  /** add needed options into the given map. */
+  /**
+   * add needed options into the given map.
+   */
   protected abstract void createConfig(Map<String, String> pConfig);
 
   @Override
@@ -273,7 +277,8 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
       shutdownNotifier.shutdownIfNecessary();
       clientCallback.apply(
           Collections.unmodifiableList(
-              Lists.transform(Longs.asList(model), ((Mathsat5FormulaCreator) formulaManager.getFormulaCreator())::encapsulateBoolean)));
+              Lists.transform(Longs.asList(model),
+                  ((Mathsat5FormulaCreator) formulaManager.getFormulaCreator())::encapsulateBoolean)));
     }
   }
 }

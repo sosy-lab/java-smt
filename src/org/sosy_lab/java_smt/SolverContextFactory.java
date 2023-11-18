@@ -9,8 +9,6 @@
 package org.sosy_lab.java_smt;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-
-import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -38,7 +36,7 @@ import org.sosy_lab.java_smt.solvers.princess.PrincessSolverContext;
 import org.sosy_lab.java_smt.solvers.smtinterpol.SmtInterpolSolverContext;
 import org.sosy_lab.java_smt.solvers.yices2.Yices2SolverContext;
 import org.sosy_lab.java_smt.solvers.z3.Z3SolverContext;
-import org.sosy_lab.java_smt.utils.Generators.Generator;
+import org.sosy_lab.java_smt.basicimpl.Generator;
 
 /**
  * Factory class for loading and generating solver contexts. Generates a {@link SolverContext}
@@ -229,8 +227,8 @@ public class SolverContextFactory {
       // statistics need to be the most outer wrapping layer.
       context = new StatisticsSolverContext(context);
     }
-    if (generateSMTLIB2 || ! generateSMTLIB2) {
-      Generator.isLoggingEnabled = true;
+    if (generateSMTLIB2 || !generateSMTLIB2) {
+      Generator.setIsLoggingEnabled(true);
 
     }
     return context;

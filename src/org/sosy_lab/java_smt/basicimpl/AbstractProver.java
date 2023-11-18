@@ -25,7 +25,6 @@ import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
-import org.sosy_lab.java_smt.utils.Generators.Generator;
 
 public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
@@ -106,7 +105,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
       throws InterruptedException {
     checkState(!closed);
     Iterables.getLast(assertedFormulas).add(constraint);
-    if (Generator.isLoggingEnabled) {
+    if (Generator.isLoggingEnabled()) {
       Generator.logAddConstraint(constraint);
     }
     return null;

@@ -16,7 +16,8 @@ public abstract class AbstractModel<TFormulaInfo, TType, TEnv>
     extends AbstractEvaluator<TFormulaInfo, TType, TEnv> implements Model {
 
   protected AbstractModel(
-      AbstractProver<?> prover, AbstractFormulaManager<TFormulaInfo, TType, TEnv, ?> pFormulaManager) {
+      AbstractProver<?> prover,
+      AbstractFormulaManager<TFormulaInfo, TType, TEnv, ?> pFormulaManager) {
     super(prover, pFormulaManager);
   }
 

@@ -18,22 +18,21 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.EnumerationFormula;
 import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.StringFormula;
-import org.sosy_lab.java_smt.utils.Generators.Generator;
 
 @SuppressWarnings("ClassTypeParameterName")
 public abstract class AbstractEvaluator<TFormulaInfo, TType, TEnv> implements Evaluator {
 
   private final AbstractProver<?> prover;
   protected final FormulaCreator<TFormulaInfo, TType, TEnv, ?> creator;
-  protected final AbstractFormulaManager <TFormulaInfo, TType, TEnv, ?> formulaManager;
+  protected final AbstractFormulaManager<TFormulaInfo, TType, TEnv, ?> formulaManager;
   private boolean closed = false;
 
   protected AbstractEvaluator(
-      AbstractProver<?> pProver, AbstractFormulaManager<TFormulaInfo, TType, TEnv, ?> pFormulaManager) {
+      AbstractProver<?> pProver,
+      AbstractFormulaManager<TFormulaInfo, TType, TEnv, ?> pFormulaManager) {
     this.prover = pProver;
     this.formulaManager = pFormulaManager;
     this.creator = pFormulaManager.getFormulaCreator();

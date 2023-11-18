@@ -32,7 +32,7 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.utils.Generators.Generator;
+import org.sosy_lab.java_smt.basicimpl.Generator;
 
 public class Main {
   public static void main(String[] args)

@@ -37,10 +37,15 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
   private final long model;
   private final Mathsat5FormulaCreator formulaCreator;
 
-  /** for detecting closed environments, Exception is better than SegFault. */
+  /**
+   * for detecting closed environments, Exception is better than SegFault.
+   */
   private final Mathsat5AbstractProver<?> prover;
 
-  Mathsat5Model(long model, Mathsat5FormulaManager pFormulaManager, Mathsat5AbstractProver<?> pProver) {
+  Mathsat5Model(
+      long model,
+      Mathsat5FormulaManager pFormulaManager,
+      Mathsat5AbstractProver<?> pProver) {
     super(pProver, pFormulaManager);
     this.model = model;
     formulaCreator = (Mathsat5FormulaCreator) pFormulaManager.getFormulaCreator();
@@ -87,7 +92,9 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
         argumentInterpretation);
   }
 
-  /** split an array-assignment into several assignments for all positions. */
+  /**
+   * split an array-assignment into several assignments for all positions.
+   */
   private Collection<ValueAssignment> getArrayAssignments(
       long symbol, long key, long array, List<Object> upperIndices) {
     Collection<ValueAssignment> assignments = new ArrayList<>();

@@ -186,7 +186,8 @@ public class NNFVisitor extends BooleanFormulaTransformationVisitor {
         BooleanFormula processedElseFormula) {
       try {
         return bfmgr.visit(
-            rewriteIfThenElse(processedCondition, processedThenFormula, processedElseFormula), this);
+            rewriteIfThenElse(processedCondition, processedThenFormula, processedElseFormula),
+            this);
       } catch (IOException pE) {
         throw new RuntimeException(pE);
       }

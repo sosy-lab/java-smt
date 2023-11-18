@@ -1,3 +1,4 @@
+(set-logic AUFLIRA)
 (declare-const a1 (Array Int Int))
 (declare-const a2 (Array Int Int))
 (declare-const c1 (Array (Array Int Int) (Array (Array Int Int) (Array Int Int))))

@@ -34,7 +34,7 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.basicimpl.ShutdownHook;
-import org.sosy_lab.java_smt.utils.Generators.Generator;
+import org.sosy_lab.java_smt.basicimpl.Generator;
 
 class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     implements ProverEnvironment, BasicProverEnvironment<Void> {

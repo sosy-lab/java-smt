@@ -24,9 +24,6 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormulaManager;
-import org.sosy_lab.java_smt.utils.Generators.Generator;
-import org.sosy_lab.java_smt.utils.Generators.GeneratorException;
-import org.sosy_lab.java_smt.utils.Generators.NumeralGenerator;
 
 /**
  * Similar to the other Abstract*FormulaManager classes in this package, this class serves as a
@@ -94,7 +91,7 @@ public abstract class AbstractNumeralFormulaManager<
   @Override
   public ResultFormulaType makeNumber(long i) {
     ResultFormulaType result = wrap(makeNumberImpl(i));
-    if (Generator.isLoggingEnabled) {
+    if (Generator.isLoggingEnabled()) {
       NumeralGenerator.logMakeNumber(result, String.valueOf(i));
     }
     return result;
@@ -105,7 +102,7 @@ public abstract class AbstractNumeralFormulaManager<
   @Override
   public ResultFormulaType makeNumber(BigInteger i) {
     ResultFormulaType result = wrap(makeNumberImpl(i));
-    if (Generator.isLoggingEnabled) {
+    if (Generator.isLoggingEnabled()) {
       NumeralGenerator.logMakeNumber(result, String.valueOf(i));
     }
     return result;
@@ -116,7 +113,7 @@ public abstract class AbstractNumeralFormulaManager<
   @Override
   public ResultFormulaType makeNumber(String i) {
     ResultFormulaType result = wrap(makeNumberImpl(i));
-    if (Generator.isLoggingEnabled) {
+    if (Generator.isLoggingEnabled()) {
       NumeralGenerator.logMakeNumber(result, i);
     }
     return result;
@@ -127,7 +124,7 @@ public abstract class AbstractNumeralFormulaManager<
   @Override
   public ResultFormulaType makeNumber(Rational pRational) {
     ResultFormulaType result = wrap(makeNumberImpl(pRational));
-    if (Generator.isLoggingEnabled) {
+    if (Generator.isLoggingEnabled()) {
       NumeralGenerator.logMakeNumber(result, String.valueOf(pRational));
     }
     return result;
@@ -140,7 +137,7 @@ public abstract class AbstractNumeralFormulaManager<
   @Override
   public ResultFormulaType makeNumber(double pNumber) {
     ResultFormulaType result = wrap(makeNumberImpl(pNumber));
-    if (Generator.isLoggingEnabled) {
+    if (Generator.isLoggingEnabled()) {
       NumeralGenerator.logMakeNumber(result, String.valueOf(pNumber));
     }
     return wrap(makeNumberImpl(pNumber));
@@ -151,7 +148,7 @@ public abstract class AbstractNumeralFormulaManager<
   @Override
   public ResultFormulaType makeNumber(BigDecimal pNumber) {
     ResultFormulaType result = wrap(makeNumberImpl(pNumber));
-    if (Generator.isLoggingEnabled) {
+    if (Generator.isLoggingEnabled()) {
       NumeralGenerator.logMakeNumber(result, String.valueOf(pNumber));
     }
     return wrap(makeNumberImpl(pNumber));
@@ -200,7 +197,7 @@ public abstract class AbstractNumeralFormulaManager<
   public ResultFormulaType makeVariable(String pVar) {
     checkVariableName(pVar);
     ResultFormulaType result = wrap(makeVariableImpl(pVar));
-    if (Generator.isLoggingEnabled) {
+    if (Generator.isLoggingEnabled()) {
       NumeralGenerator.logMakeIntVariable(result, pVar);
     }
     return result;
@@ -212,7 +209,7 @@ public abstract class AbstractNumeralFormulaManager<
   public ResultFormulaType negate(ParamFormulaType pNumber) {
     TFormulaInfo param1 = extractInfo(pNumber);
     ResultFormulaType result = wrap(negate(param1));
-    if (Generator.isLoggingEnabled) {
+    if (Generator.isLoggingEnabled()) {
       NumeralGenerator.logNegate(result, pNumber);
     }
     return wrap(negate(param1));
@@ -225,7 +222,7 @@ public abstract class AbstractNumeralFormulaManager<
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
     ResultFormulaType result = wrap(add(param1, param2));
-    if (Generator.isLoggingEnabled) {
+    if (Generator.isLoggingEnabled()) {
       NumeralGenerator.logAdd(result, pNumber1, pNumber2);
     }
     return result;
@@ -236,7 +233,7 @@ public abstract class AbstractNumeralFormulaManager<
   @Override
   public ResultFormulaType sum(List<ParamFormulaType> operands) {
     ResultFormulaType result = wrap(sumImpl(Lists.transform(operands, this::extractInfo)));
-    if (Generator.isLoggingEnabled) {
+    if (Generator.isLoggingEnabled()) {
       NumeralGenerator.logSum(result, operands);
     }
     return result;
@@ -255,7 +252,7 @@ public abstract class AbstractNumeralFormulaManager<
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
     ResultFormulaType result = wrap(subtract(param1, param2));
-    if (Generator.isLoggingEnabled) {
+    if (Generator.isLoggingEnabled()) {
       NumeralGenerator.logSubtract(result, pNumber1, pNumber2);
     }
     return result;
@@ -286,7 +283,7 @@ public abstract class AbstractNumeralFormulaManager<
         }
       }
     }
-    if (Generator.isLoggingEnabled) {
+    if (Generator.isLoggingEnabled()) {
       NumeralGenerator.logDivide(wrap(result), pNumber1, pNumber2);
     }
     return wrap(result);
@@ -321,7 +318,7 @@ public abstract class AbstractNumeralFormulaManager<
         }
       }
     }
-    if (Generator.isLoggingEnabled) {
+    if (Generator.isLoggingEnabled()) {
       NumeralGenerator.logModulo(wrap(result), pNumber1, pNumber2);
     }
     return wrap(result);
@@ -345,7 +342,7 @@ public abstract class AbstractNumeralFormulaManager<
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
     BooleanFormula result = wrapBool(modularCongruence(param1, param2, pModulo));
-    if (Generator.isLoggingEnabled) {
+    if (Generator.isLoggingEnabled()) {
       throw new GeneratorException("Modular Congruence is not available in SMTLIB2. ");
     }
     return result;
@@ -360,7 +357,7 @@ public abstract class AbstractNumeralFormulaManager<
     TFormulaInfo param2 = extractInfo(pNumber2);
 
     BooleanFormula result = wrapBool(modularCongruence(param1, param2, pModulo));
-    if (Generator.isLoggingEnabled) {
+    if (Generator.isLoggingEnabled()) {
       throw new GeneratorException("Modular Congruence is not available in SMTLIB2. ");
     }
     return result;
@@ -408,7 +405,7 @@ public abstract class AbstractNumeralFormulaManager<
         }
       }
     }
-    if (Generator.isLoggingEnabled) {
+    if (Generator.isLoggingEnabled()) {
       NumeralGenerator.logMultiply(wrap(result), pNumber1, pNumber2);
     }
     return wrap(result);
@@ -430,7 +427,7 @@ public abstract class AbstractNumeralFormulaManager<
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
     BooleanFormula result = wrapBool(equal(param1, param2));
-    if (Generator.isLoggingEnabled) {
+    if (Generator.isLoggingEnabled()) {
       NumeralGenerator.logEqual(result, pNumber1, pNumber2);
     }
     return result;
@@ -441,7 +438,7 @@ public abstract class AbstractNumeralFormulaManager<
   @Override
   public BooleanFormula distinct(List<ParamFormulaType> pNumbers) {
     BooleanFormula result =  wrapBool(distinctImpl(Lists.transform(pNumbers, this::extractInfo)));
-    if (Generator.isLoggingEnabled) {
+    if (Generator.isLoggingEnabled()) {
       NumeralGenerator.logDistinct(result, pNumbers);
     }
     return result;
@@ -454,7 +451,7 @@ public abstract class AbstractNumeralFormulaManager<
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
     BooleanFormula result = wrapBool(greaterThan(param1, param2));
-    if (Generator.isLoggingEnabled) {
+    if (Generator.isLoggingEnabled()) {
       NumeralGenerator.logGreaterThan(result, pNumber1, pNumber2);
     }
     return result;
@@ -467,7 +464,7 @@ public abstract class AbstractNumeralFormulaManager<
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
     BooleanFormula result = wrapBool(greaterOrEquals(param1, param2));
-    if (Generator.isLoggingEnabled) {
+    if (Generator.isLoggingEnabled()) {
       NumeralGenerator.logGreaterOrEquals(result, pNumber1, pNumber2);
     }
     return result;
@@ -480,7 +477,7 @@ public abstract class AbstractNumeralFormulaManager<
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
     BooleanFormula result = wrapBool(lessThan(param1, param2));
-    if (Generator.isLoggingEnabled) {
+    if (Generator.isLoggingEnabled()) {
       NumeralGenerator.logLessThan(result, pNumber1, pNumber2);
     }
     return result;
@@ -493,7 +490,7 @@ public abstract class AbstractNumeralFormulaManager<
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
     BooleanFormula result = wrapBool(lessOrEquals(param1, param2));
-    if (Generator.isLoggingEnabled) {
+    if (Generator.isLoggingEnabled()) {
       NumeralGenerator.logLessOrEquals(result, pNumber1, pNumber2);
     }
     return result;
@@ -505,14 +502,14 @@ public abstract class AbstractNumeralFormulaManager<
   public IntegerFormula floor(ParamFormulaType number) {
     if (getFormulaCreator().getFormulaType(number) == FormulaType.IntegerType) {
       IntegerFormula result = (IntegerFormula) number;
-      if (Generator.isLoggingEnabled) {
+      if (Generator.isLoggingEnabled()) {
         NumeralGenerator.logFloor(result, number);
       }
       return result;
     } else {
       IntegerFormula result = getFormulaCreator().encapsulate(FormulaType.IntegerType,
           floor(extractInfo(number)));
-      if (Generator.isLoggingEnabled) {
+      if (Generator.isLoggingEnabled()) {
         NumeralGenerator.logFloor(result, number);
       }
       return result;

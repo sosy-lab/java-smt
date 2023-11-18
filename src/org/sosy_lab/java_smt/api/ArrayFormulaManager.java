@@ -8,9 +8,7 @@
 
 package org.sosy_lab.java_smt.api;
 
-import java.io.IOException;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
-import org.sosy_lab.java_smt.utils.Generators.GeneratorException;
 
 /**
  * This interface represents the theory of (arbitrarily nested) arrays. (as defined in the SMTLIB2

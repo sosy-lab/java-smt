@@ -20,7 +20,6 @@ import java.util.Collection;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
-import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 
 public class CVC5Model extends AbstractModel<Term, Sort, Solver> {

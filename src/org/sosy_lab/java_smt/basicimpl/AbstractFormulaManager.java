@@ -46,9 +46,8 @@ import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 import org.sosy_lab.java_smt.basicimpl.tactics.NNFVisitor;
-import org.sosy_lab.java_smt.utils.Parsers.Visitor;
-import org.sosy_lab.java_smt.utils.Parsers.smtlibv2Lexer;
-import org.sosy_lab.java_smt.utils.Parsers.smtlibv2Parser;
+import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Lexer;
+import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Parser;
 import org.sosy_lab.java_smt.utils.SolverUtils;
 
 /**

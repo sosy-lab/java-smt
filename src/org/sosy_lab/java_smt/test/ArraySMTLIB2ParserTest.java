@@ -34,8 +34,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.utils.Generators.Generator;
-import org.sosy_lab.java_smt.utils.Parsers.Visitor;
+import org.sosy_lab.java_smt.basicimpl.Visitor;
 
 
 public class ArraySMTLIB2ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {

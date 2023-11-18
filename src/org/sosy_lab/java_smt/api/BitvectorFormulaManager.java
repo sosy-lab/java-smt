@@ -12,7 +12,7 @@ import java.math.BigInteger;
 import java.util.List;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.java_smt.utils.Generators.GeneratorException;
+import org.sosy_lab.java_smt.basicimpl.GeneratorException;
 
 /** Manager for dealing with formulas of the bitvector sort. */
 public interface BitvectorFormulaManager {

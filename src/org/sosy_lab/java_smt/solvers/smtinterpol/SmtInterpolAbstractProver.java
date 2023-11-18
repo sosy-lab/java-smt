@@ -44,7 +44,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
-import org.sosy_lab.java_smt.utils.Generators.Generator;
+import org.sosy_lab.java_smt.basicimpl.Generator;
 
 @SuppressWarnings("ClassTypeParameterName")
 abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {

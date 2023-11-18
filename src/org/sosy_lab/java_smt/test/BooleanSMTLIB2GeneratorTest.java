@@ -21,7 +21,7 @@
 package org.sosy_lab.java_smt.test;
 
 import org.junit.*;
-import org.sosy_lab.java_smt.utils.Generators.Generator;
+import org.sosy_lab.java_smt.basicimpl.Generator;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 
 

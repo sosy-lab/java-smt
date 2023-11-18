@@ -32,7 +32,11 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
 
   private final Z3FormulaCreator z3creator;
 
-  Z3Model(AbstractProver<?> pProver, long z3context, long z3model, Z3FormulaManager pFormulaManager) {
+  Z3Model(
+      AbstractProver<?> pProver,
+      long z3context,
+      long z3model,
+      Z3FormulaManager pFormulaManager) {
     super(pProver, pFormulaManager);
     Native.modelIncRef(z3context, z3model);
     model = z3model;
@@ -90,7 +94,7 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
     Preconditions.checkArgument(
         Native.getArity(z3context, keyDecl) == 0, "Declaration is not a constant");
 
-    long var = Native.mkApp(z3context, keyDecl, 0, new long[] {});
+    long var = Native.mkApp(z3context, keyDecl, 0, new long[]{});
     long value = Native.modelGetConstInterp(z3context, model, keyDecl);
     checkReturnValue(value, keyDecl);
     Native.incRef(z3context, value);
@@ -138,7 +142,9 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
     }
   }
 
-  /** unrolls an constant array assignment. */
+  /**
+   * unrolls an constant array assignment.
+   */
   private Collection<ValueAssignment> getConstantArrayAssignment(
       long arraySymbol, long value, long decl) {
 
@@ -271,8 +277,8 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
   /**
    * get all ValueAssignments for a function declaration in the model.
    *
-   * @param evalDecl function declaration where the evaluation comes from
-   * @param funcDecl function declaration where the function name comes from
+   * @param evalDecl     function declaration where the evaluation comes from
+   * @param funcDecl     function declaration where the function name comes from
    * @param functionName the name of the funcDecl
    */
   private Collection<ValueAssignment> getFunctionAssignments(
@@ -321,7 +327,7 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
 
   /**
    * @return ValueAssignment for an entry (one evaluation) of an uninterpreted function in the
-   *     model.
+   * model.
    */
   private ValueAssignment getFunctionAssignment(
       String functionName, long funcDecl, long entry, long entryValue) {
@@ -336,8 +342,8 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
       // indirect assignments
       assert !Native.isAsArray(z3context, arg)
           : String.format(
-              "unexpected array-reference '%s' as evaluation of a UF parameter for UF '%s'.",
-              Native.astToString(z3context, arg), Native.funcDeclToString(z3context, funcDecl));
+          "unexpected array-reference '%s' as evaluation of a UF parameter for UF '%s'.",
+          Native.astToString(z3context, arg), Native.funcDeclToString(z3context, funcDecl));
       argumentInterpretation.add(z3creator.convertValue(arg));
       args[k] = arg;
     }

@@ -20,7 +20,10 @@ public class CVC4Evaluator extends AbstractEvaluator<Expr, Type, ExprManager> {
   private final SmtEngine smtEngine;
   private final CVC4TheoremProver prover;
 
-  CVC4Evaluator(CVC4TheoremProver pProver, CVC4FormulaManager pFormulaManager, SmtEngine pSmtEngine) {
+  CVC4Evaluator(
+      CVC4TheoremProver pProver,
+      CVC4FormulaManager pFormulaManager,
+      SmtEngine pSmtEngine) {
     super(pProver, pFormulaManager);
     smtEngine = pSmtEngine;
     prover = pProver;
@@ -32,7 +35,9 @@ public class CVC4Evaluator extends AbstractEvaluator<Expr, Type, ExprManager> {
     return getValue(f);
   }
 
-  /** we need to convert the given expression into the current context. */
+  /**
+   * we need to convert the given expression into the current context.
+   */
   private Expr getValue(Expr f) {
     return prover.exportExpr(smtEngine.getValue(prover.importExpr(f)));
   }

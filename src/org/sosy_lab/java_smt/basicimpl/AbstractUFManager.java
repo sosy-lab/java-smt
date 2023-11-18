@@ -18,8 +18,6 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.UFManager;
-import org.sosy_lab.java_smt.utils.Generators.Generator;
-import org.sosy_lab.java_smt.utils.Generators.UFGenerator;
 
 /**
  * This class simplifies the implementation of the FunctionFormulaManager by converting the types to
@@ -52,7 +50,7 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
         pArgTypes,
         pReturnType,
         formulaCreator.declareUFImpl(pName, toSolverType(pReturnType), argTypes));
-    if (Generator.isLoggingEnabled) {
+    if (Generator.isLoggingEnabled()) {
       UFGenerator.logMakeFun(result, pName, pReturnType, pArgTypes);
     }
     return result;
@@ -69,7 +67,7 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
   @Override
   public <T extends Formula> T callUF(FunctionDeclaration<T> funcType, Formula... args) {
     T result = formulaCreator.callFunction(funcType, Arrays.asList(args));
-    if (Generator.isLoggingEnabled) {
+    if (Generator.isLoggingEnabled()) {
       UFGenerator.logCallFun(result, funcType, args);
     }
     return result;
@@ -79,7 +77,7 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
   public final <T extends Formula> T callUF(
       FunctionDeclaration<T> pFunc, List<? extends Formula> pArgs) {
     T result = formulaCreator.callFunction(pFunc, pArgs);
-    if (Generator.isLoggingEnabled) {
+    if (Generator.isLoggingEnabled()) {
       UFGenerator.logCallFun(result, pFunc, pArgs);
     }
     return result;
@@ -95,7 +93,7 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
     List<FormulaType<?>> argTypes = Lists.transform(pArgs, getFormulaCreator()::getFormulaType);
     FunctionDeclaration<T> func = declareUF(name, pReturnType, argTypes);
     T result = callUF(func, pArgs);
-    if (Generator.isLoggingEnabled) {
+    if (Generator.isLoggingEnabled()) {
       UFGenerator.logCallFun(result, declareUF(name, pReturnType, argTypes), pArgs);
     }
     return result;

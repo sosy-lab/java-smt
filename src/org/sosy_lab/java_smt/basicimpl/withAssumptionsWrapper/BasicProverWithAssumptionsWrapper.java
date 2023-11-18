@@ -19,7 +19,6 @@ import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.utils.Generators.Generator;
 
 public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironment<T>>
     implements BasicProverEnvironment<T> {
@@ -79,8 +78,11 @@ public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironme
     return delegate.isUnsat();
   }
 
-  /** overridden in sub-class. */
-  protected void registerPushedFormula(@SuppressWarnings("unused") T pPushResult) {}
+  /**
+   * overridden in sub-class.
+   */
+  protected void registerPushedFormula(@SuppressWarnings("unused") T pPushResult) {
+  }
 
   @Override
   public Model getModel() throws SolverException {
@@ -99,7 +101,8 @@ public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironme
 
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
-      Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException, IOException {
+      Collection<BooleanFormula> pAssumptions)
+      throws SolverException, InterruptedException, IOException {
     clearAssumptions();
     return delegate.unsatCoreOverAssumptions(pAssumptions);
     //    if (isUnsatWithAssumptions(pAssumptions)) {
