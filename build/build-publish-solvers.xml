@@ -654,6 +654,71 @@ SPDX-License-Identifier: Apache-2.0
     </target>
     <!-- }}} -->
 
+    <!-- SECTION: Publishing Princess {{{1
+         ==================================================================
+    -->
+    <target name="package-princess" depends="">
+        <!-- Copy princess binaries to the root folder along with the version postfix. -->
+        <!--
+        <fail unless="cvc4.path">
+            Please specify the path to CVC4 with the flag -Dcvc4.path=/path/to/cvc4.
+            The path has to point to the root CVC4 folder, i.e.,
+            a checkout of the official git repositoy from 'https://github.com/CVC4/CVC4.git'.
+            Note that shell substitutions do not work and a full absolute path has to be specified.
+        </fail>
+        <fail unless="cvc4.customRev">
+            Please specify a custom revision with the flag -Dcvc4.customRev=XXX.
+            The custom revision has to be unique amongst the already known version
+            numbers from the ivy repository. The script will append the git revision.
+        </fail>
+        -->
+
+        <!--
+        So wird das Jar aufgerufen, wenn man die Binary runterlädt:
+        export CLASSPATH=$CLASSPATH:$BASEDIR/dist/princess-all.jar
+        exec java -Xss20000k -Xmx1500m -noverify ap.CmdlMain "$@"
+
+        Habe das Manifest wie in der ersten Zeile angepasst, da fliegt mit dem Befehl in der
+        zweiten Zeile der
+        Fehler in der dritten Zeile:
+       MANIFEST.MF: Main-Class: ap.CmdlMain
+       $ java -Xss20000k -Xmx1500m -noverify -jar princess-all.jar -help
+        kein Hauptmanifestattribut, in princess-all.jar
+
+        Mit diesem Aufruf kann man das Jar ohne Fehler ausführen:
+       $ java -Xss20000k -Xmx1500m -noverify -cp princess-all.jar ap.CmdlMain
+        ________       _____
+        ___  __ \_________(_)________________________________
+        __  /_/ /_  ___/_  /__  __ \  ___/  _ \_  ___/_  ___/
+        _  ____/_  /   _  / _  / / / /__ /  __/(__  )_(__  )
+        /_/     /_/    /_/  /_/ /_/\___/ \___//____/ /____/
+
+
+        => ap.CmdlMain muss als Parameter übergeben werden?
+         -->
+
+        <!-- copy library files into directory to be published for IVY -->
+        <copy file="princess_all.jar" tofile="princess-VERSION.jar"/>
+    </target>
+
+    <target name="publish-princess" depends="package-princess, load-ivy"
+            description="Publish princess binaries to Ivy repository.">
+
+        <ivy:resolve conf="solver-princess" file="solvers_ivy_conf/ivy_princess.xml" />
+        <available property="ivy.hasrepository" file="repository/${ivy.organisation}/${ivy.module}" />
+        <fail unless="ivy.hasrepository"
+              message="Cannot publish without 'repository' dir, please run 'svn co https://svn.sosy-lab.org/software/ivy/repository/${ivy.organisation}/${ivy.module} repository/${ivy.organisation}/${ivy.module}'." />
+
+        <ivy:publish
+                pubrevision="princess-VERSION"
+                resolver="Sosy-Lab-Publish"
+                artifactspattern="[artifact]-[revision].[ext]"
+                status="release"
+        />
+    </target>
+
+    <!-- }}} -->
+
     <macrodef name="checkPathOption">
         <attribute name="pathOption"/>
         <attribute name="defaultPath"/>
