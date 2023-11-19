@@ -47,11 +47,13 @@ import ap.types.Sort$;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Table;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -78,6 +80,8 @@ class PrincessFormulaCreator
   // Java-SMT kind
   private static final Map<IFunction, FunctionDeclarationKind> theoryFunctionKind = new HashMap<>();
   private static final Map<Predicate, FunctionDeclarationKind> theoryPredKind = new HashMap<>();
+  private static final Set<String> CONSTANT_UFS =
+      ImmutableSet.of("str_cons", "str_empty", "Rat_int", "Rat_frac");
 
   static {
     theoryFunctionKind.put(ModuloArithmetic.bv_concat(), FunctionDeclarationKind.BV_CONCAT);
@@ -196,6 +200,7 @@ class PrincessFormulaCreator
           // we found a bitvector BV(lower, upper, ctxt), lets extract the last parameter
           return ((IIntLit) fun.apply(2)).value().bigIntValue();
         case "_int":
+        case "Rat_int":
           Preconditions.checkArgument(fun.fun().arity() == 1);
           ITerm term = fun.apply(0);
           if (term instanceof IIntLit) {
@@ -439,9 +444,7 @@ class PrincessFormulaCreator
     }
 
     if (kind == FunctionDeclarationKind.UF && input instanceof IFunApp) {
-      if (PrincessEnvironment.stringTheory.str_cons().equals(((IFunApp) input).fun())
-          || PrincessEnvironment.stringTheory.str_empty().equals(((IFunApp) input).fun())) {
-        // str_cons(97, str_cons(98, str_empty)) -> String "ab"
+      if (CONSTANT_UFS.contains(((IFunApp) input).fun().name())) {
         return visitor.visitConstant(f, convertValue(input));
       }
     }
