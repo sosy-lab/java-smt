@@ -160,6 +160,8 @@ class PrincessFormulaCreator
     theoryPredKind.put(
         PrincessEnvironment.stringTheory.str_contains(), FunctionDeclarationKind.STR_CONTAINS);
     theoryPredKind.put(
+        PrincessEnvironment.stringTheory.str_$less$eq(), FunctionDeclarationKind.STR_LE);
+    theoryPredKind.put(
         PrincessEnvironment.stringTheory.str_in_re(), FunctionDeclarationKind.STR_IN_RE);
   }
 
