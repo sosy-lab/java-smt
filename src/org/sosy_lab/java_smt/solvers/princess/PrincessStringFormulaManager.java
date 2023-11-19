@@ -110,7 +110,7 @@ public class PrincessStringFormulaManager
 
   @Override
   protected ITerm charAt(IExpression str, IExpression index) {
-    return new IFunApp(PrincessEnvironment.stringTheory.str_char(), toITermSeq(str, index));
+    return new IFunApp(PrincessEnvironment.stringTheory.str_at(), toITermSeq(str, index));
   }
 
   @Override

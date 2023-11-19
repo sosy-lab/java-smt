@@ -48,7 +48,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Table;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -118,7 +117,7 @@ class PrincessFormulaCreator
     theoryFunctionKind.put(
         PrincessEnvironment.stringTheory.str_indexof(), FunctionDeclarationKind.STR_INDEX_OF);
     theoryFunctionKind.put(
-        PrincessEnvironment.stringTheory.str_char(), FunctionDeclarationKind.STR_CHAR_AT);
+        PrincessEnvironment.stringTheory.str_at(), FunctionDeclarationKind.STR_CHAR_AT);
     theoryFunctionKind.put(
         PrincessEnvironment.stringTheory.str_substr(), FunctionDeclarationKind.STR_SUBSTRING);
     theoryFunctionKind.put(
@@ -234,13 +233,22 @@ class PrincessFormulaCreator
   private Object strToString(IFunApp fun) {
     final StringBuilder str = new StringBuilder();
     while ("str_cons".equals(fun.fun().name())) {
-      Preconditions.checkArgument(fun.fun().arity() == 2);
-      BigInteger chr = ((IIntLit) fun.apply(0)).value().bigIntValue();
-      str.append(Character.toString(chr.intValue()));
+      checkArgument(fun.fun().arity() == 2);
+      ITerm arg = fun.apply(0);
+      IIntLit chr;
+      if (arg instanceof IIntLit) {
+        chr = ((IIntLit) arg);
+      } else if (arg instanceof IFunApp
+          && ModuloArithmetic.mod_cast().equals(((IFunApp) arg).fun())) {
+        chr = ((IIntLit) ((IFunApp) arg).apply(2));
+      } else {
+        throw new AssertionError("unexpected string value: " + fun);
+      }
+      str.append(Character.toString(chr.value().bigIntValue().intValue()));
       fun = (IFunApp) fun.apply(1);
     }
-    Preconditions.checkArgument("str_empty".equals(fun.fun().name()));
-    Preconditions.checkArgument(fun.fun().arity() == 0);
+    checkArgument("str_empty".equals(fun.fun().name()));
+    checkArgument(fun.fun().arity() == 0);
     return str.toString();
   }
 
@@ -381,101 +389,105 @@ class PrincessFormulaCreator
               ImmutableList.of(coeffType, factorType),
               getFormulaType(f),
               PrincessMultiplyDeclaration.INSTANCE));
+    }
 
-    } else {
+    // then we have to check the declaration kind
+    final FunctionDeclarationKind kind = getDeclarationKind(input);
 
-      // then we have to check the declaration kind
-      final FunctionDeclarationKind kind = getDeclarationKind(input);
+    if (kind == FunctionDeclarationKind.EQ) {
+      scala.Option<scala.Tuple2<ITerm, ITerm>> maybeArgs =
+          IExpression.Eq$.MODULE$.unapply((IFormula) input);
 
-      if (kind == FunctionDeclarationKind.EQ) {
-        scala.Option<scala.Tuple2<ITerm, ITerm>> maybeArgs =
-            IExpression.Eq$.MODULE$.unapply((IFormula) input);
+      assert maybeArgs.isDefined();
 
-        assert maybeArgs.isDefined();
+      final ITerm left = maybeArgs.get()._1;
+      final ITerm right = maybeArgs.get()._2;
 
-        final ITerm left = maybeArgs.get()._1;
-        final ITerm right = maybeArgs.get()._2;
+      ImmutableList.Builder<Formula> args = ImmutableList.builder();
+      ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
 
-        ImmutableList.Builder<Formula> args = ImmutableList.builder();
-        ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
+      FormulaType<?> argumentTypeLeft = getFormulaType(left);
+      args.add(encapsulate(argumentTypeLeft, left));
+      argTypes.add(argumentTypeLeft);
+      FormulaType<?> argumentTypeRight = getFormulaType(right);
+      args.add(encapsulate(argumentTypeRight, right));
+      argTypes.add(argumentTypeRight);
 
-        FormulaType<?> argumentTypeLeft = getFormulaType(left);
-        args.add(encapsulate(argumentTypeLeft, left));
-        argTypes.add(argumentTypeLeft);
-        FormulaType<?> argumentTypeRight = getFormulaType(right);
-        args.add(encapsulate(argumentTypeRight, right));
-        argTypes.add(argumentTypeRight);
+      return visitor.visitFunction(
+          f,
+          args.build(),
+          FunctionDeclarationImpl.of(
+              getName(input),
+              FunctionDeclarationKind.EQ,
+              argTypes.build(),
+              getFormulaType(f),
+              PrincessEquationDeclaration.INSTANCE));
+    }
 
-        return visitor.visitFunction(
-            f,
-            args.build(),
-            FunctionDeclarationImpl.of(
-                getName(input),
-                FunctionDeclarationKind.EQ,
-                argTypes.build(),
-                getFormulaType(f),
-                PrincessEquationDeclaration.INSTANCE));
+    if (kind == FunctionDeclarationKind.UF && input instanceof IIntFormula) {
+      assert ((IIntFormula) input).rel().equals(IIntRelation.EqZero());
+      // this is really a Boolean formula, visit the lhs of the equation
+      return visit(visitor, f, ((IIntFormula) input).t());
+    }
 
-      } else if (kind == FunctionDeclarationKind.UF && input instanceof IIntFormula) {
-
-        assert ((IIntFormula) input).rel().equals(IIntRelation.EqZero());
-
-        // this is really a Boolean formula, visit the lhs of the equation
-        return visit(visitor, f, ((IIntFormula) input).t());
-
-      } else if (kind == FunctionDeclarationKind.OTHER
-          && input instanceof IFunApp
-          && ((IFunApp) input).fun() == ModuloArithmetic.mod_cast()
+    if (kind == FunctionDeclarationKind.OTHER && input instanceof IFunApp) {
+      if (ModuloArithmetic.mod_cast().equals(((IFunApp) input).fun())
           && ((IFunApp) input).apply(2) instanceof IIntLit) {
+        // mod_cast(0, 256, 7) -> BV=7 with bitsize=8
         return visitor.visitConstant(f, convertValue(input));
-
-      } else {
-
-        ImmutableList.Builder<Formula> args = ImmutableList.builder();
-        ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
-        int arity = input.length();
-        int arityStart = 0;
-
-        PrincessFunctionDeclaration solverDeclaration;
-        if (isBitvectorOperationWithAdditionalArgument(kind)) {
-          // the first argument is the bitsize, and it is not relevant for the user.
-          // we do not want type/sort information as arguments.
-          arityStart = 1;
-          if (input instanceof IAtom) {
-            solverDeclaration = new PrincessBitvectorToBooleanDeclaration(((IAtom) input).pred());
-          } else if (input instanceof IFunApp) {
-            solverDeclaration =
-                new PrincessBitvectorToBitvectorDeclaration(((IFunApp) input).fun());
-          } else {
-            throw new AssertionError(
-                String.format("unexpected bitvector operation '%s' for formula '%s'", kind, input));
-          }
-        } else if (input instanceof IFunApp) {
-          if (kind == FunctionDeclarationKind.UF) {
-            solverDeclaration = new PrincessIFunctionDeclaration(((IFunApp) input).fun());
-          } else if (kind == FunctionDeclarationKind.MUL) {
-            solverDeclaration = PrincessMultiplyDeclaration.INSTANCE;
-          } else {
-            solverDeclaration = new PrincessByExampleDeclaration(input);
-          }
-        } else {
-          solverDeclaration = new PrincessByExampleDeclaration(input);
-        }
-
-        for (int i = arityStart; i < arity; i++) {
-          IExpression arg = input.apply(i);
-          FormulaType<?> argumentType = getFormulaType(arg);
-          args.add(encapsulate(argumentType, arg));
-          argTypes.add(argumentType);
-        }
-
-        return visitor.visitFunction(
-            f,
-            args.build(),
-            FunctionDeclarationImpl.of(
-                getName(input), kind, argTypes.build(), getFormulaType(f), solverDeclaration));
       }
     }
+
+    if (kind == FunctionDeclarationKind.UF && input instanceof IFunApp) {
+      if (PrincessEnvironment.stringTheory.str_cons().equals(((IFunApp) input).fun())
+          || PrincessEnvironment.stringTheory.str_empty().equals(((IFunApp) input).fun())) {
+        // str_cons(97, str_cons(98, str_empty)) -> String "ab"
+        return visitor.visitConstant(f, convertValue(input));
+      }
+    }
+
+    ImmutableList.Builder<Formula> args = ImmutableList.builder();
+    ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
+    int arity = input.length();
+    int arityStart = 0;
+
+    PrincessFunctionDeclaration solverDeclaration;
+    if (isBitvectorOperationWithAdditionalArgument(kind)) {
+      // the first argument is the bitsize, and it is not relevant for the user.
+      // we do not want type/sort information as arguments.
+      arityStart = 1;
+      if (input instanceof IAtom) {
+        solverDeclaration = new PrincessBitvectorToBooleanDeclaration(((IAtom) input).pred());
+      } else if (input instanceof IFunApp) {
+        solverDeclaration = new PrincessBitvectorToBitvectorDeclaration(((IFunApp) input).fun());
+      } else {
+        throw new AssertionError(
+            String.format("unexpected bitvector operation '%s' for formula '%s'", kind, input));
+      }
+    } else if (input instanceof IFunApp) {
+      if (kind == FunctionDeclarationKind.UF) {
+        solverDeclaration = new PrincessIFunctionDeclaration(((IFunApp) input).fun());
+      } else if (kind == FunctionDeclarationKind.MUL) {
+        solverDeclaration = PrincessMultiplyDeclaration.INSTANCE;
+      } else {
+        solverDeclaration = new PrincessByExampleDeclaration(input);
+      }
+    } else {
+      solverDeclaration = new PrincessByExampleDeclaration(input);
+    }
+
+    for (int i = arityStart; i < arity; i++) {
+      IExpression arg = input.apply(i);
+      FormulaType<?> argumentType = getFormulaType(arg);
+      args.add(encapsulate(argumentType, arg));
+      argTypes.add(argumentType);
+    }
+
+    return visitor.visitFunction(
+        f,
+        args.build(),
+        FunctionDeclarationImpl.of(
+            getName(input), kind, argTypes.build(), getFormulaType(f), solverDeclaration));
   }
 
   private boolean isBitvectorOperationWithAdditionalArgument(FunctionDeclarationKind kind) {
