@@ -54,6 +54,7 @@ import java.io.StringReader;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -64,6 +65,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
@@ -702,6 +704,15 @@ class PrincessEnvironment {
 
   static <T> Seq<T> toSeq(List<T> list) {
     return collectionAsScalaIterableConverter(list).asScala().toSeq();
+  }
+
+  static Seq<ITerm> toITermSeq(List<IExpression> exprs) {
+    return PrincessEnvironment.toSeq(
+        exprs.stream().map(e -> (ITerm) e).collect(Collectors.toList()));
+  }
+
+  static Seq<ITerm> toITermSeq(IExpression... exprs) {
+    return toITermSeq(Arrays.asList(exprs));
   }
 
   IExpression simplify(IExpression f) {

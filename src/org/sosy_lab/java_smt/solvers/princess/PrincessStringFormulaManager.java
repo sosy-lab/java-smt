@@ -8,6 +8,8 @@
 
 package org.sosy_lab.java_smt.solvers.princess;
 
+import static org.sosy_lab.java_smt.solvers.princess.PrincessEnvironment.toITermSeq;
+
 import ap.parser.IAtom;
 import ap.parser.IBinFormula;
 import ap.parser.IBinJunctor;
@@ -17,12 +19,9 @@ import ap.parser.IFunApp;
 import ap.parser.INot;
 import ap.parser.ITerm;
 import ap.types.Sort;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager;
-import scala.collection.immutable.Seq;
 
 public class PrincessStringFormulaManager
     extends AbstractStringFormulaManager<
@@ -30,15 +29,6 @@ public class PrincessStringFormulaManager
 
   PrincessStringFormulaManager(PrincessFormulaCreator pCreator) {
     super(pCreator);
-  }
-
-  static Seq<ITerm> toITermSeq(List<IExpression> exprs) {
-    return PrincessEnvironment.toSeq(
-        exprs.stream().map(e -> (ITerm) e).collect(Collectors.toList()));
-  }
-
-  static Seq<ITerm> toITermSeq(IExpression... exprs) {
-    return toITermSeq(Arrays.asList(exprs));
   }
 
   @Override
