@@ -13,6 +13,7 @@ import static org.sosy_lab.java_smt.solvers.princess.PrincessEnvironment.toSeq;
 
 import ap.basetypes.IdealInt;
 import ap.parser.IAtom;
+import ap.parser.IConstant;
 import ap.parser.IExpression;
 import ap.parser.IExpression.BooleanFunApplier;
 import ap.parser.IFormula;
@@ -21,10 +22,13 @@ import ap.parser.IFunction;
 import ap.parser.IIntLit;
 import ap.parser.ITerm;
 import ap.parser.ITermITE;
+import ap.terfor.ConstantTerm;
 import ap.terfor.preds.Predicate;
 import ap.theories.nia.GroebnerMultiplication;
+import ap.types.MonoSortedIFunction;
 import ap.types.Sort;
 import ap.types.Sort$;
+import ap.types.SortedConstantTerm;
 import ap.types.SortedIFunction$;
 import java.util.ArrayList;
 import java.util.List;
@@ -88,12 +92,16 @@ abstract class PrincessFunctionDeclaration {
           args.size() == declarationItem.arity(), "functiontype has different number of args.");
 
       final List<ITerm> argsList = new ArrayList<>();
-      for (IExpression arg : args) {
-        ITerm termArg;
+      for (int i = 0; i < args.size(); i++) {
+        final IExpression arg = args.get(i);
+        final ITerm termArg;
         if (arg instanceof IFormula) { // boolean term -> build ITE(t,0,1)
           termArg =
               new ITermITE(
                   (IFormula) arg, new IIntLit(IdealInt.ZERO()), new IIntLit(IdealInt.ONE()));
+        } else if (!isRationalSortArg(arg) && isRationalSortArgument(i)) {
+          // sort does not match, so we need  to cast the argument to rational theory.
+          termArg = PrincessEnvironment.rationalTheory.int2ring((ITerm) arg);
         } else {
           termArg = (ITerm) arg;
         }
@@ -110,6 +118,32 @@ abstract class PrincessFunctionDeclaration {
       } else {
         return returnFormula;
       }
+    }
+
+    private boolean isRationalSortArg(IExpression arg) {
+      if (arg instanceof IFunApp) {
+        IFunction fun = ((IFunApp) arg).fun();
+        if (fun instanceof MonoSortedIFunction) {
+          Sort sort = ((MonoSortedIFunction) fun).resSort();
+          return PrincessEnvironment.FRACTION_SORT.equals(sort);
+        }
+      }
+      if (arg instanceof IConstant) {
+        ConstantTerm constant = ((IConstant) arg).c();
+        if (constant instanceof SortedConstantTerm) {
+          Sort sort = ((SortedConstantTerm) constant).sort();
+          return PrincessEnvironment.FRACTION_SORT.equals(sort);
+        }
+      }
+      return false;
+    }
+
+    private boolean isRationalSortArgument(int index) {
+      if (declarationItem instanceof MonoSortedIFunction) {
+        Sort sort = ((MonoSortedIFunction) declarationItem).argSorts().apply(index);
+        return PrincessEnvironment.rationalTheory.FractionSort().equals(sort);
+      }
+      return false;
     }
   }
 
