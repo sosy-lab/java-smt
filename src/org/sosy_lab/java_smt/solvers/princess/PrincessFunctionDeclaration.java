@@ -138,7 +138,8 @@ abstract class PrincessFunctionDeclaration {
       return false;
     }
 
-    private boolean isRationalSortArgument(int index) {
+    private boolean isRationalSortArgument(Integer index) {
+      // we switch from "int" to "Integer" in the signature to avoid ambiguous types with Scala API.
       if (declarationItem instanceof MonoSortedIFunction) {
         Sort sort = ((MonoSortedIFunction) declarationItem).argSorts().apply(index);
         return PrincessEnvironment.rationalTheory.FractionSort().equals(sort);
