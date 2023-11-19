@@ -209,8 +209,11 @@ class PrincessFormulaCreator
           ITerm term1 = fun.apply(0);
           ITerm term2 = fun.apply(1);
           if (term1 instanceof IIntLit && term2 instanceof IIntLit) {
-            return Rational.of(
-                ((IIntLit) term1).value().bigIntValue(), ((IIntLit) term2).value().bigIntValue());
+            Rational ratValue =
+                Rational.of(
+                    ((IIntLit) term1).value().bigIntValue(),
+                    ((IIntLit) term2).value().bigIntValue());
+            return ratValue.isIntegral() ? ratValue.getNum() : ratValue;
           }
           break;
         case "str_empty":
