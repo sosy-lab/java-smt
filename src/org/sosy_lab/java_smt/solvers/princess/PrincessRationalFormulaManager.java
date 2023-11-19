@@ -11,9 +11,10 @@ package org.sosy_lab.java_smt.solvers.princess;
 import ap.parser.IExpression;
 import ap.parser.IFunApp;
 import ap.parser.ITerm;
+import com.google.common.collect.ImmutableList;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
+import java.util.List;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
@@ -81,9 +82,10 @@ public class PrincessRationalFormulaManager
 
   @Override
   protected IExpression makeNumberImpl(BigDecimal pNumber) {
-    ArrayList<ITerm> args = new ArrayList<>(2);
-    args.add(pInteger.makeNumberImpl(pNumber.unscaledValue()));
-    args.add(pInteger.makeNumberImpl(BigInteger.valueOf(10).pow(pNumber.scale())));
+    List<ITerm> args =
+        ImmutableList.of(
+            pInteger.makeNumberImpl(pNumber.unscaledValue()),
+            pInteger.makeNumberImpl(BigInteger.valueOf(10).pow(pNumber.scale())));
     return new IFunApp(PrincessEnvironment.rationalTheory.frac(), PrincessEnvironment.toSeq(args));
   }
 
