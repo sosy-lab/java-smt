@@ -670,7 +670,7 @@ SPDX-License-Identifier: Apache-2.0
             numbers from the ivy repository. The script will append the git revision.
         </fail>
         <!-- get a nive version -->
-        <exec executable="git" dir="${apron.path}/apron" outputproperty="apron.revision"
+        <exec executable="git" dir="${apron.path}/" outputproperty="apron.revision"
               failonerror="true">
             <arg value="show"/>
             <arg value="-s"/>
