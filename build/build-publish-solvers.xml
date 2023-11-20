@@ -669,8 +669,8 @@ SPDX-License-Identifier: Apache-2.0
             The custom revision has to be unique amongst the already known version
             numbers from the ivy repository. The script will append the git revision.
         </fail>
-        <!-- get a nive version -->
-        <exec executable="git" dir="${apron.path}/" outputproperty="apron.revision"
+        <!-- get a naive version -->
+        <exec executable="git" dir="${apron.path}" outputproperty="apron.revision"
               failonerror="true">
             <arg value="show"/>
             <arg value="-s"/>
@@ -690,7 +690,6 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="~/git/apron/build"/>
             <arg value="--no-ocaml-plugins"/>
             <arg value="--no-ocaml-find"/>
-
         </exec>
         <exec executable="make" dir="${apron.path}" failonerror="true">
         </exec>
