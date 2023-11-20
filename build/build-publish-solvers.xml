@@ -679,48 +679,62 @@ SPDX-License-Identifier: Apache-2.0
         <property name="apron.version" value="${apron.customRev}-g${apron.revision}"/>
         <echo message="Building Apron in version '${apron.version}'"/>
 
+        <!-- build apron -->
+        <exec executable="./configure" dir="${apron.path}/apron" failonerror="true">
+            <arg value="-java-prefix /usr/lib/jvm/java-11-openjdk-amd64"/>
+            <arg value="--no-cxx"/>
+            <arg value="--no-ocaml"/>
+            <arg value="--no-ppl"/>
+            <arg value="--prefix ~/git/apron/build"/>
+            <arg value="--no-ocaml-plugins"/>
+            <arg value="--no-ocaml-find"/>
+
+        </exec>
+        <exec executable="make" dir="${apron.path}/apron" failonerror="true">
+        </exec>
+
         <!-- fix RPATH and library dependencies -->
-        <exec executable="patchelf" dir="${apron.path}" failonerror="true">
+        <exec executable="patchelf" dir="${apron.path}/apron/japron" failonerror="true">
             <arg value="--set-rpath"/><arg value="$ORIGIN"/>
             <arg value="libapron.so"/>
         </exec>
-        <exec executable="patchelf" dir="${apron.path}" failonerror="true">
+        <exec executable="patchelf" dir="${apron.path}/apron/japron" failonerror="true">
             <arg value="--set-rpath"/><arg value="$ORIGIN"/>
             <arg value="libboxD.so"/>
         </exec>
-        <exec executable="patchelf" dir="${apron.path}" failonerror="true">
+        <exec executable="patchelf" dir="${apron.path}/apron/japron" failonerror="true">
             <arg value="--set-rpath"/><arg value="$ORIGIN"/>
             <arg value="libjapron.so"/>
         </exec>
-        <exec executable="patchelf" dir="${apron.path}" failonerror="true">
+        <exec executable="patchelf" dir="${apron.path}/apron/japron" failonerror="true">
             <arg value="--set-rpath"/><arg value="$ORIGIN"/>
             <arg value="libjgmp.so"/>
         </exec>
-        <exec executable="patchelf" dir="${apron.path}" failonerror="true">
+        <exec executable="patchelf" dir="${apron.path}/apron/japron" failonerror="true">
             <arg value="--set-rpath"/><arg value="$ORIGIN"/>
             <arg value="liboctD.so"/>
         </exec>
-        <exec executable="patchelf" dir="${apron.path}" failonerror="true">
+        <exec executable="patchelf" dir="${apron.path}/apron/japron" failonerror="true">
             <arg value="--set-rpath"/><arg value="$ORIGIN"/>
             <arg value="libpolkaMPQ.so"/>
         </exec>
 
         <!-- copy library files into directory to be published for IVY -->
-        <copy file="${apron.path}/apron.jar"
+        <copy file="${apron.path}/apron/japron/apron.jar"
               tofile="apron-${apron.version}.jar"/>
-        <copy file="${apron.path}/gmp.jar"
+        <copy file="${apron.path}/apron/japron/gmp.jar"
               tofile="gmp-${apron.version}.jar"/>
-        <copy file="${apron.path}/libapron.so"
+        <copy file="${apron.path}/apron/japron/libapron.so"
               tofile="libapron-${apron.version}.so"/>
-        <copy file="${apron.path}/libboxD.so"
+        <copy file="${apron.path}/apron/japron/libboxD.so"
               tofile="libboxD-${apron.version}.so"/>
-        <copy file="${apron.path}/libjapron.so"
+        <copy file="${apron.path}/apron/japron/libjapron.so"
               tofile="libjapron-${apron.version}.so"/>
-        <copy file="${apron.path}/libjgmp.so"
+        <copy file="${apron.path}/apron/japron/libjgmp.so"
               tofile="libjgmp-${apron.version}.so"/>
-        <copy file="${apron.path}/liboctD.so"
+        <copy file="${apron.path}/apron/japron/liboctD.so"
               tofile="liboctD-${apron.version}.so"/>
-        <copy file="${apron.path}/libpolkaMPQ.so"
+        <copy file="${apron.path}/apron/japron/libpolkaMPQ.so"
               tofile="libpolkaMPQ-${apron.version}.so"/>
     </target>
 
