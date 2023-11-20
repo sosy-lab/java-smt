@@ -73,6 +73,7 @@ public interface ApronNode extends Formula {
 
   ApronNode getInstance();
   @Immutable
+  @SuppressWarnings("Immutable")
   interface ApronNumeralNode extends ApronNode, NumeralFormula {
     /**
      * This class wraps all rational constants, defined by numerator and denominator
