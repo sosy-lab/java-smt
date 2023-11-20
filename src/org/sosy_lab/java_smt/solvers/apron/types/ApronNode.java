@@ -76,6 +76,7 @@ public interface ApronNode extends Formula {
     /**
      * This class wraps all rational constants, defined by numerator and denominator
      */
+    @Immutable
     class ApronRatCstNode
         implements RationalFormula, ApronNumeralNode {
 
@@ -105,7 +106,7 @@ public interface ApronNode extends Formula {
        *  form "num/den" for non Integers; If the number is an Integer, the numerator is 1 here
        * @param pNode node of type from the Apron Lib
        */
-      @SuppressWarnings("[StringSplitte]")
+      @SuppressWarnings("StringSplitter")
       public ApronRatCstNode(Texpr1CstNode pNode) {
         this.cstNode = pNode;
         Coeff coeff = pNode.getConstant();
