@@ -20,7 +20,6 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
-
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.Charset;
@@ -33,9 +32,7 @@ import java.util.stream.Collectors;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 
 public class Generator {
-  private Generator() {
-  }
-
+  private Generator() {}
 
   private static boolean loggingEnabled = false;
   private static final String file = "Out.smt2";
@@ -45,10 +42,8 @@ public class Generator {
 
   public static final List<FunctionEnvironment> registeredVariables = new ArrayList<>();
 
-
   protected static void writeToFile(String line, String fileName) throws IOException {
-    Writer fileWriter = Files.newBufferedWriter(Paths.get(fileName),
-        Charset.defaultCharset());
+    Writer fileWriter = Files.newBufferedWriter(Paths.get(fileName), Charset.defaultCharset());
     try {
       fileWriter.write(line);
       fileWriter.flush();
@@ -67,6 +62,7 @@ public class Generator {
   }
 
   protected static String evaluateRecursive(Object constraint) {
+
     if (constraint instanceof String) {
       return (String) constraint;
     } else {
@@ -114,7 +110,10 @@ public class Generator {
       }
       if (variable.keyword.equals("BitVec")) {
         String newEntry =
-            "(declare-const " + variable.inputParams.get(0) + " (_ BitVec " + variable.bitVecLength
+            "(declare-const "
+                + variable.inputParams.get(0)
+                + " (_ BitVec "
+                + variable.bitVecLength
                 + "))\n";
         if (lines.indexOf(newEntry) == -1) {
           lines.append(newEntry);
@@ -122,9 +121,13 @@ public class Generator {
       }
       if (variable.keyword.equals("Array")) {
         String newEntry =
-            "(declare-const " + variable.inputParams.get(0) + " (Array " + variable.arrayIndexType
+            "(declare-const "
+                + variable.inputParams.get(0)
+                + " (Array "
+                + variable.arrayIndexType
                 + " "
-                + variable.arrayValueType + "))"
+                + variable.arrayValueType
+                + "))"
                 + "\n";
         if (lines.indexOf(newEntry) == -1) {
           lines.append(newEntry);
@@ -132,8 +135,13 @@ public class Generator {
       }
       if (variable.keyword.equals("UFFun")) {
         String newEntry =
-            "(declare-fun " + variable.ufName + " " + variable.ufInputType + " "
-                + variable.ufOutputType + ")"
+            "(declare-fun "
+                + variable.ufName
+                + " "
+                + variable.ufInputType
+                + " "
+                + variable.ufOutputType
+                + ")"
                 + "\n";
         if (lines.indexOf(newEntry) == -1) {
           lines.append(newEntry);
@@ -157,7 +165,5 @@ public class Generator {
     lines.append(endSMTLIB2);
     writeToFile(String.valueOf(lines), file);
     lines.delete(0, lines.length() - 1);
-
   }
-
 }

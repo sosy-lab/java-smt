@@ -145,9 +145,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
           "set-logic",
           "set-option");
 
-  /**
-   * Some special chars are not allowed to appear in symbol names. See .
-   */
+  /** Some special chars are not allowed to appear in symbol names. See . */
   @SuppressWarnings("javadoc")
   private static final ImmutableSet<String> UNSUPPORTED_NAMES =
       ImmutableSet.of(
@@ -307,9 +305,13 @@ public class VariableNamesTest extends SolverBasedTest0 {
     requireIntegers();
     requireArrays();
     for (String name : getAllNames()) {
-      testName0(name, s -> {
-          return amgr.makeArray(s, IntegerType, IntegerType);
-      }, amgr::equivalence, false);
+      testName0(
+          name,
+          s -> {
+            return amgr.makeArray(s, IntegerType, IntegerType);
+          },
+          amgr::equivalence,
+          false);
     }
   }
 
@@ -322,12 +324,12 @@ public class VariableNamesTest extends SolverBasedTest0 {
     for (String name : NAMES) {
       testName0(
           name,
-          s ->
-          {
-              return Objects.requireNonNull(amgr).makeArray(
-                  s,
-                  FormulaType.getBitvectorTypeWithSize(2),
-                  FormulaType.getBitvectorTypeWithSize(2));
+          s -> {
+            return Objects.requireNonNull(amgr)
+                .makeArray(
+                    s,
+                    FormulaType.getBitvectorTypeWithSize(2),
+                    FormulaType.getBitvectorTypeWithSize(2));
           },
           amgr::equivalence,
           false);
@@ -423,7 +425,8 @@ public class VariableNamesTest extends SolverBasedTest0 {
                 BooleanFormula pF,
                 Quantifier pQuantifier,
                 List<Formula> pBoundVariables,
-                BooleanFormula pBody) throws IOException {
+                BooleanFormula pBody)
+                throws IOException {
               if (solverToUse() != Solvers.PRINCESS) {
                 // TODO Princess does not (yet) return quantified variables.
                 assertThat(pBoundVariables).hasSize(1);
@@ -509,7 +512,8 @@ public class VariableNamesTest extends SolverBasedTest0 {
                 BooleanFormula pF,
                 Quantifier pQuantifier,
                 List<Formula> pBoundVariables,
-                BooleanFormula pBody) throws IOException {
+                BooleanFormula pBody)
+                throws IOException {
               if (solverToUse() != Solvers.PRINCESS) {
                 // TODO Princess does not return quantified variables.
                 assertThat(pBoundVariables).hasSize(1);
@@ -618,9 +622,11 @@ public class VariableNamesTest extends SolverBasedTest0 {
     requireArrays();
     requireIntegers();
     for (String name : getAllNames()) {
-      createVariableWith(v -> {
-          return Objects.requireNonNull(amgr).makeArray(v, IntegerType, IntegerType);
-      }, name);
+      createVariableWith(
+          v -> {
+            return Objects.requireNonNull(amgr).makeArray(v, IntegerType, IntegerType);
+          },
+          name);
     }
   }
 
@@ -632,12 +638,12 @@ public class VariableNamesTest extends SolverBasedTest0 {
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
     for (String name : getAllNames()) {
       createVariableWith(
-          v ->
-          {
-              return Objects.requireNonNull(amgr).makeArray(
-                  v,
-                  FormulaType.getBitvectorTypeWithSize(2),
-                  FormulaType.getBitvectorTypeWithSize(2));
+          v -> {
+            return Objects.requireNonNull(amgr)
+                .makeArray(
+                    v,
+                    FormulaType.getBitvectorTypeWithSize(2),
+                    FormulaType.getBitvectorTypeWithSize(2));
           },
           name);
     }

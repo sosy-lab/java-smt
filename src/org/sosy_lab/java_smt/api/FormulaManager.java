@@ -35,7 +35,6 @@ public interface FormulaManager {
    *
    * @throws UnsupportedOperationException If the theory is not supported by the solver.
    */
-
   IntegerFormulaManager getIntegerFormulaManager();
 
   /**

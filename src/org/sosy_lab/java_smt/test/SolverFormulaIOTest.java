@@ -221,8 +221,8 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
   }
 
   @Test
-  public void parseMathSatTestExprFirst1() throws SolverException, InterruptedException,
-                                                  IOException {
+  public void parseMathSatTestExprFirst1()
+      throws SolverException, InterruptedException, IOException {
     requireParser();
     compareParseWithOrgExprFirst(MATHSAT_DUMP1, this::genBoolExpr);
   }
@@ -261,8 +261,8 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
   }
 
   @Test
-  public void parseMathSatTestExprFirst2() throws SolverException, InterruptedException,
-                                                  IOException {
+  public void parseMathSatTestExprFirst2()
+      throws SolverException, InterruptedException, IOException {
     requireParser();
     compareParseWithOrgExprFirst(MATHSAT_DUMP2, this::redundancyExprGen);
   }
@@ -282,8 +282,8 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
   }
 
   @Test
-  public void parseZ3SatTestParseFirst2() throws SolverException, InterruptedException,
-                                                 IOException {
+  public void parseZ3SatTestParseFirst2()
+      throws SolverException, InterruptedException, IOException {
     requireParser();
     compareParseWithOrgParseFirst(Z3_DUMP2, this::redundancyExprGen);
   }
@@ -295,8 +295,8 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
   }
 
   @Test
-  public void parseMathSatTestExprFirst3() throws SolverException, InterruptedException,
-                                                  IOException {
+  public void parseMathSatTestExprFirst3()
+      throws SolverException, InterruptedException, IOException {
     requireParser();
     compareParseWithOrgExprFirst(MATHSAT_DUMP3, this::functionExprGen);
   }

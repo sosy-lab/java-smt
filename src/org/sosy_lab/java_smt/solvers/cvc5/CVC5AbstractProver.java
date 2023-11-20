@@ -135,8 +135,8 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
             this,
             mgr,
             formulaManager,
-            Collections2.transform(getAssertedFormulas(),
-                formulaManager.getFormulaCreator()::extractInfo)));
+            Collections2.transform(
+                getAssertedFormulas(), formulaManager.getFormulaCreator()::extractInfo)));
   }
 
   @Override
@@ -174,8 +174,8 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     closeAllEvaluators();
     changedSinceLastSatQuery = false;
     if (!incremental) {
-      getAssertedFormulas().forEach(
-          f -> solver.assertFormula(formulaManager.getFormulaCreator().extractInfo(f)));
+      getAssertedFormulas()
+          .forEach(f -> solver.assertFormula(formulaManager.getFormulaCreator().extractInfo(f)));
     }
 
     /* Shutdown currently not possible in CVC5. */

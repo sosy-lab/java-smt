@@ -117,8 +117,8 @@ public class ModelEvaluationTest extends SolverBasedTest0.ParameterizedSolverBas
   }
 
   @Test
-  public void testGetRationalsEvaluation() throws SolverException, InterruptedException,
-                                                  IOException {
+  public void testGetRationalsEvaluation()
+      throws SolverException, InterruptedException, IOException {
     requireRationals();
     evaluateInModel(
         rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(Rational.ofString("1/3"))),
@@ -138,8 +138,8 @@ public class ModelEvaluationTest extends SolverBasedTest0.ParameterizedSolverBas
   }
 
   @Test
-  public void testGetBooleansEvaluation() throws SolverException, InterruptedException,
-                                                 IOException {
+  public void testGetBooleansEvaluation()
+      throws SolverException, InterruptedException, IOException {
     evaluateInModel(
         bmgr.makeVariable("x"),
         bmgr.makeVariable("y"),

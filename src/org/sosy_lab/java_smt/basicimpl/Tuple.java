@@ -21,12 +21,13 @@
 package org.sosy_lab.java_smt.basicimpl;
 
 public class Tuple {
-    private final String name;
-    private final String type;
-    public Tuple(String name, String type) {
-      this.name = name;
-      this.type = type;
-    }
+  private final String name;
+  private final String type;
+
+  public Tuple(String name, String type) {
+    this.name = name;
+    this.type = type;
+  }
 
   public String getName() {
     return name;
@@ -35,9 +36,4 @@ public class Tuple {
   public String getType() {
     return type;
   }
-
-
 }
-
-
-

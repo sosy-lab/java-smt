@@ -69,12 +69,14 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
   public IntegerFormula toIntegerFormula(BitvectorFormula pI, boolean signed)
       throws GeneratorException {
     TFormulaInfo param1 = extractInfo(pI);
-    IntegerFormula result = getFormulaCreator()
-        .encapsulate(FormulaType.IntegerType, toIntegerFormulaImpl(param1, signed));
+    IntegerFormula result =
+        getFormulaCreator()
+            .encapsulate(FormulaType.IntegerType, toIntegerFormulaImpl(param1, signed));
     if (Generator.isLoggingEnabled()) {
-      throw new GeneratorException("\"toIntegerFormula operation is not available for \"\n"
-          + "        + \"bitvectors in \"\n"
-          + "        + \"SMT-LIB2\"");
+      throw new GeneratorException(
+          "\"toIntegerFormula operation is not available for \"\n"
+              + "        + \"bitvectors in \"\n"
+              + "        + \"SMT-LIB2\"");
     }
     return result;
   }
@@ -327,8 +329,8 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
   public BitvectorFormula makeBitvector(int pLength, long i) {
     BitvectorFormula result = wrap(makeBitvectorImpl(pLength, i));
     if (Generator.isLoggingEnabled()) {
-      BitvectorGenerator.logMakeBitVector(result, pLength, transformValueToRange(pLength,
-          BigInteger.valueOf(i)));
+      BitvectorGenerator.logMakeBitVector(
+          result, pLength, transformValueToRange(pLength, BigInteger.valueOf(i)));
     }
     return result;
   }
@@ -494,8 +496,8 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     } else {
       BooleanFormula result = wrapBool(distinctImpl(Lists.transform(pBits, this::extractInfo)));
       if (Generator.isLoggingEnabled()) {
-        throw new GeneratorException("distinct operation is not available for bitvectors in "
-            + "SMT-LIB2");
+        throw new GeneratorException(
+            "distinct operation is not available for bitvectors in " + "SMT-LIB2");
       }
       return result;
     }

@@ -2251,8 +2251,8 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
   @SuppressWarnings("resource")
-  public void modelAfterSolverCloseTest() throws SolverException, InterruptedException,
-                                                 IOException {
+  public void modelAfterSolverCloseTest()
+      throws SolverException, InterruptedException, IOException {
     ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS);
     if (imgr != null) {
       prover.push(imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1)));
@@ -2290,8 +2290,8 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test(expected = IllegalStateException.class)
-  public void testGenerateModelsOption2() throws SolverException, InterruptedException,
-                                                 IOException {
+  public void testGenerateModelsOption2()
+      throws SolverException, InterruptedException, IOException {
     try (ProverEnvironment prover = context.newProverEnvironment()) { // no option
       assertThat(prover).isSatisfiable();
       prover.getModelAssignments();
@@ -2361,8 +2361,8 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test // (timeout = 10_000)
   // TODO CVC5 crashes on making the first boolean symbol when using timeout ???.
-  public void testDeeplyNestedFormulaLIA() throws SolverException, InterruptedException,
-                                                  IOException {
+  public void testDeeplyNestedFormulaLIA()
+      throws SolverException, InterruptedException, IOException {
     requireIntegers();
 
     testDeeplyNestedFormula(
@@ -2373,8 +2373,8 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test // (timeout = 10_000)
   // TODO CVC5 crashes on making the first boolean symbol when using timeout ???.
-  public void testDeeplyNestedFormulaBV() throws SolverException, InterruptedException,
-                                                 IOException {
+  public void testDeeplyNestedFormulaBV()
+      throws SolverException, InterruptedException, IOException {
     requireBitvectors();
 
     testDeeplyNestedFormula(

@@ -268,8 +268,8 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
   }
 
   @Test
-  public void bvToIntEqualityWithSymbols() throws SolverException, InterruptedException,
-                                                  IOException {
+  public void bvToIntEqualityWithSymbols()
+      throws SolverException, InterruptedException, IOException {
     requireBitvectorToInt();
     requireIntegers();
 

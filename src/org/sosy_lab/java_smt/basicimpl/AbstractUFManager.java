@@ -44,12 +44,13 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
       pName = pName.replaceAll("PIPE", "|");
     }
     List<TType> argTypes = Lists.transform(pArgTypes, this::toSolverType);
-    FunctionDeclaration<T> result = FunctionDeclarationImpl.of(
-        pName,
-        FunctionDeclarationKind.UF,
-        pArgTypes,
-        pReturnType,
-        formulaCreator.declareUFImpl(pName, toSolverType(pReturnType), argTypes));
+    FunctionDeclaration<T> result =
+        FunctionDeclarationImpl.of(
+            pName,
+            FunctionDeclarationKind.UF,
+            pArgTypes,
+            pReturnType,
+            formulaCreator.declareUFImpl(pName, toSolverType(pReturnType), argTypes));
     if (Generator.isLoggingEnabled()) {
       UFGenerator.logMakeFun(result, pName, pReturnType, pArgTypes);
     }
@@ -99,9 +100,6 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
     return result;
   }
 
-
-
-
   @Override
   public <T extends Formula> T declareAndCallUF(
       String name, FormulaType<T> pReturnType, Formula... pArgs) {
@@ -109,6 +107,4 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
     T result = declareAndCallUF(name, pReturnType, Arrays.asList(pArgs));
     return result;
   }
-
-
 }

@@ -36,11 +36,11 @@ public class FunctionEnvironment {
   String arrayIndexType = "";
   String arrayValueType = "";
 
-
   protected FunctionEnvironment(
       Object pResult,
       List<Object> pInputParams,
       Function<List<Object>, String> pFunctionToString, String pKeyword) {
+
     result = pResult;
     inputParams = pInputParams;
     functionToString = pFunctionToString;
@@ -126,5 +126,4 @@ public class FunctionEnvironment {
   public void setUFOutputType(String pUFOutputType) {
     ufOutputType = pUFOutputType;
   }
-
 }

@@ -164,8 +164,8 @@ public class TranslateFormulaTest {
   }
 
   @Test
-  public void testTranslatingAndReverse() throws SolverException, InterruptedException,
-                                                 IOException {
+  public void testTranslatingAndReverse()
+      throws SolverException, InterruptedException, IOException {
     requireParserTo();
     requireParserFrom();
 

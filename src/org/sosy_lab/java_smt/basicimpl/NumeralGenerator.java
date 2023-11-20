@@ -28,7 +28,6 @@ import java.util.function.Function;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
-
 public class NumeralGenerator {
 
   protected static void logMakeNumber(Object result, String pVar) {
@@ -108,12 +107,12 @@ public class NumeralGenerator {
         inPlaceInputParams -> {
           StringBuilder out = new StringBuilder();
           out.append("(+ ");
-          inPlaceInputParams.forEach((c) -> {
-            out.append(c);
-            out.append(" ");
-          });
-          return String.valueOf(
-              out.deleteCharAt(out.length() - 1).append(")"));
+          inPlaceInputParams.forEach(
+              (c) -> {
+                out.append(c);
+                out.append(" ");
+              });
+          return String.valueOf(out.deleteCharAt(out.length() - 1).append(")"));
         };
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
@@ -172,12 +171,12 @@ public class NumeralGenerator {
         inPlaceInputParams -> {
           StringBuilder out = new StringBuilder();
           out.append("(distinct ");
-          inPlaceInputParams.forEach((c) -> {
-            out.append(c);
-            out.append(" ");
-          });
-          return String.valueOf(
-              out.deleteCharAt(out.length() - 1).append(")"));
+          inPlaceInputParams.forEach(
+              (c) -> {
+                out.append(c);
+                out.append(" ");
+              });
+          return String.valueOf(out.deleteCharAt(out.length() - 1).append(")"));
         };
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
@@ -235,5 +234,4 @@ public class NumeralGenerator {
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
-
 }

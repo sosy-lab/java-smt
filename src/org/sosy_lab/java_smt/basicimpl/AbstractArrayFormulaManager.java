@@ -56,8 +56,8 @@ public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFu
     final FormulaType<TE> elementType = getFormulaCreator().getArrayFormulaElementType(pArray);
 
     final TFormulaInfo term = store(extractInfo(pArray), extractInfo(pIndex), extractInfo(pValue));
-    ArrayFormula<TI, TE> result = getFormulaCreator().encapsulateArray(term, indexType,
-        elementType);
+    ArrayFormula<TI, TE> result =
+        getFormulaCreator().encapsulateArray(term, indexType, elementType);
     if (Generator.isLoggingEnabled()) {
       ArrayGenerator.logStore(result, pArray, pIndex, pValue);
     }
@@ -80,12 +80,11 @@ public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFu
           FTI extends FormulaType<TI>,
           FTE extends FormulaType<TE>>
       ArrayFormula<TI, TE> makeArray(String pName, FTI pIndexType, FTE pElementType)
-      throws GeneratorException {
+          throws GeneratorException {
     checkVariableName(pName);
     final TFormulaInfo namedArrayFormula = internalMakeArray(pName, pIndexType, pElementType);
-    ArrayFormula<TI, TE> result = getFormulaCreator().encapsulateArray(namedArrayFormula,
-        pIndexType,
-        pElementType);
+    ArrayFormula<TI, TE> result =
+        getFormulaCreator().encapsulateArray(namedArrayFormula, pIndexType, pElementType);
     if (Generator.isLoggingEnabled()) {
       ArrayGenerator.logMakeArray(result, pName, pIndexType, pElementType);
     }
@@ -108,8 +107,9 @@ public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFu
   @Override
   public <TI extends Formula, TE extends Formula> BooleanFormula equivalence(
       ArrayFormula<TI, TE> pArray1, ArrayFormula<TI, TE> pArray2) {
-    BooleanFormula result = getFormulaCreator()
-        .encapsulateBoolean(equivalence(extractInfo(pArray1), extractInfo(pArray2)));
+    BooleanFormula result =
+        getFormulaCreator()
+            .encapsulateBoolean(equivalence(extractInfo(pArray1), extractInfo(pArray2)));
     if (Generator.isLoggingEnabled()) {
       ArrayGenerator.logArrayEquivalence(result, pArray1, pArray2);
     }

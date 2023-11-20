@@ -107,8 +107,8 @@ public class EnumerationFormulaManagerTest extends SolverBasedTest0.Parameterize
   }
 
   @Test
-  public void testTooManyDistinctValues() throws SolverException, InterruptedException,
-                                                 IOException {
+  public void testTooManyDistinctValues()
+      throws SolverException, InterruptedException, IOException {
     EnumerationFormulaType colorType = emgr.declareEnumeration("ColorA", "Blue", "White");
     EnumerationFormula color1 = emgr.makeVariable("first", colorType);
     EnumerationFormula color2 = emgr.makeVariable("second", colorType);

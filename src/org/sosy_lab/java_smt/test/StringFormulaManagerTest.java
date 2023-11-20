@@ -259,8 +259,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testStringToIntConversion() throws SolverException, InterruptedException,
-                                                 IOException {
+  public void testStringToIntConversion()
+      throws SolverException, InterruptedException, IOException {
     IntegerFormula ten = imgr.makeNumber(10);
     StringFormula zeroStr = smgr.makeString("0");
 
@@ -399,8 +399,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
   /** Test const Strings = String variables + prefix and suffix constraints. */
   @Test
-  public void testConstStringEqStringVar() throws SolverException, InterruptedException,
-                                                  IOException {
+  public void testConstStringEqStringVar()
+      throws SolverException, InterruptedException, IOException {
     String string1 = "";
     String string2 = "a";
     String string3 = "ab";
@@ -696,8 +696,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
   /** Takeaway: invalid positions always refer to the empty string! */
   @Test
-  public void testCharAtWithConstString() throws SolverException, InterruptedException,
-                                                 IOException {
+  public void testCharAtWithConstString()
+      throws SolverException, InterruptedException, IOException {
     StringFormula empty = smgr.makeString("");
     StringFormula a = smgr.makeString("a");
     StringFormula b = smgr.makeString("b");
@@ -962,8 +962,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testStringVariableContains() throws SolverException, InterruptedException,
-                                                  IOException {
+  public void testStringVariableContains()
+      throws SolverException, InterruptedException, IOException {
     StringFormula var1 = smgr.makeVariable("var1");
     StringFormula var2 = smgr.makeVariable("var2");
 
@@ -1075,8 +1075,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testStringVariableIndexOf() throws SolverException, InterruptedException,
-                                                 IOException {
+  public void testStringVariableIndexOf()
+      throws SolverException, InterruptedException, IOException {
     StringFormula var1 = smgr.makeVariable("var1");
     StringFormula var2 = smgr.makeVariable("var2");
     IntegerFormula intVar = imgr.makeVariable("intVar");
@@ -1181,8 +1181,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testConstStringSubStrings() throws SolverException, InterruptedException,
-                                                 IOException {
+  public void testConstStringSubStrings()
+      throws SolverException, InterruptedException, IOException {
     StringFormula empty = smgr.makeString("");
     StringFormula a = smgr.makeString("a");
     StringFormula aUppercase = smgr.makeString("A");
@@ -1517,8 +1517,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testConstStringReplaceAll() throws SolverException, InterruptedException,
-                                                 IOException {
+  public void testConstStringReplaceAll()
+      throws SolverException, InterruptedException, IOException {
     assume()
         .withMessage("Solver %s does not support replaceAll()", solverToUse())
         .that(solverToUse())

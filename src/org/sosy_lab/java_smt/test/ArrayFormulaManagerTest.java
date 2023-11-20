@@ -58,8 +58,8 @@ public class ArrayFormulaManagerTest extends SolverBasedTest0.ParameterizedSolve
    *  Test whether or not String Arrays are possible with String indexes
    */
   @Test
-  public void testStringIndexStringValue() throws SolverException, InterruptedException,
-                                                  IOException {
+  public void testStringIndexStringValue()
+      throws SolverException, InterruptedException, IOException {
     requireStrings();
 
     // (arr2 = store(arr1, "four", "two")) & !(select(arr2, "four") = "two")

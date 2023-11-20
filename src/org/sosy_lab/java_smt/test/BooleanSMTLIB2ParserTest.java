@@ -28,26 +28,25 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.Visitor;
 
-
-public class BooleanSMTLIB2ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0  {
+public class BooleanSMTLIB2ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   public void clearVisitor() {
     Visitor.variables.clear();
     Visitor.letVariables.clear();
     Visitor.constraints.clear();
   }
+
   @Test
   public void testMakeVariable()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-      clearVisitor();
+    clearVisitor();
 
-      String a = "(declare-const a Bool)\n"
-          + "(assert a)\n";
+    String a = "(declare-const a Bool)\n" + "(assert a)\n";
 
-      BooleanFormula actualResult = mgr.universalParseFromString(a);
+    BooleanFormula actualResult = mgr.universalParseFromString(a);
 
-      BooleanFormula expectedResult = bmgr.makeVariable("a");
-      Assert.assertEquals(expectedResult, actualResult);
+    BooleanFormula expectedResult = bmgr.makeVariable("a");
+    Assert.assertEquals(expectedResult, actualResult);
   }
 
   @Test
@@ -62,7 +61,6 @@ public class BooleanSMTLIB2ParserTest extends SolverBasedTest0.ParameterizedSolv
     BooleanFormula expectedResult = bmgr.makeTrue();
     Assert.assertEquals(expectedResult, actualResult);
   }
-
 
   @Test
   public void testMakeFalse()
@@ -82,8 +80,7 @@ public class BooleanSMTLIB2ParserTest extends SolverBasedTest0.ParameterizedSolv
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     clearVisitor();
 
-    String a = "(declare-const a Bool)\n"
-        + "(assert (not a))\n";
+    String a = "(declare-const a Bool)\n" + "(assert (not a))\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(a);
 
@@ -96,9 +93,7 @@ public class BooleanSMTLIB2ParserTest extends SolverBasedTest0.ParameterizedSolv
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     clearVisitor();
 
-    String a = "(declare-const a Bool)\n"
-        + "(declare-const b Bool)\n"
-        + "(assert (or a b))\n";
+    String a = "(declare-const a Bool)\n" + "(declare-const b Bool)\n" + "(assert (or a b))\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(a);
 
@@ -111,15 +106,16 @@ public class BooleanSMTLIB2ParserTest extends SolverBasedTest0.ParameterizedSolv
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     clearVisitor();
 
-    String a = "(declare-const a Bool)\n"
-        + "(declare-const b Bool)\n"
-        + "(declare-const c Bool)\n"
-        + "(assert (or a b c))\n";
+    String a =
+        "(declare-const a Bool)\n"
+            + "(declare-const b Bool)\n"
+            + "(declare-const c Bool)\n"
+            + "(assert (or a b c))\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(a);
 
-    BooleanFormula expectedResult = bmgr.or(bmgr.makeVariable("a"), bmgr.makeVariable("b"),
-        bmgr.makeVariable("c"));
+    BooleanFormula expectedResult =
+        bmgr.or(bmgr.makeVariable("a"), bmgr.makeVariable("b"), bmgr.makeVariable("c"));
     Assert.assertEquals(expectedResult, actualResult);
   }
 
@@ -128,9 +124,7 @@ public class BooleanSMTLIB2ParserTest extends SolverBasedTest0.ParameterizedSolv
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     clearVisitor();
 
-    String a = "(declare-const a Bool)\n"
-        + "(declare-const b Bool)\n"
-        + "(assert (and a b))\n";
+    String a = "(declare-const a Bool)\n" + "(declare-const b Bool)\n" + "(assert (and a b))\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(a);
 
@@ -143,15 +137,16 @@ public class BooleanSMTLIB2ParserTest extends SolverBasedTest0.ParameterizedSolv
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     clearVisitor();
 
-    String a = "(declare-const a Bool)\n"
-        + "(declare-const b Bool)\n"
-        + "(declare-const c Bool)\n"
-        + "(assert (and a b c))\n";
+    String a =
+        "(declare-const a Bool)\n"
+            + "(declare-const b Bool)\n"
+            + "(declare-const c Bool)\n"
+            + "(assert (and a b c))\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(a);
 
-    BooleanFormula expectedResult = bmgr.and(bmgr.makeVariable("a"), bmgr.makeVariable("b"),
-        bmgr.makeVariable("c"));
+    BooleanFormula expectedResult =
+        bmgr.and(bmgr.makeVariable("a"), bmgr.makeVariable("b"), bmgr.makeVariable("c"));
     Assert.assertEquals(expectedResult, actualResult);
   }
 
@@ -160,9 +155,7 @@ public class BooleanSMTLIB2ParserTest extends SolverBasedTest0.ParameterizedSolv
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     clearVisitor();
 
-    String a = "(declare-const a Bool)\n"
-        + "(declare-const b Bool)\n"
-        + "(assert (xor a b))\n";
+    String a = "(declare-const a Bool)\n" + "(declare-const b Bool)\n" + "(assert (xor a b))\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(a);
 
@@ -175,13 +168,12 @@ public class BooleanSMTLIB2ParserTest extends SolverBasedTest0.ParameterizedSolv
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     clearVisitor();
 
-    String a = "(declare-const a Bool)\n"
-        + "(declare-const b Bool)\n"
-        + "(assert (= a b))\n";
+    String a = "(declare-const a Bool)\n" + "(declare-const b Bool)\n" + "(assert (= a b))\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(a);
 
-    BooleanFormula expectedResult = bmgr.equivalence(bmgr.makeVariable("a"), bmgr.makeVariable("b"));
+    BooleanFormula expectedResult =
+        bmgr.equivalence(bmgr.makeVariable("a"), bmgr.makeVariable("b"));
     Assert.assertEquals(expectedResult, actualResult);
   }
 
@@ -190,13 +182,12 @@ public class BooleanSMTLIB2ParserTest extends SolverBasedTest0.ParameterizedSolv
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     clearVisitor();
 
-    String a = "(declare-const a Bool)\n"
-        + "(declare-const b Bool)\n"
-        + "(assert (=> a b))\n";
+    String a = "(declare-const a Bool)\n" + "(declare-const b Bool)\n" + "(assert (=> a b))\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(a);
 
-    BooleanFormula expectedResult = bmgr.implication(bmgr.makeVariable("a"), bmgr.makeVariable("b"));
+    BooleanFormula expectedResult =
+        bmgr.implication(bmgr.makeVariable("a"), bmgr.makeVariable("b"));
     Assert.assertEquals(expectedResult, actualResult);
   }
 
@@ -205,15 +196,16 @@ public class BooleanSMTLIB2ParserTest extends SolverBasedTest0.ParameterizedSolv
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     clearVisitor();
 
-    String a = "(declare-const a Bool)\n"
-        + "(declare-const b Bool)\n"
-        + "(declare-const c Bool)\n"
-        + "(assert (ite a b c))\n";
+    String a =
+        "(declare-const a Bool)\n"
+            + "(declare-const b Bool)\n"
+            + "(declare-const c Bool)\n"
+            + "(assert (ite a b c))\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(a);
 
-    BooleanFormula expectedResult = bmgr.ifThenElse(bmgr.makeVariable("a"), bmgr.makeVariable("b"),
-        bmgr.makeVariable("c"));
+    BooleanFormula expectedResult =
+        bmgr.ifThenElse(bmgr.makeVariable("a"), bmgr.makeVariable("b"), bmgr.makeVariable("c"));
     Assert.assertEquals(expectedResult, actualResult);
   }
 
@@ -222,24 +214,36 @@ public class BooleanSMTLIB2ParserTest extends SolverBasedTest0.ParameterizedSolv
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     clearVisitor();
 
-    String a = "(declare-const a Bool)\n"
-        + "(declare-const e Bool)\n"
-        + "(declare-const c Bool)\n"
-        + "(declare-const d Bool)\n"
-        + "(declare-const b Bool)\n"
-        + "(declare-const f Bool)\n"
-        + "(assert (ite (=> (and a e true) a) (xor c d) (= b (or b (and a e true) a f))))\n";
+    String a =
+        "(declare-const a Bool)\n"
+            + "(declare-const e Bool)\n"
+            + "(declare-const c Bool)\n"
+            + "(declare-const d Bool)\n"
+            + "(declare-const b Bool)\n"
+            + "(declare-const f Bool)\n"
+            + "(assert (ite (=> (and a e true) a) (xor c d) (= b (or b (and a e true) a f))))\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(a);
 
-    BooleanFormula expectedResult = bmgr.ifThenElse(bmgr.implication(bmgr.and(bmgr.and(bmgr.makeBoolean
-            (true), bmgr.makeVariable("a")), bmgr.makeVariable("e"), bmgr.makeTrue()),
-        bmgr.and(bmgr.makeBoolean(true), bmgr.makeVariable("a"))), bmgr.xor(bmgr.
-        makeVariable("c"), bmgr.makeVariable("d")), bmgr.equivalence(bmgr.or(bmgr.
-        makeVariable("b"), bmgr.makeFalse()), bmgr.or(bmgr.or(bmgr.makeVariable("b"),
-        bmgr.makeFalse()), bmgr.and(bmgr.and(bmgr.makeBoolean(true), bmgr.makeVariable
-        ("a")), bmgr.makeVariable("e"), bmgr.makeTrue()), bmgr.and(bmgr.makeBoolean
-        (true), bmgr.makeVariable("a")), bmgr.makeVariable("f"))));
+    BooleanFormula expectedResult =
+        bmgr.ifThenElse(
+            bmgr.implication(
+                bmgr.and(
+                    bmgr.and(bmgr.makeBoolean(true), bmgr.makeVariable("a")),
+                    bmgr.makeVariable("e"),
+                    bmgr.makeTrue()),
+                bmgr.and(bmgr.makeBoolean(true), bmgr.makeVariable("a"))),
+            bmgr.xor(bmgr.makeVariable("c"), bmgr.makeVariable("d")),
+            bmgr.equivalence(
+                bmgr.or(bmgr.makeVariable("b"), bmgr.makeFalse()),
+                bmgr.or(
+                    bmgr.or(bmgr.makeVariable("b"), bmgr.makeFalse()),
+                    bmgr.and(
+                        bmgr.and(bmgr.makeBoolean(true), bmgr.makeVariable("a")),
+                        bmgr.makeVariable("e"),
+                        bmgr.makeTrue()),
+                    bmgr.and(bmgr.makeBoolean(true), bmgr.makeVariable("a")),
+                    bmgr.makeVariable("f"))));
     Assert.assertEquals(expectedResult, actualResult);
   }
 }

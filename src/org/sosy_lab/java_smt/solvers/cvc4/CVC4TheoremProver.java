@@ -33,8 +33,8 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
-import org.sosy_lab.java_smt.basicimpl.ShutdownHook;
 import org.sosy_lab.java_smt.basicimpl.Generator;
+import org.sosy_lab.java_smt.basicimpl.ShutdownHook;
 
 class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     implements ProverEnvironment, BasicProverEnvironment<Void> {
@@ -71,7 +71,6 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     smtEngine = new SmtEngine(exprManager);
     incremental = !enableSL;
     creator = (CVC4FormulaCreator) pFormulaManager.getFormulaCreator();
-
 
     setOptions(randomSeed, pOptions);
   }

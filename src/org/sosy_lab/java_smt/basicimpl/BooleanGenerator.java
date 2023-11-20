@@ -53,6 +53,7 @@ public class BooleanGenerator {
         inPlaceInputParams -> (String) inPlaceInputParams.get(0);
     Generator.executedAggregator.add(new FunctionEnvironment(result, inputParams, functionToString,
         "Direct"));
+
   }
 
   protected static void logNot(Object result, BooleanFormula pBits) {
@@ -82,12 +83,12 @@ public class BooleanGenerator {
         inPlaceInputParams -> {
           StringBuilder out = new StringBuilder();
           out.append("(or ");
-          inPlaceInputParams.forEach((c) -> {
-            out.append(c);
-            out.append(" ");
-          });
-          return String.valueOf(
-              out.deleteCharAt(out.length() - 1).append(")"));
+          inPlaceInputParams.forEach(
+              (c) -> {
+                out.append(c);
+                out.append(" ");
+              });
+          return String.valueOf(out.deleteCharAt(out.length() - 1).append(")"));
         };
 
     Generator.executedAggregator.add(
@@ -112,18 +113,17 @@ public class BooleanGenerator {
           StringBuilder out = new StringBuilder();
           out.delete(0, out.length());
           out.append("(and ");
-          inPlaceInputParams.forEach((c) -> {
-            out.append(c);
-            out.append(" ");
-          });
-          return String.valueOf(
-              out.deleteCharAt(out.length() - 1).append(")"));
+          inPlaceInputParams.forEach(
+              (c) -> {
+                out.append(c);
+                out.append(" ");
+              });
+          return String.valueOf(out.deleteCharAt(out.length() - 1).append(")"));
         };
 
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
-
 
   protected static void logXor(Object result, BooleanFormula pBits1, BooleanFormula pBits2) {
     List<Object> inputParams = new ArrayList<>();
@@ -137,9 +137,7 @@ public class BooleanGenerator {
   }
 
   protected static void logEquivalence(
-      Object result,
-      BooleanFormula pBits1,
-      BooleanFormula pBits2) {
+      Object result, BooleanFormula pBits1, BooleanFormula pBits2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pBits1);
     inputParams.add(pBits2);
@@ -151,9 +149,7 @@ public class BooleanGenerator {
   }
 
   protected static void logImplication(
-      Object result,
-      BooleanFormula pBits1,
-      BooleanFormula pBits2) {
+      Object result, BooleanFormula pBits1, BooleanFormula pBits2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pBits1);
     inputParams.add(pBits2);
@@ -175,5 +171,4 @@ public class BooleanGenerator {
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
-
 }

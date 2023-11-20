@@ -20,7 +20,6 @@
 
 package org.sosy_lab.java_smt.test;
 
-
 import static com.google.common.truth.Truth.assertThat;
 
 import java.util.Objects;
@@ -31,15 +30,12 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.Generator;
 
-
 public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   /**
-   * Integer and Rationals not supported by BOOLECTOR
-   * Rationals not supported by PRINCESS
-   * Z3 runs only when executed separately from other solvers
+   * Integer and Rationals not supported by BOOLECTOR Rationals not supported by PRINCESS Z3 runs
+   * only when executed separately from other solvers
    */
-
   public void clearGenerator() {
     Generator.lines.delete(0, Generator.lines.length());
     Generator.registeredVariables.clear();
@@ -82,11 +78,11 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
     // + "(assert (= e f))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
-    }
+  }
 
   @Test
   public void testMakeBitVectorWithIntegerFormulas() {
-    //not working for Yices due to lacking support of BitVectorFormula from IntegerFormula
+    // not working for Yices due to lacking support of BitVectorFormula from IntegerFormula
     requireBitvectors();
     requireIntegers();
     clearGenerator();
@@ -107,13 +103,18 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
 
     String actualResult = String.valueOf(Generator.lines);
 
-    String expectedResultMathsat5 = "(assert (= #b111111110110 #b000000010100))\n"
-        + "(assert (= #b01010 #b01010))\n"
-        + "(assert (= #b111111110110 #b000000010100))\n";
-    String expectedResultOthers = "(assert (= #b111111110110 #b000000010100))\n"
-        + "(assert (= #b01010 #b01010))\n"
-        + "(assert (= #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011011010))\n";
-    Assert.assertTrue(expectedResultMathsat5.equals(actualResult) || expectedResultOthers.equals(actualResult));
+    String expectedResultMathsat5 =
+        "(assert (= #b111111110110 #b000000010100))\n"
+            + "(assert (= #b01010 #b01010))\n"
+            + "(assert (= #b111111110110 #b000000010100))\n";
+    String expectedResultOthers =
+        "(assert (= #b111111110110 #b000000010100))\n"
+            + "(assert (= #b01010 #b01010))\n"
+            + "(assert (="
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011011010))\n";
+    Assert.assertTrue(
+        expectedResultMathsat5.equals(actualResult) || expectedResultOthers.equals(actualResult));
   }
 
   @Test
@@ -137,13 +138,18 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
 
     String actualResult = String.valueOf(Generator.lines);
 
-    String expectedResultMathsat5 = "(assert (= #b111111110110 #b000000010100))\n"
-        + "(assert (= #b01010 #b01010))\n"
-        + "(assert (= #b111111110110 #b000000010100))\n";
-    String expectedResultOthers = "(assert (= #b111111110110 #b000000010100))\n"
-        + "(assert (= #b01010 #b01010))\n"
-        + "(assert (= #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011011010))\n";
-    Assert.assertTrue(expectedResultMathsat5.equals(actualResult) || expectedResultOthers.equals(actualResult));
+    String expectedResultMathsat5 =
+        "(assert (= #b111111110110 #b000000010100))\n"
+            + "(assert (= #b01010 #b01010))\n"
+            + "(assert (= #b111111110110 #b000000010100))\n";
+    String expectedResultOthers =
+        "(assert (= #b111111110110 #b000000010100))\n"
+            + "(assert (= #b01010 #b01010))\n"
+            + "(assert (="
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011011010))\n";
+    Assert.assertTrue(
+        expectedResultMathsat5.equals(actualResult) || expectedResultOthers.equals(actualResult));
   }
 
   @Test
@@ -167,15 +173,20 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
 
     String actualResult = String.valueOf(Generator.lines);
 
-    String expectedResultMathsat5 = "(assert (= #b111111110110 (bvadd #b111111110110 #b000000010100)))\n"
-        + "(assert (= #b01010 #b01010))\n"
-        + "(assert (= #b111111110110 (bvadd #b111111110110 #b000000010100)))\n";
-    String expectedResultOthers = "(assert (= #b111111110110 (bvadd #b111111110110 #b000000010100)))\n"
-        + "(assert (= #b01010 (bvadd #b01010 #b00000)))\n"
-        + "(assert (= "
-        +
-        "#b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 (bvadd #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011011010)))\n";
-    Assert.assertTrue(expectedResultMathsat5.equals(actualResult) || expectedResultOthers.equals(actualResult));
+    String expectedResultMathsat5 =
+        "(assert (= #b111111110110 (bvadd #b111111110110 #b000000010100)))\n"
+            + "(assert (= #b01010 #b01010))\n"
+            + "(assert (= #b111111110110 (bvadd #b111111110110 #b000000010100)))\n";
+    String expectedResultOthers =
+        "(assert (= #b111111110110 (bvadd #b111111110110 #b000000010100)))\n"
+            + "(assert (= #b01010 (bvadd #b01010 #b00000)))\n"
+            + "(assert (="
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110"
+            + " (bvadd"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011011010)))\n";
+    Assert.assertTrue(
+        expectedResultMathsat5.equals(actualResult) || expectedResultOthers.equals(actualResult));
   }
 
   @Test
@@ -187,21 +198,33 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
     BitvectorFormula d = bvmgr.makeBitvector(12, 20);
     BitvectorFormula e = Objects.requireNonNull(bvmgr).makeBitvector(100, 263255254);
     BitvectorFormula f = bvmgr.makeBitvector(100, 0);
-    BooleanFormula constraint1 = bvmgr.equal(bvmgr.negate(c), bvmgr.add(bvmgr.negate(c),
-        bvmgr.negate(d)));
-    BooleanFormula constraint3 = bvmgr.equal(bvmgr.negate(e), bvmgr.add(bvmgr.negate(e),
-        bvmgr.negate(f)));
+    BooleanFormula constraint1 =
+        bvmgr.equal(bvmgr.negate(c), bvmgr.add(bvmgr.negate(c), bvmgr.negate(d)));
+    BooleanFormula constraint3 =
+        bvmgr.equal(bvmgr.negate(e), bvmgr.add(bvmgr.negate(e), bvmgr.negate(f)));
 
     Generator.logAddConstraint(constraint1);
     Generator.logAddConstraint(constraint3);
 
     String actualResult = String.valueOf(Generator.lines);
 
-    String expectedResultMathsat5 = "(assert (= (bvneg #b111111110110) #b111111110110))\n"
-        + "(assert (= (bvneg #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110) (bvneg #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110)))\n";
-    String expectedResultOthers = "(assert (= (bvneg #b111111110110) (bvadd (bvneg #b111111110110) (bvneg #b000000010100))))\n"
-        + "(assert (= (bvneg #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110) (bvadd (bvneg #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110) (bvneg #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000))))\n";
-    Assert.assertTrue(expectedResultMathsat5.equals(actualResult) || expectedResultOthers.equals(actualResult));
+    String expectedResultMathsat5 =
+        "(assert (= (bvneg #b111111110110) #b111111110110))\n"
+            + "(assert (= (bvneg"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110)"
+            + " (bvneg"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110)))\n";
+    String expectedResultOthers =
+        "(assert (= (bvneg #b111111110110) (bvadd (bvneg #b111111110110) (bvneg"
+            + " #b000000010100))))\n"
+            + "(assert (= (bvneg"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110)"
+            + " (bvadd (bvneg"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110)"
+            + " (bvneg"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000))))\n";
+    Assert.assertTrue(
+        expectedResultMathsat5.equals(actualResult) || expectedResultOthers.equals(actualResult));
   }
 
   @Test
@@ -221,16 +244,25 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
 
     String actualResult = String.valueOf(Generator.lines);
 
-    String expectedResultMathsat5 = "(assert (= #b111111110110 (bvsub #b111111110110 #b000000010100)))\n"
-        + "(assert (= #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110))\n";
-    String expectedResultOthers = "(assert (= #b111111110110 (bvsub #b111111110110 #b000000010100)))\n"
-        + "(assert (= #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 (bvsub #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
-    Assert.assertTrue(expectedResultMathsat5.equals(actualResult) || expectedResultOthers.equals(actualResult));
+    String expectedResultMathsat5 =
+        "(assert (= #b111111110110 (bvsub #b111111110110 #b000000010100)))\n"
+            + "(assert (="
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110))\n";
+    String expectedResultOthers =
+        "(assert (= #b111111110110 (bvsub #b111111110110 #b000000010100)))\n"
+            + "(assert (="
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110"
+            + " (bvsub"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
+    Assert.assertTrue(
+        expectedResultMathsat5.equals(actualResult) || expectedResultOthers.equals(actualResult));
   }
 
   @Test
   public void testDivide() {
-    //Does not work for CVC4 due to "BigInteger argument out of bounds"
+    // Does not work for CVC4 due to "BigInteger argument out of bounds"
     requireBitvectors();
     clearGenerator();
 
@@ -246,18 +278,24 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
 
     String actualResult = String.valueOf(Generator.lines);
 
-    String expectedResultOthers = "(assert (= #b111111110110 (bvsdiv #b111111110110 "
-        + "#b000000010100)))\n"
-        + "(assert (= #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 (bvudiv #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
-    String expectedResultYices = "(assert (= #b111111110110 (bvsdiv #b111111110110 "
-        + "#b000000010100)))\n"
-        + "(assert (= #b111111110110 (bvsdiv #b111111110110 #b000000010100)))\n";
-    Assert.assertTrue(expectedResultYices.equals(actualResult) || expectedResultOthers.equals(actualResult));
+    String expectedResultOthers =
+        "(assert (= #b111111110110 (bvsdiv #b111111110110 #b000000010100)))\n"
+            + "(assert (="
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110"
+            + " (bvudiv"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
+    String expectedResultYices =
+        "(assert (= #b111111110110 (bvsdiv #b111111110110 "
+            + "#b000000010100)))\n"
+            + "(assert (= #b111111110110 (bvsdiv #b111111110110 #b000000010100)))\n";
+    Assert.assertTrue(
+        expectedResultYices.equals(actualResult) || expectedResultOthers.equals(actualResult));
   }
 
   @Test
   public void testModulo() {
-    //Does not work for CVC4 due to "BigInteger argument out of bounds"
+    // Does not work for CVC4 due to "BigInteger argument out of bounds"
     requireBitvectors();
     clearGenerator();
 
@@ -273,18 +311,32 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
 
     String actualResult = String.valueOf(Generator.lines);
 
-    String expectedResultOthers = "(assert (= #b111111110110 (bvsrem #b111111110110 #b000000010100)))\n"
-        + "(assert (= #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 (bvurem #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
-    String expectedResultYices = "(assert (= #b111111110110 #b111111110110))\n"
-        + "(assert (= #b111111110110 #b111111110110))\n";
-    String expectedResultMathsat5 = "(assert (= #b111111110110 #b111111110110))\n"
-        + "(assert (= #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 (bvurem #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
-    Assert.assertTrue(expectedResultYices.equals(actualResult) || expectedResultOthers.equals(actualResult) || expectedResultMathsat5.equals(actualResult));
+    String expectedResultOthers =
+        "(assert (= #b111111110110 (bvsrem #b111111110110 #b000000010100)))\n"
+            + "(assert (="
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110"
+            + " (bvurem"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
+    String expectedResultYices =
+        "(assert (= #b111111110110 #b111111110110))\n"
+            + "(assert (= #b111111110110 #b111111110110))\n";
+    String expectedResultMathsat5 =
+        "(assert (= #b111111110110 #b111111110110))\n"
+            + "(assert (="
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110"
+            + " (bvurem"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
+    Assert.assertTrue(
+        expectedResultYices.equals(actualResult)
+            || expectedResultOthers.equals(actualResult)
+            || expectedResultMathsat5.equals(actualResult));
   }
 
   @Test
   public void testMultiply() {
-    //Does not work for CVC4 due to "BigInteger argument out of bounds"
+    // Does not work for CVC4 due to "BigInteger argument out of bounds"
     requireBitvectors();
     clearGenerator();
 
@@ -300,16 +352,23 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
 
     String actualResult = String.valueOf(Generator.lines);
 
-    String expectedResultOthers = "(assert (= #b111111110110 (bvmul #b111111110110 "
-        + "#b000000010100)))\n"
-        + "(assert (= "
-        +
-        "#b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 (bvmul #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
-    String expectedResultYices = "(assert (= #b111111110110 #b111111110110))\n"
-        + "(assert (= #b111111110110 #b111111110110))\n";
-    String expectedResultMathsat5 = "(assert (= #b111111110110 (bvmul #b111111110110 #b000000010100)))\n"
-        + "(assert (= #b111111110110 (bvmul #b111111110110 #b000000010100)))\n";
-    Assert.assertTrue(expectedResultYices.equals(actualResult) || expectedResultOthers.equals(actualResult) || expectedResultMathsat5.equals(actualResult));
+    String expectedResultOthers =
+        "(assert (= #b111111110110 (bvmul #b111111110110 #b000000010100)))\n"
+            + "(assert (="
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110"
+            + " (bvmul"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
+    String expectedResultYices =
+        "(assert (= #b111111110110 #b111111110110))\n"
+            + "(assert (= #b111111110110 #b111111110110))\n";
+    String expectedResultMathsat5 =
+        "(assert (= #b111111110110 (bvmul #b111111110110 #b000000010100)))\n"
+            + "(assert (= #b111111110110 (bvmul #b111111110110 #b000000010100)))\n";
+    Assert.assertTrue(
+        expectedResultYices.equals(actualResult)
+            || expectedResultOthers.equals(actualResult)
+            || expectedResultMathsat5.equals(actualResult));
   }
 
   @Test
@@ -329,8 +388,11 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
 
     String actualResult = String.valueOf(Generator.lines);
 
-    String expectedResult = "(assert (bvsgt #b111111110110 #b000000010100))\n"
-        + "(assert (bvugt #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000))\n";
+    String expectedResult =
+        "(assert (bvsgt #b111111110110 #b000000010100))\n"
+            + "(assert (bvugt"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000))\n";
     Assert.assertEquals(expectedResult, actualResult);
   }
 
@@ -351,9 +413,11 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
 
     String actualResult = String.valueOf(Generator.lines);
 
-    String expectedResult = "(assert (bvsge #b111111110110 #b000000010100))\n"
-        + "(assert (bvuge "
-        + "#b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000))\n";
+    String expectedResult =
+        "(assert (bvsge #b111111110110 #b000000010100))\n"
+            + "(assert (bvuge"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000))\n";
     Assert.assertEquals(expectedResult, actualResult);
   }
 
@@ -374,9 +438,11 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
 
     String actualResult = String.valueOf(Generator.lines);
 
-    String expectedResult = "(assert (bvslt #b111111110110 #b000000010100))\n"
-        + "(assert (bvult "
-        + "#b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000))\n";
+    String expectedResult =
+        "(assert (bvslt #b111111110110 #b000000010100))\n"
+            + "(assert (bvult"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000))\n";
     Assert.assertEquals(expectedResult, actualResult);
   }
 
@@ -397,9 +463,11 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
 
     String actualResult = String.valueOf(Generator.lines);
 
-    String expectedResult = "(assert (bvsle #b111111110110 #b000000010100))\n"
-        + "(assert (bvule "
-        + "#b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000))\n";
+    String expectedResult =
+        "(assert (bvsle #b111111110110 #b000000010100))\n"
+            + "(assert (bvule"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000))\n";
     Assert.assertEquals(expectedResult, actualResult);
   }
 
@@ -420,11 +488,17 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
 
     String actualResult = String.valueOf(Generator.lines);
 
-    String expectedResultMathsat5 = "(assert (= (bvnot #b111111110110) (bvnot #b000000010100)))\n"
-        + "(assert (= (bvnot #b111111110110) (bvnot #b000000010100)))\n";
-    String expectedResultOthers = "(assert (= (bvnot #b111111110110) (bvnot #b000000010100)))\n"
-        + "(assert (= (bvnot #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110) (bvnot #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
-    Assert.assertTrue(expectedResultMathsat5.equals(actualResult) || expectedResultOthers.equals(actualResult));
+    String expectedResultMathsat5 =
+        "(assert (= (bvnot #b111111110110) (bvnot #b000000010100)))\n"
+            + "(assert (= (bvnot #b111111110110) (bvnot #b000000010100)))\n";
+    String expectedResultOthers =
+        "(assert (= (bvnot #b111111110110) (bvnot #b000000010100)))\n"
+            + "(assert (= (bvnot"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110)"
+            + " (bvnot"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
+    Assert.assertTrue(
+        expectedResultMathsat5.equals(actualResult) || expectedResultOthers.equals(actualResult));
   }
 
   @Test
@@ -446,15 +520,21 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
 
     String actualResult = String.valueOf(Generator.lines);
 
-    String expectedResultMathsat5 = "(declare-const a (_ BitVec 12))\n"
-        + "(assert (= a #b000000010100))\n"
-        + "(declare-const b (_ BitVec 100))\n"
-        + "(assert (= b #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000))\n";
-    String expectedResultZ3 = "(declare-const a (_ BitVec 12))\n"
-        + "(assert (= a (bvand #b111111110110 #b000000010100)))\n"
-        + "(declare-const b (_ BitVec 100))\n"
-        + "(assert (= b (bvand #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
-    Assert.assertTrue(expectedResultMathsat5.equals(actualResult) || expectedResultZ3.equals(actualResult));
+    String expectedResultMathsat5 =
+        "(declare-const a (_ BitVec 12))\n"
+            + "(assert (= a #b000000010100))\n"
+            + "(declare-const b (_ BitVec 100))\n"
+            + "(assert (= b"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000))\n";
+    String expectedResultZ3 =
+        "(declare-const a (_ BitVec 12))\n"
+            + "(assert (= a (bvand #b111111110110 #b000000010100)))\n"
+            + "(declare-const b (_ BitVec 100))\n"
+            + "(assert (= b (bvand"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
+    Assert.assertTrue(
+        expectedResultMathsat5.equals(actualResult) || expectedResultZ3.equals(actualResult));
   }
 
   @Test
@@ -476,15 +556,21 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
 
     String actualResult = String.valueOf(Generator.lines);
 
-    String expectedResultMathsat5 = "(declare-const a (_ BitVec 12))\n"
-        + "(assert (= a #b111111110110))\n"
-        + "(declare-const b (_ BitVec 100))\n"
-        + "(assert (= b #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110))\n";
-    String expectedResultZ3 = "(declare-const a (_ BitVec 12))\n"
-        + "(assert (= a (bvor #b111111110110 #b000000010100)))\n"
-        + "(declare-const b (_ BitVec 100))\n"
-        + "(assert (= b (bvor #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
-    Assert.assertTrue(expectedResultMathsat5.equals(actualResult) || expectedResultZ3.equals(actualResult));
+    String expectedResultMathsat5 =
+        "(declare-const a (_ BitVec 12))\n"
+            + "(assert (= a #b111111110110))\n"
+            + "(declare-const b (_ BitVec 100))\n"
+            + "(assert (= b"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110))\n";
+    String expectedResultZ3 =
+        "(declare-const a (_ BitVec 12))\n"
+            + "(assert (= a (bvor #b111111110110 #b000000010100)))\n"
+            + "(declare-const b (_ BitVec 100))\n"
+            + "(assert (= b (bvor"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
+    Assert.assertTrue(
+        expectedResultMathsat5.equals(actualResult) || expectedResultZ3.equals(actualResult));
   }
 
   @Test
@@ -506,15 +592,21 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
 
     String actualResult = String.valueOf(Generator.lines);
 
-    String expectedResultMathsat5 = "(declare-const a (_ BitVec 12))\n"
-        + "(assert (= a (bvxor #b111111110110 #b000000010100)))\n"
-        + "(declare-const b (_ BitVec 100))\n"
-        + "(assert (= b #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110))\n";
-    String expectedResultZ3 = "(declare-const a (_ BitVec 12))\n"
-        + "(assert (= a (bvxor #b111111110110 #b000000010100)))\n"
-        + "(declare-const b (_ BitVec 100))\n"
-        + "(assert (= b (bvxor #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
-    Assert.assertTrue(expectedResultMathsat5.equals(actualResult) || expectedResultZ3.equals(actualResult));
+    String expectedResultMathsat5 =
+        "(declare-const a (_ BitVec 12))\n"
+            + "(assert (= a (bvxor #b111111110110 #b000000010100)))\n"
+            + "(declare-const b (_ BitVec 100))\n"
+            + "(assert (= b"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110))\n";
+    String expectedResultZ3 =
+        "(declare-const a (_ BitVec 12))\n"
+            + "(assert (= a (bvxor #b111111110110 #b000000010100)))\n"
+            + "(declare-const b (_ BitVec 100))\n"
+            + "(assert (= b (bvxor"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
+    Assert.assertTrue(
+        expectedResultMathsat5.equals(actualResult) || expectedResultZ3.equals(actualResult));
   }
 
   @Test
@@ -536,15 +628,21 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
 
     String actualResult = String.valueOf(Generator.lines);
 
-    String expectedResultMathsat5 = "(declare-const a (_ BitVec 12))\n"
-        + "(assert (= a (bvashr #b111111110110 #b000000010100)))\n"
-        + "(declare-const b (_ BitVec 100))\n"
-        + "(assert (= b #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110))\n";
-    String expectedResultZ3 = "(declare-const a (_ BitVec 12))\n"
-        + "(assert (= a (bvashr #b111111110110 #b000000010100)))\n"
-        + "(declare-const b (_ BitVec 100))\n"
-        + "(assert (= b (bvlshr #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
-    Assert.assertTrue(expectedResultMathsat5.equals(actualResult) || expectedResultZ3.equals(actualResult));
+    String expectedResultMathsat5 =
+        "(declare-const a (_ BitVec 12))\n"
+            + "(assert (= a (bvashr #b111111110110 #b000000010100)))\n"
+            + "(declare-const b (_ BitVec 100))\n"
+            + "(assert (= b"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110))\n";
+    String expectedResultZ3 =
+        "(declare-const a (_ BitVec 12))\n"
+            + "(assert (= a (bvashr #b111111110110 #b000000010100)))\n"
+            + "(declare-const b (_ BitVec 100))\n"
+            + "(assert (= b (bvlshr"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
+    Assert.assertTrue(
+        expectedResultMathsat5.equals(actualResult) || expectedResultZ3.equals(actualResult));
   }
 
   @Test
@@ -566,15 +664,21 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
 
     String actualResult = String.valueOf(Generator.lines);
 
-    String expectedResultOthers = "(declare-const a (_ BitVec 12))\n"
-        + "(assert (= a (bvshl #b111111110110 #b000000010100)))\n"
-        + "(declare-const b (_ BitVec 100))\n"
-        + "(assert (= b (bvshl #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
-    String expectedResultMathsat5 = "(declare-const a (_ BitVec 12))\n"
-        + "(assert (= a (bvshl #b111111110110 #b000000010100)))\n"
-        + "(declare-const b (_ BitVec 100))\n"
-        + "(assert (= b #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110))\n";
-    Assert.assertTrue(expectedResultOthers.equals(actualResult) || expectedResultMathsat5.equals(actualResult));
+    String expectedResultOthers =
+        "(declare-const a (_ BitVec 12))\n"
+            + "(assert (= a (bvshl #b111111110110 #b000000010100)))\n"
+            + "(declare-const b (_ BitVec 100))\n"
+            + "(assert (= b (bvshl"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
+    String expectedResultMathsat5 =
+        "(declare-const a (_ BitVec 12))\n"
+            + "(assert (= a (bvshl #b111111110110 #b000000010100)))\n"
+            + "(declare-const b (_ BitVec 100))\n"
+            + "(assert (= b"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110))\n";
+    Assert.assertTrue(
+        expectedResultOthers.equals(actualResult) || expectedResultMathsat5.equals(actualResult));
   }
 
   @Test
@@ -596,10 +700,13 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
 
     String actualResult = String.valueOf(Generator.lines);
 
-    String expectedResultMathsat5 = "(declare-const a (_ BitVec 24))\n"
-        + "(assert (= a (concat #b111111110110 #b000000010100)))\n"
-        + "(declare-const b (_ BitVec 200))\n"
-        + "(assert (= b (concat #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110 #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
+    String expectedResultMathsat5 =
+        "(declare-const a (_ BitVec 24))\n"
+            + "(assert (= a (concat #b111111110110 #b000000010100)))\n"
+            + "(declare-const b (_ BitVec 200))\n"
+            + "(assert (= b (concat"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
     Assert.assertEquals(expectedResultMathsat5, actualResult);
   }
 
@@ -620,10 +727,12 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
 
     String actualResult = String.valueOf(Generator.lines);
 
-    String expectedResultMathsat5 = "(declare-const a (_ BitVec 6))\n"
-        + "(assert (= a ((_ extract 11 6) #b111111110110)))\n"
-        + "(declare-const b (_ BitVec 50))\n"
-        + "(assert (= b ((_ extract 99 50) #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
+    String expectedResultMathsat5 =
+        "(declare-const a (_ BitVec 6))\n"
+            + "(assert (= a ((_ extract 11 6) #b111111110110)))\n"
+            + "(declare-const b (_ BitVec 50))\n"
+            + "(assert (= b ((_ extract 99 50)"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
     Assert.assertEquals(expectedResultMathsat5, actualResult);
   }
 
@@ -644,10 +753,12 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
 
     String actualResult = String.valueOf(Generator.lines);
 
-    String expectedResultMathsat5 = "(declare-const a (_ BitVec 18))\n"
-        + "(assert (= a ((_ sign_extend 6) #b111111110110)))\n"
-        + "(declare-const b (_ BitVec 150))\n"
-        + "(assert (= b ((_ zero_extend 50) #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
+    String expectedResultMathsat5 =
+        "(declare-const a (_ BitVec 18))\n"
+            + "(assert (= a ((_ sign_extend 6) #b111111110110)))\n"
+            + "(declare-const b (_ BitVec 150))\n"
+            + "(assert (= b ((_ zero_extend 50)"
+            + " #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
     Assert.assertEquals(expectedResultMathsat5, actualResult);
   }
 
@@ -673,16 +784,17 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
 
     String actualResult = String.valueOf(Generator.lines);
 
-    String expectedResultOthers = "(declare-const a (_ BitVec 5))\n"
-        + "(declare-const b (_ BitVec 5))\n"
-        + "(assert (= a (bvshl (bvand (bvsub (bvadd a b) (bvsdiv #b10110 #b00000)) (bvsrem a #b10110)) (bvxor b #b00000))))\n";
-    String expectedResultMathsat5 = "(declare-const a (_ BitVec 5))\n"
-        + "(declare-const b (_ BitVec 5))\n"
-        + "(assert (= a (bvshl (bvand (bvsub (bvadd a b) (bvsdiv #b10110 #b00000)) (bvsrem a "
-        + "#b10110)) b)))\n";
-    Assert.assertTrue(expectedResultOthers.equals(actualResult) || expectedResultMathsat5.equals(actualResult));
+    String expectedResultOthers =
+        "(declare-const a (_ BitVec 5))\n"
+            + "(declare-const b (_ BitVec 5))\n"
+            + "(assert (= a (bvshl (bvand (bvsub (bvadd a b) (bvsdiv #b10110 #b00000)) (bvsrem a"
+            + " #b10110)) (bvxor b #b00000))))\n";
+    String expectedResultMathsat5 =
+        "(declare-const a (_ BitVec 5))\n"
+            + "(declare-const b (_ BitVec 5))\n"
+            + "(assert (= a (bvshl (bvand (bvsub (bvadd a b) (bvsdiv #b10110 #b00000)) (bvsrem a "
+            + "#b10110)) b)))\n";
+    Assert.assertTrue(
+        expectedResultOthers.equals(actualResult) || expectedResultMathsat5.equals(actualResult));
   }
-
-
-
-  }
+}

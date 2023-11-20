@@ -422,7 +422,8 @@ public class PrincessEnvironment {
           final Set<IExpression> allVars,
           final Map<String, IExpression> symbols,
           final Map<String, IFunApp> ufs,
-          final Map<String, IExpression> abbrevs) throws IOException {
+          final Map<String, IExpression> abbrevs)
+          throws IOException {
         final Deque<IExpression> waitlistSymbols = new ArrayDeque<>(allVars);
         final Set<String> seenSymbols = new HashSet<>();
         while (!waitlistSymbols.isEmpty()) {

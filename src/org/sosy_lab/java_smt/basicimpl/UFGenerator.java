@@ -37,9 +37,12 @@ public class UFGenerator {
     StringBuilder inputArgs = new StringBuilder("(");
     for (FormulaType<?> arg : args) {
       if (arg.isArrayType()) {
-        inputArgs.append("(Array ")
-            .append(checkUFOutputType(((ArrayFormulaType<?, ?>) arg).getIndexType())).append(" ")
-            .append(checkUFOutputType(((ArrayFormulaType<?, ?>) arg).getElementType())).append(")");
+        inputArgs
+            .append("(Array ")
+            .append(checkUFOutputType(((ArrayFormulaType<?, ?>) arg).getIndexType()))
+            .append(" ")
+            .append(checkUFOutputType(((ArrayFormulaType<?, ?>) arg).getElementType()))
+            .append(")");
       } else if (arg.isBitvectorType()) {
         inputArgs.append("(_ BitVec ").append(((BitvectorType) arg).getSize()).append(")");
       } else if (arg.isBooleanType()) {
@@ -58,8 +61,11 @@ public class UFGenerator {
 
   protected static String checkUFOutputType(FormulaType<?> out) {
     if (out.isArrayType()) {
-      return "(Array " + checkUFOutputType(((ArrayFormulaType<?, ?>) out).getIndexType()) + " "
-          + checkUFOutputType(((ArrayFormulaType<?, ?>) out).getElementType()) + ")";
+      return "(Array "
+          + checkUFOutputType(((ArrayFormulaType<?, ?>) out).getIndexType())
+          + " "
+          + checkUFOutputType(((ArrayFormulaType<?, ?>) out).getElementType())
+          + ")";
     } else if (out.isBitvectorType()) {
       return "(_ BitVec " + ((FormulaType.BitvectorType) out).getSize() + ")";
     } else if (out.isBooleanType()) {
@@ -74,8 +80,7 @@ public class UFGenerator {
   }
 
   protected static <T extends Formula> void logMakeFun(
-      Object result,
-      String pName, FormulaType<T> pReturnType, List<FormulaType<?>> pArgTypes) {
+      Object result, String pName, FormulaType<T> pReturnType, List<FormulaType<?>> pArgTypes) {
     List<Object> inputParams = new ArrayList<>();
 
     inputParams.add(pName);
@@ -88,20 +93,19 @@ public class UFGenerator {
         new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
 
-
   protected static <T extends Formula> void logCallFun(
-      Object result,
-      FunctionDeclaration<T> funcType, List<? extends Formula> pArgs) {
+      Object result, FunctionDeclaration<T> funcType, List<? extends Formula> pArgs) {
 
     List<Object> inputParams = new ArrayList<>(pArgs);
     Function<List<Object>, String> functionToString =
         inPlaceInputParams -> {
           StringBuilder out = new StringBuilder();
           out.append(funcType.getName()).append(" ");
-          inPlaceInputParams.forEach((c) -> {
-            out.append(c);
-            out.append(" ");
-          });
+          inPlaceInputParams.forEach(
+              (c) -> {
+                out.append(c);
+                out.append(" ");
+              });
           out.deleteCharAt(out.length() - 1);
           if (!inPlaceInputParams.isEmpty()) {
             out.insert(0, "(");
@@ -119,18 +123,18 @@ public class UFGenerator {
   }
 
   protected static <T extends Formula> void logCallFun(
-      Object result,
-      FunctionDeclaration<T> funcType, Formula... args) {
+      Object result, FunctionDeclaration<T> funcType, Formula... args) {
 
     List<Object> inputParams = new ArrayList<>(Arrays.asList(args));
     Function<List<Object>, String> functionToString =
         inPlaceInputParams -> {
           StringBuilder out = new StringBuilder();
           out.append(funcType.getName()).append(" ");
-          inPlaceInputParams.forEach((c) -> {
-            out.append(c);
-            out.append(" ");
-          });
+          inPlaceInputParams.forEach(
+              (c) -> {
+                out.append(c);
+                out.append(" ");
+              });
           out.deleteCharAt(out.length() - 1);
           if (!inPlaceInputParams.isEmpty()) {
             out.insert(0, "(");
@@ -145,6 +149,4 @@ public class UFGenerator {
     newEntry.setUFOutputType(checkUFOutputType(funcType.getType()));
     Generator.executedAggregator.add(newEntry);
   }
-
-
 }

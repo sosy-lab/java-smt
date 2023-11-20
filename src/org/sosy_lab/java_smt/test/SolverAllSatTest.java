@@ -192,8 +192,8 @@ public class SolverAllSatTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void allSatTest_withQuantifier() throws SolverException, InterruptedException,
-                                                 IOException {
+  public void allSatTest_withQuantifier()
+      throws SolverException, InterruptedException, IOException {
     requireBitvectors();
     requireQuantifiers();
 

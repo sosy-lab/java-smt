@@ -162,8 +162,8 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void testIsEquisatisfiableToYes() throws SolverException, InterruptedException,
-                                                  IOException {
+  public void testIsEquisatisfiableToYes()
+      throws SolverException, InterruptedException, IOException {
     assertThatFormula(simpleFormula).isEquisatisfiableTo(tautology);
   }
 

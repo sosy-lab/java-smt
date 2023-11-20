@@ -82,8 +82,7 @@ public class BitvectorGenerator {
   }
 
   protected static void logMakeBitVecVariable(
-      BitvectorFormula result, BitvectorType pType,
-      String pVar) {
+      BitvectorFormula result, BitvectorType pType, String pVar) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pVar);
     Function<List<Object>, String> functionToString =
@@ -94,9 +93,7 @@ public class BitvectorGenerator {
     Generator.executedAggregator.add(newEntry);
   }
 
-  protected static void logMakeBitVecVariable(
-      BitvectorFormula result, int pLength,
-      String pVar) {
+  protected static void logMakeBitVecVariable(BitvectorFormula result, int pLength, String pVar) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pVar);
     Function<List<Object>, String> functionToString =
@@ -109,9 +106,7 @@ public class BitvectorGenerator {
   }
 
   protected static void logBVEqual(
-      Object result,
-      BitvectorFormula pNumber1,
-      BitvectorFormula pNumber2) {
+      Object result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -121,7 +116,6 @@ public class BitvectorGenerator {
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
-
 
   protected static void logBVNegate(Object result, BitvectorFormula pNumber) {
     List<Object> inputParams = new ArrayList<>();
@@ -133,9 +127,7 @@ public class BitvectorGenerator {
   }
 
   protected static void logBVAdd(
-      BitvectorFormula result,
-      BitvectorFormula pNumber1,
-      BitvectorFormula pNumber2) {
+      BitvectorFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -147,8 +139,7 @@ public class BitvectorGenerator {
   }
 
   protected static void logBVSub(
-      BitvectorFormula result, BitvectorFormula pNumber1,
-      BitvectorFormula pNumber2) {
+      BitvectorFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -160,8 +151,7 @@ public class BitvectorGenerator {
   }
 
   protected static void logBVSDivide(
-      BitvectorFormula result, BitvectorFormula pNumber1,
-      BitvectorFormula pNumber2) {
+      BitvectorFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -173,8 +163,7 @@ public class BitvectorGenerator {
   }
 
   protected static void logBVUDivide(
-      BitvectorFormula result, BitvectorFormula pNumber1,
-      BitvectorFormula pNumber2) {
+      BitvectorFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -186,8 +175,7 @@ public class BitvectorGenerator {
   }
 
   protected static void logBVSModulo(
-      BitvectorFormula result, BitvectorFormula pNumber1,
-      BitvectorFormula pNumber2) {
+      BitvectorFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -199,8 +187,7 @@ public class BitvectorGenerator {
   }
 
   protected static void logBVUModulo(
-      BitvectorFormula result, BitvectorFormula pNumber1,
-      BitvectorFormula pNumber2) {
+      BitvectorFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -212,8 +199,7 @@ public class BitvectorGenerator {
   }
 
   protected static void logBVMultiply(
-      BitvectorFormula result, BitvectorFormula pNumber1,
-      BitvectorFormula pNumber2) {
+      BitvectorFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -225,8 +211,7 @@ public class BitvectorGenerator {
   }
 
   protected static void logBVUGreaterThan(
-      BooleanFormula result, BitvectorFormula pNumber1,
-      BitvectorFormula pNumber2) {
+      BooleanFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -238,8 +223,7 @@ public class BitvectorGenerator {
   }
 
   protected static void logBVSGreaterThan(
-      BooleanFormula result, BitvectorFormula pNumber1,
-      BitvectorFormula pNumber2) {
+      BooleanFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -251,8 +235,7 @@ public class BitvectorGenerator {
   }
 
   protected static void logBVUGreaterOrEqual(
-      BooleanFormula result, BitvectorFormula pNumber1,
-      BitvectorFormula pNumber2) {
+      BooleanFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -264,8 +247,7 @@ public class BitvectorGenerator {
   }
 
   protected static void logBVSGreaterOrEqual(
-      BooleanFormula result, BitvectorFormula pNumber1,
-      BitvectorFormula pNumber2) {
+      BooleanFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -277,8 +259,7 @@ public class BitvectorGenerator {
   }
 
   protected static void logBVULessThan(
-      BooleanFormula result, BitvectorFormula pNumber1,
-      BitvectorFormula pNumber2) {
+      BooleanFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -290,8 +271,7 @@ public class BitvectorGenerator {
   }
 
   protected static void logBVSLessThan(
-      BooleanFormula result, BitvectorFormula pNumber1,
-      BitvectorFormula pNumber2) {
+      BooleanFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -303,8 +283,7 @@ public class BitvectorGenerator {
   }
 
   protected static void logBVULessOrEqual(
-      BooleanFormula result, BitvectorFormula pNumber1,
-      BitvectorFormula pNumber2) {
+      BooleanFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -316,8 +295,7 @@ public class BitvectorGenerator {
   }
 
   protected static void logBVSLessOrEqual(
-      BooleanFormula result, BitvectorFormula pNumber1,
-      BitvectorFormula pNumber2) {
+      BooleanFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -338,8 +316,7 @@ public class BitvectorGenerator {
   }
 
   protected static void logBVAnd(
-      BitvectorFormula result, BitvectorFormula pNumber1,
-      BitvectorFormula pNumber2) {
+      BitvectorFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -351,8 +328,7 @@ public class BitvectorGenerator {
   }
 
   protected static void logBVOr(
-      BitvectorFormula result, BitvectorFormula pNumber1,
-      BitvectorFormula pNumber2) {
+      BitvectorFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -364,8 +340,7 @@ public class BitvectorGenerator {
   }
 
   protected static void logBVXor(
-      BitvectorFormula result, BitvectorFormula pNumber1,
-      BitvectorFormula pNumber2) {
+      BitvectorFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -377,8 +352,7 @@ public class BitvectorGenerator {
   }
 
   protected static void logBVSShiftRight(
-      BitvectorFormula result, BitvectorFormula pNumber,
-      BitvectorFormula toShift) {
+      BitvectorFormula result, BitvectorFormula pNumber, BitvectorFormula toShift) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber);
     inputParams.add(toShift);
@@ -390,8 +364,7 @@ public class BitvectorGenerator {
   }
 
   protected static void logBVUShiftRight(
-      BitvectorFormula result, BitvectorFormula pNumber,
-      BitvectorFormula toShift) {
+      BitvectorFormula result, BitvectorFormula pNumber, BitvectorFormula toShift) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber);
     inputParams.add(toShift);
@@ -403,8 +376,7 @@ public class BitvectorGenerator {
   }
 
   protected static void logBVShiftLeft(
-      BitvectorFormula result, BitvectorFormula pNumber,
-      BitvectorFormula toShift) {
+      BitvectorFormula result, BitvectorFormula pNumber, BitvectorFormula toShift) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber);
     inputParams.add(toShift);
@@ -416,8 +388,7 @@ public class BitvectorGenerator {
   }
 
   protected static void logConcat(
-      BitvectorFormula result, BitvectorFormula pNumber,
-      BitvectorFormula append) {
+      BitvectorFormula result, BitvectorFormula pNumber, BitvectorFormula append) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber);
     inputParams.add(append);
@@ -429,8 +400,7 @@ public class BitvectorGenerator {
   }
 
   protected static void logExtract(
-      BitvectorFormula result, BitvectorFormula pNumber,
-      int pMsb, int pLsb) {
+      BitvectorFormula result, BitvectorFormula pNumber, int pMsb, int pLsb) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber);
     inputParams.add(String.valueOf(pMsb));
@@ -444,8 +414,7 @@ public class BitvectorGenerator {
   }
 
   protected static void logUExtend(
-      BitvectorFormula result, BitvectorFormula pNumber,
-      int pExtensionBits) {
+      BitvectorFormula result, BitvectorFormula pNumber, int pExtensionBits) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber);
     inputParams.add(String.valueOf(pExtensionBits));
@@ -457,8 +426,7 @@ public class BitvectorGenerator {
   }
 
   protected static void logSExtend(
-      BitvectorFormula result, BitvectorFormula pNumber,
-      int pExtensionBits) {
+      BitvectorFormula result, BitvectorFormula pNumber, int pExtensionBits) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber);
     inputParams.add(String.valueOf(pExtensionBits));
@@ -468,5 +436,4 @@ public class BitvectorGenerator {
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, saveResult, "Skip"));
   }
-
 }

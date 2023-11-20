@@ -83,7 +83,6 @@ class BoolectorModel extends AbstractModel<Long, Long, Long> {
   private final BoolectorAbstractProver<?> prover;
   private final BoolectorFormulaCreator bfCreator;
 
-
   private final ImmutableList<Long> assertedTerms;
 
   BoolectorModel(
