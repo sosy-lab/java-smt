@@ -76,10 +76,10 @@ public class ArrayGenerator {
       String pName, FormulaType<?> pIndexType, FormulaType<?> pElementType) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pName);
-    Function<List<Object>, String> saveResult =
+    Function<List<Object>, String> functionToString =
         inPlaceInputParams -> (String) inPlaceInputParams.get(0);
-    RecursiveString
-        newEntry = new RecursiveString(result, inputParams, saveResult, "Array");
+    FunctionEnvironment
+        newEntry = new FunctionEnvironment(result, inputParams, functionToString, "Array");
     newEntry.setArrayIndexType(checkArrayIndexSort(pIndexType));
     newEntry.setArrayValueType(checkArrayElementSort(pElementType));
     Generator.executedAggregator.add(newEntry);
@@ -92,11 +92,11 @@ public class ArrayGenerator {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pArray1);
     inputParams.add(pArray2);
-    Function<List<Object>, String> saveResult =
+    Function<List<Object>, String> functionToString =
         inPlaceInputParams -> "(= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
             + ")";
     Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
 
   protected static void logSelect(
@@ -106,11 +106,11 @@ public class ArrayGenerator {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pArray);
     inputParams.add(pIndex);
-    Function<List<Object>, String> saveResult =
+    Function<List<Object>, String> functionToString =
         inPlaceInputParams -> "(select " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
             1) + ")";
     Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
 
   protected static void logStore(
@@ -119,11 +119,11 @@ public class ArrayGenerator {
     inputParams.add(pArray);
     inputParams.add(pIndex);
     inputParams.add(pValue);
-    Function<List<Object>, String> saveResult =
+    Function<List<Object>, String> functionToString =
         inPlaceInputParams -> "(store " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
             1) + " " + inPlaceInputParams.get(2) + ")";
     Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
 
 }

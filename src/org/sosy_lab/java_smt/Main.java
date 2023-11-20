@@ -26,6 +26,7 @@ import org.sosy_lab.common.log.BasicLogManager;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
@@ -46,7 +47,7 @@ public class Main {
         SolverContextFactory.createSolverContext(config, logger, shutdown.getNotifier(),
             Solvers.PRINCESS_BINARY);
     FormulaManager fmgr = context.getFormulaManager();
-
+    BooleanFormulaManager bmgr = fmgr.getBooleanFormulaManager();
 
     String a = "(declare-const a1 (Array Int Int))\n"
         + "(declare-const a2 (Array Int Int))\n"

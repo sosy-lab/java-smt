@@ -31,54 +31,54 @@ public class BooleanGenerator {
   protected static void logMakeVariable(Object result, String pVar) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pVar);
-    Function<List<Object>, String> saveResult =
+    Function<List<Object>, String> functionToString =
         inPlaceInputParams -> (String) inPlaceInputParams.get(0);
     Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Bool"));
+        new FunctionEnvironment(result, inputParams, functionToString, "Bool"));
   }
 
   protected static void logMakeTrue(Object result, String pVar) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pVar);
-    Function<List<Object>, String> saveResult =
+    Function<List<Object>, String> functionToString =
         inPlaceInputParams -> (String) inPlaceInputParams.get(0);
     Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Direct"));
+        new FunctionEnvironment(result, inputParams, functionToString, "Direct"));
   }
 
   protected static void logMakeFalse(Object result, String pVar) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pVar);
-    Function<List<Object>, String> saveResult =
+    Function<List<Object>, String> functionToString =
         inPlaceInputParams -> (String) inPlaceInputParams.get(0);
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult,
+    Generator.executedAggregator.add(new FunctionEnvironment(result, inputParams, functionToString,
         "Direct"));
   }
 
   protected static void logNot(Object result, BooleanFormula pBits) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pBits);
-    Function<List<Object>, String> saveResult =
+    Function<List<Object>, String> functionToString =
         inPlaceInputParams -> "(not " + inPlaceInputParams.get(0) + ")";
     Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
 
   protected static void logOr(Object result, BooleanFormula pBits1, BooleanFormula pBits2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pBits1);
     inputParams.add(pBits2);
-    Function<List<Object>, String> saveResult =
+    Function<List<Object>, String> functionToString =
         inPlaceInputParams -> "(or " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
             + ")";
     Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
 
   protected static void logOr(Object result, Collection<BooleanFormula> pBits1) {
 
     List<Object> inputParams = new ArrayList<>(pBits1);
-    Function<List<Object>, String> saveResult =
+    Function<List<Object>, String> functionToString =
         inPlaceInputParams -> {
           StringBuilder out = new StringBuilder();
           out.append("(or ");
@@ -91,23 +91,23 @@ public class BooleanGenerator {
         };
 
     Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
 
   protected static void logAnd(Object result, BooleanFormula pBits1, BooleanFormula pBits2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pBits1);
     inputParams.add(pBits2);
-    Function<List<Object>, String> saveResult =
+    Function<List<Object>, String> functionToString =
         inPlaceInputParams -> "(and " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
             + ")";
     Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
 
   protected static void logAnd(Object result, Collection<BooleanFormula> pBits1) {
     List<Object> inputParams = new ArrayList<>(pBits1);
-    Function<List<Object>, String> saveResult =
+    Function<List<Object>, String> functionToString =
         inPlaceInputParams -> {
           StringBuilder out = new StringBuilder();
           out.delete(0, out.length());
@@ -121,7 +121,7 @@ public class BooleanGenerator {
         };
 
     Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
 
 
@@ -129,11 +129,11 @@ public class BooleanGenerator {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pBits1);
     inputParams.add(pBits2);
-    Function<List<Object>, String> saveResult =
+    Function<List<Object>, String> functionToString =
         inPlaceInputParams -> "(xor " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
             + ")";
     Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
 
   protected static void logEquivalence(
@@ -143,11 +143,11 @@ public class BooleanGenerator {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pBits1);
     inputParams.add(pBits2);
-    Function<List<Object>, String> saveResult =
+    Function<List<Object>, String> functionToString =
         inPlaceInputParams -> "(= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
             + ")";
     Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
 
   protected static void logImplication(
@@ -157,11 +157,11 @@ public class BooleanGenerator {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pBits1);
     inputParams.add(pBits2);
-    Function<List<Object>, String> saveResult =
+    Function<List<Object>, String> functionToString =
         inPlaceInputParams -> "(=> " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
             + ")";
     Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
 
   protected static void logIfThenElse(Object result, BooleanFormula pBits1, Object f1, Object f2) {
@@ -169,11 +169,11 @@ public class BooleanGenerator {
     inputParams.add(pBits1);
     inputParams.add(f1);
     inputParams.add(f2);
-    Function<List<Object>, String> saveResult =
+    Function<List<Object>, String> functionToString =
         inPlaceInputParams -> "(ite " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
             + " " + inPlaceInputParams.get(2) + ")";
     Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
 
 }

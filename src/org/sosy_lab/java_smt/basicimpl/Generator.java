@@ -41,9 +41,9 @@ public class Generator {
   private static final String file = "Out.smt2";
   public static final StringBuilder lines = new StringBuilder("(set-logic AUFLIRA)\n");
 
-  public static final List<RecursiveString> executedAggregator = new ArrayList<>();
+  public static final List<FunctionEnvironment> executedAggregator = new ArrayList<>();
 
-  public static final List<RecursiveString> registeredVariables = new ArrayList<>();
+  public static final List<FunctionEnvironment> registeredVariables = new ArrayList<>();
 
 
   protected static void writeToFile(String line, String fileName) throws IOException {
@@ -67,54 +67,52 @@ public class Generator {
   }
 
   protected static String evaluateRecursive(Object constraint) {
-    RecursiveString methodToEvaluate = executedAggregator
-        .stream()
-        .filter(x -> x.getResult().equals(constraint))
-        .findFirst()
-        .orElse(null);
-    if (methodToEvaluate != null && !methodToEvaluate.variableType.equals("Direct")) {
-      registeredVariables.add(methodToEvaluate);
-    }
-
     if (constraint instanceof String) {
-      String result = (String) constraint;
-      return result;
+      return (String) constraint;
     } else {
+      FunctionEnvironment methodToEvaluate = executedAggregator
+          .stream()
+          .filter(x -> x.getResult().equals(constraint))
+          .findFirst()
+          .orElse(null);
+      if (methodToEvaluate != null && !methodToEvaluate.keyword.equals("Direct")) {
+        registeredVariables.add(methodToEvaluate);
+      }
       List<Object> evaluatedInputs = new ArrayList<>();
       for (Object value : Objects.requireNonNull(methodToEvaluate).getInputParams()) {
         String evaluatedInput = evaluateRecursive(value);
         evaluatedInputs.add(evaluatedInput);
       }
-      String result = methodToEvaluate.getSaveResult().apply(evaluatedInputs);
+      String result = methodToEvaluate.getFunctionToString().apply(evaluatedInputs);
       return result;
     }
   }
 
   public static void logAddConstraint(BooleanFormula constraint) {
     String result = evaluateRecursive(constraint);
-    List<RecursiveString> uniqueRegisteredValues =
+    List<FunctionEnvironment> uniqueRegisteredValues =
         registeredVariables.stream().distinct().collect(Collectors.toList());
     String command = "(assert ";
-    for (RecursiveString variable : uniqueRegisteredValues) {
-      if (variable.variableType.equals("Bool")) {
+    for (FunctionEnvironment variable : uniqueRegisteredValues) {
+      if (variable.keyword.equals("Bool")) {
         String newEntry = "(declare-const " + variable.inputParams.get(0) + " Bool)\n";
         if (lines.indexOf(newEntry) == -1) {
           lines.append(newEntry);
         }
       }
-      if (variable.variableType.equals("Int")) {
+      if (variable.keyword.equals("Int")) {
         String newEntry = "(declare-const " + variable.inputParams.get(0) + " Int)\n";
         if (lines.indexOf(newEntry) == -1) {
           lines.append(newEntry);
         }
       }
-      if (variable.variableType.equals("Real")) {
+      if (variable.keyword.equals("Real")) {
         String newEntry = "(declare-const " + variable.inputParams.get(0) + " Real)\n";
         if (lines.indexOf(newEntry) == -1) {
           lines.append(newEntry);
         }
       }
-      if (variable.variableType.equals("BitVec")) {
+      if (variable.keyword.equals("BitVec")) {
         String newEntry =
             "(declare-const " + variable.inputParams.get(0) + " (_ BitVec " + variable.bitVecLength
                 + "))\n";
@@ -122,7 +120,7 @@ public class Generator {
           lines.append(newEntry);
         }
       }
-      if (variable.variableType.equals("Array")) {
+      if (variable.keyword.equals("Array")) {
         String newEntry =
             "(declare-const " + variable.inputParams.get(0) + " (Array " + variable.arrayIndexType
                 + " "
@@ -132,14 +130,7 @@ public class Generator {
           lines.append(newEntry);
         }
       }
-      if (variable.variableType.equals("UFSort")) {
-        String newEntry =
-            "(declare-sort " + variable.result + " 0)\n";
-        if (lines.indexOf(newEntry) == -1) {
-          lines.append(newEntry);
-        }
-      }
-      if (variable.variableType.equals("UFFun")) {
+      if (variable.keyword.equals("UFFun")) {
         String newEntry =
             "(declare-fun " + variable.ufName + " " + variable.ufInputType + " "
                 + variable.ufOutputType + ")"

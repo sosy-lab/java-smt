@@ -36,9 +36,9 @@ public class NumeralGenerator {
     if (result instanceof IntegerFormula && Integer.parseInt(pVar) < 0) {
       String absVar = String.valueOf(abs(Integer.parseInt(pVar)));
       inputParams.add(absVar);
-      Function<List<Object>, String> saveResult =
+      Function<List<Object>, String> functionToString =
           inPlaceInputParams -> "(- " + inPlaceInputParams.get(0) + ")";
-      Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult,
+      Generator.executedAggregator.add(new FunctionEnvironment(result, inputParams, functionToString,
           "Direct"));
     } else if (result instanceof NumeralFormula) {
       String checkedVar = String.valueOf(result);
@@ -46,9 +46,9 @@ public class NumeralGenerator {
     } else {
       inputParams.add(pVar);
     }
-    Function<List<Object>, String> saveResult =
+    Function<List<Object>, String> functionToString =
         inPlaceInputParams -> (String) inPlaceInputParams.get(0);
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult,
+    Generator.executedAggregator.add(new FunctionEnvironment(result, inputParams, functionToString,
         "Direct"));
   }
 
@@ -61,9 +61,9 @@ public class NumeralGenerator {
     }
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pVar);
-    Function<List<Object>, String> saveResult =
+    Function<List<Object>, String> functionToString =
         inPlaceInputParams -> (String) inPlaceInputParams.get(0);
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult,
+    Generator.executedAggregator.add(new FunctionEnvironment(result, inputParams, functionToString,
         varType));
   }
 
@@ -71,31 +71,31 @@ public class NumeralGenerator {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
-    Function<List<Object>, String> saveResult =
+    Function<List<Object>, String> functionToString =
         inPlaceInputParams -> "(+ " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
             + ")";
     Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
 
   protected static void logEqual(Object result, NumeralFormula pNumber1, NumeralFormula pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
-    Function<List<Object>, String> saveResult =
+    Function<List<Object>, String> functionToString =
         inPlaceInputParams -> "(= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
             + ")";
     Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
 
   protected static void logNegate(Object result, NumeralFormula pBits) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pBits);
-    Function<List<Object>, String> saveResult =
+    Function<List<Object>, String> functionToString =
         inPlaceInputParams -> "(- " + inPlaceInputParams.get(0) + ")";
     Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
 
   protected static void logSum(Object result, List<?> operands) {
@@ -104,7 +104,7 @@ public class NumeralGenerator {
     for (Object pOperand : operands) {
       inputParams.add(pOperand.toString());
     }
-    Function<List<Object>, String> saveResult =
+    Function<List<Object>, String> functionToString =
         inPlaceInputParams -> {
           StringBuilder out = new StringBuilder();
           out.append("(+ ");
@@ -116,51 +116,51 @@ public class NumeralGenerator {
               out.deleteCharAt(out.length() - 1).append(")"));
         };
     Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
 
   protected static void logSubtract(Object result, Object pNumber1, Object pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
-    Function<List<Object>, String> saveResult =
+    Function<List<Object>, String> functionToString =
         inPlaceInputParams -> "(- " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
             + ")";
     Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
 
   protected static void logDivide(Object result, Object pNumber1, Object pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
-    Function<List<Object>, String> saveResult =
+    Function<List<Object>, String> functionToString =
         inPlaceInputParams -> "(div " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
             + ")";
     Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
 
   protected static void logModulo(Object result, Object pNumber1, Object pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
-    Function<List<Object>, String> saveResult =
+    Function<List<Object>, String> functionToString =
         inPlaceInputParams -> "(mod " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
             + ")";
     Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
 
   protected static void logMultiply(Object result, Object pNumber1, Object pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
-    Function<List<Object>, String> saveResult =
+    Function<List<Object>, String> functionToString =
         inPlaceInputParams -> "(* " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
             + ")";
     Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
 
   protected static void logDistinct(Object result, List<?> operands) {
@@ -168,7 +168,7 @@ public class NumeralGenerator {
     for (Object pOperand : operands) {
       inputParams.add(pOperand.toString());
     }
-    Function<List<Object>, String> saveResult =
+    Function<List<Object>, String> functionToString =
         inPlaceInputParams -> {
           StringBuilder out = new StringBuilder();
           out.append("(distinct ");
@@ -180,60 +180,60 @@ public class NumeralGenerator {
               out.deleteCharAt(out.length() - 1).append(")"));
         };
     Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
 
   protected static void logGreaterThan(Object result, Object pNumber1, Object pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
-    Function<List<Object>, String> saveResult =
+    Function<List<Object>, String> functionToString =
         inPlaceInputParams -> "(> " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
             + ")";
     Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
 
   protected static void logGreaterOrEquals(Object result, Object pNumber1, Object pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
-    Function<List<Object>, String> saveResult =
+    Function<List<Object>, String> functionToString =
         inPlaceInputParams -> "(>= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
             + ")";
     Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
 
   protected static void logLessThan(Object result, Object pNumber1, Object pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
-    Function<List<Object>, String> saveResult =
+    Function<List<Object>, String> functionToString =
         inPlaceInputParams -> "(< " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
             + ")";
     Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
 
   protected static void logLessOrEquals(Object result, Object pNumber1, Object pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
-    Function<List<Object>, String> saveResult =
+    Function<List<Object>, String> functionToString =
         inPlaceInputParams -> "(<= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
             + ")";
     Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
 
   protected static void logFloor(Object result, Object number) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(number);
-    Function<List<Object>, String> saveResult =
+    Function<List<Object>, String> functionToString =
         inPlaceInputParams -> "(to_int " + inPlaceInputParams.get(0) + ")";
     Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
 
 }

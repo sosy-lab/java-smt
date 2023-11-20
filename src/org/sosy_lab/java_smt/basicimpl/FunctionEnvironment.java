@@ -23,12 +23,12 @@ package org.sosy_lab.java_smt.basicimpl;
 import java.util.List;
 import java.util.function.Function;
 
-public class RecursiveString {
+public class FunctionEnvironment {
 
   Object result;
   List<Object> inputParams;
-  Function<List<Object>, String> saveResult;
-  String variableType;
+  Function<List<Object>, String> functionToString;
+  String keyword;
   int bitVecLength;
   String ufName = "";
   String ufInputType = "";
@@ -37,14 +37,14 @@ public class RecursiveString {
   String arrayValueType = "";
 
 
-  protected RecursiveString(
+  protected FunctionEnvironment(
       Object pResult,
       List<Object> pInputParams,
-      Function<List<Object>, String> pSaveResult, String pVariableType) {
+      Function<List<Object>, String> pFunctionToString, String pKeyword) {
     result = pResult;
     inputParams = pInputParams;
-    saveResult = pSaveResult;
-    variableType = pVariableType;
+    functionToString = pFunctionToString;
+    keyword = pKeyword;
   }
 
   public Object getResult() {
@@ -59,12 +59,12 @@ public class RecursiveString {
     bitVecLength = pBitVecLength;
   }
 
-  public String getVariableType() {
-    return variableType;
+  public String getKeyword() {
+    return keyword;
   }
 
-  public void setVariableType(String pVariableType) {
-    variableType = pVariableType;
+  public void setKeyword(String pKeyword) {
+    keyword = pKeyword;
   }
 
   public void setResult(Object pResult) {
@@ -79,12 +79,12 @@ public class RecursiveString {
     inputParams = pInputParams;
   }
 
-  public Function<List<Object>, String> getSaveResult() {
-    return saveResult;
+  public Function<List<Object>, String> getFunctionToString() {
+    return functionToString;
   }
 
-  public void setSaveResult(Function<List<Object>, String> pSaveResult) {
-    saveResult = pSaveResult;
+  public void setFunctionToString(Function<List<Object>, String> pFunctionToString) {
+    functionToString = pFunctionToString;
   }
 
   public void setArrayIndexType(String pArrayIndexType) {

@@ -81,11 +81,11 @@ public class UFGenerator {
     inputParams.add(pName);
     inputParams.add(pReturnType);
     inputParams.add(pArgTypes);
-    Function<List<Object>, String> saveResult =
+    Function<List<Object>, String> functionToString =
         inPlaceInputParams -> "(declare-fun " + inPlaceInputParams.get(0) + " ("
             + inPlaceInputParams.get(1) + ")" + inPlaceInputParams.get(2) + ")";
     Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
 
 
@@ -94,7 +94,7 @@ public class UFGenerator {
       FunctionDeclaration<T> funcType, List<? extends Formula> pArgs) {
 
     List<Object> inputParams = new ArrayList<>(pArgs);
-    Function<List<Object>, String> saveResult =
+    Function<List<Object>, String> functionToString =
         inPlaceInputParams -> {
           StringBuilder out = new StringBuilder();
           out.append(funcType.getName()).append(" ");
@@ -109,8 +109,8 @@ public class UFGenerator {
           }
           return String.valueOf(out);
         };
-    RecursiveString newEntry = new RecursiveString(result, inputParams,
-        saveResult,
+    FunctionEnvironment newEntry = new FunctionEnvironment(result, inputParams,
+        functionToString,
         "UFFun");
     newEntry.setUFName(funcType.getName());
     newEntry.setUFInputType(checkUFInputType(funcType.getArgumentTypes()));
@@ -123,7 +123,7 @@ public class UFGenerator {
       FunctionDeclaration<T> funcType, Formula... args) {
 
     List<Object> inputParams = new ArrayList<>(Arrays.asList(args));
-    Function<List<Object>, String> saveResult =
+    Function<List<Object>, String> functionToString =
         inPlaceInputParams -> {
           StringBuilder out = new StringBuilder();
           out.append(funcType.getName()).append(" ");
@@ -138,8 +138,8 @@ public class UFGenerator {
           }
           return String.valueOf(out);
         };
-    RecursiveString newEntry = new RecursiveString(result, inputParams,
-        saveResult, "UFFun");
+    FunctionEnvironment newEntry = new FunctionEnvironment(result, inputParams,
+        functionToString, "UFFun");
     newEntry.setUFName(funcType.getName());
     newEntry.setUFInputType(checkUFInputType(funcType.getArgumentTypes()));
     newEntry.setUFOutputType(checkUFOutputType(funcType.getType()));
