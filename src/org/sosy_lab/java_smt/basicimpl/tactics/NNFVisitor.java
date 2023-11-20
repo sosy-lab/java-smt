@@ -127,24 +127,30 @@ public class NNFVisitor extends BooleanFormulaTransformationVisitor {
 
     @Override
     public BooleanFormula visitAnd(List<BooleanFormula> processedOperands) {
-      return bfmgr.or(Lists.transform(processedOperands, f -> {
-        try {
-          return bfmgr.visit(f, this);
-        } catch (IOException pE) {
-          throw new RuntimeException(pE);
-        }
-      }));
+      return bfmgr.or(
+          Lists.transform(
+              processedOperands,
+              f -> {
+                try {
+                  return bfmgr.visit(f, this);
+                } catch (IOException pE) {
+                  throw new RuntimeException(pE);
+                }
+              }));
     }
 
     @Override
     public BooleanFormula visitOr(List<BooleanFormula> processedOperands) {
-      return bfmgr.and(Lists.transform(processedOperands, f -> {
-        try {
-          return bfmgr.visit(f, this);
-        } catch (IOException pE) {
-          throw new RuntimeException(pE);
-        }
-      }));
+      return bfmgr.and(
+          Lists.transform(
+              processedOperands,
+              f -> {
+                try {
+                  return bfmgr.visit(f, this);
+                } catch (IOException pE) {
+                  throw new RuntimeException(pE);
+                }
+              }));
     }
 
     @Override

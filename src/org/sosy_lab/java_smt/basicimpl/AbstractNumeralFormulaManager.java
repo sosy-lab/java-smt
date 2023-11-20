@@ -437,7 +437,7 @@ public abstract class AbstractNumeralFormulaManager<
 
   @Override
   public BooleanFormula distinct(List<ParamFormulaType> pNumbers) {
-    BooleanFormula result =  wrapBool(distinctImpl(Lists.transform(pNumbers, this::extractInfo)));
+    BooleanFormula result = wrapBool(distinctImpl(Lists.transform(pNumbers, this::extractInfo)));
     if (Generator.isLoggingEnabled()) {
       NumeralGenerator.logDistinct(result, pNumbers);
     }
@@ -507,8 +507,8 @@ public abstract class AbstractNumeralFormulaManager<
       }
       return result;
     } else {
-      IntegerFormula result = getFormulaCreator().encapsulate(FormulaType.IntegerType,
-          floor(extractInfo(number)));
+      IntegerFormula result =
+          getFormulaCreator().encapsulate(FormulaType.IntegerType, floor(extractInfo(number)));
       if (Generator.isLoggingEnabled()) {
         NumeralGenerator.logFloor(result, number);
       }

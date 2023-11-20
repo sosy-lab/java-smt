@@ -251,8 +251,8 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
   }
 
   @Test
-  public void testDivisionUnsatisfiable() throws SolverException, InterruptedException,
-                                                 IOException {
+  public void testDivisionUnsatisfiable()
+      throws SolverException, InterruptedException, IOException {
     T a = nmgr.makeVariable("a");
 
     BooleanFormula f =

@@ -165,8 +165,8 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   }
 
   @Test
-  public <T> void binaryBVInterpolation1() throws SolverException, InterruptedException,
-                                                  IOException {
+  public <T> void binaryBVInterpolation1()
+      throws SolverException, InterruptedException, IOException {
     requireBitvectors();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();

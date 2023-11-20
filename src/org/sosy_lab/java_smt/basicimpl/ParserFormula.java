@@ -28,9 +28,9 @@ public class ParserFormula {
   String type;
   Object javaSmt;
 
-   FormulaType<?> returnType;
+  FormulaType<?> returnType;
 
-   List<FormulaType<?>> inputParams;
+  List<FormulaType<?>> inputParams;
 
   public ParserFormula(String pType, Object pJavaSmt) {
     type = pType;
@@ -56,6 +56,7 @@ public class ParserFormula {
   public FormulaType<?> getReturnType() {
     return returnType;
   }
+
   public void setReturnType(FormulaType<?> pReturnType) {
     returnType = pReturnType;
   }

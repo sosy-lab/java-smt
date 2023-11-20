@@ -328,7 +328,8 @@ public class FormulaClassifier {
         BooleanFormula pF,
         Quantifier pQuantifier,
         List<Formula> pBoundVariables,
-        BooleanFormula pBody) throws IOException {
+        BooleanFormula pBody)
+        throws IOException {
       hasQuantifiers = true;
       checkType(pF);
       return mgr.visit(pBody, this);

@@ -371,8 +371,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testBVExistsArrayConjunct1() throws SolverException, InterruptedException,
-                                                  IOException {
+  public void testBVExistsArrayConjunct1()
+      throws SolverException, InterruptedException, IOException {
     // (exists x . b[x] = 0) AND (b[123] = 1) is SAT
     requireBitvectors();
     // Princess does not support bitvectors in arrays
@@ -406,8 +406,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testBVExistsArrayConjunct2() throws SolverException, InterruptedException,
-                                                  IOException {
+  public void testBVExistsArrayConjunct2()
+      throws SolverException, InterruptedException, IOException {
     assume()
         .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
         .that(solverToUse())
@@ -447,8 +447,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testBVExistsArrayConjunct3() throws SolverException, InterruptedException,
-                                                  IOException {
+  public void testBVExistsArrayConjunct3()
+      throws SolverException, InterruptedException, IOException {
     // (exists x . b[x] = 0) AND (forall x . b[x] = 0) is SAT
     requireBitvectors();
     // Princess does not support bitvectors in arrays
@@ -482,8 +482,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testBVExistsArrayDisjunct1() throws SolverException, InterruptedException,
-                                                  IOException {
+  public void testBVExistsArrayDisjunct1()
+      throws SolverException, InterruptedException, IOException {
     // (exists x . b[x] = 0) OR (forall x . b[x] = 1) is SAT
     requireBitvectors();
     // Princess does not support bitvectors in arrays
@@ -512,8 +512,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testBVExistsArrayDisjunct2() throws SolverException, InterruptedException,
-                                                  IOException {
+  public void testBVExistsArrayDisjunct2()
+      throws SolverException, InterruptedException, IOException {
     // (exists x . b[x] = 1) OR (exists x . b[x] = 1) is SAT
     requireBitvectors();
     // Princess does not support bitvectors in arrays
@@ -909,8 +909,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testExistsRestrictedRange() throws SolverException, InterruptedException,
-                                                 IOException {
+  public void testExistsRestrictedRange()
+      throws SolverException, InterruptedException, IOException {
     assume()
         .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
         .that(solverToUse())
@@ -966,8 +966,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testForallRestrictedRange() throws SolverException, InterruptedException,
-                                                 IOException {
+  public void testForallRestrictedRange()
+      throws SolverException, InterruptedException, IOException {
     assume()
         .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
         .that(solverToUse())
@@ -1085,8 +1085,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testExistsBasicStringArray() throws SolverException, InterruptedException,
-                                                  IOException {
+  public void testExistsBasicStringArray()
+      throws SolverException, InterruptedException, IOException {
     requireStrings();
     requireIntegers();
 
@@ -1102,8 +1102,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testForallBasicStringArray() throws SolverException, InterruptedException,
-                                                  IOException {
+  public void testForallBasicStringArray()
+      throws SolverException, InterruptedException, IOException {
     requireStrings();
     requireIntegers();
 

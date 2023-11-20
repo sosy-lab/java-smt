@@ -36,11 +36,11 @@ public class RecursiveString {
   String arrayIndexType = "";
   String arrayValueType = "";
 
-
   protected RecursiveString(
       Object pResult,
       List<Object> pInputParams,
-      Function<List<Object>, String> pSaveResult, String pVariableType) {
+      Function<List<Object>, String> pSaveResult,
+      String pVariableType) {
     result = pResult;
     inputParams = pInputParams;
     saveResult = pSaveResult;
@@ -126,5 +126,4 @@ public class RecursiveString {
   public void setUFOutputType(String pUFOutputType) {
     ufOutputType = pUFOutputType;
   }
-
 }

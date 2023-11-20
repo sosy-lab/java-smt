@@ -78,11 +78,8 @@ public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironme
     return delegate.isUnsat();
   }
 
-  /**
-   * overridden in sub-class.
-   */
-  protected void registerPushedFormula(@SuppressWarnings("unused") T pPushResult) {
-  }
+  /** overridden in sub-class. */
+  protected void registerPushedFormula(@SuppressWarnings("unused") T pPushResult) {}
 
   @Override
   public Model getModel() throws SolverException {

@@ -84,8 +84,7 @@ public class SmtInterpolFormulaManager
           }
 
           @Override
-          public void printSuccess() {
-          }
+          public void printSuccess() {}
         };
 
     try {

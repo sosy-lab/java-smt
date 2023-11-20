@@ -189,13 +189,14 @@ public class UfElimination {
     // substitute all UFs in the additional constraints,
     // required if UFs are arguments of UFs, e.g. uf(uf(1, 2), 2)
     for (int i = 0; i < depth; i++) {
-      extraConstraints.replaceAll(c -> {
-        try {
-          return fmgr.substitute(c, substitutions);
-        } catch (IOException pE) {
-          throw new RuntimeException(pE);
-        }
-      });
+      extraConstraints.replaceAll(
+          c -> {
+            try {
+              return fmgr.substitute(c, substitutions);
+            } catch (IOException pE) {
+              throw new RuntimeException(pE);
+            }
+          });
     }
 
     Map<Formula, Formula> otherSubstitution =
@@ -285,13 +286,18 @@ public class UfElimination {
           @Override
           public Integer visitFunction(
               Formula pF, List<Formula> pArgs, FunctionDeclaration<?> pFunctionDeclaration) {
-            int depthOfArgs = pArgs.stream().mapToInt(f -> {
-              try {
-                return fmgr.visit(f, this);
-              } catch (IOException pE) {
-                throw new RuntimeException(pE);
-              }
-            }).max().orElse(0);
+            int depthOfArgs =
+                pArgs.stream()
+                    .mapToInt(
+                        f -> {
+                          try {
+                            return fmgr.visit(f, this);
+                          } catch (IOException pE) {
+                            throw new RuntimeException(pE);
+                          }
+                        })
+                    .max()
+                    .orElse(0);
 
             // count only UFs
             if (pFunctionDeclaration.getKind() == FunctionDeclarationKind.UF) {
@@ -306,7 +312,8 @@ public class UfElimination {
               BooleanFormula pF,
               QuantifiedFormulaManager.Quantifier pQ,
               List<Formula> pBoundVariables,
-              BooleanFormula pBody) throws IOException {
+              BooleanFormula pBody)
+              throws IOException {
             return fmgr.visit(pBody, this);
           }
         });

@@ -45,8 +45,7 @@ public class BitvectorGenerator {
                   Long.toBinaryString(parseLong((String) inPlaceInputParamsString.get(1))));
           return "#b" + String.format(formatString, binaryNumber);
         };
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logMakeBitVector(Object result, int length, BigInteger i) {
@@ -61,8 +60,7 @@ public class BitvectorGenerator {
                   Long.toBinaryString(parseLong((String) inPlaceInputParamsString.get(1))));
           return "#b" + String.format(formatString, binaryNumber);
         };
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logMakeBitVector(BitvectorFormula result, int length, IntegerFormula pI) {
@@ -77,255 +75,212 @@ public class BitvectorGenerator {
                   Long.toBinaryString(parseLong((String) inPlaceInputParamsString.get(1))));
           return "#b" + String.format(formatString, binaryNumber);
         };
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logMakeBitVecVariable(
-      BitvectorFormula result, BitvectorType pType,
-      String pVar) {
+      BitvectorFormula result, BitvectorType pType, String pVar) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pVar);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> (String) inPlaceInputParams.get(0);
-    RecursiveString
-        newEntry = new RecursiveString(result, inputParams, saveResult, "BitVec");
+    RecursiveString newEntry = new RecursiveString(result, inputParams, saveResult, "BitVec");
     newEntry.setBitVecLength(pType.getSize());
     Generator.executedAggregator.add(newEntry);
   }
 
-  protected static void logMakeBitVecVariable(
-      BitvectorFormula result, int pLength,
-      String pVar) {
+  protected static void logMakeBitVecVariable(BitvectorFormula result, int pLength, String pVar) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pVar);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> (String) inPlaceInputParams.get(0);
-    RecursiveString
-        newEntry = new RecursiveString(result, inputParams, saveResult,
-        "BitVec");
+    RecursiveString newEntry = new RecursiveString(result, inputParams, saveResult, "BitVec");
     newEntry.setBitVecLength(pLength);
     Generator.executedAggregator.add(newEntry);
   }
 
   protected static void logBVEqual(
-      Object result,
-      BitvectorFormula pNumber1,
-      BitvectorFormula pNumber2) {
+      Object result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
-            + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "(= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
-
 
   protected static void logBVNegate(Object result, BitvectorFormula pNumber) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(bvneg " + inPlaceInputParams.get(0) + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logBVAdd(
-      BitvectorFormula result,
-      BitvectorFormula pNumber1,
-      BitvectorFormula pNumber2) {
+      BitvectorFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(bvadd " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "(bvadd " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logBVSub(
-      BitvectorFormula result, BitvectorFormula pNumber1,
-      BitvectorFormula pNumber2) {
+      BitvectorFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(bvsub " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "(bvsub " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logBVSDivide(
-      BitvectorFormula result, BitvectorFormula pNumber1,
-      BitvectorFormula pNumber2) {
+      BitvectorFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(bvsdiv " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "(bvsdiv " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logBVUDivide(
-      BitvectorFormula result, BitvectorFormula pNumber1,
-      BitvectorFormula pNumber2) {
+      BitvectorFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(bvudiv " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "(bvudiv " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logBVSModulo(
-      BitvectorFormula result, BitvectorFormula pNumber1,
-      BitvectorFormula pNumber2) {
+      BitvectorFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(bvsrem " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "(bvsrem " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logBVUModulo(
-      BitvectorFormula result, BitvectorFormula pNumber1,
-      BitvectorFormula pNumber2) {
+      BitvectorFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(bvurem " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "(bvurem " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logBVMultiply(
-      BitvectorFormula result, BitvectorFormula pNumber1,
-      BitvectorFormula pNumber2) {
+      BitvectorFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(bvmul " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "(bvmul " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logBVUGreaterThan(
-      BooleanFormula result, BitvectorFormula pNumber1,
-      BitvectorFormula pNumber2) {
+      BooleanFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(bvugt " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "(bvugt " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logBVSGreaterThan(
-      BooleanFormula result, BitvectorFormula pNumber1,
-      BitvectorFormula pNumber2) {
+      BooleanFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(bvsgt " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "(bvsgt " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logBVUGreaterOrEqual(
-      BooleanFormula result, BitvectorFormula pNumber1,
-      BitvectorFormula pNumber2) {
+      BooleanFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(bvuge " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "(bvuge " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logBVSGreaterOrEqual(
-      BooleanFormula result, BitvectorFormula pNumber1,
-      BitvectorFormula pNumber2) {
+      BooleanFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(bvsge " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "(bvsge " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logBVULessThan(
-      BooleanFormula result, BitvectorFormula pNumber1,
-      BitvectorFormula pNumber2) {
+      BooleanFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(bvult " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "(bvult " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logBVSLessThan(
-      BooleanFormula result, BitvectorFormula pNumber1,
-      BitvectorFormula pNumber2) {
+      BooleanFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(bvslt " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "(bvslt " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logBVULessOrEqual(
-      BooleanFormula result, BitvectorFormula pNumber1,
-      BitvectorFormula pNumber2) {
+      BooleanFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(bvule " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "(bvule " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logBVSLessOrEqual(
-      BooleanFormula result, BitvectorFormula pNumber1,
-      BitvectorFormula pNumber2) {
+      BooleanFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(bvsle " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "(bvsle " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logBVNot(Object result, BitvectorFormula pNumber) {
@@ -333,140 +288,123 @@ public class BitvectorGenerator {
     inputParams.add(pNumber);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(bvnot " + inPlaceInputParams.get(0) + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logBVAnd(
-      BitvectorFormula result, BitvectorFormula pNumber1,
-      BitvectorFormula pNumber2) {
+      BitvectorFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(bvand " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "(bvand " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logBVOr(
-      BitvectorFormula result, BitvectorFormula pNumber1,
-      BitvectorFormula pNumber2) {
+      BitvectorFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(bvor " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
-            + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "(bvor " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logBVXor(
-      BitvectorFormula result, BitvectorFormula pNumber1,
-      BitvectorFormula pNumber2) {
+      BitvectorFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(bvxor " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "(bvxor " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logBVSShiftRight(
-      BitvectorFormula result, BitvectorFormula pNumber,
-      BitvectorFormula toShift) {
+      BitvectorFormula result, BitvectorFormula pNumber, BitvectorFormula toShift) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber);
     inputParams.add(toShift);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(bvashr " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "(bvashr " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logBVUShiftRight(
-      BitvectorFormula result, BitvectorFormula pNumber,
-      BitvectorFormula toShift) {
+      BitvectorFormula result, BitvectorFormula pNumber, BitvectorFormula toShift) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber);
     inputParams.add(toShift);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(bvlshr " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "(bvlshr " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logBVShiftLeft(
-      BitvectorFormula result, BitvectorFormula pNumber,
-      BitvectorFormula toShift) {
+      BitvectorFormula result, BitvectorFormula pNumber, BitvectorFormula toShift) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber);
     inputParams.add(toShift);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(bvshl " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "(bvshl " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logConcat(
-      BitvectorFormula result, BitvectorFormula pNumber,
-      BitvectorFormula append) {
+      BitvectorFormula result, BitvectorFormula pNumber, BitvectorFormula append) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber);
     inputParams.add(append);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(concat " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "(concat " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logExtract(
-      BitvectorFormula result, BitvectorFormula pNumber,
-      int pMsb, int pLsb) {
+      BitvectorFormula result, BitvectorFormula pNumber, int pMsb, int pLsb) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber);
     inputParams.add(String.valueOf(pMsb));
     inputParams.add(String.valueOf(pLsb));
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "((_ extract " + inPlaceInputParams.get(1) + " "
-            + inPlaceInputParams.get(2)
-            + ") " + inPlaceInputParams.get(0) + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "((_ extract "
+                + inPlaceInputParams.get(1)
+                + " "
+                + inPlaceInputParams.get(2)
+                + ") "
+                + inPlaceInputParams.get(0)
+                + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logUExtend(
-      BitvectorFormula result, BitvectorFormula pNumber,
-      int pExtensionBits) {
+      BitvectorFormula result, BitvectorFormula pNumber, int pExtensionBits) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber);
     inputParams.add(String.valueOf(pExtensionBits));
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "((_ zero_extend " + inPlaceInputParams.get(1) + ") "
-            + inPlaceInputParams.get(0) + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "((_ zero_extend " + inPlaceInputParams.get(1) + ") " + inPlaceInputParams.get(0) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logSExtend(
-      BitvectorFormula result, BitvectorFormula pNumber,
-      int pExtensionBits) {
+      BitvectorFormula result, BitvectorFormula pNumber, int pExtensionBits) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber);
     inputParams.add(String.valueOf(pExtensionBits));
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "((_ sign_extend " + inPlaceInputParams.get(1) + ") "
-            + inPlaceInputParams.get(0) + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "((_ sign_extend " + inPlaceInputParams.get(1) + ") " + inPlaceInputParams.get(0) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
-
 }

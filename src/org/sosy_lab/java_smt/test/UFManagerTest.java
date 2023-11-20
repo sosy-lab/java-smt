@@ -357,8 +357,8 @@ public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   }
 
   /** utility method: create an UF from given arguments and return type and calls it. */
-  private void createAndCallUF(
-      String name, FormulaType<? extends Formula> retType, Formula... args) throws IOException {
+  private void createAndCallUF(String name, FormulaType<? extends Formula> retType, Formula... args)
+      throws IOException {
     Formula f = fmgr.declareAndCallUF(name, retType, args);
     FunctionDeclaration<?> declaration = getDeclaration(f);
     Truth.assertThat(declaration.getName()).isEqualTo(name);

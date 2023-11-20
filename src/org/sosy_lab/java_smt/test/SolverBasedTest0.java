@@ -125,7 +125,6 @@ public abstract class SolverBasedTest0 {
   public final void initSolver() throws InvalidConfigurationException {
     config = createTestConfigBuilder().build();
 
-
     factory = new SolverContextFactory(config, logger, shutdownNotifierToUse());
     try {
       context = factory.generateContext();

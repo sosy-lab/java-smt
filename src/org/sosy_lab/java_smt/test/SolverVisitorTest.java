@@ -505,8 +505,8 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void stringInStringFormulaVisit() throws SolverException, InterruptedException,
-                                                  IOException {
+  public void stringInStringFormulaVisit()
+      throws SolverException, InterruptedException, IOException {
     requireStrings();
     StringFormula x = smgr.makeVariable("xVariable");
     StringFormula y = smgr.makeVariable("yVariable");

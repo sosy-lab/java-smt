@@ -135,8 +135,11 @@ class StatisticsFormulaManager implements FormulaManager {
 
   @Override
   public BooleanFormula universalParse(String pS)
-      throws IllegalArgumentException, IOException, SolverException, InterruptedException,
-             InvalidConfigurationException {
+      throws IllegalArgumentException,
+          IOException,
+          SolverException,
+          InterruptedException,
+          InvalidConfigurationException {
     return delegate.universalParse(pS);
   }
 

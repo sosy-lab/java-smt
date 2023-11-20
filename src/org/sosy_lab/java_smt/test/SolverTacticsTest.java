@@ -164,8 +164,8 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void ufEliminationNestedUfsTest() throws SolverException, InterruptedException,
-                                                  IOException {
+  public void ufEliminationNestedUfsTest()
+      throws SolverException, InterruptedException, IOException {
     requireIntegers();
     // f :=uf2(uf1(v1, v2), v3) XOR uf2(uf1(v2, v1), v4)
     IntegerFormula variable1 = imgr.makeVariable("variable1");

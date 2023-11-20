@@ -33,8 +33,7 @@ public class BooleanGenerator {
     inputParams.add(pVar);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> (String) inPlaceInputParams.get(0);
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Bool"));
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Bool"));
   }
 
   protected static void logMakeTrue(Object result, String pVar) {
@@ -51,8 +50,8 @@ public class BooleanGenerator {
     inputParams.add(pVar);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> (String) inPlaceInputParams.get(0);
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult,
-        "Direct"));
+    Generator.executedAggregator.add(
+        new RecursiveString(result, inputParams, saveResult, "Direct"));
   }
 
   protected static void logNot(Object result, BooleanFormula pBits) {
@@ -60,8 +59,7 @@ public class BooleanGenerator {
     inputParams.add(pBits);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(not " + inPlaceInputParams.get(0) + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logOr(Object result, BooleanFormula pBits1, BooleanFormula pBits2) {
@@ -69,10 +67,9 @@ public class BooleanGenerator {
     inputParams.add(pBits1);
     inputParams.add(pBits2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(or " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
-            + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "(or " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logOr(Object result, Collection<BooleanFormula> pBits1) {
@@ -82,16 +79,15 @@ public class BooleanGenerator {
         inPlaceInputParams -> {
           StringBuilder out = new StringBuilder();
           out.append("(or ");
-          inPlaceInputParams.forEach((c) -> {
-            out.append(c);
-            out.append(" ");
-          });
-          return String.valueOf(
-              out.deleteCharAt(out.length() - 1).append(")"));
+          inPlaceInputParams.forEach(
+              (c) -> {
+                out.append(c);
+                out.append(" ");
+              });
+          return String.valueOf(out.deleteCharAt(out.length() - 1).append(")"));
         };
 
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logAnd(Object result, BooleanFormula pBits1, BooleanFormula pBits2) {
@@ -99,10 +95,9 @@ public class BooleanGenerator {
     inputParams.add(pBits1);
     inputParams.add(pBits2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(and " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
-            + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "(and " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logAnd(Object result, Collection<BooleanFormula> pBits1) {
@@ -112,56 +107,47 @@ public class BooleanGenerator {
           StringBuilder out = new StringBuilder();
           out.delete(0, out.length());
           out.append("(and ");
-          inPlaceInputParams.forEach((c) -> {
-            out.append(c);
-            out.append(" ");
-          });
-          return String.valueOf(
-              out.deleteCharAt(out.length() - 1).append(")"));
+          inPlaceInputParams.forEach(
+              (c) -> {
+                out.append(c);
+                out.append(" ");
+              });
+          return String.valueOf(out.deleteCharAt(out.length() - 1).append(")"));
         };
 
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
-
 
   protected static void logXor(Object result, BooleanFormula pBits1, BooleanFormula pBits2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pBits1);
     inputParams.add(pBits2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(xor " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
-            + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "(xor " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logEquivalence(
-      Object result,
-      BooleanFormula pBits1,
-      BooleanFormula pBits2) {
+      Object result, BooleanFormula pBits1, BooleanFormula pBits2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pBits1);
     inputParams.add(pBits2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
-            + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "(= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logImplication(
-      Object result,
-      BooleanFormula pBits1,
-      BooleanFormula pBits2) {
+      Object result, BooleanFormula pBits1, BooleanFormula pBits2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pBits1);
     inputParams.add(pBits2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(=> " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
-            + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "(=> " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logIfThenElse(Object result, BooleanFormula pBits1, Object f1, Object f2) {
@@ -170,10 +156,14 @@ public class BooleanGenerator {
     inputParams.add(f1);
     inputParams.add(f2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(ite " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
-            + " " + inPlaceInputParams.get(2) + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "(ite "
+                + inPlaceInputParams.get(0)
+                + " "
+                + inPlaceInputParams.get(1)
+                + " "
+                + inPlaceInputParams.get(2)
+                + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
-
 }

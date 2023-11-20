@@ -51,7 +51,7 @@ public class UniversalModel extends AbstractModel<IExpression, Sort, PrincessEnv
   AbstractFormulaManager<IExpression, Sort, PrincessEnvironment, ?> fmgr;
   private final BooleanFormulaManager bmgr;
   private final IntegerFormulaManager imgr;
-  //private final RationalFormulaManager rmgr;
+  // private final RationalFormulaManager rmgr;
   private final BitvectorFormulaManager bvmgr;
   private final ArrayFormulaManager amgr;
   private final UFManager umgr;
@@ -60,8 +60,6 @@ public class UniversalModel extends AbstractModel<IExpression, Sort, PrincessEnv
   private ImmutableList<ValueAssignment> finalList;
   private boolean isUnsat;
 
-
-
   public UniversalModel(
       AbstractProver<?> prover,
       AbstractFormulaManager<IExpression, Sort, PrincessEnvironment, ?> pFormulaManager) {
@@ -69,13 +67,11 @@ public class UniversalModel extends AbstractModel<IExpression, Sort, PrincessEnv
     fmgr = pFormulaManager;
     bmgr = formulaManager.getBooleanFormulaManager();
     imgr = formulaManager.getIntegerFormulaManager();
-    //rmgr = Objects.requireNonNull(formulaManager.getRationalFormulaManager());
+    // rmgr = Objects.requireNonNull(formulaManager.getRationalFormulaManager());
     bvmgr = formulaManager.getBitvectorFormulaManager();
     amgr = formulaManager.getArrayFormulaManager();
     umgr = formulaManager.getUFManager();
     assignments = new ArrayList<>();
-
-
   }
 
   @Override
@@ -89,10 +85,11 @@ public class UniversalModel extends AbstractModel<IExpression, Sort, PrincessEnv
   }
 
   public void getOutput() throws IOException {
-    String fileName = "/home/janel/Desktop/Studium/Semester_6/Bachelorarbeit/Princess/princess"
-        + "-bin-2023-06-19/./princess";
-    Process process = Runtime.getRuntime().exec(new String[]{fileName, "+incremental",
-        filePath + "/Out.smt2"});
+    String fileName =
+        "/home/janel/Desktop/Studium/Semester_6/Bachelorarbeit/Princess/princess"
+            + "-bin-2023-06-19/./princess";
+    Process process =
+        Runtime.getRuntime().exec(new String[] {fileName, "+incremental", filePath + "/Out.smt2"});
     StringBuilder output = new StringBuilder();
 
     /*
@@ -132,8 +129,7 @@ public class UniversalModel extends AbstractModel<IExpression, Sort, PrincessEnv
     br.close();
   }
 
-  public List<ValueAssignment> parseModel(String pString)
-      throws IOException {
+  public List<ValueAssignment> parseModel(String pString) throws IOException {
     smtlibv2Lexer lexer = new smtlibv2Lexer(CharStreams.fromFileName(pString));
     smtlibv2Parser parser = new smtlibv2Parser(new CommonTokenStream(lexer));
     Visitor visitor = new Visitor(formulaManager, bmgr, imgr, null, bvmgr, amgr, umgr);
@@ -151,8 +147,7 @@ public class UniversalModel extends AbstractModel<IExpression, Sort, PrincessEnv
     return assignments;
   }
 
-  protected void getAssignments()
-      throws IOException, ModelException {
+  protected void getAssignments() throws IOException, ModelException {
     getOutput();
     if (!isUnsat) {
       assignments = parseModel(filePath + "/Model.smt2");
@@ -160,7 +155,6 @@ public class UniversalModel extends AbstractModel<IExpression, Sort, PrincessEnv
       throw new ModelException("Formula has to be sat in order to retrieve a model.");
     }
     finalList = listToImmutable(assignments);
-
   }
 
   @Override
@@ -170,8 +164,11 @@ public class UniversalModel extends AbstractModel<IExpression, Sort, PrincessEnv
   }
 
   public UniversalModel getModel()
-      throws IOException, SolverException, InterruptedException, InvalidConfigurationException,
-             ModelException {
+      throws IOException,
+          SolverException,
+          InterruptedException,
+          InvalidConfigurationException,
+          ModelException {
     getAssignments();
     return this;
   }
@@ -195,4 +192,3 @@ public class UniversalModel extends AbstractModel<IExpression, Sort, PrincessEnv
     isUnsat = pUnsat;
   }
 }
-

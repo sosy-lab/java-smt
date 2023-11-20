@@ -46,9 +46,9 @@ import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 import org.sosy_lab.java_smt.basicimpl.tactics.NNFVisitor;
+import org.sosy_lab.java_smt.utils.SolverUtils;
 import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Lexer;
 import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Parser;
-import org.sosy_lab.java_smt.utils.SolverUtils;
 
 /**
  * Simplifies building a solver from the specific theories.
@@ -175,19 +175,24 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
                 && quantifiedManager.getFormulaCreator() != formulaCreator),
         "The creator instances must match across the managers!");
   }
+
   public final FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> getFormulaCreator() {
     return formulaCreator;
   }
 
-
   @Override
-  public BooleanFormula universalParse(String pString)
-      throws IOException {
+  public BooleanFormula universalParse(String pString) throws IOException {
     smtlibv2Lexer lexer = new smtlibv2Lexer(CharStreams.fromFileName(pString));
     smtlibv2Parser parser = new smtlibv2Parser(new CommonTokenStream(lexer));
-    Visitor visitor = new Visitor(this, this.booleanManager, this.integerManager,
-        this.rationalManager,
-        this.bitvectorManager, this.arrayManager, this.functionManager);
+    Visitor visitor =
+        new Visitor(
+            this,
+            this.booleanManager,
+            this.integerManager,
+            this.rationalManager,
+            this.bitvectorManager,
+            this.arrayManager,
+            this.functionManager);
     visitor.visit(parser.start());
     List<BooleanFormula> constraints = visitor.getConstraints();
 
@@ -198,9 +203,15 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   public BooleanFormula universalParseFromString(String pString) {
     smtlibv2Lexer lexer = new smtlibv2Lexer(CharStreams.fromString(pString));
     smtlibv2Parser parser = new smtlibv2Parser(new CommonTokenStream(lexer));
-    Visitor visitor = new Visitor(this, this.booleanManager, this.integerManager,
-        this.rationalManager,
-        this.bitvectorManager, this.arrayManager, this.functionManager);
+    Visitor visitor =
+        new Visitor(
+            this,
+            this.booleanManager,
+            this.integerManager,
+            this.rationalManager,
+            this.bitvectorManager,
+            this.arrayManager,
+            this.functionManager);
     visitor.visit(parser.start());
     List<BooleanFormula> constraints = visitor.getConstraints();
 
@@ -331,10 +342,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     }
   }
 
-  /**
-   * Eliminate UFs from the given input formula.
-   *
-   */
+  /** Eliminate UFs from the given input formula. */
   protected BooleanFormula applyUFEImpl(BooleanFormula pF) throws IOException {
     return SolverUtils.ufElimination(this).eliminateUfs(pF);
   }
@@ -505,8 +513,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
           public Formula visitFunction(
               Formula f, List<Formula> newArgs, FunctionDeclaration<?> functionDeclaration) {
             Formula out = pFromToMapping.get(f);
-            return Objects.requireNonNullElseGet(out,
-                () -> makeApplication(functionDeclaration, newArgs));
+            return Objects.requireNonNullElseGet(
+                out, () -> makeApplication(functionDeclaration, newArgs));
           }
 
           private Formula replace(Formula f) {

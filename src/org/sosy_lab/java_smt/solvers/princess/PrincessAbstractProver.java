@@ -57,9 +57,8 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
 
   private final PrincessFormulaCreator creator;
   protected boolean wasLastSatCheckSat = false; // and stack is not changed
-  
-  private final UniversalModel binaryModel;
 
+  private final UniversalModel binaryModel;
 
   protected PrincessAbstractProver(
       PrincessFormulaManager pMgr,
@@ -74,7 +73,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
 
     trackingStack.push(new Level());
     partitions.push(PathCopyingPersistentTreeMap.of());
-    binaryModel = new UniversalModel(this,  mgr);
+    binaryModel = new UniversalModel(this, mgr);
   }
 
   /**

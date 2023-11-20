@@ -28,7 +28,6 @@ import java.util.function.Function;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
-
 public class NumeralGenerator {
 
   protected static void logMakeNumber(Object result, String pVar) {
@@ -38,8 +37,8 @@ public class NumeralGenerator {
       inputParams.add(absVar);
       Function<List<Object>, String> saveResult =
           inPlaceInputParams -> "(- " + inPlaceInputParams.get(0) + ")";
-      Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult,
-          "Direct"));
+      Generator.executedAggregator.add(
+          new RecursiveString(result, inputParams, saveResult, "Direct"));
     } else if (result instanceof NumeralFormula) {
       String checkedVar = String.valueOf(result);
       inputParams.add(checkedVar);
@@ -48,8 +47,8 @@ public class NumeralGenerator {
     }
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> (String) inPlaceInputParams.get(0);
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult,
-        "Direct"));
+    Generator.executedAggregator.add(
+        new RecursiveString(result, inputParams, saveResult, "Direct"));
   }
 
   protected static void logMakeIntVariable(Object result, String pVar) {
@@ -63,8 +62,7 @@ public class NumeralGenerator {
     inputParams.add(pVar);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> (String) inPlaceInputParams.get(0);
-    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult,
-        varType));
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, varType));
   }
 
   protected static void logAdd(Object result, Object pNumber1, Object pNumber2) {
@@ -72,10 +70,9 @@ public class NumeralGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(+ " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
-            + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "(+ " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logEqual(Object result, NumeralFormula pNumber1, NumeralFormula pNumber2) {
@@ -83,10 +80,9 @@ public class NumeralGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
-            + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "(= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logNegate(Object result, NumeralFormula pBits) {
@@ -94,8 +90,7 @@ public class NumeralGenerator {
     inputParams.add(pBits);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(- " + inPlaceInputParams.get(0) + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logSum(Object result, List<?> operands) {
@@ -108,15 +103,14 @@ public class NumeralGenerator {
         inPlaceInputParams -> {
           StringBuilder out = new StringBuilder();
           out.append("(+ ");
-          inPlaceInputParams.forEach((c) -> {
-            out.append(c);
-            out.append(" ");
-          });
-          return String.valueOf(
-              out.deleteCharAt(out.length() - 1).append(")"));
+          inPlaceInputParams.forEach(
+              (c) -> {
+                out.append(c);
+                out.append(" ");
+              });
+          return String.valueOf(out.deleteCharAt(out.length() - 1).append(")"));
         };
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logSubtract(Object result, Object pNumber1, Object pNumber2) {
@@ -124,10 +118,9 @@ public class NumeralGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(- " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
-            + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "(- " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logDivide(Object result, Object pNumber1, Object pNumber2) {
@@ -135,10 +128,9 @@ public class NumeralGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(div " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
-            + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "(div " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logModulo(Object result, Object pNumber1, Object pNumber2) {
@@ -146,10 +138,9 @@ public class NumeralGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(mod " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
-            + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "(mod " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logMultiply(Object result, Object pNumber1, Object pNumber2) {
@@ -157,10 +148,9 @@ public class NumeralGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(* " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
-            + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "(* " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logDistinct(Object result, List<?> operands) {
@@ -172,15 +162,14 @@ public class NumeralGenerator {
         inPlaceInputParams -> {
           StringBuilder out = new StringBuilder();
           out.append("(distinct ");
-          inPlaceInputParams.forEach((c) -> {
-            out.append(c);
-            out.append(" ");
-          });
-          return String.valueOf(
-              out.deleteCharAt(out.length() - 1).append(")"));
+          inPlaceInputParams.forEach(
+              (c) -> {
+                out.append(c);
+                out.append(" ");
+              });
+          return String.valueOf(out.deleteCharAt(out.length() - 1).append(")"));
         };
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logGreaterThan(Object result, Object pNumber1, Object pNumber2) {
@@ -188,10 +177,9 @@ public class NumeralGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(> " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
-            + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "(> " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logGreaterOrEquals(Object result, Object pNumber1, Object pNumber2) {
@@ -199,10 +187,9 @@ public class NumeralGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(>= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
-            + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "(>= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logLessThan(Object result, Object pNumber1, Object pNumber2) {
@@ -210,10 +197,9 @@ public class NumeralGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(< " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
-            + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "(< " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logLessOrEquals(Object result, Object pNumber1, Object pNumber2) {
@@ -221,10 +207,9 @@ public class NumeralGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(<= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
-            + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+        inPlaceInputParams ->
+            "(<= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
 
   protected static void logFloor(Object result, Object number) {
@@ -232,8 +217,6 @@ public class NumeralGenerator {
     inputParams.add(number);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(to_int " + inPlaceInputParams.get(0) + ")";
-    Generator.executedAggregator.add(
-        new RecursiveString(result, inputParams, saveResult, "Skip"));
+    Generator.executedAggregator.add(new RecursiveString(result, inputParams, saveResult, "Skip"));
   }
-
 }

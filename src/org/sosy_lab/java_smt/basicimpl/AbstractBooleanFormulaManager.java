@@ -53,7 +53,6 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
   protected AbstractBooleanFormulaManager(
       FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pCreator) {
     super(pCreator);
-
   }
 
   private BooleanFormula wrap(TFormulaInfo formulaInfo) {
@@ -210,11 +209,11 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
   public BooleanFormula or(Collection<BooleanFormula> pBits) {
     switch (pBits.size()) {
       case 0:
-        BooleanFormula result0 =  makeFalse();
+        BooleanFormula result0 = makeFalse();
         BooleanGenerator.logMakeFalse(result0, "false");
         return result0;
       case 1:
-        BooleanFormula result1 =  pBits.iterator().next();
+        BooleanFormula result1 = pBits.iterator().next();
         BooleanGenerator.logOr(result1, pBits);
         return result1;
       case 2:
@@ -223,8 +222,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
         BooleanGenerator.logOr(result2, pBits);
         return result2;
       default:
-
-          BooleanFormula result = wrap(orImpl(Collections2.transform(pBits, this::extractInfo)));
+        BooleanFormula result = wrap(orImpl(Collections2.transform(pBits, this::extractInfo)));
         if (Generator.isLoggingEnabled()) {
           BooleanGenerator.logOr(result, pBits);
         }
@@ -505,13 +503,16 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
 
     while (!toProcess.isEmpty()) {
       BooleanFormula s = toProcess.pop();
-      Set<BooleanFormula> out = cache.computeIfAbsent(s, ss -> {
-        try {
-          return formulaCreator.visit(ss, visitor);
-        } catch (IOException pE) {
-          throw new RuntimeException(pE);
-        }
-      });
+      Set<BooleanFormula> out =
+          cache.computeIfAbsent(
+              s,
+              ss -> {
+                try {
+                  return formulaCreator.visit(ss, visitor);
+                } catch (IOException pE) {
+                  throw new RuntimeException(pE);
+                }
+              });
       if (out.size() == 1 && s.equals(out.iterator().next())) {
         output.add(s);
       }

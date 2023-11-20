@@ -118,7 +118,6 @@ public abstract class AbstractFormula<TFormulaInfo> implements Formula {
     BooleanFormulaImpl(TFormulaInfo pT) {
       super(pT);
     }
-
   }
 
   /** Simple IntegerFormula implementation. */

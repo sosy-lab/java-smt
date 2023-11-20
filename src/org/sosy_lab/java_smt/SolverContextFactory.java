@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -25,6 +26,7 @@ import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
+import org.sosy_lab.java_smt.basicimpl.Generator;
 import org.sosy_lab.java_smt.delegate.logging.LoggingSolverContext;
 import org.sosy_lab.java_smt.delegate.statistics.StatisticsSolverContext;
 import org.sosy_lab.java_smt.delegate.synchronize.SynchronizedSolverContext;
@@ -36,7 +38,6 @@ import org.sosy_lab.java_smt.solvers.princess.PrincessSolverContext;
 import org.sosy_lab.java_smt.solvers.smtinterpol.SmtInterpolSolverContext;
 import org.sosy_lab.java_smt.solvers.yices2.Yices2SolverContext;
 import org.sosy_lab.java_smt.solvers.z3.Z3SolverContext;
-import org.sosy_lab.java_smt.basicimpl.Generator;
 
 /**
  * Factory class for loading and generating solver contexts. Generates a {@link SolverContext}
@@ -113,7 +114,6 @@ public class SolverContextFactory {
   private final ShutdownNotifier shutdownNotifier;
   private final Configuration config;
   private final Consumer<String> loader;
-
 
   /**
    * This constructor uses the default JavaSMT loader for accessing native libraries.
@@ -229,7 +229,6 @@ public class SolverContextFactory {
     }
     if (generateSMTLIB2 || !generateSMTLIB2) {
       Generator.setIsLoggingEnabled(true);
-
     }
     return context;
   }
@@ -287,7 +286,8 @@ public class SolverContextFactory {
       case PRINCESS_BINARY:
         return PrincessSolverContext.create(
             Configuration.builder().copyFrom(config).setOption("parseFromFile", "true").build(),
-            shutdownNotifier, logfile,
+            shutdownNotifier,
+            logfile,
             (int) randomSeed,
             nonLinearArithmetic);
 

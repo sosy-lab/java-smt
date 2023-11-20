@@ -101,8 +101,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
   @Override
   @CanIgnoreReturnValue
-  public @Nullable T addConstraint(BooleanFormula constraint)
-      throws InterruptedException {
+  public @Nullable T addConstraint(BooleanFormula constraint) throws InterruptedException {
     checkState(!closed);
     Iterables.getLast(assertedFormulas).add(constraint);
     if (Generator.isLoggingEnabled()) {

@@ -303,7 +303,8 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
   public void visitRecursively(
       FormulaVisitor<TraversalProcess> pFormulaVisitor,
       Formula pF,
-      Predicate<Formula> shouldProcess) throws IOException {
+      Predicate<Formula> shouldProcess)
+      throws IOException {
     RecursiveFormulaVisitorImpl recVisitor = new RecursiveFormulaVisitorImpl(pFormulaVisitor);
     recVisitor.addToQueue(pF);
     while (!recVisitor.isQueueEmpty()) {
@@ -371,7 +372,8 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
   public void extractVariablesAndUFs(
       final TFormulaInfo pFormula,
       final boolean extractUFs,
-      final BiConsumer<String, TFormulaInfo> pConsumer) throws IOException {
+      final BiConsumer<String, TFormulaInfo> pConsumer)
+      throws IOException {
     extractVariablesAndUFs(
         encapsulateWithTypeOf(pFormula),
         extractUFs,
@@ -380,9 +382,8 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
 
   /** Extract all free variables from the formula, optionally including UFs. */
   public void extractVariablesAndUFs(
-      final Formula pFormula,
-      final boolean extractUF,
-      final BiConsumer<String, Formula> pConsumer) throws IOException {
+      final Formula pFormula, final boolean extractUF, final BiConsumer<String, Formula> pConsumer)
+      throws IOException {
     visitRecursively(
         new VariableAndUFExtractor(extractUF, pConsumer, ImmutableSet.of(), new LinkedHashSet<>()),
         pFormula);

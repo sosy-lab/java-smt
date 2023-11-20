@@ -476,8 +476,8 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void intTest4_ModularCongruence() throws SolverException, InterruptedException,
-                                                  IOException {
+  public void intTest4_ModularCongruence()
+      throws SolverException, InterruptedException, IOException {
     requireIntegers();
     IntegerFormula a = imgr.makeVariable("int_a");
     IntegerFormula b = imgr.makeVariable("int_b");
@@ -661,8 +661,8 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void quantifierEliminationTest1() throws SolverException, InterruptedException,
-                                                  IOException {
+  public void quantifierEliminationTest1()
+      throws SolverException, InterruptedException, IOException {
     requireQuantifiers();
     requireIntegers();
 
@@ -686,8 +686,8 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
 
   @Test
   @Ignore
-  public void quantifierEliminationTest2() throws SolverException, InterruptedException,
-                                                  IOException {
+  public void quantifierEliminationTest2()
+      throws SolverException, InterruptedException, IOException {
     requireQuantifiers();
     requireIntegers();
 
