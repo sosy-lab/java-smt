@@ -76,8 +76,11 @@ public interface ApronNode extends Formula {
   interface ApronNumeralNode extends ApronNode, NumeralFormula {
     /**
      * This class wraps all rational constants, defined by numerator and denominator
+     * SupressWarnig has to be used, baucause the internal Texpr1Node form the Apron library is
+     * not immutble. But all instances are final.
      */
     @Immutable
+    @SuppressWarnings("Immutable")
     class ApronRatCstNode
         implements RationalFormula, ApronNumeralNode {
 
