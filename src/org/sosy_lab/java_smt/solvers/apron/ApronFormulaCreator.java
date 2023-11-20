@@ -60,7 +60,7 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
   private Environment formulaEnvironment;
 
   /**
-   * @variables is a map that stores all variable-objects with their name as key;
+   * variables is a map that stores all variable-objects with their name as key;
    */
   private final Map<String, ApronNode> variables;
 
@@ -115,7 +115,7 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
         Map<Tcons1, Texpr1Node> map = constraint.getConstraintNodes();
         Tcons1[] tcons1s = map.keySet().toArray(new Tcons1[map.size()]);
         Abstract1 helper = new Abstract1(this.manager, tcons1s);
-        return !(helper.isBottom(this.manager));
+        return !helper.isBottom(this.manager);
       } catch (ApronException pException) {
         throw new RuntimeException(pException);
       }
@@ -194,7 +194,7 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
     } else if (type.equals(FormulaType.INTEGER)) {
       return org.sosy_lab.java_smt.api.FormulaType.IntegerType;
     }
-    throw new IllegalArgumentException("Type %type not available!");
+    throw new IllegalArgumentException("Type"+type+"not available!");
   }
 
   @Override

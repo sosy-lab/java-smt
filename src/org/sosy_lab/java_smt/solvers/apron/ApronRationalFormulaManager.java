@@ -91,6 +91,8 @@ public class ApronRationalFormulaManager extends
     return new ApronRatCstNode(i, BigInteger.ONE);
   }
 
+  @SuppressWarnings("[StringSpiltter]") //String splitter is needed here and checked for unwanted
+  // behavior
   @Override
   protected ApronNode makeNumberImpl(String i) {
     Preconditions.checkArgument(!(i.contains(".") || i.contains(",")),
