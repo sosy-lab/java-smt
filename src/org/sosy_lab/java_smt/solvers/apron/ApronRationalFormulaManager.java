@@ -24,6 +24,7 @@ import apron.Tcons1;
 import apron.Texpr1BinNode;
 import apron.Texpr1UnNode;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -101,10 +102,10 @@ public class ApronRationalFormulaManager extends
  protected ApronNode makeNumberImpl(String i) {
     Preconditions.checkArgument(!(i.contains(".") || i.contains(",")),
         "Rational number has to be written like 2/5.");
-    String[] numbers = i.split("/");
-    BigInteger num = new BigInteger(numbers[0]);
-    if (numbers.length > 1) {
-      BigInteger den = new BigInteger(numbers[1]);
+   List<String> numbers = Splitter.on('/').splitToList(i);
+   BigInteger num = new BigInteger(numbers.get(0));
+    if (numbers.size() > 1) {
+      BigInteger den = new BigInteger(numbers.get(1));
       return new ApronRatCstNode(num, den);
     }
     return new ApronRatCstNode(num, BigInteger.ONE);
