@@ -681,11 +681,13 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- build apron -->
         <exec executable="./configure" dir="${apron.path}/apron" failonerror="true">
-            <arg value="-java-prefix /usr/lib/jvm/java-11-openjdk-amd64"/>
+            <arg value="-java-prefix"/>
+            <arg value="/usr/lib/jvm/java-11-openjdk-amd64"/>
             <arg value="--no-cxx"/>
             <arg value="--no-ocaml"/>
             <arg value="--no-ppl"/>
-            <arg value="--prefix ~/git/apron/build"/>
+            <arg value="--prefix"/>
+            <arg value="~/git/apron/build"/>
             <arg value="--no-ocaml-plugins"/>
             <arg value="--no-ocaml-find"/>
 
