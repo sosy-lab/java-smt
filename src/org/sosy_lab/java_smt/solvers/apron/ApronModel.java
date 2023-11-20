@@ -229,8 +229,12 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
     }
   }
 
-  //String splitter is needed here and checked for unwanted behaviour
-  @SuppressWarnings("StringSpiltter")
+  /**
+   * StringSplitter is needed for extracting numeral values from Apron
+   * @param pNode Node to evaluate
+   * @return new node with all possible value assignments
+   */
+  @SuppressWarnings("StringSplitter")
   private ApronNode getComplexValue(ApronNode pNode) {
     Preconditions.checkState(!(
         (pNode instanceof ApronIntCstNode) ||

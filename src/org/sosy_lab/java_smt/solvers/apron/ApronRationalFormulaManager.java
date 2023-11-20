@@ -91,7 +91,12 @@ public class ApronRationalFormulaManager extends
     return new ApronRatCstNode(i, BigInteger.ONE);
   }
 
-  //String splitter is needed here and checked for unwanted behaviour
+  /**
+   * StringSplitter is used to extract the numerator and denomintaot out of a String of the form
+   * "a/b"
+   * @param i input String
+   * @return new rational constant
+   */
   @SuppressWarnings("StringSpiltter")
   @Override
   protected ApronNode makeNumberImpl(String i) {
