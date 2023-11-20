@@ -56,6 +56,7 @@ import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.FormulaType;
  * Texpr1Node; All BooleanFormulas refer to Tcons1; The wrapper is needed to implement methods that
  * are needed for the JavaSMT-binding but are not provided by the Apron-library.
  */
+@SuppressWarnings("Immutable")
 public interface ApronNode extends Formula {
 
   FormulaType getType();
