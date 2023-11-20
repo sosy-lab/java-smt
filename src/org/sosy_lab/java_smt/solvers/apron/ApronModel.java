@@ -33,11 +33,13 @@ import apron.Texpr1Node;
 import apron.Texpr1UnNode;
 import apron.Texpr1VarNode;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -143,14 +145,7 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
         argumentInterpretationBuilder.build());
   }
 
-  /**
-   * StringSplitter Warning is checked for unwanted bahaviour and needed for getting the numeral
-   * value of a constant in the Apron Lib
-   * @param pVar variable name
-   * @return numeral value for the variable
-   * @throws ApronException throws exception
-   */
-  @SuppressWarnings("StringSplitter")
+
   private ValueAssignment getRatAssignment(String pVar)
       throws ApronException {
     ImmutableList.Builder<Object> argumentInterpretationBuilder = ImmutableList.builder();
@@ -174,11 +169,11 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
       strValue = upperBound.toString();
     }
     //translates the value into nominator and denominator
-    String[] numbers = strValue.split("/");
-    BigInteger nominator = new BigInteger(numbers[0]);
+    List<String> numbers = Splitter.on('/').splitToList(strValue);
+    BigInteger nominator = new BigInteger(numbers.get(0));
     ApronRatCstNode valueFormula;
-    if (numbers.length > 1) {
-      BigInteger denominator = new BigInteger(numbers[1]);
+    if (numbers.size() > 1) {
+      BigInteger denominator = new BigInteger(numbers.get(1));
       valueFormula = new ApronRatCstNode(nominator, denominator);
     } else { //if the value is an integer
       valueFormula = new ApronRatCstNode(nominator, BigInteger.ONE);
@@ -229,12 +224,6 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
     }
   }
 
-  /**
-   * StringSplitter is needed for extracting numeral values from Apron
-   * @param pNode Node to evaluate
-   * @return new node with all possible value assignments
-   */
-  @SuppressWarnings("StringSplitter")
   private ApronNode getComplexValue(ApronNode pNode) {
     Preconditions.checkState(!(
         (pNode instanceof ApronIntCstNode) ||
@@ -280,11 +269,12 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
         Object bound =
             abstract1.getBound(prover.getAbstract1().getCreationManager(), resultName).sup;
         String strValue = bound.toString();
-        String[] numbers = strValue.split("/");
-        BigInteger nominator = new BigInteger(numbers[0]);
+        List<String> numbers = Splitter.on('/').splitToList(strValue);
+        BigInteger nominator =
+            new BigInteger(numbers.get(0));
         ApronRatCstNode valueFormula;
-        if (numbers.length > 1) { //for rational lower bounds
-          BigInteger denominator = new BigInteger(numbers[1]);
+        if (numbers.size() > 1) { //for rational lower bounds
+          BigInteger denominator = new BigInteger(numbers.get(1));
           valueFormula = new ApronRatCstNode(nominator, denominator);
         } else { //if the value is an integer
           valueFormula = new ApronRatCstNode(nominator, BigInteger.ONE);

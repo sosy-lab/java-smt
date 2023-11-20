@@ -33,6 +33,7 @@ import apron.Texpr1UnNode;
 import apron.Texpr1VarNode;
 import apron.Var;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
 import com.google.errorprone.annotations.Immutable;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -102,23 +103,18 @@ public interface ApronNode extends Formula {
         this.rational = Rational.of(numerator, denominator);
       }
 
-      /**SurpressWarning for StringSplitter is used, because rational numbers in Apron are of the
-       *  form "num/den" for non Integers; If the number is an Integer, the numerator is 1 here
-       * @param pNode node of type from the Apron Lib
-       */
-      @SuppressWarnings("StringSplitter")
       public ApronRatCstNode(Texpr1CstNode pNode) {
         this.cstNode = pNode;
         Coeff coeff = pNode.getConstant();
         Scalar scalar = coeff.inf();
         String string = scalar.toString();
-        final String[] strings = string.split("/");
-        if (strings.length == 1) {
-          this.numerator = BigInteger.valueOf(Long.parseLong(strings[0]));
+        final List<String> strings = Splitter.on('/').splitToList(string);
+        if (strings.size() == 1) {
+          this.numerator = BigInteger.valueOf(Long.parseLong(strings.get(0)));
           this.denominator = BigInteger.ONE;
         } else {
-          this.numerator = BigInteger.valueOf(Long.parseLong(strings[1]));
-          this.denominator = BigInteger.valueOf(Long.parseLong(strings[1]));
+          this.numerator = BigInteger.valueOf(Long.parseLong(strings.get(0)));
+          this.denominator = BigInteger.valueOf(Long.parseLong(strings.get(0)));
         }
         this.rational = Rational.of(numerator, denominator);
       }
