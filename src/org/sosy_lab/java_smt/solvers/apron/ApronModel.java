@@ -143,7 +143,7 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
         argumentInterpretationBuilder.build());
   }
 
-  @SuppressWarnings("[StringSpiltter]") //String splitter is needed here and checked for unwanted
+  @SuppressWarnings("StringSpiltter") //String splitter is needed here and checked for unwanted
   // behavior
   private ValueAssignment getRatAssignment(String pVar)
       throws ApronException {
@@ -222,7 +222,7 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
       }
     }
   }
-  @SuppressWarnings("[StringSpiltter]") //String splitter is needed here and checked for unwanted
+  @SuppressWarnings("StringSpiltter") //String splitter is needed here and checked for unwanted
   // behavior
   private ApronNode getComplexValue(ApronNode pNode) {
     Preconditions.checkState(!(
