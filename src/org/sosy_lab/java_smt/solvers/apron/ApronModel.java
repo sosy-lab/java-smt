@@ -142,8 +142,15 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
         formulaCreator.convertValue(keyFormula, valueFormula),
         argumentInterpretationBuilder.build());
   }
-  //String splitter is needed here and checked for unwanted behaviour
-  @SuppressWarnings("StringSpiltter")
+
+  /**
+   * StringSplitter Warning is checked for unwanted bahaviour and needed for getting the numeral
+   * value of a constant in the Apron Lib
+   * @param pVar variable name
+   * @return numeral value for the variable
+   * @throws ApronException throws exception
+   */
+  @SuppressWarnings("StringSplitter")
   private ValueAssignment getRatAssignment(String pVar)
       throws ApronException {
     ImmutableList.Builder<Object> argumentInterpretationBuilder = ImmutableList.builder();
