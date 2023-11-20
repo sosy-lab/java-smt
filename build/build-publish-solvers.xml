@@ -695,11 +695,11 @@ SPDX-License-Identifier: Apache-2.0
         </exec>
 
         <!-- fix RPATH and library dependencies -->
-        <exec executable="patchelf" dir="${apron.path}/japron" failonerror="true">
+        <exec executable="patchelf" dir="${apron.path}/apron" failonerror="true">
             <arg value="--set-rpath"/><arg value="$ORIGIN"/>
             <arg value="libapron.so"/>
         </exec>
-        <exec executable="patchelf" dir="${apron.path}/japron" failonerror="true">
+        <exec executable="patchelf" dir="${apron.path}/box" failonerror="true">
             <arg value="--set-rpath"/><arg value="$ORIGIN"/>
             <arg value="libboxD.so"/>
         </exec>
@@ -711,11 +711,11 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="--set-rpath"/><arg value="$ORIGIN"/>
             <arg value="libjgmp.so"/>
         </exec>
-        <exec executable="patchelf" dir="${apron.path}/japron" failonerror="true">
+        <exec executable="patchelf" dir="${apron.path}/octagons" failonerror="true">
             <arg value="--set-rpath"/><arg value="$ORIGIN"/>
             <arg value="liboctD.so"/>
         </exec>
-        <exec executable="patchelf" dir="${apron.path}/japron" failonerror="true">
+        <exec executable="patchelf" dir="${apron.path}/newpolka" failonerror="true">
             <arg value="--set-rpath"/><arg value="$ORIGIN"/>
             <arg value="libpolkaMPQ.so"/>
         </exec>
@@ -725,17 +725,17 @@ SPDX-License-Identifier: Apache-2.0
               tofile="apron-${apron.version}.jar"/>
         <copy file="${apron.path}/japron/gmp.jar"
               tofile="gmp-${apron.version}.jar"/>
-        <copy file="${apron.path}/japron/libapron.so"
+        <copy file="${apron.path}/apron/libapron.so"
               tofile="libapron-${apron.version}.so"/>
-        <copy file="${apron.path}/japron/libboxD.so"
+        <copy file="${apron.path}/box/libboxD.so"
               tofile="libboxD-${apron.version}.so"/>
         <copy file="${apron.path}/japron/libjapron.so"
               tofile="libjapron-${apron.version}.so"/>
         <copy file="${apron.path}/japron/libjgmp.so"
               tofile="libjgmp-${apron.version}.so"/>
-        <copy file="${apron.path}/japron/liboctD.so"
+        <copy file="${apron.path}/octagons/liboctD.so"
               tofile="liboctD-${apron.version}.so"/>
-        <copy file="${apron.path}/japron/libpolkaMPQ.so"
+        <copy file="${apron.path}/newpolka/libpolkaMPQ.so"
               tofile="libpolkaMPQ-${apron.version}.so"/>
     </target>
 
