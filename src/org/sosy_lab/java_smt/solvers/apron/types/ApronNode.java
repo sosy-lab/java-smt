@@ -55,6 +55,9 @@ import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.FormulaType;
  * Apron-library instances of
  * Texpr1Node; All BooleanFormulas refer to Tcons1; The wrapper is needed to implement methods that
  * are needed for the JavaSMT-binding but are not provided by the Apron-library.
+ *
+ * SupressWarnig has to be used, baucause the internal Texpr1Node form the Apron library is not
+ * immutble. But all instances are final.
  */
 @SuppressWarnings("Immutable")
 public interface ApronNode extends Formula {
@@ -74,15 +77,11 @@ public interface ApronNode extends Formula {
 
   ApronNode getInstance();
   @Immutable
-  @SuppressWarnings("Immutable")
   interface ApronNumeralNode extends ApronNode, NumeralFormula {
     /**
      * This class wraps all rational constants, defined by numerator and denominator
-     * SupressWarnig has to be used, baucause the internal Texpr1Node form the Apron library is
-     * not immutble. But all instances are final.
      */
     @Immutable
-    @SuppressWarnings("Immutable")
     class ApronRatCstNode
         implements RationalFormula, ApronNumeralNode {
 
