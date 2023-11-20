@@ -98,7 +98,7 @@ public class ApronRationalFormulaManager extends
    * @param i input String
    * @return new rational constant
    */
- @SuppressWarnings("StringSpiltter")  @Override
+  @Override
  protected ApronNode makeNumberImpl(String i) {
     Preconditions.checkArgument(!(i.contains(".") || i.contains(",")),
         "Rational number has to be written like 2/5.");
