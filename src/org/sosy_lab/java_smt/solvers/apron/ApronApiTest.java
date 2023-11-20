@@ -49,9 +49,10 @@ public class ApronApiTest {
   public static Manager manager = new PolkaEq();
 
   @BeforeClass
-  public static void loadCVC4() {
+  public static void loadApron() {
     try {
-      NativeLibraries.loadLibrary("apron");
+      NativeLibraries.loadLibrary("japron");
+      NativeLibraries.loadLibrary("jgmp");
     } catch (UnsatisfiedLinkError e) {
       throw new AssumptionViolatedException("Apron is not available", e);
     }
