@@ -142,9 +142,8 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
         formulaCreator.convertValue(keyFormula, valueFormula),
         argumentInterpretationBuilder.build());
   }
-
-  @SuppressWarnings("StringSpiltter") //String splitter is needed here and checked for unwanted
-  // behavior
+  //String splitter is needed here and checked for unwanted behaviour
+  @SuppressWarnings("StringSpiltter")
   private ValueAssignment getRatAssignment(String pVar)
       throws ApronException {
     ImmutableList.Builder<Object> argumentInterpretationBuilder = ImmutableList.builder();
@@ -222,8 +221,9 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
       }
     }
   }
-  @SuppressWarnings("StringSpiltter") //String splitter is needed here and checked for unwanted
-  // behavior
+
+  //String splitter is needed here and checked for unwanted behaviour
+  @SuppressWarnings("StringSpiltter")
   private ApronNode getComplexValue(ApronNode pNode) {
     Preconditions.checkState(!(
         (pNode instanceof ApronIntCstNode) ||
