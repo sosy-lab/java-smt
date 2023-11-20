@@ -39,11 +39,25 @@ import apron.Texpr1CstNode;
 import apron.Texpr1Node;
 import apron.Texpr1VarNode;
 import com.google.common.base.Preconditions;
+import org.junit.AssumptionViolatedException;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.sosy_lab.common.NativeLibraries;
 
 public class ApronApiTest {
 
   public static Manager manager = new PolkaEq();
+
+  @BeforeClass
+  public static void loadCVC4() {
+    try {
+      NativeLibraries.loadLibrary("apron");
+    } catch (UnsatisfiedLinkError e) {
+      throw new AssumptionViolatedException("Apron is not available", e);
+    }
+  }
+
+
 
   @Test
   public void solverBackendTest() {
