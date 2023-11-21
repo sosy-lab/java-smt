@@ -696,13 +696,22 @@ SPDX-License-Identifier: Apache-2.0
 
         => ap.CmdlMain muss als Parameter übergeben werden?
          -->
+        <fail unless="princess.customRev">
+            Please specify a custom revision with the flag -Dprincess.customRev=XXX.
+            The custom revision has to be unique amongst the already known version
+            numbers from the ivy repository.
+        </fail>
 
         <!-- copy library files into directory to be published for IVY -->
-        <copy file="princess_all.jar" tofile="princess-VERSION.jar"/>
+        <copy file="princess-all.jar" tofile="princess_all-${princess.customRev}.jar"/>
     </target>
 
     <target name="publish-princess" depends="package-princess, load-ivy"
-            description="Publish princess binaries to Ivy repository.">
+            description="Publish Princess standalone fat-Jar to Ivy repository.">
+        <fail unless="princess.version">
+            Please specify the @{flag} version with the flag -Dprincess.version=XXX .
+            This has to match the -Dprincess.customRev=XXX flag!
+        </fail>
 
         <ivy:resolve conf="solver-princess" file="solvers_ivy_conf/ivy_princess.xml" />
         <available property="ivy.hasrepository" file="repository/${ivy.organisation}/${ivy.module}" />
@@ -710,7 +719,7 @@ SPDX-License-Identifier: Apache-2.0
               message="Cannot publish without 'repository' dir, please run 'svn co https://svn.sosy-lab.org/software/ivy/repository/${ivy.organisation}/${ivy.module} repository/${ivy.organisation}/${ivy.module}'." />
 
         <ivy:publish
-                pubrevision="princess-VERSION"
+                pubrevision="${princess.version}"
                 resolver="Sosy-Lab-Publish"
                 artifactspattern="[artifact]-[revision].[ext]"
                 status="release"
