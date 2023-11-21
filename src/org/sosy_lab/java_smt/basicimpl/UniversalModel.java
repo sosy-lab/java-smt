@@ -30,6 +30,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -43,6 +44,7 @@ import org.sosy_lab.java_smt.api.UFManager;
 import org.sosy_lab.java_smt.solvers.princess.PrincessEnvironment;
 import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Lexer;
 import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Parser;
+import java.io.File;
 
 public class UniversalModel extends AbstractModel<IExpression, Sort, PrincessEnvironment> {
 
@@ -85,32 +87,18 @@ public class UniversalModel extends AbstractModel<IExpression, Sort, PrincessEnv
   }
 
   public void getOutput() throws IOException {
+
     String fileName =
-        "/home/janel/Desktop/Studium/Semester_6/Bachelorarbeit/Princess/princess"
-            + "-bin-2023-06-19/./princess";
+        "/princess_all-janelle.jar";
+    String princessJar = filePath + fileName;
+    // does it work?
+    new File(princessJar).setExecutable(true);
+
     Process process =
-        Runtime.getRuntime().exec(new String[] {fileName, "+incremental", filePath + "/Out.smt2"});
+        Runtime.getRuntime().exec("java -jar " + princessJar + " +incremental " + filePath +
+            "/Out.smt2");
+
     StringBuilder output = new StringBuilder();
-
-    /*
-    String fileName = "/lib/java/runtime-princess/princess_2.13.jar";
-    ProcessBuilder processBuilder = new ProcessBuilder();
-    Map<String, String> environment = processBuilder.environment();
-    environment.put("SCALA_HOME", filePath + "/home/janel/.local/share/coursier/bin/scala");
-    String classPath = filePath + "/lib/java/runtime-princess/princess-smt-parser_2.13.jar"
-    + filePath + ":/lib/java/runtime-princess/princess-parser_2.13.jar"
-    + filePath + ":/lib/java/runtime-princess/java-cup-runtime.jar";
-    String classPath = filePath + "/home/janel/.local/share/coursier/bin/scala";
-    environment.put("CLASSPATH", classPath);
-    Process process = Runtime.getRuntime().exec(new String[]{"/home/janel/.local/share/coursier/bin/scala", filePath + fileName,
-        filePath + "/Out"
-        + ".smt2"});
-
-    //processBuilder.command("scala " + filePath + fileName + " " + filePath + "/Out.smt2");
-    //Process process = processBuilder.start();
-
-    */
-
     InputStream is = process.getInputStream();
     InputStreamReader isr = new InputStreamReader(is, Charset.defaultCharset());
     BufferedReader br = new BufferedReader(isr);

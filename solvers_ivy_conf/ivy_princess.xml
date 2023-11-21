@@ -30,6 +30,7 @@ SPDX-License-Identifier: Apache-2.0
         <artifact name="princess_all" conf="solver-princess"/>
     </publications>
 
-    <dependencies></dependencies>
+    <dependencies>
+    </dependencies>
 
 </ivy-module>
