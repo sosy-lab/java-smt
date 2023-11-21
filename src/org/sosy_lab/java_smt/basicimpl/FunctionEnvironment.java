@@ -39,7 +39,8 @@ public class FunctionEnvironment {
   protected FunctionEnvironment(
       Object pResult,
       List<Object> pInputParams,
-      Function<List<Object>, String> pFunctionToString, String pKeyword) {
+      Function<List<Object>, String> pFunctionToString,
+      String pKeyword) {
 
     result = pResult;
     inputParams = pInputParams;

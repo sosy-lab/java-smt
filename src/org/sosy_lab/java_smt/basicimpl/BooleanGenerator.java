@@ -51,9 +51,8 @@ public class BooleanGenerator {
     inputParams.add(pVar);
     Function<List<Object>, String> functionToString =
         inPlaceInputParams -> (String) inPlaceInputParams.get(0);
-    Generator.executedAggregator.add(new FunctionEnvironment(result, inputParams, functionToString,
-        "Direct"));
-
+    Generator.executedAggregator.add(
+        new FunctionEnvironment(result, inputParams, functionToString, "Direct"));
   }
 
   protected static void logNot(Object result, BooleanFormula pBits) {
@@ -70,8 +69,8 @@ public class BooleanGenerator {
     inputParams.add(pBits1);
     inputParams.add(pBits2);
     Function<List<Object>, String> functionToString =
-        inPlaceInputParams -> "(or " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
-            + ")";
+        inPlaceInputParams ->
+            "(or " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
@@ -100,8 +99,8 @@ public class BooleanGenerator {
     inputParams.add(pBits1);
     inputParams.add(pBits2);
     Function<List<Object>, String> functionToString =
-        inPlaceInputParams -> "(and " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
-            + ")";
+        inPlaceInputParams ->
+            "(and " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
@@ -130,8 +129,8 @@ public class BooleanGenerator {
     inputParams.add(pBits1);
     inputParams.add(pBits2);
     Function<List<Object>, String> functionToString =
-        inPlaceInputParams -> "(xor " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
-            + ")";
+        inPlaceInputParams ->
+            "(xor " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
@@ -142,8 +141,8 @@ public class BooleanGenerator {
     inputParams.add(pBits1);
     inputParams.add(pBits2);
     Function<List<Object>, String> functionToString =
-        inPlaceInputParams -> "(= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
-            + ")";
+        inPlaceInputParams ->
+            "(= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
@@ -154,8 +153,8 @@ public class BooleanGenerator {
     inputParams.add(pBits1);
     inputParams.add(pBits2);
     Function<List<Object>, String> functionToString =
-        inPlaceInputParams -> "(=> " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
-            + ")";
+        inPlaceInputParams ->
+            "(=> " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
@@ -166,8 +165,14 @@ public class BooleanGenerator {
     inputParams.add(f1);
     inputParams.add(f2);
     Function<List<Object>, String> functionToString =
-        inPlaceInputParams -> "(ite " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
-            + " " + inPlaceInputParams.get(2) + ")";
+        inPlaceInputParams ->
+            "(ite "
+                + inPlaceInputParams.get(0)
+                + " "
+                + inPlaceInputParams.get(1)
+                + " "
+                + inPlaceInputParams.get(2)
+                + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }

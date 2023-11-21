@@ -66,11 +66,11 @@ public class Generator {
     if (constraint instanceof String) {
       return (String) constraint;
     } else {
-      FunctionEnvironment methodToEvaluate = executedAggregator
-          .stream()
-          .filter(x -> x.getResult().equals(constraint))
-          .findFirst()
-          .orElse(null);
+      FunctionEnvironment methodToEvaluate =
+          executedAggregator.stream()
+              .filter(x -> x.getResult().equals(constraint))
+              .findFirst()
+              .orElse(null);
       if (methodToEvaluate != null && !methodToEvaluate.keyword.equals("Direct")) {
         registeredVariables.add(methodToEvaluate);
       }

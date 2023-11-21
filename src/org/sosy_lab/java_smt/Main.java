@@ -49,14 +49,9 @@ public class Main {
     FormulaManager fmgr = context.getFormulaManager();
     BooleanFormulaManager bmgr = fmgr.getBooleanFormulaManager();
 
-    String a = "(declare-const a1 (Array Int Int))\n"
-        + "(declare-const a2 (Array Int Int))\n"
-        + "(assert (= a1 a2))\n"
-        + "(declare-const c1 (Array (Array Int Int) (Array (Array Int Int) (Array Int Int))))\n"
-        + "(declare-const c2 (Array (Array Int Int) (Array (Array Int Int) (Array Int Int))))\n"
-        + "(assert (= c1 c2))\n";
 
-    BooleanFormula constraint = fmgr.universalParseFromString(a);
+    BooleanFormula constraint = bmgr.equivalence(bmgr.makeVariable("x"), bmgr.and(bmgr.makeTrue()
+        , bmgr.makeVariable("y")));
 
     try (ProverEnvironment prover =
         context.newProverEnvironment(

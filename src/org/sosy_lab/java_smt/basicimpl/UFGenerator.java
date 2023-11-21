@@ -87,8 +87,14 @@ public class UFGenerator {
     inputParams.add(pReturnType);
     inputParams.add(pArgTypes);
     Function<List<Object>, String> functionToString =
-        inPlaceInputParams -> "(declare-fun " + inPlaceInputParams.get(0) + " ("
-            + inPlaceInputParams.get(1) + ")" + inPlaceInputParams.get(2) + ")";
+        inPlaceInputParams ->
+            "(declare-fun "
+                + inPlaceInputParams.get(0)
+                + " ("
+                + inPlaceInputParams.get(1)
+                + ")"
+                + inPlaceInputParams.get(2)
+                + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
@@ -113,9 +119,8 @@ public class UFGenerator {
           }
           return String.valueOf(out);
         };
-    FunctionEnvironment newEntry = new FunctionEnvironment(result, inputParams,
-        functionToString,
-        "UFFun");
+    FunctionEnvironment newEntry =
+        new FunctionEnvironment(result, inputParams, functionToString, "UFFun");
     newEntry.setUFName(funcType.getName());
     newEntry.setUFInputType(checkUFInputType(funcType.getArgumentTypes()));
     newEntry.setUFOutputType(checkUFOutputType(funcType.getType()));
@@ -142,8 +147,8 @@ public class UFGenerator {
           }
           return String.valueOf(out);
         };
-    FunctionEnvironment newEntry = new FunctionEnvironment(result, inputParams,
-        functionToString, "UFFun");
+    FunctionEnvironment newEntry =
+        new FunctionEnvironment(result, inputParams, functionToString, "UFFun");
     newEntry.setUFName(funcType.getName());
     newEntry.setUFInputType(checkUFInputType(funcType.getArgumentTypes()));
     newEntry.setUFOutputType(checkUFOutputType(funcType.getType()));

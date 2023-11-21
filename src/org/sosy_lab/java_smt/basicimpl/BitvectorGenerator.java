@@ -87,8 +87,8 @@ public class BitvectorGenerator {
     inputParams.add(pVar);
     Function<List<Object>, String> functionToString =
         inPlaceInputParams -> (String) inPlaceInputParams.get(0);
-    FunctionEnvironment
-        newEntry = new FunctionEnvironment(result, inputParams, functionToString, "BitVec");
+    FunctionEnvironment newEntry =
+        new FunctionEnvironment(result, inputParams, functionToString, "BitVec");
     newEntry.setBitVecLength(pType.getSize());
     Generator.executedAggregator.add(newEntry);
   }
@@ -98,9 +98,8 @@ public class BitvectorGenerator {
     inputParams.add(pVar);
     Function<List<Object>, String> functionToString =
         inPlaceInputParams -> (String) inPlaceInputParams.get(0);
-    FunctionEnvironment
-        newEntry = new FunctionEnvironment(result, inputParams, functionToString,
-        "BitVec");
+    FunctionEnvironment newEntry =
+        new FunctionEnvironment(result, inputParams, functionToString, "BitVec");
     newEntry.setBitVecLength(pLength);
     Generator.executedAggregator.add(newEntry);
   }
@@ -111,8 +110,8 @@ public class BitvectorGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> functionToString =
-        inPlaceInputParams -> "(= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
-            + ")";
+        inPlaceInputParams ->
+            "(= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
@@ -132,8 +131,8 @@ public class BitvectorGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> functionToString =
-        inPlaceInputParams -> "(bvadd " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
+        inPlaceInputParams ->
+            "(bvadd " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
@@ -144,8 +143,8 @@ public class BitvectorGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> functionToString =
-        inPlaceInputParams -> "(bvsub " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
+        inPlaceInputParams ->
+            "(bvsub " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
@@ -156,8 +155,8 @@ public class BitvectorGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> functionToString =
-        inPlaceInputParams -> "(bvsdiv " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
+        inPlaceInputParams ->
+            "(bvsdiv " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
@@ -168,8 +167,8 @@ public class BitvectorGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> functionToString =
-        inPlaceInputParams -> "(bvudiv " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
+        inPlaceInputParams ->
+            "(bvudiv " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
@@ -180,8 +179,8 @@ public class BitvectorGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> functionToString =
-        inPlaceInputParams -> "(bvsrem " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
+        inPlaceInputParams ->
+            "(bvsrem " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
@@ -192,8 +191,8 @@ public class BitvectorGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> functionToString =
-        inPlaceInputParams -> "(bvurem " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
+        inPlaceInputParams ->
+            "(bvurem " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
@@ -204,8 +203,8 @@ public class BitvectorGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> functionToString =
-        inPlaceInputParams -> "(bvmul " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
+        inPlaceInputParams ->
+            "(bvmul " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
@@ -216,8 +215,8 @@ public class BitvectorGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(bvugt " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
+        inPlaceInputParams ->
+            "(bvugt " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, saveResult, "Skip"));
   }
@@ -228,8 +227,8 @@ public class BitvectorGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(bvsgt " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
+        inPlaceInputParams ->
+            "(bvsgt " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, saveResult, "Skip"));
   }
@@ -240,8 +239,8 @@ public class BitvectorGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(bvuge " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
+        inPlaceInputParams ->
+            "(bvuge " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, saveResult, "Skip"));
   }
@@ -252,8 +251,8 @@ public class BitvectorGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(bvsge " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
+        inPlaceInputParams ->
+            "(bvsge " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, saveResult, "Skip"));
   }
@@ -264,8 +263,8 @@ public class BitvectorGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(bvult " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
+        inPlaceInputParams ->
+            "(bvult " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, saveResult, "Skip"));
   }
@@ -276,8 +275,8 @@ public class BitvectorGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(bvslt " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
+        inPlaceInputParams ->
+            "(bvslt " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, saveResult, "Skip"));
   }
@@ -288,8 +287,8 @@ public class BitvectorGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(bvule " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
+        inPlaceInputParams ->
+            "(bvule " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, saveResult, "Skip"));
   }
@@ -300,8 +299,8 @@ public class BitvectorGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(bvsle " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
+        inPlaceInputParams ->
+            "(bvsle " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, saveResult, "Skip"));
   }
@@ -321,8 +320,8 @@ public class BitvectorGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(bvand " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
+        inPlaceInputParams ->
+            "(bvand " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, saveResult, "Skip"));
   }
@@ -333,8 +332,8 @@ public class BitvectorGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(bvor " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
-            + ")";
+        inPlaceInputParams ->
+            "(bvor " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, saveResult, "Skip"));
   }
@@ -345,8 +344,8 @@ public class BitvectorGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(bvxor " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
+        inPlaceInputParams ->
+            "(bvxor " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, saveResult, "Skip"));
   }
@@ -357,8 +356,8 @@ public class BitvectorGenerator {
     inputParams.add(pNumber);
     inputParams.add(toShift);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(bvashr " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
+        inPlaceInputParams ->
+            "(bvashr " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, saveResult, "Skip"));
   }
@@ -369,8 +368,8 @@ public class BitvectorGenerator {
     inputParams.add(pNumber);
     inputParams.add(toShift);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(bvlshr " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
+        inPlaceInputParams ->
+            "(bvlshr " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, saveResult, "Skip"));
   }
@@ -381,8 +380,8 @@ public class BitvectorGenerator {
     inputParams.add(pNumber);
     inputParams.add(toShift);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(bvshl " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
+        inPlaceInputParams ->
+            "(bvshl " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, saveResult, "Skip"));
   }
@@ -393,8 +392,8 @@ public class BitvectorGenerator {
     inputParams.add(pNumber);
     inputParams.add(append);
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "(concat " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
+        inPlaceInputParams ->
+            "(concat " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, saveResult, "Skip"));
   }
@@ -406,9 +405,14 @@ public class BitvectorGenerator {
     inputParams.add(String.valueOf(pMsb));
     inputParams.add(String.valueOf(pLsb));
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "((_ extract " + inPlaceInputParams.get(1) + " "
-            + inPlaceInputParams.get(2)
-            + ") " + inPlaceInputParams.get(0) + ")";
+        inPlaceInputParams ->
+            "((_ extract "
+                + inPlaceInputParams.get(1)
+                + " "
+                + inPlaceInputParams.get(2)
+                + ") "
+                + inPlaceInputParams.get(0)
+                + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, saveResult, "Skip"));
   }
@@ -419,8 +423,8 @@ public class BitvectorGenerator {
     inputParams.add(pNumber);
     inputParams.add(String.valueOf(pExtensionBits));
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "((_ zero_extend " + inPlaceInputParams.get(1) + ") "
-            + inPlaceInputParams.get(0) + ")";
+        inPlaceInputParams ->
+            "((_ zero_extend " + inPlaceInputParams.get(1) + ") " + inPlaceInputParams.get(0) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, saveResult, "Skip"));
   }
@@ -431,8 +435,8 @@ public class BitvectorGenerator {
     inputParams.add(pNumber);
     inputParams.add(String.valueOf(pExtensionBits));
     Function<List<Object>, String> saveResult =
-        inPlaceInputParams -> "((_ sign_extend " + inPlaceInputParams.get(1) + ") "
-            + inPlaceInputParams.get(0) + ")";
+        inPlaceInputParams ->
+            "((_ sign_extend " + inPlaceInputParams.get(1) + ") " + inPlaceInputParams.get(0) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, saveResult, "Skip"));
   }

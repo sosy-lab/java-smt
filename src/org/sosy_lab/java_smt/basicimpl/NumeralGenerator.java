@@ -37,8 +37,8 @@ public class NumeralGenerator {
       inputParams.add(absVar);
       Function<List<Object>, String> functionToString =
           inPlaceInputParams -> "(- " + inPlaceInputParams.get(0) + ")";
-      Generator.executedAggregator.add(new FunctionEnvironment(result, inputParams, functionToString,
-          "Direct"));
+      Generator.executedAggregator.add(
+          new FunctionEnvironment(result, inputParams, functionToString, "Direct"));
     } else if (result instanceof NumeralFormula) {
       String checkedVar = String.valueOf(result);
       inputParams.add(checkedVar);
@@ -47,8 +47,8 @@ public class NumeralGenerator {
     }
     Function<List<Object>, String> functionToString =
         inPlaceInputParams -> (String) inPlaceInputParams.get(0);
-    Generator.executedAggregator.add(new FunctionEnvironment(result, inputParams, functionToString,
-        "Direct"));
+    Generator.executedAggregator.add(
+        new FunctionEnvironment(result, inputParams, functionToString, "Direct"));
   }
 
   protected static void logMakeIntVariable(Object result, String pVar) {
@@ -62,8 +62,8 @@ public class NumeralGenerator {
     inputParams.add(pVar);
     Function<List<Object>, String> functionToString =
         inPlaceInputParams -> (String) inPlaceInputParams.get(0);
-    Generator.executedAggregator.add(new FunctionEnvironment(result, inputParams, functionToString,
-        varType));
+    Generator.executedAggregator.add(
+        new FunctionEnvironment(result, inputParams, functionToString, varType));
   }
 
   protected static void logAdd(Object result, Object pNumber1, Object pNumber2) {
@@ -71,8 +71,8 @@ public class NumeralGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> functionToString =
-        inPlaceInputParams -> "(+ " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
-            + ")";
+        inPlaceInputParams ->
+            "(+ " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
@@ -82,8 +82,8 @@ public class NumeralGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> functionToString =
-        inPlaceInputParams -> "(= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
-            + ")";
+        inPlaceInputParams ->
+            "(= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
@@ -123,8 +123,8 @@ public class NumeralGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> functionToString =
-        inPlaceInputParams -> "(- " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
-            + ")";
+        inPlaceInputParams ->
+            "(- " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
@@ -134,8 +134,8 @@ public class NumeralGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> functionToString =
-        inPlaceInputParams -> "(div " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
-            + ")";
+        inPlaceInputParams ->
+            "(div " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
@@ -145,8 +145,8 @@ public class NumeralGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> functionToString =
-        inPlaceInputParams -> "(mod " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
-            + ")";
+        inPlaceInputParams ->
+            "(mod " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
@@ -156,8 +156,8 @@ public class NumeralGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> functionToString =
-        inPlaceInputParams -> "(* " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
-            + ")";
+        inPlaceInputParams ->
+            "(* " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
@@ -187,8 +187,8 @@ public class NumeralGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> functionToString =
-        inPlaceInputParams -> "(> " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
-            + ")";
+        inPlaceInputParams ->
+            "(> " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
@@ -198,8 +198,8 @@ public class NumeralGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> functionToString =
-        inPlaceInputParams -> "(>= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
-            + ")";
+        inPlaceInputParams ->
+            "(>= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
@@ -209,8 +209,8 @@ public class NumeralGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> functionToString =
-        inPlaceInputParams -> "(< " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
-            + ")";
+        inPlaceInputParams ->
+            "(< " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
@@ -220,8 +220,8 @@ public class NumeralGenerator {
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
     Function<List<Object>, String> functionToString =
-        inPlaceInputParams -> "(<= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
-            + ")";
+        inPlaceInputParams ->
+            "(<= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }

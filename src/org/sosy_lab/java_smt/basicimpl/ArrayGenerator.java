@@ -82,8 +82,8 @@ public class ArrayGenerator {
     inputParams.add(pName);
     Function<List<Object>, String> functionToString =
         inPlaceInputParams -> (String) inPlaceInputParams.get(0);
-    FunctionEnvironment
-        newEntry = new FunctionEnvironment(result, inputParams, functionToString, "Array");
+    FunctionEnvironment newEntry =
+        new FunctionEnvironment(result, inputParams, functionToString, "Array");
     newEntry.setArrayIndexType(checkArrayIndexSort(pIndexType));
     newEntry.setArrayValueType(checkArrayElementSort(pElementType));
     Generator.executedAggregator.add(newEntry);
@@ -95,8 +95,8 @@ public class ArrayGenerator {
     inputParams.add(pArray1);
     inputParams.add(pArray2);
     Function<List<Object>, String> functionToString =
-        inPlaceInputParams -> "(= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1)
-            + ")";
+        inPlaceInputParams ->
+            "(= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
@@ -106,8 +106,8 @@ public class ArrayGenerator {
     inputParams.add(pArray);
     inputParams.add(pIndex);
     Function<List<Object>, String> functionToString =
-        inPlaceInputParams -> "(select " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + ")";
+        inPlaceInputParams ->
+            "(select " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
@@ -119,8 +119,14 @@ public class ArrayGenerator {
     inputParams.add(pIndex);
     inputParams.add(pValue);
     Function<List<Object>, String> functionToString =
-        inPlaceInputParams -> "(store " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(
-            1) + " " + inPlaceInputParams.get(2) + ")";
+        inPlaceInputParams ->
+            "(store "
+                + inPlaceInputParams.get(0)
+                + " "
+                + inPlaceInputParams.get(1)
+                + " "
+                + inPlaceInputParams.get(2)
+                + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
   }
