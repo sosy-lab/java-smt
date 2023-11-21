@@ -29,7 +29,15 @@ import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.tree.*;
 
-@SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast", "CheckReturnValue"})
+@SuppressWarnings({
+  "all",
+  "warnings",
+  "unchecked",
+  "unused",
+  "cast",
+  "CheckReturnValue",
+  "UnnecessaryParentheses"
+})
 public class smtlibv2Parser extends Parser {
   static {
     RuntimeMetaData.checkVersion("4.13.1", RuntimeMetaData.VERSION);
