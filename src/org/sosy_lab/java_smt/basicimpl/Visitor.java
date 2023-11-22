@@ -213,7 +213,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
   public Object visitVar_binding(Var_bindingContext ctx) {
     String name = ctx.symbol().getText();
     Formula formula = (Formula) visit(ctx.term());
-    letVariables.put(name, new ParserFormula(name, formula));
+    letVariables.put(name, new ParserFormula(formula));
     return visitChildren(ctx);
   }
 
@@ -286,12 +286,12 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     } else if (getNumericType(operand).equals("Integer")
         || getNumericType(operand).equals("Long")) {
       variables.put(
-          operand, new ParserFormula("Int", Objects.requireNonNull(imgr).makeNumber(operand)));
+          operand, new ParserFormula(Objects.requireNonNull(imgr).makeNumber(operand)));
       return variables.get(operand).javaSmt;
     } else if (getNumericType(operand).equals("Double")
         || getNumericType(operand).equals("Float")) {
       variables.put(
-          operand, new ParserFormula("Real", Objects.requireNonNull(rmgr).makeNumber(operand)));
+          operand, new ParserFormula(Objects.requireNonNull(rmgr).makeNumber(operand)));
       return variables.get(operand).javaSmt;
     } else if (operand.startsWith("#b")) {
       String binVal = Iterables.get(Splitter.on('b').split(operand), 1);
@@ -316,24 +316,26 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     }
     List<String> bitVec = (List<String>) visitChildren(ctx);
     if (letVariables.containsKey(operand)) {
-      if (letVariables.get(operand).type.equals("UF")
-          && variables.get(operand).inputParams.isEmpty()) {
+      if (!(letVariables.get(operand).type == null) && Objects.equals(
+          letVariables.get(operand).type, "UF")
+          && letVariables.get(operand).inputParams == null) {
         return umgr.callUF(
             (FunctionDeclaration<Formula>) letVariables.get(operand).javaSmt, new ArrayList<>());
       }
       return letVariables.get(operand).javaSmt;
     } else if (variables.containsKey(operand)) {
-      if (variables.get(operand).type.equals("UF")
-          && variables.get(operand).inputParams.isEmpty()) {
+      if (!(variables.get(operand).type == null) && Objects.equals(variables.get(operand).type,
+          "UF")
+          && variables.get(operand).inputParams == null) {
         return umgr.callUF(
             (FunctionDeclaration<Formula>) variables.get(operand).javaSmt, new ArrayList<>());
       }
       return variables.get(operand).javaSmt;
     } else if (operand.equals("false")) {
-      variables.put(operand, new ParserFormula("Bool", bmgr.makeFalse()));
+      variables.put(operand, new ParserFormula(bmgr.makeFalse()));
       return variables.get(operand).javaSmt;
     } else if (operand.equals("true")) {
-      variables.put(operand, new ParserFormula("Bool", bmgr.makeTrue()));
+      variables.put(operand, new ParserFormula(bmgr.makeTrue()));
       return variables.get(operand).javaSmt;
     } else if (!bitVec.isEmpty()) {
       BigInteger value = new BigInteger(Iterables.get(Splitter.on('v').split(bitVec.get(0)), 1));
@@ -1039,7 +1041,6 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
           variables.put(
               "temp",
               new ParserFormula(
-                  "Array",
                   Objects.requireNonNull(amgr)
                       .makeArray(
                           "(as const (Array "
@@ -1195,7 +1196,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
         String name = ctx.sorted_var(i).symbol().getText();
         FormulaType<?> sort = (FormulaType<?>) visit(ctx.sort());
         Formula temp = mapKey(sort, name);
-        variables.put("name", new ParserFormula("def-fun", temp));
+        variables.put("name", new ParserFormula(temp));
         inputParams.add(temp);
       }
     }
@@ -1206,7 +1207,8 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     Formula key;
 
     if (!inputParams.isEmpty()) {
-      ParserFormula temp = new ParserFormula("UF", umgr.declareUF(variable, returnTypes));
+      ParserFormula temp = new ParserFormula(umgr.declareUF(variable, returnTypes));
+      temp.setType("UF");
       temp.setReturnType(returnTypes);
       temp.setInputParams(javaSorts);
       variables.put(variable, temp);
@@ -1220,7 +1222,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
 
     Formula input = (Formula) visit(ctx.term());
     Formula value = input;
-    variables.put(variable, new ParserFormula("def-fun", input));
+    variables.put(variable, new ParserFormula(input));
 
     String keyString = key.toString();
     if (keyString.startsWith("PIPE")) {
@@ -1252,25 +1254,23 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     FormulaType<?> sorts = (FormulaType<?>) visit(ctx.sort());
 
     if (sorts.isBooleanType()) {
-      variables.put(variable, new ParserFormula("Bool", bmgr.makeVariable(variable)));
+      variables.put(variable, new ParserFormula(bmgr.makeVariable(variable)));
     } else if (sorts.isIntegerType()) {
       variables.put(
-          variable, new ParserFormula("Int", Objects.requireNonNull(imgr).makeVariable(variable)));
+          variable, new ParserFormula(Objects.requireNonNull(imgr).makeVariable(variable)));
     } else if (sorts.isRationalType()) {
       variables.put(
-          variable, new ParserFormula("Real", Objects.requireNonNull(rmgr).makeVariable(variable)));
+          variable, new ParserFormula(Objects.requireNonNull(rmgr).makeVariable(variable)));
     } else if (sorts.isBitvectorType()) {
       variables.put(
           variable,
           new ParserFormula(
-              "BitVec",
               Objects.requireNonNull(bimgr)
                   .makeVariable(((FormulaType.BitvectorType) sorts).getSize(), variable)));
     } else if (sorts.isArrayType()) {
       variables.put(
           variable,
           new ParserFormula(
-              "BitVec",
               Objects.requireNonNull(amgr)
                   .makeArray(
                       variable,
@@ -1395,8 +1395,8 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
 
     ParserFormula temp =
         new ParserFormula(
-            "UF",
             umgr.declareUF(variable, mapSort(Collections.singletonList(returnType)), javaSorts));
+    temp.setType("UF");
     temp.setReturnType(mapSort(Collections.singletonList(returnType)));
     temp.setInputParams(javaSorts);
     variables.put(variable, temp);

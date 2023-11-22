@@ -21,22 +21,26 @@
 package org.sosy_lab.java_smt.basicimpl;
 
 import java.util.List;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.FormulaType;
 
 public class ParserFormula {
 
+  @Nullable
   String type;
   Object javaSmt;
 
+  @Nullable
   FormulaType<?> returnType;
 
+  @Nullable
   List<FormulaType<?>> inputParams;
 
-  public ParserFormula(String pType, Object pJavaSmt) {
-    type = pType;
+  public ParserFormula(Object pJavaSmt) {
     javaSmt = pJavaSmt;
   }
 
+  @javax.annotation.Nullable
   public String getType() {
     return type;
   }
