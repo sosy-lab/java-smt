@@ -57,14 +57,12 @@ import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.Apro
 public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaType, Environment,
     Long> {
 
-  private Environment formulaEnvironment;
-
   /**
    * variables is a map that stores all variable-objects with their name as key;
    */
   private final Map<String, ApronNode> variables;
-
   private final Manager manager;
+  private Environment formulaEnvironment;
 
   protected ApronFormulaCreator(
       Manager pManager,
@@ -194,7 +192,7 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
     } else if (type.equals(FormulaType.INTEGER)) {
       return org.sosy_lab.java_smt.api.FormulaType.IntegerType;
     }
-    throw new IllegalArgumentException("Type"+type+"not available!");
+    throw new IllegalArgumentException("Type" + type + "not available!");
   }
 
   @Override
@@ -220,9 +218,16 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
     return null;
   }
 
-  //SuppressWarning of unchecked is used here because the unchecked warning was because of
-  // unchecked class cast, but as all formulas are instances of ApronNode and ApronNode inherits
-  // from Formula, the Class Cast is correct here
+  /**
+   * SuppressWarning of unchecked is used here because the unchecked warning was because of
+   * unchecked class cast, but as all formulas are instances of ApronNode and ApronNode
+   * inherits from Formula, the Class Cast is correct here
+   *
+   * @param pType type of the formula
+   * @param pTerm term to encapsulate
+   * @param <T>   all subclasses of ApronNode, all extend Formula
+   * @return more specified ApronNode
+   */
   @Override
   @SuppressWarnings("unchecked")
   public <T extends Formula> T encapsulate(

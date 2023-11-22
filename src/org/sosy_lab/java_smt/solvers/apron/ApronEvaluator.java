@@ -54,7 +54,7 @@ public class ApronEvaluator extends AbstractEvaluator<ApronNode, ApronFormulaTyp
   }
 
   @Override
-  public void close(){
+  public void close() {
     this.theoremProver.close();
     this.apronModel.close();
   }

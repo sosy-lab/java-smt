@@ -192,7 +192,8 @@ public class ApronIntegerFormulaManager
         Texpr1BinNode.OP_SUB);
     Map<ApronNode, Integer> map = new HashMap<>();
     map.put(binaryNode, Tcons1.EQ);
-    ApronConstraint constraint = new ApronConstraint(apronFormulaCreator.getFormulaEnvironment(), map);
+    ApronConstraint constraint =
+        new ApronConstraint(apronFormulaCreator.getFormulaEnvironment(), map);
     return constraint;
   }
 
@@ -205,7 +206,8 @@ public class ApronIntegerFormulaManager
             new ApronIntBinaryNode(pNumbers.get(i), pNumbers.get(j), Texpr1BinNode.OP_SUB);
         Map<ApronNode, Integer> map = new HashMap<>();
         map.put(apronNode, Tcons1.DISEQ);
-        ApronConstraint constraint = new ApronConstraint(apronFormulaCreator.getFormulaEnvironment(), map);
+        ApronConstraint constraint =
+            new ApronConstraint(apronFormulaCreator.getFormulaEnvironment(), map);
         constraints.add(constraint);
       }
     }
@@ -218,7 +220,8 @@ public class ApronIntegerFormulaManager
         Texpr1BinNode.OP_SUB);
     Map<ApronNode, Integer> map = new HashMap<>();
     map.put(binaryNode, Tcons1.SUP);
-    ApronConstraint constraint = new ApronConstraint(apronFormulaCreator.getFormulaEnvironment(), map);
+    ApronConstraint constraint =
+        new ApronConstraint(apronFormulaCreator.getFormulaEnvironment(), map);
     return constraint;
   }
 
@@ -228,7 +231,8 @@ public class ApronIntegerFormulaManager
         Texpr1BinNode.OP_SUB);
     Map<ApronNode, Integer> map = new HashMap<>();
     map.put(binaryNode, Tcons1.SUPEQ);
-    ApronConstraint constraint = new ApronConstraint(apronFormulaCreator.getFormulaEnvironment(), map);
+    ApronConstraint constraint =
+        new ApronConstraint(apronFormulaCreator.getFormulaEnvironment(), map);
     return constraint;
   }
 
@@ -238,7 +242,8 @@ public class ApronIntegerFormulaManager
         Texpr1BinNode.OP_SUB);
     Map<ApronNode, Integer> map = new HashMap<>();
     map.put(binaryNode, Tcons1.SUP);
-    ApronConstraint constraint = new ApronConstraint(apronFormulaCreator.getFormulaEnvironment(), map);
+    ApronConstraint constraint =
+        new ApronConstraint(apronFormulaCreator.getFormulaEnvironment(), map);
     return constraint;
   }
 
@@ -248,7 +253,8 @@ public class ApronIntegerFormulaManager
         Texpr1BinNode.OP_SUB);
     Map<ApronNode, Integer> map = new HashMap<>();
     map.put(binaryNode, Tcons1.SUPEQ);
-    ApronConstraint constraint = new ApronConstraint(apronFormulaCreator.getFormulaEnvironment(), map);
+    ApronConstraint constraint =
+        new ApronConstraint(apronFormulaCreator.getFormulaEnvironment(), map);
     return constraint;
   }
 }

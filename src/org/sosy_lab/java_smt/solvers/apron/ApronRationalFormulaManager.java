@@ -93,11 +93,11 @@ public class ApronRationalFormulaManager extends
   }
 
   @Override
- protected ApronNode makeNumberImpl(String i) {
+  protected ApronNode makeNumberImpl(String i) {
     Preconditions.checkArgument(!(i.contains(".") || i.contains(",")),
         "Rational number has to be written like 2/5.");
-   List<String> numbers = Splitter.on('/').splitToList(i);
-   BigInteger num = new BigInteger(numbers.get(0));
+    List<String> numbers = Splitter.on('/').splitToList(i);
+    BigInteger num = new BigInteger(numbers.get(0));
     if (numbers.size() > 1) {
       BigInteger den = new BigInteger(numbers.get(1));
       return new ApronRatCstNode(num, den);
@@ -159,7 +159,8 @@ public class ApronRationalFormulaManager extends
         Texpr1BinNode.OP_SUB);
     Map<ApronNode, Integer> map = new HashMap<>();
     map.put(binaryNode, Tcons1.EQ);
-    ApronConstraint constraint = new ApronConstraint(apronFormulaCreator.getFormulaEnvironment(), map);
+    ApronConstraint constraint =
+        new ApronConstraint(apronFormulaCreator.getFormulaEnvironment(), map);
     return constraint;
   }
 
@@ -172,7 +173,8 @@ public class ApronRationalFormulaManager extends
             Texpr1BinNode.OP_SUB);
         Map<ApronNode, Integer> map = new HashMap<>();
         map.put(apronNode, Tcons1.DISEQ);
-        ApronConstraint constraint = new ApronConstraint(apronFormulaCreator.getFormulaEnvironment(), map);
+        ApronConstraint constraint =
+            new ApronConstraint(apronFormulaCreator.getFormulaEnvironment(), map);
         constraints.add(constraint);
       }
     }
@@ -185,7 +187,8 @@ public class ApronRationalFormulaManager extends
         Texpr1BinNode.OP_SUB);
     Map<ApronNode, Integer> map = new HashMap<>();
     map.put(binaryNode, Tcons1.SUP);
-    ApronConstraint constraint = new ApronConstraint(apronFormulaCreator.getFormulaEnvironment(), map);
+    ApronConstraint constraint =
+        new ApronConstraint(apronFormulaCreator.getFormulaEnvironment(), map);
     return constraint;
   }
 
@@ -195,7 +198,8 @@ public class ApronRationalFormulaManager extends
         Texpr1BinNode.OP_SUB);
     Map<ApronNode, Integer> map = new HashMap<>();
     map.put(binaryNode, Tcons1.SUPEQ);
-    ApronConstraint constraint = new ApronConstraint(apronFormulaCreator.getFormulaEnvironment(), map);
+    ApronConstraint constraint =
+        new ApronConstraint(apronFormulaCreator.getFormulaEnvironment(), map);
     return constraint;
   }
 
@@ -205,7 +209,8 @@ public class ApronRationalFormulaManager extends
         Texpr1BinNode.OP_SUB);
     Map<ApronNode, Integer> map = new HashMap<>();
     map.put(binaryNode, Tcons1.SUP);
-    ApronConstraint constraint = new ApronConstraint(apronFormulaCreator.getFormulaEnvironment(), map);
+    ApronConstraint constraint =
+        new ApronConstraint(apronFormulaCreator.getFormulaEnvironment(), map);
     return constraint;
   }
 
@@ -215,7 +220,8 @@ public class ApronRationalFormulaManager extends
         Texpr1BinNode.OP_SUB);
     Map<ApronNode, Integer> map = new HashMap<>();
     map.put(binaryNode, Tcons1.SUPEQ);
-    ApronConstraint constraint = new ApronConstraint(apronFormulaCreator.getFormulaEnvironment(), map);
+    ApronConstraint constraint =
+        new ApronConstraint(apronFormulaCreator.getFormulaEnvironment(), map);
     return constraint;
   }
 
@@ -224,6 +230,12 @@ public class ApronRationalFormulaManager extends
     return toInteger(pTerm);
   }
 
+  /**
+   * uses especially for this case designed constructors of all Integer Type ApronNode
+   *
+   * @param pNumeralNode rational Node
+   * @return integer Node
+   */
   private ApronNode toInteger(ApronNode pNumeralNode) {
     FormulaType pType = pNumeralNode.getType();
     if (pType.equals(FormulaType.RATIONAL)) {

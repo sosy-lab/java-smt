@@ -55,8 +55,7 @@ import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.FormulaType;
  * Apron-library instances of
  * Texpr1Node; All BooleanFormulas refer to Tcons1; The wrapper is needed to implement methods that
  * are needed for the JavaSMT-binding but are not provided by the Apron-library.
- *
- * SupressWarnig has to be used, baucause the internal Texpr1Node form the Apron library is not
+ * SupressWarnig has to be used, because the internal Texpr1Node form the Apron library is not
  * immutble. But all instances are final.
  */
 @SuppressWarnings("Immutable")
@@ -76,6 +75,7 @@ public interface ApronNode extends Formula {
   Set<String> getVarNames();
 
   ApronNode getInstance();
+
   @Immutable
   interface ApronNumeralNode extends ApronNode, NumeralFormula {
     /**
@@ -244,8 +244,9 @@ public interface ApronNode extends Formula {
       }
 
       /**
-       * this method is needed to add the variable to the @Environment; the @Environment holds
-       * all variables in two separated arrays, one for Integers and one for Rationals
+       * this method is needed to add the variable to the Environment; the Environment from the
+       * Apron library holds all variables in two separated arrays, one for Integers and one for
+       * Rationals; it is a necessary component of an Abstract1 object
        */
       private void addVarToEnv() {
         Var[] intVars = formulaCreator.getFormulaEnvironment().getIntVars();
@@ -279,7 +280,8 @@ public interface ApronNode extends Formula {
     }
 
     /**
-     * This class wraps terms with unary arithmetic operators for rational values (ex. -x)
+     * This class wraps terms with unary arithmetic operators for rational values (ex. -x); it is
+     * build by an unary operator and a Node;
      */
     class ApronRatUnaryNode implements RationalFormula, ApronNumeralNode {
       private final Texpr1UnNode unaryNode;
@@ -349,7 +351,8 @@ public interface ApronNode extends Formula {
     }
 
     /**
-     * This class wraps terms with binary arithmetic operators for rational values (ex. a+4.5)
+     * This class wraps terms with binary arithmetic operators for rational values (ex. a+4.5); a
+     * binary node is defined by a binary operator and two nodes;
      */
     class ApronRatBinaryNode implements RationalFormula, ApronNumeralNode {
 
@@ -589,8 +592,9 @@ public interface ApronNode extends Formula {
       }
 
       /**
-       * this method is needed to add the variable to the @Environment; the @Environment holdas
-       * all variables in two separated arrays, one for Integers and one for Rationals
+       * this method is needed to add the variable to the Environment; the Environment from the
+       * Apron library holds all variables in two separated arrays, one for Integers and one for
+       * Rationals; it is a necessary component of each Abstract1 object
        */
       private void addVarToEnv() {
         Var[] intVars = formulaCreator.getFormulaEnvironment().getIntVars();
@@ -619,7 +623,8 @@ public interface ApronNode extends Formula {
     }
 
     /**
-     * This class wraps terms with unary arithmetic operators for integer values (ex. -x)
+     * This class wraps terms with unary arithmetic operators for integer values (ex. -x); it is
+     * build by an unary operator and a node
      */
     class ApronIntUnaryNode implements IntegerFormula, ApronNumeralNode {
       private final Texpr1UnNode unaryNode;
@@ -694,7 +699,8 @@ public interface ApronNode extends Formula {
     }
 
     /**
-     * This class wraps terms with unary arithmetic operators for integer values (ex. x+3)
+     * This class wraps terms with binary arithmetic operators for integer values (ex. x+3); it
+     * is build with an binary operator and two nodes
      */
     class ApronIntBinaryNode implements IntegerFormula, ApronNumeralNode {
 

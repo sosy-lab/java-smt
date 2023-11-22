@@ -59,7 +59,6 @@ public class ApronApiTest {
   }
 
 
-
   @Test
   public void solverBackendTest() {
   }
@@ -88,7 +87,7 @@ public class ApronApiTest {
     cons2.setCst(new MpqScalar(+3));
     cons2.setKind(Lincons1.SUPEQ);
     Abstract1 abstract1 = new Abstract1(pManager, new Lincons1[]{cons1, cons2});
-    assertFalse("The domain is not UNSAT.", abstract1.isBottom(pManager));
+    assertFalse("The domain is not UNSAT for sure.", abstract1.isBottom(pManager));
   }
 
   /**

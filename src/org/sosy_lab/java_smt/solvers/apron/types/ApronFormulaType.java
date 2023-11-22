@@ -21,7 +21,8 @@
 package org.sosy_lab.java_smt.solvers.apron.types;
 
 /**
- * This is a helper-class for defining the integer, rational and boolean type for the
+ * This is a helper-class for defining the integer, rational and boolean type for the Generics of
+ * ApronFormulaCreator
  */
 public interface ApronFormulaType {
 

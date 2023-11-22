@@ -85,7 +85,7 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
     return super.getModelAssignments();
   }
 
-  public boolean getClosed(){
+  public boolean getClosed() {
     return closed;
   }
 
