@@ -86,7 +86,7 @@ public class UniversalModel extends AbstractModel<IExpression, Sort, PrincessEnv
   public void getOutput() throws IOException {
 
     String fileName =
-        "/princess_all-janelle.jar";
+        "/princess_all-2023-06-19.jar";
     String princessJar = filePath + fileName;
     // does it work?
     new File(princessJar).setExecutable(true);
