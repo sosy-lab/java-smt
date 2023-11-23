@@ -66,7 +66,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   private BooleanFormula bv_forall_x_a_at_x_eq_0;
 
   @Before
-  public void setUpLIA() throws IOException {
+  public void setUpLIA() {
     requireIntegers();
     requireArrays();
     requireQuantifiers();
@@ -81,7 +81,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Before
-  public void setUpBV() throws IOException {
+  public void setUpBV() {
     requireBitvectors();
     requireArrays();
     requireQuantifiers();

@@ -254,12 +254,16 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
   }
 
   public static boolean isBigInteger(String strNum) {
+    boolean ret = true;
     try {
-      new BigInteger(strNum);
+      BigInteger x = new BigInteger(strNum);
+      if (!x.equals(new BigInteger(strNum))) {
+        ret = false;
+      }
     } catch (NumberFormatException nfe) {
       return false;
     }
-    return true;
+    return ret;
   }
 
   public static String getNumericType(String strNum) {
@@ -1346,7 +1350,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
       case "Real":
         return FormulaType.RationalType;
       case "BitVec":
-        return FormulaType.BitvectorType.getBitvectorTypeWithSize(Integer.parseInt(bvSize));
+        return FormulaType.getBitvectorTypeWithSize(Integer.parseInt(bvSize));
 
       default:
         throw new ParserException("JavaSMT supports only Int, Real, BitVec and Bool for UF.");
@@ -1377,6 +1381,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     if (variable.startsWith("|")) {
       variable = variable.replaceAll("\\|", "PIPE");
     }
+
     List<String> declaration = new ArrayList<>();
     List<FormulaType<?>> javaSorts = new ArrayList<>();
     String returnType = ctx.getChild(ctx.getChildCount() - 1).getText();

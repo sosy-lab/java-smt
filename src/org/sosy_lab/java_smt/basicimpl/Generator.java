@@ -43,11 +43,13 @@ public class Generator {
   public static final List<FunctionEnvironment> registeredVariables = new ArrayList<>();
 
   protected static void writeToFile(String line, String fileName) throws IOException {
-    Writer fileWriter = Files.newBufferedWriter(Paths.get(fileName), Charset.defaultCharset());
+
     try {
+      try (Writer fileWriter = Files.newBufferedWriter(Paths.get(fileName),
+          Charset.defaultCharset())) {
       fileWriter.write(line);
       fileWriter.flush();
-      fileWriter.close();
+      }
     } catch (GeneratorException e) {
       throw new GeneratorException("Could not write to file");
     }

@@ -18,7 +18,6 @@ import java.util.List;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.Test;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
-import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -159,7 +158,7 @@ public class ModelEvaluationTest extends SolverBasedTest0.ParameterizedSolverBas
 
   @Test
   public void testModelGeneration()
-      throws SolverException, InterruptedException, IOException, InvalidConfigurationException {
+      throws SolverException, InterruptedException, IOException {
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(bmgr.and(getConstraints()));
       for (int i = 0; i < problemSize; i++) {
@@ -173,7 +172,7 @@ public class ModelEvaluationTest extends SolverBasedTest0.ParameterizedSolverBas
 
   @Test
   public void testEvaluatorGeneration()
-      throws SolverException, InterruptedException, InvalidConfigurationException {
+      throws SolverException, InterruptedException {
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(bmgr.and(getConstraints()));
 

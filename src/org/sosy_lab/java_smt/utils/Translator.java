@@ -24,5 +24,5 @@ import java.util.HashMap;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 
 public class Translator {
-  static HashMap<BooleanFormula, String> constraints = new HashMap<BooleanFormula, String>();
+  static HashMap<BooleanFormula, String> constraints = new HashMap<>();
 }

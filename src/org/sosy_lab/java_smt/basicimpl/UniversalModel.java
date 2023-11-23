@@ -24,27 +24,24 @@ import ap.parser.IExpression;
 import ap.types.Sort;
 import com.google.common.collect.ImmutableList;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.api.ArrayFormulaManager;
 import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
-import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.UFManager;
 import org.sosy_lab.java_smt.solvers.princess.PrincessEnvironment;
 import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Lexer;
 import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Parser;
-import java.io.File;
 
 public class UniversalModel extends AbstractModel<IExpression, Sort, PrincessEnvironment> {
 
@@ -99,23 +96,26 @@ public class UniversalModel extends AbstractModel<IExpression, Sort, PrincessEnv
             "/Out.smt2");
 
     StringBuilder output = new StringBuilder();
-    InputStream is = process.getInputStream();
-    InputStreamReader isr = new InputStreamReader(is, Charset.defaultCharset());
-    BufferedReader br = new BufferedReader(isr);
-    String lines;
-    while ((lines = br.readLine()) != null) {
-      output.append(lines).append("\n");
+      try (InputStream is = process.getInputStream()) {
+        try (InputStreamReader isr = new InputStreamReader(is, Charset.defaultCharset())) {
+          try (BufferedReader br = new BufferedReader(isr)) {
+            String lines;
+            while ((lines = br.readLine()) != null) {
+              output.append(lines).append("\n");
+            }
+            if (String.valueOf(output).startsWith("un")) {
+              isUnsat = true;
+              output.delete(0, 5);
+            } else {
+              isUnsat = false;
+              output.delete(0, 3);
+            }
+            Generator.writeToFile(String.valueOf(output), (filePath + "/Model.smt2"));
+          }
+        }
+      }
     }
-    if (String.valueOf(output).startsWith("un")) {
-      isUnsat = true;
-      output.delete(0, 5);
-    } else {
-      isUnsat = false;
-      output.delete(0, 3);
-    }
-    Generator.writeToFile(String.valueOf(output), (filePath + "/Model.smt2"));
-    br.close();
-  }
+
 
   public List<ValueAssignment> parseModel(String pString) throws IOException {
     smtlibv2Lexer lexer = new smtlibv2Lexer(CharStreams.fromFileName(pString));
@@ -153,9 +153,6 @@ public class UniversalModel extends AbstractModel<IExpression, Sort, PrincessEnv
 
   public UniversalModel getModel()
       throws IOException,
-          SolverException,
-          InterruptedException,
-          InvalidConfigurationException,
           ModelException {
     getAssignments();
     return this;

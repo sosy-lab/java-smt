@@ -33,7 +33,6 @@ import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.collect.PathCopyingPersistentTreeMap;
 import org.sosy_lab.common.collect.PersistentMap;
-import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
@@ -150,12 +149,13 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
     super.pop();
   }
 
+  @SuppressWarnings("resource")
   @Override
   public Model getModel() throws SolverException {
     if (useBinary) {
       try {
         return binaryModel.getModel();
-      } catch (IOException | InterruptedException | InvalidConfigurationException pE) {
+      } catch (IOException pE) {
         throw new RuntimeException(pE);
       }
     } else {
