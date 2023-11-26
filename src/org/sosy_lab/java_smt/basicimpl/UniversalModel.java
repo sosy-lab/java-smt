@@ -97,6 +97,11 @@ public class UniversalModel extends AbstractModel<IExpression, Sort, PrincessEnv
 
     StringBuilder output = new StringBuilder();
       try (InputStream is = process.getInputStream()) {
+        try {
+          process.waitFor();
+        } catch (InterruptedException pE) {
+          throw new RuntimeException(pE);
+        }
         try (InputStreamReader isr = new InputStreamReader(is, Charset.defaultCharset())) {
           try (BufferedReader br = new BufferedReader(isr)) {
             String lines;
@@ -161,6 +166,7 @@ public class UniversalModel extends AbstractModel<IExpression, Sort, PrincessEnv
   @Override
   public String toString() {
     StringBuilder out = new StringBuilder();
+    out.append("binary model: \n");
     for (int i = 0; i < finalList.size(); i++) {
       out.append(finalList.get(i));
       out.append("\n");

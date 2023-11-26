@@ -285,7 +285,8 @@ public class SolverContextFactory {
             config, shutdownNotifier, logfile, (int) randomSeed, nonLinearArithmetic);
       case PRINCESS_BINARY:
         return PrincessSolverContext.create(
-            Configuration.builder().copyFrom(config).setOption("parseFromFile", "true").build(),
+            Configuration.builder().copyFrom(config).setOption("--solver.generateSMTLIB2",
+                "true").build(),
             shutdownNotifier,
             logfile,
             (int) randomSeed,

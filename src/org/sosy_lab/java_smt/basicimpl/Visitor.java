@@ -24,7 +24,6 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -314,10 +313,8 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
 
   @Override
   public Object visitTerm_qual_id(Term_qual_idContext ctx) {
-    String operand = ctx.getText();
-    if (operand.startsWith("|")) {
-      operand = operand.replaceAll("\\|", "PIPE");
-    }
+    String operand = replaceEscapeChars(ctx.getText());
+
     List<String> bitVec = (List<String>) visitChildren(ctx);
     if (letVariables.containsKey(operand)) {
       if (!(letVariables.get(operand).type == null) && Objects.equals(
@@ -330,7 +327,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     } else if (variables.containsKey(operand)) {
       if (!(variables.get(operand).type == null) && Objects.equals(variables.get(operand).type,
           "UF")
-          && variables.get(operand).inputParams == null) {
+          && variables.get(operand).inputParams.isEmpty()) {
         return umgr.callUF(
             (FunctionDeclaration<Formula>) variables.get(operand).javaSmt, new ArrayList<>());
       }
@@ -375,10 +372,11 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
       operator = ((Tuple2<String, FormulaType<?>>) identifier)._1;
       sort = ((Tuple2<String, FormulaType<?>>) identifier)._2;
     }
-
+    operator = replaceEscapeChars(operator);
     // String binary = (String) visit(ctx.b);
 
     Object ufOperator = null;
+    HashMap bla = variables;
     if (variables.containsKey(operator)) {
       ufOperator = variables.get(operator).javaSmt;
       operator = "UF";
@@ -1189,10 +1187,8 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
 
   @Override
   public Object visitFunction_def(Function_defContext ctx) {
-    String variable = ctx.symbol().getText();
-    if (variable.startsWith("|")) {
-      variable = variable.replaceAll("\\|", "PIPE");
-    }
+    String variable = replaceEscapeChars(ctx.symbol().getText());
+
     List<FormulaType<?>> javaSorts;
     List<Formula> inputParams = new ArrayList<>();
     if (!ctx.sorted_var().isEmpty()) {
@@ -1375,35 +1371,33 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     }
   }
 
+  public String replaceEscapeChars(String variable) {
+    if (variable.startsWith("|")) {
+      return variable.replaceAll("\\|", "PIPE");
+    } else {
+      return variable;
+    }
+  }
+
   @Override
   public Object visitCmd_declareFun(Cmd_declareFunContext ctx) {
-    String variable = ctx.symbol().getText();
-    if (variable.startsWith("|")) {
-      variable = variable.replaceAll("\\|", "PIPE");
-    }
+    String variable = replaceEscapeChars(ctx.symbol().getText());
 
-    List<String> declaration = new ArrayList<>();
-    List<FormulaType<?>> javaSorts = new ArrayList<>();
-    String returnType = ctx.getChild(ctx.getChildCount() - 1).getText();
-    for (int i = 0; i < ctx.getChildCount(); i++) {
-      declaration.add(ctx.getChild(i).getText());
-    }
+    FormulaType<?> returnType = (FormulaType<?>) visit(ctx.sort(ctx.sort().size()-1));
 
-    List<String> inputParams;
-    if (ctx.getChildCount() > 4 && !ctx.getChild(3).getText().equals(")")) {
-      inputParams = declaration.subList(3, ctx.getChildCount() - 2);
-      javaSorts =
-          inputParams.stream()
-              .map(e -> mapSort(Collections.singletonList(e)))
-              .collect(Collectors.toList());
+    List<FormulaType<?>> inputParams = new ArrayList<>();
+    if (ctx.sort().size() > 1) {
+      for (int i = 0; i < ctx.sort().size() - 1; i++) {
+        inputParams.add((FormulaType<?>) visit(ctx.sort(i)));
+      }
     }
 
     ParserFormula temp =
         new ParserFormula(
-            umgr.declareUF(variable, mapSort(Collections.singletonList(returnType)), javaSorts));
+            umgr.declareUF(variable, returnType, inputParams));
     temp.setType("UF");
-    temp.setReturnType(mapSort(Collections.singletonList(returnType)));
-    temp.setInputParams(javaSorts);
+    temp.setReturnType(returnType);
+    temp.setInputParams(inputParams);
     variables.put(variable, temp);
 
     return visitChildren(ctx);

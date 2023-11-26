@@ -22,6 +22,7 @@ package org.sosy_lab.java_smt.basicimpl;
 
 import static java.lang.Math.abs;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -32,8 +33,9 @@ public class NumeralGenerator {
 
   protected static void logMakeNumber(Object result, String pVar) {
     List<Object> inputParams = new ArrayList<>();
-    if (result instanceof IntegerFormula && Integer.parseInt(pVar) < 0) {
-      String absVar = String.valueOf(abs(Integer.parseInt(pVar)));
+    if (result instanceof IntegerFormula && new BigInteger(pVar).signum() == 0) {
+      BigInteger input = new BigInteger(pVar);
+      String absVar = String.valueOf((input.abs()));
       inputParams.add(absVar);
       Function<List<Object>, String> functionToString =
           inPlaceInputParams -> "(- " + inPlaceInputParams.get(0) + ")";
