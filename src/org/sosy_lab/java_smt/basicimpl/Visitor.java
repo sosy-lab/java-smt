@@ -314,7 +314,6 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
   @Override
   public Object visitTerm_qual_id(Term_qual_idContext ctx) {
     String operand = replaceEscapeChars(ctx.getText());
-    HashMap bla = variables;
     List<String> bitVec = (List<String>) visitChildren(ctx);
     if (letVariables.containsKey(operand)) {
       if (!(letVariables.get(operand).type == null) && Objects.equals(
@@ -1211,7 +1210,6 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
       temp.setReturnType(returnTypes);
       temp.setInputParams(javaSorts);
       variables.put(variable, temp);
-      HashMap bla = variables;
       key =
           umgr.callUF(
               (FunctionDeclaration<? extends Formula>) variables.get(variable).javaSmt,
