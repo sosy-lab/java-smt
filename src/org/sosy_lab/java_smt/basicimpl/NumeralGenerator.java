@@ -20,8 +20,6 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
-import static java.lang.Math.abs;
-
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +33,7 @@ public class NumeralGenerator {
     List<Object> inputParams = new ArrayList<>();
     if (result instanceof IntegerFormula && new BigInteger(pVar).signum() == 0) {
       BigInteger input = new BigInteger(pVar);
-      String absVar = String.valueOf((input.abs()));
+      String absVar = String.valueOf( input.abs());
       inputParams.add(absVar);
       Function<List<Object>, String> functionToString =
           inPlaceInputParams -> "(- " + inPlaceInputParams.get(0) + ")";
