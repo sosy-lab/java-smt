@@ -27,6 +27,7 @@ import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
+import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 import org.sosy_lab.java_smt.basicimpl.Generator;
 import org.sosy_lab.java_smt.delegate.logging.LoggingSolverContext;
 import org.sosy_lab.java_smt.delegate.statistics.StatisticsSolverContext;
@@ -285,7 +286,6 @@ public class SolverContextFactory {
         return PrincessSolverContext.create(
             config, shutdownNotifier, logfile, (int) randomSeed, nonLinearArithmetic);
       case PRINCESS_BINARY:
-
         generateSMTLIB2 = true;
         return PrincessSolverContext.create(
             config,
