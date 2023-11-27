@@ -13,6 +13,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Consumer;
+import javax.security.auth.callback.ConfirmationCallback;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -227,7 +228,7 @@ public class SolverContextFactory {
       // statistics need to be the most outer wrapping layer.
       context = new StatisticsSolverContext(context);
     }
-    if (generateSMTLIB2 || !generateSMTLIB2) {
+    if (generateSMTLIB2) {
       Generator.setIsLoggingEnabled(true);
     }
     return context;
@@ -284,9 +285,11 @@ public class SolverContextFactory {
         return PrincessSolverContext.create(
             config, shutdownNotifier, logfile, (int) randomSeed, nonLinearArithmetic);
       case PRINCESS_BINARY:
+
+        generateSMTLIB2 = true;
         return PrincessSolverContext.create(
-            Configuration.builder().copyFrom(config).setOption("--solver.generateSMTLIB2",
-                "true").build(),
+            config,
+            //Configuration.fromCmdLineArguments(cmdLineArguments),
             shutdownNotifier,
             logfile,
             (int) randomSeed,

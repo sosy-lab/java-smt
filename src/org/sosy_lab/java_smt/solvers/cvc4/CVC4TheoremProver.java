@@ -17,6 +17,7 @@ import edu.stanford.CVC4.ExprManagerMapCollection;
 import edu.stanford.CVC4.Result;
 import edu.stanford.CVC4.SExpr;
 import edu.stanford.CVC4.SmtEngine;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -191,7 +192,11 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   @Override
   @SuppressWarnings("try")
   public boolean isUnsat() throws InterruptedException, SolverException {
-    Generator.lines.append("(check-sat)\n");
+    try {
+      Generator.dumpSMTLIB2();
+    } catch (IOException pE) {
+      throw new RuntimeException(pE);
+    }
     Preconditions.checkState(!closed);
     closeAllEvaluators();
     changedSinceLastSatQuery = false;

@@ -16,6 +16,7 @@ import io.github.cvc5.Result;
 import io.github.cvc5.Solver;
 import io.github.cvc5.Term;
 import io.github.cvc5.UnknownExplanation;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -169,7 +170,11 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   @Override
   @SuppressWarnings("try")
   public boolean isUnsat() throws InterruptedException, SolverException {
-    Generator.lines.append("(check-sat)\n");
+    try {
+      Generator.dumpSMTLIB2();
+    } catch (IOException pE) {
+      throw new RuntimeException(pE);
+    }
     Preconditions.checkState(!closed);
     closeAllEvaluators();
     changedSinceLastSatQuery = false;

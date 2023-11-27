@@ -57,14 +57,16 @@ public class ParserFormula {
     javaSmt = pJavaSmt;
   }
 
+  @Nullable
   public FormulaType<?> getReturnType() {
     return returnType;
   }
 
+
   public void setReturnType(FormulaType<?> pReturnType) {
     returnType = pReturnType;
   }
-
+  @Nullable
   public List<FormulaType<?>> getInputParams() {
     return inputParams;
   }

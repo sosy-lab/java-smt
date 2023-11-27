@@ -13,6 +13,7 @@ import com.google.common.collect.ImmutableMap;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Z3Exception;
 import com.microsoft.z3.enumerations.Z3_lbool;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -83,7 +84,11 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
 
   @Override
   public boolean isUnsat() throws Z3SolverException, InterruptedException {
-    Generator.lines.append("(check-sat)\n");
+    try {
+      Generator.dumpSMTLIB2();
+    } catch (IOException pE) {
+      throw new RuntimeException(pE);
+    }
     Preconditions.checkState(!closed);
     logSolverStack();
     int result;

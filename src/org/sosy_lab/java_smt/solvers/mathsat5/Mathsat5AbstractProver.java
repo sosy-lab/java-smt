@@ -33,6 +33,7 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Longs;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -100,7 +101,11 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
 
   @Override
   public boolean isUnsat() throws InterruptedException, SolverException {
-    Generator.lines.append("(check-sat)\n");
+    try {
+      Generator.dumpSMTLIB2();
+    } catch (IOException pE) {
+      throw new RuntimeException(pE);
+    }
     Preconditions.checkState(!closed);
     return !msat_check_sat(curEnv);
   }

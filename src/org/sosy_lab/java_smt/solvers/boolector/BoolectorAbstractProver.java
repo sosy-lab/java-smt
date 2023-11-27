@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.solvers.boolector;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -83,7 +84,11 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
    */
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
-    Generator.lines.append("(check-sat)\n");
+    try {
+      Generator.dumpSMTLIB2();
+    } catch (IOException pE) {
+      throw new RuntimeException(pE);
+    }
     Preconditions.checkState(!closed);
     wasLastSatCheckSat = false;
     final int result = BtorJNI.boolector_sat(btor);

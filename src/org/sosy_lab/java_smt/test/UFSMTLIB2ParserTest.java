@@ -25,7 +25,6 @@ import static com.google.common.truth.Truth.assertThat;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
-import org.junit.Assert;
 import org.junit.Test;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.api.ArrayFormula;
@@ -36,7 +35,6 @@ import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.basicimpl.Generator;
 import org.sosy_lab.java_smt.basicimpl.Visitor;
 
 public class UFSMTLIB2ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
@@ -211,51 +209,60 @@ public class UFSMTLIB2ParserTest extends SolverBasedTest0.ParameterizedSolverBas
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
-
-
   @Test
-  public void testDeclareAndCallUFBoolean() {
+  public void testDeclareAndCallUFBoolean()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     clearVisitor();
+
+    String x =
+        "(declare-fun a (Bool) Bool)\n"
+            + "(declare-fun b () Bool)\n"
+            + "(assert (= (a false) b))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
     BooleanFormula a = fmgr.declareAndCallUF("a", FormulaType.BooleanType, bmgr.makeFalse());
     BooleanFormula b = fmgr.declareAndCallUF("b", FormulaType.BooleanType);
 
     BooleanFormula constraint = bmgr.equivalence(a, b);
 
-    Generator.logAddConstraint(constraint);
-
-    String actualResult = String.valueOf(Generator.lines);
-
-    String expectedResult =
-        "(declare-fun a (Bool) Bool)\n"
-            + "(declare-fun b () Bool)\n"
-            + "(assert (= (a false) b))\n";
+    BooleanFormula expectedResult = constraint;
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
-  public void testDeclareAndCallUFInteger() {
+  public void testDeclareAndCallUFInteger()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
     clearVisitor();
+
+    String x =
+        "(declare-fun a (Int) Int)\n" + "(declare-fun b () Int)\n" + "(assert (= (a 4) b))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
     IntegerFormula a = fmgr.declareAndCallUF("a", FormulaType.IntegerType, imgr.makeNumber(4));
     IntegerFormula b = fmgr.declareAndCallUF("b", FormulaType.IntegerType);
 
     BooleanFormula constraint = imgr.equal(a, b);
 
-    Generator.logAddConstraint(constraint);
-
-    String actualResult = String.valueOf(Generator.lines);
-
-    String expectedResult =
-        "(declare-fun a (Int) Int)\n" + "(declare-fun b () Int)\n" + "(assert (= (a 4) b))\n";
+    BooleanFormula expectedResult = constraint;
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
-  public void testDeclareAndCallUFRational() {
+  public void testDeclareAndCallUFRational()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireRationals();
     clearVisitor();
+
+    String x =
+        "(declare-fun a (Real) Real)\n" + "(declare-fun b () Real)\n" + "(assert (= (a 4.0) b))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
     RationalFormula a =
         fmgr.declareAndCallUF(
             "a", FormulaType.RationalType, Objects.requireNonNull(rmgr).makeNumber(4));
@@ -263,24 +270,24 @@ public class UFSMTLIB2ParserTest extends SolverBasedTest0.ParameterizedSolverBas
 
     BooleanFormula constraint = rmgr.equal(a, b);
 
-    Generator.logAddConstraint(constraint);
+    BooleanFormula expectedResult = constraint;
 
-    String actualResult = String.valueOf(Generator.lines);
-
-    String expectedResult =
-        "(declare-fun a (Real) Real)\n" + "(declare-fun b () Real)\n" + "(assert (= (a 4) b))\n";
-
-    String expectedResultSMTInterpol =
-        "(declare-fun a (Real) Real)\n" + "(declare-fun b () Real)\n" + "(assert (= (a 4.0) b))\n";
-
-    Assert.assertTrue(
-        actualResult.equals(expectedResult) || actualResult.equals(expectedResultSMTInterpol));
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
-  public void testDeclareAndCallUFBitvectors() {
+  public void testDeclareAndCallUFBitvectors()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
     clearVisitor();
+
+    String x =
+        "(declare-fun a ((_ BitVec 4)) (_ BitVec 4))\n"
+            + "(declare-fun b () (_ BitVec 4))\n"
+            + "(assert (= (a #b0010) b))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
     BitvectorFormula a =
         fmgr.declareAndCallUF(
             "a",
@@ -291,23 +298,27 @@ public class UFSMTLIB2ParserTest extends SolverBasedTest0.ParameterizedSolverBas
 
     BooleanFormula constraint = bvmgr.equal(a, b);
 
-    Generator.logAddConstraint(constraint);
-
-    String actualResult = String.valueOf(Generator.lines);
-
-    String expectedResult =
-        "(declare-fun a ((_ BitVec 4)) (_ BitVec 4))\n"
-            + "(declare-fun b () (_ BitVec 4))\n"
-            + "(assert (= (a #b0010) b))\n";
+    BooleanFormula expectedResult = constraint;
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
-  public void testDeclareAndCallUFArrays() {
-    requireArrays();
+  public void testDeclareAndCallUFArrays()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
+    requireArrays();
     clearVisitor();
+
+    String x =
+        "(declare-fun constr ((Array Int Int)(Array Int Int)) Bool)\n"
+            + "(declare-fun a ((Array (Array Int Int) Int)) (Array Int Int))\n"
+            + "(declare-const test (Array (Array Int Int) Int))\n"
+            + "(declare-fun b () (Array Int Int))\n"
+            + "(assert (constr (a test) b))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
     ArrayFormula<IntegerFormula, IntegerFormula> a =
         fmgr.declareAndCallUF(
             "a",
@@ -323,17 +334,9 @@ public class UFSMTLIB2ParserTest extends SolverBasedTest0.ParameterizedSolverBas
 
     BooleanFormula constraint = fmgr.declareAndCallUF("constr", FormulaType.BooleanType, a, b);
 
-    Generator.logAddConstraint(constraint);
-
-    String actualResult = String.valueOf(Generator.lines);
-
-    String expectedResult =
-        "(declare-fun constr ((Array Int Int)(Array Int Int)) Bool)\n"
-            + "(declare-fun a ((Array (Array Int Int) Int)) (Array Int Int))\n"
-            + "(declare-const test (Array (Array Int Int) Int))\n"
-            + "(declare-fun b () (Array Int Int))\n"
-            + "(assert (constr (a test) b))\n";
+    BooleanFormula expectedResult = constraint;
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
+
 }

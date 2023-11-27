@@ -24,6 +24,7 @@ import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Script.LBool;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
+import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Deque;
@@ -109,7 +110,11 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
 
   @Override
   public boolean isUnsat() throws InterruptedException {
-    Generator.lines.append("(check-sat)\n");
+    try {
+      Generator.dumpSMTLIB2();
+    } catch (IOException pE) {
+      throw new RuntimeException(pE);
+    }
     checkState(!closed);
 
     // We actually terminate SmtInterpol during the analysis

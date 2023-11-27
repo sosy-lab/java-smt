@@ -19,7 +19,6 @@ package org.sosy_lab.java_smt; /*
  */
 
 import java.io.IOException;
-import java.util.function.Function;
 import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -27,6 +26,7 @@ import org.sosy_lab.common.log.BasicLogManager;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.ArrayFormulaManager;
+import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -35,19 +35,14 @@ import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
-import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext;
-import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.UFManager;
-import org.sosy_lab.java_smt.basicimpl.Generator;
 
 public class Main {
   public static void main(String[] args)
       throws InvalidConfigurationException, InterruptedException, IOException, SolverException {
-    String[] cmdLineArguments = new String[1];
-    cmdLineArguments[0] = "--solver.generateSMTLIB2=true";
-    Configuration config = Configuration.fromCmdLineArguments(cmdLineArguments);
+    Configuration config = Configuration.fromCmdLineArguments(args);
     LogManager logger = BasicLogManager.create(config);
     ShutdownManager shutdown = ShutdownManager.create();
     SolverContext context =
@@ -56,6 +51,7 @@ public class Main {
     FormulaManager fmgr = context.getFormulaManager();
     BooleanFormulaManager bmgr = fmgr.getBooleanFormulaManager();
     IntegerFormulaManager imgr = fmgr.getIntegerFormulaManager();
+    BitvectorFormulaManager bvmgr = fmgr.getBitvectorFormulaManager();
     UFManager umgr = fmgr.getUFManager();
     ArrayFormulaManager amgr = fmgr.getArrayFormulaManager();
 
@@ -63,13 +59,14 @@ public class Main {
         FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.IntegerType));
     BooleanFormula constraint = umgr.callUF(test, amgr.makeArray("bla", FormulaType.IntegerType,
         FormulaType.IntegerType));
-
     try (ProverEnvironment prover =
              context.newProverEnvironment(
                  SolverContext.ProverOptions.GENERATE_MODELS)) {
       prover.addConstraint(constraint);
 
-      Generator.dumpSMTLIB2();
+      /*
+{bla -> const(0), test(const(0)) -> true}
+       */
       boolean isUnsat = prover.isUnsat();
 
       if (!isUnsat) {

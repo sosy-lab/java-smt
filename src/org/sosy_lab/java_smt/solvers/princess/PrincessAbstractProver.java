@@ -81,7 +81,11 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
    */
   @Override
   public boolean isUnsat() throws SolverException, IOException {
-    Generator.lines.append("(check-sat)\n");
+    try {
+      Generator.dumpSMTLIB2();
+    } catch (IOException pE) {
+      throw new RuntimeException(pE);
+    }
     Preconditions.checkState(!closed);
     wasLastSatCheckSat = false;
     if (useBinary) {

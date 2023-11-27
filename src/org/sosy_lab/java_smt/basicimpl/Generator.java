@@ -81,8 +81,7 @@ public class Generator {
         String evaluatedInput = evaluateRecursive(value);
         evaluatedInputs.add(evaluatedInput);
       }
-      String result = methodToEvaluate.getFunctionToString().apply(evaluatedInputs);
-      return result;
+      return methodToEvaluate.getFunctionToString().apply(evaluatedInputs);
     }
   }
 
