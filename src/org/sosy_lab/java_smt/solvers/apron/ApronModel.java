@@ -241,9 +241,9 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
       ApronNode toSub = (ApronNode) assignment.getValueAsFormula();
       Texpr1Node toSubT = toSub.getNode();
       //hasVar() only works for Texpr0Node
-      Texpr0Node zeroNode = nodeToEvaluate.toTexpr0Node(prover.getAbstract1().getEnvironment());
+      Texpr0Node zeroNode = nodeToEvaluate.toTexpr0Node(formulaCreator.getFormulaEnvironment());
       boolean hasVarZero =
-          zeroNode.hasDim(prover.getAbstract1().getEnvironment().dimOfVar(modelVar));
+          zeroNode.hasDim(formulaCreator.getFormulaEnvironment().dimOfVar(modelVar));
       //if the node to evaluate has the variable of the current assignment, substitute the
       // variable with the assigned value
       if (hasVarZero) {
