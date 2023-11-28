@@ -23,6 +23,7 @@ package org.sosy_lab.java_smt.solvers.apron;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.sosy_lab.java_smt.solvers.apron.ApronApiTest.OS.LINUX;
 
 import apron.Abstract1;
 import apron.ApronException;
@@ -39,10 +40,12 @@ import apron.Texpr1CstNode;
 import apron.Texpr1Node;
 import apron.Texpr1VarNode;
 import com.google.common.base.Preconditions;
-import org.junit.AssumptionViolatedException;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Optional;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.sosy_lab.common.NativeLibraries;
 
 public class ApronApiTest {
 
@@ -50,12 +53,136 @@ public class ApronApiTest {
 
   @BeforeClass
   public static void loadApron() {
+
+    loadLibrary("apron");
+  }
+
+  public static void loadLibrary(String name) {
     try {
-      NativeLibraries.loadLibrary("japron");
-      NativeLibraries.loadLibrary("jgmp");
-    } catch (UnsatisfiedLinkError e) {
-      throw new AssumptionViolatedException("Apron is not available", e);
+      Optional<Path> path = findPathForLibrary(name);
+      if (path.isPresent()) {
+        System.load(path.orElseThrow().toAbsolutePath().toString());
+      } else {
+        System.loadLibrary(name);
+      }
+    } catch (URISyntaxException e) {
+      throw new RuntimeException("Apron custom loading failed and Apron is not available", e);
     }
+  }
+
+  public static Optional<Path> findPathForLibrary(String libraryName) throws URISyntaxException {
+    String osLibName = System.mapLibraryName(libraryName);
+    Path p = getNativeLibraryPath().resolve(osLibName).toAbsolutePath();
+    if (Files.exists(p)) {
+      return Optional.of(p);
+    }
+    p =
+        Path.of(ApronApiTest.class.getProtectionDomain().getCodeSource().getLocation().toURI()).resolveSibling(osLibName).toAbsolutePath();
+    if (Files.exists(p)) {
+      return Optional.of(p);
+    }
+    return Optional.empty();
+  }
+
+  private static Path nativePath = null;
+
+  public static Path getNativeLibraryPath() {
+    if (nativePath == null) {
+      String arch = guessVmArchitecture().name().toLowerCase();
+      String os = guessOperatingSystem().name().toLowerCase();
+
+      nativePath =
+          getCodeLocation(ApronApiTest.class)
+              .getParent()
+              .getParent()
+              .getParent()
+              .resolve(Path.of("native", arch + "-" + os));
+    }
+    return nativePath;
+  }
+  public enum OS {
+    LINUX,
+    MACOSX,
+    WINDOWS;
+  }
+  private static OS currentOS = null;
+
+  public static OS guessOperatingSystem() {
+    // Quick and dirty
+    currentOS = LINUX;
+    return currentOS;
+  }
+
+
+
+  public enum Architecture {
+    X86,
+    X86_64;
+  }
+
+  public static Path getCodeLocation(Class<?> cls) {
+    try {
+      return Path.of(cls.getProtectionDomain().getCodeSource().getLocation().toURI());
+    } catch (URISyntaxException e) {
+      throw new AssertionError(e);
+    }
+  }
+
+  private static Architecture currentArch = null;
+
+  public static Architecture guessVmArchitecture() {
+    if (currentArch != null) {
+      return currentArch;
+    }
+    String prop = System.getProperty("os.arch.data.model");
+    if (prop == null || prop.isEmpty()) {
+      prop = System.getProperty("sun.arch.data.model");
+    }
+
+    if (prop != null && !prop.isEmpty()) {
+      switch (prop) {
+        case "32":
+          currentArch = Architecture.X86;
+          break;
+        case "64":
+          currentArch = Architecture.X86_64;
+          break;
+        default:
+          throw new UnsatisfiedLinkError(
+              "Unknown value for os.arch.data.model: '"
+                  + prop
+                  + "', please report this together with information about your system "
+                  + "(OS, architecture, JVM).");
+      }
+    } else {
+
+      prop = "java.vm.name";
+      if (prop != null && !prop.isEmpty() ) {
+        prop = prop.toLowerCase();
+
+        if (prop.contains("32-bit") || prop.contains("32bit") || prop.contains("i386")) {
+
+          currentArch = Architecture.X86;
+        } else if (prop.contains("64-bit")
+            || prop.contains("64bit")
+            || prop.contains("x64")
+            || prop.contains("x86_64")
+            || prop.contains("amd64")) {
+
+          currentArch = Architecture.X86_64;
+        } else {
+          throw new UnsatisfiedLinkError(
+              "Unknown value for java.vm.name: '"
+                  + prop
+                  + "', please report this together with information about your system "
+                  + "(OS, architecture, JVM).");
+        }
+      } else {
+        throw new UnsatisfiedLinkError("Could not detect system architecture");
+      }
+    }
+
+    return currentArch;
   }
 
 
