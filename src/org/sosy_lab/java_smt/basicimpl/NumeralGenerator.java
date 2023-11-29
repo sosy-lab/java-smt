@@ -31,7 +31,7 @@ public class NumeralGenerator {
 
   protected static void logMakeNumber(Object result, String pVar) {
     List<Object> inputParams = new ArrayList<>();
-    if (result instanceof IntegerFormula && new BigInteger(pVar).signum() == 0) {
+    if (result instanceof IntegerFormula && new BigInteger(pVar).signum() == -1) {
       BigInteger input = new BigInteger(pVar);
       String absVar = String.valueOf( input.abs());
       inputParams.add(absVar);
@@ -42,8 +42,6 @@ public class NumeralGenerator {
     } else if (result instanceof NumeralFormula) {
       String checkedVar = String.valueOf(result);
       inputParams.add(checkedVar);
-    } else {
-      inputParams.add(pVar);
     }
     Function<List<Object>, String> functionToString =
         inPlaceInputParams -> (String) inPlaceInputParams.get(0);

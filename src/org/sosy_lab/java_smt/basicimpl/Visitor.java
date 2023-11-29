@@ -99,10 +99,6 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
   private final UFManager umgr;
   List<Model.ValueAssignment> assignments = new ArrayList<>();
 
-  public HashMap<String, ParserFormula> getVariables() {
-    return variables;
-  }
-
   public List<BooleanFormula> getConstraints() {
     return constraints;
   }
@@ -132,10 +128,6 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
 
   public boolean isModel() {
     return isModel;
-  }
-
-  public void setModel(boolean pModel) {
-    isModel = pModel;
   }
 
   @Override
@@ -580,7 +572,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
               List<NumeralFormula> numeralOperands =
                   operands.stream().map(e -> (RationalFormula) e).collect(Collectors.toList());
               return Objects.requireNonNull(rmgr)
-                  .greaterOrEquals(numeralOperands.get(0), numeralOperands.get(1));
+                  .greaterThan(numeralOperands.get(0), numeralOperands.get(1));
             } else {
               List<IntegerFormula> integerOperands =
                   operands.stream().map(e -> (IntegerFormula) e).collect(Collectors.toList());
@@ -949,8 +941,8 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
           if (Objects.requireNonNull(operators).size() == 3
               && isInteger(operators.get(2))
               && isInteger(operators.get(1))) {
-            int left = Integer.parseInt(operators.get(2));
-            int right = Integer.parseInt(operators.get(1));
+            int right = Integer.parseInt(operators.get(2));
+            int left = Integer.parseInt(operators.get(1));
             try {
               return Objects.requireNonNull(bimgr)
                   .extract((BitvectorFormula) operands.get(0), left, right);
@@ -972,7 +964,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
             int extension = Integer.parseInt(operators.get(1));
             try {
               return Objects.requireNonNull(bimgr)
-                  .extend((BitvectorFormula) operands.get(0), extension, true);
+                  .extend((BitvectorFormula) operands.get(0), extension, false);
             } catch (Exception e) {
               throw new ParserException(
                   "Operands for " + operator + "need to be of bitvector type");
@@ -989,7 +981,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
             int extension = Integer.parseInt(operators.get(1));
             try {
               return Objects.requireNonNull(bimgr)
-                  .extend((BitvectorFormula) operands.get(0), extension, false);
+                  .extend((BitvectorFormula) operands.get(0), extension, true);
             } catch (Exception e) {
               throw new ParserException(
                   "Operands for " + operator + "need to be of bitvector type");
@@ -1008,7 +1000,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
             return Objects.requireNonNull(bimgr)
                 .toIntegerFormula((BitvectorFormula) operands.get(0), false);
           } catch (Exception e) {
-            throw new ParserException("Operands for " + operator + "need to be of bitvector type");
+            throw new ParserException("Operands for " + operator + " need to be of bitvector type");
           }
         }
       case "int2bv":
@@ -1020,18 +1012,26 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
         // array operators
       case "select":
         if (operands.size() == 2) {
-          return Objects.requireNonNull(amgr)
-              .select((ArrayFormula<Formula, Formula>) operands.get(0), operands.get(1));
+          try {
+            return Objects.requireNonNull(amgr)
+                .select((ArrayFormula<Formula, Formula>) operands.get(0), operands.get(1));
+          } catch (Exception e) {
+            throw new ParserException("Operands for " + operator + " need to be of Array type");
+          }
         } else {
           throw new ParserException(operator + " takes one array and one index as input. ");
         }
       case "store":
         if (operands.size() == 3) {
+          try {
           return Objects.requireNonNull(amgr)
               .store(
                   (ArrayFormula<Formula, Formula>) operands.get(0),
                   operands.get(1),
                   operands.get(2));
+          } catch (Exception e) {
+            throw new ParserException("Operands for " + operator + " need to be of Array type");
+          }
         } else {
           throw new ParserException(operator + " takes one array and one index as input. ");
         }

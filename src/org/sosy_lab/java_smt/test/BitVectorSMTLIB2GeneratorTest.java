@@ -21,10 +21,12 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.TruthJUnit.assume;
 
 import java.util.Objects;
 import org.junit.Assert;
 import org.junit.Test;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -85,6 +87,7 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
     // not working for Yices due to lacking support of BitVectorFormula from IntegerFormula
     requireBitvectors();
     requireIntegers();
+    requireBitvectorToInt();
     clearGenerator();
 
     BitvectorFormula c = Objects.requireNonNull(bvmgr).makeBitvector(12, -10);
@@ -264,6 +267,12 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
   public void testDivide() {
     // Does not work for CVC4 due to "BigInteger argument out of bounds"
     requireBitvectors();
+    assume()
+        .withMessage(
+            "Solver %s cannot handle this BigInterger argument",
+            solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC4);
     clearGenerator();
 
     BitvectorFormula c = Objects.requireNonNull(bvmgr).makeBitvector(12, -10);

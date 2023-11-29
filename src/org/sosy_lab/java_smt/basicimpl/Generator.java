@@ -64,7 +64,7 @@ public class Generator {
   }
 
   protected static String evaluateRecursive(Object constraint) {
-
+    List<?> bla = executedAggregator;
     if (constraint instanceof String) {
       return (String) constraint;
     } else {

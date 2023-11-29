@@ -33,22 +33,6 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
 public class BitvectorGenerator {
 
-  protected static void logMakeBitVector(Object result, int length, long i) {
-    List<Object> inputParams = new ArrayList<>();
-    inputParams.add(Long.toString(length));
-    inputParams.add(Long.toString(i));
-    Function<List<Object>, String> functionToString =
-        inPlaceInputParamsString -> {
-          String formatString = "%0" + length + "d";
-          long binaryNumber =
-              Long.parseLong(
-                  Long.toBinaryString(parseLong((String) inPlaceInputParamsString.get(1))));
-          return "#b" + String.format(formatString, binaryNumber);
-        };
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
-  }
-
   protected static void logMakeBitVector(Object result, int length, BigInteger i) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(Long.toString(length));
@@ -85,8 +69,7 @@ public class BitvectorGenerator {
       BitvectorFormula result, BitvectorType pType, String pVar) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pVar);
-    Function<List<Object>, String> functionToString =
-        inPlaceInputParams -> (String) inPlaceInputParams.get(0);
+    Function<List<Object>, String> functionToString = inPlaceInputParams -> (String) inPlaceInputParams.get(0);
     FunctionEnvironment newEntry =
         new FunctionEnvironment(result, inputParams, functionToString, "BitVec");
     newEntry.setBitVecLength(pType.getSize());

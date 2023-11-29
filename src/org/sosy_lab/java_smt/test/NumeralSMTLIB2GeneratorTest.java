@@ -20,11 +20,14 @@
 
 package org.sosy_lab.java_smt.test;
 
+import static com.google.common.truth.TruthJUnit.assume;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import org.junit.Assert;
 import org.junit.Test;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
@@ -303,6 +306,12 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
   @Test
   public void testIntegerModulo() {
     requireIntegers();
+    assume()
+        .withMessage(
+            "Solver %s does not support modulo. ",
+            solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.MATHSAT5);
     clearGenerator();
     IntegerFormula a = imgr.makeNumber(1);
     IntegerFormula b = imgr.makeNumber(-5);

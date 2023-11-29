@@ -52,8 +52,8 @@ public class SolverContextFactory {
 
   public enum Solvers {
     MATHSAT5,
-    SMTINTERPOL,
     Z3,
+    SMTINTERPOL,
     PRINCESS,
     PRINCESS_BINARY,
     BOOLECTOR,
@@ -126,6 +126,14 @@ public class SolverContextFactory {
       Configuration pConfig, LogManager pLogger, ShutdownNotifier pShutdownNotifier)
       throws InvalidConfigurationException {
     this(pConfig, pLogger, pShutdownNotifier, NativeLibraries::loadLibrary);
+  }
+
+  public boolean isGenerateSMTLIB2() {
+    return generateSMTLIB2;
+  }
+
+  public void setGenerateSMTLIB2(boolean pGenerateSMTLIB2) {
+    generateSMTLIB2 = pGenerateSMTLIB2;
   }
 
   /**
