@@ -3365,4 +3365,209 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     BooleanFormula actualResult = mgr.universalParseFromString(x);
   }
 
+  @Test
+  public void testExceptionDefineFunctionBoolEmptyInput()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    clearVisitor();
+
+    String x =
+        "(define-fun bla () Bool true)\n";
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
+    BooleanFormula constraint = bmgr.makeTrue();
+
+    BooleanFormula expectedResult = constraint;
+
+    assertThat(actualResult).isEqualTo(expectedResult);
+  }
+
+  @Test
+  public void testExceptionDefineFunctionBoolWithInput()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    requireBooleanUFs();
+    clearVisitor();
+
+    String x =
+        "(define-fun bla ((x Bool)) Bool (= x true))\n";
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
+    BooleanFormula constraint = bmgr.makeTrue();
+
+    BooleanFormula expectedResult = constraint;
+
+    assertThat(actualResult).isEqualTo(expectedResult);
+  }
+
+  @Test
+  public void testExceptionDefineFunctionInt()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    requireIntegers();
+    clearVisitor();
+
+    String x =
+        "(define-fun bla () Int (- 3 4))\n"
+        + "(assert (= bla bla))\n";
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+    IntegerFormula drei = imgr.makeNumber(3);
+    IntegerFormula vier = imgr.makeNumber(4);
+    IntegerFormula sub = imgr.subtract(drei, vier);
+    BooleanFormula constraint = imgr.equal(sub, sub);
+
+    BooleanFormula expectedResult = constraint;
+
+    assertThat(actualResult).isEqualTo(expectedResult);
+  }
+
+  @Test
+  public void testExceptionDefineFunctionIntWithInput()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    requireIntegers();
+    clearVisitor();
+
+    String x =
+        "(define-fun bla ((x Int)) Int (- 3 x))\n"
+            + "(assert (= bla bla))\n";
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+    IntegerFormula drei = imgr.makeNumber(3);
+    IntegerFormula xVar = imgr.makeVariable("x");
+    IntegerFormula sub = imgr.subtract(drei, xVar);
+    BooleanFormula constraint = imgr.equal(sub, sub);
+
+    BooleanFormula expectedResult = constraint;
+
+    assertThat(actualResult).isEqualTo(expectedResult);
+  }
+
+  @Test
+  public void testExceptionDefineFunctionReal()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    requireRationals();
+    clearVisitor();
+
+    String x =
+        "(define-fun bla () Real (- 3 4.0))\n"
+            + "(assert (= bla bla))\n";
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+    IntegerFormula drei = imgr.makeNumber(3);
+    RationalFormula vier = Objects.requireNonNull(rmgr).makeNumber(4.0);
+    RationalFormula sub = rmgr.subtract(drei, vier);
+    BooleanFormula constraint = rmgr.equal(sub, sub);
+
+    BooleanFormula expectedResult = constraint;
+
+    assertThat(actualResult).isEqualTo(expectedResult);
+  }
+
+  @Test
+  public void testExceptionDefineFunctionRealWithInput()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    requireRationals();
+    clearVisitor();
+
+    String x =
+        "(define-fun bla ((x Real)) Real (- 3 x))\n"
+            + "(assert (= bla bla))\n";
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+    IntegerFormula drei = imgr.makeNumber(3);
+    RationalFormula xVar = Objects.requireNonNull(rmgr).makeVariable("x");
+    RationalFormula sub = rmgr.subtract(drei, xVar);
+    BooleanFormula constraint = rmgr.equal(sub, sub);
+
+    BooleanFormula expectedResult = constraint;
+
+    assertThat(actualResult).isEqualTo(expectedResult);
+  }
+
+  @Test
+  public void testExceptionDefineFunctionBitVec()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    requireBitvectors();
+    assume()
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.SMTINTERPOL);
+    clearVisitor();
+
+    String x =
+        "(define-fun bla () (_ BitVec 5) (bvsub #b10000 #b00001))\n"
+            + "(assert (= bla bla))\n";
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+    BitvectorFormula first = Objects.requireNonNull(bvmgr).makeBitvector(5, 16);
+    BitvectorFormula second = bvmgr.makeBitvector(5, 1);
+    BitvectorFormula sub = bvmgr.subtract(first, second);
+    BooleanFormula constraint = bvmgr.equal(sub, sub);
+
+    BooleanFormula expectedResult = constraint;
+
+    assertThat(actualResult).isEqualTo(expectedResult);
+  }
+
+  @Test
+  public void testExceptionDefineFunctionBitVecWithInput()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    requireBitvectors();
+    assume()
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.SMTINTERPOL);
+    clearVisitor();
+
+    String x =
+        "(define-fun bla ((x (_ BitVec 5))) (_ BitVec 5) (bvsub #b10000 x))\n"
+            + "(assert (= bla bla))\n";
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+    BitvectorFormula first = Objects.requireNonNull(bvmgr).makeBitvector(5, 16);
+    BitvectorFormula second = bvmgr.makeVariable(5, "x");
+    BitvectorFormula sub = bvmgr.subtract(first, second);
+    BooleanFormula constraint = bvmgr.equal(sub, sub);
+
+    BooleanFormula expectedResult = constraint;
+
+    assertThat(actualResult).isEqualTo(expectedResult);
+  }
+
+  @Test
+  public void testExceptionDefineFunctionArray()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    requireIntegers();
+    requireArrays();
+
+    clearVisitor();
+
+    String x =
+        "(declare-const a (Array Int Int))\n"
+            + "(define-fun bla () (Array Int Int) a)\n"
+            + "(assert (= a a))\n";
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
+    ArrayFormula<IntegerFormula, IntegerFormula> a = Objects.requireNonNull(amgr)
+        .makeArray("a", FormulaType.IntegerType,
+        FormulaType.IntegerType);
+    BooleanFormula constraint = amgr.equivalence(a, a);
+    BooleanFormula expectedResult = constraint;
+
+    assertThat(actualResult).isEqualTo(expectedResult);
+  }
+
+  @Test
+  public void testExceptionDefineFunctionArrayWithInput()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    requireIntegers();
+    requireArrays();
+    clearVisitor();
+
+    String x =
+            "(define-fun bla ((a (Array Int Int))) (Array Int Int) (= (store a 1 2) a))\n"
+        + "(assert (= a a))\n";
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
+    ArrayFormula<IntegerFormula, IntegerFormula> a = Objects.requireNonNull(amgr)
+        .makeArray("a", FormulaType.IntegerType,
+        FormulaType.IntegerType);
+    a = amgr.store(a, imgr.makeNumber(1), imgr.makeNumber(2));
+    BooleanFormula constraint = amgr.equivalence(a, a);
+
+    BooleanFormula expectedResult = constraint;
+
+    assertThat(actualResult).isEqualTo(expectedResult);
+  }
+
 }

@@ -442,7 +442,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
           try {
             if (operands.stream().anyMatch(c -> c instanceof RationalFormula)) {
               List<NumeralFormula> numeralOperands =
-                  operands.stream().map(e -> (RationalFormula) e).collect(Collectors.toList());
+                  operands.stream().map(e -> (NumeralFormula) e).collect(Collectors.toList());
               return Objects.requireNonNull(rmgr).sum(numeralOperands);
             } else {
               List<IntegerFormula> integerOperands =
@@ -460,7 +460,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
           try {
             if (operands.stream().anyMatch(c -> c instanceof RationalFormula)) {
               List<NumeralFormula> numeralOperands =
-                  operands.stream().map(e -> (RationalFormula) e).collect(Collectors.toList());
+                  operands.stream().map(e -> (NumeralFormula) e).collect(Collectors.toList());
               return Objects.requireNonNull(rmgr)
                   .subtract(numeralOperands.get(0), numeralOperands.get(1));
             } else {
@@ -476,7 +476,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
           try {
             if (operands.stream().anyMatch(c -> c instanceof RationalFormula)) {
               List<NumeralFormula> numeralOperands =
-                  operands.stream().map(e -> (RationalFormula) e).collect(Collectors.toList());
+                  operands.stream().map(e -> (NumeralFormula) e).collect(Collectors.toList());
               return Objects.requireNonNull(rmgr).negate(numeralOperands.get(0));
             } else {
               List<IntegerFormula> integerOperands =
@@ -495,7 +495,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
           try {
             if (operands.stream().anyMatch(c -> c instanceof RationalFormula)) {
               List<NumeralFormula> numeralOperands =
-                  operands.stream().map(e -> (RationalFormula) e).collect(Collectors.toList());
+                  operands.stream().map(e -> (NumeralFormula) e).collect(Collectors.toList());
               return Objects.requireNonNull(rmgr)
                   .divide(numeralOperands.get(0), numeralOperands.get(1));
             } else {
@@ -532,7 +532,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
           try {
             if (operands.stream().anyMatch(c -> c instanceof RationalFormula)) {
               List<NumeralFormula> numeralOperands =
-                  operands.stream().map(e -> (RationalFormula) e).collect(Collectors.toList());
+                  operands.stream().map(e -> (NumeralFormula) e).collect(Collectors.toList());
               return Objects.requireNonNull(rmgr)
                   .multiply(numeralOperands.get(0), numeralOperands.get(1));
             } else {
@@ -552,7 +552,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
           try {
             if (operands.stream().anyMatch(c -> c instanceof RationalFormula)) {
               List<NumeralFormula> numeralOperands =
-                  operands.stream().map(e -> (RationalFormula) e).collect(Collectors.toList());
+                  operands.stream().map(e -> (NumeralFormula) e).collect(Collectors.toList());
               return Objects.requireNonNull(rmgr).distinct(numeralOperands);
             } else {
               List<IntegerFormula> integerOperands =
@@ -570,7 +570,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
           try {
             if (operands.stream().anyMatch(c -> c instanceof RationalFormula)) {
               List<NumeralFormula> numeralOperands =
-                  operands.stream().map(e -> (RationalFormula) e).collect(Collectors.toList());
+                  operands.stream().map(e -> (NumeralFormula) e).collect(Collectors.toList());
               return Objects.requireNonNull(rmgr)
                   .greaterThan(numeralOperands.get(0), numeralOperands.get(1));
             } else {
@@ -590,7 +590,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
           try {
             if (operands.stream().anyMatch(c -> c instanceof RationalFormula)) {
               List<NumeralFormula> numeralOperands =
-                  operands.stream().map(e -> (RationalFormula) e).collect(Collectors.toList());
+                  operands.stream().map(e -> (NumeralFormula) e).collect(Collectors.toList());
               return Objects.requireNonNull(rmgr)
                   .greaterOrEquals(numeralOperands.get(0), numeralOperands.get(1));
             } else {
@@ -610,7 +610,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
           try {
             if (operands.stream().anyMatch(c -> c instanceof RationalFormula)) {
               List<NumeralFormula> numeralOperands =
-                  operands.stream().map(e -> (RationalFormula) e).collect(Collectors.toList());
+                  operands.stream().map(e -> (NumeralFormula) e).collect(Collectors.toList());
               return Objects.requireNonNull(rmgr)
                   .lessThan(numeralOperands.get(0), numeralOperands.get(1));
             } else {
@@ -630,7 +630,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
           try {
             if (operands.stream().anyMatch(c -> c instanceof RationalFormula)) {
               List<NumeralFormula> numeralOperands =
-                  operands.stream().map(e -> (RationalFormula) e).collect(Collectors.toList());
+                  operands.stream().map(e -> (NumeralFormula) e).collect(Collectors.toList());
               return Objects.requireNonNull(rmgr)
                   .lessOrEquals(numeralOperands.get(0), numeralOperands.get(1));
             } else {
@@ -650,7 +650,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
         if (operands.size() == 1) {
           try {
             List<NumeralFormula> numeralOperands =
-                operands.stream().map(e -> (RationalFormula) e).collect(Collectors.toList());
+                operands.stream().map(e -> (NumeralFormula) e).collect(Collectors.toList());
             return Objects.requireNonNull(rmgr).floor(numeralOperands.get(0));
           } catch (Exception e) {
             throw new ParserException("Operands for " + operator + "need to be of real type");
@@ -1227,11 +1227,12 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
       keyString = keyString.replaceAll("PIPE", "|");
     }
     String valueString = value.toString();
-
-    Model.ValueAssignment assignment =
-        new ValueAssignment(
-            key, value, mapEquivalence(key, value), keyString, valueString, new ArrayList<>());
-    assignments.add(assignment);
+    if (isModel) {
+      Model.ValueAssignment assignment =
+          new ValueAssignment(
+              key, value, mapEquivalence(key, value), keyString, valueString, new ArrayList<>());
+      assignments.add(assignment);
+    }
     return visitChildren(ctx);
   }
 
