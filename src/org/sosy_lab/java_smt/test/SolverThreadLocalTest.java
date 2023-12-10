@@ -70,7 +70,7 @@ public class SolverThreadLocalTest extends SolverBasedTest0.ParameterizedSolverB
 
                 SolverContextFactory newFactory =
                     new SolverContextFactory(newConfig, newLogger, newShutdownNotifier);
-                return factory.generateContext();
+                return newFactory.generateContext();
               } catch (InvalidConfigurationException e) {
                 throw new RuntimeException(e);
               }
