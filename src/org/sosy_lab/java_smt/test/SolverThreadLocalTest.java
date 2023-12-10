@@ -57,8 +57,8 @@ public class SolverThreadLocalTest extends SolverBasedTest0.ParameterizedSolverB
     }
   }
 
-  @Test public void nonlocalContext() throws ExecutionException, InterruptedException,
-                                             SolverException {
+  @Test
+  public void nonlocalContext() throws ExecutionException, InterruptedException, SolverException {
     requireIntegers();
 
     /* FIXME: Exception for CVC5 (related to #310?)
@@ -68,42 +68,46 @@ public class SolverThreadLocalTest extends SolverBasedTest0.ParameterizedSolverB
     assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
 
     ExecutorService executor = Executors.newSingleThreadExecutor();
-    Future<SolverContext> result = executor.submit(() -> {
-      Configuration config;
-      try {
-        config = Configuration.builder()
-            .setOption("solver.solver", solverToUse().toString())
-            .build();
-      } catch (InvalidConfigurationException e) {
-        throw new RuntimeException(e);
-      }
-      LogManager logger = LogManager.createTestLogManager();
-      ShutdownNotifier shutdownNotifier = ShutdownManager.create().getNotifier();
+    Future<SolverContext> result =
+        executor.submit(
+            () -> {
+              try {
+                Configuration newConfig =
+                    Configuration.builder()
+                        .setOption("solver.solver", solverToUse().toString())
+                        .build();
 
-      SolverContextFactory factory = new SolverContextFactory(config, logger, shutdownNotifier);
-      return factory.generateContext();
-    });
+                LogManager newLogger = LogManager.createTestLogManager();
+                ShutdownNotifier newShutdownNotifier = ShutdownManager.create().getNotifier();
+
+                SolverContextFactory newFactory =
+                    new SolverContextFactory(newConfig, newLogger, newShutdownNotifier);
+                return factory.generateContext();
+              } catch (InvalidConfigurationException e) {
+                throw new RuntimeException(e);
+              }
+            });
 
     executor.shutdownNow();
 
-    SolverContext context = result.get();
-    FormulaManager mgr = context.getFormulaManager();
+    SolverContext newContext = result.get();
+    FormulaManager newMgr = context.getFormulaManager();
 
-    BooleanFormulaManager bmgr = mgr.getBooleanFormulaManager();
-    IntegerFormulaManager imgr = mgr.getIntegerFormulaManager();
+    BooleanFormulaManager newBmgr = newMgr.getBooleanFormulaManager();
+    IntegerFormulaManager newImgr = newMgr.getIntegerFormulaManager();
 
-    HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
+    HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(newImgr, newBmgr);
     BooleanFormula formula = gen.generate(8); // CVC5 throws an exception here
 
-    try (BasicProverEnvironment<?> prover = context.newProverEnvironment()) {
+    try (BasicProverEnvironment<?> prover = newContext.newProverEnvironment()) {
       prover.push(formula);
       assertThat(prover).isUnsatisfiable();
     }
   }
 
   @Test
-  public void nonlocalFormulaTest() throws InterruptedException, SolverException,
-                                           ExecutionException {
+  public void nonlocalFormulaTest()
+      throws InterruptedException, SolverException, ExecutionException {
     requireIntegers();
 
     /* FIXME: Exception for CVC5 (related to #310?)
@@ -112,10 +116,12 @@ public class SolverThreadLocalTest extends SolverBasedTest0.ParameterizedSolverB
     assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
 
     ExecutorService executor = Executors.newSingleThreadExecutor();
-    Future<BooleanFormula> result = executor.submit(() -> {
-      HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
-      return gen.generate(8);
-    });
+    Future<BooleanFormula> result =
+        executor.submit(
+            () -> {
+              HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
+              return gen.generate(8);
+            });
 
     BooleanFormula formula = result.get();
     executor.shutdownNow();
@@ -140,13 +146,14 @@ public class SolverThreadLocalTest extends SolverBasedTest0.ParameterizedSolverB
     BooleanFormula formula = gen.generate(8);
 
     ExecutorService executor = Executors.newSingleThreadExecutor();
-    Future<Boolean> result = executor.submit(
-        () -> {
-          try (BasicProverEnvironment<?> prover = context.newProverEnvironment()) {
-            prover.push(formula); // CVC5 throws an exception here
-            return prover.isUnsat();
-          }
-        });
+    Future<Boolean> result =
+        executor.submit(
+            () -> {
+              try (BasicProverEnvironment<?> prover = context.newProverEnvironment()) {
+                prover.push(formula); // CVC5 throws an exception here
+                return prover.isUnsat();
+              }
+            });
 
     Boolean isUnsat = result.get();
     executor.shutdownNow();
