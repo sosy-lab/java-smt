@@ -69,8 +69,9 @@ public class SolverThreadLocalTest extends SolverBasedTest0.ParameterizedSolverB
 
     ExecutorService executor = Executors.newSingleThreadExecutor();
     Future<SolverContext> result = executor.submit(() -> {
+      Configuration config;
       try {
-        Configuration config = Configuration.builder()
+        config = Configuration.builder()
             .setOption("solver.solver", solverToUse().toString())
             .build();
       } catch (InvalidConfigurationException e) {
@@ -150,6 +151,6 @@ public class SolverThreadLocalTest extends SolverBasedTest0.ParameterizedSolverB
     Boolean isUnsat = result.get();
     executor.shutdownNow();
 
-    assert(isUnsat).equals(true);
+    assert isUnsat.equals(true);
   }
 }
