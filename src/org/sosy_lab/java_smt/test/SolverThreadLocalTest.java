@@ -79,7 +79,7 @@ public class SolverThreadLocalTest extends SolverBasedTest0.ParameterizedSolverB
     executor.shutdownNow();
 
     SolverContext newContext = result.get();
-    FormulaManager newMgr = context.getFormulaManager();
+    FormulaManager newMgr = newContext.getFormulaManager();
 
     BooleanFormulaManager newBmgr = newMgr.getBooleanFormulaManager();
     IntegerFormulaManager newImgr = newMgr.getIntegerFormulaManager();
