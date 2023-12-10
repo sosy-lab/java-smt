@@ -78,18 +78,19 @@ public class SolverThreadLocalTest extends SolverBasedTest0.ParameterizedSolverB
 
     executor.shutdownNow();
 
-    SolverContext newContext = result.get();
-    FormulaManager newMgr = newContext.getFormulaManager();
+    try (SolverContext newContext = result.get()) {
+      FormulaManager newMgr = newContext.getFormulaManager();
 
-    BooleanFormulaManager newBmgr = newMgr.getBooleanFormulaManager();
-    IntegerFormulaManager newImgr = newMgr.getIntegerFormulaManager();
+      BooleanFormulaManager newBmgr = newMgr.getBooleanFormulaManager();
+      IntegerFormulaManager newImgr = newMgr.getIntegerFormulaManager();
 
-    HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(newImgr, newBmgr);
-    BooleanFormula formula = gen.generate(8); // CVC5 throws an exception here
+      HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(newImgr, newBmgr);
+      BooleanFormula formula = gen.generate(8); // CVC5 throws an exception here
 
-    try (BasicProverEnvironment<?> prover = newContext.newProverEnvironment()) {
-      prover.push(formula);
-      assertThat(prover).isUnsatisfiable();
+      try (BasicProverEnvironment<?> prover = newContext.newProverEnvironment()) {
+        prover.push(formula);
+        assertThat(prover).isUnsatisfiable();
+      }
     }
   }
 
