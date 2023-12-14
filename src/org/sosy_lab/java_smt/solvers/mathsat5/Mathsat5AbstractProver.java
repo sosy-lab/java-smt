@@ -39,6 +39,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -100,7 +101,19 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   @Override
   public boolean isUnsat() throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
-    return !msat_check_sat(curEnv);
+    boolean result;
+    try {
+      result = !msat_check_sat(curEnv);
+    }
+    catch (IllegalStateException pE) {
+      if (Objects.equals(
+          pE.getMessage(), "msat_solve returned \"unknown\": user-requested termination")) {
+        assert shutdownNotifier.shouldShutdown();
+        throw new InterruptedException();
+      }
+      throw pE;
+    }
+    return result;
   }
 
   @Override
