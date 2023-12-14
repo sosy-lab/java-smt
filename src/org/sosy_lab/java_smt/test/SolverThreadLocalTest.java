@@ -139,7 +139,7 @@ public class SolverThreadLocalTest extends SolverBasedTest0.ParameterizedSolverB
     BooleanFormula formula = gen.generate(8);
 
     ExecutorService executor = Executors.newSingleThreadExecutor();
-    Future<Boolean> result =
+    Future<?> task =
         executor.submit(
             () -> {
               try (BasicProverEnvironment<?> prover = context.newProverEnvironment()) {
@@ -156,12 +156,13 @@ public class SolverThreadLocalTest extends SolverBasedTest0.ParameterizedSolverB
                 //       (AbstractProver.java:108)
                 //   at ..
                 prover.push(formula);
-
-                return prover.isUnsat();
+                assertThat(prover).isUnsatisfiable();
+              } catch (SolverException | InterruptedException pE) {
+                throw new RuntimeException(pE);
               }
             });
 
-    assert result.get();
+    assert task.get() == null;
   }
 
   @Override
