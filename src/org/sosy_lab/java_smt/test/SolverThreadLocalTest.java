@@ -45,6 +45,7 @@ public class SolverThreadLocalTest extends SolverBasedTest0.ParameterizedSolverB
     }
   }
 
+  @SuppressWarnings("resource")
   @Test
   public void nonlocalContext() throws ExecutionException, InterruptedException, SolverException {
     requireIntegers();
@@ -94,6 +95,8 @@ public class SolverThreadLocalTest extends SolverBasedTest0.ParameterizedSolverB
     }
   }
 
+
+  @SuppressWarnings("resource")
   @Test
   public void nonlocalFormulaTest()
       throws InterruptedException, SolverException, ExecutionException {
@@ -121,6 +124,7 @@ public class SolverThreadLocalTest extends SolverBasedTest0.ParameterizedSolverB
     }
   }
 
+  @SuppressWarnings("resource")
   @Test
   public void nonlocalProverTest() throws InterruptedException, ExecutionException {
     requireIntegers();
