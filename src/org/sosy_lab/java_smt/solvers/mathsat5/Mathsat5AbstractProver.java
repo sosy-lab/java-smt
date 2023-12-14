@@ -104,8 +104,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
     boolean result;
     try {
       result = !msat_check_sat(curEnv);
-    }
-    catch (IllegalStateException pE) {
+    } catch (IllegalStateException pE) {
       if (Objects.equals(
           pE.getMessage(), "msat_solve returned \"unknown\": user-requested termination")) {
         assert shutdownNotifier.shouldShutdown();
