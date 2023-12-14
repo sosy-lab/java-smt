@@ -95,7 +95,6 @@ public class SolverThreadLocalTest extends SolverBasedTest0.ParameterizedSolverB
     }
   }
 
-
   @SuppressWarnings("resource")
   @Test
   public void nonlocalFormulaTest()
