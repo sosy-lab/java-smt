@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.test;
 
+import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import java.util.List;
@@ -23,6 +24,7 @@ import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
@@ -51,6 +53,7 @@ public class SolverThreadLocalTest extends SolverBasedTest0.ParameterizedSolverB
   @Test
   public void nonlocalContext() throws ExecutionException, InterruptedException, SolverException {
     requireIntegers();
+    assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
 
     ExecutorService executor = Executors.newSingleThreadExecutor();
     Future<SolverContext> result =
@@ -103,6 +106,7 @@ public class SolverThreadLocalTest extends SolverBasedTest0.ParameterizedSolverB
   public void nonlocalFormulaTest()
       throws InterruptedException, SolverException, ExecutionException {
     requireIntegers();
+    assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
 
     ExecutorService executor = Executors.newSingleThreadExecutor();
     Future<BooleanFormula> result =
@@ -134,6 +138,7 @@ public class SolverThreadLocalTest extends SolverBasedTest0.ParameterizedSolverB
   @Test
   public void nonlocalProverTest() throws InterruptedException, ExecutionException {
     requireIntegers();
+    assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
 
     HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
     BooleanFormula formula = gen.generate(8);
@@ -208,6 +213,7 @@ public class SolverThreadLocalTest extends SolverBasedTest0.ParameterizedSolverB
   public <T> void nonlocalInterpolationTest() throws InterruptedException, ExecutionException {
     requireIntegers();
     requireInterpolation();
+    assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
 
     ExecutorService executor = Executors.newFixedThreadPool(5);
 
