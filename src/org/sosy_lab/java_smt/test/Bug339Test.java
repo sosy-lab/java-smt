@@ -71,6 +71,6 @@ public class Bug339Test extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
               }
             });
 
-      assert task1.get() == null;
+    assert task1.get() == null;
   }
 }
