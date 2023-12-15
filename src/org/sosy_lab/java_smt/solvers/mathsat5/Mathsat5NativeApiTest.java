@@ -537,7 +537,6 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
 
   private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-
   @SuppressWarnings("unused")
   private long createSharedEnv(long sibling) {
     long cfg = msat_create_config();
@@ -569,13 +568,15 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
     long prover = createSharedEnv(this.env);
     msat_assert_formula(prover, formula);
 
-    Future<?> task1 = executor.submit(() -> {
-      try {
-        assertThat(msat_check_sat(prover)).isFalse();
-      } catch (InterruptedException | SolverException pE) {
-        throw new RuntimeException(pE);
-      }
-    });
+    Future<?> task1 =
+        executor.submit(
+            () -> {
+              try {
+                assertThat(msat_check_sat(prover)).isFalse();
+              } catch (InterruptedException | SolverException pE) {
+                throw new RuntimeException(pE);
+              }
+            });
 
     assert task1.get() == null;
   }

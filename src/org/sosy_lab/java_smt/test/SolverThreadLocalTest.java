@@ -218,36 +218,37 @@ public class SolverThreadLocalTest extends SolverBasedTest0.ParameterizedSolverB
         (InterpolatingProverEnvironment<T>) context.newProverEnvironmentWithInterpolation()) {
       T id1 = prover.push(f1);
 
-      Future<?> task1 = executor.submit(
-          () -> {
-            try {
-              // FIXME: Exception for CVC5
-              // java.lang.IllegalStateException:
-              // You tried to use push() on an CVC5 assertion stack illegally.
-              //   at org.sosy_lab.java_smt.solvers.cvc5.CVC5AbstractProver.pushImpl
-              //       (CVC5AbstractProver.java:89)
-              //   at org.sosy_lab.java_smt.basicimpl.AbstractProver.push
-              //       (AbstractProver.java:88)
-              //   at ..
-              prover.push(f2);
+      Future<?> task1 =
+          executor.submit(
+              () -> {
+                try {
+                  // FIXME: Exception for CVC5
+                  // java.lang.IllegalStateException:
+                  // You tried to use push() on an CVC5 assertion stack illegally.
+                  //   at org.sosy_lab.java_smt.solvers.cvc5.CVC5AbstractProver.pushImpl
+                  //       (CVC5AbstractProver.java:89)
+                  //   at org.sosy_lab.java_smt.basicimpl.AbstractProver.push
+                  //       (AbstractProver.java:88)
+                  //   at ..
+                  prover.push(f2);
 
-              // FIXME: Exception for MathSAT (bug #339)
-              // java.lang.StackOverflowError
-              //   at org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_solve
-              //       (Native Method)
-              //   at org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_check_sat
-              //       (Mathsat5NativeApi.java:156)
-              //   at org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5AbstractProver.isUnsat
-              //       (Mathsat5AbstractProver.java:106)
-              //   at org.sosy_lab.java_smt.test.ProverEnvironmentSubject.isUnsatisfiable
-              //       (ProverEnvironmentSubject.java:67)
-              //   at ..
-              assertThat(prover).isUnsatisfiable();
+                  // FIXME: Exception for MathSAT (bug #339)
+                  // java.lang.StackOverflowError
+                  //   at org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_solve
+                  //       (Native Method)
+                  //   at org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_check_sat
+                  //       (Mathsat5NativeApi.java:156)
+                  //   at org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5AbstractProver.isUnsat
+                  //       (Mathsat5AbstractProver.java:106)
+                  //   at org.sosy_lab.java_smt.test.ProverEnvironmentSubject.isUnsatisfiable
+                  //       (ProverEnvironmentSubject.java:67)
+                  //   at ..
+                  assertThat(prover).isUnsatisfiable();
 
-            } catch (SolverException | InterruptedException pE) {
-              throw new RuntimeException(pE);
-            }
-          });
+                } catch (SolverException | InterruptedException pE) {
+                  throw new RuntimeException(pE);
+                }
+              });
 
       assert task1.get() == null;
 
@@ -271,19 +272,20 @@ public class SolverThreadLocalTest extends SolverBasedTest0.ParameterizedSolverB
       executor.awaitTermination(100, TimeUnit.MILLISECONDS);
       prover.pop();
 
-      Future<?> task3 = executor.submit(
-          () -> {
-            try {
-              prover.pop();
+      Future<?> task3 =
+          executor.submit(
+              () -> {
+                try {
+                  prover.pop();
 
-              prover.push(itp.get());
-              prover.push(f2);
+                  prover.push(itp.get());
+                  prover.push(f2);
 
-              assertThat(prover).isUnsatisfiable();
-            } catch (SolverException | InterruptedException | ExecutionException pE) {
-              throw new RuntimeException(pE);
-            }
-          });
+                  assertThat(prover).isUnsatisfiable();
+                } catch (SolverException | InterruptedException | ExecutionException pE) {
+                  throw new RuntimeException(pE);
+                }
+              });
 
       assert task3.get() == null;
     }
