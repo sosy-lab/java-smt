@@ -11,7 +11,7 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
-import java.util.List;
+import com.google.common.collect.ImmutableList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -198,7 +198,7 @@ public class SolverThreadLocalTest extends SolverBasedTest0.ParameterizedSolverB
 
       assertThat(prover).isUnsatisfiable();
 
-      BooleanFormula itp = prover.getInterpolant(List.of(id2));
+      BooleanFormula itp = prover.getInterpolant(ImmutableList.of(id2));
       checkInterpolant(f2, f1, itp);
 
       prover.pop();
@@ -261,7 +261,7 @@ public class SolverThreadLocalTest extends SolverBasedTest0.ParameterizedSolverB
       Future<BooleanFormula> itp =
           executor.submit(
               () -> {
-                BooleanFormula interpol = prover.getInterpolant(List.of(id1));
+                BooleanFormula interpol = prover.getInterpolant(ImmutableList.of(id1));
                 Future<?> task2 =
                     executor.submit(
                         () -> {
