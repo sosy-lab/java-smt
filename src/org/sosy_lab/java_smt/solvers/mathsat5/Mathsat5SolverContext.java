@@ -122,7 +122,11 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
     this.shutdownNotifier = shutdownNotifier;
     this.creator = creator;
 
-    terminationTest = shutdownNotifier::shouldShutdown;
+    terminationTest =
+        () -> {
+          shutdownNotifier.shutdownIfNecessary();
+          return false;
+        };
   }
 
   private static void logLicenseInfo(LogManager logger) {
