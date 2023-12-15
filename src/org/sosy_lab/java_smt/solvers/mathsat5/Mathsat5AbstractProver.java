@@ -40,7 +40,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -114,18 +113,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   @Override
   public synchronized boolean isUnsat() throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
-    boolean result;
-    try {
-      result = exec(() -> !msat_check_sat(curEnv));
-    } catch (IllegalStateException e) {
-      if (Objects.equals(
-          e.getMessage(), "msat_solve returned \"unknown\": user-requested termination")) {
-        assert shutdownNotifier.shouldShutdown();
-        throw new InterruptedException();
-      }
-      throw e;
-    }
-    return result;
+    return exec(() -> !msat_check_sat(curEnv));
   }
 
   @Override
@@ -133,18 +121,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     checkForLiterals(pAssumptions);
-    boolean result;
-    try {
-      result = exec(() -> !msat_check_sat_with_assumptions(curEnv, getMsatTerm(pAssumptions)));
-    } catch (IllegalStateException e) {
-      if (Objects.equals(
-          e.getMessage(), "msat_solve returned \"unknown\": user-requested termination")) {
-        assert shutdownNotifier.shouldShutdown();
-        throw new InterruptedException();
-      }
-      throw e;
-    }
-    return result;
+    return exec(() -> !msat_check_sat_with_assumptions(curEnv, getMsatTerm(pAssumptions)));
   }
 
   private void checkForLiterals(Collection<BooleanFormula> formulas) {
