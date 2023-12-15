@@ -13,6 +13,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_asse
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_check_sat;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_config;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_env;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_shared_env;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_arity;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_name;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_config;
@@ -26,10 +27,12 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_rational_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_is_enum_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_is_integer_type;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_and;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_asin;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_eq;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_equal;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_exp;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_leq;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_log;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_not;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_number;
@@ -45,12 +48,17 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_mode
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_pop_backtrack_point;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_push_backtrack_point;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_option_checked;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_termination_callback;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_get_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_pi;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_repr;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_type_equals;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_type_repr;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import org.junit.AssumptionViolatedException;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -525,5 +533,50 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
     msat_assert_formula(env, msat_make_not(env, msat_make_equal(env, green, var)));
     assertThat(msat_check_sat(env)).isFalse();
     msat_pop_backtrack_point(env);
+  }
+
+  private final ExecutorService executor = Executors.newSingleThreadExecutor();
+
+
+  @SuppressWarnings("unused")
+  private long createSharedEnv(long sibling) {
+    long cfg = msat_create_config();
+    msat_set_option_checked(cfg, "dpll.ghost_filtering", "true");
+    msat_set_option_checked(cfg, "theory.la.split_rat_eq", "false");
+
+    long prover = msat_create_shared_env(cfg, sibling);
+    msat_destroy_config(cfg);
+
+    // FIXME: Bug #339 is caused by this line. Removing it will fix the test.
+    long hook = msat_set_termination_callback(prover, () -> false);
+
+    return prover;
+  }
+
+  private long makeLt(long e, long t1, long t2) {
+    return msat_make_not(e, msat_make_leq(e, t2, t1));
+  }
+
+  @Test
+  public void bug339Test() throws ExecutionException, InterruptedException {
+    long integerType = msat_get_integer_type(env);
+
+    long varA = msat_make_variable(env, "A", integerType);
+    long varB = msat_make_variable(env, "B", integerType);
+
+    long formula = msat_make_and(env, makeLt(env, varA, varB), makeLt(env, varB, varA));
+
+    long prover = createSharedEnv(this.env);
+    msat_assert_formula(prover, formula);
+
+    Future<?> task1 = executor.submit(() -> {
+      try {
+        assertThat(msat_check_sat(prover)).isFalse();
+      } catch (InterruptedException | SolverException pE) {
+        throw new RuntimeException(pE);
+      }
+    });
+
+    assert task1.get() == null;
   }
 }
