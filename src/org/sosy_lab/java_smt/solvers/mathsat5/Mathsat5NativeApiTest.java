@@ -537,7 +537,7 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
 
   private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-  @SuppressWarnings("unused")
+
   private long createSharedEnv(long sibling) {
     long cfg = msat_create_config();
     msat_set_option_checked(cfg, "dpll.ghost_filtering", "true");
@@ -546,9 +546,6 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
     long prover = msat_create_shared_env(cfg, sibling);
     msat_destroy_config(cfg);
 
-    // FIXME: Bug #339 is caused by this line. Removing it will fix the test.
-    long hook = msat_set_termination_callback(prover, () -> false);
-
     return prover;
   }
 
@@ -556,22 +553,56 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
     return msat_make_not(e, msat_make_leq(e, t2, t1));
   }
 
+  @SuppressWarnings("unused")
   @Test
-  public void bug339Test() throws ExecutionException, InterruptedException {
+  public void bug339BrokenTest() throws ExecutionException, InterruptedException {
     long integerType = msat_get_integer_type(env);
 
     long varA = msat_make_variable(env, "A", integerType);
     long varB = msat_make_variable(env, "B", integerType);
 
     long formula = msat_make_and(env, makeLt(env, varA, varB), makeLt(env, varB, varA));
-
     long prover = createSharedEnv(this.env);
+
+    // FIXME: Bug #339 is caused by this line. Removing it will fix the test.
+    long hook = msat_set_termination_callback(prover, () -> false);
+
     msat_assert_formula(prover, formula);
 
     Future<?> task1 =
         executor.submit(
             () -> {
               try {
+                assertThat(msat_check_sat(prover)).isFalse();
+              } catch (InterruptedException | SolverException pE) {
+                throw new RuntimeException(pE);
+              }
+            });
+
+    assert task1.get() == null;
+  }
+
+  @SuppressWarnings("unused")
+  @Test
+  public void bug339FixedTest() throws ExecutionException, InterruptedException {
+    long integerType = msat_get_integer_type(env);
+
+    long varA = msat_make_variable(env, "A", integerType);
+    long varB = msat_make_variable(env, "B", integerType);
+
+    long formula = msat_make_and(env, makeLt(env, varA, varB), makeLt(env, varB, varA));
+    long prover = createSharedEnv(this.env);
+
+    msat_assert_formula(prover, formula);
+
+    Future<?> task1 =
+        executor.submit(
+            () -> {
+              try {
+                // FIXME: Bug #339 is not triggered if we add the callback on the thread that
+                //  will do the calculation
+                long hook = msat_set_termination_callback(prover, () -> false);
+
                 assertThat(msat_check_sat(prover)).isFalse();
               } catch (InterruptedException | SolverException pE) {
                 throw new RuntimeException(pE);
