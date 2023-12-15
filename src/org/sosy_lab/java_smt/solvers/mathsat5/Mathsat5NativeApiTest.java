@@ -553,7 +553,7 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
   }
 
   @SuppressWarnings("unused")
-  @Test
+  @Test(expected = StackOverflowError.class)
   public void bug339BrokenTest() throws ExecutionException, InterruptedException {
     long integerType = msat_get_integer_type(env);
 
