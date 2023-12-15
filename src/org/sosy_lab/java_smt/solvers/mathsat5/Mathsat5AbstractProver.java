@@ -30,6 +30,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
+import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Longs;
@@ -42,6 +43,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Evaluator;
@@ -58,7 +60,6 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   protected final Mathsat5SolverContext context;
   protected final long curEnv;
   private final long curConfig;
-  private final long terminationTest;
   protected final Mathsat5FormulaCreator creator;
   private final ShutdownNotifier shutdownNotifier;
 
@@ -72,7 +73,6 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
     creator = pCreator;
     curConfig = buildConfig(pOptions);
     curEnv = context.createEnvironment(curConfig);
-    terminationTest = context.addTerminationTest(curEnv);
     shutdownNotifier = pShutdownNotifier;
   }
 
@@ -98,29 +98,53 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   /** add needed options into the given map. */
   protected abstract void createConfig(Map<String, String> pConfig);
 
+  private <T> T exec(Callable<T> closure) throws SolverException {
+    long hook = context.addTerminationTest(curEnv);
+    T value = null;
+    try {
+      value = closure.call();
+    } catch (Throwable t) {
+      Throwables.propagateIfPossible(t, IllegalStateException.class, SolverException.class);
+    } finally {
+      msat_free_termination_callback(hook);
+    }
+    return value;
+  }
+
   @Override
-  public boolean isUnsat() throws InterruptedException, SolverException {
+  public synchronized boolean isUnsat() throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
     boolean result;
     try {
-      result = !msat_check_sat(curEnv);
-    } catch (IllegalStateException pE) {
+      result = exec(() -> !msat_check_sat(curEnv));
+    } catch (IllegalStateException e) {
       if (Objects.equals(
-          pE.getMessage(), "msat_solve returned \"unknown\": user-requested termination")) {
+          e.getMessage(), "msat_solve returned \"unknown\": user-requested termination")) {
         assert shutdownNotifier.shouldShutdown();
         throw new InterruptedException();
       }
-      throw pE;
+      throw e;
     }
     return result;
   }
 
   @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
+  public synchronized boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     checkForLiterals(pAssumptions);
-    return !msat_check_sat_with_assumptions(curEnv, getMsatTerm(pAssumptions));
+    boolean result;
+    try {
+      result = exec(() -> !msat_check_sat_with_assumptions(curEnv, getMsatTerm(pAssumptions)));
+    } catch (IllegalStateException e) {
+      if (Objects.equals(
+          e.getMessage(), "msat_solve returned \"unknown\": user-requested termination")) {
+        assert shutdownNotifier.shouldShutdown();
+        throw new InterruptedException();
+      }
+      throw e;
+    }
+    return result;
   }
 
   private void checkForLiterals(Collection<BooleanFormula> formulas) {
@@ -226,7 +250,6 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   public void close() {
     if (!closed) {
       msat_destroy_env(curEnv);
-      msat_free_termination_callback(terminationTest);
       msat_destroy_config(curConfig);
     }
     super.close();
@@ -237,7 +260,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   }
 
   @Override
-  public <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important)
+  public synchronized <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
     checkGenerateAllSat();

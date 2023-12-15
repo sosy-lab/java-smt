@@ -537,7 +537,6 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
 
   private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-
   private long createSharedEnv(long sibling) {
     long cfg = msat_create_config();
     msat_set_option_checked(cfg, "dpll.ghost_filtering", "true");

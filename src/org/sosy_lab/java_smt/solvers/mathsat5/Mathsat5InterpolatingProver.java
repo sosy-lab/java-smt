@@ -152,7 +152,7 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
   }
 
   @Override
-  public <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important) {
+  public synchronized <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important) {
     // TODO how can we support allsat in MathSat5-interpolation-prover?
     // error: "allsat is not compatible wwith proof generation"
     throw new UnsupportedOperationException(
