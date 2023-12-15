@@ -97,13 +97,14 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   /** add needed options into the given map. */
   protected abstract void createConfig(Map<String, String> pConfig);
 
-  private <T> T exec(Callable<T> closure) throws SolverException {
+  private <T> T exec(Callable<T> closure) throws SolverException, InterruptedException {
     long hook = context.addTerminationTest(curEnv);
     T value = null;
     try {
       value = closure.call();
     } catch (Throwable t) {
       Throwables.propagateIfPossible(t, IllegalStateException.class, SolverException.class);
+      Throwables.propagateIfPossible(t, InterruptedException.class);
     } finally {
       msat_free_termination_callback(hook);
     }
