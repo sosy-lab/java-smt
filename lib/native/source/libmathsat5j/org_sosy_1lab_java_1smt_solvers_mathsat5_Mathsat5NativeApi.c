@@ -74,7 +74,12 @@ static int call_java_termination_callback(void *user_data) {
 	}
 
 	jboolean result = (*jenv)->CallBooleanMethod(jenv, helper->obj, helper->callback_method);
-        return result;
+
+	if ((*jenv)->ExceptionCheck(jenv)) {
+		return 1;
+	}
+
+	return result;
 }
 
 /*
