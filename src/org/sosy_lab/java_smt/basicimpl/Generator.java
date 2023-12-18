@@ -34,6 +34,18 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 public class Generator {
   private Generator() {}
 
+  public enum Keyword {
+    DIRECT,
+    SKIP,
+    BOOL,
+    INT,
+    REAL,
+    BITVEC,
+    UFFUN,
+    ARRAY
+  }
+
+
   private static boolean loggingEnabled = false;
   private static final String file = "Out.smt2";
   public static final StringBuilder lines = new StringBuilder("(set-logic AUFLIRA)\n");
@@ -73,7 +85,7 @@ public class Generator {
               .filter(x -> x.getResult().equals(constraint))
               .findFirst()
               .orElse(null);
-      if (methodToEvaluate != null && !methodToEvaluate.keyword.equals("Direct")) {
+      if (methodToEvaluate != null && !methodToEvaluate.expressionType.equals(Keyword.DIRECT)) {
         registeredVariables.add(methodToEvaluate);
       }
       List<Object> evaluatedInputs = new ArrayList<>();
@@ -91,25 +103,25 @@ public class Generator {
         registeredVariables.stream().distinct().collect(Collectors.toList());
     String command = "(assert ";
     for (FunctionEnvironment variable : uniqueRegisteredValues) {
-      if (variable.keyword.equals("Bool")) {
+      if (variable.expressionType.equals(Keyword.BOOL)) {
         String newEntry = "(declare-const " + variable.inputParams.get(0) + " Bool)\n";
         if (lines.indexOf(newEntry) == -1) {
           lines.append(newEntry);
         }
       }
-      if (variable.keyword.equals("Int")) {
+      if (variable.expressionType.equals(Keyword.INT)) {
         String newEntry = "(declare-const " + variable.inputParams.get(0) + " Int)\n";
         if (lines.indexOf(newEntry) == -1) {
           lines.append(newEntry);
         }
       }
-      if (variable.keyword.equals("Real")) {
+      if (variable.expressionType.equals(Keyword.REAL)) {
         String newEntry = "(declare-const " + variable.inputParams.get(0) + " Real)\n";
         if (lines.indexOf(newEntry) == -1) {
           lines.append(newEntry);
         }
       }
-      if (variable.keyword.equals("BitVec")) {
+      if (variable.expressionType.equals(Keyword.BITVEC)) {
         String newEntry =
             "(declare-const "
                 + variable.inputParams.get(0)
@@ -120,7 +132,7 @@ public class Generator {
           lines.append(newEntry);
         }
       }
-      if (variable.keyword.equals("Array")) {
+      if (variable.expressionType.equals(Keyword.ARRAY)) {
         String newEntry =
             "(declare-const "
                 + variable.inputParams.get(0)
@@ -134,7 +146,7 @@ public class Generator {
           lines.append(newEntry);
         }
       }
-      if (variable.keyword.equals("UFFun")) {
+      if (variable.expressionType.equals(Keyword.UFFUN)) {
         String newEntry =
             "(declare-fun "
                 + variable.ufName

@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.basicimpl.Generator.Keyword;
 
 public class BooleanGenerator {
 
@@ -34,7 +35,7 @@ public class BooleanGenerator {
     Function<List<Object>, String> functionToString =
         inPlaceInputParams -> (String) inPlaceInputParams.get(0);
     Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, "Bool"));
+        new FunctionEnvironment(result, inputParams, functionToString, Keyword.BOOL));
   }
 
   protected static void logMakeTrue(Object result, String pVar) {
@@ -43,7 +44,7 @@ public class BooleanGenerator {
     Function<List<Object>, String> functionToString =
         inPlaceInputParams -> (String) inPlaceInputParams.get(0);
     Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, "Direct"));
+        new FunctionEnvironment(result, inputParams, functionToString, Keyword.DIRECT));
   }
 
   protected static void logMakeFalse(Object result, String pVar) {
@@ -52,7 +53,7 @@ public class BooleanGenerator {
     Function<List<Object>, String> functionToString =
         inPlaceInputParams -> (String) inPlaceInputParams.get(0);
     Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, "Direct"));
+        new FunctionEnvironment(result, inputParams, functionToString, Keyword.DIRECT));
   }
 
   protected static void logNot(Object result, BooleanFormula pBits) {
@@ -61,7 +62,7 @@ public class BooleanGenerator {
     Function<List<Object>, String> functionToString =
         inPlaceInputParams -> "(not " + inPlaceInputParams.get(0) + ")";
     Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
+        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 
   protected static void logOr(Object result, BooleanFormula pBits1, BooleanFormula pBits2) {
@@ -72,7 +73,7 @@ public class BooleanGenerator {
         inPlaceInputParams ->
             "(or " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
+        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 
   protected static void logOr(Object result, Collection<BooleanFormula> pBits1) {
@@ -91,7 +92,7 @@ public class BooleanGenerator {
         };
 
     Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
+        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 
   protected static void logAnd(Object result, BooleanFormula pBits1, BooleanFormula pBits2) {
@@ -102,7 +103,7 @@ public class BooleanGenerator {
         inPlaceInputParams ->
             "(and " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
+        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 
   protected static void logAnd(Object result, Collection<BooleanFormula> pBits1) {
@@ -121,7 +122,7 @@ public class BooleanGenerator {
         };
 
     Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
+        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 
   protected static void logXor(Object result, BooleanFormula pBits1, BooleanFormula pBits2) {
@@ -132,7 +133,7 @@ public class BooleanGenerator {
         inPlaceInputParams ->
             "(xor " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
+        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 
   protected static void logEquivalence(
@@ -144,7 +145,7 @@ public class BooleanGenerator {
         inPlaceInputParams ->
             "(= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
+        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 
   protected static void logImplication(
@@ -156,7 +157,7 @@ public class BooleanGenerator {
         inPlaceInputParams ->
             "(=> " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
     Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
+        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 
   protected static void logIfThenElse(Object result, BooleanFormula pBits1, Object f1, Object f2) {
@@ -174,6 +175,6 @@ public class BooleanGenerator {
                 + inPlaceInputParams.get(2)
                 + ")";
     Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, "Skip"));
+        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 }

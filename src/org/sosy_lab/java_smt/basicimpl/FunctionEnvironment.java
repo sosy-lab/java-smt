@@ -28,7 +28,7 @@ public class FunctionEnvironment {
   Object result;
   List<Object> inputParams;
   Function<List<Object>, String> functionToString;
-  String keyword;
+  Generator.Keyword expressionType;
   int bitVecLength;
   String ufName = "";
   String ufInputType = "";
@@ -40,12 +40,12 @@ public class FunctionEnvironment {
       Object pResult,
       List<Object> pInputParams,
       Function<List<Object>, String> pFunctionToString,
-      String pKeyword) {
+      Generator.Keyword pKeyword) {
 
     result = pResult;
     inputParams = pInputParams;
     functionToString = pFunctionToString;
-    keyword = pKeyword;
+    expressionType = pKeyword;
   }
 
   public Object getResult() {
@@ -60,12 +60,12 @@ public class FunctionEnvironment {
     bitVecLength = pBitVecLength;
   }
 
-  public String getKeyword() {
-    return keyword;
+  public Generator.Keyword getKeyword() {
+    return expressionType;
   }
 
-  public void setKeyword(String pKeyword) {
-    keyword = pKeyword;
+  public void setKeyword(Generator.Keyword pKeyword) {
+    expressionType = pKeyword;
   }
 
   public void setResult(Object pResult) {
