@@ -95,33 +95,33 @@ public class ArraySMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSol
         Objects.requireNonNull(amgr)
             .makeArray("a2", FormulaType.IntegerType, FormulaType.IntegerType);
     ArrayFormula<
-        ArrayFormula<IntegerFormula, IntegerFormula>,
-        ArrayFormula<
             ArrayFormula<IntegerFormula, IntegerFormula>,
-            ArrayFormula<IntegerFormula, IntegerFormula>>>
+            ArrayFormula<
+                ArrayFormula<IntegerFormula, IntegerFormula>,
+                ArrayFormula<IntegerFormula, IntegerFormula>>>
         c1 =
-        amgr.makeArray(
-            "c1",
-            FormulaType.getArrayType(
-                FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.IntegerType),
+            amgr.makeArray(
+                "c1",
                 FormulaType.getArrayType(
                     FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.IntegerType),
                     FormulaType.getArrayType(
-                        FormulaType.IntegerType, FormulaType.IntegerType))));
+                        FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.IntegerType),
+                        FormulaType.getArrayType(
+                            FormulaType.IntegerType, FormulaType.IntegerType))));
     ArrayFormula<
-        ArrayFormula<IntegerFormula, IntegerFormula>,
-        ArrayFormula<
             ArrayFormula<IntegerFormula, IntegerFormula>,
-            ArrayFormula<IntegerFormula, IntegerFormula>>>
+            ArrayFormula<
+                ArrayFormula<IntegerFormula, IntegerFormula>,
+                ArrayFormula<IntegerFormula, IntegerFormula>>>
         c2 =
-        amgr.makeArray(
-            "c2",
-            FormulaType.getArrayType(
-                FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.IntegerType),
+            amgr.makeArray(
+                "c2",
                 FormulaType.getArrayType(
                     FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.IntegerType),
                     FormulaType.getArrayType(
-                        FormulaType.IntegerType, FormulaType.IntegerType))));
+                        FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.IntegerType),
+                        FormulaType.getArrayType(
+                            FormulaType.IntegerType, FormulaType.IntegerType))));
 
     BooleanFormula constraint1 = amgr.equivalence(a1, a2);
     BooleanFormula constraint3 = amgr.equivalence(c1, c2);
@@ -154,35 +154,35 @@ public class ArraySMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSol
         Objects.requireNonNull(amgr)
             .makeArray("a2", FormulaType.RationalType, FormulaType.RationalType);
     ArrayFormula<
-        ArrayFormula<RationalFormula, RationalFormula>,
-        ArrayFormula<
             ArrayFormula<RationalFormula, RationalFormula>,
-            ArrayFormula<RationalFormula, RationalFormula>>>
+            ArrayFormula<
+                ArrayFormula<RationalFormula, RationalFormula>,
+                ArrayFormula<RationalFormula, RationalFormula>>>
         c1 =
-        amgr.makeArray(
-            "c1",
-            FormulaType.getArrayType(
-                FormulaType.getArrayType(FormulaType.RationalType, FormulaType.RationalType),
+            amgr.makeArray(
+                "c1",
                 FormulaType.getArrayType(
+                    FormulaType.getArrayType(FormulaType.RationalType, FormulaType.RationalType),
                     FormulaType.getArrayType(
-                        FormulaType.RationalType, FormulaType.RationalType),
-                    FormulaType.getArrayType(
-                        FormulaType.RationalType, FormulaType.RationalType))));
+                        FormulaType.getArrayType(
+                            FormulaType.RationalType, FormulaType.RationalType),
+                        FormulaType.getArrayType(
+                            FormulaType.RationalType, FormulaType.RationalType))));
     ArrayFormula<
-        ArrayFormula<RationalFormula, RationalFormula>,
-        ArrayFormula<
             ArrayFormula<RationalFormula, RationalFormula>,
-            ArrayFormula<RationalFormula, RationalFormula>>>
+            ArrayFormula<
+                ArrayFormula<RationalFormula, RationalFormula>,
+                ArrayFormula<RationalFormula, RationalFormula>>>
         c2 =
-        amgr.makeArray(
-            "c2",
-            FormulaType.getArrayType(
-                FormulaType.getArrayType(FormulaType.RationalType, FormulaType.RationalType),
+            amgr.makeArray(
+                "c2",
                 FormulaType.getArrayType(
+                    FormulaType.getArrayType(FormulaType.RationalType, FormulaType.RationalType),
                     FormulaType.getArrayType(
-                        FormulaType.RationalType, FormulaType.RationalType),
-                    FormulaType.getArrayType(
-                        FormulaType.RationalType, FormulaType.RationalType))));
+                        FormulaType.getArrayType(
+                            FormulaType.RationalType, FormulaType.RationalType),
+                        FormulaType.getArrayType(
+                            FormulaType.RationalType, FormulaType.RationalType))));
 
     BooleanFormula constraint1 = amgr.equivalence(a1, a2);
     BooleanFormula constraint3 = amgr.equivalence(c1, c2);
@@ -218,33 +218,33 @@ public class ArraySMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSol
         Objects.requireNonNull(amgr)
             .makeArray("a2", FormulaType.BooleanType, FormulaType.BooleanType);
     ArrayFormula<
-        ArrayFormula<BooleanFormula, BooleanFormula>,
-        ArrayFormula<
             ArrayFormula<BooleanFormula, BooleanFormula>,
-            ArrayFormula<BooleanFormula, BooleanFormula>>>
+            ArrayFormula<
+                ArrayFormula<BooleanFormula, BooleanFormula>,
+                ArrayFormula<BooleanFormula, BooleanFormula>>>
         c1 =
-        amgr.makeArray(
-            "c1",
-            FormulaType.getArrayType(
-                FormulaType.getArrayType(FormulaType.BooleanType, FormulaType.BooleanType),
+            amgr.makeArray(
+                "c1",
                 FormulaType.getArrayType(
                     FormulaType.getArrayType(FormulaType.BooleanType, FormulaType.BooleanType),
                     FormulaType.getArrayType(
-                        FormulaType.BooleanType, FormulaType.BooleanType))));
+                        FormulaType.getArrayType(FormulaType.BooleanType, FormulaType.BooleanType),
+                        FormulaType.getArrayType(
+                            FormulaType.BooleanType, FormulaType.BooleanType))));
     ArrayFormula<
-        ArrayFormula<BooleanFormula, BooleanFormula>,
-        ArrayFormula<
             ArrayFormula<BooleanFormula, BooleanFormula>,
-            ArrayFormula<BooleanFormula, BooleanFormula>>>
+            ArrayFormula<
+                ArrayFormula<BooleanFormula, BooleanFormula>,
+                ArrayFormula<BooleanFormula, BooleanFormula>>>
         c2 =
-        amgr.makeArray(
-            "c2",
-            FormulaType.getArrayType(
-                FormulaType.getArrayType(FormulaType.BooleanType, FormulaType.BooleanType),
+            amgr.makeArray(
+                "c2",
                 FormulaType.getArrayType(
                     FormulaType.getArrayType(FormulaType.BooleanType, FormulaType.BooleanType),
                     FormulaType.getArrayType(
-                        FormulaType.BooleanType, FormulaType.BooleanType))));
+                        FormulaType.getArrayType(FormulaType.BooleanType, FormulaType.BooleanType),
+                        FormulaType.getArrayType(
+                            FormulaType.BooleanType, FormulaType.BooleanType))));
 
     BooleanFormula constraint1 = amgr.equivalence(a1, a2);
     BooleanFormula constraint3 = amgr.equivalence(c1, c2);
@@ -318,33 +318,33 @@ public class ArraySMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSol
     ArrayFormula<BitvectorFormula, BooleanFormula> b2 =
         amgr.makeArray("b2", FormulaType.getBitvectorTypeWithSize(3), FormulaType.BooleanType);
     ArrayFormula<
-        ArrayFormula<IntegerFormula, IntegerFormula>,
-        ArrayFormula<
-            ArrayFormula<BooleanFormula, BooleanFormula>,
-            ArrayFormula<IntegerFormula, BitvectorFormula>>>
+            ArrayFormula<IntegerFormula, IntegerFormula>,
+            ArrayFormula<
+                ArrayFormula<BooleanFormula, BooleanFormula>,
+                ArrayFormula<IntegerFormula, BitvectorFormula>>>
         c1 =
-        amgr.makeArray(
-            "c1",
-            FormulaType.getArrayType(
-                FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.IntegerType),
+            amgr.makeArray(
+                "c1",
                 FormulaType.getArrayType(
-                    FormulaType.getArrayType(FormulaType.BooleanType, FormulaType.BooleanType),
+                    FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.IntegerType),
                     FormulaType.getArrayType(
-                        FormulaType.IntegerType, FormulaType.getBitvectorTypeWithSize(3)))));
+                        FormulaType.getArrayType(FormulaType.BooleanType, FormulaType.BooleanType),
+                        FormulaType.getArrayType(
+                            FormulaType.IntegerType, FormulaType.getBitvectorTypeWithSize(3)))));
     ArrayFormula<
-        ArrayFormula<IntegerFormula, IntegerFormula>,
-        ArrayFormula<
-            ArrayFormula<BooleanFormula, BooleanFormula>,
-            ArrayFormula<IntegerFormula, BitvectorFormula>>>
+            ArrayFormula<IntegerFormula, IntegerFormula>,
+            ArrayFormula<
+                ArrayFormula<BooleanFormula, BooleanFormula>,
+                ArrayFormula<IntegerFormula, BitvectorFormula>>>
         c2 =
-        amgr.makeArray(
-            "c2",
-            FormulaType.getArrayType(
-                FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.IntegerType),
+            amgr.makeArray(
+                "c2",
                 FormulaType.getArrayType(
-                    FormulaType.getArrayType(FormulaType.BooleanType, FormulaType.BooleanType),
+                    FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.IntegerType),
                     FormulaType.getArrayType(
-                        FormulaType.IntegerType, FormulaType.getBitvectorTypeWithSize(3)))));
+                        FormulaType.getArrayType(FormulaType.BooleanType, FormulaType.BooleanType),
+                        FormulaType.getArrayType(
+                            FormulaType.IntegerType, FormulaType.getBitvectorTypeWithSize(3)))));
 
     BooleanFormula constraint1 = amgr.equivalence(a1, a2);
     BooleanFormula constraint2 = amgr.equivalence(b1, b2);
@@ -376,9 +376,7 @@ public class ArraySMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSol
   public void testStore() {
     requireArrays();
     requireIntegers();
-    assume()
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.Z3);
+    assume().that(solverToUse()).isNotEqualTo(Solvers.Z3);
     clearGenerator();
     ArrayFormula<IntegerFormula, IntegerFormula> a1 =
         Objects.requireNonNull(amgr)
@@ -402,9 +400,7 @@ public class ArraySMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSol
   public void testSelect() {
     requireArrays();
     requireIntegers();
-    assume()
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.Z3);
+    assume().that(solverToUse()).isNotEqualTo(Solvers.Z3);
     clearGenerator();
     ArrayFormula<IntegerFormula, IntegerFormula> a1 =
         Objects.requireNonNull(amgr)

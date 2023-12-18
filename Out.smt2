@@ -1,6 +1,0 @@
-(declare-const c (Array (Array Bool Bool) (Array Bool Bool)))
-(declare-const d (Array (Array Bool Bool) (Array Bool Bool)))
-(assert (= c d))
-(check-sat)
-(get-model)
-(exit)

@@ -56,11 +56,11 @@ public abstract class AbstractSLFormulaManager<TFormulaInfo, TType, TEnv, TFuncD
 
   @Override
   public <
-      AF extends Formula,
-      VF extends Formula,
-      AT extends FormulaType<AF>,
-      VT extends FormulaType<VF>>
-  BooleanFormula makeEmptyHeap(AT pAdressType, VT pValueType) {
+          AF extends Formula,
+          VF extends Formula,
+          AT extends FormulaType<AF>,
+          VT extends FormulaType<VF>>
+      BooleanFormula makeEmptyHeap(AT pAdressType, VT pValueType) {
     final TType adressType = toSolverType(pAdressType);
     final TType valueType = toSolverType(pValueType);
     return wrap(makeEmptyHeap(adressType, valueType));

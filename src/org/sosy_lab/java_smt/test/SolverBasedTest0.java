@@ -53,7 +53,6 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.StringFormulaManager;
 import org.sosy_lab.java_smt.api.UFManager;
-import org.sosy_lab.java_smt.basicimpl.Generator;
 
 /**
  * Abstract base class with helpful utilities for writing tests that use an SMT solver. It
@@ -193,18 +192,17 @@ public abstract class SolverBasedTest0 {
   /** Skip test if the solver does not support Booleans in UFs. */
   protected final void requireBooleanUFs() {
     assume()
-        .withMessage("Solver %s does not support making UFs with Boolean return values",
-            solverToUse())
+        .withMessage(
+            "Solver %s does not support making UFs with Boolean return values", solverToUse())
         .that(solverToUse())
         .isNotEqualTo(Solvers.MATHSAT5);
   }
 
-
   /** Skip test if the solver does not support Booleans as arguments in Arrays. */
   protected final void requireBooleanArgumentArrays() {
     assume()
-        .withMessage("Solver %s does not support making Arrays with Bool as arguments",
-            solverToUse())
+        .withMessage(
+            "Solver %s does not support making Arrays with Bool as arguments", solverToUse())
         .that(solverToUse())
         .isNoneOf(Solvers.MATHSAT5, Solvers.SMTINTERPOL);
   }
@@ -212,18 +210,17 @@ public abstract class SolverBasedTest0 {
   /** Skip test if the solver does not support any other sort than bitvector in Arrays. */
   protected final void requireAllSortArrays() {
     assume()
-        .withMessage("Solver %s does not support making Arrays with sorts other than bitvectors",
+        .withMessage(
+            "Solver %s does not support making Arrays with sorts other than bitvectors",
             solverToUse())
         .that(solverToUse())
         .isNotEqualTo(Solvers.BOOLECTOR);
   }
 
-
   /** Skip test if the solver does not support UFs without arguments. */
   protected final void requireNoArgumentsInUFs() {
     assume()
-        .withMessage("Solver %s does not support making UFs without input Arguments",
-            solverToUse())
+        .withMessage("Solver %s does not support making UFs without input Arguments", solverToUse())
         .that(solverToUse())
         .isNotEqualTo(Solvers.BOOLECTOR);
   }

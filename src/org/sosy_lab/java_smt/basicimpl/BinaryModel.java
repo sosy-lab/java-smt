@@ -40,9 +40,9 @@ import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.UFManager;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Visitor;
-import org.sosy_lab.java_smt.solvers.princess.PrincessEnvironment;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Lexer;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser;
+import org.sosy_lab.java_smt.solvers.princess.PrincessEnvironment;
 
 /**
  * Generates a model by executing Princess with the contents of "Out.smt2" as input and parsing

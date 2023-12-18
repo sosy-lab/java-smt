@@ -1,5 +1,0 @@
-(declare-const a Bool)
-(define-fun test () Bool (let ((a (+ 1 2)) (b (- 3 4)) ) (= a b)))
-(assert (= a (and test true)))
-(check-sat)
-(get-model)

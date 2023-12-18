@@ -37,12 +37,12 @@ import org.sosy_lab.java_smt.api.NumeralFormulaManager;
  */
 @SuppressWarnings("ClassTypeParameterName")
 public abstract class AbstractNumeralFormulaManager<
-    TFormulaInfo,
-    TType,
-    TEnv,
-    ParamFormulaType extends NumeralFormula,
-    ResultFormulaType extends NumeralFormula,
-    TFuncDecl>
+        TFormulaInfo,
+        TType,
+        TEnv,
+        ParamFormulaType extends NumeralFormula,
+        ResultFormulaType extends NumeralFormula,
+        TFuncDecl>
     extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     implements NumeralFormulaManager<ParamFormulaType, ResultFormulaType> {
 

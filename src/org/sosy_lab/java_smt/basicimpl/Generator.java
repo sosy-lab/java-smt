@@ -70,7 +70,7 @@ public class Generator {
 
     try {
       try (Writer fileWriter =
-               Files.newBufferedWriter(Paths.get(fileName), Charset.defaultCharset())) {
+          Files.newBufferedWriter(Paths.get(fileName), Charset.defaultCharset())) {
         fileWriter.write(line);
         fileWriter.flush();
       }

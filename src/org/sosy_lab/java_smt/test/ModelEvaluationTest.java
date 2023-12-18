@@ -157,8 +157,7 @@ public class ModelEvaluationTest extends SolverBasedTest0.ParameterizedSolverBas
   }
 
   @Test
-  public void testModelGeneration()
-      throws SolverException, InterruptedException, IOException {
+  public void testModelGeneration() throws SolverException, InterruptedException, IOException {
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(bmgr.and(getConstraints()));
       for (int i = 0; i < problemSize; i++) {
@@ -171,8 +170,7 @@ public class ModelEvaluationTest extends SolverBasedTest0.ParameterizedSolverBas
   }
 
   @Test
-  public void testEvaluatorGeneration()
-      throws SolverException, InterruptedException {
+  public void testEvaluatorGeneration() throws SolverException, InterruptedException {
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(bmgr.and(getConstraints()));
 

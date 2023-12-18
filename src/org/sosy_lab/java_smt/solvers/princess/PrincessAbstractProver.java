@@ -38,9 +38,9 @@ import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
+import org.sosy_lab.java_smt.basicimpl.BinaryModel;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import org.sosy_lab.java_smt.basicimpl.Generator;
-import org.sosy_lab.java_smt.basicimpl.BinaryModel;
 import scala.Enumeration.Value;
 
 @SuppressWarnings("ClassTypeParameterName")

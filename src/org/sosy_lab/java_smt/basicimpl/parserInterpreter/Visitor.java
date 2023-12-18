@@ -72,7 +72,6 @@ import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Term_spe
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Var_bindingContext;
 import scala.Tuple2;
 
-
 /**
  * Implements a method from smtlibv2BaseVisitor for each node in a parse tree that requires some
  * form of action in order to transform the parsed SMT-LIB2 into JavaSMT
@@ -1043,12 +1042,12 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
                       .makeArray(
                           "(as const (Array "
                               + getArrayStrings(
-                              ((FormulaType.ArrayFormulaType<?, ?>)
-                                  Objects.requireNonNull(sort))
-                                  .getIndexType())
+                                  ((FormulaType.ArrayFormulaType<?, ?>)
+                                          Objects.requireNonNull(sort))
+                                      .getIndexType())
                               + " "
                               + getArrayStrings(
-                              ((FormulaType.ArrayFormulaType<?, ?>) sort).getElementType())
+                                  ((FormulaType.ArrayFormulaType<?, ?>) sort).getElementType())
                               + ") "
                               + operands.get(0)
                               + ")",

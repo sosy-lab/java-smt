@@ -86,9 +86,7 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
   @Test
   public void testMakeBitVectorWithIntegerFormulas() {
     requireBitvectors();
-    assume()
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.Z3);
+    assume().that(solverToUse()).isNotEqualTo(Solvers.Z3);
     requireIntegers();
     requireBitvectorToInt();
     clearGenerator();

@@ -46,10 +46,10 @@ import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Visitor;
-import org.sosy_lab.java_smt.basicimpl.tactics.NNFVisitor;
-import org.sosy_lab.java_smt.utils.SolverUtils;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Lexer;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser;
+import org.sosy_lab.java_smt.basicimpl.tactics.NNFVisitor;
+import org.sosy_lab.java_smt.utils.SolverUtils;
 
 /**
  * Simplifies building a solver from the specific theories.
@@ -171,9 +171,9 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
             && functionManager.getFormulaCreator() == formulaCreator
             && !(bitvectorManager != null && bitvectorManager.getFormulaCreator() != formulaCreator)
             && !(floatingPointManager != null
-            && floatingPointManager.getFormulaCreator() != formulaCreator)
+                && floatingPointManager.getFormulaCreator() != formulaCreator)
             && !(quantifiedManager != null
-            && quantifiedManager.getFormulaCreator() != formulaCreator),
+                && quantifiedManager.getFormulaCreator() != formulaCreator),
         "The creator instances must match across the managers!");
   }
 
@@ -261,13 +261,13 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
 
   @Override
   public AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
-  getBooleanFormulaManager() {
+      getBooleanFormulaManager() {
     return booleanManager;
   }
 
   @Override
   public AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
-  getBitvectorFormulaManager() {
+      getBitvectorFormulaManager() {
     if (bitvectorManager == null) {
       throw new UnsupportedOperationException("Solver does not support bitvector theory");
     }
@@ -297,7 +297,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
 
   @Override
   public AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
-  getQuantifiedFormulaManager() {
+      getQuantifiedFormulaManager() {
     if (quantifiedManager == null) {
       throw new UnsupportedOperationException("Solver does not support quantification");
     }
