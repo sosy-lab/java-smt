@@ -40,7 +40,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import org.sosy_lab.java_smt.basicimpl.Generator;
-import org.sosy_lab.java_smt.basicimpl.UniversalModel;
+import org.sosy_lab.java_smt.basicimpl.BinaryModel;
 import scala.Enumeration.Value;
 
 @SuppressWarnings("ClassTypeParameterName")
@@ -57,7 +57,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   private final PrincessFormulaCreator creator;
   protected boolean wasLastSatCheckSat = false; // and stack is not changed
 
-  private final UniversalModel binaryModel;
+  private final BinaryModel binaryModel;
 
   protected PrincessAbstractProver(
       PrincessFormulaManager pMgr,
@@ -72,7 +72,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
 
     trackingStack.push(new Level());
     partitions.push(PathCopyingPersistentTreeMap.of());
-    binaryModel = new UniversalModel(this, mgr);
+    binaryModel = new BinaryModel(this, mgr);
   }
 
   /**

@@ -43,8 +43,11 @@ import org.sosy_lab.java_smt.solvers.princess.PrincessEnvironment;
 import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Lexer;
 import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Parser;
 
-public class UniversalModel extends AbstractModel<IExpression, Sort, PrincessEnvironment> {
-
+/**
+ * Generates a model by executing Princess with the contents of "Out.smt2" as input and parsing
+ * Princess' output model from the file "Model.smt2" back to JavaSMT.
+ */
+public class BinaryModel extends AbstractModel<IExpression, Sort, PrincessEnvironment> {
   private final String filePath = System.getProperty("user.dir");
 
   AbstractFormulaManager<IExpression, Sort, PrincessEnvironment, ?> fmgr;
@@ -56,10 +59,13 @@ public class UniversalModel extends AbstractModel<IExpression, Sort, PrincessEnv
   private final UFManager umgr;
 
   private List<ValueAssignment> assignments;
-  private ImmutableList<ValueAssignment> finalList;
+
+  /** Model.ValuesAssignments for the parsed Princess model */
+  public ImmutableList<ValueAssignment> finalList;
+
   private boolean isUnsat;
 
-  public UniversalModel(
+  public BinaryModel(
       AbstractProver<?> prover,
       AbstractFormulaManager<IExpression, Sort, PrincessEnvironment, ?> pFormulaManager) {
     super(prover, pFormulaManager);
@@ -83,58 +89,51 @@ public class UniversalModel extends AbstractModel<IExpression, Sort, PrincessEnv
     return immutableList;
   }
 
+  /**
+   * generates an SMT-LIB2 model from Princess and writes it into a file "Model.smt2"
+   *
+   * @throws IOException if writing to file fails
+   */
   public void getOutput() throws IOException {
 
-    String fileName =
-        "/princess_all-2023-06-19.jar";
+    String fileName = "/princess_all-2023-06-19.jar";
     String princessJar = filePath + fileName;
-    // does it work?
     new File(princessJar).setExecutable(true);
 
     Process process =
-        Runtime.getRuntime().exec("java -jar " + princessJar + " +incremental " + filePath +
-            "/Out.smt2");
+        Runtime.getRuntime()
+            .exec("java -jar " + princessJar + " +incremental " + filePath + "/Out.smt2");
 
     StringBuilder output = new StringBuilder();
-      try (InputStream is = process.getInputStream()) {
-        try {
-          process.waitFor();
-        } catch (InterruptedException pE) {
-          throw new RuntimeException(pE);
-        }
-        try (InputStreamReader isr = new InputStreamReader(is, Charset.defaultCharset())) {
-          try (BufferedReader br = new BufferedReader(isr)) {
-            String lines;
-            while ((lines = br.readLine()) != null) {
-              output.append(lines).append("\n");
-            }
-            if (String.valueOf(output).startsWith("un")) {
-              isUnsat = true;
-              output.delete(0, 5);
-            } else {
-              isUnsat = false;
-              output.delete(0, 3);
-            }
-            Generator.writeToFile(String.valueOf(output), (filePath + "/Model.smt2"));
+    try (InputStream is = process.getInputStream()) {
+      try {
+        process.waitFor();
+      } catch (InterruptedException pE) {
+        throw new RuntimeException(pE);
+      }
+      try (InputStreamReader isr = new InputStreamReader(is, Charset.defaultCharset())) {
+        try (BufferedReader br = new BufferedReader(isr)) {
+          String lines;
+          while ((lines = br.readLine()) != null) {
+            output.append(lines).append("\n");
           }
+          if (String.valueOf(output).startsWith("un")) {
+            isUnsat = true;
+            output.delete(0, 5);
+          } else {
+            isUnsat = false;
+            output.delete(0, 3);
+          }
+          Generator.writeToFile(String.valueOf(output), (filePath + "/Model.smt2"));
         }
       }
     }
+  }
 
-
-  public List<ValueAssignment> parseModel(String pString) throws IOException {
+  private List<ValueAssignment> parseModel(String pString) throws IOException {
     smtlibv2Lexer lexer = new smtlibv2Lexer(CharStreams.fromFileName(pString));
     smtlibv2Parser parser = new smtlibv2Parser(new CommonTokenStream(lexer));
     Visitor visitor = new Visitor(formulaManager, bmgr, imgr, null, bvmgr, amgr, umgr);
-    visitor.visit(parser.start());
-    assignments = visitor.getAssignments();
-    return assignments;
-  }
-
-  public List<ValueAssignment> parseModelFromString(String pString) {
-    smtlibv2Lexer lexer = new smtlibv2Lexer(CharStreams.fromString(pString));
-    smtlibv2Parser parser = new smtlibv2Parser(new CommonTokenStream(lexer));
-    Visitor visitor = new Visitor(fmgr, bmgr, imgr, null, bvmgr, amgr, umgr);
     visitor.visit(parser.start());
     assignments = visitor.getAssignments();
     return assignments;
@@ -156,9 +155,7 @@ public class UniversalModel extends AbstractModel<IExpression, Sort, PrincessEnv
     return finalList;
   }
 
-  public UniversalModel getModel()
-      throws IOException,
-          ModelException {
+  public BinaryModel getModel() throws IOException, ModelException {
     getAssignments();
     return this;
   }
