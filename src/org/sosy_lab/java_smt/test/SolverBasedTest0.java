@@ -136,7 +136,6 @@ public abstract class SolverBasedTest0 {
           .isNotInstanceOf(UnsatisfiedLinkError.class);
       throw e;
     }
-    Generator.setIsLoggingEnabled(true);
     mgr = context.getFormulaManager();
 
     fmgr = mgr.getUFManager();

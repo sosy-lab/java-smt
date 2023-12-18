@@ -55,6 +55,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
 
   /** Z3 runs only when executed separately from other solvers */
   public void clearVisitor() {
+    Generator.setIsLoggingEnabled(true);
     Visitor.variables.clear();
     Visitor.letVariables.clear();
     Visitor.constraints.clear();

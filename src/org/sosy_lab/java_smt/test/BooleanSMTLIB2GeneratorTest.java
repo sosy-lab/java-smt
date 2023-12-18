@@ -27,6 +27,7 @@ import org.sosy_lab.java_smt.basicimpl.Generator;
 public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   public void clearGenerator() {
+    Generator.setIsLoggingEnabled(true);
     Generator.lines.delete(0, Generator.lines.length());
     Generator.registeredVariables.clear();
     Generator.executedAggregator.clear();

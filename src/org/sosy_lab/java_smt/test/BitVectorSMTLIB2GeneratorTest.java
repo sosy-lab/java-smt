@@ -39,6 +39,7 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
    * only when executed separately from other solvers
    */
   public void clearGenerator() {
+    Generator.setIsLoggingEnabled(true);
     Generator.lines.delete(0, Generator.lines.length());
     Generator.registeredVariables.clear();
     Generator.executedAggregator.clear();

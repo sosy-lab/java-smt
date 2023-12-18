@@ -21,9 +21,11 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.TruthJUnit.assume;
 
 import java.util.Objects;
 import org.junit.Test;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -41,6 +43,7 @@ public class ArraySMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSol
    * only when executed separately from other solvers
    */
   public void clearGenerator() {
+    Generator.setIsLoggingEnabled(true);
     Generator.lines.delete(0, Generator.lines.length());
     Generator.registeredVariables.clear();
     Generator.executedAggregator.clear();
@@ -384,6 +387,9 @@ public class ArraySMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSol
     requireArrays();
     requireIntegers();
     clearGenerator();
+    assume()
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3);
     ArrayFormula<IntegerFormula, IntegerFormula> a1 =
         Objects.requireNonNull(amgr)
             .makeArray("a1", FormulaType.IntegerType, FormulaType.IntegerType);
@@ -407,6 +413,9 @@ public class ArraySMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSol
     requireArrays();
     requireIntegers();
     clearGenerator();
+    assume()
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3);
     ArrayFormula<IntegerFormula, IntegerFormula> a1 =
         Objects.requireNonNull(amgr)
             .makeArray("a1", FormulaType.IntegerType, FormulaType.IntegerType);

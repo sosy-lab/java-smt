@@ -38,6 +38,7 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
   /** Z3 runs only when executed separately from other solvers */
   public void clearGenerator() {
+    Generator.setIsLoggingEnabled(true);
     Generator.lines.delete(0, Generator.lines.length());
     Generator.registeredVariables.clear();
     Generator.executedAggregator.clear();

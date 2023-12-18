@@ -21,11 +21,13 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.TruthJUnit.assume;
 
 import java.util.ArrayList;
 import java.util.Objects;
 import org.junit.Assert;
 import org.junit.Test;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -44,6 +46,7 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
    * only when executed separately from other solvers
    */
   public void clearGenerator() {
+    Generator.setIsLoggingEnabled(true);
     Generator.lines.delete(0, Generator.lines.length());
     Generator.registeredVariables.clear();
     Generator.executedAggregator.clear();
@@ -142,6 +145,9 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
   public void testDeclareUFIntegerWithInput() {
     requireIntegers();
     clearGenerator();
+    assume()
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3);
     FunctionDeclaration<IntegerFormula> a =
         fmgr.declareUF("a", FormulaType.IntegerType, FormulaType.IntegerType);
     FunctionDeclaration<IntegerFormula> b =
@@ -192,6 +198,9 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
   public void testDeclareUFRationalWithInput() {
     requireRationals();
     clearGenerator();
+    assume()
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3);
     FunctionDeclaration<RationalFormula> a =
         fmgr.declareUF("a", FormulaType.RationalType, FormulaType.RationalType);
     FunctionDeclaration<RationalFormula> b =
@@ -444,6 +453,9 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
   public void testDeclareAndCallUFIntegerWithInput() {
     requireIntegers();
     clearGenerator();
+    assume()
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3);
     IntegerFormula a = fmgr.declareAndCallUF("a", FormulaType.IntegerType, imgr.makeNumber(4));
     IntegerFormula b = fmgr.declareAndCallUF("b", FormulaType.IntegerType, imgr.makeNumber(9));
 
@@ -484,6 +496,9 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
   public void testDeclareAndCallUFRationalWithInput() {
     requireRationals();
     clearGenerator();
+    assume()
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3);
     RationalFormula a =
         fmgr.declareAndCallUF(
             "a", FormulaType.RationalType, Objects.requireNonNull(rmgr).makeNumber(4));

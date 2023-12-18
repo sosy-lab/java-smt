@@ -55,11 +55,11 @@ public class SolverContextFactory {
     Z3,
     SMTINTERPOL,
     PRINCESS,
-    PRINCESS_BINARY,
     BOOLECTOR,
     CVC4,
     CVC5,
-    YICES2
+    YICES2,
+    PRINCESS_BINARY
   }
 
   @Option(secure = true, description = "Export solver queries in SmtLib format into a file.")
