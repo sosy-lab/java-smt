@@ -20,7 +20,7 @@
 
 // Generated from
 // /home/janel/Desktop/Studium/Semester_6/Bachelorarbeit/nochmalneu/src/org/sosy_lab/java_smt/utils/Parsers/smtlibv2.g4 by ANTLR 4.13.1
-package org.sosy_lab.java_smt.utils.parserUtils;
+package org.sosy_lab.java_smt.basicimpl.parserInterpreter;
 
 import java.io.IOException;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;

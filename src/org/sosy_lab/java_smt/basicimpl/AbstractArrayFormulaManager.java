@@ -75,12 +75,12 @@ public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFu
 
   @Override
   public <
-          TI extends Formula,
-          TE extends Formula,
-          FTI extends FormulaType<TI>,
-          FTE extends FormulaType<TE>>
-      ArrayFormula<TI, TE> makeArray(String pName, FTI pIndexType, FTE pElementType)
-          throws GeneratorException {
+      TI extends Formula,
+      TE extends Formula,
+      FTI extends FormulaType<TI>,
+      FTE extends FormulaType<TE>>
+  ArrayFormula<TI, TE> makeArray(String pName, FTI pIndexType, FTE pElementType)
+      throws GeneratorException {
     checkVariableName(pName);
     final TFormulaInfo namedArrayFormula = internalMakeArray(pName, pIndexType, pElementType);
     ArrayFormula<TI, TE> result =

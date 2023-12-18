@@ -156,9 +156,9 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
       TFormulaInfo pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
     assert getFormulaType(pTerm).equals(FormulaType.getArrayType(pIndexType, pElementType))
         : "Expected: "
-            + getFormulaType(pTerm)
-            + " but found: "
-            + FormulaType.getArrayType(pIndexType, pElementType);
+        + getFormulaType(pTerm)
+        + " but found: "
+        + FormulaType.getArrayType(pIndexType, pElementType);
 
     return new ArrayFormulaImpl<>(pTerm, pIndexType, pElementType);
   }
@@ -186,8 +186,8 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
   public <T extends Formula> T encapsulate(FormulaType<T> pType, TFormulaInfo pTerm) {
     assert pType.equals(getFormulaType(pTerm))
         : String.format(
-            "Trying to encapsulate formula %s of type %s as %s",
-            pTerm, getFormulaType(pTerm), pType);
+        "Trying to encapsulate formula %s of type %s as %s",
+        pTerm, getFormulaType(pTerm), pType);
     if (pType.isBooleanType()) {
       return (T) new BooleanFormulaImpl<>(pTerm);
     } else if (pType.isIntegerType()) {

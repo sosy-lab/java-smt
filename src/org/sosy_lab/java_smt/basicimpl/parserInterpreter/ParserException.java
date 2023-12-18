@@ -18,7 +18,7 @@
  *  limitations under the License.
  */
 
-package org.sosy_lab.java_smt.basicimpl;
+package org.sosy_lab.java_smt.basicimpl.parserInterpreter;
 
 /** Exception thrown if there is an error during Generating SMTLIB2. */
 public class ParserException extends RuntimeException {

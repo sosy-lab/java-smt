@@ -45,10 +45,11 @@ import org.sosy_lab.java_smt.api.Tactic;
 import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Visitor;
 import org.sosy_lab.java_smt.basicimpl.tactics.NNFVisitor;
 import org.sosy_lab.java_smt.utils.SolverUtils;
-import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Lexer;
-import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Parser;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Lexer;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser;
 
 /**
  * Simplifies building a solver from the specific theories.
@@ -170,9 +171,9 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
             && functionManager.getFormulaCreator() == formulaCreator
             && !(bitvectorManager != null && bitvectorManager.getFormulaCreator() != formulaCreator)
             && !(floatingPointManager != null
-                && floatingPointManager.getFormulaCreator() != formulaCreator)
+            && floatingPointManager.getFormulaCreator() != formulaCreator)
             && !(quantifiedManager != null
-                && quantifiedManager.getFormulaCreator() != formulaCreator),
+            && quantifiedManager.getFormulaCreator() != formulaCreator),
         "The creator instances must match across the managers!");
   }
 
@@ -180,6 +181,13 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     return formulaCreator;
   }
 
+  /**
+   * Parses an SMT-LIB2 file and translates it into an equivalent BooleanFormula constraint
+   *
+   * @param pString name of the file that contains the SMT-LIB2
+   * @return BooleanFormula equivalent to the SMT-LIB2 in file
+   * @throws IOException if file can't be read
+   */
   @Override
   public BooleanFormula universalParse(String pString) throws IOException {
     smtlibv2Lexer lexer = new smtlibv2Lexer(CharStreams.fromFileName(pString));
@@ -199,6 +207,12 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     return this.booleanManager.and(constraints);
   }
 
+  /**
+   * Parses an SMT-LIB2 String and translates it into an equivalent BooleanFormula constraint
+   *
+   * @param pString SMT-LIB2 formula as String that will be parsed
+   * @return BooleanFormula equivalent to the SMT-LIB2 string
+   */
   @Override
   public BooleanFormula universalParseFromString(String pString) {
     smtlibv2Lexer lexer = new smtlibv2Lexer(CharStreams.fromString(pString));
@@ -216,6 +230,17 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     List<BooleanFormula> constraints = visitor.getConstraints();
 
     return this.booleanManager.and(constraints);
+  }
+
+  /**
+   * Calls the dumpSMTLIB2 method from the Generator, which will write the assembled SMT-LIB2 to a
+   * file 'Out.smt2'
+   *
+   * @throws IOException if writing to file fails
+   */
+  @Override
+  public void dumpSMTLIB2() throws IOException {
+    Generator.dumpSMTLIB2();
   }
 
   @Override
@@ -236,13 +261,13 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
 
   @Override
   public AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
-      getBooleanFormulaManager() {
+  getBooleanFormulaManager() {
     return booleanManager;
   }
 
   @Override
   public AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
-      getBitvectorFormulaManager() {
+  getBitvectorFormulaManager() {
     if (bitvectorManager == null) {
       throw new UnsupportedOperationException("Solver does not support bitvector theory");
     }
@@ -272,7 +297,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
 
   @Override
   public AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
-      getQuantifiedFormulaManager() {
+  getQuantifiedFormulaManager() {
     if (quantifiedManager == null) {
       throw new UnsupportedOperationException("Solver does not support quantification");
     }
@@ -563,7 +588,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
         help);
     Preconditions.checkArgument(
         !SMTLIB2_KEYWORDS.contains(variableName),
-        "Identifier '%s' can not be used, because it is a keyword of SMT-LIB2. %s",
+        "Identifier '%s' can not be used, because it is a expressionType of SMT-LIB2. %s",
         variableName,
         help);
     Preconditions.checkArgument(

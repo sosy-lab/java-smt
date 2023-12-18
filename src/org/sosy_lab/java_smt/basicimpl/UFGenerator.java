@@ -87,7 +87,15 @@ public class UFGenerator {
     inputParams.add(pName);
     inputParams.add(pReturnType);
     inputParams.add(pArgTypes);
-    Function<List<Object>, String> functionToString = inPlaceInputParams -> "(declare-fun " + inPlaceInputParams.get(0) + " (" + inPlaceInputParams.get(1) + ")" + inPlaceInputParams.get(2) + ")";
+    Function<List<Object>, String> functionToString =
+        inPlaceInputParams ->
+            "(declare-fun "
+                + inPlaceInputParams.get(0)
+                + " ("
+                + inPlaceInputParams.get(1)
+                + ")"
+                + inPlaceInputParams.get(2)
+                + ")";
     Generator.executedAggregator.add(
         new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }

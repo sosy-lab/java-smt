@@ -18,7 +18,7 @@
  *  limitations under the License.
  */
 
-package org.sosy_lab.java_smt.basicimpl;
+package org.sosy_lab.java_smt.basicimpl.parserInterpreter;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
@@ -49,47 +49,52 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.UFManager;
-import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2BaseVisitor;
-import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Parser.Cmd_assertContext;
-import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Parser.Cmd_declareConstContext;
-import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Parser.Cmd_declareFunContext;
-import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Parser.Cmd_popContext;
-import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Parser.Cmd_pushContext;
-import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Parser.Decl_sortContext;
-import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Parser.ErrorContext;
-import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Parser.Function_defContext;
-import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Parser.Id_symbContext;
-import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Parser.Id_symb_idxContext;
-import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Parser.MultisortContext;
-import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Parser.MultitermContext;
-import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Parser.Qual_id_sortContext;
-import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Parser.Resp_get_modelContext;
-import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Parser.Sort_idContext;
-import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Parser.Sort_symbol_declContext;
-import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Parser.Spec_constant_binContext;
-import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Parser.Term_exclamContext;
-import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Parser.Term_existsContext;
-import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Parser.Term_forallContext;
-import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Parser.Term_letContext;
-import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Parser.Term_qual_idContext;
-import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Parser.Term_spec_constContext;
-import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Parser.Theory_attrContext;
-import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Parser.Theory_defContext;
-import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Parser.Theory_funContext;
-import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Parser.Theory_fun_descrContext;
-import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Parser.Theory_notesContext;
-import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Parser.Theory_sortContext;
-import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Parser.Theory_sort_descrContext;
-import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Parser.Theory_valContext;
-import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Parser.Var_bindingContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Cmd_assertContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Cmd_declareConstContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Cmd_declareFunContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Cmd_popContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Cmd_pushContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Decl_sortContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Function_defContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Id_symbContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Id_symb_idxContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.MultisortContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.MultitermContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Qual_id_sortContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Resp_get_modelContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Sort_idContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Term_exclamContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Term_existsContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Term_forallContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Term_letContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Term_qual_idContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Term_spec_constContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Var_bindingContext;
 import scala.Tuple2;
 
+
+/**
+ * Implements a method from smtlibv2BaseVisitor for each node in a parse tree that requires some
+ * form of action in order to transform the parsed SMT-LIB2 into JavaSMT
+ */
 @SuppressWarnings({"CheckReturnValue", "unchecked"})
 public class Visitor extends smtlibv2BaseVisitor<Object> {
 
+  /**
+   * saves all created Formulas that are not part of a let statement as ParserFormula objects with
+   * their variable name or value as key
+   */
   public static final HashMap<String, ParserFormula> variables = new HashMap<>();
+
+  /**
+   * saves all created Formulas that are part of a let statement as ParserFormula objects with their
+   * variable name or value as key
+   */
   public static final HashMap<String, ParserFormula> letVariables = new HashMap<>();
+
+  /** saves each 'assert' statement interpreted as a BooleanFormula object as an entry */
   public static final List<BooleanFormula> constraints = new ArrayList<>();
+
   private final FormulaManager fmgr;
   private final BooleanFormulaManager bmgr;
   private final @Nullable IntegerFormulaManager imgr;
@@ -107,6 +112,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     return assignments;
   }
 
+  /** is set to 'true' if a node 'model' is encountered */
   private boolean isModel = false;
 
   public Visitor(
@@ -124,16 +130,6 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     this.bimgr = bimgr;
     this.amgr = amgr;
     this.umgr = umgr;
-  }
-
-  public boolean isModel() {
-    return isModel;
-  }
-
-  @Override
-  public String visitSpec_constant_bin(Spec_constant_binContext ctx) {
-    String binary = ctx.getText();
-    return binary;
   }
 
   @Override
@@ -280,13 +276,11 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
       return variables.get(operand).javaSmt;
     } else if (getNumericType(operand).equals("Integer")
         || getNumericType(operand).equals("Long")) {
-      variables.put(
-          operand, new ParserFormula(Objects.requireNonNull(imgr).makeNumber(operand)));
+      variables.put(operand, new ParserFormula(Objects.requireNonNull(imgr).makeNumber(operand)));
       return variables.get(operand).javaSmt;
     } else if (getNumericType(operand).equals("Double")
         || getNumericType(operand).equals("Float")) {
-      variables.put(
-          operand, new ParserFormula(Objects.requireNonNull(rmgr).makeNumber(operand)));
+      variables.put(operand, new ParserFormula(Objects.requireNonNull(rmgr).makeNumber(operand)));
       return variables.get(operand).javaSmt;
     } else if (operand.startsWith("#b")) {
       String binVal = Iterables.get(Splitter.on('b').split(operand), 1);
@@ -305,21 +299,21 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
 
   @Override
   public Object visitTerm_qual_id(Term_qual_idContext ctx) {
-    String operand = replaceEscapeChars(ctx.getText());
+    String operand = replaceReservedChars(ctx.getText());
     List<String> bitVec = (List<String>) visitChildren(ctx);
     if (letVariables.containsKey(operand)) {
-      if (!(letVariables.get(operand).type == null) && Objects.equals(
-          letVariables.get(operand).type, "UF")
+      if (!(letVariables.get(operand).type == null)
+          && Objects.equals(letVariables.get(operand).type, "UF")
           && letVariables.get(operand).inputParams == null) {
         return umgr.callUF(
             (FunctionDeclaration<Formula>) letVariables.get(operand).javaSmt, new ArrayList<>());
       }
       return letVariables.get(operand).javaSmt;
     } else if (variables.containsKey(operand)) {
-      if (!(variables.get(operand).type == null) && Objects.equals(variables.get(operand).type,
-          "UF")
-          && !(variables.get(operand).inputParams == null) && Objects.requireNonNull(
-          variables.get(operand).inputParams).isEmpty()) {
+      if (!(variables.get(operand).type == null)
+          && Objects.equals(variables.get(operand).type, "UF")
+          && !(variables.get(operand).inputParams == null)
+          && Objects.requireNonNull(variables.get(operand).inputParams).isEmpty()) {
         return umgr.callUF(
             (FunctionDeclaration<Formula>) variables.get(operand).javaSmt, new ArrayList<>());
       }
@@ -339,11 +333,16 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     }
   }
 
+  /**
+   * gets the operands used in a nested term
+   *
+   * @param ctx current MultitermContext
+   * @param operands List of the operands transformed to Formula objects
+   */
   public void getOperands(MultitermContext ctx, List<Formula> operands) {
 
     for (int i = 0; i < ctx.term().size(); ++i) {
       Object operand = visit(ctx.term(i));
-      // do not add multi term to list of operands
       if (operand != null) {
         operands.add((Formula) operand);
       }
@@ -363,7 +362,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
       operator = ((Tuple2<String, FormulaType<?>>) identifier)._1;
       sort = ((Tuple2<String, FormulaType<?>>) identifier)._2;
     }
-    operator = replaceEscapeChars(operator);
+    operator = replaceReservedChars(operator);
 
     Object ufOperator = null;
     if (variables.containsKey(operator)) {
@@ -374,7 +373,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     List<Formula> operands = new ArrayList<>();
     getOperands(ctx, operands);
     switch (operator) {
-        // boolean operators
+      // boolean operators
       case "and":
         try {
           List<BooleanFormula> booleanOperands =
@@ -1024,11 +1023,11 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
       case "store":
         if (operands.size() == 3) {
           try {
-          return Objects.requireNonNull(amgr)
-              .store(
-                  (ArrayFormula<Formula, Formula>) operands.get(0),
-                  operands.get(1),
-                  operands.get(2));
+            return Objects.requireNonNull(amgr)
+                .store(
+                    (ArrayFormula<Formula, Formula>) operands.get(0),
+                    operands.get(1),
+                    operands.get(2));
           } catch (Exception e) {
             throw new ParserException("Operands for " + operator + " need to be of Array type");
           }
@@ -1044,12 +1043,12 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
                       .makeArray(
                           "(as const (Array "
                               + getArrayStrings(
-                                  ((FormulaType.ArrayFormulaType<?, ?>)
-                                          Objects.requireNonNull(sort))
-                                      .getIndexType())
+                              ((FormulaType.ArrayFormulaType<?, ?>)
+                                  Objects.requireNonNull(sort))
+                                  .getIndexType())
                               + " "
                               + getArrayStrings(
-                                  ((FormulaType.ArrayFormulaType<?, ?>) sort).getElementType())
+                              ((FormulaType.ArrayFormulaType<?, ?>) sort).getElementType())
                               + ") "
                               + operands.get(0)
                               + ")",
@@ -1138,53 +1137,8 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
   }
 
   @Override
-  public Object visitSort_symbol_decl(Sort_symbol_declContext ctx) {
-    throw new ParserException("Parser does not support Attributed Expressions");
-  }
-
-  @Override
-  public Object visitTheory_sort(Theory_sortContext ctx) {
-    throw new ParserException("Parser does not support Theory Attributes");
-  }
-
-  @Override
-  public Object visitTheory_fun(Theory_funContext ctx) {
-    throw new ParserException("Parser does not support Theory Attributes");
-  }
-
-  @Override
-  public Object visitTheory_sort_descr(Theory_sort_descrContext ctx) {
-    throw new ParserException("Parser does not support Theory Attributes");
-  }
-
-  @Override
-  public Object visitTheory_fun_descr(Theory_fun_descrContext ctx) {
-    throw new ParserException("Parser does not support Theory Attributes");
-  }
-
-  @Override
-  public Object visitTheory_def(Theory_defContext ctx) {
-    throw new ParserException("Parser does not support Theory Attributes");
-  }
-
-  @Override
-  public Object visitTheory_val(Theory_valContext ctx) {
-    throw new ParserException("Parser does not support Theory Attributes");
-  }
-
-  @Override
-  public Object visitTheory_notes(Theory_notesContext ctx) {
-    throw new ParserException("Parser does not support Theory Attributes");
-  }
-
-  @Override
-  public Object visitTheory_attr(Theory_attrContext ctx) {
-    throw new ParserException("Parser does not support Theory Attributes");
-  }
-
-  @Override
   public Object visitFunction_def(Function_defContext ctx) {
-    String variable = replaceEscapeChars(ctx.symbol().getText());
+    String variable = replaceReservedChars(ctx.symbol().getText());
 
     List<FormulaType<?>> javaSorts;
     List<Formula> inputParams = new ArrayList<>();
@@ -1204,7 +1158,6 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     Formula key;
     Formula input = (Formula) visit(ctx.term());
     if (!inputParams.isEmpty()) {
-
       ParserFormula temp = new ParserFormula(umgr.declareUF(variable, returnTypes, javaSorts));
       temp.setType("UF");
       temp.setReturnType(returnTypes);
@@ -1218,14 +1171,10 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
       key = mapKey(returnTypes, variable);
     }
 
-
     Formula value = input;
     variables.put(variable, new ParserFormula(input));
 
-    String keyString = key.toString();
-    if (keyString.startsWith("PIPE")) {
-      keyString = keyString.replaceAll("PIPE", "|");
-    }
+    String keyString = replaceReplacedChars(key.toString());
     String valueString = value.toString();
     if (isModel) {
       Model.ValueAssignment assignment =
@@ -1249,36 +1198,44 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
 
   @Override
   public Object visitCmd_declareConst(Cmd_declareConstContext ctx) {
-    String variable = ctx.symbol().getText();
-    FormulaType<?> sorts = (FormulaType<?>) visit(ctx.sort());
+    String variableSymbol = ctx.symbol().getText();
+    FormulaType<?> sort = (FormulaType<?>) visit(ctx.sort());
 
-    if (sorts.isBooleanType()) {
-      variables.put(variable, new ParserFormula(bmgr.makeVariable(variable)));
-    } else if (sorts.isIntegerType()) {
+    if (sort.isBooleanType()) {
+      variables.put(variableSymbol, new ParserFormula(bmgr.makeVariable(variableSymbol)));
+    } else if (sort.isIntegerType()) {
       variables.put(
-          variable, new ParserFormula(Objects.requireNonNull(imgr).makeVariable(variable)));
-    } else if (sorts.isRationalType()) {
+          variableSymbol,
+          new ParserFormula(Objects.requireNonNull(imgr).makeVariable(variableSymbol)));
+    } else if (sort.isRationalType()) {
       variables.put(
-          variable, new ParserFormula(Objects.requireNonNull(rmgr).makeVariable(variable)));
-    } else if (sorts.isBitvectorType()) {
+          variableSymbol,
+          new ParserFormula(Objects.requireNonNull(rmgr).makeVariable(variableSymbol)));
+    } else if (sort.isBitvectorType()) {
       variables.put(
-          variable,
+          variableSymbol,
           new ParserFormula(
               Objects.requireNonNull(bimgr)
-                  .makeVariable(((FormulaType.BitvectorType) sorts).getSize(), variable)));
-    } else if (sorts.isArrayType()) {
+                  .makeVariable(((FormulaType.BitvectorType) sort).getSize(), variableSymbol)));
+    } else if (sort.isArrayType()) {
       variables.put(
-          variable,
+          variableSymbol,
           new ParserFormula(
               Objects.requireNonNull(amgr)
                   .makeArray(
-                      variable,
-                      ((FormulaType.ArrayFormulaType<?, ?>) sorts).getIndexType(),
-                      ((FormulaType.ArrayFormulaType<?, ?>) sorts).getElementType())));
+                      variableSymbol,
+                      ((FormulaType.ArrayFormulaType<?, ?>) sort).getIndexType(),
+                      ((FormulaType.ArrayFormulaType<?, ?>) sort).getElementType())));
     }
     return visitChildren(ctx);
   }
 
+  /**
+   * maps FormulaType to the corresponding SMT-LIB2 sort for the String representation of the model
+   *
+   * @param type FormulaType that is needs to be translated to SMT-LIB2
+   * @return String representation of FormulaType in SMT-LIB2
+   */
   public static String getArrayStrings(FormulaType<?> type) {
 
     if (type.isBooleanType()) {
@@ -1299,6 +1256,14 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     }
   }
 
+  /**
+   * creates a Formula object to use as the key in ValueAssignments for model from the given
+   * FormulaType
+   *
+   * @param sorts FormulaType of the value in ValueAssignments
+   * @param variable String representation of the key in ValueAssignments
+   * @return Formula matching the given FormulaType 'sorts'
+   */
   public Formula mapKey(FormulaType<?> sorts, String variable) {
 
     if (sorts.isBooleanType()) {
@@ -1321,37 +1286,14 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     }
   }
 
-  public static FormulaType<?> mapSort(List<String> sorts) {
-    String bvSize = "";
-    String sort = "";
-    if (sorts.get(0).startsWith("(_")) {
-      bvSize = Iterables.get(Splitter.on("(_BitVec").split(sorts.get(0)), 1);
-      bvSize = Iterables.get(Splitter.on(')').split(bvSize), 0);
-      sort = "BitVec";
-    } else if (sorts.size() > 1) {
-
-      if (sorts.get(0).startsWith("Array")) {
-        sort = "Array";
-      }
-    } else {
-      sort = sorts.get(0);
-    }
-
-    switch (sort) {
-      case "Int":
-        return FormulaType.IntegerType;
-      case "Bool":
-        return FormulaType.BooleanType;
-      case "Real":
-        return FormulaType.RationalType;
-      case "BitVec":
-        return FormulaType.getBitvectorTypeWithSize(Integer.parseInt(bvSize));
-
-      default:
-        throw new ParserException("JavaSMT supports only Int, Real, BitVec and Bool for UF.");
-    }
-  }
-
+  /**
+   * Assembles a BooleanFormula for the ValueAssignment field 'formula' by applying
+   * BooleanFormulaManager.equivalence() to key Formula and value Formula
+   *
+   * @param key Variable name as Formula
+   * @param value Variable value as Formula
+   * @return Equivalence of key and value
+   */
   public BooleanFormula mapEquivalence(Formula key, Formula value) {
     if (key instanceof BooleanFormula) {
       return bmgr.equivalence((BooleanFormula) key, (BooleanFormula) value);
@@ -1370,9 +1312,34 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     }
   }
 
-  public String replaceEscapeChars(String variable) {
+  /**
+   * Checks if String contains forbidden characters and temporarily replaces them, can be undone
+   * with 'replaceReplacedChars()'.
+   *
+   * @param variable String that is checked and modified if necessary
+   * @return String with no forbidden characters
+   */
+  public String replaceReservedChars(String variable) {
     if (variable.startsWith("|")) {
       return variable.replaceAll("\\|", "PIPE");
+    } else if (variable.contains("\\")) {
+      return variable.replaceAll("\\\\", "BACKSLASH");
+    } else {
+      return variable;
+    }
+  }
+
+  /**
+   * Reverses 'replaceReservedChars'
+   *
+   * @param variable String that is checked for necessary char replacements
+   * @return modified String
+   */
+  public String replaceReplacedChars(String variable) {
+    if (variable.contains("PIPE")) {
+      return variable.replaceAll("PIPE", "|");
+    } else if (variable.contains("BACKSLASH")) {
+      return variable.replaceAll("BACKSLASH", "\\");
     } else {
       return variable;
     }
@@ -1380,9 +1347,9 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
 
   @Override
   public Object visitCmd_declareFun(Cmd_declareFunContext ctx) {
-    String variable = replaceEscapeChars(ctx.symbol().getText());
+    String variable = replaceReservedChars(ctx.symbol().getText());
 
-    FormulaType<?> returnType = (FormulaType<?>) visit(ctx.sort(ctx.sort().size()-1));
+    FormulaType<?> returnType = (FormulaType<?>) visit(ctx.sort(ctx.sort().size() - 1));
 
     List<FormulaType<?>> inputParams = new ArrayList<>();
     if (ctx.sort().size() > 1) {
@@ -1391,9 +1358,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
       }
     }
 
-    ParserFormula temp =
-        new ParserFormula(
-            umgr.declareUF(variable, returnType, inputParams));
+    ParserFormula temp = new ParserFormula(umgr.declareUF(variable, returnType, inputParams));
     temp.setType("UF");
     temp.setReturnType(returnType);
     temp.setInputParams(inputParams);
@@ -1415,11 +1380,6 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
   @Override
   public Object visitDecl_sort(Decl_sortContext ctx) {
     throw new ParserException("JavaSMT does not support \"declare-sort\"");
-  }
-
-  @Override
-  public Object visitError(ErrorContext ctx) {
-    throw new ParserException(ctx.getText());
   }
 
   @Override

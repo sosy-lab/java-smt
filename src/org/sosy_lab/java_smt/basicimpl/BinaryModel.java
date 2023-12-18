@@ -39,9 +39,10 @@ import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.UFManager;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Visitor;
 import org.sosy_lab.java_smt.solvers.princess.PrincessEnvironment;
-import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Lexer;
-import org.sosy_lab.java_smt.utils.parserUtils.smtlibv2Parser;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Lexer;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser;
 
 /**
  * Generates a model by executing Princess with the contents of "Out.smt2" as input and parsing

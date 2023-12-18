@@ -34,7 +34,7 @@ public class NumeralGenerator {
     List<Object> inputParams = new ArrayList<>();
     if (result instanceof IntegerFormula && new BigInteger(pVar).signum() == -1) {
       BigInteger input = new BigInteger(pVar);
-      String absVar = String.valueOf( input.abs());
+      String absVar = String.valueOf(input.abs());
       inputParams.add(absVar);
       Function<List<Object>, String> functionToString =
           inPlaceInputParams -> "(- " + inPlaceInputParams.get(0) + ")";
@@ -51,7 +51,7 @@ public class NumeralGenerator {
   }
 
   protected static void logMakeIntVariable(Object result, String pVar) {
-    Generator.Keyword varType;
+    Keyword varType;
     if (result instanceof IntegerFormula) {
       varType = Keyword.INT;
     } else {

@@ -20,4 +20,4 @@
 
 /** Solver-specific backends. */
 /** Generators */
-package org.sosy_lab.java_smt.utils.parserUtils;
+package org.sosy_lab.java_smt.basicimpl.parserInterpreter;

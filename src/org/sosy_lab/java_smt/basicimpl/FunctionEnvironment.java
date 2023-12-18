@@ -22,13 +22,14 @@ package org.sosy_lab.java_smt.basicimpl;
 
 import java.util.List;
 import java.util.function.Function;
+import org.sosy_lab.java_smt.basicimpl.Generator.Keyword;
 
 public class FunctionEnvironment {
 
   Object result;
   List<Object> inputParams;
   Function<List<Object>, String> functionToString;
-  Generator.Keyword expressionType;
+  Keyword expressionType;
   int bitVecLength;
   String ufName = "";
   String ufInputType = "";
@@ -40,7 +41,7 @@ public class FunctionEnvironment {
       Object pResult,
       List<Object> pInputParams,
       Function<List<Object>, String> pFunctionToString,
-      Generator.Keyword pKeyword) {
+      Keyword pKeyword) {
 
     result = pResult;
     inputParams = pInputParams;
@@ -60,12 +61,12 @@ public class FunctionEnvironment {
     bitVecLength = pBitVecLength;
   }
 
-  public Generator.Keyword getKeyword() {
+  public Keyword getExpressionType() {
     return expressionType;
   }
 
-  public void setKeyword(Generator.Keyword pKeyword) {
-    expressionType = pKeyword;
+  public void setExpressionType(Keyword pExpressionType) {
+    expressionType = pExpressionType;
   }
 
   public void setResult(Object pResult) {

@@ -70,7 +70,8 @@ public class BitvectorGenerator {
       BitvectorFormula result, BitvectorType pType, String pVar) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pVar);
-    Function<List<Object>, String> functionToString = inPlaceInputParams -> (String) inPlaceInputParams.get(0);
+    Function<List<Object>, String> functionToString =
+        inPlaceInputParams -> (String) inPlaceInputParams.get(0);
     FunctionEnvironment newEntry =
         new FunctionEnvironment(result, inputParams, functionToString, Keyword.BITVEC);
     newEntry.setBitVecLength(pType.getSize());
