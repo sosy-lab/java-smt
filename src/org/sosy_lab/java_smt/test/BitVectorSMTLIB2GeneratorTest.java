@@ -84,7 +84,9 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
 
   @Test
   public void testMakeBitVectorWithIntegerFormulas() {
-    // not working for Yices due to lacking support of BitVectorFormula from IntegerFormula
+    assume()
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3);
     requireBitvectors();
     requireIntegers();
     requireBitvectorToInt();

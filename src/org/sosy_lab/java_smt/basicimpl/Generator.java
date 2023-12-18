@@ -28,6 +28,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 
@@ -76,24 +77,21 @@ public class Generator {
   }
 
   protected static String evaluateRecursive(Object constraint) {
-    List<?> bla = executedAggregator;
     if (constraint instanceof String) {
       return (String) constraint;
     } else {
-      FunctionEnvironment methodToEvaluate =
-          executedAggregator.stream()
-              .filter(x -> x.getResult().equals(constraint))
-              .findFirst()
-              .orElse(null);
-      if (methodToEvaluate != null && !methodToEvaluate.expressionType.equals(Keyword.DIRECT)) {
-        registeredVariables.add(methodToEvaluate);
+      Optional<FunctionEnvironment> methodToEvaluate =
+          executedAggregator.stream().filter(x -> x.getResult().equals(constraint)).findFirst();
+      if (methodToEvaluate.isPresent()
+          && !methodToEvaluate.get().expressionType.equals(Keyword.DIRECT)) {
+        registeredVariables.add(methodToEvaluate.get());
       }
       List<Object> evaluatedInputs = new ArrayList<>();
-      for (Object value : Objects.requireNonNull(methodToEvaluate).getInputParams()) {
+      for (Object value : Objects.requireNonNull(methodToEvaluate).get().getInputParams()) {
         String evaluatedInput = evaluateRecursive(value);
         evaluatedInputs.add(evaluatedInput);
       }
-      return methodToEvaluate.getFunctionToString().apply(evaluatedInputs);
+      return methodToEvaluate.get().getFunctionToString().apply(evaluatedInputs);
     }
   }
 
