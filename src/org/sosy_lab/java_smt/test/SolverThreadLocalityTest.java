@@ -27,6 +27,7 @@ import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
@@ -282,6 +283,57 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
               });
 
       assert task3.get() == null;
+    }
+  }
+
+  @SuppressWarnings("resource")
+  @Test
+  public void wrongContextTest() throws InterruptedException, SolverException {
+    assume()
+        .that(solverToUse())
+        .isNoneOf(
+            Solvers.OPENSMT,
+            Solvers.MATHSAT5,
+            Solvers.SMTINTERPOL,
+            Solvers.Z3,
+            Solvers.PRINCESS,
+            Solvers.BOOLECTOR);
+
+    // FIXME: This test tries to use a formula that was created in a different context. We expect
+    //  this test to fail for most solvers, but there should be a unique error message.
+    //  Right now we get:
+    //  OpenSMT claims the formula is satisfiable:
+    //    expected to be : unsatisfiable
+    //    but was        : org.sosy_lab.java_smt.solvers.opensmt.OpenSmtTheoremProver@10d59286
+    //    which is       : satisfiable
+    //    which has model:
+    //  MathSAT5 thows an IllegalStateExpression:
+    //    msat_solve returned "unknown": polarity information is meaningful only for terms of
+    //    type Bool
+    //  SMTInterpol thows an de.uni_freiburg.informatik.ultimate.logic.SMTLIBException:
+    //    Asserted terms created with incompatible theory
+    //  Z3 throws an com.microsoft.z3.Z3Exception:
+    //    invalid argument
+    //  Princess throws an java.util.NoSuchElementException:
+    //    key not found: i@15
+    //  Boolector crashes with a segfault:
+    //    boolector_assert: argument 'exp' belongs to different Boolector instance
+
+    HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
+
+    // Boolector does not support integer, so we have to use two different versions for this test.
+    BooleanFormula formula =
+        solverToUse() == Solvers.BOOLECTOR ? bmgr.makeFalse() : gen.generate(8);
+
+    try (SolverContext newContext = factory.generateContext()) {
+      try (BasicProverEnvironment<?> prover =
+          newContext.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+        // Trying to add a formula from our global context to the newly created solver context.
+        prover.push(formula);
+        assertThat(prover).isUnsatisfiable();
+      }
+    } catch (InvalidConfigurationException e) {
+      throw new RuntimeException(e);
     }
   }
 }
