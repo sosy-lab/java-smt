@@ -10,15 +10,12 @@
       <option name="REPORT_METHODS" value="false" />
       <option name="REPORT_FIELDS" value="true" />
     </inspection_tool>
-    <inspection_tool class="CommentedOutCode" enabled="true" level="WEAK WARNING" enabled_by_default="true">
-      <option name="minLines" value="4" />
-    </inspection_tool>
     <inspection_tool class="EmptyStatementBody" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="m_reportEmptyBlocks" value="false" />
     </inspection_tool>
     <inspection_tool class="FieldCanBeLocal" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="JavadocReference" enabled="true" level="ERROR" enabled_by_default="true">
-      <option name="REPORT_INACCESSIBLE" value="false" />
+    <inspection_tool class="JavadocDeclaration" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ADDITIONAL_TAGS" value="Texpr1Node" />
     </inspection_tool>
     <inspection_tool class="LoggerInitializedWithForeignClass" enabled="false" level="WARNING" enabled_by_default="false">
       <option name="loggerClassName" value="org.apache.log4j.Logger,org.slf4j.LoggerFactory,org.apache.commons.logging.LogFactory,java.util.logging.Logger" />

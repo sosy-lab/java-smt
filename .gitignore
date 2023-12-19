@@ -58,9 +58,9 @@ solvers_maven_conf/*.asc
 
 /*.so
 /*.dll
+/*.jar
 
 build.properties
 /.apt-generated/
 /repository
-.gitignore
 pom.xml
