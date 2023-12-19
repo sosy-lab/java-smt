@@ -36,6 +36,8 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
 public class SolverThreadLocalTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+  ExecutorService executor = Executors.newFixedThreadPool(2);
+
   @Test
   public void allLocalTest() throws InterruptedException, SolverException {
     requireIntegers();
@@ -53,9 +55,9 @@ public class SolverThreadLocalTest extends SolverBasedTest0.ParameterizedSolverB
   @Test
   public void nonlocalContext() throws ExecutionException, InterruptedException, SolverException {
     requireIntegers();
+
     assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
 
-    ExecutorService executor = Executors.newSingleThreadExecutor();
     Future<SolverContext> result =
         executor.submit(
             () -> {
@@ -106,9 +108,9 @@ public class SolverThreadLocalTest extends SolverBasedTest0.ParameterizedSolverB
   public void nonlocalFormulaTest()
       throws InterruptedException, SolverException, ExecutionException {
     requireIntegers();
+
     assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
 
-    ExecutorService executor = Executors.newSingleThreadExecutor();
     Future<BooleanFormula> result =
         executor.submit(
             () -> {
@@ -134,47 +136,58 @@ public class SolverThreadLocalTest extends SolverBasedTest0.ParameterizedSolverB
     }
   }
 
-  @SuppressWarnings("resource")
   @Test
   public void nonlocalProverTest() throws InterruptedException, ExecutionException {
     requireIntegers();
+
     assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
 
     HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
     BooleanFormula formula = gen.generate(8);
 
-    ExecutorService executor = Executors.newSingleThreadExecutor();
-    Future<?> task =
-        executor.submit(
-            () -> {
-              try (BasicProverEnvironment<?> prover = context.newProverEnvironment()) {
-                // FIXME: Exception for CVC5
-                // io.github.cvc5.CVC5ApiException:
-                // Given term is not associated with the node manager of this solver
-                //   at io.github.cvc5.Solver.assertFormula
-                //       (Native Method)
-                //   at io.github.cvc5.Solver.assertFormula
-                //       (Solver.java:1455)
-                //   at org.sosy_lab.java_smt.solvers.cvc5.CVC5AbstractProver.addConstraintImpl
-                //       (CVC5AbstractProver.java:114)
-                //   at org.sosy_lab.java_smt.basicimpl.AbstractProver.addConstraint
-                //       (AbstractProver.java:108)
-                //   at ..
-                prover.push(formula);
-                assertThat(prover).isUnsatisfiable();
-              } catch (SolverException | InterruptedException pE) {
-                throw new RuntimeException(pE);
-              }
-            });
+    try (BasicProverEnvironment<?> prover = context.newProverEnvironment()) {
+      Future<?> task =
+          executor.submit(
+              () -> {
+                try {
+                  // FIXME: Exception for CVC5
+                  // io.github.cvc5.CVC5ApiException:
+                  // Given term is not associated with the node manager of this solver
+                  //   at io.github.cvc5.Solver.assertFormula
+                  //       (Native Method)
+                  //   at io.github.cvc5.Solver.assertFormula
+                  //       (Solver.java:1455)
+                  //   at org.sosy_lab.java_smt.solvers.cvc5.CVC5AbstractProver.addConstraintImpl
+                  //       (CVC5AbstractProver.java:114)
+                  //   at org.sosy_lab.java_smt.basicimpl.AbstractProver.addConstraint
+                  //       (AbstractProver.java:108)
+                  //   at ..
+                  prover.push(formula);
 
-    assert task.get() == null;
+                  // FIXME: Exception for MathSAT (bug #339)
+                  // java.lang.StackOverflowError
+                  //   at org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_solve
+                  //       (Native Method)
+                  //   at org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_check_sat
+                  //       (Mathsat5NativeApi.java:156)
+                  //   at org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5AbstractProver.isUnsat
+                  //       (Mathsat5AbstractProver.java:106)
+                  //   at org.sosy_lab.java_smt.test.ProverEnvironmentSubject.isUnsatisfiable
+                  //       (ProverEnvironmentSubject.java:67)
+                  //   at ..
+                  assertThat(prover).isUnsatisfiable();
+                } catch (SolverException | InterruptedException pE) {
+                  throw new RuntimeException(pE);
+                }
+              });
+      assert task.get() == null;
+    }
   }
 
   @Override
-  protected Logics logicToUse() {
-    return Logics.QF_LIA;
-  }
+  protected Logics logicToUse() { return Logics.QF_LIA; }
 
+  // Make sure that the solver returned a valid interpolant for the two formulas
   private void checkInterpolant(
       BooleanFormula formulaA, BooleanFormula formulaB, BooleanFormula itp)
       throws SolverException, InterruptedException {
@@ -213,9 +226,8 @@ public class SolverThreadLocalTest extends SolverBasedTest0.ParameterizedSolverB
   public <T> void nonlocalInterpolationTest() throws InterruptedException, ExecutionException {
     requireIntegers();
     requireInterpolation();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
 
-    ExecutorService executor = Executors.newFixedThreadPool(5);
+    assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
 
     BooleanFormula f1 = imgr.lessThan(imgr.makeVariable("A"), imgr.makeVariable("B"));
     BooleanFormula f2 = imgr.lessThan(imgr.makeVariable("B"), imgr.makeVariable("A"));
@@ -237,18 +249,6 @@ public class SolverThreadLocalTest extends SolverBasedTest0.ParameterizedSolverB
                   //       (AbstractProver.java:88)
                   //   at ..
                   prover.push(f2);
-
-                  // FIXME: Exception for MathSAT (bug #339)
-                  // java.lang.StackOverflowError
-                  //   at org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_solve
-                  //       (Native Method)
-                  //   at org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_check_sat
-                  //       (Mathsat5NativeApi.java:156)
-                  //   at org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5AbstractProver.isUnsat
-                  //       (Mathsat5AbstractProver.java:106)
-                  //   at org.sosy_lab.java_smt.test.ProverEnvironmentSubject.isUnsatisfiable
-                  //       (ProverEnvironmentSubject.java:67)
-                  //   at ..
                   assertThat(prover).isUnsatisfiable();
 
                 } catch (SolverException | InterruptedException pE) {
