@@ -18,12 +18,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import org.junit.Test;
-import org.sosy_lab.common.ShutdownManager;
-import org.sosy_lab.common.ShutdownNotifier;
-import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
-import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -53,7 +48,8 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
 
   @SuppressWarnings("resource")
   @Test
-  public void nonlocalContext() throws ExecutionException, InterruptedException, SolverException {
+  public void nonlocalContextTest()
+      throws ExecutionException, InterruptedException, SolverException {
     requireIntegers();
 
     assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
@@ -62,17 +58,7 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
         executor.submit(
             () -> {
               try {
-                Configuration newConfig =
-                    Configuration.builder()
-                        .setOption("solver.solver", solverToUse().toString())
-                        .build();
-
-                LogManager newLogger = LogManager.createTestLogManager();
-                ShutdownNotifier newShutdownNotifier = ShutdownManager.create().getNotifier();
-
-                SolverContextFactory newFactory =
-                    new SolverContextFactory(newConfig, newLogger, newShutdownNotifier);
-                return newFactory.generateContext();
+                return factory.generateContext();
               } catch (InvalidConfigurationException e) {
                 throw new RuntimeException(e);
               }
@@ -185,7 +171,9 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Override
-  protected Logics logicToUse() { return Logics.QF_LIA; }
+  protected Logics logicToUse() {
+    return Logics.QF_LIA;
+  }
 
   // Make sure that the solver returned a valid interpolant for the two formulas
   private void checkInterpolant(
