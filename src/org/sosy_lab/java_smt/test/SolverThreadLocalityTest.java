@@ -35,7 +35,7 @@ import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
-public class SolverThreadLocalTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   ExecutorService executor = Executors.newFixedThreadPool(2);
 
   @Test
