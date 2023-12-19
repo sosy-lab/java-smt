@@ -150,18 +150,6 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
                   //       (AbstractProver.java:108)
                   //   at ..
                   prover.push(formula);
-
-                  // FIXME: Exception for MathSAT (bug #339)
-                  // java.lang.StackOverflowError
-                  //   at org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_solve
-                  //       (Native Method)
-                  //   at org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_check_sat
-                  //       (Mathsat5NativeApi.java:156)
-                  //   at org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5AbstractProver.isUnsat
-                  //       (Mathsat5AbstractProver.java:106)
-                  //   at org.sosy_lab.java_smt.test.ProverEnvironmentSubject.isUnsatisfiable
-                  //       (ProverEnvironmentSubject.java:67)
-                  //   at ..
                   assertThat(prover).isUnsatisfiable();
                 } catch (SolverException | InterruptedException pE) {
                   throw new RuntimeException(pE);
