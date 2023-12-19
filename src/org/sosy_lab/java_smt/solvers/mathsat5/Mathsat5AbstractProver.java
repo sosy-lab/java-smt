@@ -112,13 +112,13 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   }
 
   @Override
-  public synchronized boolean isUnsat() throws InterruptedException, SolverException {
+  public boolean isUnsat() throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
     return exec(() -> !msat_check_sat(curEnv));
   }
 
   @Override
-  public synchronized boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
+  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     checkForLiterals(pAssumptions);
@@ -238,7 +238,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   }
 
   @Override
-  public synchronized <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important)
+  public <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
     checkGenerateAllSat();
