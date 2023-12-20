@@ -68,7 +68,6 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
     }
   }
 
-  @SuppressWarnings("resource")
   @Test
   public void nonlocalContextTest()
       throws ExecutionException, InterruptedException, SolverException {
@@ -103,7 +102,6 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
     }
   }
 
-  @SuppressWarnings("resource")
   @Test
   public void nonlocalFormulaTest()
       throws InterruptedException, SolverException, ExecutionException {
@@ -281,7 +279,6 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
     }
   }
 
-  @SuppressWarnings("resource")
   @Test
   public void wrongContextTest()
       throws InterruptedException, SolverException, InvalidConfigurationException {
