@@ -248,11 +248,11 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
 
       assert task1.get() == null;
 
-      Future<BooleanFormula> itp =
+      Future<BooleanFormula> task2 =
           executor.submit(
               () -> {
                 BooleanFormula interpol = prover.getInterpolant(ImmutableList.of(id1));
-                Future<?> task2 =
+                Future<?> task3 =
                     executor.submit(
                         () -> {
                           try {
@@ -261,29 +261,29 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
                             throw new RuntimeException(pE);
                           }
                         });
-                assert task2.get() == null;
+                assert task3.get() == null;
                 return interpol;
               });
 
-      executor.awaitTermination(100, TimeUnit.MILLISECONDS);
+      BooleanFormula itp = task2.get();
       prover.pop();
 
-      Future<?> task3 =
+      Future<?> task4 =
           executor.submit(
               () -> {
                 try {
                   prover.pop();
 
-                  prover.push(itp.get());
+                  prover.push(itp);
                   prover.push(f2);
 
                   assertThat(prover).isUnsatisfiable();
-                } catch (SolverException | InterruptedException | ExecutionException pE) {
+                } catch (SolverException | InterruptedException pE) {
                   throw new RuntimeException(pE);
                 }
               });
 
-      assert task3.get() == null;
+      assert task4.get() == null;
     }
   }
 
