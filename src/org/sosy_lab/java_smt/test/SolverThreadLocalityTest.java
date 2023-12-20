@@ -16,7 +16,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,9 +35,17 @@ import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   private ExecutorService executor;
 
+  private HardIntegerFormulaGenerator hardProblem;
+  private final int DEFAULT_PROBLEM_SIZE = 8;
+
   @Before
   public void makeThreads() {
     executor = Executors.newFixedThreadPool(2);
+  }
+
+  @Before
+  public void initProblemGenerator() {
+    hardProblem = new HardIntegerFormulaGenerator(imgr, bmgr);
   }
 
   @After
@@ -51,8 +58,7 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
   public void allLocalTest() throws InterruptedException, SolverException {
     requireIntegers();
 
-    HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
-    BooleanFormula formula = gen.generate(8);
+    BooleanFormula formula = hardProblem.generate(DEFAULT_PROBLEM_SIZE);
 
     try (BasicProverEnvironment<?> prover = context.newProverEnvironment()) {
       prover.push(formula);
@@ -65,7 +71,6 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
   public void nonlocalContextTest()
       throws ExecutionException, InterruptedException, SolverException {
     requireIntegers();
-
     assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
 
     Future<SolverContext> result =
@@ -84,7 +89,8 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
       BooleanFormulaManager newBmgr = newMgr.getBooleanFormulaManager();
       IntegerFormulaManager newImgr = newMgr.getIntegerFormulaManager();
 
-      HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(newImgr, newBmgr);
+      HardIntegerFormulaGenerator newHardProblem =
+          new HardIntegerFormulaGenerator(newImgr, newBmgr);
 
       // FIXME: Exception for CVC5 (related to bug #310?)
       // io.github.cvc5.CVC5ApiException:
@@ -94,7 +100,7 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
       //   at io.github.cvc5.Sort.getKind
       //       (Sort.java:93)
       //   at ..
-      BooleanFormula formula = gen.generate(8);
+      BooleanFormula formula = newHardProblem.generate(DEFAULT_PROBLEM_SIZE);
 
       try (BasicProverEnvironment<?> prover = newContext.newProverEnvironment()) {
         prover.push(formula);
@@ -108,14 +114,11 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
   public void nonlocalFormulaTest()
       throws InterruptedException, SolverException, ExecutionException {
     requireIntegers();
-
     assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
 
     Future<BooleanFormula> result =
         executor.submit(
             () -> {
-              HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
-
               // FIXME: Exception for CVC5 (related to bug #310?)
               // io.github.cvc5.CVC5ApiException:
               // Invalid call to 'cvc5::SortKind cvc5::Sort::getKind() const', expected non-null
@@ -125,7 +128,7 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
               //   at io.github.cvc5.Sort.getKind
               //       (Sort.java:93)
               //   at ..
-              return gen.generate(8);
+              return hardProblem.generate(DEFAULT_PROBLEM_SIZE);
             });
 
     BooleanFormula formula = result.get();
@@ -139,11 +142,9 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
   @Test
   public void nonlocalProverTest() throws InterruptedException, ExecutionException {
     requireIntegers();
-
     assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
 
-    HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
-    BooleanFormula formula = gen.generate(8);
+    BooleanFormula formula = hardProblem.generate(DEFAULT_PROBLEM_SIZE);
 
     try (BasicProverEnvironment<?> prover = context.newProverEnvironment()) {
       Future<?> task =
@@ -216,7 +217,6 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
   public <T> void nonlocalInterpolationTest() throws InterruptedException, ExecutionException {
     requireIntegers();
     requireInterpolation();
-
     assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
 
     BooleanFormula f1 = imgr.lessThan(imgr.makeVariable("A"), imgr.makeVariable("B"));
@@ -320,11 +320,11 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
     //  Boolector crashes with a segfault:
     //    boolector_assert: argument 'exp' belongs to different Boolector instance
 
-    HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
-
     // Boolector does not support integer, so we have to use two different versions for this test.
     BooleanFormula formula =
-        solverToUse() == Solvers.BOOLECTOR ? bmgr.makeFalse() : gen.generate(8);
+        solverToUse() == Solvers.BOOLECTOR
+            ? bmgr.makeFalse()
+            : hardProblem.generate(DEFAULT_PROBLEM_SIZE);
 
     try (SolverContext newContext = factory.generateContext()) {
       try (BasicProverEnvironment<?> prover =
