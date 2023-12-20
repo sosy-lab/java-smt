@@ -36,7 +36,7 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
   private ExecutorService executor;
 
   private HardIntegerFormulaGenerator hardProblem;
-  private final int DEFAULT_PROBLEM_SIZE = 8;
+  private static final int DEFAULT_PROBLEM_SIZE = 8;
 
   @Before
   public void makeThreads() {
