@@ -50,8 +50,10 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
 
   @After
   public void releaseThreads() {
-    // All threads should have terminated by now as we always wait in the test cases
-    executor.shutdownNow();
+    // All threads should have terminated by now as we always wait in the test
+    if (executor != null) {
+      executor.shutdownNow();
+    }
   }
 
   @Test
