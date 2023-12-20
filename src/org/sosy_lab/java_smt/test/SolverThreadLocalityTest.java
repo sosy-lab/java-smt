@@ -17,6 +17,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -32,7 +34,18 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
 public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
-  ExecutorService executor = Executors.newFixedThreadPool(2);
+  private ExecutorService executor;
+
+  @Before
+  public void makeThreads() {
+    executor = Executors.newFixedThreadPool(2);
+  }
+
+  @After
+  public void releaseThreads() {
+    // All threads should have terminated by now as we always wait in the test cases
+    executor.shutdownNow();
+  }
 
   @Test
   public void allLocalTest() throws InterruptedException, SolverException {
