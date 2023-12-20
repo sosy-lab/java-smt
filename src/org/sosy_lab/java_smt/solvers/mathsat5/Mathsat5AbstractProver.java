@@ -30,7 +30,6 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
-import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Longs;
@@ -42,7 +41,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Evaluator;
@@ -97,24 +95,18 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   /** add needed options into the given map. */
   protected abstract void createConfig(Map<String, String> pConfig);
 
-  private <T> T exec(Callable<T> closure) throws SolverException, InterruptedException {
-    long hook = context.addTerminationTest(curEnv);
-    T value = null;
-    try {
-      value = closure.call();
-    } catch (Throwable t) {
-      Throwables.propagateIfPossible(t, IllegalStateException.class, SolverException.class);
-      Throwables.propagateIfPossible(t, InterruptedException.class);
-    } finally {
-      msat_free_termination_callback(hook);
-    }
-    return value;
-  }
-
   @Override
   public boolean isUnsat() throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
-    return exec(() -> !msat_check_sat(curEnv));
+
+    long hook = context.addTerminationTest(curEnv);
+    boolean result;
+    try {
+      result = !msat_check_sat(curEnv);
+    } finally {
+      msat_free_termination_callback(hook);
+    }
+    return result;
   }
 
   @Override
@@ -122,7 +114,15 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     checkForLiterals(pAssumptions);
-    return exec(() -> !msat_check_sat_with_assumptions(curEnv, getMsatTerm(pAssumptions)));
+
+    long hook = context.addTerminationTest(curEnv);
+    boolean result;
+    try {
+      result = !msat_check_sat_with_assumptions(curEnv, getMsatTerm(pAssumptions));
+    } finally {
+      msat_free_termination_callback(hook);
+    }
+    return result;
   }
 
   private void checkForLiterals(Collection<BooleanFormula> formulas) {
