@@ -73,15 +73,7 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
     requireIntegers();
     assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
 
-    Future<SolverContext> result =
-        executor.submit(
-            () -> {
-              try {
-                return factory.generateContext();
-              } catch (InvalidConfigurationException e) {
-                throw new RuntimeException(e);
-              }
-            });
+    Future<SolverContext> result = executor.submit(() -> factory.generateContext());
 
     try (SolverContext newContext = result.get()) {
       FormulaManager newMgr = newContext.getFormulaManager();
@@ -289,7 +281,8 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
 
   @SuppressWarnings("resource")
   @Test
-  public void wrongContextTest() throws InterruptedException, SolverException {
+  public void wrongContextTest()
+      throws InterruptedException, SolverException, InvalidConfigurationException {
     assume()
         .that(solverToUse())
         .isNoneOf(
@@ -333,8 +326,6 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
         prover.push(formula);
         assertThat(prover).isUnsatisfiable();
       }
-    } catch (InvalidConfigurationException e) {
-      throw new RuntimeException(e);
     }
   }
 }
