@@ -54,10 +54,11 @@ public class Bug347Test extends ParameterizedSolverBasedTest0 {
 
                 BooleanFormula formula = newBmgr.makeFalse();
 
-                try (BasicProverEnvironment<?> prover = newContext.newProverEnvironment()) {
-                  prover.push(formula);
-                  assertThat(prover).isUnsatisfiable();
-                }
+                BasicProverEnvironment<?> prover = newContext.newProverEnvironment();
+                prover.push(formula);
+                assert prover.isUnsat();
+                prover.close();
+
                 newContext.close();
                 return null;
               });
@@ -90,10 +91,11 @@ public class Bug347Test extends ParameterizedSolverBasedTest0 {
 
                 BooleanFormula formula = newBmgr.makeFalse();
 
-                try (BasicProverEnvironment<?> prover = newContext.newProverEnvironment()) {
-                  prover.push(formula);
-                  assertThat(prover).isUnsatisfiable();
-                }
+                BasicProverEnvironment<?> prover = newContext.newProverEnvironment();
+                prover.push(formula);
+                assertThat(prover).isUnsatisfiable();
+                prover.close();
+
                 return null;
               });
     }
