@@ -47,19 +47,19 @@ public class Bug347Test extends ParameterizedSolverBasedTest0 {
       Future<?> future =
           exec.submit(
               () -> {
-                try (SolverContext newContext = factory.generateContext()) {
-                  FormulaManager newMgr = newContext.getFormulaManager();
-                  BooleanFormulaManager newBmgr = newMgr.getBooleanFormulaManager();
+                SolverContext newContext = factory.generateContext();
 
-                  BooleanFormula formula = newBmgr.makeFalse();
+                FormulaManager newMgr = newContext.getFormulaManager();
+                BooleanFormulaManager newBmgr = newMgr.getBooleanFormulaManager();
 
-                  try (BasicProverEnvironment<?> prover = newContext.newProverEnvironment()) {
-                    prover.push(formula);
-                    assertThat(prover).isUnsatisfiable();
-                  }
-                } catch (Throwable t) {
-                  throw new RuntimeException(t);
+                BooleanFormula formula = newBmgr.makeFalse();
+
+                try (BasicProverEnvironment<?> prover = newContext.newProverEnvironment()) {
+                  prover.push(formula);
+                  assertThat(prover).isUnsatisfiable();
                 }
+                newContext.close();
+                return null;
               });
     }
     exec.shutdown();
@@ -83,18 +83,18 @@ public class Bug347Test extends ParameterizedSolverBasedTest0 {
       Future<?> future =
           exec.submit(
               () -> {
-                try (SolverContext newContext = factory.generateContext()) {
-                  FormulaManager newMgr = newContext.getFormulaManager();
-                  BooleanFormulaManager newBmgr = newMgr.getBooleanFormulaManager();
+                SolverContext newContext = factory.generateContext();
 
-                  BooleanFormula formula = newBmgr.makeFalse();
+                FormulaManager newMgr = newContext.getFormulaManager();
+                BooleanFormulaManager newBmgr = newMgr.getBooleanFormulaManager();
 
-                  BasicProverEnvironment<?> prover = newContext.newProverEnvironment();
+                BooleanFormula formula = newBmgr.makeFalse();
+
+                try (BasicProverEnvironment<?> prover = newContext.newProverEnvironment()) {
                   prover.push(formula);
                   assertThat(prover).isUnsatisfiable();
-                } catch (Throwable t) {
-                  throw new RuntimeException(t);
                 }
+                return null;
               });
     }
     exec.shutdown();
