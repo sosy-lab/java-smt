@@ -34,7 +34,7 @@ public class Bug347Test extends ParameterizedSolverBasedTest0 {
 
     ExecutorService exec = Executors.newFixedThreadPool(2);
 
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 20; i++) {
       @SuppressWarnings("unused")
       Future<?> future = exec.submit(
           () -> {
@@ -69,7 +69,7 @@ public class Bug347Test extends ParameterizedSolverBasedTest0 {
   public void bug437FixedTest() throws InterruptedException {
     ExecutorService exec = Executors.newFixedThreadPool(2);
 
-    for (int k = 0; k < 3; k++) {
+    for (int k = 0; k < 20; k++) {
       @SuppressWarnings("unused")
       Future<?> future = exec.submit(
           () -> {
