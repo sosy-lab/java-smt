@@ -71,7 +71,7 @@ public class Bug347Test extends ParameterizedSolverBasedTest0 {
 
                   BasicProverEnvironment<?> prover = newContext.newProverEnvironment();
                   prover.push(formula);
-                  assert prover.isUnsat();
+                  assertThat(prover).isUnsatisfiable();
                   prover.close();
 
                   newContext.close();
