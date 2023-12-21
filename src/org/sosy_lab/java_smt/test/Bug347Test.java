@@ -1,0 +1,100 @@
+package org.sosy_lab.java_smt.test;
+
+import static com.google.common.truth.Truth.assertWithMessage;
+import static com.google.common.truth.TruthJUnit.assume;
+import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import org.junit.Test;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.api.BasicProverEnvironment;
+import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.BooleanFormulaManager;
+import org.sosy_lab.java_smt.api.FormulaManager;
+import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.test.SolverBasedTest0.ParameterizedSolverBasedTest0;
+
+public class Bug347Test extends ParameterizedSolverBasedTest0 {
+  @SuppressWarnings("resource")
+  @Test
+  public void bug437BrokenTest() throws InterruptedException {
+    // FIXME: Segfault for CVC5
+    //  Native frames: (J=compiled Java code, j=interpreted, Vv=VM code, C=native code)
+    //    C  [libcvc5.so+0x3d3eb3]  cvc5::internal::SolverEngine::~SolverEngine()+0x2d3
+    //  Java frames: (J=compiled Java code, j=interpreted, Vv=VM code)
+    //    j  io.github.cvc5.Solver.deletePointer(J)V+0
+    //    j  io.github.cvc5.Solver.deletePointer()V+13
+    //    j  org.sosy_lab.java_smt.solvers.cvc5.CVC5SolverContext.close()V+16
+    //    j  org.sosy_lab.java_smt.test.Bug347Test.lambda$bug437BrokenTest$0()
+    //        Ljava/lang/Object;+71
+    assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
+
+    ExecutorService exec = Executors.newFixedThreadPool(2);
+
+    for (int i = 0; i < 3; i++) {
+      @SuppressWarnings("unused")
+      Future<?> future = exec.submit(
+          () -> {
+            try (SolverContext newContext = factory.generateContext()) {
+              FormulaManager newMgr = newContext.getFormulaManager();
+              BooleanFormulaManager newBmgr = newMgr.getBooleanFormulaManager();
+
+              BooleanFormula formula = newBmgr.makeFalse();
+
+              try (BasicProverEnvironment<?> prover = newContext.newProverEnvironment()) {
+                prover.push(formula);
+                assertThat(prover).isUnsatisfiable();
+              }
+            } catch(Throwable t) {
+              throw new RuntimeException(t);
+            }
+          });
+    }
+    exec.shutdown();
+
+    try {
+      assertWithMessage("Timeout in bug437BrokenTest")
+          .that(exec.awaitTermination(10, TimeUnit.SECONDS))
+          .isTrue();
+    } finally {
+      exec.shutdownNow();
+    }
+  }
+
+  @SuppressWarnings("resource")
+  @Test
+  public void bug437FixedTest() throws InterruptedException {
+    ExecutorService exec = Executors.newFixedThreadPool(2);
+
+    for (int k = 0; k < 3; k++) {
+      @SuppressWarnings("unused")
+      Future<?> future = exec.submit(
+          () -> {
+            try (SolverContext newContext = factory.generateContext()) {
+              FormulaManager newMgr = newContext.getFormulaManager();
+              BooleanFormulaManager newBmgr = newMgr.getBooleanFormulaManager();
+
+              BooleanFormula formula = newBmgr.makeFalse();
+
+              BasicProverEnvironment<?> prover = newContext.newProverEnvironment();
+              prover.push(formula);
+              assertThat(prover).isUnsatisfiable();
+            } catch(Throwable t) {
+              throw new RuntimeException(t);
+            }
+          });
+    }
+    exec.shutdown();
+
+    try {
+      assertWithMessage("Timeout in bug437FixedTest")
+          .that(exec.awaitTermination(10, TimeUnit.SECONDS))
+          .isTrue();
+    } finally {
+      exec.shutdownNow();
+    }
+  }
+}
