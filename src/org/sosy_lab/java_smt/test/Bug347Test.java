@@ -12,6 +12,7 @@ import static com.google.common.truth.Truth.assertWithMessage;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -26,6 +27,10 @@ import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.test.SolverBasedTest0.ParameterizedSolverBasedTest0;
 
 public class Bug347Test extends ParameterizedSolverBasedTest0 {
+  private int numberOfTasks() {
+    return List.of(Solvers.Z3, Solvers.PRINCESS).contains(solverToUse()) ? 10 : 400;
+  }
+
   @SuppressWarnings("resource")
   @Test
   public void bug437BrokenTest() throws InterruptedException {
@@ -40,9 +45,9 @@ public class Bug347Test extends ParameterizedSolverBasedTest0 {
     //        Ljava/lang/Object;+71
     assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
 
-    ExecutorService exec = Executors.newFixedThreadPool(2);
+    ExecutorService exec = Executors.newFixedThreadPool(4);
 
-    for (int i = 0; i < 20; i++) {
+    for (int i = 0; i < numberOfTasks(); i++) {
       @SuppressWarnings("unused")
       Future<?> future =
           exec.submit(
@@ -79,7 +84,7 @@ public class Bug347Test extends ParameterizedSolverBasedTest0 {
   public void bug437FixedTest() throws InterruptedException {
     ExecutorService exec = Executors.newFixedThreadPool(2);
 
-    for (int k = 0; k < 20; k++) {
+    for (int k = 0; k < numberOfTasks(); k++) {
       @SuppressWarnings("unused")
       Future<?> future =
           exec.submit(
