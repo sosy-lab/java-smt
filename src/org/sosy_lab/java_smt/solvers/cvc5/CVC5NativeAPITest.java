@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.cvc5;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth.assertWithMessage;
 import static org.junit.Assert.assertThrows;
 
 import com.google.common.base.Preconditions;
@@ -25,6 +26,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import org.junit.After;
 import org.junit.AssumptionViolatedException;
 import org.junit.Before;
@@ -1340,5 +1346,109 @@ public class CVC5NativeAPITest {
         sort,
         exp.getSort(),
         exp);
+  }
+
+  /*
+  Solver openContext() {
+    Solver context = new Solver();
+    context.setOption("seed", String.valueOf(0xDEADBEEF));
+    context.setOption("output-language", "smtlib2");
+    return context;
+  }
+
+  Solver openProver() {
+    Solver prover = new Solver();
+    prover.setOption("incremental", "true");
+    prover.setOption("produce-assertions", "true");
+    prover.setOption("dump-models", "true");
+    prover.setOption("output-language", "smt2");
+    prover.setOption("seed", String.valueOf(0xDEADBEEF));
+    prover.setOption("strings-exp", "true");
+    prover.setOption("full-saturate-quant", "true");
+    return prover;
+  }
+*/
+
+  private final int numberOfLoops = 100;
+
+  @Ignore
+  @SuppressWarnings("resource")
+  @Test
+  public void bug347BrokenTest() throws InterruptedException {
+    for (int k = 0; k < numberOfLoops; k++) {
+      ExecutorService exec = Executors.newFixedThreadPool(4);
+      CountDownLatch barrier = new CountDownLatch(1);
+
+      for (int i = 0; i < 4; i++) {
+        @SuppressWarnings("unused")
+        Future<?> future =
+            exec.submit(
+                () -> {
+                  Solver newSolver = new Solver();
+                  Term formula = newSolver.mkBoolean(false);
+
+                  Solver prover = createEnvironment();
+                  prover.push();
+                  prover.assertFormula(formula);
+
+                  assert !prover.checkSat().isSat();
+
+                  prover.deletePointer();
+                  newSolver.deletePointer();
+                  return null;
+                });
+      }
+      exec.shutdown();
+
+      System.out.println(k);
+      barrier.countDown();
+
+      try {
+        assertWithMessage("Timeout in bug437BrokenTest")
+            .that(exec.awaitTermination(10, TimeUnit.SECONDS))
+            .isTrue();
+      } finally {
+        exec.shutdownNow();
+      }
+    }
+  }
+
+  @SuppressWarnings("resource")
+  @Test
+  public void bug347FixedTest() throws InterruptedException {
+    for (int k = 0; k < numberOfLoops; k++) {
+      ExecutorService exec = Executors.newFixedThreadPool(4);
+      CountDownLatch barrier = new CountDownLatch(1);
+
+      for (int i = 0; i < 4; i++) {
+        @SuppressWarnings("unused")
+        Future<?> future =
+            exec.submit(
+                () -> {
+                  Solver newSolver = new Solver();
+                  Term formula = newSolver.mkBoolean(false);
+
+                  Solver prover = createEnvironment();
+                  prover.push();
+                  prover.assertFormula(formula);
+
+                  assert !prover.checkSat().isSat();
+
+                  return null;
+                });
+      }
+      exec.shutdown();
+
+      System.out.println(k);
+      barrier.countDown();
+
+      try {
+        assertWithMessage("Timeout in bug437FixedTest")
+            .that(exec.awaitTermination(10, TimeUnit.SECONDS))
+            .isTrue();
+      } finally {
+        exec.shutdownNow();
+      }
+    }
   }
 }
