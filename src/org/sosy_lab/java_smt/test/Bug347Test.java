@@ -56,7 +56,7 @@ public class Bug347Test extends ParameterizedSolverBasedTest0 {
                 prover.push(formula);
                 assertThat(prover).isUnsatisfiable();
               }
-            } catch(Throwable t) {
+            } catch (Throwable t) {
               throw new RuntimeException(t);
             }
           });
@@ -90,7 +90,7 @@ public class Bug347Test extends ParameterizedSolverBasedTest0 {
               BasicProverEnvironment<?> prover = newContext.newProverEnvironment();
               prover.push(formula);
               assertThat(prover).isUnsatisfiable();
-            } catch(Throwable t) {
+            } catch (Throwable t) {
               throw new RuntimeException(t);
             }
           });
