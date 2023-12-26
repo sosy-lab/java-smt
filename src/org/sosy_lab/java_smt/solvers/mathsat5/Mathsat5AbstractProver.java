@@ -24,6 +24,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_num_
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_pop_backtrack_point;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_push_backtrack_point;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_option_checked;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_termination_callback;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_get_arg;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_boolean_constant;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_not;
@@ -99,14 +100,12 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   public boolean isUnsat() throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
 
-    long hook = context.addTerminationTest(curEnv);
-    boolean result;
+    final long hook = msat_set_termination_callback(curEnv, context.getTerminationTest());
     try {
-      result = !msat_check_sat(curEnv);
+      return !msat_check_sat(curEnv);
     } finally {
       msat_free_termination_callback(hook);
     }
-    return result;
   }
 
   @Override
@@ -115,14 +114,12 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
     Preconditions.checkState(!closed);
     checkForLiterals(pAssumptions);
 
-    long hook = context.addTerminationTest(curEnv);
-    boolean result;
+    final long hook = msat_set_termination_callback(curEnv, context.getTerminationTest());
     try {
-      result = !msat_check_sat_with_assumptions(curEnv, getMsatTerm(pAssumptions));
+      return !msat_check_sat_with_assumptions(curEnv, getMsatTerm(pAssumptions));
     } finally {
       msat_free_termination_callback(hook);
     }
-    return result;
   }
 
   private void checkForLiterals(Collection<BooleanFormula> formulas) {

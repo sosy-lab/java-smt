@@ -17,7 +17,6 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_dest
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_env;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_version;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_option_checked;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_termination_callback;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
@@ -300,9 +299,13 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
     }
   }
 
-  long addTerminationTest(long env) {
+  /**
+   * Get a termination callback for the current context. The callback can be registered upfront,
+   * i.e., before calling a possibly expensive computation in the solver to allow a proper shutdown.
+   */
+  TerminationCallback getTerminationTest() {
     Preconditions.checkState(!closed, "solver context is already closed");
-    return msat_set_termination_callback(env, terminationTest);
+    return terminationTest;
   }
 
   @Override
