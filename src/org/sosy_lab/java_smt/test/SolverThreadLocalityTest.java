@@ -69,11 +69,12 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void nonlocalContextTest()
+  public void nonLocalContextTest()
       throws ExecutionException, InterruptedException, SolverException {
     requireIntegers();
     assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
 
+    // generate a new context in another thread, i.e., non-locally
     Future<SolverContext> result = executor.submit(() -> factory.generateContext());
 
     try (SolverContext newContext = result.get()) {
@@ -103,11 +104,12 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void nonlocalFormulaTest()
+  public void nonLocalFormulaTest()
       throws InterruptedException, SolverException, ExecutionException {
     requireIntegers();
     assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
 
+    // generate a new formula in another thread, i.e., non-locally
     Future<BooleanFormula> result =
         executor.submit(
             () -> {
@@ -132,13 +134,14 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void nonlocalProverTest() throws InterruptedException, ExecutionException {
+  public void nonLocalProverTest() throws InterruptedException, ExecutionException {
     requireIntegers();
     assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
 
     BooleanFormula formula = hardProblem.generate(DEFAULT_PROBLEM_SIZE);
 
     try (BasicProverEnvironment<?> prover = context.newProverEnvironment()) {
+      // generate a new prover in another thread, i.e., non-locally
       Future<?> task =
           executor.submit(
               () -> {
@@ -206,7 +209,7 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
 
   @SuppressWarnings({"unchecked", "resource"})
   @Test
-  public <T> void nonlocalInterpolationTest() throws InterruptedException, ExecutionException {
+  public <T> void nonLocalInterpolationTest() throws InterruptedException, ExecutionException {
     requireIntegers();
     requireInterpolation();
     assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
@@ -218,6 +221,7 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
         (InterpolatingProverEnvironment<T>) context.newProverEnvironmentWithInterpolation()) {
       T id1 = prover.push(f1);
 
+      // push a formula in another thread, i.e., non-locally
       Future<?> task1 =
           executor.submit(
               () -> {
@@ -240,6 +244,7 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
 
       assert task1.get() == null;
 
+      // compute/check interpolants in different threads, i.e., non-locally
       Future<BooleanFormula> task2 =
           executor.submit(
               () -> {
@@ -260,6 +265,7 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
       BooleanFormula itp = task2.get();
       prover.pop();
 
+      // use interpolants in another thread, i.e., non-locally
       Future<?> task4 =
           executor.submit(
               () -> {
@@ -311,6 +317,11 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
     //    key not found: i@15
     //  Boolector crashes with a segfault:
     //    boolector_assert: argument 'exp' belongs to different Boolector instance
+    //
+    // To fix this issue, we would need to track which formula was created in which context,
+    // which might result in quite some management and memory overhead.
+    // We might want to see this as very low priority, as there is no real benefit for the user,
+    // except having a nice error message.
 
     // Boolector does not support integer, so we have to use two different versions for this test.
     BooleanFormula formula =
