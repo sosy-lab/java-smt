@@ -140,32 +140,31 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
 
     BooleanFormula formula = hardProblem.generate(DEFAULT_PROBLEM_SIZE);
 
-    try (BasicProverEnvironment<?> prover = context.newProverEnvironment()) {
-      // generate a new prover in another thread, i.e., non-locally
-      Future<?> task =
-          executor.submit(
-              () -> {
-                try {
-                  // FIXME: Exception for CVC5
-                  // io.github.cvc5.CVC5ApiException:
-                  // Given term is not associated with the node manager of this solver
-                  //   at io.github.cvc5.Solver.assertFormula
-                  //       (Native Method)
-                  //   at io.github.cvc5.Solver.assertFormula
-                  //       (Solver.java:1455)
-                  //   at org.sosy_lab.java_smt.solvers.cvc5.CVC5AbstractProver.addConstraintImpl
-                  //       (CVC5AbstractProver.java:114)
-                  //   at org.sosy_lab.java_smt.basicimpl.AbstractProver.addConstraint
-                  //       (AbstractProver.java:108)
-                  //   at ..
-                  prover.push(formula);
-                  assertThat(prover).isUnsatisfiable();
-                } catch (SolverException | InterruptedException pE) {
-                  throw new RuntimeException(pE);
-                }
-              });
-      assert task.get() == null;
-    }
+    // generate a new prover in another thread, i.e., non-locally
+    Future<?> task =
+        executor.submit(
+            () -> {
+              try (BasicProverEnvironment<?> prover = context.newProverEnvironment()) {
+                // FIXME: Exception for CVC5
+                // io.github.cvc5.CVC5ApiException:
+                // Given term is not associated with the node manager of this solver
+                //   at io.github.cvc5.Solver.assertFormula
+                //       (Native Method)
+                //   at io.github.cvc5.Solver.assertFormula
+                //       (Solver.java:1455)
+                //   at org.sosy_lab.java_smt.solvers.cvc5.CVC5AbstractProver.addConstraintImpl
+                //       (CVC5AbstractProver.java:114)
+                //   at org.sosy_lab.java_smt.basicimpl.AbstractProver.addConstraint
+                //       (AbstractProver.java:108)
+                //   at ..
+                prover.push(formula);
+                assertThat(prover).isUnsatisfiable();
+              } catch (SolverException | InterruptedException pE) {
+                throw new RuntimeException(pE);
+              }
+            });
+
+    assert task.get() == null;
   }
 
   @Override
