@@ -14,7 +14,7 @@ package org.sosy_lab.java_smt.delegate.debugging;
 public class ThreadChecks {
   private final long localThread = Thread.currentThread().getId();
 
-  /** Assert that this object is only used by the thread that created it */
+  /** Assert that this object is only used by the thread that created it. */
   public void assertThreadLocal() {
     assert localThread == Thread.currentThread().getId();
   }
