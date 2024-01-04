@@ -6,7 +6,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package org.sosy_lab.java_smt.delegate.debugging.checks;
+package org.sosy_lab.java_smt.delegate.debugging;
 
 /* Base class for everything in the debugging.* package. Provides a method that makes sure that API
  * calls are only made from the same thread that was used to create the object.

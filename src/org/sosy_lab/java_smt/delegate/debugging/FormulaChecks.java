@@ -6,7 +6,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package org.sosy_lab.java_smt.delegate.debugging.checks;
+package org.sosy_lab.java_smt.delegate.debugging;
 
 import java.util.Set;
 import org.sosy_lab.java_smt.api.Formula;
@@ -22,12 +22,12 @@ public class FormulaChecks extends ThreadChecks {
     localFormulas = pformulasInContext;
   }
 
-  /** Needs to be called after a new Formula is created to associate it with this context */
+  /** Needs to be called after a new Formula is created to associate it with this context. */
   public void addFormulaToContext(Formula pFormula) {
     localFormulas.add(pFormula);
   }
 
-  /** Assert that the formula belongs to this context */
+  /** Assert that the formula belongs to this context. */
   public void assertFormulaInContext(Formula pFormula) {
     assert localFormulas.contains(pFormula);
   }

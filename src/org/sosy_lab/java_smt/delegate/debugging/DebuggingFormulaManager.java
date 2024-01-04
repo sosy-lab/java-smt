@@ -38,7 +38,6 @@ import org.sosy_lab.java_smt.api.UFManager;
 import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
-import org.sosy_lab.java_smt.delegate.debugging.checks.FormulaChecks;
 
 public class DebuggingFormulaManager extends FormulaChecks implements FormulaManager {
   private final FormulaManager delegate;

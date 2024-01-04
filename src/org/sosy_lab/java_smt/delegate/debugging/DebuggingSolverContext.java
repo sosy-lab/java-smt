@@ -20,7 +20,6 @@ import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
-import org.sosy_lab.java_smt.delegate.debugging.checks.ThreadChecks;
 
 public class DebuggingSolverContext extends ThreadChecks implements SolverContext {
   private Set<Formula> localFormulas = new HashSet<>();

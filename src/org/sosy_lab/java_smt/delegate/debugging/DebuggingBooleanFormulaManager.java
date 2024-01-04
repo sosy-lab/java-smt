@@ -18,7 +18,6 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.visitors.BooleanFormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.BooleanFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
-import org.sosy_lab.java_smt.delegate.debugging.checks.FormulaChecks;
 
 public class DebuggingBooleanFormulaManager extends FormulaChecks implements BooleanFormulaManager {
   private final BooleanFormulaManager delegate;

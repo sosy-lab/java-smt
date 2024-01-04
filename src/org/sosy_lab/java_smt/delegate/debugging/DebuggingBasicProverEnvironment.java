@@ -18,7 +18,6 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.delegate.debugging.checks.FormulaChecks;
 
 class DebuggingBasicProverEnvironment<T> extends FormulaChecks
     implements BasicProverEnvironment<T> {

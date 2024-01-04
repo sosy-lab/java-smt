@@ -23,7 +23,6 @@ import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.StringFormula;
-import org.sosy_lab.java_smt.delegate.debugging.checks.FormulaChecks;
 
 public class DebuggingModel extends FormulaChecks implements Model {
   private final Model delegate;
