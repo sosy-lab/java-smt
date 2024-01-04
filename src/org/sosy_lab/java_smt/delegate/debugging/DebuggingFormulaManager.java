@@ -49,7 +49,8 @@ public class DebuggingFormulaManager extends FormulaChecks implements FormulaMan
 
   @Override
   public IntegerFormulaManager getIntegerFormulaManager() {
-    throw new UnsupportedOperationException();
+    assertThreadLocal();
+    return new DebuggingIntegerFormulaManager(delegate.getIntegerFormulaManager(), localFormulas);
   }
 
   @Override
