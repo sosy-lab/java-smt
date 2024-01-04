@@ -26,6 +26,7 @@ import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
+import org.sosy_lab.java_smt.delegate.debugging.DebuggingSolverContext;
 import org.sosy_lab.java_smt.delegate.logging.LoggingSolverContext;
 import org.sosy_lab.java_smt.delegate.statistics.StatisticsSolverContext;
 import org.sosy_lab.java_smt.delegate.synchronize.SynchronizedSolverContext;
@@ -88,6 +89,9 @@ public class SolverContextFactory {
       secure = true,
       description = "Sequentialize all solver actions to allow concurrent access!")
   private boolean synchronize = false;
+
+  @Option(secure = true, description = "Apply additional checks to catch common user errors.")
+  private boolean debugMode = false;
 
   @Option(
       secure = true,
@@ -221,10 +225,14 @@ public class SolverContextFactory {
     if (synchronize) {
       context = new SynchronizedSolverContext(config, logger, shutdownNotifier, context);
     }
+    if (debugMode) {
+      context = new DebuggingSolverContext(context);
+    }
     if (collectStatistics) {
       // statistics need to be the most outer wrapping layer.
       context = new StatisticsSolverContext(context);
     }
+
     return context;
   }
 
