@@ -55,7 +55,8 @@ public class DebuggingFormulaManager extends FormulaChecks implements FormulaMan
 
   @Override
   public RationalFormulaManager getRationalFormulaManager() {
-    throw new UnsupportedOperationException();
+    assertThreadLocal();
+    return new DebuggingRationalFormulaManager(delegate.getRationalFormulaManager(), localFormulas);
   }
 
   @Override
