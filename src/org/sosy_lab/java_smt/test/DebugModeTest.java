@@ -11,12 +11,14 @@ package org.sosy_lab.java_smt.test;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.base.Throwables;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -25,12 +27,18 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
+import org.sosy_lab.java_smt.api.FormulaManager;
+import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.UFManager;
 
 public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   private SolverContext debugContext;
+  private UFManager debugFmgr;
   private BooleanFormulaManager debugBmgr;
   private IntegerFormulaManager debugImgr;
 
@@ -48,8 +56,11 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
 
     debugContext = debuggingFactory.generateContext();
     try {
-      debugBmgr = debugContext.getFormulaManager().getBooleanFormulaManager();
-      debugImgr = debugContext.getFormulaManager().getIntegerFormulaManager();
+      FormulaManager debugMgr = debugContext.getFormulaManager();
+
+      debugFmgr = debugMgr.getUFManager();
+      debugBmgr = debugMgr.getBooleanFormulaManager();
+      debugImgr = debugMgr.getIntegerFormulaManager();
     } catch (UnsupportedOperationException e) {
       // Boolector does not support integers and throws an exception. In this case we'll just
       // leave the formula manager set to null
@@ -131,5 +142,17 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
       prover.push(formula);
       assertThat(prover).isUnsatisfiable();
     }
+  }
+
+  @SuppressWarnings("unused")
+  @Ignore // FIXME: We need to track FunctionDeclarations in the debugging.* package
+  @Test(expected = AssertionError.class)
+  public void wrongContextUFTest() {
+    requireIntegers();
+    // Declara the function on the normal context...
+    FunctionDeclaration<IntegerFormula> id =
+        fmgr.declareUF("id", FormulaType.IntegerType, List.of(FormulaType.IntegerType));
+    // then try calling it from the debugging context
+    IntegerFormula f = debugFmgr.callUF(id, debugImgr.makeNumber(0));
   }
 }
