@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.test;
 
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
+import com.google.common.base.Throwables;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -46,9 +47,13 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
         new SolverContextFactory(debugConfig, logger, shutdownNotifierToUse());
 
     debugContext = debuggingFactory.generateContext();
-
-    debugBmgr = debugContext.getFormulaManager().getBooleanFormulaManager();
-    debugImgr = debugContext.getFormulaManager().getIntegerFormulaManager();
+    try {
+      debugBmgr = debugContext.getFormulaManager().getBooleanFormulaManager();
+      debugImgr = debugContext.getFormulaManager().getIntegerFormulaManager();
+    } catch (UnsupportedOperationException e) {
+      // Boolector does not support integers and throws an exception. In this case we'll just
+      // leave the formula manager set to null
+    }
   }
 
   @After
@@ -60,7 +65,8 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
 
   @SuppressWarnings("resource")
   @Test(expected = AssertionError.class)
-  public void wrongThreadTest() throws InterruptedException, ExecutionException {
+  public void wrongThreadTest() throws InterruptedException {
+    requireIntegers();
     HardIntegerFormulaGenerator hardProblem = new HardIntegerFormulaGenerator(debugImgr, debugBmgr);
 
     // Try to use the context in a different thread
@@ -75,12 +81,20 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
               }
               return null;
             });
-    assert result.get() == null;
+
+    try {
+      assert result.get() == null;
+    } catch (ExecutionException e) {
+      Throwables.throwIfInstanceOf(e.getCause(), AssertionError.class);
+    }
     exec.shutdownNow();
   }
 
   @Test(expected = AssertionError.class)
   public void wrongContextTest() throws InterruptedException, SolverException {
+    requireIntegers();
+    HardIntegerFormulaGenerator hardProblem = new HardIntegerFormulaGenerator(imgr, bmgr);
+
     // FIXME: This test tries to use a formula that was created in a different context. We expect
     //  this test to fail for most solvers, but there should be a unique error message.
     //  Right now we get:
@@ -105,8 +119,6 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
     // which might result in quite some management and memory overhead.
     // We might want to see this as very low priority, as there is no real benefit for the user,
     // except having a nice error message.
-
-    HardIntegerFormulaGenerator hardProblem = new HardIntegerFormulaGenerator(imgr, bmgr);
 
     // Boolector does not support integer, so we have to use two different versions for this test.
     BooleanFormula formula =
