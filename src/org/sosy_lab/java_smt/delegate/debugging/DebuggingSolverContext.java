@@ -49,7 +49,9 @@ public class DebuggingSolverContext extends ThreadChecks implements SolverContex
       ProverOptions... options) {
     assertThreadLocal();
     return new DebuggingInterpolatingProverEnvironment<>(
-        delegate.newProverEnvironmentWithInterpolation(options), localFormulas);
+        delegate.newProverEnvironmentWithInterpolation(options),
+        delegate.getFormulaManager(),
+        localFormulas);
   }
 
   @SuppressWarnings("resource")
