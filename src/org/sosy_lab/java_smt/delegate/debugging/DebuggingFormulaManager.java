@@ -80,7 +80,9 @@ public class DebuggingFormulaManager extends FormulaChecks implements FormulaMan
 
   @Override
   public FloatingPointFormulaManager getFloatingPointFormulaManager() {
-    throw new UnsupportedOperationException();
+    assertThreadLocal();
+    return new DebuggingFloatingPointFormulaManager(
+        delegate.getFloatingPointFormulaManager(), localFormulas);
   }
 
   @Override
