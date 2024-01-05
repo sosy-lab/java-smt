@@ -82,7 +82,8 @@ public class DebuggingFormulaManager extends FormulaChecks implements FormulaMan
 
   @Override
   public UFManager getUFManager() {
-    throw new UnsupportedOperationException();
+    assertThreadLocal();
+    return new DebuggingUFManager(delegate.getUFManager(), localFormulas);
   }
 
   @Override
