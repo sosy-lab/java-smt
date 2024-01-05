@@ -42,10 +42,13 @@ public class DebuggingSolverContext extends ThreadChecks implements SolverContex
     return new DebuggingProverEnvironment(delegate.newProverEnvironment(options), localFormulas);
   }
 
+  @SuppressWarnings("resource")
   @Override
   public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation(
       ProverOptions... options) {
-    throw new UnsupportedOperationException();
+    assertThreadLocal();
+    return new DebuggingInterpolatingProverEnvironment<>(
+        delegate.newProverEnvironmentWithInterpolation(), localFormulas);
   }
 
   @Override
