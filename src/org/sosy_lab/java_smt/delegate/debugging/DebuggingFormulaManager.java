@@ -68,7 +68,7 @@ public class DebuggingFormulaManager extends FormulaChecks implements FormulaMan
   @Override
   public ArrayFormulaManager getArrayFormulaManager() {
     assertThreadLocal();
-    return delegate.getArrayFormulaManager();
+    return new DebuggingArrayFormulaManager(delegate.getArrayFormulaManager(), localFormulas);
   }
 
   @Override
