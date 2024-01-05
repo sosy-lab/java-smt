@@ -49,7 +49,7 @@ public class DebuggingSolverContext extends ThreadChecks implements SolverContex
       ProverOptions... options) {
     assertThreadLocal();
     return new DebuggingInterpolatingProverEnvironment<>(
-        delegate.newProverEnvironmentWithInterpolation(), localFormulas);
+        delegate.newProverEnvironmentWithInterpolation(options), localFormulas);
   }
 
   @SuppressWarnings("resource")
@@ -57,7 +57,7 @@ public class DebuggingSolverContext extends ThreadChecks implements SolverContex
   public OptimizationProverEnvironment newOptimizationProverEnvironment(ProverOptions... options) {
     assertThreadLocal();
     return new DebuggingOptimizationProverEnvironment(
-        delegate.newOptimizationProverEnvironment(), localFormulas);
+        delegate.newOptimizationProverEnvironment(options), localFormulas);
   }
 
   @Override
