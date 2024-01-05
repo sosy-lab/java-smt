@@ -72,6 +72,7 @@ class DebuggingBasicProverEnvironment<T> extends FormulaChecks
     return delegate.isUnsatWithAssumptions(assumptions);
   }
 
+  @SuppressWarnings("resource")
   @Override
   public Model getModel() throws SolverException {
     assertThreadLocal();

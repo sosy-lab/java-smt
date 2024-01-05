@@ -58,8 +58,9 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
     }
   }
 
+  @SuppressWarnings("resource")
   @Test(expected = AssertionError.class)
-  public void wrongThreadTest() throws InterruptedException {
+  public void wrongThreadTest() throws InterruptedException, ExecutionException {
     HardIntegerFormulaGenerator hardProblem = new HardIntegerFormulaGenerator(debugImgr, debugBmgr);
 
     // Try to use the context in a different thread
@@ -74,13 +75,8 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
               }
               return null;
             });
-    exec.shutdown();
-
-    try {
-      assert result.get() == null;
-    } catch (ExecutionException pE) {
-
-    }
+    assert result.get() == null;
+    exec.shutdownNow();
   }
 
   @Test(expected = AssertionError.class)

@@ -11,6 +11,8 @@ package org.sosy_lab.java_smt.delegate.debugging;
 /* Base class for everything in the debugging.* package. Provides a method that makes sure that API
  * calls are only made from the same thread that was used to create the object.
  */
+
+@SuppressWarnings("deprecation")
 public class ThreadChecks {
   private final long localThread = Thread.currentThread().getId();
 

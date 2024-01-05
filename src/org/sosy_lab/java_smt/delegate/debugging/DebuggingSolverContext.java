@@ -35,6 +35,7 @@ public class DebuggingSolverContext extends ThreadChecks implements SolverContex
     return new DebuggingFormulaManager(delegate.getFormulaManager(), localFormulas);
   }
 
+  @SuppressWarnings("resource")
   @Override
   public ProverEnvironment newProverEnvironment(ProverOptions... options) {
     assertThreadLocal();
