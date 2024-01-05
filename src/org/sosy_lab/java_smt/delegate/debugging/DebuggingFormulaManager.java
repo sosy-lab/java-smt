@@ -73,7 +73,9 @@ public class DebuggingFormulaManager extends FormulaChecks implements FormulaMan
 
   @Override
   public BitvectorFormulaManager getBitvectorFormulaManager() {
-    throw new UnsupportedOperationException();
+    assertThreadLocal();
+    return new DebuggingBitvectorFormulaManager(
+        delegate.getBitvectorFormulaManager(), localFormulas);
   }
 
   @Override
