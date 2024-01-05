@@ -22,7 +22,7 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
 
 public class DebuggingSolverContext extends ThreadChecks implements SolverContext {
-  private Set<Formula> localFormulas = new HashSet<>();
+  private final Set<Formula> localFormulas = new HashSet<>();
   private final SolverContext delegate;
 
   public DebuggingSolverContext(SolverContext pDelegate) {
