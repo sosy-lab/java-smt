@@ -21,6 +21,7 @@ import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
 
+// TODO: Add configuration options to enable/disable some of the checks
 public class DebuggingSolverContext extends ThreadChecks implements SolverContext {
   private final Set<Formula> localFormulas = new HashSet<>();
   private final SolverContext delegate;

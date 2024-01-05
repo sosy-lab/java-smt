@@ -75,6 +75,7 @@ class DebuggingBasicProverEnvironment<T> extends FormulaChecks
   @SuppressWarnings("resource")
   @Override
   public Model getModel() throws SolverException {
+    // TODO: Check that isUnsat was called and returned false, and that the stack has not changed
     assertThreadLocal();
     return new DebuggingModel(delegate.getModel(), localFormulas);
   }

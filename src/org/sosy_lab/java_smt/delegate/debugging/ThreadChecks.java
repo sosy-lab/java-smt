@@ -18,6 +18,7 @@ public class ThreadChecks {
 
   /** Assert that this object is only used by the thread that created it. */
   public void assertThreadLocal() {
+    // TODO: Improve error reporting
     assert localThread == Thread.currentThread().getId();
   }
 }

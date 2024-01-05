@@ -29,6 +29,7 @@ public class FormulaChecks extends ThreadChecks {
 
   /** Assert that the formula belongs to this context. */
   public void assertFormulaInContext(Formula pFormula) {
+    // TODO: Improve error reporting
     assert localFormulas.contains(pFormula);
   }
 }
