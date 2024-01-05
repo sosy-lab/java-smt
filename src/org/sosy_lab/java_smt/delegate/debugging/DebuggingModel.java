@@ -93,7 +93,12 @@ public class DebuggingModel extends FormulaChecks implements Model {
   @Override
   public ImmutableList<ValueAssignment> asList() {
     assertThreadLocal();
-    return delegate.asList();
+    ImmutableList<ValueAssignment> result = delegate.asList();
+    for (ValueAssignment v : result) {
+      addFormulaToContext(v.getKey());
+      addFormulaToContext(v.getValueAsFormula());
+    }
+    return result;
   }
 
   @Override
