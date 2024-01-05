@@ -93,7 +93,8 @@ public class DebuggingFormulaManager extends FormulaChecks implements FormulaMan
 
   @Override
   public SLFormulaManager getSLFormulaManager() {
-    throw new UnsupportedOperationException();
+    assertThreadLocal();
+    return new DebuggingSLFormulaManager(delegate.getSLFormulaManager(), localFormulas);
   }
 
   @Override
