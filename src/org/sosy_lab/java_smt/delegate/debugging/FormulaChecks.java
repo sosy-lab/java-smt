@@ -8,6 +8,8 @@
 
 package org.sosy_lab.java_smt.delegate.debugging;
 
+import static com.google.common.truth.Truth.assertWithMessage;
+
 import java.util.Set;
 import org.sosy_lab.java_smt.api.Formula;
 
@@ -29,7 +31,8 @@ public class FormulaChecks extends ThreadChecks {
 
   /** Assert that the formula belongs to this context. */
   public void assertFormulaInContext(Formula pFormula) {
-    // TODO: Improve error reporting
-    assert localFormulas.contains(pFormula);
+    assertWithMessage("Solver object was not defined in this context.")
+        .that(localFormulas)
+        .contains(pFormula);
   }
 }
