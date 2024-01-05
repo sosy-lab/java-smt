@@ -97,6 +97,7 @@ public class DebuggingModel extends FormulaChecks implements Model {
     for (ValueAssignment v : result) {
       addFormulaToContext(v.getKey());
       addFormulaToContext(v.getValueAsFormula());
+      addFormulaToContext(v.getAssignmentAsFormula());
     }
     return result;
   }
