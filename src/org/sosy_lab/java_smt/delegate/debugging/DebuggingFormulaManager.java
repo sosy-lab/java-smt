@@ -106,7 +106,9 @@ public class DebuggingFormulaManager extends FormulaChecks implements FormulaMan
 
   @Override
   public EnumerationFormulaManager getEnumerationFormulaManager() {
-    throw new UnsupportedOperationException();
+    assertThreadLocal();
+    return new DebuggingEnumerationFormulaManager(
+        delegate.getEnumerationFormulaManager(), localFormulas);
   }
 
   @Override
