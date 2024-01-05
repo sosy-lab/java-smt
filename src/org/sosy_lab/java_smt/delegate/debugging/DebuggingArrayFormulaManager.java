@@ -18,6 +18,7 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 
+@SuppressWarnings({"ClassTypeParameterName", "MethodTypeParameterName"})
 public class DebuggingArrayFormulaManager extends FormulaChecks implements ArrayFormulaManager {
   private final ArrayFormulaManager delegate;
 
