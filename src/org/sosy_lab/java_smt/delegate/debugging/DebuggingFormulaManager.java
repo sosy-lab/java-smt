@@ -98,7 +98,9 @@ public class DebuggingFormulaManager extends FormulaChecks implements FormulaMan
 
   @Override
   public QuantifiedFormulaManager getQuantifiedFormulaManager() {
-    throw new UnsupportedOperationException();
+    assertThreadLocal();
+    return new DebuggingQuantifiedFormulaManager(
+        delegate.getQuantifiedFormulaManager(), localFormulas);
   }
 
   @Override
