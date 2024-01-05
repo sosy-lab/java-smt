@@ -33,7 +33,7 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   private BooleanFormulaManager debugBmgr;
   private IntegerFormulaManager debugImgr;
 
-  private final int DEFAULT_PROBLEM_SIZE = 8;
+  private static final int DEFAULT_PROBLEM_SIZE = 8;
 
   @Before
   public void init() throws InvalidConfigurationException {
@@ -53,11 +53,13 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
 
   @After
   public void cleanup() {
-    if (debugContext != null) debugContext.close();
+    if (debugContext != null) {
+      debugContext.close();
+    }
   }
 
   @Test(expected = AssertionError.class)
-  public void wrongThreadTest() throws InterruptedException, SolverException, ExecutionException {
+  public void wrongThreadTest() throws InterruptedException {
     HardIntegerFormulaGenerator hardProblem = new HardIntegerFormulaGenerator(debugImgr, debugBmgr);
 
     // Try to use the context in a different thread
@@ -74,7 +76,11 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
             });
     exec.shutdown();
 
-    assert result.get() == null;
+    try {
+      assert result.get() == null;
+    } catch (ExecutionException pE) {
+
+    }
   }
 
   @Test(expected = AssertionError.class)

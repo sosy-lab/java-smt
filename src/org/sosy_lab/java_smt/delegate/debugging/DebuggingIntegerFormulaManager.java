@@ -8,6 +8,8 @@
 
 package org.sosy_lab.java_smt.delegate.debugging;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.math.BigInteger;
 import java.util.Set;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -23,7 +25,7 @@ public class DebuggingIntegerFormulaManager
   public DebuggingIntegerFormulaManager(
       IntegerFormulaManager pDelegate, Set<Formula> pLocalFormulas) {
     super(pDelegate, pLocalFormulas);
-    delegate = pDelegate;
+    delegate = checkNotNull(pDelegate);
   }
 
   @Override

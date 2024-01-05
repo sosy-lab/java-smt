@@ -8,6 +8,8 @@
 
 package org.sosy_lab.java_smt.delegate.debugging;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collector;
@@ -25,7 +27,7 @@ public class DebuggingBooleanFormulaManager extends FormulaChecks implements Boo
   public DebuggingBooleanFormulaManager(
       BooleanFormulaManager pDelegate, Set<Formula> pLocalFormulas) {
     super(pLocalFormulas);
-    delegate = pDelegate;
+    delegate = checkNotNull(pDelegate);
   }
 
   @Override

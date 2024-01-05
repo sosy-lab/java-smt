@@ -8,6 +8,8 @@
 
 package org.sosy_lab.java_smt.delegate.debugging;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -26,7 +28,7 @@ class DebuggingBasicProverEnvironment<T> extends FormulaChecks
   DebuggingBasicProverEnvironment(
       BasicProverEnvironment<T> pDelegate, Set<Formula> pLocalFormulas) {
     super(pLocalFormulas);
-    delegate = pDelegate;
+    delegate = checkNotNull(pDelegate);
   }
 
   @Override

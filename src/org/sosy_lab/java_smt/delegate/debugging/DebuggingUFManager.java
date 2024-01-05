@@ -8,6 +8,8 @@
 
 package org.sosy_lab.java_smt.delegate.debugging;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.List;
 import java.util.Set;
 import org.sosy_lab.java_smt.api.Formula;
@@ -20,7 +22,7 @@ public class DebuggingUFManager extends FormulaChecks implements UFManager {
 
   public DebuggingUFManager(UFManager pDelegate, Set<Formula> pLocalFormulas) {
     super(pLocalFormulas);
-    delegate = pDelegate;
+    delegate = checkNotNull(pDelegate);
   }
 
   @Override
