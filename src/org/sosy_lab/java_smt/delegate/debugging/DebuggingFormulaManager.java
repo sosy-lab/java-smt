@@ -35,6 +35,7 @@ import org.sosy_lab.java_smt.api.SLFormulaManager;
 import org.sosy_lab.java_smt.api.StringFormulaManager;
 import org.sosy_lab.java_smt.api.Tactic;
 import org.sosy_lab.java_smt.api.UFManager;
+import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
@@ -156,11 +157,20 @@ public class DebuggingFormulaManager extends FormulaChecks implements FormulaMan
     return delegate.getFormulaType(formula);
   }
 
+  /* Used by parse() to add all the subterms of the parsed term to the context */
+  private class Closure extends DefaultFormulaVisitor<TraversalProcess> {
+    @Override
+    protected TraversalProcess visitDefault(Formula f) {
+      addFormulaToContext(f);
+      return TraversalProcess.CONTINUE;
+    }
+  }
+
   @Override
   public BooleanFormula parse(String s) throws IllegalArgumentException {
     assertThreadLocal();
     BooleanFormula formula = delegate.parse(s);
-    addFormulaToContext(formula);
+    delegate.visitRecursively(formula, new Closure());
     return formula;
   }
 
