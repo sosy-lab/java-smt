@@ -47,7 +47,9 @@ public class DebuggingUFManager extends FormulaChecks implements UFManager {
     for (Formula t : args) {
       assertFormulaInContext(t);
     }
-    return delegate.callUF(funcType, args);
+    T result = delegate.callUF(funcType, args);
+    addFormulaToContext(result);
+    return result;
   }
 
   @Override
@@ -56,7 +58,9 @@ public class DebuggingUFManager extends FormulaChecks implements UFManager {
     for (Formula t : args) {
       assertFormulaInContext(t);
     }
-    return delegate.callUF(funcType, args);
+    T result = delegate.callUF(funcType, args);
+    addFormulaToContext(result);
+    return result;
   }
 
   @Override
@@ -66,7 +70,9 @@ public class DebuggingUFManager extends FormulaChecks implements UFManager {
     for (Formula t : pArgs) {
       assertFormulaInContext(t);
     }
-    return delegate.declareAndCallUF(name, pReturnType, pArgs);
+    T result = delegate.declareAndCallUF(name, pReturnType, pArgs);
+    addFormulaToContext(result);
+    return result;
   }
 
   @Override
@@ -76,6 +82,8 @@ public class DebuggingUFManager extends FormulaChecks implements UFManager {
     for (Formula t : pArgs) {
       assertFormulaInContext(t);
     }
-    return delegate.declareAndCallUF(name, pReturnType, pArgs);
+    T result = delegate.declareAndCallUF(name, pReturnType, pArgs);
+    addFormulaToContext(result);
+    return result;
   }
 }
