@@ -31,14 +31,20 @@ public class DebuggingInterpolatingProverEnvironment<T> extends DebuggingBasicPr
       throws SolverException, InterruptedException {
     assertThreadLocal();
     // FIXME: We should probably check that the formula ids are valid
-    return delegate.getInterpolant(formulasOfA);
+    BooleanFormula result = delegate.getInterpolant(formulasOfA);
+    addFormulaToContext(result);
+    return result;
   }
 
   @Override
   public List<BooleanFormula> getSeqInterpolants(List<? extends Collection<T>> partitionedFormulas)
       throws SolverException, InterruptedException {
     assertThreadLocal();
-    return delegate.getSeqInterpolants(partitionedFormulas);
+    List<BooleanFormula> result = delegate.getSeqInterpolants(partitionedFormulas);
+    for (BooleanFormula t : result) {
+      addFormulaToContext(t);
+    }
+    return result;
   }
 
   @Override
@@ -46,6 +52,10 @@ public class DebuggingInterpolatingProverEnvironment<T> extends DebuggingBasicPr
       List<? extends Collection<T>> partitionedFormulas, int[] startOfSubTree)
       throws SolverException, InterruptedException {
     assertThreadLocal();
-    return delegate.getTreeInterpolants(partitionedFormulas, startOfSubTree);
+    List<BooleanFormula> result = delegate.getTreeInterpolants(partitionedFormulas, startOfSubTree);
+    for (BooleanFormula t : result) {
+      addFormulaToContext(t);
+    }
+    return result;
   }
 }
