@@ -78,7 +78,9 @@ public class DebuggingArrayFormulaManager extends FormulaChecks implements Array
     assertThreadLocal();
     assertFormulaInContext(pArray1);
     assertFormulaInContext(pArray2);
-    return delegate.equivalence(pArray1, pArray2);
+    BooleanFormula result = delegate.equivalence(pArray1, pArray2);
+    addFormulaToContext(result);
+    return result;
   }
 
   @Override
