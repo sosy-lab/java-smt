@@ -16,6 +16,7 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.SLFormulaManager;
 
+@SuppressWarnings({"ClassTypeParameterName", "MethodTypeParameterName"})
 public class DebuggingSLFormulaManager extends FormulaChecks implements SLFormulaManager {
   private final SLFormulaManager delegate;
 
