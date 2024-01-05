@@ -466,7 +466,7 @@ public class DebuggingFloatingPointFormulaManager extends FormulaChecks
   public BooleanFormula isNegative(FloatingPointFormula number) {
     assertThreadLocal();
     assertFormulaInContext(number);
-    BooleanFormula result = delegate.isNormal(number);
+    BooleanFormula result = delegate.isNegative(number);
     addFormulaToContext(result);
     return result;
   }
