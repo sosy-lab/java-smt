@@ -11,7 +11,7 @@ package org.sosy_lab.java_smt.test;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.base.Throwables;
-import java.util.List;
+import com.google.common.collect.ImmutableList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -151,7 +151,7 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
     requireIntegers();
     // Declara the function on the normal context...
     FunctionDeclaration<IntegerFormula> id =
-        fmgr.declareUF("id", FormulaType.IntegerType, List.of(FormulaType.IntegerType));
+        fmgr.declareUF("id", FormulaType.IntegerType, ImmutableList.of(FormulaType.IntegerType));
     // then try calling it from the debugging context
     IntegerFormula f = debugFmgr.callUF(id, debugImgr.makeNumber(0));
   }
