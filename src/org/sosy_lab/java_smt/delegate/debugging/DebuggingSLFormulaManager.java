@@ -8,6 +8,8 @@
 
 package org.sosy_lab.java_smt.delegate.debugging;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.Set;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
@@ -19,7 +21,7 @@ public class DebuggingSLFormulaManager extends FormulaChecks implements SLFormul
 
   public DebuggingSLFormulaManager(SLFormulaManager pDelegate, Set<Formula> pformulasInContext) {
     super(pformulasInContext);
-    delegate = pDelegate;
+    delegate = checkNotNull(pDelegate);
   }
 
   @Override
