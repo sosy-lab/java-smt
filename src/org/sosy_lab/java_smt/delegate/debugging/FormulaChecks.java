@@ -32,7 +32,7 @@ public class FormulaChecks extends ThreadChecks {
   /** Assert that the formula belongs to this context. */
   public void assertFormulaInContext(Formula pFormula) {
     assertWithMessage("Solver object was not defined in this context.")
-        .that(nodeManager.isInContext(pFormula))
-        .isTrue();
+        .that(nodeManager.formulasInContext())
+        .contains(pFormula);
   }
 }

@@ -45,6 +45,10 @@ public class DebuggingSolverContext extends ThreadChecks implements SolverContex
     public boolean isInContext(Formula pFormula) {
       return solverObjects.contains(pFormula);
     }
+
+    public Iterable<Formula> formulasInContext() {
+      return solverObjects;
+    }
   }
 
   public DebuggingSolverContext(SolverContext pDelegate) {
