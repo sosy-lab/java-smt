@@ -31,7 +31,6 @@ public class DebuggingInterpolatingProverEnvironment<T> extends DebuggingBasicPr
   public BooleanFormula getInterpolant(Collection<T> formulasOfA)
       throws SolverException, InterruptedException {
     assertThreadLocal();
-    // FIXME: We should probably check that the formula ids are valid
     BooleanFormula result = delegate.getInterpolant(formulasOfA);
     addFormulaToContext(result);
     return result;
