@@ -249,8 +249,12 @@ public class DebuggingFormulaManager extends FormulaChecks implements FormulaMan
 
   @Override
   public BooleanFormula translateFrom(BooleanFormula formula, FormulaManager otherManager) {
-    // TODO: We need to check that 'formula' belongs to 'otherManager'
-    throw new UnsupportedOperationException();
+    if (otherManager instanceof DebuggingFormulaManager) {
+      ((DebuggingFormulaManager) otherManager).assertFormulaInContext(formula);
+    }
+    BooleanFormula result = delegate.translateFrom(formula, otherManager);
+    addFormulaToContext(result);
+    return result;
   }
 
   @Override
