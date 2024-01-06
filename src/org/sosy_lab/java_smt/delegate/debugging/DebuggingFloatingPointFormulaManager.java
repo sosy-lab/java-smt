@@ -9,7 +9,6 @@
 package org.sosy_lab.java_smt.delegate.debugging;
 
 import java.math.BigDecimal;
-import java.util.Set;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -19,13 +18,14 @@ import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
+import org.sosy_lab.java_smt.delegate.debugging.DebuggingSolverContext.NodeManager;
 
 public class DebuggingFloatingPointFormulaManager extends FormulaChecks
     implements FloatingPointFormulaManager {
   private final FloatingPointFormulaManager delegate;
 
   public DebuggingFloatingPointFormulaManager(
-      FloatingPointFormulaManager pDelegate, Set<Formula> pLocalFormulas) {
+      FloatingPointFormulaManager pDelegate, NodeManager pLocalFormulas) {
     super(pLocalFormulas);
     delegate = pDelegate;
   }

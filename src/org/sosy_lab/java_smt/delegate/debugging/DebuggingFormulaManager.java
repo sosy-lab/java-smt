@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
 import org.sosy_lab.java_smt.api.ArrayFormulaManager;
@@ -30,21 +29,20 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
-import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.SLFormulaManager;
 import org.sosy_lab.java_smt.api.StringFormulaManager;
 import org.sosy_lab.java_smt.api.Tactic;
 import org.sosy_lab.java_smt.api.UFManager;
-import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
+import org.sosy_lab.java_smt.delegate.debugging.DebuggingSolverContext.NodeManager;
 
 public class DebuggingFormulaManager extends FormulaChecks implements FormulaManager {
   private final FormulaManager delegate;
 
-  public DebuggingFormulaManager(FormulaManager pDelegate, Set<Formula> pLocalFormulas) {
+  public DebuggingFormulaManager(FormulaManager pDelegate, NodeManager pLocalFormulas) {
     super(pLocalFormulas);
     delegate = checkNotNull(pDelegate);
   }
@@ -52,71 +50,70 @@ public class DebuggingFormulaManager extends FormulaChecks implements FormulaMan
   @Override
   public IntegerFormulaManager getIntegerFormulaManager() {
     assertThreadLocal();
-    return new DebuggingIntegerFormulaManager(delegate.getIntegerFormulaManager(), localFormulas);
+    return new DebuggingIntegerFormulaManager(delegate.getIntegerFormulaManager(), nodeManager);
   }
 
   @Override
   public RationalFormulaManager getRationalFormulaManager() {
     assertThreadLocal();
-    return new DebuggingRationalFormulaManager(delegate.getRationalFormulaManager(), localFormulas);
+    return new DebuggingRationalFormulaManager(delegate.getRationalFormulaManager(), nodeManager);
   }
 
   @Override
   public BooleanFormulaManager getBooleanFormulaManager() {
     assertThreadLocal();
-    return new DebuggingBooleanFormulaManager(delegate.getBooleanFormulaManager(), localFormulas);
+    return new DebuggingBooleanFormulaManager(delegate.getBooleanFormulaManager(), nodeManager);
   }
 
   @Override
   public ArrayFormulaManager getArrayFormulaManager() {
     assertThreadLocal();
-    return new DebuggingArrayFormulaManager(delegate.getArrayFormulaManager(), localFormulas);
+    return new DebuggingArrayFormulaManager(delegate.getArrayFormulaManager(), nodeManager);
   }
 
   @Override
   public BitvectorFormulaManager getBitvectorFormulaManager() {
     assertThreadLocal();
-    return new DebuggingBitvectorFormulaManager(
-        delegate.getBitvectorFormulaManager(), localFormulas);
+    return new DebuggingBitvectorFormulaManager(delegate.getBitvectorFormulaManager(), nodeManager);
   }
 
   @Override
   public FloatingPointFormulaManager getFloatingPointFormulaManager() {
     assertThreadLocal();
     return new DebuggingFloatingPointFormulaManager(
-        delegate.getFloatingPointFormulaManager(), localFormulas);
+        delegate.getFloatingPointFormulaManager(), nodeManager);
   }
 
   @Override
   public UFManager getUFManager() {
     assertThreadLocal();
-    return new DebuggingUFManager(delegate.getUFManager(), localFormulas);
+    return new DebuggingUFManager(delegate.getUFManager(), nodeManager);
   }
 
   @Override
   public SLFormulaManager getSLFormulaManager() {
     assertThreadLocal();
-    return new DebuggingSLFormulaManager(delegate.getSLFormulaManager(), localFormulas);
+    return new DebuggingSLFormulaManager(delegate.getSLFormulaManager(), nodeManager);
   }
 
   @Override
   public QuantifiedFormulaManager getQuantifiedFormulaManager() {
     assertThreadLocal();
     return new DebuggingQuantifiedFormulaManager(
-        delegate.getQuantifiedFormulaManager(), localFormulas);
+        delegate.getQuantifiedFormulaManager(), nodeManager);
   }
 
   @Override
   public StringFormulaManager getStringFormulaManager() {
     assertThreadLocal();
-    return new DebuggingStringFormulaManager(delegate.getStringFormulaManager(), localFormulas);
+    return new DebuggingStringFormulaManager(delegate.getStringFormulaManager(), nodeManager);
   }
 
   @Override
   public EnumerationFormulaManager getEnumerationFormulaManager() {
     assertThreadLocal();
     return new DebuggingEnumerationFormulaManager(
-        delegate.getEnumerationFormulaManager(), localFormulas);
+        delegate.getEnumerationFormulaManager(), nodeManager);
   }
 
   @Override
@@ -158,20 +155,11 @@ public class DebuggingFormulaManager extends FormulaChecks implements FormulaMan
     return delegate.getFormulaType(formula);
   }
 
-  /* Used by parse() to add all the subterms of the parsed term to the context */
-  private class Closure extends DefaultFormulaVisitor<TraversalProcess> {
-    @Override
-    protected TraversalProcess visitDefault(Formula f) {
-      addFormulaToContext(f);
-      return TraversalProcess.CONTINUE;
-    }
-  }
-
   @Override
   public BooleanFormula parse(String s) throws IllegalArgumentException {
     assertThreadLocal();
     BooleanFormula formula = delegate.parse(s);
-    delegate.visitRecursively(formula, new Closure());
+    addFormulaToContext(formula);
     return formula;
   }
 
@@ -207,65 +195,18 @@ public class DebuggingFormulaManager extends FormulaChecks implements FormulaMan
     return result;
   }
 
-  private class DebuggingVisitor<R> implements FormulaVisitor<R> {
-    private final FormulaVisitor<R> visitor;
-
-    private DebuggingVisitor(FormulaVisitor<R> pVisitor) {
-      visitor = pVisitor;
-    }
-
-    @Override
-    public R visitFreeVariable(Formula f, String name) {
-      return visitor.visitFreeVariable(f, name);
-    }
-
-    @Override
-    public R visitBoundVariable(Formula f, int deBruijnIdx) {
-      return visitor.visitBoundVariable(f, deBruijnIdx);
-    }
-
-    @Override
-    public R visitConstant(Formula f, Object value) {
-      return visitor.visitConstant(f, value);
-    }
-
-    @Override
-    public R visitFunction(
-        Formula f,
-        List<Formula> args,
-        FunctionDeclaration<?> functionDeclaration) {
-      for (Formula t : args) {
-        addFormulaToContext(t);
-      }
-      return visitor.visitFunction(f, args, functionDeclaration);
-    }
-
-    @Override
-    public R visitQuantifier(
-        BooleanFormula f,
-        Quantifier quantifier,
-        List<Formula> boundVariables,
-        BooleanFormula body) {
-      for (Formula t : boundVariables) {
-        addFormulaToContext(t);
-      }
-      addFormulaToContext(body);
-      return visitor.visitQuantifier(f, quantifier, boundVariables, body);
-    }
-  }
-
   @Override
   public <R> R visit(Formula f, FormulaVisitor<R> rFormulaVisitor) {
     assertThreadLocal();
     assertFormulaInContext(f);
-    return delegate.visit(f, new DebuggingVisitor<R>(rFormulaVisitor));
+    return delegate.visit(f, rFormulaVisitor);
   }
 
   @Override
   public void visitRecursively(Formula f, FormulaVisitor<TraversalProcess> rFormulaVisitor) {
     assertThreadLocal();
     assertFormulaInContext(f);
-    delegate.visitRecursively(f, new DebuggingVisitor<>(rFormulaVisitor));
+    delegate.visitRecursively(f, rFormulaVisitor);
   }
 
   @Override
@@ -280,7 +221,6 @@ public class DebuggingFormulaManager extends FormulaChecks implements FormulaMan
   public ImmutableMap<String, Formula> extractVariables(Formula f) {
     assertThreadLocal();
     assertFormulaInContext(f);
-    // All Formulas in the result are subterms of f and don't have to be added to the context again
     return delegate.extractVariables(f);
   }
 

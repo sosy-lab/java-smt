@@ -12,7 +12,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
 import java.math.BigInteger;
-import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -23,11 +22,12 @@ import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.StringFormula;
+import org.sosy_lab.java_smt.delegate.debugging.DebuggingSolverContext.NodeManager;
 
 public class DebuggingModel extends FormulaChecks implements Model {
   private final Model delegate;
 
-  public DebuggingModel(Model pDelegate, Set<Formula> pLocalFormula) {
+  public DebuggingModel(Model pDelegate, NodeManager pLocalFormula) {
     super(pLocalFormula);
     delegate = checkNotNull(pDelegate);
   }

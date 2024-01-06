@@ -11,11 +11,10 @@ package org.sosy_lab.java_smt.delegate.debugging;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
-import java.util.Set;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.delegate.debugging.DebuggingSolverContext.NodeManager;
 
 public class DebuggingIntegerFormulaManager
     extends DebuggingNumeralFormulaManager<IntegerFormula, IntegerFormula>
@@ -23,7 +22,7 @@ public class DebuggingIntegerFormulaManager
   private final IntegerFormulaManager delegate;
 
   public DebuggingIntegerFormulaManager(
-      IntegerFormulaManager pDelegate, Set<Formula> pLocalFormulas) {
+      IntegerFormulaManager pDelegate, NodeManager pLocalFormulas) {
     super(pDelegate, pLocalFormulas);
     delegate = checkNotNull(pDelegate);
   }

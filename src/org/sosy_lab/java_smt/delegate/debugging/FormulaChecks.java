@@ -10,29 +10,29 @@ package org.sosy_lab.java_smt.delegate.debugging;
 
 import static com.google.common.truth.Truth.assertWithMessage;
 
-import java.util.Set;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.delegate.debugging.DebuggingSolverContext.NodeManager;
 
 /* Base class for all FormulaManagers and all other classes that need to handle formulas as
  * arguments. Adds a method to register formulas to the current context, and another that checks
  * if a given formula was created on this context.
  */
 public class FormulaChecks extends ThreadChecks {
-  protected final Set<Formula> localFormulas;
+  protected final NodeManager nodeManager;
 
-  public FormulaChecks(Set<Formula> pformulasInContext) {
-    localFormulas = pformulasInContext;
+  public FormulaChecks(NodeManager pNodeManager) {
+    nodeManager = pNodeManager;
   }
 
   /** Needs to be called after a new Formula is created to associate it with this context. */
   public void addFormulaToContext(Formula pFormula) {
-    localFormulas.add(pFormula);
+    nodeManager.addFormulaToContext(pFormula);
   }
 
   /** Assert that the formula belongs to this context. */
   public void assertFormulaInContext(Formula pFormula) {
     assertWithMessage("Solver object was not defined in this context.")
-        .that(localFormulas)
-        .contains(pFormula);
+        .that(nodeManager.isInContext(pFormula))
+        .isTrue();
   }
 }

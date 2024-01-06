@@ -13,20 +13,18 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.delegate.debugging.DebuggingSolverContext.NodeManager;
 
 class DebuggingBasicProverEnvironment<T> extends FormulaChecks
     implements BasicProverEnvironment<T> {
   private final BasicProverEnvironment<T> delegate;
 
-  DebuggingBasicProverEnvironment(
-      BasicProverEnvironment<T> pDelegate, Set<Formula> pLocalFormulas) {
+  DebuggingBasicProverEnvironment(BasicProverEnvironment<T> pDelegate, NodeManager pLocalFormulas) {
     super(pLocalFormulas);
     delegate = checkNotNull(pDelegate);
   }
@@ -77,7 +75,7 @@ class DebuggingBasicProverEnvironment<T> extends FormulaChecks
   public Model getModel() throws SolverException {
     // TODO: Check that isUnsat was called and returned false, and that the stack has not changed
     assertThreadLocal();
-    return new DebuggingModel(delegate.getModel(), localFormulas);
+    return new DebuggingModel(delegate.getModel(), nodeManager);
   }
 
   @Override

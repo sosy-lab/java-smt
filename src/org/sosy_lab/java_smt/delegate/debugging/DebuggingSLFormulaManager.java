@@ -10,17 +10,17 @@ package org.sosy_lab.java_smt.delegate.debugging;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Set;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.SLFormulaManager;
+import org.sosy_lab.java_smt.delegate.debugging.DebuggingSolverContext.NodeManager;
 
 @SuppressWarnings({"ClassTypeParameterName", "MethodTypeParameterName"})
 public class DebuggingSLFormulaManager extends FormulaChecks implements SLFormulaManager {
   private final SLFormulaManager delegate;
 
-  public DebuggingSLFormulaManager(SLFormulaManager pDelegate, Set<Formula> pformulasInContext) {
+  public DebuggingSLFormulaManager(SLFormulaManager pDelegate, NodeManager pformulasInContext) {
     super(pformulasInContext);
     delegate = checkNotNull(pDelegate);
   }

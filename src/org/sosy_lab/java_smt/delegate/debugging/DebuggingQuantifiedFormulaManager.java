@@ -11,18 +11,18 @@ package org.sosy_lab.java_smt.delegate.debugging;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.List;
-import java.util.Set;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.delegate.debugging.DebuggingSolverContext.NodeManager;
 
 public class DebuggingQuantifiedFormulaManager extends FormulaChecks
     implements QuantifiedFormulaManager {
   private final QuantifiedFormulaManager delegate;
 
   public DebuggingQuantifiedFormulaManager(
-      QuantifiedFormulaManager pDelegate, Set<Formula> pLocalFormulas) {
+      QuantifiedFormulaManager pDelegate, NodeManager pLocalFormulas) {
     super(pLocalFormulas);
     delegate = checkNotNull(pDelegate);
   }

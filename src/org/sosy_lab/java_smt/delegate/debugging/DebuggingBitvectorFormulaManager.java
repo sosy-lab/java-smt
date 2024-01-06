@@ -10,20 +10,19 @@ package org.sosy_lab.java_smt.delegate.debugging;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Set;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.delegate.debugging.DebuggingSolverContext.NodeManager;
 
 public class DebuggingBitvectorFormulaManager extends FormulaChecks
     implements BitvectorFormulaManager {
   private final BitvectorFormulaManager delegate;
 
   public DebuggingBitvectorFormulaManager(
-      BitvectorFormulaManager pDelegate, Set<Formula> pLocalFormulas) {
+      BitvectorFormulaManager pDelegate, NodeManager pLocalFormulas) {
     super(pLocalFormulas);
     delegate = pDelegate;
   }

@@ -11,16 +11,16 @@ package org.sosy_lab.java_smt.delegate.debugging;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.List;
-import java.util.Set;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.UFManager;
+import org.sosy_lab.java_smt.delegate.debugging.DebuggingSolverContext.NodeManager;
 
 public class DebuggingUFManager extends FormulaChecks implements UFManager {
   private final UFManager delegate;
 
-  public DebuggingUFManager(UFManager pDelegate, Set<Formula> pLocalFormulas) {
+  public DebuggingUFManager(UFManager pDelegate, NodeManager pLocalFormulas) {
     super(pLocalFormulas);
     delegate = checkNotNull(pDelegate);
   }

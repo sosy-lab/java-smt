@@ -11,24 +11,22 @@ package org.sosy_lab.java_smt.delegate.debugging;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.api.FunctionDeclaration;
-import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.visitors.BooleanFormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.BooleanFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
+import org.sosy_lab.java_smt.delegate.debugging.DebuggingSolverContext.NodeManager;
 
 public class DebuggingBooleanFormulaManager extends FormulaChecks implements BooleanFormulaManager {
   private final BooleanFormulaManager delegate;
 
   public DebuggingBooleanFormulaManager(
-      BooleanFormulaManager pDelegate, Set<Formula> pLocalFormulas) {
+      BooleanFormulaManager pDelegate, NodeManager pLocalFormulas) {
     super(pLocalFormulas);
     delegate = checkNotNull(pDelegate);
   }
@@ -212,103 +210,12 @@ public class DebuggingBooleanFormulaManager extends FormulaChecks implements Boo
     addFormulaToContext(result);
     return result;
   }
-  private class DebuggingBooleanVisitor<R> implements BooleanFormulaVisitor<R> {
-    private final BooleanFormulaVisitor<R> visitor;
-
-    private DebuggingBooleanVisitor(BooleanFormulaVisitor<R> pVisitor) {
-      visitor = pVisitor;
-    }
-
-    @Override
-    public R visitConstant(boolean value) {
-      return visitor.visitConstant(value);
-    }
-
-    @Override
-    public R visitBoundVar(BooleanFormula var, int deBruijnIdx) {
-      return visitor.visitBoundVar(var, deBruijnIdx);
-    }
-
-    @Override
-    public R visitNot(BooleanFormula operand) {
-      addFormulaToContext(operand);
-      return visitor.visitNot(operand);
-    }
-
-    @Override
-    public R visitAnd(List<BooleanFormula> operands) {
-      for (Formula t : operands) {
-        addFormulaToContext(t);
-      }
-      return visitor.visitAnd(operands);
-    }
-
-    @Override
-    public R visitOr(List<BooleanFormula> operands) {
-      for (Formula t : operands) {
-        addFormulaToContext(t);
-      }
-      return visitor.visitOr(operands);
-    }
-
-    @Override
-    public R visitXor(BooleanFormula operand1, BooleanFormula operand2) {
-      addFormulaToContext(operand1);
-      addFormulaToContext(operand2);
-      return visitor.visitXor(operand1, operand2);
-    }
-
-    @Override
-    public R visitEquivalence(BooleanFormula operand1, BooleanFormula operand2) {
-      addFormulaToContext(operand1);
-      addFormulaToContext(operand2);
-      return visitor.visitEquivalence(operand1, operand2);
-    }
-
-    @Override
-    public R visitImplication(BooleanFormula operand1, BooleanFormula operand2) {
-      addFormulaToContext(operand1);
-      addFormulaToContext(operand2);
-      return visitor.visitImplication(operand1, operand2);
-    }
-
-    @Override
-    public R visitIfThenElse(
-        BooleanFormula condition,
-        BooleanFormula thenFormula,
-        BooleanFormula elseFormula) {
-      addFormulaToContext(condition);
-      addFormulaToContext(thenFormula);
-      addFormulaToContext(elseFormula);
-      return visitor.visitIfThenElse(condition, thenFormula, elseFormula);
-    }
-
-    @Override
-    public R visitQuantifier(
-        Quantifier quantifier,
-        BooleanFormula quantifiedAST,
-        List<Formula> boundVars,
-        BooleanFormula body) {
-      addFormulaToContext(quantifiedAST);
-      for (Formula t : boundVars) {
-        addFormulaToContext(t);
-      }
-      addFormulaToContext(body);
-      return visitor.visitQuantifier(quantifier, quantifiedAST, boundVars, body);
-    }
-
-    @Override
-    public R visitAtom(BooleanFormula atom, FunctionDeclaration<BooleanFormula> funcDecl) {
-      addFormulaToContext(atom);
-      return visitor.visitAtom(atom, funcDecl);
-    }
-  }
 
   @Override
   public <R> R visit(BooleanFormula pFormula, BooleanFormulaVisitor<R> visitor) {
     assertThreadLocal();
     assertFormulaInContext(pFormula);
-    return delegate.visit(pFormula, new DebuggingBooleanVisitor<R>(visitor));
+    return delegate.visit(pFormula, visitor);
   }
 
   @Override
@@ -316,7 +223,7 @@ public class DebuggingBooleanFormulaManager extends FormulaChecks implements Boo
       BooleanFormula f, BooleanFormulaVisitor<TraversalProcess> rFormulaVisitor) {
     assertThreadLocal();
     assertFormulaInContext(f);
-    delegate.visitRecursively(f, new DebuggingBooleanVisitor<>(rFormulaVisitor));
+    delegate.visitRecursively(f, rFormulaVisitor);
   }
 
   @Override
@@ -324,7 +231,6 @@ public class DebuggingBooleanFormulaManager extends FormulaChecks implements Boo
       BooleanFormula f, BooleanFormulaTransformationVisitor pVisitor) {
     assertThreadLocal();
     assertFormulaInContext(f);
-    // TODO: We might need to wrap this one too?
     BooleanFormula result = delegate.transformRecursively(f, pVisitor);
     addFormulaToContext(result);
     return result;

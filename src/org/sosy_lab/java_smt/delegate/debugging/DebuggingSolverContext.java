@@ -11,8 +11,8 @@ package org.sosy_lab.java_smt.delegate.debugging;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableMap;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -20,11 +20,32 @@ import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
+import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
 // TODO: Add configuration options to enable/disable some of the checks
 public class DebuggingSolverContext extends ThreadChecks implements SolverContext {
-  private final Set<Formula> localFormulas = new HashSet<>();
+  private final NodeManager nodeManager = new NodeManager();
   private final SolverContext delegate;
+
+  public final class NodeManager extends DefaultFormulaVisitor<TraversalProcess> {
+    private final Set<Formula> solverObjects = ConcurrentHashMap.newKeySet();
+
+    @Override
+    protected TraversalProcess visitDefault(Formula f) {
+      solverObjects.add(f);
+      return TraversalProcess.CONTINUE;
+    }
+
+    public void addFormulaToContext(Formula pFormula) {
+      // We're adding the formula recursively, along with all of its sub terms
+      delegate.getFormulaManager().visitRecursively(pFormula, this);
+    }
+
+    public boolean isInContext(Formula pFormula) {
+      return solverObjects.contains(pFormula);
+    }
+  }
 
   public DebuggingSolverContext(SolverContext pDelegate) {
     delegate = checkNotNull(pDelegate);
@@ -33,14 +54,14 @@ public class DebuggingSolverContext extends ThreadChecks implements SolverContex
   @Override
   public FormulaManager getFormulaManager() {
     assertThreadLocal();
-    return new DebuggingFormulaManager(delegate.getFormulaManager(), localFormulas);
+    return new DebuggingFormulaManager(delegate.getFormulaManager(), nodeManager);
   }
 
   @SuppressWarnings("resource")
   @Override
   public ProverEnvironment newProverEnvironment(ProverOptions... options) {
     assertThreadLocal();
-    return new DebuggingProverEnvironment(delegate.newProverEnvironment(options), localFormulas);
+    return new DebuggingProverEnvironment(delegate.newProverEnvironment(options), nodeManager);
   }
 
   @SuppressWarnings("resource")
@@ -49,9 +70,7 @@ public class DebuggingSolverContext extends ThreadChecks implements SolverContex
       ProverOptions... options) {
     assertThreadLocal();
     return new DebuggingInterpolatingProverEnvironment<>(
-        delegate.newProverEnvironmentWithInterpolation(options),
-        delegate.getFormulaManager(),
-        localFormulas);
+        delegate.newProverEnvironmentWithInterpolation(options), nodeManager);
   }
 
   @SuppressWarnings("resource")
@@ -59,7 +78,7 @@ public class DebuggingSolverContext extends ThreadChecks implements SolverContex
   public OptimizationProverEnvironment newOptimizationProverEnvironment(ProverOptions... options) {
     assertThreadLocal();
     return new DebuggingOptimizationProverEnvironment(
-        delegate.newOptimizationProverEnvironment(options), localFormulas);
+        delegate.newOptimizationProverEnvironment(options), nodeManager);
   }
 
   @Override

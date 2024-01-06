@@ -12,15 +12,15 @@ import java.util.Set;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.EnumerationFormula;
 import org.sosy_lab.java_smt.api.EnumerationFormulaManager;
-import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType.EnumerationFormulaType;
+import org.sosy_lab.java_smt.delegate.debugging.DebuggingSolverContext.NodeManager;
 
 public class DebuggingEnumerationFormulaManager extends FormulaChecks
     implements EnumerationFormulaManager {
   private final EnumerationFormulaManager delegate;
 
   public DebuggingEnumerationFormulaManager(
-      EnumerationFormulaManager pDelegate, Set<Formula> pLocalFormulas) {
+      EnumerationFormulaManager pDelegate, NodeManager pLocalFormulas) {
     super(pLocalFormulas);
     delegate = pDelegate;
   }

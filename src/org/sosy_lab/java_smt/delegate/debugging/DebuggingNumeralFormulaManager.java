@@ -13,14 +13,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Set;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormulaManager;
+import org.sosy_lab.java_smt.delegate.debugging.DebuggingSolverContext.NodeManager;
 
 @SuppressWarnings("ClassTypeParameterName")
 public class DebuggingNumeralFormulaManager<
@@ -30,7 +29,7 @@ public class DebuggingNumeralFormulaManager<
 
   public DebuggingNumeralFormulaManager(
       NumeralFormulaManager<ParamFormulaType, ResultFormulaType> pDelegate,
-      Set<Formula> pformulasInContext) {
+      NodeManager pformulasInContext) {
     super(pformulasInContext);
     delegate = checkNotNull(pDelegate);
   }

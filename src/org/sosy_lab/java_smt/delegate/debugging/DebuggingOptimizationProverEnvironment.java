@@ -9,18 +9,18 @@
 package org.sosy_lab.java_smt.delegate.debugging;
 
 import java.util.Optional;
-import java.util.Set;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.delegate.debugging.DebuggingSolverContext.NodeManager;
 
 public class DebuggingOptimizationProverEnvironment extends DebuggingBasicProverEnvironment<Void>
     implements OptimizationProverEnvironment {
   private final OptimizationProverEnvironment delegate;
 
   public DebuggingOptimizationProverEnvironment(
-      OptimizationProverEnvironment pDelegate, Set<Formula> pLocalFormulas) {
+      OptimizationProverEnvironment pDelegate, NodeManager pLocalFormulas) {
     super(pDelegate, pLocalFormulas);
     delegate = pDelegate;
   }

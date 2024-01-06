@@ -11,19 +11,18 @@ package org.sosy_lab.java_smt.delegate.debugging;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.List;
-import java.util.Set;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.StringFormulaManager;
+import org.sosy_lab.java_smt.delegate.debugging.DebuggingSolverContext.NodeManager;
 
 public class DebuggingStringFormulaManager extends FormulaChecks implements StringFormulaManager {
   private final StringFormulaManager delegate;
 
   public DebuggingStringFormulaManager(
-      StringFormulaManager pDelegate, Set<Formula> pformulasInContext) {
+      StringFormulaManager pDelegate, NodeManager pformulasInContext) {
     super(pformulasInContext);
     delegate = checkNotNull(pDelegate);
   }
