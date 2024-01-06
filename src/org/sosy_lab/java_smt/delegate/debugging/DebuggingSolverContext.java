@@ -16,6 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
+import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
@@ -29,25 +30,38 @@ public class DebuggingSolverContext extends ThreadChecks implements SolverContex
   private final SolverContext delegate;
 
   public final class NodeManager extends DefaultFormulaVisitor<TraversalProcess> {
-    private final Set<Formula> solverObjects = ConcurrentHashMap.newKeySet();
+    private final Set<FunctionDeclaration<?>> declaredFunctions = ConcurrentHashMap.newKeySet();
+    private final Set<Formula> formulaTerms = ConcurrentHashMap.newKeySet();
+
+    public void addFunctionDeclaration(FunctionDeclaration<?> pFunctionDeclaration) {
+      declaredFunctions.add(pFunctionDeclaration);
+    }
+
+    public boolean isInFunctionDeclarations(FunctionDeclaration<?> pFunctionDeclaration) {
+      return declaredFunctions.contains(pFunctionDeclaration);
+    }
+
+    public Iterable<FunctionDeclaration<?>> listFunctionDeclarations() {
+      return declaredFunctions;
+    }
 
     @Override
     protected TraversalProcess visitDefault(Formula f) {
-      solverObjects.add(f);
+      formulaTerms.add(f);
       return TraversalProcess.CONTINUE;
     }
 
-    public void addFormulaToContext(Formula pFormula) {
+    public void addFormulaTerm(Formula pFormula) {
       // We're adding the formula recursively, along with all of its sub terms
       delegate.getFormulaManager().visitRecursively(pFormula, this);
     }
 
-    public boolean isInContext(Formula pFormula) {
-      return solverObjects.contains(pFormula);
+    public boolean isInFormulaTerms(Formula pFormula) {
+      return formulaTerms.contains(pFormula);
     }
 
-    public Iterable<Formula> formulasInContext() {
-      return solverObjects;
+    public Iterable<Formula> listFormulaTerms() {
+      return formulaTerms;
     }
   }
 

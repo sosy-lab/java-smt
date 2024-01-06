@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.delegate.debugging;
 
 import com.google.common.base.Preconditions;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.delegate.debugging.DebuggingSolverContext.NodeManager;
 
 /* Base class for all FormulaManagers and all other classes that need to handle formulas as
@@ -25,15 +26,29 @@ public class FormulaChecks extends ThreadChecks {
 
   /** Needs to be called after a new Formula is created to associate it with this context. */
   public void addFormulaToContext(Formula pFormula) {
-    nodeManager.addFormulaToContext(pFormula);
+    nodeManager.addFormulaTerm(pFormula);
   }
 
   /** Assert that the formula belongs to this context. */
   public void assertFormulaInContext(Formula pFormula) {
     Preconditions.checkArgument(
-        nodeManager.isInContext(pFormula),
-        "Solver object was not defined" + " in this context.\n  %s\nnot in\n  %s",
+        nodeManager.isInFormulaTerms(pFormula),
+        "Formula was not created in this context.\n  %s\nnot in\n  %s",
         pFormula,
-        nodeManager.formulasInContext());
+        nodeManager.listFormulaTerms());
+  }
+
+  /** Needs to be called whenever a new UF is defined to associate it with this context. */
+  public void addDeclarationToContext(FunctionDeclaration<?> pFunctionDeclaration) {
+    nodeManager.addFunctionDeclaration(pFunctionDeclaration);
+  }
+
+  /** Assert that the function declaration belongs to this context. */
+  public void assertDeclarationInContext(FunctionDeclaration<?> pFunctionDeclaration) {
+    Preconditions.checkArgument(
+        nodeManager.isInFunctionDeclarations(pFunctionDeclaration),
+        "Function was not declared in this context.\n  %s\nnot in\n  %s",
+        pFunctionDeclaration,
+        nodeManager.listFunctionDeclarations());
   }
 }

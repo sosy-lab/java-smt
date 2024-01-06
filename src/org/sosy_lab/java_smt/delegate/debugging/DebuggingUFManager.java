@@ -28,22 +28,26 @@ public class DebuggingUFManager extends FormulaChecks implements UFManager {
   @Override
   public <T extends Formula> FunctionDeclaration<T> declareUF(
       String name, FormulaType<T> returnType, List<FormulaType<?>> args) {
-    // TODO: FunctionDeclarations and FormulaTypes should probably be tracked too?
     assertThreadLocal();
-    return delegate.declareUF(name, returnType, args);
+    FunctionDeclaration<T> result = delegate.declareUF(name, returnType, args);
+    addDeclarationToContext(result);
+    return result;
   }
 
   @Override
   public <T extends Formula> FunctionDeclaration<T> declareUF(
       String name, FormulaType<T> returnType, FormulaType<?>... args) {
     assertThreadLocal();
-    return delegate.declareUF(name, returnType, args);
+    FunctionDeclaration<T> result = delegate.declareUF(name, returnType, args);
+    addDeclarationToContext(result);
+    return result;
   }
 
   @Override
   public <T extends Formula> T callUF(
       FunctionDeclaration<T> funcType, List<? extends Formula> args) {
     assertThreadLocal();
+    assertDeclarationInContext(funcType);
     for (Formula t : args) {
       assertFormulaInContext(t);
     }
@@ -55,6 +59,7 @@ public class DebuggingUFManager extends FormulaChecks implements UFManager {
   @Override
   public <T extends Formula> T callUF(FunctionDeclaration<T> funcType, Formula... args) {
     assertThreadLocal();
+    assertDeclarationInContext(funcType);
     for (Formula t : args) {
       assertFormulaInContext(t);
     }

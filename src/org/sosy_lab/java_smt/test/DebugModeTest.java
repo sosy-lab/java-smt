@@ -18,7 +18,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -145,11 +144,10 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   }
 
   @SuppressWarnings("unused")
-  @Ignore // FIXME: We need to track FunctionDeclarations in the debugging.* package
   @Test(expected = IllegalArgumentException.class)
   public void wrongContextUFTest() {
     requireIntegers();
-    // Declara the function on the normal context...
+    // Declare the function on the normal context...
     FunctionDeclaration<IntegerFormula> id =
         fmgr.declareUF("id", FormulaType.IntegerType, ImmutableList.of(FormulaType.IntegerType));
     // then try calling it from the debugging context
