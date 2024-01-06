@@ -95,7 +95,9 @@ public class DebuggingModel extends FormulaChecks implements Model {
     assertThreadLocal();
     ImmutableList<ValueAssignment> result = delegate.asList();
     for (ValueAssignment v : result) {
-      addFormulaToContext(v.getKey());
+      // Both lines are needed as assignments like "a == false" may have been simplified to
+      // "not(a)" by the solver. This then leads to errors as the term "false" is not defined in
+      // the context.
       addFormulaToContext(v.getValueAsFormula());
       addFormulaToContext(v.getAssignmentAsFormula());
     }
