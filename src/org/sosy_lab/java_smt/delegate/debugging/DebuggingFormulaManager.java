@@ -30,6 +30,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
+import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.SLFormulaManager;
 import org.sosy_lab.java_smt.api.StringFormulaManager;
@@ -206,18 +207,65 @@ public class DebuggingFormulaManager extends FormulaChecks implements FormulaMan
     return result;
   }
 
+  private class DebuggingVisitor<R> implements FormulaVisitor<R> {
+    private final FormulaVisitor<R> visitor;
+
+    private DebuggingVisitor(FormulaVisitor<R> pVisitor) {
+      visitor = pVisitor;
+    }
+
+    @Override
+    public R visitFreeVariable(Formula f, String name) {
+      return visitor.visitFreeVariable(f, name);
+    }
+
+    @Override
+    public R visitBoundVariable(Formula f, int deBruijnIdx) {
+      return visitor.visitBoundVariable(f, deBruijnIdx);
+    }
+
+    @Override
+    public R visitConstant(Formula f, Object value) {
+      return visitor.visitConstant(f, value);
+    }
+
+    @Override
+    public R visitFunction(
+        Formula f,
+        List<Formula> args,
+        FunctionDeclaration<?> functionDeclaration) {
+      for (Formula t : args) {
+        addFormulaToContext(t);
+      }
+      return visitor.visitFunction(f, args, functionDeclaration);
+    }
+
+    @Override
+    public R visitQuantifier(
+        BooleanFormula f,
+        Quantifier quantifier,
+        List<Formula> boundVariables,
+        BooleanFormula body) {
+      for (Formula t : boundVariables) {
+        addFormulaToContext(t);
+      }
+      addFormulaToContext(body);
+      return visitor.visitQuantifier(f, quantifier, boundVariables, body);
+    }
+  }
+
   @Override
   public <R> R visit(Formula f, FormulaVisitor<R> rFormulaVisitor) {
     assertThreadLocal();
     assertFormulaInContext(f);
-    return delegate.visit(f, rFormulaVisitor);
+    return delegate.visit(f, new DebuggingVisitor<R>(rFormulaVisitor));
   }
 
   @Override
   public void visitRecursively(Formula f, FormulaVisitor<TraversalProcess> rFormulaVisitor) {
     assertThreadLocal();
     assertFormulaInContext(f);
-    delegate.visitRecursively(f, rFormulaVisitor);
+    delegate.visitRecursively(f, new DebuggingVisitor<>(rFormulaVisitor));
   }
 
   @Override
