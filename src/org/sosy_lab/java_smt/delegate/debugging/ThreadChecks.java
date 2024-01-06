@@ -12,15 +12,18 @@ package org.sosy_lab.java_smt.delegate.debugging;
  * calls are only made from the same thread that was used to create the object.
  */
 
-import static com.google.common.truth.Truth.assertWithMessage;
+import com.google.common.base.Preconditions;
 
 public class ThreadChecks {
-  private final String localThread = Thread.currentThread().getName();
+  private final Thread localThread = Thread.currentThread();
 
   /** Assert that this object is only used by the thread that created it. */
   public void assertThreadLocal() {
-    assertWithMessage("Solver object was not defined by this thread.")
-        .that(Thread.currentThread().getName())
-        .isEqualTo(localThread);
+    Thread currentThread = Thread.currentThread();
+    Preconditions.checkArgument(
+        currentThread.equals(localThread),
+        "Solver object was not defined " + "by this thread. " + "Defined on %s, but this is %s.",
+        localThread.getName(),
+        currentThread.getName());
   }
 }

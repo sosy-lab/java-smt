@@ -101,7 +101,7 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
     exec.shutdownNow();
   }
 
-  @Test(expected = AssertionError.class)
+  @Test(expected = IllegalArgumentException.class)
   public void wrongContextTest() throws InterruptedException, SolverException {
     requireIntegers();
     HardIntegerFormulaGenerator hardProblem = new HardIntegerFormulaGenerator(imgr, bmgr);

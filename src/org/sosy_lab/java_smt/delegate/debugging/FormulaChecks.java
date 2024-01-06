@@ -8,8 +8,7 @@
 
 package org.sosy_lab.java_smt.delegate.debugging;
 
-import static com.google.common.truth.Truth.assertWithMessage;
-
+import com.google.common.base.Preconditions;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.delegate.debugging.DebuggingSolverContext.NodeManager;
 
@@ -31,8 +30,10 @@ public class FormulaChecks extends ThreadChecks {
 
   /** Assert that the formula belongs to this context. */
   public void assertFormulaInContext(Formula pFormula) {
-    assertWithMessage("Solver object was not defined in this context.")
-        .that(nodeManager.formulasInContext())
-        .contains(pFormula);
+    Preconditions.checkArgument(
+        nodeManager.isInContext(pFormula),
+        "Solver object was not defined" + " in this context.\n  %s\nnot in\n  %s",
+        pFormula,
+        nodeManager.formulasInContext());
   }
 }
