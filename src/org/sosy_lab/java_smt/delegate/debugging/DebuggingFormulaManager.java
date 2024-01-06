@@ -119,9 +119,9 @@ public class DebuggingFormulaManager extends FormulaChecks implements FormulaMan
   @Override
   public <T extends Formula> T makeVariable(FormulaType<T> formulaType, String name) {
     assertThreadLocal();
-    T var = delegate.makeVariable(formulaType, name);
-    addFormulaToContext(var);
-    return var;
+    T result = delegate.makeVariable(formulaType, name);
+    addFormulaToContext(result);
+    return result;
   }
 
   @Override
@@ -131,9 +131,9 @@ public class DebuggingFormulaManager extends FormulaChecks implements FormulaMan
     for (Formula f : args) {
       assertFormulaInContext(f);
     }
-    T app = delegate.makeApplication(declaration, args);
-    addFormulaToContext(app);
-    return app;
+    T result = delegate.makeApplication(declaration, args);
+    addFormulaToContext(result);
+    return result;
   }
 
   @Override
@@ -143,9 +143,9 @@ public class DebuggingFormulaManager extends FormulaChecks implements FormulaMan
     for (Formula f : args) {
       assertFormulaInContext(f);
     }
-    T app = delegate.makeApplication(declaration, args);
-    addFormulaToContext(app);
-    return app;
+    T result = delegate.makeApplication(declaration, args);
+    addFormulaToContext(result);
+    return result;
   }
 
   @Override
@@ -158,9 +158,9 @@ public class DebuggingFormulaManager extends FormulaChecks implements FormulaMan
   @Override
   public BooleanFormula parse(String s) throws IllegalArgumentException {
     assertThreadLocal();
-    BooleanFormula formula = delegate.parse(s);
-    addFormulaToContext(formula);
-    return formula;
+    BooleanFormula result = delegate.parse(s);
+    addFormulaToContext(result);
+    return result;
   }
 
   @Override
