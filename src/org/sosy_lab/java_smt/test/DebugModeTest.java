@@ -96,7 +96,7 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
     try {
       assert result.get() == null;
     } catch (ExecutionException e) {
-      Throwables.throwIfInstanceOf(e.getCause(), AssertionError.class);
+      Throwables.throwIfInstanceOf(e.getCause(), IllegalArgumentException.class);
     }
     exec.shutdownNow();
   }
