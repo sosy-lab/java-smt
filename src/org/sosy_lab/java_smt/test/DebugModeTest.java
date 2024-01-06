@@ -75,7 +75,7 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   }
 
   @SuppressWarnings("resource")
-  @Test(expected = AssertionError.class)
+  @Test(expected = IllegalArgumentException.class)
   public void wrongThreadTest() throws InterruptedException {
     requireIntegers();
     HardIntegerFormulaGenerator hardProblem = new HardIntegerFormulaGenerator(debugImgr, debugBmgr);
@@ -146,7 +146,7 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
 
   @SuppressWarnings("unused")
   @Ignore // FIXME: We need to track FunctionDeclarations in the debugging.* package
-  @Test(expected = AssertionError.class)
+  @Test(expected = IllegalArgumentException.class)
   public void wrongContextUFTest() {
     requireIntegers();
     // Declara the function on the normal context...
