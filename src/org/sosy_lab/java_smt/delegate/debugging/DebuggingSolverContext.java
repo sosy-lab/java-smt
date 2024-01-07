@@ -12,6 +12,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.sosy_lab.common.configuration.Configuration;
@@ -72,7 +73,8 @@ public class DebuggingSolverContext extends DefaultFormulaVisitor<TraversalProce
 
   /** Assert that the function declaration belongs to this context. */
   public void assertDeclarationInContext(FunctionDeclaration<?> pFunctionDeclaration) {
-    if (pFunctionDeclaration.getKind() == FunctionDeclarationKind.UF) {
+    if (List.of(FunctionDeclarationKind.VAR, FunctionDeclarationKind.UF)
+        .contains(pFunctionDeclaration.getKind())) {
       if (noSharedContexts) {
         Preconditions.checkArgument(
             declaredFunctions.contains(pFunctionDeclaration),
