@@ -18,54 +18,54 @@ import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.delegate.debugging.DebuggingSolverContext.NodeManager;
 
-class DebuggingBasicProverEnvironment<T> extends FormulaChecks
-    implements BasicProverEnvironment<T> {
+class DebuggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   private final BasicProverEnvironment<T> delegate;
+  private final DebuggingSolverContext debugging;
 
-  DebuggingBasicProverEnvironment(BasicProverEnvironment<T> pDelegate, NodeManager pLocalFormulas) {
-    super(pLocalFormulas);
+  DebuggingBasicProverEnvironment(
+      BasicProverEnvironment<T> pDelegate, DebuggingSolverContext pDebugging) {
     delegate = checkNotNull(pDelegate);
+    debugging = pDebugging;
   }
 
   @Override
   public void pop() {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     delegate.pop();
   }
 
   @Override
   public @Nullable T addConstraint(BooleanFormula constraint) throws InterruptedException {
-    assertThreadLocal();
-    assertFormulaInContext(constraint);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(constraint);
     return delegate.addConstraint(constraint);
   }
 
   @Override
   public void push() throws InterruptedException {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     delegate.push();
   }
 
   @Override
   public int size() {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     return delegate.size();
   }
 
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     return delegate.isUnsat();
   }
 
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     for (BooleanFormula f : assumptions) {
-      assertFormulaInContext(f);
+      debugging.assertFormulaInContext(f);
     }
     return delegate.isUnsatWithAssumptions(assumptions);
   }
@@ -73,38 +73,38 @@ class DebuggingBasicProverEnvironment<T> extends FormulaChecks
   @SuppressWarnings("resource")
   @Override
   public Model getModel() throws SolverException {
-    assertThreadLocal();
-    return new DebuggingModel(delegate.getModel(), nodeManager);
+    debugging.assertThreadLocal();
+    return new DebuggingModel(delegate.getModel(), debugging);
   }
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     return delegate.getUnsatCore();
   }
 
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     for (BooleanFormula f : assumptions) {
-      assertFormulaInContext(f);
+      debugging.assertFormulaInContext(f);
     }
     return delegate.unsatCoreOverAssumptions(assumptions);
   }
 
   @Override
   public void close() {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     delegate.close();
   }
 
   @Override
   public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     for (BooleanFormula f : important) {
-      assertFormulaInContext(f);
+      debugging.assertFormulaInContext(f);
     }
     return delegate.allSat(callback, important);
   }

@@ -19,210 +19,210 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormulaManager;
-import org.sosy_lab.java_smt.delegate.debugging.DebuggingSolverContext.NodeManager;
 
 @SuppressWarnings("ClassTypeParameterName")
 public class DebuggingNumeralFormulaManager<
         ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
-    extends FormulaChecks implements NumeralFormulaManager<ParamFormulaType, ResultFormulaType> {
+    implements NumeralFormulaManager<ParamFormulaType, ResultFormulaType> {
   private final NumeralFormulaManager<ParamFormulaType, ResultFormulaType> delegate;
+  private final DebuggingSolverContext debugging;
 
   public DebuggingNumeralFormulaManager(
       NumeralFormulaManager<ParamFormulaType, ResultFormulaType> pDelegate,
-      NodeManager pformulasInContext) {
-    super(pformulasInContext);
+      DebuggingSolverContext pDebugging) {
     delegate = checkNotNull(pDelegate);
+    debugging = pDebugging;
   }
 
   @Override
   public ResultFormulaType makeNumber(long number) {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     ResultFormulaType result = delegate.makeNumber(number);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public ResultFormulaType makeNumber(BigInteger number) {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     ResultFormulaType result = delegate.makeNumber(number);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public ResultFormulaType makeNumber(double number) {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     ResultFormulaType result = delegate.makeNumber(number);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public ResultFormulaType makeNumber(BigDecimal number) {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     ResultFormulaType result = delegate.makeNumber(number);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public ResultFormulaType makeNumber(String pI) {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     ResultFormulaType result = delegate.makeNumber(pI);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public ResultFormulaType makeNumber(Rational pRational) {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     ResultFormulaType result = delegate.makeNumber(pRational);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public ResultFormulaType makeVariable(String pVar) {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     ResultFormulaType result = delegate.makeVariable(pVar);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public FormulaType<ResultFormulaType> getFormulaType() {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     return delegate.getFormulaType();
   }
 
   @Override
   public ResultFormulaType negate(ParamFormulaType number) {
-    assertThreadLocal();
-    assertFormulaInContext(number);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(number);
     ResultFormulaType result = delegate.negate(number);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public ResultFormulaType add(ParamFormulaType number1, ParamFormulaType number2) {
-    assertThreadLocal();
-    assertFormulaInContext(number1);
-    assertFormulaInContext(number2);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(number1);
+    debugging.assertFormulaInContext(number2);
     ResultFormulaType result = delegate.add(number1, number2);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public ResultFormulaType sum(List<ParamFormulaType> operands) {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     for (ParamFormulaType t : operands) {
-      assertFormulaInContext(t);
+      debugging.assertFormulaInContext(t);
     }
     ResultFormulaType result = delegate.sum(operands);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public ResultFormulaType subtract(ParamFormulaType number1, ParamFormulaType number2) {
-    assertThreadLocal();
-    assertFormulaInContext(number1);
-    assertFormulaInContext(number2);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(number1);
+    debugging.assertFormulaInContext(number2);
     ResultFormulaType result = delegate.subtract(number1, number2);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public ResultFormulaType divide(ParamFormulaType numerator, ParamFormulaType denumerator) {
-    assertThreadLocal();
-    assertFormulaInContext(numerator);
-    assertFormulaInContext(denumerator);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(numerator);
+    debugging.assertFormulaInContext(denumerator);
     ResultFormulaType result = delegate.divide(numerator, denumerator);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public ResultFormulaType multiply(ParamFormulaType number1, ParamFormulaType number2) {
-    assertThreadLocal();
-    assertFormulaInContext(number1);
-    assertFormulaInContext(number2);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(number1);
+    debugging.assertFormulaInContext(number2);
     ResultFormulaType result = delegate.multiply(number1, number2);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public BooleanFormula equal(ParamFormulaType number1, ParamFormulaType number2) {
-    assertThreadLocal();
-    assertFormulaInContext(number1);
-    assertFormulaInContext(number2);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(number1);
+    debugging.assertFormulaInContext(number2);
     BooleanFormula result = delegate.equal(number1, number2);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public BooleanFormula distinct(List<ParamFormulaType> pNumbers) {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     for (ParamFormulaType t : pNumbers) {
-      assertFormulaInContext(t);
+      debugging.assertFormulaInContext(t);
     }
     BooleanFormula result = delegate.distinct(pNumbers);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public BooleanFormula greaterThan(ParamFormulaType number1, ParamFormulaType number2) {
-    assertThreadLocal();
-    assertFormulaInContext(number1);
-    assertFormulaInContext(number2);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(number1);
+    debugging.assertFormulaInContext(number2);
     BooleanFormula result = delegate.greaterThan(number1, number2);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public BooleanFormula greaterOrEquals(ParamFormulaType number1, ParamFormulaType number2) {
-    assertThreadLocal();
-    assertFormulaInContext(number1);
-    assertFormulaInContext(number2);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(number1);
+    debugging.assertFormulaInContext(number2);
     BooleanFormula result = delegate.greaterOrEquals(number1, number2);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public BooleanFormula lessThan(ParamFormulaType number1, ParamFormulaType number2) {
-    assertThreadLocal();
-    assertFormulaInContext(number1);
-    assertFormulaInContext(number2);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(number1);
+    debugging.assertFormulaInContext(number2);
     BooleanFormula result = delegate.lessThan(number1, number2);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public BooleanFormula lessOrEquals(ParamFormulaType number1, ParamFormulaType number2) {
-    assertThreadLocal();
-    assertFormulaInContext(number1);
-    assertFormulaInContext(number2);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(number1);
+    debugging.assertFormulaInContext(number2);
     BooleanFormula result = delegate.lessOrEquals(number1, number2);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public IntegerFormula floor(ParamFormulaType formula) {
-    assertThreadLocal();
-    assertFormulaInContext(formula);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(formula);
     IntegerFormula result = delegate.floor(formula);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 }

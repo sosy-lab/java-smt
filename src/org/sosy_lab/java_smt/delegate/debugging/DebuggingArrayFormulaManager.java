@@ -16,37 +16,38 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
-import org.sosy_lab.java_smt.delegate.debugging.DebuggingSolverContext.NodeManager;
 
 @SuppressWarnings({"ClassTypeParameterName", "MethodTypeParameterName"})
-public class DebuggingArrayFormulaManager extends FormulaChecks implements ArrayFormulaManager {
+public class DebuggingArrayFormulaManager implements ArrayFormulaManager {
   private final ArrayFormulaManager delegate;
+  private final DebuggingSolverContext debugging;
 
-  public DebuggingArrayFormulaManager(ArrayFormulaManager pDelegate, NodeManager pLocalFormulas) {
-    super(pLocalFormulas);
+  public DebuggingArrayFormulaManager(
+      ArrayFormulaManager pDelegate, DebuggingSolverContext pDebugging) {
     delegate = checkNotNull(pDelegate);
+    debugging = pDebugging;
   }
 
   @Override
   public <TI extends Formula, TE extends Formula> TE select(
       ArrayFormula<TI, TE> pArray, TI pIndex) {
-    assertThreadLocal();
-    assertFormulaInContext(pArray);
-    assertFormulaInContext(pIndex);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(pArray);
+    debugging.assertFormulaInContext(pIndex);
     TE result = delegate.select(pArray, pIndex);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> store(
       ArrayFormula<TI, TE> pArray, TI pIndex, TE pValue) {
-    assertThreadLocal();
-    assertFormulaInContext(pArray);
-    assertFormulaInContext(pIndex);
-    assertFormulaInContext(pValue);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(pArray);
+    debugging.assertFormulaInContext(pIndex);
+    debugging.assertFormulaInContext(pValue);
     ArrayFormula<TI, TE> result = delegate.store(pArray, pIndex, pValue);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
@@ -57,43 +58,43 @@ public class DebuggingArrayFormulaManager extends FormulaChecks implements Array
           FTI extends FormulaType<TI>,
           FTE extends FormulaType<TE>>
       ArrayFormula<TI, TE> makeArray(String pName, FTI pIndexType, FTE pElementType) {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     ArrayFormula<TI, TE> result = delegate.makeArray(pName, pIndexType, pElementType);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> makeArray(
       String pName, ArrayFormulaType<TI, TE> type) {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     ArrayFormula<TI, TE> result = delegate.makeArray(pName, type);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public <TI extends Formula, TE extends Formula> BooleanFormula equivalence(
       ArrayFormula<TI, TE> pArray1, ArrayFormula<TI, TE> pArray2) {
-    assertThreadLocal();
-    assertFormulaInContext(pArray1);
-    assertFormulaInContext(pArray2);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(pArray1);
+    debugging.assertFormulaInContext(pArray2);
     BooleanFormula result = delegate.equivalence(pArray1, pArray2);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public <TI extends Formula> FormulaType<TI> getIndexType(ArrayFormula<TI, ?> pArray) {
-    assertThreadLocal();
-    assertFormulaInContext(pArray);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(pArray);
     return delegate.getIndexType(pArray);
   }
 
   @Override
   public <TE extends Formula> FormulaType<TE> getElementType(ArrayFormula<?, TE> pArray) {
-    assertThreadLocal();
-    assertFormulaInContext(pArray);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(pArray);
     return delegate.getElementType(pArray);
   }
 }

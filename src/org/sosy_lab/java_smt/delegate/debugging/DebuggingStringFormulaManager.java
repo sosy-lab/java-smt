@@ -16,342 +16,342 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.StringFormulaManager;
-import org.sosy_lab.java_smt.delegate.debugging.DebuggingSolverContext.NodeManager;
 
-public class DebuggingStringFormulaManager extends FormulaChecks implements StringFormulaManager {
+public class DebuggingStringFormulaManager implements StringFormulaManager {
   private final StringFormulaManager delegate;
+  private final DebuggingSolverContext debugging;
 
   public DebuggingStringFormulaManager(
-      StringFormulaManager pDelegate, NodeManager pformulasInContext) {
-    super(pformulasInContext);
+      StringFormulaManager pDelegate, DebuggingSolverContext pDebugging) {
     delegate = checkNotNull(pDelegate);
+    debugging = pDebugging;
   }
 
   @Override
   public StringFormula makeString(String value) {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     StringFormula result = delegate.makeString(value);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public StringFormula makeVariable(String pVar) {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     StringFormula result = delegate.makeVariable(pVar);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public BooleanFormula equal(StringFormula str1, StringFormula str2) {
-    assertThreadLocal();
-    assertFormulaInContext(str1);
-    assertFormulaInContext(str2);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(str1);
+    debugging.assertFormulaInContext(str2);
     BooleanFormula result = delegate.equal(str1, str2);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public BooleanFormula greaterThan(StringFormula str1, StringFormula str2) {
-    assertThreadLocal();
-    assertFormulaInContext(str1);
-    assertFormulaInContext(str2);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(str1);
+    debugging.assertFormulaInContext(str2);
     BooleanFormula result = delegate.greaterThan(str1, str2);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public BooleanFormula greaterOrEquals(StringFormula str1, StringFormula str2) {
-    assertThreadLocal();
-    assertFormulaInContext(str1);
-    assertFormulaInContext(str2);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(str1);
+    debugging.assertFormulaInContext(str2);
     BooleanFormula result = delegate.equal(str1, str2);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public BooleanFormula lessThan(StringFormula str1, StringFormula str2) {
-    assertThreadLocal();
-    assertFormulaInContext(str1);
-    assertFormulaInContext(str2);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(str1);
+    debugging.assertFormulaInContext(str2);
     BooleanFormula result = delegate.lessThan(str1, str2);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public BooleanFormula lessOrEquals(StringFormula str1, StringFormula str2) {
-    assertThreadLocal();
-    assertFormulaInContext(str1);
-    assertFormulaInContext(str2);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(str1);
+    debugging.assertFormulaInContext(str2);
     BooleanFormula result = delegate.lessOrEquals(str1, str2);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public BooleanFormula prefix(StringFormula prefix, StringFormula str) {
-    assertThreadLocal();
-    assertFormulaInContext(prefix);
-    assertFormulaInContext(str);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(prefix);
+    debugging.assertFormulaInContext(str);
     BooleanFormula result = delegate.prefix(prefix, str);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public BooleanFormula suffix(StringFormula suffix, StringFormula str) {
-    assertThreadLocal();
-    assertFormulaInContext(suffix);
-    assertFormulaInContext(str);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(suffix);
+    debugging.assertFormulaInContext(str);
     BooleanFormula result = delegate.suffix(suffix, str);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public BooleanFormula contains(StringFormula str, StringFormula part) {
-    assertThreadLocal();
-    assertFormulaInContext(str);
-    assertFormulaInContext(part);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(str);
+    debugging.assertFormulaInContext(part);
     BooleanFormula result = delegate.contains(str, part);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public IntegerFormula indexOf(StringFormula str, StringFormula part, IntegerFormula startIndex) {
-    assertThreadLocal();
-    assertFormulaInContext(str);
-    assertFormulaInContext(part);
-    assertFormulaInContext(startIndex);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(str);
+    debugging.assertFormulaInContext(part);
+    debugging.assertFormulaInContext(startIndex);
     IntegerFormula result = delegate.indexOf(str, part, startIndex);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public StringFormula charAt(StringFormula str, IntegerFormula index) {
-    assertThreadLocal();
-    assertFormulaInContext(str);
-    assertFormulaInContext(index);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(str);
+    debugging.assertFormulaInContext(index);
     StringFormula result = delegate.charAt(str, index);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public StringFormula substring(StringFormula str, IntegerFormula index, IntegerFormula length) {
-    assertThreadLocal();
-    assertFormulaInContext(str);
-    assertFormulaInContext(index);
-    assertFormulaInContext(length);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(str);
+    debugging.assertFormulaInContext(index);
+    debugging.assertFormulaInContext(length);
     StringFormula result = delegate.substring(str, index, length);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public StringFormula replace(
       StringFormula fullStr, StringFormula target, StringFormula replacement) {
-    assertThreadLocal();
-    assertFormulaInContext(fullStr);
-    assertFormulaInContext(target);
-    assertFormulaInContext(replacement);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(fullStr);
+    debugging.assertFormulaInContext(target);
+    debugging.assertFormulaInContext(replacement);
     StringFormula result = delegate.replace(fullStr, target, replacement);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public StringFormula replaceAll(
       StringFormula fullStr, StringFormula target, StringFormula replacement) {
-    assertThreadLocal();
-    assertFormulaInContext(fullStr);
-    assertFormulaInContext(target);
-    assertFormulaInContext(replacement);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(fullStr);
+    debugging.assertFormulaInContext(target);
+    debugging.assertFormulaInContext(replacement);
     StringFormula result = delegate.replaceAll(fullStr, target, replacement);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public IntegerFormula length(StringFormula str) {
-    assertThreadLocal();
-    assertFormulaInContext(str);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(str);
     IntegerFormula result = delegate.length(str);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public StringFormula concat(List<StringFormula> parts) {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     for (StringFormula t : parts) {
-      assertFormulaInContext(t);
+      debugging.assertFormulaInContext(t);
     }
     StringFormula result = delegate.concat(parts);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public BooleanFormula in(StringFormula str, RegexFormula regex) {
-    assertThreadLocal();
-    assertFormulaInContext(str);
-    assertFormulaInContext(regex);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(str);
+    debugging.assertFormulaInContext(regex);
     BooleanFormula result = delegate.in(str, regex);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public RegexFormula makeRegex(String value) {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     RegexFormula result = delegate.makeRegex(value);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public RegexFormula none() {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     RegexFormula result = delegate.none();
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public RegexFormula all() {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     RegexFormula result = delegate.all();
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public RegexFormula allChar() {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     RegexFormula result = delegate.allChar();
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public RegexFormula range(StringFormula start, StringFormula end) {
-    assertThreadLocal();
-    assertFormulaInContext(start);
-    assertFormulaInContext(end);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(start);
+    debugging.assertFormulaInContext(end);
     RegexFormula result = delegate.range(start, end);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public RegexFormula concatRegex(List<RegexFormula> parts) {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     for (RegexFormula t : parts) {
-      assertFormulaInContext(t);
+      debugging.assertFormulaInContext(t);
     }
     RegexFormula result = delegate.concatRegex(parts);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public RegexFormula union(RegexFormula regex1, RegexFormula regex2) {
-    assertThreadLocal();
-    assertFormulaInContext(regex1);
-    assertFormulaInContext(regex2);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(regex1);
+    debugging.assertFormulaInContext(regex2);
     RegexFormula result = delegate.union(regex1, regex2);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public RegexFormula intersection(RegexFormula regex1, RegexFormula regex2) {
-    assertThreadLocal();
-    assertFormulaInContext(regex1);
-    assertFormulaInContext(regex2);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(regex1);
+    debugging.assertFormulaInContext(regex2);
     RegexFormula result = delegate.intersection(regex1, regex2);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public RegexFormula complement(RegexFormula regex) {
-    assertThreadLocal();
-    assertFormulaInContext(regex);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(regex);
     RegexFormula result = delegate.complement(regex);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public RegexFormula closure(RegexFormula regex) {
-    assertThreadLocal();
-    assertFormulaInContext(regex);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(regex);
     RegexFormula result = delegate.closure(regex);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public RegexFormula difference(RegexFormula regex1, RegexFormula regex2) {
-    assertThreadLocal();
-    assertFormulaInContext(regex1);
-    assertFormulaInContext(regex2);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(regex1);
+    debugging.assertFormulaInContext(regex2);
     RegexFormula result = delegate.difference(regex1, regex2);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public RegexFormula cross(RegexFormula regex) {
-    assertThreadLocal();
-    assertFormulaInContext(regex);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(regex);
     RegexFormula result = delegate.cross(regex);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public RegexFormula optional(RegexFormula regex) {
-    assertThreadLocal();
-    assertFormulaInContext(regex);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(regex);
     RegexFormula result = delegate.optional(regex);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public RegexFormula times(RegexFormula regex, int repetitions) {
-    assertThreadLocal();
-    assertFormulaInContext(regex);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(regex);
     RegexFormula result = delegate.times(regex, repetitions);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public IntegerFormula toIntegerFormula(StringFormula str) {
-    assertThreadLocal();
-    assertFormulaInContext(str);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(str);
     IntegerFormula result = delegate.toIntegerFormula(str);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public StringFormula toStringFormula(IntegerFormula number) {
-    assertThreadLocal();
-    assertFormulaInContext(number);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(number);
     StringFormula result = delegate.toStringFormula(number);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 }

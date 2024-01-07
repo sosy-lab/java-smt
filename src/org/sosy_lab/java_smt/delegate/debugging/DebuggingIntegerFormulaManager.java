@@ -14,47 +14,48 @@ import java.math.BigInteger;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.java_smt.delegate.debugging.DebuggingSolverContext.NodeManager;
 
 public class DebuggingIntegerFormulaManager
     extends DebuggingNumeralFormulaManager<IntegerFormula, IntegerFormula>
     implements IntegerFormulaManager {
   private final IntegerFormulaManager delegate;
+  private final DebuggingSolverContext debugging;
 
   public DebuggingIntegerFormulaManager(
-      IntegerFormulaManager pDelegate, NodeManager pLocalFormulas) {
-    super(pDelegate, pLocalFormulas);
+      IntegerFormulaManager pDelegate, DebuggingSolverContext pDebugging) {
+    super(pDelegate, pDebugging);
     delegate = checkNotNull(pDelegate);
+    debugging = pDebugging;
   }
 
   @Override
   public BooleanFormula modularCongruence(
       IntegerFormula number1, IntegerFormula number2, BigInteger n) {
-    assertThreadLocal();
-    assertFormulaInContext(number1);
-    assertFormulaInContext(number2);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(number1);
+    debugging.assertFormulaInContext(number2);
     BooleanFormula result = delegate.modularCongruence(number1, number2, n);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public BooleanFormula modularCongruence(IntegerFormula number1, IntegerFormula number2, long n) {
-    assertThreadLocal();
-    assertFormulaInContext(number1);
-    assertFormulaInContext(number2);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(number1);
+    debugging.assertFormulaInContext(number2);
     BooleanFormula result = delegate.modularCongruence(number1, number2, n);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public IntegerFormula modulo(IntegerFormula numerator, IntegerFormula denumerator) {
-    assertThreadLocal();
-    assertFormulaInContext(numerator);
-    assertFormulaInContext(denumerator);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(numerator);
+    debugging.assertFormulaInContext(denumerator);
     IntegerFormula result = delegate.modulo(numerator, denumerator);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 }

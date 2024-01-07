@@ -22,91 +22,91 @@ import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.StringFormula;
-import org.sosy_lab.java_smt.delegate.debugging.DebuggingSolverContext.NodeManager;
 
-public class DebuggingModel extends FormulaChecks implements Model {
+public class DebuggingModel implements Model {
   private final Model delegate;
+  private final DebuggingSolverContext debugging;
 
-  public DebuggingModel(Model pDelegate, NodeManager pLocalFormula) {
-    super(pLocalFormula);
+  public DebuggingModel(Model pDelegate, DebuggingSolverContext pDebugging) {
     delegate = checkNotNull(pDelegate);
+    debugging = pDebugging;
   }
 
   @Override
   public <T extends Formula> @Nullable T eval(T formula) {
-    assertThreadLocal();
-    assertFormulaInContext(formula);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(formula);
     T result = delegate.eval(formula);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public @Nullable Object evaluate(Formula formula) {
-    assertThreadLocal();
-    assertFormulaInContext(formula);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(formula);
     return delegate.evaluate(formula);
   }
 
   @Override
   public @Nullable BigInteger evaluate(IntegerFormula formula) {
-    assertThreadLocal();
-    assertFormulaInContext(formula);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(formula);
     return delegate.evaluate(formula);
   }
 
   @Override
   public @Nullable Rational evaluate(RationalFormula formula) {
-    assertThreadLocal();
-    assertFormulaInContext(formula);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(formula);
     return delegate.evaluate(formula);
   }
 
   @Override
   public @Nullable Boolean evaluate(BooleanFormula formula) {
-    assertThreadLocal();
-    assertFormulaInContext(formula);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(formula);
     return delegate.evaluate(formula);
   }
 
   @Override
   public @Nullable BigInteger evaluate(BitvectorFormula formula) {
-    assertThreadLocal();
-    assertFormulaInContext(formula);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(formula);
     return delegate.evaluate(formula);
   }
 
   @Override
   public @Nullable String evaluate(StringFormula formula) {
-    assertThreadLocal();
-    assertFormulaInContext(formula);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(formula);
     return delegate.evaluate(formula);
   }
 
   @Override
   public @Nullable String evaluate(EnumerationFormula formula) {
-    assertThreadLocal();
-    assertFormulaInContext(formula);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(formula);
     return delegate.evaluate(formula);
   }
 
   @Override
   public ImmutableList<ValueAssignment> asList() {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     ImmutableList<ValueAssignment> result = delegate.asList();
     for (ValueAssignment v : result) {
       // Both lines are needed as assignments like "a == false" may have been simplified to
       // "not(a)" by the solver. This then leads to errors as the term "false" is not defined in
       // the context.
-      addFormulaToContext(v.getValueAsFormula());
-      addFormulaToContext(v.getAssignmentAsFormula());
+      debugging.addFormulaTerm(v.getValueAsFormula());
+      debugging.addFormulaTerm(v.getAssignmentAsFormula());
     }
     return result;
   }
 
   @Override
   public void close() {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     delegate.close();
   }
 }

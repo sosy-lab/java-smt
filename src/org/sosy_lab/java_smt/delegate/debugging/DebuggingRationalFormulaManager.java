@@ -11,14 +11,13 @@ package org.sosy_lab.java_smt.delegate.debugging;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
-import org.sosy_lab.java_smt.delegate.debugging.DebuggingSolverContext.NodeManager;
 
 public class DebuggingRationalFormulaManager
     extends DebuggingNumeralFormulaManager<NumeralFormula, RationalFormula>
     implements RationalFormulaManager {
 
   public DebuggingRationalFormulaManager(
-      RationalFormulaManager pDelegate, NodeManager pformulasInContext) {
-    super(pDelegate, pformulasInContext);
+      RationalFormulaManager pDelegate, DebuggingSolverContext pDebugging) {
+    super(pDelegate, pDebugging);
   }
 }

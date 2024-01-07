@@ -14,44 +14,44 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.SLFormulaManager;
-import org.sosy_lab.java_smt.delegate.debugging.DebuggingSolverContext.NodeManager;
 
 @SuppressWarnings({"ClassTypeParameterName", "MethodTypeParameterName"})
-public class DebuggingSLFormulaManager extends FormulaChecks implements SLFormulaManager {
+public class DebuggingSLFormulaManager implements SLFormulaManager {
   private final SLFormulaManager delegate;
+  private final DebuggingSolverContext debugging;
 
-  public DebuggingSLFormulaManager(SLFormulaManager pDelegate, NodeManager pformulasInContext) {
-    super(pformulasInContext);
+  public DebuggingSLFormulaManager(SLFormulaManager pDelegate, DebuggingSolverContext pDebugging) {
     delegate = checkNotNull(pDelegate);
+    debugging = pDebugging;
   }
 
   @Override
   public BooleanFormula makeStar(BooleanFormula f1, BooleanFormula f2) {
-    assertThreadLocal();
-    assertFormulaInContext(f1);
-    assertFormulaInContext(f2);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(f1);
+    debugging.assertFormulaInContext(f2);
     BooleanFormula result = delegate.makeStar(f1, f2);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public <AF extends Formula, VF extends Formula> BooleanFormula makePointsTo(AF ptr, VF to) {
-    assertThreadLocal();
-    assertFormulaInContext(ptr);
-    assertFormulaInContext(to);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(ptr);
+    debugging.assertFormulaInContext(to);
     BooleanFormula result = delegate.makePointsTo(ptr, to);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public BooleanFormula makeMagicWand(BooleanFormula f1, BooleanFormula f2) {
-    assertThreadLocal();
-    assertFormulaInContext(f1);
-    assertFormulaInContext(f2);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(f1);
+    debugging.assertFormulaInContext(f2);
     BooleanFormula result = delegate.makeMagicWand(f1, f2);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
@@ -62,17 +62,17 @@ public class DebuggingSLFormulaManager extends FormulaChecks implements SLFormul
           AT extends FormulaType<AF>,
           VT extends FormulaType<VF>>
       BooleanFormula makeEmptyHeap(AT pAdressType, VT pValueType) {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     BooleanFormula result = delegate.makeEmptyHeap(pAdressType, pValueType);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public <AF extends Formula, AT extends FormulaType<AF>> AF makeNilElement(AT pAdressType) {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     AF result = delegate.makeNilElement(pAdressType);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 }

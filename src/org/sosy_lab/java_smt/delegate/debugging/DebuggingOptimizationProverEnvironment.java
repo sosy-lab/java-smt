@@ -13,47 +13,48 @@ import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.delegate.debugging.DebuggingSolverContext.NodeManager;
 
 public class DebuggingOptimizationProverEnvironment extends DebuggingBasicProverEnvironment<Void>
     implements OptimizationProverEnvironment {
   private final OptimizationProverEnvironment delegate;
+  private final DebuggingSolverContext debugging;
 
   public DebuggingOptimizationProverEnvironment(
-      OptimizationProverEnvironment pDelegate, NodeManager pLocalFormulas) {
-    super(pDelegate, pLocalFormulas);
+      OptimizationProverEnvironment pDelegate, DebuggingSolverContext pDebugging) {
+    super(pDelegate, pDebugging);
     delegate = pDelegate;
+    debugging = pDebugging;
   }
 
   @Override
   public int maximize(Formula objective) {
-    assertThreadLocal();
-    assertFormulaInContext(objective);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(objective);
     return delegate.maximize(objective);
   }
 
   @Override
   public int minimize(Formula objective) {
-    assertThreadLocal();
-    assertFormulaInContext(objective);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(objective);
     return delegate.maximize(objective);
   }
 
   @Override
   public OptStatus check() throws InterruptedException, SolverException {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     return delegate.check();
   }
 
   @Override
   public Optional<Rational> upper(int handle, Rational epsilon) {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     return delegate.upper(handle, epsilon);
   }
 
   @Override
   public Optional<Rational> lower(int handle, Rational epsilon) {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     return delegate.lower(handle, epsilon);
   }
 }

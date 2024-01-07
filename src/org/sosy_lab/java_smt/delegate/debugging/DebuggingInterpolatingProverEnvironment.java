@@ -15,34 +15,35 @@ import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.delegate.debugging.DebuggingSolverContext.NodeManager;
 
 public class DebuggingInterpolatingProverEnvironment<T> extends DebuggingBasicProverEnvironment<T>
     implements InterpolatingProverEnvironment<T> {
   private final InterpolatingProverEnvironment<T> delegate;
+  private final DebuggingSolverContext debugging;
 
   public DebuggingInterpolatingProverEnvironment(
-      InterpolatingProverEnvironment<T> pDelegate, NodeManager pLocalFormulas) {
-    super(pDelegate, pLocalFormulas);
+      InterpolatingProverEnvironment<T> pDelegate, DebuggingSolverContext pDebugging) {
+    super(pDelegate, pDebugging);
     delegate = checkNotNull(pDelegate);
+    debugging = pDebugging;
   }
 
   @Override
   public BooleanFormula getInterpolant(Collection<T> formulasOfA)
       throws SolverException, InterruptedException {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     BooleanFormula result = delegate.getInterpolant(formulasOfA);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public List<BooleanFormula> getSeqInterpolants(List<? extends Collection<T>> partitionedFormulas)
       throws SolverException, InterruptedException {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     List<BooleanFormula> result = delegate.getSeqInterpolants(partitionedFormulas);
     for (BooleanFormula t : result) {
-      addFormulaToContext(t);
+      debugging.addFormulaTerm(t);
     }
     return result;
   }
@@ -51,10 +52,10 @@ public class DebuggingInterpolatingProverEnvironment<T> extends DebuggingBasicPr
   public List<BooleanFormula> getTreeInterpolants(
       List<? extends Collection<T>> partitionedFormulas, int[] startOfSubTree)
       throws SolverException, InterruptedException {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     List<BooleanFormula> result = delegate.getTreeInterpolants(partitionedFormulas, startOfSubTree);
     for (BooleanFormula t : result) {
-      addFormulaToContext(t);
+      debugging.addFormulaTerm(t);
     }
     return result;
   }

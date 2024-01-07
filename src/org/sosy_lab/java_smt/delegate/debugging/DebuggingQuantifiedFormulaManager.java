@@ -15,38 +15,37 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.delegate.debugging.DebuggingSolverContext.NodeManager;
 
-public class DebuggingQuantifiedFormulaManager extends FormulaChecks
-    implements QuantifiedFormulaManager {
+public class DebuggingQuantifiedFormulaManager implements QuantifiedFormulaManager {
   private final QuantifiedFormulaManager delegate;
+  private final DebuggingSolverContext debugging;
 
   public DebuggingQuantifiedFormulaManager(
-      QuantifiedFormulaManager pDelegate, NodeManager pLocalFormulas) {
-    super(pLocalFormulas);
+      QuantifiedFormulaManager pDelegate, DebuggingSolverContext pDebugging) {
     delegate = checkNotNull(pDelegate);
+    debugging = pDebugging;
   }
 
   @Override
   public BooleanFormula mkQuantifier(
       Quantifier q, List<? extends Formula> pVariables, BooleanFormula pBody) {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     for (Formula t : pVariables) {
-      assertFormulaInContext(t);
+      debugging.assertFormulaInContext(t);
     }
-    assertFormulaInContext(pBody);
+    debugging.assertFormulaInContext(pBody);
     BooleanFormula result = delegate.mkQuantifier(q, pVariables, pBody);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public BooleanFormula eliminateQuantifiers(BooleanFormula pF)
       throws InterruptedException, SolverException {
-    assertThreadLocal();
-    assertFormulaInContext(pF);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(pF);
     BooleanFormula result = delegate.eliminateQuantifiers(pF);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 }

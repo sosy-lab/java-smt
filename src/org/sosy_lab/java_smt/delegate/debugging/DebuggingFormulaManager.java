@@ -37,136 +37,135 @@ import org.sosy_lab.java_smt.api.UFManager;
 import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
-import org.sosy_lab.java_smt.delegate.debugging.DebuggingSolverContext.NodeManager;
 
-public class DebuggingFormulaManager extends FormulaChecks implements FormulaManager {
+public class DebuggingFormulaManager implements FormulaManager {
   private final FormulaManager delegate;
+  private final DebuggingSolverContext debugging;
 
-  public DebuggingFormulaManager(FormulaManager pDelegate, NodeManager pLocalFormulas) {
-    super(pLocalFormulas);
+  public DebuggingFormulaManager(FormulaManager pDelegate, DebuggingSolverContext pDebugging) {
     delegate = checkNotNull(pDelegate);
+    debugging = pDebugging;
   }
 
   @Override
   public IntegerFormulaManager getIntegerFormulaManager() {
-    assertThreadLocal();
-    return new DebuggingIntegerFormulaManager(delegate.getIntegerFormulaManager(), nodeManager);
+    debugging.assertThreadLocal();
+    return new DebuggingIntegerFormulaManager(delegate.getIntegerFormulaManager(), debugging);
   }
 
   @Override
   public RationalFormulaManager getRationalFormulaManager() {
-    assertThreadLocal();
-    return new DebuggingRationalFormulaManager(delegate.getRationalFormulaManager(), nodeManager);
+    debugging.assertThreadLocal();
+    return new DebuggingRationalFormulaManager(delegate.getRationalFormulaManager(), debugging);
   }
 
   @Override
   public BooleanFormulaManager getBooleanFormulaManager() {
-    assertThreadLocal();
-    return new DebuggingBooleanFormulaManager(delegate.getBooleanFormulaManager(), nodeManager);
+    debugging.assertThreadLocal();
+    return new DebuggingBooleanFormulaManager(delegate.getBooleanFormulaManager(), debugging);
   }
 
   @Override
   public ArrayFormulaManager getArrayFormulaManager() {
-    assertThreadLocal();
-    return new DebuggingArrayFormulaManager(delegate.getArrayFormulaManager(), nodeManager);
+    debugging.assertThreadLocal();
+    return new DebuggingArrayFormulaManager(delegate.getArrayFormulaManager(), debugging);
   }
 
   @Override
   public BitvectorFormulaManager getBitvectorFormulaManager() {
-    assertThreadLocal();
-    return new DebuggingBitvectorFormulaManager(delegate.getBitvectorFormulaManager(), nodeManager);
+    debugging.assertThreadLocal();
+    return new DebuggingBitvectorFormulaManager(delegate.getBitvectorFormulaManager(), debugging);
   }
 
   @Override
   public FloatingPointFormulaManager getFloatingPointFormulaManager() {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     return new DebuggingFloatingPointFormulaManager(
-        delegate.getFloatingPointFormulaManager(), nodeManager);
+        delegate.getFloatingPointFormulaManager(), debugging);
   }
 
   @Override
   public UFManager getUFManager() {
-    assertThreadLocal();
-    return new DebuggingUFManager(delegate.getUFManager(), nodeManager);
+    debugging.assertThreadLocal();
+    return new DebuggingUFManager(delegate.getUFManager(), debugging);
   }
 
   @Override
   public SLFormulaManager getSLFormulaManager() {
-    assertThreadLocal();
-    return new DebuggingSLFormulaManager(delegate.getSLFormulaManager(), nodeManager);
+    debugging.assertThreadLocal();
+    return new DebuggingSLFormulaManager(delegate.getSLFormulaManager(), debugging);
   }
 
   @Override
   public QuantifiedFormulaManager getQuantifiedFormulaManager() {
-    assertThreadLocal();
-    return new DebuggingQuantifiedFormulaManager(
-        delegate.getQuantifiedFormulaManager(), nodeManager);
+    debugging.assertThreadLocal();
+    return new DebuggingQuantifiedFormulaManager(delegate.getQuantifiedFormulaManager(), debugging);
   }
 
   @Override
   public StringFormulaManager getStringFormulaManager() {
-    assertThreadLocal();
-    return new DebuggingStringFormulaManager(delegate.getStringFormulaManager(), nodeManager);
+    debugging.assertThreadLocal();
+    return new DebuggingStringFormulaManager(delegate.getStringFormulaManager(), debugging);
   }
 
   @Override
   public EnumerationFormulaManager getEnumerationFormulaManager() {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     return new DebuggingEnumerationFormulaManager(
-        delegate.getEnumerationFormulaManager(), nodeManager);
+        delegate.getEnumerationFormulaManager(), debugging);
   }
 
   @Override
   public <T extends Formula> T makeVariable(FormulaType<T> formulaType, String name) {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     T result = delegate.makeVariable(formulaType, name);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public <T extends Formula> T makeApplication(
       FunctionDeclaration<T> declaration, List<? extends Formula> args) {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     for (Formula f : args) {
-      assertFormulaInContext(f);
+      debugging.assertFormulaInContext(f);
     }
     T result = delegate.makeApplication(declaration, args);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public <T extends Formula> T makeApplication(
       FunctionDeclaration<T> declaration, Formula... args) {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     for (Formula f : args) {
-      assertFormulaInContext(f);
+      debugging.assertFormulaInContext(f);
     }
     T result = delegate.makeApplication(declaration, args);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public <T extends Formula> FormulaType<T> getFormulaType(T formula) {
-    assertThreadLocal();
-    assertFormulaInContext(formula);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(formula);
     return delegate.getFormulaType(formula);
   }
 
   @Override
   public BooleanFormula parse(String s) throws IllegalArgumentException {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     BooleanFormula result = delegate.parse(s);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public Appender dumpFormula(BooleanFormula pT) {
-    assertThreadLocal();
-    assertFormulaInContext(pT);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(pT);
     return new Appenders.AbstractAppender() {
       @Override
       public void appendTo(Appendable out) throws IOException {
@@ -179,99 +178,99 @@ public class DebuggingFormulaManager extends FormulaChecks implements FormulaMan
   @Override
   public BooleanFormula applyTactic(BooleanFormula input, Tactic tactic)
       throws InterruptedException {
-    assertThreadLocal();
-    assertFormulaInContext(input);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(input);
     BooleanFormula result = delegate.applyTactic(input, tactic);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public <T extends Formula> T simplify(T input) throws InterruptedException {
-    assertThreadLocal();
-    assertFormulaInContext(input);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(input);
     T result = delegate.simplify(input);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public <R> R visit(Formula f, FormulaVisitor<R> rFormulaVisitor) {
-    assertThreadLocal();
-    assertFormulaInContext(f);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(f);
     return delegate.visit(f, rFormulaVisitor);
   }
 
   @Override
   public void visitRecursively(Formula f, FormulaVisitor<TraversalProcess> rFormulaVisitor) {
-    assertThreadLocal();
-    assertFormulaInContext(f);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(f);
     delegate.visitRecursively(f, rFormulaVisitor);
   }
 
   @Override
   public <T extends Formula> T transformRecursively(
       T f, FormulaTransformationVisitor pFormulaVisitor) {
-    assertThreadLocal();
-    assertFormulaInContext(f);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(f);
     return delegate.transformRecursively(f, pFormulaVisitor);
   }
 
   @Override
   public ImmutableMap<String, Formula> extractVariables(Formula f) {
-    assertThreadLocal();
-    assertFormulaInContext(f);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(f);
     return delegate.extractVariables(f);
   }
 
   @Override
   public ImmutableMap<String, Formula> extractVariablesAndUFs(Formula f) {
-    assertThreadLocal();
-    assertFormulaInContext(f);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(f);
     return delegate.extractVariablesAndUFs(f);
   }
 
   @Override
   public <T extends Formula> T substitute(
       T f, Map<? extends Formula, ? extends Formula> fromToMapping) {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     List<Formula> checkAll = new ArrayList<>();
     checkAll.add(f);
     checkAll.addAll(fromToMapping.keySet());
     checkAll.addAll(fromToMapping.values());
     for (Formula term : checkAll) {
-      assertFormulaInContext(term);
+      debugging.assertFormulaInContext(term);
     }
     T result = delegate.substitute(f, fromToMapping);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public BooleanFormula translateFrom(BooleanFormula formula, FormulaManager otherManager) {
     if (otherManager instanceof DebuggingFormulaManager) {
-      ((DebuggingFormulaManager) otherManager).assertFormulaInContext(formula);
+      ((DebuggingFormulaManager) otherManager).debugging.assertFormulaInContext(formula);
     }
     BooleanFormula result = delegate.translateFrom(formula, otherManager);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public boolean isValidName(String variableName) {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     return delegate.isValidName(variableName);
   }
 
   @Override
   public String escape(String variableName) {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     return delegate.escape(variableName);
   }
 
   @Override
   public String unescape(String variableName) {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     return delegate.unescape(variableName);
   }
 }

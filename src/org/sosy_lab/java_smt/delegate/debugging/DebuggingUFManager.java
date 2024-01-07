@@ -15,80 +15,80 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.UFManager;
-import org.sosy_lab.java_smt.delegate.debugging.DebuggingSolverContext.NodeManager;
 
-public class DebuggingUFManager extends FormulaChecks implements UFManager {
+public class DebuggingUFManager implements UFManager {
   private final UFManager delegate;
+  private final DebuggingSolverContext debugging;
 
-  public DebuggingUFManager(UFManager pDelegate, NodeManager pLocalFormulas) {
-    super(pLocalFormulas);
+  public DebuggingUFManager(UFManager pDelegate, DebuggingSolverContext pDebugging) {
     delegate = checkNotNull(pDelegate);
+    debugging = pDebugging;
   }
 
   @Override
   public <T extends Formula> FunctionDeclaration<T> declareUF(
       String name, FormulaType<T> returnType, List<FormulaType<?>> args) {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     FunctionDeclaration<T> result = delegate.declareUF(name, returnType, args);
-    addDeclarationToContext(result);
+    debugging.addFunctionDeclaration(result);
     return result;
   }
 
   @Override
   public <T extends Formula> FunctionDeclaration<T> declareUF(
       String name, FormulaType<T> returnType, FormulaType<?>... args) {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     FunctionDeclaration<T> result = delegate.declareUF(name, returnType, args);
-    addDeclarationToContext(result);
+    debugging.addFunctionDeclaration(result);
     return result;
   }
 
   @Override
   public <T extends Formula> T callUF(
       FunctionDeclaration<T> funcType, List<? extends Formula> args) {
-    assertThreadLocal();
-    assertDeclarationInContext(funcType);
+    debugging.assertThreadLocal();
+    debugging.assertDeclarationInContext(funcType);
     for (Formula t : args) {
-      assertFormulaInContext(t);
+      debugging.assertFormulaInContext(t);
     }
     T result = delegate.callUF(funcType, args);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public <T extends Formula> T callUF(FunctionDeclaration<T> funcType, Formula... args) {
-    assertThreadLocal();
-    assertDeclarationInContext(funcType);
+    debugging.assertThreadLocal();
+    debugging.assertDeclarationInContext(funcType);
     for (Formula t : args) {
-      assertFormulaInContext(t);
+      debugging.assertFormulaInContext(t);
     }
     T result = delegate.callUF(funcType, args);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public <T extends Formula> T declareAndCallUF(
       String name, FormulaType<T> pReturnType, List<Formula> pArgs) {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     for (Formula t : pArgs) {
-      assertFormulaInContext(t);
+      debugging.assertFormulaInContext(t);
     }
     T result = delegate.declareAndCallUF(name, pReturnType, pArgs);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public <T extends Formula> T declareAndCallUF(
       String name, FormulaType<T> pReturnType, Formula... pArgs) {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     for (Formula t : pArgs) {
-      assertFormulaInContext(t);
+      debugging.assertFormulaInContext(t);
     }
     T result = delegate.declareAndCallUF(name, pReturnType, pArgs);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 }

@@ -13,48 +13,47 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.EnumerationFormula;
 import org.sosy_lab.java_smt.api.EnumerationFormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType.EnumerationFormulaType;
-import org.sosy_lab.java_smt.delegate.debugging.DebuggingSolverContext.NodeManager;
 
-public class DebuggingEnumerationFormulaManager extends FormulaChecks
-    implements EnumerationFormulaManager {
+public class DebuggingEnumerationFormulaManager implements EnumerationFormulaManager {
   private final EnumerationFormulaManager delegate;
+  private final DebuggingSolverContext debugging;
 
   public DebuggingEnumerationFormulaManager(
-      EnumerationFormulaManager pDelegate, NodeManager pLocalFormulas) {
-    super(pLocalFormulas);
+      EnumerationFormulaManager pDelegate, DebuggingSolverContext pDebugging) {
     delegate = pDelegate;
+    debugging = pDebugging;
   }
 
   @Override
   public EnumerationFormulaType declareEnumeration(String pName, Set<String> ppElementNames) {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     return delegate.declareEnumeration(pName, ppElementNames);
   }
 
   @Override
   public EnumerationFormula makeConstant(String pName, EnumerationFormulaType pType) {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     EnumerationFormula result = delegate.makeConstant(pName, pType);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public EnumerationFormula makeVariable(String pVar, EnumerationFormulaType pType) {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     EnumerationFormula result = delegate.makeVariable(pVar, pType);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public BooleanFormula equivalence(
       EnumerationFormula pEnumeration1, EnumerationFormula pEnumeration2) {
-    assertThreadLocal();
-    assertFormulaInContext(pEnumeration1);
-    assertFormulaInContext(pEnumeration2);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(pEnumeration1);
+    debugging.assertFormulaInContext(pEnumeration2);
     BooleanFormula result = delegate.equivalence(pEnumeration1, pEnumeration2);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 }

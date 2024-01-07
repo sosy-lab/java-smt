@@ -10,9 +10,14 @@ package org.sosy_lab.java_smt.delegate.debugging;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.common.configuration.Option;
+import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -24,62 +29,98 @@ import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
-// TODO: Add configuration options to enable/disable some of the checks
-public class DebuggingSolverContext extends ThreadChecks implements SolverContext {
-  private final NodeManager nodeManager = new NodeManager();
-  private final SolverContext delegate;
+@Options(prefix = "solver.debugMode")
+public class DebuggingSolverContext extends DefaultFormulaVisitor<TraversalProcess>
+    implements SolverContext {
+  @Option(
+      secure = true,
+      description =
+          "Enable assertions that make sure that solver objects are only used on the "
+              + "thread that created them.")
+  private boolean threadLocal = true;
 
-  public final class NodeManager extends DefaultFormulaVisitor<TraversalProcess> {
-    private final Set<FunctionDeclaration<?>> declaredFunctions = ConcurrentHashMap.newKeySet();
-    private final Set<Formula> formulaTerms = ConcurrentHashMap.newKeySet();
+  private final Thread solverThread = Thread.currentThread();
 
-    public void addFunctionDeclaration(FunctionDeclaration<?> pFunctionDeclaration) {
-      declaredFunctions.add(pFunctionDeclaration);
-    }
-
-    public boolean isInFunctionDeclarations(FunctionDeclaration<?> pFunctionDeclaration) {
-      return declaredFunctions.contains(pFunctionDeclaration);
-    }
-
-    public Iterable<FunctionDeclaration<?>> listFunctionDeclarations() {
-      return declaredFunctions;
-    }
-
-    @Override
-    protected TraversalProcess visitDefault(Formula f) {
-      formulaTerms.add(f);
-      return TraversalProcess.CONTINUE;
-    }
-
-    public void addFormulaTerm(Formula pFormula) {
-      // We're adding the formula recursively, along with all of its sub terms
-      delegate.getFormulaManager().visitRecursively(pFormula, this);
-    }
-
-    public boolean isInFormulaTerms(Formula pFormula) {
-      return formulaTerms.contains(pFormula);
-    }
-
-    public Iterable<Formula> listFormulaTerms() {
-      return formulaTerms;
+  /** Assert that this object is only used by the thread that created it. */
+  public void assertThreadLocal() {
+    if (threadLocal) {
+      Thread currentThread = Thread.currentThread();
+      Preconditions.checkArgument(
+          currentThread.equals(solverThread),
+          "Solver object was not defined by this thread. Defined on %s, but this is %s.",
+          solverThread.getName(),
+          currentThread.getName());
     }
   }
 
-  public DebuggingSolverContext(SolverContext pDelegate) {
+  @Option(
+      secure = true,
+      description =
+          "Enable assertions that make sure that solver objects are only used with the "
+              + "context that created them.")
+  private boolean noSharedContexts = true;
+
+  private final Set<FunctionDeclaration<?>> declaredFunctions = ConcurrentHashMap.newKeySet();
+  private final Set<Formula> formulaTerms = ConcurrentHashMap.newKeySet();
+
+  /** Needs to be called after a new function is declared to associate it with this context. */
+  public void addFunctionDeclaration(FunctionDeclaration<?> pFunctionDeclaration) {
+    declaredFunctions.add(pFunctionDeclaration);
+  }
+
+  /** Assert that the function declaration belongs to this context. */
+  public void assertDeclarationInContext(FunctionDeclaration<?> pFunctionDeclaration) {
+    if (noSharedContexts) {
+      Preconditions.checkArgument(
+          declaredFunctions.contains(pFunctionDeclaration),
+          "Function was not declared in this context.\n  %s\nnot in\n  %s",
+          pFunctionDeclaration,
+          declaredFunctions);
+    }
+  }
+
+  @Override
+  protected TraversalProcess visitDefault(Formula f) {
+    // Used in addFormulaTerm where we recursively add all sub terms of a formula to the context
+    formulaTerms.add(f);
+    return TraversalProcess.CONTINUE;
+  }
+
+  /** Needs to be called after a new Formula is created to associate it with this context. */
+  public void addFormulaTerm(Formula pFormula) {
+    delegate.getFormulaManager().visitRecursively(pFormula, this);
+  }
+
+  /** Assert that the formula belongs to this context. */
+  public void assertFormulaInContext(Formula pFormula) {
+    if (noSharedContexts) {
+      Preconditions.checkArgument(
+          formulaTerms.contains(pFormula),
+          "Formula was not created in this context.\n  %s\nnot in\n  %s",
+          pFormula,
+          formulaTerms);
+    }
+  }
+
+  private final SolverContext delegate;
+
+  public DebuggingSolverContext(Configuration pConfiguration, SolverContext pDelegate)
+      throws InvalidConfigurationException {
+    pConfiguration.inject(this);
     delegate = checkNotNull(pDelegate);
   }
 
   @Override
   public FormulaManager getFormulaManager() {
     assertThreadLocal();
-    return new DebuggingFormulaManager(delegate.getFormulaManager(), nodeManager);
+    return new DebuggingFormulaManager(delegate.getFormulaManager(), this);
   }
 
   @SuppressWarnings("resource")
   @Override
   public ProverEnvironment newProverEnvironment(ProverOptions... options) {
     assertThreadLocal();
-    return new DebuggingProverEnvironment(delegate.newProverEnvironment(options), nodeManager);
+    return new DebuggingProverEnvironment(delegate.newProverEnvironment(options), this);
   }
 
   @SuppressWarnings("resource")
@@ -88,7 +129,7 @@ public class DebuggingSolverContext extends ThreadChecks implements SolverContex
       ProverOptions... options) {
     assertThreadLocal();
     return new DebuggingInterpolatingProverEnvironment<>(
-        delegate.newProverEnvironmentWithInterpolation(options), nodeManager);
+        delegate.newProverEnvironmentWithInterpolation(options), this);
   }
 
   @SuppressWarnings("resource")
@@ -96,7 +137,7 @@ public class DebuggingSolverContext extends ThreadChecks implements SolverContex
   public OptimizationProverEnvironment newOptimizationProverEnvironment(ProverOptions... options) {
     assertThreadLocal();
     return new DebuggingOptimizationProverEnvironment(
-        delegate.newOptimizationProverEnvironment(options), nodeManager);
+        delegate.newOptimizationProverEnvironment(options), this);
   }
 
   @Override

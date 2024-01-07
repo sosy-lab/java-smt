@@ -20,124 +20,124 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.visitors.BooleanFormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.BooleanFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
-import org.sosy_lab.java_smt.delegate.debugging.DebuggingSolverContext.NodeManager;
 
-public class DebuggingBooleanFormulaManager extends FormulaChecks implements BooleanFormulaManager {
+public class DebuggingBooleanFormulaManager implements BooleanFormulaManager {
   private final BooleanFormulaManager delegate;
+  private final DebuggingSolverContext debugging;
 
   public DebuggingBooleanFormulaManager(
-      BooleanFormulaManager pDelegate, NodeManager pLocalFormulas) {
-    super(pLocalFormulas);
+      BooleanFormulaManager pDelegate, DebuggingSolverContext pDebugging) {
     delegate = checkNotNull(pDelegate);
+    debugging = pDebugging;
   }
 
   @Override
   public BooleanFormula makeTrue() {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     BooleanFormula result = delegate.makeTrue();
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public BooleanFormula makeFalse() {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     BooleanFormula result = delegate.makeFalse();
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public BooleanFormula makeVariable(String pVar) {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     BooleanFormula result = delegate.makeVariable(pVar);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public BooleanFormula equivalence(BooleanFormula formula1, BooleanFormula formula2) {
-    assertThreadLocal();
-    assertFormulaInContext(formula1);
-    assertFormulaInContext(formula2);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(formula1);
+    debugging.assertFormulaInContext(formula2);
     BooleanFormula result = delegate.equivalence(formula1, formula2);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public BooleanFormula implication(BooleanFormula formula1, BooleanFormula formula2) {
-    assertThreadLocal();
-    assertFormulaInContext(formula1);
-    assertFormulaInContext(formula2);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(formula1);
+    debugging.assertFormulaInContext(formula2);
     BooleanFormula result = delegate.implication(formula1, formula2);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public boolean isTrue(BooleanFormula formula) {
-    assertThreadLocal();
-    assertFormulaInContext(formula);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(formula);
     return delegate.isTrue(formula);
   }
 
   @Override
   public boolean isFalse(BooleanFormula formula) {
-    assertThreadLocal();
-    assertFormulaInContext(formula);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(formula);
     return delegate.isFalse(formula);
   }
 
   @Override
   public <T extends Formula> T ifThenElse(BooleanFormula cond, T f1, T f2) {
-    assertThreadLocal();
-    assertFormulaInContext(cond);
-    assertFormulaInContext(f1);
-    assertFormulaInContext(f2);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(cond);
+    debugging.assertFormulaInContext(f1);
+    debugging.assertFormulaInContext(f2);
     T result = delegate.ifThenElse(cond, f1, f2);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public BooleanFormula not(BooleanFormula bits) {
-    assertThreadLocal();
-    assertFormulaInContext(bits);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(bits);
     BooleanFormula result = delegate.not(bits);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public BooleanFormula and(BooleanFormula bits1, BooleanFormula bits2) {
-    assertThreadLocal();
-    assertFormulaInContext(bits1);
-    assertFormulaInContext(bits2);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(bits1);
+    debugging.assertFormulaInContext(bits2);
     BooleanFormula result = delegate.and(bits1, bits2);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public BooleanFormula and(Collection<BooleanFormula> bits) {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     for (BooleanFormula f : bits) {
-      assertFormulaInContext(f);
+      debugging.assertFormulaInContext(f);
     }
     BooleanFormula result = delegate.and(bits);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public BooleanFormula and(BooleanFormula... bits) {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     for (BooleanFormula f : bits) {
-      assertFormulaInContext(f);
+      debugging.assertFormulaInContext(f);
     }
     BooleanFormula result = delegate.and(bits);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
@@ -147,43 +147,43 @@ public class DebuggingBooleanFormulaManager extends FormulaChecks implements Boo
         Collectors.toList(),
         (terms) -> {
           for (BooleanFormula f : terms) {
-            assertFormulaInContext(f);
+            debugging.assertFormulaInContext(f);
           }
           BooleanFormula result = and(terms);
-          addFormulaToContext(result);
+          debugging.addFormulaTerm(result);
           return result;
         });
   }
 
   @Override
   public BooleanFormula or(BooleanFormula bits1, BooleanFormula bits2) {
-    assertThreadLocal();
-    assertFormulaInContext(bits1);
-    assertFormulaInContext(bits2);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(bits1);
+    debugging.assertFormulaInContext(bits2);
     BooleanFormula result = delegate.or(bits1, bits2);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public BooleanFormula or(Collection<BooleanFormula> bits) {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     for (BooleanFormula f : bits) {
-      assertFormulaInContext(f);
+      debugging.assertFormulaInContext(f);
     }
     BooleanFormula result = delegate.or(bits);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public BooleanFormula or(BooleanFormula... bits) {
-    assertThreadLocal();
+    debugging.assertThreadLocal();
     for (BooleanFormula f : bits) {
-      assertFormulaInContext(f);
+      debugging.assertFormulaInContext(f);
     }
     BooleanFormula result = delegate.or(bits);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
@@ -193,67 +193,67 @@ public class DebuggingBooleanFormulaManager extends FormulaChecks implements Boo
         Collectors.toList(),
         (terms) -> {
           for (BooleanFormula f : terms) {
-            assertFormulaInContext(f);
+            debugging.assertFormulaInContext(f);
           }
           BooleanFormula result = or(terms);
-          addFormulaToContext(result);
+          debugging.addFormulaTerm(result);
           return result;
         });
   }
 
   @Override
   public BooleanFormula xor(BooleanFormula bits1, BooleanFormula bits2) {
-    assertThreadLocal();
-    assertFormulaInContext(bits1);
-    assertFormulaInContext(bits2);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(bits1);
+    debugging.assertFormulaInContext(bits2);
     BooleanFormula result = delegate.xor(bits1, bits2);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public <R> R visit(BooleanFormula pFormula, BooleanFormulaVisitor<R> visitor) {
-    assertThreadLocal();
-    assertFormulaInContext(pFormula);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(pFormula);
     return delegate.visit(pFormula, visitor);
   }
 
   @Override
   public void visitRecursively(
       BooleanFormula f, BooleanFormulaVisitor<TraversalProcess> rFormulaVisitor) {
-    assertThreadLocal();
-    assertFormulaInContext(f);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(f);
     delegate.visitRecursively(f, rFormulaVisitor);
   }
 
   @Override
   public BooleanFormula transformRecursively(
       BooleanFormula f, BooleanFormulaTransformationVisitor pVisitor) {
-    assertThreadLocal();
-    assertFormulaInContext(f);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(f);
     BooleanFormula result = delegate.transformRecursively(f, pVisitor);
-    addFormulaToContext(result);
+    debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public Set<BooleanFormula> toConjunctionArgs(BooleanFormula f, boolean flatten) {
-    assertThreadLocal();
-    assertFormulaInContext(f);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(f);
     Set<BooleanFormula> result = delegate.toConjunctionArgs(f, flatten);
     for (BooleanFormula r : result) {
-      addFormulaToContext(r);
+      debugging.addFormulaTerm(r);
     }
     return result;
   }
 
   @Override
   public Set<BooleanFormula> toDisjunctionArgs(BooleanFormula f, boolean flatten) {
-    assertThreadLocal();
-    assertFormulaInContext(f);
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(f);
     Set<BooleanFormula> result = delegate.toDisjunctionArgs(f, flatten);
     for (BooleanFormula r : result) {
-      addFormulaToContext(r);
+      debugging.addFormulaTerm(r);
     }
     return result;
   }

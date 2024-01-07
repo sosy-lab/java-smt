@@ -226,7 +226,7 @@ public class SolverContextFactory {
       context = new SynchronizedSolverContext(config, logger, shutdownNotifier, context);
     }
     if (debugMode) {
-      context = new DebuggingSolverContext(context);
+      context = new DebuggingSolverContext(config, context);
     }
     if (collectStatistics) {
       // statistics need to be the most outer wrapping layer.
