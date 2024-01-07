@@ -47,7 +47,7 @@ public class DebuggingSolverContext extends DefaultFormulaVisitor<TraversalProce
   public void assertThreadLocal() {
     if (threadLocal) {
       Thread currentThread = Thread.currentThread();
-      Preconditions.checkArgument(
+      Preconditions.checkState(
           currentThread.equals(solverThread),
           "Solver instance was not created on this thread. This is thread %s, but the solver "
               + "instance belongs to thread %s.",

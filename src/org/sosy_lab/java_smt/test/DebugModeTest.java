@@ -74,7 +74,7 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   }
 
   @SuppressWarnings("resource")
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = IllegalStateException.class)
   public void wrongThreadTest() throws InterruptedException {
     requireIntegers();
     HardIntegerFormulaGenerator hardProblem = new HardIntegerFormulaGenerator(debugImgr, debugBmgr);
@@ -95,7 +95,7 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
     try {
       assert result.get() == null;
     } catch (ExecutionException e) {
-      Throwables.throwIfInstanceOf(e.getCause(), IllegalArgumentException.class);
+      Throwables.throwIfInstanceOf(e.getCause(), IllegalStateException.class);
     }
     exec.shutdownNow();
   }
