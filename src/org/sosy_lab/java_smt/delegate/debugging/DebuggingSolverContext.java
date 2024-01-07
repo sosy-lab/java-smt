@@ -22,6 +22,7 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
+import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
@@ -70,12 +71,14 @@ public class DebuggingSolverContext extends DefaultFormulaVisitor<TraversalProce
 
   /** Assert that the function declaration belongs to this context. */
   public void assertDeclarationInContext(FunctionDeclaration<?> pFunctionDeclaration) {
-    if (noSharedContexts) {
-      Preconditions.checkArgument(
-          declaredFunctions.contains(pFunctionDeclaration),
-          "Function was not declared in this context.\n  %s\nnot in\n  %s",
-          pFunctionDeclaration,
-          declaredFunctions);
+    if (pFunctionDeclaration.getKind() == FunctionDeclarationKind.UF) {
+      if (noSharedContexts) {
+        Preconditions.checkArgument(
+            declaredFunctions.contains(pFunctionDeclaration),
+            "Function was not declared in this context.\n  %s\nnot in\n  %s",
+            pFunctionDeclaration,
+            declaredFunctions);
+      }
     }
   }
 
