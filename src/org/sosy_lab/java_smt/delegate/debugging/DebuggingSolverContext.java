@@ -36,7 +36,7 @@ public class DebuggingSolverContext extends DefaultFormulaVisitor<TraversalProce
   @Option(
       secure = true,
       description =
-          "Enable assertions that make sure that solver objects are only used on the "
+          "Enable assertions that make sure that solver instances are only used on the "
               + "thread that created them.")
   private boolean threadLocal = true;
 
@@ -48,17 +48,18 @@ public class DebuggingSolverContext extends DefaultFormulaVisitor<TraversalProce
       Thread currentThread = Thread.currentThread();
       Preconditions.checkArgument(
           currentThread.equals(solverThread),
-          "Solver object was not defined by this thread. Defined on %s, but this is %s.",
-          solverThread.getName(),
-          currentThread.getName());
+          "Solver instance was not created on this thread. This is thread %s, but the solver "
+              + "instance belongs to thread %s.",
+          currentThread.getName(),
+          solverThread.getName());
     }
   }
 
   @Option(
       secure = true,
       description =
-          "Enable assertions that make sure that solver objects are only used with the "
-              + "context that created them.")
+          "Enable assertions that make sure that formulas and function declarations are only used "
+              + "in the context that created them.")
   private boolean noSharedContexts = true;
 
   private final Set<FunctionDeclaration<?>> declaredFunctions = ConcurrentHashMap.newKeySet();
