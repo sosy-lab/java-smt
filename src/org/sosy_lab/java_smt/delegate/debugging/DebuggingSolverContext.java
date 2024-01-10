@@ -31,6 +31,13 @@ import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
+// TODO: Check which solver is used and disable all unneeded checks
+//      wrongThread: everything but cvc5 passes
+//      wrongContext: cvc4, cvc5, yices pass
+//      wrongContextUF: princess, cvc5, yices pass
+
+// TODO: Figure out what to do about boolector (does not support visitors..)
+
 @Options(prefix = "solver.debugMode")
 public class DebuggingSolverContext extends DefaultFormulaVisitor<TraversalProcess>
     implements SolverContext {
