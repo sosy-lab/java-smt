@@ -30,7 +30,6 @@ import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
-import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.UFManager;
@@ -76,15 +75,15 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   @SuppressWarnings("resource")
   @Test(expected = IllegalStateException.class)
   public void wrongThreadTest() throws InterruptedException {
-    requireIntegers();
-    HardIntegerFormulaGenerator hardProblem = new HardIntegerFormulaGenerator(debugImgr, debugBmgr);
-
     // Try to use the context in a different thread
     ExecutorService exec = Executors.newSingleThreadExecutor();
     Future<?> result =
         exec.submit(
             () -> {
-              BooleanFormula formula = hardProblem.generate(DEFAULT_PROBLEM_SIZE);
+              // Generate a non trivial problem for our tests
+              BooleanFormula varA = debugBmgr.makeVariable("a");
+              BooleanFormula formula = debugBmgr.and(varA, debugBmgr.not(varA));
+
               try (BasicProverEnvironment<?> prover = debugContext.newProverEnvironment()) {
                 prover.push(formula);
                 assertThat(prover).isUnsatisfiable();
@@ -103,9 +102,6 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
 
   @Test(expected = IllegalArgumentException.class)
   public void wrongContextTest() throws InterruptedException, SolverException {
-    requireIntegers();
-    HardIntegerFormulaGenerator hardProblem = new HardIntegerFormulaGenerator(imgr, bmgr);
-
     // FIXME: This test tries to use a formula that was created in a different context. We expect
     //  this test to fail for most solvers, but there should be a unique error message.
     //  Right now we get:
@@ -131,6 +127,8 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
     // We might want to see this as very low priority, as there is no real benefit for the user,
     // except having a nice error message.
 
+    HardIntegerFormulaGenerator hardProblem = new HardIntegerFormulaGenerator(imgr, bmgr);
+
     // Boolector does not support integer, so we have to use two different versions for this test.
     BooleanFormula formula =
         solverToUse() == Solvers.BOOLECTOR
@@ -147,11 +145,9 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   @SuppressWarnings("unused")
   @Test(expected = IllegalArgumentException.class)
   public void wrongContextUFTest() {
-    requireIntegers();
-    // Declare the function on the normal context...
-    FunctionDeclaration<IntegerFormula> id =
-        fmgr.declareUF("id", FormulaType.IntegerType, ImmutableList.of(FormulaType.IntegerType));
-    // then try calling it from the debugging context
-    IntegerFormula f = debugFmgr.callUF(id, debugImgr.makeNumber(0));
+    // Declare the function on the normal context, then try calling it from the debugging context
+    FunctionDeclaration<BooleanFormula> id =
+        fmgr.declareUF("id", FormulaType.BooleanType, ImmutableList.of(FormulaType.BooleanType));
+    BooleanFormula f = debugFmgr.callUF(id, debugBmgr.makeFalse());
   }
 }
