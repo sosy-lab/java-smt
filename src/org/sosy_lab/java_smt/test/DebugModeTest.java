@@ -35,6 +35,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.UFManager;
 
 public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+  private SolverContextFactory debugFactory;
   private SolverContext debugContext;
   private UFManager debugFmgr;
   private BooleanFormulaManager debugBmgr;
@@ -49,10 +50,8 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
             .setOption("solver.solver", solverToUse().toString())
             .setOption("solver.debugMode", String.valueOf(true))
             .build();
-    SolverContextFactory debuggingFactory =
-        new SolverContextFactory(debugConfig, logger, shutdownNotifierToUse());
-
-    debugContext = debuggingFactory.generateContext();
+    debugFactory = new SolverContextFactory(debugConfig, logger, shutdownNotifierToUse());
+    debugContext = debugFactory.generateContext();
     try {
       FormulaManager debugMgr = debugContext.getFormulaManager();
 
@@ -149,5 +148,23 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
     FunctionDeclaration<BooleanFormula> id =
         fmgr.declareUF("id", FormulaType.BooleanType, ImmutableList.of(FormulaType.BooleanType));
     BooleanFormula f = debugFmgr.callUF(id, debugBmgr.makeFalse());
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void wrongSolver()
+      throws InvalidConfigurationException, InterruptedException, SolverException {
+    Solvers otherSolver =
+        solverToUse() == Solvers.SMTINTERPOL ? Solvers.MATHSAT5 : Solvers.SMTINTERPOL;
+
+    try (SolverContext otherContext = debugFactory.generateContext(otherSolver)) {
+      BooleanFormulaManager otherBmgr = otherContext.getFormulaManager().getBooleanFormulaManager();
+      BooleanFormula formula = otherBmgr.makeFalse();
+
+      try (BasicProverEnvironment<?> prover = debugContext.newProverEnvironment()) {
+        // Try to add a formula from a different solver to our solver context.
+        prover.push(formula);
+        assertThat(prover).isUnsatisfiable();
+      }
+    }
   }
 }
