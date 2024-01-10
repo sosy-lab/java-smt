@@ -12,6 +12,7 @@ import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.test.BooleanFormulaSubject.assertUsing;
 
 import com.google.common.collect.Lists;
+import java.util.Arrays;
 import java.util.List;
 import org.junit.After;
 import org.junit.Before;
