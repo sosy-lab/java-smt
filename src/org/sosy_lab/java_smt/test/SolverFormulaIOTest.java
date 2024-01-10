@@ -19,8 +19,8 @@ import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multiset;
 import com.google.common.truth.TruthJUnit;
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Supplier;
 import org.junit.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -446,7 +446,6 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
       assertThat(dump).contains("(declare-const " + var + " " + type + ")");
     }
   }
-
 
   private void checkThatAssertIsInLastLine(String dump) {
     // Boolector will fail this anyway since bools are bitvecs for btor
