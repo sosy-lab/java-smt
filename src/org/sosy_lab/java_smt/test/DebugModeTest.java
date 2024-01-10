@@ -29,7 +29,6 @@ import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
-import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.UFManager;
@@ -39,7 +38,6 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   private SolverContext debugContext;
   private UFManager debugFmgr;
   private BooleanFormulaManager debugBmgr;
-  private IntegerFormulaManager debugImgr;
 
   private static final int DEFAULT_PROBLEM_SIZE = 8;
 
@@ -52,16 +50,10 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
             .build();
     debugFactory = new SolverContextFactory(debugConfig, logger, shutdownNotifierToUse());
     debugContext = debugFactory.generateContext();
-    try {
-      FormulaManager debugMgr = debugContext.getFormulaManager();
 
-      debugFmgr = debugMgr.getUFManager();
-      debugBmgr = debugMgr.getBooleanFormulaManager();
-      debugImgr = debugMgr.getIntegerFormulaManager();
-    } catch (UnsupportedOperationException e) {
-      // Boolector does not support integers and throws an exception. In this case we'll just
-      // leave the formula manager set to null
-    }
+    FormulaManager debugMgr = debugContext.getFormulaManager();
+    debugFmgr = debugMgr.getUFManager();
+    debugBmgr = debugMgr.getBooleanFormulaManager();
   }
 
   @After
