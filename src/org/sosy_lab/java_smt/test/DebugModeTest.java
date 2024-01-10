@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.test;
 
+import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.base.Throwables;
@@ -137,6 +138,8 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   @Test(expected = IllegalArgumentException.class)
   public void wrongContextUFTest() {
     // Declare the function on the normal context, then try calling it from the debugging context
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
+
     FunctionDeclaration<BooleanFormula> id =
         fmgr.declareUF("id", FormulaType.BooleanType, ImmutableList.of(FormulaType.BooleanType));
     BooleanFormula f = debugFmgr.callUF(id, debugBmgr.makeFalse());
