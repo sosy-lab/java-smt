@@ -102,18 +102,13 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
    * including all of its formulas, i.e., all formulas that were added for this backtracking point.
    */
   @Override
-  public void pop() {
-    Preconditions.checkState(!closed);
-    Preconditions.checkState(size() > 0);
+  public void popImpl() {
     BitwuzlaJNI.bitwuzla_pop(env, 1);
-    super.pop();
   }
 
   @Override
-  public @Nullable Void addConstraint(BooleanFormula constraint) throws InterruptedException {
-    Preconditions.checkState(!closed);
+  public @Nullable Void addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
     wasLastSatCheckSat = false;
-    super.addConstraint(constraint);
     BitwuzlaJNI.bitwuzla_assert(env, ((BitwuzlaBooleanFormula) constraint).getTerm());
     return null;
   }
@@ -126,9 +121,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
    * via a POP-operation.
    */
   @Override
-  public void push() throws InterruptedException {
-    Preconditions.checkState(!closed);
-    super.push();
+  public void pushImpl() throws InterruptedException {
     BitwuzlaJNI.bitwuzla_push(env, 1);
   }
 
