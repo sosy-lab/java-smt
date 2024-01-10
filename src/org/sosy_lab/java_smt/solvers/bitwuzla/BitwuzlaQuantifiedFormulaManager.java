@@ -8,6 +8,8 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import java.util.List;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
@@ -29,10 +31,8 @@ public class BitwuzlaQuantifiedFormulaManager
 
   @Override
   public Long mkQuantifier(Quantifier q, List<Long> vars, Long body) {
-    if (vars.isEmpty()) {
-      throw new IllegalArgumentException(
-          "The list of bound variables for a quantifier may not be" + " empty.");
-    }
+    checkArgument(
+        !vars.isEmpty(), "The list of bound variables for a quantifier may not be empty.");
     long[] origVars = new long[vars.size()];
     long[] substVars = new long[vars.size()];
 
