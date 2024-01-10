@@ -356,14 +356,12 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, Sy
       return visitor.visitFreeVariable(formula, dequote(varName));
     }
 
-    // FIXME: Handle abstract values for arrays?
-
     String varName = logic.getSymName(logic.getSymRef(f));
 
     ImmutableList.Builder<Formula> argTerms = ImmutableList.builder();
     ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
 
-    /* FIXME Caused crashes in ModelEvaluationTest
+    /* FIXME: Caused crashes in ModelEvaluationTest
     VectorPTRef subterms = logic.getPterm(f).getArgs();
 
     for (PTRef sub : subterms) {

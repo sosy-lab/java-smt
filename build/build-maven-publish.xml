@@ -105,7 +105,7 @@ SPDX-License-Identifier: Apache-2.0
       </sequential>
     </macrodef>
     
-    <target name="stage-opensmt" depends="build-dependencies"
+    <target name="stage-opensmt" depends="build-dependencies, install-contrib"
             description="deploy current version of OpenSMT to Maven staging repository">
         <!-- get revision from dependencies -->
         <ivy:artifactproperty name="[artifact].revision" value="[revision]"/>
@@ -117,6 +117,8 @@ SPDX-License-Identifier: Apache-2.0
         <stage-solver-file filename="libopensmt" fileending="so"/>
         <stage-solver-file filename="libopensmtjava" fileending="so"/>
         <stage-solver-file filename="opensmt" fileending="jar"/>
+        <stage-solver-file filename="opensmt-sources" fileending="jar" classifier="sources" filedirectory="lib/java-contrib"/>
+        <stage-solver-file filename="opensmt-javadoc" fileending="jar" classifier="javadoc" filedirectory="lib/java-contrib"/>
     </target>
     
     <target name="stage-mathsat5" depends="build-dependencies"

@@ -54,12 +54,7 @@ class OpenSmtFormulaManager extends AbstractFormulaManager<PTRef, SRef, Logic, S
 
   @Override
   public BooleanFormula parse(String pS) throws IllegalArgumentException {
-    // FIXME: IllegalArgumentException should be thrown directly in the swig header
-    try {
-      return creator.encapsulateBoolean(osmtLogic.parseFormula(pS));
-    } catch (RuntimeException e) {
-      throw new IllegalArgumentException(e.getMessage());
-    }
+    return creator.encapsulateBoolean(osmtLogic.parseFormula(pS));
   }
 
   @Override
@@ -79,7 +74,7 @@ class OpenSmtFormulaManager extends AbstractFormulaManager<PTRef, SRef, Logic, S
           out.append("(declare-fun ")
               .append(osmtLogic.protectName(ref))
               .append(" (")
-              .append(Joiner.on(' ').join(Lists.transform(sym.getArgs(), osmtLogic::printSort)))
+              .append(Joiner.on(' ').join(Lists.transform(sym.getArgTypes(), osmtLogic::printSort)))
               .append(") ")
               .append(osmtLogic.printSort(sym.rsort()))
               .append(")\n");

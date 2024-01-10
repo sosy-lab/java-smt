@@ -18,7 +18,7 @@ SPDX-License-Identifier: Apache-2.0
         <license name="Apache2 and GNU GPLv3" url="https://github.com/SRI-CSL/yices2/blob/master/LICENSE.txt"/>
         <description>
             JavaSMT components for the Yices2 solver.
-            Seperated from the main package of JavaSMT because of the licence.
+            Separated from the main package of JavaSMT because of the licence.
         </description>
     </info>
 

@@ -107,30 +107,25 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   }
 
   @Override
-  public void push() throws InterruptedException {
-    Preconditions.checkState(!closed);
+  protected void pushImpl() throws InterruptedException {
     setChanged();
-    super.push();
     if (incremental) {
       smtEngine.push();
     }
   }
 
   @Override
-  public void pop() {
-    Preconditions.checkState(!closed);
+  protected void popImpl() {
     setChanged();
     if (incremental) {
       smtEngine.pop();
     }
-    super.pop();
   }
 
   @Override
-  public @Nullable Void addConstraint(BooleanFormula pF) throws InterruptedException {
+  protected @Nullable Void addConstraintImpl(BooleanFormula pF) throws InterruptedException {
     Preconditions.checkState(!closed);
     setChanged();
-    super.addConstraint(pF);
     Expr exp = creator.extractInfo(pF);
     if (incremental) {
       smtEngine.assertFormula(importExpr(exp));

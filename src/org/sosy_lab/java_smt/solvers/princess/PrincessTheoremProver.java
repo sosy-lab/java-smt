@@ -29,7 +29,7 @@ class PrincessTheoremProver extends PrincessAbstractProver<Void> implements Prov
 
   @Override
   @Nullable
-  public Void addConstraint(BooleanFormula constraint) throws InterruptedException {
+  protected Void addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
     addConstraint0(constraint);
     return null;
   }

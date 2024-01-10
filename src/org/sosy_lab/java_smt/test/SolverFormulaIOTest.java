@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.test;
 
+import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.getLast;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
@@ -18,6 +19,7 @@ import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multiset;
 import com.google.common.truth.TruthJUnit;
+import java.util.List;
 import java.util.Arrays;
 import java.util.function.Supplier;
 import org.junit.Test;
@@ -113,11 +115,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     } else {
       assertThat(formDump).contains("(declare-fun |main::a| () Bool)");
     }
-    try {
-      assertThat(formDump).contains("(declare-fun b () Bool)");
-    } catch (AssertionError err) {
-      assertThat(formDump).contains("(declare-const b Bool)");
-    }
+    checkVariableIsDeclared(formDump, "b", "Bool");
     checkThatAssertIsInLastLine(formDump);
     checkThatDumpIsParseable(formDump);
   }
@@ -135,14 +133,8 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     BooleanFormula d = bmgr.and(c1, c2);
 
     String formDump = mgr.dumpFormula(d).toString();
-
-    try {
-      assertThat(formDump).contains("(declare-fun |main a| () Bool)");
-      assertThat(formDump).contains("(declare-fun b () Bool)");
-    } catch (AssertionError err) {
-      assertThat(formDump).contains("(declare-const |main a| Bool)");
-      assertThat(formDump).contains("(declare-const b Bool)");
-    }
+    checkVariableIsDeclared(formDump, "|main a|", "Bool");
+    checkVariableIsDeclared(formDump, "b", "Bool");
     checkThatAssertIsInLastLine(formDump);
     checkThatDumpIsParseable(formDump);
   }
@@ -171,13 +163,9 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     BooleanFormula branchComp = bmgr.or(branch1, branch2);
 
     String formDump = mgr.dumpFormula(branchComp).toString();
-    try {
-      assertThat(formDump).contains("(declare-fun a () Bool)");
-      assertThat(formDump).contains("(declare-fun b () Bool)");
-    } catch (AssertionError err) {
-      assertThat(formDump).contains("(declare-const a Bool)");
-      assertThat(formDump).contains("(declare-const b Bool)");
-    }
+
+    checkVariableIsDeclared(formDump, "a", "Bool");
+    checkVariableIsDeclared(formDump, "b", "Bool");
 
     // The serialization has to be parse-able.
     checkThatDumpIsParseable(formDump);
@@ -187,9 +175,11 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
   public void valDumpTest() {
     // Boolector will fail this anyway since bools are bitvecs for btor
     TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
+
     // Bitwuzla currently rewrites trivial assertions, leading to no proper dump here
-    // TODO: chick this later and remove the assumption once its resolved
+    // TODO: check this later and remove the assumption once its resolved
     TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BITWUZLA);
+
     BooleanFormula tr1 = bmgr.makeBoolean(true);
     BooleanFormula tr2 = bmgr.makeBoolean(true);
     BooleanFormula fl1 = bmgr.makeBoolean(false);
@@ -231,11 +221,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     String formDump = mgr.dumpFormula(formula).toString();
 
     // check that int variable is declared correctly + necessary assert that has to be there
-    try {
-      assertThat(formDump).contains("(declare-fun a () (_ BitVec 8))");
-    } catch (AssertionError err) {
-      assertThat(formDump).contains("(declare-const a (_ BitVec 8))");
-    }
+    checkVariableIsDeclared(formDump, "a", "(_ BitVec 8)");
     checkThatAssertIsInLastLine(formDump);
     checkThatDumpIsParseable(formDump);
   }
@@ -453,13 +439,32 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     assertWithMessage("duplicate function declarations").that(funDeclares).isEmpty();
   }
 
-  private void checkThatAssertIsInLastLine(String lines) {
+  private void checkVariableIsDeclared(String dump, String var, String type) {
+    try {
+      assertThat(dump).contains("(declare-fun " + var + " () " + type + ")");
+    } catch (AssertionError err) {
+      assertThat(dump).contains("(declare-const " + var + " " + type + ")");
+    }
+  }
+
+
+  private void checkThatAssertIsInLastLine(String dump) {
     // Boolector will fail this anyway since bools are bitvecs for btor
     TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
-    lines = lines.trim();
-    assertWithMessage("last line of <\n" + lines + ">")
-        .that(getLast(Splitter.on('\n').split(lines)))
+
+    List<String> lines = Splitter.on('\n').splitToList(dump.trim());
+    String lineUnderTest = getLast(lines);
+
+    if (solver == Solvers.OPENSMT) {
+      // OpenSMT prints assertions over several lines, so lets find the last SMT-LIB command by
+      // heuristic: the last line starting with a plain bracket.
+      lineUnderTest = getLast(filter(lines, line -> line.startsWith("(")));
+    }
+
+    assertWithMessage("last line(s) of <\n" + dump + ">")
+        .that(lineUnderTest)
         .startsWith("(assert ");
+    assertWithMessage("last line(s) of <\n" + dump + ">").that(getLast(lines)).endsWith(")");
   }
 
   @SuppressWarnings("CheckReturnValue")

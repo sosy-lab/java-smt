@@ -10,21 +10,17 @@ package org.sosy_lab.java_smt.solvers.opensmt;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import com.google.common.collect.ImmutableList;
-import java.util.Arrays;
 import org.junit.AssumptionViolatedException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.java_smt.solvers.opensmt.api.ArithLogic;
 import org.sosy_lab.java_smt.solvers.opensmt.api.InterpolationContext;
-import org.sosy_lab.java_smt.solvers.opensmt.api.ItpAlgorithm;
 import org.sosy_lab.java_smt.solvers.opensmt.api.Logic;
 import org.sosy_lab.java_smt.solvers.opensmt.api.LogicFactory;
 import org.sosy_lab.java_smt.solvers.opensmt.api.Logic_t;
 import org.sosy_lab.java_smt.solvers.opensmt.api.MainSolver;
 import org.sosy_lab.java_smt.solvers.opensmt.api.Model;
-import org.sosy_lab.java_smt.solvers.opensmt.api.OpenSmt;
 import org.sosy_lab.java_smt.solvers.opensmt.api.PTRef;
 import org.sosy_lab.java_smt.solvers.opensmt.api.SMTConfig;
 import org.sosy_lab.java_smt.solvers.opensmt.api.SMTOption;
@@ -34,7 +30,6 @@ import org.sosy_lab.java_smt.solvers.opensmt.api.TemplateFunction;
 import org.sosy_lab.java_smt.solvers.opensmt.api.VectorInt;
 import org.sosy_lab.java_smt.solvers.opensmt.api.VectorPTRef;
 import org.sosy_lab.java_smt.solvers.opensmt.api.VectorSRef;
-import org.sosy_lab.java_smt.solvers.opensmt.api.opensmt_logic;
 import org.sosy_lab.java_smt.solvers.opensmt.api.sstat;
 
 public class OpenSmtNativeAPITest {
@@ -71,14 +66,16 @@ public class OpenSmtNativeAPITest {
     MainSolver solver = new MainSolver(logic, config, "opensmt-verifier");
 
     // Check A ⊨ I
-    solver.push(logic.mkNot(logic.mkImpl(partA, interpol)));
+    solver.push();
+    solver.insertFormula(logic.mkNot(logic.mkImpl(partA, interpol)));
     if (!solver.check().equals(sstat.False())) {
       return false;
     }
     solver.pop();
 
     // Check I ⊨ ¬B
-    solver.push(logic.mkNot(logic.mkImpl(interpol, logic.mkNot(partB))));
+    solver.push();
+    solver.insertFormula(logic.mkNot(logic.mkImpl(interpol, logic.mkNot(partB))));
     if (!solver.check().equals(sstat.False())) {
       return false;
     }
@@ -102,8 +99,10 @@ public class OpenSmtNativeAPITest {
     PTRef f = logic.mkEq(varA, varB);
 
     SMTConfig config = new SMTConfig();
-    MainSolver mainSolver = new MainSolver(logic, config, "JavaSmt");
-    mainSolver.push(f);
+    MainSolver mainSolver = new MainSolver(logic, config, "opensmt-test");
+
+    mainSolver.push();
+    mainSolver.insertFormula(f);
 
     sstat r = mainSolver.check();
     assertThat(r).isEqualTo(sstat.True());
@@ -118,16 +117,18 @@ public class OpenSmtNativeAPITest {
 
   @Test
   public void testBooleanLogic() {
-    OpenSmt osmt = new OpenSmt(opensmt_logic.qf_bool, "opensmt-test", false);
-    Logic logic = osmt.getLogic();
+    Logic logic = LogicFactory.getInstance(Logic_t.QF_BOOL);
 
     // a ∧ ¬a
     PTRef varA = logic.mkBoolVar("a");
     PTRef notA = logic.mkNot(varA);
     PTRef f = logic.mkAnd(varA, notA);
 
-    MainSolver mainSolver = osmt.getMainSolver();
-    mainSolver.push(f);
+    SMTConfig config = new SMTConfig();
+    MainSolver mainSolver = new MainSolver(logic, config, "opensmt-test");
+
+    mainSolver.push();
+    mainSolver.insertFormula(f);
 
     sstat r = mainSolver.check();
     assertThat(r).isEqualTo(sstat.False());
@@ -135,8 +136,7 @@ public class OpenSmtNativeAPITest {
 
   @Test
   public void testUninterpretedFunctionLogic() {
-    OpenSmt osmt = new OpenSmt(opensmt_logic.qf_uf, "opensmt-test", false);
-    Logic logic = osmt.getLogic();
+    Logic logic = LogicFactory.getInstance(Logic_t.QF_UF);
 
     // Declare sort U
     SRef mySort = logic.declareUninterpretedSort("U");
@@ -169,9 +169,13 @@ public class OpenSmtNativeAPITest {
     dist.add(appFb);
     PTRef f1 = logic.mkDistinct(dist);
 
-    MainSolver mainSolver = osmt.getMainSolver();
-    mainSolver.push(f0);
-    mainSolver.push(f1);
+    SMTConfig config = new SMTConfig();
+    MainSolver mainSolver = new MainSolver(logic, config, "opensmt-test");
+
+    mainSolver.push();
+    mainSolver.insertFormula(f0);
+    mainSolver.push();
+    mainSolver.insertFormula(f1);
 
     sstat r = mainSolver.check();
     assertThat(r).isEqualTo(sstat.False());
@@ -179,8 +183,7 @@ public class OpenSmtNativeAPITest {
 
   @Test
   public void testUninterpretedFunctionInterpol() {
-    OpenSmt osmt = new OpenSmt(opensmt_logic.qf_uf, "opensmt-test", true);
-    Logic logic = osmt.getLogic();
+    Logic logic = LogicFactory.getInstance(Logic_t.QF_UF);
 
     // Declare sort U
     SRef mysort = logic.declareUninterpretedSort("U");
@@ -199,9 +202,14 @@ public class OpenSmtNativeAPITest {
     dist.add(varC);
     PTRef f1 = logic.mkDistinct(dist);
 
-    MainSolver mainSolver = osmt.getMainSolver();
-    mainSolver.push(f0);
-    mainSolver.push(f1);
+    SMTConfig config = new SMTConfig();
+    config.setOption(":produce-interpolants", new SMTOption(true));
+    MainSolver mainSolver = new MainSolver(logic, config, "opensmt-test");
+
+    mainSolver.push();
+    mainSolver.insertFormula(f0);
+    mainSolver.push();
+    mainSolver.insertFormula(f1);
 
     sstat r = mainSolver.check();
     assertThat(r).isEqualTo(sstat.False());
@@ -217,8 +225,7 @@ public class OpenSmtNativeAPITest {
 
   @Test
   public void testLinearIntegerLogic() {
-    OpenSmt osmt = new OpenSmt(opensmt_logic.qf_lia, "opensmt-test", false);
-    ArithLogic logic = osmt.getLIALogic();
+    ArithLogic logic = LogicFactory.getLAInstance(Logic_t.QF_LIA);
 
     // Declare variables
     PTRef varA = logic.mkIntVar("a");
@@ -232,9 +239,13 @@ public class OpenSmtNativeAPITest {
     PTRef f0 = logic.mkLt(logic.mkPlus(varA, const3), varC);
     PTRef f1 = logic.mkGeq(varC, const0);
 
-    MainSolver mainSolver = osmt.getMainSolver();
-    mainSolver.push(f0);
-    mainSolver.push(f1);
+    SMTConfig config = new SMTConfig();
+    MainSolver mainSolver = new MainSolver(logic, config, "opensmt-test");
+
+    mainSolver.push();
+    mainSolver.insertFormula(f0);
+    mainSolver.push();
+    mainSolver.insertFormula(f1);
 
     sstat r = mainSolver.check();
     assertThat(r).isEqualTo(sstat.True());
@@ -242,8 +253,7 @@ public class OpenSmtNativeAPITest {
 
   @Test
   public void testLinearIntegerInterpol() {
-    OpenSmt osmt = new OpenSmt(opensmt_logic.qf_lia, "opensmt-test", true);
-    ArithLogic logic = osmt.getLIALogic();
+    ArithLogic logic = LogicFactory.getLAInstance(Logic_t.QF_LIA);
 
     // Declare variables
     PTRef varA = logic.mkIntVar("a");
@@ -256,9 +266,14 @@ public class OpenSmtNativeAPITest {
     // Term c>a
     PTRef f1 = logic.mkGt(varC, varA);
 
-    MainSolver solver = osmt.getMainSolver();
-    solver.push(f0);
-    solver.push(f1);
+    SMTConfig config = new SMTConfig();
+    config.setOption(":produce-interpolants", new SMTOption(true));
+    MainSolver solver = new MainSolver(logic, config, "opensmt-test");
+
+    solver.push();
+    solver.insertFormula(f0);
+    solver.push();
+    solver.insertFormula(f1);
 
     sstat r = solver.check();
     assertThat(r).isEqualTo(sstat.False());
@@ -271,9 +286,8 @@ public class OpenSmtNativeAPITest {
     PTRef interpol = context.getSingleInterpolant(mask);
     assertThat(verifyInterpolant(logic, f0, f1, interpol)).isTrue();
 
-    // Switch interpolation algorithm
-    SMTConfig config = osmt.getConfig();
-    config.setLRAInterpolationAlgorithm(ItpAlgorithm.getLraDecomposingWeak());
+    // Switch interpolation algorithm to 'LraDecompositionWeak'
+    config.setOption(":interpolation-lra-algorithm", new SMTOption(5));
 
     // Verify second interpolant
     PTRef interpolDweak = context.getSingleInterpolant(mask);
@@ -282,8 +296,7 @@ public class OpenSmtNativeAPITest {
 
   @Test
   public void testIntegerArray() {
-    OpenSmt osmt = new OpenSmt(opensmt_logic.qf_alia, "opensmt-test", false);
-    ArithLogic logic = osmt.getLIALogic();
+    ArithLogic logic = LogicFactory.getLAInstance(Logic_t.QF_ALIA);
 
     // Declare an integer array variable
     SRef sortIntArray = logic.getArraySort(logic.getSort_int(), logic.getSort_int());
@@ -312,8 +325,11 @@ public class OpenSmtNativeAPITest {
     PTRef f = logic.mkOr(neg);
 
     // Prove that the equations hold for all models
-    MainSolver solver = osmt.getMainSolver();
-    solver.push(f);
+    SMTConfig config = new SMTConfig();
+    MainSolver solver = new MainSolver(logic, config, "opensmt-test");
+
+    solver.push();
+    solver.insertFormula(f);
 
     sstat r = solver.check();
     assertThat(r).isEqualTo(sstat.False());
@@ -321,8 +337,7 @@ public class OpenSmtNativeAPITest {
 
   @Test
   public void testFormulaIntrospection() {
-    OpenSmt osmt = new OpenSmt(opensmt_logic.qf_lia, "opensmt-test", false);
-    ArithLogic logic = osmt.getLIALogic();
+    ArithLogic logic = LogicFactory.getLAInstance(Logic_t.QF_LIA);
 
     // Declare variables
     PTRef varA = logic.mkIntVar("a");
@@ -339,15 +354,13 @@ public class OpenSmtNativeAPITest {
 
   @Test
   public void testFunctionTemplates() {
-    OpenSmt osmt = new OpenSmt(opensmt_logic.qf_lia, "opensmt-test", false);
-    ArithLogic logic = osmt.getLIALogic();
+    ArithLogic logic = LogicFactory.getLAInstance(Logic_t.QF_LIA);
 
     // Define function negate(a) = -1*a
 
-    // FIXME: This will fail the test. Are formal arguments not scoped? See Interpret.cc, line 750
-    // PTRef negate_a = logic.mkIntVar("a");
-
-    PTRef negateA = logic.mkIntVar("negate_a");
+    // NOTE: We have to use "negateA" instead of just "a" as variable name as
+    // OpenSMT does not properly scope formal arguments.
+    PTRef negateA = logic.mkIntVar("negateA");
     PTRef negateBody = logic.mkTimes(logic.getTerm_IntMinusOne(), negateA);
 
     VectorPTRef negateArgs = new VectorPTRef();
@@ -371,8 +384,11 @@ public class OpenSmtNativeAPITest {
     // Term negate(negate(a)) ≠ a
     PTRef f = logic.mkNot(logic.mkEq(app1, varA));
 
-    MainSolver solver = osmt.getMainSolver();
-    solver.push(f);
+    SMTConfig config = new SMTConfig();
+    MainSolver solver = new MainSolver(logic, config, "opensmt-test");
+
+    solver.push();
+    solver.insertFormula(f);
 
     sstat r = solver.check();
     assertThat(r).isEqualTo(sstat.False());
@@ -380,8 +396,7 @@ public class OpenSmtNativeAPITest {
 
   @Test
   public void testAbort() {
-    OpenSmt osmt = new OpenSmt(opensmt_logic.qf_lia, "opensmt-test", false);
-    ArithLogic logic = osmt.getLIALogic();
+    ArithLogic logic = LogicFactory.getLAInstance(Logic_t.QF_LIA);
 
     // Declare variables
     PTRef varA = logic.mkIntVar("a");
@@ -395,96 +410,17 @@ public class OpenSmtNativeAPITest {
     PTRef f0 = logic.mkLt(logic.mkPlus(varA, const3), varC);
     PTRef f1 = logic.mkGeq(varC, const0);
 
-    MainSolver mainSolver = osmt.getMainSolver();
-    mainSolver.push(f0);
-    mainSolver.push(f1);
+    SMTConfig config = new SMTConfig();
+    MainSolver mainSolver = new MainSolver(logic, config, "opensmt-test");
+
+    mainSolver.push();
+    mainSolver.insertFormula(f0);
+    mainSolver.push();
+    mainSolver.insertFormula(f1);
 
     mainSolver.stop();
 
     sstat r = mainSolver.check();
     assertThat(r).isEqualTo(sstat.Undef());
-  }
-
-  /* INFO:
-   * This testcase was taken from VariableNames test and shows that OpenSMT does
-   * not handle \u0000 in variable names correctly.
-   */
-  @Test
-  public void testNulString() {
-    Logic logic = LogicFactory.getLAInstance(Logic_t.QF_AUFLIRA);
-
-    // Any String containing \u0000 should work here
-    PTRef nil = logic.mkBoolVar("\u0000");
-
-    // This test fails intermittently, so i needs to be chosen large enough
-    for (int i = 0; i < 1000; i++) {
-      String pp = logic.pp(nil);
-      assertThat(pp)
-          .isEqualTo(
-              "\u0000"); // The String returned in the failed case is just \u0000 - without the `|`
-      // characters
-
-      /* Note:
-       * I patched OpenSMT to fix the issue and logic.pp(nil) should now always
-       * return "\u0000"
-       *
-       * OpenSMT internally uses a function that converts the letters of the
-       * variable name to their ASCII code and then looks up that code in a
-       * table to see if any of them are reserved. In that case the entire
-       * variable name needs to be escaped and is put in '|' quotes. Due to a
-       * bug this function only works for regular ASCII characters with a value
-       * less than 128. However in our case the unicode character \u0000 gets
-       * represented as the two byte sequence C0 80 as Java uses modifie utf8
-       * for Strings. With this encoding \u0000 can occur in a C String as its
-       * not confused with the terminating null. However due to the bug the
-       * escape sequence is converted to a signed value and since the character
-       * code is greater than 127 that value is negative. The negative index
-       * then is looked up in the table and will generally hit a non-zero value
-       * in memory - which is then interpreted as 'true' and quotes are added.
-       * However occasionally the value happens to be zero and that's why the
-       * test failed intermittently.
-       *
-       * With the patch the conversion is now handled correctly, and there's no
-       * need to quote the escape sequence for \u0000.
-       */
-    }
-  }
-
-  @Test
-  public void testExample() {
-    ArithLogic logic = LogicFactory.getLIAInstance();
-
-    PTRef varA = logic.mkIntVar("a");
-    PTRef varB = logic.mkIntVar("b");
-    PTRef varC = logic.mkIntVar("c");
-
-    PTRef formulaA = logic.mkAnd(logic.mkLt(varA, varB), logic.mkLt(varC, varA));
-    PTRef formulaB = logic.mkLt(varB, varC);
-
-    SMTConfig config = new SMTConfig();
-    config.setOption(":produce-interpolants", new SMTOption(1));
-
-    MainSolver mainSolver = new MainSolver(logic, config, "JavaSmt");
-    mainSolver.push(formulaA);
-    mainSolver.push(formulaB);
-
-    sstat check1 = mainSolver.check();
-    System.out.println(check1);
-
-    InterpolationContext context = mainSolver.getInterpolationContext();
-    VectorInt mask = new VectorInt(ImmutableList.of(0));
-    PTRef interpol = context.getSingleInterpolant(mask);
-    System.out.println(logic.pp(interpol));
-
-    mainSolver.pop();
-
-    sstat check2 = mainSolver.check();
-    System.out.println(check2);
-
-    Model model = mainSolver.getModel();
-    for (PTRef var : Arrays.asList(varA, varB, varC)) {
-      PTRef val = model.evaluate(var);
-      System.out.println(logic.pp(val));
-    }
   }
 }

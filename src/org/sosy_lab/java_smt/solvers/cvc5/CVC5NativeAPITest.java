@@ -22,7 +22,9 @@ import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.junit.After;
 import org.junit.AssumptionViolatedException;
 import org.junit.Before;
@@ -1321,5 +1323,22 @@ public class CVC5NativeAPITest {
             solver.mkTerm(
                 Kind.ADD, solver.mkInteger(1), solver.mkTerm(Kind.MULT, z, solver.mkInteger(2))));
     interpolateAndCheck(solver, f1, f2);
+  }
+
+  @Test
+  public void testBitvectorSortinVariableCache() throws CVC5ApiException {
+    Map<String, Term> variablesCache = new HashMap<>();
+    String name = "__ADDRESS_OF_main::i@";
+    Sort sort = solver.mkBitVectorSort(32);
+    System.out.println(sort);
+    System.out.println("--------");
+    Term exp = variablesCache.computeIfAbsent(name, n -> solver.mkConst(sort, name));
+    Preconditions.checkArgument(
+        sort.equals(exp.getSort()),
+        "symbol name %s with sort %s already in use for different sort %s with value %s as String",
+        name,
+        sort,
+        exp.getSort(),
+        exp);
   }
 }

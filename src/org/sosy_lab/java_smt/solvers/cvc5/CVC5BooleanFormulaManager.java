@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Iterables;
 import io.github.cvc5.CVC5ApiException;
 import io.github.cvc5.Kind;
@@ -34,7 +35,8 @@ public class CVC5BooleanFormulaManager
   }
 
   @Override
-  protected Term makeVariableImpl(String pVar) {
+  @VisibleForTesting
+  public Term makeVariableImpl(String pVar) {
     return formulaCreator.makeVariable(getFormulaCreator().getBoolType(), pVar);
   }
 
