@@ -109,12 +109,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     BooleanFormula d = bmgr.and(c1, c2);
 
     String formDump = mgr.dumpFormula(d).toString();
-    if (solverToUse() == Solvers.BITWUZLA) {
-      // This is valid in SMTLIB2
-      assertThat(formDump).contains("(declare-const main::a Bool)");
-    } else {
-      assertThat(formDump).contains("(declare-fun |main::a| () Bool)");
-    }
+    checkVariableIsDeclared(formDump, "|main::a|", "Bool");
     checkVariableIsDeclared(formDump, "b", "Bool");
     checkThatAssertIsInLastLine(formDump);
     checkThatDumpIsParseable(formDump);
@@ -124,8 +119,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
   public void varWithSpaceDumpTest() {
     // Boolector will fail this anyway since bools are bitvecs for btor
     TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
-    // TODO: this is temporary! Check back after we reported it and its fixed
-    TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BITWUZLA);
+
     BooleanFormula a = bmgr.makeVariable("main a");
     BooleanFormula b = bmgr.makeVariable("b");
     BooleanFormula c1 = bmgr.xor(a, b);
