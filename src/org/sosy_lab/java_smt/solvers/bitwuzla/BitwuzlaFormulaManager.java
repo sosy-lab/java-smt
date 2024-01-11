@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
+import com.google.common.base.Preconditions;
 import java.io.IOException;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
@@ -50,6 +51,7 @@ final class BitwuzlaFormulaManager
       s = s.replace("(exit)", "");
     }
     long[] terms = BitwuzlaJNI.parse(s);
+    Preconditions.checkArgument(terms != null, "Could not parse input string \"%s\"", s);
     assert terms != null;
     // AND all the terms
     Long retForm;

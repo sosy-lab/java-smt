@@ -36,9 +36,15 @@ public class PrettyPrinterTest extends SolverBasedTest0.ParameterizedSolverBased
     pp = new PrettyPrinter(context.getFormulaManager());
   }
 
+  // TODO: Add parsing tests for bitvectors and booleans that can be used with Bitwuzla
+
   @Test
   public void testPrettyPrintOnlyBoolean() {
     requireParser();
+    requireIntegers();
+    requireRationals();
+    requireArrays();
+
     String expected;
     switch (solverToUse()) {
       case MATHSAT5:
@@ -79,6 +85,10 @@ public class PrettyPrinterTest extends SolverBasedTest0.ParameterizedSolverBased
   @Test
   public void testPrettyPrintAll() {
     requireParser();
+    requireIntegers();
+    requireRationals();
+    requireArrays();
+
     String expected;
     switch (solverToUse()) {
       case MATHSAT5:
@@ -178,6 +188,10 @@ public class PrettyPrinterTest extends SolverBasedTest0.ParameterizedSolverBased
   @Test
   public void testDotOnlyBoolean() {
     requireParser();
+    requireIntegers();
+    requireRationals();
+    requireArrays();
+
     String expected;
     switch (solverToUse()) {
       case MATHSAT5:
@@ -258,6 +272,10 @@ public class PrettyPrinterTest extends SolverBasedTest0.ParameterizedSolverBased
   @Test
   public void testDotAll() {
     requireParser();
+    requireIntegers();
+    requireRationals();
+    requireArrays();
+
     String expected;
     switch (solverToUse()) {
       case MATHSAT5:
