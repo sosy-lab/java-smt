@@ -318,11 +318,6 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     compareParseWithOrgExprFirst(MATHSAT_DUMP3, this::functionExprGen);
   }
 
-  public void parseMathSatTestParseFirst3() throws SolverException, InterruptedException {
-    requireParser();
-    compareParseWithOrgParseFirst(MATHSAT_DUMP3, this::functionExprGen);
-  }
-
   @Test
   public void redundancyTest() {
     assume()
