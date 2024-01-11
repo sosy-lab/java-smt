@@ -170,10 +170,6 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     // Boolector will fail this anyway since bools are bitvecs for btor
     TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
 
-    // Bitwuzla currently rewrites trivial assertions, leading to no proper dump here
-    // TODO: check this later and remove the assumption once its resolved
-    TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BITWUZLA);
-
     BooleanFormula tr1 = bmgr.makeBoolean(true);
     BooleanFormula tr2 = bmgr.makeBoolean(true);
     BooleanFormula fl1 = bmgr.makeBoolean(false);
@@ -185,6 +181,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     BooleanFormula valComp5 = bmgr.or(valComp3, valComp4);
 
     String formDump = mgr.dumpFormula(valComp5).toString();
+
     checkThatAssertIsInLastLine(formDump);
     checkThatDumpIsParseable(formDump);
   }
