@@ -12,7 +12,6 @@ import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.test.BooleanFormulaSubject.assertUsing;
 
 import com.google.common.collect.Lists;
-import java.util.Arrays;
 import java.util.List;
 import org.junit.After;
 import org.junit.Before;
@@ -90,12 +89,10 @@ public class TranslateFormulaTest {
   }
 
   private void requireParserTo() {
-    // TODO: Bitwuzla is only temporarly on this list, as the parser crashes JavaSMT on invalid
-    //  input
     assume()
         .withMessage("Solver %s does not support parsing formulae", translateTo)
         .that(translateTo)
-        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2, Solvers.CVC5, Solvers.BITWUZLA);
+        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2, Solvers.CVC5);
   }
 
   private void requireParserFrom() {

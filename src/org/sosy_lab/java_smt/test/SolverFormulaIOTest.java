@@ -459,11 +459,8 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
 
   @SuppressWarnings("CheckReturnValue")
   private void checkThatDumpIsParseable(String dump) {
-    if (solverToUse() != Solvers.BITWUZLA) {
-      requireParser();
-
-      mgr.parse(dump);
-    }
+    requireParser();
+    mgr.parse(dump);
   }
 
   private BooleanFormula genBoolExpr() {
