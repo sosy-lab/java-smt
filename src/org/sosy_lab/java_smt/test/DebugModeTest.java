@@ -91,7 +91,7 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
     }
   }
 
-  /** Try to use the context from a different thread */
+  /** Try to use the context from a different thread. */
   @SuppressWarnings("resource")
   @Test
   public void nonLocalThreadTest() throws InterruptedException {
@@ -169,7 +169,7 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
     debugFmgr.callUF(pDeclaration, debugImgr.makeNumber(0));
   }
 
-  /** Declare a function, then try calling it from a different context */
+  /** Declare a function, then try calling it from a different context. */
   @Test
   public void noSharedDeclarationsTest() throws InvalidConfigurationException {
     // Fails for Boolector as debug mode requires visitor support
