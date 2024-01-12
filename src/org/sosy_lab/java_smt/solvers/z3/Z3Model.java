@@ -32,13 +32,12 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
 
   private final Z3FormulaCreator z3creator;
 
-  Z3Model(
-      AbstractProver<?> pProver, long z3context, long z3model, Z3FormulaManager pFormulaManager) {
-    super(pProver, pFormulaManager);
+  Z3Model(AbstractProver<?> pProver, long z3context, long z3model, Z3FormulaCreator pCreator) {
+    super(pProver, pCreator);
     Native.modelIncRef(z3context, z3model);
     model = z3model;
     this.z3context = z3context;
-    z3creator = (Z3FormulaCreator) pFormulaManager.getFormulaCreator();
+    z3creator = pCreator;
   }
 
   @Override

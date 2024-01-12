@@ -19,6 +19,7 @@ import io.github.cvc5.CVC5ApiException;
 import io.github.cvc5.Kind;
 import io.github.cvc5.Solver;
 import io.github.cvc5.Term;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -198,18 +199,21 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
   private void checkInterpolationCriteria(Term interpolant, Term phiPlus, Term phiMinus) {
 
     // checks that every Symbol of the interpolant appears either in term A or term B
-    Set<String> interpolantSymbols =
-        mgr.extractVariablesAndUFs(creator.encapsulateBoolean(interpolant)).keySet();
-    Set<String> interpolASymbols =
-        mgr.extractVariablesAndUFs(creator.encapsulateBoolean(phiPlus)).keySet();
-    Set<String> interpolBSymbols =
-        mgr.extractVariablesAndUFs(creator.encapsulateBoolean(phiMinus)).keySet();
-    Set<String> intersection = Sets.intersection(interpolASymbols, interpolBSymbols);
-    checkState(
-        intersection.containsAll(interpolantSymbols),
-        "Interpolant contains symbols %s that are not part of both input formulas.",
-        Sets.difference(interpolantSymbols, intersection));
-
+    try {
+      Set<String> interpolantSymbols =
+          mgr.extractVariablesAndUFs(creator.encapsulateBoolean(interpolant)).keySet();
+      Set<String> interpolASymbols =
+          mgr.extractVariablesAndUFs(creator.encapsulateBoolean(phiPlus)).keySet();
+      Set<String> interpolBSymbols =
+          mgr.extractVariablesAndUFs(creator.encapsulateBoolean(phiMinus)).keySet();
+      Set<String> intersection = Sets.intersection(interpolASymbols, interpolBSymbols);
+      checkState(
+          intersection.containsAll(interpolantSymbols),
+          "Interpolant contains symbols %s that are not part of both input formulas.",
+          Sets.difference(interpolantSymbols, intersection));
+    } catch (IOException pE) {
+      throw new RuntimeException(pE);
+    }
     // build and check both Craig interpolation formulas with the generated interpolant.
     Solver validationSolver = new Solver();
     // interpolation option is not required for validation
@@ -232,7 +236,6 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
           "Failure when validating interpolant '" + interpolant + "'.", e);
-
     } finally {
       validationSolver.deletePointer();
     }

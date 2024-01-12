@@ -34,9 +34,9 @@ public class CVC5Model extends AbstractModel<Term, Sort, Solver> {
   CVC5Model(
       CVC5AbstractProver<?> pProver,
       FormulaManager pMgr,
-      CVC5FormulaManager pFormulaManager,
+      CVC5FormulaCreator pCreator,
       Collection<Term> pAssertedExpressions) {
-    super(pProver, pFormulaManager);
+    super(pProver, pCreator);
     solver = pProver.solver;
     mgr = pMgr;
     assertedExpressions = ImmutableList.copyOf(pAssertedExpressions);

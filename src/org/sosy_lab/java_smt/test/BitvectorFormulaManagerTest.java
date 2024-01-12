@@ -121,7 +121,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
   }
 
   @Test
-  public void bvModelValue32bit() throws SolverException, InterruptedException {
+  public void bvModelValue32bit() throws SolverException, InterruptedException, IOException {
     BitvectorFormula var = bvmgr.makeVariable(32, "var");
 
     Map<Long, Long> values = new LinkedHashMap<>();
@@ -160,8 +160,6 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
         }
         prover.pop();
       }
-    } catch (IOException pE) {
-      throw new RuntimeException(pE);
     }
   }
 

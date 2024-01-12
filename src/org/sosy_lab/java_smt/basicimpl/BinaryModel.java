@@ -51,7 +51,7 @@ import org.sosy_lab.java_smt.solvers.princess.PrincessEnvironment;
 public class BinaryModel extends AbstractModel<IExpression, Sort, PrincessEnvironment> {
   private final String filePath = System.getProperty("user.dir");
 
-  AbstractFormulaManager<IExpression, Sort, PrincessEnvironment, ?> fmgr;
+  AbstractFormulaManager<IExpression, Sort, PrincessEnvironment, ?> mgr;
   private final BooleanFormulaManager bmgr;
   private final IntegerFormulaManager imgr;
   // private final RationalFormulaManager rmgr;
@@ -68,15 +68,16 @@ public class BinaryModel extends AbstractModel<IExpression, Sort, PrincessEnviro
 
   public BinaryModel(
       AbstractProver<?> prover,
+      FormulaCreator<IExpression, Sort, PrincessEnvironment, ?> pCreator,
       AbstractFormulaManager<IExpression, Sort, PrincessEnvironment, ?> pFormulaManager) {
-    super(prover, pFormulaManager);
-    fmgr = pFormulaManager;
-    bmgr = formulaManager.getBooleanFormulaManager();
-    imgr = formulaManager.getIntegerFormulaManager();
+    super(prover, pCreator);
+    mgr = pFormulaManager;
+    bmgr = mgr.getBooleanFormulaManager();
+    imgr = mgr.getIntegerFormulaManager();
     // rmgr = Objects.requireNonNull(formulaManager.getRationalFormulaManager());
-    bvmgr = formulaManager.getBitvectorFormulaManager();
-    amgr = formulaManager.getArrayFormulaManager();
-    umgr = formulaManager.getUFManager();
+    bvmgr = mgr.getBitvectorFormulaManager();
+    amgr = mgr.getArrayFormulaManager();
+    umgr = mgr.getUFManager();
     assignments = new ArrayList<>();
   }
 
@@ -134,7 +135,7 @@ public class BinaryModel extends AbstractModel<IExpression, Sort, PrincessEnviro
   private List<ValueAssignment> parseModel(String pString) throws IOException {
     smtlibv2Lexer lexer = new smtlibv2Lexer(CharStreams.fromFileName(pString));
     smtlibv2Parser parser = new smtlibv2Parser(new CommonTokenStream(lexer));
-    Visitor visitor = new Visitor(formulaManager, bmgr, imgr, null, bvmgr, amgr, umgr);
+    Visitor visitor = new Visitor(mgr, bmgr, imgr, null, bvmgr, amgr, umgr);
     visitor.visit(parser.start());
     assignments = visitor.getAssignments();
     return assignments;

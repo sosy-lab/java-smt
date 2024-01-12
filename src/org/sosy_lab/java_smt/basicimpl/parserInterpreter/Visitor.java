@@ -372,7 +372,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     List<Formula> operands = new ArrayList<>();
     getOperands(ctx, operands);
     switch (operator) {
-      // boolean operators
+        // boolean operators
       case "and":
         try {
           List<BooleanFormula> booleanOperands =

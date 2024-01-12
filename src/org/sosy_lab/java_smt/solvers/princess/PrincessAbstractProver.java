@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -72,7 +71,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
 
     trackingStack.push(new Level());
     partitions.push(PathCopyingPersistentTreeMap.of());
-    binaryModel = new BinaryModel(this, mgr);
+    binaryModel = new BinaryModel(this, creator, mgr);
   }
 
   /**
@@ -109,7 +108,6 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
 
   @CanIgnoreReturnValue
   protected int addConstraint0(BooleanFormula constraint) {
-    Preconditions.checkState(!closed);
     wasLastSatCheckSat = false;
 
     final int formulaId = idGenerator.getFreshId();
@@ -171,7 +169,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
     } catch (SimpleAPIException ex) {
       throw new SolverException(ex.getMessage(), ex);
     }
-    return new PrincessModel(this, partialModel, mgr, api);
+    return new PrincessModel(this, partialModel, creator, api);
   }
 
   /**
@@ -196,7 +194,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
     final List<BooleanFormula> result = new ArrayList<>();
     final Set<Object> core = asJava(api.getUnsatCore());
     for (Object partitionId : core) {
-      result.add(Objects.requireNonNull(partitions.peek()).get(partitionId));
+      result.add(partitions.peek().get(partitionId));
     }
     return result;
   }

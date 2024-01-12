@@ -20,8 +20,8 @@ class Mathsat5Evaluator extends AbstractEvaluator<Long, Long, Long> {
   private final long proverEnvironment;
 
   Mathsat5Evaluator(
-      AbstractProver<?> prover, Mathsat5FormulaManager pFormulaManager, long pProverEnvironment) {
-    super(prover, pFormulaManager);
+      AbstractProver<?> prover, Mathsat5FormulaCreator creator, long pProverEnvironment) {
+    super(prover, creator);
     proverEnvironment = pProverEnvironment;
   }
 

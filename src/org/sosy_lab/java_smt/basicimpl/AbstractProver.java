@@ -87,9 +87,9 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   @Override
   public final void push() throws InterruptedException {
     checkState(!closed);
+    Generator.logPush();
     pushImpl();
     assertedFormulas.add(new LinkedHashMap<>());
-    Generator.logPush();
   }
 
   protected abstract void pushImpl() throws InterruptedException;
@@ -98,9 +98,9 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   public final void pop() {
     checkState(!closed);
     checkState(assertedFormulas.size() > 1, "initial level must remain until close");
-    assertedFormulas.remove(assertedFormulas.size() - 1); // remove last
-    popImpl();
     Generator.logPop();
+    popImpl();
+    assertedFormulas.remove(assertedFormulas.size() - 1); // remove last
   }
 
   protected abstract void popImpl();
@@ -109,11 +109,11 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   @CanIgnoreReturnValue
   public final @Nullable T addConstraint(BooleanFormula constraint) throws InterruptedException {
     checkState(!closed);
-    T t = addConstraintImpl(constraint);
-    Iterables.getLast(assertedFormulas).put(constraint, t);
     if (Generator.isLoggingEnabled()) {
       Generator.assembleConstraint(constraint);
     }
+    T t = addConstraintImpl(constraint);
+    Iterables.getLast(assertedFormulas).put(constraint, t);
     return t;
   }
 

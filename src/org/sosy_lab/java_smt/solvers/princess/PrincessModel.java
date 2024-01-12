@@ -38,6 +38,7 @@ import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
+import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import scala.Option;
 
 class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment> {
@@ -47,9 +48,9 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
   PrincessModel(
       AbstractProver<?> pProver,
       PartialModel partialModel,
-      PrincessFormulaManager pFormulaManager,
+      FormulaCreator<IExpression, Sort, PrincessEnvironment, ?> creator,
       SimpleAPI pApi) {
-    super(pProver, pFormulaManager);
+    super(pProver, creator);
     this.model = partialModel;
     this.api = pApi;
   }
@@ -75,7 +76,6 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
         assignments.addAll(getAssignments(entry.getKey(), entry.getValue(), arrays));
       }
     }
-    System.out.println(assignments.build().asList());
     return assignments.build().asList();
   }
 

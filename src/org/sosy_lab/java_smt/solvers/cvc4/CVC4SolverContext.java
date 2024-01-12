@@ -33,7 +33,6 @@ public final class CVC4SolverContext extends AbstractSolverContext {
   private CVC4FormulaCreator creator;
   private final ShutdownNotifier shutdownNotifier;
   private final int randomSeed;
-  private final CVC4FormulaManager formulaManager;
 
   private CVC4SolverContext(
       CVC4FormulaCreator creator,
@@ -44,7 +43,6 @@ public final class CVC4SolverContext extends AbstractSolverContext {
     this.creator = creator;
     shutdownNotifier = pShutdownNotifier;
     randomSeed = pRandomSeed;
-    formulaManager = manager;
   }
 
   public static SolverContext create(
@@ -132,7 +130,7 @@ public final class CVC4SolverContext extends AbstractSolverContext {
   @Override
   public ProverEnvironment newProverEnvironment0(Set<ProverOptions> pOptions) {
     return new CVC4TheoremProver(
-        formulaManager,
+        creator,
         shutdownNotifier,
         randomSeed,
         pOptions,

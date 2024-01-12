@@ -40,7 +40,7 @@ import org.sosy_lab.java_smt.basicimpl.ShutdownHook;
 class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     implements ProverEnvironment, BasicProverEnvironment<Void> {
 
-  private final CVC4FormulaManager formulaManager;
+  private final CVC4FormulaCreator creator;
   SmtEngine smtEngine; // final except for SL theory
   private boolean changedSinceLastSatQuery = false;
 
@@ -58,20 +58,18 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
 
   // CVC4 does not support separation logic in incremental mode.
   private final boolean incremental;
-  private final CVC4FormulaCreator creator;
 
   protected CVC4TheoremProver(
-      CVC4FormulaManager pFormulaManager,
+      CVC4FormulaCreator pFormulaCreator,
       ShutdownNotifier pShutdownNotifier,
       int randomSeed,
       Set<ProverOptions> pOptions,
       BooleanFormulaManager pBmgr) {
     super(pOptions, pBmgr, pShutdownNotifier);
 
-    formulaManager = pFormulaManager;
+    creator = pFormulaCreator;
     smtEngine = new SmtEngine(exprManager);
     incremental = !enableSL;
-    creator = (CVC4FormulaCreator) pFormulaManager.getFormulaCreator();
 
     setOptions(randomSeed, pOptions);
   }
@@ -148,7 +146,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     return registerEvaluator(
         new CVC4Model(
             this,
-            formulaManager,
+            creator,
             smtEngine,
             Collections2.transform(getAssertedFormulas(), creator::extractInfo)));
   }
@@ -163,7 +161,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   @SuppressWarnings("resource")
   @Override
   protected Evaluator getEvaluatorWithoutChecks() {
-    return registerEvaluator(new CVC4Evaluator(this, formulaManager, smtEngine));
+    return registerEvaluator(new CVC4Evaluator(this, creator, smtEngine));
   }
 
   private void setChanged() {

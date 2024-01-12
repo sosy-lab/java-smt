@@ -165,7 +165,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
         new SmtInterpolModel(
             this,
             model,
-            mgr,
+            creator,
             transformedImmutableSetCopy(getAssertedFormulas(), mgr::extractInfo)));
   }
 

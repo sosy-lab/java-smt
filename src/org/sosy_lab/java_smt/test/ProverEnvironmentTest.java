@@ -136,7 +136,8 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void unsatCoreWithAssumptionsTest() throws SolverException, InterruptedException {
+  public void unsatCoreWithAssumptionsTest()
+      throws SolverException, InterruptedException, IOException {
     requireUnsatCore();
     assume()
         .withMessage(

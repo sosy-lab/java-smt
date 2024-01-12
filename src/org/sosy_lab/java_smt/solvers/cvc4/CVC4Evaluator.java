@@ -20,9 +20,8 @@ public class CVC4Evaluator extends AbstractEvaluator<Expr, Type, ExprManager> {
   private final SmtEngine smtEngine;
   private final CVC4TheoremProver prover;
 
-  CVC4Evaluator(
-      CVC4TheoremProver pProver, CVC4FormulaManager pFormulaManager, SmtEngine pSmtEngine) {
-    super(pProver, pFormulaManager);
+  CVC4Evaluator(CVC4TheoremProver pProver, CVC4FormulaCreator pCreator, SmtEngine pSmtEngine) {
+    super(pProver, pCreator);
     smtEngine = pSmtEngine;
     prover = pProver;
   }

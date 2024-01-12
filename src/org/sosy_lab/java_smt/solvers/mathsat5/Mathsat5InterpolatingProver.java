@@ -57,9 +57,9 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
   Mathsat5InterpolatingProver(
       Mathsat5SolverContext pMgr,
       ShutdownNotifier pShutdownNotifier,
-      Mathsat5FormulaManager pFormulaManager,
+      Mathsat5FormulaCreator creator,
       Set<ProverOptions> options) {
-    super(pMgr, options, pFormulaManager, pShutdownNotifier);
+    super(pMgr, options, creator, pShutdownNotifier);
   }
 
   @Override
@@ -74,7 +74,7 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
     closeAllEvaluators();
     int group = msat_create_itp_group(curEnv);
     msat_set_itp_group(curEnv, group);
-    long t = formulaManager.getFormulaCreator().extractInfo(f);
+    long t = creator.extractInfo(f);
     msat_assert_formula(curEnv, t);
     return group;
   }
@@ -120,7 +120,7 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
       }
       throw e;
     }
-    return formulaManager.getFormulaCreator().encapsulateBoolean(itp);
+    return creator.encapsulateBoolean(itp);
   }
 
   @Override

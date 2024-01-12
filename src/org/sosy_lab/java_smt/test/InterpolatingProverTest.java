@@ -163,7 +163,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   }
 
   @Test
-    public <T> void binaryInterpolationWithConstantFalse()
+  public <T> void binaryInterpolationWithConstantFalse()
       throws SolverException, InterruptedException, IOException {
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
@@ -319,7 +319,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
   @Test
   public <T> void sequentialInterpolationIsNotRepeatedIndividualInterpolation()
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     requireIntegers();
 
@@ -1104,7 +1104,8 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   }
 
   @Test
-  public <T> void testTrivialInterpolation() throws InterruptedException, SolverException {
+  public <T> void testTrivialInterpolation()
+      throws InterruptedException, SolverException, IOException {
     requireInterpolation();
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     IntegerFormula zero = imgr.makeNumber(0);
@@ -1151,7 +1152,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
   @SuppressWarnings({"unchecked", "unused"})
   @Test
-  public <T> void testInvalidToken() throws InterruptedException, SolverException {
+  public <T> void testInvalidToken() throws InterruptedException, SolverException, IOException {
     requireInterpolation();
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 

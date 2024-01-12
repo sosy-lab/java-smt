@@ -40,11 +40,10 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
   /** for detecting closed environments, Exception is better than SegFault. */
   private final Mathsat5AbstractProver<?> prover;
 
-  Mathsat5Model(
-      long model, Mathsat5FormulaManager pFormulaManager, Mathsat5AbstractProver<?> pProver) {
-    super(pProver, pFormulaManager);
+  Mathsat5Model(long model, Mathsat5FormulaCreator creator, Mathsat5AbstractProver<?> pProver) {
+    super(pProver, creator);
     this.model = model;
-    formulaCreator = (Mathsat5FormulaCreator) pFormulaManager.getFormulaCreator();
+    formulaCreator = creator;
     prover = pProver;
   }
 

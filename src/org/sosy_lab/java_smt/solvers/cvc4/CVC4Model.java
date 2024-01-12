@@ -32,10 +32,10 @@ public class CVC4Model extends AbstractModel<Expr, Type, ExprManager> {
 
   CVC4Model(
       CVC4TheoremProver pProver,
-      CVC4FormulaManager pFormulaManager,
+      CVC4FormulaCreator pCreator,
       SmtEngine pSmtEngine,
       Collection<Expr> pAssertedExpressions) {
-    super(pProver, pFormulaManager);
+    super(pProver, pCreator);
     smtEngine = pSmtEngine;
     prover = pProver;
     assertedExpressions = ImmutableList.copyOf(pAssertedExpressions);

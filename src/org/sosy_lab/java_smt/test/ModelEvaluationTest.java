@@ -138,6 +138,7 @@ public class ModelEvaluationTest extends SolverBasedTest0.ParameterizedSolverBas
 
   @Test
   public void testGetBooleansEvaluation()
+      throws SolverException, IOException, InterruptedException {
     final boolean defaultValue;
     if (solverToUse() == Solvers.OPENSMT) {
       defaultValue = true; // Default value for boolean in OpenSMT is 'true'.
