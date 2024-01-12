@@ -167,6 +167,12 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
               bmgr.not(bvmgr.equal(x, y)),
               bvmgr.lessThan(x, y, true),
               bvmgr.lessThan(x, y, false),
+              // FIXME: Bitwuzla
+              //  AssertionError
+              //  at encapsulateBoolean(BitwuzlaFormulaCreator.java:625)
+              //  The term for lessOrEquals() is not of type Boolean?
+              //  Interestingly enough this only brakes for the "OrEqual" variants of
+              //  lessThan and greaterThan
               bvmgr.lessOrEquals(x, y, true),
               bvmgr.lessOrEquals(x, y, false),
               bvmgr.greaterThan(x, y, true),
@@ -186,6 +192,9 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
       for (BitvectorFormula f :
           ImmutableList.of(
               bvmgr.add(x, y),
+              // FIXME: Bitwuzla
+              //  AssertionError: Unexpected formula type for BV formula: Boolean
+              //  at encapsulateBitvector(BitwuzlaFormulaCreator.java:129)
               bvmgr.subtract(x, y),
               bvmgr.multiply(x, y),
               bvmgr.and(x, y),
@@ -393,6 +402,10 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
 
     for (Formula f :
         ImmutableList.of(
+            // FIXME: Bitwuzla
+            //  AssertionError
+            //  at encapsulateBoolean(BitwuzlaFormulaCreator.java:625)
+            //  The term for lessOrEquals() is not of type Boolean?
             bvmgr.lessOrEquals(x, y, true),
             bvmgr.lessOrEquals(x, y, false),
             bvmgr.lessThan(x, y, true),
@@ -402,6 +415,9 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
             bvmgr.greaterThan(x, y, true),
             bvmgr.greaterThan(x, y, false),
             bvmgr.add(x, y),
+            // FIXME: Bitwuzla
+            //  AssertionError: Unexpected formula type for BV formula: Boolean
+            //  at encapsulateBitvector(BitwuzlaFormulaCreator.java:129)
             bvmgr.subtract(x, y),
             bvmgr.multiply(x, y),
             bvmgr.divide(x, y, true),

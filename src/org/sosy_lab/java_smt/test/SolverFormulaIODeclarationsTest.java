@@ -67,6 +67,10 @@ public class SolverFormulaIODeclarationsTest
     String query = "(declare-fun var () Bool)(assert var)";
     BooleanFormula formula = mgr.parse(query);
     BooleanFormula var = bmgr.makeVariable("var");
+    // FIXME: Bitwuzla
+    //  expected: var
+    //  but was : (non-equal instance of same class with same string representation)
+    //  We may need to add the variables to the cache?
     Truth.assertThat(mgr.extractVariables(formula).values()).containsExactly(var);
   }
 
@@ -127,6 +131,9 @@ public class SolverFormulaIODeclarationsTest
   public void parseDeclareBeforeTest() {
     String query = "(assert var)";
     BooleanFormula var = bmgr.makeVariable("var");
+    // FIXME: Bitwuzla
+    //  IllegalArgumentException: Could not parse input string "(assert var)"
+    //  at parse(BitwuzlaFormulaManager.java:54)
     BooleanFormula formula = mgr.parse(query);
     Truth.assertThat(mgr.extractVariables(formula).values()).containsExactly(var);
   }
@@ -226,6 +233,9 @@ public class SolverFormulaIODeclarationsTest
     String query2 = "(assert (not x))";
     BooleanFormula formula1 = mgr.parse(query1);
     Truth.assertThat(mgr.extractVariables(formula1).values()).hasSize(1);
+    // FIXME: Bitwuzla
+    //   IllegalArgumentException: Could not parse input string "(assert (not x))"
+    //	 at parse(BitwuzlaFormulaManager.java:54)
     BooleanFormula formula2 = mgr.parse(query2);
     Truth.assertThat(mgr.extractVariables(formula2).values()).hasSize(1);
     Truth.assertThat(mgr.extractVariables(formula1)).isEqualTo(mgr.extractVariables(formula2));
@@ -239,6 +249,10 @@ public class SolverFormulaIODeclarationsTest
     Truth.assertThat(mgr.extractVariables(formula1).values()).hasSize(1);
     BooleanFormula formula2 = mgr.parse(query2);
     Truth.assertThat(mgr.extractVariables(formula2).values()).hasSize(1);
+    // FIXME: Bitwuzla
+    //  expected: x
+    //  but was : (non-equal instance of same class with same string representation)
+    //  We may need to add the variables to the cache?
     Truth.assertThat(formula1).isEqualTo(formula2);
   }
 
@@ -260,12 +274,18 @@ public class SolverFormulaIODeclarationsTest
   public void parseDeclareOnceNotTwiceTest3() {
     String query1 = "(declare-fun x () Bool)(declare-fun y () Bool)(assert x)";
     String query2 = "(assert y)";
+    // FIXME: Bitwuzla
+    //  IllegalArgumentException: Could not parse input string "(assert y)"
+    //  at parse(BitwuzlaFormulaManager.java:54)
     BooleanFormula formula1 = mgr.parse(query1);
     Truth.assertThat(mgr.extractVariablesAndUFs(formula1).values()).hasSize(1);
     if (Solvers.Z3 == solverToUse()) {
       // "y" is unknown for the second query.
       assertThrows(IllegalArgumentException.class, () -> mgr.parse(query2));
     } else {
+      // FIXME: Bitwuzla
+      //  IllegalArgumentException: Could not parse input string "(assert y)"
+      //  at parse(BitwuzlaFormulaManager.java:54)
       BooleanFormula formula2 = mgr.parse(query2);
       Truth.assertThat(mgr.extractVariablesAndUFs(formula2).values()).hasSize(1);
     }
@@ -302,6 +322,12 @@ public class SolverFormulaIODeclarationsTest
             + " (not (= |f::v@2| (_ bv1 32)))))";
     BooleanFormula parsedQuery = mgr.parse(query);
     assertThatFormula(parsedQuery).isUnsatisfiable();
+    // FIXME: Bitwuzla
+    //  UnsupportedOperationException: Can not discern formula kind BITWUZLA_KIND_BV_UADD_OVERFLOW
+    //  We seem to be off by one in the enum?
+    //   BITWUZLA_KIND_BV_SUB,
+    //   BITWUZLA_KIND_BV_UADD_OVERFLOW,
+    //   ...
     assert_().that(mgr.extractVariables(parsedQuery)).hasSize(9);
     assert_().that(mgr.extractVariablesAndUFs(parsedQuery)).hasSize(9);
   }

@@ -288,6 +288,9 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
       BooleanFormula bvConstr =
           bmgr.or(
               bvmgr.equal(
+                  // FIXME: Bitwuzla
+                  //  AssertionError: Unexpected formula type for BV formula: Boolean
+                  //  at encapsulateBitvector(BitwuzlaFormulaCreator.java:129)
                   bvmgr.subtract(
                       bvmgr.add(bvmgr.makeVariable(8, "x"), bvmgr.makeVariable(8, "z")),
                       bvmgr.makeBitvector(8, 10)),

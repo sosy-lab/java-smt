@@ -418,6 +418,10 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
     BooleanFormula bEqNeg2 = bvmgr.equal(b, numNeg2);
 
     // positive numbers, signed.
+
+    // FIXME: Bitwuzla
+    //  AssertionError: unexpected formula type for BV formula: Boolean
+    //  at encapsulateBitvector(BitwuzlaFormulaCreator.java:129)
     assertDivision(a, num5, true, b, aEq10, bEq2);
     assertDivision(a, num3, true, num3, aEq10);
     assertDivision(a, numNeg3, true, numNeg3, aEq10);

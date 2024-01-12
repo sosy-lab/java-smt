@@ -830,6 +830,9 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
           if (solver != Solvers.BOOLECTOR && solver != Solvers.BITWUZLA) {
             assertThat(m.evaluate(x)).isEqualTo(BigInteger.ONE);
           } else {
+            // FIXME: Bitwuzla
+            //    expected: 64
+            //    but was : 0
             assertThat(m.evaluate(x)).isEqualTo(BigInteger.valueOf(64));
           }
           // it works now, but maybe the model "x=1" for the constraint "x>0" is not valid for new
@@ -919,6 +922,9 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
               BitvectorFormula one = bvmgr.makeBitvector(i, 1);
               assertThat(m.evaluate(bvmgr.add(zero, zero))).isEqualTo(BigInteger.ZERO);
               assertThat(m.evaluate(bvmgr.add(zero, one))).isEqualTo(BigInteger.ONE);
+              // FIXME: Bitwuzla
+              //  AssertionError: Unexpected formula type for BV formula: Boolean
+              //  at encapsulateBitvector(BitwuzlaFormulaCreator.java:129)
               assertThat(m.evaluate(bvmgr.subtract(one, one))).isEqualTo(BigInteger.ZERO);
               assertThat(m.evaluate(bvmgr.subtract(one, zero))).isEqualTo(BigInteger.ONE);
             }
