@@ -13,7 +13,6 @@ import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.collect.ImmutableList;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.After;
@@ -118,7 +117,7 @@ public class SolverAllSatTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void allSatTest_unsat() throws SolverException, InterruptedException, IOException {
+  public void allSatTest_unsat() throws SolverException, InterruptedException {
     requireIntegers();
 
     IntegerFormula a = imgr.makeVariable("i");
@@ -151,7 +150,7 @@ public class SolverAllSatTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void allSatTest_xor() throws SolverException, InterruptedException, IOException {
+  public void allSatTest_xor() throws SolverException, InterruptedException {
     requireIntegers();
 
     IntegerFormula a = imgr.makeVariable("i");
@@ -181,7 +180,7 @@ public class SolverAllSatTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void allSatTest_nondetValue() throws SolverException, InterruptedException, IOException {
+  public void allSatTest_nondetValue() throws SolverException, InterruptedException {
     BooleanFormula v1 = bmgr.makeVariable("b1");
     BooleanFormula v2 = bmgr.makeVariable("b2");
 
@@ -199,8 +198,7 @@ public class SolverAllSatTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void allSatTest_withQuantifier()
-      throws SolverException, InterruptedException, IOException {
+  public void allSatTest_withQuantifier() throws SolverException, InterruptedException {
     requireBitvectors();
     requireQuantifiers();
 

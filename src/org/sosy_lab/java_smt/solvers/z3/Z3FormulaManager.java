@@ -13,7 +13,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Longs;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Z3Exception;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -122,17 +121,13 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
     final long term = Native.astVectorGet(env, e, 0);
 
     // last step: all parsed symbols need to be declared again to have them tracked in the creator.
-    try {
-      declareAllSymbols(term);
-    } catch (IOException pE) {
-      throw new RuntimeException(pE);
-    }
+    declareAllSymbols(term);
 
     return getFormulaCreator().encapsulateBoolean(term);
   }
 
   @SuppressWarnings("CheckReturnValue")
-  private void declareAllSymbols(final long term) throws IOException {
+  private void declareAllSymbols(final long term) {
     final long env = getEnvironment();
     final Map<String, Long> symbols = formulaCreator.extractVariablesAndUFs(term, true);
     for (Map.Entry<String, Long> symbol : symbols.entrySet()) {

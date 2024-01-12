@@ -12,7 +12,6 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertThrows;
 
 import com.google.common.collect.ImmutableList;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;
@@ -28,7 +27,7 @@ import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 public class NumeralFormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
-  public void distinctTest() throws SolverException, InterruptedException, IOException {
+  public void distinctTest() throws SolverException, InterruptedException {
     requireIntegers();
     List<IntegerFormula> symbols = new ArrayList<>();
     for (int i = 0; i < 5; i++) {
@@ -39,7 +38,7 @@ public class NumeralFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void distinctTest2() throws SolverException, InterruptedException, IOException {
+  public void distinctTest2() throws SolverException, InterruptedException {
     requireIntegers();
     IntegerFormula zero = imgr.makeNumber(0);
     IntegerFormula four = imgr.makeNumber(4);
@@ -55,7 +54,7 @@ public class NumeralFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void distinctTest3() throws SolverException, InterruptedException, IOException {
+  public void distinctTest3() throws SolverException, InterruptedException {
     requireIntegers();
     IntegerFormula zero = imgr.makeNumber(0);
     IntegerFormula four = imgr.makeNumber(4);
@@ -86,7 +85,7 @@ public class NumeralFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
 
   @SuppressWarnings("CheckReturnValue")
   @Test
-  public void testSubTypes() throws IOException {
+  public void testSubTypes() {
     requireIntegers();
     requireRationals();
     IntegerFormula a = imgr.makeVariable("a");

@@ -12,7 +12,6 @@ import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Locale;
 import org.junit.After;
@@ -105,7 +104,7 @@ public class BoolectorNativeApiTest {
    */
   @Test
   public void satSolverBackendTest()
-      throws InvalidConfigurationException, InterruptedException, SolverException, IOException {
+      throws InvalidConfigurationException, InterruptedException, SolverException {
 
     for (SatSolver satsolver : BoolectorSolverContext.SatSolver.values()) {
       ConfigurationBuilder config =

@@ -87,6 +87,7 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
     try {
       Generator.dumpSMTLIB2();
     } catch (IOException pE) {
+      // FIXME: Find a better way to handle the IOException
       throw new RuntimeException(pE);
     }
     Preconditions.checkState(!closed);

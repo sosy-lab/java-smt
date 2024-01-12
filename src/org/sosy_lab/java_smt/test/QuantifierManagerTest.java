@@ -14,7 +14,6 @@ import static org.sosy_lab.java_smt.api.FormulaType.StringType;
 
 import com.google.common.collect.ImmutableList;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -116,8 +115,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   private static final UniqueIdGenerator index = new UniqueIdGenerator(); // to get different names
 
   @Test
-  public void testLIAForallArrayConjunctUnsat()
-      throws SolverException, InterruptedException, IOException {
+  public void testLIAForallArrayConjunctUnsat() throws SolverException, InterruptedException {
     assume()
         .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
         .that(solverToUse())
@@ -134,8 +132,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testBVForallArrayConjunctUnsat()
-      throws SolverException, InterruptedException, IOException {
+  public void testBVForallArrayConjunctUnsat() throws SolverException, InterruptedException {
     assume()
         .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
         .that(solverToUse())
@@ -158,8 +155,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testLIAForallArrayConjunctSat()
-      throws SolverException, InterruptedException, IOException {
+  public void testLIAForallArrayConjunctSat() throws SolverException, InterruptedException {
     assume()
         .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
         .that(solverToUse())
@@ -181,8 +177,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testBVForallArrayConjunctSat()
-      throws SolverException, InterruptedException, IOException {
+  public void testBVForallArrayConjunctSat() throws SolverException, InterruptedException {
     assume()
         .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
         .that(solverToUse())
@@ -210,8 +205,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testLIAForallArrayDisjunct1()
-      throws SolverException, InterruptedException, IOException {
+  public void testLIAForallArrayDisjunct1() throws SolverException, InterruptedException {
     assume()
         .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
         .that(solverToUse())
@@ -234,8 +228,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testLIAForallArrayDisjunctSat2()
-      throws SolverException, InterruptedException, IOException {
+  public void testLIAForallArrayDisjunctSat2() throws SolverException, InterruptedException {
     assume()
         .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
         .that(solverToUse())
@@ -255,8 +248,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testLIANotExistsArrayConjunct1()
-      throws SolverException, InterruptedException, IOException {
+  public void testLIANotExistsArrayConjunct1() throws SolverException, InterruptedException {
     assume()
         .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
         .that(solverToUse())
@@ -276,8 +268,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testLIANotExistsArrayConjunct2()
-      throws SolverException, InterruptedException, IOException {
+  public void testLIANotExistsArrayConjunct2() throws SolverException, InterruptedException {
     assume()
         .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
         .that(solverToUse())
@@ -297,8 +288,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testLIANotExistsArrayConjunct3()
-      throws SolverException, InterruptedException, IOException {
+  public void testLIANotExistsArrayConjunct3() throws SolverException, InterruptedException {
     assume()
         .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
         .that(solverToUse())
@@ -314,8 +304,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testLIANotExistsArrayDisjunct1()
-      throws SolverException, InterruptedException, IOException {
+  public void testLIANotExistsArrayDisjunct1() throws SolverException, InterruptedException {
     assume()
         .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
         .that(solverToUse())
@@ -338,8 +327,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testLIANotExistsArrayDisjunct2()
-      throws SolverException, InterruptedException, IOException {
+  public void testLIANotExistsArrayDisjunct2() throws SolverException, InterruptedException {
     // (not exists x . not b[x] = 0) OR (b[123] = 1) is SAT
     assume()
         .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
@@ -359,8 +347,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testLIAExistsArrayConjunct1()
-      throws SolverException, InterruptedException, IOException {
+  public void testLIAExistsArrayConjunct1() throws SolverException, InterruptedException {
     // (exists x . b[x] = 0) AND (b[123] = 1) is SAT
     requireIntegers();
     BooleanFormula f =
@@ -371,8 +358,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testBVExistsArrayConjunct1()
-      throws SolverException, InterruptedException, IOException {
+  public void testBVExistsArrayConjunct1() throws SolverException, InterruptedException {
     // (exists x . b[x] = 0) AND (b[123] = 1) is SAT
     requireBitvectors();
     // Princess does not support bitvectors in arrays
@@ -390,8 +376,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testLIAExistsArrayConjunct2()
-      throws SolverException, InterruptedException, IOException {
+  public void testLIAExistsArrayConjunct2() throws SolverException, InterruptedException {
     assume()
         .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
         .that(solverToUse())
@@ -406,8 +391,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testBVExistsArrayConjunct2()
-      throws SolverException, InterruptedException, IOException {
+  public void testBVExistsArrayConjunct2() throws SolverException, InterruptedException {
     assume()
         .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
         .that(solverToUse())
@@ -426,8 +410,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testLIAExistsArrayConjunct3()
-      throws SolverException, InterruptedException, IOException {
+  public void testLIAExistsArrayConjunct3() throws SolverException, InterruptedException {
     assume()
         .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
         .that(solverToUse())
@@ -447,8 +430,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testBVExistsArrayConjunct3()
-      throws SolverException, InterruptedException, IOException {
+  public void testBVExistsArrayConjunct3() throws SolverException, InterruptedException {
     // (exists x . b[x] = 0) AND (forall x . b[x] = 0) is SAT
     requireBitvectors();
     // Princess does not support bitvectors in arrays
@@ -469,8 +451,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testLIAExistsArrayDisjunct1()
-      throws SolverException, InterruptedException, IOException {
+  public void testLIAExistsArrayDisjunct1() throws SolverException, InterruptedException {
     // (exists x . b[x] = 0) OR  (forall x . b[x] = 1) is SAT
 
     requireIntegers();
@@ -487,8 +468,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testBVExistsArrayDisjunct1()
-      throws SolverException, InterruptedException, IOException {
+  public void testBVExistsArrayDisjunct1() throws SolverException, InterruptedException {
     // (exists x . b[x] = 0) OR (forall x . b[x] = 1) is SAT
     requireBitvectors();
     // Princess does not support bitvectors in arrays
@@ -504,8 +484,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testLIAExistsArrayDisjunct2()
-      throws SolverException, InterruptedException, IOException {
+  public void testLIAExistsArrayDisjunct2() throws SolverException, InterruptedException {
     // (exists x . b[x] = 1) OR (exists x . b[x] = 1) is SAT
 
     requireIntegers();
@@ -517,8 +496,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testBVExistsArrayDisjunct2()
-      throws SolverException, InterruptedException, IOException {
+  public void testBVExistsArrayDisjunct2() throws SolverException, InterruptedException {
     // (exists x . b[x] = 1) OR (exists x . b[x] = 1) is SAT
     requireBitvectors();
     // Princess does not support bitvectors in arrays
@@ -534,7 +512,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testLIAContradiction() throws SolverException, InterruptedException, IOException {
+  public void testLIAContradiction() throws SolverException, InterruptedException {
     // forall x . x = x+1  is UNSAT
 
     requireIntegers();
@@ -544,7 +522,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testBVContradiction() throws SolverException, InterruptedException, IOException {
+  public void testBVContradiction() throws SolverException, InterruptedException {
     // forall x . x = x+1 is UNSAT
     requireBitvectors();
     // Boolector quants need to be reworked
@@ -559,7 +537,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testLIASimple() throws SolverException, InterruptedException, IOException {
+  public void testLIASimple() throws SolverException, InterruptedException {
     // forall x . x+2 = x+1+1  is SAT
     requireIntegers();
 
@@ -573,7 +551,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testBVSimple() throws SolverException, InterruptedException, IOException {
+  public void testBVSimple() throws SolverException, InterruptedException {
     // forall z . z+2 = z+1+1 is SAT
     requireBitvectors();
     // Boolector quants need to be reworked
@@ -592,7 +570,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testLIAEquality() throws SolverException, InterruptedException, IOException {
+  public void testLIAEquality() throws SolverException, InterruptedException {
     requireIntegers();
 
     // Note that due to the variable cache we simply get the existing var x here!
@@ -604,7 +582,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testBVEquality() throws SolverException, InterruptedException, IOException {
+  public void testBVEquality() throws SolverException, InterruptedException {
     requireBitvectors();
     // Boolector quants need to be reworked
     assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
@@ -617,7 +595,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testBVEquality2() throws SolverException, InterruptedException, IOException {
+  public void testBVEquality2() throws SolverException, InterruptedException {
     requireBitvectors();
     // Boolector quants need to be reworked
     assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
@@ -629,7 +607,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testBVEquality3() throws SolverException, InterruptedException, IOException {
+  public void testBVEquality3() throws SolverException, InterruptedException {
     // exists z . (forall y . z = y && z + 2 > z)
     // UNSAT because of bv behaviour
     requireBitvectors();
@@ -650,7 +628,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testLIABoundVariables() throws SolverException, InterruptedException, IOException {
+  public void testLIABoundVariables() throws SolverException, InterruptedException {
     // If the free and bound vars are equal, this will be UNSAT
     requireIntegers();
     IntegerFormula aa = imgr.makeVariable("aa");
@@ -662,7 +640,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testBVBoundVariables() throws SolverException, InterruptedException, IOException {
+  public void testBVBoundVariables() throws SolverException, InterruptedException {
     // If the free and bound vars are equal, this will be UNSAT
     requireBitvectors();
     // Boolector quants need to be reworked
@@ -678,7 +656,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testQELight() throws InterruptedException, IOException {
+  public void testQELight() throws InterruptedException {
     requireIntegers();
     assume().that(solverToUse()).isEqualTo(Solvers.Z3);
     // exists y : (y=4 && x=y+3) --> simplified: x=7
@@ -693,7 +671,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testIntrospectionForall() throws IOException {
+  public void testIntrospectionForall() {
     requireIntegers();
     BooleanFormula forall = qmgr.forall(ImmutableList.of(x), a_at_x_eq_0);
 
@@ -725,7 +703,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testIntrospectionExists() throws IOException {
+  public void testIntrospectionExists() {
     requireIntegers();
     BooleanFormula exists = qmgr.exists(ImmutableList.of(x), a_at_x_eq_0);
     final AtomicBoolean isQuantifier = new AtomicBoolean(false);
@@ -778,8 +756,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void checkLIAQuantifierElimination()
-      throws InterruptedException, SolverException, IOException {
+  public void checkLIAQuantifierElimination() throws InterruptedException, SolverException {
     // build formula: (forall x . ((x < 5) | (7 < x + y)))
     // quantifier-free equivalent: (2 < y)
     requireIntegers();
@@ -796,8 +773,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void checkLIAQuantifierEliminationFail()
-      throws InterruptedException, SolverException, IOException {
+  public void checkLIAQuantifierEliminationFail() throws InterruptedException, SolverException {
     assume()
         .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
         .that(solverToUse())
@@ -821,8 +797,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void checkBVQuantifierEliminationFail()
-      throws InterruptedException, SolverException, IOException {
+  public void checkBVQuantifierEliminationFail() throws InterruptedException, SolverException {
     // build formula: (exists x : arr[x] = 3) && (forall y: arr[y] = 2)
     // as there is no quantifier free equivalent, it should return the input formula.
     requireBitvectors();
@@ -852,8 +827,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void checkBVQuantifierElimination()
-      throws InterruptedException, SolverException, IOException {
+  public void checkBVQuantifierElimination() throws InterruptedException, SolverException {
     requireBitvectors();
 
     // build formula: exists y : bv[2]. x * y = 1
@@ -877,8 +851,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
 
   /** Quant elim test based on a crash in Z3. */
   @Test
-  public void checkBVQuantifierElimination2()
-      throws InterruptedException, SolverException, IOException {
+  public void checkBVQuantifierElimination2() throws InterruptedException, SolverException {
     requireBitvectors();
 
     // build formula: exists a2 : (and (= a2 #x00000006)
@@ -914,8 +887,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testExistsRestrictedRange()
-      throws SolverException, InterruptedException, IOException {
+  public void testExistsRestrictedRange() throws SolverException, InterruptedException {
     assume()
         .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
         .that(solverToUse())
@@ -948,7 +920,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
 
   @Test
   public void testExistsRestrictedRangeWithoutInconclusiveSolvers()
-      throws SolverException, InterruptedException, IOException {
+      throws SolverException, InterruptedException {
     assume()
         .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
         .that(solverToUse())
@@ -971,8 +943,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testForallRestrictedRange()
-      throws SolverException, InterruptedException, IOException {
+  public void testForallRestrictedRange() throws SolverException, InterruptedException {
     assume()
         .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
         .that(solverToUse())
@@ -1006,7 +977,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
 
   @Test
   public void testForallRestrictedRangeWithoutConclusiveSolvers()
-      throws SolverException, InterruptedException, IOException {
+      throws SolverException, InterruptedException {
     assume()
         .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
         .that(solverToUse())
@@ -1048,8 +1019,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testExistsBasicStringTheorie()
-      throws SolverException, InterruptedException, IOException {
+  public void testExistsBasicStringTheorie() throws SolverException, InterruptedException {
     requireStrings();
     requireIntegers();
 
@@ -1069,8 +1039,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testForallBasicStringTheorie()
-      throws SolverException, InterruptedException, IOException {
+  public void testForallBasicStringTheorie() throws SolverException, InterruptedException {
     requireStrings();
     requireIntegers();
 
@@ -1090,8 +1059,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testExistsBasicStringArray()
-      throws SolverException, InterruptedException, IOException {
+  public void testExistsBasicStringArray() throws SolverException, InterruptedException {
     requireStrings();
     requireIntegers();
 
@@ -1107,8 +1075,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testForallBasicStringArray()
-      throws SolverException, InterruptedException, IOException {
+  public void testForallBasicStringArray() throws SolverException, InterruptedException {
     requireStrings();
     requireIntegers();
 

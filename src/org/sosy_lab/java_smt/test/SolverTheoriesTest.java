@@ -16,7 +16,6 @@ import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +41,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
-  public void basicBoolTest() throws SolverException, InterruptedException, IOException {
+  public void basicBoolTest() throws SolverException, InterruptedException {
     BooleanFormula a = bmgr.makeVariable("a");
     BooleanFormula b = bmgr.makeBoolean(false);
     BooleanFormula c = bmgr.xor(a, b);
@@ -64,7 +63,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void basisRatTest() throws SolverException, InterruptedException, IOException {
+  public void basisRatTest() throws SolverException, InterruptedException {
     requireRationals();
 
     RationalFormula a = rmgr.makeVariable("int_c");
@@ -75,7 +74,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void intTest1() throws SolverException, InterruptedException, IOException {
+  public void intTest1() throws SolverException, InterruptedException {
     requireIntegers();
     IntegerFormula a = imgr.makeVariable("int_a");
     IntegerFormula num = imgr.makeNumber(2);
@@ -85,7 +84,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void intTest2() throws SolverException, InterruptedException, IOException {
+  public void intTest2() throws SolverException, InterruptedException {
     requireIntegers();
     IntegerFormula a = imgr.makeVariable("int_b");
     IntegerFormula num = imgr.makeNumber(1);
@@ -99,7 +98,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
       IntegerFormula denumerator,
       IntegerFormula expectedResult,
       BooleanFormula... constraints)
-      throws SolverException, InterruptedException, IOException {
+      throws SolverException, InterruptedException {
     assertDivision(true, numerator, denumerator, expectedResult, constraints);
   }
 
@@ -109,7 +108,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
       IntegerFormula denumerator,
       IntegerFormula expectedResult,
       BooleanFormula... constraints)
-      throws SolverException, InterruptedException, IOException {
+      throws SolverException, InterruptedException {
     assertOperation(
         includeNegation, buildDivision(numerator, denumerator, expectedResult), constraints);
   }
@@ -120,7 +119,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
       boolean signed,
       BitvectorFormula expectedResult,
       BooleanFormula... constraints)
-      throws SolverException, InterruptedException, IOException {
+      throws SolverException, InterruptedException {
     assertDivision(true, numerator, denumerator, signed, expectedResult, constraints);
   }
 
@@ -131,7 +130,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
       boolean signed,
       BitvectorFormula expectedResult,
       BooleanFormula... constraints)
-      throws SolverException, InterruptedException, IOException {
+      throws SolverException, InterruptedException {
     assertOperation(
         includeNegation,
         buildDivision(numerator, denumerator, signed, expectedResult),
@@ -143,7 +142,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
       IntegerFormula denumerator,
       IntegerFormula expectedResult,
       BooleanFormula... constraints)
-      throws SolverException, InterruptedException, IOException {
+      throws SolverException, InterruptedException {
     assertModulo(true, numerator, denumerator, expectedResult, constraints);
   }
 
@@ -153,7 +152,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
       IntegerFormula denumerator,
       IntegerFormula expectedResult,
       BooleanFormula... constraints)
-      throws SolverException, InterruptedException, IOException {
+      throws SolverException, InterruptedException {
     assertOperation(
         includeNegation, buildModulo(numerator, denumerator, expectedResult), constraints);
   }
@@ -164,7 +163,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
       boolean signed,
       BitvectorFormula expectedResult,
       BooleanFormula... constraints)
-      throws SolverException, InterruptedException, IOException {
+      throws SolverException, InterruptedException {
     assertModulo(true, numerator, denumerator, signed, expectedResult, constraints);
   }
 
@@ -175,7 +174,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
       boolean signed,
       BitvectorFormula expectedResult,
       BooleanFormula... constraints)
-      throws SolverException, InterruptedException, IOException {
+      throws SolverException, InterruptedException {
     assertOperation(
         includeNegation, buildModulo(numerator, denumerator, signed, expectedResult), constraints);
   }
@@ -208,7 +207,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
 
   private void assertOperation(
       boolean includeNegation, BooleanFormula equation, BooleanFormula... constraints)
-      throws SolverException, InterruptedException, IOException {
+      throws SolverException, InterruptedException {
     // check positive case
     assertThatFormula(bmgr.and(bmgr.and(constraints), equation)).isSatisfiable();
 
@@ -223,7 +222,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void intTest3_DivModLinear() throws SolverException, InterruptedException, IOException {
+  public void intTest3_DivModLinear() throws SolverException, InterruptedException {
     requireIntegers();
     IntegerFormula a = imgr.makeVariable("int_a");
     IntegerFormula b = imgr.makeVariable("int_b");
@@ -280,8 +279,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void intTest3_DivModLinear_zeroDenumerator()
-      throws SolverException, InterruptedException, IOException {
+  public void intTest3_DivModLinear_zeroDenumerator() throws SolverException, InterruptedException {
     requireIntegers();
     IntegerFormula a = imgr.makeVariable("int_a");
 
@@ -342,7 +340,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void intTest3_DivModNonLinear() throws SolverException, InterruptedException, IOException {
+  public void intTest3_DivModNonLinear() throws SolverException, InterruptedException {
     // not all solvers support division-by-variable,
     // we guarantee soundness by allowing any value that yields SAT.
     requireIntegers();
@@ -387,7 +385,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void intTestBV_DivMod() throws SolverException, InterruptedException, IOException {
+  public void intTestBV_DivMod() throws SolverException, InterruptedException {
     requireBitvectors();
 
     final int bitsize = 8;
@@ -473,8 +471,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void intTest4_ModularCongruence_Simple()
-      throws SolverException, InterruptedException, IOException {
+  public void intTest4_ModularCongruence_Simple() throws SolverException, InterruptedException {
     requireIntegers();
     final IntegerFormula x = imgr.makeVariable("x");
     final BooleanFormula f1 = imgr.modularCongruence(x, imgr.makeNumber(0), 2);
@@ -484,8 +481,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void intTest4_ModularCongruence()
-      throws SolverException, InterruptedException, IOException {
+  public void intTest4_ModularCongruence() throws SolverException, InterruptedException {
     requireIntegers();
     IntegerFormula a = imgr.makeVariable("int_a");
     IntegerFormula b = imgr.makeVariable("int_b");
@@ -530,7 +526,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
 
   @Test
   public void intTest4_ModularCongruence_NegativeNumbers()
-      throws SolverException, InterruptedException, IOException {
+      throws SolverException, InterruptedException {
     requireIntegers();
     IntegerFormula a = imgr.makeVariable("int_a");
     IntegerFormula b = imgr.makeVariable("int_b");
@@ -553,7 +549,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void testHardCongruence() throws SolverException, InterruptedException, IOException {
+  public void testHardCongruence() throws SolverException, InterruptedException {
     requireIntegers();
     IntegerFormula a = imgr.makeVariable("a");
     IntegerFormula b = imgr.makeVariable("b");
@@ -590,7 +586,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void realTest() throws SolverException, InterruptedException, IOException {
+  public void realTest() throws SolverException, InterruptedException {
     requireRationals();
 
     RationalFormula a = rmgr.makeVariable("int_c");
@@ -601,8 +597,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void test_BitvectorIsZeroAfterShiftLeft()
-      throws SolverException, InterruptedException, IOException {
+  public void test_BitvectorIsZeroAfterShiftLeft() throws SolverException, InterruptedException {
     requireBitvectors();
 
     BitvectorFormula one = bvmgr.makeBitvector(32, 1);
@@ -632,7 +627,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void testUfWithBoolType() throws SolverException, InterruptedException, IOException {
+  public void testUfWithBoolType() throws SolverException, InterruptedException {
     requireIntegers();
     FunctionDeclaration<BooleanFormula> uf =
         fmgr.declareUF("fun_ib", FormulaType.BooleanType, FormulaType.IntegerType);
@@ -652,7 +647,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void testUfWithBoolArg() throws SolverException, InterruptedException, IOException {
+  public void testUfWithBoolArg() throws SolverException, InterruptedException {
     assume()
         .withMessage("Solver %s does not support boolean arguments", solverToUse())
         .that(solver)
@@ -669,8 +664,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void quantifierEliminationTest1()
-      throws SolverException, InterruptedException, IOException {
+  public void quantifierEliminationTest1() throws SolverException, InterruptedException {
     requireQuantifiers();
     requireIntegers();
 
@@ -694,8 +688,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
 
   @Test
   @Ignore
-  public void quantifierEliminationTest2()
-      throws SolverException, InterruptedException, IOException {
+  public void quantifierEliminationTest2() throws SolverException, InterruptedException {
     requireQuantifiers();
     requireIntegers();
 
@@ -863,7 +856,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void nonLinearMultiplication() throws SolverException, InterruptedException, IOException {
+  public void nonLinearMultiplication() throws SolverException, InterruptedException {
     requireIntegers();
     IntegerFormula i2 = imgr.makeNumber(2);
     IntegerFormula i3 = imgr.makeNumber(3);
@@ -896,8 +889,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void composedLinearMultiplication()
-      throws SolverException, InterruptedException, IOException {
+  public void composedLinearMultiplication() throws SolverException, InterruptedException {
     requireIntegers();
     IntegerFormula i2 = imgr.makeNumber(2);
     IntegerFormula i3 = imgr.makeNumber(3);
@@ -926,7 +918,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void multiplicationSquares() throws SolverException, InterruptedException, IOException {
+  public void multiplicationSquares() throws SolverException, InterruptedException {
     requireIntegers();
     IntegerFormula i2 = imgr.makeNumber(2);
     IntegerFormula i3 = imgr.makeNumber(3);
@@ -988,7 +980,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void multiplicationFactors() throws SolverException, InterruptedException, IOException {
+  public void multiplicationFactors() throws SolverException, InterruptedException {
     requireIntegers();
     IntegerFormula i37 = imgr.makeNumber(37);
     IntegerFormula i1 = imgr.makeNumber(1);
@@ -1014,7 +1006,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void multiplicationCubic() throws SolverException, InterruptedException, IOException {
+  public void multiplicationCubic() throws SolverException, InterruptedException {
     requireIntegers();
     IntegerFormula i125 = imgr.makeNumber(125);
     IntegerFormula i27 = imgr.makeNumber(27);
@@ -1053,7 +1045,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void nonLinearDivision() throws SolverException, InterruptedException, IOException {
+  public void nonLinearDivision() throws SolverException, InterruptedException {
     requireIntegers();
     IntegerFormula i2 = imgr.makeNumber(2);
     IntegerFormula i3 = imgr.makeNumber(3);
@@ -1086,7 +1078,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void integerDivisionRounding() throws SolverException, InterruptedException, IOException {
+  public void integerDivisionRounding() throws SolverException, InterruptedException {
     requireIntegers();
     IntegerFormula varSeven = imgr.makeVariable("a");
     IntegerFormula varEight = imgr.makeVariable("b");
@@ -1113,7 +1105,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void bvInRange() throws SolverException, InterruptedException, IOException {
+  public void bvInRange() throws SolverException, InterruptedException {
     requireBitvectors();
 
     assertThatFormula(

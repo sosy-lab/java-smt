@@ -122,12 +122,7 @@ final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Lo
   protected Long simplify(Long f) throws InterruptedException {
     // we need to keep all variables, otherwise we will not return a equisatisfiable formula.
     // TODO we could expand the interface and let the user choose the variables.
-    final Map<String, Long> variables;
-    try {
-      variables = getFormulaCreator().extractVariablesAndUFs(f, true);
-    } catch (IOException pE) {
-      throw new RuntimeException(pE);
-    }
+    final Map<String, Long> variables = getFormulaCreator().extractVariablesAndUFs(f, true);
     final long[] protectedSymbols = Longs.toArray(variables.values());
     return msat_simplify(getFormulaCreator().getEnv(), f, protectedSymbols);
   }

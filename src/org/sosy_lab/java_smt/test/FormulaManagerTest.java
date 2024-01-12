@@ -16,7 +16,6 @@ import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.testing.EqualsTester;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Map;
@@ -33,7 +32,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
-  public void testEmptySubstitution() throws SolverException, InterruptedException, IOException {
+  public void testEmptySubstitution() throws SolverException, InterruptedException {
     requireSubstitution();
     assume().withMessage("Princess fails").that(solver).isNotEqualTo(Solvers.PRINCESS);
 
@@ -53,7 +52,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void testNoSubstitution() throws SolverException, InterruptedException, IOException {
+  public void testNoSubstitution() throws SolverException, InterruptedException {
     requireSubstitution();
     assume().withMessage("Princess fails").that(solver).isNotEqualTo(Solvers.PRINCESS);
 
@@ -79,7 +78,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void testSubstitution() throws SolverException, InterruptedException, IOException {
+  public void testSubstitution() throws SolverException, InterruptedException {
     requireSubstitution();
 
     BooleanFormula input =
@@ -101,7 +100,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void testSubstitutionTwice() throws SolverException, InterruptedException, IOException {
+  public void testSubstitutionTwice() throws SolverException, InterruptedException {
     requireSubstitution();
 
     BooleanFormula input =
@@ -125,8 +124,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void testSubstitutionMultipleInstances()
-      throws SolverException, InterruptedException, IOException {
+  public void testSubstitutionMultipleInstances() throws SolverException, InterruptedException {
     requireSubstitution();
     requireIntegers();
 
@@ -145,8 +143,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void testSubstitutionSelfReference()
-      throws SolverException, InterruptedException, IOException {
+  public void testSubstitutionSelfReference() throws SolverException, InterruptedException {
     requireSubstitution();
     requireIntegers();
 
@@ -272,7 +269,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void variableNameExtractorTest() throws IOException {
+  public void variableNameExtractorTest() {
     // Since Boolector does not support integers we use bitvectors
     if (imgr != null) {
       BooleanFormula constr =
@@ -304,7 +301,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void ufNameExtractorTest() throws IOException {
+  public void ufNameExtractorTest() {
     // Since Boolector does not support integers we use bitvectors for constraints
     if (imgr != null) {
       BooleanFormula constraint =
@@ -337,7 +334,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void simplifyIntTest() throws SolverException, InterruptedException, IOException {
+  public void simplifyIntTest() throws SolverException, InterruptedException {
     requireIntegers();
     // x=1 && y=x+2 && z=y+3 --> simplified: x=1 && y=3 && z=6
     IntegerFormula num1 = imgr.makeNumber(1);
@@ -355,7 +352,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void simplifyArrayTest() throws SolverException, InterruptedException, IOException {
+  public void simplifyArrayTest() throws SolverException, InterruptedException {
     requireIntegers();
     requireArrays();
     // exists arr : (arr[0]=5 && x=arr[0]) --> simplified: x=5

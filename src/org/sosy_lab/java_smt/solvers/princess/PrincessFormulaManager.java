@@ -12,7 +12,6 @@ import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.types.Sort;
 import com.google.common.base.Preconditions;
-import java.io.IOException;
 import java.util.List;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -56,12 +55,7 @@ final class PrincessFormulaManager
 
   @Override
   public BooleanFormula parse(String pS) throws IllegalArgumentException {
-    List<? extends IExpression> formulas = null;
-    try {
-      formulas = getEnvironment().parseStringToTerms(pS, creator);
-    } catch (IOException pE) {
-      throw new RuntimeException(pE);
-    }
+    List<? extends IExpression> formulas = getEnvironment().parseStringToTerms(pS, creator);
     Preconditions.checkState(
         formulas.size() == 1,
         "parsing expects exactly one asserted term, but got %s terms",

@@ -124,7 +124,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -248,7 +247,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
   }
 
   @Override
-  public <R> R visit(FormulaVisitor<R> pVisitor, Formula pFormula, Integer pF) throws IOException {
+  public <R> R visit(FormulaVisitor<R> pVisitor, Formula pFormula, Integer pF) {
     int constructor = yices_term_constructor(pF);
     switch (constructor) {
       case YICES_BOOL_CONST:
@@ -265,8 +264,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
   }
 
   private <R> R visitFunctionApplication(
-      FormulaVisitor<R> pVisitor, Formula pFormula, int pF, final int constructor)
-      throws IOException {
+      FormulaVisitor<R> pVisitor, Formula pFormula, int pF, final int constructor) {
 
     // Map built-in constructors in negative int to avoid collision with UFs.
     int functionDeclaration = -constructor;

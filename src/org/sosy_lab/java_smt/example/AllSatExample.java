@@ -18,7 +18,6 @@ import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.Z3;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +61,7 @@ public class AllSatExample {
   private final SolverContext context;
 
   public static void main(String... args)
-      throws InvalidConfigurationException, SolverException, InterruptedException, IOException {
+      throws InvalidConfigurationException, SolverException, InterruptedException {
     Configuration config = Configuration.defaultConfiguration();
     LogManager logger = BasicLogManager.create(config);
     ShutdownNotifier notifier = ShutdownNotifier.createDummy();
@@ -119,7 +118,7 @@ public class AllSatExample {
 
   /** For boolean symbols we can directly use the method {@link ProverEnvironment#allSat}. */
   private List<List<BooleanFormula>> allSatBooleans1()
-      throws InterruptedException, SolverException, IOException {
+      throws InterruptedException, SolverException {
     bfmgr = context.getFormulaManager().getBooleanFormulaManager();
 
     // formula (p --> q) with 3 models
@@ -148,7 +147,7 @@ public class AllSatExample {
 
   /** For boolean symbols we can also ask the model directly for evaluations of symbols. */
   private List<List<ValueAssignment>> allSatBooleans2()
-      throws InterruptedException, SolverException, IOException {
+      throws InterruptedException, SolverException {
     bfmgr = context.getFormulaManager().getBooleanFormulaManager();
 
     // formula (p --> q) with 3 models
@@ -187,7 +186,7 @@ public class AllSatExample {
    * For integer formulas, we can implement the allsat-loop and collect all models when iterating.
    */
   private List<List<ValueAssignment>> allSatIntegers()
-      throws InterruptedException, SolverException, IOException {
+      throws InterruptedException, SolverException {
     bfmgr = context.getFormulaManager().getBooleanFormulaManager();
     ifmgr = context.getFormulaManager().getIntegerFormulaManager();
 
@@ -225,7 +224,7 @@ public class AllSatExample {
    * For integer formulas, we can implement the allsat-loop and collect all models when iterating.
    */
   private List<List<ValueAssignment>> allSatIntegers2()
-      throws InterruptedException, SolverException, IOException {
+      throws InterruptedException, SolverException {
     bfmgr = context.getFormulaManager().getBooleanFormulaManager();
     ifmgr = context.getFormulaManager().getIntegerFormulaManager();
 
@@ -272,7 +271,7 @@ public class AllSatExample {
    * For bitvector formulas, we can implement the allsat-loop and collect all models when iterating.
    */
   private List<List<ValueAssignment>> allSatBitvectors()
-      throws InterruptedException, SolverException, IOException {
+      throws InterruptedException, SolverException {
     bfmgr = context.getFormulaManager().getBooleanFormulaManager();
     bvfmgr = context.getFormulaManager().getBitvectorFormulaManager();
 

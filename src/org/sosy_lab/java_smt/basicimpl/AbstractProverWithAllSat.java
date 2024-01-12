@@ -10,7 +10,6 @@ package org.sosy_lab.java_smt.basicimpl;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
@@ -43,7 +42,7 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
 
   @Override
   public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> importantPredicates)
-      throws InterruptedException, SolverException, IOException {
+      throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
     checkGenerateAllSat();
 
@@ -51,7 +50,7 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
     try {
       // try model-based computation of ALLSAT
       iterateOverAllModels(callback, importantPredicates);
-    } catch (SolverException | IOException e) {
+    } catch (SolverException e) {
       // fallback to direct SAT/UNSAT-based computation of ALLSAT
       iterateOverAllPredicateCombinations(callback, importantPredicates, new ArrayDeque<>());
       // TODO should we completely switch to the second method?
@@ -67,7 +66,7 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
    */
   private <R> void iterateOverAllModels(
       AllSatCallback<R> callback, List<BooleanFormula> importantPredicates)
-      throws SolverException, InterruptedException, IOException {
+      throws SolverException, InterruptedException {
     while (!isUnsat()) {
       shutdownNotifier.shutdownIfNecessary();
 
@@ -112,7 +111,7 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
       AllSatCallback<R> callback,
       List<BooleanFormula> predicates,
       Deque<BooleanFormula> valuesOfModel)
-      throws SolverException, InterruptedException, IOException {
+      throws SolverException, InterruptedException {
 
     shutdownNotifier.shutdownIfNecessary();
 

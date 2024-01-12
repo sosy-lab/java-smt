@@ -18,7 +18,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -203,7 +202,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
 
   private <T extends Formula> void testName0(
       String name, Function<String, T> creator, BiFunction<T, T, BooleanFormula> eq, boolean isUF)
-      throws SolverException, InterruptedException, IOException {
+      throws SolverException, InterruptedException {
     requireVisitor();
 
     // create a variable
@@ -258,14 +257,14 @@ public class VariableNamesTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testNameBool() throws SolverException, InterruptedException, IOException {
+  public void testNameBool() throws SolverException, InterruptedException {
     for (String name : getAllNames()) {
       testName0(name, bmgr::makeVariable, bmgr::equivalence, false);
     }
   }
 
   @Test
-  public void testNameInt() throws SolverException, InterruptedException, IOException {
+  public void testNameInt() throws SolverException, InterruptedException {
     requireIntegers();
     for (String name : getAllNames()) {
       testName0(name, imgr::makeVariable, imgr::equal, false);
@@ -273,7 +272,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testNameRat() throws SolverException, InterruptedException, IOException {
+  public void testNameRat() throws SolverException, InterruptedException {
     requireRationals();
     for (String name : getAllNames()) {
       testName0(name, rmgr::makeVariable, rmgr::equal, false);
@@ -281,7 +280,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testNameBV() throws SolverException, InterruptedException, IOException {
+  public void testNameBV() throws SolverException, InterruptedException {
     requireBitvectors();
     for (String name : getAllNames()) {
       testName0(name, s -> bvmgr.makeVariable(4, s), bvmgr::equal, false);
@@ -289,7 +288,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testNameFloat() throws SolverException, InterruptedException, IOException {
+  public void testNameFloat() throws SolverException, InterruptedException {
     requireFloats();
     for (String name : getAllNames()) {
       testName0(
@@ -301,7 +300,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testNameIntArray() throws SolverException, InterruptedException, IOException {
+  public void testNameIntArray() throws SolverException, InterruptedException {
     requireIntegers();
     requireArrays();
     for (String name : getAllNames()) {
@@ -316,7 +315,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testNameBvArray() throws SolverException, InterruptedException, IOException {
+  public void testNameBvArray() throws SolverException, InterruptedException {
     requireBitvectors();
     requireArrays();
     // Someone who knows princess has to debug this!
@@ -337,7 +336,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testNameUF1Bool() throws SolverException, InterruptedException, IOException {
+  public void testNameUF1Bool() throws SolverException, InterruptedException {
     requireIntegers();
     for (String name : NAMES) {
       testName0(
@@ -349,7 +348,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testNameUF1Int() throws SolverException, InterruptedException, IOException {
+  public void testNameUF1Int() throws SolverException, InterruptedException {
     requireIntegers();
     for (String name : NAMES) {
       testName0(
@@ -358,7 +357,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testNameUFBv() throws SolverException, InterruptedException, IOException {
+  public void testNameUFBv() throws SolverException, InterruptedException {
     requireBitvectors();
     // Someone who knows princess has to debug this!
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
@@ -372,7 +371,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testNameUF2Bool() throws SolverException, InterruptedException, IOException {
+  public void testNameUF2Bool() throws SolverException, InterruptedException {
     requireIntegers();
     IntegerFormula zero = imgr.makeNumber(0);
     for (String name : NAMES) {
@@ -382,7 +381,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testNameUF2Int() throws SolverException, InterruptedException, IOException {
+  public void testNameUF2Int() throws SolverException, InterruptedException {
     requireIntegers();
     IntegerFormula zero = imgr.makeNumber(0);
     for (String name : NAMES) {
@@ -391,7 +390,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testNameInQuantification() throws IOException {
+  public void testNameInQuantification() {
     requireQuantifiers();
     requireIntegers();
 
@@ -425,8 +424,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
                 BooleanFormula pF,
                 Quantifier pQuantifier,
                 List<Formula> pBoundVariables,
-                BooleanFormula pBody)
-                throws IOException {
+                BooleanFormula pBody) {
               if (solverToUse() != Solvers.PRINCESS) {
                 // TODO Princess does not (yet) return quantified variables.
                 assertThat(pBoundVariables).hasSize(1);
@@ -448,7 +446,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testNameInNestedQuantification() throws IOException {
+  public void testNameInNestedQuantification() {
     requireQuantifiers();
     requireIntegers();
 
@@ -512,8 +510,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
                 BooleanFormula pF,
                 Quantifier pQuantifier,
                 List<Formula> pBoundVariables,
-                BooleanFormula pBody)
-                throws IOException {
+                BooleanFormula pBody) {
               if (solverToUse() != Solvers.PRINCESS) {
                 // TODO Princess does not return quantified variables.
                 assertThat(pBoundVariables).hasSize(1);
@@ -536,7 +533,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testBoolVariableNameInVisitor() throws IOException {
+  public void testBoolVariableNameInVisitor() {
     requireVisitor();
 
     for (String name : getAllNames()) {

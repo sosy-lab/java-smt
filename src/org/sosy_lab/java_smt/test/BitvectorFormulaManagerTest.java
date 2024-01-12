@@ -14,7 +14,6 @@ import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -67,7 +66,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
   }
 
   @Test
-  public void bvOne() throws SolverException, InterruptedException, IOException {
+  public void bvOne() throws SolverException, InterruptedException {
     int[] testValues;
     if (solver == Solvers.BOOLECTOR) {
       testValues = new int[] {2, 4, 32, 64, 1000};
@@ -121,7 +120,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
   }
 
   @Test
-  public void bvModelValue32bit() throws SolverException, InterruptedException, IOException {
+  public void bvModelValue32bit() throws SolverException, InterruptedException {
     BitvectorFormula var = bvmgr.makeVariable(32, "var");
 
     Map<Long, Long> values = new LinkedHashMap<>();
@@ -164,7 +163,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
   }
 
   @Test
-  public void bvToInt() throws SolverException, InterruptedException, IOException {
+  public void bvToInt() throws SolverException, InterruptedException {
     requireBitvectorToInt();
     requireIntegers();
 
@@ -190,7 +189,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
   }
 
   @Test
-  public void bvToIntEquality() throws SolverException, InterruptedException, IOException {
+  public void bvToIntEquality() throws SolverException, InterruptedException {
     requireBitvectorToInt();
     requireIntegers();
 
@@ -215,8 +214,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
       new int[] {0, 1, 3, 4, 8, 32, 100, 512, 100000, Integer.MAX_VALUE};
 
   @Test
-  public void bvToIntEqualityWithOverflow()
-      throws SolverException, InterruptedException, IOException {
+  public void bvToIntEqualityWithOverflow() throws SolverException, InterruptedException {
     requireBitvectorToInt();
     requireIntegers();
 
@@ -240,8 +238,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
   }
 
   @Test
-  public void bvToIntEqualityWithOverflowNegative()
-      throws SolverException, InterruptedException, IOException {
+  public void bvToIntEqualityWithOverflowNegative() throws SolverException, InterruptedException {
     requireBitvectorToInt();
     requireIntegers();
 
@@ -266,8 +263,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
   }
 
   @Test
-  public void bvToIntEqualityWithSymbols()
-      throws SolverException, InterruptedException, IOException {
+  public void bvToIntEqualityWithSymbols() throws SolverException, InterruptedException {
     requireBitvectorToInt();
     requireIntegers();
 
@@ -374,7 +370,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
   }
 
   @Test
-  public void bvDistinct() throws SolverException, InterruptedException, IOException {
+  public void bvDistinct() throws SolverException, InterruptedException {
     for (int bitsize : new int[] {2, 4, 6}) {
       if (solverToUse() == Solvers.CVC5 && bitsize > 4) {
         // CVC5 runs endlessly for > 4; A issue is open for this as CVC4 can solve this in less than
@@ -393,7 +389,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
   }
 
   @Test
-  public void bvVarDistinct() throws SolverException, InterruptedException, IOException {
+  public void bvVarDistinct() throws SolverException, InterruptedException {
     BitvectorFormula a = bvmgr.makeVariable(4, "a");
     BitvectorFormula num3 = bvmgr.makeBitvector(4, 3);
 

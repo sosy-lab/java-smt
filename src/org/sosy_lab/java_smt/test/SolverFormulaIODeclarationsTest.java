@@ -14,7 +14,6 @@ import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 
 import com.google.common.truth.Truth;
-import java.io.IOException;
 import java.util.EnumSet;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,35 +31,35 @@ public class SolverFormulaIODeclarationsTest
   }
 
   @Test
-  public void parseDeclareInQueryTest1() throws IOException {
+  public void parseDeclareInQueryTest1() {
     String query = "(declare-fun var () Bool)(assert var)";
     BooleanFormula formula = mgr.parse(query);
     Truth.assertThat(mgr.extractVariables(formula)).hasSize(1);
   }
 
   @Test
-  public void parseDeclareInQueryTest2() throws IOException {
+  public void parseDeclareInQueryTest2() {
     String query = "(declare-fun x () Int)(assert (= 0 x))";
     BooleanFormula formula = mgr.parse(query);
     Truth.assertThat(mgr.extractVariables(formula)).hasSize(1);
   }
 
   @Test
-  public void parseDeclareInQueryTest3() throws IOException {
+  public void parseDeclareInQueryTest3() {
     String query = "(declare-fun foo (Int Int) Bool)(assert (foo 1 2))";
     BooleanFormula formula = mgr.parse(query);
     Truth.assertThat(mgr.extractVariablesAndUFs(formula)).hasSize(1);
   }
 
   @Test
-  public void parseDeclareInQueryTest4() throws IOException {
+  public void parseDeclareInQueryTest4() {
     String query = "(declare-fun x () Int)(declare-fun foo (Int Int) Bool)(assert (foo x 2))";
     BooleanFormula formula = mgr.parse(query);
     Truth.assertThat(mgr.extractVariablesAndUFs(formula)).hasSize(2);
   }
 
   @Test
-  public void parseDeclareAfterQueryTest1() throws IOException {
+  public void parseDeclareAfterQueryTest1() {
     String query = "(declare-fun var () Bool)(assert var)";
     BooleanFormula formula = mgr.parse(query);
     BooleanFormula var = bmgr.makeVariable("var");
@@ -68,7 +67,7 @@ public class SolverFormulaIODeclarationsTest
   }
 
   @Test
-  public void parseDeclareAfterQueryTest2() throws IOException {
+  public void parseDeclareAfterQueryTest2() {
     String query = "(declare-fun x () Int)(assert (= 0 x))";
     BooleanFormula formula = mgr.parse(query);
     IntegerFormula var = imgr.makeVariable("x");
@@ -76,7 +75,7 @@ public class SolverFormulaIODeclarationsTest
   }
 
   @Test
-  public void parseDeclareAfterQueryTest3() throws IOException {
+  public void parseDeclareAfterQueryTest3() {
     String query = "(declare-fun foo (Int Int) Bool)(assert (foo 1 2))";
     BooleanFormula formula = mgr.parse(query);
     BooleanFormula calledFoo =
@@ -85,7 +84,7 @@ public class SolverFormulaIODeclarationsTest
   }
 
   @Test
-  public void parseDeclareAfterQueryTest4() throws IOException {
+  public void parseDeclareAfterQueryTest4() {
     String query = "(declare-fun x () Int)(declare-fun foo (Int Int) Bool)(assert (foo 1 x))";
     BooleanFormula formula = mgr.parse(query);
     IntegerFormula var = imgr.makeVariable("x");
@@ -118,7 +117,7 @@ public class SolverFormulaIODeclarationsTest
   }
 
   @Test
-  public void parseDeclareBeforeTest() throws IOException {
+  public void parseDeclareBeforeTest() {
     String query = "(assert var)";
     BooleanFormula var = bmgr.makeVariable("var");
     BooleanFormula formula = mgr.parse(query);
@@ -126,7 +125,7 @@ public class SolverFormulaIODeclarationsTest
   }
 
   @Test
-  public void parseDeclareRedundantTest1() throws IOException {
+  public void parseDeclareRedundantTest1() {
     IntegerFormula var = imgr.makeVariable("x");
     String query = "(declare-fun x () Int)(declare-fun x () Int)(assert (= 0 x))";
     if (EnumSet.of(Solvers.PRINCESS, Solvers.Z3).contains(solverToUse())) {
@@ -139,7 +138,7 @@ public class SolverFormulaIODeclarationsTest
   }
 
   @Test
-  public void parseDeclareRedundantTest2() throws IOException {
+  public void parseDeclareRedundantTest2() {
     IntegerFormula var =
         fmgr.declareAndCallUF("foo", IntegerType, imgr.makeNumber(1), imgr.makeNumber(2));
     String query =
@@ -184,7 +183,7 @@ public class SolverFormulaIODeclarationsTest
   }
 
   @Test
-  public void parseDeclareConflictAfterQueryTest() throws IOException {
+  public void parseDeclareConflictAfterQueryTest() {
     String query = "(declare-fun x () Bool)(assert x)";
     BooleanFormula formula = mgr.parse(query);
     Truth.assertThat(mgr.extractVariables(formula).values()).hasSize(1);
@@ -197,7 +196,7 @@ public class SolverFormulaIODeclarationsTest
   }
 
   @Test
-  public void parseDeclareOnceNotTwiceTest1() throws IOException {
+  public void parseDeclareOnceNotTwiceTest1() {
     String query1 = "(declare-fun x () Bool)(assert x)";
     String query2 = "(assert (not x))";
     BooleanFormula formula1 = mgr.parse(query1);
@@ -208,7 +207,7 @@ public class SolverFormulaIODeclarationsTest
   }
 
   @Test
-  public void parseTwiceTest1() throws IOException {
+  public void parseTwiceTest1() {
     String query1 = "(declare-fun x () Bool)(assert x)";
     String query2 = "(declare-fun x () Bool)(assert x)";
     BooleanFormula formula1 = mgr.parse(query1);
@@ -219,7 +218,7 @@ public class SolverFormulaIODeclarationsTest
   }
 
   @Test
-  public void parseDeclareOnceNotTwiceTest2() throws IOException {
+  public void parseDeclareOnceNotTwiceTest2() {
     String query1 =
         "(declare-fun x () Bool)(declare-fun foo (Int Int) Bool)(assert (= (foo 1 2) x))";
     String query2 = "(assert (and (not x) (foo 3 4)))";
@@ -232,7 +231,7 @@ public class SolverFormulaIODeclarationsTest
   }
 
   @Test
-  public void parseDeclareOnceNotTwiceTest3() throws IOException {
+  public void parseDeclareOnceNotTwiceTest3() {
     String query1 = "(declare-fun x () Bool)(declare-fun y () Bool)(assert x)";
     String query2 = "(assert y)";
     BooleanFormula formula1 = mgr.parse(query1);
@@ -247,7 +246,7 @@ public class SolverFormulaIODeclarationsTest
   }
 
   @Test
-  public void parseAbbreviation() throws SolverException, InterruptedException, IOException {
+  public void parseAbbreviation() throws SolverException, InterruptedException {
     requireBitvectors();
 
     String query =

@@ -11,7 +11,6 @@ package org.sosy_lab.java_smt.solvers.opensmt;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -45,11 +44,7 @@ public class OpenSmtModel extends AbstractModel<PTRef, SRef, Logic> {
 
     Map<String, PTRef> userDeclarations = new HashMap<>();
     for (PTRef asserted : pAssertedTerms) {
-      try {
-        userDeclarations.putAll(creator.extractVariablesAndUFs(asserted, true));
-      } catch (IOException pE) {
-        throw new RuntimeException(pE);
-      }
+      userDeclarations.putAll(creator.extractVariablesAndUFs(asserted, true));
     }
 
     ImmutableList.Builder<ValueAssignment> builder = ImmutableList.builder();
@@ -106,12 +101,7 @@ public class OpenSmtModel extends AbstractModel<PTRef, SRef, Logic> {
   @Override
   public PTRef evalImpl(PTRef f) {
     Preconditions.checkState(!isClosed());
-    Map<String, PTRef> userDeclarations = null;
-    try {
-      userDeclarations = creator.extractVariablesAndUFs(f, true);
-    } catch (IOException pE) {
-      throw new RuntimeException(pE);
-    }
+    Map<String, PTRef> userDeclarations = creator.extractVariablesAndUFs(f, true);
 
     // FIXME: rewrite to use checkCompatability from AbstractProver
 

@@ -9,7 +9,6 @@
 package org.sosy_lab.java_smt.example;
 
 import com.google.common.collect.ImmutableList;
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +54,7 @@ public class NQueens {
   }
 
   public static void main(String... args)
-      throws InvalidConfigurationException, SolverException, InterruptedException, IOException {
+      throws InvalidConfigurationException, SolverException, InterruptedException {
     Configuration config = Configuration.defaultConfiguration();
     LogManager logger = BasicLogManager.create(config);
     ShutdownNotifier notifier = ShutdownNotifier.createDummy();
@@ -273,7 +272,7 @@ public class NQueens {
    * @throws InterruptedException if the solving process is interrupted
    * @throws SolverException if an error occurs during the solving process
    */
-  private Optional<boolean[][]> solve() throws InterruptedException, SolverException, IOException {
+  private Optional<boolean[][]> solve() throws InterruptedException, SolverException {
     BooleanFormula[][] symbols = getSymbols();
     List<BooleanFormula> rules =
         ImmutableList.<BooleanFormula>builder()

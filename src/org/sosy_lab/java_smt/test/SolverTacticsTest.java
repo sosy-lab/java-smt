@@ -15,7 +15,6 @@ import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.truth.TruthJUnit;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +35,7 @@ import org.sosy_lab.java_smt.api.visitors.BooleanFormulaVisitor;
 public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
-  public void nnfTacticDefaultTest1() throws SolverException, InterruptedException, IOException {
+  public void nnfTacticDefaultTest1() throws SolverException, InterruptedException {
     requireVisitor();
 
     BooleanFormula a = bmgr.makeVariable("a");
@@ -51,7 +50,7 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void nnfTacticDefaultTest2() throws SolverException, InterruptedException, IOException {
+  public void nnfTacticDefaultTest2() throws SolverException, InterruptedException {
     requireVisitor();
 
     BooleanFormula a = bmgr.makeVariable("a");
@@ -67,7 +66,7 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void cnfTacticDefaultTest1() throws SolverException, InterruptedException, IOException {
+  public void cnfTacticDefaultTest1() throws SolverException, InterruptedException {
     TruthJUnit.assume().that(solver).isEqualTo(Solvers.Z3);
     BooleanFormula a = bmgr.makeVariable("a");
     BooleanFormula b = bmgr.makeVariable("b");
@@ -88,7 +87,7 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void cnfTacticDefaultTest2() throws SolverException, InterruptedException, IOException {
+  public void cnfTacticDefaultTest2() throws SolverException, InterruptedException {
     TruthJUnit.assume().that(solver).isEqualTo(Solvers.Z3);
     BooleanFormula a = bmgr.makeVariable("a");
     BooleanFormula b = bmgr.makeVariable("b");
@@ -111,7 +110,7 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void cnfTacticDefaultTest3() throws SolverException, InterruptedException, IOException {
+  public void cnfTacticDefaultTest3() throws SolverException, InterruptedException {
     TruthJUnit.assume().that(solver).isEqualTo(Solvers.Z3);
     BooleanFormula x = bmgr.makeVariable("x");
     BooleanFormula y = bmgr.makeVariable("y");
@@ -133,7 +132,7 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void ufEliminationSimpleTest() throws SolverException, InterruptedException, IOException {
+  public void ufEliminationSimpleTest() throws SolverException, InterruptedException {
     requireIntegers();
     // f := uf(v1, v3) XOR uf(v2, v4)
     IntegerFormula variable1 = imgr.makeVariable("variable1");
@@ -164,8 +163,7 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void ufEliminationNestedUfsTest()
-      throws SolverException, InterruptedException, IOException {
+  public void ufEliminationNestedUfsTest() throws SolverException, InterruptedException {
     requireIntegers();
     // f :=uf2(uf1(v1, v2), v3) XOR uf2(uf1(v2, v1), v4)
     IntegerFormula variable1 = imgr.makeVariable("variable1");
@@ -201,7 +199,7 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void ufEliminationNesteQuantifierTest() throws InterruptedException {
+  public void ufEliminationNestedQuantifierTest() throws InterruptedException {
     requireIntegers();
     requireQuantifiers();
     // f := exists v1,v2v,v3,v4 : uf(v1, v3) == uf(v2, v4)
@@ -222,8 +220,7 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
       mgr.applyTactic(f, Tactic.ACKERMANNIZATION);
       assert_().fail();
     } catch (IllegalArgumentException expected) {
-    } catch (IOException pE) {
-      throw new RuntimeException(pE);
+      // Ignore the exception
     }
   }
 
@@ -239,7 +236,7 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
       bfmgr = pFmgr.getBooleanFormulaManager();
     }
 
-    Void visit(BooleanFormula f) throws IOException {
+    Void visit(BooleanFormula f) {
       // TODO rewrite using RecursiveBooleanFormulaVisitor should make this class easier
       return bfmgr.visit(f, this);
     }
@@ -269,11 +266,7 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
     @Override
     public Void visitNot(BooleanFormula pOperand) {
       started = true;
-      try {
-        return visit(pOperand);
-      } catch (IOException pE) {
-        throw new RuntimeException(pE);
-      }
+      return visit(pOperand);
     }
 
     @Override
@@ -285,11 +278,7 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
         containsMoreAnd = true;
       }
       for (BooleanFormula pOperand : pOperands) {
-        try {
-          visit(pOperand);
-        } catch (IOException pE) {
-          throw new RuntimeException(pE);
-        }
+        visit(pOperand);
       }
       return null;
     }
@@ -298,11 +287,7 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
     public Void visitOr(List<BooleanFormula> pOperands) {
       if (started) {
         for (BooleanFormula pOperand : pOperands) {
-          try {
-            visit(pOperand);
-          } catch (IOException pE) {
-            throw new RuntimeException(pE);
-          }
+          visit(pOperand);
         }
       }
       return null;
@@ -317,16 +302,8 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
     @Override
     public Void visitEquivalence(BooleanFormula pOperand1, BooleanFormula pOperand2) {
       if (started) {
-        try {
-          visit(pOperand1);
-        } catch (IOException pE) {
-          throw new RuntimeException(pE);
-        }
-        try {
-          visit(pOperand2);
-        } catch (IOException pE) {
-          throw new RuntimeException(pE);
-        }
+        visit(pOperand1);
+        visit(pOperand2);
       }
       return null;
     }
@@ -334,16 +311,8 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
     @Override
     public Void visitImplication(BooleanFormula pOperand1, BooleanFormula pOperand2) {
       if (started) {
-        try {
-          visit(pOperand1);
-        } catch (IOException pE) {
-          throw new RuntimeException(pE);
-        }
-        try {
-          visit(pOperand2);
-        } catch (IOException pE) {
-          throw new RuntimeException(pE);
-        }
+        visit(pOperand1);
+        visit(pOperand2);
       }
       return null;
     }
@@ -352,21 +321,9 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
     public Void visitIfThenElse(
         BooleanFormula pCondition, BooleanFormula pThenFormula, BooleanFormula pElseFormula) {
       if (started) {
-        try {
-          visit(pCondition);
-        } catch (IOException pE) {
-          throw new RuntimeException(pE);
-        }
-        try {
-          visit(pThenFormula);
-        } catch (IOException pE) {
-          throw new RuntimeException(pE);
-        }
-        try {
-          visit(pElseFormula);
-        } catch (IOException pE) {
-          throw new RuntimeException(pE);
-        }
+        visit(pCondition);
+        visit(pThenFormula);
+        visit(pElseFormula);
       }
       return null;
     }
@@ -378,11 +335,7 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
         List<Formula> boundVars,
         BooleanFormula pBody) {
       if (started) {
-        try {
-          visit(pBody);
-        } catch (IOException pE) {
-          throw new RuntimeException(pE);
-        }
+        visit(pBody);
       }
       return null;
     }
@@ -401,11 +354,7 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
 
     Void visit(BooleanFormula f) {
       // TODO rewrite using RecursiveBooleanFormulaVisitor should make this class easier
-      try {
-        return bfmgr.visit(f, this);
-      } catch (IOException pE) {
-        throw new RuntimeException(pE);
-      }
+      return bfmgr.visit(f, this);
     }
 
     public boolean isInNNF() {

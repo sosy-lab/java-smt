@@ -13,7 +13,6 @@ import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.collect.Iterables;
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -36,7 +35,7 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
       };
 
   @Test
-  public void rationalToIntTest() throws SolverException, InterruptedException, IOException {
+  public void rationalToIntTest() throws SolverException, InterruptedException {
     requireRationals();
     assume()
         .withMessage("Solver %s does not support floor operation", solverToUse())
@@ -53,7 +52,7 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
   }
 
   @Test
-  public void intToIntTest() throws SolverException, InterruptedException, IOException {
+  public void intToIntTest() throws SolverException, InterruptedException {
     requireIntegers();
     for (double v : SOME_DOUBLES) {
       IntegerFormula i = imgr.makeNumber((int) Math.floor(v));
@@ -64,7 +63,7 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
   }
 
   @Test
-  public void intToIntWithRmgrTest() throws SolverException, InterruptedException, IOException {
+  public void intToIntWithRmgrTest() throws SolverException, InterruptedException {
     requireRationals();
     for (double v : SOME_DOUBLES) {
       IntegerFormula i = imgr.makeNumber((int) Math.floor(v));
@@ -75,8 +74,7 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
   }
 
   @Test
-  public void floorIsLessOrEqualsValueTest()
-      throws SolverException, InterruptedException, IOException {
+  public void floorIsLessOrEqualsValueTest() throws SolverException, InterruptedException {
     requireRationals();
     requireQuantifiers();
     RationalFormula v = rmgr.makeVariable("v");
@@ -84,8 +82,7 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
   }
 
   @Test
-  public void floorIsGreaterThanValueTest()
-      throws SolverException, InterruptedException, IOException {
+  public void floorIsGreaterThanValueTest() throws SolverException, InterruptedException {
     requireRationals();
     requireQuantifiers();
     RationalFormula v = rmgr.makeVariable("v");
@@ -93,8 +90,7 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
   }
 
   @Test
-  public void forallFloorIsLessOrEqualsValueTest()
-      throws SolverException, InterruptedException, IOException {
+  public void forallFloorIsLessOrEqualsValueTest() throws SolverException, InterruptedException {
     requireRationals();
     requireQuantifiers();
     RationalFormula v = rmgr.makeVariable("v");
@@ -102,8 +98,7 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
   }
 
   @Test
-  public void forallFloorIsLessThanValueTest()
-      throws SolverException, InterruptedException, IOException {
+  public void forallFloorIsLessThanValueTest() throws SolverException, InterruptedException {
     requireRationals();
     requireQuantifiers();
     RationalFormula v = rmgr.makeVariable("v");
@@ -112,7 +107,7 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
   }
 
   @Test
-  public void visitFloorTest() throws IOException {
+  public void visitFloorTest() {
     requireRationals();
     assume()
         .withMessage("Solver %s does not support floor operation", solverToUse())

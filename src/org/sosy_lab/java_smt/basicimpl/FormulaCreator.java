@@ -15,7 +15,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
@@ -275,15 +274,14 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
    * @see org.sosy_lab.java_smt.api.FormulaManager#visit
    */
   @CanIgnoreReturnValue
-  public <R> R visit(Formula input, FormulaVisitor<R> visitor) throws IOException {
+  public <R> R visit(Formula input, FormulaVisitor<R> visitor) {
     return visit(visitor, input, extractInfo(input));
   }
 
   /**
    * @see org.sosy_lab.java_smt.api.FormulaManager#visit
    */
-  public abstract <R> R visit(FormulaVisitor<R> visitor, Formula formula, TFormulaInfo f)
-      throws IOException;
+  public abstract <R> R visit(FormulaVisitor<R> visitor, Formula formula, TFormulaInfo f);
 
   protected List<TFormulaInfo> extractInfo(List<? extends Formula> input) {
     return Lists.transform(input, this::extractInfo);
@@ -292,8 +290,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
   /**
    * @see org.sosy_lab.java_smt.api.FormulaManager#visitRecursively
    */
-  public void visitRecursively(FormulaVisitor<TraversalProcess> pFormulaVisitor, Formula pF)
-      throws IOException {
+  public void visitRecursively(FormulaVisitor<TraversalProcess> pFormulaVisitor, Formula pF) {
     visitRecursively(pFormulaVisitor, pF, t -> true);
   }
 
@@ -303,8 +300,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
   public void visitRecursively(
       FormulaVisitor<TraversalProcess> pFormulaVisitor,
       Formula pF,
-      Predicate<Formula> shouldProcess)
-      throws IOException {
+      Predicate<Formula> shouldProcess) {
     RecursiveFormulaVisitorImpl recVisitor = new RecursiveFormulaVisitorImpl(pFormulaVisitor);
     recVisitor.addToQueue(pF);
     while (!recVisitor.isQueueEmpty()) {
@@ -319,14 +315,12 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
   }
 
   public <T extends Formula> T transformRecursively(
-      FormulaVisitor<? extends Formula> pFormulaVisitor, T pF) throws IOException {
+      FormulaVisitor<? extends Formula> pFormulaVisitor, T pF) {
     return transformRecursively(pFormulaVisitor, pF, t -> true);
   }
 
   public <T extends Formula> T transformRecursively(
-      FormulaVisitor<? extends Formula> pFormulaVisitor, T pF, Predicate<Object> shouldProcess)
-      throws IOException {
-
+      FormulaVisitor<? extends Formula> pFormulaVisitor, T pF, Predicate<Object> shouldProcess) {
     final Deque<Formula> toProcess = new ArrayDeque<>();
     Map<Formula, Formula> pCache = new HashMap<>();
     FormulaTransformationVisitorImpl recVisitor =
@@ -358,7 +352,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
    * input and output.
    */
   public Map<String, TFormulaInfo> extractVariablesAndUFs(
-      final TFormulaInfo pFormula, final boolean extractUFs) throws IOException {
+      final TFormulaInfo pFormula, final boolean extractUFs) {
     Map<String, TFormulaInfo> found = new LinkedHashMap<>();
     extractVariablesAndUFs(
         encapsulateWithTypeOf(pFormula), extractUFs, (name, f) -> found.put(name, extractInfo(f)));
@@ -372,8 +366,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
   public void extractVariablesAndUFs(
       final TFormulaInfo pFormula,
       final boolean extractUFs,
-      final BiConsumer<String, TFormulaInfo> pConsumer)
-      throws IOException {
+      final BiConsumer<String, TFormulaInfo> pConsumer) {
     extractVariablesAndUFs(
         encapsulateWithTypeOf(pFormula),
         extractUFs,
@@ -382,8 +375,9 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
 
   /** Extract all free variables from the formula, optionally including UFs. */
   public void extractVariablesAndUFs(
-      final Formula pFormula, final boolean extractUF, final BiConsumer<String, Formula> pConsumer)
-      throws IOException {
+      final Formula pFormula,
+      final boolean extractUF,
+      final BiConsumer<String, Formula> pConsumer) {
     visitRecursively(
         new VariableAndUFExtractor(extractUF, pConsumer, ImmutableSet.of(), new LinkedHashSet<>()),
         pFormula);
@@ -446,9 +440,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
 
     @Override
     public TraversalProcess visitQuantifier(
-        BooleanFormula f, Quantifier q, List<Formula> boundVariables, BooleanFormula body)
-        throws IOException {
-
+        BooleanFormula f, Quantifier q, List<Formula> boundVariables, BooleanFormula body) {
       // We begin a new nested scope, thus we need a 'really' recursive call and
       // use another visitor-instance which knows the corresponding bound variables.
       visitRecursively(

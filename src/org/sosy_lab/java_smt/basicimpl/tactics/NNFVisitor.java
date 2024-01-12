@@ -9,7 +9,6 @@
 package org.sosy_lab.java_smt.basicimpl.tactics;
 
 import com.google.common.collect.Lists;
-import java.io.IOException;
 import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
@@ -29,21 +28,13 @@ public class NNFVisitor extends BooleanFormulaTransformationVisitor {
 
   @Override
   public BooleanFormula visitNot(BooleanFormula processedOperand) {
-    try {
-      return bfmgr.visit(processedOperand, insideNotVisitor);
-    } catch (IOException pE) {
-      throw new RuntimeException(pE);
-    }
+    return bfmgr.visit(processedOperand, insideNotVisitor);
   }
 
   @Override
   public BooleanFormula visitXor(
       BooleanFormula processedOperand1, BooleanFormula processedOperand2) {
-    try {
-      return bfmgr.visit(rewriteXor(processedOperand1, processedOperand2), this);
-    } catch (IOException pE) {
-      throw new RuntimeException(pE);
-    }
+    return bfmgr.visit(rewriteXor(processedOperand1, processedOperand2), this);
   }
 
   private BooleanFormula rewriteXor(BooleanFormula operand1, BooleanFormula operand2) {
@@ -54,11 +45,7 @@ public class NNFVisitor extends BooleanFormulaTransformationVisitor {
   @Override
   public BooleanFormula visitEquivalence(
       BooleanFormula processedOperand1, BooleanFormula processedOperand2) {
-    try {
-      return bfmgr.visit(rewriteEquivalence(processedOperand1, processedOperand2), this);
-    } catch (IOException pE) {
-      throw new RuntimeException(pE);
-    }
+    return bfmgr.visit(rewriteEquivalence(processedOperand1, processedOperand2), this);
   }
 
   private BooleanFormula rewriteEquivalence(BooleanFormula pOperand1, BooleanFormula pOperand2) {
@@ -69,11 +56,7 @@ public class NNFVisitor extends BooleanFormulaTransformationVisitor {
   @Override
   public BooleanFormula visitImplication(
       BooleanFormula processedOperand1, BooleanFormula processedOperand2) {
-    try {
-      return bfmgr.visit(rewriteImplication(processedOperand1, processedOperand2), this);
-    } catch (IOException pE) {
-      throw new RuntimeException(pE);
-    }
+    return bfmgr.visit(rewriteImplication(processedOperand1, processedOperand2), this);
   }
 
   private BooleanFormula rewriteImplication(BooleanFormula pOperand1, BooleanFormula pOperand2) {
@@ -85,12 +68,8 @@ public class NNFVisitor extends BooleanFormulaTransformationVisitor {
       BooleanFormula processedCondition,
       BooleanFormula processedThenFormula,
       BooleanFormula processedElseFormula) {
-    try {
-      return bfmgr.visit(
-          rewriteIfThenElse(processedCondition, processedThenFormula, processedElseFormula), this);
-    } catch (IOException pE) {
-      throw new RuntimeException(pE);
-    }
+    return bfmgr.visit(
+        rewriteIfThenElse(processedCondition, processedThenFormula, processedElseFormula), this);
   }
 
   private BooleanFormula rewriteIfThenElse(
@@ -118,59 +97,29 @@ public class NNFVisitor extends BooleanFormulaTransformationVisitor {
 
     @Override
     public BooleanFormula visitNot(BooleanFormula processedOperand) {
-      try {
-        return bfmgr.visit(processedOperand, NNFVisitor.this);
-      } catch (IOException pE) {
-        throw new RuntimeException(pE);
-      }
+      return bfmgr.visit(processedOperand, NNFVisitor.this);
     }
 
     @Override
     public BooleanFormula visitAnd(List<BooleanFormula> processedOperands) {
-      return bfmgr.or(
-          Lists.transform(
-              processedOperands,
-              f -> {
-                try {
-                  return bfmgr.visit(f, this);
-                } catch (IOException pE) {
-                  throw new RuntimeException(pE);
-                }
-              }));
+      return bfmgr.or(Lists.transform(processedOperands, f -> bfmgr.visit(f, this)));
     }
 
     @Override
     public BooleanFormula visitOr(List<BooleanFormula> processedOperands) {
-      return bfmgr.and(
-          Lists.transform(
-              processedOperands,
-              f -> {
-                try {
-                  return bfmgr.visit(f, this);
-                } catch (IOException pE) {
-                  throw new RuntimeException(pE);
-                }
-              }));
+      return bfmgr.and(Lists.transform(processedOperands, f -> bfmgr.visit(f, this)));
     }
 
     @Override
     public BooleanFormula visitXor(
         BooleanFormula processedOperand1, BooleanFormula processedOperand2) {
-      try {
-        return bfmgr.visit(rewriteXor(processedOperand1, processedOperand2), this);
-      } catch (IOException pE) {
-        throw new RuntimeException(pE);
-      }
+      return bfmgr.visit(rewriteXor(processedOperand1, processedOperand2), this);
     }
 
     @Override
     public BooleanFormula visitEquivalence(
         BooleanFormula processedOperand1, BooleanFormula processedOperand2) {
-      try {
-        return bfmgr.visit(rewriteEquivalence(processedOperand1, processedOperand2), this);
-      } catch (IOException pE) {
-        throw new RuntimeException(pE);
-      }
+      return bfmgr.visit(rewriteEquivalence(processedOperand1, processedOperand2), this);
     }
 
     @Override
@@ -178,11 +127,7 @@ public class NNFVisitor extends BooleanFormulaTransformationVisitor {
         BooleanFormula processedOperand1, BooleanFormula processedOperand2) {
 
       // Rewrite using primitives.
-      try {
-        return bfmgr.visit(bfmgr.or(bfmgr.not(processedOperand1), processedOperand2), this);
-      } catch (IOException pE) {
-        throw new RuntimeException(pE);
-      }
+      return bfmgr.visit(bfmgr.or(bfmgr.not(processedOperand1), processedOperand2), this);
     }
 
     @Override
@@ -190,13 +135,9 @@ public class NNFVisitor extends BooleanFormulaTransformationVisitor {
         BooleanFormula processedCondition,
         BooleanFormula processedThenFormula,
         BooleanFormula processedElseFormula) {
-      try {
-        return bfmgr.visit(
-            rewriteIfThenElse(processedCondition, processedThenFormula, processedElseFormula),
-            this);
-      } catch (IOException pE) {
-        throw new RuntimeException(pE);
-      }
+
+      return bfmgr.visit(
+          rewriteIfThenElse(processedCondition, processedThenFormula, processedElseFormula), this);
     }
   }
 }

@@ -11,7 +11,6 @@ package org.sosy_lab.java_smt.solvers.opensmt;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -154,11 +153,7 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
 
     Map<String, PTRef> userDeclarations = new HashMap<>();
     for (PTRef asserted : Collections2.transform(getAssertedFormulas(), creator::extractInfo)) {
-      try {
-        userDeclarations.putAll(creator.extractVariablesAndUFs(asserted, true));
-      } catch (IOException pE) {
-        throw new RuntimeException(pE);
-      }
+      userDeclarations.putAll(creator.extractVariablesAndUFs(asserted, true));
     }
 
     boolean usesUFs = false;

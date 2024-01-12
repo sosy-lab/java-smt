@@ -9,7 +9,6 @@
 package org.sosy_lab.java_smt.basicimpl;
 
 import com.google.common.base.Preconditions;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
@@ -37,7 +36,7 @@ final class FormulaTransformationVisitorImpl implements FormulaVisitor<Void> {
   }
 
   @Override
-  public Void visitFreeVariable(Formula f, String name) throws IOException {
+  public Void visitFreeVariable(Formula f, String name) {
     pCache.put(f, delegate.visitFreeVariable(f, name));
     return null;
   }
@@ -60,8 +59,7 @@ final class FormulaTransformationVisitorImpl implements FormulaVisitor<Void> {
 
   @Override
   public Void visitFunction(
-      Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration)
-      throws IOException {
+      Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
     Preconditions.checkNotNull(f);
 
     boolean allArgumentsTransformed = true;
@@ -97,8 +95,7 @@ final class FormulaTransformationVisitorImpl implements FormulaVisitor<Void> {
 
   @Override
   public Void visitQuantifier(
-      BooleanFormula f, Quantifier quantifier, List<Formula> boundVariables, BooleanFormula body)
-      throws IOException {
+      BooleanFormula f, Quantifier quantifier, List<Formula> boundVariables, BooleanFormula body) {
     Preconditions.checkNotNull(f);
     Preconditions.checkNotNull(quantifier);
     Preconditions.checkNotNull(boundVariables);

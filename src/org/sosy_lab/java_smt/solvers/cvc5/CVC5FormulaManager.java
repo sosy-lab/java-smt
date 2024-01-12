@@ -79,7 +79,6 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, Solver, Term
         : "Only BooleanFormulas may be dumped";
 
     return new Appenders.AbstractAppender() {
-
       @Override
       public void appendTo(Appendable out) throws IOException {
 

@@ -17,7 +17,6 @@ import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.model.FunctionValue.Index;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -49,14 +48,10 @@ class SmtInterpolModel extends AbstractModel<Term, Sort, Script> {
 
     Set<FunctionSymbol> usedSymbols = new LinkedHashSet<>();
     for (Term assertedTerm : assertedTerms) {
-      try {
-        for (Term symbol : creator.extractVariablesAndUFs(assertedTerm, true).values()) {
-          if (symbol instanceof ApplicationTerm) {
-            usedSymbols.add(((ApplicationTerm) symbol).getFunction());
-          }
+      for (Term symbol : creator.extractVariablesAndUFs(assertedTerm, true).values()) {
+        if (symbol instanceof ApplicationTerm) {
+          usedSymbols.add(((ApplicationTerm) symbol).getFunction());
         }
-      } catch (IOException pE) {
-        throw new RuntimeException(pE);
       }
     }
 

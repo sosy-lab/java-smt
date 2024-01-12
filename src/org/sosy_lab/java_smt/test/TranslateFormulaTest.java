@@ -12,7 +12,6 @@ import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.test.BooleanFormulaSubject.assertUsing;
 
 import com.google.common.collect.Lists;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.After;
@@ -112,7 +111,7 @@ public class TranslateFormulaTest {
   }
 
   @Test
-  public void testDumpingAndParsing() throws SolverException, InterruptedException, IOException {
+  public void testDumpingAndParsing() throws SolverException, InterruptedException {
     requireParserTo();
 
     BooleanFormula input = createTestFormula(managerFrom);
@@ -123,7 +122,7 @@ public class TranslateFormulaTest {
   }
 
   @Test
-  public void testTranslating() throws SolverException, InterruptedException, IOException {
+  public void testTranslating() throws SolverException, InterruptedException {
     requireParserTo();
 
     BooleanFormula inputFrom = createTestFormula(managerFrom);
@@ -134,8 +133,7 @@ public class TranslateFormulaTest {
   }
 
   @Test
-  public void testTranslatingForIContextdentity()
-      throws SolverException, InterruptedException, IOException {
+  public void testTranslatingForIContextdentity() throws SolverException, InterruptedException {
     assume().that(translateTo).isEqualTo(translateFrom);
     FormulaManager manager = managerFrom;
 
@@ -147,8 +145,7 @@ public class TranslateFormulaTest {
   }
 
   @Test
-  public void testTranslatingForContextSibling()
-      throws SolverException, InterruptedException, IOException {
+  public void testTranslatingForContextSibling() throws SolverException, InterruptedException {
     assume().that(translateTo).isEqualTo(translateFrom);
 
     assume()
@@ -164,8 +161,7 @@ public class TranslateFormulaTest {
   }
 
   @Test
-  public void testTranslatingAndReverse()
-      throws SolverException, InterruptedException, IOException {
+  public void testTranslatingAndReverse() throws SolverException, InterruptedException {
     requireParserTo();
     requireParserFrom();
 

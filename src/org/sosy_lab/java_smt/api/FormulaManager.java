@@ -110,7 +110,7 @@ public interface FormulaManager {
    * @param name the name of the variable.
    * @return the created variable.
    */
-  <T extends Formula> T makeVariable(FormulaType<T> formulaType, String name) throws IOException;
+  <T extends Formula> T makeVariable(FormulaType<T> formulaType, String name);
 
   /**
    * Create a function application to the given list of arguments.
@@ -172,8 +172,7 @@ public interface FormulaManager {
    * Apply a tactic which performs formula transformation. The available tactics depend on the used
    * solver.
    */
-  BooleanFormula applyTactic(BooleanFormula input, Tactic tactic)
-      throws InterruptedException, IOException;
+  BooleanFormula applyTactic(BooleanFormula input, Tactic tactic) throws InterruptedException;
 
   /**
    * Simplify an input formula, while ensuring equivalence.
@@ -200,7 +199,7 @@ public interface FormulaManager {
    * @param rFormulaVisitor an implementation that provides steps for each kind of formula.
    */
   @CanIgnoreReturnValue
-  <R> R visit(Formula f, FormulaVisitor<R> rFormulaVisitor) throws IOException;
+  <R> R visit(Formula f, FormulaVisitor<R> rFormulaVisitor);
 
   /**
    * Visit the formula recursively with a given {@link FormulaVisitor}. This method traverses
@@ -217,8 +216,7 @@ public interface FormulaManager {
    * parent will be visited BEFORE its children. The unmodified child-formulas are passed as
    * argument to the parent's visitation.
    */
-  void visitRecursively(Formula f, FormulaVisitor<TraversalProcess> rFormulaVisitor)
-      throws IOException;
+  void visitRecursively(Formula f, FormulaVisitor<TraversalProcess> rFormulaVisitor);
 
   /**
    * Visit the formula recursively with a given {@link FormulaVisitor}.
@@ -235,8 +233,7 @@ public interface FormulaManager {
    *
    * @param pFormulaVisitor Transformation described by the user.
    */
-  <T extends Formula> T transformRecursively(T f, FormulaTransformationVisitor pFormulaVisitor)
-      throws IOException;
+  <T extends Formula> T transformRecursively(T f, FormulaTransformationVisitor pFormulaVisitor);
 
   /**
    * Extract the names of all free variables and UFs in a formula.
@@ -244,7 +241,7 @@ public interface FormulaManager {
    * @param f The input formula
    * @return Map from variable names to the corresponding formulas.
    */
-  ImmutableMap<String, Formula> extractVariables(Formula f) throws IOException;
+  ImmutableMap<String, Formula> extractVariables(Formula f);
 
   /**
    * Extract the names of all free variables and UFs in a formula.
@@ -253,7 +250,7 @@ public interface FormulaManager {
    * @return Map from variable names to the corresponding formulas. If an UF occurs multiple times
    *     in the input formula, an arbitrary instance of an application of this UF is in the map.
    */
-  ImmutableMap<String, Formula> extractVariablesAndUFs(Formula f) throws IOException;
+  ImmutableMap<String, Formula> extractVariablesAndUFs(Formula f);
 
   /**
    * Substitute every occurrence of any item from {@code changeFrom} in formula {@code f} to the
@@ -267,8 +264,7 @@ public interface FormulaManager {
    * @param fromToMapping Mapping of old and new formula parts.
    * @return Formula with parts replaced.
    */
-  <T extends Formula> T substitute(T f, Map<? extends Formula, ? extends Formula> fromToMapping)
-      throws IOException;
+  <T extends Formula> T substitute(T f, Map<? extends Formula, ? extends Formula> fromToMapping);
 
   /**
    * Translates the formula from another context into the context represented by {@code this}.

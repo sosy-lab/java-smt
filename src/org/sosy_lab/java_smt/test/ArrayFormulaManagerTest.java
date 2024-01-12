@@ -14,7 +14,6 @@ import static org.sosy_lab.java_smt.api.FormulaType.StringType;
 import static org.sosy_lab.java_smt.api.FormulaType.getBitvectorTypeWithSize;
 import static org.sosy_lab.java_smt.api.FormulaType.getSinglePrecisionFloatingPointType;
 
-import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;
 import org.sosy_lab.java_smt.api.ArrayFormula;
@@ -37,7 +36,7 @@ public class ArrayFormulaManagerTest extends SolverBasedTest0.ParameterizedSolve
   }
 
   @Test
-  public void testIntIndexIntValue() throws SolverException, InterruptedException, IOException {
+  public void testIntIndexIntValue() throws SolverException, InterruptedException {
     requireIntegers();
 
     // (arr2 = store(arr1, 4, 2)) & !(select(arr2, 4) = 2)
@@ -58,8 +57,7 @@ public class ArrayFormulaManagerTest extends SolverBasedTest0.ParameterizedSolve
    *  Test whether or not String Arrays are possible with String indexes
    */
   @Test
-  public void testStringIndexStringValue()
-      throws SolverException, InterruptedException, IOException {
+  public void testStringIndexStringValue() throws SolverException, InterruptedException {
     requireStrings();
 
     // (arr2 = store(arr1, "four", "two")) & !(select(arr2, "four") = "two")
@@ -80,7 +78,7 @@ public class ArrayFormulaManagerTest extends SolverBasedTest0.ParameterizedSolve
    *  Test whether or not String Arrays with Int indexes are possible
    */
   @Test
-  public void testIntIndexStringValue() throws SolverException, InterruptedException, IOException {
+  public void testIntIndexStringValue() throws SolverException, InterruptedException {
     requireStrings();
 
     // (arr2 = store(arr1, 4, "two")) & !(select(arr2, 4) = "two")
@@ -101,7 +99,7 @@ public class ArrayFormulaManagerTest extends SolverBasedTest0.ParameterizedSolve
    *  Test whether or not String Arrays with bitvector indexes are possible
    */
   @Test
-  public void testBvIndexStringValue() throws SolverException, InterruptedException, IOException {
+  public void testBvIndexStringValue() throws SolverException, InterruptedException {
     requireStrings();
 
     // (arr2 = store(arr1, 0100, "two")) & !(select(arr2, 0100) = "two")
@@ -122,7 +120,7 @@ public class ArrayFormulaManagerTest extends SolverBasedTest0.ParameterizedSolve
    *  Test whether or not Bitvector Arrays are possible with bv index
    */
   @Test
-  public void testBvIndexBvValue() throws SolverException, InterruptedException, IOException {
+  public void testBvIndexBvValue() throws SolverException, InterruptedException {
     requireBitvectors();
 
     // (arr2 = store(arr1, 0100, 0010)) & !(select(arr2, 0100) = 0010)
@@ -143,8 +141,7 @@ public class ArrayFormulaManagerTest extends SolverBasedTest0.ParameterizedSolve
    *  Test whether or not Rational Arrays are possible with Rational index
    */
   @Test
-  public void testRationalIndexRationalValue()
-      throws SolverException, InterruptedException, IOException {
+  public void testRationalIndexRationalValue() throws SolverException, InterruptedException {
     requireRationals();
 
     // (arr2 = store(arr1, 4, 2)) & !(select(arr2, 4) = 2)
@@ -165,7 +162,7 @@ public class ArrayFormulaManagerTest extends SolverBasedTest0.ParameterizedSolve
    *  Test whether or not Float Arrays are possible with Float index
    */
   @Test
-  public void testFloatIndexFloatValue() throws SolverException, InterruptedException, IOException {
+  public void testFloatIndexFloatValue() throws SolverException, InterruptedException {
     requireFloats();
 
     // (arr2 = store(arr1, 4.0, 2.0)) & !(select(arr2, 4.0) = 2.0)

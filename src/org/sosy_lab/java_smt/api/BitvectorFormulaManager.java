@@ -12,7 +12,6 @@ import java.math.BigInteger;
 import java.util.List;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.java_smt.basicimpl.GeneratorException;
 
 /** Manager for dealing with formulas of the bitvector sort. */
 public interface BitvectorFormulaManager {
@@ -40,7 +39,7 @@ public interface BitvectorFormulaManager {
   BitvectorFormula makeBitvector(int length, IntegerFormula pI);
 
   /** Convert/Cast/Interpret a signed/unsigned bitvector formula as an integer formula. */
-  IntegerFormula toIntegerFormula(BitvectorFormula pI, boolean signed) throws GeneratorException;
+  IntegerFormula toIntegerFormula(BitvectorFormula pI, boolean signed);
 
   /**
    * Creates a variable with exactly the given name and bitwidth.
@@ -294,5 +293,5 @@ public interface BitvectorFormulaManager {
   BitvectorFormula extend(BitvectorFormula number, int extensionBits, boolean signed);
 
   /** All given bitvectors are pairwise unequal. */
-  BooleanFormula distinct(List<BitvectorFormula> pBits) throws GeneratorException;
+  BooleanFormula distinct(List<BitvectorFormula> pBits);
 }

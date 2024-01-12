@@ -19,7 +19,6 @@ import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multiset;
 import com.google.common.truth.TruthJUnit;
-import java.io.IOException;
 import java.util.List;
 import java.util.function.Supplier;
 import org.junit.Test;
@@ -216,95 +215,84 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
   }
 
   @Test
-  public void parseMathSatTestParseFirst1()
-      throws SolverException, InterruptedException, IOException {
+  public void parseMathSatTestParseFirst1() throws SolverException, InterruptedException {
     requireParser();
     compareParseWithOrgParseFirst(MATHSAT_DUMP1, this::genBoolExpr);
   }
 
   @Test
-  public void parseMathSatTestExprFirst1()
-      throws SolverException, InterruptedException, IOException {
+  public void parseMathSatTestExprFirst1() throws SolverException, InterruptedException {
     requireParser();
     compareParseWithOrgExprFirst(MATHSAT_DUMP1, this::genBoolExpr);
   }
 
   @Test
-  public void parseSmtinterpolTestParseFirst1()
-      throws SolverException, InterruptedException, IOException {
+  public void parseSmtinterpolTestParseFirst1() throws SolverException, InterruptedException {
     requireParser();
     compareParseWithOrgParseFirst(SMTINTERPOL_DUMP1, this::genBoolExpr);
   }
 
   @Test
-  public void parseSmtinterpolTestExprFirst1()
-      throws SolverException, InterruptedException, IOException {
+  public void parseSmtinterpolTestExprFirst1() throws SolverException, InterruptedException {
     requireParser();
     compareParseWithOrgExprFirst(SMTINTERPOL_DUMP1, this::genBoolExpr);
   }
 
   @Test
-  public void parseZ3TestParseFirst1() throws SolverException, InterruptedException, IOException {
+  public void parseZ3TestParseFirst1() throws SolverException, InterruptedException {
     requireParser();
     compareParseWithOrgParseFirst(Z3_DUMP1, this::genBoolExpr);
   }
 
   @Test
-  public void parseZ3TestExprFirst1() throws SolverException, InterruptedException, IOException {
+  public void parseZ3TestExprFirst1() throws SolverException, InterruptedException {
     requireParser();
     compareParseWithOrgExprFirst(Z3_DUMP1, this::genBoolExpr);
   }
 
   @Test
-  public void parseMathSatTestParseFirst2()
-      throws SolverException, InterruptedException, IOException {
+  public void parseMathSatTestParseFirst2() throws SolverException, InterruptedException {
     requireParser();
     compareParseWithOrgParseFirst(MATHSAT_DUMP2, this::redundancyExprGen);
   }
 
   @Test
-  public void parseMathSatTestExprFirst2()
-      throws SolverException, InterruptedException, IOException {
+  public void parseMathSatTestExprFirst2() throws SolverException, InterruptedException {
     requireParser();
     compareParseWithOrgExprFirst(MATHSAT_DUMP2, this::redundancyExprGen);
   }
 
   @Test
-  public void parseSmtinterpolSatTestParseFirst2()
-      throws SolverException, InterruptedException, IOException {
+  public void parseSmtinterpolSatTestParseFirst2() throws SolverException, InterruptedException {
     requireParser();
     compareParseWithOrgParseFirst(SMTINTERPOL_DUMP2, this::redundancyExprGen);
   }
 
   @Test
-  public void parseSmtinterpolSatTestExprFirst2()
-      throws SolverException, InterruptedException, IOException {
+  public void parseSmtinterpolSatTestExprFirst2() throws SolverException, InterruptedException {
     requireParser();
     compareParseWithOrgExprFirst(SMTINTERPOL_DUMP2, this::redundancyExprGen);
   }
 
   @Test
-  public void parseZ3SatTestParseFirst2()
-      throws SolverException, InterruptedException, IOException {
+  public void parseZ3SatTestParseFirst2() throws SolverException, InterruptedException {
     requireParser();
     compareParseWithOrgParseFirst(Z3_DUMP2, this::redundancyExprGen);
   }
 
   @Test
-  public void parseZ3SatTestExprFirst2() throws SolverException, InterruptedException, IOException {
+  public void parseZ3SatTestExprFirst2() throws SolverException, InterruptedException {
     requireParser();
     compareParseWithOrgExprFirst(Z3_DUMP2, this::redundancyExprGen);
   }
 
   @Test
-  public void parseMathSatTestExprFirst3()
-      throws SolverException, InterruptedException, IOException {
+  public void parseMathSatTestExprFirst3() throws SolverException, InterruptedException {
     requireParser();
     compareParseWithOrgExprFirst(MATHSAT_DUMP3, this::functionExprGen);
   }
 
-  public void parseMathSatTestParseFirst3()
-      throws SolverException, InterruptedException, IOException {
+  public void parseMathSatTestParseFirst3() throws SolverException, InterruptedException {
     requireParser();
     compareParseWithOrgParseFirst(MATHSAT_DUMP3, this::functionExprGen);
   }
@@ -377,7 +365,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
   }
 
   private void compareParseWithOrgExprFirst(String textToParse, Supplier<BooleanFormula> fun)
-      throws SolverException, InterruptedException, IOException {
+      throws SolverException, InterruptedException {
     // Boolector will fail this anyway since bools are bitvecs for btor
     TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
     // check if input is correct
@@ -391,7 +379,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
   }
 
   private void compareParseWithOrgParseFirst(String textToParse, Supplier<BooleanFormula> fun)
-      throws SolverException, InterruptedException, IOException {
+      throws SolverException, InterruptedException {
     // Boolector will fail this anyway since bools are bitvecs for btor
     TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
     // check if input is correct

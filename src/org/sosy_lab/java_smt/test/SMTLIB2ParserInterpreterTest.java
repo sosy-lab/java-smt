@@ -63,7 +63,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   /* ARRAY CONSTRAINT TESTS */
   @Test
   public void testMakeArrayInteger()
-      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+      throws SolverException, InterruptedException, InvalidConfigurationException, IOException {
     requireArrays();
     requireIntegers();
     clearVisitor();
@@ -122,7 +122,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
 
   @Test
   public void testMakeArrayRationals()
-      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+      throws SolverException, InterruptedException, InvalidConfigurationException, IOException {
     requireArrays();
     requireRationals();
     clearVisitor();
@@ -185,7 +185,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
 
   @Test
   public void testMakeArrayBooleans()
-      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+      throws SolverException, InterruptedException, InvalidConfigurationException, IOException {
     requireArrays();
     requireRationals();
     requireBooleanArgumentArrays();
@@ -247,7 +247,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
 
   @Test
   public void testMakeArrayBitvectors()
-      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+      throws SolverException, InterruptedException, InvalidConfigurationException, IOException {
     requireArrays();
     requireBitvectors();
     clearVisitor();

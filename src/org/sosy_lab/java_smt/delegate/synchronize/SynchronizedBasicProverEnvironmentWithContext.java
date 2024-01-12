@@ -12,7 +12,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -80,13 +79,13 @@ class SynchronizedBasicProverEnvironmentWithContext<T> implements BasicProverEnv
   }
 
   @Override
-  public boolean isUnsat() throws SolverException, InterruptedException, IOException {
+  public boolean isUnsat() throws SolverException, InterruptedException {
     return delegate.isUnsat();
   }
 
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
-      throws SolverException, InterruptedException, IOException {
+      throws SolverException, InterruptedException {
     return delegate.isUnsatWithAssumptions(translate(pAssumptions, manager, otherManager));
   }
 
@@ -105,8 +104,7 @@ class SynchronizedBasicProverEnvironmentWithContext<T> implements BasicProverEnv
 
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
-      Collection<BooleanFormula> pAssumptions)
-      throws SolverException, InterruptedException, IOException {
+      Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
     Optional<List<BooleanFormula>> core =
         delegate.unsatCoreOverAssumptions(translate(pAssumptions, manager, otherManager));
     if (core.isPresent()) {
@@ -139,7 +137,7 @@ class SynchronizedBasicProverEnvironmentWithContext<T> implements BasicProverEnv
 
   @Override
   public <R> R allSat(AllSatCallback<R> pCallback, List<BooleanFormula> pImportant)
-      throws InterruptedException, SolverException, IOException {
+      throws InterruptedException, SolverException {
     AllSatCallback<R> callback = new AllSatCallbackWithContext<>(pCallback);
     synchronized (sync) {
       return delegate.allSat(callback, translate(pImportant, manager, otherManager));

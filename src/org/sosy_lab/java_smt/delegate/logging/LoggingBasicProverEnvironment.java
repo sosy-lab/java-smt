@@ -13,7 +13,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -71,7 +70,7 @@ class LoggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public boolean isUnsat() throws SolverException, InterruptedException, IOException {
+  public boolean isUnsat() throws SolverException, InterruptedException {
     boolean result = wrapped.isUnsat();
     logger.log(Level.FINE, "unsat-check returned:", result);
     return result;
@@ -79,7 +78,7 @@ class LoggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
 
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
-      throws SolverException, InterruptedException, IOException {
+      throws SolverException, InterruptedException {
     logger.log(Level.FINE, "assumptions:", pAssumptions);
     boolean result = wrapped.isUnsatWithAssumptions(pAssumptions);
     logger.log(Level.FINE, "unsat-check returned:", result);
@@ -109,8 +108,7 @@ class LoggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
 
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
-      Collection<BooleanFormula> assumptions)
-      throws SolverException, InterruptedException, IOException {
+      Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
     Optional<List<BooleanFormula>> result = wrapped.unsatCoreOverAssumptions(assumptions);
     logger.log(Level.FINE, "unsat-check returned:", result.isEmpty());
     return result;
@@ -134,7 +132,7 @@ class LoggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
 
   @Override
   public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
-      throws InterruptedException, SolverException, IOException {
+      throws InterruptedException, SolverException {
     R result = wrapped.allSat(callback, important);
     logger.log(Level.FINE, "allsat-result:", result);
     return result;

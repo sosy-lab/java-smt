@@ -9,7 +9,6 @@
 package org.sosy_lab.java_smt.solvers.opensmt;
 
 import com.google.common.collect.ImmutableList;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.util.List;
 import org.sosy_lab.common.rationals.Rational;
@@ -354,11 +353,7 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, Sy
 
     if (logic.isVar(f)) {
       String varName = logic.getSymName(logic.getSymRef(f));
-      try {
-        return visitor.visitFreeVariable(formula, dequote(varName));
-      } catch (IOException pE) {
-        throw new RuntimeException(pE);
-      }
+      return visitor.visitFreeVariable(formula, dequote(varName));
     }
 
     String varName = logic.getSymName(logic.getSymRef(f));
@@ -366,34 +361,22 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, Sy
     ImmutableList.Builder<Formula> argTerms = ImmutableList.builder();
     ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
 
-    /* FIXME: Caused crashes in ModelEvaluationTest
-    VectorPTRef subterms = logic.getPterm(f).getArgs();
-
-    for (PTRef sub : subterms) {
-      argTerms.add(encapsulate(sub));
-      argTypes.add(getFormulaType(sub));
-    }
-    */
-
     Pterm pterm = logic.getPterm(f);
+
     for (int i = 0; i < pterm.size(); i++) {
       PTRef sub = pterm.at(i);
       argTerms.add(encapsulate(sub));
       argTypes.add(getFormulaType(sub));
     }
 
-    try {
-      return visitor.visitFunction(
-          formula,
-          argTerms.build(),
-          FunctionDeclarationImpl.of(
-              varName,
-              getDeclarationKind(f),
-              argTypes.build(),
-              getFormulaType(f),
-              logic.getSymRef(f)));
-    } catch (IOException pE) {
-      throw new RuntimeException(pE);
-    }
+    return visitor.visitFunction(
+        formula,
+        argTerms.build(),
+        FunctionDeclarationImpl.of(
+            varName,
+            getDeclarationKind(f),
+            argTypes.build(),
+            getFormulaType(f),
+            logic.getSymRef(f)));
   }
 }

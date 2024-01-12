@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.api.visitors;
 
-import java.io.IOException;
 import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
@@ -41,15 +40,14 @@ public abstract class DefaultFormulaVisitor<R> implements FormulaVisitor<R> {
   }
 
   @Override
-  public R visitFunction(Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration)
-      throws IOException {
+  public R visitFunction(
+      Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
     return visitDefault(f);
   }
 
   @Override
   public R visitQuantifier(
-      BooleanFormula f, Quantifier q, List<Formula> boundVariables, BooleanFormula body)
-      throws IOException {
+      BooleanFormula f, Quantifier q, List<Formula> boundVariables, BooleanFormula body) {
     return visitDefault(f);
   }
 }

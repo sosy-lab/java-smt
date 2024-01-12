@@ -15,7 +15,6 @@ import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -61,7 +60,7 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void simpleStackTestBool() throws SolverException, InterruptedException, IOException {
+  public void simpleStackTestBool() throws SolverException, InterruptedException {
     BasicProverEnvironment<?> stack = newEnvironmentForTest(context);
 
     int i = index.getFreshId();
@@ -117,7 +116,7 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void singleStackTestInteger() throws SolverException, InterruptedException, IOException {
+  public void singleStackTestInteger() throws SolverException, InterruptedException {
     requireIntegers();
 
     BasicProverEnvironment<?> env = newEnvironmentForTest(context);
@@ -125,7 +124,7 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void singleStackTestRational() throws SolverException, InterruptedException, IOException {
+  public void singleStackTestRational() throws SolverException, InterruptedException {
     requireRationals();
     requireTheoryCombination();
 
@@ -135,7 +134,7 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
 
   private <X extends NumeralFormula, Y extends X> void simpleStackTestNum(
       NumeralFormulaManager<X, Y> nmgr, BasicProverEnvironment<?> stack)
-      throws SolverException, InterruptedException, IOException {
+      throws SolverException, InterruptedException {
     int i = index.getFreshId();
     X a = nmgr.makeVariable("num_a" + i);
     X b = nmgr.makeVariable("num_b" + i);
@@ -228,7 +227,7 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void largeStackUsageTest() throws InterruptedException, SolverException, IOException {
+  public void largeStackUsageTest() throws InterruptedException, SolverException {
     BasicProverEnvironment<?> stack = newEnvironmentForTest(context);
     for (int i = 0; i < 20; i++) {
       assertThat(stack.size()).isEqualTo(i);
@@ -243,7 +242,7 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void largerStackUsageTest() throws InterruptedException, SolverException, IOException {
+  public void largerStackUsageTest() throws InterruptedException, SolverException {
     int n = 1000;
     if (ImmutableList.of(Solvers.PRINCESS, Solvers.OPENSMT).contains(solverToUse())) {
       n = 50; // some solvers are slower, so we use a smaller number
@@ -272,7 +271,7 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void stackTestUnsat() throws InterruptedException, SolverException, IOException {
+  public void stackTestUnsat() throws InterruptedException, SolverException {
     BasicProverEnvironment<?> stack = newEnvironmentForTest(context, ProverOptions.GENERATE_MODELS);
     assertThat(stack).isSatisfiable();
     stack.push();
@@ -290,7 +289,7 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void stackTestUnsat2() throws InterruptedException, SolverException, IOException {
+  public void stackTestUnsat2() throws InterruptedException, SolverException {
     BasicProverEnvironment<?> stack = newEnvironmentForTest(context, ProverOptions.GENERATE_MODELS);
     assertThat(stack).isSatisfiable();
     stack.push();
@@ -315,7 +314,7 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
   /** Create a symbol on a level and pop this level. Symbol must remain valid and usable! */
   @SuppressWarnings("unused")
   @Test
-  public void symbolsOnStackTest() throws InterruptedException, SolverException, IOException {
+  public void symbolsOnStackTest() throws InterruptedException, SolverException {
     requireModel();
 
     BasicProverEnvironment<?> stack = newEnvironmentForTest(context, ProverOptions.GENERATE_MODELS);
@@ -344,7 +343,7 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void constraintTestBool1() throws SolverException, InterruptedException, IOException {
+  public void constraintTestBool1() throws SolverException, InterruptedException {
     BooleanFormula a = bmgr.makeVariable("bool_a");
 
     try (BasicProverEnvironment<?> stack = newEnvironmentForTest(context)) {
@@ -361,7 +360,7 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void constraintTestBool2() throws SolverException, InterruptedException, IOException {
+  public void constraintTestBool2() throws SolverException, InterruptedException {
     BooleanFormula a = bmgr.makeVariable("bool_a");
 
     try (BasicProverEnvironment<?> stack = newEnvironmentForTest(context)) {
@@ -378,7 +377,7 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void constraintTestBool3() throws SolverException, InterruptedException, IOException {
+  public void constraintTestBool3() throws SolverException, InterruptedException {
     BooleanFormula a = bmgr.makeVariable("bool_a");
 
     try (BasicProverEnvironment<?> stack = newEnvironmentForTest(context)) {
@@ -395,7 +394,7 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void constraintTestBool4() throws SolverException, InterruptedException, IOException {
+  public void constraintTestBool4() throws SolverException, InterruptedException {
     BasicProverEnvironment<?> stack = newEnvironmentForTest(context);
     stack.addConstraint(bmgr.makeVariable("bool_a"));
     assertThat(stack).isSatisfiable();
@@ -404,14 +403,14 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void satTestBool5() throws SolverException, InterruptedException, IOException {
+  public void satTestBool5() throws SolverException, InterruptedException {
     BasicProverEnvironment<?> stack = newEnvironmentForTest(context);
     assertThat(stack.size()).isEqualTo(0);
     assertThat(stack).isSatisfiable();
   }
 
   @Test
-  public void dualStackTest() throws SolverException, InterruptedException, IOException {
+  public void dualStackTest() throws SolverException, InterruptedException {
     requireMultipleStackSupport();
 
     BooleanFormula a = bmgr.makeVariable("bool_a");
@@ -441,7 +440,7 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void dualStackTest2() throws SolverException, InterruptedException, IOException {
+  public void dualStackTest2() throws SolverException, InterruptedException {
     requireMultipleStackSupport();
 
     BooleanFormula a = bmgr.makeVariable("bool_a");
@@ -468,7 +467,7 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void multiStackTest() throws SolverException, InterruptedException, IOException {
+  public void multiStackTest() throws SolverException, InterruptedException {
     requireMultipleStackSupport();
     int limit = 10;
 
@@ -530,8 +529,7 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
    * for BMC with induction (where we create new formulas while there is something on the stack).
    */
   @Test
-  public void dualStackGlobalDeclarations()
-      throws SolverException, InterruptedException, IOException {
+  public void dualStackGlobalDeclarations() throws SolverException, InterruptedException {
     // Create non-empty stack
     BasicProverEnvironment<?> stack1 = newEnvironmentForTest(context);
     stack1.push(bmgr.makeVariable("bool_a"));
@@ -556,7 +554,7 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
 
   @Test
   @SuppressWarnings("CheckReturnValue")
-  public void modelForUnsatFormula() throws SolverException, InterruptedException, IOException {
+  public void modelForUnsatFormula() throws SolverException, InterruptedException {
     requireIntegers();
     try (BasicProverEnvironment<?> stack = newEnvironmentForTest(context)) {
       stack.push(imgr.greaterThan(imgr.makeVariable("a"), imgr.makeNumber(0)));
@@ -569,7 +567,7 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
 
   @Test
   @SuppressWarnings("CheckReturnValue")
-  public void modelForUnsatFormula2() throws SolverException, InterruptedException, IOException {
+  public void modelForUnsatFormula2() throws SolverException, InterruptedException {
     requireIntegers();
     try (BasicProverEnvironment<?> stack = newEnvironmentForTest(context)) {
       stack.push(imgr.greaterThan(imgr.makeVariable("a"), imgr.makeNumber(0)));
@@ -582,7 +580,7 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void modelForSatFormula() throws SolverException, InterruptedException, IOException {
+  public void modelForSatFormula() throws SolverException, InterruptedException {
     requireIntegers();
     try (BasicProverEnvironment<?> stack =
         newEnvironmentForTest(context, ProverOptions.GENERATE_MODELS)) {
@@ -597,8 +595,7 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void modelForSatFormulaWithLargeValue()
-      throws SolverException, InterruptedException, IOException {
+  public void modelForSatFormulaWithLargeValue() throws SolverException, InterruptedException {
     requireIntegers();
     try (BasicProverEnvironment<?> stack =
         newEnvironmentForTest(context, ProverOptions.GENERATE_MODELS)) {
@@ -613,7 +610,7 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void modelForSatFormulaWithUF() throws SolverException, InterruptedException, IOException {
+  public void modelForSatFormulaWithUF() throws SolverException, InterruptedException {
     requireIntegers();
     requireTheoryCombination();
 
@@ -644,7 +641,7 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
 
   @Test
   @SuppressWarnings("resource")
-  public void multiCloseTest() throws SolverException, InterruptedException, IOException {
+  public void multiCloseTest() throws SolverException, InterruptedException {
     BasicProverEnvironment<?> stack = newEnvironmentForTest(context, ProverOptions.GENERATE_MODELS);
     try {
       // do something on the stack

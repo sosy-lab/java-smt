@@ -9,7 +9,6 @@
 package org.sosy_lab.java_smt.api;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collector;
@@ -144,7 +143,7 @@ public interface BooleanFormulaManager {
 
   /** Visit the formula with the given visitor. */
   @CanIgnoreReturnValue
-  <R> R visit(BooleanFormula pFormula, BooleanFormulaVisitor<R> visitor) throws IOException;
+  <R> R visit(BooleanFormula pFormula, BooleanFormulaVisitor<R> visitor);
 
   /**
    * Visit the formula recursively with a given {@link BooleanFormulaVisitor}.
@@ -155,8 +154,7 @@ public interface BooleanFormulaManager {
    * <p>Furthermore, this method also guarantees that every equal part of the formula is visited
    * only once. Thus, it can be used to traverse DAG-like formulas efficiently.
    */
-  void visitRecursively(BooleanFormula f, BooleanFormulaVisitor<TraversalProcess> rFormulaVisitor)
-      throws IOException;
+  void visitRecursively(BooleanFormula f, BooleanFormulaVisitor<TraversalProcess> rFormulaVisitor);
 
   /**
    * Visit the formula recursively with a given {@link BooleanFormulaVisitor}. The arguments each
@@ -169,7 +167,7 @@ public interface BooleanFormulaManager {
    * only once. Thus, it can be used to traverse DAG-like formulas efficiently.
    */
   BooleanFormula transformRecursively(
-      BooleanFormula f, BooleanFormulaTransformationVisitor pVisitor) throws IOException;
+      BooleanFormula f, BooleanFormulaTransformationVisitor pVisitor);
 
   /**
    * Return a set of formulas such that a conjunction over them is equivalent to the input formula.
@@ -184,7 +182,7 @@ public interface BooleanFormulaManager {
    *
    * @param flatten If {@code true}, flatten recursively.
    */
-  Set<BooleanFormula> toConjunctionArgs(BooleanFormula f, boolean flatten) throws IOException;
+  Set<BooleanFormula> toConjunctionArgs(BooleanFormula f, boolean flatten);
 
   /**
    * Return a set of formulas such that a disjunction over them is equivalent to the input formula.
@@ -199,5 +197,5 @@ public interface BooleanFormulaManager {
    *
    * @param flatten If {@code true}, flatten recursively.
    */
-  Set<BooleanFormula> toDisjunctionArgs(BooleanFormula f, boolean flatten) throws IOException;
+  Set<BooleanFormula> toDisjunctionArgs(BooleanFormula f, boolean flatten);
 }

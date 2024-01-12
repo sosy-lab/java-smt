@@ -16,7 +16,6 @@ import com.google.common.base.Throwables;
 import com.google.common.truth.ExpectFailure;
 import com.google.common.truth.ExpectFailure.SimpleSubjectBuilderCallback;
 import com.google.common.truth.SimpleSubjectBuilder;
-import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -49,8 +48,7 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void testIsTriviallySatisfiableYes()
-      throws SolverException, InterruptedException, IOException {
+  public void testIsTriviallySatisfiableYes() throws SolverException, InterruptedException {
     assertThatFormula(bmgr.makeTrue()).isSatisfiable();
   }
 
@@ -62,7 +60,7 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void testIsSatisfiableYes() throws SolverException, InterruptedException, IOException {
+  public void testIsSatisfiableYes() throws SolverException, InterruptedException {
     assertThatFormula(simpleFormula).isSatisfiable();
   }
 
@@ -80,8 +78,7 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void testIsTriviallyUnSatisfiableYes()
-      throws SolverException, InterruptedException, IOException {
+  public void testIsTriviallyUnSatisfiableYes() throws SolverException, InterruptedException {
     assertThatFormula(bmgr.makeFalse()).isUnsatisfiable();
   }
 
@@ -93,7 +90,7 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void testIsUnsatisfiableYes() throws SolverException, InterruptedException, IOException {
+  public void testIsUnsatisfiableYes() throws SolverException, InterruptedException {
     assertThatFormula(contradiction).isUnsatisfiable();
   }
 
@@ -106,8 +103,7 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void testIsTriviallyTautologicalYes()
-      throws SolverException, InterruptedException, IOException {
+  public void testIsTriviallyTautologicalYes() throws SolverException, InterruptedException {
     assertThatFormula(bmgr.makeTrue()).isTautological();
   }
 
@@ -119,7 +115,7 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void testIsTautologicalYes() throws SolverException, InterruptedException, IOException {
+  public void testIsTautologicalYes() throws SolverException, InterruptedException {
     assertThatFormula(tautology).isTautological();
   }
 
@@ -140,7 +136,7 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void testIsEquivalentToYes() throws SolverException, InterruptedException, IOException {
+  public void testIsEquivalentToYes() throws SolverException, InterruptedException {
     BooleanFormula simpleFormula2;
     if (imgr != null) {
       simpleFormula2 =
@@ -163,8 +159,7 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void testIsEquisatisfiableToYes()
-      throws SolverException, InterruptedException, IOException {
+  public void testIsEquisatisfiableToYes() throws SolverException, InterruptedException {
     assertThatFormula(simpleFormula).isEquisatisfiableTo(tautology);
   }
 
@@ -184,7 +179,7 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void testImpliesYes() throws SolverException, InterruptedException, IOException {
+  public void testImpliesYes() throws SolverException, InterruptedException {
     assertThatFormula(simpleFormula).implies(tautology);
   }
 

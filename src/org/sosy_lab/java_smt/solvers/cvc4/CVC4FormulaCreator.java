@@ -30,7 +30,6 @@ import edu.stanford.CVC4.Rational;
 import edu.stanford.CVC4.Type;
 import edu.stanford.CVC4.vectorExpr;
 import edu.stanford.CVC4.vectorType;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -298,7 +297,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   }
 
   @Override
-  public <R> R visit(FormulaVisitor<R> visitor, Formula formula, final Expr f) throws IOException {
+  public <R> R visit(FormulaVisitor<R> visitor, Formula formula, final Expr f) {
     checkState(!f.isNull());
     Type type = f.getType();
 

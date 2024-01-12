@@ -15,7 +15,6 @@ import com.google.common.base.Throwables;
 import com.google.common.truth.ExpectFailure;
 import com.google.common.truth.ExpectFailure.SimpleSubjectBuilderCallback;
 import com.google.common.truth.SimpleSubjectBuilder;
-import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
@@ -48,8 +47,6 @@ public class ProverEnvironmentSubjectTest extends SolverBasedTest0.Parameterized
     try (ProverEnvironment env = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       env.push(simpleFormula);
       assertThatEnvironment(env).isSatisfiable();
-    } catch (IOException pE) {
-      throw new RuntimeException(pE);
     }
   }
 
@@ -70,8 +67,6 @@ public class ProverEnvironmentSubjectTest extends SolverBasedTest0.Parameterized
     try (ProverEnvironment env = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       env.push(contradiction);
       assertThatEnvironment(env).isUnsatisfiable();
-    } catch (IOException pE) {
-      throw new RuntimeException(pE);
     }
   }
 

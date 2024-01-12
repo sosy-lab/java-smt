@@ -91,57 +91,62 @@ public class BinaryModel extends AbstractModel<IExpression, Sort, PrincessEnviro
     return immutableList;
   }
 
-  /**
-   * generates an SMT-LIB2 model from Princess and writes it into a file "Model.smt2"
-   *
-   * @throws IOException if writing to file fails
-   */
-  public void getOutput() throws IOException {
+  /** generates an SMT-LIB2 model from Princess and writes it into a file "Model.smt2" */
+  public void getOutput() {
+    // FIXME: Find a better way to handle IO errors
+    try {
+      String fileName = "/princess_all-2023-06-19.jar";
+      String princessJar = filePath + fileName;
+      new File(princessJar).setExecutable(true);
 
-    String fileName = "/princess_all-2023-06-19.jar";
-    String princessJar = filePath + fileName;
-    new File(princessJar).setExecutable(true);
+      ProcessBuilder builder = new ProcessBuilder();
+      builder.command("java", "-jar", princessJar, "+incremental", filePath, "/Out.smt2");
+      Process process = builder.start();
 
-    ProcessBuilder builder = new ProcessBuilder();
-    builder.command("java", "-jar", princessJar, "+incremental", filePath, "/Out.smt2");
-    Process process = builder.start();
-
-    StringBuilder output = new StringBuilder();
-    try (InputStream is = process.getInputStream()) {
-      try {
-        process.waitFor();
-      } catch (InterruptedException pE) {
-        throw new RuntimeException(pE);
-      }
-      try (InputStreamReader isr = new InputStreamReader(is, Charset.defaultCharset())) {
-        try (BufferedReader br = new BufferedReader(isr)) {
-          String lines;
-          while ((lines = br.readLine()) != null) {
-            output.append(lines).append("\n");
+      StringBuilder output = new StringBuilder();
+      try (InputStream is = process.getInputStream()) {
+        try {
+          process.waitFor();
+        } catch (InterruptedException pE) {
+          throw new RuntimeException(pE);
+        }
+        try (InputStreamReader isr = new InputStreamReader(is, Charset.defaultCharset())) {
+          try (BufferedReader br = new BufferedReader(isr)) {
+            String lines;
+            while ((lines = br.readLine()) != null) {
+              output.append(lines).append("\n");
+            }
+            if (String.valueOf(output).startsWith("un")) {
+              isUnsat = true;
+              output.delete(0, 5);
+            } else {
+              isUnsat = false;
+              output.delete(0, 3);
+            }
+            Generator.writeToFile(String.valueOf(output), (filePath + "/Model.smt2"));
           }
-          if (String.valueOf(output).startsWith("un")) {
-            isUnsat = true;
-            output.delete(0, 5);
-          } else {
-            isUnsat = false;
-            output.delete(0, 3);
-          }
-          Generator.writeToFile(String.valueOf(output), (filePath + "/Model.smt2"));
         }
       }
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
   }
 
-  private List<ValueAssignment> parseModel(String pString) throws IOException {
-    smtlibv2Lexer lexer = new smtlibv2Lexer(CharStreams.fromFileName(pString));
-    smtlibv2Parser parser = new smtlibv2Parser(new CommonTokenStream(lexer));
-    Visitor visitor = new Visitor(mgr, bmgr, imgr, null, bvmgr, amgr, umgr);
-    visitor.visit(parser.start());
-    assignments = visitor.getAssignments();
-    return assignments;
+  private List<ValueAssignment> parseModel(String pString) {
+    // FIXME: Find a better way to handle IO errors
+    try {
+      smtlibv2Lexer lexer = new smtlibv2Lexer(CharStreams.fromFileName(pString));
+      smtlibv2Parser parser = new smtlibv2Parser(new CommonTokenStream(lexer));
+      Visitor visitor = new Visitor(mgr, bmgr, imgr, null, bvmgr, amgr, umgr);
+      visitor.visit(parser.start());
+      assignments = visitor.getAssignments();
+      return assignments;
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
-  protected void getAssignments() throws IOException, ModelException {
+  protected void getAssignments() throws ModelException {
     getOutput();
     if (!isUnsat) {
       assignments = parseModel(filePath + "/Model.smt2");
@@ -153,11 +158,10 @@ public class BinaryModel extends AbstractModel<IExpression, Sort, PrincessEnviro
 
   @Override
   public ImmutableList<ValueAssignment> asList() {
-
     return finalList;
   }
 
-  public BinaryModel getModel() throws IOException, ModelException {
+  public BinaryModel getModel() throws ModelException {
     getAssignments();
     return this;
   }

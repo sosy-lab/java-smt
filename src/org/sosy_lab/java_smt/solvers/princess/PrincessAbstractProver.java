@@ -79,7 +79,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
    * SAT or UNSAT.
    */
   @Override
-  public boolean isUnsat() throws SolverException, IOException {
+  public boolean isUnsat() throws SolverException {
     try {
       Generator.dumpSMTLIB2();
     } catch (IOException pE) {
@@ -148,11 +148,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   @Override
   public Model getModel() throws SolverException {
     if (useBinary) {
-      try {
-        return binaryModel.getModel();
-      } catch (IOException pE) {
-        throw new RuntimeException(pE);
-      }
+      return binaryModel.getModel();
     } else {
       Preconditions.checkState(!closed);
       Preconditions.checkState(wasLastSatCheckSat, NO_MODEL_HELP);
@@ -221,7 +217,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
 
   @Override
   public <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important)
-      throws InterruptedException, SolverException, IOException {
+      throws InterruptedException, SolverException {
     T result = super.allSat(callback, important);
     wasLastSatCheckSat = false; // we do not know about the current state, thus we reset the flag.
     return result;
