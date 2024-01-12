@@ -94,7 +94,7 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   /** Try to use the context from a different thread. */
   @SuppressWarnings("resource")
   @Test
-  public void nonLocalThreadTest() throws InterruptedException {
+  public void nonLocalThreadTest() {
     // Fails for Boolector as debug mode requires visitor support
     assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
 
