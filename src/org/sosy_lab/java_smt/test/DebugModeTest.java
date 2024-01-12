@@ -9,10 +9,12 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -30,15 +32,19 @@ import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
+import org.sosy_lab.java_smt.api.IntegerFormulaManager;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.UFManager;
 
 public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   private SolverContextFactory debugFactory;
+
   private SolverContext debugContext;
   private UFManager debugFmgr;
   private BooleanFormulaManager debugBmgr;
+  private IntegerFormulaManager debugImgr;
 
   private static final int DEFAULT_PROBLEM_SIZE = 8;
 
@@ -53,8 +59,13 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
     debugContext = debugFactory.generateContext();
 
     FormulaManager debugMgr = debugContext.getFormulaManager();
-    debugFmgr = debugMgr.getUFManager();
-    debugBmgr = debugMgr.getBooleanFormulaManager();
+    try {
+      debugFmgr = debugMgr.getUFManager();
+      debugBmgr = debugMgr.getBooleanFormulaManager();
+      debugImgr = debugMgr.getIntegerFormulaManager();
+    } catch (UnsupportedOperationException e) {
+      // Boolector does not support integer theory. We just leave debugImgr set to null.
+    }
   }
 
   @After
@@ -64,10 +75,29 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
     }
   }
 
+  /**
+   * Helper method for threadLocalTest(). Will rethrow any exception that occurred on the other
+   * thread.
+   */
+  private void checkForExceptions(Future<?> task) {
+    try {
+      // Accessing the future will rethrow the exception on the main thread
+      assert task.get() == null;
+    } catch (ExecutionException e) {
+      Throwables.throwIfInstanceOf(e.getCause(), IllegalStateException.class);
+      Throwables.throwIfUnchecked(e.getCause());
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    }
+  }
+
+  /** Try to use the context from a different thread */
   @SuppressWarnings("resource")
-  @Test(expected = IllegalStateException.class)
-  public void wrongThreadTest() throws InterruptedException {
-    // Try to use the context in a different thread
+  @Test
+  public void nonLocalThreadTest() throws InterruptedException {
+    // Fails for Boolector as debug mode requires visitor support
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
+
     ExecutorService exec = Executors.newSingleThreadExecutor();
     Future<?> result =
         exec.submit(
@@ -83,70 +113,86 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
               return null;
             });
 
-    try {
-      assert result.get() == null;
-    } catch (ExecutionException e) {
-      Throwables.throwIfInstanceOf(e.getCause(), IllegalStateException.class);
-      Throwables.throwIfUnchecked(e.getCause());
+    // We expect debug mode to throw an exception only on CVC5
+    if (solverToUse() == Solvers.CVC5) {
+      assertThrows(IllegalStateException.class, () -> checkForExceptions(result));
+    } else {
+      checkForExceptions(result);
     }
     exec.shutdownNow();
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void wrongContextTest() throws InterruptedException, SolverException {
-    // FIXME: This test tries to use a formula that was created in a different context. We expect
-    //  this test to fail for most solvers, but there should be a unique error message.
-    //  Right now we get:
-    //  OpenSMT claims the formula is satisfiable:
-    //    expected to be : unsatisfiable
-    //    but was        : org.sosy_lab.java_smt.solvers.opensmt.OpenSmtTheoremProver@10d59286
-    //    which is       : satisfiable
-    //    which has model:
-    //  MathSAT5 thows an IllegalStateExpression:
-    //    msat_solve returned "unknown": polarity information is meaningful only for terms of
-    //    type Bool
-    //  SMTInterpol thows an de.uni_freiburg.informatik.ultimate.logic.SMTLIBException:
-    //    Asserted terms created with incompatible theory
-    //  Z3 throws an com.microsoft.z3.Z3Exception:
-    //    invalid argument
-    //  Princess throws an java.util.NoSuchElementException:
-    //    key not found: i@15
-    //  Boolector crashes with a segfault:
-    //    boolector_assert: argument 'exp' belongs to different Boolector instance
-    //
-    // To fix this issue, we would need to track which formula was created in which context,
-    // which might result in quite some management and memory overhead.
-    // We might want to see this as very low priority, as there is no real benefit for the user,
-    // except having a nice error message.
-
-    HardIntegerFormulaGenerator hardProblem = new HardIntegerFormulaGenerator(imgr, bmgr);
-
-    // Boolector does not support integer, so we have to use two different versions for this test.
-    BooleanFormula formula =
-        solverToUse() == Solvers.BOOLECTOR
-            ? bmgr.makeFalse()
-            : hardProblem.generate(DEFAULT_PROBLEM_SIZE);
-
+  /**
+   * Helper method for noSharedFormulasTest(). Will use the debug context to check the formula for
+   * satisfiability.
+   *
+   * @param pFormula This formula should come from a different context
+   */
+  private void checkFormulaInDebugContext(BooleanFormula pFormula)
+      throws InterruptedException, SolverException {
     try (BasicProverEnvironment<?> prover = debugContext.newProverEnvironment()) {
-      // Try to add a formula from a different context to our debug solver context.
-      prover.push(formula);
+      prover.push(pFormula);
       assertThat(prover).isUnsatisfiable();
     }
   }
 
-  @SuppressWarnings("unused")
-  @Test(expected = IllegalArgumentException.class)
-  public void wrongContextUFTest() {
-    // Declare the function on the normal context, then try calling it from the debugging context
+  /** Create a formula then try using it from a different context. */
+  @Test
+  public void noSharedFormulasTest()
+      throws InterruptedException, SolverException, InvalidConfigurationException {
+    // Fails for Boolector as debug mode requires visitor support
     assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
 
-    FunctionDeclaration<BooleanFormula> id =
-        fmgr.declareUF("id", FormulaType.BooleanType, ImmutableList.of(FormulaType.BooleanType));
-    BooleanFormula f = debugFmgr.callUF(id, debugBmgr.makeFalse());
+    try (SolverContext newContext = debugFactory.generateContext()) {
+      BooleanFormulaManager newBmgr = newContext.getFormulaManager().getBooleanFormulaManager();
+      IntegerFormulaManager newImgr = newContext.getFormulaManager().getIntegerFormulaManager();
+
+      HardIntegerFormulaGenerator hardProblem = new HardIntegerFormulaGenerator(newImgr, newBmgr);
+      BooleanFormula formula = hardProblem.generate(DEFAULT_PROBLEM_SIZE);
+
+      // We expect debug mode to throw an exception for all solvers, except CVC4, CVC5 and Yices
+      if (!List.of(Solvers.CVC4, Solvers.CVC5, Solvers.YICES2).contains(solverToUse())) {
+        assertThrows(IllegalArgumentException.class, () -> checkFormulaInDebugContext(formula));
+      } else {
+        checkFormulaInDebugContext(formula);
+      }
+    }
   }
 
+  /**
+   * Helper method for noSharedDeclarationsTest(). Uses the function declaration in debug context.
+   *
+   * @param pDeclaration A function declaration from a different context.
+   */
+  @SuppressWarnings("ResultOfMethodCallIgnored")
+  public void checkDeclarationInDebugContext(FunctionDeclaration<IntegerFormula> pDeclaration) {
+    debugFmgr.callUF(pDeclaration, debugImgr.makeNumber(0));
+  }
+
+  /** Declare a function, then try calling it from a different context */
+  @Test
+  public void noSharedDeclarationsTest() throws InvalidConfigurationException {
+    // Fails for Boolector as debug mode requires visitor support
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
+
+    try (SolverContext newContext = debugFactory.generateContext()) {
+      UFManager newFmgr = newContext.getFormulaManager().getUFManager();
+      FunctionDeclaration<IntegerFormula> id =
+          newFmgr.declareUF(
+              "id", FormulaType.IntegerType, ImmutableList.of(FormulaType.IntegerType));
+
+      // We expect debug mode to throw an exception for all solvers, except Princess, CVC4 and Yices
+      if (!List.of(Solvers.PRINCESS, Solvers.CVC5, Solvers.YICES2).contains(solverToUse())) {
+        assertThrows(IllegalArgumentException.class, () -> checkDeclarationInDebugContext(id));
+      } else {
+        checkDeclarationInDebugContext(id);
+      }
+    }
+  }
+
+  /** Try to add a formula from a different solver to our solver context. */
   @Test(expected = IllegalArgumentException.class)
-  public void wrongSolver()
+  public void noSharingBetweenSolversTest()
       throws InvalidConfigurationException, InterruptedException, SolverException {
     Solvers otherSolver =
         solverToUse() == Solvers.SMTINTERPOL ? Solvers.MATHSAT5 : Solvers.SMTINTERPOL;
@@ -156,7 +202,7 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
       BooleanFormula formula = otherBmgr.makeFalse();
 
       try (BasicProverEnvironment<?> prover = debugContext.newProverEnvironment()) {
-        // Try to add a formula from a different solver to our solver context.
+        // This should fail for all solvers
         prover.push(formula);
         assertThat(prover).isUnsatisfiable();
       }

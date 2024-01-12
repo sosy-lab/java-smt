@@ -13,6 +13,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.sosy_lab.common.configuration.Configuration;
@@ -31,12 +32,8 @@ import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
-// TODO: Check which solver is used and disable all unneeded checks
-//      wrongThread: everything but cvc5 passes
-//      wrongContext: cvc4, cvc5, yices pass
-//      wrongContextUF: princess, cvc5, yices pass
-
 // TODO: Figure out what to do about boolector (does not support visitors..)
+// TODO: Add an option that checks if sorts were created on the context
 
 @Options(prefix = "solver.debugMode")
 public class DebuggingSolverContext extends DefaultFormulaVisitor<TraversalProcess>
@@ -46,9 +43,49 @@ public class DebuggingSolverContext extends DefaultFormulaVisitor<TraversalProce
       description =
           "Enable assertions that make sure that solver instances are only used on the "
               + "thread that created them.")
-  private boolean threadLocal = true;
+  private boolean threadLocal = false;
+
+  @Option(
+      secure = true,
+      description =
+          "Enable assertions that make sure that functions are only used in the context that "
+              + "declared them.")
+  private boolean noSharedDeclarations = false;
+
+  @Option(
+      secure = true,
+      description =
+          "Enable assertions that make sure formula terms are only used in the context that "
+              + "created them.")
+  private boolean noSharedFormulas = false;
 
   private final Thread solverThread = Thread.currentThread();
+
+  // TODO: Check that the feature map is correct
+  private static final Map<Solvers, Set<FunctionDeclaration<?>>> globalFunctions =
+      Map.of(
+          Solvers.PRINCESS,
+          ConcurrentHashMap.newKeySet(),
+          Solvers.CVC5,
+          ConcurrentHashMap.newKeySet(),
+          Solvers.YICES2,
+          ConcurrentHashMap.newKeySet());
+
+  private final Set<FunctionDeclaration<?>> declaredFunctions;
+
+  // TODO: Check that the feature map is correct
+  private static final Map<Solvers, Set<Formula>> globalTerms =
+      Map.of(
+          Solvers.CVC4,
+          ConcurrentHashMap.newKeySet(),
+          Solvers.CVC5,
+          ConcurrentHashMap.newKeySet(),
+          Solvers.YICES2,
+          ConcurrentHashMap.newKeySet());
+
+  private final Set<Formula> definedFormulas;
+
+  private final SolverContext delegate;
 
   /** Assert that this object is only used by the thread that created it. */
   public void assertThreadLocal() {
@@ -63,16 +100,6 @@ public class DebuggingSolverContext extends DefaultFormulaVisitor<TraversalProce
     }
   }
 
-  @Option(
-      secure = true,
-      description =
-          "Enable assertions that make sure that formulas and function declarations are only used "
-              + "in the context that created them.")
-  private boolean noSharedContexts = true;
-
-  private final Set<FunctionDeclaration<?>> declaredFunctions = ConcurrentHashMap.newKeySet();
-  private final Set<Formula> formulaTerms = ConcurrentHashMap.newKeySet();
-
   /** Needs to be called after a new function is declared to associate it with this context. */
   public void addFunctionDeclaration(FunctionDeclaration<?> pFunctionDeclaration) {
     declaredFunctions.add(pFunctionDeclaration);
@@ -82,20 +109,22 @@ public class DebuggingSolverContext extends DefaultFormulaVisitor<TraversalProce
   public void assertDeclarationInContext(FunctionDeclaration<?> pFunctionDeclaration) {
     if (List.of(FunctionDeclarationKind.VAR, FunctionDeclarationKind.UF)
         .contains(pFunctionDeclaration.getKind())) {
-      if (noSharedContexts) {
-        Preconditions.checkArgument(
-            declaredFunctions.contains(pFunctionDeclaration),
-            "Function was not declared in this context.\n  %s\nnot in\n  %s",
-            pFunctionDeclaration,
-            declaredFunctions);
-      }
+      Preconditions.checkArgument(
+          declaredFunctions.contains(pFunctionDeclaration),
+          "Function was not declared "
+              + (noSharedDeclarations ? "in this context." : "on this solver.")
+              + "\n%s"
+              + "\nnot in"
+              + "\n%s",
+          pFunctionDeclaration,
+          declaredFunctions);
     }
   }
 
   @Override
   protected TraversalProcess visitDefault(Formula f) {
     // Used in addFormulaTerm where we recursively add all sub terms of a formula to the context
-    formulaTerms.add(f);
+    definedFormulas.add(f);
     return TraversalProcess.CONTINUE;
   }
 
@@ -106,20 +135,52 @@ public class DebuggingSolverContext extends DefaultFormulaVisitor<TraversalProce
 
   /** Assert that the formula belongs to this context. */
   public void assertFormulaInContext(Formula pFormula) {
-    if (noSharedContexts) {
-      Preconditions.checkArgument(
-          formulaTerms.contains(pFormula),
-          "Formula was not created in this context.\n  %s\nnot in\n  %s",
-          pFormula,
-          formulaTerms);
-    }
+    Preconditions.checkArgument(
+        definedFormulas.contains(pFormula),
+        "Function was not declared "
+            + (noSharedDeclarations ? "in this context." : "on this solver.")
+            + "\n%s"
+            + "\nnot in"
+            + "\n%s",
+        pFormula,
+        definedFormulas);
   }
 
-  private final SolverContext delegate;
-
-  public DebuggingSolverContext(Configuration pConfiguration, SolverContext pDelegate)
+  public DebuggingSolverContext(
+      Solvers pSolver, Configuration pConfiguration, SolverContext pDelegate)
       throws InvalidConfigurationException {
+    // Read in user supplied options
     pConfiguration.inject(this);
+
+    // Set configuration options based on the solver that is being used
+    if (pSolver == Solvers.CVC5) {
+      threadLocal = true;
+    }
+    if (!globalFunctions.keySet().contains(pSolver)) {
+      noSharedDeclarations = true;
+    }
+    if (!globalTerms.keySet().contains(pSolver)) {
+      noSharedFormulas = true;
+    }
+
+    // Initialize function declaration context
+    if (noSharedDeclarations) {
+      // If noSharedDeclarations was set to true by the user we throw exceptions on declaration
+      // sharing even if the solver allows it.
+      declaredFunctions = ConcurrentHashMap.newKeySet();
+    } else {
+      declaredFunctions = globalFunctions.getOrDefault(pSolver, ConcurrentHashMap.newKeySet());
+    }
+
+    // Initialize formula context
+    if (noSharedFormulas) {
+      // If noSharedFormulas was set to true by the user we throw exceptions on formula sharing
+      // even if the solver allows it.
+      definedFormulas = ConcurrentHashMap.newKeySet();
+    } else {
+      definedFormulas = globalTerms.getOrDefault(pSolver, ConcurrentHashMap.newKeySet());
+    }
+
     delegate = checkNotNull(pDelegate);
   }
 
