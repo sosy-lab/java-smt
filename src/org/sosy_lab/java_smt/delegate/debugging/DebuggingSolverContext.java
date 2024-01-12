@@ -156,10 +156,10 @@ public class DebuggingSolverContext extends DefaultFormulaVisitor<TraversalProce
     if (pSolver == Solvers.CVC5) {
       threadLocal = true;
     }
-    if (!globalFunctions.keySet().contains(pSolver)) {
+    if (!globalFunctions.containsKey(pSolver)) {
       noSharedDeclarations = true;
     }
-    if (!globalTerms.keySet().contains(pSolver)) {
+    if (!globalTerms.containsKey(pSolver)) {
       noSharedFormulas = true;
     }
 
