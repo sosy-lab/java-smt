@@ -102,9 +102,9 @@ public class BinaryModel extends AbstractModel<IExpression, Sort, PrincessEnviro
     String princessJar = filePath + fileName;
     new File(princessJar).setExecutable(true);
 
-    Process process =
-        Runtime.getRuntime()
-            .exec("java -jar " + princessJar + " +incremental " + filePath + "/Out.smt2");
+    ProcessBuilder builder = new ProcessBuilder();
+    builder.command("java", "-jar", princessJar, "+incremental", filePath, "/Out.smt2");
+    Process process = builder.start();
 
     StringBuilder output = new StringBuilder();
     try (InputStream is = process.getInputStream()) {
