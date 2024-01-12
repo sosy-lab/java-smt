@@ -10,6 +10,14 @@ SPDX-License-Identifier: Apache-2.0
 
 # JavaSMT ChangeLog
 
+## JavaSMT 4.1.0
+
+This release brings support for the SMT solver OpenSMT (version 2.5.2).
+
+## JavaSMT 4.0.3
+
+This release contains updates for several dependencies.
+
 ## JavaSMT 4.0.2
 
 This patch release improves documentation and updates the dependency for our Yices2 component.

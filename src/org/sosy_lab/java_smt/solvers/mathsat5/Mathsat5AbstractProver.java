@@ -157,18 +157,14 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   }
 
   @Override
-  public void push() throws InterruptedException {
-    Preconditions.checkState(!closed);
+  protected void pushImpl() throws InterruptedException {
     msat_push_backtrack_point(curEnv);
-    super.push();
   }
 
   @Override
-  public void pop() {
-    Preconditions.checkState(!closed);
+  protected void popImpl() {
     closeAllEvaluators();
     msat_pop_backtrack_point(curEnv);
-    super.pop();
   }
 
   @Override

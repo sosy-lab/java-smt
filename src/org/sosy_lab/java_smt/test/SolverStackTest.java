@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2023 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -27,33 +27,10 @@ import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
-import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.api.FunctionDeclaration;
-import org.sosy_lab.java_smt.api.Model;
-import org.sosy_lab.java_smt.api.NumeralFormula;
-import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.java_smt.api.NumeralFormulaManager;
+import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
-import org.sosy_lab.java_smt.api.SolverException;
 
-@RunWith(Parameterized.class)
-@SuppressWarnings("resource")
-public class SolverStackTest extends SolverBasedTest0 {
-
-  @Parameters(name = "{0} (interpolation={1}}")
-  public static List<Object[]> getAllCombinations() {
-    List<Object[]> result = new ArrayList<>();
-    for (Solvers solver : Solvers.values()) {
-      for (String kind : new String[] {"default", "optimize", "interpolation"}) {
-        result.add(new Object[] {solver, kind});
-      }
-    }
-    return result;
-  }
-
-  @Parameter(0)
-  public Solvers solver;
+public class SolverStackTest extends SolverStackTest0 {
 
   @Override
   protected Solvers solverToUse() {
@@ -692,5 +669,9 @@ public class SolverStackTest extends SolverBasedTest0 {
         assertThrows(IllegalStateException.class, stack::pop);
       }
     }
+    
+  protected BasicProverEnvironment<?> newEnvironmentForTest(
+      SolverContext pContext, ProverOptions... options) {
+    return pContext.newProverEnvironment(options);
   }
 }

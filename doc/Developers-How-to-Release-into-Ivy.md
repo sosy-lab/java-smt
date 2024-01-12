@@ -112,6 +112,22 @@ During the build process, our script automatically appends the git-revision afte
 Finally, follow the instructions shown in the message at the end.
 
 
+### Publishing OpenSMT
+
+We prefer/need to compile our own OpenSMT2 binaries and Java bindings.
+For simple usage, we provide a Docker definition/environment under `/docker`,
+in which the following command can be run.
+
+Download [OpenSMT](https://github.com/usi-verification-and-security/opensmt) using Git into a 
+file of your choice. The following command patches the OpenSMT2 API, generates Java bindings 
+with SWIG, builds the library, and packages it. 
+
+```
+ant publish-opensmt -Dopensmt.path=/workspace/opensmt -Dopensmt.customRev=2.5.2
+```
+Then upload the binaries to the Ivy repository using SVN as described in the message on the screen.
+
+
 ### Publishing Boolector
 
 We prefer to use our own Boolector binaries and Java bindings.
@@ -213,7 +229,7 @@ Afterwards you need to update the version number in `solvers_ivy_conf/ivy_javasm
 
 Info: There is a small cyclic dependency: JavaSMT itself depends on the Java components of Yices2.
 
-As long as no API was changed and compilation suceeds, simply execute `ant publish-artifacts-yices2`.
+As long as no API was changed and compilation succeeds, simply execute `ant publish-artifacts-yices2`.
 
 If the API was changed, we need to break the dependency cycle for the publication and revert this later:
 edit `lib/ivy.xml` and replace the dependency towards `javasmt-yices2` with the dependency towards `javasmt-solver-yices2`

@@ -55,8 +55,7 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
   }
 
   @Override
-  public void push() throws InterruptedException {
-    Preconditions.checkState(!closed);
+  protected void pushImpl() throws InterruptedException {
     push0();
     try {
       Native.solverPush(z3context, z3solver);
@@ -66,8 +65,7 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
   }
 
   @Override
-  public void pop() {
-    Preconditions.checkState(!closed);
+  protected void popImpl() {
     Native.solverPop(z3context, z3solver, 1);
     pop0();
   }

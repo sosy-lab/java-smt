@@ -108,11 +108,9 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   }
 
   @CanIgnoreReturnValue
-  protected int addConstraint0(BooleanFormula constraint) throws InterruptedException {
+  protected int addConstraint0(BooleanFormula constraint) {
     Preconditions.checkState(!closed);
     wasLastSatCheckSat = false;
-
-    super.addConstraint(constraint);
 
     final int formulaId = idGenerator.getFreshId();
     partitions.push(partitions.pop().putAndCopy(formulaId, constraint));
@@ -125,9 +123,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   }
 
   @Override
-  public final void push() throws InterruptedException {
-    Preconditions.checkState(!closed);
-    super.push();
+  protected final void pushImpl() {
     wasLastSatCheckSat = false;
     api.push();
     trackingStack.push(new Level());
@@ -135,9 +131,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   }
 
   @Override
-  public void pop() {
-    Preconditions.checkState(!closed);
-    Preconditions.checkState(size() > 0);
+  protected void popImpl() {
     wasLastSatCheckSat = false;
     api.pop();
 
@@ -150,7 +144,6 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
       trackingStack.peek().mergeWithHigher(level);
     }
     partitions.pop();
-    super.pop();
   }
 
   @SuppressWarnings("resource")

@@ -56,36 +56,34 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     incremental = !enableSL;
     solver = new Solver();
 
-    setSolverOptions(randomSeed, pOptions);
+    setSolverOptions(randomSeed, pOptions, solver);
   }
 
-  private void setSolverOptions(int randomSeed, Set<ProverOptions> pOptions) {
+  protected void setSolverOptions(int randomSeed, Set<ProverOptions> pOptions, Solver pSolver) {
     if (incremental) {
-      solver.setOption("incremental", "true");
+      pSolver.setOption("incremental", "true");
     }
     if (pOptions.contains(ProverOptions.GENERATE_MODELS)) {
-      solver.setOption("produce-models", "true");
+      pSolver.setOption("produce-models", "true");
     }
     if (pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE)) {
-      solver.setOption("produce-unsat-cores", "true");
+      pSolver.setOption("produce-unsat-cores", "true");
     }
-    solver.setOption("produce-assertions", "true");
-    solver.setOption("dump-models", "true");
-    solver.setOption("output-language", "smt2");
-    solver.setOption("seed", String.valueOf(randomSeed));
+    pSolver.setOption("produce-assertions", "true");
+    pSolver.setOption("dump-models", "true");
+    pSolver.setOption("output-language", "smt2");
+    pSolver.setOption("seed", String.valueOf(randomSeed));
 
     // Set Strings option to enable all String features (such as lessOrEquals)
-    solver.setOption("strings-exp", "true");
+    pSolver.setOption("strings-exp", "true");
 
     // Enable more complete quantifier solving (for more info see CVC5QuantifiedFormulaManager)
-    solver.setOption("full-saturate-quant", "true");
+    pSolver.setOption("full-saturate-quant", "true");
   }
 
   @Override
-  public void push() throws InterruptedException {
-    Preconditions.checkState(!closed);
+  protected void pushImpl() throws InterruptedException {
     setChanged();
-    super.push();
     if (incremental) {
       try {
         solver.push();
@@ -97,8 +95,7 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   @Override
-  public void pop() {
-    Preconditions.checkState(!closed);
+  protected void popImpl() {
     setChanged();
     if (incremental) {
       try {
@@ -108,15 +105,13 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
             "You tried to use pop() on an CVC5 assertion stack illegally.", e);
       }
     }
-    super.pop();
   }
 
   @Override
-  public @Nullable T addConstraint(BooleanFormula pF) throws InterruptedException {
+  protected @Nullable T addConstraintImpl(BooleanFormula pF) throws InterruptedException {
     Preconditions.checkState(!closed);
     setChanged();
-    super.addConstraint(pF);
-    Term exp = formulaManager.getFormulaCreator().extractInfo(pF);
+    Term exp = creator.extractInfo(pF);
     if (incremental) {
       solver.assertFormula(exp);
     }

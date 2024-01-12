@@ -103,8 +103,7 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
   }
 
   @Override
-  public void push() throws InterruptedException {
-    Preconditions.checkState(!closed);
+  protected void pushImpl() throws InterruptedException {
     push0();
     try {
       Native.optimizePush(z3context, z3optSolver);
@@ -114,8 +113,7 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
   }
 
   @Override
-  public void pop() {
-    Preconditions.checkState(!closed);
+  protected void popImpl() {
     Native.optimizePop(z3context, z3optSolver);
     pop0();
   }

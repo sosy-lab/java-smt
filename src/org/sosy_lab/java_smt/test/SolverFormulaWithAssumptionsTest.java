@@ -20,14 +20,22 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
 public class SolverFormulaWithAssumptionsTest
     extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+
+  // INFO: OpenSmt only support interpolation for QF_LIA, QF_LRA and QF_UF
+  @Override
+  protected Logics logicToUse() {
+    return Logics.QF_LIA;
+  }
 
   /**
    * Generate a prover environment depending on the parameter above. Can be overridden to
@@ -57,6 +65,11 @@ public class SolverFormulaWithAssumptionsTest
   public <T> void basicAssumptionsTest()
       throws SolverException, InterruptedException, InvalidConfigurationException, IOException {
     requireInterpolation();
+
+    assume()
+        .withMessage("Solver %s runs into timeout on this test", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC5);
 
     IntegerFormula v1 = imgr.makeVariable("v1");
     IntegerFormula v2 = imgr.makeVariable("v2");
@@ -99,6 +112,11 @@ public class SolverFormulaWithAssumptionsTest
   public <T> void assumptionsTest()
       throws SolverException, InterruptedException, InvalidConfigurationException, IOException {
     requireInterpolation();
+
+    assume()
+        .withMessage("Solver %s runs into timeout on this test", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC5);
 
     int n = 5;
 

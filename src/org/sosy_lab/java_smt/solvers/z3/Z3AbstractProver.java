@@ -45,7 +45,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
   private final Z3FormulaManager mgr;
 
   private final UniqueIdGenerator trackId = new UniqueIdGenerator();
-  private final Deque<PersistentMap<String, BooleanFormula>> storedConstraints;
+  @Nullable private final Deque<PersistentMap<String, BooleanFormula>> storedConstraints;
 
   private final @Nullable PathCounterTemplate logfile;
 
@@ -123,11 +123,11 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
   protected abstract void assertContraintAndTrack(long constraint, long symbol);
 
   @Override
-  public Void addConstraint(BooleanFormula f) throws InterruptedException {
+  protected Void addConstraintImpl(BooleanFormula f) throws InterruptedException {
+    Preconditions.checkState(!closed);
     if (Generator.isLoggingEnabled()) {
       Generator.assembleConstraint(f);
     }
-    Preconditions.checkState(!closed);
     long e = creator.extractInfo(f);
     Native.incRef(z3context, e);
     try {
@@ -148,9 +148,8 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
     return null;
   }
 
-  protected void push0() throws InterruptedException {
+  protected void push0() {
     Preconditions.checkState(!closed);
-    super.push();
     if (storedConstraints != null) {
       storedConstraints.push(storedConstraints.peek());
     }
@@ -161,7 +160,6 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
     if (storedConstraints != null) {
       storedConstraints.pop();
     }
-    super.pop();
   }
 
   protected abstract long getUnsatCore0();

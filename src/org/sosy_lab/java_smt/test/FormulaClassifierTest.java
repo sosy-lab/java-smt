@@ -39,6 +39,14 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
     classifier = new FormulaClassifier(context);
   }
 
+  private void requireNonlinear() {
+    // INFO: OpenSMT does not allow nonlinear formulas, even when the solver is not called
+    assume()
+        .withMessage("Solver %s does not support nonlinear formulas", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.OPENSMT);
+  }
+
   @Test
   public void test_AUFLIA() throws IOException {
     requireParser();
@@ -58,6 +66,12 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
 
   @Test
   public void test_QF_AUFLIRA() throws IOException {
+    // INFO: AUFLIRA only support integers OR reals in OpenSMT
+    assume()
+        .withMessage("Solver %s does not support mixed integer-real arithmetic", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.OPENSMT);
+
     requireParser();
     requireRationals();
     String query = VARS + "(assert (= (select arr x) (bar (/ 1 2))))";
@@ -69,6 +83,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
   public void test_QF_AUFNIRA() throws IOException {
     requireParser();
     requireRationals();
+    requireNonlinear();
     String query = VARS + "(assert (= (select arr (* x x)) (bar (/ 1 2))))";
     classifier.visit(mgr.parse(query));
     assertThat(classifier.toString()).isEqualTo("QF_AUFNIRA");
@@ -146,6 +161,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
   @Test
   public void test_QF_NIA() throws IOException {
     requireParser();
+    requireNonlinear();
     String query = VARS + "(assert (< xx (* x x)))";
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
     classifier.visit(mgr.parse(query));
@@ -155,6 +171,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
   @Test
   public void test_QF_NRA() throws IOException {
     requireParser();
+    requireNonlinear();
     String query = VARS + "(assert (< yy (* y y)))";
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
     classifier.visit(mgr.parse(query));
@@ -201,6 +218,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
   @Test
   public void test_QF_UFNRA() throws IOException {
     requireParser();
+    requireNonlinear();
     String query = VARS + "(assert (< (* y yy) (bar y)))";
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
     classifier.visit(mgr.parse(query));

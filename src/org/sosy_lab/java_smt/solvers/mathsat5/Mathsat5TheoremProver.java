@@ -37,9 +37,8 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
 
   @Override
   @Nullable
-  public Void addConstraint(BooleanFormula constraint) throws InterruptedException {
+  protected Void addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
     Preconditions.checkState(!closed);
-    super.addConstraint(constraint);
     closeAllEvaluators();
     msat_assert_formula(curEnv, getMsatTerm(constraint));
     return null;

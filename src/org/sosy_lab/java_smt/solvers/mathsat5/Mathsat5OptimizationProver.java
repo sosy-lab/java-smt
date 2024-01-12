@@ -70,8 +70,7 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
 
   @Override
   @Nullable
-  public Void addConstraint(BooleanFormula constraint) throws InterruptedException {
-    super.addConstraint(constraint);
+  protected Void addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
     msat_assert_formula(curEnv, getMsatTerm(constraint));
     return null;
   }
@@ -108,16 +107,15 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
   }
 
   @Override
-  public void push() throws InterruptedException {
-    super.push();
+  protected void pushImpl() throws InterruptedException {
+    super.pushImpl();
     stack.add(objectiveMap);
   }
 
   @Override
-  public void pop() {
-    checkState(!closed);
+  protected void popImpl() {
     objectiveMap = stack.pop();
-    super.pop();
+    super.popImpl();
   }
 
   @Override

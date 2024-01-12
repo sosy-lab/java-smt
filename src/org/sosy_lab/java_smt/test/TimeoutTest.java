@@ -24,6 +24,7 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Tactic;
+import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
 /** Check that timeout is handled gracefully. */
 @RunWith(Parameterized.class)
@@ -53,6 +54,12 @@ public class TimeoutTest extends SolverBasedTest0 {
   @Override
   protected Solvers solverToUse() {
     return solver;
+  }
+
+  // INFO: OpenSmt only support interpolation for QF_LIA, QF_LRA and QF_UF
+  @Override
+  protected Logics logicToUse() {
+    return Logics.QF_LIA;
   }
 
   @Test
@@ -133,6 +140,7 @@ public class TimeoutTest extends SolverBasedTest0 {
                 throw new UnsupportedOperationException("Unexpected interrupt");
               }
             });
+
     try (BasicProverEnvironment<?> pe = proverConstructor.get()) {
       pe.push(instance);
       t.start();

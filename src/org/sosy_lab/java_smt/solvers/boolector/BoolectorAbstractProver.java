@@ -111,17 +111,12 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   @Override
-  public void pop() {
-    Preconditions.checkState(!closed);
-    Preconditions.checkState(size() > 0);
+  protected void popImpl() {
     BtorJNI.boolector_pop(manager.getEnvironment(), 1);
-    super.pop();
   }
 
   @Override
-  public void push() throws InterruptedException {
-    Preconditions.checkState(!closed);
-    super.push();
+  protected void pushImpl() throws InterruptedException {
     BtorJNI.boolector_push(manager.getEnvironment(), 1);
   }
 
@@ -164,8 +159,7 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @Override
   @Nullable
-  public T addConstraint(BooleanFormula constraint) throws InterruptedException {
-    super.addConstraint(constraint);
+  protected T addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
     BtorJNI.boolector_assert(
         manager.getEnvironment(), BoolectorFormulaManager.getBtorTerm(constraint));
     return null;

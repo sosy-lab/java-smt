@@ -14,10 +14,12 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Table;
 import io.github.cvc5.CVC5ApiException;
 import io.github.cvc5.Datatype;
 import io.github.cvc5.DatatypeConstructor;
@@ -29,6 +31,7 @@ import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
 import io.github.cvc5.Triplet;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -72,7 +75,9 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
   // private static final Pattern FLOATING_POINT_PATTERN = Pattern.compile("^\\(fp #b(?<sign>\\d)
   // #b(?<exp>\\d+) #b(?<mant>\\d+)$");
 
-  private final Map<String, Term> variablesCache = new HashMap<>();
+  // <Name, Sort.toString, Term> because CVC5 returns distinct pointers for types, while the
+  // String representation is equal (and they are equal)
+  private final Table<String, String, Term> variablesCache = HashBasedTable.create();
   private final Map<String, Term> functionsCache = new HashMap<>();
   private final Solver solver;
 
@@ -89,15 +94,32 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
 
   @Override
   public Term makeVariable(Sort sort, String name) {
-    checkSymbol(name);
-    Term exp = variablesCache.computeIfAbsent(name, n -> solver.mkConst(sort, name));
-    Preconditions.checkArgument(
-        sort.equals(exp.getSort()),
-        "symbol name %s with sort %s already in use for different sort %s",
-        name,
-        sort,
-        exp.getSort());
-    return exp;
+    Term existingVar = variablesCache.get(name, sort.toString());
+    if (existingVar != null) {
+      return existingVar;
+    }
+    if (variablesCache.containsRow(name)) {
+      throw new IllegalArgumentException(
+          "Symbol "
+              + name
+              + " requested with type "
+              + sort
+              + ", but "
+              + "already "
+              + "used "
+              + "with "
+              + "type "
+              + variablesCache
+                  .rowMap()
+                  .get(name)
+                  .entrySet()
+                  .toArray((java.util.Map.Entry[]) Array.newInstance(java.util.Map.Entry.class, 0))[
+                  0]
+                  .getKey());
+    }
+    Term newVar = solver.mkConst(sort, name);
+    variablesCache.put(name, sort.toString(), newVar);
+    return newVar;
   }
 
   /**
@@ -392,7 +414,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
         // BOUND vars are used for all vars that are bound to a quantifier in CVC5.
         // We resubstitute them back to the original free.
         // CVC5 doesn't give you the de-brujin index
-        Term originalVar = variablesCache.get(dequote(formula.toString()));
+        Term originalVar = accessVariablesCache(formula.toString(), sort);
         return visitor.visitBoundVariable(encapsulate(originalVar), 0);
 
       } else if (f.getKind() == Kind.FORALL || f.getKind() == Kind.EXISTS) {
@@ -402,7 +424,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
         List<Formula> freeVars = new ArrayList<>();
         for (Term boundVar : f.getChild(0)) { // unpack grand-children of f.
           String name = getName(boundVar);
-          Term freeVar = Preconditions.checkNotNull(variablesCache.get(name));
+          Term freeVar = Preconditions.checkNotNull(accessVariablesCache(name, boundVar.getSort()));
           body = body.substitute(boundVar, freeVar);
           freeVars.add(encapsulate(freeVar));
         }
@@ -829,5 +851,29 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
               value, valueType, type),
           e);
     }
+  }
+
+  private Term accessVariablesCache(String name, Sort sort) {
+    Term existingVar = variablesCache.get(name, sort.toString());
+    if (existingVar == null) {
+      throw new IllegalArgumentException(
+          "Symbol "
+              + name
+              + " requested with type "
+              + sort
+              + ", but "
+              + "already "
+              + "used "
+              + "with "
+              + "type"
+              + variablesCache
+                  .rowMap()
+                  .get(name)
+                  .entrySet()
+                  .toArray((java.util.Map.Entry[]) Array.newInstance(java.util.Map.Entry.class, 0))[
+                  0]
+                  .getKey());
+    }
+    return existingVar;
   }
 }
