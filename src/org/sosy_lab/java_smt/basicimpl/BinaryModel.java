@@ -91,13 +91,14 @@ public class BinaryModel extends AbstractModel<IExpression, Sort, PrincessEnviro
     // FIXME: This method uses the standalone binary, which has to be copied to the main folder.
     //  We should switch to the version that is already included in our distribution.
 
+    String princessPath = "lib/native/source/princess/princess-bin-2023-06-19/dist/";
     try {
       Process process =
           new ProcessBuilder()
               .command(
                   "java",
                   "-cp",
-                  "princess_all-2023-06-19.jar",
+                  princessPath + "princess-all.jar",
                   "ap.CmdlMain",
                   "-logo",
                   "+incremental",
