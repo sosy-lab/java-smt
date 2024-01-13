@@ -109,8 +109,8 @@ public class SolverContextFactory {
               + "This affects only the theories of integer and rational arithmetic.")
   private NonLinearArithmetic nonLinearArithmetic = NonLinearArithmetic.USE;
 
-  @Option(secure = true, description = "test.")
-  private boolean generateSMTLIB2;
+  @Option(secure = true, description = "Enable SMTLIB2 script generation.")
+  private boolean generateSMTLIB2 = false;
 
   private final LogManager logger;
   private final ShutdownNotifier shutdownNotifier;
@@ -126,14 +126,6 @@ public class SolverContextFactory {
       Configuration pConfig, LogManager pLogger, ShutdownNotifier pShutdownNotifier)
       throws InvalidConfigurationException {
     this(pConfig, pLogger, pShutdownNotifier, NativeLibraries::loadLibrary);
-  }
-
-  public boolean isGenerateSMTLIB2() {
-    return generateSMTLIB2;
-  }
-
-  public void setGenerateSMTLIB2(boolean pGenerateSMTLIB2) {
-    generateSMTLIB2 = pGenerateSMTLIB2;
   }
 
   /**
@@ -299,8 +291,8 @@ public class SolverContextFactory {
       case PRINCESS:
         return PrincessSolverContext.create(
             config, shutdownNotifier, logfile, (int) randomSeed, nonLinearArithmetic);
+
       case PRINCESS_BINARY:
-        generateSMTLIB2 = true;
         return PrincessSolverContext.create(
             config,
             // Configuration.fromCmdLineArguments(cmdLineArguments),

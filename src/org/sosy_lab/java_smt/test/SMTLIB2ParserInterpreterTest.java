@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Objects;
 import org.junit.Assert;
 import org.junit.Test;
+import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.ArrayFormula;
@@ -52,6 +53,13 @@ import org.sosy_lab.java_smt.basicimpl.parserInterpreter.ParserException;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Visitor;
 
 public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+  @Override
+  protected ConfigurationBuilder createTestConfigBuilder() {
+    ConfigurationBuilder newConfig = super.createTestConfigBuilder();
+    return solverToUse() == Solvers.PRINCESS_BINARY
+        ? newConfig.setOption("solver.generateSMTLIB2", String.valueOf(true))
+        : newConfig;
+  }
 
   public void clearVisitor() {
     Generator.setIsLoggingEnabled(true);

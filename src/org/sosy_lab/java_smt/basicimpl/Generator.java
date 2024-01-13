@@ -52,6 +52,8 @@ public class Generator {
   }
 
   private static boolean loggingEnabled = false;
+
+  // TODO: Add an option to set the output path
   private static final String file = "Out.smt2";
 
   /** collects assembled SMT-LIB2, its value will be written to Out.smt2 */

@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Objects;
 import org.junit.Assert;
 import org.junit.Test;
+import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula;
@@ -35,6 +36,11 @@ import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.basicimpl.Generator;
 
 public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+  @Override
+  protected ConfigurationBuilder createTestConfigBuilder() {
+    ConfigurationBuilder newConfig = super.createTestConfigBuilder();
+    return newConfig.setOption("solver.generateSMTLIB2", String.valueOf(true));
+  }
 
   /** Z3 runs only when executed separately from other solvers */
   public void clearGenerator() {
@@ -263,12 +269,14 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
   @Test
   public void testIntegerDivide() {
     requireIntegers();
+    // OpenSMT does not allow division by zero
+    assume().that(solverToUse()).isNotEqualTo(Solvers.OPENSMT);
+
     clearGenerator();
     IntegerFormula a = imgr.makeNumber(1);
     IntegerFormula b = imgr.makeNumber(-5);
     IntegerFormula c = imgr.makeNumber("3");
     IntegerFormula e = imgr.makeNumber(2147483647);
-
     BooleanFormula constraint = imgr.equal(a, imgr.divide(b, imgr.divide(c, e)));
     Generator.assembleConstraint(constraint);
     String actualResult = String.valueOf(Generator.lines);
@@ -637,6 +645,9 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
   @Test
   public void testRationalFloor() {
     requireRationals();
+    // OpenSMT does not support 'floor'
+    assume().that(solverToUse()).isNotEqualTo(Solvers.OPENSMT);
+
     clearGenerator();
     RationalFormula a = Objects.requireNonNull(rmgr).makeNumber(-1);
     RationalFormula c = rmgr.makeNumber("3.4");
