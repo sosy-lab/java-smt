@@ -74,9 +74,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
             .encapsulate(FormulaType.IntegerType, toIntegerFormulaImpl(param1, signed));
     if (Generator.isLoggingEnabled()) {
       throw new GeneratorException(
-          "\"toIntegerFormula operation is not available for \"\n"
-              + "        + \"bitvectors in \"\n"
-              + "        + \"SMT-LIB2\"");
+          "toIntegerFormula operation is not available for bitvectors in SMTLIB2");
     }
     return result;
   }
