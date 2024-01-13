@@ -88,27 +88,25 @@ public class BinaryModel extends AbstractModel<IExpression, Sort, PrincessEnviro
     // FIXME: This method is called twice, once for isUnsat and once to get the model.
     //  Instead of running the solver twice we should cache the result.
 
-    // FIXME: This method uses the standalone binary, which has to be copied to the main folder.
-    //  We should switch to the version that is already included in our distribution.
-
-    String princessPath = "lib/native/source/princess/princess-bin-2023-06-19/dist/";
+    // FIXME: Pull the version from the configuration
+    String princessJar = "princess_2.13.jar";
     try {
       Process process =
           new ProcessBuilder()
               .command(
                   "java",
                   "-cp",
-                  princessPath + "princess-all.jar",
+                  "lib/java/runtime-princess/*:lib/java/runtime-princess/" + princessJar,
                   "ap.CmdlMain",
                   "-logo",
                   "+incremental",
-                  "Out.smt2")
+                  "Out.smt2") // FIXME: Use a temporary file (same for Model.smt2)
               .start();
 
       StringBuilder output = new StringBuilder();
       try (InputStream is = process.getInputStream()) {
         // Wait until the process has finished and throw an exception if an error occurred
-        assert process.waitFor() == 0;
+        assert process.waitFor() == 0; // TODO: Add an better error message
 
         try (InputStreamReader isr = new InputStreamReader(is, Charset.defaultCharset())) {
           try (BufferedReader br = new BufferedReader(isr)) {
