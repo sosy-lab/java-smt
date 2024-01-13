@@ -1,6 +1,0 @@
-(set-logic AUFLIA)
-(declare-fun a () (Array Int Int))
-(declare-fun b () (Array Int Int))
-(assert (= (store a 0 1) b))
-(assert (= (select b 0) 2))
-(check-sat)

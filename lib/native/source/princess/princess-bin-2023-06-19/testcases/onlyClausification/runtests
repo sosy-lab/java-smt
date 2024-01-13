@@ -1,9 +1,0 @@
-#!/bin/sh
-
-# tests only runnable with unit resolution and clausification
-
-PRI=../../princess
-
-TESTS="PUZ031p1.pri PHI009+1.pri"
-
-$PRI "$@" $TESTS
