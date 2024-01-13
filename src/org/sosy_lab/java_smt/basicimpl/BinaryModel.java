@@ -24,7 +24,6 @@ import ap.parser.IExpression;
 import ap.types.Sort;
 import com.google.common.collect.ImmutableList;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -49,8 +48,6 @@ import org.sosy_lab.java_smt.solvers.princess.PrincessEnvironment;
  * Princess' output model from the file "Model.smt2" back to JavaSMT.
  */
 public class BinaryModel extends AbstractModel<IExpression, Sort, PrincessEnvironment> {
-  private final String filePath = System.getProperty("user.dir");
-
   AbstractFormulaManager<IExpression, Sort, PrincessEnvironment, ?> mgr;
   private final BooleanFormulaManager bmgr;
   private final IntegerFormulaManager imgr;
@@ -83,57 +80,59 @@ public class BinaryModel extends AbstractModel<IExpression, Sort, PrincessEnviro
 
   @Override
   protected @Nullable IExpression evalImpl(IExpression formula) {
-    return null;
-  }
-
-  protected ImmutableList<ValueAssignment> listToImmutable(List<ValueAssignment> pList) {
-    ImmutableList<ValueAssignment> immutableList = ImmutableList.copyOf(pList);
-    return immutableList;
+    throw new UnsupportedOperationException("Princess (Binary) does not support eval().");
   }
 
   /** generates an SMT-LIB2 model from Princess and writes it into a file "Model.smt2" */
   public void getOutput() {
-    // FIXME: Find a better way to handle IO errors
-    try {
-      String fileName = "/princess_all-2023-06-19.jar";
-      String princessJar = filePath + fileName;
-      new File(princessJar).setExecutable(true);
+    // FIXME: This method is called twice, once for isUnsat and once to get the model.
+    //  Instead of running the solver twice we should cache the result.
 
-      ProcessBuilder builder = new ProcessBuilder();
-      builder.command("java", "-jar", princessJar, "+incremental", filePath, "/Out.smt2");
-      Process process = builder.start();
+    // FIXME: This method uses the standalone binary, which has to be copied to the main folder.
+    //  We should switch to the version that is already included in our distribution.
+
+    try {
+      Process process =
+          new ProcessBuilder()
+              .command(
+                  "java",
+                  "-cp",
+                  "princess_all-2023-06-19.jar",
+                  "ap.CmdlMain",
+                  "-logo",
+                  "+incremental",
+                  "Out.smt2")
+              .start();
 
       StringBuilder output = new StringBuilder();
       try (InputStream is = process.getInputStream()) {
-        try {
-          process.waitFor();
-        } catch (InterruptedException pE) {
-          throw new RuntimeException(pE);
-        }
+        // Wait until the process has finished and throw an exception if an error occurred
+        assert process.waitFor() == 0;
+
         try (InputStreamReader isr = new InputStreamReader(is, Charset.defaultCharset())) {
           try (BufferedReader br = new BufferedReader(isr)) {
-            String lines;
-            while ((lines = br.readLine()) != null) {
+            // Read the first line to get the result (either "sat" or "unsat")
+            isUnsat = br.readLine().equals("unsat");
+
+            // Read the rest of the file to get the model
+            String lines = br.readLine();
+            while (lines != null) {
               output.append(lines).append("\n");
+              lines = br.readLine();
             }
-            if (String.valueOf(output).startsWith("un")) {
-              isUnsat = true;
-              output.delete(0, 5);
-            } else {
-              isUnsat = false;
-              output.delete(0, 3);
-            }
-            Generator.writeToFile(String.valueOf(output), (filePath + "/Model.smt2"));
+
+            // Store it in Model.smt2
+            Generator.writeToFile(String.valueOf(output), "Model.smt2");
           }
         }
       }
-    } catch (IOException e) {
+    } catch (IOException | InterruptedException e) {
+      // FIXME: Find a better way to handle IO errors
       throw new RuntimeException(e);
     }
   }
 
   private List<ValueAssignment> parseModel(String pString) {
-    // FIXME: Find a better way to handle IO errors
     try {
       smtlibv2Lexer lexer = new smtlibv2Lexer(CharStreams.fromFileName(pString));
       smtlibv2Parser parser = new smtlibv2Parser(new CommonTokenStream(lexer));
@@ -142,6 +141,7 @@ public class BinaryModel extends AbstractModel<IExpression, Sort, PrincessEnviro
       assignments = visitor.getAssignments();
       return assignments;
     } catch (IOException e) {
+      // FIXME: Find a better way to handle IO errors
       throw new RuntimeException(e);
     }
   }
@@ -149,11 +149,11 @@ public class BinaryModel extends AbstractModel<IExpression, Sort, PrincessEnviro
   protected void getAssignments() throws ModelException {
     getOutput();
     if (!isUnsat) {
-      assignments = parseModel(filePath + "/Model.smt2");
+      assignments = parseModel("Model.smt2");
     } else {
       throw new ModelException("Formula has to be sat in order to retrieve a model.");
     }
-    finalList = listToImmutable(assignments);
+    finalList = ImmutableList.copyOf(assignments);
   }
 
   @Override
@@ -180,9 +180,5 @@ public class BinaryModel extends AbstractModel<IExpression, Sort, PrincessEnviro
 
   public boolean isUnsat() {
     return isUnsat;
-  }
-
-  public void setUnsat(boolean pUnsat) {
-    isUnsat = pUnsat;
   }
 }

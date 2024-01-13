@@ -1480,11 +1480,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
     // Broken for anything but Princess
-    assume()
-        .that(solverToUse())
-        .isAnyOf(
-            Solvers.PRINCESS,
-            Solvers.PRINCESS_BINARY);
+    assume().that(solverToUse()).isAnyOf(Solvers.PRINCESS, Solvers.PRINCESS_BINARY);
     clearVisitor();
 
     String x = "(assert (= (- (to_int 5) (to_int 1)) (- (to_int 3) (to_int 2147483647))))\n";
@@ -3552,9 +3548,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     clearVisitor();
     clearGenerator();
-    assume()
-        .that(solverToUse())
-        .isEqualTo(Solvers.PRINCESS_BINARY);
+    assume().that(solverToUse()).isEqualTo(Solvers.PRINCESS_BINARY);
     String a =
         "(declare-const c Bool)\n"
             + "(declare-const d Bool)\n"
@@ -3605,9 +3599,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     requireBitvectors();
     clearVisitor();
     clearGenerator();
-    assume()
-        .that(solverToUse())
-        .isEqualTo(Solvers.PRINCESS_BINARY);
+    assume().that(solverToUse()).isEqualTo(Solvers.PRINCESS_BINARY);
     String a =
         "(declare-const c (_ BitVec 3))\n"
             + "(declare-const d (_ BitVec 3))\n"
@@ -3660,9 +3652,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     requireArrayModel();
     clearVisitor();
     clearGenerator();
-    assume()
-        .that(solverToUse())
-        .isEqualTo(Solvers.PRINCESS_BINARY);
+    assume().that(solverToUse()).isEqualTo(Solvers.PRINCESS_BINARY);
     String a =
         "(declare-const c (Array Int Int))\n"
             + "(declare-const d (Array Int Int))\n"
@@ -3719,9 +3709,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     requireBitvectors();
     clearVisitor();
     clearGenerator();
-    assume()
-        .that(solverToUse())
-        .isEqualTo(Solvers.PRINCESS_BINARY);
+    assume().that(solverToUse()).isEqualTo(Solvers.PRINCESS_BINARY);
     String a =
         "(declare-const c (Array (_ BitVec 32) (_ BitVec 32)))\n"
             + "(declare-const d (Array (_ BitVec 32) (_ BitVec 32)))\n"
@@ -3802,9 +3790,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     requireArrayModel();
     clearVisitor();
     clearGenerator();
-    assume()
-        .that(solverToUse())
-        .isEqualTo(Solvers.PRINCESS_BINARY);
+    assume().that(solverToUse()).isEqualTo(Solvers.PRINCESS_BINARY);
     String a =
         "(declare-const c (Array Bool Bool))\n"
             + "(declare-const d (Array Bool Bool))\n"
@@ -3861,9 +3847,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     requireArrayModel();
     clearVisitor();
     clearGenerator();
-    assume()
-        .that(solverToUse())
-        .isEqualTo(Solvers.PRINCESS_BINARY);
+    assume().that(solverToUse()).isEqualTo(Solvers.PRINCESS_BINARY);
     String a =
         "(declare-const c (Array (Array Bool Bool) (Array Bool Bool)))\n"
             + "(declare-const d (Array (Array Bool Bool) (Array Bool Bool)))\n"
