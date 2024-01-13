@@ -1144,6 +1144,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testIntegerDivide()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
+    assume().that(solverToUse()).isNotEqualTo(Solvers.OPENSMT);
     clearVisitor();
 
     String x = "(assert (= 1 (div 5 (div 3 2147483647))))\n";
@@ -1478,15 +1479,12 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testIntegerFloor()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
+    // Broken for anything but Princess
     assume()
         .that(solverToUse())
-        .isNoneOf(
-            Solvers.MATHSAT5,
-            Solvers.SMTINTERPOL,
-            Solvers.Z3,
-            Solvers.CVC4,
-            Solvers.CVC5,
-            Solvers.YICES2);
+        .isAnyOf(
+            Solvers.PRINCESS,
+            Solvers.PRINCESS_BINARY);
     clearVisitor();
 
     String x = "(assert (= (- (to_int 5) (to_int 1)) (- (to_int 3) (to_int 2147483647))))\n";
@@ -1497,12 +1495,10 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     IntegerFormula b = imgr.makeNumber(5);
     IntegerFormula c = imgr.makeNumber("3");
     IntegerFormula e = imgr.makeNumber(2147483647);
-    BooleanFormula constraint =
+    BooleanFormula expectedResult =
         imgr.equal(
             imgr.subtract(imgr.floor(b), imgr.floor(a)),
             imgr.subtract(imgr.floor(c), imgr.floor(e)));
-
-    BooleanFormula expectedResult = constraint;
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -1511,6 +1507,8 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testRationalFloor()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireRationals();
+    // OpenSMT does not support 'floor'
+    assume().that(solverToUse()).isNotEqualTo(Solvers.OPENSMT);
     clearVisitor();
 
     String x = "(assert (= (to_int 1.0) (- (to_int 3.4) (to_int 2147483.647))))\n";
@@ -1697,7 +1695,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testModulo()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.CVC4);
     clearVisitor();
 
     String x =
@@ -1729,7 +1726,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testMultiply()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.CVC4);
     clearVisitor();
 
     String x =
@@ -2507,8 +2503,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test(expected = ParserException.class)
   public void testExceptionBVNeg2()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    assume().that(solverToUse()).isNotEqualTo(Solvers.SMTINTERPOL);
-    requireIntegers();
+    requireBitvectors();
     clearVisitor();
 
     String x = "(assert (bvneg #b100 #b100))\n";
@@ -2519,7 +2514,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test(expected = ParserException.class)
   public void testExceptionBVAdd()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    requireIntegers();
+    requireBitvectors();
     clearVisitor();
 
     String x = "(assert (bvadd true false))\n";
@@ -2530,8 +2525,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test(expected = ParserException.class)
   public void testExceptionBVAdd3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.SMTINTERPOL);
+    requireBitvectors();
     clearVisitor();
 
     String x = "(assert (bvadd #b001 #b100 #b100))\n";
@@ -2542,8 +2536,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test(expected = ParserException.class)
   public void testExceptionBVSub()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.SMTINTERPOL);
+    requireBitvectors();
     clearVisitor();
 
     String x = "(assert (bvsub true false))\n";
@@ -2554,8 +2547,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test(expected = ParserException.class)
   public void testExceptionBVSub3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.SMTINTERPOL);
+    requireBitvectors();
     clearVisitor();
 
     String x = "(assert (bvsub #b001 #b100 #b100))\n";
@@ -2566,8 +2558,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test(expected = ParserException.class)
   public void testExceptionBVsdiv()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.SMTINTERPOL);
+    requireBitvectors();
     clearVisitor();
 
     String x = "(assert (bvsdiv true false))\n";
@@ -2578,8 +2569,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test(expected = ParserException.class)
   public void testExceptionBVsdiv3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.SMTINTERPOL);
+    requireBitvectors();
     clearVisitor();
 
     String x = "(assert (bvsdiv #b001 #b100 #b100))\n";
@@ -2601,8 +2591,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test(expected = ParserException.class)
   public void testExceptionBVudiv3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.SMTINTERPOL);
+    requireBitvectors();
     clearVisitor();
 
     String x = "(assert (bvudiv #b001 #b100 #b100))\n";
@@ -2624,8 +2613,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test(expected = ParserException.class)
   public void testExceptionBVsrem3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.SMTINTERPOL);
+    requireBitvectors();
     clearVisitor();
 
     String x = "(assert (bvsrem #b001 #b100 #b100))\n";
@@ -2647,8 +2635,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test(expected = ParserException.class)
   public void testExceptionBVurem3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.SMTINTERPOL);
+    requireBitvectors();
     clearVisitor();
 
     String x = "(assert (bvurem #b001 #b100 #b100))\n";
@@ -2670,8 +2657,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test(expected = ParserException.class)
   public void testExceptionBVmul3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.SMTINTERPOL);
+    requireBitvectors();
     clearVisitor();
 
     String x = "(assert (bvmul #b001 #b100 #b100))\n";
@@ -2693,8 +2679,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test(expected = ParserException.class)
   public void testExceptionBVsgt3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.SMTINTERPOL);
+    requireBitvectors();
     clearVisitor();
 
     String x = "(assert (bvsgt #b001 #b100 #b100))\n";
@@ -2716,8 +2701,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test(expected = ParserException.class)
   public void testExceptionBVugt3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.SMTINTERPOL);
+    requireBitvectors();
     clearVisitor();
 
     String x = "(assert (bvugt #b001 #b100 #b100))\n";
@@ -2739,8 +2723,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test(expected = ParserException.class)
   public void testExceptionBVsge3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.SMTINTERPOL);
+    requireBitvectors();
     clearVisitor();
 
     String x = "(assert (bvsge #b001 #b100 #b100))\n";
@@ -2762,8 +2745,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test(expected = ParserException.class)
   public void testExceptionBVuge3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.SMTINTERPOL);
+    requireBitvectors();
     clearVisitor();
 
     String x = "(assert (bvuge #b001 #b100 #b100))\n";
@@ -2785,8 +2767,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test(expected = ParserException.class)
   public void testExceptionBVslt3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.SMTINTERPOL);
+    requireBitvectors();
     clearVisitor();
 
     String x = "(assert (bvslt #b001 #b100 #b100))\n";
@@ -2808,8 +2789,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test(expected = ParserException.class)
   public void testExceptionBVult3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.SMTINTERPOL);
+    requireBitvectors();
     clearVisitor();
 
     String x = "(assert (bvult #b001 #b100 #b100))\n";
@@ -2831,8 +2811,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test(expected = ParserException.class)
   public void testExceptionBVsle3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.SMTINTERPOL);
+    requireBitvectors();
     clearVisitor();
 
     String x = "(assert (bvsle #b001 #b100 #b100))\n";
@@ -2854,8 +2833,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test(expected = ParserException.class)
   public void testExceptionBVule3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.SMTINTERPOL);
+    requireBitvectors();
     clearVisitor();
 
     String x = "(assert (bvule #b001 #b100 #b100))\n";
@@ -2877,8 +2855,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test(expected = ParserException.class)
   public void testExceptionBVnot2()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.SMTINTERPOL);
+    requireBitvectors();
     clearVisitor();
 
     String x = "(assert (bvnot #b100 #b100))\n";
@@ -2900,8 +2877,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test(expected = ParserException.class)
   public void testExceptionBVand3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.SMTINTERPOL);
+    requireBitvectors();
     clearVisitor();
 
     String x = "(assert (bvand #b001 #b100 #b100))\n";
@@ -2913,7 +2889,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVor()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.SMTINTERPOL);
     clearVisitor();
 
     String x = "(assert (bvor true false))\n";
@@ -2924,8 +2899,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test(expected = ParserException.class)
   public void testExceptionBVor3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.SMTINTERPOL);
+    requireBitvectors();
     clearVisitor();
 
     String x = "(assert (bvor #b001 #b100 #b100))\n";
@@ -2947,8 +2921,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test(expected = ParserException.class)
   public void testExceptionBVxor3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.SMTINTERPOL);
+    requireBitvectors();
     clearVisitor();
 
     String x = "(assert (bvxor #b001 #b100 #b100))\n";
@@ -2970,8 +2943,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test(expected = ParserException.class)
   public void testExceptionBVashr3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.SMTINTERPOL);
+    requireBitvectors();
     clearVisitor();
 
     String x = "(assert (bvashr #b001 #b100 #b100))\n";
@@ -2993,8 +2965,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test(expected = ParserException.class)
   public void testExceptionBVlshr3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.SMTINTERPOL);
+    requireBitvectors();
     clearVisitor();
 
     String x = "(assert (bvlshr #b001 #b100 #b100))\n";
@@ -3016,8 +2987,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test(expected = ParserException.class)
   public void testExceptionBVshl3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.SMTINTERPOL);
+    requireBitvectors();
     clearVisitor();
 
     String x = "(assert (bvshl #b001 #b100 #b100))\n";
@@ -3039,8 +3009,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test(expected = ParserException.class)
   public void testExceptionBVconcat3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.SMTINTERPOL);
+    requireBitvectors();
     clearVisitor();
 
     String x = "(assert (concat #b001 #b100 #b100))\n";
@@ -3051,8 +3020,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test(expected = ParserException.class)
   public void testExceptionBVextract()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    assume().that(solverToUse()).isNotEqualTo(Solvers.SMTINTERPOL);
-    requireIntegers();
+    requireBitvectors();
     clearVisitor();
 
     String x = "(assert ((_ extract true false) #b100))\n";
@@ -3063,8 +3031,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test(expected = ParserException.class)
   public void testExceptionBVextract2()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    assume().that(solverToUse()).isNotEqualTo(Solvers.SMTINTERPOL);
-    requireIntegers();
+    requireBitvectors();
     clearVisitor();
 
     String x = "(assert ((_ extract 1) #b100))\n";
@@ -3086,8 +3053,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test(expected = ParserException.class)
   public void testExceptionBVzeroExtend()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    assume().that(solverToUse()).isNotEqualTo(Solvers.SMTINTERPOL);
-    requireIntegers();
+    requireBitvectors();
     clearVisitor();
 
     String x = "(assert ((_ zero_extend true) #b100))\n";
@@ -3098,7 +3064,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test(expected = ParserException.class)
   public void testExceptionBVzeroExtend2()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    assume().that(solverToUse()).isNotEqualTo(Solvers.SMTINTERPOL);
     requireIntegers();
     clearVisitor();
 
@@ -3111,7 +3076,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVZeroExtend3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.SMTINTERPOL);
+    requireBitvectors();
     clearVisitor();
 
     String x = "(assert ((_ zero_extend 4 1) #b100))\n";
@@ -3122,8 +3087,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test(expected = ParserException.class)
   public void testExceptionBVsignExtend()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    assume().that(solverToUse()).isNotEqualTo(Solvers.SMTINTERPOL);
-    requireIntegers();
+    requireBitvectors();
     clearVisitor();
 
     String x = "(assert ((_ sign_extend true) #b100))\n";
@@ -3134,7 +3098,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test(expected = ParserException.class)
   public void testExceptionBVsignExtend2()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    assume().that(solverToUse()).isNotEqualTo(Solvers.SMTINTERPOL);
     requireIntegers();
     clearVisitor();
 
@@ -3146,8 +3109,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test(expected = ParserException.class)
   public void testExceptionBVsignExtend3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.SMTINTERPOL);
+    requireBitvectors();
     clearVisitor();
 
     String x = "(assert ((_ sign_extend 4 1) #b100))\n";
@@ -3158,7 +3120,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test(expected = ParserException.class)
   public void testExceptionBVtoInt()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    assume().that(solverToUse()).isNotEqualTo(Solvers.SMTINTERPOL);
     requireIntegers();
     clearVisitor();
 
@@ -3170,8 +3131,8 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test(expected = ParserException.class)
   public void testExceptionBVtoInt2()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.SMTINTERPOL);
+    requireBitvectors();
+    requireBitvectorToInt();
     clearVisitor();
 
     String x = "(assert (bv2int #b100 #b100)\n";
@@ -3180,10 +3141,10 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   }
 
   @Test(expected = ParserException.class)
-  public void testExceptionInttoBV()
+  public void testExceptionIntToBV()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.SMTINTERPOL);
+    requireBitvectors();
     clearVisitor();
 
     String x = "(assert (int2bv #b100)\n";
@@ -3195,7 +3156,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionSelect()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.YICES2);
+    requireArrays();
     clearVisitor();
 
     String x = "(declare-const all1 (Array Int Int))\n" + "(assert (select all1 true))\n";
@@ -3218,7 +3179,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionSelect3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.YICES2);
+    requireArrays();
     clearVisitor();
 
     String x = "(declare-const all1 (Array Int Int))\n" + "(assert (select all1 1 5))\n";
@@ -3230,7 +3191,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionStore()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.YICES2);
+    requireArrays();
     clearVisitor();
 
     String x = "(declare-const all1 (Array Int Int))\n" + "(assert (select all1 1 true))\n";
@@ -3253,7 +3214,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionStore3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.YICES2);
+    requireArrays();
     clearVisitor();
 
     String x = "(declare-const all1 (Array Int Int))\n" + "(assert (select all1 1))\n";
@@ -3276,6 +3237,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionForAll()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
+    // MathSAT does not support arrays with Bool arguments
     assume().that(solverToUse()).isNotEqualTo(Solvers.MATHSAT5);
     clearVisitor();
 
@@ -3291,6 +3253,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionExists()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
+    // MathSAT does not support arrays with Bool arguments
     assume().that(solverToUse()).isNotEqualTo(Solvers.MATHSAT5);
     clearVisitor();
 
@@ -3408,6 +3371,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testDefineFunctionReal()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireRationals();
+    assume().that(solverToUse()).isNotEqualTo(Solvers.OPENSMT);
     clearVisitor();
 
     String x = "(define-fun bla () Real (- 3 4.0))\n" + "(assert (= bla bla))\n";
@@ -3426,6 +3390,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testDefineFunctionRealWithInput()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireRationals();
+    assume().that(solverToUse()).isNotEqualTo(Solvers.OPENSMT);
     clearVisitor();
 
     String x = "(define-fun bla ((x Real)) Real (- 3 x))\n" + "(assert (= bla bla))\n";
@@ -3444,7 +3409,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testDefineFunctionBitVec()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.SMTINTERPOL);
     clearVisitor();
 
     String x =
@@ -3464,7 +3428,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testDefineFunctionBitVecWithInput()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.SMTINTERPOL);
     clearVisitor();
 
     String x =
@@ -3510,7 +3473,9 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testLetExpression()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    assume().that(solverToUse()).isNoneOf(Solvers.CVC4, Solvers.SMTINTERPOL, Solvers.YICES2);
+    assume()
+        .that(solverToUse())
+        .isNoneOf(Solvers.OPENSMT, Solvers.CVC4, Solvers.SMTINTERPOL, Solvers.YICES2);
     clearVisitor();
 
     String s =
@@ -3589,15 +3554,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     clearGenerator();
     assume()
         .that(solverToUse())
-        .isNoneOf(
-            Solvers.MATHSAT5,
-            Solvers.SMTINTERPOL,
-            Solvers.YICES2,
-            Solvers.Z3,
-            Solvers.CVC4,
-            Solvers.CVC5,
-            Solvers.BOOLECTOR,
-            Solvers.PRINCESS);
+        .isEqualTo(Solvers.PRINCESS_BINARY);
     String a =
         "(declare-const c Bool)\n"
             + "(declare-const d Bool)\n"
@@ -3645,19 +3602,12 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test
   public void testModelBitvector()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    requireBitvectors();
     clearVisitor();
     clearGenerator();
     assume()
         .that(solverToUse())
-        .isNoneOf(
-            Solvers.MATHSAT5,
-            Solvers.SMTINTERPOL,
-            Solvers.YICES2,
-            Solvers.Z3,
-            Solvers.CVC4,
-            Solvers.CVC5,
-            Solvers.BOOLECTOR,
-            Solvers.PRINCESS);
+        .isEqualTo(Solvers.PRINCESS_BINARY);
     String a =
         "(declare-const c (_ BitVec 3))\n"
             + "(declare-const d (_ BitVec 3))\n"
@@ -3705,19 +3655,14 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test
   public void testModelArrayInt()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    requireIntegers();
+    requireArrays();
+    requireArrayModel();
     clearVisitor();
     clearGenerator();
     assume()
         .that(solverToUse())
-        .isNoneOf(
-            Solvers.MATHSAT5,
-            Solvers.SMTINTERPOL,
-            Solvers.YICES2,
-            Solvers.Z3,
-            Solvers.CVC4,
-            Solvers.CVC5,
-            Solvers.BOOLECTOR,
-            Solvers.PRINCESS);
+        .isEqualTo(Solvers.PRINCESS_BINARY);
     String a =
         "(declare-const c (Array Int Int))\n"
             + "(declare-const d (Array Int Int))\n"
@@ -3770,19 +3715,13 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test
   public void testModelArrayBitVec()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    requireArrays();
+    requireBitvectors();
     clearVisitor();
     clearGenerator();
     assume()
         .that(solverToUse())
-        .isNoneOf(
-            Solvers.MATHSAT5,
-            Solvers.SMTINTERPOL,
-            Solvers.YICES2,
-            Solvers.Z3,
-            Solvers.CVC4,
-            Solvers.CVC5,
-            Solvers.BOOLECTOR,
-            Solvers.PRINCESS);
+        .isEqualTo(Solvers.PRINCESS_BINARY);
     String a =
         "(declare-const c (Array (_ BitVec 32) (_ BitVec 32)))\n"
             + "(declare-const d (Array (_ BitVec 32) (_ BitVec 32)))\n"
@@ -3859,19 +3798,13 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test
   public void testModelArrayBool()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    requireArrays();
+    requireArrayModel();
     clearVisitor();
     clearGenerator();
     assume()
         .that(solverToUse())
-        .isNoneOf(
-            Solvers.MATHSAT5,
-            Solvers.SMTINTERPOL,
-            Solvers.YICES2,
-            Solvers.Z3,
-            Solvers.CVC4,
-            Solvers.CVC5,
-            Solvers.BOOLECTOR,
-            Solvers.PRINCESS);
+        .isEqualTo(Solvers.PRINCESS_BINARY);
     String a =
         "(declare-const c (Array Bool Bool))\n"
             + "(declare-const d (Array Bool Bool))\n"
@@ -3924,19 +3857,13 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test
   public void testModelArrayArray()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    requireArrays();
+    requireArrayModel();
     clearVisitor();
     clearGenerator();
     assume()
         .that(solverToUse())
-        .isNoneOf(
-            Solvers.MATHSAT5,
-            Solvers.SMTINTERPOL,
-            Solvers.YICES2,
-            Solvers.Z3,
-            Solvers.CVC4,
-            Solvers.CVC5,
-            Solvers.BOOLECTOR,
-            Solvers.PRINCESS);
+        .isEqualTo(Solvers.PRINCESS_BINARY);
     String a =
         "(declare-const c (Array (Array Bool Bool) (Array Bool Bool)))\n"
             + "(declare-const d (Array (Array Bool Bool) (Array Bool Bool)))\n"
