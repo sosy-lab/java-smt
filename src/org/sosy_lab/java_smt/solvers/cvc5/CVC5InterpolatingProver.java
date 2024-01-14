@@ -232,7 +232,6 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
           "Failure when validating interpolant '" + interpolant + "'.", e);
-
     } finally {
       validationSolver.deletePointer();
     }

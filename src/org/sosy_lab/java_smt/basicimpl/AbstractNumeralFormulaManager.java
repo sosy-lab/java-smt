@@ -90,28 +90,44 @@ public abstract class AbstractNumeralFormulaManager<
 
   @Override
   public ResultFormulaType makeNumber(long i) {
-    return wrap(makeNumberImpl(i));
+    ResultFormulaType result = wrap(makeNumberImpl(i));
+    if (Generator.isLoggingEnabled()) {
+      NumeralGenerator.logMakeNumber(result, String.valueOf(i));
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo makeNumberImpl(long i);
 
   @Override
   public ResultFormulaType makeNumber(BigInteger i) {
-    return wrap(makeNumberImpl(i));
+    ResultFormulaType result = wrap(makeNumberImpl(i));
+    if (Generator.isLoggingEnabled()) {
+      NumeralGenerator.logMakeNumber(result, String.valueOf(i));
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo makeNumberImpl(BigInteger i);
 
   @Override
   public ResultFormulaType makeNumber(String i) {
-    return wrap(makeNumberImpl(i));
+    ResultFormulaType result = wrap(makeNumberImpl(i));
+    if (Generator.isLoggingEnabled()) {
+      NumeralGenerator.logMakeNumber(result, i);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo makeNumberImpl(String i);
 
   @Override
   public ResultFormulaType makeNumber(Rational pRational) {
-    return wrap(makeNumberImpl(pRational));
+    ResultFormulaType result = wrap(makeNumberImpl(pRational));
+    if (Generator.isLoggingEnabled()) {
+      NumeralGenerator.logMakeNumber(result, String.valueOf(pRational));
+    }
+    return result;
   }
 
   protected TFormulaInfo makeNumberImpl(Rational pRational) {
@@ -120,6 +136,10 @@ public abstract class AbstractNumeralFormulaManager<
 
   @Override
   public ResultFormulaType makeNumber(double pNumber) {
+    ResultFormulaType result = wrap(makeNumberImpl(pNumber));
+    if (Generator.isLoggingEnabled()) {
+      NumeralGenerator.logMakeNumber(result, String.valueOf(pNumber));
+    }
     return wrap(makeNumberImpl(pNumber));
   }
 
@@ -127,6 +147,10 @@ public abstract class AbstractNumeralFormulaManager<
 
   @Override
   public ResultFormulaType makeNumber(BigDecimal pNumber) {
+    ResultFormulaType result = wrap(makeNumberImpl(pNumber));
+    if (Generator.isLoggingEnabled()) {
+      NumeralGenerator.logMakeNumber(result, String.valueOf(pNumber));
+    }
     return wrap(makeNumberImpl(pNumber));
   }
 
@@ -172,7 +196,11 @@ public abstract class AbstractNumeralFormulaManager<
   @Override
   public ResultFormulaType makeVariable(String pVar) {
     checkVariableName(pVar);
-    return wrap(makeVariableImpl(pVar));
+    ResultFormulaType result = wrap(makeVariableImpl(pVar));
+    if (Generator.isLoggingEnabled()) {
+      NumeralGenerator.logMakeIntVariable(result, pVar);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo makeVariableImpl(String i);
@@ -180,6 +208,10 @@ public abstract class AbstractNumeralFormulaManager<
   @Override
   public ResultFormulaType negate(ParamFormulaType pNumber) {
     TFormulaInfo param1 = extractInfo(pNumber);
+    ResultFormulaType result = wrap(negate(param1));
+    if (Generator.isLoggingEnabled()) {
+      NumeralGenerator.logNegate(result, pNumber);
+    }
     return wrap(negate(param1));
   }
 
@@ -189,15 +221,22 @@ public abstract class AbstractNumeralFormulaManager<
   public ResultFormulaType add(ParamFormulaType pNumber1, ParamFormulaType pNumber2) {
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
-
-    return wrap(add(param1, param2));
+    ResultFormulaType result = wrap(add(param1, param2));
+    if (Generator.isLoggingEnabled()) {
+      NumeralGenerator.logAdd(result, pNumber1, pNumber2);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo add(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
   @Override
   public ResultFormulaType sum(List<ParamFormulaType> operands) {
-    return wrap(sumImpl(Lists.transform(operands, this::extractInfo)));
+    ResultFormulaType result = wrap(sumImpl(Lists.transform(operands, this::extractInfo)));
+    if (Generator.isLoggingEnabled()) {
+      NumeralGenerator.logSum(result, operands);
+    }
+    return result;
   }
 
   protected TFormulaInfo sumImpl(List<TFormulaInfo> operands) {
@@ -212,8 +251,11 @@ public abstract class AbstractNumeralFormulaManager<
   public ResultFormulaType subtract(ParamFormulaType pNumber1, ParamFormulaType pNumber2) {
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
-
-    return wrap(subtract(param1, param2));
+    ResultFormulaType result = wrap(subtract(param1, param2));
+    if (Generator.isLoggingEnabled()) {
+      NumeralGenerator.logSubtract(result, pNumber1, pNumber2);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo subtract(TFormulaInfo pParam1, TFormulaInfo pParam2);
@@ -240,6 +282,9 @@ public abstract class AbstractNumeralFormulaManager<
           throw e;
         }
       }
+    }
+    if (Generator.isLoggingEnabled()) {
+      NumeralGenerator.logDivide(wrap(result), pNumber1, pNumber2);
     }
     return wrap(result);
   }
@@ -273,6 +318,9 @@ public abstract class AbstractNumeralFormulaManager<
         }
       }
     }
+    if (Generator.isLoggingEnabled()) {
+      NumeralGenerator.logModulo(wrap(result), pNumber1, pNumber2);
+    }
     return wrap(result);
   }
 
@@ -288,22 +336,31 @@ public abstract class AbstractNumeralFormulaManager<
   }
 
   public BooleanFormula modularCongruence(
-      ParamFormulaType pNumber1, ParamFormulaType pNumber2, long pModulo) {
+      ParamFormulaType pNumber1, ParamFormulaType pNumber2, long pModulo)
+      throws GeneratorException {
     Preconditions.checkArgument(pModulo > 0, "modular congruence needs a positive modulo.");
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
-
-    return wrapBool(modularCongruence(param1, param2, pModulo));
+    BooleanFormula result = wrapBool(modularCongruence(param1, param2, pModulo));
+    if (Generator.isLoggingEnabled()) {
+      throw new GeneratorException("Modular Congruence is not available in SMTLIB2. ");
+    }
+    return result;
   }
 
   public BooleanFormula modularCongruence(
-      ParamFormulaType pNumber1, ParamFormulaType pNumber2, BigInteger pModulo) {
+      ParamFormulaType pNumber1, ParamFormulaType pNumber2, BigInteger pModulo)
+      throws GeneratorException {
     Preconditions.checkArgument(
         pModulo.signum() > 0, "modular congruence needs a positive modulo.");
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
 
-    return wrapBool(modularCongruence(param1, param2, pModulo));
+    BooleanFormula result = wrapBool(modularCongruence(param1, param2, pModulo));
+    if (Generator.isLoggingEnabled()) {
+      throw new GeneratorException("Modular Congruence is not available in SMTLIB2. ");
+    }
+    return result;
   }
 
   /**
@@ -348,6 +405,9 @@ public abstract class AbstractNumeralFormulaManager<
         }
       }
     }
+    if (Generator.isLoggingEnabled()) {
+      NumeralGenerator.logMultiply(wrap(result), pNumber1, pNumber2);
+    }
     return wrap(result);
   }
 
@@ -366,15 +426,22 @@ public abstract class AbstractNumeralFormulaManager<
   public BooleanFormula equal(ParamFormulaType pNumber1, ParamFormulaType pNumber2) {
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
-
-    return wrapBool(equal(param1, param2));
+    BooleanFormula result = wrapBool(equal(param1, param2));
+    if (Generator.isLoggingEnabled()) {
+      NumeralGenerator.logEqual(result, pNumber1, pNumber2);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo equal(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
   @Override
   public BooleanFormula distinct(List<ParamFormulaType> pNumbers) {
-    return wrapBool(distinctImpl(Lists.transform(pNumbers, this::extractInfo)));
+    BooleanFormula result = wrapBool(distinctImpl(Lists.transform(pNumbers, this::extractInfo)));
+    if (Generator.isLoggingEnabled()) {
+      NumeralGenerator.logDistinct(result, pNumbers);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo distinctImpl(List<TFormulaInfo> pNumbers);
@@ -383,8 +450,11 @@ public abstract class AbstractNumeralFormulaManager<
   public BooleanFormula greaterThan(ParamFormulaType pNumber1, ParamFormulaType pNumber2) {
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
-
-    return wrapBool(greaterThan(param1, param2));
+    BooleanFormula result = wrapBool(greaterThan(param1, param2));
+    if (Generator.isLoggingEnabled()) {
+      NumeralGenerator.logGreaterThan(result, pNumber1, pNumber2);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo greaterThan(TFormulaInfo pParam1, TFormulaInfo pParam2);
@@ -393,8 +463,11 @@ public abstract class AbstractNumeralFormulaManager<
   public BooleanFormula greaterOrEquals(ParamFormulaType pNumber1, ParamFormulaType pNumber2) {
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
-
-    return wrapBool(greaterOrEquals(param1, param2));
+    BooleanFormula result = wrapBool(greaterOrEquals(param1, param2));
+    if (Generator.isLoggingEnabled()) {
+      NumeralGenerator.logGreaterOrEquals(result, pNumber1, pNumber2);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo greaterOrEquals(TFormulaInfo pParam1, TFormulaInfo pParam2);
@@ -403,8 +476,11 @@ public abstract class AbstractNumeralFormulaManager<
   public BooleanFormula lessThan(ParamFormulaType pNumber1, ParamFormulaType pNumber2) {
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
-
-    return wrapBool(lessThan(param1, param2));
+    BooleanFormula result = wrapBool(lessThan(param1, param2));
+    if (Generator.isLoggingEnabled()) {
+      NumeralGenerator.logLessThan(result, pNumber1, pNumber2);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo lessThan(TFormulaInfo pParam1, TFormulaInfo pParam2);
@@ -413,8 +489,11 @@ public abstract class AbstractNumeralFormulaManager<
   public BooleanFormula lessOrEquals(ParamFormulaType pNumber1, ParamFormulaType pNumber2) {
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
-
-    return wrapBool(lessOrEquals(param1, param2));
+    BooleanFormula result = wrapBool(lessOrEquals(param1, param2));
+    if (Generator.isLoggingEnabled()) {
+      NumeralGenerator.logLessOrEquals(result, pNumber1, pNumber2);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo lessOrEquals(TFormulaInfo pParam1, TFormulaInfo pParam2);
@@ -422,9 +501,18 @@ public abstract class AbstractNumeralFormulaManager<
   @Override
   public IntegerFormula floor(ParamFormulaType number) {
     if (getFormulaCreator().getFormulaType(number) == FormulaType.IntegerType) {
-      return (IntegerFormula) number;
+      IntegerFormula result = (IntegerFormula) number;
+      if (Generator.isLoggingEnabled()) {
+        NumeralGenerator.logFloor(result, number);
+      }
+      return result;
     } else {
-      return getFormulaCreator().encapsulate(FormulaType.IntegerType, floor(extractInfo(number)));
+      IntegerFormula result =
+          getFormulaCreator().encapsulate(FormulaType.IntegerType, floor(extractInfo(number)));
+      if (Generator.isLoggingEnabled()) {
+        NumeralGenerator.logFloor(result, number);
+      }
+      return result;
     }
   }
 

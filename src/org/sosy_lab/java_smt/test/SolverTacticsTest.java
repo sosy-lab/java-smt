@@ -199,7 +199,7 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void ufEliminationNesteQuantifierTest() throws InterruptedException {
+  public void ufEliminationNestedQuantifierTest() throws InterruptedException {
     requireIntegers();
     requireQuantifiers();
     // f := exists v1,v2v,v3,v4 : uf(v1, v3) == uf(v2, v4)
@@ -220,6 +220,7 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
       mgr.applyTactic(f, Tactic.ACKERMANNIZATION);
       assert_().fail();
     } catch (IllegalArgumentException expected) {
+      // Ignore the exception
     }
   }
 
@@ -276,14 +277,18 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
       } else {
         containsMoreAnd = true;
       }
-      pOperands.forEach(this::visit);
+      for (BooleanFormula pOperand : pOperands) {
+        visit(pOperand);
+      }
       return null;
     }
 
     @Override
     public Void visitOr(List<BooleanFormula> pOperands) {
       if (started) {
-        pOperands.forEach(this::visit);
+        for (BooleanFormula pOperand : pOperands) {
+          visit(pOperand);
+        }
       }
       return null;
     }

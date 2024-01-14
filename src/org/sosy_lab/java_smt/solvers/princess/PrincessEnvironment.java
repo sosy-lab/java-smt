@@ -83,7 +83,7 @@ import scala.collection.immutable.Set$;
  * for all stacks.
  */
 @Options(prefix = "solver.princess")
-class PrincessEnvironment {
+public class PrincessEnvironment {
 
   @Option(
       secure = true,
@@ -251,7 +251,6 @@ class PrincessEnvironment {
   }
 
   public List<? extends IExpression> parseStringToTerms(String s, PrincessFormulaCreator creator) {
-
     Tuple4<
             Seq<IFormula>,
             scala.collection.immutable.Map<IFunction, SMTFunctionType>,

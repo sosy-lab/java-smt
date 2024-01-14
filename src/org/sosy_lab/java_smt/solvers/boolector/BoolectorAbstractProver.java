@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.solvers.boolector;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +24,7 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
+import org.sosy_lab.java_smt.basicimpl.Generator;
 import org.sosy_lab.java_smt.solvers.boolector.BtorJNI.TerminationCallback;
 
 abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
@@ -82,6 +84,12 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
    */
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
+    try {
+      Generator.dumpSMTLIB2();
+    } catch (IOException pE) {
+      // FIXME: Find a better way to handle the IOException
+      throw new RuntimeException(pE);
+    }
     Preconditions.checkState(!closed);
     wasLastSatCheckSat = false;
     final int result = BtorJNI.boolector_sat(btor);

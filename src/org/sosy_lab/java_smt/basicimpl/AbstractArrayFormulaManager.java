@@ -39,8 +39,11 @@ public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFu
     //    Rational
 
     final TFormulaInfo term = select(extractInfo(pArray), extractInfo(pIndex));
-
-    return (TE) getFormulaCreator().encapsulate(elementType, term);
+    TE result = (TE) getFormulaCreator().encapsulate(elementType, term);
+    if (Generator.isLoggingEnabled()) {
+      ArrayGenerator.logSelect(result, pArray, pIndex);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo select(TFormulaInfo pArray, TFormulaInfo pIndex);
@@ -53,7 +56,12 @@ public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFu
     final FormulaType<TE> elementType = getFormulaCreator().getArrayFormulaElementType(pArray);
 
     final TFormulaInfo term = store(extractInfo(pArray), extractInfo(pIndex), extractInfo(pValue));
-    return getFormulaCreator().encapsulateArray(term, indexType, elementType);
+    ArrayFormula<TI, TE> result =
+        getFormulaCreator().encapsulateArray(term, indexType, elementType);
+    if (Generator.isLoggingEnabled()) {
+      ArrayGenerator.logStore(result, pArray, pIndex, pValue);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo store(
@@ -61,7 +69,7 @@ public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFu
 
   @Override
   public <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> makeArray(
-      String pName, ArrayFormulaType<TI, TE> type) {
+      String pName, ArrayFormulaType<TI, TE> type) throws GeneratorException {
     return makeArray(pName, type.getIndexType(), type.getElementType());
   }
 
@@ -71,10 +79,16 @@ public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFu
           TE extends Formula,
           FTI extends FormulaType<TI>,
           FTE extends FormulaType<TE>>
-      ArrayFormula<TI, TE> makeArray(String pName, FTI pIndexType, FTE pElementType) {
+      ArrayFormula<TI, TE> makeArray(String pName, FTI pIndexType, FTE pElementType)
+          throws GeneratorException {
     checkVariableName(pName);
     final TFormulaInfo namedArrayFormula = internalMakeArray(pName, pIndexType, pElementType);
-    return getFormulaCreator().encapsulateArray(namedArrayFormula, pIndexType, pElementType);
+    ArrayFormula<TI, TE> result =
+        getFormulaCreator().encapsulateArray(namedArrayFormula, pIndexType, pElementType);
+    if (Generator.isLoggingEnabled()) {
+      ArrayGenerator.logMakeArray(result, pName, pIndexType, pElementType);
+    }
+    return result;
   }
 
   protected abstract <TI extends Formula, TE extends Formula> TFormulaInfo internalMakeArray(
@@ -93,8 +107,13 @@ public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFu
   @Override
   public <TI extends Formula, TE extends Formula> BooleanFormula equivalence(
       ArrayFormula<TI, TE> pArray1, ArrayFormula<TI, TE> pArray2) {
-    return getFormulaCreator()
-        .encapsulateBoolean(equivalence(extractInfo(pArray1), extractInfo(pArray2)));
+    BooleanFormula result =
+        getFormulaCreator()
+            .encapsulateBoolean(equivalence(extractInfo(pArray1), extractInfo(pArray2)));
+    if (Generator.isLoggingEnabled()) {
+      ArrayGenerator.logArrayEquivalence(result, pArray1, pArray2);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo equivalence(TFormulaInfo pArray1, TFormulaInfo pArray2);

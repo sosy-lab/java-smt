@@ -17,6 +17,7 @@ import edu.stanford.CVC4.ExprManagerMapCollection;
 import edu.stanford.CVC4.Result;
 import edu.stanford.CVC4.SExpr;
 import edu.stanford.CVC4.SmtEngine;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -33,6 +34,7 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
+import org.sosy_lab.java_smt.basicimpl.Generator;
 import org.sosy_lab.java_smt.basicimpl.ShutdownHook;
 
 class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
@@ -183,6 +185,11 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   @Override
   @SuppressWarnings("try")
   public boolean isUnsat() throws InterruptedException, SolverException {
+    try {
+      Generator.dumpSMTLIB2();
+    } catch (IOException pE) {
+      throw new RuntimeException(pE);
+    }
     Preconditions.checkState(!closed);
     closeAllEvaluators();
     changedSinceLastSatQuery = false;

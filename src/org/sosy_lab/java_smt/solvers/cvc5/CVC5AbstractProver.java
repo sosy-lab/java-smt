@@ -16,6 +16,7 @@ import io.github.cvc5.Result;
 import io.github.cvc5.Solver;
 import io.github.cvc5.Term;
 import io.github.cvc5.UnknownExplanation;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -30,6 +31,7 @@ import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
+import org.sosy_lab.java_smt.basicimpl.Generator;
 
 public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
@@ -107,7 +109,6 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @Override
   protected @Nullable T addConstraintImpl(BooleanFormula pF) throws InterruptedException {
-    Preconditions.checkState(!closed);
     setChanged();
     Term exp = creator.extractInfo(pF);
     if (incremental) {
@@ -162,6 +163,11 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   @Override
   @SuppressWarnings("try")
   public boolean isUnsat() throws InterruptedException, SolverException {
+    try {
+      Generator.dumpSMTLIB2();
+    } catch (IOException pE) {
+      throw new RuntimeException(pE);
+    }
     Preconditions.checkState(!closed);
     closeAllEvaluators();
     changedSinceLastSatQuery = false;

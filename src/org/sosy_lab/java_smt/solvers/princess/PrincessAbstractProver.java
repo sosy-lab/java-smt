@@ -20,6 +20,7 @@ import ap.parser.IFunction;
 import ap.parser.ITerm;
 import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,7 +37,9 @@ import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
+import org.sosy_lab.java_smt.basicimpl.BinaryModel;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
+import org.sosy_lab.java_smt.basicimpl.Generator;
 import scala.Enumeration.Value;
 
 @SuppressWarnings("ClassTypeParameterName")
@@ -53,6 +56,8 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   private final PrincessFormulaCreator creator;
   protected boolean wasLastSatCheckSat = false; // and stack is not changed
 
+  private final BinaryModel binaryModel;
+
   protected PrincessAbstractProver(
       PrincessFormulaManager pMgr,
       PrincessFormulaCreator creator,
@@ -66,6 +71,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
 
     trackingStack.push(new Level());
     partitions.push(PathCopyingPersistentTreeMap.of());
+    binaryModel = new BinaryModel(this, creator, mgr);
   }
 
   /**
@@ -74,25 +80,34 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
    */
   @Override
   public boolean isUnsat() throws SolverException {
+    try {
+      Generator.dumpSMTLIB2();
+    } catch (IOException pE) {
+      throw new RuntimeException(pE);
+    }
     Preconditions.checkState(!closed);
     wasLastSatCheckSat = false;
-    final Value result = api.checkSat(true);
-    if (result.equals(SimpleAPI.ProverStatus$.MODULE$.Sat())) {
-      wasLastSatCheckSat = true;
-      return false;
-    } else if (result.equals(SimpleAPI.ProverStatus$.MODULE$.Unsat())) {
-      return true;
-    } else if (result.equals(SimpleAPI.ProverStatus$.MODULE$.OutOfMemory())) {
-      throw new SolverException(
-          "Princess ran out of stack or heap memory, try increasing their sizes.");
+    if (useBinary) {
+      binaryModel.getOutput();
+      return binaryModel.isUnsat();
     } else {
-      throw new SolverException("Princess' checkSat call returned " + result);
+      final Value result = api.checkSat(true);
+      if (result.equals(SimpleAPI.ProverStatus$.MODULE$.Sat())) {
+        wasLastSatCheckSat = true;
+        return false;
+      } else if (result.equals(SimpleAPI.ProverStatus$.MODULE$.Unsat())) {
+        return true;
+      } else if (result.equals(SimpleAPI.ProverStatus$.MODULE$.OutOfMemory())) {
+        throw new SolverException(
+            "Princess ran out of stack or heap memory, try increasing their sizes.");
+      } else {
+        throw new SolverException("Princess' checkSat call returned " + result);
+      }
     }
   }
 
   @CanIgnoreReturnValue
   protected int addConstraint0(BooleanFormula constraint) {
-    Preconditions.checkState(!closed);
     wasLastSatCheckSat = false;
 
     final int formulaId = idGenerator.getFreshId();
@@ -132,10 +147,14 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   @SuppressWarnings("resource")
   @Override
   public Model getModel() throws SolverException {
-    Preconditions.checkState(!closed);
-    Preconditions.checkState(wasLastSatCheckSat, NO_MODEL_HELP);
-    checkGenerateModels();
-    return new CachingModel(getEvaluatorWithoutChecks());
+    if (useBinary) {
+      return binaryModel.getModel();
+    } else {
+      Preconditions.checkState(!closed);
+      Preconditions.checkState(wasLastSatCheckSat, NO_MODEL_HELP);
+      checkGenerateModels();
+      return new CachingModel(getEvaluatorWithoutChecks());
+    }
   }
 
   @Override

@@ -40,46 +40,71 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
   public final <T extends Formula> FunctionDeclaration<T> declareUF(
       String pName, FormulaType<T> pReturnType, List<FormulaType<?>> pArgTypes) {
     checkVariableName(pName);
+    if (pName.contains("PIPE")) {
+      pName = pName.replaceAll("PIPE", "|");
+    }
     List<TType> argTypes = Lists.transform(pArgTypes, this::toSolverType);
-    return FunctionDeclarationImpl.of(
-        pName,
-        FunctionDeclarationKind.UF,
-        pArgTypes,
-        pReturnType,
-        formulaCreator.declareUFImpl(pName, toSolverType(pReturnType), argTypes));
+    FunctionDeclaration<T> result =
+        FunctionDeclarationImpl.of(
+            pName,
+            FunctionDeclarationKind.UF,
+            pArgTypes,
+            pReturnType,
+            formulaCreator.declareUFImpl(pName, toSolverType(pReturnType), argTypes));
+    if (Generator.isLoggingEnabled()) {
+      UFGenerator.logMakeFun(result, pName, pReturnType, pArgTypes);
+    }
+    return result;
   }
 
   @Override
   public <T extends Formula> FunctionDeclaration<T> declareUF(
       String pName, FormulaType<T> pReturnType, FormulaType<?>... pArgs) {
     checkVariableName(pName);
-    return declareUF(pName, pReturnType, Arrays.asList(pArgs));
+    FunctionDeclaration<T> result = declareUF(pName, pReturnType, Arrays.asList(pArgs));
+    return result;
   }
 
   @Override
   public <T extends Formula> T callUF(FunctionDeclaration<T> funcType, Formula... args) {
-    return formulaCreator.callFunction(funcType, Arrays.asList(args));
+    T result = formulaCreator.callFunction(funcType, Arrays.asList(args));
+    if (Generator.isLoggingEnabled()) {
+      UFGenerator.logCallFun(result, funcType, args);
+    }
+    return result;
   }
 
   @Override
   public final <T extends Formula> T callUF(
       FunctionDeclaration<T> pFunc, List<? extends Formula> pArgs) {
-    return formulaCreator.callFunction(pFunc, pArgs);
+    T result = formulaCreator.callFunction(pFunc, pArgs);
+    if (Generator.isLoggingEnabled()) {
+      UFGenerator.logCallFun(result, pFunc, pArgs);
+    }
+    return result;
   }
 
   @Override
   public <T extends Formula> T declareAndCallUF(
       String name, FormulaType<T> pReturnType, List<Formula> pArgs) {
     checkVariableName(name);
+    if (name.contains("PIPE")) {
+      name = name.replaceAll("PIPE", "|");
+    }
     List<FormulaType<?>> argTypes = Lists.transform(pArgs, getFormulaCreator()::getFormulaType);
     FunctionDeclaration<T> func = declareUF(name, pReturnType, argTypes);
-    return callUF(func, pArgs);
+    T result = callUF(func, pArgs);
+    if (Generator.isLoggingEnabled()) {
+      UFGenerator.logCallFun(result, declareUF(name, pReturnType, argTypes), pArgs);
+    }
+    return result;
   }
 
   @Override
   public <T extends Formula> T declareAndCallUF(
       String name, FormulaType<T> pReturnType, Formula... pArgs) {
     checkVariableName(name);
-    return declareAndCallUF(name, pReturnType, Arrays.asList(pArgs));
+    T result = declareAndCallUF(name, pReturnType, Arrays.asList(pArgs));
+    return result;
   }
 }

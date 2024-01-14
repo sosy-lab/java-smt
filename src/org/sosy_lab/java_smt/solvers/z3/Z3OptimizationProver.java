@@ -14,6 +14,7 @@ import com.microsoft.z3.Native;
 import com.microsoft.z3.Native.IntPtr;
 import com.microsoft.z3.Z3Exception;
 import com.microsoft.z3.enumerations.Z3_lbool;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -29,6 +30,7 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.basicimpl.Generator;
 
 class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProverEnvironment {
 
@@ -133,6 +135,11 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
 
   @Override
   public boolean isUnsat() throws Z3SolverException, InterruptedException {
+    try {
+      Generator.dumpSMTLIB2();
+    } catch (IOException pE) {
+      throw new RuntimeException(pE);
+    }
     Preconditions.checkState(!closed);
     logSolverStack();
     return check() == OptStatus.UNSAT;

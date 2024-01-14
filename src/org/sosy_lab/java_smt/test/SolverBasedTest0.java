@@ -134,7 +134,6 @@ public abstract class SolverBasedTest0 {
   @Before
   public final void initSolver() throws InvalidConfigurationException {
     config = createTestConfigBuilder().build();
-
     factory = new SolverContextFactory(config, logger, shutdownNotifierToUse());
     try {
       context = factory.generateContext();
@@ -198,6 +197,42 @@ public abstract class SolverBasedTest0 {
     if (context != null) {
       context.close();
     }
+  }
+
+  /** Skip test if the solver does not support Booleans in UFs. */
+  protected final void requireBooleanUFs() {
+    assume()
+        .withMessage(
+            "Solver %s does not support making UFs with Boolean return values", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.MATHSAT5);
+  }
+
+  /** Skip test if the solver does not support Booleans as arguments in Arrays. */
+  protected final void requireBooleanArgumentArrays() {
+    assume()
+        .withMessage(
+            "Solver %s does not support making Arrays with Bool as arguments", solverToUse())
+        .that(solverToUse())
+        .isNoneOf(Solvers.MATHSAT5, Solvers.SMTINTERPOL);
+  }
+
+  /** Skip test if the solver does not support any other sort than bitvector in Arrays. */
+  protected final void requireAllSortArrays() {
+    assume()
+        .withMessage(
+            "Solver %s does not support making Arrays with sorts other than bitvectors",
+            solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BOOLECTOR);
+  }
+
+  /** Skip test if the solver does not support UFs without arguments. */
+  protected final void requireNoArgumentsInUFs() {
+    assume()
+        .withMessage("Solver %s does not support making UFs without input Arguments", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BOOLECTOR);
   }
 
   /** Skip test if the solver does not support integers. */

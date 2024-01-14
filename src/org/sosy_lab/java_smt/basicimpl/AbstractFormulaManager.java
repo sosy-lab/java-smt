@@ -17,9 +17,13 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.java_smt.api.ArrayFormulaManager;
@@ -41,6 +45,9 @@ import org.sosy_lab.java_smt.api.Tactic;
 import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Visitor;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Lexer;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser;
 import org.sosy_lab.java_smt.basicimpl.tactics.NNFVisitor;
 import org.sosy_lab.java_smt.utils.SolverUtils;
 
@@ -174,6 +181,68 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     return formulaCreator;
   }
 
+  /**
+   * Parses an SMT-LIB2 file and translates it into an equivalent BooleanFormula constraint
+   *
+   * @param pString name of the file that contains the SMT-LIB2
+   * @return BooleanFormula equivalent to the SMT-LIB2 in file
+   * @throws IOException if file can't be read
+   */
+  @Override
+  public BooleanFormula universalParse(String pString) throws IOException {
+    smtlibv2Lexer lexer = new smtlibv2Lexer(CharStreams.fromFileName(pString));
+    smtlibv2Parser parser = new smtlibv2Parser(new CommonTokenStream(lexer));
+    Visitor visitor =
+        new Visitor(
+            this,
+            this.booleanManager,
+            this.integerManager,
+            this.rationalManager,
+            this.bitvectorManager,
+            this.arrayManager,
+            this.functionManager);
+    visitor.visit(parser.start());
+    List<BooleanFormula> constraints = visitor.getConstraints();
+
+    return this.booleanManager.and(constraints);
+  }
+
+  /**
+   * Parses an SMT-LIB2 String and translates it into an equivalent BooleanFormula constraint
+   *
+   * @param pString SMT-LIB2 formula as String that will be parsed
+   * @return BooleanFormula equivalent to the SMT-LIB2 string
+   */
+  @Override
+  public BooleanFormula universalParseFromString(String pString) {
+    smtlibv2Lexer lexer = new smtlibv2Lexer(CharStreams.fromString(pString));
+    smtlibv2Parser parser = new smtlibv2Parser(new CommonTokenStream(lexer));
+    Visitor visitor =
+        new Visitor(
+            this,
+            this.booleanManager,
+            this.integerManager,
+            this.rationalManager,
+            this.bitvectorManager,
+            this.arrayManager,
+            this.functionManager);
+    visitor.visit(parser.start());
+    List<BooleanFormula> constraints = visitor.getConstraints();
+
+    return this.booleanManager.and(constraints);
+  }
+
+  /**
+   * Calls the dumpSMTLIB2 method from the Generator, which will write the assembled SMT-LIB2 to a
+   * file 'Out.smt2'
+   *
+   * @throws IOException if writing to file fails
+   */
+  @Override
+  public void dumpSMTLIB2() throws IOException {
+    Generator.dumpSMTLIB2();
+  }
+
   @Override
   public IntegerFormulaManager getIntegerFormulaManager() {
     if (integerManager == null) {
@@ -297,12 +366,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     }
   }
 
-  /**
-   * Eliminate UFs from the given input formula.
-   *
-   * @throws InterruptedException Can be thrown by the native code.
-   */
-  protected BooleanFormula applyUFEImpl(BooleanFormula pF) throws InterruptedException {
+  /** Eliminate UFs from the given input formula. */
+  protected BooleanFormula applyUFEImpl(BooleanFormula pF) {
     return SolverUtils.ufElimination(this).eliminateUfs(pF);
   }
 
@@ -442,7 +507,6 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public <T extends Formula> T makeApplication(
       FunctionDeclaration<T> declaration, List<? extends Formula> args) {
     return formulaCreator.callFunction(declaration, args);
@@ -469,20 +533,13 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
           public Formula visitFunction(
               Formula f, List<Formula> newArgs, FunctionDeclaration<?> functionDeclaration) {
             Formula out = pFromToMapping.get(f);
-            if (out == null) {
-              return makeApplication(functionDeclaration, newArgs);
-            } else {
-              return out;
-            }
+            return Objects.requireNonNullElseGet(
+                out, () -> makeApplication(functionDeclaration, newArgs));
           }
 
           private Formula replace(Formula f) {
             Formula out = pFromToMapping.get(f);
-            if (out == null) {
-              return f;
-            } else {
-              return out;
-            }
+            return Objects.requireNonNullElse(out, f);
           }
         });
   }
@@ -504,10 +561,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     if (SMTLIB2_KEYWORDS.contains(pVar)) {
       return false;
     }
-    if (DISALLOWED_CHARACTERS.matchesAnyOf(pVar)) {
-      return false;
-    }
-    return true;
+    return !DISALLOWED_CHARACTERS.matchesAnyOf(pVar);
   }
 
   /**
@@ -529,7 +583,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
         help);
     Preconditions.checkArgument(
         !SMTLIB2_KEYWORDS.contains(variableName),
-        "Identifier '%s' can not be used, because it is a keyword of SMT-LIB2. %s",
+        "Identifier '%s' can not be used, because it is a expressionType of SMT-LIB2. %s",
         variableName,
         help);
     Preconditions.checkArgument(

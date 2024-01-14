@@ -26,6 +26,7 @@ import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
+import org.sosy_lab.java_smt.basicimpl.Generator;
 import org.sosy_lab.java_smt.delegate.logging.LoggingSolverContext;
 import org.sosy_lab.java_smt.delegate.statistics.StatisticsSolverContext;
 import org.sosy_lab.java_smt.delegate.synchronize.SynchronizedSolverContext;
@@ -51,13 +52,14 @@ public class SolverContextFactory {
   public enum Solvers {
     OPENSMT,
     MATHSAT5,
-    SMTINTERPOL,
     Z3,
+    SMTINTERPOL,
     PRINCESS,
     BOOLECTOR,
     CVC4,
     CVC5,
-    YICES2
+    YICES2,
+    PRINCESS_BINARY
   }
 
   @Option(secure = true, description = "Export solver queries in SmtLib format into a file.")
@@ -106,6 +108,9 @@ public class SolverContextFactory {
               + "or always approximate non-linear arithmetic. "
               + "This affects only the theories of integer and rational arithmetic.")
   private NonLinearArithmetic nonLinearArithmetic = NonLinearArithmetic.USE;
+
+  @Option(secure = true, description = "Enable SMTLIB2 script generation.")
+  private boolean generateSMTLIB2 = false;
 
   private final LogManager logger;
   private final ShutdownNotifier shutdownNotifier;
@@ -225,6 +230,9 @@ public class SolverContextFactory {
       // statistics need to be the most outer wrapping layer.
       context = new StatisticsSolverContext(context);
     }
+    if (generateSMTLIB2) {
+      Generator.setIsLoggingEnabled(true);
+    }
     return context;
   }
 
@@ -283,6 +291,15 @@ public class SolverContextFactory {
       case PRINCESS:
         return PrincessSolverContext.create(
             config, shutdownNotifier, logfile, (int) randomSeed, nonLinearArithmetic);
+
+      case PRINCESS_BINARY:
+        return PrincessSolverContext.create(
+            config,
+            // Configuration.fromCmdLineArguments(cmdLineArguments),
+            shutdownNotifier,
+            logfile,
+            (int) randomSeed,
+            nonLinearArithmetic);
 
       case YICES2:
         return Yices2SolverContext.create(nonLinearArithmetic, shutdownNotifier, loader);

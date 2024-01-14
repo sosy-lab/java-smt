@@ -34,6 +34,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   private final boolean generateUnsatCoresOverAssumptions;
   protected final boolean enableSL;
   protected boolean closed = false;
+  protected boolean useBinary;
 
   private final Set<Evaluator> evaluators = new LinkedHashSet<>();
 
@@ -49,6 +50,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     generateUnsatCoresOverAssumptions =
         pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS);
     enableSL = pOptions.contains(ProverOptions.ENABLE_SEPARATION_LOGIC);
+    useBinary = pOptions.contains(ProverOptions.USE_BINARY);
 
     assertedFormulas.add(new LinkedHashMap<>());
   }
@@ -85,6 +87,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   @Override
   public final void push() throws InterruptedException {
     checkState(!closed);
+    Generator.logPush();
     pushImpl();
     assertedFormulas.add(new LinkedHashMap<>());
   }
@@ -95,8 +98,9 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   public final void pop() {
     checkState(!closed);
     checkState(assertedFormulas.size() > 1, "initial level must remain until close");
-    assertedFormulas.remove(assertedFormulas.size() - 1); // remove last
+    Generator.logPop();
     popImpl();
+    assertedFormulas.remove(assertedFormulas.size() - 1); // remove last
   }
 
   protected abstract void popImpl();
@@ -105,6 +109,9 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   @CanIgnoreReturnValue
   public final @Nullable T addConstraint(BooleanFormula constraint) throws InterruptedException {
     checkState(!closed);
+    if (Generator.isLoggingEnabled()) {
+      Generator.assembleConstraint(constraint);
+    }
     T t = addConstraintImpl(constraint);
     Iterables.getLast(assertedFormulas).put(constraint, t);
     return t;

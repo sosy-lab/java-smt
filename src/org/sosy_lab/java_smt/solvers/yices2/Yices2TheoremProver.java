@@ -25,6 +25,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_set_con
 
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -41,6 +42,7 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
+import org.sosy_lab.java_smt.basicimpl.Generator;
 
 /**
  * Info about the option {@link ProverOptions#GENERATE_UNSAT_CORE}: Yices provides the unsat core
@@ -118,6 +120,11 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
 
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
+    try {
+      Generator.dumpSMTLIB2();
+    } catch (IOException pE) {
+      throw new RuntimeException(pE);
+    }
     Preconditions.checkState(!closed);
     boolean unsat;
     if (generateUnsatCores) { // unsat core does not work with incremental mode

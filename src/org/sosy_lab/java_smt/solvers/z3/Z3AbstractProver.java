@@ -36,6 +36,7 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
+import org.sosy_lab.java_smt.basicimpl.Generator;
 
 abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
 
@@ -123,7 +124,9 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
 
   @Override
   protected Void addConstraintImpl(BooleanFormula f) throws InterruptedException {
-    Preconditions.checkState(!closed);
+    if (Generator.isLoggingEnabled()) {
+      Generator.assembleConstraint(f);
+    }
     long e = creator.extractInfo(f);
     Native.incRef(z3context, e);
     try {

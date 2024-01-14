@@ -120,7 +120,8 @@ public class PrettyPrinter {
   }
 
   private static String formulaToString(
-      BooleanFormula formula, org.sosy_lab.java_smt.utils.PrettyPrinter pp, Type type) {
+      BooleanFormula formula, org.sosy_lab.java_smt.utils.PrettyPrinter pp, Type type)
+      throws IOException {
     switch (type) {
       case DETAILED_TEXT:
         return pp.formulaToString(formula);

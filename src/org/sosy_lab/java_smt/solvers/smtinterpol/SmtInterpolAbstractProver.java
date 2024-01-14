@@ -24,6 +24,7 @@ import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Script.LBool;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
+import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Deque;
@@ -44,6 +45,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
+import org.sosy_lab.java_smt.basicimpl.Generator;
 
 @SuppressWarnings("ClassTypeParameterName")
 abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
@@ -103,6 +105,11 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
 
   @Override
   public boolean isUnsat() throws InterruptedException {
+    try {
+      Generator.dumpSMTLIB2();
+    } catch (IOException pE) {
+      throw new RuntimeException(pE);
+    }
     checkState(!closed);
 
     // We actually terminate SmtInterpol during the analysis

@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.api.ArrayFormulaManager;
 import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -31,6 +32,7 @@ import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.SLFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.StringFormulaManager;
 import org.sosy_lab.java_smt.api.Tactic;
 import org.sosy_lab.java_smt.api.UFManager;
@@ -162,6 +164,48 @@ class SynchronizedFormulaManager implements FormulaManager {
     synchronized (sync) {
       return delegate.parse(pS);
     }
+  }
+
+  /**
+   * Parses an SMT-LIB2 file and translates it into an equivalent BooleanFormula constraint
+   *
+   * @param pS name of the file that contains the SMT-LIB2
+   * @return BooleanFormula equivalent to the SMT-LIB2 in file
+   * @throws IOException if file can't be read
+   */
+  @Override
+  public BooleanFormula universalParse(String pS)
+      throws IllegalArgumentException,
+          IOException,
+          SolverException,
+          InterruptedException,
+          InvalidConfigurationException {
+    synchronized (sync) {
+      return delegate.universalParse(pS);
+    }
+  }
+
+  /**
+   * Parses an SMT-LIB2 String and translates it into an equivalent BooleanFormula constraint
+   *
+   * @param pString SMT-LIB2 formula as String that will be parsed
+   * @return BooleanFormula equivalent to the SMT-LIB2 string
+   */
+  @Override
+  public BooleanFormula universalParseFromString(String pString)
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    return delegate.universalParseFromString(pString);
+  }
+
+  /**
+   * Calls the dumpSMTLIB2 method from the Generator, which will write the assembled SMT-LIB2 to a
+   * file 'Out.smt2'
+   *
+   * @throws IOException if writing to file fails
+   */
+  @Override
+  public void dumpSMTLIB2() throws IOException {
+    delegate.dumpSMTLIB2();
   }
 
   @Override

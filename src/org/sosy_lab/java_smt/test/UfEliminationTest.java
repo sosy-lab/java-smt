@@ -242,6 +242,7 @@ public class UfEliminationTest extends SolverBasedTest0.ParameterizedSolverBased
       ackermannization.eliminateUfs(f);
       assert_().fail();
     } catch (IllegalArgumentException expected) {
+      // Ignore the exception
     }
   }
 
