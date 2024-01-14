@@ -773,7 +773,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         || Native.isAlgebraicNumber(environment, value)
         || Native.isString(environment, value)
         || isOP(environment, value, Z3_decl_kind.Z3_OP_TRUE)
-        || isOP(environment, value, Z3_decl_kind.Z3_OP_FALSE);
+        || isOP(environment, value, Z3_decl_kind.Z3_OP_FALSE)
+        || isOP(environment, value, Z3_decl_kind.Z3_OP_DT_CONSTRUCTOR); // enumeration value
   }
 
   /**
