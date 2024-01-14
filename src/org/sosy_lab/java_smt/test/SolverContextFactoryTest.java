@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.assertThrows;
 
 import com.google.common.base.StandardSystemProperty;
 import com.google.common.truth.StandardSubjectBuilder;
@@ -132,13 +133,10 @@ public class SolverContextFactoryTest {
     SolverContextFactory factory =
         new SolverContextFactory(
             config, logger, shutdownManager.getNotifier(), System::loadLibrary);
-    try (SolverContext context = factory.generateContext()) {
-      assert_().fail();
-      @SuppressWarnings("unused")
-      FormulaManager mgr = context.getFormulaManager();
-    } catch (InvalidConfigurationException e) {
-      assert_().that(e).hasCauseThat().isInstanceOf(UnsatisfiedLinkError.class);
-    }
+    assert_()
+        .that(assertThrows(InvalidConfigurationException.class, () -> factory.generateContext()))
+        .hasCauseThat()
+        .isInstanceOf(UnsatisfiedLinkError.class);
   }
 
   @Test
