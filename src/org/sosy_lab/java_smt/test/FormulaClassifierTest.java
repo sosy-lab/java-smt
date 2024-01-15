@@ -12,6 +12,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.example.FormulaClassifier;
@@ -44,6 +45,48 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
         .withMessage("Solver %s does not support nonlinear formulas", solverToUse())
         .that(solverToUse())
         .isNotEqualTo(Solvers.OPENSMT);
+  }
+
+  @Ignore
+  @Test
+  public void test_equality() {
+    // TODO: Should this be classified as QF_LIA?
+    requireParser();
+    requireIntegers();
+    // MathSAT and OpenSMT will simplify the formula to just "true" and have to be disabled
+    assume().that(solverToUse()).isNoneOf(Solvers.MATHSAT5, Solvers.OPENSMT);
+    String query = "(declare-const a Int)" + "(assert (= a a))";
+    classifier.visit(mgr.parse(query));
+    assertThat(classifier.toString()).isEqualTo("QF_LIA");
+  }
+
+  @Ignore
+  @Test
+  public void test_unused() {
+    // TODO: Should this be classified as QF_LIA?
+    requireParser();
+    requireIntegers();
+    String query =
+        "(declare-const x Int)"
+            + "(declare-const a Bool)"
+            + "(assert (and a (not a)))";
+    classifier.visit(mgr.parse(query));
+    assertThat(classifier.toString()).isEqualTo("QF_LIA");
+  }
+
+  @Ignore
+  @Test
+  public void test_arrayEquality() {
+    // TODO: Should this be classified as QF_ALIA?
+    requireParser();
+    requireIntegers();
+    requireArrays();
+    String query =
+        "(declare-const a1 (Array Int Int))"
+            + "(declare-const a2 (Array Int Int))"
+            + "(assert (= a1 a2))";
+    classifier.visit(mgr.parse(query));
+    assertThat(classifier.toString()).isEqualTo("QF_ALIA");
   }
 
   @Test
@@ -120,6 +163,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
   @Test
   public void test_ABV() {
     // FIXME: This formula uses integers/reals and is not in ABV"
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BITWUZLA);
     requireParser();
     requireArrays();
     requireQuantifiers();
@@ -134,7 +178,8 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
 
   @Test
   public void test_QF_AUFBV() {
-    // FIXME: This formula actually uses integers (and reals) and is not in QF_AUFBV"
+    // FIXME: This formula uses integers (and reals) and is not in QF_AUFBV"
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BITWUZLA);
     requireParser();
     requireArrays();
     requireBitvectors();
@@ -197,7 +242,8 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
 
   @Test
   public void test_QF_UF() {
-    // FIXME: This formula uses integers/reals and is not in QF_UF
+    // FIXME: This formula uses integers (and reals) and is not in QF_UF
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BITWUZLA);
     requireParser();
     String query = VARS + "(assert (= (foo x) x))";
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
@@ -207,7 +253,8 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
 
   @Test
   public void test_QF_UFBV() {
-    // FIXME: This formula uses integers/reals and is not in QF_UFBV"
+    // FIXME: This formula uses integers (and reals) and is not in QF_UFBV"
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BITWUZLA);
     requireParser();
     requireBitvectors();
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
