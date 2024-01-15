@@ -32,8 +32,18 @@ final class Z3UserPropagator extends Native.UserPropagatorBase implements Propag
   private final Z3FormulaManager manager;
   private final UserPropagator userPropagator;
 
-  // function calls from z3's side
-  // (forwarding callbacks to the user propagator)
+  Z3UserPropagator(long ctx, long solver, Z3FormulaCreator creator, Z3FormulaManager manager,
+                   UserPropagator userPropagator) {
+    super(ctx, solver);
+    this.creator = creator;
+    this.userPropagator = userPropagator;
+    this.manager = manager;
+  }
+
+  // ===========================================================================
+  // Function calls from Z3's side (forwarding callbacks to the user propagator)
+  // ===========================================================================
+
   @Override
   public void pushWrapper() {
     userPropagator.onPush();
@@ -54,40 +64,54 @@ final class Z3UserPropagator extends Native.UserPropagatorBase implements Propag
     userPropagator.onEquality(creator.encapsulateBoolean(lx), creator.encapsulateBoolean(ly));
   }
 
-  // to function correctly, new prop and context are needed
-  // currently, there is no support for delegating subproblems to new user propagators
-  @Override
-  public Z3UserPropagator freshWrapper(long lctx) {
-    return this;
-  }
-
-  @Override
-  public void createdWrapper(long le) {
-  }
-
   @Override
   public void fixedWrapper(long lvar, long lvalue) {
     userPropagator.onKnownValue(creator.encapsulateBoolean(lvar),
         creator.encapsulateBoolean(lvalue));
   }
 
+  // TODO: This method is called if Z3 re-instantiates a user propagator for a subproblem
+  //  (usually when quantifiers are involved). For now, we assume the user propagators to only get
+  //  used on quantifier-less formulas so that this method is unnecessary.
+  @Override
+  public Z3UserPropagator freshWrapper(long lctx) {
+    return this;
+  }
+
+  // TODO: This method is called if the user registers a function (currently not
+  //  possible) and the solver instantiates the registered function: if the solver
+  //  instantiates "forall x: f(x)" at x=y, then f(y) will get created.
+  @Override
+  public void createdWrapper(long le) {
+  }
+
+  //FIXME: Z3's Native.UserPropagatorBase does not define this method but the JNI
+  // bindings require its existence. We define an empty stub here to avoid an exception getting
+  // thrown.
   public void decideWrapper(long expr, int i, int j) {}
 
-
-  // function calls from java-smt's side (mostly calls to the smt backend)
-  // (register events on z3's side)
-
-  Z3UserPropagator(long ctx, long solver, Z3FormulaCreator creator, Z3FormulaManager manager,
-                          UserPropagator userPropagator) {
-    super(ctx, solver);
-    this.creator = creator;
-    this.userPropagator = userPropagator;
-    this.manager = manager;
-  }
+  // ===========================================================================
+  // Function calls from JavaSMT's side (mostly calls to the smt backend)
+  // ===========================================================================
 
   @Override
   public void registerExpression(BooleanFormula exprToWatch) {
     Native.propagateAdd(this, ctx, solver, javainfo, creator.extractInfo(exprToWatch));
+  }
+
+  @Override
+  public void notifyOnKnownValue() {
+    registerFixed();
+  }
+
+  @Override
+  public void notifyOnEquality() {
+    registerEq();
+  }
+
+  @Override
+  public void notifyOnFinalCheck() {
+    registerFinal();
   }
 
   @Override
@@ -109,12 +133,12 @@ final class Z3UserPropagator extends Native.UserPropagatorBase implements Propag
       BooleanFormula consequence) {
     Preconditions.checkArgument(equalitiesLHS.length == equalitiesRHS.length);
     Native.propagateConflict(this, ctx, solver, javainfo, assignedLiterals.length,
-        formulaArrayToLong(assignedLiterals)
-        , equalitiesLHS.length, formulaArrayToLong(equalitiesLHS), formulaArrayToLong(equalitiesRHS),
+        extractInfoFromArray(assignedLiterals)
+        , equalitiesLHS.length, extractInfoFromArray(equalitiesLHS), extractInfoFromArray(equalitiesRHS),
         creator.extractInfo(consequence));
   }
 
-  private long[] formulaArrayToLong(BooleanFormula[] formulaArray) {
+  private long[] extractInfoFromArray(BooleanFormula[] formulaArray) {
     long[] formulaInfos = new long[formulaArray.length];
     for (int i = 0; i < formulaArray.length; i++) {
       if (formulaArray[i] != null) {
@@ -123,13 +147,4 @@ final class Z3UserPropagator extends Native.UserPropagatorBase implements Propag
     }
     return formulaInfos;
   }
-
-  @Override
-  public void notifyOnKnownValue() { registerFixed(); }
-
-  @Override
-  public void notifyOnEquality() { registerEq(); }
-
-  @Override
-  public void notifyOnFinalCheck() { registerFinal(); }
 }
