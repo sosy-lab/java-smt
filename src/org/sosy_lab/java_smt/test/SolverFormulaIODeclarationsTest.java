@@ -12,6 +12,7 @@ import static com.google.common.truth.Truth.assert_;
 import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
+import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.truth.Truth;
 import java.util.EnumSet;
@@ -21,6 +22,8 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 public class SolverFormulaIODeclarationsTest
@@ -254,6 +257,25 @@ public class SolverFormulaIODeclarationsTest
     //  but was : (non-equal instance of same class with same string representation)
     //  We may need to add the variables to the cache?
     Truth.assertThat(formula1).isEqualTo(formula2);
+  }
+
+  @Test
+  public void parseTwiceTest2() throws SolverException, InterruptedException {
+    // FIXME: Bitwuzla
+    //  expected to be:
+    //   unsatisfiable
+    //  but has model:
+    //   x: true
+    //   x: false
+    // One more example for why Bitwuzla is causing problems in our parser tests.
+    // We may need to track variables manually somehow?
+    BooleanFormula formula1 = mgr.parse("(declare-const x Bool)(assert x)");
+    BooleanFormula formula2 = mgr.parse("(declare-const x Bool)(assert (not x))");
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(formula1);
+      prover.push(formula2);
+      assertThat(prover).isUnsatisfiable();
+    }
   }
 
   @Test
