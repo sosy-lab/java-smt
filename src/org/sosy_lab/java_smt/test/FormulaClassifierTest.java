@@ -66,10 +66,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
     // TODO: Should this be classified as QF_LIA?
     requireParser();
     requireIntegers();
-    String query =
-        "(declare-const x Int)"
-            + "(declare-const a Bool)"
-            + "(assert (and a (not a)))";
+    String query = "(declare-const x Int)" + "(declare-const a Bool)" + "(assert (and a (not a)))";
     classifier.visit(mgr.parse(query));
     assertThat(classifier.toString()).isEqualTo("QF_LIA");
   }
