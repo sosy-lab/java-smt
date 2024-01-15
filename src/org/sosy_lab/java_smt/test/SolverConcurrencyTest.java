@@ -188,9 +188,6 @@ public class SolverConcurrencyTest {
    */
   @Test
   public void testBvConcurrencyWithConcurrentContext() {
-    // FIXME: Parallel solving is not supported in Bitwuzla
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BITWUZLA);
-
     requireBitvectors();
     assertConcurrency(
         "testBvConcurrencyWithConcurrentContext",

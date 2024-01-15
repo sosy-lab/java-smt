@@ -150,11 +150,6 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
     requireBitvectors();
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
     String query = BVS + "(assert (bvult bv (bvadd bv #x1)))";
-    // FIXME: Bitwuzla
-    //   UnsupportedOperationException: Can not discern formula kind BITWUZLA_KIND_BV_UMUL_OVERFLOW
-    //   at getDeclarationKind(BitwuzlaFormulaCreator.java:366)
-    //   at visit(BitwuzlaFormulaCreator.java:535)
-    //   ...
     classifier.visit(mgr.parse(query));
     assertThat(classifier.toString()).isEqualTo("QF_BV");
   }

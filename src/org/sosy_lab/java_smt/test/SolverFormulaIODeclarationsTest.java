@@ -274,9 +274,6 @@ public class SolverFormulaIODeclarationsTest
   public void parseDeclareOnceNotTwiceTest3() {
     String query1 = "(declare-fun x () Bool)(declare-fun y () Bool)(assert x)";
     String query2 = "(assert y)";
-    // FIXME: Bitwuzla
-    //  IllegalArgumentException: Could not parse input string "(assert y)"
-    //  at parse(BitwuzlaFormulaManager.java:54)
     BooleanFormula formula1 = mgr.parse(query1);
     Truth.assertThat(mgr.extractVariablesAndUFs(formula1).values()).hasSize(1);
     if (Solvers.Z3 == solverToUse()) {
@@ -322,12 +319,6 @@ public class SolverFormulaIODeclarationsTest
             + " (not (= |f::v@2| (_ bv1 32)))))";
     BooleanFormula parsedQuery = mgr.parse(query);
     assertThatFormula(parsedQuery).isUnsatisfiable();
-    // FIXME: Bitwuzla
-    //  UnsupportedOperationException: Can not discern formula kind BITWUZLA_KIND_BV_UADD_OVERFLOW
-    //  We seem to be off by one in the enum?
-    //   BITWUZLA_KIND_BV_SUB,
-    //   BITWUZLA_KIND_BV_UADD_OVERFLOW,
-    //   ...
     assert_().that(mgr.extractVariables(parsedQuery)).hasSize(9);
     assert_().that(mgr.extractVariablesAndUFs(parsedQuery)).hasSize(9);
   }

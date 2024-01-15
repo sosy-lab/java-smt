@@ -419,9 +419,6 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
 
     // positive numbers, signed.
 
-    // FIXME: Bitwuzla
-    //  AssertionError: unexpected formula type for BV formula: Boolean
-    //  at encapsulateBitvector(BitwuzlaFormulaCreator.java:129)
     assertDivision(a, num5, true, b, aEq10, bEq2);
     assertDivision(a, num3, true, num3, aEq10);
     assertDivision(a, numNeg3, true, numNeg3, aEq10);
@@ -603,15 +600,6 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   @Test
   public void test_BitvectorIsZeroAfterShiftLeft() throws SolverException, InterruptedException {
     requireBitvectors();
-    // FIXME: Crashes for Bitwuzla
-    //  bitwuzla: error: invalid call to
-    //  'bitwuzla::Term bitwuzla::mk_term(
-    //      Kind,
-    //      const std::vector<Term>&,
-    //      const std::vector<long unsigned int>&)',
-    //  invalid number of arguments for kind 'BV_NOT', expected  '1' but got '2'
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BITWUZLA);
-
     BitvectorFormula one = bvmgr.makeBitvector(32, 1);
 
     // unsigned char
