@@ -44,7 +44,6 @@ public class NQueens {
   private final SolverContext context;
   private final BooleanFormulaManager bmgr;
   private final int n;
-  private NQueensEnumeratingPropagator theorySolver;
 
   public NQueens(SolverContext pContext, int n) {
     context = pContext;
@@ -252,31 +251,6 @@ public class NQueens {
       }
     }
     return rules;
-  }
-
-  /**
-   * Returns a boolean value indicating whether a queen is placed on the cell corresponding to the
-   * given row and column.
-   *
-   * @param symbols a 2D BooleanFormula array representing the cells of the chess board.
-   * @param model the Model object representing the current state of the board.
-   * @param row the row index of the cell to check.
-   * @param col the column index of the cell to check.
-   * @return true if a queen is placed on the cell, false otherwise.
-   */
-  private boolean getValue(BooleanFormula[][] symbols, Model model, int row, int col) {
-    return Boolean.TRUE.equals(model.evaluate(symbols[row][col]));
-  }
-
-  private void addConstraints(ProverEnvironment prover, BooleanFormula[][] symbols) throws InterruptedException, SolverException{
-    List<BooleanFormula> rules =
-            ImmutableList.<BooleanFormula>builder()
-                    .addAll(rowRule1(symbols))
-                    .addAll(rowRule2(symbols))
-                    .addAll(columnRule(symbols))
-                    .addAll(diagonalRule(symbols))
-                    .build();
-    prover.addConstraint(bmgr.and(rules));
   }
 
   private int enumerateSolutionsClassic(ProverEnvironment prover) throws InterruptedException, SolverException {
