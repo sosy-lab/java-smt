@@ -91,12 +91,15 @@ public class SolverContextFactoryTest {
         // any operating system is allowed, Java is already available.
         return;
       case BOOLECTOR:
-      case BITWUZLA:
       case CVC4:
       case CVC5:
       case OPENSMT:
       case YICES2:
         assume.that(IS_LINUX).isTrue();
+        return;
+      case BITWUZLA:
+        assume.that(IS_LINUX).isTrue();
+        assume.that(isSufficientVersionOfLibc()).isTrue();
         return;
       case MATHSAT5:
         assume.that(IS_LINUX || IS_WINDOWS).isTrue();
@@ -121,6 +124,18 @@ public class SolverContextFactoryTest {
       NativeLibraries.loadLibrary("z3");
     } catch (UnsatisfiedLinkError e) {
       if (e.getMessage().contains("version `GLIBCXX_3.4.26' not found")) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /** Bitwuzla requires GLIB version 2.20 or newer. This is not included in Ubuntu 18.04. */
+  private boolean isSufficientVersionOfLibc() {
+    try {
+      NativeLibraries.loadLibrary("bitwuzla");
+    } catch (UnsatisfiedLinkError e) {
+      if (e.getMessage().contains("version `GLIBC_2.29' not found")) {
         return false;
       }
     }
