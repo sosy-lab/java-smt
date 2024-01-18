@@ -32,6 +32,17 @@ final class Z3UserPropagator extends Native.UserPropagatorBase implements Propag
   private final Z3FormulaManager manager;
   private final UserPropagator userPropagator;
 
+  private enum Z3LBool {
+    FALSE(-1),
+    UNDEFINED(0),
+    TRUE(1);
+
+    final int value;
+    Z3LBool(int value) {
+      this.value = value;
+    }
+  }
+
   Z3UserPropagator(long ctx, long solver, Z3FormulaCreator creator, Z3FormulaManager manager,
                    UserPropagator userPropagator) {
     super(ctx, solver);
@@ -121,8 +132,8 @@ final class Z3UserPropagator extends Native.UserPropagatorBase implements Propag
 
   @Override
   public void propagateConsequence(BooleanFormula[] assignedLiterals, BooleanFormula consequence) {
-    propagateConsequenceWithEqualities(assignedLiterals, new BooleanFormula[0],
-        new BooleanFormula[0], consequence);
+    BooleanFormula[] emptyEqs = new BooleanFormula[0];
+    propagateConsequenceWithEqualities(assignedLiterals, emptyEqs, emptyEqs, consequence);
   }
 
   @Override
@@ -132,10 +143,22 @@ final class Z3UserPropagator extends Native.UserPropagatorBase implements Propag
       BooleanFormula[] equalitiesRHS,
       BooleanFormula consequence) {
     Preconditions.checkArgument(equalitiesLHS.length == equalitiesRHS.length);
-    Native.propagateConflict(this, ctx, solver, javainfo, assignedLiterals.length,
-        extractInfoFromArray(assignedLiterals)
-        , equalitiesLHS.length, extractInfoFromArray(equalitiesLHS), extractInfoFromArray(equalitiesRHS),
-        creator.extractInfo(consequence));
+    Native.propagateConflict(this, ctx, solver, javainfo,
+        assignedLiterals.length,
+        extractInfoFromArray(assignedLiterals),
+        equalitiesLHS.length,
+        extractInfoFromArray(equalitiesLHS),
+        extractInfoFromArray(equalitiesRHS),
+        creator.extractInfo(consequence)
+    );
+  }
+
+  //TODO
+  public void propagateNextDecision(BooleanFormula literal, boolean value) {
+    Z3LBool phase = value ? Z3LBool.TRUE : Z3LBool.FALSE;
+    int index = 0; // Only relevant for bitvector expressions, which are not supported yet.
+    Native.propagateNextSplit(this, ctx, solver, javainfo, creator.extractInfo(literal),0,
+        phase.value);
   }
 
   private long[] extractInfoFromArray(BooleanFormula[] formulaArray) {
