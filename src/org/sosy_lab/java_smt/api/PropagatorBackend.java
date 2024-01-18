@@ -34,9 +34,7 @@ public interface PropagatorBackend {
    * get reported to the user propagator by invoking the callback
    * {@link UserPropagator#onKnownValue} (if notification was enabled via
    * {@link #notifyOnKnownValue}).
-   * Similarly, equalities between registered expressions are reported via
-   * {@link UserPropagator#onEquality} (if enabled via
-   * {@link #notifyOnEquality()}.
+   *
    * @param theoryExpr The expression to observe.
    */
   void registerExpression(BooleanFormula theoryExpr);
@@ -59,31 +57,26 @@ public interface PropagatorBackend {
    * {@link UserPropagator#onKnownValue} and
    * {@link UserPropagator#onFinalCheck()}.
    *
-   * <p> Effectively causes the solver to learn the implication "/\ assignedLiterals => consequence"
+   * <p> Effectively causes the solver to learn the implication "/\ {@code assignedLiterals} =>
+   * {@code consequence}"
+   * It is possible to have an empty set of {@code assignedLiterals} to generate a theory lemma.
    *
    * @param assignedLiterals A set of assigned literals.
-   * @param consequence The consequence implied by the assigned literals.
+   * @param consequence      The consequence implied by the assigned literals.
    */
   void propagateConsequence(BooleanFormula[] assignedLiterals, BooleanFormula consequence);
 
   /**
-   * Propagates a consequence as well as a set of equalities implied by a set of assigned literals.
-   * Shall only be called from within a callback by {@link UserPropagator} such as
-   * {@link UserPropagator#onKnownValue} and
-   * {@link UserPropagator#onFinalCheck()}
+   * Propagates a decision to be made by the solver.
+   * If called during {@link UserPropagator#onKnownValue}, will set the next decision to be made.
    *
-   * <p> Effectively causes the solver to learn the implication "/\ assignedLiterals =>
-   *    (consequence /\ forall i: equalitiesLHS[i] == equalitiesRHS[i])"
-   *
-   * @param assignedLiterals A set of assigned literals.
-   * @param equalitiesLHS The left-hand sides of implied equalities.
-   * @param equalitiesRHS The right-hand sides of implied equalities.
-   * @param consequence The consequence implied by the assigned literals.
+   * @param literal The literal to assign to next.
+   * @param value   The value to be assigned.
+   * @return False, if the value of the literal is already assigned. True, otherwise.
+   * Note that the literal may already be decided before being reported via
+   * {@link UserPropagator#onKnownValue}.
    */
-  void propagateConsequenceWithEqualities(BooleanFormula[] assignedLiterals,
-                                          BooleanFormula[] equalitiesLHS,
-                                          BooleanFormula[] equalitiesRHS,
-                                          BooleanFormula consequence);
+  boolean propagateNextDecision(BooleanFormula literal, boolean value);
 
   /**
    * Enables tracking of expression values for the associated {@link UserPropagator} via
@@ -94,16 +87,6 @@ public interface PropagatorBackend {
    * {@link #registerExpression}.
    */
   void notifyOnKnownValue();
-
-  /**
-   * Enables tracking of equalities for the associated {@link UserPropagator} via
-   * {@link UserPropagator#onEquality(BooleanFormula, BooleanFormula)}.
-   *
-   * <p>This function is typically called from {@link UserPropagator#initialize()} if the
-   * theory solver needs to observe equalities between expressions registered by
-   * {@link #registerExpression}.
-   */
-  void notifyOnEquality();
 
   /**
    * Enables the final callback {@link UserPropagator#onFinalCheck()} that is invoked

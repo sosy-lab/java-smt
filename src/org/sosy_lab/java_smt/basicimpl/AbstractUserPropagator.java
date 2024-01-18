@@ -36,11 +36,6 @@ public abstract class AbstractUserPropagator implements UserPropagator  {
   }
 
   @Override
-  public void onEquality(BooleanFormula x, BooleanFormula y) {
-
-  }
-
-  @Override
   public void onKnownValue(BooleanFormula expr, BooleanFormula val) {
 
   }

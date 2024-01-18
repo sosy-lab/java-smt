@@ -32,17 +32,6 @@ final class Z3UserPropagator extends Native.UserPropagatorBase implements Propag
   private final Z3FormulaManager manager;
   private final UserPropagator userPropagator;
 
-  private enum Z3LBool {
-    FALSE(-1),
-    UNDEFINED(0),
-    TRUE(1);
-
-    final int value;
-    Z3LBool(int value) {
-      this.value = value;
-    }
-  }
-
   Z3UserPropagator(long ctx, long solver, Z3FormulaCreator creator, Z3FormulaManager manager,
                    UserPropagator userPropagator) {
     super(ctx, solver);
@@ -70,9 +59,10 @@ final class Z3UserPropagator extends Native.UserPropagatorBase implements Propag
     userPropagator.onFinalCheck();
   }
 
+  // TODO: This method is not supported for now.
   @Override
-  public void eqWrapper(long lx, long ly) {
-    userPropagator.onEquality(creator.encapsulateBoolean(lx), creator.encapsulateBoolean(ly));
+  protected void eqWrapper(long pL, long pL1) {
+
   }
 
   @Override
@@ -116,11 +106,6 @@ final class Z3UserPropagator extends Native.UserPropagatorBase implements Propag
   }
 
   @Override
-  public void notifyOnEquality() {
-    registerEq();
-  }
-
-  @Override
   public void notifyOnFinalCheck() {
     registerFinal();
   }
@@ -133,32 +118,33 @@ final class Z3UserPropagator extends Native.UserPropagatorBase implements Propag
   @Override
   public void propagateConsequence(BooleanFormula[] assignedLiterals, BooleanFormula consequence) {
     BooleanFormula[] emptyEqs = new BooleanFormula[0];
-    propagateConsequenceWithEqualities(assignedLiterals, emptyEqs, emptyEqs, consequence);
-  }
-
-  @Override
-  public void propagateConsequenceWithEqualities(
-      BooleanFormula[] assignedLiterals,
-      BooleanFormula[] equalitiesLHS,
-      BooleanFormula[] equalitiesRHS,
-      BooleanFormula consequence) {
-    Preconditions.checkArgument(equalitiesLHS.length == equalitiesRHS.length);
     Native.propagateConflict(this, ctx, solver, javainfo,
         assignedLiterals.length,
         extractInfoFromArray(assignedLiterals),
-        equalitiesLHS.length,
-        extractInfoFromArray(equalitiesLHS),
-        extractInfoFromArray(equalitiesRHS),
+        emptyEqs.length,
+        extractInfoFromArray(emptyEqs),
+        extractInfoFromArray(emptyEqs),
         creator.extractInfo(consequence)
     );
   }
 
-  //TODO
-  public void propagateNextDecision(BooleanFormula literal, boolean value) {
+  private enum Z3LBool {
+    FALSE(-1),
+    UNDEFINED(0),
+    TRUE(1);
+
+    final int value;
+    Z3LBool(int value) {
+      this.value = value;
+    }
+  }
+
+  @Override
+  public boolean propagateNextDecision(BooleanFormula literal, boolean value) {
     Z3LBool phase = value ? Z3LBool.TRUE : Z3LBool.FALSE;
     int index = 0; // Only relevant for bitvector expressions, which are not supported yet.
-    Native.propagateNextSplit(this, ctx, solver, javainfo, creator.extractInfo(literal),0,
-        phase.value);
+    return Native.propagateNextSplit(this, ctx, solver, javainfo, creator.extractInfo(literal),
+        index, phase.value);
   }
 
   private long[] extractInfoFromArray(BooleanFormula[] formulaArray) {

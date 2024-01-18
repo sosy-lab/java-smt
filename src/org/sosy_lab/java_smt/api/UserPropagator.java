@@ -57,27 +57,11 @@ public interface UserPropagator {
   void onFinalCheck();
 
   /**
-   * This callback is invoked if the solver finds two registered expressions
-   * ({@link #registerExpression})
-   * to be equal.
-   *
-   * <p>The solver may not report all quadratically-many equalities. Instead, the solver may report
-   * only linearly many equalities (~ a spanning tree) that are sufficient to reconstruct the full
-   * equivalence relation (e.g., via a union-find data structure).
-   *
-   * <p>The reported equalities hold only true on the current and later push levels,
-   * but will in general get invalidated when backtracking.
-   *
-   * Note: This callback is only invoked if the user propagator enabled it via
-   * {@link PropagatorBackend#notifyOnEquality()}.
-   * @param x The first expression.
-   * @param y The second expression that equals the first one.
-   */
-  void onEquality(BooleanFormula x, BooleanFormula y);
-
-  /**
    * This callback is invoked if the solver gets to know the value of a registered expression
    * ({@link #registerExpression}).
+   *
+   * The reported value is only known on the current and later push levels,
+   * but will get invalidated when backtracking.
    *
    * Note: This callback is only invoked if the user propagator enabled it via
    * {@link PropagatorBackend#notifyOnKnownValue()}.
@@ -106,9 +90,6 @@ public interface UserPropagator {
    * get reported to the user propagator by invoking the callback
    * {@link UserPropagator#onKnownValue} (if notification was enabled via
    * {@link PropagatorBackend#notifyOnKnownValue}).
-   * Similarly, equalities between registered expressions are reported via
-   * {@link UserPropagator#onEquality} (if enabled via
-   * {@link PropagatorBackend#notifyOnEquality()}.
    * @param theoryExpr The expression to observe.
    */
   void registerExpression(BooleanFormula theoryExpr);
