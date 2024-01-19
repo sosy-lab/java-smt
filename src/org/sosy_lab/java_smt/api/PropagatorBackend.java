@@ -20,6 +20,8 @@
 
 package org.sosy_lab.java_smt.api;
 
+import java.util.Optional;
+
 /**
  * The PropagatorBackend class is used by {@link UserPropagator} to implement custom user
  * propagators.
@@ -45,38 +47,39 @@ public interface PropagatorBackend {
    * {@link UserPropagator#onKnownValue} and
    * {@link UserPropagator#onFinalCheck()}.
    *
-   * <p> Effectively causes the solver to learn the implication "/\ conflictLiterals => false"
+   * <p> Effectively causes the solver to learn the implication "{@code conflictExpressions} =>
+   *   false"
    *
-   * @param conflictLiterals A set of inconsistent assignments.
+   * @param conflictExpressions A set of inconsistent assignments.
    */
-  void propagateConflict(BooleanFormula[] conflictLiterals);
+  void propagateConflict(BooleanFormula[] conflictExpressions);
 
   /**
-   * Propagates a consequence implied by a set of assigned literals. Shall only be called
+   * Propagates a consequence implied by a set of assigned expressions. Shall only be called
    * from within a callback by {@link UserPropagator} such as
    * {@link UserPropagator#onKnownValue} and
    * {@link UserPropagator#onFinalCheck()}.
    *
-   * <p> Effectively causes the solver to learn the implication "/\ {@code assignedLiterals} =>
+   * <p> Effectively causes the solver to learn the implication "/\ {@code assignedExpressions} =>
    * {@code consequence}"
-   * It is possible to have an empty set of {@code assignedLiterals} to generate a theory lemma.
+   * It is possible to have an empty set of {@code assignedExpressions} to generate a theory lemma.
    *
-   * @param assignedLiterals A set of assigned literals.
-   * @param consequence      The consequence implied by the assigned literals.
+   * @param assignedExpressions A set of assigned expressions.
+   * @param consequence      The consequence implied by the assigned expressions.
    */
-  void propagateConsequence(BooleanFormula[] assignedLiterals, BooleanFormula consequence);
+  void propagateConsequence(BooleanFormula[] assignedExpressions, BooleanFormula consequence);
 
   /**
    * Propagates a decision to be made by the solver.
    * If called during {@link UserPropagator#onKnownValue}, will set the next decision to be made.
    *
-   * @param literal The literal to assign to next.
-   * @param value   The value to be assigned.
-   * @return False, if the value of the literal is already assigned. True, otherwise.
-   * Note that the literal may already be decided before being reported via
+   * @param expr The expression to assign to next.
+   * @param value   The value to be assigned. If not given, the solver will decide.
+   * @return False, if the value of {@code expr} is already assigned. True, otherwise.
+   * Note that the value of {@code expr} may already be decided before being reported via
    * {@link UserPropagator#onKnownValue}.
    */
-  boolean propagateNextDecision(BooleanFormula literal, boolean value);
+  boolean propagateNextDecision(BooleanFormula expr, Optional<Boolean> value);
 
   /**
    * Enables tracking of expression values for the associated {@link UserPropagator} via

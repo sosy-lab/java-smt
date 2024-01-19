@@ -21,13 +21,14 @@
 package org.sosy_lab.java_smt.solvers.z3;
 
 
-import com.google.common.base.Preconditions;
 import com.microsoft.z3.Native;
-import org.sosy_lab.java_smt.api.PropagatorBackend;
+import com.microsoft.z3.Native.UserPropagatorBase;
+import java.util.Optional;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.PropagatorBackend;
 import org.sosy_lab.java_smt.api.UserPropagator;
 
-final class Z3UserPropagator extends Native.UserPropagatorBase implements PropagatorBackend {
+final class Z3UserPropagator extends UserPropagatorBase implements PropagatorBackend {
   private final Z3FormulaCreator creator;
   private final Z3FormulaManager manager;
   private final UserPropagator userPropagator;
@@ -89,6 +90,7 @@ final class Z3UserPropagator extends Native.UserPropagatorBase implements Propag
   //FIXME: Z3's Native.UserPropagatorBase does not define this method but the JNI
   // bindings require its existence. We define an empty stub here to avoid an exception getting
   // thrown.
+  // A recent PR fixes this issues: https://github.com/Z3Prover/z3/pull/7088
   public void decideWrapper(long expr, int i, int j) {}
 
   // ===========================================================================
@@ -111,19 +113,19 @@ final class Z3UserPropagator extends Native.UserPropagatorBase implements Propag
   }
 
   @Override
-  public void propagateConflict(BooleanFormula[] conflictLiterals) {
-    propagateConsequence(conflictLiterals, manager.getBooleanFormulaManager().makeFalse());
+  public void propagateConflict(BooleanFormula[] conflictExpressions) {
+    propagateConsequence(conflictExpressions, manager.getBooleanFormulaManager().makeFalse());
   }
 
   @Override
   public void propagateConsequence(BooleanFormula[] assignedLiterals, BooleanFormula consequence) {
-    BooleanFormula[] emptyEqs = new BooleanFormula[0];
+    long[] emptyEqs = new long[0];
     Native.propagateConflict(this, ctx, solver, javainfo,
         assignedLiterals.length,
         extractInfoFromArray(assignedLiterals),
         emptyEqs.length,
-        extractInfoFromArray(emptyEqs),
-        extractInfoFromArray(emptyEqs),
+        emptyEqs,
+        emptyEqs,
         creator.extractInfo(consequence)
     );
   }
@@ -140,10 +142,11 @@ final class Z3UserPropagator extends Native.UserPropagatorBase implements Propag
   }
 
   @Override
-  public boolean propagateNextDecision(BooleanFormula literal, boolean value) {
-    Z3LBool phase = value ? Z3LBool.TRUE : Z3LBool.FALSE;
+  public boolean propagateNextDecision(BooleanFormula expr, Optional<Boolean> value) {
+    Z3LBool phase = value.map(pBoolean -> (pBoolean ? Z3LBool.TRUE : Z3LBool.FALSE))
+            .orElse(Z3LBool.UNDEFINED);
     int index = 0; // Only relevant for bitvector expressions, which are not supported yet.
-    return Native.propagateNextSplit(this, ctx, solver, javainfo, creator.extractInfo(literal),
+    return Native.propagateNextSplit(this, ctx, solver, javainfo, creator.extractInfo(expr),
         index, phase.value);
   }
 

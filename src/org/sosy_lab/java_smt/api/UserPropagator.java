@@ -59,6 +59,10 @@ public interface UserPropagator {
   /**
    * This callback is invoked if the solver gets to know the value of a registered expression
    * ({@link #registerExpression}).
+   * WIthin the callback, the user can raise conflicts via
+   * {@link PropagatorBackend#propagateConflict}, propagate consequences via
+   * {@link PropagatorBackend#propagateConsequence}, or influence the solvers decision heuristics
+   * via {@link PropagatorBackend#propagateNextDecision}.
    *
    * The reported value is only known on the current and later push levels,
    * but will get invalidated when backtracking.
