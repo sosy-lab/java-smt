@@ -8,8 +8,8 @@
 
 %module BitwuzlaNative
 %{
-#include "include/bitwuzla/cpp/bitwuzla.h"
-#include "include/bitwuzla/cpp/parser.h"
+#include <bitwuzla/cpp/bitwuzla.h>
+#include <bitwuzla/cpp/parser.h>
 
 #include <sstream>
 %}
