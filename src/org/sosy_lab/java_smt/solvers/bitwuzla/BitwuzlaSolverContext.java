@@ -132,10 +132,10 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
   /**
    * Set more options for Bitwuzla.
    *
-   * @param pOptions        current Bitwuzla options
+   * @param pOptions current Bitwuzla options
    * @param pFurtherOptions String to be parsed with options to be set.
    * @throws InvalidConfigurationException signals that the format of the option string is wrong or
-   *                                       an invalid option is used.
+   *     an invalid option is used.
    */
   private static Options setFurtherOptions(Options pOptions, String pFurtherOptions)
       throws InvalidConfigurationException {
