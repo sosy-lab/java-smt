@@ -403,7 +403,13 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
         String name = boundVar.symbol();
         assert name != null;
         Sort sort = boundVar.sort();
-        Term freeVar = formulaCache.get(name, sort); // FIXME: Shouldn this be a fresh variable?
+        Term freeVar;
+        if (formulaCache.contains(name, sort)) {
+          freeVar = formulaCache.get(name, sort);
+        } else {
+          // no free var existing (e.g. from parsing), create a new one
+          freeVar = makeVariable(sort, name);
+        }
         freeVars[i] = freeVar;
         freeEncVars.add(encapsulate(getFormulaType(freeVar), freeVar));
       }
