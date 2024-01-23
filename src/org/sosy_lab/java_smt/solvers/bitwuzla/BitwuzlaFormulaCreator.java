@@ -486,7 +486,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Bit
         long sort = BitwuzlaJNI.bitwuzla_term_get_sort(boundVar);
         long freeVar;
         if (formulaCache.contains(name, sort)) {
-           freeVar = formulaCache.get(name, sort);
+          freeVar = formulaCache.get(name, sort);
         } else {
           // no free var existing (e.g. from parsing), create a new one
           freeVar = makeVariable(sort, name);

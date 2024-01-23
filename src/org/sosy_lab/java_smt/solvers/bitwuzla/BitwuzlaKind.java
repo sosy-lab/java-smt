@@ -57,7 +57,8 @@ public final class BitwuzlaKind {
   public static final BitwuzlaKind BITWUZLA_KIND_BV_MUL = BitwuzlaKind.of("BITWUZLA_KIND_BV_MUL");
   public static final BitwuzlaKind BITWUZLA_KIND_BV_NAND = BitwuzlaKind.of("BITWUZLA_KIND_BV_NAND");
   public static final BitwuzlaKind BITWUZLA_KIND_BV_NEG = BitwuzlaKind.of("BITWUZLA_KIND_BV_NEG");
-  public static final BitwuzlaKind BITWUZLA_KIND_BV_NEG_OVERFLOW = BitwuzlaKind.of("BITWUZLA_KIND_BV_NEG_OVERFLOW");
+  public static final BitwuzlaKind BITWUZLA_KIND_BV_NEG_OVERFLOW =
+      BitwuzlaKind.of("BITWUZLA_KIND_BV_NEG_OVERFLOW");
   public static final BitwuzlaKind BITWUZLA_KIND_BV_NOR = BitwuzlaKind.of("BITWUZLA_KIND_BV_NOR");
   public static final BitwuzlaKind BITWUZLA_KIND_BV_NOT = BitwuzlaKind.of("BITWUZLA_KIND_BV_NOT");
   public static final BitwuzlaKind BITWUZLA_KIND_BV_OR = BitwuzlaKind.of("BITWUZLA_KIND_BV_OR");
@@ -235,7 +236,7 @@ public final class BitwuzlaKind {
     BITWUZLA_KIND_BV_MUL,
     BITWUZLA_KIND_BV_NAND,
     BITWUZLA_KIND_BV_NEG,
-      BITWUZLA_KIND_BV_NEG_OVERFLOW,
+    BITWUZLA_KIND_BV_NEG_OVERFLOW,
     BITWUZLA_KIND_BV_NOR,
     BITWUZLA_KIND_BV_NOT,
     BITWUZLA_KIND_BV_OR,

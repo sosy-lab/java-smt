@@ -35,8 +35,8 @@ public final class BitwuzlaOption {
   public static final BitwuzlaOption BITWUZLA_OPT_TIME_LIMIT_PER =
       new BitwuzlaOption("BITWUZLA_OPT_TIME_LIMIT_PER");
 
-  public static final BitwuzlaOption BITWUZLA_OPT_MEMORY_LIMIT = new BitwuzlaOption(
-      "BITWUZLA_OPT_MEMORY_LIMIT");
+  public static final BitwuzlaOption BITWUZLA_OPT_MEMORY_LIMIT =
+      new BitwuzlaOption("BITWUZLA_OPT_MEMORY_LIMIT");
   public static final BitwuzlaOption BITWUZLA_OPT_BV_SOLVER =
       new BitwuzlaOption("BITWUZLA_OPT_BV_SOLVER");
   public static final BitwuzlaOption BITWUZLA_OPT_REWRITE_LEVEL =
@@ -137,7 +137,8 @@ public final class BitwuzlaOption {
     BITWUZLA_OPT_PRODUCE_UNSAT_CORES,
     BITWUZLA_OPT_SEED,
     BITWUZLA_OPT_VERBOSITY,
-    BITWUZLA_OPT_TIME_LIMIT_PER, BITWUZLA_OPT_MEMORY_LIMIT,
+    BITWUZLA_OPT_TIME_LIMIT_PER,
+    BITWUZLA_OPT_MEMORY_LIMIT,
     BITWUZLA_OPT_BV_SOLVER,
     BITWUZLA_OPT_REWRITE_LEVEL,
     BITWUZLA_OPT_SAT_SOLVER,
