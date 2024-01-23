@@ -8,16 +8,25 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
+
 import com.google.common.base.Preconditions;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.sosy_lab.common.Appender;
-import org.sosy_lab.common.Appenders;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Options;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Parser;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Sort;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Term;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Term;
 
 final class BitwuzlaFormulaManager
-    extends AbstractFormulaManager<Long, Long, Long, BitwuzlaDeclaration> {
+    extends AbstractFormulaManager<Term, Sort, Void, BitwuzlaDeclaration> {
+
+  private final Options bitwuzlaOption;
 
   BitwuzlaFormulaManager(
       BitwuzlaFormulaCreator pFormulaCreator,
@@ -26,7 +35,8 @@ final class BitwuzlaFormulaManager
       BitwuzlaBitvectorFormulaManager pBitvectorManager,
       BitwuzlaQuantifiedFormulaManager pQuantifierManager,
       BitwuzlaFloatingPointManager pFloatingPointManager,
-      BitwuzlaArrayFormulaManager pArrayManager) {
+      BitwuzlaArrayFormulaManager pArrayManager,
+      Options pBitwuzlaOptions) {
     super(
         pFormulaCreator,
         pFunctionManager,
@@ -40,6 +50,8 @@ final class BitwuzlaFormulaManager
         null,
         null,
         null);
+
+    bitwuzlaOption = pBitwuzlaOptions;
   }
 
   @Override
@@ -50,24 +62,31 @@ final class BitwuzlaFormulaManager
     if (s.contains("(exit)")) {
       s = s.replace("(exit)", "");
     }
-    long[] terms = BitwuzlaJNI.parse(s);
-    Preconditions.checkArgument(terms != null, "Could not parse input string \"%s\"", s);
-    assert terms != null;
-    // AND all the terms
-    Long retForm;
-    if (terms.length > 1) {
-      retForm =
-          BitwuzlaJNI.bitwuzla_mk_term(
-              BitwuzlaKind.BITWUZLA_KIND_AND.swigValue(), terms.length, terms);
-    } else {
-      retForm = terms[0];
+
+    // create a temporary file and dump the formulas to it in SMTLIB2 format
+    Path file;
+    try {
+      file = Files.createTempFile("bitwuzla-", ".smt2");
+      Files.writeString(file, s);
+    } catch (IOException e) {
+      throw new RuntimeException("Could not created temporary file for parsing", e);
     }
-    assert BitwuzlaJNI.bitwuzla_term_is_bool(retForm);
-    return super.getFormulaCreator().encapsulateBoolean(retForm);
+
+    // run the parser on the temporary file
+    Parser parser = new Parser(bitwuzlaOption, file.toString());
+    String error = parser.parse(true);
+
+    Preconditions.checkArgument(error.isEmpty(), error);
+    Vector_Term assertions = parser.bitwuzla().get_assertions();
+
+    Preconditions.checkArgument(assertions.size() == 1, "Could not parse input string \"%s\"", s);
+    return getFormulaCreator().encapsulateBoolean(assertions.get(0));
   }
 
   @Override
-  public Appender dumpFormula(Long pTerm) {
+  public Appender dumpFormula(Term pTerm) {
+    // TODO: We need to reimplement this
+    /*
     // There are 2 ways of SMT2 printing in Bitwuzla, bitwuzla_term_print() and
     // bitwuzla_term_print_fmt(), which print a single formula, and bitwuzla_print_formula(),
     // which prints the complete assertion stack of the bitwuzla instance given to the function.
@@ -91,9 +110,11 @@ final class BitwuzlaFormulaManager
         out.append(dump);
       }
     };
+    */
+    throw new UnsupportedOperationException();
   }
 
-  static long getBitwuzlaTerm(Formula pT) {
+  static Term getBitwuzlaTerm(Formula pT) {
     return ((BitwuzlaFormula) pT).getTerm();
   }
 }

@@ -16,6 +16,7 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
+/*
 public class NumericValue {
   private transient long swigCPtr;
   protected transient boolean swigCMemOwn;
@@ -75,3 +76,4 @@ public class NumericValue {
     this(BitwuzlaJNI.new_NumericValue(), true);
   }
 }
+*/

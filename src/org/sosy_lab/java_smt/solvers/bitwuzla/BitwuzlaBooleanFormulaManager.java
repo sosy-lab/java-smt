@@ -10,50 +10,52 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Bitwuzla;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Kind;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Sort;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Term;
 
 public class BitwuzlaBooleanFormulaManager
-    extends AbstractBooleanFormulaManager<Long, Long, Long, BitwuzlaDeclaration> {
+    extends AbstractBooleanFormulaManager<Term, Sort, Void, BitwuzlaDeclaration> {
   // private final long bitwuzla;
-  private final long pTrue;
-  private final long pFalse;
+  private final Term pTrue;
+  private final Term pFalse;
 
   protected BitwuzlaBooleanFormulaManager(
-      FormulaCreator<Long, Long, Long, BitwuzlaDeclaration> pCreator) {
+      FormulaCreator<Term, Sort, Void, BitwuzlaDeclaration> pCreator) {
     super(pCreator);
     // bitwuzla = getFormulaCreator().getEnv();
-    pTrue = BitwuzlaJNI.bitwuzla_mk_true();
-    pFalse = BitwuzlaJNI.bitwuzla_mk_false();
+    pTrue = Bitwuzla.mk_true();
+    pFalse = Bitwuzla.mk_false();
   }
 
   @Override
-  protected Long makeVariableImpl(String pVar) {
-    long boolType = getFormulaCreator().getBoolType();
+  protected Term makeVariableImpl(String pVar) {
+    Sort boolType = getFormulaCreator().getBoolType();
     return getFormulaCreator().makeVariable(boolType, pVar);
   }
 
   @Override
-  protected Long makeBooleanImpl(boolean value) {
+  protected Term makeBooleanImpl(boolean value) {
     return value ? pTrue : pFalse;
   }
 
   @Override
-  protected Long not(Long pParam1) {
+  protected Term not(Term pParam1) {
     if (isTrue(pParam1)) {
       return pFalse;
     } else if (isFalse(pParam1)) {
       return pTrue;
     }
 
-    if (BitwuzlaJNI.bitwuzla_term_get_kind(pParam1) == BitwuzlaKind.BITWUZLA_KIND_NOT.swigValue()) {
-      long[] size = new long[1];
-      long[] pChildren = BitwuzlaJNI.bitwuzla_term_get_children(pParam1, size);
-      return pChildren[0];
+    if (pParam1.kind() == Kind.NOT) {
+      return pParam1.get(0);
     }
-    return BitwuzlaJNI.bitwuzla_mk_term1(BitwuzlaKind.BITWUZLA_KIND_NOT.swigValue(), pParam1);
+    return Bitwuzla.mk_term(Kind.NOT, pParam1);
   }
 
   @Override
-  protected Long and(Long pParam1, Long pParam2) {
+  protected Term and(Term pParam1, Term pParam2) {
     if (isTrue(pParam1)) {
       return pParam2;
     } else if (isTrue(pParam2)) {
@@ -65,12 +67,11 @@ public class BitwuzlaBooleanFormulaManager
     } else if (pParam1.equals(pParam2)) {
       return pParam1;
     }
-    return BitwuzlaJNI.bitwuzla_mk_term2(
-        BitwuzlaKind.BITWUZLA_KIND_AND.swigValue(), pParam1, pParam2);
+    return Bitwuzla.mk_term(Kind.AND, pParam1, pParam2);
   }
 
   @Override
-  protected Long or(Long pParam1, Long pParam2) {
+  protected Term or(Term pParam1, Term pParam2) {
     if (isTrue(pParam1)) {
       return pTrue;
     } else if (isTrue(pParam2)) {
@@ -82,33 +83,31 @@ public class BitwuzlaBooleanFormulaManager
     } else if (pParam1.equals(pParam2)) {
       return pParam1;
     }
-    return BitwuzlaJNI.bitwuzla_mk_term2(
-        BitwuzlaKind.BITWUZLA_KIND_OR.swigValue(), pParam1, pParam2);
+    return Bitwuzla.mk_term(Kind.OR, pParam1, pParam2);
   }
 
   @Override
-  protected Long xor(Long pParam1, Long pParam2) {
-    return BitwuzlaJNI.bitwuzla_mk_term2(
-        BitwuzlaKind.BITWUZLA_KIND_XOR.swigValue(), pParam1, pParam2);
+  protected Term xor(Term pParam1, Term pParam2) {
+    return Bitwuzla.mk_term(Kind.XOR, pParam1, pParam2);
   }
 
   @Override
-  protected Long equivalence(Long bits1, Long bits2) {
-    return BitwuzlaJNI.bitwuzla_mk_term2(BitwuzlaKind.BITWUZLA_KIND_IFF.swigValue(), bits1, bits2);
+  protected Term equivalence(Term bits1, Term bits2) {
+    return Bitwuzla.mk_term(Kind.IFF, bits1, bits2);
   }
 
   @Override
-  protected boolean isTrue(Long bits) {
-    return BitwuzlaJNI.bitwuzla_term_is_true(bits);
+  protected boolean isTrue(Term bits) {
+    return bits.is_true();
   }
 
   @Override
-  protected boolean isFalse(Long bits) {
-    return BitwuzlaJNI.bitwuzla_term_is_false(bits);
+  protected boolean isFalse(Term bits) {
+    return bits.is_false();
   }
 
   @Override
-  protected Long ifThenElse(Long pCond, Long pF1, Long pF2) {
+  protected Term ifThenElse(Term pCond, Term pF1, Term pF2) {
     if (isTrue(pCond)) {
       return pF1;
     } else if (isFalse(pCond)) {
@@ -120,7 +119,6 @@ public class BitwuzlaBooleanFormulaManager
     } else if (isFalse(pF1) && isTrue(pF2)) {
       return not(pCond);
     }
-    return BitwuzlaJNI.bitwuzla_mk_term3(
-        BitwuzlaKind.BITWUZLA_KIND_ITE.swigValue(), pCond, pF1, pF2);
+    return Bitwuzla.mk_term(Kind.ITE, pCond, pF1, pF2);
   }
 }

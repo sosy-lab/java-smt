@@ -14,51 +14,59 @@ import java.util.List;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Bitwuzla;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Kind;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Map_TermTerm;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Sort;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Term;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Term;
 
 public class BitwuzlaQuantifiedFormulaManager
-    extends AbstractQuantifiedFormulaManager<Long, Long, Long, BitwuzlaDeclaration> {
+    extends AbstractQuantifiedFormulaManager<Term, Sort, Void, BitwuzlaDeclaration> {
 
   protected BitwuzlaQuantifiedFormulaManager(
-      FormulaCreator<Long, Long, Long, BitwuzlaDeclaration> pCreator) {
+      FormulaCreator<Term, Sort, Void, BitwuzlaDeclaration> pCreator) {
     super(pCreator);
   }
 
   @Override
-  protected Long eliminateQuantifiers(Long pExtractInfo)
+  protected Term eliminateQuantifiers(Term pExtractInfo)
       throws SolverException, InterruptedException {
     throw new UnsupportedOperationException("Bitwuzla does not support eliminating Quantifiers.");
   }
 
   @Override
-  public Long mkQuantifier(Quantifier q, List<Long> vars, Long body) {
+  public Term mkQuantifier(Quantifier q, List<Term> vars, Term body) {
     checkArgument(
         !vars.isEmpty(), "The list of bound variables for a quantifier may not be empty.");
-    long[] origVars = new long[vars.size()];
-    long[] substVars = new long[vars.size()];
+    Term[] origVars = new Term[vars.size()];
+    Term[] substVars = new Term[vars.size()];
 
     for (int i = 0; i < vars.size(); i++) {
-      long var = vars.get(i);
+      Term var = vars.get(i);
       origVars[i] = var;
       // Create/Use bound vars
-      long boundCopy = ((BitwuzlaFormulaCreator) formulaCreator).makeBoundVariable(var);
+      Term boundCopy = ((BitwuzlaFormulaCreator) formulaCreator).makeBoundVariable(var);
       substVars[i] = boundCopy;
     }
-    long substBody = BitwuzlaJNI.bitwuzla_substitute_term(body, vars.size(), origVars, substVars);
 
-    long[] argsAndBody = new long[2];
-    argsAndBody[1] = substBody;
-    long currentFormula = substBody;
+    Map_TermTerm map = new Map_TermTerm();
+    for (int i = 0; i < origVars.length; i++) {
+      map.put(origVars[i], substVars[i]);
+    }
+    // FIXME: This will ovewrite the old body
+    body.substitute(map);
+
+    Term[] argsAndBody = new Term[2];
+    argsAndBody[1] = body;
+    Term currentFormula = body;
     for (int i = 0; i < vars.size(); i++) {
       argsAndBody[0] = substVars[i];
       if (q.equals(Quantifier.FORALL)) {
-        currentFormula =
-            BitwuzlaJNI.bitwuzla_mk_term(
-                BitwuzlaKind.BITWUZLA_KIND_FORALL.swigValue(), argsAndBody.length, argsAndBody);
+        currentFormula = Bitwuzla.mk_term(Kind.FORALL, new Vector_Term(argsAndBody));
 
       } else {
-        currentFormula =
-            BitwuzlaJNI.bitwuzla_mk_term(
-                BitwuzlaKind.BITWUZLA_KIND_EXISTS.swigValue(), argsAndBody.length, argsAndBody);
+        currentFormula = Bitwuzla.mk_term(Kind.EXISTS, new Vector_Term(argsAndBody));
       }
       argsAndBody[1] = currentFormula;
     }

@@ -8,45 +8,45 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_EQUAL;
-
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Bitwuzla;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Kind;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Sort;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Term;
 
 public class BitwuzlaArrayFormulaManager
-    extends AbstractArrayFormulaManager<Long, Long, Long, BitwuzlaDeclaration> {
+    extends AbstractArrayFormulaManager<Term, Sort, Void, BitwuzlaDeclaration> {
 
   protected BitwuzlaArrayFormulaManager(BitwuzlaFormulaCreator pCreator) {
     super(pCreator);
   }
 
   @Override
-  protected Long select(Long pArray, Long pIndex) {
-    return BitwuzlaJNI.bitwuzla_mk_term2(
-        BitwuzlaKind.BITWUZLA_KIND_ARRAY_SELECT.swigValue(), pArray, pIndex);
+  protected Term select(Term pArray, Term pIndex) {
+    return Bitwuzla.mk_term(Kind.ARRAY_SELECT, pArray, pIndex);
   }
 
   @Override
-  protected Long store(Long pArray, Long pIndex, Long pValue) {
-    return BitwuzlaJNI.bitwuzla_mk_term3(
-        BitwuzlaKind.BITWUZLA_KIND_ARRAY_STORE.swigValue(), pArray, pIndex, pValue);
+  protected Term store(Term pArray, Term pIndex, Term pValue) {
+    return Bitwuzla.mk_term(Kind.ARRAY_STORE, pArray, pIndex, pValue);
   }
 
   @Override
   @SuppressWarnings("MethodTypeParameterName")
-  protected <TI extends Formula, TE extends Formula> Long internalMakeArray(
+  protected <TI extends Formula, TE extends Formula> Term internalMakeArray(
       String pName, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
     final ArrayFormulaType<TI, TE> arrayFormulaType =
         FormulaType.getArrayType(pIndexType, pElementType);
-    final long bitwuzlaArrayType = toSolverType(arrayFormulaType);
-    long newVar = getFormulaCreator().makeVariable(bitwuzlaArrayType, pName);
+    final Sort bitwuzlaArrayType = toSolverType(arrayFormulaType);
+    Term newVar = getFormulaCreator().makeVariable(bitwuzlaArrayType, pName);
     return newVar;
   }
 
   @Override
-  protected Long equivalence(Long pArray1, Long pArray2) {
-    return BitwuzlaJNI.bitwuzla_mk_term2(BITWUZLA_KIND_EQUAL.swigValue(), pArray1, pArray2);
+  protected Term equivalence(Term pArray1, Term pArray2) {
+    return Bitwuzla.mk_term(Kind.EQUAL, pArray1, pArray2);
   }
 }

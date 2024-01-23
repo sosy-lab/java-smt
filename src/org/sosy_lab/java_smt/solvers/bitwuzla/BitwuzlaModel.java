@@ -20,22 +20,27 @@ import java.util.List;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Bitwuzla;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Kind;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Sort;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Term;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Term;
 
-class BitwuzlaModel extends AbstractModel<Long, Long, Long> {
+class BitwuzlaModel extends AbstractModel<Term, Sort, Void> {
 
   // The prover env, not the creator env!
-  private final long bitwuzlaEnv;
+  private final Bitwuzla bitwuzlaEnv;
 
   private final BitwuzlaTheoremProver prover;
 
   private final BitwuzlaFormulaCreator bitwuzlaCreator;
-  private final ImmutableList<Long> assertedTerms;
+  private final ImmutableList<Term> assertedTerms;
 
   protected BitwuzlaModel(
-      long bitwuzlaEnv,
+      Bitwuzla bitwuzlaEnv,
       BitwuzlaTheoremProver prover,
       BitwuzlaFormulaCreator bitwuzlaCreator,
-      Collection<Long> assertedTerms) {
+      Collection<Term> assertedTerms) {
     super(prover, bitwuzlaCreator);
     this.bitwuzlaEnv = bitwuzlaEnv;
     this.prover = prover;
@@ -49,42 +54,38 @@ class BitwuzlaModel extends AbstractModel<Long, Long, Long> {
     Preconditions.checkState(!isClosed());
     Preconditions.checkState(!prover.isClosed(), "Cannot use model after prover is closed");
     ImmutableSet.Builder<ValueAssignment> variablesBuilder = ImmutableSet.builder();
-    Deque<Long> queue = new ArrayDeque<>(assertedTerms);
+    Deque<Term> queue = new ArrayDeque<>(assertedTerms);
     while (!queue.isEmpty()) {
-      long term = queue.removeFirst();
-      long[] children = BitwuzlaJNI.bitwuzla_term_get_children(term, new long[1]);
+      Term term = queue.removeFirst();
+      Sort sort = term.sort();
+      Vector_Term children = term.children();
       // The term might be a value (variable or const, w only variable having a symbol)
       // an array, an UF, or an FP or a function.
       // Functions are just split into their children and those are traversed
-      if (BitwuzlaJNI.bitwuzla_term_is_rm(term)) {
+      if (sort.is_rm()) {
         // Do nothing
-      } else if (BitwuzlaJNI.bitwuzla_term_get_kind(term)
-          == BitwuzlaKind.BITWUZLA_KIND_APPLY.swigValue()) {
+      } else if (term.kind() == Kind.APPLY) {
         variablesBuilder.add(getUFAssignment(term));
-        for (int i = 1; i < children.length; i++) {
-          queue.addLast(children[i]);
+        for (int i = 1; i < children.size(); i++) {
+          queue.addLast(children.get(i));
         }
 
-      } else if (BitwuzlaJNI.bitwuzla_term_is_bv(term)
-          && BitwuzlaJNI.bitwuzla_term_is_const(term)) {
+      } else if (sort.is_bv() && term.is_const()) {
         variablesBuilder.add(getSimpleAssignment(term));
 
-      } else if (BitwuzlaJNI.bitwuzla_term_is_bool(term)
-          && BitwuzlaJNI.bitwuzla_term_is_const(term)) {
+      } else if (sort.is_bool() && term.is_const()) {
         variablesBuilder.add(getSimpleAssignment(term));
 
-      } else if (BitwuzlaJNI.bitwuzla_term_is_fp(term)
-          && BitwuzlaJNI.bitwuzla_term_is_const(term)) {
+      } else if (sort.is_fp() && term.is_const()) {
         // We can't eval FP properly at the moment, we just return whatever the solver gives us
         // (BV representation of the FP)
         variablesBuilder.add(getSimpleAssignment(term));
 
-      } else if (BitwuzlaJNI.bitwuzla_term_is_array(term)
-          && BitwuzlaJNI.bitwuzla_term_is_const(term)) {
+      } else if (sort.is_array() && term.is_const()) {
         variablesBuilder.addAll(getArrayAssignment(term));
 
       } else {
-        for (long child : children) {
+        for (Term child : children) {
           queue.addLast(child);
         }
       }
@@ -93,10 +94,10 @@ class BitwuzlaModel extends AbstractModel<Long, Long, Long> {
     return variablesBuilder.build().asList();
   }
 
-  private ValueAssignment getSimpleAssignment(long pTerm) {
+  private ValueAssignment getSimpleAssignment(Term pTerm) {
     List<Object> argumentInterpretation = new ArrayList<>();
-    long valueTerm = BitwuzlaJNI.bitwuzla_get_value(bitwuzlaEnv, pTerm);
-    String name = BitwuzlaJNI.bitwuzla_term_get_symbol(pTerm);
+    Term valueTerm = bitwuzlaEnv.get_value(pTerm);
+    String name = pTerm.symbol();
     assert name != null;
     return new ValueAssignment(
         bitwuzlaCreator.encapsulateWithTypeOf(pTerm),
@@ -107,13 +108,13 @@ class BitwuzlaModel extends AbstractModel<Long, Long, Long> {
         argumentInterpretation);
   }
 
-  private Collection<ValueAssignment> getArrayAssignment(long pTerm) {
+  private Collection<ValueAssignment> getArrayAssignment(Term pTerm) {
     return getArrayAssignments(pTerm, ImmutableList.of());
   }
 
   // TODO: check this in detail. I think this might be incomplete.
   // We should add more Model tests in general. As most are parsing and int based!
-  private Collection<ValueAssignment> getArrayAssignments(long pTerm, List<Object> upperIndices) {
+  private Collection<ValueAssignment> getArrayAssignments(Term pTerm, List<Object> upperIndices) {
     // Array children for store are structured in the following way:
     // {starting array, index, value} in "we add value at index to array"
     // Selections are structured: {starting array, index}
@@ -125,54 +126,53 @@ class BitwuzlaModel extends AbstractModel<Long, Long, Long> {
     // formula})
 
     // TODO: Array equals value
-    long array = pTerm;
+    Term array = pTerm;
     Collection<ValueAssignment> assignments = new ArrayList<>();
-    Set<Long> indices = new HashSet<>();
-    while (BitwuzlaJNI.bitwuzla_term_is_array(array)) {
+    Set<Term> indices = new HashSet<>();
+    while (array.sort().is_array()) {
       // Here we either have STORE; SELECT or an empty Array
-      long[] children = BitwuzlaJNI.bitwuzla_term_get_children(array, new long[1]);
+      Vector_Term children = array.children();
       List<Object> innerIndices = new ArrayList<>(upperIndices);
       String name = getArrayName(array);
       assert name != null;
-      if (children.length == 0) {
+      if (children.size() == 0) {
         // Empty array
         return assignments;
-      } else if (children.length == 2) {
+      } else if (children.size() == 2) {
         // SELECT expression
-        long index = children[1];
-
+        Term index = children.get(1);
         if (!indices.add(index)) {
           continue;
         }
 
-        long indexValue = BitwuzlaJNI.bitwuzla_get_value(bitwuzlaEnv, index);
+        Term indexValue = bitwuzlaEnv.get_value(index);
         innerIndices.add(evaluateImpl(indexValue));
 
         // The value of an SELECT is equal to the content
-        long valueTerm = BitwuzlaJNI.bitwuzla_get_value(bitwuzlaEnv, array);
+        Term valueTerm = bitwuzlaEnv.get_value(array);
 
         assignments.add(
             new ValueAssignment(
                 bitwuzlaCreator.encapsulateWithTypeOf(array),
                 bitwuzlaCreator.encapsulateWithTypeOf(valueTerm),
-                creator.encapsulateBoolean(buildEqForTwoTerms(pTerm, valueTerm)),
+                creator.encapsulateBoolean(buildEqForTwoTerms(array, valueTerm)),
                 name,
                 evaluateImpl(valueTerm),
                 innerIndices));
-        array = children[0];
+        array = children.get(0);
 
       } else {
         // STORE expression
-        assert children.length == 3;
-        long index = children[1];
-        long content = children[2];
+        assert children.size() == 3;
+        Term index = children.get(1);
+        Term content = children.get(2);
 
         if (!indices.add(index)) {
           continue;
         }
 
-        long indexValue = BitwuzlaJNI.bitwuzla_get_value(bitwuzlaEnv, index);
-        long contentValue = BitwuzlaJNI.bitwuzla_get_value(bitwuzlaEnv, content);
+        Term indexValue = bitwuzlaEnv.get_value(index);
+        Term contentValue = bitwuzlaEnv.get_value(content);
         innerIndices.add(evaluateImpl(indexValue));
         assignments.add(
             new ValueAssignment(
@@ -183,41 +183,41 @@ class BitwuzlaModel extends AbstractModel<Long, Long, Long> {
                 evaluateImpl(contentValue),
                 innerIndices));
 
-        array = children[0];
+        array = children.get(0);
         assignments.addAll(getArrayAssignments(array, innerIndices));
       }
     }
     return assignments;
   }
 
-  private String getArrayName(long array) {
-    String name = BitwuzlaJNI.bitwuzla_term_get_symbol(array);
+  private String getArrayName(Term array) {
+    String name = array.symbol();
     if (name != null) {
       return name;
     }
-    return getArrayName(BitwuzlaJNI.bitwuzla_term_get_children(array, new long[1])[0]);
+    return getArrayName(array.get(0));
   }
 
-  private long buildEqForTwoTerms(long left, long right) {
-    assert BitwuzlaJNI.bitwuzla_term_is_equal_sort(left, right);
-    BitwuzlaKind kind = BitwuzlaKind.BITWUZLA_KIND_EQUAL;
-    if (BitwuzlaJNI.bitwuzla_term_is_fp(left)) {
-      kind = BitwuzlaKind.BITWUZLA_KIND_FP_EQUAL;
+  private Term buildEqForTwoTerms(Term left, Term right) {
+    assert left.sort().equals(right.sort());
+    Kind kind = Kind.EQUAL;
+    if (left.sort().is_fp()) {
+      kind = Kind.FP_EQUAL;
     }
-    return BitwuzlaJNI.bitwuzla_mk_term2(kind.swigValue(), left, right);
+    return Bitwuzla.mk_term(kind, left, right);
   }
 
-  private ValueAssignment getUFAssignment(long pTerm) {
-    long valueTerm = BitwuzlaJNI.bitwuzla_get_value(bitwuzlaEnv, pTerm);
+  private ValueAssignment getUFAssignment(Term pTerm) {
+    Term valueTerm = bitwuzlaEnv.get_value(pTerm);
     // The first child is the decl, the others are args
-    long[] children = BitwuzlaJNI.bitwuzla_term_get_children(pTerm, new long[1]);
-    String name = BitwuzlaJNI.bitwuzla_term_get_symbol(children[0]);
+    Vector_Term children = pTerm.children();
+    String name = children.get(0).symbol();
     assert name != null;
 
     List<Object> argumentInterpretation = new ArrayList<>();
-    for (int i = 1; i < children.length; i++) {
-      long child = children[i];
-      long childValue = BitwuzlaJNI.bitwuzla_get_value(bitwuzlaEnv, child);
+    for (int i = 1; i < children.size(); i++) {
+      Term child = children.get(i);
+      Term childValue = bitwuzlaEnv.get_value(child);
       argumentInterpretation.add(creator.convertValue(childValue));
     }
 
@@ -231,8 +231,8 @@ class BitwuzlaModel extends AbstractModel<Long, Long, Long> {
   }
 
   @Override
-  protected @Nullable Long evalImpl(Long formula) {
+  protected @Nullable Term evalImpl(Term formula) {
     Preconditions.checkState(!prover.isClosed(), "Cannot use model after prover is closed");
-    return BitwuzlaJNI.bitwuzla_get_value(bitwuzlaEnv, formula);
+    return bitwuzlaEnv.get_value(formula);
   }
 }

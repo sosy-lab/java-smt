@@ -10,9 +10,11 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import org.sosy_lab.java_smt.basicimpl.AbstractUFManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Sort;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Term;
 
-public class BitwuzlaUFManager extends AbstractUFManager<Long, BitwuzlaDeclaration, Long, Long> {
-  protected BitwuzlaUFManager(FormulaCreator<Long, Long, Long, BitwuzlaDeclaration> pCreator) {
+public class BitwuzlaUFManager extends AbstractUFManager<Term, BitwuzlaDeclaration, Sort, Void> {
+  protected BitwuzlaUFManager(FormulaCreator<Term, Sort, Void, BitwuzlaDeclaration> pCreator) {
     super(pCreator);
   }
 }

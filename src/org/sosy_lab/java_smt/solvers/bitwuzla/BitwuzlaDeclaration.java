@@ -9,32 +9,39 @@
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import java.util.Objects;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Kind;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Term;
 
 // Declarations sometimes need the info of a Term, but mostly those of Kinds.
 // We can not discern between the two however, hence this wrapper
 public class BitwuzlaDeclaration {
-  private final Long decl;
+  private final Object decl;
 
   // If isKind, decl == KIND; else decl == term
   private final boolean isKind;
 
-  BitwuzlaDeclaration(long pDecl, boolean pIsKind) {
-    decl = pDecl;
-    isKind = pIsKind;
+  BitwuzlaDeclaration(Term pTerm) {
+    decl = pTerm;
+    isKind = false;
+  }
+
+  BitwuzlaDeclaration(Kind pKind) {
+    decl = pKind;
+    isKind = true;
   }
 
   public boolean isKind() {
     return isKind;
   }
 
-  public long getTerm() {
+  public Term getTerm() {
     assert !isKind;
-    return decl;
+    return (Term) decl;
   }
 
-  public int getKind() {
+  public Kind getKind() {
     assert isKind;
-    return decl.intValue();
+    return (Kind) decl;
   }
 
   @Override
@@ -44,16 +51,13 @@ public class BitwuzlaDeclaration {
     }
     if (any instanceof BitwuzlaDeclaration) {
       BitwuzlaDeclaration otherDecl = (BitwuzlaDeclaration) any;
-      if (this.isKind == otherDecl.isKind && Objects.equals(this.decl, otherDecl.decl)) {
-        return true;
-      }
+      return isKind == otherDecl.isKind && Objects.equals(decl, otherDecl.decl);
     }
     return false;
   }
 
   @Override
   public int hashCode() {
-    // Might be errorprone as term and kind might have the same hashcode but not be equal
-    return decl != null ? decl.hashCode() : 0;
+    return Objects.hash(decl, isKind);
   }
 }

@@ -13,7 +13,6 @@ import com.google.common.collect.Collections2;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -26,12 +25,16 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaFormula.BitwuzlaBooleanFormula;
-import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaJNI.TerminationCallback;
-import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaSolverContext.BitwuzlaSettings;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Bitwuzla;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Option;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Options;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Result;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Term;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Term;
 
 class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements ProverEnvironment {
 
-  private final long env;
+  private final Bitwuzla env;
 
   @SuppressWarnings("unused")
   private final BitwuzlaFormulaManager manager;
@@ -39,62 +42,45 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   private final BitwuzlaFormulaCreator creator;
   protected boolean wasLastSatCheckSat = false; // and stack is not changed
 
-  private final TerminationCallback terminationCallback;
-  private final long terminationCallbackHelper;
+  // FIXME: Add termination callback
+  // private final TerminationCallback terminationCallback;
+  // private final long terminationCallbackHelper;
 
   protected BitwuzlaTheoremProver(
       BitwuzlaFormulaManager pManager,
       BitwuzlaFormulaCreator pCreator,
       ShutdownNotifier pShutdownNotifier,
       Set<ProverOptions> pOptions,
-      BitwuzlaSettings pSettings,
-      long pRandomSeed) {
+      Options pSolverOptions) {
     super(pOptions, pManager.getBooleanFormulaManager(), pShutdownNotifier);
     manager = pManager;
     creator = pCreator;
     // Bitwuzla guarantees that Terms and Sorts are shared
-    env = createEnvironment(pOptions, pSettings, pRandomSeed);
-    terminationCallback = shutdownNotifier::shouldShutdown;
-    terminationCallbackHelper = addTerminationCallback();
+    env = createEnvironment(pOptions, pSolverOptions);
+    // terminationCallback = shutdownNotifier::shouldShutdown;
+    // terminationCallbackHelper = addTerminationCallback();
   }
 
-  private long createEnvironment(
-      Set<ProverOptions> pFurtherOptions, BitwuzlaSettings pSettings, long pRandomSeed) {
-    // TODO: set further options
-    long options = BitwuzlaJNI.bitwuzla_options_new();
-
-    if (pFurtherOptions.contains(ProverOptions.GENERATE_MODELS)
-        || pFurtherOptions.contains(ProverOptions.GENERATE_ALL_SAT)) {
-      BitwuzlaJNI.bitwuzla_set_option(
-          options, BitwuzlaOption.BITWUZLA_OPT_PRODUCE_MODELS.swigValue(), 2);
+  private Bitwuzla createEnvironment(Set<ProverOptions> pFurtherOptions, Options pSolverOptions) {
+    if (!pFurtherOptions.contains(ProverOptions.GENERATE_MODELS)
+        && !pFurtherOptions.contains(ProverOptions.GENERATE_ALL_SAT)) {
+      // Model generation is always on in pSolverOptions. Disable it when the ProverOption was
+      // not selected.
+      pSolverOptions.set(Option.PRODUCE_MODELS, 0);
     }
 
     if (pFurtherOptions.contains(ProverOptions.GENERATE_UNSAT_CORE)) {
-      BitwuzlaJNI.bitwuzla_set_option(
-          options, BitwuzlaOption.BITWUZLA_OPT_PRODUCE_UNSAT_CORES.swigValue(), 2);
+      pSolverOptions.set(Option.PRODUCE_UNSAT_CORES, 2);
     }
 
     if (pFurtherOptions.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
-      BitwuzlaJNI.bitwuzla_set_option(
-          options, BitwuzlaOption.BITWUZLA_OPT_PRODUCE_UNSAT_ASSUMPTIONS.swigValue(), 2);
+      pSolverOptions.set(Option.PRODUCE_UNSAT_ASSUMPTIONS, 2);
     }
+
     // TODO: termination callback
     // bitwuzlaJNI.bitwuzla_set_termination_callback();
 
-    Preconditions.checkNotNull(pSettings.getSatSolver());
-    BitwuzlaJNI.bitwuzla_set_option_mode(
-        options,
-        BitwuzlaOption.BITWUZLA_OPT_SAT_SOLVER.swigValue(),
-        pSettings.getSatSolver().name().toLowerCase(Locale.getDefault()));
-    BitwuzlaJNI.bitwuzla_set_option(
-        options, BitwuzlaOption.BITWUZLA_OPT_SEED.swigValue(), pRandomSeed);
-    // Stop Bitwuzla from rewriting formulas in outputs
-    BitwuzlaJNI.bitwuzla_set_option(
-        options, BitwuzlaOption.BITWUZLA_OPT_REWRITE_LEVEL.swigValue(), 0);
-
-    // setFurtherOptions(pOptions, settings.getFurtherOptions());
-
-    return BitwuzlaJNI.bitwuzla_new(options);
+    return new Bitwuzla(pSolverOptions);
   }
 
   /**
@@ -103,13 +89,13 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
    */
   @Override
   public void popImpl() {
-    BitwuzlaJNI.bitwuzla_pop(env, 1);
+    env.pop(1);
   }
 
   @Override
   public @Nullable Void addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
     wasLastSatCheckSat = false;
-    BitwuzlaJNI.bitwuzla_assert(env, ((BitwuzlaBooleanFormula) constraint).getTerm());
+    env.assert_formula(((BitwuzlaBooleanFormula) constraint).getTerm());
     return null;
   }
 
@@ -122,19 +108,18 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
    */
   @Override
   public void pushImpl() throws InterruptedException {
-    BitwuzlaJNI.bitwuzla_push(env, 1);
+    env.push(1);
   }
 
-  private boolean readSATResult(int resultValue) throws SolverException, InterruptedException {
-    if (resultValue == BitwuzlaResult.BITWUZLA_SAT.swigValue()) {
+  private boolean readSATResult(Result resultValue) throws SolverException, InterruptedException {
+    if (resultValue == Result.SAT) {
       wasLastSatCheckSat = true;
       return false;
-    } else if (resultValue == BitwuzlaResult.BITWUZLA_UNSAT.swigValue()) {
+    } else if (resultValue == Result.UNSAT) {
       return true;
-    } else if (resultValue == BitwuzlaResult.BITWUZLA_UNKNOWN.swigValue()
-        && terminationCallback.shouldTerminate()) {
-      throw new InterruptedException("Bitwuzla interrupted.");
-    } else {
+    } /*else if (resultValue == Result.UNKNOWN && terminationCallback.shouldTerminate()) {
+        throw new InterruptedException("Bitwuzla interrupted.");
+      }*/ else {
       throw new SolverException("Bitwuzla returned UNKNOWN.");
     }
   }
@@ -144,7 +129,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   public boolean isUnsat() throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     wasLastSatCheckSat = false;
-    final int result = BitwuzlaJNI.bitwuzla_check_sat(env);
+    final Result result = env.check_sat();
     return readSATResult(result);
   }
 
@@ -157,9 +142,12 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
-    long[] ass =
-        assumptions.stream().mapToLong(a -> ((BitwuzlaBooleanFormula) a).getTerm()).toArray();
-    final int result = BitwuzlaJNI.bitwuzla_check_sat_assuming(env, assumptions.size(), ass);
+    Vector_Term ass = new Vector_Term();
+    for (BooleanFormula formula : assumptions) {
+      BitwuzlaBooleanFormula bitwuzlaFormula = (BitwuzlaBooleanFormula) formula;
+      ass.add(bitwuzlaFormula.getTerm());
+    }
+    final Result result = env.check_sat(ass);
     return readSATResult(result);
   }
 
@@ -177,21 +165,15 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
     Preconditions.checkState(!closed);
     Preconditions.checkState(wasLastSatCheckSat, NO_MODEL_HELP);
     checkGenerateModels();
-    Model result = new CachingModel(getEvaluatorWithoutChecks());
-    return result;
+    return new CachingModel(getEvaluatorWithoutChecks());
   }
 
   private List<BooleanFormula> getUnsatCore0() {
-    long[] size = new long[1];
-    return encapsulate(BitwuzlaJNI.bitwuzla_get_unsat_core(env, size), size[0]);
-  }
-
-  private List<BooleanFormula> encapsulate(long pTermsArray, long size) {
-    List<BooleanFormula> result = new ArrayList<>((int) size);
-    for (int i = 0; i < size; i++) {
-      result.add(creator.encapsulateBoolean(BitwuzlaJNI.BitwuzlaTermArray_getitem(pTermsArray, i)));
+    List<BooleanFormula> wrapped = new ArrayList<>();
+    for (Term term : env.get_unsat_assumptions()) {
+      wrapped.add(creator.encapsulateBoolean(term));
     }
-    return result;
+    return wrapped;
   }
 
   /**
@@ -233,9 +215,8 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   @Override
   public void close() {
     if (!closed) {
-      BitwuzlaJNI.free_termination(terminationCallbackHelper);
-      BitwuzlaJNI.bitwuzla_delete(env);
       closed = true;
+      env.delete();
     }
     super.close();
   }
@@ -249,9 +230,10 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   public boolean isClosed() {
     return closed;
   }
-
-  private long addTerminationCallback() {
-    Preconditions.checkState(!closed, "solver context is already closed");
-    return BitwuzlaJNI.set_termination(env, terminationCallback);
-  }
+  /*
+   private long addTerminationCallback() {
+     Preconditions.checkState(!closed, "solver context is already closed");
+     return BitwuzlaJNI.set_termination(env, terminationCallback);
+   }
+  */
 }

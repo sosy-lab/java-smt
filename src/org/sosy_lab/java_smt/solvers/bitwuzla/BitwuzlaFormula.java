@@ -17,16 +17,18 @@ import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Term;
 
 @Immutable
 abstract class BitwuzlaFormula implements Formula {
-  private final long bitwuzlaTerm;
+  @SuppressWarnings("Immutable")
+  private final Term bitwuzlaTerm;
 
-  BitwuzlaFormula(long term) {
+  BitwuzlaFormula(Term term) {
     bitwuzlaTerm = term;
   }
 
-  final long getTerm() {
+  final Term getTerm() {
     return bitwuzlaTerm;
   }
 
@@ -39,7 +41,7 @@ abstract class BitwuzlaFormula implements Formula {
    */
   @Override
   public String toString() {
-    return BitwuzlaJNI.bitwuzla_term_to_string(this.bitwuzlaTerm);
+    return bitwuzlaTerm.toString();
   }
 
   /**
@@ -58,14 +60,14 @@ abstract class BitwuzlaFormula implements Formula {
     if (!(other instanceof BitwuzlaFormula)) {
       return false;
     }
-    return bitwuzlaTerm == ((BitwuzlaFormula) other).getTerm();
+    Term otherTerm = ((BitwuzlaFormula) other).getTerm();
+    return bitwuzlaTerm.equals(otherTerm);
   }
 
   /** returns a valid hashCode satisfying the constraints given by {@link #equals}. */
   @Override
   public int hashCode() {
-    // In this case, the long returned by the JNI is not a pointer, but the value itself.
-    return (int) BitwuzlaJNI.bitwuzla_term_hash(bitwuzlaTerm);
+    return bitwuzlaTerm.hashCode();
   }
 
   @Immutable
@@ -76,7 +78,7 @@ abstract class BitwuzlaFormula implements Formula {
     private final FormulaType<TI> indexType;
     private final FormulaType<TE> elementType;
 
-    BitwuzlaArrayFormula(long pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
+    BitwuzlaArrayFormula(Term pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
       super(pTerm);
       indexType = pIndexType;
       elementType = pElementType;
@@ -93,7 +95,7 @@ abstract class BitwuzlaFormula implements Formula {
 
   @Immutable
   static final class BitwuzlaBitvectorFormula extends BitwuzlaFormula implements BitvectorFormula {
-    BitwuzlaBitvectorFormula(long pTerm) {
+    BitwuzlaBitvectorFormula(Term pTerm) {
       super(pTerm);
     }
   }
@@ -101,7 +103,7 @@ abstract class BitwuzlaFormula implements Formula {
   @Immutable
   static final class BitwuzlaFloatingPointFormula extends BitwuzlaFormula
       implements FloatingPointFormula {
-    BitwuzlaFloatingPointFormula(long pTerm) {
+    BitwuzlaFloatingPointFormula(Term pTerm) {
       super(pTerm);
     }
   }
@@ -109,14 +111,14 @@ abstract class BitwuzlaFormula implements Formula {
   @Immutable
   static final class BitwuzlaFloatingPointRoundingModeFormula extends BitwuzlaFormula
       implements FloatingPointRoundingModeFormula {
-    BitwuzlaFloatingPointRoundingModeFormula(long pTerm) {
+    BitwuzlaFloatingPointRoundingModeFormula(Term pTerm) {
       super(pTerm);
     }
   }
 
   @Immutable
   static final class BitwuzlaBooleanFormula extends BitwuzlaFormula implements BooleanFormula {
-    BitwuzlaBooleanFormula(long pTerm) {
+    BitwuzlaBooleanFormula(Term pTerm) {
       super(pTerm);
     }
   }

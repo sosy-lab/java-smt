@@ -22,8 +22,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
-import org.sosy_lab.common.configuration.Option;
-import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
@@ -31,10 +29,13 @@ import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.BitwuzlaNative;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Option;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Options;
 
 public final class BitwuzlaSolverContext extends AbstractSolverContext {
 
-  @Options(prefix = "solver.bitwuzla")
+  @org.sosy_lab.common.configuration.Options(prefix = "solver.bitwuzla")
   public static class BitwuzlaSettings {
 
     enum SatSolver {
@@ -44,10 +45,12 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
       KISSAT
     }
 
-    @Option(secure = true, description = "The SAT solver used by Bitwuzla.")
+    @org.sosy_lab.common.configuration.Option(
+        secure = true,
+        description = "The SAT solver used by " + "Bitwuzla.")
     private SatSolver satSolver = SatSolver.CADICAL;
 
-    @Option(
+    @org.sosy_lab.common.configuration.Option(
         secure = true,
         description =
             "Further options for Bitwuzla in addition to the default options. "
@@ -73,9 +76,7 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
   private final BitwuzlaFormulaCreator creator;
   private final ShutdownNotifier shutdownNotifier;
 
-  private final BitwuzlaSettings settings;
-
-  private final long randomSeed;
+  private final Options solverOptions;
 
   private boolean closed = false;
 
@@ -83,14 +84,12 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
       BitwuzlaFormulaManager pManager,
       BitwuzlaFormulaCreator pCreator,
       ShutdownNotifier pShutdownNotifier,
-      long pRandomSeed,
-      BitwuzlaSettings pSettings) {
+      Options pOptions) {
     super(pManager);
     manager = pManager;
     creator = pCreator;
     shutdownNotifier = pShutdownNotifier;
-    randomSeed = pRandomSeed;
-    settings = pSettings;
+    solverOptions = pOptions;
   }
 
   @SuppressWarnings("unused")
@@ -104,10 +103,9 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
       throws InvalidConfigurationException {
     pLoader.accept("bitwuzlaJNI");
 
-    BitwuzlaSettings settings = new BitwuzlaSettings(config);
-    final long bitwuzla = createEnvironmentBasedOnOptions(settings, randomSeed);
+    Options solverOptions = buildBitwuzlaOptions(new BitwuzlaSettings(config), randomSeed);
 
-    BitwuzlaFormulaCreator creator = new BitwuzlaFormulaCreator(bitwuzla);
+    BitwuzlaFormulaCreator creator = new BitwuzlaFormulaCreator();
     BitwuzlaUFManager functionTheory = new BitwuzlaUFManager(creator);
     BitwuzlaBooleanFormulaManager booleanTheory = new BitwuzlaBooleanFormulaManager(creator);
     BitwuzlaBitvectorFormulaManager bitvectorTheory =
@@ -125,31 +123,66 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
             bitvectorTheory,
             quantifierTheory,
             floatingPointTheory,
-            arrayTheory);
+            arrayTheory,
+            solverOptions);
 
-    return new BitwuzlaSolverContext(manager, creator, pShutdownNotifier, randomSeed, settings);
+    return new BitwuzlaSolverContext(manager, creator, pShutdownNotifier, solverOptions);
   }
 
-  private static long createEnvironmentBasedOnOptions(BitwuzlaSettings settings, long randomSeed)
+  /**
+   * Set more options for Bitwuzla.
+   *
+   * @param pOptions        current Bitwuzla options
+   * @param pFurtherOptions String to be parsed with options to be set.
+   * @throws InvalidConfigurationException signals that the format of the option string is wrong or
+   *                                       an invalid option is used.
+   */
+  private static Options setFurtherOptions(Options pOptions, String pFurtherOptions)
       throws InvalidConfigurationException {
-    long options = BitwuzlaJNI.bitwuzla_options_new();
+    MapSplitter optionSplitter =
+        Splitter.on(',')
+            .trimResults()
+            .omitEmptyStrings()
+            .withKeyValueSeparator(Splitter.on('=').limit(2).trimResults());
+    ImmutableMap<String, String> furtherOptionsMap;
 
+    try {
+      furtherOptionsMap = ImmutableMap.copyOf(optionSplitter.split(pFurtherOptions));
+    } catch (IllegalArgumentException e) {
+      throw new InvalidConfigurationException(
+          "Invalid Bitwuzla option in \"" + pFurtherOptions + "\": " + e.getMessage(), e);
+    }
+    for (Map.Entry<String, String> option : furtherOptionsMap.entrySet()) {
+      try {
+        Class<?> optionClass = Option.class;
+        Field optionField = optionClass.getField(option.getKey());
+        // Get the value of the public fields
+        Option value = (Option) optionField.get(null);
+        if (pOptions.is_numeric(value)) {
+          pOptions.set(value, Integer.parseInt(option.getValue()));
+        } else {
+          pOptions.set(value, option.getValue());
+        }
+      } catch (java.lang.NoSuchFieldException e) {
+        throw new InvalidConfigurationException(e.getMessage(), e);
+      } catch (IllegalAccessException pE) {
+        throw new RuntimeException("Problem with access to BitwuzlaOption Field", pE);
+      }
+    }
+    return pOptions;
+  }
+
+  private static Options buildBitwuzlaOptions(BitwuzlaSettings settings, long randomSeed)
+      throws InvalidConfigurationException {
     Preconditions.checkNotNull(settings.getSatSolver());
-    BitwuzlaJNI.bitwuzla_set_option_mode(
-        options,
-        BitwuzlaOption.BITWUZLA_OPT_SAT_SOLVER.swigValue(),
-        settings.getSatSolver().name().toLowerCase(Locale.getDefault()));
-    BitwuzlaJNI.bitwuzla_set_option(
-        options, BitwuzlaOption.BITWUZLA_OPT_PRODUCE_MODELS.swigValue(), 2);
-    BitwuzlaJNI.bitwuzla_set_option(
-        options, BitwuzlaOption.BITWUZLA_OPT_SEED.swigValue(), randomSeed);
-    // Stop Bitwuzla from rewriting formulas in outputs
-    BitwuzlaJNI.bitwuzla_set_option(
-        options, BitwuzlaOption.BITWUZLA_OPT_REWRITE_LEVEL.swigValue(), 0);
 
-    setFurtherOptions(options, settings.getFurtherOptions());
+    Options options = new Options();
+    options.set(Option.SAT_SOLVER, settings.getSatSolver().name().toLowerCase(Locale.getDefault()));
+    options.set(Option.PRODUCE_MODELS, 2); // "2" means "create model for all terms"
+    options.set(Option.SEED, (int) randomSeed);
+    options.set(Option.REWRITE_LEVEL, 0); // Stop Bitwuzla from rewriting formulas in outputs
 
-    return BitwuzlaJNI.bitwuzla_new(options);
+    return setFurtherOptions(options, settings.getFurtherOptions());
   }
 
   /**
@@ -160,7 +193,7 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
    */
   @Override
   public String getVersion() {
-    return "Bitwuzla " + BitwuzlaJNI.bitwuzla_version();
+    return "Bitwuzla " + BitwuzlaNative.version();
   }
 
   /**
@@ -187,7 +220,6 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
   public void close() {
     if (!closed) {
       closed = true;
-      BitwuzlaJNI.bitwuzla_delete(creator.getEnv());
     }
   }
 
@@ -195,8 +227,7 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
 
-    return new BitwuzlaTheoremProver(
-        manager, creator, shutdownNotifier, options, settings, randomSeed);
+    return new BitwuzlaTheoremProver(manager, creator, shutdownNotifier, options, solverOptions);
   }
 
   @Override
@@ -228,48 +259,5 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
   @Override
   protected boolean supportsAssumptionSolving() {
     return true;
-  }
-
-  /**
-   * Set more options for Bitwuzla.
-   *
-   * @param pOptions options pointer
-   * @param pFurtherOptions String to be parsed with options to be set.
-   * @throws InvalidConfigurationException signals that the format of the option string is wrong or
-   *     an invalid option is used.
-   */
-  private static void setFurtherOptions(long pOptions, String pFurtherOptions)
-      throws InvalidConfigurationException {
-    MapSplitter optionSplitter =
-        Splitter.on(',')
-            .trimResults()
-            .omitEmptyStrings()
-            .withKeyValueSeparator(Splitter.on('=').limit(2).trimResults());
-    ImmutableMap<String, String> furtherOptionsMap;
-
-    try {
-      furtherOptionsMap = ImmutableMap.copyOf(optionSplitter.split(pFurtherOptions));
-    } catch (IllegalArgumentException e) {
-      throw new InvalidConfigurationException(
-          "Invalid Bitwuzla option in \"" + pFurtherOptions + "\": " + e.getMessage(), e);
-    }
-    for (Map.Entry<String, String> option : furtherOptionsMap.entrySet()) {
-      try {
-        Class<?> optionClass = BitwuzlaOption.class;
-        Field optionField = optionClass.getField(option.getKey());
-        // Get the value of the public fields
-        BitwuzlaOption value = (BitwuzlaOption) optionField.get(null);
-        if (BitwuzlaJNI.bitwuzla_option_is_numeric(pOptions, value.swigValue())) {
-          long optionValue = Long.parseLong(option.getValue());
-          BitwuzlaJNI.bitwuzla_set_option(pOptions, value.swigValue(), optionValue);
-        } else {
-          BitwuzlaJNI.bitwuzla_set_option_mode(pOptions, value.swigValue(), option.getValue());
-        }
-      } catch (java.lang.NoSuchFieldException e) {
-        throw new InvalidConfigurationException(e.getMessage(), e);
-      } catch (IllegalAccessException pE) {
-        throw new RuntimeException("Problem with access to BitwuzlaOption Field", pE);
-      }
-    }
   }
 }
