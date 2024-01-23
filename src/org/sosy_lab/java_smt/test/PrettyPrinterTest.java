@@ -36,7 +36,8 @@ public class PrettyPrinterTest extends SolverBasedTest0.ParameterizedSolverBased
     pp = new PrettyPrinter(context.getFormulaManager());
   }
 
-  // TODO: Add parsing tests for bitvectors and booleans that can be used with Bitwuzla
+  // TODO: Bitwuzla
+  //  Add parsing tests for bitvectors and booleans that can be used with Bitwuzla
 
   @Test
   public void testPrettyPrintOnlyBoolean() {

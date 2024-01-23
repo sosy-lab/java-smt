@@ -17,6 +17,8 @@
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 public final class BitwuzlaKind {
+  // FIXME: We should use SWIG to auto-generate the enum for us. This class will break whenever
+  //  bitwuzla changes their definitions.
 
   private static int swigNext = 0;
   private final int swigValue;

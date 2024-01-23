@@ -250,7 +250,8 @@ public abstract class SolverBasedTest0 {
   }
 
   protected final void requireFloats() {
-    // TODO: Remove once we have a proper solution to the results
+    // TODO: Bitwuza
+    //  Remove once we have a proper solution to the results
     assume()
         .withMessage(
             "FP is not available in Bitwuzla until we can get a proper decimal "

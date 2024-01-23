@@ -159,6 +159,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
 
   @Test
   public void test_QF_AUFBV() {
+    // FIXME: This formula actually uses integers (and reals) and is not in QF_AUFBV"
     requireParser();
     requireArrays();
     requireBitvectors();
@@ -232,6 +233,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
 
   @Test
   public void test_QF_UF() {
+    // FIXME: This formula uses integers/reals and is not in QF_UF
     requireParser();
     String query = BOOL_VARS + "(assert (= (foo x) x))";
     assume()
@@ -260,6 +262,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
 
   @Test
   public void test_QF_UFBV() {
+    // FIXME: This formula uses integers/reals and is not in QF_UFBV"
     requireParser();
     requireBitvectors();
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
