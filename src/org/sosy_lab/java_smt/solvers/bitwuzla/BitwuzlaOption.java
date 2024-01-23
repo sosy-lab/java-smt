@@ -34,6 +34,9 @@ public final class BitwuzlaOption {
       new BitwuzlaOption("BITWUZLA_OPT_VERBOSITY");
   public static final BitwuzlaOption BITWUZLA_OPT_TIME_LIMIT_PER =
       new BitwuzlaOption("BITWUZLA_OPT_TIME_LIMIT_PER");
+
+  public static final BitwuzlaOption BITWUZLA_OPT_MEMORY_LIMIT = new BitwuzlaOption(
+      "BITWUZLA_OPT_MEMORY_LIMIT");
   public static final BitwuzlaOption BITWUZLA_OPT_BV_SOLVER =
       new BitwuzlaOption("BITWUZLA_OPT_BV_SOLVER");
   public static final BitwuzlaOption BITWUZLA_OPT_REWRITE_LEVEL =
@@ -126,6 +129,7 @@ public final class BitwuzlaOption {
     this.swigValue = swigNext++;
   }
 
+  // Keep in the same order as option.h!
   private static BitwuzlaOption[] swigValues = {
     BITWUZLA_OPT_LOGLEVEL,
     BITWUZLA_OPT_PRODUCE_MODELS,
@@ -133,7 +137,7 @@ public final class BitwuzlaOption {
     BITWUZLA_OPT_PRODUCE_UNSAT_CORES,
     BITWUZLA_OPT_SEED,
     BITWUZLA_OPT_VERBOSITY,
-    BITWUZLA_OPT_TIME_LIMIT_PER,
+    BITWUZLA_OPT_TIME_LIMIT_PER, BITWUZLA_OPT_MEMORY_LIMIT,
     BITWUZLA_OPT_BV_SOLVER,
     BITWUZLA_OPT_REWRITE_LEVEL,
     BITWUZLA_OPT_SAT_SOLVER,
@@ -165,4 +169,8 @@ public final class BitwuzlaOption {
     BITWUZLA_OPT_DBG_CHECK_UNSAT_CORE,
     BITWUZLA_OPT_NUM_OPTS,
   };
+
+  public static BitwuzlaOption[] getBitwuzlaOptions() {
+    return swigValues;
+  }
 }
