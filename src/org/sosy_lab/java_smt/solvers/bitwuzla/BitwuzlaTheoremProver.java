@@ -170,7 +170,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
 
   private List<BooleanFormula> getUnsatCore0() {
     List<BooleanFormula> wrapped = new ArrayList<>();
-    for (Term term : env.get_unsat_assumptions()) {
+    for (Term term : env.get_unsat_core()) {
       wrapped.add(creator.encapsulateBoolean(term));
     }
     return wrapped;
