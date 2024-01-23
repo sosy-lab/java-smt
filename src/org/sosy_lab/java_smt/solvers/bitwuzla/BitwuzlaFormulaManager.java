@@ -14,9 +14,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import org.sosy_lab.common.Appender;
+import org.sosy_lab.common.Appenders;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Bitwuzla;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Options;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Parser;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Sort;
@@ -85,8 +87,6 @@ final class BitwuzlaFormulaManager
 
   @Override
   public Appender dumpFormula(Term pTerm) {
-    // TODO: We need to reimplement this
-    /*
     // There are 2 ways of SMT2 printing in Bitwuzla, bitwuzla_term_print() and
     // bitwuzla_term_print_fmt(), which print a single formula, and bitwuzla_print_formula(),
     // which prints the complete assertion stack of the bitwuzla instance given to the function.
@@ -95,23 +95,14 @@ final class BitwuzlaFormulaManager
     return new Appenders.AbstractAppender() {
       @Override
       public void appendTo(Appendable out) throws IOException {
-        long printCtx = getFormulaCreator().getEnv();
-        BitwuzlaJNI.bitwuzla_push(printCtx, 1);
-        BitwuzlaJNI.bitwuzla_assert(printCtx, pTerm);
-        String dump = BitwuzlaJNI.dump_assertions_smt2(printCtx, 10);
-        BitwuzlaJNI.bitwuzla_pop(printCtx, 1);
-        // Bitwuzla prints (check-sat)\n(exit)\n in the end. We remove that.
-        if (dump.contains("(check-sat)\n")) {
-          dump = dump.replace("(check-sat)", "");
-        }
-        if (dump.contains("(exit)")) {
-          dump = dump.replace("(exit)", "");
-        }
+        Bitwuzla bitwuzla = new Bitwuzla(); // TODO: It would be better to keep this instance around
+        bitwuzla.assert_formula(pTerm);
+        String dump = bitwuzla.print_formula();
+        dump = dump.replace("(check-sat)", "");
+        dump = dump.replace("(exit)", "");
         out.append(dump);
       }
     };
-    */
-    throw new UnsupportedOperationException();
   }
 
   static Term getBitwuzlaTerm(Formula pT) {
