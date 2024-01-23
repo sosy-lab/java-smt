@@ -418,8 +418,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
       for (int i = 0; i < boundVars.length; i++) {
         map.put(boundVars[i], freeVars[i]);
       }
-      // FIXME: This will change the original term
-      body.substitute(map);
+      body = body.substitute(map);
 
       Quantifier quant = kind.equals(Kind.EXISTS) ? Quantifier.EXISTS : Quantifier.FORALL;
       return visitor.visitQuantifier(

@@ -54,8 +54,7 @@ public class BitwuzlaQuantifiedFormulaManager
     for (int i = 0; i < origVars.length; i++) {
       map.put(origVars[i], substVars[i]);
     }
-    // FIXME: This will ovewrite the old body
-    body.substitute(map);
+    body = body.substitute(map);
 
     Term[] argsAndBody = new Term[2];
     argsAndBody[1] = body;

@@ -315,8 +315,8 @@ namespace bitwuzla {
 %ignore substitute_terms (std::vector<Term> &, const std::unordered_map<Term,Term> &);
 %ignore substitute_term (const Term &, const std::unordered_map<Term, Term> &);
 %extend Term {
-  void substitute(const std::unordered_map<Term, Term> &map) {
-    bitwuzla::substitute_term(*$self, map);
+  Term substitute(const std::unordered_map<Term, Term> &map) {
+    return bitwuzla::substitute_term(*$self, map);
   }
 }
 
