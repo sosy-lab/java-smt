@@ -474,10 +474,6 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
       // The term might be indexed, then we need index creation
       Term term = declaration.getTerm();
       Kind properKind = term.kind();
-      if (properKind == Kind.BV_ZERO_EXTEND) {
-        // FIXME: Not implemented
-        throw new UnsupportedOperationException();
-      }
       return Bitwuzla.mk_term(properKind, new Vector_Term(args), term.indices());
     }
 
