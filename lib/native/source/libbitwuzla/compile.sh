@@ -53,7 +53,7 @@ echo "$BWZL_SRC_DIR"
 
 # check requirements
 if [ ! -f "$BWZL_BUILD_SRC_DIR/libbitwuzla.so.0" ]; then
-    echo "You need to specify the directory with the compiled Bitwuzla shared libaries on the command line!"
+    echo "compile.sh: the specified directory with the compiled Bitwuzla shared libaries is incorrect. You might need to specify the complete path on the cmd line. Searched directoy: $BWZL_BUILD_SRC_DIR"
     exit 1
 fi
 
