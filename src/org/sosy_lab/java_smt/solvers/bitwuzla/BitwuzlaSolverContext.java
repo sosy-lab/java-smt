@@ -47,16 +47,17 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
 
     @org.sosy_lab.common.configuration.Option(
         secure = true,
-        description = "The SAT solver used by " + "Bitwuzla.")
+        description = "The SAT solver used by Bitwuzla.")
     private SatSolver satSolver = SatSolver.CADICAL;
 
     @org.sosy_lab.common.configuration.Option(
         secure = true,
         description =
             "Further options for Bitwuzla in addition to the default options. "
-                + "Format:  \"Optionname=value\" with ’,’ to seperate options. "
-                + "Optionname and value can be found in BtorOption or Bitwuzla C Api."
-                + "Example: \"BTOR_OPT_MODEL_GEN=2,BTOR_OPT_INCREMENTAL=1\".")
+                + "Format:  \"option_name=value\" with ’,’ to separate options. "
+                + "Option names and values can be found in the Bitwuzla documentation online:"
+                + "https://bitwuzla.github.io/docs/cpp/enums/option.html#_CPPv4N8bitwuzla6OptionE"
+                + "Example: \"PRODUCE_MODELS=2,SAT_SOLVER=kissat\".")
     private String furtherOptions = "";
 
     protected SatSolver getSatSolver() {
