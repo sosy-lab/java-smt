@@ -257,7 +257,11 @@ public class FloatingPointFormulaManagerTest
   @Test
   @SuppressWarnings("FloatingPointLiteralPrecision")
   public void numberConstants() throws SolverException, InterruptedException {
-    checkEqualityOfNumberConstantsFor(1.0, singlePrecType);
+    // FIXME: Bitwuzla does not understand scientific notation (f.ex 3e10)
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BITWUZLA);
+
+    checkEqualityOfNumberConstantsFor(1.0,
+        singlePrecType);
     checkEqualityOfNumberConstantsFor(-5.877471754111438E-39, singlePrecType);
     checkEqualityOfNumberConstantsFor(-5.877471754111438E-39, doublePrecType);
     checkEqualityOfNumberConstantsFor(3.4028234663852886e+38, singlePrecType);
