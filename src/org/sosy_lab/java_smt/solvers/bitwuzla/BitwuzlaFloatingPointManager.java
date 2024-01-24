@@ -88,7 +88,11 @@ public class BitwuzlaFloatingPointManager
 
   @Override
   protected Long makeNumberImpl(double n, FloatingPointType type, Long pFloatingPointRoundingMode) {
-    return makeNumberImpl(String.format("%f", n), type, pFloatingPointRoundingMode);
+    if (Double.compare(n, -0.0) == 0) {
+      return BitwuzlaJNI.bitwuzla_mk_fp_neg_zero(mkFpaSort(type));
+    } else {
+      return makeNumberImpl(String.format("%f", n), type, pFloatingPointRoundingMode);
+    }
   }
 
   private long mkFpaSort(FloatingPointType pType) {
@@ -98,7 +102,11 @@ public class BitwuzlaFloatingPointManager
   @Override
   protected Long makeNumberAndRound(
       String pN, FloatingPointType pType, Long pFloatingPointRoundingMode) {
-    return BitwuzlaJNI.bitwuzla_mk_fp_from_real(mkFpaSort(pType), pFloatingPointRoundingMode, pN);
+    if (Double.compare(Double.parseDouble(pN), -0.0) == 0) {
+      return BitwuzlaJNI.bitwuzla_mk_fp_neg_zero(mkFpaSort(pType));
+    } else {
+      return BitwuzlaJNI.bitwuzla_mk_fp_from_real(mkFpaSort(pType), pFloatingPointRoundingMode, pN);
+    }
   }
 
   @Override
