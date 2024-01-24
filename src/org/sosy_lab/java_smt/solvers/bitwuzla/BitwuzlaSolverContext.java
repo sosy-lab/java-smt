@@ -179,7 +179,6 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
 
     Options options = new Options();
     options.set(Option.SAT_SOLVER, settings.getSatSolver().name().toLowerCase(Locale.getDefault()));
-    options.set(Option.PRODUCE_MODELS, 2); // "2" means "create model for all terms"
     options.set(Option.SEED, (int) randomSeed);
     options.set(Option.REWRITE_LEVEL, 0); // Stop Bitwuzla from rewriting formulas in outputs
 

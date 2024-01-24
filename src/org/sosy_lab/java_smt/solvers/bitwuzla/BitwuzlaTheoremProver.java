@@ -67,17 +67,15 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
         });
   }
 
-  private Bitwuzla createEnvironment(Set<ProverOptions> pFurtherOptions, Options pSolverOptions) {
-    if (!pFurtherOptions.contains(ProverOptions.GENERATE_MODELS)
-        && !pFurtherOptions.contains(ProverOptions.GENERATE_ALL_SAT)) {
-      // Model generation is always on in pSolverOptions. Disable it when the ProverOption was
-      // not selected.
-      pSolverOptions.set(Option.PRODUCE_MODELS, 0);
+  private Bitwuzla createEnvironment(Set<ProverOptions> pProverOptions, Options pSolverOptions) {
+    if (pProverOptions.contains(ProverOptions.GENERATE_MODELS)
+        || pProverOptions.contains(ProverOptions.GENERATE_ALL_SAT)) {
+      pSolverOptions.set(Option.PRODUCE_MODELS, 2);
     }
-    if (pFurtherOptions.contains(ProverOptions.GENERATE_UNSAT_CORE)) {
+    if (pProverOptions.contains(ProverOptions.GENERATE_UNSAT_CORE)) {
       pSolverOptions.set(Option.PRODUCE_UNSAT_CORES, 2);
     }
-    if (pFurtherOptions.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
+    if (pProverOptions.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       pSolverOptions.set(Option.PRODUCE_UNSAT_ASSUMPTIONS, 2);
     }
 
