@@ -17,9 +17,6 @@
 %include <stdint.i>
 %include <std_string.i>
 
-%include <stdint.i>
-%include <std_string.i>
-
 %include <std_vector.i>
 %template(Vector_Int)
   std::vector<int>;
