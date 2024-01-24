@@ -170,8 +170,4 @@ public final class BitwuzlaOption {
     BITWUZLA_OPT_DBG_CHECK_UNSAT_CORE,
     BITWUZLA_OPT_NUM_OPTS,
   };
-
-  public static BitwuzlaOption[] getBitwuzlaOptions() {
-    return swigValues;
-  }
 }
