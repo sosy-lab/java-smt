@@ -34,6 +34,16 @@
 %include <std_shared_ptr.i>
 %shared_ptr(bitwuzla::Bitwuzla);
 
+%exception {
+  try {
+    $action
+  } catch(bitwuzla::Exception& e) {
+    jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
+    jenv->ThrowNew(exceptionType, e.what());
+    return $null;
+  }
+}
+
 namespace std {
 %ignore to_string(bitwuzla::Kind kind);
 %ignore to_string(bitwuzla::RoundingMode rm);
@@ -44,7 +54,6 @@ namespace std {
 %include "include/bitwuzla/option.h"
 
 namespace bitwuzla {
-
 /** Output streams */
 %ignore set_bv_format;
 %ignore operator<< (std::ostream &ostream, const set_bv_format &f);
@@ -92,8 +101,9 @@ namespace bitwuzla {
 
 %ignore Term::symbol () const;
 %exception Term::symbol {
-  try { $action }
-  catch(std::bad_optional_access& e) {
+  try {
+    $action
+  } catch(std::bad_optional_access& e) {
     return $null;
   }
 }
