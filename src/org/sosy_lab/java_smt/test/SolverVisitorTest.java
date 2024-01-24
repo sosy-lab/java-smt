@@ -582,6 +582,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
 
   @Test
   public void booleanIdVisitWithAtoms() {
+    requireIntegers();
     IntegerFormula n12 = imgr.makeNumber(12);
     IntegerFormula a = imgr.makeVariable("a");
     IntegerFormula b = imgr.makeVariable("b");
@@ -605,6 +606,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
    */
   @Test
   public void testFormulaVisitor() {
+    requireIntegers();
     IntegerFormula x = imgr.makeVariable("x");
     IntegerFormula y = imgr.makeVariable("y");
     IntegerFormula z = imgr.makeVariable("z");
@@ -835,6 +837,8 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
 
   @Test
   public void recursiveTransformationVisitorTest() throws Exception {
+    requireIntegers();
+
     BooleanFormula f =
         bmgr.or(
             imgr.equal(
@@ -859,6 +863,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
 
   @Test
   public void recursiveTransformationVisitorTest2() throws Exception {
+    requireIntegers();
     BooleanFormula f = imgr.equal(imgr.makeVariable("y"), imgr.makeNumber(1));
     BooleanFormula transformed =
         mgr.transformRecursively(
@@ -875,6 +880,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
 
   @Test
   public void booleanRecursiveTraversalTest() {
+    requireIntegers();
     BooleanFormula f =
         bmgr.or(
             bmgr.and(bmgr.makeVariable("x"), bmgr.makeVariable("y")),
@@ -945,6 +951,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   public void testTransformationInsideQuantifiersWithTrue()
       throws SolverException, InterruptedException {
     requireQuantifiers();
+    requireIntegers();
     List<IntegerFormula> quantifiedVars = ImmutableList.of(imgr.makeVariable("x"));
     BooleanFormula body = bmgr.makeTrue();
     BooleanFormula f = qmgr.exists(quantifiedVars, body);
@@ -957,6 +964,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   public void testTransformationInsideQuantifiersWithFalse()
       throws SolverException, InterruptedException {
     requireQuantifiers();
+    requireIntegers();
     List<IntegerFormula> quantifiedVars = ImmutableList.of(imgr.makeVariable("x"));
     BooleanFormula body = bmgr.makeFalse();
     BooleanFormula f = qmgr.exists(quantifiedVars, body);
@@ -969,6 +977,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   public void testTransformationInsideQuantifiersWithVariable()
       throws SolverException, InterruptedException {
     requireQuantifiers();
+    requireIntegers();
     List<IntegerFormula> quantifiedVars = ImmutableList.of(imgr.makeVariable("x"));
     BooleanFormula body = bmgr.makeVariable("b");
     BooleanFormula f = qmgr.exists(quantifiedVars, body);
@@ -979,6 +988,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
 
   @Test
   public void extractionTest1() {
+    requireIntegers();
     IntegerFormula v = imgr.makeVariable("v");
     BooleanFormula q = fmgr.declareAndCallUF("q", FormulaType.BooleanType, v);
     Map<String, Formula> mapping = mgr.extractVariablesAndUFs(q);
@@ -989,6 +999,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
 
   @Test
   public void extractionTest2() {
+    requireIntegers();
     // the same as above, but with nullary UF.
     IntegerFormula v = fmgr.declareAndCallUF("v", FormulaType.IntegerType);
     BooleanFormula q = fmgr.declareAndCallUF("q", FormulaType.BooleanType, v);

@@ -418,6 +418,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
     BooleanFormula bEqNeg2 = bvmgr.equal(b, numNeg2);
 
     // positive numbers, signed.
+
     assertDivision(a, num5, true, b, aEq10, bEq2);
     assertDivision(a, num3, true, num3, aEq10);
     assertDivision(a, numNeg3, true, numNeg3, aEq10);
@@ -599,7 +600,6 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   @Test
   public void test_BitvectorIsZeroAfterShiftLeft() throws SolverException, InterruptedException {
     requireBitvectors();
-
     BitvectorFormula one = bvmgr.makeBitvector(32, 1);
 
     // unsigned char
@@ -1253,7 +1253,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
     assume()
         .withMessage("Solver %s does not support UFs without arguments", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.BOOLECTOR, Solvers.CVC5);
+        .isNoneOf(Solvers.BOOLECTOR, Solvers.CVC5, Solvers.BITWUZLA);
 
     BooleanFormula z1 = bmgr.makeVariable("z");
     BooleanFormula z2 = fmgr.declareAndCallUF("z", FormulaType.BooleanType);
