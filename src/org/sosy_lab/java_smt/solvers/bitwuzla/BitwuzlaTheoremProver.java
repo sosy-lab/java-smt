@@ -30,6 +30,7 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.Option;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Options;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Result;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Term;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Terminator;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Term;
 
 class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements ProverEnvironment {
@@ -42,10 +43,6 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   private final BitwuzlaFormulaCreator creator;
   protected boolean wasLastSatCheckSat = false; // and stack is not changed
 
-  // FIXME: Add termination callback
-  // private final TerminationCallback terminationCallback;
-  // private final long terminationCallbackHelper;
-
   protected BitwuzlaTheoremProver(
       BitwuzlaFormulaManager pManager,
       BitwuzlaFormulaCreator pCreator,
@@ -55,10 +52,19 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
     super(pOptions, pManager.getBooleanFormulaManager(), pShutdownNotifier);
     manager = pManager;
     creator = pCreator;
+
     // Bitwuzla guarantees that Terms and Sorts are shared
     env = createEnvironment(pOptions, pSolverOptions);
-    // terminationCallback = shutdownNotifier::shouldShutdown;
-    // terminationCallbackHelper = addTerminationCallback();
+
+    // Install shutdown hook
+    env.configure_terminator(
+        new Terminator() {
+          @Override
+          public boolean terminate() {
+            return shutdownNotifier
+                .shouldShutdown(); // shutdownNotifer is defined in the superclass
+          }
+        });
   }
 
   private Bitwuzla createEnvironment(Set<ProverOptions> pFurtherOptions, Options pSolverOptions) {
@@ -68,17 +74,12 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
       // not selected.
       pSolverOptions.set(Option.PRODUCE_MODELS, 0);
     }
-
     if (pFurtherOptions.contains(ProverOptions.GENERATE_UNSAT_CORE)) {
       pSolverOptions.set(Option.PRODUCE_UNSAT_CORES, 2);
     }
-
     if (pFurtherOptions.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       pSolverOptions.set(Option.PRODUCE_UNSAT_ASSUMPTIONS, 2);
     }
-
-    // TODO: termination callback
-    // bitwuzlaJNI.bitwuzla_set_termination_callback();
 
     return new Bitwuzla(pSolverOptions);
   }
@@ -117,9 +118,9 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
       return false;
     } else if (resultValue == Result.UNSAT) {
       return true;
-    } /*else if (resultValue == Result.UNKNOWN && terminationCallback.shouldTerminate()) {
-        throw new InterruptedException("Bitwuzla interrupted.");
-      }*/ else {
+    } else if (resultValue == Result.UNKNOWN && shutdownNotifier.shouldShutdown()) {
+      throw new InterruptedException();
+    } else {
       throw new SolverException("Bitwuzla returned UNKNOWN.");
     }
   }
@@ -230,10 +231,4 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   public boolean isClosed() {
     return closed;
   }
-  /*
-   private long addTerminationCallback() {
-     Preconditions.checkState(!closed, "solver context is already closed");
-     return BitwuzlaJNI.set_termination(env, terminationCallback);
-   }
-  */
 }

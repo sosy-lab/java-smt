@@ -6,7 +6,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-%module BitwuzlaNative
+%module(directors="1") BitwuzlaNative
 %{
 #include <bitwuzla/cpp/bitwuzla.h>
 #include <bitwuzla/cpp/parser.h>
@@ -417,8 +417,11 @@ namespace bitwuzla {
 %ignore mk_rm_sort();
 
 /** Terminator */
-// TODO: Can we use this directly?
-%ignore Terminator;
+%insert("runtime") %{
+#define SWIG_JAVA_ATTACH_CURRENT_THREAD_AS_DAEMON
+%}
+
+%feature("director") Terminator;
 
 /** Bitwuzla */
 %ignore Bitwuzla::is_unsat_assumption (const Term &term);
