@@ -102,10 +102,13 @@ public class BitwuzlaFloatingPointManager
   @Override
   protected Long makeNumberAndRound(
       String pN, FloatingPointType pType, Long pFloatingPointRoundingMode) {
+    // Convert scientific notation (f.ex "1.234E2") to a plain decimal string (f.ex "123.4")
+    String decimals = String.format("%.0f", Double.parseDouble(pN));
     if (Double.compare(Double.parseDouble(pN), -0.0) == 0) {
       return BitwuzlaJNI.bitwuzla_mk_fp_neg_zero(mkFpaSort(pType));
     } else {
-      return BitwuzlaJNI.bitwuzla_mk_fp_from_real(mkFpaSort(pType), pFloatingPointRoundingMode, pN);
+      return BitwuzlaJNI.bitwuzla_mk_fp_from_real(
+          mkFpaSort(pType), pFloatingPointRoundingMode, decimals);
     }
   }
 
