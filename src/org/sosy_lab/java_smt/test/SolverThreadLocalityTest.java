@@ -199,6 +199,7 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
                           throw new RuntimeException(pE);
                         }
                       }));
+      Truth.assertThat(task.get()).isInstanceOf(io.github.cvc5.CVC5ApiException.class);
 
     } else {
       task =
@@ -214,8 +215,8 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
                   throw new RuntimeException(pE);
                 }
               });
+      Truth.assertThat(task.get()).isNull();
     }
-    Truth.assertThat(task.get()).isNull();
   }
 
   @Override
