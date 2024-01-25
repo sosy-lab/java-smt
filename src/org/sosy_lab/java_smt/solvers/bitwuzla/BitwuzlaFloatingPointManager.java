@@ -63,7 +63,7 @@ public class BitwuzlaFloatingPointManager
   }
 
   @Override
-  protected Term makeNumberImpl(double n, FloatingPointType type, Long pFloatingPointRoundingMode) {
+  protected Term makeNumberImpl(double n, FloatingPointType type, Term pFloatingPointRoundingMode) {
     if (Double.compare(n, -0.0) == 0) {
       return Bitwuzla.mk_fp_neg_zero(mkFpaSort(type));
     } else {
@@ -83,8 +83,7 @@ public class BitwuzlaFloatingPointManager
     if (Double.compare(Double.parseDouble(pN), -0.0) == 0) {
       return Bitwuzla.mk_fp_neg_zero(mkFpaSort(pType));
     } else {
-      return Bitwuzla.mk_fp_from_real(
-          mkFpaSort(pType), pFloatingPointRoundingMode, decimals);
+      return Bitwuzla.mk_fp_value(mkFpaSort(pType), pFloatingPointRoundingMode, decimals);
     }
   }
 
