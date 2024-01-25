@@ -11,6 +11,8 @@
 #include <bitwuzla/cpp/bitwuzla.h>
 #include <bitwuzla/cpp/parser.h>
 
+#include <gmp.h>
+
 #include <sstream>
 %}
 
@@ -114,6 +116,48 @@ namespace bitwuzla {
 }
 
 %ignore Term::value() const;
+%extend Term {
+  bool to_bool() {
+    assert($self->is_value() && $self->sort().is_bool());
+    return $self->value<bool>();
+  }
+
+  bitwuzla::RoundingMode to_rm() {
+    assert($self->is_value() && $self->sort().is_rm());
+    return $self->value<bitwuzla::RoundingMode>();
+  }
+
+  std::string to_bv() {
+    assert($self->is_value() && $self->sort().is_bv());
+    return $self->value<std::string>();
+  }
+
+  double to_fp() {
+    assert($self->is_value() && $self->sort().is_fp());
+        const auto [sign, exponent, mantissa] =
+          $self->value<std::tuple<std::string, std::string, std::string>>();
+
+        mpz_t expMpz;
+        mpz_init_set_str(expMpz, exponent.c_str(), 2);
+        int32_t expVal = mpz_get_si(expMpz);
+        int32_t bias = -1 + (1 << -1 + exponent.length());
+        mpz_clear(expMpz);
+
+        std::string significant = (expVal == 0 ? "" : "1") + mantissa;
+        std::string formated =
+          significant + "@" + std::to_string(expVal - bias - (-1 + significant.length()));
+
+        mpf_t fpMpz;
+        int error = mpf_init_set_str(fpMpz, formated.c_str(), -2);
+        if (error != 0) {
+          throw bitwuzla::Exception("sign: " + sign + ", exponent: " + exponent + ", mantissa: " + mantissa);
+        }
+        double fpVal = mpf_get_d(fpMpz);
+        mpf_clear(fpMpz);
+
+        return (sign == "1") ? -fpVal : fpVal;
+  }
+}
 
 %ignore operator==(const Term &a, const Term &b);
 %ignore operator!=(const Term &a, const Term &b);

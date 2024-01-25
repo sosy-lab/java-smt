@@ -10,11 +10,11 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Table;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -374,9 +374,6 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
     Kind kind = f.kind();
     if (f.is_value()) {
       return visitor.visitConstant(formula, convertValue(f));
-    } else if (f.sort().is_fp()) {
-      return visitor.visitConstant(formula, parseIEEEbinaryFP(f));
-
     } else if (f.is_const()) {
       String name = f.symbol();
       return visitor.visitFreeVariable(formula, name);
@@ -555,36 +552,20 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
 
   @Override
   public Object convertValue(Term term) {
+    Preconditions.checkArgument(term.is_value(), "Term \"%s\" is not a value.", term);
     Sort sort = term.sort();
-    if (term.is_const()) {
-      return null;
+    if (sort.is_bool()) {
+      return term.to_bool();
     }
-    if (sort.is_fun()) {
-      // TODO: this is wrong
-      throw new AssertionError("Error: Unknown sort and term");
-    } else {
-      String value = term.toString();
-      if (value.startsWith("#b")) {
-        // Bitvectors in Bitwuzla start with a #b
-        return new BigInteger(value.substring(2), 2);
-      } else if (value.equals("true")) {
-        return true;
-      } else if (value.equals("false")) {
-        return false;
-      } else if (value.startsWith("(fp")) {
-        return value
-            .replace("(fp", "")
-            .replace(")", "")
-            .replace("#b", "")
-            .replace("#b", "")
-            .replace("#b", "")
-            .strip();
-      } else if (sort.is_rm()) {
-        return value;
-      }
+    if (sort.is_rm()) {
+      return term.to_rm();
     }
-
-    throw new AssertionError(
-        "Error: Could not convert term to value; Unknown sort and term. " + "Value: " + term);
+    if (sort.is_bv()) {
+      return term.to_bv();
+    }
+    if (sort.is_fp()) {
+      return term.to_fp();
+    }
+    throw new AssertionError("Unknown value type.");
   }
 }

@@ -931,6 +931,7 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="-c"/>
             <arg value="bitwuzla_wrap.cpp"/>
             <arg value="-I${source.path}/include"/>
+            <arg value="-I${gmp.path}"/>
             <arg value="-I${java.home}/include"/>
             <arg value="-I${java.home}/include/linux"/>
         </exec>
@@ -946,7 +947,9 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="libbitwuzlaJNI.so"/>
             <arg value="bitwuzla_wrap.o"/>
             <arg value="-L${bitwuzla.path}/install/lib/x86_64-linux-gnu"/>
+            <arg value="-L${gmp.path}/.libs"/>
             <arg value="-lbitwuzla"/>
+            <arg value="-lgmp"/>
             <arg value="-Wl,-z,defs"/>
         </exec>
         <delete file="${source.path}/bitwuzla_wrap.o"/>
@@ -1007,6 +1010,9 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="--replace-needed"/>
             <arg value="libbitwuzla.so.0"/>
             <arg value="libbitwuzla.so"/>
+            <arg value="--replace-needed"/>
+            <arg value="libgmp.so.10"/>
+            <arg value="libgmp.so"/>
             <arg value="libbitwuzlaJNI-${bitwuzla.version}.so"/>
         </exec>
         <!-- We need to run this twice? -->
@@ -1015,6 +1021,9 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="--replace-needed"/>
             <arg value="libbitwuzla.so.0"/>
             <arg value="libbitwuzla.so"/>
+            <arg value="--replace-needed"/>
+            <arg value="libgmp.so.10"/>
+            <arg value="libgmp.so"/>
             <arg value="libbitwuzlaJNI-${bitwuzla.version}.so"/>
         </exec>
     </target>
