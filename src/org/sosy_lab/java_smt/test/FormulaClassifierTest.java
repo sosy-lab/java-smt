@@ -330,7 +330,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
   public void test_QF_FP() {
     requireParser();
     requireFloats();
-    String query = NUMERAL_VARS + "(declare-fun a () Float32) (assert (fp.eq a (fp.add RNE a a)))";
+    String query = "(declare-fun a () Float32) (assert (fp.eq a (fp.add RNE a a)))";
     classifier.visit(mgr.parse(query));
     assertThat(classifier.toString()).isEqualTo("QF_FP");
   }
@@ -340,8 +340,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
     requireParser();
     requireFloats();
     requireQuantifiers();
-    String query =
-        NUMERAL_VARS + "(declare-fun a () Float32) (assert (exists ((zz Real)) (fp.eq a a)))";
+    String query = "(declare-fun a () Float32) (assert (exists ((zz Float32)) (fp.eq a a)))";
     classifier.visit(mgr.parse(query));
     assertThat(classifier.toString()).isEqualTo("FP");
   }

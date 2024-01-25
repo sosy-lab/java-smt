@@ -63,8 +63,12 @@ public class BitwuzlaFloatingPointManager
   }
 
   @Override
-  protected Term makeNumberImpl(double n, FloatingPointType type, Term pFloatingPointRoundingMode) {
-    return makeNumberImpl(String.format("%f", n), type, pFloatingPointRoundingMode);
+  protected Term makeNumberImpl(double n, FloatingPointType type, Long pFloatingPointRoundingMode) {
+    if (Double.compare(n, -0.0) == 0) {
+      return Bitwuzla.mk_fp_neg_zero(mkFpaSort(type));
+    } else {
+      return makeNumberImpl(String.format("%f", n), type, pFloatingPointRoundingMode);
+    }
   }
 
   private Sort mkFpaSort(FloatingPointType pType) {
@@ -74,7 +78,14 @@ public class BitwuzlaFloatingPointManager
   @Override
   protected Term makeNumberAndRound(
       String pN, FloatingPointType pType, Term pFloatingPointRoundingMode) {
-    return Bitwuzla.mk_fp_value(mkFpaSort(pType), pFloatingPointRoundingMode, pN);
+    // Convert scientific notation (f.ex "1.234E2") to a plain decimal string (f.ex "123.4")
+    String decimals = String.format("%.0f", Double.parseDouble(pN));
+    if (Double.compare(Double.parseDouble(pN), -0.0) == 0) {
+      return Bitwuzla.mk_fp_neg_zero(mkFpaSort(pType));
+    } else {
+      return Bitwuzla.mk_fp_from_real(
+          mkFpaSort(pType), pFloatingPointRoundingMode, decimals);
+    }
   }
 
   @Override
