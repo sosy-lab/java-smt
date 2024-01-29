@@ -14,6 +14,8 @@
 #include <gmp.h>
 
 #include <sstream>
+#include <cassert>
+#include <limits>
 %}
 
 %include <stdint.i>
@@ -132,30 +134,52 @@ namespace bitwuzla {
     return $self->value<std::string>();
   }
 
-  double to_fp() {
+  std::string to_fp () {
     assert($self->is_value() && $self->sort().is_fp());
-        const auto [sign, exponent, mantissa] =
-          $self->value<std::tuple<std::string, std::string, std::string>>();
 
-        mpz_t expMpz;
-        mpz_init_set_str(expMpz, exponent.c_str(), 2);
-        int32_t expVal = mpz_get_si(expMpz);
-        int32_t bias = -1 + (1 << -1 + exponent.length());
-        mpz_clear(expMpz);
+    // Get Bitwuzla representation of the term value
+    auto [sign, exponent, mantissa] =
+      $self->value<std::tuple<std::string, std::string, std::string>> ();
 
-        std::string significant = (expVal == 0 ? "" : "1") + mantissa;
-        std::string formated =
-          significant + "@" + std::to_string(expVal - bias - (-1 + significant.length()));
+    bool isSignZero = sign == "0";
+    bool isExponentZero = exponent.find_first_not_of("0") == std::string::npos;
+    bool isExponentOnes = exponent.find_first_not_of("1") == std::string::npos;
+    bool isMantissaZero = exponent.find_first_not_of("0") == std::string::npos;
 
-        mpf_t fpMpz;
-        int error = mpf_init_set_str(fpMpz, formated.c_str(), -2);
-        if (error != 0) {
-          throw bitwuzla::Exception("sign: " + sign + ", exponent: " + exponent + ", mantissa: " + mantissa);
-        }
-        double fpVal = mpf_get_d(fpMpz);
-        mpf_clear(fpMpz);
+    // Handle special values
+    if (isExponentZero && isMantissaZero) {
+      return isSignZero ? "0.0" : "-0.0";
+    }
+    if (isExponentOnes && isMantissaZero) {
+      return isSignZero ? "Infinity" : "-Infinity";
+    }
+    if (isExponentOnes && !isMantissaZero) {
+      return "NaN";
+    }
 
-        return (sign == "1") ? -fpVal : fpVal;
+    // Calculate value of the exponent
+    mpz_t expMpz;
+    mpz_init_set_str(expMpz, exponent.c_str(), 2);
+    int32_t expVal = mpz_get_si(expMpz);
+    int32_t bias = -1 + (1 << -1 + exponent.length());
+    mpz_clear(expMpz);
+
+    // Rewrite Bitwuzla representation in a format GMP can understand
+    std::string significant = (expVal == 0 ? "" : "1") + mantissa;
+    std::string formated =
+      significant + "@" + std::to_string(expVal - bias - ((int32_t) significant.length() - 1));
+
+    // Convert result to base10 floating point representation
+    mpf_t floatMpf;
+    mpf_init_set_str(floatMpf, formated.c_str(), -2);
+
+    mp_exp_t exp10;
+    char* sig10 = mpf_get_str(nullptr, &exp10, 10, 0, floatMpf);
+    std::string result =  "0." + std::string(sig10) + "e" + std::to_string(exp10);
+    delete[] sig10;
+    mpf_clear(floatMpf);
+
+    return (sign == "-") ? ("-" + result) : result;
   }
 }
 
@@ -283,8 +307,61 @@ namespace bitwuzla {
 }
 %ignore mk_fp_value(const Sort &, const Term &, const std::string &);
 %extend Bitwuzla {
-  static Term mk_fp_value(const Sort &sort, const Term &rm, const std::string &real) {
-    return bitwuzla::mk_fp_value(sort, rm, real);
+  static Term mk_fp_value(const Sort &sort, const Term &rm, const std::string &repr) {
+    // Handle special values
+    if (repr == "0.0") {
+      return mk_fp_pos_zero(sort);
+    }
+    if (repr == "-0.0") {
+      return mk_fp_neg_zero(sort);
+    }
+    if (repr == "Infinity") {
+      return mk_fp_pos_inf(sort);
+    }
+    if (repr == "-Infinity") {
+      return mk_fp_neg_inf(sort);
+    }
+    if (repr == "NaN") {
+      return mk_fp_nan(sort);
+    }
+
+    // Parse float value with GMP
+    mpf_t floatVal;
+    std::string prev_loc = std::setlocale(LC_ALL, nullptr);
+    std::setlocale(LC_ALL, "en_US.UTF-8");
+    int error = mpf_init_set_str(floatVal, repr.c_str(), 10);
+    std::setlocale(LC_ALL, prev_loc.c_str());
+    if (error != 0) {
+      throw bitwuzla::Exception(
+        "String \"" + repr + "\" can't be parsed as a floating point number.");
+    }
+
+    // Convert to decimal format for Bitwuzla
+    mp_exp_t exponent;
+    char* mantissa = mpf_get_str(nullptr, &exponent, 10, 0, floatVal);
+    std::string input = std::string(mantissa);
+    std::ostringstream output;
+    if (input[0] == '-') {
+      output << "-";
+      input.erase(0, 1);
+    }
+    if (exponent <= 0) {
+      output << "0.";
+      output << std::string(-exponent, '0');
+      output << input;
+    } else {
+      output << input.substr(0, exponent);
+      if (exponent > input.length()) {
+        output << std::string(exponent - input.length(), '0');
+      }
+      if (exponent < input.length()) {
+        output << '.' << input.substr(exponent);
+      }
+    }
+    delete[] mantissa;
+
+    // Create the term
+    return bitwuzla::mk_fp_value(sort, rm, output.str());
   }
 }
 %ignore mk_fp_value(const Sort &,

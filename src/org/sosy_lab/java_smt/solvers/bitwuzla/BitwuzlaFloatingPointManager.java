@@ -8,6 +8,9 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
+import java.math.BigDecimal;
+import org.sosy_lab.common.rationals.Rational;
+import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
@@ -63,12 +66,15 @@ public class BitwuzlaFloatingPointManager
   }
 
   @Override
+  public FloatingPointFormula makeNumber(Rational n, FormulaType.FloatingPointType type) {
+    BigDecimal num = new BigDecimal(n.getNum());
+    BigDecimal den = new BigDecimal(n.getDen());
+    return makeNumber(num.divide(den), type);
+  }
+
+  @Override
   protected Term makeNumberImpl(double n, FloatingPointType type, Term pFloatingPointRoundingMode) {
-    if (Double.compare(n, -0.0) == 0) {
-      return Bitwuzla.mk_fp_neg_zero(mkFpaSort(type));
-    } else {
-      return makeNumberImpl(String.format("%f", n), type, pFloatingPointRoundingMode);
-    }
+    return makeNumberImpl(String.valueOf(n), type, pFloatingPointRoundingMode);
   }
 
   private Sort mkFpaSort(FloatingPointType pType) {
@@ -78,13 +84,7 @@ public class BitwuzlaFloatingPointManager
   @Override
   protected Term makeNumberAndRound(
       String pN, FloatingPointType pType, Term pFloatingPointRoundingMode) {
-    // Convert scientific notation (f.ex "1.234E2") to a plain decimal string (f.ex "123.4")
-    String decimals = String.format("%.0f", Double.parseDouble(pN));
-    if (Double.compare(Double.parseDouble(pN), -0.0) == 0) {
-      return Bitwuzla.mk_fp_neg_zero(mkFpaSort(pType));
-    } else {
-      return Bitwuzla.mk_fp_value(mkFpaSort(pType), pFloatingPointRoundingMode, decimals);
-    }
+    return Bitwuzla.mk_fp_value(mkFpaSort(pType), pFloatingPointRoundingMode, pN);
   }
 
   @Override

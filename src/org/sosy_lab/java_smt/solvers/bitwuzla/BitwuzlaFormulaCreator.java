@@ -14,7 +14,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Table;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -346,28 +345,6 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
     return bitwuzlaSortToType(pType);
   }
 
-  private BigDecimal parseIEEEbinaryFP(Term pTerm) {
-    // The Bitwuzla string for FPs is always in binary, regardless of the second argument.
-
-    String fp = pTerm.toString();
-
-    if (fp.length() == 32) {
-      float result = Float.intBitsToFloat(Integer.parseUnsignedInt(fp, 2));
-      return new BigDecimal(result);
-    } else if (fp.length() == 64) {
-      double result = Double.longBitsToDouble(Long.parseUnsignedLong(fp, 2));
-      return new BigDecimal(result);
-    } else {
-      throw new UnsupportedOperationException(
-          "Visitor can only visit constant FPs of 32 or 64 " + "bits.");
-    }
-
-    //    String fpSMTLIB = bitwuzlaJNI.bitwuzla_term_to_string(pTerm);
-    //    String[] mySplit = fpSMTLIB.split(" #b");
-    //    mySplit[3] = mySplit[3].replace(")", "");
-    //    double result = calculateDecimal(mySplit[3], mySplit[2], mySplit[1]);
-  }
-
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula formula, Term f)
       throws UnsupportedOperationException {
@@ -564,7 +541,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
       return term.to_bv();
     }
     if (sort.is_fp()) {
-      return term.to_fp();
+      return Double.parseDouble(term.to_fp());
     }
     throw new AssertionError("Unknown value type.");
   }
