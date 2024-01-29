@@ -146,7 +146,7 @@ namespace bitwuzla {
     bool isSignZero = sign == "0";
     bool isExponentZero = exponent.find_first_not_of("0") == std::string::npos;
     bool isExponentOnes = exponent.find_first_not_of("1") == std::string::npos;
-    bool isMantissaZero = exponent.find_first_not_of("0") == std::string::npos;
+    bool isMantissaZero = mantissa.find_first_not_of("0") == std::string::npos;
 
     // Handle special values
     if (isExponentZero && isMantissaZero) {
