@@ -13,9 +13,11 @@
 
 #include <gmp.h>
 
+#include <string>
 #include <sstream>
+
 #include <cassert>
-#include <limits>
+
 %}
 
 %include <stdint.i>
@@ -309,12 +311,6 @@ namespace bitwuzla {
 %extend Bitwuzla {
   static Term mk_fp_value(const Sort &sort, const Term &rm, const std::string &repr) {
     // Handle special values
-    if (repr == "0.0") {
-      return mk_fp_pos_zero(sort);
-    }
-    if (repr == "-0.0") {
-      return mk_fp_neg_zero(sort);
-    }
     if (repr == "Infinity") {
       return mk_fp_pos_inf(sort);
     }
@@ -340,6 +336,17 @@ namespace bitwuzla {
     mp_exp_t exponent;
     char* mantissa = mpf_get_str(nullptr, &exponent, 10, 0, floatVal);
     std::string input = std::string(mantissa);
+
+    bool isZeroes = input.find_first_not_of("0") == std::string::npos;
+    if (isZeroes) {
+      // GMP drops the sign for -0.0, so we have handle this as a special case
+      if (repr[0] == '-') {
+        return mk_fp_neg_zero(sort);
+      } else {
+        return mk_fp_pos_zero(sort);
+      }
+    }
+
     std::ostringstream output;
     if (input[0] == '-') {
       output << "-";
