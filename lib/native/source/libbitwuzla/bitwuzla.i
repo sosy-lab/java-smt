@@ -336,7 +336,7 @@ namespace bitwuzla {
     mp_exp_t exponent;
     char* mantissa = mpf_get_str(nullptr, &exponent, 10, 0, floatVal);
     std::string input = std::string(mantissa);
-
+    mpf_clear(floatVal);
     bool isZeroes = input.find_first_not_of("0") == std::string::npos;
     if (isZeroes) {
       // GMP drops the sign for -0.0, so we have handle this as a special case
