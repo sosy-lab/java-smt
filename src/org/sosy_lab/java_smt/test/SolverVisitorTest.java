@@ -360,8 +360,10 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     checkKind(fpmgr.max(x, y), FunctionDeclarationKind.FP_MAX);
     checkKind(fpmgr.min(x, y), FunctionDeclarationKind.FP_MIN);
     checkKind(fpmgr.sqrt(x), FunctionDeclarationKind.FP_SQRT);
-    if (Solvers.CVC4 != solverToUse()
-        && Solvers.CVC5 != solverToUse()) { // CVC4/CVC5 do not support this operation
+    if (!List.of(Solvers.CVC4, Solvers.CVC5, Solvers.BITWUZLA)
+        .contains(solverToUse())) { // CVC4/CVC5 do not
+      // support this operation
+      // .. and neither does Bitwuzla
       checkKind(fpmgr.toIeeeBitvector(x), FunctionDeclarationKind.FP_AS_IEEEBV);
     }
     checkKind(
