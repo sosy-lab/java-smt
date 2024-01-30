@@ -196,13 +196,15 @@ public class BitwuzlaFloatingPointManager
 
   @Override
   protected Long toIeeeBitvectorImpl(Long pNumber) {
-    long rm = BitwuzlaJNI.bitwuzla_mk_rm_value(BitwuzlaJNI.BITWUZLA_RM_RTZ_get());
-    long inputBits =
-        BitwuzlaJNI.bitwuzla_term_fp_get_exp_size(pNumber)
-            + BitwuzlaJNI.bitwuzla_term_fp_get_sig_size(pNumber);
-    // This is most likely wrong/inprecise!
-    return BitwuzlaJNI.bitwuzla_mk_term2_indexed1(
-        BITWUZLA_KIND_FP_TO_SBV.swigValue(), rm, pNumber, inputBits);
+    // FIXME: Bitwuzla seems to be lacking an inverse to FP_TO_FP_FROM_BV?
+    //  The supported options are:
+    //    * FP_TO_FP_FROM_SBV: Converts from in to float
+    //    * FP_TO_SBV: Converts from float to int by rounding to the next integer
+    //    * FP_TO_FP_FROM_BV: Recast a bitvector as float
+    //    * FP_TO_BV: Missing?
+    //  Using FP_TO_SBV instead will only work if the floating point number is really an integer
+    throw new UnsupportedOperationException(
+        "Bitwuzla does not support casting from float to bitvector");
   }
 
   @Override
