@@ -1048,7 +1048,7 @@ SPDX-License-Identifier: Apache-2.0
         <ivy:publish
                 pubrevision="${bitwuzla.version}"
                 resolver="Sosy-Lab-Publish"
-                artifactspattern="[artifact]-[revision].[ext]"
+                artifactspattern="[artifact]-[revision](-[classifier]).[ext]"
                 status="release"
         />
         <echo>

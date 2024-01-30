@@ -11,6 +11,7 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 <ivy-module version="2.0"
+            xmlns:e="http://ant.apache.org/ivy/extra"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
     <info organisation="org.sosy_lab" module="javasmt-solver-bitwuzla">
@@ -27,26 +28,22 @@ SPDX-License-Identifier: Apache-2.0
         <conf name="solver-bitwuzla" extends="solver-bitwuzla-linux"/>
         <conf name="solver-bitwuzla-linux" extends="solver-bitwuzla-common"/>
         <conf name="solver-bitwuzla-common" visibility="private"/>
-        <!--
         <conf name="sources"/>
         <conf name="javadoc"/>
-        -->
     </configurations>
 
     <publications defaultconf="solver-bitwuzla">
         <!-- Linux native libraries -->
         <artifact name="libbitwuzlaJNI" conf="solver-bitwuzla" type="shared-object" ext="so"/>
         <artifact name="libbitwuzla" conf="solver-bitwuzla" type="shared-object" ext="so"/>
-        <artifact name="libgmp" conf="solver-bitwuzla" type="shared-object" ext="so"/>
         <artifact name="libbitwuzlabb"  conf="solver-bitwuzla" type="shared-object" ext="so"/>
         <artifact name="libbitwuzlabv"  conf="solver-bitwuzla" type="shared-object" ext="so"/>
         <artifact name="libbitwuzlals"  conf="solver-bitwuzla" type="shared-object" ext="so"/>
+        <artifact name="libgmp" conf="solver-bitwuzla" type="shared-object" ext="so"/>
         <!-- Java code, docs and source -->
         <artifact name="bitwuzla" conf="solver-bitwuzla-common" ext="jar"/>
-        <!--
         <artifact name="bitwuzla" conf="sources" e:classifier="sources" type="source" ext="jar"/>
-        <artifact name="bitwuzla" conf="javadoc" e:classifier="javadoc" type="javadoc" ext="jar"/>^
-        -->
+        <artifact name="bitwuzla" conf="javadoc" e:classifier="javadoc" type="javadoc" ext="jar"/>
     </publications>
 
     <dependencies></dependencies>
