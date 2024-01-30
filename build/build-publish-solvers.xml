@@ -936,6 +936,7 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="-I${java.home}/include/linux"/>
         </exec>
         <delete file="${source.path}/bitwuzla_wrap.cpp"/>
+        <delete file="${source.path}/bitwuzla_wrap.h"/>
 
         <!-- delete includes from the source tree (we're done compiling) -->
         <delete dir="${source.path}/include"/>
