@@ -14,6 +14,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Table;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -538,7 +539,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
       return term.to_rm();
     }
     if (sort.is_bv()) {
-      return term.to_bv();
+      return new BigInteger(term.to_bv());
     }
     if (sort.is_fp()) {
       return Double.parseDouble(term.to_fp());
