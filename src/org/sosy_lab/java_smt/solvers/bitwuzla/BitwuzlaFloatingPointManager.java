@@ -37,6 +37,8 @@ import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_
 import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_FP_TO_SBV;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_FP_TO_UBV;
 
+import java.math.BigDecimal;
+import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
@@ -84,6 +86,14 @@ public class BitwuzlaFloatingPointManager
         throw new AssertionError("Unexpected value");
     }
     return out;
+  }
+
+  @Override
+  public Long makeNumberImpl(
+      Rational n, FormulaType.FloatingPointType type, Long pFloatingPointRoundingMode) {
+    BigDecimal num = new BigDecimal(n.getNum());
+    BigDecimal den = new BigDecimal(n.getDen());
+    return makeNumberImpl(num.divide(den).toString(), type, pFloatingPointRoundingMode);
   }
 
   @Override
