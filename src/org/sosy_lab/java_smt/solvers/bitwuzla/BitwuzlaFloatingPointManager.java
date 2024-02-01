@@ -98,11 +98,7 @@ public class BitwuzlaFloatingPointManager
 
   @Override
   protected Long makeNumberImpl(double n, FloatingPointType type, Long pFloatingPointRoundingMode) {
-    if (Double.compare(n, -0.0) == 0) {
-      return BitwuzlaJNI.bitwuzla_mk_fp_neg_zero(mkFpaSort(type));
-    } else {
-      return makeNumberImpl(String.format("%f", n), type, pFloatingPointRoundingMode);
-    }
+    return makeNumberImpl(String.valueOf(n), type, pFloatingPointRoundingMode);
   }
 
   private long mkFpaSort(FloatingPointType pType) {
@@ -112,14 +108,8 @@ public class BitwuzlaFloatingPointManager
   @Override
   protected Long makeNumberAndRound(
       String pN, FloatingPointType pType, Long pFloatingPointRoundingMode) {
-    // Convert scientific notation (f.ex "1.234E2") to a plain decimal string (f.ex "123.4")
-    String decimals = String.format("%.0f", Double.parseDouble(pN));
-    if (Double.compare(Double.parseDouble(pN), -0.0) == 0) {
-      return BitwuzlaJNI.bitwuzla_mk_fp_neg_zero(mkFpaSort(pType));
-    } else {
-      return BitwuzlaJNI.bitwuzla_mk_fp_from_real(
-          mkFpaSort(pType), pFloatingPointRoundingMode, decimals);
-    }
+    Double.parseDouble(pN); // Will throw an exception if the string is not a valid float
+    return BitwuzlaJNI.bitwuzla_mk_fp_from_real(mkFpaSort(pType), pFloatingPointRoundingMode, pN);
   }
 
   @Override
