@@ -84,6 +84,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Table;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -654,34 +655,17 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Bit
 
   @Override
   public Object convertValue(Long term) {
-    String value;
-    long sort = BitwuzlaJNI.bitwuzla_term_get_sort(term);
-    if (BitwuzlaJNI.bitwuzla_term_is_const(term)) {
-      return null;
+    if (BitwuzlaJNI.bitwuzla_term_is_bool(term)) {
+      return BitwuzlaJNI.bitwuzla_term_value_get_bool(term);
     }
-    if (BitwuzlaJNI.bitwuzla_sort_is_fun(sort)) {
-      // TODO: this is wrong
-      throw new AssertionError("Error: Unknown sort and term");
-    } else {
-      value = BitwuzlaJNI.bitwuzla_term_to_string(term);
-      if (value.startsWith("#b")) {
-        // Bitvectors in Bitwuzla start with a #b
-        return new BigInteger(value.substring(2), 2);
-      } else if (value.equals("true")) {
-        return true;
-      } else if (value.equals("false")) {
-        return false;
-      } else if (value.startsWith("(fp")) {
-        return value
-            .replace("(fp", "")
-            .replace(")", "")
-            .replace("#b", "")
-            .replace("#b", "")
-            .replace("#b", "")
-            .strip();
-      } else if (BitwuzlaJNI.bitwuzla_sort_is_rm(sort)) {
-        return value;
-      }
+    if (BitwuzlaJNI.bitwuzla_term_is_bv(term)) {
+      return new BigInteger(BitwuzlaJNI.bitwuzla_term_value_get_str(term), 2);
+    }
+    if (BitwuzlaJNI.bitwuzla_term_is_fp(term)) {
+      return Double.parseDouble(BitwuzlaJNI.bitwuzla_term_value_get_real(term));
+    }
+    if (BitwuzlaJNI.bitwuzla_term_is_rm(term)) {
+      return RoundingMode.valueOf(BitwuzlaJNI.bitwuzla_term_value_get_rm(term));
     }
 
     throw new AssertionError(
