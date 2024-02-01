@@ -82,7 +82,6 @@ import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Table;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -427,37 +426,12 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Bit
     return bitwuzlaSortToType(pType);
   }
 
-  private BigDecimal parseIEEEbinaryFP(long pTerm) {
-    // The Bitwuzla string for FPs is always in binary, regardless of the second argument.
-
-    String fp = BitwuzlaJNI.bitwuzla_term_value_get_str(pTerm);
-
-    if (fp.length() == 32) {
-      float result = Float.intBitsToFloat(Integer.parseUnsignedInt(fp, 2));
-      return new BigDecimal(result);
-    } else if (fp.length() == 64) {
-      double result = Double.longBitsToDouble(Long.parseUnsignedLong(fp, 2));
-      return new BigDecimal(result);
-    } else {
-      throw new UnsupportedOperationException(
-          "Visitor can only visit constant FPs of 32 or 64 " + "bits.");
-    }
-
-    //    String fpSMTLIB = bitwuzlaJNI.bitwuzla_term_to_string(pTerm);
-    //    String[] mySplit = fpSMTLIB.split(" #b");
-    //    mySplit[3] = mySplit[3].replace(")", "");
-    //    double result = calculateDecimal(mySplit[3], mySplit[2], mySplit[1]);
-  }
-
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula formula, Long f)
       throws UnsupportedOperationException {
     BitwuzlaKind kind = BitwuzlaKind.swigToEnum(BitwuzlaJNI.bitwuzla_term_get_kind(f));
     if (termIsConstant(f)) {
       return visitor.visitConstant(formula, convertValue(f));
-
-    } else if (BitwuzlaJNI.bitwuzla_term_is_fp_value(f)) {
-      return visitor.visitConstant(formula, parseIEEEbinaryFP(f));
 
     } else if (BitwuzlaJNI.bitwuzla_term_is_const(f)) {
       String name = BitwuzlaJNI.bitwuzla_term_get_symbol(f);
