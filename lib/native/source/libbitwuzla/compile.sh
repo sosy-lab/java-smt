@@ -63,7 +63,7 @@ echo "Compiling the C wrapper code and creating the \"$OUT_FILE\" library..."
 gcc $JNI_HEADERS -I$BWZL_SRC_DIR -I$BWZL_LIB_DIR -I$BWZL_BUILD_SRC_DIR -I$BWZL_BUILD_LIB_DIR -I$BWZL_INCLUDE_DIR -I$BWZL_INCLUDE_C_DIR $SRC_FILE -fPIC -Wall -pedantic -c
 
 # Link
-gcc -shared bitwuzla_wrap.o -L$BWZL_BUILD_SRC_DIR -lbitwuzla -Wl,-rpath,$BWZL_BUILD_SRC_DIR -o libbitwuzlaJNI.so
+gcc -shared bitwuzla_wrap.o -L$BWZL_BUILD_SRC_DIR -lgmp -lbitwuzla -Wl,-rpath,$BWZL_BUILD_SRC_DIR -o libbitwuzlaJNI.so
 
 # TODO: improve compiliation process (strict mode), strip lib, check if we can compile static libs and include them
 

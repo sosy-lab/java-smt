@@ -570,6 +570,8 @@ public class BitwuzlaJNI {
 
   public static final native String bitwuzla_term_value_get_str_fmt(long jarg1, int jarg2);
 
+  public static final native String bitwuzla_term_value_get_real(long jarg1);
+
   public static final native void bitwuzla_term_value_get_fp_ieee(
       long jarg1, long jarg2, long jarg3, long jarg4, int jarg5);
 

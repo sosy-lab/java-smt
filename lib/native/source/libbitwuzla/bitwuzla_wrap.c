@@ -633,6 +633,7 @@ static void SWIG_JavaArrayArgoutUlong (JNIEnv *jenv, jlong *jarr, unsigned long 
   (*jenv)->ReleaseLongArrayElements(jenv, input, jarr, 0);
 }
 
+/*
 static jlongArray SWIG_JavaArrayOutUlong (JNIEnv *jenv, unsigned long *result, jsize sz) {
   jlong *arr;
   int i;
@@ -647,7 +648,7 @@ static jlongArray SWIG_JavaArrayOutUlong (JNIEnv *jenv, unsigned long *result, j
   (*jenv)->ReleaseLongArrayElements(jenv, jresult, arr, 0);
   return jresult;
 }
-
+*/
 
 /* jlong[] support */ /*
 static int SWIG_JavaArrayInLonglong (JNIEnv *jenv, jlong **jarr, jlong **carr, jlongArray input) {
@@ -778,6 +779,8 @@ static void SWIG_JavaArrayArgoutDouble (JNIEnv *jenv, jdouble *jarr, double *car
 #include "bitwuzla.h"
 #include "parser.h"
 
+#include "gmp.h"
+#include "locale.h"
 
 #include <stdint.h>		// Use the C99 official header
 
@@ -843,6 +846,148 @@ typedef union {
   char __wchb[4];
 } __mbstate_t___value;
 
+
+SWIGINTERN char* bitwuzla_term_to_fp(BitwuzlaTerm term){
+  assert(bitwuzla_term_is_fp_value(term));
+
+  // Get Bitwuzla representation of the term value
+  const char *sign, *exponent, *mantissa;
+  bitwuzla_term_value_get_fp_ieee(term, &sign, &exponent, &mantissa, 2);
+
+  bool isSignZero = strcmp(sign, "0") == 0;
+  bool isExponentZero = strspn(exponent, "0") == strlen(exponent);
+  bool isExponentOnes = strspn(exponent, "1") == strlen(exponent);
+  bool isMantissaZero = strspn(mantissa, "0") == strlen(mantissa);
+
+  // Handle special values
+  if (isExponentZero && isMantissaZero) {
+    return isSignZero ? "0.0" : "-0.0";
+  }
+  if (isExponentOnes && isMantissaZero) {
+    return isSignZero ? "Infinity" : "-Infinity";
+  }
+  if (isExponentOnes && !isMantissaZero) {
+    return "NaN";
+  }
+
+  // Calculate value of the exponent
+  mpz_t expMpz;
+  mpz_init_set_str(expMpz, exponent, 2);
+  int32_t expVal = mpz_get_si(expMpz);
+  int32_t bias = -1 + (1 << (-1 + strlen(exponent)));
+  mpz_clear(expMpz);
+
+  // Rewrite Bitwuzla representation in a format GMP can understand
+  char *significant = malloc(1 + strlen(mantissa) + 1);
+  strcpy(significant, expVal == 0 ? "" : "1");
+  strcat(significant, mantissa);
+
+  int32_t biased_exp = expVal - bias - ((int32_t) strlen(significant) - 1);
+  char exp_str[12];
+  sprintf(exp_str, "%d", biased_exp);
+
+  char *formated = malloc(strlen(significant) + 1 + strlen(exp_str) + 1);
+  strcpy(formated, significant);
+  free(significant);
+  strcpy(formated, "@");
+  strcat(formated, exp_str);
+
+  // Convert result to base10 floating point representation
+  mpf_t floatMpf;
+  mpf_init_set_str(floatMpf, formated, -2);
+  free(formated);
+
+  mp_exp_t exp10;
+  char *sig10 = mpf_get_str(0, &exp10, 10, 0, floatMpf);
+  char exp10_str[12];
+  sprintf(exp10_str, "%d", (int) exp10);
+  char *result = malloc(1 + 1 + strlen(sig10) + 1 + strlen(exp10_str) + 1);
+  strcpy(result, strcmp(sign, "-") == 0 ? "-" : "");
+  strcat(result, "0.");
+  strcat(result, sig10);
+  free(sig10);
+  strcat(result, exp10_str);
+  mpf_clear(floatMpf);
+
+  return result;
+}
+
+char* repeat(char value, size_t times) {
+ char *output = (char*) malloc(times + 1);
+ memset(output, value, times);
+ output[times] = 0;
+ return output;
+}
+
+SWIGINTERN BitwuzlaTerm bitwuzla_mk_fp_from_real__patched_(BitwuzlaSort sort, BitwuzlaTerm rm, const char *repr) {
+  // Handle special values
+  if (strcmp(repr, "Infinity") == 0) {
+    return bitwuzla_mk_fp_pos_inf(sort);
+  }
+  if (strcmp(repr, "-Infinity") == 0) {
+    return bitwuzla_mk_fp_neg_inf(sort);
+  }
+  if (strcmp(repr, "NaN") == 0) {
+    return bitwuzla_mk_fp_nan(sort);
+  }
+
+  // Parse float value with GMP
+  mpf_t floatVal;
+  char *prev_loc = setlocale(LC_ALL, 0);
+  setlocale(LC_ALL, "en_US.UTF-8");
+  int error = mpf_init_set_str(floatVal, repr, 10);
+  setlocale(LC_ALL, prev_loc);
+  if (error != 0) {
+    fprintf(stderr, "String \"%s\" can't be parsed as a floating point number.", repr);
+    abort();
+  }
+
+  // Convert to decimal format for Bitwuzla
+  mp_exp_t exponent;
+  char *mantissa = mpf_get_str(0, &exponent, 10, 0, floatVal);
+  mpf_clear(floatVal);
+  bool isZeroes = strspn(mantissa, "0") == strlen(mantissa);
+  if (isZeroes) {
+    // GMP drops the sign for -0.0, so we have handle this as a special case
+    if (repr[0] == '-') {
+      return bitwuzla_mk_fp_neg_zero(sort);
+    } else {
+      return bitwuzla_mk_fp_pos_zero(sort);
+    }
+  }
+
+  char *output = (char*) malloc(2 + abs(exponent) + strlen(mantissa) + 1);
+  char *input = mantissa;
+  strcpy(output, "");
+  if (input[0] == '-') {
+    strcat(output, "-");
+    input++;
+  }
+  if (exponent <= 0) {
+    strcat(output, "0.");
+    char *zeroes = repeat('0', -exponent);
+    strcat(output, zeroes);
+    free(zeroes);
+    strcat(output, input);
+  } else {
+    strncat(output, input, exponent);
+    if (exponent > strlen(input)) {
+      char *zeroes = repeat('0', exponent - strlen(input));
+      strcat(output, zeroes);
+      free(zeroes);
+    }
+    if (exponent < strlen(input)) {
+      strcat(output, ".");
+      strcat(output, input+exponent);
+    }
+  }
+  free(mantissa);
+
+  // Create the term
+  BitwuzlaTerm result = bitwuzla_mk_fp_from_real(sort, rm, output);
+  free(output);
+  return result;
+}
 
 #ifdef __cplusplus
 extern "C" {
@@ -6765,6 +6910,21 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_BitwuzlaJN
 }
 
 
+SWIGEXPORT jstring JNICALL
+Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_BitwuzlaJNI_bitwuzla_1term_1value_1get_1real(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jstring jresult = 0 ;
+  BitwuzlaTerm arg1;
+  char *result = 0;
+
+  (void)jenv;
+  (void)jcls;
+  arg1 = (BitwuzlaTerm)jarg1;
+  result = (char *)bitwuzla_term_to_fp(arg1);
+  if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_BitwuzlaJNI_bitwuzla_1term_1value_1get_1rm(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jint jresult = 0 ;
   BitwuzlaTerm arg1 ;
@@ -7531,7 +7691,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_BitwuzlaJ
     arg3 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg3, 0);
     if (!arg3) return 0;
   }
-  result = (BitwuzlaTerm)bitwuzla_mk_fp_from_real(arg1,arg2,(char const *)arg3);
+  result = (BitwuzlaTerm)bitwuzla_mk_fp_from_real__patched_(arg1,arg2,(char const *)arg3);
   jresult = (jlong)result; 
   if (arg3) (*jenv)->ReleaseStringUTFChars(jenv, jarg3, (const char *)arg3);
   return jresult;
