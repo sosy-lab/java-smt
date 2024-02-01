@@ -250,14 +250,6 @@ public abstract class SolverBasedTest0 {
   }
 
   protected final void requireFloats() {
-    // TODO: Bitwuza
-    //  Remove once we have a proper solution to the results
-    assume()
-        .withMessage(
-            "FP is not available in Bitwuzla until we can get a proper decimal "
-                + "representation of the results.")
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.BITWUZLA);
     assume()
         .withMessage("Solver %s does not support the theory of floats", solverToUse())
         .that(fpmgr)
