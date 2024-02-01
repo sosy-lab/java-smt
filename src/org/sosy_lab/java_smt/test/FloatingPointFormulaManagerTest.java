@@ -614,6 +614,7 @@ public class FloatingPointFormulaManagerTest
 
   @Test
   public void rationalToFpMinusOne() throws SolverException, InterruptedException {
+    requireRationals();
     requireBitvectors();
 
     NumeralFormula ratOne = rmgr.makeNumber(-1);
