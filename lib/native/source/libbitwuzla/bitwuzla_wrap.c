@@ -888,9 +888,9 @@ SWIGINTERN char* bitwuzla_term_to_fp(BitwuzlaTerm term){
 
   char *formated = malloc(strlen(significant) + 1 + strlen(exp_str) + 1);
   strcpy(formated, significant);
-  free(significant);
-  strcpy(formated, "@");
+  strcat(formated, "@");
   strcat(formated, exp_str);
+  free(significant);
 
   // Convert result to base10 floating point representation
   mpf_t floatMpf;
@@ -902,13 +902,14 @@ SWIGINTERN char* bitwuzla_term_to_fp(BitwuzlaTerm term){
   char exp10_str[12];
   sprintf(exp10_str, "%d", (int) exp10);
   char *result = malloc(1 + 1 + strlen(sig10) + 1 + strlen(exp10_str) + 1);
-  strcpy(result, strcmp(sign, "-") == 0 ? "-" : "");
+  strcpy(result, strcmp(sign, "1") == 0 ? "-" : "");
   strcat(result, "0.");
   strcat(result, sig10);
-  free(sig10);
+  strcat(result, "e");
   strcat(result, exp10_str);
-  mpf_clear(floatMpf);
+  free(sig10);
 
+  mpf_clear(floatMpf);
   return result;
 }
 
