@@ -204,7 +204,7 @@ public class BitwuzlaFloatingPointManager
 
     long bvVar = BitwuzlaJNI.bitwuzla_mk_const(bvSort, "");
     long equal = BitwuzlaJNI.bitwuzla_mk_term2(
-        BitwuzlaKind.BITWUZLA_KIND_EQUAL.swigValue(),
+        BitwuzlaKind.BITWUZLA_KIND_FP_EQUAL.swigValue(),
         BitwuzlaJNI.bitwuzla_mk_term1_indexed2(
             BitwuzlaKind.BITWUZLA_KIND_FP_TO_FP_FROM_BV.swigValue(),
             bvVar, sizeExp,
