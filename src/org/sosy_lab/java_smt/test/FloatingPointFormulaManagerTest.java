@@ -720,7 +720,6 @@ public class FloatingPointFormulaManagerTest
 
   @Test
   public void checkIeeeFpConversion32() throws SolverException, InterruptedException {
-    // FIXME: This is *very* slow on Bitwuzla
     for (float f : getListOfFloats()) {
       checkFP(
           singlePrecType,
@@ -731,7 +730,6 @@ public class FloatingPointFormulaManagerTest
 
   @Test
   public void checkIeeeFpConversion64() throws SolverException, InterruptedException {
-    // FIXME: This is *very* slow on Bitwuzla
     for (double d : getListOfDoubles()) {
       checkFP(
           doublePrecType,
@@ -752,14 +750,16 @@ public class FloatingPointFormulaManagerTest
             0.0f // , -0.0f // MathSat5 fails for NEGATIVE_ZERO
             );
 
-    for (int i = 1; i < 20; i++) {
-      for (int j = 1; j < 20; j++) {
+    final int stepSize = solverToUse() == Solvers.BITWUZLA ? 10 : 1;
+    for (int i = 1; i < 20; i += stepSize) {
+      for (int j = 1; j < 20; j += stepSize) {
         flts.add((float) (i * Math.pow(10, j)));
       }
     }
 
+    final int numRandom = solverToUse() == Solvers.BITWUZLA ? 5 : NUM_RANDOM_TESTS;
     Random rand = new Random(0);
-    for (int i = 0; i < NUM_RANDOM_TESTS; i++) {
+    for (int i = 0; i < numRandom; i++) {
       float flt = Float.intBitsToFloat(rand.nextInt());
       if (!Float.isNaN(flt)) {
         flts.add(flt);
@@ -781,14 +781,16 @@ public class FloatingPointFormulaManagerTest
             0.0 // , -0.0 // MathSat5 fails for NEGATIVE_ZERO
             );
 
-    for (int i = 1; i < 20; i++) {
-      for (int j = 1; j < 20; j++) {
+    final int stepSize = solverToUse() == Solvers.BITWUZLA ? 10 : 1;
+    for (int i = 1; i < 20; i += stepSize) {
+      for (int j = 1; j < 20; j += stepSize) {
         dbls.add(i * Math.pow(10, j));
       }
     }
 
+    final int numRandom = solverToUse() == Solvers.BITWUZLA ? 5 : NUM_RANDOM_TESTS;
     Random rand = new Random(0);
-    for (int i = 0; i < NUM_RANDOM_TESTS; i++) {
+    for (int i = 0; i < numRandom; i++) {
       double d = Double.longBitsToDouble(rand.nextLong());
       if (!Double.isNaN(d)) {
         dbls.add(d);
