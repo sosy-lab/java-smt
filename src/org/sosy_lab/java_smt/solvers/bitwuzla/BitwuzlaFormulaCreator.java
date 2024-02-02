@@ -16,10 +16,12 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Table;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -49,7 +51,7 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Term;
 public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, BitwuzlaDeclaration> {
   private final Table<String, Sort, Term> formulaCache = HashBasedTable.create();
 
-  // private final Table<String, Long, Long> boundFormulaCache = HashBasedTable.create();
+  private final Set<Term> variableCasts = new HashSet<>();
 
   protected BitwuzlaFormulaCreator() {
     super(null, Bitwuzla.mk_bool_sort(), null, null, null, null);
@@ -545,5 +547,13 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
       return Double.parseDouble(term.to_fp());
     }
     throw new AssertionError("Unknown value type.");
+  }
+
+  public void addVariableCast(Term equal) {
+    variableCasts.add(equal);
+  }
+
+  public Iterable<Term> getVariableCasts() {
+    return variableCasts;
   }
 }

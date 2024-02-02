@@ -24,14 +24,14 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.Term;
 
 public class BitwuzlaFloatingPointManager
     extends AbstractFloatingPointFormulaManager<Term, Sort, Void, BitwuzlaDeclaration> {
-  // private final long bitwuzla;
+  private final BitwuzlaFormulaCreator bitwuzlaCreator;
   private final Term roundingMode;
 
   protected BitwuzlaFloatingPointManager(
       FormulaCreator<Term, Sort, Void, BitwuzlaDeclaration> pCreator,
       FloatingPointRoundingMode pFloatingPointRoundingMode) {
     super(pCreator);
-    // bitwuzla = pCreator.getEnv();
+    bitwuzlaCreator = (BitwuzlaFormulaCreator) pCreator;
     roundingMode = getRoundingModeImpl(pFloatingPointRoundingMode);
   }
 
@@ -169,15 +169,19 @@ public class BitwuzlaFloatingPointManager
 
   @Override
   protected Term toIeeeBitvectorImpl(Term pNumber) {
-    // FIXME: Bitwuzla seems to be lacking an inverse to FP_TO_FP_FROM_BV?
-    //  The supported options are:
-    //    * FP_TO_FP_FROM_SBV: Converts from in to float
-    //    * FP_TO_SBV: Converts from float to int by rounding to the next integer
-    //    * FP_TO_FP_FROM_BV: Recast a bitvector as float
-    //    * FP_TO_BV: Missing?
-    //  Using FP_TO_SBV instead will only work if the floating point number is really an integer
-    throw new UnsupportedOperationException(
-        "Bitwuzla does not support casting from float to bitvector");
+    int sizeExp = pNumber.sort().fp_exp_size();
+    int sizeSig = pNumber.sort().fp_sig_size();
+
+    Sort bvSort = Bitwuzla.mk_bv_sort(sizeExp + sizeSig);
+
+    Term bvVar = Bitwuzla.mk_const(bvSort);
+    Term equal = Bitwuzla.mk_term(
+        Kind.EQUAL,
+        Bitwuzla.mk_term(Kind.FP_TO_FP_FROM_BV, bvVar, sizeExp, sizeSig),
+        pNumber);
+
+    bitwuzlaCreator.addVariableCast(equal);
+    return bvVar;
   }
 
   @Override

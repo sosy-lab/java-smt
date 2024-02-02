@@ -361,9 +361,11 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     checkKind(fpmgr.min(x, y), FunctionDeclarationKind.FP_MIN);
     checkKind(fpmgr.sqrt(x), FunctionDeclarationKind.FP_SQRT);
     if (!List.of(Solvers.CVC4, Solvers.CVC5, Solvers.BITWUZLA)
-        .contains(solverToUse())) { // CVC4/CVC5 do not
-      // support this operation
-      // .. and neither does Bitwuzla
+        .contains(solverToUse())) { // CVC4/CVC5 and bitwuzla do not support this operation
+      // On Bitwuzla we now use a workaround that replaces "fp_to_bv(fpTerm)" with "newVar" and then
+      // adds the assertion "fpTerm = bv_to_fp(newVar)" as a side condition.
+      // Unfortunately this does not solve the problem in this test and there is no way of fixing
+      // it.
       checkKind(fpmgr.toIeeeBitvector(x), FunctionDeclarationKind.FP_AS_IEEEBV);
     }
     checkKind(

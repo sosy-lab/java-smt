@@ -696,7 +696,7 @@ public class FloatingPointFormulaManagerTest
     assume()
         .withMessage("FP-to-BV conversion not available for %s", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.BITWUZLA);
+        .isNoneOf(Solvers.CVC4, Solvers.CVC5);
 
     FloatingPointFormula var = fpmgr.makeVariable("var", singlePrecType);
     assertThatFormula(
@@ -710,7 +710,7 @@ public class FloatingPointFormulaManagerTest
     assume()
         .withMessage("FP-to-BV conversion not available for %s", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.BITWUZLA);
+        .isNoneOf(Solvers.CVC4, Solvers.CVC5);
 
     BitvectorFormula var = bvmgr.makeBitvector(32, 123456789);
     assertThatFormula(
@@ -720,11 +720,7 @@ public class FloatingPointFormulaManagerTest
 
   @Test
   public void checkIeeeFpConversion32() throws SolverException, InterruptedException {
-    assume()
-        .withMessage("FP-to-BV conversion not available for Bitwuzla")
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.BITWUZLA);
-
+    // FIXME: This is *very* slow on Bitwuzla
     for (float f : getListOfFloats()) {
       checkFP(
           singlePrecType,
@@ -735,11 +731,7 @@ public class FloatingPointFormulaManagerTest
 
   @Test
   public void checkIeeeFpConversion64() throws SolverException, InterruptedException {
-    assume()
-        .withMessage("FP-to-BV conversion not available for Bitwuzla")
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.BITWUZLA);
-
+    // FIXME: This is *very* slow on Bitwuzla
     for (double d : getListOfDoubles()) {
       checkFP(
           doublePrecType,
