@@ -197,8 +197,8 @@ public class BitwuzlaFloatingPointManager
 
   @Override
   protected Long toIeeeBitvectorImpl(Long pNumber) {
-    long sizeExp = BitwuzlaJNI.bitwuzla_sort_fp_get_exp_size(pNumber);
-    long sizeSig = BitwuzlaJNI.bitwuzla_sort_fp_get_sig_size(pNumber);
+    long sizeExp = BitwuzlaJNI.bitwuzla_term_fp_get_exp_size(pNumber);
+    long sizeSig = BitwuzlaJNI.bitwuzla_term_fp_get_sig_size(pNumber);
 
     long bvSort = BitwuzlaJNI.bitwuzla_mk_bv_sort(sizeExp + sizeSig);
 
