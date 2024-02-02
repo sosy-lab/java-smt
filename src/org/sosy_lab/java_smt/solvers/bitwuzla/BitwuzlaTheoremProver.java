@@ -141,6 +141,8 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
+    Preconditions.checkState(!closed);
+    wasLastSatCheckSat = false;
     Vector_Term ass = new Vector_Term();
     for (BooleanFormula formula : assumptions) {
       BitwuzlaBooleanFormula bitwuzlaFormula = (BitwuzlaBooleanFormula) formula;
@@ -200,7 +202,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
     Preconditions.checkNotNull(assumptions);
     Preconditions.checkState(!closed);
-    checkGenerateUnsatCores();
+    checkGenerateUnsatCores(); // FIXME: JavaDoc say ProverOptions.GENERATE_UNSAT_CORE is not needed
     Preconditions.checkState(!wasLastSatCheckSat);
     boolean sat = !isUnsatWithAssumptions(assumptions);
     return sat ? Optional.empty() : Optional.of(getUnsatCore0());
