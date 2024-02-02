@@ -195,6 +195,8 @@ public class BitwuzlaFloatingPointManager
         pTargetType.getMantissaSize() + 1);
   }
 
+  private int variableCounter = 0;
+
   @Override
   protected Long toIeeeBitvectorImpl(Long pNumber) {
     long sizeExp = BitwuzlaJNI.bitwuzla_term_fp_get_exp_size(pNumber);
@@ -202,7 +204,8 @@ public class BitwuzlaFloatingPointManager
 
     long bvSort = BitwuzlaJNI.bitwuzla_mk_bv_sort(sizeExp + sizeSig);
 
-    long bvVar = BitwuzlaJNI.bitwuzla_mk_const(bvSort, "");
+    // FIXME: Use reserved symbol for the variable names
+    long bvVar = BitwuzlaJNI.bitwuzla_mk_const(bvSort, "toIeeeBitvector_" + variableCounter++);
     long equal = BitwuzlaJNI.bitwuzla_mk_term2(
         BitwuzlaKind.BITWUZLA_KIND_FP_EQUAL.swigValue(),
         BitwuzlaJNI.bitwuzla_mk_term1_indexed2(
