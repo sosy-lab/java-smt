@@ -181,7 +181,7 @@ namespace bitwuzla {
     delete[] sig10;
     mpf_clear(floatMpf);
 
-    return (sign == "-") ? ("-" + result) : result;
+    return (sign == "1") ? ("-" + result) : result;
   }
 }
 
