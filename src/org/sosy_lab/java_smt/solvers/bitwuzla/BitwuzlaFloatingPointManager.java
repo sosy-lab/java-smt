@@ -48,13 +48,14 @@ import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 public class BitwuzlaFloatingPointManager
     extends AbstractFloatingPointFormulaManager<Long, Long, Long, BitwuzlaDeclaration> {
   // private final long bitwuzla;
+  private final BitwuzlaFormulaCreator bitwuzlaCreator;
   private final long roundingMode;
 
   protected BitwuzlaFloatingPointManager(
       FormulaCreator<Long, Long, Long, BitwuzlaDeclaration> pCreator,
       FloatingPointRoundingMode pFloatingPointRoundingMode) {
     super(pCreator);
-    // bitwuzla = pCreator.getEnv();
+    bitwuzlaCreator = (BitwuzlaFormulaCreator) pCreator;
     roundingMode = getRoundingModeImpl(pFloatingPointRoundingMode);
   }
 
@@ -196,15 +197,22 @@ public class BitwuzlaFloatingPointManager
 
   @Override
   protected Long toIeeeBitvectorImpl(Long pNumber) {
-    // FIXME: Bitwuzla seems to be lacking an inverse to FP_TO_FP_FROM_BV?
-    //  The supported options are:
-    //    * FP_TO_FP_FROM_SBV: Converts from in to float
-    //    * FP_TO_SBV: Converts from float to int by rounding to the next integer
-    //    * FP_TO_FP_FROM_BV: Recast a bitvector as float
-    //    * FP_TO_BV: Missing?
-    //  Using FP_TO_SBV instead will only work if the floating point number is really an integer
-    throw new UnsupportedOperationException(
-        "Bitwuzla does not support casting from float to bitvector");
+    long sizeExp = BitwuzlaJNI.bitwuzla_sort_fp_get_exp_size(pNumber);
+    long sizeSig = BitwuzlaJNI.bitwuzla_sort_fp_get_sig_size(pNumber);
+
+    long bvSort = BitwuzlaJNI.bitwuzla_mk_bv_sort(sizeExp + sizeSig);
+
+    long bvVar = BitwuzlaJNI.bitwuzla_mk_const(bvSort, "");
+    long equal = BitwuzlaJNI.bitwuzla_mk_term2(
+        BitwuzlaKind.BITWUZLA_KIND_EQUAL.swigValue(),
+        BitwuzlaJNI.bitwuzla_mk_term1_indexed2(
+            BitwuzlaKind.BITWUZLA_KIND_FP_TO_FP_FROM_BV.swigValue(),
+            bvVar, sizeExp,
+            sizeSig),
+        pNumber);
+
+    bitwuzlaCreator.addVariableCast(equal);
+    return bvVar;
   }
 
   @Override

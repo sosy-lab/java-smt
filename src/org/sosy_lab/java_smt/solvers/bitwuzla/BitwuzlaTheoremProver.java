@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -144,7 +145,13 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   public boolean isUnsat() throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     wasLastSatCheckSat = false;
-    final int result = BitwuzlaJNI.bitwuzla_check_sat(env);
+    ImmutableList.Builder<Long> builder = ImmutableList.builder();
+    builder.addAll(creator.getVariableCasts());
+    long[] arrayOfAssumptions = builder.build().stream().mapToLong(Long::longValue).toArray();
+    final int result = BitwuzlaJNI.bitwuzla_check_sat_assuming(
+        env,
+        arrayOfAssumptions.length,
+        arrayOfAssumptions);
     return readSATResult(result);
   }
 
@@ -157,9 +164,17 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
-    long[] ass =
-        assumptions.stream().mapToLong(a -> ((BitwuzlaBooleanFormula) a).getTerm()).toArray();
-    final int result = BitwuzlaJNI.bitwuzla_check_sat_assuming(env, assumptions.size(), ass);
+    ImmutableList.Builder<Long> builder = ImmutableList.builder();
+    builder.addAll(creator.getVariableCasts());
+    for (BooleanFormula formula : assumptions) {
+      BitwuzlaBooleanFormula bitwuzlaFormula = (BitwuzlaBooleanFormula) formula;
+      builder.add(bitwuzlaFormula.getTerm());
+    }
+    long[] arrayOfAssumptions = builder.build().stream().mapToLong(Long::longValue).toArray();
+    final int result = BitwuzlaJNI.bitwuzla_check_sat_assuming(
+        env,
+        arrayOfAssumptions.length,
+        arrayOfAssumptions);
     return readSATResult(result);
   }
 
