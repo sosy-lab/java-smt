@@ -747,8 +747,11 @@ public class FloatingPointFormulaManagerTest
             Float.MAX_VALUE,
             Float.POSITIVE_INFINITY,
             Float.NEGATIVE_INFINITY,
-            0.0f // , -0.0f // MathSat5 fails for NEGATIVE_ZERO
-            );
+            0.0f);
+
+    if (solverToUse() != Solvers.MATHSAT5) {
+      flts.add(-0.0f); // MathSat5 fails for NEGATIVE_ZERO
+    }
 
     final int stepSize = solverToUse() == Solvers.BITWUZLA ? 10 : 1;
     for (int i = 1; i < 20; i += stepSize) {
@@ -778,8 +781,11 @@ public class FloatingPointFormulaManagerTest
             Double.MAX_VALUE,
             Double.POSITIVE_INFINITY,
             Double.NEGATIVE_INFINITY,
-            0.0 // , -0.0 // MathSat5 fails for NEGATIVE_ZERO
-            );
+            0.0);
+
+    if (solverToUse() != Solvers.MATHSAT5) {
+      dbls.add(-0.0); // MathSat5 fails for NEGATIVE_ZERO
+    }
 
     final int stepSize = solverToUse() == Solvers.BITWUZLA ? 10 : 1;
     for (int i = 1; i < 20; i += stepSize) {
