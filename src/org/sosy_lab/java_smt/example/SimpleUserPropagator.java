@@ -169,15 +169,21 @@ public class SimpleUserPropagator {
         logger.log(Level.INFO, "User propagator raised conflict on", expr);
         backend.propagateConflict(new BooleanFormula[] { expr });
       }
+    }
 
-      // NOTE: This part is just to demonstrate the ability to change the order of decision.
-      // It serves no practical purpose: we just force the solver to decide in the order
-      // in which the expressions were registered.
+    @Override
+    public void onDecision(BooleanFormula expr, boolean value) {
+      // NOTE 1: This part just serves to show the ability to affect solver decision.
+      // In this case, we force the solver to run into conflicts as early as possible.
+      // NOTE 2: The same code could be executed in `onKnownValue` to influence the next(!)
+      // decision the solver would make.
       for (BooleanFormula disExpr : disabledExpressions) {
-        if (backend.propagateNextDecision(disExpr, Optional.of(true))) {
+        final boolean decisionValue = true;
+        if (backend.propagateNextDecision(disExpr, Optional.of(decisionValue))) {
           // The above call returns "true" if the provided literal is yet undecided, otherwise
           // false.
-          logger.log(Level.INFO, "User propagator set next decision to expression", disExpr);
+          logger.log(Level.INFO, String.format("User propagator overwrites decision "
+              + "from '%s = %s' to '%s = %s'", expr, value, disExpr, decisionValue));
           return;
         }
       }
@@ -185,8 +191,9 @@ public class SimpleUserPropagator {
 
     @Override
     public void initialize() {
-      // Enable "onKnownValue" callback
+      // Enable callbacks
       backend.notifyOnKnownValue();
+      backend.notifyOnDecision();
     }
 
     @Override
