@@ -31,8 +31,8 @@ public abstract class AbstractEvaluator<TFormulaInfo, TType, TEnv> implements Ev
 
   protected AbstractEvaluator(
       AbstractProver<?> pProver, FormulaCreator<TFormulaInfo, TType, TEnv, ?> creator) {
-    this.prover = pProver;
-    this.creator = creator;
+    this.prover = Preconditions.checkNotNull(pProver);
+    this.creator = Preconditions.checkNotNull(creator);
   }
 
   @SuppressWarnings("unchecked")
@@ -126,9 +126,7 @@ public abstract class AbstractEvaluator<TFormulaInfo, TType, TEnv> implements Ev
 
   @Override
   public void close() {
-    if (prover != null) { // can be NULL for testing
-      prover.unregisterEvaluator(this);
-    }
+    prover.unregisterEvaluator(this);
     closed = true;
   }
 }
