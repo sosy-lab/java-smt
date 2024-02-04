@@ -23,11 +23,9 @@ import com.microsoft.z3.enumerations.Z3_decl_kind;
 import com.microsoft.z3.enumerations.Z3_sort_kind;
 import com.microsoft.z3.enumerations.Z3_symbol_kind;
 import java.lang.ref.PhantomReference;
-import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -120,8 +118,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   /** Automatic clean-up of Z3 ASTs. */
   private final ReferenceQueue<Z3Formula> referenceQueue = new ReferenceQueue<>();
 
-  private final IdentityHashMap<PhantomReference<? extends Z3Formula>, Long> referenceMap =
-      new IdentityHashMap<>();
+  private @Nullable Z3AstReference referenceListHead = null;
 
   // todo: getters for statistic.
   private final Timer cleanupTimer = new Timer();
@@ -259,14 +256,6 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         new Z3ArrayFormula<>(getEnv(), pTerm, pIndexType, pElementType), pTerm);
   }
 
-  private <T extends Z3Formula> T storePhantomReference(T out, Long pTerm) {
-    if (usePhantomReferences) {
-      PhantomReference<T> ref = new PhantomReference<>(out, referenceQueue);
-      referenceMap.put(ref, pTerm);
-    }
-    return out;
-  }
-
   @SuppressWarnings("unchecked")
   @Override
   public <T extends Formula> T encapsulate(FormulaType<T> pType, Long pTerm) {
@@ -386,16 +375,53 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     return fpSort;
   }
 
+  private static class Z3AstReference extends PhantomReference<Z3Formula> {
+
+    private long z3Ast;
+    private @Nullable Z3AstReference next;
+    private @Nullable Z3AstReference prev;
+
+    public Z3AstReference(Z3Formula referent, ReferenceQueue<? super Z3Formula> q, long z3Ast,
+                          @Nullable Z3AstReference head) {
+      super(referent, q);
+      this.next = head;
+      this.prev = null;
+      if (head != null) {
+        head.prev = this;
+      }
+    }
+  }
+
+  private <T extends Z3Formula> T storePhantomReference(T out, Long pTerm) {
+    if (usePhantomReferences) {
+      referenceListHead = new Z3AstReference(out, referenceQueue, pTerm, referenceListHead);
+    }
+    return out;
+  }
+
   private void cleanupReferences() {
     if (!usePhantomReferences) {
       return;
     }
     cleanupTimer.start();
     try {
-      Reference<? extends Z3Formula> ref;
-      while ((ref = referenceQueue.poll()) != null) {
-        long z3ast = referenceMap.remove(ref);
+      Z3AstReference ref;
+      while ((ref = (Z3AstReference) referenceQueue.poll()) != null) {
+        long z3ast = ref.z3Ast;
         Native.decRef(environment, z3ast);
+
+        // Remove reference from doubly-linked list
+        if (ref.next != null) {
+          ref.next.prev = ref.prev;
+        }
+        if (ref != referenceListHead) {
+          assert ref.prev != null;
+          ref.prev.next = ref.next;
+        } else {
+          referenceListHead = ref.next;
+          assert referenceListHead != null;
+          referenceListHead.prev = null;
+        }
       }
     } finally {
       cleanupTimer.stop();
@@ -928,12 +954,6 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   /** Closing the context. */
   public void forceClose() {
     cleanupReferences();
-
-    // Force clean all ASTs, even those which were not GC'd yet.
-    // Is a no-op if phantom reference handling is not enabled.
-    for (long ast : referenceMap.values()) {
-      Native.decRef(getEnv(), ast);
-    }
   }
 
   /**
