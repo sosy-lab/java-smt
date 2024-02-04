@@ -56,9 +56,9 @@ public class NQueensEnumeratingPropagator extends AbstractUserPropagator {
   }
 
   @Override
-  public void onKnownValue(BooleanFormula var, BooleanFormula val) {
+  public void onKnownValue(BooleanFormula var, BooleanFormula value) {
     fixedVariables.push(var);
-    currentModel.put(var, val);
+    currentModel.put(var, value);
   }
 
   @Override

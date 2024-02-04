@@ -14,16 +14,14 @@ import java.util.Optional;
  * The PropagatorBackend class is used by {@link UserPropagator} to implement custom user
  * propagators.
  * It contains functions to interact with the SAT/SMT core during solving, for example, it provides
- * the ability to propagate conflicts.
+ * the ability to propagate conflicts and to influence the decision-making.
  */
 public interface PropagatorBackend {
 
   /**
    * Registers an expression to be observed by a {@link UserPropagator}.
-   * Whenever the value of a registered expression becomes known by the solver, this will
-   * get reported to the user propagator by invoking the callback
-   * {@link UserPropagator#onKnownValue} (if notification was enabled via
-   * {@link #notifyOnKnownValue}).
+   * See {@link UserPropagator#onKnownValue} and {@link UserPropagator#onDecision}
+   * for more information.
    *
    * @param theoryExpr The expression to observe.
    */
@@ -60,6 +58,8 @@ public interface PropagatorBackend {
   /**
    * Propagates a decision to be made by the solver.
    * If called during {@link UserPropagator#onKnownValue}, will set the next decision to be made.
+   * If called during {@link UserPropagator#onDecision}, will overwrite the current decision to be
+   * made.
    *
    * @param expr The expression to assign to next.
    * @param value   The value to be assigned. If not given, the solver will decide.
@@ -78,6 +78,16 @@ public interface PropagatorBackend {
    * {@link #registerExpression}.
    */
   void notifyOnKnownValue();
+
+  /**
+   * Enables tracking of decisions made for the associated {@link UserPropagator} via
+   * {@link UserPropagator#onDecision(BooleanFormula, boolean)}.
+   *
+   * <p>This function is typically called from {@link UserPropagator#initialize()} if the
+   * theory solver needs to listen to and/or modify the decisions made by the solver on
+   * expressions registered by {@link #registerExpression}.
+   */
+  void notifyOnDecision();
 
   /**
    * Enables the final callback {@link UserPropagator#onFinalCheck()} that is invoked

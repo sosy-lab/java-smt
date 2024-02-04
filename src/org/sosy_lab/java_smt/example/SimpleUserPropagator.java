@@ -163,9 +163,9 @@ public class SimpleUserPropagator {
     }
 
     @Override
-    public void onKnownValue(BooleanFormula expr, BooleanFormula val) {
-      logger.log(Level.INFO, "Solver assigned", expr, "to", val);
-      if (disabledExpressions.contains(expr) && bmgr.isTrue(val)) {
+    public void onKnownValue(BooleanFormula expr, BooleanFormula value) {
+      logger.log(Level.INFO, "Solver assigned", expr, "to", value);
+      if (disabledExpressions.contains(expr) && bmgr.isTrue(value)) {
         logger.log(Level.INFO, "User propagator raised conflict on", expr);
         backend.propagateConflict(new BooleanFormula[] { expr });
       }

@@ -21,8 +21,9 @@ final class Z3UserPropagator extends UserPropagatorBase implements PropagatorBac
   private final Z3FormulaManager manager;
   private final UserPropagator userPropagator;
 
-  Z3UserPropagator(long ctx, long solver, Z3FormulaCreator creator, Z3FormulaManager manager,
-                   UserPropagator userPropagator) {
+  Z3UserPropagator(
+      long ctx, long solver, Z3FormulaCreator creator, Z3FormulaManager manager,
+      UserPropagator userPropagator) {
     super(ctx, solver);
     this.creator = creator;
     this.userPropagator = userPropagator;
@@ -56,8 +57,7 @@ final class Z3UserPropagator extends UserPropagatorBase implements PropagatorBac
 
   @Override
   public void fixedWrapper(long lvar, long lvalue) {
-    userPropagator.onKnownValue(creator.encapsulateBoolean(lvar),
-        creator.encapsulateBoolean(lvalue));
+    userPropagator.onKnownValue(encapsulate(lvar), encapsulate(lvalue));
   }
 
   // TODO: This method is called if Z3 re-instantiates a user propagator for a subproblem
@@ -75,11 +75,13 @@ final class Z3UserPropagator extends UserPropagatorBase implements PropagatorBac
   public void createdWrapper(long le) {
   }
 
-  //FIXME: Z3's Native.UserPropagatorBase does not define this method but the JNI
-  // bindings require its existence. We define an empty stub here to avoid an exception getting
-  // thrown.
-  // A recent PR fixes this issues: https://github.com/Z3Prover/z3/pull/7088
-  public void decideWrapper(long expr, int i, int j) {}
+  @Override
+  protected void decideWrapper(long lvar, int bit, boolean is_pos) {
+    // We currently only allow tracking of decision on boolean formulas
+    // so we ignore the <bit> parameter
+    userPropagator.onDecision(encapsulate(lvar), is_pos);
+  }
+
 
   // ===========================================================================
   // Function calls from JavaSMT's side (mostly calls to the smt backend)
@@ -96,6 +98,11 @@ final class Z3UserPropagator extends UserPropagatorBase implements PropagatorBac
   }
 
   @Override
+  public void notifyOnDecision() {
+    registerDecide();
+  }
+
+  @Override
   public void notifyOnFinalCheck() {
     registerFinal();
   }
@@ -108,7 +115,7 @@ final class Z3UserPropagator extends UserPropagatorBase implements PropagatorBac
   @Override
   public void propagateConsequence(BooleanFormula[] assignedLiterals, BooleanFormula consequence) {
     long[] emptyEqs = new long[0];
-    Native.propagateConflict(this, ctx, solver, javainfo,
+    Native.propagateConsequence(this, ctx, solver, javainfo,
         assignedLiterals.length,
         extractInfoFromArray(assignedLiterals),
         emptyEqs.length,
@@ -124,6 +131,7 @@ final class Z3UserPropagator extends UserPropagatorBase implements PropagatorBac
     TRUE(1);
 
     final int value;
+
     Z3LBool(int value) {
       this.value = value;
     }
@@ -132,7 +140,7 @@ final class Z3UserPropagator extends UserPropagatorBase implements PropagatorBac
   @Override
   public boolean propagateNextDecision(BooleanFormula expr, Optional<Boolean> value) {
     Z3LBool phase = value.map(pBoolean -> (pBoolean ? Z3LBool.TRUE : Z3LBool.FALSE))
-            .orElse(Z3LBool.UNDEFINED);
+        .orElse(Z3LBool.UNDEFINED);
     int index = 0; // Only relevant for bitvector expressions, which are not supported yet.
     return Native.propagateNextSplit(this, ctx, solver, javainfo, creator.extractInfo(expr),
         index, phase.value);
@@ -146,5 +154,9 @@ final class Z3UserPropagator extends UserPropagatorBase implements PropagatorBac
       }
     }
     return formulaInfos;
+  }
+
+  private BooleanFormula encapsulate(long z3Expr) {
+    return creator.encapsulateBoolean(z3Expr);
   }
 }

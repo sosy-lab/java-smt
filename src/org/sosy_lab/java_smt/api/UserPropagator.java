@@ -38,7 +38,7 @@ public interface UserPropagator {
    * This callback is invoked when the solver finds a complete satisfying assignment.
    * The user can check the found model for consistency and potentially raise conflicts via
    * {@link PropagatorBackend#propagateConflict(BooleanFormula[])}.
-   *
+   * <p>
    * Note: This callback is only invoked if the user propagator enabled it via
    * {@link PropagatorBackend#notifyOnFinalCheck()}.
    */
@@ -47,20 +47,34 @@ public interface UserPropagator {
   /**
    * This callback is invoked if the solver gets to know the value of a registered expression
    * ({@link #registerExpression}).
-   * WIthin the callback, the user can raise conflicts via
+   * Within the callback, the user can raise conflicts via
    * {@link PropagatorBackend#propagateConflict}, propagate consequences via
    * {@link PropagatorBackend#propagateConsequence}, or influence the solvers decision heuristics
    * via {@link PropagatorBackend#propagateNextDecision}.
-   *
+   * <p>
    * The reported value is only known on the current and later push levels,
    * but will get invalidated when backtracking.
-   *
+   * <p>
    * Note: This callback is only invoked if the user propagator enabled it via
    * {@link PropagatorBackend#notifyOnKnownValue()}.
-   * @param expr The expressions whose value is known.
-   * @param val The value of the expression (true or false).
+   *
+   * @param expr  The expressions whose value is known.
+   * @param value The value of the expression (true or false).
    */
-  void onKnownValue(BooleanFormula expr, BooleanFormula val);
+  void onKnownValue(BooleanFormula expr, BooleanFormula value);
+
+  /**
+   * This callback is invoked if the solver decides to branch on a registered expression.
+   * ({@link #registerExpression}).
+   * Within the callback, the user can change the decision by calling
+   * {@link PropagatorBackend#propagateNextDecision}.
+   * <p>
+   * Note: This callback is only invoked if the user propagator enabled it via
+   * {@link PropagatorBackend#notifyOnDecision()}.
+   * @param expr The expressions whose value gets decided (usually a literal).
+   * @param value The decision value.
+   */
+  void onDecision(BooleanFormula expr, boolean value);
 
   /**
    * Connects this user propagator with a {@link PropagatorBackend}. The backend is used
@@ -78,10 +92,20 @@ public interface UserPropagator {
 
   /**
    * Registers an expression to be observed by the {@link UserPropagator}.
-   * Whenever the value of a registered expression becomes known by the solver, this will
-   * get reported to the user propagator by invoking the callback
-   * {@link UserPropagator#onKnownValue} (if notification was enabled via
-   * {@link PropagatorBackend#notifyOnKnownValue}).
+   * Solver actions related to the expression are reported:
+   * <ul>
+   *   <li>
+   *     The callback {@link UserPropagator#onKnownValue} gets invoked if the value of a
+   *     registered expression becomes known (if notification was enabled via
+   *    {@link PropagatorBackend#notifyOnKnownValue}).
+   *   </li>
+   *   <li>
+   *     The callback {@link UserPropagator#onDecision} gets invoked right before the
+   *     solver decides on the value of a registered expression (if notification was enabled via
+   *     {@link PropagatorBackend#notifyOnDecision()}).
+   *   </li>
+   * </ul>
+   *
    * @param theoryExpr The expression to observe.
    */
   void registerExpression(BooleanFormula theoryExpr);
