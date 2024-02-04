@@ -118,7 +118,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   /** Automatic clean-up of Z3 ASTs. */
   private final ReferenceQueue<Z3Formula> referenceQueue = new ReferenceQueue<>();
 
-  private @Nullable Z3AstReference referenceListHead = null;
+  private final Z3AstReference referenceListHead;
 
   // todo: getters for statistic.
   private final Timer cleanupTimer = new Timer();
@@ -138,6 +138,18 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     super(pEnv, pBoolType, pIntegerType, pRealType, pStringType, pRegexType);
     shutdownNotifier = pShutdownNotifier;
     config.inject(this);
+
+    if (usePhantomReferences) {
+      // Setup sentinel nodes for doubly-linked phantom reference list.
+      Z3AstReference head = new Z3AstReference();
+      Z3AstReference tail = new Z3AstReference();
+      head.next = tail;
+      tail.prev = head;
+      referenceListHead = head;
+    } else {
+      referenceListHead = null;
+    }
+
   }
 
   final Z3Exception handleZ3Exception(Z3Exception e) throws Z3Exception, InterruptedException {
@@ -376,25 +388,37 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   }
 
   private static class Z3AstReference extends PhantomReference<Z3Formula> {
-
     private long z3Ast;
-    private @Nullable Z3AstReference next;
     private @Nullable Z3AstReference prev;
+    private @Nullable Z3AstReference next;
+
+    // To generate dummy head and tail nodes
+    public Z3AstReference() {
+      super(null, null);
+    }
 
     public Z3AstReference(Z3Formula referent, ReferenceQueue<? super Z3Formula> q, long z3Ast,
-                          @Nullable Z3AstReference head) {
+                          Z3AstReference listHead) {
       super(referent, q);
-      this.next = head;
-      this.prev = null;
-      if (head != null) {
-        head.prev = this;
-      }
+      // Insert directly after head
+      prev = listHead;
+      next = listHead.next;
+      assert next != null;
+      prev.next = this;
+      next.prev = this;
+    }
+
+    public void cleanup(Long environment) {
+      Native.decRef(environment, z3Ast);
+      assert (prev != null && next != null);
+      prev.next = next;
+      next.prev = prev;
     }
   }
 
   private <T extends Z3Formula> T storePhantomReference(T out, Long pTerm) {
     if (usePhantomReferences) {
-      referenceListHead = new Z3AstReference(out, referenceQueue, pTerm, referenceListHead);
+      new Z3AstReference(out, referenceQueue, pTerm, referenceListHead);
     }
     return out;
   }
@@ -407,21 +431,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     try {
       Z3AstReference ref;
       while ((ref = (Z3AstReference) referenceQueue.poll()) != null) {
-        long z3ast = ref.z3Ast;
-        Native.decRef(environment, z3ast);
-
-        // Remove reference from doubly-linked list
-        if (ref.next != null) {
-          ref.next.prev = ref.prev;
-        }
-        if (ref != referenceListHead) {
-          assert ref.prev != null;
-          ref.prev.next = ref.next;
-        } else {
-          referenceListHead = ref.next;
-          assert referenceListHead != null;
-          referenceListHead.prev = null;
-        }
+        ref.cleanup(environment);
       }
     } finally {
       cleanupTimer.stop();
