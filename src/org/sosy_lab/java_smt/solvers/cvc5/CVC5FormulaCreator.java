@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Table;
+import com.google.common.primitives.Ints;
 import io.github.cvc5.CVC5ApiException;
 import io.github.cvc5.Datatype;
 import io.github.cvc5.DatatypeConstructor;
@@ -29,9 +30,7 @@ import io.github.cvc5.Pair;
 import io.github.cvc5.Solver;
 import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
-import io.github.cvc5.Triplet;
 import java.lang.reflect.Array;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,6 +43,7 @@ import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.EnumerationFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
+import org.sosy_lab.java_smt.api.FloatingPointNumber;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
@@ -801,38 +801,9 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
         String bitvectorValue = value.getBitVectorValue();
         return new BigInteger(bitvectorValue, 2);
 
-      } else if (value.isFloatingPointNaN()) {
-        return Float.NaN;
-
-      } else if (value.isFloatingPointNegInf()) {
-        return Float.NEGATIVE_INFINITY;
-
-      } else if (value.isFloatingPointPosInf()) {
-        return Float.POSITIVE_INFINITY;
-
-      } else if (value.isFloatingPointPosZero()) {
-        return BigDecimal.ZERO;
-
       } else if (value.isFloatingPointValue()) {
-        // Negative zero falls under this category
-        // String valueString =
-        // solver.getValue(solver.mkTerm(Kind.FLOATINGPOINT_TO_REAL, fpTerm)).toString();
-        // return new BigDecimal(valueString).stripTrailingZeros();
-        final Triplet<Long, Long, Term> fpValue = value.getFloatingPointValue();
-        final long expWidth = fpValue.first;
-        final long mantWidth = fpValue.second - 1; // CVC5 also counts the sign-bit in the mantissa
-        final Term bvValue = fpValue.third;
-        Preconditions.checkState(bvValue.isBitVectorValue());
-        BigInteger bits = new BigInteger(bvValue.getBitVectorValue(), 2);
+        return convertFloatingPoint(value);
 
-        if (expWidth == 11 && mantWidth == 52) { // standard IEEE double type with 64 bits
-          return Double.longBitsToDouble(bits.longValue());
-        } else if (expWidth == 8 && mantWidth == 23) { // standard IEEE float type with 32 bits
-          return Float.intBitsToFloat(bits.intValue());
-        } else {
-          // TODO to be fully correct, we would need to interpret the BV as FP or Rational
-          return value.toString(); // returns a BV representation of the FP
-        }
       } else if (value.isBooleanValue()) {
         return value.getBooleanValue();
 
@@ -850,6 +821,16 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
               value, valueType, type),
           e);
     }
+  }
+
+  private FloatingPointNumber convertFloatingPoint(Term value) throws CVC5ApiException {
+    final var fpValue = value.getFloatingPointValue();
+    final var expWidth = Ints.checkedCast(fpValue.first);
+    final var mantWidth = Ints.checkedCast(fpValue.second - 1); // without sign bit
+    final var bvValue = fpValue.third;
+    Preconditions.checkState(bvValue.isBitVectorValue());
+    final var bits = bvValue.getBitVectorValue();
+    return FloatingPointNumber.of(bits, expWidth, mantWidth);
   }
 
   private Term accessVariablesCache(String name, Sort sort) {

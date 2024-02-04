@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2022 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -17,6 +17,8 @@ import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.EnumerationFormula;
 import org.sosy_lab.java_smt.api.Evaluator;
+import org.sosy_lab.java_smt.api.FloatingPointFormula;
+import org.sosy_lab.java_smt.api.FloatingPointNumber;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
@@ -82,6 +84,12 @@ public abstract class AbstractEvaluator<TFormulaInfo, TType, TEnv> implements Ev
   public final String evaluate(EnumerationFormula f) {
     Preconditions.checkState(!isClosed());
     return (String) evaluateImpl(creator.extractInfo(f));
+  }
+
+  @Override
+  public final @Nullable FloatingPointNumber evaluate(FloatingPointFormula f) {
+    Preconditions.checkState(!isClosed());
+    return (FloatingPointNumber) evaluateImpl(creator.extractInfo(f));
   }
 
   @Nullable
