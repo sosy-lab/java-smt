@@ -11,6 +11,8 @@ package org.sosy_lab.java_smt.solvers.z3;
 
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Native.UserPropagatorBase;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.PropagatorBackend;
@@ -20,6 +22,12 @@ final class Z3UserPropagator extends UserPropagatorBase implements PropagatorBac
   private final Z3FormulaCreator creator;
   private final Z3FormulaManager manager;
   private final UserPropagator userPropagator;
+
+  // We use this map to reuse existing formula wrappers and avoid creating
+  // unnecessary phantom references (if enabled).
+  // This is particularly useful, because the user propagator frequently reports
+  // the same formulas.
+  private final Map<Long, BooleanFormula> canonicalizer = new HashMap<>();
 
   Z3UserPropagator(
       long ctx, long solver, Z3FormulaCreator creator, Z3FormulaManager manager,
@@ -35,17 +43,17 @@ final class Z3UserPropagator extends UserPropagatorBase implements PropagatorBac
   // ===========================================================================
 
   @Override
-  public void pushWrapper() {
+  protected void pushWrapper() {
     userPropagator.onPush();
   }
 
   @Override
-  public void popWrapper(int num) {
+  protected void popWrapper(int num) {
     userPropagator.onPop(num);
   }
 
   @Override
-  public void finWrapper() {
+  protected void finWrapper() {
     userPropagator.onFinalCheck();
   }
 
@@ -56,7 +64,7 @@ final class Z3UserPropagator extends UserPropagatorBase implements PropagatorBac
   }
 
   @Override
-  public void fixedWrapper(long lvar, long lvalue) {
+  protected void fixedWrapper(long lvar, long lvalue) {
     userPropagator.onKnownValue(encapsulate(lvar), encapsulate(lvalue));
   }
 
@@ -64,7 +72,7 @@ final class Z3UserPropagator extends UserPropagatorBase implements PropagatorBac
   //  (usually when quantifiers are involved). For now, we assume the user propagators to only get
   //  used on quantifier-less formulas so that this method is unnecessary.
   @Override
-  public Z3UserPropagator freshWrapper(long lctx) {
+  protected Z3UserPropagator freshWrapper(long lctx) {
     return this;
   }
 
@@ -72,7 +80,7 @@ final class Z3UserPropagator extends UserPropagatorBase implements PropagatorBac
   //  possible) and the solver instantiates the registered function: if the solver
   //  instantiates "forall x: f(x)" at x=y, then f(y) will get created.
   @Override
-  public void createdWrapper(long le) {
+  protected void createdWrapper(long le) {
   }
 
   @Override
@@ -157,6 +165,12 @@ final class Z3UserPropagator extends UserPropagatorBase implements PropagatorBac
   }
 
   private BooleanFormula encapsulate(long z3Expr) {
-    return creator.encapsulateBoolean(z3Expr);
+    return canonicalizer.computeIfAbsent(z3Expr, creator::encapsulateBoolean);
+  }
+
+  @Override
+  public void close() {
+    super.close();
+    canonicalizer.clear();
   }
 }
