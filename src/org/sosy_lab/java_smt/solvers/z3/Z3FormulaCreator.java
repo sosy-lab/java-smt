@@ -397,15 +397,17 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       super(null, null);
     }
 
-    public Z3AstReference(Z3Formula referent, ReferenceQueue<? super Z3Formula> q, long z3Ast,
-                          Z3AstReference listHead) {
+    public Z3AstReference(Z3Formula referent, ReferenceQueue<? super Z3Formula> q, long z3Ast) {
       super(referent, q);
-      // Insert directly after head
-      prev = listHead;
-      next = listHead.next;
+      this.z3Ast = z3Ast;
+    }
+
+    public void insert(Z3AstReference ref) {
       assert next != null;
-      prev.next = this;
-      next.prev = this;
+      ref.prev = this;
+      ref.next = this.next;
+      ref.next.prev = ref;
+      this.next = ref;
     }
 
     public void cleanup(Long environment) {
@@ -418,7 +420,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   private <T extends Z3Formula> T storePhantomReference(T out, Long pTerm) {
     if (usePhantomReferences) {
-      new Z3AstReference(out, referenceQueue, pTerm, referenceListHead);
+      referenceListHead.insert(new Z3AstReference(out, referenceQueue, pTerm));
     }
     return out;
   }
