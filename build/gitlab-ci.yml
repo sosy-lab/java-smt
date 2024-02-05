@@ -52,6 +52,8 @@ build-dependencies:
     paths:
       - "bin/"
       - "*.jar"
+      - "hs_err_pid*.log"
+      - "core.*"
 
 build:jdk-11:
   <<: *build
