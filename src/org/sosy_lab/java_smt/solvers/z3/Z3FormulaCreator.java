@@ -974,6 +974,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       assert cur != null;
       while (cur.next != null) {
         Native.decRef(environment, cur.z3Ast);
+        cur = cur.next;
       }
       Z3AstReference tail = cur;
       // Bulk delete everything between head and tail
