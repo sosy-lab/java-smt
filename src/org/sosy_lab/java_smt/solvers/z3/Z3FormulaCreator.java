@@ -387,22 +387,22 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     return fpSort;
   }
 
-  private static class Z3AstReference extends PhantomReference<Z3Formula> {
-    private long z3Ast;
+  private static final class Z3AstReference extends PhantomReference<Z3Formula> {
+    private final long z3Ast;
     private @Nullable Z3AstReference prev;
     private @Nullable Z3AstReference next;
 
     // To generate dummy head and tail nodes
-    public Z3AstReference() {
-      super(null, null);
+    private Z3AstReference() {
+      this(null, null, 0);
     }
 
-    public Z3AstReference(Z3Formula referent, ReferenceQueue<? super Z3Formula> q, long z3Ast) {
+    private Z3AstReference(Z3Formula referent, ReferenceQueue<? super Z3Formula> q, long z3Ast) {
       super(referent, q);
       this.z3Ast = z3Ast;
     }
 
-    public void insert(Z3AstReference ref) {
+    private void insert(Z3AstReference ref) {
       assert next != null;
       ref.prev = this;
       ref.next = this.next;
@@ -410,7 +410,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       this.next = ref;
     }
 
-    public void cleanup(Long environment) {
+    private void cleanup(long environment) {
       Native.decRef(environment, z3Ast);
       assert (prev != null && next != null);
       prev.next = next;
@@ -418,7 +418,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     }
   }
 
-  private <T extends Z3Formula> T storePhantomReference(T out, Long pTerm) {
+  private <T extends Z3Formula> T storePhantomReference(T out, long pTerm) {
     if (usePhantomReferences) {
       referenceListHead.insert(new Z3AstReference(out, referenceQueue, pTerm));
     }
@@ -966,6 +966,20 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   /** Closing the context. */
   public void forceClose() {
     cleanupReferences();
+
+    // Force clean all ASTs, even those which were not GC'd yet.
+    // Is a no-op if phantom reference handling is not enabled.
+    if (referenceListHead != null) {
+      Z3AstReference cur = referenceListHead.next;
+      assert cur != null;
+      while (cur.next != null) {
+        Native.decRef(environment, cur.z3Ast);
+      }
+      Z3AstReference tail = cur;
+      // Bulk delete everything between head and tail
+      referenceListHead.next = tail;
+      tail.prev = referenceListHead;
+    }
   }
 
   /**
