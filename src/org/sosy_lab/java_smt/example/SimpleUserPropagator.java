@@ -71,7 +71,7 @@ public class SimpleUserPropagator {
           + "all literals ==========");
 
       // Create user propagator that prohibits variables to be set to true
-      MyUserPropagator myUserPropagator = new MyUserPropagator(bmgr, logger);
+      MyUserPropagator myUserPropagator = new MyUserPropagator(logger);
       Verify.verify(prover.registerUserPropagator(myUserPropagator));
       myUserPropagator.registerExpression(p);
       myUserPropagator.registerExpression(q);
@@ -99,7 +99,7 @@ public class SimpleUserPropagator {
           + "the full clause ==========");
 
       // Create user propagator that prohibits the full clause to be set to true.
-      MyUserPropagator myUserPropagator = new MyUserPropagator(bmgr, logger);
+      MyUserPropagator myUserPropagator = new MyUserPropagator(logger);
       Verify.verify(prover.registerUserPropagator(myUserPropagator));
       myUserPropagator.registerExpression(clause);
 
@@ -127,7 +127,7 @@ public class SimpleUserPropagator {
 
       // Create user propagator that prohibits (sub)clauses to be set to true.
       // Note that the subclauses are not directly asserted in the original input formula.
-      MyUserPropagator myUserPropagator = new MyUserPropagator(bmgr, logger);
+      MyUserPropagator myUserPropagator = new MyUserPropagator(logger);
       Verify.verify(prover.registerUserPropagator(myUserPropagator));
       myUserPropagator.registerExpression(subclause1);
       myUserPropagator.registerExpression(subclause2);
@@ -144,11 +144,9 @@ public class SimpleUserPropagator {
   private static class MyUserPropagator extends AbstractUserPropagator {
 
     private final List<BooleanFormula> disabledExpressions = new ArrayList<>();
-    private final BooleanFormulaManager bmgr;
     private final LogManager logger;
 
-    public MyUserPropagator(BooleanFormulaManager bmgr, LogManager logger) {
-      this.bmgr = bmgr;
+    public MyUserPropagator(LogManager logger) {
       this.logger = logger;
     }
 
