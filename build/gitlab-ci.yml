@@ -40,6 +40,7 @@ build-dependencies:
   artifacts:
     paths:
       - "lib/java/"
+    expire_in: 1 day # sufficient for building later stages and near-time debugging
 
 
 # Build binaries and provide them to later stages
