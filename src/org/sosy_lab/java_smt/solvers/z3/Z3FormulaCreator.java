@@ -969,7 +969,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
     // Force clean all ASTs, even those which were not GC'd yet.
     // Is a no-op if phantom reference handling is not enabled.
-    if (referenceListHead != null) {
+    if (usePhantomReferences) {
       Z3AstReference cur = referenceListHead.next;
       assert cur != null;
       while (cur.next != null) {
