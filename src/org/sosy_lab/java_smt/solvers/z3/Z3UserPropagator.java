@@ -170,7 +170,11 @@ final class Z3UserPropagator extends UserPropagatorBase implements PropagatorBac
   }
 
   private BooleanFormula encapsulate(long z3Expr) {
-    return canonicalizer.computeIfAbsent(z3Expr, creator::encapsulateBoolean);
+    // We fill the lowest 3 bits that are always 0 due pointer alignment.
+    // This reduces collision in the map.
+    assert (z3Expr & 7) == 0; // Make sure the lowest 3 bits are free
+    return canonicalizer.computeIfAbsent(z3Expr >> 3,
+        key -> creator.encapsulateBoolean(key << 3));
   }
 
   @Override
