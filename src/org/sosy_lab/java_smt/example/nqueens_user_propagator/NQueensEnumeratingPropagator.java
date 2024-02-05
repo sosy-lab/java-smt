@@ -25,7 +25,10 @@ public class NQueensEnumeratingPropagator extends AbstractUserPropagator {
   protected final Map<BooleanFormula, Boolean> currentModel = new HashMap<>();
 
   // Set of found solutions
-  protected final Set<Map<BooleanFormula, Boolean>> modelSet = new HashSet<>();
+  // Implementation note: The hashcodes of the different Nqueens models tend to overlap (due to
+  // patterns in the models) which degrades the <modelSet>'s performance.
+  // So instead, we transform the model before storing it.
+  protected final Set<Map<BooleanFormula, Integer>> modelSet = new HashSet<>();
 
   public int getNumOfSolutions() { return modelSet.size(); }
 
@@ -46,9 +49,11 @@ public class NQueensEnumeratingPropagator extends AbstractUserPropagator {
 
   @Override
   public void onFinalCheck() {
-    modelSet.add(Map.copyOf(currentModel));
     // We found a model. Note that the solver is allowed to revise a previously found model,
-    // so we rely on the uniqueness provided by the <modelSet> to avoid duplicate counting.
+    // so we rely on the uniqueness provided by sets to avoid duplicate counting.
+    final Map<BooleanFormula, Integer> transformedModel = new HashMap<>(currentModel.size());
+    currentModel.forEach((k, v) -> transformedModel.put(k, k.hashCode() * v.hashCode()));
+    modelSet.add(transformedModel);
 
     // Raise conflict on the whole model to force the solver to find another one.
     // NOTE: It should be sufficient to raise a conflict on only the positive variables.
