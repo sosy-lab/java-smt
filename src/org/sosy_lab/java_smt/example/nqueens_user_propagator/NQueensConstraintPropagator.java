@@ -22,11 +22,9 @@ import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 public class NQueensConstraintPropagator extends NQueensEnumeratingPropagator {
   private final BooleanFormula[][] symbols;
   private final Map<BooleanFormula, Pair<Integer, Integer>> symbolToCoordinates;
-  private final BooleanFormulaManager bmgr;
 
-  public NQueensConstraintPropagator(BooleanFormula[][] symbols, BooleanFormulaManager bmgr) {
+  public NQueensConstraintPropagator(BooleanFormula[][] symbols) {
     this.symbols = symbols;
-    this.bmgr = bmgr;
     symbolToCoordinates = new HashMap<>();
     fillCoordinateMap();
   }

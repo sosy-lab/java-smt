@@ -321,7 +321,7 @@ public class NQueens {
     prover.addConstraint(bmgr.and(rules));
 
     // Enumerate all solutions via a custom user propagator that enforces unique placement constraints.
-    NQueensConstraintPropagator constraintPropagator = new NQueensConstraintPropagator(symbols, bmgr);
+    NQueensConstraintPropagator constraintPropagator = new NQueensConstraintPropagator(symbols);
     Verify.verify(prover.registerUserPropagator(constraintPropagator));
     for (BooleanFormula[] symbolRow : symbols) {
       for (BooleanFormula symbol : symbolRow) {
