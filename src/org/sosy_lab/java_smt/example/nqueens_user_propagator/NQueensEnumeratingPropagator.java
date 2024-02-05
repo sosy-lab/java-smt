@@ -22,10 +22,10 @@ public class NQueensEnumeratingPropagator extends AbstractUserPropagator {
   protected final Deque<Integer> fixedCount = new ArrayDeque<>();
   protected final Deque<BooleanFormula> fixedVariables = new ArrayDeque<>();
 
-  protected final HashMap<BooleanFormula, BooleanFormula> currentModel = new HashMap<>();
+  protected final Map<BooleanFormula, Boolean> currentModel = new HashMap<>();
 
   // Set of found solutions
-  protected final Set<HashMap<BooleanFormula, BooleanFormula>> modelSet = new HashSet<>();
+  protected final Set<Map<BooleanFormula, Boolean>> modelSet = new HashSet<>();
 
   public int getNumOfSolutions() { return modelSet.size(); }
 
@@ -46,7 +46,7 @@ public class NQueensEnumeratingPropagator extends AbstractUserPropagator {
 
   @Override
   public void onFinalCheck() {
-    modelSet.add(currentModel);
+    modelSet.add(Map.copyOf(currentModel));
     // We found a model. Note that the solver is allowed to revise a previously found model,
     // so we rely on the uniqueness provided by the <modelSet> to avoid duplicate counting.
 
@@ -56,7 +56,7 @@ public class NQueensEnumeratingPropagator extends AbstractUserPropagator {
   }
 
   @Override
-  public void onKnownValue(BooleanFormula var, BooleanFormula value) {
+  public void onKnownValue(BooleanFormula var, boolean value) {
     fixedVariables.push(var);
     currentModel.put(var, value);
   }

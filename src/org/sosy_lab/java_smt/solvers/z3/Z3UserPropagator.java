@@ -22,6 +22,8 @@ final class Z3UserPropagator extends UserPropagatorBase implements PropagatorBac
   private final Z3FormulaCreator creator;
   private final Z3FormulaManager manager;
   private final UserPropagator userPropagator;
+  private final long z3True;
+  private final long z3False;
 
   // We use this map to reuse existing formula wrappers and avoid creating
   // unnecessary phantom references (if enabled).
@@ -36,6 +38,8 @@ final class Z3UserPropagator extends UserPropagatorBase implements PropagatorBac
     this.creator = creator;
     this.userPropagator = userPropagator;
     this.manager = manager;
+    z3True = creator.extractInfo(manager.getBooleanFormulaManager().makeTrue());
+    z3False = creator.extractInfo(manager.getBooleanFormulaManager().makeFalse());
   }
 
   // ===========================================================================
@@ -65,7 +69,8 @@ final class Z3UserPropagator extends UserPropagatorBase implements PropagatorBac
 
   @Override
   protected void fixedWrapper(long lvar, long lvalue) {
-    userPropagator.onKnownValue(encapsulate(lvar), encapsulate(lvalue));
+    assert lvalue == z3True || lvalue == z3False;
+    userPropagator.onKnownValue(encapsulate(lvar), lvalue == z3True);
   }
 
   // TODO: This method is called if Z3 re-instantiates a user propagator for a subproblem

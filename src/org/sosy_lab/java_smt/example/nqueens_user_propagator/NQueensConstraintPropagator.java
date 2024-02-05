@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.example.nqueens_user_propagator;
 import io.github.cvc5.Pair;
 import java.util.HashMap;
 
+import java.util.Map;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 
@@ -20,11 +21,10 @@ import org.sosy_lab.java_smt.api.BooleanFormulaManager;
  */
 public class NQueensConstraintPropagator extends NQueensEnumeratingPropagator {
   private final BooleanFormula[][] symbols;
-  private final HashMap<BooleanFormula, Pair<Integer, Integer>> symbolToCoordinates;
+  private final Map<BooleanFormula, Pair<Integer, Integer>> symbolToCoordinates;
   private final BooleanFormulaManager bmgr;
 
   public NQueensConstraintPropagator(BooleanFormula[][] symbols, BooleanFormulaManager bmgr) {
-    super();
     this.symbols = symbols;
     this.bmgr = bmgr;
     symbolToCoordinates = new HashMap<>();
@@ -40,13 +40,12 @@ public class NQueensConstraintPropagator extends NQueensEnumeratingPropagator {
   }
 
   @Override
-  public void onKnownValue(BooleanFormula var, BooleanFormula value) {
-    if (bmgr.isTrue(value)) {
+  public void onKnownValue(BooleanFormula var, boolean value) {
+    if (value) {
       // Check if the placed queen conflicts with another queen
       Pair<Integer, Integer> coordinates = symbolToCoordinates.get(var);
       for (BooleanFormula other : fixedVariables) {
-        BooleanFormula otherValue = currentModel.get(other);
-        if (bmgr.isTrue(otherValue)) {
+        if (currentModel.get(other)) {
           Pair<Integer, Integer> otherCoordinates = symbolToCoordinates.get(other);
 
           int x1 = coordinates.first;

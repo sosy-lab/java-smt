@@ -59,9 +59,9 @@ public interface UserPropagator {
    * {@link PropagatorBackend#notifyOnKnownValue()}.
    *
    * @param expr  The expressions whose value is known.
-   * @param value The value of the expression (true or false).
+   * @param value The value of the expression.
    */
-  void onKnownValue(BooleanFormula expr, BooleanFormula value);
+  void onKnownValue(BooleanFormula expr, boolean value);
 
   /**
    * This callback is invoked if the solver decides to branch on a registered expression.
