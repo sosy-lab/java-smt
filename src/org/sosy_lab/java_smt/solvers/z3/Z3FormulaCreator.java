@@ -965,8 +965,6 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   /** Closing the context. */
   public void forceClose() {
-    cleanupReferences();
-
     // Force clean all ASTs, even those which were not GC'd yet.
     if (usePhantomReferences) {
       Z3AstReference cur = referenceListHead.next;
@@ -979,6 +977,12 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       // Bulk delete everything between head and tail
       referenceListHead.next = tail;
       tail.prev = referenceListHead;
+
+      // Remove already enqueued references.
+      // NOTE: Together with the above list deletion, this will guarantee that no more ast
+      // references are reachable by the GC making them all eligible for garbage collection and
+      // preventing them from getting enqueued into the reference queue in the future.
+      while (referenceQueue.poll() != null);
     }
   }
 
