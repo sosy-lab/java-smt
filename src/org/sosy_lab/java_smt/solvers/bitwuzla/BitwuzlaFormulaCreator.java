@@ -16,12 +16,12 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Table;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.Set;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -51,7 +51,13 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Term;
 public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, BitwuzlaDeclaration> {
   private final Table<String, Sort, Term> formulaCache = HashBasedTable.create();
 
-  private final Set<Term> variableCasts = new HashSet<>();
+  // Bitwuzla has no operation for casting floats to bitvectors. We need to use a workaround
+  // where a variable "bvVar" is introduces, along with the side condition that
+  // "fpTerm = to_fp(bvVar)" holds. These side conditions are stored here and need to be added when
+  // satisfiability is checked, or when the formula is to be printed.
+  // Since Bitwuzla allows terms to be shared across solver contexts we use a static collection
+  // to store all equations.
+  private static final Collection<Term> variableCasts = new HashSet<>();
 
   protected BitwuzlaFormulaCreator() {
     super(null, Bitwuzla.mk_bool_sort(), null, null, null, null);
@@ -549,11 +555,11 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
     throw new AssertionError("Unknown value type.");
   }
 
-  public void addVariableCast(Term equal) {
+  public static void addVariableCast(Term equal) {
     variableCasts.add(equal);
   }
 
-  public Iterable<Term> getVariableCasts() {
+  public static Iterable<Term> getVariableCasts() {
     return variableCasts;
   }
 }

@@ -41,6 +41,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   private final BitwuzlaFormulaManager manager;
 
   private final BitwuzlaFormulaCreator creator;
+
   protected boolean wasLastSatCheckSat = false; // and stack is not changed
 
   protected BitwuzlaTheoremProver(
@@ -128,7 +129,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   public boolean isUnsat() throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     wasLastSatCheckSat = false;
-    final Result result = env.check_sat(new Vector_Term(creator.getVariableCasts()));
+    final Result result = env.check_sat(new Vector_Term(BitwuzlaFormulaCreator.getVariableCasts()));
     return readSATResult(result);
   }
 
@@ -143,7 +144,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     wasLastSatCheckSat = false;
-    Vector_Term ass = new Vector_Term(creator.getVariableCasts());
+    Vector_Term ass = new Vector_Term(BitwuzlaFormulaCreator.getVariableCasts());
     for (BooleanFormula formula : assumptions) {
       BitwuzlaBooleanFormula bitwuzlaFormula = (BitwuzlaBooleanFormula) formula;
       ass.add(bitwuzlaFormula.getTerm());
