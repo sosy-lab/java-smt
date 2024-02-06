@@ -184,13 +184,17 @@ public class BitwuzlaFloatingPointManager
   @Override
   protected Term toIeeeBitvectorImpl(Term pNumber) {
     // FIXME: We should use a reserved symbol for the fresh variables
-
     int sizeExp = pNumber.sort().fp_exp_size();
     int sizeSig = pNumber.sort().fp_sig_size();
 
     Sort bvSort = Bitwuzla.mk_bv_sort(sizeExp + sizeSig);
 
-    Term bvNaN = Bitwuzla.mk_bv_value(bvSort, "1".repeat(sizeExp + sizeExp));
+    // Note that NaN is handled as a special case in this method. This is not strictly necessary,
+    // but if we just use "fpTerm = to_fp(bvVar)" the NaN will be given a random payload (and
+    // sign). Since NaN payloads are not preserved here anyway we might as well pick a canonical
+    // representation.
+    Term bvNaN =
+        Bitwuzla.mk_bv_value(bvSort, "0" + "1".repeat(sizeExp + 1) + "0".repeat(sizeSig - 2));
     Term bvVar = Bitwuzla.mk_const(bvSort, generateRandomName("toIeeeBitvector", 10));
     Term equal =
         Bitwuzla.mk_term(
