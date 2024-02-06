@@ -146,7 +146,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
     Preconditions.checkState(!closed);
     wasLastSatCheckSat = false;
     ImmutableList.Builder<Long> builder = ImmutableList.builder();
-    builder.addAll(creator.getVariableCasts());
+    builder.addAll(BitwuzlaFormulaCreator.getVariableCasts());
     long[] arrayOfAssumptions = builder.build().stream().mapToLong(Long::longValue).toArray();
     final int result = BitwuzlaJNI.bitwuzla_check_sat_assuming(
         env,
@@ -165,7 +165,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
     ImmutableList.Builder<Long> builder = ImmutableList.builder();
-    builder.addAll(creator.getVariableCasts());
+    builder.addAll(BitwuzlaFormulaCreator.getVariableCasts());
     for (BooleanFormula formula : assumptions) {
       BitwuzlaBooleanFormula bitwuzlaFormula = (BitwuzlaBooleanFormula) formula;
       builder.add(bitwuzlaFormula.getTerm());

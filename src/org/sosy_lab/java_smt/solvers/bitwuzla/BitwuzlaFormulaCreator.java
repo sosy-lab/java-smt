@@ -85,12 +85,12 @@ import com.google.common.collect.Table;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.LongStream;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -114,7 +114,13 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaFormula.BitwuzlaFloatingPo
 public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, BitwuzlaDeclaration> {
   private final Table<String, Long, Long> formulaCache = HashBasedTable.create();
 
-  private final Set<Long> variableCasts = new HashSet<>();
+  // Bitwuzla has no operation for casting floats to bitvectors. We need to use a workaround
+  // where a variable "bvVar" is introduces, along with the side condition that
+  // "fpTerm = to_fp(bvVar)" holds. These side conditions are stored here and need to be added when
+  // satisfiability is checked, or when the formula is to be printed.
+  // Since Bitwuzla allows terms to be shared across solver contexts we use a static collection
+  // to store all equations.
+  private static final Collection<Long> variableCasts = new HashSet<>();
 
   protected BitwuzlaFormulaCreator(Long pBitwuzlaEnv) {
     super(pBitwuzlaEnv, BitwuzlaJNI.bitwuzla_mk_bool_sort(), null, null, null, null);
@@ -650,11 +656,11 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Bit
             + BitwuzlaJNI.bitwuzla_term_to_string(term));
   }
 
-  public void addVariableCast(Long equal) {
+  public static void addVariableCast(Long equal) {
     variableCasts.add(equal);
   }
 
-  public Iterable<Long> getVariableCasts() {
+  public static Iterable<Long> getVariableCasts() {
     return variableCasts;
   }
 }

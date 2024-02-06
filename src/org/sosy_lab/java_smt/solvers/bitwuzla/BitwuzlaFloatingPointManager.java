@@ -48,14 +48,12 @@ import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 public class BitwuzlaFloatingPointManager
     extends AbstractFloatingPointFormulaManager<Long, Long, Long, BitwuzlaDeclaration> {
   // private final long bitwuzla;
-  private final BitwuzlaFormulaCreator bitwuzlaCreator;
   private final long roundingMode;
 
   protected BitwuzlaFloatingPointManager(
       FormulaCreator<Long, Long, Long, BitwuzlaDeclaration> pCreator,
       FloatingPointRoundingMode pFloatingPointRoundingMode) {
     super(pCreator);
-    bitwuzlaCreator = (BitwuzlaFormulaCreator) pCreator;
     roundingMode = getRoundingModeImpl(pFloatingPointRoundingMode);
   }
 
@@ -214,7 +212,7 @@ public class BitwuzlaFloatingPointManager
             sizeSig),
         pNumber);
 
-    bitwuzlaCreator.addVariableCast(equal);
+    BitwuzlaFormulaCreator.addVariableCast(equal);
     return bvVar;
   }
 
