@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import java.math.BigDecimal;
+import java.util.Random;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
@@ -167,14 +168,30 @@ public class BitwuzlaFloatingPointManager
         pTargetType.getMantissaSize() + 1);
   }
 
+  Random randomGenerator = new Random();
+
+  private String generateRandomName(String prefix, int length) {
+    int char_a = Character.valueOf('a');
+    int char_z = Character.valueOf('z');
+
+    String generated = randomGenerator.ints(char_a, char_z + 1)
+        .limit(length)
+        .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+        .toString();
+    return prefix + "_" + generated;
+  }
+
   @Override
   protected Term toIeeeBitvectorImpl(Term pNumber) {
+    // FIXME: We should use a reserved symbol for the fresh variables
+
     int sizeExp = pNumber.sort().fp_exp_size();
     int sizeSig = pNumber.sort().fp_sig_size();
 
     Sort bvSort = Bitwuzla.mk_bv_sort(sizeExp + sizeSig);
 
     Term bvVar = Bitwuzla.mk_const(bvSort);
+    Term bvVar = Bitwuzla.mk_const(bvSort, generateRandomName("toIeeeBitvector", 10));
     Term equal = Bitwuzla.mk_term(
         Kind.EQUAL,
         Bitwuzla.mk_term(Kind.FP_TO_FP_FROM_BV, bvVar, sizeExp, sizeSig),
