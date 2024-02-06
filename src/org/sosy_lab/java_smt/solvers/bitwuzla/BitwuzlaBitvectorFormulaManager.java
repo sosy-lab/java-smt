@@ -41,7 +41,7 @@ public class BitwuzlaBitvectorFormulaManager
 
   @Override
   protected Long negate(Long pParam1) {
-    return BitwuzlaJNI.bitwuzla_mk_term1(BitwuzlaKind.BITWUZLA_KIND_BV_NOT.swigValue(), pParam1);
+    return BitwuzlaJNI.bitwuzla_mk_term1(BitwuzlaKind.BITWUZLA_KIND_BV_NEG.swigValue(), pParam1);
   }
 
   @Override
