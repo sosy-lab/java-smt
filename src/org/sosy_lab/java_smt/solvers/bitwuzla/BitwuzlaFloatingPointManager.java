@@ -172,10 +172,12 @@ public class BitwuzlaFloatingPointManager
     int char_a = Character.valueOf('a');
     int char_z = Character.valueOf('z');
 
-    String generated = randomGenerator.ints(char_a, char_z + 1)
-        .limit(length)
-        .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
-        .toString();
+    String generated =
+        randomGenerator
+            .ints(char_a, char_z + 1)
+            .limit(length)
+            .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+            .toString();
     return prefix + "_" + generated;
   }
 
@@ -190,17 +192,15 @@ public class BitwuzlaFloatingPointManager
 
     Term bvNaN = Bitwuzla.mk_bv_value(bvSort, "1".repeat(sizeExp + sizeExp));
     Term bvVar = Bitwuzla.mk_const(bvSort, generateRandomName("toIeeeBitvector", 10));
-    Term equal = Bitwuzla.mk_term(
-        Kind.ITE,
-        Bitwuzla.mk_term(Kind.FP_IS_NAN, pNumber),
+    Term equal =
         Bitwuzla.mk_term(
-            Kind.EQUAL,
-            bvVar,
-            bvNaN),
-        Bitwuzla.mk_term(
-            Kind.EQUAL,
-            Bitwuzla.mk_term(Kind.FP_TO_FP_FROM_BV, bvVar, sizeExp, sizeSig),
-            pNumber));
+            Kind.ITE,
+            Bitwuzla.mk_term(Kind.FP_IS_NAN, pNumber),
+            Bitwuzla.mk_term(Kind.EQUAL, bvVar, bvNaN),
+            Bitwuzla.mk_term(
+                Kind.EQUAL,
+                Bitwuzla.mk_term(Kind.FP_TO_FP_FROM_BV, bvVar, sizeExp, sizeSig),
+                pNumber));
 
     BitwuzlaFormulaCreator.addVariableCast(equal);
     return bvVar;
