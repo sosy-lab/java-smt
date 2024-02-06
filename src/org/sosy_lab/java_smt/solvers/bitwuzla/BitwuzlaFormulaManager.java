@@ -101,8 +101,12 @@ final class BitwuzlaFormulaManager
       @Override
       public void appendTo(Appendable out) throws IOException {
         Bitwuzla bitwuzla = new Bitwuzla(); // TODO: It would be better to keep this instance around
+        for (Term t : BitwuzlaFormulaCreator.getVariableCasts()) {
+          bitwuzla.assert_formula(t);
+        }
         bitwuzla.assert_formula(pTerm);
         String dump = bitwuzla.print_formula();
+        dump = dump.replace("(set-logic ALL)", "");
         dump = dump.replace("(check-sat)", "");
         dump = dump.replace("(exit)", "");
         out.append(dump);
