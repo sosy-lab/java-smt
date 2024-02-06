@@ -188,12 +188,19 @@ public class BitwuzlaFloatingPointManager
 
     Sort bvSort = Bitwuzla.mk_bv_sort(sizeExp + sizeSig);
 
-    Term bvVar = Bitwuzla.mk_const(bvSort);
+    Term bvNaN = Bitwuzla.mk_bv_value(bvSort, "1".repeat(sizeExp + sizeExp));
     Term bvVar = Bitwuzla.mk_const(bvSort, generateRandomName("toIeeeBitvector", 10));
     Term equal = Bitwuzla.mk_term(
-        Kind.EQUAL,
-        Bitwuzla.mk_term(Kind.FP_TO_FP_FROM_BV, bvVar, sizeExp, sizeSig),
-        pNumber);
+        Kind.ITE,
+        Bitwuzla.mk_term(Kind.FP_IS_NAN, pNumber),
+        Bitwuzla.mk_term(
+            Kind.EQUAL,
+            bvVar,
+            bvNaN),
+        Bitwuzla.mk_term(
+            Kind.EQUAL,
+            Bitwuzla.mk_term(Kind.FP_TO_FP_FROM_BV, bvVar, sizeExp, sizeSig),
+            pNumber));
 
     BitwuzlaFormulaCreator.addVariableCast(equal);
     return bvVar;
