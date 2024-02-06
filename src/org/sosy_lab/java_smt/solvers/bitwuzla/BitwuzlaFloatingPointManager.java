@@ -203,7 +203,8 @@ public class BitwuzlaFloatingPointManager
     long bvSort = BitwuzlaJNI.bitwuzla_mk_bv_sort(sizeExp + sizeSig);
 
     // FIXME: Use reserved symbol for the variable names
-    Long bvNaN = BitwuzlaJNI.bitwuzla_mk_bv_value(bvSort, "1".repeat(sizeExp + sizeExp), 2);
+    Long bvNaN = BitwuzlaJNI.bitwuzla_mk_bv_value(bvSort,
+        "0" + "1".repeat(sizeExp + 1) + "0".repeat(sizeSig - 2), 2);
     long bvVar = BitwuzlaJNI.bitwuzla_mk_const(bvSort, "toIeeeBitvector_" + variableCounter++);
     Long equal = BitwuzlaJNI.bitwuzla_mk_term3(
         BitwuzlaKind.BITWUZLA_KIND_ITE.swigValue(),
