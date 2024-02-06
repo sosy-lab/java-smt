@@ -45,7 +45,7 @@ public class BitwuzlaBitvectorFormulaManager
 
   @Override
   protected Term negate(Term pParam1) {
-    return Bitwuzla.mk_term(Kind.BV_NOT, pParam1);
+    return Bitwuzla.mk_term(Kind.BV_NEG, pParam1);
   }
 
   @Override
