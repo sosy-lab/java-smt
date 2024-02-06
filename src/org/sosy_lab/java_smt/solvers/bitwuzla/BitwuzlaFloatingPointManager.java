@@ -204,13 +204,12 @@ public class BitwuzlaFloatingPointManager
 
     // FIXME: Use reserved symbol for the variable names
     long bvVar = BitwuzlaJNI.bitwuzla_mk_const(bvSort, "toIeeeBitvector_" + variableCounter++);
-    long equal = BitwuzlaJNI.bitwuzla_mk_term2(
-        BitwuzlaKind.BITWUZLA_KIND_FP_EQUAL.swigValue(),
-        BitwuzlaJNI.bitwuzla_mk_term1_indexed2(
-            BitwuzlaKind.BITWUZLA_KIND_FP_TO_FP_FROM_BV.swigValue(),
-            bvVar, sizeExp,
-            sizeSig),
-        pNumber);
+    long equal =
+        BitwuzlaJNI.bitwuzla_mk_term2(
+            BitwuzlaKind.BITWUZLA_KIND_FP_EQUAL.swigValue(),
+            BitwuzlaJNI.bitwuzla_mk_term1_indexed2(
+                BitwuzlaKind.BITWUZLA_KIND_FP_TO_FP_FROM_BV.swigValue(), bvVar, sizeExp, sizeSig),
+            pNumber);
 
     BitwuzlaFormulaCreator.addVariableCast(equal);
     return bvVar;

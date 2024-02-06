@@ -148,10 +148,8 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
     ImmutableList.Builder<Long> builder = ImmutableList.builder();
     builder.addAll(BitwuzlaFormulaCreator.getVariableCasts());
     long[] arrayOfAssumptions = builder.build().stream().mapToLong(Long::longValue).toArray();
-    final int result = BitwuzlaJNI.bitwuzla_check_sat_assuming(
-        env,
-        arrayOfAssumptions.length,
-        arrayOfAssumptions);
+    final int result =
+        BitwuzlaJNI.bitwuzla_check_sat_assuming(env, arrayOfAssumptions.length, arrayOfAssumptions);
     return readSATResult(result);
   }
 
@@ -171,10 +169,8 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
       builder.add(bitwuzlaFormula.getTerm());
     }
     long[] arrayOfAssumptions = builder.build().stream().mapToLong(Long::longValue).toArray();
-    final int result = BitwuzlaJNI.bitwuzla_check_sat_assuming(
-        env,
-        arrayOfAssumptions.length,
-        arrayOfAssumptions);
+    final int result =
+        BitwuzlaJNI.bitwuzla_check_sat_assuming(env, arrayOfAssumptions.length, arrayOfAssumptions);
     return readSATResult(result);
   }
 
