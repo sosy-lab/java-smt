@@ -177,7 +177,7 @@ namespace bitwuzla {
 
     mp_exp_t exp10;
     char* sig10 = mpf_get_str(nullptr, &exp10, 10, 0, floatMpf);
-    std::string result =  "0." + std::string(sig10) + "e" + std::to_string(exp10);
+    std::string result = "0." + std::string(sig10) + (exp10 == 0 ? "" : "e" + std::to_string(exp10));
     delete[] sig10;
     mpf_clear(floatMpf);
 
