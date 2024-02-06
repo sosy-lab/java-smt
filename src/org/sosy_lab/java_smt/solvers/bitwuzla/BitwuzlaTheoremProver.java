@@ -34,7 +34,13 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.Terminator;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Term;
 
 class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements ProverEnvironment {
-
+  private final Terminator terminator =
+      new Terminator() {
+        @Override
+        public boolean terminate() {
+          return shutdownNotifier.shouldShutdown(); // shutdownNotifer is defined in the superclass
+        }
+      };
   private final Bitwuzla env;
 
   @SuppressWarnings("unused")
@@ -58,14 +64,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
     env = createEnvironment(pOptions, pSolverOptions);
 
     // Install shutdown hook
-    env.configure_terminator(
-        new Terminator() {
-          @Override
-          public boolean terminate() {
-            return shutdownNotifier
-                .shouldShutdown(); // shutdownNotifer is defined in the superclass
-          }
-        });
+    env.configure_terminator(terminator);
   }
 
   private Bitwuzla createEnvironment(Set<ProverOptions> pProverOptions, Options pSolverOptions) {
