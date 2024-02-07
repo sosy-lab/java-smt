@@ -548,12 +548,12 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
       return term.to_rm();
     }
     if (sort.is_bv()) {
-      return new BigInteger(term.to_bv());
+      return new BigInteger(term.to_bv(), 2);
     }
     if (sort.is_fp()) {
       int sizeExponent = sort.fp_exp_size();
       int sizeMantissa = sort.fp_sig_size() - 1;
-      return FloatingPointNumber.of(term.toString(), sizeExponent, sizeMantissa);
+      return FloatingPointNumber.of(term.to_bv(), sizeExponent, sizeMantissa);
     }
     throw new AssertionError("Unknown value type.");
   }

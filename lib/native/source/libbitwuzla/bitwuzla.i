@@ -132,8 +132,8 @@ namespace bitwuzla {
   }
 
   std::string to_bv() {
-    assert($self->is_value() && $self->sort().is_bv());
-    return $self->value<std::string>(10);
+    assert($self->is_value() && ($self->sort().is_bv() || $self->sort().is_fp()));
+    return $self->value<std::string>();
   }
 
   std::string to_fp () {
