@@ -18,17 +18,16 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.List;
 import java.util.Random;
 import org.junit.Before;
 import org.junit.Test;
-import org.sosy_lab.common.rationals.ExtendedRational;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
+import org.sosy_lab.java_smt.api.FloatingPointNumber;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
@@ -827,7 +826,7 @@ public class FloatingPointFormulaManagerTest
   }
 
   @Test
-  public void fpModelValue() throws SolverException, InterruptedException {
+  public void fpModelContent() throws SolverException, InterruptedException {
     FloatingPointFormula zeroVar = fpmgr.makeVariable("zero", singlePrecType);
     BooleanFormula zeroEq = fpmgr.assignment(zeroVar, zero);
 
@@ -837,63 +836,68 @@ public class FloatingPointFormulaManagerTest
     FloatingPointFormula nanVar = fpmgr.makeVariable("nan", singlePrecType);
     BooleanFormula nanEq = fpmgr.assignment(nanVar, nan);
 
-    FloatingPointFormula posInfVar = fpmgr.makeVariable("posInf", singlePrecType);
-    BooleanFormula posInfEq = fpmgr.assignment(posInfVar, posInf);
-
-    FloatingPointFormula negInfVar = fpmgr.makeVariable("negInf", singlePrecType);
-    BooleanFormula negInfEq = fpmgr.assignment(negInfVar, negInf);
-
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(zeroEq);
       prover.push(oneEq);
       prover.push(nanEq);
-      prover.push(posInfEq);
-      prover.push(negInfEq);
 
       assertThat(prover).isSatisfiable();
 
       try (Model model = prover.getModel()) {
 
-        Object zeroValue = model.evaluate(zeroVar);
-        ValueAssignment zeroAssignment =
-            new ValueAssignment(zeroVar, zero, zeroEq, "zero", zeroValue, ImmutableList.of());
-        assertThat(zeroValue)
-            .isAnyOf(ExtendedRational.ZERO, Rational.ZERO, BigDecimal.ZERO, 0.0, 0.0f);
-
-        Object oneValue = model.evaluate(oneVar);
+        FloatingPointNumber oneValue = model.evaluate(oneVar);
         ValueAssignment oneAssignment =
             new ValueAssignment(oneVar, one, oneEq, "one", oneValue, ImmutableList.of());
-        assertThat(oneValue)
-            .isAnyOf(
-                new ExtendedRational(Rational.ONE),
-                BigInteger.ONE,
-                Rational.ONE,
-                BigDecimal.ONE,
-                1.0,
-                1.0f);
 
-        Object nanValue = model.evaluate(nanVar);
+        FloatingPointNumber zeroValue = model.evaluate(zeroVar);
+        ValueAssignment zeroAssignment =
+            new ValueAssignment(zeroVar, zero, zeroEq, "zero", zeroValue, ImmutableList.of());
+
+        FloatingPointNumber nanValue = model.evaluate(nanVar);
         ValueAssignment nanAssignment =
             new ValueAssignment(nanVar, nan, nanEq, "nan", nanValue, ImmutableList.of());
-        assertThat(nanValue).isAnyOf(ExtendedRational.NaN, Double.NaN, Float.NaN);
 
-        Object posInfValue = model.evaluate(posInfVar);
-        ValueAssignment posInfAssignment =
-            new ValueAssignment(
-                posInfVar, posInf, posInfEq, "posInf", posInfValue, ImmutableList.of());
-        assertThat(posInfValue)
-            .isAnyOf(ExtendedRational.INFTY, Double.POSITIVE_INFINITY, Float.POSITIVE_INFINITY);
+        assertThat(model).containsExactly(zeroAssignment, oneAssignment, nanAssignment);
+      }
+    }
+  }
 
-        Object negInfValue = model.evaluate(negInfVar);
-        ValueAssignment negInfAssignment =
-            new ValueAssignment(
-                negInfVar, negInf, negInfEq, "negInf", negInfValue, ImmutableList.of());
-        assertThat(negInfValue)
-            .isAnyOf(ExtendedRational.NEG_INFTY, Double.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY);
+  @Test
+  public void fpModelValue() throws SolverException, InterruptedException {
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(bmgr.makeTrue());
 
-        assertThat(model)
-            .containsExactly(
-                zeroAssignment, oneAssignment, nanAssignment, posInfAssignment, negInfAssignment);
+      assertThat(prover).isSatisfiable();
+
+      try (Model model = prover.getModel()) {
+        assertThat(model).isEmpty();
+
+        for (float f :
+            new float[] {
+              0,
+              1,
+              2,
+              3,
+              4,
+              256,
+              1000,
+              1024,
+              -1,
+              -2,
+              -3,
+              -4,
+              -1000,
+              -1024,
+              Float.NEGATIVE_INFINITY,
+              Float.POSITIVE_INFINITY,
+              Float.MAX_VALUE,
+              Float.MIN_VALUE,
+              Float.MIN_NORMAL,
+            }) {
+          FloatingPointNumber fiveValue = model.evaluate(fpmgr.makeNumber(f, singlePrecType));
+          assertThat(fiveValue.floatValue()).isEqualTo(f);
+          assertThat(fiveValue.doubleValue()).isEqualTo((double) f);
+        }
       }
     }
   }
