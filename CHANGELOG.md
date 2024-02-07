@@ -10,6 +10,10 @@ SPDX-License-Identifier: Apache-2.0
 
 # JavaSMT ChangeLog
 
+## JavaSMT 4.1.1
+
+This patch release brings small fixes for Z3 and MathSAT.
+
 ## JavaSMT 4.1.0
 
 This release brings support for the SMT solver OpenSMT (version 2.5.2).
