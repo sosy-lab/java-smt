@@ -40,6 +40,7 @@ build-dependencies:
   artifacts:
     paths:
       - "lib/java/"
+    expire_in: 1 day # sufficient for building later stages and near-time debugging
 
 
 # Build binaries and provide them to later stages
@@ -51,6 +52,8 @@ build-dependencies:
     paths:
       - "bin/"
       - "*.jar"
+      - "hs_err_pid*.log"
+      - "core.*"
 
 build:jdk-11:
   <<: *build

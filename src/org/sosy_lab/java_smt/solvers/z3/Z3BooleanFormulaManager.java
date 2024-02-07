@@ -152,12 +152,12 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
 
   @Override
   protected boolean isTrue(Long pParam) {
-    return isOP(z3context, pParam, Z3_decl_kind.Z3_OP_TRUE);
+    return z3true.equals(pParam);
   }
 
   @Override
   protected boolean isFalse(Long pParam) {
-    return isOP(z3context, pParam, Z3_decl_kind.Z3_OP_FALSE);
+    return z3false.equals(pParam);
   }
 
   @Override
