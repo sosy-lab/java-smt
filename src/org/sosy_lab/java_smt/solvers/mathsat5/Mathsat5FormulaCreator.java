@@ -108,11 +108,10 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_repr;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_type_repr;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.primitives.Longs;
-import com.google.common.primitives.UnsignedInteger;
-import com.google.common.primitives.UnsignedLong;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -123,6 +122,7 @@ import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.EnumerationFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
+import org.sosy_lab.java_smt.api.FloatingPointNumber;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
@@ -555,25 +555,35 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     }
   }
 
-  private Number parseFloatingPoint(String lTermRepresentation) {
+  private FloatingPointNumber parseFloatingPoint(String lTermRepresentation) {
 
-    // the term is of the format "<VALUE>_<EXPWIDTH>_<MANTWIDTH>"
+    // the term is of the format "<VALUE_AS_BITVECTOR>_<EXPWIDTH>_<MANTWIDTH>"
     Matcher matcher = FLOATING_POINT_PATTERN.matcher(lTermRepresentation);
     if (!matcher.matches()) {
       throw new NumberFormatException("Unknown floating-point format: " + lTermRepresentation);
     }
 
+    BigInteger bits = new BigInteger(matcher.group(1));
     int expWidth = Integer.parseInt(matcher.group(2));
     int mantWidth = Integer.parseInt(matcher.group(3));
 
-    if (expWidth == 11 && mantWidth == 52) {
-      return Double.longBitsToDouble(UnsignedLong.valueOf(matcher.group(1)).longValue());
-    } else if (expWidth == 8 && mantWidth == 23) {
-      return Float.intBitsToFloat(UnsignedInteger.valueOf(matcher.group(1)).intValue());
-    }
+    boolean sign = bits.testBit(expWidth + mantWidth);
+    BigInteger exponent = extractBitsFrom(bits, mantWidth, expWidth);
+    BigInteger mantissa = extractBitsFrom(bits, 0, mantWidth);
 
-    // TODO to be fully correct, we would need to interpret this string
-    return new BigInteger(matcher.group(1));
+    return FloatingPointNumber.of(sign, exponent, mantissa, expWidth, mantWidth);
+  }
+
+  /**
+   * Returns a range of bits from the bitvector representation of a number.
+   *
+   * @param start the index of the lowest significant bit to be extracted.
+   * @param length how many bits to extract?
+   */
+  private static BigInteger extractBitsFrom(BigInteger number, int start, int length) {
+    Preconditions.checkArgument(0 <= start && 0 < length);
+    BigInteger mask = BigInteger.ONE.shiftLeft(length).subtract(BigInteger.ONE);
+    return number.shiftRight(start).and(mask);
   }
 
   // TODO: change this to the latest version

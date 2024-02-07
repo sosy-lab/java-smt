@@ -37,6 +37,8 @@ import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_
 import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_FP_TO_SBV;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_FP_TO_UBV;
 
+import java.math.BigDecimal;
+import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
@@ -52,7 +54,6 @@ public class BitwuzlaFloatingPointManager
       FormulaCreator<Long, Long, Long, BitwuzlaDeclaration> pCreator,
       FloatingPointRoundingMode pFloatingPointRoundingMode) {
     super(pCreator);
-    // bitwuzla = pCreator.getEnv();
     roundingMode = getRoundingModeImpl(pFloatingPointRoundingMode);
   }
 
@@ -87,12 +88,16 @@ public class BitwuzlaFloatingPointManager
   }
 
   @Override
+  public Long makeNumberImpl(
+      Rational n, FormulaType.FloatingPointType type, Long pFloatingPointRoundingMode) {
+    BigDecimal num = new BigDecimal(n.getNum());
+    BigDecimal den = new BigDecimal(n.getDen());
+    return makeNumberImpl(num.divide(den).toString(), type, pFloatingPointRoundingMode);
+  }
+
+  @Override
   protected Long makeNumberImpl(double n, FloatingPointType type, Long pFloatingPointRoundingMode) {
-    if (Double.compare(n, -0.0) == 0) {
-      return BitwuzlaJNI.bitwuzla_mk_fp_neg_zero(mkFpaSort(type));
-    } else {
-      return makeNumberImpl(String.format("%f", n), type, pFloatingPointRoundingMode);
-    }
+    return makeNumberImpl(String.valueOf(n), type, pFloatingPointRoundingMode);
   }
 
   private long mkFpaSort(FloatingPointType pType) {
@@ -102,14 +107,8 @@ public class BitwuzlaFloatingPointManager
   @Override
   protected Long makeNumberAndRound(
       String pN, FloatingPointType pType, Long pFloatingPointRoundingMode) {
-    // Convert scientific notation (f.ex "1.234E2") to a plain decimal string (f.ex "123.4")
-    String decimals = String.format("%.0f", Double.parseDouble(pN));
-    if (Double.compare(Double.parseDouble(pN), -0.0) == 0) {
-      return BitwuzlaJNI.bitwuzla_mk_fp_neg_zero(mkFpaSort(pType));
-    } else {
-      return BitwuzlaJNI.bitwuzla_mk_fp_from_real(
-          mkFpaSort(pType), pFloatingPointRoundingMode, decimals);
-    }
+    Double.parseDouble(pN); // Will throw an exception if the string is not a valid float
+    return BitwuzlaJNI.bitwuzla_mk_fp_from_real(mkFpaSort(pType), pFloatingPointRoundingMode, pN);
   }
 
   @Override
@@ -194,15 +193,38 @@ public class BitwuzlaFloatingPointManager
         pTargetType.getMantissaSize() + 1);
   }
 
+  private int variableCounter = 0;
+
   @Override
   protected Long toIeeeBitvectorImpl(Long pNumber) {
-    long rm = BitwuzlaJNI.bitwuzla_mk_rm_value(BitwuzlaJNI.BITWUZLA_RM_RTZ_get());
-    long inputBits =
-        BitwuzlaJNI.bitwuzla_term_fp_get_exp_size(pNumber)
-            + BitwuzlaJNI.bitwuzla_term_fp_get_sig_size(pNumber);
-    // This is most likely wrong/inprecise!
-    return BitwuzlaJNI.bitwuzla_mk_term2_indexed1(
-        BITWUZLA_KIND_FP_TO_SBV.swigValue(), rm, pNumber, inputBits);
+    int sizeExp = (int) BitwuzlaJNI.bitwuzla_term_fp_get_exp_size(pNumber);
+    int sizeSig = (int) BitwuzlaJNI.bitwuzla_term_fp_get_sig_size(pNumber);
+
+    long bvSort = BitwuzlaJNI.bitwuzla_mk_bv_sort(sizeExp + sizeSig);
+
+    // FIXME: Use reserved symbol for the variable names
+    Long bvNaN =
+        BitwuzlaJNI.bitwuzla_mk_bv_value(
+            bvSort, "0" + "1".repeat(sizeExp + 1) + "0".repeat(sizeSig - 2), 2);
+    long bvVar = BitwuzlaJNI.bitwuzla_mk_const(bvSort, "toIeeeBitvector_" + variableCounter++);
+    Long equal =
+        BitwuzlaJNI.bitwuzla_mk_term3(
+            BitwuzlaKind.BITWUZLA_KIND_ITE.swigValue(),
+            BitwuzlaJNI.bitwuzla_mk_term1(
+                BitwuzlaKind.BITWUZLA_KIND_FP_IS_NAN.swigValue(), pNumber),
+            BitwuzlaJNI.bitwuzla_mk_term2(
+                BitwuzlaKind.BITWUZLA_KIND_EQUAL.swigValue(), bvVar, bvNaN),
+            BitwuzlaJNI.bitwuzla_mk_term2(
+                BitwuzlaKind.BITWUZLA_KIND_EQUAL.swigValue(),
+                BitwuzlaJNI.bitwuzla_mk_term1_indexed2(
+                    BitwuzlaKind.BITWUZLA_KIND_FP_TO_FP_FROM_BV.swigValue(),
+                    bvVar,
+                    sizeExp,
+                    sizeSig),
+                pNumber));
+
+    BitwuzlaFormulaCreator.addVariableCast(equal);
+    return bvVar;
   }
 
   @Override

@@ -78,16 +78,16 @@ final class BitwuzlaFormulaManager
       public void appendTo(Appendable out) throws IOException {
         long printCtx = getFormulaCreator().getEnv();
         BitwuzlaJNI.bitwuzla_push(printCtx, 1);
+        for (Long t : BitwuzlaFormulaCreator.getVariableCasts()) {
+          BitwuzlaJNI.bitwuzla_assert(printCtx, t);
+        }
         BitwuzlaJNI.bitwuzla_assert(printCtx, pTerm);
         String dump = BitwuzlaJNI.dump_assertions_smt2(printCtx, 10);
         BitwuzlaJNI.bitwuzla_pop(printCtx, 1);
         // Bitwuzla prints (check-sat)\n(exit)\n in the end. We remove that.
-        if (dump.contains("(check-sat)\n")) {
-          dump = dump.replace("(check-sat)", "");
-        }
-        if (dump.contains("(exit)")) {
-          dump = dump.replace("(exit)", "");
-        }
+        dump = dump.replace("(set-logic ALL)", "");
+        dump = dump.replace("(check-sat)", "");
+        dump = dump.replace("(exit)", "");
         out.append(dump);
       }
     };

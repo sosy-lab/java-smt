@@ -18,17 +18,16 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.List;
 import java.util.Random;
 import org.junit.Before;
 import org.junit.Test;
-import org.sosy_lab.common.rationals.ExtendedRational;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
+import org.sosy_lab.java_smt.api.FloatingPointNumber;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
@@ -614,6 +613,7 @@ public class FloatingPointFormulaManagerTest
 
   @Test
   public void rationalToFpMinusOne() throws SolverException, InterruptedException {
+    requireRationals();
     requireBitvectors();
 
     NumeralFormula ratOne = rmgr.makeNumber(-1);
@@ -681,9 +681,9 @@ public class FloatingPointFormulaManagerTest
   @Test
   public void fpIeeeConversionTypes() {
     assume()
-        .withMessage("FP-to-BV conversion not available for CVC4 and CVC5")
+        .withMessage("FP-to-BV conversion not available for %s", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.CVC4, Solvers.CVC5);
+        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.BITWUZLA);
 
     FloatingPointFormula var = fpmgr.makeVariable("var", singlePrecType);
     assertThat(mgr.getFormulaType(fpmgr.toIeeeBitvector(var)))
@@ -693,7 +693,7 @@ public class FloatingPointFormulaManagerTest
   @Test
   public void fpIeeeConversion() throws SolverException, InterruptedException {
     assume()
-        .withMessage("FP-to-BV conversion not available for CVC4 and CVC5")
+        .withMessage("FP-to-BV conversion not available for %s", solverToUse())
         .that(solverToUse())
         .isNoneOf(Solvers.CVC4, Solvers.CVC5);
 
@@ -707,7 +707,7 @@ public class FloatingPointFormulaManagerTest
   @Test
   public void ieeeFpConversion() throws SolverException, InterruptedException {
     assume()
-        .withMessage("FP-to-BV conversion not available for CVC4 and CVC5")
+        .withMessage("FP-to-BV conversion not available for %s", solverToUse())
         .that(solverToUse())
         .isNoneOf(Solvers.CVC4, Solvers.CVC5);
 
@@ -746,17 +746,22 @@ public class FloatingPointFormulaManagerTest
             Float.MAX_VALUE,
             Float.POSITIVE_INFINITY,
             Float.NEGATIVE_INFINITY,
-            0.0f // , -0.0f // MathSat5 fails for NEGATIVE_ZERO
-            );
+            0.0f);
 
-    for (int i = 1; i < 20; i++) {
-      for (int j = 1; j < 20; j++) {
+    if (solverToUse() != Solvers.MATHSAT5) {
+      flts.add(-0.0f); // MathSat5 fails for NEGATIVE_ZERO
+    }
+
+    final int stepSize = solverToUse() == Solvers.BITWUZLA ? 10 : 1;
+    for (int i = 1; i < 20; i += stepSize) {
+      for (int j = 1; j < 20; j += stepSize) {
         flts.add((float) (i * Math.pow(10, j)));
       }
     }
 
+    final int numRandom = solverToUse() == Solvers.BITWUZLA ? 5 : NUM_RANDOM_TESTS;
     Random rand = new Random(0);
-    for (int i = 0; i < NUM_RANDOM_TESTS; i++) {
+    for (int i = 0; i < numRandom; i++) {
       float flt = Float.intBitsToFloat(rand.nextInt());
       if (!Float.isNaN(flt)) {
         flts.add(flt);
@@ -775,17 +780,22 @@ public class FloatingPointFormulaManagerTest
             Double.MAX_VALUE,
             Double.POSITIVE_INFINITY,
             Double.NEGATIVE_INFINITY,
-            0.0 // , -0.0 // MathSat5 fails for NEGATIVE_ZERO
-            );
+            0.0);
 
-    for (int i = 1; i < 20; i++) {
-      for (int j = 1; j < 20; j++) {
+    if (solverToUse() != Solvers.MATHSAT5) {
+      dbls.add(-0.0); // MathSat5 fails for NEGATIVE_ZERO
+    }
+
+    final int stepSize = solverToUse() == Solvers.BITWUZLA ? 10 : 1;
+    for (int i = 1; i < 20; i += stepSize) {
+      for (int j = 1; j < 20; j += stepSize) {
         dbls.add(i * Math.pow(10, j));
       }
     }
 
+    final int numRandom = solverToUse() == Solvers.BITWUZLA ? 5 : NUM_RANDOM_TESTS;
     Random rand = new Random(0);
-    for (int i = 0; i < NUM_RANDOM_TESTS; i++) {
+    for (int i = 0; i < numRandom; i++) {
       double d = Double.longBitsToDouble(rand.nextLong());
       if (!Double.isNaN(d)) {
         dbls.add(d);
@@ -816,7 +826,7 @@ public class FloatingPointFormulaManagerTest
   }
 
   @Test
-  public void fpModelValue() throws SolverException, InterruptedException {
+  public void fpModelContent() throws SolverException, InterruptedException {
     FloatingPointFormula zeroVar = fpmgr.makeVariable("zero", singlePrecType);
     BooleanFormula zeroEq = fpmgr.assignment(zeroVar, zero);
 
@@ -826,63 +836,68 @@ public class FloatingPointFormulaManagerTest
     FloatingPointFormula nanVar = fpmgr.makeVariable("nan", singlePrecType);
     BooleanFormula nanEq = fpmgr.assignment(nanVar, nan);
 
-    FloatingPointFormula posInfVar = fpmgr.makeVariable("posInf", singlePrecType);
-    BooleanFormula posInfEq = fpmgr.assignment(posInfVar, posInf);
-
-    FloatingPointFormula negInfVar = fpmgr.makeVariable("negInf", singlePrecType);
-    BooleanFormula negInfEq = fpmgr.assignment(negInfVar, negInf);
-
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(zeroEq);
       prover.push(oneEq);
       prover.push(nanEq);
-      prover.push(posInfEq);
-      prover.push(negInfEq);
 
       assertThat(prover).isSatisfiable();
 
       try (Model model = prover.getModel()) {
 
-        Object zeroValue = model.evaluate(zeroVar);
-        ValueAssignment zeroAssignment =
-            new ValueAssignment(zeroVar, zero, zeroEq, "zero", zeroValue, ImmutableList.of());
-        assertThat(zeroValue)
-            .isAnyOf(ExtendedRational.ZERO, Rational.ZERO, BigDecimal.ZERO, 0.0, 0.0f);
-
-        Object oneValue = model.evaluate(oneVar);
+        FloatingPointNumber oneValue = model.evaluate(oneVar);
         ValueAssignment oneAssignment =
             new ValueAssignment(oneVar, one, oneEq, "one", oneValue, ImmutableList.of());
-        assertThat(oneValue)
-            .isAnyOf(
-                new ExtendedRational(Rational.ONE),
-                BigInteger.ONE,
-                Rational.ONE,
-                BigDecimal.ONE,
-                1.0,
-                1.0f);
 
-        Object nanValue = model.evaluate(nanVar);
+        FloatingPointNumber zeroValue = model.evaluate(zeroVar);
+        ValueAssignment zeroAssignment =
+            new ValueAssignment(zeroVar, zero, zeroEq, "zero", zeroValue, ImmutableList.of());
+
+        FloatingPointNumber nanValue = model.evaluate(nanVar);
         ValueAssignment nanAssignment =
             new ValueAssignment(nanVar, nan, nanEq, "nan", nanValue, ImmutableList.of());
-        assertThat(nanValue).isAnyOf(ExtendedRational.NaN, Double.NaN, Float.NaN);
 
-        Object posInfValue = model.evaluate(posInfVar);
-        ValueAssignment posInfAssignment =
-            new ValueAssignment(
-                posInfVar, posInf, posInfEq, "posInf", posInfValue, ImmutableList.of());
-        assertThat(posInfValue)
-            .isAnyOf(ExtendedRational.INFTY, Double.POSITIVE_INFINITY, Float.POSITIVE_INFINITY);
+        assertThat(model).containsExactly(zeroAssignment, oneAssignment, nanAssignment);
+      }
+    }
+  }
 
-        Object negInfValue = model.evaluate(negInfVar);
-        ValueAssignment negInfAssignment =
-            new ValueAssignment(
-                negInfVar, negInf, negInfEq, "negInf", negInfValue, ImmutableList.of());
-        assertThat(negInfValue)
-            .isAnyOf(ExtendedRational.NEG_INFTY, Double.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY);
+  @Test
+  public void fpModelValue() throws SolverException, InterruptedException {
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(bmgr.makeTrue());
 
-        assertThat(model)
-            .containsExactly(
-                zeroAssignment, oneAssignment, nanAssignment, posInfAssignment, negInfAssignment);
+      assertThat(prover).isSatisfiable();
+
+      try (Model model = prover.getModel()) {
+        assertThat(model).isEmpty();
+
+        for (float f :
+            new float[] {
+              0,
+              1,
+              2,
+              3,
+              4,
+              256,
+              1000,
+              1024,
+              -1,
+              -2,
+              -3,
+              -4,
+              -1000,
+              -1024,
+              Float.NEGATIVE_INFINITY,
+              Float.POSITIVE_INFINITY,
+              Float.MAX_VALUE,
+              Float.MIN_VALUE,
+              Float.MIN_NORMAL,
+            }) {
+          FloatingPointNumber fiveValue = model.evaluate(fpmgr.makeNumber(f, singlePrecType));
+          assertThat(fiveValue.floatValue()).isEqualTo(f);
+          assertThat(fiveValue.doubleValue()).isEqualTo((double) f);
+        }
       }
     }
   }

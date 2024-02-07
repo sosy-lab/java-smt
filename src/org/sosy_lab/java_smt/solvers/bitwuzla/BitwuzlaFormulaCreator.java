@@ -82,9 +82,11 @@ import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Table;
-import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
@@ -94,6 +96,7 @@ import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
+import org.sosy_lab.java_smt.api.FloatingPointNumber;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
@@ -112,7 +115,13 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaFormula.BitwuzlaFloatingPo
 public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, BitwuzlaDeclaration> {
   private final Table<String, Long, Long> formulaCache = HashBasedTable.create();
 
-  // private final Table<String, Long, Long> boundFormulaCache = HashBasedTable.create();
+  // Bitwuzla has no operation for casting floats to bitvectors. We need to use a workaround
+  // where a variable "bvVar" is introduces, along with the side condition that
+  // "fpTerm = to_fp(bvVar)" holds. These side conditions are stored here and need to be added when
+  // satisfiability is checked, or when the formula is to be printed.
+  // Since Bitwuzla allows terms to be shared across solver contexts we use a static collection
+  // to store all equations.
+  private static final Collection<Long> variableCasts = new HashSet<>();
 
   protected BitwuzlaFormulaCreator(Long pBitwuzlaEnv) {
     super(pBitwuzlaEnv, BitwuzlaJNI.bitwuzla_mk_bool_sort(), null, null, null, null);
@@ -426,37 +435,12 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Bit
     return bitwuzlaSortToType(pType);
   }
 
-  private BigDecimal parseIEEEbinaryFP(long pTerm) {
-    // The Bitwuzla string for FPs is always in binary, regardless of the second argument.
-
-    String fp = BitwuzlaJNI.bitwuzla_term_value_get_str(pTerm);
-
-    if (fp.length() == 32) {
-      float result = Float.intBitsToFloat(Integer.parseUnsignedInt(fp, 2));
-      return new BigDecimal(result);
-    } else if (fp.length() == 64) {
-      double result = Double.longBitsToDouble(Long.parseUnsignedLong(fp, 2));
-      return new BigDecimal(result);
-    } else {
-      throw new UnsupportedOperationException(
-          "Visitor can only visit constant FPs of 32 or 64 " + "bits.");
-    }
-
-    //    String fpSMTLIB = bitwuzlaJNI.bitwuzla_term_to_string(pTerm);
-    //    String[] mySplit = fpSMTLIB.split(" #b");
-    //    mySplit[3] = mySplit[3].replace(")", "");
-    //    double result = calculateDecimal(mySplit[3], mySplit[2], mySplit[1]);
-  }
-
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula formula, Long f)
       throws UnsupportedOperationException {
     BitwuzlaKind kind = BitwuzlaKind.swigToEnum(BitwuzlaJNI.bitwuzla_term_get_kind(f));
     if (termIsConstant(f)) {
       return visitor.visitConstant(formula, convertValue(f));
-
-    } else if (BitwuzlaJNI.bitwuzla_term_is_fp_value(f)) {
-      return visitor.visitConstant(formula, parseIEEEbinaryFP(f));
 
     } else if (BitwuzlaJNI.bitwuzla_term_is_const(f)) {
       String name = BitwuzlaJNI.bitwuzla_term_get_symbol(f);
@@ -654,39 +638,33 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Bit
 
   @Override
   public Object convertValue(Long term) {
-    String value;
-    long sort = BitwuzlaJNI.bitwuzla_term_get_sort(term);
-    if (BitwuzlaJNI.bitwuzla_term_is_const(term)) {
-      return null;
+    if (BitwuzlaJNI.bitwuzla_term_is_bool(term)) {
+      return BitwuzlaJNI.bitwuzla_term_value_get_bool(term);
     }
-    if (BitwuzlaJNI.bitwuzla_sort_is_fun(sort)) {
-      // TODO: this is wrong
-      throw new AssertionError("Error: Unknown sort and term");
-    } else {
-      value = BitwuzlaJNI.bitwuzla_term_to_string(term);
-      if (value.startsWith("#b")) {
-        // Bitvectors in Bitwuzla start with a #b
-        return new BigInteger(value.substring(2), 2);
-      } else if (value.equals("true")) {
-        return true;
-      } else if (value.equals("false")) {
-        return false;
-      } else if (value.startsWith("(fp")) {
-        return value
-            .replace("(fp", "")
-            .replace(")", "")
-            .replace("#b", "")
-            .replace("#b", "")
-            .replace("#b", "")
-            .strip();
-      } else if (BitwuzlaJNI.bitwuzla_sort_is_rm(sort)) {
-        return value;
-      }
+    if (BitwuzlaJNI.bitwuzla_term_is_bv(term)) {
+      return new BigInteger(BitwuzlaJNI.bitwuzla_term_value_get_str(term), 2);
+    }
+    if (BitwuzlaJNI.bitwuzla_term_is_fp(term)) {
+      int sizeExponent = (int) BitwuzlaJNI.bitwuzla_term_fp_get_exp_size(term);
+      int sizeMantissa = (int) BitwuzlaJNI.bitwuzla_term_fp_get_sig_size(term);
+      String repr = BitwuzlaJNI.bitwuzla_term_value_get_str(term);
+      return FloatingPointNumber.of(repr, sizeExponent, sizeMantissa - 1);
+    }
+    if (BitwuzlaJNI.bitwuzla_term_is_rm(term)) {
+      return RoundingMode.valueOf(BitwuzlaJNI.bitwuzla_term_value_get_rm(term));
     }
 
     throw new AssertionError(
         "Error: Could not convert term to value; Unknown sort and term. "
             + "Value: "
             + BitwuzlaJNI.bitwuzla_term_to_string(term));
+  }
+
+  public static void addVariableCast(Long equal) {
+    variableCasts.add(equal);
+  }
+
+  public static Iterable<Long> getVariableCasts() {
+    return variableCasts;
   }
 }
