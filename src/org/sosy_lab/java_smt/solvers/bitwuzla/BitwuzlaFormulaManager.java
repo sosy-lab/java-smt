@@ -57,6 +57,9 @@ final class BitwuzlaFormulaManager
 
   @Override
   public BooleanFormula parse(String s) throws IllegalArgumentException {
+    if (s.startsWith("(set-logic ")) {
+      s = s.substring(1 + s.indexOf(')'));
+    }
     if (s.contains("(check-sat)")) {
       s = s.replace("(check-sat)", "");
     }
