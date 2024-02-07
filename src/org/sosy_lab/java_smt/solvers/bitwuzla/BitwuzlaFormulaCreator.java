@@ -26,6 +26,7 @@ import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
+import org.sosy_lab.java_smt.api.FloatingPointNumber;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
@@ -550,7 +551,9 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
       return new BigInteger(term.to_bv());
     }
     if (sort.is_fp()) {
-      return Double.parseDouble(term.to_fp());
+      int sizeExponent = sort.fp_exp_size();
+      int sizeMantissa = sort.fp_sig_size() - 1;
+      return FloatingPointNumber.of(term.toString(), sizeExponent, sizeMantissa);
     }
     throw new AssertionError("Unknown value type.");
   }
