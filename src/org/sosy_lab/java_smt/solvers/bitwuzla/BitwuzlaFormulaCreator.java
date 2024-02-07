@@ -96,6 +96,7 @@ import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
+import org.sosy_lab.java_smt.api.FloatingPointNumber;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
@@ -644,7 +645,10 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Bit
       return new BigInteger(BitwuzlaJNI.bitwuzla_term_value_get_str(term), 2);
     }
     if (BitwuzlaJNI.bitwuzla_term_is_fp(term)) {
-      return Double.parseDouble(BitwuzlaJNI.bitwuzla_term_value_get_real(term));
+      int sizeExponent = (int) BitwuzlaJNI.bitwuzla_term_fp_get_exp_size(term);
+      int sizeMantissa = (int) BitwuzlaJNI.bitwuzla_term_fp_get_sig_size(term);
+      String repr = BitwuzlaJNI.bitwuzla_term_value_get_str(term);
+      return FloatingPointNumber.of(repr, sizeExponent, sizeMantissa - 1);
     }
     if (BitwuzlaJNI.bitwuzla_term_is_rm(term)) {
       return RoundingMode.valueOf(BitwuzlaJNI.bitwuzla_term_value_get_rm(term));
