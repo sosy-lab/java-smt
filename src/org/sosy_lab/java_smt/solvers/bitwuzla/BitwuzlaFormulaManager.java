@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterables;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -80,17 +81,12 @@ final class BitwuzlaFormulaManager
     Parser parser = new Parser(bitwuzlaOption, file.toString());
     String error = parser.parse(true);
 
-    Preconditions.checkArgument(
-        error.isEmpty(), "Could not parse input string \"%s\": Error \"%s\"", s, error);
-    Vector_Term assertions = parser.bitwuzla().get_assertions();
+    String errorMsg = String.format("Could not parse input string \"%s\": ", s);
+    Preconditions.checkArgument(error.isEmpty(), errorMsg + "Error \"%s\".", error);
 
-    Preconditions.checkArgument(
-        !assertions.isEmpty(), "Could not parse input string \"%s\": No assertion was found", s);
-    Preconditions.checkArgument(
-        assertions.size() == 1,
-        "Could not parse input string \"%s\": Only one assertion is allowed",
-        s);
-    return getFormulaCreator().encapsulateBoolean(assertions.get(0));
+    Vector_Term assertions = parser.bitwuzla().get_assertions();
+    Preconditions.checkArgument(!assertions.isEmpty(), errorMsg + "No assertion was found.");
+    return getFormulaCreator().encapsulateBoolean(Iterables.getLast(assertions));
   }
 
   @Override
