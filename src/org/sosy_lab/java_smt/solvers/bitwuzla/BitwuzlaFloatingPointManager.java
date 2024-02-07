@@ -203,23 +203,25 @@ public class BitwuzlaFloatingPointManager
     long bvSort = BitwuzlaJNI.bitwuzla_mk_bv_sort(sizeExp + sizeSig);
 
     // FIXME: Use reserved symbol for the variable names
-    Long bvNaN = BitwuzlaJNI.bitwuzla_mk_bv_value(bvSort,
-        "0" + "1".repeat(sizeExp + 1) + "0".repeat(sizeSig - 2), 2);
+    Long bvNaN =
+        BitwuzlaJNI.bitwuzla_mk_bv_value(
+            bvSort, "0" + "1".repeat(sizeExp + 1) + "0".repeat(sizeSig - 2), 2);
     long bvVar = BitwuzlaJNI.bitwuzla_mk_const(bvSort, "toIeeeBitvector_" + variableCounter++);
-    Long equal = BitwuzlaJNI.bitwuzla_mk_term3(
-        BitwuzlaKind.BITWUZLA_KIND_ITE.swigValue(),
-        BitwuzlaJNI.bitwuzla_mk_term1(BitwuzlaKind.BITWUZLA_KIND_FP_IS_NAN.swigValue(), pNumber),
-        BitwuzlaJNI.bitwuzla_mk_term2(
-            BitwuzlaKind.BITWUZLA_KIND_EQUAL.swigValue(),
-            bvVar,
-            bvNaN),
-        BitwuzlaJNI.bitwuzla_mk_term2(
-            BitwuzlaKind.BITWUZLA_KIND_EQUAL.swigValue(),
-            BitwuzlaJNI.bitwuzla_mk_term1_indexed2(
-                BitwuzlaKind.BITWUZLA_KIND_FP_TO_FP_FROM_BV.swigValue()
-                , bvVar,
-                sizeExp, sizeSig),
-            pNumber));
+    Long equal =
+        BitwuzlaJNI.bitwuzla_mk_term3(
+            BitwuzlaKind.BITWUZLA_KIND_ITE.swigValue(),
+            BitwuzlaJNI.bitwuzla_mk_term1(
+                BitwuzlaKind.BITWUZLA_KIND_FP_IS_NAN.swigValue(), pNumber),
+            BitwuzlaJNI.bitwuzla_mk_term2(
+                BitwuzlaKind.BITWUZLA_KIND_EQUAL.swigValue(), bvVar, bvNaN),
+            BitwuzlaJNI.bitwuzla_mk_term2(
+                BitwuzlaKind.BITWUZLA_KIND_EQUAL.swigValue(),
+                BitwuzlaJNI.bitwuzla_mk_term1_indexed2(
+                    BitwuzlaKind.BITWUZLA_KIND_FP_TO_FP_FROM_BV.swigValue(),
+                    bvVar,
+                    sizeExp,
+                    sizeSig),
+                pNumber));
 
     BitwuzlaFormulaCreator.addVariableCast(equal);
     return bvVar;
