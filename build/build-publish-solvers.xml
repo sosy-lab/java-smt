@@ -883,13 +883,13 @@ SPDX-License-Identifier: Apache-2.0
         </exec>
 
         <!-- copy bitwuzla include files to the source tree -->
+        <delete dir="${source.path}/include" quiet="true"/>
         <copy todir="${source.path}">
-            <fileset dir="${bitwuzla.path}/install">
-                <include name="include/**"/>
-            </fileset>
+            <fileset dir="${bitwuzla.path}/install" includes="include/**"/>
         </copy>
 
         <!-- create ouput directory for the swig proxies -->
+        <delete dir="$source.path}/src" quiet="true"/>
         <mkdir dir="${source.path}/src/org/sosy_lab/java_smt/solvers/bitwuzla/api"/>
 
         <!-- run swig to generate java files and the c wrapper -->
@@ -915,8 +915,8 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- compile java proxies and create jar file -->
         <mkdir dir="${source.path}/build"/>
-        <javac srcdir="${source.path}/src/" destdir="${source.path}/build"
-               includeantruntime="false" failonerror="true">
+        <javac srcdir="${source.path}/src/" destdir="${source.path}/build" includeantruntime="false"
+               failonerror="true">
             <include name="org/sosy_lab/java_smt/solvers/bitwuzla/api/*.java"/>
         </javac>
         <jar destfile="bitwuzla-${bitwuzla.version}.jar" basedir="${source.path}/build"/>
@@ -929,9 +929,8 @@ SPDX-License-Identifier: Apache-2.0
         <jar destfile="bitwuzla-${bitwuzla.version}-javadoc.jar" basedir="${source.path}/doc"/>
         <delete dir="${source.path}/doc"/>
 
-        <!-- package swig generated source code, then remove the files -->
+        <!-- package swig generated source code -->
         <jar destfile="bitwuzla-${bitwuzla.version}-sources.jar" basedir="${source.path}/src"/>
-        <delete dir="${source.path}/src"/>
 
         <!-- compile the swig wrapper -->
         <exec executable="g++" dir="${source.path}" failonerror="true">
@@ -943,11 +942,6 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="-I${java.home}/include"/>
             <arg value="-I${java.home}/include/linux"/>
         </exec>
-        <delete file="${source.path}/bitwuzla_wrap.cpp"/>
-        <delete file="${source.path}/bitwuzla_wrap.h"/>
-
-        <!-- delete includes from the source tree (we're done compiling) -->
-        <delete dir="${source.path}/include"/>
 
         <!-- link the wrapper to create libbitwuzlaJNI.so -->
         <exec executable="g++" dir="${source.path}" failonerror="true">
@@ -961,7 +955,6 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="-lgmp"/>
             <arg value="-Wl,-z,defs"/>
         </exec>
-        <delete file="${source.path}/bitwuzla_wrap.o"/>
 
         <!-- copy library files into directory to be published for Ivy -->
         <move file="${source.path}/libbitwuzlaJNI.so"
@@ -1035,6 +1028,13 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="libgmp.so"/>
             <arg value="libbitwuzlaJNI-${bitwuzla.version}.so"/>
         </exec>
+
+        <!-- clean up the source tree -->
+        <delete includeemptydirs="true">
+            <fileset dir="${source.path}" includes="include/ src/"/>
+            <fileset dir="${source.path}"
+                     includes="bitwuzla_wrap.cpp bitwuzla_wrap.h bitwuzla_wrap.o"/>
+        </delete>
     </target>
 
     <target name="publish-bitwuzla" depends="package-bitwuzla, load-ivy"
