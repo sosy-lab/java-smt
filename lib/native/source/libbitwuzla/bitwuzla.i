@@ -68,7 +68,7 @@ namespace bitwuzla {
 %ignore operator<< (std::ostream &out, RoundingMode rm);
 
 /** Exception */
-%ignore Exception::Exception (const std::stringstream &stream);
+%ignore Exception;
 
 /** Options */
 %ignore Options::operator= (const Options &options);

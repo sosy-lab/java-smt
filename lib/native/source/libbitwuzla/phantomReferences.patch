@@ -10,18 +10,6 @@ diff -ru lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzl
    }
  
    public synchronized void delete() {
-diff -ru lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Exception.java lib/native/source/libbitwuzla/src.patched/org/sosy_lab/java_smt/solvers/bitwuzla/api/Exception.java
---- lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Exception.java	2024-01-30 02:17:08.706597398 +0100
-+++ lib/native/source/libbitwuzla/src.patched/org/sosy_lab/java_smt/solvers/bitwuzla/api/Exception.java	2024-01-30 02:13:50.576389963 +0100
-@@ -35,7 +35,7 @@
- 
-   @SuppressWarnings("deprecation")
-   protected void finalize() {
--    delete();
-+    //delete();
-   }
- 
-   public synchronized void delete() {
 diff -ru lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Map_TermTerm.java lib/native/source/libbitwuzla/src.patched/org/sosy_lab/java_smt/solvers/bitwuzla/api/Map_TermTerm.java
 --- lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Map_TermTerm.java	2024-01-30 02:16:53.494652530 +0100
 +++ lib/native/source/libbitwuzla/src.patched/org/sosy_lab/java_smt/solvers/bitwuzla/api/Map_TermTerm.java	2024-01-30 02:13:50.564390151 +0100
