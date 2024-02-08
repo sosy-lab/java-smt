@@ -11,8 +11,6 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -27,7 +25,7 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Term;
 
 final class BitwuzlaFormulaManager
     extends AbstractFormulaManager<Term, Sort, Void, BitwuzlaDeclaration> {
-
+  private final BitwuzlaFormulaCreator creator;
   private final Options bitwuzlaOption;
 
   BitwuzlaFormulaManager(
@@ -52,12 +50,15 @@ final class BitwuzlaFormulaManager
         null,
         null,
         null);
-
+    creator = pFormulaCreator;
     bitwuzlaOption = pBitwuzlaOptions;
   }
 
   @Override
-  public BooleanFormula parse(String s) throws IllegalArgumentException {
+  public BooleanFormula parse(String formulaStr) throws IllegalArgumentException {
+    // Strip the input string and remove everything but declarations and assertions
+    // FIXME: We should handle this in AbstractFormulaManager as it affects all solvers
+    String s = formulaStr;
     if (s.startsWith("(set-logic ")) {
       s = s.substring(1 + s.indexOf(')'));
     }
@@ -68,25 +69,14 @@ final class BitwuzlaFormulaManager
       s = s.replace("(exit)", "");
     }
 
-    // create a temporary file and dump the formulas to it in SMTLIB2 format
-    Path file;
-    try {
-      file = Files.createTempFile("bitwuzla-", ".smt2");
-      Files.writeString(file, s);
-    } catch (IOException e) {
-      throw new RuntimeException("Could not created temporary file for parsing", e);
-    }
-
-    // run the parser on the temporary file
-    Parser parser = new Parser(bitwuzlaOption, file.toString());
-    String error = parser.parse(true);
-
-    String errorMsg = String.format("Could not parse input string \"%s\": ", s);
-    Preconditions.checkArgument(error.isEmpty(), errorMsg + "Error \"%s\".", error);
+    Parser parser = new Parser(bitwuzlaOption);
+    parser.parse(s, true, false);
 
     Vector_Term assertions = parser.bitwuzla().get_assertions();
-    Preconditions.checkArgument(!assertions.isEmpty(), errorMsg + "No assertion was found.");
-    return getFormulaCreator().encapsulateBoolean(Iterables.getLast(assertions));
+    Preconditions.checkArgument(
+        !assertions.isEmpty(), "No assertion found in input string \"%s\"", formulaStr);
+
+    return creator.encapsulateBoolean(Iterables.getLast(assertions));
   }
 
   @Override
@@ -105,7 +95,9 @@ final class BitwuzlaFormulaManager
         }
         bitwuzla.assert_formula(pTerm);
         String dump = bitwuzla.print_formula();
-        dump = dump.replace("(set-logic ALL)", "");
+        if (dump.startsWith("(set-logic ")) {
+          dump = dump.substring(1 + dump.indexOf(')'));
+        }
         dump = dump.replace("(check-sat)", "");
         dump = dump.replace("(exit)", "");
         out.append(dump);
