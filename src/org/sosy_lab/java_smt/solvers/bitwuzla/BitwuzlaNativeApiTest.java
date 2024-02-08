@@ -9,12 +9,8 @@
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assertWithMessage;
 
 import com.google.common.truth.Truth;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import org.junit.After;
 import org.junit.AssumptionViolatedException;
 import org.junit.Before;
@@ -57,7 +53,7 @@ public class BitwuzlaNativeApiTest {
   private Options createOptions() {
     Options options = new Options();
     options.set(Option.REWRITE_LEVEL, 0);
-    options.set(Option.PRODUCE_MODELS, 1);
+    options.set(Option.PRODUCE_MODELS, 2);
     return options;
   }
 
@@ -68,12 +64,14 @@ public class BitwuzlaNativeApiTest {
     }
   }
 
-  //  @Test
-  //  public void functionWithNoArguments() {
-  //      Sort bool_sort = Bitwuzla.mk_bool_sort();
-  //      Term a = Bitwuzla.mk_var(bool_sort, "a");
-  //      Term noArgumentUF = Bitwuzla.mk_term(Kind.LAMBDA, a);
-  //  }
+  // Bitwuzla does not support lambdas with no argument
+  @Ignore
+  @Test
+  public void functionWithNoArguments() {
+    Sort bool_sort = Bitwuzla.mk_bool_sort();
+    Term a = Bitwuzla.mk_var(bool_sort, "a");
+    Term noArgumentUF = Bitwuzla.mk_term(Kind.LAMBDA, a);
+  }
 
   @Test
   public void signedFunctions() {
@@ -100,7 +98,7 @@ public class BitwuzlaNativeApiTest {
   }
 
   // FIXME: Bitwuzla fails this critically!
-  @Ignore
+  // -- This seems to be working now?
   @Test
   public void repeatedTermCreationInMultipleSolversTest() {
     Term tru1 = Bitwuzla.mk_true();
@@ -219,7 +217,6 @@ public class BitwuzlaNativeApiTest {
     assertThat(children3).isEmpty();
   }
 
-  @Ignore // FIXME
   @Test
   public void testBvArrayModelSelect() {
     Sort bvSort4 = Bitwuzla.mk_bv_sort(4);
@@ -245,7 +242,7 @@ public class BitwuzlaNativeApiTest {
     String arrAtZeroString = selectArrAtZero.symbol();
     assertThat(arrAtZeroString).isNull();
     // Get model value arr[0] as String
-    String arrAtZeroValueString = bitwuzla.get_value(selectArrAtZero).toString();
+    String arrAtZeroValueString = bitwuzla.get_value(selectArrAtZero).to_bv();
     // 00001011 == 11
     assertThat(arrAtZeroValueString).isEqualTo("00001011");
 
@@ -571,38 +568,28 @@ public class BitwuzlaNativeApiTest {
           + "(define-fun .def_14 () Bool (or e .def_13))\n"
           + "(assert .def_14)";
 
-  private Vector_Term parse(String smt2dump) throws IOException {
-    // create a temporary file and dump the formulas to it in SMTLIB2 format
-    Path file = Files.createTempFile("bitwuzla-", ".smt2");
-    Files.writeString(file, smt2dump);
-
-    // run the parser on the temporary file
-    Parser parser = new Parser(createOptions(), file.toString());
-    String error = parser.parse(true);
-
-    assertWithMessage(error).that(error).isEmpty();
+  private Vector_Term parse(String smt2dump) {
+    Parser parser = new Parser(createOptions());
+    parser.parse(smt2dump, true, false);
     return parser.bitwuzla().get_assertions();
   }
 
   // Bitwuzla currently REWRITES terms when parsing
   @Ignore
   @Test
-  public void parserTest2() throws IOException {
+  public void parserTest2() {
     Vector_Term assertions = parse(SMT2DUMP);
     bitwuzla.push(1);
     bitwuzla.assert_formula(assertions.get(0));
     String newDump = bitwuzla.print_formula();
-    if (newDump.contains("(check-sat)")) {
-      newDump = newDump.replace("(check-sat)", "");
-    }
-    if (newDump.contains("(exit)")) {
-      newDump = newDump.replace("(exit)", "");
-    }
+    newDump = newDump.replace("(set-logic ALL)", "");
+    newDump = newDump.replace("(check-sat)", "");
+    newDump = newDump.replace("(exit)", "");
     assertThat(newDump).isEqualTo(SMT2DUMP);
   }
 
   @Test
-  public void parserTest() throws IOException {
+  public void parserTest() {
     Sort boolSort = Bitwuzla.mk_bool_sort();
     Term x = Bitwuzla.mk_const(boolSort, "x");
     Term y = Bitwuzla.mk_const(boolSort, "y");
@@ -610,11 +597,8 @@ public class BitwuzlaNativeApiTest {
     bitwuzla.push(1);
     bitwuzla.assert_formula(xOrY);
 
+    // dump formulas in SMTLIB2 format
     String dump = bitwuzla.print_formula();
-    System.out.println(dump);
-    // check-sat and exit messes with the parse, in that suddenly sat is checked and the formulas
-    // are rewritten and then returned in a different form, independent of options
-
     bitwuzla.pop(1);
 
     // parse the dumped formulas
@@ -630,18 +614,14 @@ public class BitwuzlaNativeApiTest {
     assertThat(newDump).isEqualTo(dump);
   }
 
-  /*
-  @Ignore
-  @Test
-  public void parserFailTest() throws IOException {
+  @Test(expected = IllegalArgumentException.class)
+  public void parserFailTest() {
     // valid
-    String input = "(declare-const a Bool)\n(declare-const b Bool)\n(assert (or a b))";
+    String input = "(declare-const a Bool)(declare-const b Bool)(assert (or a b))";
     Vector_Term assertions = parse(input);
     assertThat(assertions).isNotEmpty();
     // invalid/fails
-    String badInput = "(declare-const a Bool)\n(assert (or a b))";
-    assertions = parse(badInput);
-    // FIXME: Throw an exception in swig if the parse failed
+    String badInput = "(declare-const a Bool)(assert (or a b))";
+    parse(badInput);
   }
-  */
 }
