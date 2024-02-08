@@ -17,7 +17,6 @@
 #include <sstream>
 
 #include <cassert>
-
 %}
 
 %include <stdint.i>
@@ -575,18 +574,18 @@ namespace bitwuzla {
 %include "include/bitwuzla/cpp/bitwuzla.h"
 
 namespace bitwuzla::parser {
-%ignore Parser::Parser(
-  Options &options,
-  const std::string &infile_name,
-  const std::string &language,
-  std::ostream *out = &std::cout);
+%exception {
+  try {
+    $action
+  } catch(Exception& e) {
+    jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
+    jenv->ThrowNew(exceptionType, e.what());
+    return $null;
+  }
+}
 
-%ignore Parser::Parser(
-  Options &options,
-  const std::string &infile_name,
-  FILE *infile,
-  const std::string &language = "smt2",
-  std::ostream *out = &std::cout);
+/** Exception */
+%ignore Exception;
 }
 
 %include "include/bitwuzla/cpp/parser.h"
