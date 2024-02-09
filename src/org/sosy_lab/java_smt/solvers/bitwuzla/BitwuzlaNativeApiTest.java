@@ -65,13 +65,13 @@ public class BitwuzlaNativeApiTest {
   }
 
   // Bitwuzla does not support lambdas with no argument
-  @Ignore
-  @Test
-  public void functionWithNoArguments() {
-    Sort bool_sort = Bitwuzla.mk_bool_sort();
-    Term a = Bitwuzla.mk_var(bool_sort, "a");
-    Term noArgumentUF = Bitwuzla.mk_term(Kind.LAMBDA, a);
-  }
+  //@Ignore
+  //@Test
+  //public void functionWithNoArguments() {
+  //  Sort bool_sort = Bitwuzla.mk_bool_sort();
+  //  Term a = Bitwuzla.mk_var(bool_sort, "a");
+  //  Bitwuzla.mk_term(Kind.LAMBDA, a);
+  //}
 
   @Test
   public void signedFunctions() {
@@ -614,6 +614,7 @@ public class BitwuzlaNativeApiTest {
     assertThat(newDump).isEqualTo(dump);
   }
 
+  @SuppressWarnings("unused")
   @Test(expected = IllegalArgumentException.class)
   public void parserFailTest() {
     // valid
@@ -622,6 +623,6 @@ public class BitwuzlaNativeApiTest {
     assertThat(assertions).isNotEmpty();
     // invalid/fails
     String badInput = "(declare-const a Bool)(assert (or a b))";
-    parse(badInput);
+    assertions = parse(badInput);
   }
 }
