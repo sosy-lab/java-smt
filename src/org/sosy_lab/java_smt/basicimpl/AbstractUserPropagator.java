@@ -46,13 +46,17 @@ public abstract class AbstractUserPropagator implements UserPropagator  {
   }
 
   @Override
-  public final void injectBackend(PropagatorBackend backend) {
+  public void initializeWithBackend(PropagatorBackend backend) {
+    Preconditions.checkState(this.backend == null,
+        "Trying to register a user propagator that has been registered before.");
     this.backend = Preconditions.checkNotNull(backend);
   }
 
   @Override
   public void registerExpression(BooleanFormula theoryExpr) {
-    Preconditions.checkState(backend != null);
+    Preconditions.checkState(backend != null,
+        "Uninitialized backend. Make sure to register the user propagator with the prover"
+            + "before calling this method.");
     backend.registerExpression(theoryExpr);
   }
 

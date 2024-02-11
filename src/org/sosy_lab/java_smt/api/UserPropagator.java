@@ -77,18 +77,17 @@ public interface UserPropagator {
   void onDecision(BooleanFormula expr, boolean value);
 
   /**
-   * Connects this user propagator with a {@link PropagatorBackend}. The backend is used
-   * to register expressions, raise conflicts, propagate consequences, etc.
-   * @param backend The propagator backend.
+   * This method is invoked after the user propagator is registered via
+   * {@link ProverEnvironment#registerUserPropagator(UserPropagator)}.
+   * The user can enable notifications by accessing the provided {@link PropagatorBackend}.
+   *
+   * <p>
+   *   Warning: During its lifetime, a user propagator shall only be registered once
+   *   via {@link ProverEnvironment#registerUserPropagator(UserPropagator)} for otherwise
+   *   unexpected errors can occur.
+   *   Implementations are advised to throw exceptions if this method is called multiple times.
    */
-  void injectBackend(PropagatorBackend backend);
-
-  /**
-   * This method is similar to a constructor but is guaranteed to get invoked only after
-   * {@link #injectBackend} was successfully called.
-   * The user can enable notifications by accessing the injected {@link PropagatorBackend}.
-   */
-  void initialize();
+  void initializeWithBackend(PropagatorBackend backend);
 
   /**
    * Registers an expression to be observed by the {@link UserPropagator}.

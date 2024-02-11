@@ -90,7 +90,7 @@ final class Z3UserPropagator extends UserPropagatorBase implements PropagatorBac
 
   @Override
   protected void decideWrapper(long lvar, int bit, boolean is_pos) {
-    // We currently only allow tracking of decision on boolean formulas
+    // We currently only allow tracking of decision on boolean formulas,
     // so we ignore the <bit> parameter
     userPropagator.onDecision(encapsulate(lvar), is_pos);
   }

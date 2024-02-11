@@ -164,8 +164,7 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
       propagator.close();
     }
     propagator = new Z3UserPropagator(z3context, z3solver, creator, mgr, prop);
-    prop.injectBackend(propagator);
-    prop.initialize();
+    prop.initializeWithBackend(propagator);
     return true;
   }
 
@@ -186,6 +185,7 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
       Native.solverDecRef(z3context, z3solver);
       if (propagator != null) {
         propagator.close();
+        propagator = null;
       }
       shutdownNotifier.unregister(interruptListener);
     }

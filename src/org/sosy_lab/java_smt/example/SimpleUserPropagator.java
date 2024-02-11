@@ -23,6 +23,7 @@ import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
+import org.sosy_lab.java_smt.api.PropagatorBackend;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
@@ -188,7 +189,8 @@ public class SimpleUserPropagator {
     }
 
     @Override
-    public void initialize() {
+    public void initializeWithBackend(PropagatorBackend backend) {
+      super.initializeWithBackend(backend);
       // Enable callbacks
       backend.notifyOnKnownValue();
       backend.notifyOnDecision();

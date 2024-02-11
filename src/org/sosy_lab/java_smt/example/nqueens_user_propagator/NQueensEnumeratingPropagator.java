@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.example.nqueens_user_propagator;
 
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.PropagatorBackend;
 import org.sosy_lab.java_smt.basicimpl.AbstractUserPropagator;
 
 import java.util.*;
@@ -67,8 +68,10 @@ public class NQueensEnumeratingPropagator extends AbstractUserPropagator {
   }
 
   @Override
-  public void initialize() {
+  public void initializeWithBackend(PropagatorBackend backend) {
+    super.initializeWithBackend(backend);
     backend.notifyOnFinalCheck();
     backend.notifyOnKnownValue();
   }
+
 }

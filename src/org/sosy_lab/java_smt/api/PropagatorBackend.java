@@ -71,9 +71,9 @@ public interface PropagatorBackend {
 
   /**
    * Enables tracking of expression values for the associated {@link UserPropagator} via
-   * {@link UserPropagator#onKnownValue(BooleanFormula, BooleanFormula)}.
+   * {@link UserPropagator#onKnownValue}.
    *
-   * <p>This function is typically called from {@link UserPropagator#initialize()} if the
+   * <p>This function is typically called from {@link UserPropagator#initializeWithBackend} if the
    * theory solver needs to listen to the value of expressions registered by
    * {@link #registerExpression}.
    */
@@ -83,7 +83,7 @@ public interface PropagatorBackend {
    * Enables tracking of decisions made for the associated {@link UserPropagator} via
    * {@link UserPropagator#onDecision(BooleanFormula, boolean)}.
    *
-   * <p>This function is typically called from {@link UserPropagator#initialize()} if the
+   * <p>This function is typically called from {@link UserPropagator#initializeWithBackend} if the
    * theory solver needs to listen to and/or modify the decisions made by the solver on
    * expressions registered by {@link #registerExpression}.
    */
@@ -93,7 +93,7 @@ public interface PropagatorBackend {
    * Enables the final callback {@link UserPropagator#onFinalCheck()} that is invoked
    * when the solver finds a full satisfying assignment.
    *
-   * <p>This function is typically called from {@link UserPropagator#initialize()} if the
+   * <p>This function is typically called from {@link UserPropagator#initializeWithBackend} if the
    * theory solver needs to perform final consistency checks.
    */
   void notifyOnFinalCheck();
