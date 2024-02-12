@@ -30,7 +30,7 @@ public interface PropagatorBackend {
    * a callback by {@link UserPropagator} such as {@link UserPropagator#onKnownValue} and {@link
    * UserPropagator#onFinalCheck()}.
    *
-   * <p>Effectively causes the solver to learn the implication "{@code conflictExpressions} =>
+   * <p>Effectively causes the solver to learn the implication "{@code conflictExpressions} =&gt;
    * false"
    *
    * @param conflictExpressions A set of inconsistent assignments.
@@ -42,7 +42,7 @@ public interface PropagatorBackend {
    * within a callback by {@link UserPropagator} such as {@link UserPropagator#onKnownValue} and
    * {@link UserPropagator#onFinalCheck()}.
    *
-   * <p>Effectively causes the solver to learn the implication "/\ {@code assignedExpressions} =>
+   * <p>Effectively causes the solver to learn the implication "/\ {@code assignedExpressions} =&gt;
    * {@code consequence}" It is possible to have an empty set of {@code assignedExpressions} to
    * generate a theory lemma.
    *

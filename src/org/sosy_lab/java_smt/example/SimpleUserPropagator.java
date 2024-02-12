@@ -32,6 +32,8 @@ import org.sosy_lab.java_smt.basicimpl.AbstractUserPropagator;
 /** Example of a simple user propagator that prohibits variables/expressions to be set to true. */
 public class SimpleUserPropagator {
 
+  private SimpleUserPropagator() {}
+
   public static void main(String[] args)
       throws InvalidConfigurationException, InterruptedException, SolverException {
     Configuration config = Configuration.defaultConfiguration();
@@ -157,7 +159,7 @@ public class SimpleUserPropagator {
     private final List<BooleanFormula> disabledExpressions = new ArrayList<>();
     private final LogManager logger;
 
-    public MyUserPropagator(LogManager logger) {
+    MyUserPropagator(LogManager logger) {
       this.logger = logger;
     }
 
@@ -176,7 +178,7 @@ public class SimpleUserPropagator {
       logger.log(Level.INFO, "Solver assigned", expr, "to", value);
       if (value && disabledExpressions.contains(expr)) {
         logger.log(Level.INFO, "User propagator raised conflict on", expr);
-        backend.propagateConflict(new BooleanFormula[] {expr});
+        getBackend().propagateConflict(new BooleanFormula[] {expr});
       }
     }
 
@@ -188,7 +190,7 @@ public class SimpleUserPropagator {
       // decision the solver would make.
       for (BooleanFormula disExpr : disabledExpressions) {
         final boolean decisionValue = true;
-        if (backend.propagateNextDecision(disExpr, Optional.of(decisionValue))) {
+        if (getBackend().propagateNextDecision(disExpr, Optional.of(decisionValue))) {
           // The above call returns "true" if the provided literal is yet undecided, otherwise
           // false.
           logger.log(

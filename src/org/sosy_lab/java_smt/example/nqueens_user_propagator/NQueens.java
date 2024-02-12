@@ -357,7 +357,7 @@ public class NQueens {
     }
 
     AllSatCallback<Integer> cb =
-        new AllSatCallback<Integer>() {
+        new AllSatCallback<>() {
           int counter = 0;
 
           @Override

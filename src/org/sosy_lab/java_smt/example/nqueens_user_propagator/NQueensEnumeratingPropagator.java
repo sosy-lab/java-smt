@@ -63,7 +63,7 @@ public class NQueensEnumeratingPropagator extends AbstractUserPropagator {
 
     // Raise conflict on the whole model to force the solver to find another one.
     // NOTE: It should be sufficient to raise a conflict on only the positive variables.
-    backend.propagateConflict(fixedVariables.toArray(new BooleanFormula[0]));
+    getBackend().propagateConflict(fixedVariables.toArray(new BooleanFormula[0]));
   }
 
   @Override
