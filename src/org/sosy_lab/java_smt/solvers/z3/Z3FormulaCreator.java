@@ -155,7 +155,6 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     } else {
       referenceListHead = null;
     }
-
   }
 
   final Z3Exception handleZ3Exception(Z3Exception e) throws Z3Exception, InterruptedException {
@@ -1017,6 +1016,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   }
 
   /** Closing the context. */
+  @SuppressWarnings("empty-statement")
   public void forceClose() {
     // Force clean all ASTs, even those which were not GC'd yet.
     if (usePhantomReferences) {
@@ -1032,10 +1032,11 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       tail.prev = referenceListHead;
 
       // Remove already enqueued references.
-      // NOTE: Together with the above list deletion, this will guarantee that no more ast
-      // references are reachable by the GC making them all eligible for garbage collection and
-      // preventing them from getting enqueued into the reference queue in the future.
-      while (referenceQueue.poll() != null);
+      while (referenceQueue.poll() != null) {
+        // NOTE: Together with the above list deletion, this empty loop will guarantee that no more
+        // ast references are reachable by the GC making them all eligible for garbage collection
+        // and preventing them from getting enqueued into the reference queue in the future.
+      }
     }
   }
 
