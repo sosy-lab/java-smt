@@ -8,20 +8,28 @@
 
 package org.sosy_lab.java_smt.example.nqueens_user_propagator;
 
-import io.github.cvc5.Pair;
 import java.util.HashMap;
-
 import java.util.Map;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 
 /**
- * In addition to the enumeration done by {@link NQueensEnumeratingPropagator},
- * this propagator also enforces the queen placement constraints without explicit encoding.
+ * In addition to the enumeration done by {@link NQueensEnumeratingPropagator}, this propagator also
+ * enforces the queen placement constraints without explicit encoding.
  */
 public class NQueensConstraintPropagator extends NQueensEnumeratingPropagator {
+
+  private static class Coordinates {
+    final int x;
+    final int y;
+
+    private Coordinates(int pX, int pY) {
+      x = pX;
+      y = pY;
+    }
+  }
+
   private final BooleanFormula[][] symbols;
-  private final Map<BooleanFormula, Pair<Integer, Integer>> symbolToCoordinates;
+  private final Map<BooleanFormula, Coordinates> symbolToCoordinates;
 
   public NQueensConstraintPropagator(BooleanFormula[][] symbols) {
     this.symbols = symbols;
@@ -32,7 +40,7 @@ public class NQueensConstraintPropagator extends NQueensEnumeratingPropagator {
   private void fillCoordinateMap() {
     for (int i = 0; i < symbols[0].length; i++) {
       for (int j = 0; j < symbols[i].length; j++) {
-        symbolToCoordinates.put(symbols[i][j], new Pair<>(i, j));
+        symbolToCoordinates.put(symbols[i][j], new Coordinates(i, j));
       }
     }
   }
@@ -41,19 +49,19 @@ public class NQueensConstraintPropagator extends NQueensEnumeratingPropagator {
   public void onKnownValue(BooleanFormula var, boolean value) {
     if (value) {
       // Check if the placed queen conflicts with another queen
-      Pair<Integer, Integer> coordinates = symbolToCoordinates.get(var);
+      Coordinates coordinates = symbolToCoordinates.get(var);
       for (BooleanFormula other : fixedVariables) {
         if (currentModel.get(other)) {
-          Pair<Integer, Integer> otherCoordinates = symbolToCoordinates.get(other);
+          Coordinates otherCoordinates = symbolToCoordinates.get(other);
 
-          int x1 = coordinates.first;
-          int y1 = coordinates.second;
-          int x2 = otherCoordinates.first;
-          int y2 = otherCoordinates.second;
+          int x1 = coordinates.x;
+          int y1 = coordinates.y;
+          int x2 = otherCoordinates.x;
+          int y2 = otherCoordinates.y;
           if (x1 == x2 || y1 == y2 || Math.abs(x1 - x2) == Math.abs(y1 - y2)) {
             // We have two queens on the same row, same column, or same diagonal.
             // This is not allowed, so we raise a conflict.
-            backend.propagateConflict(new BooleanFormula[] { var, other });
+            backend.propagateConflict(new BooleanFormula[] {var, other});
           }
         }
       }
@@ -61,5 +69,4 @@ public class NQueensConstraintPropagator extends NQueensEnumeratingPropagator {
 
     super.onKnownValue(var, value);
   }
-
 }

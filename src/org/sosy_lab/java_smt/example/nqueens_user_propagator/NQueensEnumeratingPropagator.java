@@ -8,30 +8,35 @@
 
 package org.sosy_lab.java_smt.example.nqueens_user_propagator;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.PropagatorBackend;
 import org.sosy_lab.java_smt.basicimpl.AbstractUserPropagator;
 
-import java.util.*;
-
 /**
- * This propagator enumerates the solutions of the Nqueens problem
- * by raising a conflict whenever the solver finds a model.
+ * This propagator enumerates the solutions of the NQueens problem by raising a conflict whenever
+ * the solver finds a model.
  */
 public class NQueensEnumeratingPropagator extends AbstractUserPropagator {
   // For backtracking
   protected final Deque<Integer> fixedCount = new ArrayDeque<>();
   protected final Deque<BooleanFormula> fixedVariables = new ArrayDeque<>();
-
   protected final Map<BooleanFormula, Boolean> currentModel = new HashMap<>();
 
   // Set of found solutions
-  // Implementation note: The hashcodes of the different Nqueens models tend to overlap (due to
+  // Implementation note: The hashcodes of the different NQueens models tend to overlap (due to
   // patterns in the models) which degrades the <modelSet>'s performance.
   // So instead, we transform the model before storing it.
   protected final Set<Map<BooleanFormula, Integer>> modelSet = new HashSet<>();
 
-  public int getNumOfSolutions() { return modelSet.size(); }
+  public int getNumOfSolutions() {
+    return modelSet.size();
+  }
 
   @Override
   public void onPush() {
@@ -73,5 +78,4 @@ public class NQueensEnumeratingPropagator extends AbstractUserPropagator {
     backend.notifyOnFinalCheck();
     backend.notifyOnKnownValue();
   }
-
 }

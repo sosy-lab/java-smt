@@ -20,9 +20,9 @@ import org.sosy_lab.common.log.BasicLogManager;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.api.BasicProverEnvironment.AllSatCallback;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
-import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
@@ -41,6 +41,36 @@ import org.sosy_lab.java_smt.api.SolverException;
  * </pre>
  */
 public class NQueens {
+  private static final String HELP_TEXT =
+      "Please specify two numbers: the size N of the NQueens problem and a "
+          + "method M for solving it. The method M can be one of:\n"
+          + "0: plain SMT solving,\n"
+          + "1: plain SMT solving using ALL_SAT,\n"
+          + "2: with enumerating propagation,\n"
+          + "3: with more propagation";
+
+  private enum Method {
+    SMT(0),
+    SMT_ALL_SAT(1),
+    ENUMERATING_PROPAGATOR(2),
+    CONSTRAINTS_PROPAGATOR(3);
+
+    private final int idx;
+
+    Method(int i) {
+      idx = i;
+    }
+
+    static Method of(int i) {
+      for (Method method : Method.values()) {
+        if (method.idx == i) {
+          return method;
+        }
+      }
+      throw new AssertionError("unexpected method: " + i);
+    }
+  }
+
   private final SolverContext context;
   private final BooleanFormulaManager bmgr;
   private final int n;
@@ -57,27 +87,53 @@ public class NQueens {
     LogManager logger = BasicLogManager.create(config);
     ShutdownNotifier notifier = ShutdownNotifier.createDummy();
 
+    // this example uses Z3, because it is currently the only solver providing user propagation.
     try (SolverContext context =
-        SolverContextFactory.createSolverContext(config, logger, notifier, Solvers.Z3);
-         ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS,
-             ProverOptions.GENERATE_ALL_SAT)) {
-      int n = Integer.parseInt(args[0]);
-      int method = Integer.parseInt(args[1]);
+            SolverContextFactory.createSolverContext(config, logger, notifier, Solvers.Z3);
+        ProverEnvironment prover =
+            context.newProverEnvironment(
+                ProverOptions.GENERATE_MODELS, ProverOptions.GENERATE_ALL_SAT)) {
+
+      // parse input parameters
+      if (args == null || args.length != 2) {
+        System.out.println(HELP_TEXT);
+        return;
+      }
+      final int n;
+      final Method method;
+      try {
+        n = Integer.parseInt(args[0]);
+        method = Method.of(Integer.parseInt(args[1]));
+      } catch (NumberFormatException e) {
+        System.out.println(HELP_TEXT);
+        return;
+      }
 
       long timeSnapshot = System.currentTimeMillis();
       NQueens myQueen = new NQueens(context, n);
       int solutions;
-      if (method == 1) {
-        System.out.println("Enumerating Nqueens solutions with classical blocking clauses.");
-        solutions = myQueen.enumerateSolutionsClassic(prover);
-      } else if (method == 2) {
-        System.out.println("Enumerating Nqueens solutions with enumerating propagator.");
-        solutions = myQueen.enumerateSolutionsWithPropagator(prover);
-      } else if (method == 3) {
-        System.out.println("Enumerating Nqueens solutions with enumerating and constraining propagator.");
-        solutions = myQueen.enumerateSolutionsWithConstraintPropagator(prover);
-      } else {
-        throw new IllegalArgumentException("The second method argument must be in {1, 2, 3}.");
+      switch (method) {
+        case SMT:
+          System.out.println("Enumerating NQueens solutions with classical blocking clauses.");
+          solutions = myQueen.enumerateSolutionsClassic(prover);
+          break;
+        case SMT_ALL_SAT:
+          System.out.println(
+              "Enumerating NQueens solutions with classical blocking clauses using all-sat"
+                  + " iteration.");
+          solutions = myQueen.enumerateSolutionsClassicAllSat(prover);
+          break;
+        case ENUMERATING_PROPAGATOR:
+          System.out.println("Enumerating NQueens solutions with enumerating propagator.");
+          solutions = myQueen.enumerateSolutionsWithPropagator(prover);
+          break;
+        case CONSTRAINTS_PROPAGATOR:
+          System.out.println(
+              "Enumerating NQueens solutions with enumerating and constraining propagator.");
+          solutions = myQueen.enumerateSolutionsWithConstraintPropagator(prover);
+          break;
+        default:
+          throw new IllegalArgumentException("Unexpected method for solving  NQueens: " + method);
       }
       long passedMillis = System.currentTimeMillis() - timeSnapshot;
       System.out.printf("Found %d solutions in %.2f seconds%n", solutions, (passedMillis / 1000d));
@@ -88,7 +144,6 @@ public class NQueens {
       logger.logUserException(Level.INFO, e, e.getMessage());
     }
   }
-
 
   /**
    * Creates a 2D array of BooleanFormula objects to represent the variables for each cell in a grid
@@ -253,16 +308,17 @@ public class NQueens {
     return rules;
   }
 
-  private int enumerateSolutionsClassic(ProverEnvironment prover) throws InterruptedException, SolverException {
+  private int enumerateSolutionsClassic(ProverEnvironment prover)
+      throws InterruptedException, SolverException {
     BooleanFormula[][] symbols = getSymbols();
-    // Add full Nqueens encoding
+    // Add full NQueens encoding
     List<BooleanFormula> rules =
-            ImmutableList.<BooleanFormula>builder()
-                    .addAll(rowRule1(symbols))
-                    .addAll(rowRule2(symbols))
-                    .addAll(columnRule(symbols))
-                    .addAll(diagonalRule(symbols))
-                    .build();
+        ImmutableList.<BooleanFormula>builder()
+            .addAll(rowRule1(symbols))
+            .addAll(rowRule2(symbols))
+            .addAll(columnRule(symbols))
+            .addAll(diagonalRule(symbols))
+            .build();
     prover.addConstraint(bmgr.and(rules));
 
     // Enumerate all solutions by iteratively adding blocking clauses
@@ -279,16 +335,56 @@ public class NQueens {
     return numSolutions;
   }
 
-  private int enumerateSolutionsWithPropagator(ProverEnvironment prover) throws InterruptedException, SolverException {
+  private int enumerateSolutionsClassicAllSat(ProverEnvironment prover)
+      throws InterruptedException, SolverException {
     BooleanFormula[][] symbols = getSymbols();
-    // Add full Nqueens encoding
+    // Add full NQueens encoding
     List<BooleanFormula> rules =
-            ImmutableList.<BooleanFormula>builder()
-                    .addAll(rowRule1(symbols))
-                    .addAll(rowRule2(symbols))
-                    .addAll(columnRule(symbols))
-                    .addAll(diagonalRule(symbols))
-                    .build();
+        ImmutableList.<BooleanFormula>builder()
+            .addAll(rowRule1(symbols))
+            .addAll(rowRule2(symbols))
+            .addAll(columnRule(symbols))
+            .addAll(diagonalRule(symbols))
+            .build();
+    prover.addConstraint(bmgr.and(rules));
+
+    // Enumerate all solutions by iteratively adding blocking clauses
+    List<BooleanFormula> predicates = new ArrayList<>();
+    for (int row = 0; row < n; row++) {
+      for (int col = 0; col < n; col++) {
+        predicates.add(symbols[row][col]);
+      }
+    }
+
+    AllSatCallback<Integer> cb =
+        new AllSatCallback<Integer>() {
+          int counter = 0;
+
+          @Override
+          public void apply(List<BooleanFormula> model) {
+            counter++;
+          }
+
+          @Override
+          public Integer getResult() {
+            return counter;
+          }
+        };
+    int numSolutions = prover.allSat(cb, predicates);
+    return numSolutions;
+  }
+
+  private int enumerateSolutionsWithPropagator(ProverEnvironment prover)
+      throws InterruptedException, SolverException {
+    BooleanFormula[][] symbols = getSymbols();
+    // Add full NQueens encoding
+    List<BooleanFormula> rules =
+        ImmutableList.<BooleanFormula>builder()
+            .addAll(rowRule1(symbols))
+            .addAll(rowRule2(symbols))
+            .addAll(columnRule(symbols))
+            .addAll(diagonalRule(symbols))
+            .build();
     prover.addConstraint(bmgr.and(rules));
 
     // Enumerate all solutions via a custom user propagator.
@@ -301,26 +397,28 @@ public class NQueens {
     }
 
     boolean isUnsat = prover.isUnsat();
-    Verify.verify(isUnsat); // The propagator should make sure that the instance becomes unsat by eventually
-    // blocking all models.
+    Verify.verify(isUnsat);
+    // The propagator makes sure that the instance becomes unsat by eventually blocking all models.
 
     return enumeratingPropagator.getNumOfSolutions();
   }
 
-  private int enumerateSolutionsWithConstraintPropagator(ProverEnvironment prover) throws InterruptedException, SolverException {
+  private int enumerateSolutionsWithConstraintPropagator(ProverEnvironment prover)
+      throws InterruptedException, SolverException {
     BooleanFormula[][] symbols = getSymbols();
-    // Add partial Nqueens encoding (only enforce a queen per row)
-    // The remaining constraints are enforced by the user propagator
+    // Add partial NQueens encoding (only enforce a queen per row).
+    // The remaining constraints are enforced by the user propagator.
     List<BooleanFormula> rules =
-            ImmutableList.<BooleanFormula>builder()
-                    .addAll(rowRule1(symbols))
-                    //.addAll(rowRule2(symbols))
-                    //.addAll(columnRule(symbols))
-                    //.addAll(diagonalRule(symbols))
-                    .build();
+        ImmutableList.<BooleanFormula>builder()
+            .addAll(rowRule1(symbols))
+            // .addAll(rowRule2(symbols))
+            // .addAll(columnRule(symbols))
+            // .addAll(diagonalRule(symbols))
+            .build();
     prover.addConstraint(bmgr.and(rules));
 
-    // Enumerate all solutions via a custom user propagator that enforces unique placement constraints.
+    // Enumerate all solutions via a custom user propagator that enforces unique placement
+    // constraints.
     NQueensConstraintPropagator constraintPropagator = new NQueensConstraintPropagator(symbols);
     Verify.verify(prover.registerUserPropagator(constraintPropagator));
     for (BooleanFormula[] symbolRow : symbols) {
@@ -330,10 +428,9 @@ public class NQueens {
     }
 
     boolean isUnsat = prover.isUnsat();
-    Verify.verify(isUnsat); // The propagator should make sure that the instance becomes unsat by eventually
-    // blocking all models.
+    Verify.verify(isUnsat);
+    // The propagator makes sure that the instance becomes unsat by eventually blocking all models.
 
     return constraintPropagator.getNumOfSolutions();
   }
-
 }
