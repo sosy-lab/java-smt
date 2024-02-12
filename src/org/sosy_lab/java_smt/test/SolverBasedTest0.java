@@ -349,6 +349,13 @@ public abstract class SolverBasedTest0 {
         .isNotEqualTo(Solvers.BOOLECTOR);
   }
 
+  protected void requireUserPropagators() {
+    assume()
+        .withMessage("Solver %s does not support user propagation", solverToUse())
+        .that(solverToUse())
+        .isEqualTo(Solvers.Z3);
+  }
+
   /**
    * Use this for checking assertions about BooleanFormulas with Truth: <code>
    * assertThatFormula(formula).is...()</code>.

@@ -24,6 +24,12 @@ public abstract class AbstractUserPropagator implements UserPropagator {
   }
 
   @Override
+  public void onPush() {}
+
+  @Override
+  public void onPop(int numPoppedLevels) {}
+
+  @Override
   public void onFinalCheck() {}
 
   @Override
