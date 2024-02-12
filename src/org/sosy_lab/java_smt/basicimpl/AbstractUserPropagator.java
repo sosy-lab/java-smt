@@ -23,41 +23,36 @@ package org.sosy_lab.java_smt.basicimpl;
 import com.google.common.base.Preconditions;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.UserPropagator;
 import org.sosy_lab.java_smt.api.PropagatorBackend;
+import org.sosy_lab.java_smt.api.UserPropagator;
 
-public abstract class AbstractUserPropagator implements UserPropagator  {
+public abstract class AbstractUserPropagator implements UserPropagator {
 
   protected @Nullable PropagatorBackend backend;
 
   @Override
-  public void onFinalCheck() {
-
-  }
+  public void onFinalCheck() {}
 
   @Override
-  public void onKnownValue(BooleanFormula expr, boolean value) {
-
-  }
+  public void onKnownValue(BooleanFormula expr, boolean value) {}
 
   @Override
-  public void onDecision(BooleanFormula expr, boolean value) {
-
-  }
+  public void onDecision(BooleanFormula expr, boolean value) {}
 
   @Override
   public void initializeWithBackend(PropagatorBackend backend) {
-    Preconditions.checkState(this.backend == null,
+    Preconditions.checkState(
+        this.backend == null,
         "Trying to register a user propagator that has been registered before.");
     this.backend = Preconditions.checkNotNull(backend);
   }
 
   @Override
   public void registerExpression(BooleanFormula theoryExpr) {
-    Preconditions.checkState(backend != null,
+    Preconditions.checkState(
+        backend != null,
         "Uninitialized backend. Make sure to register the user propagator with the prover"
             + "before calling this method.");
     backend.registerExpression(theoryExpr);
   }
-
 }

@@ -8,12 +8,11 @@
 
 package org.sosy_lab.java_smt.example;
 
+import com.google.common.base.Verify;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
-
-import com.google.common.base.Verify;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -30,19 +29,17 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractUserPropagator;
 
-/**
- * Example of a simple user propagator that prohibits variables/expressions to be set to true.
- */
+/** Example of a simple user propagator that prohibits variables/expressions to be set to true. */
 public class SimpleUserPropagator {
 
-  public static void main (String[] args) throws InvalidConfigurationException,
-                                                 InterruptedException, SolverException {
+  public static void main(String[] args)
+      throws InvalidConfigurationException, InterruptedException, SolverException {
     Configuration config = Configuration.defaultConfiguration();
     LogManager logger = BasicLogManager.create(config);
     ShutdownNotifier notifier = ShutdownNotifier.createDummy();
 
-    try (SolverContext context = SolverContextFactory.createSolverContext(config, logger, notifier,
-            Solvers.Z3)) {
+    try (SolverContext context =
+        SolverContextFactory.createSolverContext(config, logger, notifier, Solvers.Z3)) {
       final BooleanFormulaManager bmgr = context.getFormulaManager().getBooleanFormulaManager();
 
       testWithBlockedLiterals(context, bmgr, logger);
@@ -54,11 +51,11 @@ public class SimpleUserPropagator {
     } catch (UnsupportedOperationException e) {
       logger.logUserException(Level.INFO, e, e.getMessage());
     }
-
   }
 
-  private static void testWithBlockedLiterals(SolverContext context, BooleanFormulaManager bmgr,
-                                 LogManager logger) throws InterruptedException, SolverException {
+  private static void testWithBlockedLiterals(
+      SolverContext context, BooleanFormulaManager bmgr, LogManager logger)
+      throws InterruptedException, SolverException {
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       // assert "p or q or r or s"
       BooleanFormula p = bmgr.makeVariable("p");
@@ -68,8 +65,11 @@ public class SimpleUserPropagator {
       BooleanFormula clause = bmgr.or(p, q, r, s);
       prover.addConstraint(clause);
 
-      logger.log(Level.INFO, "========== Checking satisfiability of", clause, "while blocking "
-          + "all literals ==========");
+      logger.log(
+          Level.INFO,
+          "========== Checking satisfiability of",
+          clause,
+          "while blocking " + "all literals ==========");
 
       // Create user propagator that prohibits variables to be set to true
       MyUserPropagator myUserPropagator = new MyUserPropagator(logger);
@@ -85,8 +85,9 @@ public class SimpleUserPropagator {
     }
   }
 
-  private static void testWithBlockedClause(SolverContext context, BooleanFormulaManager bmgr,
-                                         LogManager logger) throws InterruptedException, SolverException {
+  private static void testWithBlockedClause(
+      SolverContext context, BooleanFormulaManager bmgr, LogManager logger)
+      throws InterruptedException, SolverException {
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       // assert "p or q or r or s"
       BooleanFormula p = bmgr.makeVariable("p");
@@ -96,8 +97,11 @@ public class SimpleUserPropagator {
       BooleanFormula clause = bmgr.or(p, q, r, s);
       prover.addConstraint(clause);
 
-      logger.log(Level.INFO, "========== Checking satisfiability of", clause, "while blocking "
-          + "the full clause ==========");
+      logger.log(
+          Level.INFO,
+          "========== Checking satisfiability of",
+          clause,
+          "while blocking " + "the full clause ==========");
 
       // Create user propagator that prohibits the full clause to be set to true.
       MyUserPropagator myUserPropagator = new MyUserPropagator(logger);
@@ -110,8 +114,9 @@ public class SimpleUserPropagator {
     }
   }
 
-  private static void testWithBlockedSubclauses(SolverContext context, BooleanFormulaManager bmgr,
-                                 LogManager logger) throws InterruptedException, SolverException {
+  private static void testWithBlockedSubclauses(
+      SolverContext context, BooleanFormulaManager bmgr, LogManager logger)
+      throws InterruptedException, SolverException {
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       // assert "p or q or r or s"
       BooleanFormula p = bmgr.makeVariable("p");
@@ -123,8 +128,15 @@ public class SimpleUserPropagator {
       BooleanFormula subclause2 = bmgr.or(r, s);
       prover.addConstraint(clause);
 
-      logger.log(Level.INFO, "========== Checking satisfiability of", clause, "while blocking "
-          + "the subclauses", subclause1, "and", subclause2, "==========");
+      logger.log(
+          Level.INFO,
+          "========== Checking satisfiability of",
+          clause,
+          "while blocking " + "the subclauses",
+          subclause1,
+          "and",
+          subclause2,
+          "==========");
 
       // Create user propagator that prohibits (sub)clauses to be set to true.
       // Note that the subclauses are not directly asserted in the original input formula.
@@ -139,9 +151,7 @@ public class SimpleUserPropagator {
     }
   }
 
-  /**
-   * This user propagator will raise a conflict whenever a registered expression is set to true.
-   */
+  /** This user propagator will raise a conflict whenever a registered expression is set to true. */
   private static class MyUserPropagator extends AbstractUserPropagator {
 
     private final List<BooleanFormula> disabledExpressions = new ArrayList<>();
@@ -166,7 +176,7 @@ public class SimpleUserPropagator {
       logger.log(Level.INFO, "Solver assigned", expr, "to", value);
       if (value && disabledExpressions.contains(expr)) {
         logger.log(Level.INFO, "User propagator raised conflict on", expr);
-        backend.propagateConflict(new BooleanFormula[] { expr });
+        backend.propagateConflict(new BooleanFormula[] {expr});
       }
     }
 
@@ -181,9 +191,12 @@ public class SimpleUserPropagator {
         if (backend.propagateNextDecision(disExpr, Optional.of(decisionValue))) {
           // The above call returns "true" if the provided literal is yet undecided, otherwise
           // false.
-          logger.log(Level.INFO, String.format("User propagator overwrites decision "
-              + "from '%s = %s' to '%s = %s'", expr, value, disExpr, decisionValue));
-          return;
+          logger.log(
+              Level.INFO,
+              String.format(
+                  "User propagator overwrites decision from '%s = %s' to '%s = %s'",
+                  expr, value, disExpr, decisionValue));
+          break;
         }
       }
     }

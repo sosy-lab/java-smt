@@ -191,5 +191,4 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
     }
     super.close();
   }
-
 }
