@@ -1,141 +1,153 @@
-diff -ru lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Bitwuzla.java lib/native/source/libbitwuzla/src.patched/org/sosy_lab/java_smt/solvers/bitwuzla/api/Bitwuzla.java
---- lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Bitwuzla.java	2024-01-30 02:17:29.958540211 +0100
-+++ lib/native/source/libbitwuzla/src.patched/org/sosy_lab/java_smt/solvers/bitwuzla/api/Bitwuzla.java	2024-01-30 02:13:50.700388020 +0100
-@@ -27,7 +27,7 @@
- 
-   @SuppressWarnings("deprecation")
-   protected void finalize() {
--    delete();
-+    //delete();
-   }
- 
-   public synchronized void delete() {
-diff -ru lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Map_TermTerm.java lib/native/source/libbitwuzla/src.patched/org/sosy_lab/java_smt/solvers/bitwuzla/api/Map_TermTerm.java
---- lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Map_TermTerm.java	2024-01-30 02:16:53.494652530 +0100
-+++ lib/native/source/libbitwuzla/src.patched/org/sosy_lab/java_smt/solvers/bitwuzla/api/Map_TermTerm.java	2024-01-30 02:13:50.564390151 +0100
-@@ -35,7 +35,7 @@
- 
-   @SuppressWarnings("deprecation")
-   protected void finalize() {
--    delete();
-+    //delete();
-   }
- 
-   public synchronized void delete() {
-@@ -171,7 +171,7 @@
-   
-     @SuppressWarnings("deprecation")
-     protected void finalize() {
--      delete();
-+      //delete();
+diff -ur lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Bitwuzla.java lib/native/source/libbitwuzla/dst/org/sosy_lab/java_smt/solvers/bitwuzla/api/Bitwuzla.java
+--- lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Bitwuzla.java	2024-02-28 15:41:51.242097065 +0100
++++ lib/native/source/libbitwuzla/dst/org/sosy_lab/java_smt/solvers/bitwuzla/api/Bitwuzla.java	2024-02-28 15:44:53.024398221 +0100
+@@ -34,7 +34,7 @@
+     if (swigCPtr != 0) {
+       if (swigCMemOwn) {
+         swigCMemOwn = false;
+-        BitwuzlaNativeJNI.delete_Bitwuzla(swigCPtr);
++        //BitwuzlaNativeJNI.delete_Bitwuzla(swigCPtr);
+       }
+       swigCPtr = 0;
      }
-   
-     public synchronized void delete() {
-diff -ru lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Options.java lib/native/source/libbitwuzla/src.patched/org/sosy_lab/java_smt/solvers/bitwuzla/api/Options.java
---- lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Options.java	2024-01-30 02:17:14.802578662 +0100
-+++ lib/native/source/libbitwuzla/src.patched/org/sosy_lab/java_smt/solvers/bitwuzla/api/Options.java	2024-01-30 02:13:50.596389650 +0100
-@@ -35,7 +35,7 @@
- 
-   @SuppressWarnings("deprecation")
-   protected void finalize() {
--    delete();
-+    //delete();
-   }
- 
-   public synchronized void delete() {
-diff -ru lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Parser.java lib/native/source/libbitwuzla/src.patched/org/sosy_lab/java_smt/solvers/bitwuzla/api/Parser.java
---- lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Parser.java	2024-01-30 02:17:40.450520255 +0100
-+++ lib/native/source/libbitwuzla/src.patched/org/sosy_lab/java_smt/solvers/bitwuzla/api/Parser.java	2024-01-30 02:13:50.704387957 +0100
-@@ -35,7 +35,7 @@
- 
-   @SuppressWarnings("deprecation")
-   protected void finalize() {
--    delete();
-+    //delete();
-   }
- 
-   public synchronized void delete() {
-diff -ru lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Sort.java lib/native/source/libbitwuzla/src.patched/org/sosy_lab/java_smt/solvers/bitwuzla/api/Sort.java
---- lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Sort.java	2024-01-30 02:17:20.062564011 +0100
-+++ lib/native/source/libbitwuzla/src.patched/org/sosy_lab/java_smt/solvers/bitwuzla/api/Sort.java	2024-01-30 02:13:50.636389023 +0100
-@@ -35,7 +35,7 @@
- 
-   @SuppressWarnings("deprecation")
-   protected void finalize() {
--    delete();
-+    //delete();
-   }
- 
-   public synchronized void delete() {
-diff -ru lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Terminator.java lib/native/source/libbitwuzla/src.patched/org/sosy_lab/java_smt/solvers/bitwuzla/api/Terminator.java
---- lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Terminator.java	2024-01-30 02:16:42.862698311 +0100
-+++ lib/native/source/libbitwuzla/src.patched/org/sosy_lab/java_smt/solvers/bitwuzla/api/Terminator.java	2024-01-30 02:13:50.640388960 +0100
-@@ -35,7 +35,7 @@
- 
-   @SuppressWarnings("deprecation")
-   protected void finalize() {
--    delete();
-+    //delete();
-   }
- 
-   public synchronized void delete() {
-diff -ru lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Term.java lib/native/source/libbitwuzla/src.patched/org/sosy_lab/java_smt/solvers/bitwuzla/api/Term.java
---- lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Term.java	2024-01-30 02:17:34.346531214 +0100
-+++ lib/native/source/libbitwuzla/src.patched/org/sosy_lab/java_smt/solvers/bitwuzla/api/Term.java	2024-01-30 02:13:50.624389211 +0100
-@@ -35,7 +35,7 @@
- 
-   @SuppressWarnings("deprecation")
-   protected void finalize() {
--    delete();
-+    //delete();
-   }
- 
-   public synchronized void delete() {
-diff -ru lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Vector_Int.java lib/native/source/libbitwuzla/src.patched/org/sosy_lab/java_smt/solvers/bitwuzla/api/Vector_Int.java
---- lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Vector_Int.java	2024-01-30 02:16:58.418633361 +0100
-+++ lib/native/source/libbitwuzla/src.patched/org/sosy_lab/java_smt/solvers/bitwuzla/api/Vector_Int.java	2024-01-30 02:13:50.460391781 +0100
-@@ -35,7 +35,7 @@
- 
-   @SuppressWarnings("deprecation")
-   protected void finalize() {
--    delete();
-+    //delete();
-   }
- 
-   public synchronized void delete() {
-diff -ru lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Vector_Sort.java lib/native/source/libbitwuzla/src.patched/org/sosy_lab/java_smt/solvers/bitwuzla/api/Vector_Sort.java
---- lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Vector_Sort.java	2024-01-30 02:17:24.998551530 +0100
-+++ lib/native/source/libbitwuzla/src.patched/org/sosy_lab/java_smt/solvers/bitwuzla/api/Vector_Sort.java	2024-01-30 02:13:50.532390653 +0100
-@@ -35,7 +35,7 @@
- 
-   @SuppressWarnings("deprecation")
-   protected void finalize() {
--    delete();
-+    //delete();
-   }
- 
-   public synchronized void delete() {
-diff -ru lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Vector_String.java lib/native/source/libbitwuzla/src.patched/org/sosy_lab/java_smt/solvers/bitwuzla/api/Vector_String.java
---- lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Vector_String.java	2024-01-30 02:16:35.794732123 +0100
-+++ lib/native/source/libbitwuzla/src.patched/org/sosy_lab/java_smt/solvers/bitwuzla/api/Vector_String.java	2024-01-30 02:13:50.484391405 +0100
-@@ -35,7 +35,7 @@
- 
-   @SuppressWarnings("deprecation")
-   protected void finalize() {
--    delete();
-+    //delete();
-   }
- 
-   public synchronized void delete() {
-diff -ru lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Vector_Term.java lib/native/source/libbitwuzla/src.patched/org/sosy_lab/java_smt/solvers/bitwuzla/api/Vector_Term.java
---- lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Vector_Term.java	2024-01-30 02:17:03.534614791 +0100
-+++ lib/native/source/libbitwuzla/src.patched/org/sosy_lab/java_smt/solvers/bitwuzla/api/Vector_Term.java	2024-01-30 02:13:50.508391029 +0100
-@@ -35,7 +35,7 @@
- 
-   @SuppressWarnings("deprecation")
-   protected void finalize() {
--    delete();
-+    //delete();
-   }
- 
-   public synchronized void delete() {
+diff -ur lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Map_TermTerm.java lib/native/source/libbitwuzla/dst/org/sosy_lab/java_smt/solvers/bitwuzla/api/Map_TermTerm.java
+--- lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Map_TermTerm.java	2024-02-28 15:41:51.090094941 +0100
++++ lib/native/source/libbitwuzla/dst/org/sosy_lab/java_smt/solvers/bitwuzla/api/Map_TermTerm.java	2024-02-28 15:45:50.689042441 +0100
+@@ -42,7 +42,7 @@
+     if (swigCPtr != 0) {
+       if (swigCMemOwn) {
+         swigCMemOwn = false;
+-        BitwuzlaNativeJNI.delete_Map_TermTerm(swigCPtr);
++        //BitwuzlaNativeJNI.delete_Map_TermTerm(swigCPtr);
+       }
+       swigCPtr = 0;
+     }
+@@ -178,7 +178,7 @@
+       if (swigCPtr != 0) {
+         if (swigCMemOwn) {
+           swigCMemOwn = false;
+-          BitwuzlaNativeJNI.delete_Map_TermTerm_Iterator(swigCPtr);
++          //BitwuzlaNativeJNI.delete_Map_TermTerm_Iterator(swigCPtr);
+         }
+         swigCPtr = 0;
+       }
+diff -ur lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Options.java lib/native/source/libbitwuzla/dst/org/sosy_lab/java_smt/solvers/bitwuzla/api/Options.java
+--- lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Options.java	2024-02-28 15:41:51.122095389 +0100
++++ lib/native/source/libbitwuzla/dst/org/sosy_lab/java_smt/solvers/bitwuzla/api/Options.java	2024-02-28 15:44:28.532113367 +0100
+@@ -42,7 +42,7 @@
+     if (swigCPtr != 0) {
+       if (swigCMemOwn) {
+         swigCMemOwn = false;
+-        BitwuzlaNativeJNI.delete_Options(swigCPtr);
++        //BitwuzlaNativeJNI.delete_Options(swigCPtr);
+       }
+       swigCPtr = 0;
+     }
+diff -ur lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Parser.java lib/native/source/libbitwuzla/dst/org/sosy_lab/java_smt/solvers/bitwuzla/api/Parser.java
+--- lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Parser.java	2024-02-28 15:41:51.254097233 +0100
++++ lib/native/source/libbitwuzla/dst/org/sosy_lab/java_smt/solvers/bitwuzla/api/Parser.java	2024-02-28 15:45:16.476664563 +0100
+@@ -42,7 +42,7 @@
+     if (swigCPtr != 0) {
+       if (swigCMemOwn) {
+         swigCMemOwn = false;
+-        BitwuzlaNativeJNI.delete_Parser(swigCPtr);
++        //BitwuzlaNativeJNI.delete_Parser(swigCPtr);
+       }
+       swigCPtr = 0;
+     }
+diff -ur lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Sort.java lib/native/source/libbitwuzla/dst/org/sosy_lab/java_smt/solvers/bitwuzla/api/Sort.java
+--- lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Sort.java	2024-02-28 15:41:51.158095891 +0100
++++ lib/native/source/libbitwuzla/dst/org/sosy_lab/java_smt/solvers/bitwuzla/api/Sort.java	2024-02-28 15:44:38.132225856 +0100
+@@ -42,7 +42,7 @@
+     if (swigCPtr != 0) {
+       if (swigCMemOwn) {
+         swigCMemOwn = false;
+-        BitwuzlaNativeJNI.delete_Sort(swigCPtr);
++        //BitwuzlaNativeJNI.delete_Sort(swigCPtr);
+       }
+       swigCPtr = 0;
+     }
+diff -ur lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Terminator.java lib/native/source/libbitwuzla/dst/org/sosy_lab/java_smt/solvers/bitwuzla/api/Terminator.java
+--- lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Terminator.java	2024-02-28 15:41:51.158095891 +0100
++++ lib/native/source/libbitwuzla/dst/org/sosy_lab/java_smt/solvers/bitwuzla/api/Terminator.java	2024-02-28 15:43:30.935414605 +0100
+@@ -42,7 +42,7 @@
+     if (swigCPtr != 0) {
+       if (swigCMemOwn) {
+         swigCMemOwn = false;
+-        BitwuzlaNativeJNI.delete_Terminator(swigCPtr);
++        //BitwuzlaNativeJNI.delete_Terminator(swigCPtr);
+       }
+       swigCPtr = 0;
+     }
+diff -ur lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Term.java lib/native/source/libbitwuzla/dst/org/sosy_lab/java_smt/solvers/bitwuzla/api/Term.java
+--- lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Term.java	2024-02-28 15:41:51.146095724 +0100
++++ lib/native/source/libbitwuzla/dst/org/sosy_lab/java_smt/solvers/bitwuzla/api/Term.java	2024-02-28 15:45:08.800578060 +0100
+@@ -42,7 +42,7 @@
+     if (swigCPtr != 0) {
+       if (swigCMemOwn) {
+         swigCMemOwn = false;
+-        BitwuzlaNativeJNI.delete_Term(swigCPtr);
++        //BitwuzlaNativeJNI.delete_Term(swigCPtr);
+       }
+       swigCPtr = 0;
+     }
+diff -ur lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/TermManager.java lib/native/source/libbitwuzla/dst/org/sosy_lab/java_smt/solvers/bitwuzla/api/TermManager.java
+--- lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/TermManager.java	2024-02-28 15:41:51.230096898 +0100
++++ lib/native/source/libbitwuzla/dst/org/sosy_lab/java_smt/solvers/bitwuzla/api/TermManager.java	2024-02-28 15:45:02.164502752 +0100
+@@ -42,7 +42,7 @@
+     if (swigCPtr != 0) {
+       if (swigCMemOwn) {
+         swigCMemOwn = false;
+-        BitwuzlaNativeJNI.delete_TermManager(swigCPtr);
++        //BitwuzlaNativeJNI.delete_TermManager(swigCPtr);
+       }
+       swigCPtr = 0;
+     }
+diff -ur lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Vector_Int.java lib/native/source/libbitwuzla/dst/org/sosy_lab/java_smt/solvers/bitwuzla/api/Vector_Int.java
+--- lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Vector_Int.java	2024-02-28 15:41:50.978093376 +0100
++++ lib/native/source/libbitwuzla/dst/org/sosy_lab/java_smt/solvers/bitwuzla/api/Vector_Int.java	2024-02-28 15:44:08.099870263 +0100
+@@ -42,7 +42,7 @@
+     if (swigCPtr != 0) {
+       if (swigCMemOwn) {
+         swigCMemOwn = false;
+-        BitwuzlaNativeJNI.delete_Vector_Int(swigCPtr);
++        //BitwuzlaNativeJNI.delete_Vector_Int(swigCPtr);
+       }
+       swigCPtr = 0;
+     }
+diff -ur lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Vector_Sort.java lib/native/source/libbitwuzla/dst/org/sosy_lab/java_smt/solvers/bitwuzla/api/Vector_Sort.java
+--- lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Vector_Sort.java	2024-02-28 15:41:51.054094438 +0100
++++ lib/native/source/libbitwuzla/dst/org/sosy_lab/java_smt/solvers/bitwuzla/api/Vector_Sort.java	2024-02-28 15:44:44.748302748 +0100
+@@ -42,7 +42,7 @@
+     if (swigCPtr != 0) {
+       if (swigCMemOwn) {
+         swigCMemOwn = false;
+-        BitwuzlaNativeJNI.delete_Vector_Sort(swigCPtr);
++        //BitwuzlaNativeJNI.delete_Vector_Sort(swigCPtr);
+       }
+       swigCPtr = 0;
+     }
+diff -ur lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Vector_String.java lib/native/source/libbitwuzla/dst/org/sosy_lab/java_smt/solvers/bitwuzla/api/Vector_String.java
+--- lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Vector_String.java	2024-02-28 15:41:51.002093712 +0100
++++ lib/native/source/libbitwuzla/dst/org/sosy_lab/java_smt/solvers/bitwuzla/api/Vector_String.java	2024-02-28 15:43:22.031302740 +0100
+@@ -42,7 +42,7 @@
+     if (swigCPtr != 0) {
+       if (swigCMemOwn) {
+         swigCMemOwn = false;
+-        BitwuzlaNativeJNI.delete_Vector_String(swigCPtr);
++        //BitwuzlaNativeJNI.delete_Vector_String(swigCPtr);
+       }
+       swigCPtr = 0;
+     }
+diff -ur lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Vector_Term.java lib/native/source/libbitwuzla/dst/org/sosy_lab/java_smt/solvers/bitwuzla/api/Vector_Term.java
+--- lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Vector_Term.java	2024-02-28 15:41:51.030094103 +0100
++++ lib/native/source/libbitwuzla/dst/org/sosy_lab/java_smt/solvers/bitwuzla/api/Vector_Term.java	2024-02-28 15:44:17.651984547 +0100
+@@ -42,7 +42,7 @@
+     if (swigCPtr != 0) {
+       if (swigCMemOwn) {
+         swigCMemOwn = false;
+-        BitwuzlaNativeJNI.delete_Vector_Term(swigCPtr);
++        //BitwuzlaNativeJNI.delete_Vector_Term(swigCPtr);
+       }
+       swigCPtr = 0;
+     }
