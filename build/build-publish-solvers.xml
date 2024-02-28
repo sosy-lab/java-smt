@@ -1028,13 +1028,6 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="libgmp.so"/>
             <arg value="libbitwuzlaJNI-${bitwuzla.version}.so"/>
         </exec>
-
-        <!-- clean up the source tree -->
-        <delete includeemptydirs="true">
-            <fileset dir="${source.path}" includes="include/ src/"/>
-            <fileset dir="${source.path}"
-                     includes="bitwuzla_wrap.cpp bitwuzla_wrap.h bitwuzla_wrap.o"/>
-        </delete>
     </target>
 
     <target name="publish-bitwuzla" depends="package-bitwuzla, load-ivy"
