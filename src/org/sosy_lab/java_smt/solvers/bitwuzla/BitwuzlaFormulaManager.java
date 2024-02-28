@@ -91,7 +91,7 @@ final class BitwuzlaFormulaManager
       public void appendTo(Appendable out) throws IOException {
         // TODO: It would be better to keep this instance around
         Bitwuzla bitwuzla = new Bitwuzla(creator.getTermManager());
-        for (Term t : BitwuzlaFormulaCreator.getVariableCasts()) {
+        for (Term t : creator.getVariableCasts()) {
           bitwuzla.assert_formula(t);
         }
         bitwuzla.assert_formula(pTerm);
