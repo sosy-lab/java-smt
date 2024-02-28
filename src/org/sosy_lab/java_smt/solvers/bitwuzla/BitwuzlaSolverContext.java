@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -95,14 +94,6 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
     solverOptions = pOptions;
   }
 
-  // TODO: This should be moved back into create()
-  private static TermManager makeTermManager() {
-    NativeLibraries.loadLibrary("bitwuzlaJNI");
-    return new TermManager();
-  }
-
-  private static final TermManager termManager = makeTermManager();
-
   @SuppressWarnings("unused")
   public static BitwuzlaSolverContext create(
       Configuration config,
@@ -112,7 +103,9 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
       FloatingPointRoundingMode pFloatingPointRoundingMode,
       Consumer<String> pLoader)
       throws InvalidConfigurationException {
+    pLoader.accept("bitwuzlaJNI");
 
+    TermManager termManager = new TermManager();
     Options solverOptions = buildBitwuzlaOptions(new BitwuzlaSettings(config), randomSeed);
 
     BitwuzlaFormulaCreator creator = new BitwuzlaFormulaCreator(termManager);
