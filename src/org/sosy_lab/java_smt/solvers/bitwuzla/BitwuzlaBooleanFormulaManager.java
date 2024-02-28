@@ -9,24 +9,24 @@
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
-import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
-import org.sosy_lab.java_smt.solvers.bitwuzla.api.Bitwuzla;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Kind;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Sort;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Term;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.TermManager;
 
 public class BitwuzlaBooleanFormulaManager
     extends AbstractBooleanFormulaManager<Term, Sort, Void, BitwuzlaDeclaration> {
-  // private final long bitwuzla;
+  private final TermManager termManager;
+
   private final Term pTrue;
   private final Term pFalse;
 
   protected BitwuzlaBooleanFormulaManager(
-      FormulaCreator<Term, Sort, Void, BitwuzlaDeclaration> pCreator) {
+      BitwuzlaFormulaCreator pCreator) {
     super(pCreator);
-    // bitwuzla = getFormulaCreator().getEnv();
-    pTrue = Bitwuzla.mk_true();
-    pFalse = Bitwuzla.mk_false();
+    termManager = pCreator.getTermManager();
+    pTrue = termManager.mk_true();
+    pFalse = termManager.mk_false();
   }
 
   @Override
@@ -51,7 +51,7 @@ public class BitwuzlaBooleanFormulaManager
     if (pParam1.kind() == Kind.NOT) {
       return pParam1.get(0);
     }
-    return Bitwuzla.mk_term(Kind.NOT, pParam1);
+    return termManager.mk_term(Kind.NOT, pParam1);
   }
 
   @Override
@@ -67,7 +67,7 @@ public class BitwuzlaBooleanFormulaManager
     } else if (pParam1.equals(pParam2)) {
       return pParam1;
     }
-    return Bitwuzla.mk_term(Kind.AND, pParam1, pParam2);
+    return termManager.mk_term(Kind.AND, pParam1, pParam2);
   }
 
   @Override
@@ -83,17 +83,17 @@ public class BitwuzlaBooleanFormulaManager
     } else if (pParam1.equals(pParam2)) {
       return pParam1;
     }
-    return Bitwuzla.mk_term(Kind.OR, pParam1, pParam2);
+    return termManager.mk_term(Kind.OR, pParam1, pParam2);
   }
 
   @Override
   protected Term xor(Term pParam1, Term pParam2) {
-    return Bitwuzla.mk_term(Kind.XOR, pParam1, pParam2);
+    return termManager.mk_term(Kind.XOR, pParam1, pParam2);
   }
 
   @Override
   protected Term equivalence(Term bits1, Term bits2) {
-    return Bitwuzla.mk_term(Kind.IFF, bits1, bits2);
+    return termManager.mk_term(Kind.IFF, bits1, bits2);
   }
 
   @Override
@@ -119,6 +119,6 @@ public class BitwuzlaBooleanFormulaManager
     } else if (isFalse(pF1) && isTrue(pF2)) {
       return not(pCond);
     }
-    return Bitwuzla.mk_term(Kind.ITE, pCond, pF1, pF2);
+    return termManager.mk_term(Kind.ITE, pCond, pF1, pF2);
   }
 }

@@ -134,54 +134,6 @@ namespace bitwuzla {
     assert($self->is_value() && ($self->sort().is_bv() || $self->sort().is_fp()));
     return $self->value<std::string>();
   }
-
-  std::string to_fp () {
-    assert($self->is_value() && $self->sort().is_fp());
-
-    // Get Bitwuzla representation of the term value
-    auto [sign, exponent, mantissa] =
-      $self->value<std::tuple<std::string, std::string, std::string>> ();
-
-    bool isSignZero = sign == "0";
-    bool isExponentZero = exponent.find_first_not_of("0") == std::string::npos;
-    bool isExponentOnes = exponent.find_first_not_of("1") == std::string::npos;
-    bool isMantissaZero = mantissa.find_first_not_of("0") == std::string::npos;
-
-    // Handle special values
-    if (isExponentZero && isMantissaZero) {
-      return isSignZero ? "0.0" : "-0.0";
-    }
-    if (isExponentOnes && isMantissaZero) {
-      return isSignZero ? "Infinity" : "-Infinity";
-    }
-    if (isExponentOnes && !isMantissaZero) {
-      return "NaN";
-    }
-
-    // Calculate value of the exponent
-    mpz_t expMpz;
-    mpz_init_set_str(expMpz, exponent.c_str(), 2);
-    int32_t expVal = mpz_get_si(expMpz);
-    int32_t bias = -1 + (1 << -1 + exponent.length());
-    mpz_clear(expMpz);
-
-    // Rewrite Bitwuzla representation in a format GMP can understand
-    std::string significant = (expVal == 0 ? "" : "1") + mantissa;
-    std::string formated =
-      significant + "@" + std::to_string(expVal - bias - ((int32_t) significant.length() - 1));
-
-    // Convert result to base10 floating point representation
-    mpf_t floatMpf;
-    mpf_init_set_str(floatMpf, formated.c_str(), -2);
-
-    mp_exp_t exp10;
-    char* sig10 = mpf_get_str(nullptr, &exp10, 10, 0, floatMpf);
-    std::string result = "0." + std::string(sig10) + (exp10 == 0 ? "" : "e" + std::to_string(exp10));
-    delete[] sig10;
-    mpf_clear(floatMpf);
-
-    return (sign == "1") ? ("-" + result) : result;
-  }
 }
 
 %ignore operator==(const Term &a, const Term &b);
@@ -207,252 +159,6 @@ namespace bitwuzla {
     return false;
   }
 %}
-
-// Add static methods for term creation
-%ignore mk_true();
-%extend Bitwuzla {
-  static Term mk_true() {
-    return bitwuzla::mk_true();
-  }
-}
-%ignore mk_false();
-%extend Bitwuzla {
-  static Term mk_false() {
-    return bitwuzla::mk_false();
-  }
-}
-%ignore mk_bv_zero(const Sort &);
-%extend Bitwuzla {
-  static Term mk_bv_zero(const Sort &sort) {
-    return bitwuzla::mk_bv_zero(sort);
-  }
-}
-%ignore mk_bv_one(const Sort &);
-%extend Bitwuzla {
-  static Term mk_bv_one(const Sort &sort) {
-    return bitwuzla::mk_bv_one(sort);
-  }
-}
-%ignore mk_bv_ones(const Sort &);
-%extend Bitwuzla {
-  static Term mk_bv_ones(const Sort &sort) {
-    return bitwuzla::mk_bv_ones(sort);
-  }
-}
-%ignore mk_bv_min_signed(const Sort &);
-%extend Bitwuzla {
-  static Term mk_bv_min_signed(const Sort &sort) {
-    return bitwuzla::mk_bv_min_signed(sort);
-  }
-}
-%ignore mk_bv_max_signed(const Sort &);
-%extend Bitwuzla {
-    static Term mk_bv_max_signed(const Sort &sort) {
-    return bitwuzla::mk_bv_max_signed(sort);
-  }
-}
-%ignore mk_bv_value(const Sort &, const std::string &, uint8_t = 2);
-%extend Bitwuzla {
-    static Term mk_bv_value(const Sort &sort, const std::string &value, int base = 2) {
-      return bitwuzla::mk_bv_value(sort, value, (int8_t) base);
-  }
-}
-%ignore mk_bv_value_uint64(const Sort &, uint64_t);
-%extend Bitwuzla {
-  static Term mk_bv_value_unsigned(const Sort &sort, int value) {
-    return bitwuzla::mk_bv_value_uint64(sort, value);
-  }
-}
-%ignore mk_bv_value_int64(const Sort &, int64_t);
-%extend Bitwuzla {
-  static Term mk_bv_value_signed(const Sort &sort, int value) {
-    return bitwuzla::mk_bv_value_int64(sort, value);
-  }
-}
-%ignore mk_fp_pos_zero(const Sort &);
-%extend Bitwuzla {
-  static Term mk_fp_pos_zero(const Sort &sort) {
-    return bitwuzla::mk_fp_pos_zero(sort);
-  }
-}
-%ignore mk_fp_neg_zero(const Sort &);
-%extend Bitwuzla {
-  static Term mk_fp_neg_zero(const Sort &sort) {
-    return bitwuzla::mk_fp_neg_zero(sort);
-  }
-}
-%ignore mk_fp_pos_inf(const Sort &);
-%extend Bitwuzla {
-  static Term mk_fp_pos_inf(const Sort &sort) {
-    return bitwuzla::mk_fp_pos_inf(sort);
-  }
-}
-%ignore mk_fp_neg_inf(const Sort &);
-%extend Bitwuzla {
-  static Term mk_fp_neg_inf(const Sort &sort) {
-    return bitwuzla::mk_fp_neg_inf(sort);
-  }
-}
-%ignore mk_fp_nan(const Sort &);
-%extend Bitwuzla {
-  static Term mk_fp_nan(const Sort &sort) {
-    return bitwuzla::mk_fp_nan(sort);
-  }
-}
-%ignore mk_fp_value(const Term &, const Term &, const Term &);
-%extend Bitwuzla {
-  static Term mk_fp_value(
-      const Term &bv_sign, const Term &bv_exponent, const Term &bv_significand) {
-    return bitwuzla::mk_fp_value(bv_sign, bv_exponent, bv_significand);
-  }
-}
-%ignore mk_fp_value(const Sort &, const Term &, const std::string &);
-%extend Bitwuzla {
-  static Term mk_fp_value(const Sort &sort, const Term &rm, const std::string &repr) {
-    // Handle special values
-    if (repr == "Infinity") {
-      return mk_fp_pos_inf(sort);
-    }
-    if (repr == "-Infinity") {
-      return mk_fp_neg_inf(sort);
-    }
-    if (repr == "NaN") {
-      return mk_fp_nan(sort);
-    }
-
-    // Parse float value with GMP
-    mpf_t floatVal;
-    std::string prev_loc = std::setlocale(LC_ALL, nullptr);
-    std::setlocale(LC_ALL, "en_US.UTF-8");
-    int error = mpf_init_set_str(floatVal, repr.c_str(), 10);
-    std::setlocale(LC_ALL, prev_loc.c_str());
-    if (error != 0) {
-      throw bitwuzla::Exception(
-        "String \"" + repr + "\" can't be parsed as a floating point number.");
-    }
-
-    // Convert to decimal format for Bitwuzla
-    mp_exp_t exponent;
-    char* mantissa = mpf_get_str(nullptr, &exponent, 10, 0, floatVal);
-    std::string input = std::string(mantissa);
-    mpf_clear(floatVal);
-    bool isZeroes = input.find_first_not_of("0") == std::string::npos;
-    if (isZeroes) {
-      // GMP drops the sign for -0.0, so we have handle this as a special case
-      if (repr[0] == '-') {
-        return mk_fp_neg_zero(sort);
-      } else {
-        return mk_fp_pos_zero(sort);
-      }
-    }
-
-    std::ostringstream output;
-    if (input[0] == '-') {
-      output << "-";
-      input.erase(0, 1);
-    }
-    if (exponent <= 0) {
-      output << "0.";
-      output << std::string(-exponent, '0');
-      output << input;
-    } else {
-      output << input.substr(0, exponent);
-      if (exponent > input.length()) {
-        output << std::string(exponent - input.length(), '0');
-      }
-      if (exponent < input.length()) {
-        output << '.' << input.substr(exponent);
-      }
-    }
-    delete[] mantissa;
-
-    // Create the term
-    return bitwuzla::mk_fp_value(sort, rm, output.str());
-  }
-}
-%ignore mk_fp_value(const Sort &,
-                    const Term &,
-                    const std::string &,
-                    const std::string &);
-%extend Bitwuzla {
-  static Term mk_fp_value(
-      const Sort &sort, const Term &rm, const std::string &num, const std::string &den) {
-    return bitwuzla::mk_fp_value(sort, rm, num, den);
-  }
-}
-%ignore mk_rm_value(RoundingMode);
-%extend Bitwuzla {
-  static Term mk_rm_value(RoundingMode rm) {
-    return bitwuzla::mk_rm_value(rm);
-  }
-}
-%ignore mk_const_array(const Sort &, const Term &);
-%extend Bitwuzla {
-  static Term mk_const_array(const Sort &sort, const Term &term) {
-    return bitwuzla::mk_const_array(sort, term);
-  }
-}
-%ignore mk_term(Kind, const std::vector<Term> &, const std::vector<uint64_t> &indices = {});
-%extend Bitwuzla {
-  static Term mk_term(Kind kind, const Term &t1) {
-    return bitwuzla::mk_term(kind, {t1}, {});
-  }
-  static Term mk_term(Kind kind, const Term &t1, int i1) {
-    return bitwuzla::mk_term(kind, {t1}, {(uint64_t) i1});
-  }
-  static Term mk_term(Kind kind, const Term &t1, int i1, int i2) {
-    return bitwuzla::mk_term(kind, {t1}, {(uint64_t) i1, (uint64_t) i2});
-  }
-  static Term mk_term(Kind kind, const Term &t1, const Term &t2) {
-    return bitwuzla::mk_term(kind, {t1, t2}, {});
-  }
-  static Term mk_term(Kind kind, const Term &t1, const Term &t2, int i1) {
-    return bitwuzla::mk_term(kind, {t1, t2}, {(uint64_t) i1});
-  }
-  static Term mk_term(Kind kind, const Term &t1, const Term &t2, int i1, int i2) {
-    return bitwuzla::mk_term(kind, {t1, t2}, {(uint64_t) i1, (uint64_t) i2});
-  }
-  static Term mk_term(Kind kind, const Term &t1, const Term &t2, const Term &t3) {
-    return bitwuzla::mk_term(kind, {t1, t2, t3}, {});
-  }
-  static Term mk_term(Kind kind, const std::vector<Term> &args) {
-    return bitwuzla::mk_term(kind, args, {});
-  }
-  static Term mk_term(Kind kind, const std::vector<Term> &args, const std::vector<int> &indices) {
-    std::vector<uint64_t> unsigned_indices;
-    for (auto i : indices) {
-      unsigned_indices.emplace_back((uint64_t) i);
-    }
-    return bitwuzla::mk_term(kind, args, unsigned_indices);
-  }
-}
-%ignore mk_const(const Sort &, std::optional<const std::string> = std::nullopt);
-%extend Bitwuzla {
-  static Term mk_const(const Sort &sort) {
-    return bitwuzla::mk_const(sort, std::nullopt);
-  }
-  static Term mk_const(const Sort &sort, std::string symbol) {
-    return bitwuzla::mk_const(sort, symbol);
-  }
-}
-%ignore mk_var(const Sort &, std::optional<const std::string> = std::nullopt);
-%extend Bitwuzla {
-  static Term mk_var(const Sort &sort) {
-    return bitwuzla::mk_var(sort, std::nullopt);
-  }
-  static Term mk_var(const Sort &sort, std::string symbol) {
-    return bitwuzla::mk_var(sort, symbol);
-  }
-}
-
-// Substitution: This will change the term itself!
-%ignore substitute_terms (std::vector<Term> &, const std::unordered_map<Term,Term> &);
-%ignore substitute_term (const Term &, const std::unordered_map<Term, Term> &);
-%extend Term {
-  Term substitute(const std::unordered_map<Term, Term> &map) {
-    return bitwuzla::substitute_term(*$self, map);
-  }
-}
 
 /** Sort */
 %rename(toString) Sort::str;
@@ -515,41 +221,6 @@ namespace bitwuzla {
   }
 %}
 
-// Add static methods for sort creation
-%ignore mk_array_sort(const Sort &, const Sort &);
-%extend Bitwuzla {
-   static Sort mk_array_sort(const Sort &index, const Sort &element) {
-     return bitwuzla::mk_array_sort(index, element);
-  }
-}
-%ignore mk_bool_sort();
-%extend Bitwuzla {
-   static Sort mk_bool_sort() {
-     return bitwuzla::mk_bool_sort();
-  }
- }
-%ignore mk_bv_sort(uint64_t);
-%extend Bitwuzla {
-  static Sort mk_bv_sort(int size) {
-    return bitwuzla::mk_bv_sort(size);
-  }
-}
-%ignore mk_fp_sort(uint64_t, uint64_t);
-%extend Bitwuzla {
-  static Sort mk_fp_sort(int exp_size, int sig_size) {
-    return bitwuzla::mk_fp_sort(exp_size, sig_size);
-  }
-}
-%ignore mk_fun_sort(const std::vector<Sort> &, const Sort &);
-%extend Bitwuzla {
-  static Sort mk_fun_sort(const std::vector<Sort> &domain, const Sort &codomain) {
-    return bitwuzla::mk_fun_sort(domain, codomain);
-  }
-}
-
-%ignore mk_uninterpreted_sort(std::optional<const std::string> = std::nullopt);
-%ignore mk_rm_sort();
-
 /** Terminator */
 %insert("runtime") %{
 #define SWIG_JAVA_ATTACH_CURRENT_THREAD_AS_DAEMON
@@ -557,7 +228,141 @@ namespace bitwuzla {
 
 %feature("director") Terminator;
 
+/** TermManager */
+%ignore TermManager::mk_rm_sort();
+%ignore TermManager::mk_uninterpreted_sort(const std::optional< std::string > &symbol=std::nullopt);
+
+%ignore TermManager::mk_bv_sort(uint64_t size);
+%extend TermManager {
+  Sort mk_bv_sort(int size) {
+    return $self->mk_bv_sort(size);
+  }
+}
+%ignore TermManager::mk_fp_sort(uint64_t exp_size, uint64_t sig_size);
+%extend TermManager {
+  Sort mk_fp_sort(int exp_size, int sig_size) {
+    return $self->mk_fp_sort(exp_size, sig_size);
+  }
+}
+
+%ignore TermManager::mk_fp_value(const Sort &sort, const Term &rm, const std::string &real);
+%extend TermManager {
+  // Patch mk_fp_value to handle scientific notation in the input string
+  Term parse_fp_value(const Sort &sort, const Term &rm, const std::string &repr) {
+    // Handle special values
+    if (repr == "Infinity") {
+      return $self->mk_fp_pos_inf(sort);
+    }
+    if (repr == "-Infinity") {
+      return $self->mk_fp_neg_inf(sort);
+    }
+    if (repr == "NaN") {
+      return $self->mk_fp_nan(sort);
+    }
+
+    // Parse float value with GMP
+    mpf_t floatVal;
+    std::string prev_loc = std::setlocale(LC_ALL, nullptr);
+    std::setlocale(LC_ALL, "en_US.UTF-8");
+    int error = mpf_init_set_str(floatVal, repr.c_str(), 10);
+    std::setlocale(LC_ALL, prev_loc.c_str());
+    if (error != 0) {
+      throw bitwuzla::Exception(
+        "String \"" + repr + "\" can't be parsed as a floating point number.");
+    }
+
+    // Convert to decimal format for Bitwuzla
+    mp_exp_t exponent;
+    char* mantissa = mpf_get_str(nullptr, &exponent, 10, 0, floatVal);
+    std::string input = std::string(mantissa);
+    mpf_clear(floatVal);
+    bool isZeroes = input.find_first_not_of("0") == std::string::npos;
+    if (isZeroes) {
+      // GMP drops the sign for -0.0, so we have handle this as a special case
+      if (repr[0] == '-') {
+        return $self->mk_fp_neg_zero(sort);
+      } else {
+        return $self->mk_fp_pos_zero(sort);
+      }
+    }
+
+    std::ostringstream output;
+    if (input[0] == '-') {
+      output << "-";
+      input.erase(0, 1);
+    }
+    if (exponent <= 0) {
+      output << "0.";
+      output << std::string(-exponent, '0');
+      output << input;
+    } else {
+      output << input.substr(0, exponent);
+      if (exponent > input.length()) {
+        output << std::string(exponent - input.length(), '0');
+      }
+      if (exponent < input.length()) {
+        output << '.' << input.substr(exponent);
+      }
+    }
+    delete[] mantissa;
+
+    // Create the term
+    return $self->mk_fp_value(sort, rm, output.str());
+  }
+}
+
+%ignore TermManager::mk_term(Kind, const std::vector<Term> &, const std::vector<uint64_t> &indices = {});
+%extend TermManager {
+  Term mk_term(Kind kind, const Term &t1) {
+    return $self->mk_term(kind, {t1}, {});
+  }
+  Term mk_term(Kind kind, const Term &t1, int i1) {
+    return $self->mk_term(kind, {t1}, {(uint64_t) i1});
+  }
+  Term mk_term(Kind kind, const Term &t1, int i1, int i2) {
+    return $self->mk_term(kind, {t1}, {(uint64_t) i1, (uint64_t) i2});
+  }
+  Term mk_term(Kind kind, const Term &t1, const Term &t2) {
+    return $self->mk_term(kind, {t1, t2}, {});
+  }
+  Term mk_term(Kind kind, const Term &t1, const Term &t2, int i1) {
+    return $self->mk_term(kind, {t1, t2}, {(uint64_t) i1});
+  }
+  Term mk_term(Kind kind, const Term &t1, const Term &t2, int i1, int i2) {
+    return $self->mk_term(kind, {t1, t2}, {(uint64_t) i1, (uint64_t) i2});
+  }
+  Term mk_term(Kind kind, const Term &t1, const Term &t2, const Term &t3) {
+    return $self->mk_term(kind, {t1, t2, t3}, {});
+  }
+  Term mk_term(Kind kind, const std::vector<Term> &args, const std::vector<int> &indices) {
+    std::vector<uint64_t> unsigned_indices;
+    for (auto i : indices) {
+      unsigned_indices.emplace_back((uint64_t) i);
+    }
+    return $self->mk_term(kind, args, unsigned_indices);
+  }
+}
+%ignore TermManager::mk_const(const Sort &sort, const std::optional<std::string> &symbol=std::nullopt);
+%extend TermManager {
+  Term mk_const(const Sort &sort) {
+    return $self->mk_const(sort, std::nullopt);
+  }
+  Term mk_const(const Sort &sort, std::string symbol) {
+    return $self->mk_const(sort, symbol);
+  }
+}
+%ignore TermManager::mk_var(const Sort &sort, const std::optional<std::string> &symbol=std::nullopt);
+%extend TermManager {
+  Term mk_var(const Sort &sort) {
+    return $self->mk_var(sort, std::nullopt);
+  }
+  Term mk_var(const Sort &sort, std::string symbol) {
+    return $self->mk_var(sort, symbol);
+  }
+}
+
 /** Bitwuzla */
+%ignore Bitwuzla::Bitwuzla(const Options &options = Options());
 %ignore Bitwuzla::is_unsat_assumption (const Term &term);
 %ignore Bitwuzla::print_formula (std::ostream &out, const std::string &format="smt2") const;
 %extend Bitwuzla {
@@ -574,6 +379,11 @@ namespace bitwuzla {
 %include "include/bitwuzla/cpp/bitwuzla.h"
 
 namespace bitwuzla::parser {
+%ignore Parser::Parser(TermManager &tm, Options &options, const std::string &language, std::ostream *out);
+%ignore Parser::Parser(TermManager &tm, Options &options, std::ostream *out);
+
+%ignore Parser::parse(const std::string &infile_name, std::istream &input, bool parse_only=false);
+
 %exception {
   try {
     $action

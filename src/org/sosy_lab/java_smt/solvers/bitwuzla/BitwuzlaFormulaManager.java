@@ -69,7 +69,7 @@ final class BitwuzlaFormulaManager
       s = s.replace("(exit)", "");
     }
 
-    Parser parser = new Parser(bitwuzlaOption);
+    Parser parser = new Parser(creator.getTermManager(), bitwuzlaOption);
     parser.parse(s, true, false);
 
     Vector_Term assertions = parser.bitwuzla().get_assertions();
@@ -89,7 +89,8 @@ final class BitwuzlaFormulaManager
     return new Appenders.AbstractAppender() {
       @Override
       public void appendTo(Appendable out) throws IOException {
-        Bitwuzla bitwuzla = new Bitwuzla(); // TODO: It would be better to keep this instance around
+        // TODO: It would be better to keep this instance around
+        Bitwuzla bitwuzla = new Bitwuzla(creator.getTermManager());
         for (Term t : BitwuzlaFormulaCreator.getVariableCasts()) {
           bitwuzla.assert_formula(t);
         }

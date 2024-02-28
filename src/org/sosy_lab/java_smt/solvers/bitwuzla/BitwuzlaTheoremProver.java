@@ -79,7 +79,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
       pSolverOptions.set(Option.PRODUCE_UNSAT_ASSUMPTIONS, 2);
     }
 
-    return new Bitwuzla(pSolverOptions);
+    return new Bitwuzla(creator.getTermManager(), pSolverOptions);
   }
 
   /**

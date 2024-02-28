@@ -28,11 +28,13 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.Result;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.RoundingMode;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Sort;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Term;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.TermManager;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Int;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Sort;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Term;
 
 public class BitwuzlaNativeApiTest {
+  private TermManager termManager;
   private Bitwuzla bitwuzla;
 
   @BeforeClass
@@ -46,8 +48,8 @@ public class BitwuzlaNativeApiTest {
 
   @Before
   public void createEnvironment() {
-    Options options = createOptions();
-    bitwuzla = new Bitwuzla(options);
+    termManager = new TermManager();
+    bitwuzla = new Bitwuzla(termManager, createOptions());
   }
 
   private Options createOptions() {
@@ -68,23 +70,23 @@ public class BitwuzlaNativeApiTest {
   //@Ignore
   //@Test
   //public void functionWithNoArguments() {
-  //  Sort bool_sort = Bitwuzla.mk_bool_sort();
-  //  Term a = Bitwuzla.mk_var(bool_sort, "a");
-  //  Bitwuzla.mk_term(Kind.LAMBDA, a);
+  //  Sort bool_sort = termManager.mk_bool_sort();
+  //  Term a = termManager.mk_var(bool_sort, "a");
+  //  termManager.mk_term(Kind.LAMBDA, a);
   //}
 
   @Test
   public void signedFunctions() {
-    Sort sortbv4 = Bitwuzla.mk_bv_sort(4);
-    Sort sortbv8 = Bitwuzla.mk_bv_sort(8);
+    Sort sortbv4 = termManager.mk_bv_sort(4);
+    Sort sortbv8 = termManager.mk_bv_sort(8);
     // Create function sort.
     Sort[] domain = {sortbv8, sortbv4};
-    Sort sortfun = Bitwuzla.mk_fun_sort(new Vector_Sort(domain), sortbv8);
+    Sort sortfun = termManager.mk_fun_sort(new Vector_Sort(domain), sortbv8);
 
-    Term x = Bitwuzla.mk_const(sortbv8, "x");
-    Term f = Bitwuzla.mk_const(sortfun, "f");
+    Term x = termManager.mk_const(sortbv8, "x");
+    Term f = termManager.mk_const(sortfun, "f");
 
-    Term term = Bitwuzla.mk_term(Kind.APPLY, f, x, Bitwuzla.mk_term(Kind.BV_EXTRACT, x, 6, 3));
+    Term term = termManager.mk_term(Kind.APPLY, f, x, termManager.mk_term(Kind.BV_EXTRACT, x, 6, 3));
 
     Sort resultSort = term.sort();
 
@@ -93,7 +95,7 @@ public class BitwuzlaNativeApiTest {
 
   @Test
   public void boolType() {
-    Sort pBoolType = Bitwuzla.mk_bool_sort();
+    Sort pBoolType = termManager.mk_bool_sort();
     assertThat(pBoolType.is_bool()).isTrue();
   }
 
@@ -101,8 +103,8 @@ public class BitwuzlaNativeApiTest {
   // -- This seems to be working now?
   @Test
   public void repeatedTermCreationInMultipleSolversTest() {
-    Term tru1 = Bitwuzla.mk_true();
-    Term tru12 = Bitwuzla.mk_true();
+    Term tru1 = termManager.mk_true();
+    Term tru12 = termManager.mk_true();
     assertThat(tru1.is_true()).isTrue();
     assertThat(tru12.is_true()).isTrue();
 
@@ -116,9 +118,9 @@ public class BitwuzlaNativeApiTest {
 
   @Test
   public void isFalse() {
-    Sort pBoolType = Bitwuzla.mk_bool_sort();
-    Term var1 = Bitwuzla.mk_const(pBoolType, "var1");
-    Term var2 = Bitwuzla.mk_const(pBoolType, "var2");
+    Sort pBoolType = termManager.mk_bool_sort();
+    Term var1 = termManager.mk_const(pBoolType, "var1");
+    Term var2 = termManager.mk_const(pBoolType, "var2");
 
     Truth.assertThat(var1.is_false()).isFalse();
     Truth.assertThat(var1.is_true()).isFalse();
@@ -128,14 +130,14 @@ public class BitwuzlaNativeApiTest {
 
   @Test
   public void testBvModel() {
-    Sort bvSort = Bitwuzla.mk_bv_sort(32);
-    Term a = Bitwuzla.mk_const(bvSort, "a");
-    Term one = Bitwuzla.mk_bv_one(bvSort);
-    Term two = Bitwuzla.mk_bv_value_signed(bvSort, 2);
+    Sort bvSort = termManager.mk_bv_sort(32);
+    Term a = termManager.mk_const(bvSort, "a");
+    Term one = termManager.mk_bv_one(bvSort);
+    Term two = termManager.mk_bv_value_int64(bvSort, 2);
 
     // 1 + 2 = a
-    Term add = Bitwuzla.mk_term(Kind.BV_ADD, one, two);
-    Term eq = Bitwuzla.mk_term(Kind.EQUAL, add, a);
+    Term add = termManager.mk_term(Kind.BV_ADD, one, two);
+    Term eq = termManager.mk_term(Kind.EQUAL, add, a);
 
     bitwuzla.assert_formula(eq);
     Result res = bitwuzla.check_sat();
@@ -153,25 +155,25 @@ public class BitwuzlaNativeApiTest {
 
   @Test
   public void testBvArrayModelStore() {
-    Sort bvSort4 = Bitwuzla.mk_bv_sort(4);
-    Sort bvSort8 = Bitwuzla.mk_bv_sort(8);
-    Sort sortArr = Bitwuzla.mk_array_sort(bvSort4, bvSort8);
+    Sort bvSort4 = termManager.mk_bv_sort(4);
+    Sort bvSort8 = termManager.mk_bv_sort(8);
+    Sort sortArr = termManager.mk_array_sort(bvSort4, bvSort8);
 
-    Term var = Bitwuzla.mk_const(bvSort8, "var");
-    Term eleven = Bitwuzla.mk_bv_value_signed(bvSort8, 11);
-    Term zero = Bitwuzla.mk_bv_zero(bvSort4);
-    Term one = Bitwuzla.mk_bv_one(bvSort4);
+    Term var = termManager.mk_const(bvSort8, "var");
+    Term eleven = termManager.mk_bv_value_int64(bvSort8, 11);
+    Term zero = termManager.mk_bv_zero(bvSort4);
+    Term one = termManager.mk_bv_one(bvSort4);
 
-    Term arr = Bitwuzla.mk_const(sortArr, "arr");
+    Term arr = termManager.mk_const(sortArr, "arr");
 
     // Array arr = {11, var} AND arr[0] == arr[1] -> var == 11
-    Term arrW11At0 = Bitwuzla.mk_term(Kind.ARRAY_STORE, arr, zero, eleven);
-    Term arrWVarAt1 = Bitwuzla.mk_term(Kind.ARRAY_STORE, arrW11At0, one, var);
+    Term arrW11At0 = termManager.mk_term(Kind.ARRAY_STORE, arr, zero, eleven);
+    Term arrWVarAt1 = termManager.mk_term(Kind.ARRAY_STORE, arrW11At0, one, var);
     Term eq =
-        Bitwuzla.mk_term(
+        termManager.mk_term(
             Kind.EQUAL,
-            Bitwuzla.mk_term(Kind.ARRAY_SELECT, arrWVarAt1, one),
-            Bitwuzla.mk_term(Kind.ARRAY_SELECT, arrWVarAt1, zero));
+            termManager.mk_term(Kind.ARRAY_SELECT, arrWVarAt1, one),
+            termManager.mk_term(Kind.ARRAY_SELECT, arrWVarAt1, zero));
 
     bitwuzla.assert_formula(eq);
     Result res = bitwuzla.check_sat();
@@ -219,21 +221,21 @@ public class BitwuzlaNativeApiTest {
 
   @Test
   public void testBvArrayModelSelect() {
-    Sort bvSort4 = Bitwuzla.mk_bv_sort(4);
-    Sort bvSort8 = Bitwuzla.mk_bv_sort(8);
-    Sort sortArr = Bitwuzla.mk_array_sort(bvSort4, bvSort8);
+    Sort bvSort4 = termManager.mk_bv_sort(4);
+    Sort bvSort8 = termManager.mk_bv_sort(8);
+    Sort sortArr = termManager.mk_array_sort(bvSort4, bvSort8);
 
-    Term eleven = Bitwuzla.mk_bv_value_signed(bvSort8, 11);
-    Term zero = Bitwuzla.mk_bv_zero(bvSort4);
-    Term one = Bitwuzla.mk_bv_one(bvSort4);
+    Term eleven = termManager.mk_bv_value_int64(bvSort8, 11);
+    Term zero = termManager.mk_bv_zero(bvSort4);
+    Term one = termManager.mk_bv_one(bvSort4);
 
-    Term arr = Bitwuzla.mk_const(sortArr, "arr");
+    Term arr = termManager.mk_const(sortArr, "arr");
 
     // Array arr[0] == (store arr[1] 11))[1]
-    Term selectArrAtZero = Bitwuzla.mk_term(Kind.ARRAY_SELECT, arr, zero);
-    Term arrWElevenAt1 = Bitwuzla.mk_term(Kind.ARRAY_STORE, arr, one, eleven);
-    Term selectArrWElevenAtOne = Bitwuzla.mk_term(Kind.ARRAY_SELECT, arrWElevenAt1, one);
-    Term eq = Bitwuzla.mk_term(Kind.EQUAL, selectArrAtZero, selectArrWElevenAtOne);
+    Term selectArrAtZero = termManager.mk_term(Kind.ARRAY_SELECT, arr, zero);
+    Term arrWElevenAt1 = termManager.mk_term(Kind.ARRAY_STORE, arr, one, eleven);
+    Term selectArrWElevenAtOne = termManager.mk_term(Kind.ARRAY_SELECT, arrWElevenAt1, one);
+    Term eq = termManager.mk_term(Kind.EQUAL, selectArrAtZero, selectArrWElevenAtOne);
 
     bitwuzla.assert_formula(eq);
     Result res = bitwuzla.check_sat();
@@ -259,18 +261,18 @@ public class BitwuzlaNativeApiTest {
 
   @Test
   public void testUfModel() {
-    Sort boolSort = Bitwuzla.mk_bool_sort();
-    Term res = Bitwuzla.mk_const(boolSort, "res");
-    Sort bvSort8 = Bitwuzla.mk_bv_sort(8);
-    Term arg1 = Bitwuzla.mk_const(bvSort8, "arg1");
-    Term arg2 = Bitwuzla.mk_bv_value_signed(bvSort8, 11);
+    Sort boolSort = termManager.mk_bool_sort();
+    Term res = termManager.mk_const(boolSort, "res");
+    Sort bvSort8 = termManager.mk_bv_sort(8);
+    Term arg1 = termManager.mk_const(bvSort8, "arg1");
+    Term arg2 = termManager.mk_bv_value_int64(bvSort8, 11);
     Sort[] domain = {bvSort8, bvSort8};
-    Sort sortFun = Bitwuzla.mk_fun_sort(new Vector_Sort(domain), boolSort);
+    Sort sortFun = termManager.mk_fun_sort(new Vector_Sort(domain), boolSort);
 
-    Term foo = Bitwuzla.mk_const(sortFun, "foo");
-    Term appliedFoo = Bitwuzla.mk_term(Kind.APPLY, foo, arg1, arg2);
+    Term foo = termManager.mk_const(sortFun, "foo");
+    Term appliedFoo = termManager.mk_term(Kind.APPLY, foo, arg1, arg2);
 
-    Term eq = Bitwuzla.mk_term(Kind.EQUAL, appliedFoo, res);
+    Term eq = termManager.mk_term(Kind.EQUAL, appliedFoo, res);
     bitwuzla.assert_formula(eq);
     Result result = bitwuzla.check_sat();
     assertThat(result).isEqualTo(Result.SAT);
@@ -299,14 +301,14 @@ public class BitwuzlaNativeApiTest {
 
   @Test
   public void testBoolModel() {
-    Sort boolSort = Bitwuzla.mk_bool_sort();
-    Term x = Bitwuzla.mk_const(boolSort, "x");
-    Term t = Bitwuzla.mk_true();
-    Term f = Bitwuzla.mk_false();
+    Sort boolSort = termManager.mk_bool_sort();
+    Term x = termManager.mk_const(boolSort, "x");
+    Term t = termManager.mk_true();
+    Term f = termManager.mk_false();
 
     // (x AND true) OR false
-    Term and = Bitwuzla.mk_term(Kind.AND, x, t);
-    Term or = Bitwuzla.mk_term(Kind.OR, and, f);
+    Term and = termManager.mk_term(Kind.AND, x, t);
+    Term or = termManager.mk_term(Kind.OR, and, f);
 
     bitwuzla.assert_formula(or);
     Result res = bitwuzla.check_sat();
@@ -339,16 +341,16 @@ public class BitwuzlaNativeApiTest {
 
   @Test
   public void testFpModel() {
-    Sort fpSort = Bitwuzla.mk_fp_sort(5, 11);
-    Term rm = Bitwuzla.mk_rm_value(RoundingMode.RNE);
-    Term a = Bitwuzla.mk_const(fpSort, "a");
-    Term one = Bitwuzla.mk_fp_value(fpSort, rm, "1");
+    Sort fpSort = termManager.mk_fp_sort(5, 11);
+    Term rm = termManager.mk_rm_value(RoundingMode.RNE);
+    Term a = termManager.mk_const(fpSort, "a");
+    Term one = termManager.parse_fp_value(fpSort, rm, "1");
     // Rational with 0 (or only 0s) as the second argument crashes Bitwuzla!
-    Term two = Bitwuzla.mk_fp_value(fpSort, rm, "2", "1");
+    Term two = termManager.mk_fp_value(fpSort, rm, "2", "1");
 
     // 1 + 2 = a
-    Term add = Bitwuzla.mk_term(Kind.FP_ADD, rm, two, one);
-    Term eq = Bitwuzla.mk_term(Kind.EQUAL, add, a);
+    Term add = termManager.mk_term(Kind.FP_ADD, rm, two, one);
+    Term eq = termManager.mk_term(Kind.EQUAL, add, a);
 
     bitwuzla.assert_formula(eq);
     Result res = bitwuzla.check_sat();
@@ -368,20 +370,20 @@ public class BitwuzlaNativeApiTest {
   public void testFpToBv() {
     // A constant (BITWUZLA_KIND_CONSTANT) is both, a variable and a constant value
     // However a value is also a BITWUZLA_KIND_VALUE, while a variable is not
-    Sort fpSort = Bitwuzla.mk_fp_sort(5, 11);
-    Term rm = Bitwuzla.mk_rm_value(RoundingMode.RTZ);
-    Term a = Bitwuzla.mk_const(fpSort, "a");
-    Term one = Bitwuzla.mk_fp_value(fpSort, rm, "-1");
-    Term two = Bitwuzla.mk_fp_value(fpSort, rm, "2");
+    Sort fpSort = termManager.mk_fp_sort(5, 11);
+    Term rm = termManager.mk_rm_value(RoundingMode.RTZ);
+    Term a = termManager.mk_const(fpSort, "a");
+    Term one = termManager.parse_fp_value(fpSort, rm, "-1");
+    Term two = termManager.parse_fp_value(fpSort, rm, "2");
 
-    Term bvOne = Bitwuzla.mk_term(Kind.FP_TO_SBV, rm, one, 11 + 5);
-    Term bvTwo = Bitwuzla.mk_term(Kind.FP_TO_SBV, rm, two, 11 + 5);
-    Term add = Bitwuzla.mk_term(Kind.FP_ADD, rm, two, one);
-    Term eq = Bitwuzla.mk_term(Kind.EQUAL, add, a);
+    Term bvOne = termManager.mk_term(Kind.FP_TO_SBV, rm, one, 11 + 5);
+    Term bvTwo = termManager.mk_term(Kind.FP_TO_SBV, rm, two, 11 + 5);
+    Term add = termManager.mk_term(Kind.FP_ADD, rm, two, one);
+    Term eq = termManager.mk_term(Kind.EQUAL, add, a);
 
-    Term bvA = Bitwuzla.mk_term(Kind.FP_TO_SBV, rm, a, 11 + 5);
-    Term bvAdd = Bitwuzla.mk_term(Kind.BV_ADD, bvOne, bvTwo);
-    Term eqBv = Bitwuzla.mk_term(Kind.EQUAL, bvAdd, bvA);
+    Term bvA = termManager.mk_term(Kind.FP_TO_SBV, rm, a, 11 + 5);
+    Term bvAdd = termManager.mk_term(Kind.BV_ADD, bvOne, bvTwo);
+    Term eqBv = termManager.mk_term(Kind.EQUAL, bvAdd, bvA);
 
     bitwuzla.assert_formula(eq);
     bitwuzla.assert_formula(eqBv);
@@ -394,13 +396,13 @@ public class BitwuzlaNativeApiTest {
     assertThat(bitwuzla.get_value(bvOne).toString()).isEqualTo("#b1111111111111111");
     assertThat(bitwuzla.get_value(bvTwo).toString()).isEqualTo("#b0000000000000010");
     // Now test -0.9 to 0 and 0.9 to 0
-    Term nearlyMin1 = Bitwuzla.mk_fp_value(fpSort, rm, "-0.9");
-    Term nearly1 = Bitwuzla.mk_fp_value(fpSort, rm, "0.9");
-    Term bvnearlyMin1 = Bitwuzla.mk_term(Kind.FP_TO_SBV, rm, nearlyMin1, 11 + 5);
-    Term bvnearly1 = Bitwuzla.mk_term(Kind.FP_TO_SBV, rm, nearly1, 11 + 5);
-    Term b = Bitwuzla.mk_const(Bitwuzla.mk_bv_sort(11 + 5), "b");
-    Term bvAdd2 = Bitwuzla.mk_term(Kind.BV_ADD, bvnearlyMin1, bvnearly1);
-    Term eqBv2 = Bitwuzla.mk_term(Kind.EQUAL, bvAdd2, b);
+    Term nearlyMin1 = termManager.parse_fp_value(fpSort, rm, "-0.9");
+    Term nearly1 = termManager.parse_fp_value(fpSort, rm, "0.9");
+    Term bvnearlyMin1 = termManager.mk_term(Kind.FP_TO_SBV, rm, nearlyMin1, 11 + 5);
+    Term bvnearly1 = termManager.mk_term(Kind.FP_TO_SBV, rm, nearly1, 11 + 5);
+    Term b = termManager.mk_const(termManager.mk_bv_sort(11 + 5), "b");
+    Term bvAdd2 = termManager.mk_term(Kind.BV_ADD, bvnearlyMin1, bvnearly1);
+    Term eqBv2 = termManager.mk_term(Kind.EQUAL, bvAdd2, b);
 
     bitwuzla.assert_formula(eqBv2);
     res = bitwuzla.check_sat();
@@ -414,25 +416,25 @@ public class BitwuzlaNativeApiTest {
   public void testTypes() {
     // A constant (BITWUZLA_KIND_CONSTANT) is both, a variable and a constant value
     // However a value is also a BITWUZLA_KIND_VALUE, while a variable is not
-    Sort fpSort = Bitwuzla.mk_fp_sort(5, 11);
-    Term rm = Bitwuzla.mk_rm_value(RoundingMode.RNE);
-    Term a = Bitwuzla.mk_const(fpSort, "a");
-    Term one = Bitwuzla.mk_fp_value(fpSort, rm, "1");
-    Term two = Bitwuzla.mk_fp_value(fpSort, rm, "2");
+    Sort fpSort = termManager.mk_fp_sort(5, 11);
+    Term rm = termManager.mk_rm_value(RoundingMode.RNE);
+    Term a = termManager.mk_const(fpSort, "a");
+    Term one = termManager.parse_fp_value(fpSort, rm, "1");
+    Term two = termManager.parse_fp_value(fpSort, rm, "2");
 
-    Sort boolSort = Bitwuzla.mk_bool_sort();
-    //    Result res = Bitwuzla.mk_const(boolSort, "res");
-    Sort bvSort8 = Bitwuzla.mk_bv_sort(8);
-    Term arg1 = Bitwuzla.mk_const(bvSort8, "arg1");
-    Term arg2 = Bitwuzla.mk_bv_value_signed(bvSort8, 11);
+    Sort boolSort = termManager.mk_bool_sort();
+    //    Result res = termManager.mk_const(boolSort, "res");
+    Sort bvSort8 = termManager.mk_bv_sort(8);
+    Term arg1 = termManager.mk_const(bvSort8, "arg1");
+    Term arg2 = termManager.mk_bv_value_int64(bvSort8, 11);
     Sort[] domain = {bvSort8, bvSort8};
-    Sort sortFun = Bitwuzla.mk_fun_sort(new Vector_Sort(domain), boolSort);
+    Sort sortFun = termManager.mk_fun_sort(new Vector_Sort(domain), boolSort);
 
     // (applied) UFs have 1 + arity children, the UF decl (in this case foo), then the arguments
     // in order. Applied UFs are also no "fun", but can only be discerned by KIND
     // The decl has no children, but you can get domain and codomain with API calls
-    Term foo = Bitwuzla.mk_const(sortFun, "foo");
-    Term appliedFoo = Bitwuzla.mk_term(Kind.APPLY, foo, arg1, arg2);
+    Term foo = termManager.mk_const(sortFun, "foo");
+    Term appliedFoo = termManager.mk_term(Kind.APPLY, foo, arg1, arg2);
     assertThat(appliedFoo.sort().is_fun()).isFalse();
     assertThat(appliedFoo.sort().is_bool()).isTrue();
     assertThat(appliedFoo.symbol()).isNull();
@@ -446,9 +448,9 @@ public class BitwuzlaNativeApiTest {
     assertThat(appliedFoo.kind()).isEqualTo(Kind.APPLY);
     assertThat(foo.kind()).isEqualTo(Kind.CONSTANT);
 
-    Term add = Bitwuzla.mk_term(Kind.FP_ADD, rm, two, one);
-    Term eq = Bitwuzla.mk_term(Kind.EQUAL, add, a);
-    Term neg = Bitwuzla.mk_term(Kind.NOT, eq);
+    Term add = termManager.mk_term(Kind.FP_ADD, rm, two, one);
+    Term eq = termManager.mk_term(Kind.EQUAL, add, a);
+    Term neg = termManager.mk_term(Kind.NOT, eq);
 
     // The type of add is fp (a bv add would be bv)
     assertThat(add.sort().is_fp()).isTrue();
@@ -505,12 +507,12 @@ public class BitwuzlaNativeApiTest {
    */
   @Test
   public void testExtend() {
-    Sort bvSort8 = Bitwuzla.mk_bv_sort(8);
-    Sort bvSort10 = Bitwuzla.mk_bv_sort(10);
-    Term x = Bitwuzla.mk_const(bvSort8, "x");
-    Term y = Bitwuzla.mk_const(bvSort10, "y");
-    Term xExt = Bitwuzla.mk_term(Kind.BV_SIGN_EXTEND, x, 2);
-    Term xExtEqY = Bitwuzla.mk_term(Kind.EQUAL, xExt, y);
+    Sort bvSort8 = termManager.mk_bv_sort(8);
+    Sort bvSort10 = termManager.mk_bv_sort(10);
+    Term x = termManager.mk_const(bvSort8, "x");
+    Term y = termManager.mk_const(bvSort10, "y");
+    Term xExt = termManager.mk_term(Kind.BV_SIGN_EXTEND, x, 2);
+    Term xExtEqY = termManager.mk_term(Kind.EQUAL, xExt, y);
     bitwuzla.assert_formula(xExtEqY);
     Result res = bitwuzla.check_sat();
     assertThat(res).isEqualTo(Result.SAT);
@@ -527,27 +529,27 @@ public class BitwuzlaNativeApiTest {
   @Test
   public void testExists() {
     // EXISTS x, y . x = z AND y = z implies x = y
-    Sort bvSort8 = Bitwuzla.mk_bv_sort(8);
-    Term x = Bitwuzla.mk_const(bvSort8, "x");
-    Term y = Bitwuzla.mk_const(bvSort8, "y");
-    Term z = Bitwuzla.mk_const(bvSort8, "z");
+    Sort bvSort8 = termManager.mk_bv_sort(8);
+    Term x = termManager.mk_const(bvSort8, "x");
+    Term y = termManager.mk_const(bvSort8, "y");
+    Term z = termManager.mk_const(bvSort8, "z");
 
-    Term xEqZ = Bitwuzla.mk_term(Kind.EQUAL, x, z);
-    Term yEqZ = Bitwuzla.mk_term(Kind.EQUAL, y, z);
-    Term xEqY = Bitwuzla.mk_term(Kind.EQUAL, x, y);
-    Term formula = Bitwuzla.mk_term(Kind.IMPLIES, Bitwuzla.mk_term(Kind.AND, xEqZ, yEqZ), xEqY);
+    Term xEqZ = termManager.mk_term(Kind.EQUAL, x, z);
+    Term yEqZ = termManager.mk_term(Kind.EQUAL, y, z);
+    Term xEqY = termManager.mk_term(Kind.EQUAL, x, y);
+    Term formula = termManager.mk_term(Kind.IMPLIES, termManager.mk_term(Kind.AND, xEqZ, yEqZ), xEqY);
 
     // Substitute the free vars with bound vars
-    Term xB = Bitwuzla.mk_var(bvSort8, "x");
-    Term yB = Bitwuzla.mk_var(bvSort8, "y");
+    Term xB = termManager.mk_var(bvSort8, "x");
+    Term yB = termManager.mk_var(bvSort8, "y");
     // Substitution does not return a new term, but modifies the existing!
     Map_TermTerm mapping = new Map_TermTerm();
     mapping.put(x, xB);
     mapping.put(y, yB);
-    formula.substitute(mapping);
+    termManager.substitute_term(formula, mapping);
     // Build quantifier
     Term[] argsAndBody = {xB, yB, formula};
-    Term ex = Bitwuzla.mk_term(Kind.FORALL, new Vector_Term(argsAndBody));
+    Term ex = termManager.mk_term(Kind.FORALL, new Vector_Term(argsAndBody), new Vector_Int());
 
     // Check SAT
     bitwuzla.assert_formula(ex);
@@ -569,7 +571,7 @@ public class BitwuzlaNativeApiTest {
           + "(assert .def_14)";
 
   private Vector_Term parse(String smt2dump) {
-    Parser parser = new Parser(createOptions());
+    Parser parser = new Parser(termManager, createOptions());
     parser.parse(smt2dump, true, false);
     return parser.bitwuzla().get_assertions();
   }
@@ -590,10 +592,10 @@ public class BitwuzlaNativeApiTest {
 
   @Test
   public void parserTest() {
-    Sort boolSort = Bitwuzla.mk_bool_sort();
-    Term x = Bitwuzla.mk_const(boolSort, "x");
-    Term y = Bitwuzla.mk_const(boolSort, "y");
-    Term xOrY = Bitwuzla.mk_term(Kind.XOR, x, y);
+    Sort boolSort = termManager.mk_bool_sort();
+    Term x = termManager.mk_const(boolSort, "x");
+    Term y = termManager.mk_const(boolSort, "y");
+    Term xOrY = termManager.mk_term(Kind.XOR, x, y);
     bitwuzla.push(1);
     bitwuzla.assert_formula(xOrY);
 

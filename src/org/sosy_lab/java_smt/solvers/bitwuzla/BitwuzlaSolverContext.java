@@ -32,6 +32,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.BitwuzlaNative;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Option;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Options;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.TermManager;
 
 public final class BitwuzlaSolverContext extends AbstractSolverContext {
 
@@ -104,9 +105,10 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
       throws InvalidConfigurationException {
     pLoader.accept("bitwuzlaJNI");
 
+    TermManager termManager = new TermManager();
     Options solverOptions = buildBitwuzlaOptions(new BitwuzlaSettings(config), randomSeed);
 
-    BitwuzlaFormulaCreator creator = new BitwuzlaFormulaCreator();
+    BitwuzlaFormulaCreator creator = new BitwuzlaFormulaCreator(termManager);
     BitwuzlaUFManager functionTheory = new BitwuzlaUFManager(creator);
     BitwuzlaBooleanFormulaManager booleanTheory = new BitwuzlaBooleanFormulaManager(creator);
     BitwuzlaBitvectorFormulaManager bitvectorTheory =

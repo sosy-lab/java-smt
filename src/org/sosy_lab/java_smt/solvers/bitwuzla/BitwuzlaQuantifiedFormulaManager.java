@@ -13,20 +13,22 @@ import static com.google.common.base.Preconditions.checkArgument;
 import java.util.List;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
-import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
-import org.sosy_lab.java_smt.solvers.bitwuzla.api.Bitwuzla;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Kind;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Map_TermTerm;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Sort;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Term;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.TermManager;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Int;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Term;
 
 public class BitwuzlaQuantifiedFormulaManager
     extends AbstractQuantifiedFormulaManager<Term, Sort, Void, BitwuzlaDeclaration> {
+  private final TermManager termManager;
 
   protected BitwuzlaQuantifiedFormulaManager(
-      FormulaCreator<Term, Sort, Void, BitwuzlaDeclaration> pCreator) {
+      BitwuzlaFormulaCreator pCreator) {
     super(pCreator);
+    termManager = pCreator.getTermManager();
   }
 
   @Override
@@ -54,7 +56,7 @@ public class BitwuzlaQuantifiedFormulaManager
     for (int i = 0; i < origVars.length; i++) {
       map.put(origVars[i], substVars[i]);
     }
-    body = body.substitute(map);
+    body = termManager.substitute_term(body, map);
 
     Term[] argsAndBody = new Term[2];
     argsAndBody[1] = body;
@@ -62,10 +64,10 @@ public class BitwuzlaQuantifiedFormulaManager
     for (int i = 0; i < vars.size(); i++) {
       argsAndBody[0] = substVars[i];
       if (q.equals(Quantifier.FORALL)) {
-        currentFormula = Bitwuzla.mk_term(Kind.FORALL, new Vector_Term(argsAndBody));
+        currentFormula = termManager.mk_term(Kind.FORALL, new Vector_Term(argsAndBody), new Vector_Int());
 
       } else {
-        currentFormula = Bitwuzla.mk_term(Kind.EXISTS, new Vector_Term(argsAndBody));
+        currentFormula = termManager.mk_term(Kind.EXISTS, new Vector_Term(argsAndBody), new Vector_Int());
       }
       argsAndBody[1] = currentFormula;
     }

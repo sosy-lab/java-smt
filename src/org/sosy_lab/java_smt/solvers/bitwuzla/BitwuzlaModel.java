@@ -204,7 +204,7 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, Void> {
     if (left.sort().is_fp()) {
       kind = Kind.FP_EQUAL;
     }
-    return Bitwuzla.mk_term(kind, left, right);
+    return bitwuzlaCreator.getTermManager().mk_term(kind, left, right);
   }
 
   private ValueAssignment getUFAssignment(Term pTerm) {
