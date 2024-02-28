@@ -67,13 +67,13 @@ public class BitwuzlaNativeApiTest {
   }
 
   // Bitwuzla does not support lambdas with no argument
-  //@Ignore
-  //@Test
-  //public void functionWithNoArguments() {
+  // @Ignore
+  // @Test
+  // public void functionWithNoArguments() {
   //  Sort bool_sort = termManager.mk_bool_sort();
   //  Term a = termManager.mk_var(bool_sort, "a");
   //  termManager.mk_term(Kind.LAMBDA, a);
-  //}
+  // }
 
   @Test
   public void signedFunctions() {
@@ -86,7 +86,8 @@ public class BitwuzlaNativeApiTest {
     Term x = termManager.mk_const(sortbv8, "x");
     Term f = termManager.mk_const(sortfun, "f");
 
-    Term term = termManager.mk_term(Kind.APPLY, f, x, termManager.mk_term(Kind.BV_EXTRACT, x, 6, 3));
+    Term term =
+        termManager.mk_term(Kind.APPLY, f, x, termManager.mk_term(Kind.BV_EXTRACT, x, 6, 3));
 
     Sort resultSort = term.sort();
 
@@ -537,7 +538,8 @@ public class BitwuzlaNativeApiTest {
     Term xEqZ = termManager.mk_term(Kind.EQUAL, x, z);
     Term yEqZ = termManager.mk_term(Kind.EQUAL, y, z);
     Term xEqY = termManager.mk_term(Kind.EQUAL, x, y);
-    Term formula = termManager.mk_term(Kind.IMPLIES, termManager.mk_term(Kind.AND, xEqZ, yEqZ), xEqY);
+    Term formula =
+        termManager.mk_term(Kind.IMPLIES, termManager.mk_term(Kind.AND, xEqZ, yEqZ), xEqY);
 
     // Substitute the free vars with bound vars
     Term xB = termManager.mk_var(bvSort8, "x");

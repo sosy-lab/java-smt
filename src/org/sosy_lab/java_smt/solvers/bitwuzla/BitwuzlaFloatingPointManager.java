@@ -28,8 +28,7 @@ public class BitwuzlaFloatingPointManager
   private final Term roundingMode;
 
   protected BitwuzlaFloatingPointManager(
-      BitwuzlaFormulaCreator pCreator,
-      FloatingPointRoundingMode pFloatingPointRoundingMode) {
+      BitwuzlaFormulaCreator pCreator, FloatingPointRoundingMode pFloatingPointRoundingMode) {
     super(pCreator);
     termManager = pCreator.getTermManager();
     roundingMode = getRoundingModeImpl(pFloatingPointRoundingMode);

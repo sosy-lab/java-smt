@@ -25,8 +25,7 @@ public class BitwuzlaQuantifiedFormulaManager
     extends AbstractQuantifiedFormulaManager<Term, Sort, Void, BitwuzlaDeclaration> {
   private final TermManager termManager;
 
-  protected BitwuzlaQuantifiedFormulaManager(
-      BitwuzlaFormulaCreator pCreator) {
+  protected BitwuzlaQuantifiedFormulaManager(BitwuzlaFormulaCreator pCreator) {
     super(pCreator);
     termManager = pCreator.getTermManager();
   }
@@ -64,10 +63,12 @@ public class BitwuzlaQuantifiedFormulaManager
     for (int i = 0; i < vars.size(); i++) {
       argsAndBody[0] = substVars[i];
       if (q.equals(Quantifier.FORALL)) {
-        currentFormula = termManager.mk_term(Kind.FORALL, new Vector_Term(argsAndBody), new Vector_Int());
+        currentFormula =
+            termManager.mk_term(Kind.FORALL, new Vector_Term(argsAndBody), new Vector_Int());
 
       } else {
-        currentFormula = termManager.mk_term(Kind.EXISTS, new Vector_Term(argsAndBody), new Vector_Int());
+        currentFormula =
+            termManager.mk_term(Kind.EXISTS, new Vector_Term(argsAndBody), new Vector_Int());
       }
       argsAndBody[1] = currentFormula;
     }

@@ -52,7 +52,7 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Term;
 
 public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, BitwuzlaDeclaration> {
   private final TermManager termManager;
-  
+
   private final Table<String, Sort, Term> formulaCache = HashBasedTable.create();
 
   // Bitwuzla has no operation for casting floats to bitvectors. We need to use a workaround
@@ -65,7 +65,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
 
   protected BitwuzlaFormulaCreator(TermManager pTermManager) {
     super(null, pTermManager.mk_bool_sort(), null, null, null, null);
-    termManager= pTermManager;
+    termManager = pTermManager;
   }
 
   TermManager getTermManager() {
