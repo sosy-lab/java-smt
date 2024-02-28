@@ -188,9 +188,6 @@ public class SolverConcurrencyTest {
    */
   @Test
   public void testBvConcurrencyWithConcurrentContext() {
-    // FIXME: Bitwuzla does not support parallel solver threads
-    assume().that(solver).isNotEqualTo(Solvers.BITWUZLA);
-
     requireBitvectors();
     assertConcurrency(
         "testBvConcurrencyWithConcurrentContext",
@@ -208,13 +205,6 @@ public class SolverConcurrencyTest {
    */
   @Test
   public void testConcurrencyWithConcurrentManagers() throws InvalidConfigurationException {
-    assume()
-        .withMessage(
-            "Solver does not support usage of managers in threads distinct to the "
-                + "creating thread")
-        .that(solver)
-        .isNotEqualTo(Solvers.BITWUZLA);
-
     ConcurrentLinkedQueue<ContextAndFormula> contextAndFormulaList = new ConcurrentLinkedQueue<>();
     SolverContext context = initSolver();
     FormulaManager mgr = context.getFormulaManager();
@@ -377,11 +367,6 @@ public class SolverConcurrencyTest {
   @Test
   public void testBvConcurrencyWithoutConcurrentContext() throws InvalidConfigurationException {
     requireBitvectors();
-
-    assume()
-        .withMessage("Solver does not support concurrency without concurrent context.")
-        .that(solver)
-        .isNoneOf(Solvers.CVC5, Solvers.BITWUZLA);
 
     ConcurrentLinkedQueue<SolverContext> contextList = new ConcurrentLinkedQueue<>();
     // Initialize contexts before using them in the threads
