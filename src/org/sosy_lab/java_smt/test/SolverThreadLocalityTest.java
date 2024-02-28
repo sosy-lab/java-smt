@@ -342,13 +342,10 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
       throws InterruptedException, SolverException, InvalidConfigurationException {
     assume()
         .that(solverToUse())
-        .isNoneOf(
-            Solvers.OPENSMT,
-            Solvers.MATHSAT5,
-            Solvers.SMTINTERPOL,
-            Solvers.Z3,
-            Solvers.PRINCESS,
-            Solvers.BOOLECTOR);
+        .isAnyOf(
+            Solvers.CVC4,
+            Solvers.CVC5,
+            Solvers.YICES2);
 
     // FIXME: This test tries to use a formula that was created in a different context. We expect
     //  this test to fail for most solvers, but there should be a unique error message.
