@@ -11,8 +11,6 @@
 #include <bitwuzla/cpp/bitwuzla.h>
 #include <bitwuzla/cpp/parser.h>
 
-#include <gmp.h>
-
 #include <string>
 #include <sstream>
 
@@ -23,18 +21,13 @@
 %include <std_string.i>
 
 %include <std_vector.i>
-%template(Vector_Int)
-  std::vector<int>;
-%template(Vector_String)
-  std::vector<std::string>;
-%template(Vector_Term)
-  std::vector<bitwuzla::Term>;
-%template(Vector_Sort)
-  std::vector<bitwuzla::Sort>;
+%template(Vector_Int) std::vector<int>;
+%template(Vector_String) std::vector<std::string>;
+%template(Vector_Term) std::vector<bitwuzla::Term>;
+%template(Vector_Sort) std::vector<bitwuzla::Sort>;
 
 %include <std_unordered_map.i>
-%template(Map_TermTerm)
-  std::unordered_map<bitwuzla::Term, bitwuzla::Term>;
+%template(Map_TermTerm) std::unordered_map<bitwuzla::Term, bitwuzla::Term>;
 
 %include <std_shared_ptr.i>
 %shared_ptr(bitwuzla::Bitwuzla);
@@ -242,72 +235,6 @@ namespace bitwuzla {
 %extend TermManager {
   Sort mk_fp_sort(int exp_size, int sig_size) {
     return $self->mk_fp_sort(exp_size, sig_size);
-  }
-}
-
-%ignore TermManager::mk_fp_value(const Sort &sort, const Term &rm, const std::string &real);
-%extend TermManager {
-  // Patch mk_fp_value to handle scientific notation in the input string
-  Term parse_fp_value(const Sort &sort, const Term &rm, const std::string &repr) {
-    // Handle special values
-    if (repr == "Infinity") {
-      return $self->mk_fp_pos_inf(sort);
-    }
-    if (repr == "-Infinity") {
-      return $self->mk_fp_neg_inf(sort);
-    }
-    if (repr == "NaN") {
-      return $self->mk_fp_nan(sort);
-    }
-
-    // Parse float value with GMP
-    mpf_t floatVal;
-    std::string prev_loc = std::setlocale(LC_ALL, nullptr);
-    std::setlocale(LC_ALL, "en_US.UTF-8");
-    int error = mpf_init_set_str(floatVal, repr.c_str(), 10);
-    std::setlocale(LC_ALL, prev_loc.c_str());
-    if (error != 0) {
-      throw bitwuzla::Exception(
-        "String \"" + repr + "\" can't be parsed as a floating point number.");
-    }
-
-    // Convert to decimal format for Bitwuzla
-    mp_exp_t exponent;
-    char* mantissa = mpf_get_str(nullptr, &exponent, 10, 0, floatVal);
-    std::string input = std::string(mantissa);
-    mpf_clear(floatVal);
-    bool isZeroes = input.find_first_not_of("0") == std::string::npos;
-    if (isZeroes) {
-      // GMP drops the sign for -0.0, so we have handle this as a special case
-      if (repr[0] == '-') {
-        return $self->mk_fp_neg_zero(sort);
-      } else {
-        return $self->mk_fp_pos_zero(sort);
-      }
-    }
-
-    std::ostringstream output;
-    if (input[0] == '-') {
-      output << "-";
-      input.erase(0, 1);
-    }
-    if (exponent <= 0) {
-      output << "0.";
-      output << std::string(-exponent, '0');
-      output << input;
-    } else {
-      output << input.substr(0, exponent);
-      if (exponent > input.length()) {
-        output << std::string(exponent - input.length(), '0');
-      }
-      if (exponent < input.length()) {
-        output << '.' << input.substr(exponent);
-      }
-    }
-    delete[] mantissa;
-
-    // Create the term
-    return $self->mk_fp_value(sort, rm, output.str());
   }
 }
 

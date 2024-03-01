@@ -345,7 +345,7 @@ public class BitwuzlaNativeApiTest {
     Sort fpSort = termManager.mk_fp_sort(5, 11);
     Term rm = termManager.mk_rm_value(RoundingMode.RNE);
     Term a = termManager.mk_const(fpSort, "a");
-    Term one = termManager.parse_fp_value(fpSort, rm, "1");
+    Term one = termManager.mk_fp_value(fpSort, rm, "1");
     // Rational with 0 (or only 0s) as the second argument crashes Bitwuzla!
     Term two = termManager.mk_fp_value(fpSort, rm, "2", "1");
 
@@ -374,8 +374,8 @@ public class BitwuzlaNativeApiTest {
     Sort fpSort = termManager.mk_fp_sort(5, 11);
     Term rm = termManager.mk_rm_value(RoundingMode.RTZ);
     Term a = termManager.mk_const(fpSort, "a");
-    Term one = termManager.parse_fp_value(fpSort, rm, "-1");
-    Term two = termManager.parse_fp_value(fpSort, rm, "2");
+    Term one = termManager.mk_fp_value(fpSort, rm, "-1");
+    Term two = termManager.mk_fp_value(fpSort, rm, "2");
 
     Term bvOne = termManager.mk_term(Kind.FP_TO_SBV, rm, one, 11 + 5);
     Term bvTwo = termManager.mk_term(Kind.FP_TO_SBV, rm, two, 11 + 5);
@@ -397,8 +397,8 @@ public class BitwuzlaNativeApiTest {
     assertThat(bitwuzla.get_value(bvOne).toString()).isEqualTo("#b1111111111111111");
     assertThat(bitwuzla.get_value(bvTwo).toString()).isEqualTo("#b0000000000000010");
     // Now test -0.9 to 0 and 0.9 to 0
-    Term nearlyMin1 = termManager.parse_fp_value(fpSort, rm, "-0.9");
-    Term nearly1 = termManager.parse_fp_value(fpSort, rm, "0.9");
+    Term nearlyMin1 = termManager.mk_fp_value(fpSort, rm, "-0.9");
+    Term nearly1 = termManager.mk_fp_value(fpSort, rm, "0.9");
     Term bvnearlyMin1 = termManager.mk_term(Kind.FP_TO_SBV, rm, nearlyMin1, 11 + 5);
     Term bvnearly1 = termManager.mk_term(Kind.FP_TO_SBV, rm, nearly1, 11 + 5);
     Term b = termManager.mk_const(termManager.mk_bv_sort(11 + 5), "b");
@@ -420,8 +420,8 @@ public class BitwuzlaNativeApiTest {
     Sort fpSort = termManager.mk_fp_sort(5, 11);
     Term rm = termManager.mk_rm_value(RoundingMode.RNE);
     Term a = termManager.mk_const(fpSort, "a");
-    Term one = termManager.parse_fp_value(fpSort, rm, "1");
-    Term two = termManager.parse_fp_value(fpSort, rm, "2");
+    Term one = termManager.mk_fp_value(fpSort, rm, "1");
+    Term two = termManager.mk_fp_value(fpSort, rm, "2");
 
     Sort boolSort = termManager.mk_bool_sort();
     //    Result res = termManager.mk_const(boolSort, "res");

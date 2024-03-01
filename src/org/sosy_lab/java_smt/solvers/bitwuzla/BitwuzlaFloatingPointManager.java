@@ -85,7 +85,29 @@ public class BitwuzlaFloatingPointManager
   @Override
   protected Term makeNumberAndRound(
       String pN, FloatingPointType pType, Term pFloatingPointRoundingMode) {
-    return termManager.parse_fp_value(mkFpaSort(pType), pFloatingPointRoundingMode, pN);
+    // Convert input string to "canonical" format, that is without trailing zeroes, but at least
+    // one digit after the dot
+    String canonical = pN.replaceAll("(\\.[0-9]+?)0*$", "$1");
+    if (!canonical.contains(".")) {
+      canonical = canonical + ".0";
+    }
+
+    // Handle special cases
+    if (canonical.equals("-inf")) {
+      return termManager.mk_fp_neg_inf(mkFpaSort(pType));
+    }
+    if (canonical.equals("-0.0")) {
+      return termManager.mk_fp_neg_zero(mkFpaSort(pType));
+    }
+    if (canonical.equals("nan")) {
+      return termManager.mk_fp_nan(mkFpaSort(pType));
+    }
+    if (canonical.equals("inf")) {
+      return termManager.mk_fp_pos_inf(mkFpaSort(pType));
+    }
+
+    String decimalString = new BigDecimal(canonical).toPlainString();
+    return termManager.mk_fp_value(mkFpaSort(pType), pFloatingPointRoundingMode, decimalString);
   }
 
   @Override
