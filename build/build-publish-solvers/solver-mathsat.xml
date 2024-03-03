@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+This file is part of JavaSMT,
+an API wrapper for a collection of SMT solvers:
+https://github.com/sosy-lab/java-smt
+
+SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<!-- vim: set tabstop=8 shiftwidth=4 expandtab sts=4 filetype=ant fdm=marker: -->
+<project name="publish-solvers-mathsat" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+
+    <import file="macros.xml"/>
+
+    <target name="compile-mathsat-bindings-linux">
+        <compile-mathsatlike-bindings-linux flag="mathsat"/>
+    </target>
+
+    <target name="compile-mathsat-bindings-windows">
+        <compile-mathsatlike-bindings-windows flag="mathsat"/>
+    </target>
+
+    <target name="compile-optimathsat-bindings">
+        <compile-mathsatlike-bindings-linux flag="optimathsat"/>
+    </target>
+
+    <macrodef name="compile-mathsatlike-bindings-linux">
+        <attribute name="flag" default="mathsat"/>
+        <sequential>
+            <checkPathOption pathOption="mathsat.path" defaultPath="/path/to/mathsat" targetName="Mathsat5 source folder (Linux version)"/>
+            <checkPathOption pathOption="gmp.path" defaultPath="/path/to/gmp" targetName="GMP source folder (Linux version)"/>
+            <exec executable="lib/native/source/libmathsat5j/compile.sh" failonerror="true">
+                <arg value="${mathsat.path}" />
+                <arg value="${gmp.path}" />
+                <arg value="-@{flag}" />
+            </exec>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="compile-mathsatlike-bindings-windows">
+        <attribute name="flag" default="mathsat"/> <!-- unused, OptiMathSAT not yet build for Windows -->
+        <sequential>
+            <checkPathOption pathOption="mathsat-windows.path" defaultPath="/path/to/mathsat" targetName="Mathsat5 source folder (Windows version)"/>
+            <checkPathOption pathOption="mpir-windows.path" defaultPath="/path/to/mpir" targetName="MPIR source folder (Windows version)"/>
+            <checkPathOption pathOption="jdk-windows.path" defaultPath="/path/to/jdk" targetName="JDK source folder (Windows version)"/>
+            <exec executable="lib/native/source/libmathsat5j/compileForWindows.sh" failonerror="true">
+                <arg value="${mathsat-windows.path}" />
+                <arg value="${mpir-windows.path}" />
+                <arg value="${jdk-windows.path}" />
+            </exec>
+        </sequential>
+    </macrodef>
+
+    <target name="publish-mathsat" depends="compile-mathsat-bindings-linux, compile-mathsat-bindings-windows, load-ivy"
+        description="Publish MathSAT binaries to Ivy repo.">
+        <fail unless="mathsat.version">
+            Please specify the MathSAT5 version with the flag -Dmathsat.version=... .
+        </fail>
+
+        <copy file="lib/native/source/libmathsat5j/libmathsat5j.so" tofile="libmathsat5j-${mathsat.version}.so"/>
+        <copy file="lib/native/source/libmathsat5j/mathsat5j.dll" tofile="mathsat5j-${mathsat.version}.dll"/>
+        <copy file="${mathsat-windows.path}/lib/mathsat.dll" tofile="mathsat-${mathsat.version}.dll"/>
+        <copy file="${mathsat-windows.path}/bin/mpir.dll" tofile="mpir-${mathsat.version}.dll"/>
+
+        <ivy:resolve conf="solver-mathsat" file="solvers_ivy_conf/ivy_mathsat.xml" />
+        <available property="ivy.hasrepository" file="repository/${ivy.organisation}/${ivy.module}" />
+        <fail unless="ivy.hasrepository"
+            message="Cannot publish without 'repository' dir, please run 'svn co https://svn.sosy-lab.org/software/ivy/repository/${ivy.organisation}/${ivy.module} repository/${ivy.organisation}/${ivy.module}'." />
+
+        <ivy:publish
+            pubrevision="${mathsat.version}"
+            resolver="Sosy-Lab-Publish"
+            artifactspattern="[artifact]-[revision].[ext]"
+            status="release"
+            />
+        <echo>
+            You now want to run
+            svn add repository/${ivy.organisation}/${ivy.module}/*-${mathsat.version}*
+            svn ci repository/${ivy.organisation}/${ivy.module} -m"publish version ${mathsat.version} of MathSAT5"
+            to make the new version publicly available.</echo>
+    </target>
+
+    <target name="publish-optimathsat" depends="compile-optimathsat-bindings, load-ivy"
+        description="Publish OptiMathSAT binaries to Ivy repo.">
+        <fail unless="mathsat.version">
+            Please specify the @{flag} version with the flag -Dmathsat.version=... .
+        </fail>
+
+        <copy file="lib/native/source/libmathsat5j/liboptimathsat5j.so" tofile="liboptimathsat5j-${mathsat.version}.so"/>
+
+        <ivy:resolve conf="solver-optimathsat" file="solvers_ivy_conf/ivy_optimathsat.xml" />
+        <available property="ivy.hasrepository" file="repository/${ivy.organisation}/${ivy.module}" />
+        <fail unless="ivy.hasrepository"
+            message="Cannot publish without 'repository' dir, please run 'svn co https://svn.sosy-lab.org/software/ivy/repository/${ivy.organisation}/${ivy.module} repository/${ivy.organisation}/${ivy.module}'." />
+
+        <ivy:publish
+            pubrevision="${mathsat.version}"
+            resolver="Sosy-Lab-Publish"
+            artifactspattern="[artifact]-[revision].[ext]"
+            status="release"
+            />
+        <echo>
+            You now want to run
+            svn add repository/${ivy.organisation}/${ivy.module}/*-${mathsat.version}*
+            svn ci repository/${ivy.organisation}/${ivy.module} -m"publish version ${mathsat.version} of OptiMathSAT"
+            to make the new version publicly available.</echo>
+    </target>
+</project>
