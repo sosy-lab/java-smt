@@ -39,21 +39,7 @@ SPDX-License-Identifier: Apache-2.0
             <copy file="lib/native/source/yices2j/libyices2j.so" tofile="libyices2j-${yices2.version}.so"/>
 
             <ivy:resolve conf="solver-yices2" file="solvers_ivy_conf/ivy_yices2.xml" />
-            <available property="ivy.hasrepository" file="repository/${ivy.organisation}/${ivy.module}" />
-            <fail unless="ivy.hasrepository"
-                message="Cannot publish without 'repository' dir, please run 'svn co https://svn.sosy-lab.org/software/ivy/repository/${ivy.organisation}/${ivy.module} repository/${ivy.organisation}/${ivy.module}'." />
-
-            <ivy:publish
-                pubrevision="${yices2.version}"
-                resolver="Sosy-Lab-Publish"
-                artifactspattern="[artifact]-[revision].[ext]"
-                status="release"
-                />
-            <echo>
-                You now want to run
-                svn add repository/${ivy.organisation}/${ivy.module}/*-${yices2.version}*
-                svn ci repository/${ivy.organisation}/${ivy.module} -m"publish version ${yices2.version} of Yices2 Solver"
-                to make the new version publicly available.</echo>
+            <publishToRepository solverName="Yices" solverVersion="${version}"/>
         </sequential>
     </target>
 
@@ -63,24 +49,10 @@ SPDX-License-Identifier: Apache-2.0
     <target name="publish-artifacts-yices2" depends="load-ivy, determine-version, dist-yices2"
          description="Publish Java bindings for Yices2 to Ivy repo.">
         <sequential>
-            <ivy:resolve conf="runtime" file="solvers_ivy_conf/ivy_javasmt_yices2.xml" />
-            <available property="ivy.hasrepository" file="repository/${ivy.organisation}/${ivy.module}" />
-            <fail unless="ivy.hasrepository"
-                message="Cannot publish without 'repository' dir, please run 'svn co https://svn.sosy-lab.org/software/ivy/repository/${ivy.organisation}/${ivy.module} repository/${ivy.organisation}/${ivy.module}'." />
             <fail unless="version.publishable"
-                message="Cannot publish version ${version}, only unmodified working copies may be published." />
-
-            <ivy:publish
-                pubrevision="${version}"
-                resolver="Sosy-Lab-Publish"
-                status="release"
-                artifactspattern="[artifact]-[revision](-[classifier]).[ext]">
-            </ivy:publish>
-            <echo>
-                You now want to run
-                svn add repository/${ivy.organisation}/${ivy.module}/*-${version}*
-                svn ci repository/${ivy.organisation}/${ivy.module} -m"publish version ${version} of ${ant.project.name}"
-                to make the new version publicly available.</echo>
+                  message="Cannot publish version ${version}, only unmodified working copies may be published." />
+            <ivy:resolve conf="runtime" file="solvers_ivy_conf/ivy_javasmt_yices2.xml" />
+            <publishToRepository solverName="Yices" solverVersion="${version}"/>
         </sequential>
     </target>
 </project>

@@ -13,6 +13,8 @@ SPDX-License-Identifier: Apache-2.0
 <!-- vim: set tabstop=8 shiftwidth=4 expandtab sts=4 filetype=ant fdm=marker: -->
 <project name="publish-solvers-cvc4" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
 
+    <import file="macros.xml"/>
+
     <target name="package-cvc4" depends="">
         <!-- Copy CVC4 binaries to the root folder along with the version postfix. -->
         <fail unless="cvc4.path">
@@ -83,22 +85,7 @@ SPDX-License-Identifier: Apache-2.0
 
     <target name="publish-cvc4" depends="package-cvc4, load-ivy"
         description="Publish CVC4 binaries to Ivy repository.">
-
         <ivy:resolve conf="solver-cvc4" file="solvers_ivy_conf/ivy_cvc4.xml" />
-        <available property="ivy.hasrepository" file="repository/${ivy.organisation}/${ivy.module}" />
-        <fail unless="ivy.hasrepository"
-            message="Cannot publish without 'repository' dir, please run 'svn co https://svn.sosy-lab.org/software/ivy/repository/${ivy.organisation}/${ivy.module} repository/${ivy.organisation}/${ivy.module}'." />
-
-        <ivy:publish
-            pubrevision="${cvc4.version}"
-            resolver="Sosy-Lab-Publish"
-            artifactspattern="[artifact]-[revision].[ext]"
-            status="release"
-            />
-        <echo>
-            You now want to run
-            svn add repository/${ivy.organisation}/${ivy.module}/*-${cvc4.version}*
-            svn ci repository/${ivy.organisation}/${ivy.module} -m"publish version ${cvc4.version} of CVC4 Solver"
-            to make the new version publicly available.</echo>
+        <publishToRepository solverName="CVC4" solverVersion="${cvc4.version}"/>
     </target>
 </project>

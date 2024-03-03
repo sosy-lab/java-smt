@@ -13,6 +13,8 @@ SPDX-License-Identifier: Apache-2.0
 <!-- vim: set tabstop=8 shiftwidth=4 expandtab sts=4 filetype=ant fdm=marker: -->
 <project name="publish-solvers-boolector" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
 
+    <import file="macros.xml"/>
+
     <target name="package-boolector" depends="">
         <!-- Copy Boolector repository to the root folder along with the version postfix. -->
         <fail unless="boolector.path">
@@ -86,22 +88,7 @@ SPDX-License-Identifier: Apache-2.0
 
     <target name="publish-boolector" depends="package-boolector, load-ivy"
         description="Publish Boolector binaries to Ivy repository.">
-
         <ivy:resolve conf="solver-boolector" file="solvers_ivy_conf/ivy_boolector.xml" />
-        <available property="ivy.hasrepository" file="repository/${ivy.organisation}/${ivy.module}" />
-        <fail unless="ivy.hasrepository"
-            message="Cannot publish without 'repository' dir, please run 'svn co https://svn.sosy-lab.org/software/ivy/repository/${ivy.organisation}/${ivy.module} repository/${ivy.organisation}/${ivy.module}'." />
-
-        <ivy:publish
-            pubrevision="${boolector.version}"
-            resolver="Sosy-Lab-Publish"
-            artifactspattern="[artifact]-[revision].[ext]"
-            status="release"
-            />
-        <echo>
-            You now want to run
-            svn add repository/${ivy.organisation}/${ivy.module}/*-${boolector.version}*
-            svn ci repository/${ivy.organisation}/${ivy.module} -m"publish version ${boolector.version} of Boolector Solver"
-            to make the new version publicly available.</echo>
+        <publishToRepository solverName="Boolector" solverVersion="${boolector.version}"/>
     </target>
 </project>

@@ -66,21 +66,7 @@ SPDX-License-Identifier: Apache-2.0
         <copy file="${mathsat-windows.path}/bin/mpir.dll" tofile="mpir-${mathsat.version}.dll"/>
 
         <ivy:resolve conf="solver-mathsat" file="solvers_ivy_conf/ivy_mathsat.xml" />
-        <available property="ivy.hasrepository" file="repository/${ivy.organisation}/${ivy.module}" />
-        <fail unless="ivy.hasrepository"
-            message="Cannot publish without 'repository' dir, please run 'svn co https://svn.sosy-lab.org/software/ivy/repository/${ivy.organisation}/${ivy.module} repository/${ivy.organisation}/${ivy.module}'." />
-
-        <ivy:publish
-            pubrevision="${mathsat.version}"
-            resolver="Sosy-Lab-Publish"
-            artifactspattern="[artifact]-[revision].[ext]"
-            status="release"
-            />
-        <echo>
-            You now want to run
-            svn add repository/${ivy.organisation}/${ivy.module}/*-${mathsat.version}*
-            svn ci repository/${ivy.organisation}/${ivy.module} -m"publish version ${mathsat.version} of MathSAT5"
-            to make the new version publicly available.</echo>
+        <publishToRepository solverName="MathSAT" solverVersion="${mathsat.version}"/>
     </target>
 
     <target name="publish-optimathsat" depends="compile-optimathsat-bindings, load-ivy"
@@ -92,20 +78,6 @@ SPDX-License-Identifier: Apache-2.0
         <copy file="lib/native/source/libmathsat5j/liboptimathsat5j.so" tofile="liboptimathsat5j-${mathsat.version}.so"/>
 
         <ivy:resolve conf="solver-optimathsat" file="solvers_ivy_conf/ivy_optimathsat.xml" />
-        <available property="ivy.hasrepository" file="repository/${ivy.organisation}/${ivy.module}" />
-        <fail unless="ivy.hasrepository"
-            message="Cannot publish without 'repository' dir, please run 'svn co https://svn.sosy-lab.org/software/ivy/repository/${ivy.organisation}/${ivy.module} repository/${ivy.organisation}/${ivy.module}'." />
-
-        <ivy:publish
-            pubrevision="${mathsat.version}"
-            resolver="Sosy-Lab-Publish"
-            artifactspattern="[artifact]-[revision].[ext]"
-            status="release"
-            />
-        <echo>
-            You now want to run
-            svn add repository/${ivy.organisation}/${ivy.module}/*-${mathsat.version}*
-            svn ci repository/${ivy.organisation}/${ivy.module} -m"publish version ${mathsat.version} of OptiMathSAT"
-            to make the new version publicly available.</echo>
+        <publishToRepository solverName="OptiMathSAT" solverVersion="${mathsat.version}"/>
     </target>
 </project>

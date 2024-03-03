@@ -13,6 +13,8 @@ SPDX-License-Identifier: Apache-2.0
 <!-- vim: set tabstop=8 shiftwidth=4 expandtab sts=4 filetype=ant fdm=marker: -->
 <project name="publish-solvers-opensmt" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
 
+    <import file="macros.xml"/>
+
     <target name="package-opensmt">
         <fail unless="opensmt.path">
             Please specify the path to OpenSMT with the flag -Dopensmt.path=/path/to/opensmt.
@@ -174,22 +176,7 @@ SPDX-License-Identifier: Apache-2.0
 
     <target name="publish-opensmt" depends="package-opensmt, load-ivy"
         description="Publish OpenSMT binaries to Ivy repository.">
-
         <ivy:resolve conf="solver-opensmt" file="solvers_ivy_conf/ivy_opensmt.xml" />
-        <available property="ivy.hasrepository" file="repository/${ivy.organisation}/${ivy.module}" />
-        <fail unless="ivy.hasrepository"
-            message="Cannot publish without 'repository' dir, please run 'svn co https://svn.sosy-lab.org/software/ivy/repository/${ivy.organisation}/${ivy.module} repository/${ivy.organisation}/${ivy.module}'." />
-
-        <ivy:publish
-            pubrevision="${opensmt.version}"
-            resolver="Sosy-Lab-Publish"
-            artifactspattern="[artifact]-[revision](-[classifier]).[ext]"
-            status="release"
-            />
-        <echo>
-            You now want to run
-            svn add repository/${ivy.organisation}/${ivy.module}/*-${opensmt.version}*
-            svn ci repository/${ivy.organisation}/${ivy.module} -m"publish version ${opensmt.version} of OpenSMT Solver"
-            to make the new version publicly available.</echo>
+        <publishToRepository solverName="OpenSMT" solverVersion="${opensmt.version}"/>
     </target>
 </project>
