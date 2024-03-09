@@ -872,6 +872,7 @@ SPDX-License-Identifier: Apache-2.0
         <!-- build bitwuzla -->
         <exec executable="./configure.py" dir="${bitwuzla.path}" failonerror="true">
             <arg value="--shared"/>
+            <arg value="--wipe"/>
             <arg value="--prefix"/>
             <arg value="${bitwuzla.path}/install"/>
         </exec>
