@@ -189,4 +189,17 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
     /** Returning the result generated after all the {@link #apply} calls went through. */
     R getResult() throws InterruptedException;
   }
+
+  /**
+   * Registers a {@link UserPropagator} for this prover environment. Only a single user propagator
+   * can be registered at a time, and each user propagator shall only be registered once in its
+   * lifetime (see also {@link UserPropagator#initializeWithBackend}).
+   *
+   * @param propagator The (fresh) user propagator to register.
+   * @return {@code true}, if the user propagator was successfully registered. Most SMT solvers do
+   *     not support user propagators and hence return {@code false}.
+   */
+  default boolean registerUserPropagator(UserPropagator propagator) {
+    return false;
+  }
 }

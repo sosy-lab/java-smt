@@ -96,10 +96,6 @@ public class TimeoutTest extends SolverBasedTest0 {
         .withMessage(solverToUse() + " does not support interruption")
         .that(solverToUse())
         .isNoneOf(Solvers.PRINCESS, Solvers.CVC5);
-    TruthJUnit.assume()
-        .withMessage(solverToUse() + " does not support sort/term creation in different threads.")
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.BITWUZLA);
     testBasicProverTimeoutBv(() -> context.newProverEnvironment());
   }
 

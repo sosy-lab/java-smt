@@ -1,0 +1,36 @@
+diff -ur lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Term.java lib/native/source/libbitwuzla/dst/org/sosy_lab/java_smt/solvers/bitwuzla/api/Term.java
+--- lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Term.java	2024-02-28 15:41:51.146095724 +0100
++++ lib/native/source/libbitwuzla/dst/org/sosy_lab/java_smt/solvers/bitwuzla/api/Term.java	2024-02-28 15:45:08.800578060 +0100
+@@ -42,7 +42,7 @@
+     if (swigCPtr != 0) {
+       if (swigCMemOwn) {
+         swigCMemOwn = false;
+-        BitwuzlaNativeJNI.delete_Term(swigCPtr);
++        //BitwuzlaNativeJNI.delete_Term(swigCPtr);
+       }
+       swigCPtr = 0;
+     }
+diff -ur lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/TermManager.java lib/native/source/libbitwuzla/dst/org/sosy_lab/java_smt/solvers/bitwuzla/api/TermManager.java
+--- lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/TermManager.java	2024-02-28 15:41:51.230096898 +0100
++++ lib/native/source/libbitwuzla/dst/org/sosy_lab/java_smt/solvers/bitwuzla/api/TermManager.java	2024-02-28 15:45:02.164502752 +0100
+@@ -42,7 +42,7 @@
+     if (swigCPtr != 0) {
+       if (swigCMemOwn) {
+         swigCMemOwn = false;
+-        BitwuzlaNativeJNI.delete_TermManager(swigCPtr);
++        //BitwuzlaNativeJNI.delete_TermManager(swigCPtr);
+       }
+       swigCPtr = 0;
+     }
+diff -ur lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Vector_Term.java lib/native/source/libbitwuzla/dst/org/sosy_lab/java_smt/solvers/bitwuzla/api/Vector_Term.java
+--- lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Vector_Term.java	2024-02-28 15:41:51.030094103 +0100
++++ lib/native/source/libbitwuzla/dst/org/sosy_lab/java_smt/solvers/bitwuzla/api/Vector_Term.java	2024-02-28 15:44:17.651984547 +0100
+@@ -42,7 +42,7 @@
+     if (swigCPtr != 0) {
+       if (swigCMemOwn) {
+         swigCMemOwn = false;
+-        BitwuzlaNativeJNI.delete_Vector_Term(swigCPtr);
++        //BitwuzlaNativeJNI.delete_Vector_Term(swigCPtr);
+       }
+       swigCPtr = 0;
+     }

@@ -23,11 +23,14 @@ import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
+import org.sosy_lab.java_smt.api.UserPropagator;
 
 class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
 
   private final long z3solver;
   private final ShutdownRequestListener interruptListener;
+
+  private @Nullable Z3UserPropagator propagator = null;
 
   Z3TheoremProver(
       Z3FormulaCreator creator,
@@ -155,6 +158,17 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
   }
 
   @Override
+  public boolean registerUserPropagator(UserPropagator prop) {
+    Preconditions.checkState(!closed);
+    if (propagator != null) {
+      propagator.close();
+    }
+    propagator = new Z3UserPropagator(z3context, z3solver, creator, mgr, prop);
+    prop.initializeWithBackend(propagator);
+    return true;
+  }
+
+  @Override
   public String toString() {
     Preconditions.checkState(!closed);
     return Native.solverToString(z3context, z3solver);
@@ -169,6 +183,10 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
 
       Native.solverReset(z3context, z3solver); // remove all assertions from the solver
       Native.solverDecRef(z3context, z3solver);
+      if (propagator != null) {
+        propagator.close();
+        propagator = null;
+      }
       shutdownNotifier.unregister(interruptListener);
     }
     super.close();

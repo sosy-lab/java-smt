@@ -68,7 +68,7 @@ public class Yices2Model extends AbstractModel<Integer, Integer, Long> {
   protected Yices2Model(long model, Yices2TheoremProver prover, Yices2FormulaCreator pCreator) {
     super(prover, pCreator);
     this.model = model;
-    this.prover = prover; // can be NULL for testing
+    this.prover = prover;
     this.formulaCreator = Preconditions.checkNotNull(pCreator);
   }
 

@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0 OR GPL-3.0-or-later
 
@@ -17,15 +17,12 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_SUM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_EQ_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_NOT_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_OR_TERM;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_STATUS_SAT;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YVAL_RATIONAL;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_add;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_and;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_and2;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_application;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_arith_eq_atom;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_arith_gt_atom;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_arith_lt_atom;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_assert_formula;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bool_const_value;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bool_type;
@@ -43,23 +40,19 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvsum_c
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvxor2;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_check_context;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_context_disable_option;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_def_terms;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_eq;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_exit;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_false;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_free_config;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_free_context;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_function_type;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_model;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_term_name;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_value;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_idiv;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_iff;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_init;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_int32;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_int64;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_int_type;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_model_to_string;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_mul;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_named_variable;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_new_config;
@@ -73,9 +66,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_r
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_term;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_product_component;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_proj_arg;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_push;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_rational32;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_real_type;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_redand;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_set_config;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_set_term_name;
@@ -90,7 +81,6 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_is
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_num_children;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_to_string;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_true;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_val_get_mpq;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_zero_extend;
 
 import com.google.common.base.Joiner;
@@ -108,7 +98,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.rationals.Rational;
-import org.sosy_lab.java_smt.api.Model;
 
 @SuppressWarnings("unused")
 public class Yices2NativeApiTest {
@@ -449,74 +438,6 @@ public class Yices2NativeApiTest {
     int[] argArray = new int[] {yices_int32(123), yices_int32(456)};
     int app = yices_application(uf, argArray.length, argArray);
     assertThat(yices_term_constructor(app)).isEqualTo(YICES_APP_TERM);
-  }
-
-  @SuppressWarnings("resource")
-  @Test
-  public void modelTest() {
-    int varx = yices_named_variable(yices_real_type(), "x");
-    int eq = yices_arith_eq_atom(varx, yices_int32(10));
-    int query = yices_named_variable(yices_real_type(), "x");
-    Yices2FormulaCreator creator = new Yices2FormulaCreator();
-    yices_push(env);
-    yices_assert_formula(env, eq);
-    System.out.println("varx: " + varx);
-    System.out.println("query: " + query);
-    if (yices_check_context(env, 0) == YICES_STATUS_SAT) {
-      Model m = new Yices2Model(yices_get_model(env, 1), null, creator);
-      Object val = m.evaluate(creator.encapsulateWithTypeOf(varx));
-      System.out.println(val);
-      m.close();
-    }
-  }
-
-  @SuppressWarnings("resource")
-  @Test
-  public void modelExplorationTest() {
-    int x = yices_int32(5);
-    int y = yices_int32(7);
-    int z = yices_named_variable(yices_int_type(), "z");
-    int gt = yices_arith_gt_atom(z, x);
-    int lt = yices_arith_lt_atom(z, y);
-    int x2 = yices_int32(333);
-    int y2 = yices_int32(335);
-    int z2 = yices_named_variable(yices_int_type(), "z2");
-    int gt2 = yices_arith_gt_atom(z2, x2);
-    int lt2 = yices_arith_lt_atom(z2, y2);
-    int sub = yices_sub(z2, z);
-    int eq = yices_arith_eq_atom(sub, yices_int32(328));
-    Yices2FormulaCreator creator = new Yices2FormulaCreator();
-    yices_push(env);
-    yices_assert_formula(env, gt);
-    yices_assert_formula(env, lt);
-    yices_assert_formula(env, gt2);
-    yices_assert_formula(env, lt2);
-    yices_assert_formula(env, eq);
-    if (yices_check_context(env, 0) == YICES_STATUS_SAT) {
-      long model = yices_get_model(env, 1);
-      Model m = new Yices2Model(model, null, creator);
-      System.out.println(yices_model_to_string(model));
-      Object val = m.evaluate(creator.encapsulateWithTypeOf(eq));
-      System.out.println(val);
-      int addT = yices_add(z, z2);
-      Object val2 = m.evaluate(creator.encapsulateWithTypeOf(addT));
-      System.out.println(val2);
-      System.out.println("DEFINED TERMS");
-      int[] terms = yices_def_terms(model);
-      for (int term : terms) {
-        System.out.println(yices_term_to_string(term));
-        System.out.println("Term id is: " + term);
-        int[] yval = yices_get_value(model, term);
-        System.out.println("Node id is: " + yval[0]);
-        System.out.println("Node tag is: " + yval[1]);
-        if (yval[1] == YVAL_RATIONAL) {
-          System.out.println("Value is: " + yices_val_get_mpq(model, yval[0], yval[1]));
-        }
-      }
-      m.close();
-    } else {
-      throw new IllegalArgumentException("The environment is not solvable!");
-    }
   }
 
   @Test

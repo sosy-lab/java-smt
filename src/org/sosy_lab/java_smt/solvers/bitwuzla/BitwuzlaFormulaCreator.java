@@ -9,91 +9,24 @@
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_AND;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_APPLY;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_ARRAY_SELECT;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_ARRAY_STORE;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_BV_ADD;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_BV_AND;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_BV_ASHR;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_BV_CONCAT;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_BV_EXTRACT;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_BV_MUL;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_BV_NEG;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_BV_NOT;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_BV_OR;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_BV_SDIV;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_BV_SGE;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_BV_SGT;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_BV_SHL;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_BV_SIGN_EXTEND;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_BV_SLE;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_BV_SLT;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_BV_SREM;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_BV_SUB;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_BV_UDIV;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_BV_UGE;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_BV_UGT;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_BV_ULE;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_BV_ULT;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_BV_UREM;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_BV_XOR;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_BV_ZERO_EXTEND;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_CONSTANT;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_DISTINCT;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_EQUAL;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_EXISTS;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_FORALL;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_FP_ABS;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_FP_ADD;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_FP_DIV;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_FP_EQUAL;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_FP_GEQ;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_FP_GT;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_FP_IS_INF;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_FP_IS_NAN;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_FP_IS_NEG;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_FP_IS_NORMAL;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_FP_IS_SUBNORMAL;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_FP_IS_ZERO;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_FP_LEQ;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_FP_LT;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_FP_MAX;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_FP_MIN;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_FP_MUL;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_FP_NEG;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_FP_RTI;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_FP_SQRT;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_FP_SUB;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_FP_TO_FP_FROM_BV;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_FP_TO_FP_FROM_FP;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_FP_TO_FP_FROM_SBV;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_FP_TO_FP_FROM_UBV;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_FP_TO_SBV;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_FP_TO_UBV;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_IFF;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_IMPLIES;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_ITE;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_NOT;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_OR;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_VALUE;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_XOR;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Table;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.stream.LongStream;
+import java.util.Set;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
+import org.sosy_lab.java_smt.api.FloatingPointNumber;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
@@ -108,23 +41,38 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaFormula.BitwuzlaBitvectorF
 import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaFormula.BitwuzlaBooleanFormula;
 import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaFormula.BitwuzlaFloatingPointFormula;
 import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaFormula.BitwuzlaFloatingPointRoundingModeFormula;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Kind;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Map_TermTerm;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Sort;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Term;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.TermManager;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Int;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Sort;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Term;
 
-public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, BitwuzlaDeclaration> {
-  private final Table<String, Long, Long> formulaCache = HashBasedTable.create();
+public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, BitwuzlaDeclaration> {
+  private final TermManager termManager;
 
-  // private final Table<String, Long, Long> boundFormulaCache = HashBasedTable.create();
+  private final Table<String, Sort, Term> formulaCache = HashBasedTable.create();
 
-  protected BitwuzlaFormulaCreator(Long pBitwuzlaEnv) {
-    super(pBitwuzlaEnv, BitwuzlaJNI.bitwuzla_mk_bool_sort(), null, null, null, null);
+  private final Set<Term> variableCasts = new HashSet<>();
+
+  protected BitwuzlaFormulaCreator(TermManager pTermManager) {
+    super(null, pTermManager.mk_bool_sort(), null, null, null, null);
+    termManager = pTermManager;
+  }
+
+  TermManager getTermManager() {
+    return termManager;
   }
 
   @Override
-  public Long getBitvectorType(int bitwidth) {
-    return BitwuzlaJNI.bitwuzla_mk_bv_sort(bitwidth);
+  public Sort getBitvectorType(int bitwidth) {
+    return termManager.mk_bv_sort(bitwidth);
   }
 
   @Override
-  public BitvectorFormula encapsulateBitvector(Long pTerm) {
+  public BitvectorFormula encapsulateBitvector(Term pTerm) {
     assert getFormulaType(pTerm).isBitvectorType()
         : "Unexpected formula type for BV formula: " + getFormulaType(pTerm);
     return new BitwuzlaBitvectorFormula(pTerm);
@@ -133,10 +81,8 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Bit
   // Assuming that JavaSMT FloatingPointType follows IEEE 754, if it is in the decimal
   // system instead use bitwuzla_mk_fp_value_from_real somehow or convert myself
   @Override
-  public Long getFloatingPointType(FloatingPointType type) {
-    long fpSort =
-        BitwuzlaJNI.bitwuzla_mk_fp_sort(type.getExponentSize(), type.getMantissaSize() + 1);
-    return fpSort;
+  public Sort getFloatingPointType(FloatingPointType type) {
+    return termManager.mk_fp_sort(type.getExponentSize(), type.getMantissaSize() + 1);
   }
 
   @Override
@@ -154,213 +100,206 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Bit
   }
 
   @Override
-  public Long getArrayType(Long indexType, Long elementType) {
-    return BitwuzlaJNI.bitwuzla_mk_array_sort(indexType, elementType);
+  public Sort getArrayType(Sort indexType, Sort elementType) {
+    return termManager.mk_array_sort(indexType, elementType);
   }
 
   @Override
-  protected FloatingPointFormula encapsulateFloatingPoint(Long pTerm) {
+  protected FloatingPointFormula encapsulateFloatingPoint(Term pTerm) {
     assert getFormulaType(pTerm).isFloatingPointType()
-        : String.format(
-            "%s is no FP, but %s (%s)",
-            pTerm, BitwuzlaJNI.bitwuzla_term_get_sort(pTerm), getFormulaType(pTerm));
+        : String.format("%s is no FP, but %s (%s)", pTerm, pTerm.sort(), getFormulaType(pTerm));
     return new BitwuzlaFloatingPointFormula(pTerm);
   }
 
   @Override
   @SuppressWarnings("MethodTypeParameterName")
   protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> encapsulateArray(
-      Long pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
+      Term pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
     assert getFormulaType(pTerm).isArrayType()
         : "Unexpected formula type for array formula: " + getFormulaType(pTerm);
     return new BitwuzlaArrayFormula<>(pTerm, pIndexType, pElementType);
   }
 
   @Override
-  public Long makeVariable(Long pSort, String varName) {
-    Long maybeFormula = formulaCache.get(varName, pSort);
+  public Term makeVariable(Sort pSort, String varName) {
+    Term maybeFormula = formulaCache.get(varName, pSort);
     if (maybeFormula != null) {
       return maybeFormula;
     }
 
-    long newVar = BitwuzlaJNI.bitwuzla_mk_const(pSort, varName);
+    Term newVar = termManager.mk_const(pSort, varName);
     formulaCache.put(varName, pSort, newVar);
     return newVar;
   }
 
-  public long makeBoundVariable(long var) {
-    String name = BitwuzlaJNI.bitwuzla_term_get_symbol(var);
-    Long sort = BitwuzlaJNI.bitwuzla_term_get_sort(var);
+  public Term makeBoundVariable(Term var) {
+    String name = var.symbol();
+    Sort sort = var.sort();
     // TODO: do we need a bound cache?
-    // Long maybeVar = boundFormulaCache.get(name, sort);
+    // Term maybeVar = boundFormulaCache.get(name, sort);
     // if (maybeVar != null) {
     // return maybeVar;
     // }
 
-    long newVar = BitwuzlaJNI.bitwuzla_mk_var(sort, name);
+    Term newVar = termManager.mk_var(sort, name);
     // boundFormulaCache.put(name, sort, newVar);
     return newVar;
   }
 
-  public FormulaType<?> bitwuzlaSortToType(Long pSort) {
+  public FormulaType<?> bitwuzlaSortToType(Sort pSort) {
     // UFs play by different rules. For them, we need to extract the domain
-    if (BitwuzlaJNI.bitwuzla_sort_is_fp(pSort)) {
-      long exponent = BitwuzlaJNI.bitwuzla_sort_fp_get_exp_size(pSort);
-      long mantissa = BitwuzlaJNI.bitwuzla_sort_fp_get_sig_size(pSort) - 1;
-      return FormulaType.getFloatingPointType((int) exponent, (int) mantissa);
-    } else if (BitwuzlaJNI.bitwuzla_sort_is_bv(pSort)) {
-      return FormulaType.getBitvectorTypeWithSize(
-          (int) BitwuzlaJNI.bitwuzla_sort_bv_get_size(pSort));
-    } else if (BitwuzlaJNI.bitwuzla_sort_is_array(pSort)) {
-      FormulaType<?> domainSort =
-          bitwuzlaSortToType(BitwuzlaJNI.bitwuzla_sort_array_get_element(pSort));
-      FormulaType<?> rangeSort =
-          bitwuzlaSortToType(BitwuzlaJNI.bitwuzla_sort_array_get_index(pSort));
+    if (pSort.is_fp()) {
+      int exponent = pSort.fp_exp_size();
+      int mantissa = pSort.fp_sig_size() - 1;
+      return FormulaType.getFloatingPointType(exponent, mantissa);
+    } else if (pSort.is_bv()) {
+      return FormulaType.getBitvectorTypeWithSize(pSort.bv_size());
+    } else if (pSort.is_array()) {
+      FormulaType<?> domainSort = bitwuzlaSortToType(pSort.array_index());
+      FormulaType<?> rangeSort = bitwuzlaSortToType(pSort.array_element());
       return FormulaType.getArrayType(domainSort, rangeSort);
-    } else if (BitwuzlaJNI.bitwuzla_sort_is_bool(pSort)) {
+    } else if (pSort.is_bool()) {
       return FormulaType.BooleanType;
-    } else if (BitwuzlaJNI.bitwuzla_sort_is_rm(pSort)) {
+    } else if (pSort.is_rm()) {
       return FormulaType.FloatingPointRoundingModeType;
     }
 
     throw new UnsupportedOperationException(
-        "Could not find the JavaSMT type for sort"
-            + BitwuzlaJNI.bitwuzla_sort_to_string(pSort)
-            + ".");
+        "Could not find the JavaSMT type for sort" + pSort + ".");
   }
 
-  private FunctionDeclarationKind getDeclarationKind(Long term) {
-    BitwuzlaKind kind = BitwuzlaKind.swigToEnum(BitwuzlaJNI.bitwuzla_term_get_kind(term));
+  private FunctionDeclarationKind getDeclarationKind(Term term) {
+    Kind kind = term.kind();
 
-    if (kind.equals(BITWUZLA_KIND_AND)) {
+    if (kind.equals(Kind.AND)) {
       return FunctionDeclarationKind.AND;
-    } else if (kind.equals(BITWUZLA_KIND_DISTINCT)) {
+    } else if (kind.equals(Kind.DISTINCT)) {
       return FunctionDeclarationKind.DISTINCT;
-    } else if (kind.equals(BITWUZLA_KIND_EQUAL)) {
+    } else if (kind.equals(Kind.EQUAL)) {
       return FunctionDeclarationKind.EQ;
-    } else if (kind.equals(BITWUZLA_KIND_IFF)) {
+    } else if (kind.equals(Kind.IFF)) {
       return FunctionDeclarationKind.IFF;
-    } else if (kind.equals(BITWUZLA_KIND_IMPLIES)) {
+    } else if (kind.equals(Kind.IMPLIES)) {
       return FunctionDeclarationKind.IMPLIES;
-    } else if (kind.equals(BITWUZLA_KIND_NOT)) {
+    } else if (kind.equals(Kind.NOT)) {
       return FunctionDeclarationKind.NOT;
-    } else if (kind.equals(BITWUZLA_KIND_OR)) {
+    } else if (kind.equals(Kind.OR)) {
       return FunctionDeclarationKind.OR;
-    } else if (kind.equals(BITWUZLA_KIND_XOR)) {
+    } else if (kind.equals(Kind.XOR)) {
       return FunctionDeclarationKind.XOR;
-    } else if (kind.equals(BITWUZLA_KIND_ITE)) {
+    } else if (kind.equals(Kind.ITE)) {
       return FunctionDeclarationKind.ITE;
-    } else if (kind.equals(BITWUZLA_KIND_APPLY)) {
+    } else if (kind.equals(Kind.APPLY)) {
       return FunctionDeclarationKind.UF;
-    } else if (kind.equals(BITWUZLA_KIND_ARRAY_SELECT)) {
+    } else if (kind.equals(Kind.ARRAY_SELECT)) {
       return FunctionDeclarationKind.SELECT;
-    } else if (kind.equals(BITWUZLA_KIND_ARRAY_STORE)) {
+    } else if (kind.equals(Kind.ARRAY_STORE)) {
       return FunctionDeclarationKind.STORE;
-    } else if (kind.equals(BITWUZLA_KIND_BV_ADD)) {
+    } else if (kind.equals(Kind.BV_ADD)) {
       return FunctionDeclarationKind.BV_ADD;
-    } else if (kind.equals(BITWUZLA_KIND_BV_AND)) {
+    } else if (kind.equals(Kind.BV_AND)) {
       return FunctionDeclarationKind.BV_AND;
-    } else if (kind.equals(BITWUZLA_KIND_BV_ASHR)) {
+    } else if (kind.equals(Kind.BV_ASHR)) {
       return FunctionDeclarationKind.BV_ASHR;
-    } else if (kind.equals(BITWUZLA_KIND_BV_CONCAT)) {
+    } else if (kind.equals(Kind.BV_CONCAT)) {
       return FunctionDeclarationKind.BV_CONCAT;
-    } else if (kind.equals(BITWUZLA_KIND_BV_MUL)) {
+    } else if (kind.equals(Kind.BV_MUL)) {
       return FunctionDeclarationKind.BV_MUL;
-    } else if (kind.equals(BITWUZLA_KIND_BV_NEG)) {
+    } else if (kind.equals(Kind.BV_NEG)) {
       return FunctionDeclarationKind.BV_NEG;
-    } else if (kind.equals(BITWUZLA_KIND_BV_NOT)) {
+    } else if (kind.equals(Kind.BV_NOT)) {
       return FunctionDeclarationKind.BV_NOT;
-    } else if (kind.equals(BITWUZLA_KIND_BV_OR)) {
+    } else if (kind.equals(Kind.BV_OR)) {
       return FunctionDeclarationKind.BV_OR;
-    } else if (kind.equals(BITWUZLA_KIND_BV_SDIV)) {
+    } else if (kind.equals(Kind.BV_SDIV)) {
       return FunctionDeclarationKind.BV_SDIV;
-    } else if (kind.equals(BITWUZLA_KIND_BV_SGE)) {
+    } else if (kind.equals(Kind.BV_SGE)) {
       return FunctionDeclarationKind.BV_SGE;
-    } else if (kind.equals(BITWUZLA_KIND_BV_SGT)) {
+    } else if (kind.equals(Kind.BV_SGT)) {
       return FunctionDeclarationKind.BV_SGT;
-    } else if (kind.equals(BITWUZLA_KIND_BV_SHL)) {
+    } else if (kind.equals(Kind.BV_SHL)) {
       return FunctionDeclarationKind.BV_SHL;
-    } else if (kind.equals(BITWUZLA_KIND_BV_SLE)) {
+    } else if (kind.equals(Kind.BV_SLE)) {
       return FunctionDeclarationKind.BV_SLE;
-    } else if (kind.equals(BITWUZLA_KIND_BV_SLT)) {
+    } else if (kind.equals(Kind.BV_SLT)) {
       return FunctionDeclarationKind.BV_SLT;
-    } else if (kind.equals(BITWUZLA_KIND_BV_SREM)) {
+    } else if (kind.equals(Kind.BV_SREM)) {
       return FunctionDeclarationKind.BV_SREM;
-    } else if (kind.equals(BITWUZLA_KIND_BV_SUB)) {
+    } else if (kind.equals(Kind.BV_SUB)) {
       return FunctionDeclarationKind.BV_SUB;
-    } else if (kind.equals(BITWUZLA_KIND_BV_UDIV)) {
+    } else if (kind.equals(Kind.BV_UDIV)) {
       return FunctionDeclarationKind.BV_UDIV;
-    } else if (kind.equals(BITWUZLA_KIND_BV_UGE)) {
+    } else if (kind.equals(Kind.BV_UGE)) {
       return FunctionDeclarationKind.BV_UGE;
-    } else if (kind.equals(BITWUZLA_KIND_BV_UGT)) {
+    } else if (kind.equals(Kind.BV_UGT)) {
       return FunctionDeclarationKind.BV_UGT;
-    } else if (kind.equals(BITWUZLA_KIND_BV_ULE)) {
+    } else if (kind.equals(Kind.BV_ULE)) {
       return FunctionDeclarationKind.BV_ULE;
-    } else if (kind.equals(BITWUZLA_KIND_BV_ULT)) {
+    } else if (kind.equals(Kind.BV_ULT)) {
       return FunctionDeclarationKind.BV_ULT;
-    } else if (kind.equals(BITWUZLA_KIND_BV_UREM)) {
+    } else if (kind.equals(Kind.BV_UREM)) {
       return FunctionDeclarationKind.BV_UREM;
-    } else if (kind.equals(BITWUZLA_KIND_BV_EXTRACT)) {
+    } else if (kind.equals(Kind.BV_EXTRACT)) {
       return FunctionDeclarationKind.BV_EXTRACT;
-    } else if (kind.equals(BITWUZLA_KIND_BV_SIGN_EXTEND)) {
+    } else if (kind.equals(Kind.BV_SIGN_EXTEND)) {
       return FunctionDeclarationKind.BV_SIGN_EXTENSION;
-    } else if (kind.equals(BITWUZLA_KIND_BV_ZERO_EXTEND)) {
+    } else if (kind.equals(Kind.BV_ZERO_EXTEND)) {
       return FunctionDeclarationKind.BV_ZERO_EXTENSION;
-    } else if (kind.equals(BITWUZLA_KIND_FP_ABS)) {
+    } else if (kind.equals(Kind.FP_ABS)) {
       return FunctionDeclarationKind.FP_ABS;
-    } else if (kind.equals(BITWUZLA_KIND_FP_ADD)) {
+    } else if (kind.equals(Kind.FP_ADD)) {
       return FunctionDeclarationKind.FP_ADD;
-    } else if (kind.equals(BITWUZLA_KIND_FP_DIV)) {
+    } else if (kind.equals(Kind.FP_DIV)) {
       return FunctionDeclarationKind.FP_DIV;
-    } else if (kind.equals(BITWUZLA_KIND_FP_EQUAL)) {
+    } else if (kind.equals(Kind.FP_EQUAL)) {
       return FunctionDeclarationKind.FP_EQ;
-    } else if (kind.equals(BITWUZLA_KIND_FP_GEQ)) {
+    } else if (kind.equals(Kind.FP_GEQ)) {
       return FunctionDeclarationKind.FP_GE;
-    } else if (kind.equals(BITWUZLA_KIND_FP_GT)) {
+    } else if (kind.equals(Kind.FP_GT)) {
       return FunctionDeclarationKind.FP_GT;
-    } else if (kind.equals(BITWUZLA_KIND_FP_IS_INF)) {
+    } else if (kind.equals(Kind.FP_IS_INF)) {
       return FunctionDeclarationKind.FP_IS_INF;
-    } else if (kind.equals(BITWUZLA_KIND_FP_IS_NAN)) {
+    } else if (kind.equals(Kind.FP_IS_NAN)) {
       return FunctionDeclarationKind.FP_IS_NAN;
-    } else if (kind.equals(BITWUZLA_KIND_FP_IS_NEG)) {
+    } else if (kind.equals(Kind.FP_IS_NEG)) {
       return FunctionDeclarationKind.FP_IS_NEGATIVE;
-    } else if (kind.equals(BITWUZLA_KIND_FP_IS_NORMAL)) {
+    } else if (kind.equals(Kind.FP_IS_NORMAL)) {
       return FunctionDeclarationKind.FP_IS_NORMAL;
-    } else if (kind.equals(BITWUZLA_KIND_FP_IS_SUBNORMAL)) {
+    } else if (kind.equals(Kind.FP_IS_SUBNORMAL)) {
       return FunctionDeclarationKind.FP_IS_SUBNORMAL;
-    } else if (kind.equals(BITWUZLA_KIND_FP_IS_ZERO)) {
+    } else if (kind.equals(Kind.FP_IS_ZERO)) {
       return FunctionDeclarationKind.FP_IS_ZERO;
-    } else if (kind.equals(BITWUZLA_KIND_FP_LEQ)) {
+    } else if (kind.equals(Kind.FP_LEQ)) {
       return FunctionDeclarationKind.FP_LE;
-    } else if (kind.equals(BITWUZLA_KIND_FP_LT)) {
+    } else if (kind.equals(Kind.FP_LT)) {
       return FunctionDeclarationKind.FP_LT;
-    } else if (kind.equals(BITWUZLA_KIND_FP_MAX)) {
+    } else if (kind.equals(Kind.FP_MAX)) {
       return FunctionDeclarationKind.FP_MAX;
-    } else if (kind.equals(BITWUZLA_KIND_FP_MIN)) {
+    } else if (kind.equals(Kind.FP_MIN)) {
       return FunctionDeclarationKind.FP_MIN;
-    } else if (kind.equals(BITWUZLA_KIND_FP_MUL)) {
+    } else if (kind.equals(Kind.FP_MUL)) {
       return FunctionDeclarationKind.FP_MUL;
-    } else if (kind.equals(BITWUZLA_KIND_FP_NEG)) {
+    } else if (kind.equals(Kind.FP_NEG)) {
       return FunctionDeclarationKind.FP_NEG;
-    } else if (kind.equals(BITWUZLA_KIND_FP_RTI)) {
+    } else if (kind.equals(Kind.FP_RTI)) {
       return FunctionDeclarationKind.FP_ROUND_TO_INTEGRAL;
-    } else if (kind.equals(BITWUZLA_KIND_FP_SQRT)) {
+    } else if (kind.equals(Kind.FP_SQRT)) {
       return FunctionDeclarationKind.FP_SQRT;
-    } else if (kind.equals(BITWUZLA_KIND_FP_SUB)) {
+    } else if (kind.equals(Kind.FP_SUB)) {
       return FunctionDeclarationKind.FP_SUB;
-    } else if (kind.equals(BITWUZLA_KIND_FP_TO_FP_FROM_BV)) {
+    } else if (kind.equals(Kind.FP_TO_FP_FROM_BV)) {
       return FunctionDeclarationKind.BV_UCASTTO_FP;
-    } else if (kind.equals(BITWUZLA_KIND_FP_TO_FP_FROM_FP)) {
+    } else if (kind.equals(Kind.FP_TO_FP_FROM_FP)) {
       return FunctionDeclarationKind.FP_CASTTO_FP;
-    } else if (kind.equals(BITWUZLA_KIND_FP_TO_FP_FROM_SBV)) {
+    } else if (kind.equals(Kind.FP_TO_FP_FROM_SBV)) {
       return FunctionDeclarationKind.BV_SCASTTO_FP;
-    } else if (kind.equals(BITWUZLA_KIND_FP_TO_FP_FROM_UBV)) {
+    } else if (kind.equals(Kind.FP_TO_FP_FROM_UBV)) {
       return FunctionDeclarationKind.BV_UCASTTO_FP;
-    } else if (kind.equals(BITWUZLA_KIND_FP_TO_SBV)) {
+    } else if (kind.equals(Kind.FP_TO_SBV)) {
       return FunctionDeclarationKind.FP_CASTTO_SBV;
-    } else if (kind.equals(BITWUZLA_KIND_FP_TO_UBV)) {
+    } else if (kind.equals(Kind.FP_TO_UBV)) {
       return FunctionDeclarationKind.FP_CASTTO_UBV;
-    } else if (kind.equals(BITWUZLA_KIND_BV_XOR)) {
+    } else if (kind.equals(Kind.BV_XOR)) {
       return FunctionDeclarationKind.BV_XOR;
     }
     throw new UnsupportedOperationException("Can not discern formula kind " + kind);
@@ -368,7 +307,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Bit
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T extends Formula> T encapsulate(FormulaType<T> pType, Long pTerm) {
+  public <T extends Formula> T encapsulate(FormulaType<T> pType, Term pTerm) {
     assert pType.equals(getFormulaType(pTerm))
         : String.format(
             "Trying to encapsulate formula of type %s as %s", getFormulaType(pTerm), pType);
@@ -390,101 +329,67 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Bit
   @SuppressWarnings("unchecked")
   @Override
   public <T extends Formula> FormulaType<T> getFormulaType(T pFormula) {
-    long sort = BitwuzlaJNI.bitwuzla_term_get_sort(extractInfo(pFormula));
+    Sort sort = extractInfo(pFormula).sort();
     if (pFormula instanceof BitvectorFormula) {
-      checkArgument(
-          BitwuzlaJNI.bitwuzla_sort_is_bv(sort),
-          "BitvectorFormula with type missmatch: %s",
-          pFormula);
-      return (FormulaType<T>)
-          FormulaType.getBitvectorTypeWithSize(
-              Math.toIntExact(BitwuzlaJNI.bitwuzla_sort_bv_get_size(sort)));
+      checkArgument(sort.is_bv(), "BitvectorFormula with type missmatch: %s", pFormula);
+      return (FormulaType<T>) FormulaType.getBitvectorTypeWithSize(sort.bv_size());
     } else if (pFormula instanceof ArrayFormula<?, ?>) {
       FormulaType<T> arrayIndexType = getArrayFormulaIndexType((ArrayFormula<T, T>) pFormula);
       FormulaType<T> arrayElementType = getArrayFormulaElementType((ArrayFormula<T, T>) pFormula);
       return (FormulaType<T>) FormulaType.getArrayType(arrayIndexType, arrayElementType);
     } else if (pFormula instanceof FloatingPointFormula) {
-      if (!BitwuzlaJNI.bitwuzla_sort_is_fp(sort)) {
+      if (!sort.is_fp()) {
         throw new IllegalArgumentException(
-            "FloatingPointFormula with actual type "
-                + BitwuzlaJNI.bitwuzla_sort_to_string(sort)
-                + ": "
-                + pFormula);
+            "FloatingPointFormula with actual type " + sort + ": " + pFormula);
       }
-      int exp = (int) BitwuzlaJNI.bitwuzla_sort_fp_get_exp_size(sort);
-      int man = (int) BitwuzlaJNI.bitwuzla_sort_fp_get_sig_size(sort) - 1;
+      int exp = sort.fp_exp_size();
+      int man = sort.fp_sig_size() - 1;
       return (FormulaType<T>) FormulaType.getFloatingPointType(exp, man);
-    } else if (BitwuzlaJNI.bitwuzla_sort_is_rm(sort)) {
+    } else if (sort.is_rm()) {
       return (FormulaType<T>) FormulaType.FloatingPointRoundingModeType;
     }
     return super.getFormulaType(pFormula);
   }
 
   @Override
-  public FormulaType<?> getFormulaType(Long formula) {
-    long pType = BitwuzlaJNI.bitwuzla_term_get_sort(formula);
+  public FormulaType<?> getFormulaType(Term formula) {
+    Sort pType = formula.sort();
     return bitwuzlaSortToType(pType);
   }
 
-  private BigDecimal parseIEEEbinaryFP(long pTerm) {
-    // The Bitwuzla string for FPs is always in binary, regardless of the second argument.
-
-    String fp = BitwuzlaJNI.bitwuzla_term_value_get_str(pTerm);
-
-    if (fp.length() == 32) {
-      float result = Float.intBitsToFloat(Integer.parseUnsignedInt(fp, 2));
-      return new BigDecimal(result);
-    } else if (fp.length() == 64) {
-      double result = Double.longBitsToDouble(Long.parseUnsignedLong(fp, 2));
-      return new BigDecimal(result);
-    } else {
-      throw new UnsupportedOperationException(
-          "Visitor can only visit constant FPs of 32 or 64 " + "bits.");
-    }
-
-    //    String fpSMTLIB = bitwuzlaJNI.bitwuzla_term_to_string(pTerm);
-    //    String[] mySplit = fpSMTLIB.split(" #b");
-    //    mySplit[3] = mySplit[3].replace(")", "");
-    //    double result = calculateDecimal(mySplit[3], mySplit[2], mySplit[1]);
-  }
-
   @Override
-  public <R> R visit(FormulaVisitor<R> visitor, Formula formula, Long f)
+  public <R> R visit(FormulaVisitor<R> visitor, Formula formula, Term f)
       throws UnsupportedOperationException {
-    BitwuzlaKind kind = BitwuzlaKind.swigToEnum(BitwuzlaJNI.bitwuzla_term_get_kind(f));
-    if (termIsConstant(f)) {
+    Kind kind = f.kind();
+    if (f.is_value()) {
       return visitor.visitConstant(formula, convertValue(f));
-
-    } else if (BitwuzlaJNI.bitwuzla_term_is_fp_value(f)) {
-      return visitor.visitConstant(formula, parseIEEEbinaryFP(f));
-
-    } else if (BitwuzlaJNI.bitwuzla_term_is_const(f)) {
-      String name = BitwuzlaJNI.bitwuzla_term_get_symbol(f);
+    } else if (f.is_const()) {
+      String name = f.symbol();
       return visitor.visitFreeVariable(formula, name);
 
-    } else if (BitwuzlaJNI.bitwuzla_term_is_var(f)) {
-      String name = BitwuzlaJNI.bitwuzla_term_get_symbol(f);
-      long sort = BitwuzlaJNI.bitwuzla_term_get_sort(f);
-      long originalVar = formulaCache.get(name, sort);
+    } else if (f.is_variable()) {
+      String name = f.symbol();
+      Sort sort = f.sort();
+      Term originalVar = formulaCache.get(name, sort);
       return visitor.visitBoundVariable(encapsulate(getFormulaType(originalVar), originalVar), 0);
 
-    } else if (kind.equals(BITWUZLA_KIND_EXISTS) || kind.equals(BITWUZLA_KIND_FORALL)) {
-      long[] children = BitwuzlaJNI.bitwuzla_term_get_children(f, new long[1]);
+    } else if (kind.equals(Kind.EXISTS) || kind.equals(Kind.FORALL)) {
+      Vector_Term children = f.children();
       // QUANTIFIER: replace bound variable with free variable for visitation
-      int size = children.length;
-      assert children.length == 2;
-      long bodyUnSub = children[size - 1];
+      int size = children.size();
+      assert size == 2;
+      Term body = children.get(size - 1);
       List<Formula> freeEncVars = new ArrayList<>();
       // The first length - 2 elements are bound vars, and the last element is the body
-      long[] boundVars = new long[size - 1];
-      long[] freeVars = new long[size - 1];
+      Term[] boundVars = new Term[size - 1];
+      Term[] freeVars = new Term[size - 1];
       for (int i = 0; i < size - 1; i++) {
-        long boundVar = children[i];
+        Term boundVar = children.get(i);
         boundVars[i] = boundVar;
-        String name = BitwuzlaJNI.bitwuzla_term_get_symbol(boundVar);
+        String name = boundVar.symbol();
         assert name != null;
-        long sort = BitwuzlaJNI.bitwuzla_term_get_sort(boundVar);
-        long freeVar;
+        Sort sort = boundVar.sort();
+        Term freeVar;
         if (formulaCache.contains(name, sort)) {
           freeVar = formulaCache.get(name, sort);
         } else {
@@ -495,26 +400,30 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Bit
         freeEncVars.add(encapsulate(getFormulaType(freeVar), freeVar));
       }
 
-      long bodySubbed = BitwuzlaJNI.bitwuzla_substitute_term(bodyUnSub, 1, boundVars, freeVars);
+      Map_TermTerm map = new Map_TermTerm();
+      for (int i = 0; i < boundVars.length; i++) {
+        map.put(boundVars[i], freeVars[i]);
+      }
+      body = termManager.substitute_term(body, map);
 
-      Quantifier quant = kind.equals(BITWUZLA_KIND_EXISTS) ? Quantifier.EXISTS : Quantifier.FORALL;
+      Quantifier quant = kind.equals(Kind.EXISTS) ? Quantifier.EXISTS : Quantifier.FORALL;
       return visitor.visitQuantifier(
-          (BooleanFormula) formula, quant, freeEncVars, encapsulateBoolean(bodySubbed));
+          (BooleanFormula) formula, quant, freeEncVars, encapsulateBoolean(body));
 
     } else {
-      long[] args = BitwuzlaJNI.bitwuzla_term_get_children(f, new long[1]);
+      Vector_Term args = f.children();
       ImmutableList.Builder<Formula> arguments = ImmutableList.builder();
       ImmutableList.Builder<FormulaType<?>> argumentTypes = ImmutableList.builder();
 
-      String name = BitwuzlaJNI.bitwuzla_term_get_symbol(f);
+      String name = f.symbol();
 
       BitwuzlaDeclaration decl = null;
-      for (int i = 0; i < args.length; i++) {
-        long argument = args[i];
-        if (kind == BITWUZLA_KIND_APPLY && i == 0) {
+      for (int i = 0; i < args.size(); i++) {
+        Term argument = args.get(i);
+        if (kind == Kind.APPLY && i == 0) {
           // UFs carry the decl in the first child and the decl has the name
-          decl = new BitwuzlaDeclaration(argument, false);
-          name = BitwuzlaJNI.bitwuzla_term_get_symbol(argument);
+          decl = new BitwuzlaDeclaration(argument);
+          name = argument.symbol();
           continue;
         }
         FormulaType<?> type = getFormulaType(argument);
@@ -523,15 +432,15 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Bit
       }
 
       if (name == null) {
-        name = BitwuzlaJNI.bitwuzla_kind_to_string(BitwuzlaJNI.bitwuzla_term_get_kind(f));
+        name = f.kind().toString();
       }
       if (decl == null) {
-        decl = new BitwuzlaDeclaration(BitwuzlaJNI.bitwuzla_term_get_kind(f), true);
+        decl = new BitwuzlaDeclaration(f.kind());
       }
-      if (BitwuzlaJNI.bitwuzla_term_is_indexed(f)) {
+      if (f.num_indices() > 0) {
         // We need to retain the original formula as the declaration for indexed formulas,
         // otherwise we loose the index info, but we also need to know if its a kind or term
-        decl = new BitwuzlaDeclaration(f, false);
+        decl = new BitwuzlaDeclaration(f);
       }
 
       return visitor.visitFunction(
@@ -542,97 +451,75 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Bit
     }
   }
 
-  private boolean termIsConstant(long term) {
-    return BITWUZLA_KIND_VALUE.swigValue() == BitwuzlaJNI.bitwuzla_term_get_kind(term);
-  }
-
   @Override
-  public Long callFunctionImpl(BitwuzlaDeclaration declaration, List<Long> args) {
+  public Term callFunctionImpl(BitwuzlaDeclaration declaration, List<Term> args) {
     // For UFs the declaration needs to be a const wrapping of the function sort
     // For all other functions it needs to be the kind
     // BUT, we can never use a bitwuzla_term_is... function on a KIND
-    if (!declaration.isKind() && BitwuzlaJNI.bitwuzla_term_is_indexed(declaration.getTerm())) {
+    if (!declaration.isKind() && declaration.getTerm().num_indices() > 0) {
       // The term might be indexed, then we need index creation
-      long term = declaration.getTerm();
-      int properKind = BitwuzlaJNI.bitwuzla_term_get_kind(term);
-      if (BitwuzlaKind.swigToEnum(properKind) == BITWUZLA_KIND_BV_ZERO_EXTEND) {
-        System.out.println();
-      }
-      long[] indices = BitwuzlaJNI.bitwuzla_term_get_indices(term, new long[1]);
-      return BitwuzlaJNI.bitwuzla_mk_term_indexed(
-          properKind,
-          args.size(),
-          args.stream().mapToLong(Long::longValue).toArray(),
-          indices.length,
-          indices);
+      Term term = declaration.getTerm();
+      Kind properKind = term.kind();
+      return termManager.mk_term(properKind, new Vector_Term(args), term.indices());
     }
 
-    if (!declaration.isKind() && BitwuzlaJNI.bitwuzla_term_is_fun(declaration.getTerm())) {
-      long[] functionAndArgs =
-          LongStream.concat(
-                  LongStream.of(declaration.getTerm()), args.stream().mapToLong(Long::longValue))
-              .toArray();
-      return BitwuzlaJNI.bitwuzla_mk_term(
-          BITWUZLA_KIND_APPLY.swigValue(), functionAndArgs.length, functionAndArgs);
+    if (!declaration.isKind() && declaration.getTerm().sort().is_fun()) {
+      Vector_Term functionAndArgs = new Vector_Term();
+      functionAndArgs.add(declaration.getTerm());
+      functionAndArgs.addAll(args);
+      return termManager.mk_term(Kind.APPLY, functionAndArgs, new Vector_Int());
     }
 
     assert declaration.isKind();
-    long declKind = declaration.getKind();
 
-    return BitwuzlaJNI.bitwuzla_mk_term(
-        (int) declKind, args.size(), args.stream().mapToLong(Long::longValue).toArray());
+    return termManager.mk_term(declaration.getKind(), new Vector_Term(args), new Vector_Int());
   }
 
   @Override
-  public BitwuzlaDeclaration declareUFImpl(String name, Long pReturnType, List<Long> pArgTypes) {
+  public BitwuzlaDeclaration declareUFImpl(String name, Sort pReturnType, List<Sort> pArgTypes) {
     if (pArgTypes.isEmpty()) {
       // Bitwuzla does not support UFs with no args, so we make a variable
       // TODO: implement
       throw new UnsupportedOperationException("Bitwuzla does not support 0 arity UFs.");
     }
-    long functionSort =
-        BitwuzlaJNI.bitwuzla_mk_fun_sort(
-            pArgTypes.size(), pArgTypes.stream().mapToLong(Long::longValue).toArray(), pReturnType);
+    Sort functionSort = termManager.mk_fun_sort(new Vector_Sort(pArgTypes), pReturnType);
 
-    Long maybeFormula = formulaCache.get(name, functionSort);
+    Term maybeFormula = formulaCache.get(name, functionSort);
     if (maybeFormula != null) {
-      return new BitwuzlaDeclaration(maybeFormula, false);
+      return new BitwuzlaDeclaration(maybeFormula);
     }
 
-    long uf = BitwuzlaJNI.bitwuzla_mk_const(functionSort, name);
+    Term uf = termManager.mk_const(functionSort, name);
     formulaCache.put(name, functionSort, uf);
-    return new BitwuzlaDeclaration(uf, false);
+    return new BitwuzlaDeclaration(uf);
   }
 
   @Override
-  protected BitwuzlaDeclaration getBooleanVarDeclarationImpl(Long pLong) {
-    long kind = BitwuzlaJNI.bitwuzla_term_get_kind(pLong);
+  protected BitwuzlaDeclaration getBooleanVarDeclarationImpl(Term pTerm) {
+    Kind kind = pTerm.kind();
 
     // CONSTANTS are "variables" and Kind.VARIABLES are bound variables in for example quantifiers
-    assert kind == BITWUZLA_KIND_APPLY.swigValue() || kind == BITWUZLA_KIND_CONSTANT.swigValue()
-        : BitwuzlaJNI.bitwuzla_term_to_string(kind);
-    if (kind == BITWUZLA_KIND_APPLY.swigValue()) {
-      long[] size = new long[1];
-      long[] pChildren = BitwuzlaJNI.bitwuzla_term_get_children(pLong, size);
+    assert kind == Kind.APPLY || kind == Kind.CONSTANT : kind.toString();
+    if (kind == Kind.APPLY) {
       // Returns pointer to Uninterpreted Function used in Apply
-      return new BitwuzlaDeclaration(pChildren[0], false);
+      return new BitwuzlaDeclaration(pTerm.get(0));
     } else {
-      return new BitwuzlaDeclaration(pLong, true);
+      return new BitwuzlaDeclaration(pTerm);
     }
   }
 
   @Override
-  public Long extractInfo(Formula pT) {
+  public Term extractInfo(Formula pT) {
     return BitwuzlaFormulaManager.getBitwuzlaTerm(pT);
   }
 
   @Override
-  public BooleanFormula encapsulateBoolean(Long pTerm) {
+  public BooleanFormula encapsulateBoolean(Term pTerm) {
     assert getFormulaType(pTerm).isBooleanType();
     return new BitwuzlaBooleanFormula(pTerm);
   }
 
-  protected Table<String, Long, Long> getCache() {
+  protected Table<String, Sort, Term> getCache() {
     return formulaCache;
   }
 
@@ -643,50 +530,41 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Bit
   }
 
   // Optional that contains the variable to the entered String if there is one.
-  protected Optional<Long> getFormulaFromCache(String variable) {
-    Iterator<Entry<Long, Long>> entrySetIter = formulaCache.row(variable).entrySet().iterator();
+  protected Optional<Term> getFormulaFromCache(String variable) {
+    Iterator<Entry<Sort, Term>> entrySetIter = formulaCache.row(variable).entrySet().iterator();
     if (entrySetIter.hasNext()) {
-      // If there is a non empty row for an entry, there is only one entry
+      // If there is a non-empty row for an entry, there is only one entry
       return Optional.of(entrySetIter.next().getValue());
     }
     return Optional.empty();
   }
 
   @Override
-  public Object convertValue(Long term) {
-    String value;
-    long sort = BitwuzlaJNI.bitwuzla_term_get_sort(term);
-    if (BitwuzlaJNI.bitwuzla_term_is_const(term)) {
-      return null;
+  public Object convertValue(Term term) {
+    Preconditions.checkArgument(term.is_value(), "Term \"%s\" is not a value.", term);
+    Sort sort = term.sort();
+    if (sort.is_bool()) {
+      return term.to_bool();
     }
-    if (BitwuzlaJNI.bitwuzla_sort_is_fun(sort)) {
-      // TODO: this is wrong
-      throw new AssertionError("Error: Unknown sort and term");
-    } else {
-      value = BitwuzlaJNI.bitwuzla_term_to_string(term);
-      if (value.startsWith("#b")) {
-        // Bitvectors in Bitwuzla start with a #b
-        return new BigInteger(value.substring(2), 2);
-      } else if (value.equals("true")) {
-        return true;
-      } else if (value.equals("false")) {
-        return false;
-      } else if (value.startsWith("(fp")) {
-        return value
-            .replace("(fp", "")
-            .replace(")", "")
-            .replace("#b", "")
-            .replace("#b", "")
-            .replace("#b", "")
-            .strip();
-      } else if (BitwuzlaJNI.bitwuzla_sort_is_rm(sort)) {
-        return value;
-      }
+    if (sort.is_rm()) {
+      return term.to_rm();
     }
+    if (sort.is_bv()) {
+      return new BigInteger(term.to_bv(), 2);
+    }
+    if (sort.is_fp()) {
+      int sizeExponent = sort.fp_exp_size();
+      int sizeMantissa = sort.fp_sig_size() - 1;
+      return FloatingPointNumber.of(term.to_bv(), sizeExponent, sizeMantissa);
+    }
+    throw new AssertionError("Unknown value type.");
+  }
 
-    throw new AssertionError(
-        "Error: Could not convert term to value; Unknown sort and term. "
-            + "Value: "
-            + BitwuzlaJNI.bitwuzla_term_to_string(term));
+  public void addVariableCast(Term equal) {
+    variableCasts.add(equal);
+  }
+
+  public Iterable<Term> getVariableCasts() {
+    return variableCasts;
   }
 }

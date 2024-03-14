@@ -239,9 +239,6 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
   @Test
   public void parseMathSatTestParseFirst1() throws SolverException, InterruptedException {
     requireParser();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BITWUZLA);
-    // Bitwuzla returns 2 distinct variables
-    // TODO: investigate and fix
     compareParseWithOrgParseFirst(MATHSAT_DUMP1, this::genBoolExpr);
   }
 
@@ -254,36 +251,24 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
   @Test
   public void parseSmtinterpolTestParseFirst1() throws SolverException, InterruptedException {
     requireParser();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BITWUZLA);
-    // Bitwuzla returns 2 distinct variables
-    // TODO: investigate and fix
     compareParseWithOrgParseFirst(SMTINTERPOL_DUMP1, this::genBoolExpr);
   }
 
   @Test
   public void parseSmtinterpolTestExprFirst1() throws SolverException, InterruptedException {
     requireParser();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BITWUZLA);
-    // Bitwuzla returns 2 distinct variables
-    // TODO: investigate and fix
     compareParseWithOrgExprFirst(SMTINTERPOL_DUMP1, this::genBoolExpr);
   }
 
   @Test
   public void parseZ3TestParseFirst1() throws SolverException, InterruptedException {
     requireParser();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BITWUZLA);
-    // Bitwuzla returns 2 distinct variables
-    // TODO: investigate and fix
     compareParseWithOrgParseFirst(Z3_DUMP1, this::genBoolExpr);
   }
 
   @Test
   public void parseZ3TestExprFirst1() throws SolverException, InterruptedException {
     requireParser();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BITWUZLA);
-    // Bitwuzla returns 2 distinct variables
-    // TODO: investigate and fix
     compareParseWithOrgExprFirst(Z3_DUMP1, this::genBoolExpr);
   }
 
@@ -405,9 +390,6 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     // Boolector will fail this anyway since bools are bitvecs for btor
     TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
 
-    // FIXME: Bitwuzla seems to have similar issues?
-    TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BITWUZLA);
-
     // check if input is correct
     checkThatFunOnlyDeclaredOnce(textToParse);
     checkThatAssertIsInLastLine(textToParse);
@@ -415,9 +397,6 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     // actual test
     BooleanFormula expr = fun.get();
     BooleanFormula parsedForm = mgr.parse(textToParse);
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BITWUZLA);
-    // Bitwuzla returns 2 distinct variables
-    // TODO: investigate and fix
     assertThatFormula(parsedForm).isEquivalentTo(expr);
   }
 
@@ -425,9 +404,6 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
       throws SolverException, InterruptedException {
     // Boolector will fail this anyway since bools are bitvecs for btor
     TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
-
-    // FIXME: Bitwuzla seems to have similar issues?
-    TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BITWUZLA);
 
     // check if input is correct
     checkThatFunOnlyDeclaredOnce(textToParse);
