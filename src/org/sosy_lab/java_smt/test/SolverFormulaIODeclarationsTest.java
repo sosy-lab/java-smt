@@ -160,6 +160,7 @@ public class SolverFormulaIODeclarationsTest
       Truth.assertThat(mgr.extractVariablesAndUFs(formula).values()).containsExactly(var);
     }
   }
+
   @Test
   public void parseDeclareRedundantBvTest() {
     requireBitvectors();
