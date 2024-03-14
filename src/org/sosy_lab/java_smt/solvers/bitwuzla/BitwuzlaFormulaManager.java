@@ -131,9 +131,16 @@ public final class BitwuzlaFormulaManager
         declParser.parse(token, true, false);
         Term parsed = declParser.get_declared_funs().get(0);
 
+        String symbol = parsed.symbol();
+        if (symbol.startsWith("|") && symbol.endsWith("|")) {
+          // Strip quotes from the name
+          symbol = symbol.substring(1, symbol.length() - 1);
+        }
+        Sort sort = parsed.sort();
+
         // Check if the symbol is already defined in the variable cache
-        if (cache.containsRow(parsed.symbol())) {
-          if (!cache.contains(parsed.symbol(), parsed.sort())) {
+        if (cache.containsRow(symbol)) {
+          if (!cache.contains(symbol, sort)) {
             // Sort of the definition that we parsed does not match the sort from the variable
             // cache.
             throw new IllegalArgumentException();
@@ -149,7 +156,7 @@ public final class BitwuzlaFormulaManager
     // Build SMT-LIB2 declarations for all variables in the cache
     ImmutableList.Builder<String> builder = ImmutableList.builder();
     for (Cell<String, Sort, Term> c : cache.cellSet()) {
-      String symbol = c.getRowKey();
+      String symbol = c.getValue().toString();
       List<Sort> args = ImmutableList.of();
       Sort sort = c.getColumnKey();
       if (sort.is_fun()) {
@@ -197,7 +204,7 @@ public final class BitwuzlaFormulaManager
       }
     }
 
-    // Substitude all symbols from the context with their original terms
+    // Substitute all symbols from the context with their original terms
     result = creator.getTermManager().substitute_term(result, subst);
 
     // Return the updated term
