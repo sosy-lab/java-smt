@@ -680,11 +680,6 @@ public class FloatingPointFormulaManagerTest
 
   @Test
   public void fpIeeeConversionTypes() {
-    assume()
-        .withMessage("FP-to-BV conversion not available for %s", solverToUse())
-        .that(solverToUse())
-        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.BITWUZLA);
-
     FloatingPointFormula var = fpmgr.makeVariable("var", singlePrecType);
     assertThat(mgr.getFormulaType(fpmgr.toIeeeBitvector(var)))
         .isEqualTo(FormulaType.getBitvectorTypeWithSize(32));
