@@ -376,6 +376,10 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   public void fpToBvTest() {
     requireFloats();
     requireBitvectors();
+    assume()
+        .withMessage("FP-to-BV conversion not available for CVC4 and CVC5")
+        .that(solverToUse())
+        .isNoneOf(Solvers.CVC4, Solvers.CVC5);
 
     var fpType = FormulaType.getFloatingPointType(5, 10);
     var visitor =
