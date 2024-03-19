@@ -736,10 +736,10 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       case Z3_OP_FPA_TO_IEEE_BV:
         return FunctionDeclarationKind.FP_AS_IEEEBV;
       case Z3_OP_FPA_TO_FP:
+        // use the last argument. other arguments can be part of rounding or casting.
+        long arg = Native.getAppArg(environment, f, Native.getAppNumArgs(environment, f) - 1);
         Z3_sort_kind sortKind =
-            Z3_sort_kind.fromInt(
-                Native.getSortKind(
-                    environment, Native.getSort(environment, Native.getAppArg(environment, f, 0))));
+            Z3_sort_kind.fromInt(Native.getSortKind(environment, Native.getSort(environment, arg)));
         if (Z3_sort_kind.Z3_BV_SORT == sortKind) {
           return FunctionDeclarationKind.BV_SCASTTO_FP;
         } else {
