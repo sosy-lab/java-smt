@@ -739,7 +739,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         Z3_sort_kind sortKind =
             Z3_sort_kind.fromInt(
                 Native.getSortKind(
-                    environment, Native.getSort(environment, Native.getAppArg(environment, f, 1))));
+                    environment, Native.getSort(environment, Native.getAppArg(environment, f, 0))));
         if (Z3_sort_kind.Z3_BV_SORT == sortKind) {
           return FunctionDeclarationKind.BV_SCASTTO_FP;
         } else {

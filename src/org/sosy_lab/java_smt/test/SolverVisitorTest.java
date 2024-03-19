@@ -373,6 +373,28 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
+  public void fpToBvTest() {
+    requireFloats();
+    requireBitvectors();
+
+    var fpType = FormulaType.getFloatingPointType(5, 10);
+    var visitor =
+        new DefaultFormulaVisitor<Void>() {
+          @Override
+          protected Void visitDefault(Formula f) {
+            return null;
+          }
+        };
+
+    for (int num : List.of(0, 1, 4, 16, 256, 1024)) {
+      Formula bv2fp = fpmgr.fromIeeeBitvector(bvmgr.makeBitvector(16, num), fpType);
+      mgr.visit(bv2fp, visitor);
+      Formula fp2bv = fpmgr.toIeeeBitvector(fpmgr.makeNumber(num, fpType));
+      mgr.visit(fp2bv, visitor);
+    }
+  }
+
+  @Test
   public void bvVisit() throws SolverException, InterruptedException {
     requireBitvectors();
     BitvectorFormula x = bvmgr.makeVariable(5, "x");
