@@ -737,6 +737,11 @@ public class FloatingPointFormulaManagerTest
 
   @Test
   public void checkIeeeFp2BvConversion32() throws SolverException, InterruptedException {
+    assume()
+        .withMessage("FP-to-BV conversion not available for CVC4 and CVC5")
+        .that(solverToUse())
+        .isNoneOf(Solvers.CVC4, Solvers.CVC5);
+
     for (float f : getListOfFloats()) {
       checkFP2BV(
           singlePrecType,
@@ -747,6 +752,11 @@ public class FloatingPointFormulaManagerTest
 
   @Test
   public void checkIeeeFp2BvConversion64() throws SolverException, InterruptedException {
+    assume()
+        .withMessage("FP-to-BV conversion not available for CVC4 and CVC5")
+        .that(solverToUse())
+        .isNoneOf(Solvers.CVC4, Solvers.CVC5);
+
     for (double d : getListOfDoubles()) {
       checkFP2BV(
           doublePrecType,
