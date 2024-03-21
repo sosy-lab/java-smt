@@ -255,7 +255,8 @@ public interface BitvectorFormulaManager {
    * This method returns a term representing the right shift (towards least-significant bit) of
    * number by toShift. The result has the same length as the given number. On the left side, we
    * fill up the most significant bits with ones (i.e., arithmetic shift), if the number is signed
-   * and negative, else we fill up with zeroes. For "toShift >= bitsize", we return a bitvector with
+   * and negative, else we fill up with zeroes. For "toShift &gt;= bitsize", we return a bitvector
+   * with
    * value zero, if number was zero or positive, or all bits set to one, if negative.
    */
   BitvectorFormula shiftRight(BitvectorFormula number, BitvectorFormula toShift, boolean signed);
@@ -263,7 +264,7 @@ public interface BitvectorFormulaManager {
   /**
    * This method returns a term representing the left shift (towards most-significant bit) of number
    * by toShift. The result has the same length as the given number. On the right side, we fill up
-   * the least significant bits with zeroes. For "toShift >= bitsize", we return a bitvector with
+   * the least significant bits with zeroes. For "toShift &gt;= bitsize", we return a bitvector with
    * value zero.
    */
   BitvectorFormula shiftLeft(BitvectorFormula number, BitvectorFormula toShift);
