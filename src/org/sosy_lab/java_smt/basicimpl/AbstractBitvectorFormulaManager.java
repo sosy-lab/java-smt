@@ -325,6 +325,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     return wrap(rotateLeft(extractInfo(pNumber), extractInfo(pToRotate)));
   }
 
+  @SuppressWarnings("unused")
   protected TFormulaInfo rotateLeft(TFormulaInfo pNumber, TFormulaInfo pToRotate) {
     throw new UnsupportedOperationException("Solver does not support BV rotation.");
   }
@@ -346,6 +347,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     return wrap(rotateRight(extractInfo(pNumber), extractInfo(pToRotate)));
   }
 
+  @SuppressWarnings("unused")
   protected TFormulaInfo rotateRight(TFormulaInfo pNumber, TFormulaInfo pToRotate) {
     throw new UnsupportedOperationException("Solver does not support BV rotation.");
   }
