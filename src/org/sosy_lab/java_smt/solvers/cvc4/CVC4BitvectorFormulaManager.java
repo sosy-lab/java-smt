@@ -10,6 +10,8 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 
 import edu.stanford.CVC4.BitVector;
 import edu.stanford.CVC4.BitVectorExtract;
+import edu.stanford.CVC4.BitVectorRotateLeft;
+import edu.stanford.CVC4.BitVectorRotateRight;
 import edu.stanford.CVC4.BitVectorSignExtend;
 import edu.stanford.CVC4.BitVectorType;
 import edu.stanford.CVC4.BitVectorZeroExtend;
@@ -80,8 +82,20 @@ public class CVC4BitvectorFormulaManager
   }
 
   @Override
-  protected Expr shiftLeft(Expr pParam1, Expr pParam2) {
-    return exprManager.mkExpr(Kind.BITVECTOR_SHL, pParam1, pParam2);
+  protected Expr shiftLeft(Expr number, Expr toShift) {
+    return exprManager.mkExpr(Kind.BITVECTOR_SHL, number, toShift);
+  }
+
+  @Override
+  protected Expr rotateLeftByConstant(Expr number, int toRotate) {
+    Expr op = exprManager.mkConst(new BitVectorRotateLeft(toRotate));
+    return exprManager.mkExpr(op, number);
+  }
+
+  @Override
+  protected Expr rotateRightByConstant(Expr number, int toRotate) {
+    Expr op = exprManager.mkConst(new BitVectorRotateRight(toRotate));
+    return exprManager.mkExpr(op, number);
   }
 
   @Override

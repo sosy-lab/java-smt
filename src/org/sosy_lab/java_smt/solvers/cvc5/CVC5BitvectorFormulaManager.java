@@ -126,6 +126,28 @@ public class CVC5BitvectorFormulaManager
   }
 
   @Override
+  protected Term rotateLeftByConstant(Term pNumber, int pToRotate) {
+    try {
+      Op op = solver.mkOp(Kind.BITVECTOR_ROTATE_LEFT, pToRotate);
+      return solver.mkTerm(op, pNumber);
+    } catch (CVC5ApiException e) {
+      throw new IllegalArgumentException(
+          String.format("You tried rotation a bitvector %s with shift %d", pNumber, pToRotate), e);
+    }
+  }
+
+  @Override
+  protected Term rotateRightByConstant(Term pNumber, int pToRotate) {
+    try {
+      Op op = solver.mkOp(Kind.BITVECTOR_ROTATE_RIGHT, pToRotate);
+      return solver.mkTerm(op, pNumber);
+    } catch (CVC5ApiException e) {
+      throw new IllegalArgumentException(
+          String.format("You tried rotation a bitvector %s with shift %d", pNumber, pToRotate), e);
+    }
+  }
+
+  @Override
   protected Term not(Term pParam1) {
     return solver.mkTerm(Kind.BITVECTOR_NOT, pParam1);
   }

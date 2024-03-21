@@ -429,6 +429,96 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
   }
 
   @Test
+  public void bvRotateByConstant() throws SolverException, InterruptedException {
+    for (int bitsize : new int[] {8, 13, 25, 31}) {
+      BitvectorFormula zero = bvmgr.makeBitvector(bitsize, 0);
+      BitvectorFormula a = bvmgr.makeVariable(bitsize, "a" + bitsize);
+      BitvectorFormula b = bvmgr.makeVariable(bitsize, "b" + bitsize);
+      BitvectorFormula zeroA = bvmgr.concat(zero, a);
+      BitvectorFormula bZero = bvmgr.concat(b, zero);
+
+      // shift is small enough to be in range of the bitsize.
+      BitvectorFormula shift = bvmgr.makeBitvector(bitsize * 2, bitsize);
+
+      // rotating left and right is identity
+      assertThatFormula(bvmgr.equal(a, bvmgr.rotateLeft(bvmgr.rotateRight(a, 7), 7)))
+          .isTautological();
+      assertThatFormula(bvmgr.equal(a, bvmgr.rotateRight(bvmgr.rotateLeft(a, 7), 7)))
+          .isTautological();
+
+      // rotating twice by half is identity
+      assertThatFormula(
+              bvmgr.equal(zeroA, bvmgr.rotateLeft(bvmgr.rotateLeft(zeroA, bitsize), bitsize)))
+          .isTautological();
+      assertThatFormula(
+              bvmgr.equal(bZero, bvmgr.rotateRight(bvmgr.rotateRight(bZero, bitsize), bitsize)))
+          .isTautological();
+
+      // rotating a half-zero variable is shifting
+      assertThatFormula(
+              bvmgr.equal(bvmgr.rotateLeft(zeroA, bitsize), bvmgr.shiftLeft(zeroA, shift)))
+          .isTautological();
+      assertThatFormula(
+              bvmgr.equal(bvmgr.rotateRight(bZero, bitsize), bvmgr.shiftRight(bZero, shift, false)))
+          .isTautological();
+    }
+  }
+
+  @Test
+  public void bvRotateByBV() throws SolverException, InterruptedException {
+    requireBitvectorRotation();
+
+    for (int bitsize : new int[] {8, 13, 25, 31}) {
+      BitvectorFormula zero = bvmgr.makeBitvector(bitsize, 0);
+      BitvectorFormula a = bvmgr.makeVariable(bitsize, "a" + bitsize);
+      BitvectorFormula b = bvmgr.makeVariable(bitsize, "b" + bitsize);
+      BitvectorFormula zeroA = bvmgr.concat(zero, a);
+      BitvectorFormula bZero = bvmgr.concat(b, zero);
+
+      // shift is small enough to be in range of the bitsize.
+      BitvectorFormula shift = bvmgr.makeBitvector(bitsize * 2, bitsize);
+
+      // rotating left and right is identity
+      assertThatFormula(bvmgr.equal(a, bvmgr.rotateLeft(bvmgr.rotateRight(a, b), b)))
+          .isTautological();
+      assertThatFormula(bvmgr.equal(a, bvmgr.rotateRight(bvmgr.rotateLeft(a, b), b)))
+          .isTautological();
+
+      // rotating twice by half is identity
+      assertThatFormula(bvmgr.equal(zeroA, bvmgr.rotateLeft(bvmgr.rotateLeft(zeroA, shift), shift)))
+          .isTautological();
+      assertThatFormula(
+              bvmgr.equal(bZero, bvmgr.rotateRight(bvmgr.rotateRight(bZero, shift), shift)))
+          .isTautological();
+
+      // rotating a half-zero variable is shifting
+      assertThatFormula(bvmgr.equal(bvmgr.rotateLeft(zeroA, shift), bvmgr.shiftLeft(zeroA, shift)))
+          .isTautological();
+      assertThatFormula(
+              bvmgr.equal(bvmgr.rotateRight(bZero, shift), bvmgr.shiftRight(bZero, shift, false)))
+          .isTautological();
+    }
+  }
+
+  @Test
+  public void bvIsIdenticalAfterFullRotation() throws SolverException, InterruptedException {
+    requireBitvectorRotation();
+
+    for (int bitsize : new int[] {2, 4, 8, 16, 32, 55}) {
+      BitvectorFormula number = bvmgr.makeVariable(bitsize, "NUM_ROT_" + bitsize);
+      for (int multiplier : new int[] {0, 1, 2, 5, 17, 37, 111, 1111}) {
+        int toRotate = multiplier * bitsize;
+        if (toRotate >= (1 << bitsize)) {
+          continue; // ignore numbers larger than bitsize
+        }
+        BitvectorFormula rot = bvmgr.makeBitvector(bitsize, toRotate);
+        assertThatFormula(bvmgr.equal(number, bvmgr.rotateLeft(number, rot))).isTautological();
+        assertThatFormula(bvmgr.equal(number, bvmgr.rotateRight(number, rot))).isTautological();
+      }
+    }
+  }
+
+  @Test
   public void bvInRange() throws SolverException, InterruptedException {
     requireBitvectors();
 

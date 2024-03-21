@@ -83,6 +83,26 @@ class Z3BitvectorFormulaManager extends AbstractBitvectorFormulaManager<Long, Lo
   }
 
   @Override
+  public Long rotateLeftByConstant(Long number, int toShift) {
+    return Native.mkRotateLeft(z3context, toShift, number);
+  }
+
+  @Override
+  public Long rotateLeft(Long number, Long toShift) {
+    return Native.mkExtRotateLeft(z3context, number, toShift);
+  }
+
+  @Override
+  public Long rotateRightByConstant(Long number, int toShift) {
+    return Native.mkRotateRight(z3context, toShift, number);
+  }
+
+  @Override
+  public Long rotateRight(Long number, Long toShift) {
+    return Native.mkExtRotateRight(z3context, number, toShift);
+  }
+
+  @Override
   public Long not(Long pBits) {
     return Native.mkBvnot(z3context, pBits);
   }

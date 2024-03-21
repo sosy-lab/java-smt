@@ -233,6 +233,15 @@ public abstract class SolverBasedTest0 {
         .isNotEqualTo(Solvers.YICES2);
   }
 
+  protected final void requireBitvectorRotation() {
+    assume()
+        .withMessage(
+            "Solver %s does not yet support the rotation of bitvectors by arbitrary shift",
+            solverToUse())
+        .that(solverToUse())
+        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.MATHSAT5, Solvers.PRINCESS, Solvers.YICES2);
+  }
+
   /** Skip test if the solver does not support quantifiers. */
   protected final void requireQuantifiers() {
     assume()
