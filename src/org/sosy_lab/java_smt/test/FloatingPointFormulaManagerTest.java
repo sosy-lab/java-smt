@@ -716,9 +716,9 @@ public class FloatingPointFormulaManagerTest
   }
 
   @Test
-  public void checkIeeeFpConversion32() throws SolverException, InterruptedException {
+  public void checkIeeeBv2FpConversion32() throws SolverException, InterruptedException {
     for (float f : getListOfFloats()) {
-      checkFP(
+      checkBV2FP(
           singlePrecType,
           bvmgr.makeBitvector(32, Float.floatToRawIntBits(f)),
           fpmgr.makeNumber(f, singlePrecType));
@@ -726,9 +726,29 @@ public class FloatingPointFormulaManagerTest
   }
 
   @Test
-  public void checkIeeeFpConversion64() throws SolverException, InterruptedException {
+  public void checkIeeeBv2FpConversion64() throws SolverException, InterruptedException {
     for (double d : getListOfDoubles()) {
-      checkFP(
+      checkBV2FP(
+          doublePrecType,
+          bvmgr.makeBitvector(64, Double.doubleToRawLongBits(d)),
+          fpmgr.makeNumber(d, doublePrecType));
+    }
+  }
+
+  @Test
+  public void checkIeeeFp2BvConversion32() throws SolverException, InterruptedException {
+    for (float f : getListOfFloats()) {
+      checkFP2BV(
+          singlePrecType,
+          bvmgr.makeBitvector(32, Float.floatToRawIntBits(f)),
+          fpmgr.makeNumber(f, singlePrecType));
+    }
+  }
+
+  @Test
+  public void checkIeeeFp2BvConversion64() throws SolverException, InterruptedException {
+    for (double d : getListOfDoubles()) {
+      checkFP2BV(
           doublePrecType,
           bvmgr.makeBitvector(64, Double.doubleToRawLongBits(d)),
           fpmgr.makeNumber(d, doublePrecType));
@@ -738,6 +758,8 @@ public class FloatingPointFormulaManagerTest
   private List<Float> getListOfFloats() {
     List<Float> flts =
         Lists.newArrayList(
+            2.139922e-34f, // normal
+            8.345803E-39f, // subnormal
             // Float.NaN, // NaN is no unique bitvector
             Float.MIN_NORMAL,
             Float.MIN_VALUE,
@@ -793,24 +815,20 @@ public class FloatingPointFormulaManagerTest
     return dbls;
   }
 
-  private void checkFP(FloatingPointType type, BitvectorFormula bv, FloatingPointFormula flt)
+  private void checkBV2FP(FloatingPointType type, BitvectorFormula bv, FloatingPointFormula flt)
       throws SolverException, InterruptedException {
-    assume()
-        .withMessage("FP-to-BV conversion not available for CVC4 and CVC5")
-        .that(solverToUse())
-        .isNoneOf(Solvers.CVC4, Solvers.CVC5);
+    FloatingPointFormula ieeeFp = fpmgr.fromIeeeBitvector(bv, type);
+    assertThat(mgr.getFormulaType(ieeeFp)).isEqualTo(mgr.getFormulaType(flt));
+    assertThatFormula(fpmgr.equalWithFPSemantics(flt, ieeeFp)).isTautological();
+  }
 
+  private void checkFP2BV(FloatingPointType type, BitvectorFormula bv, FloatingPointFormula flt)
+      throws SolverException, InterruptedException {
     BitvectorFormula var = bvmgr.makeVariable(type.getTotalSize(), "x");
-
-    assertThat(mgr.getFormulaType(var)).isEqualTo(mgr.getFormulaType(fpmgr.toIeeeBitvector(flt)));
-    assertThat(mgr.getFormulaType(flt))
-        .isEqualTo(mgr.getFormulaType(fpmgr.fromIeeeBitvector(bv, type)));
-
-    assertThatFormula(bmgr.and(bvmgr.equal(bv, var), bvmgr.equal(var, fpmgr.toIeeeBitvector(flt))))
-        .isSatisfiable();
-    assertThatFormula(bvmgr.equal(bv, fpmgr.toIeeeBitvector(flt))).isTautological();
-    assertThatFormula(fpmgr.equalWithFPSemantics(flt, fpmgr.fromIeeeBitvector(bv, type)))
-        .isTautological();
+    BitvectorFormula ieeeBv = fpmgr.toIeeeBitvector(flt);
+    assertThat(mgr.getFormulaType(ieeeBv)).isEqualTo(mgr.getFormulaType(var));
+    assertThatFormula(bvmgr.equal(bv, ieeeBv)).isTautological();
+    assertThatFormula(bmgr.and(bvmgr.equal(bv, var), bvmgr.equal(var, ieeeBv))).isSatisfiable();
   }
 
   @Test
