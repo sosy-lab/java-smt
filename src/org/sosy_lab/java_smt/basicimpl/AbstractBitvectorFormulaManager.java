@@ -349,7 +349,6 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
   protected TFormulaInfo rotateRight(TFormulaInfo pNumber, TFormulaInfo pToRotate) {
     throw new UnsupportedOperationException("Solver does not support BV rotation.");
   }
-  ;
 
   @Override
   public final BitvectorFormula concat(BitvectorFormula pNumber, BitvectorFormula pAppend) {
