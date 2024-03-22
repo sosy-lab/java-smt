@@ -15,7 +15,6 @@ import ap.theories.bitvectors.ModuloArithmetic$;
 import ap.types.Sort;
 import ap.types.Sort$;
 import com.google.common.base.Preconditions;
-import edu.stanford.CVC4.Expr;
 import java.math.BigInteger;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
