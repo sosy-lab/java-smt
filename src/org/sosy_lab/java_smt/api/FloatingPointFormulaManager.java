@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.api;
 
-import com.microsoft.z3.Native;
 import java.math.BigDecimal;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
@@ -203,11 +202,10 @@ public interface FloatingPointFormulaManager {
       FloatingPointRoundingMode pFloatingPointRoundingMode);
 
   /**
-   * remainder: x - y * n, where n in Z is nearest to x/y
+   * remainder: x - y * n, where n in Z is nearest to x/y. Can be negative even or two positive
+   * arguments (as opposed to integer modulo operators)
    */
-  FloatingPointFormula remainder(
-      FloatingPointFormula number1,
-      FloatingPointFormula number2);
+  FloatingPointFormula remainder(FloatingPointFormula number1, FloatingPointFormula number2);
 
   // ----------------- Numeric relations, return type BooleanFormula -----------------
 

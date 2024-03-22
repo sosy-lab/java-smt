@@ -204,8 +204,10 @@ public class FloatingPointFormulaManagerTest
         .that(solver == Solvers.MATHSAT5)
         .isFalse();
 
-    for (FloatingPointType prec : new FloatingPointType[]{singlePrecType, doublePrecType,
-        FormulaType.getFloatingPointType(5, 6)}) {
+    for (FloatingPointType prec :
+        new FloatingPointType[] {
+          singlePrecType, doublePrecType, FormulaType.getFloatingPointType(5, 6)
+        }) {
 
       final FloatingPointFormula five = fpmgr.makeNumber(5, prec);
       final FloatingPointFormula four = fpmgr.makeNumber(4, prec);
@@ -229,8 +231,10 @@ public class FloatingPointFormulaManagerTest
         .that(solver == Solvers.MATHSAT5)
         .isFalse();
 
-    for (FloatingPointType prec : new FloatingPointType[]{singlePrecType, doublePrecType,
-        FormulaType.getFloatingPointType(5, 6)}) {
+    for (FloatingPointType prec :
+        new FloatingPointType[] {
+          singlePrecType, doublePrecType, FormulaType.getFloatingPointType(5, 6)
+        }) {
 
       final FloatingPointFormula num = fpmgr.makeNumber(42, prec);
 
@@ -241,7 +245,6 @@ public class FloatingPointFormulaManagerTest
       final FloatingPointFormula minusNan = fpmgr.makeNumber("-NaN", prec);
       final FloatingPointFormula minusZero = fpmgr.makeNumber("0", prec);
       final FloatingPointFormula minusInf = fpmgr.makeMinusInfinity(prec);
-
 
       final FloatingPointFormula expr1 = fpmgr.remainder(nan, nan);
       final FloatingPointFormula expr2 = fpmgr.remainder(zero, zero);

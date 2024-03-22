@@ -376,8 +376,7 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
 
   @Override
   public FloatingPointFormula remainder(
-      FloatingPointFormula number1,
-      FloatingPointFormula number2) {
+      FloatingPointFormula number1, FloatingPointFormula number2) {
     return wrap(remainder(extractInfo(number1), extractInfo(number2)));
   }
 

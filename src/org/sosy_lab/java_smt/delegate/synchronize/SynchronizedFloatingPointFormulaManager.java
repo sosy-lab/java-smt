@@ -299,8 +299,7 @@ class SynchronizedFloatingPointFormulaManager implements FloatingPointFormulaMan
 
   @Override
   public FloatingPointFormula remainder(
-      FloatingPointFormula number1,
-      FloatingPointFormula number2) {
+      FloatingPointFormula number1, FloatingPointFormula number2) {
     synchronized (sync) {
       return delegate.remainder(number1, number2);
     }
