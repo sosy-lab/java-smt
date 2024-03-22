@@ -179,6 +179,18 @@ class StatisticsBitvectorFormulaManager implements BitvectorFormulaManager {
   }
 
   @Override
+  public BitvectorFormula rotateRight(BitvectorFormula pNumber, BitvectorFormula pToRotate) {
+    stats.bvOperations.getAndIncrement();
+    return delegate.rotateRight(pNumber, pToRotate);
+  }
+
+  @Override
+  public BitvectorFormula rotateLeft(BitvectorFormula pNumber, BitvectorFormula pToRotate) {
+    stats.bvOperations.getAndIncrement();
+    return delegate.rotateLeft(pNumber, pToRotate);
+  }
+
+  @Override
   public BitvectorFormula concat(BitvectorFormula pNumber, BitvectorFormula pAppend) {
     stats.bvOperations.getAndIncrement();
     return delegate.concat(pNumber, pAppend);
