@@ -15,7 +15,9 @@ import ap.theories.bitvectors.ModuloArithmetic$;
 import ap.types.Sort;
 import ap.types.Sort$;
 import com.google.common.base.Preconditions;
+import edu.stanford.CVC4.Expr;
 import java.math.BigInteger;
+import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
 import scala.Option;
 
@@ -175,6 +177,24 @@ class PrincessBitvectorFormulaManager
   @Override
   protected IExpression shiftLeft(IExpression pExtract, IExpression pExtract2) {
     return ModuloArithmetic$.MODULE$.bvshl((ITerm) pExtract, (ITerm) pExtract2);
+  }
+
+  @Override
+  protected IExpression rotateRight(IExpression pNumber, IExpression toRotate) {
+    // Princess does not support non-literal rotation, so we rewrite it to (bvor (bvlshr pNumber
+    // toRotate) (bvshl pNumber (bvsub size toRotate)))
+    final int bitsize = ((BitvectorType) formulaCreator.getFormulaType(pNumber)).getSize();
+    final IExpression size = this.makeBitvectorImpl(bitsize, bitsize);
+    return or(shiftRight(pNumber, toRotate, false), shiftLeft(pNumber, subtract(size, toRotate)));
+  }
+
+  @Override
+  protected IExpression rotateLeft(IExpression pNumber, IExpression toRotate) {
+    // Princess does not support non-literal rotation, so we rewrite it to (bvor (bvshl pNumber
+    // toRotate) (bvlshr pNumber (bvsub size toRotate)))
+    final int bitsize = ((BitvectorType) formulaCreator.getFormulaType(pNumber)).getSize();
+    final IExpression size = this.makeBitvectorImpl(bitsize, bitsize);
+    return or(shiftLeft(pNumber, toRotate), shiftRight(pNumber, subtract(size, toRotate), false));
   }
 
   @Override

@@ -35,13 +35,18 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvsrem;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvsub;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvxor2;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_bvbin;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_rotate_left;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_rotate_right;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_sign_extend;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_zero_extend;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import edu.stanford.CVC4.Expr;
 import java.math.BigInteger;
+import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
+import scala.Int;
 
 public class Yices2BitvectorFormulaManager
     extends AbstractBitvectorFormulaManager<Integer, Integer, Long, Integer> {
@@ -189,6 +194,24 @@ public class Yices2BitvectorFormulaManager
   @Override
   protected Integer shiftLeft(Integer pNumber, Integer pToShift) {
     return yices_bvshl(pNumber, pToShift);
+  }
+
+  @Override
+  protected Integer rotateRight(Integer pNumber, Integer toRotate) {
+    // Yices2 does not support non-literal rotation, so we rewrite it to (bvor (bvlshr pNumber
+    // toRotate) (bvshl pNumber (bvsub size toRotate)))
+    final int bitsize = ((BitvectorType) formulaCreator.getFormulaType(pNumber)).getSize();
+    final Integer size = this.makeBitvectorImpl(bitsize, bitsize);
+    return or(shiftRight(pNumber, toRotate, false), shiftLeft(pNumber, subtract(size, toRotate)));
+  }
+
+  @Override
+  protected Integer rotateLeft(Integer pNumber, Integer toRotate) {
+    // Yices2 does not support non-literal rotation, so we rewrite it to (bvor (bvshl pNumber
+    // toRotate) (bvlshr pNumber (bvsub size toRotate)))
+    final int bitsize = ((BitvectorType) formulaCreator.getFormulaType(pNumber)).getSize();
+    final Integer size = this.makeBitvectorImpl(bitsize, bitsize);
+    return or(shiftLeft(pNumber, toRotate), shiftRight(pNumber, subtract(size, toRotate), false));
   }
 
   @Override

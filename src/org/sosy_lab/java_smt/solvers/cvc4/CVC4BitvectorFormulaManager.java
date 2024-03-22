@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 
 import edu.stanford.CVC4.BitVector;
 import edu.stanford.CVC4.BitVectorExtract;
+import edu.stanford.CVC4.BitVectorRotateLeft;
 import edu.stanford.CVC4.BitVectorSignExtend;
 import edu.stanford.CVC4.BitVectorType;
 import edu.stanford.CVC4.BitVectorZeroExtend;
@@ -82,6 +83,24 @@ public class CVC4BitvectorFormulaManager
   @Override
   protected Expr shiftLeft(Expr pParam1, Expr pParam2) {
     return exprManager.mkExpr(Kind.BITVECTOR_SHL, pParam1, pParam2);
+  }
+
+  @Override
+  protected Expr rotateRight(Expr pNumber, Expr toRotate) {
+    // cvc4 does not support non-literal rotation, so we rewrite it to (bvor (bvlshr pNumber
+    // toRotate) (bvshl pNumber (bvsub size toRotate)))
+    final int bitsize = ((BitvectorType) formulaCreator.getFormulaType(pNumber)).getSize();
+    final Expr size = this.makeBitvectorImpl(bitsize, bitsize);
+    return or(shiftRight(pNumber, toRotate, false), shiftLeft(pNumber, subtract(size, toRotate)));
+  }
+
+  @Override
+  protected Expr rotateLeft(Expr pNumber, Expr toRotate) {
+    // cvc4 does not support non-literal rotation, so we rewrite it to (bvor (bvshl pNumber
+    // toRotate) (bvlshr pNumber (bvsub size toRotate)))
+    final int bitsize = ((BitvectorType) formulaCreator.getFormulaType(pNumber)).getSize();
+    final Expr size = this.makeBitvectorImpl(bitsize, bitsize);
+    return or(shiftLeft(pNumber, toRotate), shiftRight(pNumber, subtract(size, toRotate), false));
   }
 
   @Override

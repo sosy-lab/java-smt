@@ -16,6 +16,8 @@ import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_mul;
 import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_neg;
 import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_not;
 import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_or;
+import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_rol;
+import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_ror;
 import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_sdiv;
 import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_sext;
 import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_sgt;
@@ -185,6 +187,16 @@ class BoolectorBitvectorFormulaManager
   @Override
   public Long shiftLeft(Long bitVec, Long toShift) {
     return boolector_sll(btor, bitVec, toShift);
+  }
+
+  @Override
+  protected Long rotateRight(Long pNumber, Long toRotate) {
+    return boolector_ror(btor, pNumber, toRotate);
+  }
+
+  @Override
+  protected Long rotateLeft(Long pNumber, Long toRotate) {
+    return boolector_rol(btor, pNumber, toRotate);
   }
 
   @Override

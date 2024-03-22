@@ -20,6 +20,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_bv_number;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_bv_or;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_bv_plus;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_bv_ror;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_bv_sdiv;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_bv_sext;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_bv_sleq;
@@ -37,7 +38,9 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_int_from_ubv;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_int_to_bv;
 
+import edu.stanford.CVC4.Expr;
 import java.math.BigInteger;
+import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
 
 /** Mathsat Bitvector Theory, build out of Bitvector*Operations. */
@@ -123,6 +126,24 @@ class Mathsat5BitvectorFormulaManager
   @Override
   public Long shiftLeft(Long number, Long toShift) {
     return msat_make_bv_lshl(mathsatEnv, number, toShift);
+  }
+
+  @Override
+  protected Long rotateRight(Long pNumber, Long toRotate) {
+    // MathSAT5 does not support non-literal rotation, so we rewrite it to (bvor (bvlshr pNumber
+    // toRotate) (bvshl pNumber (bvsub size toRotate)))
+    final int bitsize = ((BitvectorType) formulaCreator.getFormulaType(pNumber)).getSize();
+    final Long size = this.makeBitvectorImpl(bitsize, bitsize);
+    return or(shiftRight(pNumber, toRotate, false), shiftLeft(pNumber, subtract(size, toRotate)));
+  }
+
+  @Override
+  protected Long rotateLeft(Long pNumber, Long toRotate) {
+    // MathSAT5 does not support non-literal rotation, so we rewrite it to (bvor (bvshl pNumber
+    // toRotate) (bvlshr pNumber (bvsub size toRotate)))
+    final int bitsize = ((BitvectorType) formulaCreator.getFormulaType(pNumber)).getSize();
+    final Long size = this.makeBitvectorImpl(bitsize, bitsize);
+    return or(shiftLeft(pNumber, toRotate), shiftRight(pNumber, subtract(size, toRotate), false));
   }
 
   @Override

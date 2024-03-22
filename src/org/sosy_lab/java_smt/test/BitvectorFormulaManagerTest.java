@@ -397,4 +397,29 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
     assertThatFormula(bvmgr.distinct(List.of(a, a))).isUnsatisfiable();
     assertThatFormula(bvmgr.distinct(List.of(num3, num3))).isUnsatisfiable();
   }
+
+  @Test
+  public void bvRotateLeft() throws SolverException, InterruptedException {
+    // (ROL 0001 0010) == 0100
+    // (ROL 0100 0010) == 0001
+    BitvectorFormula bf1 = bvmgr.makeBitvector(4, BigInteger.ONE);
+    BitvectorFormula bf2 = bvmgr.makeBitvector(4, BigInteger.TWO);
+    BitvectorFormula bf3 = bvmgr.makeBitvector(4, BigInteger.valueOf(4));
+
+    assertThatFormula(bvmgr.equal(bvmgr.rotateLeft(bf1, bf2), bf3)).isTautological();
+    assertThatFormula(bvmgr.equal(bvmgr.rotateLeft(bf3, bf2), bf1)).isTautological();
+  }
+
+  @Test
+  public void bvRotateRight() throws SolverException, InterruptedException {
+    // (ROR 0001 0011) == 0010
+    // (ROR 0010 0011) == 0100
+    BitvectorFormula bf1 = bvmgr.makeBitvector(4, BigInteger.ONE);
+    BitvectorFormula bf2 = bvmgr.makeBitvector(4, BigInteger.valueOf(3));
+    BitvectorFormula bf3 = bvmgr.makeBitvector(4, BigInteger.TWO);
+    BitvectorFormula bf4 = bvmgr.makeBitvector(4, BigInteger.valueOf(4));
+
+    assertThatFormula(bvmgr.equal(bvmgr.rotateRight(bf1, bf2), bf3)).isTautological();
+    assertThatFormula(bvmgr.equal(bvmgr.rotateRight(bf3, bf2), bf4)).isTautological();
+  }
 }
