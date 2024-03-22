@@ -264,6 +264,14 @@ class StatisticsFloatingPointFormulaManager implements FloatingPointFormulaManag
   }
 
   @Override
+  public FloatingPointFormula remainder(
+      FloatingPointFormula number1,
+      FloatingPointFormula number2) {
+    stats.fpOperations.getAndIncrement();
+    return delegate.remainder(number1, number2);
+  }
+
+  @Override
   public BooleanFormula assignment(FloatingPointFormula pNumber1, FloatingPointFormula pNumber2) {
     stats.fpOperations.getAndIncrement();
     return delegate.assignment(pNumber1, pNumber2);
