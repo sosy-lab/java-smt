@@ -99,6 +99,24 @@ public class CVC4BitvectorFormulaManager
   }
 
   @Override
+  protected Expr rotateRight(Expr pNumber, Expr toRotate) {
+    // cvc4 does not support non-literal rotation, so we rewrite it to (bvor (bvlshr pNumber
+    // toRotate) (bvshl pNumber (bvsub size toRotate)))
+    final int bitsize = ((BitvectorType) formulaCreator.getFormulaType(pNumber)).getSize();
+    final Expr size = this.makeBitvectorImpl(bitsize, bitsize);
+    return or(shiftRight(pNumber, toRotate, false), shiftLeft(pNumber, subtract(size, toRotate)));
+  }
+
+  @Override
+  protected Expr rotateLeft(Expr pNumber, Expr toRotate) {
+    // cvc4 does not support non-literal rotation, so we rewrite it to (bvor (bvshl pNumber
+    // toRotate) (bvlshr pNumber (bvsub size toRotate)))
+    final int bitsize = ((BitvectorType) formulaCreator.getFormulaType(pNumber)).getSize();
+    final Expr size = this.makeBitvectorImpl(bitsize, bitsize);
+    return or(shiftLeft(pNumber, toRotate), shiftRight(pNumber, subtract(size, toRotate), false));
+  }
+
+  @Override
   protected Expr not(Expr pParam1) {
     return exprManager.mkExpr(Kind.BITVECTOR_NOT, pParam1);
   }

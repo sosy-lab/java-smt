@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
+import edu.stanford.CVC4.Expr;
 import io.github.cvc5.CVC5ApiException;
 import io.github.cvc5.Kind;
 import io.github.cvc5.Op;
@@ -16,6 +17,7 @@ import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
 import java.math.BigInteger;
 import java.util.List;
+import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
 
 public class CVC5BitvectorFormulaManager
@@ -145,6 +147,21 @@ public class CVC5BitvectorFormulaManager
       throw new IllegalArgumentException(
           String.format("You tried rotation a bitvector %s with shift %d", pNumber, pToRotate), e);
     }
+  protected Term rotateRight(Term pNumber, Term toRotate) {
+    // cvc5 does not support non-literal rotation, so we rewrite it to (bvor (bvlshr pNumber
+    // toRotate) (bvshl pNumber (bvsub size toRotate)))
+    final int bitsize = ((BitvectorType) formulaCreator.getFormulaType(pNumber)).getSize();
+    final Term size = this.makeBitvectorImpl(bitsize, bitsize);
+    return or(shiftRight(pNumber, toRotate, false), shiftLeft(pNumber, subtract(size, toRotate)));
+  }
+
+  @Override
+  protected Term rotateLeft(Term pNumber, Term toRotate) {
+    // cvc5 does not support non-literal rotation, so we rewrite it to (bvor (bvshl pNumber
+    // toRotate) (bvlshr pNumber (bvsub size toRotate)))
+    final int bitsize = ((BitvectorType) formulaCreator.getFormulaType(pNumber)).getSize();
+    final Term size = this.makeBitvectorImpl(bitsize, bitsize);
+    return or(shiftLeft(pNumber, toRotate), shiftRight(pNumber, subtract(size, toRotate), false));
   }
 
   @Override
