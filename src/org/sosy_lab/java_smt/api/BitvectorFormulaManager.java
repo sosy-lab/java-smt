@@ -266,6 +266,18 @@ public interface BitvectorFormulaManager {
    */
   BitvectorFormula shiftLeft(BitvectorFormula number, BitvectorFormula toShift);
 
+  /**
+   * This method returns a term representing the right rotation of number by toRotate. The result
+   * has the same length as the given number.
+   */
+  BitvectorFormula rotateRight(BitvectorFormula number, BitvectorFormula toRotate);
+
+  /**
+   * This method returns a term representing the left shift of number by toRotate. The result
+   * has the same length as the given number.
+   */
+  BitvectorFormula rotateLeft(BitvectorFormula number, BitvectorFormula toRotate);
+
   /** Concatenate two bitvectors. */
   BitvectorFormula concat(BitvectorFormula prefix, BitvectorFormula suffix);
 
