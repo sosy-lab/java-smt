@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
-import edu.stanford.CVC4.Expr;
 import io.github.cvc5.CVC5ApiException;
 import io.github.cvc5.Kind;
 import io.github.cvc5.Op;

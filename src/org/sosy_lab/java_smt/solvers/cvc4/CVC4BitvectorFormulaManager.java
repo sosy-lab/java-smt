@@ -10,7 +10,6 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 
 import edu.stanford.CVC4.BitVector;
 import edu.stanford.CVC4.BitVectorExtract;
-import edu.stanford.CVC4.BitVectorRotateLeft;
 import edu.stanford.CVC4.BitVectorSignExtend;
 import edu.stanford.CVC4.BitVectorType;
 import edu.stanford.CVC4.BitVectorZeroExtend;

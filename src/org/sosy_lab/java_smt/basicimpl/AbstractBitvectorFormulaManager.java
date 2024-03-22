@@ -314,9 +314,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
 
   protected abstract TFormulaInfo shiftLeft(TFormulaInfo pExtract, TFormulaInfo pExtract2);
 
-  /**
-   * Return a term representing the right rotation of number by toRotate.
-   */
+  /** Return a term representing the right rotation of number by toRotate. */
   @Override
   public BitvectorFormula rotateRight(BitvectorFormula pNumber, BitvectorFormula toRotate) {
     TFormulaInfo param1 = extractInfo(pNumber);
@@ -327,9 +325,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
 
   protected abstract TFormulaInfo rotateRight(TFormulaInfo pNumber, TFormulaInfo toRotate);
 
-  /**
-   * Return a term representing the left rotation of number by toRotate.
-   */
+  /** Return a term representing the left rotation of number by toRotate. */
   @Override
   public BitvectorFormula rotateLeft(BitvectorFormula pNumber, BitvectorFormula toRotate) {
     TFormulaInfo param1 = extractInfo(pNumber);

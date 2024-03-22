@@ -273,8 +273,8 @@ public interface BitvectorFormulaManager {
   BitvectorFormula rotateRight(BitvectorFormula number, BitvectorFormula toRotate);
 
   /**
-   * This method returns a term representing the left shift of number by toRotate. The result
-   * has the same length as the given number.
+   * This method returns a term representing the left shift of number by toRotate. The result has
+   * the same length as the given number.
    */
   BitvectorFormula rotateLeft(BitvectorFormula number, BitvectorFormula toRotate);
 
