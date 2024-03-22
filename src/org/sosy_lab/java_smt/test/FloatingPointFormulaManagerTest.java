@@ -198,6 +198,83 @@ public class FloatingPointFormulaManagerTest
   }
 
   @Test
+  public void fpremNormal() throws SolverException, InterruptedException {
+    assume()
+        .withMessage("MathSAT5 does not implement fp.rem")
+        .that(solver == Solvers.MATHSAT5)
+        .isFalse();
+
+    for (FloatingPointType prec : new FloatingPointType[]{singlePrecType, doublePrecType,
+        FormulaType.getFloatingPointType(5, 6)}) {
+
+      final FloatingPointFormula five = fpmgr.makeNumber(5, prec);
+      final FloatingPointFormula four = fpmgr.makeNumber(4, prec);
+      final FloatingPointFormula six = fpmgr.makeNumber(6, prec);
+
+      final FloatingPointFormula one = fpmgr.makeNumber(1, prec);
+      final FloatingPointFormula minusOne = fpmgr.makeNumber(-1, prec);
+
+      final FloatingPointFormula expr1 = fpmgr.remainder(five, four);
+      final FloatingPointFormula expr2 = fpmgr.remainder(five, six);
+
+      assertThatFormula(fpmgr.assignment(expr1, one)).isTautological();
+      assertThatFormula(fpmgr.assignment(expr2, minusOne)).isTautological();
+    }
+  }
+
+  @Test
+  public void fpremSpecial() throws SolverException, InterruptedException {
+    assume()
+        .withMessage("MathSAT5 does not implement fp.rem")
+        .that(solver == Solvers.MATHSAT5)
+        .isFalse();
+
+    for (FloatingPointType prec : new FloatingPointType[]{singlePrecType, doublePrecType,
+        FormulaType.getFloatingPointType(5, 6)}) {
+
+      final FloatingPointFormula num = fpmgr.makeNumber(42, prec);
+
+      final FloatingPointFormula nan = fpmgr.makeNumber("NaN", prec);
+      final FloatingPointFormula zero = fpmgr.makeNumber("0", prec);
+      final FloatingPointFormula inf = fpmgr.makePlusInfinity(prec);
+
+      final FloatingPointFormula minusNan = fpmgr.makeNumber("-NaN", prec);
+      final FloatingPointFormula minusZero = fpmgr.makeNumber("0", prec);
+      final FloatingPointFormula minusInf = fpmgr.makeMinusInfinity(prec);
+
+
+      final FloatingPointFormula expr1 = fpmgr.remainder(nan, nan);
+      final FloatingPointFormula expr2 = fpmgr.remainder(zero, zero);
+      final FloatingPointFormula expr3 = fpmgr.remainder(inf, inf);
+
+      final FloatingPointFormula expr4 = fpmgr.remainder(minusNan, minusNan);
+      final FloatingPointFormula expr5 = fpmgr.remainder(minusZero, minusZero);
+      final FloatingPointFormula expr6 = fpmgr.remainder(minusInf, minusInf);
+
+      final FloatingPointFormula expr7 = fpmgr.remainder(num, nan);
+      final FloatingPointFormula expr8 = fpmgr.remainder(num, zero);
+      final FloatingPointFormula expr9 = fpmgr.remainder(num, inf);
+
+      final FloatingPointFormula expr10 = fpmgr.remainder(num, minusNan);
+      final FloatingPointFormula expr11 = fpmgr.remainder(num, minusZero);
+      final FloatingPointFormula expr12 = fpmgr.remainder(num, minusInf);
+
+      assertThatFormula(fpmgr.assignment(expr1, nan)).isTautological();
+      assertThatFormula(fpmgr.assignment(expr2, nan)).isTautological();
+      assertThatFormula(fpmgr.assignment(expr3, nan)).isTautological();
+      assertThatFormula(fpmgr.assignment(expr4, nan)).isTautological();
+      assertThatFormula(fpmgr.assignment(expr5, nan)).isTautological();
+      assertThatFormula(fpmgr.assignment(expr6, nan)).isTautological();
+      assertThatFormula(fpmgr.assignment(expr7, nan)).isTautological();
+      assertThatFormula(fpmgr.assignment(expr8, nan)).isTautological();
+      assertThatFormula(fpmgr.assignment(expr9, num)).isTautological();
+      assertThatFormula(fpmgr.assignment(expr10, nan)).isTautological();
+      assertThatFormula(fpmgr.assignment(expr11, nan)).isTautological();
+      assertThatFormula(fpmgr.assignment(expr12, num)).isTautological();
+    }
+  }
+
+  @Test
   public void specialValueFunctions() throws SolverException, InterruptedException {
     assertThatFormula(fpmgr.isInfinity(posInf)).isTautological();
     assertThatFormula(fpmgr.isNormal(posInf)).isUnsatisfiable();

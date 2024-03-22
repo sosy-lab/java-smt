@@ -318,6 +318,11 @@ public class CVC5FloatingPointFormulaManager
   }
 
   @Override
+  protected Term remainder(Term pParam1, Term pParam2) {
+    return solver.mkTerm(Kind.FLOATINGPOINT_REM, pParam1, pParam2);
+  }
+
+  @Override
   protected Term assignment(Term pParam1, Term pParam2) {
     return solver.mkTerm(Kind.EQUAL, pParam1, pParam2);
   }

@@ -249,6 +249,11 @@ class Mathsat5FloatingPointFormulaManager
   }
 
   @Override
+  protected Long remainder(Long pParam1, Long pParam2) {
+    throw new UnsupportedOperationException("MathSAT5 does not implement fp.rem");
+  }
+
+  @Override
   protected Long divide(Long pNumber1, Long pNumber2, Long pRoundingMode) {
     return msat_make_fp_div(mathsatEnv, pRoundingMode, pNumber1, pNumber2);
   }

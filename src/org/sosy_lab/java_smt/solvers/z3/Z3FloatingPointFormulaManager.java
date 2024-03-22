@@ -217,6 +217,11 @@ class Z3FloatingPointFormulaManager
   }
 
   @Override
+  protected Long remainder(Long pParam1, Long pParam2) {
+    return Native.mkFpaRem(z3context, pParam1, pParam2);
+  }
+
+  @Override
   protected Long divide(Long pNumber1, Long pNumber2, Long pRoundingMode) {
     return Native.mkFpaDiv(z3context, pRoundingMode, pNumber1, pNumber2);
   }

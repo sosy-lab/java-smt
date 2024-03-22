@@ -281,6 +281,11 @@ public class CVC4FloatingPointFormulaManager
   }
 
   @Override
+  protected Expr remainder(Expr pParam1, Expr pParam2) {
+    return exprManager.mkExpr(Kind.FLOATINGPOINT_REM, pParam1, pParam2);
+  }
+
+  @Override
   protected Expr assignment(Expr pParam1, Expr pParam2) {
     return exprManager.mkExpr(Kind.EQUAL, pParam1, pParam2);
   }
