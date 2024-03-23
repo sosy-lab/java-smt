@@ -130,15 +130,15 @@ public interface BitvectorFormulaManager {
    * instruction).
    */
   @Deprecated(forRemoval = true)
-  default BitvectorFormula modulo(BitvectorFormula numerator, BitvectorFormula denumerator,
-                           boolean signed) {
+  default BitvectorFormula modulo(
+      BitvectorFormula numerator, BitvectorFormula denumerator, boolean signed) {
     return rem(numerator, denumerator, signed);
   }
 
   /**
    * This method returns the Signed Modular Remainder for two bitvector formulas.
    *
-   * <p> The sign of the result follows the sign of the denumerator, e.g., a user can assume the
+   * <p>The sign of the result follows the sign of the denumerator, e.g., a user can assume the
    * following equations:
    *
    * <ul>

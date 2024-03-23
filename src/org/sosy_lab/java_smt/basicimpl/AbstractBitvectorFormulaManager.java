@@ -123,12 +123,10 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     return wrap(rem(param1, param2, signed));
   }
 
-  protected abstract TFormulaInfo rem(
-      TFormulaInfo pParam1, TFormulaInfo pParam2, boolean signed);
+  protected abstract TFormulaInfo rem(TFormulaInfo pParam1, TFormulaInfo pParam2, boolean signed);
 
   @Override
-  public BitvectorFormula smod(
-      BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
+  public BitvectorFormula smod(BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     checkSameSize(pNumber1, pNumber2, "smod");
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
@@ -136,8 +134,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     return wrap(smod(param1, param2));
   }
 
-  protected abstract TFormulaInfo smod(
-      TFormulaInfo pParam1, TFormulaInfo pParam2);
+  protected abstract TFormulaInfo smod(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
   @Override
   public BitvectorFormula multiply(BitvectorFormula pNumber1, BitvectorFormula pNumber2) {

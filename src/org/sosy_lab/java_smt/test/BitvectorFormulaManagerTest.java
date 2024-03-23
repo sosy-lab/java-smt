@@ -630,6 +630,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
     assertThatFormula(bvmgr.equal(bvmgr.rem(ten, minusThree, true), one)).isTautological();
     assertThatFormula(bvmgr.equal(bvmgr.rem(minusTen, five, true), zero)).isTautological();
     assertThatFormula(bvmgr.equal(bvmgr.rem(minusTen, three, true), minusOne)).isTautological();
-    assertThatFormula(bvmgr.equal(bvmgr.rem(minusTen, minusThree, true), minusOne)).isTautological();
+    assertThatFormula(bvmgr.equal(bvmgr.rem(minusTen, minusThree, true), minusOne))
+        .isTautological();
   }
 }

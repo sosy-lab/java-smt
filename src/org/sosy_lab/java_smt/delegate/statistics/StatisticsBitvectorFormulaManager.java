@@ -102,8 +102,7 @@ class StatisticsBitvectorFormulaManager implements BitvectorFormulaManager {
   }
 
   @Override
-  public BitvectorFormula smod(
-      BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
+  public BitvectorFormula smod(BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     stats.bvOperations.getAndIncrement();
     return delegate.smod(pNumber1, pNumber2);
   }
