@@ -152,7 +152,7 @@ public class CVC4BitvectorFormulaManager
   }
 
   @Override
-  protected Expr modulo(Expr numerator, Expr denumerator, boolean signed) {
+  protected Expr rem(Expr numerator, Expr denumerator, boolean signed) {
     final Kind operator = signed ? Kind.BITVECTOR_SREM : Kind.BITVECTOR_UREM;
     final Expr remainder = exprManager.mkExpr(operator, numerator, denumerator);
     // CVC4 does not align with SMTLIB standard when it comes to modulo-by-zero.
@@ -161,6 +161,11 @@ public class CVC4BitvectorFormulaManager
     final Expr zero = makeBitvectorImpl(bitsize, 0);
     return exprManager.mkExpr(
         Kind.ITE, exprManager.mkExpr(Kind.EQUAL, denumerator, zero), numerator, remainder);
+  }
+
+  @Override
+  protected Expr smod(Expr numerator, Expr denumerator) {
+    return exprManager.mkExpr(Kind.BITVECTOR_SMOD, numerator, denumerator);
   }
 
   @Override

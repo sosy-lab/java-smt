@@ -192,12 +192,17 @@ public class CVC5BitvectorFormulaManager
   }
 
   @Override
-  protected Term modulo(Term pParam1, Term pParam2, boolean signed) {
+  protected Term rem(Term pParam1, Term pParam2, boolean signed) {
     if (signed) {
       return solver.mkTerm(Kind.BITVECTOR_SREM, pParam1, pParam2);
     } else {
       return solver.mkTerm(Kind.BITVECTOR_UREM, pParam1, pParam2);
     }
+  }
+
+  @Override
+  protected Term smod(Term pParam1, Term pParam2) {
+    return solver.mkTerm(Kind.BITVECTOR_SMOD, pParam1, pParam2);
   }
 
   @Override
