@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Random;
 import org.junit.Before;
@@ -948,5 +949,14 @@ public class FloatingPointFormulaManagerTest
   public void failOnInvalidString() {
     fpmgr.makeNumber("a", singlePrecType);
     assert_().fail();
+  }
+
+  @Test
+  public void fpFromBitPattern() throws SolverException, InterruptedException {
+    final FloatingPointFormula expr1 = fpmgr.makeNumber(-0.1, doublePrecType);
+    final FloatingPointFormula expr2 =
+        fpmgr.makeNumber(
+            BigInteger.valueOf(123), BigInteger.valueOf(5033165), true, doublePrecType);
+    assertThatFormula(fpmgr.assignment(expr1, expr2)).isTautological();
   }
 }

@@ -8,8 +8,11 @@
 
 package org.sosy_lab.java_smt.solvers.z3;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.microsoft.z3.Native;
+import com.microsoft.z3.Z3Exception;
+import java.math.BigInteger;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
@@ -68,6 +71,24 @@ class Z3FloatingPointFormulaManager
   @Override
   protected Long makeNumberImpl(double pN, FloatingPointType pType, Long pRoundingMode) {
     return makeNumberImpl(Double.toString(pN), pType, pRoundingMode);
+  }
+
+  @Override
+  protected Long makeNumberImpl(
+      BigInteger exponent,
+      BigInteger mantissa,
+      boolean signBit,
+      FloatingPointType type) {
+
+    long signBv = Native.mkBvNumeral(z3context, 1, new boolean[]{signBit});
+    long expoBv = Native.mkNumeral(z3context, exponent.toString(), Native.mkBvSort(z3context,
+        type.getExponentSize()));
+    long mantBv = Native.mkNumeral(z3context, mantissa.toString(), Native.mkBvSort(z3context,
+        type.getMantissaSize()));
+
+    assert Native.getSort(z3context, signBv) != Native.getSort(z3context, mantBv);
+
+    return Native.mkFpaFp(z3context, signBv, expoBv, mantBv);
   }
 
   @Override

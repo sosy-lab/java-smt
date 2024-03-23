@@ -17,6 +17,7 @@ import io.github.cvc5.Solver;
 import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -64,6 +65,23 @@ public class CVC5FloatingPointFormulaManager
   @Override
   protected Term makeNumberImpl(double pN, FloatingPointType pType, Term pRoundingMode) {
     return makeNumberImpl(Double.toString(pN), pType, pRoundingMode);
+  }
+
+  @Override
+  protected Term makeNumberImpl(
+      BigInteger exponent, BigInteger mantissa, boolean signBit, FloatingPointType type) {
+    try {
+      final String signStr = signBit ? "1" : "0";
+      final String exponentStr = getBvRepresentation(exponent, type.getExponentSize());
+      final String mantissaStr = getBvRepresentation(mantissa, type.getMantissaSize());
+      final String bitvecForm = signStr + exponentStr + mantissaStr;
+
+      final Term bv =
+          solver.mkBitVector(type.getExponentSize() + type.getMantissaSize() + 1, bitvecForm, 2);
+      return solver.mkFloatingPoint(type.getExponentSize(), type.getMantissaSize() + 1, bv);
+    } catch (CVC5ApiException e) {
+      throw new IllegalArgumentException("You tried creating a invalid bitvector", e);
+    }
   }
 
   @Override
