@@ -210,7 +210,7 @@ public class Yices2BitvectorFormulaManager
     // toRotate) (bvshl pNumber (bvsub size toRotate)))
     final int bitsize = ((BitvectorType) formulaCreator.getFormulaType(pNumber)).getSize();
     final Integer size = this.makeBitvectorImpl(bitsize, bitsize);
-    final Integer toRotateInRange = yices_bvrem(pNumber, toRotate);
+    final Integer toRotateInRange = yices_bvrem(toRotate, size);
     return or(
         shiftRight(pNumber, toRotateInRange, false),
         shiftLeft(pNumber, subtract(size, toRotateInRange)));
@@ -222,7 +222,7 @@ public class Yices2BitvectorFormulaManager
     // toRotate) (bvlshr pNumber (bvsub size toRotate)))
     final int bitsize = ((BitvectorType) formulaCreator.getFormulaType(pNumber)).getSize();
     final Integer size = this.makeBitvectorImpl(bitsize, bitsize);
-    final Integer toRotateInRange = yices_bvrem(pNumber, toRotate);
+    final Integer toRotateInRange = yices_bvrem(toRotate, size);
     return or(
         shiftLeft(pNumber, toRotateInRange),
         shiftRight(pNumber, subtract(size, toRotateInRange), false));

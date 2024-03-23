@@ -166,7 +166,10 @@ public class CVC5BitvectorFormulaManager
     // toRotate) (bvlshr pNumber (bvsub size toRotate)))
     final int bitsize = ((BitvectorType) formulaCreator.getFormulaType(pNumber)).getSize();
     final Term size = this.makeBitvectorImpl(bitsize, bitsize);
-    return or(shiftLeft(pNumber, toRotate), shiftRight(pNumber, subtract(size, toRotate), false));
+    final Term toRotateInRange = solver.mkTerm(Kind.BITVECTOR_UREM, toRotate, size);
+    return or(
+        shiftLeft(pNumber, toRotateInRange),
+        shiftRight(pNumber, subtract(size, toRotateInRange), false));
   }
 
   @Override

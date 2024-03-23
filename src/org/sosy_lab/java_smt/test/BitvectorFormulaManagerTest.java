@@ -500,8 +500,6 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void bvIsIdenticalAfterFullRotation() throws SolverException, InterruptedException {
-    requireBitvectorRotation();
-
     for (int bitsize : new int[] {2, 4, 8, 16, 32, 55}) {
       BitvectorFormula number = bvmgr.makeVariable(bitsize, "NUM_ROT_" + bitsize);
       for (int multiplier : new int[] {0, 1, 2, 5, 17, 37, 111, 1111}) {
