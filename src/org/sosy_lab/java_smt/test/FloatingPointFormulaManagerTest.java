@@ -144,7 +144,7 @@ public class FloatingPointFormulaManagerTest
 
   @Test
   public void nanAssignedNanIsTrue() throws SolverException, InterruptedException {
-    assertEqualAsFormula(nan, nan);
+    assertEqualsAsFormula(nan, nan);
   }
 
   @Test
@@ -206,8 +206,8 @@ public class FloatingPointFormulaManagerTest
       final FloatingPointFormula numOne = fpmgr.makeNumber(1, prec);
       final FloatingPointFormula numMinusOne = fpmgr.makeNumber(-1, prec);
 
-      assertEqualAsFormula(fpmgr.remainder(numFive, numFour), numOne);
-      assertEqualAsFormula(fpmgr.remainder(numFive, numSix), numMinusOne);
+      assertEqualsAsFormula(fpmgr.remainder(numFive, numFour), numOne);
+      assertEqualsAsFormula(fpmgr.remainder(numFive, numSix), numMinusOne);
     }
   }
 
@@ -233,18 +233,18 @@ public class FloatingPointFormulaManagerTest
       final FloatingPointFormula minusZero = fpmgr.makeNumber("0", prec);
       final FloatingPointFormula minusInf = fpmgr.makeMinusInfinity(prec);
 
-      assertEqualAsFormula(fpmgr.remainder(fpNan, fpNan), fpNan);
-      assertEqualAsFormula(fpmgr.remainder(fpZero, fpZero), fpNan);
-      assertEqualAsFormula(fpmgr.remainder(fpInf, fpInf), fpNan);
-      assertEqualAsFormula(fpmgr.remainder(minusNan, minusNan), fpNan);
-      assertEqualAsFormula(fpmgr.remainder(minusZero, minusZero), fpNan);
-      assertEqualAsFormula(fpmgr.remainder(minusInf, minusInf), fpNan);
-      assertEqualAsFormula(fpmgr.remainder(num, fpNan), fpNan);
-      assertEqualAsFormula(fpmgr.remainder(num, fpZero), fpNan);
-      assertEqualAsFormula(fpmgr.remainder(num, fpInf), num);
-      assertEqualAsFormula(fpmgr.remainder(num, minusNan), fpNan);
-      assertEqualAsFormula(fpmgr.remainder(num, minusZero), fpNan);
-      assertEqualAsFormula(fpmgr.remainder(num, minusInf), num);
+      assertEqualsAsFormula(fpmgr.remainder(fpNan, fpNan), fpNan);
+      assertEqualsAsFormula(fpmgr.remainder(fpZero, fpZero), fpNan);
+      assertEqualsAsFormula(fpmgr.remainder(fpInf, fpInf), fpNan);
+      assertEqualsAsFormula(fpmgr.remainder(minusNan, minusNan), fpNan);
+      assertEqualsAsFormula(fpmgr.remainder(minusZero, minusZero), fpNan);
+      assertEqualsAsFormula(fpmgr.remainder(minusInf, minusInf), fpNan);
+      assertEqualsAsFormula(fpmgr.remainder(num, fpNan), fpNan);
+      assertEqualsAsFormula(fpmgr.remainder(num, fpZero), fpNan);
+      assertEqualsAsFormula(fpmgr.remainder(num, fpInf), num);
+      assertEqualsAsFormula(fpmgr.remainder(num, minusNan), fpNan);
+      assertEqualsAsFormula(fpmgr.remainder(num, minusZero), fpNan);
+      assertEqualsAsFormula(fpmgr.remainder(num, minusInf), num);
     }
   }
 
@@ -558,7 +558,7 @@ public class FloatingPointFormulaManagerTest
     assertThatFormula(fpmgr.equalWithFPSemantics(f1, f2)).isTautological();
   }
 
-  private void assertEqualAsFormula(FloatingPointFormula f1, FloatingPointFormula f2)
+  private void assertEqualsAsFormula(FloatingPointFormula f1, FloatingPointFormula f2)
       throws SolverException, InterruptedException {
     assertThatFormula(fpmgr.assignment(f1, f2)).isTautological();
   }
