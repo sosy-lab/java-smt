@@ -205,6 +205,34 @@ class SynchronizedBitvectorFormulaManager implements BitvectorFormulaManager {
   }
 
   @Override
+  public BitvectorFormula rotateLeft(BitvectorFormula pNumber, int pToRotate) {
+    synchronized (sync) {
+      return delegate.rotateLeft(pNumber, pToRotate);
+    }
+  }
+
+  @Override
+  public BitvectorFormula rotateLeft(BitvectorFormula pNumber, BitvectorFormula pToRotate) {
+    synchronized (sync) {
+      return delegate.rotateLeft(pNumber, pToRotate);
+    }
+  }
+
+  @Override
+  public BitvectorFormula rotateRight(BitvectorFormula pNumber, int pToRotate) {
+    synchronized (sync) {
+      return delegate.rotateRight(pNumber, pToRotate);
+    }
+  }
+
+  @Override
+  public BitvectorFormula rotateRight(BitvectorFormula pNumber, BitvectorFormula pToRotate) {
+    synchronized (sync) {
+      return delegate.rotateRight(pNumber, pToRotate);
+    }
+  }
+
+  @Override
   public BitvectorFormula concat(BitvectorFormula pNumber, BitvectorFormula pAppend) {
     synchronized (sync) {
       return delegate.concat(pNumber, pAppend);

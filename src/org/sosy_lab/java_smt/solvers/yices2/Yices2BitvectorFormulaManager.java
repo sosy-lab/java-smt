@@ -35,6 +35,8 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvsrem;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvsub;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvxor2;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_bvbin;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_rotate_left;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_rotate_right;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_sign_extend;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_zero_extend;
 
@@ -189,6 +191,16 @@ public class Yices2BitvectorFormulaManager
   @Override
   protected Integer shiftLeft(Integer pNumber, Integer pToShift) {
     return yices_bvshl(pNumber, pToShift);
+  }
+
+  @Override
+  protected Integer rotateLeftByConstant(Integer pNumber, int toRotate) {
+    return yices_rotate_left(pNumber, toRotate);
+  }
+
+  @Override
+  protected Integer rotateRightByConstant(Integer pNumber, int toRotate) {
+    return yices_rotate_right(pNumber, toRotate);
   }
 
   @Override

@@ -20,6 +20,8 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_bv_number;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_bv_or;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_bv_plus;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_bv_rol;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_bv_ror;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_bv_sdiv;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_bv_sext;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_bv_sleq;
@@ -123,6 +125,16 @@ class Mathsat5BitvectorFormulaManager
   @Override
   public Long shiftLeft(Long number, Long toShift) {
     return msat_make_bv_lshl(mathsatEnv, number, toShift);
+  }
+
+  @Override
+  public Long rotateLeftByConstant(Long number, int toRotate) {
+    return msat_make_bv_rol(mathsatEnv, toRotate, number);
+  }
+
+  @Override
+  public Long rotateRightByConstant(Long number, int toRotate) {
+    return msat_make_bv_ror(mathsatEnv, toRotate, number);
   }
 
   @Override

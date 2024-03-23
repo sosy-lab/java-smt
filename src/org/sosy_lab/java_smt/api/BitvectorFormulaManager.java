@@ -252,19 +252,57 @@ public interface BitvectorFormulaManager {
   BitvectorFormula xor(BitvectorFormula bits1, BitvectorFormula bits2);
 
   /**
-   * This method returns a term representing the right shift of number by toShift. The result has
-   * the same length as the given number. On the left side, we fill up the most significant bits
-   * with ones (i.e., arithmetic shift), if the number is signed and negative, else we fill up with
-   * zeroes.
+   * This method returns a term representing the right shift (towards least-significant bit) of
+   * number by toShift. The result has the same length as the given number. On the left side, we
+   * fill up the most significant bits with ones (i.e., arithmetic shift), if the number is signed
+   * and negative, else we fill up with zeroes. For "toShift &gt;= bitsize", we return a bitvector
+   * with value zero, if number was zero or positive, or all bits set to one, if negative.
    */
   BitvectorFormula shiftRight(BitvectorFormula number, BitvectorFormula toShift, boolean signed);
 
   /**
-   * This method returns a term representing the left shift of number by toShift. The result has the
-   * same length as the given number. On the right side, we fill up the least significant bits with
-   * zeroes.
+   * This method returns a term representing the left shift (towards most-significant bit) of number
+   * by toShift. The result has the same length as the given number. On the right side, we fill up
+   * the least significant bits with zeroes. For "toShift &gt;= bitsize", we return a bitvector with
+   * value zero.
    */
   BitvectorFormula shiftLeft(BitvectorFormula number, BitvectorFormula toShift);
+
+  /**
+   * This method returns a term representing the left rotation (towards most-significant bit) of
+   * number by toRotate. The result has the same length as the given number. For "toRotate % bitsize
+   * == 0", we return the number itself.
+   *
+   * @param toRotate the number of bits to be moved
+   */
+  BitvectorFormula rotateLeft(BitvectorFormula number, int toRotate);
+
+  /**
+   * This method returns a term representing the left rotation (towards most-significant bit) of
+   * number by toRotate. The result has the same length as the given number. For "toRotate % bitsize
+   * == 0", we return the number itself.
+   *
+   * @param toRotate unsigned bitvector, represents the number of bits to be moved
+   */
+  BitvectorFormula rotateLeft(BitvectorFormula number, BitvectorFormula toRotate);
+
+  /**
+   * This method returns a term representing the right rotation (towards least-significant bit) of
+   * number by toRotate. The result has the same length as the given number. For "toRotate % bitsize
+   * == 0", we return the number itself.
+   *
+   * @param toRotate the number of bits to be moved
+   */
+  BitvectorFormula rotateRight(BitvectorFormula number, int toRotate);
+
+  /**
+   * This method returns a term representing the right rotation (towards least-significant bit) of
+   * number by toRotate. The result has the same length as the given number. For "toRotate % bitsize
+   * == 0", we return the number itself.
+   *
+   * @param toRotate unsigned bitvector, represents the number of bits to be moved
+   */
+  BitvectorFormula rotateRight(BitvectorFormula number, BitvectorFormula toRotate);
 
   /** Concatenate two bitvectors. */
   BitvectorFormula concat(BitvectorFormula prefix, BitvectorFormula suffix);

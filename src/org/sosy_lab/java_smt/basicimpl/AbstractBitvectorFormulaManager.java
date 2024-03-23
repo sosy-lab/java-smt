@@ -294,11 +294,8 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
    */
   @Override
   public BitvectorFormula shiftRight(
-      BitvectorFormula pNumber, BitvectorFormula toShift, boolean signed) {
-    TFormulaInfo param1 = extractInfo(pNumber);
-    TFormulaInfo param2 = extractInfo(toShift);
-
-    return wrap(shiftRight(param1, param2, signed));
+      BitvectorFormula pNumber, BitvectorFormula pToShift, boolean signed) {
+    return wrap(shiftRight(extractInfo(pNumber), extractInfo(pToShift), signed));
   }
 
   protected abstract TFormulaInfo shiftRight(
@@ -306,20 +303,58 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
 
   @Override
   public BitvectorFormula shiftLeft(BitvectorFormula pNumber, BitvectorFormula toShift) {
-    TFormulaInfo param1 = extractInfo(pNumber);
-    TFormulaInfo param2 = extractInfo(toShift);
-
-    return wrap(shiftLeft(param1, param2));
+    return wrap(shiftLeft(extractInfo(pNumber), extractInfo(toShift)));
   }
 
-  protected abstract TFormulaInfo shiftLeft(TFormulaInfo pExtract, TFormulaInfo pExtract2);
+  protected abstract TFormulaInfo shiftLeft(TFormulaInfo pNumber, TFormulaInfo pToShift);
+
+  @Override
+  public BitvectorFormula rotateLeft(BitvectorFormula pNumber, int pToRotate) {
+    checkArgument(pToRotate >= 0, "Can not rotate by a negative number %s.", pToRotate);
+    return wrap(rotateLeftByConstant(extractInfo(pNumber), pToRotate));
+  }
+
+  protected TFormulaInfo rotateLeftByConstant(TFormulaInfo pNumber, int pToRotate) {
+    int length = getLength(wrap(pNumber));
+    int shift = pToRotate % length;
+    return extract(concat(pNumber, pNumber), length - 1 + shift, shift);
+  }
+
+  @Override
+  public BitvectorFormula rotateLeft(BitvectorFormula pNumber, BitvectorFormula pToRotate) {
+    return wrap(rotateLeft(extractInfo(pNumber), extractInfo(pToRotate)));
+  }
+
+  @SuppressWarnings("unused")
+  protected TFormulaInfo rotateLeft(TFormulaInfo pNumber, TFormulaInfo pToRotate) {
+    throw new UnsupportedOperationException("Solver does not support BV rotation.");
+  }
+
+  @Override
+  public BitvectorFormula rotateRight(BitvectorFormula pNumber, int pToRotate) {
+    checkArgument(pToRotate >= 0, "Can not rotate by a negative number %s.", pToRotate);
+    return wrap(rotateRightByConstant(extractInfo(pNumber), pToRotate));
+  }
+
+  protected TFormulaInfo rotateRightByConstant(TFormulaInfo pNumber, int pToRotate) {
+    int length = getLength(wrap(pNumber));
+    int shift = pToRotate % length;
+    return extract(concat(pNumber, pNumber), 2 * length - 1 - shift, length - shift);
+  }
+
+  @Override
+  public BitvectorFormula rotateRight(BitvectorFormula pNumber, BitvectorFormula pToRotate) {
+    return wrap(rotateRight(extractInfo(pNumber), extractInfo(pToRotate)));
+  }
+
+  @SuppressWarnings("unused")
+  protected TFormulaInfo rotateRight(TFormulaInfo pNumber, TFormulaInfo pToRotate) {
+    throw new UnsupportedOperationException("Solver does not support BV rotation.");
+  }
 
   @Override
   public final BitvectorFormula concat(BitvectorFormula pNumber, BitvectorFormula pAppend) {
-    TFormulaInfo param1 = extractInfo(pNumber);
-    TFormulaInfo param2 = extractInfo(pAppend);
-
-    return wrap(concat(param1, param2));
+    return wrap(concat(extractInfo(pNumber), extractInfo(pAppend)));
   }
 
   protected abstract TFormulaInfo concat(TFormulaInfo number, TFormulaInfo pAppend);

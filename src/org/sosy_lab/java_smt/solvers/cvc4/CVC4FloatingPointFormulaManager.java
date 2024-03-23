@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.cvc4;
 
 import com.google.common.collect.ImmutableList;
+import edu.stanford.CVC4.BitVectorExtract;
 import edu.stanford.CVC4.Expr;
 import edu.stanford.CVC4.ExprManager;
 import edu.stanford.CVC4.FloatingPoint;
@@ -346,8 +347,21 @@ public class CVC4FloatingPointFormulaManager
   }
 
   @Override
-  protected Expr fromIeeeBitvectorImpl(Expr pNumber, FloatingPointType pTargetType) {
-    return exprManager.mkExpr(Kind.FLOATINGPOINT_FP, pNumber);
+  protected Expr fromIeeeBitvectorImpl(Expr bitvector, FloatingPointType pTargetType) {
+    int mantissaSize = pTargetType.getMantissaSize();
+    int exponentSize = pTargetType.getExponentSize();
+    int size = pTargetType.getTotalSize();
+    assert size == mantissaSize + exponentSize + 1;
+
+    Expr signExtract = exprManager.mkConst(new BitVectorExtract(size - 1, size - 1));
+    Expr exponentExtract = exprManager.mkConst(new BitVectorExtract(size - 2, mantissaSize));
+    Expr mantissaExtract = exprManager.mkConst(new BitVectorExtract(mantissaSize - 1, 0));
+
+    Expr sign = exprManager.mkExpr(Kind.BITVECTOR_EXTRACT, signExtract, bitvector);
+    Expr exponent = exprManager.mkExpr(Kind.BITVECTOR_EXTRACT, exponentExtract, bitvector);
+    Expr mantissa = exprManager.mkExpr(Kind.BITVECTOR_EXTRACT, mantissaExtract, bitvector);
+
+    return exprManager.mkExpr(Kind.FLOATINGPOINT_FP, sign, exponent, mantissa);
   }
 
   @Override
