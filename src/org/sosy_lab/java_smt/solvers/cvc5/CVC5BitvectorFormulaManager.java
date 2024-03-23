@@ -146,12 +146,18 @@ public class CVC5BitvectorFormulaManager
       throw new IllegalArgumentException(
           String.format("You tried rotation a bitvector %s with shift %d", pNumber, pToRotate), e);
     }
+  }
+
+  @Override
   protected Term rotateRight(Term pNumber, Term toRotate) {
     // cvc5 does not support non-literal rotation, so we rewrite it to (bvor (bvlshr pNumber
     // toRotate) (bvshl pNumber (bvsub size toRotate)))
     final int bitsize = ((BitvectorType) formulaCreator.getFormulaType(pNumber)).getSize();
     final Term size = this.makeBitvectorImpl(bitsize, bitsize);
-    return or(shiftRight(pNumber, toRotate, false), shiftLeft(pNumber, subtract(size, toRotate)));
+    final Term toRotateInRange = solver.mkTerm(Kind.BITVECTOR_UREM, toRotate, size);
+    return or(
+        shiftRight(pNumber, toRotateInRange, false),
+        shiftLeft(pNumber, subtract(size, toRotateInRange)));
   }
 
   @Override

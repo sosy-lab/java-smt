@@ -104,7 +104,10 @@ public class CVC4BitvectorFormulaManager
     // toRotate) (bvshl pNumber (bvsub size toRotate)))
     final int bitsize = ((BitvectorType) formulaCreator.getFormulaType(pNumber)).getSize();
     final Expr size = this.makeBitvectorImpl(bitsize, bitsize);
-    return or(shiftRight(pNumber, toRotate, false), shiftLeft(pNumber, subtract(size, toRotate)));
+    final Expr toRotateInRange = exprManager.mkExpr(Kind.BITVECTOR_UREM, toRotate, size);
+    return or(
+        shiftRight(pNumber, toRotateInRange, false),
+        shiftLeft(pNumber, subtract(size, toRotateInRange)));
   }
 
   @Override
@@ -113,7 +116,10 @@ public class CVC4BitvectorFormulaManager
     // toRotate) (bvlshr pNumber (bvsub size toRotate)))
     final int bitsize = ((BitvectorType) formulaCreator.getFormulaType(pNumber)).getSize();
     final Expr size = this.makeBitvectorImpl(bitsize, bitsize);
-    return or(shiftLeft(pNumber, toRotate), shiftRight(pNumber, subtract(size, toRotate), false));
+    final Expr toRotateInRange = exprManager.mkExpr(Kind.BITVECTOR_UREM, toRotate, size);
+    return or(
+        shiftLeft(pNumber, toRotateInRange),
+        shiftRight(pNumber, subtract(size, toRotateInRange), false));
   }
 
   @Override

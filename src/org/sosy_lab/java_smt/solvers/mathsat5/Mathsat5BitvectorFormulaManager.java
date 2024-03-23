@@ -136,12 +136,18 @@ class Mathsat5BitvectorFormulaManager
   @Override
   public Long rotateRightByConstant(Long number, int toRotate) {
     return msat_make_bv_ror(mathsatEnv, toRotate, number);
+  }
+
+  @Override
   protected Long rotateRight(Long pNumber, Long toRotate) {
     // MathSAT5 does not support non-literal rotation, so we rewrite it to (bvor (bvlshr pNumber
     // toRotate) (bvshl pNumber (bvsub size toRotate)))
     final int bitsize = ((BitvectorType) formulaCreator.getFormulaType(pNumber)).getSize();
-    final Long size = this.makeBitvectorImpl(bitsize, bitsize);
-    return or(shiftRight(pNumber, toRotate, false), shiftLeft(pNumber, subtract(size, toRotate)));
+    final Long size = makeBitvectorImpl(bitsize, bitsize);
+    final Long toRotateInRange = msat_make_bv_urem(mathsatEnv, toRotate, size);
+    return or(
+        shiftRight(pNumber, toRotateInRange, false),
+        shiftLeft(pNumber, subtract(size, toRotateInRange)));
   }
 
   @Override
@@ -150,7 +156,10 @@ class Mathsat5BitvectorFormulaManager
     // toRotate) (bvlshr pNumber (bvsub size toRotate)))
     final int bitsize = ((BitvectorType) formulaCreator.getFormulaType(pNumber)).getSize();
     final Long size = this.makeBitvectorImpl(bitsize, bitsize);
-    return or(shiftLeft(pNumber, toRotate), shiftRight(pNumber, subtract(size, toRotate), false));
+    final Long toRotateInRange = msat_make_bv_urem(mathsatEnv, toRotate, size);
+    return or(
+        shiftLeft(pNumber, toRotateInRange),
+        shiftRight(pNumber, subtract(size, toRotateInRange), false));
   }
 
   @Override
