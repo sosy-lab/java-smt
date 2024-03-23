@@ -108,10 +108,18 @@ class SynchronizedBitvectorFormulaManager implements BitvectorFormulaManager {
   }
 
   @Override
-  public BitvectorFormula modulo(
+  public BitvectorFormula rem(
       BitvectorFormula pNumber1, BitvectorFormula pNumber2, boolean pSigned) {
     synchronized (sync) {
-      return delegate.modulo(pNumber1, pNumber2, pSigned);
+      return delegate.rem(pNumber1, pNumber2, pSigned);
+    }
+  }
+
+  @Override
+  public BitvectorFormula smod(
+      BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
+    synchronized (sync) {
+      return delegate.smod(pNumber1, pNumber2);
     }
   }
 

@@ -95,10 +95,17 @@ class StatisticsBitvectorFormulaManager implements BitvectorFormulaManager {
   }
 
   @Override
-  public BitvectorFormula modulo(
+  public BitvectorFormula rem(
       BitvectorFormula pNumber1, BitvectorFormula pNumber2, boolean pSigned) {
     stats.bvOperations.getAndIncrement();
-    return delegate.modulo(pNumber1, pNumber2, pSigned);
+    return delegate.rem(pNumber1, pNumber2, pSigned);
+  }
+
+  @Override
+  public BitvectorFormula smod(
+      BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
+    stats.bvOperations.getAndIncrement();
+    return delegate.smod(pNumber1, pNumber2);
   }
 
   @Override
