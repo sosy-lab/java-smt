@@ -83,7 +83,14 @@ class Z3FloatingPointFormulaManager
         Native.mkNumeral(
             z3context, mantissa.toString(), Native.mkBvSort(z3context, type.getMantissaSize()));
 
-    assert Native.getSort(z3context, signBv) != Native.getSort(z3context, mantBv);
+    assert Native.getBvSortSize(z3context, Native.getSort(z3context, signBv)) == 1
+        : "SignBV should be 1 bit long";
+    assert Native.getBvSortSize(z3context, Native.getSort(z3context, expoBv))
+            == type.getExponentSize()
+        : "ExpoBV should be " + type.getExponentSize() + " bits long";
+    assert Native.getBvSortSize(z3context, Native.getSort(z3context, mantBv))
+            == type.getMantissaSize()
+        : "MantBV should be " + type.getMantissaSize() + " bits long";
 
     return Native.mkFpaFp(z3context, signBv, expoBv, mantBv);
   }
