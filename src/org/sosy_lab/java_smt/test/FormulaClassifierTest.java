@@ -70,6 +70,10 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
         .withMessage("Solver %s does not support mixed integer-real arithmetic", solverToUse())
         .that(solverToUse())
         .isNotEqualTo(Solvers.OPENSMT);
+    assume()
+        .withMessage("Solver %s does not support mixed real-array arithmetic", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.PRINCESS);
 
     requireParser();
     requireRationals();
@@ -80,6 +84,11 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
 
   @Test
   public void test_QF_AUFNIRA() {
+    assume()
+        .withMessage("Solver %s does not support mixed real-array arithmetic", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.PRINCESS);
+
     requireParser();
     requireRationals();
     requireNonlinear();

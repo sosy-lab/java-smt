@@ -241,7 +241,7 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
   public void close() {}
 
   @Override
-  protected IExpression evalImpl(IExpression formula) {
+  protected @Nullable IExpression evalImpl(IExpression formula) {
     IExpression evaluation = evaluate(formula);
     if (evaluation == null) {
       // fallback: try to simplify the query and evaluate again.
