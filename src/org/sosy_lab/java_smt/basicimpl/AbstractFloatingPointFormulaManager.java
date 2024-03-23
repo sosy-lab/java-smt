@@ -375,6 +375,14 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
       TFormulaInfo pParam1, TFormulaInfo pParam2, TFormulaInfo pFloatingPointRoundingMode);
 
   @Override
+  public FloatingPointFormula remainder(
+      FloatingPointFormula number1, FloatingPointFormula number2) {
+    return wrap(remainder(extractInfo(number1), extractInfo(number2)));
+  }
+
+  protected abstract TFormulaInfo remainder(TFormulaInfo pParam1, TFormulaInfo pParam2);
+
+  @Override
   public BooleanFormula assignment(FloatingPointFormula pNumber1, FloatingPointFormula pNumber2) {
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
