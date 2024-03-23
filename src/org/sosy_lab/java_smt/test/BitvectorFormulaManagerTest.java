@@ -592,4 +592,44 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
     BitvectorFormula x = bvmgr.makeVariable(bv8, "x");
     bmgr.ifThenElse(bmgr.makeBoolean(true), x, x);
   }
+  
+  @Test
+  public void bvMod() throws SolverException, InterruptedException {
+    BitvectorFormula ten = bvmgr.makeBitvector(8, 10);
+    BitvectorFormula five = bvmgr.makeBitvector(8, 5);
+    BitvectorFormula three = bvmgr.makeBitvector(8, 3);
+    BitvectorFormula two = bvmgr.makeBitvector(8, 2);
+    BitvectorFormula one = bvmgr.makeBitvector(8, 1);
+    BitvectorFormula zero = bvmgr.makeBitvector(8, 0);
+    BitvectorFormula minusTen = bvmgr.makeBitvector(8, -10);
+    BitvectorFormula minusThree = bvmgr.makeBitvector(8, -3);
+    BitvectorFormula minusTwo = bvmgr.makeBitvector(8, -2);
+    BitvectorFormula minusOne = bvmgr.makeBitvector(8, -1);
+
+    assertThatFormula(bvmgr.equal(bvmgr.smod(ten, five), zero)).isTautological();
+    assertThatFormula(bvmgr.equal(bvmgr.smod(ten, three), one)).isTautological();
+    assertThatFormula(bvmgr.equal(bvmgr.smod(ten, minusThree), minusTwo)).isTautological();
+    assertThatFormula(bvmgr.equal(bvmgr.smod(minusTen, five), zero)).isTautological();
+    assertThatFormula(bvmgr.equal(bvmgr.smod(minusTen, three), two)).isTautological();
+    assertThatFormula(bvmgr.equal(bvmgr.smod(minusTen, minusThree), minusOne)).isTautological();
+  }
+
+  @Test
+  public void bvRem() throws SolverException, InterruptedException {
+    BitvectorFormula ten = bvmgr.makeBitvector(8, 10);
+    BitvectorFormula five = bvmgr.makeBitvector(8, 5);
+    BitvectorFormula three = bvmgr.makeBitvector(8, 3);
+    BitvectorFormula one = bvmgr.makeBitvector(8, 1);
+    BitvectorFormula zero = bvmgr.makeBitvector(8, 0);
+    BitvectorFormula minusTen = bvmgr.makeBitvector(8, -10);
+    BitvectorFormula minusThree = bvmgr.makeBitvector(8, -3);
+    BitvectorFormula minusOne = bvmgr.makeBitvector(8, -1);
+
+    assertThatFormula(bvmgr.equal(bvmgr.rem(ten, five, true), zero)).isTautological();
+    assertThatFormula(bvmgr.equal(bvmgr.rem(ten, three, true), one)).isTautological();
+    assertThatFormula(bvmgr.equal(bvmgr.rem(ten, minusThree, true), one)).isTautological();
+    assertThatFormula(bvmgr.equal(bvmgr.rem(minusTen, five, true), zero)).isTautological();
+    assertThatFormula(bvmgr.equal(bvmgr.rem(minusTen, three, true), minusOne)).isTautological();
+    assertThatFormula(bvmgr.equal(bvmgr.rem(minusTen, minusThree, true), minusOne)).isTautological();
+  }
 }
