@@ -75,24 +75,22 @@ class Z3FloatingPointFormulaManager
   protected Long makeNumberImpl(
       BigInteger exponent, BigInteger mantissa, boolean signBit, FloatingPointType type) {
 
-    long signBv = Native.mkBvNumeral(z3context, 1, new boolean[] {signBit});
-    long expoBv =
-        Native.mkNumeral(
-            z3context, exponent.toString(), Native.mkBvSort(z3context, type.getExponentSize()));
-    long mantBv =
-        Native.mkNumeral(
-            z3context, mantissa.toString(), Native.mkBvSort(z3context, type.getMantissaSize()));
+    final Long signSort = getFormulaCreator().getBitvectorType(1);
+    final Long expoSort = getFormulaCreator().getBitvectorType(type.getExponentSize());
+    final Long mantSort = getFormulaCreator().getBitvectorType(type.getMantissaSize());
 
-    assert Native.getBvSortSize(z3context, Native.getSort(z3context, signBv)) == 1
-        : "SignBV should be 1 bit long";
-    assert Native.getBvSortSize(z3context, Native.getSort(z3context, expoBv))
-            == type.getExponentSize()
-        : "ExpoBV should be " + type.getExponentSize() + " bits long";
-    assert Native.getBvSortSize(z3context, Native.getSort(z3context, mantBv))
-            == type.getMantissaSize()
-        : "MantBV should be " + type.getMantissaSize() + " bits long";
+    final Long signBv = Native.mkNumeral(z3context, signBit ? "1" : "0", signSort);
+    Native.incRef(z3context, signBv);
+    final Long expoBv = Native.mkNumeral(z3context, exponent.toString(), expoSort);
+    Native.incRef(z3context, expoBv);
+    final Long mantBv = Native.mkNumeral(z3context, mantissa.toString(), mantSort);
+    Native.incRef(z3context, mantBv);
 
-    return Native.mkFpaFp(z3context, signBv, expoBv, mantBv);
+    final Long fp = Native.mkFpaFp(z3context, signBv, expoBv, mantBv);
+    Native.decRef(z3context, mantBv);
+    Native.decRef(z3context, expoBv);
+    Native.decRef(z3context, signBv);
+    return fp;
   }
 
   @Override
