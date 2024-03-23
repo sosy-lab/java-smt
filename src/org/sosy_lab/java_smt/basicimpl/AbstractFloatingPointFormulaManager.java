@@ -12,6 +12,7 @@ import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariab
 
 import com.google.common.base.Preconditions;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 import org.sosy_lab.common.rationals.Rational;
@@ -132,6 +133,15 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
         return makeNumberAndRound(n, type, pFloatingPointRoundingMode);
     }
   }
+
+  @Override
+  public FloatingPointFormula makeNumber(
+      BigInteger exponent, BigInteger mantissa, boolean signBit, FloatingPointType type) {
+    return wrap(makeNumberImpl(exponent, mantissa, signBit, type));
+  }
+
+  protected abstract TFormulaInfo makeNumberImpl(
+      BigInteger exponent, BigInteger mantissa, boolean signBit, FloatingPointType type);
 
   protected static boolean isNegativeZero(Double pN) {
     Preconditions.checkNotNull(pN);
@@ -486,4 +496,12 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
 
   protected abstract TFormulaInfo round(
       TFormulaInfo pFormula, FloatingPointRoundingMode pRoundingMode);
+
+  protected static String getBvRepresentation(BigInteger integer, int size) {
+    char[] values = new char[size];
+    for (int i = 0; i < size; i++) {
+      values[size - 1 - i] = integer.testBit(i) ? '1' : '0';
+    }
+    return String.copyValueOf(values);
+  }
 }
