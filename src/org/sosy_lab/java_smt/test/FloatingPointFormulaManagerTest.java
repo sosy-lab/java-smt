@@ -953,10 +953,10 @@ public class FloatingPointFormulaManagerTest
 
   @Test
   public void fpFromBitPattern() throws SolverException, InterruptedException {
-    final FloatingPointFormula expr1 = fpmgr.makeNumber(-0.1, doublePrecType);
+    final FloatingPointFormula expr1 = fpmgr.makeNumber(-0.1, singlePrecType);
     final FloatingPointFormula expr2 =
         fpmgr.makeNumber(
-            BigInteger.valueOf(123), BigInteger.valueOf(5033165), true, doublePrecType);
+            BigInteger.valueOf(123), BigInteger.valueOf(5033165), true, singlePrecType);
     assertThatFormula(fpmgr.assignment(expr1, expr2)).isTautological();
   }
 }
