@@ -202,10 +202,11 @@ public interface FloatingPointFormulaManager {
       FloatingPointRoundingMode pFloatingPointRoundingMode);
 
   /**
-   * remainder: x - y * n, where n in Z is nearest to x/y. Can be negative even or two positive
-   * arguments (as opposed to integer modulo operators)
+   * remainder: x - y * n, where n in Z is nearest to x/y. The result can be negative even for two
+   * positive arguments, e.g. "rem(5, 4) == 1" and "rem(5, 6) == -1", as opposed to integer modulo
+   * operators.
    */
-  FloatingPointFormula remainder(FloatingPointFormula number1, FloatingPointFormula number2);
+  FloatingPointFormula remainder(FloatingPointFormula dividend, FloatingPointFormula divisor);
 
   // ----------------- Numeric relations, return type BooleanFormula -----------------
 
