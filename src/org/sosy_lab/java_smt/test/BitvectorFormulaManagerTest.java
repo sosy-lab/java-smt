@@ -592,7 +592,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
     BitvectorFormula x = bvmgr.makeVariable(bv8, "x");
     bmgr.ifThenElse(bmgr.makeBoolean(true), x, x);
   }
-  
+
   @Test
   public void bvMod() throws SolverException, InterruptedException {
     BitvectorFormula ten = bvmgr.makeBitvector(8, 10);
