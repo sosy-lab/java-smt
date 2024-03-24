@@ -70,7 +70,7 @@ public interface ArrayFormulaManager {
       ArrayFormulaType<TI, TE> type);
 
   /**
-   * Create a new array constant with uninitialized values.
+   * Create a new array constant with values initialized to elseElem.
    *
    * @param elseElem: The default value of all entries in the array.
    */
