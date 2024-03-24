@@ -318,7 +318,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
             formula, new BigInteger(f.getConstBitVector().getValue().toString(10)));
       } else if (type.isFloatingPoint()) {
         // TODO is this correct?
-        return visitor.visitConstant(formula, f.getConstFloatingPoint());
+        return visitor.visitConstant(formula, convertFloatingPoint(f));
       } else if (type.isRoundingMode()) {
         // TODO is this correct?
         return visitor.visitConstant(formula, f.getConstRoundingMode());
