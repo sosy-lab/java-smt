@@ -777,12 +777,16 @@ public class FloatingPointFormulaManagerTest
             Float.MAX_VALUE,
             Float.POSITIVE_INFINITY,
             Float.NEGATIVE_INFINITY,
-            0.0f // , -0.0f // MathSat5 fails for NEGATIVE_ZERO
-            );
+            0.0f, // , -0.0f // MathSat5 fails for NEGATIVE_ZERO
+            1f,
+            -1f,
+            2f,
+            -2f);
 
     for (int i = 1; i < 20; i++) {
       for (int j = 1; j < 20; j++) {
         flts.add((float) (i * Math.pow(10, j)));
+        flts.add((float) (-i * Math.pow(10, j)));
       }
     }
 
@@ -806,12 +810,16 @@ public class FloatingPointFormulaManagerTest
             Double.MAX_VALUE,
             Double.POSITIVE_INFINITY,
             Double.NEGATIVE_INFINITY,
-            0.0 // , -0.0 // MathSat5 fails for NEGATIVE_ZERO
-            );
+            0.0, // , -0.0 // MathSat5 fails for NEGATIVE_ZERO
+            1d,
+            -1d,
+            2d,
+            -2d);
 
     for (int i = 1; i < 20; i++) {
       for (int j = 1; j < 20; j++) {
         dbls.add(i * Math.pow(10, j));
+        dbls.add(-i * Math.pow(10, j));
       }
     }
 
@@ -952,11 +960,32 @@ public class FloatingPointFormulaManagerTest
   }
 
   @Test
-  public void fpFromBitPattern() throws SolverException, InterruptedException {
-    final FloatingPointFormula expr1 = fpmgr.makeNumber(-0.1, singlePrecType);
-    final FloatingPointFormula expr2 =
-        fpmgr.makeNumber(
-            BigInteger.valueOf(123), BigInteger.valueOf(5033165), true, singlePrecType);
-    assertThatFormula(fpmgr.assignment(expr1, expr2)).isTautological();
+  public void fpFrom32BitPattern() throws SolverException, InterruptedException {
+    for (float f : getListOfFloats()) {
+      int bits = Float.floatToRawIntBits(f);
+      int exponent = (bits >>> 23) & 0xFF;
+      int mantissa = bits & 0x7FFFFF;
+      boolean sign = bits < 0; // equal to: (bits >>> 31) & 0x1
+      final FloatingPointFormula fpFromBv =
+          fpmgr.makeNumber(
+              BigInteger.valueOf(exponent), BigInteger.valueOf(mantissa), sign, singlePrecType);
+      final FloatingPointFormula fp = fpmgr.makeNumber(f, singlePrecType);
+      assertThatFormula(fpmgr.assignment(fpFromBv, fp)).isTautological();
+    }
+  }
+
+  @Test
+  public void fpFrom64BitPattern() throws SolverException, InterruptedException {
+    for (double d : getListOfDoubles()) {
+      long bits = Double.doubleToRawLongBits(d);
+      long exponent = (bits >>> 52) & 0x7FF;
+      long mantissa = bits & 0xFFFFFFFFFFFFFL;
+      boolean sign = bits < 0; // equal to: (doubleBits >>> 63) & 1;
+      final FloatingPointFormula fpFromBv =
+          fpmgr.makeNumber(
+              BigInteger.valueOf(exponent), BigInteger.valueOf(mantissa), sign, doublePrecType);
+      final FloatingPointFormula fp = fpmgr.makeNumber(d, doublePrecType);
+      assertThatFormula(fpmgr.assignment(fpFromBv, fp)).isTautological();
+    }
   }
 }
