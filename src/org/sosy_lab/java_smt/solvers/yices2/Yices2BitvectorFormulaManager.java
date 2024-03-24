@@ -31,6 +31,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvsgt_a
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvshl;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvsle_atom;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvslt_atom;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvsmod;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvsrem;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvsub;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvxor2;
@@ -98,13 +99,17 @@ public class Yices2BitvectorFormulaManager
   }
 
   @Override
-  protected Integer modulo(Integer pParam1, Integer pParam2, boolean pSigned) {
-    // TODO Correct Methods?
+  protected Integer remainder(Integer pParam1, Integer pParam2, boolean pSigned) {
     if (pSigned) {
       return yices_bvsrem(pParam1, pParam2);
     } else {
       return yices_bvrem(pParam1, pParam2);
     }
+  }
+
+  @Override
+  protected Integer smodulo(Integer pParam1, Integer pParam2) {
+    return yices_bvsmod(pParam1, pParam2);
   }
 
   @Override

@@ -12,6 +12,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.google.common.truth.Truth;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -193,8 +194,9 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
               bvmgr.xor(x, y),
               bvmgr.divide(x, y, true),
               bvmgr.divide(x, y, false),
-              bvmgr.modulo(x, y, true),
-              bvmgr.modulo(x, y, false),
+              bvmgr.remainder(x, y, true),
+              bvmgr.remainder(x, y, false),
+              bvmgr.smodulo(x, y),
               bvmgr.not(x),
               bvmgr.negate(x),
               bvmgr.extract(x, 7, 5),
@@ -417,8 +419,8 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     BitvectorFormula x = bvmgr.makeVariable(5, "x");
     BitvectorFormula y = bvmgr.makeVariable(5, "y");
 
-    for (Formula f :
-        ImmutableList.of(
+    final List<Formula> formulas =
+        Lists.newArrayList(
             bvmgr.lessOrEquals(x, y, true),
             bvmgr.lessOrEquals(x, y, false),
             bvmgr.lessThan(x, y, true),
@@ -432,14 +434,19 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
             bvmgr.multiply(x, y),
             bvmgr.divide(x, y, true),
             bvmgr.divide(x, y, false),
-            bvmgr.modulo(x, y, true),
-            bvmgr.modulo(x, y, false),
+            bvmgr.remainder(x, y, true),
+            bvmgr.remainder(x, y, false),
             bvmgr.and(x, y),
             bvmgr.or(x, y),
             bvmgr.xor(x, y),
             bvmgr.equal(x, y),
             bvmgr.not(x),
-            bvmgr.negate(y))) {
+            bvmgr.negate(y));
+    if (Solvers.MATHSAT5 != solver) {
+      formulas.add(bvmgr.smodulo(x, y));
+    }
+
+    for (Formula f : formulas) {
       mgr.visitRecursively(
           f,
           new DefaultFormulaVisitor<>() {

@@ -126,6 +126,31 @@ public interface BitvectorFormulaManager {
   BitvectorFormula divide(BitvectorFormula numerator, BitvectorFormula denumerator, boolean signed);
 
   /**
+   * This method returns the Signed Modular Remainder for two bitvector formulas.
+   *
+   * <p>The sign of the result follows the sign of the denumerator, e.g., a user can assume the
+   * following equations:
+   *
+   * <ul>
+   *   <li>10 % 5 = 0
+   *   <li>10 % 3 = 1
+   *   <li>10 % (-3) = -2
+   *   <li>-10 % 5 = 0
+   *   <li>-10 % 3 = 2
+   *   <li>-10 % (-3) = -1
+   * </ul>
+   *
+   * <p>If the denumerator evaluates to zero (modulo-by-zero), either directly as value or
+   * indirectly via an additional constraint, then the result of the modulo operation is defined as
+   * the numerator itself. We refer to the SMTLIB standard for the division and modulo operators in
+   * BV theory.
+   *
+   * @param numerator dividend
+   * @param denumerator divisor
+   */
+  BitvectorFormula smodulo(BitvectorFormula numerator, BitvectorFormula denumerator);
+
+  /**
    * This method returns the remainder (modulo) for two bitvector formulas.
    *
    * <p>For signed bitvectors, the sign of the result follows the sign of the numerator, e.g., a
@@ -149,7 +174,8 @@ public interface BitvectorFormulaManager {
    * @param denumerator divisor
    * @param signed whether to interpret all operands as signed or as unsigned numbers.
    */
-  BitvectorFormula modulo(BitvectorFormula numerator, BitvectorFormula denumerator, boolean signed);
+  BitvectorFormula remainder(
+      BitvectorFormula numerator, BitvectorFormula denumerator, boolean signed);
 
   /**
    * This method returns the multiplication of the given bitvectors. The result has the same length

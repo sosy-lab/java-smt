@@ -322,6 +322,9 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
       case YICES_BV_SREM:
         functionKind = FunctionDeclarationKind.BV_SREM;
         break;
+      case YICES_BV_SMOD:
+        functionKind = FunctionDeclarationKind.BV_SMOD;
+        break;
       case YICES_BV_SHL:
         functionKind = FunctionDeclarationKind.BV_SHL;
         break;
