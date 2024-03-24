@@ -11,7 +11,9 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.truth.Truth;
 import java.math.BigInteger;
@@ -22,6 +24,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -32,6 +35,7 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
+import org.sosy_lab.java_smt.api.FloatingPointNumber;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -299,6 +303,55 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
       assertThat(visitor.found)
           .containsExactly(BigInteger.ONE.shiftLeft(32).add(BigInteger.valueOf(n)));
     }
+  }
+
+  @Test
+  public void floatConstantVisit() {
+    requireFloats();
+
+    var testValues =
+        ImmutableMap.<Double, String>builder()
+            .put(Double.NEGATIVE_INFINITY, "1111110000000000")
+            .put(-1d, "1011110000000000")
+            .put(-2d, "1100000000000000")
+            .put(0.0, "0000000000000000")
+            .put(-0.0, "1000000000000000")
+            .put(0.00001, "0000000010101000")
+            .put(1d, "0011110000000000")
+            .put(2d, "0100000000000000")
+            .put(5.32, "0100010101010010")
+            .put(10d, "0100100100000000")
+            .put(Double.POSITIVE_INFINITY, "0111110000000000")
+            .build();
+
+    for (Entry<Double, String> entry : testValues.entrySet()) {
+      checkFloatConstant(
+          FormulaType.getDoublePrecisionFloatingPointType(),
+          entry.getKey(),
+          Strings.padStart(
+              Long.toBinaryString(Double.doubleToRawLongBits(entry.getKey())), 64, '0'));
+      checkFloatConstant(
+          FormulaType.getSinglePrecisionFloatingPointType(),
+          entry.getKey().floatValue(),
+          Strings.padStart(
+              Integer.toBinaryString(Float.floatToRawIntBits(entry.getKey().floatValue())),
+              32,
+              '0'));
+      checkFloatConstant(FormulaType.getFloatingPointType(5, 10), entry.getKey(), entry.getValue());
+    }
+  }
+
+  private void checkFloatConstant(FloatingPointType prec, double value, String bits) {
+    FloatingPointNumber fp =
+        FloatingPointNumber.of(bits, prec.getExponentSize(), prec.getMantissaSize());
+
+    ConstantsVisitor visitor = new ConstantsVisitor();
+    mgr.visit(fpmgr.makeNumber(value, prec), visitor);
+    assertThat(visitor.found).containsExactly(fp);
+
+    ConstantsVisitor visitor2 = new ConstantsVisitor();
+    mgr.visit(fpmgr.makeNumber(fp.getExponent(), fp.getMantissa(), fp.getSign(), prec), visitor2);
+    assertThat(visitor2.found).containsExactly(fp);
   }
 
   @Test

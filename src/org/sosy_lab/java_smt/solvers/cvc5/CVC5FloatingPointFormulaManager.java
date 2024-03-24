@@ -101,7 +101,9 @@ public class CVC5FloatingPointFormulaManager
               Kind.FLOATINGPOINT_TO_FP_FROM_REAL,
               pType.getExponentSize(),
               pType.getMantissaSize() + 1);
-      return solver.mkTerm(realToFp, pRoundingMode, solver.mkReal(rationalValue.toString()));
+      Term term = solver.mkTerm(realToFp, pRoundingMode, solver.mkReal(rationalValue.toString()));
+      // simplification removes the cast from real to fp and return a bit-precise fp-number.
+      return solver.simplify(term);
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
           "You tried creating a invalid floating point with exponent size "

@@ -100,12 +100,7 @@ public class CVC4FloatingPointFormulaManager
   protected Expr makeNumberAndRound(String pN, FloatingPointType pType, Expr pRoundingMode) {
     try {
       if (isNegativeZero(Double.valueOf(pN))) {
-        return negate(
-            exprManager.mkConst(
-                new FloatingPoint(
-                    getFPSize(pType),
-                    pRoundingMode.getConstRoundingMode(),
-                    Rational.fromDecimal(pN))));
+        return exprManager.mkConst(FloatingPoint.makeZero(getFPSize(pType), /* sign */ true));
       }
     } catch (NumberFormatException e) {
       // ignore and fallback to floating point from rational numbers

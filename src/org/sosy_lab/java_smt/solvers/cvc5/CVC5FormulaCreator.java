@@ -403,11 +403,10 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
         return visitor.visitConstant(formula, new BigInteger(f.getBitVectorValue(), 2));
 
       } else if (f.isFloatingPointValue()) {
-        // String is easier to parse here
-        return visitor.visitConstant(formula, f.toString());
+        return visitor.visitConstant(formula, convertFloatingPoint(f));
 
-      } else if (f.getKind() == Kind.CONST_ROUNDINGMODE) {
-        return visitor.visitConstant(formula, f.toString());
+      } else if (f.isRoundingModeValue()) {
+        return visitor.visitConstant(formula, f.getRoundingModeValue());
 
       } else if (f.getKind() == Kind.VARIABLE) {
         // BOUND vars are used for all vars that are bound to a quantifier in CVC5.
