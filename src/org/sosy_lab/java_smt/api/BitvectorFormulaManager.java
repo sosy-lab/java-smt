@@ -126,16 +126,6 @@ public interface BitvectorFormulaManager {
   BitvectorFormula divide(BitvectorFormula numerator, BitvectorFormula denumerator, boolean signed);
 
   /**
-   * Deprecated in favor of rem() due to confusing method name (modulo() returns SREM/UREM
-   * instruction).
-   */
-  @Deprecated(forRemoval = true)
-  default BitvectorFormula modulo(
-      BitvectorFormula numerator, BitvectorFormula denumerator, boolean signed) {
-    return remainder(numerator, denumerator, signed);
-  }
-
-  /**
    * This method returns the Signed Modular Remainder for two bitvector formulas.
    *
    * <p>The sign of the result follows the sign of the denumerator, e.g., a user can assume the
