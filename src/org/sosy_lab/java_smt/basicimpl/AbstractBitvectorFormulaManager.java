@@ -338,7 +338,18 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
 
   @SuppressWarnings("unused")
   protected TFormulaInfo rotateLeft(TFormulaInfo pNumber, TFormulaInfo pToRotate) {
-    throw new UnsupportedOperationException("Solver does not support BV rotation.");
+    int length = getLength(wrap(pNumber));
+    final TFormulaInfo lengthAsBv = makeBitvectorImpl(length, length);
+    final TFormulaInfo toRotateInRange = smodulo(pToRotate, lengthAsBv);
+    return or(
+        shiftLeft(pNumber, toRotateInRange),
+        shiftRight(pNumber, subtract(lengthAsBv, toRotateInRange), false));
+
+    // The following approach would also work. However, some solvers are slower with it.
+    // return extract(
+    // shiftLeft(concat(pNumber, pNumber), extend(toRotateInRange, length, false)),
+    // 2 * length - 1,
+    // length);
   }
 
   @Override
@@ -360,7 +371,18 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
 
   @SuppressWarnings("unused")
   protected TFormulaInfo rotateRight(TFormulaInfo pNumber, TFormulaInfo pToRotate) {
-    throw new UnsupportedOperationException("Solver does not support BV rotation.");
+    int length = getLength(wrap(pNumber));
+    final TFormulaInfo lengthAsBv = makeBitvectorImpl(length, length);
+    final TFormulaInfo toRotateInRange = smodulo(pToRotate, lengthAsBv);
+    return or(
+        shiftRight(pNumber, toRotateInRange, false),
+        shiftLeft(pNumber, subtract(lengthAsBv, toRotateInRange)));
+
+    // The following approach would also work. However, some solvers are slower with it.
+    // return extract(
+    // shiftRight(concat(pNumber, pNumber), extend(toRotateInRange, length, false), false),
+    // length - 1,
+    // 0);
   }
 
   @Override

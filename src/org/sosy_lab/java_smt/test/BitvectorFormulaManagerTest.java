@@ -466,7 +466,10 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void bvRotateByBV() throws SolverException, InterruptedException {
-    requireBitvectorRotation();
+    assume()
+        .withMessage("Princess is too slow for this test")
+        .that(solver)
+        .isNotEqualTo(Solvers.PRINCESS);
 
     for (int bitsize : new int[] {8, 13, 25, 31}) {
       BitvectorFormula zero = bvmgr.makeBitvector(bitsize, 0);
@@ -502,8 +505,6 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void bvIsIdenticalAfterFullRotation() throws SolverException, InterruptedException {
-    requireBitvectorRotation();
-
     for (int bitsize : new int[] {2, 4, 8, 16, 32, 55}) {
       BitvectorFormula number = bvmgr.makeVariable(bitsize, "NUM_ROT_" + bitsize);
       for (int multiplier : new int[] {0, 1, 2, 5, 17, 37, 111, 1111}) {
