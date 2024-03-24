@@ -261,13 +261,9 @@ public class ArrayFormulaManagerTest extends SolverBasedTest0.ParameterizedSolve
 
     IntegerFormula num2 = imgr.makeNumber(2);
     IntegerFormula num4 = imgr.makeNumber(4);
-    IntegerFormula num5 = imgr.makeNumber(5);
-    IntegerFormula numM1 = imgr.makeNumber(-1);
 
     BitvectorFormula bv2 = bvmgr.makeBitvector(4, 2);
     BitvectorFormula bv4 = bvmgr.makeBitvector(4, 4);
-    BitvectorFormula bv5 = bvmgr.makeBitvector(4, 5);
-    BitvectorFormula bvM1 = bvmgr.makeBitvector(4, -1);
 
     // select(store(arr, i, j), i) == select(store(arr, k, j), k)
     assertThatFormula(
