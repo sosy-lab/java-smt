@@ -165,7 +165,13 @@ public class CVC4BitvectorFormulaManager
 
   @Override
   protected Expr smodulo(Expr numerator, Expr denumerator) {
-    return exprManager.mkExpr(Kind.BITVECTOR_SMOD, numerator, denumerator);
+    final Expr modulo = exprManager.mkExpr(Kind.BITVECTOR_SMOD, numerator, denumerator);
+    // CVC4 does not align with SMTLIB standard when it comes to modulo-by-zero.
+    // For modulo-by-zero, we compute the result as: "return the numerator".
+    final int bitsize = ((BitvectorType) formulaCreator.getFormulaType(numerator)).getSize();
+    final Expr zero = makeBitvectorImpl(bitsize, 0);
+    return exprManager.mkExpr(
+        Kind.ITE, exprManager.mkExpr(Kind.EQUAL, denumerator, zero), numerator, modulo);
   }
 
   @Override
