@@ -557,8 +557,8 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
           .put(Kind.BITVECTOR_SDIV, FunctionDeclarationKind.BV_SDIV)
           .put(Kind.BITVECTOR_UDIV, FunctionDeclarationKind.BV_UDIV)
           .put(Kind.BITVECTOR_SREM, FunctionDeclarationKind.BV_SREM)
-          // TODO: find out where Kind.BITVECTOR_SMOD fits in here
           .put(Kind.BITVECTOR_UREM, FunctionDeclarationKind.BV_UREM)
+          .put(Kind.BITVECTOR_SMOD, FunctionDeclarationKind.BV_SMOD)
           .put(Kind.BITVECTOR_NOT, FunctionDeclarationKind.BV_NOT)
           .put(Kind.BITVECTOR_NEG, FunctionDeclarationKind.BV_NEG)
           .put(Kind.BITVECTOR_EXTRACT, FunctionDeclarationKind.BV_EXTRACT)
