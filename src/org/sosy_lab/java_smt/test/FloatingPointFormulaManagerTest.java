@@ -196,7 +196,7 @@ public class FloatingPointFormulaManagerTest
 
     for (FloatingPointType prec :
         new FloatingPointType[] {
-          singlePrecType, doublePrecType, FormulaType.getFloatingPointType(5, 6)
+          singlePrecType, doublePrecType, FormulaType.getFloatingPointType(5, 6),
         }) {
 
       final FloatingPointFormula numFive = fpmgr.makeNumber(5, prec);
@@ -220,7 +220,7 @@ public class FloatingPointFormulaManagerTest
 
     for (FloatingPointType prec :
         new FloatingPointType[] {
-          singlePrecType, doublePrecType, FormulaType.getFloatingPointType(5, 6)
+          singlePrecType, doublePrecType, FormulaType.getFloatingPointType(5, 6),
         }) {
 
       final FloatingPointFormula num = fpmgr.makeNumber(42, prec);
