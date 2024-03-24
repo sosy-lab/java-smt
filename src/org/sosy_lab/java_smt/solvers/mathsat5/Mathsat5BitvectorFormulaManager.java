@@ -8,11 +8,11 @@
 
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_and;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_bv_and;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_bv_ashr;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_bv_concat;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_bv_extract;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_bv_int_number;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_bv_lshl;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_bv_lshr;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_bv_minus;
@@ -36,6 +36,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_bv_xor;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_bv_zext;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_equal;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_iff;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_int_from_sbv;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_int_from_ubv;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_int_to_bv;
@@ -81,7 +82,7 @@ class Mathsat5BitvectorFormulaManager
   public Long makeBitvectorImpl(int pLength, long pI) {
     int i = (int) pI;
     if (i == pI && i > 0) { // fits into an int
-      return Mathsat5NativeApi.msat_make_bv_int_number(mathsatEnv, i, pLength);
+      return msat_make_bv_int_number(mathsatEnv, i, pLength);
     }
     return makeBitvectorImpl(pLength, BigInteger.valueOf(pI));
   }
@@ -195,51 +196,37 @@ class Mathsat5BitvectorFormulaManager
   }
 
   /**
-   * Because mathsat does not define an smod operator, we emulate it using the definition (bvsmod s
-   * t) abbreviates (let ((?msb_s ((_ extract |m-1| |m-1|) s)) (?msb_t ((_ extract |m-1| |m-1|) t)))
-   * (let ((abs_s (ite (= ?msb_s #b0) s (bvneg s))) (abs_t (ite (= ?msb_t #b0) t (bvneg t)))) (let
-   * ((u (bvurem abs_s abs_t))) (ite (= u (_ bv0 m)) u (ite (and (= ?msb_s #b0) (= ?msb_t #b0)) u
-   * (ite (and (= ?msb_s #b1) (= ?msb_t #b0)) (bvadd (bvneg u) t) (ite (and (= ?msb_s #b0) (= ?msb_t
-   * #b1)) (bvadd u t) (bvneg u))))))))
+   * Because MathSAT does not define the smod operator, we apply a definition of (bvsmod s t):
+   *
+   * <pre>
+   * (let ((r (bvsrem s t)))
+   *   (ite (= t 0) s
+   *   (ite (= r 0) 0
+   *   (ite (and (> s 0) (< t 0)) (+ r t)    // distinct sign
+   *   (ite (and (< s 0) (> t 0)) (+ r t)    // distinct sign
+   *   r                                     // same sign
+   * )))
+   * </pre>
    */
   @Override
   public Long smodulo(Long s, Long t) {
     final int size = ((BitvectorType) formulaCreator.getFormulaType(s)).getSize();
-    final Long zero = msat_make_bv_number(mathsatEnv, "0", size, 10);
+    final long zero = makeBitvectorImpl(size, 0);
 
-    final Function<Long, Long> isNegative = pLong -> msat_make_bv_slt(mathsatEnv, pLong, zero);
-    final Function<Long, Long> isPositive = pLong -> msat_make_bv_slt(mathsatEnv, zero, pLong);
-    final Function<Long, Long> abs =
-        pLong ->
-            msat_make_term_ite(
-                mathsatEnv, isPositive.apply(pLong), pLong, msat_make_bv_neg(mathsatEnv, pLong));
-    final Long absS = abs.apply(s);
-    final Long absT = abs.apply(t);
-    final Long u = msat_make_bv_urem(mathsatEnv, absS, absT);
-
-    final Long sPositive = isPositive.apply(s);
-    final Long tPositive = isPositive.apply(t);
-    final Long sNegative = isNegative.apply(s);
-    final Long tNegative = isNegative.apply(t);
-
-    final Long pp = msat_make_and(mathsatEnv, sPositive, tPositive);
-    final Long pn = msat_make_and(mathsatEnv, sPositive, tNegative);
-    final Long np = msat_make_and(mathsatEnv, sNegative, tPositive);
-
-    final Long npTerm = msat_make_bv_plus(mathsatEnv, msat_make_bv_neg(mathsatEnv, u), t);
-    final Long pnTerm = msat_make_bv_plus(mathsatEnv, u, t);
-    final Long nnTerm = msat_make_bv_neg(mathsatEnv, u);
+    final Function<Long, Long> isNegative = term -> msat_make_bv_slt(mathsatEnv, term, zero);
+    final long sameSign = msat_make_iff(mathsatEnv, isNegative.apply(s), isNegative.apply(t));
+    final long srem = msat_make_bv_srem(mathsatEnv, s, t);
+    final long sremPlusT = msat_make_bv_plus(mathsatEnv, srem, t);
 
     return msat_make_term_ite(
         mathsatEnv,
-        msat_make_equal(mathsatEnv, u, zero),
-        u,
+        equal(t, zero),
+        s,
         msat_make_term_ite(
             mathsatEnv,
-            pp,
-            u,
-            msat_make_term_ite(
-                mathsatEnv, np, npTerm, msat_make_term_ite(mathsatEnv, pn, pnTerm, nnTerm))));
+            equal(srem, zero),
+            zero,
+            msat_make_term_ite(mathsatEnv, sameSign, srem, sremPlusT)));
   }
 
   @Override
