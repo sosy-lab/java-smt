@@ -196,8 +196,11 @@ class Mathsat5BitvectorFormulaManager
   }
 
   /**
-   * Because MathSAT does not define the smod operator, we apply a definition of (bvsmod s t):
+   * Because MathSAT does not define SMOD, we apply a definition of SMOD based on SREM.
+   *
    * <pre>
+   * (bvsmod s t) is defined as
+   *
    * (let ((r (bvsrem s t)))
    *   (ite (= t 0) s
    *   (ite (= r 0) 0
