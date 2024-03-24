@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.cvc4;
 
 import com.google.common.collect.ImmutableList;
+import edu.stanford.CVC4.BitVector;
 import edu.stanford.CVC4.BitVectorExtract;
 import edu.stanford.CVC4.Expr;
 import edu.stanford.CVC4.ExprManager;
@@ -80,6 +81,19 @@ public class CVC4FloatingPointFormulaManager
   @Override
   protected Expr makeNumberImpl(double pN, FloatingPointType pType, Expr pRoundingMode) {
     return makeNumberImpl(Double.toString(pN), pType, pRoundingMode);
+  }
+
+  @Override
+  protected Expr makeNumberImpl(
+      BigInteger exponent, BigInteger mantissa, boolean signBit, FloatingPointType type) {
+    final String signStr = signBit ? "1" : "0";
+    final String exponentStr = getBvRepresentation(exponent, type.getExponentSize());
+    final String mantissaStr = getBvRepresentation(mantissa, type.getMantissaSize());
+    final String bitvecStr = signStr + exponentStr + mantissaStr;
+    final BitVector bitVector = new BitVector(bitvecStr, 2);
+    final FloatingPoint fp =
+        new FloatingPoint(type.getExponentSize(), type.getMantissaSize() + 1, bitVector);
+    return exprManager.mkConst(fp);
   }
 
   @Override
