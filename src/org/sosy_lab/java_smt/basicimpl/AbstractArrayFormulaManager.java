@@ -81,6 +81,56 @@ public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFu
       String pName, FormulaType<TI> pIndexType, FormulaType<TE> pElementType);
 
   @Override
+  public <
+          TI extends Formula,
+          TE extends Formula,
+          FTI extends FormulaType<TI>,
+          FTE extends FormulaType<TE>>
+      ArrayFormula<TI, TE> makeArray(FTI pIndexType, FTE pElementType) {
+    final TFormulaInfo arrayConst = internalMakeArray(pIndexType, pElementType);
+    return getFormulaCreator().encapsulateArray(arrayConst, pIndexType, pElementType);
+  }
+
+  @Override
+  public <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> makeArray(
+      ArrayFormulaType<TI, TE> type) {
+    final TFormulaInfo arrayConst = internalMakeArray(type.getIndexType(), type.getElementType());
+    return getFormulaCreator()
+        .encapsulateArray(arrayConst, type.getIndexType(), type.getElementType());
+  }
+
+  @Override
+  public <
+          TI extends Formula,
+          TE extends Formula,
+          FTI extends FormulaType<TI>,
+          FTE extends FormulaType<TE>>
+      ArrayFormula<TI, TE> makeArray(TE elseElem, FTI pIndexType, FTE pElementType) {
+    final TFormulaInfo arrayConst =
+        internalMakeArray(extractInfo(elseElem), pIndexType, pElementType);
+    return getFormulaCreator().encapsulateArray(arrayConst, pIndexType, pElementType);
+  }
+
+  @Override
+  public <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> makeArray(
+      TE elseElem, ArrayFormulaType<TI, TE> type) {
+    final TFormulaInfo arrayConst =
+        internalMakeArray(extractInfo(elseElem), type.getIndexType(), type.getElementType());
+    return getFormulaCreator()
+        .encapsulateArray(arrayConst, type.getIndexType(), type.getElementType());
+  }
+
+  protected <TI extends Formula, TE extends Formula> TFormulaInfo internalMakeArray(
+      FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
+    return internalMakeArray("__unnamed_array", pIndexType, pElementType);
+  }
+
+  protected <TI extends Formula, TE extends Formula> TFormulaInfo internalMakeArray(
+      TFormulaInfo elseElem, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
+    throw new UnsupportedOperationException("Initialized arrays are not supported.");
+  }
+
+  @Override
   public <TI extends Formula> FormulaType<TI> getIndexType(ArrayFormula<TI, ?> pArray) {
     return getFormulaCreator().getArrayFormulaIndexType(pArray);
   }

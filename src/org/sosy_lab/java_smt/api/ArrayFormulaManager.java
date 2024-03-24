@@ -61,6 +61,30 @@ public interface ArrayFormulaManager {
   <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> makeArray(
       String pName, ArrayFormulaType<TI, TE> type);
 
+  /** Create a new array constant with uninitialized values. */
+  <TI extends Formula, TE extends Formula, FTI extends FormulaType<TI>, FTE extends FormulaType<TE>>
+      ArrayFormula<TI, TE> makeArray(FTI pIndexType, FTE pElementType);
+
+  /** Create a new array constant with uninitialized values. */
+  <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> makeArray(
+      ArrayFormulaType<TI, TE> type);
+
+  /**
+   * Create a new array constant with uninitialized values.
+   *
+   * @param elseElem: The default value of all entries in the array.
+   */
+  <TI extends Formula, TE extends Formula, FTI extends FormulaType<TI>, FTE extends FormulaType<TE>>
+      ArrayFormula<TI, TE> makeArray(TE elseElem, FTI pIndexType, FTE pElementType);
+
+  /**
+   * Create a new array constant with values initialized to elseElem.
+   *
+   * @param elseElem: The default value of all entries in the array.
+   */
+  <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> makeArray(
+      TE elseElem, ArrayFormulaType<TI, TE> type);
+
   /** Make a {@link BooleanFormula} that represents the equality of two {@link ArrayFormula}. */
   <TI extends Formula, TE extends Formula> BooleanFormula equivalence(
       ArrayFormula<TI, TE> pArray1, ArrayFormula<TI, TE> pArray2);

@@ -180,4 +180,102 @@ public class ArrayFormulaManagerTest extends SolverBasedTest0.ParameterizedSolve
             bmgr.not(fpmgr.equalWithFPSemantics(num2, amgr.select(arr2, num4))));
     assertThatFormula(query).isUnsatisfiable();
   }
+
+  @Test
+  public void testArrayConst() throws SolverException, InterruptedException {
+    requireIntegers();
+
+    ArrayFormulaType<IntegerFormula, IntegerFormula> type =
+        FormulaType.getArrayType(IntegerType, IntegerType);
+    ArrayFormula<IntegerFormula, IntegerFormula> arr = amgr.makeArray(type);
+
+    IntegerFormula num2 = imgr.makeNumber(2);
+    IntegerFormula num4 = imgr.makeNumber(4);
+    IntegerFormula num5 = imgr.makeNumber(5);
+    IntegerFormula numM1 = imgr.makeNumber(-1);
+
+    // select(store(arr, i, j)) == j
+    assertThatFormula(imgr.equal(num4, amgr.select(amgr.store(arr, num2, num4), num2)))
+        .isTautological();
+    // same, but checking whether unnamed arrays work well (i.e., not global)
+    assertThatFormula(imgr.equal(num5, amgr.select(amgr.store(arr, num2, num5), num2)))
+        .isTautological();
+    // uninit array can read any value
+    assertThatFormula(imgr.equal(numM1, amgr.select(arr, num2))).isSatisfiable();
+  }
+
+  @Test
+  public void testArrayConstBv() throws SolverException, InterruptedException {
+    requireBitvectors();
+
+    ArrayFormulaType<BitvectorFormula, BitvectorFormula> type =
+        FormulaType.getArrayType(getBitvectorTypeWithSize(4), getBitvectorTypeWithSize(4));
+    ArrayFormula<BitvectorFormula, BitvectorFormula> arr = amgr.makeArray(type);
+
+    BitvectorFormula num2 = bvmgr.makeBitvector(4, 2);
+    BitvectorFormula num4 = bvmgr.makeBitvector(4, 4);
+    BitvectorFormula num5 = bvmgr.makeBitvector(4, 5);
+    BitvectorFormula numM1 = bvmgr.makeBitvector(4, -1);
+
+    // select(store(arr, i, j)) == j
+    assertThatFormula(bvmgr.equal(num4, amgr.select(amgr.store(arr, num2, num4), num2)))
+        .isTautological();
+    // same, but checking whether unnamed arrays work well (i.e., not global)
+    assertThatFormula(bvmgr.equal(num5, amgr.select(amgr.store(arr, num2, num5), num2)))
+        .isTautological();
+    // uninit array can read any value
+    assertThatFormula(bvmgr.equal(numM1, amgr.select(arr, num2))).isSatisfiable();
+  }
+
+  @Test
+  public void testArrayConstWithDefault() throws SolverException, InterruptedException {
+    requireIntegers();
+    requireArraysWithDefaultValue();
+
+    ArrayFormulaType<IntegerFormula, IntegerFormula> type =
+        FormulaType.getArrayType(IntegerType, IntegerType);
+    IntegerFormula num0 = imgr.makeNumber(0);
+    ArrayFormula<IntegerFormula, IntegerFormula> arr = amgr.makeArray(num0, type);
+
+    IntegerFormula num2 = imgr.makeNumber(2);
+    IntegerFormula num4 = imgr.makeNumber(4);
+    IntegerFormula num5 = imgr.makeNumber(5);
+    IntegerFormula numM1 = imgr.makeNumber(-1);
+
+    // select(store(arr, i, j)) == j
+    assertThatFormula(imgr.equal(num4, amgr.select(amgr.store(arr, num2, num4), num2)))
+        .isTautological();
+    // same, but checking whether unnamed arrays work well (i.e., not global)
+    assertThatFormula(imgr.equal(num5, amgr.select(amgr.store(arr, num2, num5), num2)))
+        .isTautological();
+    // init array cannot read any value besides default
+    assertThatFormula(imgr.equal(numM1, amgr.select(arr, num2))).isUnsatisfiable();
+    assertThatFormula(imgr.equal(num0, amgr.select(arr, num2))).isTautological();
+  }
+
+  @Test
+  public void testArrayConstBvWithDefault() throws SolverException, InterruptedException {
+    requireBitvectors();
+    requireArraysWithDefaultValue();
+
+    ArrayFormulaType<BitvectorFormula, BitvectorFormula> type =
+        FormulaType.getArrayType(getBitvectorTypeWithSize(4), getBitvectorTypeWithSize(4));
+    BitvectorFormula num0 = bvmgr.makeBitvector(4, 0);
+    ArrayFormula<BitvectorFormula, BitvectorFormula> arr = amgr.makeArray(num0, type);
+
+    BitvectorFormula num2 = bvmgr.makeBitvector(4, 2);
+    BitvectorFormula num4 = bvmgr.makeBitvector(4, 4);
+    BitvectorFormula num5 = bvmgr.makeBitvector(4, 5);
+    BitvectorFormula numM1 = bvmgr.makeBitvector(4, -1);
+
+    // select(store(arr, i, j)) == j
+    assertThatFormula(bvmgr.equal(num4, amgr.select(amgr.store(arr, num2, num4), num2)))
+        .isTautological();
+    // same, but checking whether unnamed arrays work well (i.e., not global)
+    assertThatFormula(bvmgr.equal(num5, amgr.select(amgr.store(arr, num2, num5), num2)))
+        .isTautological();
+    // init array cannot read any value besides default
+    assertThatFormula(bvmgr.equal(numM1, amgr.select(arr, num2))).isUnsatisfiable();
+    assertThatFormula(bvmgr.equal(num0, amgr.select(arr, num2))).isTautological();
+  }
 }
