@@ -132,7 +132,7 @@ public interface BitvectorFormulaManager {
   @Deprecated(forRemoval = true)
   default BitvectorFormula modulo(
       BitvectorFormula numerator, BitvectorFormula denumerator, boolean signed) {
-    return rem(numerator, denumerator, signed);
+    return remainder(numerator, denumerator, signed);
   }
 
   /**
@@ -158,7 +158,7 @@ public interface BitvectorFormulaManager {
    * @param numerator dividend
    * @param denumerator divisor
    */
-  BitvectorFormula smod(BitvectorFormula numerator, BitvectorFormula denumerator);
+  BitvectorFormula smodulo(BitvectorFormula numerator, BitvectorFormula denumerator);
 
   /**
    * This method returns the remainder (modulo) for two bitvector formulas.
@@ -184,7 +184,8 @@ public interface BitvectorFormulaManager {
    * @param denumerator divisor
    * @param signed whether to interpret all operands as signed or as unsigned numbers.
    */
-  BitvectorFormula rem(BitvectorFormula numerator, BitvectorFormula denumerator, boolean signed);
+  BitvectorFormula remainder(
+      BitvectorFormula numerator, BitvectorFormula denumerator, boolean signed);
 
   /**
    * This method returns the multiplication of the given bitvectors. The result has the same length

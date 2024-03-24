@@ -99,8 +99,7 @@ public class Yices2BitvectorFormulaManager
   }
 
   @Override
-  protected Integer rem(Integer pParam1, Integer pParam2, boolean pSigned) {
-    // TODO Correct Methods?
+  protected Integer remainder(Integer pParam1, Integer pParam2, boolean pSigned) {
     if (pSigned) {
       return yices_bvsrem(pParam1, pParam2);
     } else {
@@ -109,7 +108,7 @@ public class Yices2BitvectorFormulaManager
   }
 
   @Override
-  protected Integer smod(Integer pParam1, Integer pParam2) {
+  protected Integer smodulo(Integer pParam1, Integer pParam2) {
     return yices_bvsmod(pParam1, pParam2);
   }
 

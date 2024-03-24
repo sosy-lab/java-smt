@@ -186,7 +186,7 @@ class Mathsat5BitvectorFormulaManager
   }
 
   @Override
-  public Long rem(Long pNumber1, Long pNumber2, boolean signed) {
+  public Long remainder(Long pNumber1, Long pNumber2, boolean signed) {
     if (signed) {
       return msat_make_bv_srem(mathsatEnv, pNumber1, pNumber2);
     } else {
@@ -203,7 +203,7 @@ class Mathsat5BitvectorFormulaManager
    * #b1)) (bvadd u t) (bvneg u))))))))
    */
   @Override
-  public Long smod(Long s, Long t) {
+  public Long smodulo(Long s, Long t) {
     final int size = ((BitvectorType) formulaCreator.getFormulaType(s)).getSize();
     final Long zero = msat_make_bv_number(mathsatEnv, "0", size, 10);
 

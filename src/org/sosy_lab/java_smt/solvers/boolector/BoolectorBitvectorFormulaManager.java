@@ -96,7 +96,7 @@ class BoolectorBitvectorFormulaManager
   }
 
   @Override
-  public Long rem(Long bitVec1, Long bitVec2, boolean signed) {
+  public Long remainder(Long bitVec1, Long bitVec2, boolean signed) {
     if (signed) {
       return boolector_srem(btor, bitVec1, bitVec2);
     } else {
@@ -105,7 +105,7 @@ class BoolectorBitvectorFormulaManager
   }
 
   @Override
-  public Long smod(Long bitVec1, Long bitVec2) {
+  public Long smodulo(Long bitVec1, Long bitVec2) {
     return boolector_smod(btor, bitVec1, bitVec2);
   }
 

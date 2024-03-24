@@ -1045,10 +1045,11 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     BooleanFormula f1Internal1 =
         bmgr.and(
             bvmgr.lessThan(bv0, p, true),
-            bvmgr.equal(bvmgr.rem(p, bv4, false), bvmgr.rem(bv0, bv4, false)),
+            bvmgr.equal(bvmgr.remainder(p, bv4, false), bvmgr.remainder(bv0, bv4, false)),
             bvmgr.lessThan(bv0, bvmgr.add(p, bv8), true));
 
-    BooleanFormula f1Internal2 = bvmgr.equal(bvmgr.rem(p, bv4, false), bvmgr.rem(bv0, bv4, false));
+    BooleanFormula f1Internal2 =
+        bvmgr.equal(bvmgr.remainder(p, bv4, false), bvmgr.remainder(bv0, bv4, false));
 
     BooleanFormula f1Internal3 = bvmgr.lessThan(bv0, bvmgr.add(p, bv8), true);
 

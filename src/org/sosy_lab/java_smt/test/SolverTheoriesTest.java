@@ -200,7 +200,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
       BitvectorFormula denumerator,
       boolean signed,
       BitvectorFormula expectedResult) {
-    return bvmgr.equal(bvmgr.rem(numerator, denumerator, signed), expectedResult);
+    return bvmgr.equal(bvmgr.remainder(numerator, denumerator, signed), expectedResult);
   }
 
   private void assertOperation(
