@@ -184,6 +184,7 @@ public class ArrayFormulaManagerTest extends SolverBasedTest0.ParameterizedSolve
   @Test
   public void testArrayConst() throws SolverException, InterruptedException {
     requireIntegers();
+    requireArraysWithoutDefaultValue();
 
     ArrayFormulaType<IntegerFormula, IntegerFormula> type =
         FormulaType.getArrayType(IntegerType, IntegerType);
@@ -202,11 +203,22 @@ public class ArrayFormulaManagerTest extends SolverBasedTest0.ParameterizedSolve
         .isTautological();
     // uninit array can read any value
     assertThatFormula(imgr.equal(numM1, amgr.select(arr, num2))).isSatisfiable();
+
+    // name not taken for other types
+    IntegerFormula intVar = imgr.makeVariable("__unnamed_arr");
+    assertThatFormula(imgr.equal(imgr.makeNumber(42), intVar)).isSatisfiable();
+
+    // name not taken for same-type arrays
+    ArrayFormula<IntegerFormula, IntegerFormula> unnamedArrVar =
+        amgr.makeArray("__unnamed_arr", type);
+    assertThatFormula(imgr.equal(num4, amgr.select(amgr.store(unnamedArrVar, num2, num4), num2)))
+        .isTautological();
   }
 
   @Test
   public void testArrayConstBv() throws SolverException, InterruptedException {
     requireBitvectors();
+    requireArraysWithoutDefaultValue();
 
     ArrayFormulaType<BitvectorFormula, BitvectorFormula> type =
         FormulaType.getArrayType(getBitvectorTypeWithSize(4), getBitvectorTypeWithSize(4));
@@ -225,6 +237,51 @@ public class ArrayFormulaManagerTest extends SolverBasedTest0.ParameterizedSolve
         .isTautological();
     // uninit array can read any value
     assertThatFormula(bvmgr.equal(numM1, amgr.select(arr, num2))).isSatisfiable();
+  }
+
+  @Test
+  public void testArrayConstMixed() throws SolverException, InterruptedException {
+    requireIntegers();
+    requireBitvectors();
+    requireArraysWithoutDefaultValue();
+
+    ArrayFormulaType<IntegerFormula, IntegerFormula> typeIntInt =
+        FormulaType.getArrayType(IntegerType, IntegerType);
+    ArrayFormulaType<BitvectorFormula, IntegerFormula> typeBvInt =
+        FormulaType.getArrayType(getBitvectorTypeWithSize(4), IntegerType);
+    ArrayFormulaType<BitvectorFormula, BitvectorFormula> typeBvBv =
+        FormulaType.getArrayType(getBitvectorTypeWithSize(4), getBitvectorTypeWithSize(4));
+    ArrayFormulaType<IntegerFormula, BitvectorFormula> typeIntBv =
+        FormulaType.getArrayType(IntegerType, getBitvectorTypeWithSize(4));
+
+    ArrayFormula<IntegerFormula, IntegerFormula> arrIntInt = amgr.makeArray(typeIntInt);
+    ArrayFormula<BitvectorFormula, IntegerFormula> arrBvInt = amgr.makeArray(typeBvInt);
+    ArrayFormula<BitvectorFormula, BitvectorFormula> arrBvBv = amgr.makeArray(typeBvBv);
+    ArrayFormula<IntegerFormula, BitvectorFormula> arrIntBv = amgr.makeArray(typeIntBv);
+
+    IntegerFormula num2 = imgr.makeNumber(2);
+    IntegerFormula num4 = imgr.makeNumber(4);
+    IntegerFormula num5 = imgr.makeNumber(5);
+    IntegerFormula numM1 = imgr.makeNumber(-1);
+
+    BitvectorFormula bv2 = bvmgr.makeBitvector(4, 2);
+    BitvectorFormula bv4 = bvmgr.makeBitvector(4, 4);
+    BitvectorFormula bv5 = bvmgr.makeBitvector(4, 5);
+    BitvectorFormula bvM1 = bvmgr.makeBitvector(4, -1);
+
+    // select(store(arr, i, j), i) == select(store(arr, k, j), k)
+    assertThatFormula(
+            imgr.equal(
+                amgr.select(amgr.store(arrIntInt, num2, num4), num2),
+                amgr.select(amgr.store(arrBvInt, bv2, num4), bv2)))
+        .isTautological();
+
+    // select(store(arr, i, j), i) == select(store(arr, k, j), k)
+    assertThatFormula(
+            bvmgr.equal(
+                amgr.select(amgr.store(arrIntBv, num2, bv4), num2),
+                amgr.select(amgr.store(arrBvBv, bv2, bv4), bv2)))
+        .isTautological();
   }
 
   @Test

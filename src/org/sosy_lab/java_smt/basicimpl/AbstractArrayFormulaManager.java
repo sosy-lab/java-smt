@@ -122,7 +122,7 @@ public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFu
 
   protected <TI extends Formula, TE extends Formula> TFormulaInfo internalMakeArray(
       FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
-    return internalMakeArray("__unnamed_array", pIndexType, pElementType);
+    throw new UnsupportedOperationException("Array literals are not supported.");
   }
 
   protected <TI extends Formula, TE extends Formula> TFormulaInfo internalMakeArray(
