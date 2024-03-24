@@ -818,6 +818,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     return Native.isNumeralAst(environment, value)
         || Native.isAlgebraicNumber(environment, value)
         || Native.isString(environment, value)
+        || isOP(environment, value, Z3_decl_kind.Z3_OP_FPA_FP)
         || isOP(environment, value, Z3_decl_kind.Z3_OP_TRUE)
         || isOP(environment, value, Z3_decl_kind.Z3_OP_FALSE)
         || isOP(environment, value, Z3_decl_kind.Z3_OP_DT_CONSTRUCTOR); // enumeration value
@@ -871,7 +872,31 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   }
 
   private FloatingPointNumber convertFloatingPoint(FloatingPointType pType, Long pValue) {
-    if (Native.fpaIsNumeralInf(environment, pValue)) {
+    if (isOP(environment, pValue, Z3_decl_kind.Z3_OP_FPA_FP)) {
+      if (Native.getAppNumArgs(environment, pValue) != 3) {
+        return null;
+      } else {
+        final var signBv = Native.getAppArg(environment, pValue, 0);
+        final var expoBv = Native.getAppArg(environment, pValue, 1);
+        final var mantBv = Native.getAppArg(environment, pValue, 2);
+
+        if (!isConstant(signBv)
+            || !isConstant(expoBv)
+            || !isConstant(mantBv)
+            || !getFormulaType(signBv).isBitvectorType()
+            || !getFormulaType(expoBv).isBitvectorType()
+            || !getFormulaType(mantBv).isBitvectorType()) {
+          return null;
+        }
+
+        final var sign = new BigInteger(Native.getNumeralString(environment, signBv));
+        final var expo = new BigInteger(Native.getNumeralString(environment, expoBv));
+        final var mant = new BigInteger(Native.getNumeralString(environment, mantBv));
+
+        return FloatingPointNumber.of(
+            sign.testBit(0), expo, mant, pType.getExponentSize(), pType.getMantissaSize());
+      }
+    } else if (Native.fpaIsNumeralInf(environment, pValue)) {
       // Floating Point Inf uses:
       //  - an sign for posiive/negative infinity,
       //  - "11..11" as exponent,

@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.truth.Truth;
 import java.math.BigInteger;
@@ -31,6 +32,7 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
+import org.sosy_lab.java_smt.api.FloatingPointNumber;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -296,6 +298,42 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
       mgr.visit(bvmgr.makeBitvector(32, n), visitor);
       assertThat(visitor.found)
           .containsExactly(BigInteger.ONE.shiftLeft(32).add(BigInteger.valueOf(n)));
+    }
+  }
+
+  @Test
+  public void floatConstantVisit() {
+    requireFloats();
+    assume()
+        .withMessage("CVC5 cannot be tested here because makeNumber does not return a literal")
+        .that(solver)
+        .isNotEqualTo(Solvers.CVC5);
+
+    for (double d :
+        new double[] {
+          -1, -2, Double.NEGATIVE_INFINITY, 1, 2, 5.32, 0.0, Double.POSITIVE_INFINITY
+        }) {
+      // double prec
+      FloatingPointType prec = FormulaType.getDoublePrecisionFloatingPointType();
+
+      ConstantsVisitor visitor = new ConstantsVisitor();
+      mgr.visit(fpmgr.makeNumber(d, prec), visitor);
+      var bits = Strings.padStart(Long.toBinaryString(Double.doubleToRawLongBits(d)), 64, '0');
+      assertThat(visitor.found)
+          .containsExactly(
+              FloatingPointNumber.of(bits, prec.getExponentSize(), prec.getMantissaSize()));
+
+      // other precs
+      for (FloatingPointType oddPrec :
+          new FloatingPointType[] {
+            FormulaType.getSinglePrecisionFloatingPointType(),
+            FormulaType.getFloatingPointType(5, 10)
+          }) {
+
+        ConstantsVisitor oddVisitor = new ConstantsVisitor();
+        mgr.visit(fpmgr.makeNumber(d, oddPrec), oddVisitor);
+        assertThat(oddVisitor.found).hasSize(1);
+      }
     }
   }
 
