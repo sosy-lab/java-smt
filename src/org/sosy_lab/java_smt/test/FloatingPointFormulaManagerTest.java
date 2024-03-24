@@ -1024,7 +1024,7 @@ public class FloatingPointFormulaManagerTest
           fpmgr.makeNumber(
               BigInteger.valueOf(exponent), BigInteger.valueOf(mantissa), sign, singlePrecType);
       final FloatingPointFormula fp = fpmgr.makeNumber(f, singlePrecType);
-      assertThatFormula(fpmgr.assignment(fpFromBv, fp)).isTautological();
+      assertEqualsAsFormula(fpFromBv, fp);
     }
   }
 
@@ -1039,7 +1039,7 @@ public class FloatingPointFormulaManagerTest
           fpmgr.makeNumber(
               BigInteger.valueOf(exponent), BigInteger.valueOf(mantissa), sign, doublePrecType);
       final FloatingPointFormula fp = fpmgr.makeNumber(d, doublePrecType);
-      assertThatFormula(fpmgr.assignment(fpFromBv, fp)).isTautological();
+      assertEqualsAsFormula(fpFromBv, fp);
     }
   }
 }
