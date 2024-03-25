@@ -61,6 +61,42 @@ class StatisticsArrayFormulaManager implements ArrayFormulaManager {
   }
 
   @Override
+  public <
+          TI extends Formula,
+          TE extends Formula,
+          FTI extends FormulaType<TI>,
+          FTE extends FormulaType<TE>>
+      ArrayFormula<TI, TE> makeArray(FTI pIndexType, FTE pElementType) {
+    stats.arrayOperations.getAndIncrement();
+    return delegate.makeArray(pIndexType, pElementType);
+  }
+
+  @Override
+  public <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> makeArray(
+      ArrayFormulaType<TI, TE> type) {
+    stats.arrayOperations.getAndIncrement();
+    return delegate.makeArray(type);
+  }
+
+  @Override
+  public <
+          TI extends Formula,
+          TE extends Formula,
+          FTI extends FormulaType<TI>,
+          FTE extends FormulaType<TE>>
+      ArrayFormula<TI, TE> makeArray(TE elseElem, FTI pIndexType, FTE pElementType) {
+    stats.arrayOperations.getAndIncrement();
+    return delegate.makeArray(elseElem, pIndexType, pElementType);
+  }
+
+  @Override
+  public <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> makeArray(
+      TE elseElem, ArrayFormulaType<TI, TE> type) {
+    stats.arrayOperations.getAndIncrement();
+    return delegate.makeArray(elseElem, type);
+  }
+
+  @Override
   public <TI extends Formula, TE extends Formula> BooleanFormula equivalence(
       ArrayFormula<TI, TE> pArray1, ArrayFormula<TI, TE> pArray2) {
     stats.arrayOperations.getAndIncrement();

@@ -249,6 +249,34 @@ public abstract class SolverBasedTest0 {
         .isNotNull();
   }
 
+  /** Skip test if the solver does not support uninitialized array literals. */
+  protected /*final*/ void requireArraysWithoutDefaultValue() {
+    assume()
+        .withMessage("Solver %s does not support arrays without default values", solverToUse())
+        .that(solverToUse())
+        .isNoneOf(
+            Solvers.OPENSMT,
+            Solvers.MATHSAT5,
+            Solvers.SMTINTERPOL,
+            Solvers.PRINCESS,
+            Solvers.CVC4,
+            Solvers.CVC5,
+            Solvers.BOOLECTOR);
+  }
+
+  /** Skip test if the solver does not support initialized arrays. */
+  protected /*final*/ void requireArraysWithDefaultValue() {
+    assume()
+        .withMessage("Solver %s does not support arrays with default values", solverToUse())
+        .that(solverToUse())
+        .isNoneOf(
+            Solvers.OPENSMT,
+            Solvers.SMTINTERPOL,
+            Solvers.PRINCESS,
+            Solvers.CVC4,
+            Solvers.BOOLECTOR);
+  }
+
   protected final void requireFloats() {
     assume()
         .withMessage("Solver %s does not support the theory of floats", solverToUse())

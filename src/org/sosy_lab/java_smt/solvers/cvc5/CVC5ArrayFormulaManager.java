@@ -47,6 +47,15 @@ public class CVC5ArrayFormulaManager extends AbstractArrayFormulaManager<Term, S
   }
 
   @Override
+  protected <TI extends Formula, TE extends Formula> Term internalMakeArray(
+      Term elseElem, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
+    final ArrayFormulaType<TI, TE> arrayFormulaType =
+        FormulaType.getArrayType(pIndexType, pElementType);
+    final Sort cvc5ArrayType = toSolverType(arrayFormulaType);
+    return solver.mkConstArray(cvc5ArrayType, elseElem);
+  }
+
+  @Override
   protected Term equivalence(Term pArray1, Term pArray2) {
     return solver.mkTerm(Kind.EQUAL, pArray1, pArray2);
   }
