@@ -322,7 +322,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
             .put(5.32, "0100010101010010")
             .put(10d, "0100100100000000")
             .put(Double.POSITIVE_INFINITY, "0111110000000000")
-            .build();
+            .buildOrThrow();
 
     for (Entry<Double, String> entry : testValues.entrySet()) {
       checkFloatConstant(
