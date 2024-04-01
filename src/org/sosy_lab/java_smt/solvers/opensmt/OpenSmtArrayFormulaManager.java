@@ -10,13 +10,13 @@ package org.sosy_lab.java_smt.solvers.opensmt;
 
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
 import org.sosy_lab.java_smt.solvers.opensmt.api.Logic;
 import org.sosy_lab.java_smt.solvers.opensmt.api.PTRef;
 import org.sosy_lab.java_smt.solvers.opensmt.api.SRef;
 import org.sosy_lab.java_smt.solvers.opensmt.api.SymRef;
 
+@SuppressWarnings("MethodTypeParameterName")
 public class OpenSmtArrayFormulaManager
     extends AbstractArrayFormulaManager<PTRef, SRef, Logic, SymRef> {
 
@@ -41,10 +41,14 @@ public class OpenSmtArrayFormulaManager
   @SuppressWarnings("MethodTypeParameterName")
   protected <TI extends Formula, TE extends Formula> PTRef internalMakeArray(
       String pName, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
-    final ArrayFormulaType<TI, TE> arrayFormulaType =
-        FormulaType.getArrayType(pIndexType, pElementType);
-    final SRef osmtArrayType = toSolverType(arrayFormulaType);
+    final SRef osmtArrayType = toSolverType(FormulaType.getArrayType(pIndexType, pElementType));
     return getFormulaCreator().makeVariable(osmtArrayType, pName);
+  }
+
+  @Override
+  protected <TI extends Formula, TE extends Formula> PTRef internalMakeArray(
+      FormulaType<TI> pIndexType, FormulaType<TE> pElementType, PTRef elseElem) {
+    throw new UnsupportedOperationException();
   }
 
   @Override

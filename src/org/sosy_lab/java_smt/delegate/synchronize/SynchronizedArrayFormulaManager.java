@@ -57,6 +57,18 @@ class SynchronizedArrayFormulaManager implements ArrayFormulaManager {
   }
 
   @Override
+  public <
+          TI extends Formula,
+          TE extends Formula,
+          FTI extends FormulaType<TI>,
+          FTE extends FormulaType<TE>>
+      ArrayFormula<TI, TE> makeArray(FTI pIndexType, FTE pElementType, TE elseElem) {
+    synchronized (sync) {
+      return delegate.makeArray(pIndexType, pElementType, elseElem);
+    }
+  }
+
+  @Override
   public <TI extends Formula, TE extends Formula> BooleanFormula equivalence(
       ArrayFormula<TI, TE> pArray1, ArrayFormula<TI, TE> pArray2) {
     synchronized (sync) {

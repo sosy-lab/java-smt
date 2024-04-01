@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -17,6 +17,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,7 @@ import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
+import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.SLFormulaManager;
@@ -445,6 +447,15 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   @SuppressWarnings("unchecked")
   public <T extends Formula> T makeApplication(
       FunctionDeclaration<T> declaration, List<? extends Formula> args) {
+
+    if (declaration.getKind() == FunctionDeclarationKind.CONST) {
+      ArrayFormulaType<?, ?> arrayType = (ArrayFormulaType<?, ?>) declaration.getType();
+      Formula elseElem = Iterables.getOnlyElement(args);
+      return (T)
+          arrayManager.makeArray(
+              arrayType.getIndexType(), getFormulaType(elseElem), Iterables.getOnlyElement(args));
+    }
+
     return formulaCreator.callFunction(declaration, args);
   }
 
