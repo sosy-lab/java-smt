@@ -29,6 +29,7 @@ import ap.parser.SMTParser2InputAbsy.SMTFunctionType;
 import ap.parser.SMTParser2InputAbsy.SMTType;
 import ap.terfor.ConstantTerm;
 import ap.terfor.preds.Predicate;
+import ap.theories.ExtArray;
 import ap.theories.ExtArray.ArraySort;
 import ap.theories.bitvectors.ModuloArithmetic;
 import ap.theories.rationals.Fractions.FractionSort$;
@@ -47,6 +48,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -606,6 +609,22 @@ class PrincessEnvironment {
     List<ITerm> args = ImmutableList.of(array, index, value);
     ArraySort arraySort = (ArraySort) Sort$.MODULE$.sortOf(array);
     return new IFunApp(arraySort.theory().store(), toSeq(args));
+  }
+
+  public ITerm makeConstArray(ArraySort arraySort, ITerm elseTerm) {
+    // return new IFunApp(arraySort.theory().const(), elseTerm); // I love Scala! So simple! ;-)
+
+    // Scala uses keywords that are illegal in Java. Thus, we use reflection to access the method.
+    // TODO we should contact the developers of Princess and ask for a renaming.
+    final IFunction constArrayOp;
+    try {
+      Method constMethod = ExtArray.class.getMethod("const");
+      constArrayOp = (IFunction) constMethod.invoke(arraySort.theory());
+    } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException pE) {
+      throw new RuntimeException(pE);
+    }
+
+    return new IFunApp(constArrayOp, toSeq(ImmutableList.of(elseTerm)));
   }
 
   public boolean hasArrayType(IExpression exp) {

@@ -68,6 +68,24 @@ public interface ArrayFormulaManager {
     return makeArray(pName, type.getIndexType(), type.getElementType());
   }
 
+  /**
+   * Create a new array constant with values initialized to elseElem.
+   *
+   * @param elseElem The default value of all entries in the array.
+   */
+  <TI extends Formula, TE extends Formula, FTI extends FormulaType<TI>, FTE extends FormulaType<TE>>
+      ArrayFormula<TI, TE> makeArray(FTI pIndexType, FTE pElementType, TE elseElem);
+
+  /**
+   * Create a new array constant with values initialized to elseElem.
+   *
+   * @param elseElem The default value of all entries in the array.
+   */
+  default <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> makeArray(
+      ArrayFormulaType<TI, TE> type, TE elseElem) {
+    return makeArray(type.getIndexType(), type.getElementType(), elseElem);
+  }
+
   /** Make a {@link BooleanFormula} that represents the equality of two {@link ArrayFormula}. */
   <TI extends Formula, TE extends Formula> BooleanFormula equivalence(
       ArrayFormula<TI, TE> pArray1, ArrayFormula<TI, TE> pArray2);
