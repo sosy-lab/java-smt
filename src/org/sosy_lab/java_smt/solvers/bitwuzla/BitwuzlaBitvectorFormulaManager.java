@@ -166,6 +166,26 @@ public class BitwuzlaBitvectorFormulaManager
   }
 
   @Override
+  public Term rotateLeftByConstant(Term bitVec, int toRotate) {
+    return termManager.mk_term(Kind.BV_ROLI, bitVec, toRotate);
+  }
+
+  @Override
+  public Term rotateLeft(Term bitVec, Term toRotate) {
+    return termManager.mk_term(Kind.BV_ROL, bitVec, toRotate);
+  }
+
+  @Override
+  public Term rotateRightByConstant(Term bitVec, int toRotate) {
+    return termManager.mk_term(Kind.BV_RORI, bitVec, toRotate);
+  }
+
+  @Override
+  public Term rotateRight(Term bitVec, Term toRotate) {
+    return termManager.mk_term(Kind.BV_ROR, bitVec, toRotate);
+  }
+
+  @Override
   protected Term concat(Term number, Term pAppend) {
     return termManager.mk_term(Kind.BV_CONCAT, number, pAppend);
   }
