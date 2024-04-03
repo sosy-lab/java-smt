@@ -85,8 +85,16 @@ public class BitwuzlaFloatingPointManager
       BigInteger mantissa,
       boolean signBit,
       FloatingPointType type) {
-    // FIXME: Implement by converting the arguments to bitvectors?
-    throw new UnsupportedOperationException();
+    Sort signSort = termManager.mk_bv_sort(1);
+    Term signTerm = termManager.mk_bv_value(signSort, signBit ? "1" : "0");
+
+    Sort expSort = termManager.mk_bv_sort(type.getExponentSize());
+    Term expTerm = termManager.mk_bv_value(expSort, exponent.toString(2));
+
+    Sort mantissaSort = termManager.mk_bv_sort(type.getMantissaSize());
+    Term mantissaTerm = termManager.mk_bv_value(mantissaSort, mantissa.toString(2));
+
+    return termManager.mk_fp_value(signTerm, expTerm, mantissaTerm);
   }
 
   private Sort mkFpaSort(FloatingPointType pType) {
