@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+This file is part of JavaSMT,
+an API wrapper for a collection of SMT solvers:
+https://github.com/sosy-lab/java-smt
+
+SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<!-- vim: set tabstop=8 shiftwidth=4 expandtab sts=4 filetype=ant fdm=marker: -->
+<project name="macros" basedir="."
+         xmlns:ivy="antlib:org.apache.ivy.ant">
+
+    <macrodef name="checkPathOption">
+        <attribute name="pathOption"/>
+        <attribute name="defaultPath"/>
+        <attribute name="targetName"/>
+        <sequential>
+            <fail unless="@{pathOption}">-
+                Please specify the path to the @{targetName} with the following flag:
+                -D@{pathOption}=@{defaultPath}
+                The path has to point to the root of the @{targetName}.
+                Note that shell substitutions do not work and a full absolute path is preferred.
+            </fail>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="publishToRepository">
+        <attribute name="solverName"/>
+        <attribute name="solverVersion"/>
+        <sequential>
+            <available property="ivy.hasrepository"
+                       file="repository/${ivy.organisation}/${ivy.module}"/>
+            <fail unless="ivy.hasrepository"
+                  message="Cannot publish without 'repository' dir, please run 'svn co https://svn.sosy-lab.org/software/ivy/repository/${ivy.organisation}/${ivy.module} repository/${ivy.organisation}/${ivy.module}'."/>
+            <ivy:publish
+                    pubrevision="@{solverVersion}"
+                    resolver="Sosy-Lab-Publish"
+                    artifactspattern="[artifact]-[revision](-[classifier]).[ext]"
+                    status="release"
+            />
+            <echo>
+                You now want to run
+                svn add repository/${ivy.organisation}/${ivy.module}/*-@{solverVersion}*
+                svn ci repository/${ivy.organisation}/${ivy.module} -m"publish version
+                @{solverVersion} of @{solverName} Solver"
+                to make the new version publicly available.
+            </echo>
+        </sequential>
+    </macrodef>
+</project>

@@ -35,6 +35,7 @@ import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
+import org.sosy_lab.java_smt.api.FloatingPointNumber;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
@@ -1797,8 +1798,16 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       assignmentFormulas.add(va.getAssignmentAsFormula());
       assertThatFormula(va.getAssignmentAsFormula())
           .isEqualTo(makeAssignment(va.getKey(), va.getValueAsFormula()));
-      assertThat(va.getValue().getClass())
-          .isIn(ImmutableList.of(Boolean.class, BigInteger.class, Rational.class, Double.class));
+      assertThat(
+          ImmutableList.of(
+                  Boolean.class,
+                  BigInteger.class,
+                  Rational.class,
+                  Double.class,
+                  FloatingPointNumber.class)
+              .stream()
+              .anyMatch(cls -> cls.isInstance(va.getValue())))
+          .isTrue();
     }
 
     // Check that model is not contradicting
@@ -2223,9 +2232,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     assume()
         .withMessage("Solver is quite slow for this example")
         .that(solverToUse())
-        .isNoneOf(Solvers.PRINCESS, Solvers.Z3);
-    // TODO regression:
-    //  the Z3 library was able to solve this in v4.11.2, but no longer in v4.12.1-glibc_2.27.
+        .isNotEqualTo(Solvers.PRINCESS);
 
     BooleanFormula formula =
         context

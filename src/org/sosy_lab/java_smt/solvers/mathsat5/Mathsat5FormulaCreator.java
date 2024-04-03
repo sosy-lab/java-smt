@@ -8,111 +8,12 @@
 
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_AND;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_ARRAY_READ;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_ARRAY_WRITE;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_ADD;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_AND;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_ASHR;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_CONCAT;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_EXTRACT;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_LSHL;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_LSHR;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_MUL;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_NEG;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_NOT;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_OR;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_SDIV;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_SEXT;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_SLE;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_SLT;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_SREM;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_SUB;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_UDIV;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_ULE;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_ULT;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_UREM;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_XOR;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_ZEXT;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_EQ;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FLOOR;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_ABS;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_ADD;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_AS_IEEEBV;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_CAST;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_DIV;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_EQ;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_FROM_SBV;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_FROM_UBV;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_ISINF;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_ISNAN;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_ISNEG;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_ISNORMAL;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_ISSUBNORMAL;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_ISZERO;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_LE;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_LT;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_MAX;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_MIN;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_MUL;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_NEG;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_ROUND_TO_INT;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_SQRT;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_SUB;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_TO_SBV;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_TO_UBV;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_IFF;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_ITE;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_LEQ;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_NOT;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_OR;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_PLUS;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_TIMES;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_UNKNOWN;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_arg_type;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_name;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_tag;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_declare_function;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_array_element_type;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_array_index_type;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_array_type;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_bool_type;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_bv_type;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_bv_type_size;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_enum_constants;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_fp_type;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_fp_type_exp_width;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_fp_type_mant_width;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_function_type;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_integer_type;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_rational_type;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_is_array_type;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_is_bool_type;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_is_bv_type;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_is_enum_type;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_is_fp_roundingmode_type;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_is_fp_type;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_is_integer_type;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_is_rational_type;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_constant;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_term;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_arity;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_get_arg;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_get_decl;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_get_type;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_constant;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_false;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_number;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_true;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_uf;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_repr;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_type_repr;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.*;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.primitives.Longs;
-import com.google.common.primitives.UnsignedInteger;
-import com.google.common.primitives.UnsignedLong;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -123,6 +24,7 @@ import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.EnumerationFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
+import org.sosy_lab.java_smt.api.FloatingPointNumber;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
@@ -555,25 +457,35 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     }
   }
 
-  private Number parseFloatingPoint(String lTermRepresentation) {
+  private FloatingPointNumber parseFloatingPoint(String lTermRepresentation) {
 
-    // the term is of the format "<VALUE>_<EXPWIDTH>_<MANTWIDTH>"
+    // the term is of the format "<VALUE_AS_BITVECTOR>_<EXPWIDTH>_<MANTWIDTH>"
     Matcher matcher = FLOATING_POINT_PATTERN.matcher(lTermRepresentation);
     if (!matcher.matches()) {
       throw new NumberFormatException("Unknown floating-point format: " + lTermRepresentation);
     }
 
+    BigInteger bits = new BigInteger(matcher.group(1));
     int expWidth = Integer.parseInt(matcher.group(2));
     int mantWidth = Integer.parseInt(matcher.group(3));
 
-    if (expWidth == 11 && mantWidth == 52) {
-      return Double.longBitsToDouble(UnsignedLong.valueOf(matcher.group(1)).longValue());
-    } else if (expWidth == 8 && mantWidth == 23) {
-      return Float.intBitsToFloat(UnsignedInteger.valueOf(matcher.group(1)).intValue());
-    }
+    boolean sign = bits.testBit(expWidth + mantWidth);
+    BigInteger exponent = extractBitsFrom(bits, mantWidth, expWidth);
+    BigInteger mantissa = extractBitsFrom(bits, 0, mantWidth);
 
-    // TODO to be fully correct, we would need to interpret this string
-    return new BigInteger(matcher.group(1));
+    return FloatingPointNumber.of(sign, exponent, mantissa, expWidth, mantWidth);
+  }
+
+  /**
+   * Returns a range of bits from the bitvector representation of a number.
+   *
+   * @param start  the index of the lowest significant bit to be extracted.
+   * @param length how many bits to extract?
+   */
+  private static BigInteger extractBitsFrom(BigInteger number, int start, int length) {
+    Preconditions.checkArgument(0 <= start && 0 < length);
+    BigInteger mask = BigInteger.ONE.shiftLeft(length).subtract(BigInteger.ONE);
+    return number.shiftRight(start).and(mask);
   }
 
   // TODO: change this to the latest version

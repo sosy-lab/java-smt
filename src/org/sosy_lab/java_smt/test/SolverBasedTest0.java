@@ -343,11 +343,25 @@ public abstract class SolverBasedTest0 {
         .isNoneOf(Solvers.BOOLECTOR, Solvers.OPENSMT);
   }
 
+  protected void requireUnsatCoreOverAssumptions() {
+    assume()
+        .withMessage("Solver %s does not support unsat core generation", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.PRINCESS);
+  }
+
   protected void requireSubstitution() {
     assume()
         .withMessage("Solver %s does not support formula substitution", solverToUse())
         .that(solverToUse())
         .isNotEqualTo(Solvers.BOOLECTOR);
+  }
+
+  protected void requireUserPropagators() {
+    assume()
+        .withMessage("Solver %s does not support user propagation", solverToUse())
+        .that(solverToUse())
+        .isEqualTo(Solvers.Z3);
   }
 
   /**

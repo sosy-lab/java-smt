@@ -150,4 +150,42 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(unsatCore).containsExactly(bmgr.not(selector));
     }
   }
+
+  @Test
+  public void testSatWithUnsatUnsatCoreOptions() throws InterruptedException, SolverException {
+    requireUnsatCore();
+    try (ProverEnvironment prover = context.newProverEnvironment(GENERATE_UNSAT_CORE)) {
+      checkSimpleQuery(prover);
+    }
+
+    requireUnsatCoreOverAssumptions();
+    try (ProverEnvironment prover =
+             context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
+      checkSimpleQuery(prover);
+    }
+
+    try (ProverEnvironment prover =
+             context.newProverEnvironment(GENERATE_UNSAT_CORE,
+                 GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
+      checkSimpleQuery(prover);
+    }
+  }
+
+  private void checkSimpleQuery(ProverEnvironment pProver)
+      throws InterruptedException, SolverException {
+    BooleanFormula constraint = bmgr.implication(bmgr.makeVariable("a"), bmgr.makeVariable("b"));
+
+    {
+      pProver.push(constraint);
+      assertThat(pProver.isUnsat()).isFalse();
+      pProver.pop();
+    }
+
+    {
+      pProver.push();
+      pProver.addConstraint(constraint); // Z3 crashed here
+      assertThat(pProver.isUnsat()).isFalse();
+      pProver.pop();
+    }
+  }
 }

@@ -15,14 +15,11 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
-import com.google.common.primitives.UnsignedInteger;
-import com.google.common.primitives.UnsignedLong;
+import com.google.common.primitives.Ints;
 import edu.stanford.CVC4.ArrayType;
 import edu.stanford.CVC4.BitVectorType;
 import edu.stanford.CVC4.Expr;
 import edu.stanford.CVC4.ExprManager;
-import edu.stanford.CVC4.FloatingPoint;
-import edu.stanford.CVC4.FloatingPointSize;
 import edu.stanford.CVC4.FunctionType;
 import edu.stanford.CVC4.Integer;
 import edu.stanford.CVC4.Kind;
@@ -35,12 +32,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
+import org.sosy_lab.java_smt.api.FloatingPointNumber;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
@@ -320,8 +317,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
         return visitor.visitConstant(
             formula, new BigInteger(f.getConstBitVector().getValue().toString(10)));
       } else if (type.isFloatingPoint()) {
-        // TODO is this correct?
-        return visitor.visitConstant(formula, f.getConstFloatingPoint());
+        return visitor.visitConstant(formula, convertFloatingPoint(f));
       } else if (type.isRoundingMode()) {
         // TODO is this correct?
         return visitor.visitConstant(formula, f.getConstRoundingMode());
@@ -444,11 +440,11 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           .put(Kind.BITVECTOR_SDIV, FunctionDeclarationKind.BV_SDIV)
           .put(Kind.BITVECTOR_UDIV, FunctionDeclarationKind.BV_UDIV)
           .put(Kind.BITVECTOR_SREM, FunctionDeclarationKind.BV_SREM)
+          .put(Kind.BITVECTOR_UREM, FunctionDeclarationKind.BV_UREM)
+          .put(Kind.BITVECTOR_SMOD, FunctionDeclarationKind.BV_SMOD)
           .put(Kind.BITVECTOR_SHL, FunctionDeclarationKind.BV_SHL)
           .put(Kind.BITVECTOR_ASHR, FunctionDeclarationKind.BV_ASHR)
           .put(Kind.BITVECTOR_LSHR, FunctionDeclarationKind.BV_LSHR)
-          // TODO: find out where Kind.BITVECTOR_SMOD fits in here
-          .put(Kind.BITVECTOR_UREM, FunctionDeclarationKind.BV_UREM)
           .put(Kind.BITVECTOR_NOT, FunctionDeclarationKind.BV_NOT)
           .put(Kind.BITVECTOR_NEG, FunctionDeclarationKind.BV_NEG)
           .put(Kind.BITVECTOR_EXTRACT, FunctionDeclarationKind.BV_EXTRACT)
@@ -591,7 +587,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       }
 
     } else if (valueType.isFloatingPoint()) {
-      return parseFloatingPoint(value);
+      return convertFloatingPoint(value);
 
     } else if (valueType.isString()) {
       return value.getConstString().toString();
@@ -602,29 +598,26 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     }
   }
 
-  private Object parseFloatingPoint(Expr fpExpr) {
-    Matcher matcher = FLOATING_POINT_PATTERN.matcher(fpExpr.toString());
+  private FloatingPointNumber convertFloatingPoint(Expr fpExpr) {
+    final var matcher = FLOATING_POINT_PATTERN.matcher(fpExpr.toString());
     if (!matcher.matches()) {
       throw new NumberFormatException("Unknown floating-point format: " + fpExpr);
     }
 
-    FloatingPoint fp = fpExpr.getConstFloatingPoint();
-    FloatingPointSize fpType = fp.getT();
-    long expWidth = fpType.exponentWidth();
-    long mantWidth = fpType.significandWidth() - 1; // without sign bit
+    final var fp = fpExpr.getConstFloatingPoint();
+    final var fpType = fp.getT();
+    final var expWidth = Ints.checkedCast(fpType.exponentWidth());
+    final var mantWidth = Ints.checkedCast(fpType.significandWidth() - 1); // without sign bit
 
-    assert matcher.group("sign").length() == 1;
-    assert matcher.group("exp").length() == expWidth;
-    assert matcher.group("mant").length() == mantWidth;
+    final var sign = matcher.group("sign");
+    final var exp = matcher.group("exp");
+    final var mant = matcher.group("mant");
 
-    String str = matcher.group("sign") + matcher.group("exp") + matcher.group("mant");
-    if (expWidth == 11 && mantWidth == 52) {
-      return Double.longBitsToDouble(UnsignedLong.valueOf(str, 2).longValue());
-    } else if (expWidth == 8 && mantWidth == 23) {
-      return Float.intBitsToFloat(UnsignedInteger.valueOf(str, 2).intValue());
-    }
+    Preconditions.checkArgument(sign.length() == 1 && "01".contains(sign));
+    Preconditions.checkArgument(exp.length() == expWidth);
+    Preconditions.checkArgument(mant.length() == mantWidth);
 
-    // TODO to be fully correct, we would need to interpret this string
-    return fpExpr.toString();
+    return FloatingPointNumber.of(
+        sign.equals("1"), new BigInteger(exp, 2), new BigInteger(mant, 2), expWidth, mantWidth);
   }
 }

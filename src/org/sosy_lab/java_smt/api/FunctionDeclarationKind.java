@@ -138,6 +138,11 @@ public enum FunctionDeclarationKind {
   /** Unsigned remainder over bitvectors. */
   BV_UREM,
 
+  /**
+   * Signed modulo over bitvectors.
+   */
+  BV_SMOD,
+
   /** Multiplication over bitvectors. */
   BV_MUL,
 

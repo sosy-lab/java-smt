@@ -108,10 +108,17 @@ class SynchronizedBitvectorFormulaManager implements BitvectorFormulaManager {
   }
 
   @Override
-  public BitvectorFormula modulo(
+  public BitvectorFormula remainder(
       BitvectorFormula pNumber1, BitvectorFormula pNumber2, boolean pSigned) {
     synchronized (sync) {
-      return delegate.modulo(pNumber1, pNumber2, pSigned);
+      return delegate.remainder(pNumber1, pNumber2, pSigned);
+    }
+  }
+
+  @Override
+  public BitvectorFormula smodulo(BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
+    synchronized (sync) {
+      return delegate.smodulo(pNumber1, pNumber2);
     }
   }
 
@@ -201,6 +208,34 @@ class SynchronizedBitvectorFormulaManager implements BitvectorFormulaManager {
   public BitvectorFormula shiftLeft(BitvectorFormula pNumber, BitvectorFormula pToShift) {
     synchronized (sync) {
       return delegate.shiftLeft(pNumber, pToShift);
+    }
+  }
+
+  @Override
+  public BitvectorFormula rotateLeft(BitvectorFormula pNumber, int pToRotate) {
+    synchronized (sync) {
+      return delegate.rotateLeft(pNumber, pToRotate);
+    }
+  }
+
+  @Override
+  public BitvectorFormula rotateLeft(BitvectorFormula pNumber, BitvectorFormula pToRotate) {
+    synchronized (sync) {
+      return delegate.rotateLeft(pNumber, pToRotate);
+    }
+  }
+
+  @Override
+  public BitvectorFormula rotateRight(BitvectorFormula pNumber, int pToRotate) {
+    synchronized (sync) {
+      return delegate.rotateRight(pNumber, pToRotate);
+    }
+  }
+
+  @Override
+  public BitvectorFormula rotateRight(BitvectorFormula pNumber, BitvectorFormula pToRotate) {
+    synchronized (sync) {
+      return delegate.rotateRight(pNumber, pToRotate);
     }
   }
 

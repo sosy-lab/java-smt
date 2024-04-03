@@ -341,7 +341,6 @@ typedef void jvoid; // for symmetry to jint, jlong etc.
   if(retval == -1){ \
     const char *msg = yices_error_string(); \
     throwException(jenv, "java/lang/IllegalArgumentException", msg); \
-    return jretval; \
     goto out; \
   } \
   size_t sz = s_arg##num.size; \

@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.delegate.synchronize;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -92,6 +93,14 @@ class SynchronizedFloatingPointFormulaManager implements FloatingPointFormulaMan
       Rational pN, FloatingPointType pType, FloatingPointRoundingMode pFloatingPointRoundingMode) {
     synchronized (sync) {
       return delegate.makeNumber(pN, pType, pFloatingPointRoundingMode);
+    }
+  }
+
+  @Override
+  public FloatingPointFormula makeNumber(
+      BigInteger exponent, BigInteger mantissa, boolean signBit, FloatingPointType type) {
+    synchronized (sync) {
+      return delegate.makeNumber(exponent, mantissa, signBit, type);
     }
   }
 
@@ -294,6 +303,14 @@ class SynchronizedFloatingPointFormulaManager implements FloatingPointFormulaMan
       FloatingPointRoundingMode pFloatingPointRoundingMode) {
     synchronized (sync) {
       return delegate.multiply(pNumber1, pNumber2, pFloatingPointRoundingMode);
+    }
+  }
+
+  @Override
+  public FloatingPointFormula remainder(
+      FloatingPointFormula number1, FloatingPointFormula number2) {
+    synchronized (sync) {
+      return delegate.remainder(number1, number2);
     }
   }
 

@@ -91,7 +91,8 @@ SPDX-License-Identifier: Apache-2.0
 
     <target name="tests" depends="unit-tests-coverage" description="Run all tests"/>
 
-    <target name="publish" depends="tests, dist, publish-artifacts" description="Publish current version of JavaSMT to Ivy repository" />
+    <target name="publish" depends="dist, publish-artifacts"
+            description="Publish current version of JavaSMT to Ivy repository"/>
 
     <target name="documentation" depends="collect-options, javadoc" description="Build documentation"/>
 

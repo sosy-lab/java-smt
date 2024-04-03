@@ -68,14 +68,16 @@ public class BitwuzlaBitvectorFormulaManager
   }
 
   @Override
-  protected Long modulo(Long pParam1, Long pParam2, boolean signed) {
-    if (signed) {
-      return BitwuzlaJNI.bitwuzla_mk_term2(
-          BitwuzlaKind.BITWUZLA_KIND_BV_SREM.swigValue(), pParam1, pParam2);
-    } else {
-      return BitwuzlaJNI.bitwuzla_mk_term2(
-          BitwuzlaKind.BITWUZLA_KIND_BV_UREM.swigValue(), pParam1, pParam2);
-    }
+  protected Long remainder(Long pParam1, Long pParam2, boolean signed) {
+    BitwuzlaKind kind =
+        signed ? BitwuzlaKind.BITWUZLA_KIND_BV_SREM : BitwuzlaKind.BITWUZLA_KIND_BV_UREM;
+    return BitwuzlaJNI.bitwuzla_mk_term2(kind.swigValue(), pParam1, pParam2);
+  }
+
+  @Override
+  protected Long smodulo(Long pParam1, Long pParam2) {
+    return BitwuzlaJNI.bitwuzla_mk_term2(
+        BitwuzlaKind.BITWUZLA_KIND_BV_SMOD.swigValue(), pParam1, pParam2);
   }
 
   @Override
