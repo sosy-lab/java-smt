@@ -29,6 +29,7 @@ import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_
 import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_BV_SIGN_EXTEND;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_BV_SLE;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_BV_SLT;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_BV_SMOD;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_BV_SREM;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_BV_SUB;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_BV_UDIV;
@@ -264,6 +265,8 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Long, Long, Long, Bit
       return FunctionDeclarationKind.BV_ASHR;
     } else if (kind.equals(BITWUZLA_KIND_BV_CONCAT)) {
       return FunctionDeclarationKind.BV_CONCAT;
+    } else if (kind.equals(BITWUZLA_KIND_BV_SMOD)) {
+      return FunctionDeclarationKind.BV_SMOD;
     } else if (kind.equals(BITWUZLA_KIND_BV_MUL)) {
       return FunctionDeclarationKind.BV_MUL;
     } else if (kind.equals(BITWUZLA_KIND_BV_NEG)) {
