@@ -37,6 +37,7 @@ import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_
 import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_FP_TO_SBV;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaKind.BITWUZLA_KIND_FP_TO_UBV;
 
+import java.math.BigInteger;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
@@ -93,6 +94,16 @@ public class BitwuzlaFloatingPointManager
     } else {
       return makeNumberImpl(String.format("%f", n), type, pFloatingPointRoundingMode);
     }
+  }
+
+  @Override
+  protected Long makeNumberImpl(
+      BigInteger exponent,
+      BigInteger mantissa,
+      boolean signBit,
+      FloatingPointType type) {
+    // FIXME: Implement by converting the arguments to bitvectors?
+    throw new UnsupportedOperationException();
   }
 
   private long mkFpaSort(FloatingPointType pType) {
@@ -252,6 +263,12 @@ public class BitwuzlaFloatingPointManager
   protected Long multiply(Long pParam1, Long pParam2, Long pFloatingPointRoundingMode) {
     return BitwuzlaJNI.bitwuzla_mk_term3(
         BITWUZLA_KIND_FP_MUL.swigValue(), pFloatingPointRoundingMode, pParam1, pParam2);
+  }
+
+  @Override
+  protected Long remainder(Long pParam1, Long pParam2) {
+    return BitwuzlaJNI.bitwuzla_mk_term2(
+        BitwuzlaKind.BITWUZLA_KIND_FP_REM.swigValue(), pParam1, pParam2);
   }
 
   @Override
