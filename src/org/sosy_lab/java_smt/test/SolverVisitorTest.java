@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.sosy_lab.java_smt.api.FormulaType.getArrayType;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
@@ -304,7 +305,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     requireIntegers();
 
     ArrayFormulaType<IntegerFormula, IntegerFormula> arrayType =
-        ArrayFormulaType.getArrayType(FormulaType.IntegerType, FormulaType.IntegerType);
+        getArrayType(FormulaType.IntegerType, FormulaType.IntegerType);
     IntegerFormula index = imgr.makeNumber(1);
     IntegerFormula elem = imgr.makeNumber(123);
 
@@ -339,7 +340,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     requireArrays();
 
     ArrayFormulaType<IntegerFormula, IntegerFormula> arrayType =
-        ArrayFormulaType.getArrayType(FormulaType.IntegerType, FormulaType.IntegerType);
+        getArrayType(FormulaType.IntegerType, FormulaType.IntegerType);
     IntegerFormula index = imgr.makeNumber(1);
     IntegerFormula elem = imgr.makeNumber(123);
     IntegerFormula x = imgr.makeVariable("some_var");
