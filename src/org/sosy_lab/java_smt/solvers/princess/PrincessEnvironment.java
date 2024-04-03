@@ -12,6 +12,7 @@ import static scala.collection.JavaConverters.asJava;
 import static scala.collection.JavaConverters.collectionAsScalaIterableConverter;
 
 import ap.api.SimpleAPI;
+import ap.parameters.GlobalSettings;
 import ap.parser.BooleanCompactifier;
 import ap.parser.Environment.EnvironmentException;
 import ap.parser.IAtom;
@@ -26,11 +27,11 @@ import ap.parser.Parser2InputAbsy.TranslationException;
 import ap.parser.PartialEvaluator;
 import ap.parser.SMTLineariser;
 import ap.parser.SMTParser2InputAbsy.SMTFunctionType;
-import ap.parser.SMTParser2InputAbsy.SMTType;
+import ap.parser.SMTTypes.SMTType;
 import ap.terfor.ConstantTerm;
 import ap.terfor.preds.Predicate;
-import ap.theories.ExtArray;
-import ap.theories.ExtArray.ArraySort;
+import ap.theories.arrays.ExtArray;
+import ap.theories.arrays.ExtArray.ArraySort;
 import ap.theories.bitvectors.ModuloArithmetic;
 import ap.theories.rationals.Fractions.FractionSort$;
 import ap.types.Sort;
@@ -78,7 +79,6 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import scala.Tuple2;
 import scala.Tuple4;
 import scala.collection.immutable.Seq;
-import scala.collection.immutable.Set$;
 
 /**
  * This is a Wrapper around Princess. This Wrapper allows to set a logfile for all Smt-Queries
@@ -219,8 +219,7 @@ class PrincessEnvironment {
             SimpleAPI.apply$default$8(), // tightFunctionScopes
             SimpleAPI.apply$default$9(), // genTotalityAxioms
             new scala.Some<>(randomSeed), // randomSeed
-            Set$.MODULE$.empty() // empty Set<LOG_FLAG>, no internal logging
-            );
+            GlobalSettings.DEFAULT());
 
     if (constructProofs) { // needed for interpolation and unsat cores
       newApi.setConstructProofs(true);

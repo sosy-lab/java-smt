@@ -10,7 +10,7 @@ package org.sosy_lab.java_smt.solvers.princess;
 
 import ap.parser.IExpression;
 import ap.parser.ITerm;
-import ap.theories.ExtArray.ArraySort;
+import ap.theories.arrays.ExtArray.ArraySort;
 import ap.types.Sort;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
