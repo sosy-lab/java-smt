@@ -490,6 +490,18 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
           } else if (declKind == Z3_decl_kind.Z3_OP_DT_CONSTRUCTOR.toInt()) {
             return visitor.visitConstant(formula, convertValue(f));
           } // else: fall-through with a function application
+
+        } else if (arity == 3) {
+
+          // FP from BV
+          if (declKind == Z3_decl_kind.Z3_OP_FPA_FP.toInt()) {
+            final var signBv = Native.getAppArg(environment, f, 0);
+            final var expoBv = Native.getAppArg(environment, f, 1);
+            final var mantBv = Native.getAppArg(environment, f, 2);
+            if (isConstant(signBv) && isConstant(expoBv) && isConstant(mantBv)) {
+              return visitor.visitConstant(formula, convertValue(f));
+            }
+          }
         }
 
         // Function application with zero or more parameters
@@ -676,6 +688,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.BV_UREM;
       case Z3_OP_BSREM:
         return FunctionDeclarationKind.BV_SREM;
+      case Z3_OP_BSMOD:
+        return FunctionDeclarationKind.BV_SMOD;
       case Z3_OP_BSHL:
         return FunctionDeclarationKind.BV_SHL;
       case Z3_OP_BLSHR:
@@ -736,10 +750,10 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       case Z3_OP_FPA_TO_IEEE_BV:
         return FunctionDeclarationKind.FP_AS_IEEEBV;
       case Z3_OP_FPA_TO_FP:
+        // use the last argument. other arguments can be part of rounding or casting.
+        long arg = Native.getAppArg(environment, f, Native.getAppNumArgs(environment, f) - 1);
         Z3_sort_kind sortKind =
-            Z3_sort_kind.fromInt(
-                Native.getSortKind(
-                    environment, Native.getSort(environment, Native.getAppArg(environment, f, 1))));
+            Z3_sort_kind.fromInt(Native.getSortKind(environment, Native.getSort(environment, arg)));
         if (Z3_sort_kind.Z3_BV_SORT == sortKind) {
           return FunctionDeclarationKind.BV_SCASTTO_FP;
         } else {
@@ -818,6 +832,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     return Native.isNumeralAst(environment, value)
         || Native.isAlgebraicNumber(environment, value)
         || Native.isString(environment, value)
+        || isOP(environment, value, Z3_decl_kind.Z3_OP_FPA_FP) // FP from IEEE-BV
         || isOP(environment, value, Z3_decl_kind.Z3_OP_TRUE)
         || isOP(environment, value, Z3_decl_kind.Z3_OP_FALSE)
         || isOP(environment, value, Z3_decl_kind.Z3_OP_DT_CONSTRUCTOR); // enumeration value
@@ -871,7 +886,19 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   }
 
   private FloatingPointNumber convertFloatingPoint(FloatingPointType pType, Long pValue) {
-    if (Native.fpaIsNumeralInf(environment, pValue)) {
+    if (isOP(environment, pValue, Z3_decl_kind.Z3_OP_FPA_FP)) {
+      final var signBv = Native.getAppArg(environment, pValue, 0);
+      final var expoBv = Native.getAppArg(environment, pValue, 1);
+      final var mantBv = Native.getAppArg(environment, pValue, 2);
+      assert isConstant(signBv) && isConstant(expoBv) && isConstant(mantBv);
+      final var sign = Native.getNumeralString(environment, signBv);
+      assert "0".equals(sign) || "1".equals(sign);
+      final var expo = new BigInteger(Native.getNumeralString(environment, expoBv));
+      final var mant = new BigInteger(Native.getNumeralString(environment, mantBv));
+      return FloatingPointNumber.of(
+          "1".equals(sign), expo, mant, pType.getExponentSize(), pType.getMantissaSize());
+
+    } else if (Native.fpaIsNumeralInf(environment, pValue)) {
       // Floating Point Inf uses:
       //  - an sign for posiive/negative infinity,
       //  - "11..11" as exponent,
@@ -881,6 +908,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
           sign + "1".repeat(pType.getExponentSize()) + "0".repeat(pType.getMantissaSize()),
           pType.getExponentSize(),
           pType.getMantissaSize());
+
     } else if (Native.fpaIsNumeralNan(environment, pValue)) {
       // TODO We are underspecified here and choose several bits on our own.
       //  This is not sound, if we combine FP anf BV theory.
@@ -892,6 +920,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
           "0" + "1".repeat(pType.getExponentSize()) + "1".repeat(pType.getMantissaSize()),
           pType.getExponentSize(),
           pType.getMantissaSize());
+
     } else {
       boolean sign = getSign(pValue);
       var exponentBv = Native.fpaGetNumeralExponentBv(environment, pValue, true);

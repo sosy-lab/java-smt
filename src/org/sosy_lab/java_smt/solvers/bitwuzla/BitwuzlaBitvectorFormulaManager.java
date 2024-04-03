@@ -70,12 +70,13 @@ public class BitwuzlaBitvectorFormulaManager
   }
 
   @Override
-  protected Term modulo(Term pParam1, Term pParam2, boolean signed) {
-    if (signed) {
-      return termManager.mk_term(Kind.BV_SREM, pParam1, pParam2);
-    } else {
-      return termManager.mk_term(Kind.BV_UREM, pParam1, pParam2);
-    }
+  protected Term remainder(Term pParam1, Term pParam2, boolean signed) {
+    return termManager.mk_term(signed ? Kind.BV_SREM : Kind.BV_UREM, pParam1, pParam2);
+  }
+
+  @Override
+  protected Term smodulo(Term pParam1, Term pParam2) {
+    return termManager.mk_term(Kind.BV_SMOD, pParam1, pParam2);
   }
 
   @Override

@@ -29,7 +29,7 @@ import ap.parser.SMTParser2InputAbsy.SMTFunctionType;
 import ap.parser.SMTParser2InputAbsy.SMTType;
 import ap.terfor.ConstantTerm;
 import ap.terfor.preds.Predicate;
-import ap.theories.ExtArray;
+import ap.theories.ExtArray.ArraySort;
 import ap.theories.bitvectors.ModuloArithmetic;
 import ap.theories.rationals.Fractions.FractionSort$;
 import ap.types.Sort;
@@ -532,9 +532,9 @@ class PrincessEnvironment {
       return FormulaType.IntegerType;
     } else if (sort instanceof FractionSort$) {
       return FormulaType.RationalType;
-    } else if (sort instanceof ExtArray.ArraySort) {
-      Seq<Sort> indexSorts = ((ExtArray.ArraySort) sort).theory().indexSorts();
-      Sort elementSort = ((ExtArray.ArraySort) sort).theory().objSort();
+    } else if (sort instanceof ArraySort) {
+      Seq<Sort> indexSorts = ((ArraySort) sort).theory().indexSorts();
+      Sort elementSort = ((ArraySort) sort).theory().objSort();
       assert indexSorts.iterator().size() == 1 : "unexpected index type in Array type:" + sort;
       // assert indexSorts.size() == 1; // TODO Eclipse does not like simpler code.
       return FormulaType.getArrayType(
@@ -598,20 +598,20 @@ class PrincessEnvironment {
 
   public ITerm makeSelect(ITerm array, ITerm index) {
     List<ITerm> args = ImmutableList.of(array, index);
-    ExtArray.ArraySort arraySort = (ExtArray.ArraySort) Sort$.MODULE$.sortOf(array);
+    ArraySort arraySort = (ArraySort) Sort$.MODULE$.sortOf(array);
     return new IFunApp(arraySort.theory().select(), toSeq(args));
   }
 
   public ITerm makeStore(ITerm array, ITerm index, ITerm value) {
     List<ITerm> args = ImmutableList.of(array, index, value);
-    ExtArray.ArraySort arraySort = (ExtArray.ArraySort) Sort$.MODULE$.sortOf(array);
+    ArraySort arraySort = (ArraySort) Sort$.MODULE$.sortOf(array);
     return new IFunApp(arraySort.theory().store(), toSeq(args));
   }
 
   public boolean hasArrayType(IExpression exp) {
     if (exp instanceof ITerm) {
       final ITerm t = (ITerm) exp;
-      return Sort$.MODULE$.sortOf(t) instanceof ExtArray.ArraySort;
+      return Sort$.MODULE$.sortOf(t) instanceof ArraySort;
     } else {
       return false;
     }

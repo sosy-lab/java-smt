@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Random;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
@@ -76,6 +77,16 @@ public class BitwuzlaFloatingPointManager
   @Override
   protected Term makeNumberImpl(double n, FloatingPointType type, Term pFloatingPointRoundingMode) {
     return makeNumberImpl(String.valueOf(n), type, pFloatingPointRoundingMode);
+  }
+
+  @Override
+  protected Term makeNumberImpl(
+      BigInteger exponent,
+      BigInteger mantissa,
+      boolean signBit,
+      FloatingPointType type) {
+    // FIXME: Implement by converting the arguments to bitvectors?
+    throw new UnsupportedOperationException();
   }
 
   private Sort mkFpaSort(FloatingPointType pType) {
@@ -277,6 +288,11 @@ public class BitwuzlaFloatingPointManager
   @Override
   protected Term multiply(Term pParam1, Term pParam2, Term pFloatingPointRoundingMode) {
     return termManager.mk_term(Kind.FP_MUL, pFloatingPointRoundingMode, pParam1, pParam2);
+  }
+
+  @Override
+  protected Term remainder(Term pParam1, Term pParam2) {
+    return termManager.mk_term(Kind.FP_REM, pParam1, pParam2);
   }
 
   @Override

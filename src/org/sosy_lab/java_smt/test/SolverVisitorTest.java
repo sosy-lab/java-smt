@@ -11,7 +11,10 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.common.truth.Truth;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -21,6 +24,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -31,6 +35,7 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
+import org.sosy_lab.java_smt.api.FloatingPointNumber;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -193,8 +198,9 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
               bvmgr.xor(x, y),
               bvmgr.divide(x, y, true),
               bvmgr.divide(x, y, false),
-              bvmgr.modulo(x, y, true),
-              bvmgr.modulo(x, y, false),
+              bvmgr.remainder(x, y, true),
+              bvmgr.remainder(x, y, false),
+              bvmgr.smodulo(x, y),
               bvmgr.not(x),
               bvmgr.negate(x),
               bvmgr.extract(x, 7, 5),
@@ -300,6 +306,55 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
+  public void floatConstantVisit() {
+    requireFloats();
+
+    var testValues =
+        ImmutableMap.<Double, String>builder()
+            .put(Double.NEGATIVE_INFINITY, "1111110000000000")
+            .put(-1d, "1011110000000000")
+            .put(-2d, "1100000000000000")
+            .put(0.0, "0000000000000000")
+            .put(-0.0, "1000000000000000")
+            .put(0.00001, "0000000010101000")
+            .put(1d, "0011110000000000")
+            .put(2d, "0100000000000000")
+            .put(5.32, "0100010101010010")
+            .put(10d, "0100100100000000")
+            .put(Double.POSITIVE_INFINITY, "0111110000000000")
+            .buildOrThrow();
+
+    for (Entry<Double, String> entry : testValues.entrySet()) {
+      checkFloatConstant(
+          FormulaType.getDoublePrecisionFloatingPointType(),
+          entry.getKey(),
+          Strings.padStart(
+              Long.toBinaryString(Double.doubleToRawLongBits(entry.getKey())), 64, '0'));
+      checkFloatConstant(
+          FormulaType.getSinglePrecisionFloatingPointType(),
+          entry.getKey().floatValue(),
+          Strings.padStart(
+              Integer.toBinaryString(Float.floatToRawIntBits(entry.getKey().floatValue())),
+              32,
+              '0'));
+      checkFloatConstant(FormulaType.getFloatingPointType(5, 10), entry.getKey(), entry.getValue());
+    }
+  }
+
+  private void checkFloatConstant(FloatingPointType prec, double value, String bits) {
+    FloatingPointNumber fp =
+        FloatingPointNumber.of(bits, prec.getExponentSize(), prec.getMantissaSize());
+
+    ConstantsVisitor visitor = new ConstantsVisitor();
+    mgr.visit(fpmgr.makeNumber(value, prec), visitor);
+    assertThat(visitor.found).containsExactly(fp);
+
+    ConstantsVisitor visitor2 = new ConstantsVisitor();
+    mgr.visit(fpmgr.makeNumber(fp.getExponent(), fp.getMantissa(), fp.getSign(), prec), visitor2);
+    assertThat(visitor2.found).containsExactly(fp);
+  }
+
+  @Test
   public void floatIdVisit() {
     requireFloats();
     FloatingPointType fp = FormulaType.getSinglePrecisionFloatingPointType();
@@ -376,6 +431,32 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
+  public void fpToBvTest() {
+    requireFloats();
+    requireBitvectors();
+    assume()
+        .withMessage("FP-to-BV conversion not available for CVC4 and CVC5")
+        .that(solverToUse())
+        .isNoneOf(Solvers.CVC4, Solvers.CVC5);
+
+    var fpType = FormulaType.getFloatingPointType(5, 10);
+    var visitor =
+        new DefaultFormulaVisitor<Void>() {
+          @Override
+          protected Void visitDefault(Formula f) {
+            return null;
+          }
+        };
+
+    for (int num : List.of(0, 1, 4, 16, 256, 1024)) {
+      Formula bv2fp = fpmgr.fromIeeeBitvector(bvmgr.makeBitvector(16, num), fpType);
+      mgr.visit(bv2fp, visitor);
+      Formula fp2bv = fpmgr.toIeeeBitvector(fpmgr.makeNumber(num, fpType));
+      mgr.visit(fp2bv, visitor);
+    }
+  }
+
+  @Test
   public void bvVisit() throws SolverException, InterruptedException {
     requireBitvectors();
     BitvectorFormula x = bvmgr.makeVariable(5, "x");
@@ -394,8 +475,8 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     BitvectorFormula x = bvmgr.makeVariable(5, "x");
     BitvectorFormula y = bvmgr.makeVariable(5, "y");
 
-    for (Formula f :
-        ImmutableList.of(
+    final List<Formula> formulas =
+        Lists.newArrayList(
             bvmgr.lessOrEquals(x, y, true),
             bvmgr.lessOrEquals(x, y, false),
             bvmgr.lessThan(x, y, true),
@@ -409,14 +490,19 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
             bvmgr.multiply(x, y),
             bvmgr.divide(x, y, true),
             bvmgr.divide(x, y, false),
-            bvmgr.modulo(x, y, true),
-            bvmgr.modulo(x, y, false),
+            bvmgr.remainder(x, y, true),
+            bvmgr.remainder(x, y, false),
             bvmgr.and(x, y),
             bvmgr.or(x, y),
             bvmgr.xor(x, y),
             bvmgr.equal(x, y),
             bvmgr.not(x),
-            bvmgr.negate(y))) {
+            bvmgr.negate(y));
+    if (Solvers.MATHSAT5 != solver) {
+      formulas.add(bvmgr.smodulo(x, y));
+    }
+
+    for (Formula f : formulas) {
       mgr.visitRecursively(
           f,
           new DefaultFormulaVisitor<>() {

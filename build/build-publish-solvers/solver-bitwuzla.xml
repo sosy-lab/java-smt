@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+This file is part of JavaSMT,
+an API wrapper for a collection of SMT solvers:
+https://github.com/sosy-lab/java-smt
+
+SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<!-- vim: set tabstop=8 shiftwidth=4 expandtab sts=4 filetype=ant fdm=marker: -->
+<project name="publish-solvers-cvc4" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+
+    <import file="macros.xml"/>
+
+    <target name="package-bitwuzla" depends="">
+        <fail unless="bitwuzla.path">
+            Please specify the path to Bitwuzla with the flag -Dbitwuzla.path=/path/to/bitwuzla.
+            The path has to point to the root Bitwuzla folder, i.e.,
+            a checkout of the official git repositoy from 'https://github.com/bitwuzla/bitwuzla'.
+            Note that shell substitutions do not work and a full absolute path has to be specified.
+        </fail>
+        <fail unless="bitwuzla.customRev">
+            Please specify a custom revision with the flag -Dbitwuzla.customRev=XXX.
+            The custom revision has to be unique amongst the already known version
+            numbers from the ivy repository. The script will append the git revision.
+        </fail>
+        <fail unless="gmp.path">
+            Please specify the path to GMP with the flag -Dgmp.path=/path/to/gmp.
+            The path has to point to the root GMP folder with version equal to or larger than 6.1.
+            Note that shell substitutions do not work and a full absolute path has to be specified.
+        </fail>
+
+        <!-- get a naive version -->
+        <exec executable="git" dir="${bitwuzla.path}" outputproperty="bitwuzla.revision"
+              failonerror="true">
+            <arg value="show"/>
+            <arg value="-s"/>
+            <arg value="--format=%h"/>
+        </exec>
+        <property name="bitwuzla.version" value="${bitwuzla.customRev}-g${bitwuzla.revision}"/>
+        <echo message="Building Bitwuzla in version '${bitwuzla.version}'"/>
+
+        <!-- path to our local directory in lib/native -->
+        <property name="source.path" value="${user.dir}/lib/native/source/libbitwuzla"/>
+
+        <!-- build bitwuzla -->
+        <exec executable="./configure.py" dir="${bitwuzla.path}" failonerror="true">
+            <arg value="--shared"/>
+            <arg value="--wipe"/>
+            <arg value="--prefix"/>
+            <arg value="${bitwuzla.path}/install"/>
+        </exec>
+        <exec executable="meson" dir="${bitwuzla.path}/build/" failonerror="true">
+            <arg value="compile"/>
+        </exec>
+        <exec executable="meson" dir="${bitwuzla.path}/build/" failonerror="true">
+            <arg value="install"/>
+        </exec>
+
+        <!-- copy bitwuzla include files to the source tree -->
+        <delete dir="${source.path}/include" quiet="true"/>
+        <copy todir="${source.path}">
+            <fileset dir="${bitwuzla.path}/install" includes="include/**"/>
+        </copy>
+
+        <!-- create ouput directory for the swig proxies -->
+        <delete dir="$source.path}/src" quiet="true"/>
+        <mkdir dir="${source.path}/src/org/sosy_lab/java_smt/solvers/bitwuzla/api"/>
+
+        <!-- run swig to generate java files and the c wrapper -->
+        <exec executable="swig" dir="${source.path}" failonerror="true">
+            <arg value="-java"/>
+            <arg value="-c++"/>
+            <arg value="-package"/>
+            <arg value="org.sosy_lab.java_smt.solvers.bitwuzla.api"/>
+            <arg value="-outdir"/>
+            <arg value="src/org/sosy_lab/java_smt/solvers/bitwuzla/api"/>
+            <arg value="-o"/>
+            <arg value="bitwuzla_wrap.cpp"/>
+            <arg value="bitwuzla.i"/>
+        </exec>
+
+        <!-- apply patch for the phantom reference issue -->
+        <!-- FIXME: This will lead to memory leaks. We should look for a proper fix. -->
+        <exec executable="patch" failonerror="true">
+            <arg value="-p0"/>
+            <arg value="-i"/>
+            <arg value="lib/native/source/libbitwuzla/phantomReferences.patch"/>
+        </exec>
+
+        <!-- compile java proxies and create jar file -->
+        <mkdir dir="${source.path}/build"/>
+        <javac srcdir="${source.path}/src/" destdir="${source.path}/build" includeantruntime="false"
+               failonerror="true">
+            <include name="org/sosy_lab/java_smt/solvers/bitwuzla/api/*.java"/>
+        </javac>
+        <jar destfile="bitwuzla-${bitwuzla.version}.jar" basedir="${source.path}/build"/>
+        <delete dir="${source.path}/build"/>
+
+        <!-- generate and package javadoc documentation -->
+        <delete dir="${source.path}/doc"/>
+        <mkdir dir="${source.path}/doc"/>
+        <javadoc sourcepath="${source.path}/src" destdir="${source.path}/doc"/>
+        <jar destfile="bitwuzla-${bitwuzla.version}-javadoc.jar" basedir="${source.path}/doc"/>
+        <delete dir="${source.path}/doc"/>
+
+        <!-- package swig generated source code -->
+        <jar destfile="bitwuzla-${bitwuzla.version}-sources.jar" basedir="${source.path}/src"/>
+
+        <!-- compile the swig wrapper -->
+        <exec executable="g++" dir="${source.path}" failonerror="true">
+            <arg value="-fPIC"/>
+            <arg value="-c"/>
+            <arg value="bitwuzla_wrap.cpp"/>
+            <arg value="-I${source.path}/include"/>
+            <arg value="-I${gmp.path}"/>
+            <arg value="-I${java.home}/include"/>
+            <arg value="-I${java.home}/include/linux"/>
+        </exec>
+
+        <!-- link the wrapper to create libbitwuzlaJNI.so -->
+        <exec executable="g++" dir="${source.path}" failonerror="true">
+            <arg value="-shared"/>
+            <arg value="-o"/>
+            <arg value="libbitwuzlaJNI.so"/>
+            <arg value="bitwuzla_wrap.o"/>
+            <arg value="-L${bitwuzla.path}/install/lib/x86_64-linux-gnu"/>
+            <arg value="-L${gmp.path}/.libs"/>
+            <arg value="-lbitwuzla"/>
+            <arg value="-lgmp"/>
+            <arg value="-Wl,-z,defs"/>
+        </exec>
+
+        <!-- copy library files into directory to be published for Ivy -->
+        <move file="${source.path}/libbitwuzlaJNI.so"
+              tofile="libbitwuzlaJNI-${bitwuzla.version}.so"
+              failonerror="true"/>
+        <copy file="${bitwuzla.path}/build/src/libbitwuzla.so.0"
+              tofile="libbitwuzla-${bitwuzla.version}.so"
+              failonerror="true"/>
+        <copy file="${bitwuzla.path}/build/src/lib/libbitwuzlals.so"
+              tofile="libbitwuzlals-${bitwuzla.version}.so"
+              failonerror="true"/>
+        <copy file="${bitwuzla.path}/build/src/lib/libbitwuzlabv.so"
+              tofile="libbitwuzlabv-${bitwuzla.version}.so"
+              failonerror="true"/>
+        <copy file="${bitwuzla.path}/build/src/lib/libbitwuzlabb.so"
+              tofile="libbitwuzlabb-${bitwuzla.version}.so"
+              failonerror="true"/>
+        <copy file="${gmp.path}/.libs/libgmp.so.10.5.0"
+              tofile="libgmp-${bitwuzla.version}.so"
+              failonerror="true"/>
+
+        <!-- patch libraries -->
+        <exec executable="patchelf" failonerror="true">
+            <arg value="--set-rpath"/>
+            <arg value="$ORIGIN"/>
+            <arg value="libgmp-${bitwuzla.version}.so"/>
+        </exec>
+        <exec executable="patchelf" failonerror="true">
+            <arg value="--set-rpath"/>
+            <arg value="$ORIGIN"/>
+            <arg value="libbitwuzlabb-${bitwuzla.version}.so"/>
+        </exec>
+        <exec executable="patchelf" failonerror="true">
+            <arg value="--set-rpath"/>
+            <arg value="$ORIGIN"/>
+            <arg value="--replace-needed"/>
+            <arg value="libgmp.so.10"/>
+            <arg value="libgmp.so"/>
+            <arg value="libbitwuzlabv-${bitwuzla.version}.so"/>
+        </exec>
+        <exec executable="patchelf" failonerror="true">
+            <arg value="--set-rpath"/>
+            <arg value="$ORIGIN"/>
+            <arg value="--replace-needed"/>
+            <arg value="libgmp.so.10"/>
+            <arg value="libgmp.so"/>
+            <arg value="libbitwuzlals-${bitwuzla.version}.so"/>
+        </exec>
+        <exec executable="patchelf" failonerror="true">
+            <arg value="--set-rpath"/>
+            <arg value="$ORIGIN"/>
+            <arg value="--replace-needed"/>
+            <arg value="libgmp.so.10"/>
+            <arg value="libgmp.so"/>
+            <arg value="libbitwuzla-${bitwuzla.version}.so"/>
+        </exec>
+        <exec executable="patchelf" failonerror="true">
+            <arg value="--set-rpath"/>
+            <arg value="$ORIGIN"/>
+            <arg value="--replace-needed"/>
+            <arg value="libbitwuzla.so.0"/>
+            <arg value="libbitwuzla.so"/>
+            <arg value="--replace-needed"/>
+            <arg value="libgmp.so.10"/>
+            <arg value="libgmp.so"/>
+            <arg value="libbitwuzlaJNI-${bitwuzla.version}.so"/>
+        </exec>
+        <!-- We need to run this twice? -->
+        <exec executable="patchelf" failonerror="true">
+            <arg value="--set-rpath"/>
+            <arg value="$ORIGIN"/>
+            <arg value="--replace-needed"/>
+            <arg value="libbitwuzla.so.0"/>
+            <arg value="libbitwuzla.so"/>
+            <arg value="--replace-needed"/>
+            <arg value="libgmp.so.10"/>
+            <arg value="libgmp.so"/>
+            <arg value="libbitwuzlaJNI-${bitwuzla.version}.so"/>
+        </exec>
+    </target>
+
+
+    <target name="publish-cvc5" depends="package-cvc5, load-ivy"
+            description="Publish Bitwuzla binaries to Ivy repository.">
+        <ivy:resolve conf="solver-bitwuzla" file="solvers_ivy_conf/ivy_bitwuzla.xml"/>
+        <publishToRepository solverName="Bitwuzla" solverVersion="${bitwuzla.version}"/>
+    </target>
+</project>

@@ -403,11 +403,10 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
         return visitor.visitConstant(formula, new BigInteger(f.getBitVectorValue(), 2));
 
       } else if (f.isFloatingPointValue()) {
-        // String is easier to parse here
-        return visitor.visitConstant(formula, f.toString());
+        return visitor.visitConstant(formula, convertFloatingPoint(f));
 
-      } else if (f.getKind() == Kind.CONST_ROUNDINGMODE) {
-        return visitor.visitConstant(formula, f.toString());
+      } else if (f.isRoundingModeValue()) {
+        return visitor.visitConstant(formula, f.getRoundingModeValue());
 
       } else if (f.getKind() == Kind.VARIABLE) {
         // BOUND vars are used for all vars that are bound to a quantifier in CVC5.
@@ -557,8 +556,8 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
           .put(Kind.BITVECTOR_SDIV, FunctionDeclarationKind.BV_SDIV)
           .put(Kind.BITVECTOR_UDIV, FunctionDeclarationKind.BV_UDIV)
           .put(Kind.BITVECTOR_SREM, FunctionDeclarationKind.BV_SREM)
-          // TODO: find out where Kind.BITVECTOR_SMOD fits in here
           .put(Kind.BITVECTOR_UREM, FunctionDeclarationKind.BV_UREM)
+          .put(Kind.BITVECTOR_SMOD, FunctionDeclarationKind.BV_SMOD)
           .put(Kind.BITVECTOR_NOT, FunctionDeclarationKind.BV_NOT)
           .put(Kind.BITVECTOR_NEG, FunctionDeclarationKind.BV_NEG)
           .put(Kind.BITVECTOR_EXTRACT, FunctionDeclarationKind.BV_EXTRACT)
