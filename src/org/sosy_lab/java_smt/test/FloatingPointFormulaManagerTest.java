@@ -736,9 +736,9 @@ public class FloatingPointFormulaManagerTest
   @Test
   public void fpIeeeConversionTypes() {
     assume()
-        .withMessage("FP-to-BV conversion not available for CVC4 and CVC5")
+        .withMessage("FP-to-BV conversion not available for %s", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.CVC4, Solvers.CVC5);
+        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.BITWUZLA);
 
     FloatingPointFormula var = fpmgr.makeVariable("var", singlePrecType);
     assertThat(mgr.getFormulaType(fpmgr.toIeeeBitvector(var)))
@@ -748,7 +748,7 @@ public class FloatingPointFormulaManagerTest
   @Test
   public void fpIeeeConversion() throws SolverException, InterruptedException {
     assume()
-        .withMessage("FP-to-BV conversion not available for CVC4 and CVC5")
+        .withMessage("FP-to-BV conversion not available for %s", solverToUse())
         .that(solverToUse())
         .isNoneOf(Solvers.CVC4, Solvers.CVC5);
 
@@ -762,7 +762,7 @@ public class FloatingPointFormulaManagerTest
   @Test
   public void ieeeFpConversion() throws SolverException, InterruptedException {
     assume()
-        .withMessage("FP-to-BV conversion not available for CVC4 and CVC5")
+        .withMessage("FP-to-BV conversion not available for %s", solverToUse())
         .that(solverToUse())
         .isNoneOf(Solvers.CVC4, Solvers.CVC5);
 

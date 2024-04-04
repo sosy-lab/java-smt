@@ -65,13 +65,18 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
 
   @Override
   public FloatingPointFormula makeNumber(Rational n, FormulaType.FloatingPointType type) {
-    return wrap(makeNumberImpl(n.toString(), type, getDefaultRoundingMode()));
+    return wrap(makeNumberImpl(n, type, getDefaultRoundingMode()));
   }
 
   @Override
   public FloatingPointFormula makeNumber(
       Rational n, FloatingPointType type, FloatingPointRoundingMode pFloatingPointRoundingMode) {
-    return wrap(makeNumberImpl(n.toString(), type, getRoundingMode(pFloatingPointRoundingMode)));
+    return wrap(makeNumberImpl(n, type, getRoundingMode(pFloatingPointRoundingMode)));
+  }
+
+  public TFormulaInfo makeNumberImpl(
+      Rational n, FormulaType.FloatingPointType type, TFormulaInfo pFloatingPointRoundingMode) {
+    return makeNumberImpl(n.toString(), type, pFloatingPointRoundingMode);
   }
 
   @Override
