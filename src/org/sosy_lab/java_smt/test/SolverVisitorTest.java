@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.sosy_lab.java_smt.api.FormulaType.getArrayType;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
@@ -32,6 +33,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
@@ -39,6 +41,7 @@ import org.sosy_lab.java_smt.api.FloatingPointNumber;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
@@ -58,12 +61,13 @@ import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   /** visit a formula and fail on OTHER, i.e., unexpected function declaration type. */
-  private final class FunctionDeclarationVisitorNoOther extends DefaultFormulaVisitor<Formula> {
+  private final class FunctionDeclarationVisitorNoOther
+      extends DefaultFormulaVisitor<List<FunctionDeclarationKind>> {
 
     private final List<FunctionDeclarationKind> found = new ArrayList<>();
 
     @Override
-    public Formula visitFunction(
+    public List<FunctionDeclarationKind> visitFunction(
         Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
       found.add(functionDeclaration.getKind());
       Truth.assert_()
@@ -79,18 +83,19 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     }
 
     @Override
-    protected Formula visitDefault(Formula pF) {
-      return pF;
+    protected List<FunctionDeclarationKind> visitDefault(Formula pF) {
+      return found;
     }
   }
 
   /** visit a formula and fail on UF, i.e., uninterpreted function declaration type. */
-  private final class FunctionDeclarationVisitorNoUF extends DefaultFormulaVisitor<Formula> {
+  private final class FunctionDeclarationVisitorNoUF
+      extends DefaultFormulaVisitor<List<FunctionDeclarationKind>> {
 
     private final List<FunctionDeclarationKind> found = new ArrayList<>();
 
     @Override
-    public Formula visitFunction(
+    public List<FunctionDeclarationKind> visitFunction(
         Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
       found.add(functionDeclaration.getKind());
       Truth.assert_()
@@ -106,25 +111,45 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     }
 
     @Override
-    protected Formula visitDefault(Formula pF) {
-      return pF;
+    protected List<FunctionDeclarationKind> visitDefault(Formula pF) {
+      return found;
     }
   }
 
   /** visit only constants and ignore other operations. */
-  private static final class ConstantsVisitor extends DefaultFormulaVisitor<Formula> {
+  private final class ConstantsVisitor extends DefaultFormulaVisitor<List<Object>> {
 
+    private final boolean recursive;
     private final List<Object> found = new ArrayList<>();
 
+    ConstantsVisitor(boolean recursive) {
+      this.recursive = recursive;
+    }
+
+    ConstantsVisitor() {
+      this.recursive = false;
+    }
+
     @Override
-    public Formula visitConstant(Formula f, Object value) {
+    public List<Object> visitConstant(Formula f, Object value) {
       found.add(value);
       return visitDefault(f);
     }
 
     @Override
-    protected Formula visitDefault(Formula pF) {
-      return pF;
+    public List<Object> visitFunction(
+        Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
+      if (recursive) {
+        for (Formula arg : args) {
+          mgr.visit(arg, this);
+        }
+      }
+      return visitDefault(f);
+    }
+
+    @Override
+    protected List<Object> visitDefault(Formula pF) {
+      return found;
     }
   }
 
@@ -272,6 +297,74 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
       mgr.visit(rmgr.makeNumber(Rational.ofLongs(n, 321)), visitor);
       assertThat(visitor.found).containsExactly(Rational.ofLongs(n, 321));
     }
+  }
+
+  @Test
+  public void arrayVisit() {
+    requireArrays();
+    requireIntegers();
+
+    ArrayFormulaType<IntegerFormula, IntegerFormula> arrayType =
+        getArrayType(FormulaType.IntegerType, FormulaType.IntegerType);
+    IntegerFormula index = imgr.makeNumber(1);
+    IntegerFormula elem = imgr.makeNumber(123);
+
+    ArrayFormula<IntegerFormula, IntegerFormula> arr = amgr.makeArray("some_array", arrayType);
+    IntegerFormula selectedElem = amgr.select(arr, index);
+    assertThat(mgr.visit(selectedElem, new FunctionDeclarationVisitorNoOther()))
+        .containsExactly(FunctionDeclarationKind.SELECT);
+    assertThat(mgr.visit(selectedElem, new ConstantsVisitor(true)))
+        .containsExactly(BigInteger.valueOf(1));
+
+    ArrayFormula<IntegerFormula, IntegerFormula> store = amgr.store(arr, index, elem);
+    assertThat(mgr.visit(store, new FunctionDeclarationVisitorNoOther()))
+        .containsExactly(FunctionDeclarationKind.STORE);
+    assertThat(mgr.visit(store, new ConstantsVisitor(true)))
+        .containsExactly(BigInteger.valueOf(1), BigInteger.valueOf(123));
+
+    assume()
+        .withMessage("Solver %s does not support initialization of arrays", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.OPENSMT);
+
+    ArrayFormula<IntegerFormula, IntegerFormula> initializedArr = amgr.makeArray(arrayType, elem);
+    assertThat(mgr.visit(initializedArr, new FunctionDeclarationVisitorNoOther()))
+        .containsExactly(FunctionDeclarationKind.CONST);
+    assertThat(mgr.visit(initializedArr, new ConstantsVisitor(true)))
+        .containsExactly(BigInteger.valueOf(123));
+  }
+
+  @Test
+  public void arrayTransform() throws SolverException, InterruptedException {
+    requireArrays();
+    requireArrays();
+
+    ArrayFormulaType<IntegerFormula, IntegerFormula> arrayType =
+        getArrayType(FormulaType.IntegerType, FormulaType.IntegerType);
+    IntegerFormula index = imgr.makeNumber(1);
+    IntegerFormula elem = imgr.makeNumber(123);
+    IntegerFormula x = imgr.makeVariable("some_var");
+
+    ArrayFormula<IntegerFormula, IntegerFormula> arr = amgr.makeArray("some_array", arrayType);
+    BooleanFormula f = imgr.equal(amgr.select(arr, index), x);
+    BooleanFormula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
+    assertThat(f2).isEqualTo(f);
+    assertThatFormula(f).isEquivalentTo(f2);
+
+    BooleanFormula f3 = amgr.equivalence(amgr.store(arr, index, elem), arr);
+    BooleanFormula f4 = mgr.transformRecursively(f3, new FormulaTransformationVisitor(mgr) {});
+    assertThat(f4).isEqualTo(f3);
+    assertThatFormula(f3).isEquivalentTo(f4);
+
+    assume()
+        .withMessage("Solver %s does not support initialization of arrays", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.OPENSMT);
+
+    BooleanFormula f5 = amgr.equivalence(amgr.makeArray(arrayType, elem), arr);
+    BooleanFormula f6 = mgr.transformRecursively(f5, new FormulaTransformationVisitor(mgr) {});
+    assertThat(f6).isEqualTo(f5);
+    assertThatFormula(f5).isEquivalentTo(f6);
   }
 
   @Test

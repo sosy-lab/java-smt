@@ -10,13 +10,14 @@ package org.sosy_lab.java_smt.solvers.princess;
 
 import ap.parser.IExpression;
 import ap.parser.ITerm;
+import ap.theories.arrays.ExtArray.ArraySort;
 import ap.types.Sort;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
+@SuppressWarnings("MethodTypeParameterName")
 class PrincessArrayFormulaManager
     extends AbstractArrayFormulaManager<
         IExpression, Sort, PrincessEnvironment, PrincessFunctionDeclaration> {
@@ -44,11 +45,15 @@ class PrincessArrayFormulaManager
   @SuppressWarnings("MethodTypeParameterName")
   protected <TI extends Formula, TE extends Formula> IExpression internalMakeArray(
       String pName, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
-    final ArrayFormulaType<TI, TE> arrayFormulaType =
-        FormulaType.getArrayType(pIndexType, pElementType);
-    final Sort arrayType = toSolverType(arrayFormulaType);
-
+    final Sort arrayType = toSolverType(FormulaType.getArrayType(pIndexType, pElementType));
     return getFormulaCreator().makeVariable(arrayType, pName);
+  }
+
+  @Override
+  protected <TI extends Formula, TE extends Formula> IExpression internalMakeArray(
+      FormulaType<TI> pIndexType, FormulaType<TE> pElementType, IExpression elseElem) {
+    final Sort arrayType = toSolverType(FormulaType.getArrayType(pIndexType, pElementType));
+    return env.makeConstArray((ArraySort) arrayType, (ITerm) elseElem);
   }
 
   @Override

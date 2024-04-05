@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -311,6 +311,8 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
         return FunctionDeclarationKind.SELECT;
       case "store":
         return FunctionDeclarationKind.STORE;
+      case "const":
+        return FunctionDeclarationKind.CONST;
       case "*":
         return FunctionDeclarationKind.MUL;
       case "+":

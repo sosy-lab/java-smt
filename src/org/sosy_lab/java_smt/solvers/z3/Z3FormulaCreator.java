@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -629,6 +629,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.STORE;
       case Z3_OP_SELECT:
         return FunctionDeclarationKind.SELECT;
+      case Z3_OP_CONST_ARRAY:
+        return FunctionDeclarationKind.CONST;
 
       case Z3_OP_TRUE:
       case Z3_OP_FALSE:

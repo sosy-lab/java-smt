@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2022 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -408,6 +408,18 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
       } else if (f.isRoundingModeValue()) {
         return visitor.visitConstant(formula, f.getRoundingModeValue());
 
+      } else if (f.isConstArray()) {
+        Term constant = f.getConstArrayBase();
+        return visitor.visitFunction(
+            formula,
+            ImmutableList.of(encapsulate(constant)),
+            FunctionDeclarationImpl.of(
+                getName(f),
+                getDeclarationKind(f),
+                ImmutableList.of(getFormulaTypeFromTermType(constant.getSort())),
+                getFormulaType(f),
+                f.getKind()));
+
       } else if (f.getKind() == Kind.VARIABLE) {
         // BOUND vars are used for all vars that are bound to a quantifier in CVC5.
         // We resubstitute them back to the original free.
@@ -623,6 +635,9 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
           .put(Kind.REGEXP_INTER, FunctionDeclarationKind.RE_INTERSECT)
           .put(Kind.REGEXP_COMPLEMENT, FunctionDeclarationKind.RE_COMPLEMENT)
           .put(Kind.REGEXP_DIFF, FunctionDeclarationKind.RE_DIFFERENCE)
+          .put(Kind.SELECT, FunctionDeclarationKind.SELECT)
+          .put(Kind.STORE, FunctionDeclarationKind.STORE)
+          .put(Kind.CONST_ARRAY, FunctionDeclarationKind.CONST)
           .build();
 
   private FunctionDeclarationKind getDeclarationKind(Term f) {
