@@ -61,6 +61,12 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="install"/>
         </exec>
 
+        <!-- copy bitwuzla include files to the source tree -->
+        <delete dir="${source.path}/include" quiet="true"/>
+        <copy todir="${source.path}">
+            <fileset dir="${bitwuzla.path}/install" includes="include/**"/>
+        </copy>
+
         <!-- check if -Dbitwuzla.rebuildWrapper=on was used-->
         <condition property="rebuild">
             <istrue value="${bitwuzla.rebuildWrapper}"/>
@@ -69,12 +75,6 @@ SPDX-License-Identifier: Apache-2.0
 
     <!-- Run swig to generate a new wrapper. Only executed if rebuildWrapper was specified. -->
     <target name="build-wrapper" if="rebuild" depends="build-bitwuzla">
-        <!-- copy bitwuzla include files to the source tree -->
-        <delete dir="${source.path}/include" quiet="true"/>
-        <copy todir="${source.path}">
-            <fileset dir="${bitwuzla.path}/install" includes="include/**"/>
-        </copy>
-
         <!-- create ouput directory for the swig proxies -->
         <delete dir="$source.path}/src" quiet="true"/>
         <mkdir dir="${source.path}/src/org/sosy_lab/java_smt/solvers/bitwuzla/api"/>
