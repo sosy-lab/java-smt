@@ -253,6 +253,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
   @Test
   public void parseMathSatTestParseFirst2() throws SolverException, InterruptedException {
     requireParser();
+    requireIntegers();
     compareParseWithOrgParseFirst(MATHSAT_DUMP2, this::redundancyExprGen);
   }
 
@@ -442,6 +443,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
   }
 
   private BooleanFormula redundancyExprGen() {
+    requireIntegers();
     IntegerFormula i1 = imgr.makeVariable("a");
     IntegerFormula i2 = imgr.makeVariable("b");
     IntegerFormula erg = imgr.makeVariable("c");

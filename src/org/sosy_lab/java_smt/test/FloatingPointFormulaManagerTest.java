@@ -566,6 +566,7 @@ public class FloatingPointFormulaManagerTest
 
   @Test
   public void round() throws SolverException, InterruptedException {
+    requireIntegers();
 
     // constants
     round0(0, 0, 0, 0, 0, 0);
