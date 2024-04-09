@@ -66,42 +66,40 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
 
   @Before
   public void setUpLIA() {
+    requireIntegers();
     requireArrays();
     requireQuantifiers();
 
-    if (imgr != null) {
-      x = imgr.makeVariable("x");
-      a = amgr.makeArray("a", FormulaType.IntegerType, FormulaType.IntegerType);
+    x = imgr.makeVariable("x");
+    a = amgr.makeArray("a", FormulaType.IntegerType, FormulaType.IntegerType);
 
-      a_at_x_eq_1 = imgr.equal(amgr.select(a, x), imgr.makeNumber(1));
-      a_at_x_eq_0 = imgr.equal(amgr.select(a, x), imgr.makeNumber(0));
+    a_at_x_eq_1 = imgr.equal(amgr.select(a, x), imgr.makeNumber(1));
+    a_at_x_eq_0 = imgr.equal(amgr.select(a, x), imgr.makeNumber(0));
 
-      forall_x_a_at_x_eq_0 = qmgr.forall(ImmutableList.of(x), a_at_x_eq_0);
-    }
+    forall_x_a_at_x_eq_0 = qmgr.forall(ImmutableList.of(x), a_at_x_eq_0);
   }
 
   @Before
   public void setUpBV() {
+    requireBitvectors();
     requireArrays();
     requireQuantifiers();
-    if (bmgr != null) {
-      assume()
-          .withMessage("Solver %s does not support quantifiers via JavaSMT", solverToUse())
-          .that(solverToUse())
-          .isNotEqualTo(Solvers.BOOLECTOR);
+    assume()
+        .withMessage("Solver %s does not support quantifiers via JavaSMT", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BOOLECTOR);
 
-      xbv = bvmgr.makeVariable(bvWidth, "xbv");
-      bvArray =
-          amgr.makeArray(
-              "bvArray",
-              FormulaType.getBitvectorTypeWithSize(bvWidth),
-              FormulaType.getBitvectorTypeWithSize(bvWidth));
+    xbv = bvmgr.makeVariable(bvWidth, "xbv");
+    bvArray =
+        amgr.makeArray(
+            "bvArray",
+            FormulaType.getBitvectorTypeWithSize(bvWidth),
+            FormulaType.getBitvectorTypeWithSize(bvWidth));
 
-      bvArray_at_x_eq_1 = bvmgr.equal(amgr.select(bvArray, xbv), bvmgr.makeBitvector(bvWidth, 1));
-      bvArray_at_x_eq_0 = bvmgr.equal(amgr.select(bvArray, xbv), bvmgr.makeBitvector(bvWidth, 0));
+    bvArray_at_x_eq_1 = bvmgr.equal(amgr.select(bvArray, xbv), bvmgr.makeBitvector(bvWidth, 1));
+    bvArray_at_x_eq_0 = bvmgr.equal(amgr.select(bvArray, xbv), bvmgr.makeBitvector(bvWidth, 0));
 
-      bv_forall_x_a_at_x_eq_0 = qmgr.forall(ImmutableList.of(xbv), bvArray_at_x_eq_0);
-    }
+    bv_forall_x_a_at_x_eq_0 = qmgr.forall(ImmutableList.of(xbv), bvArray_at_x_eq_0);
   }
 
   private SolverException handleSolverException(SolverException e) throws SolverException {
@@ -370,7 +368,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
 
     BooleanFormula f =
         bmgr.and(
-            qmgr.exists(ImmutableList.of(xbv), bvArray_at_x_eq_0),
+            qmgr.exists(ImmutableList.of(x), a_at_x_eq_0),
             bvmgr.equal(
                 amgr.select(bvArray, bvmgr.makeBitvector(bvWidth, 123)),
                 bvmgr.makeBitvector(bvWidth, 1)));
@@ -385,6 +383,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
         .isNotEqualTo(Solvers.CVC5);
 
     // (exists x . b[x] = 1) AND  (forall x . b[x] = 0) is UNSAT
+
     requireIntegers();
     BooleanFormula f =
         bmgr.and(qmgr.exists(ImmutableList.of(x), a_at_x_eq_1), forall_x_a_at_x_eq_0);
@@ -454,6 +453,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   @Test
   public void testLIAExistsArrayDisjunct1() throws SolverException, InterruptedException {
     // (exists x . b[x] = 0) OR  (forall x . b[x] = 1) is SAT
+
     requireIntegers();
     BooleanFormula f =
         bmgr.or(
@@ -486,6 +486,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   @Test
   public void testLIAExistsArrayDisjunct2() throws SolverException, InterruptedException {
     // (exists x . b[x] = 1) OR (exists x . b[x] = 1) is SAT
+
     requireIntegers();
     BooleanFormula f =
         bmgr.or(
@@ -513,6 +514,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   @Test
   public void testLIAContradiction() throws SolverException, InterruptedException {
     // forall x . x = x+1  is UNSAT
+
     requireIntegers();
     BooleanFormula f =
         qmgr.forall(ImmutableList.of(x), imgr.equal(x, imgr.add(x, imgr.makeNumber(1))));
@@ -805,10 +807,6 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
         .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
         .that(solverToUse())
         .isNoneOf(Solvers.CVC5, Solvers.BOOLECTOR, Solvers.PRINCESS);
-    assume()
-        .withMessage("Bitwuzla does not support quantifier elimination.")
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.BITWUZLA);
 
     int width = 2;
     BitvectorFormula xx = bvmgr.makeVariable(width, "x_bv");
@@ -831,10 +829,6 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   @Test
   public void checkBVQuantifierElimination() throws InterruptedException, SolverException {
     requireBitvectors();
-    assume()
-        .withMessage("Bitwuzla does not support quantifier elimination.")
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.BITWUZLA);
 
     // build formula: exists y : bv[2]. x * y = 1
     // quantifier-free equivalent: x = 1 | x = 3
@@ -859,10 +853,6 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   @Test
   public void checkBVQuantifierElimination2() throws InterruptedException, SolverException {
     requireBitvectors();
-    assume()
-        .withMessage("Bitwuzla does not support quantifier elimination.")
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.BITWUZLA);
 
     // build formula: exists a2 : (and (= a2 #x00000006)
     //                                 (= b2 #x00000006)
@@ -898,7 +888,6 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
 
   @Test
   public void testExistsRestrictedRange() throws SolverException, InterruptedException {
-    requireIntegers();
     assume()
         .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
         .that(solverToUse())
@@ -932,7 +921,6 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   @Test
   public void testExistsRestrictedRangeWithoutInconclusiveSolvers()
       throws SolverException, InterruptedException {
-    requireIntegers();
     assume()
         .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
         .that(solverToUse())
@@ -956,7 +944,6 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
 
   @Test
   public void testForallRestrictedRange() throws SolverException, InterruptedException {
-    requireIntegers();
     assume()
         .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
         .that(solverToUse())
@@ -991,7 +978,6 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   @Test
   public void testForallRestrictedRangeWithoutConclusiveSolvers()
       throws SolverException, InterruptedException {
-    requireIntegers();
     assume()
         .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
         .that(solverToUse())

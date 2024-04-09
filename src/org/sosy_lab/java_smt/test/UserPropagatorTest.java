@@ -48,9 +48,7 @@ public class UserPropagatorTest extends SolverBasedTest0.ParameterizedSolverBase
     }
   }
 
-  /**
-   * This user propagator will raise a conflict whenever a registered expression is set to true.
-   */
+  /** This user propagator will raise a conflict whenever a registered expression is set to true. */
   private static class TestUserPropagator extends AbstractUserPropagator {
 
     private final List<BooleanFormula> disabledExpressions = new ArrayList<>();
@@ -58,7 +56,7 @@ public class UserPropagatorTest extends SolverBasedTest0.ParameterizedSolverBase
     @Override
     public void onKnownValue(BooleanFormula expr, boolean value) {
       if (value && disabledExpressions.contains(expr)) {
-        getBackend().propagateConflict(new BooleanFormula[]{expr});
+        getBackend().propagateConflict(new BooleanFormula[] {expr});
       }
     }
 

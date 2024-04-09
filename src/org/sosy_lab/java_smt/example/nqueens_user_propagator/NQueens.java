@@ -89,10 +89,10 @@ public class NQueens {
 
     // this example uses Z3, because it is currently the only solver providing user propagation.
     try (SolverContext context =
-             SolverContextFactory.createSolverContext(config, logger, notifier, Solvers.Z3);
-         ProverEnvironment prover =
-             context.newProverEnvironment(
-                 ProverOptions.GENERATE_MODELS, ProverOptions.GENERATE_ALL_SAT)) {
+            SolverContextFactory.createSolverContext(config, logger, notifier, Solvers.Z3);
+        ProverEnvironment prover =
+            context.newProverEnvironment(
+                ProverOptions.GENERATE_MODELS, ProverOptions.GENERATE_ALL_SAT)) {
 
       // parse input parameters
       if (args == null || args.length != 2) {
@@ -150,7 +150,7 @@ public class NQueens {
    * of size N x N.
    *
    * @return a 2D array of BooleanFormula objects, where each BooleanFormula object represents a
-   * variable for a cell in the grid.
+   *     variable for a cell in the grid.
    */
   private BooleanFormula[][] getSymbols() {
     final BooleanFormula[][] symbols = new BooleanFormula[n][n];
@@ -167,7 +167,7 @@ public class NQueens {
    * board.
    *
    * @param symbols a 2D Boolean array representing the board. Each element is true if there is a
-   *                queen in that cell, false otherwise.
+   *     queen in that cell, false otherwise.
    * @return a List of BooleanFormulas representing the rules for this constraint.
    */
   private List<BooleanFormula> rowRule1(BooleanFormula[][] symbols) {
@@ -196,7 +196,7 @@ public class NQueens {
    * <p>We add a negation of the conjunction of all possible pairs of variables in each row.
    *
    * @param symbols a 2D array of BooleanFormula objects representing the variables for each cell on
-   *                the board.
+   *     the board.
    * @return a list of BooleanFormula objects representing the constraints added by this rule.
    */
   private List<BooleanFormula> rowRule2(BooleanFormula[][] symbols) {
@@ -225,7 +225,7 @@ public class NQueens {
    * <p>We add a negation of the conjunction of all possible pairs of variables in each column.
    *
    * @param symbols a 2D array of BooleanFormula representing the placement of queens on the
-   *                chessboard
+   *     chessboard
    * @return a list of BooleanFormula objects representing the constraints added by this rule.
    */
   private List<BooleanFormula> columnRule(BooleanFormula[][] symbols) {
@@ -267,7 +267,7 @@ public class NQueens {
    * </pre>
    *
    * @param symbols a two-dimensional array of Boolean formulas representing the chessboard
-   *                configuration
+   *     configuration
    * @return a list of BooleanFormula objects representing the constraints added by this rule.
    */
   private List<BooleanFormula> diagonalRule(BooleanFormula[][] symbols) {

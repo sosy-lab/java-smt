@@ -25,26 +25,26 @@ public class FloatingPointNumberTest {
   @Test
   public void floatingPointNumberWithSinglePrecision() {
     for (float f :
-        new float[]{
-            0,
-            1,
-            2,
-            3,
-            4,
-            256,
-            1000,
-            1024,
-            -1,
-            -2,
-            -3,
-            -4,
-            -1000,
-            -1024,
-            Float.NEGATIVE_INFINITY,
-            Float.POSITIVE_INFINITY,
-            Float.MAX_VALUE,
-            Float.MIN_VALUE,
-            Float.MIN_NORMAL,
+        new float[] {
+          0,
+          1,
+          2,
+          3,
+          4,
+          256,
+          1000,
+          1024,
+          -1,
+          -2,
+          -3,
+          -4,
+          -1000,
+          -1024,
+          Float.NEGATIVE_INFINITY,
+          Float.POSITIVE_INFINITY,
+          Float.MAX_VALUE,
+          Float.MIN_VALUE,
+          Float.MIN_NORMAL,
         }) {
       var bits = Strings.padStart(Integer.toBinaryString(Float.floatToRawIntBits(f)), 32, '0');
       var fpNum =
@@ -58,26 +58,26 @@ public class FloatingPointNumberTest {
   @Test
   public void floatingPointNumberWithDoublePrecision() {
     for (double d :
-        new double[]{
-            0,
-            1,
-            2,
-            3,
-            4,
-            256,
-            1000,
-            1024,
-            -1,
-            -2,
-            -3,
-            -4,
-            -1000,
-            -1024,
-            Double.NEGATIVE_INFINITY,
-            Double.POSITIVE_INFINITY,
-            Double.MAX_VALUE,
-            Double.MIN_VALUE,
-            Double.MIN_NORMAL,
+        new double[] {
+          0,
+          1,
+          2,
+          3,
+          4,
+          256,
+          1000,
+          1024,
+          -1,
+          -2,
+          -3,
+          -4,
+          -1000,
+          -1024,
+          Double.NEGATIVE_INFINITY,
+          Double.POSITIVE_INFINITY,
+          Double.MAX_VALUE,
+          Double.MIN_VALUE,
+          Double.MIN_NORMAL,
         }) {
       var bits = Strings.padStart(Long.toBinaryString(Double.doubleToRawLongBits(d)), 64, '0');
       var fpNum =

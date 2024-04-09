@@ -25,9 +25,7 @@ SPDX-License-Identifier: Apache-2.0
     <target name="jar-yices2" depends="determine-version, build"
               description="Create a runnable JAR file of all classes related to Yices2">
         <property name="yices2jar.file" value="javasmt-yices2-${version}.jar"/>
-        <copy todir="${class.dir}">
-            <fileset dir=".." includes="META-INF/**"/>
-        </copy>
+        <copy todir="${class.dir}"><fileset dir=".." includes="META-INF/**"/></copy>
         <manifestclasspath property="yices2Classpath.jar" jarfile="${ivy.lib.dir}/runtime-yices2/${jar.file}" maxParentLevels="0">
             <classpath><fileset dir="${ivy.lib.dir}/runtime-yices2" includes="checker-qual.jar common.jar guava.jar"/></classpath>
         </manifestclasspath>

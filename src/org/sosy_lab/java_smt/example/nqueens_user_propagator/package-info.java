@@ -6,7 +6,5 @@
 //
 // SPDX-License-Identifier: Unlicense OR Apache-2.0 OR MIT
 
-/**
- * Some basic examples for using Java-SMT.
- */
+/** Some basic examples for using Java-SMT. */
 package org.sosy_lab.java_smt.example.nqueens_user_propagator;

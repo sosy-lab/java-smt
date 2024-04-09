@@ -34,7 +34,6 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
   @Test
   public void testEmptySubstitution() throws SolverException, InterruptedException {
     requireSubstitution();
-    requireIntegers();
     assume().withMessage("Princess fails").that(solver).isNotEqualTo(Solvers.PRINCESS);
 
     IntegerFormula variable1 = imgr.makeVariable("variable1");
@@ -55,7 +54,6 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
   @Test
   public void testNoSubstitution() throws SolverException, InterruptedException {
     requireSubstitution();
-    requireIntegers();
     assume().withMessage("Princess fails").that(solver).isNotEqualTo(Solvers.PRINCESS);
 
     IntegerFormula variable1 = imgr.makeVariable("variable1");
@@ -174,7 +172,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
   @Test
   public void formulaEqualsAndHashCode() {
     // Solvers without integers (Boolector) get their own test below
-    requireIntegers();
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     FunctionDeclaration<IntegerFormula> fb = fmgr.declareUF("f_b", IntegerType, IntegerType);
 
     new EqualsTester()
@@ -228,28 +226,28 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
             FormulaType.getBitvectorTypeWithSize(8));
 
     new EqualsTester()
-        .addEqualityGroup(bmgr.makeBoolean(true)) // 0
-        .addEqualityGroup(bmgr.makeBoolean(false)) // 1
-        .addEqualityGroup(bmgr.makeVariable("bool_a")) // 2
-        .addEqualityGroup(bvmgr.makeVariable(8, "bv_a")) // 3
+        .addEqualityGroup(bmgr.makeBoolean(true))
+        .addEqualityGroup(bmgr.makeBoolean(false))
+        .addEqualityGroup(bmgr.makeVariable("bool_a"))
+        .addEqualityGroup(bvmgr.makeVariable(8, "bv_a"))
 
         // Way of creating numbers should not make a difference.
         .addEqualityGroup(
             bvmgr.makeBitvector(8, 0L),
             bvmgr.makeBitvector(8, 0),
-            bvmgr.makeBitvector(8, BigInteger.ZERO)) // 4
+            bvmgr.makeBitvector(8, BigInteger.ZERO))
         .addEqualityGroup(
             bvmgr.makeBitvector(8, 1L),
             bvmgr.makeBitvector(8, 1),
-            bvmgr.makeBitvector(8, BigInteger.ONE)) // 5
+            bvmgr.makeBitvector(8, BigInteger.ONE))
         // The same formula when created twice should compare equal.
-        .addEqualityGroup(bmgr.makeVariable("bool_b"), bmgr.makeVariable("bool_b")) // 6
+        .addEqualityGroup(bmgr.makeVariable("bool_b"), bmgr.makeVariable("bool_b"))
         .addEqualityGroup(
             bmgr.and(bmgr.makeVariable("bool_a"), bmgr.makeVariable("bool_b")),
-            bmgr.and(bmgr.makeVariable("bool_a"), bmgr.makeVariable("bool_b"))) // 7
+            bmgr.and(bmgr.makeVariable("bool_a"), bmgr.makeVariable("bool_b")))
         .addEqualityGroup(
             bvmgr.equal(bvmgr.makeBitvector(8, 0), bvmgr.makeVariable(8, "int_a")),
-            bvmgr.equal(bvmgr.makeBitvector(8, 0), bvmgr.makeVariable(8, "int_a"))) // 8
+            bvmgr.equal(bvmgr.makeBitvector(8, 0), bvmgr.makeVariable(8, "int_a")))
 
         // UninterpretedFunctionDeclarations should not compare equal to Formulas,
         // but declaring one twice needs to return the same UIF.
@@ -261,8 +259,8 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
             fmgr.declareUF(
                 "f_a",
                 FormulaType.getBitvectorTypeWithSize(8),
-                FormulaType.getBitvectorTypeWithSize(8))) // 9
-        .addEqualityGroup(fb) // 10
+                FormulaType.getBitvectorTypeWithSize(8)))
+        .addEqualityGroup(fb)
         .addEqualityGroup(fmgr.callUF(fb, bvmgr.makeBitvector(8, 0)))
         .addEqualityGroup(
             fmgr.callUF(fb, bvmgr.makeBitvector(8, 1)), // why not equal?!

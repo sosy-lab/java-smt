@@ -27,19 +27,13 @@ public abstract class FloatingPointNumber {
   public static final int DOUBLE_PRECISION_EXPONENT_SIZE = 11;
   public static final int DOUBLE_PRECISION_MANTISSA_SIZE = 52;
 
-  /**
-   * Whether the number is positive (TRUE) or negative (FALSE).
-   */
+  /** Whether the number is positive (TRUE) or negative (FALSE). */
   public abstract boolean getSign();
 
-  /**
-   * The exponent of the floating-point number, given as numeric value.
-   */
+  /** The exponent of the floating-point number, given as numeric value. */
   public abstract BigInteger getExponent();
 
-  /**
-   * The mantissa (aka significand) of the floating-point number, given as numeric value.
-   */
+  /** The mantissa (aka significand) of the floating-point number, given as numeric value. */
   public abstract BigInteger getMantissa();
 
   public abstract int getExponentSize();
@@ -84,9 +78,7 @@ public abstract class FloatingPointNumber {
         && getMantissaSize() == DOUBLE_PRECISION_MANTISSA_SIZE;
   }
 
-  /**
-   * compute a representation as Java-based float value, if possible.
-   */
+  /** compute a representation as Java-based float value, if possible. */
   public float floatValue() {
     Preconditions.checkArgument(
         isSinglePrecision(),
@@ -96,9 +88,7 @@ public abstract class FloatingPointNumber {
     return Float.intBitsToFloat(bits.length() == 0 ? 0 : (int) bits.toLongArray()[0]);
   }
 
-  /**
-   * compute a representation as Java-based double value, if possible.
-   */
+  /** compute a representation as Java-based double value, if possible. */
   public double doubleValue() {
     Preconditions.checkArgument(
         isSinglePrecision() || isDoublePrecision(),

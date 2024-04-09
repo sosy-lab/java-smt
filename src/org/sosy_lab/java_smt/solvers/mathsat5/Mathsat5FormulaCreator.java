@@ -580,7 +580,7 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   /**
    * Returns a range of bits from the bitvector representation of a number.
    *
-   * @param start  the index of the lowest significant bit to be extracted.
+   * @param start the index of the lowest significant bit to be extracted.
    * @param length how many bits to extract?
    */
   private static BigInteger extractBitsFrom(BigInteger number, int start, int length) {

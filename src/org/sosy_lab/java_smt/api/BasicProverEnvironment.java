@@ -197,7 +197,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    *
    * @param propagator The (fresh) user propagator to register.
    * @return {@code true}, if the user propagator was successfully registered. Most SMT solvers do
-   * not support user propagators and hence return {@code false}.
+   *     not support user propagators and hence return {@code false}.
    */
   default boolean registerUserPropagator(UserPropagator propagator) {
     return false;

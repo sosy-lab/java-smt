@@ -61,7 +61,7 @@ public class NQueensConstraintPropagator extends NQueensEnumeratingPropagator {
           if (x1 == x2 || y1 == y2 || Math.abs(x1 - x2) == Math.abs(y1 - y2)) {
             // We have two queens on the same row, same column, or same diagonal.
             // This is not allowed, so we raise a conflict.
-            getBackend().propagateConflict(new BooleanFormula[]{var, other});
+            getBackend().propagateConflict(new BooleanFormula[] {var, other});
           }
         }
       }

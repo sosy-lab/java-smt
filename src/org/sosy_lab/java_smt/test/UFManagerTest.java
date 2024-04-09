@@ -301,7 +301,6 @@ public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
     requireBooleanArgument();
     createAndCallUF("fooBool1", FormulaType.BooleanType, bmgr.makeTrue());
     createAndCallUF("fooBool2", FormulaType.BooleanType, bmgr.makeTrue(), bmgr.makeTrue());
-    requireIntegers();
     createAndCallUF(
         "fooBool3", FormulaType.IntegerType, bmgr.makeTrue(), bmgr.makeTrue(), bmgr.makeTrue());
 
@@ -338,7 +337,6 @@ public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   @Test
   public void testDeclareAndCallUFWithBVArgs() {
     requireBitvectors();
-    requireIntegers();
     createAndCallUF("fooBV1", FormulaType.getBitvectorTypeWithSize(5), bvmgr.makeBitvector(3, 3L));
     requireBooleanArgument();
     createAndCallUF(

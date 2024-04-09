@@ -24,24 +24,19 @@ public abstract class AbstractUserPropagator implements UserPropagator {
   }
 
   @Override
-  public void onPush() {
-  }
+  public void onPush() {}
 
   @Override
-  public void onPop(int numPoppedLevels) {
-  }
+  public void onPop(int numPoppedLevels) {}
 
   @Override
-  public void onFinalCheck() {
-  }
+  public void onFinalCheck() {}
 
   @Override
-  public void onKnownValue(BooleanFormula expr, boolean value) {
-  }
+  public void onKnownValue(BooleanFormula expr, boolean value) {}
 
   @Override
-  public void onDecision(BooleanFormula expr, boolean value) {
-  }
+  public void onDecision(BooleanFormula expr, boolean value) {}
 
   @Override
   public void initializeWithBackend(PropagatorBackend pBackend) {

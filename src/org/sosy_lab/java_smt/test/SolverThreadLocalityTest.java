@@ -15,7 +15,6 @@ import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 import com.google.common.collect.ImmutableList;
 import com.google.common.truth.Truth;
 import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -375,10 +374,9 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
     // We might want to see this as very low priority, as there is no real benefit for the user,
     // except having a nice error message.
 
-    // Boolector and Bitwuzla do not support integers, so we have to use two different versions
-    // for this test.
+    // Boolector does not support integer, so we have to use two different versions for this test.
     BooleanFormula formula =
-        List.of(Solvers.BOOLECTOR, Solvers.BITWUZLA).contains(solverToUse())
+        solverToUse() == Solvers.BOOLECTOR
             ? bmgr.makeFalse()
             : hardProblem.generate(DEFAULT_PROBLEM_SIZE);
 

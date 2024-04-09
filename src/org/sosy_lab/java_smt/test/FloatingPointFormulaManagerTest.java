@@ -196,8 +196,8 @@ public class FloatingPointFormulaManagerTest
         .isNotEqualTo(Solvers.MATHSAT5);
 
     for (FloatingPointType prec :
-        new FloatingPointType[]{
-            singlePrecType, doublePrecType, FormulaType.getFloatingPointType(5, 6),
+        new FloatingPointType[] {
+          singlePrecType, doublePrecType, FormulaType.getFloatingPointType(5, 6),
         }) {
 
       final FloatingPointFormula numFive = fpmgr.makeNumber(5, prec);
@@ -220,8 +220,8 @@ public class FloatingPointFormulaManagerTest
         .isNotEqualTo(Solvers.MATHSAT5);
 
     for (FloatingPointType prec :
-        new FloatingPointType[]{
-            singlePrecType, doublePrecType, FormulaType.getFloatingPointType(5, 6),
+        new FloatingPointType[] {
+          singlePrecType, doublePrecType, FormulaType.getFloatingPointType(5, 6),
         }) {
 
       final FloatingPointFormula num = fpmgr.makeNumber(42, prec);
@@ -566,7 +566,6 @@ public class FloatingPointFormulaManagerTest
 
   @Test
   public void round() throws SolverException, InterruptedException {
-    requireIntegers();
 
     // constants
     round0(0, 0, 0, 0, 0, 0);
@@ -953,26 +952,26 @@ public class FloatingPointFormulaManagerTest
         assertThat(model).isEmpty();
 
         for (float f :
-            new float[]{
-                0,
-                1,
-                2,
-                3,
-                4,
-                256,
-                1000,
-                1024,
-                -1,
-                -2,
-                -3,
-                -4,
-                -1000,
-                -1024,
-                Float.NEGATIVE_INFINITY,
-                Float.POSITIVE_INFINITY,
-                Float.MAX_VALUE,
-                Float.MIN_VALUE,
-                Float.MIN_NORMAL,
+            new float[] {
+              0,
+              1,
+              2,
+              3,
+              4,
+              256,
+              1000,
+              1024,
+              -1,
+              -2,
+              -3,
+              -4,
+              -1000,
+              -1024,
+              Float.NEGATIVE_INFINITY,
+              Float.POSITIVE_INFINITY,
+              Float.MAX_VALUE,
+              Float.MIN_VALUE,
+              Float.MIN_NORMAL,
             }) {
           FloatingPointNumber fiveValue = model.evaluate(fpmgr.makeNumber(f, singlePrecType));
           assertThat(fiveValue.floatValue()).isEqualTo(f);

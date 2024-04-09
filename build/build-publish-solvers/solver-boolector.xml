@@ -30,8 +30,7 @@ SPDX-License-Identifier: Apache-2.0
         </fail>
 
         <!-- get a nive version -->
-        <exec executable="git" dir="${boolector.path}" outputproperty="boolector.revision"
-              failonerror="true">
+        <exec executable="git" dir="${boolector.path}" outputproperty="boolector.revision" failonerror="true">
             <arg value="show"/>
             <arg value="-s"/>
             <arg value="--format=%h"/>
@@ -40,65 +39,56 @@ SPDX-License-Identifier: Apache-2.0
         <echo message="Building Boolector in version '${boolector.version}'"/>
 
         <!-- add JNI wrapper before compiling Boolector -->
-        <copy file="lib/native/source/libboolector/interface_wrap.c"
-              tofile="${boolector.path}/src/interface_wrap.c"/>
-        <copy file="lib/native/source/libboolector/include_interface_and_jni.patch"
-              tofile="${boolector.path}/src/include_interface_and_jni.patch"/>
+        <copy file="lib/native/source/libboolector/interface_wrap.c"                tofile="${boolector.path}/src/interface_wrap.c"/>
+        <copy file="lib/native/source/libboolector/include_interface_and_jni.patch" tofile="${boolector.path}/src/include_interface_and_jni.patch"/>
         <exec executable="git" dir="${boolector.path}" failonerror="true">
             <arg value="apply"/>
             <arg value="src/include_interface_and_jni.patch"/>
         </exec>
 
         <!-- build Boolector -->
-        <exec executable="./contrib/setup-picosat.sh" dir="${boolector.path}" failonerror="true"/>
-        <exec executable="./contrib/setup-minisat.sh" dir="${boolector.path}" failonerror="true"/>
-        <exec executable="./contrib/setup-cms.sh" dir="${boolector.path}" failonerror="true"/>
-        <exec executable="./contrib/setup-lingeling.sh" dir="${boolector.path}" failonerror="true"/>
-        <exec executable="./contrib/setup-cadical.sh" dir="${boolector.path}" failonerror="true"/>
-        <exec executable="./contrib/setup-btor2tools.sh" dir="${boolector.path}"
-              failonerror="true"/>
+        <exec executable="./contrib/setup-picosat.sh"    dir="${boolector.path}" failonerror="true"/>
+        <exec executable="./contrib/setup-minisat.sh"    dir="${boolector.path}" failonerror="true"/>
+    	<exec executable="./contrib/setup-cms.sh"    	 dir="${boolector.path}" failonerror="true"/>
+        <exec executable="./contrib/setup-lingeling.sh"  dir="${boolector.path}" failonerror="true"/>
+        <exec executable="./contrib/setup-cadical.sh"    dir="${boolector.path}" failonerror="true"/>
+        <exec executable="./contrib/setup-btor2tools.sh" dir="${boolector.path}" failonerror="true"/>
         <exec executable="./configure.sh" dir="${boolector.path}" failonerror="true">
             <arg value="-fno-strict-aliasing"/>
             <arg value="-fpic"/>
             <arg value="--shared"/>
         </exec>
         <exec executable="make" dir="${boolector.path}/build/" failonerror="true">
-            <arg value="-j4"/>
+            <arg value="-j4" />
         </exec>
 
         <!-- remove unneeded symbols -->
         <exec executable="strip" dir="${boolector.path}/deps/install/lib/" failonerror="true">
-            <arg value="libpicosat.so"/>
+            <arg value="libpicosat.so" />
         </exec>
         <exec executable="strip" dir="${boolector.path}/deps/install/lib/" failonerror="true">
-            <arg value="libminisat.so"/>
+            <arg value="libminisat.so" />
         </exec>
         <exec executable="strip" dir="${boolector.path}/build/lib/" failonerror="true">
-            <arg value="libboolector.so"/>
+            <arg value="libboolector.so" />
         </exec>
 
         <!-- fix RPATH and library dependencies -->
         <exec executable="patchelf" dir="${boolector.path}/build/lib/" failonerror="true">
-            <arg value="--set-rpath"/>
-            <arg value="$ORIGIN"/>
-            <arg value="--replace-needed"/>
-            <arg value="libminisat.so.2"/>
-            <arg value="libminisat.so"/>
+            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
+            <arg value="--replace-needed"/><arg value="libminisat.so.2"/><arg value="libminisat.so"/>
             <arg value="libboolector.so"/>
         </exec>
 
         <!-- copy library files into directory to be published for IVY -->
-        <copy file="${boolector.path}/deps/install/lib/libminisat.so"
-              tofile="libminisat-${boolector.version}.so"/>
-        <copy file="${boolector.path}/deps/install/lib/libpicosat.so"
-              tofile="libpicosat-${boolector.version}.so"/>
-        <copy file="${boolector.path}/build/lib/libboolector.so"
-              tofile="libboolector-${boolector.version}.so"/>
+        <copy file="${boolector.path}/deps/install/lib/libminisat.so" tofile="libminisat-${boolector.version}.so"/>
+        <copy file="${boolector.path}/deps/install/lib/libpicosat.so" tofile="libpicosat-${boolector.version}.so"/>
+        <copy file="${boolector.path}/build/lib/libboolector.so"      tofile="libboolector-${boolector.version}.so"/>
     </target>
 
     <target name="publish-boolector" depends="package-boolector, load-ivy"
-            description="Publish Boolector binaries to Ivy repository.">
-        <ivy:resolve conf="solver-boolector" file="solvers_ivy_conf/ivy_boolector.xml"/>
+        description="Publish Boolector binaries to Ivy repository.">
+        <ivy:resolve conf="solver-boolector" file="solvers_ivy_conf/ivy_boolector.xml" />
         <publishToRepository solverName="Boolector" solverVersion="${boolector.version}"/>
     </target>
 </project>

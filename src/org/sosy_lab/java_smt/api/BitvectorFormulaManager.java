@@ -145,7 +145,7 @@ public interface BitvectorFormulaManager {
    * the numerator itself. We refer to the SMTLIB standard for the division and modulo operators in
    * BV theory.
    *
-   * @param numerator   dividend
+   * @param numerator dividend
    * @param denumerator divisor
    */
   BitvectorFormula smodulo(BitvectorFormula numerator, BitvectorFormula denumerator);

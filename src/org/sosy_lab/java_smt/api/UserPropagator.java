@@ -65,7 +65,7 @@ public interface UserPropagator {
    * <p>Note: This callback is only invoked if the user propagator enabled it via {@link
    * PropagatorBackend#notifyOnKnownValue()}.
    *
-   * @param expr  The expressions whose value is known.
+   * @param expr The expressions whose value is known.
    * @param value The value of the expression.
    */
   void onKnownValue(BooleanFormula expr, boolean value);
@@ -78,7 +78,7 @@ public interface UserPropagator {
    * <p>Note: This callback is only invoked if the user propagator enabled it via {@link
    * PropagatorBackend#notifyOnDecision()}.
    *
-   * @param expr  The expressions whose value gets decided (usually a literal).
+   * @param expr The expressions whose value gets decided (usually a literal).
    * @param value The decision value.
    */
   void onDecision(BooleanFormula expr, boolean value);

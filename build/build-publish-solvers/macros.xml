@@ -32,10 +32,9 @@ SPDX-License-Identifier: Apache-2.0
         <attribute name="solverName"/>
         <attribute name="solverVersion"/>
         <sequential>
-            <available property="ivy.hasrepository"
-                       file="repository/${ivy.organisation}/${ivy.module}"/>
+            <available property="ivy.hasrepository" file="repository/${ivy.organisation}/${ivy.module}" />
             <fail unless="ivy.hasrepository"
-                  message="Cannot publish without 'repository' dir, please run 'svn co https://svn.sosy-lab.org/software/ivy/repository/${ivy.organisation}/${ivy.module} repository/${ivy.organisation}/${ivy.module}'."/>
+                  message="Cannot publish without 'repository' dir, please run 'svn co https://svn.sosy-lab.org/software/ivy/repository/${ivy.organisation}/${ivy.module} repository/${ivy.organisation}/${ivy.module}'." />
             <ivy:publish
                     pubrevision="@{solverVersion}"
                     resolver="Sosy-Lab-Publish"
@@ -45,10 +44,8 @@ SPDX-License-Identifier: Apache-2.0
             <echo>
                 You now want to run
                 svn add repository/${ivy.organisation}/${ivy.module}/*-@{solverVersion}*
-                svn ci repository/${ivy.organisation}/${ivy.module} -m"publish version
-                @{solverVersion} of @{solverName} Solver"
-                to make the new version publicly available.
-            </echo>
+                svn ci repository/${ivy.organisation}/${ivy.module} -m"publish version @{solverVersion} of @{solverName} Solver"
+                to make the new version publicly available.</echo>
         </sequential>
     </macrodef>
 </project>

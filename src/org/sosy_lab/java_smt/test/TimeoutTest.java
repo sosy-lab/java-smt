@@ -16,16 +16,13 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.Supplier;
 import org.junit.Test;
-import org.junit.function.ThrowingRunnable;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
-import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.Tactic;
 import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
@@ -96,27 +93,7 @@ public class TimeoutTest extends SolverBasedTest0 {
         .withMessage(solverToUse() + " does not support interruption")
         .that(solverToUse())
         .isNoneOf(Solvers.PRINCESS, Solvers.CVC5);
-    TruthJUnit.assume()
-        .withMessage(solverToUse() + " does not support sort/term creation in different threads.")
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.BITWUZLA);
     testBasicProverTimeoutBv(() -> context.newProverEnvironment());
-  }
-
-  @Test(timeout = TIMOUT_MILLISECONDS)
-  public void testProverTimeoutBvFullEnvironmentInRunnable() {
-    requireBitvectors();
-    TruthJUnit.assume()
-        .withMessage(solverToUse() + " does not support interruption")
-        .that(solverToUse())
-        .isNoneOf(Solvers.PRINCESS, Solvers.CVC5);
-    TruthJUnit.assume()
-        .withMessage(
-            "This test creates the formulas first, hence it fails "
-                + "sometimes for small timeout times.")
-        .that(delay)
-        .isAtLeast(50);
-    testProverTimeoutWithFullEnvironmentInThread();
   }
 
   @Test(timeout = TIMOUT_MILLISECONDS)
@@ -169,41 +146,5 @@ public class TimeoutTest extends SolverBasedTest0 {
       t.start();
       assertThrows(InterruptedException.class, pe::isUnsat);
     }
-  }
-
-  @SuppressWarnings("CheckReturnValue")
-  private void testProverTimeoutWithFullEnvironmentInThread() {
-
-    Thread t =
-        new Thread(
-            () -> {
-              try {
-                Thread.sleep(delay);
-                shutdownManager.requestShutdown("Shutdown Request");
-              } catch (InterruptedException pE) {
-                throw new UnsupportedOperationException("Unexpected interrupt");
-              }
-            });
-
-    ThrowingRunnable runnable =
-        new ThrowingRunnable() {
-          @Override
-          public void run()
-              throws InterruptedException, SolverException, InvalidConfigurationException {
-            initSolver();
-            // SolverContext newEnv = SolverContextFactory.createSolverContext();
-            mgr = context.getFormulaManager();
-            bmgr = mgr.getBooleanFormulaManager();
-            bvmgr = mgr.getBitvectorFormulaManager();
-            HardBitvectorFormulaGenerator gen = new HardBitvectorFormulaGenerator(bvmgr, bmgr);
-            try (BasicProverEnvironment<?> pe = context.newProverEnvironment()) {
-              pe.push(gen.generate(100));
-              pe.isUnsat();
-            }
-          }
-        };
-
-    t.start();
-    assertThrows(InterruptedException.class, runnable);
   }
 }

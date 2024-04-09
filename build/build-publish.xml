@@ -25,10 +25,8 @@ SPDX-License-Identifier: Apache-2.0
         <available property="ivy.hasrepository" file="repository/${ivy.organisation}/${ivy.module}" />
         <fail unless="ivy.hasrepository"
             message="Cannot publish without 'repository' dir, please run 'svn co https://svn.sosy-lab.org/software/ivy/repository/${ivy.organisation}/${ivy.module} repository/${ivy.organisation}/${ivy.module}'." />
-        <!--
         <fail unless="version.publishable"
             message="Cannot publish version ${version}, only unmodified working copies may be published." />
-        -->
         <ivy:publish
             conf="core, contrib, *(public)"
             pubrevision="${version}"

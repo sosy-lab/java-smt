@@ -65,8 +65,7 @@ final class Z3UserPropagator extends UserPropagatorBase implements PropagatorBac
 
   // TODO: This method is not supported for now.
   @Override
-  protected void eqWrapper(long pL, long pL1) {
-  }
+  protected void eqWrapper(long pL, long pL1) {}
 
   @Override
   protected void fixedWrapper(long lvar, long lvalue) {
@@ -86,8 +85,7 @@ final class Z3UserPropagator extends UserPropagatorBase implements PropagatorBac
   //  possible) and the solver instantiates the registered function: if the solver
   //  instantiates "forall x: f(x)" at x=y, then f(y) will get created.
   @Override
-  protected void createdWrapper(long le) {
-  }
+  protected void createdWrapper(long le) {}
 
   @Override
   protected void decideWrapper(long lvar, int bit, boolean isPositive) {

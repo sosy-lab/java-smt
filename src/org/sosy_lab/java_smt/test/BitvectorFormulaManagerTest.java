@@ -347,7 +347,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
     assume()
         .withMessage("Solver %s does not support arrays with integer index", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.BOOLECTOR, Solvers.BITWUZLA);
+        .isNotEqualTo(Solvers.BOOLECTOR);
 
     BitvectorFormula bv = bvmgr.makeBitvector(4, 3);
     ArrayFormula<IntegerFormula, BitvectorFormula> arr =
@@ -430,7 +430,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void bvRotateByConstant() throws SolverException, InterruptedException {
-    for (int bitsize : new int[]{8, 13, 25, 31}) {
+    for (int bitsize : new int[] {8, 13, 25, 31}) {
       BitvectorFormula zero = bvmgr.makeBitvector(bitsize, 0);
       BitvectorFormula a = bvmgr.makeVariable(bitsize, "a" + bitsize);
       BitvectorFormula b = bvmgr.makeVariable(bitsize, "b" + bitsize);
@@ -448,18 +448,18 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
 
       // rotating twice by half is identity
       assertThatFormula(
-          bvmgr.equal(zeroA, bvmgr.rotateLeft(bvmgr.rotateLeft(zeroA, bitsize), bitsize)))
+              bvmgr.equal(zeroA, bvmgr.rotateLeft(bvmgr.rotateLeft(zeroA, bitsize), bitsize)))
           .isTautological();
       assertThatFormula(
-          bvmgr.equal(bZero, bvmgr.rotateRight(bvmgr.rotateRight(bZero, bitsize), bitsize)))
+              bvmgr.equal(bZero, bvmgr.rotateRight(bvmgr.rotateRight(bZero, bitsize), bitsize)))
           .isTautological();
 
       // rotating a half-zero variable is shifting
       assertThatFormula(
-          bvmgr.equal(bvmgr.rotateLeft(zeroA, bitsize), bvmgr.shiftLeft(zeroA, shift)))
+              bvmgr.equal(bvmgr.rotateLeft(zeroA, bitsize), bvmgr.shiftLeft(zeroA, shift)))
           .isTautological();
       assertThatFormula(
-          bvmgr.equal(bvmgr.rotateRight(bZero, bitsize), bvmgr.shiftRight(bZero, shift, false)))
+              bvmgr.equal(bvmgr.rotateRight(bZero, bitsize), bvmgr.shiftRight(bZero, shift, false)))
           .isTautological();
     }
   }
@@ -471,7 +471,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
         .that(solver)
         .isNotEqualTo(Solvers.PRINCESS);
 
-    for (int bitsize : new int[]{8, 13, 25, 31}) {
+    for (int bitsize : new int[] {8, 13, 25, 31}) {
       BitvectorFormula zero = bvmgr.makeBitvector(bitsize, 0);
       BitvectorFormula a = bvmgr.makeVariable(bitsize, "a" + bitsize);
       BitvectorFormula b = bvmgr.makeVariable(bitsize, "b" + bitsize);
@@ -491,23 +491,23 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
       assertThatFormula(bvmgr.equal(zeroA, bvmgr.rotateLeft(bvmgr.rotateLeft(zeroA, shift), shift)))
           .isTautological();
       assertThatFormula(
-          bvmgr.equal(bZero, bvmgr.rotateRight(bvmgr.rotateRight(bZero, shift), shift)))
+              bvmgr.equal(bZero, bvmgr.rotateRight(bvmgr.rotateRight(bZero, shift), shift)))
           .isTautological();
 
       // rotating a half-zero variable is shifting
       assertThatFormula(bvmgr.equal(bvmgr.rotateLeft(zeroA, shift), bvmgr.shiftLeft(zeroA, shift)))
           .isTautological();
       assertThatFormula(
-          bvmgr.equal(bvmgr.rotateRight(bZero, shift), bvmgr.shiftRight(bZero, shift, false)))
+              bvmgr.equal(bvmgr.rotateRight(bZero, shift), bvmgr.shiftRight(bZero, shift, false)))
           .isTautological();
     }
   }
 
   @Test
   public void bvIsIdenticalAfterFullRotation() throws SolverException, InterruptedException {
-    for (int bitsize : new int[]{2, 4, 8, 16, 32, 55}) {
+    for (int bitsize : new int[] {2, 4, 8, 16, 32, 55}) {
       BitvectorFormula number = bvmgr.makeVariable(bitsize, "NUM_ROT_" + bitsize);
-      for (int multiplier : new int[]{0, 1, 2, 5, 17, 37, 111, 1111}) {
+      for (int multiplier : new int[] {0, 1, 2, 5, 17, 37, 111, 1111}) {
         int toRotate = multiplier * bitsize;
         if (toRotate >= (1 << bitsize)) {
           continue; // ignore numbers larger than bitsize
@@ -524,16 +524,16 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
     requireBitvectors();
 
     assertThatFormula(
-        bvmgr.equal(
-            bvmgr.add(bvmgr.makeBitvector(4, 15), bvmgr.makeBitvector(4, -8)),
-            bvmgr.makeBitvector(4, 7)))
+            bvmgr.equal(
+                bvmgr.add(bvmgr.makeBitvector(4, 15), bvmgr.makeBitvector(4, -8)),
+                bvmgr.makeBitvector(4, 7)))
         .isTautological();
   }
 
   @Test
   @SuppressWarnings("CheckReturnValue")
   public void bvOutOfRange() {
-    for (int[] sizeAndValue : new int[][]{{4, 32}, {4, -9}, {8, 300}, {8, -160}}) {
+    for (int[] sizeAndValue : new int[][] {{4, 32}, {4, -9}, {8, 300}, {8, -160}}) {
       try {
         bvmgr.makeBitvector(sizeAndValue[0], sizeAndValue[1]);
         assert_().fail();
@@ -541,7 +541,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
       }
     }
 
-    for (int size : new int[]{4, 6, 8, 10, 16, 32}) {
+    for (int size : new int[] {4, 6, 8, 10, 16, 32}) {
       // allowed values
       bvmgr.makeBitvector(size, (1L << size) - 1);
       bvmgr.makeBitvector(size, -(1L << (size - 1)));
@@ -559,7 +559,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
       }
     }
 
-    for (int size : new int[]{36, 40, 64, 65, 100, 128, 200, 250, 1000, 10000}) {
+    for (int size : new int[] {36, 40, 64, 65, 100, 128, 200, 250, 1000, 10000}) {
       if (size > 64) {
         assume()
             .withMessage("Solver does not support large bitvectors")

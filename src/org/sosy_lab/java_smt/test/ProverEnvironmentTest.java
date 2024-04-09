@@ -100,7 +100,6 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
   private void unsatCoreTest0(BasicProverEnvironment<?> pe)
       throws InterruptedException, SolverException {
-    requireIntegers();
     pe.push();
     pe.addConstraint(imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1)));
     pe.addConstraint(imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(2)));
@@ -130,7 +129,6 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
   @Test
   public void unsatCoreWithAssumptionsTest() throws SolverException, InterruptedException {
-    requireIntegers();
     requireUnsatCore();
     assume()
         .withMessage(
@@ -160,13 +158,12 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
     requireUnsatCoreOverAssumptions();
     try (ProverEnvironment prover =
-             context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
+        context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       checkSimpleQuery(prover);
     }
 
     try (ProverEnvironment prover =
-             context.newProverEnvironment(GENERATE_UNSAT_CORE,
-                 GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
+        context.newProverEnvironment(GENERATE_UNSAT_CORE, GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       checkSimpleQuery(prover);
     }
   }

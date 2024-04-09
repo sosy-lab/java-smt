@@ -30,8 +30,7 @@ SPDX-License-Identifier: Apache-2.0
         </fail>
 
         <!-- Get a naive version -->
-        <exec executable="git" dir="${opensmt.path}" outputproperty="opensmt.revision"
-              failonerror="true">
+        <exec executable="git" dir="${opensmt.path}" outputproperty="opensmt.revision" failonerror="true">
             <arg value="show"/>
             <arg value="-s"/>
             <arg value="--format=%h"/>
@@ -40,9 +39,9 @@ SPDX-License-Identifier: Apache-2.0
         <echo message="Building OpenSMT in version '${opensmt.version}'"/>
 
         <!-- Create build directories -->
-        <property name="path.build" value="${opensmt.path}/build"/>
+        <property name="path.build"   value="${opensmt.path}/build"/>
         <property name="path.install" value="${opensmt.path}/install"/>
-        <property name="path.source" value="${user.dir}/lib/native/source/opensmt"/>
+        <property name="path.source"  value="${user.dir}/lib/native/source/opensmt"/>
 
         <mkdir dir="${path.build}"/>
         <mkdir dir="${path.install}"/>
@@ -72,8 +71,8 @@ SPDX-License-Identifier: Apache-2.0
         </exec>
 
         <!-- Copy swig files to the install directory -->
-        <copy todir="${path.install}">
-            <fileset dir="${path.source}" includes="**"/>
+        <copy todir="${path.install}" >
+          <fileset dir="${path.source}" includes="**"/>
         </copy>
 
         <!-- Dump ${opensmt.version} to a file so that we can use it from swig -->
@@ -176,8 +175,8 @@ SPDX-License-Identifier: Apache-2.0
     </target>
 
     <target name="publish-opensmt" depends="package-opensmt, load-ivy"
-            description="Publish OpenSMT binaries to Ivy repository.">
-        <ivy:resolve conf="solver-opensmt" file="solvers_ivy_conf/ivy_opensmt.xml"/>
+        description="Publish OpenSMT binaries to Ivy repository.">
+        <ivy:resolve conf="solver-opensmt" file="solvers_ivy_conf/ivy_opensmt.xml" />
         <publishToRepository solverName="OpenSMT" solverVersion="${opensmt.version}"/>
     </target>
 </project>

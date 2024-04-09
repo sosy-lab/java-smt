@@ -47,7 +47,7 @@ public interface PropagatorBackend {
    * generate a theory lemma.
    *
    * @param assignedExpressions A set of assigned expressions.
-   * @param consequence         The consequence implied by the assigned expressions.
+   * @param consequence The consequence implied by the assigned expressions.
    */
   void propagateConsequence(BooleanFormula[] assignedExpressions, BooleanFormula consequence);
 
@@ -56,11 +56,11 @@ public interface PropagatorBackend {
    * UserPropagator#onKnownValue}, will set the next decision to be made. If called during {@link
    * UserPropagator#onDecision}, will overwrite the current decision to be made.
    *
-   * @param expr  The expression to assign to next.
+   * @param expr The expression to assign to next.
    * @param value The value to be assigned. If not given, the solver will decide.
    * @return False, if the value of {@code expr} is already assigned. True, otherwise. Note that the
-   * value of {@code expr} may already be decided before being reported via {@link
-   * UserPropagator#onKnownValue}.
+   *     value of {@code expr} may already be decided before being reported via {@link
+   *     UserPropagator#onKnownValue}.
    */
   boolean propagateNextDecision(BooleanFormula expr, Optional<Boolean> value);
 

@@ -29,13 +29,10 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractUserPropagator;
 
-/**
- * Example of a simple user propagator that prohibits variables/expressions to be set to true.
- */
+/** Example of a simple user propagator that prohibits variables/expressions to be set to true. */
 public class SimpleUserPropagator {
 
-  private SimpleUserPropagator() {
-  }
+  private SimpleUserPropagator() {}
 
   public static void main(String[] args)
       throws InvalidConfigurationException, InterruptedException, SolverException {
@@ -44,7 +41,7 @@ public class SimpleUserPropagator {
     ShutdownNotifier notifier = ShutdownNotifier.createDummy();
 
     try (SolverContext context =
-             SolverContextFactory.createSolverContext(config, logger, notifier, Solvers.Z3)) {
+        SolverContextFactory.createSolverContext(config, logger, notifier, Solvers.Z3)) {
       final BooleanFormulaManager bmgr = context.getFormulaManager().getBooleanFormulaManager();
 
       testWithBlockedLiterals(context, bmgr, logger);
@@ -156,9 +153,7 @@ public class SimpleUserPropagator {
     }
   }
 
-  /**
-   * This user propagator will raise a conflict whenever a registered expression is set to true.
-   */
+  /** This user propagator will raise a conflict whenever a registered expression is set to true. */
   private static class MyUserPropagator extends AbstractUserPropagator {
 
     private final List<BooleanFormula> disabledExpressions = new ArrayList<>();
@@ -183,7 +178,7 @@ public class SimpleUserPropagator {
       logger.log(Level.INFO, "Solver assigned", expr, "to", value);
       if (value && disabledExpressions.contains(expr)) {
         logger.log(Level.INFO, "User propagator raised conflict on", expr);
-        getBackend().propagateConflict(new BooleanFormula[]{expr});
+        getBackend().propagateConflict(new BooleanFormula[] {expr});
       }
     }
 
