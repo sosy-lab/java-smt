@@ -108,6 +108,10 @@ public class TranslateFormulaTest {
         .withMessage("Solver %s does not support integer theory", translateFrom)
         .that(translateFrom)
         .isNoneOf(Solvers.BOOLECTOR, Solvers.BITWUZLA);
+    assume()
+        .withMessage("Solver %s does not support integer theory", translateTo)
+        .that(translateTo)
+        .isNoneOf(Solvers.BOOLECTOR, Solvers.BITWUZLA);
   }
 
   @Test
