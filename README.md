@@ -56,19 +56,18 @@ Only a few SMT solvers provide support for theories like Arrays, Floating Point,
 
 Currently JavaSMT supports several SMT solvers (see [Getting Started](doc/Getting-started.md) for installation):
 
-| SMT Solver                                                              | Linux64 | Windows64 | MacOS | Description                                                                  |
-|-------------------------------------------------------------------------|:---:|:---:|:---:|:-----------------------------------------------------------------------------|
-| [Bitwuzla](https://boolector.github.io/)                                | :heavy_check_mark: |  |  | a fast solver for bitvector and floating-point logic, successor of Boolector |
-| [Boolector](https://boolector.github.io/)                               | :heavy_check_mark: |  |  | a fast solver for bitvector logic, misses formula introspection              |
-| [CVC4](https://cvc4.github.io/)                                         | :heavy_check_mark: |  |  |                                                                              |
-| [CVC5](https://cvc5.github.io/)                                         | :heavy_check_mark: |  |  | new!                                                                         |
-| [MathSAT5](http://mathsat.fbk.eu/)                                      | :heavy_check_mark: | :heavy_check_mark: |  |                                                                              |
-| [OpenSMT](https://verify.inf.usi.ch/opensmt)                            | :heavy_check_mark: |  |  | new!                                                                         |
-| [OptiMathSAT](http://optimathsat.disi.unitn.it/)                        | :heavy_check_mark: |  |  | based on MathSAT5, with support for optimization                             |
-| [Princess](http://www.philipp.ruemmer.org/princess.shtml)               | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | Java-based SMT solver                                                        |
-| [SMTInterpol](https://ultimate.informatik.uni-freiburg.de/smtinterpol/) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | Java-based SMT solver                                                        |
-| [Yices2](https://yices.csl.sri.com/)                                    | :heavy_check_mark: | [soon](https://github.com/sosy-lab/java-smt/pull/215) |  |                                                                              |
-| [Z3](https://github.com/Z3Prover/z3)                                    | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | mature and well-known solver                                                 |
+| SMT Solver | Linux64 | Windows64 | MacOS | Description |
+| --- |:---:|:---:|:---:|:--- |
+| [Boolector](https://boolector.github.io/) | :heavy_check_mark: |  |  | a fast solver for bitvector logic, misses formula introspection |
+| [CVC4](https://cvc4.github.io/) | :heavy_check_mark: |  |  |  |
+| [CVC5](https://cvc5.github.io/) | :heavy_check_mark: |  |  | new! |
+| [MathSAT5](http://mathsat.fbk.eu/) | :heavy_check_mark: | :heavy_check_mark: |  |  |
+| [OpenSMT](https://verify.inf.usi.ch/opensmt) | :heavy_check_mark: |  |  | new! |
+| [OptiMathSAT](http://optimathsat.disi.unitn.it/) | :heavy_check_mark: |  |  | based on MathSAT5, with support for optimization |
+| [Princess](http://www.philipp.ruemmer.org/princess.shtml) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | Java-based SMT solver |
+| [SMTInterpol](https://ultimate.informatik.uni-freiburg.de/smtinterpol/) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | Java-based SMT solver |
+| [Yices2](https://yices.csl.sri.com/) | :heavy_check_mark: | [soon](https://github.com/sosy-lab/java-smt/pull/215) |  |  |
+| [Z3](https://github.com/Z3Prover/z3) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | mature and well-known solver |
 
 The following features are supported (depending on the used SMT solver):
 
