@@ -160,12 +160,19 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
    * <p>A model might contain additional symbols with their evaluation, if a solver uses its own
    * temporary symbols. There should be at least a value-assignment for each free symbol.
    */
+  @SuppressWarnings("resource")
   @Override
   public Model getModel() throws SolverException {
     Preconditions.checkState(!closed);
     Preconditions.checkState(wasLastSatCheckSat, NO_MODEL_HELP);
     checkGenerateModels();
-    return new CachingModel(getEvaluatorWithoutChecks());
+    return new CachingModel(
+        registerEvaluator(
+            new BitwuzlaModel(
+                env,
+                this,
+                creator,
+                Collections2.transform(getAssertedFormulas(), creator::extractInfo))));
   }
 
   private List<BooleanFormula> getUnsatCore0() {
@@ -221,10 +228,15 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
     super.close();
   }
 
+  @SuppressWarnings("resource")
   @Override
   protected BitwuzlaModel getEvaluatorWithoutChecks() {
-    return new BitwuzlaModel(
-        env, this, creator, Collections2.transform(getAssertedFormulas(), creator::extractInfo));
+    return registerEvaluator(
+        new BitwuzlaModel(
+            env,
+            this,
+            creator,
+            Collections2.transform(getAssertedFormulas(), creator::extractInfo)));
   }
 
   public boolean isClosed() {
