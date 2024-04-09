@@ -165,8 +165,9 @@ public class SolverFormulaIODeclarationsTest
   public void parseDeclareRedundantBvTest() {
     requireBitvectors();
     BitvectorFormula var = bvmgr.makeVariable(8, "x");
-    String query = "(declare-fun x () (_ BitVec 8))(declare-fun x () (_ BitVec 8))(assert (= x x))";
-    if (EnumSet.of(Solvers.BITWUZLA).contains(solverToUse())) {
+    String query =
+        "(declare-fun x () (_ BitVec 8))(declare-fun x () (_ BitVec 8))(assert (= x #b00000000))";
+    if (EnumSet.of(Solvers.MATHSAT5, Solvers.BITWUZLA).contains(solverToUse())) {
       BooleanFormula formula = mgr.parse(query);
       Truth.assertThat(mgr.extractVariables(formula).values()).containsExactly(var);
     } else {
