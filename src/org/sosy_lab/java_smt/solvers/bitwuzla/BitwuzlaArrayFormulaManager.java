@@ -48,6 +48,7 @@ public class BitwuzlaArrayFormulaManager
   }
 
   @Override
+  @SuppressWarnings("MethodTypeParameterName")
   protected <TI extends Formula, TE extends Formula> Term internalMakeArray(
       FormulaType<TI> pIndexType, FormulaType<TE> pElementType, Term elseElem) {
     final ArrayFormulaType<TI, TE> arrayFormulaType =

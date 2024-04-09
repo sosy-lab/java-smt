@@ -209,12 +209,12 @@ public class BitwuzlaFloatingPointManager
   Random randomGenerator = new Random();
 
   private String generateRandomName(String prefix, int length) {
-    int char_a = Character.valueOf('a');
-    int char_z = Character.valueOf('z');
+    int charA = Character.valueOf('a');
+    int charZ = Character.valueOf('z');
 
     String generated =
         randomGenerator
-            .ints(char_a, char_z + 1)
+            .ints(charA, charZ + 1)
             .limit(length)
             .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
             .toString();
