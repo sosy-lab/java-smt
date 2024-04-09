@@ -83,8 +83,8 @@ SPDX-License-Identifier: Apache-2.0
         <delete includeEmptyDirs="true">
             <fileset dir="." includes="${class.dir}/** ${ivy.module}-*.jar ivy-*.xml *.so *.dll *.dylib *.jar"/>
             <fileset dir="lib/native/source/libmathsat5j" includes="*.so *.dll *.o"/>
-            <fileset dir="${bitwuzla.path}" includes="include/ src/"/>
-            <fileset dir="${bitwuzla.path}" includes="bitwuzla_wrap.cpp bitwuzla_wrap.h bitwuzla_wrap.o"/>
+            <fileset dir="${bitwuzla.path}" includes="include/"/>
+            <fileset dir="${bitwuzla.path}" includes="bitwuzla_wrap.o"/>
         </delete>
     </target>
 

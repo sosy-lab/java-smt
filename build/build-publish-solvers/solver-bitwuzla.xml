@@ -15,7 +15,8 @@ SPDX-License-Identifier: Apache-2.0
 
     <import file="macros.xml"/>
 
-    <target name="package-bitwuzla" depends="">
+    <!-- Determine version and build the Bitwuzla binaries -->
+    <target name="build-bitwuzla">
         <fail unless="bitwuzla.path">
             Please specify the path to Bitwuzla with the flag -Dbitwuzla.path=/path/to/bitwuzla.
             The path has to point to the root Bitwuzla folder, i.e.,
@@ -60,6 +61,14 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="install"/>
         </exec>
 
+        <!-- check if -Dbitwuzla.rebuildWrapper=on was used-->
+        <condition property="rebuild">
+            <istrue value="${bitwuzla.rebuildWrapper}"/>
+        </condition>
+    </target>
+
+    <!-- Run swig to generate a new wrapper. Only executed if rebuildWrapper was specified. -->
+    <target name="build-wrapper" if="rebuild" depends="build-bitwuzla">
         <!-- copy bitwuzla include files to the source tree -->
         <delete dir="${source.path}/include" quiet="true"/>
         <copy todir="${source.path}">
@@ -90,7 +99,17 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="-i"/>
             <arg value="lib/native/source/libbitwuzla/phantomReferences.patch"/>
         </exec>
+    </target>
 
+    <!-- Skip rebuilding the swig header if rebuildWrapper was not specified -->
+    <target name="skip-wrapper" unless="rebuild" depends="build-bitwuzla">
+        <echo>WARNING: Skipping the build step for the SWIG wrapper.
+        If the Bitwuzla API has changed since the last release the wrapper should be updated. Use
+        option -Dbitwuzla.rebuildWrapper to run SWIG and automatically generate a new wrapper.</echo>
+    </target>
+
+    <!-- Continue with the build and package everything -->
+    <target name="package-bitwuzla" depends="build-wrapper, skip-wrapper">
         <!-- compile java proxies and create jar file -->
         <mkdir dir="${source.path}/build"/>
         <javac release="11" srcdir="${source.path}/src/" destdir="${source.path}/build" includeantruntime="false"
@@ -213,7 +232,6 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="libbitwuzlaJNI-${bitwuzla.version}.so"/>
         </exec>
     </target>
-
 
     <target name="publish-bitwuzla" depends="package-bitwuzla, load-ivy"
             description="Publish Bitwuzla binaries to Ivy repository.">
