@@ -147,9 +147,7 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="libbitwuzlaJNI.so"/>
             <arg value="bitwuzla_wrap.o"/>
             <arg value="-L${bitwuzla.path}/install/lib/x86_64-linux-gnu"/>
-            <arg value="-L${gmp.path}/.libs"/>
             <arg value="-lbitwuzla"/>
-            <arg value="-lgmp"/>
             <arg value="-Wl,-z,defs"/>
         </exec>
 
@@ -214,21 +212,6 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="--replace-needed"/>
             <arg value="libbitwuzla.so.0"/>
             <arg value="libbitwuzla.so"/>
-            <arg value="--replace-needed"/>
-            <arg value="libgmp.so.10"/>
-            <arg value="libgmp.so"/>
-            <arg value="libbitwuzlaJNI-${bitwuzla.version}.so"/>
-        </exec>
-        <!-- We need to run this twice? -->
-        <exec executable="patchelf" failonerror="true">
-            <arg value="--set-rpath"/>
-            <arg value="$ORIGIN"/>
-            <arg value="--replace-needed"/>
-            <arg value="libbitwuzla.so.0"/>
-            <arg value="libbitwuzla.so"/>
-            <arg value="--replace-needed"/>
-            <arg value="libgmp.so.10"/>
-            <arg value="libgmp.so"/>
             <arg value="libbitwuzlaJNI-${bitwuzla.version}.so"/>
         </exec>
     </target>
