@@ -48,6 +48,17 @@ public class BitwuzlaArrayFormulaManager
   }
 
   @Override
+  protected <TI extends Formula, TE extends Formula> Term internalMakeArray(
+      FormulaType<TI> pIndexType,
+      FormulaType<TE> pElementType,
+      Term elseElem) {
+    final ArrayFormulaType<TI, TE> arrayFormulaType =
+        FormulaType.getArrayType(pIndexType, pElementType);
+    final Sort bitwuzlaArrayType = toSolverType(arrayFormulaType);
+    return termManager.mk_const_array(bitwuzlaArrayType, elseElem);
+  }
+
+  @Override
   protected Term equivalence(Term pArray1, Term pArray2) {
     return termManager.mk_term(Kind.EQUAL, pArray1, pArray2);
   }
