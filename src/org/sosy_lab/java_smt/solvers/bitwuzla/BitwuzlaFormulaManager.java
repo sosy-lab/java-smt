@@ -65,7 +65,20 @@ public final class BitwuzlaFormulaManager
     ImmutableList.Builder<String> builder = ImmutableList.builder();
     int level = 0;
     StringBuilder read = new StringBuilder();
-    for (char c : input.toCharArray()) {
+    boolean inComment = false;
+    for (int i = 0; i < input.length(); i++) {
+      char c = input.charAt(i);
+      if (inComment) {
+        if (c == '\n') {
+          inComment = false;
+        }
+        continue;
+      }
+      if (c == ';') {
+        // Comment
+        inComment = true;
+        continue;
+      }
       if (level == 0) {
         if (!Character.isWhitespace(c)) {
           if (c == '(') {
