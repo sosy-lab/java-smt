@@ -2,13 +2,14 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_AND;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_ARRAY_CONST;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_ARRAY_READ;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_ARRAY_WRITE;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_ADD;
@@ -408,6 +409,8 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.SELECT;
       case MSAT_TAG_ARRAY_WRITE:
         return FunctionDeclarationKind.STORE;
+      case MSAT_TAG_ARRAY_CONST:
+        return FunctionDeclarationKind.CONST;
 
       case MSAT_TAG_BV_EXTRACT:
         return FunctionDeclarationKind.BV_EXTRACT;

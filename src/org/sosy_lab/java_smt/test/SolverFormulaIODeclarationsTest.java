@@ -18,7 +18,6 @@ import java.util.EnumSet;
 import org.junit.Before;
 import org.junit.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
-import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -40,7 +39,6 @@ public class SolverFormulaIODeclarationsTest
 
   @Test
   public void parseDeclareInQueryTest2() {
-    requireIntegers();
     String query = "(declare-fun x () Int)(assert (= 0 x))";
     BooleanFormula formula = mgr.parse(query);
     Truth.assertThat(mgr.extractVariables(formula)).hasSize(1);
@@ -48,7 +46,6 @@ public class SolverFormulaIODeclarationsTest
 
   @Test
   public void parseDeclareInQueryTest3() {
-    requireIntegers();
     String query = "(declare-fun foo (Int Int) Bool)(assert (foo 1 2))";
     BooleanFormula formula = mgr.parse(query);
     Truth.assertThat(mgr.extractVariablesAndUFs(formula)).hasSize(1);
@@ -56,7 +53,6 @@ public class SolverFormulaIODeclarationsTest
 
   @Test
   public void parseDeclareInQueryTest4() {
-    requireIntegers();
     String query = "(declare-fun x () Int)(declare-fun foo (Int Int) Bool)(assert (foo x 2))";
     BooleanFormula formula = mgr.parse(query);
     Truth.assertThat(mgr.extractVariablesAndUFs(formula)).hasSize(2);
@@ -72,7 +68,6 @@ public class SolverFormulaIODeclarationsTest
 
   @Test
   public void parseDeclareAfterQueryTest2() {
-    requireIntegers();
     String query = "(declare-fun x () Int)(assert (= 0 x))";
     BooleanFormula formula = mgr.parse(query);
     IntegerFormula var = imgr.makeVariable("x");
@@ -81,7 +76,6 @@ public class SolverFormulaIODeclarationsTest
 
   @Test
   public void parseDeclareAfterQueryTest3() {
-    requireIntegers();
     String query = "(declare-fun foo (Int Int) Bool)(assert (foo 1 2))";
     BooleanFormula formula = mgr.parse(query);
     BooleanFormula calledFoo =
@@ -91,7 +85,6 @@ public class SolverFormulaIODeclarationsTest
 
   @Test
   public void parseDeclareAfterQueryTest4() {
-    requireIntegers();
     String query = "(declare-fun x () Int)(declare-fun foo (Int Int) Bool)(assert (foo 1 x))";
     BooleanFormula formula = mgr.parse(query);
     IntegerFormula var = imgr.makeVariable("x");
@@ -133,7 +126,6 @@ public class SolverFormulaIODeclarationsTest
 
   @Test
   public void parseDeclareRedundantTest1() {
-    requireIntegers();
     IntegerFormula var = imgr.makeVariable("x");
     String query = "(declare-fun x () Int)(declare-fun x () Int)(assert (= 0 x))";
     if (EnumSet.of(Solvers.PRINCESS, Solvers.Z3).contains(solverToUse())) {
@@ -147,7 +139,6 @@ public class SolverFormulaIODeclarationsTest
 
   @Test
   public void parseDeclareRedundantTest2() {
-    requireIntegers();
     IntegerFormula var =
         fmgr.declareAndCallUF("foo", IntegerType, imgr.makeNumber(1), imgr.makeNumber(2));
     String query =
@@ -176,14 +167,12 @@ public class SolverFormulaIODeclarationsTest
 
   @Test
   public void parseDeclareConflictInQueryTest1() {
-    requireIntegers();
     String query = "(declare-fun x () Bool)(declare-fun x () Int)(assert (= 0 x))";
     assertThrows(IllegalArgumentException.class, () -> mgr.parse(query));
   }
 
   @Test
   public void parseDeclareConflictInQueryTest2() {
-    requireIntegers();
     String query = "(declare-fun x () Bool)(declare-fun x (Int Int) Bool)(assert (x 2 3))";
     if (Solvers.Z3 != solverToUse()) {
       assertThrows(IllegalArgumentException.class, () -> mgr.parse(query));
@@ -192,7 +181,6 @@ public class SolverFormulaIODeclarationsTest
 
   @Test
   public void parseDeclareConflictInQueryTest3() {
-    requireIntegers();
     String query = "(declare-fun x (Int) Bool)(declare-fun x (Int) Int)(assert (x 0))";
     if (Solvers.Z3 != solverToUse()) {
       assertThrows(IllegalArgumentException.class, () -> mgr.parse(query));
@@ -201,18 +189,8 @@ public class SolverFormulaIODeclarationsTest
 
   @Test
   public void parseDeclareConflictBeforeQueryTest() {
-    requireIntegers();
     @SuppressWarnings("unused")
     IntegerFormula var = imgr.makeVariable("x");
-    String query = "(declare-fun x () Bool)(assert (= 0 x))";
-    assertThrows(IllegalArgumentException.class, () -> mgr.parse(query));
-  }
-
-  @Test
-  public void parseDeclareConflictBeforeBvQueryTest() {
-    requireBitvectors();
-    @SuppressWarnings("unused")
-    BitvectorFormula var = bvmgr.makeVariable(8, "x");
     String query = "(declare-fun x () Bool)(assert (= 0 x))";
     assertThrows(IllegalArgumentException.class, () -> mgr.parse(query));
   }
@@ -222,11 +200,8 @@ public class SolverFormulaIODeclarationsTest
     String query = "(declare-fun x () Bool)(assert x)";
     BooleanFormula formula = mgr.parse(query);
     Truth.assertThat(mgr.extractVariables(formula).values()).hasSize(1);
-    if (!EnumSet.of(Solvers.PRINCESS, Solvers.Z3, Solvers.BITWUZLA).contains(solverToUse())) {
+    if (!EnumSet.of(Solvers.PRINCESS, Solvers.Z3).contains(solverToUse())) {
       assertThrows(IllegalArgumentException.class, () -> imgr.makeVariable("x"));
-    } else if (EnumSet.of(Solvers.BITWUZLA).contains(solverToUse())) {
-      Truth.assertThat(mgr.extractVariables(formula).values())
-          .doesNotContain(bvmgr.makeVariable(32, "x"));
     } else {
       Truth.assertThat(mgr.extractVariables(formula).values())
           .doesNotContain(imgr.makeVariable("x"));
@@ -257,7 +232,6 @@ public class SolverFormulaIODeclarationsTest
 
   @Test
   public void parseDeclareOnceNotTwiceTest2() {
-    requireIntegers();
     String query1 =
         "(declare-fun x () Bool)(declare-fun foo (Int Int) Bool)(assert (= (foo 1 2) x))";
     String query2 = "(assert (and (not x) (foo 3 4)))";

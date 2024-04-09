@@ -347,7 +347,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
     assume()
         .withMessage("Solver %s does not support arrays with integer index", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.BOOLECTOR, Solvers.BITWUZLA);
+        .isNotEqualTo(Solvers.BOOLECTOR);
 
     BitvectorFormula bv = bvmgr.makeBitvector(4, 3);
     ArrayFormula<IntegerFormula, BitvectorFormula> arr =
