@@ -93,7 +93,7 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- compile java proxies and create jar file -->
         <mkdir dir="${source.path}/build"/>
-        <javac target="11" srcdir="${source.path}/src/" destdir="${source.path}/build" includeantruntime="false"
+        <javac release="11" srcdir="${source.path}/src/" destdir="${source.path}/build" includeantruntime="false"
                failonerror="true">
             <include name="org/sosy_lab/java_smt/solvers/bitwuzla/api/*.java"/>
         </javac>
