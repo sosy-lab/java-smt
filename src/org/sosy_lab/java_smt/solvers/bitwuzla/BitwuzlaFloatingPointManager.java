@@ -81,10 +81,7 @@ public class BitwuzlaFloatingPointManager
 
   @Override
   protected Term makeNumberImpl(
-      BigInteger exponent,
-      BigInteger mantissa,
-      boolean signBit,
-      FloatingPointType type) {
+      BigInteger exponent, BigInteger mantissa, boolean signBit, FloatingPointType type) {
     Sort signSort = termManager.mk_bv_sort(1);
     Term signTerm = termManager.mk_bv_value(signSort, signBit ? "1" : "0");
 
