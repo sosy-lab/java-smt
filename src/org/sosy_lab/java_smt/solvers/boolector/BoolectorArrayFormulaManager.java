@@ -16,6 +16,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
 
+@SuppressWarnings("MethodTypeParameterName")
 public class BoolectorArrayFormulaManager
     extends AbstractArrayFormulaManager<Long, Long, Long, Long> {
 
@@ -62,6 +63,12 @@ public class BoolectorArrayFormulaManager
     final long array = BtorJNI.boolector_array(btor, arraySort, name);
     nameFormulaCache.put(name, arraySort, array);
     return array;
+  }
+
+  @Override
+  protected <TI extends Formula, TE extends Formula> Long internalMakeArray(
+      FormulaType<TI> pIndexType, FormulaType<TE> pElementType, Long elseElem) {
+    throw new UnsupportedOperationException();
   }
 
   @Override

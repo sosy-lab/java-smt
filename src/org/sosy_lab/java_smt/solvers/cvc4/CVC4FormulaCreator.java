@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -16,6 +16,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.primitives.Ints;
+import edu.stanford.CVC4.ArrayStoreAll;
 import edu.stanford.CVC4.ArrayType;
 import edu.stanford.CVC4.BitVectorType;
 import edu.stanford.CVC4.Expr;
@@ -323,6 +324,18 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
         return visitor.visitConstant(formula, f.getConstRoundingMode());
       } else if (type.isString()) {
         return visitor.visitConstant(formula, f.getConstString());
+      } else if (type.isArray()) {
+        ArrayStoreAll storeAll = f.getConstArrayStoreAll();
+        Expr constant = storeAll.getExpr();
+        return visitor.visitFunction(
+            formula,
+            ImmutableList.of(encapsulate(constant)),
+            FunctionDeclarationImpl.of(
+                getName(f),
+                getDeclarationKind(f),
+                ImmutableList.of(getFormulaTypeFromTermType(constant.getType())),
+                getFormulaType(f),
+                f.getKind()));
       } else {
         throw new UnsupportedOperationException("Unhandled constant " + f + " with type " + type);
       }
@@ -506,6 +519,9 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           .put(Kind.REGEXP_INTER, FunctionDeclarationKind.RE_INTERSECT)
           .put(Kind.REGEXP_COMPLEMENT, FunctionDeclarationKind.RE_COMPLEMENT)
           .put(Kind.REGEXP_DIFF, FunctionDeclarationKind.RE_DIFFERENCE)
+          .put(Kind.SELECT, FunctionDeclarationKind.SELECT)
+          .put(Kind.STORE, FunctionDeclarationKind.STORE)
+          .put(Kind.STORE_ALL, FunctionDeclarationKind.CONST)
           .buildOrThrow();
 
   private FunctionDeclarationKind getDeclarationKind(Expr f) {

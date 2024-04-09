@@ -39,7 +39,7 @@ import ap.parser.ITimes;
 import ap.parser.IVariable;
 import ap.terfor.conjunctions.Quantifier;
 import ap.terfor.preds.Predicate;
-import ap.theories.ExtArray;
+import ap.theories.arrays.ExtArray;
 import ap.theories.bitvectors.ModuloArithmetic;
 import ap.theories.nia.GroebnerMultiplication$;
 import ap.types.Sort;
@@ -427,6 +427,8 @@ class PrincessFormulaCreator
         return FunctionDeclarationKind.SELECT;
       } else if (ExtArray.Store$.MODULE$.unapply(fun).isDefined()) {
         return FunctionDeclarationKind.STORE;
+      } else if (ExtArray.Const$.MODULE$.unapply(fun).isDefined()) {
+        return FunctionDeclarationKind.CONST;
       } else if (fun == ModuloArithmetic.mod_cast()) {
         return FunctionDeclarationKind.OTHER;
       } else if (fun == ModuloArithmetic.int_cast()) {

@@ -8,15 +8,16 @@
 
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_array_const;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_array_read;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_array_write;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_equal;
 
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
 
+@SuppressWarnings("MethodTypeParameterName")
 class Mathsat5ArrayFormulaManager extends AbstractArrayFormulaManager<Long, Long, Long, Long> {
 
   private final long mathsatEnv;
@@ -40,12 +41,15 @@ class Mathsat5ArrayFormulaManager extends AbstractArrayFormulaManager<Long, Long
   @SuppressWarnings("MethodTypeParameterName")
   protected <TI extends Formula, TE extends Formula> Long internalMakeArray(
       String pName, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
-    // throw new UnsupportedOperationException("Please implement me!");
-    final ArrayFormulaType<TI, TE> arrayFormulaType =
-        FormulaType.getArrayType(pIndexType, pElementType);
-    final Long mathsatArrayType = toSolverType(arrayFormulaType);
-
+    final Long mathsatArrayType = toSolverType(FormulaType.getArrayType(pIndexType, pElementType));
     return getFormulaCreator().makeVariable(mathsatArrayType, pName);
+  }
+
+  @Override
+  protected <TI extends Formula, TE extends Formula> Long internalMakeArray(
+      FormulaType<TI> pIndexType, FormulaType<TE> pElementType, Long elseElem) {
+    final Long mathsatArrayType = toSolverType(FormulaType.getArrayType(pIndexType, pElementType));
+    return msat_make_array_const(mathsatEnv, mathsatArrayType, elseElem);
   }
 
   @Override
