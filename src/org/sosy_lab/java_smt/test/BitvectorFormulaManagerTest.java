@@ -533,7 +533,6 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
   @Test
   @SuppressWarnings("CheckReturnValue")
   public void bvOutOfRange() {
-    assume().that(solver).isNotEqualTo(Solvers.BITWUZLA);
     for (int[] sizeAndValue : new int[][] {{4, 32}, {4, -9}, {8, 300}, {8, -160}}) {
       try {
         bvmgr.makeBitvector(sizeAndValue[0], sizeAndValue[1]);
