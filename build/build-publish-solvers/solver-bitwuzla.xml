@@ -151,6 +151,14 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="-Wl,-z,defs"/>
         </exec>
 
+        <!-- patch JNI library as it fails to do later for some reason -->
+        <exec executable="patchelf" failonerror="true">
+            <arg value="--set-rpath"/>
+            <arg value="$ORIGIN"/>
+            <arg value="--replace-needed"/><arg value="libbitwuzla.so.0"/><arg value="libbitwuzla.so"/>
+            <arg value="${source.path}/libbitwuzlaJNI.so"/>
+        </exec>
+
         <!-- copy library files into directory to be published for Ivy -->
         <move file="${source.path}/libbitwuzlaJNI.so"
               tofile="libbitwuzlaJNI-${bitwuzla.version}.so"
@@ -171,7 +179,7 @@ SPDX-License-Identifier: Apache-2.0
               tofile="libgmp-${bitwuzla.version}.so"
               failonerror="true"/>
 
-        <!-- patch libraries -->
+        <!-- patch all other libraries -->
         <exec executable="patchelf" failonerror="true">
             <arg value="--set-rpath"/>
             <arg value="$ORIGIN"/>
@@ -205,14 +213,6 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="libgmp.so.10"/>
             <arg value="libgmp.so"/>
             <arg value="libbitwuzla-${bitwuzla.version}.so"/>
-        </exec>
-        <exec executable="patchelf" failonerror="true">
-            <arg value="--set-rpath"/>
-            <arg value="$ORIGIN"/>
-            <arg value="--replace-needed"/>
-            <arg value="libbitwuzla.so.0"/>
-            <arg value="libbitwuzla.so"/>
-            <arg value="libbitwuzlaJNI-${bitwuzla.version}.so"/>
         </exec>
     </target>
 
