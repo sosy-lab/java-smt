@@ -158,6 +158,12 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="--replace-needed"/><arg value="libbitwuzla.so.0"/><arg value="libbitwuzla.so"/>
             <arg value="${source.path}/libbitwuzlaJNI.so"/>
         </exec>
+        <exec executable="patchelf" failonerror="true">
+            <arg value="--set-rpath"/>
+            <arg value="$ORIGIN"/>
+            <arg value="--replace-needed"/><arg value="libbitwuzla.so.0"/><arg value="libbitwuzla.so"/>
+            <arg value="${source.path}/libbitwuzlaJNI.so"/>
+        </exec>
 
         <!-- copy library files into directory to be published for Ivy -->
         <move file="${source.path}/libbitwuzlaJNI.so"
