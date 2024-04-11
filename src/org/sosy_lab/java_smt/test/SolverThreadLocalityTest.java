@@ -340,7 +340,16 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
   @Test
   public void wrongContextTest()
       throws InterruptedException, SolverException, InvalidConfigurationException {
-    assume().that(solverToUse()).isAnyOf(Solvers.CVC4, Solvers.CVC5, Solvers.YICES2);
+    assume()
+        .that(solverToUse())
+        .isNoneOf(
+            Solvers.OPENSMT,
+            Solvers.MATHSAT5,
+            Solvers.SMTINTERPOL,
+            Solvers.Z3,
+            Solvers.PRINCESS,
+            Solvers.BOOLECTOR,
+            Solvers.BITWUZLA);
 
     // FIXME: This test tries to use a formula that was created in a different context. We expect
     //  this test to fail for most solvers, but there should be a unique error message.
@@ -361,6 +370,10 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
     //    key not found: i@15
     //  Boolector crashes with a segfault:
     //    boolector_assert: argument 'exp' belongs to different Boolector instance
+    //  Bitwuzla:
+    //    java.lang.IllegalArgumentException: invalid call to
+    //    'void bitwuzla::Bitwuzla::assert_formula(const bitwuzla::Term&)',
+    //    mismatching term manager for asserted formula
     //
     // To fix this issue, we would need to track which formula was created in which context,
     // which might result in quite some management and memory overhead.
