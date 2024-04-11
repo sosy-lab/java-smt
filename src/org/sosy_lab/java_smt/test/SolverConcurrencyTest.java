@@ -128,6 +128,7 @@ public class SolverConcurrencyTest {
         .that(solver)
         .isNoneOf(
             Solvers.SMTINTERPOL,
+            Solvers.BITWUZLA,
             Solvers.BOOLECTOR,
             Solvers.OPENSMT, // INFO: OpenSMT does not support concurrent stacks
             Solvers.MATHSAT5,
@@ -410,7 +411,8 @@ public class SolverConcurrencyTest {
    * the Threads).
    */
   @Test
-  public void testConcurrentStack() throws InvalidConfigurationException, InterruptedException {
+  public void testConcurrentIntegerStack()
+      throws InvalidConfigurationException, InterruptedException {
     requireIntegers();
     requireConcurrentMultipleStackSupport();
     SolverContext context = initSolver();
@@ -418,6 +420,39 @@ public class SolverConcurrencyTest {
     IntegerFormulaManager imgr = mgr.getIntegerFormulaManager();
     BooleanFormulaManager bmgr = mgr.getBooleanFormulaManager();
     HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
+
+    ConcurrentLinkedQueue<BasicProverEnvironment<?>> proverList = new ConcurrentLinkedQueue<>();
+    for (int i = 0; i < NUMBER_OF_THREADS; i++) {
+      BooleanFormula instance = gen.generate(INTEGER_FORMULA_GEN.getOrDefault(solver, 9));
+      BasicProverEnvironment<?> pe = context.newProverEnvironment();
+      pe.push(instance);
+      proverList.add(pe);
+    }
+    assertConcurrency(
+        "testConcurrentStack",
+        () -> {
+          BasicProverEnvironment<?> stack = proverList.poll();
+          assertWithMessage("Solver %s failed a concurrency test", solverToUse())
+              .that(stack.isUnsat())
+              .isTrue();
+        });
+    closeSolver(context);
+  }
+
+  /**
+   * Test solving of large formula on concurrent stacks in one context (Stacks are not created in
+   * the Threads).
+   */
+  @Test
+  public void testConcurrentBitvectorStack()
+      throws InvalidConfigurationException, InterruptedException {
+    requireBitvectors();
+    requireConcurrentMultipleStackSupport();
+    SolverContext context = initSolver();
+    FormulaManager mgr = context.getFormulaManager();
+    BitvectorFormulaManager bvmgr = mgr.getBitvectorFormulaManager();
+    BooleanFormulaManager bmgr = mgr.getBooleanFormulaManager();
+    HardBitvectorFormulaGenerator gen = new HardBitvectorFormulaGenerator(bvmgr, bmgr);
 
     ConcurrentLinkedQueue<BasicProverEnvironment<?>> proverList = new ConcurrentLinkedQueue<>();
     for (int i = 0; i < NUMBER_OF_THREADS; i++) {
