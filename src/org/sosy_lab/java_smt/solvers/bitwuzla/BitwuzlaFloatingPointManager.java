@@ -10,7 +10,6 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Random;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
@@ -62,7 +61,7 @@ public class BitwuzlaFloatingPointManager
         out = termManager.mk_rm_value(RoundingMode.RTZ);
         break;
       default:
-        throw new AssertionError("Unexpected value");
+        throw new AssertionError("Unexpected value for Floating-Point rounding mode.");
     }
     return out;
   }
@@ -165,7 +164,8 @@ public class BitwuzlaFloatingPointManager
         return termManager.mk_term(Kind.FP_TO_UBV, pRoundingMode, pNumber, targetType.getSize());
       }
     } else {
-      throw new UnsupportedOperationException("Attempted cast to an unsupported type.");
+      throw new UnsupportedOperationException(
+          "Attempted cast of FP to an unsupported type: " + pTargetType + ".");
     }
   }
 
@@ -193,7 +193,8 @@ public class BitwuzlaFloatingPointManager
       }
 
     } else {
-      throw new UnsupportedOperationException("Attempted cast from an unsupported type.");
+      throw new UnsupportedOperationException(
+          "Attempted cast towards FP from an unsupported type" + ": " + formulaType + ".");
     }
   }
 
@@ -204,21 +205,6 @@ public class BitwuzlaFloatingPointManager
         pNumber,
         pTargetType.getExponentSize(),
         pTargetType.getMantissaSize() + 1);
-  }
-
-  Random randomGenerator = new Random();
-
-  private String generateRandomName(String prefix, int length) {
-    int charA = Character.valueOf('a');
-    int charZ = Character.valueOf('z');
-
-    String generated =
-        randomGenerator
-            .ints(charA, charZ + 1)
-            .limit(length)
-            .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
-            .toString();
-    return prefix + "_" + generated;
   }
 
   @Override
@@ -235,7 +221,8 @@ public class BitwuzlaFloatingPointManager
     // representation.
     Term bvNaN =
         termManager.mk_bv_value(bvSort, "0" + "1".repeat(sizeExp + 1) + "0".repeat(sizeSig - 2));
-    Term bvVar = termManager.mk_const(bvSort, generateRandomName("toIeeeBitvector", 10));
+
+    Term bvVar = termManager.mk_const(bvSort, pNumber.symbol() + "_toIeeeBitvector");
     Term equal =
         termManager.mk_term(
             Kind.ITE,
