@@ -828,15 +828,15 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         prover.push(bvmgr.greaterThan(x, bvmgr.makeBitvector(8, 0), true));
         assertThat(prover).isSatisfiable();
         try (Model m = prover.getModel()) {
-          if (solver != Solvers.BOOLECTOR) {
+          if (solver != Solvers.BOOLECTOR && solver != Solvers.BITWUZLA) {
             assertThat(m.evaluate(x)).isEqualTo(BigInteger.ONE);
           } else {
             assertThat(m.evaluate(x)).isEqualTo(BigInteger.valueOf(64));
           }
           // it works now, but maybe the model "x=1" for the constraint "x>0" is not valid for new
           // solvers.
-          // Can confirm ;D Boolector likes to take the "max" values for bitvectors instead of the
-          // min; as a result it returns 64
+          // Can confirm ;D Boolector/Bitwuzla like to take the "max" values for bitvectors
+          // instead of the min; as a result it returns 64
         }
       }
     }
@@ -1111,6 +1111,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void testGetArrays6() throws SolverException, InterruptedException {
     requireArrays();
+    requireIntegers();
     requireArrayModel();
     requireParser();
 
@@ -1138,6 +1139,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void testGetArrays3() throws SolverException, InterruptedException {
     requireParser();
+    requireIntegers();
     requireArrays();
     requireArrayModel();
 
@@ -1180,6 +1182,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void testGetArrays4() throws SolverException, InterruptedException {
     requireParser();
+    requireIntegers();
     requireArrays();
     requireArrayModel();
 
@@ -1236,6 +1239,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireParser();
     requireArrays();
     requireArrayModel();
+    requireIntegers();
 
     // create formula for "arr[5:6]==[x,x] && x==123"
     BooleanFormula f =
@@ -1261,6 +1265,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void testGetArrays5b() throws SolverException, InterruptedException {
     requireParser();
+    requireIntegers();
     requireArrays();
     requireArrayModel();
 
@@ -1316,6 +1321,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void testGetArrays5c() throws SolverException, InterruptedException {
     requireParser();
+    requireIntegers();
     requireArrays();
     requireArrayModel();
 
@@ -1352,6 +1358,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void testGetArrays5d() throws SolverException, InterruptedException {
     requireParser();
+    requireIntegers();
     requireArrays();
     requireArrayModel();
 
@@ -1388,6 +1395,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void testGetArrays5e() throws SolverException, InterruptedException {
     requireParser();
+    requireIntegers();
     requireArrays();
     requireArrayModel();
 
@@ -1424,6 +1432,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void testGetArrays5f() throws SolverException, InterruptedException {
     requireParser();
+    requireIntegers();
     requireArrays();
     requireArrayModel();
 
@@ -2141,6 +2150,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireParser();
     requireArrays();
     requireArrayModel();
+    requireIntegers();
 
     for (String query :
         ImmutableList.of(
@@ -2156,6 +2166,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireArrays();
     requireArrayModel();
     requireOptimization();
+    requireIntegers();
     requireFloats();
     requireBitvectors();
     // only Z3 fulfills these requirements
@@ -2193,6 +2204,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void arrayTest3() throws SolverException, InterruptedException {
     requireParser();
+    requireIntegers();
     requireArrays();
     requireArrayModel();
 
@@ -2204,6 +2216,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   public void arrayTest4() throws SolverException, InterruptedException {
     requireParser();
     requireArrays();
+    requireIntegers();
     requireBitvectors();
     BooleanFormula formula = context.getFormulaManager().parse(ARRAY_QUERY_BV);
     checkModelIteration(formula, false);

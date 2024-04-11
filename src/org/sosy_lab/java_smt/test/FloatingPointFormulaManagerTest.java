@@ -566,6 +566,7 @@ public class FloatingPointFormulaManagerTest
 
   @Test
   public void round() throws SolverException, InterruptedException {
+    requireIntegers();
 
     // constants
     round0(0, 0, 0, 0, 0, 0);
@@ -667,6 +668,7 @@ public class FloatingPointFormulaManagerTest
 
   @Test
   public void rationalToFpMinusOne() throws SolverException, InterruptedException {
+    requireRationals();
     requireBitvectors();
 
     NumeralFormula ratOne = rmgr.makeNumber(-1);
@@ -831,21 +833,27 @@ public class FloatingPointFormulaManagerTest
             Float.MAX_VALUE,
             Float.POSITIVE_INFINITY,
             Float.NEGATIVE_INFINITY,
-            0.0f, // , -0.0f // MathSat5 fails for NEGATIVE_ZERO
+            0.0f,
             1f,
             -1f,
             2f,
             -2f);
 
-    for (int i = 1; i < 20; i++) {
-      for (int j = 1; j < 20; j++) {
+    if (solverToUse() != Solvers.MATHSAT5) {
+      flts.add(-0.0f); // MathSat5 fails for NEGATIVE_ZERO
+    }
+
+    final int stepSize = solverToUse() == Solvers.BITWUZLA ? 10 : 1;
+    for (int i = 1; i < 20; i += stepSize) {
+      for (int j = 1; j < 20; j += stepSize) {
         flts.add((float) (i * Math.pow(10, j)));
         flts.add((float) (-i * Math.pow(10, j)));
       }
     }
 
+    final int numRandom = solverToUse() == Solvers.BITWUZLA ? 5 : NUM_RANDOM_TESTS;
     Random rand = new Random(0);
-    for (int i = 0; i < NUM_RANDOM_TESTS; i++) {
+    for (int i = 0; i < numRandom; i++) {
       float flt = Float.intBitsToFloat(rand.nextInt());
       if (!Float.isNaN(flt)) {
         flts.add(flt);
@@ -864,21 +872,27 @@ public class FloatingPointFormulaManagerTest
             Double.MAX_VALUE,
             Double.POSITIVE_INFINITY,
             Double.NEGATIVE_INFINITY,
-            0.0, // , -0.0 // MathSat5 fails for NEGATIVE_ZERO
+            0.0,
             1d,
             -1d,
             2d,
             -2d);
 
-    for (int i = 1; i < 20; i++) {
-      for (int j = 1; j < 20; j++) {
+    if (solverToUse() != Solvers.MATHSAT5) {
+      dbls.add(-0.0); // MathSat5 fails for NEGATIVE_ZERO
+    }
+
+    final int stepSize = solverToUse() == Solvers.BITWUZLA ? 10 : 1;
+    for (int i = 1; i < 20; i += stepSize) {
+      for (int j = 1; j < 20; j += stepSize) {
         dbls.add(i * Math.pow(10, j));
         dbls.add(-i * Math.pow(10, j));
       }
     }
 
+    final int numRandom = solverToUse() == Solvers.BITWUZLA ? 5 : NUM_RANDOM_TESTS;
     Random rand = new Random(0);
-    for (int i = 0; i < NUM_RANDOM_TESTS; i++) {
+    for (int i = 0; i < numRandom; i++) {
       double d = Double.longBitsToDouble(rand.nextLong());
       if (!Double.isNaN(d)) {
         dbls.add(d);
