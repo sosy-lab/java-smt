@@ -514,11 +514,9 @@ public class BitwuzlaNativeApiTest {
     assertThat(indices.get(0)).isEqualTo(2);
   }
 
-  // Todo:
-  @Ignore
   @Test
   public void testExists() {
-    // EXISTS x, y . x = z AND y = z implies x = y
+    // EXISTS x, y . (z != 0) AND (x = z AND y = z) implies x = y
     Sort bvSort8 = termManager.mk_bv_sort(8);
     Term x = termManager.mk_const(bvSort8, "x");
     Term y = termManager.mk_const(bvSort8, "y");
@@ -527,8 +525,12 @@ public class BitwuzlaNativeApiTest {
     Term xEqZ = termManager.mk_term(Kind.EQUAL, x, z);
     Term yEqZ = termManager.mk_term(Kind.EQUAL, y, z);
     Term xEqY = termManager.mk_term(Kind.EQUAL, x, y);
-    Term formula =
+    Term zNotEq0 =
+        termManager.mk_term(
+            Kind.NOT, termManager.mk_term(Kind.EQUAL, z, termManager.mk_bv_zero(bvSort8)));
+    Term implies =
         termManager.mk_term(Kind.IMPLIES, termManager.mk_term(Kind.AND, xEqZ, yEqZ), xEqY);
+    Term formula = termManager.mk_term(Kind.AND, zNotEq0, implies);
 
     // Substitute the free vars with bound vars
     Term xB = termManager.mk_var(bvSort8, "x");
@@ -545,9 +547,21 @@ public class BitwuzlaNativeApiTest {
     // Check SAT
     bitwuzla.assert_formula(ex);
     Result res = bitwuzla.check_sat();
-    assertThat(res).isEqualTo(Result.UNSAT);
+    assertThat(res).isEqualTo(Result.SAT);
 
-    // Model
+    // Get model values and compare
+    String xString = x.toString();
+    assertThat(xString).isEqualTo("x");
+    String xValue = bitwuzla.get_value(x).toString();
+    String yString = y.toString();
+    assertThat(yString).isEqualTo("y");
+    String yValue = bitwuzla.get_value(y).toString();
+    String zString = z.toString();
+    assertThat(zString).isEqualTo("z");
+    String zValue = bitwuzla.get_value(z).toString();
+    assertThat(xValue).isEqualTo(yValue);
+    assertThat(zValue).isEqualTo(xValue);
+    assertThat(zValue).doesNotContain("00000000");
   }
 
   private static final String SMT2DUMP =
