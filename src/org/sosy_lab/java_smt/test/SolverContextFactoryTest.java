@@ -130,12 +130,12 @@ public class SolverContextFactoryTest {
     return true;
   }
 
-  /** Bitwuzla requires GLIB version 2.20 or newer. This is not included in Ubuntu 18.04. */
+  /** Bitwuzla requires GLIB version 2.32 or newer. This is not included in Ubuntu 18.04. */
   private boolean isSufficientVersionOfLibc() {
     try {
       NativeLibraries.loadLibrary("bitwuzla");
     } catch (UnsatisfiedLinkError e) {
-      if (e.getMessage().contains("version `GLIBC_2.29' not found")) {
+      if (e.getMessage().contains("version `GLIBC_2.32' not found")) {
         return false;
       }
     }
