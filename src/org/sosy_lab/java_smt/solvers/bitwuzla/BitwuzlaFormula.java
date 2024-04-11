@@ -32,26 +32,11 @@ abstract class BitwuzlaFormula implements Formula {
     return bitwuzlaTerm;
   }
 
-  /**
-   * returns an arbitrary representation of the formula, might be human- or machine-readable.
-   *
-   * <p>We do not guarantee that the returned String is in any way related to the formula. The
-   * solver might apply escaping or even un-escaping. A user should not use the returned String for
-   * further processing. For analyzing formulas, we recommend using a {@link FormulaVisitor}.
-   */
   @Override
   public String toString() {
     return bitwuzlaTerm.toString();
   }
 
-  /**
-   * checks whether the other object is a formula of the same structure. Does not apply an expensive
-   * SAT-check to check equisatisfiability.
-   *
-   * <p>Two formulas that are structured in the same way, are determined as "equal". Due to
-   * transformations and simplifications, two equisatisfiable formulas with different structure
-   * might not be determined as "equal".
-   */
   @Override
   public boolean equals(Object other) {
     if (other == this) {
