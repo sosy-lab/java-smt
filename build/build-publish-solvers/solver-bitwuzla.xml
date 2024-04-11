@@ -103,7 +103,7 @@ SPDX-License-Identifier: Apache-2.0
         <exec executable="patch" failonerror="true">
             <arg value="-p0"/>
             <arg value="-i"/>
-            <arg value="lib/native/source/libbitwuzla/phantomReferences.patch"/>
+            <arg value="lib/native/source/libbitwuzla/swigWrapper.patch"/>
         </exec>
     </target>
 
