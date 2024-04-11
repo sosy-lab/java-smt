@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
 import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.truth.Truth;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import org.junit.After;
 import org.junit.AssumptionViolatedException;
 import org.junit.Before;
@@ -66,15 +67,6 @@ public class BitwuzlaNativeApiTest {
     }
   }
 
-  // Bitwuzla does not support lambdas with no argument
-  // @Ignore
-  // @Test
-  // public void functionWithNoArguments() {
-  //  Sort bool_sort = termManager.mk_bool_sort();
-  //  Term a = termManager.mk_var(bool_sort, "a");
-  //  termManager.mk_term(Kind.LAMBDA, a);
-  // }
-
   @Test
   public void signedFunctions() {
     Sort sortbv4 = termManager.mk_bv_sort(4);
@@ -100,8 +92,6 @@ public class BitwuzlaNativeApiTest {
     assertThat(pBoolType.is_bool()).isTrue();
   }
 
-  // FIXME: Bitwuzla fails this critically!
-  // -- This seems to be working now?
   @Test
   public void repeatedTermCreationInMultipleSolversTest() {
     Term tru1 = termManager.mk_true();
@@ -618,7 +608,7 @@ public class BitwuzlaNativeApiTest {
     assertThat(newDump).isEqualTo(dump);
   }
 
-  @SuppressWarnings("unused")
+  @CanIgnoreReturnValue
   @Test(expected = IllegalArgumentException.class)
   public void parserFailTest() {
     // valid
@@ -627,6 +617,6 @@ public class BitwuzlaNativeApiTest {
     assertThat(assertions).isNotEmpty();
     // invalid/fails
     String badInput = "(declare-const a Bool)(assert (or a b))";
-    assertions = parse(badInput);
+    parse(badInput);
   }
 }
