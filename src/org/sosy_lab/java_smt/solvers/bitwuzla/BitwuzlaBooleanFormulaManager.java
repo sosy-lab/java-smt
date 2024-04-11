@@ -97,12 +97,12 @@ public class BitwuzlaBooleanFormulaManager
 
   @Override
   protected boolean isTrue(Term bits) {
-    return bits.is_true();
+    return bits == pTrue || bits.is_true();
   }
 
   @Override
   protected boolean isFalse(Term bits) {
-    return bits.is_false();
+    return bits == pFalse || bits.is_false();
   }
 
   @Override
