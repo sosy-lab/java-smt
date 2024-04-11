@@ -43,8 +43,7 @@ public class BitwuzlaArrayFormulaManager
     final ArrayFormulaType<TI, TE> arrayFormulaType =
         FormulaType.getArrayType(pIndexType, pElementType);
     final Sort bitwuzlaArrayType = toSolverType(arrayFormulaType);
-    Term newVar = getFormulaCreator().makeVariable(bitwuzlaArrayType, pName);
-    return newVar;
+    return getFormulaCreator().makeVariable(bitwuzlaArrayType, pName);
   }
 
   @Override

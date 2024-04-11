@@ -30,7 +30,7 @@ public class BitwuzlaBitvectorFormulaManager
 
   @Override
   protected Term makeBitvectorImpl(int length, Term pParam1) {
-    throw new UnsupportedOperationException("Bitwuzla does not support INT theory");
+    throw new UnsupportedOperationException("Bitwuzla does not support the theory of Integers.");
   }
 
   @Override
@@ -42,7 +42,7 @@ public class BitwuzlaBitvectorFormulaManager
 
   @Override
   protected Term toIntegerFormulaImpl(Term pI, boolean signed) {
-    throw new UnsupportedOperationException("BV to INT conversion is not supported.");
+    throw new UnsupportedOperationException("Bitvector to Integers conversion is not supported.");
   }
 
   @Override
