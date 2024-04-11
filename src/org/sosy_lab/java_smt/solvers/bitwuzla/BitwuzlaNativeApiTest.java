@@ -196,12 +196,12 @@ public class BitwuzlaNativeApiTest {
     // {starting array, index, value} in "we add value at index to array"
     // Just declared (empty) arrays return an empty array
     Vector_Term children = arrWVarAt1.children();
-    assertThat(children.size()).isEqualTo(3);
+    assertThat(children).hasSize(3);
     assertThat(children.get(0)).isEqualTo(arrW11At0);
     assertThat(children.get(1)).isEqualTo(one);
     assertThat(children.get(2)).isEqualTo(var);
     Vector_Term children2 = arrW11At0.children();
-    assertThat(children.size()).isEqualTo(3);
+    assertThat(children).hasSize(3);
     assertThat(children2.get(0)).isEqualTo(arr);
     assertThat(children2.get(1)).isEqualTo(zero);
     assertThat(children2.get(2)).isEqualTo(eleven);
@@ -242,7 +242,7 @@ public class BitwuzlaNativeApiTest {
     // {starting array, index} in "we select index from array"
     // Just declared (empty) arrays return an empty children array
     Vector_Term children = selectArrAtZero.children();
-    assertThat(children.size()).isEqualTo(2);
+    assertThat(children).hasSize(2);
     assertThat(children.get(0)).isEqualTo(arr);
     String arrSymbol = children.get(0).symbol();
     assertThat(arrSymbol).isEqualTo("arr");
@@ -281,7 +281,7 @@ public class BitwuzlaNativeApiTest {
     // {function, arguments...}
     // Declaration is empty array
     Vector_Term childrenAppliedFoo = appliedFoo.children();
-    assertThat(childrenAppliedFoo.size()).isEqualTo(3);
+    assertThat(childrenAppliedFoo).hasSize(3);
     assertThat(childrenAppliedFoo.get(0)).isEqualTo(foo);
     assertThat(childrenAppliedFoo.get(1)).isEqualTo(arg1);
     assertThat(childrenAppliedFoo.get(2)).isEqualTo(arg2);
@@ -315,14 +315,14 @@ public class BitwuzlaNativeApiTest {
 
     // Children of AND and OR
     Vector_Term childrenOr = or.children();
-    assertThat(childrenOr.size()).isEqualTo(2);
+    assertThat(childrenOr).hasSize(2);
     assertThat(childrenOr.get(0)).isEqualTo(and);
     assertThat(childrenOr.get(1)).isEqualTo(f);
 
     assertThat(or.kind()).isEqualTo(Kind.OR);
 
     Vector_Term childrenAnd = and.children();
-    assertThat(childrenOr.size()).isEqualTo(2);
+    assertThat(childrenOr).hasSize(2);
     assertThat(childrenAnd.get(0)).isEqualTo(x);
     assertThat(childrenAnd.get(1)).isEqualTo(t);
 
@@ -510,7 +510,7 @@ public class BitwuzlaNativeApiTest {
     assertThat(xExt.num_children()).isEqualTo(1);
     assertThat(xExt.num_indices()).isGreaterThan(0);
     Vector_Int indices = xExt.indices();
-    assertThat(indices.size()).isEqualTo(1);
+    assertThat(indices).hasSize(1);
     assertThat(indices.get(0)).isEqualTo(2);
   }
 
@@ -599,7 +599,7 @@ public class BitwuzlaNativeApiTest {
 
     // add the parsed assertion to our stack
     bitwuzla.push(1);
-    assertThat(assertions.size()).isEqualTo(1);
+    assertThat(assertions).hasSize(1);
     bitwuzla.assert_formula(assertions.get(0));
 
     // the output of print_formula should stay the same

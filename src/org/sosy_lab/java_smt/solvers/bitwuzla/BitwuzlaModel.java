@@ -135,7 +135,7 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, Void> {
       List<Object> innerIndices = new ArrayList<>(upperIndices);
       String name = getArrayName(array);
       assert name != null;
-      if (children.size() == 0) {
+      if (children.isEmpty()) {
         // Empty array
         return assignments;
       } else if (children.size() == 2) {
