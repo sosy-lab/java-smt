@@ -221,6 +221,7 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
   @Override
   public void close() {
     if (!closed) {
+      creator.getTermManager().delete();
       closed = true;
     }
   }
