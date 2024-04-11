@@ -53,6 +53,13 @@ SPDX-License-Identifier: Apache-2.0
         <!-- path to our local directory in lib/native -->
         <property name="source.path" value="${user.dir}/lib/native/source/libbitwuzla"/>
 
+        <!-- build gmp -->
+        <exec executable="./configure" dir="${gmp.path}" failonerror="true"/>
+        <exec executable="make" dir="${gmp.path}" failonerror="true">
+            <arg value="clean"/>
+        </exec>
+        <exec executable="make" dir="${gmp.path}" failonerror="true"/>
+
         <!-- build bitwuzla -->
         <exec executable="./configure.py" dir="${bitwuzla.path}" failonerror="true">
             <arg value="--shared"/>
