@@ -59,77 +59,10 @@ public final class BitwuzlaFormulaManager
     bitwuzlaOption = pBitwuzlaOptions;
   }
 
-  // Split up a sequence of lisp expressions
-  // f.ex "(define-const a Int)(assert (= a 0)" becomes ["(define-const a Int)", "(assert (= a 0))"]
-  public static List<String> tokenize(String input) {
-    ImmutableList.Builder<String> builder = ImmutableList.builder();
-    int level = 0;
-    StringBuilder read = new StringBuilder();
-    boolean inComment = false;
-    for (int i = 0; i < input.length(); i++) {
-      char c = input.charAt(i);
-      if (inComment) {
-        if (c == '\n') {
-          inComment = false;
-        }
-        continue;
-      }
-      if (c == ';') {
-        // Comment
-        inComment = true;
-        continue;
-      }
-      if (level == 0) {
-        if (!Character.isWhitespace(c)) {
-          if (c == '(') {
-            read.append("(");
-            level++;
-          } else {
-            // All top-level expressions should have parentheses around them
-            throw new IllegalArgumentException();
-          }
-        }
-      } else {
-        read.append(c);
-        if (c == '(') {
-          level++;
-        }
-        if (c == ')') {
-          if (level == 1) {
-            builder.add(read.toString());
-            read = new StringBuilder();
-          }
-          level--;
-        }
-      }
-    }
-    if (level != 0) {
-      // Missing closing parenthesis
-      throw new IllegalArgumentException();
-    }
-    return builder.build();
-  }
-
-  // Check if the token is a function or variable declaration
-  public static boolean isDecl(String token) {
-    // TODO: How to handle function *definitions*? And are they supported by Bitwuzla?
-    return token.matches("\\(\\s*(declare-const|declare-fun).*");
-  }
-
   @Override
   public BooleanFormula parse(String formulaStr) throws IllegalArgumentException {
     // Strip the input string and remove everything but declarations and assertions
-    // FIXME: We should handle this in AbstractFormulaManager as it affects all solvers
-    String s = formulaStr;
-    if (s.startsWith("(set-logic ")) {
-      s = s.substring(1 + s.indexOf(')'));
-    }
-    if (s.contains("(check-sat)")) {
-      s = s.replace("(check-sat)", "");
-    }
-    if (s.contains("(exit)")) {
-      s = s.replace("(exit)", "");
-    }
+    String s = stripSMTLIB2String(formulaStr);
 
     // Split the input string into a list of SMT-LIB2 commands
     List<String> tokens = tokenize(s);
@@ -224,6 +157,24 @@ public final class BitwuzlaFormulaManager
     return creator.encapsulateBoolean(result);
   }
 
+  private String stripSMTLIB2String(String pFormulaStr) {
+    String s = pFormulaStr;
+    int setLogicIndex = s.indexOf("(set-logic ");
+    if (setLogicIndex != -1) {
+      int endLogicIndex = s.indexOf(')', setLogicIndex + 1);
+      String s1 = s.substring(0, setLogicIndex);
+      String s2 = s.substring(endLogicIndex + 1);
+      s = s1 + s2;
+    }
+    if (s.contains("(check-sat)")) {
+      s = s.replace("(check-sat)", "");
+    }
+    if (s.contains("(exit)")) {
+      s = s.replace("(exit)", "");
+    }
+    return s;
+  }
+
   @Override
   public Appender dumpFormula(Term pTerm) {
     // There are 2 ways of SMT2 printing in Bitwuzla, bitwuzla_term_print() and
@@ -234,7 +185,6 @@ public final class BitwuzlaFormulaManager
     return new Appenders.AbstractAppender() {
       @Override
       public void appendTo(Appendable out) throws IOException {
-        // TODO: It would be better to keep this instance around
         Bitwuzla bitwuzla = new Bitwuzla(creator.getTermManager());
         for (Term t : creator.getVariableCasts()) {
           bitwuzla.assert_formula(t);
@@ -253,5 +203,62 @@ public final class BitwuzlaFormulaManager
 
   static Term getBitwuzlaTerm(Formula pT) {
     return ((BitwuzlaFormula) pT).getTerm();
+  }
+
+  // Split up a sequence of lisp expressions
+  // f.ex "(define-const a Int)(assert (= a 0)" becomes ["(define-const a Int)", "(assert (= a 0))"]
+  public static List<String> tokenize(String input) {
+    ImmutableList.Builder<String> builder = ImmutableList.builder();
+    int level = 0;
+    StringBuilder read = new StringBuilder();
+    boolean inComment = false;
+    for (int i = 0; i < input.length(); i++) {
+      char c = input.charAt(i);
+      if (inComment) {
+        if (c == '\n') {
+          inComment = false;
+        }
+        continue;
+      }
+      if (c == ';') {
+        // Comment
+        inComment = true;
+        continue;
+      }
+      if (level == 0) {
+        if (!Character.isWhitespace(c)) {
+          if (c == '(') {
+            read.append("(");
+            level++;
+          } else {
+            // All top-level expressions should have parentheses around them
+            throw new IllegalArgumentException();
+          }
+        }
+      } else {
+        read.append(c);
+        if (c == '(') {
+          level++;
+        }
+        if (c == ')') {
+          if (level == 1) {
+            builder.add(read.toString());
+            read = new StringBuilder();
+          }
+          level--;
+        }
+      }
+    }
+    if (level != 0) {
+      // Missing closing parenthesis
+      throw new IllegalArgumentException();
+    }
+    return builder.build();
+  }
+
+  // Check if the token is a function or variable declaration
+  public static boolean isDecl(String token) {
+    // TODO: How to handle function *definitions*? And are they supported by Bitwuzla?
+    return token.matches("\\(\\s*(declare-const|declare-fun).*");
   }
 }
