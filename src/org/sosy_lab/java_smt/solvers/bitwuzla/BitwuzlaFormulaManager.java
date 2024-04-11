@@ -33,6 +33,7 @@ public final class BitwuzlaFormulaManager
   private final BitwuzlaFormulaCreator creator;
   private final Options bitwuzlaOption;
 
+  @SuppressWarnings("checkstyle:parameternumber")
   BitwuzlaFormulaManager(
       BitwuzlaFormulaCreator pFormulaCreator,
       BitwuzlaUFManager pFunctionManager,
