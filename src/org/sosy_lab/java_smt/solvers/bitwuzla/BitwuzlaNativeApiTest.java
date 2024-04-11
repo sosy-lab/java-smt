@@ -11,7 +11,6 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
 import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.truth.Truth;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import org.junit.After;
 import org.junit.AssumptionViolatedException;
 import org.junit.Before;
@@ -608,7 +607,7 @@ public class BitwuzlaNativeApiTest {
     assertThat(newDump).isEqualTo(dump);
   }
 
-  @CanIgnoreReturnValue
+  @SuppressWarnings("CheckReturnValue")
   @Test(expected = IllegalArgumentException.class)
   public void parserFailTest() {
     // valid
