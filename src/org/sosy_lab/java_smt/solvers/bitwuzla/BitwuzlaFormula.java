@@ -24,7 +24,7 @@ abstract class BitwuzlaFormula implements Formula {
   @SuppressWarnings("Immutable")
   private final Term bitwuzlaTerm;
 
-  BitwuzlaFormula(Term term) {
+  BitwuzlaFormula(final Term term) {
     bitwuzlaTerm = term;
   }
 
