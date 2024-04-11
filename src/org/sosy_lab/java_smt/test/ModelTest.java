@@ -828,10 +828,10 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         prover.push(bvmgr.greaterThan(x, bvmgr.makeBitvector(8, 0), true));
         assertThat(prover).isSatisfiable();
         try (Model m = prover.getModel()) {
-          if (solver != Solvers.BOOLECTOR && solver != Solvers.BITWUZLA) {
-            assertThat(m.evaluate(x)).isEqualTo(BigInteger.ONE);
-          } else {
+          if (solver == Solvers.BOOLECTOR || solver == Solvers.BITWUZLA) {
             assertThat(m.evaluate(x)).isEqualTo(BigInteger.valueOf(64));
+          } else {
+            assertThat(m.evaluate(x)).isEqualTo(BigInteger.ONE);
           }
           // it works now, but maybe the model "x=1" for the constraint "x>0" is not valid for new
           // solvers.
