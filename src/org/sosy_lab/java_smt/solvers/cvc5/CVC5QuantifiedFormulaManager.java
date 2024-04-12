@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
+import io.github.cvc5.CVC5ApiException;
 import io.github.cvc5.Kind;
 import io.github.cvc5.Solver;
 import io.github.cvc5.Sort;
@@ -46,10 +47,13 @@ public class CVC5QuantifiedFormulaManager
    */
   @Override
   protected Term eliminateQuantifiers(Term input) throws SolverException, InterruptedException {
+    // This sometimes fails for (even simple) bv input in an exception. We can not catch the
+    // exception from getQuantifierElim() (CVC5ApiException) and we don't know if the state is
+    // recoverable afterward
     try {
+      input.getKind(); // Pseudo call that throws the exception, but does not really throw it
       return solver.getQuantifierElimination(input);
-    } catch (RuntimeException e) {
-      // quantifier elimination failed, simply return the input
+    } catch (CVC5ApiException pE) {
       return input;
     }
   }
