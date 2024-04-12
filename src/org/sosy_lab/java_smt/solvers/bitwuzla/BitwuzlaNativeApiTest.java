@@ -10,7 +10,6 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.truth.Truth;
 import org.junit.After;
 import org.junit.AssumptionViolatedException;
@@ -341,139 +340,130 @@ public class BitwuzlaNativeApiTest {
   @Test
   public void testFpSpecialValueEquality() {
     Sort fpSort = termManager.mk_fp_sort(5, 11);
-    for (RoundingMode roundMode :
-        ImmutableList.of(
-            RoundingMode.RNE,
-            RoundingMode.RTZ,
-            RoundingMode.RNA,
-            RoundingMode.RTN,
-            RoundingMode.RTP)) {
-      Term rm = termManager.mk_rm_value(roundMode);
-      Term zero = termManager.mk_fp_pos_zero(fpSort);
-      assertThat(zero.is_fp_value_pos_zero()).isTrue();
-      assertThat(zero.is_fp_value_neg_zero()).isFalse();
-      Term negZero = termManager.mk_fp_neg_zero(fpSort);
-      assertThat(negZero.is_fp_value_neg_zero()).isTrue();
-      assertThat(negZero.is_fp_value_pos_zero()).isFalse();
+    Term zero = termManager.mk_fp_pos_zero(fpSort);
+    assertThat(zero.is_fp_value_pos_zero()).isTrue();
+    assertThat(zero.is_fp_value_neg_zero()).isFalse();
+    Term negZero = termManager.mk_fp_neg_zero(fpSort);
+    assertThat(negZero.is_fp_value_neg_zero()).isTrue();
+    assertThat(negZero.is_fp_value_pos_zero()).isFalse();
 
-      // -0 == 0 for FP equals is SAT
-      Term negZeroFpEqZero = termManager.mk_term(Kind.FP_EQUAL, zero, negZero);
-      bitwuzla.push(1);
-      bitwuzla.assert_formula(negZeroFpEqZero);
-      Result res = bitwuzla.check_sat();
-      assertThat(res).isEqualTo(Result.SAT);
-      bitwuzla.pop(1);
+    // -0 == 0 for FP equals is SAT
+    Term negZeroFpEqZero = termManager.mk_term(Kind.FP_EQUAL, zero, negZero);
+    bitwuzla.push(1);
+    bitwuzla.assert_formula(negZeroFpEqZero);
+    Result res = bitwuzla.check_sat();
+    assertThat(res).isEqualTo(Result.SAT);
+    bitwuzla.pop(1);
 
-      // -0 != 0 for fp equals is UNSAT
-      Term notNegZeroFpEqZero = termManager.mk_term(Kind.NOT, negZeroFpEqZero);
-      bitwuzla.push(1);
-      bitwuzla.assert_formula(notNegZeroFpEqZero);
-      res = bitwuzla.check_sat();
-      assertThat(res).isEqualTo(Result.UNSAT);
-      bitwuzla.pop(1);
+    // -0 != 0 for fp equals is UNSAT
+    Term notNegZeroFpEqZero = termManager.mk_term(Kind.NOT, negZeroFpEqZero);
+    bitwuzla.push(1);
+    bitwuzla.assert_formula(notNegZeroFpEqZero);
+    res = bitwuzla.check_sat();
+    assertThat(res).isEqualTo(Result.UNSAT);
+    bitwuzla.pop(1);
 
-      // -0 == 0 for equals is UNSAT
-      Term negZeroEqZero = termManager.mk_term(Kind.EQUAL, zero, negZero);
-      bitwuzla.push(1);
-      bitwuzla.assert_formula(negZeroEqZero);
-      res = bitwuzla.check_sat();
-      assertThat(res).isEqualTo(Result.UNSAT);
-      bitwuzla.pop(1);
+    // -0 == 0 for equals is UNSAT
+    Term negZeroEqZero = termManager.mk_term(Kind.EQUAL, zero, negZero);
+    bitwuzla.push(1);
+    bitwuzla.assert_formula(negZeroEqZero);
+    res = bitwuzla.check_sat();
+    assertThat(res).isEqualTo(Result.UNSAT);
+    bitwuzla.pop(1);
 
-      // -0 != 0 for equals is SAT
-      Term notnegZeroEqZero = termManager.mk_term(Kind.NOT, negZeroEqZero);
-      bitwuzla.push(1);
-      bitwuzla.assert_formula(notnegZeroEqZero);
-      res = bitwuzla.check_sat();
-      assertThat(res).isEqualTo(Result.SAT);
-      bitwuzla.pop(1);
+    // -0 != 0 for equals is SAT
+    Term notnegZeroEqZero = termManager.mk_term(Kind.NOT, negZeroEqZero);
+    bitwuzla.push(1);
+    bitwuzla.assert_formula(notnegZeroEqZero);
+    res = bitwuzla.check_sat();
+    assertThat(res).isEqualTo(Result.SAT);
+    bitwuzla.pop(1);
 
-      // -------  NAN  --------
-      Term nan = termManager.mk_fp_nan(fpSort);
-      assertThat(nan.is_fp_value_nan()).isTrue();
-      assertThat(negZero.is_fp_value_nan()).isFalse();
-      assertThat(zero.is_fp_value_nan()).isFalse();
-      assertThat(nan.is_fp_value_neg_zero()).isFalse();
-      assertThat(nan.is_fp_value_pos_zero()).isFalse();
+    // -------  NAN  --------
+    Term nan = termManager.mk_fp_nan(fpSort);
+    assertThat(nan.is_fp_value_nan()).isTrue();
+    assertThat(negZero.is_fp_value_nan()).isFalse();
+    assertThat(zero.is_fp_value_nan()).isFalse();
+    assertThat(nan.is_fp_value_neg_zero()).isFalse();
+    assertThat(nan.is_fp_value_pos_zero()).isFalse();
 
-      // nan == nan for FP equals is UNSAT
-      Term nanFpEqNan = termManager.mk_term(Kind.FP_EQUAL, nan, nan);
-      bitwuzla.push(1);
-      bitwuzla.assert_formula(nanFpEqNan);
-      res = bitwuzla.check_sat();
-      assertThat(res).isEqualTo(Result.UNSAT);
-      bitwuzla.pop(1);
+    // nan == nan for FP equals is UNSAT
+    Term nanFpEqNan = termManager.mk_term(Kind.FP_EQUAL, nan, nan);
+    bitwuzla.push(1);
+    bitwuzla.assert_formula(nanFpEqNan);
+    res = bitwuzla.check_sat();
+    assertThat(res).isEqualTo(Result.UNSAT);
+    bitwuzla.pop(1);
 
-      // nan != nan for fp equals is SAT
-      Term notNanFpEqNan = termManager.mk_term(Kind.NOT, nanFpEqNan);
-      bitwuzla.push(1);
-      bitwuzla.assert_formula(notNanFpEqNan);
-      res = bitwuzla.check_sat();
-      assertThat(res).isEqualTo(Result.SAT);
-      bitwuzla.pop(1);
+    // nan != nan for fp equals is SAT
+    Term notNanFpEqNan = termManager.mk_term(Kind.NOT, nanFpEqNan);
+    bitwuzla.push(1);
+    bitwuzla.assert_formula(notNanFpEqNan);
+    res = bitwuzla.check_sat();
+    assertThat(res).isEqualTo(Result.SAT);
+    bitwuzla.pop(1);
 
-      // nan == nan for equals is SAT
-      Term nanEqNan = termManager.mk_term(Kind.EQUAL, nan, nan);
-      bitwuzla.push(1);
-      bitwuzla.assert_formula(nanEqNan);
-      res = bitwuzla.check_sat();
-      assertThat(res).isEqualTo(Result.SAT);
-      bitwuzla.pop(1);
+    // nan == nan for equals is SAT
+    Term nanEqNan = termManager.mk_term(Kind.EQUAL, nan, nan);
+    bitwuzla.push(1);
+    bitwuzla.assert_formula(nanEqNan);
+    res = bitwuzla.check_sat();
+    assertThat(res).isEqualTo(Result.SAT);
+    bitwuzla.pop(1);
 
-      // nan != nan for equals is UNSAT
-      Term notNanEqNan = termManager.mk_term(Kind.NOT, nanEqNan);
-      bitwuzla.push(1);
-      bitwuzla.assert_formula(notNanEqNan);
-      res = bitwuzla.check_sat();
-      assertThat(res).isEqualTo(Result.UNSAT);
-      bitwuzla.pop(1);
+    // nan != nan for equals is UNSAT
+    Term notNanEqNan = termManager.mk_term(Kind.NOT, nanEqNan);
+    bitwuzla.push(1);
+    bitwuzla.assert_formula(notNanEqNan);
+    res = bitwuzla.check_sat();
+    assertThat(res).isEqualTo(Result.UNSAT);
+    bitwuzla.pop(1);
 
-      // ------  pos infinity and neg infinity  ------
-      Term posInf = termManager.mk_fp_pos_inf(fpSort);
-      Term negInf = termManager.mk_fp_neg_inf(fpSort);
-      assertThat(posInf.is_fp_value_pos_inf()).isTrue();
-      assertThat(posInf.is_fp_value_neg_inf()).isFalse();
-      assertThat(negInf.is_fp_value_pos_inf()).isFalse();
-      assertThat(negInf.is_fp_value_neg_inf()).isTrue();
-      assertThat(nan.is_fp_value_pos_inf()).isFalse();
-      assertThat(nan.is_fp_value_neg_inf()).isFalse();
-      assertThat(zero.is_fp_value_pos_inf()).isFalse();
-      assertThat(zero.is_fp_value_neg_inf()).isFalse();
-      assertThat(negZero.is_fp_value_pos_inf()).isFalse();
-      assertThat(negZero.is_fp_value_neg_inf()).isFalse();
+    // ------  pos infinity and neg infinity  ------
+    Term posInf = termManager.mk_fp_pos_inf(fpSort);
+    Term negInf = termManager.mk_fp_neg_inf(fpSort);
+    assertThat(posInf.is_fp_value_pos_inf()).isTrue();
+    assertThat(posInf.is_fp_value_neg_inf()).isFalse();
+    assertThat(negInf.is_fp_value_pos_inf()).isFalse();
+    assertThat(negInf.is_fp_value_neg_inf()).isTrue();
+    assertThat(nan.is_fp_value_pos_inf()).isFalse();
+    assertThat(nan.is_fp_value_neg_inf()).isFalse();
+    assertThat(zero.is_fp_value_pos_inf()).isFalse();
+    assertThat(zero.is_fp_value_neg_inf()).isFalse();
+    assertThat(negZero.is_fp_value_pos_inf()).isFalse();
+    assertThat(negZero.is_fp_value_neg_inf()).isFalse();
 
-      // pos inf == neg inf fp eq is UNSAT
-      Term posInfFpEqNegInf = termManager.mk_term(Kind.FP_EQUAL, posInf, negInf);
-      bitwuzla.push(1);
-      bitwuzla.assert_formula(posInfFpEqNegInf);
-      res = bitwuzla.check_sat();
-      assertThat(res).isEqualTo(Result.UNSAT);
-      bitwuzla.pop(1);
+    // pos inf == neg inf fp eq is UNSAT
+    Term posInfFpEqNegInf = termManager.mk_term(Kind.FP_EQUAL, posInf, negInf);
+    bitwuzla.push(1);
+    bitwuzla.assert_formula(posInfFpEqNegInf);
+    res = bitwuzla.check_sat();
+    assertThat(res).isEqualTo(Result.UNSAT);
+    bitwuzla.pop(1);
 
-      // pos inf != neg inf fp eq is SAT
-      Term notPosInfFpEqNegInf = termManager.mk_term(Kind.NOT, posInfFpEqNegInf);
-      bitwuzla.push(1);
-      bitwuzla.assert_formula(notPosInfFpEqNegInf);
-      res = bitwuzla.check_sat();
-      assertThat(res).isEqualTo(Result.SAT);
-      bitwuzla.pop(1);
+    // pos inf != neg inf fp eq is SAT
+    Term notPosInfFpEqNegInf = termManager.mk_term(Kind.NOT, posInfFpEqNegInf);
+    bitwuzla.push(1);
+    bitwuzla.assert_formula(notPosInfFpEqNegInf);
+    res = bitwuzla.check_sat();
+    assertThat(res).isEqualTo(Result.SAT);
+    bitwuzla.pop(1);
 
-      // pos inf == neg inf eq is UNSAT
-      Term posInfEqNegInf = termManager.mk_term(Kind.EQUAL, posInf, negInf);
-      bitwuzla.push(1);
-      bitwuzla.assert_formula(posInfEqNegInf);
-      res = bitwuzla.check_sat();
-      assertThat(res).isEqualTo(Result.UNSAT);
-      bitwuzla.pop(1);
+    // pos inf == neg inf eq is UNSAT
+    Term posInfEqNegInf = termManager.mk_term(Kind.EQUAL, posInf, negInf);
+    bitwuzla.push(1);
+    bitwuzla.assert_formula(posInfEqNegInf);
+    res = bitwuzla.check_sat();
+    assertThat(res).isEqualTo(Result.UNSAT);
+    bitwuzla.pop(1);
 
-      // pos inf != neg inf eq is SAT
-      Term notPosInfEqNegInf = termManager.mk_term(Kind.NOT, posInfEqNegInf);
-      bitwuzla.push(1);
-      bitwuzla.assert_formula(notPosInfEqNegInf);
-      res = bitwuzla.check_sat();
-      assertThat(res).isEqualTo(Result.SAT);
-      bitwuzla.pop(1);
-    }
+    // pos inf != neg inf eq is SAT
+    Term notPosInfEqNegInf = termManager.mk_term(Kind.NOT, posInfEqNegInf);
+    bitwuzla.push(1);
+    bitwuzla.assert_formula(notPosInfEqNegInf);
+    res = bitwuzla.check_sat();
+    assertThat(res).isEqualTo(Result.SAT);
+    bitwuzla.pop(1);
   }
 
   @Test
