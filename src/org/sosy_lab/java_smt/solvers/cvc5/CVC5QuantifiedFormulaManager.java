@@ -51,6 +51,7 @@ public class CVC5QuantifiedFormulaManager
     // exception from getQuantifierElim() (CVC5ApiException) and we don't know if the state is
     // recoverable afterward (they state that the object should not be used afterward, i guess
     // they mean the input formula, they might however reference to the solver instance!)
+    // See https://github.com/cvc5/cvc5/issues/10624 for updates
     try {
       input.getKind(); // Pseudo call that throws the exception, but does not really throw it
       return solver.getQuantifierElimination(input); // CVC5ApiException throw missing in native
