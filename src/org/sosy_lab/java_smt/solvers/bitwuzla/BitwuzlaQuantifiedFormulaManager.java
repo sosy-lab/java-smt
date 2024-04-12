@@ -57,11 +57,11 @@ public class BitwuzlaQuantifiedFormulaManager
     }
     body = termManager.substitute_term(body, map);
 
-    Term[] argsAndBody = new Term[2];
-    argsAndBody[1] = body;
     Term currentFormula = body;
     for (int i = 0; i < vars.size(); i++) {
+      Term[] argsAndBody = new Term[2];
       argsAndBody[0] = substVars[i];
+      argsAndBody[1] = currentFormula;
       if (q.equals(Quantifier.FORALL)) {
         currentFormula =
             termManager.mk_term(Kind.FORALL, new Vector_Term(argsAndBody), new Vector_Int());
@@ -70,7 +70,6 @@ public class BitwuzlaQuantifiedFormulaManager
         currentFormula =
             termManager.mk_term(Kind.EXISTS, new Vector_Term(argsAndBody), new Vector_Int());
       }
-      argsAndBody[1] = currentFormula;
     }
     return currentFormula;
   }
