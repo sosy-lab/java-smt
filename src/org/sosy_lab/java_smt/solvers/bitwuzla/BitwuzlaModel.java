@@ -201,7 +201,7 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, Void> {
   private Term buildEqForTwoTerms(Term left, Term right) {
     assert left.sort().equals(right.sort());
     Kind kind = Kind.EQUAL;
-    if (left.sort().is_fp()) {
+    if (left.sort().is_fp() || right.sort().is_fp()) {
       kind = Kind.FP_EQUAL;
     }
     return bitwuzlaCreator.getTermManager().mk_term(kind, left, right);
