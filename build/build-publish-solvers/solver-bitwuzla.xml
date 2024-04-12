@@ -129,6 +129,8 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- apply patch for the phantom reference issue -->
         <!-- FIXME: This will lead to memory leaks. We should look for a proper fix. -->
+        <!-- Update: the TermManger introduced in 0.4.0 handles memory of Terms/Sorts 
+             now and should clean up everything when we destroy it. -->
         <exec executable="patch" failonerror="true">
             <arg value="-p0"/>
             <arg value="-i"/>
