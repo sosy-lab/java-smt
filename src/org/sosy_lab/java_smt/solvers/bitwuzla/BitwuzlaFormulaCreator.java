@@ -424,7 +424,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
         Term argument = args.get(i);
         if (kind == Kind.APPLY && i == 0) {
           // UFs carry the decl in the first child and the decl has the name
-          decl = new BitwuzlaDeclaration(argument);
+          decl = BitwuzlaDeclaration.create(argument);
           name = argument.symbol();
           continue;
         }
@@ -437,12 +437,12 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
         name = f.kind().toString();
       }
       if (decl == null) {
-        decl = new BitwuzlaDeclaration(f.kind());
+        decl = BitwuzlaDeclaration.create(f.kind());
       }
       if (f.num_indices() > 0) {
         // We need to retain the original formula as the declaration for indexed formulas,
         // otherwise we loose the index info, but we also need to know if its a kind or term
-        decl = new BitwuzlaDeclaration(f);
+        decl = BitwuzlaDeclaration.create(f);
       }
 
       return visitor.visitFunction(
@@ -488,12 +488,12 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
 
     Term maybeFormula = formulaCache.get(name, functionSort);
     if (maybeFormula != null) {
-      return new BitwuzlaDeclaration(maybeFormula);
+      return BitwuzlaDeclaration.create(maybeFormula);
     }
 
     Term uf = termManager.mk_const(functionSort, name);
     formulaCache.put(name, functionSort, uf);
-    return new BitwuzlaDeclaration(uf);
+    return BitwuzlaDeclaration.create(uf);
   }
 
   @Override
@@ -504,9 +504,9 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
     assert kind == Kind.APPLY || kind == Kind.CONSTANT : kind.toString();
     if (kind == Kind.APPLY) {
       // Returns pointer to Uninterpreted Function used in Apply
-      return new BitwuzlaDeclaration(pTerm.get(0));
+      return BitwuzlaDeclaration.create(pTerm.get(0));
     } else {
-      return new BitwuzlaDeclaration(pTerm);
+      return BitwuzlaDeclaration.create(pTerm);
     }
   }
 

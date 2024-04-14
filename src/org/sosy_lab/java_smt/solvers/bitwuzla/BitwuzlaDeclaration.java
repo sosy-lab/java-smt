@@ -8,56 +8,32 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
-import java.util.Objects;
+import com.google.auto.value.AutoValue;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Kind;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Term;
 
 // Declarations sometimes need the info of a Term, but mostly those of Kinds.
 // We can not discern between the two however, hence this wrapper
-public class BitwuzlaDeclaration {
-  private final Object decl;
+@AutoValue
+public abstract class BitwuzlaDeclaration {
+  public abstract @Nullable Term getTerm();
 
-  // If isKind, decl == KIND; else decl == term
-  private final boolean isKind;
+  public abstract @Nullable Kind getKind();
 
-  BitwuzlaDeclaration(Term pTerm) {
-    decl = pTerm;
-    isKind = false;
+  public static BitwuzlaDeclaration create(Term pTerm) {
+    return new AutoValue_BitwuzlaDeclaration(pTerm, null);
   }
 
-  BitwuzlaDeclaration(Kind pKind) {
-    decl = pKind;
-    isKind = true;
+  public static BitwuzlaDeclaration create(Kind pKind) {
+    return new AutoValue_BitwuzlaDeclaration(null, pKind);
+  }
+
+  public boolean isTerm() {
+    return getTerm() != null;
   }
 
   public boolean isKind() {
-    return isKind;
-  }
-
-  public Term getTerm() {
-    assert !isKind;
-    return (Term) decl;
-  }
-
-  public Kind getKind() {
-    assert isKind;
-    return (Kind) decl;
-  }
-
-  @Override
-  public boolean equals(Object any) {
-    if (any == this) {
-      return true;
-    }
-    if (any instanceof BitwuzlaDeclaration) {
-      BitwuzlaDeclaration otherDecl = (BitwuzlaDeclaration) any;
-      return isKind == otherDecl.isKind && Objects.equals(decl, otherDecl.decl);
-    }
-    return false;
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(decl, isKind);
+    return getKind() != null;
   }
 }
