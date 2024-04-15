@@ -249,16 +249,12 @@ public abstract class SolverBasedTest0 {
           .that(qmgr.eliminateQuantifiers(bmgr.makeTrue()))
           .isNotNull();
     } catch (InterruptedException | SolverException pE) {
-      assume()
-          .withMessage("Solver %s does not support quantifier elimination", solverToUse())
-          .that(pE)
-          .hasMessageThat()
-          .contains("CVC5");
+      throw new RuntimeException(pE);
     } catch (UnsupportedOperationException uoe) {
       assume()
           .withMessage("Solver %s does not support quantifier elimination", solverToUse())
           .that(uoe)
-          .isNull();
+          .isNotInstanceOf(Exception.class);
     }
   }
 
