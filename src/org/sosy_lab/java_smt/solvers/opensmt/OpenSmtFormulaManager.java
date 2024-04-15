@@ -54,7 +54,7 @@ class OpenSmtFormulaManager extends AbstractFormulaManager<PTRef, SRef, Logic, S
 
   @Override
   public BooleanFormula parse(String pS) throws IllegalArgumentException {
-    return creator.encapsulateBoolean(osmtLogic.parseFormula(pS));
+    return creator.encapsulateBoolean(osmtLogic.parseFormula(stripSMTLIB2String(pS)));
   }
 
   @Override
@@ -82,5 +82,26 @@ class OpenSmtFormulaManager extends AbstractFormulaManager<PTRef, SRef, Logic, S
         out.append("(assert ").append(osmtLogic.dumpWithLets(f)).append(String.valueOf(')'));
       }
     };
+  }
+
+  // TODO: this is ignoring escape chars etc.
+  private String stripSMTLIB2String(String pFormulaStr) {
+    String s = pFormulaStr;
+    int commentIndex = s.indexOf(";;");
+    while (commentIndex != -1) {
+      int endCommentIndex = s.indexOf('\n', commentIndex + 1);
+      String s1 = s.substring(0, commentIndex);
+      String s2 = s.substring(endCommentIndex + 1);
+      s = s1 + s2;
+      commentIndex = s.indexOf(";;");
+    }
+    int setLogicIndex = s.indexOf("(set-logic ");
+    if (setLogicIndex != -1) {
+      int endLogicIndex = s.indexOf(')', setLogicIndex + 1);
+      String s1 = s.substring(0, setLogicIndex);
+      String s2 = s.substring(endLogicIndex + 1);
+      s = s1 + s2;
+    }
+    return s;
   }
 }
