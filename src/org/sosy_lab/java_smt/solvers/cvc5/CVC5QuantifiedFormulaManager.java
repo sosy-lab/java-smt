@@ -49,16 +49,12 @@ public class CVC5QuantifiedFormulaManager
   protected Term eliminateQuantifiers(Term input) throws SolverException, InterruptedException {
     // This sometimes fails for (even simple) bv input in an exception. We can not catch the
     // exception from getQuantifierElim() (CVC5ApiException) and we don't know if the state is
-    // recoverable afterward (they state that the object should not be used afterward, i guess
-    // they mean the input formula, they might however reference to the solver instance!)
+    // recoverable afterward
     try {
       input.getKind(); // Pseudo call that throws the exception, but does not really throw it
-      return solver.getQuantifierElimination(input); // CVC5ApiException throw missing in native
+      return solver.getQuantifierElimination(input);
     } catch (CVC5ApiException pE) {
-      throw new SolverException(
-          "CVC5 encountered an error when eliminating quantifiers. Please "
-              + "do not reuse the input formula, as it might be corrupted."
-              + pE);
+      return input;
     }
   }
 
