@@ -241,6 +241,27 @@ public abstract class SolverBasedTest0 {
         .isNotNull();
   }
 
+  /** Skip test if the solver does not support quantifier elimination. */
+  protected final void requireQuantifierElimination() {
+    try {
+      assume()
+          .withMessage("Solver %s does not support quantifier elimination", solverToUse())
+          .that(qmgr.eliminateQuantifiers(bmgr.makeTrue()))
+          .isNotNull();
+    } catch (InterruptedException | SolverException pE) {
+      // We assume that InterruptedException is not thrown in this instance
+      assume()
+          .withMessage("Solver %s does not support quantifier elimination", solverToUse())
+          .that(pE)
+          .isNotInstanceOf(Exception.class);
+    } catch (UnsupportedOperationException uoe) {
+      assume()
+          .withMessage("Solver %s does not support quantifier elimination", solverToUse())
+          .that(uoe)
+          .isNotInstanceOf(Exception.class);
+    }
+  }
+
   /** Skip test if the solver does not support arrays. */
   protected /*final*/ void requireArrays() {
     assume()
