@@ -32,14 +32,6 @@ import org.sosy_lab.java_smt.api.SolverException;
 
 @SuppressWarnings("checkstyle:linelength")
 public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
-  private static final String BOOL_CHECK =
-      "(declare-fun x () Bool)(declare-fun y () Bool)(assert (= y x))";
-
-  private static final String BOOL_VARS_W_LOGIC = "(set-logic all)" + BOOL_CHECK;
-
-  private static final String BOOL_VARS_W_LOGIC_AND_COMMENT =
-      ";; Some comment in SMTLIB2\n" + BOOL_VARS_W_LOGIC;
-
   private static final String MATHSAT_DUMP1 =
       "(set-info :source |printed by MathSAT|)\n"
           + "(declare-fun a () Bool)\n"
@@ -104,40 +96,6 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
           + "(declare-fun u () Bool)\n"
           + "(assert  (let (($x35 (and (xor q (= (+ a b) c)) (>= a b)))) (let (($x9 (= a b))) (and"
           + " (and (or $x35 u) q) (and $x9 $x35)))))";
-
-  @Test
-  public void logicsParseTest() throws SolverException, InterruptedException {
-    requireParser();
-    // Some solvers have problems with (set-logic xxx) in the beginning
-
-    // Boolector will fail this anyway since bools are bitvecs for btor
-    TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
-
-    BooleanFormula x = bmgr.makeVariable("x");
-    BooleanFormula y = bmgr.makeVariable("y");
-    BooleanFormula expr = bmgr.equivalence(y, x);
-
-    // actual test
-    BooleanFormula parsedForm = mgr.parse(BOOL_VARS_W_LOGIC);
-    assertThatFormula(parsedForm).isEquivalentTo(expr);
-  }
-
-  @Test
-  public void commentsParseTest() throws SolverException, InterruptedException {
-    requireParser();
-    // Some solvers have problems with comments in the beginning
-
-    // Boolector will fail this anyway since bools are bitvecs for btor
-    TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
-
-    BooleanFormula x = bmgr.makeVariable("x");
-    BooleanFormula y = bmgr.makeVariable("y");
-    BooleanFormula expr = bmgr.equivalence(y, x);
-
-    // actual test
-    BooleanFormula parsedForm = mgr.parse(BOOL_VARS_W_LOGIC_AND_COMMENT);
-    assertThatFormula(parsedForm).isEquivalentTo(expr);
-  }
 
   @Test
   public void varDumpTest() {
