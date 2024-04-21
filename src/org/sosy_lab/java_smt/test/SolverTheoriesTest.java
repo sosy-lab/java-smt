@@ -769,11 +769,6 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
     requireArrays();
     requireBitvectors();
 
-    assume()
-        .withMessage("Solver does not support bit-vector arrays.")
-        .that(solver)
-        .isNotEqualTo(Solvers.PRINCESS);
-
     BitvectorFormula _i = mgr.getBitvectorFormulaManager().makeVariable(64, "i");
     ArrayFormula<BitvectorFormula, BitvectorFormula> _b =
         amgr.makeArray(
@@ -786,6 +781,9 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
       case MATHSAT5:
         // Mathsat5 has a different internal representation of the formula
         assertThat(_b_at_i.toString()).isEqualTo("(`read_T(18)_T(20)` b i)");
+        break;
+      case PRINCESS:
+        assertThat(_b_at_i.toString()).isEqualTo("select(b, i)");
         break;
       case BOOLECTOR:
         assume()
@@ -830,11 +828,6 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
     requireBitvectors();
     requireIntegers();
 
-    assume()
-        .withMessage("Solver does not support bit-vector arrays.")
-        .that(solver)
-        .isNotEqualTo(Solvers.PRINCESS);
-
     IntegerFormula _i = imgr.makeVariable("i");
     ArrayFormula<IntegerFormula, ArrayFormula<IntegerFormula, BitvectorFormula>> multi =
         amgr.makeArray(
@@ -849,6 +842,9 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
       case MATHSAT5:
         String readWrite = "(`read_int_T(18)` (`read_int_T(19)` multi i) i)";
         assertThat(valueInMulti.toString()).isEqualTo(readWrite);
+        break;
+      case PRINCESS:
+        assertThat(valueInMulti.toString()).isEqualTo("select(select(multi, i), i)");
         break;
       default:
         assertThat(valueInMulti.toString()).isEqualTo("(select (select multi i) i)");
