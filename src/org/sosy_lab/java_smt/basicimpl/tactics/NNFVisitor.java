@@ -135,7 +135,6 @@ public class NNFVisitor extends BooleanFormulaTransformationVisitor {
         BooleanFormula processedCondition,
         BooleanFormula processedThenFormula,
         BooleanFormula processedElseFormula) {
-
       return bfmgr.visit(
           rewriteIfThenElse(processedCondition, processedThenFormula, processedElseFormula), this);
     }

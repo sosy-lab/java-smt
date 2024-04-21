@@ -277,18 +277,14 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
       } else {
         containsMoreAnd = true;
       }
-      for (BooleanFormula pOperand : pOperands) {
-        visit(pOperand);
-      }
+      pOperands.forEach(this::visit);
       return null;
     }
 
     @Override
     public Void visitOr(List<BooleanFormula> pOperands) {
       if (started) {
-        for (BooleanFormula pOperand : pOperands) {
-          visit(pOperand);
-        }
+        pOperands.forEach(this::visit);
       }
       return null;
     }

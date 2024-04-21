@@ -63,7 +63,7 @@ public final class CVC4SolverContext extends AbstractSolverContext {
     // temporary SmtEngine instance, until ExprManager.getOptions() works without SegFault.
     SmtEngine smtEngine = new SmtEngine(exprManager);
     smtEngine.setOption("output-language", new SExpr("smt2"));
-    // smtEngine.setOption("random-seed", new SExpr(randomSeed));
+    smtEngine.setOption("random-seed", new SExpr(randomSeed));
     // Set Strings option to enable all String features (such as lessOrEquals)
     smtEngine.setOption("strings-exp", new SExpr(true));
     // smtEngine.delete();

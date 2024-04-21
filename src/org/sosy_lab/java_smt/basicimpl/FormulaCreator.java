@@ -214,7 +214,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
   }
 
   @SuppressWarnings("unchecked")
-  public TFormulaInfo extractInfo(Formula pT) {
+  protected TFormulaInfo extractInfo(Formula pT) {
     if (pT instanceof AbstractFormula) {
       return ((AbstractFormula<TFormulaInfo>) pT).getFormulaInfo();
     }
@@ -321,6 +321,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
 
   public <T extends Formula> T transformRecursively(
       FormulaVisitor<? extends Formula> pFormulaVisitor, T pF, Predicate<Object> shouldProcess) {
+
     final Deque<Formula> toProcess = new ArrayDeque<>();
     Map<Formula, Formula> pCache = new HashMap<>();
     FormulaTransformationVisitorImpl recVisitor =
@@ -441,6 +442,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
     @Override
     public TraversalProcess visitQuantifier(
         BooleanFormula f, Quantifier q, List<Formula> boundVariables, BooleanFormula body) {
+
       // We begin a new nested scope, thus we need a 'really' recursive call and
       // use another visitor-instance which knows the corresponding bound variables.
       visitRecursively(

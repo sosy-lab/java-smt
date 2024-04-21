@@ -251,6 +251,7 @@ public class PrincessEnvironment {
   }
 
   public List<? extends IExpression> parseStringToTerms(String s, PrincessFormulaCreator creator) {
+
     Tuple4<
             Seq<IFormula>,
             scala.collection.immutable.Map<IFunction, SMTFunctionType>,

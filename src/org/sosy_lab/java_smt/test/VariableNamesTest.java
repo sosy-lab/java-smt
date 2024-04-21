@@ -20,7 +20,6 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import org.junit.Test;
@@ -144,7 +143,10 @@ public class VariableNamesTest extends SolverBasedTest0 {
           "set-logic",
           "set-option");
 
-  /** Some special chars are not allowed to appear in symbol names. See . */
+  /**
+   * Some special chars are not allowed to appear in symbol names. See {@link
+   * AbstractFormulaManager#DISALLOWED_CHARACTERS}.
+   */
   @SuppressWarnings("javadoc")
   private static final ImmutableSet<String> UNSUPPORTED_NAMES =
       ImmutableSet.of(
@@ -304,13 +306,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
     requireIntegers();
     requireArrays();
     for (String name : getAllNames()) {
-      testName0(
-          name,
-          s -> {
-            return amgr.makeArray(s, IntegerType, IntegerType);
-          },
-          amgr::equivalence,
-          false);
+      testName0(name, s -> amgr.makeArray(s, IntegerType, IntegerType), amgr::equivalence, false);
     }
   }
 
@@ -323,13 +319,11 @@ public class VariableNamesTest extends SolverBasedTest0 {
     for (String name : NAMES) {
       testName0(
           name,
-          s -> {
-            return Objects.requireNonNull(amgr)
-                .makeArray(
-                    s,
-                    FormulaType.getBitvectorTypeWithSize(2),
-                    FormulaType.getBitvectorTypeWithSize(2));
-          },
+          s ->
+              amgr.makeArray(
+                  s,
+                  FormulaType.getBitvectorTypeWithSize(2),
+                  FormulaType.getBitvectorTypeWithSize(2)),
           amgr::equivalence,
           false);
     }
@@ -619,11 +613,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
     requireArrays();
     requireIntegers();
     for (String name : getAllNames()) {
-      createVariableWith(
-          v -> {
-            return Objects.requireNonNull(amgr).makeArray(v, IntegerType, IntegerType);
-          },
-          name);
+      createVariableWith(v -> amgr.makeArray(v, IntegerType, IntegerType), name);
     }
   }
 
@@ -635,13 +625,11 @@ public class VariableNamesTest extends SolverBasedTest0 {
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
     for (String name : getAllNames()) {
       createVariableWith(
-          v -> {
-            return Objects.requireNonNull(amgr)
-                .makeArray(
-                    v,
-                    FormulaType.getBitvectorTypeWithSize(2),
-                    FormulaType.getBitvectorTypeWithSize(2));
-          },
+          v ->
+              amgr.makeArray(
+                  v,
+                  FormulaType.getBitvectorTypeWithSize(2),
+                  FormulaType.getBitvectorTypeWithSize(2)),
           name);
     }
   }

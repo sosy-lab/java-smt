@@ -37,7 +37,7 @@ public class ParserFormula {
     javaSmt = pJavaSmt;
   }
 
-  @javax.annotation.Nullable
+  @Nullable
   public String getType() {
     return type;
   }

@@ -107,6 +107,7 @@ class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, ExprManager,
         // f.toStream() uses LET-expressions and is exactly what we want.
         try (OutputStream stream =
             new OutputStream() {
+
               @Override
               public void write(int chr) throws IOException {
                 out.append((char) chr);

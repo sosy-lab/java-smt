@@ -362,7 +362,6 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, Sy
     ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
 
     Pterm pterm = logic.getPterm(f);
-
     for (int i = 0; i < pterm.size(); i++) {
       PTRef sub = pterm.at(i);
       argTerms.add(encapsulate(sub));

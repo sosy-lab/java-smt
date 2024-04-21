@@ -64,4 +64,5 @@ solvers_maven_conf/*.asc
 build.properties
 /.apt-generated/
 /repository
+
 pom.xml

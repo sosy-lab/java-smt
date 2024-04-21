@@ -109,6 +109,7 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @Override
   protected @Nullable T addConstraintImpl(BooleanFormula pF) throws InterruptedException {
+    Preconditions.checkState(!closed);
     setChanged();
     Term exp = creator.extractInfo(pF);
     if (incremental) {

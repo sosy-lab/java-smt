@@ -103,9 +103,7 @@ public class FormulaClassifier {
 
       // classify the formulas
       FormulaClassifier fc = new FormulaClassifier(context);
-      for (BooleanFormula formula : formulas) {
-        fc.visit(formula);
-      }
+      formulas.forEach(fc::visit);
       System.out.println(fc + ", checked formulas: " + formulas.size());
 
     } catch (InvalidConfigurationException | UnsatisfiedLinkError e) {

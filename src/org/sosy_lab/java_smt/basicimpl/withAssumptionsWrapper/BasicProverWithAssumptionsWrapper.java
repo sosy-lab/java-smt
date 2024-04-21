@@ -62,7 +62,6 @@ public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironme
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
     clearAssumptions();
-
     return delegate.isUnsat();
   }
 

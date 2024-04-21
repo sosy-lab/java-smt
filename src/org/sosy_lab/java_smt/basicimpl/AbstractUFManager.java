@@ -61,8 +61,7 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
   public <T extends Formula> FunctionDeclaration<T> declareUF(
       String pName, FormulaType<T> pReturnType, FormulaType<?>... pArgs) {
     checkVariableName(pName);
-    FunctionDeclaration<T> result = declareUF(pName, pReturnType, Arrays.asList(pArgs));
-    return result;
+    return declareUF(pName, pReturnType, Arrays.asList(pArgs));
   }
 
   @Override
@@ -104,7 +103,6 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
   public <T extends Formula> T declareAndCallUF(
       String name, FormulaType<T> pReturnType, Formula... pArgs) {
     checkVariableName(name);
-    T result = declareAndCallUF(name, pReturnType, Arrays.asList(pArgs));
-    return result;
+    return declareAndCallUF(name, pReturnType, Arrays.asList(pArgs));
   }
 }

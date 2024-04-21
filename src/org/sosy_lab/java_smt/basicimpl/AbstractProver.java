@@ -99,8 +99,8 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     checkState(!closed);
     checkState(assertedFormulas.size() > 1, "initial level must remain until close");
     Generator.logPop();
-    popImpl();
     assertedFormulas.remove(assertedFormulas.size() - 1); // remove last
+    popImpl();
   }
 
   protected abstract void popImpl();

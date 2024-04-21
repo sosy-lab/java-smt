@@ -124,6 +124,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
 
   @Override
   protected Void addConstraintImpl(BooleanFormula f) throws InterruptedException {
+    Preconditions.checkState(!closed);
     if (Generator.isLoggingEnabled()) {
       Generator.assembleConstraint(f);
     }

@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.example;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -94,7 +95,7 @@ public class Sudoku {
   private static final Integer[][] UNSOLVABLE_SUDOKU = null;
 
   public static void main(String... args)
-      throws InvalidConfigurationException, SolverException, InterruptedException {
+      throws InvalidConfigurationException, SolverException, InterruptedException, IOException {
     Configuration config = Configuration.defaultConfiguration();
     LogManager logger = BasicLogManager.create(config);
     ShutdownNotifier notifier = ShutdownNotifier.createDummy();

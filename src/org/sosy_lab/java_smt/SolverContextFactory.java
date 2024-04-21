@@ -52,8 +52,8 @@ public class SolverContextFactory {
   public enum Solvers {
     OPENSMT,
     MATHSAT5,
-    Z3,
     SMTINTERPOL,
+    Z3,
     PRINCESS,
     BOOLECTOR,
     CVC4,

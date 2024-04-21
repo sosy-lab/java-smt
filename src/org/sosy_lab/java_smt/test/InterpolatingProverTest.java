@@ -594,6 +594,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   private <T> void testTreeInterpolants1(
       BooleanFormula pA, BooleanFormula pB, BooleanFormula pC, BooleanFormula pD, BooleanFormula pE)
       throws SolverException, InterruptedException {
+
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
     T TA = stack.push(pA);
