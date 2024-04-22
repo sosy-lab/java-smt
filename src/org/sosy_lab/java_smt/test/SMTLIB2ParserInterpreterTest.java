@@ -962,11 +962,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     assume()
         .withMessage("Solver %s always adds zero", solverToUse())
         .that(solverToUse())
-        .isNoneOf(
-            Solvers.CVC5,
-            Solvers.CVC4,
-            Solvers.PRINCESS,
-            Solvers.SMTINTERPOL);
+        .isNoneOf(Solvers.CVC5, Solvers.CVC4, Solvers.PRINCESS, Solvers.SMTINTERPOL);
     clearVisitor();
 
     String x = "(assert (= (+ 1 5) (+ 3 2147483647)))\n";

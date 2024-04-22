@@ -217,9 +217,10 @@ public class SolverContextFactory {
       throws InvalidConfigurationException {
     if (useBinary && solverToCreate != Solvers.PRINCESS) {
       throw new InvalidConfigurationException(
-          String.format("Can't use option solver.useBinary with solver %s. Currently only "
-                  + "Princess is supported in binary mode.",
-          solverToCreate));
+          String.format(
+              "Can't use option solver.useBinary with solver %s. Currently only Princess is"
+                  + "supported in binary mode.",
+              solverToCreate));
     }
     SolverContext context;
     try {

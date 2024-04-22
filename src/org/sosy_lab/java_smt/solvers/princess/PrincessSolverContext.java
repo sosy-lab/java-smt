@@ -30,9 +30,7 @@ public final class PrincessSolverContext extends AbstractSolverContext {
   private final boolean useBinary;
 
   private PrincessSolverContext(
-      PrincessFormulaManager manager,
-      PrincessFormulaCreator creator,
-      boolean useBinary) {
+      PrincessFormulaManager manager, PrincessFormulaCreator creator, boolean useBinary) {
     super(manager);
     this.manager = manager;
     this.creator = creator;
