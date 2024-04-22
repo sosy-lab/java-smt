@@ -27,8 +27,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Writer;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -56,10 +58,8 @@ public class BinaryModel extends AbstractModel<IExpression, Sort, PrincessEnviro
   private final ArrayFormulaManager amgr;
   private final UFManager umgr;
 
-  private List<ValueAssignment> assignments;
-
   /** Model.ValuesAssignments for the parsed Princess model */
-  public ImmutableList<ValueAssignment> finalList;
+  public ImmutableList<ValueAssignment> finalList = ImmutableList.of();
 
   private boolean isUnsat;
 
@@ -75,7 +75,6 @@ public class BinaryModel extends AbstractModel<IExpression, Sort, PrincessEnviro
     bvmgr = mgr.getBitvectorFormulaManager();
     amgr = mgr.getArrayFormulaManager();
     umgr = mgr.getUFManager();
-    assignments = new ArrayList<>();
   }
 
   @Override
@@ -84,9 +83,20 @@ public class BinaryModel extends AbstractModel<IExpression, Sort, PrincessEnviro
   }
 
   /** generates an SMT-LIB2 model from Princess and writes it into a file "Model.smt2" */
-  public void getOutput() {
+  public void runBinary(String input) {
     // FIXME: This method is called twice, once for isUnsat and once to get the model.
     //  Instead of running the solver twice we should cache the result.
+
+    // Write SMTLIB2 script to a file
+    try {
+      try (Writer fileWriter =
+               Files.newBufferedWriter(Paths.get("Out.smt2"), Charset.defaultCharset())) {
+        fileWriter.write(input);
+        fileWriter.flush();
+      }
+    } catch (IOException e) {
+      throw new GeneratorException("Could not write to file");
+    }
 
     // FIXME: Pull the version from the configuration
     String princessJar = "princess_2.13.jar";
@@ -120,8 +130,10 @@ public class BinaryModel extends AbstractModel<IExpression, Sort, PrincessEnviro
               lines = br.readLine();
             }
 
-            // Store it in Model.smt2
-            Generator.writeToFile(String.valueOf(output), "Model.smt2");
+            // Parse the model returned by the binary
+            if (!isUnsat) {
+              finalList = ImmutableList.copyOf(parseModel(output.toString()));
+            }
           }
         }
       }
@@ -131,28 +143,12 @@ public class BinaryModel extends AbstractModel<IExpression, Sort, PrincessEnviro
     }
   }
 
-  private List<ValueAssignment> parseModel(String pString) {
-    try {
-      smtlibv2Lexer lexer = new smtlibv2Lexer(CharStreams.fromFileName(pString));
-      smtlibv2Parser parser = new smtlibv2Parser(new CommonTokenStream(lexer));
-      Visitor visitor = new Visitor(mgr, bmgr, imgr, null, bvmgr, amgr, umgr);
-      visitor.visit(parser.start());
-      assignments = visitor.getAssignments();
-      return assignments;
-    } catch (IOException e) {
-      // FIXME: Find a better way to handle IO errors
-      throw new RuntimeException(e);
-    }
-  }
-
-  protected void getAssignments() throws ModelException {
-    getOutput();
-    if (!isUnsat) {
-      assignments = parseModel("Model.smt2");
-    } else {
-      throw new ModelException("Formula has to be sat in order to retrieve a model.");
-    }
-    finalList = ImmutableList.copyOf(assignments);
+  private List<ValueAssignment> parseModel(String output) {
+    smtlibv2Lexer lexer = new smtlibv2Lexer(CharStreams.fromString(output));
+    smtlibv2Parser parser = new smtlibv2Parser(new CommonTokenStream(lexer));
+    Visitor visitor = new Visitor(mgr, bmgr, imgr, null, bvmgr, amgr, umgr);
+    visitor.visit(parser.start());
+    return visitor.getAssignments();
   }
 
   @Override
@@ -161,7 +157,7 @@ public class BinaryModel extends AbstractModel<IExpression, Sort, PrincessEnviro
   }
 
   public BinaryModel getModel() throws ModelException {
-    getAssignments();
+    // TODO: Split of the Model with the values as a separate class
     return this;
   }
 

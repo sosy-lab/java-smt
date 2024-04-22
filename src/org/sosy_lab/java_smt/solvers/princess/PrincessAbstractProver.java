@@ -20,7 +20,6 @@ import ap.parser.IFunction;
 import ap.parser.ITerm;
 import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -80,16 +79,14 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
    */
   @Override
   public boolean isUnsat() throws SolverException {
-    try {
-      Generator.dumpSMTLIB2();
-    } catch (IOException pE) {
-      throw new RuntimeException(pE);
-    }
     Preconditions.checkState(!closed);
     wasLastSatCheckSat = false;
     if (useBinary) {
-      binaryModel.getOutput();
-      return binaryModel.isUnsat();
+      String input = Generator.getSMTLIB2String();
+      binaryModel.runBinary(input);
+      boolean isUnsat = binaryModel.isUnsat();
+      wasLastSatCheckSat = !isUnsat;
+      return isUnsat;
     } else {
       final Value result = api.checkSat(true);
       if (result.equals(SimpleAPI.ProverStatus$.MODULE$.Sat())) {
@@ -148,12 +145,12 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   @SuppressWarnings("resource")
   @Override
   public Model getModel() throws SolverException {
+    Preconditions.checkState(!closed);
+    Preconditions.checkState(wasLastSatCheckSat, NO_MODEL_HELP);
+    checkGenerateModels();
     if (useBinary) {
       return binaryModel.getModel();
     } else {
-      Preconditions.checkState(!closed);
-      Preconditions.checkState(wasLastSatCheckSat, NO_MODEL_HELP);
-      checkGenerateModels();
       return new CachingModel(getEvaluatorWithoutChecks());
     }
   }
@@ -188,6 +185,10 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   public List<BooleanFormula> getUnsatCore() {
     Preconditions.checkState(!closed);
     checkGenerateUnsatCores();
+    if (useBinary) {
+      // FIXME: Add support for unsat core
+      throw new UnsupportedOperationException();
+    }
     final List<BooleanFormula> result = new ArrayList<>();
     final Set<Object> core = asJava(api.getUnsatCore());
     for (Object partitionId : core) {
