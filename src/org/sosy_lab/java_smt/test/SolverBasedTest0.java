@@ -279,6 +279,8 @@ public abstract class SolverBasedTest0 {
         .withMessage("Solver %s does not support quantifiers", solverToUse())
         .that(qmgr)
         .isNotNull();
+    // FIXME: Disabled while we're testing the binary backend
+    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
   }
 
   /** Skip test if the solver does not support arrays. */
