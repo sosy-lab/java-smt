@@ -59,7 +59,6 @@ public class SolverContextFactory {
     CVC4,
     CVC5,
     YICES2,
-    PRINCESS_BINARY
   }
 
   @Option(secure = true, description = "Export solver queries in SmtLib format into a file.")
@@ -112,6 +111,9 @@ public class SolverContextFactory {
   @Option(secure = true, description = "Enable SMTLIB2 script generation.")
   private boolean generateSMTLIB2 = false;
 
+  @Option(secure = true, description = "Run the solver binary instead of using the library.")
+  private boolean useBinary = false;
+
   private final LogManager logger;
   private final ShutdownNotifier shutdownNotifier;
   private final Configuration config;
@@ -157,6 +159,12 @@ public class SolverContextFactory {
       Consumer<String> pLoader)
       throws InvalidConfigurationException {
     pConfig.inject(this);
+    if (useBinary && !generateSMTLIB2) {
+      // FIXME: Maybe this should be just one option?
+      throw new InvalidConfigurationException(
+          "Can't use option solver.useBinary without also enabling solver.generateSMTLIB2.");
+    }
+
     logger = pLogger.withComponentName("JavaSMT");
     shutdownNotifier = checkNotNull(pShutdownNotifier);
     config = pConfig;
@@ -207,7 +215,12 @@ public class SolverContextFactory {
   @SuppressWarnings("resource") // returns unclosed context object
   public SolverContext generateContext(Solvers solverToCreate)
       throws InvalidConfigurationException {
-
+    if (useBinary && solverToCreate != Solvers.PRINCESS) {
+      throw new InvalidConfigurationException(
+          String.format("Can't use option solver.useBinary with solver %s. Currently only "
+                  + "Princess is supported in binary mode.",
+          solverToCreate));
+    }
     SolverContext context;
     try {
       context = generateContext0(solverToCreate);
@@ -288,16 +301,7 @@ public class SolverContextFactory {
 
       case PRINCESS:
         return PrincessSolverContext.create(
-            config, shutdownNotifier, logfile, (int) randomSeed, nonLinearArithmetic);
-
-      case PRINCESS_BINARY:
-        return PrincessSolverContext.create(
-            config,
-            // Configuration.fromCmdLineArguments(cmdLineArguments),
-            shutdownNotifier,
-            logfile,
-            (int) randomSeed,
-            nonLinearArithmetic);
+            config, useBinary, shutdownNotifier, logfile, (int) randomSeed, nonLinearArithmetic);
 
       case YICES2:
         return Yices2SolverContext.create(nonLinearArithmetic, shutdownNotifier, loader);

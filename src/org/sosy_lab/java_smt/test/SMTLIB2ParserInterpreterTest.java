@@ -56,9 +56,11 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() {
     ConfigurationBuilder newConfig = super.createTestConfigBuilder();
-    return solverToUse() == Solvers.PRINCESS_BINARY
-        ? newConfig.setOption("solver.generateSMTLIB2", String.valueOf(true))
-        : newConfig;
+    if (solverToUse() == Solvers.PRINCESS) {
+      newConfig.setOption("solver.generateSMTLIB2", String.valueOf(true));
+      newConfig.setOption("solver.useBinary", String.valueOf(true));
+    }
+    return newConfig;
   }
 
   public void clearVisitor() {
@@ -964,7 +966,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
             Solvers.CVC5,
             Solvers.CVC4,
             Solvers.PRINCESS,
-            Solvers.PRINCESS_BINARY,
             Solvers.SMTINTERPOL);
     clearVisitor();
 
@@ -1488,7 +1489,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
     // Broken for anything but Princess
-    assume().that(solverToUse()).isAnyOf(Solvers.PRINCESS, Solvers.PRINCESS_BINARY);
+    assume().that(solverToUse()).isEqualTo(Solvers.PRINCESS);
     clearVisitor();
 
     String x = "(assert (= (- (to_int 5) (to_int 1)) (- (to_int 3) (to_int 2147483647))))\n";
@@ -3556,7 +3557,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     clearVisitor();
     clearGenerator();
-    assume().that(solverToUse()).isEqualTo(Solvers.PRINCESS_BINARY);
+    assume().that(solverToUse()).isEqualTo(Solvers.PRINCESS);
     String a =
         "(declare-const c Bool)\n"
             + "(declare-const d Bool)\n"
@@ -3607,7 +3608,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     requireBitvectors();
     clearVisitor();
     clearGenerator();
-    assume().that(solverToUse()).isEqualTo(Solvers.PRINCESS_BINARY);
+    assume().that(solverToUse()).isEqualTo(Solvers.PRINCESS);
     String a =
         "(declare-const c (_ BitVec 3))\n"
             + "(declare-const d (_ BitVec 3))\n"
@@ -3660,7 +3661,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     requireArrayModel();
     clearVisitor();
     clearGenerator();
-    assume().that(solverToUse()).isEqualTo(Solvers.PRINCESS_BINARY);
+    assume().that(solverToUse()).isEqualTo(Solvers.PRINCESS);
     String a =
         "(declare-const c (Array Int Int))\n"
             + "(declare-const d (Array Int Int))\n"
@@ -3717,7 +3718,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     requireBitvectors();
     clearVisitor();
     clearGenerator();
-    assume().that(solverToUse()).isEqualTo(Solvers.PRINCESS_BINARY);
+    assume().that(solverToUse()).isEqualTo(Solvers.PRINCESS);
     String a =
         "(declare-const c (Array (_ BitVec 32) (_ BitVec 32)))\n"
             + "(declare-const d (Array (_ BitVec 32) (_ BitVec 32)))\n"
@@ -3798,7 +3799,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     requireArrayModel();
     clearVisitor();
     clearGenerator();
-    assume().that(solverToUse()).isEqualTo(Solvers.PRINCESS_BINARY);
+    assume().that(solverToUse()).isEqualTo(Solvers.PRINCESS);
     String a =
         "(declare-const c (Array Bool Bool))\n"
             + "(declare-const d (Array Bool Bool))\n"
@@ -3855,7 +3856,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     requireArrayModel();
     clearVisitor();
     clearGenerator();
-    assume().that(solverToUse()).isEqualTo(Solvers.PRINCESS_BINARY);
+    assume().that(solverToUse()).isEqualTo(Solvers.PRINCESS);
     String a =
         "(declare-const c (Array (Array Bool Bool) (Array Bool Bool)))\n"
             + "(declare-const d (Array (Array Bool Bool) (Array Bool Bool)))\n"

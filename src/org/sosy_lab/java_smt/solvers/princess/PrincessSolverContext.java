@@ -27,15 +27,21 @@ public final class PrincessSolverContext extends AbstractSolverContext {
 
   private final PrincessFormulaManager manager;
   private final PrincessFormulaCreator creator;
+  private final boolean useBinary;
 
-  private PrincessSolverContext(PrincessFormulaManager manager, PrincessFormulaCreator creator) {
+  private PrincessSolverContext(
+      PrincessFormulaManager manager,
+      PrincessFormulaCreator creator,
+      boolean useBinary) {
     super(manager);
     this.manager = manager;
     this.creator = creator;
+    this.useBinary = useBinary;
   }
 
   public static SolverContext create(
       Configuration config,
+      boolean useBinary,
       ShutdownNotifier pShutdownNotifier,
       @Nullable PathCounterTemplate pLogfileTemplate,
       int pRandomSeed,
@@ -64,7 +70,7 @@ public final class PrincessSolverContext extends AbstractSolverContext {
             bitvectorTheory,
             arrayTheory,
             quantifierTheory);
-    return new PrincessSolverContext(manager, creator);
+    return new PrincessSolverContext(manager, creator, useBinary);
   }
 
   @SuppressWarnings("resource")
@@ -74,6 +80,9 @@ public final class PrincessSolverContext extends AbstractSolverContext {
       throw new UnsupportedOperationException(
           "Princess does not support unsat core generation with assumptions yet");
     }
+    if (useBinary) {
+      options.add(ProverOptions.USE_BINARY);
+    }
     return (PrincessTheoremProver) creator.getEnv().getNewProver(false, manager, creator, options);
   }
 
@@ -81,6 +90,9 @@ public final class PrincessSolverContext extends AbstractSolverContext {
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> options) {
+    if (useBinary) {
+      options.add(ProverOptions.USE_BINARY);
+    }
     return (PrincessInterpolatingProver)
         creator.getEnv().getNewProver(true, manager, creator, options);
   }
