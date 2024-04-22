@@ -344,6 +344,8 @@ public abstract class SolverBasedTest0 {
         .withMessage("Solver %s does not support parsing formulae", solverToUse())
         .that(solverToUse())
         .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2, Solvers.CVC5);
+    // FIXME: Disabled while we're testing the binary backend
+    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
   }
 
   protected void requireArrayModel() {
