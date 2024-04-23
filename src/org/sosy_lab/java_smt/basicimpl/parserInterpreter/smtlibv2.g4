@@ -1,7 +1,7 @@
 /**
  * SMT-LIB (v2.6) grammar
  *
- * Grammar is baesd on the following specification:
+ * Grammar is based on the following specification:
  * http://smtlib.cs.uiowa.edu/papers/smt-lib-reference-v2.6-r2017-07-18.pdf
  *
  * The MIT License (MIT)
@@ -26,6 +26,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  **/
+
+/*
+ * SPDX-FileCopyrightText: 2017 Julian Thome <julian.thome.de@gmail.com>
+ *
+ * SPDX-License-Identifier: MIT
+ */
 
 grammar smtlibv2;
 
