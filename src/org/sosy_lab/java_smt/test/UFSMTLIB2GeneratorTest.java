@@ -24,7 +24,6 @@ import static com.google.common.truth.Truth.assertThat;
 
 import java.util.ArrayList;
 import java.util.Objects;
-import org.junit.Assert;
 import org.junit.Test;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -216,8 +215,9 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
             + "(assert (= (a 4.0) "
             + "(b 9.0)))\n";
 
-    Assert.assertTrue(
-        actualResult.equals(expectedResult) || actualResult.equals(expectedResultSMTInterpol));
+    assertThat(
+            actualResult.equals(expectedResult) || actualResult.equals(expectedResultSMTInterpol))
+        .isTrue();
   }
 
   @Test
@@ -506,8 +506,9 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
             + "(assert (= (a 4.0) "
             + "(b 9.0)))\n";
 
-    Assert.assertTrue(
-        expectedResult.equals(actualResult) || actualResult.equals(expectedResultSMTInterpol));
+    assertThat(
+            expectedResult.equals(actualResult) || actualResult.equals(expectedResultSMTInterpol))
+        .isTrue();
   }
 
   @Test

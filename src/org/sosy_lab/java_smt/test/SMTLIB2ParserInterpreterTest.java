@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import org.junit.Assert;
 import org.junit.Test;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -419,7 +418,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     BooleanFormula actualResult = mgr.universalParseFromString(a);
 
     BooleanFormula expectedResult = bmgr.makeVariable("a");
-    Assert.assertEquals(expectedResult, actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -432,7 +431,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     BooleanFormula actualResult = mgr.universalParseFromString(a);
 
     BooleanFormula expectedResult = bmgr.makeTrue();
-    Assert.assertEquals(expectedResult, actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -445,7 +444,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     BooleanFormula actualResult = mgr.universalParseFromString(a);
 
     BooleanFormula expectedResult = bmgr.makeFalse();
-    Assert.assertEquals(expectedResult, actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -458,7 +457,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     BooleanFormula actualResult = mgr.universalParseFromString(a);
 
     BooleanFormula expectedResult = bmgr.not(bmgr.makeVariable("a"));
-    Assert.assertEquals(expectedResult, actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -471,7 +470,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     BooleanFormula actualResult = mgr.universalParseFromString(a);
 
     BooleanFormula expectedResult = bmgr.or(bmgr.makeVariable("a"), bmgr.makeVariable("b"));
-    Assert.assertEquals(expectedResult, actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -489,7 +488,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
 
     BooleanFormula expectedResult =
         bmgr.or(bmgr.makeVariable("a"), bmgr.makeVariable("b"), bmgr.makeVariable("c"));
-    Assert.assertEquals(expectedResult, actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -502,7 +501,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     BooleanFormula actualResult = mgr.universalParseFromString(a);
 
     BooleanFormula expectedResult = bmgr.and(bmgr.makeVariable("a"), bmgr.makeVariable("b"));
-    Assert.assertEquals(expectedResult, actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -520,7 +519,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
 
     BooleanFormula expectedResult =
         bmgr.and(bmgr.makeVariable("a"), bmgr.makeVariable("b"), bmgr.makeVariable("c"));
-    Assert.assertEquals(expectedResult, actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -533,7 +532,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     BooleanFormula actualResult = mgr.universalParseFromString(a);
 
     BooleanFormula expectedResult = bmgr.xor(bmgr.makeVariable("a"), bmgr.makeVariable("b"));
-    Assert.assertEquals(expectedResult, actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -547,7 +546,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
 
     BooleanFormula expectedResult =
         bmgr.equivalence(bmgr.makeVariable("a"), bmgr.makeVariable("b"));
-    Assert.assertEquals(expectedResult, actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -561,7 +560,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
 
     BooleanFormula expectedResult =
         bmgr.implication(bmgr.makeVariable("a"), bmgr.makeVariable("b"));
-    Assert.assertEquals(expectedResult, actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -579,7 +578,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
 
     BooleanFormula expectedResult =
         bmgr.ifThenElse(bmgr.makeVariable("a"), bmgr.makeVariable("b"), bmgr.makeVariable("c"));
-    Assert.assertEquals(expectedResult, actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -617,7 +616,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
                         bmgr.makeTrue()),
                     bmgr.and(bmgr.makeBoolean(true), bmgr.makeVariable("a")),
                     bmgr.makeVariable("f"))));
-    Assert.assertEquals(expectedResult, actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   /* UF CONSTRAINT TESTS */

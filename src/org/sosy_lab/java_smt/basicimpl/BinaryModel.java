@@ -30,7 +30,7 @@ import java.io.InputStreamReader;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.List;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -90,7 +90,7 @@ public class BinaryModel extends AbstractModel<IExpression, Sort, PrincessEnviro
     // Write SMTLIB2 script to a file
     try {
       try (Writer fileWriter =
-               Files.newBufferedWriter(Paths.get("Out.smt2"), Charset.defaultCharset())) {
+          Files.newBufferedWriter(Path.of("Out.smt2"), Charset.defaultCharset())) {
         fileWriter.write(input);
         fileWriter.flush();
       }

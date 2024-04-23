@@ -24,7 +24,6 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 
 import java.util.Objects;
-import org.junit.Assert;
 import org.junit.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -117,8 +116,10 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
             + "(assert (="
             + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110"
             + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011011010))\n";
-    Assert.assertTrue(
-        expectedResultMathsat5.equals(actualResult) || expectedResultOthers.equals(actualResult));
+    assertThat(
+            expectedResultMathsat5.equals(actualResult)
+                || expectedResultOthers.equals(actualResult))
+        .isTrue();
   }
 
   @Test
@@ -152,8 +153,10 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
             + "(assert (="
             + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110"
             + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011011010))\n";
-    Assert.assertTrue(
-        expectedResultMathsat5.equals(actualResult) || expectedResultOthers.equals(actualResult));
+    assertThat(
+            expectedResultMathsat5.equals(actualResult)
+                || expectedResultOthers.equals(actualResult))
+        .isTrue();
   }
 
   @Test
@@ -189,8 +192,10 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
             + " (bvadd"
             + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110"
             + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011011010)))\n";
-    Assert.assertTrue(
-        expectedResultMathsat5.equals(actualResult) || expectedResultOthers.equals(actualResult));
+    assertThat(
+            expectedResultMathsat5.equals(actualResult)
+                || expectedResultOthers.equals(actualResult))
+        .isTrue();
   }
 
   @Test
@@ -227,8 +232,10 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
             + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110)"
             + " (bvneg"
             + " #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000))))\n";
-    Assert.assertTrue(
-        expectedResultMathsat5.equals(actualResult) || expectedResultOthers.equals(actualResult));
+    assertThat(
+            expectedResultMathsat5.equals(actualResult)
+                || expectedResultOthers.equals(actualResult))
+        .isTrue();
   }
 
   @Test
@@ -260,8 +267,10 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
             + " (bvsub"
             + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110"
             + " #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
-    Assert.assertTrue(
-        expectedResultMathsat5.equals(actualResult) || expectedResultOthers.equals(actualResult));
+    assertThat(
+            expectedResultMathsat5.equals(actualResult)
+                || expectedResultOthers.equals(actualResult))
+        .isTrue();
   }
 
   @Test
@@ -297,8 +306,9 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
         "(assert (= #b111111110110 (bvsdiv #b111111110110 "
             + "#b000000010100)))\n"
             + "(assert (= #b111111110110 (bvsdiv #b111111110110 #b000000010100)))\n";
-    Assert.assertTrue(
-        expectedResultYices.equals(actualResult) || expectedResultOthers.equals(actualResult));
+    assertThat(
+            expectedResultYices.equals(actualResult) || expectedResultOthers.equals(actualResult))
+        .isTrue();
   }
 
   @Test
@@ -336,10 +346,11 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
             + " (bvurem"
             + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110"
             + " #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
-    Assert.assertTrue(
-        expectedResultYices.equals(actualResult)
-            || expectedResultOthers.equals(actualResult)
-            || expectedResultMathsat5.equals(actualResult));
+    assertThat(
+            expectedResultYices.equals(actualResult)
+                || expectedResultOthers.equals(actualResult)
+                || expectedResultMathsat5.equals(actualResult))
+        .isTrue();
   }
 
   @Test
@@ -373,10 +384,11 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
     String expectedResultMathsat5 =
         "(assert (= #b111111110110 (bvmul #b111111110110 #b000000010100)))\n"
             + "(assert (= #b111111110110 (bvmul #b111111110110 #b000000010100)))\n";
-    Assert.assertTrue(
-        expectedResultYices.equals(actualResult)
-            || expectedResultOthers.equals(actualResult)
-            || expectedResultMathsat5.equals(actualResult));
+    assertThat(
+            expectedResultYices.equals(actualResult)
+                || expectedResultOthers.equals(actualResult)
+                || expectedResultMathsat5.equals(actualResult))
+        .isTrue();
   }
 
   @Test
@@ -401,7 +413,7 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
             + "(assert (bvugt"
             + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110"
             + " #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000))\n";
-    Assert.assertEquals(expectedResult, actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -426,7 +438,7 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
             + "(assert (bvuge"
             + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110"
             + " #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000))\n";
-    Assert.assertEquals(expectedResult, actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -451,7 +463,7 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
             + "(assert (bvult"
             + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110"
             + " #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000))\n";
-    Assert.assertEquals(expectedResult, actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -476,7 +488,7 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
             + "(assert (bvule"
             + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110"
             + " #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000))\n";
-    Assert.assertEquals(expectedResult, actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -505,8 +517,10 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
             + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110)"
             + " (bvnot"
             + " #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
-    Assert.assertTrue(
-        expectedResultMathsat5.equals(actualResult) || expectedResultOthers.equals(actualResult));
+    assertThat(
+            expectedResultMathsat5.equals(actualResult)
+                || expectedResultOthers.equals(actualResult))
+        .isTrue();
   }
 
   @Test
@@ -541,8 +555,8 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
             + "(assert (= b (bvand"
             + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110"
             + " #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
-    Assert.assertTrue(
-        expectedResultMathsat5.equals(actualResult) || expectedResultZ3.equals(actualResult));
+    assertThat(expectedResultMathsat5.equals(actualResult) || expectedResultZ3.equals(actualResult))
+        .isTrue();
   }
 
   @Test
@@ -577,8 +591,8 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
             + "(assert (= b (bvor"
             + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110"
             + " #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
-    Assert.assertTrue(
-        expectedResultMathsat5.equals(actualResult) || expectedResultZ3.equals(actualResult));
+    assertThat(expectedResultMathsat5.equals(actualResult) || expectedResultZ3.equals(actualResult))
+        .isTrue();
   }
 
   @Test
@@ -613,8 +627,8 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
             + "(assert (= b (bvxor"
             + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110"
             + " #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
-    Assert.assertTrue(
-        expectedResultMathsat5.equals(actualResult) || expectedResultZ3.equals(actualResult));
+    assertThat(expectedResultMathsat5.equals(actualResult) || expectedResultZ3.equals(actualResult))
+        .isTrue();
   }
 
   @Test
@@ -649,8 +663,8 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
             + "(assert (= b (bvlshr"
             + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110"
             + " #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
-    Assert.assertTrue(
-        expectedResultMathsat5.equals(actualResult) || expectedResultZ3.equals(actualResult));
+    assertThat(expectedResultMathsat5.equals(actualResult) || expectedResultZ3.equals(actualResult))
+        .isTrue();
   }
 
   @Test
@@ -685,8 +699,10 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
             + "(declare-const b (_ BitVec 100))\n"
             + "(assert (= b"
             + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110))\n";
-    Assert.assertTrue(
-        expectedResultOthers.equals(actualResult) || expectedResultMathsat5.equals(actualResult));
+    assertThat(
+            expectedResultOthers.equals(actualResult)
+                || expectedResultMathsat5.equals(actualResult))
+        .isTrue();
   }
 
   @Test
@@ -715,7 +731,7 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
             + "(assert (= b (concat"
             + " #b0000000000000000000000000000000000000000000000000000000000000000000000001111101100001111010011010110"
             + " #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
-    Assert.assertEquals(expectedResultMathsat5, actualResult);
+    assertThat(actualResult).isEqualTo(expectedResultMathsat5);
   }
 
   @Test
@@ -741,7 +757,7 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
             + "(declare-const b (_ BitVec 50))\n"
             + "(assert (= b ((_ extract 99 50)"
             + " #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
-    Assert.assertEquals(expectedResultMathsat5, actualResult);
+    assertThat(actualResult).isEqualTo(expectedResultMathsat5);
   }
 
   @Test
@@ -767,7 +783,7 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
             + "(declare-const b (_ BitVec 150))\n"
             + "(assert (= b ((_ zero_extend 50)"
             + " #b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)))\n";
-    Assert.assertEquals(expectedResultMathsat5, actualResult);
+    assertThat(actualResult).isEqualTo(expectedResultMathsat5);
   }
 
   @Test
@@ -802,7 +818,9 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
             + "(declare-const b (_ BitVec 5))\n"
             + "(assert (= a (bvshl (bvand (bvsub (bvadd a b) (bvsdiv #b10110 #b00000)) (bvsrem a "
             + "#b10110)) b)))\n";
-    Assert.assertTrue(
-        expectedResultOthers.equals(actualResult) || expectedResultMathsat5.equals(actualResult));
+    assertThat(
+            expectedResultOthers.equals(actualResult)
+                || expectedResultMathsat5.equals(actualResult))
+        .isTrue();
   }
 }

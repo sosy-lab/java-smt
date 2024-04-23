@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -72,7 +72,7 @@ public class Generator {
 
     try {
       try (Writer fileWriter =
-          Files.newBufferedWriter(Paths.get(fileName), Charset.defaultCharset())) {
+          Files.newBufferedWriter(Path.of(fileName), Charset.defaultCharset())) {
         fileWriter.write(line);
         fileWriter.flush();
       }
@@ -102,15 +102,15 @@ public class Generator {
       Optional<FunctionEnvironment> methodToEvaluate =
           executedAggregator.stream().filter(x -> x.getResult().equals(constraint)).findFirst();
       if (methodToEvaluate.isPresent()
-          && !methodToEvaluate.get().expressionType.equals(Keyword.DIRECT)) {
-        registeredVariables.add(methodToEvaluate.get());
+          && !methodToEvaluate.orElseThrow().expressionType.equals(Keyword.DIRECT)) {
+        registeredVariables.add(methodToEvaluate.orElseThrow());
       }
       List<Object> evaluatedInputs = new ArrayList<>();
-      for (Object value : Objects.requireNonNull(methodToEvaluate).get().getInputParams()) {
+      for (Object value : Objects.requireNonNull(methodToEvaluate).orElseThrow().getInputParams()) {
         String evaluatedInput = evaluateRecursive(value);
         evaluatedInputs.add(evaluatedInput);
       }
-      return methodToEvaluate.get().getFunctionToString().apply(evaluatedInputs);
+      return methodToEvaluate.orElseThrow().getFunctionToString().apply(evaluatedInputs);
     }
   }
 

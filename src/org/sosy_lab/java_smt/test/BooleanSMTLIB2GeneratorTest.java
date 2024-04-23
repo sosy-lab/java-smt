@@ -20,6 +20,8 @@
 
 package org.sosy_lab.java_smt.test;
 
+import static com.google.common.truth.Truth.assertThat;
+
 import org.junit.*;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.basicimpl.Generator;
@@ -41,7 +43,7 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
     String actualResult = String.valueOf(Generator.lines);
 
     String expectedResult = "(declare-const a Bool)\n" + "(assert a)\n";
-    Assert.assertEquals(expectedResult, actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -52,7 +54,7 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
     String actualResult = String.valueOf(Generator.lines);
 
     String expectedResult = "(assert true)\n";
-    Assert.assertEquals(expectedResult, actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -63,7 +65,7 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
     String actualResult = String.valueOf(Generator.lines);
 
     String expectedResult = "(assert false)\n";
-    Assert.assertEquals(expectedResult, actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -74,7 +76,7 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
     String actualResult = String.valueOf(Generator.lines);
 
     String expectedResult = "(declare-const a Bool)\n" + "(assert (not a))\n";
-    Assert.assertEquals(expectedResult, actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -86,7 +88,7 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
     String expectedResult =
         "(declare-const a Bool)\n" + "(declare-const b Bool)\n" + "(assert (or a b))\n";
-    Assert.assertEquals(expectedResult, actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -102,7 +104,7 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
             + "(declare-const b Bool)\n"
             + "(declare-const c Bool)\n"
             + "(assert (or a b c))\n";
-    Assert.assertEquals(expectedResult, actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -114,7 +116,7 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
     String expectedResult =
         "(declare-const a Bool)\n" + "(declare-const b Bool)\n" + "(assert (and a b))\n";
-    Assert.assertEquals(expectedResult, actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -130,7 +132,7 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
             + "(declare-const b Bool)\n"
             + "(declare-const c Bool)\n"
             + "(assert (and a b c))\n";
-    Assert.assertEquals(expectedResult, actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -142,7 +144,7 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
     String expectedResult =
         "(declare-const a Bool)\n" + "(declare-const b Bool)\n" + "(assert (xor a b))\n";
-    Assert.assertEquals(expectedResult, actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -154,7 +156,7 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
     String expectedResult =
         "(declare-const a Bool)\n" + "(declare-const b Bool)\n" + "(assert (= a b))\n";
-    Assert.assertEquals(expectedResult, actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -166,7 +168,7 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
     String expectedResult =
         "(declare-const a Bool)\n" + "(declare-const b Bool)\n" + "(assert (=> a b))\n";
-    Assert.assertEquals(expectedResult, actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -182,7 +184,7 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
             + "(declare-const b Bool)\n"
             + "(declare-const c Bool)\n"
             + "(assert (ite a b c))\n";
-    Assert.assertEquals(expectedResult, actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -209,6 +211,6 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
             + "(declare-const b Bool)\n"
             + "(declare-const f Bool)\n"
             + "(assert (ite (=> (and a e true) a) (xor c d) (= b (or b (and a e true) a f))))\n";
-    Assert.assertEquals(expectedResult, actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 }
