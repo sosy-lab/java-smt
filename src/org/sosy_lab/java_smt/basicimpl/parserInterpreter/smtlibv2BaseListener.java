@@ -18,7 +18,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
  * This class provides an empty implementation of {@link smtlibv2Listener}, which can be extended to
  * create a listener which only needs to handle a subset of the available methods.
  */
-@SuppressWarnings("CheckReturnValue")
+@SuppressWarnings({"CheckReturnValue", "checkstyle:typename"})
 public class smtlibv2BaseListener implements smtlibv2Listener {
   /**
    * {@inheritDoc}

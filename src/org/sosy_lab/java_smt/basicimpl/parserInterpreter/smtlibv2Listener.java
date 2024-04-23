@@ -15,6 +15,7 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
 /**
  * This interface defines a complete listener for a parse tree produced by {@link smtlibv2Parser}.
  */
+@SuppressWarnings({"checkstyle:methodname", "checkstyle:typename"})
 public interface smtlibv2Listener extends ParseTreeListener {
   /**
    * Enter a parse tree produced by the {@code start_logic} labeled alternative in {@link

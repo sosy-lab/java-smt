@@ -20,7 +20,7 @@ import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
  * @param <T> The return type of the visit operation. Use {@link Void} for operations with no return
  *     type.
  */
-@SuppressWarnings("CheckReturnValue")
+@SuppressWarnings({"CheckReturnValue", "checkstyle:typename"})
 public class smtlibv2BaseVisitor<T> extends AbstractParseTreeVisitor<T>
     implements smtlibv2Visitor<T> {
   /**

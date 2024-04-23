@@ -28,7 +28,8 @@ import org.antlr.v4.runtime.dfa.DFA;
   "unused",
   "cast",
   "CheckReturnValue",
-  "this-escape"
+  "this-escape",
+  "checkstyle:typename"
 })
 public class smtlibv2Lexer extends Lexer {
   static {

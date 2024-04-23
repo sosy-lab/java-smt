@@ -6,6 +6,9 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-/** Solver-specific backends. */
-/** Generators */
+/** Parser for the SMTLIB2 format. */
+@com.google.errorprone.annotations.CheckReturnValue
+@javax.annotation.ParametersAreNonnullByDefault
+@org.sosy_lab.common.annotations.FieldsAreNonnullByDefault
+@org.sosy_lab.common.annotations.ReturnValuesAreNonnullByDefault
 package org.sosy_lab.java_smt.basicimpl.parserInterpreter;
