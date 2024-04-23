@@ -25,23 +25,10 @@ import org.sosy_lab.java_smt.basicimpl.Generator;
 import org.sosy_lab.java_smt.basicimpl.GeneratorException;
 
 public class ArraySMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
-
-  /**
-   * Integer and Rationals not supported by BOOLECTOR Rationals not supported by PRINCESS Z3 runs
-   * only when executed separately from other solvers
-   */
-  public void clearGenerator() {
-    Generator.setIsLoggingEnabled(true);
-    Generator.getLines().delete(0, Generator.getLines().length());
-    Generator.getRegisteredVariables().clear();
-    Generator.getExecutedAggregator().clear();
-  }
-
   @Test(expected = GeneratorException.class)
   public void testdeclareArrayElementException() {
     requireArrays();
     requireStrings();
-    clearGenerator();
     ArrayFormula<BitvectorFormula, StringFormula> a1 =
         Objects.requireNonNull(amgr)
             .makeArray("a1", FormulaType.getBitvectorTypeWithSize(3), FormulaType.StringType);
@@ -58,7 +45,6 @@ public class ArraySMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSol
   public void testdeclareArrayIndexException() {
     requireArrays();
     requireStrings();
-    clearGenerator();
     ArrayFormula<StringFormula, BitvectorFormula> a1 =
         Objects.requireNonNull(amgr)
             .makeArray("a1", FormulaType.StringType, FormulaType.getBitvectorTypeWithSize(3));
@@ -75,7 +61,6 @@ public class ArraySMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSol
   public void testMakeArrayInteger() {
     requireArrays();
     requireIntegers();
-    clearGenerator();
     ArrayFormula<IntegerFormula, IntegerFormula> a1 =
         Objects.requireNonNull(amgr)
             .makeArray("a1", FormulaType.IntegerType, FormulaType.IntegerType);
@@ -134,7 +119,6 @@ public class ArraySMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSol
   public void testMakeArrayRationals() {
     requireArrays();
     requireRationals();
-    clearGenerator();
     ArrayFormula<RationalFormula, RationalFormula> a1 =
         Objects.requireNonNull(amgr)
             .makeArray("a1", FormulaType.RationalType, FormulaType.RationalType);
@@ -198,7 +182,6 @@ public class ArraySMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSol
     requireArrays();
     requireBooleanArgumentArrays();
     requireAllSortArrays();
-    clearGenerator();
     ArrayFormula<BooleanFormula, BooleanFormula> a1 =
         Objects.requireNonNull(amgr)
             .makeArray("a1", FormulaType.BooleanType, FormulaType.BooleanType);
@@ -259,7 +242,6 @@ public class ArraySMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSol
   public void testMakeArrayBitvectors() {
     requireArrays();
     requireBitvectors();
-    clearGenerator();
     ArrayFormula<BitvectorFormula, BitvectorFormula> a1 =
         Objects.requireNonNull(amgr)
             .makeArray(
@@ -294,7 +276,6 @@ public class ArraySMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSol
     requireRationals();
     requireIntegers();
     requireBooleanArgumentArrays();
-    clearGenerator();
     ArrayFormula<IntegerFormula, RationalFormula> a1 =
         Objects.requireNonNull(amgr)
             .makeArray("a1", FormulaType.IntegerType, FormulaType.RationalType);
@@ -365,7 +346,6 @@ public class ArraySMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSol
     requireArrays();
     requireIntegers();
     assume().that(solverToUse()).isNotEqualTo(Solvers.Z3);
-    clearGenerator();
     ArrayFormula<IntegerFormula, IntegerFormula> a1 =
         Objects.requireNonNull(amgr)
             .makeArray("a1", FormulaType.IntegerType, FormulaType.IntegerType);
@@ -389,7 +369,6 @@ public class ArraySMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSol
     requireArrays();
     requireIntegers();
     assume().that(solverToUse()).isNotEqualTo(Solvers.Z3);
-    clearGenerator();
     ArrayFormula<IntegerFormula, IntegerFormula> a1 =
         Objects.requireNonNull(amgr)
             .makeArray("a1", FormulaType.IntegerType, FormulaType.IntegerType);

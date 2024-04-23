@@ -38,6 +38,7 @@ import org.sosy_lab.java_smt.basicimpl.BinaryModel;
 import org.sosy_lab.java_smt.basicimpl.Generator;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.ParserException;
 
+@SuppressWarnings("checkstyle:linelength")
 public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() {
@@ -49,7 +50,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     return newConfig;
   }
 
-  /* ARRAY CONSTRAINT TESTS */
+  /* ARRAY CONSTRAINT TESTS. */
   @Test
   public void testMakeArrayInteger()
       throws SolverException, InterruptedException, InvalidConfigurationException, IOException {
@@ -3360,7 +3361,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
             "c",
             "false",
             new ArrayList<>());
-    ArrayList<Model.ValueAssignment> temp = new ArrayList<>();
+    List<Model.ValueAssignment> temp = new ArrayList<>();
     temp.add(entry1);
     temp.add(entry2);
     String expectedResult = modelToString(ImmutableList.copyOf(temp));
@@ -3410,7 +3411,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
             "c",
             bvmgr.makeBitvector(3, 7).toString(),
             new ArrayList<>());
-    ArrayList<Model.ValueAssignment> temp = new ArrayList<>();
+    List<Model.ValueAssignment> temp = new ArrayList<>();
     temp.add(entry1);
     temp.add(entry2);
     String expectedResult = modelToString(ImmutableList.copyOf(temp));
@@ -3467,7 +3468,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
             "d",
             "(as const (Array Int Int) 0)",
             new ArrayList<>());
-    ArrayList<Model.ValueAssignment> temp = new ArrayList<>();
+    List<Model.ValueAssignment> temp = new ArrayList<>();
     temp.add(entry1);
     temp.add(entry2);
     String expectedResult = modelToString(ImmutableList.copyOf(temp));
@@ -3547,7 +3548,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
             "d",
             "(as const (Array (_ BitVec 32) (_ BitVec 32)) mod_cast(0, 4294967295, 0))",
             new ArrayList<>());
-    ArrayList<Model.ValueAssignment> temp = new ArrayList<>();
+    List<Model.ValueAssignment> temp = new ArrayList<>();
     temp.add(entry1);
     temp.add(entry2);
     String expectedResult = modelToString(ImmutableList.copyOf(temp));
@@ -3603,7 +3604,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
             "d",
             "(as const (Array Bool Bool) true)",
             new ArrayList<>());
-    ArrayList<Model.ValueAssignment> temp = new ArrayList<>();
+    List<Model.ValueAssignment> temp = new ArrayList<>();
     temp.add(entry1);
     temp.add(entry2);
     String expectedResult = modelToString(ImmutableList.copyOf(temp));
@@ -3685,7 +3686,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
             "(as const (Array (Array Bool Bool (Array Bool Bool) (as const (Array Bool Bool)"
                 + " true))",
             new ArrayList<>());
-    ArrayList<Model.ValueAssignment> temp = new ArrayList<>();
+    List<Model.ValueAssignment> temp = new ArrayList<>();
     temp.add(entry1);
     temp.add(entry2);
     String expectedResult = modelToString(ImmutableList.copyOf(temp));

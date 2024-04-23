@@ -217,5 +217,7 @@ public class Generator {
 
   public static void resetGenerator() {
     lines = new StringBuilder("(set-logic AUFLIRA)\n");
+    executedAggregator.clear();
+    registeredVariables.clear();
   }
 }

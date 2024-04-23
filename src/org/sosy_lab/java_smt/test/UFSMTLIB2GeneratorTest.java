@@ -25,21 +25,8 @@ import org.sosy_lab.java_smt.basicimpl.Generator;
 import org.sosy_lab.java_smt.basicimpl.GeneratorException;
 
 public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
-
-  /**
-   * Integer and Rationals not supported by BOOLECTOR Rationals not supported by PRINCESS Z3 runs
-   * only when executed separately from other solvers
-   */
-  public void clearGenerator() {
-    Generator.setIsLoggingEnabled(true);
-    Generator.getLines().delete(0, Generator.getLines().length());
-    Generator.getRegisteredVariables().clear();
-    Generator.getExecutedAggregator().clear();
-  }
-
   @Test
   public void testdeclareUFBooleanWithInput() {
-    clearGenerator();
     requireBooleanUFs();
     FunctionDeclaration<BooleanFormula> a =
         fmgr.declareUF("a", FormulaType.BooleanType, FormulaType.BooleanType);
@@ -65,7 +52,6 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
 
   @Test
   public void testdeclareUFBooleanEmptyInput() {
-    clearGenerator();
     requireBooleanUFs();
     requireNoArgumentsInUFs();
     FunctionDeclaration<BooleanFormula> a = fmgr.declareUF("a", FormulaType.BooleanType);
@@ -88,7 +74,6 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
 
   @Test(expected = GeneratorException.class)
   public void testdeclareUFInputException() {
-    clearGenerator();
     requireBooleanUFs();
     requireStrings();
     FunctionDeclaration<BooleanFormula> a =
@@ -106,7 +91,6 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
 
   @Test(expected = GeneratorException.class)
   public void testdeclareUFOutputException() {
-    clearGenerator();
     requireBooleanUFs();
     requireStrings();
     FunctionDeclaration<StringFormula> a =
@@ -125,7 +109,6 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
   @Test
   public void testDeclareUFIntegerWithInput() {
     requireIntegers();
-    clearGenerator();
     FunctionDeclaration<IntegerFormula> a =
         fmgr.declareUF("a", FormulaType.IntegerType, FormulaType.IntegerType);
     FunctionDeclaration<IntegerFormula> b =
@@ -152,7 +135,6 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
   @Test
   public void testDeclareUFIntegerWithoutInput() {
     requireIntegers();
-    clearGenerator();
     requireNoArgumentsInUFs();
     FunctionDeclaration<IntegerFormula> a = fmgr.declareUF("a", FormulaType.IntegerType);
     FunctionDeclaration<IntegerFormula> b = fmgr.declareUF("b", FormulaType.IntegerType);
@@ -175,7 +157,6 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
   @Test
   public void testDeclareUFRationalWithInput() {
     requireRationals();
-    clearGenerator();
     FunctionDeclaration<RationalFormula> a =
         fmgr.declareUF("a", FormulaType.RationalType, FormulaType.RationalType);
     FunctionDeclaration<RationalFormula> b =
@@ -211,7 +192,6 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
   @Test
   public void testDeclareUFRationalEmptyInput() {
     requireRationals();
-    clearGenerator();
     requireNoArgumentsInUFs();
     FunctionDeclaration<RationalFormula> a = fmgr.declareUF("a", FormulaType.RationalType);
     FunctionDeclaration<RationalFormula> b = fmgr.declareUF("b", FormulaType.RationalType);
@@ -234,7 +214,6 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
   @Test
   public void testDeclareUFBitvectorsWithInput() {
     requireBitvectors();
-    clearGenerator();
     FunctionDeclaration<BitvectorFormula> a =
         fmgr.declareUF(
             "a", FormulaType.getBitvectorTypeWithSize(4), FormulaType.getBitvectorTypeWithSize(4));
@@ -262,7 +241,6 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
   @Test
   public void testDeclareUFBitvectorsEmptyInput() {
     requireBitvectors();
-    clearGenerator();
     requireNoArgumentsInUFs();
     FunctionDeclaration<BitvectorFormula> a =
         fmgr.declareUF("a", FormulaType.getBitvectorTypeWithSize(4));
@@ -290,7 +268,6 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
   public void testDeclareUFArraysWithInput() {
     requireArrays();
     requireIntegers();
-    clearGenerator();
     FunctionDeclaration<ArrayFormula<IntegerFormula, IntegerFormula>> a =
         fmgr.declareUF(
             "a",
@@ -350,7 +327,6 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
     requireArrays();
     requireIntegers();
     requireNoArgumentsInUFs();
-    clearGenerator();
     FunctionDeclaration<ArrayFormula<IntegerFormula, IntegerFormula>> a =
         fmgr.declareUF(
             "a", FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.IntegerType));
@@ -386,7 +362,6 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
 
   @Test
   public void testDeclareAndCallUFBooleanWithInput() {
-    clearGenerator();
     requireBooleanUFs();
     BooleanFormula a = fmgr.declareAndCallUF("a", FormulaType.BooleanType, bmgr.makeFalse());
     BooleanFormula b = fmgr.declareAndCallUF("b", FormulaType.BooleanType, bmgr.makeTrue());
@@ -407,7 +382,6 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
 
   @Test
   public void testDeclareAndCallUFBooleanEmptyInput() {
-    clearGenerator();
     requireBooleanUFs();
     requireNoArgumentsInUFs();
     BooleanFormula a = fmgr.declareAndCallUF("a", FormulaType.BooleanType);
@@ -428,7 +402,6 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
   @Test
   public void testDeclareAndCallUFIntegerWithInput() {
     requireIntegers();
-    clearGenerator();
     IntegerFormula a = fmgr.declareAndCallUF("a", FormulaType.IntegerType, imgr.makeNumber(4));
     IntegerFormula b = fmgr.declareAndCallUF("b", FormulaType.IntegerType, imgr.makeNumber(9));
 
@@ -451,7 +424,6 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
   public void testDeclareAndCallUFIntegerEmptyInput() {
     requireIntegers();
     requireNoArgumentsInUFs();
-    clearGenerator();
     IntegerFormula a = fmgr.declareAndCallUF("a", FormulaType.IntegerType);
     IntegerFormula b = fmgr.declareAndCallUF("b", FormulaType.IntegerType);
 
@@ -470,7 +442,6 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
   @Test
   public void testDeclareAndCallUFRationalWithInput() {
     requireRationals();
-    clearGenerator();
     RationalFormula a =
         fmgr.declareAndCallUF(
             "a", FormulaType.RationalType, Objects.requireNonNull(rmgr).makeNumber(4));
@@ -503,7 +474,6 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
   public void testDeclareAndCallUFRationalEmptyInput() {
     requireRationals();
     requireNoArgumentsInUFs();
-    clearGenerator();
     RationalFormula a = fmgr.declareAndCallUF("a", FormulaType.RationalType);
     RationalFormula b = fmgr.declareAndCallUF("b", FormulaType.RationalType);
 
@@ -521,7 +491,6 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
   @Test
   public void testDeclareAndCallUFBitvectorsWithInput() {
     requireBitvectors();
-    clearGenerator();
     BitvectorFormula a =
         fmgr.declareAndCallUF(
             "a",
@@ -549,7 +518,6 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
   public void testDeclareAndCallUFBitvectorsEmptyInput() {
     requireBitvectors();
     requireNoArgumentsInUFs();
-    clearGenerator();
     BitvectorFormula a = fmgr.declareAndCallUF("a", FormulaType.getBitvectorTypeWithSize(4));
     BitvectorFormula b = fmgr.declareAndCallUF("b", FormulaType.getBitvectorTypeWithSize(4));
 
@@ -571,7 +539,6 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
   public void testDeclareAndCallUFArraysWithInput() {
     requireArrays();
     requireIntegers();
-    clearGenerator();
     ArrayFormula<IntegerFormula, IntegerFormula> a =
         fmgr.declareAndCallUF(
             "a",
@@ -611,7 +578,6 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
     requireArrays();
     requireIntegers();
     requireNoArgumentsInUFs();
-    clearGenerator();
     ArrayFormula<IntegerFormula, IntegerFormula> a =
         fmgr.declareAndCallUF(
             "a", FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.IntegerType));

@@ -10,22 +10,15 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import org.junit.*;
+import org.junit.Test;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.basicimpl.Generator;
 
+@SuppressWarnings("checkstyle:linelength")
 public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
-
-  public void clearGenerator() {
-    Generator.setIsLoggingEnabled(true);
-    Generator.getLines().delete(0, Generator.getLines().length());
-    Generator.getRegisteredVariables().clear();
-    Generator.getExecutedAggregator().clear();
-  }
 
   @Test
   public void testMakeVariable() {
-    clearGenerator();
     BooleanFormula a = bmgr.makeVariable("a");
     Generator.assembleConstraint(a);
     String actualResult = String.valueOf(Generator.getLines());
@@ -36,7 +29,6 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void testMakeTrue() {
-    clearGenerator();
     BooleanFormula a = bmgr.makeTrue();
     Generator.assembleConstraint(a);
     String actualResult = String.valueOf(Generator.getLines());
@@ -47,7 +39,6 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void testMakeFalse() {
-    clearGenerator();
     BooleanFormula a = bmgr.makeFalse();
     Generator.assembleConstraint(a);
     String actualResult = String.valueOf(Generator.getLines());
@@ -58,7 +49,6 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void testNot() {
-    clearGenerator();
     BooleanFormula a = bmgr.not(bmgr.makeVariable("a"));
     Generator.assembleConstraint(a);
     String actualResult = String.valueOf(Generator.getLines());
@@ -69,7 +59,6 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void testBinaryOr() {
-    clearGenerator();
     BooleanFormula result = bmgr.or(bmgr.makeVariable("a"), bmgr.makeVariable("b"));
     Generator.assembleConstraint(result);
     String actualResult = String.valueOf(Generator.getLines());
@@ -81,7 +70,6 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void testCollectionOr() {
-    clearGenerator();
     BooleanFormula result =
         bmgr.or(bmgr.makeVariable("a"), bmgr.makeVariable("b"), bmgr.makeVariable("c"));
     Generator.assembleConstraint(result);
@@ -97,7 +85,6 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void testBinaryAnd() {
-    clearGenerator();
     BooleanFormula result = bmgr.and(bmgr.makeVariable("a"), bmgr.makeVariable("b"));
     Generator.assembleConstraint(result);
     String actualResult = String.valueOf(Generator.getLines());
@@ -109,7 +96,6 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void testCollectionAnd() {
-    clearGenerator();
     BooleanFormula result =
         bmgr.and(bmgr.makeVariable("a"), bmgr.makeVariable("b"), bmgr.makeVariable("c"));
     Generator.assembleConstraint(result);
@@ -125,7 +111,6 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void testXor() {
-    clearGenerator();
     BooleanFormula result = bmgr.xor(bmgr.makeVariable("a"), bmgr.makeVariable("b"));
     Generator.assembleConstraint(result);
     String actualResult = String.valueOf(Generator.getLines());
@@ -137,7 +122,6 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void testEquivalence() {
-    clearGenerator();
     BooleanFormula result = bmgr.equivalence(bmgr.makeVariable("a"), bmgr.makeVariable("b"));
     Generator.assembleConstraint(result);
     String actualResult = String.valueOf(Generator.getLines());
@@ -149,7 +133,6 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void testImplication() {
-    clearGenerator();
     BooleanFormula result = bmgr.implication(bmgr.makeVariable("a"), bmgr.makeVariable("b"));
     Generator.assembleConstraint(result);
     String actualResult = String.valueOf(Generator.getLines());
@@ -161,7 +144,6 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void testIfThenElse() {
-    clearGenerator();
     BooleanFormula result =
         bmgr.ifThenElse(bmgr.makeVariable("a"), bmgr.makeVariable("b"), bmgr.makeVariable("c"));
     Generator.assembleConstraint(result);
@@ -177,7 +159,6 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void testNestedTerms() {
-    clearGenerator();
     BooleanFormula term1 = bmgr.and(bmgr.makeBoolean(true), bmgr.makeVariable("a"));
     BooleanFormula term2 = bmgr.and(term1, bmgr.makeVariable("e"), bmgr.makeTrue());
     BooleanFormula term3 = bmgr.or(bmgr.makeVariable("b"), bmgr.makeFalse());

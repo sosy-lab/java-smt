@@ -19,23 +19,11 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.Generator;
 
+@SuppressWarnings("checkstyle:linelength")
 public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
-
-  /**
-   * Integer and Rationals not supported by BOOLECTOR Rationals not supported by PRINCESS Z3 runs
-   * only when executed separately from other solvers
-   */
-  public void clearGenerator() {
-    Generator.setIsLoggingEnabled(true);
-    Generator.getLines().delete(0, Generator.getLines().length());
-    Generator.getRegisteredVariables().clear();
-    Generator.getExecutedAggregator().clear();
-  }
-
   @Test
   public void testMakeVariable() {
     requireBitvectors();
-    clearGenerator();
     BitvectorFormula a = Objects.requireNonNull(bvmgr).makeVariable(32, "a");
     BitvectorFormula b = bvmgr.makeVariable(32, "b");
     BitvectorFormula c = bvmgr.makeVariable(FormulaType.getBitvectorTypeWithSize(5), "c");
@@ -76,7 +64,6 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
     assume().that(solverToUse()).isNotEqualTo(Solvers.Z3);
     requireIntegers();
     requireBitvectorToInt();
-    clearGenerator();
 
     BitvectorFormula c = Objects.requireNonNull(bvmgr).makeBitvector(12, -10);
     BitvectorFormula d = bvmgr.makeBitvector(12, 20);
@@ -113,7 +100,6 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
   @Test
   public void testMakeBitVectorWithoutIntegerFormulas() {
     requireBitvectors();
-    clearGenerator();
 
     BitvectorFormula c = Objects.requireNonNull(bvmgr).makeBitvector(12, -10);
     BitvectorFormula d = bvmgr.makeBitvector(12, 20);
@@ -150,7 +136,6 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
   @Test
   public void testAdd() {
     requireBitvectors();
-    clearGenerator();
 
     BitvectorFormula c = Objects.requireNonNull(bvmgr).makeBitvector(12, -10);
     BitvectorFormula d = bvmgr.makeBitvector(12, 20);
@@ -189,7 +174,6 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
   @Test
   public void testNegate() {
     requireBitvectors();
-    clearGenerator();
 
     BitvectorFormula c = Objects.requireNonNull(bvmgr).makeBitvector(12, -10);
     BitvectorFormula d = bvmgr.makeBitvector(12, 20);
@@ -229,7 +213,6 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
   @Test
   public void testSubtract() {
     requireBitvectors();
-    clearGenerator();
 
     BitvectorFormula c = Objects.requireNonNull(bvmgr).makeBitvector(12, -10);
     BitvectorFormula d = bvmgr.makeBitvector(12, 20);
@@ -269,7 +252,6 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
         .withMessage("Solver %s cannot handle this BigInterger argument", solverToUse())
         .that(solverToUse())
         .isNotEqualTo(Solvers.CVC4);
-    clearGenerator();
 
     BitvectorFormula c = Objects.requireNonNull(bvmgr).makeBitvector(12, -10);
     BitvectorFormula d = bvmgr.makeBitvector(12, 20);
@@ -303,7 +285,6 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
   public void testModulo() {
     // Does not work for CVC4 due to "BigInteger argument out of bounds"
     requireBitvectors();
-    clearGenerator();
 
     BitvectorFormula c = Objects.requireNonNull(bvmgr).makeBitvector(12, -10);
     BitvectorFormula d = bvmgr.makeBitvector(12, 20);
@@ -345,7 +326,6 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
   public void testMultiply() {
     // Does not work for CVC4 due to "BigInteger argument out of bounds"
     requireBitvectors();
-    clearGenerator();
 
     BitvectorFormula c = Objects.requireNonNull(bvmgr).makeBitvector(12, -10);
     BitvectorFormula d = bvmgr.makeBitvector(12, 20);
@@ -382,7 +362,6 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
   @Test
   public void testGreaterThan() {
     requireBitvectors();
-    clearGenerator();
 
     BitvectorFormula c = Objects.requireNonNull(bvmgr).makeBitvector(12, -10);
     BitvectorFormula d = bvmgr.makeBitvector(12, 20);
@@ -407,7 +386,6 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
   @Test
   public void testGreaterOrEqual() {
     requireBitvectors();
-    clearGenerator();
 
     BitvectorFormula c = Objects.requireNonNull(bvmgr).makeBitvector(12, -10);
     BitvectorFormula d = bvmgr.makeBitvector(12, 20);
@@ -432,7 +410,6 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
   @Test
   public void testLessThan() {
     requireBitvectors();
-    clearGenerator();
 
     BitvectorFormula c = Objects.requireNonNull(bvmgr).makeBitvector(12, -10);
     BitvectorFormula d = bvmgr.makeBitvector(12, 20);
@@ -457,7 +434,6 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
   @Test
   public void testLessOrEqual() {
     requireBitvectors();
-    clearGenerator();
 
     BitvectorFormula c = Objects.requireNonNull(bvmgr).makeBitvector(12, -10);
     BitvectorFormula d = bvmgr.makeBitvector(12, 20);
@@ -482,7 +458,6 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
   @Test
   public void testNot() {
     requireBitvectors();
-    clearGenerator();
 
     BitvectorFormula c = Objects.requireNonNull(bvmgr).makeBitvector(12, -10);
     BitvectorFormula d = bvmgr.makeBitvector(12, 20);
@@ -514,7 +489,6 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
   @Test
   public void testAnd() {
     requireBitvectors();
-    clearGenerator();
 
     BitvectorFormula a = Objects.requireNonNull(bvmgr).makeVariable(12, "a");
     BitvectorFormula b = bvmgr.makeVariable(100, "b");
@@ -550,7 +524,6 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
   @Test
   public void testOr() {
     requireBitvectors();
-    clearGenerator();
 
     BitvectorFormula a = Objects.requireNonNull(bvmgr).makeVariable(12, "a");
     BitvectorFormula b = bvmgr.makeVariable(100, "b");
@@ -586,7 +559,6 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
   @Test
   public void testXor() {
     requireBitvectors();
-    clearGenerator();
 
     BitvectorFormula a = Objects.requireNonNull(bvmgr).makeVariable(12, "a");
     BitvectorFormula b = bvmgr.makeVariable(100, "b");
@@ -622,7 +594,6 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
   @Test
   public void testShiftRight() {
     requireBitvectors();
-    clearGenerator();
 
     BitvectorFormula a = Objects.requireNonNull(bvmgr).makeVariable(12, "a");
     BitvectorFormula b = bvmgr.makeVariable(100, "b");
@@ -658,7 +629,6 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
   @Test
   public void testShiftLeft() {
     requireBitvectors();
-    clearGenerator();
 
     BitvectorFormula a = Objects.requireNonNull(bvmgr).makeVariable(12, "a");
     BitvectorFormula b = bvmgr.makeVariable(100, "b");
@@ -696,7 +666,6 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
   @Test
   public void testConcat() {
     requireBitvectors();
-    clearGenerator();
 
     BitvectorFormula a = Objects.requireNonNull(bvmgr).makeVariable(24, "a");
     BitvectorFormula b = bvmgr.makeVariable(200, "b");
@@ -725,7 +694,6 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
   @Test
   public void testExtract() {
     requireBitvectors();
-    clearGenerator();
 
     BitvectorFormula a = Objects.requireNonNull(bvmgr).makeVariable(6, "a");
     BitvectorFormula b = bvmgr.makeVariable(50, "b");
@@ -751,7 +719,6 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
   @Test
   public void testExtend() {
     requireBitvectors();
-    clearGenerator();
 
     BitvectorFormula a = Objects.requireNonNull(bvmgr).makeVariable(18, "a");
     BitvectorFormula b = bvmgr.makeVariable(150, "b");
@@ -777,7 +744,6 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
   @Test
   public void testNested() {
     requireBitvectors();
-    clearGenerator();
 
     BitvectorFormula a = Objects.requireNonNull(bvmgr).makeVariable(5, "a");
     BitvectorFormula b = bvmgr.makeVariable(5, "b");
