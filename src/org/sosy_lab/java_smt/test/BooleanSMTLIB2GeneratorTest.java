@@ -18,9 +18,9 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
 
   public void clearGenerator() {
     Generator.setIsLoggingEnabled(true);
-    Generator.lines.delete(0, Generator.lines.length());
-    Generator.registeredVariables.clear();
-    Generator.executedAggregator.clear();
+    Generator.getLines().delete(0, Generator.getLines().length());
+    Generator.getRegisteredVariables().clear();
+    Generator.getExecutedAggregator().clear();
   }
 
   @Test
@@ -28,7 +28,7 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
     clearGenerator();
     BooleanFormula a = bmgr.makeVariable("a");
     Generator.assembleConstraint(a);
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult = "(declare-const a Bool)\n" + "(assert a)\n";
     assertThat(actualResult).isEqualTo(expectedResult);
@@ -39,7 +39,7 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
     clearGenerator();
     BooleanFormula a = bmgr.makeTrue();
     Generator.assembleConstraint(a);
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult = "(assert true)\n";
     assertThat(actualResult).isEqualTo(expectedResult);
@@ -50,7 +50,7 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
     clearGenerator();
     BooleanFormula a = bmgr.makeFalse();
     Generator.assembleConstraint(a);
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult = "(assert false)\n";
     assertThat(actualResult).isEqualTo(expectedResult);
@@ -61,7 +61,7 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
     clearGenerator();
     BooleanFormula a = bmgr.not(bmgr.makeVariable("a"));
     Generator.assembleConstraint(a);
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult = "(declare-const a Bool)\n" + "(assert (not a))\n";
     assertThat(actualResult).isEqualTo(expectedResult);
@@ -72,7 +72,7 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
     clearGenerator();
     BooleanFormula result = bmgr.or(bmgr.makeVariable("a"), bmgr.makeVariable("b"));
     Generator.assembleConstraint(result);
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
         "(declare-const a Bool)\n" + "(declare-const b Bool)\n" + "(assert (or a b))\n";
@@ -85,7 +85,7 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
     BooleanFormula result =
         bmgr.or(bmgr.makeVariable("a"), bmgr.makeVariable("b"), bmgr.makeVariable("c"));
     Generator.assembleConstraint(result);
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
         "(declare-const a Bool)\n"
@@ -100,7 +100,7 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
     clearGenerator();
     BooleanFormula result = bmgr.and(bmgr.makeVariable("a"), bmgr.makeVariable("b"));
     Generator.assembleConstraint(result);
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
         "(declare-const a Bool)\n" + "(declare-const b Bool)\n" + "(assert (and a b))\n";
@@ -113,7 +113,7 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
     BooleanFormula result =
         bmgr.and(bmgr.makeVariable("a"), bmgr.makeVariable("b"), bmgr.makeVariable("c"));
     Generator.assembleConstraint(result);
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
         "(declare-const a Bool)\n"
@@ -128,7 +128,7 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
     clearGenerator();
     BooleanFormula result = bmgr.xor(bmgr.makeVariable("a"), bmgr.makeVariable("b"));
     Generator.assembleConstraint(result);
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
         "(declare-const a Bool)\n" + "(declare-const b Bool)\n" + "(assert (xor a b))\n";
@@ -140,7 +140,7 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
     clearGenerator();
     BooleanFormula result = bmgr.equivalence(bmgr.makeVariable("a"), bmgr.makeVariable("b"));
     Generator.assembleConstraint(result);
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
         "(declare-const a Bool)\n" + "(declare-const b Bool)\n" + "(assert (= a b))\n";
@@ -152,7 +152,7 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
     clearGenerator();
     BooleanFormula result = bmgr.implication(bmgr.makeVariable("a"), bmgr.makeVariable("b"));
     Generator.assembleConstraint(result);
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
         "(declare-const a Bool)\n" + "(declare-const b Bool)\n" + "(assert (=> a b))\n";
@@ -165,7 +165,7 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
     BooleanFormula result =
         bmgr.ifThenElse(bmgr.makeVariable("a"), bmgr.makeVariable("b"), bmgr.makeVariable("c"));
     Generator.assembleConstraint(result);
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
         "(declare-const a Bool)\n"
@@ -189,7 +189,7 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
     BooleanFormula result = bmgr.ifThenElse(term5, term6, term7);
 
     Generator.assembleConstraint(result);
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
         "(declare-const a Bool)\n"

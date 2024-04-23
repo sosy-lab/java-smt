@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -62,24 +63,24 @@ import scala.Tuple2;
 
 /**
  * Implements a method from smtlibv2BaseVisitor for each node in a parse tree that requires some
- * form of action in order to transform the parsed SMT-LIB2 into JavaSMT
+ * form of action in order to transform the parsed SMT-LIB2 into JavaSMT.
  */
 @SuppressWarnings({"CheckReturnValue", "unchecked"})
 public class Visitor extends smtlibv2BaseVisitor<Object> {
 
   /**
    * saves all created Formulas that are not part of a let statement as ParserFormula objects with
-   * their variable name or value as key
+   * their variable name or value as key.
    */
-  private final HashMap<String, ParserFormula> variables = new HashMap<>();
+  private final Map<String, ParserFormula> variables = new HashMap<>();
 
   /**
    * saves all created Formulas that are part of a let statement as ParserFormula objects with their
-   * variable name or value as key
+   * variable name or value as key.
    */
-  private final HashMap<String, ParserFormula> letVariables = new HashMap<>();
+  private final Map<String, ParserFormula> letVariables = new HashMap<>();
 
-  /** saves each 'assert' statement interpreted as a BooleanFormula object as an entry */
+  /** saves each 'assert' statement interpreted as a BooleanFormula object as an entry. */
   private final List<BooleanFormula> constraints = new ArrayList<>();
 
   private final FormulaManager fmgr;
@@ -99,7 +100,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     return assignments;
   }
 
-  /** is set to 'true' if a node 'model' is encountered */
+  /** is set to 'true' if a node 'model' is encountered. */
   private boolean isModel = false;
 
   public Visitor(
@@ -321,7 +322,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
   }
 
   /**
-   * gets the operands used in a nested term
+   * gets the operands used in a nested term.
    *
    * @param ctx current MultitermContext
    * @param operands List of the operands transformed to Formula objects
@@ -1218,7 +1219,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
   }
 
   /**
-   * maps FormulaType to the corresponding SMT-LIB2 sort for the String representation of the model
+   * maps FormulaType to the corresponding SMT-LIB2 sort for the String representation of the model.
    *
    * @param type FormulaType that is needs to be translated to SMT-LIB2
    * @return String representation of FormulaType in SMT-LIB2
@@ -1245,7 +1246,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
 
   /**
    * creates a Formula object to use as the key in ValueAssignments for model from the given
-   * FormulaType
+   * FormulaType.
    *
    * @param sorts FormulaType of the value in ValueAssignments
    * @param variable String representation of the key in ValueAssignments
@@ -1275,7 +1276,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
 
   /**
    * Assembles a BooleanFormula for the ValueAssignment field 'formula' by applying
-   * BooleanFormulaManager.equivalence() to key Formula and value Formula
+   * BooleanFormulaManager.equivalence() to key Formula and value Formula.
    *
    * @param key Variable name as Formula
    * @param value Variable value as Formula
@@ -1317,7 +1318,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
   }
 
   /**
-   * Reverses 'replaceReservedChars'
+   * Reverses 'replaceReservedChars'.
    *
    * @param variable String that is checked for necessary char replacements
    * @return modified String

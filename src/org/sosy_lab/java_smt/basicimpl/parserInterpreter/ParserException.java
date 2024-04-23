@@ -11,7 +11,7 @@ package org.sosy_lab.java_smt.basicimpl.parserInterpreter;
 /** Exception thrown if there is an error during Generating SMTLIB2. */
 public class ParserException extends RuntimeException {
 
-  private static final long serialVersionUID = 7364683736456l;
+  private static final long serialVersionUID = 7364683736456L;
 
   public ParserException() {}
 

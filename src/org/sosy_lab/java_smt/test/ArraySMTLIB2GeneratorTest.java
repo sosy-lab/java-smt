@@ -32,9 +32,9 @@ public class ArraySMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSol
    */
   public void clearGenerator() {
     Generator.setIsLoggingEnabled(true);
-    Generator.lines.delete(0, Generator.lines.length());
-    Generator.registeredVariables.clear();
-    Generator.executedAggregator.clear();
+    Generator.getLines().delete(0, Generator.getLines().length());
+    Generator.getRegisteredVariables().clear();
+    Generator.getExecutedAggregator().clear();
   }
 
   @Test(expected = GeneratorException.class)
@@ -117,7 +117,7 @@ public class ArraySMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSol
     Generator.assembleConstraint(constraint1);
     Generator.assembleConstraint(constraint3);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
         "(declare-const a1 (Array Int Int))\n"
@@ -178,7 +178,7 @@ public class ArraySMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSol
     Generator.assembleConstraint(constraint1);
     Generator.assembleConstraint(constraint3);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
         "(declare-const a1 (Array Real Real))\n"
@@ -240,7 +240,7 @@ public class ArraySMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSol
     Generator.assembleConstraint(constraint1);
     Generator.assembleConstraint(constraint3);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
         "(declare-const a1 (Array Bool Bool))\n"
@@ -277,7 +277,7 @@ public class ArraySMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSol
 
     Generator.assembleConstraint(constraint1);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
         "(declare-const a1 (Array (_ BitVec 3) (_ BitVec 3)))\n"
@@ -342,7 +342,7 @@ public class ArraySMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSol
     Generator.assembleConstraint(constraint2);
     Generator.assembleConstraint(constraint3);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
         "(declare-const a1 (Array Int Real))\n"
@@ -376,7 +376,7 @@ public class ArraySMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSol
 
     Generator.assembleConstraint(constraint);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
         "(declare-const a1 (Array Int Int))\n" + "(assert (= a1 (store a1 3 2)))\n";
@@ -399,7 +399,7 @@ public class ArraySMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSol
 
     Generator.assembleConstraint(constraint);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
         "(declare-const a1 (Array Int Int))\n" + "(assert (= (select a1 2) 5))\n";

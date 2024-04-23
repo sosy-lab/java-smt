@@ -21,6 +21,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.basicimpl.Generator.Keyword;
 
 public class BitvectorGenerator {
+  private BitvectorGenerator() {}
 
   protected static void logMakeBitVector(Object result, int length, BigInteger i) {
     List<Object> inputParams = new ArrayList<>();
@@ -34,8 +35,8 @@ public class BitvectorGenerator {
                   Long.toBinaryString(parseLong((String) inPlaceInputParamsString.get(1))));
           return "#b" + String.format(formatString, binaryNumber);
         };
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 
   protected static void logMakeBitVector(BitvectorFormula result, int length, IntegerFormula pI) {
@@ -50,8 +51,8 @@ public class BitvectorGenerator {
                   Long.toBinaryString(parseLong((String) inPlaceInputParamsString.get(1))));
           return "#b" + String.format(formatString, binaryNumber);
         };
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 
   protected static void logMakeBitVecVariable(
@@ -63,7 +64,7 @@ public class BitvectorGenerator {
     FunctionEnvironment newEntry =
         new FunctionEnvironment(result, inputParams, functionToString, Keyword.BITVEC);
     newEntry.setBitVecLength(pType.getSize());
-    Generator.executedAggregator.add(newEntry);
+    Generator.getExecutedAggregator().add(newEntry);
   }
 
   protected static void logMakeBitVecVariable(BitvectorFormula result, int pLength, String pVar) {
@@ -74,7 +75,7 @@ public class BitvectorGenerator {
     FunctionEnvironment newEntry =
         new FunctionEnvironment(result, inputParams, functionToString, Keyword.BITVEC);
     newEntry.setBitVecLength(pLength);
-    Generator.executedAggregator.add(newEntry);
+    Generator.getExecutedAggregator().add(newEntry);
   }
 
   protected static void logBVEqual(
@@ -85,8 +86,8 @@ public class BitvectorGenerator {
     Function<List<Object>, String> functionToString =
         inPlaceInputParams ->
             "(= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 
   protected static void logBVNegate(Object result, BitvectorFormula pNumber) {
@@ -94,8 +95,8 @@ public class BitvectorGenerator {
     inputParams.add(pNumber);
     Function<List<Object>, String> functionToString =
         inPlaceInputParams -> "(bvneg " + inPlaceInputParams.get(0) + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 
   protected static void logBVAdd(
@@ -106,8 +107,8 @@ public class BitvectorGenerator {
     Function<List<Object>, String> functionToString =
         inPlaceInputParams ->
             "(bvadd " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 
   protected static void logBVSub(
@@ -118,8 +119,8 @@ public class BitvectorGenerator {
     Function<List<Object>, String> functionToString =
         inPlaceInputParams ->
             "(bvsub " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 
   protected static void logBVSDivide(
@@ -130,8 +131,8 @@ public class BitvectorGenerator {
     Function<List<Object>, String> functionToString =
         inPlaceInputParams ->
             "(bvsdiv " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 
   protected static void logBVUDivide(
@@ -142,8 +143,8 @@ public class BitvectorGenerator {
     Function<List<Object>, String> functionToString =
         inPlaceInputParams ->
             "(bvudiv " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 
   protected static void logBVSModulo(
@@ -154,8 +155,8 @@ public class BitvectorGenerator {
     Function<List<Object>, String> functionToString =
         inPlaceInputParams ->
             "(bvsrem " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 
   protected static void logBVUModulo(
@@ -166,8 +167,8 @@ public class BitvectorGenerator {
     Function<List<Object>, String> functionToString =
         inPlaceInputParams ->
             "(bvurem " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 
   protected static void logBVMultiply(
@@ -178,8 +179,8 @@ public class BitvectorGenerator {
     Function<List<Object>, String> functionToString =
         inPlaceInputParams ->
             "(bvmul " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 
   protected static void logBVUGreaterThan(
@@ -190,8 +191,8 @@ public class BitvectorGenerator {
     Function<List<Object>, String> saveResult =
         inPlaceInputParams ->
             "(bvugt " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, saveResult, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, saveResult, Keyword.SKIP));
   }
 
   protected static void logBVSGreaterThan(
@@ -202,8 +203,8 @@ public class BitvectorGenerator {
     Function<List<Object>, String> saveResult =
         inPlaceInputParams ->
             "(bvsgt " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, saveResult, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, saveResult, Keyword.SKIP));
   }
 
   protected static void logBVUGreaterOrEqual(
@@ -214,8 +215,8 @@ public class BitvectorGenerator {
     Function<List<Object>, String> saveResult =
         inPlaceInputParams ->
             "(bvuge " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, saveResult, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, saveResult, Keyword.SKIP));
   }
 
   protected static void logBVSGreaterOrEqual(
@@ -226,8 +227,8 @@ public class BitvectorGenerator {
     Function<List<Object>, String> saveResult =
         inPlaceInputParams ->
             "(bvsge " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, saveResult, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, saveResult, Keyword.SKIP));
   }
 
   protected static void logBVULessThan(
@@ -238,8 +239,8 @@ public class BitvectorGenerator {
     Function<List<Object>, String> saveResult =
         inPlaceInputParams ->
             "(bvult " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, saveResult, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, saveResult, Keyword.SKIP));
   }
 
   protected static void logBVSLessThan(
@@ -250,8 +251,8 @@ public class BitvectorGenerator {
     Function<List<Object>, String> saveResult =
         inPlaceInputParams ->
             "(bvslt " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, saveResult, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, saveResult, Keyword.SKIP));
   }
 
   protected static void logBVULessOrEqual(
@@ -262,8 +263,8 @@ public class BitvectorGenerator {
     Function<List<Object>, String> saveResult =
         inPlaceInputParams ->
             "(bvule " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, saveResult, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, saveResult, Keyword.SKIP));
   }
 
   protected static void logBVSLessOrEqual(
@@ -274,8 +275,8 @@ public class BitvectorGenerator {
     Function<List<Object>, String> saveResult =
         inPlaceInputParams ->
             "(bvsle " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, saveResult, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, saveResult, Keyword.SKIP));
   }
 
   protected static void logBVNot(Object result, BitvectorFormula pNumber) {
@@ -283,8 +284,8 @@ public class BitvectorGenerator {
     inputParams.add(pNumber);
     Function<List<Object>, String> saveResult =
         inPlaceInputParams -> "(bvnot " + inPlaceInputParams.get(0) + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, saveResult, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, saveResult, Keyword.SKIP));
   }
 
   protected static void logBVAnd(
@@ -295,8 +296,8 @@ public class BitvectorGenerator {
     Function<List<Object>, String> saveResult =
         inPlaceInputParams ->
             "(bvand " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, saveResult, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, saveResult, Keyword.SKIP));
   }
 
   protected static void logBVOr(
@@ -307,8 +308,8 @@ public class BitvectorGenerator {
     Function<List<Object>, String> saveResult =
         inPlaceInputParams ->
             "(bvor " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, saveResult, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, saveResult, Keyword.SKIP));
   }
 
   protected static void logBVXor(
@@ -319,8 +320,8 @@ public class BitvectorGenerator {
     Function<List<Object>, String> saveResult =
         inPlaceInputParams ->
             "(bvxor " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, saveResult, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, saveResult, Keyword.SKIP));
   }
 
   protected static void logBVSShiftRight(
@@ -331,8 +332,8 @@ public class BitvectorGenerator {
     Function<List<Object>, String> saveResult =
         inPlaceInputParams ->
             "(bvashr " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, saveResult, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, saveResult, Keyword.SKIP));
   }
 
   protected static void logBVUShiftRight(
@@ -343,8 +344,8 @@ public class BitvectorGenerator {
     Function<List<Object>, String> saveResult =
         inPlaceInputParams ->
             "(bvlshr " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, saveResult, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, saveResult, Keyword.SKIP));
   }
 
   protected static void logBVShiftLeft(
@@ -355,8 +356,8 @@ public class BitvectorGenerator {
     Function<List<Object>, String> saveResult =
         inPlaceInputParams ->
             "(bvshl " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, saveResult, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, saveResult, Keyword.SKIP));
   }
 
   protected static void logConcat(
@@ -367,8 +368,8 @@ public class BitvectorGenerator {
     Function<List<Object>, String> saveResult =
         inPlaceInputParams ->
             "(concat " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, saveResult, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, saveResult, Keyword.SKIP));
   }
 
   protected static void logExtract(
@@ -386,8 +387,8 @@ public class BitvectorGenerator {
                 + ") "
                 + inPlaceInputParams.get(0)
                 + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, saveResult, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, saveResult, Keyword.SKIP));
   }
 
   protected static void logUExtend(
@@ -398,8 +399,8 @@ public class BitvectorGenerator {
     Function<List<Object>, String> saveResult =
         inPlaceInputParams ->
             "((_ zero_extend " + inPlaceInputParams.get(1) + ") " + inPlaceInputParams.get(0) + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, saveResult, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, saveResult, Keyword.SKIP));
   }
 
   protected static void logSExtend(
@@ -410,7 +411,7 @@ public class BitvectorGenerator {
     Function<List<Object>, String> saveResult =
         inPlaceInputParams ->
             "((_ sign_extend " + inPlaceInputParams.get(1) + ") " + inPlaceInputParams.get(0) + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, saveResult, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, saveResult, Keyword.SKIP));
   }
 }

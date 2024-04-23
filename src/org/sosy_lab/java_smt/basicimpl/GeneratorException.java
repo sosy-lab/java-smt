@@ -11,7 +11,7 @@ package org.sosy_lab.java_smt.basicimpl;
 /** Exception thrown if there is an error during Generating SMTLIB2. */
 public class GeneratorException extends RuntimeException {
 
-  private static final long serialVersionUID = 176487434783322l;
+  private static final long serialVersionUID = 176487434783322L;
 
   /** Constructs an UnsupportedOperationException with no detail message. */
   public GeneratorException() {}

@@ -19,6 +19,7 @@ import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.basicimpl.Generator.Keyword;
 
 public class ArrayGenerator {
+  private ArrayGenerator() {}
 
   private static String checkArrayElementSort(FormulaType<?> pElementType) {
     if (pElementType.isIntegerType()) {
@@ -75,7 +76,7 @@ public class ArrayGenerator {
         new FunctionEnvironment(result, inputParams, functionToString, Keyword.ARRAY);
     newEntry.setArrayIndexType(checkArrayIndexSort(pIndexType));
     newEntry.setArrayValueType(checkArrayElementSort(pElementType));
-    Generator.executedAggregator.add(newEntry);
+    Generator.getExecutedAggregator().add(newEntry);
   }
 
   protected static void logArrayEquivalence(
@@ -86,8 +87,8 @@ public class ArrayGenerator {
     Function<List<Object>, String> functionToString =
         inPlaceInputParams ->
             "(= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 
   protected static void logSelect(Object result, ArrayFormula<?, ?> pArray, Formula pIndex) {
@@ -97,8 +98,8 @@ public class ArrayGenerator {
     Function<List<Object>, String> functionToString =
         inPlaceInputParams ->
             "(select " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 
   protected static void logStore(
@@ -116,7 +117,7 @@ public class ArrayGenerator {
                 + " "
                 + inPlaceInputParams.get(2)
                 + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 }

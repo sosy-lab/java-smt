@@ -3315,9 +3315,9 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
 
   public void clearGenerator() {
     Generator.setIsLoggingEnabled(true);
-    Generator.lines.delete(0, Generator.lines.length());
-    Generator.registeredVariables.clear();
-    Generator.executedAggregator.clear();
+    Generator.getLines().delete(0, Generator.getLines().length());
+    Generator.getRegisteredVariables().clear();
+    Generator.getExecutedAggregator().clear();
   }
 
   /* MODEL TESTS */
@@ -3374,7 +3374,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
         try (Model model = prover.getModel()) {
           BinaryModel binaryModel = (BinaryModel) model;
           try (binaryModel) {
-            String actualResult = modelToString(binaryModel.finalList);
+            String actualResult = modelToString(binaryModel.asList());
             assertThat(actualResult).isEqualTo(expectedResult);
           }
         }
@@ -3424,7 +3424,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
         try (Model model = prover.getModel()) {
           BinaryModel binaryModel = (BinaryModel) model;
           try (binaryModel) {
-            String actualResult = modelToString(binaryModel.finalList);
+            String actualResult = modelToString(binaryModel.asList());
             assertThat(actualResult).isEqualTo(expectedResult);
           }
         }
@@ -3481,7 +3481,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
         try (Model model = prover.getModel()) {
           BinaryModel binaryModel = (BinaryModel) model;
           try (binaryModel) {
-            String actualResult = modelToString(binaryModel.finalList);
+            String actualResult = modelToString(binaryModel.asList());
             assertThat(actualResult).isEqualTo(expectedResult);
           }
         }
@@ -3561,7 +3561,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
         try (Model model = prover.getModel()) {
           BinaryModel binaryModel = (BinaryModel) model;
           try (binaryModel) {
-            String actualResult = modelToString(binaryModel.finalList);
+            String actualResult = modelToString(binaryModel.asList());
             assertThat(actualResult).isEqualTo(expectedResult);
           }
         }
@@ -3617,7 +3617,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
         try (Model model = prover.getModel()) {
           BinaryModel binaryModel = (BinaryModel) model;
           try (binaryModel) {
-            String actualResult = modelToString(binaryModel.finalList);
+            String actualResult = modelToString(binaryModel.asList());
             assertThat(actualResult).isEqualTo(expectedResult);
           }
         }
@@ -3699,7 +3699,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
         try (Model model = prover.getModel()) {
           BinaryModel binaryModel = (BinaryModel) model;
           try (binaryModel) {
-            String actualResult = modelToString(binaryModel.finalList);
+            String actualResult = modelToString(binaryModel.asList());
             assertThat(actualResult).isEqualTo(expectedResult);
           }
         }

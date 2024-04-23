@@ -46,8 +46,8 @@ public class BinaryModel extends AbstractModel<IExpression, Sort, PrincessEnviro
   private final ArrayFormulaManager amgr;
   private final UFManager umgr;
 
-  /** Model.ValuesAssignments for the parsed Princess model */
-  public ImmutableList<ValueAssignment> finalList = ImmutableList.of();
+  /** Model.ValuesAssignments for the parsed Princess model. */
+  private ImmutableList<ValueAssignment> finalList = ImmutableList.of();
 
   private boolean isUnsat;
 
@@ -70,7 +70,7 @@ public class BinaryModel extends AbstractModel<IExpression, Sort, PrincessEnviro
     throw new UnsupportedOperationException("Princess (Binary) does not support eval().");
   }
 
-  /** generates an SMT-LIB2 model from Princess and writes it into a file "Model.smt2" */
+  /** Send the query to the Princess binary and store the result. */
   public void runBinary(String input) {
     // FIXME: This method is called twice, once for isUnsat and once to get the model.
     //  Instead of running the solver twice we should cache the result.

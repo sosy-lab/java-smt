@@ -21,6 +21,7 @@ import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.basicimpl.Generator.Keyword;
 
 public class UFGenerator {
+  private UFGenerator() {}
 
   protected static String checkUFInputType(ImmutableList<FormulaType<?>> args) {
     StringBuilder inputArgs = new StringBuilder("(");
@@ -84,8 +85,8 @@ public class UFGenerator {
                 + ")"
                 + inPlaceInputParams.get(2)
                 + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 
   protected static <T extends Formula> void logCallFun(
@@ -113,7 +114,7 @@ public class UFGenerator {
     newEntry.setUFName(funcType.getName());
     newEntry.setUFInputType(checkUFInputType(funcType.getArgumentTypes()));
     newEntry.setUFOutputType(checkUFOutputType(funcType.getType()));
-    Generator.executedAggregator.add(newEntry);
+    Generator.getExecutedAggregator().add(newEntry);
   }
 
   protected static <T extends Formula> void logCallFun(
@@ -141,6 +142,6 @@ public class UFGenerator {
     newEntry.setUFName(funcType.getName());
     newEntry.setUFInputType(checkUFInputType(funcType.getArgumentTypes()));
     newEntry.setUFOutputType(checkUFOutputType(funcType.getType()));
-    Generator.executedAggregator.add(newEntry);
+    Generator.getExecutedAggregator().add(newEntry);
   }
 }

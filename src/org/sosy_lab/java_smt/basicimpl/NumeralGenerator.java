@@ -17,6 +17,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.basicimpl.Generator.Keyword;
 
 public class NumeralGenerator {
+  private NumeralGenerator() {}
 
   protected static void logMakeNumber(Object result, String pVar) {
     List<Object> inputParams = new ArrayList<>();
@@ -26,16 +27,16 @@ public class NumeralGenerator {
       inputParams.add(absVar);
       Function<List<Object>, String> functionToString =
           inPlaceInputParams -> "(- " + inPlaceInputParams.get(0) + ")";
-      Generator.executedAggregator.add(
-          new FunctionEnvironment(result, inputParams, functionToString, Keyword.DIRECT));
+      Generator.getExecutedAggregator()
+          .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.DIRECT));
     } else if (result instanceof NumeralFormula) {
       String checkedVar = String.valueOf(result);
       inputParams.add(checkedVar);
     }
     Function<List<Object>, String> functionToString =
         inPlaceInputParams -> (String) inPlaceInputParams.get(0);
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, Keyword.DIRECT));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.DIRECT));
   }
 
   protected static void logMakeIntVariable(Object result, String pVar) {
@@ -49,8 +50,8 @@ public class NumeralGenerator {
     inputParams.add(pVar);
     Function<List<Object>, String> functionToString =
         inPlaceInputParams -> (String) inPlaceInputParams.get(0);
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, varType));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, functionToString, varType));
   }
 
   protected static void logAdd(Object result, Object pNumber1, Object pNumber2) {
@@ -60,8 +61,8 @@ public class NumeralGenerator {
     Function<List<Object>, String> functionToString =
         inPlaceInputParams ->
             "(+ " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 
   protected static void logEqual(Object result, NumeralFormula pNumber1, NumeralFormula pNumber2) {
@@ -71,8 +72,8 @@ public class NumeralGenerator {
     Function<List<Object>, String> functionToString =
         inPlaceInputParams ->
             "(= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 
   protected static void logNegate(Object result, NumeralFormula pBits) {
@@ -80,8 +81,8 @@ public class NumeralGenerator {
     inputParams.add(pBits);
     Function<List<Object>, String> functionToString =
         inPlaceInputParams -> "(- " + inPlaceInputParams.get(0) + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 
   protected static void logSum(Object result, List<?> operands) {
@@ -101,8 +102,8 @@ public class NumeralGenerator {
               });
           return String.valueOf(out.deleteCharAt(out.length() - 1).append(")"));
         };
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 
   protected static void logSubtract(Object result, Object pNumber1, Object pNumber2) {
@@ -112,8 +113,8 @@ public class NumeralGenerator {
     Function<List<Object>, String> functionToString =
         inPlaceInputParams ->
             "(- " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 
   protected static void logDivide(Object result, Object pNumber1, Object pNumber2) {
@@ -123,8 +124,8 @@ public class NumeralGenerator {
     Function<List<Object>, String> functionToString =
         inPlaceInputParams ->
             "(div " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 
   protected static void logModulo(Object result, Object pNumber1, Object pNumber2) {
@@ -134,8 +135,8 @@ public class NumeralGenerator {
     Function<List<Object>, String> functionToString =
         inPlaceInputParams ->
             "(mod " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 
   protected static void logMultiply(Object result, Object pNumber1, Object pNumber2) {
@@ -145,8 +146,8 @@ public class NumeralGenerator {
     Function<List<Object>, String> functionToString =
         inPlaceInputParams ->
             "(* " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 
   protected static void logDistinct(Object result, List<?> operands) {
@@ -165,8 +166,8 @@ public class NumeralGenerator {
               });
           return String.valueOf(out.deleteCharAt(out.length() - 1).append(")"));
         };
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 
   protected static void logGreaterThan(Object result, Object pNumber1, Object pNumber2) {
@@ -176,8 +177,8 @@ public class NumeralGenerator {
     Function<List<Object>, String> functionToString =
         inPlaceInputParams ->
             "(> " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 
   protected static void logGreaterOrEquals(Object result, Object pNumber1, Object pNumber2) {
@@ -187,8 +188,8 @@ public class NumeralGenerator {
     Function<List<Object>, String> functionToString =
         inPlaceInputParams ->
             "(>= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 
   protected static void logLessThan(Object result, Object pNumber1, Object pNumber2) {
@@ -198,8 +199,8 @@ public class NumeralGenerator {
     Function<List<Object>, String> functionToString =
         inPlaceInputParams ->
             "(< " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 
   protected static void logLessOrEquals(Object result, Object pNumber1, Object pNumber2) {
@@ -209,8 +210,8 @@ public class NumeralGenerator {
     Function<List<Object>, String> functionToString =
         inPlaceInputParams ->
             "(<= " + inPlaceInputParams.get(0) + " " + inPlaceInputParams.get(1) + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 
   protected static void logFloor(Object result, Object number) {
@@ -218,7 +219,7 @@ public class NumeralGenerator {
     inputParams.add(number);
     Function<List<Object>, String> functionToString =
         inPlaceInputParams -> "(to_int " + inPlaceInputParams.get(0) + ")";
-    Generator.executedAggregator.add(
-        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 }

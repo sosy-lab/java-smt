@@ -32,9 +32,9 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
    */
   public void clearGenerator() {
     Generator.setIsLoggingEnabled(true);
-    Generator.lines.delete(0, Generator.lines.length());
-    Generator.registeredVariables.clear();
-    Generator.executedAggregator.clear();
+    Generator.getLines().delete(0, Generator.getLines().length());
+    Generator.getRegisteredVariables().clear();
+    Generator.getExecutedAggregator().clear();
   }
 
   @Test
@@ -53,7 +53,7 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
 
     Generator.assembleConstraint(constraint);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
         "(declare-fun a (Bool) Bool)\n"
@@ -78,7 +78,7 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
 
     Generator.assembleConstraint(constraint);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
         "(declare-fun a () Bool)\n" + "(declare-fun b () Bool)\n" + "(assert (= a b))\n";
@@ -138,7 +138,7 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
 
     Generator.assembleConstraint(constraint);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
         "(declare-fun a (Int) Int)\n"
@@ -164,7 +164,7 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
 
     Generator.assembleConstraint(constraint);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
         "(declare-fun a () Int)\n" + "(declare-fun b () Int)\n" + "(assert (= a b))\n";
@@ -188,7 +188,7 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
 
     Generator.assembleConstraint(constraint);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
         "(declare-fun a (Real) Real)\n"
@@ -223,7 +223,7 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
 
     Generator.assembleConstraint(constraint);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
         "(declare-fun a () Real)\n" + "(declare-fun b () Real)\n" + "(assert (= a b))\n";
@@ -249,7 +249,7 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
 
     Generator.assembleConstraint(constraint);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
         "(declare-fun a ((_ BitVec 4)) (_ BitVec 4))\n"
@@ -276,7 +276,7 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
 
     Generator.assembleConstraint(constraint);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
         "(declare-fun a () (_ BitVec 4))\n"
@@ -333,7 +333,7 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
 
     Generator.assembleConstraint(constraint);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
         "(declare-fun constr ((Array Int Int)(Array Int Int)) Bool)\n"
@@ -373,7 +373,7 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
 
     Generator.assembleConstraint(constraint);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
         "(declare-fun constr ((Array Int Int)(Array Int Int)) Bool)\n"
@@ -395,7 +395,7 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
 
     Generator.assembleConstraint(constraint);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
         "(declare-fun a (Bool) Bool)\n"
@@ -417,7 +417,7 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
 
     Generator.assembleConstraint(constraint);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
         "(declare-fun a () Bool)\n" + "(declare-fun b () Bool)\n" + "(assert (= a b))\n";
@@ -436,7 +436,7 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
 
     Generator.assembleConstraint(constraint);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
         "(declare-fun a (Int) Int)\n"
@@ -459,7 +459,7 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
 
     Generator.assembleConstraint(constraint);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
         "(declare-fun a () Int)\n" + "(declare-fun b () Int)\n" + "(assert (= a b))\n";
@@ -480,7 +480,7 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
 
     Generator.assembleConstraint(constraint);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
         "(declare-fun a (Real) Real)\n"
@@ -511,7 +511,7 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
 
     Generator.assembleConstraint(constraint);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
         "(declare-fun a () Real)\n" + "(declare-fun b () Real)\n" + "(assert (= a b))\n";
@@ -535,7 +535,7 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
 
     Generator.assembleConstraint(constraint);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
         "(declare-fun a ((_ BitVec 4)) (_ BitVec 4))\n"
@@ -557,7 +557,7 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
 
     Generator.assembleConstraint(constraint);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
         "(declare-fun a () (_ BitVec 4))\n"
@@ -594,7 +594,7 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
 
     Generator.assembleConstraint(constraint);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
         "(declare-fun constr ((Array Int Int)(Array Int Int)) Bool)\n"
@@ -623,7 +623,7 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
 
     Generator.assembleConstraint(constraint);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
         "(declare-fun constr ((Array Int Int)(Array Int Int)) Bool)\n"

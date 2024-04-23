@@ -27,9 +27,9 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
    */
   public void clearGenerator() {
     Generator.setIsLoggingEnabled(true);
-    Generator.lines.delete(0, Generator.lines.length());
-    Generator.registeredVariables.clear();
-    Generator.executedAggregator.clear();
+    Generator.getLines().delete(0, Generator.getLines().length());
+    Generator.getRegisteredVariables().clear();
+    Generator.getExecutedAggregator().clear();
   }
 
   @Test
@@ -54,7 +54,7 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
     Generator.assembleConstraint(constraint3);
     */
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
         "(declare-const a (_ BitVec 32))\n"
@@ -92,7 +92,7 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
     Generator.assembleConstraint(constraint2);
     Generator.assembleConstraint(constraint3);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResultMathsat5 =
         "(assert (= #b111111110110 #b000000010100))\n"
@@ -129,7 +129,7 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
     Generator.assembleConstraint(constraint2);
     Generator.assembleConstraint(constraint3);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResultMathsat5 =
         "(assert (= #b111111110110 #b000000010100))\n"
@@ -166,7 +166,7 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
     Generator.assembleConstraint(constraint2);
     Generator.assembleConstraint(constraint3);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResultMathsat5 =
         "(assert (= #b111111110110 (bvadd #b111111110110 #b000000010100)))\n"
@@ -203,7 +203,7 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
     Generator.assembleConstraint(constraint1);
     Generator.assembleConstraint(constraint3);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResultMathsat5 =
         "(assert (= (bvneg #b111111110110) #b111111110110))\n"
@@ -241,7 +241,7 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
     Generator.assembleConstraint(constraint1);
     Generator.assembleConstraint(constraint3);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResultMathsat5 =
         "(assert (= #b111111110110 (bvsub #b111111110110 #b000000010100)))\n"
@@ -281,7 +281,7 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
     Generator.assembleConstraint(constraint1);
     Generator.assembleConstraint(constraint3);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResultOthers =
         "(assert (= #b111111110110 (bvsdiv #b111111110110 #b000000010100)))\n"
@@ -315,7 +315,7 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
     Generator.assembleConstraint(constraint1);
     Generator.assembleConstraint(constraint3);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResultOthers =
         "(assert (= #b111111110110 (bvsrem #b111111110110 #b000000010100)))\n"
@@ -357,7 +357,7 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
     Generator.assembleConstraint(constraint1);
     Generator.assembleConstraint(constraint3);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResultOthers =
         "(assert (= #b111111110110 (bvmul #b111111110110 #b000000010100)))\n"
@@ -394,7 +394,7 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
     Generator.assembleConstraint(constraint1);
     Generator.assembleConstraint(constraint3);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
         "(assert (bvsgt #b111111110110 #b000000010100))\n"
@@ -419,7 +419,7 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
     Generator.assembleConstraint(constraint1);
     Generator.assembleConstraint(constraint3);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
         "(assert (bvsge #b111111110110 #b000000010100))\n"
@@ -444,7 +444,7 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
     Generator.assembleConstraint(constraint1);
     Generator.assembleConstraint(constraint3);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
         "(assert (bvslt #b111111110110 #b000000010100))\n"
@@ -469,7 +469,7 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
     Generator.assembleConstraint(constraint1);
     Generator.assembleConstraint(constraint3);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
         "(assert (bvsle #b111111110110 #b000000010100))\n"
@@ -494,7 +494,7 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
     Generator.assembleConstraint(constraint1);
     Generator.assembleConstraint(constraint3);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResultMathsat5 =
         "(assert (= (bvnot #b111111110110) (bvnot #b000000010100)))\n"
@@ -528,7 +528,7 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
     Generator.assembleConstraint(constraint1);
     Generator.assembleConstraint(constraint3);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResultMathsat5 =
         "(declare-const a (_ BitVec 12))\n"
@@ -564,7 +564,7 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
     Generator.assembleConstraint(constraint1);
     Generator.assembleConstraint(constraint3);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResultMathsat5 =
         "(declare-const a (_ BitVec 12))\n"
@@ -600,7 +600,7 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
     Generator.assembleConstraint(constraint1);
     Generator.assembleConstraint(constraint3);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResultMathsat5 =
         "(declare-const a (_ BitVec 12))\n"
@@ -636,7 +636,7 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
     Generator.assembleConstraint(constraint1);
     Generator.assembleConstraint(constraint3);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResultMathsat5 =
         "(declare-const a (_ BitVec 12))\n"
@@ -672,7 +672,7 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
     Generator.assembleConstraint(constraint1);
     Generator.assembleConstraint(constraint3);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResultOthers =
         "(declare-const a (_ BitVec 12))\n"
@@ -710,7 +710,7 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
     Generator.assembleConstraint(constraint1);
     Generator.assembleConstraint(constraint3);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResultMathsat5 =
         "(declare-const a (_ BitVec 24))\n"
@@ -737,7 +737,7 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
     Generator.assembleConstraint(constraint1);
     Generator.assembleConstraint(constraint3);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResultMathsat5 =
         "(declare-const a (_ BitVec 6))\n"
@@ -763,7 +763,7 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
     Generator.assembleConstraint(constraint1);
     Generator.assembleConstraint(constraint3);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResultMathsat5 =
         "(declare-const a (_ BitVec 18))\n"
@@ -794,7 +794,7 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
 
     Generator.assembleConstraint(constraint);
 
-    String actualResult = String.valueOf(Generator.lines);
+    String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResultOthers =
         "(declare-const a (_ BitVec 5))\n"
