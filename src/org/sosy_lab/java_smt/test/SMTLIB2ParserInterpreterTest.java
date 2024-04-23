@@ -37,7 +37,6 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.BinaryModel;
 import org.sosy_lab.java_smt.basicimpl.Generator;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.ParserException;
-import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Visitor;
 
 public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Override
@@ -50,20 +49,12 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     return newConfig;
   }
 
-  public void clearVisitor() {
-    Generator.setIsLoggingEnabled(true);
-    Visitor.variables.clear();
-    Visitor.letVariables.clear();
-    Visitor.constraints.clear();
-  }
-
   /* ARRAY CONSTRAINT TESTS */
   @Test
   public void testMakeArrayInteger()
       throws SolverException, InterruptedException, InvalidConfigurationException, IOException {
     requireArrays();
     requireIntegers();
-    clearVisitor();
 
     String a =
         "(declare-const a1 (Array Int Int))\n"
@@ -122,7 +113,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
       throws SolverException, InterruptedException, InvalidConfigurationException, IOException {
     requireArrays();
     requireRationals();
-    clearVisitor();
 
     String a =
         "(declare-const a1 (Array Real Real))\n"
@@ -186,7 +176,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     requireArrays();
     requireRationals();
     requireBooleanArgumentArrays();
-    clearVisitor();
 
     String a =
         "(declare-const a1 (Array Bool Bool))\n"
@@ -247,7 +236,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
       throws SolverException, InterruptedException, InvalidConfigurationException, IOException {
     requireArrays();
     requireBitvectors();
-    clearVisitor();
 
     String a =
         "(declare-const a1 (Array (_ BitVec 3) (_ BitVec 3)))\n"
@@ -284,7 +272,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     requireRationals();
     requireIntegers();
     requireBooleanArgumentArrays();
-    clearVisitor();
 
     String a =
         "(declare-const a1 (Array Int Real))\n"
@@ -353,7 +340,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireArrays();
     requireIntegers();
-    clearVisitor();
 
     String a = "(declare-const a1 (Array Int Int))\n" + "(assert (= a1 (store a1 3 2)))\n";
 
@@ -377,7 +363,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireArrays();
     requireIntegers();
-    clearVisitor();
 
     String a = "(declare-const a1 (Array Int Int))\n" + "(assert (= (select a1 2) 5))\n";
 
@@ -399,7 +384,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test
   public void testMakeVariable()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    clearVisitor();
 
     String a = "(declare-const a Bool)\n" + "(assert a)\n";
 
@@ -412,7 +396,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test
   public void testMakeTrue()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    clearVisitor();
 
     String a = "(assert true)\n";
 
@@ -425,7 +408,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test
   public void testMakeFalse()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    clearVisitor();
 
     String a = "(assert false)\n";
 
@@ -438,7 +420,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test
   public void testNot()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    clearVisitor();
 
     String a = "(declare-const a Bool)\n" + "(assert (not a))\n";
 
@@ -451,7 +432,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test
   public void testBinaryOr()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    clearVisitor();
 
     String a = "(declare-const a Bool)\n" + "(declare-const b Bool)\n" + "(assert (or a b))\n";
 
@@ -464,7 +444,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test
   public void testCollectionOr()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    clearVisitor();
 
     String a =
         "(declare-const a Bool)\n"
@@ -482,7 +461,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test
   public void testBinaryAnd()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    clearVisitor();
 
     String a = "(declare-const a Bool)\n" + "(declare-const b Bool)\n" + "(assert (and a b))\n";
 
@@ -495,7 +473,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test
   public void testCollectionAnd()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    clearVisitor();
 
     String a =
         "(declare-const a Bool)\n"
@@ -513,7 +490,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test
   public void testXor()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    clearVisitor();
 
     String a = "(declare-const a Bool)\n" + "(declare-const b Bool)\n" + "(assert (xor a b))\n";
 
@@ -526,7 +502,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test
   public void testEquivalence()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    clearVisitor();
 
     String a = "(declare-const a Bool)\n" + "(declare-const b Bool)\n" + "(assert (= a b))\n";
 
@@ -540,7 +515,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test
   public void testImplication()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    clearVisitor();
 
     String a = "(declare-const a Bool)\n" + "(declare-const b Bool)\n" + "(assert (=> a b))\n";
 
@@ -554,7 +528,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test
   public void testIfThenElse()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    clearVisitor();
 
     String a =
         "(declare-const a Bool)\n"
@@ -572,7 +545,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test
   public void testNestedTerms()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    clearVisitor();
 
     String a =
         "(declare-const a Bool)\n"
@@ -611,7 +583,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test
   public void testdeclareUFBoolean()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    clearVisitor();
     requireBooleanUFs();
     requireNoArgumentsInUFs();
     String x =
@@ -640,7 +611,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testDeclareUFInteger()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x =
         "(declare-fun a (Int) Int)\n" + "(declare-fun b () Int)\n" + "(assert (= (a 4) b))\n";
@@ -666,7 +636,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testDeclareUFRational()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireRationals();
-    clearVisitor();
 
     String x =
         "(declare-fun a (Real) Real)\n" + "(declare-fun b () Real)\n" + "(assert (= (a 4.0) b))\n";
@@ -693,7 +662,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
     requireNoArgumentsInUFs();
-    clearVisitor();
 
     String x =
         "(declare-fun a ((_ BitVec 4)) (_ BitVec 4))\n"
@@ -723,7 +691,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireArrays();
     requireIntegers();
-    clearVisitor();
 
     String x =
         "(declare-fun constr ((Array Int Int)(Array Int Int)) Bool)\n"
@@ -773,7 +740,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test
   public void testDeclareAndCallUFBoolean()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    clearVisitor();
     requireBooleanUFs();
     requireNoArgumentsInUFs();
     String x =
@@ -797,7 +763,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testDeclareAndCallUFInteger()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x =
         "(declare-fun a (Int) Int)\n" + "(declare-fun b () Int)\n" + "(assert (= (a 4) b))\n";
@@ -818,7 +783,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testDeclareAndCallUFRational()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireRationals();
-    clearVisitor();
 
     String x =
         "(declare-fun a (Real) Real)\n" + "(declare-fun b () Real)\n" + "(assert (= (a 4.0) b))\n";
@@ -842,7 +806,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
     requireNoArgumentsInUFs();
-    clearVisitor();
 
     String x =
         "(declare-fun a ((_ BitVec 4)) (_ BitVec 4))\n"
@@ -871,7 +834,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
     requireArrays();
-    clearVisitor();
 
     String x =
         "(declare-fun constr ((Array Int Int)(Array Int Int)) Bool)\n"
@@ -908,7 +870,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testMakeVariableInteger()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(declare-const a Int)\n" + "(declare-const b Int)\n" + "(assert (= a b))\n";
 
@@ -927,7 +888,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testMakeVariableRational()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireRationals();
-    clearVisitor();
 
     String x = "(declare-const a Real)\n" + "(declare-const b Real)\n" + "(assert (= a b))\n";
 
@@ -950,7 +910,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
         .withMessage("Solver %s always adds zero", solverToUse())
         .that(solverToUse())
         .isNoneOf(Solvers.CVC5, Solvers.CVC4, Solvers.PRINCESS, Solvers.SMTINTERPOL);
-    clearVisitor();
 
     String x = "(assert (= (+ 1 5) (+ 3 2147483647)))\n";
 
@@ -976,7 +935,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
         .withMessage("Solver %s always adds zero", solverToUse())
         .that(solverToUse())
         .isNoneOf(Solvers.CVC5, Solvers.CVC4, Solvers.SMTINTERPOL);
-    clearVisitor();
 
     String x = "(assert (= 1.0 (+ 3.4 2147483.647)))\n";
 
@@ -996,8 +954,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testIntegerSubtract()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-
-    clearVisitor();
 
     String x = "(assert (= 1 (- 5 (- 3 2147483647))))\n";
 
@@ -1019,7 +975,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testRationalSubtract()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireRationals();
-    clearVisitor();
 
     String x = "(assert (= 1.0 (- 3.4 2147483.647)))\n";
 
@@ -1039,7 +994,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testIntegerNegate()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (= (- (- 5) (- 1)) (- (- 3) (- 2147483647))))\n";
 
@@ -1063,7 +1017,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testRationalNegate()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireRationals();
-    clearVisitor();
 
     String x = "(assert (= (- 1.0) (- (- 3.4) (- 2147483.647))))\n";
 
@@ -1084,7 +1037,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testIntegerSum()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (= 2147483647 (+ 1 5 3 2147483647)))\n";
 
@@ -1111,7 +1063,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testRationalSum()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireRationals();
-    clearVisitor();
 
     String x = "(assert (= 1.0 (+ 1.0 3.4 2147483.647)))\n";
 
@@ -1137,7 +1088,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
     assume().that(solverToUse()).isNotEqualTo(Solvers.OPENSMT);
-    clearVisitor();
 
     String x = "(assert (= 1 (div 5 (div 3 2147483647))))\n";
 
@@ -1159,7 +1109,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testRationalDivide()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireRationals();
-    clearVisitor();
 
     String x = "(assert (= 1.0 (div 3.4 2147483.647)))\n";
 
@@ -1183,7 +1132,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
         .withMessage("Solver %s does not support modulo. ", solverToUse())
         .that(solverToUse())
         .isNotEqualTo(Solvers.MATHSAT5);
-    clearVisitor();
 
     String x = "(assert (= 1 (mod 5 (mod 3 2147483647))))\n";
 
@@ -1205,7 +1153,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testIntegerMultiply()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (= 1 (* 5 (* 3 2147483647))))\n";
 
@@ -1227,7 +1174,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testRationalMultiply()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireRationals();
-    clearVisitor();
 
     String x = "(assert (= 1.0 (* 3.4 2147483.647)))\n";
 
@@ -1247,7 +1193,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testIntegerDistinct()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (distinct 1 5 3 2147483647))\n";
 
@@ -1274,7 +1219,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testRationalDistinct()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireRationals();
-    clearVisitor();
 
     String x = "(assert (distinct 1.0 3.4 2147483.647))\n";
 
@@ -1299,7 +1243,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testIntegerGreaterThan()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (and (> 1 5) (> 3 2147483647)))\n";
 
@@ -1321,7 +1264,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testRationalGreaterThan()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireRationals();
-    clearVisitor();
 
     String x = "(assert (and (> 1.0 3.4) (> 3.4 2147483.647)))\n";
 
@@ -1342,7 +1284,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testIntegerGreaterOrEquals()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (and (>= 1 5) (>= 3 2147483647)))\n";
 
@@ -1364,7 +1305,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testRationalGreaterOrEquals()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireRationals();
-    clearVisitor();
 
     String x = "(assert (and (>= 1.0 3.4) (>= 3.4 2147483.647)))\n";
 
@@ -1385,7 +1325,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testIntegerLessThan()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (and (< 1 5) (< 3 2147483647)))\n";
 
@@ -1407,7 +1346,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testRationalLessThan()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireRationals();
-    clearVisitor();
 
     String x = "(assert (and (< 1.0 3.4) (< 3.4 2147483.647)))\n";
 
@@ -1428,7 +1366,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testIntegerLessOrEqual()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (and (<= 1 5) (<= 3 2147483647)))\n";
 
@@ -1450,7 +1387,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testRationalLessOrEqual()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireRationals();
-    clearVisitor();
 
     String x = "(assert (and (<= 1.0 3.4) (<= 3.4 2147483.647)))\n";
 
@@ -1473,7 +1409,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     requireIntegers();
     // Broken for anything but Princess
     assume().that(solverToUse()).isEqualTo(Solvers.PRINCESS);
-    clearVisitor();
 
     String x = "(assert (= (- (to_int 5) (to_int 1)) (- (to_int 3) (to_int 2147483647))))\n";
 
@@ -1497,7 +1432,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     requireRationals();
     // OpenSMT does not support 'floor'
     assume().that(solverToUse()).isNotEqualTo(Solvers.OPENSMT);
-    clearVisitor();
 
     String x = "(assert (= (to_int 1.0) (- (to_int 3.4) (to_int 2147483.647))))\n";
 
@@ -1520,7 +1454,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testMakeVariableBV()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x =
         "(declare-const a (_ BitVec 32))\n"
@@ -1549,7 +1482,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testAdd()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x =
         "(assert (= #b111111110110 (bvadd #b111111110110 #b000000010100)))\n"
@@ -1585,7 +1517,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testNegate()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x =
         "(assert (= (bvneg #b111111110110) (bvadd (bvneg #b111111110110) (bvneg"
@@ -1620,7 +1551,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testSubtract()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x =
         "(assert (= #b111111110110 (bvsub #b111111110110 #b000000010100)))\n"
@@ -1652,7 +1582,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
     assume().that(solverToUse()).isNotEqualTo(Solvers.CVC4);
-    clearVisitor();
 
     String x =
         "(assert (= #b111111110110 (bvsdiv #b111111110110 #b000000010100)))\n"
@@ -1683,7 +1612,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testModulo()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x =
         "(assert (= #b111111110110 (bvsrem #b111111110110 #b000000010100)))\n"
@@ -1714,7 +1642,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testMultiply()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x =
         "(assert (= #b111111110110 (bvmul #b111111110110 #b000000010100)))\n"
@@ -1745,7 +1672,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testGreaterThan()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x =
         "(assert (bvsgt #b111111110110 #b000000010100))\n"
@@ -1775,8 +1701,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
 
-    clearVisitor();
-
     String x =
         "(assert (bvsge #b111111110110 #b000000010100))\n"
             + "(assert (bvuge"
@@ -1804,7 +1728,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testLessThan()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x =
         "(assert (bvslt #b111111110110 #b000000010100))\n"
@@ -1833,7 +1756,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testLessOrEqual()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x =
         "(assert (bvsle #b111111110110 #b000000010100))\n"
@@ -1862,7 +1784,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testNotBV()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x =
         "(assert (= (bvnot #b111111110110) (bvnot #b000000010100)))\n"
@@ -1892,7 +1813,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testAndBV()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x =
         "(declare-const a (_ BitVec 12))\n"
@@ -1925,7 +1845,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testOrBV()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x =
         "(declare-const a (_ BitVec 12))\n"
@@ -1958,7 +1877,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testBVXor()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x =
         "(declare-const a (_ BitVec 12))\n"
@@ -1991,7 +1909,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testShiftRight()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x =
         "(declare-const a (_ BitVec 12))\n"
@@ -2024,7 +1941,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testShiftLeft()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x =
         "(declare-const a (_ BitVec 12))\n"
@@ -2057,7 +1973,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testConcat()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x =
         "(declare-const a (_ BitVec 24))\n"
@@ -2090,7 +2005,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExtract()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x =
         "(declare-const a (_ BitVec 6))\n"
@@ -2120,7 +2034,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExtend()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x =
         "(declare-const a (_ BitVec 18))\n"
@@ -2151,7 +2064,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionAnd()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (and 1 5))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2162,7 +2074,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionOr()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (or 1 5))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2173,7 +2084,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionXor()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (xor 1 5))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2184,7 +2094,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionXor3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (xor true false false))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2195,7 +2104,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionNot()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (not 5))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2206,7 +2114,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionNot2()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (not true false))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2217,7 +2124,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionImplication()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (=> 4 5))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2228,7 +2134,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionImplication3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (=> false false true))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2239,7 +2144,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionIfThenElse()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (ite 4 5 6))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2250,7 +2154,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionIfThenElse2()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (ite true false)\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2261,7 +2164,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionAdd()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (+ true true))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2272,7 +2174,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionSubtract()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (- true true))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2283,7 +2184,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionSubtract3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (- 3 4 5))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2294,7 +2194,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionDivide()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (div true true))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2305,7 +2204,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionDivide3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (div 3 4 5))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2316,7 +2214,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionMod()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (mod true false))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2327,7 +2224,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionMod3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (mod 3 4 5))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2338,7 +2234,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionMultiply()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (* true false))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2349,7 +2244,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionMultiply3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (* 3 4 5))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2360,7 +2254,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionDistinct()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (distinct false true false))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2371,7 +2264,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionGreaterThan()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (> true false))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2382,7 +2274,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionGreaterThan3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (> 3 4 5))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2393,7 +2284,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionGreaterOrEqual()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (>= true false))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2404,7 +2294,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionGreaterOrEqual3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (>= 3 4 5))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2415,7 +2304,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionLessThan()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (< true false))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2426,7 +2314,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionLessThan3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (< 3 4 5))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2437,7 +2324,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionLessOrEquals()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (<= true false))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2448,7 +2334,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionLessOrEqual3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (<= 3 4 5))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2459,7 +2344,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionToInt()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (to_int true))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2470,7 +2354,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionToInt2()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (to_int 3 4 5))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2481,7 +2364,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVNeg()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (bvneg false))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2492,7 +2374,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVNeg2()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x = "(assert (bvneg #b100 #b100))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2503,7 +2384,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVAdd()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x = "(assert (bvadd true false))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2514,7 +2394,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVAdd3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x = "(assert (bvadd #b001 #b100 #b100))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2525,7 +2404,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVSub()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x = "(assert (bvsub true false))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2536,7 +2414,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVSub3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x = "(assert (bvsub #b001 #b100 #b100))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2547,7 +2424,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVsdiv()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x = "(assert (bvsdiv true false))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2558,7 +2434,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVsdiv3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x = "(assert (bvsdiv #b001 #b100 #b100))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2569,7 +2444,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVudiv()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (bvudiv true false))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2580,7 +2454,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVudiv3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x = "(assert (bvudiv #b001 #b100 #b100))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2591,7 +2464,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVsrem()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (bvsrem true false))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2602,7 +2474,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVsrem3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x = "(assert (bvsrem #b001 #b100 #b100))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2613,7 +2484,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVurem()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (bvurem true false))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2624,7 +2494,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVurem3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x = "(assert (bvurem #b001 #b100 #b100))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2635,7 +2504,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVmul()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (bvmul true false))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2646,7 +2514,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVmul3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x = "(assert (bvmul #b001 #b100 #b100))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2657,7 +2524,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVsgt()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (bvsgt true false))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2668,7 +2534,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVsgt3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x = "(assert (bvsgt #b001 #b100 #b100))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2679,7 +2544,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVugt()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (bvugt true false))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2690,7 +2554,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVugt3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x = "(assert (bvugt #b001 #b100 #b100))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2701,7 +2564,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVsge()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (bvsge true false))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2712,7 +2574,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVsge3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x = "(assert (bvsge #b001 #b100 #b100))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2723,7 +2584,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVuge()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (bvuge true false))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2734,7 +2594,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVuge3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x = "(assert (bvuge #b001 #b100 #b100))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2745,7 +2604,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVslt()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (bvslt true false))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2756,7 +2614,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVslt3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x = "(assert (bvslt #b001 #b100 #b100))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2767,7 +2624,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVult()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (bvult true false))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2778,7 +2634,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVult3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x = "(assert (bvult #b001 #b100 #b100))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2789,7 +2644,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVsle()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (bvsle true false))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2800,7 +2654,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVsle3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x = "(assert (bvsle #b001 #b100 #b100))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2811,7 +2664,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVule()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (bvule true false))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2822,7 +2674,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVule3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x = "(assert (bvule #b001 #b100 #b100))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2833,7 +2684,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVnot()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (bvnot true))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2844,7 +2694,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVnot2()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x = "(assert (bvnot #b100 #b100))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2855,7 +2704,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVand()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (bvand true false))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2866,7 +2714,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVand3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x = "(assert (bvand #b001 #b100 #b100))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2877,7 +2724,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVor()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (bvor true false))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2888,7 +2734,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVor3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x = "(assert (bvor #b001 #b100 #b100))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2899,7 +2744,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVxor()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (bvxor true false))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2910,7 +2754,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVxor3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x = "(assert (bvxor #b001 #b100 #b100))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2921,7 +2764,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVashr()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (bvashr true false))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2932,7 +2774,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVashr3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x = "(assert (bvashr #b001 #b100 #b100))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2943,7 +2784,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVlshr()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (bvlshr true false))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2954,7 +2794,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVlshr3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x = "(assert (bvlshr #b001 #b100 #b100))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2965,7 +2804,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVshl()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (bvshl true false))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2976,7 +2814,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVshl3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x = "(assert (bvshl #b001 #b100 #b100))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2987,7 +2824,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVconcat()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (concat true false))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -2998,7 +2834,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVconcat3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x = "(assert (concat #b001 #b100 #b100))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -3009,7 +2844,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVextract()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x = "(assert ((_ extract true false) #b100))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -3020,7 +2854,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVextract2()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x = "(assert ((_ extract 1) #b100))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -3031,7 +2864,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVextract3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert ((_ extract 1 3) true))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -3042,7 +2874,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVzeroExtend()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x = "(assert ((_ zero_extend true) #b100))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -3053,7 +2884,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVzeroExtend2()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert ((_ zero_extend 4) true))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -3065,7 +2895,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
     requireBitvectors();
-    clearVisitor();
 
     String x = "(assert ((_ zero_extend 4 1) #b100))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -3076,7 +2905,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVsignExtend()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x = "(assert ((_ sign_extend true) #b100))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -3087,7 +2915,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVsignExtend2()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert ((_ sign_extend 4) true))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -3098,7 +2925,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVsignExtend3()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x = "(assert ((_ sign_extend 4 1) #b100))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -3109,7 +2935,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionBVtoInt()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (bv2int true))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -3121,7 +2946,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
     requireBitvectorToInt();
-    clearVisitor();
 
     String x = "(assert (bv2int #b100 #b100)\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -3133,7 +2957,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
     requireBitvectors();
-    clearVisitor();
 
     String x = "(assert (int2bv #b100)\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -3145,7 +2968,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
     requireArrays();
-    clearVisitor();
 
     String x = "(declare-const all1 (Array Int Int))\n" + "(assert (select all1 true))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -3156,7 +2978,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionSelect2()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (select true 1))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -3168,7 +2989,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
     requireArrays();
-    clearVisitor();
 
     String x = "(declare-const all1 (Array Int Int))\n" + "(assert (select all1 1 5))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -3180,7 +3000,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
     requireArrays();
-    clearVisitor();
 
     String x = "(declare-const all1 (Array Int Int))\n" + "(assert (select all1 1 true))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -3191,7 +3010,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionStore2()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (select true 1 3))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -3203,7 +3021,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
     requireArrays();
-    clearVisitor();
 
     String x = "(declare-const all1 (Array Int Int))\n" + "(assert (select all1 1))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -3214,7 +3031,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionNewSort()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(declare-sort Type 0)\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -3227,7 +3043,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     requireIntegers();
     // MathSAT does not support arrays with Bool arguments
     assume().that(solverToUse()).isNotEqualTo(Solvers.MATHSAT5);
-    clearVisitor();
 
     String x =
         "(declare-fun subtype (Bool Bool) Bool)\n"
@@ -3243,7 +3058,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     requireIntegers();
     // MathSAT does not support arrays with Bool arguments
     assume().that(solverToUse()).isNotEqualTo(Solvers.MATHSAT5);
-    clearVisitor();
 
     String x =
         "(declare-fun subtype (Bool Bool) Bool)\n"
@@ -3257,7 +3071,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionExclam()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(assert (! (=> p q) :named PQ))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -3268,7 +3081,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionPop()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(pop 1)\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -3279,7 +3091,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testExceptionPush()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(push 1)\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -3291,7 +3102,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test
   public void testDefineFunctionBoolEmptyInput()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    clearVisitor();
 
     String x = "(define-fun bla () Bool true)\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -3307,7 +3117,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testDefineFunctionBoolWithInput()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBooleanUFs();
-    clearVisitor();
 
     String x = "(define-fun bla ((x Bool)) Bool (= x true))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -3323,7 +3132,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testDefineFunctionInt()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(define-fun bla () Int (- 3 4))\n" + "(assert (= bla bla))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -3341,7 +3149,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testDefineFunctionIntWithInput()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
-    clearVisitor();
 
     String x = "(define-fun bla ((x Int)) Int (- 3 x))\n" + "(assert (= bla bla))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -3360,7 +3167,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireRationals();
     assume().that(solverToUse()).isNotEqualTo(Solvers.OPENSMT);
-    clearVisitor();
 
     String x = "(define-fun bla () Real (- 3 4.0))\n" + "(assert (= bla bla))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -3379,7 +3185,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireRationals();
     assume().that(solverToUse()).isNotEqualTo(Solvers.OPENSMT);
-    clearVisitor();
 
     String x = "(define-fun bla ((x Real)) Real (- 3 x))\n" + "(assert (= bla bla))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -3397,7 +3202,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testDefineFunctionBitVec()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x =
         "(define-fun bla () (_ BitVec 5) (bvsub #b10000 #b00001))\n" + "(assert (= bla bla))\n";
@@ -3416,7 +3220,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testDefineFunctionBitVecWithInput()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String x =
         "(define-fun bla ((x (_ BitVec 5))) (_ BitVec 5) (bvsub #b10000 x))\n"
@@ -3437,8 +3240,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
     requireArrays();
-
-    clearVisitor();
 
     String x =
         "(declare-const a (Array Int Int))\n"
@@ -3464,7 +3265,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     assume()
         .that(solverToUse())
         .isNoneOf(Solvers.OPENSMT, Solvers.CVC4, Solvers.SMTINTERPOL, Solvers.YICES2);
-    clearVisitor();
 
     String s =
         "(declare-const x Int)\n"
@@ -3487,7 +3287,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testBinaryNumber()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String s = "(declare-const x (_ BitVec 3))\n" + "(assert (= x #b110))";
     BooleanFormula actualResult = mgr.universalParseFromString(s);
@@ -3503,7 +3302,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testHexNumber()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
 
     String s = "(declare-const x (_ BitVec 12))\n" + "(assert (= x #x110))";
     BooleanFormula actualResult = mgr.universalParseFromString(s);
@@ -3538,7 +3336,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test
   public void testModelBool()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    clearVisitor();
     clearGenerator();
     assume().that(solverToUse()).isEqualTo(Solvers.PRINCESS);
     String a =
@@ -3589,7 +3386,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testModelBitvector()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
-    clearVisitor();
     clearGenerator();
     assume().that(solverToUse()).isEqualTo(Solvers.PRINCESS);
     String a =
@@ -3642,7 +3438,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     requireIntegers();
     requireArrays();
     requireArrayModel();
-    clearVisitor();
     clearGenerator();
     assume().that(solverToUse()).isEqualTo(Solvers.PRINCESS);
     String a =
@@ -3699,7 +3494,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireArrays();
     requireBitvectors();
-    clearVisitor();
     clearGenerator();
     assume().that(solverToUse()).isEqualTo(Solvers.PRINCESS);
     String a =
@@ -3780,7 +3574,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireArrays();
     requireArrayModel();
-    clearVisitor();
     clearGenerator();
     assume().that(solverToUse()).isEqualTo(Solvers.PRINCESS);
     String a =
@@ -3837,7 +3630,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireArrays();
     requireArrayModel();
-    clearVisitor();
     clearGenerator();
     assume().that(solverToUse()).isEqualTo(Solvers.PRINCESS);
     String a =

@@ -71,16 +71,16 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
    * saves all created Formulas that are not part of a let statement as ParserFormula objects with
    * their variable name or value as key
    */
-  public static final HashMap<String, ParserFormula> variables = new HashMap<>();
+  private final HashMap<String, ParserFormula> variables = new HashMap<>();
 
   /**
    * saves all created Formulas that are part of a let statement as ParserFormula objects with their
    * variable name or value as key
    */
-  public static final HashMap<String, ParserFormula> letVariables = new HashMap<>();
+  private final HashMap<String, ParserFormula> letVariables = new HashMap<>();
 
   /** saves each 'assert' statement interpreted as a BooleanFormula object as an entry */
-  public static final List<BooleanFormula> constraints = new ArrayList<>();
+  private final List<BooleanFormula> constraints = new ArrayList<>();
 
   private final FormulaManager fmgr;
   private final BooleanFormulaManager bmgr;
