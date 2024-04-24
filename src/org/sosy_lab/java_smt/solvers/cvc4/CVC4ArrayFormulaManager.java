@@ -8,15 +8,17 @@
 
 package org.sosy_lab.java_smt.solvers.cvc4;
 
+import edu.stanford.CVC4.ArrayStoreAll;
+import edu.stanford.CVC4.ArrayType;
 import edu.stanford.CVC4.Expr;
 import edu.stanford.CVC4.ExprManager;
 import edu.stanford.CVC4.Kind;
 import edu.stanford.CVC4.Type;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
 
+@SuppressWarnings("MethodTypeParameterName")
 public class CVC4ArrayFormulaManager
     extends AbstractArrayFormulaManager<Expr, Type, ExprManager, Expr> {
 
@@ -41,10 +43,15 @@ public class CVC4ArrayFormulaManager
   @SuppressWarnings("MethodTypeParameterName")
   protected <TI extends Formula, TE extends Formula> Expr internalMakeArray(
       String pName, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
-    final ArrayFormulaType<TI, TE> arrayFormulaType =
-        FormulaType.getArrayType(pIndexType, pElementType);
-    final Type cvc4ArrayType = toSolverType(arrayFormulaType);
+    final Type cvc4ArrayType = toSolverType(FormulaType.getArrayType(pIndexType, pElementType));
     return getFormulaCreator().makeVariable(cvc4ArrayType, pName);
+  }
+
+  @Override
+  protected <TI extends Formula, TE extends Formula> Expr internalMakeArray(
+      FormulaType<TI> pIndexType, FormulaType<TE> pElementType, Expr elseElem) {
+    final Type cvc4ArrayType = toSolverType(FormulaType.getArrayType(pIndexType, pElementType));
+    return exprManager.mkConst(new ArrayStoreAll((ArrayType) cvc4ArrayType, elseElem));
   }
 
   @Override

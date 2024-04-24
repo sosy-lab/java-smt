@@ -41,7 +41,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
 
   protected final Z3FormulaCreator creator;
   protected final long z3context;
-  private final Z3FormulaManager mgr;
+  protected final Z3FormulaManager mgr;
 
   private final UniqueIdGenerator trackId = new UniqueIdGenerator();
   @Nullable private final Deque<PersistentMap<String, BooleanFormula>> storedConstraints;

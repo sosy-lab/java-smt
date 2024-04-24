@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -16,6 +16,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.primitives.Ints;
+import edu.stanford.CVC4.ArrayStoreAll;
 import edu.stanford.CVC4.ArrayType;
 import edu.stanford.CVC4.BitVectorType;
 import edu.stanford.CVC4.Expr;
@@ -317,13 +318,24 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
         return visitor.visitConstant(
             formula, new BigInteger(f.getConstBitVector().getValue().toString(10)));
       } else if (type.isFloatingPoint()) {
-        // TODO is this correct?
-        return visitor.visitConstant(formula, f.getConstFloatingPoint());
+        return visitor.visitConstant(formula, convertFloatingPoint(f));
       } else if (type.isRoundingMode()) {
         // TODO is this correct?
         return visitor.visitConstant(formula, f.getConstRoundingMode());
       } else if (type.isString()) {
         return visitor.visitConstant(formula, f.getConstString());
+      } else if (type.isArray()) {
+        ArrayStoreAll storeAll = f.getConstArrayStoreAll();
+        Expr constant = storeAll.getExpr();
+        return visitor.visitFunction(
+            formula,
+            ImmutableList.of(encapsulate(constant)),
+            FunctionDeclarationImpl.of(
+                getName(f),
+                getDeclarationKind(f),
+                ImmutableList.of(getFormulaTypeFromTermType(constant.getType())),
+                getFormulaType(f),
+                f.getKind()));
       } else {
         throw new UnsupportedOperationException("Unhandled constant " + f + " with type " + type);
       }
@@ -441,11 +453,11 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           .put(Kind.BITVECTOR_SDIV, FunctionDeclarationKind.BV_SDIV)
           .put(Kind.BITVECTOR_UDIV, FunctionDeclarationKind.BV_UDIV)
           .put(Kind.BITVECTOR_SREM, FunctionDeclarationKind.BV_SREM)
+          .put(Kind.BITVECTOR_UREM, FunctionDeclarationKind.BV_UREM)
+          .put(Kind.BITVECTOR_SMOD, FunctionDeclarationKind.BV_SMOD)
           .put(Kind.BITVECTOR_SHL, FunctionDeclarationKind.BV_SHL)
           .put(Kind.BITVECTOR_ASHR, FunctionDeclarationKind.BV_ASHR)
           .put(Kind.BITVECTOR_LSHR, FunctionDeclarationKind.BV_LSHR)
-          // TODO: find out where Kind.BITVECTOR_SMOD fits in here
-          .put(Kind.BITVECTOR_UREM, FunctionDeclarationKind.BV_UREM)
           .put(Kind.BITVECTOR_NOT, FunctionDeclarationKind.BV_NOT)
           .put(Kind.BITVECTOR_NEG, FunctionDeclarationKind.BV_NEG)
           .put(Kind.BITVECTOR_EXTRACT, FunctionDeclarationKind.BV_EXTRACT)
@@ -507,6 +519,9 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           .put(Kind.REGEXP_INTER, FunctionDeclarationKind.RE_INTERSECT)
           .put(Kind.REGEXP_COMPLEMENT, FunctionDeclarationKind.RE_COMPLEMENT)
           .put(Kind.REGEXP_DIFF, FunctionDeclarationKind.RE_DIFFERENCE)
+          .put(Kind.SELECT, FunctionDeclarationKind.SELECT)
+          .put(Kind.STORE, FunctionDeclarationKind.STORE)
+          .put(Kind.STORE_ALL, FunctionDeclarationKind.CONST)
           .buildOrThrow();
 
   private FunctionDeclarationKind getDeclarationKind(Expr f) {

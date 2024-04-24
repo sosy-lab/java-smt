@@ -52,7 +52,14 @@ public abstract class FloatingPointNumber {
   public static FloatingPointNumber of(String bits, int exponentSize, int mantissaSize) {
     Preconditions.checkArgument(0 < exponentSize);
     Preconditions.checkArgument(0 < mantissaSize);
-    Preconditions.checkArgument(bits.length() == 1 + exponentSize + mantissaSize);
+    Preconditions.checkArgument(
+        bits.length() == 1 + exponentSize + mantissaSize,
+        "Bitsize (%s) of floating point numeral does not match the size of sign, exponent and "
+            + "mantissa (%s + %s + %s).",
+        bits.length(),
+        1,
+        exponentSize,
+        mantissaSize);
     Preconditions.checkArgument(bits.chars().allMatch(c -> c == '0' || c == '1'));
     boolean sign = bits.charAt(0) == '1';
     BigInteger exponent = new BigInteger(bits.substring(1, 1 + exponentSize), 2);

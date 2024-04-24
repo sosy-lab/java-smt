@@ -16,6 +16,11 @@ RUN apt-get update \
         openjdk-11-jdk ant maven \
         mingw-w64 zlib1g-dev m4
 
+# Yices2 requires some dependencies
+RUN apt-get update \
+ && apt-get install -y \
+        autoconf gperf
+
 # CVC5 requires some dependencies
 RUN apt-get update \
  && apt-get install -y \

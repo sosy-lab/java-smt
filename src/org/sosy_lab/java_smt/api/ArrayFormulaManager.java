@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -48,18 +48,43 @@ public interface ArrayFormulaManager {
    *
    * @param pIndexType The type of the array index
    * @param pElementType The type of the array elements
-   * @return Formula that represents the array
    */
   <TI extends Formula, TE extends Formula, FTI extends FormulaType<TI>, FTE extends FormulaType<TE>>
       ArrayFormula<TI, TE> makeArray(String pName, FTI pIndexType, FTE pElementType);
 
   /**
-   * Declare a new array.
+   * Declare a new array with exactly the given name.
    *
-   * @param pName The name of the array variable
+   * <p>Please make sure that the given name is valid in SMT-LIB2. Take a look at {@link
+   * FormulaManager#isValidName} for further information.
+   *
+   * <p>This method does not quote or unquote the given name, but uses the plain name "AS IS".
+   * {@link Formula#toString} can return a different String than the given one.
+   *
+   * @param type The type of the array, consisting of index type and element type
    */
-  <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> makeArray(
-      String pName, ArrayFormulaType<TI, TE> type);
+  default <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> makeArray(
+      String pName, ArrayFormulaType<TI, TE> type) {
+    return makeArray(pName, type.getIndexType(), type.getElementType());
+  }
+
+  /**
+   * Create a new array constant with values initialized to elseElem.
+   *
+   * @param elseElem The default value of all entries in the array.
+   */
+  <TI extends Formula, TE extends Formula, FTI extends FormulaType<TI>, FTE extends FormulaType<TE>>
+      ArrayFormula<TI, TE> makeArray(FTI pIndexType, FTE pElementType, TE elseElem);
+
+  /**
+   * Create a new array constant with values initialized to elseElem.
+   *
+   * @param elseElem The default value of all entries in the array.
+   */
+  default <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> makeArray(
+      ArrayFormulaType<TI, TE> type, TE elseElem) {
+    return makeArray(type.getIndexType(), type.getElementType(), elseElem);
+  }
 
   /** Make a {@link BooleanFormula} that represents the equality of two {@link ArrayFormula}. */
   <TI extends Formula, TE extends Formula> BooleanFormula equivalence(
