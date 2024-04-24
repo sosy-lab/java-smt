@@ -74,6 +74,20 @@ public class DebuggingArrayFormulaManager implements ArrayFormulaManager {
   }
 
   @Override
+  public <
+          TI extends Formula,
+          TE extends Formula,
+          FTI extends FormulaType<TI>,
+          FTE extends FormulaType<TE>>
+      ArrayFormula<TI, TE> makeArray(FTI pIndexType, FTE pElementType, TE elseElem) {
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(elseElem);
+    ArrayFormula<TI, TE> result = delegate.makeArray(pIndexType, pElementType, elseElem);
+    debugging.addFormulaTerm(result);
+    return result;
+  }
+
+  @Override
   public <TI extends Formula, TE extends Formula> BooleanFormula equivalence(
       ArrayFormula<TI, TE> pArray1, ArrayFormula<TI, TE> pArray2) {
     debugging.assertThreadLocal();

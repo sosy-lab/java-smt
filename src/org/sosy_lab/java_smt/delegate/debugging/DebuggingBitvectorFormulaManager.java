@@ -125,12 +125,22 @@ public class DebuggingBitvectorFormulaManager implements BitvectorFormulaManager
   }
 
   @Override
-  public BitvectorFormula modulo(
+  public BitvectorFormula smodulo(BitvectorFormula numerator, BitvectorFormula denumerator) {
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(numerator);
+    debugging.assertFormulaInContext(denumerator);
+    BitvectorFormula result = delegate.smodulo(numerator, denumerator);
+    debugging.addFormulaTerm(result);
+    return result;
+  }
+
+  @Override
+  public BitvectorFormula remainder(
       BitvectorFormula numerator, BitvectorFormula denumerator, boolean signed) {
     debugging.assertThreadLocal();
     debugging.assertFormulaInContext(numerator);
     debugging.assertFormulaInContext(denumerator);
-    BitvectorFormula result = delegate.modulo(numerator, denumerator, signed);
+    BitvectorFormula result = delegate.remainder(numerator, denumerator, signed);
     debugging.addFormulaTerm(result);
     return result;
   }
@@ -256,6 +266,44 @@ public class DebuggingBitvectorFormulaManager implements BitvectorFormulaManager
     debugging.assertFormulaInContext(number);
     debugging.assertFormulaInContext(toShift);
     BitvectorFormula result = delegate.shiftLeft(number, toShift);
+    debugging.addFormulaTerm(result);
+    return result;
+  }
+
+  @Override
+  public BitvectorFormula rotateLeft(BitvectorFormula number, int toRotate) {
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(number);
+    BitvectorFormula result = delegate.rotateLeft(number, toRotate);
+    debugging.addFormulaTerm(result);
+    return result;
+  }
+
+  @Override
+  public BitvectorFormula rotateLeft(BitvectorFormula number, BitvectorFormula toRotate) {
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(number);
+    debugging.assertFormulaInContext(toRotate);
+    BitvectorFormula result = delegate.rotateLeft(number, toRotate);
+    debugging.addFormulaTerm(result);
+    return result;
+  }
+
+  @Override
+  public BitvectorFormula rotateRight(BitvectorFormula number, int toRotate) {
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(number);
+    BitvectorFormula result = delegate.rotateRight(number, toRotate);
+    debugging.addFormulaTerm(result);
+    return result;
+  }
+
+  @Override
+  public BitvectorFormula rotateRight(BitvectorFormula number, BitvectorFormula toRotate) {
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(number);
+    debugging.assertFormulaInContext(toRotate);
+    BitvectorFormula result = delegate.rotateRight(number, toRotate);
     debugging.addFormulaTerm(result);
     return result;
   }

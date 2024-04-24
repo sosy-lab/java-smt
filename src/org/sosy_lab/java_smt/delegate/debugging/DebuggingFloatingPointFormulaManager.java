@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.delegate.debugging;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -93,6 +94,15 @@ public class DebuggingFloatingPointFormulaManager implements FloatingPointFormul
       Rational n, FloatingPointType type, FloatingPointRoundingMode pFloatingPointRoundingMode) {
     debugging.assertThreadLocal();
     FloatingPointFormula result = delegate.makeNumber(n, type, pFloatingPointRoundingMode);
+    debugging.addFormulaTerm(result);
+    return result;
+  }
+
+  @Override
+  public FloatingPointFormula makeNumber(
+      BigInteger exponent, BigInteger mantissa, boolean signBit, FloatingPointType type) {
+    debugging.assertThreadLocal();
+    FloatingPointFormula result = delegate.makeNumber(exponent, mantissa, signBit, type);
     debugging.addFormulaTerm(result);
     return result;
   }
@@ -350,6 +360,17 @@ public class DebuggingFloatingPointFormulaManager implements FloatingPointFormul
     debugging.assertFormulaInContext(number1);
     debugging.assertFormulaInContext(number2);
     FloatingPointFormula result = delegate.multiply(number1, number2, pFloatingPointRoundingMode);
+    debugging.addFormulaTerm(result);
+    return result;
+  }
+
+  @Override
+  public FloatingPointFormula remainder(
+      FloatingPointFormula dividend, FloatingPointFormula divisor) {
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(dividend);
+    debugging.assertFormulaInContext(divisor);
+    FloatingPointFormula result = delegate.remainder(dividend, divisor);
     debugging.addFormulaTerm(result);
     return result;
   }
