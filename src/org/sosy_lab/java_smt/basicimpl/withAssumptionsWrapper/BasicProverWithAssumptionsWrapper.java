@@ -118,6 +118,11 @@ public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironme
   }
 
   @Override
+  public String toString() {
+    return delegate.toString();
+  }
+
+  @Override
   public <R> R allSat(AllSatCallback<R> pCallback, List<BooleanFormula> pImportant)
       throws InterruptedException, SolverException {
     clearAssumptions();

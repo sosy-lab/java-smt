@@ -139,24 +139,17 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, Solver, Term
 
   @Override
   public <T extends Formula> T substitute(
-      final T pF, final Map<? extends Formula, ? extends Formula> pFromToMapping) {
-    Term termThatGetsSubst = extractInfo(pF);
-    Term[] toBeSubstituted = new Term[pFromToMapping.size()];
-    Term[] substitutes = new Term[pFromToMapping.size()];
-    int i = 0;
-    for (Map.Entry<? extends Formula, ? extends Formula> e : pFromToMapping.entrySet()) {
-      toBeSubstituted[i] = extractInfo(e.getKey());
-      substitutes[i] = extractInfo(e.getValue());
-      i++;
+      final T f, final Map<? extends Formula, ? extends Formula> fromToMapping) {
+    Term[] changeFrom = new Term[fromToMapping.size()];
+    Term[] changeTo = new Term[fromToMapping.size()];
+    int idx = 0;
+    for (Map.Entry<? extends Formula, ? extends Formula> e : fromToMapping.entrySet()) {
+      changeFrom[idx] = extractInfo(e.getKey());
+      changeTo[idx] = extractInfo(e.getValue());
+      idx++;
     }
-    // CVC5 stops after the first term is replaced, rerun until nothing changes
-    boolean matches = false;
-    while (!matches) {
-      Term newTerm = termThatGetsSubst.substitute(toBeSubstituted, substitutes);
-      matches = termThatGetsSubst.equals(newTerm);
-      termThatGetsSubst = newTerm;
-    }
-    FormulaType<T> type = getFormulaType(pF);
-    return getFormulaCreator().encapsulate(type, termThatGetsSubst);
+    Term input = extractInfo(f);
+    FormulaType<T> type = getFormulaType(f);
+    return getFormulaCreator().encapsulate(type, input.substitute(changeFrom, changeTo));
   }
 }

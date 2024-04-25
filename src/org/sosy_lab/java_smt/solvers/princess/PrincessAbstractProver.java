@@ -15,11 +15,11 @@ import static scala.collection.JavaConverters.asScala;
 import ap.api.PartialModel;
 import ap.api.SimpleAPI;
 import ap.api.SimpleAPI.SimpleAPIException;
-import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.IFunction;
 import ap.parser.ITerm;
 import com.google.common.base.Preconditions;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,6 +28,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.common.UniqueIdGenerator;
+import org.sosy_lab.common.collect.PathCopyingPersistentTreeMap;
+import org.sosy_lab.common.collect.PersistentMap;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
@@ -37,12 +40,15 @@ import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import scala.Enumeration.Value;
 
 @SuppressWarnings("ClassTypeParameterName")
-abstract class PrincessAbstractProver<E, AF> extends AbstractProverWithAllSat<E> {
+abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
 
   protected final SimpleAPI api;
   protected final PrincessFormulaManager mgr;
-  protected final Deque<List<AF>> assertedFormulas = new ArrayDeque<>(); // all terms on all levels
-  private final Deque<Level> trackingStack = new ArrayDeque<>(); // symbols on all levels
+  protected final Deque<Level> trackingStack = new ArrayDeque<>(); // symbols on all levels
+
+  // assign a unique partition number for eah added constraint, for unsat-core and interpolation.
+  protected final UniqueIdGenerator idGenerator = new UniqueIdGenerator();
+  protected final Deque<PersistentMap<Integer, BooleanFormula>> partitions = new ArrayDeque<>();
 
   private final PrincessFormulaCreator creator;
   protected boolean wasLastSatCheckSat = false; // and stack is not changed
@@ -58,8 +64,8 @@ abstract class PrincessAbstractProver<E, AF> extends AbstractProverWithAllSat<E>
     this.creator = creator;
     this.api = checkNotNull(pApi);
 
-    assertedFormulas.push(new ArrayList<>());
-    trackingStack.push(new Level(0));
+    trackingStack.push(new Level());
+    partitions.push(PathCopyingPersistentTreeMap.of());
   }
 
   /**
@@ -84,40 +90,32 @@ abstract class PrincessAbstractProver<E, AF> extends AbstractProverWithAllSat<E>
     }
   }
 
-  protected void addConstraint0(IFormula t) {
+  @CanIgnoreReturnValue
+  protected int addConstraint0(BooleanFormula constraint) {
     Preconditions.checkState(!closed);
     wasLastSatCheckSat = false;
+
+    final int formulaId = idGenerator.getFreshId();
+    partitions.push(partitions.pop().putAndCopy(formulaId, constraint));
+    api.setPartitionNumber(formulaId);
+
+    final IFormula t = (IFormula) mgr.extractInfo(constraint);
     api.addAssertion(api.abbrevSharedExpressions(t, creator.getEnv().getMinAtomsForAbbreviation()));
-  }
 
-  protected int addAssertedFormula(AF f) {
-    assertedFormulas.peek().add(f);
-    final int id = trackingStack.peek().constraintNum++;
-    return id;
+    return formulaId;
   }
 
   @Override
-  public final void push() {
-    Preconditions.checkState(!closed);
+  protected final void pushImpl() {
     wasLastSatCheckSat = false;
-    assertedFormulas.push(new ArrayList<>());
     api.push();
-
-    final int oldConstraintNum;
-    if (trackingStack.isEmpty()) {
-      oldConstraintNum = 0;
-    } else {
-      oldConstraintNum = trackingStack.peek().constraintNum;
-    }
-    trackingStack.push(new Level(oldConstraintNum));
+    trackingStack.push(new Level());
+    partitions.push(partitions.peek());
   }
 
   @Override
-  public void pop() {
-    Preconditions.checkState(!closed);
-    Preconditions.checkState(size() > 0);
+  protected void popImpl() {
     wasLastSatCheckSat = false;
-    assertedFormulas.pop();
     api.pop();
 
     // we have to recreate symbols on lower levels, because JavaSMT assumes "global" symbols.
@@ -128,12 +126,7 @@ abstract class PrincessAbstractProver<E, AF> extends AbstractProverWithAllSat<E>
     if (!trackingStack.isEmpty()) {
       trackingStack.peek().mergeWithHigher(level);
     }
-  }
-
-  @Override
-  public int size() {
-    Preconditions.checkState(!closed);
-    return assertedFormulas.size() - 1;
+    partitions.pop();
   }
 
   @SuppressWarnings("resource")
@@ -177,18 +170,11 @@ abstract class PrincessAbstractProver<E, AF> extends AbstractProverWithAllSat<E>
     checkGenerateUnsatCores();
     final List<BooleanFormula> result = new ArrayList<>();
     final Set<Object> core = asJava(api.getUnsatCore());
-
-    int cnt = 0;
-    for (IExpression formula : getAssertedFormulas()) {
-      if (core.contains(cnt)) {
-        result.add(mgr.encapsulateBooleanFormula(formula));
-      }
-      ++cnt;
+    for (Object partitionId : core) {
+      result.add(partitions.peek().get(partitionId));
     }
     return result;
   }
-
-  protected abstract Iterable<IExpression> getAssertedFormulas();
 
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
@@ -205,8 +191,9 @@ abstract class PrincessAbstractProver<E, AF> extends AbstractProverWithAllSat<E>
       api.shutDown();
       api.reset(); // cleanup memory, even if we keep a reference to "api" and "mgr"
       creator.getEnv().unregisterStack(this);
+      partitions.clear();
     }
-    closed = true;
+    super.close();
   }
 
   @Override
@@ -244,17 +231,12 @@ abstract class PrincessAbstractProver<E, AF> extends AbstractProverWithAllSat<E>
     }
   }
 
-  private static class Level {
+  static class Level {
     final List<IFormula> booleanSymbols = new ArrayList<>();
     final List<ITerm> intSymbols = new ArrayList<>();
     final List<IFunction> functionSymbols = new ArrayList<>();
-    // the number of constraints asserted up to this point, this is needed
-    // for unsat core computation
-    int constraintNum;
 
-    Level(int constraintNum) {
-      this.constraintNum = constraintNum;
-    }
+    Level() {}
 
     /** add higher level to current level, we keep the order of creating symbols. */
     void mergeWithHigher(Level other) {

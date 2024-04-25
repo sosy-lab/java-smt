@@ -134,11 +134,18 @@ public class ModelEvaluationTest extends SolverBasedTest0.ParameterizedSolverBas
   @Test
   public void testGetBooleansEvaluation() throws SolverException, InterruptedException {
     requireNonNumeralVariables();
+    final boolean defaultValue;
+    if (solverToUse() == Solvers.OPENSMT) {
+      defaultValue = true; // Default value for boolean in OpenSMT is 'true'.
+    } else {
+      defaultValue = DEFAULT_MODEL_BOOLEAN;
+    }
+
     evaluateInModel(
         bmgr.makeVariable("x"),
         bmgr.makeVariable("y"),
-        Lists.newArrayList(null, DEFAULT_MODEL_BOOLEAN),
-        Lists.newArrayList(null, bmgr.makeBoolean(DEFAULT_MODEL_BOOLEAN)));
+        Lists.newArrayList(null, defaultValue),
+        Lists.newArrayList(null, bmgr.makeBoolean(defaultValue)));
   }
 
   @Test
@@ -170,7 +177,6 @@ public class ModelEvaluationTest extends SolverBasedTest0.ParameterizedSolverBas
     requireNonNumeralVariables();
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(bmgr.and(getConstraints()));
-
       for (int i = 0; i < problemSize; i++) {
         assertThat(prover).isSatisfiable();
         try (Evaluator m = prover.getEvaluator()) {

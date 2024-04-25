@@ -18,7 +18,6 @@ import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.CVC4;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.CVC5;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.MATHSAT5;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.PRINCESS;
-import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.Z3;
 import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE;
 import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
@@ -86,6 +85,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
   @Test
   public void unsatCoreTestForInterpolation() throws SolverException, InterruptedException {
+    requireUnsatCore();
     requireInterpolation();
     try (BasicProverEnvironment<?> pe =
         context.newProverEnvironmentWithInterpolation(GENERATE_UNSAT_CORE)) {
@@ -95,11 +95,8 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
   @Test
   public void unsatCoreTestForOptimizationProver() throws SolverException, InterruptedException {
+    requireUnsatCore();
     requireOptimization();
-
-    // Z3 and Boolector do not implement unsat core for optimization
-    assume().that(solverToUse()).isNoneOf(Z3, BOOLECTOR);
-
     try (BasicProverEnvironment<?> pe =
         context.newOptimizationProverEnvironment(GENERATE_UNSAT_CORE)) {
       unsatCoreTest0(pe);
@@ -122,11 +119,12 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
   @Test
   public void unsatCoreWithAssumptionsNullTest() {
+    requireUnsatCore();
     assume()
         .withMessage(
             "Solver %s does not support unsat core generation over assumptions", solverToUse())
         .that(solverToUse())
-        .isNoneOf(PRINCESS, BOOLECTOR, CVC4, CVC5);
+        .isNoneOf(PRINCESS, CVC4, CVC5);
 
     try (ProverEnvironment pe =
         context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
@@ -136,12 +134,13 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
   @Test
   public void unsatCoreWithAssumptionsTest() throws SolverException, InterruptedException {
+    requireUnsatCore();
+    requireNonNumeralVariables();
     assume()
         .withMessage(
             "Solver %s does not support unsat core generation over assumptions", solverToUse())
         .that(solverToUse())
-        .isNoneOf(PRINCESS, BOOLECTOR, CVC4, CVC5, APRON);
-    requireNonNumeralVariables();
+        .isNoneOf(PRINCESS, CVC4, CVC5, APRON);
     try (ProverEnvironment pe =
         context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       pe.push();
@@ -153,6 +152,43 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(res).isPresent();
       List<BooleanFormula> unsatCore = res.orElseThrow();
       assertThat(unsatCore).containsExactly(bmgr.not(selector));
+    }
+  }
+
+  @Test
+  public void testSatWithUnsatUnsatCoreOptions() throws InterruptedException, SolverException {
+    requireUnsatCore();
+    try (ProverEnvironment prover = context.newProverEnvironment(GENERATE_UNSAT_CORE)) {
+      checkSimpleQuery(prover);
+    }
+
+    requireUnsatCoreOverAssumptions();
+    try (ProverEnvironment prover =
+        context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
+      checkSimpleQuery(prover);
+    }
+
+    try (ProverEnvironment prover =
+        context.newProverEnvironment(GENERATE_UNSAT_CORE, GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
+      checkSimpleQuery(prover);
+    }
+  }
+
+  private void checkSimpleQuery(ProverEnvironment pProver)
+      throws InterruptedException, SolverException {
+    BooleanFormula constraint = bmgr.implication(bmgr.makeVariable("a"), bmgr.makeVariable("b"));
+
+    {
+      pProver.push(constraint);
+      assertThat(pProver.isUnsat()).isFalse();
+      pProver.pop();
+    }
+
+    {
+      pProver.push();
+      pProver.addConstraint(constraint); // Z3 crashed here
+      assertThat(pProver.isUnsat()).isFalse();
+      pProver.pop();
     }
   }
 }

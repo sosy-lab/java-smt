@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.test;
 
+import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.getLast;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
@@ -18,6 +19,7 @@ import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multiset;
 import com.google.common.truth.TruthJUnit;
+import java.util.List;
 import java.util.function.Supplier;
 import org.junit.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -414,13 +416,23 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     assertWithMessage("duplicate function declarations").that(funDeclares).isEmpty();
   }
 
-  private void checkThatAssertIsInLastLine(String lines) {
+  private void checkThatAssertIsInLastLine(String dump) {
     // Boolector will fail this anyway since bools are bitvecs for btor
     TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
-    lines = lines.trim();
-    assertWithMessage("last line of <\n" + lines + ">")
-        .that(getLast(Splitter.on('\n').split(lines)))
+
+    List<String> lines = Splitter.on('\n').splitToList(dump.trim());
+    String lineUnderTest = getLast(lines);
+
+    if (solver == Solvers.OPENSMT) {
+      // OpenSMT prints assertions over several lines, so lets find the last SMT-LIB command by
+      // heuristic: the last line starting with a plain bracket.
+      lineUnderTest = getLast(filter(lines, line -> line.startsWith("(")));
+    }
+
+    assertWithMessage("last line(s) of <\n" + dump + ">")
+        .that(lineUnderTest)
         .startsWith("(assert ");
+    assertWithMessage("last line(s) of <\n" + dump + ">").that(getLast(lines)).endsWith(")");
   }
 
   @SuppressWarnings("CheckReturnValue")

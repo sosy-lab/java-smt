@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
+import static com.google.common.base.Preconditions.checkState;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5FormulaManager.getMsatTerm;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_OPTIMUM;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_assert_formula;
@@ -19,8 +20,6 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_number;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_objective_value_is_unbounded;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_objective_value_term;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_pop_backtrack_point;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_push_backtrack_point;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_repr;
 
 import java.util.ArrayDeque;
@@ -71,13 +70,14 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
 
   @Override
   @Nullable
-  public Void addConstraint(BooleanFormula constraint) {
+  protected Void addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
     msat_assert_formula(curEnv, getMsatTerm(constraint));
     return null;
   }
 
   @Override
   public int maximize(Formula objective) {
+    checkState(!closed);
     long objectiveId = msat_make_maximize(curEnv, getMsatTerm(objective));
     msat_assert_objective(curEnv, objectiveId);
     int id = idGenerator.getFreshId(); // mapping needed to avoid long-int-conversion
@@ -87,6 +87,7 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
 
   @Override
   public int minimize(Formula objective) {
+    checkState(!closed);
     long objectiveId = msat_make_minimize(curEnv, getMsatTerm(objective));
     msat_assert_objective(curEnv, objectiveId);
     int id = idGenerator.getFreshId(); // mapping needed to avoid long-int-conversion
@@ -96,6 +97,7 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
 
   @Override
   public OptStatus check() throws InterruptedException, SolverException {
+    checkState(!closed);
     final boolean isSatisfiable = msat_check_sat(curEnv);
     if (isSatisfiable) {
       return OptStatus.OPT;
@@ -105,24 +107,26 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
   }
 
   @Override
-  public void push() {
-    msat_push_backtrack_point(curEnv);
+  protected void pushImpl() throws InterruptedException {
+    super.pushImpl();
     stack.add(objectiveMap);
   }
 
   @Override
-  public void pop() {
-    msat_pop_backtrack_point(curEnv);
+  protected void popImpl() {
     objectiveMap = stack.pop();
+    super.popImpl();
   }
 
   @Override
   public Optional<Rational> upper(int handle, Rational epsilon) {
+    checkState(!closed);
     return getValue(handle, epsilon);
   }
 
   @Override
   public Optional<Rational> lower(int handle, Rational epsilon) {
+    checkState(!closed);
     return getValue(handle, epsilon);
   }
 
@@ -142,6 +146,7 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
 
   @Override
   public Model getModel() throws SolverException {
+    checkState(!closed);
     if (!objectiveMap.isEmpty()) {
       msat_load_objective_model(curEnv, objectiveMap.values().iterator().next());
     }

@@ -126,6 +126,28 @@ public class CVC5BitvectorFormulaManager
   }
 
   @Override
+  protected Term rotateLeftByConstant(Term pNumber, int pToRotate) {
+    try {
+      Op op = solver.mkOp(Kind.BITVECTOR_ROTATE_LEFT, pToRotate);
+      return solver.mkTerm(op, pNumber);
+    } catch (CVC5ApiException e) {
+      throw new IllegalArgumentException(
+          String.format("You tried rotation a bitvector %s with shift %d", pNumber, pToRotate), e);
+    }
+  }
+
+  @Override
+  protected Term rotateRightByConstant(Term pNumber, int pToRotate) {
+    try {
+      Op op = solver.mkOp(Kind.BITVECTOR_ROTATE_RIGHT, pToRotate);
+      return solver.mkTerm(op, pNumber);
+    } catch (CVC5ApiException e) {
+      throw new IllegalArgumentException(
+          String.format("You tried rotation a bitvector %s with shift %d", pNumber, pToRotate), e);
+    }
+  }
+
+  @Override
   protected Term not(Term pParam1) {
     return solver.mkTerm(Kind.BITVECTOR_NOT, pParam1);
   }
@@ -170,12 +192,17 @@ public class CVC5BitvectorFormulaManager
   }
 
   @Override
-  protected Term modulo(Term pParam1, Term pParam2, boolean signed) {
+  protected Term remainder(Term pParam1, Term pParam2, boolean signed) {
     if (signed) {
       return solver.mkTerm(Kind.BITVECTOR_SREM, pParam1, pParam2);
     } else {
       return solver.mkTerm(Kind.BITVECTOR_UREM, pParam1, pParam2);
     }
+  }
+
+  @Override
+  protected Term smodulo(Term pParam1, Term pParam2) {
+    return solver.mkTerm(Kind.BITVECTOR_SMOD, pParam1, pParam2);
   }
 
   @Override

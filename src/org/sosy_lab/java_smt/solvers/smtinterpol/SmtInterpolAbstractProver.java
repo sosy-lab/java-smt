@@ -9,8 +9,12 @@
 package org.sosy_lab.java_smt.solvers.smtinterpol;
 
 import static com.google.common.base.Preconditions.checkState;
+import static org.sosy_lab.common.collect.Collections3.transformedImmutableSetCopy;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableMap;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import de.uni_freiburg.informatik.ultimate.logic.Annotation;
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
 import de.uni_freiburg.informatik.ultimate.logic.Model;
@@ -21,10 +25,9 @@ import de.uni_freiburg.informatik.ultimate.logic.Script.LBool;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -32,6 +35,8 @@ import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.collect.Collections3;
+import org.sosy_lab.common.collect.PathCopyingPersistentTreeMap;
+import org.sosy_lab.common.collect.PersistentMap;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
@@ -41,14 +46,12 @@ import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 @SuppressWarnings("ClassTypeParameterName")
-abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
+abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
 
-  protected boolean closed = false;
   protected final Script env;
   protected final FormulaCreator<Term, Sort, Script, FunctionSymbol> creator;
   protected final SmtInterpolFormulaManager mgr;
-  protected final Deque<List<AF>> assertedFormulas = new ArrayDeque<>();
-  protected final Map<String, Term> annotatedTerms = new HashMap<>(); // Collection of termNames
+  protected final Deque<PersistentMap<String, BooleanFormula>> annotatedTerms = new ArrayDeque<>();
   protected final ShutdownNotifier shutdownNotifier;
 
   private static final String PREFIX = "term_"; // for termnames
@@ -65,7 +68,7 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
     creator = pMgr.getFormulaCreator();
     env = pEnv;
     shutdownNotifier = pShutdownNotifier;
-    assertedFormulas.push(new ArrayList<>());
+    annotatedTerms.add(PathCopyingPersistentTreeMap.of());
   }
 
   protected boolean isClosed() {
@@ -73,23 +76,29 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
   }
 
   @Override
-  public int size() {
-    checkState(!closed);
-    return assertedFormulas.size() - 1;
-  }
-
-  @Override
-  public void push() {
-    checkState(!closed);
-    assertedFormulas.push(new ArrayList<>());
+  protected void pushImpl() {
+    annotatedTerms.add(annotatedTerms.peek());
     env.push(1);
   }
 
   @Override
-  public void pop() {
-    checkState(!closed);
-    assertedFormulas.pop();
+  protected void popImpl() {
     env.pop(1);
+    annotatedTerms.pop();
+  }
+
+  @CanIgnoreReturnValue
+  protected String addConstraint0(BooleanFormula constraint) {
+    Preconditions.checkState(!closed);
+
+    // create a term-name, used for unsat-core or interpolation, otherwise there is no overhead.
+    String termName = generateTermName();
+    Term t = mgr.extractInfo(constraint);
+    Term annotatedTerm = env.annotate(t, new Annotation(":named", termName));
+    annotatedTerms.push(annotatedTerms.pop().putAndCopy(termName, constraint));
+
+    env.assertTerm(annotatedTerm);
+    return termName;
   }
 
   @Override
@@ -129,8 +138,6 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
     }
   }
 
-  protected abstract Collection<Term> getAssertedTerms();
-
   @SuppressWarnings("resource")
   @Override
   public org.sosy_lab.java_smt.api.Model getModel() {
@@ -147,7 +154,12 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
         throw e;
       }
     }
-    return new CachingModel(new SmtInterpolModel(this, model, creator, getAssertedTerms()));
+    return new CachingModel(
+        new SmtInterpolModel(
+            this,
+            model,
+            creator,
+            transformedImmutableSetCopy(getAssertedFormulas(), mgr::extractInfo)));
   }
 
   protected static String generateTermName() {
@@ -158,18 +170,23 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
   public List<BooleanFormula> getUnsatCore() {
     checkState(!closed);
     checkGenerateUnsatCores();
-    return getUnsatCore0();
+    return getUnsatCore0(annotatedTerms.peek());
   }
 
   /**
    * small helper method, because we guarantee that {@link
    * ProverOptions#GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS} is independent of {@link
    * ProverOptions#GENERATE_UNSAT_CORE}.
+   *
+   * @param annotatedConstraints from where to extract the constraints for the unsat-core. Note that
+   *     further constraints can also contribute to unsatisfiability.
    */
-  private List<BooleanFormula> getUnsatCore0() {
-    return Collections3.transformedImmutableListCopy(
-        env.getUnsatCore(),
-        input -> creator.encapsulateBoolean(annotatedTerms.get(input.toString())));
+  private List<BooleanFormula> getUnsatCore0(Map<String, BooleanFormula> annotatedConstraints) {
+    return FluentIterable.from(env.getUnsatCore())
+        .transform(Term::toString)
+        .filter(annotatedConstraints::containsKey) // filter for constraints under test.
+        .transform(annotatedConstraints::get)
+        .toList();
   }
 
   @Override
@@ -177,20 +194,14 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
       Collection<BooleanFormula> assumptions) throws InterruptedException {
     checkState(!closed);
     checkGenerateUnsatCoresOverAssumptions();
+    Map<String, BooleanFormula> annotatedConstraints = new LinkedHashMap<>();
     push();
-    checkState(
-        annotatedTerms.isEmpty(),
-        "Empty environment required for UNSAT core over assumptions: %s",
-        annotatedTerms);
     for (BooleanFormula assumption : assumptions) {
-      String termName = generateTermName();
-      Term t = mgr.extractInfo(assumption);
-      Term annotated = env.annotate(t, new Annotation(":named", termName));
-      annotatedTerms.put(termName, t);
-      env.assertTerm(annotated);
+      String name = addConstraint0(assumption);
+      annotatedConstraints.put(name, assumption);
     }
     Optional<List<BooleanFormula>> result =
-        isUnsat() ? Optional.of(getUnsatCore0()) : Optional.empty();
+        isUnsat() ? Optional.of(getUnsatCore0(annotatedConstraints)) : Optional.empty();
     pop();
     return result;
   }
@@ -205,11 +216,10 @@ abstract class SmtInterpolAbstractProver<T, AF> extends AbstractProver<T> {
   @Override
   public void close() {
     if (!closed) {
-      assertedFormulas.clear();
       annotatedTerms.clear();
-      env.pop(assertedFormulas.size());
-      closed = true;
+      env.pop(size());
     }
+    super.close();
   }
 
   @Override

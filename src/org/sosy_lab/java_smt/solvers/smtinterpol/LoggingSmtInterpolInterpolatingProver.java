@@ -60,20 +60,18 @@ class LoggingSmtInterpolInterpolatingProver extends SmtInterpolInterpolatingProv
   }
 
   @Override
-  public void push() {
+  protected void pushImpl() {
     out.println("(push 1)");
-    super.push();
   }
 
   @Override
-  public void pop() {
+  protected void popImpl() {
     out.println("(pop 1)");
-    super.pop();
   }
 
   @Override
-  public String addConstraint(BooleanFormula f) {
-    String result = super.addConstraint(f);
+  protected String addConstraintImpl(BooleanFormula f) throws InterruptedException {
+    String result = super.addConstraintImpl(f);
     out.println("(assert (! " + f + " :named " + result + "))");
     return result;
   }

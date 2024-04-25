@@ -9,7 +9,6 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
@@ -28,7 +27,6 @@ import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
@@ -203,7 +201,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
       BitvectorFormula denumerator,
       boolean signed,
       BitvectorFormula expectedResult) {
-    return bvmgr.equal(bvmgr.modulo(numerator, denumerator, signed), expectedResult);
+    return bvmgr.equal(bvmgr.remainder(numerator, denumerator, signed), expectedResult);
   }
 
   private void assertOperation(
@@ -299,6 +297,11 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
             IllegalArgumentException.class,
             () -> assertThatFormula(buildDivision(num10, num0, num10)).isSatisfiable());
         break;
+      case OPENSMT: // INFO: OpenSMT does not allow division by zero
+        assertThrows(
+            UnsupportedOperationException.class,
+            () -> assertThatFormula(buildDivision(num10, num0, num10)).isSatisfiable());
+        break;
       default:
         // division-by-zero results in an arbitrary result
         assertDivision(false, num0, num0, num0);
@@ -319,6 +322,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
             IllegalArgumentException.class,
             () -> assertThatFormula(buildModulo(num10, num0, num10)).isSatisfiable());
         break;
+      case OPENSMT: // INFO
       case MATHSAT5: // modulo not supported
         assertThrows(UnsupportedOperationException.class, () -> buildModulo(num10, num0, num10));
         break;
@@ -359,6 +363,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
     BooleanFormula aEqNeg10 = imgr.equal(a, numNeg10);
 
     switch (solverToUse()) {
+      case OPENSMT: // INFO: OpenSmt does not allow nonlinear terms
       case SMTINTERPOL:
       case YICES2:
         assertThrows(UnsupportedOperationException.class, () -> buildDivision(a, b, num5));
@@ -378,6 +383,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
 
     // TODO negative case is disabled, because we would need the option
     // solver.solver.useNonLinearIntegerArithmetic=true.
+
   }
 
   @Test
@@ -597,36 +603,6 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void test_BitvectorIsZeroAfterShiftLeft() throws SolverException, InterruptedException {
-    requireBitvectors();
-
-    BitvectorFormula one = bvmgr.makeBitvector(32, 1);
-
-    // unsigned char
-    BitvectorFormula a = bvmgr.makeVariable(8, "char_a");
-    BitvectorFormula b = bvmgr.makeVariable(8, "char_b");
-    BitvectorFormula rightOp = bvmgr.makeBitvector(32, 7);
-
-    // 'cast' a to unsigned int
-    a = bvmgr.extend(a, 32 - 8, false);
-    b = bvmgr.extend(b, 32 - 8, false);
-    a = bvmgr.or(a, one);
-    b = bvmgr.or(b, one);
-    a = bvmgr.extract(a, 7, 0);
-    b = bvmgr.extract(b, 7, 0);
-    a = bvmgr.extend(a, 32 - 8, false);
-    b = bvmgr.extend(b, 32 - 8, false);
-
-    a = bvmgr.shiftLeft(a, rightOp);
-    b = bvmgr.shiftLeft(b, rightOp);
-    a = bvmgr.extract(a, 7, 0);
-    b = bvmgr.extract(b, 7, 0);
-    BooleanFormula f = bmgr.not(bvmgr.equal(a, b));
-
-    assertThatFormula(f).isUnsatisfiable();
-  }
-
-  @Test
   public void testUfWithBoolType() throws SolverException, InterruptedException {
     requireIntegers();
     requireUninterpretedFunctions();
@@ -756,6 +732,10 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
         break;
       case PRINCESS:
         assertThat(_b_at_i_plus_1.toString()).isEqualTo("select(b, (i + 1))");
+        break;
+      case OPENSMT:
+        // INFO: OpenSmt changes the order of the terms in the sum
+        assertThat(_b_at_i_plus_1.toString()).isEqualTo("(select b (+ 1 i))");
         break;
       default:
         assertThat(_b_at_i_plus_1.toString())
@@ -1108,94 +1088,23 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
     assertThatFormula(f).isSatisfiable();
   }
 
-  @Test
-  public void bvInRange() throws SolverException, InterruptedException {
-    requireBitvectors();
-
-    assertThatFormula(
-            bvmgr.equal(
-                bvmgr.add(bvmgr.makeBitvector(4, 15), bvmgr.makeBitvector(4, -8)),
-                bvmgr.makeBitvector(4, 7)))
-        .isTautological();
-  }
-
-  @Test
-  @SuppressWarnings("CheckReturnValue")
-  public void bvOutOfRange() {
-    requireBitvectors();
-
-    for (int[] sizeAndValue : new int[][] {{4, 32}, {4, -9}, {8, 300}, {8, -160}}) {
-      try {
-        bvmgr.makeBitvector(sizeAndValue[0], sizeAndValue[1]);
-        assert_().fail();
-      } catch (IllegalArgumentException expected) {
-      }
-    }
-
-    for (int size : new int[] {4, 6, 8, 10, 16, 32}) {
-      // allowed values
-      bvmgr.makeBitvector(size, (1L << size) - 1);
-      bvmgr.makeBitvector(size, -(1L << (size - 1)));
-
-      // forbitten values
-      try {
-        bvmgr.makeBitvector(size, 1L << size);
-        assert_().fail();
-      } catch (IllegalArgumentException expected) {
-      }
-      try {
-        bvmgr.makeBitvector(size, -(1L << (size - 1)) - 1);
-        assert_().fail();
-      } catch (IllegalArgumentException expected) {
-      }
-    }
-
-    for (int size : new int[] {36, 40, 64, 65, 100, 128, 200, 250, 1000, 10000}) {
-      if (size > 64) {
-        assume()
-            .withMessage("Solver does not support large bitvectors")
-            .that(solverToUse())
-            .isNotEqualTo(Solvers.CVC4);
-      }
-
-      // allowed values
-      bvmgr.makeBitvector(size, BigInteger.ONE.shiftLeft(size).subtract(BigInteger.ONE));
-      bvmgr.makeBitvector(size, BigInteger.ONE.shiftLeft(size - 1).negate());
-
-      // forbitten values
-      try {
-        bvmgr.makeBitvector(size, BigInteger.ONE.shiftLeft(size));
-        assert_().fail();
-      } catch (IllegalArgumentException expected) {
-      }
-      try {
-        bvmgr.makeBitvector(
-            size, BigInteger.ONE.shiftLeft(size - 1).negate().subtract(BigInteger.ONE));
-        assert_().fail();
-      } catch (IllegalArgumentException expected) {
-      }
-    }
-  }
-
-  @Test
-  @SuppressWarnings("CheckReturnValue")
-  public void bvITETest() {
-    requireBitvectors();
-    BitvectorType bv8 = FormulaType.getBitvectorTypeWithSize(8);
-    BitvectorFormula x = bvmgr.makeVariable(bv8, "x");
-    bmgr.ifThenElse(bmgr.makeBoolean(true), x, x);
-  }
-
   private static final ImmutableSet<Solvers> VAR_TRACKING_SOLVERS =
       ImmutableSet.of(
           Solvers.SMTINTERPOL,
           Solvers.MATHSAT5,
           Solvers.CVC4,
+          Solvers.CVC5,
           Solvers.BOOLECTOR,
           Solvers.YICES2,
-          Solvers.CVC5);
+          Solvers.OPENSMT);
+
   private static final ImmutableSet<Solvers> VAR_AND_UF_TRACKING_SOLVERS =
-      ImmutableSet.of(Solvers.SMTINTERPOL, Solvers.MATHSAT5, Solvers.BOOLECTOR, Solvers.YICES2);
+      ImmutableSet.of(
+          Solvers.SMTINTERPOL,
+          Solvers.MATHSAT5,
+          Solvers.BOOLECTOR,
+          Solvers.YICES2,
+          Solvers.OPENSMT);
 
   @Test
   @SuppressWarnings("CheckReturnValue")

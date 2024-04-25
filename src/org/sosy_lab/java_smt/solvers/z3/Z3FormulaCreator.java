@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.solvers.z3;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -23,11 +24,9 @@ import com.microsoft.z3.enumerations.Z3_decl_kind;
 import com.microsoft.z3.enumerations.Z3_sort_kind;
 import com.microsoft.z3.enumerations.Z3_symbol_kind;
 import java.lang.ref.PhantomReference;
-import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,10 +43,12 @@ import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.EnumerationFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
+import org.sosy_lab.java_smt.api.FloatingPointNumber;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.RegexFormula;
@@ -74,11 +75,6 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       ImmutableMap.<Integer, Object>builder()
           .put(Z3_decl_kind.Z3_OP_TRUE.toInt(), true)
           .put(Z3_decl_kind.Z3_OP_FALSE.toInt(), false)
-          .put(Z3_decl_kind.Z3_OP_FPA_PLUS_ZERO.toInt(), +0.0)
-          .put(Z3_decl_kind.Z3_OP_FPA_MINUS_ZERO.toInt(), -0.0)
-          .put(Z3_decl_kind.Z3_OP_FPA_PLUS_INF.toInt(), Double.POSITIVE_INFINITY)
-          .put(Z3_decl_kind.Z3_OP_FPA_MINUS_INF.toInt(), Double.NEGATIVE_INFINITY)
-          .put(Z3_decl_kind.Z3_OP_FPA_NAN.toInt(), Double.NaN)
           .put(
               Z3_decl_kind.Z3_OP_FPA_RM_NEAREST_TIES_TO_EVEN.toInt(),
               FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN)
@@ -93,6 +89,14 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
               FloatingPointRoundingMode.TOWARD_NEGATIVE)
           .put(Z3_decl_kind.Z3_OP_FPA_RM_TOWARD_ZERO.toInt(), FloatingPointRoundingMode.TOWARD_ZERO)
           .buildOrThrow();
+
+  private static final ImmutableSet<Integer> Z3_FP_CONSTANTS =
+      ImmutableSet.of(
+          Z3_decl_kind.Z3_OP_FPA_PLUS_ZERO.toInt(),
+          Z3_decl_kind.Z3_OP_FPA_MINUS_ZERO.toInt(),
+          Z3_decl_kind.Z3_OP_FPA_PLUS_INF.toInt(),
+          Z3_decl_kind.Z3_OP_FPA_MINUS_INF.toInt(),
+          Z3_decl_kind.Z3_OP_FPA_NAN.toInt());
 
   // Set of error messages that might occur if Z3 is interrupted.
   private static final ImmutableSet<String> Z3_INTERRUPT_ERRORS =
@@ -120,8 +124,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   /** Automatic clean-up of Z3 ASTs. */
   private final ReferenceQueue<Z3Formula> referenceQueue = new ReferenceQueue<>();
 
-  private final IdentityHashMap<PhantomReference<? extends Z3Formula>, Long> referenceMap =
-      new IdentityHashMap<>();
+  private final Z3AstReference referenceListHead;
 
   // todo: getters for statistic.
   private final Timer cleanupTimer = new Timer();
@@ -141,6 +144,17 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     super(pEnv, pBoolType, pIntegerType, pRealType, pStringType, pRegexType);
     shutdownNotifier = pShutdownNotifier;
     config.inject(this);
+
+    if (usePhantomReferences) {
+      // Setup sentinel nodes for doubly-linked phantom reference list.
+      Z3AstReference head = new Z3AstReference();
+      Z3AstReference tail = new Z3AstReference();
+      head.next = tail;
+      tail.prev = head;
+      referenceListHead = head;
+    } else {
+      referenceListHead = null;
+    }
   }
 
   final Z3Exception handleZ3Exception(Z3Exception e) throws Z3Exception, InterruptedException {
@@ -257,14 +271,6 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     cleanupReferences();
     return storePhantomReference(
         new Z3ArrayFormula<>(getEnv(), pTerm, pIndexType, pElementType), pTerm);
-  }
-
-  private <T extends Z3Formula> T storePhantomReference(T out, Long pTerm) {
-    if (usePhantomReferences) {
-      PhantomReference<T> ref = new PhantomReference<>(out, referenceQueue);
-      referenceMap.put(ref, pTerm);
-    }
-    return out;
   }
 
   @SuppressWarnings("unchecked")
@@ -386,16 +392,53 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     return fpSort;
   }
 
+  private static final class Z3AstReference extends PhantomReference<Z3Formula> {
+    private final long z3Ast;
+    private @Nullable Z3AstReference prev;
+    private @Nullable Z3AstReference next;
+
+    // To generate dummy head and tail nodes
+    private Z3AstReference() {
+      this(null, null, 0);
+    }
+
+    private Z3AstReference(Z3Formula referent, ReferenceQueue<? super Z3Formula> q, long z3Ast) {
+      super(referent, q);
+      this.z3Ast = z3Ast;
+    }
+
+    private void insert(Z3AstReference ref) {
+      assert next != null;
+      ref.prev = this;
+      ref.next = this.next;
+      ref.next.prev = ref;
+      this.next = ref;
+    }
+
+    private void cleanup(long environment) {
+      Native.decRef(environment, z3Ast);
+      assert (prev != null && next != null);
+      prev.next = next;
+      next.prev = prev;
+    }
+  }
+
+  private <T extends Z3Formula> T storePhantomReference(T out, long pTerm) {
+    if (usePhantomReferences) {
+      referenceListHead.insert(new Z3AstReference(out, referenceQueue, pTerm));
+    }
+    return out;
+  }
+
   private void cleanupReferences() {
     if (!usePhantomReferences) {
       return;
     }
     cleanupTimer.start();
     try {
-      Reference<? extends Z3Formula> ref;
-      while ((ref = referenceQueue.poll()) != null) {
-        long z3ast = referenceMap.remove(ref);
-        Native.decRef(environment, z3ast);
+      Z3AstReference ref;
+      while ((ref = (Z3AstReference) referenceQueue.poll()) != null) {
+        ref.cleanup(environment);
       }
     } finally {
       cleanupTimer.stop();
@@ -423,6 +466,9 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
           if (value != null) {
             return visitor.visitConstant(formula, value);
 
+          } else if (Z3_FP_CONSTANTS.contains(declKind)) {
+            return visitor.visitConstant(formula, convertValue(f));
+
             // Rounding mode
           } else if (declKind == Z3_decl_kind.Z3_OP_FPA_NUM.toInt()
               || Native.getSortKind(environment, Native.getSort(environment, f))
@@ -444,6 +490,18 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
           } else if (declKind == Z3_decl_kind.Z3_OP_DT_CONSTRUCTOR.toInt()) {
             return visitor.visitConstant(formula, convertValue(f));
           } // else: fall-through with a function application
+
+        } else if (arity == 3) {
+
+          // FP from BV
+          if (declKind == Z3_decl_kind.Z3_OP_FPA_FP.toInt()) {
+            final var signBv = Native.getAppArg(environment, f, 0);
+            final var expoBv = Native.getAppArg(environment, f, 1);
+            final var mantBv = Native.getAppArg(environment, f, 2);
+            if (isConstant(signBv) && isConstant(expoBv) && isConstant(mantBv)) {
+              return visitor.visitConstant(formula, convertValue(f));
+            }
+          }
         }
 
         // Function application with zero or more parameters
@@ -571,6 +629,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.STORE;
       case Z3_OP_SELECT:
         return FunctionDeclarationKind.SELECT;
+      case Z3_OP_CONST_ARRAY:
+        return FunctionDeclarationKind.CONST;
 
       case Z3_OP_TRUE:
       case Z3_OP_FALSE:
@@ -630,6 +690,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.BV_UREM;
       case Z3_OP_BSREM:
         return FunctionDeclarationKind.BV_SREM;
+      case Z3_OP_BSMOD:
+        return FunctionDeclarationKind.BV_SMOD;
       case Z3_OP_BSHL:
         return FunctionDeclarationKind.BV_SHL;
       case Z3_OP_BLSHR:
@@ -690,10 +752,10 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       case Z3_OP_FPA_TO_IEEE_BV:
         return FunctionDeclarationKind.FP_AS_IEEEBV;
       case Z3_OP_FPA_TO_FP:
+        // use the last argument. other arguments can be part of rounding or casting.
+        long arg = Native.getAppArg(environment, f, Native.getAppNumArgs(environment, f) - 1);
         Z3_sort_kind sortKind =
-            Z3_sort_kind.fromInt(
-                Native.getSortKind(
-                    environment, Native.getSort(environment, Native.getAppArg(environment, f, 1))));
+            Z3_sort_kind.fromInt(Native.getSortKind(environment, Native.getSort(environment, arg)));
         if (Z3_sort_kind.Z3_BV_SORT == sortKind) {
           return FunctionDeclarationKind.BV_SCASTTO_FP;
         } else {
@@ -772,8 +834,10 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     return Native.isNumeralAst(environment, value)
         || Native.isAlgebraicNumber(environment, value)
         || Native.isString(environment, value)
-        || isOP(environment, value, Z3_decl_kind.Z3_OP_TRUE.toInt())
-        || isOP(environment, value, Z3_decl_kind.Z3_OP_FALSE.toInt());
+        || isOP(environment, value, Z3_decl_kind.Z3_OP_FPA_FP) // FP from IEEE-BV
+        || isOP(environment, value, Z3_decl_kind.Z3_OP_TRUE)
+        || isOP(environment, value, Z3_decl_kind.Z3_OP_FALSE)
+        || isOP(environment, value, Z3_decl_kind.Z3_OP_DT_CONSTRUCTOR); // enumeration value
   }
 
   /**
@@ -798,7 +862,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     try {
       FormulaType<?> type = getFormulaType(value);
       if (type.isBooleanType()) {
-        return isOP(environment, value, Z3_decl_kind.Z3_OP_TRUE.toInt());
+        return isOP(environment, value, Z3_decl_kind.Z3_OP_TRUE);
       } else if (type.isIntegerType()) {
         return new BigInteger(Native.getNumeralString(environment, value));
       } else if (type.isRationalType()) {
@@ -809,8 +873,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       } else if (type.isBitvectorType()) {
         return new BigInteger(Native.getNumeralString(environment, value));
       } else if (type.isFloatingPointType()) {
-        // Converting to Rational first.
-        return convertValue(Native.simplify(environment, Native.mkFpaToReal(environment, value)));
+        return convertFloatingPoint((FloatingPointType) type, value);
       } else if (type.isEnumerationType()) {
         return Native.astToString(environment, value);
       } else {
@@ -822,6 +885,65 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     } finally {
       Native.decRef(environment, value);
     }
+  }
+
+  private FloatingPointNumber convertFloatingPoint(FloatingPointType pType, Long pValue) {
+    if (isOP(environment, pValue, Z3_decl_kind.Z3_OP_FPA_FP)) {
+      final var signBv = Native.getAppArg(environment, pValue, 0);
+      final var expoBv = Native.getAppArg(environment, pValue, 1);
+      final var mantBv = Native.getAppArg(environment, pValue, 2);
+      assert isConstant(signBv) && isConstant(expoBv) && isConstant(mantBv);
+      final var sign = Native.getNumeralString(environment, signBv);
+      assert "0".equals(sign) || "1".equals(sign);
+      final var expo = new BigInteger(Native.getNumeralString(environment, expoBv));
+      final var mant = new BigInteger(Native.getNumeralString(environment, mantBv));
+      return FloatingPointNumber.of(
+          "1".equals(sign), expo, mant, pType.getExponentSize(), pType.getMantissaSize());
+
+    } else if (Native.fpaIsNumeralInf(environment, pValue)) {
+      // Floating Point Inf uses:
+      //  - an sign for posiive/negative infinity,
+      //  - "11..11" as exponent,
+      //  - "00..00" as mantissa.
+      String sign = getSign(pValue) ? "1" : "0";
+      return FloatingPointNumber.of(
+          sign + "1".repeat(pType.getExponentSize()) + "0".repeat(pType.getMantissaSize()),
+          pType.getExponentSize(),
+          pType.getMantissaSize());
+
+    } else if (Native.fpaIsNumeralNan(environment, pValue)) {
+      // TODO We are underspecified here and choose several bits on our own.
+      //  This is not sound, if we combine FP anf BV theory.
+      // Floating Point NaN uses:
+      //  - an unspecified sign (we choose "0"),
+      //  - "11..11" as exponent,
+      //  - an unspecified mantissa (we choose all "1").
+      return FloatingPointNumber.of(
+          "0" + "1".repeat(pType.getExponentSize()) + "1".repeat(pType.getMantissaSize()),
+          pType.getExponentSize(),
+          pType.getMantissaSize());
+
+    } else {
+      boolean sign = getSign(pValue);
+      var exponentBv = Native.fpaGetNumeralExponentBv(environment, pValue, true);
+      var exponent = Native.getNumeralString(environment, exponentBv);
+      var mantissaBv = Native.fpaGetNumeralSignificandBv(environment, pValue);
+      var mantissa = Native.getNumeralString(environment, mantissaBv);
+      return FloatingPointNumber.of(
+          sign,
+          new BigInteger(exponent),
+          new BigInteger(mantissa),
+          pType.getExponentSize(),
+          pType.getMantissaSize());
+    }
+  }
+
+  private boolean getSign(Long pValue) {
+    Native.IntPtr signPtr = new Native.IntPtr();
+    Preconditions.checkState(
+        Native.fpaGetNumeralSign(environment, pValue, signPtr), "Sign is not a Boolean value");
+    var sign = signPtr.value != 0;
+    return sign;
   }
 
   @Override
@@ -845,13 +967,13 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   }
 
   /** returns, if the function of the expression is the given operation. */
-  static boolean isOP(long z3context, long expr, int op) {
+  static boolean isOP(long z3context, long expr, Z3_decl_kind op) {
     if (!Native.isApp(z3context, expr)) {
       return false;
     }
 
     long decl = Native.getAppDecl(z3context, expr);
-    return Native.getDeclKind(z3context, decl) == op;
+    return Native.getDeclKind(z3context, decl) == op.toInt();
   }
 
   /**
@@ -925,13 +1047,27 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   }
 
   /** Closing the context. */
+  @SuppressWarnings("empty-statement")
   public void forceClose() {
-    cleanupReferences();
-
     // Force clean all ASTs, even those which were not GC'd yet.
-    // Is a no-op if phantom reference handling is not enabled.
-    for (long ast : referenceMap.values()) {
-      Native.decRef(getEnv(), ast);
+    if (usePhantomReferences) {
+      Z3AstReference cur = referenceListHead.next;
+      assert cur != null;
+      while (cur.next != null) {
+        Native.decRef(environment, cur.z3Ast);
+        cur = cur.next;
+      }
+      Z3AstReference tail = cur;
+      // Bulk delete everything between head and tail
+      referenceListHead.next = tail;
+      tail.prev = referenceListHead;
+
+      // Remove already enqueued references.
+      while (referenceQueue.poll() != null) {
+        // NOTE: Together with the above list deletion, this empty loop will guarantee that no more
+        // ast references are reachable by the GC making them all eligible for garbage collection
+        // and preventing them from getting enqueued into the reference queue in the future.
+      }
     }
   }
 

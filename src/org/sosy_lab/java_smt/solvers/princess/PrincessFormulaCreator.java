@@ -39,7 +39,7 @@ import ap.parser.ITimes;
 import ap.parser.IVariable;
 import ap.terfor.conjunctions.Quantifier;
 import ap.terfor.preds.Predicate;
-import ap.theories.ExtArray;
+import ap.theories.arrays.ExtArray;
 import ap.theories.bitvectors.ModuloArithmetic;
 import ap.theories.nia.GroebnerMultiplication$;
 import ap.types.Sort;
@@ -91,7 +91,7 @@ class PrincessFormulaCreator
     theoryFunctionKind.put(ModuloArithmetic.bv_sdiv(), FunctionDeclarationKind.BV_SDIV);
     theoryFunctionKind.put(ModuloArithmetic.bv_urem(), FunctionDeclarationKind.BV_UREM);
     theoryFunctionKind.put(ModuloArithmetic.bv_srem(), FunctionDeclarationKind.BV_SREM);
-    // modmod.bv_smod()?
+    theoryFunctionKind.put(ModuloArithmetic.bv_smod(), FunctionDeclarationKind.BV_SMOD);
     theoryFunctionKind.put(ModuloArithmetic.bv_shl(), FunctionDeclarationKind.BV_SHL);
     theoryFunctionKind.put(ModuloArithmetic.bv_lshr(), FunctionDeclarationKind.BV_LSHR);
     theoryFunctionKind.put(ModuloArithmetic.bv_ashr(), FunctionDeclarationKind.BV_ASHR);
@@ -394,6 +394,7 @@ class PrincessFormulaCreator
       case BV_UDIV:
       case BV_SREM:
       case BV_UREM:
+      case BV_SMOD:
       case BV_MUL:
       case BV_ULT:
       case BV_SLT:
@@ -426,6 +427,8 @@ class PrincessFormulaCreator
         return FunctionDeclarationKind.SELECT;
       } else if (ExtArray.Store$.MODULE$.unapply(fun).isDefined()) {
         return FunctionDeclarationKind.STORE;
+      } else if (ExtArray.Const$.MODULE$.unapply(fun).isDefined()) {
+        return FunctionDeclarationKind.CONST;
       } else if (fun == ModuloArithmetic.mod_cast()) {
         return FunctionDeclarationKind.OTHER;
       } else if (fun == ModuloArithmetic.int_cast()) {

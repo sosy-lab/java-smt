@@ -53,12 +53,17 @@ class PrincessBitvectorFormulaManager
   }
 
   @Override
-  protected IExpression modulo(IExpression pParam1, IExpression pParam2, boolean signed) {
+  protected IExpression remainder(IExpression pParam1, IExpression pParam2, boolean signed) {
     if (signed) {
       return ModuloArithmetic$.MODULE$.bvsrem((ITerm) pParam1, (ITerm) pParam2);
     } else {
       return ModuloArithmetic$.MODULE$.bvurem((ITerm) pParam1, (ITerm) pParam2);
     }
+  }
+
+  @Override
+  protected IExpression smodulo(IExpression pParam1, IExpression pParam2) {
+    return ModuloArithmetic$.MODULE$.bvsmod((ITerm) pParam1, (ITerm) pParam2);
   }
 
   @Override

@@ -9,10 +9,8 @@
 package org.sosy_lab.java_smt.solvers.boolector;
 
 import com.google.common.base.Preconditions;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
+import com.google.common.collect.Collections2;
 import java.util.Collection;
-import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -28,8 +26,6 @@ import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import org.sosy_lab.java_smt.solvers.boolector.BtorJNI.TerminationCallback;
 
 abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
-  // BoolectorAbstractProver<E, AF> extends AbstractProverWithAllSat<E>
-  // AF = assertedFormulas; E = ?
 
   /** Boolector does not support multiple solver stacks. */
   private final AtomicBoolean isAnyStackAlive;
@@ -37,7 +33,6 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   private final long btor;
   private final BoolectorFormulaManager manager;
   private final BoolectorFormulaCreator creator;
-  protected final Deque<List<Long>> assertedFormulas = new ArrayDeque<>();
   protected boolean wasLastSatCheckSat = false; // and stack is not changed
   private final TerminationCallback terminationCallback;
   private final long terminationCallbackHelper;
@@ -64,7 +59,7 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
         "Boolector does not support the usage of multiple "
             + "solver stacks at the same time. Please close any existing solver stack.");
     // push an initial level, required for cleaning up later (see #close), for reusage of Boolector.
-    push();
+    BtorJNI.boolector_push(manager.getEnvironment(), 1);
   }
 
   @Override
@@ -73,14 +68,13 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
       // Free resources of callback
       BtorJNI.boolector_free_termination(terminationCallbackHelper);
       // remove the whole stack, including the initial level from the constructor call.
-      BtorJNI.boolector_pop(manager.getEnvironment(), assertedFormulas.size());
-      assertedFormulas.clear();
+      BtorJNI.boolector_pop(manager.getEnvironment(), size() + 1);
       // You can't use delete here because you wouldn't be able to access model
       // Wait till we have visitor/toList, after that we can delete here
       // BtorJNI.boolector_delete(btor);
-      closed = true;
       Preconditions.checkState(isAnyStackAlive.getAndSet(false));
     }
+    super.close();
   }
 
   /*
@@ -110,24 +104,13 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   @Override
-  public void pop() {
-    Preconditions.checkState(!closed);
-    Preconditions.checkState(size() > 0);
-    assertedFormulas.pop();
+  protected void popImpl() {
     BtorJNI.boolector_pop(manager.getEnvironment(), 1);
   }
 
   @Override
-  public void push() {
-    Preconditions.checkState(!closed);
-    assertedFormulas.push(new ArrayList<>());
+  protected void pushImpl() throws InterruptedException {
     BtorJNI.boolector_push(manager.getEnvironment(), 1);
-  }
-
-  @Override
-  public int size() {
-    Preconditions.checkState(!closed);
-    return assertedFormulas.size() - 1;
   }
 
   @Override
@@ -151,7 +134,8 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @Override
   protected BoolectorModel getEvaluatorWithoutChecks() {
-    return new BoolectorModel(btor, creator, this, getAssertedTerms());
+    return new BoolectorModel(
+        btor, creator, this, Collections2.transform(getAssertedFormulas(), creator::extractInfo));
   }
 
   @Override
@@ -168,17 +152,10 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @Override
   @Nullable
-  public T addConstraint(BooleanFormula constraint) {
+  protected T addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
     BtorJNI.boolector_assert(
         manager.getEnvironment(), BoolectorFormulaManager.getBtorTerm(constraint));
-    assertedFormulas.peek().add(BoolectorFormulaManager.getBtorTerm(constraint));
     return null;
-  }
-
-  protected Collection<Long> getAssertedTerms() {
-    List<Long> result = new ArrayList<>();
-    assertedFormulas.forEach(result::addAll);
-    return result;
   }
 
   /**

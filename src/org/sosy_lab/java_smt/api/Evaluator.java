@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2022 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -105,6 +105,13 @@ public interface Evaluator extends AutoCloseable {
    * <p>The formula does not need to be a variable, we also allow complex expression.
    */
   @Nullable String evaluate(EnumerationFormula formula);
+
+  /**
+   * Type-safe evaluation for floating-point formulas.
+   *
+   * <p>The formula does not need to be a variable, we also allow complex expression.
+   */
+  @Nullable FloatingPointNumber evaluate(FloatingPointFormula formula);
 
   /**
    * Free resources associated with this evaluator (existing {@link Formula} instances stay valid,

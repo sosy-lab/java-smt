@@ -141,7 +141,7 @@ public class TranslateFormulaTest {
   }
 
   @Test
-  public void testTranslatingForIContextdentity() throws SolverException, InterruptedException {
+  public void testTranslatingForIContextIdentity() throws SolverException, InterruptedException {
     requireOr();
     assume().that(translateTo).isEqualTo(translateFrom);
     FormulaManager manager = managerFrom;

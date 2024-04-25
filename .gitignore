@@ -20,6 +20,7 @@
 lib/native/source/libz3j/org_sosy_lab_solver_z3_Z3NativeApi.c
 lib/native/source/*/*.so
 lib/native/source/*/*.o
+lib/native/source/**/*.java
 lib/native/*/*.asc
 
 doc/Example-Maven-Project/target*
@@ -54,9 +55,8 @@ solvers_maven_conf/*.asc
 /Javadoc-z3
 /gh-pages
 
-.idea/workspace.xml
-.idea/uiDesigner.xml
-.idea
+.idea/
+
 /*.so
 /*.dll
 /*.jar

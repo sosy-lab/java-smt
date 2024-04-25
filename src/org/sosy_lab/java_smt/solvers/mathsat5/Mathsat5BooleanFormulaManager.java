@@ -66,6 +66,18 @@ class Mathsat5BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, 
 
   @Override
   public Long ifThenElse(Long cond, Long f1, Long f2) {
+    if (isTrue(cond)) {
+      return f1;
+    } else if (isFalse(cond)) {
+      return f2;
+    } else if (f1.equals(f2)) {
+      return f1;
+    } else if (isTrue(f1) && isFalse(f2)) {
+      return cond;
+    } else if (isFalse(f1) && isTrue(f2)) {
+      return not(cond);
+    }
+
     long t;
     long msatEnv = mathsatEnv;
     long f1Type = msat_term_get_type(f1);

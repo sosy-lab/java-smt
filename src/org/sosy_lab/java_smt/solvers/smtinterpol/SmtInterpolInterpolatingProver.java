@@ -8,11 +8,13 @@
 
 package org.sosy_lab.java_smt.solvers.smtinterpol;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import de.uni_freiburg.informatik.ultimate.logic.Annotation;
+import com.google.common.collect.Sets;
 import de.uni_freiburg.informatik.ultimate.logic.SMTLIBException;
 import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
@@ -26,7 +28,7 @@ import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
-class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String, String>
+class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String>
     implements InterpolatingProverEnvironment<String> {
 
   SmtInterpolInterpolatingProver(
@@ -38,46 +40,30 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String, S
   }
 
   @Override
-  public void pop() {
-    Preconditions.checkState(!closed);
-    for (String removed : assertedFormulas.peek()) {
-      annotatedTerms.remove(removed);
-    }
-    super.pop();
-  }
-
-  @Override
-  public String addConstraint(BooleanFormula f) {
-    Preconditions.checkState(!closed);
-    String termName = generateTermName();
-    Term t = mgr.extractInfo(f);
-    Term annotatedTerm = env.annotate(t, new Annotation(":named", termName));
-    env.assertTerm(annotatedTerm);
-    assertedFormulas.peek().add(termName);
-    annotatedTerms.put(termName, t);
-    return termName;
+  protected String addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
+    return super.addConstraint0(constraint);
   }
 
   @Override
   public BooleanFormula getInterpolant(Collection<String> pTermNamesOfA)
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
+    checkArgument(
+        getAssertedConstraintIds().containsAll(pTermNamesOfA),
+        "interpolation can only be done over previously asserted formulas.");
 
     // SMTInterpol is not able to handle the trivial cases,
     // so we need to check them explicitly
     if (pTermNamesOfA.isEmpty()) {
       return mgr.getBooleanFormulaManager().makeBoolean(true);
-    } else if (pTermNamesOfA.containsAll(annotatedTerms.keySet())) {
+    } else if (pTermNamesOfA.containsAll(annotatedTerms.peek().keySet())) {
       return mgr.getBooleanFormulaManager().makeBoolean(false);
     }
 
     Set<String> termNamesOfA = ImmutableSet.copyOf(pTermNamesOfA);
 
     // calc difference: termNamesOfB := assertedFormulas - termNamesOfA
-    Set<String> termNamesOfB =
-        annotatedTerms.keySet().stream()
-            .filter(n -> !termNamesOfA.contains(n))
-            .collect(ImmutableSet.toImmutableSet());
+    Set<String> termNamesOfB = Sets.difference(annotatedTerms.peek().keySet(), termNamesOfA);
 
     // build 2 groups:  (and A1 A2 A3...) , (and B1 B2 B3...)
     return Iterables.getOnlyElement(
@@ -89,6 +75,10 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String, S
       List<? extends Collection<String>> partitionedTermNames, int[] startOfSubTree)
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
+    final ImmutableSet<String> assertedConstraintIds = getAssertedConstraintIds();
+    checkArgument(
+        partitionedTermNames.stream().allMatch(assertedConstraintIds::containsAll),
+        "interpolation can only be done over previously asserted formulas.");
     assert InterpolatingProverEnvironment.checkTreeStructure(
         partitionedTermNames.size(), startOfSubTree);
 
@@ -131,10 +121,5 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String, S
       return env.term(Iterables.getOnlyElement(termNames));
     }
     return env.term("and", termNames.stream().map(env::term).toArray(Term[]::new));
-  }
-
-  @Override
-  protected Collection<Term> getAssertedTerms() {
-    return annotatedTerms.values();
   }
 }

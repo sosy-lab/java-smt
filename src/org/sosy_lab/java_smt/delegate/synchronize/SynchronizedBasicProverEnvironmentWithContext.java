@@ -129,6 +129,13 @@ class SynchronizedBasicProverEnvironmentWithContext<T> implements BasicProverEnv
   }
 
   @Override
+  public String toString() {
+    synchronized (sync) {
+      return delegate.toString();
+    }
+  }
+
+  @Override
   public <R> R allSat(AllSatCallback<R> pCallback, List<BooleanFormula> pImportant)
       throws InterruptedException, SolverException {
     AllSatCallback<R> callback = new AllSatCallbackWithContext<>(pCallback);

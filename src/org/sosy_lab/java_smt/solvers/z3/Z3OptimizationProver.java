@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2023 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -15,7 +15,6 @@ import com.microsoft.z3.Native.IntPtr;
 import com.microsoft.z3.Z3Exception;
 import com.microsoft.z3.enumerations.Z3_lbool;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
@@ -31,7 +30,7 @@ import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
-class Z3OptimizationProver extends Z3AbstractProver<Void> implements OptimizationProverEnvironment {
+class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProverEnvironment {
 
   private final LogManager logger;
   private final long z3optSolver;
@@ -43,10 +42,9 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
       Z3FormulaManager pMgr,
       Set<ProverOptions> pOptions,
       ImmutableMap<String, Object> pSolverOptions,
-      ImmutableMap<String, String> pOptimizationOptions,
       @Nullable PathCounterTemplate pLogfile,
       ShutdownNotifier pShutdownNotifier) {
-    super(creator, pMgr, pOptions, pSolverOptions, pLogfile, pShutdownNotifier);
+    super(creator, pMgr, pOptions, pLogfile, pShutdownNotifier);
     z3optSolver = Native.mkOptimize(z3context);
     Native.optimizeIncRef(z3context, z3optSolver);
     logger = pLogger;
@@ -54,20 +52,11 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
     // set parameters for the optimization solver
     long params = Native.mkParams(z3context);
     Native.paramsIncRef(z3context, params);
-    for (Entry<String, String> entry : pOptimizationOptions.entrySet()) {
+    for (Entry<String, Object> entry : pSolverOptions.entrySet()) {
       addParameter(params, entry.getKey(), entry.getValue());
     }
     Native.optimizeSetParams(z3context, z3optSolver, params);
     Native.paramsDecRef(z3context, params);
-  }
-
-  @Override
-  @Nullable
-  public Void addConstraint(BooleanFormula constraint) {
-    Preconditions.checkState(!closed);
-    long z3Constraint = creator.extractInfo(constraint);
-    Native.optimizeAssert(z3context, z3optSolver, z3Constraint);
-    return null;
   }
 
   @Override
@@ -112,21 +101,47 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
   }
 
   @Override
-  public void push() {
-    Preconditions.checkState(!closed);
-    Native.optimizePush(z3context, z3optSolver);
+  protected void pushImpl() throws InterruptedException {
+    push0();
+    try {
+      Native.optimizePush(z3context, z3optSolver);
+    } catch (Z3Exception exception) {
+      throw creator.handleZ3Exception(exception);
+    }
   }
 
   @Override
-  public void pop() {
-    Preconditions.checkState(!closed);
+  protected void popImpl() {
     Native.optimizePop(z3context, z3optSolver);
+    pop0();
+  }
+
+  @Override
+  protected void assertContraint(long constraint) {
+    Native.optimizeAssert(z3context, z3optSolver, constraint);
+  }
+
+  @Override
+  protected void assertContraintAndTrack(long constraint, long symbol) {
+    Native.optimizeAssertAndTrack(z3context, z3optSolver, constraint, symbol);
+  }
+
+  @Override
+  protected long getUnsatCore0() {
+    return Native.optimizeGetUnsatCore(z3context, z3optSolver);
   }
 
   @Override
   public boolean isUnsat() throws Z3SolverException, InterruptedException {
     Preconditions.checkState(!closed);
+    logSolverStack();
     return check() == OptStatus.UNSAT;
+  }
+
+  @Override
+  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
+      throws SolverException, InterruptedException {
+    return false;
   }
 
   @Override
@@ -187,37 +202,22 @@ class Z3OptimizationProver extends Z3AbstractProver<Void> implements Optimizatio
   }
 
   @Override
-  protected void assertContraint(long negatedModel) {
-    Native.optimizeAssert(z3context, z3optSolver, negatedModel);
+  protected long getStatistics0() {
+    return Native.optimizeGetStatistics(z3context, z3optSolver);
   }
 
-  @Override
-  public List<BooleanFormula> getUnsatCore() {
-    throw new UnsupportedOperationException(
-        "unsat core computation is not available for optimization prover environment.");
-  }
-
-  @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
-      Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException(
-        "unsat core computation is not available for optimization prover environment.");
-  }
-
-  @Override
-  public void close() {
-    Preconditions.checkState(!closed);
-    Native.optimizeDecRef(z3context, z3optSolver);
-    closed = true;
-  }
-
-  /**
-   * Dumps the optimized objectives and the constraints on the solver in the SMT-lib format.
-   * Super-useful!
-   */
+  /** Dumps the optimized objectives and the constraints on the solver in the SMT-lib format. */
   @Override
   public String toString() {
     Preconditions.checkState(!closed);
     return Native.optimizeToString(z3context, z3optSolver);
+  }
+
+  @Override
+  public void close() {
+    if (!closed) {
+      Native.optimizeDecRef(z3context, z3optSolver);
+    }
+    super.close();
   }
 }

@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.cvc4;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import edu.stanford.CVC4.Expr;
 import edu.stanford.CVC4.ExprManager;
@@ -16,10 +17,8 @@ import edu.stanford.CVC4.ExprManagerMapCollection;
 import edu.stanford.CVC4.Result;
 import edu.stanford.CVC4.SExpr;
 import edu.stanford.CVC4.SmtEngine;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -42,9 +41,6 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   private final CVC4FormulaCreator creator;
   SmtEngine smtEngine; // final except for SL theory
   private boolean changedSinceLastSatQuery = false;
-
-  /** Tracks formulas on the stack, needed for model generation. */
-  protected final Deque<List<Expr>> assertedFormulas = new ArrayDeque<>();
 
   /**
    * The local exprManager allows to set options per Prover (and not globally). See <a
@@ -72,7 +68,6 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     creator = pFormulaCreator;
     smtEngine = new SmtEngine(exprManager);
     incremental = !enableSL;
-    assertedFormulas.push(new ArrayList<>()); // create initial level
 
     setOptions(randomSeed, pOptions);
   }
@@ -112,38 +107,26 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   }
 
   @Override
-  public void push() {
-    Preconditions.checkState(!closed);
+  protected void pushImpl() throws InterruptedException {
     setChanged();
-    assertedFormulas.push(new ArrayList<>());
     if (incremental) {
       smtEngine.push();
     }
   }
 
   @Override
-  public void pop() {
-    Preconditions.checkState(!closed);
+  protected void popImpl() {
     setChanged();
-    assertedFormulas.pop();
-    Preconditions.checkState(!assertedFormulas.isEmpty(), "initial level must remain until close");
     if (incremental) {
       smtEngine.pop();
     }
   }
 
   @Override
-  public int size() {
-    Preconditions.checkState(!closed);
-    return assertedFormulas.size() - 1;
-  }
-
-  @Override
-  public @Nullable Void addConstraint(BooleanFormula pF) throws InterruptedException {
+  protected @Nullable Void addConstraintImpl(BooleanFormula pF) throws InterruptedException {
     Preconditions.checkState(!closed);
     setChanged();
     Expr exp = creator.extractInfo(pF);
-    assertedFormulas.peek().add(exp);
     if (incremental) {
       smtEngine.assertFormula(importExpr(exp));
     }
@@ -158,7 +141,12 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     checkGenerateModels();
     // special case for CVC4: Models are not permanent and need to be closed
     // before any change is applied to the prover stack. So, we register the Model as Evaluator.
-    return registerEvaluator(new CVC4Model(this, creator, smtEngine, getAssertedExpressions()));
+    return registerEvaluator(
+        new CVC4Model(
+            this,
+            creator,
+            smtEngine,
+            Collections2.transform(getAssertedFormulas(), creator::extractInfo)));
   }
 
   @Override
@@ -199,9 +187,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     closeAllEvaluators();
     changedSinceLastSatQuery = false;
     if (!incremental) {
-      for (Expr expr : getAssertedExpressions()) {
-        smtEngine.assertFormula(importExpr(expr));
-      }
+      getAssertedFormulas().forEach(f -> smtEngine.assertFormula(creator.extractInfo(f)));
     }
 
     Result result;
@@ -254,20 +240,12 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     throw new UnsupportedOperationException();
   }
 
-  protected Collection<Expr> getAssertedExpressions() {
-    List<Expr> result = new ArrayList<>();
-    assertedFormulas.forEach(result::addAll);
-    return result;
-  }
-
   @Override
   public void close() {
     if (!closed) {
-      assertedFormulas.clear();
       exportMapping.delete();
       // smtEngine.delete();
       exprManager.delete();
-      closed = true;
     }
     super.close();
   }

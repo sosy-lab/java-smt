@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2022 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -14,10 +14,13 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Table;
+import com.google.common.primitives.Ints;
 import io.github.cvc5.CVC5ApiException;
 import io.github.cvc5.Datatype;
 import io.github.cvc5.DatatypeConstructor;
@@ -27,8 +30,7 @@ import io.github.cvc5.Pair;
 import io.github.cvc5.Solver;
 import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
-import io.github.cvc5.Triplet;
-import java.math.BigDecimal;
+import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,6 +43,7 @@ import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.EnumerationFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
+import org.sosy_lab.java_smt.api.FloatingPointNumber;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
@@ -71,7 +74,9 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
   // private static final Pattern FLOATING_POINT_PATTERN = Pattern.compile("^\\(fp #b(?<sign>\\d)
   // #b(?<exp>\\d+) #b(?<mant>\\d+)$");
 
-  private final Map<String, Term> variablesCache = new HashMap<>();
+  // <Name, Sort.toString, Term> because CVC5 returns distinct pointers for types, while the
+  // String representation is equal (and they are equal)
+  private final Table<String, String, Term> variablesCache = HashBasedTable.create();
   private final Map<String, Term> functionsCache = new HashMap<>();
   private final Solver solver;
 
@@ -88,15 +93,32 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
 
   @Override
   public Term makeVariable(Sort sort, String name) {
-    checkSymbol(name);
-    Term exp = variablesCache.computeIfAbsent(name, n -> solver.mkConst(sort, name));
-    Preconditions.checkArgument(
-        sort.equals(exp.getSort()),
-        "symbol name %s with sort %s already in use for different sort %s",
-        name,
-        sort,
-        exp.getSort());
-    return exp;
+    Term existingVar = variablesCache.get(name, sort.toString());
+    if (existingVar != null) {
+      return existingVar;
+    }
+    if (variablesCache.containsRow(name)) {
+      throw new IllegalArgumentException(
+          "Symbol "
+              + name
+              + " requested with type "
+              + sort
+              + ", but "
+              + "already "
+              + "used "
+              + "with "
+              + "type "
+              + variablesCache
+                  .rowMap()
+                  .get(name)
+                  .entrySet()
+                  .toArray((java.util.Map.Entry[]) Array.newInstance(java.util.Map.Entry.class, 0))[
+                  0]
+                  .getKey());
+    }
+    Term newVar = solver.mkConst(sort, name);
+    variablesCache.put(name, sort.toString(), newVar);
+    return newVar;
   }
 
   /**
@@ -381,17 +403,28 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
         return visitor.visitConstant(formula, new BigInteger(f.getBitVectorValue(), 2));
 
       } else if (f.isFloatingPointValue()) {
-        // String is easier to parse here
-        return visitor.visitConstant(formula, f.toString());
+        return visitor.visitConstant(formula, convertFloatingPoint(f));
 
-      } else if (f.getKind() == Kind.CONST_ROUNDINGMODE) {
-        return visitor.visitConstant(formula, f.toString());
+      } else if (f.isRoundingModeValue()) {
+        return visitor.visitConstant(formula, f.getRoundingModeValue());
+
+      } else if (f.isConstArray()) {
+        Term constant = f.getConstArrayBase();
+        return visitor.visitFunction(
+            formula,
+            ImmutableList.of(encapsulate(constant)),
+            FunctionDeclarationImpl.of(
+                getName(f),
+                getDeclarationKind(f),
+                ImmutableList.of(getFormulaTypeFromTermType(constant.getSort())),
+                getFormulaType(f),
+                f.getKind()));
 
       } else if (f.getKind() == Kind.VARIABLE) {
         // BOUND vars are used for all vars that are bound to a quantifier in CVC5.
         // We resubstitute them back to the original free.
         // CVC5 doesn't give you the de-brujin index
-        Term originalVar = variablesCache.get(dequote(formula.toString()));
+        Term originalVar = accessVariablesCache(formula.toString(), sort);
         return visitor.visitBoundVariable(encapsulate(originalVar), 0);
 
       } else if (f.getKind() == Kind.FORALL || f.getKind() == Kind.EXISTS) {
@@ -401,7 +434,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
         List<Formula> freeVars = new ArrayList<>();
         for (Term boundVar : f.getChild(0)) { // unpack grand-children of f.
           String name = getName(boundVar);
-          Term freeVar = Preconditions.checkNotNull(variablesCache.get(name));
+          Term freeVar = Preconditions.checkNotNull(accessVariablesCache(name, boundVar.getSort()));
           body = body.substitute(boundVar, freeVar);
           freeVars.add(encapsulate(freeVar));
         }
@@ -535,8 +568,8 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
           .put(Kind.BITVECTOR_SDIV, FunctionDeclarationKind.BV_SDIV)
           .put(Kind.BITVECTOR_UDIV, FunctionDeclarationKind.BV_UDIV)
           .put(Kind.BITVECTOR_SREM, FunctionDeclarationKind.BV_SREM)
-          // TODO: find out where Kind.BITVECTOR_SMOD fits in here
           .put(Kind.BITVECTOR_UREM, FunctionDeclarationKind.BV_UREM)
+          .put(Kind.BITVECTOR_SMOD, FunctionDeclarationKind.BV_SMOD)
           .put(Kind.BITVECTOR_NOT, FunctionDeclarationKind.BV_NOT)
           .put(Kind.BITVECTOR_NEG, FunctionDeclarationKind.BV_NEG)
           .put(Kind.BITVECTOR_EXTRACT, FunctionDeclarationKind.BV_EXTRACT)
@@ -602,6 +635,9 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
           .put(Kind.REGEXP_INTER, FunctionDeclarationKind.RE_INTERSECT)
           .put(Kind.REGEXP_COMPLEMENT, FunctionDeclarationKind.RE_COMPLEMENT)
           .put(Kind.REGEXP_DIFF, FunctionDeclarationKind.RE_DIFFERENCE)
+          .put(Kind.SELECT, FunctionDeclarationKind.SELECT)
+          .put(Kind.STORE, FunctionDeclarationKind.STORE)
+          .put(Kind.CONST_ARRAY, FunctionDeclarationKind.CONST)
           .build();
 
   private FunctionDeclarationKind getDeclarationKind(Term f) {
@@ -779,38 +815,9 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
         String bitvectorValue = value.getBitVectorValue();
         return new BigInteger(bitvectorValue, 2);
 
-      } else if (value.isFloatingPointNaN()) {
-        return Float.NaN;
-
-      } else if (value.isFloatingPointNegInf()) {
-        return Float.NEGATIVE_INFINITY;
-
-      } else if (value.isFloatingPointPosInf()) {
-        return Float.POSITIVE_INFINITY;
-
-      } else if (value.isFloatingPointPosZero()) {
-        return BigDecimal.ZERO;
-
       } else if (value.isFloatingPointValue()) {
-        // Negative zero falls under this category
-        // String valueString =
-        // solver.getValue(solver.mkTerm(Kind.FLOATINGPOINT_TO_REAL, fpTerm)).toString();
-        // return new BigDecimal(valueString).stripTrailingZeros();
-        final Triplet<Long, Long, Term> fpValue = value.getFloatingPointValue();
-        final long expWidth = fpValue.first;
-        final long mantWidth = fpValue.second - 1; // CVC5 also counts the sign-bit in the mantissa
-        final Term bvValue = fpValue.third;
-        Preconditions.checkState(bvValue.isBitVectorValue());
-        BigInteger bits = new BigInteger(bvValue.getBitVectorValue(), 2);
+        return convertFloatingPoint(value);
 
-        if (expWidth == 11 && mantWidth == 52) { // standard IEEE double type with 64 bits
-          return Double.longBitsToDouble(bits.longValue());
-        } else if (expWidth == 8 && mantWidth == 23) { // standard IEEE float type with 32 bits
-          return Float.intBitsToFloat(bits.intValue());
-        } else {
-          // TODO to be fully correct, we would need to interpret the BV as FP or Rational
-          return value.toString(); // returns a BV representation of the FP
-        }
       } else if (value.isBooleanValue()) {
         return value.getBooleanValue();
 
@@ -828,5 +835,39 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
               value, valueType, type),
           e);
     }
+  }
+
+  private FloatingPointNumber convertFloatingPoint(Term value) throws CVC5ApiException {
+    final var fpValue = value.getFloatingPointValue();
+    final var expWidth = Ints.checkedCast(fpValue.first);
+    final var mantWidth = Ints.checkedCast(fpValue.second - 1); // without sign bit
+    final var bvValue = fpValue.third;
+    Preconditions.checkState(bvValue.isBitVectorValue());
+    final var bits = bvValue.getBitVectorValue();
+    return FloatingPointNumber.of(bits, expWidth, mantWidth);
+  }
+
+  private Term accessVariablesCache(String name, Sort sort) {
+    Term existingVar = variablesCache.get(name, sort.toString());
+    if (existingVar == null) {
+      throw new IllegalArgumentException(
+          "Symbol "
+              + name
+              + " requested with type "
+              + sort
+              + ", but "
+              + "already "
+              + "used "
+              + "with "
+              + "type"
+              + variablesCache
+                  .rowMap()
+                  .get(name)
+                  .entrySet()
+                  .toArray((java.util.Map.Entry[]) Array.newInstance(java.util.Map.Entry.class, 0))[
+                  0]
+                  .getKey());
+    }
+    return existingVar;
   }
 }
