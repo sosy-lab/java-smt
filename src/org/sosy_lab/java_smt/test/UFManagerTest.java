@@ -88,6 +88,13 @@ public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   @Test
   public void testDeclareAndCallUFWithIntAndRational()
       throws SolverException, InterruptedException {
+
+    // INFO: OpenSMT does not support casting from real to int
+    assume()
+        .withMessage("Solver %s does not support mixed integer-real artihmetic ", solverToUse())
+        .that(solver)
+        .isNotEqualTo(Solvers.OPENSMT);
+
     requireIntegers();
     requireRationals();
 

@@ -243,20 +243,13 @@ public final class Z3SolverContext extends AbstractSolverContext {
       Set<ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
     final ImmutableMap<String, Object> solverOptions =
-        ImmutableMap.of(":random-seed", extraOptions.randomSeed);
-    final ImmutableMap<String, String> optimizationOptions =
-        ImmutableMap.of(
-            OPT_ENGINE_CONFIG_KEY, extraOptions.optimizationEngine,
-            OPT_PRIORITY_CONFIG_KEY, extraOptions.objectivePrioritizationMode);
+        ImmutableMap.<String, Object>builder()
+            // .put(":random-seed", extraOptions.randomSeed) // not supported here
+            .put(OPT_ENGINE_CONFIG_KEY, extraOptions.optimizationEngine)
+            .put(OPT_PRIORITY_CONFIG_KEY, extraOptions.objectivePrioritizationMode)
+            .build();
     return new Z3OptimizationProver(
-        creator,
-        logger,
-        manager,
-        options,
-        solverOptions,
-        optimizationOptions,
-        extraOptions.logfile,
-        shutdownNotifier);
+        creator, logger, manager, options, solverOptions, extraOptions.logfile, shutdownNotifier);
   }
 
   @Override

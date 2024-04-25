@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+This file is part of JavaSMT,
+an API wrapper for a collection of SMT solvers:
+https://github.com/sosy-lab/java-smt
+
+SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<ivy-module version="2.0"
+    xmlns:e="http://ant.apache.org/ivy/extra"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+    <info organisation="org.sosy_lab" module="javasmt-solver-opensmt">
+        <license name="MIT License" url="https://github.com/usi-verification-and-security/opensmt/blob/master/LICENSE"/>
+        <description>
+            OpenSMT solver and JNI wrapper.
+            OpenSMT is provided under the MIT License.
+        </description>
+    </info>
+    
+    <configurations>
+        <conf name="solver-opensmt" extends="solver-opensmt-linux"/>
+        <conf name="solver-opensmt-linux" extends="solver-opensmt-common"/>
+        <conf name="solver-opensmt-common" visibility="private"/>
+        <conf name="sources"/>
+        <conf name="javadoc"/>
+    </configurations>
+    
+    <publications defaultconf="solver-opensmt">
+        <!-- Linux native libraries -->
+        <artifact name="libopensmt" conf="solver-opensmt-linux" type="shared-object" ext="so"/>
+        <artifact name="libopensmtjava" conf="solver-opensmt-linux" type="shared-object" ext="so"/>
+        <!-- Java code, docs and source -->
+        <artifact name="opensmt" conf="solver-opensmt-common" ext="jar"/>
+        <artifact name="opensmt" conf="sources" e:classifier="sources" type="source" ext="jar"/>
+        <artifact name="opensmt" conf="javadoc" e:classifier="javadoc" type="javadoc" ext="jar"/>
+    </publications>
+    
+    <dependencies></dependencies>
+</ivy-module>

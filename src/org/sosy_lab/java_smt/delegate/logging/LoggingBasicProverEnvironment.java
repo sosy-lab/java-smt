@@ -126,6 +126,11 @@ class LoggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
+  public String toString() {
+    return wrapped.toString();
+  }
+
+  @Override
   public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
     R result = wrapped.allSat(callback, important);

@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.assertThrows;
 
 import com.google.common.base.StandardSystemProperty;
 import com.google.common.truth.StandardSubjectBuilder;
@@ -20,6 +21,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
+import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -91,6 +93,7 @@ public class SolverContextFactoryTest {
       case BOOLECTOR:
       case CVC4:
       case CVC5:
+      case OPENSMT:
       case YICES2:
       case DREAL4:
         assume.that(IS_LINUX).isTrue();
@@ -100,10 +103,28 @@ public class SolverContextFactoryTest {
         return;
       case Z3:
         assume.that(IS_LINUX || IS_WINDOWS || IS_MAC).isTrue();
+        if (IS_LINUX) {
+          assume.that(isSufficientVersionOfLibcxx()).isTrue();
+        }
         return;
       default:
         throw new AssertionError("unexpected solver: " + solverToUse());
     }
+  }
+
+  /**
+   * The official Z3 release does only run with GLIBCXX in version 3.4.26 or newer. This excludes
+   * Ubuntu 18.04.
+   */
+  private boolean isSufficientVersionOfLibcxx() {
+    try {
+      NativeLibraries.loadLibrary("z3");
+    } catch (UnsatisfiedLinkError e) {
+      if (e.getMessage().contains("version `GLIBCXX_3.4.26' not found")) {
+        return false;
+      }
+    }
+    return true;
   }
 
   @Before
@@ -132,13 +153,10 @@ public class SolverContextFactoryTest {
     SolverContextFactory factory =
         new SolverContextFactory(
             config, logger, shutdownManager.getNotifier(), System::loadLibrary);
-    try (SolverContext context = factory.generateContext()) {
-      assert_().fail();
-      @SuppressWarnings("unused")
-      FormulaManager mgr = context.getFormulaManager();
-    } catch (InvalidConfigurationException e) {
-      assert_().that(e).hasCauseThat().isInstanceOf(UnsatisfiedLinkError.class);
-    }
+    assert_()
+        .that(assertThrows(InvalidConfigurationException.class, () -> factory.generateContext()))
+        .hasCauseThat()
+        .isInstanceOf(UnsatisfiedLinkError.class);
   }
 
   @Test

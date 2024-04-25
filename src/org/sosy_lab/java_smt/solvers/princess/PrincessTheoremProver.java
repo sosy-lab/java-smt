@@ -9,10 +9,6 @@
 package org.sosy_lab.java_smt.solvers.princess;
 
 import ap.api.SimpleAPI;
-import ap.parser.IExpression;
-import ap.parser.IFormula;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Iterables;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -20,8 +16,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 
-class PrincessTheoremProver extends PrincessAbstractProver<Void, IExpression>
-    implements ProverEnvironment {
+class PrincessTheoremProver extends PrincessAbstractProver<Void> implements ProverEnvironment {
 
   PrincessTheoremProver(
       PrincessFormulaManager pMgr,
@@ -34,19 +29,8 @@ class PrincessTheoremProver extends PrincessAbstractProver<Void, IExpression>
 
   @Override
   @Nullable
-  public Void addConstraint(BooleanFormula constraint) {
-    Preconditions.checkState(!closed);
-    final IFormula t = (IFormula) mgr.extractInfo(constraint);
-    final int formulaId = addAssertedFormula(t);
-    if (generateUnsatCores) {
-      api.setPartitionNumber(formulaId);
-    }
-    addConstraint0(t);
+  protected Void addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
+    addConstraint0(constraint);
     return null;
-  }
-
-  @Override
-  protected Iterable<IExpression> getAssertedFormulas() {
-    return Iterables.concat(assertedFormulas);
   }
 }

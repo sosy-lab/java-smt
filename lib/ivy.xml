@@ -5,7 +5,7 @@ This file is part of JavaSMT,
 an API wrapper for a collection of SMT solvers:
 https://github.com/sosy-lab/java-smt
 
-SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+SPDX-FileCopyrightText: 2023 Dirk Beyer <https://www.sosy-lab.org>
 
 SPDX-License-Identifier: Apache-2.0
 -->
@@ -31,6 +31,7 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- The normal dependencies with only one solver included. -->
         <conf name="runtime-mathsat" extends="core" description="only one solver included"/>
+        <conf name="runtime-opensmt" extends="core" description="only one solver included"/>
         <conf name="runtime-optimathsat" extends="core" description="only one solver included"/>
         <conf name="runtime-smtinterpol" extends="core" description="only one solver included"/>
         <conf name="runtime-princess" extends="core" description="only one solver included"/>
@@ -48,7 +49,7 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- The normal dependencies with all solvers included, except those unter GPL. -->
         <conf name="runtime-without-gpl"
-              extends="runtime-mathsat,runtime-optimathsat,runtime-smtinterpol,runtime-princess,runtime-z3,runtime-cvc4,runtime-cvc5,runtime-boolector"
+              extends="runtime-mathsat,runtime-opensmt,runtime-optimathsat,runtime-smtinterpol,runtime-princess,runtime-z3,runtime-cvc4,runtime-cvc5,runtime-boolector"
               description="all solvers included, except those unter GPL"/>
 
         <!-- Dependencies needed for building or running tests. -->
@@ -81,25 +82,25 @@ SPDX-License-Identifier: Apache-2.0
 
     <dependencies>
         <!-- SoSy-Lab Common Library -->
-        <dependency org="org.sosy_lab" name="common" rev="0.3000-568-gb81232a9" conf="core->runtime; contrib->sources"/>
+        <dependency org="org.sosy_lab" name="common" rev="0.3000-569-g89796f98" conf="core->runtime; contrib->sources"/>
 
         <!-- Google Core Libraries for Java
              Contains a lot of helpful data structures. -->
-        <dependency org="com.google.guava" name="guava" rev="32.0.0-jre" conf="core->default; contrib->sources"/>
+        <dependency org="com.google.guava" name="guava" rev="32.1.2-jre" conf="core->default; contrib->sources"/>
 
         <!--  Guava-testlib contains many useful testing utilities -->
-        <dependency org="com.google.guava" name="guava-testlib" rev="32.0.0-jre" conf="test->default; contrib->sources"/>
+        <dependency org="com.google.guava" name="guava-testlib" rev="32.1.2-jre" conf="test->default; contrib->sources"/>
 
         <!-- Dependency on Ivy itself so that we can ugprade it easily.
              Change version number in build/build-ivy.xml for upgrading. -->
         <dependency org="org.apache.ivy" name="ivy" rev="${ivy.target_version}" conf="build->default"/>
 
         <!-- Google Auto-Value
-             Library for auto-generating value types. --><dependency org="com.google.auto.value" name="auto-value" rev="1.10.1" conf="build->default"/>
-        <dependency org="com.google.auto.value" name="auto-value-annotations" rev="1.10.1" conf="build->default; contrib->sources"/>
+             Library for auto-generating value types. --><dependency org="com.google.auto.value" name="auto-value" rev="1.10.3" conf="build->default"/>
+        <dependency org="com.google.auto.value" name="auto-value-annotations" rev="1.10.3" conf="build->default; contrib->sources"/>
 
         <!-- Annotations we use for @Nullable etc. -->
-        <dependency org="org.checkerframework" name="checker-qual" rev="3.35.0" conf="core->default; contrib->sources"/>
+        <dependency org="org.checkerframework" name="checker-qual" rev="3.37.0" conf="core->default; contrib->sources"/>
 
         <!-- JUnit
              Testing framework. -->
@@ -116,13 +117,13 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- Truth
              Library for writing literal assertions. -->
-        <dependency org="com.google.truth" name="truth" rev="1.1.4" conf="test->default; contrib->sources"/>
-        <dependency org="com.google.truth.extensions" name="truth-java8-extension" rev="1.1.4" conf="test->default; contrib->sources"/>
+        <dependency org="com.google.truth" name="truth" rev="1.1.5" conf="test->default; contrib->sources"/>
+        <dependency org="com.google.truth.extensions" name="truth-java8-extension" rev="1.1.5" conf="test->default; contrib->sources"/>
 
         <!-- Google error-prone
              Compiler adaptor with some useful checks for common errors. -->
-        <dependency org="com.google.errorprone" name="error_prone_core" rev="2.19.1" conf="build->default" />
-        <dependency org="com.google.errorprone" name="error_prone_annotations" rev="2.19.1" conf="build->default; contrib->sources" />
+        <dependency org="com.google.errorprone" name="error_prone_core" rev="2.21.1" conf="build->default" />
+        <dependency org="com.google.errorprone" name="error_prone_annotations" rev="2.21.1" conf="build->default; contrib->sources" />
 
         <!-- Eclipse JDT Compiler
              For additional compiler warnings. -->
@@ -140,15 +141,15 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- Checkstyle -->
         <dependency org="com.github.sevntu-checkstyle" name="sevntu-checks" rev="1.44.1" conf="checkstyle->default"/>
-        <dependency org="com.puppycrawl.tools" name="checkstyle" rev="10.12.0" conf="checkstyle->default"/>
+        <dependency org="com.puppycrawl.tools" name="checkstyle" rev="10.12.2" conf="checkstyle->default"/>
 
         <!-- SmtInterpol -->
         <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.5-1242-g5c50fb6d" conf="runtime-smtinterpol->master; contrib->sources"/>
 
         <!-- Princess for our Maven release -->
-        <dependency org="io.github.uuverifiers" name="princess_2.13" rev="2023-04-07" conf="runtime-princess-with-javacup->default; contrib->sources"/>
+        <dependency org="io.github.uuverifiers" name="princess_2.13" rev="2024-01-12" conf="runtime-princess-with-javacup->default; contrib->sources"/>
         <!-- Princess for our Ivy release-->
-        <dependency org="io.github.uuverifiers" name="princess_2.13" rev="2023-04-07" conf="runtime-princess->default; contrib->sources">
+        <dependency org="io.github.uuverifiers" name="princess_2.13" rev="2024-01-12" conf="runtime-princess->default; contrib->sources">
           <!-- Exclude dependency on java-cup and replace it with java-cup-runtime, which is enough.
                We use the JAR that is published by us instead of the one from net.sf.squirrel-sql.thirdparty-non-maven
                because the latter does not provide a separate JAR for java-cup-runtime. -->
@@ -158,14 +159,15 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- Solver Binaries -->
         <dependency org="org.sosy_lab" name="javasmt-solver-mathsat" rev="5.6.10" conf="runtime-mathsat->solver-mathsat" />
-        <dependency org="org.sosy_lab" name="javasmt-solver-z3" rev="4.12.2-glibc_2.27" conf="runtime-z3->solver-z3; contrib->sources,javadoc" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-z3" rev="4.12.5" conf="runtime-z3->solver-z3; contrib->sources,javadoc" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-opensmt" rev="2.5.2-g7f502169" conf="runtime-opensmt->solver-opensmt; contrib->sources,javadoc" />
         <dependency org="org.sosy_lab" name="javasmt-solver-optimathsat" rev="1.7.1-sosy0" conf="runtime-optimathsat->solver-optimathsat" />
         <dependency org="org.sosy_lab" name="javasmt-solver-cvc4" rev="1.8-prerelease-2020-06-24-g7825d8f28" conf="runtime-cvc4->solver-cvc4" />
         <dependency org="org.sosy_lab" name="javasmt-solver-cvc5" rev="1.0.5-g4cb2ab9eb" conf="runtime-cvc5->solver-cvc5" />
         <dependency org="org.sosy_lab" name="javasmt-solver-boolector" rev="3.2.2-g1a89c229" conf="runtime-boolector->solver-boolector" />
 
         <!-- additional JavaSMT components with Solver Binaries -->
-        <dependency org="org.sosy_lab" name="javasmt-yices2" rev="4.0.1" conf="runtime-yices2->runtime; contrib->sources" />
+        <dependency org="org.sosy_lab" name="javasmt-yices2" rev="4.1.1-59-gaf9c0520c" conf="runtime-yices2->runtime; contrib->sources" />
         <!-- <dependency org="org.sosy_lab" name="javasmt-solver-yices2" rev="2.6.2-396-g194350c1" conf="runtime-yices2->solver-yices2" /> -->
 
         <!-- Several JARs declare animal-sniffer-annotations.jar as dependency in their manifest although they do not really need it.

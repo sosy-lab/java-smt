@@ -10,7 +10,6 @@ package org.sosy_lab.java_smt.solvers.mathsat5;
 
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5FormulaManager.getMsatTerm;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_assert_formula;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_push_backtrack_point;
 
 import com.google.common.base.Preconditions;
 import java.util.Map;
@@ -38,16 +37,10 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
 
   @Override
   @Nullable
-  public Void addConstraint(BooleanFormula constraint) {
+  protected Void addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
     Preconditions.checkState(!closed);
     closeAllEvaluators();
     msat_assert_formula(curEnv, getMsatTerm(constraint));
     return null;
-  }
-
-  @Override
-  public void push() {
-    Preconditions.checkState(!closed);
-    msat_push_backtrack_point(curEnv);
   }
 }

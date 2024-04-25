@@ -9,16 +9,15 @@
 package org.sosy_lab.java_smt.solvers.cvc5;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import io.github.cvc5.CVC5ApiException;
 import io.github.cvc5.Result;
 import io.github.cvc5.Solver;
 import io.github.cvc5.Term;
 import io.github.cvc5.UnknownExplanation;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -39,9 +38,6 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   protected final Solver solver;
   private boolean changedSinceLastSatQuery = false;
 
-  /** Tracks formulas on the stack, needed for model generation. */
-  protected final Deque<List<Term>> assertedFormulas = new ArrayDeque<>();
-
   // TODO: does CVC5 support separation logic in incremental mode?
   protected final boolean incremental;
 
@@ -56,40 +52,36 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     mgr = pMgr;
     creator = pFormulaCreator;
     incremental = !enableSL;
-    assertedFormulas.push(new ArrayList<>()); // create initial level
-
     solver = new Solver();
 
-    setSolverOptions(randomSeed, pOptions);
+    setSolverOptions(randomSeed, pOptions, solver);
   }
 
-  private void setSolverOptions(int randomSeed, Set<ProverOptions> pOptions) {
+  protected void setSolverOptions(int randomSeed, Set<ProverOptions> pOptions, Solver pSolver) {
     if (incremental) {
-      solver.setOption("incremental", "true");
+      pSolver.setOption("incremental", "true");
     }
     if (pOptions.contains(ProverOptions.GENERATE_MODELS)) {
-      solver.setOption("produce-models", "true");
+      pSolver.setOption("produce-models", "true");
     }
     if (pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE)) {
-      solver.setOption("produce-unsat-cores", "true");
+      pSolver.setOption("produce-unsat-cores", "true");
     }
-    solver.setOption("produce-assertions", "true");
-    solver.setOption("dump-models", "true");
-    solver.setOption("output-language", "smt2");
-    solver.setOption("seed", String.valueOf(randomSeed));
+    pSolver.setOption("produce-assertions", "true");
+    pSolver.setOption("dump-models", "true");
+    pSolver.setOption("output-language", "smt2");
+    pSolver.setOption("seed", String.valueOf(randomSeed));
 
     // Set Strings option to enable all String features (such as lessOrEquals)
-    solver.setOption("strings-exp", "true");
+    pSolver.setOption("strings-exp", "true");
 
     // Enable more complete quantifier solving (for more info see CVC5QuantifiedFormulaManager)
-    solver.setOption("full-saturate-quant", "true");
+    pSolver.setOption("full-saturate-quant", "true");
   }
 
   @Override
-  public void push() {
-    Preconditions.checkState(!closed);
+  protected void pushImpl() throws InterruptedException {
     setChanged();
-    assertedFormulas.push(new ArrayList<>());
     if (incremental) {
       try {
         solver.push();
@@ -101,11 +93,8 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   @Override
-  public void pop() {
-    Preconditions.checkState(!closed);
+  protected void popImpl() {
     setChanged();
-    assertedFormulas.pop();
-    Preconditions.checkState(!assertedFormulas.isEmpty(), "initial level must remain until close");
     if (incremental) {
       try {
         solver.pop();
@@ -117,11 +106,10 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   @Override
-  public @Nullable T addConstraint(BooleanFormula pF) throws InterruptedException {
+  protected @Nullable T addConstraintImpl(BooleanFormula pF) throws InterruptedException {
     Preconditions.checkState(!closed);
     setChanged();
     Term exp = creator.extractInfo(pF);
-    assertedFormulas.peek().add(exp);
     if (incremental) {
       solver.assertFormula(exp);
     }
@@ -136,7 +124,12 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     checkGenerateModels();
     // special case for CVC5: Models are not permanent and need to be closed
     // before any change is applied to the prover stack. So, we register the Model as Evaluator.
-    return registerEvaluator(new CVC5Model(this, mgr, creator, getAssertedExpressions()));
+    return registerEvaluator(
+        new CVC5Model(
+            this,
+            mgr,
+            creator,
+            Collections2.transform(getAssertedFormulas(), creator::extractInfo)));
   }
 
   @Override
@@ -173,7 +166,7 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     closeAllEvaluators();
     changedSinceLastSatQuery = false;
     if (!incremental) {
-      getAssertedExpressions().forEach(solver::assertFormula);
+      getAssertedFormulas().forEach(f -> solver.assertFormula(creator.extractInfo(f)));
     }
 
     /* Shutdown currently not possible in CVC5. */
@@ -218,25 +211,11 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     throw new UnsupportedOperationException();
   }
 
-  protected Collection<Term> getAssertedExpressions() {
-    List<Term> result = new ArrayList<>();
-    assertedFormulas.forEach(result::addAll);
-    return result;
-  }
-
   @Override
   public void close() {
     if (!closed) {
-      assertedFormulas.clear();
       solver.deletePointer();
-      closed = true;
     }
     super.close();
-  }
-
-  @Override
-  public int size() {
-    Preconditions.checkState(!closed);
-    return assertedFormulas.size() - 1;
   }
 }

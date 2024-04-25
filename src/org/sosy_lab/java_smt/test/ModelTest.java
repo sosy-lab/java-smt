@@ -35,6 +35,7 @@ import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
+import org.sosy_lab.java_smt.api.FloatingPointNumber;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
@@ -957,6 +958,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void testNonVariableValues() throws SolverException, InterruptedException {
     requireArrays();
+    requireArrayModel();
     requireIntegers();
 
     ArrayFormula<IntegerFormula, IntegerFormula> array1 =
@@ -1011,6 +1013,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void testNonVariableValues2() throws SolverException, InterruptedException {
     requireArrays();
+    requireArrayModel();
     requireIntegers();
 
     ArrayFormula<IntegerFormula, IntegerFormula> array1 =
@@ -1065,7 +1068,9 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void testGetIntArrays() throws SolverException, InterruptedException {
     requireArrays();
+    requireArrayModel();
     requireIntegers();
+
     ArrayFormula<IntegerFormula, IntegerFormula> array =
         amgr.makeArray("array", IntegerType, IntegerType);
     ArrayFormula<IntegerFormula, IntegerFormula> updated =
@@ -1102,6 +1107,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   public void testGetArrays2() throws SolverException, InterruptedException {
     requireParser();
     requireArrays();
+    requireArrayModel();
     requireBitvectors();
 
     ArrayFormula<BitvectorFormula, BitvectorFormula> array =
@@ -1131,7 +1137,9 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void testGetArrays6() throws SolverException, InterruptedException {
     requireArrays();
+    requireArrayModel();
     requireParser();
+
     BooleanFormula f =
         mgr.parse(
             "(declare-fun |pi@2| () Int)\n"
@@ -1157,6 +1165,8 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   public void testGetArrays3() throws SolverException, InterruptedException {
     requireParser();
     requireArrays();
+    requireArrayModel();
+
     assume()
         .withMessage("As of now, only Princess does not support multi-dimensional arrays")
         .that(solver)
@@ -1197,6 +1207,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   public void testGetArrays4() throws SolverException, InterruptedException {
     requireParser();
     requireArrays();
+    requireArrayModel();
 
     // create formula for "arr[5]==x && x==123"
     BooleanFormula f =
@@ -1224,6 +1235,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   public void testGetArrays4invalid() throws SolverException, InterruptedException {
     requireParser();
     requireArrays();
+    requireArrayModel();
 
     // create formula for "arr[5]==x && x==123"
     BooleanFormula f =
@@ -1249,6 +1261,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   public void testGetArrays5() throws SolverException, InterruptedException {
     requireParser();
     requireArrays();
+    requireArrayModel();
 
     // create formula for "arr[5:6]==[x,x] && x==123"
     BooleanFormula f =
@@ -1275,6 +1288,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   public void testGetArrays5b() throws SolverException, InterruptedException {
     requireParser();
     requireArrays();
+    requireArrayModel();
 
     // create formula for "arr[5]==x && arr[6]==x && x==123"
     BooleanFormula f =
@@ -1329,6 +1343,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   public void testGetArrays5c() throws SolverException, InterruptedException {
     requireParser();
     requireArrays();
+    requireArrayModel();
 
     // create formula for "arr[5:6]==[x,x] && x==123"
     BooleanFormula f =
@@ -1364,6 +1379,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   public void testGetArrays5d() throws SolverException, InterruptedException {
     requireParser();
     requireArrays();
+    requireArrayModel();
 
     // create formula for "arr[5:6]==[x,x] && x==123"
     BooleanFormula f =
@@ -1399,6 +1415,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   public void testGetArrays5e() throws SolverException, InterruptedException {
     requireParser();
     requireArrays();
+    requireArrayModel();
 
     // create formula for "arrgh[5:6]==[x,x] && ahoi[5,7] == [x,x] && x==123"
     BooleanFormula f =
@@ -1434,6 +1451,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   public void testGetArrays5f() throws SolverException, InterruptedException {
     requireParser();
     requireArrays();
+    requireArrayModel();
 
     // create formula for "arrgh[5:6]==[x,x] && ahoi[5,6] == [x,y] && y = 125 && x==123"
     BooleanFormula f =
@@ -1470,6 +1488,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void testGetArrays7() throws SolverException, InterruptedException {
     requireArrays();
+    requireArrayModel();
     requireIntegers();
 
     ArrayFormula<IntegerFormula, IntegerFormula> array1 =
@@ -1504,6 +1523,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void testGetArrays8() throws SolverException, InterruptedException {
     requireArrays();
+    requireArrayModel();
     requireIntegers();
 
     ArrayFormula<IntegerFormula, IntegerFormula> array1 =
@@ -1550,6 +1570,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void testGetArrays9() throws SolverException, InterruptedException {
     requireArrays();
+    requireArrayModel();
     requireIntegers();
 
     ArrayFormula<IntegerFormula, IntegerFormula> array1 =
@@ -1794,8 +1815,16 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       assignmentFormulas.add(va.getAssignmentAsFormula());
       assertThatFormula(va.getAssignmentAsFormula())
           .isEqualTo(makeAssignment(va.getKey(), va.getValueAsFormula()));
-      assertThat(va.getValue().getClass())
-          .isIn(ImmutableList.of(Boolean.class, BigInteger.class, Rational.class, Double.class));
+      assertThat(
+              ImmutableList.of(
+                      Boolean.class,
+                      BigInteger.class,
+                      Rational.class,
+                      Double.class,
+                      FloatingPointNumber.class)
+                  .stream()
+                  .anyMatch(cls -> cls.isInstance(va.getValue())))
+          .isTrue();
     }
 
     // Check that model is not contradicting
@@ -2143,6 +2172,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   public void arrayTest1() throws SolverException, InterruptedException {
     requireParser();
     requireArrays();
+    requireArrayModel();
 
     for (String query :
         ImmutableList.of(
@@ -2156,6 +2186,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   public void arrayTest2() throws SolverException, InterruptedException {
     requireParser();
     requireArrays();
+    requireArrayModel();
     requireOptimization();
     requireFloats();
     requireBitvectors();
@@ -2195,6 +2226,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   public void arrayTest3() throws SolverException, InterruptedException {
     requireParser();
     requireArrays();
+    requireArrayModel();
 
     BooleanFormula formula = context.getFormulaManager().parse(ARRAY_QUERY_INT);
     checkModelIteration(formula, false);
@@ -2219,9 +2251,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     assume()
         .withMessage("Solver is quite slow for this example")
         .that(solverToUse())
-        .isNoneOf(Solvers.PRINCESS, Solvers.Z3);
-    // TODO regression:
-    //  the Z3 library was able to solve this in v4.11.2, but no longer in v4.12.1-glibc_2.27.
+        .isNotEqualTo(Solvers.PRINCESS);
 
     BooleanFormula formula =
         context

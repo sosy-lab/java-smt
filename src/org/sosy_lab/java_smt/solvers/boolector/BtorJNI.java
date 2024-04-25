@@ -221,6 +221,10 @@ class BtorJNI {
 
   protected static native long boolector_ror(long jarg1, long jarg2, long jarg3);
 
+  protected static native long boolector_roli(long btor, long node, int nbits);
+
+  protected static native long boolector_rori(long btor, long node, int nbits);
+
   protected static native long boolector_sub(long jarg1, long jarg2, long jarg3);
 
   protected static native long boolector_usubo(long jarg1, long jarg2, long jarg3);
@@ -413,10 +417,6 @@ class BtorJNI {
   protected static native long btor_abort_callback_get();
 
   protected static native int boolector_bitvec_sort_get_width(long jarg1, long jarg2);
-
-  protected static native long boolector_roli(long btor, long node, int nbits);
-
-  protected static native long boolector_rori(long btor, long node, int nbits);
 
   protected static native long boolector_get_value(long btor, long node);
 

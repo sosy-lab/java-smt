@@ -112,7 +112,9 @@ public class NonLinearArithmeticWithModuloTest extends SolverBasedTest0 {
                 imgr.makeNumber(1),
                 handleExpectedException(() -> imgr.modulo(a, imgr.makeNumber(3)))));
 
-    if (ImmutableSet.of(Solvers.SMTINTERPOL, Solvers.CVC4, Solvers.YICES2).contains(solver)
+    // INFO: OpenSMT does support modulo with constants
+    if (ImmutableSet.of(Solvers.SMTINTERPOL, Solvers.CVC4, Solvers.YICES2, Solvers.OPENSMT)
+            .contains(solver)
         && nonLinearArithmetic == NonLinearArithmetic.APPROXIMATE_FALLBACK) {
       // some solvers support modulo with constants
       assertThatFormula(f).isUnsatisfiable();

@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.test;
 
+import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 import static org.sosy_lab.java_smt.api.FormulaType.RationalType;
 import static org.sosy_lab.java_smt.api.FormulaType.StringType;
@@ -16,12 +17,14 @@ import static org.sosy_lab.java_smt.api.FormulaType.getSinglePrecisionFloatingPo
 
 import org.junit.Before;
 import org.junit.Test;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -179,5 +182,68 @@ public class ArrayFormulaManagerTest extends SolverBasedTest0.ParameterizedSolve
             amgr.equivalence(arr2, amgr.store(arr1, num4, num2)),
             bmgr.not(fpmgr.equalWithFPSemantics(num2, amgr.select(arr2, num4))));
     assertThatFormula(query).isUnsatisfiable();
+  }
+
+  @Test
+  public void testArrayConstWithDefault() throws SolverException, InterruptedException {
+    requireIntegers();
+    assume()
+        .withMessage("Solver %s does not yet support array initialization", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.OPENSMT);
+
+    for (int elem : new int[] {0, 1, 5, 100, -100}) {
+      IntegerFormula elseElem = imgr.makeNumber(elem);
+      IntegerFormula otherElem = imgr.makeNumber(elem + 1);
+
+      ArrayFormula<IntegerFormula, IntegerFormula> arr =
+          amgr.makeArray(FormulaType.getArrayType(IntegerType, IntegerType), elseElem);
+
+      for (int i : new int[] {1, 3, 9, 13}) {
+        IntegerFormula index = imgr.makeNumber(i);
+
+        // select(arr, i) == elseElem, and not otherElem
+        assertThatFormula(imgr.equal(elseElem, amgr.select(arr, index))).isTautological();
+        assertThatFormula(imgr.equal(otherElem, amgr.select(arr, index))).isUnsatisfiable();
+
+        // select(store(arr, i, j)) == j, and not elseElem
+        IntegerFormula selectFromStore = amgr.select(amgr.store(arr, index, otherElem), index);
+        assertThatFormula(imgr.equal(otherElem, selectFromStore)).isTautological();
+        assertThatFormula(imgr.equal(elseElem, selectFromStore)).isUnsatisfiable();
+      }
+    }
+  }
+
+  @Test
+  public void testArrayConstBvWithDefault() throws SolverException, InterruptedException {
+    requireBitvectors();
+    assume()
+        .withMessage("Solver %s does not yet support array initialization", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BOOLECTOR);
+
+    final int size = 8;
+
+    for (int elem : new int[] {0, 1, 5, 100, -100}) {
+      BitvectorFormula elseElem = bvmgr.makeBitvector(size, elem);
+      BitvectorFormula otherElem = bvmgr.makeBitvector(size, elem + 1);
+
+      BitvectorType bvType = getBitvectorTypeWithSize(size);
+      ArrayFormula<BitvectorFormula, BitvectorFormula> arr =
+          amgr.makeArray(FormulaType.getArrayType(bvType, bvType), elseElem);
+
+      for (int i : new int[] {1, 3, 9, 13}) {
+        BitvectorFormula index = bvmgr.makeBitvector(size, i);
+
+        // select(arr, i) == elseElem, and not otherElem
+        assertThatFormula(bvmgr.equal(elseElem, amgr.select(arr, index))).isTautological();
+        assertThatFormula(bvmgr.equal(otherElem, amgr.select(arr, index))).isUnsatisfiable();
+
+        // select(store(arr, i, j)) == j, and not elseElem
+        BitvectorFormula selectFromStore = amgr.select(amgr.store(arr, index, otherElem), index);
+        assertThatFormula(bvmgr.equal(otherElem, selectFromStore)).isTautological();
+        assertThatFormula(bvmgr.equal(elseElem, selectFromStore)).isUnsatisfiable();
+      }
+    }
   }
 }

@@ -62,6 +62,7 @@ Currently JavaSMT supports several SMT solvers (see [Getting Started](doc/Gettin
 | [CVC4](https://cvc4.github.io/) | :heavy_check_mark: |  |  |  |
 | [CVC5](https://cvc5.github.io/) | :heavy_check_mark: |  |  | new! |
 | [MathSAT5](http://mathsat.fbk.eu/) | :heavy_check_mark: | :heavy_check_mark: |  |  |
+| [OpenSMT](https://verify.inf.usi.ch/opensmt) | :heavy_check_mark: |  |  | new! |
 | [OptiMathSAT](http://optimathsat.disi.unitn.it/) | :heavy_check_mark: |  |  | based on MathSAT5, with support for optimization |
 | [Princess](http://www.philipp.ruemmer.org/princess.shtml) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | Java-based SMT solver |
 | [SMTInterpol](https://ultimate.informatik.uni-freiburg.de/smtinterpol/) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | Java-based SMT solver |
@@ -88,8 +89,9 @@ If something specific is missing, please [look for or file an issue](https://git
 | --- |:---:|:---:|
 | [Boolector](https://boolector.github.io/) | :heavy_check_mark: |  |
 | [CVC4](https://cvc4.github.io/) | :heavy_check_mark: | :heavy_check_mark: |
-| [CVC5](https://cvc4.github.io/) | :heavy_check_mark: | |
+| [CVC5](https://cvc4.github.io/) | :question: | |
 | [MathSAT5](http://mathsat.fbk.eu/) | :heavy_check_mark: |  |
+| [OpenSMT](https://verify.inf.usi.ch/opensmt) | :question: | |
 | [OptiMathSAT](http://optimathsat.disi.unitn.it/) | :heavy_check_mark: |  |
 | [Princess](http://www.philipp.ruemmer.org/princess.shtml) | :heavy_check_mark: |  |
 | [SMTInterpol](https://ultimate.informatik.uni-freiburg.de/smtinterpol/) | :heavy_check_mark: |  |
@@ -158,7 +160,7 @@ try (SolverContext context = SolverContextFactory.createSolverContext(
  - Project maintainers: [Karlheinz Friedberger][] and [Philipp Wendler][]
  - Former project maintainer: [George Karpenkov][]
  - Initial codebase, many design decisions: [Philipp Wendler][]
- - Contributions: Daniel Baier, [Thomas Stieglmaier][] and several others.
+ - Contributions: [Daniel Baier][], [Thomas Stieglmaier][] and several others.
 
 [ConfigurationOptions]: https://sosy-lab.github.io/java-smt/ConfigurationOptions.txt
 [Manual Installation]: doc/Getting-started.md#manual-installation
@@ -168,5 +170,6 @@ try (SolverContext context = SolverContextFactory.createSolverContext(
 [Philipp Wendler]: https://www.philippwendler.de/
 [Thomas Stieglmaier]: https://stieglmaier.me/
 [Karlheinz Friedberger]: https://www.sosy-lab.org/people/friedberger
+[Daniel Baier]: https://www.sosy-lab.org/people/baier
 [Ivy repository]: https://www.sosy-lab.org/ivy
 [Maven repository]: https://mvnrepository.com/artifact/org.sosy-lab/java-smt

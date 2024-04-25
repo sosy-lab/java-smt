@@ -83,6 +83,26 @@ class Z3BitvectorFormulaManager extends AbstractBitvectorFormulaManager<Long, Lo
   }
 
   @Override
+  public Long rotateLeftByConstant(Long number, int toShift) {
+    return Native.mkRotateLeft(z3context, toShift, number);
+  }
+
+  @Override
+  public Long rotateLeft(Long number, Long toShift) {
+    return Native.mkExtRotateLeft(z3context, number, toShift);
+  }
+
+  @Override
+  public Long rotateRightByConstant(Long number, int toShift) {
+    return Native.mkRotateRight(z3context, toShift, number);
+  }
+
+  @Override
+  public Long rotateRight(Long number, Long toShift) {
+    return Native.mkExtRotateRight(z3context, number, toShift);
+  }
+
+  @Override
   public Long not(Long pBits) {
     return Native.mkBvnot(z3context, pBits);
   }
@@ -127,12 +147,17 @@ class Z3BitvectorFormulaManager extends AbstractBitvectorFormulaManager<Long, Lo
   }
 
   @Override
-  public Long modulo(Long pNumber1, Long pNumber2, boolean signed) {
+  public Long remainder(Long pNumber1, Long pNumber2, boolean signed) {
     if (signed) {
       return Native.mkBvsrem(z3context, pNumber1, pNumber2);
     } else {
       return Native.mkBvurem(z3context, pNumber1, pNumber2);
     }
+  }
+
+  @Override
+  protected Long smodulo(Long pParam1, Long pParam2) {
+    return Native.mkBvsmod(z3context, pParam1, pParam2);
   }
 
   @Override

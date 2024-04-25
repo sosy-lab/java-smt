@@ -16,6 +16,11 @@ RUN apt-get update \
         openjdk-11-jdk ant maven \
         mingw-w64 zlib1g-dev m4
 
+# Yices2 requires some dependencies
+RUN apt-get update \
+ && apt-get install -y \
+        autoconf gperf
+
 # CVC5 requires some dependencies
 RUN apt-get update \
  && apt-get install -y \
@@ -34,6 +39,33 @@ RUN apt-get update \
 ENV LC_ALL en_US.UTF-8
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US.UTF-8
+
+# OpenSMT requires swig, gmp, flex and bison
+# - swig needs to built manually to get version 4.1 for unique_ptr support
+# - libpcre2-dev is a dependency of swig
+# - gmp needs to be recompiled to generate PIC code
+# - lzip is required to unpack the gmp tar ball
+RUN apt-get update \
+ && apt-get install -y \
+        flex \
+        bison \
+        libpcre2-dev  \
+        lzip
+WORKDIR /dependencies
+RUN wget http://prdownloads.sourceforge.net/swig/swig-4.1.1.tar.gz \
+ && tar xf swig-4.1.1.tar.gz \
+ && cd swig-4.1.1 \
+ && ./configure \
+ && make -j4 \
+ && make install \
+ && cd --
+RUN wget https://gmplib.org/download/gmp/gmp-6.2.1.tar.lz \
+ && tar xf gmp-6.2.1.tar.lz \
+ && cd gmp-6.2.1 \
+ && ./configure --enable-cxx --with-pic --disable-shared --enable-fat \
+ && make -j4 \
+ && make install \
+ && cd --
 
 # Add the user "developer" with UID:1000, GID:1000, home at /developer.
 # This allows to map the docker-internal user to the local user 1000:1000 outside of the container.

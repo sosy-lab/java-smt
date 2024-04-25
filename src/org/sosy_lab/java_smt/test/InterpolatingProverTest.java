@@ -13,11 +13,13 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
 import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import org.junit.Test;
@@ -28,10 +30,18 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.solvers.cvc5.CVC5BooleanFormulaManager;
+import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
 /** This class contains some simple Junit-tests to check the interpolation-API of our solvers. */
 @SuppressWarnings({"resource", "LocalVariableName"})
 public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+
+  // INFO: OpenSmt only support interpolation for QF_LIA, QF_LRA and QF_UF
+  @Override
+  protected Logics logicToUse() {
+    return Logics.QF_LIA;
+  }
 
   /** Generate a prover environment depending on the parameter above. */
   @SuppressWarnings("unchecked")
@@ -45,16 +55,30 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   @Test
   @SuppressWarnings("CheckReturnValue")
   public <T> void simpleInterpolation() throws SolverException, InterruptedException {
+    assume()
+        .withMessage("Solver %s runs into timeout on this test", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC5);
+
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       IntegerFormula x = imgr.makeVariable("x");
       IntegerFormula y = imgr.makeVariable("y");
-      IntegerFormula z = imgr.makeVariable("z");
+      /* INFO: Due to limitations in OpenSMT we need to use a simpler formular for this solver
+       * Setting z=x means that the original formula `2x ≠ 1+2z`simplifies to `0 ≠ 1`,
+       * which is trivially true.
+       *
+       * https://github.com/usi-verification-and-security/opensmt/issues/638
+       */
+      IntegerFormula z = solverToUse() == Solvers.OPENSMT ? x : imgr.makeVariable("z");
+
       BooleanFormula f1 = imgr.equal(y, imgr.multiply(imgr.makeNumber(2), x));
       BooleanFormula f2 =
           imgr.equal(y, imgr.add(imgr.makeNumber(1), imgr.multiply(z, imgr.makeNumber(2))));
+
       prover.push(f1);
       T id2 = prover.push(f2);
       boolean check = prover.isUnsat();
+
       assertWithMessage("formulas must be contradicting").that(check).isTrue();
       prover.getInterpolant(ImmutableList.of(id2));
       // we actually only check for a successful execution here, the result is irrelevant.
@@ -67,7 +91,14 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       IntegerFormula x = imgr.makeVariable("x");
       IntegerFormula y = imgr.makeVariable("y");
-      IntegerFormula z = imgr.makeVariable("z");
+      /* INFO: Due to limitations in OpenSMT we need to use a simpler formula for this solver
+       * Setting z=x means that the original formula `2x ≠ 1+2z`simplifies to `0 ≠ 1`,
+       * which is trivially true.
+       *
+       * https://github.com/usi-verification-and-security/opensmt/issues/638
+       */
+      IntegerFormula z = solverToUse() == Solvers.OPENSMT ? x : imgr.makeVariable("z");
+
       BooleanFormula f1 = imgr.equal(y, imgr.multiply(imgr.makeNumber(2), x));
       BooleanFormula f2 =
           imgr.equal(y, imgr.add(imgr.makeNumber(1), imgr.multiply(z, imgr.makeNumber(2))));
@@ -130,41 +161,49 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   }
 
   @Test
-  public <T> void binaryInterpolation1() throws SolverException, InterruptedException {
+  public <T> void binaryInterpolationWithConstantFalse()
+      throws SolverException, InterruptedException {
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
-    // build formula:  1 = A = B = C = 0
+    // build formula:  [false, false]
     BooleanFormula A = bmgr.makeBoolean(false);
     BooleanFormula B = bmgr.makeBoolean(false);
+    BooleanFormula C = bmgr.makeBoolean(false);
 
     T TA = stack.push(A);
     T TB = stack.push(B);
+    T TC = stack.push(C);
 
     assertThat(stack).isUnsatisfiable();
 
-    BooleanFormula itp0 = stack.getInterpolant(ImmutableList.of());
-    BooleanFormula itpA = stack.getInterpolant(ImmutableList.of(TA));
-    BooleanFormula itpB = stack.getInterpolant(ImmutableList.of(TA));
-    BooleanFormula itpAB = stack.getInterpolant(ImmutableList.of(TA, TB));
+    assertThat(stack.getInterpolant(ImmutableList.of())).isEqualTo(bmgr.makeBoolean(true));
+    // some interpolant needs to be FALSE, however, it can be at arbitrary position.
+    assertThat(
+            ImmutableList.of(
+                stack.getInterpolant(ImmutableList.of(TA)),
+                stack.getInterpolant(ImmutableList.of(TB)),
+                stack.getInterpolant(ImmutableList.of(TC))))
+        .contains(bmgr.makeBoolean(false));
+    assertThat(
+            ImmutableList.of(
+                stack.getInterpolant(ImmutableList.of(TA, TB)),
+                stack.getInterpolant(ImmutableList.of(TB, TC)),
+                stack.getInterpolant(ImmutableList.of(TC, TA))))
+        .contains(bmgr.makeBoolean(false));
+    assertThat(stack.getInterpolant(ImmutableList.of(TA, TB, TC)))
+        .isEqualTo(bmgr.makeBoolean(false));
 
     stack.close();
-
-    // special cases: start and end of sequence might need special handling in the solver
-    assertThat(bmgr.makeBoolean(true)).isEqualTo(itp0);
-    assertThat(bmgr.makeBoolean(false)).isEqualTo(itpAB);
-
-    // want to see non-determinism in all solvers? try this:
-    // System.out.println(solver + ": " + itpA);
-
-    // we check here the stricter properties for sequential interpolants,
-    // but this simple example should work for all solvers
-    checkItpSequence(ImmutableList.of(A, B), ImmutableList.of(itpA));
-    checkItpSequence(ImmutableList.of(B, A), ImmutableList.of(itpB));
   }
 
   @Test
   public <T> void binaryBVInterpolation1() throws SolverException, InterruptedException {
     requireBitvectors();
+
+    assume()
+        .withMessage("Solver %s runs into timeout on this test", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC5);
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
@@ -224,6 +263,11 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     requireIntegers();
 
+    assume()
+        .withMessage("Solver %s runs into timeout on this test", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC5);
+
     int i = index.getFreshId();
 
     IntegerFormula zero = imgr.makeNumber(0);
@@ -269,6 +313,55 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     checkItpSequence(ImmutableList.of(B, C, D, A, A, A, D), itps6);
   }
 
+  @Test
+  public <T> void sequentialInterpolationIsNotRepeatedIndividualInterpolation()
+      throws SolverException, InterruptedException {
+    InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
+    requireIntegers();
+
+    IntegerFormula zero = imgr.makeNumber(0);
+    IntegerFormula one = imgr.makeNumber(1);
+    IntegerFormula thousand = imgr.makeNumber(1000);
+
+    IntegerFormula i3 = imgr.makeVariable("i3");
+    IntegerFormula i4 = imgr.makeVariable("i4");
+
+    BooleanFormula A = imgr.equal(i3, zero);
+    BooleanFormula B = bmgr.and(imgr.lessThan(i3, thousand), imgr.equal(i4, imgr.add(i3, one)));
+    BooleanFormula C = imgr.greaterThan(i4, thousand);
+
+    T TA = stack.push(A);
+    T TB = stack.push(B);
+    T TC = stack.push(C);
+
+    assertThat(stack).isUnsatisfiable();
+
+    List<BooleanFormula> itpSeq = stack.getSeqInterpolants0(ImmutableList.of(TA, TB, TC));
+
+    BooleanFormula itp1 = stack.getInterpolant(ImmutableList.of(TA));
+    BooleanFormula itp2 = stack.getInterpolant(ImmutableList.of(TA, TB));
+
+    stack.close();
+
+    // sequential interpolation should always work as expected
+    checkItpSequence(ImmutableList.of(A, B, C), itpSeq);
+
+    if (solverToUse() == Solvers.CVC5) {
+      assertThatFormula(A).implies(itp1);
+      assertThatFormula(bmgr.and(A, B)).implies(itp2);
+      assertThatFormula(bmgr.and(itp1, B, C)).isUnsatisfiable();
+      assertThatFormula(bmgr.and(itp2, C)).isUnsatisfiable();
+
+      // this is a counterexample for sequential interpolation via individual interpolants:
+      assertThatFormula(bmgr.not(bmgr.implication(bmgr.and(itp1, B), itp2))).isSatisfiable();
+
+    } else {
+      // other solvers satisfy this condition,
+      // because they internally use the same proof for all interpolation queries
+      checkItpSequence(ImmutableList.of(A, B, C), List.of(itp1, itp2));
+    }
+  }
+
   @Test(expected = IllegalArgumentException.class)
   @SuppressWarnings("CheckReturnValue")
   public <T> void sequentialInterpolationWithoutPartition()
@@ -287,14 +380,13 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   @Test
   public <T> void sequentialInterpolationWithOnePartition()
       throws SolverException, InterruptedException {
-    InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     requireIntegers();
 
+    InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     int i = index.getFreshId();
 
     IntegerFormula zero = imgr.makeNumber(0);
     IntegerFormula one = imgr.makeNumber(1);
-
     IntegerFormula a = imgr.makeVariable("a" + i);
 
     // build formula:  1 = A = 0
@@ -316,14 +408,13 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   @Test
   public <T> void sequentialInterpolationWithFewPartitions()
       throws SolverException, InterruptedException {
-    InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     requireIntegers();
 
+    InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     int i = index.getFreshId();
 
     IntegerFormula zero = imgr.makeNumber(0);
     IntegerFormula one = imgr.makeNumber(1);
-
     IntegerFormula a = imgr.makeVariable("a" + i);
 
     // build formula:  1 = A = 0
@@ -350,6 +441,12 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   @Test
   public <T> void sequentialBVInterpolation() throws SolverException, InterruptedException {
     requireBitvectors();
+
+    assume()
+        .withMessage("Solver %s runs into timeout on this test", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC5);
+
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
     int i = index.getFreshId();
@@ -497,6 +594,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   private <T> void testTreeInterpolants1(
       BooleanFormula pA, BooleanFormula pB, BooleanFormula pC, BooleanFormula pD, BooleanFormula pE)
       throws SolverException, InterruptedException {
+
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
     T TA = stack.push(pA);
@@ -529,6 +627,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   private <T> void testTreeInterpolants2(
       BooleanFormula pA, BooleanFormula pB, BooleanFormula pC, BooleanFormula pD, BooleanFormula pE)
       throws SolverException, InterruptedException {
+
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
     T TA = stack.push(pA);
@@ -923,6 +1022,11 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     requireBitvectors();
     requireInterpolation();
 
+    assume()
+        .withMessage("Solver %s runs into timeout on this test", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.CVC5);
+
     int bvWidth = 32;
     BitvectorFormula bv0 = bvmgr.makeBitvector(bvWidth, 0);
     BitvectorFormula bv1 = bvmgr.makeBitvector(bvWidth, 1);
@@ -941,11 +1045,11 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     BooleanFormula f1Internal1 =
         bmgr.and(
             bvmgr.lessThan(bv0, p, true),
-            bvmgr.equal(bvmgr.modulo(p, bv4, false), bvmgr.modulo(bv0, bv4, false)),
+            bvmgr.equal(bvmgr.remainder(p, bv4, false), bvmgr.remainder(bv0, bv4, false)),
             bvmgr.lessThan(bv0, bvmgr.add(p, bv8), true));
 
     BooleanFormula f1Internal2 =
-        bvmgr.equal(bvmgr.modulo(p, bv4, false), bvmgr.modulo(bv0, bv4, false));
+        bvmgr.equal(bvmgr.remainder(p, bv4, false), bvmgr.remainder(bv0, bv4, false));
 
     BooleanFormula f1Internal3 = bvmgr.lessThan(bv0, bvmgr.add(p, bv8), true);
 
@@ -984,6 +1088,34 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     }
   }
 
+  @Test
+  public <T> void testTrivialInterpolation() throws InterruptedException, SolverException {
+    requireInterpolation();
+    InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
+    IntegerFormula zero = imgr.makeNumber(0);
+    IntegerFormula one = imgr.makeNumber(1);
+
+    IntegerFormula a = imgr.makeVariable("a");
+    IntegerFormula b = imgr.makeVariable("b");
+
+    // build formula "1 = A = 0", then check interpolant
+    BooleanFormula A = bmgr.and(imgr.equal(a, zero), imgr.equal(a, one));
+    T p1 = stack.push(A);
+    assertThat(stack).isUnsatisfiable();
+    BooleanFormula interpol1 = stack.getInterpolant(ImmutableList.of(p1));
+    assertThatFormula(interpol1).isEqualTo(bmgr.makeFalse());
+    stack.pop();
+
+    // build formulas "a < 0" and "b < 0 && 1 < b", then check interpolant
+    BooleanFormula B1 = imgr.lessThan(a, zero);
+    BooleanFormula B2 = bmgr.and(imgr.lessThan(b, zero), imgr.lessThan(one, b));
+    T p2 = stack.push(B1);
+    stack.push(B2);
+    assertThat(stack).isUnsatisfiable();
+    BooleanFormula interpol2 = stack.getInterpolant(ImmutableList.of(p2));
+    assertThatFormula(interpol2).isEqualTo(bmgr.makeTrue());
+  }
+
   private void checkItpSequence(List<BooleanFormula> formulas, List<BooleanFormula> itps)
       throws SolverException, InterruptedException {
 
@@ -1000,5 +1132,51 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
       assertThatFormula(bmgr.and(getLast(itps), getLast(formulas)))
           .implies(bmgr.makeBoolean(false));
     }
+  }
+
+  @SuppressWarnings({"unchecked", "unused"})
+  @Test
+  public <T> void testInvalidToken() throws InterruptedException, SolverException {
+    requireInterpolation();
+    InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
+
+    // create and push formulas and solve them
+    IntegerFormula zero = imgr.makeNumber(0);
+    IntegerFormula one = imgr.makeNumber(1);
+    IntegerFormula a = imgr.makeVariable("a");
+    T p1 = stack.push(imgr.lessThan(a, zero));
+    T p2 = stack.push(imgr.lessThan(one, a));
+    assertThat(stack).isUnsatisfiable();
+
+    // try to solve with a null-token
+    List<T> lst = new ArrayList<>();
+    lst.add(null);
+    assertThrows(IllegalArgumentException.class, () -> stack.getInterpolant(lst));
+
+    // create an invalid interpolation token
+    final Object p3;
+    switch (solverToUse()) {
+      case CVC5:
+        p3 = ((CVC5BooleanFormulaManager) bmgr).makeVariableImpl("c");
+        break;
+      case MATHSAT5:
+        p3 = 12345;
+        break;
+      case OPENSMT:
+        p3 = 12347;
+        break;
+      case PRINCESS:
+        p3 = 12349;
+        break;
+      case SMTINTERPOL:
+        p3 = "some string";
+        break;
+      default:
+        p3 = null; // unexpected solver for interpolation
+    }
+
+    // and try to solve with the token
+    assertThrows(
+        IllegalArgumentException.class, () -> stack.getInterpolant(ImmutableList.of((T) p3)));
   }
 }

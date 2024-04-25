@@ -95,10 +95,16 @@ class StatisticsBitvectorFormulaManager implements BitvectorFormulaManager {
   }
 
   @Override
-  public BitvectorFormula modulo(
+  public BitvectorFormula remainder(
       BitvectorFormula pNumber1, BitvectorFormula pNumber2, boolean pSigned) {
     stats.bvOperations.getAndIncrement();
-    return delegate.modulo(pNumber1, pNumber2, pSigned);
+    return delegate.remainder(pNumber1, pNumber2, pSigned);
+  }
+
+  @Override
+  public BitvectorFormula smodulo(BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
+    stats.bvOperations.getAndIncrement();
+    return delegate.smodulo(pNumber1, pNumber2);
   }
 
   @Override
@@ -176,6 +182,30 @@ class StatisticsBitvectorFormulaManager implements BitvectorFormulaManager {
   public BitvectorFormula shiftLeft(BitvectorFormula pNumber, BitvectorFormula pToShift) {
     stats.bvOperations.getAndIncrement();
     return delegate.shiftLeft(pNumber, pToShift);
+  }
+
+  @Override
+  public BitvectorFormula rotateLeft(BitvectorFormula pNumber, int pToRotate) {
+    stats.bvOperations.getAndIncrement();
+    return delegate.rotateLeft(pNumber, pToRotate);
+  }
+
+  @Override
+  public BitvectorFormula rotateLeft(BitvectorFormula pNumber, BitvectorFormula pToRotate) {
+    stats.bvOperations.getAndIncrement();
+    return delegate.rotateLeft(pNumber, pToRotate);
+  }
+
+  @Override
+  public BitvectorFormula rotateRight(BitvectorFormula pNumber, int pToRotate) {
+    stats.bvOperations.getAndIncrement();
+    return delegate.rotateRight(pNumber, pToRotate);
+  }
+
+  @Override
+  public BitvectorFormula rotateRight(BitvectorFormula pNumber, BitvectorFormula pToRotate) {
+    stats.bvOperations.getAndIncrement();
+    return delegate.rotateRight(pNumber, pToRotate);
   }
 
   @Override

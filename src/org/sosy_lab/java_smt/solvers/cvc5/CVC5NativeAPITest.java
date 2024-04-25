@@ -22,7 +22,9 @@ import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.junit.After;
 import org.junit.AssumptionViolatedException;
 import org.junit.Before;
@@ -1231,5 +1233,112 @@ public class CVC5NativeAPITest {
     Preconditions.checkNotNull(valueV);
 
     System.out.println(valueV);
+  }
+
+  @Test
+  public void checkCVC5InterpolationMethod() {
+    solver.setOption("produce-interpolants", "true");
+    Term xp = solver.mkConst(solver.getIntegerSort(), "xp");
+    Term y = solver.mkConst(solver.getIntegerSort(), "y");
+
+    Term ip0 = solver.mkTerm(Kind.GT, xp, y);
+    Term ip1 = solver.mkTerm(Kind.EQUAL, xp, solver.mkInteger(0));
+    Term ip2 = solver.mkTerm(Kind.GT, y, solver.mkInteger(0));
+
+    Term a = ip0;
+    Term b = solver.mkTerm(Kind.AND, ip1, ip2);
+
+    assertThat(!interpolateAndCheck(solver, a, b).isNull()).isTrue();
+  }
+
+  /**
+   * Interpolates Terms after CVC5 and checks the Definition of Craig-Interpolation for the
+   * interpolation.
+   *
+   * @return Interpolantion of interpolantA and interpolantB after CVC5 Interpolation Definition
+   */
+  private Term interpolateAndCheck(Solver solverP, Term interpolantA, Term interpolantB) {
+    // solver.setOption("produce-interpolants", "true");
+    solverP.assertFormula(interpolantA);
+    System.out.println(
+        "Interpolation Pair:\n" + interpolantA + "\n" + solverP.mkTerm(Kind.NOT, interpolantB));
+    Term interpolation = solverP.getInterpolant(solverP.mkTerm(Kind.NOT, interpolantB));
+    System.out.println("Interpolation: " + interpolation);
+    solverP.resetAssertions();
+    Term cvc51 = solverP.mkTerm(Kind.IMPLIES, interpolantA, interpolation);
+    Term cvc52 =
+        solverP.mkTerm(Kind.IMPLIES, interpolation, solverP.mkTerm(Kind.NOT, interpolantB));
+
+    solverP.assertFormula(cvc51);
+    solverP.assertFormula(cvc52);
+    if (solverP.checkSat().isUnsat()) {
+      System.out.println("Does not satisfy CVC5 Interpolation Definition");
+      return null;
+    }
+
+    solverP.resetAssertions();
+    solverP.assertFormula(solverP.mkTerm(Kind.NOT, solverP.mkTerm(Kind.AND, cvc51, cvc52)));
+    if (solverP.checkSat().isSat()) {
+      System.out.println("Does not satisfy generally CVC5 Interpolation Definition");
+      return null;
+    }
+
+    solverP.resetAssertions();
+    Term craig1 = solverP.mkTerm(Kind.IMPLIES, interpolantA, interpolation);
+    Term craig2 =
+        solverP.mkTerm(
+            Kind.EQUAL,
+            solverP.mkTerm(Kind.AND, interpolation, interpolantB),
+            solverP.mkBoolean(false));
+    solverP.assertFormula(craig1);
+    solverP.assertFormula(craig2);
+    if (solverP.checkSat().isUnsat()) {
+      System.out.println("Does not satisfy Craig Interpolation Definition");
+      return null;
+    }
+    solverP.resetAssertions();
+    solverP.assertFormula(solverP.mkTerm(Kind.NOT, solverP.mkTerm(Kind.AND, craig1, craig2)));
+    if (solverP.checkSat().isSat()) {
+      System.out.println("Does not satisfy generally Craig Interpolation Definition");
+      return null;
+    }
+    System.out.println("------------");
+    return interpolation;
+  }
+
+  @Test
+  @Ignore // Does not terminate
+  public void testSimpleInterpolation() {
+    // Out of InterpolatingProverTest.java
+    // Line: 65
+    solver.setOption("produce-interpolants", "true");
+    Term xprime = solver.mkConst(solver.getIntegerSort(), "x");
+    Term y = solver.mkConst(solver.getIntegerSort(), "y");
+    Term z = solver.mkConst(solver.getIntegerSort(), "z");
+    Term f1 = solver.mkTerm(Kind.EQUAL, y, solver.mkTerm(Kind.MULT, solver.mkInteger(2), xprime));
+    Term f2 =
+        solver.mkTerm(
+            Kind.EQUAL,
+            y,
+            solver.mkTerm(
+                Kind.ADD, solver.mkInteger(1), solver.mkTerm(Kind.MULT, z, solver.mkInteger(2))));
+    interpolateAndCheck(solver, f1, f2);
+  }
+
+  @Test
+  public void testBitvectorSortinVariableCache() throws CVC5ApiException {
+    Map<String, Term> variablesCache = new HashMap<>();
+    String name = "__ADDRESS_OF_main::i@";
+    Sort sort = solver.mkBitVectorSort(32);
+    System.out.println(sort);
+    System.out.println("--------");
+    Term exp = variablesCache.computeIfAbsent(name, n -> solver.mkConst(sort, name));
+    Preconditions.checkArgument(
+        sort.equals(exp.getSort()),
+        "symbol name %s with sort %s already in use for different sort %s with value %s as String",
+        name,
+        sort,
+        exp.getSort(),
+        exp);
   }
 }

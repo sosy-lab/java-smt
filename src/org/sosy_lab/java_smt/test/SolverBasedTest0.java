@@ -52,6 +52,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.StringFormulaManager;
 import org.sosy_lab.java_smt.api.UFManager;
+import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
 /**
  * Abstract base class with helpful utilities for writing tests that use an SMT solver. It
@@ -116,8 +117,18 @@ public abstract class SolverBasedTest0 {
     return Solvers.SMTINTERPOL;
   }
 
+  /** This method is only called, if OpenSMT is called. OpenSMT needs to know the logic upfront. */
+  protected Logics logicToUse() {
+    return Logics.QF_AUFLIRA;
+  }
+
   protected ConfigurationBuilder createTestConfigBuilder() {
-    return Configuration.builder().setOption("solver.solver", solverToUse().toString());
+    ConfigurationBuilder newConfig =
+        Configuration.builder().setOption("solver.solver", solverToUse().toString());
+    if (solverToUse() == Solvers.OPENSMT) {
+      newConfig.setOption("solver.opensmt.logic", logicToUse().toString());
+    }
+    return newConfig;
   }
 
   @Before
@@ -231,7 +242,7 @@ public abstract class SolverBasedTest0 {
   }
 
   /** Skip test if the solver does not support arrays. */
-  protected final void requireArrays() {
+  protected /*final*/ void requireArrays() {
     assume()
         .withMessage("Solver %s does not support the theory of arrays", solverToUse())
         .that(amgr)
@@ -250,6 +261,10 @@ public abstract class SolverBasedTest0 {
     assume()
         .withMessage("Solver %s does not support the theory of strings", solverToUse())
         .that(smgr)
+        .isNotNull();
+    assume()
+        .withMessage("Solver %s does not support the theory of arrays", solverToUse())
+        .that(amgr)
         .isNotNull();
   }
 
@@ -298,6 +313,14 @@ public abstract class SolverBasedTest0 {
         .isNotEqualTo(Solvers.DREAL4);
   }
 
+  protected void requireArrayModel() {
+    // INFO: OpenSmt does not support model generation for array
+    assume()
+        .withMessage("Solver %s does not support model generation for arrays", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.OPENSMT);
+  }
+
   protected void requireModel() {
     /*assume()
     .withMessage("Solver %s does not support model generation in a usable way", solverToUse())
@@ -316,7 +339,21 @@ public abstract class SolverBasedTest0 {
     assume()
         .withMessage("Solver %s does not support unsat core generation", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.BOOLECTOR, Solvers.DREAL4);
+        .isNoneOf(Solvers.BOOLECTOR, Solvers.OPENSMT, Solvers.DREAL4);
+  }
+
+  protected void requireUnsatCoreOverAssumptions() {
+    assume()
+        .withMessage("Solver %s does not support unsat core generation", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.PRINCESS);
+  }
+
+  protected void requireSubstitution() {
+    assume()
+        .withMessage("Solver %s does not support formula substitution", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BOOLECTOR);
   }
 
   /** Skip test if solver does not support uninterpreted function. */
@@ -341,6 +378,13 @@ public abstract class SolverBasedTest0 {
         .withMessage("Solver %s does not support floor opertion.", solverToUse())
         .that(solverToUse())
         .isNotEqualTo(Solvers.DREAL4);
+  }
+
+  protected void requireUserPropagators() {
+    assume()
+        .withMessage("Solver %s does not support user propagation", solverToUse())
+        .that(solverToUse())
+        .isEqualTo(Solvers.Z3);
   }
 
   /**

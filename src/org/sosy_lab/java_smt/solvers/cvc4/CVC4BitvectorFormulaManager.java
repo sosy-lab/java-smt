@@ -10,6 +10,8 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 
 import edu.stanford.CVC4.BitVector;
 import edu.stanford.CVC4.BitVectorExtract;
+import edu.stanford.CVC4.BitVectorRotateLeft;
+import edu.stanford.CVC4.BitVectorRotateRight;
 import edu.stanford.CVC4.BitVectorSignExtend;
 import edu.stanford.CVC4.BitVectorType;
 import edu.stanford.CVC4.BitVectorZeroExtend;
@@ -80,8 +82,20 @@ public class CVC4BitvectorFormulaManager
   }
 
   @Override
-  protected Expr shiftLeft(Expr pParam1, Expr pParam2) {
-    return exprManager.mkExpr(Kind.BITVECTOR_SHL, pParam1, pParam2);
+  protected Expr shiftLeft(Expr number, Expr toShift) {
+    return exprManager.mkExpr(Kind.BITVECTOR_SHL, number, toShift);
+  }
+
+  @Override
+  protected Expr rotateLeftByConstant(Expr number, int toRotate) {
+    Expr op = exprManager.mkConst(new BitVectorRotateLeft(toRotate));
+    return exprManager.mkExpr(op, number);
+  }
+
+  @Override
+  protected Expr rotateRightByConstant(Expr number, int toRotate) {
+    Expr op = exprManager.mkConst(new BitVectorRotateRight(toRotate));
+    return exprManager.mkExpr(op, number);
   }
 
   @Override
@@ -138,7 +152,7 @@ public class CVC4BitvectorFormulaManager
   }
 
   @Override
-  protected Expr modulo(Expr numerator, Expr denumerator, boolean signed) {
+  protected Expr remainder(Expr numerator, Expr denumerator, boolean signed) {
     final Kind operator = signed ? Kind.BITVECTOR_SREM : Kind.BITVECTOR_UREM;
     final Expr remainder = exprManager.mkExpr(operator, numerator, denumerator);
     // CVC4 does not align with SMTLIB standard when it comes to modulo-by-zero.
@@ -147,6 +161,17 @@ public class CVC4BitvectorFormulaManager
     final Expr zero = makeBitvectorImpl(bitsize, 0);
     return exprManager.mkExpr(
         Kind.ITE, exprManager.mkExpr(Kind.EQUAL, denumerator, zero), numerator, remainder);
+  }
+
+  @Override
+  protected Expr smodulo(Expr numerator, Expr denumerator) {
+    final Expr modulo = exprManager.mkExpr(Kind.BITVECTOR_SMOD, numerator, denumerator);
+    // CVC4 does not align with SMTLIB standard when it comes to modulo-by-zero.
+    // For modulo-by-zero, we compute the result as: "return the numerator".
+    final int bitsize = ((BitvectorType) formulaCreator.getFormulaType(numerator)).getSize();
+    final Expr zero = makeBitvectorImpl(bitsize, 0);
+    return exprManager.mkExpr(
+        Kind.ITE, exprManager.mkExpr(Kind.EQUAL, denumerator, zero), numerator, modulo);
   }
 
   @Override

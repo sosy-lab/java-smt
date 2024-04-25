@@ -1,0 +1,255 @@
+diff --git a/src/api/Interpret.cc b/src/api/Interpret.cc
+index 0c778b9f..418da7d8 100644
+--- a/src/api/Interpret.cc
++++ b/src/api/Interpret.cc
+@@ -43,6 +43,11 @@ Interpret::~Interpret() {
+     for (int i = 0; i < term_names.size(); ++i) {
+         free(term_names[i]);
+     }
++
++    // if the logic is given in the constructor and was not set via string-input, we cleanup the reference
++    if (!ownsLogic) {
++        logic.release();
++    }
+ }
+ 
+ PTRef
+@@ -1067,11 +1072,13 @@ void Interpret::comment_formatted(const char* fmt_str, ...) const {
+ 
+ 
+ void Interpret::notify_formatted(bool error, const char* fmt_str, ...) {
++    std::stringstream out;
++
+     va_list ap;
+     int d;
+     char c1, *t;
+     if (error)
+-        std::cout << "(error \"";
++        out << "(error \"";
+ 
+     va_start(ap, fmt_str);
+     while (true) {
+@@ -1080,25 +1087,31 @@ void Interpret::notify_formatted(bool error, const char* fmt_str, ...) {
+             switch (*fmt_str++) {
+             case 's':
+                 t = va_arg(ap, char *);
+-                std::cout << t;
++                out << t;
+                 break;
+             case 'd':
+                 d = va_arg(ap, int);
+-                std::cout << d;
++                out << d;
+                 break;
+             case '%':
+-                std::cout << '%';
++                out << '%';
+                 break;
+             }
+         }
+         else if (c1 != '\0')
+-            std::cout << c1;
++            out << c1;
+         else break;
+     }
+     va_end(ap);
++
+     if (error)
+-        std::cout << "\")" << '\n';
+-    std::cout << std::endl;
++        out << "\")" << '\n';
++    out << std::endl;
++
++    if (error)
++      throw new OsmtApiException(out.str());
++
++    std::cout << out.str();
+ }
+ 
+ void Interpret::notify_success() {
+diff --git a/src/api/Interpret.h b/src/api/Interpret.h
+index e43b7691..a28a659d 100644
+--- a/src/api/Interpret.h
++++ b/src/api/Interpret.h
+@@ -135,6 +135,7 @@ class Interpret {
+     std::unique_ptr<MainSolver> main_solver;
+ 
+     bool            f_exit;
++    bool            ownsLogic;
+ 
+     // Named terms for getting variable values
+     MapWithKeys<const char*,PTRef,StringHash,Equal<const char*>> nameToTerm;
+@@ -189,8 +190,20 @@ class Interpret {
+     Interpret(SMTConfig & c)
+         : config     (c)
+         , f_exit     (false)
++        , ownsLogic  (true)
+         { }
+ 
++    /** This constructor reuses the existing logic from caller context. */
++    Interpret(SMTConfig & c, Logic & l)
++        : config     (c)
++        , f_exit     (false)
++        , ownsLogic  (false)
++        {
++          logic.reset(&l);
++          main_solver = createMainSolver(l.getName().c_str());
++          main_solver->initialize();
++        }
++
+     ~Interpret();
+ 
+     int interpFile(FILE* in);
+diff --git a/src/common/FastRational.cc b/src/common/FastRational.cc
+index 8ccc5a51..2af7bfbf 100644
+--- a/src/common/FastRational.cc
++++ b/src/common/FastRational.cc
+@@ -11,18 +11,22 @@ Copyright (c) 2008, 2009 Centre national de la recherche scientifique (CNRS)
+ mpq_ptr FastRational::mpqPool::alloc()
+ {
+     mpq_ptr r;
++    cs.lock();
+     if (!pool.empty()) {
+         r = pool.top();
+         pool.pop();
+     } else {
+         r = store.emplace().get_mpq_t();
+     }
++    cs.unlock();
+     return r;
+ }
+ 
+ void FastRational::mpqPool::release(mpq_ptr ptr)
+ {
++    cs.lock();
+     pool.push(ptr);
++    cs.unlock();
+ }
+ 
+ FastRational::FastRational( const char * s, const int base )
+diff --git a/src/common/FastRational.h b/src/common/FastRational.h
+index a3f4bb1c..9fc7ac3d 100644
+--- a/src/common/FastRational.h
++++ b/src/common/FastRational.h
+@@ -13,6 +13,7 @@ Copyright (c) 2008, 2009 Centre national de la recherche scientifique (CNRS)
+ #include "Vec.h"
+ #include <stack>
+ #include <vector>
++#include <mutex>
+ 
+ typedef int32_t  word;
+ typedef uint32_t uword;
+@@ -71,6 +72,7 @@ class FastRational
+ {
+     class mpqPool
+     {
++        std::mutex cs; // We use a mutex to make the pool thread-safe
+         std::stack<mpq_class> store; // uses deque as storage to avoid realloc
+         std::stack<mpq_ptr, std::vector<mpq_ptr>> pool;
+     public:
+diff --git a/src/logics/Logic.cc b/src/logics/Logic.cc
+index b90430c2..c4b34fc4 100644
+--- a/src/logics/Logic.cc
++++ b/src/logics/Logic.cc
+@@ -15,6 +15,7 @@
+ #include "Substitutor.h"
+ #include "smt2tokens.h"
+ #include "IteHandler.h"
++#include "Interpret.h"
+ 
+ #include <iostream>
+ #include <map>
+@@ -724,6 +725,18 @@ PTRef Logic::mkBoolVar(const char* name)
+     return mkFun(sr, {});
+ }
+ 
++PTRef Logic::parseFormula(std::string input) {
++    SMTConfig config = SMTConfig();
++    Interpret repl = Interpret(config, *this);
++
++    int rval = repl.interpFile(input.data());
++    if (rval != 0) {
++      throw OsmtApiException("Failed to parse input formula");
++    }
++
++    return repl.getParsedFormula();
++}
++
+ void Logic::instantiateFunctions(SRef sr)
+ {
+     // Equality
+@@ -807,12 +820,10 @@ PTRef Logic::insertTerm(SymRef sym, vec<PTRef>&& terms)
+         assert(terms.size() == 0);
+         return mkFun(sym, std::move(terms));
+     }
+-    if (hasArrays()) {
+-        if (isArrayStore(sym))
+-            return mkStore(std::move(terms));
+-        if (isArraySelect(sym))
+-            return mkSelect(std::move(terms));
+-    }
++    if (isArrayStore(sym))
++      return mkStore(std::move(terms));
++    if (isArraySelect(sym))
++      return mkSelect(std::move(terms));
+     return mkUninterpFun(sym, std::move(terms));
+ }
+ 
+@@ -1455,6 +1466,9 @@ Logic::collectStats(PTRef root, int& n_of_conn, int& n_of_eq, int& n_of_uf, int&
+ 
+ PTRef Logic::conjoinExtras(PTRef root) { return root; }
+ 
++Sort const&       Logic::getSortDefinition (SRef s)     const { return sort_store[s]; }
++SortSymbol const& Logic::getSortSymbol     (SSymRef ss) const { return sort_store[ss]; }
++
+ // Fetching sorts
+ SRef        Logic::getSortRef    (const PTRef tr)        const { return getSortRef(getPterm(tr).symb()); }
+ SRef        Logic::getSortRef    (const SymRef sr)       const { return getSym(sr).rsort(); }
+diff --git a/src/logics/Logic.h b/src/logics/Logic.h
+index 73513cd1..888f970c 100644
+--- a/src/logics/Logic.h
++++ b/src/logics/Logic.h
+@@ -144,6 +144,9 @@ class Logic {
+     void        markConstant  (SymId sid);
+ 
+   public:
++    const Sort&       getSortDefinition (SRef s)     const;
++    const SortSymbol& getSortSymbol     (SSymRef ss) const;
++
+     SRef                getSortRef (PTRef tr)  const;
+     SRef                getSortRef (SymRef sr) const;
+     std::string         printSort  (SRef s)    const;
+@@ -275,6 +278,8 @@ public:
+     void dumpWithLets(std::ostream & out, PTRef formula) const;
+     std::string dumpWithLets(PTRef formula) const;
+ 
++    PTRef parseFormula(std::string input);
++
+     PTRef instantiateFunctionTemplate(TemplateFunction const & tmplt, vec<PTRef> const & args);
+ 
+     SSymRef       getSortSymIndexed()              const { return sym_IndexedSort; }
+diff --git a/src/symbols/SymStore.cc b/src/symbols/SymStore.cc
+index 9b2c3241..a2b06c2d 100644
+--- a/src/symbols/SymStore.cc
++++ b/src/symbols/SymStore.cc
+@@ -27,6 +27,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ #include "string.h"
+ #include "SymStore.h"
+ #include "Symbol.h"
++#include "OsmtApiException.h"
+ 
+ const char* SymStore::e_duplicate_symbol = "Symbol Store: symbol already exists";
+ const int   SymStore::symstore_buf_offs_idx = 1;
+@@ -55,6 +56,11 @@ SymRef SymStore::newSymb(const char * fname, SRef rsort, vec<SRef> const & args,
+                 }
+             }
+         }
++        if (!symConfig.isInterpreted) {
++          // Only builtin functions like "=" or "+" should be polymorphic
++          throw OsmtApiException("Symbol `" + std::string(fname) + "` has conflicting definitions");
++        }
+     }
++
+     bool newsym = (symrefs == nullptr);
+     SymRef tr = ta.alloc(rsort, args, symConfig);
+     SymId id = symbols.size();

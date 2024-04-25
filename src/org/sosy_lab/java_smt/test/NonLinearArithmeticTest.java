@@ -36,11 +36,16 @@ import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearAr
 @RunWith(Parameterized.class)
 public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBasedTest0 {
 
-  // Boolector, CVC4, SMTInterpol and MathSAT5 do not fully support non-linear arithmetic
+  // Boolector, CVC4, SMTInterpol, MathSAT5 and OpenSMT do not fully support non-linear arithmetic
   // (though SMTInterpol and MathSAT5 support some parts)
   static final ImmutableSet<Solvers> SOLVER_WITHOUT_NONLINEAR_ARITHMETIC =
       ImmutableSet.of(
-          Solvers.SMTINTERPOL, Solvers.MATHSAT5, Solvers.BOOLECTOR, Solvers.CVC4, Solvers.YICES2);
+          Solvers.SMTINTERPOL,
+          Solvers.MATHSAT5,
+          Solvers.BOOLECTOR,
+          Solvers.CVC4,
+          Solvers.YICES2,
+          Solvers.OPENSMT);
 
   @Parameters(name = "{0} {1} {2}")
   public static Iterable<Object[]> getAllSolversAndTheories() {
@@ -200,7 +205,8 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
     assume()
         .withMessage("Solver %s does not support division by zero", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.YICES2, Solvers.DREAL4);
+        .isNoneOf(Solvers.YICES2, Solvers.OPENSMT, Solvers.DREAL4);
+
 
     T a = nmgr.makeVariable("a");
     T b = nmgr.makeVariable("b");

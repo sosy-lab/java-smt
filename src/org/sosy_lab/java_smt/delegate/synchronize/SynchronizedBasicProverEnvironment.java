@@ -112,6 +112,13 @@ class SynchronizedBasicProverEnvironment<T> implements BasicProverEnvironment<T>
   }
 
   @Override
+  public String toString() {
+    synchronized (sync) {
+      return delegate.toString();
+    }
+  }
+
+  @Override
   public <R> R allSat(AllSatCallback<R> pCallback, List<BooleanFormula> pImportant)
       throws InterruptedException, SolverException {
     synchronized (sync) {

@@ -30,8 +30,11 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
    * {@link #isUnsat()} call that returned <code>true</code>.
    *
    * <p>There is no direct guarantee that the interpolants returned are part of an inductive
-   * sequence', however this seems to work for most (all?) solvers as long as the same proof is
-   * used, i.e. all interpolants are computed after the same SAT-check.
+   * sequence', however this seems to work for most solvers as long as the same proof is used, i.e.
+   * all interpolants are computed after the same SAT-check. If a solver does not use the same
+   * internal proof for several interpolation queries (such as CVC5), then the returned interpolants
+   * might not satisfy the sequence-criteria. We suggest the proper method {@link
+   * #getSeqInterpolants} for that case.
    *
    * @param formulasOfA A collection of values returned by {@link #push(BooleanFormula)}. All the
    *     corresponding formulas from group A, the remaining formulas form group B.

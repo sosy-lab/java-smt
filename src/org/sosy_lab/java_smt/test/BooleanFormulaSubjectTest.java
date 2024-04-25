@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.ExpectFailure.assertThat;
+import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.test.BooleanFormulaSubject.booleanFormulasOf;
 
 import com.google.common.base.Throwables;
@@ -17,6 +18,7 @@ import com.google.common.truth.ExpectFailure.SimpleSubjectBuilderCallback;
 import com.google.common.truth.SimpleSubjectBuilder;
 import org.junit.Before;
 import org.junit.Test;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 
@@ -64,7 +66,11 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0.ParameterizedSol
 
   @Test
   public void testIsSatisfiableNo() {
-    requireUnsatCore();
+    // INFO: OpenSMT does not support unsat core
+    assume()
+        .withMessage("Solver does not support unsat core generation in a usable way")
+        .that(solverToUse())
+        .isNoneOf(Solvers.BOOLECTOR, Solvers.OPENSMT);
 
     AssertionError failure =
         expectFailure(whenTesting -> whenTesting.that(contradiction).isSatisfiable());
@@ -158,12 +164,12 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void testIsEquisatisfiableoNo() {
+  public void testIsEquisatisfiableToNo() {
     BooleanFormula simpleFormula2;
     if (imgr != null) {
-      simpleFormula2 = imgr.equal(imgr.makeVariable("a"), imgr.makeVariable("2"));
+      simpleFormula2 = imgr.equal(imgr.makeVariable("a"), imgr.makeNumber(2));
     } else {
-      simpleFormula2 = bvmgr.equal(bvmgr.makeVariable(2, "a"), bvmgr.makeVariable(2, "2"));
+      simpleFormula2 = bvmgr.equal(bvmgr.makeVariable(2, "a"), bvmgr.makeBitvector(2, 2));
     }
     AssertionError failure =
         expectFailure(
