@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+This file is part of JavaSMT,
+an API wrapper for a collection of SMT solvers:
+https://github.com/sosy-lab/java-smt
+
+SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<!-- vim: set tabstop=8 shiftwidth=4 expandtab sts=4 filetype=ant fdm=marker: -->
+<!-- SECTION: Publishing Apron {{{1
+   ==================================================================
+-->
+<project name="publish-solvers-apron" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+    <import file="macros.xml"/>
+
+    <target name="package-apron" depends="">
+        <!-- Copy Apron repository to the root folder along with the version postfix. -->
+        <fail unless="apron.path">
+            Please specify the path to Apron with the flag -Dapron.path=/path/to/apron.
+            The path has to point to the root Apron folder, i.e.,
+            a checkout of the official git repositoy from 'https://github.com/antoinemine/apron'.
+            Note that shell substitutions do not work and a full absolute path has to be specified.
+        </fail>
+        <fail unless="apron.customRev">
+            Please specify a custom revision with the flag -Dapron.customRev=XXX.
+            The custom revision has to be unique amongst the already known version
+            numbers from the ivy repository. The script will append the git revision.
+        </fail>
+        <!-- get a naive version -->
+        <exec executable="git" dir="${apron.path}" outputproperty="apron.revision"
+              failonerror="true">
+            <arg value="show"/>
+            <arg value="-s"/>
+            <arg value="--format=%h"/>
+        </exec>
+        <property name="apron.version" value="${apron.customRev}-g${apron.revision}"/>
+        <echo message="Building Apron in version '${apron.version}'"/>
+
+        <!-- build apron -->
+        <exec executable="./configure" dir="${apron.path}" failonerror="true">
+            <arg value="-java-prefix"/>
+            <arg value="/usr/lib/jvm/java-11-openjdk-amd64"/>
+            <arg value="--no-cxx"/>
+            <arg value="--no-ocaml"/>
+            <arg value="--no-ppl"/>
+            <arg value="--prefix"/>
+            <arg value="${apron.path}/install"/>
+            <arg value="--no-ocaml-plugins"/>
+            <arg value="--no-ocamlfind"/>
+        </exec>
+        <exec executable="make" dir="${apron.path}" failonerror="true">
+        </exec>
+
+        <!-- fix RPATH and library dependencies -->
+        <exec executable="patchelf" dir="${apron.path}/apron" failonerror="true">
+            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
+            <arg value="libapron.so"/>
+        </exec>
+        <exec executable="patchelf" dir="${apron.path}/box" failonerror="true">
+            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
+            <arg value="libboxD.so"/>
+        </exec>
+        <exec executable="patchelf" dir="${apron.path}/japron" failonerror="true">
+            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
+            <arg value="libjapron.so"/>
+        </exec>
+        <exec executable="patchelf" dir="${apron.path}/japron" failonerror="true">
+            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
+            <arg value="libjgmp.so"/>
+        </exec>
+        <exec executable="patchelf" dir="${apron.path}/octagons" failonerror="true">
+            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
+            <arg value="liboctD.so"/>
+        </exec>
+        <exec executable="patchelf" dir="${apron.path}/newpolka" failonerror="true">
+            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
+            <arg value="libpolkaMPQ.so"/>
+        </exec>
+
+        <!-- copy library files into directory to be published for IVY -->
+        <copy file="${apron.path}/japron/apron.jar"
+              tofile="apron-${apron.version}.jar"/>
+        <copy file="${apron.path}/japron/gmp.jar"
+              tofile="gmp-${apron.version}.jar"/>
+        <copy file="${apron.path}/apron/libapron.so"
+              tofile="libapron-${apron.version}.so"/>
+        <copy file="${apron.path}/box/libboxD.so"
+              tofile="libboxD-${apron.version}.so"/>
+        <copy file="${apron.path}/japron/libjapron.so"
+              tofile="libjapron-${apron.version}.so"/>
+        <copy file="${apron.path}/japron/libjgmp.so"
+              tofile="libjgmp-${apron.version}.so"/>
+        <copy file="${apron.path}/octagons/liboctD.so"
+              tofile="liboctD-${apron.version}.so"/>
+        <copy file="${apron.path}/newpolka/libpolkaMPQ.so"
+              tofile="libpolkaMPQ-${apron.version}.so"/>
+    </target>
+
+    <target name="publish-apron" depends="package-apron, load-ivy"
+            description="Publish Apron binaries to Ivy repository.">
+        <ivy:resolve conf="solver-apron" file="solvers_ivy_conf/ivy_apron.xml" />
+        <publishToRepository solverName="Apron" solverVersion="${apron.version}"/>
+    </target>
+</project>
