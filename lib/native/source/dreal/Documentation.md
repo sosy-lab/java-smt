@@ -32,7 +32,8 @@ zlib1g-dev
 ```
 4. Build with bazel
 `bazel build //...`
-5. Library can be found in `bazel-bin/libdreal_.so`
+5. Comment out the broken test and bazel again...
+6Library can be found in `bazel-bin/libdreal_.so`
 
 ### How to build the library:
 1. Install the dependencies for libibex-dev
