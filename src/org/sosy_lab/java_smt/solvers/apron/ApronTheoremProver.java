@@ -26,10 +26,8 @@ import apron.Tcons1;
 import apron.Texpr1Node;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -47,14 +45,12 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
-import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronConstraint;
 
 public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
     implements ProverEnvironment {
 
   private final ApronSolverContext solverContext;
-  private final List<Collection<ApronConstraint>> assertedFormulas = new ArrayList<>();
   private final Logger logger = Logger.getLogger("TheoremProver logger");
   private Abstract1 abstract1;
 
@@ -70,15 +66,10 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
         new Abstract1(
             pApronSolverContext.getManager(),
             pApronSolverContext.getFormulaCreator().getFormulaEnvironment());
-    this.assertedFormulas.add(new LinkedHashSet<>());
   }
 
   public ApronSolverContext getSolverContext() {
     return solverContext;
-  }
-
-  public List<Collection<ApronConstraint>> getAssertedFormulas() {
-    return assertedFormulas;
   }
 
   @Override
@@ -92,28 +83,16 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
   }
 
   @Override
-  public void pop() {
-    Preconditions.checkState(!closed);
-    Preconditions.checkState(assertedFormulas.size() > 1);
-    assertedFormulas.remove(assertedFormulas.size() - 1);
+  protected void popImpl() {
+    // Do nothing
   }
 
   @Override
-  public @Nullable Void addConstraint(BooleanFormula constraint) throws InterruptedException {
-    Preconditions.checkState(!closed);
-    ApronNode node = ApronFormulaManager.getTerm(constraint);
-    if (node instanceof ApronConstraint) {
-      addConstraintException((ApronConstraint) node);
-    } else {
-      throw new IllegalArgumentException("Constraint of wrong Type!");
-    }
-
-    return null;
-  }
-
-  private void addConstraintException(ApronConstraint pConstraint) {
+  protected @Nullable Void addConstraintImpl(BooleanFormula constraint)
+      throws InterruptedException {
+    ApronConstraint node = (ApronConstraint) ApronFormulaManager.getTerm(constraint);
     try {
-      for (Map.Entry<Tcons1, Texpr1Node> cons : pConstraint.getConstraintNodes().entrySet()) {
+      for (Map.Entry<Tcons1, Texpr1Node> cons : node.getConstraintNodes().entrySet()) {
         Tcons1[] consOld = abstract1.toTcons(solverContext.getManager());
         Tcons1[] newCons = new Tcons1[consOld.length + 1];
         int i = 0;
@@ -128,32 +107,21 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
             solverContext.getFormulaCreator().getFormulaEnvironment(),
             false);
         this.abstract1 = new Abstract1(solverContext.getManager(), newCons);
-        Iterables.getLast(assertedFormulas).add(pConstraint);
       }
     } catch (ApronException e) {
       throw new RuntimeException(e);
     }
+    return null;
   }
 
   @Override
-  public void push() throws InterruptedException {
-    Preconditions.checkState(!closed);
-    assertedFormulas.add(new LinkedHashSet<>());
-  }
-
-  @Override
-  public int size() {
-    Preconditions.checkState(!closed);
-    return assertedFormulas.size() - 1;
+  protected void pushImpl() throws InterruptedException {
+    // Do nothing
   }
 
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
-    return isUnsatApron();
-  }
-
-  private boolean isUnsatApron() {
     try {
       if (abstract1.isBottom(solverContext.getManager())) {
         return true;
@@ -172,13 +140,11 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
   @Override
   public Model getModel() throws SolverException {
     Preconditions.checkState(!closed);
-    return new ApronModel(this, solverContext.getFormulaCreator(), getAssertedExpressions());
-  }
-
-  private Collection<ApronConstraint> getAssertedExpressions() {
-    List<ApronConstraint> result = new ArrayList<>();
-    assertedFormulas.forEach(result::addAll);
-    return result;
+    ImmutableList.Builder<ApronConstraint> constraints = ImmutableList.builder();
+    for (var f : getAssertedFormulas()) {
+      constraints.add((ApronConstraint) ApronFormulaManager.getTerm(f));
+    }
+    return new ApronModel(this, solverContext.getFormulaCreator(), constraints.build());
   }
 
   @Override
@@ -234,7 +200,6 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
   @Override
   public void close() {
     if (!closed) {
-      assertedFormulas.clear();
       closed = true;
     }
     super.close();
