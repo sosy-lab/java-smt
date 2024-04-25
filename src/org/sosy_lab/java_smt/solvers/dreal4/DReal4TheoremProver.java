@@ -9,13 +9,7 @@
 package org.sosy_lab.java_smt.solvers.dreal4;
 
 import com.google.common.base.Preconditions;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Deque;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import com.google.common.collect.ImmutableList;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -25,11 +19,12 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
-import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Box;
-import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Config;
-import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Context;
-import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula;
-import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.*;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 class DReal4TheoremProver extends AbstractProverWithAllSat<Void> implements ProverEnvironment {
 
@@ -37,7 +32,6 @@ class DReal4TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   private final Config config;
   private final Context curCnt;
 
-  protected final Deque<List<DRealTerm<?, ?>>> assertedFormulas = new ArrayDeque<>();
   private Box model;
 
   protected DReal4TheoremProver(
@@ -49,23 +43,17 @@ class DReal4TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
     this.creator = creator;
     config = creator.getEnv();
     model = new Box();
-    assertedFormulas.push(new ArrayList<>());
     curCnt = new Context(config);
   }
 
   @Override
-  public void pop() {
-    Preconditions.checkState(!closed);
-    Preconditions.checkState(size() > 0);
-    assertedFormulas.pop();
+  protected void popImpl() {
     curCnt.pop(1);
   }
 
   @Override
-  public @Nullable Void addConstraint(BooleanFormula constraint) throws InterruptedException {
-    Preconditions.checkState(!closed);
+  protected @Nullable Void addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
     DRealTerm<?, ?> formula = creator.extractInfo(constraint);
-    assertedFormulas.peek().add(formula);
     // It is not possible to assert an Expression, only Variable of type boolean or a formula
     Preconditions.checkState(!formula.isExp());
     if (formula.isVar()) {
@@ -81,16 +69,8 @@ class DReal4TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   }
 
   @Override
-  public void push() throws InterruptedException {
-    Preconditions.checkState(!closed);
-    assertedFormulas.push(new ArrayList<>());
+  protected void pushImpl() throws InterruptedException {
     curCnt.push(1);
-  }
-
-  @Override
-  public int size() {
-    Preconditions.checkState(!closed);
-    return assertedFormulas.size() - 1;
   }
 
   @Override
@@ -127,21 +107,18 @@ class DReal4TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
 
   @Override
   protected DReal4Model getEvaluatorWithoutChecks() {
-    return new DReal4Model(this, creator, model, getAssertedExpressions());
+    ImmutableList.Builder<DRealTerm<?,?>> constraints = ImmutableList.builder();
+    for (BooleanFormula f : getAssertedFormulas()) {
+      constraints.add(creator.extractInfo(f));
+    }
+    return new DReal4Model(this, creator, model, constraints.build());
   }
 
   @Override
   public void close() {
     if (!closed) {
-      assertedFormulas.clear();
       Context.exit();
       closed = true;
     }
-  }
-
-  protected Collection<DRealTerm<?, ?>> getAssertedExpressions() {
-    List<DRealTerm<?, ?>> result = new ArrayList<>();
-    assertedFormulas.forEach(result::addAll);
-    return result;
   }
 }
