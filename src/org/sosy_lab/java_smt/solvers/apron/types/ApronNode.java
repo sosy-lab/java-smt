@@ -845,11 +845,11 @@ public interface ApronNode extends Formula {
 
     @Override
     public String toString() {
-      String str = "";
+      StringBuilder builder = new StringBuilder();
       for (Map.Entry<Tcons1, Texpr1Node> node : this.constraintNodes.entrySet()) {
-        str = str + node.getKey().toString() + "\n";
+        builder.append(node.getKey().toString()).append("\n");
       }
-      return str;
+      return builder.toString();
     }
 
     @Override
