@@ -18,20 +18,20 @@ package org.sosy_lab.java_smt.solvers.dreal4.drealjni;
 import javax.annotation.concurrent.NotThreadSafe;
 
 @NotThreadSafe
-public class VaribaleIntUnorderedMap extends java.util.AbstractMap<Variable, Integer> {
+public class VariableIntUnorderedMap extends java.util.AbstractMap<Variable, Integer> {
   private transient long swigCPtr;
   protected transient boolean swigCMemOwn;
 
-  protected VaribaleIntUnorderedMap(long cPtr, boolean cMemoryOwn) {
+  protected VariableIntUnorderedMap(long cPtr, boolean cMemoryOwn) {
     swigCMemOwn = cMemoryOwn;
     swigCPtr = cPtr;
   }
 
-  protected static long getCPtr(VaribaleIntUnorderedMap obj) {
+  protected static long getCPtr(VariableIntUnorderedMap obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
-  protected static long swigRelease(VaribaleIntUnorderedMap obj) {
+  protected static long swigRelease(VariableIntUnorderedMap obj) {
     long ptr = 0;
     if (obj != null) {
       if (!obj.swigCMemOwn) {
@@ -155,13 +155,13 @@ public class VaribaleIntUnorderedMap extends java.util.AbstractMap<Variable, Int
     return setToReturn;
   }
 
-  public VaribaleIntUnorderedMap() {
+  public VariableIntUnorderedMap() {
     this(DrealJNI.newVaribaleIntUnorderedMapSWIG0(), true);
   }
 
-  public VaribaleIntUnorderedMap(VaribaleIntUnorderedMap other) {
+  public VariableIntUnorderedMap(VariableIntUnorderedMap other) {
     this(
-        DrealJNI.newVaribaleIntUnorderedMapSWIG1(VaribaleIntUnorderedMap.getCPtr(other), other),
+        DrealJNI.newVaribaleIntUnorderedMapSWIG1(VariableIntUnorderedMap.getCPtr(other), other),
         true);
   }
 
@@ -207,14 +207,14 @@ public class VaribaleIntUnorderedMap extends java.util.AbstractMap<Variable, Int
       }
     }
 
-    private VaribaleIntUnorderedMap.Iterator getNextUnchecked() {
-      return new VaribaleIntUnorderedMap.Iterator(
+    private VariableIntUnorderedMap.Iterator getNextUnchecked() {
+      return new VariableIntUnorderedMap.Iterator(
           DrealJNI.varibaleIntUnorderedMapIteratorGetNextUnchecked(swigCPtr, this), true);
     }
 
-    private boolean isNot(VaribaleIntUnorderedMap.Iterator other) {
+    private boolean isNot(VariableIntUnorderedMap.Iterator other) {
       return DrealJNI.varibaleIntUnorderedMapIteratorIsNot(
-          swigCPtr, this, VaribaleIntUnorderedMap.Iterator.getCPtr(other), other);
+          swigCPtr, this, VariableIntUnorderedMap.Iterator.getCPtr(other), other);
     }
 
     private Variable getKey() {
@@ -240,18 +240,18 @@ public class VaribaleIntUnorderedMap extends java.util.AbstractMap<Variable, Int
     DrealJNI.varibaleIntUnorderedMapClear(swigCPtr, this);
   }
 
-  private VaribaleIntUnorderedMap.Iterator find(Variable key) {
-    return new VaribaleIntUnorderedMap.Iterator(
+  private VariableIntUnorderedMap.Iterator find(Variable key) {
+    return new VariableIntUnorderedMap.Iterator(
         DrealJNI.varibaleIntUnorderedMapFind(swigCPtr, this, Variable.getCPtr(key), key), true);
   }
 
-  private VaribaleIntUnorderedMap.Iterator begin() {
-    return new VaribaleIntUnorderedMap.Iterator(
+  private VariableIntUnorderedMap.Iterator begin() {
+    return new VariableIntUnorderedMap.Iterator(
         DrealJNI.varibaleIntUnorderedMapBegin(swigCPtr, this), true);
   }
 
-  private VaribaleIntUnorderedMap.Iterator end() {
-    return new VaribaleIntUnorderedMap.Iterator(
+  private VariableIntUnorderedMap.Iterator end() {
+    return new VariableIntUnorderedMap.Iterator(
         DrealJNI.varibaleIntUnorderedMapEnd(swigCPtr, this), true);
   }
 
@@ -267,8 +267,8 @@ public class VaribaleIntUnorderedMap extends java.util.AbstractMap<Variable, Int
     DrealJNI.varibaleIntUnorderedMapPutUnchecked(swigCPtr, this, Variable.getCPtr(key), key, value);
   }
 
-  private void removeUnchecked(VaribaleIntUnorderedMap.Iterator itr) {
+  private void removeUnchecked(VariableIntUnorderedMap.Iterator itr) {
     DrealJNI.varibaleIntUnorderedMapRemoveUnchecked(
-        swigCPtr, this, VaribaleIntUnorderedMap.Iterator.getCPtr(itr), itr);
+        swigCPtr, this, VariableIntUnorderedMap.Iterator.getCPtr(itr), itr);
   }
 }

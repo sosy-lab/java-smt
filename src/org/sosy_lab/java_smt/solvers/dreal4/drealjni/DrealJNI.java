@@ -310,56 +310,56 @@ public final class DrealJNI {
   public static native long newVaribaleIntUnorderedMapSWIG0();
 
   public static native long newVaribaleIntUnorderedMapSWIG1(
-      long jarg1, VaribaleIntUnorderedMap jarg11);
+      long jarg1, VariableIntUnorderedMap jarg11);
 
   public static native long varibaleIntUnorderedMapIteratorGetNextUnchecked(
-      long jarg1, VaribaleIntUnorderedMap.Iterator jarg11);
+      long jarg1, VariableIntUnorderedMap.Iterator jarg11);
 
   public static native boolean varibaleIntUnorderedMapIteratorIsNot(
       long jarg1,
-      VaribaleIntUnorderedMap.Iterator jarg11,
+      VariableIntUnorderedMap.Iterator jarg11,
       long jarg2,
-      VaribaleIntUnorderedMap.Iterator jarg22);
+      VariableIntUnorderedMap.Iterator jarg22);
 
   public static native long varibaleIntUnorderedMapIteratorGetKey(
-      long jarg1, VaribaleIntUnorderedMap.Iterator jarg11);
+      long jarg1, VariableIntUnorderedMap.Iterator jarg11);
 
   public static native int varibaleIntUnorderedMapIteratorGetValue(
-      long jarg1, VaribaleIntUnorderedMap.Iterator jarg11);
+      long jarg1, VariableIntUnorderedMap.Iterator jarg11);
 
   public static native void varibaleIntUnorderedMapIteratorSetValue(
-      long jarg1, VaribaleIntUnorderedMap.Iterator jarg11, int jarg2);
+          long jarg1, VariableIntUnorderedMap.Iterator jarg11, int jarg2);
 
   public static native void deleteVaribaleIntUnorderedMapIterator(long jarg1);
 
   public static native boolean varibaleIntUnorderedMapIsEmpty(
-      long jarg1, VaribaleIntUnorderedMap jarg11);
+      long jarg1, VariableIntUnorderedMap jarg11);
 
   public static native void varibaleIntUnorderedMapClear(
-      long jarg1, VaribaleIntUnorderedMap jarg11);
+      long jarg1, VariableIntUnorderedMap jarg11);
 
   public static native long varibaleIntUnorderedMapFind(
-      long jarg1, VaribaleIntUnorderedMap jarg11, long jarg2, Variable jarg22);
+          long jarg1, VariableIntUnorderedMap jarg11, long jarg2, Variable jarg22);
 
   public static native long varibaleIntUnorderedMapBegin(
-      long jarg1, VaribaleIntUnorderedMap jarg11);
+      long jarg1, VariableIntUnorderedMap jarg11);
 
-  public static native long varibaleIntUnorderedMapEnd(long jarg1, VaribaleIntUnorderedMap jarg11);
+  public static native long varibaleIntUnorderedMapEnd(long jarg1, VariableIntUnorderedMap jarg11);
 
   public static native int varibaleIntUnorderedMapSizeImpl(
-      long jarg1, VaribaleIntUnorderedMap jarg11);
+      long jarg1, VariableIntUnorderedMap jarg11);
 
   public static native boolean varibaleIntUnorderedMapContainsImpl(
-      long jarg1, VaribaleIntUnorderedMap jarg11, long jarg2, Variable jarg22);
+          long jarg1, VariableIntUnorderedMap jarg11, long jarg2, Variable jarg22);
 
   public static native void varibaleIntUnorderedMapPutUnchecked(
-      long jarg1, VaribaleIntUnorderedMap jarg11, long jarg2, Variable jarg22, int jarg3);
+          long jarg1, VariableIntUnorderedMap jarg11, long jarg2, Variable jarg22, int jarg3);
 
   public static native void varibaleIntUnorderedMapRemoveUnchecked(
       long jarg1,
-      VaribaleIntUnorderedMap jarg11,
+      VariableIntUnorderedMap jarg11,
       long jarg2,
-      VaribaleIntUnorderedMap.Iterator jarg22);
+      VariableIntUnorderedMap.Iterator jarg22);
 
   public static native void deleteVaribaleIntUnorderedMap(long jarg1);
 
