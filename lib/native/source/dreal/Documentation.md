@@ -9,6 +9,31 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 ## Documentation:
+### Building on Ubuntu 23.10
+0. Get the source from github
+1. Install Bazel from the github release
+`https://github.com/bazelbuild/bazel/releases/download/7.1.1/bazel_7.1.1-linux-x86_64.deb`
+2. Get libibex from the ppa
+`https://launchpad.net/~dreal/+archive/ubuntu/dreal/+sourcepub/13805166/+listing-archive-extra`
+3. Install missing dependencies with apt
+```
+bison
+coinor-libclp-dev
+g++
+libfl-dev
+libgmp-dev
+libibex-dev
+libnlopt-cxx-dev
+libpython3-dev
+pkg-config
+python3-distutils
+python3-minimal
+zlib1g-dev
+```
+4. Build with bazel
+`bazel build //...`
+5. Library can be found in `bazel-bin/libdreal_.so`
+
 ### How to build the library:
 1. Install the dependencies for libibex-dev
     ```bash
