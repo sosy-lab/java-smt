@@ -354,7 +354,7 @@ public abstract class SolverBasedTest0 {
     assume()
         .withMessage("Solver %s does not support formula substitution", solverToUse())
         .that(solverToUse())
-        .isNotEqualTo(Solvers.BOOLECTOR);
+        .isNoneOf(Solvers.BOOLECTOR, Solvers.APRON);
   }
 
   protected void requireNonNumeralVariables() {

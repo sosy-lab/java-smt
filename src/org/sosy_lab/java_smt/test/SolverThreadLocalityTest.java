@@ -65,6 +65,7 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
   @Test
   public void allLocalTest() throws InterruptedException, SolverException {
     requireIntegers();
+    requireNonNumeralVariables();
 
     BooleanFormula formula = hardProblem.generate(DEFAULT_PROBLEM_SIZE);
 
@@ -78,6 +79,7 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
   public void nonLocalContextTest()
       throws ExecutionException, InterruptedException, SolverException {
     requireIntegers();
+    requireNonNumeralVariables();
     assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
 
     // generate a new context in another thread, i.e., non-locally
@@ -113,6 +115,7 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
   public void nonLocalFormulaTest()
       throws InterruptedException, SolverException, ExecutionException {
     requireIntegers();
+    requireNonNumeralVariables();
     assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
 
     // generate a new formula in another thread, i.e., non-locally
@@ -142,6 +145,7 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
   @Test
   public void nonLocalProverTest() throws InterruptedException, ExecutionException {
     requireIntegers();
+    requireNonNumeralVariables();
     assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
 
     BooleanFormula formula = hardProblem.generate(DEFAULT_PROBLEM_SIZE);
@@ -177,6 +181,7 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
   public void nonLocalFormulaTranslationTest() throws Throwable {
     // Test that even when using translation, the thread local problem persists for CVC5
     requireIntegers();
+    requireNonNumeralVariables();
 
     BooleanFormula formula = hardProblem.generate(DEFAULT_PROBLEM_SIZE);
 
@@ -339,6 +344,7 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
   @Test
   public void wrongContextTest()
       throws InterruptedException, SolverException, InvalidConfigurationException {
+    requireNonNumeralVariables();
     assume()
         .that(solverToUse())
         .isNoneOf(

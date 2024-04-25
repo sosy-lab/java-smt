@@ -323,6 +323,7 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
 
   @Test
   public void simplifiedNot() {
+    requireNonNumeralVariables();
     BooleanFormula fTrue = bmgr.makeTrue();
     BooleanFormula fFalse = bmgr.makeFalse();
     BooleanFormula var1 = bmgr.makeVariable("var1");
@@ -344,6 +345,7 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
 
   @Test
   public void simplifiedAnd() {
+    requireNonNumeralVariables();
     BooleanFormula fTrue = bmgr.makeTrue();
     BooleanFormula fFalse = bmgr.makeFalse();
     BooleanFormula var1 = bmgr.makeVariable("var1");
@@ -367,6 +369,7 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
 
   @Test
   public void simplifiedOr() {
+    requireNonNumeralVariables();
     BooleanFormula fTrue = bmgr.makeTrue();
     BooleanFormula fFalse = bmgr.makeFalse();
     BooleanFormula var1 = bmgr.makeVariable("var1");
@@ -390,6 +393,7 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
 
   @Test
   public void simplifiedIfThenElse() {
+    requireNonNumeralVariables();
     BooleanFormula fTrue = bmgr.makeTrue();
     BooleanFormula fFalse = bmgr.makeFalse();
     BooleanFormula var1 = bmgr.makeVariable("var1");
