@@ -77,8 +77,13 @@ public class ApronSolverContext extends AbstractSolverContext {
         new ApronIntegerFormulaManager(formulaCreator, pNonLinearArithmetic);
     ApronRationalFormulaManager rationalFormulaManager =
         new ApronRationalFormulaManager(formulaCreator, pNonLinearArithmetic);
-    ApronFormulaManager fmgr = new ApronFormulaManager(formulaCreator, ufManager,
-        booleanFormulaManager, integerFormulaManager, rationalFormulaManager);
+    ApronFormulaManager fmgr =
+        new ApronFormulaManager(
+            formulaCreator,
+            ufManager,
+            booleanFormulaManager,
+            integerFormulaManager,
+            rationalFormulaManager);
     return new ApronSolverContext(fmgr, manager, formulaCreator, pShutdownNotifier, pLogger);
   }
 
@@ -117,20 +122,22 @@ public class ApronSolverContext extends AbstractSolverContext {
     try {
       ApronBooleanFormulaManager booleanFormulaManager =
           new ApronBooleanFormulaManager(this.formulaCreator);
-      return new ApronTheoremProver(pProverOptions, booleanFormulaManager, this.shutdownNotifier,
-          this);
+      return new ApronTheoremProver(
+          pProverOptions, booleanFormulaManager, this.shutdownNotifier, this);
     } catch (ApronException pApronException) {
       throw new RuntimeException(pApronException);
     }
   }
 
   @Override
-  protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(Set<ProverOptions> pSet) {
+  protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
+      Set<ProverOptions> pSet) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  protected OptimizationProverEnvironment newOptimizationProverEnvironment0(Set<ProverOptions> pSet) {
+  protected OptimizationProverEnvironment newOptimizationProverEnvironment0(
+      Set<ProverOptions> pSet) {
     throw new UnsupportedOperationException("Optimization prover not supported by Apron.");
   }
 

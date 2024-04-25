@@ -22,7 +22,7 @@ package org.sosy_lab.java_smt.solvers.apron.types;
 
 /**
  * This is a helper-class for defining the integer, rational and boolean type for the Generics of
- * ApronFormulaCreator
+ * ApronFormulaCreator.
  */
 public interface ApronFormulaType {
 
@@ -36,20 +36,17 @@ public interface ApronFormulaType {
 
   class ApronIntegerType implements ApronFormulaType {
 
-    public ApronIntegerType() {
-    }
+    public ApronIntegerType() {}
 
     @Override
     public FormulaType getType() {
       return FormulaType.INTEGER;
     }
-
   }
 
   class ApronRationalType implements ApronFormulaType {
 
-    public ApronRationalType() {
-    }
+    public ApronRationalType() {}
 
     @Override
     public FormulaType getType() {
@@ -59,8 +56,7 @@ public interface ApronFormulaType {
 
   class ApronBooleanType implements ApronFormulaType {
 
-    public ApronBooleanType() {
-    }
+    public ApronBooleanType() {}
 
     @Override
     public FormulaType getType() {

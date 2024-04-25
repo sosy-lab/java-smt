@@ -52,11 +52,10 @@ import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.FormulaType;
 
 /**
  * This is a wrapper for formulas from the Apron-library. All numeral formulas refer to
- * Apron-library instances of
- * Texpr1Node; All BooleanFormulas refer to Tcons1; The wrapper is needed to implement methods that
- * are needed for the JavaSMT-binding but are not provided by the Apron-library.
- * SupressWarnig has to be used, because the internal Texpr1Node form the Apron library is not
- * immutble. But all instances are final.
+ * Apron-library instances of Texpr1Node; All BooleanFormulas refer to Tcons1; The wrapper is needed
+ * to implement methods that are needed for the JavaSMT-binding but are not provided by the
+ * Apron-library. SupressWarnig has to be used, because the internal Texpr1Node form the Apron
+ * library is not immutble. But all instances are final.
  */
 @SuppressWarnings("Immutable")
 public interface ApronNode extends Formula {
@@ -66,9 +65,9 @@ public interface ApronNode extends Formula {
   Texpr1Node getNode();
 
   /**
-   * this array is needed for getting all variable names; it is not possible to directly extract
-   * the name
-   * of a variable used in an Texpr1Node; that is the reason why the names are tracked additionally
+   * this array is needed for getting all variable names; it is not possible to directly extract the
+   * name of a variable used in an Texpr1Node; that is the reason why the names are tracked
+   * additionally.
    *
    * @return String-array with all variables that are used in the created formulas
    */
@@ -78,12 +77,9 @@ public interface ApronNode extends Formula {
 
   @Immutable
   interface ApronNumeralNode extends ApronNode, NumeralFormula {
-    /**
-     * This class wraps all rational constants, defined by numerator and denominator
-     */
+    /** This class wraps all rational constants, defined by numerator and denominator. */
     @Immutable
-    class ApronRatCstNode
-        implements RationalFormula, ApronNumeralNode {
+    class ApronRatCstNode implements RationalFormula, ApronNumeralNode {
 
       private final FormulaType type = FormulaType.RATIONAL;
       private final Texpr1CstNode cstNode;
@@ -93,8 +89,7 @@ public interface ApronNode extends Formula {
       private final Rational rational;
 
       public ApronRatCstNode(BigInteger pNumerator, BigInteger pDenominator) {
-        this.cstNode = new Texpr1CstNode(new MpqScalar(pNumerator,
-            pDenominator));
+        this.cstNode = new Texpr1CstNode(new MpqScalar(pNumerator, pDenominator));
         this.numerator = pNumerator;
         this.denominator = pDenominator;
         this.rational = Rational.of(numerator, denominator);
@@ -177,9 +172,7 @@ public interface ApronNode extends Formula {
       }
     }
 
-    /**
-     * This class wraps variables for rational values
-     */
+    /** This class wraps variables for rational values. */
     class ApronRatVarNode implements RationalFormula, ApronNumeralNode {
 
       private final FormulaType type = FormulaType.RATIONAL;
@@ -246,7 +239,7 @@ public interface ApronNode extends Formula {
       /**
        * this method is needed to add the variable to the Environment; the Environment from the
        * Apron library holds all variables in two separated arrays, one for Integers and one for
-       * Rationals; it is a necessary component of an Abstract1 object
+       * Rationals; it is a necessary component of an Abstract1 object.
        */
       private void addVarToEnv() {
         Var[] intVars = formulaCreator.getFormulaEnvironment().getIntVars();
@@ -288,8 +281,7 @@ public interface ApronNode extends Formula {
       private final Set<String> varNames;
 
       public ApronRatUnaryNode(ApronNode param, int op) {
-        this.unaryNode = new Texpr1UnNode(op,
-            param.getNode());
+        this.unaryNode = new Texpr1UnNode(op, param.getNode());
         this.varNames = param.getVarNames();
       }
 
@@ -363,7 +355,7 @@ public interface ApronNode extends Formula {
       public ApronRatBinaryNode(ApronNode param1, ApronNode param2, int op) {
         this.binaryNode = new Texpr1BinNode(op, param1.getNode(), param2.getNode());
         this.varNames = new HashSet<>();
-        //adding the variable names of both parameters to @varNames
+        // adding the variable names of both parameters to @varNames
         this.varNames.addAll(param1.getVarNames());
         this.varNames.addAll(param2.getVarNames());
       }
@@ -425,9 +417,7 @@ public interface ApronNode extends Formula {
       }
     }
 
-    /**
-     * This class wraps integer constants, defined by their BigInteger value.
-     */
+    /** This class wraps integer constants, defined by their BigInteger value. */
     class ApronIntCstNode implements IntegerFormula, ApronNumeralNode {
 
       private final FormulaType type = FormulaType.INTEGER;
@@ -445,15 +435,17 @@ public interface ApronNode extends Formula {
       }
 
       /**
-       * constructor for transforming a rational constant to an integer constant
+       * constructor for transforming a rational constant to an integer constant.
        *
        * @param ratNode constant formula to transform
        */
       public ApronIntCstNode(ApronRatCstNode ratNode) {
         this.cstNode =
-            new Texpr1CstNode(new MpqScalar(
-                BigInteger.valueOf(
-                    Double.valueOf(Math.floor(ratNode.getRational().doubleValue())).longValue())));
+            new Texpr1CstNode(
+                new MpqScalar(
+                    BigInteger.valueOf(
+                        Double.valueOf(Math.floor(ratNode.getRational().doubleValue()))
+                            .longValue())));
         this.value =
             BigInteger.valueOf(
                 Double.valueOf(Math.floor(ratNode.getRational().doubleValue())).longValue());
@@ -506,9 +498,7 @@ public interface ApronNode extends Formula {
       }
     }
 
-    /**
-     * This class wraps variables for integer values.
-     */
+    /** This class wraps variables for integer values. */
     class ApronIntVarNode implements IntegerFormula, ApronNumeralNode {
 
       private final FormulaType type = FormulaType.INTEGER;
@@ -530,7 +520,7 @@ public interface ApronNode extends Formula {
       }
 
       /**
-       * constructor for converting a rational variable to an integer variable
+       * constructor for converting a rational variable to an integer variable.
        *
        * @param rationalNode variable formula that should be transformed
        */
@@ -538,16 +528,16 @@ public interface ApronNode extends Formula {
         this.varNode = new Texpr1VarNode(rationalNode.varName);
         this.varName = rationalNode.varName;
         this.formulaCreator = rationalNode.getFormulaCreator();
-        //deleting real variable from environment
+        // deleting real variable from environment
         Var[] intVars = formulaCreator.getFormulaEnvironment().getIntVars();
         Var[] realVars = formulaCreator.getFormulaEnvironment().getRealVars();
-        ArrayList<Var> list = new ArrayList<>(Arrays.asList(realVars));
+        List<Var> list = new ArrayList<>(Arrays.asList(realVars));
         Var v = new StringVar(varName);
         list.remove(v);
         Var[] newRealVars = new Var[list.size()];
         newRealVars = list.toArray(newRealVars);
         formulaCreator.setFormulaEnvironment(new Environment(intVars, newRealVars));
-        //adding int var to Environment
+        // adding int var to Environment
         addVarToEnv();
       }
 
@@ -594,7 +584,7 @@ public interface ApronNode extends Formula {
       /**
        * this method is needed to add the variable to the Environment; the Environment from the
        * Apron library holds all variables in two separated arrays, one for Integers and one for
-       * Rationals; it is a necessary component of each Abstract1 object
+       * Rationals; it is a necessary component of each Abstract1 object.
        */
       private void addVarToEnv() {
         Var[] intVars = formulaCreator.getFormulaEnvironment().getIntVars();
@@ -631,8 +621,8 @@ public interface ApronNode extends Formula {
       private final Set<String> varNames;
 
       public ApronIntUnaryNode(ApronNode param, int op) {
-        this.unaryNode = new Texpr1UnNode(op, Texpr1Node.RTYPE_INT, Texpr1Node.RDIR_DOWN,
-            param.getNode());
+        this.unaryNode =
+            new Texpr1UnNode(op, Texpr1Node.RTYPE_INT, Texpr1Node.RDIR_DOWN, param.getNode());
         this.varNames = param.getVarNames();
       }
 
@@ -644,7 +634,7 @@ public interface ApronNode extends Formula {
       }
 
       /**
-       * constructor for transforming a rational formula to an integer formula
+       * constructor for transforming a rational formula to an integer formula.
        *
        * @param rationalNode formula to transform
        */
@@ -699,8 +689,8 @@ public interface ApronNode extends Formula {
     }
 
     /**
-     * This class wraps terms with binary arithmetic operators for integer values (ex. x+3); it
-     * is build with an binary operator and two nodes
+     * This class wraps terms with binary arithmetic operators for integer values (ex. x+3); it is
+     * build with an binary operator and two nodes
      */
     class ApronIntBinaryNode implements IntegerFormula, ApronNumeralNode {
 
@@ -709,9 +699,10 @@ public interface ApronNode extends Formula {
       private final Set<String> varNames;
 
       public ApronIntBinaryNode(ApronNode param1, ApronNode param2, int op) {
-        this.binaryNode = new Texpr1BinNode(op, Texpr1Node.RTYPE_INT, Texpr1Node.RDIR_DOWN,
-            param1.getNode(), param2.getNode());
-        //adding the variablenames of both parameters to @varNames
+        this.binaryNode =
+            new Texpr1BinNode(
+                op, Texpr1Node.RTYPE_INT, Texpr1Node.RDIR_DOWN, param1.getNode(), param2.getNode());
+        // adding the variablenames of both parameters to @varNames
         this.varNames = new HashSet<>();
         varNames.addAll(param1.getVarNames());
         varNames.addAll(param2.getVarNames());
@@ -725,7 +716,7 @@ public interface ApronNode extends Formula {
       }
 
       /**
-       * constructor for transforming a rational binary formula to an integer one
+       * constructor for transforming a rational binary formula to an integer one.
        *
        * @param rationalNode formula to transform
        */
@@ -782,7 +773,7 @@ public interface ApronNode extends Formula {
 
   /**
    * This class wraps boolean formulas defined by a node and a boolean operator =,!=, >, >=. All
-   * boolean formulas in Apron are syntactically like </Texpr1Node> </operaot> 0; a constraint is
+   * boolean formulas in Apron are syntactically like "Texpr1Node operation 0"; a constraint is
    * defined by a map of Texpr1Nodes and an operation. The reason for the map is, that Apron does
    * not have an extra and-operation. Stacking constraints ia a way to implement this for JavaSMT.
    */
@@ -794,7 +785,7 @@ public interface ApronNode extends Formula {
 
     /**
      * Constructor for building a constraint form a map of nodes and Tcons1-operations (ex.: [
-     * (a+1), Tcons1.EQ] -> (a+1) = 0)
+     * (a+1), Tcons1.EQ] -> (a+1) = 0).
      *
      * @param pEnvironment environment of all existing variables
      * @param pConstraints map of nodes and boolean operators
@@ -820,7 +811,7 @@ public interface ApronNode extends Formula {
     }
 
     /**
-     * Constructor for building a new constraint out of a list of constraints
+     * Constructor for building a new constraint out of a list of constraints.
      *
      * @param pConstraints list of constraints to build a new constraint
      * @param pEnvironment environment of all existing variables
@@ -876,15 +867,14 @@ public interface ApronNode extends Formula {
 
     /**
      * As constraints can consist of multiple constraints, it is not logical to return just one
-     * constraint
+     * constraint.
      *
      * @return the left side of the equation; ex.: 2x + 3 < 0 --> 2x + 3
      */
     @Override
     public Texpr1Node getNode() {
-      throw new RuntimeException("For ApronConstraints, pleas use getConstraintNodes() or "
-          + "getApronNodes()"
-          + ".");
+      throw new RuntimeException(
+          "For ApronConstraints, pleas use getConstraintNodes() or " + "getApronNodes()" + ".");
     }
 
     public Map<Tcons1, Texpr1Node> getConstraintNodes() {

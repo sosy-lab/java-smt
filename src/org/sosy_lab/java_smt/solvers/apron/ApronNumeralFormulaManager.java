@@ -28,18 +28,17 @@ import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType.FormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
 
-
+@SuppressWarnings("ClassTypeParameterName")
 abstract class ApronNumeralFormulaManager<
-    ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
+        ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
     extends AbstractNumeralFormulaManager<
-    ApronNode, ApronFormulaType, Environment, ParamFormulaType, ResultFormulaType, Long> {
+        ApronNode, ApronFormulaType, Environment, ParamFormulaType, ResultFormulaType, Long> {
 
   protected ApronNumeralFormulaManager(
       FormulaCreator<ApronNode, ApronFormulaType, Environment, Long> pCreator,
       NonLinearArithmetic pNonLinearArithmetic) {
     super(pCreator, pNonLinearArithmetic);
   }
-
 
   @Override
   protected boolean isNumeral(ApronNode val) {
@@ -48,5 +47,4 @@ abstract class ApronNumeralFormulaManager<
   }
 
   protected abstract FormulaType getNumeralType();
-
 }

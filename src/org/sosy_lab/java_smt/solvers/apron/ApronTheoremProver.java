@@ -36,7 +36,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
@@ -58,16 +58,18 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
   private final Logger logger = Logger.getLogger("TheoremProver logger");
   private Abstract1 abstract1;
 
-
   protected ApronTheoremProver(
       Set<ProverOptions> pSet,
       BooleanFormulaManager pBmgr,
       ShutdownNotifier pShutdownNotifier,
-      ApronSolverContext pApronSolverContext) throws ApronException {
+      ApronSolverContext pApronSolverContext)
+      throws ApronException {
     super(pSet, pBmgr, pShutdownNotifier);
     this.solverContext = pApronSolverContext;
-    this.abstract1 = new Abstract1(pApronSolverContext.getManager(),
-        pApronSolverContext.getFormulaCreator().getFormulaEnvironment());
+    this.abstract1 =
+        new Abstract1(
+            pApronSolverContext.getManager(),
+            pApronSolverContext.getFormulaCreator().getFormulaEnvironment());
     this.assertedFormulas.add(new LinkedHashSet<>());
   }
 
@@ -97,8 +99,7 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
   }
 
   @Override
-  public @Nullable Void addConstraint(BooleanFormula constraint)
-      throws InterruptedException {
+  public @Nullable Void addConstraint(BooleanFormula constraint) throws InterruptedException {
     Preconditions.checkState(!closed);
     ApronNode node = ApronFormulaManager.getTerm(constraint);
     if (node instanceof ApronConstraint) {
@@ -122,8 +123,10 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
           i++;
         }
         newCons[consOld.length] = cons.getKey();
-        this.abstract1.changeEnvironment(solverContext.getManager(),
-            solverContext.getFormulaCreator().getFormulaEnvironment(), false);
+        this.abstract1.changeEnvironment(
+            solverContext.getManager(),
+            solverContext.getFormulaCreator().getFormulaEnvironment(),
+            false);
         this.abstract1 = new Abstract1(solverContext.getManager(), newCons);
         Iterables.getLast(assertedFormulas).add(pConstraint);
       }
@@ -156,8 +159,9 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
         return true;
       } else {
         logger.setLevel(Level.WARNING);
-        logger.warning("Apron can only guarantee for clear results for UNSAT! SAT can "
-            + "also mean UNKNOWN!");
+        logger.warning(
+            "Apron can only guarantee for clear results for UNSAT! SAT can "
+                + "also mean UNKNOWN!");
         return false;
       }
     } catch (ApronException pApronException) {
@@ -183,25 +187,25 @@ public class ApronTheoremProver extends AbstractProverWithAllSat<Void>
   }
 
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(Collection<BooleanFormula> assumptions)
-      throws SolverException, InterruptedException {
+  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+      Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
     throw new NullPointerException();
   }
 
   /**
-   * with the help of the join() method form the Apron-library one can build a new abstract1
-   * object with additional constraints
+   * with the help of the join() method form the Apron-library one can build a new abstract1 object
+   * with additional constraints.
    *
    * @param assumptions A list of literals.
    * @return if the prover is satisfiable with some additional assumptions
-   * @throws SolverException      throws exception
+   * @throws SolverException throws exception
    * @throws InterruptedException throws exception
    */
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
-    ArrayList<Tcons1> constraints = new ArrayList<>();
+    List<Tcons1> constraints = new ArrayList<>();
     for (BooleanFormula assumption : assumptions) {
       ApronConstraint cons = (ApronConstraint) ApronFormulaManager.getTerm(assumption);
       for (Map.Entry<Tcons1, Texpr1Node> entry : cons.getConstraintNodes().entrySet()) {

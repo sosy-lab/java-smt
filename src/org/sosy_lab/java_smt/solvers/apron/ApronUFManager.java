@@ -25,10 +25,9 @@ import org.sosy_lab.java_smt.basicimpl.AbstractUFManager;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
 
-public class ApronUFManager extends AbstractUFManager<ApronNode, Long, ApronFormulaType,
-    Environment> {
+public class ApronUFManager
+    extends AbstractUFManager<ApronNode, Long, ApronFormulaType, Environment> {
   protected ApronUFManager(ApronFormulaCreator pCreator) {
     super(pCreator);
   }
-
 }

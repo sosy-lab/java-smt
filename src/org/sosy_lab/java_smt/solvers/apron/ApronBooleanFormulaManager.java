@@ -28,6 +28,7 @@ import apron.Texpr1Node;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,8 +41,8 @@ import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.Apro
 /**
  * Apron only supports and-operations by stacking constraints. Boolean type variables do not exist.
  */
-public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<ApronNode,
-    ApronFormulaType, Environment, Long> {
+public class ApronBooleanFormulaManager
+    extends AbstractBooleanFormulaManager<ApronNode, ApronFormulaType, Environment, Long> {
 
   private final ApronFormulaCreator apronFormulaCreator;
   private final Logger logger = Logger.getLogger("BooleanFormula logger");
@@ -57,7 +58,7 @@ public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<Ap
   }
 
   /**
-   * True is symbolized by 1=1, false by 1!=1
+   * True is symbolized by 1=1, false by 1!=1.
    *
    * @param value boolean value to implement
    * @return ApronConstraint of the form 1=1 (true) or 1!=1 (false)
@@ -67,10 +68,10 @@ public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<Ap
     ApronIntCstNode one = new ApronIntCstNode(BigInteger.ONE);
     Map<ApronNode, Integer> map = new HashMap<>();
     if (value) {
-      //1 != 0
+      // 1 != 0
       map.put(one, Tcons1.DISEQ);
     } else {
-      //1 = 0
+      // 1 = 0
       map.put(one, Tcons1.EQ);
     }
     return new ApronConstraint(apronFormulaCreator.getFormulaEnvironment(), map);
@@ -82,7 +83,7 @@ public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<Ap
   }
 
   /**
-   * the and() method is implemented by stacking two constraints
+   * the and() method is implemented by stacking two constraints.
    *
    * @param pParam1 ApronConstraint 1
    * @param pParam2 ApronConstraint 2
@@ -92,7 +93,7 @@ public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<Ap
   protected ApronNode and(ApronNode pParam1, ApronNode pParam2) {
     ApronConstraint cons1 = (ApronConstraint) pParam1;
     ApronConstraint cons2 = (ApronConstraint) pParam2;
-    ArrayList<ApronConstraint> constraints = new ArrayList<>();
+    List<ApronConstraint> constraints = new ArrayList<>();
     constraints.add(cons1);
     constraints.add(cons2);
     return new ApronConstraint(constraints, apronFormulaCreator.getFormulaEnvironment());
@@ -114,8 +115,8 @@ public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<Ap
   }
 
   /**
-   * For checking whether a BooleanFormula is true, Apron needs an Abstract1 object with the
-   * formula as input. Then one can check, if the Abstract1 object is bottom (for false).
+   * For checking whether a BooleanFormula is true, Apron needs an Abstract1 object with the formula
+   * as input. Then one can check, if the Abstract1 object is bottom (for false).
    *
    * @param bits ApronConstraint to check
    * @return !isBottom()
@@ -132,8 +133,9 @@ public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<Ap
         return false;
       } else {
         logger.setLevel(Level.WARNING);
-        logger.warning("Apron can only guarantee for clear results for UNSAT! SAT can "
-            + "also mean UNKNOWN!");
+        logger.warning(
+            "Apron can only guarantee for clear results for UNSAT! SAT can "
+                + "also mean UNKNOWN!");
         return true;
       }
     } catch (ApronException pException) {
@@ -160,8 +162,9 @@ public class ApronBooleanFormulaManager extends AbstractBooleanFormulaManager<Ap
         return true;
       } else {
         logger.setLevel(Level.WARNING);
-        logger.warning("Apron can only guarantee for clear results for UNSAT! SAT can "
-            + "also mean UNKNOWN!");
+        logger.warning(
+            "Apron can only guarantee for clear results for UNSAT! SAT can "
+                + "also mean UNKNOWN!");
         return false;
       }
     } catch (ApronException pException) {

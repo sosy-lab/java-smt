@@ -53,14 +53,12 @@ import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.Apro
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronRatUnaryNode;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode.ApronNumeralNode.ApronRatVarNode;
 
+public class ApronFormulaCreator
+    extends FormulaCreator<ApronNode, ApronFormulaType, Environment, Long> {
 
-public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaType, Environment,
-    Long> {
-
-  /**
-   * variables is a map that stores all variable-objects with their name as key;
-   */
+  /** variables is a map that stores all variable-objects with their name as key. */
   private final Map<String, ApronNode> variables;
+
   private final Manager manager;
   private Environment formulaEnvironment;
 
@@ -77,37 +75,36 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
   }
 
   /**
-   * Method for extracting the value of a formula
+   * Method for extracting the value of a formula.
    *
    * @param exprNode an additional formula where the type can be received from.
-   * @param value    the formula to be converted.
+   * @param value the formula to be converted.
    * @return for constants (actual value), variables (String names) and constraints (Boolean value)
    */
   @Override
   public Object convertValue(ApronNode exprNode, ApronNode value) {
     FormulaType valueType = value.getType();
 
-    //constants
+    // constants
     if (valueType == FormulaType.INTEGER && value instanceof ApronIntCstNode) {
       return ((ApronIntCstNode) value).getValue();
     } else if (valueType == FormulaType.RATIONAL && value instanceof ApronRatCstNode) {
       BigInteger num = ((ApronRatCstNode) value).getNumerator();
       BigInteger den = ((ApronRatCstNode) value).getDenominator();
       Rational div = Rational.of(num, den);
-      //for integer values
+      // for integer values
       if (den.equals(BigInteger.ONE)) {
         return num;
       }
       return div;
-    }
-    //variables
-    else if (value instanceof ApronIntVarNode) {
+    } else if (value instanceof ApronIntVarNode) {
+      // integer variables
       return ((ApronIntVarNode) value).getVarName();
     } else if (value instanceof ApronRatVarNode) {
+      // rational variables
       return ((ApronRatVarNode) value).getVarName();
-    }
-    //constraints
-    else if (value instanceof ApronConstraint) {
+    } else if (value instanceof ApronConstraint) {
+      // constraints
       try {
         ApronConstraint constraint = (ApronConstraint) value;
         Map<Tcons1, Texpr1Node> map = constraint.getConstraintNodes();
@@ -154,15 +151,14 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
    * environment!
    *
    * @param pApronFormulaType Integer or Rational?
-   * @param varName           name of the variable
+   * @param varName name of the variable
    * @return object of either ApronIntVarNode (Type Integer) or ApronRatVarNode (Type Rational)
    */
   @Override
   public ApronNode makeVariable(ApronFormulaType pApronFormulaType, String varName) {
     Preconditions.checkArgument(
-        (pApronFormulaType.getType().equals(FormulaType.INTEGER) || pApronFormulaType.getType()
-            .equals(
-                FormulaType.RATIONAL)),
+        (pApronFormulaType.getType().equals(FormulaType.INTEGER)
+            || pApronFormulaType.getType().equals(FormulaType.RATIONAL)),
         "Only Integer or rational variables allowed!");
     if (formulaEnvironment.hasVar(varName)) {
       return variables.get(varName);
@@ -207,9 +203,7 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
 
   @Override
   public Long declareUFImpl(
-      String pName,
-      ApronFormulaType pReturnType,
-      List<ApronFormulaType> pArgTypes) {
+      String pName, ApronFormulaType pReturnType, List<ApronFormulaType> pArgTypes) {
     return null;
   }
 
@@ -220,19 +214,18 @@ public class ApronFormulaCreator extends FormulaCreator<ApronNode, ApronFormulaT
 
   /**
    * SuppressWarning of unchecked is used here because the unchecked warning was because of
-   * unchecked class cast, but as all formulas are instances of ApronNode and ApronNode
-   * inherits from Formula, the Class Cast is correct here
+   * unchecked class cast, but as all formulas are instances of ApronNode and ApronNode inherits
+   * from Formula, the Class Cast is correct here.
    *
    * @param pType type of the formula
    * @param pTerm term to encapsulate
-   * @param <T>   all subclasses of ApronNode, all extend Formula
+   * @param <T> all subclasses of ApronNode, all extend Formula
    * @return more specified ApronNode
    */
   @Override
   @SuppressWarnings("unchecked")
   public <T extends Formula> T encapsulate(
-      org.sosy_lab.java_smt.api.FormulaType<T> pType,
-      ApronNode pTerm) {
+      org.sosy_lab.java_smt.api.FormulaType<T> pType, ApronNode pTerm) {
     if (pType.isBooleanType()) {
       ApronConstraint constraint = (ApronConstraint) pTerm;
       return (T) new ApronNode.ApronConstraint(constraint);

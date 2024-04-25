@@ -29,8 +29,8 @@ import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronFormulaType;
 import org.sosy_lab.java_smt.solvers.apron.types.ApronNode;
 
-public class ApronFormulaManager extends AbstractFormulaManager<ApronNode, ApronFormulaType,
-    Environment, Long> {
+public class ApronFormulaManager
+    extends AbstractFormulaManager<ApronNode, ApronFormulaType, Environment, Long> {
 
   protected ApronFormulaManager(
       ApronFormulaCreator pFormulaCreator,
@@ -38,8 +38,19 @@ public class ApronFormulaManager extends AbstractFormulaManager<ApronNode, Apron
       ApronBooleanFormulaManager booleanManager,
       ApronIntegerFormulaManager pIntegerFormulaManager,
       ApronRationalFormulaManager pRationalFormulaManager) {
-    super(pFormulaCreator, functionManager, booleanManager, pIntegerFormulaManager,
-        pRationalFormulaManager, null, null, null, null, null, null, null);
+    super(
+        pFormulaCreator,
+        functionManager,
+        booleanManager,
+        pIntegerFormulaManager,
+        pRationalFormulaManager,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null);
   }
 
   public static ApronNode getTerm(Formula pFormula) {
@@ -58,8 +69,7 @@ public class ApronFormulaManager extends AbstractFormulaManager<ApronNode, Apron
 
   @Override
   public <T extends Formula> T substitute(
-      T f,
-      Map<? extends Formula, ? extends Formula> fromToMapping) {
+      T f, Map<? extends Formula, ? extends Formula> fromToMapping) {
     throw new UnsupportedOperationException("Apron does not support substitute().");
   }
 }
