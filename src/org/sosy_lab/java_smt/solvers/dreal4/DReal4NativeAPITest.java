@@ -18,6 +18,7 @@ import org.junit.AssumptionViolatedException;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Box;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Config;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Context;
@@ -35,7 +36,7 @@ public class DReal4NativeAPITest {
   @BeforeClass
   public static void loadDReal() {
     try {
-      System.loadLibrary("dreal4");
+      NativeLibraries.loadLibrary("drealjava");
     } catch (UnsatisfiedLinkError e) {
       throw new AssumptionViolatedException("dReal is not available", e);
     }
