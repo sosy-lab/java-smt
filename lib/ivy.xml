@@ -167,7 +167,7 @@ SPDX-License-Identifier: Apache-2.0
         <dependency org="org.sosy_lab" name="javasmt-solver-cvc4" rev="1.8-prerelease-2020-06-24-g7825d8f28" conf="runtime-cvc4->solver-cvc4" />
         <dependency org="org.sosy_lab" name="javasmt-solver-cvc5" rev="1.0.5-g4cb2ab9eb" conf="runtime-cvc5->solver-cvc5" />
         <dependency org="org.sosy_lab" name="javasmt-solver-boolector" rev="3.2.2-g1a89c229" conf="runtime-boolector->solver-boolector" />
-        <dependency org="org.sosy_lab" name="javasmt-solver-apron" rev="8-g718470b" conf="runtime-apron->solver-apron" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-apron" rev="0.9.14-g718470b" conf="runtime-apron->solver-apron" />
 
         <!-- additional JavaSMT components with Solver Binaries -->
         <dependency org="org.sosy_lab" name="javasmt-yices2" rev="4.1.1-59-gaf9c0520c" conf="runtime-yices2->runtime; contrib->sources" />
