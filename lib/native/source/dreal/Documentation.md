@@ -32,8 +32,14 @@ zlib1g-dev
 ```
 4. Build with bazel
 `bazel build //...`
-5. Comment out the broken test and bazel again...
-6Library can be found in `bazel-bin/libdreal_.so`
+5. Comment out the broken test
+6. Run bazel again
+7. Library can be found in `bazel-bin/libdreal_.so`. Run `bazel build //:package_debian` to 
+   generate a deb package and install it.
+8. Compile the SIWG wrapper with `g++ -fpic -c dreal_wrap.cxx -I/usr/lib/jvm/java-20-openjdk-amd64/include/ -I/usr/lib/jvm/java-20-openjdk-amd64/include/linux -I/opt/libibex/2.7.4/include/ -I/opt/libibex/2.7.4/include/ibex -I/opt/libibex/2.7.4/include/ibex/3rd -I/opt/dreal/4.21.06.2/include/`
+9. Then link it with `g++ -shared dreal_wrap.o -L/opt/libibex/2.7.4/lib -L/opt/dreal/4.21.06.2/lib 
+   -ldreal_ -libex -o libdrealjava.so`
+10. Patch with rpath
 
 ### How to build the library:
 1. Install the dependencies for libibex-dev
