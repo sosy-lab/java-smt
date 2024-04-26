@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+This file is part of JavaSMT,
+an API wrapper for a collection of SMT solvers:
+https://github.com/sosy-lab/java-smt
+
+SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<ivy-module version="2.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+    <info organisation="org.sosy_lab" module="javasmt-solver-apron">
+        <license name="GNU Lesser General Public License" url="https://github.com/antoinemine/apron/blob/master/COPYING"/>
+        <description>
+            Apron Numerical Abstract Domain library.
+            Apron provided with GNU Lesser General Public License.
+        </description>
+    </info>
+
+    <configurations>
+        <conf name="solver-apron" />
+    </configurations>
+
+    <publications defaultconf="solver-apron">
+        <artifact name="apron" conf="solver-apron"/>
+        <artifact name="gmp" conf="solver-apron"/>
+        <artifact name="libjapron" conf="solver-apron" type="shared-object" ext="so"/>
+        <artifact name="libjgmp" conf="solver-apron" type="shared-object" ext="so"/>
+        <artifact name="libapron" conf="solver-apron" type="shared-object" ext="so"/>
+        <artifact name="libboxD" conf="solver-apron" type="shared-object" ext="so"/>
+        <artifact name="liboctD" conf="solver-apron" type="shared-object" ext="so"/>
+        <artifact name="libpolkaMPQ" conf="solver-apron" type="shared-object" ext="so"/>
+    </publications>
+
+    <dependencies></dependencies>
+
+</ivy-module>

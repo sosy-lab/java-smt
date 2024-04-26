@@ -208,6 +208,14 @@ public abstract class SolverBasedTest0 {
         .isNotNull();
   }
 
+  protected final void requirePrecision() {
+    assume()
+        .withMessage(
+            "Solver %s gives non-precise solutions due to over-approximation", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.APRON);
+  }
+
   /** Skip test if the solver does not support rationals. */
   protected final void requireRationals() {
     assume()
@@ -303,7 +311,7 @@ public abstract class SolverBasedTest0 {
     assume()
         .withMessage("Solver %s does not support parsing formulae", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2, Solvers.CVC5);
+        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2, Solvers.CVC5, Solvers.APRON);
   }
 
   protected void requireArrayModel() {
@@ -325,14 +333,14 @@ public abstract class SolverBasedTest0 {
     assume()
         .withMessage("Solver %s does not support formula visitor", solverToUse())
         .that(solverToUse())
-        .isNotEqualTo(Solvers.BOOLECTOR);
+        .isNoneOf(Solvers.BOOLECTOR, Solvers.APRON);
   }
 
   protected void requireUnsatCore() {
     assume()
         .withMessage("Solver %s does not support unsat core generation", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.BOOLECTOR, Solvers.OPENSMT);
+        .isNoneOf(Solvers.BOOLECTOR, Solvers.OPENSMT, Solvers.APRON);
   }
 
   protected void requireUnsatCoreOverAssumptions() {
@@ -346,7 +354,72 @@ public abstract class SolverBasedTest0 {
     assume()
         .withMessage("Solver %s does not support formula substitution", solverToUse())
         .that(solverToUse())
-        .isNotEqualTo(Solvers.BOOLECTOR);
+        .isNoneOf(Solvers.BOOLECTOR, Solvers.APRON);
+  }
+
+  protected void requireNonNumeralVariables() {
+    assume()
+        .withMessage("Solver %s does not support non-numeral variables", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.APRON);
+  }
+
+  protected void requireDumpFormula() {
+    assume()
+        .withMessage("Solver %s does not support dumpFormula() method", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.APRON);
+  }
+
+  protected void requireNot() {
+    assume()
+        .withMessage("Solver %s does not support not()-operations", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.APRON);
+  }
+
+  protected void requireOr() {
+    assume()
+        .withMessage("Solver %s does not support or()-operations", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.APRON);
+  }
+
+  protected void requireXOr() {
+    assume()
+        .withMessage("Solver %s does not support xor()-operations", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.APRON);
+  }
+
+  protected void requireNonLinearModulo() {
+    assume()
+        .withMessage(
+            "Solver %s does not support variables as denumerator in modulo operations",
+            solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.APRON);
+  }
+
+  protected void requireCallFunctionImpl() {
+    assume()
+        .withMessage("Solver %s does not support callFunctionImpl()", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.APRON);
+  }
+
+  protected void requireUninterpretedFunctions() {
+    assume()
+        .withMessage("Solver %s does not support uninterpreted functions", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.APRON);
+  }
+
+  protected void requireVisit() {
+    assume()
+        .withMessage("Solver %s does not support visit()-method", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.APRON);
   }
 
   protected void requireUserPropagators() {
@@ -413,6 +486,9 @@ public abstract class SolverBasedTest0 {
               break;
             case BOOLECTOR:
               // ignore, Boolector provides no useful values
+              break;
+            case APRON:
+              // ignore, Apron does not provide useful values
               break;
             default:
               Truth.assertThat(eval).isIn(possibleExpectedFormulas);

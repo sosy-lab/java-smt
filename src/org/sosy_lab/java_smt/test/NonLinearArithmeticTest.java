@@ -135,6 +135,7 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
 
   @Test
   public void testLinearMultiplicationUnsatisfiable() throws SolverException, InterruptedException {
+    requireXOr();
     T a = nmgr.makeVariable("a");
 
     BooleanFormula f =
@@ -164,6 +165,7 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
   @Test
   public void testMultiplicationOfVariablesUnsatisfiable()
       throws SolverException, InterruptedException {
+    requireNot();
     T a = nmgr.makeVariable("a");
     T b = nmgr.makeVariable("b");
     T c = nmgr.makeVariable("c");
@@ -187,6 +189,7 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
 
   @Test
   public void testDivisionByConstant() throws SolverException, InterruptedException {
+    requireCallFunctionImpl();
     T a = nmgr.makeVariable("a");
 
     BooleanFormula f =
@@ -200,6 +203,7 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
 
   @Test
   public void testDivisionByZero() throws SolverException, InterruptedException {
+    requireCallFunctionImpl();
     // INFO: OpenSmt does not allow division by zero
     assume()
         .withMessage("Solver %s does not support division by zero", solverToUse())
@@ -220,6 +224,8 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
 
   @Test
   public void testDivisionByConstantUnsatisfiable() throws SolverException, InterruptedException {
+    requireXOr();
+    requireCallFunctionImpl();
     T a = nmgr.makeVariable("a");
 
     BooleanFormula f =
@@ -241,6 +247,7 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
 
   @Test
   public void testDivision() throws SolverException, InterruptedException {
+    requireCallFunctionImpl();
     T a = nmgr.makeVariable("a");
 
     // (a == 2) && (3 == 6 / a)
@@ -256,6 +263,7 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
 
   @Test
   public void testDivisionUnsatisfiable() throws SolverException, InterruptedException {
+    requireNot();
     T a = nmgr.makeVariable("a");
 
     BooleanFormula f =

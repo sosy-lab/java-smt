@@ -40,6 +40,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
 
   @Test
   public void basicBoolTest() throws SolverException, InterruptedException {
+    requireNonNumeralVariables();
     BooleanFormula a = bmgr.makeVariable("a");
     BooleanFormula b = bmgr.makeBoolean(false);
     BooleanFormula c = bmgr.xor(a, b);
@@ -222,6 +223,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   @Test
   public void intTest3_DivModLinear() throws SolverException, InterruptedException {
     requireIntegers();
+    requireNot();
     IntegerFormula a = imgr.makeVariable("int_a");
     IntegerFormula b = imgr.makeVariable("int_b");
 
@@ -279,6 +281,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   @Test
   public void intTest3_DivModLinear_zeroDenumerator() throws SolverException, InterruptedException {
     requireIntegers();
+    requireNot();
     IntegerFormula a = imgr.makeVariable("int_a");
 
     IntegerFormula num10 = imgr.makeNumber(10);
@@ -342,6 +345,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
     // not all solvers support division-by-variable,
     // we guarantee soundness by allowing any value that yields SAT.
     requireIntegers();
+    requireNot();
 
     IntegerFormula a = imgr.makeVariable("int_a");
     IntegerFormula b = imgr.makeVariable("int_b");
@@ -471,6 +475,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   @Test
   public void intTest4_ModularCongruence_Simple() throws SolverException, InterruptedException {
     requireIntegers();
+    requirePrecision();
     final IntegerFormula x = imgr.makeVariable("x");
     final BooleanFormula f1 = imgr.modularCongruence(x, imgr.makeNumber(0), 2);
     final BooleanFormula f2 = imgr.equal(x, imgr.makeNumber(1));
@@ -481,6 +486,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   @Test
   public void intTest4_ModularCongruence() throws SolverException, InterruptedException {
     requireIntegers();
+    requireNot();
     IntegerFormula a = imgr.makeVariable("int_a");
     IntegerFormula b = imgr.makeVariable("int_b");
     IntegerFormula c = imgr.makeVariable("int_c");
@@ -526,6 +532,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   public void intTest4_ModularCongruence_NegativeNumbers()
       throws SolverException, InterruptedException {
     requireIntegers();
+    requireNot();
     IntegerFormula a = imgr.makeVariable("int_a");
     IntegerFormula b = imgr.makeVariable("int_b");
     IntegerFormula c = imgr.makeVariable("int_c");
@@ -549,6 +556,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   @Test
   public void testHardCongruence() throws SolverException, InterruptedException {
     requireIntegers();
+    requirePrecision();
     IntegerFormula a = imgr.makeVariable("a");
     IntegerFormula b = imgr.makeVariable("b");
     IntegerFormula c = imgr.makeVariable("c");
@@ -597,6 +605,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   @Test
   public void testUfWithBoolType() throws SolverException, InterruptedException {
     requireIntegers();
+    requireUninterpretedFunctions();
     FunctionDeclaration<BooleanFormula> uf =
         fmgr.declareUF("fun_ib", FormulaType.BooleanType, FormulaType.IntegerType);
     BooleanFormula uf0 = fmgr.callUF(uf, imgr.makeNumber(0));
@@ -616,6 +625,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
 
   @Test
   public void testUfWithBoolArg() throws SolverException, InterruptedException {
+    requireUninterpretedFunctions();
     assume()
         .withMessage("Solver %s does not support boolean arguments", solverToUse())
         .that(solver)
@@ -689,6 +699,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   @Test
   public void testGetFormulaType() {
     requireIntegers();
+    requireNonNumeralVariables();
     BooleanFormula _boolVar = bmgr.makeVariable("boolVar");
     assertThat(mgr.getFormulaType(_boolVar)).isEqualTo(FormulaType.BooleanType);
 
@@ -826,6 +837,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   @Test
   public void nonLinearMultiplication() throws SolverException, InterruptedException {
     requireIntegers();
+    requirePrecision();
     IntegerFormula i2 = imgr.makeNumber(2);
     IntegerFormula i3 = imgr.makeNumber(3);
     IntegerFormula i4 = imgr.makeNumber(4);
@@ -950,6 +962,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   @Test
   public void multiplicationFactors() throws SolverException, InterruptedException {
     requireIntegers();
+    requirePrecision();
     IntegerFormula i37 = imgr.makeNumber(37);
     IntegerFormula i1 = imgr.makeNumber(1);
     IntegerFormula x = imgr.makeVariable("x");
@@ -976,6 +989,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   @Test
   public void multiplicationCubic() throws SolverException, InterruptedException {
     requireIntegers();
+    requirePrecision();
     IntegerFormula i125 = imgr.makeNumber(125);
     IntegerFormula i27 = imgr.makeNumber(27);
     IntegerFormula i5 = imgr.makeNumber(5);
@@ -1015,6 +1029,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   @Test
   public void nonLinearDivision() throws SolverException, InterruptedException {
     requireIntegers();
+    requirePrecision();
     IntegerFormula i2 = imgr.makeNumber(2);
     IntegerFormula i3 = imgr.makeNumber(3);
     IntegerFormula i4 = imgr.makeNumber(4);
@@ -1048,6 +1063,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   @Test
   public void integerDivisionRounding() throws SolverException, InterruptedException {
     requireIntegers();
+    requirePrecision();
     IntegerFormula varSeven = imgr.makeVariable("a");
     IntegerFormula varEight = imgr.makeVariable("b");
 
@@ -1093,6 +1109,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   @Test
   @SuppressWarnings("CheckReturnValue")
   public void testVariableWithDifferentSort() {
+    requireNonNumeralVariables();
     assume().that(solverToUse()).isNotIn(VAR_TRACKING_SOLVERS);
     bmgr.makeVariable("x");
     if (imgr != null) {
@@ -1117,6 +1134,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   @Test
   @SuppressWarnings("CheckReturnValue")
   public void testVariableAndUFWithDifferentSort() {
+    requireNonNumeralVariables();
     assume().that(solverToUse()).isNotIn(VAR_AND_UF_TRACKING_SOLVERS);
     bmgr.makeVariable("y");
     fmgr.declareUF("y", FormulaType.BooleanType, FormulaType.BooleanType);
@@ -1140,6 +1158,8 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
 
   @Test
   public void testVariableAndUFWithEqualSort() {
+    requireNonNumeralVariables();
+    requireUninterpretedFunctions();
     assume()
         .withMessage("Solver %s does not support UFs without arguments", solverToUse())
         .that(solverToUse())

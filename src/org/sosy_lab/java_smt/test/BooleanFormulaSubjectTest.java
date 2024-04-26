@@ -34,6 +34,7 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0.ParameterizedSol
 
   @Before
   public void setupFormulas() {
+    requireNot();
     if (imgr != null) {
       simpleFormula = imgr.equal(imgr.makeVariable("a"), imgr.makeNumber(1));
       contradiction =
@@ -66,7 +67,7 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0.ParameterizedSol
 
   @Test
   public void testIsSatisfiableNo() {
-    // INFO: OpenSMT does not support unsat core
+    requireUnsatCore();
     assume()
         .withMessage("Solver does not support unsat core generation in a usable way")
         .that(solverToUse())
@@ -167,9 +168,9 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0.ParameterizedSol
   public void testIsEquisatisfiableToNo() {
     BooleanFormula simpleFormula2;
     if (imgr != null) {
-      simpleFormula2 = imgr.equal(imgr.makeVariable("a"), imgr.makeNumber("2"));
+      simpleFormula2 = imgr.equal(imgr.makeVariable("a"), imgr.makeNumber(2));
     } else {
-      simpleFormula2 = bvmgr.equal(bvmgr.makeVariable(2, "a"), bvmgr.makeVariable(2, "2"));
+      simpleFormula2 = bvmgr.equal(bvmgr.makeVariable(2, "a"), bvmgr.makeBitvector(2, 2));
     }
     AssertionError failure =
         expectFailure(

@@ -176,6 +176,7 @@ public class SolverFormulaWithAssumptionsTest
   @Test
   @SuppressWarnings("CheckReturnValue")
   public void assumptionsTest1() throws SolverException, InterruptedException {
+    requireNonNumeralVariables();
     /*
     (declare-fun A () Bool)
     (push 1)

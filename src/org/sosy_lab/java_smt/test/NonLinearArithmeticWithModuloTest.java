@@ -99,6 +99,7 @@ public class NonLinearArithmeticWithModuloTest extends SolverBasedTest0 {
   @Test
   public void testModuloConstantUnsatisfiable() throws SolverException, InterruptedException {
     requireIntegers();
+    requirePrecision();
     IntegerFormula a = imgr.makeVariable("a");
 
     BooleanFormula f =
@@ -123,6 +124,7 @@ public class NonLinearArithmeticWithModuloTest extends SolverBasedTest0 {
   @Test
   public void testModulo() throws SolverException, InterruptedException {
     requireIntegers();
+    requireNonLinearModulo();
     IntegerFormula a = imgr.makeVariable("a");
 
     BooleanFormula f =
@@ -138,6 +140,7 @@ public class NonLinearArithmeticWithModuloTest extends SolverBasedTest0 {
   @Test
   public void testModuloUnsatisfiable() throws SolverException, InterruptedException {
     requireIntegers();
+    requireNonLinearModulo();
     IntegerFormula a = imgr.makeVariable("a");
 
     BooleanFormula f =

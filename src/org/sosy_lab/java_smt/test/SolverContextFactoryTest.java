@@ -71,7 +71,7 @@ public class SolverContextFactoryTest {
     assume()
         .withMessage("Solver %s requires to load a native library", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.SMTINTERPOL, Solvers.PRINCESS);
+        .isNoneOf(Solvers.SMTINTERPOL, Solvers.PRINCESS, Solvers.APRON);
   }
 
   /**
@@ -86,6 +86,7 @@ public class SolverContextFactoryTest {
             .withMessage(
                 "Solver %s is not yet supported in the operating system %s", solverToUse(), OS);
     switch (solverToUse()) {
+      case APRON:
       case SMTINTERPOL:
       case PRINCESS:
         // any operating system is allowed, Java is already available.

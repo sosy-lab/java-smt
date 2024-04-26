@@ -93,14 +93,14 @@ public class TranslateFormulaTest {
     assume()
         .withMessage("Solver %s does not support parsing formulae", translateTo)
         .that(translateTo)
-        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2, Solvers.CVC5);
+        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2, Solvers.CVC5, Solvers.APRON);
   }
 
   private void requireParserFrom() {
     assume()
         .withMessage("Solver %s does not support parsing formulae", translateFrom)
         .that(translateFrom)
-        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2, Solvers.CVC5);
+        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2, Solvers.CVC5, Solvers.APRON);
   }
 
   private void requireIntegers() {
@@ -110,10 +110,17 @@ public class TranslateFormulaTest {
         .isNotEqualTo(Solvers.BOOLECTOR);
   }
 
+  private void requireOr() {
+    assume()
+        .withMessage("Solver %s does not support or()", translateFrom)
+        .that(translateFrom)
+        .isNotEqualTo(Solvers.APRON);
+  }
+
   @Test
   public void testDumpingAndParsing() throws SolverException, InterruptedException {
     requireParserTo();
-
+    requireOr();
     BooleanFormula input = createTestFormula(managerFrom);
     String out = managerFrom.dumpFormula(input).toString();
     BooleanFormula parsed = managerTo.parse(out);
@@ -124,6 +131,7 @@ public class TranslateFormulaTest {
   @Test
   public void testTranslating() throws SolverException, InterruptedException {
     requireParserTo();
+    requireOr();
 
     BooleanFormula inputFrom = createTestFormula(managerFrom);
     BooleanFormula inputTo = createTestFormula(managerTo);
@@ -134,6 +142,7 @@ public class TranslateFormulaTest {
 
   @Test
   public void testTranslatingForIContextIdentity() throws SolverException, InterruptedException {
+    requireOr();
     assume().that(translateTo).isEqualTo(translateFrom);
     FormulaManager manager = managerFrom;
 
@@ -146,6 +155,7 @@ public class TranslateFormulaTest {
 
   @Test
   public void testTranslatingForContextSibling() throws SolverException, InterruptedException {
+    requireOr();
     assume().that(translateTo).isEqualTo(translateFrom);
 
     assume()

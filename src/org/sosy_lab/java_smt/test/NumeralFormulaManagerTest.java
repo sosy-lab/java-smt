@@ -56,6 +56,7 @@ public class NumeralFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
   @Test
   public void distinctTest3() throws SolverException, InterruptedException {
     requireIntegers();
+    requirePrecision();
     IntegerFormula zero = imgr.makeNumber(0);
     IntegerFormula four = imgr.makeNumber(4);
     List<IntegerFormula> symbols = new ArrayList<>();
@@ -88,6 +89,7 @@ public class NumeralFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
   public void testSubTypes() {
     requireIntegers();
     requireRationals();
+    requireUninterpretedFunctions();
     IntegerFormula a = imgr.makeVariable("a");
     RationalFormula r = rmgr.makeVariable("r");
     List<FormulaType<?>> argTypes =

@@ -253,6 +253,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
 
   @Test
   public void testBoolVariable() {
+    requireNonNumeralVariables();
     for (String name : getAllNames()) {
       createVariableWith(bmgr::makeVariable, name);
     }
@@ -555,6 +556,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
 
   @Test
   public void testBoolVariableDump() {
+    requireNonNumeralVariables();
     for (String name : getAllNames()) {
       BooleanFormula var = createVariableWith(bmgr::makeVariable, name);
       if (var != null) {
@@ -566,6 +568,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
 
   @Test
   public void testEqBoolVariableDump() {
+    requireNonNumeralVariables();
     for (String name : getAllNames()) {
       BooleanFormula var = createVariableWith(bmgr::makeVariable, name);
       if (var != null) {

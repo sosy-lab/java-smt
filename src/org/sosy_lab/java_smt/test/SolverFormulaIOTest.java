@@ -99,6 +99,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
 
   @Test
   public void varDumpTest() {
+    requireNonNumeralVariables();
     // Boolector will fail this anyway since bools are bitvecs for btor
     TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
     BooleanFormula a = bmgr.makeVariable("main::a");
@@ -116,6 +117,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
 
   @Test
   public void varDumpTest2() {
+    requireNonNumeralVariables();
     // Boolector will fail this anyway since bools are bitvecs for btor
     TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
 
@@ -147,6 +149,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
 
   @Test
   public void valDumpTest() {
+    requireOr();
     // Boolector will fail this anyway since bools are bitvecs for btor
     TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
     BooleanFormula tr1 = bmgr.makeBoolean(true);
@@ -167,6 +170,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
   @Test
   public void intsDumpTest() {
     requireIntegers();
+    requireDumpFormula();
     IntegerFormula f1 = imgr.makeVariable("a");
     IntegerFormula val = imgr.makeNumber(1);
     BooleanFormula formula = imgr.equal(f1, val);
@@ -198,6 +202,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
   @Test
   public void funcsDumpTest() {
     requireIntegers();
+    requireUninterpretedFunctions();
     IntegerFormula int1 = imgr.makeNumber(1);
     IntegerFormula var = imgr.makeVariable("var_a");
     FunctionDeclaration<IntegerFormula> funA =
@@ -299,6 +304,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
 
   @Test
   public void redundancyTest() {
+    requireNonNumeralVariables();
     assume()
         .withMessage(
             "Solver %s does not remove redundant sub formulae from formula dump.", solverToUse())
@@ -325,6 +331,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
   @Test
   public void funDeclareTest() {
     requireIntegers();
+    requireUninterpretedFunctions();
     IntegerFormula int1 = imgr.makeNumber(1);
     IntegerFormula int2 = imgr.makeNumber(2);
 
@@ -347,6 +354,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
   @Test
   public void funDeclareTest2() {
     requireIntegers();
+    requireUninterpretedFunctions();
     IntegerFormula int1 = imgr.makeNumber(1);
     IntegerFormula int2 = imgr.makeNumber(2);
 

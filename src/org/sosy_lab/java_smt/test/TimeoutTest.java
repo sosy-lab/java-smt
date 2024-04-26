@@ -79,6 +79,7 @@ public class TimeoutTest extends SolverBasedTest0 {
   @Test(timeout = TIMOUT_MILLISECONDS)
   public void testProverTimeoutInt() throws InterruptedException {
     requireIntegers();
+    requireNonNumeralVariables();
     TruthJUnit.assume()
         .withMessage(solverToUse() + " does not support interruption")
         .that(solverToUse())
