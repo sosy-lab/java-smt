@@ -42,7 +42,7 @@ public class DReal4SolverContext extends AbstractSolverContext {
       NonLinearArithmetic pNonLinearArithmetic,
       Consumer<String> pLoader) {
 
-    pLoader.accept("dreal4");
+    pLoader.accept("drealjava");
 
     // Create config
     Config config = new Config();

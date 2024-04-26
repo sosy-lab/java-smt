@@ -1,0 +1,44 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+<!--
+This file is part of JavaSMT,
+an API wrapper for a collection of SMT solvers:
+https://github.com/sosy-lab/java-smt
+
+SPDX-FileCopyrightText: 2021 Dirk Beyer <https://www.sosy-lab.org>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.sosy-lab</groupId>
+  <artifactId>javasmt-solver-dreal</artifactId>
+  <packaging>pom</packaging>
+  <name>javasmt-solver-dreal</name>
+  <version>${stage.revision}</version>
+  <description>JavaSMT backend for the Apron numerical abstract domain library</description>
+  <url>https://github.com/sosy-lab/java-smt</url>
+
+  <licenses>
+      <license>
+          <name>Apache License, Version 2.0</name>
+          <url>https://opensource.org/license/apache-2-0</url>
+      </license>
+  </licenses>
+
+  <organization>
+      <name>Software Systems Lab</name>
+      <url>https://www.sosy-lab.org/</url>
+  </organization>
+
+  <scm>
+      <url>https://github.com/sosy-lab/java-smt/</url>
+      <connection>scm:git:git://github.com/sosy-lab/java-smt.git</connection>
+      <developerConnection>scm:git:git@github.com:sosy-lab/java-smt.git</developerConnection>
+  </scm>
+
+  <developers>
+      <!-- FIXME: Add maintainers -->
+  </developers>
+</project>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+This file is part of JavaSMT,
+an API wrapper for a collection of SMT solvers:
+https://github.com/sosy-lab/java-smt
+
+SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<ivy-module version="2.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+    <info organisation="org.sosy_lab" module="javasmt-solver-dreal">
+      <license name="Apache License 2.0" url="https://github.com/dreal/dreal4/blob/master/LICENSE"/>
+        <description>
+            JavaSMT backend for the dReal automated reasoning tool.
+            dReal is provided under the Apache License 2.0.
+        </description>
+    </info>
+
+    <configurations>
+        <conf name="solver-dreal" extends="solver-dreal-linux"/>
+        <conf name="solver-dreal-linux" extends="solver-dreal-common"/>
+        <conf name="solver-dreal-common" visibility="private"/>
+    </configurations>
+
+    <publications defaultconf="solver-dreal">
+        <artifact name="libdrealjava"  conf="solver-dreal" type="shared-object" ext="so" />
+        <artifact name="libdreal_"     conf="solver-dreal" type="shared-object" ext="so" />
+        <artifact name="libibex"       conf="solver-dreal" type="shared-object" ext="so" />
+    </publications>
+
+    <dependencies></dependencies>
+
+</ivy-module>

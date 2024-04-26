@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+This file is part of JavaSMT,
+an API wrapper for a collection of SMT solvers:
+https://github.com/sosy-lab/java-smt
+
+SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<!-- vim: set tabstop=8 shiftwidth=4 expandtab sts=4 filetype=ant fdm=marker: -->
+<project name="publish-solvers-dreal" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+
+    <import file="macros.xml"/>
+
+    <!-- SECTION: Publishing dReal
+         ==================================================================
+    -->
+    <target name="package-dreal" depends="">
+        <fail unless="dreal.path">
+            Please specify the path to CVC5 with the flag -Dcvc5.path=/path/to/cvc5.
+            The path has to point to the root CVC5 folder, i.e.,
+            a checkout of the official git repository from 'https://github.com/cvc5/cvc5'.
+            Note that shell substitutions do not work and a full absolute path has to be specified.
+        </fail>
+        <fail unless="dreal.customRev">
+            Please specify a custom revision with the flag -Ddreal.customRev=XXX.
+            The custom revision has to be unique amongst the already known version
+            numbers from the ivy repository. The script will append the git revision.
+        </fail>
+
+        <!-- FIXME:
+        We assume the .so files have already been built and just need to be distributed
+         -->
+
+        <!-- get the short commit hash of the dreal version used -->
+        <exec executable="git" dir="${dreal.path}" outputproperty="dreal.revision"
+              failonerror="true">
+            <arg value="show"/>
+            <arg value="-s"/>
+            <arg value="--format=%h"/>
+        </exec>
+        <property name="dreal.version" value="${dreal.customRev}-g${dreal.revision}"/>
+        <echo message="Building dReal in version '${dreal.version}'"/>
+
+        <exec executable="patchelf" failonerror="true">
+            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
+            <arg value="libibex-${dreal.version}.so"/>
+        </exec>
+        <exec executable="patchelf" failonerror="true">
+            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
+            <arg value="libdreal_-${dreal.version}.so"/>
+        </exec>
+        <exec executable="patchelf" failonerror="true">
+            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
+            <arg value="libdrealjava-${dreal.version}.so"/>
+        </exec>
+    </target>
+
+    <target name="publish-dreal" depends="package-dreal, load-ivy"
+            description="Publish dReal binaries to Ivy repository.">
+        <ivy:resolve conf="solver-dreal" file="solvers_ivy_conf/ivy_dreal.xml" />
+        <publishToRepository solverName="dReal" solverVersion="${dreal.version}"/>
+    </target>
+</project>
