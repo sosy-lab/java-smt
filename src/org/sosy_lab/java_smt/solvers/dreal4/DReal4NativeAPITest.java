@@ -285,9 +285,9 @@ public class DReal4NativeAPITest {
     Variable x = new Variable("x");
     Variable y = new Variable("y");
     Expression exp = new Expression(Dreal.add(new Expression(x), new Expression(y)));
-    List<Long> expected = Arrays.asList(x.getHash(), y.getHash());
-    for (Variable var : exp.getVariables()) {
-      assertThat(expected).contains(var.getHash());
+    Variables variables = exp.expressionGetVariables();
+    for (Variable var : ImmutableList.of(x, y)) {
+      assertThat(variables.include(var)).isTrue();
     }
   }
 
