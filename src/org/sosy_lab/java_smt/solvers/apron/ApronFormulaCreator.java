@@ -103,7 +103,7 @@ public class ApronFormulaCreator
         throw new RuntimeException(pException);
       }
     }
-    throw new IllegalArgumentException();
+    return null;
   }
 
   public Manager getManager() {
