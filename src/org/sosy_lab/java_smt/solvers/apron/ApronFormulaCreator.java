@@ -45,7 +45,7 @@ public class ApronFormulaCreator
     extends FormulaCreator<ApronNode, ApronFormulaType, Environment, Long> {
 
   /** variables is a map that stores all variable-objects with their name as key. */
-  private final Map<String, ApronNode> variables;
+  private final Map<String, ApronNode> variableNamesToNodes;
 
   private final Manager manager;
   private Environment formulaEnvironment;
@@ -58,7 +58,7 @@ public class ApronFormulaCreator
       ApronRationalType pRationalType) {
     super(pO, boolType, pIntegerType, pRationalType, null, null);
     this.formulaEnvironment = pO;
-    this.variables = new HashMap<>();
+    this.variableNamesToNodes = new HashMap<>();
     this.manager = pManager;
   }
 
@@ -102,9 +102,8 @@ public class ApronFormulaCreator
       } catch (ApronException pException) {
         throw new RuntimeException(pException);
       }
-    } else {
-      return null;
     }
+    throw new IllegalArgumentException();
   }
 
   public Manager getManager() {
@@ -149,21 +148,21 @@ public class ApronFormulaCreator
             || pApronFormulaType.getType().equals(FormulaType.RATIONAL)),
         "Only Integer or rational variables allowed!");
     if (formulaEnvironment.hasVar(varName)) {
-      return variables.get(varName);
+      return variableNamesToNodes.get(varName);
     }
     if (pApronFormulaType.getType().equals(FormulaType.INTEGER)) {
       ApronIntVarNode varNode = new ApronIntVarNode(varName, this);
-      variables.put(varName, varNode);
+      variableNamesToNodes.put(varName, varNode);
       return varNode;
     } else {
       ApronRatVarNode varNode = new ApronRatVarNode(varName, this);
-      variables.put(varName, varNode);
+      variableNamesToNodes.put(varName, varNode);
       return varNode;
     }
   }
 
-  public Map<String, ApronNode> getVariables() {
-    return variables;
+  Map<String, ApronNode> getVariables() {
+    return variableNamesToNodes;
   }
 
   @Override

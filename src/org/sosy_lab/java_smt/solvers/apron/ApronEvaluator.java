@@ -26,8 +26,7 @@ public class ApronEvaluator extends AbstractEvaluator<ApronNode, ApronFormulaTyp
       FormulaCreator<ApronNode, ApronFormulaType, ApronModel, Long> creator)
       throws SolverException {
     super(pProver, creator);
-    ApronTheoremProver prover = (ApronTheoremProver) pProver;
-    this.theoremProver = prover;
+    this.theoremProver = (ApronTheoremProver) pProver;
     this.apronModel = (ApronModel) theoremProver.getModel();
   }
 

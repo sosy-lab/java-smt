@@ -93,7 +93,6 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
   }
 
   private ValueAssignment getIntAssignment(String pVar) throws ApronException {
-    ImmutableList.Builder<Object> argumentInterpretationBuilder = ImmutableList.builder();
     ApronNode keyFormula = formulaCreator.getVariables().get(pVar);
     Manager man = this.prover.getAbstract1().getCreationManager();
     // shows the interval for all values the variable can take
@@ -132,11 +131,10 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
         formula,
         pVar,
         formulaCreator.convertValue(keyFormula, valueFormula),
-        argumentInterpretationBuilder.build());
+        ImmutableList.of());
   }
 
   private ValueAssignment getRatAssignment(String pVar) throws ApronException {
-    ImmutableList.Builder<Object> argumentInterpretationBuilder = ImmutableList.builder();
     ApronNode keyFormula = formulaCreator.getVariables().get(pVar);
     Manager man = this.prover.getAbstract1().getCreationManager();
     // shows the interval for all values the variable can take
@@ -175,7 +173,7 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
     BooleanFormula formula = new ApronConstraint(formulaCreator.getFormulaEnvironment(), map);
     Object node = formulaCreator.convertValue(keyFormula, valueFormula);
     return new ValueAssignment(
-        keyFormula, valueFormula, formula, pVar, node, argumentInterpretationBuilder.build());
+        keyFormula, valueFormula, formula, pVar, node, ImmutableList.of());
   }
 
   @Override
@@ -282,24 +280,22 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
   }
 
   private ApronNode getIntVarValue(ApronIntVarNode varNode) {
-    ApronIntCstNode nullValue = new ApronIntCstNode(BigInteger.ZERO);
     String varName = varNode.getVarName();
     for (ValueAssignment assignment : model) {
       if (varName.equals(assignment.getName())) {
         return (ApronNode) assignment.getValueAsFormula();
       }
     }
-    return nullValue;
+    return new ApronIntCstNode(BigInteger.ZERO); // Use 0 as default value
   }
 
   private ApronNode getRatVarValue(ApronRatVarNode varNode) {
-    ApronIntCstNode nullValue = new ApronIntCstNode(BigInteger.ZERO);
     String varName = varNode.getVarName();
     for (ValueAssignment assignment : model) {
       if (varName.equals(assignment.getName())) {
         return (ApronNode) assignment.getValueAsFormula();
       }
     }
-    return nullValue;
+    return new ApronIntCstNode(BigInteger.ZERO); // Use 0 as default value
   }
 }

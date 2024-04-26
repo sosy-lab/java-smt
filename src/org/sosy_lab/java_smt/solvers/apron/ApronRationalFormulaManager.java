@@ -94,14 +94,12 @@ public class ApronRationalFormulaManager
 
   @Override
   protected ApronNode negate(ApronNode pParam1) {
-    ApronRatUnaryNode unaryNode = new ApronRatUnaryNode(pParam1, Texpr1UnNode.OP_NEG);
-    return unaryNode;
+    return new ApronRatUnaryNode(pParam1, Texpr1UnNode.OP_NEG);
   }
 
   @Override
   protected ApronNode add(ApronNode pParam1, ApronNode pParam2) {
-    ApronRatBinaryNode binaryNode = new ApronRatBinaryNode(pParam1, pParam2, Texpr1BinNode.OP_ADD);
-    return binaryNode;
+    return new ApronRatBinaryNode(pParam1, pParam2, Texpr1BinNode.OP_ADD);
   }
 
   @Override
@@ -113,25 +111,22 @@ public class ApronRationalFormulaManager
       }
       return first;
     }
-    return null;
+    return makeNumberImpl(0);
   }
 
   @Override
   protected ApronNode subtract(ApronNode pParam1, ApronNode pParam2) {
-    ApronRatBinaryNode binaryNode = new ApronRatBinaryNode(pParam1, pParam2, Texpr1BinNode.OP_SUB);
-    return binaryNode;
+    return new ApronRatBinaryNode(pParam1, pParam2, Texpr1BinNode.OP_SUB);
   }
 
   @Override
   protected ApronNode divide(ApronNode pParam1, ApronNode pParam2) {
-    ApronRatBinaryNode binaryNode = new ApronRatBinaryNode(pParam1, pParam2, Texpr1BinNode.OP_DIV);
-    return binaryNode;
+    return new ApronRatBinaryNode(pParam1, pParam2, Texpr1BinNode.OP_DIV);
   }
 
   @Override
   protected ApronNode multiply(ApronNode pParam1, ApronNode pParam2) {
-    ApronRatBinaryNode binaryNode = new ApronRatBinaryNode(pParam1, pParam2, Texpr1BinNode.OP_MUL);
-    return binaryNode;
+    return new ApronRatBinaryNode(pParam1, pParam2, Texpr1BinNode.OP_MUL);
   }
 
   @Override
@@ -166,9 +161,7 @@ public class ApronRationalFormulaManager
     ApronRatBinaryNode binaryNode = new ApronRatBinaryNode(pParam1, pParam2, Texpr1BinNode.OP_SUB);
     Map<ApronNode, Integer> map = new HashMap<>();
     map.put(binaryNode, Tcons1.SUP);
-    ApronConstraint constraint =
-        new ApronConstraint(apronFormulaCreator.getFormulaEnvironment(), map);
-    return constraint;
+    return new ApronConstraint(apronFormulaCreator.getFormulaEnvironment(), map);
   }
 
   @Override
@@ -176,9 +169,7 @@ public class ApronRationalFormulaManager
     ApronRatBinaryNode binaryNode = new ApronRatBinaryNode(pParam1, pParam2, Texpr1BinNode.OP_SUB);
     Map<ApronNode, Integer> map = new HashMap<>();
     map.put(binaryNode, Tcons1.SUPEQ);
-    ApronConstraint constraint =
-        new ApronConstraint(apronFormulaCreator.getFormulaEnvironment(), map);
-    return constraint;
+    return new ApronConstraint(apronFormulaCreator.getFormulaEnvironment(), map);
   }
 
   @Override
@@ -186,9 +177,7 @@ public class ApronRationalFormulaManager
     ApronRatBinaryNode binaryNode = new ApronRatBinaryNode(pParam2, pParam1, Texpr1BinNode.OP_SUB);
     Map<ApronNode, Integer> map = new HashMap<>();
     map.put(binaryNode, Tcons1.SUP);
-    ApronConstraint constraint =
-        new ApronConstraint(apronFormulaCreator.getFormulaEnvironment(), map);
-    return constraint;
+    return new ApronConstraint(apronFormulaCreator.getFormulaEnvironment(), map);
   }
 
   @Override
@@ -196,9 +185,7 @@ public class ApronRationalFormulaManager
     ApronRatBinaryNode binaryNode = new ApronRatBinaryNode(pParam2, pParam1, Texpr1BinNode.OP_SUB);
     Map<ApronNode, Integer> map = new HashMap<>();
     map.put(binaryNode, Tcons1.SUPEQ);
-    ApronConstraint constraint =
-        new ApronConstraint(apronFormulaCreator.getFormulaEnvironment(), map);
-    return constraint;
+    return new ApronConstraint(apronFormulaCreator.getFormulaEnvironment(), map);
   }
 
   @Override
