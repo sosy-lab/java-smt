@@ -13,6 +13,7 @@ import static org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier.FORA
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -43,6 +44,7 @@ import org.sosy_lab.java_smt.solvers.dreal4.drealjni.FormulaKind;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.FormulaSet;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.VariableSet;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variables;
 
 public class DReal4FormulaCreator
     extends FormulaCreator<DRealTerm<?, ?>, Variable.Type.Kind, Config, DRealTerm<?, ?>> {
@@ -328,7 +330,7 @@ public class DReal4FormulaCreator
     return formulas;
   }
 
-  private static List<DRealTerm<?, ?>> getExpressionArgs(DRealTerm<?, ?> parent) {
+  private List<DRealTerm<?, ?>> getExpressionArgs(DRealTerm<?, ?> parent) {
     List<DRealTerm<?, ?>> children = new ArrayList<>();
     // pTerm should be a Formula, so that the expressions or variable can be extracted
     Preconditions.checkState(parent.isFormula());
@@ -424,7 +426,7 @@ public class DReal4FormulaCreator
   have only the parent to get the type from, it will always return Boolean Type, but the
   expression should be some kind of NumeralFormula Type
   */
-  protected static Variable.Type.Kind getTypeForExpressions(Expression pExpression) {
+  protected Variable.Type.Kind getTypeForExpressions(Expression pExpression) {
     // If the Expression is Constant we return null, because from constant we cannot get the
     // type, but this function is always called from a formula, so this is called two times, and
     // one of them has a Variable, else this Formula would have been a True or False formula
@@ -434,12 +436,36 @@ public class DReal4FormulaCreator
       return Dreal.getVariable(pExpression).getType();
     } else {
       // There is at least one Variable in the Expression, else it would be a constant
-      VariableSet varSet = pExpression.getVariables();
-      Preconditions.checkState(!varSet.isEmpty());
-      Iterator<Variable> iter = varSet.iterator();
-      Variable var = iter.next();
-      return var.getType();
+      Variables varSet = pExpression.expressionGetVariables();
+      Preconditions.checkState(!varSet.empty());
+
+      // FIXME: Remove this hack
+      // We just need any of the variables from the set, but can't use the iterator with the
+      // current JNI bindings.
+      Variable.Type.Kind varType = null;
+      for (Variable var : toSet(varSet)) {
+        if (varSet.include(var)) {
+          varType = var.getType();
+        }
+      }
+      if (varType == null) {
+        throw new IllegalArgumentException();
+      }
+      return varType;
     }
+  }
+
+  // TODO: Patch JNI bindings and remove this hack
+  public ImmutableSet<Variable> toSet(Variables vars) {
+    // FIXME: Assumes there are no 'unknown' variables that are not in the cache
+    ImmutableSet.Builder<Variable> builder = ImmutableSet.builder();
+    for (DRealTerm<?, ?> v : variablesCache.values()) {
+      Variable var = v.getVariable();
+      if (vars.include(var)) {
+        builder.add(var);
+      }
+    }
+    return builder.build();
   }
 
   // Not possible to throw an unsupported exception, because in AbstractFormulaManager

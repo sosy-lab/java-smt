@@ -27,6 +27,7 @@ import org.sosy_lab.java_smt.solvers.dreal4.drealjni.FormulaKind;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.FormulaSet;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable;
 import org.sosy_lab.java_smt.solvers.dreal4.drealjni.VariableSet;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variables;
 
 public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Variable.Type.Kind, Config> {
 
@@ -88,8 +89,9 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Variable.Type.Ki
         Variable var = Dreal.getVariable(exp);
         return evalImpl(new DRealTerm<>(var, var.getType(), var.getType()));
       } else {
-        VariableSet expSet = exp.getVariables();
-        for (Variable var : expSet) {
+        Variables variables = exp.expressionGetVariables();
+        DReal4FormulaCreator myCreator = (DReal4FormulaCreator) creator;
+        for (Variable var : myCreator.toSet(variables)) {
           // if we find a variable that is not in the model, abort
           if (!model.hasVariable(var)) {
             return null;
@@ -277,11 +279,12 @@ public class DReal4Model extends AbstractModel<DRealTerm<?, ?>, Variable.Type.Ki
         Expression leftChild = Dreal.getLhsExpression(term.getFormula());
         Expression rightChild = Dreal.getRhsExpression(term.getFormula());
         Variable.Type.Kind type;
-        type = DReal4FormulaCreator.getTypeForExpressions(leftChild);
+        DReal4FormulaCreator myCreator = (DReal4FormulaCreator) creator;
+        type = myCreator.getTypeForExpressions(leftChild);
         // if type is null, we did not find a variable in left child, we can ignore the formula,
         // else both child could have variable
         if (type == null) {
-          type = DReal4FormulaCreator.getTypeForExpressions(rightChild);
+          type = myCreator.getTypeForExpressions(rightChild);
           recursiveAssignmentFinder(
               builder, new DRealTerm<>(rightChild, type, rightChild.getKind()));
         } else {
