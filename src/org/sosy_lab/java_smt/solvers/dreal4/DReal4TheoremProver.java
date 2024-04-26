@@ -10,6 +10,10 @@ package org.sosy_lab.java_smt.solvers.dreal4;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -19,12 +23,11 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
-import org.sosy_lab.java_smt.solvers.dreal4.drealjni.*;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Box;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Config;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Context;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Formula;
+import org.sosy_lab.java_smt.solvers.dreal4.drealjni.Variable;
 
 class DReal4TheoremProver extends AbstractProverWithAllSat<Void> implements ProverEnvironment {
 
@@ -52,7 +55,8 @@ class DReal4TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   }
 
   @Override
-  protected @Nullable Void addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
+  protected @Nullable Void addConstraintImpl(BooleanFormula constraint)
+      throws InterruptedException {
     DRealTerm<?, ?> formula = creator.extractInfo(constraint);
     // It is not possible to assert an Expression, only Variable of type boolean or a formula
     Preconditions.checkState(!formula.isExp());
@@ -107,7 +111,7 @@ class DReal4TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
 
   @Override
   protected DReal4Model getEvaluatorWithoutChecks() {
-    ImmutableList.Builder<DRealTerm<?,?>> constraints = ImmutableList.builder();
+    ImmutableList.Builder<DRealTerm<?, ?>> constraints = ImmutableList.builder();
     for (BooleanFormula f : getAssertedFormulas()) {
       constraints.add(creator.extractInfo(f));
     }

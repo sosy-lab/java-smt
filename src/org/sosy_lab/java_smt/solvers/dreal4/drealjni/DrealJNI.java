@@ -328,7 +328,7 @@ public final class DrealJNI {
       long jarg1, VariableIntUnorderedMap.Iterator jarg11);
 
   public static native void varibaleIntUnorderedMapIteratorSetValue(
-          long jarg1, VariableIntUnorderedMap.Iterator jarg11, int jarg2);
+      long jarg1, VariableIntUnorderedMap.Iterator jarg11, int jarg2);
 
   public static native void deleteVaribaleIntUnorderedMapIterator(long jarg1);
 
@@ -339,7 +339,7 @@ public final class DrealJNI {
       long jarg1, VariableIntUnorderedMap jarg11);
 
   public static native long varibaleIntUnorderedMapFind(
-          long jarg1, VariableIntUnorderedMap jarg11, long jarg2, Variable jarg22);
+      long jarg1, VariableIntUnorderedMap jarg11, long jarg2, Variable jarg22);
 
   public static native long varibaleIntUnorderedMapBegin(
       long jarg1, VariableIntUnorderedMap jarg11);
@@ -350,10 +350,10 @@ public final class DrealJNI {
       long jarg1, VariableIntUnorderedMap jarg11);
 
   public static native boolean varibaleIntUnorderedMapContainsImpl(
-          long jarg1, VariableIntUnorderedMap jarg11, long jarg2, Variable jarg22);
+      long jarg1, VariableIntUnorderedMap jarg11, long jarg2, Variable jarg22);
 
   public static native void varibaleIntUnorderedMapPutUnchecked(
-          long jarg1, VariableIntUnorderedMap jarg11, long jarg2, Variable jarg22, int jarg3);
+      long jarg1, VariableIntUnorderedMap jarg11, long jarg2, Variable jarg22, int jarg3);
 
   public static native void varibaleIntUnorderedMapRemoveUnchecked(
       long jarg1,
