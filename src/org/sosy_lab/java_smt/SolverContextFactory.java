@@ -91,7 +91,7 @@ public class SolverContextFactory {
   private boolean synchronize = false;
 
   @Option(secure = true, description = "Apply additional checks to catch common user errors.")
-  private boolean debugMode = false;
+  private boolean useDebugMode = false;
 
   @Option(
       secure = true,
@@ -225,7 +225,7 @@ public class SolverContextFactory {
     if (synchronize) {
       context = new SynchronizedSolverContext(config, logger, shutdownNotifier, context);
     }
-    if (debugMode) {
+    if (useDebugMode) {
       context = new DebuggingSolverContext(solverToCreate, config, context);
     }
     if (collectStatistics) {

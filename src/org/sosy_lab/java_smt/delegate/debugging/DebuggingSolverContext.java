@@ -152,7 +152,10 @@ public class DebuggingSolverContext extends DefaultFormulaVisitor<TraversalProce
     // Read in user supplied options
     pConfiguration.inject(this);
 
-    // Set configuration options based on the solver that is being used
+    // Set configuration options based on the solver that is being used. Options from the
+    // configuration passed on the command line will overwrite these settings. That is, if
+    // threadLocal, noSharedDeclarations or noSharedFormulas is set to 'true' we will throw an
+    // exception if the forbidden feature is used, even if the solver does allow it.
     if (pSolver == Solvers.CVC5) {
       threadLocal = true;
     }
@@ -165,8 +168,6 @@ public class DebuggingSolverContext extends DefaultFormulaVisitor<TraversalProce
 
     // Initialize function declaration context
     if (noSharedDeclarations) {
-      // If noSharedDeclarations was set to true by the user we throw exceptions on declaration
-      // sharing even if the solver allows it.
       declaredFunctions = ConcurrentHashMap.newKeySet();
     } else {
       declaredFunctions = globalFunctions.getOrDefault(pSolver, ConcurrentHashMap.newKeySet());
@@ -174,8 +175,6 @@ public class DebuggingSolverContext extends DefaultFormulaVisitor<TraversalProce
 
     // Initialize formula context
     if (noSharedFormulas) {
-      // If noSharedFormulas was set to true by the user we throw exceptions on formula sharing
-      // even if the solver allows it.
       definedFormulas = ConcurrentHashMap.newKeySet();
     } else {
       definedFormulas = globalTerms.getOrDefault(pSolver, ConcurrentHashMap.newKeySet());
