@@ -172,8 +172,7 @@ public class ApronModel extends AbstractModel<ApronNode, ApronFormulaType, Envir
     map.put(binaryNode, Tcons1.EQ);
     BooleanFormula formula = new ApronConstraint(formulaCreator.getFormulaEnvironment(), map);
     Object node = formulaCreator.convertValue(keyFormula, valueFormula);
-    return new ValueAssignment(
-        keyFormula, valueFormula, formula, pVar, node, ImmutableList.of());
+    return new ValueAssignment(keyFormula, valueFormula, formula, pVar, node, ImmutableList.of());
   }
 
   @Override

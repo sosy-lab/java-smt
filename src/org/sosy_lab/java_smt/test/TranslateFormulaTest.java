@@ -110,7 +110,7 @@ public class TranslateFormulaTest {
         .isNotEqualTo(Solvers.BOOLECTOR);
   }
 
-  private void requireOr(){
+  private void requireOr() {
     assume()
         .withMessage("Solver %s does not support or()", translateFrom)
         .that(translateFrom)

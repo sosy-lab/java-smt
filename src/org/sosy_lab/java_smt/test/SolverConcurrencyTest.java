@@ -166,7 +166,7 @@ public class SolverConcurrencyTest {
             Solvers.APRON);
   }
 
-  protected void requireNonNumeralVariables(){
+  protected void requireNonNumeralVariables() {
     assume()
         .withMessage("Solver %s does not support non-numeral variables", solverToUse())
         .that(solverToUse())

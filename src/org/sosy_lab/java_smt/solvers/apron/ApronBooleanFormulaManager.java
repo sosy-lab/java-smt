@@ -148,7 +148,8 @@ public class ApronBooleanFormulaManager
       Boolean isBottom = helper.isBottom(this.apronFormulaCreator.getManager());
       if (!isBottom) {
         logger.setLevel(Level.WARNING);
-        logger.warning("Apron can only guarantee for clear results for UNSAT! SAT can " + "also mean UNKNOWN!");
+        logger.warning(
+            "Apron can only guarantee for clear results for UNSAT! SAT can also mean UNKNOWN!");
       }
       return isBottom;
     } catch (ApronException pException) {
