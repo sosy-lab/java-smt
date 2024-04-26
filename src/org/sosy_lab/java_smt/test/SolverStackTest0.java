@@ -596,6 +596,8 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
 
   @Test
   public void modelForSatFormulaWithLargeValue() throws SolverException, InterruptedException {
+    // FIXME: dReal returns 'unsat' for large numbers (> 10^10)
+    assume().that(solverToUse()).isNotEqualTo(Solvers.DREAL4);
     requireIntegers();
     try (BasicProverEnvironment<?> stack =
         newEnvironmentForTest(context, ProverOptions.GENERATE_MODELS)) {
@@ -612,6 +614,7 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
   @Test
   public void modelForSatFormulaWithUF() throws SolverException, InterruptedException {
     requireIntegers();
+    requireUF();
     requireTheoryCombination();
 
     try (BasicProverEnvironment<?> stack =
