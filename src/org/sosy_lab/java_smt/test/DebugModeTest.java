@@ -53,7 +53,7 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
     Configuration debugConfig =
         Configuration.builder()
             .setOption("solver.solver", solverToUse().toString())
-            .setOption("solver.debugMode", String.valueOf(true))
+            .setOption("solver.useDebugMode", String.valueOf(true))
             .build();
     debugFactory = new SolverContextFactory(debugConfig, logger, shutdownNotifierToUse());
     debugContext = debugFactory.generateContext();
