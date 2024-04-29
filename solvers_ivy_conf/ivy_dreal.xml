@@ -28,9 +28,9 @@ SPDX-License-Identifier: Apache-2.0
     </configurations>
 
     <publications defaultconf="solver-dreal">
-        <artifact name="libdrealjava"  conf="solver-dreal" type="shared-object" ext="so" />
-        <artifact name="libdreal_"     conf="solver-dreal" type="shared-object" ext="so" />
-        <artifact name="libibex"       conf="solver-dreal" type="shared-object" ext="so" />
+        <artifact name="libdrealjava" conf="solver-dreal" type="shared-object" ext="so" />
+        <artifact name="libdreal"     conf="solver-dreal" type="shared-object" ext="so" />
+        <artifact name="libibex"      conf="solver-dreal" type="shared-object" ext="so" />
     </publications>
 
     <dependencies></dependencies>
