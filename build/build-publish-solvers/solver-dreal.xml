@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+This file is part of JavaSMT,
+an API wrapper for a collection of SMT solvers:
+https://github.com/sosy-lab/java-smt
+
+SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<!-- vim: set tabstop=8 shiftwidth=4 expandtab sts=4 filetype=ant fdm=marker: -->
+<project name="publish-solvers-dreal" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+
+    <import file="macros.xml"/>
+
+    <!-- SECTION: Publishing dReal
+         ==================================================================
+    -->
+    <target name="package-dreal" depends="">
+        <fail unless="dreal.customRev">
+            Please specify a custom revision with the flag -Ddreal.customRev=XXX.
+            The custom revision has to be unique amongst the already known version
+            numbers from the ivy repository. The script will append the git revision.
+        </fail>
+
+        <!-- build a version string for dreal -->
+        <property name="dreal.version" value="${dreal.customRev}-g4067225"/>
+        <echo message="Building dReal in version '${dreal.version}'"/>
+
+        <!-- fetch and install libibex and dreal -->
+        <mkdir dir="build-deps"/>
+        <exec executable="curl" dir="build-deps" failonerror="true">
+            <arg value="-O"/>
+            <arg value="-L"/>
+            <arg value="https://launchpad.net/~dreal/+archive/ubuntu/dreal/+files/libibex-dev_2.7.4.20220710184652.git352eeeb2345fb2b7a7ec248b44770d8cdc4a5d67~22.04_amd64.deb"/>
+        </exec>
+        <exec executable="dpkg" dir="build-deps" failonerror="true">
+            <arg value="-x"/>
+            <arg value="libibex-dev_2.7.4.20220710184652.git352eeeb2345fb2b7a7ec248b44770d8cdc4a5d67~22.04_amd64.deb"/>
+            <arg value="."/>
+        </exec>
+        <exec executable="curl" dir="build-deps" failonerror="true">
+            <arg value="-O"/>
+            <arg value="-L"/>
+            <arg value="https://github.com/dreal/dreal4/releases/download/4.21.06.2/dreal_4.21.06.2_amd64.deb"/>
+        </exec>
+        <exec executable="dpkg" dir="build-deps" failonerror="true">
+            <arg value="-x"/>
+            <arg value="dreal_4.21.06.2_amd64.deb"/>
+            <arg value="."/>
+        </exec>
+
+        <property name="path.source" value="${user.dir}/lib/native/source/dreal"/>
+
+        <property name="dreal.install" value="${user.dir}/build-deps/opt/dreal/4.21.06.2"/>
+        <property name="ibex.install" value="${user.dir}/build-deps/opt/libibex/2.7.4"/>
+
+        <!-- compile the JNI code -->
+        <exec executable="g++" dir="${path.source}" failonerror="true">
+            <arg value="-fpic"/>
+            <arg value="-c"/>
+            <arg value="dreal_wrap.cxx"/>
+            <arg value="-I${java.home}/include"/>
+            <arg value="-I${java.home}/include/linux"/>
+            <arg value="-I${ibex.install}/include"/>
+            <arg value="-I${ibex.install}/include/ibex"/>
+            <arg value="-I${ibex.install}/include/ibex/3rd"/>
+            <arg value="-I${dreal.install}/include/"/>
+        </exec>
+
+        <!-- link the JNI code as a new library -->
+        <exec executable="g++" dir="${path.source}" failonerror="true">
+            <arg value="-shared"/>
+            <arg value="dreal_wrap.o"/>
+            <arg value="-ldreal"/>
+            <arg value="-libex"/>
+            <arg value="-o"/>
+            <arg value="libdrealjava.so"/>
+            <arg value="-L${ibex.install}/lib"/>
+            <arg value="-L${dreal.install}/lib/"/>
+        </exec>
+
+        <!-- copy library files to the main directory -->
+        <copy file="${ibex.install}/lib/libibex.so" tofile="libibex-${dreal.version}.so"/>
+        <copy file="${dreal.install}/lib/libdreal.so" tofile="libdreal-${dreal.version}.so"/>
+        <copy file="${path.source}/libdrealjava.so" tofile="libdrealjava-${dreal.version}.so"/>
+
+        <!-- patch dependencies -->
+        <exec executable="patchelf" failonerror="true">
+            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
+            <arg value="libibex-${dreal.version}.so"/>
+        </exec>
+        <exec executable="patchelf" failonerror="true">
+            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
+            <arg value="libdreal-${dreal.version}.so"/>
+        </exec>
+        <exec executable="patchelf" failonerror="true">
+            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
+            <arg value="libdrealjava-${dreal.version}.so"/>
+        </exec>
+    </target>
+
+    <target name="publish-dreal" depends="package-dreal, load-ivy"
+            description="Publish dReal binaries to Ivy repository.">
+        <ivy:resolve conf="solver-dreal" file="solvers_ivy_conf/ivy_dreal.xml" />
+        <publishToRepository solverName="dReal" solverVersion="${dreal.version}"/>
+    </target>
+</project>

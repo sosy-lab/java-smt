@@ -80,7 +80,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       FormulaType.getArrayType(IntegerType, IntegerType);
 
   private static final ImmutableList<Solvers> SOLVERS_WITH_PARTIAL_MODEL =
-      ImmutableList.of(Solvers.Z3, Solvers.PRINCESS);
+      ImmutableList.of(Solvers.Z3, Solvers.PRINCESS, Solvers.DREAL4);
 
   @Before
   public void setup() {
@@ -136,6 +136,13 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
   public void testGetLargeIntegers() throws SolverException, InterruptedException {
+    assume()
+        .withMessage(
+            "This number is to big for integers in dReal, BigIntegers are not supported,"
+                + " only in rationals.")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.DREAL4);
+
     requireIntegers();
     BigInteger large = new BigInteger("1000000000000000000000000000000000000000");
     testModelGetters(
@@ -170,6 +177,14 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
   public void testGetRationals() throws SolverException, InterruptedException {
+    assume()
+        .withMessage(
+            "dReal does get the an answer, just not as precise, because dReal uses "
+                + "double as rationals. Therefore the solution here is 333333/1000000 because of "
+                + "rounding.")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.DREAL4);
+
     requireIntegers();
     requireRationals();
     for (String name : VARIABLE_NAMES) {
@@ -243,6 +258,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   /** Test that different names are no problem for int UFs in the model. */
   @Test
   public void testGetIntUfs() throws SolverException, InterruptedException {
+    requireUF();
     requireIntegers();
     // Some names are specificly chosen to test the Boolector model
     // Use 1 instead of 0 or max bv value, as solvers tend to use 0, min or max as default
@@ -266,6 +282,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
   public void testGetUFs() throws SolverException, InterruptedException {
+    requireUF();
     // Boolector does not support integers
     if (imgr != null) {
       IntegerFormula x =
@@ -299,6 +316,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
   public void testGetUFsWithMultipleAssignments() throws SolverException, InterruptedException {
+    requireUF();
     requireIntegers();
 
     List<BooleanFormula> constraints = new ArrayList<>();
@@ -335,6 +353,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
   public void testGetUFwithMoreParams() throws Exception {
+    requireUF();
     // Boolector does not support integers
     if (imgr != null) {
       IntegerFormula x =
@@ -356,6 +375,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
   public void testGetMultipleUFsWithInts() throws Exception {
+    requireUF();
     requireIntegers();
     IntegerFormula arg1 = imgr.makeVariable("arg1");
     IntegerFormula arg2 = imgr.makeVariable("arg2");
@@ -573,6 +593,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   // var = 1 & Exists boundVar . (boundVar = 0 & var = f(boundVar))
   @Test
   public void testQuantifiedUF() throws SolverException, InterruptedException {
+    requireUF();
     requireQuantifiers();
     requireIntegers();
 
@@ -628,6 +649,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   // var = 1 & boundVar = 1 & Exists boundVar . (boundVar = 0 & var = func(boundVar))
   @Test
   public void testQuantifiedUF2() throws SolverException, InterruptedException {
+    requireUF();
     requireQuantifiers();
     requireIntegers();
 
@@ -819,7 +841,11 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         prover.push(imgr.greaterThan(x, imgr.makeNumber(0)));
         assertThat(prover).isSatisfiable();
         try (Model m = prover.getModel()) {
-          assertThat(m.evaluate(x)).isEqualTo(BigInteger.ONE);
+          if (solverToUse() != Solvers.DREAL4) {
+            assertThat(m.evaluate(x)).isEqualTo(BigInteger.ONE);
+          } else {
+            assertThat(m.evaluate(x)).isEqualTo(BigInteger.valueOf(1073741823));
+          }
           // it works now, but maybe the model "x=1" for the constraint "x>0" is not valid for new
           // solvers.
         }
@@ -1851,8 +1877,14 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
 
-      // exists x : x==0
-      prover.push(qmgr.exists(ctr, body));
+      switch (solverToUse()) {
+        case DREAL4: // exist does not exist
+          prover.push(body);
+          break;
+        default:
+          // exists x : x==0
+          prover.push(qmgr.exists(ctr, body));
+      }
       assertThat(prover.isUnsat()).isFalse();
       try (Model m = prover.getModel()) {
         for (ValueAssignment v : m) {
@@ -2350,6 +2382,14 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
   public void testGetRationals1() throws SolverException, InterruptedException {
+    assume()
+        .withMessage(
+            "dReal does get the an answer, just not as precise, because dReal uses "
+                + "double as rationals. Therefore the solution here is 333333/2000000 because of "
+                + "rounding.")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.DREAL4);
+
     requireRationals();
     evaluateInModel(
         rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(Rational.ofString("1/3"))),

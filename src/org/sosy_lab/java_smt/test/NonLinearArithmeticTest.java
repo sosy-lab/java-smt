@@ -38,8 +38,6 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
 
   // Boolector, CVC4, SMTInterpol, MathSAT5 and OpenSMT do not fully support non-linear arithmetic
   // (though SMTInterpol and MathSAT5 support some parts)
-
-  // INFO: OpenSmt does not suport nonlinear arithmetic
   static final ImmutableSet<Solvers> SOLVER_WITHOUT_NONLINEAR_ARITHMETIC =
       ImmutableSet.of(
           Solvers.SMTINTERPOL,
@@ -180,6 +178,10 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
       // MathSAT supports non-linear multiplication
       assertThatFormula(f).isUnsatisfiable();
 
+    } else if (solver == Solvers.DREAL4) {
+      // dReal does not support UF's and APPROXIMATE_ALWAYS/FALLBACK is disabled, so result should
+      // not change
+      assertThatFormula(f).isUnsatisfiable();
     } else {
       assertExpectedUnsatifiabilityForNonLinearArithmetic(f);
     }
@@ -200,11 +202,11 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
 
   @Test
   public void testDivisionByZero() throws SolverException, InterruptedException {
-    // INFO: OpenSmt does not allow division by zero
     assume()
         .withMessage("Solver %s does not support division by zero", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.YICES2, Solvers.OPENSMT);
+        .isNoneOf(Solvers.YICES2, Solvers.OPENSMT, Solvers.DREAL4);
+
 
     T a = nmgr.makeVariable("a");
     T b = nmgr.makeVariable("b");
@@ -229,11 +231,14 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
                 nmgr.equal(nmgr.divide(a, nmgr.makeNumber(3)), nmgr.makeNumber(2)),
                 nmgr.equal(nmgr.divide(a, nmgr.makeNumber(2)), nmgr.makeNumber(3))));
 
-    if (formulaType.equals(FormulaType.IntegerType)
+    if (solverToUse() == Solvers.DREAL4) {
+      // dReal does not support UF's and APPROXIMATE_ALWAYS/FALLBACK is disabled, so result should
+      // not change
+      assertThatFormula(f).isUnsatisfiable();
+    } else if (formulaType.equals(FormulaType.IntegerType)
         && nonLinearArithmetic == NonLinearArithmetic.APPROXIMATE_ALWAYS) {
       // Integer division is always non-linear due to rounding rules
       assertThatFormula(f).isSatisfiable();
-
     } else {
       assertThatFormula(f).isUnsatisfiable();
     }
@@ -271,6 +276,10 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
       // some solvers support non-linear multiplication (partially)
       assertThatFormula(f).isUnsatisfiable();
 
+    } else if (solverToUse() == Solvers.DREAL4) {
+      // dReal does not support UF's and APPROXIMATE_ALWAYS/FALLBACK is disabled, so result should
+      // not change
+      assertThatFormula(f).isUnsatisfiable();
     } else {
       assertExpectedUnsatifiabilityForNonLinearArithmetic(f);
     }

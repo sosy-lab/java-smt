@@ -93,14 +93,14 @@ public class TranslateFormulaTest {
     assume()
         .withMessage("Solver %s does not support parsing formulae", translateTo)
         .that(translateTo)
-        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2, Solvers.CVC5);
+        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2, Solvers.CVC5, Solvers.DREAL4);
   }
 
   private void requireParserFrom() {
     assume()
         .withMessage("Solver %s does not support parsing formulae", translateFrom)
         .that(translateFrom)
-        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2, Solvers.CVC5);
+        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2, Solvers.CVC5, Solvers.DREAL4);
   }
 
   private void requireIntegers() {
@@ -113,6 +113,10 @@ public class TranslateFormulaTest {
   @Test
   public void testDumpingAndParsing() throws SolverException, InterruptedException {
     requireParserTo();
+    assume()
+        .withMessage("Solver does not support dump/parse")
+        .that(translateTo)
+        .isEqualTo(Solvers.DREAL4);
 
     BooleanFormula input = createTestFormula(managerFrom);
     String out = managerFrom.dumpFormula(input).toString();
@@ -124,6 +128,11 @@ public class TranslateFormulaTest {
   @Test
   public void testTranslating() throws SolverException, InterruptedException {
     requireParserTo();
+
+    assume()
+        .withMessage("Solver does not support dump/parse")
+        .that(translateTo)
+        .isEqualTo(Solvers.DREAL4);
 
     BooleanFormula inputFrom = createTestFormula(managerFrom);
     BooleanFormula inputTo = createTestFormula(managerTo);
@@ -151,7 +160,7 @@ public class TranslateFormulaTest {
     assume()
         .withMessage("Solver does not support shared terms or dump/parse")
         .that(translateTo)
-        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.YICES2);
+        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.YICES2, Solvers.DREAL4);
 
     BooleanFormula inputFrom = createTestFormula(managerFrom);
     BooleanFormula inputTo = createTestFormula(managerTo);

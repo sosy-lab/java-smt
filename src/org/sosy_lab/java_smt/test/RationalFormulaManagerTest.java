@@ -36,6 +36,7 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
 
   @Test
   public void rationalToIntTest() throws SolverException, InterruptedException {
+    requireFloor();
     requireRationals();
     assume()
         .withMessage("Solver %s does not support floor operation", solverToUse())
@@ -75,6 +76,7 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
 
   @Test
   public void floorIsLessOrEqualsValueTest() throws SolverException, InterruptedException {
+    requireFloor();
     requireRationals();
     requireQuantifiers();
     RationalFormula v = rmgr.makeVariable("v");
@@ -83,6 +85,7 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
 
   @Test
   public void floorIsGreaterThanValueTest() throws SolverException, InterruptedException {
+    requireFloor();
     requireRationals();
     requireQuantifiers();
     RationalFormula v = rmgr.makeVariable("v");
@@ -91,6 +94,7 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
 
   @Test
   public void forallFloorIsLessOrEqualsValueTest() throws SolverException, InterruptedException {
+    requireFloor();
     requireRationals();
     requireQuantifiers();
     RationalFormula v = rmgr.makeVariable("v");
@@ -99,6 +103,7 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
 
   @Test
   public void forallFloorIsLessThanValueTest() throws SolverException, InterruptedException {
+    requireFloor();
     requireRationals();
     requireQuantifiers();
     RationalFormula v = rmgr.makeVariable("v");
@@ -108,6 +113,7 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
 
   @Test
   public void visitFloorTest() {
+    requireFloor();
     requireRationals();
     assume()
         .withMessage("Solver %s does not support floor operation", solverToUse())

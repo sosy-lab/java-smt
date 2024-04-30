@@ -95,6 +95,7 @@ public class SolverContextFactoryTest {
       case CVC5:
       case OPENSMT:
       case YICES2:
+      case DREAL4:
         assume.that(IS_LINUX).isTrue();
         return;
       case MATHSAT5:

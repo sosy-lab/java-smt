@@ -41,6 +41,7 @@ SPDX-License-Identifier: Apache-2.0
         <conf name="runtime-cvc5" extends="core" description="only one solver included"/>
         <conf name="runtime-boolector" extends="core" description="only one solver included"/>
         <conf name="runtime-yices2" extends="core" description="only one solver included"/>
+        <conf name="runtime-dreal" extends="core" description="only one solver included"/>
 
         <!-- The normal dependencies with all solvers included. -->
         <conf name="runtime"
@@ -49,7 +50,7 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- The normal dependencies with all solvers included, except those unter GPL. -->
         <conf name="runtime-without-gpl"
-              extends="runtime-mathsat,runtime-opensmt,runtime-optimathsat,runtime-smtinterpol,runtime-princess,runtime-z3,runtime-cvc4,runtime-cvc5,runtime-boolector"
+              extends="runtime-mathsat,runtime-opensmt,runtime-optimathsat,runtime-smtinterpol,runtime-princess,runtime-z3,runtime-cvc4,runtime-cvc5,runtime-boolector, runtime-dreal"
               description="all solvers included, except those unter GPL"/>
 
         <!-- Dependencies needed for building or running tests. -->
@@ -165,6 +166,7 @@ SPDX-License-Identifier: Apache-2.0
         <dependency org="org.sosy_lab" name="javasmt-solver-cvc4" rev="1.8-prerelease-2020-06-24-g7825d8f28" conf="runtime-cvc4->solver-cvc4" />
         <dependency org="org.sosy_lab" name="javasmt-solver-cvc5" rev="1.0.5-g4cb2ab9eb" conf="runtime-cvc5->solver-cvc5" />
         <dependency org="org.sosy_lab" name="javasmt-solver-boolector" rev="3.2.2-g1a89c229" conf="runtime-boolector->solver-boolector" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-dreal" rev="4.21.06.2-gf93bdcc" conf="runtime-dreal->solver-dreal" />
 
         <!-- additional JavaSMT components with Solver Binaries -->
         <dependency org="org.sosy_lab" name="javasmt-yices2" rev="4.1.1-59-gaf9c0520c" conf="runtime-yices2->runtime; contrib->sources" />

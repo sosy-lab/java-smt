@@ -41,12 +41,19 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
     IntegerFormula variable3 = imgr.makeVariable("variable3");
     IntegerFormula variable4 = imgr.makeVariable("variable4");
 
-    FunctionDeclaration<BooleanFormula> uf2Decl =
-        fmgr.declareUF("uf", BooleanType, IntegerType, IntegerType);
-    BooleanFormula f1 = fmgr.callUF(uf2Decl, variable1, variable3);
-    BooleanFormula f2 = fmgr.callUF(uf2Decl, variable2, variable4);
-    BooleanFormula input = bmgr.xor(f1, f2);
+    BooleanFormula input;
 
+    if (solverToUse() == Solvers.DREAL4) {
+      BooleanFormula f1 = imgr.lessOrEquals(variable1, variable2);
+      BooleanFormula f2 = imgr.lessOrEquals(variable3, variable4);
+      input = bmgr.xor(f1, f2);
+    } else {
+      FunctionDeclaration<BooleanFormula> uf2Decl =
+          fmgr.declareUF("uf", BooleanType, IntegerType, IntegerType);
+      BooleanFormula f1 = fmgr.callUF(uf2Decl, variable1, variable3);
+      BooleanFormula f2 = fmgr.callUF(uf2Decl, variable2, variable4);
+      input = bmgr.xor(f1, f2);
+    }
     BooleanFormula out = mgr.substitute(input, ImmutableMap.of());
     assertThatFormula(out).isEquivalentTo(input);
   }
@@ -61,17 +68,32 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
     IntegerFormula variable3 = imgr.makeVariable("variable3");
     IntegerFormula variable4 = imgr.makeVariable("variable4");
 
-    FunctionDeclaration<BooleanFormula> uf2Decl =
-        fmgr.declareUF("uf", BooleanType, IntegerType, IntegerType);
-    BooleanFormula f1 = fmgr.callUF(uf2Decl, variable1, variable3);
-    BooleanFormula f2 = fmgr.callUF(uf2Decl, variable2, variable4);
-    BooleanFormula input = bmgr.xor(f1, f2);
+    BooleanFormula input;
 
-    Map<BooleanFormula, BooleanFormula> substitution =
-        ImmutableMap.of(
-            bmgr.makeVariable("a"), bmgr.makeVariable("a1"),
-            bmgr.makeVariable("b"), bmgr.makeVariable("b1"),
-            bmgr.and(bmgr.makeVariable("c"), bmgr.makeVariable("d")), bmgr.makeVariable("e"));
+    Map<BooleanFormula, BooleanFormula> substitution;
+
+    if (solverToUse() == Solvers.DREAL4) {
+      BooleanFormula f1 = imgr.lessOrEquals(variable1, variable2);
+      BooleanFormula f2 = imgr.lessOrEquals(variable3, variable4);
+      input = bmgr.xor(f1, f2);
+
+      substitution =
+          ImmutableMap.of(
+              bmgr.makeVariable("a"), bmgr.makeVariable("a1"),
+              bmgr.makeVariable("b"), bmgr.makeVariable("b1"));
+    } else {
+      FunctionDeclaration<BooleanFormula> uf2Decl =
+          fmgr.declareUF("uf", BooleanType, IntegerType, IntegerType);
+      BooleanFormula f1 = fmgr.callUF(uf2Decl, variable1, variable3);
+      BooleanFormula f2 = fmgr.callUF(uf2Decl, variable2, variable4);
+      input = bmgr.xor(f1, f2);
+
+      substitution =
+          ImmutableMap.of(
+              bmgr.makeVariable("a"), bmgr.makeVariable("a1"),
+              bmgr.makeVariable("b"), bmgr.makeVariable("b1"),
+              bmgr.and(bmgr.makeVariable("c"), bmgr.makeVariable("d")), bmgr.makeVariable("e"));
+    }
 
     BooleanFormula out = mgr.substitute(input, substitution);
     assertThatFormula(out).isEquivalentTo(input);
@@ -85,18 +107,36 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
         bmgr.or(
             bmgr.and(bmgr.makeVariable("a"), bmgr.makeVariable("b")),
             bmgr.and(bmgr.makeVariable("c"), bmgr.makeVariable("d")));
-    BooleanFormula out =
-        mgr.substitute(
-            input,
-            ImmutableMap.of(
-                bmgr.makeVariable("a"), bmgr.makeVariable("a1"),
-                bmgr.makeVariable("b"), bmgr.makeVariable("b1"),
-                bmgr.and(bmgr.makeVariable("c"), bmgr.makeVariable("d")), bmgr.makeVariable("e")));
-    assertThatFormula(out)
-        .isEquivalentTo(
-            bmgr.or(
-                bmgr.and(bmgr.makeVariable("a1"), bmgr.makeVariable("b1")),
-                bmgr.makeVariable("e")));
+
+    BooleanFormula out;
+
+    if (solverToUse() == Solvers.DREAL4) {
+      out =
+          mgr.substitute(
+              input,
+              ImmutableMap.of(
+                  bmgr.makeVariable("a"), bmgr.makeVariable("a1"),
+                  bmgr.makeVariable("b"), bmgr.makeVariable("b1")));
+      assertThatFormula(out)
+          .isEquivalentTo(
+              bmgr.or(
+                  bmgr.and(bmgr.makeVariable("a1"), bmgr.makeVariable("b1")),
+                  bmgr.and(bmgr.makeVariable("c"), bmgr.makeVariable("d"))));
+    } else {
+      out =
+          mgr.substitute(
+              input,
+              ImmutableMap.of(
+                  bmgr.makeVariable("a"), bmgr.makeVariable("a1"),
+                  bmgr.makeVariable("b"), bmgr.makeVariable("b1"),
+                  bmgr.and(bmgr.makeVariable("c"), bmgr.makeVariable("d")),
+                      bmgr.makeVariable("e")));
+      assertThatFormula(out)
+          .isEquivalentTo(
+              bmgr.or(
+                  bmgr.and(bmgr.makeVariable("a1"), bmgr.makeVariable("b1")),
+                  bmgr.makeVariable("e")));
+    }
   }
 
   @Test
@@ -107,17 +147,34 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
         bmgr.or(
             bmgr.and(bmgr.makeVariable("a"), bmgr.makeVariable("b")),
             bmgr.and(bmgr.makeVariable("c"), bmgr.makeVariable("d")));
-    ImmutableMap<BooleanFormula, BooleanFormula> substitution =
-        ImmutableMap.of(
-            bmgr.makeVariable("a"), bmgr.makeVariable("a1"),
-            bmgr.makeVariable("b"), bmgr.makeVariable("b1"),
-            bmgr.and(bmgr.makeVariable("c"), bmgr.makeVariable("d")), bmgr.makeVariable("e"));
-    BooleanFormula out = mgr.substitute(input, substitution);
-    assertThatFormula(out)
-        .isEquivalentTo(
-            bmgr.or(
-                bmgr.and(bmgr.makeVariable("a1"), bmgr.makeVariable("b1")),
-                bmgr.makeVariable("e")));
+
+    ImmutableMap<BooleanFormula, BooleanFormula> substitution;
+    BooleanFormula out;
+
+    if (solverToUse() == Solvers.DREAL4) {
+      substitution =
+          ImmutableMap.of(
+              bmgr.makeVariable("a"), bmgr.makeVariable("a1"),
+              bmgr.makeVariable("b"), bmgr.makeVariable("b1"));
+      out = mgr.substitute(input, substitution);
+      assertThatFormula(out)
+          .isEquivalentTo(
+              bmgr.or(
+                  bmgr.and(bmgr.makeVariable("a1"), bmgr.makeVariable("b1")),
+                  bmgr.and(bmgr.makeVariable("c"), bmgr.makeVariable("d"))));
+    } else {
+      substitution =
+          ImmutableMap.of(
+              bmgr.makeVariable("a"), bmgr.makeVariable("a1"),
+              bmgr.makeVariable("b"), bmgr.makeVariable("b1"),
+              bmgr.and(bmgr.makeVariable("c"), bmgr.makeVariable("d")), bmgr.makeVariable("e"));
+      out = mgr.substitute(input, substitution);
+      assertThatFormula(out)
+          .isEquivalentTo(
+              bmgr.or(
+                  bmgr.and(bmgr.makeVariable("a1"), bmgr.makeVariable("b1")),
+                  bmgr.makeVariable("e")));
+    }
 
     BooleanFormula out2 = mgr.substitute(out, substitution);
     assertThatFormula(out2).isEquivalentTo(out);
@@ -171,6 +228,9 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
 
   @Test
   public void formulaEqualsAndHashCode() {
+    // Solvers without UF (dReal) get their own test below
+    requireUF();
+
     // Solvers without integers (Boolector) get their own test below
     assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     FunctionDeclaration<IntegerFormula> fb = fmgr.declareUF("f_b", IntegerType, IntegerType);
@@ -269,6 +329,41 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
+  public void withOutUFFormulaEqualsAndHashCode() {
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
+
+    new EqualsTester()
+        .addEqualityGroup(bmgr.makeBoolean(true))
+        .addEqualityGroup(bmgr.makeBoolean(false))
+        .addEqualityGroup(bmgr.makeVariable("bool_a"))
+        .addEqualityGroup(imgr.makeVariable("int_a"))
+
+        // Way of creating numbers should not make a difference.
+        .addEqualityGroup(
+            imgr.makeNumber(0.0),
+            imgr.makeNumber(0L),
+            imgr.makeNumber(BigInteger.ZERO),
+            imgr.makeNumber(BigDecimal.ZERO),
+            imgr.makeNumber("0"))
+        .addEqualityGroup(
+            imgr.makeNumber(1.0),
+            imgr.makeNumber(1L),
+            imgr.makeNumber(BigInteger.ONE),
+            imgr.makeNumber(BigDecimal.ONE),
+            imgr.makeNumber("1"))
+
+        // The same formula when created twice should compare equal.
+        .addEqualityGroup(bmgr.makeVariable("bool_b"), bmgr.makeVariable("bool_b"))
+        .addEqualityGroup(
+            bmgr.and(bmgr.makeVariable("bool_a"), bmgr.makeVariable("bool_b")),
+            bmgr.and(bmgr.makeVariable("bool_a"), bmgr.makeVariable("bool_b")))
+        .addEqualityGroup(
+            imgr.equal(imgr.makeNumber(0), imgr.makeVariable("int_a")),
+            imgr.equal(imgr.makeNumber(0), imgr.makeVariable("int_a")))
+        .testEquals();
+  }
+
+  @Test
   public void variableNameExtractorTest() {
     // Since Boolector does not support integers we use bitvectors
     if (imgr != null) {
@@ -302,6 +397,8 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
 
   @Test
   public void ufNameExtractorTest() {
+    requireUF();
+
     // Since Boolector does not support integers we use bitvectors for constraints
     if (imgr != null) {
       BooleanFormula constraint =

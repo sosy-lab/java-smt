@@ -9,12 +9,14 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
 
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -55,6 +57,12 @@ public class NumeralFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
 
   @Test
   public void distinctTest3() throws SolverException, InterruptedException {
+    // dReal has delta-precision of 0.001 as default, therefore this formula is satisfiable
+    assume()
+        .withMessage("Solver %s has delta-precision.", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.DREAL4);
+
     requireIntegers();
     IntegerFormula zero = imgr.makeNumber(0);
     IntegerFormula four = imgr.makeNumber(4);
@@ -86,10 +94,12 @@ public class NumeralFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
   @SuppressWarnings("CheckReturnValue")
   @Test
   public void testSubTypes() {
+    requireUF();
     requireIntegers();
     requireRationals();
     IntegerFormula a = imgr.makeVariable("a");
     RationalFormula r = rmgr.makeVariable("r");
+
     List<FormulaType<?>> argTypes =
         ImmutableList.of(FormulaType.RationalType, FormulaType.RationalType);
     FunctionDeclaration<IntegerFormula> ufDecl =
