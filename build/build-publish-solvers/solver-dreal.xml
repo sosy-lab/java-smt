@@ -26,7 +26,7 @@ SPDX-License-Identifier: Apache-2.0
         </fail>
 
         <!-- build a version string for dreal -->
-        <property name="dreal.version" value="${dreal.customRev}-gf93bdcc"/>
+        <property name="dreal.version" value="${dreal.customRev}-g4067225"/>
         <echo message="Building dReal in version '${dreal.version}'"/>
 
         <!-- fetch and install libibex and dreal -->
