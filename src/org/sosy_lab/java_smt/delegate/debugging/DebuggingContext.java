@@ -26,7 +26,7 @@ import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
 @Options(prefix = "solver.debugMode")
-class DebuggingContext extends DefaultFormulaVisitor<TraversalProcess> {
+class DebuggingContext {
   @Option(
       secure = true,
       description =
@@ -148,16 +148,16 @@ class DebuggingContext extends DefaultFormulaVisitor<TraversalProcess> {
     }
   }
 
-  @Override
-  protected TraversalProcess visitDefault(Formula f) {
-    // Used in addFormulaTerm where we recursively add all sub terms of a formula to the context
-    definedFormulas.add(f);
-    return TraversalProcess.CONTINUE;
-  }
-
   /** Needs to be called after a new Formula is created to associate it with this context. */
   public void addFormulaTerm(Formula pFormula) {
-    formulaManager.visitRecursively(pFormula, this);
+    formulaManager.visitRecursively(pFormula, new DefaultFormulaVisitor<>() {
+      @Override
+      protected TraversalProcess visitDefault (Formula f){
+        // Recursively add all sub terms of a formula to the context
+        definedFormulas.add(f);
+        return TraversalProcess.CONTINUE;
+      }
+    });
   }
 
   /** Assert that the formula belongs to this context. */
