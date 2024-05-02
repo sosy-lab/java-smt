@@ -61,7 +61,7 @@ public class DebuggingSolverContext implements SolverContext {
   public OptimizationProverEnvironment newOptimizationProverEnvironment(ProverOptions... options) {
     debugging.assertThreadLocal();
     return new DebuggingOptimizationProverEnvironment(
-        delegate.newOptimizationProverEnvironment(options),  debugging);
+        delegate.newOptimizationProverEnvironment(options), debugging);
   }
 
   @Override

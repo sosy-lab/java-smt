@@ -80,38 +80,38 @@ class DebuggingContext {
 
   DebuggingContext(Solvers pSolver, Configuration pConfiguration, FormulaManager pFormulaManager)
       throws InvalidConfigurationException {
-      // Read in user supplied options
-      pConfiguration.inject(this);
+    // Read in user supplied options
+    pConfiguration.inject(this);
 
-      // Set configuration options based on the solver that is being used. Options from the
-      // configuration passed on the command line will overwrite these settings. That is, if
-      // threadLocal, noSharedDeclarations or noSharedFormulas is set to 'true' we will throw an
-      // exception if the forbidden feature is used, even if the solver does allow it.
-      if (pSolver == Solvers.CVC5) {
-        threadLocal = true;
-      }
-      if (!globalFunctions.containsKey(pSolver)) {
-        noSharedDeclarations = true;
-      }
-      if (!globalTerms.containsKey(pSolver)) {
-        noSharedFormulas = true;
-      }
+    // Set configuration options based on the solver that is being used. Options from the
+    // configuration passed on the command line will overwrite these settings. That is, if
+    // threadLocal, noSharedDeclarations or noSharedFormulas is set to 'true' we will throw an
+    // exception if the forbidden feature is used, even if the solver does allow it.
+    if (pSolver == Solvers.CVC5) {
+      threadLocal = true;
+    }
+    if (!globalFunctions.containsKey(pSolver)) {
+      noSharedDeclarations = true;
+    }
+    if (!globalTerms.containsKey(pSolver)) {
+      noSharedFormulas = true;
+    }
 
-      // Initialize function declaration context
-      if (noSharedDeclarations) {
-        declaredFunctions = ConcurrentHashMap.newKeySet();
-      } else {
-        declaredFunctions = globalFunctions.getOrDefault(pSolver, ConcurrentHashMap.newKeySet());
-      }
+    // Initialize function declaration context
+    if (noSharedDeclarations) {
+      declaredFunctions = ConcurrentHashMap.newKeySet();
+    } else {
+      declaredFunctions = globalFunctions.getOrDefault(pSolver, ConcurrentHashMap.newKeySet());
+    }
 
-      // Initialize formula context
-      if (noSharedFormulas) {
-        definedFormulas = ConcurrentHashMap.newKeySet();
-      } else {
-        definedFormulas = globalTerms.getOrDefault(pSolver, ConcurrentHashMap.newKeySet());
-      }
+    // Initialize formula context
+    if (noSharedFormulas) {
+      definedFormulas = ConcurrentHashMap.newKeySet();
+    } else {
+      definedFormulas = globalTerms.getOrDefault(pSolver, ConcurrentHashMap.newKeySet());
+    }
 
-      formulaManager = pFormulaManager;
+    formulaManager = pFormulaManager;
   }
 
   /** Assert that this object is only used by the thread that created it. */
@@ -150,14 +150,16 @@ class DebuggingContext {
 
   /** Needs to be called after a new Formula is created to associate it with this context. */
   public void addFormulaTerm(Formula pFormula) {
-    formulaManager.visitRecursively(pFormula, new DefaultFormulaVisitor<>() {
-      @Override
-      protected TraversalProcess visitDefault (Formula f){
-        // Recursively add all sub terms of a formula to the context
-        definedFormulas.add(f);
-        return TraversalProcess.CONTINUE;
-      }
-    });
+    formulaManager.visitRecursively(
+        pFormula,
+        new DefaultFormulaVisitor<>() {
+          @Override
+          protected TraversalProcess visitDefault(Formula f) {
+            // Recursively add all sub terms of a formula to the context
+            definedFormulas.add(f);
+            return TraversalProcess.CONTINUE;
+          }
+        });
   }
 
   /** Assert that the formula belongs to this context. */
