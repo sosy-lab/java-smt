@@ -81,9 +81,9 @@
     std::vector<PTRef> result;
     for (PTRef r : $self->getUnsatCore()) {
       result.emplace_back(r);
+    }
     return result;
   }
- }
 }
 
 %include "include/opensmt/MainSolver.h"
