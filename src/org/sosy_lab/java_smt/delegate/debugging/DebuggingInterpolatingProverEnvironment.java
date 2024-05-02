@@ -19,10 +19,10 @@ import org.sosy_lab.java_smt.api.SolverException;
 public class DebuggingInterpolatingProverEnvironment<T> extends DebuggingBasicProverEnvironment<T>
     implements InterpolatingProverEnvironment<T> {
   private final InterpolatingProverEnvironment<T> delegate;
-  private final DebuggingSolverContext debugging;
+  private final DebuggingContext debugging;
 
   public DebuggingInterpolatingProverEnvironment(
-      InterpolatingProverEnvironment<T> pDelegate, DebuggingSolverContext pDebugging) {
+      InterpolatingProverEnvironment<T> pDelegate, DebuggingContext pDebugging) {
     super(pDelegate, pDebugging);
     delegate = checkNotNull(pDelegate);
     debugging = pDebugging;

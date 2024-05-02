@@ -20,10 +20,10 @@ import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 @SuppressWarnings({"ClassTypeParameterName", "MethodTypeParameterName"})
 public class DebuggingArrayFormulaManager implements ArrayFormulaManager {
   private final ArrayFormulaManager delegate;
-  private final DebuggingSolverContext debugging;
+  private final DebuggingContext debugging;
 
   public DebuggingArrayFormulaManager(
-      ArrayFormulaManager pDelegate, DebuggingSolverContext pDebugging) {
+      ArrayFormulaManager pDelegate, DebuggingContext pDebugging) {
     delegate = checkNotNull(pDelegate);
     debugging = pDebugging;
   }

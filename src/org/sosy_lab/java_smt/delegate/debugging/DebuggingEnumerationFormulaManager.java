@@ -16,10 +16,10 @@ import org.sosy_lab.java_smt.api.FormulaType.EnumerationFormulaType;
 
 public class DebuggingEnumerationFormulaManager implements EnumerationFormulaManager {
   private final EnumerationFormulaManager delegate;
-  private final DebuggingSolverContext debugging;
+  private final DebuggingContext debugging;
 
   public DebuggingEnumerationFormulaManager(
-      EnumerationFormulaManager pDelegate, DebuggingSolverContext pDebugging) {
+      EnumerationFormulaManager pDelegate, DebuggingContext pDebugging) {
     delegate = pDelegate;
     debugging = pDebugging;
   }

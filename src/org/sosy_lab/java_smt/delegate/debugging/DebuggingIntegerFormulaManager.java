@@ -19,10 +19,10 @@ public class DebuggingIntegerFormulaManager
     extends DebuggingNumeralFormulaManager<IntegerFormula, IntegerFormula>
     implements IntegerFormulaManager {
   private final IntegerFormulaManager delegate;
-  private final DebuggingSolverContext debugging;
+  private final DebuggingContext debugging;
 
   public DebuggingIntegerFormulaManager(
-      IntegerFormulaManager pDelegate, DebuggingSolverContext pDebugging) {
+      IntegerFormulaManager pDelegate, DebuggingContext pDebugging) {
     super(pDelegate, pDebugging);
     delegate = checkNotNull(pDelegate);
     debugging = pDebugging;

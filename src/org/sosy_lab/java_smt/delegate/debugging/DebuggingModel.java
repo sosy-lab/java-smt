@@ -27,9 +27,9 @@ import org.sosy_lab.java_smt.api.StringFormula;
 
 public class DebuggingModel implements Model {
   private final Model delegate;
-  private final DebuggingSolverContext debugging;
+  private final DebuggingContext debugging;
 
-  public DebuggingModel(Model pDelegate, DebuggingSolverContext pDebugging) {
+  public DebuggingModel(Model pDelegate, DebuggingContext pDebugging) {
     delegate = checkNotNull(pDelegate);
     debugging = pDebugging;
   }

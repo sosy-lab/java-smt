@@ -20,10 +20,10 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
 public class DebuggingBitvectorFormulaManager implements BitvectorFormulaManager {
   private final BitvectorFormulaManager delegate;
-  private final DebuggingSolverContext debugging;
+  private final DebuggingContext debugging;
 
   public DebuggingBitvectorFormulaManager(
-      BitvectorFormulaManager pDelegate, DebuggingSolverContext pDebugging) {
+      BitvectorFormulaManager pDelegate, DebuggingContext pDebugging) {
     delegate = checkNotNull(pDelegate);
     debugging = pDebugging;
   }

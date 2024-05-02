@@ -22,10 +22,10 @@ import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 
 public class DebuggingFloatingPointFormulaManager implements FloatingPointFormulaManager {
   private final FloatingPointFormulaManager delegate;
-  private final DebuggingSolverContext debugging;
+  private final DebuggingContext debugging;
 
   public DebuggingFloatingPointFormulaManager(
-      FloatingPointFormulaManager pDelegate, DebuggingSolverContext pDebugging) {
+      FloatingPointFormulaManager pDelegate, DebuggingContext pDebugging) {
     delegate = pDelegate;
     debugging = pDebugging;
   }

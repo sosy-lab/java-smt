@@ -23,10 +23,10 @@ import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
 public class DebuggingBooleanFormulaManager implements BooleanFormulaManager {
   private final BooleanFormulaManager delegate;
-  private final DebuggingSolverContext debugging;
+  private final DebuggingContext debugging;
 
   public DebuggingBooleanFormulaManager(
-      BooleanFormulaManager pDelegate, DebuggingSolverContext pDebugging) {
+      BooleanFormulaManager pDelegate, DebuggingContext pDebugging) {
     delegate = checkNotNull(pDelegate);
     debugging = pDebugging;
   }
