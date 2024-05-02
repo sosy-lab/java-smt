@@ -140,6 +140,8 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   @Test
   public void noSharedFormulasTest()
       throws InterruptedException, SolverException, InvalidConfigurationException {
+    requireIntegers();
+
     // Fails for Boolector as debug mode requires visitor support
     assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
 
@@ -172,6 +174,8 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   /** Declare a function, then try calling it from a different context. */
   @Test
   public void noSharedDeclarationsTest() throws InvalidConfigurationException {
+    requireIntegers();
+
     // Fails for Boolector as debug mode requires visitor support
     assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
 
