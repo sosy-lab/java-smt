@@ -30,6 +30,7 @@ import org.sosy_lab.java_smt.delegate.debugging.DebuggingSolverContext;
 import org.sosy_lab.java_smt.delegate.logging.LoggingSolverContext;
 import org.sosy_lab.java_smt.delegate.statistics.StatisticsSolverContext;
 import org.sosy_lab.java_smt.delegate.synchronize.SynchronizedSolverContext;
+import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaSolverContext;
 import org.sosy_lab.java_smt.solvers.boolector.BoolectorSolverContext;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4SolverContext;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5SolverContext;
@@ -58,7 +59,8 @@ public class SolverContextFactory {
     BOOLECTOR,
     CVC4,
     CVC5,
-    YICES2
+    YICES2,
+    BITWUZLA
   }
 
   @Option(secure = true, description = "Export solver queries in SmtLib format into a file.")
@@ -297,6 +299,10 @@ public class SolverContextFactory {
 
       case BOOLECTOR:
         return BoolectorSolverContext.create(config, shutdownNotifier, logfile, randomSeed, loader);
+
+      case BITWUZLA:
+        return BitwuzlaSolverContext.create(
+            config, shutdownNotifier, logfile, randomSeed, floatingPointRoundingMode, loader);
 
       default:
         throw new AssertionError("no solver selected");

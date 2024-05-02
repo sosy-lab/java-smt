@@ -128,6 +128,7 @@ public class SolverConcurrencyTest {
         .that(solver)
         .isNoneOf(
             Solvers.SMTINTERPOL,
+            Solvers.BITWUZLA,
             Solvers.BOOLECTOR,
             Solvers.OPENSMT, // INFO: OpenSMT does not support concurrent stacks
             Solvers.MATHSAT5,
@@ -141,7 +142,7 @@ public class SolverConcurrencyTest {
     assume()
         .withMessage("Solver does not support integers")
         .that(solver)
-        .isNoneOf(Solvers.BOOLECTOR, Solvers.YICES2);
+        .isNoneOf(Solvers.BOOLECTOR, Solvers.YICES2, Solvers.BITWUZLA);
   }
 
   private void requireBitvectors() {
@@ -162,6 +163,7 @@ public class SolverConcurrencyTest {
             Solvers.CVC4,
             Solvers.CVC5,
             Solvers.YICES2,
+            Solvers.BITWUZLA,
             Solvers.OPENSMT);
   }
 
@@ -195,6 +197,67 @@ public class SolverConcurrencyTest {
           bvConcurrencyTest(context);
           closeSolver(context);
         });
+  }
+
+  /**
+   * Create 1 context and all managers + some basic formulas (e.g. true, false). Then, test basic
+   * checks (isFalse(), isTrue()) und usage of these managers in a different thread. This failed for
+   * a solver in the past, even when all other tests in this class worked!
+   */
+  @Test
+  public void testConcurrencyWithConcurrentManagers() throws InvalidConfigurationException {
+    ConcurrentLinkedQueue<ContextAndFormula> contextAndFormulaList = new ConcurrentLinkedQueue<>();
+    SolverContext context = initSolver();
+    FormulaManager mgr = context.getFormulaManager();
+    BooleanFormulaManager bmgr = mgr.getBooleanFormulaManager();
+    BooleanFormula tru = bmgr.makeTrue();
+    BooleanFormula fls = bmgr.makeFalse();
+    contextAndFormulaList.add(new ContextAndFormula(context, tru));
+    contextAndFormulaList.add(new ContextAndFormula(context, fls));
+    BooleanFormula var = bmgr.makeVariable("var");
+    BooleanFormula trueFormula = bmgr.not(bmgr.and(var, bmgr.not(var)));
+    BooleanFormula falseFormula = bmgr.and(var, bmgr.not(var));
+    contextAndFormulaList.add(new ContextAndFormula(context, trueFormula));
+    contextAndFormulaList.add(new ContextAndFormula(context, falseFormula));
+    // Check that its correctly true/false in the manager
+    checkBooleanFormulas(bmgr, tru, fls, trueFormula, falseFormula);
+
+    assertConcurrency(
+        "testManagerUsageInDifferentThreads",
+        () -> {
+          ContextAndFormula[] ctxAndFormulas =
+              contextAndFormulaList.toArray(new ContextAndFormula[0]);
+          SolverContext threadContext = ctxAndFormulas[0].getContext();
+          FormulaManager threadMgr = threadContext.getFormulaManager();
+          BooleanFormulaManager threadBmgr = threadMgr.getBooleanFormulaManager();
+          BooleanFormula threadTrue = ctxAndFormulas[0].getFormula();
+          BooleanFormula threadFalse = ctxAndFormulas[1].getFormula();
+          BooleanFormula threadTrueFormula = ctxAndFormulas[2].getFormula();
+          BooleanFormula threadFalseFormula = ctxAndFormulas[3].getFormula();
+
+          checkBooleanFormulas(
+              threadBmgr, threadTrue, threadFalse, threadTrueFormula, threadFalseFormula);
+        });
+  }
+
+  /*
+   * Check the entered BooleanFormulas in the BooleanFormulaManager for true/false.
+   */
+  private void checkBooleanFormulas(
+      BooleanFormulaManager pBmgr,
+      BooleanFormula pTru,
+      BooleanFormula pFls,
+      BooleanFormula pTrueFormula,
+      BooleanFormula pFalseFormula) {
+    assertThat(pBmgr.isFalse(pTru)).isFalse();
+    assertThat(pBmgr.isTrue(pTru)).isTrue();
+
+    assertThat(pBmgr.isFalse(pFls)).isTrue();
+    assertThat(pBmgr.isTrue(pFls)).isFalse();
+
+    assertThat(pBmgr.isFalse(pTrueFormula)).isFalse();
+
+    assertThat(pBmgr.isTrue(pFalseFormula)).isFalse();
   }
 
   /** Helperclass to pack a SolverContext together with a Formula. */
@@ -348,13 +411,48 @@ public class SolverConcurrencyTest {
    * the Threads).
    */
   @Test
-  public void testConcurrentStack() throws InvalidConfigurationException, InterruptedException {
+  public void testConcurrentIntegerStack()
+      throws InvalidConfigurationException, InterruptedException {
+    requireIntegers();
     requireConcurrentMultipleStackSupport();
     SolverContext context = initSolver();
     FormulaManager mgr = context.getFormulaManager();
     IntegerFormulaManager imgr = mgr.getIntegerFormulaManager();
     BooleanFormulaManager bmgr = mgr.getBooleanFormulaManager();
     HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
+
+    ConcurrentLinkedQueue<BasicProverEnvironment<?>> proverList = new ConcurrentLinkedQueue<>();
+    for (int i = 0; i < NUMBER_OF_THREADS; i++) {
+      BooleanFormula instance = gen.generate(INTEGER_FORMULA_GEN.getOrDefault(solver, 9));
+      BasicProverEnvironment<?> pe = context.newProverEnvironment();
+      pe.push(instance);
+      proverList.add(pe);
+    }
+    assertConcurrency(
+        "testConcurrentStack",
+        () -> {
+          BasicProverEnvironment<?> stack = proverList.poll();
+          assertWithMessage("Solver %s failed a concurrency test", solverToUse())
+              .that(stack.isUnsat())
+              .isTrue();
+        });
+    closeSolver(context);
+  }
+
+  /**
+   * Test solving of large formula on concurrent stacks in one context (Stacks are not created in
+   * the Threads).
+   */
+  @Test
+  public void testConcurrentBitvectorStack()
+      throws InvalidConfigurationException, InterruptedException {
+    requireBitvectors();
+    requireConcurrentMultipleStackSupport();
+    SolverContext context = initSolver();
+    FormulaManager mgr = context.getFormulaManager();
+    BitvectorFormulaManager bvmgr = mgr.getBitvectorFormulaManager();
+    BooleanFormulaManager bmgr = mgr.getBooleanFormulaManager();
+    HardBitvectorFormulaGenerator gen = new HardBitvectorFormulaGenerator(bvmgr, bmgr);
 
     ConcurrentLinkedQueue<BasicProverEnvironment<?>> proverList = new ConcurrentLinkedQueue<>();
     for (int i = 0; i < NUMBER_OF_THREADS; i++) {
