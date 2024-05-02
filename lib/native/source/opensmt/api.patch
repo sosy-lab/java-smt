@@ -131,15 +131,15 @@ diff --git a/src/common/FastRational.h b/src/common/FastRational.h
 index a3f4bb1c..9fc7ac3d 100644
 --- a/src/common/FastRational.h
 +++ b/src/common/FastRational.h
-@@ -13,6 +13,7 @@ Copyright (c) 2008, 2009 Centre national de la recherche scientifique (CNRS)
- #include "Vec.h"
+@@ -14,6 +14,7 @@ Copyright (c) 2008, 2009 Centre national de la recherche scientifique (CNRS)
  #include <stack>
  #include <vector>
+ #include <optional>
 +#include <mutex>
  
  typedef int32_t  word;
  typedef uint32_t uword;
-@@ -71,6 +72,7 @@ class FastRational
+@@ -72,6 +73,7 @@ class FastRational
  {
      class mpqPool
      {
@@ -195,16 +195,15 @@ index b90430c2..c4b34fc4 100644
      return mkUninterpFun(sym, std::move(terms));
  }
  
-@@ -1455,6 +1466,9 @@ Logic::collectStats(PTRef root, int& n_of_conn, int& n_of_eq, int& n_of_uf, int&
- 
- PTRef Logic::conjoinExtras(PTRef root) { return root; }
+@@ -1445,6 +1456,8 @@ Logic::collectStats(PTRef root, int& n_of_conn, int& n_of_eq, int& n_of_uf, int&
+     }
+ }
  
 +Sort const&       Logic::getSortDefinition (SRef s)     const { return sort_store[s]; }
 +SortSymbol const& Logic::getSortSymbol     (SSymRef ss) const { return sort_store[ss]; }
-+
+ 
  // Fetching sorts
  SRef        Logic::getSortRef    (const PTRef tr)        const { return getSortRef(getPterm(tr).symb()); }
- SRef        Logic::getSortRef    (const SymRef sr)       const { return getSym(sr).rsort(); }
 diff --git a/src/logics/Logic.h b/src/logics/Logic.h
 index 73513cd1..888f970c 100644
 --- a/src/logics/Logic.h

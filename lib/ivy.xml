@@ -162,7 +162,7 @@ SPDX-License-Identifier: Apache-2.0
         <!-- Solver Binaries -->
         <dependency org="org.sosy_lab" name="javasmt-solver-mathsat" rev="5.6.10" conf="runtime-mathsat->solver-mathsat" />
         <dependency org="org.sosy_lab" name="javasmt-solver-z3" rev="4.12.5" conf="runtime-z3->solver-z3; contrib->sources,javadoc" />
-        <dependency org="org.sosy_lab" name="javasmt-solver-opensmt" rev="2.5.2-g7f502169" conf="runtime-opensmt->solver-opensmt; contrib->sources,javadoc" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-opensmt" rev="2.6.0-g8a0cdd5a" conf="runtime-opensmt->solver-opensmt; contrib->sources,javadoc" />
         <dependency org="org.sosy_lab" name="javasmt-solver-optimathsat" rev="1.7.1-sosy0" conf="runtime-optimathsat->solver-optimathsat" />
         <dependency org="org.sosy_lab" name="javasmt-solver-cvc4" rev="1.8-prerelease-2020-06-24-g7825d8f28" conf="runtime-cvc4->solver-cvc4" />
         <dependency org="org.sosy_lab" name="javasmt-solver-cvc5" rev="1.0.5-g4cb2ab9eb" conf="runtime-cvc5->solver-cvc5" />
