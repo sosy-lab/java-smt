@@ -61,6 +61,7 @@
 %ignore MainSolver::getSMTSolver();
 %ignore MainSolver::getSMTSolver() const;
 %ignore MainSolver::getTHandler();
+%ignore MainSolver::getTHandler () const;
 %ignore MainSolver::getLogic();
 %ignore MainSolver::getTheory();
 %ignore MainSolver::getTheory() const;
@@ -68,10 +69,21 @@
 %ignore MainSolver::insertFormula(PTRef, char**);
 %ignore MainSolver::initialize();
 %ignore MainSolver::simplifyFormulas();
+%ignore MainSolver::getUnsatCore() const;
 %ignore MainSolver::printFramesAsQuery() const;
 %ignore MainSolver::solverEmpty() const;
 %ignore MainSolver::writeSolverState_smtlib2(const char*, char**) const;
 %ignore MainSolver::getTermValue(PTRef) const;
 %ignore MainSolver::createTheory(Logic&, SMTConfig&);
+%extend MainSolver {
+  %newobject getUnsatCore();
+  std::vector<PTRef> getUnsatCore() {
+    std::vector<PTRef> result;
+    for (PTRef r : $self->getUnsatCore()) {
+      result.emplace_back(r);
+    return result;
+  }
+ }
+}
 
 %include "include/opensmt/MainSolver.h"
