@@ -8,11 +8,49 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.BV_SOLVER;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.DBG_CHECK_MODEL;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.DBG_CHECK_UNSAT_CORE;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.DBG_PP_NODE_THRESH;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.DBG_RW_NODE_THRESH;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.LOGLEVEL;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.MEMORY_LIMIT;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.NUM_OPTS;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PP_CONTRADICTING_ANDS;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PP_ELIM_BV_EXTRACTS;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PP_EMBEDDED_CONSTR;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PP_FLATTEN_AND;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PP_NORMALIZE;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PP_NORMALIZE_SHARE_AWARE;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PP_SKELETON_PREPROC;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PP_VARIABLE_SUBST;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PP_VARIABLE_SUBST_NORM_BV_INEQ;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PP_VARIABLE_SUBST_NORM_DISEQ;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PP_VARIABLE_SUBST_NORM_EQ;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PREPROCESS;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PRODUCE_MODELS;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PRODUCE_UNSAT_ASSUMPTIONS;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PRODUCE_UNSAT_CORES;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PROP_CONST_BITS;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PROP_INFER_INEQ_BOUNDS;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PROP_NORMALIZE;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PROP_NPROPS;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PROP_NUPDATES;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PROP_OPT_LT_CONCAT_SEXT;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PROP_PATH_SEL;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PROP_PROB_RANDOM_INPUT;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PROP_PROB_USE_INV_VALUE;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PROP_SEXT;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.REWRITE_LEVEL;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.SAT_SOLVER;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.SEED;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.TIME_LIMIT_PER;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.VERBOSITY;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.base.Splitter.MapSplitter;
 import com.google.common.collect.ImmutableMap;
-import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
@@ -156,20 +194,22 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
           "Invalid Bitwuzla option in \"" + pFurtherOptions + "\": " + e.getMessage(), e);
     }
     for (Map.Entry<String, String> option : furtherOptionsMap.entrySet()) {
+      String optionName = option.getKey();
+      String optionValue = option.getValue();
+      Option bitwuzlaOption = getBitwuzlaOptByString(optionName);
       try {
-        Class<?> optionClass = Option.class;
-        Field optionField = optionClass.getField(option.getKey());
-        // Get the value of the public fields
-        Option value = (Option) optionField.get(null);
-        if (pOptions.is_numeric(value)) {
-          pOptions.set(value, Integer.parseInt(option.getValue()));
+        if (pOptions.is_numeric(bitwuzlaOption)) {
+          pOptions.set(bitwuzlaOption, Integer.parseInt(optionValue));
         } else {
-          pOptions.set(value, option.getValue());
+          pOptions.set(bitwuzlaOption, option.getValue());
         }
-      } catch (java.lang.NoSuchFieldException e) {
-        throw new InvalidConfigurationException(e.getMessage(), e);
-      } catch (IllegalAccessException pE) {
-        throw new RuntimeException("Problem with access to BitwuzlaOption Field", pE);
+      } catch (NumberFormatException e) {
+        throw new InvalidConfigurationException(
+            "Option "
+                + bitwuzlaOption
+                + " needs a numeric "
+                + "value as option value, but you entered "
+                + optionValue);
       }
     }
     return pOptions;
@@ -180,9 +220,9 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
     Preconditions.checkNotNull(settings.getSatSolver());
 
     Options options = new Options();
-    options.set(Option.SAT_SOLVER, settings.getSatSolver().name().toLowerCase(Locale.getDefault()));
-    options.set(Option.SEED, (int) randomSeed);
-    options.set(Option.REWRITE_LEVEL, 0); // Stop Bitwuzla from rewriting formulas in outputs
+    options.set(SAT_SOLVER, settings.getSatSolver().name().toLowerCase(Locale.getDefault()));
+    options.set(SEED, (int) randomSeed);
+    options.set(REWRITE_LEVEL, 0); // Stop Bitwuzla from rewriting formulas in outputs
 
     return setFurtherOptions(options, settings.getFurtherOptions());
   }
@@ -262,5 +302,90 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
   @Override
   protected boolean supportsAssumptionSolving() {
     return true;
+  }
+
+  public static Option getBitwuzlaOptByString(String optionName) {
+    switch (optionName) {
+      case "LOGLEVEL":
+        return LOGLEVEL;
+      case "PRODUCE_MODELS":
+        return PRODUCE_MODELS;
+      case "PRODUCE_UNSAT_ASSUMPTIONS":
+        return PRODUCE_UNSAT_ASSUMPTIONS;
+      case "PRODUCE_UNSAT_CORES":
+        return PRODUCE_UNSAT_CORES;
+      case "SEED":
+        return SEED;
+      case "VERBOSITY":
+        return VERBOSITY;
+      case "TIME_LIMIT_PER":
+        return TIME_LIMIT_PER;
+      case "MEMORY_LIMIT":
+        return MEMORY_LIMIT;
+      case "BV_SOLVER":
+        return BV_SOLVER;
+      case "REWRITE_LEVEL":
+        return REWRITE_LEVEL;
+      case "SAT_SOLVER":
+        return SAT_SOLVER;
+      case "PROP_CONST_BITS":
+        return PROP_CONST_BITS;
+      case "PROP_INFER_INEQ_BOUNDS":
+        return PROP_INFER_INEQ_BOUNDS;
+      case "PROP_NPROPS":
+        return PROP_NPROPS;
+      case "PROP_NUPDATES":
+        return PROP_NUPDATES;
+      case "PROP_OPT_LT_CONCAT_SEXT":
+        return PROP_OPT_LT_CONCAT_SEXT;
+      case "PROP_PATH_SEL":
+        return PROP_PATH_SEL;
+      case "PROP_PROB_RANDOM_INPUT":
+        return PROP_PROB_RANDOM_INPUT;
+      case "PROP_PROB_USE_INV_VALUE":
+        return PROP_PROB_USE_INV_VALUE;
+      case "PROP_SEXT":
+        return PROP_SEXT;
+      case "PROP_NORMALIZE":
+        return PROP_NORMALIZE;
+      case "PREPROCESS":
+        return PREPROCESS;
+      case "PP_CONTRADICTING_ANDS":
+        return PP_CONTRADICTING_ANDS;
+      case "PP_ELIM_BV_EXTRACTS":
+        return PP_ELIM_BV_EXTRACTS;
+      case "PP_EMBEDDED_CONSTR":
+        return PP_EMBEDDED_CONSTR;
+      case "PP_FLATTEN_AND":
+        return PP_FLATTEN_AND;
+      case "PP_NORMALIZE":
+        return PP_NORMALIZE;
+      case "PP_NORMALIZE_SHARE_AWARE":
+        return PP_NORMALIZE_SHARE_AWARE;
+      case "PP_SKELETON_PREPROC":
+        return PP_SKELETON_PREPROC;
+      case "PP_VARIABLE_SUBST":
+        return PP_VARIABLE_SUBST;
+      case "PP_VARIABLE_SUBST_NORM_EQ":
+        return PP_VARIABLE_SUBST_NORM_EQ;
+      case "PP_VARIABLE_SUBST_NORM_DISEQ":
+        return PP_VARIABLE_SUBST_NORM_DISEQ;
+      case "PP_VARIABLE_SUBST_NORM_BV_INEQ":
+        return PP_VARIABLE_SUBST_NORM_BV_INEQ;
+      case "DBG_RW_NODE_THRESH":
+        return DBG_RW_NODE_THRESH;
+      case "DBG_PP_NODE_THRESH":
+        return DBG_PP_NODE_THRESH;
+      case "DBG_CHECK_MODEL":
+        return DBG_CHECK_MODEL;
+      case "DBG_CHECK_UNSAT_CORE":
+        return DBG_CHECK_UNSAT_CORE;
+      case "NUM_OPTS":
+        return NUM_OPTS;
+      default:
+        // Possibly new option that needs to be entered into the switch case
+        throw new IllegalArgumentException(
+            "Unknown option: " + optionName + ". Please use the C++ " + "options of Bitwuzla.");
+    }
   }
 }
