@@ -30,8 +30,15 @@ import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
 public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+
+  // OpenSmt only support unsat core for QF_LIA, QF_LRA and QF_UF
+  @Override
+  protected Logics logicToUse() {
+    return Logics.QF_LIA;
+  }
 
   @Test
   public void assumptionsTest() throws SolverException, InterruptedException {
