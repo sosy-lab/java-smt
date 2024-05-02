@@ -258,6 +258,10 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
+    Preconditions.checkState(!closed);
+    checkGenerateUnsatCores();
+    Preconditions.checkState(!changedSinceLastSatQuery);
+
     ImmutableList.Builder<BooleanFormula> result = ImmutableList.builder();
     for (PTRef r : osmtSolver.getUnsatCore()) {
       result.add(creator.encapsulateBoolean(r));
