@@ -423,4 +423,29 @@ public class OpenSmtNativeAPITest {
     sstat r = mainSolver.check();
     assertThat(r).isEqualTo(sstat.Undef());
   }
+
+  @Test
+  public void testUnsatCore() {
+    // Adapted from test_UnsatCore.cc
+    Logic logic = LogicFactory.getInstance(Logic_t.QF_UF);
+
+    PTRef b1 = logic.mkBoolVar("b1");
+    PTRef b2 = logic.mkBoolVar("b2");
+    PTRef nb1 = logic.mkNot(b1);
+
+    SMTConfig config = new SMTConfig();
+    config.setOption(":produce-unsat-cores", new SMTOption(true));
+
+    MainSolver mainSolver = new MainSolver(logic, config, "opensmt-test");
+
+    mainSolver.insertFormula(b1);
+    mainSolver.insertFormula(b2);
+    mainSolver.insertFormula(nb1);
+
+    sstat r = mainSolver.check();
+    assertThat(r).isEqualTo(sstat.False());
+
+    VectorPTRef core = mainSolver.getUnsatCore();
+    assertThat(core).containsExactly(b1, nb1);
+  }
 }
