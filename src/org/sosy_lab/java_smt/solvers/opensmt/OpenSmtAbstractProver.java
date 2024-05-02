@@ -69,6 +69,11 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     SMTConfig config = new SMTConfig();
     config.setOption(":random-seed", new SMTOption(pSolverOptions.randomSeed));
     config.setOption(
+        ":produce-models",
+        new SMTOption(
+            pOptions.contains(ProverOptions.GENERATE_MODELS)
+                || pOptions.contains(ProverOptions.GENERATE_ALL_SAT)));
+    config.setOption(
         ":produce-unsat-cores",
         new SMTOption(pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE)));
     config.setOption(":produce-interpolants", new SMTOption(interpolation));
