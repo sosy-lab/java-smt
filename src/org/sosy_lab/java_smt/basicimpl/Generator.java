@@ -28,7 +28,7 @@ public class Generator {
   private Generator() {}
 
   /** collects assembled SMT-LIB2, its value will be written to Out.smt2. */
-  private static StringBuilder lines = new StringBuilder("(set-logic AUFLIRA)\n");
+  private static StringBuilder lines = new StringBuilder();
 
   /** holds FunctionEnvironment for each operation that has been executed. */
   private static final List<FunctionEnvironment> executedAggregator = new ArrayList<>();
@@ -212,11 +212,11 @@ public class Generator {
   public static String getSMTLIB2String() {
     String endSMTLIB2 = "(check-sat)\n(get-model)\n(exit)";
     lines.append(endSMTLIB2);
-    return lines.toString();
+    return "(set-logic AUFLIRA)\n" + lines;
   }
 
   public static void resetGenerator() {
-    lines = new StringBuilder("(set-logic AUFLIRA)\n");
+    lines = new StringBuilder();
     executedAggregator.clear();
     registeredVariables.clear();
   }
