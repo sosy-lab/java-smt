@@ -25,13 +25,13 @@ import org.sosy_lab.java_smt.api.SolverContext;
 
 public class DebuggingSolverContext implements SolverContext {
   private final SolverContext delegate;
-  private final DebuggingContext debugging;
+  private final DebuggingAssertions debugging;
 
   public DebuggingSolverContext(
       Solvers pSolver, Configuration pConfiguration, SolverContext pDelegate)
       throws InvalidConfigurationException {
     delegate = checkNotNull(pDelegate);
-    debugging = new DebuggingContext(pSolver, pConfiguration, pDelegate.getFormulaManager());
+    debugging = new DebuggingAssertions(pSolver, pConfiguration, pDelegate.getFormulaManager());
   }
 
   @Override

@@ -21,10 +21,10 @@ import org.sosy_lab.java_smt.api.SolverException;
 
 class DebuggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   private final BasicProverEnvironment<T> delegate;
-  private final DebuggingContext debugging;
+  private final DebuggingAssertions debugging;
 
   DebuggingBasicProverEnvironment(
-      BasicProverEnvironment<T> pDelegate, DebuggingContext pDebugging) {
+      BasicProverEnvironment<T> pDelegate, DebuggingAssertions pDebugging) {
     delegate = checkNotNull(pDelegate);
     debugging = pDebugging;
   }

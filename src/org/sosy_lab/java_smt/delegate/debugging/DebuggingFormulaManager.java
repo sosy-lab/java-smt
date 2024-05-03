@@ -40,9 +40,9 @@ import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
 public class DebuggingFormulaManager implements FormulaManager {
   private final FormulaManager delegate;
-  private final DebuggingContext debugging;
+  private final DebuggingAssertions debugging;
 
-  public DebuggingFormulaManager(FormulaManager pDelegate, DebuggingContext pDebugging) {
+  public DebuggingFormulaManager(FormulaManager pDelegate, DebuggingAssertions pDebugging) {
     delegate = checkNotNull(pDelegate);
     debugging = pDebugging;
   }

@@ -19,10 +19,10 @@ import org.sosy_lab.java_smt.api.StringFormulaManager;
 
 public class DebuggingStringFormulaManager implements StringFormulaManager {
   private final StringFormulaManager delegate;
-  private final DebuggingContext debugging;
+  private final DebuggingAssertions debugging;
 
   public DebuggingStringFormulaManager(
-      StringFormulaManager pDelegate, DebuggingContext pDebugging) {
+      StringFormulaManager pDelegate, DebuggingAssertions pDebugging) {
     delegate = checkNotNull(pDelegate);
     debugging = pDebugging;
   }

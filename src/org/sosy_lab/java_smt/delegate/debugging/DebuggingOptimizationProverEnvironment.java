@@ -17,10 +17,10 @@ import org.sosy_lab.java_smt.api.SolverException;
 public class DebuggingOptimizationProverEnvironment extends DebuggingBasicProverEnvironment<Void>
     implements OptimizationProverEnvironment {
   private final OptimizationProverEnvironment delegate;
-  private final DebuggingContext debugging;
+  private final DebuggingAssertions debugging;
 
   public DebuggingOptimizationProverEnvironment(
-      OptimizationProverEnvironment pDelegate, DebuggingContext pDebugging) {
+      OptimizationProverEnvironment pDelegate, DebuggingAssertions pDebugging) {
     super(pDelegate, pDebugging);
     delegate = pDelegate;
     debugging = pDebugging;

@@ -18,9 +18,9 @@ import org.sosy_lab.java_smt.api.UFManager;
 
 public class DebuggingUFManager implements UFManager {
   private final UFManager delegate;
-  private final DebuggingContext debugging;
+  private final DebuggingAssertions debugging;
 
-  public DebuggingUFManager(UFManager pDelegate, DebuggingContext pDebugging) {
+  public DebuggingUFManager(UFManager pDelegate, DebuggingAssertions pDebugging) {
     delegate = checkNotNull(pDelegate);
     debugging = pDebugging;
   }

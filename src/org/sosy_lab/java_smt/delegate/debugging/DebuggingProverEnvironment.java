@@ -14,7 +14,7 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 public class DebuggingProverEnvironment extends DebuggingBasicProverEnvironment<Void>
     implements ProverEnvironment {
   public DebuggingProverEnvironment(
-      BasicProverEnvironment<Void> pDelegate, DebuggingContext pDebugging) {
+      BasicProverEnvironment<Void> pDelegate, DebuggingAssertions pDebugging) {
     super(pDelegate, pDebugging);
   }
 }

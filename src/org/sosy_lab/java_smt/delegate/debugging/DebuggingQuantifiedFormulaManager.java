@@ -18,10 +18,10 @@ import org.sosy_lab.java_smt.api.SolverException;
 
 public class DebuggingQuantifiedFormulaManager implements QuantifiedFormulaManager {
   private final QuantifiedFormulaManager delegate;
-  private final DebuggingContext debugging;
+  private final DebuggingAssertions debugging;
 
   public DebuggingQuantifiedFormulaManager(
-      QuantifiedFormulaManager pDelegate, DebuggingContext pDebugging) {
+      QuantifiedFormulaManager pDelegate, DebuggingAssertions pDebugging) {
     delegate = checkNotNull(pDelegate);
     debugging = pDebugging;
   }

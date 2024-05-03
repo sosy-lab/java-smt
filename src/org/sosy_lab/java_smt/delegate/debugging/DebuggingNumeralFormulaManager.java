@@ -25,11 +25,11 @@ public class DebuggingNumeralFormulaManager<
         ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
     implements NumeralFormulaManager<ParamFormulaType, ResultFormulaType> {
   private final NumeralFormulaManager<ParamFormulaType, ResultFormulaType> delegate;
-  private final DebuggingContext debugging;
+  private final DebuggingAssertions debugging;
 
   public DebuggingNumeralFormulaManager(
       NumeralFormulaManager<ParamFormulaType, ResultFormulaType> pDelegate,
-      DebuggingContext pDebugging) {
+      DebuggingAssertions pDebugging) {
     delegate = checkNotNull(pDelegate);
     debugging = pDebugging;
   }

@@ -20,14 +20,14 @@ import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
-class DebuggingContext {
+class DebuggingAssertions {
   // The associated formula manager. Needed in addFormulaTerm to recursively iterate over all
   // sub formulas.
   private final FormulaManager formulaManager;
 
   private final DebuggingSolverInformation debugInfo;
 
-  DebuggingContext(Solvers pSolver, Configuration pConfiguration, FormulaManager pFormulaManager)
+  DebuggingAssertions(Solvers pSolver, Configuration pConfiguration, FormulaManager pFormulaManager)
       throws InvalidConfigurationException {
     debugInfo = new DebuggingSolverInformation(pSolver, pConfiguration);
     formulaManager = pFormulaManager;

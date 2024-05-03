@@ -18,9 +18,9 @@ import org.sosy_lab.java_smt.api.SLFormulaManager;
 @SuppressWarnings({"ClassTypeParameterName", "MethodTypeParameterName"})
 public class DebuggingSLFormulaManager implements SLFormulaManager {
   private final SLFormulaManager delegate;
-  private final DebuggingContext debugging;
+  private final DebuggingAssertions debugging;
 
-  public DebuggingSLFormulaManager(SLFormulaManager pDelegate, DebuggingContext pDebugging) {
+  public DebuggingSLFormulaManager(SLFormulaManager pDelegate, DebuggingAssertions pDebugging) {
     delegate = checkNotNull(pDelegate);
     debugging = pDebugging;
   }
