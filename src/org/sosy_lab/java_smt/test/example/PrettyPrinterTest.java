@@ -1,21 +1,24 @@
-// This file is part of JavaSMT,
-// an API wrapper for a collection of SMT solvers:
-// https://github.com/sosy-lab/java-smt
-//
-// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
-//
-// SPDX-License-Identifier: Apache-2.0
+/*
+ * This file is part of JavaSMT,
+ * an API wrapper for a collection of SMT solvers:
+ * https://github.com/sosy-lab/java-smt
+ *
+ * SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
-package org.sosy_lab.java_smt.test;
+package org.sosy_lab.java_smt.test.example;
 
 import static com.google.common.truth.Truth.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.sosy_lab.java_smt.test.SolverBasedTest0.ParameterizedSolverBasedTest0;
 import org.sosy_lab.java_smt.utils.PrettyPrinter;
 import org.sosy_lab.java_smt.utils.PrettyPrinter.PrinterOption;
 
-public class PrettyPrinterTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class PrettyPrinterTest extends ParameterizedSolverBasedTest0 {
 
   private PrettyPrinter pp;
 
