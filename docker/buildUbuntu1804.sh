@@ -10,7 +10,11 @@
 
 docker build -t registry.gitlab.com/sosy-lab/software/java-smt/develop:ubuntu1804 - < ubuntu1804.Dockerfile
 
-# Please use the following commands to push the build image to Gitlab:
+# For pushing to Gitlab registry, please create your personal access token:
+#   https://gitlab.com/-/user_settings/personal_access_tokens
+# with read and write rights to the Gitlab registry (full API access is not required)
 #
-# docker login registry.gitlab.com
-# docker push registry.gitlab.com/sosy-lab/software/java-smt/develop:ubuntu1804
+# Please use the following commands to push the build image to Gitlab:
+#   docker login registry.gitlab.com
+#   docker push registry.gitlab.com/sosy-lab/software/java-smt/develop:ubuntu1804
+
