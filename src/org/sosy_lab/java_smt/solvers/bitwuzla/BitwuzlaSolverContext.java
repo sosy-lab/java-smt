@@ -141,7 +141,7 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
       FloatingPointRoundingMode pFloatingPointRoundingMode,
       Consumer<String> pLoader)
       throws InvalidConfigurationException {
-    pLoader.accept("bitwuzlaJNI");
+    pLoader.accept("bitwuzlaj");
 
     TermManager termManager = new TermManager();
     Options solverOptions = buildBitwuzlaOptions(new BitwuzlaSettings(config), randomSeed);

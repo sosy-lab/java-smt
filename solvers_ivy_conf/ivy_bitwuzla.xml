@@ -5,7 +5,7 @@ This file is part of JavaSMT,
 an API wrapper for a collection of SMT solvers:
 https://github.com/sosy-lab/java-smt
 
-SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
 
 SPDX-License-Identifier: Apache-2.0
 -->
@@ -34,12 +34,7 @@ SPDX-License-Identifier: Apache-2.0
 
     <publications defaultconf="solver-bitwuzla">
         <!-- Linux native libraries -->
-        <artifact name="libbitwuzlaJNI" conf="solver-bitwuzla" type="shared-object" ext="so"/>
-        <artifact name="libbitwuzla" conf="solver-bitwuzla" type="shared-object" ext="so"/>
-        <artifact name="libbitwuzlabb"  conf="solver-bitwuzla" type="shared-object" ext="so"/>
-        <artifact name="libbitwuzlabv"  conf="solver-bitwuzla" type="shared-object" ext="so"/>
-        <artifact name="libbitwuzlals"  conf="solver-bitwuzla" type="shared-object" ext="so"/>
-        <artifact name="libgmp" conf="solver-bitwuzla" type="shared-object" ext="so"/>
+        <artifact name="libbitwuzlaj" conf="solver-bitwuzla" type="shared-object" ext="so"/>
         <!-- Java code, docs and source -->
         <artifact name="bitwuzla" conf="solver-bitwuzla-common" ext="jar"/>
         <artifact name="bitwuzla" conf="sources" e:classifier="sources" type="source" ext="jar"/>
