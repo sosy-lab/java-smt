@@ -132,7 +132,7 @@ public class SolverOverviewTable {
         context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       prover.unsatCoreOverAssumptions(ImmutableList.of());
       features.add("UnsatCore /w Assumption");
-    } catch (UnsupportedOperationException e) {
+    } catch (UnsupportedOperationException | IllegalStateException e) {
       // ignore, feature is not supported.
     }
 
