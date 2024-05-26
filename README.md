@@ -58,15 +58,16 @@ Currently JavaSMT supports several SMT solvers (see [Getting Started](doc/Gettin
 
 | SMT Solver | Linux64 | Windows64 | MacOS | Description |
 | --- |:---:|:---:|:---:|:--- |
-| [Boolector](https://boolector.github.io/) | :heavy_check_mark: |  |  | a fast solver for bitvector logic, misses formula introspection |
+| [Bitwuzla](https://bitwuzla.github.io/) | :heavy_check_mark: |  |  | a fast solver for bitvector logic |
+| [Boolector](https://boolector.github.io/) | :heavy_check_mark: |  |  | a fast solver for bitvector logic, misses formula introspection, deprecated |
 | [CVC4](https://cvc4.github.io/) | :heavy_check_mark: |  |  |  |
-| [CVC5](https://cvc5.github.io/) | :heavy_check_mark: |  |  | new! |
+| [CVC5](https://cvc5.github.io/) | :heavy_check_mark: |  |  |  |
 | [MathSAT5](http://mathsat.fbk.eu/) | :heavy_check_mark: | :heavy_check_mark: |  |  |
-| [OpenSMT](https://verify.inf.usi.ch/opensmt) | :heavy_check_mark: |  |  | new! |
-| [OptiMathSAT](http://optimathsat.disi.unitn.it/) | :heavy_check_mark: |  |  | based on MathSAT5, with support for optimization |
+| [OpenSMT](https://verify.inf.usi.ch/opensmt) | :heavy_check_mark: |  |  |  |
+| [OptiMathSAT](http://optimathsat.disi.unitn.it/) | :heavy_check_mark: |  |  | based on MathSAT5, with support for optimization queries |
 | [Princess](http://www.philipp.ruemmer.org/princess.shtml) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | Java-based SMT solver |
 | [SMTInterpol](https://ultimate.informatik.uni-freiburg.de/smtinterpol/) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | Java-based SMT solver |
-| [Yices2](https://yices.csl.sri.com/) | :heavy_check_mark: | [soon](https://github.com/sosy-lab/java-smt/pull/215) |  |  |
+| [Yices2](https://yices.csl.sri.com/) | :heavy_check_mark: | [maybe](https://github.com/sosy-lab/java-smt/pull/215) |  |  |
 | [Z3](https://github.com/Z3Prover/z3) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | mature and well-known solver |
 
 The following features are supported (depending on the used SMT solver):
@@ -87,6 +88,7 @@ If something specific is missing, please [look for or file an issue](https://git
 #### Multithreading Support
 | SMT Solver | Concurrent context usage¹ | Concurrent prover usage² |
 | --- |:---:|:---:|
+| [Bitwuzla](https://bitwuzla.github.io/) | :heavy_check_mark: |  |
 | [Boolector](https://boolector.github.io/) | :heavy_check_mark: |  |
 | [CVC4](https://cvc4.github.io/) | :heavy_check_mark: | :heavy_check_mark: |
 | [CVC5](https://cvc4.github.io/) | :question: | |
@@ -98,33 +100,29 @@ If something specific is missing, please [look for or file an issue](https://git
 | [Yices2](https://yices.csl.sri.com/) |  |  |
 | [Z3](https://github.com/Z3Prover/z3) | :heavy_check_mark: |  |
 
-Interruption using a [ShutdownNotifier][] may be used to interrupt a
-a solver from any thread.
+Interruption using a [ShutdownNotifier][] may be used to interrupt a solver from any thread.
 Formulas are translatable in between contexts/provers/threads using _FormulaManager.translateFrom()_.
 
 ¹ Multiple contexts, but all operations on each context only from a single thread.
 ² Multiple provers on one or more contexts, with each prover using its own thread.
 
 #### Garbage Collection in Native Solvers
-JavaSMT exposes an API for performing garbage collection on solvers
-implemented in a native language.
-As a native solver has no way of knowing whether the created formula
-object is still referenced by the client application, this API is
-necessary to avoid leaking memory.
-Note that several solvers already support _hash consing_ and thus, there is
-never more than one copy of an identical formula object in memory.
+JavaSMT exposes an API for performing garbage collection on solvers implemented in a native language.
+As a native solver has no way of knowing whether the created formula object is still referenced 
+by the client application, this API is necessary to avoid leaking memory.
+Note that several solvers already support _hash consing_ and thus,
+there is never more than one copy of an identical formula object in memory.
 Consequently, if all created formulas are later re-used (or re-created)
-in the application, it is not necessary to perform any garbage
-collection at all.
+in the application, it is not necessary to perform any garbage collection at all.
+Additionally, the memory for formulas created on user-side (i.e., via JavaSMT) is negligible
+compared to solver-internal memory-consumption when solving a hard SMT query.
 
-##### Z3
-The parameter `solver.z3.usePhantomReferences` may be used to control
-whether JavaSMT will attempt to decrease references on Z3 formula
-objects once they are no longer referenced.
-
-##### MathSAT5
-Currently we do not support performing garbage collection for MathSAT5.
-
+- **Z3**: The parameter `solver.z3.usePhantomReferences` may be used to control 
+  whether JavaSMT will attempt to decrease references on Z3 formula 
+  objects once they are no longer referenced.
+- **MathSAT5**: Currently we do not support performing garbage collection for MathSAT5.
+- **CVC4, CVC5, Bitwuzla**: Solvers using SWIG bindings do perform garbage collection.
+- **Other native SMT solvers**: we do not perform garbage collection.
 
 ## Getting started
 Installation is possible via [Maven][Maven repository],
