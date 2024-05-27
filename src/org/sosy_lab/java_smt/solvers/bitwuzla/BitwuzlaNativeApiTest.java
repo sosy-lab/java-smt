@@ -40,7 +40,7 @@ public class BitwuzlaNativeApiTest {
   @BeforeClass
   public static void load() {
     try {
-      NativeLibraries.loadLibrary("bitwuzlaJNI");
+      NativeLibraries.loadLibrary("bitwuzlaj");
     } catch (UnsatisfiedLinkError e) {
       throw new AssumptionViolatedException("Bitwuzla is not available", e);
     }
