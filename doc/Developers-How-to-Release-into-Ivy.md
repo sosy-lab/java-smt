@@ -164,14 +164,19 @@ in which the following command can be run.
 To publish Bitwuzla, checkout the [Bitwuzla repository](https://github.com/bitwuzla/bitwuzla).
 Then execute the following command in the JavaSMT directory:
 ```
-ant publish-bitwuzla -Dbitwuzla.path=$BITWUZLA_DIR -Dbitwuzla.customRev=$VERSION -Dbitwuzla.rebuildWrapper=$BOOL
+ant publish-bitwuzla \
+    -Dbitwuzla.path=$BITWUZLA_DIR -Dbitwuzla.customRev=$VERSION \
+    -Dbitwuzla.rebuildWrapper=$BOOL -Djdk-windows.path=$JNI_DIR
 ```
 Example:
 ```
-ant publish-bitwuzla -Dbitwuzla.path=../bitwuzla/ -Dbitwuzla.customRev=0.4.0 -Dbitwuzla.rebuildWrapper=false
+ant publish-bitwuzla \
+    -Dbitwuzla.path=../bitwuzla/ -Dbitwuzla.customRev=0.4.0 \
+    -Dbitwuzla.rebuildWrapper=false -Djdk-windows.path=/dependencies/jdk-11/
 ```
 The build-scripts Bitwuzla will download and build necessary dependencies like GMP automatically.
 Our build script will automatically append the git-revision of Bitwuzla, if available.
+The build-steps will produce a Linux and a Windows library and publish them.
 
 Finally, follow the instructions shown in the message at the end.
 The instructions for publication via SVN into the Ivy repository are not intended to be executed in the Docker environment,
