@@ -21,7 +21,9 @@ ENV LANGUAGE en_US.UTF-8
 RUN apt-get update \
  && apt-get install -y \
         wget curl git build-essential cmake patchelf \
-        openjdk-11-jdk ant maven mingw-w64 zlib1g-dev m4 \
+        openjdk-11-jdk ant maven \
+        gcc-mingw-w64-x86-64-posix g++-mingw-w64-x86-64-posix \
+        zlib1g-dev m4 \
  && apt-get clean
 
 # Yices2 requires some dependencies
