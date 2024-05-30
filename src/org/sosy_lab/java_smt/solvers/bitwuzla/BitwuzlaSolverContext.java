@@ -174,7 +174,8 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
 
   @VisibleForTesting
   static void loadLibrary(Consumer<String> pLoader) {
-    loadLibrariesWithFallback(pLoader, ImmutableList.of("bitwuzlaj"), ImmutableList.of("libbitwuzlaj"));
+    loadLibrariesWithFallback(
+        pLoader, ImmutableList.of("bitwuzlaj"), ImmutableList.of("libbitwuzlaj"));
   }
 
   /**
