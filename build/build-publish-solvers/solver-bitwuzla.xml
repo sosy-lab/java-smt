@@ -121,7 +121,7 @@ SPDX-License-Identifier: Apache-2.0
              now and should clean up everything when we destroy it. -->
         <exec executable="patch" failonerror="true">
             <arg value="-p0"/>
-            <arg value="-z''"/>
+            <arg value="--no-backup-if-mismatch"/>
             <arg value="-i"/>
             <arg value="lib/native/source/libbitwuzla/swigWrapper.patch"/>
         </exec>
