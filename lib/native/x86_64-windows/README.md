@@ -58,5 +58,5 @@ Or simply use a wildcard:
 
 To execute JavaSMT with MathSAT on a Windows system,
 please make sure that you have installed the [Visual C++ 2013 Redistributable Package](https://support.microsoft.com/en-us/help/4032938/update-for-visual-c-2013-redistributable-package).
-The library might already exist in your system when installed from another program or via some developemnt tools.
+The library might already exist in your system when installed from another program or via some development tools.
 Without an installation of this library you might get an `UnsatisfiedLinkError` because of the missing system library `msvcr120.dll`.
