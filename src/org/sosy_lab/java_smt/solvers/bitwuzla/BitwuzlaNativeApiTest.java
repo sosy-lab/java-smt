@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaSolverContext.loadLibrary;
 
 import com.google.common.truth.Truth;
 import org.junit.After;
@@ -40,7 +41,7 @@ public class BitwuzlaNativeApiTest {
   @BeforeClass
   public static void load() {
     try {
-      NativeLibraries.loadLibrary("bitwuzlaj");
+      loadLibrary(NativeLibraries::loadLibrary);
     } catch (UnsatisfiedLinkError e) {
       throw new AssumptionViolatedException("Bitwuzla is not available", e);
     }

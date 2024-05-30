@@ -47,9 +47,11 @@ import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.SEED;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.TIME_LIMIT_PER;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.VERBOSITY;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.base.Splitter.MapSplitter;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.util.Collection;
 import java.util.Locale;
@@ -141,7 +143,7 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
       FloatingPointRoundingMode pFloatingPointRoundingMode,
       Consumer<String> pLoader)
       throws InvalidConfigurationException {
-    pLoader.accept("bitwuzlaj");
+    loadLibrary(pLoader);
 
     TermManager termManager = new TermManager();
     Options solverOptions = buildBitwuzlaOptions(new BitwuzlaSettings(config), randomSeed);
@@ -168,6 +170,11 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
             solverOptions);
 
     return new BitwuzlaSolverContext(manager, creator, pShutdownNotifier, solverOptions);
+  }
+
+  @VisibleForTesting
+  static void loadLibrary(Consumer<String> pLoader) {
+    loadLibrariesWithFallback(pLoader, ImmutableList.of("bitwuzlaj"), ImmutableList.of("libbitwuzlaj"));
   }
 
   /**
