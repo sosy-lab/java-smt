@@ -306,9 +306,9 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, Sy
       return FunctionDeclarationKind.GT;
     } else if (alogic.isGt(f)) {
       return FunctionDeclarationKind.GTE;
-    } else if (alogic.isLeq(f)) {
-      return FunctionDeclarationKind.LT;
     } else if (alogic.isLt(f)) {
+      return FunctionDeclarationKind.LT;
+    } else if (alogic.isLeq(f)) {
       return FunctionDeclarationKind.LTE;
     } else if (alogic.isMod(f)) {
       return FunctionDeclarationKind.MODULO;
