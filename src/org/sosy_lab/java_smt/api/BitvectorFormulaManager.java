@@ -128,7 +128,7 @@ public interface BitvectorFormulaManager {
   /**
    * This method returns the Signed Modular Remainder for two bitvector formulas.
    *
-   * <p>The sign of the result follows the sign of the denumerator, e.g., a user can assume the
+   * <p>The sign of the result follows the sign of the divisor, e.g., a user can assume the
    * following equations:
    *
    * <ul>
@@ -145,16 +145,16 @@ public interface BitvectorFormulaManager {
    * the numerator itself. We refer to the SMTLIB standard for the division and modulo operators in
    * BV theory.
    *
-   * @param numerator dividend
-   * @param denumerator divisor
+   * @param dividend dividend of the operation.
+   * @param divisor divisor of the operation.
    */
-  BitvectorFormula smodulo(BitvectorFormula numerator, BitvectorFormula denumerator);
+  BitvectorFormula smodulo(BitvectorFormula dividend, BitvectorFormula divisor);
 
   /**
    * This method returns the remainder (modulo) for two bitvector formulas.
    *
-   * <p>For signed bitvectors, the sign of the result follows the sign of the numerator, e.g., a
-   * user can assume the following equations:
+   * <p>For signed bitvectors, the sign of the result follows the sign of the dividend, e.g., a user
+   * can assume the following equations:
    *
    * <ul>
    *   <li>10 % 5 = 0
@@ -165,17 +165,16 @@ public interface BitvectorFormulaManager {
    *   <li>-10 % (-3) = -1
    * </ul>
    *
-   * <p>If the denumerator evaluates to zero (modulo-by-zero), either directly as value or
-   * indirectly via an additional constraint, then the result of the modulo operation is defined as
-   * the numerator itself. We refer to the SMTLIB standard for the division and modulo operators in
-   * BV theory.
+   * <p>If the divisor evaluates to zero (modulo-by-zero), either directly as value or indirectly
+   * via an additional constraint, then the result of the modulo operation is defined as the
+   * numerator itself. We refer to the SMTLIB standard for the division and modulo operators in BV
+   * theory.
    *
-   * @param numerator dividend
-   * @param denumerator divisor
+   * @param dividend dividend of the operation.
+   * @param divisor divisor of the operation.
    * @param signed whether to interpret all operands as signed or as unsigned numbers.
    */
-  BitvectorFormula remainder(
-      BitvectorFormula numerator, BitvectorFormula denumerator, boolean signed);
+  BitvectorFormula remainder(BitvectorFormula dividend, BitvectorFormula divisor, boolean signed);
 
   /**
    * This method returns the multiplication of the given bitvectors. The result has the same length
