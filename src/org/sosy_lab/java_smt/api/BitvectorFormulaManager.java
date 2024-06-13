@@ -126,6 +126,18 @@ public interface BitvectorFormulaManager {
   BitvectorFormula divide(BitvectorFormula numerator, BitvectorFormula denumerator, boolean signed);
 
   /**
+   * Deprecated in favor of remainder() and smodulo() due to confusing method naming and
+   * inconsistent behavior (for signed modulo, the sign of the result follows the divisor, but for
+   * signed remainder() it follows the dividend). Unsigned remainder() is equivalent to unsigned
+   * modulo().
+   */
+  @Deprecated(forRemoval = true)
+  default BitvectorFormula modulo(
+      BitvectorFormula dividend, BitvectorFormula divisor, boolean signed) {
+    return remainder(dividend, divisor, signed);
+  }
+
+  /**
    * This method returns the Signed Modular Remainder for two bitvector formulas.
    *
    * <p>The sign of the result follows the sign of the divisor, e.g., a user can assume the
