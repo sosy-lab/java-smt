@@ -8,7 +8,7 @@
 
 version: build {build} {branch}
 
-clone_depth: 1
+clone_depth: 10
 
 # Let's define a matrix of two images, and later perform an execution on each exactly once.
 environment:
@@ -84,8 +84,8 @@ for:
         - job_name: macOS
 
     install:
+      - export export HOMEBREW_NO_AUTO_UPDATE=1
       - brew install ant
-      - export JAVA_HOME=/usr/libexec/java_home -v 14
       - export IVY_CACHE_DIR=$HOME/.ivy2
       - export PATH=/usr/local/opt/ant/bin:$JAVA_HOME/bin:$PATH
       - echo $USER
