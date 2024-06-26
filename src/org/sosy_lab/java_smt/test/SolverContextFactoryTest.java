@@ -98,8 +98,10 @@ public class SolverContextFactoryTest {
         assume.that(IS_LINUX).isTrue();
         return;
       case BITWUZLA:
-        assume.that(IS_LINUX).isTrue();
-        assume.that(isSufficientVersionOfLibcxx("bitwuzlaj")).isTrue();
+        assume.that(IS_LINUX || IS_WINDOWS).isTrue();
+        if (IS_LINUX) {
+          assume.that(isSufficientVersionOfLibcxx("bitwuzlaj")).isTrue();
+        }
         return;
       case MATHSAT5:
         assume.that(IS_LINUX || IS_WINDOWS).isTrue();
