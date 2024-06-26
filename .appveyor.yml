@@ -36,6 +36,7 @@ build_script:
   # See lib\native\x86_64-windows\README.md for details.
   - copy lib\java\runtime-z3\*dll lib\native\x86_64-windows\
   - copy lib\java\runtime-mathsat\*dll lib\native\x86_64-windows\
+  - copy lib\java\runtime-bitwuzla\*dll lib\native\x86_64-windows\
 
 test_script:
   - ant unit-tests
