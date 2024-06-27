@@ -84,12 +84,14 @@ for:
         - job_name: macOS
 
     install:
-      - export export HOMEBREW_NO_AUTO_UPDATE=1
+      - export HOMEBREW_NO_AUTO_UPDATE=1
+      - export HOMEBREW_NO_INSTALL_CLEANUP=1
       - brew install ant
       - export IVY_CACHE_DIR=$HOME/.ivy2
       - export PATH=/usr/local/opt/ant/bin:$JAVA_HOME/bin:$PATH
       - echo $USER
       - echo $PATH
+      - echo $IVY_CACHE_DIR
       - java -version
 
     build_script:
