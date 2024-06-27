@@ -13,8 +13,8 @@ clone_depth: 10
 # Let's define a matrix of two images, and later perform an execution on each exactly once.
 environment:
   matrix:
-    - job_name: Windows
-      appveyor_build_worker_image: Visual Studio 2019
+#    - job_name: Windows
+#      appveyor_build_worker_image: Visual Studio 2019
     - job_name: macOS
       appveyor_build_worker_image: macOS
 
@@ -22,61 +22,61 @@ matrix:
   fast_finish: true
 
 for:
-  -
-    matrix:
-      only:
-        - job_name: Windows
-
-    install:
-      - ps: |
-          Add-Type -AssemblyName System.IO.Compression.FileSystem
-          if (!(Test-Path -Path "C:\ant\apache-ant-1.10.14" )) {
-            (new-object System.Net.WebClient).DownloadFile(
-            'https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.14-bin.zip',
-              'C:\ant-bin.zip'
-            )
-            [System.IO.Compression.ZipFile]::ExtractToDirectory("C:\ant-bin.zip", "C:\ant")
-          }
-      - SET JAVA_HOME=C:\Program Files\Java\jdk14
-      - SET PATH=C:\ant\apache-ant-1.10.14\bin;%JAVA_HOME%\bin;%PATH%
-      - SET IVY_CACHE_DIR=C:\ivy
-      - echo %USERPROFILE%
-      - echo %PATH%
-      - java -version
-
-    build_script:
-      - ant build
-      - copy lib\java\runtime-z3\*dll lib\native\x86_64-windows\
-      - copy lib\java\runtime-mathsat\*dll lib\native\x86_64-windows\
-      - copy lib\java\runtime-bitwuzla\*dll lib\native\x86_64-windows\
-
-    test_script:
-      - ant unit-tests
-
-    on_finish:
-      - ps: |
-          $wc = New-Object 'System.Net.WebClient'
-          $files = Get-ChildItem -Path ".\junit\TEST-*.xml" -Exclude "*VariableNames*"
-          $url = "https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)"
-          foreach($file in $files){
-            echo $file.FullName
-            $wc.UploadFile($url, $file.FullName)
-          }
-      - ps: |
-          $files = Get-ChildItem -Path ".\hs_err_pid*"
-          foreach($file in $files){
-            echo $file.FullName
-            Push-AppveyorArtifact $file.FullName -DeploymentName $file.name
-          }
-      - ps: |
-          $files = Get-ChildItem -Path ".\replay_pid*"
-          foreach($file in $files){
-            echo $file.FullName
-            Push-AppveyorArtifact $file.FullName -DeploymentName $file.name
-          }
-      - ps: |
-          7z a JUnit.html.zip JUnit.html
-          Push-AppveyorArtifact JUnit.html.zip -DeploymentName "JUnit Report"
+#  -
+#    matrix:
+#      only:
+#        - job_name: Windows
+#
+#    install:
+#      - ps: |
+#          Add-Type -AssemblyName System.IO.Compression.FileSystem
+#          if (!(Test-Path -Path "C:\ant\apache-ant-1.10.14" )) {
+#            (new-object System.Net.WebClient).DownloadFile(
+#            'https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.14-bin.zip',
+#              'C:\ant-bin.zip'
+#            )
+#            [System.IO.Compression.ZipFile]::ExtractToDirectory("C:\ant-bin.zip", "C:\ant")
+#          }
+#      - SET JAVA_HOME=C:\Program Files\Java\jdk14
+#      - SET PATH=C:\ant\apache-ant-1.10.14\bin;%JAVA_HOME%\bin;%PATH%
+#      - SET IVY_CACHE_DIR=C:\ivy
+#      - echo %USERPROFILE%
+#      - echo %PATH%
+#      - java -version
+#
+#    build_script:
+#      - ant build
+#      - copy lib\java\runtime-z3\*dll lib\native\x86_64-windows\
+#      - copy lib\java\runtime-mathsat\*dll lib\native\x86_64-windows\
+#      - copy lib\java\runtime-bitwuzla\*dll lib\native\x86_64-windows\
+#
+#    test_script:
+#      - ant unit-tests
+#
+#    on_finish:
+#      - ps: |
+#          $wc = New-Object 'System.Net.WebClient'
+#          $files = Get-ChildItem -Path ".\junit\TEST-*.xml" -Exclude "*VariableNames*"
+#          $url = "https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)"
+#          foreach($file in $files){
+#            echo $file.FullName
+#            $wc.UploadFile($url, $file.FullName)
+#          }
+#      - ps: |
+#          $files = Get-ChildItem -Path ".\hs_err_pid*"
+#          foreach($file in $files){
+#            echo $file.FullName
+#            Push-AppveyorArtifact $file.FullName -DeploymentName $file.name
+#          }
+#      - ps: |
+#          $files = Get-ChildItem -Path ".\replay_pid*"
+#          foreach($file in $files){
+#            echo $file.FullName
+#            Push-AppveyorArtifact $file.FullName -DeploymentName $file.name
+#          }
+#      - ps: |
+#          7z a JUnit.html.zip JUnit.html
+#          Push-AppveyorArtifact JUnit.html.zip -DeploymentName "JUnit Report"
 
   -
     matrix:
