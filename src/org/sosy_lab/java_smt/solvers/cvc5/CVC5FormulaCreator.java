@@ -258,8 +258,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
         throw new AssertionError(
             String.format("Encountered unhandled Type '%s' %s.", sort, sort.getKind()));
       } catch (CVC5ApiException pE) {
-        pE.printStackTrace();
-        return null;
+        throw new AssertionError("Unexpected error when accessing sort.", pE);
       }
     }
   }
