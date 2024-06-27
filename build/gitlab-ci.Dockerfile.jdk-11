@@ -12,7 +12,7 @@
 #
 # Commands for updating the image:
 # docker build --pull -t registry.gitlab.com/sosy-lab/software/java-smt/test:jdk-11 - < build/gitlab-ci.Dockerfile.jdk-11
-# docker push registry.gitlab.com/sosy-lab/software/java-smt/test
+# docker push registry.gitlab.com/sosy-lab/software/java-smt/test:jdk-11
 
 FROM registry.gitlab.com/sosy-lab/software/java-project-template/test:jdk-11
 RUN apt-get update && apt-get install -y \
