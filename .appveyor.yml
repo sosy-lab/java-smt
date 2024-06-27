@@ -18,6 +18,9 @@ environment:
     - job_name: macOS
       appveyor_build_worker_image: macOS
 
+  APPVEYOR_SSH_BLOCK: true
+  APPVEYOR_SSH_KEY: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC/DR0KKfbX3KcPZrbFHztXjSToUhpfyGbo9ZMYp7c4rHDg2WFujdeewCa6y9OhxBxTLlvfhpXGthRjQnts+e4ctDt4U5LHp4fMTvzsZIR9rpUTFnJftO/TQtY6l+xm4zHxshYn2AiGhwWDK0gpSrr5APwUgDkMlQg7cp1+L9n1FAp+yEQuvG4DgBSlGVeWlmZzM0srIT8xjriTONWQU1msk1WnNpUCGlqjTShb7n9NWCYzAblpRDL6uWvIvE11vcD43U95bCmkusnZ6mMOV6ITBCyjS5b8GOJJ3AMe+Q2w/KwkXRqz68HCZ3/35cmppqjZPemIg+Uw5u3lKMITx2ifMgKyORrdS4XhACurMhbdfrlvFYJfeZkG7eZE7lBcGgcKThWJQtyRdJzSfASK/Jt+xtug15RylB5+0eImab+YH88pyWfqQr0MXyVvOX39Wyvu25BmmKa9ZLhBbk8i6G+3fzFtWxL/So3JRbphoa6v3+djck9jYzeG/b7lEU1G32c=
+
 matrix:
   fast_finish: true
 
@@ -82,6 +85,9 @@ for:
     matrix:
       only:
         - job_name: macOS
+
+    init:
+      - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-ssh.sh' | bash -e -
 
     install:
       - export HOMEBREW_NO_AUTO_UPDATE=1
