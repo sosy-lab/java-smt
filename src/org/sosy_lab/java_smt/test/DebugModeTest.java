@@ -198,8 +198,10 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   @Test(expected = IllegalArgumentException.class)
   public void noSharingBetweenSolversTest()
       throws InvalidConfigurationException, InterruptedException, SolverException {
+    // Compare the solver-under-test with another solver instance.
+    // We use Java-based solvers as reference to run on any operating system.
     Solvers otherSolver =
-        solverToUse() == Solvers.SMTINTERPOL ? Solvers.MATHSAT5 : Solvers.SMTINTERPOL;
+        solverToUse() == Solvers.SMTINTERPOL ? Solvers.PRINCESS : Solvers.SMTINTERPOL;
 
     try (SolverContext otherContext = debugFactory.generateContext(otherSolver)) {
       BooleanFormulaManager otherBmgr = otherContext.getFormulaManager().getBooleanFormulaManager();
