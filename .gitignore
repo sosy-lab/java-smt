@@ -25,6 +25,7 @@ lib/native/source/*/*.so
 lib/native/source/*/*.o
 lib/native/source/**/*.java
 lib/native/source/**/**/*.java
+lib/native/x86_64-windows/*.dll
 lib/native/*/*.asc
 
 doc/Example-Maven-Project/target*
