@@ -122,7 +122,8 @@ for:
 cache:
   - C:\ant
   - C:\ivy
-  - $HOME/.ivy2
+  - ~/.ivy2
+  - /Library/Caches/Homebrew
 
 notifications:
   - provider: Email
