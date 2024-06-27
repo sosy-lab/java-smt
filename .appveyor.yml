@@ -101,9 +101,9 @@ for:
     on_finish:
       - sh: |
           wc=$(curl --silent --show-error --fail https://ci.appveyor.com/api/testresults/junit/$APPVEYOR_JOB_ID)
+          echo $wc
           for file in $(find . -name 'TEST-*.xml' ! -name '*VariableNames*'); do
             echo $file
-            curl -X POST -F "file=@$file" $wc
           done
       - sh: |
           for file in $(find . -name 'hs_err_pid*'); do
@@ -122,7 +122,7 @@ for:
 cache:
   - C:\ant
   - C:\ivy
-  - ~/.ivy2
+  - $HOME/.ivy2
   - /Library/Caches/Homebrew
 
 notifications:
