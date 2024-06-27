@@ -126,11 +126,12 @@ for:
       - sh: |
           zip JUnit.html.zip JUnit.html
           appveyor PushArtifact JUnit.html.zip -FileName "JUnit Report"
+      - sh: sleep 3600s
 
-cache:
+cache: # do not use environment variables here!
   - C:\ant
   - C:\ivy
-  - $HOME/.ivy2
+  - /Users/appveyor/.ivy2
   - /Library/Caches/Homebrew
 
 notifications:
