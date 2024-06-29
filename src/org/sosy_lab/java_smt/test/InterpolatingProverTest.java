@@ -1179,4 +1179,70 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     assertThrows(
         IllegalArgumentException.class, () -> stack.getInterpolant(ImmutableList.of((T) p3)));
   }
+
+  @Test
+  @SuppressWarnings("unused")
+  public <T> void issue381InterpolationTest1() throws InterruptedException, SolverException {
+    try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
+      var x = imgr.makeVariable("x");
+      var one = imgr.makeNumber(1);
+      var eq = imgr.equal(one, x);
+      var lt1 = imgr.lessThan(one, x);
+      var lt2 = imgr.lessThan(one, x);
+      assertThat(lt1).isEqualTo(lt2);
+
+      var eqT = prover.addConstraint(eq);
+      var ltT1 = prover.addConstraint(lt1);
+      var ltT2 = prover.addConstraint(lt2);
+      assertThat(ltT1).isNotEqualTo(ltT2);
+      assertThat(prover.isUnsat()).isTrue();
+
+      var itps = prover.getSeqInterpolants0(ImmutableList.of(eqT, ltT1));
+      assertThat(itps).isNotNull();
+    }
+  }
+
+  @Test
+  @SuppressWarnings("unused")
+  public <T> void issue381InterpolationTest2() throws InterruptedException, SolverException {
+    try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
+      var x = imgr.makeVariable("x");
+      var one = imgr.makeNumber(1);
+      var eq = imgr.equal(one, x);
+      var lt1 = imgr.lessThan(one, x);
+      var lt2 = imgr.lessThan(one, x);
+      assertThat(lt1).isEqualTo(lt2);
+
+      var eqT = prover.addConstraint(eq);
+      var ltT1 = prover.addConstraint(lt1);
+      var ltT2 = prover.addConstraint(lt2);
+      assertThat(ltT1).isNotEqualTo(ltT2);
+      assertThat(prover.isUnsat()).isTrue();
+
+      var itps = prover.getSeqInterpolants0(ImmutableList.of(eqT, ltT2));
+      assertThat(itps).isNotNull();
+    }
+  }
+
+  @Test
+  @SuppressWarnings("unused")
+  public <T> void issue381InterpolationTest3() throws InterruptedException, SolverException {
+    try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
+      var x = imgr.makeVariable("x");
+      var one = imgr.makeNumber(1);
+      var eq = imgr.equal(one, x);
+      var lt1 = imgr.lessThan(one, x);
+      var lt2 = imgr.lessThan(one, x);
+      assertThat(lt1).isEqualTo(lt2);
+
+      var eqT = prover.addConstraint(eq);
+      var ltT1 = prover.addConstraint(lt1);
+      var ltT2 = prover.addConstraint(lt2);
+      assertThat(ltT1).isNotEqualTo(ltT2);
+      assertThat(prover.isUnsat()).isTrue();
+
+      var itps = prover.getInterpolant(ImmutableList.of(eqT));
+      assertThat(itps).isNotNull();
+    }
+  }
 }
