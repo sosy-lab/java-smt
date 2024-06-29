@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2022 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -11,18 +11,23 @@ package org.sosy_lab.java_smt.solvers.cvc5;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import io.github.cvc5.CVC5ApiException;
 import io.github.cvc5.Result;
 import io.github.cvc5.Solver;
 import io.github.cvc5.Term;
 import io.github.cvc5.UnknownExplanation;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.common.UniqueIdGenerator;
+import org.sosy_lab.common.collect.PathCopyingPersistentTreeMap;
+import org.sosy_lab.common.collect.PersistentMap;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -31,12 +36,15 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 
-public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
+abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
+
+  private static final UniqueIdGenerator ID_GENERATOR = new UniqueIdGenerator();
 
   private final FormulaManager mgr;
   protected final CVC5FormulaCreator creator;
   protected final Solver solver;
   private boolean changedSinceLastSatQuery = false;
+  protected final Deque<PersistentMap<String, Term>> assertedTerms = new ArrayDeque<>();
 
   // TODO: does CVC5 support separation logic in incremental mode?
   protected final boolean incremental;
@@ -53,6 +61,7 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     creator = pFormulaCreator;
     incremental = !enableSL;
     solver = new Solver();
+    assertedTerms.add(PathCopyingPersistentTreeMap.of());
 
     setSolverOptions(randomSeed, pOptions, solver);
   }
@@ -82,6 +91,7 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   @Override
   protected void pushImpl() throws InterruptedException {
     setChanged();
+    assertedTerms.push(assertedTerms.peek()); // add copy of top-level
     if (incremental) {
       try {
         solver.push();
@@ -103,17 +113,20 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
             "You tried to use pop() on an CVC5 assertion stack illegally.", e);
       }
     }
+    assertedTerms.pop();
   }
 
-  @Override
-  protected @Nullable T addConstraintImpl(BooleanFormula pF) throws InterruptedException {
+  @CanIgnoreReturnValue
+  protected String addConstraint0(BooleanFormula pF) throws InterruptedException {
     Preconditions.checkState(!closed);
     setChanged();
     Term exp = creator.extractInfo(pF);
     if (incremental) {
       solver.assertFormula(exp);
     }
-    return null;
+    String id = "ID_" + ID_GENERATOR.getFreshId();
+    assertedTerms.push(assertedTerms.pop().putAndCopy(id, exp));
+    return id;
   }
 
   @SuppressWarnings("resource")
@@ -214,6 +227,7 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   @Override
   public void close() {
     if (!closed) {
+      assertedTerms.clear();
       solver.deletePointer();
     }
     super.close();
