@@ -117,7 +117,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   @CanIgnoreReturnValue
-  protected String addConstraint0(BooleanFormula pF) throws InterruptedException {
+  protected String addConstraint0(BooleanFormula pF) {
     Preconditions.checkState(!closed);
     setChanged();
     Term exp = creator.extractInfo(pF);
