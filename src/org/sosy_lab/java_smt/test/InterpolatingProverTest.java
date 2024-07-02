@@ -1180,8 +1180,12 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
         IllegalArgumentException.class, () -> stack.getInterpolant(ImmutableList.of((T) p3)));
   }
 
+  /*
+   * This tests that 2 formulas that are equal but not the same are treated that way by the
+   * interpolation procedure. (Asserting the 2 formulas on the stack should return 2 distinct itp
+   *  points, that are then treated as distinct itp points by the interpolation.)
+   */
   @Test
-  @SuppressWarnings("unused")
   public <T> void issue381InterpolationTest1() throws InterruptedException, SolverException {
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       var x = imgr.makeVariable("x");
@@ -1202,8 +1206,12 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     }
   }
 
+  /*
+   * This tests that 2 formulas that are equal but not the same are treated that way by the
+   * interpolation procedure. (Asserting the 2 formulas on the stack should return 2 distinct itp
+   *  points, that are then treated as distinct itp points by the interpolation.)
+   */
   @Test
-  @SuppressWarnings("unused")
   public <T> void issue381InterpolationTest2() throws InterruptedException, SolverException {
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       var x = imgr.makeVariable("x");
@@ -1224,8 +1232,12 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     }
   }
 
+  /*
+   * This tests that 2 formulas that are equal but not the same are treated that way by the
+   * interpolation procedure. (Asserting the 2 formulas on the stack should return 2 distinct itp
+   *  points, that are then treated as distinct itp points by the interpolation.)
+   */
   @Test
-  @SuppressWarnings("unused")
   public <T> void issue381InterpolationTest3() throws InterruptedException, SolverException {
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       var x = imgr.makeVariable("x");
