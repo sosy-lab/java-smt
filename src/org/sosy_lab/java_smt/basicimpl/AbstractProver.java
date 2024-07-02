@@ -13,12 +13,12 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Multimap;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
@@ -37,8 +37,12 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
   private final Set<Evaluator> evaluators = new LinkedHashSet<>();
 
-  /** This data-structure tracks all formulas that were asserted on different levels. */
-  private final List<Map<BooleanFormula, T>> assertedFormulas = new ArrayList<>();
+  /**
+   * This data-structure tracks all formulas that were asserted on different levels. We can assert a
+   * formula multiple times on the same or also distinct levels and return a new ID for each
+   * assertion.
+   */
+  private final List<Multimap<BooleanFormula, T>> assertedFormulas = new ArrayList<>();
 
   private static final String TEMPLATE = "Please set the prover option %s.";
 
@@ -50,7 +54,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
         pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS);
     enableSL = pOptions.contains(ProverOptions.ENABLE_SEPARATION_LOGIC);
 
-    assertedFormulas.add(new LinkedHashMap<>());
+    assertedFormulas.add(LinkedHashMultimap.create());
   }
 
   protected final void checkGenerateModels() {
@@ -86,7 +90,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   public final void push() throws InterruptedException {
     checkState(!closed);
     pushImpl();
-    assertedFormulas.add(new LinkedHashMap<>());
+    assertedFormulas.add(LinkedHashMultimap.create());
   }
 
   protected abstract void pushImpl() throws InterruptedException;
@@ -115,7 +119,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
   protected ImmutableSet<BooleanFormula> getAssertedFormulas() {
     ImmutableSet.Builder<BooleanFormula> builder = ImmutableSet.builder();
-    for (Map<BooleanFormula, T> level : assertedFormulas) {
+    for (Multimap<BooleanFormula, T> level : assertedFormulas) {
       builder.addAll(level.keySet());
     }
     return builder.build();
@@ -123,7 +127,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
   protected ImmutableSet<T> getAssertedConstraintIds() {
     ImmutableSet.Builder<T> builder = ImmutableSet.builder();
-    for (Map<BooleanFormula, T> level : assertedFormulas) {
+    for (Multimap<BooleanFormula, T> level : assertedFormulas) {
       builder.addAll(level.values());
     }
     return builder.build();
