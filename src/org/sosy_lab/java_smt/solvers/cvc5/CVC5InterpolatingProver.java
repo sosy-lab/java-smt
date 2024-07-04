@@ -27,10 +27,11 @@ import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
+import org.sosy_lab.java_smt.api.InterpolationPoint;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
-public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
+public class CVC5InterpolatingProver extends CVC5AbstractProver<InterpolationPoint<String>>
     implements InterpolatingProverEnvironment<String> {
 
   private final FormulaManager mgr;
@@ -65,12 +66,13 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
   }
 
   @Override
-  protected String addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
-    return super.addConstraint0(constraint);
+  protected InterpolationPoint<String> addConstraintImpl(BooleanFormula constraint)
+      throws InterruptedException {
+    return InterpolationPoint.create(super.addConstraint0(constraint));
   }
 
   @Override
-  public BooleanFormula getInterpolant(Collection<String> pFormulasOfA)
+  public BooleanFormula getInterpolant(Collection<InterpolationPoint<String>> pFormulasOfA)
       throws SolverException, InterruptedException {
     checkState(!closed);
     checkArgument(
@@ -80,7 +82,8 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
     final Set<Term> assertedFormulas =
         transformedImmutableSetCopy(getAssertedFormulas(), creator::extractInfo);
     final Set<Term> formulasOfA =
-        transformedImmutableSetCopy(pFormulasOfA, assertedTerms.peek()::get);
+        transformedImmutableSetCopy(
+            pFormulasOfA, fa -> assertedTerms.peek().get(fa.getReference()));
     final Set<Term> formulasOfB = Sets.difference(assertedFormulas, formulasOfA);
 
     Term itp = getCVC5Interpolation(formulasOfA, formulasOfB);
@@ -88,10 +91,12 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
   }
 
   @Override
-  public List<BooleanFormula> getSeqInterpolants(List<? extends Collection<String>> partitions)
+  public List<BooleanFormula> getSeqInterpolants(
+      List<? extends Collection<InterpolationPoint<String>>> partitions)
       throws SolverException, InterruptedException {
     checkArgument(!partitions.isEmpty(), "at least one partition should be available.");
-    final ImmutableSet<String> assertedConstraintIds = getAssertedConstraintIds();
+    final ImmutableSet<InterpolationPoint<String>> assertedConstraintIds =
+        getAssertedConstraintIds();
     checkArgument(
         partitions.stream().allMatch(assertedConstraintIds::containsAll),
         "interpolation can only be done over previously asserted formulas.");
@@ -102,11 +107,12 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
     for (int i = 1; i < n; i++) {
       Collection<Term> formulasA =
           FluentIterable.from(partitions.get(i - 1))
-              .transform(assertedTerms.peek()::get)
+              .transform(fa -> assertedTerms.peek().get(fa.getReference()))
               .append(previousItp)
               .toSet();
       Collection<Term> formulasB =
           FluentIterable.concat(partitions.subList(i, n))
+              .transform(InterpolationPoint::getReference)
               .transform(assertedTerms.peek()::get)
               .toSet();
       Term itp = getCVC5Interpolation(formulasA, formulasB);
@@ -118,7 +124,8 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
 
   @Override
   public List<BooleanFormula> getTreeInterpolants(
-      List<? extends Collection<String>> partitionedFormulas, int[] startOfSubTree) {
+      List<? extends Collection<InterpolationPoint<String>>> partitionedFormulas,
+      int[] startOfSubTree) {
     throw new UnsupportedOperationException(
         "directly receiving tree interpolants is not supported."
             + "Use another solver or another strategy for interpolants.");

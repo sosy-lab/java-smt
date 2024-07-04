@@ -25,6 +25,7 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
+import org.sosy_lab.java_smt.api.InterpolationPoint;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -108,9 +109,9 @@ public class Interpolation {
 
     // create and assert some formulas.
     // instead of 'named' formulas, we return a 'handle' (of generic type T)
-    T ip0 = prover.addConstraint(imgr.greaterThan(x, y));
-    T ip1 = prover.addConstraint(imgr.equal(x, zero));
-    T ip2 = prover.addConstraint(imgr.greaterThan(y, zero));
+    InterpolationPoint<T> ip0 = prover.addConstraint(imgr.greaterThan(x, y));
+    InterpolationPoint<T> ip1 = prover.addConstraint(imgr.equal(x, zero));
+    InterpolationPoint<T> ip2 = prover.addConstraint(imgr.greaterThan(y, zero));
 
     // check for satisfiability
     boolean unsat = prover.isUnsat();
@@ -128,9 +129,9 @@ public class Interpolation {
     {
       // example 1b :
       // alternative solution ... with more code and partitioned formulas.
-      Set<T> partition0 = ImmutableSet.of(ip0);
-      Set<T> partition1 = ImmutableSet.of(ip1);
-      Set<T> partition2 = ImmutableSet.of(ip2);
+      Set<InterpolationPoint<T>> partition0 = ImmutableSet.of(ip0);
+      Set<InterpolationPoint<T>> partition1 = ImmutableSet.of(ip1);
+      Set<InterpolationPoint<T>> partition2 = ImmutableSet.of(ip2);
       itps = prover.getSeqInterpolants(ImmutableList.of(partition0, partition1, partition2));
       logger.log(Level.INFO, "1b :: Interpolants for [{ip0},{ip1},{ip2}] are:", itps);
     }
@@ -138,8 +139,8 @@ public class Interpolation {
     {
       // example 2a :
       // get a sequence of interpolants for two formulas: (get-interpolants IP_1 (and IP_0 IP_2)).
-      Set<T> partition3 = ImmutableSet.of(ip0);
-      Set<T> partition4 = ImmutableSet.of(ip1, ip2);
+      Set<InterpolationPoint<T>> partition3 = ImmutableSet.of(ip0);
+      Set<InterpolationPoint<T>> partition4 = ImmutableSet.of(ip1, ip2);
       itps = prover.getSeqInterpolants(ImmutableList.of(partition3, partition4));
       logger.log(Level.INFO, "2a :: Interpolants for [{ip0},{ip1,ip2}] are:", itps);
     }
@@ -199,7 +200,7 @@ public class Interpolation {
             imgr.lessThan(k1, fifty));
 
     // assert all formulas in the prover
-    List<T> handles = new ArrayList<>();
+    List<InterpolationPoint<T>> handles = new ArrayList<>();
     for (BooleanFormula step : programTrace) {
       handles.add(prover.addConstraint(step));
     }

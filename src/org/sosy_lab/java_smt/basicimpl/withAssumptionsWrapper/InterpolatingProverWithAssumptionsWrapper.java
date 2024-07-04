@@ -19,14 +19,16 @@ import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
+import org.sosy_lab.java_smt.api.InterpolationPoint;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.visitors.BooleanFormulaTransformationVisitor;
 
 public class InterpolatingProverWithAssumptionsWrapper<T>
-    extends BasicProverWithAssumptionsWrapper<T, InterpolatingProverEnvironment<T>>
+    extends BasicProverWithAssumptionsWrapper<
+        InterpolationPoint<T>, InterpolatingProverEnvironment<T>>
     implements InterpolatingProverEnvironment<T> {
 
-  private final List<T> solverAssumptionsFromPush;
+  private final List<InterpolationPoint<T>> solverAssumptionsFromPush;
   private final FormulaManager fmgr;
   private final BooleanFormulaManager bmgr;
 
@@ -39,9 +41,9 @@ public class InterpolatingProverWithAssumptionsWrapper<T>
   }
 
   @Override
-  public BooleanFormula getInterpolant(Collection<T> pFormulasOfA)
+  public BooleanFormula getInterpolant(Collection<InterpolationPoint<T>> pFormulasOfA)
       throws SolverException, InterruptedException {
-    List<T> completeListOfA = new ArrayList<>(pFormulasOfA);
+    List<InterpolationPoint<T>> completeListOfA = new ArrayList<>(pFormulasOfA);
     completeListOfA.addAll(solverAssumptionsFromPush);
     BooleanFormula interpolant = delegate.getInterpolant(completeListOfA);
 
@@ -55,7 +57,8 @@ public class InterpolatingProverWithAssumptionsWrapper<T>
   }
 
   @Override
-  public List<BooleanFormula> getSeqInterpolants(List<? extends Collection<T>> pPartitionedFormulas)
+  public List<BooleanFormula> getSeqInterpolants(
+      List<? extends Collection<InterpolationPoint<T>>> pPartitionedFormulas)
       throws SolverException, InterruptedException {
     if (solverAssumptionsAsFormula.isEmpty()) {
       return delegate.getSeqInterpolants(pPartitionedFormulas);
@@ -66,7 +69,7 @@ public class InterpolatingProverWithAssumptionsWrapper<T>
 
   @Override
   public List<BooleanFormula> getTreeInterpolants(
-      List<? extends Collection<T>> pPartitionedFormulas, int[] pStartOfSubTree)
+      List<? extends Collection<InterpolationPoint<T>>> pPartitionedFormulas, int[] pStartOfSubTree)
       throws SolverException, InterruptedException {
     if (solverAssumptionsAsFormula.isEmpty()) {
       return delegate.getTreeInterpolants(pPartitionedFormulas, pStartOfSubTree);
@@ -76,7 +79,7 @@ public class InterpolatingProverWithAssumptionsWrapper<T>
   }
 
   @Override
-  protected void registerPushedFormula(T pPushResult) {
+  protected void registerPushedFormula(InterpolationPoint<T> pPushResult) {
     solverAssumptionsFromPush.add(pPushResult);
   }
 

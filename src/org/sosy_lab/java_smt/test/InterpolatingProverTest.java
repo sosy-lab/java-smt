@@ -28,6 +28,7 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
+import org.sosy_lab.java_smt.api.InterpolationPoint;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5BooleanFormulaManager;
@@ -76,7 +77,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
           imgr.equal(y, imgr.add(imgr.makeNumber(1), imgr.multiply(z, imgr.makeNumber(2))));
 
       prover.push(f1);
-      T id2 = prover.push(f2);
+      InterpolationPoint<T> id2 = prover.push(f2);
       boolean check = prover.isUnsat();
 
       assertWithMessage("formulas must be contradicting").that(check).isTrue();
@@ -102,8 +103,8 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
       BooleanFormula f1 = imgr.equal(y, imgr.multiply(imgr.makeNumber(2), x));
       BooleanFormula f2 =
           imgr.equal(y, imgr.add(imgr.makeNumber(1), imgr.multiply(z, imgr.makeNumber(2))));
-      T id1 = prover.push(f1);
-      T id2 = prover.push(f2);
+      InterpolationPoint<T> id1 = prover.push(f1);
+      InterpolationPoint<T> id2 = prover.push(f2);
       assertThat(prover.isUnsat()).isTrue();
 
       BooleanFormula emptyB = prover.getInterpolant(ImmutableList.of(id1, id2));
@@ -132,10 +133,10 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     BooleanFormula C = imgr.equal(b, c);
     BooleanFormula D = imgr.equal(c, zero);
 
-    T TA = stack.push(A);
-    T TB = stack.push(B);
-    T TC = stack.push(C);
-    T TD = stack.push(D);
+    InterpolationPoint<T> TA = stack.push(A);
+    InterpolationPoint<T> TB = stack.push(B);
+    InterpolationPoint<T> TC = stack.push(C);
+    InterpolationPoint<T> TD = stack.push(D);
 
     assertThat(stack).isUnsatisfiable();
 
@@ -170,9 +171,9 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     BooleanFormula B = bmgr.makeBoolean(false);
     BooleanFormula C = bmgr.makeBoolean(false);
 
-    T TA = stack.push(A);
-    T TB = stack.push(B);
-    T TC = stack.push(C);
+    InterpolationPoint<T> TA = stack.push(A);
+    InterpolationPoint<T> TB = stack.push(B);
+    InterpolationPoint<T> TC = stack.push(C);
 
     assertThat(stack).isUnsatisfiable();
 
@@ -222,10 +223,10 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     BooleanFormula C = bvmgr.equal(c, bvmgr.add(b, n130));
     BooleanFormula D = bvmgr.greaterThan(c, b, false);
 
-    T TA = stack.push(A);
-    T TB = stack.push(B);
-    T TC = stack.push(C);
-    T TD = stack.push(D);
+    InterpolationPoint<T> TA = stack.push(A);
+    InterpolationPoint<T> TB = stack.push(B);
+    InterpolationPoint<T> TC = stack.push(C);
+    InterpolationPoint<T> TD = stack.push(D);
 
     assertThat(stack).isUnsatisfiable();
 
@@ -283,10 +284,10 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     BooleanFormula C = imgr.equal(b, c);
     BooleanFormula D = imgr.equal(c, zero);
 
-    T TA = stack.push(A);
-    T TB = stack.push(B);
-    T TC = stack.push(C);
-    T TD = stack.push(D);
+    InterpolationPoint<T> TA = stack.push(A);
+    InterpolationPoint<T> TB = stack.push(B);
+    InterpolationPoint<T> TC = stack.push(C);
+    InterpolationPoint<T> TD = stack.push(D);
 
     assertThat(stack).isUnsatisfiable();
 
@@ -330,9 +331,9 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     BooleanFormula B = bmgr.and(imgr.lessThan(i3, thousand), imgr.equal(i4, imgr.add(i3, one)));
     BooleanFormula C = imgr.greaterThan(i4, thousand);
 
-    T TA = stack.push(A);
-    T TB = stack.push(B);
-    T TC = stack.push(C);
+    InterpolationPoint<T> TA = stack.push(A);
+    InterpolationPoint<T> TB = stack.push(B);
+    InterpolationPoint<T> TC = stack.push(C);
 
     assertThat(stack).isUnsatisfiable();
 
@@ -393,13 +394,13 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     BooleanFormula A = imgr.equal(one, a);
     BooleanFormula B = imgr.equal(a, zero);
 
-    T TA = stack.push(A);
-    T TB = stack.push(B);
+    InterpolationPoint<T> TA = stack.push(A);
+    InterpolationPoint<T> TB = stack.push(B);
 
     assertThat(stack).isUnsatisfiable();
 
     // list of one partition
-    List<T> partition = ImmutableList.of(TA, TB);
+    ImmutableList<InterpolationPoint<T>> partition = ImmutableList.of(TA, TB);
     List<BooleanFormula> itps = stack.getSeqInterpolants(ImmutableList.of(partition));
     assertThat(itps).isEmpty();
   }
@@ -421,12 +422,12 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     BooleanFormula A = imgr.equal(one, a);
     BooleanFormula B = imgr.equal(a, zero);
 
-    T TA = stack.push(A);
-    T TB = stack.push(B);
+    InterpolationPoint<T> TA = stack.push(A);
+    InterpolationPoint<T> TB = stack.push(B);
 
     assertThat(stack).isUnsatisfiable();
 
-    Set<T> partition = ImmutableSet.of(TA, TB);
+    Set<InterpolationPoint<T>> partition = ImmutableSet.of(TA, TB);
     List<BooleanFormula> itps1 = stack.getSeqInterpolants(ImmutableList.of(partition));
     List<BooleanFormula> itps2 = stack.getSeqInterpolants0(ImmutableList.of(TA, TB));
     List<BooleanFormula> itps3 = stack.getSeqInterpolants0(ImmutableList.of(TB, TA));
@@ -465,10 +466,10 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     BooleanFormula C = bvmgr.equal(b, c);
     BooleanFormula D = bvmgr.equal(c, zero);
 
-    T TA = stack.push(A);
-    T TB = stack.push(B);
-    T TC = stack.push(C);
-    T TD = stack.push(D);
+    InterpolationPoint<T> TA = stack.push(A);
+    InterpolationPoint<T> TB = stack.push(B);
+    InterpolationPoint<T> TC = stack.push(C);
+    InterpolationPoint<T> TD = stack.push(D);
 
     assertThat(stack).isUnsatisfiable();
 
@@ -563,11 +564,11 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
-    T TA = stack.push(pA);
-    T TB = stack.push(pB);
-    T TC = stack.push(pC);
-    T TD = stack.push(pD);
-    T TE = stack.push(pE);
+    InterpolationPoint<T> TA = stack.push(pA);
+    InterpolationPoint<T> TB = stack.push(pB);
+    InterpolationPoint<T> TC = stack.push(pC);
+    InterpolationPoint<T> TD = stack.push(pD);
+    InterpolationPoint<T> TE = stack.push(pE);
 
     assertThat(stack).isUnsatisfiable();
 
@@ -597,11 +598,11 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
-    T TA = stack.push(pA);
-    T TB = stack.push(pB);
-    T TC = stack.push(pC);
-    T TD = stack.push(pD);
-    T TE = stack.push(pE);
+    InterpolationPoint<T> TA = stack.push(pA);
+    InterpolationPoint<T> TB = stack.push(pB);
+    InterpolationPoint<T> TC = stack.push(pC);
+    InterpolationPoint<T> TD = stack.push(pD);
+    InterpolationPoint<T> TE = stack.push(pE);
 
     assertThat(stack).isUnsatisfiable();
 
@@ -630,11 +631,11 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
-    T TA = stack.push(pA);
-    T TB = stack.push(pB);
-    T TC = stack.push(pC);
-    T TD = stack.push(pD);
-    T TE = stack.push(pE);
+    InterpolationPoint<T> TA = stack.push(pA);
+    InterpolationPoint<T> TB = stack.push(pB);
+    InterpolationPoint<T> TC = stack.push(pC);
+    InterpolationPoint<T> TD = stack.push(pD);
+    InterpolationPoint<T> TE = stack.push(pE);
 
     assertThat(stack).isUnsatisfiable();
 
@@ -688,12 +689,12 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     BooleanFormula R2 = imgr.equal(d, e);
     BooleanFormula D = imgr.equal(e, five);
 
-    T TA = stack.push(A);
-    T TB = stack.push(B);
-    T TC = stack.push(C);
-    T TD = stack.push(D);
-    T TR1 = stack.push(R1);
-    T TR2 = stack.push(R2);
+    InterpolationPoint<T> TA = stack.push(A);
+    InterpolationPoint<T> TB = stack.push(B);
+    InterpolationPoint<T> TC = stack.push(C);
+    InterpolationPoint<T> TD = stack.push(D);
+    InterpolationPoint<T> TR1 = stack.push(R1);
+    InterpolationPoint<T> TR2 = stack.push(R2);
 
     assertThat(stack).isUnsatisfiable();
 
@@ -747,11 +748,11 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     BooleanFormula R2 = imgr.equal(d, e);
     BooleanFormula D = imgr.equal(e, five);
 
-    Set<T> TB = ImmutableSet.of(stack.push(A), stack.push(B));
-    Set<T> TR1 = ImmutableSet.of(stack.push(R1));
-    Set<T> TC = ImmutableSet.of(stack.push(A), stack.push(C));
-    Set<T> TR2 = ImmutableSet.of(stack.push(R2));
-    Set<T> TD = ImmutableSet.of(stack.push(A), stack.push(D));
+    Set<InterpolationPoint<T>> TB = ImmutableSet.of(stack.push(A), stack.push(B));
+    Set<InterpolationPoint<T>> TR1 = ImmutableSet.of(stack.push(R1));
+    Set<InterpolationPoint<T>> TC = ImmutableSet.of(stack.push(A), stack.push(C));
+    Set<InterpolationPoint<T>> TR2 = ImmutableSet.of(stack.push(R2));
+    Set<InterpolationPoint<T>> TD = ImmutableSet.of(stack.push(A), stack.push(D));
 
     assertThat(stack).isUnsatisfiable();
 
@@ -796,10 +797,10 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     BooleanFormula bPlusCEqualsA = imgr.equal(imgr.add(b, c), a);
     BooleanFormula aEquals9 = imgr.equal(a, imgr.makeNumber(9));
 
-    T TbEquals1 = stack.push(bEquals1);
-    T TcEquals2 = stack.push(cEquals2);
-    T TbPlusCEqualsA = stack.push(bPlusCEqualsA);
-    T TaEquals9 = stack.push(aEquals9);
+    InterpolationPoint<T> TbEquals1 = stack.push(bEquals1);
+    InterpolationPoint<T> TcEquals2 = stack.push(cEquals2);
+    InterpolationPoint<T> TbPlusCEqualsA = stack.push(bPlusCEqualsA);
+    InterpolationPoint<T> TaEquals9 = stack.push(aEquals9);
 
     assertThat(stack).isUnsatisfiable();
 
@@ -841,7 +842,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     BooleanFormula A = imgr.equal(one, a);
     BooleanFormula B = imgr.equal(a, zero);
 
-    List<T> formulas = ImmutableList.of(stack.push(A), stack.push(B));
+    List<InterpolationPoint<T>> formulas = ImmutableList.of(stack.push(A), stack.push(B));
 
     assertThat(stack).isUnsatisfiable();
 
@@ -874,7 +875,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     BooleanFormula E = imgr.equal(d, e);
     BooleanFormula F = imgr.equal(e, zero);
 
-    List<T> formulas =
+    List<InterpolationPoint<T>> formulas =
         ImmutableList.of(
             stack.push(A),
             stack.push(B),
@@ -897,7 +898,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     BooleanFormula A = imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1));
-    Set<T> TA = ImmutableSet.of(stack.push(A));
+    Set<InterpolationPoint<T>> TA = ImmutableSet.of(stack.push(A));
     assertThat(stack).isUnsatisfiable();
 
     stack.getTreeInterpolants(ImmutableList.of(TA), new int[] {0, 0});
@@ -911,7 +912,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     BooleanFormula A = imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1));
-    Set<T> TA = ImmutableSet.of(stack.push(A));
+    Set<InterpolationPoint<T>> TA = ImmutableSet.of(stack.push(A));
     assertThat(stack).isUnsatisfiable();
 
     stack.getTreeInterpolants(ImmutableList.of(TA), new int[] {4});
@@ -925,7 +926,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     BooleanFormula A = imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1));
-    Set<T> TA = ImmutableSet.of(stack.push(A));
+    Set<InterpolationPoint<T>> TA = ImmutableSet.of(stack.push(A));
     assertThat(stack).isUnsatisfiable();
 
     stack.getTreeInterpolants(ImmutableList.of(TA, TA), new int[] {1, 0});
@@ -939,7 +940,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     BooleanFormula A = imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1));
-    T TA = stack.push(A);
+    InterpolationPoint<T> TA = stack.push(A);
     assertThat(stack).isUnsatisfiable();
 
     stack.getTreeInterpolants0(ImmutableList.of(TA, TA, TA), new int[] {0, 1, 1});
@@ -953,7 +954,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     BooleanFormula A = imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1));
-    T TA = stack.push(A);
+    InterpolationPoint<T> TA = stack.push(A);
     assertThat(stack).isUnsatisfiable();
 
     stack.getTreeInterpolants0(ImmutableList.of(TA, TA, TA), new int[] {0, 1, 2});
@@ -967,7 +968,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     BooleanFormula A = imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1));
-    T TA = stack.push(A);
+    InterpolationPoint<T> TA = stack.push(A);
     assertThat(stack).isUnsatisfiable();
 
     stack.getTreeInterpolants0(ImmutableList.of(TA, TA, TA), new int[] {0, 2, 0});
@@ -1005,13 +1006,13 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     BooleanFormula A = imgr.equal(one, a);
     BooleanFormula B = imgr.equal(a, zero);
 
-    T TA = stack.push(A);
-    T TB = stack.push(B);
+    InterpolationPoint<T> TA = stack.push(A);
+    InterpolationPoint<T> TB = stack.push(B);
 
     assertThat(stack).isUnsatisfiable();
 
     // list of one partition
-    List<T> partition = ImmutableList.of(TA, TB);
+    List<InterpolationPoint<T>> partition = ImmutableList.of(TA, TB);
     List<BooleanFormula> itps =
         stack.getTreeInterpolants(ImmutableList.of(partition), new int[] {0});
     assertThat(itps).isEmpty();
@@ -1080,8 +1081,8 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
             bvmgr.equal(c, bv0));
 
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
-      T id1 = prover.push(f2);
-      T id2 = prover.push(f1);
+      InterpolationPoint<T> id1 = prover.push(f2);
+      InterpolationPoint<T> id2 = prover.push(f1);
       assertThat(prover).isUnsatisfiable();
       @SuppressWarnings("unused")
       List<BooleanFormula> interpolants = prover.getSeqInterpolants0(ImmutableList.of(id1, id2));
@@ -1100,7 +1101,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
     // build formula "1 = A = 0", then check interpolant
     BooleanFormula A = bmgr.and(imgr.equal(a, zero), imgr.equal(a, one));
-    T p1 = stack.push(A);
+    InterpolationPoint<T> p1 = stack.push(A);
     assertThat(stack).isUnsatisfiable();
     BooleanFormula interpol1 = stack.getInterpolant(ImmutableList.of(p1));
     assertThatFormula(interpol1).isEqualTo(bmgr.makeFalse());
@@ -1109,7 +1110,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     // build formulas "a < 0" and "b < 0 && 1 < b", then check interpolant
     BooleanFormula B1 = imgr.lessThan(a, zero);
     BooleanFormula B2 = bmgr.and(imgr.lessThan(b, zero), imgr.lessThan(one, b));
-    T p2 = stack.push(B1);
+    InterpolationPoint<T> p2 = stack.push(B1);
     stack.push(B2);
     assertThat(stack).isUnsatisfiable();
     BooleanFormula interpol2 = stack.getInterpolant(ImmutableList.of(p2));
@@ -1144,12 +1145,12 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     IntegerFormula zero = imgr.makeNumber(0);
     IntegerFormula one = imgr.makeNumber(1);
     IntegerFormula a = imgr.makeVariable("a");
-    T p1 = stack.push(imgr.lessThan(a, zero));
-    T p2 = stack.push(imgr.lessThan(one, a));
+    InterpolationPoint<T> p1 = stack.push(imgr.lessThan(a, zero));
+    InterpolationPoint<T> p2 = stack.push(imgr.lessThan(one, a));
     assertThat(stack).isUnsatisfiable();
 
     // try to solve with a null-token
-    List<T> lst = new ArrayList<>();
+    List<InterpolationPoint<T>> lst = new ArrayList<>();
     lst.add(null);
     assertThrows(IllegalArgumentException.class, () -> stack.getInterpolant(lst));
 
@@ -1177,7 +1178,8 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
     // and try to solve with the token
     assertThrows(
-        IllegalArgumentException.class, () -> stack.getInterpolant(ImmutableList.of((T) p3)));
+        IllegalArgumentException.class,
+        () -> stack.getInterpolant(ImmutableList.of(InterpolationPoint.create((T) p3))));
   }
 
   /*

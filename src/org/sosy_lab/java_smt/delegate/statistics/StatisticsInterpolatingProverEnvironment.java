@@ -12,10 +12,12 @@ import java.util.Collection;
 import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
+import org.sosy_lab.java_smt.api.InterpolationPoint;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.delegate.statistics.TimerPool.TimerWrapper;
 
-class StatisticsInterpolatingProverEnvironment<T> extends StatisticsBasicProverEnvironment<T>
+class StatisticsInterpolatingProverEnvironment<T>
+    extends StatisticsBasicProverEnvironment<InterpolationPoint<T>>
     implements InterpolatingProverEnvironment<T> {
 
   private final InterpolatingProverEnvironment<T> delegate;
@@ -29,7 +31,7 @@ class StatisticsInterpolatingProverEnvironment<T> extends StatisticsBasicProverE
   }
 
   @Override
-  public BooleanFormula getInterpolant(Collection<T> pFormulasOfA)
+  public BooleanFormula getInterpolant(Collection<InterpolationPoint<T>> pFormulasOfA)
       throws SolverException, InterruptedException {
     itpTimer.start();
     try {
@@ -40,7 +42,8 @@ class StatisticsInterpolatingProverEnvironment<T> extends StatisticsBasicProverE
   }
 
   @Override
-  public List<BooleanFormula> getSeqInterpolants(List<? extends Collection<T>> pPartitionedFormulas)
+  public List<BooleanFormula> getSeqInterpolants(
+      List<? extends Collection<InterpolationPoint<T>>> pPartitionedFormulas)
       throws SolverException, InterruptedException {
     itpTimer.start();
     try {
@@ -52,7 +55,7 @@ class StatisticsInterpolatingProverEnvironment<T> extends StatisticsBasicProverE
 
   @Override
   public List<BooleanFormula> getTreeInterpolants(
-      List<? extends Collection<T>> pPartitionedFormulas, int[] pStartOfSubTree)
+      List<? extends Collection<InterpolationPoint<T>>> pPartitionedFormulas, int[] pStartOfSubTree)
       throws SolverException, InterruptedException {
     itpTimer.start();
     try {

@@ -31,6 +31,7 @@ import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
+import org.sosy_lab.java_smt.api.InterpolationPoint;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -245,7 +246,7 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
     try (InterpolatingProverEnvironment<T> prover =
         (InterpolatingProverEnvironment<T>) context.newProverEnvironmentWithInterpolation()) {
       prover.push(f1);
-      T id2 = prover.push(f2);
+      InterpolationPoint<T> id2 = prover.push(f2);
 
       assertThat(prover).isUnsatisfiable();
 
@@ -271,7 +272,7 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
 
     try (InterpolatingProverEnvironment<T> prover =
         (InterpolatingProverEnvironment<T>) context.newProverEnvironmentWithInterpolation()) {
-      T id1 = prover.push(f1);
+      InterpolationPoint<T> id1 = prover.push(f1);
 
       // push a formula in another thread, i.e., non-locally
       Future<?> task1 =

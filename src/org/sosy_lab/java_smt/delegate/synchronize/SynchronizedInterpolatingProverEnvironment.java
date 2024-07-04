@@ -12,10 +12,12 @@ import java.util.Collection;
 import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
+import org.sosy_lab.java_smt.api.InterpolationPoint;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
 
-class SynchronizedInterpolatingProverEnvironment<T> extends SynchronizedBasicProverEnvironment<T>
+class SynchronizedInterpolatingProverEnvironment<T>
+    extends SynchronizedBasicProverEnvironment<InterpolationPoint<T>>
     implements InterpolatingProverEnvironment<T> {
 
   private final InterpolatingProverEnvironment<T> delegate;
@@ -27,7 +29,7 @@ class SynchronizedInterpolatingProverEnvironment<T> extends SynchronizedBasicPro
   }
 
   @Override
-  public BooleanFormula getInterpolant(Collection<T> pFormulasOfA)
+  public BooleanFormula getInterpolant(Collection<InterpolationPoint<T>> pFormulasOfA)
       throws SolverException, InterruptedException {
     synchronized (sync) {
       return delegate.getInterpolant(pFormulasOfA);
@@ -35,7 +37,8 @@ class SynchronizedInterpolatingProverEnvironment<T> extends SynchronizedBasicPro
   }
 
   @Override
-  public List<BooleanFormula> getSeqInterpolants(List<? extends Collection<T>> pPartitionedFormulas)
+  public List<BooleanFormula> getSeqInterpolants(
+      List<? extends Collection<InterpolationPoint<T>>> pPartitionedFormulas)
       throws SolverException, InterruptedException {
     synchronized (sync) {
       return delegate.getSeqInterpolants(pPartitionedFormulas);
@@ -44,7 +47,7 @@ class SynchronizedInterpolatingProverEnvironment<T> extends SynchronizedBasicPro
 
   @Override
   public List<BooleanFormula> getTreeInterpolants(
-      List<? extends Collection<T>> pPartitionedFormulas, int[] pStartOfSubTree)
+      List<? extends Collection<InterpolationPoint<T>>> pPartitionedFormulas, int[] pStartOfSubTree)
       throws SolverException, InterruptedException {
     synchronized (sync) {
       return delegate.getTreeInterpolants(pPartitionedFormulas, pStartOfSubTree);

@@ -15,11 +15,12 @@ import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
+import org.sosy_lab.java_smt.api.InterpolationPoint;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
 
 class SynchronizedInterpolatingProverEnvironmentWithContext<T>
-    extends SynchronizedBasicProverEnvironmentWithContext<T>
+    extends SynchronizedBasicProverEnvironmentWithContext<InterpolationPoint<T>>
     implements InterpolatingProverEnvironment<T> {
 
   private final InterpolatingProverEnvironment<T> delegate;
@@ -34,20 +35,21 @@ class SynchronizedInterpolatingProverEnvironmentWithContext<T>
   }
 
   @Override
-  public BooleanFormula getInterpolant(Collection<T> pFormulasOfA)
+  public BooleanFormula getInterpolant(Collection<InterpolationPoint<T>> pFormulasOfA)
       throws SolverException, InterruptedException {
     return manager.translateFrom(delegate.getInterpolant(pFormulasOfA), otherManager);
   }
 
   @Override
-  public List<BooleanFormula> getSeqInterpolants(List<? extends Collection<T>> pPartitionedFormulas)
+  public List<BooleanFormula> getSeqInterpolants(
+      List<? extends Collection<InterpolationPoint<T>>> pPartitionedFormulas)
       throws SolverException, InterruptedException {
     return translate(delegate.getSeqInterpolants(pPartitionedFormulas), otherManager, manager);
   }
 
   @Override
   public List<BooleanFormula> getTreeInterpolants(
-      List<? extends Collection<T>> pPartitionedFormulas, int[] pStartOfSubTree)
+      List<? extends Collection<InterpolationPoint<T>>> pPartitionedFormulas, int[] pStartOfSubTree)
       throws SolverException, InterruptedException {
     return translate(
         delegate.getTreeInterpolants(pPartitionedFormulas, pStartOfSubTree), otherManager, manager);

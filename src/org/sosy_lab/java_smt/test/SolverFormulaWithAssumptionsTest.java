@@ -22,6 +22,7 @@ import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
+import org.sosy_lab.java_smt.api.InterpolationPoint;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -87,7 +88,7 @@ public class SolverFormulaWithAssumptionsTest
 
     try (InterpolatingProverEnvironment<T> env = newEnvironmentForTest()) {
 
-      T firstPartForInterpolant = env.push(term1);
+      InterpolationPoint<T> firstPartForInterpolant = env.push(term1);
       env.push(term2);
       env.push(term3);
 
@@ -137,7 +138,7 @@ public class SolverFormulaWithAssumptionsTest
     for (int i = 2; i < n; i++) {
       try (InterpolatingProverEnvironment<T> env = newEnvironmentForTest()) {
 
-        List<T> ids = new ArrayList<>();
+        List<InterpolationPoint<T>> ids = new ArrayList<>();
         for (int j = 0; j < i; j++) {
           ids.add(env.push(terms.get(j)));
         }

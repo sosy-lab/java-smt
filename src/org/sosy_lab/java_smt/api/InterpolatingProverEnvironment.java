@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -23,7 +23,8 @@ import java.util.List;
  *     to this interface.
  * @param <T> The type of the objects which can be used to select formulas for interpolant creation.
  */
-public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironment<T> {
+public interface InterpolatingProverEnvironment<T>
+    extends BasicProverEnvironment<InterpolationPoint<T>> {
 
   /**
    * Get an interpolant for two groups of formulas. This should be called only immediately after an
@@ -42,7 +43,7 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
    * @throws SolverException if interpolant cannot be computed, for example because interpolation
    *     procedure is incomplete
    */
-  BooleanFormula getInterpolant(Collection<T> formulasOfA)
+  BooleanFormula getInterpolant(Collection<InterpolationPoint<T>> formulasOfA)
       throws SolverException, InterruptedException;
 
   /**
@@ -61,7 +62,8 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
    * @throws SolverException if interpolant cannot be computed, for example because interpolation
    *     procedure is incomplete
    */
-  default List<BooleanFormula> getSeqInterpolants(List<? extends Collection<T>> partitionedFormulas)
+  default List<BooleanFormula> getSeqInterpolants(
+      List<? extends Collection<InterpolationPoint<T>>> partitionedFormulas)
       throws SolverException, InterruptedException {
     // a 'tree' with all subtrees starting at 0 is called a 'sequence'
     return getTreeInterpolants(partitionedFormulas, new int[partitionedFormulas.size()]);
@@ -73,7 +75,7 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
    *
    * @see #getSeqInterpolants
    */
-  default List<BooleanFormula> getSeqInterpolants0(List<T> formulas)
+  default List<BooleanFormula> getSeqInterpolants0(List<InterpolationPoint<T>> formulas)
       throws SolverException, InterruptedException {
     return getSeqInterpolants(Lists.transform(formulas, ImmutableSet::of));
   }
@@ -113,7 +115,7 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
    *     procedure is incomplete
    */
   List<BooleanFormula> getTreeInterpolants(
-      List<? extends Collection<T>> partitionedFormulas, int[] startOfSubTree)
+      List<? extends Collection<InterpolationPoint<T>>> partitionedFormulas, int[] startOfSubTree)
       throws SolverException, InterruptedException;
 
   /**
@@ -122,7 +124,8 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
    *
    * @see #getTreeInterpolants
    */
-  default List<BooleanFormula> getTreeInterpolants0(List<T> formulas, int[] startOfSubTree)
+  default List<BooleanFormula> getTreeInterpolants0(
+      List<InterpolationPoint<T>> formulas, int[] startOfSubTree)
       throws SolverException, InterruptedException {
     return getTreeInterpolants(Lists.transform(formulas, ImmutableSet::of), startOfSubTree);
   }

@@ -11,7 +11,9 @@ package org.sosy_lab.java_smt.solvers.opensmt;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,6 +24,7 @@ import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
+import org.sosy_lab.java_smt.api.InterpolationPoint;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtSolverContext.OpenSMTOptions;
 import org.sosy_lab.java_smt.solvers.opensmt.api.PTRef;
@@ -29,7 +32,7 @@ import org.sosy_lab.java_smt.solvers.opensmt.api.VectorInt;
 import org.sosy_lab.java_smt.solvers.opensmt.api.VectorPTRef;
 import org.sosy_lab.java_smt.solvers.opensmt.api.VectorVectorInt;
 
-class OpenSmtInterpolatingProver extends OpenSmtAbstractProver<Integer>
+class OpenSmtInterpolatingProver extends OpenSmtAbstractProver<InterpolationPoint<Integer>>
     implements InterpolatingProverEnvironment<Integer> {
 
   // OpenSMT internally tracks all asserted formulas in one array and identifies them by index.
@@ -53,11 +56,11 @@ class OpenSmtInterpolatingProver extends OpenSmtAbstractProver<Integer>
   }
 
   @Override
-  public Integer addConstraintImpl(PTRef f) throws InterruptedException {
+  public InterpolationPoint<Integer> addConstraintImpl(PTRef f) throws InterruptedException {
     osmtSolver.insertFormula(f);
     Integer id = trackedConstraints.pop();
     trackedConstraints.push(id + 1);
-    return id;
+    return InterpolationPoint.create(id);
   }
 
   @Override
@@ -73,32 +76,36 @@ class OpenSmtInterpolatingProver extends OpenSmtAbstractProver<Integer>
   }
 
   @Override
-  public BooleanFormula getInterpolant(Collection<Integer> formulasOfA) {
+  public BooleanFormula getInterpolant(Collection<InterpolationPoint<Integer>> formulasOfA) {
     checkState(!closed);
     checkArgument(
         getAssertedConstraintIds().containsAll(formulasOfA),
         "interpolation can only be done over previously asserted formulas.");
 
     return creator.encapsulateBoolean(
-        osmtSolver.getInterpolationContext().getSingleInterpolant(new VectorInt(formulasOfA)));
+        osmtSolver
+            .getInterpolationContext()
+            .getSingleInterpolant(
+                new VectorInt(Iterables.transform(formulasOfA, InterpolationPoint::getReference))));
   }
 
   @Override
   public List<BooleanFormula> getSeqInterpolants(
-      List<? extends Collection<Integer>> partitionedFormulas) {
+      List<? extends Collection<InterpolationPoint<Integer>>> partitionedFormulas) {
     checkState(!closed);
     checkArgument(!partitionedFormulas.isEmpty(), "Interpolation sequence must not be empty");
-    final ImmutableSet<Integer> assertedConstraintIds = getAssertedConstraintIds();
+    final ImmutableSet<InterpolationPoint<Integer>> assertedConstraintIds =
+        getAssertedConstraintIds();
     checkArgument(
         partitionedFormulas.stream().allMatch(assertedConstraintIds::containsAll),
         "interpolation can only be done over previously asserted formulas.");
 
     VectorVectorInt partitions = new VectorVectorInt();
     for (int i = 1; i < partitionedFormulas.size(); i++) {
-      VectorInt prefix = new VectorInt();
-      for (Collection<Integer> key : partitionedFormulas.subList(0, i)) {
-        prefix.addAll(key);
-      }
+      VectorInt prefix =
+          new VectorInt(
+              FluentIterable.concat(partitionedFormulas.subList(0, i))
+                  .transform(InterpolationPoint::getReference));
       partitions.add(prefix);
     }
 
@@ -113,7 +120,8 @@ class OpenSmtInterpolatingProver extends OpenSmtAbstractProver<Integer>
 
   @Override
   public List<BooleanFormula> getTreeInterpolants(
-      List<? extends Collection<Integer>> partitionedFormulas, int[] startOfSubTree) {
+      List<? extends Collection<InterpolationPoint<Integer>>> partitionedFormulas,
+      int[] startOfSubTree) {
     throw new UnsupportedOperationException("OpenSMT does not support tree interpolants");
   }
 

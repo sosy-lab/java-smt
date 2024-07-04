@@ -25,6 +25,7 @@ import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.io.IO;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.InterpolationPoint;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
@@ -70,9 +71,10 @@ class LoggingSmtInterpolInterpolatingProver extends SmtInterpolInterpolatingProv
   }
 
   @Override
-  protected String addConstraintImpl(BooleanFormula f) throws InterruptedException {
-    String result = super.addConstraintImpl(f);
-    out.println("(assert (! " + f + " :named " + result + "))");
+  protected InterpolationPoint<String> addConstraintImpl(BooleanFormula f)
+      throws InterruptedException {
+    InterpolationPoint<String> result = super.addConstraintImpl(f);
+    out.println("(assert (! " + f + " :named " + result.getReference() + "))");
     return result;
   }
 
@@ -99,17 +101,18 @@ class LoggingSmtInterpolInterpolatingProver extends SmtInterpolInterpolatingProv
 
   @Override
   public List<BooleanFormula> getTreeInterpolants(
-      List<? extends Collection<String>> partitionedTermNames, int[] startOfSubTree)
+      List<? extends Collection<InterpolationPoint<String>>> partitionedTermNames,
+      int[] startOfSubTree)
       throws SolverException, InterruptedException {
     Preconditions.checkArgument(partitionedTermNames.size() == startOfSubTree.length);
     out.print("(get-interpolants");
     Deque<Integer> subtrees = new ArrayDeque<>();
     for (int i = 0; i < startOfSubTree.length; i++) {
-      final Collection<String> names = partitionedTermNames.get(i);
+      final Collection<InterpolationPoint<String>> names = partitionedTermNames.get(i);
       final int currentStartOfSubtree = startOfSubTree[i];
       final String currentTerms;
       if (names.size() == 1) {
-        currentTerms = names.iterator().next();
+        currentTerms = names.iterator().next().getReference();
       } else {
         currentTerms = "(and " + Joiner.on(" ").join(names) + ")";
       }

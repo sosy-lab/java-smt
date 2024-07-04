@@ -33,6 +33,7 @@ import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
+import org.sosy_lab.java_smt.api.InterpolationPoint;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.NumeralFormula;
@@ -1007,9 +1008,10 @@ public class FloatingPointFormulaManagerTest
     FloatingPointFormula var = fpmgr.makeVariable("x", singlePrecType);
     BooleanFormula f1 = fpmgr.equalWithFPSemantics(var, zero);
     BooleanFormula f2 = bmgr.not(fpmgr.isZero(var));
-    try (InterpolatingProverEnvironment<Object> prover =
-        (InterpolatingProverEnvironment<Object>) context.newProverEnvironmentWithInterpolation()) {
-      Object itpGroup1 = prover.push(f1);
+    try (InterpolatingProverEnvironment<InterpolationPoint<?>> prover =
+        (InterpolatingProverEnvironment<InterpolationPoint<?>>)
+            context.newProverEnvironmentWithInterpolation()) {
+      InterpolationPoint<InterpolationPoint<?>> itpGroup1 = prover.push(f1);
       prover.push(f2);
 
       assertThat(prover).isUnsatisfiable();

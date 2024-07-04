@@ -19,7 +19,6 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import com.google.common.primitives.Ints;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -28,10 +27,11 @@ import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
+import org.sosy_lab.java_smt.api.InterpolationPoint;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
-class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
+class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<InterpolationPoint<Integer>>
     implements InterpolatingProverEnvironment<Integer> {
 
   private static final ImmutableSet<String> ALLOWED_FAILURE_MESSAGES =
@@ -70,13 +70,14 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
   }
 
   @Override
-  protected Integer addConstraintImpl(BooleanFormula f) throws InterruptedException {
+  protected InterpolationPoint<Integer> addConstraintImpl(BooleanFormula f)
+      throws InterruptedException {
     closeAllEvaluators();
     int group = msat_create_itp_group(curEnv);
     msat_set_itp_group(curEnv, group);
     long t = creator.extractInfo(f);
     msat_assert_formula(curEnv, t);
-    return group;
+    return InterpolationPoint.create(group);
   }
 
   @Override
@@ -99,13 +100,14 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
   }
 
   @Override
-  public BooleanFormula getInterpolant(Collection<Integer> formulasOfA) throws SolverException {
+  public BooleanFormula getInterpolant(Collection<InterpolationPoint<Integer>> formulasOfA)
+      throws SolverException {
     Preconditions.checkState(!closed);
     checkArgument(
         getAssertedConstraintIds().containsAll(formulasOfA),
         "interpolation can only be done over previously asserted formulas.");
 
-    int[] groupsOfA = Ints.toArray(formulasOfA);
+    int[] groupsOfA = formulasOfA.stream().mapToInt(InterpolationPoint::getReference).toArray();
     long itp;
     try {
       itp = msat_get_interpolant(curEnv, groupsOfA);
@@ -125,10 +127,12 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
 
   @Override
   public List<BooleanFormula> getSeqInterpolants(
-      List<? extends Collection<Integer>> partitionedFormulas) throws SolverException {
+      List<? extends Collection<InterpolationPoint<Integer>>> partitionedFormulas)
+      throws SolverException {
     Preconditions.checkArgument(
         !partitionedFormulas.isEmpty(), "at least one partition should be available.");
-    final ImmutableSet<Integer> assertedConstraintIds = getAssertedConstraintIds();
+    final ImmutableSet<InterpolationPoint<Integer>> assertedConstraintIds =
+        getAssertedConstraintIds();
     checkArgument(
         partitionedFormulas.stream().allMatch(assertedConstraintIds::containsAll),
         "interpolation can only be done over previously asserted formulas.");
@@ -145,7 +149,8 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
 
   @Override
   public List<BooleanFormula> getTreeInterpolants(
-      List<? extends Collection<Integer>> partitionedFormulas, int[] startOfSubTree) {
+      List<? extends Collection<InterpolationPoint<Integer>>> partitionedFormulas,
+      int[] startOfSubTree) {
     throw new UnsupportedOperationException(
         "directly receiving tree interpolants is not supported."
             + "Use another solver or another strategy for interpolants.");

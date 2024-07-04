@@ -17,6 +17,7 @@ import ap.basetypes.Tree;
 import ap.parser.IBoolLit;
 import ap.parser.IFormula;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -32,12 +33,13 @@ import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
+import org.sosy_lab.java_smt.api.InterpolationPoint;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import scala.collection.Seq;
 import scala.collection.mutable.ArrayBuffer;
 
-class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
+class PrincessInterpolatingProver extends PrincessAbstractProver<InterpolationPoint<Integer>>
     implements InterpolatingProverEnvironment<Integer> {
 
   PrincessInterpolatingProver(
@@ -50,21 +52,25 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
   }
 
   @Override
-  protected Integer addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
-    return addConstraint0(constraint);
+  protected InterpolationPoint<Integer> addConstraintImpl(BooleanFormula constraint)
+      throws InterruptedException {
+    return InterpolationPoint.create(addConstraint0(constraint));
   }
 
   @Override
-  public BooleanFormula getInterpolant(Collection<Integer> pTermNamesOfA) throws SolverException {
+  public BooleanFormula getInterpolant(Collection<InterpolationPoint<Integer>> pTermNamesOfA)
+      throws SolverException {
     Preconditions.checkState(!closed);
     checkArgument(
         getAssertedConstraintIds().containsAll(pTermNamesOfA),
         "interpolation can only be done over previously asserted formulas.");
 
-    Set<Integer> indexesOfA = ImmutableSet.copyOf(pTermNamesOfA);
+    Set<InterpolationPoint<Integer>> indexesOfA = ImmutableSet.copyOf(pTermNamesOfA);
 
     // calc difference: termNamesOfB := assertedFormulas - termNamesOfA
-    Set<Integer> indexesOfB = Sets.difference(partitions.peek().keySet(), indexesOfA);
+    Set<InterpolationPoint<Integer>> allIndizes =
+        Set.copyOf(Collections2.transform(partitions.peek().keySet(), InterpolationPoint::create));
+    Set<InterpolationPoint<Integer>> indexesOfB = Sets.difference(allIndizes, indexesOfA);
 
     // get interpolant of groups
     List<BooleanFormula> itp = getSeqInterpolants(ImmutableList.of(indexesOfA, indexesOfB));
@@ -75,19 +81,22 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
 
   @Override
   public List<BooleanFormula> getSeqInterpolants(
-      final List<? extends Collection<Integer>> pPartitions) throws SolverException {
+      final List<? extends Collection<InterpolationPoint<Integer>>> pPartitions)
+      throws SolverException {
     Preconditions.checkState(!closed);
     Preconditions.checkArgument(
         !pPartitions.isEmpty(), "at least one partition should be available.");
-    final ImmutableSet<Integer> assertedConstraintIds = getAssertedConstraintIds();
+    final ImmutableSet<InterpolationPoint<Integer>> assertedConstraintIds =
+        getAssertedConstraintIds();
     checkArgument(
         pPartitions.stream().allMatch(assertedConstraintIds::containsAll),
         "interpolation can only be done over previously asserted formulas.");
 
     // convert to needed data-structure
     final ArrayBuffer<scala.collection.immutable.Set<Object>> args = new ArrayBuffer<>();
-    for (Collection<Integer> partition : pPartitions) {
-      args.$plus$eq(asScala(partition).toSet());
+    for (Collection<InterpolationPoint<Integer>> partition : pPartitions) {
+      args.$plus$eq(
+          asScala(Collections2.transform(partition, InterpolationPoint::getReference)).toSet());
     }
 
     // do the hard work
@@ -116,10 +125,12 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
 
   @Override
   public List<BooleanFormula> getTreeInterpolants(
-      List<? extends Collection<Integer>> partitionedFormulas, int[] startOfSubTree)
+      List<? extends Collection<InterpolationPoint<Integer>>> partitionedFormulas,
+      int[] startOfSubTree)
       throws SolverException {
     Preconditions.checkState(!closed);
-    final ImmutableSet<Integer> assertedConstraintIds = getAssertedConstraintIds();
+    final ImmutableSet<InterpolationPoint<Integer>> assertedConstraintIds =
+        getAssertedConstraintIds();
     checkArgument(
         partitionedFormulas.stream().allMatch(assertedConstraintIds::containsAll),
         "interpolation can only be done over previously asserted formulas.");
@@ -141,7 +152,13 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
         children.$plus$eq$colon(stack.pop()); // prepend
       }
       subtreeStarts.push(start);
-      stack.push(new Tree<>(asScala(partitionedFormulas.get(i)).toSet(), children.toList()));
+      stack.push(
+          new Tree<>(
+              asScala(
+                      Collections2.transform(
+                          partitionedFormulas.get(i), InterpolationPoint::getReference))
+                  .toSet(),
+              children.toList()));
     }
 
     Preconditions.checkState(subtreeStarts.peek() == 0, "subtree of root should start at 0.");
