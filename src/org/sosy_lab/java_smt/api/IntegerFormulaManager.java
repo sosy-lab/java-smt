@@ -28,7 +28,7 @@ public interface IntegerFormulaManager
   /**
    * Create a formula representing the modulo of two operands.
    *
-   * <p>If the denumerator evaluates to zero (modulo-by-zero), either directly as value or
+   * <p>If the denominator evaluates to zero (modulo-by-zero), either directly as value or
    * indirectly via an additional constraint, then the solver is allowed to choose an arbitrary
    * value for the result of the modulo operation (cf. SMTLIB standard for the division operator in
    * Ints or Reals theory).
@@ -36,7 +36,7 @@ public interface IntegerFormulaManager
    * <p>Note: Some solvers, e.g., Yices2, abort with an exception when exploring a modulo-by-zero
    * during the SAT-check. This is not compliant to the SMTLIB standard, but sadly happens.
    */
-  IntegerFormula modulo(IntegerFormula numerator, IntegerFormula denumerator);
+  IntegerFormula modulo(IntegerFormula numerator, IntegerFormula denominator);
 
   @Override
   default FormulaType<IntegerFormula> getFormulaType() {

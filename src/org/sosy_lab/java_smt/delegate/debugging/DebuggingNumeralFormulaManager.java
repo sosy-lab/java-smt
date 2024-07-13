@@ -137,11 +137,11 @@ public class DebuggingNumeralFormulaManager<
   }
 
   @Override
-  public ResultFormulaType divide(ParamFormulaType numerator, ParamFormulaType denumerator) {
+  public ResultFormulaType divide(ParamFormulaType numerator, ParamFormulaType denominator) {
     debugging.assertThreadLocal();
     debugging.assertFormulaInContext(numerator);
-    debugging.assertFormulaInContext(denumerator);
-    ResultFormulaType result = delegate.divide(numerator, denumerator);
+    debugging.assertFormulaInContext(denominator);
+    ResultFormulaType result = delegate.divide(numerator, denominator);
     debugging.addFormulaTerm(result);
     return result;
   }
