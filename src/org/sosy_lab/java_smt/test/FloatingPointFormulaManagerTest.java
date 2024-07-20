@@ -55,6 +55,7 @@ public class FloatingPointFormulaManagerTest
   private FloatingPointFormula negInf;
   private FloatingPointFormula zero;
   private FloatingPointFormula one;
+  private FloatingPointFormula negZero;
 
   @Before
   public void init() {
@@ -66,6 +67,7 @@ public class FloatingPointFormulaManagerTest
     posInf = fpmgr.makePlusInfinity(singlePrecType);
     negInf = fpmgr.makeMinusInfinity(singlePrecType);
     zero = fpmgr.makeNumber(0.0, singlePrecType);
+    negZero = fpmgr.makeNumber(-0.0, singlePrecType);
     one = fpmgr.makeNumber(1.0, singlePrecType);
   }
 
@@ -131,8 +133,7 @@ public class FloatingPointFormulaManagerTest
   public void negativeZeroDivision() throws SolverException, InterruptedException {
     BooleanFormula formula =
         fpmgr.equalWithFPSemantics(
-            fpmgr.divide(
-                one, fpmgr.makeNumber(-0.0, singlePrecType), FloatingPointRoundingMode.TOWARD_ZERO),
+            fpmgr.divide(one, negZero, FloatingPointRoundingMode.TOWARD_ZERO),
             fpmgr.makeMinusInfinity(singlePrecType));
     assertThatFormula(formula).isSatisfiable();
     assertThatFormula(bmgr.not(formula)).isUnsatisfiable();
@@ -267,8 +268,8 @@ public class FloatingPointFormulaManagerTest
     assertThatFormula(fpmgr.isSubnormal(zero)).isUnsatisfiable();
     assertThatFormula(fpmgr.isSubnormal(zero)).isUnsatisfiable();
 
-    FloatingPointFormula negZero = fpmgr.makeNumber(-0.0, singlePrecType);
     assertThatFormula(fpmgr.isZero(negZero)).isTautological();
+    assertThatFormula(fpmgr.equalWithFPSemantics(zero, negZero)).isTautological();
     assertThatFormula(fpmgr.isSubnormal(negZero)).isUnsatisfiable();
     assertThatFormula(fpmgr.isSubnormal(negZero)).isUnsatisfiable();
 
@@ -1054,6 +1055,29 @@ public class FloatingPointFormulaManagerTest
               BigInteger.valueOf(exponent), BigInteger.valueOf(mantissa), sign, doublePrecType);
       final FloatingPointFormula fp = fpmgr.makeNumber(d, doublePrecType);
       assertEqualsAsFormula(fpFromBv, fp);
+    }
+  }
+
+  @Test
+  public void fpFromNumberIntoTooNarrowType() throws SolverException, InterruptedException {
+    // near zero rounds to zero, if precision is too narrow
+    for (double nearZero : new double[] {Double.MIN_VALUE, Float.MIN_VALUE / 2d}) {
+      assertThatFormula(
+              fpmgr.equalWithFPSemantics(zero, fpmgr.makeNumber(nearZero, singlePrecType)))
+          .isTautological();
+      assertThatFormula(
+              fpmgr.equalWithFPSemantics(negZero, fpmgr.makeNumber(-nearZero, singlePrecType)))
+          .isTautological();
+    }
+
+    // near infinity rounds to infinity, if precision is too narrow
+    for (double nearInf : new double[] {Double.MAX_VALUE, Float.MAX_VALUE * 2d}) {
+      assertThatFormula(
+              fpmgr.equalWithFPSemantics(posInf, fpmgr.makeNumber(nearInf, singlePrecType)))
+          .isTautological();
+      assertThatFormula(
+              fpmgr.equalWithFPSemantics(negInf, fpmgr.makeNumber(-nearInf, singlePrecType)))
+          .isTautological();
     }
   }
 }
