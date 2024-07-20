@@ -96,8 +96,8 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
         description =
             "Further options for Bitwuzla in addition to the default options. "
                 + "Format:  \"option_name=value\" with ’,’ to separate options. "
-                + "Option names and values can be found in the Bitwuzla documentation online:"
-                + "https://bitwuzla.github.io/docs/cpp/enums/option.html#_CPPv4N8bitwuzla6OptionE"
+                + "Option names and values can be found in the Bitwuzla documentation online: "
+                + "https://bitwuzla.github.io/docs/cpp/enums/option.html#_CPPv4N8bitwuzla6OptionE "
                 + "Example: \"PRODUCE_MODELS=2,SAT_SOLVER=kissat\".")
     private String furtherOptions = "";
 
