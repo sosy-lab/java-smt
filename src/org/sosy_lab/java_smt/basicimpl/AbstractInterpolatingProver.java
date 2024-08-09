@@ -10,6 +10,23 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
-public abstract class AbstractInterpolatingProver<F> {
+import java.util.Set;
+import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.java_smt.api.BooleanFormulaManager;
+import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 
+public abstract class AbstractInterpolatingProver<F> extends AbstractProverWithAllSat<F>
+    implements InterpolatingProverEnvironment<F> {
+
+  private final FormulaCreator<?, ?, ?, ?> creator;
+
+  protected AbstractInterpolatingProver(
+      Set<ProverOptions> pOptions,
+      BooleanFormulaManager pBmgr,
+      FormulaCreator<?, ?, ?, ?> pCreator,
+      ShutdownNotifier pShutdownNotifier) {
+    super(pOptions, pBmgr, pShutdownNotifier);
+    creator = pCreator;
+  }
 }
