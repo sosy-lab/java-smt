@@ -450,10 +450,10 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
 
     if (declaration.getKind() == FunctionDeclarationKind.CONST) {
       ArrayFormulaType<?, ?> arrayType = (ArrayFormulaType<?, ?>) declaration.getType();
-      Formula elseElem = Iterables.getOnlyElement(args);
+      Formula defaultElement = Iterables.getOnlyElement(args);
       return (T)
           arrayManager.makeArray(
-              arrayType.getIndexType(), getFormulaType(elseElem), Iterables.getOnlyElement(args));
+              arrayType.getIndexType(), getFormulaType(defaultElement), Iterables.getOnlyElement(args));
     }
 
     return formulaCreator.callFunction(declaration, args);

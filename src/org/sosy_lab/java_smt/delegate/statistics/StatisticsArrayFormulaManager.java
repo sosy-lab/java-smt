@@ -58,9 +58,9 @@ class StatisticsArrayFormulaManager implements ArrayFormulaManager {
           TE extends Formula,
           FTI extends FormulaType<TI>,
           FTE extends FormulaType<TE>>
-      ArrayFormula<TI, TE> makeArray(FTI pIndexType, FTE pElementType, TE elseElem) {
+      ArrayFormula<TI, TE> makeArray(FTI pIndexType, FTE pElementType, TE defaultElement) {
     stats.arrayOperations.getAndIncrement();
-    return delegate.makeArray(pIndexType, pElementType, elseElem);
+    return delegate.makeArray(pIndexType, pElementType, defaultElement);
   }
 
   @Override

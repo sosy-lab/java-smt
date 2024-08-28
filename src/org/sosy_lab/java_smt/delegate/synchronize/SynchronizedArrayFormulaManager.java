@@ -62,9 +62,9 @@ class SynchronizedArrayFormulaManager implements ArrayFormulaManager {
           TE extends Formula,
           FTI extends FormulaType<TI>,
           FTE extends FormulaType<TE>>
-      ArrayFormula<TI, TE> makeArray(FTI pIndexType, FTE pElementType, TE elseElem) {
+      ArrayFormula<TI, TE> makeArray(FTI pIndexType, FTE pElementType, TE defaultElement) {
     synchronized (sync) {
-      return delegate.makeArray(pIndexType, pElementType, elseElem);
+      return delegate.makeArray(pIndexType, pElementType, defaultElement);
     }
   }
 
