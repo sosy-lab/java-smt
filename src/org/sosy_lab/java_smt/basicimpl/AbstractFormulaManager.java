@@ -453,7 +453,9 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
       Formula defaultElement = Iterables.getOnlyElement(args);
       return (T)
           arrayManager.makeArray(
-              arrayType.getIndexType(), getFormulaType(defaultElement), Iterables.getOnlyElement(args));
+              arrayType.getIndexType(),
+              getFormulaType(defaultElement),
+              Iterables.getOnlyElement(args));
     }
 
     return formulaCreator.callFunction(declaration, args);

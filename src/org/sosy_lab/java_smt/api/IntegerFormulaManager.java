@@ -26,7 +26,8 @@ public interface IntegerFormulaManager
   BooleanFormula modularCongruence(IntegerFormula number1, IntegerFormula number2, long n);
 
   /**
-   * Create a formula representing the modulo of two operands according to Boute's Euclidean definition.
+   * Create a formula representing the modulo of two operands according to Boute's Euclidean
+   * definition.
    *
    * <p>If the denominator evaluates to zero (modulo-by-zero), either directly as value or
    * indirectly via an additional constraint, then the solver is allowed to choose an arbitrary
@@ -41,8 +42,9 @@ public interface IntegerFormulaManager
    * <li>-10 % 3 == 2
    * <li>-10 % (-3) == 2
    *
-   * <p>Note: Some solvers, e.g., Yices2, abort with an exception when exploring a modulo-by-zero
-   * during the SAT-check. This is not compliant to the SMTLIB standard, but sadly happens.
+   *     <p>Note: Some solvers, e.g., Yices2, abort with an exception when exploring a
+   *     modulo-by-zero during the SAT-check. This is not compliant to the SMTLIB standard, but
+   *     sadly happens.
    */
   IntegerFormula modulo(IntegerFormula numerator, IntegerFormula denominator);
 

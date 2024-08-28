@@ -67,7 +67,8 @@ public interface NumeralFormulaManager<
   ResultFormulaType subtract(ParamFormulaType number1, ParamFormulaType number2);
 
   /**
-   * Create a formula representing the division of two operands according to Boute's Euclidean definition.
+   * Create a formula representing the division of two operands according to Boute's Euclidean
+   * definition.
    *
    * <p>If the denominator evaluates to zero (division-by-zero), either directly as value or
    * indirectly via an additional constraint, then the solver is allowed to choose an arbitrary
