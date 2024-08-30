@@ -27,7 +27,8 @@ public interface IntegerFormulaManager
 
   /**
    * Create a formula representing the modulo of two operands according to Boute's Euclidean
-   * definition.
+   * definition. The quotient (div numerator denominator) of the internal modulo calculation is
+   * floored for positive denominators and rounded up for negative denominators.
    *
    * <p>If the denominator evaluates to zero (modulo-by-zero), either directly as value or
    * indirectly via an additional constraint, then the solver is allowed to choose an arbitrary
