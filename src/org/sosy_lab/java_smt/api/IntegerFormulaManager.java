@@ -35,16 +35,18 @@ public interface IntegerFormulaManager
    * Ints or Reals theory).
    *
    * <p>Examples:
-   * <li>10 % 5 == 0
-   * <li>10 % 3 == 1
-   * <li>10 % (-3) == 1
-   * <li>-10 % 5 == 0
-   * <li>-10 % 3 == 2
-   * <li>-10 % (-3) == 2
    *
-   *     <p>Note: Some solvers, e.g., Yices2, abort with an exception when exploring a
-   *     modulo-by-zero during the SAT-check. This is not compliant to the SMTLIB standard, but
-   *     sadly happens.
+   * <ul>
+   *   <li>10 % 5 == 0
+   *   <li>10 % 3 == 1
+   *   <li>10 % (-3) == 1
+   *   <li>-10 % 5 == 0
+   *   <li>-10 % 3 == 2
+   *   <li>-10 % (-3) == 2
+   * </ul>
+   *
+   * <p>Note: Some solvers, e.g., Yices2, abort with an exception when exploring a modulo-by-zero
+   * during the SAT-check. This is not compliant to the SMTLIB standard, but sadly happens.
    */
   IntegerFormula modulo(IntegerFormula numerator, IntegerFormula denominator);
 
