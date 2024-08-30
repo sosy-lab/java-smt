@@ -147,9 +147,10 @@ public interface BitvectorFormulaManager {
    * This method returns the two complement signed remainder for the Euclidean division (modulo) of
    * two bitvector formulas.
    *
-   * <p>The sign of the result follows the sign of the divisor, e.g., a user can assume the
-   * following equations, with bitvectors interpreted as signed decimal numbers and % representing
-   * signed modulo, to hold:
+   * <p>The sign of the result follows the sign of the divisor, i.e. the quotient calculated in the
+   * modulo operation is rounded in such a way that the result of the smodulo operation follows the
+   * sign of the divisor, e.g., a user can assume the following equations, with bitvectors
+   * interpreted as signed decimal numbers and % representing signed modulo, to hold:
    *
    * <ul>
    *   <li>10 % 5 == 0
@@ -178,9 +179,11 @@ public interface BitvectorFormulaManager {
    *
    * <p>For unsigned bitvectors, this returns the remainder of unsigned bitvector division.
    *
-   * <p>For signed bitvectors, the sign of the result follows the sign of the dividend, e.g., a user
-   * can assume the following equations, with bitvectors interpreted as signed decimal numbers and %
-   * representing signed remainder (similar to the C programming language), to hold:
+   * <p>For signed bitvectors, the sign of the result follows the sign of the dividend, i.e. the
+   * quotient of the division is rounded in such a way that the sign of the result of the remainder
+   * operation follows the sign of the dividend, e.g., a user can assume the following equations,
+   * with bitvectors interpreted as signed decimal numbers and % representing signed remainder
+   * (similar to the C programming language), to hold:
    *
    * <ul>
    *   <li>10 % 5 == 0
