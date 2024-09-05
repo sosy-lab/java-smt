@@ -35,7 +35,6 @@ import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractInterpolatingProver;
-import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
 
 abstract class Z3AbstractProver extends AbstractInterpolatingProver<Void> {
@@ -55,7 +54,8 @@ abstract class Z3AbstractProver extends AbstractInterpolatingProver<Void> {
       Set<ProverOptions> pOptions,
       @Nullable PathCounterTemplate pLogfile,
       ShutdownNotifier pShutdownNotifier) {
-    super(pOptions, pMgr.getBooleanFormulaManager(), pCreator, pShutdownNotifier);
+    super(pOptions, pMgr.getBooleanFormulaManager(), pShutdownNotifier, pCreator,
+        pMgr.getQuantifiedFormulaManager());
     creator = pCreator;
     z3context = creator.getEnv();
 

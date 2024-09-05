@@ -29,23 +29,20 @@ import org.sosy_lab.java_smt.api.SolverException;
 public abstract class AbstractInterpolatingProver<F> extends AbstractProverWithAllSat<F>
     implements InterpolatingProverEnvironment<F> {
 
-  private final FormulaCreator<F, ?, ?, ?> creator;
+  private final FormulaCreator<?, ?, ?, ?> creator;
   private final QuantifiedFormulaManager qfmgr;
   private final BooleanFormulaManager bmgr;
-  private final InterpolatingProverEnvironment<F> prover;
 
   protected AbstractInterpolatingProver(
       Set<ProverOptions> pOptions,
       BooleanFormulaManager pBmgr,
       ShutdownNotifier pShutdownNotifier,
-      FormulaCreator<F, ?, ?, ?> pCreator,
-      QuantifiedFormulaManager pQfmgr,
-      InterpolatingProverEnvironment<F> pProver) {
+      FormulaCreator<?, ?, ?, ?> pCreator,
+      QuantifiedFormulaManager pQfmgr) {
     super(pOptions, pBmgr, pShutdownNotifier);
     bmgr = pBmgr;
     creator = pCreator;
     qfmgr = pQfmgr;
-    prover = pProver;
   }
 
   @Override
@@ -77,10 +74,10 @@ public abstract class AbstractInterpolatingProver<F> extends AbstractProverWithA
         "interpolation can only be done over previously asserted formulas.");
 
     // free arithmetic variables a and b
-    final Set<F> assertedFormulas = transformedImmutableSetCopy(getAssertedFormulas(),
+    final Set<?> assertedFormulas = transformedImmutableSetCopy(getAssertedFormulas(),
         creator::extractInfo);
     final Set<F> a = ImmutableSet.copyOf(pFormulasOfA);
-    final Set<F> b = Sets.difference(assertedFormulas, a);
+    final Set<?> b = Sets.difference(assertedFormulas, a);
 
     // shared variables between a and b
     final Set<F> shared = Sets.intersection(a, b); // nur formeln, brauche aber variablen ->
@@ -99,10 +96,10 @@ public abstract class AbstractInterpolatingProver<F> extends AbstractProverWithA
 
     // bekomme dann eine Booleanformula itp(shared)
 
-    prover.push();
+    push();
 
     // itp(shared)
-    BooleanFormula itp = prover.getInterpolant(shared);
+    BooleanFormula itp = getInterpolant(shared);
 
     // a und b nicht casten, sondern liste separat als bmgr.and() formel und das Ergebnis fuer
     // ein neues bmgr.and()
@@ -116,14 +113,14 @@ public abstract class AbstractInterpolatingProver<F> extends AbstractProverWithA
     // z3.ForAll([b for b in Bs], z3.Implies(Itp(shared), z3.Not(B)))
     // BooleanFormula right = qfmgr.forall((List<? extends Formula>) b, (bmgr.and(itp, b)));
 
-    boolean result = prover.isUnsat();
+    boolean result = isUnsat();
     if (!result) {
       // BooleanFormula answer = prover.getModel().evaluate(itp); // ??? isUnsat should be false?
       // return prover.getInterpolant((Collection<F>) itp);
       // else { false } // makefalse in BOoleanFOrmulamanager
     }
 
-    prover.pop(); // ??? hier stack wieder aufbauen
+    pop(); // ??? hier stack wieder aufbauen
 
     // return answer;
     return null;
