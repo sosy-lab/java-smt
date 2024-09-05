@@ -76,6 +76,20 @@ public abstract class AbstractInterpolatingProver<F> extends AbstractProverWithA
    * return None
    */
   private BooleanFormula getModelBasedInterpolant(Collection<F> pFormulasOfA) {
+    checkState(!closed);
+    checkArgument(getAssertedConstraintIds().containsAll(pFormulasOfA),
+        "interpolation can only be done over previously asserted formulas.");
+
+    // free arithmetic variables a and b
+    final Set<?> assertedFormulas = transformedImmutableSetCopy(getAssertedFormulas(),
+        creator::extractInfo);
+    final Set<?> a = ImmutableSet.copyOf(pFormulasOfA);
+    final Set<?> b = Sets.difference(assertedFormulas, a);
+
+    // shared variables between a and b
+    final Set<?> sharedFormulas = Sets.intersection(a, b);
+
+
     return null;
   }
 }
