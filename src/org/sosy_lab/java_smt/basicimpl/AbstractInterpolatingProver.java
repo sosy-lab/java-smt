@@ -75,62 +75,7 @@ public abstract class AbstractInterpolatingProver<F> extends AbstractProverWithA
    *    return answer.eval(Itp(shared))
    * return None
    */
-  private BooleanFormula getModelBasedInterpolant(Collection<F> pFormulasOfA)
-      throws SolverException, InterruptedException {
-    checkState(!closed);
-    checkArgument(getAssertedConstraintIds().containsAll(pFormulasOfA),
-        "interpolation can only be done over previously asserted formulas.");
-
-    // free arithmetic variables a and b
-    final Set<?> assertedFormulas = transformedImmutableSetCopy(getAssertedFormulas(),
-        creator::extractInfo);
-    final Set<F> a = ImmutableSet.copyOf(pFormulasOfA);
-    final Set<?> b = Sets.difference(assertedFormulas, a);
-
-    // shared variables between a and b
-    final Set<F> shared = Sets.intersection(a, b); // nur formeln, brauche aber variablen ->
-    // extractVariables...
-    // visitor -> formula creator
-
-    // itp(shared) => callFunction (ausfuehren der itp), declare
-    // schau in tests: ufmanagertest
-    // F in BooleanFOrmula umwandeln kann fehlschlagen
-    // instanceOF herausfinden welchen Typ, getBitvectortype
-
-    // siehe code
-
-    // abstrakte implementierungen: floatingpointformulaimpl, ... -> manager bzw. formula
-    // (interface implementierungen anschauen wie z.B. EMmurationFOrmula, numeralformula, ...)
-
-    // bekomme dann eine Booleanformula itp(shared)
-
-    push();
-
-    // itp(shared)
-    BooleanFormula itp = getInterpolant(shared);
-
-    // a und b nicht casten, sondern liste separat als bmgr.and() formel und das Ergebnis fuer
-    // ein neues bmgr.and()
-
-    // left: A /\ NOT I
-    // z3.ForAll([a for a in As], z3.Implies(A, Itp(shared)))
-    // BooleanFormula left = qfmgr.forall((List<? extends Formula>) a, (bmgr.and(a, bmgr.not(itp)
-    // )));
-
-    // right: I /\ B
-    // z3.ForAll([b for b in Bs], z3.Implies(Itp(shared), z3.Not(B)))
-    // BooleanFormula right = qfmgr.forall((List<? extends Formula>) b, (bmgr.and(itp, b)));
-
-    boolean result = isUnsat();
-    if (!result) {
-      // BooleanFormula answer = prover.getModel().evaluate(itp); // ??? isUnsat should be false?
-      // return prover.getInterpolant((Collection<F>) itp);
-      // else { false } // makefalse in BOoleanFOrmulamanager
-    }
-
-    pop(); // ??? hier stack wieder aufbauen
-
-    // return answer;
+  private BooleanFormula getModelBasedInterpolant(Collection<F> pFormulasOfA) {
     return null;
   }
 }
