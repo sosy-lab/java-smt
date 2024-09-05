@@ -17,10 +17,11 @@ import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 
-class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements ProverEnvironment {
+class Mathsat5TheoremProver extends Mathsat5AbstractProver<Formula> implements ProverEnvironment {
 
   Mathsat5TheoremProver(
       Mathsat5SolverContext pMgr,
@@ -36,11 +37,10 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
   }
 
   @Override
-  @Nullable
-  protected Void addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
+  protected Formula addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
     Preconditions.checkState(!closed);
     closeAllEvaluators();
     msat_assert_formula(curEnv, getMsatTerm(constraint));
-    return null;
+    return constraint;
   }
 }

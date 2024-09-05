@@ -10,13 +10,14 @@ package org.sosy_lab.java_smt.solvers.opensmt;
 
 import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtSolverContext.OpenSMTOptions;
 import org.sosy_lab.java_smt.solvers.opensmt.api.PTRef;
 
-class OpenSmtTheoremProver extends OpenSmtAbstractProver<Void> implements ProverEnvironment {
+class OpenSmtTheoremProver extends OpenSmtAbstractProver<Formula> implements ProverEnvironment {
 
   OpenSmtTheoremProver(
       OpenSmtFormulaCreator pFormulaCreator,
@@ -33,8 +34,8 @@ class OpenSmtTheoremProver extends OpenSmtAbstractProver<Void> implements Prover
   }
 
   @Override
-  public Void addConstraintImpl(PTRef f) throws InterruptedException {
+  public Formula addConstraintImpl(PTRef f) throws InterruptedException {
     osmtSolver.insertFormula(f);
-    return null;
+    return (Formula) f;
   }
 }

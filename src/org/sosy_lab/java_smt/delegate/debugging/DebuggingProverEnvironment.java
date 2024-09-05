@@ -9,12 +9,13 @@
 package org.sosy_lab.java_smt.delegate.debugging;
 
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 
-public class DebuggingProverEnvironment extends DebuggingBasicProverEnvironment<Void>
+public class DebuggingProverEnvironment extends DebuggingBasicProverEnvironment<Formula>
     implements ProverEnvironment {
   public DebuggingProverEnvironment(
-      BasicProverEnvironment<Void> pDelegate, DebuggingAssertions pDebugging) {
+      BasicProverEnvironment<Formula> pDelegate, DebuggingAssertions pDebugging) {
     super(pDelegate, pDebugging);
   }
 }

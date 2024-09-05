@@ -13,10 +13,11 @@ import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 
-class PrincessTheoremProver extends PrincessAbstractProver<Void> implements ProverEnvironment {
+class PrincessTheoremProver extends PrincessAbstractProver<Formula> implements ProverEnvironment {
 
   PrincessTheoremProver(
       PrincessFormulaManager pMgr,
@@ -28,9 +29,8 @@ class PrincessTheoremProver extends PrincessAbstractProver<Void> implements Prov
   }
 
   @Override
-  @Nullable
-  protected Void addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
+  protected Formula addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
     addConstraint0(constraint);
-    return null;
+    return constraint;
   }
 }

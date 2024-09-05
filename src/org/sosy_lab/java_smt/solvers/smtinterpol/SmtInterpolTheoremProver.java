@@ -13,10 +13,11 @@ import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 
-class SmtInterpolTheoremProver extends SmtInterpolAbstractProver<Void>
+class SmtInterpolTheoremProver extends SmtInterpolAbstractProver<Formula>
     implements ProverEnvironment {
 
   SmtInterpolTheoremProver(
@@ -28,9 +29,8 @@ class SmtInterpolTheoremProver extends SmtInterpolAbstractProver<Void>
   }
 
   @Override
-  @Nullable
-  protected Void addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
+  protected Formula addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
     addConstraint0(constraint);
-    return null;
+    return constraint;
   }
 }

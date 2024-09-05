@@ -14,7 +14,7 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
 
-public class DebuggingOptimizationProverEnvironment extends DebuggingBasicProverEnvironment<Void>
+public class DebuggingOptimizationProverEnvironment extends DebuggingBasicProverEnvironment<Formula>
     implements OptimizationProverEnvironment {
   private final OptimizationProverEnvironment delegate;
   private final DebuggingAssertions debugging;

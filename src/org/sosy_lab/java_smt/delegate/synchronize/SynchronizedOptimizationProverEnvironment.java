@@ -15,7 +15,7 @@ import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
 
-class SynchronizedOptimizationProverEnvironment extends SynchronizedBasicProverEnvironment<Void>
+class SynchronizedOptimizationProverEnvironment extends SynchronizedBasicProverEnvironment<Formula>
     implements OptimizationProverEnvironment {
 
   private final OptimizationProverEnvironment delegate;

@@ -40,7 +40,7 @@ import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
-class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
+class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Formula>
     implements OptimizationProverEnvironment {
 
   private static final int ERROR_TERM = 0;
@@ -69,10 +69,9 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
   }
 
   @Override
-  @Nullable
-  protected Void addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
+  protected Formula addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
     msat_assert_formula(curEnv, getMsatTerm(constraint));
-    return null;
+    return constraint;
   }
 
   @Override

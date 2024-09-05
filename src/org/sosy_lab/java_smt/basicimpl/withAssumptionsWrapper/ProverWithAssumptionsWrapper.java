@@ -8,10 +8,11 @@
 
 package org.sosy_lab.java_smt.basicimpl.withAssumptionsWrapper;
 
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 
 public class ProverWithAssumptionsWrapper
-    extends BasicProverWithAssumptionsWrapper<Void, ProverEnvironment>
+    extends BasicProverWithAssumptionsWrapper<Formula, ProverEnvironment>
     implements ProverEnvironment {
 
   public ProverWithAssumptionsWrapper(ProverEnvironment pDelegate) {

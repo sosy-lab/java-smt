@@ -11,12 +11,13 @@ package org.sosy_lab.java_smt.solvers.cvc5;
 import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 
-class CVC5TheoremProver extends CVC5AbstractProver<Void>
-    implements ProverEnvironment, BasicProverEnvironment<Void> {
+class CVC5TheoremProver extends CVC5AbstractProver<Formula>
+    implements ProverEnvironment, BasicProverEnvironment<Formula> {
 
   protected CVC5TheoremProver(
       CVC5FormulaCreator pFormulaCreator,

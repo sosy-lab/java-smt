@@ -14,7 +14,7 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
 
-class StatisticsOptimizationProverEnvironment extends StatisticsBasicProverEnvironment<Void>
+class StatisticsOptimizationProverEnvironment extends StatisticsBasicProverEnvironment<Formula>
     implements OptimizationProverEnvironment {
 
   private final OptimizationProverEnvironment delegate;

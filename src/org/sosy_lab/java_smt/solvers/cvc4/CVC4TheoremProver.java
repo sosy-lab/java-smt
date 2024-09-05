@@ -28,6 +28,7 @@ import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.Evaluator;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
@@ -35,8 +36,8 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.basicimpl.ShutdownHook;
 
-class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
-    implements ProverEnvironment, BasicProverEnvironment<Void> {
+class CVC4TheoremProver extends AbstractProverWithAllSat<Formula>
+    implements ProverEnvironment, BasicProverEnvironment<Formula> {
 
   private final CVC4FormulaCreator creator;
   SmtEngine smtEngine; // final except for SL theory
@@ -123,14 +124,14 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   }
 
   @Override
-  protected @Nullable Void addConstraintImpl(BooleanFormula pF) throws InterruptedException {
+  protected Formula addConstraintImpl(BooleanFormula pF) throws InterruptedException {
     Preconditions.checkState(!closed);
     setChanged();
     Expr exp = creator.extractInfo(pF);
     if (incremental) {
       smtEngine.assertFormula(importExpr(exp));
     }
-    return null;
+    return pF;
   }
 
   @SuppressWarnings("resource")

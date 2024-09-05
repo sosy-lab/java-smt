@@ -18,6 +18,7 @@ import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
@@ -33,7 +34,7 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.Term;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Terminator;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Term;
 
-class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements ProverEnvironment {
+class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Formula> implements ProverEnvironment {
   private final Terminator terminator =
       new Terminator() {
         @Override
@@ -91,10 +92,10 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   }
 
   @Override
-  public @Nullable Void addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
+  public @Nullable Formula addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
     wasLastSatCheckSat = false;
     env.assert_formula(((BitwuzlaBooleanFormula) constraint).getTerm());
-    return null;
+    return constraint;
   }
 
   /**
