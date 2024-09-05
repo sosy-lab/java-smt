@@ -17,6 +17,7 @@ import static org.sosy_lab.common.collect.Collections3.transformedImmutableSetCo
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -49,6 +50,13 @@ public abstract class AbstractInterpolatingProver<F> extends AbstractProverWithA
   public BooleanFormula getInterpolant(Collection<F> pFormulasOfA)
       throws SolverException, InterruptedException {
     return getModelBasedInterpolant(pFormulasOfA);
+  }
+
+  @Override
+  public List<BooleanFormula> getTreeInterpolants(
+      List<? extends Collection<F>> partitionedFormulas,
+      int[] startOfSubTree) throws SolverException, InterruptedException {
+    return List.of();
   }
 
   /**
