@@ -87,7 +87,6 @@ public abstract class AbstractInterpolatingProver<F> extends AbstractProverWithA
     final Set<F> a = ImmutableSet.copyOf(pFormulasOfA);
     final Set<?> b = Sets.difference(assertedFormulas, a);
 
-    System.out.println("bla");
     // shared variables between a and b
     final Set<F> shared = Sets.intersection(a, b); // nur formeln, brauche aber variablen ->
     // extractVariables...

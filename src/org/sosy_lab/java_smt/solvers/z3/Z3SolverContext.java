@@ -235,7 +235,12 @@ public final class Z3SolverContext extends AbstractSolverContext {
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> options) {
-    throw new UnsupportedOperationException("Z3 does not support interpolation");
+    Preconditions.checkState(!closed, "solver context is already closed");
+    final ImmutableMap<String, Object> solverOptions =
+        ImmutableMap.<String, Object>builder()
+            .build();
+    return new Z3TheoremProver(
+        creator, manager, options, solverOptions, extraOptions.logfile, shutdownNotifier);
   }
 
   @Override
