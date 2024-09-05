@@ -31,13 +31,14 @@ import org.sosy_lab.common.collect.PathCopyingPersistentTreeMap;
 import org.sosy_lab.common.collect.PersistentMap;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractInterpolatingProver;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
 
-abstract class Z3AbstractProver extends AbstractInterpolatingProver<Void> {
+abstract class Z3AbstractProver extends AbstractInterpolatingProver<Formula> {
 
   protected final Z3FormulaCreator creator;
   protected final long z3context;
@@ -123,7 +124,7 @@ abstract class Z3AbstractProver extends AbstractInterpolatingProver<Void> {
   protected abstract void assertContraintAndTrack(long constraint, long symbol);
 
   @Override
-  protected Void addConstraintImpl(BooleanFormula f) throws InterruptedException {
+  protected Formula addConstraintImpl(BooleanFormula f) throws InterruptedException {
     Preconditions.checkState(!closed);
     long e = creator.extractInfo(f);
     try {
@@ -138,7 +139,7 @@ abstract class Z3AbstractProver extends AbstractInterpolatingProver<Void> {
     } catch (Z3Exception exception) {
       throw creator.handleZ3Exception(exception);
     }
-    return null;
+    return f;
   }
 
   protected void push0() {

@@ -21,4 +21,4 @@ import org.sosy_lab.common.ShutdownNotifier;
  * shutdown request via the {@link ShutdownNotifier}. It is not guaranteed, though, that solvers
  * respond in a timely manner (or at all) to shut down or interrupt requests.
  */
-public interface ProverEnvironment extends BasicProverEnvironment<Void> {}
+public interface ProverEnvironment extends BasicProverEnvironment<Formula> {}
