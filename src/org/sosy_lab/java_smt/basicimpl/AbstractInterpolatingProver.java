@@ -16,165 +16,116 @@ import static org.sosy_lab.common.collect.Collections3.transformedImmutableSetCo
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
-import io.github.cvc5.Kind;
-import io.github.cvc5.Solver;
-import io.github.cvc5.Term;
 import java.util.Collection;
 import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
-import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
+import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 public abstract class AbstractInterpolatingProver<F> extends AbstractProverWithAllSat<F>
     implements InterpolatingProverEnvironment<F> {
 
-  private final FormulaCreator<F, Object, Object, Object> creator;
-  private final FormulaManager mgr;
-  private final Set<ProverOptions> solverOptions;
-  private final int seed;
+  private final FormulaCreator<F, ?, ?, ?> creator;
+  private final QuantifiedFormulaManager qfmgr;
   private final BooleanFormulaManager bmgr;
-  private final boolean validateInterpolants;
-  protected final boolean incremental;
+  private final InterpolatingProverEnvironment<F> prover;
 
   protected AbstractInterpolatingProver(
       Set<ProverOptions> pOptions,
-      FormulaManager pMgr,
       BooleanFormulaManager pBmgr,
-      FormulaCreator<F, Object, Object, Object> pCreator,
       ShutdownNotifier pShutdownNotifier,
-      int randomSeed,
-      boolean pValidateInterpolants) {
+      FormulaCreator<F, ?, ?, ?> pCreator,
+      QuantifiedFormulaManager pQfmgr,
+      InterpolatingProverEnvironment<F> pProver) {
     super(pOptions, pBmgr, pShutdownNotifier);
-    creator = pCreator;
-    mgr = pMgr;
-    solverOptions = pOptions;
-    seed = randomSeed;
     bmgr = pBmgr;
-    validateInterpolants = pValidateInterpolants;
-    incremental = !enableSL;
+    creator = pCreator;
+    qfmgr = pQfmgr;
+    prover = pProver;
   }
 
   @Override
   public BooleanFormula getInterpolant(Collection<F> pFormulasOfA)
       throws SolverException, InterruptedException {
+    return getModelBasedInterpolant(pFormulasOfA);
+  }
+
+  /**
+   * As = free_arith_vars(A)
+   * Bs = free_arith_vars(B)
+   *
+   * shared = [s for s in As & Bs ]
+   *
+   * Itp = z3.Function('Itp', [s.sort() for s in shared] + [z3.BoolSort()])
+   * left = z3.ForAll([a for a in As], z3.Implies(A, Itp(shared)))
+   * right = z3.ForAll([b for b in Bs], z3.Implies(Itp(shared), z3.Not(B)))
+   *
+   * res, answer = solve_horn([left, right])
+   *
+   * if res == z3.sat:
+   *    return answer.eval(Itp(shared))
+   * return None
+   */
+  private BooleanFormula getModelBasedInterpolant(Collection<F> pFormulasOfA)
+      throws SolverException, InterruptedException {
     checkState(!closed);
-    checkArgument(
-        getAssertedConstraintIds().containsAll(pFormulasOfA),
+    checkArgument(getAssertedConstraintIds().containsAll(pFormulasOfA),
         "interpolation can only be done over previously asserted formulas.");
 
-    final Set<F> assertedFormulas =
-        transformedImmutableSetCopy(getAssertedFormulas(), creator::extractInfo);
-    final Set<F> formulasOfA = ImmutableSet.copyOf(pFormulasOfA);
-    final Set<F> formulasOfB = Sets.difference(assertedFormulas, formulasOfA);
+    // free arithmetic variables a and b
+    final Set<F> assertedFormulas = transformedImmutableSetCopy(getAssertedFormulas(),
+        creator::extractInfo);
+    final Set<F> a = ImmutableSet.copyOf(pFormulasOfA);
+    final Set<F> b = Sets.difference(assertedFormulas, a);
 
-    F itp = getModelBasedInterpolant(formulasOfA, formulasOfB);
-    return creator.encapsulateBoolean(itp);
-  }
+    // shared variables between a and b
+    final Set<F> shared = Sets.intersection(a, b); // nur formeln, brauche aber variablen ->
+    // extractVariables...
+    // visitor -> formula creator
 
-  private F getModelBasedInterpolant(Collection<F> formulasA, Collection<F> formulasB) {
-    F phiPlus = (F) andImpl(formulasA);
-    F phiMinus = (F) andImpl(formulasB);
+    // itp(shared) => callFunction (ausfuehren der itp), declare
+    // schau in tests: ufmanagertest
+    // F in BooleanFOrmula umwandeln kann fehlschlagen
+    // instanceOF herausfinden welchen Typ, getBitvectortype
 
-    // uses a separate Solver instance to leave the original solver-context unmodified
-    Solver itpSolver = new Solver();
+    // siehe code
 
-    setSolverOptions(seed, solverOptions, itpSolver);
+    // abstrakte implementierungen: floatingpointformulaimpl, ... -> manager bzw. formula
+    // (interface implementierungen anschauen wie z.B. EMmurationFOrmula, numeralformula, ...)
 
-    F interpolant;
-    try {
-      itpSolver.assertFormula((Term) phiPlus); // type cast so that it works... need to be changed
-      interpolant = (F) itpSolver.getInterpolant(itpSolver.mkTerm(Kind.NOT, (Term) phiMinus));
-    } finally {
-      itpSolver.deletePointer();
+    // bekomme dann eine Booleanformula itp(shared)
+
+    prover.push();
+
+    // itp(shared)
+    BooleanFormula itp = prover.getInterpolant(shared);
+
+    // a und b nicht casten, sondern liste separat als bmgr.and() formel und das Ergebnis fuer
+    // ein neues bmgr.and()
+
+    // left: A /\ NOT I
+    // z3.ForAll([a for a in As], z3.Implies(A, Itp(shared)))
+    // BooleanFormula left = qfmgr.forall((List<? extends Formula>) a, (bmgr.and(a, bmgr.not(itp)
+    // )));
+
+    // right: I /\ B
+    // z3.ForAll([b for b in Bs], z3.Implies(Itp(shared), z3.Not(B)))
+    // BooleanFormula right = qfmgr.forall((List<? extends Formula>) b, (bmgr.and(itp, b)));
+
+    boolean result = prover.isUnsat();
+    if (!result) {
+      // BooleanFormula answer = prover.getModel().evaluate(itp); // ??? isUnsat should be false?
+      // return prover.getInterpolant((Collection<F>) itp);
+      // else { false } // makefalse in BOoleanFOrmulamanager
     }
 
-    if (validateInterpolants) {
-      checkModelBasedInterpolationCriteria(interpolant, phiPlus, phiMinus);
-    }
+    prover.pop(); // ??? hier stack wieder aufbauen
 
-    return interpolant;
-  }
-  
-  protected BooleanFormula andImpl(Collection<F> pParams) {
-    BooleanFormula result = bmgr.makeBooleanImpl(true);
-    for (F formula : ImmutableSet.copyOf(pParams)) {
-      if (bmgr.isFalse((BooleanFormula) formula)) {
-        return (BooleanFormula) formula;
-      }
-      result = bmgr.and((BooleanFormula) result, (BooleanFormula) formula);
-    }
-    return result;
-  }
-
-  private void checkModelBasedInterpolationCriteria(F interpolant, F phiPlus, F phiMinus) {
-    // checks that every Symbol of the interpolant appears either in term A or term B
-    Set<String> interpolantSymbols =
-        mgr.extractVariablesAndUFs(creator.encapsulateBoolean(interpolant)).keySet();
-    Set<String> interpolASymbols =
-        mgr.extractVariablesAndUFs(creator.encapsulateBoolean(phiPlus)).keySet();
-    Set<String> interpolBSymbols =
-        mgr.extractVariablesAndUFs(creator.encapsulateBoolean(phiMinus)).keySet();
-    Set<String> intersection = Sets.intersection(interpolASymbols, interpolBSymbols);
-    checkState(
-        intersection.containsAll(interpolantSymbols),
-        "Interpolant contains symbols %s that are not part of both input formulas.",
-        Sets.difference(interpolantSymbols, intersection));
-
-    // build and check both Craig interpolation formulas with the generated interpolant.
-    Solver validationSolver = new Solver();
-    // interpolation option is not required for validation
-    setSolverOptions(seed, solverOptions, validationSolver);
-    try {
-      validationSolver.push();
-      validationSolver.assertFormula(validationSolver.mkTerm(Kind.IMPLIES, (Term) phiPlus,
-          (Term) interpolant));
-      checkState(
-          validationSolver.checkSat().isSat(),
-          "Invalid Craig interpolation: phi+ does not imply the interpolant.");
-      validationSolver.pop();
-
-      validationSolver.push();
-      validationSolver.assertFormula(validationSolver.mkTerm(Kind.AND, (Term) interpolant,
-          (Term) phiMinus));
-      checkState(
-          validationSolver.checkSat().isUnsat(),
-          "Invalid Craig interpolation: interpolant does not contradict phi-.");
-      validationSolver.pop();
-
-    } catch (Exception e) {
-      throw new IllegalArgumentException(
-          "Failure when validating interpolant '" + interpolant + "'.", e);
-
-    } finally {
-      validationSolver.deletePointer();
-    }
-  }
-
-  protected void setSolverOptions(int randomSeed, Set<ProverOptions> pOptions, Solver pSolver) {
-    if (incremental) {
-      pSolver.setOption("incremental", "true");
-    }
-    if (pOptions.contains(ProverOptions.GENERATE_MODELS)) {
-      pSolver.setOption("produce-models", "true");
-    }
-    if (pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE)) {
-      pSolver.setOption("produce-unsat-cores", "true");
-    }
-    pSolver.setOption("produce-assertions", "true");
-    pSolver.setOption("dump-models", "true");
-    pSolver.setOption("output-language", "smt2");
-    pSolver.setOption("seed", String.valueOf(randomSeed));
-
-    // Set Strings option to enable all String features (such as lessOrEquals)
-    pSolver.setOption("strings-exp", "true");
-
-    // Enable more complete quantifier solving (for more info see CVC5QuantifiedFormulaManager)
-    pSolver.setOption("full-saturate-quant", "true");
-
-    pSolver.setOption("produce-interpolants", "true");
+    // return answer;
+    return null;
   }
 }
